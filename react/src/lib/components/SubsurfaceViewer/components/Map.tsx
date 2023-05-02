@@ -29,12 +29,7 @@ import {
 import { LayerPickInfo } from "../layers/utils/layerTools";
 import { getLayersByType } from "../layers/utils/layerTools";
 import { getWellLayerByTypeAndSelectedWells } from "../layers/utils/layerTools";
-import {
-    WellsLayer,
-    AxesLayer,
-    Axes2DLayer,
-    NorthArrow3DLayer,
-} from "../layers";
+import { WellsLayer, Axes2DLayer, NorthArrow3DLayer } from "../layers";
 
 import { isEmpty, isEqual } from "lodash";
 import { cloneDeep } from "lodash";
@@ -342,6 +337,10 @@ const Map: React.FC<MapProps> = ({
     const [viewsProps, setViewsProps] = useState<ViewportType[]>([]);
     const [alteredLayers, setAlteredLayers] = useState<LayersList>([]);
 
+    const [centerOfData, setCenterOfData] = useState<[number, number, number]>([
+        0, 0, 0,
+    ]);
+
     const [viewPortMargins, setViewPortMargins] = useState<marginsType>({
         left: 0,
         right: 0,
@@ -352,6 +351,7 @@ const Map: React.FC<MapProps> = ({
     const initialViewState = getViewState(
         viewPortMargins,
         boundsInitial,
+        centerOfData,
         views?.viewports?.[0].target,
         views?.viewports?.[0].zoom,
         deckRef.current?.deck
@@ -367,30 +367,14 @@ const Map: React.FC<MapProps> = ({
         );
         setReportedBoundingBoxAcc(union_of_reported_bboxes);
 
-        const axesLayer = layers?.find((e) => {
-            return e?.constructor === AxesLayer;
-        }) as AxesLayer;
-        // target: camera will look at either center of axes if it exists or center of data ("union_of_reported_bboxes")
-        let target = boundingBoxCenter(
-            (axesLayer?.props.bounds ?? union_of_reported_bboxes) as BoundingBox
+        const center = boundingBoxCenter(
+            union_of_reported_bboxes // note this will include potential axesLayer
         );
-
-        const isBoundsDefined = typeof bounds !== "undefined";
-        if (isBoundsDefined) {
-            // if bounds are defined we only use z value of target and x,y set to middle of bounds.
-            const z = target[2];
-            const bounds_ =
-                typeof boundsInitial == "function"
-                    ? boundsInitial()
-                    : boundsInitial;
-
-            const x = bounds_[0] + 0.5 * (bounds_[2] - bounds_[0]); // right - left
-            const y = bounds_[1] + 0.5 * (bounds_[3] - bounds_[1]); // top - bottom
-            target = [x, y, z];
-        }
+        setCenterOfData(center);
 
         const updatedViewProps = input ? input : viewsProps;
 
+        const isBoundsDefined = typeof bounds !== "undefined";
         const viewStateMap = updatedViewProps.map((item, index) => {
             const is3D = views?.viewports?.[index]?.show3D ?? false;
 
@@ -398,6 +382,7 @@ const Map: React.FC<MapProps> = ({
                 ? getViewState(
                       viewPortMargins,
                       boundsInitial,
+                      center,
                       views?.viewports?.[index].target,
                       views?.viewports?.[index].zoom,
                       deckRef.current?.deck
@@ -450,6 +435,7 @@ const Map: React.FC<MapProps> = ({
                             : getViewState(
                                   viewPortMargins,
                                   boundsInitial,
+                                  centerOfData,
                                   views?.viewports?.[index].target,
                                   views?.viewports?.[index].zoom,
                                   deckRef.current?.deck
@@ -478,6 +464,7 @@ const Map: React.FC<MapProps> = ({
                     getViewState(
                         viewPortMargins,
                         boundsInitial,
+                        centerOfData,
                         views?.viewports?.[index].target,
                         views?.viewports?.[index].zoom,
                         deckRef.current?.deck
@@ -520,6 +507,7 @@ const Map: React.FC<MapProps> = ({
                     getViewState(
                         viewPortMargins,
                         boundsInitial,
+                        centerOfData,
                         views?.viewports?.[index].target,
                         views?.viewports?.[index].zoom,
                         deckRef.current?.deck
@@ -1005,6 +993,7 @@ export function jsonToObject(
 function getViewState(
     viewPortMargins: marginsType,
     bounds_accessor: [number, number, number, number] | BoundsAccessor,
+    centerOfData: [number, number, number],
     target?: number[],
     zoom?: number,
     deck?: Deck
@@ -1019,8 +1008,10 @@ function getViewState(
     let w = bounds[2] - bounds[0]; // right - left
     let h = bounds[3] - bounds[1]; // top - bottom
 
+    const z = centerOfData[2];
+
     const fb = fitBounds({ width: w, height: h, bounds });
-    let fb_target = [fb.x, fb.y, 0];
+    let fb_target = [fb.x, fb.y, z];
     let fb_zoom = fb.zoom;
 
     if (deck) {
@@ -1063,7 +1054,7 @@ function getViewState(
         }
 
         const fb = fitBounds({ width: w, height: h, bounds });
-        fb_target = [fb.x - translate_x, fb.y - translate_y, 0];
+        fb_target = [fb.x - translate_x, fb.y - translate_y, z];
         fb_zoom = fb.zoom;
     }
 
