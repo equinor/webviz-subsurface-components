@@ -4,6 +4,8 @@
  *
  * Copyright (C) 2020 - Equinor ASA. */
 
+/* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
+
 import { useState, useEffect, useContext } from "react";
 import PropTypes from "prop-types";
 import Context from "../../../utils/context";

@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
+
 import React from "react";
 import WellLogViewer from "./WellLogViewer";
 import { argTypesWellLogViewerProp } from "./WellLogViewer";
