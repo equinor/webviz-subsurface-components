@@ -8,7 +8,7 @@ import {
     colorTables,
 } from "@emerson-eps/color-tables";
 import { MapMouseEvent } from "../../components/Map";
-import { makeStyles } from "@material-ui/core";
+import makeStyles from "@mui/styles/makeStyles";
 
 export default {
     component: SubsurfaceViewer,

@@ -1,5 +1,7 @@
 import { Icon, Menu, Tooltip } from "@equinor/eds-core-react";
-import { createStyles, Fab, makeStyles, Theme } from "@material-ui/core";
+import { Fab, Theme } from "@mui/material";
+import createStyles from "@mui/styles/createStyles";
+import makeStyles from "@mui/styles/makeStyles";
 import React, { useCallback, useMemo } from "react";
 import { LayerIcons, LayerType } from "../../redux/types";
 import { getPropVisibility } from "../../utils/specExtractor";

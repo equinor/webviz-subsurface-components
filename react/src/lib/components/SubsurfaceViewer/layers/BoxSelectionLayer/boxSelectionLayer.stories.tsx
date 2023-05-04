@@ -1,4 +1,5 @@
-import { FormControlLabel, makeStyles, Switch } from "@material-ui/core";
+import { FormControlLabel, Switch } from "@mui/material";
+import makeStyles from "@mui/styles/makeStyles";
 import { ComponentMeta, ComponentStory } from "@storybook/react";
 import { PickInfo } from "lib";
 import React from "react";

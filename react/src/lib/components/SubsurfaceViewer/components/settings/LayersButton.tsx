@@ -1,5 +1,7 @@
 import { Icon, Menu, Tooltip } from "@equinor/eds-core-react";
-import { createStyles, Fab, makeStyles } from "@material-ui/core";
+import { Fab } from "@mui/material";
+import createStyles from "@mui/styles/createStyles";
+import makeStyles from "@mui/styles/makeStyles";
 import React, { ChangeEvent, useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { updateLayerProp, updateVisibleLayers } from "../../redux/actions";

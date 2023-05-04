@@ -1,6 +1,8 @@
 import { Icon } from "@equinor/eds-core-react";
 import { layers } from "@equinor/eds-icons";
-import { createStyles, makeStyles, Theme } from "@material-ui/core";
+import { Theme } from "@mui/material";
+import createStyles from "@mui/styles/createStyles";
+import makeStyles from "@mui/styles/makeStyles";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { MapState } from "../../redux/store";

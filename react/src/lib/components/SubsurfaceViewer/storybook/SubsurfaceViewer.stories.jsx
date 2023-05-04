@@ -1,7 +1,7 @@
 import React from "react";
 import SubsurfaceViewer from "../SubsurfaceViewer";
 import exampleData from "../../../../demo/example-data/deckgl-map.json";
-import { makeStyles } from "@material-ui/styles";
+import { makeStyles } from "@mui/styles";
 
 export default {
     component: SubsurfaceViewer,

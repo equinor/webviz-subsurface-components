@@ -3,8 +3,8 @@ import { useHoverInfo } from "../../components/Map";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import InfoCard from "../../components/InfoCard";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
-import { Slider } from "@material-ui/core";
-import { makeStyles } from "@material-ui/styles";
+import { Slider } from "@mui/material";
+import { makeStyles } from "@mui/styles";
 import { ContinuousLegend } from "@emerson-eps/color-tables";
 
 export default {
