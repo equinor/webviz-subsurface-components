@@ -359,16 +359,8 @@ const Map: React.FC<MapProps> = ({
 
     // Local help function.
     function calcDefaultViewStates(input?: ViewportType[]) {
-        // If "bounds" or "cameraPosition" is not defined "viewState" will be
-        // calculated based on the union of the reported bounding boxes from each layer.
-        const union_of_reported_bboxes = addBoundingBoxes(
-            reportedBoundingBoxAcc,
-            reportedBoundingBox
-        );
-        setReportedBoundingBoxAcc(union_of_reported_bboxes);
-
         const center = boundingBoxCenter(
-            union_of_reported_bboxes // note this will include potential axesLayer
+            reportedBoundingBoxAcc // note this will include potential axesLayer
         );
         setCenterOfData(center);
 
@@ -389,7 +381,7 @@ const Map: React.FC<MapProps> = ({
                   )
                 : getViewState3D(
                       is3D,
-                      union_of_reported_bboxes,
+                      reportedBoundingBoxAcc,
                       views?.viewports?.[index].zoom,
                       deckRef.current?.deck
                   );
@@ -476,7 +468,15 @@ const Map: React.FC<MapProps> = ({
             }
             setViewStates(tempViewStates);
         }
-    }, [bounds, cameraPosition]);
+    }, [
+        bounds,
+        cameraPosition,
+        viewsProps,
+        centerOfData,
+        views,
+        deckRef,
+        viewPortMargins,
+    ]);
 
     const [reportedBoundingBox, setReportedBoundingBox] =
         useState<BoundingBox>(bboxInitial);
@@ -490,6 +490,12 @@ const Map: React.FC<MapProps> = ({
     }, [triggerHome]);
 
     useEffect(() => {
+        const union_of_reported_bboxes = addBoundingBoxes(
+            reportedBoundingBoxAcc,
+            reportedBoundingBox
+        );
+        setReportedBoundingBoxAcc(union_of_reported_bboxes);
+
         // If "bounds" or "cameraPosition" is not defined "viewState" will be
         // calculated based on the union of the reported bounding boxes from each layer.
         if (!didUserChangeCamera && !isCameraPositionDefined) {
