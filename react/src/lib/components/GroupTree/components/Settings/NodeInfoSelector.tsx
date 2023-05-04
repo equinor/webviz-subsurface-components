@@ -1,5 +1,7 @@
 import { NativeSelect } from "@equinor/eds-core-react";
-import { createStyles, makeStyles, Theme } from "@material-ui/core";
+import { Theme } from "@mui/material";
+import createStyles from "@mui/styles/createStyles";
+import makeStyles from "@mui/styles/makeStyles";
 import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCurrentNodeInfo } from "../../redux/actions";
