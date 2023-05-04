@@ -1,7 +1,25 @@
 import React from "react";
+import { styled } from "@mui/material/styles";
 import SubsurfaceViewer from "../SubsurfaceViewer";
 import exampleData from "../../../../demo/example-data/deckgl-map.json";
-import { makeStyles } from "@mui/styles";
+const PREFIX = "Default";
+
+const classes = {
+    main: `${PREFIX}-main`,
+};
+
+const Root = styled("div")({
+    [`& .${classes.main}`]: {
+        width: 500,
+        height: 500,
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+        border: "1px solid black",
+        background: "azure",
+        position: "absolute",
+    },
+});
 
 export default {
     component: SubsurfaceViewer,
@@ -545,26 +563,11 @@ SelectableFeatureExample.args = {
     ],
 };
 
-// Map used inside a div container template
-const useStyles = makeStyles({
-    main: {
-        width: 500,
-        height: 500,
-        top: "50%",
-        left: "50%",
-        transform: "translate(-50%, -50%)",
-        border: "1px solid black",
-        background: "azure",
-        position: "absolute",
-    },
-});
-
 export const MapInContainer = (args) => {
-    const classes = useStyles();
     return (
-        <div className={classes.main}>
+        <Root className={classes.main}>
             <SubsurfaceViewer {...args} />
-        </div>
+        </Root>
     );
 };
 

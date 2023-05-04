@@ -1,11 +1,33 @@
 import React from "react";
+import { styled } from "@mui/material/styles";
 import { useHoverInfo } from "../../components/Map";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import InfoCard from "../../components/InfoCard";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 import { Slider } from "@mui/material";
-import { makeStyles } from "@mui/styles";
 import { ContinuousLegend } from "@emerson-eps/color-tables";
+
+const PREFIX = "MapLayer3d";
+
+const classes = {
+    main: `${PREFIX}-main`,
+    legend: `${PREFIX}-legend`,
+};
+
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const Root = styled("div")({
+    [`& .${classes.main}`]: {
+        height: 500,
+        border: "1px solid black",
+        position: "relative",
+    },
+    [`& .${classes.legend}`]: {
+        width: 100,
+        position: "absolute",
+        top: "0",
+        right: "0",
+    },
+});
 
 export default {
     component: SubsurfaceViewer,
@@ -188,20 +210,6 @@ Readout.parameters = {
     },
 };
 
-const useStyles = makeStyles({
-    main: {
-        height: 500,
-        border: "1px solid black",
-        position: "relative",
-    },
-    legend: {
-        width: 100,
-        position: "absolute",
-        top: "0",
-        right: "0",
-    },
-});
-
 export const BreakpointColorMap: ComponentStory<typeof SubsurfaceViewer> = (
     args
 ) => {
@@ -233,10 +241,10 @@ export const BreakpointColorMap: ComponentStory<typeof SubsurfaceViewer> = (
     }, []);
 
     return (
-        <>
-            <div className={useStyles().main}>
+        <Root>
+            <div className={classes.main}>
                 <SubsurfaceViewer {...props} />
-                <div className={useStyles().legend}>
+                <div className={classes.legend}>
                     <ContinuousLegend
                         min={meshMapLayer.propertyValueRange[0]}
                         max={meshMapLayer.propertyValueRange[1]}
@@ -250,7 +258,7 @@ export const BreakpointColorMap: ComponentStory<typeof SubsurfaceViewer> = (
                 step={1}
                 onChange={handleChange}
             />
-        </>
+        </Root>
     );
 };
 
@@ -294,8 +302,8 @@ export const ColorMapRange: ComponentStory<typeof SubsurfaceViewer> = (
     }, []);
 
     return (
-        <>
-            <div className={useStyles().main}>
+        <Root>
+            <div className={classes.main}>
                 <SubsurfaceViewer {...props} />
             </div>
             <Slider
@@ -305,7 +313,7 @@ export const ColorMapRange: ComponentStory<typeof SubsurfaceViewer> = (
                 step={1}
                 onChange={handleChange}
             />
-        </>
+        </Root>
     );
 };
 

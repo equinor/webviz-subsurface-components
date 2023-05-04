@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { styled } from "@mui/material/styles";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 import { NativeSelect } from "@equinor/eds-core-react";
@@ -8,7 +9,19 @@ import {
     colorTables,
 } from "@emerson-eps/color-tables";
 import { MapMouseEvent } from "../../components/Map";
-import makeStyles from "@mui/styles/makeStyles";
+const PREFIX = "VolveWells";
+
+const classes = {
+    main: `${PREFIX}-main`,
+};
+
+const Root = styled("div")({
+    [`& .${classes.main}`]: {
+        height: 500,
+        border: "1px solid black",
+        position: "relative",
+    },
+});
 
 export default {
     component: SubsurfaceViewer,
@@ -37,20 +50,6 @@ const defaultProps = {
         },
     ],
 };
-
-const useStyles = makeStyles({
-    main: {
-        height: 500,
-        border: "1px solid black",
-        position: "relative",
-    },
-    legend: {
-        width: 100,
-        position: "absolute",
-        top: "0",
-        right: "0",
-    },
-});
 
 const continuousLogsLayer = {
     ...defaultProps.layers[0],
@@ -277,8 +276,8 @@ export const VolveWellsWithResetButton: ComponentStory<
     }, [args.editedData]);
 
     return (
-        <>
-            <div className={useStyles().main}>
+        <Root>
+            <div className={classes.main}>
                 <SubsurfaceViewer
                     {...args}
                     editedData={editedData}
@@ -289,7 +288,7 @@ export const VolveWellsWithResetButton: ComponentStory<
                 />
             </div>
             <button onClick={handleChange1}> Reset Multiple Wells </button>
-        </>
+        </Root>
     );
 };
 
