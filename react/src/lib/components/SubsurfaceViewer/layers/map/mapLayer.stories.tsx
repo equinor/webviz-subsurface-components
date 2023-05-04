@@ -19,6 +19,7 @@ const PREFIX = "MapLayer3dPng";
 
 const classes = {
     main: `${PREFIX}-main`,
+    legend: `${PREFIX}-legend`,
 };
 
 const Root = styled("div")({
@@ -26,6 +27,12 @@ const Root = styled("div")({
         height: 500,
         border: "1px solid black",
         position: "relative",
+    },
+    [`& .${classes.legend}`]: {
+        width: 100,
+        position: "absolute",
+        top: "0",
+        right: "0",
     },
 });
 
