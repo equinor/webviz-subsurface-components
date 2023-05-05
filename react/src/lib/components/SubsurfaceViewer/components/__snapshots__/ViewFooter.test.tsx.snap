@@ -2,6 +2,6 @@
 
 exports[`Test View Footer snapshot test with no props 1`] = `
 <div
-  class="makeStyles-viewFooter-1"
+  class="css-m2xg6a"
 />
 `;

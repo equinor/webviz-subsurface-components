@@ -1,10 +1,10 @@
 import React from "react";
+import { styled } from "@mui/material/styles";
 import { ViewsType, useHoverInfo } from "../../components/Map";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import InfoCard from "../../components/InfoCard";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
-import { Slider } from "@material-ui/core";
-import { makeStyles } from "@material-ui/styles";
+import { Slider } from "@mui/material";
 import {
     ContinuousLegend,
     ColorLegend,
@@ -14,6 +14,27 @@ import { View } from "../../../..";
 import MapLayer from "./mapLayer";
 import Axes2DLayer from "../axes2d/axes2DLayer";
 import { ViewFooter } from "../../components/ViewFooter";
+
+const PREFIX = "MapLayer3dPng";
+
+const classes = {
+    main: `${PREFIX}-main`,
+    legend: `${PREFIX}-legend`,
+};
+
+const Root = styled("div")({
+    [`& .${classes.main}`]: {
+        height: 500,
+        border: "1px solid black",
+        position: "relative",
+    },
+    [`& .${classes.legend}`]: {
+        width: 100,
+        position: "absolute",
+        top: "0",
+        right: "0",
+    },
+});
 
 export default {
     component: SubsurfaceViewer,
@@ -366,12 +387,12 @@ export const ScaleZ: ComponentStory<typeof SubsurfaceViewer> = (args) => {
     };
 
     return (
-        <>
-            <div className={useStyles().main}>
+        <Root>
+            <div className={classes.main}>
                 <SubsurfaceViewer {...props} />
             </div>
             <button onClick={handleChange}> Add layer </button>
-        </>
+        </Root>
     );
 };
 
@@ -434,13 +455,13 @@ export const ResetCameraProperty: ComponentStory<typeof SubsurfaceViewer> = (
     };
 
     return (
-        <>
-            <div className={useStyles().main}>
+        <Root>
+            <div className={classes.main}>
                 <SubsurfaceViewer {...props} />
             </div>
             <button onClick={handleChange1}> Reset Camera </button>
             <button onClick={handleChange2}> Change Camera </button>
-        </>
+        </Root>
     );
 };
 
@@ -494,12 +515,12 @@ export const AddLayer: ComponentStory<typeof SubsurfaceViewer> = (args) => {
     };
 
     return (
-        <>
-            <div className={useStyles().main}>
+        <Root>
+            <div className={classes.main}>
                 <SubsurfaceViewer {...props} />
             </div>
             <button onClick={handleChange}> Add layer </button>
-        </>
+        </Root>
     );
 };
 
@@ -961,20 +982,6 @@ BigMapWithHole.parameters = {
     },
 };
 
-const useStyles = makeStyles({
-    main: {
-        height: 500,
-        border: "1px solid black",
-        position: "relative",
-    },
-    legend: {
-        width: 100,
-        position: "absolute",
-        top: "0",
-        right: "0",
-    },
-});
-
 export const BreakpointColorMap: ComponentStory<typeof SubsurfaceViewer> = (
     args
 ) => {
@@ -1002,10 +1009,10 @@ export const BreakpointColorMap: ComponentStory<typeof SubsurfaceViewer> = (
     }, []);
 
     return (
-        <>
-            <div className={useStyles().main}>
+        <Root>
+            <div className={classes.main}>
                 <SubsurfaceViewer {...props} />
-                <div className={useStyles().legend}>
+                <div className={classes.legend}>
                     <ContinuousLegend
                         min={valueRange[0]}
                         max={valueRange[1]}
@@ -1020,7 +1027,7 @@ export const BreakpointColorMap: ComponentStory<typeof SubsurfaceViewer> = (
                 step={1}
                 onChangeCommitted={handleChange}
             />
-        </>
+        </Root>
     );
 };
 
@@ -1065,8 +1072,8 @@ export const ColorMapRange: ComponentStory<typeof SubsurfaceViewer> = (
     }, []);
 
     return (
-        <>
-            <div className={useStyles().main}>
+        <Root>
+            <div className={classes.main}>
                 <SubsurfaceViewer {...props} />
             </div>
             <Slider
@@ -1076,7 +1083,7 @@ export const ColorMapRange: ComponentStory<typeof SubsurfaceViewer> = (
                 step={1000}
                 onChange={handleChange}
             />
-        </>
+        </Root>
     );
 };
 
