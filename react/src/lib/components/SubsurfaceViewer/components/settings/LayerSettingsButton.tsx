@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
+
 import { Icon, Menu, Tooltip } from "@equinor/eds-core-react";
 import { styled } from "@mui/material/styles";
 import { Fab } from "@mui/material";

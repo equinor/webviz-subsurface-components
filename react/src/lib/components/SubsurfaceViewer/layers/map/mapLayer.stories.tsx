@@ -332,6 +332,35 @@ MapLayer3dPng.parameters = {
     },
 };
 
+export const MapLayer3dPngNoBounds: ComponentStory<typeof SubsurfaceViewer> = (
+    args
+) => {
+    return <SubsurfaceViewer {...args} />;
+};
+
+MapLayer3dPngNoBounds.args = {
+    id: "map",
+    layers: [axes_hugin, meshMapLayerPng, north_arrow_layer],
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: true,
+            },
+        ],
+    },
+};
+
+MapLayer3dPngNoBounds.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: "If no bounds are specified will results in automatically calcultated camera. Will look at center of bounding box of the data",
+        },
+    },
+};
+
 export const ConstantColor: ComponentStory<typeof SubsurfaceViewer> = (
     args
 ) => {

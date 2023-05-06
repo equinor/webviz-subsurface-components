@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
+
 import React, { useState } from "react";
 import { styled } from "@mui/material/styles";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
@@ -542,13 +544,17 @@ const reverseRange = false;
 
 //eslint-disable-next-line
 const wellLayerTemplate = (args: any) => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [getColorName, setColorName] = React.useState("Rainbow");
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [isLog, setIsLog] = React.useState(false);
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const wellLayerData = React.useCallback((data) => {
         setColorName(data);
     }, []);
 
     // interpolation method
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const getInterpolateMethod = React.useCallback((data) => {
         setIsLog(data.isLog);
     }, []);

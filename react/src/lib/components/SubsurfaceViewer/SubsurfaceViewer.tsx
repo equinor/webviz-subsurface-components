@@ -125,8 +125,8 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
             enumerations
         ) as LayersList;
         setLayerInstances(layersList);
-    }, [layers]);
-
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [layers]); // Note. Fixing this dependency list may cause infinite recursion.
     React.useEffect(() => {
         if (!editedData) return;
 
@@ -134,7 +134,9 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
             ...layerEditedData,
             ...editedData,
         });
-    }, [editedData]);
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [editedData]); // Note. Fixing this dependency list may cause infinite recursion.
 
     // This callback is used as a mechanism to update the component from the layers or toolbar.
     // The changes done in a layer, for example, are bundled into a patch

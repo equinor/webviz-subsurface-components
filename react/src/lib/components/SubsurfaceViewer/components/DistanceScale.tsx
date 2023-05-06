@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
+
 import React from "react";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const convert = require("convert-units");
@@ -27,6 +29,7 @@ const DistanceScale: React.FC<ScaleProps> = ({
     scaleUnit,
 }: ScaleProps) => {
     if (!zoom || !widthPerUnit || !incrementValue) return null;
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [rulerWidth, setRulerWidth] = React.useState<number>(0);
     const widthInUnits = widthPerUnit / Math.pow(2, zoom);
     const scaleRulerStyle: React.CSSProperties = {
@@ -46,6 +49,7 @@ const DistanceScale: React.FC<ScaleProps> = ({
     const convertedUnit = convert(scaleValue).from(scaleUnit).toBest().unit;
     const convertedValue = convert(scaleValue).from(scaleUnit).toBest().val;
 
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     React.useEffect(() => {
         setRulerWidth(scaleValue * Math.pow(2, zoom));
     }, [zoom]);

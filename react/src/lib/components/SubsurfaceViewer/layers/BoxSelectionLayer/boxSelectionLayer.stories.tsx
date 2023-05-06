@@ -1,3 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
+/* eslint-disable react-hooks/rules-of-hooks  */ // remove when ready to fix these.
+
 import { FormControlLabel, Switch } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { ComponentMeta, ComponentStory } from "@storybook/react";
@@ -122,7 +125,9 @@ const enableLassoArgs = {
 export const boxSelectionWithCallback: ComponentStory<
     typeof SubsurfaceViewer
 > = () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [data, setData] = React.useState<string[]>([]);
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const getSelectedWellsDataCallBack = React.useCallback(
         (pickingInfos: PickInfo[]) => {
             const selectedWells = pickingInfos
