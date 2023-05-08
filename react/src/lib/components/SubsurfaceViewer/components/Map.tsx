@@ -507,7 +507,8 @@ const Map: React.FC<MapProps> = ({
         if (typeof triggerHome !== "undefined") {
             calcDefaultViewStates(reportedBoundingBoxAcc);
         }
-    }, [calcDefaultViewStates, reportedBoundingBoxAcc, triggerHome]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [triggerHome]);
 
     useEffect(() => {
         const union_of_reported_bboxes = addBoundingBoxes(
