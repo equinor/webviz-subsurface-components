@@ -125,9 +125,7 @@ const enableLassoArgs = {
 export const boxSelectionWithCallback: ComponentStory<
     typeof SubsurfaceViewer
 > = () => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [data, setData] = React.useState<string[]>([]);
-    // eslint-disable-next-line react-hooks/rules-of-hooks
     const getSelectedWellsDataCallBack = React.useCallback(
         (pickingInfos: PickInfo[]) => {
             const selectedWells = pickingInfos
