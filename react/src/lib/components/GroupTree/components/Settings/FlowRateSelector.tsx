@@ -1,21 +1,23 @@
 import { NativeSelect } from "@equinor/eds-core-react";
-import { Theme } from "@mui/material";
-import createStyles from "@mui/styles/createStyles";
-import makeStyles from "@mui/styles/makeStyles";
+import { styled } from "@mui/material/styles";
 import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCurrentFlowRate } from "../../redux/actions";
 import { GroupTreeState } from "../../redux/store";
 import { DataInfos, DataInfo } from "../../redux/types";
 
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        root: {
-            maxWidth: "250px",
-            padding: theme.spacing(1),
-        },
-    })
-);
+const PREFIX = "FlowRateSelector";
+
+const classes = {
+    root: `${PREFIX}-root`,
+};
+
+const StyledNativeSelect = styled(NativeSelect)(({ theme }) => ({
+    [`&.${classes.root}`]: {
+        maxWidth: "250px",
+        padding: theme.spacing(1),
+    },
+}));
 
 interface Props {
     edge_options: DataInfos;
@@ -23,7 +25,6 @@ interface Props {
 
 const FlowRateSelector: React.FC<Props> = React.memo(
     ({ edge_options }: Props) => {
-        const classes = useStyles();
         // Redux
         const dispatch = useDispatch();
         const currentFlowRate = useSelector(
@@ -38,7 +39,7 @@ const FlowRateSelector: React.FC<Props> = React.memo(
         );
 
         return (
-            <NativeSelect
+            <StyledNativeSelect
                 className={classes.root}
                 id="flow-rate-selector"
                 label="Flow Rate"
@@ -50,7 +51,7 @@ const FlowRateSelector: React.FC<Props> = React.memo(
                         {key.label}
                     </option>
                 ))}
-            </NativeSelect>
+            </StyledNativeSelect>
         );
     }
 );

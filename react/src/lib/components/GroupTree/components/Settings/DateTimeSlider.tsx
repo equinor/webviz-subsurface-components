@@ -1,7 +1,5 @@
-import { Slider, Theme } from "@mui/material";
-import createStyles from "@mui/styles/createStyles";
-import makeStyles from "@mui/styles/makeStyles";
-import withStyles from "@mui/styles/withStyles";
+import { Slider } from "@mui/material";
+import { styled } from "@mui/material/styles";
 import React, { useCallback, useContext, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCurrentDateTime } from "../../redux/actions";
@@ -9,28 +7,23 @@ import { GroupTreeState } from "../../redux/store";
 import { Data, DatedTree } from "../../redux/types";
 import { DataContext } from "../DataLoader";
 
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        root: {
-            width: "200px",
-            marginRight: theme.spacing(4),
-        },
-    })
-);
-const EdsSlider = withStyles({
-    root: {
-        color: "#007079",
+const PREFIX = "DateTimeSlider";
+
+const classes = {
+    root: `${PREFIX}-root`,
+    valueLabel: `${PREFIX}-valueLabel`,
+    root2: `${PREFIX}-root2`,
+};
+
+const Root = styled("div")(({ theme }) => ({
+    [`& .${classes.root2}`]: {
+        width: "200px",
+        marginRight: theme.spacing(4),
     },
-    valueLabel: {
-        top: 22,
-        "& *": {
-            background: "transparent",
-            color: "#000",
-        },
-    },
-})(Slider);
+}));
+
+const EdsSlider = Slider;
 const DateTimeSlider: React.FC = React.memo(() => {
-    const classes = useStyles();
     const data: Data = useContext(DataContext);
     // Redux
     const dispatch = useDispatch();
@@ -65,7 +58,7 @@ const DateTimeSlider: React.FC = React.memo(() => {
         [dispatch, times]
     );
     return (
-        <div className={classes.root}>
+        <Root className={classes.root}>
             <span>Time Steps</span>
             <EdsSlider
                 track={false}
@@ -78,8 +71,12 @@ const DateTimeSlider: React.FC = React.memo(() => {
                 step={1}
                 marks={true}
                 valueLabelFormat={outputFunction}
+                classes={{
+                    root: classes.root,
+                    valueLabel: classes.valueLabel,
+                }}
             />
-        </div>
+        </Root>
     );
 });
 
