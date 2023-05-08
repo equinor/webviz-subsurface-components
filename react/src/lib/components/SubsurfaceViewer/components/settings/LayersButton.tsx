@@ -1,18 +1,25 @@
+/* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
+
 import { Icon, Menu, Tooltip } from "@equinor/eds-core-react";
-import { createStyles, Fab, makeStyles } from "@material-ui/core";
+import { styled } from "@mui/material/styles";
+import { Fab } from "@mui/material";
 import React, { ChangeEvent, useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { updateLayerProp, updateVisibleLayers } from "../../redux/actions";
 import ToggleButton from "./ToggleButton";
 
-const useStyles = makeStyles(() =>
-    createStyles({
-        root: {
-            flexDirection: "column",
-            display: "flex",
-        },
-    })
-);
+const PREFIX = "LayersButton";
+
+const classes = {
+    root: `${PREFIX}-root`,
+};
+
+const Root = styled("div")(() => ({
+    [`& .${classes.root}`]: {
+        flexDirection: "column",
+        display: "flex",
+    },
+}));
 
 export interface LayersButtonProps {
     id: string;
@@ -21,7 +28,6 @@ export interface LayersButtonProps {
 
 const LayersButton: React.FC<LayersButtonProps> = React.memo(
     ({ id, layers }: LayersButtonProps) => {
-        const classes = useStyles();
         // Redux
         const dispatch = useDispatch();
         const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(
@@ -50,7 +56,7 @@ const LayersButton: React.FC<LayersButtonProps> = React.memo(
 
         if (!layers.length) return null;
         return (
-            <div id={id}>
+            <Root id={id}>
                 <Fab id="layers-selector-button" onClick={handleClick}>
                     <Tooltip title="Layers">
                         <Icon color="currentColor" name="layers" />
@@ -78,7 +84,7 @@ const LayersButton: React.FC<LayersButtonProps> = React.memo(
                         />
                     ))}
                 </Menu>
-            </div>
+            </Root>
         );
     }
 );

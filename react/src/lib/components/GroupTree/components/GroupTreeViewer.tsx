@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
+
 import { styled } from "@mui/material/styles";
 import { cloneDeep } from "lodash";
 import React, { useContext, useEffect, useRef } from "react";

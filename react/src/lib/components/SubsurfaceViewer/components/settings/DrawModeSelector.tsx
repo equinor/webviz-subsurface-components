@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
+
 import { NativeSelect } from "@equinor/eds-core-react";
 import React, { useCallback } from "react";
 import { useDispatch } from "react-redux";

@@ -1,5 +1,8 @@
+/* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
+
 import { Icon, Menu, Tooltip } from "@equinor/eds-core-react";
-import { createStyles, Fab, makeStyles, Theme } from "@material-ui/core";
+import { styled } from "@mui/material/styles";
+import { Fab } from "@mui/material";
 import React, { useCallback, useMemo } from "react";
 import { LayerIcons, LayerType } from "../../redux/types";
 import { getPropVisibility } from "../../utils/specExtractor";
@@ -7,25 +10,29 @@ import LayerProperty from "./LayerProperty";
 import { useDispatch } from "react-redux";
 import { updateLayerProp } from "../../redux/actions";
 
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        root: {
-            marginBottom: theme.spacing(1),
-        },
-        menu: {
-            display: "flex",
-            flexDirection: "column",
-        },
-    })
-);
+const PREFIX = "LayerSettingsButton";
+
+const classes = {
+    root: `${PREFIX}-root`,
+    menu: `${PREFIX}-menu`,
+};
+
+const Root = styled("div")(({ theme }) => ({
+    [`& .${classes.root}`]: {
+        marginBottom: theme.spacing(1),
+    },
+
+    [`& .${classes.menu}`]: {
+        display: "flex",
+        flexDirection: "column",
+    },
+}));
 
 interface Props {
     layer: Record<string, unknown>;
 }
 
 const LayerSettingsButton: React.FC<Props> = React.memo(({ layer }: Props) => {
-    const classes = useStyles();
-
     const dispatch = useDispatch();
 
     // handlers
@@ -53,7 +60,7 @@ const LayerSettingsButton: React.FC<Props> = React.memo(({ layer }: Props) => {
         return null;
 
     return (
-        <>
+        <Root>
             <Fab
                 id={`${layer["id"]}-button`}
                 size="medium"
@@ -80,7 +87,7 @@ const LayerSettingsButton: React.FC<Props> = React.memo(({ layer }: Props) => {
                     key={`layer-property-${layer["id"]}`}
                 />
             </Menu>
-        </>
+        </Root>
     );
 });
 

@@ -6,38 +6,35 @@ exports[`test 'layers' button snapshot test 1`] = `
 }
 
 <div
+  class="css-1c35s4m"
   id="layers-button-view_1"
 >
   <button
-    class="MuiButtonBase-root MuiFab-root"
+    class="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeLarge MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeLarge MuiFab-default css-mm42gz-MuiButtonBase-root-MuiFab-root"
     id="layers-selector-button"
     tabindex="0"
     type="button"
   >
-    <span
-      class="MuiFab-label"
+    <svg
+      aria-hidden="true"
+      class=""
+      fill="currentColor"
+      height="24px"
+      viewBox="0 0 24 24"
+      width="24px"
+      xmlns="http://www.w3.org/2000/svg"
     >
-      <svg
-        aria-hidden="true"
+      <path
         class=""
-        fill="currentColor"
-        height="24px"
-        viewBox="0 0 24 24"
-        width="24px"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          class=""
-          clip-rule="evenodd"
-          d="m12 16.465 7.36-5.73L21 9.465l-9-7-9 7 1.63 1.27 7.37 5.73zm-.01 2.54-7.37-5.73L3 14.535l9 7 9-7-1.63-1.27-7.38 5.74zm5.75-9.54L12 4.995l-5.74 4.47 5.74 4.47 5.74-4.47z"
-          data-testid="eds-icon-path"
-          fill-rule="evenodd"
-          height="24"
-        />
-      </svg>
-    </span>
+        clip-rule="evenodd"
+        d="m12 16.465 7.36-5.73L21 9.465l-9-7-9 7 1.63 1.27 7.37 5.73zm-.01 2.54-7.37-5.73L3 14.535l9 7 9-7-1.63-1.27-7.38 5.74zm5.75-9.54L12 4.995l-5.74 4.47 5.74 4.47 5.74-4.47z"
+        data-testid="eds-icon-path"
+        fill-rule="evenodd"
+        height="24"
+      />
+    </svg>
     <span
-      class="MuiTouchRipple-root"
+      class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
     />
   </button>
 </div>
@@ -49,38 +46,35 @@ exports[`test 'layers' button test empty MapState/specbase 1`] = `
 }
 
 <div
+  class="css-1c35s4m"
   id="layers-button-view_1"
 >
   <button
-    class="MuiButtonBase-root MuiFab-root"
+    class="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeLarge MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeLarge MuiFab-default css-mm42gz-MuiButtonBase-root-MuiFab-root"
     id="layers-selector-button"
     tabindex="0"
     type="button"
   >
-    <span
-      class="MuiFab-label"
+    <svg
+      aria-hidden="true"
+      class=""
+      fill="currentColor"
+      height="24px"
+      viewBox="0 0 24 24"
+      width="24px"
+      xmlns="http://www.w3.org/2000/svg"
     >
-      <svg
-        aria-hidden="true"
+      <path
         class=""
-        fill="currentColor"
-        height="24px"
-        viewBox="0 0 24 24"
-        width="24px"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          class=""
-          clip-rule="evenodd"
-          d="m12 16.465 7.36-5.73L21 9.465l-9-7-9 7 1.63 1.27 7.37 5.73zm-.01 2.54-7.37-5.73L3 14.535l9 7 9-7-1.63-1.27-7.38 5.74zm5.75-9.54L12 4.995l-5.74 4.47 5.74 4.47 5.74-4.47z"
-          data-testid="eds-icon-path"
-          fill-rule="evenodd"
-          height="24"
-        />
-      </svg>
-    </span>
+        clip-rule="evenodd"
+        d="m12 16.465 7.36-5.73L21 9.465l-9-7-9 7 1.63 1.27 7.37 5.73zm-.01 2.54-7.37-5.73L3 14.535l9 7 9-7-1.63-1.27-7.38 5.74zm5.75-9.54L12 4.995l-5.74 4.47 5.74 4.47 5.74-4.47z"
+        data-testid="eds-icon-path"
+        fill-rule="evenodd"
+        height="24"
+      />
+    </svg>
     <span
-      class="MuiTouchRipple-root"
+      class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
     />
   </button>
 </div>
