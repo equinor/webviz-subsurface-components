@@ -4,6 +4,7 @@ import { ExtendedLayerProps, colorMapFunctionType } from "../utils/layerTools";
 import { makeFullMesh } from "./webworker";
 import { isEqual } from "lodash";
 import { load, JSONLoader } from "@loaders.gl/core";
+import { cloneDeep } from "lodash";
 
 export type WebWorkerParams = {
     points: number[];
@@ -47,15 +48,15 @@ async function load_data(
     propertiesData: string | number[]
 ) {
     const points = Array.isArray(pointsData)
-        ? pointsData
+        ? cloneDeep(pointsData)
         : await load(pointsData as string, JSONLoader);
 
     const polys = Array.isArray(polysData)
-        ? polysData
+        ? cloneDeep(polysData)
         : await load(polysData as string, JSONLoader);
 
     const properties = Array.isArray(propertiesData)
-        ? propertiesData
+        ? cloneDeep(propertiesData)
         : await load(propertiesData as string, JSONLoader);
 
     return Promise.all([points, polys, properties]);
