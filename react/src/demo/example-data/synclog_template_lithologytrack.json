@@ -1,0 +1,186 @@
+{
+    "name": "Template 1",
+    "scale": {
+        "primary": "tvd",
+        "allowSecondary": true
+    },
+    "tracks": [
+        {
+          "plots": [
+            {
+              "name": "ZONELOG",
+              "style": "discrete"
+            }
+          ]
+        },
+        {
+          "plots": [
+            {
+              "name": "PORO"
+            },
+            {
+              "name": "NTG"
+            },
+            {
+              "name": "SW"
+            }
+          ]
+        },
+        {
+          "plots": [
+            {
+              "name": "FACIES",
+              "style": "discretecanvas"
+            }
+          ]
+        },
+        {
+            "plots": [
+                {
+                    "name": "MFOA"
+                }
+            ]
+        },
+        {
+          "plots": [
+            {
+              "name": "FACIES",
+              "style": "discrete"
+            }
+          ]
+        },
+        {
+            "plots": [
+                {
+                    "name": "DD_VOLUME"
+                }
+            ]
+        },
+        {
+            "plots": [
+                {
+                    "name": "TEMP"
+                }
+            ]
+        },
+        {
+            "plots": [
+                {
+                    "name": "BITSIZE"
+                }
+            ]
+        },
+        {
+            "plots": [
+                {
+                    "name": "GRSIM"
+                }
+            ]
+        },
+        {
+            "plots": [
+                {
+                    "name": "RACESHM"
+                }
+            ]
+        },
+        {
+            "plots": [
+                {
+                    "name": "SW",
+                    "type": "line"
+                }
+            ]
+        },
+        {
+            "plots": [
+                {
+                    "name": "MFIA",
+                    "type": "dot"
+                }
+            ]
+        },
+        {
+            "plots": [
+                {
+                    "name": "MDIA",
+                    "style": "MD"
+                }
+            ]
+        },
+        {
+            "plots": [
+                {
+                    "name": "MTOA"
+                }
+            ]
+        },
+        {
+            "plots": [
+                {
+                    "name": "MTIA"
+                }
+            ]
+        },
+        {
+            "plots": [
+                {
+                    "name": "ECDT"
+                }
+            ]
+        },
+        {
+            "plots": [
+                {
+                    "name": "BDTI"
+                }
+            ]
+        },
+        {
+            "plots": [
+                {
+                    "name": "BDDI"
+                }
+            ]
+        },
+        {
+            "plots": [
+                {
+                    "name": "BRVC"
+                }
+            ]
+        },
+        {
+            "plots": [
+                {
+                    "name": "TCTI"
+                }
+            ]
+        }
+    ],
+    "styles": [
+        {
+            "name": "HKL",
+            "type": "gradientfill",
+            "colorTable": "Physics",
+            "color": "green"
+        },
+        {
+            "name": "MD",
+            "scale": "linear",
+            "type": "area",
+            "color": "blue",
+            "fill": "green"
+        },
+        {
+          "name": "discretecanvas",
+          "type": "canvas",
+          "colorTable": "Stratigraphy"
+        },
+        {
+          "name": "discrete",
+          "type": "stacked",
+          "colorTable": "Stratigraphy"
+        }
+    ]
+}

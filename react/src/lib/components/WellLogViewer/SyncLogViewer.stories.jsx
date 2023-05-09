@@ -359,3 +359,80 @@ Default.args = {
         wellpickPatternFill: true,
     },
 };
+
+const lithologyInfoTable = {
+    codes: ["1", "2", "3", "4", "5"],
+    names: patternNamesEnglish,
+    images: patternImages,
+    colors: [
+        [255, 193, 0],
+        [255, 155, 76],
+        [255, 223, 161],
+        [204, 153, 255],
+        [101, 167, 64],
+        [255, 243, 53],
+    ],
+};
+
+export const LithofaciesTrack = Template.bind({});
+LithofaciesTrack.args = {
+    id: "Sync-Log-Viewer-litho",
+    syncTrackPos: true,
+    syncContentDomain: true,
+    syncContentSelection: true,
+    syncTemplate: true,
+    horizontal: false,
+
+    welllogs: [
+        require("../../../demo/example-data/discrete-facies-test.json")[0],
+        require("../../../demo/example-data/L916MUD.json")[0],
+        require("../../../demo/example-data/Lis1.json")[0],
+    ],
+    templates: [
+        require("../../../demo/example-data/synclog_template_lithologytrack.json"),
+        require("../../../demo/example-data/synclog_template.json"),
+        require("../../../demo/example-data/synclog_template.json"),
+    ],
+    colorTables: colorTables,
+    lithologyInfoTable: lithologyInfoTable,
+    wellpicks: [
+        {
+            wellpick: require("../../../demo/example-data/wellpicks.json")[0],
+            name: "HORIZON",
+            colorTables: require("../../../demo/example-data/wellpick_colors.json"),
+            color: "Stratigraphy",
+        },
+        {
+            wellpick: require("../../../demo/example-data/wellpicks.json")[1],
+            name: "HORIZON",
+            colorTables: require("../../../demo/example-data/wellpick_colors.json"),
+            color: "Stratigraphy",
+        },
+        {
+            wellpick: require("../../../demo/example-data/wellpicks.json")[0],
+            name: "HORIZON",
+            colorTables: require("../../../demo/example-data/wellpick_colors.json"),
+            color: "Stratigraphy",
+        },
+    ],
+    wellpickFlatting: ["Hor_2", "Hor_4"],
+    spacers: [312, 255],
+    wellDistances: {
+        units: "m",
+        distances: [2048.3, 512.7],
+    },
+
+    axisTitles: axisTitles,
+    axisMnemos: axisMnemos,
+
+    viewTitles: true, // show default welllog view titles (a wellname from the welllog)
+
+    welllogOptions: {
+        wellpickColorFill: false,
+        wellpickPatternFill: false,
+    },
+    spacerOptions: {
+        wellpickColorFill: false,
+        wellpickPatternFill: false,
+    },
+};

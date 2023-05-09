@@ -45,7 +45,8 @@
                 "area",
                 "differential",
                 "gradientfill",
-                "stacked"
+                "stacked",
+                "canvas"
             ],
             "default": "line"
         },
