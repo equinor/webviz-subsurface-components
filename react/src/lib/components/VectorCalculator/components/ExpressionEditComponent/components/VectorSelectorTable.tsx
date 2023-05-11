@@ -20,7 +20,7 @@ import {
     isVariableVectorMapValid,
 } from "../../../utils/VectorCalculatorHelperFunctions";
 
-import "!style-loader!css-loader!../../../VectorCalculator.css";
+import "../../../VectorCalculator.css";
 
 interface VectorSelectorTableProps {
     vectorData: TreeDataNode[];

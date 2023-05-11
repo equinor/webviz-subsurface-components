@@ -1,7 +1,7 @@
 import React from "react";
 import { TableRow, TableRowProps } from "@material-ui/core";
 
-import "!style-loader!css-loader!../../../VectorCalculator.css";
+import "../../../VectorCalculator.css";
 
 interface BlinkingTableRowProps extends TableRowProps {
     blinking: boolean;
