@@ -112,6 +112,7 @@
         "@testing-library/jest-dom": "^5.11.9",
         "@testing-library/react": "^12.1.2",
         "@testing-library/user-event": "^13.1.9",
+        "@types/convert-units": "^2.3.5",
         "@types/d3": "^7.4.0",
         "@types/d3-color": "^3.0.2",
         "@types/d3-interpolate": "^3.0.1",

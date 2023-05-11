@@ -1186,8 +1186,8 @@ function createViews(
             return super.handleEvent(event);
         }
     }
+    const deckgl_views: View[] = [];
 
-    const deckgl_views = [];
     // if props for multiple viewport are not proper, return 2d view
     if (!views || !views.viewports || !views.layout) {
         deckgl_views.push(

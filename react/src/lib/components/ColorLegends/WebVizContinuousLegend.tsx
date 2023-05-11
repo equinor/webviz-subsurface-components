@@ -10,7 +10,8 @@ interface LegendProps {
     cssLegendStyles?: Record<string, unknown>;
     colorName?: string;
     horizontal?: boolean | null;
-    colorTables?: colorTablesArray | string;
+    // @rmt: Not matching the type in @emerson-eps/color-tables
+    colorTables?: colorTablesArray;
     id?: string;
     isRangeShown?: boolean;
     legendFontSize?: number;
@@ -60,7 +61,7 @@ ContinuousLegendWrapper.propTypes = {
     cssLegendStyles: PropTypes.objectOf(PropTypes.string),
     colorName: PropTypes.string.isRequired,
     horizontal: PropTypes.bool,
-    colorTables: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
+    colorTables: PropTypes.array,
     id: PropTypes.string,
     isRangeShown: PropTypes.bool,
     legendFontSize: PropTypes.number,

@@ -115,8 +115,9 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
             return;
         }
 
-        const enumerations = [];
-        const layersJson = layers as unknown;
+        // @rmt: Added broad type - should be improved?
+        const enumerations: Record<string, unknown>[] = [];
+        const layersJson = layers as unknown; // @rmt: Why unknown? It is defined as Record<string, unknown>[] | undefined above
         if (resources) enumerations.push({ resources: resources });
         if (editedData) enumerations.push({ editedData: editedData });
         else enumerations.push({ editedData: {} });

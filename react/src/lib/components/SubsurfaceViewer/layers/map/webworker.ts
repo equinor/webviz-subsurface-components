@@ -99,7 +99,8 @@ export function makeFullMesh(e: { data: Params }): void {
         //         |
         //        p4
 
-        const normals = [];
+        // @rmt: missing type
+        const normals: Vec[] = [];
         if (i1_act && i2_act) {
             const normal = crossProduct(v2, v1);
             normals.push(normal);

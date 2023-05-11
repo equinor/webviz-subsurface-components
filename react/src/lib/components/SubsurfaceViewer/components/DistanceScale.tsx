@@ -28,7 +28,10 @@ const DistanceScale: React.FC<ScaleProps> = ({
     style,
     scaleUnit,
 }: ScaleProps) => {
-    if (!zoom || !widthPerUnit || !incrementValue) return null;
+    // @rmt: added scaleUnit check - NOTE: if any of the values below === 0 || === "", this will return null
+    if (!zoom || !widthPerUnit || !incrementValue || scaleUnit === undefined) {
+        return null;
+    }
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const [rulerWidth, setRulerWidth] = React.useState<number>(0);
     const widthInUnits = widthPerUnit / Math.pow(2, zoom);
@@ -46,8 +49,13 @@ const DistanceScale: React.FC<ScaleProps> = ({
             ? Math.round(widthInUnits)
             : roundToStep(widthInUnits, incrementValue);
 
-    const convertedUnit = convert(scaleValue).from(scaleUnit).toBest().unit;
-    const convertedValue = convert(scaleValue).from(scaleUnit).toBest().val;
+    // @rmt: scaleUnit could be undefined? - scaleUnit: string !instanceof convert.Unit
+    const convertedUnit = convert(scaleValue)
+        .from(scaleUnit as convert.Unit)
+        .toBest().unit;
+    const convertedValue = convert(scaleValue)
+        .from(scaleUnit as convert.Unit)
+        .toBest().val;
 
     // eslint-disable-next-line react-hooks/rules-of-hooks
     React.useEffect(() => {
