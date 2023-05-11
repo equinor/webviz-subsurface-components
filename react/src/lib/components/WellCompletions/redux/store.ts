@@ -6,7 +6,7 @@ import { enhancer } from "addon-redux";
 // #endif
 
 const createEnhancer = () => {
-    const enhancers = [];
+    const enhancers: StoreEnhancer[] = [];
     // #if process.env["NODE_ENV"] !== "production"
     enhancers.push(enhancer);
     // #endif
