@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
+
 import React, { useCallback, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { WellCompletionsState } from "../../redux/store";

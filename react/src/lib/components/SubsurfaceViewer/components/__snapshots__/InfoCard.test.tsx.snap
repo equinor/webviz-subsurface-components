@@ -95,20 +95,20 @@ exports[`Test Info Card snapshot test when property value provided 1`] = `
 }
 
 <div
-  class="MuiTableContainer-root"
+  class="MuiTableContainer-root css-rorn0c-MuiTableContainer-root"
 >
   <table
     aria-label="info-card"
-    class="MuiTable-root makeStyles-table-10"
+    class="MuiTable-root css-t8ttc-MuiTable-root"
   >
     <tbody
-      class="MuiTableBody-root"
+      class="MuiTableBody-root css-apqrd9-MuiTableBody-root"
     >
       <tr
-        class="MuiTableRow-root makeStyles-table_row-12"
+        class="MuiTableRow-root css-229i8j-MuiTableRow-root"
       >
         <td
-          class="MuiTableCell-root MuiTableCell-body makeStyles-icon_style-11"
+          class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-spv49l-MuiTableCell-root"
         >
           <button
             class="c0"
@@ -141,7 +141,7 @@ exports[`Test Info Card snapshot test when property value provided 1`] = `
           </button>
         </td>
         <td
-          class="MuiTableCell-root MuiTableCell-body"
+          class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-1ex1afd-MuiTableCell-root"
         >
            
           Position
@@ -149,73 +149,73 @@ exports[`Test Info Card snapshot test when property value provided 1`] = `
         </td>
       </tr>
       <tr
-        class="MuiTableRow-root makeStyles-table_row-12"
+        class="MuiTableRow-root css-229i8j-MuiTableRow-root"
       >
         <td
-          class="MuiTableCell-root MuiTableCell-body"
+          class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-1ex1afd-MuiTableCell-root"
           colspan="2"
           style="padding-bottom: 0px; padding-top: 0px;"
         >
           <div
-            class="MuiCollapse-root MuiCollapse-entered"
+            class="MuiCollapse-root MuiCollapse-vertical MuiCollapse-entered css-pwcg7p-MuiCollapse-root"
             style="min-height: 0px;"
           >
             <div
-              class="MuiCollapse-wrapper"
+              class="MuiCollapse-wrapper MuiCollapse-vertical css-smkl36-MuiCollapse-wrapper"
             >
               <div
-                class="MuiCollapse-wrapperInner"
+                class="MuiCollapse-wrapperInner MuiCollapse-vertical css-9l5vo-MuiCollapse-wrapperInner"
               >
                 <table
                   aria-label="properties"
-                  class="MuiTable-root"
+                  class="MuiTable-root css-rqglhn-MuiTable-root"
                 >
                   <tbody
-                    class="MuiTableBody-root"
+                    class="MuiTableBody-root css-apqrd9-MuiTableBody-root"
                   >
                     <tr
-                      class="MuiTableRow-root makeStyles-table_row-12"
+                      class="MuiTableRow-root css-229i8j-MuiTableRow-root"
                     >
                       <td
-                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall"
+                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall css-dsuxgy-MuiTableCell-root"
                         style="padding-left: 10px; padding-right: 10px;"
                       >
                         x
                       </td>
                       <td
-                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall"
+                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall css-dsuxgy-MuiTableCell-root"
                         style="text-align: right;"
                       >
                         111.00 m
                       </td>
                     </tr>
                     <tr
-                      class="MuiTableRow-root makeStyles-table_row-12"
+                      class="MuiTableRow-root css-229i8j-MuiTableRow-root"
                     >
                       <td
-                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall"
+                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall css-dsuxgy-MuiTableCell-root"
                         style="padding-left: 10px; padding-right: 10px;"
                       >
                         y
                       </td>
                       <td
-                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall"
+                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall css-dsuxgy-MuiTableCell-root"
                         style="text-align: right;"
                       >
                         222.00 m
                       </td>
                     </tr>
                     <tr
-                      class="MuiTableRow-root makeStyles-table_row-12"
+                      class="MuiTableRow-root css-229i8j-MuiTableRow-root"
                     >
                       <td
-                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall"
+                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall css-dsuxgy-MuiTableCell-root"
                         style="padding-left: 10px; padding-right: 10px;"
                       >
                         Hill shading
                       </td>
                       <td
-                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall"
+                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall css-dsuxgy-MuiTableCell-root"
                         style="text-align: right;"
                       >
                         3152.02
@@ -229,10 +229,10 @@ exports[`Test Info Card snapshot test when property value provided 1`] = `
         </td>
       </tr>
       <tr
-        class="MuiTableRow-root makeStyles-table_row-12"
+        class="MuiTableRow-root css-229i8j-MuiTableRow-root"
       >
         <td
-          class="MuiTableCell-root MuiTableCell-body makeStyles-icon_style-11"
+          class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-spv49l-MuiTableCell-root"
         >
           <button
             class="c0"
@@ -265,7 +265,7 @@ exports[`Test Info Card snapshot test when property value provided 1`] = `
           </button>
         </td>
         <td
-          class="MuiTableCell-root MuiTableCell-body"
+          class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-1ex1afd-MuiTableCell-root"
         >
            
           Wells layer
@@ -273,57 +273,57 @@ exports[`Test Info Card snapshot test when property value provided 1`] = `
         </td>
       </tr>
       <tr
-        class="MuiTableRow-root makeStyles-table_row-12"
+        class="MuiTableRow-root css-229i8j-MuiTableRow-root"
       >
         <td
-          class="MuiTableCell-root MuiTableCell-body"
+          class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-1ex1afd-MuiTableCell-root"
           colspan="2"
           style="padding-bottom: 0px; padding-top: 0px;"
         >
           <div
-            class="MuiCollapse-root MuiCollapse-entered"
+            class="MuiCollapse-root MuiCollapse-vertical MuiCollapse-entered css-pwcg7p-MuiCollapse-root"
             style="min-height: 0px;"
           >
             <div
-              class="MuiCollapse-wrapper"
+              class="MuiCollapse-wrapper MuiCollapse-vertical css-smkl36-MuiCollapse-wrapper"
             >
               <div
-                class="MuiCollapse-wrapperInner"
+                class="MuiCollapse-wrapperInner MuiCollapse-vertical css-9l5vo-MuiCollapse-wrapperInner"
               >
                 <table
                   aria-label="properties"
-                  class="MuiTable-root"
+                  class="MuiTable-root css-rqglhn-MuiTable-root"
                 >
                   <tbody
-                    class="MuiTableBody-root"
+                    class="MuiTableBody-root css-apqrd9-MuiTableBody-root"
                   >
                     <tr
-                      class="MuiTableRow-root makeStyles-table_row-12"
+                      class="MuiTableRow-root css-229i8j-MuiTableRow-root"
                     >
                       <td
-                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall"
+                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall css-dsuxgy-MuiTableCell-root"
                         style="padding-left: 10px; padding-right: 10px;"
                       >
                         Poro
                       </td>
                       <td
-                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall"
+                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall css-dsuxgy-MuiTableCell-root"
                         style="text-align: right;"
                       >
                         123
                       </td>
                     </tr>
                     <tr
-                      class="MuiTableRow-root makeStyles-table_row-12"
+                      class="MuiTableRow-root css-229i8j-MuiTableRow-root"
                     >
                       <td
-                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall"
+                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall css-dsuxgy-MuiTableCell-root"
                         style="padding-left: 10px; padding-right: 10px;"
                       >
                         Perm
                       </td>
                       <td
-                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall"
+                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall css-dsuxgy-MuiTableCell-root"
                         style="text-align: right;"
                       >
                         456
@@ -436,20 +436,20 @@ exports[`Test Info Card snapshot test with no props 1`] = `
 }
 
 <div
-  class="MuiTableContainer-root"
+  class="MuiTableContainer-root css-rorn0c-MuiTableContainer-root"
 >
   <table
     aria-label="info-card"
-    class="MuiTable-root makeStyles-table-1"
+    class="MuiTable-root css-t8ttc-MuiTable-root"
   >
     <tbody
-      class="MuiTableBody-root"
+      class="MuiTableBody-root css-apqrd9-MuiTableBody-root"
     >
       <tr
-        class="MuiTableRow-root makeStyles-table_row-3"
+        class="MuiTableRow-root css-229i8j-MuiTableRow-root"
       >
         <td
-          class="MuiTableCell-root MuiTableCell-body makeStyles-icon_style-2"
+          class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-spv49l-MuiTableCell-root"
         >
           <button
             class="c0"
@@ -482,7 +482,7 @@ exports[`Test Info Card snapshot test with no props 1`] = `
           </button>
         </td>
         <td
-          class="MuiTableCell-root MuiTableCell-body"
+          class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-1ex1afd-MuiTableCell-root"
         >
            
           Position
@@ -490,57 +490,57 @@ exports[`Test Info Card snapshot test with no props 1`] = `
         </td>
       </tr>
       <tr
-        class="MuiTableRow-root makeStyles-table_row-3"
+        class="MuiTableRow-root css-229i8j-MuiTableRow-root"
       >
         <td
-          class="MuiTableCell-root MuiTableCell-body"
+          class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-1ex1afd-MuiTableCell-root"
           colspan="2"
           style="padding-bottom: 0px; padding-top: 0px;"
         >
           <div
-            class="MuiCollapse-root MuiCollapse-entered"
+            class="MuiCollapse-root MuiCollapse-vertical MuiCollapse-entered css-pwcg7p-MuiCollapse-root"
             style="min-height: 0px;"
           >
             <div
-              class="MuiCollapse-wrapper"
+              class="MuiCollapse-wrapper MuiCollapse-vertical css-smkl36-MuiCollapse-wrapper"
             >
               <div
-                class="MuiCollapse-wrapperInner"
+                class="MuiCollapse-wrapperInner MuiCollapse-vertical css-9l5vo-MuiCollapse-wrapperInner"
               >
                 <table
                   aria-label="properties"
-                  class="MuiTable-root"
+                  class="MuiTable-root css-rqglhn-MuiTable-root"
                 >
                   <tbody
-                    class="MuiTableBody-root"
+                    class="MuiTableBody-root css-apqrd9-MuiTableBody-root"
                   >
                     <tr
-                      class="MuiTableRow-root makeStyles-table_row-3"
+                      class="MuiTableRow-root css-229i8j-MuiTableRow-root"
                     >
                       <td
-                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall"
+                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall css-dsuxgy-MuiTableCell-root"
                         style="padding-left: 10px; padding-right: 10px;"
                       >
                         x
                       </td>
                       <td
-                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall"
+                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall css-dsuxgy-MuiTableCell-root"
                         style="text-align: right;"
                       >
                         111.00 m
                       </td>
                     </tr>
                     <tr
-                      class="MuiTableRow-root makeStyles-table_row-3"
+                      class="MuiTableRow-root css-229i8j-MuiTableRow-root"
                     >
                       <td
-                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall"
+                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall css-dsuxgy-MuiTableCell-root"
                         style="padding-left: 10px; padding-right: 10px;"
                       >
                         y
                       </td>
                       <td
-                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall"
+                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall css-dsuxgy-MuiTableCell-root"
                         style="text-align: right;"
                       >
                         222.00 m

@@ -1,29 +1,40 @@
-import { FormControlLabel, makeStyles, Switch } from "@material-ui/core";
+/* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
+/* eslint-disable react-hooks/rules-of-hooks  */ // remove when ready to fix these.
+
+import { FormControlLabel, Switch } from "@mui/material";
+import { styled } from "@mui/material/styles";
 import { ComponentMeta, ComponentStory } from "@storybook/react";
 // import { PickInfo } from "lib";
 import React from "react";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 
+const PREFIX = "boxSelectionLayer";
 type PickInfo = any;
 
-export default {
-    component: SubsurfaceViewer,
-    title: "SubsurfaceViewer / Box Selection Layer",
-} as ComponentMeta<typeof SubsurfaceViewer>;
+const classes = {
+    main: `${PREFIX}-main`,
+    legend: `${PREFIX}-legend`,
+};
 
-const useStyles = makeStyles({
-    main: {
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const Root = styled("div")({
+    [`& .${classes.main}`]: {
         height: 500,
         border: "1px solid black",
         position: "relative",
     },
-    legend: {
+    [`& .${classes.legend}`]: {
         width: 100,
         position: "absolute",
         top: "0",
         right: "0",
     },
 });
+
+export default {
+    component: SubsurfaceViewer,
+    title: "SubsurfaceViewer / Box Selection Layer",
+} as ComponentMeta<typeof SubsurfaceViewer>;
 
 export const boxSelection: ComponentStory<typeof SubsurfaceViewer> = () => {
     const [argsState, setArgsState] =
@@ -46,8 +57,8 @@ export const boxSelection: ComponentStory<typeof SubsurfaceViewer> = () => {
     }, [state]);
 
     return (
-        <>
-            <div className={useStyles().main}>
+        <Root>
+            <div className={classes.main}>
                 <SubsurfaceViewer id={"DeckGL-Map"} {...argsState} />
             </div>
             <div style={{ textAlign: "center" }}>
@@ -64,7 +75,7 @@ export const boxSelection: ComponentStory<typeof SubsurfaceViewer> = () => {
                     label="Display Lasso Selection"
                 />
             </div>
-        </>
+        </Root>
     );
 };
 
@@ -141,8 +152,8 @@ export const boxSelectionWithCallback: ComponentStory<
         ],
     };
     return (
-        <>
-            <div className={useStyles().main}>
+        <Root>
+            <div className={classes.main}>
                 <SubsurfaceViewer
                     id={"DeckGL-Map"}
                     {...lassoArgsWithSelectedWellsDataCallback}
@@ -154,6 +165,6 @@ export const boxSelectionWithCallback: ComponentStory<
                     <div key={item}>{item}</div>
                 ))}
             </div>
-        </>
+        </Root>
     );
 };

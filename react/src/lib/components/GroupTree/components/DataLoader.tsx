@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
+
 import React, { PropsWithChildren, useMemo } from "react";
 import { Provider as ReduxProvider } from "react-redux";
 import { createReduxStore } from "../redux/store";

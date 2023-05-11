@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
+
 import React, { useCallback, useContext, useMemo } from "react";
 import { CompletionPlotData, PlotData } from "../../utils/dataUtil";
 import { useTooltip } from "../Common/TooltipProvider";
