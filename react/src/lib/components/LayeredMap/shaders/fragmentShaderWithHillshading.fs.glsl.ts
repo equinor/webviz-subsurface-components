@@ -36,7 +36,6 @@ void main() {
     vec4 color = texture2D(u_colormap_frame, vec2((map_array * (u_colormap_length - 1.0) + 0.5) / u_colormap_length, 0.5));
 
     gl_FragColor = color * vec4(light, light, light, 1.0);
-}`; 
+}`;
 
 export default fragmentShader;
-
