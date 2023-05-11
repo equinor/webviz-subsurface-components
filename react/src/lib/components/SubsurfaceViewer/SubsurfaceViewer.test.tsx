@@ -7,7 +7,7 @@ import React from "react";
 import SubsurfaceViewer from "./SubsurfaceViewer";
 import { colorTables } from "@emerson-eps/color-tables";
 
-const mapData = require("../../../demo/example-data/deckgl-map.json");
+import mapData from "../../../demo/example-data/deckgl-map.json";
 const colorTablesData = colorTables;
 
 describe("Test Map component", () => {
@@ -17,7 +17,8 @@ describe("Test Map component", () => {
                 id={mapData[0].id}
                 resources={mapData[0].resources}
                 layers={mapData[0].layers}
-                bounds={mapData[0].bounds}
+                // @rmt: Invalid type for "bounds" prop
+                bounds={mapData[0].bounds as [number, number, number, number]}
                 coords={mapData[0].coords}
                 scale={mapData[0].scale}
                 coordinateUnit={mapData[0].coordinateUnit}
@@ -44,7 +45,8 @@ describe("Test Map component", () => {
                 id={mapData[0].id}
                 resources={mapData[0].resources}
                 layers={mapData[0].layers}
-                bounds={mapData[0].bounds}
+                // @rmt: Invalid type
+                bounds={mapData[0].bounds as [number, number, number, number]}
                 coords={mapData[0].coords}
                 scale={mapData[0].scale}
                 coordinateUnit={mapData[0].coordinateUnit}

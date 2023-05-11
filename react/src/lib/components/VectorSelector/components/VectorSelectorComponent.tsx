@@ -30,8 +30,8 @@ import well from "./images/well.svg";
 import well_completion from "./images/well-completion.svg";
 import calculated from "./images/calculated.svg";
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const vectorDefinitions = require("../../../assets/VectorDefinitions.json");
+// @rmt: Changed require to import
+import vectorDefinitions from "../../../assets/VectorDefinitions.json";
 
 type VectorDefinitionsType = {
     [key: string]: { type: string; description: string };

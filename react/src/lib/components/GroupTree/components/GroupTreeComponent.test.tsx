@@ -5,8 +5,9 @@ import React from "react";
 import { Wrapper } from "./../test/TestWrapper";
 import GroupTreeComponent from "./GroupTreeComponent";
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const exampleData = require("../../../../demo/example-data/group-tree.json");
+// @rmt: Changed from require to import
+import exampleData from "../../../../demo/example-data/group-tree.json";
+import { Data } from "../redux/types";
 
 describe("Test GroupTree Component", () => {
     it("snapshot test", () => {
@@ -15,7 +16,7 @@ describe("Test GroupTree Component", () => {
                 children: (
                     <GroupTreeComponent
                         id={"grouptree"}
-                        data={exampleData}
+                        data={exampleData as unknown as Data}
                         edge_options={[
                             {
                                 name: "waterrate",

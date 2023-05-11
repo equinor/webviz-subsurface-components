@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+
 import React from "react";
 import PropTypes from "prop-types";
 
@@ -15,13 +17,11 @@ import {
 } from "./components/WellLogTemplateTypes";
 
 import { WellLog } from "./components/WellLogTypes";
-const welllogs =
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    require("../../../demo/example-data/volve_logs.json") as WellLog[];
+import welllogsJson from "../../../demo/example-data/volve_logs.json";
+const welllogs = welllogsJson as unknown as WellLog[];
 
-const template =
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    require("../../../demo/example-data/welllog_template_2.json") as Template;
+import templateJson from "../../../demo/example-data/welllog_template_2.json";
+const template = templateJson as unknown as Template;
 
 import { ColorTable } from "./components/ColorTableTypes";
 
@@ -39,6 +39,9 @@ import { deepCopy } from "./utils/deepcopy";
 
 import { WellLogViewOptions } from "./components/WellLogView";
 import { isEqualRanges } from "./components/WellLogView";
+
+import wellPicks from "../../../demo/example-data/wellpicks.json";
+import colorTables from "../../../demo/example-data/wellpick_colors.json";
 
 function getTemplatePlotColorTable(
     template: Template,
@@ -123,11 +126,9 @@ function addTemplateTrack(
 }
 
 const wellpick = {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    wellpick: require("../../../demo/example-data/wellpicks.json")[0],
+    wellpick: wellPicks[0],
     name: "HORIZON",
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    colorTables: require("../../../demo/example-data/wellpick_colors.json"),
+    colorTables: colorTables,
     color: "Stratigraphy",
 };
 
@@ -403,6 +404,8 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                             }
                             template={template}
                             colorTables={this.props.colorTables as ColorTable[]}
+                            // @aspentech: This issue needs to get sorted out, there seems to be a compatibility issue with the JSON file and the prop type
+                            // @ts-ignore
                             wellpick={wellpick}
                             primaryAxis={"md"}
                             axisTitles={axisTitles}

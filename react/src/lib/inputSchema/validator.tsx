@@ -3,14 +3,14 @@ import { ErrorObject, ValidateFunction } from "ajv/dist/types/index";
 
 // schema definations
 /* eslint-disable @typescript-eslint/no-var-requires */
-const wellsSchema = require("./Wells.json");
-const wellLogSchema = require("./WellLog.json");
-const wellLogsSchema = require("./WellLogs.json");
-const wellLogTemplateSchema = require("./WellLogTemplate.json");
-const pieChartSchema = require("./PieChart.json");
-const gridSchema = require("./Grid.json");
-const faultPolygonsSchema = require("./FaultPolygons.json");
-const colorTablesSchema = require("./ColorTables.json");
+import wellsSchema from "./Wells.json";
+import wellLogSchema from "./WellLog.json";
+import wellLogsSchema from "./WellLogs.json";
+import wellLogTemplateSchema from "./WellLogTemplate.json";
+import pieChartSchema from "./PieChart.json";
+import gridSchema from "./Grid.json";
+import faultPolygonsSchema from "./FaultPolygons.json";
+import colorTablesSchema from "./ColorTables.json";
 
 // Validator function accepts parameter data and schema type to be validated against.
 // Throws error message of failure.

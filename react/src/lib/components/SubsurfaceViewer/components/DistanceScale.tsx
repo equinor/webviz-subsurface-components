@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
 
 import React from "react";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const convert = require("convert-units");
+// @rmt: Changed require to import - added type dependency
+import convert from "convert-units";
 
 export interface ScaleProps {
     // Needed the zoom value to calculate width in units
