@@ -50,47 +50,63 @@ export class LithologyTrack extends StackedTrack {
     constructor(id: string | number, props: LithologyTrackOptions) {
         super(id, props);
         this.lithologyInfo = props.lithologyInfoTable as LithologyInfoTable; // TODO - ensure table is given and valid
+        setupLithologyInfoMap(this.lithologyInfo);
         this.patterns = new Map<string | number, CanvasPattern | string>();
+        this.loadPatterns = this.loadPatterns.bind(this);
     }
 
-    loadPatterns(): void {
-        const { data } = this;
-        if (!data) return;
+    async loadPatterns():Promise<void> {
+        return new Promise<void>(resolve => {
+            const { data } = this;
+            if (!data) return;
+            // Find unique canvas code names in data for this track. Later only load images for used codes
+            const uniqueCodes = [
+                ...new Set(data.map((item: LithologyTrackDataRow) => item.name)),
+            ] as (string | number)[]; // TODO: why doesn't typescript understand this itself?
 
-        // Find unique canvas code names in data for this track. Later only load images for used codes
-        const uniqueCodes = [
-            ...new Set(data.map((item: LithologyTrackDataRow) => item.name)),
-        ] as (string | number)[]; // TODO: why doesn't typescript understand this itself?
-        setupLithologyInfoMap(this.lithologyInfo);
-        uniqueCodes.forEach((code) => {
-            const pattern = lithologyInfoMap.get(code);
-            // const pattern = patterns.find(pattern => code === pattern.code)
-            if (pattern?.patternImage) {
-                // Check if we have loaded pattern
-                if (!this.patterns.get(code)) {
-                    // Temporarily set solid color while we get image to avoid fetching multiple times
-                    this.patterns.set(code, "#eee");
-                    // Create pattern
-                    const patternImage = new Image();
-                    patternImage.src = pattern.patternImage;
-                    patternImage.onload = () => {
-                        this.patterns.set(
-                            code,
-                            this.ctx?.createPattern(
-                                patternImage,
-                                "repeat"
-                            ) as CanvasPattern
-                        );
-                    };
+            let numUniquePatternsLoading = uniqueCodes.length;
+            uniqueCodes.forEach((code) => {
+                const pattern = lithologyInfoMap.get(code);
+                // const pattern = patterns.find(pattern => code === pattern.code)
+                if (pattern?.patternImage) {
+                    // Check if we have loaded pattern
+                    if (!this.patterns.get(code)) {
+                        // Temporarily set solid color while we get image to avoid fetching multiple times
+                        this.patterns.set(code, "#eee");
+                        // Create pattern
+                        const patternImage = new Image();
+                        patternImage.src = pattern.patternImage;
+                        patternImage.onload = () => {
+                            this.patterns.set(
+                                code,
+                                this.ctx?.createPattern(
+                                    patternImage,
+                                    "repeat"
+                                ) as CanvasPattern
+                            );
+                            numUniquePatternsLoading -= 1;
+                            // Resolve on last image.
+                            if (numUniquePatternsLoading <= 0) {
+                              this.isLoading = false;
+                              resolve();
+                            }
+                        };
+                    } else {
+                        numUniquePatternsLoading -= 1;
+                    }
+                } else {
+                    numUniquePatternsLoading -= 1;
                 }
+            });
+            if (numUniquePatternsLoading <= 0) {
+              this.isLoading = false;
+              resolve();
             }
-        });
+        })
     }
 
     plot(): void {
-        super.plot();
         const { ctx, scale: yscale, data, patterns } = this;
-
         if (!ctx || !data) return;
         const rectangles = scaleData(yscale, data);
         const { width: rectWidth, clientWidth, clientHeight } = ctx.canvas;
@@ -156,7 +172,8 @@ export class LithologyTrack extends StackedTrack {
             options.data().then(
                 (data: LithologyTrackDataRow[]) => {
                     this.data = data;
-                    this.plot();
+                    // @ts-ignore
+                    this.loadPatterns().then(this.plot());
                 },
                 (error: Error | string) => super.onError(error)
             );
@@ -189,8 +206,8 @@ export class LithologyTrack extends StackedTrack {
         this.plot();
     }
     onDataLoaded(): void {
-        this.loadPatterns();
-        this.plot();
+        // @ts-ignore
+        this.loadPatterns().then(this.plot());
     }
 }
 

@@ -16,6 +16,14 @@
         {
           "plots": [
             {
+              "name": "FACIES",
+              "style": "discretecanvas"
+            }
+          ]
+        },
+        {
+          "plots": [
+            {
               "name": "PORO"
             },
             {
@@ -27,60 +35,9 @@
           ]
         },
         {
-          "plots": [
-            {
-              "name": "FACIES",
-              "style": "discretecanvas"
-            }
-          ]
-        },
-        {
             "plots": [
                 {
                     "name": "MFOA"
-                }
-            ]
-        },
-        {
-          "plots": [
-            {
-              "name": "FACIES",
-              "style": "discrete"
-            }
-          ]
-        },
-        {
-            "plots": [
-                {
-                    "name": "DD_VOLUME"
-                }
-            ]
-        },
-        {
-            "plots": [
-                {
-                    "name": "TEMP"
-                }
-            ]
-        },
-        {
-            "plots": [
-                {
-                    "name": "BITSIZE"
-                }
-            ]
-        },
-        {
-            "plots": [
-                {
-                    "name": "GRSIM"
-                }
-            ]
-        },
-        {
-            "plots": [
-                {
-                    "name": "RACESHM"
                 }
             ]
         },
@@ -97,63 +54,6 @@
                 {
                     "name": "MFIA",
                     "type": "dot"
-                }
-            ]
-        },
-        {
-            "plots": [
-                {
-                    "name": "MDIA",
-                    "style": "MD"
-                }
-            ]
-        },
-        {
-            "plots": [
-                {
-                    "name": "MTOA"
-                }
-            ]
-        },
-        {
-            "plots": [
-                {
-                    "name": "MTIA"
-                }
-            ]
-        },
-        {
-            "plots": [
-                {
-                    "name": "ECDT"
-                }
-            ]
-        },
-        {
-            "plots": [
-                {
-                    "name": "BDTI"
-                }
-            ]
-        },
-        {
-            "plots": [
-                {
-                    "name": "BDDI"
-                }
-            ]
-        },
-        {
-            "plots": [
-                {
-                    "name": "BRVC"
-                }
-            ]
-        },
-        {
-            "plots": [
-                {
-                    "name": "TCTI"
                 }
             ]
         }

@@ -3,7 +3,7 @@ from pathlib import Path
 import dash
 import flask
 
-from examples.well_correlation_data.well_log_testdata import (
+from examples.example_sync_log_viewer.example_data import (
     axis_mnemos,
     axisTitles,
     color_tables,
