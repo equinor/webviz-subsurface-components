@@ -4,11 +4,17 @@
 import { FormControlLabel, Switch } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { ComponentMeta, ComponentStory } from "@storybook/react";
-import { PickInfo } from "lib";
+// import { PickInfo } from "lib";
 import React from "react";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 
 const PREFIX = "boxSelectionLayer";
+type PickInfo = any;
+
+export default {
+    component: SubsurfaceViewer,
+    title: "SubsurfaceViewer / Box Selection Layer",
+} as ComponentMeta<typeof SubsurfaceViewer>;
 
 const classes = {
     main: `${PREFIX}-main`,

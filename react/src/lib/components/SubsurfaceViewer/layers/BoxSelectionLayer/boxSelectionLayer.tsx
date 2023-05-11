@@ -6,7 +6,9 @@ import { ExtendedLayerProps } from "../utils/layerTools";
 import { getSize } from "../wells/wellsLayer";
 import { Color } from "@deck.gl/core/typed";
 import { Feature } from "geojson";
-import { PickInfo } from "lib";
+
+type PickInfo = any;
+
 export interface BoxSelectionLayerProps<D> extends ExtendedLayerProps<D> {
     mode: string; // One of modes in MODE_MAP
     selectedFeatureIndexes: number[];
