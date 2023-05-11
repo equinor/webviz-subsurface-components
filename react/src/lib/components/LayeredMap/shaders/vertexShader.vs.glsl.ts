@@ -1,4 +1,4 @@
-// This Source Code Form is subject to the terms of the Mozilla Public
+const vertexShaderVs = `// This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 //
@@ -20,5 +20,6 @@ void main() {
 
     // Pass the texCoord to the fragment shader
     v_texCoord = a_texCoord;
-}
+}`;
 
+export default vertexShaderVs;
