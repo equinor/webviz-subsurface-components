@@ -14,7 +14,7 @@ export type WebWorkerParams = {
 
 function GetBBox(
     points: number[],
-    isZIncreasingDownwards: boolean,
+    isZIncreasingDownwards: boolean
 ): [number, number, number, number, number, number] {
     let xmax = -99999999;
     let ymax = -99999999;
