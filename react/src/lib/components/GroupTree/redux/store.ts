@@ -8,7 +8,6 @@ import { enhancer } from "addon-redux";
 */
 
 const createEnhancer = () => {
-    const enhancers = [];
     const enhancers: StoreEnhancer[] = [];
     /*
     // #if process.env.NODE_RUNNING_STORYBOOK === "true"
