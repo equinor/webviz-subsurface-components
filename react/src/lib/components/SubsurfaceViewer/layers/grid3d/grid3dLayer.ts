@@ -4,16 +4,17 @@ import { ExtendedLayerProps, colorMapFunctionType } from "../utils/layerTools";
 import { makeFullMesh } from "./webworker";
 import { isEqual } from "lodash";
 import { load, JSONLoader } from "@loaders.gl/core";
-import { cloneDeep } from "lodash";
 
 export type WebWorkerParams = {
     points: number[];
     polys: number[];
     properties: number[];
+    isZIncreasingDownwards: boolean;
 };
 
 function GetBBox(
-    points: number[]
+    points: number[],
+    isZIncreasingDownwards: boolean,
 ): [number, number, number, number, number, number] {
     let xmax = -99999999;
     let ymax = -99999999;
@@ -22,6 +23,8 @@ function GetBBox(
     let xmin = 99999999;
     let ymin = 99999999;
     let zmin = 99999999;
+
+    const z_sign = isZIncreasingDownwards ? -1 : 1;
 
     for (let i = 0; i < points.length / 3; i++) {
         xmax = points[3 * i + 0] > xmax ? points[3 * i + 0] : xmax;
@@ -33,13 +36,7 @@ function GetBBox(
         zmax = points[3 * i + 2] > zmax ? points[3 * i + 2] : zmax;
         zmin = points[3 * i + 2] < zmin ? points[3 * i + 2] : zmin;
     }
-    return [xmin, ymin, zmin, xmax, ymax, zmax];
-}
-
-function FlipZ(points: number[]): void {
-    for (let i = 0; i < points.length / 3; i++) {
-        points[3 * i + 2] *= -1;
-    }
+    return [xmin, ymin, zmin * z_sign, xmax, ymax, zmax * z_sign];
 }
 
 async function load_data(
@@ -48,15 +45,15 @@ async function load_data(
     propertiesData: string | number[]
 ) {
     const points = Array.isArray(pointsData)
-        ? cloneDeep(pointsData)
+        ? pointsData
         : await load(pointsData as string, JSONLoader);
 
     const polys = Array.isArray(polysData)
-        ? cloneDeep(polysData)
+        ? polysData
         : await load(polysData as string, JSONLoader);
 
     const properties = Array.isArray(propertiesData)
-        ? cloneDeep(propertiesData)
+        ? propertiesData
         : await load(propertiesData as string, JSONLoader);
 
     return Promise.all([points, polys, properties]);
@@ -152,12 +149,7 @@ export default class Grid3DLayer extends CompositeLayer<
         );
 
         p.then(([points, polys, properties]) => {
-            if (this.props.ZIncreasingDownwards) {
-                // Will flip to webviz axes which have z axis pointing up.
-                FlipZ(points);
-            }
-
-            const bbox = GetBBox(points);
+            const bbox = GetBBox(points, this.props.ZIncreasingDownwards);
 
             // Using inline web worker for calculating the triangle mesh from
             // loaded input data so not to halt the GUI thread.
@@ -172,6 +164,7 @@ export default class Grid3DLayer extends CompositeLayer<
                 points,
                 polys,
                 properties,
+                isZIncreasingDownwards: this.props.ZIncreasingDownwards,
             };
 
             webWorker.postMessage(webworkerParams);
