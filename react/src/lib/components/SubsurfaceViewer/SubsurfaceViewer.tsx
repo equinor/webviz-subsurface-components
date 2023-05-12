@@ -9,6 +9,7 @@ import { MapMouseEvent, jsonToObject } from "./components/Map";
 import React from "react";
 import PropTypes from "prop-types";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
+import { Unit } from "convert-units";
 
 export interface SubsurfaceViewerProps {
     id: string;
@@ -27,7 +28,7 @@ export interface SubsurfaceViewerProps {
         widthPerUnit?: number | null;
         cssStyle?: Record<string, unknown> | null;
     };
-    coordinateUnit?: string;
+    coordinateUnit?: Unit;
     toolbar?: {
         visible?: boolean | null;
     };
@@ -284,7 +285,7 @@ SubsurfaceViewer.propTypes = {
      * Parameters for the Distance Scale component
      * Unit for the scale ruler
      */
-    coordinateUnit: PropTypes.string,
+    coordinateUnit: PropTypes.any,
 
     /**
      * @obsolete Toolbar should be added as annotation. This prop has no function.
