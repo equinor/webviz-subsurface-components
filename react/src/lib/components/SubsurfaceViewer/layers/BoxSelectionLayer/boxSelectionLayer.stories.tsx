@@ -11,11 +11,6 @@ import SubsurfaceViewer from "../../SubsurfaceViewer";
 const PREFIX = "boxSelectionLayer";
 type PickInfo = any;
 
-export default {
-    component: SubsurfaceViewer,
-    title: "SubsurfaceViewer / Box Selection Layer",
-} as ComponentMeta<typeof SubsurfaceViewer>;
-
 const classes = {
     main: `${PREFIX}-main`,
     legend: `${PREFIX}-legend`,
