@@ -464,9 +464,9 @@ export const ResetCameraProperty: ComponentStory<typeof SubsurfaceViewer> = (
     const [home, setHome] = React.useState<number>(0);
     const [camera, setCamera] = React.useState({
         rotationOrbit: 0,
-        rotationX: 89,
-        target: [435775, 6478650, -1750],
-        zoom: -3.5109619192773796,
+        rotationX: 45,
+        target: [435775, 6477650, -1750],
+        zoom: -3.8,
     });
 
     const handleChange1 = () => {
@@ -488,7 +488,7 @@ export const ResetCameraProperty: ComponentStory<typeof SubsurfaceViewer> = (
             <div className={classes.main}>
                 <SubsurfaceViewer {...props} />
             </div>
-            <button onClick={handleChange1}> Reset Camera </button>
+            <button onClick={handleChange1}> Reset Camera to bounds</button>
             <button onClick={handleChange2}> Change Camera </button>
         </Root>
     );
