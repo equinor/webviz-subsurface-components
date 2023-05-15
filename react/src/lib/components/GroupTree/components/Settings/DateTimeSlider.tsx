@@ -7,22 +7,30 @@ import { GroupTreeState } from "../../redux/store";
 import { Data, DatedTree } from "../../redux/types";
 import { DataContext } from "../DataLoader";
 
-const PREFIX = "DateTimeSlider";
-
 const classes = {
-    root: `${PREFIX}-root`,
-    valueLabel: `${PREFIX}-valueLabel`,
-    root2: `${PREFIX}-root2`,
+    root: "DateTimeSlider-root",
 };
 
 const Root = styled("div")(({ theme }) => ({
-    [`& .${classes.root2}`]: {
+    [`& .${classes.root}`]: {
         width: "200px",
         marginRight: theme.spacing(4),
     },
 }));
 
-const EdsSlider = Slider;
+const EdsSlider = styled(Slider)(() => ({
+    root: {
+        color: "#007079",
+    },
+    valueLabel: {
+        top: 22,
+        "& *": {
+            background: "transparent",
+            color: "#000",
+        },
+    },
+}));
+
 const DateTimeSlider: React.FC = React.memo(() => {
     const data: Data = useContext(DataContext);
     // Redux
@@ -71,10 +79,6 @@ const DateTimeSlider: React.FC = React.memo(() => {
                 step={1}
                 marks={true}
                 valueLabelFormat={outputFunction}
-                classes={{
-                    root: classes.root,
-                    valueLabel: classes.valueLabel,
-                }}
             />
         </Root>
     );

@@ -224,13 +224,13 @@ exports[`Test GroupTree Default Component snapshot test 1`] = `
       class="c6 SettingsBar-actions"
     >
       <div
-        class="DateTimeSlider-root css-18o3ah0"
+        class="DateTimeSlider-root css-16rgu47"
       >
         <span>
           Time Steps
         </span>
         <span
-          class="MuiSlider-root DateTimeSlider-root MuiSlider-trackFalse MuiSlider-colorPrimary MuiSlider-sizeMedium css-187mznn-MuiSlider-root"
+          class="MuiSlider-root MuiSlider-trackFalse MuiSlider-colorPrimary MuiSlider-sizeMedium css-1xvshl5-MuiSlider-root"
         >
           <span
             class="MuiSlider-rail css-14pt78w-MuiSlider-rail"
@@ -280,7 +280,7 @@ exports[`Test GroupTree Default Component snapshot test 1`] = `
             />
             <span
               aria-hidden="true"
-              class="MuiSlider-valueLabelOpen MuiSlider-valueLabel DateTimeSlider-valueLabel css-nnid7-MuiSlider-valueLabel"
+              class="MuiSlider-valueLabelOpen MuiSlider-valueLabel css-nnid7-MuiSlider-valueLabel"
             >
               <span
                 class="MuiSlider-valueLabelCircle"
