@@ -342,10 +342,6 @@ const Map: React.FC<MapProps> = ({
     const [viewsProps, setViewsProps] = useState<ViewportType[]>([]);
     const [alteredLayers, setAlteredLayers] = useState<LayersList>([]);
 
-    const [centerOfData, setCenterOfData] = useState<[number, number, number]>([
-        0, 0, 0,
-    ]);
-
     const [viewPortMargins, setViewPortMargins] = useState<marginsType>({
         left: 0,
         right: 0,
@@ -364,7 +360,7 @@ const Map: React.FC<MapProps> = ({
     const initialViewState = getViewState(
         viewPortMargins,
         boundsInitial,
-        centerOfData,
+        boundingBoxCenter(reportedBoundingBoxAcc),
         views?.viewports?.[0].target,
         views?.viewports?.[0].zoom,
         deckRef.current?.deck
@@ -443,7 +439,7 @@ const Map: React.FC<MapProps> = ({
                             : getViewState(
                                   viewPortMargins,
                                   boundsInitial,
-                                  centerOfData,
+                                  boundingBoxCenter(reportedBoundingBoxAcc),
                                   views?.viewports?.[index].target,
                                   views?.viewports?.[index].zoom,
                                   deckRef.current?.deck
@@ -460,7 +456,6 @@ const Map: React.FC<MapProps> = ({
     }, [
         boundsInitial,
         cameraPosition,
-        centerOfData,
         isCameraPositionDefined,
         viewPortMargins,
         views?.viewports,
@@ -481,7 +476,7 @@ const Map: React.FC<MapProps> = ({
                     getViewState(
                         viewPortMargins,
                         boundsInitial,
-                        centerOfData,
+                        boundingBoxCenter(reportedBoundingBoxAcc),
                         views?.viewports?.[index].target,
                         views?.viewports?.[index].zoom,
                         deckRef.current?.deck
@@ -499,7 +494,7 @@ const Map: React.FC<MapProps> = ({
         cameraPosition,
         viewPortMargins,
         boundsInitial,
-        centerOfData,
+        reportedBoundingBoxAcc,
         views?.viewports,
     ]);
 
@@ -507,7 +502,8 @@ const Map: React.FC<MapProps> = ({
         if (typeof triggerHome !== "undefined") {
             calcDefaultViewStates(reportedBoundingBoxAcc);
         }
-    }, [calcDefaultViewStates, reportedBoundingBoxAcc, triggerHome]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [triggerHome]);
 
     useEffect(() => {
         const union_of_reported_bboxes = addBoundingBoxes(
@@ -516,21 +512,18 @@ const Map: React.FC<MapProps> = ({
         );
         setReportedBoundingBoxAcc(union_of_reported_bboxes);
 
-        const center = boundingBoxCenter(
-            union_of_reported_bboxes // note this may include axesLayer
-        );
-        setCenterOfData(center);
-
         // If "bounds" or "cameraPosition" is not defined "viewState" will be
         // calculated based on the union of the reported bounding boxes from each layer.
         if (!didUserChangeCamera && !isCameraPositionDefined) {
             calcDefaultViewStates(union_of_reported_bboxes);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [didUserChangeCamera, isCameraPositionDefined, reportedBoundingBox]);
+    }, [reportedBoundingBox]);
 
     // react on bounds prop change
     useEffect(() => {
+        setReportedBoundingBoxAcc(bboxInitial);
+
         let tempViewStates: Record<string, ViewStateType> = {};
         if (!isCameraPositionDefined) {
             tempViewStates = Object.fromEntries(
@@ -539,7 +532,7 @@ const Map: React.FC<MapProps> = ({
                     getViewState(
                         viewPortMargins,
                         boundsInitial,
-                        centerOfData,
+                        boundingBoxCenter(reportedBoundingBoxAcc),
                         views?.viewports?.[index].target,
                         views?.viewports?.[index].zoom,
                         deckRef.current?.deck
@@ -553,9 +546,8 @@ const Map: React.FC<MapProps> = ({
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
-        bounds,
         boundsInitial,
-        isCameraPositionDefined,
+        cameraPosition,
         viewPortMargins,
         views?.viewports,
         viewsProps,
@@ -579,7 +571,8 @@ const Map: React.FC<MapProps> = ({
             );
             setViewStates(tempViewStates);
         }
-    }, [cameraPosition, initialViewState, isCameraPositionDefined, viewsProps]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [cameraPosition, viewsProps]);
 
     // Used for scaling in z direction using arrow keys.
     const [scaleZ, setScaleZ] = useState<number>(1);
@@ -621,7 +614,7 @@ const Map: React.FC<MapProps> = ({
             calcDefaultViewStates(reportedBoundingBoxAcc);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [bounds, views]);
+    }, [views]);
 
     useEffect(() => {
         if (layers == undefined) return;
