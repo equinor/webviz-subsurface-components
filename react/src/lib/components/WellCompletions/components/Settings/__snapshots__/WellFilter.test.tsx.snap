@@ -142,7 +142,7 @@ exports[`test search wells  snapshot test 1`] = `
 }
 
 <div
-  class="makeStyles-root-1"
+  class="WellFilter-root css-1mgy1d9"
 >
   <span
     aria-label="sitewide"
