@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-import Slider from "@material-ui/core/Slider";
+import Slider from "@mui/material/Slider";
 
 interface Props {
     onChange: (value: number) => void;
