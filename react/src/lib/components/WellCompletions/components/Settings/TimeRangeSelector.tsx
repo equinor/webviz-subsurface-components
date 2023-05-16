@@ -1,6 +1,6 @@
 import { NativeSelect } from "@equinor/eds-core-react";
 import { styled } from "@mui/material/styles";
-import { Slider, Theme } from "@mui/material";
+import { Slider } from "@mui/material";
 import { isEqual } from "lodash";
 import React, { useCallback, useContext, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -17,7 +17,7 @@ const classes = {
     selector: `${PREFIX}-selector`,
 };
 
-const Root = styled("div")(({ theme: Theme }) => ({
+const Root = styled("div")(({ theme }) => ({
     [`& .${classes.root2}`]: {
         display: "flex",
         flexDirection: "row",

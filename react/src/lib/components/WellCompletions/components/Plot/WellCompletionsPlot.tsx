@@ -1,4 +1,3 @@
-import { Theme } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import React, { useMemo } from "react";
 import { useResizeDetector } from "react-resize-detector";
@@ -15,7 +14,7 @@ const classes = {
     root: `${PREFIX}-root`,
 };
 
-const StyledTooltipProvider = styled(TooltipProvider)(({ theme: Theme }) => ({
+const StyledTooltipProvider = styled(TooltipProvider)(({ theme }) => ({
     [`& .${classes.root}`]: {
         display: "flex",
         flex: 1,

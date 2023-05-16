@@ -1,6 +1,5 @@
 import { NativeSelect } from "@equinor/eds-core-react";
 import { styled } from "@mui/material/styles";
-import { Theme } from "@mui/material";
 import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateWellsPerPage } from "../../redux/actions";
@@ -12,7 +11,7 @@ const classes = {
     root: `${PREFIX}-root`,
 };
 
-const StyledNativeSelect = styled(NativeSelect)(({ theme: Theme }) => ({
+const StyledNativeSelect = styled(NativeSelect)(({ theme }) => ({
     [`&.${classes.root}`]: {
         padding: theme.spacing(1),
         maxWidth: "170px",

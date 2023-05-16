@@ -2,7 +2,6 @@
 
 import { Typography } from "@equinor/eds-core-react";
 import { styled } from "@mui/material/styles";
-import { Theme } from "@mui/material";
 import { SmartNodeSelector } from "@webviz/core-components";
 import React, { useCallback, useContext, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -21,7 +20,7 @@ const classes = {
     root: `${PREFIX}-root`,
 };
 
-const Root = styled("div")(({ theme: Theme }) => ({
+const Root = styled("div")(({ theme }) => ({
     [`&.${classes.root}`]: {
         padding: theme.spacing(1),
         maxWidth: "250px",

@@ -2,7 +2,6 @@
 
 import { Search } from "@equinor/eds-core-react";
 import { styled } from "@mui/material/styles";
-import { Theme } from "@mui/material";
 import { throttle } from "lodash";
 import React, { useCallback } from "react";
 import { useDispatch } from "react-redux";
@@ -14,7 +13,7 @@ const classes = {
     root: `${PREFIX}-root`,
 };
 
-const Root = styled("div")(({ theme: Theme }) => ({
+const Root = styled("div")(({ theme }) => ({
     [`&.${classes.root}`]: {
         padding: theme.spacing(1),
         maxWidth: "250px",

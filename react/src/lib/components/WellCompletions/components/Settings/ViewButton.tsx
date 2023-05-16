@@ -1,11 +1,7 @@
 import { Button, Icon, Tooltip } from "@equinor/eds-core-react";
 import { styled } from "@mui/material/styles";
 import { view_column } from "@equinor/eds-icons";
-import {
-    Box,
-    Menu, // eslint-disable-next-line prettier/prettier
-Theme
-} from "@mui/material";
+import { Box, Menu } from "@mui/material";
 import React from "react";
 import SortButton from "./SortButton";
 import TimeAggregationSelector from "./TimeAggregationSelector";
@@ -17,7 +13,7 @@ const classes = {
     paper: `${PREFIX}-paper`,
 };
 
-const Root = styled("div")(({ theme: Theme }) => ({
+const Root = styled("div")(({ theme }) => ({
     [`& .${classes.paper}`]: {
         paddingLeft: theme.spacing(1),
         paddingRight: theme.spacing(1),

@@ -1,11 +1,7 @@
 import { Button, Icon, NativeSelect, Table } from "@equinor/eds-core-react";
 import { styled } from "@mui/material/styles";
 import { add_box, delete_to_trash } from "@equinor/eds-icons";
-import {
-    Box,
-    Theme, // eslint-disable-next-line prettier/prettier
-Tooltip
-} from "@mui/material";
+import { Box, Tooltip } from "@mui/material";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteSortKey, updateSortKey } from "../../redux/actions";
@@ -26,7 +22,7 @@ const classes = {
     select: `${PREFIX}-select`,
 };
 
-const StyledBox = styled(Box)(({ theme: Theme }) => ({
+const StyledBox = styled(Box)(({ theme }) => ({
     [`&.${classes.root}`]: {
         position: "relative",
         display: "flex",

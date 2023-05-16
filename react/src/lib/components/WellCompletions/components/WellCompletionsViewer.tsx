@@ -1,8 +1,4 @@
-import {
-    Divider,
-    Drawer, // eslint-disable-next-line prettier/prettier
-Theme
-} from "@mui/material";
+import { Divider, Drawer } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import clsx from "clsx";
 import React, { useContext, useMemo } from "react";
@@ -32,7 +28,7 @@ const classes = {
     contentShift: `${PREFIX}-contentShift`,
 };
 
-const Root = styled("div")(({ theme: Theme }) => ({
+const Root = styled("div")(({ theme }) => ({
     [`& .${classes.root}`]: {
         position: "relative",
         display: "flex",

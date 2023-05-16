@@ -1,4 +1,3 @@
-import { Theme } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import React, { useCallback, useContext, useMemo } from "react";
 import DropdownTreeSelect, { TreeNodeProps } from "react-dropdown-tree-select";
@@ -15,14 +14,12 @@ const classes = {
     root: `${PREFIX}-root`,
 };
 
-const StyledDropdownTreeSelect = styled(DropdownTreeSelect)(
-    ({ theme: Theme }) => ({
-        [`& .${classes.root}`]: {
-            padding: theme.spacing(1),
-            maxWidth: "250px",
-        },
-    })
-);
+const StyledDropdownTreeSelect = styled(DropdownTreeSelect)(({ theme }) => ({
+    [`& .${classes.root}`]: {
+        padding: theme.spacing(1),
+        maxWidth: "250px",
+    },
+}));
 
 //Construct a stratigraphy tree as the input of react-dropdown-tree
 const extractStratigraphyTree = (stratigraphy: Zone[]): TreeNodeProps => {
@@ -99,7 +96,7 @@ const ZoneSelector: React.FC = React.memo(() => {
     );
     // Render
     return (
-        <DropdownTreeSelect
+        <StyledDropdownTreeSelect
             texts={{ placeholder: "Select Zone(s)..." }}
             inlineSearchInput={true}
             showPartiallySelected={true}
