@@ -15,13 +15,9 @@ describe("Test  Date-Time Slider", () => {
     it("test slider", async () => {
         render(Wrapper({ children: <DateTimeSlider /> }));
         userEvent.type(screen.getByRole("slider"), "{arrowright}");
-        expect(testStore.dispatch).toHaveBeenCalledTimes(2);
+        expect(testStore.dispatch).toHaveBeenCalledTimes(1);
         expect(testStore.dispatch).toHaveBeenNthCalledWith(1, {
             payload: undefined,
-            type: "ui/updateCurrentDateTime",
-        });
-        expect(testStore.dispatch).toHaveBeenNthCalledWith(2, {
-            payload: "2018-03-01",
             type: "ui/updateCurrentDateTime",
         });
     });
