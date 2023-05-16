@@ -12,13 +12,12 @@ const PREFIX = "TimeRangeSelector";
 const classes = {
     root: `${PREFIX}-root`,
     valueLabel: `${PREFIX}-valueLabel`,
-    root2: `${PREFIX}-root2`,
     slider: `${PREFIX}-slider`,
     selector: `${PREFIX}-selector`,
 };
 
 const Root = styled("div")(({ theme }) => ({
-    [`& .${classes.root2}`]: {
+    [`& .${classes.root}`]: {
         display: "flex",
         flexDirection: "row",
     },
@@ -34,7 +33,19 @@ const Root = styled("div")(({ theme }) => ({
     },
 }));
 
-const EdsSlider = Slider;
+const EdsSlider = styled(Slider)({
+    root: {
+        color: "#007079",
+    },
+    valueLabel: {
+        top: 22,
+        "& *": {
+            background: "transparent",
+            color: "#000",
+        },
+    },
+});
+
 /**
  * A React component for selecting time step(s) to display in the plot
  */

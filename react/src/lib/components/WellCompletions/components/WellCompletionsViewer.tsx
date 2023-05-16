@@ -125,10 +125,10 @@ const WellCompletionsViewer: React.FC = () => {
     );
 
     //If no data is available
-    if (!data) return <Root />;
+    if (!data) return <div />;
     // Render
     return (
-        <div className={classes.root}>
+        <Root className={classes.root}>
             {/* We detect the resize of the element and resize the plot accordingly */}
             <ReactResizeDetector handleWidth handleHeight>
                 {({ width }) => (
@@ -181,7 +181,7 @@ const WellCompletionsViewer: React.FC = () => {
                     </>
                 )}
             </ReactResizeDetector>
-        </div>
+        </Root>
     );
 };
 
