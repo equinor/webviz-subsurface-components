@@ -12,7 +12,7 @@ exports[`test well attributes selector snapshot test 1`] = `
 }
 
 <div
-  class="makeStyles-root-1"
+  class="WellAttributesSelector-root css-4p3xgu"
 >
   <div
     id="AttributesSelector"

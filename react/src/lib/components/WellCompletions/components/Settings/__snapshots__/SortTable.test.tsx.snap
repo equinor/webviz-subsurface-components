@@ -293,7 +293,7 @@ exports[`test sorting the table snapshot test 1`] = `
 }
 
 <div
-  class="MuiBox-root MuiBox-root-4 makeStyles-root-1"
+  class="SortTable-root MuiBox-root css-1fg2yh3"
 >
   <table
     class="c0"
@@ -341,7 +341,7 @@ exports[`test sorting the table snapshot test 1`] = `
           class="c5"
         >
           <div
-            class="c6 makeStyles-select-3"
+            class="c6 SortTable-select"
           >
             <select
               class="c7"
@@ -391,9 +391,10 @@ exports[`test sorting the table snapshot test 1`] = `
           <button
             aria-controls="simple-menu"
             aria-haspopup="true"
+            aria-label="Add sorting level"
             class="c10"
+            data-mui-internal-clone-element="true"
             tabindex="0"
-            title="Add sorting level"
             type="button"
           >
             <span
