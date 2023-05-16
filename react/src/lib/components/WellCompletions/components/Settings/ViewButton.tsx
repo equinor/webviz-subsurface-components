@@ -2,12 +2,11 @@ import { Button, Icon, Tooltip } from "@equinor/eds-core-react";
 import { view_column } from "@equinor/eds-icons";
 import {
     Box,
-    createStyles,
-    makeStyles,
-    Menu,
-    // eslint-disable-next-line prettier/prettier
-    Theme
-} from "@material-ui/core";
+    Menu, // eslint-disable-next-line prettier/prettier
+Theme
+} from "@mui/material";
+import createStyles from "@mui/styles/createStyles";
+import makeStyles from "@mui/styles/makeStyles";
 import React from "react";
 import SortButton from "./SortButton";
 import TimeAggregationSelector from "./TimeAggregationSelector";

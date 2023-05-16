@@ -2,12 +2,11 @@ import { Button, Icon, NativeSelect, Table } from "@equinor/eds-core-react";
 import { add_box, delete_to_trash } from "@equinor/eds-icons";
 import {
     Box,
-    createStyles,
-    makeStyles,
-    Theme,
-    // eslint-disable-next-line prettier/prettier
-    Tooltip
-} from "@material-ui/core";
+    Theme, // eslint-disable-next-line prettier/prettier
+Tooltip
+} from "@mui/material";
+import createStyles from "@mui/styles/createStyles";
+import makeStyles from "@mui/styles/makeStyles";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteSortKey, updateSortKey } from "../../redux/actions";

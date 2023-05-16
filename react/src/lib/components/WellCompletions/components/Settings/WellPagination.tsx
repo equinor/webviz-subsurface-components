@@ -1,8 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
 
 import { Typography } from "@equinor/eds-core-react";
-import { createStyles, makeStyles } from "@material-ui/core";
-import { Pagination } from "@material-ui/lab";
+import createStyles from "@mui/styles/createStyles";
+import makeStyles from "@mui/styles/makeStyles";
+import { Pagination } from "@mui/material";
 import { clamp } from "lodash";
 import React, { useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";

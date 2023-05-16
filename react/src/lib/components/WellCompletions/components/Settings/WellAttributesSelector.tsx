@@ -1,7 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
 
 import { Typography } from "@equinor/eds-core-react";
-import { createStyles, makeStyles, Theme } from "@material-ui/core";
+import { Theme } from "@mui/material";
+import createStyles from "@mui/styles/createStyles";
+import makeStyles from "@mui/styles/makeStyles";
 import { SmartNodeSelector } from "@webviz/core-components";
 import React, { useCallback, useContext, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";

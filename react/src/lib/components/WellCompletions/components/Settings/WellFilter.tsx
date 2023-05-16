@@ -1,7 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
 
 import { Search } from "@equinor/eds-core-react";
-import { createStyles, makeStyles, Theme } from "@material-ui/core";
+import { Theme } from "@mui/material";
+import createStyles from "@mui/styles/createStyles";
+import makeStyles from "@mui/styles/makeStyles";
 import { throttle } from "lodash";
 import React, { useCallback } from "react";
 import { useDispatch } from "react-redux";

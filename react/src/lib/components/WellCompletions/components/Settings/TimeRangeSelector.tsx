@@ -1,12 +1,8 @@
 import { NativeSelect } from "@equinor/eds-core-react";
-import {
-    createStyles,
-    makeStyles,
-    Slider,
-    Theme,
-    // eslint-disable-next-line prettier/prettier
-    withStyles
-} from "@material-ui/core";
+import { Slider, Theme } from "@mui/material";
+import createStyles from "@mui/styles/createStyles";
+import makeStyles from "@mui/styles/makeStyles";
+import withStyles from "@mui/styles/withStyles";
 import { isEqual } from "lodash";
 import React, { useCallback, useContext, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";

@@ -1,7 +1,8 @@
 /* eslint-disable react/display-name */
 import { Button, Dialog, Icon, Menu, Scrim } from "@equinor/eds-core-react";
 import { sort } from "@equinor/eds-icons";
-import { createStyles, makeStyles } from "@material-ui/core";
+import createStyles from "@mui/styles/createStyles";
+import makeStyles from "@mui/styles/makeStyles";
 import React, { useState } from "react";
 import SortTable from "./SortTable";
 

@@ -1,11 +1,10 @@
 import {
-    createStyles,
     Divider,
-    Drawer,
-    makeStyles,
-    // eslint-disable-next-line prettier/prettier
-    Theme
-} from "@material-ui/core";
+    Drawer, // eslint-disable-next-line prettier/prettier
+Theme
+} from "@mui/material";
+import createStyles from "@mui/styles/createStyles";
+import makeStyles from "@mui/styles/makeStyles";
 import clsx from "clsx";
 import React, { useContext, useMemo } from "react";
 import { useSelector } from "react-redux";

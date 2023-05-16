@@ -1,4 +1,6 @@
-import { createStyles, makeStyles, Theme } from "@material-ui/core";
+import { Theme } from "@mui/material";
+import createStyles from "@mui/styles/createStyles";
+import makeStyles from "@mui/styles/makeStyles";
 import React, { useCallback, useContext, useMemo } from "react";
 import DropdownTreeSelect, { TreeNodeProps } from "react-dropdown-tree-select";
 import "!style-loader!css-loader!react-dropdown-tree-select/dist/styles.css";
