@@ -8,19 +8,11 @@ import { getLayout, Padding } from "./plotUtil";
 import StratigraphyPlot from "./StratigraphyPlot";
 import WellsPlot from "./WellsPlot";
 
-const PREFIX = "WellCompletionsPlot";
-
-const classes = {
-    root: `${PREFIX}-root`,
-};
-
 const Root = styled("div")(({ theme }) => ({
-    [`& .${classes.root}`]: {
-        display: "flex",
-        flex: 1,
-        height: "80%",
-        padding: theme.spacing(1),
-    },
+    display: "flex",
+    flex: 1,
+    height: "80%",
+    padding: theme.spacing(1),
 }));
 
 interface Props {
@@ -49,7 +41,6 @@ const WellCompletionsPlot: React.FC<Props> = React.memo(
         return (
             <TooltipProvider>
                 <Root
-                    className={classes.root}
                     ref={ref as React.LegacyRef<HTMLDivElement>}
                     data-tip
                     data-for="plot-tooltip"
