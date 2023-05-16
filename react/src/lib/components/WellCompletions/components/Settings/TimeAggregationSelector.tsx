@@ -1,6 +1,6 @@
 import { NativeSelect } from "@equinor/eds-core-react";
 import { styled } from "@mui/material/styles";
-import React, { useCallback } from "react";
+import React, { ChangeEvent, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateTimeAggregation } from "../../redux/actions";
 import { WellCompletionsState } from "../../redux/store";
@@ -31,7 +31,8 @@ const TimeAggregationSelector: React.FC = React.memo(() => {
     );
     // Handlers
     const handleSelectedItemChange = useCallback(
-        (event) => dispatch(updateTimeAggregation(event.target.value)),
+        (event: ChangeEvent<HTMLSelectElement>) =>
+            dispatch(updateTimeAggregation(event.target.value as any)),
         [dispatch]
     );
     //Render

@@ -37,7 +37,7 @@ import { cloneDeep } from "lodash";
 import { colorTables } from "@emerson-eps/color-tables";
 import { getModelMatrixScale } from "../layers/utils/layerTools";
 import { OrbitController, OrthographicController } from "@deck.gl/core/typed";
-import { MjolnirEvent } from "mjolnir.js";
+import { MjolnirEvent, MjolnirPointerEvent } from "mjolnir.js";
 import IntersectionView from "../views/intersectionView";
 
 type BoundingBox = [number, number, number, number, number, number];
@@ -780,7 +780,7 @@ const Map: React.FC<MapProps> = ({
         (
             type: "click" | "hover",
             infos: PickingInfo[],
-            event: Record<string, unknown>
+            event: MjolnirEvent
         ): void => {
             if (!onMouseEvent) return;
             const ev = handleMouseEvent(type, infos, event);
@@ -792,7 +792,7 @@ const Map: React.FC<MapProps> = ({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [hoverInfo, setHoverInfo] = useState<any>([]);
     const onHover = useCallback(
-        (pickInfo, event) => {
+        (pickInfo: PickingInfo, event: MjolnirEvent) => {
             const infos = getPickingInfos(pickInfo, event);
             setHoverInfo(infos); //  for InfoCard pickInfos
             callOnMouseEvent?.("hover", infos, event);
@@ -801,7 +801,7 @@ const Map: React.FC<MapProps> = ({
     );
 
     const onClick = useCallback(
-        (pickInfo, event) => {
+        (pickInfo: PickingInfo, event: MjolnirEvent) => {
             const infos = getPickingInfos(pickInfo, event);
             callOnMouseEvent?.("click", infos, event);
         },
@@ -903,7 +903,6 @@ const Map: React.FC<MapProps> = ({
                 views={deckGLViews}
                 layerFilter={layerFilter}
                 layers={deckGLLayers}
-                // @ts-expect-error this prop doesn't exists directly on DeckGL, but on Deck.Context
                 userData={{
                     setEditedData: (updated_prop: Record<string, unknown>) => {
                         setSelectedWell(updated_prop["selectedWell"] as string);
@@ -1285,14 +1284,14 @@ function getViews(views: ViewsType | undefined): ViewportType[] {
 function handleMouseEvent(
     type: "click" | "hover",
     infos: PickingInfo[],
-    event: Record<string, unknown>
+    event: MjolnirEvent
 ) {
     const ev: MapMouseEvent = {
         type: type,
         infos: infos,
     };
     if (ev.type === "click") {
-        if (event["rightButton"]) ev.type = "contextmenu";
+        if ((event as MjolnirPointerEvent).rightButton) ev.type = "contextmenu";
     }
     for (const info of infos as LayerPickInfo[]) {
         if (info.coordinate) {

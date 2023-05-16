@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
 
-import React, { PropsWithChildren, useMemo } from "react";
+import React, { PropsWithChildren, ReactNode, useMemo } from "react";
 import { Provider as ReduxProvider } from "react-redux";
 import { createReduxStore } from "../redux/store";
 import { Data, DataInfos, UISettings } from "../redux/types";
@@ -11,6 +11,7 @@ interface Props {
     edge_options: DataInfos;
     node_options: DataInfos;
     initial_index: [number, number];
+    children: ReactNode;
 }
 
 export const DataContext = React.createContext<Data>([]);

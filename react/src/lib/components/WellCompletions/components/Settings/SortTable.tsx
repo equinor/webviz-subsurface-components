@@ -95,7 +95,9 @@ const SortTable: React.FC = React.memo(() => {
     // Handlers
     // Update the sort key in the placeholder row
     const onSortKeyToAddChange = useCallback(
-        (event) => setSortKeyToAdd(event.target.value),
+        (event: {
+            target: { value: React.SetStateAction<string | undefined> };
+        }) => setSortKeyToAdd(event.target.value),
         [setSortKeyToAdd]
     );
     // Update the sort direction in the placeholder row
@@ -109,13 +111,13 @@ const SortTable: React.FC = React.memo(() => {
 
     // Add or update sort key and direction
     const onUpdateSortKey = useCallback(
-        (sortKey, sortDirection) =>
+        (sortKey: string, sortDirection: SortDirection) =>
             dispatch(updateSortKey({ sortKey, sortDirection })),
         [dispatch]
     );
     // Remove sort key and direction
     const onDeleteSortKey = useCallback(
-        (sortKey) => dispatch(deleteSortKey(sortKey)),
+        (sortKey: string) => dispatch(deleteSortKey(sortKey)),
         [dispatch]
     );
 
