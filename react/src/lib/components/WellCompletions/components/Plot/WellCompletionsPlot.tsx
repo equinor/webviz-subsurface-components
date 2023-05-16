@@ -14,7 +14,7 @@ const classes = {
     root: `${PREFIX}-root`,
 };
 
-const StyledTooltipProvider = styled(TooltipProvider)(({ theme }) => ({
+const Root = styled("div")(({ theme }) => ({
     [`& .${classes.root}`]: {
         display: "flex",
         flex: 1,
@@ -47,8 +47,8 @@ const WellCompletionsPlot: React.FC<Props> = React.memo(
         );
 
         return (
-            <StyledTooltipProvider>
-                <div
+            <TooltipProvider>
+                <Root
                     className={classes.root}
                     ref={ref as React.LegacyRef<HTMLDivElement>}
                     data-tip
@@ -79,8 +79,8 @@ const WellCompletionsPlot: React.FC<Props> = React.memo(
                             />
                         </svg>
                     )}
-                </div>
-            </StyledTooltipProvider>
+                </Root>
+            </TooltipProvider>
         );
     }
 );
