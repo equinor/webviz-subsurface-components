@@ -91,7 +91,7 @@
         "@babel/preset-react": "^7.12.13",
         "@babel/preset-typescript": "^7.13.0",
         "@babel/runtime": "^7.13.10",
-        "@cypress/react": "^7.0.1",
+        "@cypress/react": "^7.0.3",
         "@storybook/addon-docs": "^6.5.9",
         "@storybook/addon-essentials": "^6.5.9",
         "@storybook/addon-links": "^6.5.9",
@@ -151,10 +151,10 @@
         "prettier": "^2.5.1",
         "process": "^0.11.10",
         "raw-loader": "^4.0.2",
-        "react": "^17.0.2",
+        "react": "18.2.0",
         "react-ace": "^9.5.0",
         "react-docgen": "^5.3.1",
-        "react-dom": "^17.0.2",
+        "react-dom": "18.2.0",
         "react-scripts": "^5.0.1",
         "react-test-renderer": "^17.0.2",
         "redux-mock-store": "^1.5.4",
@@ -174,8 +174,8 @@
         "webpack-dev-server": "^4.11.0"
     },
     "peerDependencies": {
-        "react": ">16",
-        "react-dom": ">16"
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0"
     },
     "engines": {
         "node": ">=14.17",
