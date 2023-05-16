@@ -50,7 +50,7 @@ class ZoomSlider extends Component<Props, State> {
 
     // callback function from Zoom slider
     onChange(
-        _event: React.ChangeEvent<Record<string, unknown>>,
+        _event: Event,
         level: number | number[] // zoom level
     ): void {
         if (typeof level === "number") {
