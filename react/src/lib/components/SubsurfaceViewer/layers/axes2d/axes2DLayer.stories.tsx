@@ -1,6 +1,10 @@
 import React from "react";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
+import { View } from "../../../..";
+import { ViewsType } from "../../components/Map";
+
+type NumberQuad = [number, number, number, number];
 
 export default {
     component: SubsurfaceViewer,
@@ -90,4 +94,56 @@ ColoredTextAndBackGround.args = {
             },
         ],
     },
+};
+
+//===========================================================
+const MatrixStory = () => {
+    const views: ViewsType = {
+        layout: [2, 2],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: false,
+                layerIds: ["mesh-layer", "axes-layer2D"],
+                isSync: false,
+            },
+            {
+                id: "view_2",
+                show3D: false,
+                layerIds: ["mesh-layer"],
+                isSync: false,
+            },
+            {
+                id: "view_3",
+                show3D: false,
+                layerIds: ["mesh-layer"],
+                isSync: false,
+            },
+            {
+                id: "view_4",
+                show3D: false,
+                layerIds: ["mesh-layer"],
+                isSync: false,
+            },
+        ],
+    };
+
+    const bounds = [432150, 6475800, 439400, 6481501] as NumberQuad;
+    return (
+        <SubsurfaceViewer
+            id={"test"}
+            layers={[meshMapLayerPng, axes2D]}
+            views={views}
+            bounds={bounds}
+        >
+            <View id="view_1"></View>
+            <View id="view_2"></View>
+            <View id="view_3"></View>
+            <View id="view_4"></View>
+        </SubsurfaceViewer>
+    );
+};
+
+export const Matrix: ComponentStory<typeof MatrixStory> = () => {
+    return <MatrixStory />;
 };
