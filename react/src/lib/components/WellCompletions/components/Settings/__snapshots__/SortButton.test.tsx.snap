@@ -45,15 +45,19 @@ exports[`Test view menu snapshot test 1`] = `
   align-items: center;
 }
 
-<li
-  class="c0"
-  role="menuitem"
-  tabindex="0"
+<div
+  class="css-biakn3"
 >
-  <div
-    class="c1"
+  <li
+    class="c0"
+    role="menuitem"
+    tabindex="0"
   >
-    Sort/Group by Attributes
-  </div>
-</li>
+    <div
+      class="c1"
+    >
+      Sort/Group by Attributes
+    </div>
+  </li>
+</div>
 `;

@@ -88,7 +88,7 @@ exports[`test range display mode selector snapshot test 1`] = `
 }
 
 <div
-  class="c0 makeStyles-root-1"
+  class="c0 TimeAggregationSelector-root css-1m3ieil"
 >
   <label
     class="c1"
