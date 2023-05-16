@@ -59,7 +59,7 @@ export default class Compass extends Component {
     }
 
     _dragStarted() {
-        const [x, y] = d3.mouse(this.element.node());
+        const [x, y] = d3.pointer(this.element.node());
 
         this.element.selectAll("polygon").attr("fill", "#A75C7C");
 
@@ -67,7 +67,7 @@ export default class Compass extends Component {
     }
 
     _dragged() {
-        const [x, y] = d3.mouse(this.element.node());
+        const [x, y] = d3.pointer(this.element.node());
 
         this.dragAngle = this.constructor.calculateAngleFromCoord(x, y);
 
