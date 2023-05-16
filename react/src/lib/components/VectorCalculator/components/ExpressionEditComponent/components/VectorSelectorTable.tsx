@@ -7,7 +7,7 @@ import {
     TableRow,
     TableBody,
     TableCell,
-} from "@material-ui/core";
+} from "@mui/material";
 import { TreeDataNode } from "@webviz/core-components";
 import cloneDeep from "lodash/cloneDeep";
 
