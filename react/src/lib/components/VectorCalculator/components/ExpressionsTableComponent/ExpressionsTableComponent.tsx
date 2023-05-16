@@ -2,8 +2,8 @@
 
 import React from "react";
 
-import { Grid } from "@material-ui/core";
-import { Alert } from "@material-ui/lab";
+import { Grid } from "@mui/material";
+import { Alert } from "@mui/material";
 
 import { Button, Icon } from "@equinor/eds-core-react";
 import { add, copy, delete_forever } from "@equinor/eds-icons";
