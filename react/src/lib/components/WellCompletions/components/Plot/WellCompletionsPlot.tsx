@@ -1,6 +1,5 @@
 import { Theme } from "@mui/material";
-import createStyles from "@mui/styles/createStyles";
-import makeStyles from "@mui/styles/makeStyles";
+import { styled } from "@mui/material/styles";
 import React, { useMemo } from "react";
 import { useResizeDetector } from "react-resize-detector";
 import { PlotData } from "../../utils/dataUtil";
@@ -10,16 +9,21 @@ import { getLayout, Padding } from "./plotUtil";
 import StratigraphyPlot from "./StratigraphyPlot";
 import WellsPlot from "./WellsPlot";
 
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        root: {
-            display: "flex",
-            flex: 1,
-            height: "80%",
-            padding: theme.spacing(1),
-        },
-    })
-);
+const PREFIX = "WellCompletionsPlot";
+
+const classes = {
+    root: `${PREFIX}-root`,
+};
+
+const StyledTooltipProvider = styled(TooltipProvider)(({ theme: Theme }) => ({
+    [`& .${classes.root}`]: {
+        display: "flex",
+        flex: 1,
+        height: "80%",
+        padding: theme.spacing(1),
+    },
+}));
+
 interface Props {
     timeSteps: string[];
     plotData: PlotData;
@@ -30,7 +34,6 @@ const padding: Padding = { left: 80, right: 50, top: 70, bottom: 50 };
 /* eslint-disable react/prop-types */
 const WellCompletionsPlot: React.FC<Props> = React.memo(
     ({ timeSteps, plotData }) => {
-        const classes = useStyles();
         const { width, height, ref } = useResizeDetector({
             refreshMode: "debounce",
             refreshRate: 50,
@@ -45,7 +48,7 @@ const WellCompletionsPlot: React.FC<Props> = React.memo(
         );
 
         return (
-            <TooltipProvider>
+            <StyledTooltipProvider>
                 <div
                     className={classes.root}
                     ref={ref as React.LegacyRef<HTMLDivElement>}
@@ -78,7 +81,7 @@ const WellCompletionsPlot: React.FC<Props> = React.memo(
                         </svg>
                     )}
                 </div>
-            </TooltipProvider>
+            </StyledTooltipProvider>
         );
     }
 );

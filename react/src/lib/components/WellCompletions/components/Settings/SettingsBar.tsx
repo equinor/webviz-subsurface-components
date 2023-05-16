@@ -1,30 +1,35 @@
 import { TopBar } from "@equinor/eds-core-react";
-import createStyles from "@mui/styles/createStyles";
-import makeStyles from "@mui/styles/makeStyles";
+import { styled } from "@mui/material/styles";
 import React from "react";
 import FilterButton from "./FilterButton";
 import TimeRangeSelector from "./TimeRangeSelector";
 import ViewButton from "./ViewButton";
 
-const useStyles = makeStyles(() =>
-    createStyles({
-        topBar: {
-            minHeight: "90px",
-        },
-        actions: {
-            position: "relative",
-            display: "flex",
-            flexDirection: "row",
-        },
-    })
-);
+const PREFIX = "SettingsBar";
+
+const classes = {
+    topBar: `${PREFIX}-topBar`,
+    actions: `${PREFIX}-actions`,
+};
+
+const StyledTopBar = styled(TopBar)(() => ({
+    [`&.${classes.topBar}`]: {
+        minHeight: "90px",
+    },
+
+    [`& .${classes.actions}`]: {
+        position: "relative",
+        display: "flex",
+        flexDirection: "row",
+    },
+}));
+
 /**
  * A settings bar that offers time selection and other viewing/filtering functions
  */
 const SettingsBar: React.FC = React.memo(() => {
-    const classes = useStyles();
     return (
-        <TopBar className={classes.topBar}>
+        <StyledTopBar className={classes.topBar}>
             <TopBar.Header className={classes.actions}>
                 <TimeRangeSelector />
             </TopBar.Header>
@@ -32,7 +37,7 @@ const SettingsBar: React.FC = React.memo(() => {
                 <ViewButton />
                 <FilterButton />
             </TopBar.Actions>
-        </TopBar>
+        </StyledTopBar>
     );
 });
 

@@ -1,33 +1,36 @@
 import { Button, Icon, Tooltip } from "@equinor/eds-core-react";
+import { styled } from "@mui/material/styles";
 import { view_column } from "@equinor/eds-icons";
 import {
     Box,
     Menu, // eslint-disable-next-line prettier/prettier
 Theme
 } from "@mui/material";
-import createStyles from "@mui/styles/createStyles";
-import makeStyles from "@mui/styles/makeStyles";
 import React from "react";
 import SortButton from "./SortButton";
 import TimeAggregationSelector from "./TimeAggregationSelector";
 import WellsPerPageSelector from "./WellsPerPageSelector";
 
+const PREFIX = "ViewButton";
+
+const classes = {
+    paper: `${PREFIX}-paper`,
+};
+
+const Root = styled("div")(({ theme: Theme }) => ({
+    [`& .${classes.paper}`]: {
+        paddingLeft: theme.spacing(1),
+        paddingRight: theme.spacing(1),
+        alignSelf: "center",
+        width: "200px",
+    },
+}));
+
 Icon.add({ view_column }); // (this needs only be done once)
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        paper: {
-            paddingLeft: theme.spacing(1),
-            paddingRight: theme.spacing(1),
-            alignSelf: "center",
-            width: "200px",
-        },
-    })
-);
 /**
  * A menu button that shows a list of viewing options
  */
 const ViewButton: React.FC = React.memo(() => {
-    const classes = useStyles();
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
     // Handlers
@@ -40,7 +43,7 @@ const ViewButton: React.FC = React.memo(() => {
 
     // Render
     return (
-        <div>
+        <Root>
             <Tooltip title="View">
                 <Button variant="ghost_icon" onClick={handleClick}>
                     <Icon color="currentColor" name="view_column" />
@@ -60,7 +63,7 @@ const ViewButton: React.FC = React.memo(() => {
                     <WellsPerPageSelector />
                 </Box>
             </Menu>
-        </div>
+        </Root>
     );
 });
 

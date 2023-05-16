@@ -1,26 +1,29 @@
 import { NativeSelect } from "@equinor/eds-core-react";
+import { styled } from "@mui/material/styles";
 import { Theme } from "@mui/material";
-import createStyles from "@mui/styles/createStyles";
-import makeStyles from "@mui/styles/makeStyles";
 import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateWellsPerPage } from "../../redux/actions";
 import { WellCompletionsState } from "../../redux/store";
 
+const PREFIX = "WellsPerPageSelector";
+
+const classes = {
+    root: `${PREFIX}-root`,
+};
+
+const StyledNativeSelect = styled(NativeSelect)(({ theme: Theme }) => ({
+    [`&.${classes.root}`]: {
+        padding: theme.spacing(1),
+        maxWidth: "170px",
+    },
+}));
+
 const wellsPerPageOptions = [10, 25, 50];
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        root: {
-            padding: theme.spacing(1),
-            maxWidth: "170px",
-        },
-    })
-);
 /**
  * A drop down for selecting how many wells to display per page
  */
 const WellsPerPageSelector: React.FC = React.memo(() => {
-    const classes = useStyles();
     // Redux
     const dispatch = useDispatch();
     const wellsPerPage = useSelector(
@@ -33,7 +36,7 @@ const WellsPerPageSelector: React.FC = React.memo(() => {
     );
     // Render
     return (
-        <NativeSelect
+        <StyledNativeSelect
             label={"Wells per page"}
             id="wells-per-page-select"
             className={classes.root}
@@ -45,7 +48,7 @@ const WellsPerPageSelector: React.FC = React.memo(() => {
                     {value}
                 </option>
             ))}
-        </NativeSelect>
+        </StyledNativeSelect>
     );
 });
 

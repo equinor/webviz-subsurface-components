@@ -1,27 +1,30 @@
 import { NativeSelect } from "@equinor/eds-core-react";
+import { styled } from "@mui/material/styles";
 import { Theme } from "@mui/material";
-import createStyles from "@mui/styles/createStyles";
-import makeStyles from "@mui/styles/makeStyles";
 import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateTimeAggregation } from "../../redux/actions";
 import { WellCompletionsState } from "../../redux/store";
 import { TimeAggregations } from "../../redux/types";
 
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        root: {
-            minWidth: "170px",
-            maxWidth: "170px",
-            padding: theme.spacing(1),
-        },
-    })
-);
+const PREFIX = "TimeAggregationSelector";
+
+const classes = {
+    root: `${PREFIX}-root`,
+};
+
+const StyledNativeSelect = styled(NativeSelect)(({ theme: Theme }) => ({
+    [`&.${classes.root}`]: {
+        minWidth: "170px",
+        maxWidth: "170px",
+        padding: theme.spacing(1),
+    },
+}));
+
 /**
  * A dropdown for selecting the time aggregation mode
  */
 const TimeAggregationSelector: React.FC = React.memo(() => {
-    const classes = useStyles();
     // Redux
     const dispatch = useDispatch();
     const timeAggregation = useSelector(
@@ -34,7 +37,7 @@ const TimeAggregationSelector: React.FC = React.memo(() => {
     );
     //Render
     return (
-        <NativeSelect
+        <StyledNativeSelect
             className={classes.root}
             id="time-aggregation-selector"
             label="Time Aggregation"
@@ -44,7 +47,7 @@ const TimeAggregationSelector: React.FC = React.memo(() => {
             {Object.keys(TimeAggregations).map((mode) => (
                 <option key={mode}>{mode}</option>
             ))}
-        </NativeSelect>
+        </StyledNativeSelect>
     );
 });
 

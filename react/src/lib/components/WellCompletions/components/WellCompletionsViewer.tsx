@@ -3,8 +3,7 @@ import {
     Drawer, // eslint-disable-next-line prettier/prettier
 Theme
 } from "@mui/material";
-import createStyles from "@mui/styles/createStyles";
-import makeStyles from "@mui/styles/makeStyles";
+import { styled } from "@mui/material/styles";
 import clsx from "clsx";
 import React, { useContext, useMemo } from "react";
 import { useSelector } from "react-redux";
@@ -20,65 +19,82 @@ import WellFilter from "./Settings/WellFilter";
 import WellPagination from "./Settings/WellPagination";
 import ZoneSelector from "./Settings/ZoneSelector";
 
+const PREFIX = "WellCompletionsViewer";
+
+const classes = {
+    root: `${PREFIX}-root`,
+    main: `${PREFIX}-main`,
+    drawer: `${PREFIX}-drawer`,
+    drawerShift: `${PREFIX}-drawerShift`,
+    drawerPaper: `${PREFIX}-drawerPaper`,
+    drawerHeader: `${PREFIX}-drawerHeader`,
+    content: `${PREFIX}-content`,
+    contentShift: `${PREFIX}-contentShift`,
+};
+
+const Root = styled("div")(({ theme: Theme }) => ({
+    [`& .${classes.root}`]: {
+        position: "relative",
+        display: "flex",
+        flex: 1,
+        flexDirection: "column",
+        width: "100%",
+        height: "90%",
+    },
+
+    [`& .${classes.main}`]: {
+        position: "relative",
+        display: "flex",
+        flex: 1,
+        flexDirection: "row",
+        height: "100%",
+    },
+
+    [`& .${classes.drawer}`]: {
+        zIndex: 0,
+        width: drawerWidth,
+        flexShrink: 0,
+    },
+
+    [`& .${classes.drawerShift}`]: {
+        width: 0,
+        flexShrink: 0,
+        display: "none",
+    },
+
+    [`& .${classes.drawerPaper}`]: {
+        position: "relative",
+    },
+
+    [`& .${classes.drawerHeader}`]: {
+        display: "flex",
+        alignItems: "center",
+        padding: theme.spacing(0, 1),
+        // necessary for content to be below app bar
+        ...theme.mixins.toolbar,
+        justifyContent: "flex-start",
+    },
+
+    [`& .${classes.content}`]: {
+        width: "100%",
+        transition: theme.transitions.create("margin", {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+        }),
+    },
+
+    [`& .${classes.contentShift}`]: {
+        width: `calc(100% - ${drawerWidth}px)`,
+        transition: theme.transitions.create("margin", {
+            easing: theme.transitions.easing.easeOut,
+            duration: theme.transitions.duration.enteringScreen,
+        }),
+    },
+}));
+
 const drawerWidth = 270;
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        root: {
-            position: "relative",
-            display: "flex",
-            flex: 1,
-            flexDirection: "column",
-            width: "100%",
-            height: "90%",
-        },
-        main: {
-            position: "relative",
-            display: "flex",
-            flex: 1,
-            flexDirection: "row",
-            height: "100%",
-        },
-        drawer: {
-            zIndex: 0,
-            width: drawerWidth,
-            flexShrink: 0,
-        },
-        drawerShift: {
-            width: 0,
-            flexShrink: 0,
-            display: "none",
-        },
-        drawerPaper: {
-            position: "relative",
-        },
-        drawerHeader: {
-            display: "flex",
-            alignItems: "center",
-            padding: theme.spacing(0, 1),
-            // necessary for content to be below app bar
-            ...theme.mixins.toolbar,
-            justifyContent: "flex-start",
-        },
-        content: {
-            width: "100%",
-            transition: theme.transitions.create("margin", {
-                easing: theme.transitions.easing.sharp,
-                duration: theme.transitions.duration.leavingScreen,
-            }),
-        },
-        contentShift: {
-            width: `calc(100% - ${drawerWidth}px)`,
-            transition: theme.transitions.create("margin", {
-                easing: theme.transitions.easing.easeOut,
-                duration: theme.transitions.duration.enteringScreen,
-            }),
-        },
-    })
-);
 
 const WellCompletionsViewer: React.FC = () => {
-    const classes = useStyles();
-
     // Use input data directly
     const data = useContext(DataContext);
     // Create plot data with the selected time step(s)
@@ -113,7 +129,7 @@ const WellCompletionsViewer: React.FC = () => {
     );
 
     //If no data is available
-    if (!data) return <div />;
+    if (!data) return <Root />;
     // Render
     return (
         <div className={classes.root}>

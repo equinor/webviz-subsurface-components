@@ -1,47 +1,44 @@
 import { NativeSelect } from "@equinor/eds-core-react";
+import { styled } from "@mui/material/styles";
 import { Slider, Theme } from "@mui/material";
-import createStyles from "@mui/styles/createStyles";
-import makeStyles from "@mui/styles/makeStyles";
-import withStyles from "@mui/styles/withStyles";
 import { isEqual } from "lodash";
 import React, { useCallback, useContext, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateTimeIndexRange } from "../../redux/actions";
 import { WellCompletionsState } from "../../redux/store";
 import { DataContext } from "../DataLoader";
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        root: {
-            display: "flex",
-            flexDirection: "row",
-        },
-        slider: {
-            width: "200px",
-            marginLeft: theme.spacing(4),
-            marginRight: theme.spacing(4),
-        },
-        selector: {
-            maxWidth: "130px",
-        },
-    })
-);
-const EdsSlider = withStyles({
-    root: {
-        color: "#007079",
+const PREFIX = "TimeRangeSelector";
+
+const classes = {
+    root: `${PREFIX}-root`,
+    valueLabel: `${PREFIX}-valueLabel`,
+    root2: `${PREFIX}-root2`,
+    slider: `${PREFIX}-slider`,
+    selector: `${PREFIX}-selector`,
+};
+
+const Root = styled("div")(({ theme: Theme }) => ({
+    [`& .${classes.root2}`]: {
+        display: "flex",
+        flexDirection: "row",
     },
-    valueLabel: {
-        top: 22,
-        "& *": {
-            background: "transparent",
-            color: "#000",
-        },
+
+    [`& .${classes.slider}`]: {
+        width: "200px",
+        marginLeft: theme.spacing(4),
+        marginRight: theme.spacing(4),
     },
-})(Slider);
+
+    [`& .${classes.selector}`]: {
+        maxWidth: "130px",
+    },
+}));
+
+const EdsSlider = Slider;
 /**
  * A React component for selecting time step(s) to display in the plot
  */
 const TimeRangeSelector: React.FC = React.memo(() => {
-    const classes = useStyles();
     // Direct access to the input data
     const data = useContext(DataContext);
 
@@ -71,7 +68,7 @@ const TimeRangeSelector: React.FC = React.memo(() => {
 
     // Render
     return (
-        <div className={classes.root}>
+        <Root className={classes.root}>
             {/* This only appears when time aggregation is on */}
             {timeAggregation !== "None" && (
                 <NativeSelect
@@ -130,6 +127,10 @@ const TimeRangeSelector: React.FC = React.memo(() => {
                     step={1}
                     marks={true}
                     valueLabelFormat={outputFunction}
+                    classes={{
+                        root: classes.root,
+                        valueLabel: classes.valueLabel,
+                    }}
                 />
             </div>
             <NativeSelect
@@ -164,7 +165,7 @@ const TimeRangeSelector: React.FC = React.memo(() => {
                     </option>
                 ))}
             </NativeSelect>
-        </div>
+        </Root>
     );
 });
 

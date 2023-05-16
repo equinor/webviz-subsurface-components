@@ -1,6 +1,5 @@
 import { Theme } from "@mui/material";
-import createStyles from "@mui/styles/createStyles";
-import makeStyles from "@mui/styles/makeStyles";
+import { styled } from "@mui/material/styles";
 import React, { useCallback, useContext, useMemo } from "react";
 import DropdownTreeSelect, { TreeNodeProps } from "react-dropdown-tree-select";
 import "!style-loader!css-loader!react-dropdown-tree-select/dist/styles.css";
@@ -9,6 +8,21 @@ import { updateFilteredZones } from "../../redux/actions";
 import { Zone } from "../../redux/types";
 import { findSubzones } from "../../utils/dataUtil";
 import { DataContext } from "../DataLoader";
+
+const PREFIX = "ZoneSelector";
+
+const classes = {
+    root: `${PREFIX}-root`,
+};
+
+const StyledDropdownTreeSelect = styled(DropdownTreeSelect)(
+    ({ theme: Theme }) => ({
+        [`& .${classes.root}`]: {
+            padding: theme.spacing(1),
+            maxWidth: "250px",
+        },
+    })
+);
 
 //Construct a stratigraphy tree as the input of react-dropdown-tree
 const extractStratigraphyTree = (stratigraphy: Zone[]): TreeNodeProps => {
@@ -60,19 +74,10 @@ export const findSelectedZones = (
     return result.map((zone) => zone.name);
 };
 
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        root: {
-            padding: theme.spacing(1),
-            maxWidth: "250px",
-        },
-    })
-);
 /**
  * A react component for selecting zones to display in the completions plot
  */
 const ZoneSelector: React.FC = React.memo(() => {
-    const classes = useStyles();
     // Use input data directly
     const data = useContext(DataContext);
     // Redux
