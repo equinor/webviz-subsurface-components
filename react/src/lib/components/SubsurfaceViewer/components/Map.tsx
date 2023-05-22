@@ -860,6 +860,7 @@ const Map: React.FC<MapProps> = ({
     );
 
     const onViewStateChange = useCallback(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ({ viewId, viewState }: { viewId: string; viewState: any }) => {
             const viewports = views?.viewports || [];
             const isSyncIds = viewports

@@ -32,6 +32,7 @@ const TimeAggregationSelector: React.FC = React.memo(() => {
     // Handlers
     const handleSelectedItemChange = useCallback(
         (event: ChangeEvent<HTMLSelectElement>) =>
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             dispatch(updateTimeAggregation(event.target.value as any)),
         [dispatch]
     );
