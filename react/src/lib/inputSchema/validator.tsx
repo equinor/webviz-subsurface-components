@@ -2,7 +2,6 @@ import Ajv from "ajv";
 import { ErrorObject, ValidateFunction } from "ajv/dist/types/index";
 
 // schema definations
-/* eslint-disable @typescript-eslint/no-var-requires */
 import wellsSchema from "./Wells.json";
 import wellLogSchema from "./WellLog.json";
 import wellLogsSchema from "./WellLogs.json";
