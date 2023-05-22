@@ -28,7 +28,7 @@ export interface SubsurfaceViewerProps {
         widthPerUnit?: number | null;
         cssStyle?: Record<string, unknown> | null;
     };
-    coordinateUnit?: Unit;
+    coordinateUnit?: string;
     toolbar?: {
         visible?: boolean | null;
     };
@@ -163,7 +163,7 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
             views={views}
             coords={coords}
             scale={scale}
-            coordinateUnit={coordinateUnit}
+            coordinateUnit={coordinateUnit as Unit}
             colorTables={colorTables}
             setEditedData={setEditedData}
             checkDatafileSchema={checkDatafileSchema}
@@ -285,7 +285,7 @@ SubsurfaceViewer.propTypes = {
      * Parameters for the Distance Scale component
      * Unit for the scale ruler
      */
-    coordinateUnit: PropTypes.any,
+    coordinateUnit: PropTypes.string,
 
     /**
      * @obsolete Toolbar should be added as annotation. This prop has no function.
