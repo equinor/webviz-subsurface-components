@@ -4,10 +4,9 @@ import "jest-styled-components";
 import React from "react";
 import { Wrapper } from "../test/TestWrapper";
 import WellCompletionComponent from "./WellCompletionComponent";
-
-// @rmt: Changed from require to import
-import exampleData from "../../../../demo/example-data/well-completions.json";
 import { Data } from "../redux/types";
+
+import exampleData from "../../../../demo/example-data/well-completions.json";
 
 window.ResizeObserver =
     window.ResizeObserver ||

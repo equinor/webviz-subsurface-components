@@ -5,7 +5,6 @@ import React from "react";
 import { Wrapper } from "../GroupTree/test/TestWrapper";
 import GroupTree from "./GroupTree";
 
-// @rmt: Changed require to import
 import exampleData from "../../../demo/example-data/group-tree.json";
 
 describe("Test GroupTree Default Component", () => {

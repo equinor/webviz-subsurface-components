@@ -6,10 +6,9 @@ import * as core from "@actions/core";
 import { Wrapper } from "../test/TestWrapper";
 import WellCompletionComponent from "./WellCompletionComponent";
 import logTimes, { obj } from "../../../performanceUtility/onRenderFunction";
-
-// @rmt: Changed from require to import
-import exampleData from "../../../../demo/example-data/well-completions.json";
 import { Data } from "../redux/types";
+
+import exampleData from "../../../../demo/example-data/well-completions.json";
 
 window.ResizeObserver =
     window.ResizeObserver ||

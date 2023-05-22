@@ -30,7 +30,6 @@ import well from "./images/well.svg";
 import well_completion from "./images/well-completion.svg";
 import calculated from "./images/calculated.svg";
 
-// @rmt: Changed require to import
 import vectorDefinitions from "../../../assets/VectorDefinitions.json";
 
 type VectorDefinitionsType = {

@@ -6,7 +6,6 @@ import ErrorPlaceholder from "./Common/ErrorPlaceholder";
 import DataProvider from "./DataLoader";
 import WellCompletionsViewer from "./WellCompletionsViewer";
 
-// @rmt: Changed require to import
 import inputSchema from "../../../inputSchema/wellCompletions.json";
 
 const ajv = new Ajv();

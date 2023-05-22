@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
 
 import React from "react";
-// @rmt: Changed require to import - added type dependency
 import convert, { Unit } from "convert-units";
 
 export interface ScaleProps {

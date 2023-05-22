@@ -8,6 +8,8 @@ import SubsurfaceViewer from "./SubsurfaceViewer";
 import { colorTables } from "@emerson-eps/color-tables";
 
 import mapData from "../../../demo/example-data/deckgl-map.json";
+import { Unit } from "convert-units";
+
 const colorTablesData = colorTables;
 
 describe("Test Map component", () => {
@@ -17,11 +19,10 @@ describe("Test Map component", () => {
                 id={mapData[0].id}
                 resources={mapData[0].resources}
                 layers={mapData[0].layers}
-                // @rmt: Invalid type for "bounds" prop
                 bounds={mapData[0].bounds as [number, number, number, number]}
                 coords={mapData[0].coords}
                 scale={mapData[0].scale}
-                coordinateUnit={mapData[0].coordinateUnit}
+                coordinateUnit={mapData[0].coordinateUnit as Unit}
                 legend={mapData[0].legend}
                 editedData={mapData[0].editedData}
                 views={{
@@ -45,11 +46,10 @@ describe("Test Map component", () => {
                 id={mapData[0].id}
                 resources={mapData[0].resources}
                 layers={mapData[0].layers}
-                // @rmt: Invalid type
                 bounds={mapData[0].bounds as [number, number, number, number]}
                 coords={mapData[0].coords}
                 scale={mapData[0].scale}
-                coordinateUnit={mapData[0].coordinateUnit}
+                coordinateUnit={mapData[0].coordinateUnit as Unit}
                 legend={mapData[0].legend}
                 editedData={{}}
                 views={{
@@ -77,7 +77,7 @@ describe("Test Map component", () => {
                 bounds={[0, 0, 0]}
                 coords={mapData[0].coords}
                 scale={mapData[0].scale}
-                coordinateUnit={mapData[0].coordinateUnit}
+                coordinateUnit={mapData[0].coordinateUnit as Unit}
                 legend={mapData[0].legend}
                 editedData={mapData[0].editedData}
                 views={{

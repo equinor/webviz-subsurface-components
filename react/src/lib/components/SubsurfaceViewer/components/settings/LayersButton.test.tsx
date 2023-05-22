@@ -8,7 +8,6 @@ import userEvent from "@testing-library/user-event";
 import { EmptyWrapper } from "../../test/TestWrapper";
 import LayersButton from "./LayersButton";
 
-// @rmt: Changed require to import
 import exampleData from "../../../../../demo/example-data/deckgl-map.json";
 
 const testLayers: Record<string, unknown>[] = exampleData[0].layers;

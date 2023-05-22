@@ -5,11 +5,6 @@ import { Position } from "@deck.gl/core/typed";
 
 import {segmentReduce, geomReduce} from "@turf/meta";
 
-/*
-@rmt: The types seem pretty messed up here and this problem was hidden due to using require instead of import. 
-      @aspentech: Nice, if you can fix this issue. I will disable typechecking for now.
-*/
-
 export function length(geojson: FeatureOf<LineString>): number {
     // Calculate distance from 2-vertex line segments
     return segmentReduce(

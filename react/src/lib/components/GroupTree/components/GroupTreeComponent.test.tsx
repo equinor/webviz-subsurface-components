@@ -4,10 +4,9 @@ import "jest-styled-components";
 import React from "react";
 import { Wrapper } from "./../test/TestWrapper";
 import GroupTreeComponent from "./GroupTreeComponent";
-
-// @rmt: Changed from require to import
-import exampleData from "../../../../demo/example-data/group-tree.json";
 import { Data } from "../redux/types";
+
+import exampleData from "../../../../demo/example-data/group-tree.json";
 
 describe("Test GroupTree Component", () => {
     it("snapshot test", () => {
