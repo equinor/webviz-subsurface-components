@@ -433,12 +433,9 @@ const Map: React.FC<MapProps> = ({
 
             tempViewStates = Object.fromEntries(
                 viewsProps.map((item, index) => {
-                    const viewState = viewStates[item.id];
-                    return [
-                        item.id,
-                        typeof viewState !== "undefined"
-                            ? viewState
-                            : isBoundsDefined
+                    let viewState = viewStates[item.id];
+                    if (typeof viewState === "undefined") {
+                        viewState = isBoundsDefined
                             ? getViewState(
                                   viewPortMargins,
                                   boundsInitial,
@@ -452,8 +449,10 @@ const Map: React.FC<MapProps> = ({
                                   reportedBoundingBoxAcc,
                                   views?.viewports?.[index].zoom,
                                   deckRef.current?.deck
-                              ),
-                    ];
+                              );
+                    }
+
+                    return [item.id, viewState];
                 })
             );
         }
