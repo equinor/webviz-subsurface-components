@@ -1,4 +1,4 @@
-import React from "react";
+import React, { SyntheticEvent } from "react";
 import { styled } from "@mui/material/styles";
 import { ViewsType, useHoverInfo } from "../../components/Map";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
@@ -1033,9 +1033,12 @@ export const BreakpointColorMap: ComponentStory<typeof SubsurfaceViewer> = (
         layers: [layer],
     };
 
-    const handleChange = React.useCallback((_event, value) => {
-        setBreakpoint(value / 100);
-    }, []);
+    const handleChange = React.useCallback(
+        (_event: Event | SyntheticEvent, value: number | number[]) => {
+            setBreakpoint((value as number) / 100);
+        },
+        []
+    );
 
     return (
         <Root>
@@ -1096,9 +1099,12 @@ export const ColorMapRange: ComponentStory<typeof SubsurfaceViewer> = (
         layers: [layer],
     };
 
-    const handleChange = React.useCallback((_event, value) => {
-        setColorMapUpper(value);
-    }, []);
+    const handleChange = React.useCallback(
+        (_event: unknown, value: number | number[]) => {
+            setColorMapUpper(value as number);
+        },
+        []
+    );
 
     return (
         <Root>
@@ -1152,26 +1158,44 @@ const MapLayerColorSelectorTemplate: ComponentStory<typeof SubsurfaceViewer> = (
     const [isNearest, setIsNearest] = React.useState(false);
 
     // user defined breakpoint(domain)
-    const userDefinedBreakPoint = React.useCallback((data) => {
-        if (data) setBreakPoint(data.colorArray);
-    }, []);
+    const userDefinedBreakPoint = React.useCallback(
+        (data: { colorArray: React.SetStateAction<undefined> }) => {
+            if (data) setBreakPoint(data.colorArray);
+        },
+        []
+    );
 
     // Get color name from color selector
-    const colorNameFromSelector = React.useCallback((data) => {
-        setColorName(data);
-    }, []);
+    const colorNameFromSelector = React.useCallback(
+        (data: React.SetStateAction<string>) => {
+            setColorName(data);
+        },
+        []
+    );
 
     // user defined range
-    const userDefinedRange = React.useCallback((data) => {
-        if (data.range) setRange(data.range);
-        setAuto(data.isAuto);
-    }, []);
+    const userDefinedRange = React.useCallback(
+        (data: {
+            range: React.SetStateAction<undefined>;
+            isAuto: React.SetStateAction<undefined>;
+        }) => {
+            if (data.range) setRange(data.range);
+            setAuto(data.isAuto);
+        },
+        []
+    );
 
     // Get interpolation method from color selector to layer
-    const getInterpolateMethod = React.useCallback((data) => {
-        setIsLog(data.isLog);
-        setIsNearest(data.isNearest);
-    }, []);
+    const getInterpolateMethod = React.useCallback(
+        (data: {
+            isLog: boolean | ((prevState: boolean) => boolean);
+            isNearest: boolean | ((prevState: boolean) => boolean);
+        }) => {
+            setIsLog(data.isLog);
+            setIsNearest(data.isNearest);
+        },
+        []
+    );
 
     // color map function
     const colorMapFunc = React.useCallback(() => {

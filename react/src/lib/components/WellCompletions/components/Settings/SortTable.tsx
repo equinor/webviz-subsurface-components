@@ -206,7 +206,7 @@ const SortTable: React.FC = React.memo(() => {
                                     variant="ghost_icon"
                                     onClick={() =>
                                         onUpdateSortKey(
-                                            sortKeyToAdd,
+                                            sortKeyToAdd || "",
                                             sortDirectionToAdd
                                         )
                                     }

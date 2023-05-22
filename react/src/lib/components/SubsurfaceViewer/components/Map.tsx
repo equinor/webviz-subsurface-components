@@ -860,7 +860,7 @@ const Map: React.FC<MapProps> = ({
     );
 
     const onViewStateChange = useCallback(
-        ({ viewId, viewState }) => {
+        ({ viewId, viewState }: { viewId: string; viewState: any }) => {
             const viewports = views?.viewports || [];
             const isSyncIds = viewports
                 .filter((item) => item.isSync)
@@ -903,6 +903,8 @@ const Map: React.FC<MapProps> = ({
                 views={deckGLViews}
                 layerFilter={layerFilter}
                 layers={deckGLLayers}
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
                 userData={{
                     setEditedData: (updated_prop: Record<string, unknown>) => {
                         setSelectedWell(updated_prop["selectedWell"] as string);
