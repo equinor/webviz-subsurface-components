@@ -29,10 +29,11 @@ const labeledPointsLayer = {
                     11,  0,  7,
                     17,  0,  8
                     ],    
+    /*eslint-enable */
     color: [255, 100, 100],
-    pointRadius : 10,
-    radiusUnits : "pixels",
-    ZIncreasingDownwards: true,    
+    pointRadius: 10,
+    radiusUnits: "pixels",
+    ZIncreasingDownwards: true,
 };
 
 const smallAxesLayer = {
@@ -50,7 +51,7 @@ export const SmallLabeledPointsLayer: ComponentStory<
 SmallLabeledPointsLayer.args = {
     id: "map",
     layers: [smallAxesLayer, labeledPointsLayer],
-    bounds: [-10, -10, 17, 10],    
+    bounds: [-10, -10, 17, 10],
     views: {
         layout: [1, 1],
         viewports: [
@@ -70,7 +71,6 @@ SmallLabeledPointsLayer.parameters = {
         },
     },
 };
-
 
 // Huge example using labeledPointsLayer.
 
