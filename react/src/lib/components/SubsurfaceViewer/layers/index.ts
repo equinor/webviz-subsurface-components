@@ -1,6 +1,8 @@
 export { default as ColormapLayer } from "./colormap/colormapLayer";
 export { default as MapLayer } from "./map/mapLayer";
 export { default as TriangleLayer } from "./triangle/triangleLayer";
+export { default as LabeledPointsLayer } from "./labeled_points/labeledPointsLayer";
+export { default as PolylinesLayer } from "./polylines/polylinesLayer";
 export { default as Map3DLayer } from "./terrain/map3DLayer";
 export { default as DrawingLayer } from "./drawing/drawingLayer";
 export { default as Hillshading2DLayer } from "./hillshading2d/hillshading2dLayer";
@@ -23,6 +25,8 @@ export { FaultPolygonsLayerProps } from "./fault_polygons/faultPolygonsLayer";
 export { Hillshading2DProps } from "./hillshading2d/hillshading2dLayer";
 export { MapLayerProps } from "./map/mapLayer";
 export { TriangleLayerProps } from "./triangle/triangleLayer";
+export { LabeledPointsLayerProps } from "./labeled_points/labeledPointsLayer";
+export { PolylinesLayerProps } from "./polylines/polylinesLayer";
 export { NorthArrow3DLayerProps } from "./northarrow/northArrow3DLayer";
 export { PieChartLayerProps } from "./piechart/pieChartLayer";
 export { Map3DLayerProps } from "./terrain/map3DLayer";
