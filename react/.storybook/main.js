@@ -7,7 +7,6 @@ module.exports = {
         "@storybook/addon-links",
         "@storybook/addon-essentials",
         "@storybook/addon-actions",
-        "storybook-addon-performance/register",
 		{
 			name: "@storybook/addon-docs",
 			  options: {
