@@ -427,7 +427,7 @@ export const ScaleZ: ComponentStory<typeof SubsurfaceViewer> = (args) => {
 
 ScaleZ.args = {
     id: "ScaleZ",
-    layers: [axes_hugin, meshMapLayerPng, north_arrow_layer],
+    layers: [axes_hugin, meshMapLayerPng, wellsLayer, north_arrow_layer],
     bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
 
     views: {
