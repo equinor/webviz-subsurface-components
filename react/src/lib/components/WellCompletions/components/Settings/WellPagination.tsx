@@ -1,39 +1,47 @@
 /* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
 
 import { Typography } from "@equinor/eds-core-react";
-import { createStyles, makeStyles } from "@material-ui/core";
-import { Pagination } from "@material-ui/lab";
+import { styled } from "@mui/material/styles";
+import { Pagination } from "@mui/material";
 import { clamp } from "lodash";
 import React, { useCallback, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { usePlotData } from "../../hooks/usePlotData";
 import { updateCurrentPage } from "../../redux/actions";
 import { WellCompletionsState } from "../../redux/store";
-const useStyles = makeStyles(() =>
-    createStyles({
-        root: {
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
-        },
-        left: {
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "flex-start",
-            padding: "5px",
-        },
-        right: {
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "flex-end",
-        },
-    })
-);
+const PREFIX = "WellPagination";
+
+const classes = {
+    root: `${PREFIX}-root`,
+    left: `${PREFIX}-left`,
+    right: `${PREFIX}-right`,
+};
+
+const Root = styled("div")(() => ({
+    [`&.${classes.root}`]: {
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-between",
+    },
+
+    [`& .${classes.left}`]: {
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "flex-start",
+        padding: "5px",
+    },
+
+    [`& .${classes.right}`]: {
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "flex-end",
+    },
+}));
+
 /**
  * Divide wells into pages
  */
 const WellPagination: React.FC = React.memo(() => {
-    const classes = useStyles();
     // Redux
     const dispatch = useDispatch();
     const plotData = usePlotData();
@@ -75,7 +83,7 @@ const WellPagination: React.FC = React.memo(() => {
 
     // Render
     return (
-        <div className={classes.root}>
+        <Root className={classes.root}>
             <div className={classes.left}>
                 {/* Indicates what the current page is displaying*/}
                 <Typography
@@ -90,7 +98,7 @@ const WellPagination: React.FC = React.memo(() => {
                 size="medium"
                 onChange={onCurrentPageChange}
             />
-        </div>
+        </Root>
     );
 });
 
