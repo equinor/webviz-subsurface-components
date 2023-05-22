@@ -17,7 +17,7 @@ const layerProps = {
     isLeftRuler: true,
     isRightRuler: false,
     isBottomRuler: true,
-    isTopRuler: false,
+    isTopRuler: true,
     backgroundColor: [155, 155, 155, 255],
 };
 
