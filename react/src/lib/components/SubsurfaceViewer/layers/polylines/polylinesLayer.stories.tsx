@@ -21,27 +21,23 @@ const faultSticksLayer = {
 
     /*eslint-disable */
     polylinePoints: [ 
-                    0,  0,  0,  // Vertex 1, x, y, z
+                    0,  0,  0,   // Vertex 1, x, y, z
                     10,  0,  0,  // Vertex 2, x, y, z
                     10, 10, 0,
                     10, 10, 8,
                     
                     -8, 0,   5,
-                    -5, -5,  5,  // ...
+                    -5, -5,  5, 
                     -5, -5,  0,
-                    //5, -5, 10,
-                    // 3,
-                    // 11, -4,  6,
-                    // 11,  0,  7,
-                    // 17,  0,  8
                     ],    
+    /*eslint-enable */
     startIndices: [0, 4],
     color: [0, 100, 100],
 
     widthUnits: "pixels",
     linesWidth: 10,
 
-    ZIncreasingDownwards: true,    
+    ZIncreasingDownwards: true,
 };
 
 const axesLayer = {
@@ -79,7 +75,6 @@ SmallFaultSticksLayer.parameters = {
         },
     },
 };
-
 
 const sideSize = 10000;
 const pointsCount = 100000;

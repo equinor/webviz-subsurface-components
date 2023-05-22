@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { CompositeLayer, UpdateParameters } from "@deck.gl/core/typed";
 import { ScatterplotLayer } from "@deck.gl/layers/typed";
 import { isEqual } from "lodash";
@@ -10,9 +9,9 @@ export interface LabeledPointsLayerProps<D> extends ExtendedLayerProps<D> {
 
     color: [number, number, number];
 
-    radiusUnits : "meters" | "common" | "pixels";
+    radiusUnits: "meters" | "common" | "pixels";
 
-    pointRadius : number;
+    pointRadius: number;
 
     depthTest: boolean;
     /**  If true means that input z values are interpreted as depths.
@@ -52,88 +51,92 @@ interface IDataAttributes {
 export default class LabeledPointsLayer extends CompositeLayer<
     LabeledPointsLayerProps<unknown>
 > {
-
     renderLayers(): [ScatterplotLayer?] {
-
-
         const layer = new ScatterplotLayer(
             this.getSubLayerProps({
-                id: "points-layer",                
+                id: "points-layer",
                 pickable: this.props.pickable,
                 depthTest: this.props.depthTest,
                 billboard: true,
-                data: this.state ["dataAttributes"],
-                _pathType: 'open',    
+                data: this.state["dataAttributes"],
+                _pathType: "open",
                 getFillColor: () => this.props.color,
                 getRadius: () => this.props.pointRadius,
                 radiusUnits: this.props.radiusUnits,
 
-                updateTriggers: {                   
+                updateTriggers: {
                     getFillColor: [this.props.color],
-                    getRadius: [this.props.pointRadius]
-                }
+                    getRadius: [this.props.pointRadius],
+                },
             })
         );
         return [layer];
     }
-    
+
     initializeState(): void {
         const dataAttributes = this.rebuildDataAttributes(true);
-        this.setState({dataAttributes});
+        this.setState({ dataAttributes });
     }
 
-    updateState({ props, oldProps }: UpdateParameters<LabeledPointsLayer>): void {
+    updateState({
+        props,
+        oldProps,
+    }: UpdateParameters<LabeledPointsLayer>): void {
         const needs_reload =
-            !isEqual(props.pointsData, oldProps.pointsData) ||            
+            !isEqual(props.pointsData, oldProps.pointsData) ||
             !isEqual(props.ZIncreasingDownwards, oldProps.ZIncreasingDownwards);
 
         if (needs_reload) {
             const dataAttributes = this.rebuildDataAttributes(false);
-            this.setState({dataAttributes})
-        }        
+            this.setState({ dataAttributes });
+        }
     }
 
-    private rebuildDataAttributes (reportBoundingBox : boolean) : IDataAttributes | null {
-        
-        const dataArray = this.loadData ();
+    private rebuildDataAttributes(
+        reportBoundingBox: boolean
+    ): IDataAttributes | null {
+        const dataArray = this.loadData();
         if (!dataArray) {
             return null;
         }
         if (this.props.ZIncreasingDownwards) {
-            this.invertZCoordinate (dataArray);
+            this.invertZCoordinate(dataArray);
         }
-        if (typeof this.props.setReportedBoundingBox === "function" && reportBoundingBox) {
-            const boundingBox = this.defineBoundingBox (dataArray)
-            this.props.setReportedBoundingBox (boundingBox);
+        if (
+            typeof this.props.setReportedBoundingBox === "function" &&
+            reportBoundingBox
+        ) {
+            const boundingBox = this.defineBoundingBox(dataArray);
+            this.props.setReportedBoundingBox(boundingBox);
         }
 
         return {
             length: dataArray.length / 3,
             attributes: {
-                getPosition:
-                {
+                getPosition: {
                     value: dataArray,
-                    size: 3
-                },                
-            }
-        }        
+                    size: 3,
+                },
+            },
+        };
     }
 
-    private loadData () : Float32Array | null {
-        if (Array.isArray (this.props.pointsData)) {
-            return new Float32Array (this.props.pointsData);
+    private loadData(): Float32Array | null {
+        if (Array.isArray(this.props.pointsData)) {
+            return new Float32Array(this.props.pointsData);
         }
-        return new Float32Array ();
+        return new Float32Array();
     }
 
-    private invertZCoordinate (dataArray : Float32Array) {
-
-        for (let i = 2; i < dataArray.length; i+=3) {
-            dataArray [i] *= -1;
+    private invertZCoordinate(dataArray: Float32Array) {
+        for (let i = 2; i < dataArray.length; i += 3) {
+            dataArray[i] *= -1;
         }
     }
 
-    private defineBoundingBox (dataArray: Float32Array) : [number, number, number, number, number, number] {
+    private defineBoundingBox(
+        dataArray: Float32Array
+    ): [number, number, number, number, number, number] {
         const length = dataArray.length;
         let minX = Number.POSITIVE_INFINITY;
         let minY = Number.POSITIVE_INFINITY;
@@ -143,9 +146,9 @@ export default class LabeledPointsLayer extends CompositeLayer<
         let maxZ = Number.NEGATIVE_INFINITY;
 
         for (let i = 0; i < length; i += 3) {
-            const x = dataArray [i];
-            const y = dataArray [i + 1];
-            const z = dataArray [i + 2];
+            const x = dataArray[i];
+            const y = dataArray[i + 1];
+            const z = dataArray[i + 2];
             minX = x < minX ? x : minX;
             minY = y < minY ? y : minY;
             minZ = z < minZ ? z : minZ;

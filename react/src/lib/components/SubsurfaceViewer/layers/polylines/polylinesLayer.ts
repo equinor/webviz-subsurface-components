@@ -1,5 +1,3 @@
-/* eslint-disable prettier/prettier */
-
 import { CompositeLayer, UpdateParameters } from "@deck.gl/core/typed";
 import { PathLayer } from "@deck.gl/layers/typed";
 import { isEqual } from "lodash";
@@ -7,14 +5,13 @@ import { isEqual } from "lodash";
 import { ExtendedLayerProps } from "../utils/layerTools";
 
 export interface PolylinesLayerProps<D> extends ExtendedLayerProps<D> {
-    
     polylinePoints: number[];
 
     startIndices: number[];
 
     color: [number, number, number];
 
-    widthUnits : "meters" | "common" | "pixels";
+    widthUnits: "meters" | "common" | "pixels";
 
     linesWidth: number;
 
@@ -36,7 +33,7 @@ const defaultProps = {
     id: "polylines-layer",
     widthUnits: "pixels",
     linesWidth: 5,
-    color: [0, 0, 200, 255],    
+    color: [0, 0, 200, 255],
     pickable: true,
     visible: true,
     depthTest: true,
@@ -55,90 +52,97 @@ interface IDataAttributes {
 }
 
 export default class PolylinesLayer extends CompositeLayer<
-PolylinesLayerProps<unknown>
+    PolylinesLayerProps<unknown>
 > {
-
     renderLayers(): [PathLayer?] {
         const layer = new PathLayer(
             this.getSubLayerProps({
-                id: "polylines-layer",          
-                widthUnits: this.props.widthUnits,      
+                id: "polylines-layer",
+                widthUnits: this.props.widthUnits,
                 pickable: this.props.pickable,
                 depthTest: this.props.depthTest,
                 billboard: true,
                 jointRounded: true,
                 _pathType: "loop",
-                data: this.state ["dataAttributes"],
+                data: this.state["dataAttributes"],
 
                 getColor: () => this.props.color,
                 getWidth: () => this.props.linesWidth,
 
-                updateTriggers: {                   
-                    getColor: [this.props.color],     
-                    getWidth: [this.props.linesWidth]               
-                },                
+                updateTriggers: {
+                    getColor: [this.props.color],
+                    getWidth: [this.props.linesWidth],
+                },
             })
         );
         return [layer];
     }
-    
+
     initializeState(): void {
         const dataAttributes = this.rebuildDataAttributes(true);
-        this.setState({dataAttributes});
+        this.setState({ dataAttributes });
     }
 
     updateState({ props, oldProps }: UpdateParameters<PolylinesLayer>): void {
         const needs_reload =
-            !isEqual(props.polylinePoints, oldProps.polylinePoints) ||            
+            !isEqual(props.polylinePoints, oldProps.polylinePoints) ||
             !isEqual(props.ZIncreasingDownwards, oldProps.ZIncreasingDownwards);
 
         if (needs_reload) {
             const dataAttributes = this.rebuildDataAttributes(false);
-            this.setState({dataAttributes})
-        }        
+            this.setState({ dataAttributes });
+        }
     }
 
-    private rebuildDataAttributes (reportBoundingBox : boolean) : IDataAttributes | null {
-        
-        const dataArrays = this.loadData ();
+    private rebuildDataAttributes(
+        reportBoundingBox: boolean
+    ): IDataAttributes | null {
+        const dataArrays = this.loadData();
 
         if (this.props.ZIncreasingDownwards) {
-            this.invertZCoordinate (dataArrays.positions);
+            this.invertZCoordinate(dataArrays.positions);
         }
-        if (typeof this.props.setReportedBoundingBox === "function" && reportBoundingBox) {
-            const boundingBox = this.defineBoundingBox (dataArrays.positions)
-            this.props.setReportedBoundingBox (boundingBox);
+        if (
+            typeof this.props.setReportedBoundingBox === "function" &&
+            reportBoundingBox
+        ) {
+            const boundingBox = this.defineBoundingBox(dataArrays.positions);
+            this.props.setReportedBoundingBox(boundingBox);
         }
 
         return {
             length: dataArrays.linesCount,
             startIndices: dataArrays.startIndices,
             attributes: {
-                getPath:
-                {
+                getPath: {
                     value: dataArrays.positions,
-                    size: 3
-                },                
-            },            
-        }        
+                    size: 3,
+                },
+            },
+        };
     }
 
-    private loadData () : { linesCount: number, startIndices : Uint32Array, positions : Float32Array} {
+    private loadData(): {
+        linesCount: number;
+        startIndices: Uint32Array;
+        positions: Float32Array;
+    } {
         return {
             linesCount: this.props.startIndices.length,
-            positions: new Float32Array (this.props.polylinePoints),
-            startIndices: new Uint32Array (this.props.startIndices)
+            positions: new Float32Array(this.props.polylinePoints),
+            startIndices: new Uint32Array(this.props.startIndices),
+        };
+    }
+
+    private invertZCoordinate(dataArray: Float32Array) {
+        for (let i = 2; i < dataArray.length; i += 3) {
+            dataArray[i] *= -1;
         }
     }
 
-    private invertZCoordinate (dataArray : Float32Array) {
-
-        for (let i = 2; i < dataArray.length; i+=3) {
-            dataArray [i] *= -1;
-        }
-    }
-
-    private defineBoundingBox (dataArray: Float32Array) : [number, number, number, number, number, number] {
+    private defineBoundingBox(
+        dataArray: Float32Array
+    ): [number, number, number, number, number, number] {
         const length = dataArray.length;
         let minX = Number.POSITIVE_INFINITY;
         let minY = Number.POSITIVE_INFINITY;
@@ -148,9 +152,9 @@ PolylinesLayerProps<unknown>
         let maxZ = Number.NEGATIVE_INFINITY;
 
         for (let i = 0; i < length; i += 3) {
-            const x = dataArray [i];
-            const y = dataArray [i + 1];
-            const z = dataArray [i + 2];
+            const x = dataArray[i];
+            const y = dataArray[i + 1];
+            const z = dataArray[i + 2];
             minX = x < minX ? x : minX;
             minY = y < minY ? y : minY;
             minZ = z < minZ ? z : minZ;
