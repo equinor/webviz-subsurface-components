@@ -22,8 +22,11 @@ const LayerProperty: React.FC<Props> = React.memo(({ layer }: Props) => {
 
     // handlers
     const updateProp = useCallback(
-        (layer_id, prop_name, state) =>
-            dispatch(updateLayerProp([layer_id, prop_name, state])),
+        (
+            layer_id: string,
+            prop_name: string,
+            state: string | number | boolean
+        ) => dispatch(updateLayerProp([layer_id, prop_name, state])),
         [dispatch]
     );
 
@@ -56,7 +59,7 @@ const LayerProperty: React.FC<Props> = React.memo(({ layer }: Props) => {
                                         e: ChangeEvent<HTMLInputElement>
                                     ) => {
                                         updateProp(
-                                            layer["id"],
+                                            layer["id"] as string,
                                             prop.id,
                                             e.target.checked
                                         );
@@ -83,7 +86,7 @@ const LayerProperty: React.FC<Props> = React.memo(({ layer }: Props) => {
                                         e: ChangeEvent<HTMLInputElement>
                                     ) => {
                                         updateProp(
-                                            layer["id"],
+                                            layer["id"] as string,
                                             prop.id,
                                             Number(e.target.value)
                                         );
@@ -113,7 +116,7 @@ const LayerProperty: React.FC<Props> = React.memo(({ layer }: Props) => {
                                         value: number | number[]
                                     ) => {
                                         updateProp(
-                                            layer["id"],
+                                            layer["id"] as string,
                                             prop.id,
                                             (value as number) / 100
                                         );

@@ -1,6 +1,9 @@
 import { styled } from "@mui/material/styles";
 import React, { useCallback, useContext, useMemo } from "react";
-import DropdownTreeSelect, { TreeNodeProps } from "react-dropdown-tree-select";
+import DropdownTreeSelect, {
+    TreeNode,
+    TreeNodeProps,
+} from "react-dropdown-tree-select";
 import "!style-loader!css-loader!react-dropdown-tree-select/dist/styles.css";
 import { useDispatch } from "react-redux";
 import { updateFilteredZones } from "../../redux/actions";
@@ -86,7 +89,7 @@ const ZoneSelector: React.FC = React.memo(() => {
     );
     // Handlers
     const handleSelectionChange = useCallback(
-        (_, selectedNodes) =>
+        (_: TreeNode, selectedNodes: TreeNodeProps[]) =>
             dispatch(
                 updateFilteredZones(
                     findSelectedZones(data.stratigraphy, selectedNodes)
