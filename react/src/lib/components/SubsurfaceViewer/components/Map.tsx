@@ -395,13 +395,10 @@ const Map: React.FC<MapProps> = ({
                           deckRef.current?.deck
                       );
 
-                const minZoom = is3D ? -12 : -15;
-                const maxZoom = is3D ? +12 : +15;
+                const minZoom = is3D ? -12 : -12;
+                const maxZoom = is3D ? +12 : +4;
 
-                return [
-                    item.id,
-                    { ...viewState, minZoom: minZoom, maxZoom: maxZoom },
-                ];
+                return [item.id, { ...viewState, minZoom, maxZoom }];
             });
 
             const tempViewStates = Object.fromEntries(viewStateMap);
@@ -1202,7 +1199,7 @@ function createViews(
                 width: "100%",
                 height: "100%",
                 flipY: false,
-                far: 99999,
+                far: +99999,
                 near: -99999,
             })
         );
