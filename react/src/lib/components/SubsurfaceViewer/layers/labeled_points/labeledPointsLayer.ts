@@ -5,15 +5,26 @@ import { isEqual } from "lodash";
 import { ExtendedLayerProps } from "../utils/layerTools";
 
 export interface LabeledPointsLayerProps<D> extends ExtendedLayerProps<D> {
+    /**
+     * Point positions as [x, y, z, x, y, z....]
+     */
     pointsData: number[];
 
+    /**
+     * Point color defined as RGB triplet. Each component is 0-255 range.
+     */
     color: [number, number, number];
 
+    /**
+     * The units of the point radius, one of `'meters'`, `'common'`, and `'pixels'`
+     */
     radiusUnits: "meters" | "common" | "pixels";
 
+    /**
+     * Point radius defined in radius units.
+     */
     pointRadius: number;
 
-    depthTest: boolean;
     /**  If true means that input z values are interpreted as depths.
      * For example depth of z = 1000 corresponds to -1000 on the z axis. Default true.
      */
@@ -34,7 +45,6 @@ const defaultProps = {
     pointRadius: 5,
     pickable: true,
     visible: true,
-    depthTest: true,
     ZIncreasingDownwards: true,
 };
 
@@ -56,7 +66,6 @@ export default class LabeledPointsLayer extends CompositeLayer<
             this.getSubLayerProps({
                 id: "points-layer",
                 pickable: this.props.pickable,
-                depthTest: this.props.depthTest,
                 billboard: true,
                 data: this.state["dataAttributes"],
                 _pathType: "open",

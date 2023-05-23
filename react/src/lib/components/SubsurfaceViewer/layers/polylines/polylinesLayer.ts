@@ -5,18 +5,34 @@ import { isEqual } from "lodash";
 import { ExtendedLayerProps } from "../utils/layerTools";
 
 export interface PolylinesLayerProps<D> extends ExtendedLayerProps<D> {
+    /**
+     * Polyline vertices as [x, y, z, x, y, z....]
+     */
     polylinePoints: number[];
 
+    /**
+      Start indices of the polylines counted in vertex indices.
+      For example, if there are 3 paths of 2, 3, and 4 vertices each, startIndices should be [0, 2, 5, 9].
+     */
     startIndices: number[];
 
+    /**
+     * Line color defined as RGB triplet. Each component is 0-255 range.
+     */
     color: [number, number, number];
 
+    /**
+     * The units of the line width, one of `'meters'`, `'common'`, and `'pixels'`
+     */
     widthUnits: "meters" | "common" | "pixels";
 
+    /**
+     * Line width defined in width units.
+     */
     linesWidth: number;
 
-    depthTest: boolean;
-    /**  If true means that input z values are interpreted as depths.
+    /**
+     * If true means that input z values are interpreted as depths.
      * For example depth of z = 1000 corresponds to -1000 on the z axis. Default true.
      */
     ZIncreasingDownwards: boolean;
@@ -36,7 +52,6 @@ const defaultProps = {
     color: [0, 0, 200, 255],
     pickable: true,
     visible: true,
-    depthTest: true,
     ZIncreasingDownwards: true,
 };
 
@@ -60,10 +75,8 @@ export default class PolylinesLayer extends CompositeLayer<
                 id: "polylines-layer",
                 widthUnits: this.props.widthUnits,
                 pickable: this.props.pickable,
-                depthTest: this.props.depthTest,
                 billboard: true,
                 jointRounded: true,
-                _pathType: "loop",
                 data: this.state["dataAttributes"],
 
                 getColor: () => this.props.color,

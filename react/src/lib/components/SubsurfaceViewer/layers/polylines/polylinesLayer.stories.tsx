@@ -4,7 +4,7 @@ import { ComponentStory, ComponentMeta } from "@storybook/react";
 
 export default {
     component: SubsurfaceViewer,
-    title: "SubsurfaceViewer / FaultSticks Layer",
+    title: "SubsurfaceViewer / Polylines Layer",
 } as ComponentMeta<typeof SubsurfaceViewer>;
 
 const defaultParameters = {
@@ -14,7 +14,7 @@ const defaultParameters = {
     },
 };
 
-// Small example using triangleLayer.
+// Small example using polylinesLayer.
 const polylinesLayer = {
     "@@type": "PolylinesLayer",
     id: "polylines-layer",
@@ -22,21 +22,22 @@ const polylinesLayer = {
     /*eslint-disable */
     polylinePoints: [ 
                     0,  0,  0,   // Vertex 1, x, y, z
-                    10,  0,  0,  // Vertex 2, x, y, z
+                    10, 0,  0,   // Vertex 2, x, y, z
                     10, 10, 0,
                     10, 10, 8,
                     
-                    -8, 0,   5,
-                    -5, -5,  5, 
-                    -5, -5,  0,
+                    -8,  0, 5,
+                    -5, -5, 5, 
+                    -5, -5, 0,
+                    -8,  0, 5
                     ],    
     /*eslint-enable */
-    startIndices: [0, 4],
+    startIndices: [0, 4, 8],
     color: [0, 100, 100],
 
     widthUnits: "pixels",
     linesWidth: 10,
-
+    depthTest: false,
     ZIncreasingDownwards: true,
 };
 
