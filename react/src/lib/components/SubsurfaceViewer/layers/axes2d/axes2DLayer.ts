@@ -172,7 +172,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
         max: number,
         viewSide: ViewSide,
         pixel2world: number,
-        zoom_scale: number
+        zoomScale: number
     ): [number[], LabelData[]] {
         const ndecimals = 0;
         const n_minor_ticks = 3;
@@ -217,7 +217,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
 
         // z value of all lines and labels. In camera/view coordinates. This
         // ensures lines will be closer to camera than rest of model.
-        const z_depth = 99 * (2 / zoom_scale);
+        const z_depth = 99 * (2 / zoomScale);
 
         const tick_length =
             viewSide === ViewSide.Left || viewSide === ViewSide.Bottom
@@ -485,7 +485,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
 
         const { viewMatrix } = this.context.viewport;
         const zoom = this.context.viewport.zoom;
-        const zoom_scale = Math.pow(2, zoom);
+        const zoomScale = Math.pow(2, zoom);
 
         const mh = this.props.marginH * pixel2world;
         const mv = this.props.marginV * pixel2world;
@@ -500,17 +500,17 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
         let background_lines: number[] = [];
         let labelData: LabelData[] = [];
 
-        const z_depth = 2 / zoom_scale;
+        const zDepth = 2 / zoomScale;
 
         //- BOTTOM RULER ----------------------------------------
         if (this.props.isBottomRuler) {
-            const axes = [xMin, yMin + mv, z_depth, xMax, yMin + mv, z_depth];
+            const axes = [xMin, yMin + mv, zDepth, xMax, yMin + mv, zDepth];
             const [ticks, labels] = this.GetTickLinesAndLabels(
                 xMin,
                 xMax,
                 ViewSide.Bottom,
                 pixel2world,
-                zoom_scale
+                zoomScale
             );
             const back_lines: number[] =
                 this.GetBacgroundTriangleLinesHorizontal(
@@ -528,13 +528,13 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
 
         //- TOP RULER ----------------------------------------
         if (this.props.isTopRuler) {
-            const axes = [xMin, yMax - mv, z_depth, xMax, yMax - mv, z_depth];
+            const axes = [xMin, yMax - mv, zDepth, xMax, yMax - mv, zDepth];
             const [ticks, labels] = this.GetTickLinesAndLabels(
                 xMin,
                 xMax,
                 ViewSide.Top,
                 pixel2world,
-                zoom_scale
+                zoomScale
             );
 
             const back_lines = this.GetBacgroundTriangleLinesHorizontal(
@@ -554,13 +554,13 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
         if (this.props.isLeftRuler) {
             const ymin = this.props.isBottomRuler ? yMin + mv : yMin;
             const ymax = this.props.isTopRuler ? yMax - mv : yMax;
-            const axes = [xMin + mh, ymin, z_depth, xMin + mh, ymax, z_depth];
+            const axes = [xMin + mh, ymin, zDepth, xMin + mh, ymax, zDepth];
             const [ticks, labels] = this.GetTickLinesAndLabels(
                 ymin,
                 yMax - mv,
                 ViewSide.Left,
                 pixel2world,
-                zoom_scale
+                zoomScale
             );
             const back_lines = this.GetBacgroundTriangleLinesVertical(
                 ymin,
@@ -579,13 +579,13 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
         if (this.props.isRightRuler) {
             const ymin = this.props.isBottomRuler ? yMin + mv : yMin;
             const ymax = this.props.isTopRuler ? yMax - mv : yMax;
-            const axes = [xMax - mh, ymin, z_depth, xMax - mh, ymax, z_depth];
+            const axes = [xMax - mh, ymin, zDepth, xMax - mh, ymax, zDepth];
             const [ticks, labels] = this.GetTickLinesAndLabels(
                 ymin,
                 ymax,
                 ViewSide.Right,
                 pixel2world,
-                zoom_scale
+                zoomScale
             );
 
             const back_lines = this.GetBacgroundTriangleLinesVertical(
