@@ -87,7 +87,7 @@ const hugePolylinesLayer = {
     /*eslint-disable */
     polylinePoints: Array(pointsCount * 3).fill(0).map (() => Math.random () * sideSize),    
     startIndices: [0],
-    color: [0, 100, 100],
+    color: [0, 100, 100, 40],
 
     widthUnits: "pixels",
     linesWidth: 1,
@@ -110,7 +110,7 @@ export const HugePolylinesLayer: ComponentStory<typeof SubsurfaceViewer> = (
 HugePolylinesLayer.args = {
     id: "map",
     layers: [hugeAxesLayer, hugePolylinesLayer],
-    bounds: [-10, -10, 17, 10],
+    bounds: [0, 0, sideSize, sideSize],
     views: {
         layout: [1, 1],
         viewports: [
