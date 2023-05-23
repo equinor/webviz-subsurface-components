@@ -74,7 +74,7 @@ const WellAttributesSelector: React.FC = React.memo(() => {
     }, [filterByAttributes]);
     // Handlers
     const handleSelectionChange = useCallback(
-        (selection) =>
+        (selection: { selectedNodes: string[] }) =>
             dispatch(updateFilterByAttributes(selection.selectedNodes)),
         [dispatch]
     );

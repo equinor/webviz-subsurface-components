@@ -72,7 +72,8 @@ const WellPagination: React.FC = React.memo(() => {
     );
     // Handlers
     const onCurrentPageChange = useCallback(
-        (...arg) => dispatch(updateCurrentPage(arg[1])),
+        (...arg: unknown[]) =>
+            dispatch(updateCurrentPage((arg as number[])[1])),
         [dispatch]
     );
 

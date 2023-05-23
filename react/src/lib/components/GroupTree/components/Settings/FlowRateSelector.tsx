@@ -32,7 +32,7 @@ const FlowRateSelector: React.FC<Props> = React.memo(
         );
         // handlers
         const handleSelectedItemChange = useCallback(
-            (event) => {
+            (event: React.ChangeEvent<HTMLSelectElement>) => {
                 dispatch(updateCurrentFlowRate(event.target.value));
             },
             [dispatch]

@@ -73,7 +73,8 @@ const TimeRangeSelector: React.FC = React.memo(() => {
     // Update time range in redux. When the time aggregation is off,
     // only the upper bound of the range will be used in computing the plot data
     const onChange = useCallback(
-        (range) => dispatch(updateTimeIndexRange(range)),
+        (range: unknown) =>
+            dispatch(updateTimeIndexRange(range as [number, number])),
         [dispatch]
     );
 

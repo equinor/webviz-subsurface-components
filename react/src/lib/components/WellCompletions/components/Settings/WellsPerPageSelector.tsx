@@ -30,7 +30,8 @@ const WellsPerPageSelector: React.FC = React.memo(() => {
     );
     // Handlers
     const onWellsPerPageChange = useCallback(
-        (event) => dispatch(updateWellsPerPage(event.target.value)),
+        (event: React.ChangeEvent<HTMLSelectElement>) =>
+            dispatch(updateWellsPerPage(+event.target.value)),
         [dispatch]
     );
     // Render

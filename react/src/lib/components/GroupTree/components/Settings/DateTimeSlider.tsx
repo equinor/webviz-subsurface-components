@@ -62,7 +62,11 @@ const DateTimeSlider: React.FC = React.memo(() => {
     // handlers
     const outputFunction = useCallback((step: number) => times[step], [times]);
     const onChange = useCallback(
-        (_, step) => dispatch(updateCurrentDateTime(times[step])),
+        (_: Event, step: number | number[]) => {
+            if (typeof step === "number") {
+                dispatch(updateCurrentDateTime(times[step]));
+            }
+        },
         [dispatch, times]
     );
     return (
