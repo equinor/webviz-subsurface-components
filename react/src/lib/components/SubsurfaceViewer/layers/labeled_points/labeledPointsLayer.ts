@@ -2,21 +2,25 @@ import { CompositeLayer, UpdateParameters } from "@deck.gl/core/typed";
 import { ScatterplotLayer } from "@deck.gl/layers/typed";
 import { isEqual } from "lodash";
 
-import { ExtendedLayerProps } from "../utils/layerTools";
+import {
+    ExtendedLayerProps,
+    invertZCoordinate,
+    defineBoundingBox,
+} from "../utils/layerTools";
 
 export interface LabeledPointsLayerProps<D> extends ExtendedLayerProps<D> {
     /**
-     * Point positions as [x, y, z, x, y, z....]
+     * Point positions as [x, y, z, x, y, z....].
      */
     pointsData: number[];
 
     /**
-     * Point color defined as RGB triplet. Each component is 0-255 range.
+     * Point color defined as RGB triplet. Each component is in 0-255 range.
      */
     color: [number, number, number];
 
     /**
-     * The units of the point radius, one of `'meters'`, `'common'`, and `'pixels'`
+     * The units of the point radius, one of `'meters'`, `'common'`, and `'pixels'`.
      */
     radiusUnits: "meters" | "common" | "pixels";
 
@@ -109,13 +113,13 @@ export default class LabeledPointsLayer extends CompositeLayer<
             return null;
         }
         if (this.props.ZIncreasingDownwards) {
-            this.invertZCoordinate(dataArray);
+            invertZCoordinate(dataArray);
         }
         if (
             typeof this.props.setReportedBoundingBox === "function" &&
             reportBoundingBox
         ) {
-            const boundingBox = this.defineBoundingBox(dataArray);
+            const boundingBox = defineBoundingBox(dataArray);
             this.props.setReportedBoundingBox(boundingBox);
         }
 
@@ -135,38 +139,6 @@ export default class LabeledPointsLayer extends CompositeLayer<
             return new Float32Array(this.props.pointsData);
         }
         return new Float32Array();
-    }
-
-    private invertZCoordinate(dataArray: Float32Array) {
-        for (let i = 2; i < dataArray.length; i += 3) {
-            dataArray[i] *= -1;
-        }
-    }
-
-    private defineBoundingBox(
-        dataArray: Float32Array
-    ): [number, number, number, number, number, number] {
-        const length = dataArray.length;
-        let minX = Number.POSITIVE_INFINITY;
-        let minY = Number.POSITIVE_INFINITY;
-        let minZ = Number.POSITIVE_INFINITY;
-        let maxX = Number.NEGATIVE_INFINITY;
-        let maxY = Number.NEGATIVE_INFINITY;
-        let maxZ = Number.NEGATIVE_INFINITY;
-
-        for (let i = 0; i < length; i += 3) {
-            const x = dataArray[i];
-            const y = dataArray[i + 1];
-            const z = dataArray[i + 2];
-            minX = x < minX ? x : minX;
-            minY = y < minY ? y : minY;
-            minZ = z < minZ ? z : minZ;
-
-            maxX = x > maxX ? x : maxX;
-            maxY = y > maxY ? y : maxY;
-            maxZ = z > maxZ ? z : maxZ;
-        }
-        return [minX, minY, minZ, maxX, maxY, maxZ];
     }
 }
 

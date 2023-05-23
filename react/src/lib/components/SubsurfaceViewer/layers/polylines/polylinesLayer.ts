@@ -2,11 +2,15 @@ import { CompositeLayer, UpdateParameters } from "@deck.gl/core/typed";
 import { PathLayer } from "@deck.gl/layers/typed";
 import { isEqual } from "lodash";
 
-import { ExtendedLayerProps } from "../utils/layerTools";
+import {
+    ExtendedLayerProps,
+    invertZCoordinate,
+    defineBoundingBox,
+} from "../utils/layerTools";
 
 export interface PolylinesLayerProps<D> extends ExtendedLayerProps<D> {
     /**
-     * Polyline vertices as [x, y, z, x, y, z....]
+     * Polyline vertices as [x, y, z, x, y, z....].
      */
     polylinePoints: number[];
 
@@ -17,12 +21,12 @@ export interface PolylinesLayerProps<D> extends ExtendedLayerProps<D> {
     startIndices: number[];
 
     /**
-     * Line color defined as RGB triplet. Each component is 0-255 range.
+     * Line color defined as RGB triplet. Each component is in 0-255 range.
      */
     color: [number, number, number];
 
     /**
-     * The units of the line width, one of `'meters'`, `'common'`, and `'pixels'`
+     * The units of the line width, one of `'meters'`, `'common'`, and `'pixels'`.
      */
     widthUnits: "meters" | "common" | "pixels";
 
@@ -113,13 +117,13 @@ export default class PolylinesLayer extends CompositeLayer<
         const dataArrays = this.loadData();
 
         if (this.props.ZIncreasingDownwards) {
-            this.invertZCoordinate(dataArrays.positions);
+            invertZCoordinate(dataArrays.positions);
         }
         if (
             typeof this.props.setReportedBoundingBox === "function" &&
             reportBoundingBox
         ) {
-            const boundingBox = this.defineBoundingBox(dataArrays.positions);
+            const boundingBox = defineBoundingBox(dataArrays.positions);
             this.props.setReportedBoundingBox(boundingBox);
         }
 
@@ -145,38 +149,6 @@ export default class PolylinesLayer extends CompositeLayer<
             positions: new Float32Array(this.props.polylinePoints),
             startIndices: new Uint32Array(this.props.startIndices),
         };
-    }
-
-    private invertZCoordinate(dataArray: Float32Array) {
-        for (let i = 2; i < dataArray.length; i += 3) {
-            dataArray[i] *= -1;
-        }
-    }
-
-    private defineBoundingBox(
-        dataArray: Float32Array
-    ): [number, number, number, number, number, number] {
-        const length = dataArray.length;
-        let minX = Number.POSITIVE_INFINITY;
-        let minY = Number.POSITIVE_INFINITY;
-        let minZ = Number.POSITIVE_INFINITY;
-        let maxX = Number.NEGATIVE_INFINITY;
-        let maxY = Number.NEGATIVE_INFINITY;
-        let maxZ = Number.NEGATIVE_INFINITY;
-
-        for (let i = 0; i < length; i += 3) {
-            const x = dataArray[i];
-            const y = dataArray[i + 1];
-            const z = dataArray[i + 2];
-            minX = x < minX ? x : minX;
-            minY = y < minY ? y : minY;
-            minZ = z < minZ ? z : minZ;
-
-            maxX = x > maxX ? x : maxX;
-            maxY = y > maxY ? y : maxY;
-            maxZ = z > maxZ ? z : maxZ;
-        }
-        return [minX, minY, minZ, maxX, maxY, maxZ];
     }
 }
 
