@@ -15,9 +15,9 @@ const defaultParameters = {
 };
 
 // Small example using triangleLayer.
-const faultSticksLayer = {
-    "@@type": "FaultSticksLayer",
-    id: "fault-sticks-layer",
+const polylinesLayer = {
+    "@@type": "PolylinesLayer",
+    id: "polylines-layer",
 
     /*eslint-disable */
     polylinePoints: [ 
@@ -46,15 +46,15 @@ const axesLayer = {
     bounds: [-10, -10, 0, 20, 10, 10],
 };
 
-export const SmallFaultSticksLayer: ComponentStory<typeof SubsurfaceViewer> = (
+export const SmallPolylinesLayer: ComponentStory<typeof SubsurfaceViewer> = (
     args
 ) => {
     return <SubsurfaceViewer {...args} />;
 };
 
-SmallFaultSticksLayer.args = {
+SmallPolylinesLayer.args = {
     id: "map",
-    layers: [axesLayer, faultSticksLayer],
+    layers: [axesLayer, polylinesLayer],
     bounds: [-10, -10, 17, 10],
     views: {
         layout: [1, 1],
@@ -67,11 +67,11 @@ SmallFaultSticksLayer.args = {
     },
 };
 
-SmallFaultSticksLayer.parameters = {
+SmallPolylinesLayer.parameters = {
     docs: {
         ...defaultParameters.docs,
         description: {
-            story: "Both mesh and property data given as native javascript arrays (as opposed to URL).",
+            story: "Point coordinates are given as native javascript arrays.",
         },
     },
 };
@@ -79,9 +79,9 @@ SmallFaultSticksLayer.parameters = {
 const sideSize = 10000;
 const pointsCount = 100000;
 
-const hugeFaultSticksLayer = {
-    "@@type": "FaultSticksLayer",
-    id: "fault-sticks-layer",
+const hugePolylinesLayer = {
+    "@@type": "PolylinesLayer",
+    id: "polylines-layer",
 
     /*eslint-disable */
     polylinePoints: Array(pointsCount * 3).fill(0).map (() => Math.random () * sideSize),    
@@ -100,15 +100,15 @@ const hugeAxesLayer = {
     bounds: [0, 0, 0, sideSize, sideSize, sideSize],
 };
 
-export const HugeFaultSticksLayer: ComponentStory<typeof SubsurfaceViewer> = (
+export const HugePolylinesLayer: ComponentStory<typeof SubsurfaceViewer> = (
     args
 ) => {
     return <SubsurfaceViewer {...args} />;
 };
 
-HugeFaultSticksLayer.args = {
+HugePolylinesLayer.args = {
     id: "map",
-    layers: [hugeAxesLayer, hugeFaultSticksLayer],
+    layers: [hugeAxesLayer, hugePolylinesLayer],
     bounds: [-10, -10, 17, 10],
     views: {
         layout: [1, 1],
@@ -121,11 +121,11 @@ HugeFaultSticksLayer.args = {
     },
 };
 
-HugeFaultSticksLayer.parameters = {
+HugePolylinesLayer.parameters = {
     docs: {
         ...defaultParameters.docs,
         description: {
-            story: "Both mesh and property data given as native javascript arrays (as opposed to URL).",
+            story: "Point coordinates are given as native javascript arrays.",
         },
     },
 };
