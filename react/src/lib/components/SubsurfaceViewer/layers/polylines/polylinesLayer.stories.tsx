@@ -33,7 +33,7 @@ const polylinesLayer = {
                     ],    
     /*eslint-enable */
     startIndices: [0, 4, 8],
-    color: [0, 100, 100],
+    color: [0, 200, 100],
 
     widthUnits: "pixels",
     linesWidth: 10,
