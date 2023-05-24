@@ -159,6 +159,7 @@
         "sass": "^1.36.0",
         "sass-loader": "^12.1.0",
         "source-map-loader": "^3.0.0",
+        "style-loader": "^2.0.0",
         "terser-webpack-plugin": "^5.1.1",
         "trim": ">=0.0.3",
         "ts-loader": "^9.2.6",
