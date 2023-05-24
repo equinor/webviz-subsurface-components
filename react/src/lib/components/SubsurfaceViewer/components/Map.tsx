@@ -39,6 +39,7 @@ import { getModelMatrixScale } from "../layers/utils/layerTools";
 import { OrbitController, OrthographicController } from "@deck.gl/core/typed";
 import { MjolnirEvent, MjolnirPointerEvent } from "mjolnir.js";
 import IntersectionView from "../views/intersectionView";
+import { Unit } from "convert-units";
 
 type BoundingBox = [number, number, number, number, number, number];
 type NumberQuad = [number, number, number, number];
@@ -206,7 +207,7 @@ export interface MapProps {
         cssStyle?: Record<string, unknown> | null;
     };
 
-    coordinateUnit?: string;
+    coordinateUnit?: Unit;
 
     /**
      * Parameters to control toolbar
