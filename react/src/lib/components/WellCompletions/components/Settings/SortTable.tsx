@@ -1,13 +1,7 @@
 import { Button, Icon, NativeSelect, Table } from "@equinor/eds-core-react";
+import { styled } from "@mui/material/styles";
 import { add_box, delete_to_trash } from "@equinor/eds-icons";
-import {
-    Box,
-    createStyles,
-    makeStyles,
-    Theme,
-    // eslint-disable-next-line prettier/prettier
-    Tooltip
-} from "@material-ui/core";
+import { Box, Tooltip } from "@mui/material";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteSortKey, updateSortKey } from "../../redux/actions";
@@ -20,26 +14,35 @@ import {
     SORT_BY_STRATIGRAPHY_DEPTH
 } from "../../utils/sort";
 
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        root: {
-            position: "relative",
-            display: "flex",
-            flex: 1,
-            flexDirection: "column",
-            minWidth: "300px",
-        },
-        add: {
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
-            paddingTop: theme.spacing(3),
-        },
-        select: {
-            maxWidth: "150px",
-        },
-    })
-);
+const PREFIX = "SortTable";
+
+const classes = {
+    root: `${PREFIX}-root`,
+    add: `${PREFIX}-add`,
+    select: `${PREFIX}-select`,
+};
+
+const StyledBox = styled(Box)(({ theme }) => ({
+    [`&.${classes.root}`]: {
+        position: "relative",
+        display: "flex",
+        flex: 1,
+        flexDirection: "column",
+        minWidth: "300px",
+    },
+
+    [`& .${classes.add}`]: {
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        paddingTop: theme.spacing(3),
+    },
+
+    [`& .${classes.select}`]: {
+        maxWidth: "150px",
+    },
+}));
+
 Icon.add({ add_box }); // (this needs only be done once)
 Icon.add({ delete_to_trash }); // (this needs only be done once)
 /**
@@ -47,7 +50,6 @@ Icon.add({ delete_to_trash }); // (this needs only be done once)
  * There is also an option per row to sort by ascending or descending order
  */
 const SortTable: React.FC = React.memo(() => {
-    const classes = useStyles();
     // Local states
     // Sort key in the placeholder row
     const [sortKeyToAdd, setSortKeyToAdd] = useState<string>();
@@ -93,7 +95,9 @@ const SortTable: React.FC = React.memo(() => {
     // Handlers
     // Update the sort key in the placeholder row
     const onSortKeyToAddChange = useCallback(
-        (event) => setSortKeyToAdd(event.target.value),
+        (event: {
+            target: { value: React.SetStateAction<string | undefined> };
+        }) => setSortKeyToAdd(event.target.value),
         [setSortKeyToAdd]
     );
     // Update the sort direction in the placeholder row
@@ -107,19 +111,19 @@ const SortTable: React.FC = React.memo(() => {
 
     // Add or update sort key and direction
     const onUpdateSortKey = useCallback(
-        (sortKey, sortDirection) =>
+        (sortKey: string, sortDirection: SortDirection) =>
             dispatch(updateSortKey({ sortKey, sortDirection })),
         [dispatch]
     );
     // Remove sort key and direction
     const onDeleteSortKey = useCallback(
-        (sortKey) => dispatch(deleteSortKey(sortKey)),
+        (sortKey: string) => dispatch(deleteSortKey(sortKey)),
         [dispatch]
     );
 
     // Render
     return (
-        <Box
+        <StyledBox
             marginTop={1}
             marginX={1}
             marginBottom={2}
@@ -202,7 +206,7 @@ const SortTable: React.FC = React.memo(() => {
                                     variant="ghost_icon"
                                     onClick={() =>
                                         onUpdateSortKey(
-                                            sortKeyToAdd,
+                                            sortKeyToAdd || "",
                                             sortDirectionToAdd
                                         )
                                     }
@@ -214,7 +218,7 @@ const SortTable: React.FC = React.memo(() => {
                     </Table.Row>
                 </Table.Body>
             </Table>
-        </Box>
+        </StyledBox>
     );
 });
 

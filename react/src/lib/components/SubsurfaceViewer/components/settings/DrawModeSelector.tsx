@@ -28,7 +28,7 @@ const DrawModeSelector: React.FC<Props> = React.memo(
 
         // handlers
         const handleSelectedItemChange = useCallback(
-            (event) => {
+            (event: { target: { value: string } }) => {
                 const selection = DrawModes.find(
                     (mode) => mode.displayName === event.target.value
                 );
