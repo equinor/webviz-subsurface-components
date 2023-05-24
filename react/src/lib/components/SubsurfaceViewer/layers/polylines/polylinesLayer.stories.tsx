@@ -19,7 +19,6 @@ const defaultParameters = {
 
 // Small example using polylinesLayer.
 const polylinesLayer = new PolylinesLayer({
-    "@@type": "PolylinesLayer",
     id: "polylines-layer",
     /* eslint-disable */
     polylinePoints: [0, 0, 0, 
@@ -70,7 +69,7 @@ SmallPolylinesLayer.parameters = {
     docs: {
         ...defaultParameters.docs,
         description: {
-            story: "Point coordinates are given as native javascript array.",
+            story: "Polyline nodes are given as native javascript array.",
         },
     },
 };
@@ -79,7 +78,6 @@ const sideSize = 10000;
 const pointsCount = 100000;
 
 const hugePolylinesLayer = new PolylinesLayer({
-    "@@type": "PolylinesLayer",
     id: "polylines-layer",
 
     polylinePoints: Array(pointsCount * 3)

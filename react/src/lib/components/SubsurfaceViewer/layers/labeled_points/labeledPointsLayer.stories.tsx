@@ -19,9 +19,7 @@ const defaultParameters = {
 
 // Small example using labeledPointsLayer.
 const labeledPointsLayer = new LabeledPointsLayer({
-    "@@type": "LabeledPointsLayer",
     id: "labeledPoints-layer",
-
     /*eslint-disable */
     pointsData:   [  0,  0,  5,  // Vertex 1, x, y, z
                     10,  0,  5,  // Vertex 2, x, y, z
@@ -80,7 +78,6 @@ const sideSize = 10000;
 const pointsCount = 100000;
 
 const hugePointsLayer = new LabeledPointsLayer({
-    "@@type": "LabeledPointsLayer",
     id: "labeledPoints-layer",
     pointsData: Array(pointsCount * 3)
         .fill(0)
