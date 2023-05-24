@@ -21,7 +21,7 @@ import {
     ExpressionStatus,
 } from "../ExpressionsStore";
 
-import "!style-loader!css-loader!../../VectorCalculator.css";
+import "../../VectorCalculator.css";
 
 interface ExpressionEditComponentProps {
     vectors: TreeDataNode[];

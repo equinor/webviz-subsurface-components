@@ -20,7 +20,7 @@ import { SyncLogViewer } from "./components/WellLogViewer";
 import WebVizContinuousLegend from "./components/ColorLegends/WebVizContinuousLegend";
 import WebVizDiscreteLegend from "./components/ColorLegends/WebVizDiscreteLegend";
 import WebVizColorLegend from "./components/ColorLegends/WebVizColorLegend";
-import { PickInfo, View } from "deck.gl";
+import { View } from "deck.gl";
 import { TooltipCallback } from "./components/SubsurfaceViewer/components/Map";
 import {
     ExtendedLayerProps,
@@ -54,7 +54,6 @@ export {
     WebVizContinuousLegend,
     WebVizDiscreteLegend,
     WebVizColorLegend,
-    PickInfo,
     TooltipCallback,
     ExtendedLayerProps,
     PropertyDataType,

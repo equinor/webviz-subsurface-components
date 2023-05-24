@@ -1,11 +1,12 @@
 {
     "compilerOptions": {
-        "baseUrl": "src",
+        "baseUrl": "./src",
         "outDir": "./dist/",
         "declaration": true,
         "sourceMap": true,
         "strict": true,
         "noImplicitReturns": true,
+        "noImplicitAny": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "noFallthroughCasesInSwitch": true,

@@ -17,7 +17,7 @@ import {
     useStore,
 } from "./ExpressionsStore";
 
-import "!style-loader!css-loader!../VectorCalculator.css";
+import "../VectorCalculator.css";
 
 interface ParentProps {
     expressions?: ExpressionType[];
