@@ -30,10 +30,6 @@ const DistanceScale: React.FC<ScaleProps> = ({
     if (!zoom || !widthPerUnit || !incrementValue || !scaleUnit) return null;
 
     if (!convert().possibilities().includes(scaleUnit)) {
-        console.error(
-            "Invalid unit passed to DistanceScale component. Valid units are: ",
-            convert().possibilities()
-        );
         return null;
     }
 
