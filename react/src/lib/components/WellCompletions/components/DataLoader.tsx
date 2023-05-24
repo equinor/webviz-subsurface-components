@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, useMemo } from "react";
+import React, { PropsWithChildren, ReactNode, useMemo } from "react";
 import { Provider as ReduxProvider } from "react-redux";
 import { createReduxStore } from "../redux/store";
 import { Data, UISettings, Zone } from "../redux/types";
@@ -7,6 +7,7 @@ import { findSubzones, preprocessData } from "../utils/dataUtil";
 interface Props {
     id: string;
     data: Data;
+    children: ReactNode;
 }
 const defaultData = {
     version: "",

@@ -238,9 +238,12 @@ export const BreakpointColorMap: ComponentStory<typeof SubsurfaceViewer> = (
         };
     }, [breakpoint]);
 
-    const handleChange = React.useCallback((_event, value) => {
-        setBreakpoint(value / 100);
-    }, []);
+    const handleChange = React.useCallback(
+        (_event: unknown, value: number | number[]) => {
+            setBreakpoint((value as number) / 100);
+        },
+        []
+    );
 
     return (
         <Root>
@@ -299,9 +302,12 @@ export const ColorMapRange: ComponentStory<typeof SubsurfaceViewer> = (
         };
     }, [colorMapUpper]);
 
-    const handleChange = React.useCallback((_event, value) => {
-        setColorMapUpper(value);
-    }, []);
+    const handleChange = React.useCallback(
+        (_event: Event, value: number | number[]) => {
+            setColorMapUpper(value as number);
+        },
+        []
+    );
 
     return (
         <Root>

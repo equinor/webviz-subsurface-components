@@ -88,7 +88,7 @@ exports[`Test flow rate selector component snapshot test 1`] = `
 }
 
 <div
-  class="c0 makeStyles-root-1"
+  class="c0 NodeInfoSelector-root css-2xr5u2"
 >
   <label
     class="c1"

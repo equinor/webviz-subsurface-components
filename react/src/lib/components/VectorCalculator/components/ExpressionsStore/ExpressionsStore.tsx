@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { cloneDeep } from "lodash";
 
 import {
@@ -282,6 +282,7 @@ type Context = {
 const StoreContext = React.createContext<Context | undefined>(undefined);
 
 interface StoreProviderProps {
+    children: ReactNode;
     initialExpressions: ExpressionType[];
 }
 
