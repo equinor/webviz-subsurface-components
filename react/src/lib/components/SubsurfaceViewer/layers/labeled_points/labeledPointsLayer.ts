@@ -15,9 +15,9 @@ export interface LabeledPointsLayerProps<D> extends ExtendedLayerProps<D> {
     pointsData: number[];
 
     /**
-     * Point color defined as RGB triplet. Each component is in 0-255 range.
+     * Point color defined as RGB or RGBA array. Each component is in 0-255 range.
      */
-    color: [number, number, number];
+    color: [number, number, number] | [number, number, number, number];
 
     /**
      * The units of the point radius, one of `'meters'`, `'common'`, and `'pixels'`.

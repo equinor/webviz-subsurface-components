@@ -21,9 +21,9 @@ export interface PolylinesLayerProps<D> extends ExtendedLayerProps<D> {
     startIndices: number[];
 
     /**
-     * Line color defined as RGB triplet. Each component is in 0-255 range.
+     * Line color defined as RGB or RGBA array. Each component is in 0-255 range.
      */
-    color: [number, number, number];
+    color: [number, number, number] | [number, number, number, number];
 
     /**
      * The units of the line width, one of `'meters'`, `'common'`, and `'pixels'`.
