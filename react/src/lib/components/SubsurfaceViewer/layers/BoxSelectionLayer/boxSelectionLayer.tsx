@@ -7,6 +7,8 @@ import { getSize } from "../wells/wellsLayer";
 import { Color } from "@deck.gl/core/typed";
 import { Feature } from "geojson";
 
+// This should be fixed at some point
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type PickInfo = any;
 
 export interface BoxSelectionLayerProps<D> extends ExtendedLayerProps<D> {
