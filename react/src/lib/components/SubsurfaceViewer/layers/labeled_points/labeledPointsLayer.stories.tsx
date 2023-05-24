@@ -38,7 +38,6 @@ const labeledPointsLayer = new LabeledPointsLayer({
 });
 
 const smallAxesLayer = new AxesLayer({
-    "@@type": "AxesLayer",
     id: "axes_small",
     bounds: [-10, -10, 0, 20, 10, 10],
 });
@@ -89,7 +88,6 @@ const hugePointsLayer = new LabeledPointsLayer({
 });
 
 const hugeAxesLayer = new AxesLayer({
-    "@@type": "AxesLayer",
     id: "axes_small",
     bounds: [0, 0, 0, sideSize, sideSize, sideSize],
 });

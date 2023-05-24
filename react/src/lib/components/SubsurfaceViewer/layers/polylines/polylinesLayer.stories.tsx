@@ -39,7 +39,6 @@ const polylinesLayer = new PolylinesLayer({
 });
 
 const axesLayer = new AxesLayer({
-    "@@type": "AxesLayer",
     id: "axes_small",
     bounds: [-10, -10, 0, 20, 10, 10],
 });
@@ -93,7 +92,6 @@ const hugePolylinesLayer = new PolylinesLayer({
 });
 
 const hugeAxesLayer = new AxesLayer({
-    "@@type": "AxesLayer",
     id: "axes_huge",
     bounds: [0, 0, 0, sideSize, sideSize, sideSize],
 });
