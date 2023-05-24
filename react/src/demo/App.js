@@ -8,8 +8,6 @@
 import React, { Component } from "react";
 // Components
 import HistoryMatchDemo from "./HistoryMatchDemo";
-import LayeredMapDemo from "./LayeredMapDemo";
-import LeafletMapDemo from "./LeafletMapDemo";
 import MorrisDemo from "./MorrisDemo";
 import PriorPosteriorDistributionDemo from "./PriorPosteriorDistributionDemo";
 import SubsurfaceMapDemo from "./SubsurfaceMapDemo";
@@ -19,7 +17,7 @@ import VectorCalculatorDemo from "./VectorCalculatorDemo";
 class App extends Component {
     constructor(props) {
         super(props);
-        this.state = { value: "LeafletMap" };
+        this.state = { value: "HistoryMatch" };
     }
 
     onChange(e) {
@@ -28,9 +26,6 @@ class App extends Component {
 
     renderDemo() {
         switch (this.state.value) {
-            case "LeafletMap": {
-                return <LeafletMapDemo />;
-            }
             case "HistoryMatch": {
                 return <HistoryMatchDemo />;
             }
@@ -39,9 +34,6 @@ class App extends Component {
             }
             case "SubsurfaceMap": {
                 return <SubsurfaceMapDemo />;
-            }
-            case "LayeredMap": {
-                return <LayeredMapDemo />;
             }
             case "PriorPosteriorDistribution": {
                 return <PriorPosteriorDistributionDemo />;
@@ -65,11 +57,9 @@ class App extends Component {
                     value={this.state.value}
                     onChange={this.onChange.bind(this)}
                 >
-                    <option value="LeafletMap">LeafletMap</option>
                     <option value="HistoryMatch">HistoryMatch</option>
                     <option value="Morris">Morris</option>
                     <option value="SubsurfaceMap">SubsurfaceMap</option>
-                    <option value="LayeredMap">LayeredMap</option>
                     <option value="PriorPosteriorDistribution">
                         PriorPosteriorDistribution
                     </option>

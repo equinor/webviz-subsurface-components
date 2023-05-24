@@ -10,6 +10,7 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
     const points = params.points;
     const polys = params.polys;
     const properties = params.properties;
+    const isZIncreasingDownwards = params.isZIncreasingDownwards;
 
     const positions: number[] = [];
     const indices: number[] = [];
@@ -18,6 +19,8 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
 
     let propertyValueRangeMin = +99999999;
     let propertyValueRangeMax = -99999999;
+
+    const z_sign = isZIncreasingDownwards ? -1 : 1;
 
     let pn = 0;
     let indice = 0;
@@ -45,11 +48,11 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
 
             const x0 = points[3 * i1 + 0];
             const y0 = points[3 * i1 + 1];
-            const z0 = points[3 * i1 + 2];
+            const z0 = points[3 * i1 + 2] * z_sign;
 
             const x1 = points[3 * i2 + 0];
             const y1 = points[3 * i2 + 1];
-            const z1 = points[3 * i2 + 2];
+            const z1 = points[3 * i2 + 2] * z_sign;
 
             line_positions.push(x0, y0, z0);
             line_positions.push(x1, y1, z1);
@@ -64,19 +67,19 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
 
             const x1 = points[3 * i1 + 0];
             const y1 = points[3 * i1 + 1];
-            const z1 = points[3 * i1 + 2];
+            const z1 = points[3 * i1 + 2] * z_sign;
 
             const x2 = points[3 * i2 + 0];
             const y2 = points[3 * i2 + 1];
-            const z2 = points[3 * i2 + 2];
+            const z2 = points[3 * i2 + 2] * z_sign;
 
             const x3 = points[3 * i3 + 0];
             const y3 = points[3 * i3 + 1];
-            const z3 = points[3 * i3 + 2];
+            const z3 = points[3 * i3 + 2] * z_sign;
 
             const x4 = points[3 * i4 + 0];
             const y4 = points[3 * i4 + 1];
-            const z4 = points[3 * i4 + 2];
+            const z4 = points[3 * i4 + 2] * z_sign;
 
             // t1
             indices.push(indice++, indice++, indice++);
@@ -107,15 +110,15 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
 
             const x1 = points[3 * i1 + 0];
             const y1 = points[3 * i1 + 1];
-            const z1 = points[3 * i1 + 2];
+            const z1 = points[3 * i1 + 2] * z_sign;
 
             const x2 = points[3 * i2 + 0];
             const y2 = points[3 * i2 + 1];
-            const z2 = points[3 * i2 + 2];
+            const z2 = points[3 * i2 + 2] * z_sign;
 
             const x3 = points[3 * i3 + 0];
             const y3 = points[3 * i3 + 1];
-            const z3 = points[3 * i3 + 2];
+            const z3 = points[3 * i3 + 2] * z_sign;
 
             // t1
             indices.push(indice++, indice++, indice++);

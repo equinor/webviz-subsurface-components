@@ -94,7 +94,9 @@ exports[`test view menu snapshot test 1`] = `
   content: '';
 }
 
-<div>
+<div
+  class="css-1l0gahh"
+>
   <button
     class="c0"
     tabindex="0"

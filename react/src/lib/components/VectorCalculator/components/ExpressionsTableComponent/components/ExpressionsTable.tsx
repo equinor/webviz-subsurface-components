@@ -8,7 +8,7 @@ import {
     TableCell,
     TableContainer,
     Tooltip,
-} from "@material-ui/core";
+} from "@mui/material";
 
 import { getDetailedExpression } from "../../../utils/VectorCalculatorHelperFunctions";
 import { ExpressionType } from "../../../utils/VectorCalculatorTypes";

@@ -18,7 +18,7 @@ import {
     FormControl,
     InputLabel,
     NativeSelect,
-} from "@material-ui/core";
+} from "@mui/material";
 import { getTrackTemplate } from "../utils/tracks";
 
 const typeItems: Record<string, string> = {
