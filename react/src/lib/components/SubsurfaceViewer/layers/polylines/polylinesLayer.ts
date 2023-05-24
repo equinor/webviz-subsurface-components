@@ -16,7 +16,7 @@ export interface PolylinesLayerProps<D> extends ExtendedLayerProps<D> {
 
     /**
       Start indices of the polylines counted in vertex indices.
-      For example, if there are 3 paths of 2, 3, and 4 vertices each, startIndices should be [0, 2, 5, 9].
+      For example, if there are 3 paths of 2, 3, and 4 vertices each, startIndices should be [0, 2, 5].
      */
     startIndices: number[];
 
