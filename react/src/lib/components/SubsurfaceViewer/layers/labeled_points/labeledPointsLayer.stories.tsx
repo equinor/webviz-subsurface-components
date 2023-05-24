@@ -1,6 +1,9 @@
 import React from "react";
-import SubsurfaceViewer from "../../SubsurfaceViewer";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
+
+import SubsurfaceViewer from "../../SubsurfaceViewer";
+import { default as LabeledPointsLayer } from "./labeledPointsLayer";
+import { default as AxesLayer } from "../axes/axesLayer";
 
 export default {
     component: SubsurfaceViewer,
@@ -15,7 +18,7 @@ const defaultParameters = {
 };
 
 // Small example using labeledPointsLayer.
-const labeledPointsLayer = {
+const labeledPointsLayer = new LabeledPointsLayer({
     "@@type": "LabeledPointsLayer",
     id: "labeledPoints-layer",
 
@@ -34,13 +37,13 @@ const labeledPointsLayer = {
     pointRadius: 10,
     radiusUnits: "pixels",
     ZIncreasingDownwards: true,
-};
+});
 
-const smallAxesLayer = {
+const smallAxesLayer = new AxesLayer({
     "@@type": "AxesLayer",
     id: "axes_small",
     bounds: [-10, -10, 0, 20, 10, 10],
-};
+});
 
 export const SmallLabeledPointsLayer: ComponentStory<
     typeof SubsurfaceViewer
@@ -67,37 +70,36 @@ SmallLabeledPointsLayer.parameters = {
     docs: {
         ...defaultParameters.docs,
         description: {
-            story: "Both mesh and property data given as native javascript arrays (as opposed to URL).",
+            story: "Point coordinates are given as native javascript array.",
         },
     },
 };
 
 // Huge example using labeledPointsLayer.
-
 const sideSize = 10000;
 const pointsCount = 100000;
 
-const hugePointsLayer = {
+const hugePointsLayer = new LabeledPointsLayer({
     "@@type": "LabeledPointsLayer",
     id: "labeledPoints-layer",
-
-    /*eslint-disable */
-    pointsData:  Array(pointsCount * 3).fill(0).map (() => Math.random () * sideSize),
+    pointsData: Array(pointsCount * 3)
+        .fill(0)
+        .map(() => Math.random() * sideSize),
     color: [255, 100, 100],
-    pointRadius : 4,
-    radiusUnits : "pixels",
-    ZIncreasingDownwards: true,    
-};
+    pointRadius: 1,
+    radiusUnits: "pixels",
+    ZIncreasingDownwards: true,
+});
 
-const hugeAxesLayer = {
+const hugeAxesLayer = new AxesLayer({
     "@@type": "AxesLayer",
     id: "axes_small",
     bounds: [0, 0, 0, sideSize, sideSize, sideSize],
-};
+});
 
-export const HugeLabeledPointsLayer: ComponentStory<
-    typeof SubsurfaceViewer
-> = (args) => {
+export const HugeLabeledPointsLayer: ComponentStory<typeof SubsurfaceViewer> = (
+    args
+) => {
     return <SubsurfaceViewer {...args} />;
 };
 
@@ -123,10 +125,7 @@ HugeLabeledPointsLayer.parameters = {
     docs: {
         ...defaultParameters.docs,
         description: {
-            story: "Both mesh and property data given as native javascript arrays (as opposed to URL).",
+            story: "Point coordinates are randomly generated in runtime and given as native javascript array.",
         },
     },
 };
-
-
-

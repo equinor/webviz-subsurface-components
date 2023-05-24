@@ -1,6 +1,9 @@
 import React from "react";
-import SubsurfaceViewer from "../../SubsurfaceViewer";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
+
+import SubsurfaceViewer from "../../SubsurfaceViewer";
+import { default as PolylinesLayer } from "./polylinesLayer";
+import { default as AxesLayer } from "../axes/axesLayer";
 
 export default {
     component: SubsurfaceViewer,
@@ -15,37 +18,32 @@ const defaultParameters = {
 };
 
 // Small example using polylinesLayer.
-const polylinesLayer = {
+const polylinesLayer = new PolylinesLayer({
     "@@type": "PolylinesLayer",
     id: "polylines-layer",
-
-    /*eslint-disable */
-    polylinePoints: [ 
-                    0,  0,  0,   // Vertex 1, x, y, z
-                    10, 0,  0,   // Vertex 2, x, y, z
+    /* eslint-disable */
+    polylinePoints: [0, 0, 0, 
+                    10, 0,  0,
                     10, 10, 0,
-                    10, 10, 8,
-                    
+                    10, 10, 8,                    
                     -8,  0, 5,
                     -5, -5, 5, 
                     -5, -5, 0,
-                    -8,  0, 5
-                    ],    
-    /*eslint-enable */
+                    -8,  0, 5],
+    /* eslint-enable */
     startIndices: [0, 4, 8],
     color: [0, 200, 100],
 
     widthUnits: "pixels",
     linesWidth: 10,
-    depthTest: false,
     ZIncreasingDownwards: true,
-};
+});
 
-const axesLayer = {
+const axesLayer = new AxesLayer({
     "@@type": "AxesLayer",
     id: "axes_small",
     bounds: [-10, -10, 0, 20, 10, 10],
-};
+});
 
 export const SmallPolylinesLayer: ComponentStory<typeof SubsurfaceViewer> = (
     args
@@ -72,7 +70,7 @@ SmallPolylinesLayer.parameters = {
     docs: {
         ...defaultParameters.docs,
         description: {
-            story: "Point coordinates are given as native javascript arrays.",
+            story: "Point coordinates are given as native javascript array.",
         },
     },
 };
@@ -80,26 +78,27 @@ SmallPolylinesLayer.parameters = {
 const sideSize = 10000;
 const pointsCount = 100000;
 
-const hugePolylinesLayer = {
+const hugePolylinesLayer = new PolylinesLayer({
     "@@type": "PolylinesLayer",
     id: "polylines-layer",
 
-    /*eslint-disable */
-    polylinePoints: Array(pointsCount * 3).fill(0).map (() => Math.random () * sideSize),    
+    polylinePoints: Array(pointsCount * 3)
+        .fill(0)
+        .map(() => Math.random() * sideSize),
     startIndices: [0],
     color: [0, 100, 100, 40],
 
     widthUnits: "pixels",
     linesWidth: 1,
 
-    ZIncreasingDownwards: true,    
-};
+    ZIncreasingDownwards: true,
+});
 
-const hugeAxesLayer = {
+const hugeAxesLayer = new AxesLayer({
     "@@type": "AxesLayer",
     id: "axes_huge",
     bounds: [0, 0, 0, sideSize, sideSize, sideSize],
-};
+});
 
 export const HugePolylinesLayer: ComponentStory<typeof SubsurfaceViewer> = (
     args
@@ -126,7 +125,7 @@ HugePolylinesLayer.parameters = {
     docs: {
         ...defaultParameters.docs,
         description: {
-            story: "Point coordinates are given as native javascript arrays.",
+            story: "Polyline nodes are randomly generated in runtime and given as native javascript array.",
         },
     },
 };
