@@ -4,7 +4,7 @@ import DropdownTreeSelect, {
     TreeNode,
     TreeNodeProps,
 } from "react-dropdown-tree-select";
-import "!style-loader!css-loader!react-dropdown-tree-select/dist/styles.css";
+import "react-dropdown-tree-select/dist/styles.css";
 import { useDispatch } from "react-redux";
 import { updateFilteredZones } from "../../redux/actions";
 import { Zone } from "../../redux/types";

@@ -1,6 +1,6 @@
 import React, { Component, ReactNode } from "react";
 
-import "!vue-style-loader!css-loader!sass-loader!./styles.scss";
+import "./styles.scss";
 
 import { WellLogController, WellPickProps, getWellPicks } from "./WellLogView";
 import WellLogView from "./WellLogView";
