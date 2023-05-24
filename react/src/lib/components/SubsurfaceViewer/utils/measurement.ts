@@ -3,7 +3,7 @@
 import { FeatureOf, LineString, Polygon } from "@nebula.gl/edit-modes";
 import { Position } from "@deck.gl/core/typed";
 
-import {segmentReduce, geomReduce} from "@turf/meta";
+import { segmentReduce, geomReduce } from "@turf/meta";
 
 export function length(geojson: FeatureOf<LineString>): number {
     // Calculate distance from 2-vertex line segments
