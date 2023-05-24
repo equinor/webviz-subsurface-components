@@ -2,65 +2,69 @@
 
 exports[`Test  Date-Time Slider snapshot test 1`] = `
 <div
-  class="makeStyles-root-1"
+  class="DateTimeSlider-root css-16rgu47"
 >
   <span>
     Time Steps
   </span>
   <span
-    class="MuiSlider-root WithStyles(ForwardRef(Slider))-root-2 MuiSlider-colorPrimary MuiSlider-trackFalse"
+    class="MuiSlider-root MuiSlider-trackFalse MuiSlider-colorPrimary MuiSlider-sizeMedium css-1xvshl5-MuiSlider-root"
   >
     <span
-      class="MuiSlider-rail"
+      class="MuiSlider-rail css-14pt78w-MuiSlider-rail"
     />
     <span
-      class="MuiSlider-track"
+      class="MuiSlider-track css-pm1ix7-MuiSlider-track"
       style="left: 0%; width: 0%;"
     />
-    <input
-      type="hidden"
-      value="0"
-    />
     <span
-      class="MuiSlider-mark MuiSlider-markActive"
+      class="MuiSlider-mark MuiSlider-markActive css-6cwnna-MuiSlider-mark"
       data-index="0"
       style="left: 0%;"
     />
     <span
-      class="MuiSlider-mark"
+      class="MuiSlider-mark css-1tfve6q-MuiSlider-mark"
       data-index="1"
       style="left: 33.333333333333336%;"
     />
     <span
-      class="MuiSlider-mark"
+      class="MuiSlider-mark css-1tfve6q-MuiSlider-mark"
       data-index="2"
       style="left: 66.66666666666667%;"
     />
     <span
-      class="MuiSlider-mark"
+      class="MuiSlider-mark css-1tfve6q-MuiSlider-mark"
       data-index="3"
       style="left: 100%;"
     />
     <span
-      aria-labelledby="date-time-slider-label"
-      aria-orientation="horizontal"
-      aria-valuemax="3"
-      aria-valuemin="0"
-      aria-valuenow="0"
-      class="MuiSlider-thumb MuiSlider-thumbColorPrimary PrivateValueLabel-open-5 PrivateValueLabel-thumb-4"
+      class="MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary css-eg0mwd-MuiSlider-thumb"
       data-index="0"
-      role="slider"
       style="left: 0%;"
-      tabindex="0"
     >
+      <input
+        aria-labelledby="date-time-slider-label"
+        aria-orientation="horizontal"
+        aria-valuemax="3"
+        aria-valuemin="0"
+        aria-valuenow="0"
+        data-index="0"
+        max="3"
+        min="0"
+        step="1"
+        style="border: 0px; height: 100%; margin: -1px; overflow: hidden; padding: 0px; position: absolute; white-space: nowrap; width: 100%; direction: ltr;"
+        type="range"
+        value="0"
+      />
       <span
-        class="PrivateValueLabel-offset-6 MuiSlider-valueLabel WithStyles(ForwardRef(Slider))-valueLabel-3"
+        aria-hidden="true"
+        class="MuiSlider-valueLabelOpen MuiSlider-valueLabel css-nnid7-MuiSlider-valueLabel"
       >
         <span
-          class="PrivateValueLabel-circle-7"
+          class="MuiSlider-valueLabelCircle"
         >
           <span
-            class="PrivateValueLabel-label-8"
+            class="MuiSlider-valueLabelLabel"
           >
             2018-02-01
           </span>

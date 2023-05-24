@@ -1,27 +1,31 @@
 /* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
 
-import { createStyles, makeStyles } from "@material-ui/core";
+import { styled } from "@mui/material/styles";
 import { cloneDeep } from "lodash";
 import React, { useContext, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { GroupTreeState } from "../redux/store";
 import { DataContext } from "./DataLoader";
-import "!style-loader!css-loader!./Plot/dynamic_tree.css";
+import "./Plot/dynamic_tree.css";
 import GroupTree from "./Plot/group_tree";
 import SettingsBar from "./Settings/SettingsBar";
 import { DataInfos } from "../redux/types";
 
-const useStyles = makeStyles(() =>
-    createStyles({
-        root: {
-            position: "relative",
-            display: "flex",
-            flex: 1,
-            flexDirection: "column",
-            height: "90%",
-        },
-    })
-);
+const PREFIX = "GroupTreeViewer";
+
+const classes = {
+    root: `${PREFIX}-root`,
+};
+
+const Root = styled("div")(() => ({
+    [`&.${classes.root}`]: {
+        position: "relative",
+        display: "flex",
+        flex: 1,
+        flexDirection: "column",
+        height: "90%",
+    },
+}));
 
 interface Props {
     id: string;
@@ -36,7 +40,6 @@ const GroupTreeViewer: React.FC<Props> = ({
     node_options,
     currentDateTimeChangedCallBack,
 }: Props) => {
-    const classes = useStyles();
     const divRef = useRef<HTMLDivElement>(null);
     const data = useContext(DataContext);
 
@@ -85,14 +88,14 @@ const GroupTreeViewer: React.FC<Props> = ({
     }, [currentNodeInfo]);
 
     return (
-        <div className={classes.root}>
+        <Root className={classes.root}>
             <SettingsBar
                 edge_options={edge_options}
                 node_options={node_options}
             />
             <div id={id} ref={divRef} />
             {/* <GroupTreePlot root={root} currentFlowRate={currentFlowRate} /> */}
-        </div>
+        </Root>
     );
 };
 

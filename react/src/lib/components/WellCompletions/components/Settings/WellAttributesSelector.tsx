@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
 
 import { Typography } from "@equinor/eds-core-react";
-import { createStyles, makeStyles, Theme } from "@material-ui/core";
+import { styled } from "@mui/material/styles";
 import { SmartNodeSelector } from "@webviz/core-components";
 import React, { useCallback, useContext, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,23 +14,28 @@ import {
 } from "../../utils/dataUtil";
 import { DataContext } from "../DataLoader";
 
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        root: {
-            padding: theme.spacing(1),
-            maxWidth: "250px",
-            display: "flex",
-            flex: 1,
-            flexDirection: "column",
-        },
-    })
-);
+const PREFIX = "WellAttributesSelector";
+
+const classes = {
+    root: `${PREFIX}-root`,
+};
+
+const Root = styled("div")(({ theme }) => ({
+    [`&.${classes.root}`]: {
+        padding: theme.spacing(1),
+        maxWidth: "250px",
+        display: "flex",
+        flex: 1,
+        flexDirection: "column",
+    },
+}));
+
 /**
  * A react component to allow the users to select wells by attribute values
  */
 const WellAttributesSelector: React.FC = React.memo(() => {
     // Style
-    const classes = useStyles();
+
     // Direct access to the input data
     const data = useContext(DataContext);
     // Redux
@@ -69,13 +74,13 @@ const WellAttributesSelector: React.FC = React.memo(() => {
     }, [filterByAttributes]);
     // Handlers
     const handleSelectionChange = useCallback(
-        (selection) =>
+        (selection: { selectedNodes: string[] }) =>
             dispatch(updateFilterByAttributes(selection.selectedNodes)),
         [dispatch]
     );
     // Render
     return (
-        <div className={classes.root}>
+        <Root className={classes.root}>
             <SmartNodeSelector
                 id="AttributesSelector"
                 key="attributes-selector"
@@ -88,7 +93,7 @@ const WellAttributesSelector: React.FC = React.memo(() => {
                 numSecondsUntilSuggestionsAreShown={0.5}
             />
             <Typography>{hintText}</Typography>
-        </div>
+        </Root>
     );
 });
 

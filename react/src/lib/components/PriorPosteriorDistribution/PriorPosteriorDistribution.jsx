@@ -6,7 +6,7 @@
 
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import "!style-loader!css-loader!./prior_posterior_distribution.css";
+import "./prior_posterior_distribution.css";
 import D3PriorPosterior from "./utils/prior_posterior_distribution";
 
 class PriorPosteriorDistribution extends Component {

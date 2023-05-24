@@ -50,7 +50,8 @@ const LayersButton: React.FC<LayersButtonProps> = React.memo(
         }, []);
 
         const updateChecked = useCallback(
-            (layer, checked) => dispatch(updateVisibleLayers([layer, checked])),
+            (layer: string, checked: boolean) =>
+                dispatch(updateVisibleLayers([layer, checked])),
             [dispatch]
         );
 
@@ -78,7 +79,10 @@ const LayersButton: React.FC<LayersButtonProps> = React.memo(
                             label={layer["name"] as string}
                             checked={layer["visible"] as boolean}
                             onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                                updateChecked(layer["id"], e.target.checked);
+                                updateChecked(
+                                    layer["id"] as string,
+                                    e.target.checked
+                                );
                             }}
                             key={`layer-toggle-${layer["id"]}`}
                         />

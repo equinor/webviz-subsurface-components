@@ -1,11 +1,5 @@
-import {
-    createStyles,
-    makeStyles,
-    Slider,
-    Theme,
-    // eslint-disable-next-line prettier/prettier
-    withStyles
-} from "@material-ui/core";
+import { Slider } from "@mui/material";
+import { styled } from "@mui/material/styles";
 import React, { useCallback, useContext, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCurrentDateTime } from "../../redux/actions";
@@ -13,15 +7,18 @@ import { GroupTreeState } from "../../redux/store";
 import { Data, DatedTree } from "../../redux/types";
 import { DataContext } from "../DataLoader";
 
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        root: {
-            width: "200px",
-            marginRight: theme.spacing(4),
-        },
-    })
-);
-const EdsSlider = withStyles({
+const classes = {
+    root: "DateTimeSlider-root",
+};
+
+const Root = styled("div")(({ theme }) => ({
+    [`& .${classes.root}`]: {
+        width: "200px",
+        marginRight: theme.spacing(4),
+    },
+}));
+
+const EdsSlider = styled(Slider)(() => ({
     root: {
         color: "#007079",
     },
@@ -32,9 +29,9 @@ const EdsSlider = withStyles({
             color: "#000",
         },
     },
-})(Slider);
+}));
+
 const DateTimeSlider: React.FC = React.memo(() => {
-    const classes = useStyles();
     const data: Data = useContext(DataContext);
     // Redux
     const dispatch = useDispatch();
@@ -65,11 +62,15 @@ const DateTimeSlider: React.FC = React.memo(() => {
     // handlers
     const outputFunction = useCallback((step: number) => times[step], [times]);
     const onChange = useCallback(
-        (_, step) => dispatch(updateCurrentDateTime(times[step])),
+        (_: Event, step: number | number[]) => {
+            if (typeof step === "number") {
+                dispatch(updateCurrentDateTime(times[step]));
+            }
+        },
         [dispatch, times]
     );
     return (
-        <div className={classes.root}>
+        <Root className={classes.root}>
             <span>Time Steps</span>
             <EdsSlider
                 track={false}
@@ -83,7 +84,7 @@ const DateTimeSlider: React.FC = React.memo(() => {
                 marks={true}
                 valueLabelFormat={outputFunction}
             />
-        </div>
+        </Root>
     );
 });
 
