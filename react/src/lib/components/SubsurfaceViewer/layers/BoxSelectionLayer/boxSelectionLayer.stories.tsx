@@ -4,11 +4,13 @@
 import { FormControlLabel, Switch } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { ComponentMeta, ComponentStory } from "@storybook/react";
-// import { PickInfo } from "lib";
 import React from "react";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 
 const PREFIX = "boxSelectionLayer";
+
+// This should be fixed at some point
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type PickInfo = any;
 
 const classes = {
