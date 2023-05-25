@@ -40,7 +40,6 @@ const DistanceScale: React.FC<ScaleProps> = ({
             ? Math.round(widthInUnits)
             : roundToStep(widthInUnits, incrementValue);
 
-    // @rmt: scaleUnit could be undefined? - scaleUnit: string !instanceof convert.Unit
     const convertedUnit = convert(scaleValue)
         .from(scaleUnit as convert.Unit)
         .toBest().unit;

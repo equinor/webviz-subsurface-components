@@ -10,7 +10,6 @@ interface LegendProps {
     cssLegendStyles?: Record<string, unknown>;
     colorName?: string;
     horizontal?: boolean | null;
-    // @rmt: Not matching the type in @emerson-eps/color-tables
     colorTables?: colorTablesArray;
     id?: string;
     isRangeShown?: boolean;

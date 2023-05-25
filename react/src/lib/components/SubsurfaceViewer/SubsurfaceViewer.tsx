@@ -111,19 +111,22 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
     const [layerInstances, setLayerInstances] = React.useState<LayersList>([]);
 
     React.useEffect(() => {
+        if (!layers) {
+            setLayerInstances([]);
+            return;
+        }
+
         if (layers?.[0] instanceof Layer) {
             setLayerInstances(layers as LayersList);
             return;
         }
 
-        // @rmt: Added broad type - should be improved?
         const enumerations: Record<string, unknown>[] = [];
-        const layersJson = layers as unknown; // @rmt: Why unknown? It is defined as Record<string, unknown>[] | undefined above
         if (resources) enumerations.push({ resources: resources });
         if (editedData) enumerations.push({ editedData: editedData });
         else enumerations.push({ editedData: {} });
         const layersList = jsonToObject(
-            layersJson as Record<string, unknown>[],
+            layers as Record<string, unknown>[],
             enumerations
         ) as LayersList;
         setLayerInstances(layersList);

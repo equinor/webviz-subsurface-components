@@ -226,7 +226,6 @@ async function load_mesh_and_texture(
         image: { type: "data" }, // Will load as ImageData.
     });
 
-    // @rmt: missing type
     let meshImageData: ImageData | null = null;
 
     let mesh: MeshType;
@@ -249,7 +248,6 @@ async function load_mesh_and_texture(
         });
 
         // Note: mesh contains triangles. No normals they must be added.
-        // @rmt: MeshImageData might be null?
         if (smoothShading && meshImageData) {
             mesh = add_normals(mesh, meshImageData, bounds);
         }

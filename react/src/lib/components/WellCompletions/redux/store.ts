@@ -1,4 +1,4 @@
-import { configureStore, EnhancedStore, StoreEnhancer } from "@reduxjs/toolkit";
+import { configureStore, EnhancedStore } from "@reduxjs/toolkit";
 import { rootReducer } from "./reducer";
 
 export type WellCompletionsState = ReturnType<typeof rootReducer>;
