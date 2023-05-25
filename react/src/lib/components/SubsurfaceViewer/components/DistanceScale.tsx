@@ -1,8 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
 
 import React from "react";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const convert = require("convert-units");
+import convert, { Unit } from "convert-units";
 
 export interface ScaleProps {
     // Needed the zoom value to calculate width in units
@@ -14,7 +13,7 @@ export interface ScaleProps {
     // additional css style to position the component
     style?: Record<string, unknown>;
     // default unit for the scale ruler
-    scaleUnit?: string;
+    scaleUnit?: Unit;
 }
 
 const roundToStep = function (num: number, step: number) {
@@ -28,21 +27,13 @@ const DistanceScale: React.FC<ScaleProps> = ({
     style,
     scaleUnit,
 }: ScaleProps) => {
-    // @rmt: added scaleUnit check - NOTE: if any of the values below === 0 || === "", this will return null
-    if (!zoom || !widthPerUnit || !incrementValue || scaleUnit === undefined) {
+    if (!zoom || !widthPerUnit || !incrementValue || !scaleUnit) return null;
+
+    if (!convert().possibilities().includes(scaleUnit)) {
         return null;
     }
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const [rulerWidth, setRulerWidth] = React.useState<number>(0);
+
     const widthInUnits = widthPerUnit / Math.pow(2, zoom);
-    const scaleRulerStyle: React.CSSProperties = {
-        width: rulerWidth,
-        height: "4px",
-        border: "2px solid",
-        borderTop: "none",
-        display: "inline-block",
-        marginLeft: "3px",
-    };
 
     const scaleValue =
         widthInUnits < incrementValue
@@ -57,10 +48,16 @@ const DistanceScale: React.FC<ScaleProps> = ({
         .from(scaleUnit as convert.Unit)
         .toBest().val;
 
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    React.useEffect(() => {
-        setRulerWidth(scaleValue * Math.pow(2, zoom));
-    }, [zoom]);
+    const rulerWidth = scaleValue * Math.pow(2, zoom);
+
+    const scaleRulerStyle: React.CSSProperties = {
+        width: rulerWidth,
+        height: "4px",
+        border: "2px solid",
+        borderTop: "none",
+        display: "inline-block",
+        marginLeft: "3px",
+    };
 
     return (
         <div

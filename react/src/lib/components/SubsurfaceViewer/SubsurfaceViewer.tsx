@@ -9,6 +9,7 @@ import { MapMouseEvent, jsonToObject } from "./components/Map";
 import React from "react";
 import PropTypes from "prop-types";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
+import convert, { Unit } from "convert-units";
 
 export interface SubsurfaceViewerProps {
     id: string;
@@ -27,7 +28,7 @@ export interface SubsurfaceViewerProps {
         widthPerUnit?: number | null;
         cssStyle?: Record<string, unknown> | null;
     };
-    coordinateUnit?: string;
+    coordinateUnit?: Unit;
     toolbar?: {
         visible?: boolean | null;
     };
@@ -155,6 +156,13 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
         [setProps, layerEditedData]
     );
 
+    if (coordinateUnit && !convert().possibilities().includes(coordinateUnit)) {
+        console.error(
+            `Invalid coordinate unit: '${coordinateUnit}'. Valid units are: ${convert().possibilities()}`
+        );
+        coordinateUnit = undefined;
+    }
+
     return (
         <Map
             id={id}
@@ -163,7 +171,7 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
             views={views}
             coords={coords}
             scale={scale}
-            coordinateUnit={coordinateUnit}
+            coordinateUnit={coordinateUnit as Unit}
             colorTables={colorTables}
             setEditedData={setEditedData}
             checkDatafileSchema={checkDatafileSchema}
@@ -285,7 +293,7 @@ SubsurfaceViewer.propTypes = {
      * Parameters for the Distance Scale component
      * Unit for the scale ruler
      */
-    coordinateUnit: PropTypes.string,
+    coordinateUnit: PropTypes.oneOf(convert().possibilities()),
 
     /**
      * @obsolete Toolbar should be added as annotation. This prop has no function.

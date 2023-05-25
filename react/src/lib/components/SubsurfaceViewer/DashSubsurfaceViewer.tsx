@@ -10,6 +10,7 @@ import {
     BoundsAccessor,
 } from "./components/Map";
 import { MapMouseEvent } from "./components/Map";
+import convert, { Unit } from "convert-units";
 
 export interface DashSubsurfaceViewerProps {
     id: string;
@@ -28,7 +29,7 @@ export interface DashSubsurfaceViewerProps {
         widthPerUnit?: number | null;
         cssStyle?: Record<string, unknown> | null;
     };
-    coordinateUnit?: string;
+    coordinateUnit?: Unit;
     colorTables?: colorTablesArray;
     editedData?: Record<string, unknown>;
     setProps?: (data: Record<string, unknown>) => void;
@@ -236,7 +237,7 @@ DashSubsurfaceViewer.propTypes = {
      * Parameters for the Distance Scale component
      * Unit for the scale ruler
      */
-    coordinateUnit: PropTypes.string,
+    coordinateUnit: PropTypes.oneOf(convert().possibilities()),
 
     /**
      * Prop containing color table data
