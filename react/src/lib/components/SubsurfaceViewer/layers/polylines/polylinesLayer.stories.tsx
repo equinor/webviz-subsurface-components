@@ -1,5 +1,6 @@
 import React from "react";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
+import { create, all } from "mathjs";
 
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import { default as PolylinesLayer } from "./polylinesLayer";
@@ -7,7 +8,7 @@ import { default as AxesLayer } from "../axes/axesLayer";
 
 export default {
     component: SubsurfaceViewer,
-    title: "SubsurfaceViewer / Polylines Layer",
+    title: "SubsurfaceViewer / Experimental Polylines Layer",
 } as ComponentMeta<typeof SubsurfaceViewer>;
 
 const defaultParameters = {
@@ -76,12 +77,26 @@ SmallPolylinesLayer.parameters = {
 const sideSize = 10000;
 const pointsCount = 100000;
 
+const math = create(all, { randomSeed: "1234" });
+
+type TRandomNumberFunc = () => number;
+
+const randomFunc = ((): TRandomNumberFunc => {
+    if (math.random) {
+        return () => {
+            const val = math.random?.(sideSize);
+            return val ? val : 0.0;
+        };
+    }
+    return () => Math.random() * sideSize;
+})();
+
 const hugePolylinesLayer = new PolylinesLayer({
     id: "polylines-layer",
 
     polylinePoints: Array(pointsCount * 3)
         .fill(0)
-        .map(() => Math.random() * sideSize),
+        .map(() => randomFunc()),
     startIndices: [0],
     color: [0, 100, 100, 40],
 

@@ -1,5 +1,6 @@
 import React from "react";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
+import { create, all } from "mathjs";
 
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import { default as LabeledPointsLayer } from "./labeledPointsLayer";
@@ -7,7 +8,7 @@ import { default as AxesLayer } from "../axes/axesLayer";
 
 export default {
     component: SubsurfaceViewer,
-    title: "SubsurfaceViewer / LabeledPoints Layer",
+    title: "SubsurfaceViewer / Experimental LabeledPoints Layer",
 } as ComponentMeta<typeof SubsurfaceViewer>;
 
 const defaultParameters = {
@@ -76,11 +77,25 @@ SmallLabeledPointsLayer.parameters = {
 const sideSize = 10000;
 const pointsCount = 100000;
 
+const math = create(all, { randomSeed: "1234" });
+
+type TRandomNumberFunc = () => number;
+
+const randomFunc = ((): TRandomNumberFunc => {
+    if (math?.random) {
+        return () => {
+            const val = math.random?.(sideSize);
+            return val ? val : 0.0;
+        };
+    }
+    return () => Math.random() * sideSize;
+})();
+
 const hugePointsLayer = new LabeledPointsLayer({
     id: "labeledPoints-layer",
     pointsData: Array(pointsCount * 3)
         .fill(0)
-        .map(() => Math.random() * sideSize),
+        .map(() => randomFunc()),
     color: [255, 100, 100],
     pointRadius: 1,
     radiusUnits: "pixels",
