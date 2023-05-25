@@ -1,29 +1,34 @@
 /* eslint-disable react/display-name */
 import { Button, Dialog, Icon, Menu, Scrim } from "@equinor/eds-core-react";
+import { styled } from "@mui/material/styles";
 import { sort } from "@equinor/eds-icons";
-import { createStyles, makeStyles } from "@material-ui/core";
 import React, { useState } from "react";
 import SortTable from "./SortTable";
 
+const PREFIX = "SortButton";
+
+const classes = {
+    action: `${PREFIX}-action`,
+};
+
+// TODO jss-to-styled codemod: The Fragment root was replaced by div. Change the tag if needed.
+const Root = styled("div")(() => ({
+    [`& .${classes.action}`]: { margin: "5px" },
+}));
+
 // Use library approach
 Icon.add({ sort }); // (this needs only be done once)
-const useStyles = makeStyles(() =>
-    createStyles({
-        action: { margin: "5px" },
-    })
-);
 /**
  * A menu button that shows a dialog for sorting wells by attributes
  */
 const SortButton: React.FC = React.memo(() => {
-    const classes = useStyles();
     // Dialogs
     const [visibleScrim, setVisibleScrim] = useState(false);
     const handleClose = () => {
         setVisibleScrim(!visibleScrim);
     };
     return (
-        <>
+        <Root>
             <Menu.Item onClick={() => setVisibleScrim(true)}>
                 Sort/Group by Attributes
             </Menu.Item>
@@ -45,7 +50,7 @@ const SortButton: React.FC = React.memo(() => {
                     </Dialog>
                 </Scrim>
             )}
-        </>
+        </Root>
     );
 });
 

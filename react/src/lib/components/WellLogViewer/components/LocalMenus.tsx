@@ -12,8 +12,8 @@ import WellLogView from "./WellLogView";
 import { ExtPlotOptions } from "../utils/tracks";
 import { isScaleTrack } from "../utils/tracks";
 
-import Menu from "@material-ui/core/Menu";
-import MenuItem from "@material-ui/core/MenuItem";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 
 export interface SimpleMenuProps {
     anchorEl: HTMLElement;

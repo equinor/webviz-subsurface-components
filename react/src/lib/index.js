@@ -9,8 +9,6 @@ import SubsurfaceViewer, {
 } from "./components/SubsurfaceViewer";
 import GroupTree from "./components/GroupTree";
 import HistoryMatch from "./components/HistoryMatch";
-import LayeredMap from "./components/LayeredMap";
-import LeafletMap from "./components/LeafletMap";
 import Map from "./components/Map";
 import Morris from "./components/Morris";
 import PriorPosteriorDistribution from "./components/PriorPosteriorDistribution";
@@ -22,7 +20,7 @@ import { SyncLogViewer } from "./components/WellLogViewer";
 import WebVizContinuousLegend from "./components/ColorLegends/WebVizContinuousLegend";
 import WebVizDiscreteLegend from "./components/ColorLegends/WebVizDiscreteLegend";
 import WebVizColorLegend from "./components/ColorLegends/WebVizColorLegend";
-import { PickInfo, View } from "deck.gl";
+import { View } from "deck.gl";
 import { TooltipCallback } from "./components/SubsurfaceViewer/components/Map";
 import {
     ExtendedLayerProps,
@@ -39,9 +37,7 @@ export {
     HistoryMatch,
     Morris,
     Map,
-    LayeredMap,
     PriorPosteriorDistribution,
-    LeafletMap,
     SubsurfaceViewer,
     /**
      * Component for rendering subsurface data.
@@ -58,7 +54,6 @@ export {
     WebVizContinuousLegend,
     WebVizDiscreteLegend,
     WebVizColorLegend,
-    PickInfo,
     TooltipCallback,
     ExtendedLayerProps,
     PropertyDataType,

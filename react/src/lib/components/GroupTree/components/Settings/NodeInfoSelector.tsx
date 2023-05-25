@@ -1,19 +1,23 @@
 import { NativeSelect } from "@equinor/eds-core-react";
-import { createStyles, makeStyles, Theme } from "@material-ui/core";
+import { styled } from "@mui/material/styles";
 import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCurrentNodeInfo } from "../../redux/actions";
 import { GroupTreeState } from "../../redux/store";
 import { DataInfos, DataInfo } from "../../redux/types";
 
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        root: {
-            maxWidth: "250px",
-            padding: theme.spacing(1),
-        },
-    })
-);
+const PREFIX = "NodeInfoSelector";
+
+const classes = {
+    root: `${PREFIX}-root`,
+};
+
+const StyledNativeSelect = styled(NativeSelect)(({ theme }) => ({
+    [`&.${classes.root}`]: {
+        maxWidth: "250px",
+        padding: theme.spacing(1),
+    },
+}));
 
 interface Props {
     node_options: DataInfos;
@@ -21,7 +25,6 @@ interface Props {
 
 const NodeInfoSelector: React.FC<Props> = React.memo(
     ({ node_options }: Props) => {
-        const classes = useStyles();
         // Redux
         const dispatch = useDispatch();
         const currentNodeInfo = useSelector(
@@ -29,14 +32,14 @@ const NodeInfoSelector: React.FC<Props> = React.memo(
         );
         // handlers
         const handleSelectedItemChange = useCallback(
-            (event) => {
-                dispatch(updateCurrentNodeInfo(event.target.value));
+            (event: { target: { value: unknown } }) => {
+                dispatch(updateCurrentNodeInfo(event.target.value as string));
             },
             [dispatch]
         );
 
         return (
-            <NativeSelect
+            <StyledNativeSelect
                 className={classes.root}
                 id="node-info-selector"
                 label="Node Data"
@@ -48,7 +51,7 @@ const NodeInfoSelector: React.FC<Props> = React.memo(
                         {key.label}
                     </option>
                 ))}
-            </NativeSelect>
+            </StyledNativeSelect>
         );
     }
 );

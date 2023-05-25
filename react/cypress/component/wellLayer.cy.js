@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 import * as React from "react";
-import { mount } from "@cypress/react";
+import { mount } from "@cypress/react18";
 import { composeStories } from "@storybook/testing-react";
 
 import * as stories from "../../src/lib/components/SubsurfaceViewer/layers/wells/wellsLayer.stories";

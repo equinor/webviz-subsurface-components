@@ -143,7 +143,7 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
     // The changes done in a layer, for example, are bundled into a patch
     // and sent to the parent component via setProps. (See layers/utils/layerTools.ts)
     const setEditedData = React.useCallback(
-        (data) => {
+        (data: Record<string, unknown>) => {
             if (setProps == undefined) return;
             setProps({
                 editedData: {

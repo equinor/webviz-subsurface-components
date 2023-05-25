@@ -1,5 +1,5 @@
 import React from "react";
-import { Checkbox, TableCell, TableHead, TableRow } from "@material-ui/core";
+import { Checkbox, TableCell, TableHead, TableRow } from "@mui/material";
 
 interface EnhancedTableProps {
     numSelected: number;

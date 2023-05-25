@@ -49,8 +49,8 @@ module.exports = (env, argv) => {
           };
 
     return {
-        mode,
-        entry,
+        mode: mode,
+        entry: entry,
         resolve: {
             extensions: [".ts", ".tsx", ".js", ".jsx"],
         },
@@ -65,7 +65,7 @@ module.exports = (env, argv) => {
         optimization: {
             minimizer: [new TerserJSPlugin({}), new CssMinimizerPlugin({})],
         },
-        externals,
+        externals: externals,
         plugins: [
             new MiniCssExtractPlugin({
                 filename: demo
@@ -83,7 +83,7 @@ module.exports = (env, argv) => {
                 {
                     test: /\.(ts|js)x?$/,
                     exclude: /node_modules/,
-                    use: ["babel-loader", "webpack-conditional-loader"],
+                    use: ["babel-loader"],
                 },
                 {
                     test: /\.css$/,
@@ -92,6 +92,17 @@ module.exports = (env, argv) => {
                             loader: MiniCssExtractPlugin.loader,
                         },
                         "css-loader",
+                    ],
+                },
+                {
+                    test: /\.s[ac]ss$/i,
+                    use: [
+                        // Creates `style` nodes from JS strings
+                        "style-loader",
+                        // Translates CSS into CommonJS
+                        "css-loader",
+                        // Compiles Sass to CSS
+                        "sass-loader",
                     ],
                 },
                 {

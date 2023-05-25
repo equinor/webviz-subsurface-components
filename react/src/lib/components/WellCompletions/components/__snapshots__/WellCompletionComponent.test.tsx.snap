@@ -491,107 +491,111 @@ exports[`Test Well Completion Component snapshot test 1`] = `
 }
 
 <div
-  class="makeStyles-root-1"
+  class="WellCompletionsViewer-root css-g4xl5z"
 >
   <header
-    class="c0 makeStyles-topBar-9"
+    class="c0 SettingsBar-topBar css-mz8yvz"
   >
     <div
-      class="c1 makeStyles-actions-10"
+      class="c1 SettingsBar-actions"
     >
       <div
-        class="makeStyles-root-11"
+        class="TimeRangeSelector-root css-1htfc7f"
       >
         <div
-          class="makeStyles-slider-12"
+          class="TimeRangeSelector-slider"
         >
           <span>
             Time Steps
           </span>
           <span
-            class="MuiSlider-root WithStyles(ForwardRef(Slider))-root-14 MuiSlider-colorPrimary MuiSlider-trackFalse"
+            class="MuiSlider-root TimeRangeSelector-root MuiSlider-trackFalse MuiSlider-colorPrimary MuiSlider-sizeMedium css-1xvshl5-MuiSlider-root"
           >
             <span
-              class="MuiSlider-rail"
+              class="MuiSlider-rail css-14pt78w-MuiSlider-rail"
             />
             <span
-              class="MuiSlider-track"
+              class="MuiSlider-track css-pm1ix7-MuiSlider-track"
               style="left: 0%; width: 0%;"
             />
-            <input
-              type="hidden"
-              value="0"
-            />
             <span
-              class="MuiSlider-mark MuiSlider-markActive"
+              class="MuiSlider-mark MuiSlider-markActive css-6cwnna-MuiSlider-mark"
               data-index="0"
               style="left: 0%;"
             />
             <span
-              class="MuiSlider-mark"
+              class="MuiSlider-mark css-1tfve6q-MuiSlider-mark"
               data-index="1"
               style="left: 11.11111111111111%;"
             />
             <span
-              class="MuiSlider-mark"
+              class="MuiSlider-mark css-1tfve6q-MuiSlider-mark"
               data-index="2"
               style="left: 22.22222222222222%;"
             />
             <span
-              class="MuiSlider-mark"
+              class="MuiSlider-mark css-1tfve6q-MuiSlider-mark"
               data-index="3"
               style="left: 33.333333333333336%;"
             />
             <span
-              class="MuiSlider-mark"
+              class="MuiSlider-mark css-1tfve6q-MuiSlider-mark"
               data-index="4"
               style="left: 44.44444444444444%;"
             />
             <span
-              class="MuiSlider-mark"
+              class="MuiSlider-mark css-1tfve6q-MuiSlider-mark"
               data-index="5"
               style="left: 55.55555555555556%;"
             />
             <span
-              class="MuiSlider-mark"
+              class="MuiSlider-mark css-1tfve6q-MuiSlider-mark"
               data-index="6"
               style="left: 66.66666666666667%;"
             />
             <span
-              class="MuiSlider-mark"
+              class="MuiSlider-mark css-1tfve6q-MuiSlider-mark"
               data-index="7"
               style="left: 77.77777777777777%;"
             />
             <span
-              class="MuiSlider-mark"
+              class="MuiSlider-mark css-1tfve6q-MuiSlider-mark"
               data-index="8"
               style="left: 88.88888888888889%;"
             />
             <span
-              class="MuiSlider-mark"
+              class="MuiSlider-mark css-1tfve6q-MuiSlider-mark"
               data-index="9"
               style="left: 100%;"
             />
             <span
-              aria-labelledby="time-step-slider-label"
-              aria-orientation="horizontal"
-              aria-valuemax="9"
-              aria-valuemin="0"
-              aria-valuenow="0"
-              class="MuiSlider-thumb MuiSlider-thumbColorPrimary PrivateValueLabel-open-17 PrivateValueLabel-thumb-16"
+              class="MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary css-eg0mwd-MuiSlider-thumb"
               data-index="0"
-              role="slider"
               style="left: 0%;"
-              tabindex="0"
             >
+              <input
+                aria-labelledby="time-step-slider-label"
+                aria-orientation="horizontal"
+                aria-valuemax="9"
+                aria-valuemin="0"
+                aria-valuenow="0"
+                data-index="0"
+                max="9"
+                min="0"
+                step="1"
+                style="border: 0px; height: 100%; margin: -1px; overflow: hidden; padding: 0px; position: absolute; white-space: nowrap; width: 100%; direction: ltr;"
+                type="range"
+                value="0"
+              />
               <span
-                class="PrivateValueLabel-offset-18 MuiSlider-valueLabel WithStyles(ForwardRef(Slider))-valueLabel-15"
+                aria-hidden="true"
+                class="MuiSlider-valueLabelOpen MuiSlider-valueLabel TimeRangeSelector-valueLabel css-nnid7-MuiSlider-valueLabel"
               >
                 <span
-                  class="PrivateValueLabel-circle-19"
+                  class="MuiSlider-valueLabelCircle"
                 >
                   <span
-                    class="PrivateValueLabel-label-20"
+                    class="MuiSlider-valueLabelLabel"
                   >
                     2000-02-01
                   </span>
@@ -601,7 +605,7 @@ exports[`Test Well Completion Component snapshot test 1`] = `
           </span>
         </div>
         <div
-          class="c2 makeStyles-selector-13"
+          class="c2 TimeRangeSelector-selector"
         >
           <label
             class="c3"
@@ -672,9 +676,11 @@ exports[`Test Well Completion Component snapshot test 1`] = `
       </div>
     </div>
     <div
-      class="c6 makeStyles-actions-10"
+      class="c6 SettingsBar-actions"
     >
-      <div>
+      <div
+        class="css-1l0gahh"
+      >
         <button
           class="c7"
           tabindex="0"
@@ -738,16 +744,16 @@ exports[`Test Well Completion Component snapshot test 1`] = `
     </div>
   </header>
   <div
-    class="makeStyles-main-2"
+    class="WellCompletionsViewer-main"
   >
     <div
-      class="makeStyles-content-7"
+      class="WellCompletionsViewer-content"
     >
       <div
-        class="makeStyles-root-22"
+        class="WellPagination-root css-1yhto5y"
       >
         <div
-          class="makeStyles-left-23"
+          class="WellPagination-left"
         >
           <p
             class="c9"
@@ -758,22 +764,23 @@ exports[`Test Well Completion Component snapshot test 1`] = `
         </div>
         <nav
           aria-label="pagination navigation"
-          class="MuiPagination-root makeStyles-right-24"
+          class="MuiPagination-root MuiPagination-text WellPagination-right css-1oj2twp-MuiPagination-root"
         >
           <ul
-            class="MuiPagination-ul"
+            class="MuiPagination-ul css-wjh20t-MuiPagination-ul"
           >
             <li>
               <button
                 aria-label="Go to previous page"
-                class="MuiButtonBase-root MuiPaginationItem-root MuiPaginationItem-page Mui-disabled Mui-disabled"
+                class="MuiButtonBase-root Mui-disabled MuiPaginationItem-root MuiPaginationItem-sizeMedium MuiPaginationItem-text MuiPaginationItem-circular Mui-disabled MuiPaginationItem-previousNext css-yuzg60-MuiButtonBase-root-MuiPaginationItem-root"
                 disabled=""
                 tabindex="-1"
                 type="button"
               >
                 <svg
                   aria-hidden="true"
-                  class="MuiSvgIcon-root MuiPaginationItem-icon"
+                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium MuiPaginationItem-icon css-g2z002-MuiSvgIcon-root-MuiPaginationItem-icon"
+                  data-testid="NavigateBeforeIcon"
                   focusable="false"
                   viewBox="0 0 24 24"
                 >
@@ -787,27 +794,28 @@ exports[`Test Well Completion Component snapshot test 1`] = `
               <button
                 aria-current="true"
                 aria-label="page 1"
-                class="MuiButtonBase-root MuiPaginationItem-root MuiPaginationItem-page Mui-selected"
+                class="MuiButtonBase-root MuiPaginationItem-root MuiPaginationItem-sizeMedium MuiPaginationItem-text MuiPaginationItem-circular Mui-selected MuiPaginationItem-page css-yuzg60-MuiButtonBase-root-MuiPaginationItem-root"
                 tabindex="0"
                 type="button"
               >
                 1
                 <span
-                  class="MuiTouchRipple-root"
+                  class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
                 />
               </button>
             </li>
             <li>
               <button
                 aria-label="Go to next page"
-                class="MuiButtonBase-root MuiPaginationItem-root MuiPaginationItem-page Mui-disabled Mui-disabled"
+                class="MuiButtonBase-root Mui-disabled MuiPaginationItem-root MuiPaginationItem-sizeMedium MuiPaginationItem-text MuiPaginationItem-circular Mui-disabled MuiPaginationItem-previousNext css-yuzg60-MuiButtonBase-root-MuiPaginationItem-root"
                 disabled=""
                 tabindex="-1"
                 type="button"
               >
                 <svg
                   aria-hidden="true"
-                  class="MuiSvgIcon-root MuiPaginationItem-icon"
+                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium MuiPaginationItem-icon css-g2z002-MuiSvgIcon-root-MuiPaginationItem-icon"
+                  data-testid="NavigateNextIcon"
                   focusable="false"
                   viewBox="0 0 24 24"
                 >
@@ -824,7 +832,7 @@ exports[`Test Well Completion Component snapshot test 1`] = `
         style="min-width: 220px; min-height: 280px; height: 100%;"
       >
         <div
-          class="makeStyles-root-25"
+          class="css-a64bs7"
           currentitem="false"
           data-for="plot-tooltip"
           data-tip="true"
@@ -917,17 +925,17 @@ exports[`Test Well Completion Component snapshot test 1`] = `
       </div>
     </div>
     <div
-      class="MuiDrawer-root MuiDrawer-docked makeStyles-drawer-3 makeStyles-drawerShift-4"
+      class="MuiDrawer-root MuiDrawer-docked WellCompletionsViewer-drawer WellCompletionsViewer-drawerShift css-7ik032-MuiDrawer-docked"
     >
       <div
-        class="MuiPaper-root MuiDrawer-paper makeStyles-drawerPaper-5 MuiDrawer-paperAnchorRight MuiDrawer-paperAnchorDockedRight MuiPaper-elevation0"
-        style="visibility: hidden; webkit-transform: translateX(1024px) translateX(0px); transform: translateX(1024px) translateX(0px);"
+        class="MuiPaper-root MuiPaper-elevation MuiPaper-elevation0 MuiDrawer-paper WellCompletionsViewer-drawerPaper MuiDrawer-paperAnchorRight MuiDrawer-paperAnchorDockedRight css-18sg6k4-MuiPaper-root-MuiDrawer-paper"
+        style="visibility: hidden; webkit-transform: translateX(1024px); transform: translateX(1024px);"
       >
         <hr
-          class="MuiDivider-root"
+          class="MuiDivider-root MuiDivider-fullWidth css-9mgopn-MuiDivider-root"
         />
         <div
-          class="makeStyles-root-26 react-dropdown-tree-select"
+          class="ZoneSelector-root css-5sbdto react-dropdown-tree-select"
           id="rdts1"
         >
           <div
@@ -979,7 +987,7 @@ exports[`Test Well Completion Component snapshot test 1`] = `
           </div>
         </div>
         <div
-          class="makeStyles-root-27"
+          class="WellFilter-root css-1mgy1d9"
         >
           <span
             aria-label="sitewide"
@@ -1079,7 +1087,7 @@ exports[`Test Well Completion Component snapshot test 1`] = `
           </span>
         </label>
         <div
-          class="makeStyles-root-28"
+          class="WellAttributesSelector-root css-4p3xgu"
         >
           <div
             id="AttributesSelector"
@@ -1154,7 +1162,7 @@ exports[`Test Well Completion Component snapshot test with incorrect version num
 }
 
 <div
-  class="makeStyles-root-33"
+  class="ErrorPlaceholder-root css-1ofao1p"
 >
   <p
     class="c0"
