@@ -8,7 +8,7 @@ import {
     defineBoundingBox,
 } from "../utils/layerTools";
 
-export interface LabeledPointsLayerProps<D> extends ExtendedLayerProps<D> {
+export interface PointsLayerProps<D> extends ExtendedLayerProps<D> {
     /**
      * Point positions as [x, y, z, x, y, z....].
      */
@@ -41,9 +41,9 @@ export interface LabeledPointsLayerProps<D> extends ExtendedLayerProps<D> {
 }
 
 const defaultProps = {
-    "@@type": "LabeledPointsLayer",
-    name: "LabeledPointsLayer",
-    id: "labeled-points-layer",
+    "@@type": "PointsLayer",
+    name: "PointsLayer",
+    id: "points-layer",
     color: [125, 0, 0, 255],
     radiusUnits: "pixels",
     pointRadius: 5,
@@ -62,8 +62,8 @@ interface IDataAttributes {
     };
 }
 
-export default class LabeledPointsLayer extends CompositeLayer<
-    LabeledPointsLayerProps<unknown>
+export default class PointsLayer extends CompositeLayer<
+    PointsLayerProps<unknown>
 > {
     renderLayers(): [ScatterplotLayer?] {
         const layer = new ScatterplotLayer(
@@ -91,10 +91,7 @@ export default class LabeledPointsLayer extends CompositeLayer<
         this.setState({ dataAttributes });
     }
 
-    updateState({
-        props,
-        oldProps,
-    }: UpdateParameters<LabeledPointsLayer>): void {
+    updateState({ props, oldProps }: UpdateParameters<PointsLayer>): void {
         const needs_reload =
             !isEqual(props.pointsData, oldProps.pointsData) ||
             !isEqual(props.ZIncreasingDownwards, oldProps.ZIncreasingDownwards);
@@ -142,5 +139,5 @@ export default class LabeledPointsLayer extends CompositeLayer<
     }
 }
 
-LabeledPointsLayer.layerName = "LabeledPointsLayer";
-LabeledPointsLayer.defaultProps = defaultProps;
+PointsLayer.layerName = "PointsLayer";
+PointsLayer.defaultProps = defaultProps;

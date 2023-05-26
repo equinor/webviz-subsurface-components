@@ -8,7 +8,7 @@ import { default as AxesLayer } from "../axes/axesLayer";
 
 export default {
     component: SubsurfaceViewer,
-    title: "SubsurfaceViewer / Experimental Polylines Layer",
+    title: "SubsurfaceViewer / Polylines Layer",
 } as ComponentMeta<typeof SubsurfaceViewer>;
 
 const defaultParameters = {
@@ -19,8 +19,8 @@ const defaultParameters = {
 };
 
 // Small example using polylinesLayer.
-const polylinesLayer = new PolylinesLayer({
-    id: "polylines-layer",
+const smallPolylinesLayer = new PolylinesLayer({
+    id: "small_polylines_layer",
     /* eslint-disable */
     polylinePoints: [0, 0, 0, 
                     10, 0,  0,
@@ -39,8 +39,8 @@ const polylinesLayer = new PolylinesLayer({
     ZIncreasingDownwards: true,
 });
 
-const axesLayer = new AxesLayer({
-    id: "axes_small",
+const smallAxesLayer = new AxesLayer({
+    id: "small_axes_layer",
     bounds: [-10, -10, 0, 20, 10, 10],
 });
 
@@ -52,7 +52,7 @@ export const SmallPolylinesLayer: ComponentStory<typeof SubsurfaceViewer> = (
 
 SmallPolylinesLayer.args = {
     id: "map",
-    layers: [axesLayer, polylinesLayer],
+    layers: [smallAxesLayer, smallPolylinesLayer],
     bounds: [-10, -10, 17, 10],
     views: {
         layout: [1, 1],
@@ -92,7 +92,7 @@ const randomFunc = ((): TRandomNumberFunc => {
 })();
 
 const hugePolylinesLayer = new PolylinesLayer({
-    id: "polylines-layer",
+    id: "huge_polylines-layer",
 
     polylinePoints: Array(pointsCount * 3)
         .fill(0)
@@ -107,7 +107,7 @@ const hugePolylinesLayer = new PolylinesLayer({
 });
 
 const hugeAxesLayer = new AxesLayer({
-    id: "axes_huge",
+    id: "huge_axes_layer",
     bounds: [0, 0, 0, sideSize, sideSize, sideSize],
 });
 
