@@ -352,7 +352,7 @@ const MouseEventStory = (args: { show3d: boolean }) => {
     });
 
     const handleEvent = useCallback(
-        (event) => {
+        (event: MapMouseEvent) => {
             setEvent(event);
         },
         [setEvent]

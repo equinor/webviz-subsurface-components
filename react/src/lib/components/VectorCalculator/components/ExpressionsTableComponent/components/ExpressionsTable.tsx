@@ -8,7 +8,7 @@ import {
     TableCell,
     TableContainer,
     Tooltip,
-} from "@material-ui/core";
+} from "@mui/material";
 
 import { getDetailedExpression } from "../../../utils/VectorCalculatorHelperFunctions";
 import { ExpressionType } from "../../../utils/VectorCalculatorTypes";
@@ -22,7 +22,7 @@ import {
 import { BlinkingTableRow } from "./BlinkingTableRow";
 import { EnhancedTableHead } from "./EnhancedTableHead";
 
-import "!style-loader!css-loader!../../../VectorCalculator.css";
+import "../../../VectorCalculator.css";
 
 interface ExpressionsTableProps {
     blinkingExpressions: ExpressionType[];

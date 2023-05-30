@@ -37,8 +37,9 @@ import { cloneDeep } from "lodash";
 import { colorTables } from "@emerson-eps/color-tables";
 import { getModelMatrixScale } from "../layers/utils/layerTools";
 import { OrbitController, OrthographicController } from "@deck.gl/core/typed";
-import { MjolnirEvent } from "mjolnir.js";
+import { MjolnirEvent, MjolnirPointerEvent } from "mjolnir.js";
 import IntersectionView from "../views/intersectionView";
+import { Unit } from "convert-units";
 
 type BoundingBox = [number, number, number, number, number, number];
 type NumberQuad = [number, number, number, number];
@@ -206,7 +207,7 @@ export interface MapProps {
         cssStyle?: Record<string, unknown> | null;
     };
 
-    coordinateUnit?: string;
+    coordinateUnit?: Unit;
 
     /**
      * Parameters to control toolbar
@@ -395,13 +396,10 @@ const Map: React.FC<MapProps> = ({
                           deckRef.current?.deck
                       );
 
-                const minZoom = is3D ? -12 : -15;
-                const maxZoom = is3D ? +12 : +15;
+                const minZoom = is3D ? -12 : -12;
+                const maxZoom = is3D ? +12 : +4;
 
-                return [
-                    item.id,
-                    { ...viewState, minZoom: minZoom, maxZoom: maxZoom },
-                ];
+                return [item.id, { ...viewState, minZoom, maxZoom }];
             });
 
             const tempViewStates = Object.fromEntries(viewStateMap);
@@ -429,22 +427,30 @@ const Map: React.FC<MapProps> = ({
                 viewsProps.map((item) => [item.id, cameraPosition])
             ) as unknown as Record<string, ViewStateType>;
         } else {
+            const isBoundsDefined = typeof bounds !== "undefined";
+
             tempViewStates = Object.fromEntries(
                 viewsProps.map((item, index) => {
-                    const viewState = viewStates[item.id];
-                    return [
-                        item.id,
-                        typeof viewState !== "undefined"
-                            ? viewState
-                            : getViewState(
+                    let viewState = viewStates[item.id];
+                    if (typeof viewState === "undefined") {
+                        viewState = isBoundsDefined
+                            ? getViewState(
                                   viewPortMargins,
                                   boundsInitial,
                                   boundingBoxCenter(reportedBoundingBoxAcc),
                                   views?.viewports?.[index].target,
                                   views?.viewports?.[index].zoom,
                                   deckRef.current?.deck
-                              ),
-                    ];
+                              )
+                            : getViewState3D(
+                                  views?.viewports?.[index]?.show3D ?? false,
+                                  reportedBoundingBoxAcc,
+                                  views?.viewports?.[index].zoom,
+                                  deckRef.current?.deck
+                              );
+                    }
+
+                    return [item.id, viewState];
                 })
             );
         }
@@ -522,21 +528,28 @@ const Map: React.FC<MapProps> = ({
 
     // react on bounds prop change
     useEffect(() => {
-        setReportedBoundingBoxAcc(bboxInitial);
+        const isBoundsDefined = typeof bounds !== "undefined";
 
         let tempViewStates: Record<string, ViewStateType> = {};
         if (!isCameraPositionDefined) {
             tempViewStates = Object.fromEntries(
                 viewsProps.map((item, index) => [
                     item.id,
-                    getViewState(
-                        viewPortMargins,
-                        boundsInitial,
-                        boundingBoxCenter(reportedBoundingBoxAcc),
-                        views?.viewports?.[index].target,
-                        views?.viewports?.[index].zoom,
-                        deckRef.current?.deck
-                    ),
+                    isBoundsDefined
+                        ? getViewState(
+                              viewPortMargins,
+                              boundsInitial,
+                              boundingBoxCenter(reportedBoundingBoxAcc),
+                              views?.viewports?.[index].target,
+                              views?.viewports?.[index].zoom,
+                              deckRef.current?.deck
+                          )
+                        : getViewState3D(
+                              views?.viewports?.[index]?.show3D ?? false,
+                              reportedBoundingBoxAcc,
+                              views?.viewports?.[index].zoom,
+                              deckRef.current?.deck
+                          ),
                 ])
             );
             if (viewsProps[0] !== undefined) {
@@ -545,13 +558,7 @@ const Map: React.FC<MapProps> = ({
             setViewStates(tempViewStates);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [
-        boundsInitial,
-        cameraPosition,
-        viewPortMargins,
-        views?.viewports,
-        viewsProps,
-    ]);
+    }, [boundsInitial, cameraPosition, views?.viewports, viewsProps]);
 
     // react on cameraPosition prop change
     useEffect(() => {
@@ -780,7 +787,7 @@ const Map: React.FC<MapProps> = ({
         (
             type: "click" | "hover",
             infos: PickingInfo[],
-            event: Record<string, unknown>
+            event: MjolnirEvent
         ): void => {
             if (!onMouseEvent) return;
             const ev = handleMouseEvent(type, infos, event);
@@ -792,7 +799,7 @@ const Map: React.FC<MapProps> = ({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [hoverInfo, setHoverInfo] = useState<any>([]);
     const onHover = useCallback(
-        (pickInfo, event) => {
+        (pickInfo: PickingInfo, event: MjolnirEvent) => {
             const infos = getPickingInfos(pickInfo, event);
             setHoverInfo(infos); //  for InfoCard pickInfos
             callOnMouseEvent?.("hover", infos, event);
@@ -801,7 +808,7 @@ const Map: React.FC<MapProps> = ({
     );
 
     const onClick = useCallback(
-        (pickInfo, event) => {
+        (pickInfo: PickingInfo, event: MjolnirEvent) => {
             const infos = getPickingInfos(pickInfo, event);
             callOnMouseEvent?.("click", infos, event);
         },
@@ -860,7 +867,8 @@ const Map: React.FC<MapProps> = ({
     );
 
     const onViewStateChange = useCallback(
-        ({ viewId, viewState }) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ({ viewId, viewState }: { viewId: string; viewState: any }) => {
             const viewports = views?.viewports || [];
             const isSyncIds = viewports
                 .filter((item) => item.isSync)
@@ -903,7 +911,8 @@ const Map: React.FC<MapProps> = ({
                 views={deckGLViews}
                 layerFilter={layerFilter}
                 layers={deckGLLayers}
-                // @ts-expect-error this prop doesn't exists directly on DeckGL, but on Deck.Context
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
                 userData={{
                     setEditedData: (updated_prop: Record<string, unknown>) => {
                         setSelectedWell(updated_prop["selectedWell"] as string);
@@ -1178,8 +1187,8 @@ function createViews(
             return super.handleEvent(event);
         }
     }
+    const deckgl_views: View[] = [];
 
-    const deckgl_views = [];
     // if props for multiple viewport are not proper, return 2d view
     if (!views || !views.viewports || !views.layout) {
         deckgl_views.push(
@@ -1191,7 +1200,7 @@ function createViews(
                 width: "100%",
                 height: "100%",
                 flipY: false,
-                far: 99999,
+                far: +99999,
                 near: -99999,
             })
         );
@@ -1285,14 +1294,14 @@ function getViews(views: ViewsType | undefined): ViewportType[] {
 function handleMouseEvent(
     type: "click" | "hover",
     infos: PickingInfo[],
-    event: Record<string, unknown>
+    event: MjolnirEvent
 ) {
     const ev: MapMouseEvent = {
         type: type,
         infos: infos,
     };
     if (ev.type === "click") {
-        if (event["rightButton"]) ev.type = "contextmenu";
+        if ((event as MjolnirPointerEvent).rightButton) ev.type = "contextmenu";
     }
     for (const info of infos as LayerPickInfo[]) {
         if (info.coordinate) {

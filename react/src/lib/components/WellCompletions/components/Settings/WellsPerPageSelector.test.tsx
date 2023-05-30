@@ -20,7 +20,7 @@ describe("test number of Wells per page", () => {
         });
         expect(testStore.dispatch).toHaveBeenCalledTimes(1);
         expect(testStore.dispatch).toBeCalledWith({
-            payload: "50",
+            payload: 50,
             type: "ui/updateWellsPerPage",
         });
     });

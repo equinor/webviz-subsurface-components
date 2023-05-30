@@ -1,3 +1,4 @@
+const vsPosition = `
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -10,4 +11,6 @@ attribute vec2 position;
 void main() {
     gl_Position = vec4(position, 0, 1);
 }
+`;
 
+export default vsPosition;

@@ -2,40 +2,44 @@
 
 exports[`Test zoom slider snapshot test 1`] = `
 <span
-  class="MuiSlider-root MuiSlider-colorPrimary"
+  class="MuiSlider-root MuiSlider-colorPrimary MuiSlider-sizeMedium css-187mznn-MuiSlider-root"
 >
   <span
-    class="MuiSlider-rail"
+    class="MuiSlider-rail css-14pt78w-MuiSlider-rail"
   />
   <span
-    class="MuiSlider-track"
+    class="MuiSlider-track css-1gv0vcd-MuiSlider-track"
     style="left: 0%; width: 0%;"
   />
-  <input
-    type="hidden"
-    value="0"
-  />
   <span
-    aria-labelledby="non-linear-slider"
-    aria-orientation="horizontal"
-    aria-valuemax="256"
-    aria-valuemin="1"
-    aria-valuenow="1"
-    aria-valuetext="1"
-    class="MuiSlider-thumb MuiSlider-thumbColorPrimary PrivateValueLabel-thumb-1"
+    class="MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary css-eg0mwd-MuiSlider-thumb"
     data-index="0"
-    role="slider"
     style="left: 0%;"
-    tabindex="0"
   >
+    <input
+      aria-labelledby="non-linear-slider"
+      aria-orientation="horizontal"
+      aria-valuemax="256"
+      aria-valuemin="1"
+      aria-valuenow="1"
+      aria-valuetext="1"
+      data-index="0"
+      max="8"
+      min="0"
+      step="0.5"
+      style="border: 0px; height: 100%; margin: -1px; overflow: hidden; padding: 0px; position: absolute; white-space: nowrap; width: 100%; direction: ltr;"
+      type="range"
+      value="0"
+    />
     <span
-      class="PrivateValueLabel-offset-3 MuiSlider-valueLabel"
+      aria-hidden="true"
+      class="MuiSlider-valueLabel css-nnid7-MuiSlider-valueLabel"
     >
       <span
-        class="PrivateValueLabel-circle-4"
+        class="MuiSlider-valueLabelCircle"
       >
         <span
-          class="PrivateValueLabel-label-5"
+          class="MuiSlider-valueLabelLabel"
         >
           1
         </span>

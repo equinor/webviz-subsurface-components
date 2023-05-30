@@ -10,8 +10,6 @@ import GL from "@luma.gl/constants";
 import { Model, Geometry } from "@luma.gl/engine";
 import labelVertexShader from "./label-vertex.glsl";
 import labelFragmentShader from "./label-fragment.glsl";
-import backgroundVertexShader from "./background-vertex.glsl";
-import backgroundFragmentShader from "./background-fragment.glsl";
 import lineVertexShader from "./line-vertex.glsl";
 import lineFragmentShader from "./line-fragment.glsl";
 import { ExtendedLayerProps, Position3D } from "../utils/layerTools";
@@ -55,6 +53,10 @@ enum ViewSide {
     Bottom,
     Top,
 }
+
+const zDepthAxesBackground = 90;
+const zDepthAxesAxis = zDepthAxesBackground + 1;
+const zDepthAxesTicksAndLabels = zDepthAxesAxis + 1;
 
 export interface Axes2DLayerProps<D> extends ExtendedLayerProps<D> {
     marginH: number;
@@ -212,11 +214,11 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
         const isHorizontal =
             viewSide === ViewSide.Top || viewSide === ViewSide.Bottom;
 
-        const ticks = GetTicks(min, max, L); // Note: this may be replaced by NiceTicks npm package.  // XXX RENAME
+        const ticks = GetTicks(min, max, L); // Note: this may be replaced by NiceTicks npm package.
 
         // z value of all lines and labels. In camera/view coordinates. This
         // ensures lines will be closer to camera than rest of model.
-        const z_tick = isHorizontal ? -100 : -110; // horizontal rulers in front.
+        const z_depth = zDepthAxesTicksAndLabels;
 
         const tick_length =
             viewSide === ViewSide.Left || viewSide === ViewSide.Bottom
@@ -231,11 +233,11 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
 
             // tick line start
             if (isHorizontal) {
-                lines.push(tick, y_tick, z_tick); // tick line start
-                lines.push(tick, y_tick + tick_length, z_tick); // tick line end.
+                lines.push(tick, y_tick, z_depth); // tick line start
+                lines.push(tick, y_tick + tick_length, z_depth); // tick line end.
             } else {
-                lines.push(x_tick, tick, z_tick);
-                lines.push(x_tick + tick_length, tick, z_tick);
+                lines.push(x_tick, tick, z_depth);
+                lines.push(x_tick + tick_length, tick, z_depth);
             }
         }
 
@@ -254,11 +256,11 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
                 i++;
 
                 if (isHorizontal) {
-                    lines.push(tick, y_tick, z_tick); // tick line start
-                    lines.push(tick, y_tick + 0.5 * tick_length, z_tick); // tick line end.
+                    lines.push(tick, y_tick, z_depth); // tick line start
+                    lines.push(tick, y_tick + 0.5 * tick_length, z_depth); // tick line end.
                 } else {
-                    lines.push(x_tick, tick, z_tick);
-                    lines.push(x_tick + 0.5 * tick_length, tick, z_tick);
+                    lines.push(x_tick, tick, z_depth);
+                    lines.push(x_tick + 0.5 * tick_length, tick, z_depth);
                 }
             }
 
@@ -270,11 +272,11 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
                 i++;
 
                 if (isHorizontal) {
-                    lines.push(tick, y_tick, z_tick);
-                    lines.push(tick, y_tick + 0.5 * tick_length, z_tick);
+                    lines.push(tick, y_tick, z_depth);
+                    lines.push(tick, y_tick + 0.5 * tick_length, z_depth);
                 } else {
-                    lines.push(x_tick, tick, z_tick);
-                    lines.push(x_tick + 0.5 * tick_length, tick, z_tick);
+                    lines.push(x_tick, tick, z_depth);
+                    lines.push(x_tick + 0.5 * tick_length, tick, z_depth);
                 }
             }
         }
@@ -288,7 +290,6 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
         x_min_w: number,
         x_max_w: number,
         isTop: boolean,
-        viewMatrix: number[],
         pixel2world: number
     ): number[] {
         const mv = this.props.marginV * pixel2world;
@@ -298,28 +299,17 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
         const y_max = isTop ? vp_bounds[3] : vp_bounds[1] + mv;
         const y_min = isTop ? vp_bounds[3] - mv : vp_bounds[1];
 
-        const z = 0;
-        const p1 = vec4.fromValues(x_min_w, y_max, z, 1);
-        const p2 = vec4.fromValues(x_max_w, y_max, z, 1);
-        const p3 = vec4.fromValues(x_max_w, y_min, z, 1);
-        const p4 = vec4.fromValues(x_min_w, y_min, z, 1);
+        const zDepth = zDepthAxesBackground;
 
-        const p1_v = word2view(viewMatrix, p1);
-        const p2_v = word2view(viewMatrix, p2);
-        const p3_v = word2view(viewMatrix, p3);
-        const p4_v = word2view(viewMatrix, p4);
-
-        // Distance camera background in view space.
-        const z_dist = 101;
-        p1_v[2] = -z_dist;
-        p2_v[2] = -z_dist;
-        p3_v[2] = -z_dist;
-        p4_v[2] = -z_dist;
+        const p1 = [x_min_w, y_max, zDepth];
+        const p2 = [x_max_w, y_max, zDepth];
+        const p3 = [x_max_w, y_min, zDepth];
+        const p4 = [x_min_w, y_min, zDepth];
 
         /*eslint-disable */
         const background_lines: number[] = [ 
-            ...p1_v, ...p2_v, ...p4_v,  // triangle 1
-            ...p2_v, ...p4_v, ...p3_v,  // triangle 2 
+            ...p1, ...p2, ...p4,  // triangle 1
+            ...p2, ...p4, ...p3,  // triangle 2 
         ];
         /*eslint-enable */
 
@@ -330,7 +320,6 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
         y_min_w: number,
         y_max_w: number,
         isLeft: boolean, // left or right ruler.
-        viewMatrix: number[],
         pixel2world: number
     ): number[] {
         const mh = this.props.marginH * pixel2world;
@@ -340,28 +329,16 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
         const x_max = isLeft ? vp_bounds[0] + mh : vp_bounds[2];
         const x_min = isLeft ? vp_bounds[0] : vp_bounds[2] - mh;
 
-        const z = 0;
-        const p1 = vec4.fromValues(x_max, y_min_w, z, 1);
-        const p2 = vec4.fromValues(x_max, y_max_w, z, 1);
-        const p3 = vec4.fromValues(x_min, y_max_w, z, 1);
-        const p4 = vec4.fromValues(x_min, y_min_w, z, 1);
-
-        const p1_v = word2view(viewMatrix, p1);
-        const p2_v = word2view(viewMatrix, p2);
-        const p3_v = word2view(viewMatrix, p3);
-        const p4_v = word2view(viewMatrix, p4);
-
-        // Distance camera background in view space.
-        const z_dist = 105;
-        p1_v[2] = -z_dist;
-        p2_v[2] = -z_dist;
-        p3_v[2] = -z_dist;
-        p4_v[2] = -z_dist;
+        const zDepth = zDepthAxesBackground;
+        const p1 = [x_max, y_min_w, zDepth];
+        const p2 = [x_max, y_max_w, zDepth];
+        const p3 = [x_min, y_max_w, zDepth];
+        const p4 = [x_min, y_min_w, zDepth];
 
         /*eslint-disable */
         const background_lines: number[] = [ 
-            ...p1_v, ...p2_v, ...p4_v,  // triangle 1
-            ...p2_v, ...p4_v, ...p3_v,  // triangle 2 
+            ...p1, ...p2, ...p4,  // triangle 1
+            ...p2, ...p4, ...p3,  // triangle 2 
         ];
         /*eslint-enable */
 
@@ -457,7 +434,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
         // When both parameters are positive, (increased depth), the mesh is pushed away from the camera (hence, gets behind).
         gl.enable(GL.POLYGON_OFFSET_FILL);
         gl.polygonOffset(1, 1);
-        background_model.setUniforms({ projectionMatrix }).draw();
+        background_model.draw();
         gl.disable(GL.POLYGON_OFFSET_FILL);
 
         //gl.enable(gl.DEPTH_TEST);
@@ -497,9 +474,11 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
         let background_lines: number[] = [];
         let labelData: LabelData[] = [];
 
+        const zDepth = zDepthAxesAxis;
+
         //- BOTTOM RULER ----------------------------------------
         if (this.props.isBottomRuler) {
-            const axes = [xMin, yMin + mv, 0, xMax, yMin + mv, 0];
+            const axes = [xMin, yMin + mv, zDepth, xMax, yMin + mv, zDepth];
             const [ticks, labels] = this.GetTickLinesAndLabels(
                 xMin,
                 xMax,
@@ -511,7 +490,6 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
                     xMin,
                     xMax,
                     false,
-                    viewMatrix,
                     pixel2world
                 );
 
@@ -522,7 +500,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
 
         //- TOP RULER ----------------------------------------
         if (this.props.isTopRuler) {
-            const axes = [xMin, yMax - mv, 0, xMax, yMax - mv, 0];
+            const axes = [xMin, yMax - mv, zDepth, xMax, yMax - mv, zDepth];
             const [ticks, labels] = this.GetTickLinesAndLabels(
                 xMin,
                 xMax,
@@ -534,7 +512,6 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
                 xMin,
                 xMax,
                 true, // isTop
-                viewMatrix,
                 pixel2world
             );
 
@@ -547,7 +524,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
         if (this.props.isLeftRuler) {
             const ymin = this.props.isBottomRuler ? yMin + mv : yMin;
             const ymax = this.props.isTopRuler ? yMax - mv : yMax;
-            const axes = [xMin + mh, ymin, 0, xMin + mh, ymax, 0];
+            const axes = [xMin + mh, ymin, zDepth, xMin + mh, ymax, zDepth];
             const [ticks, labels] = this.GetTickLinesAndLabels(
                 ymin,
                 yMax - mv,
@@ -558,7 +535,6 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
                 ymin,
                 ymax,
                 true,
-                viewMatrix,
                 pixel2world
             );
 
@@ -571,7 +547,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
         if (this.props.isRightRuler) {
             const ymin = this.props.isBottomRuler ? yMin + mv : yMin;
             const ymax = this.props.isTopRuler ? yMax - mv : yMax;
-            const axes = [xMax - mh, ymin, 0, xMax - mh, ymax, 0];
+            const axes = [xMax - mh, ymin, zDepth, xMax - mh, ymax, zDepth];
             const [ticks, labels] = this.GetTickLinesAndLabels(
                 ymin,
                 ymax,
@@ -583,7 +559,6 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
                 ymin,
                 ymax,
                 false,
-                viewMatrix,
                 pixel2world
             );
 
@@ -594,20 +569,20 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
 
         // Line models. (axis line and tick lines)
         // Color on axes and text.
-        let color = [0.0, 0.0, 0.0, 1.0];
+        let lineColor = [0.0, 0.0, 0.0, 1.0];
         if (typeof this.props.axisColor !== "undefined") {
-            color = this.props.axisColor as number[];
-            if (color.length === 3) {
-                color.push(255);
+            lineColor = this.props.axisColor as number[];
+            if (lineColor.length === 3) {
+                lineColor.push(255);
             }
-            color = color.map((x) => (x ?? 0) / 255);
+            lineColor = lineColor.map((x) => (x ?? 0) / 255);
         }
 
         const line_model = new Model(gl, {
             id: `${this.props.id}-lines`,
             vs: lineVertexShader,
             fs: lineFragmentShader,
-            uniforms: { uAxisColor: color },
+            uniforms: { uColor: lineColor },
             geometry: new Geometry({
                 drawMode: GL.LINES,
                 attributes: {
@@ -633,9 +608,9 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
 
         const background_model = new Model(gl, {
             id: `${this.props.id}-background`,
-            vs: backgroundVertexShader,
-            fs: backgroundFragmentShader,
-            uniforms: { uBackGroundColor: bColor },
+            vs: lineVertexShader,
+            fs: lineFragmentShader,
+            uniforms: { uColor: bColor },
             geometry: new Geometry({
                 drawMode: GL.TRIANGLES,
                 attributes: {
@@ -763,7 +738,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
                 id,
                 vs: labelVertexShader,
                 fs: labelFragmentShader,
-                uniforms: { uAxisColor: color, uBackGroundColor: bColor },
+                uniforms: { uAxisColor: lineColor, uBackGroundColor: bColor },
                 geometry: new Geometry({
                     drawMode: GL.TRIANGLES,
                     attributes: {

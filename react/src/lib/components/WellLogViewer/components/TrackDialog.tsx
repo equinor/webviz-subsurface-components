@@ -12,9 +12,9 @@ import {
     DialogActions,
     Button,
     TextField,
-} from "@material-ui/core";
+} from "@mui/material";
 
-import { FormControl, InputLabel, NativeSelect } from "@material-ui/core";
+import { FormControl, InputLabel, NativeSelect } from "@mui/material";
 
 import { createDataItems, dataNames } from "./PlotDialog";
 import { createScaleItems } from "./PlotDialog";

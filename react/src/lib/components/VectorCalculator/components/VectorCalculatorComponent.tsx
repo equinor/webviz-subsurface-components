@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
 
 import React from "react";
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid";
 
 import {
     ExpressionType,
@@ -17,7 +17,7 @@ import {
     useStore,
 } from "./ExpressionsStore";
 
-import "!style-loader!css-loader!../VectorCalculator.css";
+import "../VectorCalculator.css";
 
 interface ParentProps {
     expressions?: ExpressionType[];

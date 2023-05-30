@@ -549,15 +549,21 @@ const wellLayerTemplate = (args: any) => {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const [isLog, setIsLog] = React.useState(false);
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    const wellLayerData = React.useCallback((data) => {
-        setColorName(data);
-    }, []);
+    const wellLayerData = React.useCallback(
+        (data: React.SetStateAction<string>) => {
+            setColorName(data);
+        },
+        []
+    );
 
     // interpolation method
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    const getInterpolateMethod = React.useCallback((data) => {
-        setIsLog(data.isLog);
-    }, []);
+    const getInterpolateMethod = React.useCallback(
+        (data: { isLog: boolean | ((prevState: boolean) => boolean) }) => {
+            setIsLog(data.isLog);
+        },
+        []
+    );
 
     const layers = [
         {
