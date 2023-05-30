@@ -97,7 +97,7 @@ function add_normals(
     const dx = (xmax - xmin) / (w - 1);
     const dy = (ymax - ymin) / (h - 1);
 
-    const indices_reduced = [];
+    const indices_reduced: number[] = [];
     for (let tn = 0; tn < ntriangles; tn++) {
         const i0 = indices[tn * 3 + 0];
         const i1 = indices[tn * 3 + 1];
@@ -226,7 +226,7 @@ async function load_mesh_and_texture(
         image: { type: "data" }, // Will load as ImageData.
     });
 
-    let meshImageData = null;
+    let meshImageData: ImageData | null = null;
 
     let mesh: MeshType;
     if (isMesh) {
@@ -248,7 +248,7 @@ async function load_mesh_and_texture(
         });
 
         // Note: mesh contains triangles. No normals they must be added.
-        if (smoothShading) {
+        if (smoothShading && meshImageData) {
             mesh = add_normals(mesh, meshImageData, bounds);
         }
     } else {

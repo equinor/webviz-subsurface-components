@@ -40,8 +40,12 @@ const DistanceScale: React.FC<ScaleProps> = ({
             ? Math.round(widthInUnits)
             : roundToStep(widthInUnits, incrementValue);
 
-    const convertedUnit = convert(scaleValue).from(scaleUnit).toBest().unit;
-    const convertedValue = convert(scaleValue).from(scaleUnit).toBest().val;
+    const convertedUnit = convert(scaleValue)
+        .from(scaleUnit as convert.Unit)
+        .toBest().unit;
+    const convertedValue = convert(scaleValue)
+        .from(scaleUnit as convert.Unit)
+        .toBest().val;
 
     const rulerWidth = scaleValue * Math.pow(2, zoom);
 
