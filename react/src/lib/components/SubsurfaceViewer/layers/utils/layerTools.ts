@@ -148,3 +148,35 @@ export function isDrawingEnabled(layer_manager: LayerManager): boolean {
         drawing_layer.props.mode != "view"
     );
 }
+
+export function invertZCoordinate(dataArray: Float32Array): void {
+    for (let i = 2; i < dataArray.length; i += 3) {
+        dataArray[i] *= -1;
+    }
+}
+
+export function defineBoundingBox(
+    dataArray: Float32Array
+): [number, number, number, number, number, number] {
+    const length = dataArray.length;
+    let minX = Number.POSITIVE_INFINITY;
+    let minY = Number.POSITIVE_INFINITY;
+    let minZ = Number.POSITIVE_INFINITY;
+    let maxX = Number.NEGATIVE_INFINITY;
+    let maxY = Number.NEGATIVE_INFINITY;
+    let maxZ = Number.NEGATIVE_INFINITY;
+
+    for (let i = 0; i < length; i += 3) {
+        const x = dataArray[i];
+        const y = dataArray[i + 1];
+        const z = dataArray[i + 2];
+        minX = x < minX ? x : minX;
+        minY = y < minY ? y : minY;
+        minZ = z < minZ ? z : minZ;
+
+        maxX = x > maxX ? x : maxX;
+        maxY = y > maxY ? y : maxY;
+        maxZ = z > maxZ ? z : maxZ;
+    }
+    return [minX, minY, minZ, maxX, maxY, maxZ];
+}
