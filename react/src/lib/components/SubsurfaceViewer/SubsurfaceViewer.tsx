@@ -72,6 +72,12 @@ export interface SubsurfaceViewerProps {
     getTooltip?: TooltipCallback;
     cameraPosition?: ViewStateType | undefined;
 
+    /**
+     * Number of pixels used for the margin in matrix mode.
+     * Defaults to 0.
+     */
+    marginPixels?: number;
+
     children?: React.ReactNode;
 }
 
@@ -101,6 +107,7 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
     getTooltip,
     cameraPosition,
     getCameraPosition,
+    marginPixels,
     triggerHome,
     triggerResetMultipleWells,
     children,
@@ -185,6 +192,7 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
             getCameraPosition={getCameraPosition}
             triggerHome={triggerHome}
             triggerResetMultipleWells={triggerResetMultipleWells}
+            marginPixels={marginPixels}
         >
             {children}
         </Map>
