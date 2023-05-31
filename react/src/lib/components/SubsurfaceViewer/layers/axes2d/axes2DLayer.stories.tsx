@@ -110,24 +110,25 @@ const MatrixStory = () => {
             {
                 id: "view_2",
                 show3D: false,
-                layerIds: ["mesh-layer"],
+                layerIds: ["mesh-layer", "axes-layer2D"],
                 isSync: false,
             },
             {
                 id: "view_3",
                 show3D: false,
-                layerIds: ["mesh-layer"],
+                layerIds: ["mesh-layer", "axes-layer2D"],
                 isSync: false,
             },
             {
                 id: "view_4",
                 show3D: false,
-                layerIds: ["mesh-layer"],
+                layerIds: ["mesh-layer", "axes-layer2D"],
                 isSync: false,
             },
         ],
     };
 
+    const marginPixels = 10;
     const bounds = [432150, 6475800, 439400, 6481501] as NumberQuad;
     return (
         <SubsurfaceViewer
@@ -135,6 +136,7 @@ const MatrixStory = () => {
             layers={[meshMapLayerPng, axes2D]}
             views={views}
             bounds={bounds}
+            marginPixels={marginPixels}
         >
             <View id="view_1"></View>
             <View id="view_2"></View>

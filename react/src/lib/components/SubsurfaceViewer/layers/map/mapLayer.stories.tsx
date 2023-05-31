@@ -1263,6 +1263,7 @@ const ContourLinesStory = (props: {
     contourOffset: number;
     zContourInterval: number;
     propertyContourInterval: number;
+    marginPixels: number;
 }) => {
     const views: ViewsType = {
         layout: [2, 2],
@@ -1331,6 +1332,7 @@ const ContourLinesStory = (props: {
                 flatPropertyContourMapLayer,
             ]}
             views={views}
+            marginPixels={props.marginPixels}
         >
             <View id="view_1">
                 <ViewFooter>Default - no contour lines</ViewFooter>
@@ -1364,4 +1366,5 @@ ContourLines.args = {
     contourOffset: 0,
     zContourInterval: 100,
     propertyContourInterval: 5000,
+    marginPixels: 0,
 };

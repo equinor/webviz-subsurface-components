@@ -257,6 +257,12 @@ export interface MapProps {
 
     getTooltip?: TooltipCallback;
     cameraPosition?: ViewStateType;
+
+    /**
+     * Number of pixels used for the margin in matrix mode.
+     * Defaults to 0.
+     */
+    marginPixels?: number;
 }
 
 export interface MapMouseEvent {
@@ -323,6 +329,7 @@ const Map: React.FC<MapProps> = ({
     getTooltip = defaultTooltip,
     cameraPosition,
     getCameraPosition,
+    marginPixels,
     triggerHome,
     triggerResetMultipleWells,
 }: MapProps) => {
@@ -362,8 +369,9 @@ const Map: React.FC<MapProps> = ({
         viewPortMargins,
         boundsInitial,
         boundingBoxCenter(reportedBoundingBoxAcc),
-        views?.viewports?.[0].target,
-        views?.viewports?.[0].zoom,
+        views?.viewports?.[0],
+        views?.layout,
+        marginPixels ?? 0,
         deckRef.current?.deck
     );
 
@@ -385,8 +393,9 @@ const Map: React.FC<MapProps> = ({
                           viewPortMargins,
                           boundsInitial,
                           center,
-                          views?.viewports?.[index].target,
-                          views?.viewports?.[index].zoom,
+                          views?.viewports?.[index],
+                          views?.layout,
+                          marginPixels ?? 0,
                           deckRef.current?.deck
                       )
                     : getViewState3D(
@@ -408,7 +417,15 @@ const Map: React.FC<MapProps> = ({
             setViewStates(tempViewStates);
         },
 
-        [bounds, boundsInitial, viewPortMargins, views?.viewports, viewsProps]
+        [
+            bounds,
+            boundsInitial,
+            marginPixels,
+            viewPortMargins,
+            views?.layout,
+            views?.viewports,
+            viewsProps,
+        ]
     );
 
     // set initial view state based on supplied bounds and zoom in viewState
@@ -438,8 +455,9 @@ const Map: React.FC<MapProps> = ({
                                   viewPortMargins,
                                   boundsInitial,
                                   boundingBoxCenter(reportedBoundingBoxAcc),
-                                  views?.viewports?.[index].target,
-                                  views?.viewports?.[index].zoom,
+                                  views?.viewports?.[index],
+                                  views?.layout,
+                                  marginPixels ?? 0,
                                   deckRef.current?.deck
                               )
                             : getViewState3D(
@@ -483,8 +501,9 @@ const Map: React.FC<MapProps> = ({
                         viewPortMargins,
                         boundsInitial,
                         boundingBoxCenter(reportedBoundingBoxAcc),
-                        views?.viewports?.[index].target,
-                        views?.viewports?.[index].zoom,
+                        views?.viewports?.[index],
+                        views?.layout,
+                        marginPixels ?? 0,
                         deckRef.current?.deck
                     ),
                 ])
@@ -502,6 +521,8 @@ const Map: React.FC<MapProps> = ({
         boundsInitial,
         reportedBoundingBoxAcc,
         views?.viewports,
+        views?.layout,
+        marginPixels,
     ]);
 
     useEffect(() => {
@@ -540,8 +561,9 @@ const Map: React.FC<MapProps> = ({
                               viewPortMargins,
                               boundsInitial,
                               boundingBoxCenter(reportedBoundingBoxAcc),
-                              views?.viewports?.[index].target,
-                              views?.viewports?.[index].zoom,
+                              views?.viewports?.[index],
+                              views?.layout,
+                              marginPixels ?? 0,
                               deckRef.current?.deck
                           )
                         : getViewState3D(
@@ -898,8 +920,15 @@ const Map: React.FC<MapProps> = ({
     );
 
     const deckGLViews = React.useMemo(() => {
-        return createViews(views, scaleUpFunction, scaleDownFunction);
-    }, [views]);
+        return createViews(
+            views,
+            scaleUpFunction,
+            scaleDownFunction,
+            marginPixels ?? 0,
+            deckRef.current?.deck
+        );
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [views, marginPixels, deckRef.current?.deck]);
 
     if (!deckGLViews || isEmpty(deckGLViews) || isEmpty(deckGLLayers))
         return null;
@@ -1048,8 +1077,9 @@ function getViewState(
     viewPortMargins: marginsType,
     bounds_accessor: [number, number, number, number] | BoundsAccessor,
     centerOfData: [number, number, number],
-    target?: number[],
-    zoom?: number,
+    viewPortType: ViewportType | undefined,
+    layout: [number, number] | undefined,
+    marginPixels: number,
     deck?: Deck
 ): ViewStateType {
     let bounds = [0, 0, 1, 1];
@@ -1069,8 +1099,8 @@ function getViewState(
     let fb_zoom = fb.zoom;
 
     if (deck) {
-        // If there are margins in the viewport (axes2DLayer) we have to account for that.
-        // Camera target should be in the middle of viewport minus the margins.
+        // If there are margins/rulers in the viewport (axes2DLayer) we have to account for that.
+        // Camera target should be in the middle of viewport minus the rulers.
         const w_bounds = w;
         const h_bounds = h;
 
@@ -1082,8 +1112,31 @@ function getViewState(
         // Subtract margins.
         const marginH = (ml > 0 ? ml : 0) + (mr > 0 ? mr : 0);
         const marginV = (mb > 0 ? mb : 0) + (mt > 0 ? mt : 0);
+
         w = deck.width - marginH; // width of the viewport minus margin.
         h = deck.height - marginV;
+
+        // Special case if matrix views.
+        // Use width and heigt for a subview instead of full viewport.
+        if (typeof layout !== "undefined") {
+            const [nY, nX] = layout;
+            const isMatrixViews = nX !== 1 || nY !== 1;
+            if (isMatrixViews) {
+                const w_ = 99.5 / nX; // Using 99.5% of viewport to avoid flickering of deckgl canvas
+                const h_ = 99.5 / nY;
+
+                const marginHorPercentage =
+                    100 * 100 * (marginPixels / (w_ * deck.width)); //percentage of sub view
+                const marginVerPercentage =
+                    100 * 100 * (marginPixels / (h_ * deck.height));
+
+                const sub_w = (w_ / 100) * deck.width;
+                const sub_h = (h_ / 100) * deck.height;
+
+                w = sub_w * (1 - 2 * (marginHorPercentage / 100)) - marginH;
+                h = sub_h * (1 - 2 * (marginVerPercentage / 100)) - marginV;
+            }
+        }
 
         const port_aspect = h / w;
         const bounds_aspect = h_bounds / w_bounds;
@@ -1111,6 +1164,9 @@ function getViewState(
         fb_target = [fb.x - translate_x, fb.y - translate_y, z];
         fb_zoom = fb.zoom;
     }
+
+    const target = viewPortType?.target;
+    const zoom = viewPortType?.zoom;
 
     const target_ = target ?? fb_target;
     const zoom_ = zoom ?? fb_zoom;
@@ -1171,7 +1227,9 @@ function getViewState3D(
 function createViews(
     views: ViewsType | undefined,
     scaleUpFunction: { (): void; (): void },
-    scaleDownFunction: { (): void; (): void }
+    scaleDownFunction: { (): void; (): void },
+    marginPixels: number,
+    deck?: Deck
 ): View[] {
     // Use modified controller to handle key events.
     class ZScaleOrbitController extends OrbitController {
@@ -1189,8 +1247,15 @@ function createViews(
     }
     const deckgl_views: View[] = [];
 
+    const widthViewPort = deck?.width;
+    const heightViewPort = deck?.height;
+
+    const isDeckDefined =
+        typeof widthViewPort !== "undefined" &&
+        typeof heightViewPort !== "undefined";
+
     // if props for multiple viewport are not proper, return 2d view
-    if (!views || !views.viewports || !views.layout) {
+    if (!views || !views.viewports || !views.layout || !isDeckDefined) {
         deckgl_views.push(
             new OrthographicView({
                 id: "main",
@@ -1207,14 +1272,27 @@ function createViews(
     } else {
         let yPos = 0;
         const [nY, nX] = views.layout;
+        const w = 99.5 / nX; // Using 99.5% of viewport to avoid flickering of deckgl canvas
+        const h = 99.5 / nY;
+
+        const singleView = nX === 1 && nY === 1;
+
+        const marginHorPercentage = singleView // percentage of sub view
+            ? 0
+            : 100 * 100 * (marginPixels / (w * widthViewPort));
+        const marginVerPercentage = singleView
+            ? 0
+            : 100 * 100 * (marginPixels / (h * heightViewPort));
+
         for (let y = 1; y <= nY; y++) {
             let xPos = 0;
             for (let x = 1; x <= nX; x++) {
                 if (
                     views.viewports == undefined ||
                     deckgl_views.length >= views.viewports.length
-                )
+                ) {
                     return deckgl_views;
+                }
 
                 const currentViewport: ViewportType =
                     views.viewports[deckgl_views.length];
@@ -1241,20 +1319,21 @@ function createViews(
                     new ViewType({
                         id: currentViewport.id,
                         controller: controller,
-                        x: xPos + "%",
-                        y: yPos + "%",
 
-                        // Using 99.5% of viewport to avoid flickering of deckgl canvas
-                        width: 99.5 / nX + "%",
-                        height: 99.5 / nY + "%",
+                        x: xPos + marginHorPercentage / nX + "%",
+                        y: yPos + marginVerPercentage / nY + "%",
+
+                        width: w * (1 - 2 * (marginHorPercentage / 100)) + "%",
+                        height: h * (1 - 2 * (marginVerPercentage / 100)) + "%",
+
                         flipY: false,
                         far,
                         near,
                     })
                 );
-                xPos = xPos + 99.5 / nX;
+                xPos = xPos + w;
             }
-            yPos = yPos + 99.5 / nY;
+            yPos = yPos + h;
         }
     }
     return deckgl_views;
