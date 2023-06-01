@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 import * as React from "react";
-import { mount, unmount } from "@cypress/react";
+import { mount, unmount } from "@cypress/react18";
 import { composeStories } from "@storybook/testing-react";
 import { render } from "@testing-library/react";
 

@@ -31,7 +31,11 @@ const TooltipProvider: React.FC<PropsWithChildren<unknown>> = ({
     return (
         <TooltipContext.Provider value={value}>
             {children}
-            <ReactTooltip id="plot-tooltip" getContent={() => Content} />
+            {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
+                <ReactTooltip id="plot-tooltip" getContent={() => Content} />
+            }
         </TooltipContext.Provider>
     );
 };

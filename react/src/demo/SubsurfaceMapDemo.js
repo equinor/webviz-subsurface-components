@@ -9,7 +9,7 @@ import React, { Component } from "react";
 
 import Map from "../lib/components/Map";
 
-const data = require("./example-data/subsurface-map.json");
+import data from "./example-data/subsurface-map.json";
 
 class SubsurfaceMapDemo extends Component {
     render() {

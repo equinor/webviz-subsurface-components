@@ -2,7 +2,7 @@
 
 exports[`test Zone Selector snapshot test 1`] = `
 <div
-  class="makeStyles-root-1 react-dropdown-tree-select"
+  class="ZoneSelector-root css-5sbdto react-dropdown-tree-select"
   id="rdts1"
 >
   <div
