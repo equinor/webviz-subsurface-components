@@ -149,7 +149,6 @@ export default class PrivateTriangleLayer extends Layer<
         if (!this.props.depthTest) {
             gl.disable(GL.DEPTH_TEST);
         }
-
         gl.enable(GL.POLYGON_OFFSET_FILL);
         gl.polygonOffset(1, 1);
         triangleModel
