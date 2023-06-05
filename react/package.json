@@ -15,7 +15,7 @@
         "dist/**/*"
     ],
     "scripts": {
-        "start": "webpack serve --mode development --devtool inline-source-map --entry ./src/demo/index.js --open --allowed-hosts all",
+        "start": "webpack serve --mode development --devtool inline-source-map --entry ./src/demo/index.js --open",
         "copy-package-json": "copyfiles ./package.json ../webviz_subsurface_components/",
         "transpile": "tsc --project tsconfig.build.json && npm run copy-files",
         "transpile:dash": "tsc --project tsconfig.build.json && rimraf ./dist/lib/components/*/**/ && tsc --project tsconfig.dash.json",
