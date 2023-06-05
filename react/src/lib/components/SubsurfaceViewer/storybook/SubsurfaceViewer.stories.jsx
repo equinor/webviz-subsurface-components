@@ -2,6 +2,7 @@ import React from "react";
 import { styled } from "@mui/material/styles";
 import SubsurfaceViewer from "../SubsurfaceViewer";
 import exampleData from "../../../../demo/example-data/deckgl-map.json";
+
 const PREFIX = "Default";
 
 const classes = {
@@ -291,8 +292,6 @@ const meshMapLayer = {
     id: "mesh-layer",
     mesh: "hugin_depth_25_m_normalized_margin.png",
     meshValueRange: [2782, 3513],
-    // Either "bounds" or "frame". "bounds" will be deprecated."
-    //bounds: [432205, 6475078, 437701, 6480898],  // [xmin, xmax, ymin, ymax]
     frame: {
         origin: [432205, 6475078],
         count: [229, 291],
@@ -304,6 +303,37 @@ const meshMapLayer = {
     contours: [0, 100.0],
     isContoursDepth: true,
     colorMapName: "Physics",
+};
+
+const meshMapLayerPng = {
+    "@@type": "MapLayer",
+    id: "mesh-layer-png",
+    meshUrl: "hugin_depth_25_m.png",
+    frame: {
+        origin: [432150, 6475800],
+        count: [291, 229],
+        increment: [25, 25],
+        rotDeg: 0,
+    },
+    propertiesUrl: "kh_netmap_25_m.png",
+    contours: [0, 100],
+    isContoursDepth: true,
+    gridLines: false,
+    material: true,
+    smoothShading: true,
+    colorMapName: "Physics",
+};
+
+const axes2D = {
+    "@@type": "Axes2DLayer",
+    id: "axes-layer",
+    marginH: 80, // Horizontal margin (in pixels)
+    marginV: 30, // Vertical margin (in pixels)
+    isLeftRuler: true,
+    isRightRuler: false,
+    isBottomRuler: true,
+    isTopRuler: false,
+    backgroundColor: [155, 155, 155, 255],
 };
 
 export const KhMapMesh = MinimalTemplate.bind({});
@@ -573,4 +603,41 @@ export const MapInContainer = (args) => {
 
 MapInContainer.args = {
     ...exampleData[0],
+};
+
+export const Matrix = EditDataTemplate.bind({});
+Matrix.args = {
+    layers: [meshMapLayerPng, axes2D],
+    bounds: [432150, 6475800, 439400, 6481501],
+    views: {
+        layout: [2, 2],
+        marginPixels: 10,
+        showLabel: true,
+        viewports: [
+            {
+                id: "view_1",
+                show3D: false,
+                layerIds: ["mesh-layer-png", "axes-layer"],
+                isSync: true,
+            },
+            {
+                id: "view_2",
+                show3D: false,
+                layerIds: ["mesh-layer-png", "axes-layer"],
+                isSync: true,
+            },
+            {
+                id: "view_3",
+                show3D: false,
+                layerIds: ["mesh-layer-png", "axes-layer"],
+                isSync: false,
+            },
+            {
+                id: "view_4",
+                show3D: false,
+                layerIds: ["mesh-layer-png", "axes-layer"],
+                isSync: false,
+            },
+        ],
+    },
 };

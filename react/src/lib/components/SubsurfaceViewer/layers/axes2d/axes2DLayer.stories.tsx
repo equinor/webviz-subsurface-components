@@ -100,6 +100,7 @@ ColoredTextAndBackGround.args = {
 const MatrixStory = () => {
     const views: ViewsType = {
         layout: [2, 2],
+        marginPixels: 10,
         viewports: [
             {
                 id: "view_1",
@@ -128,7 +129,6 @@ const MatrixStory = () => {
         ],
     };
 
-    const marginPixels = 10;
     const bounds = [432150, 6475800, 439400, 6481501] as NumberQuad;
     return (
         <SubsurfaceViewer
@@ -136,7 +136,6 @@ const MatrixStory = () => {
             layers={[meshMapLayerPng, axes2D]}
             views={views}
             bounds={bounds}
-            marginPixels={marginPixels}
         >
             <View id="view_1"></View>
             <View id="view_2"></View>

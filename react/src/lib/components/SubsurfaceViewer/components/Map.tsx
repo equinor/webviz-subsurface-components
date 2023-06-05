@@ -121,6 +121,12 @@ export interface ViewsType {
     layout: [number, number];
 
     /**
+     * Number of pixels used for the margin in matrix mode.
+     * Defaults to 0.
+     */
+    marginPixels?: number;
+
+    /**
      * Show views label
      */
     showLabel?: boolean;
@@ -257,12 +263,6 @@ export interface MapProps {
 
     getTooltip?: TooltipCallback;
     cameraPosition?: ViewStateType;
-
-    /**
-     * Number of pixels used for the margin in matrix mode.
-     * Defaults to 0.
-     */
-    marginPixels?: number;
 }
 
 export interface MapMouseEvent {
@@ -329,7 +329,6 @@ const Map: React.FC<MapProps> = ({
     getTooltip = defaultTooltip,
     cameraPosition,
     getCameraPosition,
-    marginPixels,
     triggerHome,
     triggerResetMultipleWells,
 }: MapProps) => {
@@ -369,9 +368,8 @@ const Map: React.FC<MapProps> = ({
         viewPortMargins,
         boundsInitial,
         boundingBoxCenter(reportedBoundingBoxAcc),
-        views?.viewports?.[0],
-        views?.layout,
-        marginPixels ?? 0,
+        views,
+        0,
         deckRef.current?.deck
     );
 
@@ -393,9 +391,8 @@ const Map: React.FC<MapProps> = ({
                           viewPortMargins,
                           boundsInitial,
                           center,
-                          views?.viewports?.[index],
-                          views?.layout,
-                          marginPixels ?? 0,
+                          views,
+                          index,
                           deckRef.current?.deck
                       )
                     : getViewState3D(
@@ -416,16 +413,7 @@ const Map: React.FC<MapProps> = ({
             setDidUserChangeCamera(false);
             setViewStates(tempViewStates);
         },
-
-        [
-            bounds,
-            boundsInitial,
-            marginPixels,
-            viewPortMargins,
-            views?.layout,
-            views?.viewports,
-            viewsProps,
-        ]
+        [bounds, boundsInitial, views, viewPortMargins, viewsProps]
     );
 
     // set initial view state based on supplied bounds and zoom in viewState
@@ -455,9 +443,8 @@ const Map: React.FC<MapProps> = ({
                                   viewPortMargins,
                                   boundsInitial,
                                   boundingBoxCenter(reportedBoundingBoxAcc),
-                                  views?.viewports?.[index],
-                                  views?.layout,
-                                  marginPixels ?? 0,
+                                  views,
+                                  index,
                                   deckRef.current?.deck
                               )
                             : getViewState3D(
@@ -501,9 +488,8 @@ const Map: React.FC<MapProps> = ({
                         viewPortMargins,
                         boundsInitial,
                         boundingBoxCenter(reportedBoundingBoxAcc),
-                        views?.viewports?.[index],
-                        views?.layout,
-                        marginPixels ?? 0,
+                        views,
+                        index,
                         deckRef.current?.deck
                     ),
                 ])
@@ -520,9 +506,7 @@ const Map: React.FC<MapProps> = ({
         viewPortMargins,
         boundsInitial,
         reportedBoundingBoxAcc,
-        views?.viewports,
-        views?.layout,
-        marginPixels,
+        views,
     ]);
 
     useEffect(() => {
@@ -561,9 +545,8 @@ const Map: React.FC<MapProps> = ({
                               viewPortMargins,
                               boundsInitial,
                               boundingBoxCenter(reportedBoundingBoxAcc),
-                              views?.viewports?.[index],
-                              views?.layout,
-                              marginPixels ?? 0,
+                              views,
+                              index,
                               deckRef.current?.deck
                           )
                         : getViewState3D(
@@ -924,11 +907,10 @@ const Map: React.FC<MapProps> = ({
             views,
             scaleUpFunction,
             scaleDownFunction,
-            marginPixels ?? 0,
             deckRef.current?.deck
         );
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [views, marginPixels, deckRef.current?.deck]);
+    }, [views, views, deckRef.current?.deck]);
 
     if (!deckGLViews || isEmpty(deckGLViews) || isEmpty(deckGLLayers))
         return null;
@@ -1077,9 +1059,8 @@ function getViewState(
     viewPortMargins: marginsType,
     bounds_accessor: [number, number, number, number] | BoundsAccessor,
     centerOfData: [number, number, number],
-    viewPortType: ViewportType | undefined,
-    layout: [number, number] | undefined,
-    marginPixels: number,
+    views: ViewsType | undefined,
+    viewPortIndex: number,
     deck?: Deck
 ): ViewStateType {
     let bounds = [0, 0, 1, 1];
@@ -1118,17 +1099,19 @@ function getViewState(
 
         // Special case if matrix views.
         // Use width and heigt for a subview instead of full viewport.
-        if (typeof layout !== "undefined") {
-            const [nY, nX] = layout;
+        if (typeof views?.layout !== "undefined") {
+            const [nY, nX] = views.layout;
             const isMatrixViews = nX !== 1 || nY !== 1;
             if (isMatrixViews) {
+                const mPixels = views?.marginPixels ?? 0;
+
                 const w_ = 99.5 / nX; // Using 99.5% of viewport to avoid flickering of deckgl canvas
                 const h_ = 99.5 / nY;
 
                 const marginHorPercentage =
-                    100 * 100 * (marginPixels / (w_ * deck.width)); //percentage of sub view
+                    100 * 100 * (mPixels / (w_ * deck.width)); //percentage of sub view
                 const marginVerPercentage =
-                    100 * 100 * (marginPixels / (h_ * deck.height));
+                    100 * 100 * (mPixels / (h_ * deck.height));
 
                 const sub_w = (w_ / 100) * deck.width;
                 const sub_h = (h_ / 100) * deck.height;
@@ -1165,8 +1148,8 @@ function getViewState(
         fb_zoom = fb.zoom;
     }
 
-    const target = viewPortType?.target;
-    const zoom = viewPortType?.zoom;
+    const target = views?.viewports?.[viewPortIndex]?.target;
+    const zoom = views?.viewports?.[viewPortIndex]?.zoom;
 
     const target_ = target ?? fb_target;
     const zoom_ = zoom ?? fb_zoom;
@@ -1228,7 +1211,6 @@ function createViews(
     views: ViewsType | undefined,
     scaleUpFunction: { (): void; (): void },
     scaleDownFunction: { (): void; (): void },
-    marginPixels: number,
     deck?: Deck
 ): View[] {
     // Use modified controller to handle key events.
@@ -1253,6 +1235,8 @@ function createViews(
     const isDeckDefined =
         typeof widthViewPort !== "undefined" &&
         typeof heightViewPort !== "undefined";
+
+    const mPixels = views?.marginPixels ?? 0;
 
     // if props for multiple viewport are not proper, return 2d view
     if (!views || !views.viewports || !views.layout || !isDeckDefined) {
@@ -1279,10 +1263,10 @@ function createViews(
 
         const marginHorPercentage = singleView // percentage of sub view
             ? 0
-            : 100 * 100 * (marginPixels / (w * widthViewPort));
+            : 100 * 100 * (mPixels / (w * widthViewPort));
         const marginVerPercentage = singleView
             ? 0
-            : 100 * 100 * (marginPixels / (h * heightViewPort));
+            : 100 * 100 * (mPixels / (h * heightViewPort));
 
         for (let y = 1; y <= nY; y++) {
             let xPos = 0;
