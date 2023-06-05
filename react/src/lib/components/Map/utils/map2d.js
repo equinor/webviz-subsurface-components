@@ -213,8 +213,8 @@ export default class Map2D extends Component {
         zoomListener(this.containerMap);
     }
 
-    handleZoom() {
-        const { transform } = d3.event;
+    handleZoom(event) {
+        const { transform } = event;
 
         this.mapTransform.x = transform.x;
         this.mapTransform.y = transform.y;

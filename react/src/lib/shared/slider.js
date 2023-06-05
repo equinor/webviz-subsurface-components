@@ -117,8 +117,10 @@ export default class Slider extends Component {
                 d3
                     .drag()
                     .on("start.interrupt", () => this.container.interrupt())
-                    .on("start drag", () => this.slideMove(d3.event[this.axis]))
-                    .on("end", () => this.slideEnd(d3.event[this.axis]))
+                    .on("start drag", (event) =>
+                        this.slideMove(event[this.axis])
+                    )
+                    .on("end", (event) => this.slideEnd(event[this.axis]))
             );
     }
 

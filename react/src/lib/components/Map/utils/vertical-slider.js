@@ -109,8 +109,8 @@ export default class VerticalSlider extends Component {
                     .on("start.interrupt", () => {
                         self.slider.interrupt();
                     })
-                    .on("start drag", () => {
-                        self._onDragSlider(this.scale.invert(d3.event.y));
+                    .on("start drag", (event) => {
+                        self._onDragSlider(this.scale.invert(event.y));
                     })
             );
     }

@@ -98,8 +98,8 @@ export default class Map extends Component {
             .attr("fill", (d, i) => self.color(i))
             .on("mousemove", function (d, i) {
                 self.emit("mousemove", {
-                    x: d3.mouse(this)[0],
-                    y: d3.mouse(this)[1],
+                    x: d3.pointer(this)[0],
+                    y: d3.pointer(this)[1],
                     value: self.values[self.layer][i],
                 });
             })
