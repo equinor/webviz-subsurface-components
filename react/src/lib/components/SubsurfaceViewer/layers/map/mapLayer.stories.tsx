@@ -1332,7 +1332,6 @@ const ContourLinesStory = (props: {
                 flatPropertyContourMapLayer,
             ]}
             views={views}
-            marginPixels={props.marginPixels}
         >
             <View id="view_1">
                 <ViewFooter>Default - no contour lines</ViewFooter>
