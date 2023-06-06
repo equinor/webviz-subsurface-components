@@ -24,14 +24,16 @@ const smallPolylinesLayer = new PolylinesLayer({
     /* eslint-disable */
     polylinePoints: [0, 0, 0, 
                     10, 0,  0,
-                    10, 10, 0,
-                    10, 10, 8,                    
-                    -8,  0, 5,
-                    -5, -5, 5, 
-                    -5, -5, 0,
-                    -8,  0, 5],
+                    10, 0, 10,    
+                    
+                    -5, -5, 4,
+                    0, -8, 6,
+                    5, 10, 8
+
+                    ],
     /* eslint-enable */
-    startIndices: [0, 4, 8],
+    startIndices: [0, 3],
+    polylinesClosed: [true, false],
     color: [0, 200, 100],
 
     widthUnits: "pixels",

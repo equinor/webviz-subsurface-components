@@ -8,6 +8,9 @@ import {
     defineBoundingBox,
 } from "../utils/layerTools";
 
+type TIsPolylineClosedFunc = (index: number) => boolean;
+type TPathType = "open" | "loop" | null;
+
 export interface PolylinesLayerProps<D> extends ExtendedLayerProps<D> {
     /**
      * Polyline vertices as [x, y, z, x, y, z....].
@@ -20,6 +23,10 @@ export interface PolylinesLayerProps<D> extends ExtendedLayerProps<D> {
      */
     startIndices: number[];
 
+    /** Array of boolean flags or a single value indicating whether the polylines are closed.
+     *  The polylines are considered to be open if not set.
+     */
+    polylinesClosed?: boolean | boolean[];
     /**
      * Line color defined as RGB or RGBA array. Each component is in 0-255 range.
      */
@@ -68,6 +75,7 @@ interface IDataAttributes {
             size: number;
         };
     };
+    pathType: TPathType;
 }
 
 export default class PolylinesLayer extends CompositeLayer<
@@ -81,8 +89,9 @@ export default class PolylinesLayer extends CompositeLayer<
                 pickable: this.props.pickable,
                 billboard: true,
                 jointRounded: true,
+                capRounded: true,
                 data: this.state["dataAttributes"],
-
+                _pathType: this.state["dataAttributes"].pathType,
                 getColor: () => this.props.color,
                 getWidth: () => this.props.linesWidth,
 
@@ -103,6 +112,8 @@ export default class PolylinesLayer extends CompositeLayer<
     updateState({ props, oldProps }: UpdateParameters<PolylinesLayer>): void {
         const needs_reload =
             !isEqual(props.polylinePoints, oldProps.polylinePoints) ||
+            !isEqual(props.startIndices, oldProps.startIndices) ||
+            !isEqual(props.polylinesClosed, oldProps.polylinesClosed) ||
             !isEqual(props.ZIncreasingDownwards, oldProps.ZIncreasingDownwards);
 
         if (needs_reload) {
@@ -115,7 +126,6 @@ export default class PolylinesLayer extends CompositeLayer<
         reportBoundingBox: boolean
     ): IDataAttributes | null {
         const dataArrays = this.loadData();
-
         if (this.props.ZIncreasingDownwards) {
             invertZCoordinate(dataArrays.positions);
         }
@@ -136,6 +146,7 @@ export default class PolylinesLayer extends CompositeLayer<
                     size: 3,
                 },
             },
+            pathType: dataArrays.pathType,
         };
     }
 
@@ -143,11 +154,102 @@ export default class PolylinesLayer extends CompositeLayer<
         linesCount: number;
         startIndices: Uint32Array;
         positions: Float32Array;
+        pathType: TPathType;
     } {
+        this.normalizeStartIndices();
+        const data = this.closePolylines();
+
         return {
-            linesCount: this.props.startIndices.length,
-            positions: new Float32Array(this.props.polylinePoints),
-            startIndices: new Uint32Array(this.props.startIndices),
+            linesCount: data.startIndices.length,
+            positions: new Float32Array(data.polylinePoints),
+            startIndices: new Uint32Array(data.startIndices),
+            pathType: data.pathType,
+        };
+    }
+
+    private closePolylines(): {
+        polylinePoints: number[];
+        startIndices: number[];
+        pathType: TPathType;
+    } {
+        const isClosedFunc = this.createIsClosedFunc();
+        if (!isClosedFunc.func) {
+            return {
+                polylinePoints: this.props.polylinePoints,
+                startIndices: this.props.startIndices,
+                pathType: isClosedFunc.pathType,
+            };
+        }
+        let startIndexShift = 0;
+        const closedPoints: number[] = [];
+        const closedStartIndices: number[] = [];
+        const linesCount = this.props.startIndices.length - 1;
+        for (let i = 0; i < linesCount; ++i) {
+            const isClosed = isClosedFunc.func(i);
+            closedStartIndices.push(
+                this.props.startIndices[i] + startIndexShift
+            );
+            if (isClosed) {
+                this.closePolyline(i, closedPoints);
+                ++startIndexShift;
+            } else {
+                this.copyPolyline(i, closedPoints);
+            }
+        }
+        return {
+            polylinePoints: closedPoints,
+            startIndices: closedStartIndices,
+            pathType: isClosedFunc.pathType,
+        };
+    }
+
+    private normalizeStartIndices() {
+        const lastIndex = this.props.startIndices.slice(-1)[0];
+        const totalPointsCount = this.props.polylinePoints.length / 3;
+        if (lastIndex < totalPointsCount) {
+            this.props.startIndices.push(totalPointsCount);
+        }
+    }
+
+    private copyPolyline(lineIndex: number, outPoints: number[]) {
+        const startPoint = this.props.startIndices[lineIndex];
+        const endPoint = this.props.startIndices[lineIndex + 1];
+        for (let idx = startPoint; idx < endPoint; ++idx) {
+            outPoints.push(...this.getPolylinePoint(idx));
+        }
+    }
+
+    private closePolyline(lineIndex: number, outPoints: number[]) {
+        this.copyPolyline(lineIndex, outPoints);
+        const startPoint = this.props.startIndices[lineIndex];
+        outPoints.push(...this.getPolylinePoint(startPoint));
+    }
+
+    private getPolylinePoint(index: number): number[] {
+        return this.props.polylinePoints.slice(3 * index, 3 * (index + 1));
+    }
+
+    private createIsClosedFunc(): {
+        func: TIsPolylineClosedFunc | null;
+        pathType: TPathType;
+    } {
+        if (this.props.polylinesClosed === true) {
+            return {
+                func: () => true,
+                pathType: "loop",
+            };
+        }
+        if (Array.isArray(this.props.polylinesClosed)) {
+            return {
+                func: (lineIndex: number) => {
+                    return (this.props.polylinesClosed as boolean[])[lineIndex];
+                },
+                pathType: null,
+            };
+        }
+        return {
+            func: null,
+            pathType: "open",
         };
     }
 }
