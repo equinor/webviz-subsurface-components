@@ -28,9 +28,9 @@ module.exports = (env, argv) => {
     }
 
     const entry = {
-        main: argv && argv.entry ? argv.entry : "./src/lib/index.js",
+        main: argv && argv.entry ? argv.entry : "./src/lib/index.ts",
     };
-    const demo = entry.main !== "./src/lib/index.js";
+    const demo = entry.main !== "./src/lib/index.ts";
 
     const filename_js = demo
         ? "output.js"
