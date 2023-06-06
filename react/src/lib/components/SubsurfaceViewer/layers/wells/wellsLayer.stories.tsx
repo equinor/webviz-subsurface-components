@@ -414,6 +414,15 @@ AllWellHeadsHidden.parameters = {
 export const Wells3d = Template.bind({});
 Wells3d.args = {
     ...defaultProps,
+    layers: [
+        {
+            ...defaultProps.layers[0],
+            //lineStyle: { dash: true },
+            lineStyle: { width: 4 },
+            refine: false,
+            outline: true,
+        },
+    ],
     views: {
         layout: [1, 1],
         viewports: [
