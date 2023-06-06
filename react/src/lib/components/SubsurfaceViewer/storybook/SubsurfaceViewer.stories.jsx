@@ -607,6 +607,7 @@ MapInContainer.args = {
 
 export const ViewMatrix = EditDataTemplate.bind({});
 ViewMatrix.args = {
+    id: "DeckGL-Map",
     layers: [meshMapLayerPng, axes2D],
     bounds: [432150, 6475800, 439400, 6481501],
     views: {
