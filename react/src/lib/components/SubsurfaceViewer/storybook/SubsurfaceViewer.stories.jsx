@@ -2,6 +2,8 @@ import React from "react";
 import { styled } from "@mui/material/styles";
 import SubsurfaceViewer from "../SubsurfaceViewer";
 import exampleData from "../../../../demo/example-data/deckgl-map.json";
+import { default as MapLayer } from "../layers/map/mapLayer";
+import { default as Axes2DLayer } from "../layers/axes2d/axes2DLayer";
 
 const PREFIX = "Default";
 
@@ -305,8 +307,7 @@ const meshMapLayer = {
     colorMapName: "Physics",
 };
 
-const meshMapLayerPng = {
-    "@@type": "MapLayer",
+const meshMapLayerPng = new MapLayer({
     id: "mesh-layer-png",
     meshUrl: "hugin_depth_25_m.png",
     frame: {
@@ -322,10 +323,9 @@ const meshMapLayerPng = {
     material: true,
     smoothShading: true,
     colorMapName: "Physics",
-};
+});
 
-const axes2D = {
-    "@@type": "Axes2DLayer",
+const axes2D = new Axes2DLayer({
     id: "axes-layer",
     marginH: 80, // Horizontal margin (in pixels)
     marginV: 30, // Vertical margin (in pixels)
@@ -334,7 +334,7 @@ const axes2D = {
     isBottomRuler: true,
     isTopRuler: false,
     backgroundColor: [155, 155, 155, 255],
-};
+});
 
 export const KhMapMesh = MinimalTemplate.bind({});
 KhMapMesh.args = {
@@ -605,8 +605,8 @@ MapInContainer.args = {
     ...exampleData[0],
 };
 
-export const Matrix = EditDataTemplate.bind({});
-Matrix.args = {
+export const ViewMatrix = EditDataTemplate.bind({});
+ViewMatrix.args = {
     layers: [meshMapLayerPng, axes2D],
     bounds: [432150, 6475800, 439400, 6481501],
     views: {
