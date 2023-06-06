@@ -72,7 +72,7 @@ class D3PriorPosterior {
             (x_value - this.global_min) / (this.global_max - this.global_min);
         const tooltip_width = this.tooltip.node().getBoundingClientRect().width;
 
-        const mouse_position = d3.mouse(this.svg.node());
+        const mouse_position = d3.pointer(this.svg.node());
         this.tooltip
             .style(
                 "left",

@@ -843,7 +843,7 @@ export default function sensitivitySliderPlot(
             function onMouseMove() {
                 // https://bl.ocks.org/mbostock/3902569
                 // https://bl.ocks.org/micahstubbs/e4f5c830c264d26621b80b754219ae1b
-                const x0 = self._graphX.invert(d3.mouse(this)[0]);
+                const x0 = self._graphX.invert(d3.pointer(this)[0]);
                 const i = self._bisectDate(self._output, x0, 1);
                 const d0 = self._output[i - 1];
                 const d1 = self._output[i];

@@ -325,7 +325,7 @@ export default class HistoryMatchingPlot extends Component {
             .select("text.negative")
             .text(this.data.negative[index].toFixed(2));
 
-        const [x, y] = d3.mouse(this.parentElement.node());
+        const [x, y] = d3.pointer(this.parentElement.node());
 
         this.tooltip.attr("transform", `translate(${x + 20}, ${y - 30})`);
 
