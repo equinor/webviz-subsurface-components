@@ -2,8 +2,8 @@ import React from "react";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 
-import * as MandarosPoints from "./points_patch0";
-import * as MandarosTriangles from "./triangles_patch0";
+import * as SurfacePoints from "./test_data/surfacePoints";
+import * as SurfaceTriangles from "./test_data/surfaceTriangles";
 
 export default {
     component: SubsurfaceViewer,
@@ -91,22 +91,32 @@ SmallTriangleLayer.parameters = {
 };
 
 const flipOrientation = (triangles: number[]) => {
+    const res: number[] = [];
     for (let i = 0; i < triangles.length; i += 3) {
-        const tmp = triangles[i + 1];
-        triangles[i + 1] = triangles[i + 2];
-        triangles[i + 2] = tmp;
+        res.push(triangles[i]);
+        res.push(triangles[i + 2]);
+        res.push(triangles[i + 1]);
     }
-    return triangles;
+    return res;
 };
-// Small example using triangleLayer.
-flipOrientation(MandarosTriangles.default.data.data.item._ArrayOfInt.values);
-const mandarosTopLayer = {
+
+const shiftPointsByZ = (points: number[], shift: number) => {
+    const res: number[] = [];
+    for (let i = 0; i < points.length; i += 3) {
+        res.push(points[i]);
+        res.push(points[i + 1]);
+        res.push(points[i + 2] + shift);
+    }
+    return res;
+};
+
+const upperSurfaceLayer = {
     "@@type": "TriangleLayer",
-    id: "mandaros_triangle_layer",
+    id: "upper_surface_layer",
 
     /*eslint-disable */
-    pointsData:  MandarosPoints.default.data.data.item._ArrayOfDouble.values,
-    triangleData: flipOrientation(MandarosTriangles.default.data.data.item._ArrayOfInt.values),
+    pointsData:  SurfacePoints.default,
+    triangleData: SurfaceTriangles.default,
 
     color: [100, 100, 255],      // Surface color.
     gridLines: true,             // If true will draw lines around triangles.
@@ -122,22 +132,44 @@ const mandarosTopLayer = {
     /*eslint-enable */
 };
 
-const mandarosAxesLayer = {
-    "@@type": "AxesLayer",
-    id: "mandaros_axes_small",
-    bounds: [-2000, -2000, 1500, 2500, 2000, 2500],
+const lowerSurfaceLayer = {
+    "@@type": "TriangleLayer",
+    id: "lowers_surface_layer",
+
+    /*eslint-disable */
+    pointsData:  shiftPointsByZ(SurfacePoints.default, 1000),
+    triangleData: flipOrientation(SurfaceTriangles.default),
+
+    color: [100, 255, 100],      // Surface color.
+    gridLines: true,             // If true will draw lines around triangles.
+    material: {
+        ambient: 0.35,
+        diffuse: 0.6,
+        shininess: 100,
+        specularColor: [255, 255, 255]
+    },              // If true will use triangle normals for shading.
+    smoothShading: true,         // If true will use vertex calculated mean normals for shading.
+    ZIncreasingDownwards: true,    
+    debug: true
+    /*eslint-enable */
 };
 
-export const MandarosTopLayer: ComponentStory<typeof SubsurfaceViewer> = (
+const surfaceAxesLayer = {
+    "@@type": "AxesLayer",
+    id: "mandaros_axes_small",
+    bounds: [-2000, -2000, 1500, 2500, 2000, 3000],
+};
+
+export const TwoSideLighting: ComponentStory<typeof SubsurfaceViewer> = (
     args
 ) => {
     return <SubsurfaceViewer {...args} />;
 };
 
-MandarosTopLayer.args = {
+TwoSideLighting.args = {
     id: "map",
-    layers: [mandarosAxesLayer, mandarosTopLayer],
-    // bounds: [-10, -10, 17, 10],
+    layers: [surfaceAxesLayer, upperSurfaceLayer, lowerSurfaceLayer],
+    bounds: [-2000, -2000, 2500, 2000],
     views: {
         layout: [1, 1],
         viewports: [
@@ -149,7 +181,7 @@ MandarosTopLayer.args = {
     },
 };
 
-MandarosTopLayer.parameters = {
+TwoSideLighting.parameters = {
     docs: {
         ...defaultParameters.docs,
         description: {
