@@ -8,13 +8,13 @@ import {
     defineBoundingBox,
 } from "../utils/layerTools";
 
-type TIsPolylineClosedFunc = (index: number) => boolean;
+type IsPolylineClosedFunc = (index: number) => boolean;
 
 /**
  * _pathType is Deck.GL PathLayer prop. If all the polylines are "open" or are "loop" some checks are skipped for better performance.
  * If this prop is not set or null PathLayer checks closeness by comparing coordinates and decides how to draw the polylines.
  */
-type TPathType = "open" | "loop" | null;
+type PathType = "open" | "loop" | null;
 
 export interface PolylinesLayerProps<D> extends ExtendedLayerProps<D> {
     /**
@@ -80,7 +80,7 @@ interface IDataAttributes {
             size: number;
         };
     };
-    pathType: TPathType;
+    pathType: PathType;
 }
 
 export default class PolylinesLayer extends CompositeLayer<
@@ -159,7 +159,7 @@ export default class PolylinesLayer extends CompositeLayer<
         linesCount: number;
         startIndices: Uint32Array;
         positions: Float32Array;
-        pathType: TPathType;
+        pathType: PathType;
     } {
         this.normalizeStartIndices();
         const data = this.closePolylines();
@@ -175,7 +175,7 @@ export default class PolylinesLayer extends CompositeLayer<
     private closePolylines(): {
         polylinePoints: number[];
         startIndices: number[];
-        pathType: TPathType;
+        pathType: PathType;
     } {
         const isClosedFunc = this.createIsClosedFunc();
         if (!isClosedFunc.func) {
@@ -235,8 +235,8 @@ export default class PolylinesLayer extends CompositeLayer<
     }
 
     private createIsClosedFunc(): {
-        func: TIsPolylineClosedFunc | null;
-        pathType: TPathType;
+        func: IsPolylineClosedFunc | null;
+        pathType: PathType;
     } {
         if (this.props.polylinesClosed === true) {
             return {
