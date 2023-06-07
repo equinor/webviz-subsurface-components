@@ -100,6 +100,7 @@ ColoredTextAndBackGround.args = {
 const MatrixStory = () => {
     const views: ViewsType = {
         layout: [2, 2],
+        marginPixels: 10,
         viewports: [
             {
                 id: "view_1",
@@ -110,19 +111,19 @@ const MatrixStory = () => {
             {
                 id: "view_2",
                 show3D: false,
-                layerIds: ["mesh-layer"],
+                layerIds: ["mesh-layer", "axes-layer2D"],
                 isSync: false,
             },
             {
                 id: "view_3",
                 show3D: false,
-                layerIds: ["mesh-layer"],
+                layerIds: ["mesh-layer", "axes-layer2D"],
                 isSync: false,
             },
             {
                 id: "view_4",
                 show3D: false,
-                layerIds: ["mesh-layer"],
+                layerIds: ["mesh-layer", "axes-layer2D"],
                 isSync: false,
             },
         ],
