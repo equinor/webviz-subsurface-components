@@ -194,6 +194,7 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
 SubsurfaceViewer.defaultProps = {
     views: {
         layout: [1, 1],
+        marginPixels: 0,
         showLabel: false,
         viewports: [{ id: "main-view", show3D: false, layerIds: [] }],
     },
