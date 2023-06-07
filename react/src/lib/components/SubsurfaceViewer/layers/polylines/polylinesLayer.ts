@@ -11,7 +11,7 @@ import {
 type TIsPolylineClosedFunc = (index: number) => boolean;
 
 /**
- * _pathType is Deck.GL PathLayer prop. If all the polylines are "open" or are "loop" some checks are skept for better performance.
+ * _pathType is Deck.GL PathLayer prop. If all the polylines are "open" or are "loop" some checks are skipped for better performance.
  * If this prop is not set or null PathLayer checks closeness by comparing coordinates and decides how to draw the polylines.
  */
 type TPathType = "open" | "loop" | null;
