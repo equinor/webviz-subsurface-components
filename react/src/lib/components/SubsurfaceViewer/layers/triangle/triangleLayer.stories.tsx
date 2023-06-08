@@ -2,6 +2,9 @@ import React from "react";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 
+import * as SurfacePoints from "./test_data/surfacePoints";
+import * as SurfaceTriangles from "./test_data/surfaceTriangles";
+
 export default {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer / Triangle Layer",
@@ -79,6 +82,106 @@ SmallTriangleLayer.args = {
 };
 
 SmallTriangleLayer.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: "Both mesh and property data given as native javascript arrays (as opposed to URL).",
+        },
+    },
+};
+
+const flipOrientation = (triangles: number[]) => {
+    const res: number[] = [];
+    for (let i = 0; i < triangles.length; i += 3) {
+        res.push(triangles[i]);
+        res.push(triangles[i + 2]);
+        res.push(triangles[i + 1]);
+    }
+    return res;
+};
+
+const shiftPointsByZ = (points: number[], shift: number) => {
+    const res: number[] = [];
+    for (let i = 0; i < points.length; i += 3) {
+        res.push(points[i]);
+        res.push(points[i + 1]);
+        res.push(points[i + 2] + shift);
+    }
+    return res;
+};
+
+const upperSurfaceLayer = {
+    "@@type": "TriangleLayer",
+    id: "upper_surface_layer",
+
+    /*eslint-disable */
+    pointsData:  SurfacePoints.default,
+    triangleData: SurfaceTriangles.default,
+
+    color: [100, 100, 255],      // Surface color.
+    gridLines: true,             // If true will draw lines around triangles.
+    material: {
+        ambient: 0.35,
+        diffuse: 0.6,
+        shininess: 100,
+        specularColor: [255, 255, 255]
+    },              // If true will use triangle normals for shading.
+    smoothShading: true,         // If true will use vertex calculated mean normals for shading.
+    ZIncreasingDownwards: true,    
+    debug: true
+    /*eslint-enable */
+};
+
+const lowerSurfaceLayer = {
+    "@@type": "TriangleLayer",
+    id: "lowers_surface_layer",
+
+    /*eslint-disable */
+    pointsData:  shiftPointsByZ(SurfacePoints.default, 1000),
+    triangleData: flipOrientation(SurfaceTriangles.default),
+
+    color: [100, 255, 100],      // Surface color.
+    gridLines: true,             // If true will draw lines around triangles.
+    material: {
+        ambient: 0.35,
+        diffuse: 0.6,
+        shininess: 100,
+        specularColor: [255, 255, 255]
+    },              // If true will use triangle normals for shading.
+    smoothShading: true,         // If true will use vertex calculated mean normals for shading.
+    ZIncreasingDownwards: true,    
+    debug: true
+    /*eslint-enable */
+};
+
+const surfaceAxesLayer = {
+    "@@type": "AxesLayer",
+    id: "mandaros_axes_small",
+    bounds: [-2000, -2000, 1500, 2500, 2000, 3000],
+};
+
+export const TwoSideLighting: ComponentStory<typeof SubsurfaceViewer> = (
+    args
+) => {
+    return <SubsurfaceViewer {...args} />;
+};
+
+TwoSideLighting.args = {
+    id: "map",
+    layers: [surfaceAxesLayer, upperSurfaceLayer, lowerSurfaceLayer],
+    bounds: [-2000, -2000, 2500, 2000],
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: true,
+            },
+        ],
+    },
+};
+
+TwoSideLighting.parameters = {
     docs: {
         ...defaultParameters.docs,
         description: {
