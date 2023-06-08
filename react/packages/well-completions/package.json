@@ -1,0 +1,27 @@
+{
+  "name": "well-completions",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Equinor <opensource@equinor.com>",
+  "license": "MPL-2.0",
+  "dependencies": {
+    "@equinor/eds-core-react": "^0.12.1",
+    "@equinor/eds-icons": "^0.19.1",
+    "@mui/material": "^5.13.4",
+    "@reduxjs/toolkit": "^1.7.2",
+    "@webviz/core-components": "^0.6.2",
+    "ajv": "^7.2.1",
+    "clsx": "^1.1.1",
+    "d3": "^7.8.2",
+    "lodash": "^4.17.21",
+    "react-dropdown-tree-select": "^2.8.0",
+    "react-redux": "^7.2.6",
+    "react-resize-detector": "^9.1.0",
+    "react-tooltip": "^4.2.21",
+    "semver": "^7.3.5"
+  }
+}
