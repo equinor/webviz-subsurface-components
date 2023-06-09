@@ -1067,6 +1067,13 @@ function createViewsAndViewStates(
         views.layout[1] >= 1 &&
         views.layout[0] * views.layout[1] <= views.viewports.length;
 
+    const isOk =
+        isDeckDefined &&
+        views &&
+        views.layout[0] >= 1 &&
+        views.layout[1] >= 1 &&
+        views.layout[0] * views.layout[1] <= views.viewports.length;
+
     // if props for multiple viewport are not proper, return 2d view
     if (!isOk) {
         console.warn(
