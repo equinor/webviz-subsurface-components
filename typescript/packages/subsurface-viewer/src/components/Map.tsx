@@ -1060,8 +1060,18 @@ function createViewsAndViewStates(
 
     const mPixels = views?.marginPixels ?? 0;
 
+    const isOk =
+        deck &&
+        views &&
+        views.layout[0] >= 1 &&
+        views.layout[1] >= 1 &&
+        views.layout[0] * views.layout[1] <= views.viewports.length;
+
     // if props for multiple viewport are not proper, return 2d view
-    if (!views || !views.viewports || !views.layout || !deck) {
+    if (!isOk) {
+        console.error(
+            "Properties for multiple viewports are not properly defined."
+        );
         deckgl_views.push(
             new OrthographicView({
                 id: "main",
