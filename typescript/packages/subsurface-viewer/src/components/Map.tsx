@@ -1068,6 +1068,8 @@ function createViewsAndViewStates(
         views.layout[0] * views.layout[1] <= views.viewports.length;
 
     const isOk =
+
+    const isOk =
         isDeckDefined &&
         views &&
         views.layout[0] >= 1 &&
