@@ -20,7 +20,7 @@ describe("Test Color Legend component", () => {
                         colorMapName: "Rainbow",
                         valueRange: [2782, 3513],
                         colorMapRange: [2782, 3513],
-                    } as unknown as ExtendedLayer<unknown>
+                    } as unknown as ExtendedLayer
                 }
                 colorTables={colorTables}
                 horizontal={false}

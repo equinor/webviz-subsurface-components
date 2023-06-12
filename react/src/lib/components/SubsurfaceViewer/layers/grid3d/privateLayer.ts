@@ -94,7 +94,7 @@ function getImageData(
     return data ? data : [0, 0, 0];
 }
 
-export interface privateLayerProps<D> extends ExtendedLayerProps<D> {
+export interface privateLayerProps extends ExtendedLayerProps {
     mesh: MeshType;
     meshLines: MeshTypeLines;
     colorMapName: string;
@@ -113,7 +113,7 @@ const defaultProps = {
 };
 
 // This is a private layer used only by the composite Map3DLayer
-export default class privateLayer extends Layer<privateLayerProps<unknown>> {
+export default class privateLayer extends Layer<privateLayerProps> {
     initializeState(context: DeckGLLayerContext): void {
         const { gl } = context;
         const [model_mesh, mesh_lines_model] = this._getModels(gl);

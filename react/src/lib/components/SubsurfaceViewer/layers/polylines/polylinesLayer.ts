@@ -16,7 +16,7 @@ type IsPolylineClosedFunc = (index: number) => boolean;
  */
 type PathType = "open" | "loop" | null;
 
-export interface PolylinesLayerProps<D> extends ExtendedLayerProps<D> {
+export interface PolylinesLayerProps extends ExtendedLayerProps {
     /**
      * Polyline vertices as [x, y, z, x, y, z....].
      */
@@ -83,9 +83,7 @@ interface IDataAttributes {
     pathType: PathType;
 }
 
-export default class PolylinesLayer extends CompositeLayer<
-    PolylinesLayerProps<unknown>
-> {
+export default class PolylinesLayer extends CompositeLayer<PolylinesLayerProps> {
     renderLayers(): [PathLayer?] {
         const layer = new PathLayer(
             this.getSubLayerProps({

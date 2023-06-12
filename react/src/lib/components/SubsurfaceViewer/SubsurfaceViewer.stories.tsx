@@ -126,8 +126,7 @@ const tooltipImpFunc: TooltipCallback = (
     const layerName = info.layer.constructor.name;
     let outputString = "";
     if (layerName === "Map3DLayer") {
-        const layerProps = info.layer
-            .props as unknown as ExtendedLayerProps<unknown>;
+        const layerProps = info.layer.props as unknown as ExtendedLayerProps;
         const layerName = layerProps.name;
         const properties = (info as LayerPickInfo).properties;
         outputString += `Property: ${layerName}`;

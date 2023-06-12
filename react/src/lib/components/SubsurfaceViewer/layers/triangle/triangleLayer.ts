@@ -71,7 +71,7 @@ async function loadData(
     return Promise.all([vertexArray, indexArray]);
 }
 
-export interface TriangleLayerProps<D> extends ExtendedLayerProps<D> {
+export interface TriangleLayerProps extends ExtendedLayerProps {
     /** Triangle vertexes.
      * Either an URL or an array of numbers.
      */
@@ -145,9 +145,7 @@ const defaultProps = {
     debug: false,
 };
 
-export default class TriangleLayer extends CompositeLayer<
-    TriangleLayerProps<unknown>
-> {
+export default class TriangleLayer extends CompositeLayer<TriangleLayerProps> {
     rebuildData(reportBoundingBox: boolean): void {
         const pointsData = this.props.pointsData;
         const triangleData = this.props.triangleData;
