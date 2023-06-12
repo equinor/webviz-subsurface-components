@@ -663,7 +663,13 @@ export default class WellsLayer extends CompositeLayer<
 WellsLayer.layerName = "WellsLayer";
 WellsLayer.defaultProps = {
     ...defaultProps,
-    onDataLoad: (data, context): void => onDataLoad(data, context),
+    onDataLoad: (
+        data: LayerData<FeatureCollection<Geometry, GeoJsonProperties>>,
+        context: {
+            propName: string;
+            layer: Layer;
+        }
+    ): void => onDataLoad(data, context),
 };
 
 //================= Local help functions. ==================

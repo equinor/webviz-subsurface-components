@@ -60,7 +60,7 @@ describe("Test Color Legend", () => {
                     getLayersInViewport(layers, [
                         "colormap-layer",
                         "wells-layer",
-                    ]) as Layer<unknown>[]
+                    ]) as Layer[]
                 }
                 colorTables={colorTables}
             />
@@ -74,7 +74,7 @@ describe("Test Color Legend", () => {
                     getLayersInViewport(layers, [
                         "colormap-layer",
                         "wells-layer",
-                    ]) as Layer<unknown>[]
+                    ]) as Layer[]
                 }
                 horizontal={true}
                 colorTables={colorTables}

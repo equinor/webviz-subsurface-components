@@ -27,7 +27,7 @@ export const getPropVisibility = (layer: Record<string, unknown>): boolean => {
 
 // returns layer properties
 export const getLayerProps = (
-    layers: LayerProps<unknown>[],
+    layers: LayerProps[],
     layerId: string
 ): Record<string, unknown> | null => {
     if (!layers?.length) return null;
