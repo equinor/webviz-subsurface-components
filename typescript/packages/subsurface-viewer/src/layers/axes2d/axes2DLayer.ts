@@ -58,7 +58,7 @@ const zDepthAxesBackground = 90;
 const zDepthAxesAxis = zDepthAxesBackground + 1;
 const zDepthAxesTicksAndLabels = zDepthAxesAxis + 1;
 
-export interface Axes2DLayerProps<D> extends ExtendedLayerProps<D> {
+export interface Axes2DLayerProps extends ExtendedLayerProps {
     marginH: number;
     marginV: number;
     labelColor?: Color;
@@ -140,7 +140,7 @@ const fontInfo = {
     },
 };
 
-export default class Axes2DLayer extends Layer<Axes2DLayerProps<unknown>> {
+export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
     initializeState(context: LayerContext): void {
         const { gl } = context;
 

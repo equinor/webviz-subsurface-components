@@ -51,7 +51,7 @@ export type Material =
       }
     | boolean;
 
-export interface PrivateTriangleLayerProps<D> extends ExtendedLayerProps<D> {
+export interface PrivateTriangleLayerProps extends ExtendedLayerProps {
     geometryTriangles: GeometryTriangles;
     geometryLines: GeometryLines;
     contours: [number, number];
@@ -72,9 +72,7 @@ const defaultProps = {
 };
 
 // This is a private layer used only by the composite TriangleLayer
-export default class PrivateTriangleLayer extends Layer<
-    PrivateTriangleLayerProps<unknown>
-> {
+export default class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProps> {
     initializeState(context: DeckGLLayerContext): void {
         const { gl } = context;
         const [triangleModel, lineMode] = this._getModels(gl);

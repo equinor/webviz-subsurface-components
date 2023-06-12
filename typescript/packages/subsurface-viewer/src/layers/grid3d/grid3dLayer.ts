@@ -59,7 +59,7 @@ async function load_data(
     return Promise.all([points, polys, properties]);
 }
 
-export interface Grid3DLayerProps<D> extends ExtendedLayerProps<D> {
+export interface Grid3DLayerProps extends ExtendedLayerProps {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setReportedBoundingBox?: any;
 
@@ -138,9 +138,7 @@ const defaultProps = {
     ZIncreasingDownwards: true,
 };
 
-export default class Grid3DLayer extends CompositeLayer<
-    Grid3DLayerProps<unknown>
-> {
+export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
     rebuildData(reportBoundingBox: boolean): void {
         const p = load_data(
             this.props.pointsData,
@@ -206,8 +204,8 @@ export default class Grid3DLayer extends CompositeLayer<
         props,
         oldProps,
     }: {
-        props: Grid3DLayerProps<unknown>;
-        oldProps: Grid3DLayerProps<unknown>;
+        props: Grid3DLayerProps;
+        oldProps: Grid3DLayerProps;
     }): void {
         const needs_reload =
             !isEqual(props.pointsData, oldProps.pointsData) ||
@@ -245,4 +243,4 @@ export default class Grid3DLayer extends CompositeLayer<
 }
 
 Grid3DLayer.layerName = "Grid3DLayer";
-Grid3DLayer.defaultProps = defaultProps as unknown as Grid3DLayerProps<unknown>;
+Grid3DLayer.defaultProps = defaultProps as unknown as Grid3DLayerProps;

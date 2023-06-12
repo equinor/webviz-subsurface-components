@@ -7,7 +7,7 @@ interface ColorLegendsProps {
     // Pass additional css style to the parent color legend container
     cssStyle?: Record<string, unknown> | null;
     horizontal?: boolean | null;
-    layers: ExtendedLayer<unknown>[];
+    layers: ExtendedLayer[];
     colorTables: colorTablesArray | string | undefined;
     reverseRange?: boolean;
 }

@@ -1,5 +1,4 @@
 import { CompositeLayer, PickingInfo, LayersList } from "@deck.gl/core/typed";
-import { FeatureCollection } from "@nebula.gl/edit-modes";
 import { SelectionLayer } from "@nebula.gl/layers";
 import { GeoJsonLayer } from "@deck.gl/layers/typed";
 import { ExtendedLayerProps } from "../utils/layerTools";
@@ -11,7 +10,7 @@ import { Feature } from "geojson";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type PickInfo = any;
 
-export interface BoxSelectionLayerProps<D> extends ExtendedLayerProps<D> {
+export interface BoxSelectionLayerProps extends ExtendedLayerProps {
     mode: string; // One of modes in MODE_MAP
     selectedFeatureIndexes: number[];
     pickingInfos: PickingInfo[];
@@ -62,9 +61,7 @@ type WellHeadStyleAccessor = {
 
 // Composite layer that contains an Selection Lyaer from nebula.gl
 // See https://nebula.gl/docs/api-reference/layers/selection-layer
-export default class BoxSelectionLayer extends CompositeLayer<
-    BoxSelectionLayerProps<FeatureCollection>
-> {
+export default class BoxSelectionLayer extends CompositeLayer<BoxSelectionLayerProps> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setMultiSelection(pickingInfos: any[]): void {
         if (this.internalState) {
@@ -133,4 +130,4 @@ export default class BoxSelectionLayer extends CompositeLayer<
 
 BoxSelectionLayer.layerName = "BoxSelectionLayer";
 BoxSelectionLayer.defaultProps =
-    defaultProps as unknown as BoxSelectionLayerProps<FeatureCollection>;
+    defaultProps as unknown as BoxSelectionLayerProps;

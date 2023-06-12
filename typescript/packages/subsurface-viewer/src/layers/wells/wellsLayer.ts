@@ -78,7 +78,7 @@ function onDataLoad(
     }
 }
 
-export interface WellsLayerProps<D> extends ExtendedLayerProps<D> {
+export interface WellsLayerProps extends ExtendedLayerProps {
     pointRadiusScale: number;
     lineWidthScale: number;
     outline: boolean;
@@ -235,9 +235,7 @@ export function getSize(
     return 0;
 }
 
-export default class WellsLayer extends CompositeLayer<
-    WellsLayerProps<FeatureCollection<Geometry, GeoJsonProperties>>
-> {
+export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any
     onClick(info: WellsPickInfo): boolean {
         // Make selection only when drawing is disabled
