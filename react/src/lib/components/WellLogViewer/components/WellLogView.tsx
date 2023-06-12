@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, ReactNode } from "react";
 import { LogViewer } from "@equinor/videx-wellog";
 
 import PropTypes from "prop-types";
@@ -198,11 +198,14 @@ function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
             const elem = event.target;
             if (elem) {
                 const axisTitles = parent.props.axisTitles;
-                const axisTitle = !axisTitles
-                    ? undefined
-                    : parent.props.primaryAxis
-                    ? axisTitles[parent.props.primaryAxis]
-                    : axisTitles[0];
+
+                let axisTitle = undefined;
+                if (axisTitles) {
+                    axisTitle = parent.props.primaryAxis
+                        ? axisTitles[parent.props.primaryAxis]
+                        : axisTitles[0];
+                }
+
                 elem.textContent = Number.isFinite(value)
                     ? `${axisTitle ? axisTitle : ""}: ${value.toFixed(1)}`
                     : "-";
@@ -1635,11 +1638,11 @@ class WellLogView
         return newPos;
     }
     _maxVisibleTrackNum(): number {
-        return this.props.options?.maxVisibleTrackNum
-            ? this.props.options?.maxVisibleTrackNum
-            : this.props.horizontal
-            ? 3
-            : 5 /*some default value*/;
+        if (this.props.options?.maxVisibleTrackNum) {
+            return this.props.options?.maxVisibleTrackNum;
+        } else {
+            return this.props.horizontal ? 3 : 5 /*some default value*/;
+        }
     }
 
     scrollTrackBy(delta: number): void {
@@ -1880,6 +1883,18 @@ class WellLogView
         }
     }
 
+    createViewTitle(
+        viewTitle: string | boolean | JSX.Element | undefined
+    ): ReactNode {
+        if (typeof viewTitle === "object" /*react element*/) {
+            return viewTitle;
+        } else if (viewTitle === true) {
+            return this.props.welllog?.header.well;
+        }
+
+        return viewTitle;
+    }
+
     render(): JSX.Element {
         const horizontal = this.props.horizontal;
         const viewTitle = this.props.viewTitle;
@@ -1904,11 +1919,7 @@ class WellLogView
                         }}
                         className="title"
                     >
-                        {typeof viewTitle === "object" /*react element*/
-                            ? viewTitle
-                            : viewTitle === true
-                            ? this.props.welllog?.header.well
-                            : viewTitle}
+                        {this.createViewTitle(viewTitle)}
                     </div>
                 )}
                 <div

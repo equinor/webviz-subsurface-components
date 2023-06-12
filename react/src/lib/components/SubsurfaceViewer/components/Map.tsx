@@ -1281,11 +1281,16 @@ function createViews(
                 const currentViewport: ViewportType =
                     views.viewports[deckgl_views.length];
 
-                const ViewType = currentViewport.show3D
-                    ? OrbitView
-                    : currentViewport.id === "intersection_view"
-                    ? IntersectionView
-                    : OrthographicView;
+                let ViewType:
+                    | typeof OrbitView
+                    | typeof IntersectionView
+                    | typeof OrthographicView = OrbitView;
+                if (!currentViewport.show3D) {
+                    ViewType =
+                        currentViewport.id === "intersection_view"
+                            ? IntersectionView
+                            : OrthographicView;
+                }
 
                 const far = 9999;
                 const near = currentViewport.show3D ? 0.1 : -9999;

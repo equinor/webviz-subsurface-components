@@ -248,6 +248,15 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
         const track = this.props.track;
         const plots = (track as GraphTrack).plots;
 
+        const createMenuItem = (track: GraphTrack): React.ReactNode => {
+            if ((track as GraphTrack).options.plotFactory) {
+                return [this.createMenuItem("Add plot", this.addPlot)];
+            } else if (!isScaleTrack(track)) {
+                return [this.createMenuItem("Edit track", this.editTrack)];
+            }
+            return [];
+        };
+
         return (
             <div>
                 <Menu
@@ -258,11 +267,7 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
                     onClose={this.handleCloseMenu.bind(this)}
                     onContextMenu={this.handleContextMenu.bind(this)}
                 >
-                    {(track as GraphTrack).options.plotFactory
-                        ? [this.createMenuItem("Add plot", this.addPlot)]
-                        : !isScaleTrack(track)
-                        ? [this.createMenuItem("Edit track", this.editTrack)]
-                        : []}
+                    {createMenuItem(track as GraphTrack)}
                     {plots && plots.length
                         ? [
                               this.createMenuItem("Edit plot", this.editPlots),

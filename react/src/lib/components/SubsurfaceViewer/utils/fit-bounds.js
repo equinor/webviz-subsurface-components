@@ -2,10 +2,6 @@
 // that will contain the provided corners within the provided width.
 // Only supports non-perspective mode.
 
-export function clamp(x, min, max) {
-    return x < min ? min : x > max ? max : x;
-}
-
 function ieLog2(x) {
     return Math.log(x) * Math.LOG2E;
 }
