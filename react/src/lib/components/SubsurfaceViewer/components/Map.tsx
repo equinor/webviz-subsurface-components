@@ -1227,6 +1227,13 @@ function createViews(
             return super.handleEvent(event);
         }
     }
+
+    class ZScaleOrbitView extends OrbitView {
+        get ControllerType(): typeof OrbitController {
+            return ZScaleOrbitController;
+        }
+    }
+
     const deckgl_views: View[] = [];
 
     const widthViewPort = deck?.width;
@@ -1282,7 +1289,7 @@ function createViews(
                     views.viewports[deckgl_views.length];
 
                 const ViewType = currentViewport.show3D
-                    ? OrbitView
+                    ? ZScaleOrbitView
                     : currentViewport.id === "intersection_view"
                     ? IntersectionView
                     : OrthographicView;
@@ -1299,22 +1306,22 @@ function createViews(
                     doubleClickZoom: false,
                 };
 
-                deckgl_views.push(
-                    new ViewType({
-                        id: currentViewport.id,
-                        controller: controller,
+                const view = new ViewType({
+                    id: currentViewport.id,
+                    controller: controller,
 
-                        x: xPos + marginHorPercentage / nX + "%",
-                        y: yPos + marginVerPercentage / nY + "%",
+                    x: xPos + marginHorPercentage / nX + "%",
+                    y: yPos + marginVerPercentage / nY + "%",
 
-                        width: w * (1 - 2 * (marginHorPercentage / 100)) + "%",
-                        height: h * (1 - 2 * (marginVerPercentage / 100)) + "%",
+                    width: w * (1 - 2 * (marginHorPercentage / 100)) + "%",
+                    height: h * (1 - 2 * (marginVerPercentage / 100)) + "%",
 
-                        flipY: false,
-                        far,
-                        near,
-                    })
-                );
+                    flipY: false,
+                    far,
+                    near,
+                });
+
+                deckgl_views.push(view);
                 xPos = xPos + w;
             }
             yPos = yPos + h;
