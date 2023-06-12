@@ -38,6 +38,6 @@
   "rules": {
     "react-hooks/rules-of-hooks": "error", // For checking rules of hooks
     "react-hooks/exhaustive-deps": "error", // For checking hook dependencies
-    "no-nested-ternary": 2
+    "no-nested-ternary": 2 //0 - turns rule off, 1 - warning, 2 - error
   }
 }
