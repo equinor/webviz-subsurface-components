@@ -72,11 +72,6 @@ module.exports = (env, argv) => {
                     ? filename_css
                     : path.join("..", dashLibraryName, filename_css),
             }),
-            // fix "process is not defined" error:
-            // https://stackoverflow.com/questions/41359504/webpack-bundle-js-uncaught-referenceerror-process-is-not-defined
-            new webpack.ProvidePlugin({
-                process: "process/browser",
-            }),
         ],
         module: {
             rules: [
