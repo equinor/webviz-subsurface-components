@@ -3,6 +3,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
  * Copyright (C) 2020 - Equinor ASA. */
+const webpack = require("webpack");
+
 const path = require("path");
 const TerserJSPlugin = require("terser-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
@@ -70,6 +72,11 @@ module.exports = (env, argv) => {
                     ? filename_css
                     : path.join("..", dashLibraryName, filename_css),
             }),
+            // fix "process is not defined" error:
+            // https://stackoverflow.com/questions/41359504/webpack-bundle-js-uncaught-referenceerror-process-is-not-defined
+            new webpack.ProvidePlugin({
+                process: "process/browser",
+            }),
         ],
         module: {
             rules: [
@@ -111,6 +118,14 @@ module.exports = (env, argv) => {
                     test: /\.js$/,
                     exclude: /node_modules/,
                     loader: "source-map-loader",
+                },
+
+                {
+                    // workaround for Error: Can't resolve 'process/browser'
+                    test: /\.m?js/,
+                    resolve: {
+                        fullySpecified: false,
+                    },
                 },
             ],
         },
