@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
+
 import React from "react";
 import {
     Table,
@@ -5,7 +7,7 @@ import {
     TableRow,
     TableBody,
     TableCell,
-} from "@material-ui/core";
+} from "@mui/material";
 import { TreeDataNode } from "@webviz/core-components";
 import cloneDeep from "lodash/cloneDeep";
 
@@ -18,7 +20,7 @@ import {
     isVariableVectorMapValid,
 } from "../../../utils/VectorCalculatorHelperFunctions";
 
-import "!style-loader!css-loader!../../../VectorCalculator.css";
+import "../../../VectorCalculator.css";
 
 interface VectorSelectorTableProps {
     vectorData: TreeDataNode[];

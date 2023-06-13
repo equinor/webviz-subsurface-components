@@ -1,7 +1,9 @@
+/* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
+
 import React, { useCallback, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { WellCompletionsState } from "../../redux/store";
-import { PlotData } from "../../utils/dataUtil";
+import { PlotData, WellPlotData } from "../../utils/dataUtil";
 import { SORT_BY_COMPLETION_DATE } from "../../utils/sort";
 import { capitalizeFirstLetter } from "../../utils/stringUtil";
 import { useTooltip } from "../Common/TooltipProvider";
@@ -29,7 +31,7 @@ const WellsPlot: React.FC<Props> = React.memo(
             [layout.yExtent, plotData.stratigraphy.length]
         );
         const onMouseOver = useCallback(
-            (well) => {
+            (well: WellPlotData) => {
                 setContent(() => (
                     <table style={{ color: "#fff" }}>
                         <tbody>

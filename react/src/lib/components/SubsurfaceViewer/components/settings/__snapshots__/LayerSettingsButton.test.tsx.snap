@@ -1,14 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`test layers settings button snapshot test 1`] = `
-<button
-  class="MuiButtonBase-root MuiFab-root makeStyles-root-1 MuiFab-sizeMedium"
-  id="drawing-layer-button"
-  tabindex="0"
-  type="button"
+<div
+  class="css-mk8rzy"
 >
-  <span
-    class="MuiFab-label"
+  <button
+    class="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeMedium MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeMedium MuiFab-default LayerSettingsButton-root css-1fwudth-MuiButtonBase-root-MuiFab-root"
+    id="drawing-layer-button"
+    tabindex="0"
+    type="button"
   >
     <svg
       aria-hidden="true"
@@ -28,9 +28,9 @@ exports[`test layers settings button snapshot test 1`] = `
         height="24"
       />
     </svg>
-  </span>
-  <span
-    class="MuiTouchRipple-root"
-  />
-</button>
+    <span
+      class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+    />
+  </button>
+</div>
 `;

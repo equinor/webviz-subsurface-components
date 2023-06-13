@@ -7,7 +7,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import MorrisMethod from "./utils/morris";
-import "!style-loader!css-loader!./morris.css";
+import "./morris.css";
 
 const parseData = (data) =>
     typeof data === "string" ? JSON.parse(data) : data;

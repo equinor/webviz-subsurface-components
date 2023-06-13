@@ -1,18 +1,25 @@
+/* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
+
 import { Icon, Menu, Tooltip } from "@equinor/eds-core-react";
-import { createStyles, Fab, makeStyles } from "@material-ui/core";
+import { styled } from "@mui/material/styles";
+import { Fab } from "@mui/material";
 import React, { ChangeEvent, useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { updateLayerProp, updateVisibleLayers } from "../../redux/actions";
 import ToggleButton from "./ToggleButton";
 
-const useStyles = makeStyles(() =>
-    createStyles({
-        root: {
-            flexDirection: "column",
-            display: "flex",
-        },
-    })
-);
+const PREFIX = "LayersButton";
+
+const classes = {
+    root: `${PREFIX}-root`,
+};
+
+const Root = styled("div")(() => ({
+    [`& .${classes.root}`]: {
+        flexDirection: "column",
+        display: "flex",
+    },
+}));
 
 export interface LayersButtonProps {
     id: string;
@@ -21,7 +28,6 @@ export interface LayersButtonProps {
 
 const LayersButton: React.FC<LayersButtonProps> = React.memo(
     ({ id, layers }: LayersButtonProps) => {
-        const classes = useStyles();
         // Redux
         const dispatch = useDispatch();
         const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(
@@ -44,13 +50,14 @@ const LayersButton: React.FC<LayersButtonProps> = React.memo(
         }, []);
 
         const updateChecked = useCallback(
-            (layer, checked) => dispatch(updateVisibleLayers([layer, checked])),
+            (layer: string, checked: boolean) =>
+                dispatch(updateVisibleLayers([layer, checked])),
             [dispatch]
         );
 
         if (!layers.length) return null;
         return (
-            <div id={id}>
+            <Root id={id}>
                 <Fab id="layers-selector-button" onClick={handleClick}>
                     <Tooltip title="Layers">
                         <Icon color="currentColor" name="layers" />
@@ -72,13 +79,16 @@ const LayersButton: React.FC<LayersButtonProps> = React.memo(
                             label={layer["name"] as string}
                             checked={layer["visible"] as boolean}
                             onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                                updateChecked(layer["id"], e.target.checked);
+                                updateChecked(
+                                    layer["id"] as string,
+                                    e.target.checked
+                                );
                             }}
                             key={`layer-toggle-${layer["id"]}`}
                         />
                     ))}
                 </Menu>
-            </div>
+            </Root>
         );
     }
 );

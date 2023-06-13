@@ -51,15 +51,27 @@ type TextLayerData = {
 };
 
 export default class AxesLayer extends CompositeLayer<AxesLayerProps<unknown>> {
-    initializeState(): void {
+    rebuildData(reportBoundingBox: boolean): void {
         const bounds = cloneDeep(this.props.bounds);
-        if (this.props.ZIncreasingDownwards) {
-            const tmp = bounds[5];
-            bounds[5] = bounds[2];
-            bounds[2] = tmp;
 
+        if (this.props.ZIncreasingDownwards) {
             bounds[2] *= -1;
             bounds[5] *= -1;
+        }
+
+        if (bounds[2] > bounds[5]) {
+            // Swap z values to ensure smallest first.
+            [bounds[2], bounds[5]] = [bounds[5], bounds[2]];
+        }
+
+        if (bounds[0] > bounds[3]) {
+            // Swap x values to ensure smallest first.
+            [bounds[0], bounds[3]] = [bounds[3], bounds[0]];
+        }
+
+        if (bounds[1] > bounds[4]) {
+            // Swap y values to ensure smallest first.
+            [bounds[1], bounds[4]] = [bounds[4], bounds[1]];
         }
 
         const box_lines = GetBoxLines(bounds);
@@ -68,6 +80,7 @@ export default class AxesLayer extends CompositeLayer<AxesLayerProps<unknown>> {
             this.context.viewport.constructor === OrthographicViewport;
 
         const [tick_lines, tick_labels] = GetTickLines(
+            this.props.ZIncreasingDownwards,
             is_orthographic,
             bounds,
             this.context.viewport
@@ -83,9 +96,17 @@ export default class AxesLayer extends CompositeLayer<AxesLayerProps<unknown>> {
 
         this.setState({ box_lines, tick_lines, textlayerData });
 
-        if (typeof this.props.setReportedBoundingBox !== "undefined") {
+        if (
+            typeof this.props.setReportedBoundingBox !== "undefined" &&
+            reportBoundingBox
+        ) {
             this.props.setReportedBoundingBox(bounds);
         }
+    }
+
+    initializeState(): void {
+        const reportBoundingBox = true;
+        this.rebuildData(reportBoundingBox);
     }
 
     shouldUpdateState({
@@ -105,36 +126,8 @@ export default class AxesLayer extends CompositeLayer<AxesLayerProps<unknown>> {
     }
 
     updateState(): void {
-        const is_orthographic =
-            this.context.viewport.constructor === OrthographicViewport;
-
-        const bounds = cloneDeep(this.props.bounds);
-        if (this.props.ZIncreasingDownwards) {
-            const tmp = bounds[5];
-            bounds[5] = bounds[2];
-            bounds[2] = tmp;
-
-            bounds[2] *= -1;
-            bounds[5] *= -1;
-        }
-
-        const box_lines = GetBoxLines(bounds);
-
-        const [tick_lines, tick_labels] = GetTickLines(
-            is_orthographic,
-            bounds,
-            this.context.viewport
-        );
-
-        const textlayerData = maketextLayerData(
-            is_orthographic,
-            tick_lines,
-            tick_labels,
-            bounds,
-            this.props.labelFontSize
-        );
-
-        this.setState({ box_lines, tick_lines, textlayerData });
+        const reportBoundingBox = false;
+        this.rebuildData(reportBoundingBox);
     }
 
     getAnchor(d: TextLayerData, is_orthographic: boolean): string {
@@ -354,6 +347,7 @@ function GetTicks(
 }
 
 function GetTickLines(
+    isZIncreasingDownwards: boolean,
     is_orthographic: boolean,
     bounds: [number, number, number, number, number, number],
     viewport: Viewport
@@ -371,7 +365,7 @@ function GetTickLines(
     const z_max = bounds[5];
 
     const lines: number[] = [];
-    const tick_labels = [];
+    const tick_labels: string[] = [];
 
     // ADD TICK LINES.
     const dx = x_max - x_min;
@@ -393,12 +387,15 @@ function GetTickLines(
     // Z tick marks. Only in 3D.
     if (!is_orthographic) {
         const z_ticks = GetTicks(z_min, z_max, Lz);
+
         x_tick = x_min;
         y_tick = y_min;
         for (let i = 0; i < z_ticks.length; i++) {
             const tick = z_ticks[i];
 
-            const label = (-tick).toFixed(ndecimals); // minus sign: positive depth along negative z axis.
+            const sign = isZIncreasingDownwards ? -1 : 1;
+            const tick_label_num = sign * tick;
+            const label = tick_label_num.toFixed(ndecimals);
             tick_labels.push(label);
 
             // tick line start

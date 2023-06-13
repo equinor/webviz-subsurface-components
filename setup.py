@@ -43,7 +43,7 @@ TESTS_REQUIRE = [
     "Pillow>=6.0",
     "pylint>=2.4",
     "scipy>=1.2",
-    "selenium>=3.141",
+    "selenium>=3.141.0,<=4.2.0",
     "vtk>=9.2.2",
     "webviz-core-components>=0.6.0",
     "xtgeo>=2.20.3",

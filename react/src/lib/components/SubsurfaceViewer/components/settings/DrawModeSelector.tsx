@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
+
 import { NativeSelect } from "@equinor/eds-core-react";
 import React, { useCallback } from "react";
 import { useDispatch } from "react-redux";
@@ -26,7 +28,7 @@ const DrawModeSelector: React.FC<Props> = React.memo(
 
         // handlers
         const handleSelectedItemChange = useCallback(
-            (event) => {
+            (event: { target: { value: string } }) => {
                 const selection = DrawModes.find(
                     (mode) => mode.displayName === event.target.value
                 );

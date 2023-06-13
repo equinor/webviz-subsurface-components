@@ -1,6 +1,7 @@
+/* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
+
 import React from "react";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const convert = require("convert-units");
+import convert, { Unit } from "convert-units";
 
 export interface ScaleProps {
     // Needed the zoom value to calculate width in units
@@ -12,7 +13,7 @@ export interface ScaleProps {
     // additional css style to position the component
     style?: Record<string, unknown>;
     // default unit for the scale ruler
-    scaleUnit?: string;
+    scaleUnit?: Unit;
 }
 
 const roundToStep = function (num: number, step: number) {
@@ -26,9 +27,28 @@ const DistanceScale: React.FC<ScaleProps> = ({
     style,
     scaleUnit,
 }: ScaleProps) => {
-    if (!zoom || !widthPerUnit || !incrementValue) return null;
-    const [rulerWidth, setRulerWidth] = React.useState<number>(0);
+    if (!zoom || !widthPerUnit || !incrementValue || !scaleUnit) return null;
+
+    if (!convert().possibilities().includes(scaleUnit)) {
+        return null;
+    }
+
     const widthInUnits = widthPerUnit / Math.pow(2, zoom);
+
+    const scaleValue =
+        widthInUnits < incrementValue
+            ? Math.round(widthInUnits)
+            : roundToStep(widthInUnits, incrementValue);
+
+    const convertedUnit = convert(scaleValue)
+        .from(scaleUnit as convert.Unit)
+        .toBest().unit;
+    const convertedValue = convert(scaleValue)
+        .from(scaleUnit as convert.Unit)
+        .toBest().val;
+
+    const rulerWidth = scaleValue * Math.pow(2, zoom);
+
     const scaleRulerStyle: React.CSSProperties = {
         width: rulerWidth,
         height: "4px",
@@ -37,18 +57,6 @@ const DistanceScale: React.FC<ScaleProps> = ({
         display: "inline-block",
         marginLeft: "3px",
     };
-
-    const scaleValue =
-        widthInUnits < incrementValue
-            ? Math.round(widthInUnits)
-            : roundToStep(widthInUnits, incrementValue);
-
-    const convertedUnit = convert(scaleValue).from(scaleUnit).toBest().unit;
-    const convertedValue = convert(scaleValue).from(scaleUnit).toBest().val;
-
-    React.useEffect(() => {
-        setRulerWidth(scaleValue * Math.pow(2, zoom));
-    }, [zoom]);
 
     return (
         <div

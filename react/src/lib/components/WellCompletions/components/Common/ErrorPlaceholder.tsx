@@ -1,32 +1,37 @@
 import { Typography } from "@equinor/eds-core-react";
-import { createStyles, makeStyles } from "@material-ui/core";
+import { styled } from "@mui/material/styles";
 import React from "react";
 
-const useStyles = makeStyles(() =>
-    createStyles({
-        root: {
-            display: "flex",
-            flex: 1,
-            alignItems: "center",
-            justifyContent: "center",
-        },
-        text: {
-            userSelect: "none",
-        },
-    })
-);
+const PREFIX = "ErrorPlaceholder";
+
+const classes = {
+    root: `${PREFIX}-root`,
+    text: `${PREFIX}-text`,
+};
+
+const Root = styled("div")(() => ({
+    [`&.${classes.root}`]: {
+        display: "flex",
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+
+    [`& .${classes.text}`]: {
+        userSelect: "none",
+    },
+}));
 
 interface Props {
     text: string;
 }
 const ErrorPlaceholder: React.FC<Props> = React.memo(({ text }: Props) => {
     // Style
-    const classes = useStyles();
 
     return (
-        <div className={classes.root}>
+        <Root className={classes.root}>
             <Typography color="secondary">{text}</Typography>
-        </div>
+        </Root>
     );
 });
 

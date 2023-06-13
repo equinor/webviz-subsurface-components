@@ -88,7 +88,7 @@ exports[`test number of Wells per page snapshot test 1`] = `
 }
 
 <div
-  class="c0 makeStyles-root-1"
+  class="c0 WellsPerPageSelector-root css-rze0ev"
 >
   <label
     class="c1"

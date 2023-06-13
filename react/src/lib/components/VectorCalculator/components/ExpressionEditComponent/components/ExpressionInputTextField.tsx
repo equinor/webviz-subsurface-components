@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
+
 import React from "react";
 import { Icon, TextField, Progress } from "@equinor/eds-core-react";
 import { error_filled, thumbs_up } from "@equinor/eds-icons";
@@ -11,7 +13,7 @@ import {
 
 import { getExpressionParseData } from "../../../utils/ExpressionParser";
 
-import "!style-loader!css-loader!../../../VectorCalculator.css";
+import "../../../VectorCalculator.css";
 
 type ExpressionInputTextFieldVariantType = "success" | "error" | "default";
 

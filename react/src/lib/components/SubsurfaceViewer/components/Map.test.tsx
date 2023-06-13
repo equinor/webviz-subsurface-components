@@ -19,7 +19,8 @@ import {
     WellsLayer,
 } from "../layers";
 
-const mapData = require("../../../../demo/example-data/deckgl-map.json");
+import mapData from "../../../../demo/example-data/deckgl-map.json";
+import { Unit } from "convert-units";
 const colorTablesData = colorTables;
 const testBounds = [432205, 6475078, 437720, 6481113] as [
     number,
@@ -89,7 +90,7 @@ describe("Test Map component", () => {
                         bounds={testBounds}
                         coords={mapData[0].coords}
                         scale={mapData[0].scale}
-                        coordinateUnit={mapData[0].coordinateUnit}
+                        coordinateUnit={mapData[0].coordinateUnit as Unit}
                         editedData={mapData[0].editedData}
                         views={{
                             layout: [1, 1],
@@ -119,7 +120,7 @@ describe("Test Map component", () => {
                         bounds={testBounds}
                         coords={mapData[0].coords}
                         scale={mapData[0].scale}
-                        coordinateUnit={mapData[0].coordinateUnit}
+                        coordinateUnit={mapData[0].coordinateUnit as Unit}
                         editedData={{}}
                         views={{
                             layout: [1, 1],

@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
+
 import React from "react";
 
 import { TextField, Icon } from "@equinor/eds-core-react";
@@ -14,7 +16,7 @@ import {
     expressionNameValidationMessage,
 } from "../../../utils/VectorCalculatorHelperFunctions";
 
-import "!style-loader!css-loader!../../../VectorCalculator.css";
+import "../../../VectorCalculator.css";
 
 type ExpressionNameTextFieldVariantType =
     | "success"

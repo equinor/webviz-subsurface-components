@@ -1,10 +1,10 @@
-import React from "react";
+import React, { SyntheticEvent } from "react";
+import { styled } from "@mui/material/styles";
 import { ViewsType, useHoverInfo } from "../../components/Map";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import InfoCard from "../../components/InfoCard";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
-import { Slider } from "@material-ui/core";
-import { makeStyles } from "@material-ui/styles";
+import { Slider } from "@mui/material";
 import {
     ContinuousLegend,
     ColorLegend,
@@ -14,6 +14,27 @@ import { View } from "../../../..";
 import MapLayer from "./mapLayer";
 import Axes2DLayer from "../axes2d/axes2DLayer";
 import { ViewFooter } from "../../components/ViewFooter";
+
+const PREFIX = "MapLayer3dPng";
+
+const classes = {
+    main: `${PREFIX}-main`,
+    legend: `${PREFIX}-legend`,
+};
+
+const Root = styled("div")({
+    [`& .${classes.main}`]: {
+        height: 500,
+        border: "1px solid black",
+        position: "relative",
+    },
+    [`& .${classes.legend}`]: {
+        width: 100,
+        position: "absolute",
+        top: "0",
+        right: "0",
+    },
+});
 
 export default {
     component: SubsurfaceViewer,
@@ -242,7 +263,7 @@ const meshMapLayerRotated = {
 const axes_hugin = {
     "@@type": "AxesLayer",
     id: "axes-layer2",
-    bounds: [432150, 6475800, 0, 439400, 6481500, 3500],
+    bounds: [432150, 6475800, 2000, 439400, 6481500, 3500],
 };
 
 const north_arrow_layer = {
@@ -311,6 +332,35 @@ MapLayer3dPng.parameters = {
     },
 };
 
+export const MapLayer3dPngNoBounds: ComponentStory<typeof SubsurfaceViewer> = (
+    args
+) => {
+    return <SubsurfaceViewer {...args} />;
+};
+
+MapLayer3dPngNoBounds.args = {
+    id: "map",
+    layers: [axes_hugin, meshMapLayerPng, north_arrow_layer],
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: true,
+            },
+        ],
+    },
+};
+
+MapLayer3dPngNoBounds.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: "If no bounds are specified will results in automatically calcultated camera. Will look at center of bounding box of the data",
+        },
+    },
+};
+
 export const ConstantColor: ComponentStory<typeof SubsurfaceViewer> = (
     args
 ) => {
@@ -366,18 +416,18 @@ export const ScaleZ: ComponentStory<typeof SubsurfaceViewer> = (args) => {
     };
 
     return (
-        <>
-            <div className={useStyles().main}>
+        <Root>
+            <div className={classes.main}>
                 <SubsurfaceViewer {...props} />
             </div>
             <button onClick={handleChange}> Add layer </button>
-        </>
+        </Root>
     );
 };
 
 ScaleZ.args = {
     id: "ScaleZ",
-    layers: [axes_hugin, meshMapLayerPng, north_arrow_layer],
+    layers: [axes_hugin, meshMapLayerPng, wellsLayer, north_arrow_layer],
     bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
 
     views: {
@@ -414,9 +464,9 @@ export const ResetCameraProperty: ComponentStory<typeof SubsurfaceViewer> = (
     const [home, setHome] = React.useState<number>(0);
     const [camera, setCamera] = React.useState({
         rotationOrbit: 0,
-        rotationX: 89,
-        target: [435775, 6478650, -1750],
-        zoom: -3.5109619192773796,
+        rotationX: 45,
+        target: [435775, 6477650, -1750],
+        zoom: -3.8,
     });
 
     const handleChange1 = () => {
@@ -434,13 +484,13 @@ export const ResetCameraProperty: ComponentStory<typeof SubsurfaceViewer> = (
     };
 
     return (
-        <>
-            <div className={useStyles().main}>
+        <Root>
+            <div className={classes.main}>
                 <SubsurfaceViewer {...props} />
             </div>
-            <button onClick={handleChange1}> Reset Camera </button>
+            <button onClick={handleChange1}> Reset Camera to bounds</button>
             <button onClick={handleChange2}> Change Camera </button>
-        </>
+        </Root>
     );
 };
 
@@ -494,12 +544,12 @@ export const AddLayer: ComponentStory<typeof SubsurfaceViewer> = (args) => {
     };
 
     return (
-        <>
-            <div className={useStyles().main}>
+        <Root>
+            <div className={classes.main}>
                 <SubsurfaceViewer {...props} />
             </div>
             <button onClick={handleChange}> Add layer </button>
-        </>
+        </Root>
     );
 };
 
@@ -533,9 +583,7 @@ export const MapLayer2d: ComponentStory<typeof SubsurfaceViewer> = (args) => {
 
 const axesLayer2D = new Axes2DLayer({
     id: "axesLayer2D",
-    marginH: 100, // Horizontal margin (in pixels)
-    marginV: 40, // Vertical margin (in pixels)
-    backgroundColor: [255, 255, 0, 100],
+    backgroundColor: [0, 255, 255],
 });
 
 const mapLayer = new MapLayer({
@@ -963,20 +1011,6 @@ BigMapWithHole.parameters = {
     },
 };
 
-const useStyles = makeStyles({
-    main: {
-        height: 500,
-        border: "1px solid black",
-        position: "relative",
-    },
-    legend: {
-        width: 100,
-        position: "absolute",
-        top: "0",
-        right: "0",
-    },
-});
-
 export const BreakpointColorMap: ComponentStory<typeof SubsurfaceViewer> = (
     args
 ) => {
@@ -999,15 +1033,18 @@ export const BreakpointColorMap: ComponentStory<typeof SubsurfaceViewer> = (
         layers: [layer],
     };
 
-    const handleChange = React.useCallback((_event, value) => {
-        setBreakpoint(value / 100);
-    }, []);
+    const handleChange = React.useCallback(
+        (_event: Event | SyntheticEvent, value: number | number[]) => {
+            setBreakpoint((value as number) / 100);
+        },
+        []
+    );
 
     return (
-        <>
-            <div className={useStyles().main}>
+        <Root>
+            <div className={classes.main}>
                 <SubsurfaceViewer {...props} />
-                <div className={useStyles().legend}>
+                <div className={classes.legend}>
                     <ContinuousLegend
                         min={valueRange[0]}
                         max={valueRange[1]}
@@ -1022,7 +1059,7 @@ export const BreakpointColorMap: ComponentStory<typeof SubsurfaceViewer> = (
                 step={1}
                 onChangeCommitted={handleChange}
             />
-        </>
+        </Root>
     );
 };
 
@@ -1062,13 +1099,16 @@ export const ColorMapRange: ComponentStory<typeof SubsurfaceViewer> = (
         layers: [layer],
     };
 
-    const handleChange = React.useCallback((_event, value) => {
-        setColorMapUpper(value);
-    }, []);
+    const handleChange = React.useCallback(
+        (_event: unknown, value: number | number[]) => {
+            setColorMapUpper(value as number);
+        },
+        []
+    );
 
     return (
-        <>
-            <div className={useStyles().main}>
+        <Root>
+            <div className={classes.main}>
                 <SubsurfaceViewer {...props} />
             </div>
             <Slider
@@ -1078,7 +1118,7 @@ export const ColorMapRange: ComponentStory<typeof SubsurfaceViewer> = (
                 step={1000}
                 onChange={handleChange}
             />
-        </>
+        </Root>
     );
 };
 
@@ -1118,26 +1158,44 @@ const MapLayerColorSelectorTemplate: ComponentStory<typeof SubsurfaceViewer> = (
     const [isNearest, setIsNearest] = React.useState(false);
 
     // user defined breakpoint(domain)
-    const userDefinedBreakPoint = React.useCallback((data) => {
-        if (data) setBreakPoint(data.colorArray);
-    }, []);
+    const userDefinedBreakPoint = React.useCallback(
+        (data: { colorArray: React.SetStateAction<undefined> }) => {
+            if (data) setBreakPoint(data.colorArray);
+        },
+        []
+    );
 
     // Get color name from color selector
-    const colorNameFromSelector = React.useCallback((data) => {
-        setColorName(data);
-    }, []);
+    const colorNameFromSelector = React.useCallback(
+        (data: React.SetStateAction<string>) => {
+            setColorName(data);
+        },
+        []
+    );
 
     // user defined range
-    const userDefinedRange = React.useCallback((data) => {
-        if (data.range) setRange(data.range);
-        setAuto(data.isAuto);
-    }, []);
+    const userDefinedRange = React.useCallback(
+        (data: {
+            range: React.SetStateAction<undefined>;
+            isAuto: React.SetStateAction<undefined>;
+        }) => {
+            if (data.range) setRange(data.range);
+            setAuto(data.isAuto);
+        },
+        []
+    );
 
     // Get interpolation method from color selector to layer
-    const getInterpolateMethod = React.useCallback((data) => {
-        setIsLog(data.isLog);
-        setIsNearest(data.isNearest);
-    }, []);
+    const getInterpolateMethod = React.useCallback(
+        (data: {
+            isLog: boolean | ((prevState: boolean) => boolean);
+            isNearest: boolean | ((prevState: boolean) => boolean);
+        }) => {
+            setIsLog(data.isLog);
+            setIsNearest(data.isNearest);
+        },
+        []
+    );
 
     // color map function
     const colorMapFunc = React.useCallback(() => {
@@ -1205,6 +1263,7 @@ const ContourLinesStory = (props: {
     contourOffset: number;
     zContourInterval: number;
     propertyContourInterval: number;
+    marginPixels: number;
 }) => {
     const views: ViewsType = {
         layout: [2, 2],
@@ -1306,4 +1365,5 @@ ContourLines.args = {
     contourOffset: 0,
     zContourInterval: 100,
     propertyContourInterval: 5000,
+    marginPixels: 0,
 };

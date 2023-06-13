@@ -1,6 +1,10 @@
 import React from "react";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
+import { View } from "../../../..";
+import { ViewsType } from "../../components/Map";
+
+type NumberQuad = [number, number, number, number];
 
 export default {
     component: SubsurfaceViewer,
@@ -8,8 +12,13 @@ export default {
 } as ComponentMeta<typeof SubsurfaceViewer>;
 
 const layerProps = {
-    marginH: 100, // Horizontal margin (in pixels)
-    marginV: 40, // Vertical margin (in pixels)
+    marginH: 80, // Horizontal margin (in pixels)
+    marginV: 30, // Vertical margin (in pixels)
+    isLeftRuler: true,
+    isRightRuler: false,
+    isBottomRuler: true,
+    isTopRuler: false,
+    backgroundColor: [155, 155, 155, 255],
 };
 
 const meshMapLayerPng = {
@@ -51,7 +60,6 @@ Base.args = {
         viewports: [
             {
                 id: "view_1",
-                zoom: -3.5,
                 show3D: false,
             },
         ],
@@ -82,9 +90,61 @@ ColoredTextAndBackGround.args = {
         viewports: [
             {
                 id: "view_1",
-                zoom: -3.5,
                 show3D: false,
             },
         ],
     },
+};
+
+//===========================================================
+const MatrixStory = () => {
+    const views: ViewsType = {
+        layout: [2, 2],
+        marginPixels: 10,
+        viewports: [
+            {
+                id: "view_1",
+                show3D: false,
+                layerIds: ["mesh-layer", "axes-layer2D"],
+                isSync: false,
+            },
+            {
+                id: "view_2",
+                show3D: false,
+                layerIds: ["mesh-layer", "axes-layer2D"],
+                isSync: false,
+            },
+            {
+                id: "view_3",
+                show3D: false,
+                layerIds: ["mesh-layer", "axes-layer2D"],
+                isSync: false,
+            },
+            {
+                id: "view_4",
+                show3D: false,
+                layerIds: ["mesh-layer", "axes-layer2D"],
+                isSync: false,
+            },
+        ],
+    };
+
+    const bounds = [432150, 6475800, 439400, 6481501] as NumberQuad;
+    return (
+        <SubsurfaceViewer
+            id={"test"}
+            layers={[meshMapLayerPng, axes2D]}
+            views={views}
+            bounds={bounds}
+        >
+            <View id="view_1"></View>
+            <View id="view_2"></View>
+            <View id="view_3"></View>
+            <View id="view_4"></View>
+        </SubsurfaceViewer>
+    );
+};
+
+export const Matrix: ComponentStory<typeof MatrixStory> = () => {
+    return <MatrixStory />;
 };

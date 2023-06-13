@@ -18,7 +18,7 @@ import {
     OverlayRescaleEvent,
 } from "@equinor/videx-wellog/dist/ui/interfaces";
 
-import "!vue-style-loader!css-loader!sass-loader!./styles.scss";
+import "./styles.scss";
 
 import { validateSchema } from "../../../inputSchema/validator";
 

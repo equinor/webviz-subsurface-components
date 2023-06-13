@@ -4,9 +4,9 @@ import "jest-styled-components";
 import React from "react";
 import { Wrapper } from "../test/TestWrapper";
 import WellCompletionComponent from "./WellCompletionComponent";
+import { Data } from "../redux/types";
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const exampleData = require("../../../../demo/example-data/well-completions.json");
+import exampleData from "../../../../demo/example-data/well-completions.json";
 
 window.ResizeObserver =
     window.ResizeObserver ||
@@ -31,7 +31,10 @@ describe("Test Well Completion Component", () => {
         const { container } = render(
             Wrapper({
                 children: (
-                    <WellCompletionComponent id={""} data={exampleData} />
+                    <WellCompletionComponent
+                        id={""}
+                        data={exampleData as unknown as Data}
+                    />
                 ),
             })
         );

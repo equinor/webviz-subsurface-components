@@ -1,10 +1,12 @@
+/* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
+
 import React from "react";
 
 import { Button, Icon } from "@equinor/eds-core-react";
 import { clear, save, sync } from "@equinor/eds-icons";
 Icon.add({ clear, save, sync });
 
-import { Grid } from "@material-ui/core";
+import { Grid } from "@mui/material";
 import { TreeDataNode } from "@webviz/core-components";
 
 import { VectorSelectorTable } from "./components/VectorSelectorTable";
@@ -19,7 +21,7 @@ import {
     ExpressionStatus,
 } from "../ExpressionsStore";
 
-import "!style-loader!css-loader!../../VectorCalculator.css";
+import "../../VectorCalculator.css";
 
 interface ExpressionEditComponentProps {
     vectors: TreeDataNode[];
@@ -144,7 +146,7 @@ export const ExpressionEditComponent: React.FC<ExpressionEditComponentProps> = (
                 container
                 item
                 spacing={2}
-                justify="flex-end"
+                justifyContent="flex-end"
                 alignContent="flex-end"
             >
                 <Grid item>

@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
+
 import React from "react";
 import SyncLogViewer from "./SyncLogViewer";
 import { argTypesSyncLogViewerProp } from "./SyncLogViewer";

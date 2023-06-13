@@ -1,7 +1,9 @@
+/* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
+
 import React from "react";
 
-import { Grid } from "@material-ui/core";
-import { Alert } from "@material-ui/lab";
+import { Grid } from "@mui/material";
+import { Alert } from "@mui/material";
 
 import { Button, Icon } from "@equinor/eds-core-react";
 import { add, copy, delete_forever } from "@equinor/eds-icons";
@@ -18,7 +20,7 @@ import {
     getDefaultExpression,
 } from "../../utils/VectorCalculatorHelperFunctions";
 
-import "!style-loader!css-loader!../../VectorCalculator.css";
+import "../../VectorCalculator.css";
 
 interface ExpressionsTableComponentProps {
     containerRef: React.RefObject<HTMLDivElement | null>;

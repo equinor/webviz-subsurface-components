@@ -1,5 +1,11 @@
+/* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
+
 import React, { useCallback, useContext, useMemo } from "react";
-import { CompletionPlotData, PlotData } from "../../utils/dataUtil";
+import {
+    CompletionPlotData,
+    PlotData,
+    WellPlotData,
+} from "../../utils/dataUtil";
 import { useTooltip } from "../Common/TooltipProvider";
 import { DataContext } from "../DataLoader";
 import { Padding, PlotLayout } from "./plotUtil";
@@ -34,7 +40,11 @@ const CompletionsPlot: React.FC<Props> = React.memo(
         );
 
         const onMouseMove = useCallback(
-            (e, well, completion: CompletionPlotData) => {
+            (
+                e: React.MouseEvent<SVGRectElement>,
+                well: WellPlotData,
+                completion: CompletionPlotData
+            ) => {
                 const zoneName =
                     plotData.stratigraphy[
                         Math.floor(

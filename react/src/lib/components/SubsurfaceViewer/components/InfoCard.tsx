@@ -1,13 +1,15 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import Collapse from "@material-ui/core/Collapse";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableContainer from "@material-ui/core/TableContainer";
-import TableRow from "@material-ui/core/TableRow";
+import {
+    Collapse,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableRow,
+} from "@mui/material";
 import { Button, Icon } from "@equinor/eds-core-react";
 import { arrow_drop_up, arrow_drop_down } from "@equinor/eds-icons";
+import { styled } from "@mui/system";
 
 import {
     ExtendedLayerProps,
@@ -41,43 +43,42 @@ const roundToSignificant = function (num: number) {
     );
 };
 
-const useStyles = makeStyles({
-    table: {
-        "& > *": {
-            backgroundColor: "#ffffffcc",
-            color: "#000000ff",
-            border: "2px solid #ccc",
-            padding: "0px",
-            borderRadius: "5px",
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            marginLeft: "3px",
-            marginBottom: "3px",
-        },
+const StyledTable = styled(Table)({
+    "& > *": {
+        backgroundColor: "#ffffffcc",
+        color: "#000000ff",
+        border: "2px solid #ccc",
+        padding: "0px",
+        borderRadius: "5px",
+        position: "absolute",
+        bottom: 0,
+        left: 0,
+        marginLeft: "3px",
+        marginBottom: "3px",
     },
-    icon_style: {
-        border: "none",
+});
+
+const StyledTableCell = styled(TableCell)({
+    border: "none",
+    padding: 0,
+    width: "20px",
+});
+
+const StyledTableRow = styled(TableRow)({
+    "& > *": {
         padding: 0,
-        width: "20px",
-    },
-    table_row: {
-        "& > *": {
-            padding: 0,
-        },
     },
 });
 
 function Row(props: { layer_data: InfoCardDataType }) {
     const { layer_data } = props;
     const [open, setOpen] = React.useState(true);
-    const classes = useStyles();
 
     if (layer_data.properties?.length == 0) return null;
     return (
         <React.Fragment>
-            <TableRow className={classes.table_row}>
-                <TableCell className={classes.icon_style}>
+            <StyledTableRow>
+                <StyledTableCell>
                     <Button
                         style={{ padding: 0 }}
                         variant="ghost"
@@ -89,10 +90,10 @@ function Row(props: { layer_data: InfoCardDataType }) {
                             <Icon color="currentColor" name="arrow_drop_down" />
                         )}
                     </Button>
-                </TableCell>
+                </StyledTableCell>
                 <TableCell> {layer_data.layerName} </TableCell>
-            </TableRow>
-            <TableRow className={classes.table_row}>
+            </StyledTableRow>
+            <StyledTableRow>
                 <TableCell
                     style={{ paddingBottom: 0, paddingTop: 0 }}
                     colSpan={2}
@@ -101,10 +102,7 @@ function Row(props: { layer_data: InfoCardDataType }) {
                         <Table size="small" aria-label="properties">
                             <TableBody>
                                 {layer_data.properties?.map((propertyRow) => (
-                                    <TableRow
-                                        key={propertyRow.name}
-                                        className={classes.table_row}
-                                    >
+                                    <StyledTableRow key={propertyRow.name}>
                                         <TableCell
                                             style={{
                                                 border: "none",
@@ -143,13 +141,13 @@ function Row(props: { layer_data: InfoCardDataType }) {
                                                   )
                                                 : propertyRow.value}
                                         </TableCell>
-                                    </TableRow>
+                                    </StyledTableRow>
                                 ))}
                             </TableBody>
                         </Table>
                     </Collapse>
                 </TableCell>
-            </TableRow>
+            </StyledTableRow>
         </React.Fragment>
     );
 }
@@ -241,11 +239,10 @@ const InfoCard: React.FC<InfoCardProps> = (props: InfoCardProps) => {
         setInfoCardData(info_card_data);
     }, [props.pickInfos]);
 
-    const classes = useStyles();
     return (
         infoCardData && (
             <TableContainer>
-                <Table aria-label="info-card" className={classes.table}>
+                <StyledTable aria-label="info-card">
                     <TableBody>
                         {infoCardData.map(
                             (card_data) =>
@@ -257,7 +254,7 @@ const InfoCard: React.FC<InfoCardProps> = (props: InfoCardProps) => {
                                 )
                         )}
                     </TableBody>
-                </Table>
+                </StyledTable>
             </TableContainer>
         )
     );

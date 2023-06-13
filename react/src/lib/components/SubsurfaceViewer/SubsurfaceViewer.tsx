@@ -9,6 +9,7 @@ import { MapMouseEvent, jsonToObject } from "./components/Map";
 import React from "react";
 import PropTypes from "prop-types";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
+import convert, { Unit } from "convert-units";
 
 export interface SubsurfaceViewerProps {
     id: string;
@@ -27,7 +28,7 @@ export interface SubsurfaceViewerProps {
         widthPerUnit?: number | null;
         cssStyle?: Record<string, unknown> | null;
     };
-    coordinateUnit?: string;
+    coordinateUnit?: Unit;
     toolbar?: {
         visible?: boolean | null;
     };
@@ -110,23 +111,27 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
     const [layerInstances, setLayerInstances] = React.useState<LayersList>([]);
 
     React.useEffect(() => {
+        if (!layers) {
+            setLayerInstances([]);
+            return;
+        }
+
         if (layers?.[0] instanceof Layer) {
             setLayerInstances(layers as LayersList);
             return;
         }
 
-        const enumerations = [];
-        const layersJson = layers as unknown;
+        const enumerations: Record<string, unknown>[] = [];
         if (resources) enumerations.push({ resources: resources });
         if (editedData) enumerations.push({ editedData: editedData });
         else enumerations.push({ editedData: {} });
         const layersList = jsonToObject(
-            layersJson as Record<string, unknown>[],
+            layers as Record<string, unknown>[],
             enumerations
         ) as LayersList;
         setLayerInstances(layersList);
-    }, [layers]);
-
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [layers]); // Note. Fixing this dependency list may cause infinite recursion.
     React.useEffect(() => {
         if (!editedData) return;
 
@@ -134,13 +139,15 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
             ...layerEditedData,
             ...editedData,
         });
-    }, [editedData]);
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [editedData]); // Note. Fixing this dependency list may cause infinite recursion.
 
     // This callback is used as a mechanism to update the component from the layers or toolbar.
     // The changes done in a layer, for example, are bundled into a patch
     // and sent to the parent component via setProps. (See layers/utils/layerTools.ts)
     const setEditedData = React.useCallback(
-        (data) => {
+        (data: Record<string, unknown>) => {
             if (setProps == undefined) return;
             setProps({
                 editedData: {
@@ -152,6 +159,13 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
         [setProps, layerEditedData]
     );
 
+    if (coordinateUnit && !convert().possibilities().includes(coordinateUnit)) {
+        console.error(
+            `Invalid coordinate unit: '${coordinateUnit}'. Valid units are: ${convert().possibilities()}`
+        );
+        coordinateUnit = undefined;
+    }
+
     return (
         <Map
             id={id}
@@ -160,7 +174,7 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
             views={views}
             coords={coords}
             scale={scale}
-            coordinateUnit={coordinateUnit}
+            coordinateUnit={coordinateUnit as Unit}
             colorTables={colorTables}
             setEditedData={setEditedData}
             checkDatafileSchema={checkDatafileSchema}
@@ -180,6 +194,7 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
 SubsurfaceViewer.defaultProps = {
     views: {
         layout: [1, 1],
+        marginPixels: 0,
         showLabel: false,
         viewports: [{ id: "main-view", show3D: false, layerIds: [] }],
     },
@@ -282,7 +297,7 @@ SubsurfaceViewer.propTypes = {
      * Parameters for the Distance Scale component
      * Unit for the scale ruler
      */
-    coordinateUnit: PropTypes.string,
+    coordinateUnit: PropTypes.oneOf(convert().possibilities()),
 
     /**
      * @obsolete Toolbar should be added as annotation. This prop has no function.

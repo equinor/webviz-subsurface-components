@@ -1,7 +1,28 @@
 import React from "react";
+import { styled } from "@mui/material/styles";
 import SubsurfaceViewer from "../SubsurfaceViewer";
 import exampleData from "../../../../demo/example-data/deckgl-map.json";
-import { makeStyles } from "@material-ui/styles";
+import { default as MapLayer } from "../layers/map/mapLayer";
+import { default as Axes2DLayer } from "../layers/axes2d/axes2DLayer";
+
+const PREFIX = "Default";
+
+const classes = {
+    main: `${PREFIX}-main`,
+};
+
+const Root = styled("div")({
+    [`& .${classes.main}`]: {
+        width: 500,
+        height: 500,
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+        border: "1px solid black",
+        background: "azure",
+        position: "absolute",
+    },
+});
 
 export default {
     component: SubsurfaceViewer,
@@ -273,8 +294,6 @@ const meshMapLayer = {
     id: "mesh-layer",
     mesh: "hugin_depth_25_m_normalized_margin.png",
     meshValueRange: [2782, 3513],
-    // Either "bounds" or "frame". "bounds" will be deprecated."
-    //bounds: [432205, 6475078, 437701, 6480898],  // [xmin, xmax, ymin, ymax]
     frame: {
         origin: [432205, 6475078],
         count: [229, 291],
@@ -287,6 +306,35 @@ const meshMapLayer = {
     isContoursDepth: true,
     colorMapName: "Physics",
 };
+
+const meshMapLayerPng = new MapLayer({
+    id: "mesh-layer-png",
+    meshUrl: "hugin_depth_25_m.png",
+    frame: {
+        origin: [432150, 6475800],
+        count: [291, 229],
+        increment: [25, 25],
+        rotDeg: 0,
+    },
+    propertiesUrl: "kh_netmap_25_m.png",
+    contours: [0, 100],
+    isContoursDepth: true,
+    gridLines: false,
+    material: true,
+    smoothShading: true,
+    colorMapName: "Physics",
+});
+
+const axes2D = new Axes2DLayer({
+    id: "axes-layer",
+    marginH: 80, // Horizontal margin (in pixels)
+    marginV: 30, // Vertical margin (in pixels)
+    isLeftRuler: true,
+    isRightRuler: false,
+    isBottomRuler: true,
+    isTopRuler: false,
+    backgroundColor: [155, 155, 155, 255],
+});
 
 export const KhMapMesh = MinimalTemplate.bind({});
 KhMapMesh.args = {
@@ -545,29 +593,52 @@ SelectableFeatureExample.args = {
     ],
 };
 
-// Map used inside a div container template
-const useStyles = makeStyles({
-    main: {
-        width: 500,
-        height: 500,
-        top: "50%",
-        left: "50%",
-        transform: "translate(-50%, -50%)",
-        border: "1px solid black",
-        background: "azure",
-        position: "absolute",
-    },
-});
-
 export const MapInContainer = (args) => {
-    const classes = useStyles();
     return (
-        <div className={classes.main}>
+        <Root className={classes.main}>
             <SubsurfaceViewer {...args} />
-        </div>
+        </Root>
     );
 };
 
 MapInContainer.args = {
     ...exampleData[0],
+};
+
+export const ViewMatrixMargin = EditDataTemplate.bind({});
+ViewMatrixMargin.args = {
+    id: "DeckGL-Map",
+    layers: [meshMapLayerPng, axes2D],
+    bounds: [432150, 6475800, 439400, 6481501],
+    views: {
+        layout: [2, 2],
+        marginPixels: 10,
+        showLabel: true,
+        viewports: [
+            {
+                id: "view_1",
+                show3D: false,
+                layerIds: ["mesh-layer-png", "axes-layer"],
+                isSync: true,
+            },
+            {
+                id: "view_2",
+                show3D: false,
+                layerIds: ["mesh-layer-png", "axes-layer"],
+                isSync: true,
+            },
+            {
+                id: "view_3",
+                show3D: false,
+                layerIds: ["mesh-layer-png", "axes-layer"],
+                isSync: false,
+            },
+            {
+                id: "view_4",
+                show3D: false,
+                layerIds: ["mesh-layer-png", "axes-layer"],
+                isSync: false,
+            },
+        ],
+    },
 };
