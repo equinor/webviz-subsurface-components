@@ -1069,7 +1069,7 @@ function createViewsAndViewStates(
 
     // if props for multiple viewport are not proper, return 2d view
     if (!isOk) {
-        console.error(
+        console.warn(
             "Properties for multiple viewports are not properly defined."
         );
         deckgl_views.push(
