@@ -15,7 +15,7 @@ module.exports = {
         ],
     },
     transformIgnorePatterns: [
-        "<rootDir>/node_modules/(?!(@webviz|(@emerson-eps/color-tables)|d3-.+|d3|delaunator|robust-predicates)/)",
+        "<rootDir>/node_modules/(?!(@webviz|(@emerson-eps/color-tables)|d3-.+|d3|delaunator|robust-predicates|@mapbox/tiny-sdf)/)",
     ],
     testPathIgnorePatterns: ["<rootDir>/node_modules", "<rootDir>/dist"],
     modulePathIgnorePatterns: ["<rootDir>/dist"],
