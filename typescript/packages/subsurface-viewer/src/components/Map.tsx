@@ -364,21 +364,12 @@ const Map: React.FC<MapProps> = ({
         bottom: 0,
     });
 
-    // Used for scaling in z direction using arrow keys.
-    const [scaleZ, setScaleZ] = useState<number>(1);
-    const [scaleZUp, setScaleZUp] = useState<number>(Number.MAX_VALUE);
-    const [scaleZDown, setScaleZDown] = useState<number>(Number.MAX_VALUE);
-
-    const scaleUpFunction = () => {
-        setScaleZUp(Math.random());
-    };
-
-    const scaleDownFunction = () => {
-        setScaleZDown(Math.random());
-    };
-
-    // Calculate a set of Deck.gl View's and viewStates as input to Deck.gl
     useEffect(() => {
+        setDeckGLLayers(alteredLayers);
+    }, [alteredLayers]);
+
+    useEffect(() => {
+        // Calculate a set of Deck.gl View's and viewStates as input to Deck.gl
         const [Views, viewStates] = createViewsAndViewStates(
             views,
             viewPortMargins,
@@ -397,16 +388,11 @@ const Map: React.FC<MapProps> = ({
         cameraPosition,
         views?.viewports,
         deckRef?.current?.deck,
-        reportedBoundingBox,
         reportedBoundingBoxAcc,
         views,
         viewPortMargins,
         triggerHome,
     ]);
-
-    useEffect(() => {
-        setDeckGLLayers(alteredLayers);
-    }, [alteredLayers]);
 
     useEffect(() => {
         const union_of_reported_bboxes = addBoundingBoxes(
@@ -417,32 +403,39 @@ const Map: React.FC<MapProps> = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [reportedBoundingBox]);
 
+    // Used for scaling in z direction using arrow keys.
+    const [scaleZ, setScaleZ] = useState<number>(1);
+    const [scaleZUp, setScaleZUp] = useState<number>(1);
+    const [scaleZDown, setScaleZDown] = useState<number>(1);
+
+    const scaleUpFunction = () => {
+        setScaleZUp(Math.random());
+    };
+
+    const scaleDownFunction = () => {
+        setScaleZDown(Math.random());
+    };
+
     useEffect(() => {
-        if (scaleZUp !== Number.MAX_VALUE) {
-            const newScaleZ = scaleZ * 1.05;
-            setScaleZ(newScaleZ);
-            // Make camera target follow the scaling.
-            const vs = adjustCameraTarget(viewStates, scaleZ, newScaleZ);
-            setViewStates(vs);
-        }
+        const newScaleZ = scaleZ * 1.05;
+        setScaleZ(newScaleZ);
+        // Make camera target follow the scaling.
+        const vs = adjustCameraTarget(viewStates, scaleZ, newScaleZ);
+        setViewStates(vs);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [scaleZUp]);
 
     useEffect(() => {
-        if (scaleZUp !== Number.MAX_VALUE) {
-            const newScaleZ = scaleZ * 0.95;
-            setScaleZ(newScaleZ);
-            // Make camera target follow the scaling.
-            const vs = adjustCameraTarget(viewStates, scaleZ, newScaleZ);
-            setViewStates(vs);
-        }
+        const newScaleZ = scaleZ * 0.95;
+        setScaleZ(newScaleZ);
+        // Make camera target follow the scaling.
+        const vs = adjustCameraTarget(viewStates, scaleZ, newScaleZ);
+        setViewStates(vs);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [scaleZDown]);
 
     useEffect(() => {
-        if (typeof layers === "undefined") {
-            return;
-        }
+        if (layers == undefined) return;
 
         // Margins on the viewport are extracted from a potenial axes2D layer.
         const axes2DLayer = layers?.find((e) => {
@@ -468,44 +461,27 @@ const Map: React.FC<MapProps> = ({
 
         setViewPortMargins({ left, right, top, bottom });
 
+        const m = getModelMatrixScale(scaleZ);
+
         const layers_copy = layers.map((item) => {
-            if (item?.constructor.name === NorthArrow3DLayer.name) {
-                return item;
-            }
+            if (item?.constructor.name === NorthArrow3DLayer.name) return item;
+
+            const layer = item as Layer;
+
+            // Set "modelLayer" matrix to reflect correct z scaling.
+            const scaledLayer = layer.clone({ modelMatrix: m });
 
             // Inject "setReportedBoundingBox" function into layer for it to report
             // back its respective bounding box.
-            return (item as Layer).clone({
-                // eslint-disable-next-line
-                // @ts-ignore
+            const boundedLayer = scaledLayer.clone({
                 setReportedBoundingBox: setReportedBoundingBox,
             });
+
+            return boundedLayer ?? scaledLayer;
         });
 
         setAlteredLayers(layers_copy);
-    }, [layers]);
-
-    useEffect(() => {
-        if (typeof layers === "undefined") {
-            return;
-        }
-
-        const m = getModelMatrixScale(scaleZ);
-
-        const layers_copy = deckGLLayers.map((item) => {
-            if (item?.constructor.name === NorthArrow3DLayer.name) {
-                return item;
-            }
-
-            // Set "modelLayer" matrix to reflect correct z scaling.
-            return (item as Layer).clone({
-                modelMatrix: m,
-            });
-        });
-
-        setDeckGLLayers(layers_copy);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [scaleZ]);
+    }, [scaleZ, layers]);
 
     useEffect(() => {
         const layers = deckRef.current?.deck?.props.layers;
@@ -1024,6 +1000,7 @@ function getViewState3D(
 // construct views and viewStates for DeckGL component
 function createViewsAndViewStates(
     views: ViewsType | undefined,
+
     viewPortMargins: marginsType,
     bounds: [number, number, number, number] | BoundsAccessor | undefined,
     cameraPosition: ViewStateType | undefined,
