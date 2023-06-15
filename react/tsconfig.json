@@ -22,5 +22,5 @@
         "skipLibCheck": true,
         "resolveJsonModule": true
     },
-    "include": ["./src/lib", "./src/lib/custom.d.ts"]
+    "exclude": ["**/*.test.tsx", "**/test/*.tsx", "**/*.stories.tsx"]
 }
