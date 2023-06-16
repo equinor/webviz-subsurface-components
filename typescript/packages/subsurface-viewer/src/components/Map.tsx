@@ -369,32 +369,6 @@ const Map: React.FC<MapProps> = ({
     }, [alteredLayers]);
 
     useEffect(() => {
-        // Calculate a set of Deck.gl View's and viewStates as input to Deck.gl
-        const [Views, viewStates] = createViewsAndViewStates(
-            views,
-            viewPortMargins,
-            bounds,
-            cameraPosition,
-            reportedBoundingBoxAcc,
-            scaleUpFunction,
-            scaleDownFunction,
-            deckRef.current?.deck
-        );
-
-        setDeckGLViews(Views);
-        setViewStates(viewStates);
-    }, [
-        bounds,
-        cameraPosition,
-        views?.viewports,
-        deckRef?.current?.deck,
-        reportedBoundingBoxAcc,
-        views,
-        viewPortMargins,
-        triggerHome,
-    ]);
-
-    useEffect(() => {
         const union_of_reported_bboxes = addBoundingBoxes(
             reportedBoundingBoxAcc,
             reportedBoundingBox
@@ -435,7 +409,9 @@ const Map: React.FC<MapProps> = ({
     }, [scaleZDown]);
 
     useEffect(() => {
-        if (layers == undefined) return;
+        if (typeof layers === "undefined") {
+            return;
+        }
 
         // Margins on the viewport are extracted from a potenial axes2D layer.
         const axes2DLayer = layers?.find((e) => {
@@ -461,27 +437,71 @@ const Map: React.FC<MapProps> = ({
 
         setViewPortMargins({ left, right, top, bottom });
 
-        const m = getModelMatrixScale(scaleZ);
-
         const layers_copy = layers.map((item) => {
-            if (item?.constructor.name === NorthArrow3DLayer.name) return item;
-
-            const layer = item as Layer;
-
-            // Set "modelLayer" matrix to reflect correct z scaling.
-            const scaledLayer = layer.clone({ modelMatrix: m });
+            if (item?.constructor.name === NorthArrow3DLayer.name) {
+                return item;
+            }
 
             // Inject "setReportedBoundingBox" function into layer for it to report
             // back its respective bounding box.
-            const boundedLayer = scaledLayer.clone({
+            return (item as Layer).clone({
+                // eslint-disable-next-line
+                // @ts-ignore
                 setReportedBoundingBox: setReportedBoundingBox,
             });
-
-            return boundedLayer ?? scaledLayer;
         });
 
         setAlteredLayers(layers_copy);
-    }, [scaleZ, layers]);
+    }, [layers]);
+
+    useEffect(() => {
+        if (typeof layers === "undefined") {
+            return;
+        }
+
+        const m = getModelMatrixScale(scaleZ);
+
+        const layers_copy = deckGLLayers.map((item) => {
+            if (item?.constructor.name === NorthArrow3DLayer.name) {
+                return item;
+            }
+
+            // Set "modelLayer" matrix to reflect correct z scaling.
+            return (item as Layer).clone({
+                modelMatrix: m,
+            });
+        });
+
+        setDeckGLLayers(layers_copy);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [scaleZ]);
+
+    useEffect(() => {
+        // Calculate a set of Deck.gl View's and viewStates as input to Deck.gl
+        const [Views, viewStates] = createViewsAndViewStates(
+            views,
+            viewPortMargins,
+            bounds,
+            cameraPosition,
+            reportedBoundingBoxAcc,
+            scaleUpFunction,
+            scaleDownFunction,
+            deckRef.current?.deck
+        );
+
+        setDeckGLViews(Views);
+        setViewStates(viewStates);
+    }, [
+        bounds,
+        cameraPosition,
+        views?.viewports,
+        deckRef?.current?.deck,
+        reportedBoundingBox,
+        reportedBoundingBoxAcc,
+        views,
+        viewPortMargins,
+        triggerHome,
+    ]);
 
     useEffect(() => {
         const layers = deckRef.current?.deck?.props.layers;
@@ -1000,7 +1020,6 @@ function getViewState3D(
 // construct views and viewStates for DeckGL component
 function createViewsAndViewStates(
     views: ViewsType | undefined,
-
     viewPortMargins: marginsType,
     bounds: [number, number, number, number] | BoundsAccessor | undefined,
     cameraPosition: ViewStateType | undefined,
