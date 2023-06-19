@@ -364,19 +364,6 @@ const Map: React.FC<MapProps> = ({
         bottom: 0,
     });
 
-    useEffect(() => {
-        setDeckGLLayers(alteredLayers);
-    }, [alteredLayers]);
-
-    useEffect(() => {
-        const union_of_reported_bboxes = addBoundingBoxes(
-            reportedBoundingBoxAcc,
-            reportedBoundingBox
-        );
-        setReportedBoundingBoxAcc(union_of_reported_bboxes);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [reportedBoundingBox]);
-
     // Used for scaling in z direction using arrow keys.
     const [scaleZ, setScaleZ] = useState<number>(1);
     const [scaleZUp, setScaleZUp] = useState<number>(1);
@@ -389,6 +376,46 @@ const Map: React.FC<MapProps> = ({
     const scaleDownFunction = () => {
         setScaleZDown(Math.random());
     };
+
+    // Calculate a set of Deck.gl View's and viewStates as input to Deck.gl
+    useEffect(() => {
+        const [Views, viewStates] = createViewsAndViewStates(
+            views,
+            viewPortMargins,
+            bounds,
+            cameraPosition,
+            reportedBoundingBoxAcc,
+            scaleUpFunction,
+            scaleDownFunction,
+            deckRef.current?.deck
+        );
+
+        setDeckGLViews(Views);
+        setViewStates(viewStates);
+    }, [
+        bounds,
+        cameraPosition,
+        views?.viewports,
+        deckRef?.current?.deck,
+        reportedBoundingBox,
+        reportedBoundingBoxAcc,
+        views,
+        viewPortMargins,
+        triggerHome,
+    ]);
+
+    useEffect(() => {
+        setDeckGLLayers(alteredLayers);
+    }, [alteredLayers]);
+
+    useEffect(() => {
+        const union_of_reported_bboxes = addBoundingBoxes(
+            reportedBoundingBoxAcc,
+            reportedBoundingBox
+        );
+        setReportedBoundingBoxAcc(union_of_reported_bboxes);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [reportedBoundingBox]);
 
     useEffect(() => {
         const newScaleZ = scaleZ * 1.05;
@@ -475,33 +502,6 @@ const Map: React.FC<MapProps> = ({
         setDeckGLLayers(layers_copy);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [scaleZ]);
-
-    useEffect(() => {
-        // Calculate a set of Deck.gl View's and viewStates as input to Deck.gl
-        const [Views, viewStates] = createViewsAndViewStates(
-            views,
-            viewPortMargins,
-            bounds,
-            cameraPosition,
-            reportedBoundingBoxAcc,
-            scaleUpFunction,
-            scaleDownFunction,
-            deckRef.current?.deck
-        );
-
-        setDeckGLViews(Views);
-        setViewStates(viewStates);
-    }, [
-        bounds,
-        cameraPosition,
-        views?.viewports,
-        deckRef?.current?.deck,
-        reportedBoundingBox,
-        reportedBoundingBoxAcc,
-        views,
-        viewPortMargins,
-        triggerHome,
-    ]);
 
     useEffect(() => {
         const layers = deckRef.current?.deck?.props.layers;
