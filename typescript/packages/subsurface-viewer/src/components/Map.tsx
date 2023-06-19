@@ -366,8 +366,8 @@ const Map: React.FC<MapProps> = ({
 
     // Used for scaling in z direction using arrow keys.
     const [scaleZ, setScaleZ] = useState<number>(1);
-    const [scaleZUp, setScaleZUp] = useState<number>(1);
-    const [scaleZDown, setScaleZDown] = useState<number>(1);
+    const [scaleZUp, setScaleZUp] = useState<number>(Number.MAX_VALUE);
+    const [scaleZDown, setScaleZDown] = useState<number>(Number.MAX_VALUE);
 
     const scaleUpFunction = () => {
         setScaleZUp(Math.random());
@@ -418,20 +418,24 @@ const Map: React.FC<MapProps> = ({
     }, [reportedBoundingBox]);
 
     useEffect(() => {
-        const newScaleZ = scaleZ * 1.05;
-        setScaleZ(newScaleZ);
-        // Make camera target follow the scaling.
-        const vs = adjustCameraTarget(viewStates, scaleZ, newScaleZ);
-        setViewStates(vs);
+        if (scaleZUp !== Number.MAX_VALUE) {
+            const newScaleZ = scaleZ * 1.05;
+            setScaleZ(newScaleZ);
+            // Make camera target follow the scaling.
+            const vs = adjustCameraTarget(viewStates, scaleZ, newScaleZ);
+            setViewStates(vs);
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [scaleZUp]);
 
     useEffect(() => {
-        const newScaleZ = scaleZ * 0.95;
-        setScaleZ(newScaleZ);
-        // Make camera target follow the scaling.
-        const vs = adjustCameraTarget(viewStates, scaleZ, newScaleZ);
-        setViewStates(vs);
+        if (scaleZUp !== Number.MAX_VALUE) {
+            const newScaleZ = scaleZ * 0.95;
+            setScaleZ(newScaleZ);
+            // Make camera target follow the scaling.
+            const vs = adjustCameraTarget(viewStates, scaleZ, newScaleZ);
+            setViewStates(vs);
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [scaleZDown]);
 
