@@ -20,7 +20,7 @@ import {
 
 import "./styles.scss";
 
-import { validateSchema } from "../../../inputSchema/validator";
+import { validateSchema } from "subsurface-viewer/dist/inputSchema/validator";
 
 import { select } from "d3";
 

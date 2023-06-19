@@ -4,11 +4,11 @@ import React from "react";
 import PropTypes from "prop-types";
 
 import { WeakValidationMap } from "react";
-import SubsurfaceViewer from "../SubsurfaceViewer";
-import { SubsurfaceViewerProps } from "../SubsurfaceViewer";
+import SubsurfaceViewer from "subsurface-viewer";
+import { SubsurfaceViewerProps } from "subsurface-viewer";
 import { Color } from "@deck.gl/core/typed";
 
-import { WellsLayer } from "../SubsurfaceViewer/layers";
+import { WellsLayer } from "subsurface-viewer/dist/layers";
 import {
     Template,
     TemplateTrack,
@@ -17,10 +17,10 @@ import {
 } from "./components/WellLogTemplateTypes";
 
 import { WellLog } from "./components/WellLogTypes";
-import welllogsJson from "../../../demo/example-data/volve_logs.json";
+import welllogsJson from "../demo/example-data/volve_logs.json";
 const welllogs = welllogsJson as unknown as WellLog[];
 
-import templateJson from "../../../demo/example-data/welllog_template_2.json";
+import templateJson from "../demo/example-data/welllog_template_2.json";
 const template = templateJson as unknown as Template;
 
 import { ColorTable } from "./components/ColorTableTypes";
@@ -28,7 +28,7 @@ import { ColorTable } from "./components/ColorTableTypes";
 import { WellLogController } from "./components/WellLogView";
 import { LogViewer } from "@equinor/videx-wellog";
 import { Info } from "./components/InfoTypes";
-import { MapMouseEvent } from "../SubsurfaceViewer/components/Map";
+import { MapMouseEvent } from "subsurface-viewer/dist/components/Map";
 
 import InfoPanel from "./components/InfoPanel";
 import WellLogViewWithScroller from "./components/WellLogViewWithScroller";
@@ -40,8 +40,8 @@ import { deepCopy } from "./utils/deepcopy";
 import { WellLogViewOptions } from "./components/WellLogView";
 import { isEqualRanges } from "./components/WellLogView";
 
-import wellPicks from "../../../demo/example-data/wellpicks.json";
-import colorTables from "../../../demo/example-data/wellpick_colors.json";
+import wellPicks from "../demo/example-data/wellpicks.json";
+import colorTables from "../demo/example-data/wellpick_colors.json";
 
 function getTemplatePlotColorTable(
     template: Template,
