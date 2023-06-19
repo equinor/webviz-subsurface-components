@@ -25,7 +25,7 @@ import fitBounds from "../utils/fit-bounds";
 import {
     validateColorTables,
     validateLayers,
-} from "../../../inputSchema/schemaValidationUtil";
+} from "../inputSchema/schemaValidationUtil";
 import { LayerPickInfo } from "../layers/utils/layerTools";
 import { getLayersByType } from "../layers/utils/layerTools";
 import { getWellLayerByTypeAndSelectedWells } from "../layers/utils/layerTools";
