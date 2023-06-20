@@ -170,7 +170,7 @@ jobs:
         run: |
           npm config set '//registry.npmjs.org/:_authToken' '${NPM_TOKEN}'
           cd packages/subsurface-viewer
-          npm version --no-git-tag-version 0.0.2-alpha.2  # ${GITHUB_REF//refs\/tags\//}
+          npm version --no-git-tag-version 0.0.2-alpha.3  # ${GITHUB_REF//refs\/tags\//}
           # Use 'latest' tag if $NPM_PUBLISH_TAG is not set:
           npm publish --access public --tag ${NPM_PUBLISH_TAG:-latest}
 
