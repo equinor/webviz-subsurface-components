@@ -4,11 +4,11 @@ import React from "react";
 import PropTypes from "prop-types";
 
 import { WeakValidationMap } from "react";
-import SubsurfaceViewer from "subsurface-viewer";
-import { SubsurfaceViewerProps } from "subsurface-viewer";
+import SubsurfaceViewer from "@webviz/subsurface-viewer";
+import { SubsurfaceViewerProps } from "@webviz/subsurface-viewer";
 import { Color } from "@deck.gl/core/typed";
 
-import { WellsLayer } from "subsurface-viewer/dist/layers";
+import { WellsLayer } from "@webviz/subsurface-viewer/dist/layers";
 import {
     Template,
     TemplateTrack,
@@ -28,7 +28,7 @@ import { ColorTable } from "./components/ColorTableTypes";
 import { WellLogController } from "./components/WellLogView";
 import { LogViewer } from "@equinor/videx-wellog";
 import { Info } from "./components/InfoTypes";
-import { MapMouseEvent } from "subsurface-viewer/dist/components/Map";
+import { MapMouseEvent } from "@webviz/subsurface-viewer/dist/components/Map";
 
 import InfoPanel from "./components/InfoPanel";
 import WellLogViewWithScroller from "./components/WellLogViewWithScroller";

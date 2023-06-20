@@ -1,5 +1,5 @@
 {
-  "name": "well-completions",
+  "name": "@webviz/well-completions",
   "version": "0.0.0",
   "description": "",
   "main": "src/index.js",
