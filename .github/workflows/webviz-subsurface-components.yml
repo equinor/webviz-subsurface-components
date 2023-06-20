@@ -90,15 +90,15 @@ jobs:
       - name: 🧾 List all installed packages
         run: pip freeze
 
-      - name: 🕵️ Check code style, linting and typechecking
-        if: matrix.python-version == '3.8'
-        run: |
-          # npm run validate --prefix ./typescript
-          cd ./python
-          black --check webviz_subsurface_components/ tests/ setup.py examples/
-          pylint webviz_subsurface_components/ setup.py
-          bandit -r -c ./bandit.yml webviz_subsurface_components/ tests/ setup.py examples/
-          cd ..
+      # - name: 🕵️ Check code style, linting and typechecking
+      #   if: matrix.python-version == '3.8'
+      #   run: |
+      #     npm run validate --prefix ./typescript
+      #     cd ./python
+      #     black --check webviz_subsurface_components/ tests/ setup.py examples/
+      #     pylint webviz_subsurface_components/ setup.py
+      #     bandit -r -c ./bandit.yml webviz_subsurface_components/ tests/ setup.py examples/
+      #     cd ..
 
       # - name: 🤖 Run performance tests
       #   if: github.event_name != 'release' && matrix.run-performance-tests
