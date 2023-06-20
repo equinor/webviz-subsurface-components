@@ -42,7 +42,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
 
       - name: 📦 Install build dependencies
         # The deckgl types package runs a postscript to setup, but since we ignore scripts, we need to set it up manually.
@@ -51,10 +51,10 @@ jobs:
           # In https://github.com/equinor/webviz-subsurface-components/pull/1010 we
           # loosened up npm constraint to include npm version using lockfileVersion: 1
           # for downstream users. However in the development of this repository we
-          # want to limit ourselves to lockfileVersion: 2. 
+          # want to limit ourselves to lockfileVersion: 3. 
           # While waiting for dropping node 14 and npm 6 support, we include this manual
           # check:
-          grep -q '"lockfileVersion": 2,' ./typescript/package-lock.json
+          grep -q '"lockfileVersion": 3,' ./typescript/package-lock.json
 
           npm ci CYPRESS_INSTALL_BINARY=0 --ignore-scripts --prefix ./typescript
           # npm run copy-package-json --prefix ./typescript
