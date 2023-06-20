@@ -57,7 +57,6 @@ jobs:
           grep -q '"lockfileVersion": 3,' ./typescript/package-lock.json
 
           npm ci CYPRESS_INSTALL_BINARY=0 --ignore-scripts --prefix ./typescript
-          cp ./typescript/packages/dash-components/package.json python/webviz_subsurface_components/package.json
           cd python
           pip install "werkzeug<2.1"  # ...while waiting for https://github.com/plotly/dash/issues/1992
           pip install "dash<2.5"  # Build issue upstream in dash==2.5

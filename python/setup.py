@@ -12,19 +12,6 @@ from setuptools import setup
 with open("README.md", "r", encoding="utf8") as fh:
     long_description = fh.read()
 
-with open(
-    os.path.join("webviz_subsurface_components", "package.json"), encoding="utf8"
-) as f:
-    package = json.load(f)
-
-package_name = (
-    package["name"]
-    .replace(" ", "_")
-    .replace("-", "_")
-    .replace("/", "_")
-    .replace("@", "")
-)
-
 INSTALL_REQUIRES = [
     "dash>=2.0",
     "numpy>=1.14",
@@ -50,12 +37,12 @@ TESTS_REQUIRE = [
 ]
 
 setup(
-    name=package_name,
-    author=package["author"],
-    packages=[package_name],
+    name="webviz-subsurface-components",
+    author="Equinor <opensource@equinor.com>",
+    packages=["webviz_subsurface_components"],
     include_package_data=True,
-    license=package["license"],
-    description=package["description"],
+    license="MPL-2.0",
+    description="Custom Dash subsurface components",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/equinor/webviz-subsurface-components",
