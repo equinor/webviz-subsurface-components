@@ -8,4 +8,4 @@
 `webviz-subsurface-components` is a TypeScript (React) and Python (Dash) component library for use in subsurface related dashboards.
 There is a storybook available at https://equinor.github.io/webviz-subsurface-components/.
 
-For language specific details, see the documentation in `/react` or `/python`.
+For language specific details, see the documentation in `/typescript` or `/python`.

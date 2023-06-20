@@ -54,3 +54,8 @@ You can then manually build an components using
 npx nx build <package-name>
 ```
 where package names is either `group-tree`, `subsurface-viewer`, `well-completions` or `well-log-viewer`.
+
+Alternatively you can build all by running e.g.
+```shell
+npx nx run-many -t build
+```
