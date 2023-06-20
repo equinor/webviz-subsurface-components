@@ -64,6 +64,8 @@ import {
     getSelectedTrackIndices,
     setSelectedTrackIndices,
 } from "../utils/log-viewer";
+import { Info } from "./InfoTypes";
+import { LithologyInfoTable } from "./LithologyTrack";
 
 const rubberBandSize = 9;
 const rubberBandOffset = rubberBandSize / 2;
@@ -698,14 +700,16 @@ function setTracksToController(
     axes: AxesInfo,
     welllog: WellLog | undefined, // JSON Log Format
     template: Template, // JSON
-    colorTables: ColorTable[] // JSON
+    colorTables: ColorTable[], // JSON
+    lithologyInfoTable?: LithologyInfoTable
 ): ScaleInterpolator {
     const { tracks, minmaxPrimaryAxis, primaries, secondaries } = createTracks(
         welllog,
         axes,
         template.tracks,
         template.styles,
-        colorTables
+        colorTables,
+        lithologyInfoTable
     );
     logController.reset();
     const scaleInterpolator = createScaleInterpolator(primaries, secondaries);
@@ -923,8 +927,6 @@ export interface WellLogController {
     getTemplate(): Template;
 }
 
-import { Info } from "./InfoTypes";
-
 export interface WellLogViewOptions {
     /**
      * Fill with color between well picks
@@ -967,6 +969,11 @@ export interface WellLogViewProps {
      * Prop containing track template data.
      */
     template: Template;
+
+    /**
+     * Table of codes, names, patterns and color for lithology (canvas) tracks
+     */
+    lithologyInfoTable?: LithologyInfoTable;
 
     /**
      * Prop containing color table data for discrete well logs
@@ -1076,6 +1083,10 @@ export const argTypesWellLogViewProp = {
     },
     colorTables: {
         description: "Prop containing color table data for discrete well logs.",
+    },
+    lithologyInfoTable: {
+        description:
+            "Lithology code, lithology name, image reference and color for lithology tracks",
     },
     wellpick: {
         description: "Well Picks data",
@@ -1446,7 +1457,8 @@ class WellLogView
                 axes,
                 this.props.welllog,
                 this.template,
-                this.props.colorTables
+                this.props.colorTables,
+                this.props.lithologyInfoTable
             );
             addWellPickOverlay(this.logController, this);
         }

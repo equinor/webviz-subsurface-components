@@ -1,0 +1,79 @@
+[
+  {
+    "header": {
+      "name": "LIS1  .001",
+      "well": "15/9-19A",
+      "operator": "STATOIL",
+      "source": "Converted from LIS by Log Studio 4.87 - Petroware AS",
+      "startIndex": 2179,
+      "endIndex": 4131,
+      "step": 1
+    },
+    "curves": [
+      {
+          "name": "MD",
+          "description": "continuous",
+          "quantity": "m",
+          "unit": "m",
+          "valueType": "float",
+          "dimensions": 1
+      },
+      {
+          "name": "ZONELOG",
+          "description": "discrete",
+          "quantity": "DISC",
+          "unit": "DISC",
+          "valueType": "integer",
+          "dimensions": 1
+      },
+      {
+          "name": "FACIES",
+          "description": "discrete",
+          "quantity": "DISC",
+          "unit": "DISC",
+          "valueType": "integer",
+          "dimensions": 1
+      },
+      {
+        "name": "PORO",
+        "description": "continuous",
+        "quantity": "",
+        "unit": "",
+        "valueType": "float",
+        "dimensions": 1
+    }
+    ],
+    "data": [
+      [
+        1400,
+        2,
+        1,
+        0.247
+      ],
+      [
+        2179,
+        1,
+        2,
+        0.247
+      ],
+      [
+        2300.0,
+        3,
+        3,
+        0.137
+      ],
+      [
+        3541.6,
+        3,
+        4,
+        0.237
+      ],
+      [
+        4000,
+        4,
+        5,
+        0.337
+      ]
+    ]
+  }
+]

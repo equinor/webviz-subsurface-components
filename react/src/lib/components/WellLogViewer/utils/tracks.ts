@@ -57,6 +57,13 @@ import { updateLegendRows } from "./log-viewer";
 
 import { deepCopy } from "./deepcopy";
 
+import { createPlotType } from "@equinor/videx-wellog";
+import { defaultPlotFactory } from "@equinor/videx-wellog";
+import {
+    LithologyTrack,
+    LithologyInfoTable,
+    LithologyTrackOptions,
+} from "../components/LithologyTrack";
 export function indexOfElementByName(array: Named[], name: string): number {
     if (array && name) {
         const nameUpper = name.toUpperCase();
@@ -262,7 +269,7 @@ function isValidPlotType(plotType: string): boolean {
             "area",
             "differential",
             "gradientfill",
-
+            "canvas",
             "stacked",
         ].indexOf(plotType) >= 0
     );
@@ -971,6 +978,28 @@ function createAreaData(
     };
 }
 
+async function createLithologyData(
+    data: [number | null, number | string | null][]
+) {
+    // Remove possibly null values for depth
+    const data_no_null_depths = data.filter((elem) => {
+        return elem[0] !== null;
+    });
+    // Setup areas where value used for interval is taken from the first depth (current code has a bug where value is taken from the last depth)
+    return data_no_null_depths.map((dataRow, index) => {
+        const value = dataRow[1] == null ? Number.NaN : dataRow[1].toString();
+        return {
+            from: dataRow[0],
+            to:
+                index < data.length - 1
+                    ? data_no_null_depths[index + 1][0]
+                    : dataRow[0],
+            name: value,
+            color: { r: 255, g: 25, b: 25 }, // Apparently, this is needed by the mother class in videx, use dummy for now
+        };
+    });
+}
+
 async function createStackData(
     data: [number | null, number | string | null][],
     colorTable: ColorTable | undefined,
@@ -1060,9 +1089,6 @@ export function getDiscreteMeta(
     }
     return null; // something went wrong
 }
-
-import { createPlotType } from "@equinor/videx-wellog";
-import { defaultPlotFactory } from "@equinor/videx-wellog";
 
 const plotFactory: PlotFactory = {
     ...defaultPlotFactory,
@@ -1285,6 +1311,36 @@ function addGraphTrack(
         info.tracks.push(track);
     }
 }
+function addLithologyTrack(
+    name: string,
+    currentMinMaxPrimaryAxis: [number, number],
+    curves: WellLogCurve[],
+    data: WellLogDataRow[],
+    iPrimaryAxis: number,
+    lithologInfoTable?: LithologyInfoTable
+): LithologyTrack | undefined {
+    const iCurve = indexOfElementByName(curves, name);
+    if (iCurve < 0) return; // curve not found
+    const curve = curves[iCurve];
+
+    const dimensions = curve.dimensions === undefined ? 1 : curve.dimensions;
+    if (dimensions !== 1) return;
+
+    const plotData = preparePlotData(data, iCurve, iPrimaryAxis);
+    checkMinMax(currentMinMaxPrimaryAxis, plotData.minmaxPrimaryAxis);
+    const options: LithologyTrackOptions = {
+        abbr: name, // name of the only plot
+        legendConfig: stackLegendConfig,
+        data: createLithologyData.bind(null, plotData.data),
+        showLabels: true,
+        showLines: true,
+        lithologyInfoTable: lithologInfoTable,
+    };
+    const track = new LithologyTrack(undefined as unknown as number, options);
+    updateStackedTrackScale(track);
+    return track;
+}
+
 function addStackedTrack(
     info: TracksInfo,
     welllog: WellLog,
@@ -1359,7 +1415,7 @@ function addStackedTrack(
     info.tracks.push(track);
 }
 
-function isStackedTemplateTrack(
+function getTemplateTrackType(
     templateTrack: TemplateTrack,
     templateStyles?: TemplateStyle[]
 ) {
@@ -1370,7 +1426,7 @@ function isStackedTemplateTrack(
         templatePlot,
         templateStyles
     );
-    return templatePlotProps.type === "stacked";
+    return templatePlotProps.type;
 }
 
 export function createTracks(
@@ -1378,7 +1434,8 @@ export function createTracks(
     axes: AxesInfo,
     templateTracks: TemplateTrack[], // Part of JSON
     templateStyles?: TemplateStyle[], // Part of JSON
-    colorTables?: ColorTable[] // JSON
+    colorTables?: ColorTable[], // JSON
+    lithologyInfoTable?: LithologyInfoTable
 ): TracksInfo {
     const info = new TracksInfo();
     if (welllog) {
@@ -1394,28 +1451,49 @@ export function createTracks(
 
         if (templateTracks) {
             for (const templateTrack of templateTracks) {
-                if (isStackedTemplateTrack(templateTrack, templateStyles)) {
-                    addStackedTrack(
-                        info,
-                        welllog,
-                        curves,
-                        data,
-                        iPrimaryAxis,
-                        templateTrack,
-                        templateStyles,
-                        colorTables
-                    );
-                } else {
-                    addGraphTrack(
-                        info,
-                        welllog,
-                        curves,
-                        data,
-                        iPrimaryAxis,
-                        templateTrack,
-                        templateStyles,
-                        colorTables
-                    );
+                const trackType = getTemplateTrackType(
+                    templateTrack,
+                    templateStyles
+                );
+                switch (trackType) {
+                    case "stacked": {
+                        addStackedTrack(
+                            info,
+                            welllog,
+                            curves,
+                            data,
+                            iPrimaryAxis,
+                            templateTrack,
+                            templateStyles,
+                            colorTables
+                        );
+                        break;
+                    }
+                    case "canvas": {
+                        const lithologyTrack = addLithologyTrack(
+                            templateTrack.plots[0].name,
+                            info.minmaxPrimaryAxis,
+                            curves,
+                            data,
+                            iPrimaryAxis,
+                            lithologyInfoTable
+                        );
+                        if (lithologyTrack) info.tracks.push(lithologyTrack);
+                        break;
+                    }
+                    default: {
+                        addGraphTrack(
+                            info,
+                            welllog,
+                            curves,
+                            data,
+                            iPrimaryAxis,
+                            templateTrack,
+                            templateStyles,
+                            colorTables
+                        );
+                        break;
+                    }
                 }
             }
         }

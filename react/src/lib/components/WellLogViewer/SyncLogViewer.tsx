@@ -36,7 +36,7 @@ import { LogViewer } from "@equinor/videx-wellog";
 import { Info, InfoOptions } from "./components/InfoTypes";
 
 import { isEqualRanges } from "./components/WellLogView";
-//import { boolean } from "mathjs";
+import { LithologyInfoTable } from "./components/LithologyTrack";
 
 export function isEqualArrays(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -71,8 +71,13 @@ interface Props {
      */
     colorTables: ColorTable[];
     /**
+     * Table of codes, names, patterns and color for lithology (canvas) tracks
+     */
+    lithologyInfoTable?: LithologyInfoTable;
+    /**
      * Set to true for default titles or to array of individial welllog titles
      */
+
     viewTitles?: boolean | (boolean | string | JSX.Element)[];
 
     /**
@@ -174,6 +179,9 @@ export const argTypesSyncLogViewerProp = {
     },
     colorTables: {
         description: "Prop containing color table data.",
+    },
+    lithologyInfoTable: {
+        description: "Code, name, color and image for lithology tracks",
     },
     wellpicks: {
         description: "Well Picks data array",
@@ -851,6 +859,7 @@ class SyncLogViewer extends Component<Props, State> {
                 viewTitle={viewTitle}
                 template={template}
                 colorTables={this.props.colorTables}
+                lithologyInfoTable={this.props.lithologyInfoTable}
                 wellpick={this.props.wellpicks?.[index]}
                 patternsTable={this.props.patternsTable}
                 patterns={this.props.patterns}
@@ -1069,7 +1078,10 @@ SyncLogViewer.propTypes = {
      * Prop containing color table data
      */
     colorTables: PropTypes.array.isRequired,
-
+    /**
+     * Table of codes, names, patterns and color for lithology (canvas) tracks
+     */
+    lithologyInfoTable: PropTypes.object,
     /**
      * Well Picks data array
      */

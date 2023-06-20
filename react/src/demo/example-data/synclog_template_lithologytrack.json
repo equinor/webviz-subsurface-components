@@ -1,0 +1,86 @@
+{
+    "name": "Template 1",
+    "scale": {
+        "primary": "tvd",
+        "allowSecondary": true
+    },
+    "tracks": [
+        {
+          "plots": [
+            {
+              "name": "ZONELOG",
+              "style": "discrete"
+            }
+          ]
+        },
+        {
+          "plots": [
+            {
+              "name": "FACIES",
+              "style": "discretecanvas"
+            }
+          ]
+        },
+        {
+          "plots": [
+            {
+              "name": "PORO"
+            },
+            {
+              "name": "NTG"
+            },
+            {
+              "name": "SW"
+            }
+          ]
+        },
+        {
+            "plots": [
+                {
+                    "name": "MFOA"
+                }
+            ]
+        },
+        {
+            "plots": [
+                {
+                    "name": "SW",
+                    "type": "line"
+                }
+            ]
+        },
+        {
+            "plots": [
+                {
+                    "name": "MFIA",
+                    "type": "dot"
+                }
+            ]
+        }
+    ],
+    "styles": [
+        {
+            "name": "HKL",
+            "type": "gradientfill",
+            "colorTable": "Physics",
+            "color": "green"
+        },
+        {
+            "name": "MD",
+            "scale": "linear",
+            "type": "area",
+            "color": "blue",
+            "fill": "green"
+        },
+        {
+          "name": "discretecanvas",
+          "type": "canvas",
+          "colorTable": "Stratigraphy"
+        },
+        {
+          "name": "discrete",
+          "type": "stacked",
+          "colorTable": "Stratigraphy"
+        }
+    ]
+}

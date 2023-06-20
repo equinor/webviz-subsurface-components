@@ -8,7 +8,8 @@ export type TemplatePlotTypes =
     | "area"
     | "differential"
     | "gradientfill"
-    | "stacked";
+    | "stacked"
+    | "canvas";
 
 export type CSSColor = string;
 // rgbhexcolor pattern: "^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$"
