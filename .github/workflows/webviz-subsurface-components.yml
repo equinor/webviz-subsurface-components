@@ -81,6 +81,7 @@ jobs:
           pip install .
 
       - name: 📦 Install test dependencies
+        working-directory: ./python
         run: |
           pip install .[tests]
           wget https://chromedriver.storage.googleapis.com/$(wget https://chromedriver.storage.googleapis.com/LATEST_RELEASE -q -O -)/chromedriver_linux64.zip
