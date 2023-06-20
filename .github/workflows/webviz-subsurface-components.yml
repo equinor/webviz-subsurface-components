@@ -162,7 +162,8 @@ jobs:
       #   uses: codecov/codecov-action@v3
 
       - name: 🔼 Build and publish Node.js package
-        if: github.event_name == 'release' && matrix.python-version == '3.8'
+        #if: github.event_name == 'release' && matrix.python-version == '3.8'
+        if: matrix.python-version == '3.8'
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         working-directory: ./typescript
