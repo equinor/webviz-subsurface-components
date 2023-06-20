@@ -64,7 +64,7 @@ setup(
     extras_require={"tests": TESTS_REQUIRE, "dependencies": INSTALL_REQUIRES},
     setup_requires=["setuptools_scm~=7.0"],
     python_requires="~=3.8",
-    use_scm_version=True,
+    use_scm_version={"root": ".."},
     classifiers=[
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
