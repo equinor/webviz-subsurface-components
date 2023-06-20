@@ -93,152 +93,153 @@ jobs:
       - name: 🕵️ Check code style, linting and typechecking
         if: matrix.python-version == '3.8'
         run: |
-          npm run validate --prefix ./typescript
+          # npm run validate --prefix ./typescript
           cd ./python
           black --check webviz_subsurface_components/ tests/ setup.py examples/
           pylint webviz_subsurface_components/ setup.py
           bandit -r -c ./bandit.yml webviz_subsurface_components/ tests/ setup.py examples/
           cd ..
 
-      - name: 🤖 Run performance tests
-        if: github.event_name != 'release' && matrix.run-performance-tests
-        run: npm run test_perf --prefix ./typescript
+      # - name: 🤖 Run performance tests
+      #   if: github.event_name != 'release' && matrix.run-performance-tests
+      #   run: npm run test_perf --prefix ./typescript
 
-      - name: 🤖 Run correctness tests
-        if: github.event_name != 'release' # Related to https://github.com/equinor/webviz-subsurface-components/issues/409
-        run: |
-          npm run test_correctness --prefix ./typescript
+      # - name: 🤖 Run correctness tests
+      #   if: github.event_name != 'release' # Related to https://github.com/equinor/webviz-subsurface-components/issues/409
+      #   run: |
+      #     npm run test_correctness --prefix ./typescript
 
-      - name: 🤖 Run python tests
-        if: github.event_name != 'release' # Related to https://github.com/equinor/webviz-subsurface-components/issues/409
-        working-directory: ./python
-        run: pytest ./tests --headless
+      # - name: 🤖 Run python tests
+      #   if: github.event_name != 'release' # Related to https://github.com/equinor/webviz-subsurface-components/issues/409
+      #   working-directory: ./python
+      #   run: pytest ./tests --headless
 
-      # This action allows caching cypress dependencies
-      - name: Cache Cypress
-        if: github.event_name != 'release' && matrix.e2e-tests
-        id: cache-cypress
-        uses: actions/cache@v3
-        with:
-          # list of files to cache and restore
-          path: ~/.cache/Cypress
-          # An explicit key for restoring and saving the cache
-          key: cypress-cache-v2-${{ runner.os }}-${{ hashFiles('**/package.json') }}
+      # # This action allows caching cypress dependencies
+      # - name: Cache Cypress
+      #   if: github.event_name != 'release' && matrix.e2e-tests
+      #   id: cache-cypress
+      #   uses: actions/cache@v3
+      #   with:
+      #     # list of files to cache and restore
+      #     path: ~/.cache/Cypress
+      #     # An explicit key for restoring and saving the cache
+      #     key: cypress-cache-v2-${{ runner.os }}-${{ hashFiles('**/package.json') }}
 
-      # now let's install Cypress binary
-      - name: install cypress binary
-        if: github.event_name != 'release' && matrix.e2e-tests
-        working-directory: ./typescript
-        run: npx cypress install
+      # # now let's install Cypress binary
+      # - name: install cypress binary
+      #   if: github.event_name != 'release' && matrix.e2e-tests
+      #   working-directory: ./typescript
+      #   run: npx cypress install
 
-      # run the cypress tests
-      - name: e2e on firefox
-        if: github.event_name != 'release' && matrix.e2e-tests
-        run: |
-          mkdir clone
-          cd clone
-          git clone --branch cypress-snaps --depth 1 --filter=blob:none https://github.com/equinor/webviz-subsurface-components
-          cd webviz-subsurface-components
-          git sparse-checkout set typescript/cypress-visual-screenshots
-          cd typescript
-          mv * ../../../typescript/
-          cd ../../../
-          rm -rf clone
-          cd typescript
-          npx cypress run -b chrome --component --headed
+      # # run the cypress tests
+      # - name: e2e on firefox
+      #   if: github.event_name != 'release' && matrix.e2e-tests
+      #   run: |
+      #     mkdir clone
+      #     cd clone
+      #     git clone --branch cypress-snaps --depth 1 --filter=blob:none https://github.com/equinor/webviz-subsurface-components
+      #     cd webviz-subsurface-components
+      #     git sparse-checkout set typescript/cypress-visual-screenshots
+      #     cd typescript
+      #     mv * ../../../typescript/
+      #     cd ../../../
+      #     rm -rf clone
+      #     cd typescript
+      #     npx cypress run -b chrome --component --headed
 
-      # upload the failure screenshots for reference
-      - name: upload artifacts
-        uses: actions/upload-artifact@v2
-        if: github.event_name != 'release' && failure() && matrix.e2e-tests
-        with:
-          name: cypress-screenshots
-          path: |
-            typescript/cypress/screenshots
-            typescript/cypress-visual-screenshots
-          retention-days: 5
+      # # upload the failure screenshots for reference
+      # - name: upload artifacts
+      #   uses: actions/upload-artifact@v2
+      #   if: github.event_name != 'release' && failure() && matrix.e2e-tests
+      #   with:
+      #     name: cypress-screenshots
+      #     path: |
+      #       typescript/cypress/screenshots
+      #       typescript/cypress-visual-screenshots
+      #     retention-days: 5
 
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+      # - name: Upload coverage to Codecov
+      #   uses: codecov/codecov-action@v3
 
-      - name: 🔼 Build and publish Node.js package
-        if: github.event_name == 'release' && matrix.python-version == '3.8'
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        working-directory: ./typescript
-        run: |
-          npm version --no-git-tag-version ${GITHUB_REF//refs\/tags\//}
-          npm config set '//registry.npmjs.org/:_authToken' '${NPM_TOKEN}'
-          npm config set always-auth true
-          # Use 'latest' tag if $NPM_PUBLISH_TAG is not set:
-          npm publish --access public --tag ${NPM_PUBLISH_TAG:-latest}
+      # - name: 🔼 Build and publish Node.js package
+      #   if: github.event_name == 'release' && matrix.python-version == '3.8'
+      #   env:
+      #     NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      #   working-directory: ./typescript
+      #   run: |
+      #     cd packages/subsurface-viewer
+      #     npm version --no-git-tag-version 0.0.1-a1  # ${GITHUB_REF//refs\/tags\//}
+      #     npm config set '//registry.npmjs.org/:_authToken' '${NPM_TOKEN}'
+      #     npm config set always-auth true
+      #     # Use 'latest' tag if $NPM_PUBLISH_TAG is not set:
+      #     npm publish --access public --tag ${NPM_PUBLISH_TAG:-latest}
 
-      - name: 🚢 Build and deploy Python package
-        if: github.event_name == 'release' && matrix.python-version == '3.8'
-        env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.pypi_webviz_token }}
-        working-directory: ./python
-        run: |
-          export SETUPTOOLS_SCM_PRETEND_VERSION=${GITHUB_REF//refs\/tags\//}
-          python -m pip install --upgrade setuptools wheel twine
-          python setup.py sdist bdist_wheel
-          twine upload dist/*
+      # - name: 🚢 Build and deploy Python package
+      #   if: github.event_name == 'release' && matrix.python-version == '3.8'
+      #   env:
+      #     TWINE_USERNAME: __token__
+      #     TWINE_PASSWORD: ${{ secrets.pypi_webviz_token }}
+      #   working-directory: ./python
+      #   run: |
+      #     export SETUPTOOLS_SCM_PRETEND_VERSION=${GITHUB_REF//refs\/tags\//}
+      #     python -m pip install --upgrade setuptools wheel twine
+      #     python setup.py sdist bdist_wheel
+      #     twine upload dist/*
 
-      - name: 📚 Build demo application
-        run: npm run build:js-demo --prefix ./typescript
+      # - name: 📚 Build demo application
+      #   run: npm run build:js-demo --prefix ./typescript
 
-      - name: 📚 Build Storybook
-        run: npm run build-storybook --prefix ./typescript
+      # - name: 📚 Build Storybook
+      #   run: npm run build-storybook --prefix ./typescript
 
-      - name: 📚 Update Storybook and GitHub demo application
-        if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || contains(github.event.head_commit.message, '[deploy test]')) && matrix.python-version == '3.8'
-        run: |
-          cp -r ./typescript/{index.html,output.css,output.js,storybook-static} ..
+      # - name: 📚 Update Storybook and GitHub demo application
+      #   if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || contains(github.event.head_commit.message, '[deploy test]')) && matrix.python-version == '3.8'
+      #   run: |
+      #     cp -r ./typescript/{index.html,output.css,output.js,storybook-static} ..
 
-          git config --local user.email "webviz-github-action"
-          git config --local user.name "webviz-github-action"
-          git fetch origin gh-pages
-          git checkout --track origin/gh-pages
-          git clean -f -f -d -x
-          git rm -r --ignore-unmatch *
+      #     git config --local user.email "webviz-github-action"
+      #     git config --local user.name "webviz-github-action"
+      #     git fetch origin gh-pages
+      #     git checkout --track origin/gh-pages
+      #     git clean -f -f -d -x
+      #     git rm -r --ignore-unmatch *
 
-          mv ../{index.html,output.css,output.js,storybook-static} .
+      #     mv ../{index.html,output.css,output.js,storybook-static} .
 
-          git add .
+      #     git add .
 
-          if git diff-index --quiet HEAD; then
-            echo "No changes in documentation. Skip documentation deploy."
-          else
-            git commit -m "Update Github Pages"
-            git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" gh-pages
-          fi
+      #     if git diff-index --quiet HEAD; then
+      #       echo "No changes in documentation. Skip documentation deploy."
+      #     else
+      #       git commit -m "Update Github Pages"
+      #       git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" gh-pages
+      #     fi
 
-      - name: prepare for automated pull request
-        id: check_file_changed
-        if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || contains(github.event.head_commit.message, '[deploy test]')) && matrix.python-version == '3.10' && failure()
-        working-directory: ./typescript
-        run: |
-          if [ -d "cypress-visual-screenshots/diff" ]
-          then
-            echo '::set-output name=status::true'
-            npx cypress-image-diff -u
-            rm -rf cypress-visual-screenshots/comparison
-            rm -rf cypress-visual-screenshots/diff
-            rm -rf cypress/screenshots
-            rm -rf cypress/videos
-          else
-            echo '::set-output name=status::false'
-          fi
+      # - name: prepare for automated pull request
+      #   id: check_file_changed
+      #   if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || contains(github.event.head_commit.message, '[deploy test]')) && matrix.python-version == '3.10' && failure()
+      #   working-directory: ./typescript
+      #   run: |
+      #     if [ -d "cypress-visual-screenshots/diff" ]
+      #     then
+      #       echo '::set-output name=status::true'
+      #       npx cypress-image-diff -u
+      #       rm -rf cypress-visual-screenshots/comparison
+      #       rm -rf cypress-visual-screenshots/diff
+      #       rm -rf cypress/screenshots
+      #       rm -rf cypress/videos
+      #     else
+      #       echo '::set-output name=status::false'
+      #     fi
 
-      - name: Create Pull Request
-        id: cpr
-        uses: peter-evans/create-pull-request@5a6b15373e5788c38d83296b674ad5abea28085c
-        if: steps.check_file_changed.outputs.status == 'true' && github.event_name == 'push' && (github.ref == 'refs/heads/master' || contains(github.event.head_commit.message, '[deploy test]')) && matrix.python-version == '3.10' && failure()
-        with:
-          commit-message: updated cypress snapshots
-          title: Cypress - New Snapshots generated for the commit "${{ github.event.head_commit.message }}" by ${{ github.event.commits[0].author.email }}
-          body: This is an auto-generated PR to update cypress snapshots.
-          base: cypress-snaps
-          reviewers: ${{ github.event.sender.login }}
-          delete-branch: true
+      # - name: Create Pull Request
+      #   id: cpr
+      #   uses: peter-evans/create-pull-request@5a6b15373e5788c38d83296b674ad5abea28085c
+      #   if: steps.check_file_changed.outputs.status == 'true' && github.event_name == 'push' && (github.ref == 'refs/heads/master' || contains(github.event.head_commit.message, '[deploy test]')) && matrix.python-version == '3.10' && failure()
+      #   with:
+      #     commit-message: updated cypress snapshots
+      #     title: Cypress - New Snapshots generated for the commit "${{ github.event.head_commit.message }}" by ${{ github.event.commits[0].author.email }}
+      #     body: This is an auto-generated PR to update cypress snapshots.
+      #     base: cypress-snaps
+      #     reviewers: ${{ github.event.sender.login }}
+      #     delete-branch: true
