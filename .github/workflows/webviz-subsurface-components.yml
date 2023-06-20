@@ -54,10 +54,10 @@ jobs:
           # want to limit ourselves to lockfileVersion: 2. 
           # While waiting for dropping node 14 and npm 6 support, we include this manual
           # check:
-          grep -q '"lockfileVersion": 2,' ./react/package-lock.json
+          grep -q '"lockfileVersion": 2,' ./typescript/package-lock.json
 
-          npm ci CYPRESS_INSTALL_BINARY=0 --ignore-scripts --prefix ./react
-          npm run copy-package-json --prefix ./react
+          npm ci CYPRESS_INSTALL_BINARY=0 --ignore-scripts --prefix ./typescript
+          # npm run copy-package-json --prefix ./typescript
           pip install "werkzeug<2.1"  # ...while waiting for https://github.com/plotly/dash/issues/1992
           pip install "dash<2.5"  # Build issue upstream in dash==2.5
           pip install "flask<2.3" # As we are using an old Dash version we need to use an older Flask version
@@ -69,9 +69,11 @@ jobs:
         run: echo "NPM_PUBLISH_TAG=next" >> $GITHUB_ENV
 
       - name: 🏗️ Build JavaScript part
-        run: npm run build --prefix ./react
+        working-directory: ./typescript
+        run: npx nx run-many -t build
 
       - name: 📦 Install webviz-subsurface-components with dependencies
+        working-directory: ./python
         run: |
           pip install --upgrade pip
           pip install .
@@ -88,24 +90,26 @@ jobs:
       - name: 🕵️ Check code style, linting and typechecking
         if: matrix.python-version == '3.8'
         run: |
-          npm run validate --prefix ./react
+          npm run validate --prefix ./typescript
+          cd ./python
           black --check webviz_subsurface_components/ tests/ setup.py examples/
           pylint webviz_subsurface_components/ setup.py
           bandit -r -c ./bandit.yml webviz_subsurface_components/ tests/ setup.py examples/
+          cd ..
 
       - name: 🤖 Run performance tests
         if: github.event_name != 'release' && matrix.run-performance-tests
-        run: npm run test_perf --prefix ./react
+        run: npm run test_perf --prefix ./typescript
 
       - name: 🤖 Run correctness tests
         if: github.event_name != 'release' # Related to https://github.com/equinor/webviz-subsurface-components/issues/409
         run: |
-          npm run test_correctness --prefix ./react
+          npm run test_correctness --prefix ./typescript
 
       - name: 🤖 Run python tests
         if: github.event_name != 'release' # Related to https://github.com/equinor/webviz-subsurface-components/issues/409
-        run: |
-          pytest ./tests --headless
+        working-directory: ./python
+        run: pytest ./tests --headless
 
       # This action allows caching cypress dependencies
       - name: Cache Cypress
@@ -121,9 +125,8 @@ jobs:
       # now let's install Cypress binary
       - name: install cypress binary
         if: github.event_name != 'release' && matrix.e2e-tests
-        run: |
-          cd react
-          npx cypress install
+        working-directory: ./typescript
+        run: npx cypress install
 
       # run the cypress tests
       - name: e2e on firefox
@@ -133,12 +136,12 @@ jobs:
           cd clone
           git clone --branch cypress-snaps --depth 1 --filter=blob:none https://github.com/equinor/webviz-subsurface-components
           cd webviz-subsurface-components
-          git sparse-checkout set react/cypress-visual-screenshots
-          cd react
-          mv * ../../../react/
+          git sparse-checkout set typescript/cypress-visual-screenshots
+          cd typescript
+          mv * ../../../typescript/
           cd ../../../
           rm -rf clone
-          cd react
+          cd typescript
           npx cypress run -b chrome --component --headed
 
       # upload the failure screenshots for reference
@@ -148,8 +151,8 @@ jobs:
         with:
           name: cypress-screenshots
           path: |
-            react/cypress/screenshots
-            react/cypress-visual-screenshots
+            typescript/cypress/screenshots
+            typescript/cypress-visual-screenshots
           retention-days: 5
 
       - name: Upload coverage to Codecov
@@ -159,9 +162,8 @@ jobs:
         if: github.event_name == 'release' && matrix.python-version == '3.8'
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        working-directory: ./react
+        working-directory: ./typescript
         run: |
-          cp ../README.md .
           npm version --no-git-tag-version ${GITHUB_REF//refs\/tags\//}
           npm config set '//registry.npmjs.org/:_authToken' '${NPM_TOKEN}'
           npm config set always-auth true
@@ -173,6 +175,7 @@ jobs:
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.pypi_webviz_token }}
+        working-directory: ./python
         run: |
           export SETUPTOOLS_SCM_PRETEND_VERSION=${GITHUB_REF//refs\/tags\//}
           python -m pip install --upgrade setuptools wheel twine
@@ -180,15 +183,15 @@ jobs:
           twine upload dist/*
 
       - name: 📚 Build demo application
-        run: npm run build:js-demo --prefix ./react
+        run: npm run build:js-demo --prefix ./typescript
 
       - name: 📚 Build Storybook
-        run: npm run build-storybook --prefix ./react
+        run: npm run build-storybook --prefix ./typescript
 
       - name: 📚 Update Storybook and GitHub demo application
         if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || contains(github.event.head_commit.message, '[deploy test]')) && matrix.python-version == '3.8'
         run: |
-          cp -r ./react/{index.html,output.css,output.js,storybook-static} ..
+          cp -r ./typescript/{index.html,output.css,output.js,storybook-static} ..
 
           git config --local user.email "webviz-github-action"
           git config --local user.name "webviz-github-action"
@@ -211,11 +214,11 @@ jobs:
       - name: prepare for automated pull request
         id: check_file_changed
         if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || contains(github.event.head_commit.message, '[deploy test]')) && matrix.python-version == '3.10' && failure()
+        working-directory: ./typescript
         run: |
-          if [ -d "react/cypress-visual-screenshots/diff" ]
+          if [ -d "cypress-visual-screenshots/diff" ]
           then
             echo '::set-output name=status::true'
-            cd react
             npx cypress-image-diff -u
             rm -rf cypress-visual-screenshots/comparison
             rm -rf cypress-visual-screenshots/diff
