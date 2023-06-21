@@ -1305,26 +1305,31 @@ class WellLogView
         ) {
             shouldSetTracks = true;
             checkSchema = true;
-        } else if (this.props.template !== prevProps.template) {
+        }
+        if (this.props.template !== prevProps.template) {
             this.template = deepCopy(this.props.template); // save external template content to current
             shouldSetTracks = true;
             checkSchema = true;
-        } else if (this.props.primaryAxis !== prevProps.primaryAxis) {
+        }
+        if (this.props.primaryAxis !== prevProps.primaryAxis) {
             this.selectContent([undefined, undefined]);
             selectedTrackIndices = this.getSelectedTrackIndices();
             shouldSetTracks = true;
-        } else if (this.props.colorTables !== prevProps.colorTables) {
+        }
+        if (this.props.colorTables !== prevProps.colorTables) {
             selection = this.getContentSelection();
             selectedTrackIndices = this.getSelectedTrackIndices();
             shouldSetTracks = true; // force to repaint
-        } else if (
+        }
+        if (
             this.props.axisTitles !== prevProps.axisTitles ||
             this.props.axisMnemos !== prevProps.axisMnemos
         ) {
             selection = this.getContentSelection();
             selectedTrackIndices = this.getSelectedTrackIndices();
             shouldSetTracks = true; //??
-        } else if (
+        }
+        if (
             this.props.wellpick !== prevProps.wellpick ||
             this.props.options?.wellpickPatternFill !==
                 prevProps.options?.wellpickPatternFill ||
