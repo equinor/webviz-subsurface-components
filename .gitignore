@@ -1,6 +1,6 @@
 # Dash built code
 
-react/webviz_subsurface_components/**/*
+python/webviz_subsurface_components/**/*
 webviz_subsurface_components/**/*
 !webviz_subsurface_components/__init__.py
 !webviz_subsurface_components/VectorCalculatorWrapper.py
@@ -15,8 +15,8 @@ R/
 .Rbuildignore
 
 # Storybook stuff
-react/storybook-static/**/*
-!react/storybook-static/favicon.ico
+typescript/storybook-static/**/*
+!typescript/storybook-static/favicon.ico
 
 # Cypress stuff
 chromedriver
