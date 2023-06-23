@@ -2,7 +2,7 @@ import React from "react";
 
 import { MapAndWellLogViewer } from "./MapAndWellLogViewer";
 
-import exampleData from "../../../demo/example-data/deckgl-map.json";
+import exampleData from "../../../../example-data/deckgl-map.json";
 import { colorTables } from "@emerson-eps/color-tables";
 
 const drawing_layer = exampleData[0].layers.find(

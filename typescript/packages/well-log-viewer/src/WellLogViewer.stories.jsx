@@ -8,8 +8,8 @@ import { colorTables } from "@emerson-eps/color-tables";
 const ComponentCode =
     '<WellLogViewer id="WellLogViewer" \r\n' +
     "    horizontal=false \r\n" +
-    '    welllog={require("../../../demo/example-data/L898MUD.json")[0]} \r\n' +
-    '    template={require("../../../demo/example-data/welllog_template_1.json")} \r\n' +
+    '    welllog={require("../../../../example-data/L898MUD.json")[0]} \r\n' +
+    '    template={require("../../../../example-data/welllog_template_1.json")} \r\n' +
     "    colorTables={colorTables} \r\n" +
     "/>";
 
@@ -104,7 +104,7 @@ const Template = (args) => {
 };
 
 const wellpick = {
-    wellpick: require("../../../demo/example-data/wellpicks.json")[0],
+    wellpick: require("../../../../example-data/wellpicks.json")[0],
     name: "HORIZON",
     colorTables: colorTables,
     color: "Stratigraphy",
@@ -114,8 +114,8 @@ export const Default = Template.bind({});
 Default.args = {
     id: "Well-Log-Viewer",
     horizontal: false,
-    welllog: require("../../../demo/example-data/L898MUD.json")[0],
-    template: require("../../../demo/example-data/welllog_template_1.json"),
+    welllog: require("../../../../example-data/L898MUD.json")[0],
+    template: require("../../../../example-data/welllog_template_1.json"),
     colorTables: colorTables,
     wellpick: wellpick,
     axisTitles: axisTitles,
@@ -132,8 +132,8 @@ Horizontal.args = {
     id: "Well-Log-Viewer-Horizontal",
     horizontal: true,
     welllog:
-        require("../../../demo/example-data/WL_RAW_AAC-BHPR-CAL-DEN-GR-MECH-NEU-NMR-REMP_MWD_3.json")[0],
-    template: require("../../../demo/example-data/welllog_template_2.json"),
+        require("../../../../example-data/WL_RAW_AAC-BHPR-CAL-DEN-GR-MECH-NEU-NMR-REMP_MWD_3.json")[0],
+    template: require("../../../../example-data/welllog_template_2.json"),
     colorTables: colorTables,
     wellpick: wellpick,
     axisTitles: axisTitles,
@@ -152,8 +152,8 @@ export const Discrete = Template.bind({});
 Discrete.args = {
     id: "Well-Log-Viewer-Discrete",
     horizontal: false,
-    welllog: require("../../../demo/example-data/volve_logs.json")[0],
-    template: require("../../../demo/example-data/welllog_template_2.json"),
+    welllog: require("../../../../example-data/volve_logs.json")[0],
+    template: require("../../../../example-data/welllog_template_2.json"),
     colorTables: colorTables,
     wellpick: wellpick,
     axisTitles: axisTitles,

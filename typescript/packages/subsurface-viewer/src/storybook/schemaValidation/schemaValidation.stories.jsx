@@ -8,7 +8,7 @@ import {
     sampleColorTable,
     sampleFaultPolygonsData,
 } from "./sampleData";
-import exampleData from "../../../../../demo/example-data/deckgl-map.json";
+import exampleData from "../../../../../../example-data/deckgl-map.json";
 
 export default {
     component: SubsurfaceViewer,

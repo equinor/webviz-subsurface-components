@@ -61,6 +61,7 @@
         "@babel/preset-typescript": "^7.13.0",
         "@babel/runtime": "^7.13.10",
         "@cypress/react18": "^2.0.0",
+        "@mdx-js/react": "^2.3.0",
         "@storybook/addon-essentials": "^6.5.16",
         "@storybook/addon-links": "^6.5.9",
         "@storybook/addon-storysource": "^6.5.9",

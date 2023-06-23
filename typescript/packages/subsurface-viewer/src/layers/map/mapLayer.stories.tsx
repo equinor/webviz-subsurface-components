@@ -10,10 +10,10 @@ import {
     ColorLegend,
     createColorMapFunction,
 } from "@emerson-eps/color-tables";
-import { View } from "../../../..";
 import MapLayer from "./mapLayer";
 import Axes2DLayer from "../axes2d/axes2DLayer";
 import { ViewFooter } from "../../components/ViewFooter";
+import { View } from "@deck.gl/core/typed";
 
 const PREFIX = "MapLayer3dPng";
 

@@ -1,5 +1,5 @@
 import React from "react";
-import exampleData from "../../../../../../demo/example-data/deckgl-map.json";
+import exampleData from "../../../../../../../example-data/deckgl-map.json";
 import SubsurfaceViewer from "../../../SubsurfaceViewer";
 
 export default {
