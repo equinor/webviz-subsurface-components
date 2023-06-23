@@ -43,7 +43,7 @@ const Template = (args) => {
 export const Default = Template.bind({});
 Default.args = {
     id: "grouptree",
-    data: require("../../../../../demo/example-data/group-tree.json"),
+    data: require("../../../../../../example-data/group-tree.json"),
     edge_options,
     node_options,
 };

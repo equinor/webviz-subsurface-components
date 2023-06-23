@@ -1,22 +1,16 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 import { format } from "d3-format";
-import { PickingInfo } from "@deck.gl/core/typed";
+import { PickingInfo, View } from "@deck.gl/core/typed";
 import { ContinuousLegend } from "@emerson-eps/color-tables";
 import SubsurfaceViewer from "./SubsurfaceViewer";
-import {
-    TooltipCallback,
-    LayerPickInfo,
-    WellsPickInfo,
-    ExtendedLayerProps,
-    PropertyDataType,
-    FeatureCollection,
-    ViewFooter,
-    View,
-} from "../..";
-import { MapMouseEvent, ViewStateType, ViewsType } from "./components/Map";
+import { MapMouseEvent, TooltipCallback, ViewStateType, ViewsType } from "./components/Map";
 import { WellsLayer, MapLayer } from "./layers";
 import InfoCard from "./components/InfoCard";
+import { ExtendedLayerProps, LayerPickInfo } from "./layers/utils/layerTools";
+import { WellsPickInfo } from "./layers/wells/wellsLayer";
+import { FeatureCollection } from "geojson";
+import { ViewFooter } from "./components/ViewFooter";
 
 export default {
     component: SubsurfaceViewer,

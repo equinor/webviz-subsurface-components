@@ -1,7 +1,7 @@
 import React from "react";
 import { styled } from "@mui/material/styles";
 import SubsurfaceViewer from "../SubsurfaceViewer";
-import exampleData from "../../../../demo/example-data/deckgl-map.json";
+import exampleData from "../../../../../example-data/deckgl-map.json";
 import { default as MapLayer } from "../layers/map/mapLayer";
 import { default as Axes2DLayer } from "../layers/axes2d/axes2DLayer";
 

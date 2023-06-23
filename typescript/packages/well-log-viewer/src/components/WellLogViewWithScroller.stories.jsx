@@ -6,8 +6,8 @@ import { colorTables } from "@emerson-eps/color-tables";
 const ComponentCode =
     '<WellLogViewWithScroller id="WellLogViewWithScroller" \r\n' +
     "    horizontal=false \r\n" +
-    '    welllog={require("../../../../demo/example-data/L898MUD.json")[0]} \r\n' +
-    '    template={require("../../../../demo/example-data/welllog_template_1.json")} \r\n' +
+    '    welllog={require("../../../../../example-data/L898MUD.json")[0]} \r\n' +
+    '    template={require("../../../../../example-data/welllog_template_1.json")} \r\n' +
     "    colorTables={colorTables} \r\n" +
     "/>";
 
@@ -52,13 +52,13 @@ const Template = (args) => {
     );
 };
 
-const wellLog = require("../../../../demo/example-data/L898MUD.json")[0];
+const wellLog = require("../../../../../example-data/L898MUD.json")[0];
 export const Default = Template.bind({});
 Default.args = {
     id: "Well-Log-Viewer-With-Scroller",
     horizontal: false,
     welllog: wellLog,
-    template: require("../../../../demo/example-data/welllog_template_1.json"),
+    template: require("../../../../../example-data/welllog_template_1.json"),
     viewTitle: "Well '" + wellLog.header.well + "'",
     colorTables: colorTables,
     axisTitles: axisTitles,

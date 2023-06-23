@@ -6,8 +6,8 @@ import { colorTables } from "@emerson-eps/color-tables";
 const ComponentCode =
     '<WellLogView id="WellLogView" \r\n' +
     "    horizontal=false \r\n" +
-    '    welllog={require("../../../../demo/example-data/L898MUD.json")[0]} \r\n' +
-    '    template={require("../../../../demo/example-data/welllog_template_1.json")} \r\n' +
+    '    welllog={require("../../../../../example-data/L898MUD.json")[0]} \r\n' +
+    '    template={require("../../../../../example-data/welllog_template_1.json")} \r\n' +
     "    colorTables={colorTables} \r\n" +
     "/>";
 
@@ -47,14 +47,14 @@ const Template = (args) => {
     );
 };
 
-const welllogDefault = require("../../../../demo/example-data/L898MUD.json")[0];
+const welllogDefault = require("../../../../../example-data/L898MUD.json")[0];
 
 export const Default = Template.bind({});
 Default.args = {
     id: "Well-Log-View",
     horizontal: false,
     welllog: welllogDefault,
-    template: require("../../../../demo/example-data/welllog_template_1.json"),
+    template: require("../../../../../example-data/welllog_template_1.json"),
     viewTitle: (
         <div>
             <i>Well</i> <b>{welllogDefault.header.well}</b>
@@ -66,14 +66,14 @@ Default.args = {
 };
 
 const welllogDiscrete =
-    require("../../../../demo/example-data/volve_logs.json")[0];
+    require("../../../../../example-data/volve_logs.json")[0];
 
 export const Discrete = Template.bind({});
 Discrete.args = {
     id: "Well-Log-View-Discrete",
     horizontal: false,
     welllog: welllogDiscrete,
-    template: require("../../../../demo/example-data/welllog_template_2.json"),
+    template: require("../../../../../example-data/welllog_template_2.json"),
     viewTitle: "Well '" + welllogDiscrete.header.well + "'",
     colorTables: colorTables,
     axisTitles: axisTitles,

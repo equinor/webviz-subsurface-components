@@ -17,10 +17,10 @@ import {
 } from "./components/WellLogTemplateTypes";
 
 import { WellLog } from "./components/WellLogTypes";
-import welllogsJson from "../demo/example-data/volve_logs.json";
+import welllogsJson from "./demo/example-data/volve_logs.json";
 const welllogs = welllogsJson as unknown as WellLog[];
 
-import templateJson from "../demo/example-data/welllog_template_2.json";
+import templateJson from "./demo/example-data/welllog_template_2.json";
 const template = templateJson as unknown as Template;
 
 import { ColorTable } from "./components/ColorTableTypes";
@@ -40,8 +40,8 @@ import { deepCopy } from "./utils/deepcopy";
 import { WellLogViewOptions } from "./components/WellLogView";
 import { isEqualRanges } from "./components/WellLogView";
 
-import wellPicks from "../demo/example-data/wellpicks.json";
-import colorTables from "../demo/example-data/wellpick_colors.json";
+import wellPicks from "./demo/example-data/wellpicks.json";
+import colorTables from "./demo/example-data/wellpick_colors.json";
 
 function getTemplatePlotColorTable(
     template: Template,
