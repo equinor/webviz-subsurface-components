@@ -72,6 +72,7 @@ jobs:
         working-directory: ./typescript
         run: |
           npx nx build @webviz/subsurface-viewer  # wellog-viewer depends on subsurface viewer... should be able to specify build order in some better way?
+          npx nx build @webviz/well-log-viewer
           npx nx run-many -t build
 
       - name: 📦 Install webviz-subsurface-components with dependencies
