@@ -50,5 +50,5 @@ module.exports = {
             },
         };
     },
-    staticDirs: ["../src/demo/example-data"],
+    staticDirs: ["../example-data"],
 };
