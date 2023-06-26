@@ -51,7 +51,7 @@ module.exports = {
           crypto: false,
           stream: false
         }
-      }
+      },
     };
   },
   staticDirs: ["../../example-data"],

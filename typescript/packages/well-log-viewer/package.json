@@ -11,7 +11,7 @@
   "author": "Equinor <opensource@equinor.com>",
   "license": "MPL-2.0",
   "dependencies": {
-    "@emerson-eps/color-tables": "^0.4.50",
+    "@emerson-eps/color-tables": "^0.4.57",
     "@equinor/videx-wellog": "^0.8.0",
     "@mui/material": "^5.13.4",
     "@webviz/subsurface-viewer": "*",

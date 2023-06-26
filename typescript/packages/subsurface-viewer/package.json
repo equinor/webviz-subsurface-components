@@ -12,7 +12,7 @@
     "license": "MPL-2.0",
     "dependencies": {
         "@deck.gl/core": "^8.8.25",
-        "@emerson-eps/color-tables": "^0.4.56",
+        "@emerson-eps/color-tables": "^0.4.57",
         "@equinor/eds-core-react": "^0.16.1",
         "@equinor/eds-icons": "^0.19.1",
         "@mui/material": "^5.13.4",
