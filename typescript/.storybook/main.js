@@ -1,13 +1,7 @@
 module.exports = {
   stories: ["../packages/*/src/**/*.stories.mdx", "../packages/*/src/**/*.stories.@(js|jsx|ts|tsx)"],
-  addons: ["@storybook/addon-links", "@storybook/addon-essentials", "@storybook/addon-actions", {
-    name: "@storybook/addon-docs",
-    options: {
-      sourceLoaderOptions: {
-        injectStoryParameters: false
-      }
-    }
-  }, "@storybook/addon-storysource", "@storybook/addon-mdx-gfm"],
+  addons: ["@storybook/addon-links", "@storybook/addon-essentials", "@storybook/addon-actions", 
+    "@storybook/addon-docs", "@storybook/addon-storysource", "@storybook/addon-mdx-gfm"],
   webpackFinal: config => {
     config.module.rules.push({
       test: /\.scss$/,
