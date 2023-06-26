@@ -9,7 +9,32 @@ module.exports = {
     }, {
       test: /\.(fs|vs).glsl$/i,
       use: ["raw-loader"]
-    });
+    },
+    {
+        test: /\.(ts|js)x?$/,
+        exclude: /node_modules/,
+        use: {
+          loader: "babel-loader",
+          options: {
+            "presets": [
+              [
+                "@babel/preset-env",
+                {
+                  "targets": {
+                    "chrome": 100
+                  }
+                }
+              ],
+              [
+              "@babel/preset-typescript", { "allowNamespaces": true },
+              ],
+              "@babel/preset-react"
+            ],
+
+          }
+        },
+    },
+    );
     return {
       ...config,
       resolve: {
