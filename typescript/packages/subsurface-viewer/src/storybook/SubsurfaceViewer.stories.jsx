@@ -307,7 +307,8 @@ const meshMapLayer = {
     colorMapName: "Physics",
 };
 
-const meshMapLayerPng = new MapLayer({
+const meshMapLayerPng = {
+    "@@type": "MapLayer",
     id: "mesh-layer-png",
     meshUrl: "hugin_depth_25_m.png",
     frame: {
@@ -323,9 +324,10 @@ const meshMapLayerPng = new MapLayer({
     material: true,
     smoothShading: true,
     colorMapName: "Physics",
-});
+};
 
-const axes2D = new Axes2DLayer({
+const axes2D = {
+    "@@type": "Axes2DLayer",
     id: "axes-layer",
     marginH: 80, // Horizontal margin (in pixels)
     marginV: 30, // Vertical margin (in pixels)
@@ -334,7 +336,7 @@ const axes2D = new Axes2DLayer({
     isBottomRuler: true,
     isTopRuler: false,
     backgroundColor: [155, 155, 155, 255],
-});
+};
 
 export const KhMapMesh = MinimalTemplate.bind({});
 KhMapMesh.args = {
