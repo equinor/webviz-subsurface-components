@@ -5,8 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "transpile": "tsc --project ./tsconfig.json",
-    "copy-files": "copyfiles package.json dist && copyfiles README.md dist && copyfiles --exclude **/*.{tsx,jsx,js,ts,snap} --up 1 \"src/**/*\" dist/",
-    "build": "npm run transpile && npm run copy-files"
+    "build": "git clean -xdff dist && npm run transpile"
   },
   "author": "Equinor <opensource@equinor.com>",
   "license": "MPL-2.0",
