@@ -189,31 +189,31 @@ jobs:
       # - name: 📚 Build demo application
       #   run: npm run build:js-demo --prefix ./typescript
 
-      # - name: 📚 Build Storybook
-      #   run: npm run build-storybook --prefix ./typescript
+      - name: 📚 Build Storybook
+        run: npm run build-storybook --prefix ./typescript
 
-      # - name: 📚 Update Storybook and GitHub demo application
-      #   if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || contains(github.event.head_commit.message, '[deploy test]')) && matrix.python-version == '3.8'
-      #   run: |
-      #     cp -r ./typescript/{index.html,output.css,output.js,storybook-static} ..
+      - name: 📚 Update Storybook
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || contains(github.event.head_commit.message, '[deploy test]')) && matrix.python-version == '3.8'
+        run: |
+          cp -r ./typescript/storybook-static ..
 
-      #     git config --local user.email "webviz-github-action"
-      #     git config --local user.name "webviz-github-action"
-      #     git fetch origin gh-pages
-      #     git checkout --track origin/gh-pages
-      #     git clean -f -f -d -x
-      #     git rm -r --ignore-unmatch *
+          git config --local user.email "webviz-github-action"
+          git config --local user.name "webviz-github-action"
+          git fetch origin gh-pages
+          git checkout --track origin/gh-pages
+          git clean -f -f -d -x
+          git rm -r --ignore-unmatch *
 
-      #     mv ../{index.html,output.css,output.js,storybook-static} .
+          mv ../storybook-static .
 
-      #     git add .
+          git add .
 
-      #     if git diff-index --quiet HEAD; then
-      #       echo "No changes in documentation. Skip documentation deploy."
-      #     else
-      #       git commit -m "Update Github Pages"
-      #       git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" gh-pages
-      #     fi
+          if git diff-index --quiet HEAD; then
+            echo "No changes in documentation. Skip documentation deploy."
+          else
+            git commit -m "Update Github Pages"
+            git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" gh-pages
+          fi
 
       # - name: prepare for automated pull request
       #   id: check_file_changed
