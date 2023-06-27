@@ -2,7 +2,9 @@ import React from "react";
 import PropTypes from "prop-types";
 import { View } from "@deck.gl/core/typed";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
-import SubsurfaceViewer, { SubsurfaceViewerProps } from "@webviz/subsurface-viewer/dist/SubsurfaceViewer";
+import SubsurfaceViewer, {
+    SubsurfaceViewerProps,
+} from "@webviz/subsurface-viewer/dist/SubsurfaceViewer";
 import {
     ViewsType,
     TooltipCallback,
