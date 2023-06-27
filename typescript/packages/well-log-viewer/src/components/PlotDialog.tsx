@@ -2,7 +2,7 @@ import React, { Component, ReactNode } from "react";
 
 import { Track, GraphTrack } from "@equinor/videx-wellog";
 
-import { TemplatePlot } from "./WellLogTemplateTypes";
+import { TemplatePlot, TemplatePlotTypes } from "./WellLogTemplateTypes";
 import { WellLog } from "./WellLogTypes";
 import { ColorTable } from "./ColorTableTypes";
 
@@ -283,11 +283,53 @@ export class PlotPropertiesDialog extends Component<Props, State> {
         );
     }
 
+    createSelectControlFromType(type: TemplatePlotTypes): ReactNode {
+        if (type === "area" || type === "differential") {
+            return [
+                this.createSelectControl(
+                    "fill",
+                    "Fill Color",
+                    createColorItems()
+                ),
+                <FormControl fullWidth key="112" />,
+                <FormControl fullWidth key="113" />,
+                this.state.type === "area" ? (
+                    this.createSelectControl(
+                        "inverseColor",
+                        "Inverse Color",
+                        createColorItems(),
+                        true
+                    )
+                ) : (
+                    <FormControl fullWidth />
+                ),
+            ];
+        } else if (type === "gradientfill") {
+            const colorTables = this.props.wellLogView.props.colorTables;
+            [
+                this.createSelectControl(
+                    "colorTable",
+                    "Fill Color table",
+                    createColorTableItems(colorTables)
+                ),
+                <FormControl fullWidth key="211" />,
+                <FormControl fullWidth key="212" />,
+                this.createSelectControl(
+                    "inverseColorTable",
+                    "Inverse Color table",
+                    createColorTableItems(colorTables),
+                    true
+                ),
+            ];
+        }
+
+        return [];
+    }
+
     render(): JSX.Element {
         const trackTemplate = getTrackTemplate(this.props.track);
         const title = this.props.templatePlot ? "Edit plot" : "Add New Plot";
         const skipUsed = this.props.templatePlot ? false : true; /*??*/
-        const colorTables = this.props.wellLogView.props.colorTables;
         const scale = this.state.scale || trackTemplate.scale;
         return (
             <Dialog
@@ -334,46 +376,7 @@ export class PlotPropertiesDialog extends Component<Props, State> {
                         this.state.type === "dot" ? "Dot Color" : "Line Color",
                         createColorItems()
                     )}
-
-                    {this.state.type === "area" ||
-                    this.state.type === "differential"
-                        ? [
-                              this.createSelectControl(
-                                  "fill",
-                                  "Fill Color",
-                                  createColorItems()
-                              ),
-                              <FormControl fullWidth key="112" />,
-                              <FormControl fullWidth key="113" />,
-                              this.state.type === "area" ? (
-                                  this.createSelectControl(
-                                      "inverseColor",
-                                      "Inverse Color",
-                                      createColorItems(),
-                                      true
-                                  )
-                              ) : (
-                                  <FormControl fullWidth />
-                              ),
-                          ]
-                        : this.state.type === "gradientfill"
-                        ? [
-                              this.createSelectControl(
-                                  "colorTable",
-                                  "Fill Color table",
-                                  createColorTableItems(colorTables)
-                              ),
-                              <FormControl fullWidth key="211" />,
-                              <FormControl fullWidth key="212" />,
-                              this.createSelectControl(
-                                  "inverseColorTable",
-                                  "Inverse Color table",
-                                  createColorTableItems(colorTables),
-                                  true
-                              ),
-                          ]
-                        : []}
-
+                    {this.createSelectControlFromType(this.state.type)}
                     {this.state.type === "differential"
                         ? [
                               this.createSelectControl(

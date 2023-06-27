@@ -874,12 +874,15 @@ class SyncLogViewer extends Component<Props, State> {
     createSpacer(index: number): ReactNode {
         if (!this.props.spacers) return null;
         const prev = index - 1;
-        let width =
-            this.props.spacers === true
-                ? 255 // default width
-                : typeof this.props.spacers === "number"
-                ? this.props.spacers // all widths are equal
-                : this.props.spacers[prev]; // individual width
+
+        let width = 255;
+        if (typeof this.props.spacers !== "boolean") {
+            width =
+                typeof this.props.spacers === "number"
+                    ? this.props.spacers // all widths are equal
+                    : this.props.spacers[prev]; // individual width
+        }
+
         if (width === undefined) width = 255; // set some default value
         if (!width) return null;
 

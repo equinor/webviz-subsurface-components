@@ -51,11 +51,12 @@ function getImageData(
 
     const defaultColorMap = createDefaultContinuousColorScale;
 
-    const colorMap = isColorMapFunctionDefined
-        ? colorMapFunction
-        : isColorMapNameDefined
-        ? (value: number) => rgbValues(value, colorMapName, colorTables)
-        : defaultColorMap();
+    let colorMap = colorMapFunction;
+    if (!isColorMapFunctionDefined) {
+        colorMap = isColorMapNameDefined
+            ? (value: number) => rgbValues(value, colorMapName, colorTables)
+            : defaultColorMap();
+    }
 
     for (let i = 0; i < 256; i++) {
         const value = i / 255.0;
