@@ -226,6 +226,8 @@ export default class privateMapLayer extends Layer<
             : [0, 0, 0];
 
         // Normalize to [0,1] range.
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         colorMapClampColor = (colorMapClampColor as Color).map(
             (x) => (x ?? 0) / 255
         );
