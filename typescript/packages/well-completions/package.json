@@ -24,6 +24,6 @@
     "react-redux": "^7.2.6",
     "react-resize-detector": "^9.1.0",
     "react-tooltip": "^4.2.21",
-    "semver": "^7.3.5"
+    "semver": "^7.5.2"
   }
 }
