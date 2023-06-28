@@ -10,11 +10,20 @@ exports[`Test Info Card snapshot test when property value provided 1`] = `
   -ms-flex-align: center;
   align-items: center;
   height: 100%;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
 }
 
 .c0 {
   margin: 0;
   padding: 0;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  position: relative;
+  cursor: pointer;
+  display: inline-block;
   background: transparent;
   height: 36px;
   padding-left: 16px;
@@ -28,31 +37,28 @@ exports[`Test Info Card snapshot test when property value provided 1`] = `
   font-weight: 500;
   line-height: 1.143em;
   text-align: center;
-  -webkit-text-decoration: none;
-  text-decoration: none;
-  position: relative;
-  cursor: pointer;
-  display: inline-block;
 }
 
 .c0 svg {
   justify-self: center;
 }
 
+.c0::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: auto;
+  min-height: auto;
+  content: '';
+}
+
 .c0::after {
   position: absolute;
-  top: -6px;
+  top: -7px;
   left: -0;
   width: 100%;
   height: 48px;
   content: '';
-}
-
-.c0:hover {
-  background: var(--eds_interactive_primary__hover_alt,rgba(222,237,238,1));
-  color: var(--eds_interactive_primary__hover,rgba(0,79,85,1));
-  border: 1px solid transparent;
-  border-radius: 4px;
 }
 
 .c0:focus {
@@ -60,6 +66,11 @@ exports[`Test Info Card snapshot test when property value provided 1`] = `
 }
 
 .c0[data-focus-visible-added]:focus {
+  outline: 1px dashed rgba(0,112,121,1);
+  outline-offset: 2px;
+}
+
+.c0:focus-visible {
   outline: 1px dashed rgba(0,112,121,1);
   outline-offset: 2px;
 }
@@ -81,17 +92,19 @@ exports[`Test Info Card snapshot test when property value provided 1`] = `
   text-align: center;
 }
 
-.c0:disabled:hover {
-  background: transparent;
+@media (hover:hover) and (pointer:fine) {
+  .c0:hover {
+    background: var(--eds_interactive_primary__hover_alt,rgba(222,237,238,1));
+    color: var(--eds_interactive_primary__hover,rgba(0,79,85,1));
+    border: 1px solid transparent;
+    border-radius: 4px;
+  }
 }
 
-.c0::before {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: auto;
-  min-height: auto;
-  content: '';
+@media (hover:hover) and (pointer:fine) {
+  .c0:disabled:hover {
+    background: transparent;
+  }
 }
 
 <div
@@ -131,7 +144,7 @@ exports[`Test Info Card snapshot test when property value provided 1`] = `
                 <path
                   class=""
                   clip-rule="evenodd"
-                  d="m7 14.5 5-5 5 5H7z"
+                  d="m7 14.5 5-5 5 5H7Z"
                   data-testid="eds-icon-path"
                   fill-rule="evenodd"
                   height="24"
@@ -255,7 +268,7 @@ exports[`Test Info Card snapshot test when property value provided 1`] = `
                 <path
                   class=""
                   clip-rule="evenodd"
-                  d="m7 14.5 5-5 5 5H7z"
+                  d="m7 14.5 5-5 5 5H7Z"
                   data-testid="eds-icon-path"
                   fill-rule="evenodd"
                   height="24"
@@ -351,11 +364,20 @@ exports[`Test Info Card snapshot test with no props 1`] = `
   -ms-flex-align: center;
   align-items: center;
   height: 100%;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
 }
 
 .c0 {
   margin: 0;
   padding: 0;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  position: relative;
+  cursor: pointer;
+  display: inline-block;
   background: transparent;
   height: 36px;
   padding-left: 16px;
@@ -369,31 +391,28 @@ exports[`Test Info Card snapshot test with no props 1`] = `
   font-weight: 500;
   line-height: 1.143em;
   text-align: center;
-  -webkit-text-decoration: none;
-  text-decoration: none;
-  position: relative;
-  cursor: pointer;
-  display: inline-block;
 }
 
 .c0 svg {
   justify-self: center;
 }
 
+.c0::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: auto;
+  min-height: auto;
+  content: '';
+}
+
 .c0::after {
   position: absolute;
-  top: -6px;
+  top: -7px;
   left: -0;
   width: 100%;
   height: 48px;
   content: '';
-}
-
-.c0:hover {
-  background: var(--eds_interactive_primary__hover_alt,rgba(222,237,238,1));
-  color: var(--eds_interactive_primary__hover,rgba(0,79,85,1));
-  border: 1px solid transparent;
-  border-radius: 4px;
 }
 
 .c0:focus {
@@ -401,6 +420,11 @@ exports[`Test Info Card snapshot test with no props 1`] = `
 }
 
 .c0[data-focus-visible-added]:focus {
+  outline: 1px dashed rgba(0,112,121,1);
+  outline-offset: 2px;
+}
+
+.c0:focus-visible {
   outline: 1px dashed rgba(0,112,121,1);
   outline-offset: 2px;
 }
@@ -422,17 +446,19 @@ exports[`Test Info Card snapshot test with no props 1`] = `
   text-align: center;
 }
 
-.c0:disabled:hover {
-  background: transparent;
+@media (hover:hover) and (pointer:fine) {
+  .c0:hover {
+    background: var(--eds_interactive_primary__hover_alt,rgba(222,237,238,1));
+    color: var(--eds_interactive_primary__hover,rgba(0,79,85,1));
+    border: 1px solid transparent;
+    border-radius: 4px;
+  }
 }
 
-.c0::before {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: auto;
-  min-height: auto;
-  content: '';
+@media (hover:hover) and (pointer:fine) {
+  .c0:disabled:hover {
+    background: transparent;
+  }
 }
 
 <div
@@ -472,7 +498,7 @@ exports[`Test Info Card snapshot test with no props 1`] = `
                 <path
                   class=""
                   clip-rule="evenodd"
-                  d="m7 14.5 5-5 5 5H7z"
+                  d="m7 14.5 5-5 5 5H7Z"
                   data-testid="eds-icon-path"
                   fill-rule="evenodd"
                   height="24"

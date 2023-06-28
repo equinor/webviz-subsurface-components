@@ -6,7 +6,7 @@ import "@testing-library/jest-dom";
 import React from "react";
 import { LayersList } from "@deck.gl/core/typed";
 import Map from "./Map";
-import { EmptyWrapper } from "../../SubsurfaceViewer/test/TestWrapper";
+import { EmptyWrapper } from "../test/TestWrapper";
 import { colorTables } from "@emerson-eps/color-tables";
 import {
     ColormapLayer,
@@ -19,7 +19,7 @@ import {
     WellsLayer,
 } from "../layers";
 
-import mapData from "../../../../demo/example-data/deckgl-map.json";
+import mapData from "../../../../../example-data/deckgl-map.json";
 import { Unit } from "convert-units";
 const colorTablesData = colorTables;
 const testBounds = [432205, 6475078, 437720, 6481113] as [

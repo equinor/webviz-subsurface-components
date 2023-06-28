@@ -2,10 +2,10 @@ import "@testing-library/jest-dom/extend-expect";
 import { render } from "@testing-library/react";
 import "jest-styled-components";
 import React from "react";
-import { Wrapper } from "../GroupTree/test/TestWrapper";
+import { Wrapper } from "./test/TestWrapper";
 import GroupTree from "./GroupTree";
 
-import exampleData from "../../../demo/example-data/group-tree.json";
+import exampleData from "../../../../example-data/group-tree.json";
 
 describe("Test GroupTree Default Component", () => {
     it("snapshot test", () => {

@@ -117,7 +117,7 @@ exports[`test view menu snapshot test 1`] = `
         <path
           class=""
           clip-rule="evenodd"
-          d="M3.5 18.5v-13h17v13h-17zm10-2v-9h-3v9h3zm-8-9h3v9h-3v-9zm10 9h3v-9h-3v9z"
+          d="M3.5 18.5v-13h17v13h-17Zm10-2v-9h-3v9h3Zm-8-9h3v9h-3v-9Zm10 9h3v-9h-3v9Z"
           data-testid="eds-icon-path"
           fill-rule="evenodd"
           height="24"
