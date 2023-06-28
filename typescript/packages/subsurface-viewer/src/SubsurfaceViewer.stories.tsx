@@ -4,7 +4,12 @@ import { format } from "d3-format";
 import { PickingInfo, View } from "@deck.gl/core/typed";
 import { ContinuousLegend } from "@emerson-eps/color-tables";
 import SubsurfaceViewer from "./SubsurfaceViewer";
-import { MapMouseEvent, TooltipCallback, ViewStateType, ViewsType } from "./components/Map";
+import {
+    MapMouseEvent,
+    TooltipCallback,
+    ViewStateType,
+    ViewsType,
+} from "./components/Map";
 import { WellsLayer, MapLayer } from "./layers";
 import InfoCard from "./components/InfoCard";
 import { ExtendedLayerProps, LayerPickInfo } from "./layers/utils/layerTools";

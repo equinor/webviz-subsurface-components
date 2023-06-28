@@ -7,7 +7,7 @@ declare module "*.svg" {
 declare module "*.png";
 declare module "@emerson-eps/color-tables";
 declare module "deck.gl";
-declare module '*.scss' {
-  const content: string;
-  export default content;
+declare module "*.scss" {
+    const content: string;
+    export default content;
 }

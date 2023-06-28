@@ -17,9 +17,6 @@
 // Import commands.js using ES2015 syntax:
 import "./commands";
 
-// Alternatively you can use CommonJS syntax:
-// require('./commands')
-
 import { mount } from "@cypress/react18";
 
 // Augment the Cypress namespace to include type definitions for
@@ -36,17 +33,12 @@ declare global {
 
 Cypress.Commands.add("mount", mount);
 
-// Cypress.on("uncaught:exception", (err, runnable) => {
-//     // returning false here prevents Cypress from
-//     // failing the test
-//     return true;
-// });
-
-Cypress.on('uncaught:exception', (err, runnable) => {
-if (err.message.includes('The source image could not be decoded')) {
-    return false
-}
-})
+Cypress.on("uncaught:exception", (err) => {
+    if (err.message.includes("The source image could not be decoded")) {
+        return false;
+    }
+    return null;
+});
 
 // Example use:
 // cy.mount(<MyComponent />)
