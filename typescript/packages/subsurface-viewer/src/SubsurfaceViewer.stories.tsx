@@ -3,7 +3,7 @@ import { ComponentStory, ComponentMeta } from "@storybook/react";
 import { format } from "d3-format";
 import { PickingInfo, View } from "@deck.gl/core/typed";
 import { ContinuousLegend } from "@emerson-eps/color-tables";
-import SubsurfaceViewer from "./SubsurfaceViewer";
+import SubsurfaceViewer, { SubsurfaceViewerProps } from "./SubsurfaceViewer";
 import {
     MapMouseEvent,
     TooltipCallback,
@@ -16,11 +16,29 @@ import { ExtendedLayerProps, LayerPickInfo } from "./layers/utils/layerTools";
 import { WellsPickInfo } from "./layers/wells/wellsLayer";
 import { FeatureCollection } from "geojson";
 import { ViewFooter } from "./components/ViewFooter";
+import { styled } from "@mui/material/styles";
 
 export default {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer",
 } as ComponentMeta<typeof SubsurfaceViewer>;
+
+const classes = {
+    main: "default-main",
+};
+
+const Root = styled("div")({
+    [`& .${classes.main}`]: {
+        width: 750,
+        height: 500,
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+        border: "1px solid black",
+        background: "azure",
+        position: "absolute",
+    },
+});
 
 const defaultWellsProps = {
     id: "volve-wells",
@@ -48,6 +66,24 @@ const wellsLayerWithlogs = new WellsLayer({
     logrunName: "BLOCKING",
     logName: "PORO",
     logColor: "Physics",
+});
+
+const meshMapLayerBig = new MapLayer({
+    "@@type": "MapLayer",
+    id: "mesh-layer",
+    meshData: "hugin_depth_5_m.float32",
+    frame: {
+        origin: [432150, 6475800],
+        count: [1451, 1141],
+        increment: [5, 5],
+        rotDeg: 0,
+    },
+    propertiesData: "kh_netmap_5_m.float32",
+    contours: [0, 100],
+    isContoursDepth: true,
+    gridLines: false,
+    material: true,
+    colorMapName: "Physics",
 });
 
 const Template: ComponentStory<typeof SubsurfaceViewer> = (args) => (
@@ -291,7 +327,7 @@ const wellsLayerNoDepthTest = new WellsLayer({
 export const DepthTest: ComponentStory<typeof SubsurfaceViewer> = (args) => {
     const props = {
         ...args,
-        layers: [netmapLayer, defaultWellsLayer, wellsLayerNoDepthTest],
+        layers: [huginLayer, defaultWellsLayer, wellsLayerNoDepthTest],
     };
 
     return (
@@ -316,7 +352,7 @@ DepthTest.args = {
         viewports: [
             {
                 id: "view_1",
-                layerIds: ["hugin", "wells-layer"],
+                layerIds: ["hugin", "volve-wells"],
                 show3D: false,
                 isSync: true,
             },
@@ -443,5 +479,69 @@ ViewStateSynchronization.argTypes = {
     sync: {
         options: ["view_1", "view_2", "view_3", "view_4"],
         control: "check",
+    },
+};
+
+export const IsLoadedCallback = (args: SubsurfaceViewerProps) => {
+    const [layers, setLayers] = React.useState([defaultWellsLayer] as [
+        WellsLayer,
+        MapLayer?
+    ]);
+    const [label, setLabel] = React.useState("");
+
+    const handleChange = () => {
+        if (layers.length === 1) {
+            setLayers([defaultWellsLayer, meshMapLayerBig]);
+        } else {
+            setLayers([defaultWellsLayer]);
+        }
+    };
+
+    const props = {
+        ...args,
+        isLoadedCallback: (isLoaded: boolean) => {
+            console.log("isLoadedCallback", isLoaded);
+            setLabel(isLoaded ? "LOADED" : "NOT LOADED");
+            return;
+        },
+        layers,
+    };
+
+    return (
+        <Root>
+            <div className={classes.main}>
+                <SubsurfaceViewer {...props} />
+            </div>
+            <button onClick={handleChange}>
+                {" "}
+                {layers.length === 1 ? "Add layer" : "Remove layer"}{" "}
+            </button>
+            <label> {label} </label>
+        </Root>
+    );
+};
+
+IsLoadedCallback.args = {
+    id: "DeckGL-Map",
+    layers: [meshMapLayerBig, defaultWellsLayer],
+    bounds: [432150, 6475800, 439400, 6481501],
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: false,
+            },
+        ],
+    },
+};
+
+IsLoadedCallback.parameters = {
+    docs: {
+        inlineStories: false,
+        iframeHeight: 500,
+        description: {
+            story: "IsLoadedCallback will report in console when triggered",
+        },
     },
 };

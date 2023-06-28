@@ -2,8 +2,6 @@ import React from "react";
 import { styled } from "@mui/material/styles";
 import SubsurfaceViewer from "../SubsurfaceViewer";
 import exampleData from "../../../../../example-data/deckgl-map.json";
-import { default as MapLayer } from "../layers/map/mapLayer";
-import { default as Axes2DLayer } from "../layers/axes2d/axes2DLayer";
 
 const PREFIX = "Default";
 
@@ -13,7 +11,7 @@ const classes = {
 
 const Root = styled("div")({
     [`& .${classes.main}`]: {
-        width: 500,
+        width: 750,
         height: 500,
         top: "50%",
         left: "50%",
@@ -335,7 +333,7 @@ const axes2D = {
     isRightRuler: false,
     isBottomRuler: true,
     isTopRuler: false,
-    backgroundColor: [155, 155, 155, 255],
+    backgroundColor: [155, 0, 0, 255],
 };
 
 export const KhMapMesh = MinimalTemplate.bind({});
