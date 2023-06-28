@@ -438,7 +438,7 @@ exports[`test settings bar snapshot test 1`] = `
             <path
               class=""
               clip-rule="evenodd"
-              d="M3.5 18.5v-13h17v13h-17zm10-2v-9h-3v9h3zm-8-9h3v9h-3v-9zm10 9h3v-9h-3v9z"
+              d="M3.5 18.5v-13h17v13h-17Zm10-2v-9h-3v9h3Zm-8-9h3v9h-3v-9Zm10 9h3v-9h-3v9Z"
               data-testid="eds-icon-path"
               fill-rule="evenodd"
               height="24"
@@ -469,7 +469,7 @@ exports[`test settings bar snapshot test 1`] = `
             <path
               class=""
               clip-rule="evenodd"
-              d="M7 6h10l-5.01 6.3L7 6zm-2.75-.39C6.27 8.2 10 13 10 13v6c0 .55.45 1 1 1h2c.55 0 1-.45 1-1v-6s3.72-4.8 5.74-7.39A.998.998 0 0 0 18.95 4H5.04c-.83 0-1.3.95-.79 1.61z"
+              d="M7 6h10l-5.01 6.3L7 6Zm-2.75-.39C6.27 8.2 10 13 10 13v6c0 .55.45 1 1 1h2c.55 0 1-.45 1-1v-6s3.72-4.8 5.74-7.39A.998.998 0 0 0 18.95 4H5.04c-.83 0-1.3.95-.79 1.61Z"
               data-testid="eds-icon-path"
               fill-rule="evenodd"
               height="24"

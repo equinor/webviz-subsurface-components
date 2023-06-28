@@ -6,7 +6,7 @@ import { Wrapper } from "../test/TestWrapper";
 import WellCompletionComponent from "./WellCompletionComponent";
 import { Data } from "../redux/types";
 
-import exampleData from "../../../../demo/example-data/well-completions.json";
+import exampleData from "../../../../../example-data/well-completions.json";
 
 window.ResizeObserver =
     window.ResizeObserver ||

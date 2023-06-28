@@ -6,7 +6,7 @@ import { Wrapper } from "./../test/TestWrapper";
 import GroupTreeComponent from "./GroupTreeComponent";
 import { Data } from "../redux/types";
 
-import exampleData from "../../../../demo/example-data/group-tree.json";
+import exampleData from "../../../../../example-data/group-tree.json";
 
 describe("Test GroupTree Component", () => {
     it("snapshot test", () => {

@@ -7,8 +7,8 @@ import SyncLogViewer from "./SyncLogViewer";
 import { axisTitles, axisMnemos } from "./utils/axes";
 import { colorTables } from "@emerson-eps/color-tables";
 
-const exampleWellLog = require("../../../demo/example-data/L898MUD.json")[0];
-const exampleTemplate = require("../../../demo/example-data/welllog_template_1.json");
+const exampleWellLog = require("../../../../example-data/L898MUD.json")[0];
+const exampleTemplate = require("../../../../example-data/welllog_template_1.json");
 const exampleColorTables = colorTables;
 
 window.ResizeObserver =
