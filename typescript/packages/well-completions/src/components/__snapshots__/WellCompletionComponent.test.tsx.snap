@@ -701,7 +701,7 @@ exports[`Test Well Completion Component snapshot test 1`] = `
               <path
                 class=""
                 clip-rule="evenodd"
-                d="M3.5 18.5v-13h17v13h-17zm10-2v-9h-3v9h3zm-8-9h3v9h-3v-9zm10 9h3v-9h-3v9z"
+                d="M3.5 18.5v-13h17v13h-17Zm10-2v-9h-3v9h3Zm-8-9h3v9h-3v-9Zm10 9h3v-9h-3v9Z"
                 data-testid="eds-icon-path"
                 fill-rule="evenodd"
                 height="24"
@@ -732,7 +732,7 @@ exports[`Test Well Completion Component snapshot test 1`] = `
               <path
                 class=""
                 clip-rule="evenodd"
-                d="M7 6h10l-5.01 6.3L7 6zm-2.75-.39C6.27 8.2 10 13 10 13v6c0 .55.45 1 1 1h2c.55 0 1-.45 1-1v-6s3.72-4.8 5.74-7.39A.998.998 0 0 0 18.95 4H5.04c-.83 0-1.3.95-.79 1.61z"
+                d="M7 6h10l-5.01 6.3L7 6Zm-2.75-.39C6.27 8.2 10 13 10 13v6c0 .55.45 1 1 1h2c.55 0 1-.45 1-1v-6s3.72-4.8 5.74-7.39A.998.998 0 0 0 18.95 4H5.04c-.83 0-1.3.95-.79 1.61Z"
                 data-testid="eds-icon-path"
                 fill-rule="evenodd"
                 height="24"
@@ -850,74 +850,112 @@ exports[`Test Well Completion Component snapshot test 1`] = `
 	    color: #fff;
 	    background: #222;
 	    border: 1px solid transparent;
+	    border-radius: undefinedpx;
+	    padding: 8px 21px;
   	}
 
   	.t00000000-0000-4000-8000-000000000000.place-top {
         margin-top: -10px;
     }
     .t00000000-0000-4000-8000-000000000000.place-top::before {
-        border-top: 8px solid transparent;
+        content: "";
+        background-color: inherit;
+        position: absolute;
+        z-index: 2;
+        width: 20px;
+        height: 12px;
     }
     .t00000000-0000-4000-8000-000000000000.place-top::after {
-        border-left: 8px solid transparent;
-        border-right: 8px solid transparent;
+        content: "";
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border-top-right-radius: undefinedpx;
+        border: 1px solid transparent;
+        background-color: #222;
+        z-index: -2;
         bottom: -6px;
         left: 50%;
-        margin-left: -8px;
-        border-top-color: #222;
-        border-top-style: solid;
-        border-top-width: 6px;
+        margin-left: -6px;
+        transform: rotate(135deg);
     }
 
     .t00000000-0000-4000-8000-000000000000.place-bottom {
         margin-top: 10px;
     }
     .t00000000-0000-4000-8000-000000000000.place-bottom::before {
-        border-bottom: 8px solid transparent;
+        content: "";
+        background-color: inherit;
+        position: absolute;
+        z-index: -1;
+        width: 18px;
+        height: 10px;
     }
     .t00000000-0000-4000-8000-000000000000.place-bottom::after {
-        border-left: 8px solid transparent;
-        border-right: 8px solid transparent;
+        content: "";
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border-top-right-radius: undefinedpx;
+        border: 1px solid transparent;
+        background-color: #222;
+        z-index: -2;
         top: -6px;
         left: 50%;
-        margin-left: -8px;
-        border-bottom-color: #222;
-        border-bottom-style: solid;
-        border-bottom-width: 6px;
+        margin-left: -6px;
+        transform: rotate(45deg);
     }
 
     .t00000000-0000-4000-8000-000000000000.place-left {
         margin-left: -10px;
     }
     .t00000000-0000-4000-8000-000000000000.place-left::before {
-        border-left: 8px solid transparent;
+        content: "";
+        background-color: inherit;
+        position: absolute;
+        z-index: -1;
+        width: 10px;
+        height: 18px;
     }
     .t00000000-0000-4000-8000-000000000000.place-left::after {
-        border-top: 5px solid transparent;
-        border-bottom: 5px solid transparent;
+        content: "";
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border-top-right-radius: undefinedpx;
+        border: 1px solid transparent;
+        background-color: #222;
+        z-index: -2;
         right: -6px;
         top: 50%;
-        margin-top: -4px;
-        border-left-color: #222;
-        border-left-style: solid;
-        border-left-width: 6px;
+        margin-top: -6px;
+        transform: rotate(45deg);
     }
 
     .t00000000-0000-4000-8000-000000000000.place-right {
         margin-left: 10px;
     }
     .t00000000-0000-4000-8000-000000000000.place-right::before {
-        border-right: 8px solid transparent;
+        content: "";
+        background-color: inherit;
+        position: absolute;
+        z-index: -1;
+        width: 10px;
+        height: 18px;
     }
     .t00000000-0000-4000-8000-000000000000.place-right::after {
-        border-top: 5px solid transparent;
-        border-bottom: 5px solid transparent;
+        content: "";
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border-top-right-radius: undefinedpx;
+        border: 1px solid transparent;
+        background-color: #222;
+        z-index: -2;
         left: -6px;
         top: 50%;
-        margin-top: -4px;
-        border-right-color: #222;
-        border-right-style: solid;
-        border-right-width: 6px;
+        margin-top: -6px;
+        transform: rotate(-135deg);
     }
   
           </style>

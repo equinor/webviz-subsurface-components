@@ -104,10 +104,10 @@ jobs:
       #   if: github.event_name != 'release' && matrix.run-performance-tests
       #   run: npm run test_perf --prefix ./typescript
 
-      # - name: 🤖 Run correctness tests
-      #   if: github.event_name != 'release' # Related to https://github.com/equinor/webviz-subsurface-components/issues/409
-      #   run: |
-      #     npm run test_correctness --prefix ./typescript
+      - name: 🤖 Run correctness tests
+        if: github.event_name != 'release' # Related to https://github.com/equinor/webviz-subsurface-components/issues/409
+        run: |
+          npm run test_correctness --prefix ./typescript
 
       # - name: 🤖 Run python tests
       #   if: github.event_name != 'release' # Related to https://github.com/equinor/webviz-subsurface-components/issues/409
