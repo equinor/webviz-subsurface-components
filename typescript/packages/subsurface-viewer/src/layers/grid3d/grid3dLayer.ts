@@ -139,6 +139,17 @@ const defaultProps = {
 };
 
 export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
+    get isLoaded(): boolean {
+        const subLayers = this.getSubLayers();
+        const isLoaded =
+            super.isLoaded &&
+            subLayers.length > 0 &&
+            subLayers.every((layer) => layer.isLoaded);
+
+        const isFinished = this.state?.["isFinishedLoading"] ?? false;
+        return isLoaded && isFinished;
+    }
+
     rebuildData(reportBoundingBox: boolean): void {
         const p = load_data(
             this.props.pointsData,
@@ -191,11 +202,20 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
                 }
 
                 webWorker.terminate();
+
+                this.setState({
+                    ...this.state,
+                    isFinishedLoading: true,
+                });
             };
         });
     }
 
     initializeState(): void {
+        this.setState({
+            ...this.state,
+            isFinishedLoading: false,
+        });
         const reportBoundingBox = true;
         this.rebuildData(reportBoundingBox);
     }
@@ -214,13 +234,18 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
             !isEqual(props.ZIncreasingDownwards, oldProps.ZIncreasingDownwards);
 
         if (needs_reload) {
+            this.setState({
+                ...this.state,
+                isFinishedLoading: false,
+            });
             const reportBoundingBox = false;
             this.rebuildData(reportBoundingBox);
         }
     }
 
     renderLayers(): [privateLayer?] {
-        if (Object.keys(this.state).length === 0) {
+        if (Object.keys(this.state).length === 1) {
+            // isFinishedLoading only in state
             return [];
         }
 

@@ -306,6 +306,11 @@ export interface MapProps {
     getCameraPosition?: (input: ViewStateType) => void;
 
     /**
+     * Will be called after all layers have finished loading data.
+     */
+    isLoadedCallback?: (arg: boolean) => void;
+
+    /**
      * If changed will reset camera to default position.
      */
     triggerHome?: number;
@@ -385,6 +390,7 @@ const Map: React.FC<MapProps> = ({
     getTooltip = defaultTooltip,
     cameraPosition,
     getCameraPosition,
+    isLoadedCallback,
     triggerHome,
     triggerResetMultipleWells,
 }: MapProps) => {
@@ -694,12 +700,16 @@ const Map: React.FC<MapProps> = ({
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
     const onAfterRender = useCallback(() => {
         if (deckGLLayers) {
-            const state = deckGLLayers.every(
-                (layer) => (layer as Layer).isLoaded
-            );
+            const state = deckGLLayers.every((layer) => {
+                return (layer as Layer).isLoaded;
+            });
             setIsLoaded(state);
+
+            if (typeof isLoadedCallback !== "undefined") {
+                isLoadedCallback(state);
+            }
         }
-    }, [deckGLLayers]);
+    }, [deckGLLayers, isLoadedCallback]);
 
     // validate layers data
     const [errorText, setErrorText] = useState<string>();
