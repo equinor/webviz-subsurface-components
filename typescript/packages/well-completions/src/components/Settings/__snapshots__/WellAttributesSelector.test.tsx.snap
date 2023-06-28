@@ -1,0 +1,71 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`test well attributes selector snapshot test 1`] = `
+.c0 {
+  margin: 0;
+  color: rgba(61,61,61,1);
+  font-family: Equinor;
+  font-size: 1.000rem;
+  font-weight: 400;
+  line-height: 1.250em;
+  text-align: left;
+}
+
+<div
+  class="WellAttributesSelector-root css-4p3xgu"
+>
+  <div
+    id="AttributesSelector"
+  >
+    <label>
+      Filter by Attributes
+    </label>
+    <div
+      class="SmartNodeSelector"
+    >
+      <ul
+        class="SmartNodeSelector__Tags--nolinebreak"
+      >
+        <li
+          class="SmartNodeSelector__Tag "
+          style="border-width: 1px; border-style: solid;"
+          title="Enter a new name"
+        >
+          <div
+            class="SmartNodeSelector__InnerTag SmartNodeSelector__Valid"
+          >
+            <div
+              class="SmartNodeSelector__InputContainer"
+            >
+              <input
+                placeholder="Add new tag..."
+                spellcheck="false"
+                style="width: 50px;"
+                type="text"
+                value=""
+              />
+            </div>
+          </div>
+        </li>
+      </ul>
+      <div
+        class="SmartNodeSelector__ClearAll"
+      >
+        <button
+          disabled=""
+          title="Clear all"
+          type="button"
+        />
+      </div>
+      <div
+        class="Suggestions Suggestions__Position"
+      />
+    </div>
+  </div>
+  <p
+    class="c0"
+  >
+    Well selection criteria: 
+  </p>
+</div>
+`;

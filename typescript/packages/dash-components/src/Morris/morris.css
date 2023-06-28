@@ -1,0 +1,119 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (C) 2020 - Equinor ASA. */
+
+#sensitivity-slider-plot {
+    position: relative;
+}
+
+.sensitivity-slider-plot__graph-area {
+    fill: steelblue;
+    fill-opacity: 0.4;
+}
+
+.sensitivity-slider-plot__graph-line {
+    stroke: steelblue;
+    stroke-width: 1;
+    fill: none;
+}
+
+.sensitivity-slider-plot__graph-overlay {
+    fill: none;
+    pointer-events: all;
+}
+
+.sensitivity-slider-plot__graph-container {
+    background-color: white;
+    z-index: 1;
+}
+
+.sensitivity-slider-plot__slider-container {
+    background-color: white;
+    padding: 0;
+}
+
+.sensitivity-slider-plot__graph-focus-circle {
+    fill: none;
+    stroke: black;
+    r: 4.5;
+}
+
+.sensitivity-slider-plot__graph-focus-line {
+    fill: none;
+    stroke: black;
+    stroke-width: 1.5px;
+    stroke-dasharray: 3 3;
+}
+
+.sensitivity-slider-plot__graph-focus-text {
+    /*x: 9px;*/
+    /*dy: -0.35em;*/
+    font-size: 12px;
+}
+
+.sensitivity-slider-plot__slider-cell {
+    fill: none;
+}
+
+.sensitivity-slider-plot__slider-col-header {
+    /*fill: none;*/
+}
+
+.sensitivity-slider-plot__slider-row-header {
+    /*fill: none;*/
+}
+
+.sensitivity-slider-plot__slider-col-header-label {
+    text-anchor: middle;
+    alignment-baseline: hanging;
+    font-size: 30px;
+    fill: black;
+}
+
+.sensitivity-slider-plot__slider-row-header-label {
+    text-anchor: end;
+    alignment-baseline: central;
+    font-size: 10px;
+    fill: black;
+}
+
+.sensitivity-slider-plot__slide-bar-label {
+    text-anchor: end;
+    alignment-baseline: central;
+    font-size: 12px;
+    fill: black;
+}
+
+.sensitivity-slider-plot__slider-bar-background {
+    fill: grey;
+    stroke: black;
+    stroke-width: 0.5px;
+    rx: 4;
+    ry: 4;
+}
+
+.sensitivity-slider-plot__slider-bar-main {
+    fill: rgb(210, 15, 140);
+    stroke: black;
+    stroke-width: 0.5px;
+    rx: 4;
+    ry: 4;
+}
+
+.sensitivity-slider-plot__slider-bar-interaction {
+    fill: rgb(250, 150, 0);
+    stroke: black;
+    stroke-width: 0.5px;
+    rx: 4;
+    ry: 4;
+}
+
+.affix {
+    top: 0;
+}
+
+.sensitivity-slider-plot__description.mfp-wrap {
+    z-index: initial;
+}

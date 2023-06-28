@@ -1,0 +1,33 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Test Color Legend snapshot test with default props 1`] = `
+<div
+  style="position: absolute;"
+>
+  <label>
+    800
+    m
+  </label>
+  <div
+    style="width: 100px; height: 4px; border: 2px solid; display: inline-block; margin-left: 3px;"
+  />
+</div>
+`;
+
+exports[`Test Color Legend snapshot test with higher zoom 1`] = `
+<div
+  style="position: absolute; top: 10px; left: 10px;"
+>
+  <label
+    style="top: 10px; left: 10px;"
+  >
+    50
+    m
+  </label>
+  <div
+    style="width: 100px; height: 4px; border: 2px solid; display: inline-block; margin-left: 3px;"
+  />
+</div>
+`;
+
+exports[`Test Color Legend snapshot test with invalid props 1`] = `null`;

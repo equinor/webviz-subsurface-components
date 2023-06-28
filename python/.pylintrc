@@ -1,0 +1,16 @@
+[MASTER]
+
+ignore-patterns = ^[A-Z], _imports_  # Dash auto-generated files - ignore them
+
+[MESSAGES CONTROL]
+
+disable = missing-docstring,
+          duplicate-code
+
+[BASIC]
+
+# Variable names which should always be accepted
+good-names = i,
+             j,
+             df,
+             _
