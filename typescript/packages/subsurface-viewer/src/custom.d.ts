@@ -7,3 +7,5 @@ declare module "*.svg" {
 declare module "*.png";
 declare module "@emerson-eps/color-tables";
 declare module "deck.gl";
+declare module "@emerson-eps/color-tables";
+declare module "@deck.gl/core/dist/esm/controllers/view-state";

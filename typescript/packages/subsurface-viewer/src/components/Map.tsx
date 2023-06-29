@@ -40,6 +40,7 @@ import { OrbitController, OrthographicController } from "@deck.gl/core/typed";
 import { MjolnirEvent, MjolnirPointerEvent } from "mjolnir.js";
 import IntersectionView from "../views/intersectionView";
 import { Unit } from "convert-units";
+import MyOrbitController from "./my-orbit-controller";
 
 type BoundingBox = [number, number, number, number, number, number];
 
@@ -1055,6 +1056,18 @@ function createViewsAndViewStates(
         }
     }
 
+    class MyOrbitView extends OrbitView {
+        get ControllerType(): typeof OrbitController {
+            return MyOrbitController;
+        }
+    }
+
+    class ZScaleOrbitView extends OrbitView {
+        get ControllerType(): typeof OrbitController {
+            return ZScaleOrbitController;
+        }
+    }
+
     const widthViewPort = deck?.width ?? 1;
     const heightViewPort = deck?.height ?? 1;
 
@@ -1125,9 +1138,9 @@ function createViewsAndViewStates(
                     views.viewports[deckgl_views.length];
 
                 let ViewType:
-                    | typeof OrbitView
+                    | typeof ZScaleOrbitView
                     | typeof IntersectionView
-                    | typeof OrthographicView = OrbitView;
+                    | typeof OrthographicView = ZScaleOrbitView;
                 if (!currentViewport.show3D) {
                     ViewType =
                         currentViewport.id === "intersection_view"
@@ -1139,7 +1152,7 @@ function createViewsAndViewStates(
                 const near = currentViewport.show3D ? 0.1 : -9999;
 
                 const Controller = currentViewport.show3D
-                    ? OrbitController
+                    ? ZScaleOrbitController
                     : OrthographicController;
 
                 const controller = {
