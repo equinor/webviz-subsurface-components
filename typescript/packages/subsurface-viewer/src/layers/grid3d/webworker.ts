@@ -131,7 +131,12 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
             vertexProperties.push(propertyValue);
             vertexProperties.push(propertyValue);
         } else {
-            console.error("Only triangles or four corners are expected.");
+            if (params.triangulate) {
+                const trianFunc = Function("points", params.triangulate);
+                //const earcut = trianFunc.earcut;
+                const test = trianFunc([10, 0, 0, 50, 60, 60, 70, 10]);
+                console.log("Triangulated poly: ", test);
+            }
         }
 
         i = i + n + 1;

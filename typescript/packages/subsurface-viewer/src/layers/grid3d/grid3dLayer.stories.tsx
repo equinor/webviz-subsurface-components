@@ -88,6 +88,37 @@ SimgridArrayInput.args = {
 };
 SimgridArrayInput.parameters = parameters;
 
+export const SimgridPolyhedralCell = Template.bind({});
+SimgridPolyhedralCell.args = {
+    bounds: [-400, -400, 400, 400] as NumberQuad,
+    views: {
+        layout: [1, 1] as [number, number],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: true,
+            },
+        ],
+    },
+    id: "grid-3d-polyhedral-cell",
+    layers: [
+        {
+            "@@type": "AxesLayer",
+            id: "polyhedral-cells-axes",
+            bounds: [-400, -400, -400, 400, 400, 400],
+        },
+        {
+            ...grid3dLayer,
+            pointsData: [
+                0, 0, 0, 0, 100, 0, 100, 200, 0, 200, 100, 0, 200, 0, 0,
+            ],
+            polysData: [5, 0, 1, 2, 3, 4],
+            propertiesData: [0.2, 0.6, 0.8],
+        },
+    ],
+};
+SimgridPolyhedralCell.parameters = parameters;
+
 export const Simgrid2x = Template.bind({});
 Simgrid2x.args = {
     ...defaultProps,
