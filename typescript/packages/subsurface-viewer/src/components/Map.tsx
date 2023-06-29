@@ -25,7 +25,7 @@ import fitBounds from "../utils/fit-bounds";
 import {
     validateColorTables,
     validateLayers,
-} from "../../../inputSchema/schemaValidationUtil";
+} from "../inputSchema/schemaValidationUtil";
 import { LayerPickInfo } from "../layers/utils/layerTools";
 import { getLayersByType } from "../layers/utils/layerTools";
 import { getWellLayerByTypeAndSelectedWells } from "../layers/utils/layerTools";
@@ -42,7 +42,11 @@ import IntersectionView from "../views/intersectionView";
 import { Unit } from "convert-units";
 
 type BoundingBox = [number, number, number, number, number, number];
-type NumberQuad = [number, number, number, number];
+
+const minZoom3D = -12;
+const maxZoom3D = 12;
+const minZoom2D = -12;
+const maxZoom2D = 4;
 
 function addBoundingBoxes(b1: BoundingBox, b2: BoundingBox): BoundingBox {
     const boxDefault: BoundingBox = [0, 0, 0, 1, 1, 1];
@@ -86,6 +90,29 @@ export type TooltipCallback = (
     info: PickingInfo
 ) => string | Record<string, unknown> | null;
 
+export interface ViewsType {
+    /**
+     * Layout for viewport in specified as [row, column]
+     */
+    layout: [number, number];
+
+    /**
+     * Number of pixels used for the margin in matrix mode.
+     * Defaults to 0.
+     */
+    marginPixels?: number;
+
+    /**
+     * Show views label
+     */
+    showLabel?: boolean;
+
+    /**
+     * Layers configuration for multiple viewport
+     */
+    viewports: ViewportType[];
+}
+
 export interface ViewportType {
     /**
      * Viewport id
@@ -111,30 +138,8 @@ export interface ViewportType {
     zoom?: number;
     rotationX?: number;
     rotationOrbit?: number;
+
     isSync?: boolean;
-}
-
-export interface ViewsType {
-    /**
-     * Layout for viewport in specified as [row, column]
-     */
-    layout: [number, number];
-
-    /**
-     * Number of pixels used for the margin in matrix mode.
-     * Defaults to 0.
-     */
-    marginPixels?: number;
-
-    /**
-     * Show views label
-     */
-    showLabel?: boolean;
-
-    /**
-     * Layers configuration for multiple viewport
-     */
-    viewports: ViewportType[];
 }
 
 export interface ViewStateType {
@@ -142,6 +147,8 @@ export interface ViewStateType {
     zoom: number;
     rotationX: number;
     rotationOrbit: number;
+    minZoom?: number;
+    maxZoom?: number;
 }
 
 interface marginsType {
@@ -332,21 +339,22 @@ const Map: React.FC<MapProps> = ({
     triggerHome,
     triggerResetMultipleWells,
 }: MapProps) => {
-    const isCameraPositionDefined =
-        typeof cameraPosition !== "undefined" &&
-        Object.keys(cameraPosition).length !== 0;
-
     const deckRef = useRef<DeckGLRef>(null);
 
     const bboxInitial: BoundingBox = [0, 0, 0, 1, 1, 1];
 
-    const boundsInitial = React.useMemo(
-        () => bounds ?? ([0, 0, 1, 1] as NumberQuad),
-        [bounds]
+    // Deck.gl View's and viewStates as input to Deck.gl
+    const [deckGLViews, setDeckGLViews] = useState<View[]>([]);
+    const [viewStates, setViewStates] = useState<Record<string, ViewStateType>>(
+        {}
     );
 
-    // state for views prop of DeckGL component
-    const [viewsProps, setViewsProps] = useState<ViewportType[]>([]);
+    const [reportedBoundingBox, setReportedBoundingBox] =
+        useState<BoundingBox>(bboxInitial);
+    const [reportedBoundingBoxAcc, setReportedBoundingBoxAcc] =
+        useState<BoundingBox>(bboxInitial);
+
+    const [deckGLLayers, setDeckGLLayers] = useState<LayersList>([]);
     const [alteredLayers, setAlteredLayers] = useState<LayersList>([]);
 
     const [viewPortMargins, setViewPortMargins] = useState<marginsType>({
@@ -356,240 +364,10 @@ const Map: React.FC<MapProps> = ({
         bottom: 0,
     });
 
-    const [didUserChangeCamera, setDidUserChangeCamera] =
-        useState<boolean>(false);
-
-    const [reportedBoundingBox, setReportedBoundingBox] =
-        useState<BoundingBox>(bboxInitial);
-    const [reportedBoundingBoxAcc, setReportedBoundingBoxAcc] =
-        useState<BoundingBox>(bboxInitial);
-
-    const initialViewState = getViewState(
-        viewPortMargins,
-        boundsInitial,
-        boundingBoxCenter(reportedBoundingBoxAcc),
-        views,
-        0,
-        deckRef.current?.deck
-    );
-
-    // Local help function.
-    const calcDefaultViewStates = useCallback(
-        (boundingBox: BoundingBox, input?: ViewportType[]) => {
-            const center = boundingBoxCenter(
-                boundingBox // note this may include axesLayer
-            );
-
-            const updatedViewProps = input ? input : viewsProps;
-
-            const isBoundsDefined = typeof bounds !== "undefined";
-            const viewStateMap = updatedViewProps.map((item, index) => {
-                const is3D = views?.viewports?.[index]?.show3D ?? false;
-
-                const viewState = isBoundsDefined
-                    ? getViewState(
-                          viewPortMargins,
-                          boundsInitial,
-                          center,
-                          views,
-                          index,
-                          deckRef.current?.deck
-                      )
-                    : getViewState3D(
-                          is3D,
-                          boundingBox,
-                          views?.viewports?.[index].zoom,
-                          deckRef.current?.deck
-                      );
-
-                const minZoom = is3D ? -12 : -12;
-                const maxZoom = is3D ? +12 : +4;
-
-                return [item.id, { ...viewState, minZoom, maxZoom }];
-            });
-
-            const tempViewStates = Object.fromEntries(viewStateMap);
-
-            setDidUserChangeCamera(false);
-            setViewStates(tempViewStates);
-        },
-        [bounds, boundsInitial, views, viewPortMargins, viewsProps]
-    );
-
-    // set initial view state based on supplied bounds and zoom in viewState
-    const [viewStates, setViewStates] = useState<Record<string, ViewStateType>>(
-        {
-            "main-view_2D": cameraPosition ?? ({} as ViewStateType),
-        }
-    );
-    const [firstViewStateId, setFirstViewStatesId] =
-        useState<string>("main-view_2D");
-
-    useEffect(() => {
-        let tempViewStates: Record<string, ViewStateType> = {};
-        if (isCameraPositionDefined) {
-            tempViewStates = Object.fromEntries(
-                viewsProps.map((item) => [item.id, cameraPosition])
-            ) as unknown as Record<string, ViewStateType>;
-        } else {
-            const isBoundsDefined = typeof bounds !== "undefined";
-
-            tempViewStates = Object.fromEntries(
-                viewsProps.map((item, index) => {
-                    let viewState = viewStates[item.id];
-                    if (typeof viewState === "undefined") {
-                        viewState = isBoundsDefined
-                            ? getViewState(
-                                  viewPortMargins,
-                                  boundsInitial,
-                                  boundingBoxCenter(reportedBoundingBoxAcc),
-                                  views,
-                                  index,
-                                  deckRef.current?.deck
-                              )
-                            : getViewState3D(
-                                  views?.viewports?.[index]?.show3D ?? false,
-                                  reportedBoundingBoxAcc,
-                                  views?.viewports?.[index].zoom,
-                                  deckRef.current?.deck
-                              );
-                    }
-
-                    return [item.id, viewState];
-                })
-            );
-        }
-        if (viewsProps[0] !== undefined) {
-            setFirstViewStatesId(viewsProps[0].id);
-        }
-        setViewStates(tempViewStates);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [
-        boundsInitial,
-        cameraPosition,
-        isCameraPositionDefined,
-        viewPortMargins,
-        views?.viewports,
-        viewsProps,
-    ]);
-
-    // calculate view state on deckgl context load (based on viewport size)
-    const onLoad = useCallback(() => {
-        let tempViewStates: Record<string, ViewStateType> = {};
-        if (isCameraPositionDefined) {
-            tempViewStates = Object.fromEntries(
-                viewsProps.map((item) => [item.id, cameraPosition])
-            ) as unknown as Record<string, ViewStateType>;
-        } else {
-            tempViewStates = Object.fromEntries(
-                viewsProps.map((item, index) => [
-                    item.id,
-                    getViewState(
-                        viewPortMargins,
-                        boundsInitial,
-                        boundingBoxCenter(reportedBoundingBoxAcc),
-                        views,
-                        index,
-                        deckRef.current?.deck
-                    ),
-                ])
-            );
-            if (viewsProps[0] !== undefined) {
-                setFirstViewStatesId(viewsProps[0].id);
-            }
-            setViewStates(tempViewStates);
-        }
-    }, [
-        isCameraPositionDefined,
-        viewsProps,
-        cameraPosition,
-        viewPortMargins,
-        boundsInitial,
-        reportedBoundingBoxAcc,
-        views,
-    ]);
-
-    useEffect(() => {
-        if (typeof triggerHome !== "undefined") {
-            calcDefaultViewStates(reportedBoundingBoxAcc);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [triggerHome]);
-
-    useEffect(() => {
-        const union_of_reported_bboxes = addBoundingBoxes(
-            reportedBoundingBoxAcc,
-            reportedBoundingBox
-        );
-        setReportedBoundingBoxAcc(union_of_reported_bboxes);
-
-        // If "bounds" or "cameraPosition" is not defined "viewState" will be
-        // calculated based on the union of the reported bounding boxes from each layer.
-        if (!didUserChangeCamera && !isCameraPositionDefined) {
-            calcDefaultViewStates(union_of_reported_bboxes);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [reportedBoundingBox]);
-
-    // react on bounds prop change
-    useEffect(() => {
-        const isBoundsDefined = typeof bounds !== "undefined";
-
-        let tempViewStates: Record<string, ViewStateType> = {};
-        if (!isCameraPositionDefined) {
-            tempViewStates = Object.fromEntries(
-                viewsProps.map((item, index) => [
-                    item.id,
-                    isBoundsDefined
-                        ? getViewState(
-                              viewPortMargins,
-                              boundsInitial,
-                              boundingBoxCenter(reportedBoundingBoxAcc),
-                              views,
-                              index,
-                              deckRef.current?.deck
-                          )
-                        : getViewState3D(
-                              views?.viewports?.[index]?.show3D ?? false,
-                              reportedBoundingBoxAcc,
-                              views?.viewports?.[index].zoom,
-                              deckRef.current?.deck
-                          ),
-                ])
-            );
-            if (viewsProps[0] !== undefined) {
-                setFirstViewStatesId(viewsProps[0].id);
-            }
-            setViewStates(tempViewStates);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [boundsInitial, cameraPosition, views?.viewports, viewsProps]);
-
-    // react on cameraPosition prop change
-    useEffect(() => {
-        let tempViewStates: Record<string, ViewStateType> = {};
-        if (isCameraPositionDefined) {
-            tempViewStates = Object.fromEntries(
-                viewsProps.map((item) => [item.id, cameraPosition])
-            ) as unknown as Record<string, ViewStateType>;
-            setViewStates(tempViewStates);
-            if (viewsProps[0] !== undefined) {
-                setFirstViewStatesId(viewsProps[0].id);
-            }
-        }
-        if (cameraPosition === null) {
-            tempViewStates = Object.fromEntries(
-                viewsProps.map((item) => [item.id, initialViewState])
-            );
-            setViewStates(tempViewStates);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [cameraPosition, viewsProps]);
-
     // Used for scaling in z direction using arrow keys.
     const [scaleZ, setScaleZ] = useState<number>(1);
-    const [scaleZUp, setScaleZUp] = useState<number>(1);
-    const [scaleZDown, setScaleZDown] = useState<number>(1);
+    const [scaleZUp, setScaleZUp] = useState<number>(Number.MAX_VALUE);
+    const [scaleZDown, setScaleZDown] = useState<number>(Number.MAX_VALUE);
 
     const scaleUpFunction = () => {
         setScaleZUp(Math.random());
@@ -599,37 +377,72 @@ const Map: React.FC<MapProps> = ({
         setScaleZDown(Math.random());
     };
 
+    // Calculate a set of Deck.gl View's and viewStates as input to Deck.gl
     useEffect(() => {
-        const newScaleZ = scaleZ * 1.05;
-        setScaleZ(newScaleZ);
-        // Make camera target follow the scaling.
-        const vs = adjustCameraTarget(viewStates, scaleZ, newScaleZ);
-        setViewStates(vs);
+        const [Views, viewStates] = createViewsAndViewStates(
+            views,
+            viewPortMargins,
+            bounds,
+            cameraPosition,
+            reportedBoundingBoxAcc,
+            scaleUpFunction,
+            scaleDownFunction,
+            deckRef.current?.deck
+        );
+
+        setDeckGLViews(Views);
+        setViewStates(viewStates);
+    }, [
+        bounds,
+        cameraPosition,
+        views?.viewports,
+        deckRef?.current?.deck,
+        reportedBoundingBox,
+        reportedBoundingBoxAcc,
+        views,
+        viewPortMargins,
+        triggerHome,
+    ]);
+
+    useEffect(() => {
+        setDeckGLLayers(alteredLayers);
+    }, [alteredLayers]);
+
+    useEffect(() => {
+        const union_of_reported_bboxes = addBoundingBoxes(
+            reportedBoundingBoxAcc,
+            reportedBoundingBox
+        );
+        setReportedBoundingBoxAcc(union_of_reported_bboxes);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [reportedBoundingBox]);
+
+    useEffect(() => {
+        if (scaleZUp !== Number.MAX_VALUE) {
+            const newScaleZ = scaleZ * 1.05;
+            setScaleZ(newScaleZ);
+            // Make camera target follow the scaling.
+            const vs = adjustCameraTarget(viewStates, scaleZ, newScaleZ);
+            setViewStates(vs);
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [scaleZUp]);
 
     useEffect(() => {
-        const newScaleZ = scaleZ * 0.95;
-        setScaleZ(newScaleZ);
-        // Make camera target follow the scaling.
-        const vs = adjustCameraTarget(viewStates, scaleZ, newScaleZ);
-        setViewStates(vs);
+        if (scaleZUp !== Number.MAX_VALUE) {
+            const newScaleZ = scaleZ * 0.95;
+            setScaleZ(newScaleZ);
+            // Make camera target follow the scaling.
+            const vs = adjustCameraTarget(viewStates, scaleZ, newScaleZ);
+            setViewStates(vs);
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [scaleZDown]);
 
     useEffect(() => {
-        const viewProps = getViews(views) as ViewportType[];
-
-        setViewsProps(viewProps);
-
-        if (!bounds) {
-            calcDefaultViewStates(reportedBoundingBoxAcc);
+        if (typeof layers === "undefined") {
+            return;
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [views]);
-
-    useEffect(() => {
-        if (layers == undefined) return;
 
         // Margins on the viewport are extracted from a potenial axes2D layer.
         const axes2DLayer = layers?.find((e) => {
@@ -655,33 +468,44 @@ const Map: React.FC<MapProps> = ({
 
         setViewPortMargins({ left, right, top, bottom });
 
-        const m = getModelMatrixScale(scaleZ);
-
         const layers_copy = layers.map((item) => {
-            if (item?.constructor.name === NorthArrow3DLayer.name) return item;
-
-            const layer = item as Layer;
-
-            // Set "modelLayer" matrix to reflect correct z scaling.
-            const scaledLayer = layer.clone({ modelMatrix: m });
+            if (item?.constructor.name === NorthArrow3DLayer.name) {
+                return item;
+            }
 
             // Inject "setReportedBoundingBox" function into layer for it to report
             // back its respective bounding box.
-            const boundedLayer = scaledLayer.clone({
+            return (item as Layer).clone({
+                // eslint-disable-next-line
+                // @ts-ignore
                 setReportedBoundingBox: setReportedBoundingBox,
             });
-
-            return boundedLayer ?? scaledLayer;
         });
 
         setAlteredLayers(layers_copy);
-    }, [scaleZ, layers /*dispatch*/]);
-
-    const [deckGLLayers, setDeckGLLayers] = useState<LayersList>([]);
+    }, [layers]);
 
     useEffect(() => {
-        setDeckGLLayers(alteredLayers);
-    }, [alteredLayers]);
+        if (typeof layers === "undefined") {
+            return;
+        }
+
+        const m = getModelMatrixScale(scaleZ);
+
+        const layers_copy = deckGLLayers.map((item) => {
+            if (item?.constructor.name === NorthArrow3DLayer.name) {
+                return item;
+            }
+
+            // Set "modelLayer" matrix to reflect correct z scaling.
+            return (item as Layer).clone({
+                modelMatrix: m,
+            });
+        });
+
+        setDeckGLLayers(layers_copy);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [scaleZ]);
 
     useEffect(() => {
         const layers = deckRef.current?.deck?.props.layers;
@@ -896,21 +720,9 @@ const Map: React.FC<MapProps> = ({
             if (getCameraPosition) {
                 getCameraPosition(viewState);
             }
-            setFirstViewStatesId(viewsProps[0]?.id);
-            setDidUserChangeCamera(true);
         },
-        [getCameraPosition, views?.viewports, viewsProps]
+        [getCameraPosition, views?.viewports]
     );
-
-    const deckGLViews = React.useMemo(() => {
-        return createViews(
-            views,
-            scaleUpFunction,
-            scaleDownFunction,
-            deckRef.current?.deck
-        );
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [views, views, deckRef.current?.deck]);
 
     if (!deckGLViews || isEmpty(deckGLViews) || isEmpty(deckGLLayers))
         return null;
@@ -964,7 +776,6 @@ const Map: React.FC<MapProps> = ({
                 onViewStateChange={onViewStateChange}
                 onHover={onHover}
                 onClick={onClick}
-                onLoad={onLoad}
                 onAfterRender={onAfterRender}
             >
                 {children}
@@ -972,11 +783,7 @@ const Map: React.FC<MapProps> = ({
             {scale?.visible ? (
                 <DistanceScale
                     {...scale}
-                    zoom={
-                        viewStates[firstViewStateId] === undefined
-                            ? -5
-                            : viewStates[firstViewStateId].zoom
-                    }
+                    zoom={viewStates[Object.keys(viewStates)[0]]?.zoom ?? -5}
                     scaleUnit={coordinateUnit}
                     style={scale.cssStyle ?? {}}
                 />
@@ -1060,7 +867,7 @@ function getViewState(
     bounds_accessor: [number, number, number, number] | BoundsAccessor,
     centerOfData: [number, number, number],
     views: ViewsType | undefined,
-    viewPortIndex: number,
+    viewPort: ViewportType,
     deck?: Deck
 ): ViewStateType {
     let bounds = [0, 0, 1, 1];
@@ -1148,17 +955,22 @@ function getViewState(
         fb_zoom = fb.zoom;
     }
 
-    const target = views?.viewports?.[viewPortIndex]?.target;
-    const zoom = views?.viewports?.[viewPortIndex]?.zoom;
+    const target = viewPort.target;
+    const zoom = viewPort.zoom;
 
     const target_ = target ?? fb_target;
     const zoom_ = zoom ?? fb_zoom;
+
+    const minZoom = minZoom3D;
+    const maxZoom = viewPort.show3D ? maxZoom3D : maxZoom2D;
 
     const view_state: ViewStateType = {
         target: target_,
         zoom: zoom_,
         rotationX: 90, // look down z -axis
         rotationOrbit: 0,
+        minZoom,
+        maxZoom,
     };
     return view_state;
 }
@@ -1197,22 +1009,37 @@ function getViewState3D(
         height,
         bounds: bounds2D,
     });
+
     const view_state: ViewStateType = {
         target,
         zoom: zoom ?? fitted_bound.zoom * 1.2,
         rotationX: 45, // look down z -axis at 45 degrees
         rotationOrbit: 0,
+        minZoom: minZoom3D,
+        maxZoom: maxZoom3D,
     };
     return view_state;
 }
 
-// construct views object for DeckGL component
-function createViews(
+// construct views and viewStates for DeckGL component
+function createViewsAndViewStates(
     views: ViewsType | undefined,
+    viewPortMargins: marginsType,
+    bounds: [number, number, number, number] | BoundsAccessor | undefined,
+    cameraPosition: ViewStateType | undefined,
+    boundingBox: [number, number, number, number, number, number],
     scaleUpFunction: { (): void; (): void },
     scaleDownFunction: { (): void; (): void },
     deck?: Deck
-): View[] {
+): [View[], Record<string, ViewStateType>] {
+    const deckgl_views: View[] = [];
+    let viewStates: Record<string, ViewStateType> = {} as Record<
+        string,
+        ViewStateType
+    >;
+
+    const centerOfData = boundingBoxCenter(boundingBox);
+
     // Use modified controller to handle key events.
     class ZScaleOrbitController extends OrbitController {
         handleEvent(event: MjolnirEvent): boolean {
@@ -1227,19 +1054,24 @@ function createViews(
             return super.handleEvent(event);
         }
     }
-    const deckgl_views: View[] = [];
 
-    const widthViewPort = deck?.width;
-    const heightViewPort = deck?.height;
-
-    const isDeckDefined =
-        typeof widthViewPort !== "undefined" &&
-        typeof heightViewPort !== "undefined";
+    const widthViewPort = deck?.width ?? 1;
+    const heightViewPort = deck?.height ?? 1;
 
     const mPixels = views?.marginPixels ?? 0;
 
+    const isOk =
+        deck &&
+        views &&
+        views.layout[0] >= 1 &&
+        views.layout[1] >= 1 &&
+        views.layout[0] * views.layout[1] <= views.viewports.length;
+
     // if props for multiple viewport are not proper, return 2d view
-    if (!views || !views.viewports || !views.layout || !isDeckDefined) {
+    if (!isOk) {
+        console.warn(
+            "Properties for multiple viewports are not properly defined."
+        );
         deckgl_views.push(
             new OrthographicView({
                 id: "main",
@@ -1253,6 +1085,17 @@ function createViews(
                 near: -99999,
             })
         );
+        viewStates = {
+            ...viewStates,
+            ["dummy"]: {
+                target: [0, 0],
+                zoom: 0,
+                rotationX: 0,
+                rotationOrbit: 0,
+                minZoom: minZoom2D,
+                maxZoom: maxZoom2D,
+            } as ViewStateType,
+        };
     } else {
         let yPos = 0;
         const [nY, nX] = views.layout;
@@ -1275,23 +1118,28 @@ function createViews(
                     views.viewports == undefined ||
                     deckgl_views.length >= views.viewports.length
                 ) {
-                    return deckgl_views;
+                    return [deckgl_views, viewStates];
                 }
 
                 const currentViewport: ViewportType =
                     views.viewports[deckgl_views.length];
 
-                const ViewType = currentViewport.show3D
-                    ? OrbitView
-                    : currentViewport.id === "intersection_view"
-                    ? IntersectionView
-                    : OrthographicView;
+                let ViewType:
+                    | typeof OrbitView
+                    | typeof IntersectionView
+                    | typeof OrthographicView = OrbitView;
+                if (!currentViewport.show3D) {
+                    ViewType =
+                        currentViewport.id === "intersection_view"
+                            ? IntersectionView
+                            : OrthographicView;
+                }
 
                 const far = 9999;
                 const near = currentViewport.show3D ? 0.1 : -9999;
 
                 const Controller = currentViewport.show3D
-                    ? ZScaleOrbitController
+                    ? OrbitController
                     : OrthographicController;
 
                 const controller = {
@@ -1315,43 +1163,42 @@ function createViews(
                         near,
                     })
                 );
+
+                const isBoundsDefined = typeof bounds !== "undefined";
+                const isCameraPositionDefined =
+                    typeof cameraPosition !== "undefined" &&
+                    Object.keys(cameraPosition).length !== 0;
+
+                let viewState = cameraPosition;
+                if (!isCameraPositionDefined) {
+                    viewState = isBoundsDefined
+                        ? getViewState(
+                              viewPortMargins,
+                              bounds ?? [0, 0, 1, 1],
+                              centerOfData,
+                              views,
+                              currentViewport,
+                              deck
+                          )
+                        : getViewState3D(
+                              currentViewport.show3D ?? false,
+                              boundingBox,
+                              currentViewport.zoom,
+                              deck
+                          );
+                }
+
+                viewStates = {
+                    ...viewStates,
+                    [currentViewport.id]: viewState as ViewStateType,
+                };
+
                 xPos = xPos + w;
             }
             yPos = yPos + h;
         }
     }
-    return deckgl_views;
-}
-
-// construct views object for DeckGL component
-function getViews(views: ViewsType | undefined): ViewportType[] {
-    const deckgl_views = [];
-
-    // if props for multiple viewport are not proper, return 2d view
-    if (!views || !views.viewports || !views.layout) {
-        deckgl_views.push({
-            id: "main",
-        });
-    } else {
-        const [nY, nX] = views.layout;
-        for (let y = 1; y <= nY; y++) {
-            for (let x = 1; x <= nX; x++) {
-                if (
-                    views.viewports == undefined ||
-                    deckgl_views.length >= views.viewports.length
-                )
-                    return deckgl_views;
-
-                const cur_viewport: ViewportType =
-                    views.viewports[deckgl_views.length];
-
-                deckgl_views.push({
-                    id: cur_viewport.id,
-                });
-            }
-        }
-    }
-    return deckgl_views;
+    return [deckgl_views, viewStates];
 }
 
 function handleMouseEvent(
