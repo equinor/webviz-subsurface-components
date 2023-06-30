@@ -40,7 +40,6 @@ import { OrbitController, OrthographicController } from "@deck.gl/core/typed";
 import { MjolnirEvent, MjolnirPointerEvent } from "mjolnir.js";
 import IntersectionView from "../views/intersectionView";
 import { Unit } from "convert-units";
-import MyOrbitController from "./my-orbit-controller";
 
 type BoundingBox = [number, number, number, number, number, number];
 
@@ -49,7 +48,7 @@ const maxZoom3D = 12;
 const minZoom2D = -12;
 const maxZoom2D = 4;
 
-class GlobalZScaleOrbitController extends OrbitController {
+class ZScaleOrbitController extends OrbitController {
     static setZScaleUp: React.Dispatch<React.SetStateAction<number>> | null =
         null;
     static setZScaleDown: React.Dispatch<React.SetStateAction<number>> | null =
@@ -58,35 +57,33 @@ class GlobalZScaleOrbitController extends OrbitController {
     static setZScaleUpReference(
         setZScaleUp: React.Dispatch<React.SetStateAction<number>>
     ) {
-        GlobalZScaleOrbitController.setZScaleUp = setZScaleUp;
+        ZScaleOrbitController.setZScaleUp = setZScaleUp;
     }
 
     static setZScaleDownReference(
         setZScaleDown: React.Dispatch<React.SetStateAction<number>>
     ) {
-        GlobalZScaleOrbitController.setZScaleDown = setZScaleDown;
+        ZScaleOrbitController.setZScaleDown = setZScaleDown;
     }
 
     handleEvent(event: MjolnirEvent): boolean {
-        if (GlobalZScaleOrbitController.setZScaleUp === null) {
+        if (ZScaleOrbitController.setZScaleUp === null) {
             return super.handleEvent(event);
         }
 
         if (
-            GlobalZScaleOrbitController.setZScaleUp &&
+            ZScaleOrbitController.setZScaleUp &&
             event.type === "keydown" &&
             event.key === "ArrowUp"
         ) {
-            GlobalZScaleOrbitController.setZScaleUp(Math.random());
-            //scaleUpFunction();
+            ZScaleOrbitController.setZScaleUp(Math.random());
             return true;
         } else if (
-            GlobalZScaleOrbitController.setZScaleDown &&
+            ZScaleOrbitController.setZScaleDown &&
             event.type === "keydown" &&
             event.key === "ArrowDown"
         ) {
-            GlobalZScaleOrbitController.setZScaleDown(Math.random());
-            //scaleDownFunction();
+            ZScaleOrbitController.setZScaleDown(Math.random());
             return true;
         }
 
@@ -94,9 +91,9 @@ class GlobalZScaleOrbitController extends OrbitController {
     }
 }
 
-class GlobalZScaleOrbitView extends OrbitView {
+class ZScaleOrbitView extends OrbitView {
     get ControllerType(): typeof OrbitController {
-        return GlobalZScaleOrbitController;
+        return ZScaleOrbitController;
     }
 }
 
@@ -423,11 +420,11 @@ const Map: React.FC<MapProps> = ({
     const [scaleZDown, setScaleZDown] = useState<number>(Number.MAX_VALUE);
 
     React.useEffect(() => {
-        GlobalZScaleOrbitController.setZScaleUpReference(setScaleZUp);
+        ZScaleOrbitController.setZScaleUpReference(setScaleZUp);
     }, [setScaleZUp]);
 
     React.useEffect(() => {
-        GlobalZScaleOrbitController.setZScaleDownReference(setScaleZDown);
+        ZScaleOrbitController.setZScaleDownReference(setScaleZDown);
     }, [setScaleZDown]);
 
     /*
@@ -1091,8 +1088,6 @@ function createViewsAndViewStates(
     bounds: [number, number, number, number] | BoundsAccessor | undefined,
     cameraPosition: ViewStateType | undefined,
     boundingBox: [number, number, number, number, number, number],
-    //scaleUpFunction: { (): void; (): void },
-    //scaleDownFunction: { (): void; (): void },
     deck?: Deck
 ): [View[], Record<string, ViewStateType>] {
     const deckgl_views: View[] = [];
@@ -1102,33 +1097,6 @@ function createViewsAndViewStates(
     >;
 
     const centerOfData = boundingBoxCenter(boundingBox);
-
-    // Use modified controller to handle key events.
-    class ZScaleOrbitController extends OrbitController {
-        handleEvent(event: MjolnirEvent): boolean {
-            if (event.type === "keydown" && event.key === "ArrowUp") {
-                //scaleUpFunction();
-                return true;
-            } else if (event.type === "keydown" && event.key === "ArrowDown") {
-                //scaleDownFunction();
-                return true;
-            }
-
-            return super.handleEvent(event);
-        }
-    }
-
-    class MyOrbitView extends OrbitView {
-        get ControllerType(): typeof OrbitController {
-            return MyOrbitController;
-        }
-    }
-
-    class ZScaleOrbitView extends OrbitView {
-        get ControllerType(): typeof OrbitController {
-            return ZScaleOrbitController;
-        }
-    }
 
     const widthViewPort = deck?.width ?? 1;
     const heightViewPort = deck?.height ?? 1;
@@ -1200,9 +1168,9 @@ function createViewsAndViewStates(
                     views.viewports[deckgl_views.length];
 
                 let ViewType:
-                    | typeof GlobalZScaleOrbitView
+                    | typeof ZScaleOrbitView
                     | typeof IntersectionView
-                    | typeof OrthographicView = GlobalZScaleOrbitView;
+                    | typeof OrthographicView = ZScaleOrbitView;
                 if (!currentViewport.show3D) {
                     ViewType =
                         currentViewport.id === "intersection_view"
@@ -1214,7 +1182,7 @@ function createViewsAndViewStates(
                 const near = currentViewport.show3D ? 0.1 : -9999;
 
                 const Controller = currentViewport.show3D
-                    ? GlobalZScaleOrbitController
+                    ? ZScaleOrbitController
                     : OrthographicController;
 
                 const controller = {
