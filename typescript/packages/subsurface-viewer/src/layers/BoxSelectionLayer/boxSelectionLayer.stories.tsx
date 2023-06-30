@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
 /* eslint-disable react-hooks/rules-of-hooks  */ // remove when ready to fix these.
 
-import { FormControlLabel, Switch } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { Meta } from "@storybook/react";
 import React from "react";
@@ -42,85 +41,54 @@ const wellsLayer = new WellsLayer({
     data: "./volve_wells.json",
 });
 
+const DECK_PROPS = {
+    id: "DeckGL-Map",
+    bounds: [432205, 6475078, 437720, 6481113] as [
+        number,
+        number,
+        number,
+        number
+    ],
+    layers: [wellsLayer, boxSelectionLayer],
+};
+
 export default {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer / Box Selection Layer",
 } as Meta;
 
-export const boxSelection = () => {
-    const [argsState, setArgsState] =
-        React.useState<Record<string, unknown>>(enableLassoArgs);
-    const [state, setState] = React.useState<boolean>(true);
-
-    const handleChange = React.useCallback(() => {
-        if (boxSelectionLayer.props.visible) {
-            setArgsState(enableLassoArgs);
-        } else {
-            setArgsState(disableLassoArgs);
-        }
-        setState(!state);
-    }, [state]);
+export const boxSelection = ({ enableSelection }) => {
+    const deckProps = React.useMemo(
+        () => ({
+            ...DECK_PROPS,
+            layers: [
+                wellsLayer,
+                new BoxSelectionLayer({
+                    layerIds: ["wells"],
+                    visible: enableSelection,
+                }),
+            ],
+        }),
+        [enableSelection]
+    );
 
     return (
         <Root>
             <div className={classes.main}>
-                <SubsurfaceViewer id={"DeckGL-Map"} {...argsState} />
-            </div>
-            <div style={{ textAlign: "center" }}>
-                <FormControlLabel
-                    control={
-                        <Switch
-                            checked={state}
-                            onChange={handleChange}
-                            color="primary"
-                            name="checkedB"
-                            inputProps={{ "aria-label": "primary checkbox" }}
-                        />
-                    }
-                    label="Display Lasso Selection"
-                />
+                <SubsurfaceViewer {...deckProps} />
             </div>
         </Root>
     );
 };
 
-const disableLassoArgs = {
-    id: "DeckGL-Map",
-    resources: {
-        wellsData: "./volve_wells.json",
-    },
-    bounds: [432205, 6475078, 437720, 6481113],
-    layers: [
-        wellsLayer,
-        new BoxSelectionLayer({
-            layerIds: ["wells"],
-            visible: false,
-        }),
-    ],
-    editedData: {},
-    views: {
-        layout: [1, 1],
-        showLabel: false,
-        viewports: [
-            {
-                id: "view_1",
-                show3D: false,
-                layerIds: [],
-            },
-        ],
-    },
-};
-
-const enableLassoArgs = {
-    ...disableLassoArgs,
-    layers: [wellsLayer, boxSelectionLayer],
+boxSelection.args = {
+    enableSelection: true,
 };
 
 export const boxSelectionWithCallback = () => {
     const [data, setData] = React.useState<string[]>([]);
     const getSelectedWellsDataCallBack = React.useCallback(
         (pickingInfos: PickingInfo[]) => {
-            console.log("callback ", pickingInfos);
             const selectedWells = pickingInfos
                 .map((item) => item.object)
                 .filter((item) => item.type === "Feature")
@@ -130,7 +98,7 @@ export const boxSelectionWithCallback = () => {
         []
     );
     const lassoArgsWithSelectedWellsDataCallback: Record<string, unknown> = {
-        ...disableLassoArgs,
+        ...DECK_PROPS,
         layers: [
             wellsLayer,
             new BoxSelectionLayer({
@@ -150,9 +118,11 @@ export const boxSelectionWithCallback = () => {
             </div>
             <div>
                 <div>Selected Wells:</div>
-                {data.map((item) => (
-                    <div key={item}>{item}</div>
-                ))}
+                <ol>
+                    {data.map((item) => (
+                        <li key={item}>{item}</li>
+                    ))}
+                </ol>
             </div>
         </Root>
     );
