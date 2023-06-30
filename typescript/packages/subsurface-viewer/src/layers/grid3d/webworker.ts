@@ -25,6 +25,11 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
     let pn = 0;
     let indice = 0;
     let i = 0;
+
+    const triangFunc = params.triangulate
+        ? Function("points", params.triangulate)
+        : undefined;
+
     while (i < polys.length) {
         const n = polys[i];
         const propertyValue = properties[pn++];
@@ -59,50 +64,51 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
         }
 
         // Triangles.
-        if (n == 4) {
-            const i1 = polys[i + 1];
-            const i2 = polys[i + 2];
-            const i3 = polys[i + 3];
-            const i4 = polys[i + 4];
+        // if (n == 4) {
+        //     const i1 = polys[i + 1];
+        //     const i2 = polys[i + 2];
+        //     const i3 = polys[i + 3];
+        //     const i4 = polys[i + 4];
 
-            const x1 = points[3 * i1 + 0];
-            const y1 = points[3 * i1 + 1];
-            const z1 = points[3 * i1 + 2] * z_sign;
+        //     const x1 = points[3 * i1 + 0];
+        //     const y1 = points[3 * i1 + 1];
+        //     const z1 = points[3 * i1 + 2] * z_sign;
 
-            const x2 = points[3 * i2 + 0];
-            const y2 = points[3 * i2 + 1];
-            const z2 = points[3 * i2 + 2] * z_sign;
+        //     const x2 = points[3 * i2 + 0];
+        //     const y2 = points[3 * i2 + 1];
+        //     const z2 = points[3 * i2 + 2] * z_sign;
 
-            const x3 = points[3 * i3 + 0];
-            const y3 = points[3 * i3 + 1];
-            const z3 = points[3 * i3 + 2] * z_sign;
+        //     const x3 = points[3 * i3 + 0];
+        //     const y3 = points[3 * i3 + 1];
+        //     const z3 = points[3 * i3 + 2] * z_sign;
 
-            const x4 = points[3 * i4 + 0];
-            const y4 = points[3 * i4 + 1];
-            const z4 = points[3 * i4 + 2] * z_sign;
+        //     const x4 = points[3 * i4 + 0];
+        //     const y4 = points[3 * i4 + 1];
+        //     const z4 = points[3 * i4 + 2] * z_sign;
 
-            // t1
-            indices.push(indice++, indice++, indice++);
+        //     // t1
+        //     indices.push(indice++, indice++, indice++);
 
-            positions.push(x1, y1, z1);
-            positions.push(x2, y2, z2);
-            positions.push(x3, y3, z3);
+        //     positions.push(x1, y1, z1);
+        //     positions.push(x2, y2, z2);
+        //     positions.push(x3, y3, z3);
 
-            vertexProperties.push(propertyValue);
-            vertexProperties.push(propertyValue);
-            vertexProperties.push(propertyValue);
+        //     vertexProperties.push(propertyValue);
+        //     vertexProperties.push(propertyValue);
+        //     vertexProperties.push(propertyValue);
 
-            // t2
-            indices.push(indice++, indice++, indice++);
+        //     // t2
+        //     indices.push(indice++, indice++, indice++);
 
-            positions.push(x1, y1, z1);
-            positions.push(x3, y3, z3);
-            positions.push(x4, y4, z4);
+        //     positions.push(x1, y1, z1);
+        //     positions.push(x3, y3, z3);
+        //     positions.push(x4, y4, z4);
 
-            vertexProperties.push(propertyValue);
-            vertexProperties.push(propertyValue);
-            vertexProperties.push(propertyValue);
-        } else if (n == 3) {
+        //     vertexProperties.push(propertyValue);
+        //     vertexProperties.push(propertyValue);
+        //     vertexProperties.push(propertyValue);
+        // } else
+        if (n == 3) {
             // Refactor this n == 3 && n == 4.
             const i1 = polys[i + 1];
             const i2 = polys[i + 2];
@@ -130,18 +136,33 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
             vertexProperties.push(propertyValue);
             vertexProperties.push(propertyValue);
             vertexProperties.push(propertyValue);
-        } else {
-            if (params.triangulate) {
-                const trianFunc = Function("points", params.triangulate);
-                //const earcut = trianFunc.earcut;
-                const test = trianFunc([10, 0, 0, 50, 60, 60, 70, 10]);
-                console.log("Triangulated poly: ", test);
+        } else if (triangFunc) {
+            const polygon: number[] = [];
+            for (let p = 1; p <= n; ++p) {
+                const i0 = polys[i + p];
+                const x1 = points[3 * i0 + 0];
+                const y1 = points[3 * i0 + 1];
+                const z1 = points[3 * i0 + 2] * z_sign;
+                polygon.push(x1, y1, z1);
+            }
+            const triangles = triangFunc(polygon);
+            console.warn(polygon);
+            console.warn(triangles);
+            for (let t = 0; t < triangles.length; ++t) {
+                const i0 = triangles[t];
+                const x1 = polygon[3 * i0 + 0];
+                const y1 = polygon[3 * i0 + 1];
+                const z1 = polygon[3 * i0 + 2];
+                positions.push(x1, y1, z1);
+                indices.push(indice++);
             }
         }
 
         i = i + n + 1;
     }
     console.log("Number of polygons: ", pn);
+    console.log("Points: ", positions);
+    console.log("Indices: ", indices);
 
     const mesh: MeshType = {
         drawMode: 4, // corresponds to GL.TRIANGLES,

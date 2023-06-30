@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import React from "react";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
@@ -110,10 +111,24 @@ SimgridPolyhedralCell.args = {
         {
             ...grid3dLayer,
             pointsData: [
-                0, 0, 0, 0, 100, 0, 100, 200, 0, 200, 100, 0, 200, 0, 0,
+                0, 0, 0,            //0
+                0, 100, 0,          //1     
+                100, 200, 0,        //2 
+                200, 100, 0,        //3
+                200, 0, 0,          //4
+                100, -100, 0,       //5                
+
+                0, 100, -100,       //6
+                0, 0, -100,         //7
+                0, -100, -50,       //8
+                
+                
             ],
-            polysData: [5, 0, 1, 2, 3, 4],
-            propertiesData: [0.2, 0.6, 0.8],
+            polysData: [
+                         //6, 0, 1, 2, 3, 4, 5,     
+                         4, 0, 1, 6, 7                         
+                       ],
+            propertiesData: [0.0, 0.0, 0.0, 0.0],
         },
     ],
 };

@@ -171,7 +171,7 @@ export default class Grid3DLayer extends CompositeLayer<
                 polys,
                 properties,
                 isZIncreasingDownwards: this.props.ZIncreasingDownwards,
-                triangulate: `return earcut(points);\n${earcut.toString()}`,
+                triangulate: `return earcut(points, undefined, 3);\n${earcut.toString()}`,
             };
 
             webWorker.postMessage(webworkerParams);
