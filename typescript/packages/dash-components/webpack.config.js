@@ -119,6 +119,14 @@ module.exports = (env, argv) => {
                     exclude: /node_modules/,
                     loader: "source-map-loader",
                 },
+
+                {
+                    // workaround for Error: Can't resolve 'process/browser'
+                    test: /\.m?js/,
+                    resolve: {
+                        fullySpecified: false,
+                    },
+                },
             ],
         },
         devtool,

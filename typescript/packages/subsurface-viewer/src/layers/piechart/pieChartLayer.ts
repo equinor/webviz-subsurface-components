@@ -33,7 +33,7 @@ interface PiesData {
     properties: PieProperties;
 }
 
-export interface PieChartLayerProps<D> extends ExtendedLayerProps<D> {
+export interface PieChartLayerProps<D> extends ExtendedLayerProps {
     selectedPie: D;
 
     // Enable/disable depth testing when rendering layer. Default true.

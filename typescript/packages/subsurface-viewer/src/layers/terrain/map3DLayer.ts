@@ -274,7 +274,7 @@ async function load_mesh_and_texture(
     return Promise.all([mesh, meshImageData, texture]);
 }
 
-export interface Map3DLayerProps<D> extends ExtendedLayerProps<D> {
+export interface Map3DLayerProps extends ExtendedLayerProps {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setReportedBoundingBox?: any;
 
@@ -374,9 +374,7 @@ const defaultProps = {
     depthTest: true,
 };
 
-export default class Map3DLayer extends CompositeLayer<
-    Map3DLayerProps<unknown>
-> {
+export default class Map3DLayer extends CompositeLayer<Map3DLayerProps> {
     initializeState(): void {
         // Load mesh and texture and store in state.
         const isBounds = typeof this.props.bounds !== "undefined";
@@ -445,8 +443,8 @@ export default class Map3DLayer extends CompositeLayer<
         props,
         oldProps,
     }: {
-        props: Map3DLayerProps<unknown>;
-        oldProps: Map3DLayerProps<unknown>;
+        props: Map3DLayerProps;
+        oldProps: Map3DLayerProps;
     }): void {
         const needs_reload =
             !isEqual(props.mesh, oldProps.mesh) ||

@@ -48,6 +48,55 @@ const maxZoom3D = 12;
 const minZoom2D = -12;
 const maxZoom2D = 4;
 
+class ZScaleOrbitController extends OrbitController {
+    static setZScaleUp: React.Dispatch<React.SetStateAction<number>> | null =
+        null;
+    static setZScaleDown: React.Dispatch<React.SetStateAction<number>> | null =
+        null;
+
+    static setZScaleUpReference(
+        setZScaleUp: React.Dispatch<React.SetStateAction<number>>
+    ) {
+        ZScaleOrbitController.setZScaleUp = setZScaleUp;
+    }
+
+    static setZScaleDownReference(
+        setZScaleDown: React.Dispatch<React.SetStateAction<number>>
+    ) {
+        ZScaleOrbitController.setZScaleDown = setZScaleDown;
+    }
+
+    handleEvent(event: MjolnirEvent): boolean {
+        if (ZScaleOrbitController.setZScaleUp === null) {
+            return super.handleEvent(event);
+        }
+
+        if (
+            ZScaleOrbitController.setZScaleUp &&
+            event.type === "keydown" &&
+            event.key === "ArrowUp"
+        ) {
+            ZScaleOrbitController.setZScaleUp(Math.random());
+            return true;
+        } else if (
+            ZScaleOrbitController.setZScaleDown &&
+            event.type === "keydown" &&
+            event.key === "ArrowDown"
+        ) {
+            ZScaleOrbitController.setZScaleDown(Math.random());
+            return true;
+        }
+
+        return super.handleEvent(event);
+    }
+}
+
+class ZScaleOrbitView extends OrbitView {
+    get ControllerType(): typeof OrbitController {
+        return ZScaleOrbitController;
+    }
+}
+
 function addBoundingBoxes(b1: BoundingBox, b2: BoundingBox): BoundingBox {
     const boxDefault: BoundingBox = [0, 0, 0, 1, 1, 1];
 
@@ -369,13 +418,13 @@ const Map: React.FC<MapProps> = ({
     const [scaleZUp, setScaleZUp] = useState<number>(Number.MAX_VALUE);
     const [scaleZDown, setScaleZDown] = useState<number>(Number.MAX_VALUE);
 
-    const scaleUpFunction = () => {
-        setScaleZUp(Math.random());
-    };
+    React.useEffect(() => {
+        ZScaleOrbitController.setZScaleUpReference(setScaleZUp);
+    }, [setScaleZUp]);
 
-    const scaleDownFunction = () => {
-        setScaleZDown(Math.random());
-    };
+    React.useEffect(() => {
+        ZScaleOrbitController.setZScaleDownReference(setScaleZDown);
+    }, [setScaleZDown]);
 
     // Calculate a set of Deck.gl View's and viewStates as input to Deck.gl
     useEffect(() => {
@@ -385,8 +434,6 @@ const Map: React.FC<MapProps> = ({
             bounds,
             cameraPosition,
             reportedBoundingBoxAcc,
-            scaleUpFunction,
-            scaleDownFunction,
             deckRef.current?.deck
         );
 
@@ -1028,8 +1075,6 @@ function createViewsAndViewStates(
     bounds: [number, number, number, number] | BoundsAccessor | undefined,
     cameraPosition: ViewStateType | undefined,
     boundingBox: [number, number, number, number, number, number],
-    scaleUpFunction: { (): void; (): void },
-    scaleDownFunction: { (): void; (): void },
     deck?: Deck
 ): [View[], Record<string, ViewStateType>] {
     const deckgl_views: View[] = [];
@@ -1039,21 +1084,6 @@ function createViewsAndViewStates(
     >;
 
     const centerOfData = boundingBoxCenter(boundingBox);
-
-    // Use modified controller to handle key events.
-    class ZScaleOrbitController extends OrbitController {
-        handleEvent(event: MjolnirEvent): boolean {
-            if (event.type === "keydown" && event.key === "ArrowUp") {
-                scaleUpFunction();
-                return true;
-            } else if (event.type === "keydown" && event.key === "ArrowDown") {
-                scaleDownFunction();
-                return true;
-            }
-
-            return super.handleEvent(event);
-        }
-    }
 
     const widthViewPort = deck?.width ?? 1;
     const heightViewPort = deck?.height ?? 1;
@@ -1125,9 +1155,9 @@ function createViewsAndViewStates(
                     views.viewports[deckgl_views.length];
 
                 let ViewType:
-                    | typeof OrbitView
+                    | typeof ZScaleOrbitView
                     | typeof IntersectionView
-                    | typeof OrthographicView = OrbitView;
+                    | typeof OrthographicView = ZScaleOrbitView;
                 if (!currentViewport.show3D) {
                     ViewType =
                         currentViewport.id === "intersection_view"

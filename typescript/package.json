@@ -29,7 +29,6 @@
         "format": "eslint --fix *.js *.json *.ts packages src",
         "lint": "eslint *.js *.json *.ts packages src",
         "validate": "npm run typecheck && npm run lint",
-        "setup-deckgl-types": "cd ./node_modules/@danmarshall/deckgl-typings/ && indefinitely-typed --folder deck.gl__aggregation-layers --folder deck.gl__core --folder deck.gl__extensions --folder deck.gl__geo-layers --folder deck.gl__google-maps --folder deck.gl__json --folder deck.gl__layers --folder deck.gl__mapbox --folder deck.gl__mesh-layers --folder deck.gl__react --folder deck.gl --folder luma.gl__constants --folder luma.gl__core --folder luma.gl__gltools --folder luma.gl__webgl-state-tracker --folder luma.gl__webgl --folder math.gl__core --folder math.gl",
         "storybook": "storybook dev -p 6006",
         "build-storybook": "storybook build",
         "test_perf": "jest _performance",
