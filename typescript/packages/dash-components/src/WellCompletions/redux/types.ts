@@ -1,8 +1,13 @@
+import PropTypes from "prop-types";
+
 import {
+    AttributeTypePropType,
     SortDirection,
     Units,
+    UnitsPropType,
     WellInfo,
     Zone,
+    ZonePropTypes,
 } from "../../../../well-completions-plot/src/types/dataTypes";
 
 export interface Data {
@@ -52,3 +57,29 @@ export interface UISettings {
     hideZeroCompletions: boolean;
     filterByAttributes: string[];
 }
+
+// -------------------  PropTypes -------------------------
+
+export const CompletionsPropType = PropTypes.shape({
+    t: PropTypes.arrayOf(PropTypes.number.isRequired).isRequired,
+    open: PropTypes.arrayOf(PropTypes.number.isRequired).isRequired,
+    shut: PropTypes.arrayOf(PropTypes.number.isRequired).isRequired,
+    khMean: PropTypes.arrayOf(PropTypes.number.isRequired).isRequired,
+    khMin: PropTypes.arrayOf(PropTypes.number.isRequired).isRequired,
+    khMax: PropTypes.arrayOf(PropTypes.number.isRequired).isRequired,
+});
+
+export const WellPropType = PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    earliestCompDateIndex: PropTypes.number.isRequired,
+    attributes: PropTypes.objectOf(AttributeTypePropType.isRequired).isRequired,
+    completions: PropTypes.objectOf(CompletionsPropType.isRequired).isRequired,
+});
+
+export const DataPropType = PropTypes.shape({
+    version: PropTypes.string.isRequired,
+    units: UnitsPropType.isRequired,
+    stratigraphy: PropTypes.arrayOf(ZonePropTypes).isRequired,
+    wells: PropTypes.arrayOf(WellPropType.isRequired).isRequired,
+    timeSteps: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
+});

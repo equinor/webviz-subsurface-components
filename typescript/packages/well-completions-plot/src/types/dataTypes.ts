@@ -1,3 +1,6 @@
+import PropTypes from "prop-types";
+import React from "react";
+
 export type AttributeType = string | number | boolean | undefined;
 export enum SortDirection {
     Ascending = "Ascending",
@@ -21,11 +24,12 @@ export interface WellInfo {
     attributes: Record<string, AttributeType>;
 }
 
+interface UnitInfo {
+    unit: string;
+    decimalPlaces: number;
+}
 export interface Units {
-    kh: {
-        unit: string;
-        decimalPlaces: number;
-    };
+    kh: UnitInfo;
 }
 
 export interface CompletionPlotData {
@@ -46,3 +50,33 @@ export interface PlotData {
     wells: WellPlotData[];
     units: Units;
 }
+
+// ---------------------------  PropTypes ---------------------------------------
+
+const ZoneShape: React.WeakValidationMap<Zone> = {
+    name: PropTypes.string.isRequired,
+    color: PropTypes.string.isRequired,
+};
+Object.assign(ZoneShape, {
+    subzones: PropTypes.arrayOf(PropTypes.shape(ZoneShape).isRequired),
+});
+export const ZonePropTypes = PropTypes.shape(ZoneShape).isRequired;
+
+export const AttributeTypePropType = PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+    PropTypes.bool,
+]);
+
+export const WellInfoPropType = PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    earliestCompDateIndex: PropTypes.number.isRequired,
+    attributes: PropTypes.objectOf(AttributeTypePropType).isRequired,
+});
+
+export const UnitsPropType = PropTypes.shape({
+    kh: PropTypes.shape({
+        unit: PropTypes.string.isRequired,
+        decimalPlaces: PropTypes.number.isRequired,
+    }).isRequired,
+});
