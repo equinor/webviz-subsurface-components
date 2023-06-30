@@ -49,6 +49,58 @@ const maxZoom3D = 12;
 const minZoom2D = -12;
 const maxZoom2D = 4;
 
+class GlobalZScaleOrbitController extends OrbitController {
+    static setZScaleUp: React.Dispatch<React.SetStateAction<number>> | null =
+        null;
+    static setZScaleDown: React.Dispatch<React.SetStateAction<number>> | null =
+        null;
+
+    static setZScaleUpReference(
+        setZScaleUp: React.Dispatch<React.SetStateAction<number>>
+    ) {
+        GlobalZScaleOrbitController.setZScaleUp = setZScaleUp;
+    }
+
+    static setZScaleDownReference(
+        setZScaleDown: React.Dispatch<React.SetStateAction<number>>
+    ) {
+        GlobalZScaleOrbitController.setZScaleDown = setZScaleDown;
+    }
+
+    handleEvent(event: MjolnirEvent): boolean {
+        if (GlobalZScaleOrbitController.setZScaleUp === null) {
+            return super.handleEvent(event);
+        }
+
+        if (
+            GlobalZScaleOrbitController.setZScaleUp &&
+            event.type === "keydown" &&
+            event.key === "ArrowUp"
+        ) {
+            GlobalZScaleOrbitController.setZScaleUp(Math.random());
+            //scaleUpFunction();
+            return true;
+        } else if (
+            GlobalZScaleOrbitController.setZScaleDown &&
+            event.type === "keydown" &&
+            event.key === "ArrowDown"
+        ) {
+            GlobalZScaleOrbitController.setZScaleDown(Math.random());
+            //scaleDownFunction();
+            return true;
+        }
+
+        return super.handleEvent(event);
+    }
+}
+
+class GlobalZScaleOrbitView extends OrbitView {
+    get ControllerType(): typeof OrbitController {
+        return GlobalZScaleOrbitController;
+    }
+}
+
+
 function addBoundingBoxes(b1: BoundingBox, b2: BoundingBox): BoundingBox {
     const boxDefault: BoundingBox = [0, 0, 0, 1, 1, 1];
 
@@ -370,6 +422,15 @@ const Map: React.FC<MapProps> = ({
     const [scaleZUp, setScaleZUp] = useState<number>(Number.MAX_VALUE);
     const [scaleZDown, setScaleZDown] = useState<number>(Number.MAX_VALUE);
 
+    React.useEffect(() => {
+        GlobalZScaleOrbitController.setZScaleUpReference(setScaleZUp);
+    }, [setScaleZUp]);
+
+    React.useEffect(() => {
+        GlobalZScaleOrbitController.setZScaleDownReference(setScaleZDown);
+    }, [setScaleZDown]);
+
+    /*
     const scaleUpFunction = () => {
         setScaleZUp(Math.random());
     };
@@ -377,6 +438,7 @@ const Map: React.FC<MapProps> = ({
     const scaleDownFunction = () => {
         setScaleZDown(Math.random());
     };
+    */
 
     // Calculate a set of Deck.gl View's and viewStates as input to Deck.gl
     useEffect(() => {
@@ -386,8 +448,8 @@ const Map: React.FC<MapProps> = ({
             bounds,
             cameraPosition,
             reportedBoundingBoxAcc,
-            scaleUpFunction,
-            scaleDownFunction,
+            //scaleUpFunction,
+            //scaleDownFunction,
             deckRef.current?.deck
         );
 
@@ -1029,8 +1091,8 @@ function createViewsAndViewStates(
     bounds: [number, number, number, number] | BoundsAccessor | undefined,
     cameraPosition: ViewStateType | undefined,
     boundingBox: [number, number, number, number, number, number],
-    scaleUpFunction: { (): void; (): void },
-    scaleDownFunction: { (): void; (): void },
+    //scaleUpFunction: { (): void; (): void },
+    //scaleDownFunction: { (): void; (): void },
     deck?: Deck
 ): [View[], Record<string, ViewStateType>] {
     const deckgl_views: View[] = [];
@@ -1045,10 +1107,10 @@ function createViewsAndViewStates(
     class ZScaleOrbitController extends OrbitController {
         handleEvent(event: MjolnirEvent): boolean {
             if (event.type === "keydown" && event.key === "ArrowUp") {
-                scaleUpFunction();
+                //scaleUpFunction();
                 return true;
             } else if (event.type === "keydown" && event.key === "ArrowDown") {
-                scaleDownFunction();
+                //scaleDownFunction();
                 return true;
             }
 
@@ -1138,9 +1200,9 @@ function createViewsAndViewStates(
                     views.viewports[deckgl_views.length];
 
                 let ViewType:
-                    | typeof ZScaleOrbitView
+                    | typeof GlobalZScaleOrbitView
                     | typeof IntersectionView
-                    | typeof OrthographicView = ZScaleOrbitView;
+                    | typeof OrthographicView = GlobalZScaleOrbitView;
                 if (!currentViewport.show3D) {
                     ViewType =
                         currentViewport.id === "intersection_view"
@@ -1152,7 +1214,7 @@ function createViewsAndViewStates(
                 const near = currentViewport.show3D ? 0.1 : -9999;
 
                 const Controller = currentViewport.show3D
-                    ? ZScaleOrbitController
+                    ? GlobalZScaleOrbitController
                     : OrthographicController;
 
                 const controller = {
