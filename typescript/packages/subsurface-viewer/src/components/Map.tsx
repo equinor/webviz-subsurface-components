@@ -97,7 +97,6 @@ class ZScaleOrbitView extends OrbitView {
     }
 }
 
-
 function addBoundingBoxes(b1: BoundingBox, b2: BoundingBox): BoundingBox {
     const boxDefault: BoundingBox = [0, 0, 0, 1, 1, 1];
 
@@ -427,16 +426,6 @@ const Map: React.FC<MapProps> = ({
         ZScaleOrbitController.setZScaleDownReference(setScaleZDown);
     }, [setScaleZDown]);
 
-    /*
-    const scaleUpFunction = () => {
-        setScaleZUp(Math.random());
-    };
-
-    const scaleDownFunction = () => {
-        setScaleZDown(Math.random());
-    };
-    */
-
     // Calculate a set of Deck.gl View's and viewStates as input to Deck.gl
     useEffect(() => {
         const [Views, viewStates] = createViewsAndViewStates(
@@ -445,8 +434,6 @@ const Map: React.FC<MapProps> = ({
             bounds,
             cameraPosition,
             reportedBoundingBoxAcc,
-            //scaleUpFunction,
-            //scaleDownFunction,
             deckRef.current?.deck
         );
 
