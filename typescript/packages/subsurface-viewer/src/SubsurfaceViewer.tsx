@@ -346,11 +346,6 @@ SubsurfaceViewer.propTypes = {
      * Validate JSON datafile against schema
      */
     checkDatafileSchema: PropTypes.bool,
-
-    /**
-     * For get mouse events
-     */
-    onMouseEvent: PropTypes.func,
 };
 
 export default SubsurfaceViewer;
