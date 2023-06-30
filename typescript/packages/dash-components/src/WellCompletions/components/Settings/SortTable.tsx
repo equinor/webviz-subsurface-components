@@ -6,13 +6,10 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteSortKey, updateSortKey } from "../../redux/actions";
 import { WellCompletionsState } from "../../redux/store";
-import { SortDirection } from "../../redux/types";
 import {
-    SORT_BY_COMPLETION_DATE,
-    SORT_BY_NAME,
-    // eslint-disable-next-line prettier/prettier
-    SORT_BY_STRATIGRAPHY_DEPTH
-} from "../../utils/sort";
+    SortBy,
+    SortDirection,
+} from "../../../../../well-completions-plot/src/types/dataTypes";
 
 const PREFIX = "SortTable";
 
@@ -54,8 +51,9 @@ const SortTable: React.FC = React.memo(() => {
     // Sort key in the placeholder row
     const [sortKeyToAdd, setSortKeyToAdd] = useState<string>();
     // Sort direction in the placeholder row
-    const [sortDirectionToAdd, setSortDirectionToAdd] =
-        useState<SortDirection>("Ascending");
+    const [sortDirectionToAdd, setSortDirectionToAdd] = useState<SortDirection>(
+        SortDirection.Ascending
+    );
 
     // Redux
     const dispatch = useDispatch();
@@ -69,9 +67,9 @@ const SortTable: React.FC = React.memo(() => {
     // Apart from the user defined attribute, we can also sort by well name, stratigraphy depth etc
     const sortKeys = useMemo(() => {
         const keys = new Set<string>([
-            SORT_BY_NAME,
-            SORT_BY_STRATIGRAPHY_DEPTH,
-            SORT_BY_COMPLETION_DATE,
+            SortBy.Name,
+            SortBy.StratigraphyDepth,
+            SortBy.CompletionDate,
         ]);
         attributeKeys.forEach((key) => keys.add(key));
         return keys;
@@ -104,7 +102,9 @@ const SortTable: React.FC = React.memo(() => {
     const onSortDirectionToAddChange = useCallback(
         () =>
             setSortDirectionToAdd(
-                sortDirectionToAdd === "Ascending" ? "Descending" : "Ascending"
+                sortDirectionToAdd === SortDirection.Ascending
+                    ? SortDirection.Descending
+                    : SortDirection.Ascending
             ),
         [setSortDirectionToAdd, sortDirectionToAdd]
     );
@@ -149,9 +149,10 @@ const SortTable: React.FC = React.memo(() => {
                                     onClick={() =>
                                         onUpdateSortKey(
                                             sortKey,
-                                            sortBy[sortKey] === "Ascending"
-                                                ? "Descending"
-                                                : "Ascending"
+                                            sortBy[sortKey] ===
+                                                SortDirection.Ascending
+                                                ? SortDirection.Descending
+                                                : SortDirection.Ascending
                                         )
                                     }
                                 >

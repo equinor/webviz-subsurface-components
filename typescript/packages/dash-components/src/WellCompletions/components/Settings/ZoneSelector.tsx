@@ -7,9 +7,9 @@ import DropdownTreeSelect, {
 import "react-dropdown-tree-select/dist/styles.css";
 import { useDispatch } from "react-redux";
 import { updateFilteredZones } from "../../redux/actions";
-import { Zone } from "../../redux/types";
 import { findSubzones } from "../../utils/dataUtil";
 import { DataContext } from "../DataLoader";
+import { Zone } from "../../../../../well-completions-plot/src/types/dataTypes";
 
 const PREFIX = "ZoneSelector";
 
