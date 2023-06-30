@@ -16,6 +16,7 @@ export interface BoxSelectionLayerProps extends ExtendedLayerProps {
     lineStyle: LineStyleAccessor;
     wellHeadStyle: WellHeadStyleAccessor;
     handleSelection: (pickingInfos: PickingInfo[]) => void;
+    layerIds: string[];
 }
 
 const defaultProps = {
@@ -108,13 +109,12 @@ export default class BoxSelectionLayer extends CompositeLayer<BoxSelectionLayerP
                 }: {
                     pickingInfos: PickingInfo[];
                 }) => {
-                    console.log("onSelect ", pickingInfos);
                     this.setMultiSelection(pickingInfos);
                     if (this.props.handleSelection) {
                         this.props.handleSelection(pickingInfos);
                     }
                 },
-                layerIds: ["wells-layer"],
+                layerIds: this.props.layerIds,
                 getTentativeFillColor: () => [255, 0, 255, 100],
                 getTentativeLineColor: () => [0, 0, 255, 255],
                 getTentativeLineDashArray: () => [0, 0],

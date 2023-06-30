@@ -32,6 +32,16 @@ const Root = styled("div")({
     },
 });
 
+const boxSelectionLayer = new BoxSelectionLayer({
+    visible: true,
+    layerIds: ["wells"],
+});
+
+const wellsLayer = new WellsLayer({
+    id: "wells",
+    data: "./volve_wells.json",
+});
+
 export default {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer / Box Selection Layer",
@@ -81,10 +91,9 @@ const disableLassoArgs = {
     },
     bounds: [432205, 6475078, 437720, 6481113],
     layers: [
-        new WellsLayer({
-            data: "./volve_wells.json",
-        }),
+        wellsLayer,
         new BoxSelectionLayer({
+            layerIds: ["wells"],
             visible: false,
         }),
     ],
@@ -102,18 +111,9 @@ const disableLassoArgs = {
     },
 };
 
-const boxSelectionLayer = new BoxSelectionLayer({
-    visible: true,
-});
-
 const enableLassoArgs = {
     ...disableLassoArgs,
-    layers: [
-        new WellsLayer({
-            data: "./volve_wells.json",
-        }),
-        boxSelectionLayer,
-    ],
+    layers: [wellsLayer, boxSelectionLayer],
 };
 
 export const boxSelectionWithCallback = () => {
@@ -132,12 +132,11 @@ export const boxSelectionWithCallback = () => {
     const lassoArgsWithSelectedWellsDataCallback: Record<string, unknown> = {
         ...disableLassoArgs,
         layers: [
-            new WellsLayer({
-                data: "./volve_wells.json",
-            }),
+            wellsLayer,
             new BoxSelectionLayer({
                 visible: true,
                 handleSelection: getSelectedWellsDataCallBack,
+                layerIds: ["wells"],
             }),
         ],
     };
