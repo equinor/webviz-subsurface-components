@@ -3,15 +3,14 @@
 
 import { FormControlLabel, Switch } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { ComponentMeta, ComponentStory } from "@storybook/react";
+import { Meta } from "@storybook/react";
 import React from "react";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
+import { PickingInfo } from "@deck.gl/core/typed";
+import WellsLayer from "../wells/wellsLayer";
+import BoxSelectionLayer from "./boxSelectionLayer";
 
 const PREFIX = "boxSelectionLayer";
-
-// This should be fixed at some point
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type PickInfo = any;
 
 const classes = {
     main: `${PREFIX}-main`,
@@ -36,21 +35,15 @@ const Root = styled("div")({
 export default {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer / Box Selection Layer",
-} as ComponentMeta<typeof SubsurfaceViewer>;
+} as Meta;
 
-export const boxSelection: ComponentStory<typeof SubsurfaceViewer> = () => {
+export const boxSelection = () => {
     const [argsState, setArgsState] =
         React.useState<Record<string, unknown>>(enableLassoArgs);
     const [state, setState] = React.useState<boolean>(true);
 
     const handleChange = React.useCallback(() => {
-        const boxSelectionLayer = enableLassoArgs.layers.filter(
-            (item) => item["@@type"] === "BoxSelectionLayer"
-        );
-        if (boxSelectionLayer[0].visible !== undefined) {
-            boxSelectionLayer[0].visible = !boxSelectionLayer[0].visible;
-        }
-        if (boxSelectionLayer[0].visible) {
+        if (boxSelectionLayer.props.visible) {
             setArgsState(enableLassoArgs);
         } else {
             setArgsState(disableLassoArgs);
@@ -88,14 +81,12 @@ const disableLassoArgs = {
     },
     bounds: [432205, 6475078, 437720, 6481113],
     layers: [
-        {
-            "@@type": "WellsLayer",
-            data: "@@#resources.wellsData",
-        },
-        {
-            "@@type": "BoxSelectionLayer",
+        new WellsLayer({
+            data: "./volve_wells.json",
+        }),
+        new BoxSelectionLayer({
             visible: false,
-        },
+        }),
     ],
     editedData: {},
     views: {
@@ -111,26 +102,25 @@ const disableLassoArgs = {
     },
 };
 
+const boxSelectionLayer = new BoxSelectionLayer({
+    visible: true,
+});
+
 const enableLassoArgs = {
     ...disableLassoArgs,
     layers: [
-        {
-            "@@type": "WellsLayer",
-            data: "@@#resources.wellsData",
-        },
-        {
-            "@@type": "BoxSelectionLayer",
-            visible: true,
-        },
+        new WellsLayer({
+            data: "./volve_wells.json",
+        }),
+        boxSelectionLayer,
     ],
 };
 
-export const boxSelectionWithCallback: ComponentStory<
-    typeof SubsurfaceViewer
-> = () => {
+export const boxSelectionWithCallback = () => {
     const [data, setData] = React.useState<string[]>([]);
     const getSelectedWellsDataCallBack = React.useCallback(
-        (pickingInfos: PickInfo[]) => {
+        (pickingInfos: PickingInfo[]) => {
+            console.log("callback ", pickingInfos);
             const selectedWells = pickingInfos
                 .map((item) => item.object)
                 .filter((item) => item.type === "Feature")
@@ -142,15 +132,13 @@ export const boxSelectionWithCallback: ComponentStory<
     const lassoArgsWithSelectedWellsDataCallback: Record<string, unknown> = {
         ...disableLassoArgs,
         layers: [
-            {
-                "@@type": "WellsLayer",
-                data: "@@#resources.wellsData",
-            },
-            {
-                "@@type": "BoxSelectionLayer",
+            new WellsLayer({
+                data: "./volve_wells.json",
+            }),
+            new BoxSelectionLayer({
                 visible: true,
                 handleSelection: getSelectedWellsDataCallBack,
-            },
+            }),
         ],
     };
     return (
