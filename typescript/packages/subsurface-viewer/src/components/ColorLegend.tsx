@@ -26,7 +26,7 @@ export interface ContinuousLegendDataType extends LegendBaseData {
 
 interface ColorLegendProps {
     horizontal?: boolean | null;
-    layer: ExtendedLayer<unknown>;
+    layer: ExtendedLayer;
     colorTables: colorTablesArray | string | undefined;
     reverseRange?: boolean;
 }

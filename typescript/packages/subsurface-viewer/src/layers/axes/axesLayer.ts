@@ -12,7 +12,7 @@ import { Position3D, ExtendedLayerProps } from "../utils/layerTools";
 import { TextLayer } from "@deck.gl/layers/typed";
 import { cloneDeep } from "lodash";
 
-export interface AxesLayerProps<D> extends ExtendedLayerProps<D> {
+export interface AxesLayerProps extends ExtendedLayerProps {
     /**
      *  [xmin, ymin, zmin, xmax, ymax, zmax]
      *  Note that z values are default interptreted as going downwards. See property "ZIncreasingDownwards".
@@ -50,7 +50,7 @@ type TextLayerData = {
     size: number; // font size
 };
 
-export default class AxesLayer extends CompositeLayer<AxesLayerProps<unknown>> {
+export default class AxesLayer extends CompositeLayer<AxesLayerProps> {
     rebuildData(reportBoundingBox: boolean): void {
         const bounds = cloneDeep(this.props.bounds);
 

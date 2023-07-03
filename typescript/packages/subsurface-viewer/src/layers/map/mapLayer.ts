@@ -171,7 +171,7 @@ async function load_mesh_and_properties(
     return Promise.all([isMesh, mesh, properties]);
 }
 
-export interface MapLayerProps<D> extends ExtendedLayerProps<D> {
+export interface MapLayerProps extends ExtendedLayerProps {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setReportedBoundingBox?: any;
 
@@ -291,7 +291,7 @@ const defaultProps = {
     ZIncreasingDownwards: true,
 };
 
-export default class MapLayer extends CompositeLayer<MapLayerProps<unknown>> {
+export default class MapLayer extends CompositeLayer<MapLayerProps> {
     rebuildData(reportBoundingBox: boolean): void {
         if (typeof this.props.meshUrl !== "undefined") {
             console.warn('"meshUrl" is deprecated. Use "meshData"');

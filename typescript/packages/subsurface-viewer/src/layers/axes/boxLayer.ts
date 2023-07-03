@@ -12,7 +12,7 @@ import gridVertex from "./grid-vertex.glsl";
 import { DeckGLLayerContext } from "../../components/Map";
 import { ExtendedLayerProps } from "../utils/layerTools";
 
-export interface BoxLayerProps<D> extends ExtendedLayerProps<D> {
+export interface BoxLayerProps extends ExtendedLayerProps {
     lines: [number]; // from pt , to pt.
     color: Color;
 }
@@ -25,7 +25,7 @@ const defaultProps = {
     color: [0, 0, 0, 1],
 };
 
-export default class BoxLayer extends Layer<BoxLayerProps<unknown>> {
+export default class BoxLayer extends Layer<BoxLayerProps> {
     initializeState(context: DeckGLLayerContext): void {
         const { gl } = context;
         this.setState(this._getModels(gl));
