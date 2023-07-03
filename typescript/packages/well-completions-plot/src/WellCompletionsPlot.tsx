@@ -2,10 +2,10 @@ import React from "react";
 import { useResizeDetector } from "react-resize-detector";
 import { PlotData } from "./types/dataTypes";
 import { TooltipProvider } from "./components/TooltipProvider";
-import CompletionsPlot from "./components/CompletionsPlot";
+import { CompletionsPlot } from "./components/CompletionsPlot";
 import { createLayout, Padding } from "./types/layoutTypes";
-import StratigraphyPlot from "./components/StratigraphyPlot";
-import WellsPlot from "./components/WellsPlot";
+import { StratigraphyPlot } from "./components/StratigraphyPlot";
+import { WellsPlot } from "./components/WellsPlot";
 
 import "./WellCompletionsPlot.css";
 
@@ -18,8 +18,8 @@ interface WellCompletionsPlotProps {
 const padding: Padding = { left: 80, right: 50, top: 70, bottom: 50 };
 /* eslint-disable react/display-name */
 /* eslint-disable react/prop-types */
-const WellCompletionsPlot: React.FC<WellCompletionsPlotProps> = React.memo(
-    (props: WellCompletionsPlotProps) => {
+export const WellCompletionsPlot: React.FC<WellCompletionsPlotProps> =
+    React.memo((props: WellCompletionsPlotProps) => {
         const { width, height, ref } = useResizeDetector({
             refreshMode: "debounce",
             refreshRate: 50,
@@ -73,8 +73,6 @@ const WellCompletionsPlot: React.FC<WellCompletionsPlotProps> = React.memo(
                 </div>
             </TooltipProvider>
         );
-    }
-);
+    });
 
 WellCompletionsPlot.displayName = "WellCompletionsPlot";
-export default WellCompletionsPlot;

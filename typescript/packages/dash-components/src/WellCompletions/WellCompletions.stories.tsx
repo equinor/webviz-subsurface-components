@@ -1,6 +1,6 @@
 import React from "react";
 import exampleData from "./example-data/well-completions.json";
-import WellCompletions from "./WellCompletions";
+import { WellCompletions } from "./WellCompletions";
 /**
  * Storybook test for the whole well completion component
  */

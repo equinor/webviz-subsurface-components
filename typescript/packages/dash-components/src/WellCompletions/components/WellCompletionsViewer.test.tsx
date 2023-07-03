@@ -3,7 +3,7 @@ import { render } from "@testing-library/react";
 import "jest-styled-components";
 import React from "react";
 import { Wrapper } from "../test/TestWrapper";
-import WellCompletionsViewer from "./WellCompletionsViewer";
+import { WellCompletionsViewer } from "./WellCompletionsViewer";
 
 window.ResizeObserver =
     window.ResizeObserver ||

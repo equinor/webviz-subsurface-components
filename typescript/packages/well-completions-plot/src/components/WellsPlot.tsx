@@ -13,7 +13,7 @@ interface WellsPlotProps {
     padding: Padding;
 }
 /* eslint-disable react/prop-types */
-const WellsPlot: React.FC<WellsPlotProps> = ({
+export const WellsPlot: React.FC<WellsPlotProps> = ({
     timeSteps,
     plotData,
     layout,
@@ -107,4 +107,3 @@ const WellsPlot: React.FC<WellsPlotProps> = ({
 };
 
 WellsPlot.displayName = "WellsPlot";
-export default WellsPlot;

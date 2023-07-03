@@ -1,1 +1,1 @@
-export { default } from "./WellCompletionsPlot";
+export { WellCompletionsPlot } from "./WellCompletionsPlot";

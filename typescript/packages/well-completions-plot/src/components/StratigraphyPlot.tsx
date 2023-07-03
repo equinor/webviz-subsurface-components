@@ -11,7 +11,7 @@ interface StratigraphyPlotProps {
 const shortenName = (str: string) =>
     str.length >= 13 ? "..." + str.substring(str.length - 10, str.length) : str;
 /* eslint-disable react/prop-types */
-const StratigraphyPlot: React.FC<StratigraphyPlotProps> = React.memo(
+export const StratigraphyPlot: React.FC<StratigraphyPlotProps> = React.memo(
     ({ data, layout, padding }) => {
         const barHeight = layout.yExtent / Math.max(data.length, 1);
 
@@ -51,4 +51,3 @@ const StratigraphyPlot: React.FC<StratigraphyPlotProps> = React.memo(
 );
 
 StratigraphyPlot.displayName = "StratigraphyPlot";
-export default StratigraphyPlot;

@@ -4,7 +4,7 @@ import "jest-styled-components";
 import React, { Profiler } from "react";
 import * as core from "@actions/core";
 import { Wrapper } from "./test/TestWrapper";
-import WellCompletions from "./WellCompletions";
+import { WellCompletions } from "./WellCompletions";
 import logTimes, { obj } from "../../performanceUtility/onRenderFunction";
 import { Data } from "./redux/types";
 

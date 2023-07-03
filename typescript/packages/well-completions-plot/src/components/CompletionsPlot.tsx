@@ -12,7 +12,7 @@ interface CompletionsPlotProps {
 }
 
 /* eslint-disable react/prop-types */
-const CompletionsPlot: React.FC<CompletionsPlotProps> = ({
+export const CompletionsPlot: React.FC<CompletionsPlotProps> = ({
     plotData,
     layout,
     padding,
@@ -160,4 +160,3 @@ const CompletionsPlot: React.FC<CompletionsPlotProps> = ({
 };
 
 CompletionsPlot.displayName = "CompletionsPlot";
-export default CompletionsPlot;

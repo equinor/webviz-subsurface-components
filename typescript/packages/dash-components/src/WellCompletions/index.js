@@ -1,1 +1,1 @@
-export { default } from "./WellCompletions";
+export { WellCompletions } from "./WellCompletions";

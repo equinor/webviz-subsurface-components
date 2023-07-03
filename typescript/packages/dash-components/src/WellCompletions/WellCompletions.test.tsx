@@ -3,7 +3,7 @@ import { render } from "@testing-library/react";
 import "jest-styled-components";
 import React from "react";
 import { Wrapper } from "./test/TestWrapper";
-import WellCompletions from "./WellCompletions";
+import { WellCompletions } from "./WellCompletions";
 import { Data } from "./redux/types";
 
 import exampleData from "./example-data/well-completions.json";

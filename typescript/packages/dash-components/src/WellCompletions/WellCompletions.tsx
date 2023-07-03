@@ -5,7 +5,7 @@ import semver from "semver";
 import { Data, DataPropType } from "./redux/types";
 import ErrorPlaceholder from "./components/Common/ErrorPlaceholder";
 import DataProvider from "./components/DataLoader";
-import WellCompletionsViewer from "./components/WellCompletionsViewer";
+import { WellCompletionsViewer } from "./components/WellCompletionsViewer";
 
 import inputSchema from "./inputSchema/wellCompletions.json";
 
@@ -20,7 +20,7 @@ interface WellCompletionsProps {
 /**
  * Well completions component
  */
-const WellCompletions: React.FC<WellCompletionsProps> = React.memo(
+export const WellCompletions: React.FC<WellCompletionsProps> = React.memo(
     ({ id, data }: WellCompletionsProps) => {
         const validate = React.useMemo(() => ajv.compile(inputSchema), []);
         //check against the json schema
@@ -75,5 +75,3 @@ WellCompletions.propTypes = {
     id: PropTypes.string.isRequired,
     data: DataPropType.isRequired,
 };
-
-export default WellCompletions;
