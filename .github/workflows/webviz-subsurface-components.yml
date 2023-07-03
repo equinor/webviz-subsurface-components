@@ -57,13 +57,13 @@ jobs:
           grep -q '"lockfileVersion": 3,' ./typescript/package-lock.json
 
           npm ci CYPRESS_INSTALL_BINARY=0 --ignore-scripts --prefix ./typescript
-          cd python
-          pip install "werkzeug<2.1"  # ...while waiting for https://github.com/plotly/dash/issues/1992
-          pip install "dash<2.5"  # Build issue upstream in dash==2.5
-          pip install "flask<2.3" # As we are using an old Dash version we need to use an older Flask version
-          pip install .[dependencies]
-          pip install dash[dev]
-          cd ..
+          # cd python
+          # pip install "werkzeug<2.1"  # ...while waiting for https://github.com/plotly/dash/issues/1992
+          # pip install "dash<2.5"  # Build issue upstream in dash==2.5
+          # pip install "flask<2.3" # As we are using an old Dash version we need to use an older Flask version
+          # pip install .[dependencies]
+          # pip install dash[dev]
+          # cd ..
       - name: ⏭️ Modifications when prerelease
         if: github.event.release.prerelease
         run: echo "NPM_PUBLISH_TAG=next" >> $GITHUB_ENV
@@ -74,21 +74,21 @@ jobs:
           npx nx build @webviz/subsurface-viewer  # wellog-viewer depends on subsurface viewer... should be able to specify build order in some better way?
           npx nx run-many -t build
 
-      - name: 📦 Install webviz-subsurface-components with dependencies
-        working-directory: ./python
-        run: |
-          pip install --upgrade pip
-          pip install .
+      # - name: 📦 Install webviz-subsurface-components with dependencies
+      #   working-directory: ./python
+      #   run: |
+      #     pip install --upgrade pip
+      #     pip install .
 
-      - name: 📦 Install test dependencies
-        working-directory: ./python
-        run: |
-          pip install .[tests]
-          wget https://chromedriver.storage.googleapis.com/$(wget https://chromedriver.storage.googleapis.com/LATEST_RELEASE -q -O -)/chromedriver_linux64.zip
-          unzip chromedriver_linux64.zip
+      # - name: 📦 Install test dependencies
+      #   working-directory: ./python
+      #   run: |
+      #     pip install .[tests]
+      #     wget https://chromedriver.storage.googleapis.com/$(wget https://chromedriver.storage.googleapis.com/LATEST_RELEASE -q -O -)/chromedriver_linux64.zip
+      #     unzip chromedriver_linux64.zip
 
-      - name: 🧾 List all installed packages
-        run: pip freeze
+      # - name: 🧾 List all installed packages
+      #   run: pip freeze
 
       - name: 🕵️ Check code style, linting and typechecking
         if: matrix.python-version == '3.8'
