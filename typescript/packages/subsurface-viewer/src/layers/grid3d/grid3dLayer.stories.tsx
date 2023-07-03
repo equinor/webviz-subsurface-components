@@ -3,6 +3,9 @@ import React from "react";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 
+import { Points, Faces} from "./data2"
+import { Points as Points2, Faces as Faces2} from "./data4"
+
 export default {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer/Experimental Grid3D",
@@ -91,7 +94,7 @@ SimgridArrayInput.parameters = parameters;
 
 export const SimgridPolyhedralCell = Template.bind({});
 SimgridPolyhedralCell.args = {
-    bounds: [-400, -400, 400, 400] as NumberQuad,
+    bounds: [-50, -50, 50, 50] as NumberQuad,
     views: {
         layout: [1, 1] as [number, number],
         viewports: [
@@ -106,28 +109,20 @@ SimgridPolyhedralCell.args = {
         {
             "@@type": "AxesLayer",
             id: "polyhedral-cells-axes",
-            bounds: [-400, -400, -400, 400, 400, 400],
+            bounds: [-50, -50, -50, 50, 50, 50],
         },
         {
             ...grid3dLayer,
-            pointsData: [
-                0, 0, 0,            //0
-                0, 100, 0,          //1     
-                100, 200, 0,        //2 
-                200, 100, 0,        //3
-                200, 0, 0,          //4
-                100, -100, 0,       //5                
-
-                0, 100, -100,       //6
-                0, 0, -100,         //7
-                0, -100, -50,       //8
-                
-                
-            ],
-            polysData: [
-                         //6, 0, 1, 2, 3, 4, 5,     
-                         4, 0, 1, 6, 7                         
-                       ],
+            id: "polyhedral1",
+            pointsData: Points.map ( v => 10 * v),
+            polysData: Faces,
+            propertiesData: [0.0, 0.0, 0.0, 0.0],
+        },
+        {
+            ...grid3dLayer,
+            id: "polyhedral2",
+            pointsData: Points2.map(v => 10 * v).map ((v, index) => index % 3 === 0 ? v + 30: v),
+            polysData: Faces2,
             propertiesData: [0.0, 0.0, 0.0, 0.0],
         },
     ],
