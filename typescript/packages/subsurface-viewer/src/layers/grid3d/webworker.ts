@@ -1,7 +1,60 @@
 import { MeshType, MeshTypeLines } from "./privateLayer";
 import { WebWorkerParams } from "./grid3dLayer";
+import { number } from "mathjs";
 
 export function makeFullMesh(e: { data: WebWorkerParams }): void {
+    const get3DPoint = (points: number[], index: number): number[] => {
+        return points.slice(index * 3, (index + 1) * 3);
+    };
+
+    const substractPoints = (a: number[], b: number[]): number[] => {
+        return [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+    };
+
+    const crossProduct = (a: number[], b: number[]): number[] => {
+        const a1 = a[0];
+        const a2 = a[1];
+        const a3 = a[2];
+        const b1 = b[0];
+        const b2 = b[1];
+        const b3 = b[2];
+        return [a2 * b3 - a3 * b2, a3 * b1 - a1 * b3, a1 * b2 - a2 * b1];
+    };
+
+    const dotProduct = (a: number[], b: number[]): number => {
+        return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+    };
+
+    const normalize = (a: number[]): number[] => {
+        const len = Math.sqrt(dotProduct(a, a));
+        return [a[0] / len, a[1] / len, a[2] / len];
+    };
+
+    const project = (u: number[], v: number[], p: number[]): number[] => {
+        const a = dotProduct(p, u);
+        const b = dotProduct(p, v);
+        return [a, b, 0];
+    };
+
+    const flattenPoly = (points: number[]): number[] => {
+        const p0 = get3DPoint(points, 0);
+        const p1 = get3DPoint(points, 1);
+        const p2 = get3DPoint(points, 2);
+        const v1 = substractPoints(p1, p0);
+        const v2 = substractPoints(p2, p0);
+        const normal = normalize(crossProduct(v1, v2));
+        const u = normalize(v1);
+        const v = normalize(crossProduct(normal, u));
+        console.log("u, v:", u, v);
+        const res: number[] = [];
+        const count = points.length / 3;
+        for (let i = 0; i < count; ++i) {
+            const p = get3DPoint(points, i);
+            const fp = project(u, v, p);
+            res.push(...fp);
+        }
+        return res;
+    };
     // Keep
     const t0 = performance.now();
 
@@ -63,50 +116,50 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
             line_positions.push(x1, y1, z1);
         }
 
-        // Triangles.
-        // if (n == 4) {
-        //     const i1 = polys[i + 1];
-        //     const i2 = polys[i + 2];
-        //     const i3 = polys[i + 3];
-        //     const i4 = polys[i + 4];
+        //Triangles.
+        //if (n == 4) {
+        // const i1 = polys[i + 1];
+        // const i2 = polys[i + 2];
+        // const i3 = polys[i + 3];
+        // const i4 = polys[i + 4];
 
-        //     const x1 = points[3 * i1 + 0];
-        //     const y1 = points[3 * i1 + 1];
-        //     const z1 = points[3 * i1 + 2] * z_sign;
+        // const x1 = points[3 * i1 + 0];
+        // const y1 = points[3 * i1 + 1];
+        // const z1 = points[3 * i1 + 2] * z_sign;
 
-        //     const x2 = points[3 * i2 + 0];
-        //     const y2 = points[3 * i2 + 1];
-        //     const z2 = points[3 * i2 + 2] * z_sign;
+        // const x2 = points[3 * i2 + 0];
+        // const y2 = points[3 * i2 + 1];
+        // const z2 = points[3 * i2 + 2] * z_sign;
 
-        //     const x3 = points[3 * i3 + 0];
-        //     const y3 = points[3 * i3 + 1];
-        //     const z3 = points[3 * i3 + 2] * z_sign;
+        // const x3 = points[3 * i3 + 0];
+        // const y3 = points[3 * i3 + 1];
+        // const z3 = points[3 * i3 + 2] * z_sign;
 
-        //     const x4 = points[3 * i4 + 0];
-        //     const y4 = points[3 * i4 + 1];
-        //     const z4 = points[3 * i4 + 2] * z_sign;
+        // const x4 = points[3 * i4 + 0];
+        // const y4 = points[3 * i4 + 1];
+        // const z4 = points[3 * i4 + 2] * z_sign;
 
-        //     // t1
-        //     indices.push(indice++, indice++, indice++);
+        // // t1
+        // indices.push(indice++, indice++, indice++);
 
-        //     positions.push(x1, y1, z1);
-        //     positions.push(x2, y2, z2);
-        //     positions.push(x3, y3, z3);
+        // positions.push(x1, y1, z1);
+        // positions.push(x2, y2, z2);
+        // positions.push(x3, y3, z3);
 
-        //     vertexProperties.push(propertyValue);
-        //     vertexProperties.push(propertyValue);
-        //     vertexProperties.push(propertyValue);
+        // vertexProperties.push(propertyValue);
+        // vertexProperties.push(propertyValue);
+        // vertexProperties.push(propertyValue);
 
-        //     // t2
-        //     indices.push(indice++, indice++, indice++);
+        // // t2
+        // indices.push(indice++, indice++, indice++);
 
-        //     positions.push(x1, y1, z1);
-        //     positions.push(x3, y3, z3);
-        //     positions.push(x4, y4, z4);
+        // positions.push(x1, y1, z1);
+        // positions.push(x3, y3, z3);
+        // positions.push(x4, y4, z4);
 
-        //     vertexProperties.push(propertyValue);
-        //     vertexProperties.push(propertyValue);
-        //     vertexProperties.push(propertyValue);
+        // vertexProperties.push(propertyValue);
+        // vertexProperties.push(propertyValue);
+        // vertexProperties.push(propertyValue);
         // } else
         if (n == 3) {
             // Refactor this n == 3 && n == 4.
@@ -145,9 +198,8 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
                 const z1 = points[3 * i0 + 2] * z_sign;
                 polygon.push(x1, y1, z1);
             }
-            const triangles = triangFunc(polygon);
-            console.warn(polygon);
-            console.warn(triangles);
+            const flatPoly = flattenPoly(polygon);
+            const triangles = triangFunc(flatPoly);
             for (let t = 0; t < triangles.length; ++t) {
                 const i0 = triangles[t];
                 const x1 = polygon[3 * i0 + 0];
@@ -161,8 +213,6 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
         i = i + n + 1;
     }
     console.log("Number of polygons: ", pn);
-    console.log("Points: ", positions);
-    console.log("Indices: ", indices);
 
     const mesh: MeshType = {
         drawMode: 4, // corresponds to GL.TRIANGLES,
