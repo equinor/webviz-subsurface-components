@@ -1,10 +1,6 @@
 import { UISettings } from "../redux/types";
-import {
-    SORT_BY_COMPLETION_DATE,
-    SORT_BY_NAME,
-    // eslint-disable-next-line prettier/prettier
-    SORT_BY_STRATIGRAPHY_DEPTH
-} from "../utils/sort";
+import { SortBy } from "../../../../well-completions-plot/src/types/dataTypes";
+
 export const testState = {
     id: "test",
     ui: {
@@ -21,9 +17,9 @@ export const testState = {
     } as UISettings,
     attributes: {
         attributeKeys: [
-            SORT_BY_NAME,
-            SORT_BY_STRATIGRAPHY_DEPTH,
-            SORT_BY_COMPLETION_DATE,
+            SortBy.Name,
+            SortBy.StratigraphyDepth,
+            SortBy.CompletionDate,
             "type",
             "region",
             "user defined category",
