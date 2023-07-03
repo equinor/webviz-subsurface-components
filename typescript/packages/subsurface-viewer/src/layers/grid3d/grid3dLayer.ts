@@ -162,10 +162,6 @@ export default class Grid3DLayer extends CompositeLayer<
             const url = URL.createObjectURL(blob);
             const webWorker = new Worker(url);
 
-            const triangFunc = (points: number): number[] => {
-                return earcut(points, undefined, 3);
-            };
-
             const webworkerParams: WebWorkerParams = {
                 points,
                 polys,

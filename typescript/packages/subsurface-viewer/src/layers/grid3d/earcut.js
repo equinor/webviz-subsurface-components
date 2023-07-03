@@ -5,7 +5,6 @@ module.exports = earcut;
 module.exports.default = earcut;
 
 function earcut(data, holeIndices, dim) {
-    console.log(data);
     dim = dim || 2;
 
     var hasHoles = holeIndices && holeIndices.length,
