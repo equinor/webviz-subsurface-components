@@ -832,10 +832,11 @@ exports[`Test Well Completions viewer snapshot test with data 1`] = `
         style="min-width: 220px; min-height: 0px; height: 100%;"
       >
         <div
-          class="css-a64bs7"
+          class="WellCompletionsPlot"
           currentitem="false"
           data-for="plot-tooltip"
           data-tip="true"
+          id=""
         />
         <div
           class="__react_component_tooltip t00000000-0000-4000-8000-000000000000 place-top type-dark"

@@ -225,6 +225,7 @@ describe("Data Util", () => {
                     },
                 },
             ],
+            units: testUnits,
         });
         //Well with zero completions is filtered out
         expect(
