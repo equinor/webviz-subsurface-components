@@ -17,7 +17,6 @@ import {
     PropertyDataType,
 } from "../layers/utils/layerTools";
 import { rgb } from "d3-color";
-import { FeatureCollection } from "geojson";
 
 Icon.add({ arrow_drop_up, arrow_drop_down });
 
@@ -189,8 +188,7 @@ const InfoCard: React.FC<InfoCardProps> = (props: InfoCardProps) => {
         props.pickInfos.forEach((info) => {
             const layer_properties = info.properties;
             const layer_name = (
-                info.layer
-                    ?.props as unknown as ExtendedLayerProps<FeatureCollection>
+                info.layer?.props as unknown as ExtendedLayerProps
             )?.name;
 
             // pick info can have 2 types of properties that can be displayed on the info card

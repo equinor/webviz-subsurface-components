@@ -14,7 +14,7 @@ import vertexShader from "./northarrow-vertex.glsl";
 import fragmentShader from "./northarrow-fragment.glsl";
 import { ExtendedLayerProps } from "../utils/layerTools";
 
-export interface NorthArrow3DLayerProps<D> extends ExtendedLayerProps<D> {
+export interface NorthArrow3DLayerProps extends ExtendedLayerProps {
     color: Color;
 }
 
@@ -26,9 +26,7 @@ const defaultProps = {
     color: [0, 0, 0, 1],
 };
 
-export default class NorthArrow3DLayer extends Layer<
-    NorthArrow3DLayerProps<unknown>
-> {
+export default class NorthArrow3DLayer extends Layer<NorthArrow3DLayerProps> {
     initializeState(context: LayerContext): void {
         const { gl } = context;
         this.setState(this._getModels(gl));

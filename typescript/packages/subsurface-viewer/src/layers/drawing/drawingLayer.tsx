@@ -97,7 +97,7 @@ const MODE_MAP = {
 const UNSELECTED_LINE_COLOR: Color = [0x50, 0x50, 0x50, 0xcc];
 const SELECTED_LINE_COLOR: Color = [0x0, 0x0, 0x0, 0xff];
 
-export interface DrawingLayerProps<D> extends ExtendedLayerProps<D> {
+export interface DrawingLayerProps extends ExtendedLayerProps {
     mode: string; // One of modes in MODE_MAP
     selectedFeatureIndexes: number[];
 }
@@ -120,9 +120,7 @@ const defaultProps = {
 
 // Composite layer that contains an EditableGeoJsonLayer from nebula.gl
 // See https://nebula.gl/docs/api-reference/layers/editable-geojson-layer
-export default class DrawingLayer extends CompositeLayer<
-    DrawingLayerProps<FeatureCollection>
-> {
+export default class DrawingLayer extends CompositeLayer<DrawingLayerProps> {
     initializeState(context: LayerContext): void {
         super.initializeState(context);
 
@@ -252,5 +250,4 @@ export default class DrawingLayer extends CompositeLayer<
 }
 
 DrawingLayer.layerName = "DrawingLayer";
-DrawingLayer.defaultProps =
-    defaultProps as unknown as DrawingLayerProps<FeatureCollection>;
+DrawingLayer.defaultProps = defaultProps as unknown as DrawingLayerProps;

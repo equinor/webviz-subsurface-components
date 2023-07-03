@@ -8,7 +8,7 @@ import {
     defineBoundingBox,
 } from "../utils/layerTools";
 
-export interface PointsLayerProps<D> extends ExtendedLayerProps<D> {
+export interface PointsLayerProps extends ExtendedLayerProps {
     /**
      * Point positions as [x, y, z, x, y, z....].
      */
@@ -62,9 +62,7 @@ interface IDataAttributes {
     };
 }
 
-export default class PointsLayer extends CompositeLayer<
-    PointsLayerProps<unknown>
-> {
+export default class PointsLayer extends CompositeLayer<PointsLayerProps> {
     renderLayers(): [ScatterplotLayer?] {
         const layer = new ScatterplotLayer(
             this.getSubLayerProps({
