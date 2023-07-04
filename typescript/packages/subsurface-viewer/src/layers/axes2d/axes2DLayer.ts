@@ -476,12 +476,20 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
 
         const zDepth = zDepthAxesAxis;
 
+        const isB = this.props.isBottomRuler;
+        const isT = this.props.isTopRuler;
+        const isL = this.props.isLeftRuler;
+        const isR = this.props.isRightRuler;
+
         //- BOTTOM RULER ----------------------------------------
-        if (this.props.isBottomRuler) {
-            const axes = [xMin, yMin + mv, zDepth, xMax, yMin + mv, zDepth];
+        if (isB) {
+            const xmin = xMin + (isL ? mh : 0);
+            const xmax = xMax - (isR ? mh : 0);
+            const axes = [xmin, yMin + mv, zDepth, xmax, yMin + mv, zDepth];
+
             const [ticks, labels] = this.GetTickLinesAndLabels(
-                xMin,
-                xMax,
+                xmin,
+                xmax,
                 ViewSide.Bottom,
                 pixel2world
             );
@@ -499,11 +507,14 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         }
 
         //- TOP RULER ----------------------------------------
-        if (this.props.isTopRuler) {
-            const axes = [xMin, yMax - mv, zDepth, xMax, yMax - mv, zDepth];
+        if (isT) {
+            const xmin = xMin + (isL ? mh : 0);
+            const xmax = xMax - (isR ? mh : 0);
+
+            const axes = [xmin, yMax - mv, zDepth, xmax, yMax - mv, zDepth];
             const [ticks, labels] = this.GetTickLinesAndLabels(
-                xMin,
-                xMax,
+                xmin,
+                xmax,
                 ViewSide.Top,
                 pixel2world
             );
@@ -521,9 +532,9 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         }
 
         //- LEFT RULER ----------------------------------------
-        if (this.props.isLeftRuler) {
-            const ymin = this.props.isBottomRuler ? yMin + mv : yMin;
-            const ymax = this.props.isTopRuler ? yMax - mv : yMax;
+        if (isL) {
+            const ymin = isB ? yMin + mv : yMin;
+            const ymax = isT ? yMax - mv : yMax;
             const axes = [xMin + mh, ymin, zDepth, xMin + mh, ymax, zDepth];
             const [ticks, labels] = this.GetTickLinesAndLabels(
                 ymin,
@@ -544,9 +555,9 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         }
 
         //- RIGHT RULER ----------------------------------------
-        if (this.props.isRightRuler) {
-            const ymin = this.props.isBottomRuler ? yMin + mv : yMin;
-            const ymax = this.props.isTopRuler ? yMax - mv : yMax;
+        if (isR) {
+            const ymin = isB ? yMin + mv : yMin;
+            const ymax = isT ? yMax - mv : yMax;
             const axes = [xMax - mh, ymin, zDepth, xMax - mh, ymax, zDepth];
             const [ticks, labels] = this.GetTickLinesAndLabels(
                 ymin,
