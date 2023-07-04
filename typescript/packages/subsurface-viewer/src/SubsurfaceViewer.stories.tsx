@@ -17,6 +17,7 @@ import { WellsPickInfo } from "./layers/wells/wellsLayer";
 import { FeatureCollection } from "geojson";
 import { ViewFooter } from "./components/ViewFooter";
 import { styled } from "@mui/material/styles";
+import Switch from "@mui/material/Switch";
 
 export default {
     component: SubsurfaceViewer,
@@ -512,11 +513,8 @@ export const IsLoadedCallback = (args: SubsurfaceViewerProps) => {
             <div className={classes.main}>
                 <SubsurfaceViewer {...props} />
             </div>
-            <button onClick={handleChange}>
-                {" "}
-                {layers.length === 1 ? "Add layer" : "Remove layer"}{" "}
-            </button>
-            <label> {label} </label>
+            <label>{"Add big map layer "}</label>
+            <Switch onClick={handleChange} />
         </Root>
     );
 };
