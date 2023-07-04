@@ -137,10 +137,26 @@ const MatrixStory = () => {
             views={views}
             bounds={bounds}
         >
-            <View id="view_1"></View>
-            <View id="view_2"></View>
-            <View id="view_3"></View>
-            <View id="view_4"></View>
+            {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                /* @ts-expect-error */
+                <View id="view_1"></View>
+            }
+            {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                /* @ts-expect-error */
+                <View id="view_2"></View>
+            }
+            {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                /* @ts-expect-error */
+                <View id="view_3"></View>
+            }
+            {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                /* @ts-expect-error */
+                <View id="view_4"></View>
+            }
         </SubsurfaceViewer>
     );
 };

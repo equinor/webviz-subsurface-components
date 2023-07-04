@@ -12,9 +12,13 @@ import {
 } from "./components/Map";
 import { WellsLayer, MapLayer } from "./layers";
 import InfoCard from "./components/InfoCard";
-import { ExtendedLayerProps, LayerPickInfo } from "./layers/utils/layerTools";
+import {
+    ExtendedLayerProps,
+    LayerPickInfo,
+    PropertyDataType,
+} from "./layers/utils/layerTools";
 import { WellsPickInfo } from "./layers/wells/wellsLayer";
-import { FeatureCollection } from "geojson";
+import { Feature } from "geojson";
 import { ViewFooter } from "./components/ViewFooter";
 
 export default {
@@ -132,7 +136,7 @@ const tooltipImpFunc: TooltipCallback = (
         outputString += processPropInfo(properties, true);
     } else if (layerName === "WellsLayer") {
         const wellsPickInfo = info as WellsPickInfo;
-        const wellsPickInfoObject = info.object as FeatureCollection;
+        const wellsPickInfoObject = info.object as Feature;
         const wellProperties = wellsPickInfoObject.properties;
         const name = (wellProperties as { name: string }).name;
         outputString += `Well: ${name || ""}`;
@@ -237,12 +241,16 @@ const MultiViewAnnotationTemplate: ComponentStory<typeof SubsurfaceViewer> = (
 ) => (
     <SubsurfaceViewer {...args}>
         {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            /* @ts-expect-error */
             <View id="view_1">
                 <ContinuousLegend min={-3071} max={41048} />
                 <ViewFooter>kH netmap</ViewFooter>
             </View>
         }
         {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            /* @ts-expect-error */
             <View id="view_2">
                 <ContinuousLegend min={2725} max={3396} />
                 <ViewFooter>Hugin</ViewFooter>
@@ -372,10 +380,14 @@ const MouseEventStory = (args: { show3d: boolean }) => {
 
     return (
         <SubsurfaceViewer {...useProps}>
-            <View id="test">
-                {getReadout(event)}
-                <ViewFooter>Mouse event example</ViewFooter>
-            </View>
+            {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                /* @ts-expect-error */
+                <View id="test">
+                    {getReadout(event)}
+                    <ViewFooter>Mouse event example</ViewFooter>
+                </View>
+            }
         </SubsurfaceViewer>
     );
 };
