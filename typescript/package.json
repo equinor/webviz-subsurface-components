@@ -26,7 +26,7 @@
     "build:py": "npm run transpile:dash && copyfiles -a ../webviz_subsurface_components/. ./webviz_subsurface_components/ && copyfiles ./package.json ./webviz_subsurface_components/ && copyfiles -f ./src/lib/assets/VectorDefinitions.json ./webviz_subsurface_components/ && dash-generate-components ./dist/lib/components webviz_subsurface_components -p package.json --ignore '(^index.js|.stories.js)$' && copyfiles -a -f ./webviz_subsurface_components/* ../webviz_subsurface_components/",
     "build": "npm run transpile && npm run build:js && npm run build:js-dev && npm run tidy-up && npm run build:py && npm run tidy-up",
     "typecheck": "tsc --noEmit",
-    "format": "eslint --fix *.js *.json *.ts packages src",
+    "format": "eslint --verbose *.js *.json *.ts packages src",
     "lint": "eslint *.js *.json *.ts packages src",
     "validate": "npm run typecheck && npm run lint",
     "storybook": "storybook dev -p 6006",
