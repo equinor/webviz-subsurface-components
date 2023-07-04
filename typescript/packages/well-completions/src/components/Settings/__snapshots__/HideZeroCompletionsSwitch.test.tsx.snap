@@ -1,0 +1,137 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`test hide zero completions switch snapshot test 1`] = `
+.c3 {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  position: relative;
+}
+
+.c1 {
+  border: 0;
+  -webkit-clip: rect(0 0 0 0);
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+.c1:focus {
+  outline: none;
+}
+
+.c1[data-focus-visible-added]:focus + span :first-child {
+  outline: 1px dashed var(--eds_interactive__focus,rgba(0,112,121,1));
+  outline-offset: 6px;
+}
+
+.c2[data-focus-visible-added]:focus + span :first-child {
+  outline-offset: 4px;
+}
+
+.c2:checked + span > span {
+  background-color: var(--eds_interactive_primary__resting,rgba(0,112,121,1));
+}
+
+.c2:checked + span > span:last-child {
+  -webkit-transform: translate(180%,-50%);
+  -ms-transform: translate(180%,-50%);
+  transform: translate(180%,-50%);
+  background-color: var(--eds_interactive__icon_on_interactive_colors,rgba(255,255,255,1));
+}
+
+.c5 {
+  width: 20px;
+  height: 10px;
+  border-radius: 10px;
+  border: none;
+  background-color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate(-50%,-50%);
+  -ms-transform: translate(-50%,-50%);
+  transform: translate(-50%,-50%);
+}
+
+.c6 {
+  background-color: var(--eds_interactive__icon_on_interactive_colors,rgba(255,255,255,1));
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+  position: absolute;
+  top: 50%;
+  -webkit-transform: translate(11%,-50%);
+  -ms-transform: translate(11%,-50%);
+  transform: translate(11%,-50%);
+  left: 15px;
+  -webkit-transition: -webkit-transform 0.36s cubic-bezier(0.78,0.14,0.15,0.86);
+  -webkit-transition: transform 0.36s cubic-bezier(0.78,0.14,0.15,0.86);
+  transition: transform 0.36s cubic-bezier(0.78,0.14,0.15,0.86);
+}
+
+.c0 {
+  cursor: pointer;
+  border: none;
+  background-color: transparent;
+  vertical-align: middle;
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  position: relative;
+}
+
+.c7 {
+  margin: 0;
+  color: rgba(61,61,61,1);
+  font-family: Equinor;
+  font-size: 1.000rem;
+  font-weight: 400;
+  line-height: 1.000em;
+  -webkit-letter-spacing: 0.013em;
+  -moz-letter-spacing: 0.013em;
+  -ms-letter-spacing: 0.013em;
+  letter-spacing: 0.013em;
+  text-align: left;
+}
+
+@media (hover:hover) and (pointer:fine) {
+  .c4:hover {
+    background-color: var(--eds_interactive_primary__hover_alt,rgba(222,237,238,1));
+  }
+}
+
+<label
+  class="c0"
+>
+  <input
+    class="c1 c2"
+    type="checkbox"
+  />
+  <span
+    class="c3 c4"
+  >
+    <span
+      class="c5"
+    />
+    <span
+      class="c6"
+    />
+  </span>
+  <span
+    class="c7"
+  >
+    Filter by completions
+  </span>
+</label>
+`;

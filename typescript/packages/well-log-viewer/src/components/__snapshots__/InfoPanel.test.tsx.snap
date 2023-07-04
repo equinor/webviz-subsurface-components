@@ -1,0 +1,103 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Test Info panel snapshot test 1`] = `
+<div
+  style="overflow-y: auto; overflow-x: hidden;"
+>
+  <fieldset>
+    <legend>
+      Readout
+    </legend>
+    <table
+      style="border-spacing: 0px; width: 100%;"
+    >
+      <tbody>
+        <tr>
+          <td
+            style="color: black; font-size: small;"
+          >
+            ⬤
+          </td>
+          <td>
+            DVER
+          </td>
+          <td
+            style="width: 90px; padding-left: 1.5em; text-align: right;"
+          >
+            2366
+          </td>
+          <td
+            style="padding-left: 0.5em;"
+          >
+            M
+          </td>
+        </tr>
+        <tr>
+          <td
+            colspan="4"
+          >
+             
+            <hr />
+          </td>
+        </tr>
+        <tr>
+          <td
+            style="color: orange; font-size: small;"
+          >
+            ⬤
+          </td>
+          <td>
+            BDIA
+          </td>
+          <td
+            style="width: 90px; padding-left: 1.5em; text-align: right;"
+          >
+            8.5
+          </td>
+          <td
+            style="padding-left: 0.5em;"
+          >
+            INCH
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </fieldset>
+</div>
+`;
+
+exports[`Test Info panel snapshot test when value is infinity 1`] = `
+<div
+  style="overflow-y: auto; overflow-x: hidden;"
+>
+  <fieldset>
+    <legend>
+      Readout
+    </legend>
+    <table
+      style="border-spacing: 0px; width: 100%;"
+    >
+      <tbody>
+        <tr>
+          <td
+            style="color: black; font-size: small;"
+          >
+            ⬤
+          </td>
+          <td>
+            DVER
+          </td>
+          <td
+            style="width: 90px; padding-left: 1.5em; text-align: right;"
+          />
+          <td
+            style="padding-left: 0.5em;"
+          >
+            M
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </fieldset>
+</div>
+`;

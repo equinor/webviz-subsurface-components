@@ -1,0 +1,126 @@
+{
+    "$comment": "See https://jsonwelllogformat.org",
+    "$id": "inputSchema/WellLog.json",
+    "type": "object",
+    "properties": {
+        "header": { "$ref": "#/definitions/header" },
+        "curves": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/curve" }
+        },
+        "data": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/data_row" }
+        },
+        "metadata_discrete": {
+            "type": "object"
+        }
+    },
+    "required": ["curves", "data", "header"],
+    "definitions": {
+        "header": {
+            "type": "object",
+            "properties": {
+                "name": { "type": "string", "description": "Log name" },
+                "description": {
+                    "type": "string",
+                    "description": "Log description"
+                },
+                "externalIds": {
+                    "type": "object",
+                    "description": "Record<string,string>; IDs within external storage, key being the storage name, and value being the ID."
+                },
+                "well": { "type": "string", "description": "Well name" },
+                "wellbore": {
+                    "type": "string",
+                    "description": "wellbore name"
+                },
+                "field": { "type": "string", "description": "Field name" },
+                "country": {
+                    "type": "string",
+                    "description": "Country of operation"
+                },
+                "date": {
+                    "type": "string",
+                    "description": "datetime; Logging date"
+                },
+                "operator": {
+                    "type": "string",
+                    "description": "Operator company name"
+                },
+                "serviceCompany": {
+                    "type": "string",
+                    "description": "Service company name"
+                },
+                "source": {
+                    "type": "string",
+                    "description": "Source system or process of this log"
+                },
+                "runNumber": { "type": "string", "description": "Run number" },
+                "elevation": {
+                    "type": "number",
+                    "description": "float; Vertical distance between measured depth 0.0 and mean sea level in SI unit (meters)"
+                },
+                "startIndex": {
+                    "type": "number",
+                    "description": "Value of the first index. Unit according to index curve"
+                },
+                "endIndex": {
+                    "type": "number",
+                    "description": "Value of the last index. Unit according to index curve"
+                },
+                "step": {
+                    "type": ["number", "null"],
+                    "description": "Distance between indices if regularly sampled. Unit according to index curve. If log is time based, milliseconds assumed. null if irregular step"
+                },
+                "dataUri": {
+                    "type": "string",
+                    "description": "Point to data source in case this is kept separate. Can be absolute or relative according to the URI specification"
+                }
+            }
+        },
+        "curve": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "Curve name or mnemonic. Mandatory. Non-null"
+                },
+                "description": {
+                    "type": ["string", "null"],
+                    "description": "Curve description. Optional"
+                },
+                "quantity": {
+                    "type": ["string", "null"],
+                    "description": "Curve quantity such as length, pressure, force etc. Optional"
+                },
+                "unit": {
+                    "type": ["string", "null"],
+                    "description": "Unit of measurement such as m, ft, bar, etc. Optional"
+                },
+                "valueType": {
+                    "type": ["string", "null"],
+                    "description": "Curve value type: float, integer, string, datetime or boolean. Non-null. Optional. float assumed if not present"
+                },
+                "dimensions": {
+                    "type": "number",
+                    "description": "Number of dimensions. [1,>. Non-null. Optional. 1 assumed if not present"
+                }
+            },
+            "required": ["name"]
+        },
+        "data_row": {
+            "type": "array",
+            "items": {
+                "anyOf": [
+                    { "type": "number" },
+                    { "type": "string" },
+                    { "type": "null" }
+                ]
+            }
+        },
+        "metadata_discrete": {
+            "type": "object"
+        }
+    }
+}

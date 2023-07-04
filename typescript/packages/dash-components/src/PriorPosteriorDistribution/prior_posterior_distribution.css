@@ -1,0 +1,29 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * Copyright (C) 2020 - Equinor ASA. */
+
+.prior_posterior_circle {
+    stroke: black;
+}
+
+.prior_posterior_rect:hover {
+    opacity: 0.8;
+}
+
+.prior_posterior_circle:hover {
+    fill: yellow;
+}
+
+div.prior_posterior_tooltip {
+    position: absolute;
+    padding: 5px;
+    background: black;
+    color: white;
+    text-align: center;
+    font-size: 12px;
+    border: 0px;
+    border-radius: 7px;
+    pointer-events: none;
+}

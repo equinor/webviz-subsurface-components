@@ -1,7 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`Test View Footer snapshot test with no props 1`] = `
-<div
-  class="css-m2xg6a"
-/>
-`;

@@ -1,0 +1,51 @@
+.SmartNodeSelector__Aquifer {
+    background-image: url('./images/aquifer.svg');
+}
+
+.SmartNodeSelector__Block {
+    background-image: url('./images/block.svg');
+}
+
+.SmartNodeSelector__Duplicate {
+    background-image: url('./images/duplicate.svg');
+}
+
+.SmartNodeSelector__Field {
+    background-image: url('./images/field.svg');
+}
+
+.SmartNodeSelector__Group {
+    background-image: url('./images/group.svg');
+}
+
+.SmartNodeSelector__Misc {
+    background-image: url('./images/misc.svg');
+}
+
+.SmartNodeSelector__Network {
+    background-image: url('./images/network.svg');
+}
+
+.SmartNodeSelector__Others {
+    background-image: url('./images/others.svg');
+}
+
+.SmartNodeSelector__Region {
+    background-image: url('./images/region.svg');
+}
+
+.SmartNodeSelector__Region-Region {
+    background-image: url('./images/region-region.svg');
+}
+
+.SmartNodeSelector__Segment {
+    background-image: url('./images/segment.svg');
+}
+
+.SmartNodeSelector__Well {
+    background-image: url('./images/well.svg');
+}
+
+.SmartNodeSelector__Well-completion {
+    background-image: url('./images/well-completion.svg');
+}

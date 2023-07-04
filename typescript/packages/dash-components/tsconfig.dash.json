@@ -1,0 +1,11 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "rootDir": "src/lib"
+    },
+    "include": [],
+    "files": [
+        "src/lib/components/SubsurfaceViewer/components/ViewFooter.tsx",
+        "src/lib/components/SubsurfaceViewer/components/ViewAnnotation.tsx"
+    ]
+}
