@@ -6,10 +6,6 @@ import { getSize } from "../wells/wellsLayer";
 import { Color } from "@deck.gl/core/typed";
 import { Feature } from "geojson";
 
-// This should be fixed at some point
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type PickInfo = any;
-
 export interface BoxSelectionLayerProps extends ExtendedLayerProps {
     mode: string; // One of modes in MODE_MAP
     selectedFeatureIndexes: number[];
@@ -19,11 +15,11 @@ export interface BoxSelectionLayerProps extends ExtendedLayerProps {
     lineWidthScale: number;
     lineStyle: LineStyleAccessor;
     wellHeadStyle: WellHeadStyleAccessor;
-    handleSelection: (pickingInfos: PickInfo[]) => void;
+    handleSelection: (pickingInfos: PickingInfo[]) => void;
+    layerIds: string[];
 }
 
 const defaultProps = {
-    "@@type": "BoxSelectionLayer",
     name: "boxSelection",
     id: "boxSelection-layer",
     pickable: true,
@@ -62,8 +58,7 @@ type WellHeadStyleAccessor = {
 // Composite layer that contains an Selection Lyaer from nebula.gl
 // See https://nebula.gl/docs/api-reference/layers/selection-layer
 export default class BoxSelectionLayer extends CompositeLayer<BoxSelectionLayerProps> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    setMultiSelection(pickingInfos: any[]): void {
+    setMultiSelection(pickingInfos: PickingInfo[]): void {
         if (this.internalState) {
             const data = pickingInfos
                 .map((item) => item.object)
@@ -109,14 +104,17 @@ export default class BoxSelectionLayer extends CompositeLayer<BoxSelectionLayerP
             this.getSubLayerProps({
                 id: "selection",
                 selectionType: "rectangle",
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                onSelect: ({ pickingInfos }: any) => {
+                onSelect: ({
+                    pickingInfos,
+                }: {
+                    pickingInfos: PickingInfo[];
+                }) => {
                     this.setMultiSelection(pickingInfos);
                     if (this.props.handleSelection) {
                         this.props.handleSelection(pickingInfos);
                     }
                 },
-                layerIds: ["wells-layer"],
+                layerIds: this.props.layerIds,
                 getTentativeFillColor: () => [255, 0, 255, 100],
                 getTentativeLineColor: () => [0, 0, 255, 255],
                 getTentativeLineDashArray: () => [0, 0],

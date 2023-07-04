@@ -146,6 +146,17 @@ const defaultProps = {
 };
 
 export default class TriangleLayer extends CompositeLayer<TriangleLayerProps> {
+    get isLoaded(): boolean {
+        const subLayers = this.getSubLayers();
+        const isLoaded =
+            super.isLoaded &&
+            subLayers.length > 0 &&
+            subLayers.every((layer) => layer.isLoaded);
+
+        const isFinished = this.state?.["isFinishedLoading"] ?? false;
+        return isLoaded && isFinished;
+    }
+
     rebuildData(reportBoundingBox: boolean): void {
         const pointsData = this.props.pointsData;
         const triangleData = this.props.triangleData;
@@ -223,11 +234,21 @@ export default class TriangleLayer extends CompositeLayer<TriangleLayerProps> {
                 }
 
                 webWorker.terminate();
+
+                this.setState({
+                    ...this.state,
+                    isFinishedLoading: true,
+                });
             };
         });
     }
 
     initializeState(): void {
+        this.setState({
+            ...this.state,
+            isFinishedLoading: false,
+        });
+
         const reportBoundingBox = true;
         this.rebuildData(reportBoundingBox);
     }
@@ -240,13 +261,18 @@ export default class TriangleLayer extends CompositeLayer<TriangleLayerProps> {
             !isEqual(props.ZIncreasingDownwards, oldProps.ZIncreasingDownwards);
 
         if (needs_reload) {
+            this.setState({
+                ...this.state,
+                isFinishedLoading: false,
+            });
             const reportBoundingBox = false;
             this.rebuildData(reportBoundingBox);
         }
     }
 
     renderLayers(): [PrivateTriangleLayer?] {
-        if (Object.keys(this.state).length === 0) {
+        if (Object.keys(this.state).length === 1) {
+            // isFinishedLoading only in state
             return [];
         }
 

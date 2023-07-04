@@ -292,6 +292,17 @@ const defaultProps = {
 };
 
 export default class MapLayer extends CompositeLayer<MapLayerProps> {
+    get isLoaded(): boolean {
+        const subLayers = this.getSubLayers();
+        const isLoaded =
+            super.isLoaded &&
+            subLayers.length > 0 && // Note super version differs only in this. It returns true on empty array.
+            subLayers.every((layer) => layer.isLoaded);
+
+        const isFinished = this.state?.["isFinishedLoading"] ?? false;
+        return isLoaded && isFinished;
+    }
+
     rebuildData(reportBoundingBox: boolean): void {
         if (typeof this.props.meshUrl !== "undefined") {
             console.warn('"meshUrl" is deprecated. Use "meshData"');
@@ -335,6 +346,7 @@ export default class MapLayer extends CompositeLayer<MapLayerProps> {
                     e.data;
 
                 this.setState({
+                    ...this.state,
                     mesh,
                     mesh_lines,
                     propertyValueRange,
@@ -386,11 +398,21 @@ export default class MapLayer extends CompositeLayer<MapLayerProps> {
                 }
 
                 webWorker.terminate();
+
+                this.setState({
+                    ...this.state,
+                    isFinishedLoading: true,
+                });
             };
         });
     }
 
     initializeState(): void {
+        this.setState({
+            ...this.state,
+            isFinishedLoading: false,
+        });
+
         const reportBoundingBox = true;
         this.rebuildData(reportBoundingBox);
     }
@@ -409,15 +431,21 @@ export default class MapLayer extends CompositeLayer<MapLayerProps> {
             !isEqual(props.gridLines, oldProps.gridLines);
 
         if (needs_reload) {
+            this.setState({
+                ...this.state,
+                isFinishedLoading: false,
+            });
             const reportBoundingBox = false;
             this.rebuildData(reportBoundingBox);
         }
     }
 
     renderLayers(): [privateMapLayer?] {
-        if (Object.keys(this.state).length === 0) {
+        if (Object.keys(this.state).length === 1) {
+            // isFinishedLoading only in state
             return [];
         }
+
         const [minX, minY] = this.props.frame.origin;
         const center = this.props.frame.rotPoint ?? [minX, minY];
 
