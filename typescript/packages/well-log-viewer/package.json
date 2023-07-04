@@ -1,6 +1,6 @@
 {
   "name": "@webviz/well-log-viewer",
-  "version": "0.0.0",
+  "version": "9.99.9000",
   "description": "",
   "main": "src/index.ts",
   "scripts": {

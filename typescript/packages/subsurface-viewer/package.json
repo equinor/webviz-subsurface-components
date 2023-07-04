@@ -1,6 +1,6 @@
 {
     "name": "@webviz/subsurface-viewer",
-    "version": "0.0.0",
+    "version": "9.99.9002",
     "description": "",
     "main": "dist/index.js",
     "scripts": {

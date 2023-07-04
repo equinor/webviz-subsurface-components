@@ -11,13 +11,11 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
     };
 
     const crossProduct = (a: number[], b: number[]): number[] => {
-        const a1 = a[0];
-        const a2 = a[1];
-        const a3 = a[2];
-        const b1 = b[0];
-        const b2 = b[1];
-        const b3 = b[2];
-        return [a2 * b3 - a3 * b2, a3 * b1 - a1 * b3, a1 * b2 - a2 * b1];
+        return [
+            a[1] * b[2] - a[2] * b[1],
+            a[2] * b[0] - a[0] * b[2],
+            a[0] * b[1] - a[1] * b[0],
+        ];
     };
 
     const dotProduct = (a: number[], b: number[]): number => {
@@ -29,13 +27,26 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
         return [a[0] / len, a[1] / len, a[2] / len];
     };
 
-    const project = (u: number[], v: number[], p: number[]): number[] => {
+    /**
+     * Projects a 3D point to the coordinate system of the plane formed by two 3D orthogonal unit vectors u and v.
+     * @param u the first vector
+     * @param v the second vector
+     * @param p the point to be projected as [x, y, z] triplet.
+     * @returns projected point as [x, y] triplet.
+     */
+    const projectPoint = (u: number[], v: number[], p: number[]): number[] => {
         const a = dotProduct(p, u);
         const b = dotProduct(p, v);
-        return [a, b, 0];
+        return [a, b];
     };
 
-    const flattenPoly = (points: number[]): number[] => {
+    /**
+     * Projects a polygon on the plane passing throught its points.
+     * Assumes the polygon to be flat, i.e. all the points lie on the same plane.
+     * @param points Polygon to be projected.
+     * @returns Projected polygon in the 2D coordinate system of the plane.
+     */
+    const projectPolygon = (points: number[]): number[] => {
         const p0 = get3DPoint(points, 0);
         const p1 = get3DPoint(points, 1);
         const p2 = get3DPoint(points, 2);
@@ -44,16 +55,16 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
         const normal = normalize(crossProduct(v1, v2));
         const u = normalize(v1);
         const v = normalize(crossProduct(normal, u));
-        console.log("u, v:", u, v);
         const res: number[] = [];
         const count = points.length / 3;
         for (let i = 0; i < count; ++i) {
             const p = get3DPoint(points, i);
-            const fp = project(u, v, p);
+            const fp = projectPoint(u, v, p);
             res.push(...fp);
         }
         return res;
     };
+
     // Keep
     const t0 = performance.now();
 
@@ -75,9 +86,10 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
     let pn = 0;
     let i = 0;
 
-    const triangFunc = params.triangulate
-        ? Function("points", params.triangulate)
-        : undefined;
+    const triangFunc = Function(
+        params.triangulateParamName,
+        params.triangulateFunc
+    );
 
     while (i < polys.length) {
         const n = polys[i];
@@ -109,22 +121,23 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
             line_positions.push(...p1);
             line_positions.push(...p2);
         }
-        if (triangFunc) {
-            const polygon: number[] = [];
-            const vertexIndices: number[] = [];
-            for (let p = 1; p <= n; ++p) {
-                const i0 = polys[i + p];
-                const point = get3DPoint(params.points, i0);
-                point[2] *= z_sign;
-                vertexIndices.push(i0);
-                polygon.push(...point);
-            }
-            const flatPoly = flattenPoly(polygon);
-            const triangles = triangFunc(flatPoly);
 
-            for (const t of triangles) {
-                indices.push(vertexIndices[t]);
-            }
+        const polygon: number[] = [];
+        const vertexIndices: number[] = [];
+        for (let p = 1; p <= n; ++p) {
+            const i0 = polys[i + p];
+            const point = get3DPoint(params.points, i0);
+            point[2] *= z_sign;
+            vertexIndices.push(i0);
+            polygon.push(...point);
+        }
+        // As the triangulation algorythm works in 2D space
+        // the polygon should be projected on the plane passing through its points.
+        const flatPoly = projectPolygon(polygon);
+        const triangles = triangFunc(flatPoly);
+
+        for (const t of triangles) {
+            indices.push(vertexIndices[t]);
         }
         i = i + n + 1;
     }

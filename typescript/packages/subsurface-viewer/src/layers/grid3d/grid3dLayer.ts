@@ -11,7 +11,8 @@ export type WebWorkerParams = {
     polys: number[];
     properties: number[];
     isZIncreasingDownwards: boolean;
-    triangulate?: string;
+    triangulateFunc: string;
+    triangulateParamName: string;
 };
 
 function GetBBox(
@@ -165,7 +166,8 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
                 polys,
                 properties,
                 isZIncreasingDownwards: this.props.ZIncreasingDownwards,
-                triangulate: `return earcut(points, undefined, 3);\n${earcut.toString()}`,
+                triangulateFunc: `return earcut(points);\n${earcut.toString()}`,
+                triangulateParamName: "points",
             };
 
             webWorker.postMessage(webworkerParams);
