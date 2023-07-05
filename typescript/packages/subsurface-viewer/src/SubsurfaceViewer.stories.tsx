@@ -515,6 +515,7 @@ export const IsLoadedCallback = (args: SubsurfaceViewerProps) => {
             </div>
             <label>{"Add big map layer "}</label>
             <Switch onClick={handleChange} />
+            <label>{label}</label>
         </Root>
     );
 };
