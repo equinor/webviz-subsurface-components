@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "transpile": "tsc --project ./tsconfig.json",
-    "copy-files": "copyfiles --up 1 \"src/**/*.png\" dist/",
+    "copy-files": "copyfiles --up 1 \"src/**/*.png\" dist/ && copyfiles --up 1 \"src/**/*.scss\" dist/",
     "build": "git clean -xdff dist && npm run transpile && npm run copy-files"
   },
   "author": "Equinor <opensource@equinor.com>",

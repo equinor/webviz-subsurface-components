@@ -24,10 +24,6 @@ import { getWellPicks } from "./components/WellLogView";
 import { getAvailableAxes } from "./utils/tracks";
 
 import { checkMinMax } from "./utils/minmax";
-function isEqDomains(d1: [number, number], d2: [number, number]): boolean {
-    const eps: number = Math.abs(d1[1] - d1[0] + (d2[1] - d2[0])) * 0.00001;
-    return Math.abs(d1[0] - d2[0]) < eps && Math.abs(d1[1] - d2[1]) < eps;
-}
 
 import { onTrackMouseEvent } from "./utils/edit-track";
 import { fillInfos } from "./utils/fill-info";
@@ -36,8 +32,11 @@ import { LogViewer } from "@equinor/videx-wellog";
 import { Info, InfoOptions } from "./components/InfoTypes";
 
 import { isEqualRanges } from "./components/WellLogView";
-//import { boolean } from "mathjs";
 
+function isEqDomains(d1: [number, number], d2: [number, number]): boolean {
+    const eps: number = Math.abs(d1[1] - d1[0] + (d2[1] - d2[0])) * 0.00001;
+    return Math.abs(d1[0] - d2[0]) < eps && Math.abs(d1[1] - d2[1]) < eps;
+}
 export function isEqualArrays(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     d1: undefined | any[],
