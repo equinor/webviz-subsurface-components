@@ -500,7 +500,7 @@ export const IsLoadedCallback = (args: SubsurfaceViewerProps) => {
         WellsLayer,
         MapLayer?
     ]);
-    const [, setLabel] = React.useState("");
+    const [label, setLabel] = React.useState("");
 
     const handleChange = () => {
         if (layers.length === 1) {
