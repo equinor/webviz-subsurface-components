@@ -1,6 +1,19 @@
 import React from "react";
+import { create, all } from "mathjs";
+
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
+
+import {
+    Points as SnubCubePoints,
+    Faces as SnubCubeFaces,
+    VertexCount as SnubCubeVertexCount,
+} from "./test_data/TruncatedSnubCube";
+import {
+    Points as ToroidPoints,
+    Faces as ToroidFaces,
+    VertexCount as ToroidVertexCount,
+} from "./test_data/PentagonalToroid";
 
 export default {
     component: SubsurfaceViewer,
@@ -135,6 +148,52 @@ Simgrid8xIJonly.args = {
     ],
 };
 Simgrid8xIJonly.parameters = parameters;
+
+const math = create(all, { randomSeed: "1984" });
+const randomFunc = math?.random ? math.random : Math.random;
+
+export const PolyhedralCells = Template.bind({});
+PolyhedralCells.args = {
+    bounds: [-50, -50, 50, 50] as NumberQuad,
+    views: {
+        layout: [1, 1] as [number, number],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: true,
+            },
+        ],
+    },
+    id: "grid-3d-polyhedral-cell",
+    layers: [
+        {
+            "@@type": "AxesLayer",
+            id: "polyhedral-cells-axes",
+            bounds: [-50, -50, -50, 50, 50, 50],
+        },
+        {
+            ...grid3dLayer,
+            id: "polyhedral1",
+            pointsData: SnubCubePoints.map((v) => 10 * v),
+            polysData: SnubCubeFaces,
+            propertiesData: Array(SnubCubeVertexCount)
+                .fill(0)
+                .map(() => randomFunc() * 10),
+        },
+        {
+            ...grid3dLayer,
+            id: "polyhedral2",
+            pointsData: ToroidPoints.map((v) => 10 * v).map((v, index) =>
+                index % 3 === 0 ? v + 30 : v
+            ),
+            polysData: ToroidFaces,
+            propertiesData: Array(ToroidVertexCount)
+                .fill(0)
+                .map(() => randomFunc() * 10),
+        },
+    ],
+};
+PolyhedralCells.parameters = parameters;
 
 // // Intersection story.
 // const intersection_axes = {
