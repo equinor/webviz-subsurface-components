@@ -89,6 +89,7 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
     const properties = params.properties;
     const isZIncreasingDownwards = params.isZIncreasingDownwards;
 
+    const positions: number[] = [];
     const indices: number[] = [];
     const vertexProperties: number[] = [];
     const line_positions: number[] = [];
@@ -100,7 +101,7 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
 
     let pn = 0;
     let i = 0;
-
+    let vertexIndex = 0;
     const triangFunc = Function(
         params.triangulateParamName,
         params.triangulateFunc
@@ -140,19 +141,16 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
         // As the triangulation algorythm works in 2D space
         // the polygon should be projected on the plane passing through its points.
         const flatPoly = projectPolygon(polygon);
-        const triangles = triangFunc(flatPoly);
+        const triangles : number[] = triangFunc(flatPoly);
 
         for (const t of triangles) {
-            indices.push(vertexIndices[t]);
+            positions.push(...get3DPoint(polygon, t));            
+            vertexProperties.push(propertyValue);
+            indices.push(vertexIndex++);
         }
         i = i + n + 1;
     }
-    const positions =
-        z_sign !== 1
-            ? params.points.map((value, index) => {
-                  return (index + 1) % 3 === 0 ? value * z_sign : value;
-              })
-            : params.points;
+
     console.log("Number of polygons: ", pn);
 
     const mesh: MeshType = {
