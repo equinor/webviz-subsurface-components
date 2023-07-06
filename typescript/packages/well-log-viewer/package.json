@@ -2,20 +2,47 @@
   "name": "@webviz/well-log-viewer",
   "version": "9.99.9000",
   "description": "",
-  "main": "src/index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "transpile": "tsc --project ./tsconfig.json",
-    "copy-files": "copyfiles package.json dist && copyfiles README.md dist && copyfiles --exclude **/*.{tsx,jsx,js,ts,snap} --up 1 \"src/**/*\" dist/",
-    "build": "npm run transpile && npm run copy-files"
+    "copy-files": "copyfiles --up 1 \"src/**/*.png\" dist/ && copyfiles --up 1 \"src/**/*.scss\" dist/",
+    "build": "git clean -xdff dist && npm run transpile && npm run copy-files"
   },
   "author": "Equinor <opensource@equinor.com>",
   "license": "MPL-2.0",
   "dependencies": {
     "@emerson-eps/color-tables": "^0.4.57",
     "@equinor/videx-wellog": "^0.8.0",
-    "@mui/material": "^5.13.4",
     "@webviz/subsurface-viewer": "*",
     "convert-units": "^2.3.4",
     "d3": "^7.8.2"
+  },
+  "devDependencies": {
+    "@mui/material": "^5.13.7"
+  },
+  "peerDependencies": {
+    "@mui/material": "^5",
+    "react": "^17 || ^18",
+    "react-dom": "^17 || ^18"
+  },
+  "nx": {
+    "targets": {
+      "build": {
+        "dependsOn": [
+          {
+            "dependencies": true,
+            "target": "build",
+            "params": "ignore"
+          }
+        ]
+      }
+    }
+  },
+  "volta": {
+    "node": "16.18.1"
   }
 }

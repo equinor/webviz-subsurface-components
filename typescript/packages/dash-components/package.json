@@ -22,5 +22,8 @@
   "devDependencies": {
     "deep-equal": "^2.0.5",
     "jsverify": "^0.8.4"
+  },
+  "volta": {
+    "node": "16.18.1"
   }
 }

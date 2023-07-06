@@ -149,6 +149,9 @@
         "node": ">=14.17",
         "npm": ">=6.14"
     },
+    "volta": {
+        "node": "16.18.1"
+    },
     "workspaces": [
         "packages/*"
     ]

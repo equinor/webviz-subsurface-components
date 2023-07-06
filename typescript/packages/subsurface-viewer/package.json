@@ -1,38 +1,51 @@
 {
-    "name": "@webviz/subsurface-viewer",
-    "version": "9.99.9002",
-    "description": "",
-    "main": "dist/index.js",
-    "scripts": {
-        "transpile": "tsc --project ./tsconfig.json",
-        "copy-files": "copyfiles package.json dist && copyfiles README.md dist && copyfiles --exclude **/*.{tsx,jsx,js,ts,snap} --up 1 \"src/**/*\" dist/",
-        "build": "npm run transpile && npm run copy-files"
-    },
-    "author": "Equinor <opensource@equinor.com>",
-    "license": "MPL-2.0",
-    "dependencies": {
-        "@deck.gl/core": "^8.8.25",
-        "@emerson-eps/color-tables": "^0.4.57",
-        "@equinor/eds-core-react": "^0.16.1",
-        "@equinor/eds-icons": "^0.19.1",
-        "@mui/material": "^5.13.4",
-        "@mui/system": "^5.12.1",
-        "@nebula.gl/edit-modes": "^0.22.3",
-        "@nebula.gl/layers": "^0.22.3",
-        "@reduxjs/toolkit": "^1.7.2",
-        "@vivaxy/png": "^1.3.0",
-        "ajv": "^7.2.1",
-        "convert-units": "^2.3.4",
-        "d3": "^7.8.2",
-        "d3-color": "^3.1.0",
-        "d3-format": "^1.4.5",
-        "deck.gl": "^8.9.19",
-        "gl-matrix": "^3.4.3",
-        "lodash": "^4.17.21",
-        "mathjs": "^9.4.2",
-        "react-redux": "^7.2.6"
-    },
-    "files": [
-        "/dist"
-    ]
+  "name": "@webviz/subsurface-viewer",
+  "version": "0.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "transpile": "tsc --project ./tsconfig.json",
+    "copy-files": "copyfiles --up 1 \"src/**/*.png\" dist/",
+    "build": "git clean -xdff dist && npm run transpile && npm run copy-files"
+  },
+  "author": "Equinor <opensource@equinor.com>",
+  "license": "MPL-2.0",
+  "dependencies": {
+    "@deck.gl/core": "^8.8.25",
+    "@emerson-eps/color-tables": "^0.4.57",
+    "@equinor/eds-core-react": "^0.16.1",
+    "@equinor/eds-icons": "^0.19.1",
+    "@mui/material": "^5.13.4",
+    "@mui/system": "^5.12.1",
+    "@nebula.gl/layers": "^1.0.4",
+    "@reduxjs/toolkit": "^1.7.2",
+    "@vivaxy/png": "^1.3.0",
+    "ajv": "^7.2.1",
+    "convert-units": "^2.3.4",
+    "d3": "^7.8.2",
+    "d3-color": "^3.1.0",
+    "d3-format": "^1.4.5",
+    "deck.gl": "^8.9.19",
+    "gl-matrix": "^3.4.3",
+    "lodash": "^4.17.21",
+    "mathjs": "^9.4.2",
+    "react-redux": "^7.2.6"
+  },
+  "devDependencies": {
+    "@mui/material": "^5.13.6",
+    "@mui/system": "^5.13.6"
+  },
+  "peerDependencies": {
+    "@mui/material": "^5",
+    "@mui/system": "^5",
+    "react": "^17 || ^18",
+    "react-dom": "^17 || ^18"
+  },
+  "volta": {
+    "node": "16.18.1"
+  }
 }

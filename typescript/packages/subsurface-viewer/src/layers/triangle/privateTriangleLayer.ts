@@ -141,7 +141,7 @@ export default class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProp
         const smoothShading = this.props.smoothShading;
 
         // Normalize to [0,1] range.
-        const uColor = this.props.color.map((x) => (x ?? 0) / 255);
+        const uColor = this.props.color.map((x: number) => (x ?? 0) / 255);
         uColor.push(1); // alpha channel.
 
         if (!this.props.depthTest) {

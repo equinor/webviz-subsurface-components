@@ -54,6 +54,11 @@ export interface SubsurfaceViewerProps {
     getCameraPosition?: (input: ViewStateType) => void;
 
     /**
+     * Will be called after all layers have finished loading data.
+     */
+    isLoadedCallback?: (arg: boolean) => void;
+
+    /**
      * If changed will reset camera to default position.
      */
     triggerHome?: number;
@@ -101,6 +106,7 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
     getTooltip,
     cameraPosition,
     getCameraPosition,
+    isLoadedCallback,
     triggerHome,
     triggerResetMultipleWells,
     children,
@@ -183,6 +189,7 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
             getTooltip={getTooltip}
             cameraPosition={cameraPosition}
             getCameraPosition={getCameraPosition}
+            isLoadedCallback={isLoadedCallback}
             triggerHome={triggerHome}
             triggerResetMultipleWells={triggerResetMultipleWells}
         >
