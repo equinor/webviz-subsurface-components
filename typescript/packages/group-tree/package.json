@@ -16,11 +16,8 @@
     "lodash": "^4.17.21",
     "react-redux": "^7.2.6"
   },
-  "devDependencies": {
-    "@mui/material": "^5.13.7"
-  },
   "peerDependencies": {
-    "@mui/material": "^5",
+    "@mui/material": "^5.11",
     "react": "^17 || ^18",
     "react-dom": "^17 || ^18"
   },
