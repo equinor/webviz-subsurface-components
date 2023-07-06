@@ -1,13 +1,90 @@
+/* eslint-disable prettier/prettier */
 import { MeshType, MeshTypeLines } from "./privateLayer";
 import { WebWorkerParams } from "./grid3dLayer";
 
 export function makeFullMesh(e: { data: WebWorkerParams }): void {
+    const get3DPoint = (points: number[], index: number): number[] => {
+        return points.slice(index * 3, (index + 1) * 3);
+    };
+
+    const substractPoints = (a: number[], b: number[]): number[] => {
+        return [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+    };
+
+    const crossProduct = (a: number[], b: number[]): number[] => {
+        return [
+            a[1] * b[2] - a[2] * b[1],
+            a[2] * b[0] - a[0] * b[2],
+            a[0] * b[1] - a[1] * b[0],
+        ];
+    };
+
+    const dotProduct = (a: number[], b: number[]): number => {
+        return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+    };
+
+    const normalize = (a: number[]): number[] => {
+        const len = Math.sqrt(dotProduct(a, a));
+        return [a[0] / len, a[1] / len, a[2] / len];
+    };
+
+    /**
+     * Projects a 3D point to the coordinate system of the plane formed by two 3D orthogonal unit vectors u and v.
+     * @param u the first vector
+     * @param v the second vector
+     * @param p the point to be projected as [x, y, z] triplet.
+     * @returns projected point as [x, y] triplet.
+     */
+    const projectPoint = (u: number[], v: number[], p: number[]): number[] => {
+        const a = dotProduct(p, u);
+        const b = dotProduct(p, v);
+        return [a, b];
+    };
+
+    /**
+     * Projects a polygon on the plane passing throught its points.
+     * Assumes the polygon to be flat, i.e. all the points lie on the same plane.
+     * @param points Polygon to be projected.
+     * @returns Projected polygon in the 2D coordinate system of the plane.
+     */
+    const projectPolygon = (points: number[]): number[] => {
+        const p0 = get3DPoint(points, 0);
+        const p1 = get3DPoint(points, 1);
+        const p2 = get3DPoint(points, 2);
+        const v1 = substractPoints(p1, p0);
+        const v2 = substractPoints(p2, p0);
+        const normal = normalize(crossProduct(v1, v2));
+        const u = normalize(v1);
+        const v = normalize(crossProduct(normal, u));
+        const res: number[] = [];
+        const count = points.length / 3;
+        for (let i = 0; i < count; ++i) {
+            const p = get3DPoint(points, i);
+            const fp = projectPoint(u, v, p);
+            res.push(...fp);
+        }
+        return res;
+    };
+
+    const getLineSegment = (index0: number, index1: number, out: number[]) => {
+        const i1 = polys[index0];
+        const i2 = polys[index1];
+
+        const p1 = get3DPoint(params.points, i1);
+        const p2 = get3DPoint(params.points, i2);
+
+        p1[2] *= z_sign;
+        p2[2] *= z_sign;
+
+        out.push(...p1);
+        out.push(...p2);  
+    }
+
     // Keep
     const t0 = performance.now();
 
     const params = e.data;
 
-    const points = params.points;
     const polys = params.polys;
     const properties = params.properties;
     const isZIncreasingDownwards = params.isZIncreasingDownwards;
@@ -23,8 +100,13 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
     const z_sign = isZIncreasingDownwards ? -1 : 1;
 
     let pn = 0;
-    let indice = 0;
     let i = 0;
+    let vertexIndex = 0;
+    const triangFunc = Function(
+        params.triangulateParamName,
+        params.triangulateFunc
+    );
+
     while (i < polys.length) {
         const n = polys[i];
         const propertyValue = properties[pn++];
@@ -42,100 +124,33 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
         }
 
         // Lines.
-        for (let j = i + 1; j < i + n; j++) {
-            const i1 = polys[j];
-            const i2 = polys[j + 1];
-
-            const x0 = points[3 * i1 + 0];
-            const y0 = points[3 * i1 + 1];
-            const z0 = points[3 * i1 + 2] * z_sign;
-
-            const x1 = points[3 * i2 + 0];
-            const y1 = points[3 * i2 + 1];
-            const z1 = points[3 * i2 + 2] * z_sign;
-
-            line_positions.push(x0, y0, z0);
-            line_positions.push(x1, y1, z1);
+        for (let j = i + 1; j < i + n; ++j) {
+            getLineSegment (j, j + 1, line_positions);            
         }
+        getLineSegment (i + 1, i + n, line_positions);            
 
-        // Triangles.
-        if (n == 4) {
-            const i1 = polys[i + 1];
-            const i2 = polys[i + 2];
-            const i3 = polys[i + 3];
-            const i4 = polys[i + 4];
-
-            const x1 = points[3 * i1 + 0];
-            const y1 = points[3 * i1 + 1];
-            const z1 = points[3 * i1 + 2] * z_sign;
-
-            const x2 = points[3 * i2 + 0];
-            const y2 = points[3 * i2 + 1];
-            const z2 = points[3 * i2 + 2] * z_sign;
-
-            const x3 = points[3 * i3 + 0];
-            const y3 = points[3 * i3 + 1];
-            const z3 = points[3 * i3 + 2] * z_sign;
-
-            const x4 = points[3 * i4 + 0];
-            const y4 = points[3 * i4 + 1];
-            const z4 = points[3 * i4 + 2] * z_sign;
-
-            // t1
-            indices.push(indice++, indice++, indice++);
-
-            positions.push(x1, y1, z1);
-            positions.push(x2, y2, z2);
-            positions.push(x3, y3, z3);
-
-            vertexProperties.push(propertyValue);
-            vertexProperties.push(propertyValue);
-            vertexProperties.push(propertyValue);
-
-            // t2
-            indices.push(indice++, indice++, indice++);
-
-            positions.push(x1, y1, z1);
-            positions.push(x3, y3, z3);
-            positions.push(x4, y4, z4);
-
-            vertexProperties.push(propertyValue);
-            vertexProperties.push(propertyValue);
-            vertexProperties.push(propertyValue);
-        } else if (n == 3) {
-            // Refactor this n == 3 && n == 4.
-            const i1 = polys[i + 1];
-            const i2 = polys[i + 2];
-            const i3 = polys[i + 3];
-
-            const x1 = points[3 * i1 + 0];
-            const y1 = points[3 * i1 + 1];
-            const z1 = points[3 * i1 + 2] * z_sign;
-
-            const x2 = points[3 * i2 + 0];
-            const y2 = points[3 * i2 + 1];
-            const z2 = points[3 * i2 + 2] * z_sign;
-
-            const x3 = points[3 * i3 + 0];
-            const y3 = points[3 * i3 + 1];
-            const z3 = points[3 * i3 + 2] * z_sign;
-
-            // t1
-            indices.push(indice++, indice++, indice++);
-
-            positions.push(x1, y1, z1);
-            positions.push(x2, y2, z2);
-            positions.push(x3, y3, z3);
-
-            vertexProperties.push(propertyValue);
-            vertexProperties.push(propertyValue);
-            vertexProperties.push(propertyValue);
-        } else {
-            console.error("Only triangles or four corners are expected.");
+        const polygon: number[] = [];
+        const vertexIndices: number[] = [];
+        for (let p = 1; p <= n; ++p) {
+            const i0 = polys[i + p];
+            const point = get3DPoint(params.points, i0);
+            point[2] *= z_sign;
+            vertexIndices.push(i0);
+            polygon.push(...point);
         }
+        // As the triangulation algorythm works in 2D space
+        // the polygon should be projected on the plane passing through its points.
+        const flatPoly = projectPolygon(polygon);
+        const triangles : number[] = triangFunc(flatPoly);
 
+        for (const t of triangles) {
+            positions.push(...get3DPoint(polygon, t));            
+            vertexProperties.push(propertyValue);
+            indices.push(vertexIndex++);
+        }
         i = i + n + 1;
     }
+
     console.log("Number of polygons: ", pn);
 
     const mesh: MeshType = {
