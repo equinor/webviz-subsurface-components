@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { MeshType, MeshTypeLines } from "./privateLayer";
 import { WebWorkerParams } from "./grid3dLayer";
 
@@ -65,6 +66,20 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
         return res;
     };
 
+    const getLineSegment = (index0: number, index1: number, out: number[]) => {
+        const i1 = polys[index0];
+        const i2 = polys[index1];
+
+        const p1 = get3DPoint(params.points, i1);
+        const p2 = get3DPoint(params.points, i2);
+
+        p1[2] *= z_sign;
+        p2[2] *= z_sign;
+
+        out.push(...p1);
+        out.push(...p2);  
+    }
+
     // Keep
     const t0 = performance.now();
 
@@ -109,18 +124,9 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
 
         // Lines.
         for (let j = i + 1; j < i + n; ++j) {
-            const i1 = polys[j];
-            const i2 = polys[j + 1];
-
-            const p1 = get3DPoint(params.points, i1);
-            const p2 = get3DPoint(params.points, i2);
-
-            p1[2] *= z_sign;
-            p2[2] *= z_sign;
-
-            line_positions.push(...p1);
-            line_positions.push(...p2);
+            getLineSegment (j, j + 1, line_positions);            
         }
+        getLineSegment (i + 1, i + n, line_positions);            
 
         const polygon: number[] = [];
         const vertexIndices: number[] = [];
