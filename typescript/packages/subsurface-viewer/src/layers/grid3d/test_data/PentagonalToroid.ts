@@ -50,3 +50,5 @@ export const Faces = [
 3, 5,  1,  3,
 3, 6,  2,  9,
 3, 6,  9,  7]
+
+export const VertexCount = 80;

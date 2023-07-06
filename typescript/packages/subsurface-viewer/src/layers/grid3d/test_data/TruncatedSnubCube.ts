@@ -263,3 +263,5 @@ export const Faces = [
 5, 37,  47,  95, 119,  85,
 5, 38,  44,  92, 116,  86,
 5, 39,  45,  93, 117,  87]
+
+export const VertexCount = 354;
