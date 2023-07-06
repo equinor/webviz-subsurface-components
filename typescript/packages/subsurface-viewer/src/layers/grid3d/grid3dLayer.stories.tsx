@@ -92,8 +92,8 @@ SimgridArrayInput.args = {
 };
 SimgridArrayInput.parameters = parameters;
 
-export const SimgridPolyhedralCell = Template.bind({});
-SimgridPolyhedralCell.args = {
+export const PolyhedralCells = Template.bind({});
+PolyhedralCells.args = {
     bounds: [-50, -50, 50, 50] as NumberQuad,
     views: {
         layout: [1, 1] as [number, number],
@@ -127,7 +127,7 @@ SimgridPolyhedralCell.args = {
         },
     ],
 };
-SimgridPolyhedralCell.parameters = parameters;
+PolyhedralCells.parameters = parameters;
 
 export const Simgrid2x = Template.bind({});
 Simgrid2x.args = {
