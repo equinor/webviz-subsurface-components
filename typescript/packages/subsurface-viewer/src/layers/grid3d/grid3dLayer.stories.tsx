@@ -3,8 +3,8 @@ import React from "react";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 
-import { Points, Faces} from "./data2"
-import { Points as Points2, Faces as Faces2} from "./data4"
+import { Points as SnubCubePoints, Faces as SnubCubeFaces} from "./test_data/TruncatedSnubCube"
+import { Points as ToroidPoints, Faces as ToroidFaces} from "./test_data/PentagonalToroid"
 
 export default {
     component: SubsurfaceViewer,
@@ -114,15 +114,15 @@ PolyhedralCells.args = {
         {
             ...grid3dLayer,
             id: "polyhedral1",
-            pointsData: Points.map ( v => 10 * v),
-            polysData: Faces,
+            pointsData: SnubCubePoints.map ( v => 10 * v),
+            polysData: SnubCubeFaces,
             propertiesData: [0.0, 0.0, 0.0, 0.0],
         },
         {
             ...grid3dLayer,
             id: "polyhedral2",
-            pointsData: Points2.map(v => 10 * v).map ((v, index) => index % 3 === 0 ? v + 30: v),
-            polysData: Faces2,
+            pointsData: ToroidPoints.map(v => 10 * v).map ((v, index) => index % 3 === 0 ? v + 30: v),
+            polysData: ToroidFaces,
             propertiesData: [0.0, 0.0, 0.0, 0.0],
         },
     ],
