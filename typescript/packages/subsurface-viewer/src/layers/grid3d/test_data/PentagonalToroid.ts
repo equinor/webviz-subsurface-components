@@ -1,6 +1,9 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-loss-of-precision */
-//Pentagonal Antiprism-Trapezohedron Toroid
+/**
+* Pentagonal Antiprism-Trapezohedron Toroid
+* http://dmccooey.com/polyhedra/PentagonalAntiprismTrapezohedronToroid.html
+*/
 
 const C0 = (3 - Math.sqrt(5)) / 4;
 const C1 = (Math.sqrt(5) - 1) / 4;

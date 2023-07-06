@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/no-loss-of-precision */
 /* eslint-disable prettier/prettier */
-//Canonical Truncated Snub Cube (laevo)
-//http://dmccooey.com/polyhedra/CanonicalTruncatedLsnubCube.html
+/**
+* Canonical Truncated Snub Cube (laevo)
+* http://dmccooey.com/polyhedra/CanonicalTruncatedLsnubCube.html
+*/
 
 const C0  = 0.0302251764772701090307923300606
 const C1  = 0.0363071672915951331148593569212
