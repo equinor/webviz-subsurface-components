@@ -1,4 +1,9 @@
 /* eslint-disable no-nested-ternary */
+/**
+ * The fastest and smallest JavaScript polygon triangulation library for your WebGL apps.
+ * https://github.com/mapbox/earcut
+ * The library is used as source code because of issues with imports in webworkers.
+ */
 "use strict";
 
 module.exports = earcut;
