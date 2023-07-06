@@ -108,7 +108,7 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
         }
 
         // Lines.
-        for (let j = i + 1; j < i + n; j++) {
+        for (let j = i + 1; j < i + n; ++j) {
             const i1 = polys[j];
             const i2 = polys[j + 1];
 
@@ -141,12 +141,18 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
         }
         i = i + n + 1;
     }
+    const positions =
+        z_sign !== 1
+            ? params.points.map((value, index) => {
+                  return (index + 1) % 3 === 0 ? value * z_sign : value;
+              })
+            : params.points;
     console.log("Number of polygons: ", pn);
 
     const mesh: MeshType = {
         drawMode: 4, // corresponds to GL.TRIANGLES,
         attributes: {
-            positions: { value: new Float32Array(params.points), size: 3 },
+            positions: { value: new Float32Array(positions), size: 3 },
             properties: { value: new Float32Array(vertexProperties), size: 1 },
             vertex_indexs: { value: new Int32Array(indices), size: 1 },
         },
