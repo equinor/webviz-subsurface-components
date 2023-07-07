@@ -12,6 +12,7 @@ import {
     PickingInfo,
     OrthographicView,
     OrbitView,
+    PointLight,
 } from "@deck.gl/core/typed";
 import { Feature, FeatureCollection } from "geojson";
 import React, { useEffect, useState, useCallback, useRef } from "react";
@@ -40,6 +41,15 @@ import { OrbitController, OrthographicController } from "@deck.gl/core/typed";
 import { MjolnirEvent, MjolnirPointerEvent } from "mjolnir.js";
 import IntersectionView from "../views/intersectionView";
 import { Unit } from "convert-units";
+
+// XXX
+import { LightsType } from "../SubsurfaceViewer";
+import {
+    _CameraLight as CameraLight,
+    AmbientLight,
+    DirectionalLight,
+} from "@deck.gl/core/typed";
+import { LightingEffect } from "@deck.gl/core/typed";
 
 type BoundingBox = [number, number, number, number, number, number];
 
@@ -95,6 +105,56 @@ class ZScaleOrbitView extends OrbitView {
     get ControllerType(): typeof OrbitController {
         return ZScaleOrbitController;
     }
+}
+
+function parseLights(lights?: LightsType): LightingEffect[] | undefined {
+    if (typeof lights === "undefined") {
+        return undefined;
+    }
+
+    const effects = [];
+    let lightsObj = {};
+
+    if (lights.headLight) {
+        const headLight = new CameraLight({
+            intensity: lights.headLight.intensity,
+            color: lights.headLight.color ?? [255, 255, 255],
+        });
+        lightsObj = { ...lightsObj, headLight };
+    }
+
+    if (lights.ambientLight) {
+        const ambientLight = new AmbientLight({
+            intensity: lights.ambientLight.intensity,
+            color: lights.ambientLight.color ?? [255, 255, 255],
+        });
+        lightsObj = { ...lightsObj, ambientLight };
+    }
+
+    if (typeof lights.pointLights !== "undefined") {
+        for (const light of lights.pointLights) {
+            const pointLight = new PointLight({
+                ...light,
+                color: light.color ?? [255, 255, 255],
+            });
+            lightsObj = { ...lightsObj, pointLight };
+        }
+    }
+
+    if (typeof lights.directionalLights !== "undefined") {
+        for (const light of lights.directionalLights) {
+            const directionalLight = new DirectionalLight({
+                ...light,
+                color: light.color ?? [255, 255, 255],
+            });
+            lightsObj = { ...lightsObj, directionalLight };
+        }
+    }
+
+    const lightingEffect = new LightingEffect(lightsObj);
+    effects.push(lightingEffect);
+
+    return effects;
 }
 
 function addBoundingBoxes(b1: BoundingBox, b2: BoundingBox): BoundingBox {
@@ -320,6 +380,8 @@ export interface MapProps {
         selection: [number | undefined, number | undefined] | undefined;
     };
 
+    lights?: LightsType;
+
     children?: React.ReactNode;
 
     getTooltip?: TooltipCallback;
@@ -392,6 +454,7 @@ const Map: React.FC<MapProps> = ({
     getCameraPosition,
     isLoadedCallback,
     triggerHome,
+    lights,
     triggerResetMultipleWells,
 }: MapProps) => {
     const deckRef = useRef<DeckGLRef>(null);
@@ -781,6 +844,8 @@ const Map: React.FC<MapProps> = ({
         [getCameraPosition, views?.viewports]
     );
 
+    const effects = parseLights(lights);
+
     if (!deckGLViews || isEmpty(deckGLViews) || isEmpty(deckGLLayers))
         return null;
     return (
@@ -834,6 +899,7 @@ const Map: React.FC<MapProps> = ({
                 onHover={onHover}
                 onClick={onClick}
                 onAfterRender={onAfterRender}
+                effects={effects}
             >
                 {children}
             </DeckGL>

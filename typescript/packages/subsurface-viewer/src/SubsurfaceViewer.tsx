@@ -11,6 +11,32 @@ import PropTypes from "prop-types";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
 import convert, { Unit } from "convert-units";
 
+export type LightsType = {
+    headLight?: {
+        intensity: number;
+        color?: [number, number, number];
+    };
+    ambientLight?: {
+        intensity: number;
+        color?: [number, number, number];
+    };
+    pointLights?: [
+        {
+            intensity: number;
+            position: [number, number, number];
+            color?: [number, number, number];
+        }
+    ];
+
+    directionalLights?: [
+        {
+            intensity: number;
+            direction: [number, number, number];
+            color?: [number, number, number];
+        }
+    ];
+};
+
 export interface SubsurfaceViewerProps {
     id: string;
     resources?: Record<string, unknown>;
@@ -77,6 +103,8 @@ export interface SubsurfaceViewerProps {
     getTooltip?: TooltipCallback;
     cameraPosition?: ViewStateType | undefined;
 
+    lights?: LightsType;
+
     children?: React.ReactNode;
 }
 
@@ -109,6 +137,7 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
     isLoadedCallback,
     triggerHome,
     triggerResetMultipleWells,
+    lights,
     children,
 }: SubsurfaceViewerProps) => {
     // Contains layers data received from map layers by user interaction
@@ -192,6 +221,7 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
             isLoadedCallback={isLoadedCallback}
             triggerHome={triggerHome}
             triggerResetMultipleWells={triggerResetMultipleWells}
+            lights={lights}
         >
             {children}
         </Map>

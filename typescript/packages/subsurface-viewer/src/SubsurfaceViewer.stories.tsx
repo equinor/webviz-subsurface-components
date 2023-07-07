@@ -3,7 +3,10 @@ import { ComponentStory, ComponentMeta } from "@storybook/react";
 import { format } from "d3-format";
 import { PickingInfo, View } from "@deck.gl/core/typed";
 import { ContinuousLegend } from "@emerson-eps/color-tables";
-import SubsurfaceViewer, { SubsurfaceViewerProps } from "./SubsurfaceViewer";
+import SubsurfaceViewer, {
+    SubsurfaceViewerProps,
+    LightsType,
+} from "./SubsurfaceViewer";
 import {
     MapMouseEvent,
     TooltipCallback,
@@ -21,7 +24,14 @@ import { WellsPickInfo } from "./layers/wells/wellsLayer";
 import { Feature } from "geojson";
 import { ViewFooter } from "./components/ViewFooter";
 import { styled } from "@mui/material/styles";
+import {
+    Points as SnubCubePoints,
+    Faces as SnubCubeFaces,
+    VertexCount as SnubCubeVertexCount,
+} from "./layers/grid3d/test_data/TruncatedSnubCube";
 import Switch from "@mui/material/Switch";
+import Stack from "@mui/material/Stack";
+import Slider from "@mui/material/Slider";
 
 export default {
     component: SubsurfaceViewer,
@@ -74,7 +84,6 @@ const wellsLayerWithlogs = new WellsLayer({
 });
 
 const meshMapLayerBig = new MapLayer({
-    "@@type": "MapLayer",
     id: "mesh-layer",
     meshData: "hugin_depth_5_m.float32",
     frame: {
@@ -553,6 +562,189 @@ IsLoadedCallback.parameters = {
         iframeHeight: 500,
         description: {
             story: "IsLoadedCallback will report in console when triggered",
+        },
+    },
+};
+
+export const LightsStory = (args: SubsurfaceViewerProps) => {
+    const [headLight, setHeadLight] = React.useState(false);
+    const [ambientLight, setAmbientLight] = React.useState(false);
+    const [pointLight, setPointLight] = React.useState(false);
+    const [directionalLight, setDirectionalLight] = React.useState(false);
+
+    const [headLightIntensity, setHeadLightIntensity] = React.useState(1.0);
+    const [ambientLightIntensity, setAmbientLightIntensity] =
+        React.useState(1.0);
+    const [pointLightIntensity, setPointLightIntensity] = React.useState(1.0);
+    const [directionslLightIntensity, setDirectionslLightIntensity] =
+        React.useState(1.0);
+
+    let lights = {} as LightsType;
+
+    if (headLight) {
+        lights = { ...lights, headLight: { intensity: headLightIntensity } };
+    }
+    if (ambientLight) {
+        lights = {
+            ...lights,
+            ambientLight: { intensity: ambientLightIntensity },
+        };
+    }
+
+    if (pointLight) {
+        lights = {
+            ...lights,
+            pointLights: [
+                {
+                    intensity: pointLightIntensity,
+                    position: [-50, -50, -50],
+                    color: [0, 255, 0],
+                },
+            ],
+        };
+    }
+
+    if (directionalLight) {
+        lights = {
+            ...lights,
+            directionalLights: [
+                {
+                    intensity: directionslLightIntensity,
+                    direction: [-1, 0, -1],
+                    color: [255, 0, 0],
+                },
+            ],
+        };
+    }
+
+    const props = {
+        lights,
+        ...args,
+    };
+
+    return (
+        <Root>
+            <Stack direction={"row"} alignItems={"center"} spacing={10}>
+                <Stack>
+                    <Stack direction={"row"} alignItems={"center"}>
+                        <label>{"Head Light "}</label>
+                        <Switch
+                            onClick={() => {
+                                setHeadLight(!headLight);
+                            }}
+                        />
+                    </Stack>
+                    <Slider
+                        defaultValue={100}
+                        valueLabelDisplay={"auto"}
+                        onChange={(_event: Event, value: number | number[]) => {
+                            setHeadLightIntensity((value as number) / 100);
+                        }}
+                    />
+                </Stack>
+
+                <Stack>
+                    <Stack direction={"row"} alignItems={"center"}>
+                        <label>{"Ambient Light "}</label>
+                        <Switch
+                            onClick={() => {
+                                setAmbientLight(!ambientLight);
+                            }}
+                        />
+                    </Stack>
+                    <Slider
+                        defaultValue={100}
+                        valueLabelDisplay={"auto"}
+                        onChange={(_event: Event, value: number | number[]) => {
+                            setAmbientLightIntensity((value as number) / 100);
+                        }}
+                    />
+                </Stack>
+
+                <Stack>
+                    <Stack direction={"row"} alignItems={"center"}>
+                        <label>{"Point Light "}</label>
+                        <Switch
+                            onClick={() => {
+                                setPointLight(!pointLight);
+                            }}
+                        />
+                    </Stack>
+                    <Slider
+                        defaultValue={100}
+                        valueLabelDisplay={"auto"}
+                        onChange={(_event: Event, value: number | number[]) => {
+                            setPointLightIntensity((value as number) / 100);
+                        }}
+                    />
+                </Stack>
+
+                <Stack>
+                    <Stack direction={"row"} alignItems={"center"}>
+                        <label>{"Directional Light "}</label>
+                        <Switch
+                            onClick={() => {
+                                setDirectionalLight(!directionalLight);
+                            }}
+                        />
+                    </Stack>
+                    <Slider
+                        defaultValue={100}
+                        valueLabelDisplay={"auto"}
+                        onChange={(_event: Event, value: number | number[]) => {
+                            setDirectionslLightIntensity(
+                                (value as number) / 100
+                            );
+                        }}
+                    />
+                </Stack>
+            </Stack>
+            <div className={classes.main}>
+                <SubsurfaceViewer {...props} />
+            </div>
+        </Root>
+    );
+};
+
+LightsStory.args = {
+    id: "DeckGL-Map",
+    //layers: [meshMapLayerPng],
+    //bounds: [432150, 6475800, 439400, 6481501],
+    bounds: [-50, -50, 50, 50],
+    layers: [
+        {
+            "@@type": "AxesLayer",
+            id: "polyhedral-cells-axes",
+            bounds: [-50, -50, -50, 50, 50, 50],
+        },
+        {
+            "@@type": "Grid3DLayer",
+            id: "Grid3DLayer",
+            material: true,
+            //colorMapName: "Rainbow",
+            colorMapFunction: () => [255, 255, 255],
+            pointsData: SnubCubePoints.map((v) => 35 * v),
+            polysData: SnubCubeFaces,
+            propertiesData: Array(SnubCubeVertexCount).fill(0),
+        },
+    ],
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: true,
+            },
+        ],
+    },
+};
+
+LightsStory.parameters = {
+    docs: {
+        inlineStories: false,
+        iframeHeight: 500,
+        description: {
+            story: "Using different light sources",
         },
     },
 };
