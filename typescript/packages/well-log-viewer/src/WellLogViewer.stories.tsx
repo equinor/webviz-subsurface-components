@@ -187,7 +187,7 @@ interface State {
     controller?: WellLogController;
     editedData?: Record<string, unknown>;
 
-    layers: LayersList;
+    layers?: LayersList;
 
     wellName?: string;
     selection?: [number | undefined, number | undefined];
@@ -372,14 +372,14 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
 
                         const layers = deepCopy(this.props.layers);
                         this.setState({
-                            layers: layers as Record<string, unknown>[],
+                            layers: layers as LayersList,
                         });
 
                         // Force to rerender ColorLegend after
                         setTimeout(() => {
                             const layers = deepCopy(this.props.layers);
                             this.setState({
-                                layers: layers as Record<string, unknown>[],
+                                layers: layers as LayersList,
                             });
                         }, 200);
                     }
