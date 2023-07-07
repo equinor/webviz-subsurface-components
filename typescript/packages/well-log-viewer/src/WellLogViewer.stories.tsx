@@ -110,14 +110,13 @@ const wellpick = {
 import React from "react";
 
 import exampleData from "../../../../example-data/deckgl-map.json";
-//import { colorTables } from "@emerson-eps/color-tables";
 
 import PropTypes from "prop-types";
 
 import { WeakValidationMap } from "react";
 import SubsurfaceViewer from "@webviz/subsurface-viewer";
 import { SubsurfaceViewerProps } from "@webviz/subsurface-viewer";
-import { Color } from "@deck.gl/core/typed";
+import { Color, LayersList } from "@deck.gl/core/typed";
 
 import { WellsLayer } from "@webviz/subsurface-viewer/dist/layers";
 import {
@@ -188,7 +187,7 @@ interface State {
     controller?: WellLogController;
     editedData?: Record<string, unknown>;
 
-    layers?: Record<string, unknown>[];
+    layers: LayersList;
 
     wellName?: string;
     selection?: [number | undefined, number | undefined];
@@ -286,7 +285,7 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
             wellIndex: undefined,
             infos: [],
             editedData: props.editedData,
-            layers: props.layers as Record<string, unknown>[],
+            layers: props.layers as LayersList,
         };
         this.onInfo = this.onInfo.bind(this);
         this.onCreateController = this.onCreateController.bind(this);
