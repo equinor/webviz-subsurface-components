@@ -13,7 +13,7 @@ import {
     ViewStateType,
     ViewsType,
 } from "./components/Map";
-import { WellsLayer, MapLayer } from "./layers";
+import { WellsLayer, MapLayer, AxesLayer, Grid3DLayer } from "./layers";
 import InfoCard from "./components/InfoCard";
 import {
     ExtendedLayerProps,
@@ -24,14 +24,16 @@ import { WellsPickInfo } from "./layers/wells/wellsLayer";
 import { Feature } from "geojson";
 import { ViewFooter } from "./components/ViewFooter";
 import { styled } from "@mui/material/styles";
+import Switch from "@mui/material/Switch";
+import Stack from "@mui/material/Stack";
+import Slider from "@mui/material/Slider";
+import { SphereGeometry } from "@luma.gl/engine";
 import {
     Points as SnubCubePoints,
     Faces as SnubCubeFaces,
     VertexCount as SnubCubeVertexCount,
 } from "./layers/grid3d/test_data/TruncatedSnubCube";
-import Switch from "@mui/material/Switch";
-import Stack from "@mui/material/Stack";
-import Slider from "@mui/material/Slider";
+import { SimpleMeshLayer } from "@deck.gl/mesh-layers/typed";
 
 export default {
     component: SubsurfaceViewer,
@@ -248,7 +250,6 @@ const CustomTemplate: ComponentStory<typeof SubsurfaceViewer> = (args) => {
 };
 
 export const customizedCameraPosition = CustomTemplate.bind({});
-
 const cameraPosition: ViewStateType = {
     target: [437500, 6475000],
     zoom: -5.0,
@@ -708,25 +709,33 @@ export const LightsStory = (args: SubsurfaceViewerProps) => {
 
 LightsStory.args = {
     id: "DeckGL-Map",
-    //layers: [meshMapLayerPng],
-    //bounds: [432150, 6475800, 439400, 6481501],
-    bounds: [-50, -50, 50, 50],
+    bounds: [-100, -100, 50, 50],
     layers: [
-        {
-            "@@type": "AxesLayer",
+        new AxesLayer({
             id: "polyhedral-cells-axes",
-            bounds: [-50, -50, -50, 50, 50, 50],
-        },
-        {
-            "@@type": "Grid3DLayer",
+            bounds: [-100, -50, -50, 50, 50, 50],
+        }),
+        new SimpleMeshLayer({
+            id: "sphere",
+            data: [{}],
+            mesh: new SphereGeometry({
+                nlat: 100,
+                nlong: 100,
+                radius: 30,
+            }),
+            wireframe: false,
+            getPosition: [-75, 0, 0],
+            getColor: [255, 255, 255],
+            material: true,
+        }),
+        new Grid3DLayer({
             id: "Grid3DLayer",
             material: true,
-            //colorMapName: "Rainbow",
             colorMapFunction: () => [255, 255, 255],
             pointsData: SnubCubePoints.map((v) => 35 * v),
             polysData: SnubCubeFaces,
             propertiesData: Array(SnubCubeVertexCount).fill(0),
-        },
+        }),
     ],
     views: {
         layout: [1, 1],
