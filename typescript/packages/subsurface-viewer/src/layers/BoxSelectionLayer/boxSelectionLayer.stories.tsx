@@ -57,7 +57,11 @@ export default {
     title: "SubsurfaceViewer / Box Selection Layer",
 } as Meta;
 
-export const boxSelection = ({ enableSelection }) => {
+export const boxSelection = ({
+    enableSelection,
+}: {
+    enableSelection: boolean;
+}) => {
     const deckProps = React.useMemo(
         () => ({
             ...DECK_PROPS,
