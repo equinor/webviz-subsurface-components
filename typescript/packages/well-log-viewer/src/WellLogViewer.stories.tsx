@@ -584,38 +584,38 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
     }
 }
 
-const WellLogViewOptions_propTypes = PropTypes.shape({
-    /**
-     * The maximum zoom value
-     */
-    maxContentZoom: PropTypes.number,
-    /**
-     * The maximum number of visible tracks
-     */
-    maxVisibleTrackNum: PropTypes.number,
-    /**
-     * Validate JSON datafile against schema
-     */
-    checkDatafileSchema: PropTypes.bool,
-    /**
-     * Hide titles of the track. Default is false
-     */
-    hideTrackTitle: PropTypes.bool,
-    /**
-     * Hide legends of the track. Default is false
-     */
-    hideTrackLegend: PropTypes.bool,
-});
-
-MapAndWellLogViewer.propTypes = {
-    ...SubsurfaceViewer.propTypes,
-
-    /**
-     * WellLogView additional options
-     */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    welllogOptions: WellLogViewOptions_propTypes as any /*PropTypes.object,*/,
-};
+//const WellLogViewOptions_propTypes = PropTypes.shape({
+//    /**
+//     * The maximum zoom value
+//     */
+//    maxContentZoom: PropTypes.number,
+//    /**
+//     * The maximum number of visible tracks
+//     */
+//    maxVisibleTrackNum: PropTypes.number,
+//    /**
+//     * Validate JSON datafile against schema
+//     */
+//    checkDatafileSchema: PropTypes.bool,
+//    /**
+//     * Hide titles of the track. Default is false
+//     */
+//    hideTrackTitle: PropTypes.bool,
+//    /**
+//     * Hide legends of the track. Default is false
+//     */
+//    hideTrackLegend: PropTypes.bool,
+//});
+//
+//MapAndWellLogViewer.propTypes = {
+//    ...SubsurfaceViewer.propTypes,
+//
+//    /**
+//     * WellLogView additional options
+//     */
+//    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+//    welllogOptions: WellLogViewOptions_propTypes as any /*PropTypes.object,*/,
+//};
 
 const drawing_layer = exampleData[0].layers.find(
     (item) => item["@@type"] === "DrawingLayer"
@@ -636,7 +636,8 @@ if (wells_layer) {
     wells_layer.logColor = "Stratigraphy"; //"Stratigraphy";
 }
 
-export default {
+/*
+export {
     component: MapAndWellLogViewer,
     title: "WellLogViewer/Demo/MapAndWellLogViewer",
     argTypes: {
@@ -739,12 +740,29 @@ export default {
                 "checkDatafileSchema: Validate JSON datafile against schema<br/>" +
                 "hideTrackTitle: Hide titles on the tracks<br/>" +
                 "hideLegend: Hide legends on the tracks.",
->>>>>>> 81fd9071 (refactor: moved MapAndWellLogViewer component to WellLogViewer story.)
         },
+        }
+    }
+};
+*/
+
+export const Default = Template.bind({});
+Default.args = {
+    id: "Well-Log-Viewer",
+    horizontal: false,
+    welllog: require("../../../../example-data/L898MUD.json")[0],
+    template: require("../../../../example-data/welllog_template_1.json"),
+    colorTables: colorTables,
+    wellpick: wellpick,
+    axisTitles: axisTitles,
+    axisMnemos: axisMnemos,
+    viewTitle: true, // show default welllog view title (a wellname from the welllog)
+    options: {
+        hideTrackTitle: false,
+        hideTrackLegend: false,
     },
 };
 
-<<<<<<< HEAD
 export const Discrete = Template.bind({});
 Discrete.args = {
     id: "Well-Log-Viewer-Discrete",
@@ -781,4 +799,40 @@ MapAndWellLogViewerStory.args = {
     colorTables: colorTables,
     id: "MapAndWellLog", // redefine id from exampleData[0]
 
+export const Discrete = Template.bind({});
+Discrete.args = {
+    id: "Well-Log-Viewer-Discrete",
+    horizontal: false,
+    welllog: require("../../../../example-data/volve_logs.json")[0],
+    template: require("../../../../example-data/welllog_template_2.json"),
+    colorTables: colorTables,
+    wellpick: wellpick,
+    axisTitles: axisTitles,
+    axisMnemos: axisMnemos,
+    viewTitle: true, // show default welllog view title (a wellname from the welllog)
+};
+Discrete.parameters = {
+    docs: {
+        description: {
+            story: "An example showing the tracks with discrete logs.",
+        },
+    },
+};
+
+export const MapAndWellLogViewerStory = (
+    args: React.JSX.IntrinsicAttributes &
+        React.JSX.IntrinsicClassAttributes<MapAndWellLogViewer> &
+        Readonly<Props>
+) => {
+    return (
+        <div style={{ height: "94vh", width: "100%", display: "flex" }}>
+            <MapAndWellLogViewer {...args} />
+        </div>
+    );
+};
+
+MapAndWellLogViewerStory.args = {
+    ...exampleData[0],
+    colorTables: colorTables,
+    id: "MapAndWellLog", // redefine id from exampleData[0]
 };
