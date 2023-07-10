@@ -63,9 +63,8 @@ const defaultMapLayer = new MapLayer({ ...defaultMapLayerProps });
 const wellsLayer = {
     "@@type": "WellsLayer",
     id: "wells-layer",
-    data: "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_wells.json",
-    logData:
-        "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_logs.json",
+    data: "./volve_wells.json",
+    logData: "./volve_logs.json",
     logrunName: "BLOCKING",
     logName: "ZONELOG",
     logColor: "Stratigraphy",
