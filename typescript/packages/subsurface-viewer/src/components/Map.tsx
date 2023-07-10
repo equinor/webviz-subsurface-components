@@ -41,8 +41,6 @@ import { OrbitController, OrthographicController } from "@deck.gl/core/typed";
 import { MjolnirEvent, MjolnirPointerEvent } from "mjolnir.js";
 import IntersectionView from "../views/intersectionView";
 import { Unit } from "convert-units";
-
-// XXX
 import { LightsType } from "../SubsurfaceViewer";
 import {
     _CameraLight as CameraLight,
@@ -461,6 +459,10 @@ const Map: React.FC<MapProps> = ({
 
     const bboxInitial: BoundingBox = [0, 0, 0, 1, 1, 1];
 
+    const isCameraPositionDefined =
+        typeof cameraPosition !== "undefined" &&
+        Object.keys(cameraPosition).length !== 0;
+
     // Deck.gl View's and viewStates as input to Deck.gl
     const [deckGLViews, setDeckGLViews] = useState<View[]>([]);
     const [viewStates, setViewStates] = useState<Record<string, ViewStateType>>(
@@ -474,6 +476,9 @@ const Map: React.FC<MapProps> = ({
 
     const [deckGLLayers, setDeckGLLayers] = useState<LayersList>([]);
     const [alteredLayers, setAlteredLayers] = useState<LayersList>([]);
+
+    const [didUserChangeCamera, setDidUserChangeCamera] =
+        useState<boolean>(false);
 
     const [viewPortMargins, setViewPortMargins] = useState<marginsType>({
         left: 0,
@@ -497,6 +502,9 @@ const Map: React.FC<MapProps> = ({
 
     // Calculate a set of Deck.gl View's and viewStates as input to Deck.gl
     useEffect(() => {
+        if (didUserChangeCamera && !isCameraPositionDefined) {
+            return;
+        }
         const [Views, viewStates] = createViewsAndViewStates(
             views,
             viewPortMargins,
@@ -508,6 +516,8 @@ const Map: React.FC<MapProps> = ({
 
         setDeckGLViews(Views);
         setViewStates(viewStates);
+        setDidUserChangeCamera(false);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         bounds,
         cameraPosition,
@@ -516,7 +526,6 @@ const Map: React.FC<MapProps> = ({
         reportedBoundingBox,
         reportedBoundingBoxAcc,
         views,
-        viewPortMargins,
         triggerHome,
     ]);
 
@@ -840,6 +849,7 @@ const Map: React.FC<MapProps> = ({
             if (getCameraPosition) {
                 getCameraPosition(viewState);
             }
+            setDidUserChangeCamera(true);
         },
         [getCameraPosition, views?.viewports]
     );
