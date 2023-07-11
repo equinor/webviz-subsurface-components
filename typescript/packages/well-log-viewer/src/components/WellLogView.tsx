@@ -2002,7 +2002,7 @@ export function _propTypesWellLogView(): Record<string, unknown> {
         /**
          * Prop containing color table data for discrete well logs
          */
-        colorTables: PropTypes.array.isRequired,
+        colorTables: PropTypes.array, //.isRequired,
 
         /**
          * Well picks data

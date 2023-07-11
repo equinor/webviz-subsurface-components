@@ -101,12 +101,15 @@ jobs:
 
       # - name: 🤖 Run performance tests
       #   if: github.event_name != 'release' && matrix.run-performance-tests
-      #   run: npm run test_perf --prefix ./typescript
+      #   working-directory: ./typescript
+      #   run: |
+      #     npx nx run-many -t test_perf
 
       - name: 🤖 Run correctness tests
         if: github.event_name != 'release' # Related to https://github.com/equinor/webviz-subsurface-components/issues/409
+        working-directory: ./typescript
         run: |
-          npm run test_correctness --prefix ./typescript
+          npx nx run-many -t test_correctness
 
       # - name: 🤖 Run python tests
       #   if: github.event_name != 'release' # Related to https://github.com/equinor/webviz-subsurface-components/issues/409

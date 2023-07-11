@@ -5,10 +5,10 @@ import React, { Profiler } from "react";
 import * as core from "@actions/core";
 import { Wrapper } from "../test/TestWrapper";
 import WellCompletionComponent from "./WellCompletionComponent";
-import logTimes, { obj } from "../../../performanceUtility/onRenderFunction";
 import { Data } from "../redux/types";
+import logTimes, { obj } from "../test/performanceMetrics";
 
-import exampleData from "../../../../demo/example-data/well-completions.json";
+import exampleData from "../../../../../example-data/well-completions.json";
 
 window.ResizeObserver =
     window.ResizeObserver ||
