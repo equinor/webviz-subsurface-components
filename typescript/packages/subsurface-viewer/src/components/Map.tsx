@@ -828,6 +828,10 @@ const Map: React.FC<MapProps> = ({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ({ viewId, viewState }: { viewId: string; viewState: any }) => {
             const viewports = views?.viewports || [];
+            if (viewState.target.length === 2) {
+                // In orthograpic mode viewState.target contains only x and y. Add existing z value.
+                viewState.target.push(viewStates[viewId].target[2]);
+            }
             const isSyncIds = viewports
                 .filter((item) => item.isSync)
                 .map((item) => item.id);
@@ -851,7 +855,7 @@ const Map: React.FC<MapProps> = ({
             }
             setDidUserChangeCamera(true);
         },
-        [getCameraPosition, views?.viewports]
+        [getCameraPosition, viewStates, views?.viewports]
     );
 
     const effects = parseLights(lights);
