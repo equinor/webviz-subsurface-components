@@ -4,7 +4,7 @@ import DataProvider from "./DataLoader";
 import GroupTreeViewer from "./GroupTreeViewer";
 
 //TODO schema check
-interface Props {
+export interface GroupTreeProps {
     /**
      * The ID of this component, used to identify dash components
      * in callbacks. The ID needs to be unique across all of the
@@ -23,8 +23,8 @@ interface Props {
     node_options: DataInfos;
 }
 
-const GroupTreeComponent: React.FC<Props> = React.memo(
-    ({ id, data, edge_options, node_options }: Props) => {
+const GroupTreeComponent: React.FC<GroupTreeProps> = React.memo(
+    ({ id, data, edge_options, node_options }: GroupTreeProps) => {
         const [index, setIndex] = useState([0, 0] as [number, number]);
 
         const currentDateTimeChangedCallBack = useCallback(

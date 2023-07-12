@@ -10,15 +10,16 @@ import inputSchema from "../inputSchema/wellCompletions.json";
 
 const ajv = new Ajv();
 const minVersion = "1.0.0";
-interface Props {
+
+export interface WellCompletionProps {
     id: string;
     data: Data;
 }
 /**
  * Well completions component
  */
-const WellCompletionComponent: React.FC<Props> = React.memo(
-    ({ id, data }: Props) => {
+const WellCompletionComponent: React.FC<WellCompletionProps> = React.memo(
+    ({ id, data }: WellCompletionProps) => {
         const validate = useMemo(() => ajv.compile(inputSchema), []);
         //check against the json schema
         const isSchemaValid = useMemo(() => validate(data), [data, validate]);
