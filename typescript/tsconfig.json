@@ -23,7 +23,7 @@
     "exclude": [
         "**/*.test.tsx",
         "**/test/*.tsx",
-        "**/*.stories.jsx",
+        "**/*.stories.tsx",
         "./cypress.config.ts",
         "**/*.test.ts"
     ]
