@@ -17,8 +17,8 @@
     "scripts": {
         "start": "webpack serve --mode development --devtool inline-source-map --entry ./src/demo/index.js --open",
         "typecheck": "tsc --noEmit",
-        "format": "eslint --fix *.js *.json *.ts packages src",
-        "lint": "eslint *.js *.json *.ts packages src",
+        "lint": "eslint *.js *.json \"packages/subsurface-viewer/src/**/*.{js,jsx,ts,tsx,mdx,json}\"",
+        "format": "npm run lint -- --fix",
         "validate": "npm run typecheck && npm run lint",
         "storybook": "storybook dev -p 6006",
         "build-storybook": "storybook build",

@@ -8,11 +8,11 @@ const path = require("path");
  */
 module.exports = {
     rootDir: "./",
-    resolver: '@nx/jest/plugins/resolver',
+    resolver: "@nx/jest/plugins/resolver",
     testEnvironment: "jsdom",
     moduleNameMapper: {
         "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga|scss)$":
-        path.resolve(__dirname, "__mocks__/fileMock.js"),
+            path.resolve(__dirname, "__mocks__/fileMock.js"),
         "\\.(css|less)$": path.resolve(__dirname, "__mocks__/styleMock.js"),
     },
     transform: {
@@ -22,7 +22,8 @@ module.exports = {
         ],
     },
     transformIgnorePatterns: [
-        path.resolve(__dirname, "node_modules") + "//(?!(@webviz|(@emerson-eps/color-tables)|d3-.+|d3|delaunator|robust-predicates|internmap|@mapbox/tiny-sdf)/)",
+        path.resolve(__dirname, "node_modules") +
+            "//(?!(@webviz|(@emerson-eps/color-tables)|d3-.+|d3|delaunator|robust-predicates|internmap|@mapbox/tiny-sdf)/)",
     ],
     testPathIgnorePatterns: [path.resolve(__dirname, "node_modules"), "dist"],
     modulePathIgnorePatterns: ["dist"],
