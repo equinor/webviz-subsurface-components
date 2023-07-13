@@ -9,7 +9,12 @@
   ],
   "scripts": {
     "transpile": "tsc --project ./tsconfig.json",
-    "build": "git clean -xdff dist && npm run transpile"
+    "build": "git clean -xdff dist && npm run transpile",
+    "test_perf": "jest _performance",
+    "test_correctness": "jest --coverage --testPathIgnorePatterns='_performance'",
+    "test": "jest --coverage",
+    "test:update": "npm test -- --u",
+    "test:watch": "npm test -- --watch"
   },
   "author": "Equinor <opensource@equinor.com>",
   "license": "MPL-2.0",
@@ -23,16 +28,13 @@
     "d3": "^7.8.2",
     "lodash": "^4.17.21",
     "react-dropdown-tree-select": "^2.8.0",
-    "react-redux": "^7.2.6",
+    "react-redux": "^8.1.1",
     "react-resize-detector": "^9.1.0",
     "react-tooltip": "^4.2.21",
     "semver": "^7.3.5"
   },
-  "devDependencies": {
-    "@mui/material": "^5.13.7"
-  },
   "peerDependencies": {
-    "@mui/material": "^5",
+    "@mui/material": "^5.11",
     "react": "^17 || ^18",
     "react-dom": "^17 || ^18"
   },

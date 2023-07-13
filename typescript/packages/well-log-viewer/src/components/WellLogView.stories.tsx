@@ -3,6 +3,11 @@ import WellLogView from "./WellLogView";
 import { argTypesWellLogViewProp } from "./WellLogView";
 import { colorTables } from "@emerson-eps/color-tables";
 
+import L898MUD from "../../../../../example-data/L898MUD.json";
+import volve_logs from "../../../../../example-data/volve_logs.json";
+const welllogDefault = L898MUD[0];
+const welllogDiscrete = volve_logs[0];
+
 const ComponentCode =
     '<WellLogView id="WellLogView" \r\n' +
     "    horizontal=false \r\n" +
@@ -47,8 +52,6 @@ const Template = (args) => {
     );
 };
 
-const welllogDefault = require("../../../../../example-data/L898MUD.json")[0];
-
 export const Default = Template.bind({});
 Default.args = {
     id: "Well-Log-View",
@@ -64,9 +67,6 @@ Default.args = {
     axisTitles: axisTitles,
     axisMnemos: axisMnemos,
 };
-
-const welllogDiscrete =
-    require("../../../../../example-data/volve_logs.json")[0];
 
 export const Discrete = Template.bind({});
 Discrete.args = {
