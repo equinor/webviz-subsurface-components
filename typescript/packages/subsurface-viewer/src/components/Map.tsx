@@ -508,7 +508,21 @@ const Map: React.FC<MapProps> = ({
         ZScaleOrbitController.setZScaleDownReference(setScaleZDown);
     }, [setScaleZDown]);
 
-    // Calculate a set of Deck.gl View's and viewStates as input to Deck.gl
+    useEffect(() => {
+        const [Views, viewStates] = createViewsAndViewStates(
+            views,
+            viewPortMargins,
+            bounds,
+            undefined, // Use bounds not cameraPosition,
+            reportedBoundingBoxAcc,
+            deckRef.current?.deck
+        );
+
+        setDeckGLViews(Views);
+        setViewStates(viewStates);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [triggerHome]);
+
     useEffect(() => {
         const [Views, viewStates] = createViewsAndViewStates(
             views,
@@ -530,7 +544,6 @@ const Map: React.FC<MapProps> = ({
         reportedBoundingBoxAcc,
         // eslint-disable-next-line react-hooks/exhaustive-deps
         compareViewsProp(views),
-        triggerHome,
     ]);
 
     useEffect(() => {
