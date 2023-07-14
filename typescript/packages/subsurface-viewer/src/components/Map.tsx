@@ -190,6 +190,21 @@ function boundingBoxCenter(box: BoundingBox): [number, number, number] {
         zmin + 0.5 * (zmax - zmin),
     ];
 }
+// Exclude "layerIds" when monitoring changes to "view" prop as we do not
+// want to recalculate views when the layers change.
+function compareViewsProp(views: ViewsType | undefined): string | undefined {
+    if (typeof views === "undefined") {
+        return views;
+    }
+
+    const copy = cloneDeep(views);
+    const viewports = copy.viewports.map((e) => {
+        delete e.layerIds;
+        return e;
+    });
+    copy.viewports = viewports;
+    return JSON.stringify(copy);
+}
 
 export type BoundsAccessor = () => [number, number, number, number];
 
@@ -459,10 +474,6 @@ const Map: React.FC<MapProps> = ({
 
     const bboxInitial: BoundingBox = [0, 0, 0, 1, 1, 1];
 
-    const isCameraPositionDefined =
-        typeof cameraPosition !== "undefined" &&
-        Object.keys(cameraPosition).length !== 0;
-
     // Deck.gl View's and viewStates as input to Deck.gl
     const [deckGLViews, setDeckGLViews] = useState<View[]>([]);
     const [viewStates, setViewStates] = useState<Record<string, ViewStateType>>(
@@ -476,9 +487,6 @@ const Map: React.FC<MapProps> = ({
 
     const [deckGLLayers, setDeckGLLayers] = useState<LayersList>([]);
     const [alteredLayers, setAlteredLayers] = useState<LayersList>([]);
-
-    const [didUserChangeCamera, setDidUserChangeCamera] =
-        useState<boolean>(false);
 
     const [viewPortMargins, setViewPortMargins] = useState<marginsType>({
         left: 0,
@@ -502,9 +510,6 @@ const Map: React.FC<MapProps> = ({
 
     // Calculate a set of Deck.gl View's and viewStates as input to Deck.gl
     useEffect(() => {
-        if (didUserChangeCamera && !isCameraPositionDefined) {
-            return;
-        }
         const [Views, viewStates] = createViewsAndViewStates(
             views,
             viewPortMargins,
@@ -516,16 +521,15 @@ const Map: React.FC<MapProps> = ({
 
         setDeckGLViews(Views);
         setViewStates(viewStates);
-        setDidUserChangeCamera(false);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         bounds,
         cameraPosition,
-        views?.viewports,
         deckRef?.current?.deck,
         reportedBoundingBox,
         reportedBoundingBoxAcc,
-        views,
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        compareViewsProp(views),
         triggerHome,
     ]);
 
@@ -853,7 +857,6 @@ const Map: React.FC<MapProps> = ({
             if (getCameraPosition) {
                 getCameraPosition(viewState);
             }
-            setDidUserChangeCamera(true);
         },
         [getCameraPosition, viewStates, views?.viewports]
     );
