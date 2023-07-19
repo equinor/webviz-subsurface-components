@@ -48,6 +48,7 @@ import {
     DirectionalLight,
 } from "@deck.gl/core/typed";
 import { LightingEffect } from "@deck.gl/core/typed";
+import { LineLayer } from "@deck.gl/layers/typed";
 
 type BoundingBox = [number, number, number, number, number, number];
 
@@ -486,7 +487,6 @@ const Map: React.FC<MapProps> = ({
         useState<BoundingBox>(bboxInitial);
 
     const [deckGLLayers, setDeckGLLayers] = useState<LayersList>([]);
-    const [alteredLayers, setAlteredLayers] = useState<LayersList>([]);
 
     const [viewPortMargins, setViewPortMargins] = useState<marginsType>({
         left: 0,
@@ -540,15 +540,10 @@ const Map: React.FC<MapProps> = ({
         bounds,
         cameraPosition,
         deckRef?.current?.deck,
-        reportedBoundingBox,
         reportedBoundingBoxAcc,
         // eslint-disable-next-line react-hooks/exhaustive-deps
         compareViewsProp(views),
     ]);
-
-    useEffect(() => {
-        setDeckGLLayers(alteredLayers);
-    }, [alteredLayers]);
 
     useEffect(() => {
         const union_of_reported_bboxes = addBoundingBoxes(
@@ -584,6 +579,15 @@ const Map: React.FC<MapProps> = ({
     useEffect(() => {
         if (typeof layers === "undefined") {
             return;
+        }
+
+        if (layers.length === 0) {
+            // Empty layers array makes deck.gl set deckRef to undefined (no opengl context).
+            // Hence insert dummy layer.
+            const dummy_layer = new LineLayer({
+                visible: false,
+            });
+            layers.push(dummy_layer);
         }
 
         // Margins on the viewport are extracted from a potenial axes2D layer.
@@ -624,7 +628,7 @@ const Map: React.FC<MapProps> = ({
             });
         });
 
-        setAlteredLayers(layers_copy);
+        setDeckGLLayers(layers_copy);
     }, [layers]);
 
     useEffect(() => {
