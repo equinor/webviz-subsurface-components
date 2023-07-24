@@ -4,15 +4,12 @@ import { ExtendedLayerProps, colorMapFunctionType } from "../utils/layerTools";
 import { makeFullMesh } from "./webworker";
 import { isEqual } from "lodash";
 import { load, JSONLoader } from "@loaders.gl/core";
-import { default as earcut } from "./earcut";
 
 export type WebWorkerParams = {
     points: number[];
     polys: number[];
     properties: number[];
     isZIncreasingDownwards: boolean;
-    triangulateFunc: string;
-    triangulateParamName: string;
 };
 
 function GetBBox(
@@ -177,8 +174,6 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
                 polys,
                 properties,
                 isZIncreasingDownwards: this.props.ZIncreasingDownwards,
-                triangulateFunc: `return earcut(points);\n${earcut.toString()}`,
-                triangulateParamName: "points",
             };
 
             webWorker.postMessage(webworkerParams);
