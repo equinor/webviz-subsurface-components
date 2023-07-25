@@ -1319,7 +1319,16 @@ function addStackedTrack(
     templateTrackFullPlot.title = label;
     templateTrackFullPlot.plots[0].type = templatePlotProps.type;
 
-    // curve.valueType === "integer", "string"
+    // curve.valueType could be "integer", "string"
+
+    const meta = getDiscreteMeta(welllog, name);
+    if (!meta && curve.valueType == "integer")
+        console.log(
+            "Discrete meta information for '" +
+                name +
+                "' not found. Use default"
+        );
+
     const logColor = templatePlotProps.colorTable;
     let colorTable: ColorTable | undefined = undefined;
     if (logColor) {
@@ -1335,15 +1344,9 @@ function addStackedTrack(
             );
         }
     } else {
-        console.error("No color table given in template plot props");
+        if(!meta) // see https://github.com/equinor/webviz-subsurface-components/issues/1613
+            console.error("No color table given in template plot props");
     }
-    const meta = getDiscreteMeta(welllog, name);
-    if (!meta && curve.valueType == "integer")
-        console.log(
-            "Discrete meta information for '" +
-                name +
-                "' not found. Use default"
-        );
 
     const showLines = true;
     const options: StackedTrackOptions = {
