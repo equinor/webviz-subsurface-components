@@ -54,6 +54,12 @@ const colorItems: Record<string, string> = {
     white: "White",
 };
 
+const booleanItems: Record<string, string> = {
+    // language dependent names of plot types
+    false: "No",
+    true: "Yes",
+};
+
 const noneValue = "-";
 
 export function _createItems(items: Record<string, string>): ReactNode[] {
@@ -76,6 +82,9 @@ export function createScaleItems(): ReactNode[] {
 }
 function createColorItems(): ReactNode[] {
     return _createItems(colorItems);
+}
+function createBooleanItems(): ReactNode[] {
+    return _createItems(booleanItems);
 }
 
 function createColorTableItems(colorTables: ColorTable[]): ReactNode[] {
@@ -196,6 +205,10 @@ export class PlotPropertiesDialog extends Component<Props, State> {
                   // for 'differential' plot
                   color2: "black", //??
                   fill2: "green",
+
+                  // for 'stacked' plot
+                  showLabels: true,
+                  showLines: true,
 
                   open: true,
               };
@@ -377,6 +390,20 @@ export class PlotPropertiesDialog extends Component<Props, State> {
                         createColorItems()
                     )}
                     {this.createSelectControlFromType(this.state.type)}
+                    {this.state.type === "stacked"? 
+                        [
+                            this.createSelectControl(
+                                "showLabels",
+                                "Labels",
+                                createBooleanItems()
+                            ),
+                            this.createSelectControl(
+                                "showLines",
+                                "Lines",
+                                createBooleanItems()
+                            ),
+                        ] 
+                        : [] }
                     {this.state.type === "differential"
                         ? [
                               this.createSelectControl(
