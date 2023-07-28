@@ -12,6 +12,7 @@ import {
     TooltipCallback,
     ViewStateType,
     ViewsType,
+    BoundingBox3D,
 } from "./components/Map";
 import { WellsLayer, MapLayer, AxesLayer, Grid3DLayer } from "./layers";
 import InfoCard from "./components/InfoCard";
@@ -754,6 +755,95 @@ LightsStory.parameters = {
         iframeHeight: 500,
         description: {
             story: "Using different light sources",
+        },
+    },
+};
+
+const zoomBox3D: BoundingBox3D = [-325, -450, -25, 125, 150, 125];
+//const zoomBox3D: BoundingBox3D = [-100, -100, -100,  100, 100, 100];
+
+export const AutoZoomToBoxStory = (args: SubsurfaceViewerProps) => {
+    const [rotX, setRotX] = React.useState(0);
+    const [rotZ, setRotZ] = React.useState(0);
+
+    const cameraPosition: ViewStateType = {
+        rotationX: rotX,
+        rotationOrbit: rotZ,
+        zoom: zoomBox3D,
+        target: [0, 0, 0],
+    };
+
+    const props = {
+        ...args,
+        cameraPosition,
+    };
+
+    return (
+        <Root>
+            <label>{"Rotation X Axis "}</label>
+            <Slider
+                defaultValue={50}
+                valueLabelDisplay={"auto"}
+                onChange={(_event: Event, value: number | number[]) => {
+                    const angle = 2 * ((value as number) / 100 - 0.5) * 90;
+                    setRotX(angle);
+                }}
+            />
+            <label>{"Rotation Z Axis "}</label>
+            <Slider
+                defaultValue={50}
+                valueLabelDisplay={"auto"}
+                onChange={(_event: Event, value: number | number[]) => {
+                    const angle = 2 * ((value as number) / 100 - 0.5) * 180;
+                    setRotZ(angle);
+                }}
+            />
+            <div className={classes.main}>
+                <SubsurfaceViewer {...props} />
+            </div>
+        </Root>
+    );
+};
+
+AutoZoomToBoxStory.args = {
+    id: "DeckGL-Map",
+    layers: [
+        new AxesLayer({
+            id: "polyhedral-cells-axes",
+            bounds: zoomBox3D,
+            ZIncreasingDownwards: false,
+        }),
+        new SimpleMeshLayer({
+            id: "sphere",
+            data: [{}],
+            mesh: new SphereGeometry({
+                nlat: 100,
+                nlong: 100,
+                radius: 10,
+            }),
+            wireframe: false,
+            getPosition: [0, 0, 0],
+            getColor: [255, 255, 255],
+            material: true,
+        }),
+    ],
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: true,
+            },
+        ],
+    },
+};
+
+AutoZoomToBoxStory.parameters = {
+    docs: {
+        inlineStories: false,
+        iframeHeight: 500,
+        description: {
+            story: "",
         },
     },
 };
