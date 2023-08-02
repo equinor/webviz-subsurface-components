@@ -103,7 +103,7 @@ export interface Grid3DLayerProps extends ExtendedLayerProps {
      */
     colorMapFunction?: colorMapFunctionType | false;
 
-    /** Enable lines around triangles.
+    /** Enable lines around cell faces.
      *  default: true.
      */
     gridLines: boolean;
