@@ -43,6 +43,7 @@ const defaultProps = {
 const grid3dLayer = {
     "@@type": "Grid3DLayer",
     id: "Grid3DLayer",
+    gridLines: true,
     material: true,
     colorMapName: "Rainbow",
     ZIncreasingDownwards: false,

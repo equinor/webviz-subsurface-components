@@ -102,6 +102,7 @@ export interface privateLayerProps extends ExtendedLayerProps {
     colorMapRange: [number, number];
     colorMapClampColor: Color | undefined | boolean;
     colorMapFunction?: colorMapFunctionType | false;
+    gridLines: boolean;
     propertyValueRange: [number, number];
     depthTest: boolean;
 }
@@ -247,7 +248,9 @@ export default class privateLayer extends Layer<privateLayerProps> {
         gl.disable(gl.POLYGON_OFFSET_FILL);
 
         // Draw lines.
-        mesh_lines_model.draw();
+        if (this.props.gridLines) {
+            mesh_lines_model.draw();
+        }
 
         if (!this.props.depthTest) {
             gl.enable(gl.DEPTH_TEST);
