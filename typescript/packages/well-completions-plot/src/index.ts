@@ -1,2 +1,2 @@
 export { WellCompletionsPlot } from "./WellCompletionsPlot";
-// export { PlotData } from "./types/dataTypes";
+export type { PlotData } from "./types/dataTypes";

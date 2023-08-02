@@ -2,7 +2,8 @@
     "name": "@webviz/well-completions-plot",
     "version": "0.0.0",
     "description": "",
-    "main": "src/index.ts",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
     "scripts": {
         "transpile": "tsc --project ./tsconfig.json",
         "copy-files": "copyfiles package.json dist && copyfiles README.md dist && copyfiles --exclude **/*.{tsx,jsx,js,ts,snap} --up 1 \"src/**/*\" dist/",
@@ -13,5 +14,8 @@
     "dependencies": {
         "react-resize-detector": "^9.1.0",
         "react-tooltip": "^4.2.21"
-    }
+    },
+    "files": [
+        "/dist"
+    ]
 }
