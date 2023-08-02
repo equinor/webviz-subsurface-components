@@ -12,6 +12,7 @@ import {
     PickingInfo,
     OrthographicView,
     OrbitView,
+    PointLight,
 } from "@deck.gl/core/typed";
 import { Feature, FeatureCollection } from "geojson";
 import React, { useEffect, useState, useCallback, useRef } from "react";
@@ -40,8 +41,18 @@ import { OrbitController, OrthographicController } from "@deck.gl/core/typed";
 import { MjolnirEvent, MjolnirPointerEvent } from "mjolnir.js";
 import IntersectionView from "../views/intersectionView";
 import { Unit } from "convert-units";
+import { LightsType } from "../SubsurfaceViewer";
+import {
+    _CameraLight as CameraLight,
+    AmbientLight,
+    DirectionalLight,
+} from "@deck.gl/core/typed";
+import { LightingEffect } from "@deck.gl/core/typed";
+import { LineLayer } from "@deck.gl/layers/typed";
+import { Matrix4 } from "@math.gl/core";
+import { fovyToAltitude } from "@math.gl/web-mercator";
 
-type BoundingBox = [number, number, number, number, number, number];
+export type BoundingBox3D = [number, number, number, number, number, number];
 
 const minZoom3D = -12;
 const maxZoom3D = 12;
@@ -97,8 +108,58 @@ class ZScaleOrbitView extends OrbitView {
     }
 }
 
-function addBoundingBoxes(b1: BoundingBox, b2: BoundingBox): BoundingBox {
-    const boxDefault: BoundingBox = [0, 0, 0, 1, 1, 1];
+function parseLights(lights?: LightsType): LightingEffect[] | undefined {
+    if (typeof lights === "undefined") {
+        return undefined;
+    }
+
+    const effects = [];
+    let lightsObj = {};
+
+    if (lights.headLight) {
+        const headLight = new CameraLight({
+            intensity: lights.headLight.intensity,
+            color: lights.headLight.color ?? [255, 255, 255],
+        });
+        lightsObj = { ...lightsObj, headLight };
+    }
+
+    if (lights.ambientLight) {
+        const ambientLight = new AmbientLight({
+            intensity: lights.ambientLight.intensity,
+            color: lights.ambientLight.color ?? [255, 255, 255],
+        });
+        lightsObj = { ...lightsObj, ambientLight };
+    }
+
+    if (typeof lights.pointLights !== "undefined") {
+        for (const light of lights.pointLights) {
+            const pointLight = new PointLight({
+                ...light,
+                color: light.color ?? [255, 255, 255],
+            });
+            lightsObj = { ...lightsObj, pointLight };
+        }
+    }
+
+    if (typeof lights.directionalLights !== "undefined") {
+        for (const light of lights.directionalLights) {
+            const directionalLight = new DirectionalLight({
+                ...light,
+                color: light.color ?? [255, 255, 255],
+            });
+            lightsObj = { ...lightsObj, directionalLight };
+        }
+    }
+
+    const lightingEffect = new LightingEffect(lightsObj);
+    effects.push(lightingEffect);
+
+    return effects;
+}
+
+function addBoundingBoxes(b1: BoundingBox3D, b2: BoundingBox3D): BoundingBox3D {
+    const boxDefault: BoundingBox3D = [0, 0, 0, 1, 1, 1];
 
     if (typeof b1 === "undefined" || typeof b2 === "undefined") {
         return boxDefault;
@@ -118,7 +179,7 @@ function addBoundingBoxes(b1: BoundingBox, b2: BoundingBox): BoundingBox {
     return [xmin, ymin, zmin, xmax, ymax, zmax];
 }
 
-function boundingBoxCenter(box: BoundingBox): [number, number, number] {
+function boundingBoxCenter(box: BoundingBox3D): [number, number, number] {
     const xmin = box[0];
     const ymin = box[1];
     const zmin = box[2];
@@ -131,6 +192,21 @@ function boundingBoxCenter(box: BoundingBox): [number, number, number] {
         ymin + 0.5 * (ymax - ymin),
         zmin + 0.5 * (zmax - zmin),
     ];
+}
+// Exclude "layerIds" when monitoring changes to "view" prop as we do not
+// want to recalculate views when the layers change.
+function compareViewsProp(views: ViewsType | undefined): string | undefined {
+    if (typeof views === "undefined") {
+        return views;
+    }
+
+    const copy = cloneDeep(views);
+    const viewports = copy.viewports.map((e) => {
+        delete e.layerIds;
+        return e;
+    });
+    copy.viewports = viewports;
+    return JSON.stringify(copy);
 }
 
 export type BoundsAccessor = () => [number, number, number, number];
@@ -193,7 +269,7 @@ export interface ViewportType {
 
 export interface ViewStateType {
     target: number[];
-    zoom: number;
+    zoom: number | BoundingBox3D;
     rotationX: number;
     rotationOrbit: number;
     minZoom?: number;
@@ -320,6 +396,8 @@ export interface MapProps {
         selection: [number | undefined, number | undefined] | undefined;
     };
 
+    lights?: LightsType;
+
     children?: React.ReactNode;
 
     getTooltip?: TooltipCallback;
@@ -373,6 +451,101 @@ function adjustCameraTarget(
     return vs;
 }
 
+function calculateZoomFromBBox3D(
+    camera: ViewStateType | undefined,
+    deck?: Deck
+): ViewStateType | undefined {
+    const DEGREES_TO_RADIANS = Math.PI / 180;
+    const RADIANS_TO_DEGREES = 180 / Math.PI;
+    const IDENTITY = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+
+    const camera_ = cloneDeep(camera);
+
+    if (typeof camera_ === "undefined" || !Array.isArray(camera_.zoom)) {
+        return camera;
+    }
+
+    if (typeof deck === "undefined") {
+        camera_.zoom = 0;
+        camera_.target = [0, 0, 0];
+        return camera_;
+    }
+
+    const width = deck.width;
+    const height = deck.height;
+
+    // camera fov eye position. see deck.gl file orbit-viewports.ts
+    const fovy = 50; // default in deck.gl. May also be set construction OrbitView
+    const fD = fovyToAltitude(fovy);
+
+    const bbox = camera_.zoom;
+
+    const xMin = bbox[0];
+    const yMin = bbox[1];
+    const zMin = bbox[2];
+
+    const xMax = bbox[3];
+    const yMax = bbox[4];
+    const zMax = bbox[5];
+
+    const target = [
+        xMin + (xMax - xMin) / 2,
+        yMin + (yMax - yMin) / 2,
+        zMin + (zMax - zMin) / 2,
+    ];
+
+    const cameraFovVertical = 50;
+    const angle_ver = (cameraFovVertical / 2) * DEGREES_TO_RADIANS;
+    const L = height / 2 / Math.sin(angle_ver);
+    const r = L * Math.cos(angle_ver);
+    const cameraFov = 2 * Math.atan(width / 2 / r) * RADIANS_TO_DEGREES;
+    const angle_hor = (cameraFov / 2) * DEGREES_TO_RADIANS;
+
+    const points: [number, number, number][] = [];
+    points.push([xMin, yMin, zMin]);
+    points.push([xMin, yMax, zMin]);
+    points.push([xMax, yMax, zMin]);
+    points.push([xMax, yMin, zMin]);
+    points.push([xMin, yMin, zMax]);
+    points.push([xMin, yMax, zMax]);
+    points.push([xMax, yMax, zMax]);
+    points.push([xMax, yMin, zMax]);
+
+    let zoom = 999;
+    for (const point of points) {
+        const x_ = (point[0] - target[0]) / height;
+        const y_ = (point[1] - target[1]) / height;
+        const z_ = (point[2] - target[2]) / height;
+
+        const m = new Matrix4(IDENTITY);
+        m.rotateX(camera_.rotationX * DEGREES_TO_RADIANS);
+        m.rotateZ(camera_.rotationOrbit * DEGREES_TO_RADIANS);
+
+        const [x, y, z] = m.transformAsVector([x_, y_, z_]);
+        if (y >= 0) {
+            // These points will actually appear further away when zooming in.
+            continue;
+        }
+
+        const fwX = fD * Math.tan(angle_hor);
+        let y_new = fwX / (Math.abs(x) / y - fwX / fD);
+        const zoom_x = Math.log2(y_new / y);
+
+        const fwY = fD * Math.tan(angle_ver);
+        y_new = fwY / (Math.abs(z) / y - fwY / fD);
+        const zoom_z = Math.log2(y_new / y);
+
+        // it needs to be inside view volume in both directions.
+        zoom = zoom_x < zoom ? zoom_x : zoom;
+        zoom = zoom_z < zoom ? zoom_z : zoom;
+    }
+
+    camera_.zoom = zoom;
+    camera_.target = target;
+
+    return camera_;
+}
+
 const Map: React.FC<MapProps> = ({
     id,
     layers,
@@ -392,11 +565,12 @@ const Map: React.FC<MapProps> = ({
     getCameraPosition,
     isLoadedCallback,
     triggerHome,
+    lights,
     triggerResetMultipleWells,
 }: MapProps) => {
     const deckRef = useRef<DeckGLRef>(null);
 
-    const bboxInitial: BoundingBox = [0, 0, 0, 1, 1, 1];
+    const bboxInitial: BoundingBox3D = [0, 0, 0, 1, 1, 1];
 
     // Deck.gl View's and viewStates as input to Deck.gl
     const [deckGLViews, setDeckGLViews] = useState<View[]>([]);
@@ -405,12 +579,11 @@ const Map: React.FC<MapProps> = ({
     );
 
     const [reportedBoundingBox, setReportedBoundingBox] =
-        useState<BoundingBox>(bboxInitial);
+        useState<BoundingBox3D>(bboxInitial);
     const [reportedBoundingBoxAcc, setReportedBoundingBoxAcc] =
-        useState<BoundingBox>(bboxInitial);
+        useState<BoundingBox3D>(bboxInitial);
 
     const [deckGLLayers, setDeckGLLayers] = useState<LayersList>([]);
-    const [alteredLayers, setAlteredLayers] = useState<LayersList>([]);
 
     const [viewPortMargins, setViewPortMargins] = useState<marginsType>({
         left: 0,
@@ -418,6 +591,15 @@ const Map: React.FC<MapProps> = ({
         top: 0,
         bottom: 0,
     });
+
+    const [camera, setCamera] = useState<ViewStateType>();
+    React.useEffect(() => {
+        const camera = calculateZoomFromBBox3D(
+            cameraPosition,
+            deckRef.current?.deck
+        );
+        setCamera(camera);
+    }, [cameraPosition, deckRef?.current?.deck]);
 
     // Used for scaling in z direction using arrow keys.
     const [scaleZ, setScaleZ] = useState<number>(1);
@@ -432,34 +614,42 @@ const Map: React.FC<MapProps> = ({
         ZScaleOrbitController.setZScaleDownReference(setScaleZDown);
     }, [setScaleZDown]);
 
-    // Calculate a set of Deck.gl View's and viewStates as input to Deck.gl
     useEffect(() => {
         const [Views, viewStates] = createViewsAndViewStates(
             views,
             viewPortMargins,
             bounds,
-            cameraPosition,
+            undefined, // Use bounds not cameraPosition,
             reportedBoundingBoxAcc,
             deckRef.current?.deck
         );
 
         setDeckGLViews(Views);
         setViewStates(viewStates);
-    }, [
-        bounds,
-        cameraPosition,
-        views?.viewports,
-        deckRef?.current?.deck,
-        reportedBoundingBox,
-        reportedBoundingBoxAcc,
-        views,
-        viewPortMargins,
-        triggerHome,
-    ]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [triggerHome]);
 
     useEffect(() => {
-        setDeckGLLayers(alteredLayers);
-    }, [alteredLayers]);
+        const [Views, viewStates] = createViewsAndViewStates(
+            views,
+            viewPortMargins,
+            bounds,
+            camera,
+            reportedBoundingBoxAcc,
+            deckRef.current?.deck
+        );
+
+        setDeckGLViews(Views);
+        setViewStates(viewStates);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [
+        bounds,
+        camera,
+        deckRef?.current?.deck,
+        reportedBoundingBoxAcc,
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        compareViewsProp(views),
+    ]);
 
     useEffect(() => {
         const union_of_reported_bboxes = addBoundingBoxes(
@@ -495,6 +685,15 @@ const Map: React.FC<MapProps> = ({
     useEffect(() => {
         if (typeof layers === "undefined") {
             return;
+        }
+
+        if (layers.length === 0) {
+            // Empty layers array makes deck.gl set deckRef to undefined (no opengl context).
+            // Hence insert dummy layer.
+            const dummy_layer = new LineLayer({
+                visible: false,
+            });
+            layers.push(dummy_layer);
         }
 
         // Margins on the viewport are extracted from a potenial axes2D layer.
@@ -535,7 +734,7 @@ const Map: React.FC<MapProps> = ({
             });
         });
 
-        setAlteredLayers(layers_copy);
+        setDeckGLLayers(layers_copy);
     }, [layers]);
 
     useEffect(() => {
@@ -756,6 +955,10 @@ const Map: React.FC<MapProps> = ({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ({ viewId, viewState }: { viewId: string; viewState: any }) => {
             const viewports = views?.viewports || [];
+            if (viewState.target.length === 2) {
+                // In orthograpic mode viewState.target contains only x and y. Add existing z value.
+                viewState.target.push(viewStates[viewId].target[2]);
+            }
             const isSyncIds = viewports
                 .filter((item) => item.isSync)
                 .map((item) => item.id);
@@ -778,8 +981,10 @@ const Map: React.FC<MapProps> = ({
                 getCameraPosition(viewState);
             }
         },
-        [getCameraPosition, views?.viewports]
+        [getCameraPosition, viewStates, views?.viewports]
     );
+
+    const effects = parseLights(lights);
 
     if (!deckGLViews || isEmpty(deckGLViews) || isEmpty(deckGLLayers))
         return null;
@@ -834,13 +1039,17 @@ const Map: React.FC<MapProps> = ({
                 onHover={onHover}
                 onClick={onClick}
                 onAfterRender={onAfterRender}
+                effects={effects}
             >
                 {children}
             </DeckGL>
             {scale?.visible ? (
                 <DistanceScale
                     {...scale}
-                    zoom={viewStates[Object.keys(viewStates)[0]]?.zoom ?? -5}
+                    zoom={
+                        (viewStates[Object.keys(viewStates)[0]]
+                            ?.zoom as number) ?? -5
+                    }
                     scaleUnit={coordinateUnit}
                     style={scale.cssStyle ?? {}}
                 />
@@ -1100,18 +1309,10 @@ function createViewsAndViewStates(
 
     const mPixels = views?.marginPixels ?? 0;
 
-    const isOk =
-        deck &&
-        views &&
-        views.layout[0] >= 1 &&
-        views.layout[1] >= 1 &&
-        views.layout[0] * views.layout[1] <= views.viewports.length;
+    const isOk = deck && views && views.layout[0] >= 1 && views.layout[1] >= 1;
 
-    // if props for multiple viewport are not proper, return 2d view
+    // if props for multiple viewport are not proper, or deck is not yet initialized, return 2d view
     if (!isOk) {
-        console.warn(
-            "Properties for multiple viewports are not properly defined."
-        );
         deckgl_views.push(
             new OrthographicView({
                 id: "main",

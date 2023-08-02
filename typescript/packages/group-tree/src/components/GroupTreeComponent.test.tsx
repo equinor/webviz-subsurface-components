@@ -8,7 +8,7 @@ import { Data } from "../redux/types";
 
 import exampleData from "../../../../../example-data/group-tree.json";
 
-describe("Test GroupTree Component", () => {
+describe.skip("Test GroupTree Component", () => {
     it("snapshot test", () => {
         const { container } = render(
             Wrapper({

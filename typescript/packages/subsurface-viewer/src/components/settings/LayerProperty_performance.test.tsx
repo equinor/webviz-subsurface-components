@@ -5,10 +5,9 @@ import React, { Profiler } from "react";
 import { EmptyWrapper } from "../../test/TestWrapper";
 import LayerProperty from "./LayerProperty";
 import * as core from "@actions/core";
-import { obj } from "../../../../performanceUtility/onRenderFunction";
-import logTimes from "../../../../performanceUtility/onRenderFunction";
+import logTimes, { obj } from "../../test/performanceMetrics";
 
-import exampleData from "../../../../../demo/example-data/deckgl-map.json";
+import exampleData from "../../../../../../example-data/deckgl-map.json";
 
 const layers: Record<string, unknown>[] = exampleData[0].layers;
 

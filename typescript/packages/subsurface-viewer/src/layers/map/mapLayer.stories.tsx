@@ -63,9 +63,8 @@ const defaultMapLayer = new MapLayer({ ...defaultMapLayerProps });
 const wellsLayer = {
     "@@type": "WellsLayer",
     id: "wells-layer",
-    data: "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_wells.json",
-    logData:
-        "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/volve_logs.json",
+    data: "./volve_wells.json",
+    logData: "./volve_logs.json",
     logrunName: "BLOCKING",
     logName: "ZONELOG",
     logColor: "Stratigraphy",
@@ -1217,6 +1216,8 @@ const MapLayerColorSelectorTemplate: ComponentStory<typeof SubsurfaceViewer> = (
     return (
         <SubsurfaceViewer {...args} layers={updatedLayerData}>
             {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                /* @ts-expect-error */
                 <View id="view_1">
                     <div style={{ marginTop: 50 }}>
                         <ColorLegend
@@ -1333,22 +1334,38 @@ const ContourLinesStory = (props: {
             ]}
             views={views}
         >
-            <View id="view_1">
-                <ViewFooter>Default - no contour lines</ViewFooter>
-            </View>
-            <View id="view_2">
-                <ViewFooter>
-                    Contour lines enabled - default is Z value
-                </ViewFooter>
-            </View>
-            <View id="view_3">
-                <ViewFooter>Contour lines on property value</ViewFooter>
-            </View>
-            <View id="view_4">
-                <ViewFooter>
-                    Contour lines on flat map - default is property value
-                </ViewFooter>
-            </View>
+            {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                /* @ts-expect-error */
+                <View id="view_1">
+                    <ViewFooter>Default - no contour lines</ViewFooter>
+                </View>
+            }
+            {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                /* @ts-expect-error */
+                <View id="view_2">
+                    <ViewFooter>
+                        Contour lines enabled - default is Z value
+                    </ViewFooter>
+                </View>
+            }
+            {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                /* @ts-expect-error */
+                <View id="view_3">
+                    <ViewFooter>Contour lines on property value</ViewFooter>
+                </View>
+            }
+            {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                /* @ts-expect-error */
+                <View id="view_4">
+                    <ViewFooter>
+                        Contour lines on flat map - default is property value
+                    </ViewFooter>
+                </View>
+            }
         </SubsurfaceViewer>
     );
 };

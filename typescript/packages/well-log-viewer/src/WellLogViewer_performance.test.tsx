@@ -4,14 +4,13 @@ import { render } from "@testing-library/react";
 import "jest-styled-components";
 import React, { Profiler } from "react";
 import * as core from "@actions/core";
-import { Wrapper } from "../GroupTree/test/TestWrapper";
 import WellLogViewer from "./WellLogViewer";
-import logTimes, { obj } from "../../performanceUtility/onRenderFunction";
+import logTimes, { obj } from "./test/performanceMetrics";
 import { axisTitles, axisMnemos } from "./utils/axes";
 import { colorTables } from "@emerson-eps/color-tables";
 
-const exampleTemplate = require("../../../demo/example-data/welllog_template_1.json");
-//const exampleWellLog = require("../../../demo/example-data/L898MUD.json")[0];
+const exampleTemplate = require("../../../../example-data/welllog_template_1.json");
+//const exampleWellLog = require("../../../../example-data/L898MUD.json")[0];
 const exampleWellLog = {
     header: {},
     curves: [],
@@ -30,28 +29,24 @@ window.ResizeObserver =
 describe("Well Log Viewer perfomance", () => {
     it("initial performance test", () => {
         render(
-            Wrapper({
-                children: (
-                    <Profiler id="Well Log Viewer" onRender={logTimes}>
-                        <WellLogViewer
-                            id=""
-                            welllog={exampleWellLog}
-                            options={{
-                                hideTrackTitle: true,
-                                hideTrackLegend: true,
-                            }}
-                            primaryAxis={"md"}
-                            axisTitles={axisTitles}
-                            axisMnemos={axisMnemos}
-                            template={exampleTemplate}
-                            colorTables={exampleColorTable}
-                            onContentRescale={function (): void {
-                                throw new Error("Function not implemented.");
-                            }}
-                        />
-                    </Profiler>
-                ),
-            })
+            <Profiler id="Well Log Viewer" onRender={logTimes}>
+                <WellLogViewer
+                    id=""
+                    welllog={exampleWellLog}
+                    options={{
+                        hideTrackTitle: true,
+                        hideTrackLegend: true,
+                    }}
+                    primaryAxis={"md"}
+                    axisTitles={axisTitles}
+                    axisMnemos={axisMnemos}
+                    template={exampleTemplate}
+                    colorTables={exampleColorTable}
+                    onContentRescale={function (): void {
+                        throw new Error("Function not implemented.");
+                    }}
+                />
+            </Profiler>
         );
     });
 

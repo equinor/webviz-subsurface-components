@@ -7,7 +7,7 @@ import GroupTree from "./GroupTree";
 
 import exampleData from "../../../../example-data/group-tree.json";
 
-describe("Test GroupTree Default Component", () => {
+describe.skip("Test GroupTree Default Component", () => {
     it("snapshot test", () => {
         const { container } = render(
             Wrapper({

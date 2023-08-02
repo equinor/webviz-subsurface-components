@@ -3,21 +3,38 @@ import { ComponentStory, ComponentMeta } from "@storybook/react";
 import { format } from "d3-format";
 import { PickingInfo, View } from "@deck.gl/core/typed";
 import { ContinuousLegend } from "@emerson-eps/color-tables";
-import SubsurfaceViewer, { SubsurfaceViewerProps } from "./SubsurfaceViewer";
+import SubsurfaceViewer, {
+    SubsurfaceViewerProps,
+    LightsType,
+} from "./SubsurfaceViewer";
 import {
     MapMouseEvent,
     TooltipCallback,
     ViewStateType,
     ViewsType,
+    BoundingBox3D,
 } from "./components/Map";
-import { WellsLayer, MapLayer } from "./layers";
+import { WellsLayer, MapLayer, AxesLayer, Grid3DLayer } from "./layers";
 import InfoCard from "./components/InfoCard";
-import { ExtendedLayerProps, LayerPickInfo } from "./layers/utils/layerTools";
+import {
+    ExtendedLayerProps,
+    LayerPickInfo,
+    PropertyDataType,
+} from "./layers/utils/layerTools";
 import { WellsPickInfo } from "./layers/wells/wellsLayer";
-import { FeatureCollection } from "geojson";
+import { Feature } from "geojson";
 import { ViewFooter } from "./components/ViewFooter";
 import { styled } from "@mui/material/styles";
 import Switch from "@mui/material/Switch";
+import Stack from "@mui/material/Stack";
+import Slider from "@mui/material/Slider";
+import { SphereGeometry } from "@luma.gl/engine";
+import {
+    Points as SnubCubePoints,
+    Faces as SnubCubeFaces,
+    VertexCount as SnubCubeVertexCount,
+} from "./layers/grid3d/test_data/TruncatedSnubCube";
+import { SimpleMeshLayer } from "@deck.gl/mesh-layers/typed";
 
 export default {
     component: SubsurfaceViewer,
@@ -70,7 +87,6 @@ const wellsLayerWithlogs = new WellsLayer({
 });
 
 const meshMapLayerBig = new MapLayer({
-    "@@type": "MapLayer",
     id: "mesh-layer",
     meshData: "hugin_depth_5_m.float32",
     frame: {
@@ -169,7 +185,7 @@ const tooltipImpFunc: TooltipCallback = (
         outputString += processPropInfo(properties, true);
     } else if (layerName === "WellsLayer") {
         const wellsPickInfo = info as WellsPickInfo;
-        const wellsPickInfoObject = info.object as FeatureCollection;
+        const wellsPickInfoObject = info.object as Feature;
         const wellProperties = wellsPickInfoObject.properties;
         const name = (wellProperties as { name: string }).name;
         outputString += `Well: ${name || ""}`;
@@ -235,7 +251,6 @@ const CustomTemplate: ComponentStory<typeof SubsurfaceViewer> = (args) => {
 };
 
 export const customizedCameraPosition = CustomTemplate.bind({});
-
 const cameraPosition: ViewStateType = {
     target: [437500, 6475000],
     zoom: -5.0,
@@ -274,12 +289,16 @@ const MultiViewAnnotationTemplate: ComponentStory<typeof SubsurfaceViewer> = (
 ) => (
     <SubsurfaceViewer {...args}>
         {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            /* @ts-expect-error */
             <View id="view_1">
                 <ContinuousLegend min={-3071} max={41048} />
                 <ViewFooter>kH netmap</ViewFooter>
             </View>
         }
         {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            /* @ts-expect-error */
             <View id="view_2">
                 <ContinuousLegend min={2725} max={3396} />
                 <ViewFooter>Hugin</ViewFooter>
@@ -409,10 +428,14 @@ const MouseEventStory = (args: { show3d: boolean }) => {
 
     return (
         <SubsurfaceViewer {...useProps}>
-            <View id="test">
-                {getReadout(event)}
-                <ViewFooter>Mouse event example</ViewFooter>
-            </View>
+            {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                /* @ts-expect-error */
+                <View id="test">
+                    {getReadout(event)}
+                    <ViewFooter>Mouse event example</ViewFooter>
+                </View>
+            }
         </SubsurfaceViewer>
     );
 };
@@ -541,6 +564,286 @@ IsLoadedCallback.parameters = {
         iframeHeight: 500,
         description: {
             story: "IsLoadedCallback will report in console when triggered",
+        },
+    },
+};
+
+export const LightsStory = (args: SubsurfaceViewerProps) => {
+    const [headLight, setHeadLight] = React.useState(false);
+    const [ambientLight, setAmbientLight] = React.useState(false);
+    const [pointLight, setPointLight] = React.useState(false);
+    const [directionalLight, setDirectionalLight] = React.useState(false);
+
+    const [headLightIntensity, setHeadLightIntensity] = React.useState(1.0);
+    const [ambientLightIntensity, setAmbientLightIntensity] =
+        React.useState(1.0);
+    const [pointLightIntensity, setPointLightIntensity] = React.useState(1.0);
+    const [directionslLightIntensity, setDirectionslLightIntensity] =
+        React.useState(1.0);
+
+    let lights = {} as LightsType;
+
+    if (headLight) {
+        lights = { ...lights, headLight: { intensity: headLightIntensity } };
+    }
+    if (ambientLight) {
+        lights = {
+            ...lights,
+            ambientLight: { intensity: ambientLightIntensity },
+        };
+    }
+
+    if (pointLight) {
+        lights = {
+            ...lights,
+            pointLights: [
+                {
+                    intensity: pointLightIntensity,
+                    position: [-50, -50, -50],
+                    color: [0, 255, 0],
+                },
+            ],
+        };
+    }
+
+    if (directionalLight) {
+        lights = {
+            ...lights,
+            directionalLights: [
+                {
+                    intensity: directionslLightIntensity,
+                    direction: [-1, 0, -1],
+                    color: [255, 0, 0],
+                },
+            ],
+        };
+    }
+
+    const props = {
+        lights,
+        ...args,
+    };
+
+    return (
+        <Root>
+            <Stack direction={"row"} alignItems={"center"} spacing={10}>
+                <Stack>
+                    <Stack direction={"row"} alignItems={"center"}>
+                        <label>{"Head Light "}</label>
+                        <Switch
+                            onClick={() => {
+                                setHeadLight(!headLight);
+                            }}
+                        />
+                    </Stack>
+                    <Slider
+                        defaultValue={100}
+                        valueLabelDisplay={"auto"}
+                        onChange={(_event: Event, value: number | number[]) => {
+                            setHeadLightIntensity((value as number) / 100);
+                        }}
+                    />
+                </Stack>
+
+                <Stack>
+                    <Stack direction={"row"} alignItems={"center"}>
+                        <label>{"Ambient Light "}</label>
+                        <Switch
+                            onClick={() => {
+                                setAmbientLight(!ambientLight);
+                            }}
+                        />
+                    </Stack>
+                    <Slider
+                        defaultValue={100}
+                        valueLabelDisplay={"auto"}
+                        onChange={(_event: Event, value: number | number[]) => {
+                            setAmbientLightIntensity((value as number) / 100);
+                        }}
+                    />
+                </Stack>
+
+                <Stack>
+                    <Stack direction={"row"} alignItems={"center"}>
+                        <label>{"Point Light "}</label>
+                        <Switch
+                            onClick={() => {
+                                setPointLight(!pointLight);
+                            }}
+                        />
+                    </Stack>
+                    <Slider
+                        defaultValue={100}
+                        valueLabelDisplay={"auto"}
+                        onChange={(_event: Event, value: number | number[]) => {
+                            setPointLightIntensity((value as number) / 100);
+                        }}
+                    />
+                </Stack>
+
+                <Stack>
+                    <Stack direction={"row"} alignItems={"center"}>
+                        <label>{"Directional Light "}</label>
+                        <Switch
+                            onClick={() => {
+                                setDirectionalLight(!directionalLight);
+                            }}
+                        />
+                    </Stack>
+                    <Slider
+                        defaultValue={100}
+                        valueLabelDisplay={"auto"}
+                        onChange={(_event: Event, value: number | number[]) => {
+                            setDirectionslLightIntensity(
+                                (value as number) / 100
+                            );
+                        }}
+                    />
+                </Stack>
+            </Stack>
+            <div className={classes.main}>
+                <SubsurfaceViewer {...props} />
+            </div>
+        </Root>
+    );
+};
+
+LightsStory.args = {
+    id: "DeckGL-Map",
+    bounds: [-100, -100, 50, 50],
+    layers: [
+        new AxesLayer({
+            id: "polyhedral-cells-axes",
+            bounds: [-100, -50, -50, 50, 50, 50],
+        }),
+        new SimpleMeshLayer({
+            id: "sphere",
+            data: [{}],
+            mesh: new SphereGeometry({
+                nlat: 100,
+                nlong: 100,
+                radius: 30,
+            }),
+            wireframe: false,
+            getPosition: [-75, 0, 0],
+            getColor: [255, 255, 255],
+            material: true,
+        }),
+        new Grid3DLayer({
+            id: "Grid3DLayer",
+            material: true,
+            colorMapFunction: () => [255, 255, 255],
+            pointsData: SnubCubePoints.map((v) => 35 * v),
+            polysData: SnubCubeFaces,
+            propertiesData: Array(SnubCubeVertexCount).fill(0),
+        }),
+    ],
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: true,
+            },
+        ],
+    },
+};
+
+LightsStory.parameters = {
+    docs: {
+        inlineStories: false,
+        iframeHeight: 500,
+        description: {
+            story: "Using different light sources",
+        },
+    },
+};
+
+const zoomBox3D: BoundingBox3D = [-325, -450, -25, 125, 150, 125];
+//const zoomBox3D: BoundingBox3D = [-100, -100, -100,  100, 100, 100];
+
+export const AutoZoomToBoxStory = (args: SubsurfaceViewerProps) => {
+    const [rotX, setRotX] = React.useState(0);
+    const [rotZ, setRotZ] = React.useState(0);
+
+    const cameraPosition: ViewStateType = {
+        rotationX: rotX,
+        rotationOrbit: rotZ,
+        zoom: zoomBox3D,
+        target: [0, 0, 0],
+    };
+
+    const props = {
+        ...args,
+        cameraPosition,
+    };
+
+    return (
+        <Root>
+            <label>{"Rotation X Axis "}</label>
+            <Slider
+                defaultValue={50}
+                valueLabelDisplay={"auto"}
+                onChange={(_event: Event, value: number | number[]) => {
+                    const angle = 2 * ((value as number) / 100 - 0.5) * 90;
+                    setRotX(angle);
+                }}
+            />
+            <label>{"Rotation Z Axis "}</label>
+            <Slider
+                defaultValue={50}
+                valueLabelDisplay={"auto"}
+                onChange={(_event: Event, value: number | number[]) => {
+                    const angle = 2 * ((value as number) / 100 - 0.5) * 180;
+                    setRotZ(angle);
+                }}
+            />
+            <div className={classes.main}>
+                <SubsurfaceViewer {...props} />
+            </div>
+        </Root>
+    );
+};
+
+AutoZoomToBoxStory.args = {
+    id: "DeckGL-Map",
+    layers: [
+        new AxesLayer({
+            id: "polyhedral-cells-axes",
+            bounds: zoomBox3D,
+            ZIncreasingDownwards: false,
+        }),
+        new SimpleMeshLayer({
+            id: "sphere",
+            data: [{}],
+            mesh: new SphereGeometry({
+                nlat: 100,
+                nlong: 100,
+                radius: 10,
+            }),
+            wireframe: false,
+            getPosition: [0, 0, 0],
+            getColor: [255, 255, 255],
+            material: true,
+        }),
+    ],
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: true,
+            },
+        ],
+    },
+};
+
+AutoZoomToBoxStory.parameters = {
+    docs: {
+        inlineStories: false,
+        iframeHeight: 500,
+        description: {
+            story: "",
         },
     },
 };

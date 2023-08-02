@@ -3,11 +3,11 @@ import { render } from "@testing-library/react";
 import "jest-styled-components";
 import React, { Profiler } from "react";
 import * as core from "@actions/core";
-import { Wrapper } from "../GroupTree/test/TestWrapper";
 import GroupTree from "./GroupTree";
-import logTimes, { obj } from "../../performanceUtility/onRenderFunction";
+import { Wrapper } from "./test/TestWrapper";
+import logTimes, { obj } from "./test/performanceMetrics";
 
-import exampleData from "../../../demo/example-data/group-tree.json";
+import exampleData from "../../../../example-data/group-tree.json";
 
 describe("Test GroupTree perfomance", () => {
     it("initial performance test", () => {

@@ -4,5 +4,12 @@
         "outDir": "./dist",
         "rootDir": "./src"
     },
-    "include": ["src/"]
+    "include": ["src/"],
+    "exclude": [
+        "src/demo",
+        "src/test/",
+        "./**/*.test.tsx",
+        "./**/*.stories.tsx",
+        "./**/*.stories.mdx"
+    ]
 }

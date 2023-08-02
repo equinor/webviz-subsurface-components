@@ -24,7 +24,6 @@
         "**/*.test.tsx",
         "**/test/*.tsx",
         "**/*.stories.tsx",
-        "**/*.stories.jsx",
         "./cypress.config.ts",
         "**/*.test.ts"
     ]
