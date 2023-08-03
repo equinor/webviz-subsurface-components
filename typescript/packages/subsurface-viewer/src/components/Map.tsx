@@ -23,10 +23,7 @@ import DistanceScale from "./DistanceScale";
 import StatusIndicator from "./StatusIndicator";
 import { colorTablesArray } from "@emerson-eps/color-tables/";
 import fitBounds from "../utils/fit-bounds";
-import {
-    validateColorTables,
-    validateLayers,
-} from "../inputSchema/schemaValidationUtil";
+import { validateColorTables, validateLayers } from "@webviz/wsc-common";
 import { LayerPickInfo } from "../layers/utils/layerTools";
 import { getLayersByType } from "../layers/utils/layerTools";
 import { getWellLayerByTypeAndSelectedWells } from "../layers/utils/layerTools";

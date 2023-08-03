@@ -64,7 +64,7 @@ function formatSchemaError(schema_type: string, errors: ErrorObject[]): string {
 
     if (errors[0]) {
         error_text =
-            (errors[0].dataPath ? errors[0].dataPath + ": " : "") +
+            (errors[0].instancePath ? errors[0].instancePath + ": " : "") +
             errors[0].message;
     } else error_text = "JSON schema validation failed";
 
