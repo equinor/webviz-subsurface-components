@@ -3,7 +3,52 @@
 import React from "react";
 import WellLogViewer from "./WellLogViewer";
 import { argTypesWellLogViewerProp } from "./WellLogViewer";
-import { colorTables } from "@emerson-eps/color-tables";
+//import { colorTables } from "@emerson-eps/color-tables";
+
+import exampleData from "../../../../example-data/deckgl-map.json";
+
+import PropTypes from "prop-types";
+
+import { WeakValidationMap } from "react";
+import SubsurfaceViewer from "@webviz/subsurface-viewer";
+import { SubsurfaceViewerProps } from "@webviz/subsurface-viewer";
+import { Color, LayersList } from "@deck.gl/core/typed";
+
+import { WellsLayer } from "@webviz/subsurface-viewer/dist/layers";
+import {
+    Template,
+    TemplateTrack,
+    TemplatePlot,
+    TemplatePlotTypes,
+} from "./components/WellLogTemplateTypes";
+
+import { WellLog } from "./components/WellLogTypes";
+import welllogsJson from "./demo/example-data/volve_logs.json";
+const welllogs = welllogsJson as unknown as WellLog[];
+
+import templateJson from "./demo/example-data/welllog_template_2.json";
+const template = templateJson as unknown as Template;
+
+import { ColorTable } from "./components/ColorTableTypes";
+
+import { WellLogController } from "./components/WellLogView";
+import { LogViewer } from "@equinor/videx-wellog";
+import { Info } from "./components/InfoTypes";
+import { MapMouseEvent } from "@webviz/subsurface-viewer/dist/components/Map";
+
+import InfoPanel from "./components/InfoPanel";
+import WellLogViewWithScroller from "./components/WellLogViewWithScroller";
+import { fillInfos } from "./utils/fill-info";
+import { getDiscreteMeta, indexOfElementByName } from "./utils/tracks";
+import { deepCopy } from "./utils/deepcopy";
+
+import { WellLogViewOptions } from "./components/WellLogView";
+import { isEqualRanges } from "./components/WellLogView";
+
+import wellPicks from "./demo/example-data/wellpicks.json";
+import colorTables from "./demo/example-data/wellpick_colors.json";
+
+import { axisTitles, axisMnemos } from "./utils/axes";
 
 const ComponentCode =
     '<WellLogViewer id="WellLogViewer" \r\n' +
@@ -12,8 +57,6 @@ const ComponentCode =
     '    template={require("../../../../example-data/welllog_template_1.json")} \r\n' +
     "    colorTables={colorTables} \r\n" +
     "/>";
-
-import { axisTitles, axisMnemos } from "./utils/axes";
 
 export default {
     component: WellLogViewer,
@@ -66,7 +109,7 @@ function fillInfo(controller) {
     );
 }
 
-const Template = (args) => {
+const StoryTemplate = (args) => {
     const infoRef = React.useRef();
     const setInfo = function (info) {
         if (infoRef.current) infoRef.current.innerHTML = info;
@@ -104,54 +147,13 @@ const Template = (args) => {
 };
 
 const wellpick = {
-    wellpick: require("../../../../example-data/wellpicks.json")[0],
+    wellpick: wellPicks[0],
+    name: "HORIZON",
+    colorTables: colorTables,
+    color: "Stratigraphy",
+};
 
 
-import React from "react";
-
-import exampleData from "../../../../example-data/deckgl-map.json";
-
-import PropTypes from "prop-types";
-
-import { WeakValidationMap } from "react";
-import SubsurfaceViewer from "@webviz/subsurface-viewer";
-import { SubsurfaceViewerProps } from "@webviz/subsurface-viewer";
-import { Color, LayersList } from "@deck.gl/core/typed";
-
-import { WellsLayer } from "@webviz/subsurface-viewer/dist/layers";
-import {
-    Template,
-    TemplateTrack,
-    TemplatePlot,
-    TemplatePlotTypes,
-} from "./components/WellLogTemplateTypes";
-
-import { WellLog } from "./components/WellLogTypes";
-import welllogsJson from "./demo/example-data/volve_logs.json";
-const welllogs = welllogsJson as unknown as WellLog[];
-
-import templateJson from "./demo/example-data/welllog_template_2.json";
-const template = templateJson as unknown as Template;
-
-import { ColorTable } from "./components/ColorTableTypes";
-
-import { WellLogController } from "./components/WellLogView";
-import { LogViewer } from "@equinor/videx-wellog";
-import { Info } from "./components/InfoTypes";
-import { MapMouseEvent } from "@webviz/subsurface-viewer/dist/components/Map";
-
-import InfoPanel from "./components/InfoPanel";
-import WellLogViewWithScroller from "./components/WellLogViewWithScroller";
-import { axisTitles, axisMnemos } from "./utils/axes";
-import { fillInfos } from "./utils/fill-info";
-import { getDiscreteMeta, indexOfElementByName } from "./utils/tracks";
-import { deepCopy } from "./utils/deepcopy";
-
-import { WellLogViewOptions } from "./components/WellLogView";
-import { isEqualRanges } from "./components/WellLogView";
-
-import wellPicks from "./demo/example-data/wellpicks.json";
-import colorTables from "./demo/example-data/wellpick_colors.json";
 
 function getTemplatePlotColorTable(
     template: Template,
@@ -235,14 +237,7 @@ function addTemplateTrack(
     return templateNew;
 }
 
-const wellpick = {
-    wellpick: wellPicks[0],
-    name: "HORIZON",
-    colorTables: colorTables,
-    color: "Stratigraphy",
-};
-
-export const Default = Template.bind({});
+export const Default = StoryTemplate.bind({});
 Default.args = {
     id: "Well-Log-Viewer",
     horizontal: false,
@@ -259,7 +254,7 @@ Default.args = {
     },
 };
 
-export const Horizontal = Template.bind({});
+export const Horizontal = StoryTemplate.bind({});
 Horizontal.args = {
     id: "Well-Log-Viewer-Horizontal",
     horizontal: true,
@@ -276,6 +271,9 @@ Horizontal.parameters = {
     docs: {
         description: {
             story: "An example showing horizontal orientation of the tracks.",
+        },
+    },
+};
 
 export class MapAndWellLogViewer extends React.Component<Props, State> {
     public static propTypes?: WeakValidationMap<Props> | undefined;
@@ -746,60 +744,7 @@ export {
 };
 */
 
-export const Default = Template.bind({});
-Default.args = {
-    id: "Well-Log-Viewer",
-    horizontal: false,
-    welllog: require("../../../../example-data/L898MUD.json")[0],
-    template: require("../../../../example-data/welllog_template_1.json"),
-    colorTables: colorTables,
-    wellpick: wellpick,
-    axisTitles: axisTitles,
-    axisMnemos: axisMnemos,
-    viewTitle: true, // show default welllog view title (a wellname from the welllog)
-    options: {
-        hideTrackTitle: false,
-        hideTrackLegend: false,
-    },
-};
-
-export const Discrete = Template.bind({});
-Discrete.args = {
-    id: "Well-Log-Viewer-Discrete",
-    horizontal: false,
-    welllog: require("../../../../example-data/volve_logs.json")[0],
-    template: require("../../../../example-data/welllog_template_2.json"),
-    colorTables: colorTables,
-    wellpick: wellpick,
-    axisTitles: axisTitles,
-    axisMnemos: axisMnemos,
-    viewTitle: true, // show default welllog view title (a wellname from the welllog)
-};
-Discrete.parameters = {
-    docs: {
-        description: {
-            story: "An example showing the tracks with discrete logs.",
-        },
-    },
-
-export const MapAndWellLogViewerStory = (
-    args: React.JSX.IntrinsicAttributes &
-        React.JSX.IntrinsicClassAttributes<MapAndWellLogViewer> &
-        Readonly<Props>
-) => {
-    return (
-        <div style={{ height: "94vh", width: "100%", display: "flex" }}>
-            <MapAndWellLogViewer {...args} />
-        </div>
-    );
-};
-
-MapAndWellLogViewerStory.args = {
-    ...exampleData[0],
-    colorTables: colorTables,
-    id: "MapAndWellLog", // redefine id from exampleData[0]
-
-export const Discrete = Template.bind({});
+export const Discrete = StoryTemplate.bind({});
 Discrete.args = {
     id: "Well-Log-Viewer-Discrete",
     horizontal: false,
