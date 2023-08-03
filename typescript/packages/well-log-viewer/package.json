@@ -22,6 +22,7 @@
   "dependencies": {
     "@emerson-eps/color-tables": "^0.4.57",
     "@equinor/videx-wellog": "^0.8.0",
+    "@webviz/wsc-common": "*",
     "convert-units": "^2.3.4",
     "d3": "^7.8.2"
   },
@@ -29,6 +30,19 @@
     "@mui/material": "^5.11",
     "react": "^17 || ^18",
     "react-dom": "^17 || ^18"
+  },
+  "nx": {
+    "targets": {
+      "build": {
+        "dependsOn": [
+          {
+            "dependencies": true,
+            "target": "build",
+            "params": "ignore"
+          }
+        ]
+      }
+    }
   },
   "volta": {
     "node": "16.18.1"
