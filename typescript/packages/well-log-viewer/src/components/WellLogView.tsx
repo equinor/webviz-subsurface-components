@@ -20,7 +20,6 @@ import {
 
 import "./styles.scss";
 
-//import { validateSchema } from "@webviz/subsurface-viewer/dist/inputSchema/validator";
 import { validateSchema } from "@webviz/wsc-common";
 
 import { select } from "d3";
