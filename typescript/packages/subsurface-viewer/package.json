@@ -45,19 +45,6 @@
     "react": "^17 || ^18",
     "react-dom": "^17 || ^18"
   },
-  "nx": {
-    "targets": {
-      "build": {
-        "dependsOn": [
-          {
-            "dependencies": true,
-            "target": "build",
-            "params": "ignore"
-          }
-        ]
-      }
-    }
-  },
   "volta": {
     "node": "16.18.1"
   }
