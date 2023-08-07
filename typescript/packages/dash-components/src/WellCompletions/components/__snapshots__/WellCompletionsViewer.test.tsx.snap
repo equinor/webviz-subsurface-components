@@ -1,0 +1,1189 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Test Well Completions viewer snapshot test with data 1`] = `
+.c8 {
+  display: grid;
+  grid-gap: 8px;
+  grid-auto-flow: column;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  height: 100%;
+}
+
+.c7 {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  height: 40px;
+  width: 40px;
+  padding-left: 0;
+  padding-right: 0;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  margin: 0;
+  color: var(--eds_interactive_primary__resting,rgba(0,112,121,1));
+  font-family: Equinor;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.143em;
+  text-align: center;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  position: relative;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.c7 svg {
+  justify-self: center;
+}
+
+.c7::after {
+  position: absolute;
+  top: -6px;
+  left: -4px;
+  width: 48px;
+  height: 48px;
+  content: '';
+}
+
+.c7:hover {
+  background: var(--eds_interactive_primary__hover_alt,rgba(222,237,238,1));
+  border: 1px solid transparent;
+  border-radius: 50%;
+}
+
+.c7:focus {
+  outline: none;
+}
+
+.c7[data-focus-visible-added]:focus {
+  outline: 1px dashed rgba(0,112,121,1);
+  outline-offset: 2px;
+}
+
+.c7::-moz-focus-inner {
+  border: 0;
+}
+
+.c7:disabled {
+  cursor: not-allowed;
+  background: transparent;
+  border: 1px solid transparent;
+  margin: 0;
+  color: var(--eds_interactive__disabled__text,rgba(190,190,190,1));
+  font-family: Equinor;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.143em;
+  text-align: center;
+}
+
+.c7:disabled:hover {
+  background: transparent;
+}
+
+.c7::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: auto;
+  min-height: auto;
+  content: '';
+}
+
+.c9 {
+  margin: 0;
+  color: rgba(61,61,61,1);
+  font-family: Equinor;
+  font-size: 1.000rem;
+  font-weight: 400;
+  line-height: 1.250em;
+  text-align: left;
+}
+
+.c3 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  position: relative;
+  margin: 0;
+  color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+  font-family: Equinor;
+  font-size: 0.750rem;
+  font-weight: 500;
+  line-height: 1.333em;
+  text-align: left;
+  margin-left: 8px;
+  margin-right: 8px;
+  color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+}
+
+.c4 {
+  margin: 0;
+}
+
+.c0 {
+  height: 64px;
+  top: 0;
+  position: -webkit-sticky;
+  position: sticky;
+  background: var(--eds_ui_background__default,rgba(255,255,255,1));
+  box-sizing: border-box;
+  z-index: 250;
+  display: grid;
+  grid-column-gap: 40px;
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas: 'left center right';
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  border-bottom: 2px var(--eds_ui_background__light,rgba(247,247,247,1));
+  padding-left: 40px;
+  padding-top: 8px;
+  padding-right: 40px;
+  padding-bottom: 8px;
+  margin: 0;
+  color: rgba(61,61,61,1);
+  font-family: Equinor;
+  font-size: 1.000rem;
+  font-weight: 400;
+  line-height: 1.000em;
+  -webkit-letter-spacing: 0.013em;
+  -moz-letter-spacing: 0.013em;
+  -ms-letter-spacing: 0.013em;
+  letter-spacing: 0.013em;
+  text-align: left;
+}
+
+.c6 {
+  grid-area: right;
+  text-align: right;
+}
+
+.c1 {
+  grid-area: left;
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-gap: 24px;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.c10 {
+  position: relative;
+  background: var(--eds_ui_background__light,rgba(247,247,247,1));
+  width: 100%;
+  height: 36px;
+  display: grid;
+  grid-gap: 8px;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content auto max-content;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  box-sizing: border-box;
+  border: 1px solid transparent;
+  z-index: 0;
+  padding-left: 8px;
+  padding-top: 6px;
+  padding-right: 8px;
+  padding-bottom: 6px;
+}
+
+.c10 svg {
+  fill: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+}
+
+.c10::-webkit-input-placeholder {
+  color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+}
+
+.c10::-moz-placeholder {
+  color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+}
+
+.c10:-ms-input-placeholder {
+  color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+}
+
+.c10::placeholder {
+  color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+}
+
+.c10:hover {
+  border: 1px solid var(--eds_interactive_primary__resting,rgba(0,112,121,1));
+  cursor: text;
+}
+
+.c10::after {
+  z-index: -1;
+  position: absolute;
+  top: -top:6px;
+  left: 0;
+  width: 100%;
+  height: 48px;
+  content: '';
+}
+
+.c10::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: auto;
+  min-height: auto;
+  content: '';
+}
+
+.c11 {
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
+  background: transparent;
+  margin: 0;
+  color: rgba(0,0,0,1);
+  font-family: Equinor;
+  font-size: 1.000rem;
+  font-weight: 400;
+  line-height: 1.500em;
+  -webkit-letter-spacing: 0.025em;
+  -moz-letter-spacing: 0.025em;
+  -ms-letter-spacing: 0.025em;
+  letter-spacing: 0.025em;
+  text-align: left;
+}
+
+.c11[type='search']::-webkit-search-decoration,
+.c11[type='search']::-webkit-search-cancel-button,
+.c11[type='search']::-webkit-search-results-button,
+.c11[type='search']::-webkit-search-results-decoration {
+  -webkit-appearance: none;
+}
+
+.c11:focus {
+  outline: none;
+}
+
+.c12 {
+  border-radius: 50%;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  visibility: hidden;
+  z-index: 1;
+  padding: 4px;
+  height: 16px;
+  width: 16px;
+  position: relative;
+}
+
+.c12::after {
+  z-index: -1;
+  position: absolute;
+  top: -6px;
+  left: 0;
+  width: 100%;
+  height: 36px;
+  content: '';
+}
+
+.c12::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: auto;
+  min-height: auto;
+  content: '';
+}
+
+.c5 {
+  border: none;
+  border-radius: 0;
+  box-shadow: inset 0 -1px 0 0 var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+  padding-left: 8px;
+  padding-top: 6px;
+  padding-right: 8px;
+  padding-bottom: 6px;
+  margin: 0;
+  color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+  font-family: Equinor;
+  font-size: 1.000rem;
+  font-weight: 400;
+  line-height: 1.500em;
+  -webkit-letter-spacing: 0.025em;
+  -moz-letter-spacing: 0.025em;
+  -ms-letter-spacing: 0.025em;
+  letter-spacing: 0.025em;
+  text-align: left;
+  padding-right: calc(8px *2 + 24px);
+  display: block;
+  margin: 0;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%236f6f6f' d='M7 9.5l5 5 5-5H7z'/%3E%3C/svg%3E"), linear-gradient( to bottom, var(--eds_ui_background__light,rgba(247,247,247,1)) 0%, var(--eds_ui_background__light,rgba(247,247,247,1)) 100% );
+  background-repeat: no-repeat,repeat;
+  background-position: right 8px top 50%;
+  width: 100%;
+}
+
+.c5:active,
+.c5:focus {
+  box-shadow: none;
+  outline: 2px solid var(--eds_interactive_primary__resting,rgba(0,112,121,1));
+  outline-offset: 0px;
+}
+
+.c5:disabled {
+  color: var(--eds_interactive__disabled__text,rgba(190,190,190,1));
+  background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23bebebe' d='M7 9.5l5 5 5-5H7z'/%3E%3C/svg%3E"), linear-gradient( to bottom, var(--eds_ui_background__light,rgba(247,247,247,1)) 0%, var(--eds_ui_background__light,rgba(247,247,247,1)) 100% );
+  cursor: not-allowed;
+  box-shadow: none;
+  outline: none;
+}
+
+.c5:disabled .arrow-icon {
+  fill: red;
+}
+
+.c5:disabled:focus,
+.c5:disabled:active {
+  outline: none;
+}
+
+.c2 {
+  min-width: 100px;
+  width: 100%;
+}
+
+.c16 {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  position: relative;
+}
+
+.c14 {
+  border: 0;
+  -webkit-clip: rect(0 0 0 0);
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+.c14:focus {
+  outline: none;
+}
+
+.c14[data-focus-visible-added]:focus + span :first-child {
+  outline: 1px dashed var(--eds_interactive__focus,rgba(0,112,121,1));
+  outline-offset: 6px;
+}
+
+.c15[data-focus-visible-added]:focus + span :first-child {
+  outline-offset: 4px;
+}
+
+.c15:checked + span > span {
+  background-color: var(--eds_interactive_primary__resting,rgba(0,112,121,1));
+}
+
+.c15:checked + span > span:last-child {
+  -webkit-transform: translate(180%,-50%);
+  -ms-transform: translate(180%,-50%);
+  transform: translate(180%,-50%);
+  background-color: var(--eds_interactive__icon_on_interactive_colors,rgba(255,255,255,1));
+}
+
+.c18 {
+  width: 20px;
+  height: 10px;
+  border-radius: 10px;
+  border: none;
+  background-color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate(-50%,-50%);
+  -ms-transform: translate(-50%,-50%);
+  transform: translate(-50%,-50%);
+}
+
+.c19 {
+  background-color: var(--eds_interactive__icon_on_interactive_colors,rgba(255,255,255,1));
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+  position: absolute;
+  top: 50%;
+  -webkit-transform: translate(11%,-50%);
+  -ms-transform: translate(11%,-50%);
+  transform: translate(11%,-50%);
+  left: 15px;
+  -webkit-transition: -webkit-transform 0.36s cubic-bezier(0.78,0.14,0.15,0.86);
+  -webkit-transition: transform 0.36s cubic-bezier(0.78,0.14,0.15,0.86);
+  transition: transform 0.36s cubic-bezier(0.78,0.14,0.15,0.86);
+}
+
+.c13 {
+  cursor: pointer;
+  border: none;
+  background-color: transparent;
+  vertical-align: middle;
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  position: relative;
+}
+
+.c20 {
+  margin: 0;
+  color: rgba(61,61,61,1);
+  font-family: Equinor;
+  font-size: 1.000rem;
+  font-weight: 400;
+  line-height: 1.000em;
+  -webkit-letter-spacing: 0.013em;
+  -moz-letter-spacing: 0.013em;
+  -ms-letter-spacing: 0.013em;
+  letter-spacing: 0.013em;
+  text-align: left;
+}
+
+@media (hover:hover) and (pointer:fine) {
+  .c17:hover {
+    background-color: var(--eds_interactive_primary__hover_alt,rgba(222,237,238,1));
+  }
+}
+
+<div
+  class="WellCompletionsViewer-root css-g4xl5z"
+>
+  <header
+    class="c0 SettingsBar-topBar css-mz8yvz"
+  >
+    <div
+      class="c1 SettingsBar-actions"
+    >
+      <div
+        class="TimeRangeSelector-root css-1htfc7f"
+      >
+        <div
+          class="TimeRangeSelector-slider"
+        >
+          <span>
+            Time Steps
+          </span>
+          <span
+            class="MuiSlider-root TimeRangeSelector-root MuiSlider-trackFalse MuiSlider-colorPrimary MuiSlider-sizeMedium css-1xvshl5-MuiSlider-root"
+          >
+            <span
+              class="MuiSlider-rail css-14pt78w-MuiSlider-rail"
+            />
+            <span
+              class="MuiSlider-track css-pm1ix7-MuiSlider-track"
+              style="left: 0%; width: 100%;"
+            />
+            <span
+              class="MuiSlider-mark css-1tfve6q-MuiSlider-mark"
+              data-index="0"
+              style="left: 0%;"
+            />
+            <span
+              class="MuiSlider-mark css-1tfve6q-MuiSlider-mark"
+              data-index="1"
+              style="left: 11.11111111111111%;"
+            />
+            <span
+              class="MuiSlider-mark css-1tfve6q-MuiSlider-mark"
+              data-index="2"
+              style="left: 22.22222222222222%;"
+            />
+            <span
+              class="MuiSlider-mark css-1tfve6q-MuiSlider-mark"
+              data-index="3"
+              style="left: 33.333333333333336%;"
+            />
+            <span
+              class="MuiSlider-mark css-1tfve6q-MuiSlider-mark"
+              data-index="4"
+              style="left: 44.44444444444444%;"
+            />
+            <span
+              class="MuiSlider-mark css-1tfve6q-MuiSlider-mark"
+              data-index="5"
+              style="left: 55.55555555555556%;"
+            />
+            <span
+              class="MuiSlider-mark css-1tfve6q-MuiSlider-mark"
+              data-index="6"
+              style="left: 66.66666666666667%;"
+            />
+            <span
+              class="MuiSlider-mark css-1tfve6q-MuiSlider-mark"
+              data-index="7"
+              style="left: 77.77777777777777%;"
+            />
+            <span
+              class="MuiSlider-mark css-1tfve6q-MuiSlider-mark"
+              data-index="8"
+              style="left: 88.88888888888889%;"
+            />
+            <span
+              class="MuiSlider-mark MuiSlider-markActive css-6cwnna-MuiSlider-mark"
+              data-index="9"
+              style="left: 100%;"
+            />
+            <span
+              class="MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary css-eg0mwd-MuiSlider-thumb"
+              data-index="0"
+              style="left: 100%;"
+            >
+              <input
+                aria-labelledby="time-step-slider-label"
+                aria-orientation="horizontal"
+                aria-valuemax="9"
+                aria-valuemin="0"
+                aria-valuenow="9"
+                data-index="0"
+                max="9"
+                min="0"
+                step="1"
+                style="border: 0px; height: 100%; margin: -1px; overflow: hidden; padding: 0px; position: absolute; white-space: nowrap; width: 100%; direction: ltr;"
+                type="range"
+                value="9"
+              />
+              <span
+                aria-hidden="true"
+                class="MuiSlider-valueLabelOpen MuiSlider-valueLabel TimeRangeSelector-valueLabel css-nnid7-MuiSlider-valueLabel"
+              >
+                <span
+                  class="MuiSlider-valueLabelCircle"
+                >
+                  <span
+                    class="MuiSlider-valueLabelLabel"
+                  >
+                    2002-10-01
+                  </span>
+                </span>
+              </span>
+            </span>
+          </span>
+        </div>
+        <div
+          class="c2 TimeRangeSelector-selector"
+        >
+          <label
+            class="c3"
+            for="time-end-selector"
+          >
+            <span
+              class="c4"
+            >
+              Select Time
+            </span>
+          </label>
+          <select
+            class="c5"
+            id="time-end-selector"
+          >
+            <option
+              value="0"
+            >
+              2000-02-01
+            </option>
+            <option
+              value="1"
+            >
+              2000-06-01
+            </option>
+            <option
+              value="2"
+            >
+              2000-07-01
+            </option>
+            <option
+              value="3"
+            >
+              2000-10-01
+            </option>
+            <option
+              value="4"
+            >
+              2001-01-01
+            </option>
+            <option
+              value="5"
+            >
+              2001-03-01
+            </option>
+            <option
+              value="6"
+            >
+              2001-04-01
+            </option>
+            <option
+              value="7"
+            >
+              2001-10-01
+            </option>
+            <option
+              value="8"
+            >
+              2002-07-01
+            </option>
+            <option
+              value="9"
+            >
+              2002-10-01
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div
+      class="c6 SettingsBar-actions"
+    >
+      <div
+        class="css-1l0gahh"
+      >
+        <button
+          class="c7"
+          tabindex="0"
+          type="button"
+        >
+          <span
+            class="c8"
+          >
+            <svg
+              aria-hidden="true"
+              class=""
+              fill="currentColor"
+              height="24px"
+              viewBox="0 0 24 24"
+              width="24px"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                class=""
+                clip-rule="evenodd"
+                d="M3.5 18.5v-13h17v13h-17Zm10-2v-9h-3v9h3Zm-8-9h3v9h-3v-9Zm10 9h3v-9h-3v9Z"
+                data-testid="eds-icon-path"
+                fill-rule="evenodd"
+                height="24"
+              />
+            </svg>
+          </span>
+        </button>
+      </div>
+      <div>
+        <button
+          class="c7"
+          data-testid="filter_button"
+          tabindex="0"
+          type="button"
+        >
+          <span
+            class="c8"
+          >
+            <svg
+              aria-hidden="true"
+              class=""
+              fill="currentColor"
+              height="24px"
+              viewBox="0 0 24 24"
+              width="24px"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                class=""
+                clip-rule="evenodd"
+                d="M7 6h10l-5.01 6.3L7 6Zm-2.75-.39C6.27 8.2 10 13 10 13v6c0 .55.45 1 1 1h2c.55 0 1-.45 1-1v-6s3.72-4.8 5.74-7.39A.998.998 0 0 0 18.95 4H5.04c-.83 0-1.3.95-.79 1.61Z"
+                data-testid="eds-icon-path"
+                fill-rule="evenodd"
+                height="24"
+              />
+            </svg>
+          </span>
+        </button>
+      </div>
+    </div>
+  </header>
+  <div
+    class="WellCompletionsViewer-main"
+  >
+    <div
+      class="WellCompletionsViewer-content"
+    >
+      <div
+        class="WellPagination-root css-1yhto5y"
+      >
+        <div
+          class="WellPagination-left"
+        >
+          <p
+            class="c9"
+            style="align-self: center; min-width: 125px;"
+          >
+            1 - 11 of 11 items
+          </p>
+        </div>
+        <nav
+          aria-label="pagination navigation"
+          class="MuiPagination-root MuiPagination-text WellPagination-right css-1oj2twp-MuiPagination-root"
+        >
+          <ul
+            class="MuiPagination-ul css-wjh20t-MuiPagination-ul"
+          >
+            <li>
+              <button
+                aria-label="Go to previous page"
+                class="MuiButtonBase-root Mui-disabled MuiPaginationItem-root MuiPaginationItem-sizeMedium MuiPaginationItem-text MuiPaginationItem-circular Mui-disabled MuiPaginationItem-previousNext css-yuzg60-MuiButtonBase-root-MuiPaginationItem-root"
+                disabled=""
+                tabindex="-1"
+                type="button"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium MuiPaginationItem-icon css-g2z002-MuiSvgIcon-root-MuiPaginationItem-icon"
+                  data-testid="NavigateBeforeIcon"
+                  focusable="false"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"
+                  />
+                </svg>
+              </button>
+            </li>
+            <li>
+              <button
+                aria-current="true"
+                aria-label="page 1"
+                class="MuiButtonBase-root MuiPaginationItem-root MuiPaginationItem-sizeMedium MuiPaginationItem-text MuiPaginationItem-circular Mui-selected MuiPaginationItem-page css-yuzg60-MuiButtonBase-root-MuiPaginationItem-root"
+                tabindex="0"
+                type="button"
+              >
+                1
+                <span
+                  class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+                />
+              </button>
+            </li>
+            <li>
+              <button
+                aria-label="Go to next page"
+                class="MuiButtonBase-root Mui-disabled MuiPaginationItem-root MuiPaginationItem-sizeMedium MuiPaginationItem-text MuiPaginationItem-circular Mui-disabled MuiPaginationItem-previousNext css-yuzg60-MuiButtonBase-root-MuiPaginationItem-root"
+                disabled=""
+                tabindex="-1"
+                type="button"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium MuiPaginationItem-icon css-g2z002-MuiSvgIcon-root-MuiPaginationItem-icon"
+                  data-testid="NavigateNextIcon"
+                  focusable="false"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
+                  />
+                </svg>
+              </button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      <div
+        style="min-width: 220px; min-height: 0px; height: 100%;"
+      >
+        <div
+          class="WellCompletionsPlot"
+          currentitem="false"
+          data-for="plot-tooltip"
+          data-tip="true"
+          id=""
+        />
+        <div
+          class="__react_component_tooltip t00000000-0000-4000-8000-000000000000 place-top type-dark"
+          data-id="tooltip"
+          id="plot-tooltip"
+        >
+          <style
+            aria-hidden="true"
+          >
+            
+  	.t00000000-0000-4000-8000-000000000000 {
+	    color: #fff;
+	    background: #222;
+	    border: 1px solid transparent;
+	    border-radius: undefinedpx;
+	    padding: 8px 21px;
+  	}
+
+  	.t00000000-0000-4000-8000-000000000000.place-top {
+        margin-top: -10px;
+    }
+    .t00000000-0000-4000-8000-000000000000.place-top::before {
+        content: "";
+        background-color: inherit;
+        position: absolute;
+        z-index: 2;
+        width: 20px;
+        height: 12px;
+    }
+    .t00000000-0000-4000-8000-000000000000.place-top::after {
+        content: "";
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border-top-right-radius: undefinedpx;
+        border: 1px solid transparent;
+        background-color: #222;
+        z-index: -2;
+        bottom: -6px;
+        left: 50%;
+        margin-left: -6px;
+        transform: rotate(135deg);
+    }
+
+    .t00000000-0000-4000-8000-000000000000.place-bottom {
+        margin-top: 10px;
+    }
+    .t00000000-0000-4000-8000-000000000000.place-bottom::before {
+        content: "";
+        background-color: inherit;
+        position: absolute;
+        z-index: -1;
+        width: 18px;
+        height: 10px;
+    }
+    .t00000000-0000-4000-8000-000000000000.place-bottom::after {
+        content: "";
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border-top-right-radius: undefinedpx;
+        border: 1px solid transparent;
+        background-color: #222;
+        z-index: -2;
+        top: -6px;
+        left: 50%;
+        margin-left: -6px;
+        transform: rotate(45deg);
+    }
+
+    .t00000000-0000-4000-8000-000000000000.place-left {
+        margin-left: -10px;
+    }
+    .t00000000-0000-4000-8000-000000000000.place-left::before {
+        content: "";
+        background-color: inherit;
+        position: absolute;
+        z-index: -1;
+        width: 10px;
+        height: 18px;
+    }
+    .t00000000-0000-4000-8000-000000000000.place-left::after {
+        content: "";
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border-top-right-radius: undefinedpx;
+        border: 1px solid transparent;
+        background-color: #222;
+        z-index: -2;
+        right: -6px;
+        top: 50%;
+        margin-top: -6px;
+        transform: rotate(45deg);
+    }
+
+    .t00000000-0000-4000-8000-000000000000.place-right {
+        margin-left: 10px;
+    }
+    .t00000000-0000-4000-8000-000000000000.place-right::before {
+        content: "";
+        background-color: inherit;
+        position: absolute;
+        z-index: -1;
+        width: 10px;
+        height: 18px;
+    }
+    .t00000000-0000-4000-8000-000000000000.place-right::after {
+        content: "";
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border-top-right-radius: undefinedpx;
+        border: 1px solid transparent;
+        background-color: #222;
+        z-index: -2;
+        left: -6px;
+        top: 50%;
+        margin-top: -6px;
+        transform: rotate(-135deg);
+    }
+  
+          </style>
+        </div>
+      </div>
+    </div>
+    <div
+      class="MuiDrawer-root MuiDrawer-docked WellCompletionsViewer-drawer WellCompletionsViewer-drawerShift css-7ik032-MuiDrawer-docked"
+    >
+      <div
+        class="MuiPaper-root MuiPaper-elevation MuiPaper-elevation0 MuiDrawer-paper WellCompletionsViewer-drawerPaper MuiDrawer-paperAnchorRight MuiDrawer-paperAnchorDockedRight css-18sg6k4-MuiPaper-root-MuiDrawer-paper"
+        style="visibility: hidden; webkit-transform: translateX(1024px); transform: translateX(1024px);"
+      >
+        <hr
+          class="MuiDivider-root MuiDivider-fullWidth css-9mgopn-MuiDivider-root"
+        />
+        <div
+          class="ZoneSelector-root css-5sbdto react-dropdown-tree-select"
+          id="rdts1"
+        >
+          <div
+            class="dropdown"
+          >
+            <a
+              aria-expanded="false"
+              aria-haspopup="tree"
+              aria-labelledby="rdts1-0_tag"
+              class="dropdown-trigger arrow bottom"
+              id="rdts1_trigger"
+              role="button"
+              tabindex="0"
+            >
+              <ul
+                class="tag-list"
+              >
+                <li
+                  class="tag-item"
+                >
+                  <span
+                    aria-label="All"
+                    class="tag"
+                    id="rdts1-0_tag"
+                  >
+                    All
+                    <button
+                      aria-label="Remove"
+                      aria-labelledby="rdts1-0_button rdts1-0_tag"
+                      class="tag-remove"
+                      id="rdts1-0_button"
+                      type="button"
+                    >
+                      x
+                    </button>
+                  </span>
+                </li>
+                <li
+                  class="tag-item"
+                >
+                  <span
+                    class="placeholder"
+                  >
+                    Select Zone(s)...
+                  </span>
+                </li>
+              </ul>
+            </a>
+          </div>
+        </div>
+        <div
+          class="WellFilter-root css-1mgy1d9"
+        >
+          <span
+            aria-label="sitewide"
+            class="c10"
+            role="search"
+          >
+            <svg
+              aria-labelledby="eds-search-5"
+              class=""
+              fill="currentColor"
+              height="16px"
+              role="img"
+              title="search icon"
+              viewBox="0 0 16 16"
+              width="16px"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <title
+                id="eds-search-5"
+              >
+                search icon
+              </title>
+              <path
+                class=""
+                clip-rule="evenodd"
+                d="M14.966 14.255h.79l4.99 5-1.49 1.49-5-4.99v-.79l-.27-.28a6.471 6.471 0 01-4.23 1.57 6.5 6.5 0 116.5-6.5c0 1.61-.59 3.09-1.57 4.23l.28.27zm-9.71-4.5c0 2.49 2.01 4.5 4.5 4.5s4.5-2.01 4.5-4.5-2.01-4.5-4.5-4.5-4.5 2.01-4.5 4.5z"
+                data-testid="eds-icon-path"
+                fill-rule="evenodd"
+                height="24"
+                transform="scale(0.6666666666666666)"
+              />
+            </svg>
+            <input
+              aria-label="search input"
+              class="c11"
+              id="search-well-name"
+              placeholder="Search well names"
+              role="searchbox"
+              type="search"
+              value=""
+            />
+            <div
+              class="c12"
+              role="button"
+              size="16"
+            >
+              <svg
+                aria-labelledby="eds-close-6"
+                class=""
+                fill="currentColor"
+                height="16px"
+                role="img"
+                title="clear"
+                viewBox="0 0 16 16"
+                width="16px"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <title
+                  id="eds-close-6"
+                >
+                  clear
+                </title>
+                <path
+                  class=""
+                  clip-rule="evenodd"
+                  d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"
+                  data-testid="eds-icon-path"
+                  fill-rule="evenodd"
+                  height="24"
+                  transform="scale(0.6666666666666666)"
+                />
+              </svg>
+            </div>
+          </span>
+        </div>
+        <label
+          class="c13"
+        >
+          <input
+            class="c14 c15"
+            type="checkbox"
+          />
+          <span
+            class="c16 c17"
+          >
+            <span
+              class="c18"
+            />
+            <span
+              class="c19"
+            />
+          </span>
+          <span
+            class="c20"
+          >
+            Filter by completions
+          </span>
+        </label>
+        <div
+          class="WellAttributesSelector-root css-4p3xgu"
+        >
+          <div
+            id="AttributesSelector"
+          >
+            <label>
+              Filter by Attributes
+            </label>
+            <div
+              class="SmartNodeSelector"
+            >
+              <ul
+                class="SmartNodeSelector__Tags--nolinebreak"
+              >
+                <li
+                  class="SmartNodeSelector__Tag "
+                  style="border-width: 1px; border-style: solid;"
+                  title="Enter a new name"
+                >
+                  <div
+                    class="SmartNodeSelector__InnerTag SmartNodeSelector__Valid"
+                  >
+                    <div
+                      class="SmartNodeSelector__InputContainer"
+                    >
+                      <input
+                        placeholder="Add new tag..."
+                        spellcheck="false"
+                        style="width: 50px;"
+                        type="text"
+                        value=""
+                      />
+                    </div>
+                  </div>
+                </li>
+              </ul>
+              <div
+                class="SmartNodeSelector__ClearAll"
+              >
+                <button
+                  disabled=""
+                  title="Clear all"
+                  type="button"
+                />
+              </div>
+              <div
+                class="Suggestions Suggestions__Position"
+              />
+            </div>
+          </div>
+          <p
+            class="c9"
+          >
+            Well selection criteria: 
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
