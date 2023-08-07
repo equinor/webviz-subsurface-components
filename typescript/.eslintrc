@@ -18,7 +18,11 @@
         "plugin:@typescript-eslint/recommended",
         "plugin:prettier/recommended"
       ]
-    }
+    },
+    {
+      "files": ["*.mdx"],
+      "extends": ["plugin:mdx/recommended"],
+    },
   ],
   "settings": {
     "react": {

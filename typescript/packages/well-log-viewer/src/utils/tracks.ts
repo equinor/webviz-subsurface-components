@@ -1344,7 +1344,8 @@ function addStackedTrack(
             );
         }
     } else {
-        if(!meta) // see https://github.com/equinor/webviz-subsurface-components/issues/1613
+        if (!meta)
+            // see https://github.com/equinor/webviz-subsurface-components/issues/1613
             console.error("No color table given in template plot props");
     }
 
