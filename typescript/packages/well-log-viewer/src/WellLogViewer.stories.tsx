@@ -150,8 +150,6 @@ const wellpick = {
     color: "Stratigraphy",
 };
 
-
-
 function getTemplatePlotColorTable(
     template: Template,
     templatePlot: TemplatePlot
@@ -238,8 +236,8 @@ export const Default = StoryTemplate.bind({});
 Default.args = {
     id: "Well-Log-Viewer",
     horizontal: false,
-    welllog: require("../../../../example-data/L898MUD.json")[0],
-    template: require("../../../../example-data/welllog_template_1.json"),
+    welllog: require("../../../../example-data/L898MUD.json")[0],   // eslint-disable-line
+    template: require("../../../../example-data/welllog_template_1.json"),// eslint-disable-line
     colorTables: colorTables,
     wellpick: wellpick,
     axisTitles: axisTitles,
@@ -256,8 +254,8 @@ Horizontal.args = {
     id: "Well-Log-Viewer-Horizontal",
     horizontal: true,
     welllog:
-        require("../../../../example-data/WL_RAW_AAC-BHPR-CAL-DEN-GR-MECH-NEU-NMR-REMP_MWD_3.json")[0],
-    template: require("../../../../example-data/welllog_template_2.json"),
+        require("../../../../example-data/WL_RAW_AAC-BHPR-CAL-DEN-GR-MECH-NEU-NMR-REMP_MWD_3.json")[0],// eslint-disable-line
+    template: require("../../../../example-data/welllog_template_2.json"),// eslint-disable-line
     colorTables: colorTables,
     wellpick: wellpick,
     axisTitles: axisTitles,
@@ -593,8 +591,8 @@ export const Discrete = StoryTemplate.bind({});
 Discrete.args = {
     id: "Well-Log-Viewer-Discrete",
     horizontal: false,
-    welllog: require("../../../../example-data/volve_logs.json")[0],
-    template: require("../../../../example-data/welllog_template_2.json"),
+    welllog: require("../../../../example-data/volve_logs.json")[0],// eslint-disable-line
+    template: require("../../../../example-data/welllog_template_2.json"),// eslint-disable-line
     colorTables: colorTables,
     wellpick: wellpick,
     axisTitles: axisTitles,

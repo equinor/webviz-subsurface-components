@@ -1,196 +1,196 @@
 {
-  "name": "Template 2",
-  "scale": {
-    "primary": "tvd"
-  },
-  "tracks": [
-    {
-      "plots": [
-        {
-          "name": "ZONELOG",
-          "style": "discrete"
-        }
-      ]
+    "name": "Template 2",
+    "scale": {
+        "primary": "tvd"
     },
-    {
-      "plots": [
+    "tracks": [
         {
-          "name": "PORO"
+            "plots": [
+                {
+                    "name": "ZONELOG",
+                    "style": "discrete"
+                }
+            ]
         },
         {
-          "name": "NTG"
+            "plots": [
+                {
+                    "name": "PORO"
+                },
+                {
+                    "name": "NTG"
+                },
+                {
+                    "name": "SW"
+                }
+            ]
         },
         {
-          "name": "SW"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "FAULT_PROXIMITY_FLAG",
+                    "style": "discrete"
+                }
+            ]
+        },
         {
-          "name": "FAULT_PROXIMITY_FLAG",
-          "style": "discrete"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "RDE_ORIG",
+                    "style": "discrete"
+                }
+            ]
+        },
         {
-          "name": "RDE_ORIG",
-          "style": "discrete"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "FACIES",
+                    "style": "discrete"
+                }
+            ]
+        },
         {
-          "name": "FACIES",
-          "style": "discrete"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "ZONE_MAIN",
+                    "style": "discrete"
+                }
+            ]
+        },
         {
-          "name": "ZONE_MAIN",
-          "style": "discrete"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "FaultDistance_HUM",
+                    "style": "discrete"
+                }
+            ]
+        },
         {
-          "name": "FaultDistance_HUM",
-          "style": "discrete"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "BDIA"
+                }
+            ]
+        },
         {
-          "name": "BDIA"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "ROPA"
+                }
+            ]
+        },
         {
-          "name": "ROPA"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "BVW"
+                }
+            ]
+        },
         {
-          "name": "BVW"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "COAL_FLAG"
+                }
+            ]
+        },
         {
-          "name": "COAL_FLAG"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "KLOGH"
+                }
+            ]
+        },
         {
-          "name": "KLOGH"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "PHIF"
+                }
+            ]
+        },
         {
-          "name": "PHIF"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "DD_PRESS"
+                }
+            ]
+        },
         {
-          "name": "DD_PRESS"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "DD_VOLUME"
+                }
+            ]
+        },
         {
-          "name": "DD_VOLUME"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "TEMP",
+                    "type": "linestep"
+                }
+            ]
+        },
         {
-          "name": "TEMP",
-          "type": "linestep"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "DD_PRESS_MOD_1000"
+                }
+            ]
+        },
         {
-          "name": "DD_PRESS_MOD_1000"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "DD_PRESS_MOD_100"
+                }
+            ]
+        },
         {
-          "name": "DD_PRESS_MOD_100"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "RACESLM"
+                }
+            ]
+        },
         {
-          "name": "RACESLM"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "RPAESLM"
+                }
+            ]
+        },
         {
-          "name": "RPAESLM"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "RACELM"
+                }
+            ]
+        },
         {
-          "name": "RACELM"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "RPCELM"
+                }
+            ]
+        },
         {
-          "name": "RPCELM"
-        }
-      ]
-    },
-    {
-      "plots": [
+            "plots": [
+                {
+                    "name": "RAAELM"
+                }
+            ]
+        },
         {
-          "name": "RAAELM"
+            "plots": [
+                {
+                    "name": "RPAELM"
+                }
+            ]
         }
-      ]
-    },
-    {
-      "plots": [
+    ],
+    "styles": [
         {
-          "name": "RPAELM"
+            "name": "discrete",
+            "type": "stacked",
+            "colorTable": "Stratigraphy"
         }
-      ]
-    }
-  ],
-  "styles": [
-    {
-      "name": "discrete",
-      "type": "stacked",
-      "colorTable": "Stratigraphy"
-    }
-  ]
+    ]
 }

@@ -301,32 +301,32 @@ Default.args = {
     horizontal: false,
 
     welllogs: [
-        require("../../../../example-data/L898MUD.json")[0],
-        require("../../../../example-data/L916MUD.json")[0],
-        require("../../../../example-data/Lis1.json")[0],
+        require("../../../../example-data/L898MUD.json")[0],    // eslint-disable-line
+        require("../../../../example-data/L916MUD.json")[0],// eslint-disable-line
+        require("../../../../example-data/Lis1.json")[0],// eslint-disable-line
     ],
     templates: [
-        require("../../../../example-data/synclog_template.json"),
-        require("../../../../example-data/synclog_template.json"),
+        require("../../../../example-data/synclog_template.json"),// eslint-disable-line
+        require("../../../../example-data/synclog_template.json"),// eslint-disable-line
     ],
     colorTables: colorTables,
     wellpicks: [
         {
-            wellpick: require("../../../../example-data/wellpicks.json")[0],
+            wellpick: require("../../../../example-data/wellpicks.json")[0],// eslint-disable-line
             name: "HORIZON",
-            colorTables: require("../../../../example-data/wellpick_colors.json"),
+            colorTables: require("../../../../example-data/wellpick_colors.json"),// eslint-disable-line
             color: "Stratigraphy",
         },
         {
-            wellpick: require("../../../../example-data/wellpicks.json")[1],
+            wellpick: require("../../../../example-data/wellpicks.json")[1],// eslint-disable-line
             name: "HORIZON",
-            colorTables: require("../../../../example-data/wellpick_colors.json"),
+            colorTables: require("../../../../example-data/wellpick_colors.json"),// eslint-disable-line
             color: "Stratigraphy",
         },
         {
-            wellpick: require("../../../../example-data/wellpicks.json")[0],
+            wellpick: require("../../../../example-data/wellpicks.json")[0],// eslint-disable-line
             name: "HORIZON",
-            colorTables: require("../../../../example-data/wellpick_colors.json"),
+            colorTables: require("../../../../example-data/wellpick_colors.json"),// eslint-disable-line
             color: "Stratigraphy",
         },
     ],
@@ -335,7 +335,7 @@ Default.args = {
         patternImages: patternImages,
         names: patternNamesEnglish,
     },
-    patterns: require("../../../../example-data/horizon_patterns.json"),
+    patterns: require("../../../../example-data/horizon_patterns.json"),// eslint-disable-line
 
     wellpickFlatting: ["Hor_2", "Hor_4"],
 

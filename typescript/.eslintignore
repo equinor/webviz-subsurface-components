@@ -1,2 +1,3 @@
 package-lock.json
 **/dist
+packages/well-log-viewer/src/demo/example-data/volve_logs.json
