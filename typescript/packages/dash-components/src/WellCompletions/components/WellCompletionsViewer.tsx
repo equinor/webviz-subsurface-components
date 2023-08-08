@@ -155,7 +155,7 @@ export const WellCompletionsViewer: React.FC = () => {
                                     }}
                                 >
                                     <WellCompletionsPlot
-                                        id={""}
+                                        id={"well-completions-plot"}
                                         timeSteps={data.timeSteps}
                                         plotData={dataInCurrentPage}
                                     />

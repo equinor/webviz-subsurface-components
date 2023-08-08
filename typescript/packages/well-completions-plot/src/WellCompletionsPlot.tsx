@@ -1,15 +1,17 @@
 import React from "react";
 import { useResizeDetector } from "react-resize-detector";
-import { PlotData } from "./types/dataTypes";
 import { TooltipProvider } from "./components/TooltipProvider";
 import { CompletionsPlot } from "./components/CompletionsPlot";
 import { createLayout, Padding } from "./types/layoutTypes";
 import { StratigraphyPlot } from "./components/StratigraphyPlot";
 import { WellsPlot } from "./components/WellsPlot";
 
+import { PlotData } from "./types/dataTypes";
+export { PlotData } from "./types/dataTypes";
+
 import "./WellCompletionsPlot.css";
 
-interface WellCompletionsPlotProps {
+export interface WellCompletionsPlotProps {
     id: string;
     timeSteps: string[];
     plotData: PlotData;
@@ -43,7 +45,7 @@ export const WellCompletionsPlot: React.FC<WellCompletionsPlotProps> =
                     data-tip
                     data-for="plot-tooltip"
                 >
-                    {layout && (
+                    {layout && props.plotData && (
                         <svg
                             id={"svg-context"}
                             width={width}
@@ -51,7 +53,7 @@ export const WellCompletionsPlot: React.FC<WellCompletionsPlotProps> =
                             style={{ position: "relative" }}
                         >
                             <StratigraphyPlot
-                                data={props.plotData.stratigraphy}
+                                data={props.plotData?.stratigraphy ?? []}
                                 layout={layout}
                                 padding={padding}
                             />
