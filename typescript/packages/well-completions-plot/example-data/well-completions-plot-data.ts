@@ -1,7 +1,7 @@
 import { PlotData } from "../src/WellCompletionsPlot";
 
 /**
- * This is example data extracted from the well-completions.json file found for the `package/src/WellCompletions`-package.
+ * This is example data based on the Well Completions data in `well-completions.json`-file found in the `example-data`-folder.
  *
  * Some data has been removed to make the example data smaller. Mainly it's less time steps and less wells, but the data
  * is to show how the plot occurs with given PlotData data structure.

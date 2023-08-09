@@ -8,7 +8,7 @@ import { WellCompletions } from "./WellCompletions";
 import logTimes, { obj } from "./test/performanceMetrics";
 import { Data } from "./redux/types";
 
-import exampleData from "./example-data/well-completions.json";
+import exampleData from "../../../../../example-data/well-completions.json";
 
 window.ResizeObserver =
     window.ResizeObserver ||

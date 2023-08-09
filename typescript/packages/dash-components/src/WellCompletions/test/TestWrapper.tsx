@@ -5,7 +5,7 @@ import { createReduxStore } from "../redux/store";
 import { testState } from "./testReduxState";
 import { Data } from "../redux/types";
 
-import exampleData from "../example-data/well-completions.json";
+import exampleData from "../../../../../../example-data/well-completions.json";
 
 export const testStore = createReduxStore(testState);
 testStore.dispatch = jest.fn() as never;
