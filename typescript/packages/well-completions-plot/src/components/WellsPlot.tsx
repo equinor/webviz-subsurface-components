@@ -25,7 +25,6 @@ export const WellsPlot: React.FC<WellsPlotProps> = ({
     const barHeight =
         layout.yExtent / Math.max(plotData.stratigraphy.length, 1);
 
-    // TODO: Add on pointer down for touch devices
     const onMouseOver = React.useCallback(
         (well: WellPlotData) => {
             setContent(() => (
@@ -57,7 +56,6 @@ export const WellsPlot: React.FC<WellsPlotProps> = ({
         [setContent]
     );
 
-    // TODO: Add on pointer up for touch devices
     const onMouseOut = React.useCallback(
         () => setContent(() => null),
         [setContent]
