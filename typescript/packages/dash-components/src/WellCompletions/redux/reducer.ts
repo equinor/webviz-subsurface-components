@@ -5,7 +5,7 @@ import {
     // eslint-disable-next-line prettier/prettier
     UISettings,
 } from "./types";
-import { SortDirection } from "../../../../well-completions-plot/src/types/dataTypes";
+import { SortDirection } from "../../../../well-completions-plot/src";
 
 export const idSlice = createSlice({
     name: "id",

@@ -9,7 +9,7 @@ import { useDispatch } from "react-redux";
 import { updateFilteredZones } from "../../redux/actions";
 import { findSubzones } from "../../utils/dataUtil";
 import { DataContext } from "../DataLoader";
-import { Zone } from "../../../../../well-completions-plot/src/types/dataTypes";
+import { Zone } from "../../../../../well-completions-plot/src";
 
 const PREFIX = "ZoneSelector";
 

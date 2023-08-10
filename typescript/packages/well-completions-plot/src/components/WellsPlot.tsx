@@ -1,10 +1,53 @@
 /* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
 
 import React from "react";
-import { PlotData, SortBy, WellPlotData } from "../types/dataTypes";
+import {
+    AttributeType,
+    PlotData,
+    SortBy,
+    SortByString,
+    WellPlotData,
+} from "../types/dataTypes";
 import { capitalizeFirstLetter } from "../utils/stringUtil";
 import { useTooltip } from "./TooltipProvider";
 import { Padding, PlotLayout } from "../types/layoutTypes";
+
+interface WellTooltipContentProps {
+    name: string;
+    earliestCompDate: string;
+    attributes: Record<string, AttributeType>;
+}
+
+const WellTooltipContent: React.FC<WellTooltipContentProps> = (
+    props: WellTooltipContentProps
+) => {
+    return (
+        <table style={{ color: "#fff" }}>
+            <tbody>
+                {/* earliest completion date */}
+                <tr key={`well-tooltip-${props.name}-earliest-comp`}>
+                    <td>
+                        <b>
+                            {capitalizeFirstLetter(
+                                SortByString[SortBy.CompletionDate]
+                            )}
+                        </b>
+                    </td>
+                    <td>{props.earliestCompDate}</td>
+                </tr>
+                {Object.entries(props.attributes).map(([key, value]) => (
+                    <tr key={`well-tooltip-${name}-${key}`}>
+                        <td>
+                            <b>{capitalizeFirstLetter(key)}</b>
+                        </td>
+                        <td>{value || "Undefined"}</td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+    );
+};
+WellTooltipContent.displayName = "WellTooltipContent";
 
 interface WellsPlotProps {
     timeSteps: string[];
@@ -12,57 +55,40 @@ interface WellsPlotProps {
     layout: PlotLayout;
     padding: Padding;
 }
+
 /* eslint-disable react/prop-types */
-export const WellsPlot: React.FC<WellsPlotProps> = ({
-    timeSteps,
-    plotData,
-    layout,
-    padding,
-}) => {
+export const WellsPlot: React.FC<WellsPlotProps> = (props: WellsPlotProps) => {
     const { setContent } = useTooltip();
 
-    const wellWidth = layout.xExtent / Math.max(plotData.wells.length, 1);
+    const wellWidth =
+        props.layout.xExtent / Math.max(props.plotData.wells.length, 1);
     const barHeight =
-        layout.yExtent / Math.max(plotData.stratigraphy.length, 1);
+        props.layout.yExtent / Math.max(props.plotData.stratigraphy.length, 1);
 
     const onMouseOver = React.useCallback(
-        (well: WellPlotData) => {
+        function onMouseOver(well: WellPlotData): void {
             setContent(() => (
-                <table style={{ color: "#fff" }}>
-                    <tbody>
-                        {/* earliest completion date */}
-                        <tr key={`well-tooltip-${well.name}-earliest-comp`}>
-                            <td>
-                                <b>
-                                    {capitalizeFirstLetter(
-                                        SortBy.CompletionDate
-                                    )}
-                                </b>
-                            </td>
-                            <td>{timeSteps[well.earliestCompDateIndex]}</td>
-                        </tr>
-                        {Object.entries(well.attributes).map(([key, value]) => (
-                            <tr key={`well-tooltip-${well.name}-${key}`}>
-                                <td>
-                                    <b>{capitalizeFirstLetter(key)}</b>
-                                </td>
-                                <td>{value || "Undefined"}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                <WellTooltipContent
+                    name={well.name}
+                    earliestCompDate={
+                        props.timeSteps[well.earliestCompDateIndex]
+                    }
+                    attributes={well.attributes}
+                />
             ));
         },
-        [setContent]
+        [setContent, props.timeSteps]
     );
 
     const onMouseOut = React.useCallback(
-        () => setContent(() => null),
+        function onMouseOut(): void {
+            setContent(() => null);
+        },
         [setContent]
     );
     return (
         <g>
-            {plotData.wells.map((well, i) => {
+            {props.plotData.wells.map((well, i) => {
                 const lastCompletion = Array.from(well.completions)
                     .reverse()
                     .find((comp) => comp.open + comp.shut > 0);
@@ -72,7 +98,7 @@ export const WellsPlot: React.FC<WellsPlotProps> = ({
                 return (
                     <g
                         transform={`translate(${
-                            padding.left + (i + 0.5) * wellWidth
+                            props.padding.left + (i + 0.5) * wellWidth
                         },0)`}
                         key={`well-${well.name}`}
                     >
@@ -80,7 +106,7 @@ export const WellsPlot: React.FC<WellsPlotProps> = ({
                             style={{ fontSize: "9px" }}
                             textAnchor="start"
                             transform={`translate(0,${
-                                padding.top - 10
+                                props.padding.top - 10
                             }) rotate(-60)`}
                             x={0}
                             y={0}
@@ -92,7 +118,7 @@ export const WellsPlot: React.FC<WellsPlotProps> = ({
                             {well.name}
                         </text>
                         <rect
-                            transform={`translate(0,${padding.top - 4})`}
+                            transform={`translate(0,${props.padding.top - 4})`}
                             width={0.5}
                             height={height + 4}
                             fill={"#111"}

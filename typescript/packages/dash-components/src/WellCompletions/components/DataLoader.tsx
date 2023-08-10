@@ -4,7 +4,7 @@ import { createReduxStore } from "../redux/store";
 import { Data, UISettings } from "../redux/types";
 import { findSubzones, preprocessData } from "../utils/dataUtil";
 
-import { Zone } from "../../../../well-completions-plot/src/types/dataTypes";
+import { Zone } from "../../../../well-completions-plot/src";
 
 interface Props {
     id: string;

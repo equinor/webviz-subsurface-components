@@ -1,2 +1,20 @@
 export { WellCompletionsPlot } from "./WellCompletionsPlot";
-export { CompletionPlotData, PlotData, WellPlotData } from "./types/dataTypes";
+
+export {
+    AttributeTypePropType,
+    SortBy,
+    SortByString,
+    SortDirection,
+    UnitsPropType,
+    WellInfoPropType,
+    ZonePropTypes,
+} from "./types/dataTypes";
+export type {
+    AttributeType,
+    CompletionPlotData,
+    PlotData,
+    Units,
+    WellInfo,
+    WellPlotData,
+    Zone,
+} from "./types/dataTypes";

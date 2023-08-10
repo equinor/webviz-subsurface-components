@@ -8,7 +8,7 @@ import {
     WellInfo,
     WellPlotData,
     Zone,
-} from "../../../../well-completions-plot/src/types/dataTypes";
+} from "../../../../well-completions-plot/src";
 
 /**
  * Preprocess the input data by finding the earliest completion date

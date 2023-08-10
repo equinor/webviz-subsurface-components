@@ -6,11 +6,18 @@ export enum SortDirection {
     Ascending = "Ascending",
     Descending = "Descending",
 }
+
 export enum SortBy {
     Name = "well name",
     StratigraphyDepth = "stratigraphy depth",
     CompletionDate = "earliest comp date",
 }
+
+export const SortByString = {
+    [SortBy.Name]: "well name",
+    [SortBy.StratigraphyDepth]: "stratigraphy depth",
+    [SortBy.CompletionDate]: "earliest comp date",
+};
 
 export interface Zone {
     name: string;
@@ -57,6 +64,10 @@ const ZoneShape: React.WeakValidationMap<Zone> = {
     name: PropTypes.string.isRequired,
     color: PropTypes.string.isRequired,
 };
+
+// Note: This is a solution for recursive definition for subzones, as subzones is an optional array of ZoneShape.
+// - Object.assign() resolves the issue of subzones being optional.
+// - PropTypes.arrayOf(PropTypes.shape(ZoneShape).isRequired) resolves the issue of subzones being recursive.
 Object.assign(ZoneShape, {
     subzones: PropTypes.arrayOf(PropTypes.shape(ZoneShape).isRequired),
 });

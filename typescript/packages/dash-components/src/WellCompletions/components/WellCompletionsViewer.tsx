@@ -7,7 +7,7 @@ import ReactResizeDetector from "react-resize-detector";
 import { usePlotData } from "../hooks/usePlotData";
 import { WellCompletionsState } from "../redux/store";
 import { DataContext } from "./DataLoader";
-import { WellCompletionsPlot } from "../../../../well-completions-plot/src/WellCompletionsPlot";
+import { WellCompletionsPlot } from "../../../../well-completions-plot/src";
 import HideZeroCompletionsSwitch from "./Settings/HideZeroCompletionsSwitch";
 import SettingsBar from "./Settings/SettingsBar";
 import WellAttributesSelector from "./Settings/WellAttributesSelector";
@@ -90,7 +90,13 @@ const Root = styled("div")(({ theme }) => ({
 
 const drawerWidth = 270;
 
-export const WellCompletionsViewer: React.FC = () => {
+export interface WellCompletionsViewerProps {
+    parentId: string;
+}
+
+export const WellCompletionsViewer: React.FC<WellCompletionsViewerProps> = (
+    props: WellCompletionsViewerProps
+) => {
     // Use input data directly
     const data = useContext(DataContext);
     // Create plot data with the selected time step(s)
@@ -155,7 +161,7 @@ export const WellCompletionsViewer: React.FC = () => {
                                     }}
                                 >
                                     <WellCompletionsPlot
-                                        id={"well-completions-plot"}
+                                        id={`${props.parentId}-well-completions-plot`}
                                         timeSteps={data.timeSteps}
                                         plotData={dataInCurrentPage}
                                     />

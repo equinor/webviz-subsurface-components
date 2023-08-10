@@ -1,24 +1,25 @@
 import {
     AttributeType,
     SortBy,
+    SortByString,
     SortDirection,
     WellPlotData,
-} from "../../../../well-completions-plot/src/types/dataTypes";
+} from "../../../../well-completions-plot/src";
 
 // Default sort methods
 export const createAttributeKeyFunction = (
     sortMethod: string
 ): ((well: WellPlotData) => AttributeType) => {
     switch (sortMethod) {
-        case SortBy.Name:
+        case SortByString[SortBy.Name]:
             return (well) => well.name;
-        case SortBy.StratigraphyDepth:
+        case SortByString[SortBy.StratigraphyDepth]:
             return (well) =>
                 well.completions.find(
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                     (_, index) => well.completions[index]!.open > 0
                 )?.zoneIndex;
-        case SortBy.CompletionDate:
+        case SortByString[SortBy.CompletionDate]:
             return (well) => well.earliestCompDateIndex;
         default:
             return (well) => well.attributes[sortMethod];

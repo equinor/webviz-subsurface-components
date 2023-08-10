@@ -9,10 +9,7 @@ import {
     createAttributePredicate,
     findSubzones,
 } from "../utils/dataUtil";
-import {
-    PlotData,
-    Zone,
-} from "../../../../well-completions-plot/src/types/dataTypes";
+import { PlotData, Zone } from "../../../../well-completions-plot/src";
 import { createSortFunction } from "../utils/sort";
 import { getRegexPredicate } from "../utils/stringUtil";
 

@@ -1,4 +1,4 @@
-import { PlotData } from "../src/WellCompletionsPlot";
+import { PlotData } from "../src/index";
 
 /**
  * This is example data based on the Well Completions data in `well-completions.json`-file found in the `example-data`-folder.

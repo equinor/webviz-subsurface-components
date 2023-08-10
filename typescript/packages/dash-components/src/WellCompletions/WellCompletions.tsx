@@ -56,7 +56,7 @@ export const WellCompletions: React.FC<WellCompletionsProps> = React.memo(
             return <ErrorPlaceholder text={JSON.stringify(validate.errors)} />;
         return (
             <DataProvider id={id} data={data}>
-                <WellCompletionsViewer />
+                <WellCompletionsViewer parentId={id} />
             </DataProvider>
         );
     }

@@ -1,5 +1,6 @@
 import React from "react";
-import { PlotData, WellCompletionsPlot } from "./WellCompletionsPlot";
+import { WellCompletionsPlot } from "./WellCompletionsPlot";
+import { PlotData } from "./index";
 
 import {
     timeSteps,
@@ -27,12 +28,12 @@ const Template = (data) => {
     const [plotData, setPlotData] = React.useState<PlotData>(data.plotData);
     const [timeSteps, setTimeSteps] = React.useState<string[]>(data.timeSteps);
 
-    React.useEffect(() => {
+    const [prevData, setPrevData] = React.useState(data);
+    if (data !== prevData) {
+        setPrevData(data);
         setPlotData(data.plotData);
-    }, [data.plotData]);
-    React.useEffect(() => {
         setTimeSteps(data.timeSteps);
-    }, [data.timeSteps]);
+    }
 
     const handleFirstButtonClick = () => {
         setPlotData(firstPlotData);

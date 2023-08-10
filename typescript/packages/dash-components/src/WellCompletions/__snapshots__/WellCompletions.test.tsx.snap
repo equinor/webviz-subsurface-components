@@ -836,7 +836,7 @@ exports[`Test Well Completion Component snapshot test 1`] = `
           currentitem="false"
           data-for="plot-tooltip"
           data-tip="true"
-          id="well-completions-plot"
+          id="-well-completions-plot"
         />
         <div
           class="__react_component_tooltip t00000000-0000-4000-8000-000000000000 place-top type-dark"

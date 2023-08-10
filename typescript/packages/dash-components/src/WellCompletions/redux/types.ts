@@ -8,7 +8,7 @@ import {
     WellInfo,
     Zone,
     ZonePropTypes,
-} from "../../../../well-completions-plot/src/types/dataTypes";
+} from "../../../../well-completions-plot/src";
 
 export interface Data {
     version: string;

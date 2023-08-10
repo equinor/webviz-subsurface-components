@@ -12,22 +12,22 @@ const shortenName = (str: string) =>
     str.length >= 13 ? "..." + str.substring(str.length - 10, str.length) : str;
 /* eslint-disable react/prop-types */
 export const StratigraphyPlot: React.FC<StratigraphyPlotProps> = React.memo(
-    ({ data, layout, padding }) => {
-        const barHeight = layout.yExtent / Math.max(data.length, 1);
+    (props: StratigraphyPlotProps) => {
+        const barHeight = props.layout.yExtent / Math.max(props.data.length, 1);
 
         return (
             <g>
-                {data.map((zone, i) => {
+                {props.data.map((zone, i) => {
                     return (
                         <g
                             transform={`translate(0,${
-                                padding.top + i * barHeight
+                                props.padding.top + i * barHeight
                             })`}
                             key={`zone-${zone.name}`}
                         >
                             <rect
-                                transform={`translate(${padding.left}, 0)`}
-                                width={layout.xExtent}
+                                transform={`translate(${props.padding.left}, 0)`}
+                                width={props.layout.xExtent}
                                 height={barHeight}
                                 fill={zone.color}
                             />
@@ -35,7 +35,7 @@ export const StratigraphyPlot: React.FC<StratigraphyPlotProps> = React.memo(
                             <text
                                 style={{ fontSize: "11px" }}
                                 textAnchor="end"
-                                x={padding.left - 4}
+                                x={props.padding.left - 4}
                                 y={barHeight / 2}
                                 dy={".35em"}
                                 fontFamily={"sans-serif"}

@@ -5,6 +5,57 @@ import { CompletionPlotData, PlotData, WellPlotData } from "../types/dataTypes";
 import { useTooltip } from "./TooltipProvider";
 import { Padding, PlotLayout } from "../types/layoutTypes";
 
+interface CompletionTooltipContentProps {
+    zoneName: string;
+    wellName: string;
+    completionData: CompletionPlotData;
+    khUnit: string;
+    decimalPlaces: number;
+}
+
+const CompletionTooltipContent: React.FC<CompletionTooltipContentProps> = (
+    props: CompletionTooltipContentProps
+) => {
+    return (
+        <table style={{ color: "#fff" }}>
+            <tbody>
+                {[
+                    ["Well name", props.wellName],
+                    ["Stratigraphy", props.zoneName],
+                    ["Open", props.completionData.open],
+                    ["Shut", props.completionData.shut],
+                    [
+                        "Kh Mean",
+                        `${props.completionData.khMean.toFixed(
+                            props.decimalPlaces
+                        )}${props.khUnit}`,
+                    ],
+                    [
+                        "Kh Min",
+                        `${props.completionData.khMin.toFixed(
+                            props.decimalPlaces
+                        )}${props.khUnit}`,
+                    ],
+                    [
+                        "Kh Max",
+                        `${props.completionData.khMax.toFixed(
+                            props.decimalPlaces
+                        )}${props.khUnit}`,
+                    ],
+                ].map(([key, value]) => (
+                    <tr key={`tooltip-${key}-${value}`}>
+                        <td>
+                            <b>{key}</b>
+                        </td>
+                        <td>{value}</td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+    );
+};
+CompletionTooltipContent.displayName = "CompletionTooltipContent";
+
 interface CompletionsPlotProps {
     plotData: PlotData;
     layout: PlotLayout;
@@ -12,83 +63,58 @@ interface CompletionsPlotProps {
 }
 
 /* eslint-disable react/prop-types */
-export const CompletionsPlot: React.FC<CompletionsPlotProps> = ({
-    plotData,
-    layout,
-    padding,
-}) => {
+export const CompletionsPlot: React.FC<CompletionsPlotProps> = (
+    props: CompletionsPlotProps
+) => {
     const { setContent } = useTooltip();
-    const decimalPlaces = plotData.units.kh.decimalPlaces;
+    const decimalPlaces = props.plotData.units.kh.decimalPlaces;
     const khUnit =
-        plotData.units.kh.unit.length > 0 ? ` ${plotData.units.kh.unit}` : "";
-    const wellWidth = layout.xExtent / Math.max(plotData.wells.length, 1);
+        props.plotData.units.kh.unit.length > 0
+            ? ` ${props.plotData.units.kh.unit}`
+            : "";
+    const wellWidth =
+        props.layout.xExtent / Math.max(props.plotData.wells.length, 1);
     const barHeight =
-        layout.yExtent / Math.max(plotData.stratigraphy.length, 1);
+        props.layout.yExtent / Math.max(props.plotData.stratigraphy.length, 1);
 
     const onMouseMove = React.useCallback(
-        (
+        function onMouseOver(
             e: React.MouseEvent<SVGRectElement>,
             well: WellPlotData,
             completion: CompletionPlotData
-        ) => {
+        ): void {
             const zoneName =
-                plotData.stratigraphy[
+                props.plotData.stratigraphy[
                     Math.floor(
-                        (e.nativeEvent.offsetY - padding.top) / barHeight
+                        (e.nativeEvent.offsetY - props.padding.top) / barHeight
                     )
                 ].name;
             setContent(() => (
-                <table style={{ color: "#fff" }}>
-                    <tbody>
-                        {[
-                            ["Well name", well.name],
-                            ["Stratigraphy", zoneName],
-                            ["Open", completion.open],
-                            ["Shut", completion.shut],
-                            [
-                                "Kh Mean",
-                                `${completion.khMean.toFixed(
-                                    decimalPlaces
-                                )}${khUnit}`,
-                            ],
-                            [
-                                "Kh Min",
-                                `${completion.khMin.toFixed(
-                                    decimalPlaces
-                                )}${khUnit}`,
-                            ],
-                            [
-                                "Kh Max",
-                                `${completion.khMax.toFixed(
-                                    decimalPlaces
-                                )}${khUnit}`,
-                            ],
-                        ].map(([key, value]) => (
-                            <tr key={`tooltip-${key}-${value}`}>
-                                <td>
-                                    <b>{key}</b>
-                                </td>
-                                <td>{value}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                <CompletionTooltipContent
+                    zoneName={zoneName}
+                    wellName={well.name}
+                    completionData={completion}
+                    khUnit={khUnit}
+                    decimalPlaces={decimalPlaces}
+                />
             ));
         },
-        [setContent, plotData.stratigraphy, barHeight]
+        [setContent, props.plotData.stratigraphy, barHeight]
     );
 
     const onMouseOut = React.useCallback(
-        () => setContent(() => null),
+        function onMouseOut(): void {
+            setContent(() => null);
+        },
         [setContent]
     );
     return (
         <g>
-            {plotData.wells.map((well, i) => {
+            {props.plotData.wells.map((well, i) => {
                 return (
                     <g
                         transform={`translate(${
-                            padding.left + (i + 0.5) * wellWidth
+                            props.padding.left + (i + 0.5) * wellWidth
                         }, ${0})`}
                         key={`well-${well.name}-completions`}
                     >
@@ -96,7 +122,7 @@ export const CompletionsPlot: React.FC<CompletionsPlotProps> = ({
                             const start = completion.zoneIndex;
                             const end =
                                 j === well.completions.length - 1
-                                    ? plotData.stratigraphy.length
+                                    ? props.plotData.stratigraphy.length
                                     : well.completions[j + 1].zoneIndex;
                             const totalWidth =
                                 completion.open + completion.shut;
@@ -106,7 +132,10 @@ export const CompletionsPlot: React.FC<CompletionsPlotProps> = ({
                                         key={`well-${well.name}-completions-${j}-shut-left`}
                                         transform={`translate(${
                                             -totalWidth * wellWidth * 0.25
-                                        }, ${start * barHeight + padding.top})`}
+                                        }, ${
+                                            start * barHeight +
+                                            props.padding.top
+                                        })`}
                                         width={
                                             (completion.shut * wellWidth) / 4
                                         }
@@ -121,7 +150,10 @@ export const CompletionsPlot: React.FC<CompletionsPlotProps> = ({
                                         key={`well-${well.name}-completions-${j}-open`}
                                         transform={`translate(${
                                             -completion.open * wellWidth * 0.25
-                                        }, ${start * barHeight + padding.top})`}
+                                        }, ${
+                                            start * barHeight +
+                                            props.padding.top
+                                        })`}
                                         width={
                                             (completion.open * wellWidth) / 2
                                         }
@@ -138,7 +170,10 @@ export const CompletionsPlot: React.FC<CompletionsPlotProps> = ({
                                             (totalWidth - completion.shut) *
                                             wellWidth *
                                             0.25
-                                        }, ${start * barHeight + padding.top})`}
+                                        }, ${
+                                            start * barHeight +
+                                            props.padding.top
+                                        })`}
                                         width={
                                             (completion.shut * wellWidth) / 4
                                         }
