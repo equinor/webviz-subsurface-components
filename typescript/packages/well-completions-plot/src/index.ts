@@ -3,7 +3,7 @@ export { WellCompletionsPlot } from "./WellCompletionsPlot";
 export {
     AttributeTypePropType,
     SortBy,
-    SortByString,
+    SortByEnumToStringMapping,
     SortDirection,
     UnitsPropType,
     WellInfoPropType,

@@ -44,7 +44,7 @@ export const WellCompletionsPlot: React.FC<WellCompletionsPlotProps> =
                 >
                     {layout && props.plotData && (
                         <svg
-                            id={"svg-context"}
+                            id={`${props.id}-svg-context`}
                             width={width}
                             height={height}
                             style={{ position: "relative" }}

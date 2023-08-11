@@ -13,10 +13,10 @@ export enum SortBy {
     CompletionDate = "earliest comp date",
 }
 
-export const SortByString = {
-    [SortBy.Name]: "well name",
-    [SortBy.StratigraphyDepth]: "stratigraphy depth",
-    [SortBy.CompletionDate]: "earliest comp date",
+export const SortByEnumToStringMapping = {
+    [SortBy.Name]: "Well name",
+    [SortBy.StratigraphyDepth]: "Stratigraphy depth",
+    [SortBy.CompletionDate]: "Earliest comp date",
 };
 
 export interface Zone {

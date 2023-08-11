@@ -1,5 +1,5 @@
 import { UISettings } from "../redux/types";
-import { SortBy, SortByString } from "../../../../well-completions-plot/src";
+import { SortBy } from "../../../../well-completions-plot/src";
 
 export const testState = {
     id: "test",
@@ -17,9 +17,9 @@ export const testState = {
     } as UISettings,
     attributes: {
         attributeKeys: [
-            SortByString[SortBy.Name],
-            SortByString[SortBy.StratigraphyDepth],
-            SortByString[SortBy.CompletionDate],
+            SortBy.Name,
+            SortBy.StratigraphyDepth,
+            SortBy.CompletionDate,
             "type",
             "region",
             "user defined category",

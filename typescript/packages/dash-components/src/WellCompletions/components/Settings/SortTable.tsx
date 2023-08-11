@@ -8,7 +8,6 @@ import { deleteSortKey, updateSortKey } from "../../redux/actions";
 import { WellCompletionsState } from "../../redux/store";
 import {
     SortBy,
-    SortByString,
     SortDirection,
 } from "../../../../../well-completions-plot/src";
 
@@ -68,9 +67,9 @@ const SortTable: React.FC = React.memo(() => {
     // Apart from the user defined attribute, we can also sort by well name, stratigraphy depth etc
     const sortKeys = useMemo(() => {
         const keys = new Set<string>([
-            SortByString[SortBy.Name],
-            SortByString[SortBy.StratigraphyDepth],
-            SortByString[SortBy.CompletionDate],
+            SortBy.Name,
+            SortBy.StratigraphyDepth,
+            SortBy.CompletionDate,
         ]);
         attributeKeys.forEach((key) => keys.add(key));
         return keys;

@@ -5,7 +5,7 @@ import {
     AttributeType,
     PlotData,
     SortBy,
-    SortByString,
+    SortByEnumToStringMapping,
     WellPlotData,
 } from "../types/dataTypes";
 import { capitalizeFirstLetter } from "../utils/stringUtil";
@@ -28,9 +28,7 @@ const WellTooltipContent: React.FC<WellTooltipContentProps> = (
                 <tr key={`well-tooltip-${props.name}-earliest-comp`}>
                     <td>
                         <b>
-                            {capitalizeFirstLetter(
-                                SortByString[SortBy.CompletionDate]
-                            )}
+                            {SortByEnumToStringMapping[SortBy.CompletionDate]}
                         </b>
                     </td>
                     <td>{props.earliestCompDate}</td>
