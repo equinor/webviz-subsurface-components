@@ -15,7 +15,7 @@
   "author": "Equinor <opensource@equinor.com>",
   "license": "MPL-2.0",
   "dependencies": {
-    "@equinor/eds-core-react": "^0.12.1",
+    "@equinor/eds-core-react": "^0.32.3",
     "@reduxjs/toolkit": "^1.7.2",
     "d3": "^7.8.2",
     "lodash": "^4.17.21",
