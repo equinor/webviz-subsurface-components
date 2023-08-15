@@ -22,7 +22,7 @@ interface WellCompletionsProps {
  */
 export const WellCompletions: React.FC<WellCompletionsProps> = React.memo(
     ({ id, data }: WellCompletionsProps) => {
-        const validate = React.useMemo(() => ajv.compile(inputSchema), [inputSchema]);
+        const validate = React.useMemo(() => ajv.compile(inputSchema), []);
         //check against the json schema
         const isSchemaValid = React.useMemo(
             () => validate(data),
