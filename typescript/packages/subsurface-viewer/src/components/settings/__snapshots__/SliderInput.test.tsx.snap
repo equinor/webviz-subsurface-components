@@ -28,7 +28,6 @@ exports[`Test Slider Input snapshot test 1`] = `
 }
 
 .c4 {
-  --val: 5000;
   --realWidth: calc(100% - 12px);
   width: -webkit-fit-content;
   width: -moz-fit-content;
@@ -86,13 +85,13 @@ exports[`Test Slider Input snapshot test 1`] = `
 }
 
 .c3[data-focus-visible-added]:focus::-webkit-slider-thumb {
-  outline: 1px dashed var(--eds_interactive__focus,rgba(0,112,121,1));
-  outline-offset: 2px;
+  outline: 2px dashed var(--eds_interactive__focus,rgba(0,112,121,1));
+  outline-offset: 3px;
 }
 
 .c3[data-focus-visible-added]:focus::-moz-range-thumb {
-  outline: 1px dashed var(--eds_interactive__focus,rgba(0,112,121,1));
-  outline-offset: 2px;
+  outline: 2px dashed var(--eds_interactive__focus,rgba(0,112,121,1));
+  outline-offset: 3px;
 }
 
 .c3:focus-visible {
@@ -100,13 +99,13 @@ exports[`Test Slider Input snapshot test 1`] = `
 }
 
 .c3:focus-visible::-webkit-slider-thumb {
-  outline: 1px dashed var(--eds_interactive__focus,rgba(0,112,121,1));
-  outline-offset: 2px;
+  outline: 2px dashed var(--eds_interactive__focus,rgba(0,112,121,1));
+  outline-offset: 3px;
 }
 
 .c3:focus-visible::-moz-range-thumb {
-  outline: 1px dashed var(--eds_interactive__focus,rgba(0,112,121,1));
-  outline-offset: 2px;
+  outline: 2px dashed var(--eds_interactive__focus,rgba(0,112,121,1));
+  outline-offset: 3px;
 }
 
 .c3:disabled::-webkit-slider-thumb {
@@ -173,17 +172,14 @@ exports[`Test Slider Input snapshot test 1`] = `
 }
 
 .c2 {
-  --min: 0;
-  --max: 100;
   --dif: calc(var(--max) - var(--min));
-  --value: 5000;
   --realWidth: calc(100% - 12px);
   display: grid;
   grid-template-rows: max-content 24px;
   grid-template-columns: 1fr 1fr;
   width: 100%;
   position: relative;
-  background-image: url("data:image/svg+xml,<svg xmlns='http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'><rect x='0' y='11' fill='var(--eds_ui_background__light, rgba(247, 247, 247, 1))' width='100%' height='4' rx='2' /></svg>");background-size:cover;background-repeat:no-repeat;} .c2::after{grid-column:1 / span 2;grid-row:2;height:4px;margin-bottom:9px;-webkit-align-self:end;-ms-flex-item-align:end;align-self:end;content:'';background:var(--eds_interactive_primary__resting,rgba(0,112,121,1));} .c2::after{margin-right:calc( (var(--max) - var(--value)) / var(--dif) * var(--realWidth) );margin-left:3px;} @media (hover:hover) and (pointer:fine){.c2:hover:not([disabled]){background-image:url("data:image/svg+xml,<svg xmlns='http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'><rect x='0' y='11' fill='var(--eds_ui_background__medium, rgba(220, 220, 220, 1))' width='100%' height='4' rx='2' /></svg>");
+  background-image: url("data:image/svg+xml,<svg xmlns='http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'><rect x='0' y='11' fill='var(--eds_ui_background__light, rgba(247, 247, 247, 1))' width='100%' height='4' rx='2' /></svg>");background-size:cover;background-repeat:no-repeat;} .c2::after{grid-column:1 / span 2;grid-row:2;height:4px;margin-bottom:9px;-webkit-align-self:end;-ms-flex-item-align:end;align-self:end;content:'';background:var(--background);} .c2::after{margin-right:calc( (var(--max) - var(--value)) / var(--dif) * var(--realWidth) );margin-left:3px;} @media (hover:hover) and (pointer:fine){.c2:hover:not([disabled]){background-image:url("data:image/svg+xml,<svg xmlns='http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'><rect x='0' y='11' fill='var(--eds_ui_background__medium, rgba(220, 220, 220, 1))' width='100%' height='4' rx='2' /></svg>");
 }
 
 .c2:hover:not([disabled])::after {
@@ -239,15 +235,17 @@ exports[`Test Slider Input snapshot test 1`] = `
   <div
     class="c2"
     id="Opacity-slider"
-    max="100"
-    min="0"
-    style="padding-top: 5px; padding-right: 10px; padding-bottom: 25px; width: 3rem;"
+    style="padding-top: 5px; padding-right: 10px; padding-bottom: 25px; width: 3rem; --min: 0; --max: 100; --value: 5000; --background: var(--eds_interactive_primary__resting, rgba(0, 112, 121, 1));"
     value="5000"
   >
     <input
       aria-labelledby="Opacity-slider-label"
+      aria-valuemax="100"
+      aria-valuemin="0"
+      aria-valuenow="5000"
+      aria-valuetext="5000"
       class="c3"
-      id="Opacity-slider-label-thumb"
+      id="Opacity-slider-thumb"
       max="100"
       min="0"
       step="2"
@@ -256,8 +254,8 @@ exports[`Test Slider Input snapshot test 1`] = `
     />
     <output
       class="c4"
-      for="Opacity-slider-label-thumb"
-      value="5000"
+      for="Opacity-slider-thumb"
+      style="--val: 5000;"
     >
       5000
     </output>
