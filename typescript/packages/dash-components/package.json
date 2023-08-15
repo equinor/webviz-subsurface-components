@@ -13,7 +13,7 @@
     "author": "Equinor <opensource@equinor.com>",
     "license": "MPL-2.0",
     "dependencies": {
-        "@equinor/eds-core-react": "^0.32.3",
+        "@equinor/eds-core-react": "^0.12.1",
         "@equinor/eds-icons": "^0.19.1",
         "@reduxjs/toolkit": "^1.7.2",
         "@webviz/core-components": "^0.6.2",
