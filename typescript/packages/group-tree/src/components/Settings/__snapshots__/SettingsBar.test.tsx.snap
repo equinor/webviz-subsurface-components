@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Test Settins Bar component snapshot test 1`] = `
-.c4 {
+.c3 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -23,34 +23,33 @@ exports[`Test Settins Bar component snapshot test 1`] = `
   color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
 }
 
-.c5 {
+.c4 {
   margin: 0;
 }
 
 .c0 {
-  background: var(--eds_ui_background__default,rgba(255,255,255,1));
-  box-shadow: 0 0 1px rgba(0,0,0,0.14);
-}
-
-.c1 {
   height: 64px;
+  top: 0;
+  position: -webkit-sticky;
+  position: sticky;
   background: var(--eds_ui_background__default,rgba(255,255,255,1));
   box-sizing: border-box;
+  z-index: 250;
   display: grid;
-  grid-column-gap: 24px;
+  grid-column-gap: 40px;
   grid-template-columns: auto 1fr auto;
   grid-template-areas: 'left center right';
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
-  border-bottom: 2px solid var(--eds_ui_background__light,rgba(247,247,247,1));
-  padding-left: 24px;
+  border-bottom: 2px var(--eds_ui_background__light,rgba(247,247,247,1));
+  padding-left: 40px;
   padding-top: 8px;
-  padding-right: 24px;
+  padding-right: 40px;
   padding-bottom: 8px;
   margin: 0;
-  color: var(--eds_navigation__menu_title_color,rgba(61,61,61,1));
+  color: rgba(61,61,61,1);
   font-family: Equinor;
   font-size: 1.000rem;
   font-weight: 400;
@@ -60,47 +59,34 @@ exports[`Test Settins Bar component snapshot test 1`] = `
   -ms-letter-spacing: 0.013em;
   letter-spacing: 0.013em;
   text-align: left;
-  position: -webkit-sticky;
-  position: sticky;
-  top: 0;
-  z-index: 1100;
-}
-
-.c7 {
-  grid-area: right;
-  text-align: right;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-}
-
-.c2 {
-  grid-area: left;
-  display: grid;
-  grid-template-columns: auto auto;
-  grid-gap: 12px;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-}
-
-.c3 {
-  min-width: 100px;
-  width: 100%;
 }
 
 .c6 {
+  grid-area: right;
+  text-align: right;
+}
+
+.c1 {
+  grid-area: left;
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-gap: 24px;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.c5 {
   border: none;
   border-radius: 0;
   box-shadow: inset 0 -1px 0 0 var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+  padding-left: 8px;
+  padding-top: 6px;
+  padding-right: 8px;
+  padding-bottom: 6px;
   margin: 0;
-  color: var(--eds_text__static_icons__default,rgba(61,61,61,1));
+  color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
   font-family: Equinor;
   font-size: 1.000rem;
   font-weight: 400;
@@ -110,67 +96,68 @@ exports[`Test Settins Bar component snapshot test 1`] = `
   -ms-letter-spacing: 0.025em;
   letter-spacing: 0.025em;
   text-align: left;
-  padding-left: 8px;
-  padding-top: 6px;
-  padding-right: 8px;
-  padding-bottom: 6px;
   padding-right: calc(8px *2 + 24px);
   display: block;
   margin: 0;
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%236f6f6f' d='M7 9.5l5 5 5-5H7z'/%3E%3C/svg%3E"),linear-gradient( to bottom,var(--eds_ui_background__light,rgba(247,247,247,1)) 0%,var(--eds_ui_background__light,rgba(247,247,247,1)) 100% );
+  background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%236f6f6f' d='M7 9.5l5 5 5-5H7z'/%3E%3C/svg%3E"), linear-gradient( to bottom, var(--eds_ui_background__light,rgba(247,247,247,1)) 0%, var(--eds_ui_background__light,rgba(247,247,247,1)) 100% );
   background-repeat: no-repeat,repeat;
   background-position: right 8px top 50%;
   width: 100%;
 }
 
-.c6:active,
-.c6:focus {
+.c5:active,
+.c5:focus {
   box-shadow: none;
   outline: 2px solid var(--eds_interactive_primary__resting,rgba(0,112,121,1));
   outline-offset: 0px;
 }
 
-.c6:disabled {
+.c5:disabled {
   color: var(--eds_interactive__disabled__text,rgba(190,190,190,1));
-  background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23bebebe' d='M7 9.5l5 5 5-5H7z'/%3E%3C/svg%3E"),linear-gradient( to bottom,var(--eds_ui_background__light,rgba(247,247,247,1)) 0%,var(--eds_ui_background__light,rgba(247,247,247,1)) 100% );
+  background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23bebebe' d='M7 9.5l5 5 5-5H7z'/%3E%3C/svg%3E"), linear-gradient( to bottom, var(--eds_ui_background__light,rgba(247,247,247,1)) 0%, var(--eds_ui_background__light,rgba(247,247,247,1)) 100% );
   cursor: not-allowed;
   box-shadow: none;
   outline: none;
 }
 
-.c6:disabled .arrow-icon {
+.c5:disabled .arrow-icon {
   fill: red;
 }
 
-.c6:disabled:focus,
-.c6:disabled:active {
+.c5:disabled:focus,
+.c5:disabled:active {
   outline: none;
 }
 
+.c2 {
+  min-width: 100px;
+  width: 100%;
+}
+
 <header
-  class="c0 c1 SettingsBar-topBar css-mz8yvz"
+  class="c0 SettingsBar-topBar css-mz8yvz"
 >
   <div
-    class="c2 SettingsBar-actions"
+    class="c1 SettingsBar-actions"
   >
     <div
-      class="c3 FlowRateSelector-root css-17eooks"
+      class="c2 FlowRateSelector-root css-17eooks"
     >
       <label
-        class="c4"
+        class="c3"
         for="flow-rate-selector"
       >
         <span
-          class="c5"
+          class="c4"
         >
           Flow Rate
         </span>
       </label>
       <select
-        class="c6"
+        class="c5"
         id="flow-rate-selector"
       >
         <option
@@ -201,20 +188,20 @@ exports[`Test Settins Bar component snapshot test 1`] = `
       </select>
     </div>
     <div
-      class="c3 NodeInfoSelector-root css-2xr5u2"
+      class="c2 NodeInfoSelector-root css-2xr5u2"
     >
       <label
-        class="c4"
+        class="c3"
         for="node-info-selector"
       >
         <span
-          class="c5"
+          class="c4"
         >
           Node Data
         </span>
       </label>
       <select
-        class="c6"
+        class="c5"
         id="node-info-selector"
       >
         <option
@@ -231,7 +218,7 @@ exports[`Test Settins Bar component snapshot test 1`] = `
     </div>
   </div>
   <div
-    class="c7 SettingsBar-actions"
+    class="c6 SettingsBar-actions"
   >
     <div
       class="DateTimeSlider-root css-16rgu47"
