@@ -7,9 +7,9 @@ import {
     TableContainer,
     TableRow,
 } from "@mui/material";
-import { Button, Icon } from "@equinor/eds-core-react";
-import { arrow_drop_up, arrow_drop_down } from "@equinor/eds-icons";
+import { Button } from "@mui/material";
 import { styled } from "@mui/system";
+import { ArrowDropUp, ArrowDropDown } from '@mui/icons-material';
 
 import {
     ExtendedLayerProps,
@@ -17,8 +17,6 @@ import {
     PropertyDataType,
 } from "../layers/utils/layerTools";
 import { rgb } from "d3-color";
-
-Icon.add({ arrow_drop_up, arrow_drop_down });
 
 interface InfoCardDataType {
     layerName: string;
@@ -80,13 +78,12 @@ function Row(props: { layer_data: InfoCardDataType }) {
                 <StyledTableCell>
                     <Button
                         style={{ padding: 0 }}
-                        variant="ghost"
                         onClick={() => setOpen(!open)}
                     >
                         {open ? (
-                            <Icon color="currentColor" name="arrow_drop_up" />
+                            <ArrowDropUp />
                         ) : (
-                            <Icon color="currentColor" name="arrow_drop_down" />
+                            <ArrowDropDown />
                         )}
                     </Button>
                 </StyledTableCell>
