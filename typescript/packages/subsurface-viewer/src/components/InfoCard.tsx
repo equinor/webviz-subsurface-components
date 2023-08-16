@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { Button } from "@mui/material";
 import { styled } from "@mui/system";
-import { ArrowDropUp, ArrowDropDown } from '@mui/icons-material';
+import { ArrowDropUp, ArrowDropDown } from "@mui/icons-material";
 
 import {
     ExtendedLayerProps,
@@ -80,11 +80,7 @@ function Row(props: { layer_data: InfoCardDataType }) {
                         style={{ padding: 0 }}
                         onClick={() => setOpen(!open)}
                     >
-                        {open ? (
-                            <ArrowDropUp />
-                        ) : (
-                            <ArrowDropDown />
-                        )}
+                        {open ? <ArrowDropUp /> : <ArrowDropDown />}
                     </Button>
                 </StyledTableCell>
                 <TableCell> {layer_data.layerName} </TableCell>
