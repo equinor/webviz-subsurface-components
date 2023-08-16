@@ -1,112 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Test Info Card snapshot test when property value provided 1`] = `
-.c1 {
-  display: grid;
-  grid-gap: 8px;
-  grid-auto-flow: column;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  height: 100%;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-}
-
-.c0 {
-  margin: 0;
-  padding: 0;
-  -webkit-text-decoration: none;
-  text-decoration: none;
-  position: relative;
-  cursor: pointer;
-  display: inline-block;
-  background: transparent;
-  height: 36px;
-  padding-left: 16px;
-  padding-right: 16px;
-  border: 1px solid transparent;
-  border-radius: 4px;
-  margin: 0;
-  color: var(--eds_interactive_primary__resting,rgba(0,112,121,1));
-  font-family: Equinor;
-  font-size: 0.875rem;
-  font-weight: 500;
-  line-height: 1.143em;
-  text-align: center;
-}
-
-.c0 svg {
-  justify-self: center;
-}
-
-.c0::before {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: auto;
-  min-height: auto;
-  content: '';
-}
-
-.c0::after {
-  position: absolute;
-  top: -7px;
-  left: -0;
-  width: 100%;
-  height: 48px;
-  content: '';
-}
-
-.c0:focus {
-  outline: none;
-}
-
-.c0[data-focus-visible-added]:focus {
-  outline: 1px dashed rgba(0,112,121,1);
-  outline-offset: 2px;
-}
-
-.c0:focus-visible {
-  outline: 1px dashed rgba(0,112,121,1);
-  outline-offset: 2px;
-}
-
-.c0::-moz-focus-inner {
-  border: 0;
-}
-
-.c0:disabled {
-  cursor: not-allowed;
-  background: transparent;
-  border: 1px solid transparent;
-  margin: 0;
-  color: var(--eds_interactive__disabled__text,rgba(190,190,190,1));
-  font-family: Equinor;
-  font-size: 0.875rem;
-  font-weight: 500;
-  line-height: 1.143em;
-  text-align: center;
-}
-
-@media (hover:hover) and (pointer:fine) {
-  .c0:hover {
-    background: var(--eds_interactive_primary__hover_alt,rgba(222,237,238,1));
-    color: var(--eds_interactive_primary__hover,rgba(0,79,85,1));
-    border: 1px solid transparent;
-    border-radius: 4px;
-  }
-}
-
-@media (hover:hover) and (pointer:fine) {
-  .c0:disabled:hover {
-    background: transparent;
-  }
-}
-
 <div
   class="MuiTableContainer-root css-rorn0c-MuiTableContainer-root"
 >
@@ -124,33 +18,25 @@ exports[`Test Info Card snapshot test when property value provided 1`] = `
           class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-spv49l-MuiTableCell-root"
         >
           <button
-            class="c0"
+            class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium css-1e6y48t-MuiButtonBase-root-MuiButton-root"
             style="padding: 0px;"
             tabindex="0"
             type="button"
           >
-            <span
-              class="c1"
+            <svg
+              aria-hidden="true"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-i4bv87-MuiSvgIcon-root"
+              data-testid="ArrowDropUpIcon"
+              focusable="false"
+              viewBox="0 0 24 24"
             >
-              <svg
-                aria-hidden="true"
-                class=""
-                fill="currentColor"
-                height="24px"
-                viewBox="0 0 24 24"
-                width="24px"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  class=""
-                  clip-rule="evenodd"
-                  d="m7 14.5 5-5 5 5H7Z"
-                  data-testid="eds-icon-path"
-                  fill-rule="evenodd"
-                  height="24"
-                />
-              </svg>
-            </span>
+              <path
+                d="m7 14 5-5 5 5z"
+              />
+            </svg>
+            <span
+              class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+            />
           </button>
         </td>
         <td
@@ -248,33 +134,25 @@ exports[`Test Info Card snapshot test when property value provided 1`] = `
           class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-spv49l-MuiTableCell-root"
         >
           <button
-            class="c0"
+            class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium css-1e6y48t-MuiButtonBase-root-MuiButton-root"
             style="padding: 0px;"
             tabindex="0"
             type="button"
           >
-            <span
-              class="c1"
+            <svg
+              aria-hidden="true"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-i4bv87-MuiSvgIcon-root"
+              data-testid="ArrowDropUpIcon"
+              focusable="false"
+              viewBox="0 0 24 24"
             >
-              <svg
-                aria-hidden="true"
-                class=""
-                fill="currentColor"
-                height="24px"
-                viewBox="0 0 24 24"
-                width="24px"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  class=""
-                  clip-rule="evenodd"
-                  d="m7 14.5 5-5 5 5H7Z"
-                  data-testid="eds-icon-path"
-                  fill-rule="evenodd"
-                  height="24"
-                />
-              </svg>
-            </span>
+              <path
+                d="m7 14 5-5 5 5z"
+              />
+            </svg>
+            <span
+              class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+            />
           </button>
         </td>
         <td
@@ -355,112 +233,6 @@ exports[`Test Info Card snapshot test when property value provided 1`] = `
 `;
 
 exports[`Test Info Card snapshot test with no props 1`] = `
-.c1 {
-  display: grid;
-  grid-gap: 8px;
-  grid-auto-flow: column;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  height: 100%;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-}
-
-.c0 {
-  margin: 0;
-  padding: 0;
-  -webkit-text-decoration: none;
-  text-decoration: none;
-  position: relative;
-  cursor: pointer;
-  display: inline-block;
-  background: transparent;
-  height: 36px;
-  padding-left: 16px;
-  padding-right: 16px;
-  border: 1px solid transparent;
-  border-radius: 4px;
-  margin: 0;
-  color: var(--eds_interactive_primary__resting,rgba(0,112,121,1));
-  font-family: Equinor;
-  font-size: 0.875rem;
-  font-weight: 500;
-  line-height: 1.143em;
-  text-align: center;
-}
-
-.c0 svg {
-  justify-self: center;
-}
-
-.c0::before {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: auto;
-  min-height: auto;
-  content: '';
-}
-
-.c0::after {
-  position: absolute;
-  top: -7px;
-  left: -0;
-  width: 100%;
-  height: 48px;
-  content: '';
-}
-
-.c0:focus {
-  outline: none;
-}
-
-.c0[data-focus-visible-added]:focus {
-  outline: 1px dashed rgba(0,112,121,1);
-  outline-offset: 2px;
-}
-
-.c0:focus-visible {
-  outline: 1px dashed rgba(0,112,121,1);
-  outline-offset: 2px;
-}
-
-.c0::-moz-focus-inner {
-  border: 0;
-}
-
-.c0:disabled {
-  cursor: not-allowed;
-  background: transparent;
-  border: 1px solid transparent;
-  margin: 0;
-  color: var(--eds_interactive__disabled__text,rgba(190,190,190,1));
-  font-family: Equinor;
-  font-size: 0.875rem;
-  font-weight: 500;
-  line-height: 1.143em;
-  text-align: center;
-}
-
-@media (hover:hover) and (pointer:fine) {
-  .c0:hover {
-    background: var(--eds_interactive_primary__hover_alt,rgba(222,237,238,1));
-    color: var(--eds_interactive_primary__hover,rgba(0,79,85,1));
-    border: 1px solid transparent;
-    border-radius: 4px;
-  }
-}
-
-@media (hover:hover) and (pointer:fine) {
-  .c0:disabled:hover {
-    background: transparent;
-  }
-}
-
 <div
   class="MuiTableContainer-root css-rorn0c-MuiTableContainer-root"
 >
@@ -478,33 +250,25 @@ exports[`Test Info Card snapshot test with no props 1`] = `
           class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-spv49l-MuiTableCell-root"
         >
           <button
-            class="c0"
+            class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium MuiButton-root MuiButton-text MuiButton-textPrimary MuiButton-sizeMedium MuiButton-textSizeMedium css-1e6y48t-MuiButtonBase-root-MuiButton-root"
             style="padding: 0px;"
             tabindex="0"
             type="button"
           >
-            <span
-              class="c1"
+            <svg
+              aria-hidden="true"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-i4bv87-MuiSvgIcon-root"
+              data-testid="ArrowDropUpIcon"
+              focusable="false"
+              viewBox="0 0 24 24"
             >
-              <svg
-                aria-hidden="true"
-                class=""
-                fill="currentColor"
-                height="24px"
-                viewBox="0 0 24 24"
-                width="24px"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  class=""
-                  clip-rule="evenodd"
-                  d="m7 14.5 5-5 5 5H7Z"
-                  data-testid="eds-icon-path"
-                  fill-rule="evenodd"
-                  height="24"
-                />
-              </svg>
-            </span>
+              <path
+                d="m7 14 5-5 5 5z"
+              />
+            </svg>
+            <span
+              class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+            />
           </button>
         </td>
         <td

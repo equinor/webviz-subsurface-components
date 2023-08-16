@@ -1,13 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Test Map component snapshot test 1`] = `
-.c0 {
-  display: inline-block;
-  -webkit-transform: rotate(-90deg);
-  -ms-transform: rotate(-90deg);
-  transform: rotate(-90deg);
-}
-
 <div>
   <div
     id="DeckGL-Map-wrapper"
@@ -19,40 +12,27 @@ exports[`Test Map component snapshot test 1`] = `
     />
   </div>
   <div>
-    <svg
-      aria-valuemax="100"
-      aria-valuemin="0"
+    <span
       aria-valuenow="0"
-      class="c0"
-      height="48"
-      preserveAspectRatio="xMidYMid meet"
+      class="MuiCircularProgress-root MuiCircularProgress-determinate MuiCircularProgress-colorPrimary css-1rn30mb-MuiCircularProgress-root"
       role="progressbar"
-      viewBox="24 24 48 48"
-      width="48"
+      style="width: 48px; height: 48px; transform: rotate(-90deg);"
     >
-      <circle
-        class=""
-        cx="48"
-        cy="48"
-        fill="none"
-        r="22"
-        stroke="var(--eds_infographic_primary__moss_green_13, rgba(222, 237, 238, 1))"
-        stroke-width="4"
-        style="stroke: 138.230; stroke-dashoffset: 138.230px;"
-      />
-      <circle
-        class=""
-        cx="48"
-        cy="48"
-        fill="none"
-        r="22"
-        stroke="var(--eds_infographic_primary__moss_green_100, rgba(0, 112, 121, 1))"
-        stroke-dasharray="138.23007675795088"
-        stroke-linecap="round"
-        stroke-width="4"
-        style="stroke: 138.230; stroke-dashoffset: 138.230px;"
-      />
-    </svg>
+      <svg
+        class="MuiCircularProgress-svg css-1idz92c-MuiCircularProgress-svg"
+        viewBox="22 22 44 44"
+      >
+        <circle
+          class="MuiCircularProgress-circle MuiCircularProgress-circleDeterminate css-oxts8u-MuiCircularProgress-circle"
+          cx="44"
+          cy="44"
+          fill="none"
+          r="20.2"
+          stroke-width="3.6"
+          style="stroke-dasharray: 126.920; stroke-dashoffset: 126.920px;"
+        />
+      </svg>
+    </span>
     <br />
     Loading assets...
   </div>
@@ -60,13 +40,6 @@ exports[`Test Map component snapshot test 1`] = `
 `;
 
 exports[`Test Map component snapshot test with edited data 1`] = `
-.c0 {
-  display: inline-block;
-  -webkit-transform: rotate(-90deg);
-  -ms-transform: rotate(-90deg);
-  transform: rotate(-90deg);
-}
-
 <div>
   <div
     id="DeckGL-Map-wrapper"
@@ -78,40 +51,27 @@ exports[`Test Map component snapshot test with edited data 1`] = `
     />
   </div>
   <div>
-    <svg
-      aria-valuemax="100"
-      aria-valuemin="0"
+    <span
       aria-valuenow="0"
-      class="c0"
-      height="48"
-      preserveAspectRatio="xMidYMid meet"
+      class="MuiCircularProgress-root MuiCircularProgress-determinate MuiCircularProgress-colorPrimary css-1rn30mb-MuiCircularProgress-root"
       role="progressbar"
-      viewBox="24 24 48 48"
-      width="48"
+      style="width: 48px; height: 48px; transform: rotate(-90deg);"
     >
-      <circle
-        class=""
-        cx="48"
-        cy="48"
-        fill="none"
-        r="22"
-        stroke="var(--eds_infographic_primary__moss_green_13, rgba(222, 237, 238, 1))"
-        stroke-width="4"
-        style="stroke: 138.230; stroke-dashoffset: 138.230px;"
-      />
-      <circle
-        class=""
-        cx="48"
-        cy="48"
-        fill="none"
-        r="22"
-        stroke="var(--eds_infographic_primary__moss_green_100, rgba(0, 112, 121, 1))"
-        stroke-dasharray="138.23007675795088"
-        stroke-linecap="round"
-        stroke-width="4"
-        style="stroke: 138.230; stroke-dashoffset: 138.230px;"
-      />
-    </svg>
+      <svg
+        class="MuiCircularProgress-svg css-1idz92c-MuiCircularProgress-svg"
+        viewBox="22 22 44 44"
+      >
+        <circle
+          class="MuiCircularProgress-circle MuiCircularProgress-circleDeterminate css-oxts8u-MuiCircularProgress-circle"
+          cx="44"
+          cy="44"
+          fill="none"
+          r="20.2"
+          stroke-width="3.6"
+          style="stroke-dasharray: 126.920; stroke-dashoffset: 126.920px;"
+        />
+      </svg>
+    </span>
     <br />
     Loading assets...
   </div>
@@ -119,13 +79,6 @@ exports[`Test Map component snapshot test with edited data 1`] = `
 `;
 
 exports[`Test Map component snapshot test with invalid array length 1`] = `
-.c0 {
-  display: inline-block;
-  -webkit-transform: rotate(-90deg);
-  -ms-transform: rotate(-90deg);
-  transform: rotate(-90deg);
-}
-
 <div>
   <div
     id="DeckGL-Map-wrapper"
@@ -137,40 +90,27 @@ exports[`Test Map component snapshot test with invalid array length 1`] = `
     />
   </div>
   <div>
-    <svg
-      aria-valuemax="100"
-      aria-valuemin="0"
+    <span
       aria-valuenow="0"
-      class="c0"
-      height="48"
-      preserveAspectRatio="xMidYMid meet"
+      class="MuiCircularProgress-root MuiCircularProgress-determinate MuiCircularProgress-colorPrimary css-1rn30mb-MuiCircularProgress-root"
       role="progressbar"
-      viewBox="24 24 48 48"
-      width="48"
+      style="width: 48px; height: 48px; transform: rotate(-90deg);"
     >
-      <circle
-        class=""
-        cx="48"
-        cy="48"
-        fill="none"
-        r="22"
-        stroke="var(--eds_infographic_primary__moss_green_13, rgba(222, 237, 238, 1))"
-        stroke-width="4"
-        style="stroke: 138.230; stroke-dashoffset: 138.230px;"
-      />
-      <circle
-        class=""
-        cx="48"
-        cy="48"
-        fill="none"
-        r="22"
-        stroke="var(--eds_infographic_primary__moss_green_100, rgba(0, 112, 121, 1))"
-        stroke-dasharray="138.23007675795088"
-        stroke-linecap="round"
-        stroke-width="4"
-        style="stroke: 138.230; stroke-dashoffset: 138.230px;"
-      />
-    </svg>
+      <svg
+        class="MuiCircularProgress-svg css-1idz92c-MuiCircularProgress-svg"
+        viewBox="22 22 44 44"
+      >
+        <circle
+          class="MuiCircularProgress-circle MuiCircularProgress-circleDeterminate css-oxts8u-MuiCircularProgress-circle"
+          cx="44"
+          cy="44"
+          fill="none"
+          r="20.2"
+          stroke-width="3.6"
+          style="stroke-dasharray: 126.920; stroke-dashoffset: 126.920px;"
+        />
+      </svg>
+    </span>
     <br />
     Loading assets...
   </div>
