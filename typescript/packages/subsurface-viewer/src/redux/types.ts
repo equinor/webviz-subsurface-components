@@ -1,25 +1,3 @@
-import { Icon } from "@equinor/eds-core-react";
-import {
-    map,
-    well,
-    brush,
-    fault,
-    pie_chart,
-    hill_shading,
-    surface_layer,
-} from "@equinor/eds-icons";
-
-// (this needs only be done once)
-Icon.add({
-    map,
-    well,
-    brush,
-    fault,
-    pie_chart,
-    hill_shading,
-    surface_layer,
-});
-
 export type DrawMode =
     | "view"
     | "modify"
