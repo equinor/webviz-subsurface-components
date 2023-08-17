@@ -24,6 +24,9 @@
         "build-storybook": "storybook build",
         "cy:run": "npx cypress run -b chrome --component --headed",
         "postpack": "npm run tidy-up",
+        "git:hooks:enable": "cd .. && husky install",
+        "git:hooks:disable": "cd .. && husky uninstall",
+        "prepare": "cd .. && husky install || exit 0",
         "prepublishOnly": "npm test && npm run lint",
         "preversion": "npm run lint"
     },
