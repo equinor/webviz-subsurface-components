@@ -20,7 +20,7 @@
   "author": "Equinor <opensource@equinor.com>",
   "license": "MPL-2.0",
   "dependencies": {
-    "@emerson-eps/color-tables": "^0.4.57",
+    "@emerson-eps/color-tables": "^0.4.61",
     "@equinor/videx-wellog": "^0.8.0",
     "@webviz/wsc-common": "*",
     "convert-units": "^2.3.4",
