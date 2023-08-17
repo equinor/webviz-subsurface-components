@@ -21,8 +21,8 @@
   "license": "MPL-2.0",
   "dependencies": {
     "@deck.gl/core": "^8.8.25",
-    "@emerson-eps/color-tables": "^0.4.57",
-    "@equinor/eds-core-react": "^0.16.1",
+    "@emerson-eps/color-tables": "^0.4.61",
+    "@equinor/eds-core-react": "^0.32.3",
     "@equinor/eds-icons": "^0.19.1",
     "@nebula.gl/layers": "^1.0.4",
     "@reduxjs/toolkit": "^1.7.2",
