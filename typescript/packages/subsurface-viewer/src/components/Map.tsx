@@ -48,6 +48,9 @@ import { LineLayer } from "@deck.gl/layers/typed";
 import { Matrix4 } from "@math.gl/core";
 import { fovyToAltitude } from "@math.gl/web-mercator";
 
+/**
+ * 3D bounding box defined as [xmin, ymin, zmin, xmax, ymax, zmax].
+ */
 export type BoundingBox3D = [number, number, number, number, number, number];
 
 const minZoom3D = -12;
@@ -205,15 +208,21 @@ function compareViewsProp(views: ViewsType | undefined): string | undefined {
     return JSON.stringify(copy);
 }
 
+/**
+ * Type of the function returning coordinate boundary for the view defined as [left, bottom, right, top].
+ */
 export type BoundsAccessor = () => [number, number, number, number];
 
 export type TooltipCallback = (
     info: PickingInfo
 ) => string | Record<string, unknown> | null;
 
+/**
+ * Views
+ */
 export interface ViewsType {
     /**
-     * Layout for viewport in specified as [row, column]
+     * Layout for viewport in specified as [row, column].
      */
     layout: [number, number];
 
@@ -224,16 +233,19 @@ export interface ViewsType {
     marginPixels?: number;
 
     /**
-     * Show views label
+     * Show views label.
      */
     showLabel?: boolean;
 
     /**
-     * Layers configuration for multiple viewport
+     * Layers configuration for multiple viewports.
      */
     viewports: ViewportType[];
 }
 
+/**
+ * Viewport type.
+ */
 export interface ViewportType {
     /**
      * Viewport id
@@ -263,6 +275,9 @@ export interface ViewportType {
     isSync?: boolean;
 }
 
+/**
+ * Camera view state.
+ */
 export interface ViewStateType {
     target: number[];
     zoom: number | BoundingBox3D;
