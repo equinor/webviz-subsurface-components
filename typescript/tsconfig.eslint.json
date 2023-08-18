@@ -1,0 +1,12 @@
+{
+    "extends": "./tsconfig.json",
+    "include": [
+        "packages/*/src/",
+        "tsconfig.json",
+        "tsconfig.eslint.json",
+        "package.json",
+        "nx.json",
+        "jest.config.js"
+    ],
+    "exclude": ["node_modules", "src/storybook", "src/test", "./storybook"]
+}
