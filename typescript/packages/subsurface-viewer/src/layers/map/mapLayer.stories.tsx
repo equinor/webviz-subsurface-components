@@ -1315,7 +1315,7 @@ const ContourLinesStory = (props: {
         meshData: undefined,
         contours: [props.contourOffset, props.propertyContourInterval] as [
             number,
-            number
+            number,
         ],
     };
 

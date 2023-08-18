@@ -486,7 +486,7 @@ export default class Map3DLayer extends CompositeLayer<Map3DLayerProps> {
             this.props.frame?.rotPoint ??
             ((isRotPointDefined ? this.props.rotPoint : [minX, minY]) as [
                 number,
-                number
+                number,
             ]);
 
         const rotatingModelMatrix = getModelMatrix(

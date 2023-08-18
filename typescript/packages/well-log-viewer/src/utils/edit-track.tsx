@@ -27,6 +27,7 @@ export function onTrackMouseEvent(
         el.style.width = "10px";
         el.style.height = "3px";
         ev.element.appendChild(el);
+        // eslint-disable-next-line react/no-deprecated
         ReactDOM.render(
             <SimpleMenu
                 type={ev.area}

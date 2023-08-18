@@ -298,6 +298,7 @@ export function editPlots(
     el.style.width = "10px";
     el.style.height = "13px";
     if (parent) parent.appendChild(el);
+    // eslint-disable-next-line react/no-deprecated
     ReactDOM.render(
         <SimpleMenu
             type="editPlots"
@@ -324,6 +325,7 @@ export function removePlots(
     el.style.width = "10px";
     el.style.height = "13px";
     if (parent) parent.appendChild(el);
+    // eslint-disable-next-line react/no-deprecated
     ReactDOM.render(
         <SimpleMenu
             type="removePlots"

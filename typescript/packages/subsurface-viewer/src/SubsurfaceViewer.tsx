@@ -25,7 +25,7 @@ export type LightsType = {
             intensity: number;
             position: [number, number, number];
             color?: [number, number, number];
-        }
+        },
     ];
 
     directionalLights?: [
@@ -33,7 +33,7 @@ export type LightsType = {
             intensity: number;
             direction: [number, number, number];
             color?: [number, number, number];
-        }
+        },
     ];
 };
 

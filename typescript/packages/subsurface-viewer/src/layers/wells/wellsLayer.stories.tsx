@@ -43,7 +43,7 @@ const defaultProps = {
         number,
         number,
         number,
-        number
+        number,
     ],
     layers: [
         {
@@ -107,7 +107,7 @@ volveWells2.args = {
         number,
         number,
         number,
-        number
+        number,
     ],
     layers: [
         {
@@ -200,7 +200,7 @@ MultipleVolveWells.args = {
         number,
         number,
         number,
-        number
+        number,
     ],
     layers: [
         {
@@ -303,7 +303,7 @@ VolveWellsWithResetButton.args = {
         number,
         number,
         number,
-        number
+        number,
     ],
     layers: [
         {
