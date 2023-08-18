@@ -2,12 +2,12 @@ import React from "react";
 import { useResizeDetector } from "react-resize-detector";
 import { TooltipProvider } from "./components/TooltipProvider";
 import { CompletionsPlot } from "./components/CompletionsPlot";
-import { Padding } from "./types/layoutTypes";
+import type { Padding } from "./types/layoutTypes";
 import { createLayout } from "./utils/layoutUtils";
 import { StratigraphyPlot } from "./components/StratigraphyPlot";
 import { WellsPlot } from "./components/WellsPlot";
 
-import { PlotData } from "./types/dataTypes";
+import type { PlotData } from "./types/dataTypes";
 
 import "./WellCompletionsPlot.css";
 

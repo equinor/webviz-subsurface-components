@@ -4,7 +4,7 @@ import { render } from "@testing-library/react";
 import "jest-styled-components";
 import React from "react";
 import WellLogViewer from "./WellLogViewer";
-import { WellLogController } from "./components/WellLogView";
+import type { WellLogController } from "./components/WellLogView";
 import { axisTitles, axisMnemos } from "./utils/axes";
 import { colorTables } from "@emerson-eps/color-tables";
 

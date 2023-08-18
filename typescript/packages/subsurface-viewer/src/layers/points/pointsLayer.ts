@@ -1,12 +1,10 @@
-import { CompositeLayer, UpdateParameters } from "@deck.gl/core/typed";
+import type { UpdateParameters } from "@deck.gl/core/typed";
+import { CompositeLayer } from "@deck.gl/core/typed";
 import { ScatterplotLayer } from "@deck.gl/layers/typed";
 import { isEqual } from "lodash";
 
-import {
-    ExtendedLayerProps,
-    invertZCoordinate,
-    defineBoundingBox,
-} from "../utils/layerTools";
+import type { ExtendedLayerProps } from "../utils/layerTools";
+import { invertZCoordinate, defineBoundingBox } from "../utils/layerTools";
 
 export interface PointsLayerProps extends ExtendedLayerProps {
     /**

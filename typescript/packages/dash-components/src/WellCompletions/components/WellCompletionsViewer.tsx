@@ -5,7 +5,7 @@ import React, { useContext, useMemo } from "react";
 import { useSelector } from "react-redux";
 import ReactResizeDetector from "react-resize-detector";
 import { usePlotData } from "../hooks/usePlotData";
-import { WellCompletionsState } from "../redux/store";
+import type { WellCompletionsState } from "../redux/store";
 import { DataContext } from "./DataLoader";
 import { WellCompletionsPlot } from "../../../../well-completions-plot/src";
 import HideZeroCompletionsSwitch from "./Settings/HideZeroCompletionsSwitch";

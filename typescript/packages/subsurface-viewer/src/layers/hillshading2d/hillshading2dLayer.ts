@@ -1,10 +1,12 @@
-import { BitmapLayer, BitmapLayerProps } from "@deck.gl/layers/typed";
-import { PickingInfo, Texture } from "@deck.gl/core/typed";
+import type { BitmapLayerProps } from "@deck.gl/layers/typed";
+import { BitmapLayer } from "@deck.gl/layers/typed";
+import type { PickingInfo, Texture } from "@deck.gl/core/typed";
 
 import { decoder } from "../shader_modules";
-import { decodeRGB, ValueDecoder } from "../utils/propertyMapTools";
+import type { ValueDecoder } from "../utils/propertyMapTools";
+import { decodeRGB } from "../utils/propertyMapTools";
 import { getModelMatrix } from "../utils/layerTools";
-import { LayerPickInfo } from "../../layers/utils/layerTools";
+import type { LayerPickInfo } from "../../layers/utils/layerTools";
 
 import fsHillshading from "./hillshading2d.fs.glsl";
 

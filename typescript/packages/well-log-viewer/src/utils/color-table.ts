@@ -1,4 +1,4 @@
-import { ColorTable } from "../components/ColorTableTypes";
+import type { ColorTable } from "../components/ColorTableTypes";
 
 /*
   Binary serach in array of elements [number, ...]

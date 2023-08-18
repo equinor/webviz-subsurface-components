@@ -2,10 +2,10 @@
 /* eslint-disable react-hooks/rules-of-hooks  */ // remove when ready to fix these.
 
 import { styled } from "@mui/material/styles";
-import { Meta } from "@storybook/react";
+import type { Meta } from "@storybook/react";
 import React from "react";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
-import { PickingInfo } from "@deck.gl/core/typed";
+import type { PickingInfo } from "@deck.gl/core/typed";
 import WellsLayer from "../wells/wellsLayer";
 import BoxSelectionLayer from "./boxSelectionLayer";
 

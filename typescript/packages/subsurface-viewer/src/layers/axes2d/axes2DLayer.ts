@@ -1,7 +1,6 @@
+import type { Viewport, LayerContext } from "@deck.gl/core/typed";
 import {
     Layer,
-    Viewport,
-    LayerContext,
     project,
     OrthographicViewport,
     COORDINATE_SYSTEM,
@@ -12,12 +11,12 @@ import labelVertexShader from "./label-vertex.glsl";
 import labelFragmentShader from "./label-fragment.glsl";
 import lineVertexShader from "./line-vertex.glsl";
 import lineFragmentShader from "./line-fragment.glsl";
-import { ExtendedLayerProps, Position3D } from "../utils/layerTools";
+import type { ExtendedLayerProps, Position3D } from "../utils/layerTools";
 import { load } from "@loaders.gl/core";
 import { Texture2D } from "@luma.gl/webgl";
 import { ImageLoader } from "@loaders.gl/images";
 import { vec4, mat4 } from "gl-matrix";
-import { Color } from "@deck.gl/core/typed";
+import type { Color } from "@deck.gl/core/typed";
 import fontAtlasPng from "./font-atlas.png";
 
 const DEFAULT_TEXTURE_PARAMETERS = {

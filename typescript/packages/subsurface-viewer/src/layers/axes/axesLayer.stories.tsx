@@ -1,9 +1,10 @@
 import React from "react";
 import DeckGL from "@deck.gl/react/typed";
 import { rgb } from "d3-color";
-import { Color, OrthographicView } from "@deck.gl/core/typed";
+import type { Color } from "@deck.gl/core/typed";
+import { OrthographicView } from "@deck.gl/core/typed";
 
-import { ComponentStory, ComponentMeta } from "@storybook/react";
+import type { ComponentStory, ComponentMeta } from "@storybook/react";
 import AxesLayer from "./axesLayer";
 
 export default {

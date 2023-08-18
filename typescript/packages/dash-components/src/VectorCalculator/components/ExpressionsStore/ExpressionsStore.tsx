@@ -1,7 +1,8 @@
-import React, { ReactNode } from "react";
+import type { ReactNode } from "react";
+import React from "react";
 import { cloneDeep } from "lodash";
 
-import {
+import type {
     ExpressionParsingData,
     ExpressionType,
     VariableVectorMapType,

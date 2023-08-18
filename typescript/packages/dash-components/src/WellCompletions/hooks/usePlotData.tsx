@@ -2,14 +2,14 @@ import { isEqual } from "lodash";
 import { useContext, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { DataContext } from "../components/DataLoader";
-import { WellCompletionsState } from "../redux/store";
-import { Well } from "../redux/types";
+import type { WellCompletionsState } from "../redux/store";
+import type { Well } from "../redux/types";
 import {
     computeDataToPlot,
     createAttributePredicate,
     findSubzones,
 } from "../utils/dataUtil";
-import { PlotData, Zone } from "../../../../well-completions-plot/src";
+import type { PlotData, Zone } from "../../../../well-completions-plot/src";
 import { createSortFunction } from "../utils/sort";
 import { getRegexPredicate } from "../utils/stringUtil";
 

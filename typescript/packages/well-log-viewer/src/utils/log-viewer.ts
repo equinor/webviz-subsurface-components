@@ -1,4 +1,4 @@
-import { LogViewer, Track } from "@equinor/videx-wellog";
+import type { LogViewer, Track } from "@equinor/videx-wellog";
 
 import { isScaleTrack } from "../utils/tracks";
 

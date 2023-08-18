@@ -1,1 +1,2 @@
-export { default, SubsurfaceViewerProps } from "./SubsurfaceViewer";
+export type { SubsurfaceViewerProps } from "./SubsurfaceViewer";
+export { default } from "./SubsurfaceViewer";

@@ -1,8 +1,9 @@
-import React, { Component, ReactNode } from "react";
+import type { ReactNode } from "react";
+import React, { Component } from "react";
 
-import { TemplateTrack, TemplatePlot } from "./WellLogTemplateTypes";
+import type { TemplateTrack, TemplatePlot } from "./WellLogTemplateTypes";
 
-import WellLogView from "./WellLogView";
+import type WellLogView from "./WellLogView";
 
 // material ui
 import {

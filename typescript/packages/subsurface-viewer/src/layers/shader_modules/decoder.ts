@@ -1,4 +1,4 @@
-import { ValueDecoder } from "../utils/propertyMapTools";
+import type { ValueDecoder } from "../utils/propertyMapTools";
 import fs from "./decoder.fs.glsl";
 
 // Shader module for the property map value decoder.

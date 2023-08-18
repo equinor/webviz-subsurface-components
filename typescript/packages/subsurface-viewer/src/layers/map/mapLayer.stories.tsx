@@ -1,9 +1,11 @@
-import React, { SyntheticEvent } from "react";
+import type { SyntheticEvent } from "react";
+import React from "react";
 import { styled } from "@mui/material/styles";
-import { ViewsType, useHoverInfo } from "../../components/Map";
+import type { ViewsType } from "../../components/Map";
+import { useHoverInfo } from "../../components/Map";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import InfoCard from "../../components/InfoCard";
-import { ComponentStory, ComponentMeta } from "@storybook/react";
+import type { ComponentStory, ComponentMeta } from "@storybook/react";
 import { Slider } from "@mui/material";
 import {
     ContinuousLegend,

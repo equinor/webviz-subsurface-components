@@ -6,32 +6,32 @@ import { argTypesWellLogViewerProp } from "./WellLogViewer";
 
 import exampleData from "../../../../example-data/deckgl-map.json";
 
-import { WeakValidationMap } from "react";
+import type { WeakValidationMap } from "react";
 import SubsurfaceViewer from "@webviz/subsurface-viewer";
-import { SubsurfaceViewerProps } from "@webviz/subsurface-viewer";
-import { Color, LayersList } from "@deck.gl/core/typed";
+import type { SubsurfaceViewerProps } from "@webviz/subsurface-viewer";
+import type { Color, LayersList } from "@deck.gl/core/typed";
 
-import { WellsLayer } from "@webviz/subsurface-viewer/dist/layers";
-import {
+import type { WellsLayer } from "@webviz/subsurface-viewer/dist/layers";
+import type {
     Template,
     TemplateTrack,
     TemplatePlot,
     TemplatePlotTypes,
 } from "./components/WellLogTemplateTypes";
 
-import { WellLog } from "./components/WellLogTypes";
+import type { WellLog } from "./components/WellLogTypes";
 import welllogsJson from "./demo/example-data/volve_logs.json";
 const welllogs = welllogsJson as unknown as WellLog[];
 
 import templateJson from "./demo/example-data/welllog_template_2.json";
 const template = templateJson as unknown as Template;
 
-import { ColorTable } from "./components/ColorTableTypes";
+import type { ColorTable } from "./components/ColorTableTypes";
 
-import { WellLogController } from "./components/WellLogView";
-import { LogViewer } from "@equinor/videx-wellog";
-import { Info } from "./components/InfoTypes";
-import { MapMouseEvent } from "@webviz/subsurface-viewer/dist/components/Map";
+import type { WellLogController } from "./components/WellLogView";
+import type { LogViewer } from "@equinor/videx-wellog";
+import type { Info } from "./components/InfoTypes";
+import type { MapMouseEvent } from "@webviz/subsurface-viewer/dist/components/Map";
 
 import InfoPanel from "./components/InfoPanel";
 import WellLogViewWithScroller from "./components/WellLogViewWithScroller";
@@ -39,7 +39,7 @@ import { fillInfos } from "./utils/fill-info";
 import { getDiscreteMeta, indexOfElementByName } from "./utils/tracks";
 import { deepCopy } from "./utils/deepcopy";
 
-import { WellLogViewOptions } from "./components/WellLogView";
+import type { WellLogViewOptions } from "./components/WellLogView";
 import { isEqualRanges } from "./components/WellLogView";
 
 import wellPicks from "./demo/example-data/wellpicks.json";

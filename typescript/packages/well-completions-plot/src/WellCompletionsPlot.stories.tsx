@@ -1,6 +1,6 @@
 import React from "react";
 import { WellCompletionsPlot } from "./WellCompletionsPlot";
-import { PlotData } from "./index";
+import type { PlotData } from "./index";
 
 import {
     timeSteps,

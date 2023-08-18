@@ -1,18 +1,14 @@
-import { Info, InfoOptions } from "../components/InfoTypes";
+import type { Info, InfoOptions } from "../components/InfoTypes";
 
-import {
-    Track,
-    DualScaleTrack,
-    GraphTrack,
-    StackedTrack,
-} from "@equinor/videx-wellog";
+import type { Track, DualScaleTrack, GraphTrack } from "@equinor/videx-wellog";
+import { StackedTrack } from "@equinor/videx-wellog";
 
-import { InterpolatedScaleHandler } from "@equinor/videx-wellog";
-import { DifferentialPlotLegendInfo } from "@equinor/videx-wellog/dist/plots/legend/interfaces";
-import { DifferentialPlotOptions } from "@equinor/videx-wellog/dist/plots/interfaces";
-import { LogViewer } from "@equinor/videx-wellog";
+import type { InterpolatedScaleHandler } from "@equinor/videx-wellog";
+import type { DifferentialPlotLegendInfo } from "@equinor/videx-wellog/dist/plots/legend/interfaces";
+import type { DifferentialPlotOptions } from "@equinor/videx-wellog/dist/plots/interfaces";
+import type { LogViewer } from "@equinor/videx-wellog";
 
-import { ExtPlotOptions } from "./tracks";
+import type { ExtPlotOptions } from "./tracks";
 import { isScaleTrack } from "./tracks";
 import { getPlotType } from "./tracks";
 

@@ -1,27 +1,26 @@
+import type { PickingInfo, UpdateParameters, Color } from "@deck.gl/core/typed";
 import {
     COORDINATE_SYSTEM,
     Layer,
     picking,
     project,
     phongLighting,
-    PickingInfo,
-    UpdateParameters,
-    Color,
 } from "@deck.gl/core/typed";
-import {
-    createPropertyData,
-    LayerPickInfo,
-    PropertyDataType,
-} from "../utils/layerTools";
+import type { LayerPickInfo, PropertyDataType } from "../utils/layerTools";
+import { createPropertyData } from "../utils/layerTools";
 import { Model, Geometry } from "@luma.gl/engine";
-import { DeckGLLayerContext } from "../../components/Map";
-import { ExtendedLayerProps, colorMapFunctionType } from "../utils/layerTools";
+import type { DeckGLLayerContext } from "../../components/Map";
+import type {
+    ExtendedLayerProps,
+    colorMapFunctionType,
+} from "../utils/layerTools";
 import vsShader from "./vertex.glsl";
 import fsShader from "./fragment.fs.glsl";
 import vsLineShader from "./vertex_lines.glsl";
 import fsLineShader from "./fragment_lines.glsl";
 
-import { colorTablesArray, rgbValues } from "@emerson-eps/color-tables/";
+import type { colorTablesArray } from "@emerson-eps/color-tables/";
+import { rgbValues } from "@emerson-eps/color-tables/";
 import { createDefaultContinuousColorScale } from "@emerson-eps/color-tables/dist/component/Utils/legendCommonFunction";
 import { Texture2D } from "@luma.gl/webgl";
 import GL from "@luma.gl/constants";

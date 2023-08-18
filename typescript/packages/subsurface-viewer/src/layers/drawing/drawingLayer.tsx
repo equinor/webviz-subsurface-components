@@ -1,28 +1,29 @@
-import {
-    COORDINATE_SYSTEM,
+import type {
     Color,
-    CompositeLayer,
     PickingInfo,
     LayerContext,
     LayersList,
 } from "@deck.gl/core/typed";
-import { ExtendedLayerProps, LayerPickInfo } from "../utils/layerTools";
-import {
-    DrawLineStringMode,
-    DrawPointMode,
-    DrawPolygonMode,
+import { COORDINATE_SYSTEM, CompositeLayer } from "@deck.gl/core/typed";
+import type { ExtendedLayerProps, LayerPickInfo } from "../utils/layerTools";
+import type {
     EditAction,
     Feature,
     FeatureCollection,
     GeoJsonEditMode,
-    ImmutableFeatureCollection,
     ModeProps,
+} from "@nebula.gl/edit-modes";
+import {
+    DrawLineStringMode,
+    DrawPointMode,
+    DrawPolygonMode,
+    ImmutableFeatureCollection,
     ModifyMode,
     TransformMode,
     ViewMode,
 } from "@nebula.gl/edit-modes";
 import { EditableGeoJsonLayer } from "@nebula.gl/layers";
-import { DeckGLLayerContext } from "../../components/Map";
+import type { DeckGLLayerContext } from "../../components/Map";
 import { area, length } from "../../utils/measurement";
 
 // Custom drawing mode that deletes the selected GeoJson feature when releasing the Delete key.

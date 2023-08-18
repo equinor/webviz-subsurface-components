@@ -1,9 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
 
-import React, { PropsWithChildren, ReactNode, useMemo } from "react";
+import type { PropsWithChildren, ReactNode } from "react";
+import React, { useMemo } from "react";
 import { Provider as ReduxProvider } from "react-redux";
 import { createReduxStore } from "../redux/store";
-import { Data, DataInfos, UISettings } from "../redux/types";
+import type { Data, DataInfos, UISettings } from "../redux/types";
 
 interface Props {
     id: string;

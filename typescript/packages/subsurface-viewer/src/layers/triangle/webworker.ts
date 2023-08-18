@@ -1,5 +1,5 @@
-import { GeometryTriangles, GeometryLines } from "./privateTriangleLayer";
-import { Params } from "./triangleLayer";
+import type { GeometryTriangles, GeometryLines } from "./privateTriangleLayer";
+import type { Params } from "./triangleLayer";
 
 type Vec = [number, number, number];
 

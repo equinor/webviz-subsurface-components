@@ -3,14 +3,14 @@
 import React, { useState } from "react";
 import { styled } from "@mui/material/styles";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
-import { ComponentStory, ComponentMeta } from "@storybook/react";
+import type { ComponentStory, ComponentMeta } from "@storybook/react";
 import { NativeSelect } from "@equinor/eds-core-react";
 import {
     createColorMapFunction,
     ColorLegend,
     colorTables,
 } from "@emerson-eps/color-tables";
-import { MapMouseEvent } from "../../components/Map";
+import type { MapMouseEvent } from "../../components/Map";
 const PREFIX = "VolveWells";
 
 const classes = {

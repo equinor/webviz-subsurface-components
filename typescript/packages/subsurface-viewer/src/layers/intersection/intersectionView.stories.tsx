@@ -1,7 +1,7 @@
 import React from "react";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
-import { ComponentStory, ComponentMeta } from "@storybook/react";
-import { Feature } from "geojson";
+import type { ComponentStory, ComponentMeta } from "@storybook/react";
+import type { Feature } from "geojson";
 
 export default {
     component: SubsurfaceViewer,

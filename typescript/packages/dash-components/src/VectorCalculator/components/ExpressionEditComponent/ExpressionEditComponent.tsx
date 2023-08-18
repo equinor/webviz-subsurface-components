@@ -7,7 +7,7 @@ import { clear, save, sync } from "@equinor/eds-icons";
 Icon.add({ clear, save, sync });
 
 import { Grid } from "@mui/material";
-import { TreeDataNode } from "@webviz/core-components";
+import type { TreeDataNode } from "@webviz/core-components";
 
 import { VectorSelectorTable } from "./components/VectorSelectorTable";
 import { ExpressionDescriptionTextField } from "./components/ExpressionDescriptionTextField";

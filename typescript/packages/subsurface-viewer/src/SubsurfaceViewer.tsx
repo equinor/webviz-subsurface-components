@@ -1,15 +1,19 @@
-import { LayersList, Layer } from "@deck.gl/core/typed";
-import Map, {
+import type { LayersList } from "@deck.gl/core/typed";
+import { Layer } from "@deck.gl/core/typed";
+import type {
     ViewsType,
     TooltipCallback,
     ViewStateType,
     BoundsAccessor,
 } from "./components/Map";
-import { MapMouseEvent, jsonToObject } from "./components/Map";
+import Map from "./components/Map";
+import type { MapMouseEvent } from "./components/Map";
+import { jsonToObject } from "./components/Map";
 import React from "react";
 import PropTypes from "prop-types";
-import { colorTablesArray } from "@emerson-eps/color-tables/";
-import convert, { Unit } from "convert-units";
+import type { colorTablesArray } from "@emerson-eps/color-tables/";
+import type { Unit } from "convert-units";
+import convert from "convert-units";
 
 export type LightsType = {
     headLight?: {

@@ -1,7 +1,7 @@
 /* This file contains functions wich are missed on exports from "@equinor/videx-wellog" see \src\plots\legend\common.ts */
 
 import { setProps, setAttrs } from "@equinor/videx-wellog";
-import { LegendBounds } from "@equinor/videx-wellog/dist/utils/legend-helper";
+import type { LegendBounds } from "@equinor/videx-wellog/dist/utils/legend-helper";
 // eslint-disable-next-line
 declare type D3Selection = any; // not exported from videx-wellog! import { D3Selection } from "@equinor/videx-wellog/dist/common/interfaces';
 

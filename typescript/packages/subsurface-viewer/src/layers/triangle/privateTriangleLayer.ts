@@ -1,21 +1,20 @@
+import type {
+    PickingInfo,
+    UpdateParameters,
+    LayerContext,
+} from "@deck.gl/core/typed";
 import {
     COORDINATE_SYSTEM,
     Layer,
     picking,
     project,
     phongLighting,
-    PickingInfo,
-    UpdateParameters,
-    LayerContext,
 } from "@deck.gl/core/typed";
-import {
-    createPropertyData,
-    LayerPickInfo,
-    PropertyDataType,
-} from "../utils/layerTools";
+import type { LayerPickInfo, PropertyDataType } from "../utils/layerTools";
+import { createPropertyData } from "../utils/layerTools";
 import { Model, Geometry } from "@luma.gl/engine";
-import { DeckGLLayerContext } from "../../components/Map";
-import { ExtendedLayerProps } from "../utils/layerTools";
+import type { DeckGLLayerContext } from "../../components/Map";
+import type { ExtendedLayerProps } from "../utils/layerTools";
 import vsShader from "./vertex.glsl";
 import fsShader from "./fragment.fs.glsl";
 import vsLineShader from "./vertex_lines.glsl";

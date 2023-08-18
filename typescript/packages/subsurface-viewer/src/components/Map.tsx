@@ -1,6 +1,7 @@
 import { JSONConfiguration, JSONConverter } from "@deck.gl/json/typed";
-import DeckGL, { DeckGLRef } from "@deck.gl/react/typed";
-import {
+import type { DeckGLRef } from "@deck.gl/react/typed";
+import DeckGL from "@deck.gl/react/typed";
+import type {
     Color,
     Deck,
     Layer,
@@ -10,21 +11,19 @@ import {
     View,
     Viewport,
     PickingInfo,
-    OrthographicView,
-    OrbitView,
-    PointLight,
 } from "@deck.gl/core/typed";
-import { Feature, FeatureCollection } from "geojson";
+import { OrthographicView, OrbitView, PointLight } from "@deck.gl/core/typed";
+import type { Feature, FeatureCollection } from "geojson";
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import JSON_CONVERTER_CONFIG from "../utils/configuration";
-import { WellsPickInfo } from "../layers/wells/wellsLayer";
+import type { WellsPickInfo } from "../layers/wells/wellsLayer";
 import InfoCard from "./InfoCard";
 import DistanceScale from "./DistanceScale";
 import StatusIndicator from "./StatusIndicator";
-import { colorTablesArray } from "@emerson-eps/color-tables/";
+import type { colorTablesArray } from "@emerson-eps/color-tables/";
 import fitBounds from "../utils/fit-bounds";
 import { validateColorTables, validateLayers } from "@webviz/wsc-common";
-import { LayerPickInfo } from "../layers/utils/layerTools";
+import type { LayerPickInfo } from "../layers/utils/layerTools";
 import { getLayersByType } from "../layers/utils/layerTools";
 import { getWellLayerByTypeAndSelectedWells } from "../layers/utils/layerTools";
 import { WellsLayer, Axes2DLayer, NorthArrow3DLayer } from "../layers";
@@ -35,10 +34,10 @@ import { cloneDeep } from "lodash";
 import { colorTables } from "@emerson-eps/color-tables";
 import { getModelMatrixScale } from "../layers/utils/layerTools";
 import { OrbitController, OrthographicController } from "@deck.gl/core/typed";
-import { MjolnirEvent, MjolnirPointerEvent } from "mjolnir.js";
+import type { MjolnirEvent, MjolnirPointerEvent } from "mjolnir.js";
 import IntersectionView from "../views/intersectionView";
-import { Unit } from "convert-units";
-import { LightsType } from "../SubsurfaceViewer";
+import type { Unit } from "convert-units";
+import type { LightsType } from "../SubsurfaceViewer";
 import {
     _CameraLight as CameraLight,
     AmbientLight,

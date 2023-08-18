@@ -3,7 +3,8 @@
 import { Icon, Menu, Tooltip } from "@equinor/eds-core-react";
 import { styled } from "@mui/material/styles";
 import { Fab } from "@mui/material";
-import React, { ChangeEvent, useCallback } from "react";
+import type { ChangeEvent } from "react";
+import React, { useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { updateLayerProp, updateVisibleLayers } from "../../redux/actions";
 import ToggleButton from "./ToggleButton";

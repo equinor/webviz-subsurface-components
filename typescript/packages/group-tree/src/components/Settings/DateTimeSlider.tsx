@@ -3,8 +3,8 @@ import { styled } from "@mui/material/styles";
 import React, { useCallback, useContext, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCurrentDateTime } from "../../redux/actions";
-import { GroupTreeState } from "../../redux/store";
-import { Data, DatedTree } from "../../redux/types";
+import type { GroupTreeState } from "../../redux/store";
+import type { Data, DatedTree } from "../../redux/types";
 import { DataContext } from "../DataLoader";
 
 const classes = {

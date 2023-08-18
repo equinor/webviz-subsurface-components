@@ -16,7 +16,7 @@ import {
     // eslint-disable-next-line prettier/prettier
     updateWellsPerPage
 } from "./actions";
-import { SortDirection } from "./types";
+import type { SortDirection } from "./types";
 
 const mockStore = configureStore([]);
 describe("test actions", () => {

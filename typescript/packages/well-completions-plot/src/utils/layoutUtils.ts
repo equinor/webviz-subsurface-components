@@ -1,4 +1,4 @@
-import { Padding, PlotLayout } from "../types/layoutTypes";
+import type { Padding, PlotLayout } from "../types/layoutTypes";
 
 export function createLayout(
     width: number,
