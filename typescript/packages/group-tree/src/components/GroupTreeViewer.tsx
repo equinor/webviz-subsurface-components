@@ -4,12 +4,12 @@ import { styled } from "@mui/material/styles";
 import { cloneDeep } from "lodash";
 import React, { useContext, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
-import { GroupTreeState } from "../redux/store";
+import type { GroupTreeState } from "../redux/store";
 import { DataContext } from "./DataLoader";
 import "./Plot/dynamic_tree.css";
 import GroupTree from "./Plot/group_tree";
 import SettingsBar from "./Settings/SettingsBar";
-import { DataInfos } from "../redux/types";
+import type { DataInfos } from "../redux/types";
 
 const PREFIX = "GroupTreeViewer";
 

@@ -1,17 +1,8 @@
-import {
-    Layer,
-    PickingInfo,
-    picking,
-    Color,
-    UpdateParameters,
-    project,
-} from "@deck.gl/core/typed";
-import {
-    LayerPickInfo,
-    PropertyDataType,
-    createPropertyData,
-} from "../utils/layerTools";
-import { ExtendedLayerProps } from "../utils/layerTools";
+import type { PickingInfo, Color, UpdateParameters } from "@deck.gl/core/typed";
+import { Layer, picking, project } from "@deck.gl/core/typed";
+import type { LayerPickInfo, PropertyDataType } from "../utils/layerTools";
+import { createPropertyData } from "../utils/layerTools";
+import type { ExtendedLayerProps } from "../utils/layerTools";
 import { Vector2 } from "@math.gl/core";
 import vertexShader from "./vertex.glsl";
 import fragmentShader from "./fragment.glsl";

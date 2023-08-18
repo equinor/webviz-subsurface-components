@@ -1,4 +1,5 @@
-import { View, OrthographicViewState } from "@deck.gl/core/typed";
+import type { OrthographicViewState } from "@deck.gl/core/typed";
+import { View } from "@deck.gl/core/typed";
 import IntersectionViewport from "../viewports/intersectionViewport";
 
 // IntersectionViewState and IntersectionViewProps may need to have its own implementation when defining pan and zoom controls

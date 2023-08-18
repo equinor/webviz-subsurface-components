@@ -11,7 +11,7 @@ import { Button, Icon } from "@equinor/eds-core-react";
 import { arrow_drop_up, arrow_drop_down } from "@equinor/eds-icons";
 import { styled } from "@mui/system";
 
-import {
+import type {
     ExtendedLayerProps,
     LayerPickInfo,
     PropertyDataType,

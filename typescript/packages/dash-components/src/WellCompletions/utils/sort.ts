@@ -1,9 +1,8 @@
-import {
+import type {
     AttributeType,
-    SortBy,
-    SortDirection,
     WellPlotData,
 } from "../../../../well-completions-plot/src";
+import { SortBy, SortDirection } from "../../../../well-completions-plot/src";
 
 // Default sort methods
 export const createAttributeKeyFunction = (

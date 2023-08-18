@@ -5,7 +5,7 @@ import { isEqual } from "lodash";
 import React, { useCallback, useContext, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateTimeIndexRange } from "../../redux/actions";
-import { WellCompletionsState } from "../../redux/store";
+import type { WellCompletionsState } from "../../redux/store";
 import { DataContext } from "../DataLoader";
 const PREFIX = "TimeRangeSelector";
 

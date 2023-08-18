@@ -1,16 +1,11 @@
-import {
-    COORDINATE_SYSTEM,
-    Color,
-    Layer,
-    project,
-    UpdateParameters,
-} from "@deck.gl/core/typed";
+import type { Color, UpdateParameters } from "@deck.gl/core/typed";
+import { COORDINATE_SYSTEM, Layer, project } from "@deck.gl/core/typed";
 import GL from "@luma.gl/constants";
 import { Model, Geometry } from "@luma.gl/engine";
 import fragmentShader from "./axes-fragment.glsl";
 import gridVertex from "./grid-vertex.glsl";
-import { DeckGLLayerContext } from "../../components/Map";
-import { ExtendedLayerProps } from "../utils/layerTools";
+import type { DeckGLLayerContext } from "../../components/Map";
+import type { ExtendedLayerProps } from "../utils/layerTools";
 
 export interface BoxLayerProps extends ExtendedLayerProps {
     lines: [number]; // from pt , to pt.

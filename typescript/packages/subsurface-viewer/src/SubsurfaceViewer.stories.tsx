@@ -1,13 +1,12 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { ComponentStory, ComponentMeta } from "@storybook/react";
+import type { ComponentStory, ComponentMeta } from "@storybook/react";
 import { format } from "d3-format";
-import { PickingInfo, View } from "@deck.gl/core/typed";
+import type { PickingInfo } from "@deck.gl/core/typed";
+import { View } from "@deck.gl/core/typed";
 import { ContinuousLegend } from "@emerson-eps/color-tables";
-import SubsurfaceViewer, {
-    SubsurfaceViewerProps,
-    LightsType,
-} from "./SubsurfaceViewer";
-import {
+import type { SubsurfaceViewerProps, LightsType } from "./SubsurfaceViewer";
+import SubsurfaceViewer from "./SubsurfaceViewer";
+import type {
     MapMouseEvent,
     TooltipCallback,
     ViewStateType,
@@ -16,13 +15,13 @@ import {
 } from "./components/Map";
 import { WellsLayer, MapLayer, AxesLayer, Grid3DLayer } from "./layers";
 import InfoCard from "./components/InfoCard";
-import {
+import type {
     ExtendedLayerProps,
     LayerPickInfo,
     PropertyDataType,
 } from "./layers/utils/layerTools";
-import { WellsPickInfo } from "./layers/wells/wellsLayer";
-import { Feature } from "geojson";
+import type { WellsPickInfo } from "./layers/wells/wellsLayer";
+import type { Feature } from "geojson";
 import { ViewFooter } from "./components/ViewFooter";
 import { styled } from "@mui/material/styles";
 import Switch from "@mui/material/Switch";

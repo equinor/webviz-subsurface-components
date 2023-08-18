@@ -1,9 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
 
 import React from "react";
-import { CompletionPlotData, PlotData, WellPlotData } from "../types/dataTypes";
+import type {
+    CompletionPlotData,
+    PlotData,
+    WellPlotData,
+} from "../types/dataTypes";
 import { useTooltip } from "./TooltipProvider";
-import { Padding, PlotLayout } from "../types/layoutTypes";
+import type { Padding, PlotLayout } from "../types/layoutTypes";
 
 interface CompletionTooltipContentProps {
     zoneName: string;

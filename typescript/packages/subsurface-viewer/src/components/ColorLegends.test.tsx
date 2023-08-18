@@ -4,7 +4,7 @@ import "jest-styled-components";
 import "@testing-library/jest-dom";
 import React from "react";
 import ColorLegends from "./ColorLegends";
-import { Layer } from "@deck.gl/core/typed";
+import type { Layer } from "@deck.gl/core/typed";
 import { getLayersInViewport } from "../layers/utils/layerTools";
 
 import { colorTables } from "@emerson-eps/color-tables";

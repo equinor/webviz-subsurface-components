@@ -3,7 +3,7 @@ import { filter_alt } from "@equinor/eds-icons";
 import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateIsDrawerOpen } from "../../redux/actions";
-import { WellCompletionsState } from "../../redux/store";
+import type { WellCompletionsState } from "../../redux/store";
 
 // Use library approach
 Icon.add({ filter_alt }); // (this needs only be done once)

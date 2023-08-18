@@ -6,7 +6,7 @@ import * as core from "@actions/core";
 import { Wrapper } from "./test/TestWrapper";
 import { WellCompletions } from "./WellCompletions";
 import logTimes, { obj } from "./test/performanceMetrics";
-import { Data } from "./redux/types";
+import type { Data } from "./redux/types";
 
 import exampleData from "../../../../../example-data/well-completions.json";
 

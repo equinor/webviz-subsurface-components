@@ -1,4 +1,4 @@
-import { UISettings } from "../redux/types";
+import type { UISettings } from "../redux/types";
 import { SortBy } from "../../../../well-completions-plot/src";
 
 export const testState = {

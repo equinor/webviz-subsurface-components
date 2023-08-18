@@ -1,9 +1,10 @@
 import { NativeSelect } from "@equinor/eds-core-react";
 import { styled } from "@mui/material/styles";
-import React, { ChangeEvent, useCallback } from "react";
+import type { ChangeEvent } from "react";
+import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateTimeAggregation } from "../../redux/actions";
-import { WellCompletionsState } from "../../redux/store";
+import type { WellCompletionsState } from "../../redux/store";
 import { TimeAggregations } from "../../redux/types";
 
 const PREFIX = "TimeAggregationSelector";

@@ -2,7 +2,7 @@ import { Switch } from "@equinor/eds-core-react";
 import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateHideZeroCompletions } from "../../redux/actions";
-import { WellCompletionsState } from "../../redux/store";
+import type { WellCompletionsState } from "../../redux/store";
 /**
  * A switch for showing/hiding wells with zero completion
  */

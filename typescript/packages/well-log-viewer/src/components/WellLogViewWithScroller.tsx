@@ -1,10 +1,11 @@
 import React, { Component } from "react";
 
 import WellLogView from "./WellLogView";
-import { WellLogViewProps, argTypesWellLogViewProp } from "./WellLogView";
+import type { WellLogViewProps } from "./WellLogView";
+import { argTypesWellLogViewProp } from "./WellLogView";
 import { _propTypesWellLogView } from "./WellLogView";
 
-import { WellLogController } from "./WellLogView";
+import type { WellLogController } from "./WellLogView";
 
 import Scroller from "./Scroller";
 

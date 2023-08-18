@@ -1,4 +1,5 @@
-import React, { ChangeEvent, FormEvent, useCallback } from "react";
+import type { ChangeEvent, FormEvent } from "react";
+import React, { useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { updateLayerProp } from "../../redux/actions";
 import DrawModeSelector from "./DrawModeSelector";

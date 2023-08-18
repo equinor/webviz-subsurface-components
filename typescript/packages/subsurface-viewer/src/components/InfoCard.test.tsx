@@ -8,8 +8,8 @@ import "@testing-library/jest-dom";
 import React from "react";
 import InfoCard from "./InfoCard";
 import userEvent from "@testing-library/user-event";
-import { Layer } from "@deck.gl/core/typed";
-import { LayerPickInfo } from "../layers/utils/layerTools";
+import type { Layer } from "@deck.gl/core/typed";
+import type { LayerPickInfo } from "../layers/utils/layerTools";
 
 describe("Test Info Card", () => {
     it("snapshot test with no props", () => {

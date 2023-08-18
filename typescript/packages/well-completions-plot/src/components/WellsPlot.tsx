@@ -1,16 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
 
 import React from "react";
-import {
-    AttributeType,
-    PlotData,
-    SortBy,
-    SortByEnumToStringMapping,
-    WellPlotData,
-} from "../types/dataTypes";
+import type { AttributeType, PlotData, WellPlotData } from "../types/dataTypes";
+import { SortBy, SortByEnumToStringMapping } from "../types/dataTypes";
 import { capitalizeFirstLetter } from "../utils/stringUtil";
 import { useTooltip } from "./TooltipProvider";
-import { Padding, PlotLayout } from "../types/layoutTypes";
+import type { Padding, PlotLayout } from "../types/layoutTypes";
 
 interface WellTooltipContentProps {
     name: string;

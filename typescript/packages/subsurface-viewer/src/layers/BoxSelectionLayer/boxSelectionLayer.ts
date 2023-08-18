@@ -1,10 +1,11 @@
-import { CompositeLayer, PickingInfo, LayersList } from "@deck.gl/core/typed";
+import type { PickingInfo, LayersList } from "@deck.gl/core/typed";
+import { CompositeLayer } from "@deck.gl/core/typed";
 import { SelectionLayer } from "@nebula.gl/layers";
 import { GeoJsonLayer } from "@deck.gl/layers/typed";
-import { ExtendedLayerProps } from "../utils/layerTools";
+import type { ExtendedLayerProps } from "../utils/layerTools";
 import { getSize } from "../wells/wellsLayer";
-import { Color } from "@deck.gl/core/typed";
-import { Feature } from "geojson";
+import type { Color } from "@deck.gl/core/typed";
+import type { Feature } from "geojson";
 
 export interface BoxSelectionLayerProps extends ExtendedLayerProps {
     mode: string; // One of modes in MODE_MAP

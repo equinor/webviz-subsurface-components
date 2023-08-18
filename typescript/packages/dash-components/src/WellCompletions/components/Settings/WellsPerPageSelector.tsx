@@ -3,7 +3,7 @@ import { styled } from "@mui/material/styles";
 import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateWellsPerPage } from "../../redux/actions";
-import { WellCompletionsState } from "../../redux/store";
+import type { WellCompletionsState } from "../../redux/store";
 
 const PREFIX = "WellsPerPageSelector";
 

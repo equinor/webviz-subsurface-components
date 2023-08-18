@@ -1,14 +1,16 @@
-import {
-    COORDINATE_SYSTEM,
+import type {
     Color,
-    CompositeLayer,
     Viewport,
     UpdateParameters,
     LayersList,
+} from "@deck.gl/core/typed";
+import {
+    COORDINATE_SYSTEM,
+    CompositeLayer,
     OrthographicViewport,
 } from "@deck.gl/core/typed";
 import BoxLayer from "./boxLayer";
-import { Position3D, ExtendedLayerProps } from "../utils/layerTools";
+import type { Position3D, ExtendedLayerProps } from "../utils/layerTools";
 import { TextLayer } from "@deck.gl/layers/typed";
 import { cloneDeep } from "lodash";
 

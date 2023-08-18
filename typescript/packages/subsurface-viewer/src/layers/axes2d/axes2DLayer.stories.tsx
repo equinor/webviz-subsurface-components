@@ -1,7 +1,7 @@
 import React from "react";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
-import { ComponentStory, ComponentMeta } from "@storybook/react";
-import { ViewsType } from "../../components/Map";
+import type { ComponentStory, ComponentMeta } from "@storybook/react";
+import type { ViewsType } from "../../components/Map";
 import { View } from "@deck.gl/core/typed";
 
 type NumberQuad = [number, number, number, number];

@@ -1,4 +1,5 @@
-import React, { Component, ReactNode } from "react";
+import type { ReactNode } from "react";
+import React, { Component } from "react";
 
 function getScrollbarSizes(): { vertical: number; horizontal: number } {
     // Creating invisible container

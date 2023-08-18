@@ -1,23 +1,20 @@
-import {
+import type {
     Layer,
     LayersList,
     LayerData,
-    CompositeLayer,
     UpdateParameters,
     PickingInfo,
-    OrbitViewport,
 } from "@deck.gl/core/typed";
-import { ExtendedLayerProps, isDrawingEnabled } from "../utils/layerTools";
+import { CompositeLayer, OrbitViewport } from "@deck.gl/core/typed";
+import type { ExtendedLayerProps } from "../utils/layerTools";
+import { isDrawingEnabled } from "../utils/layerTools";
 import { PathLayer, TextLayer } from "@deck.gl/layers/typed";
-import { Color, Position } from "@deck.gl/core/typed";
+import type { Color, Position } from "@deck.gl/core/typed";
 import { PathStyleExtension } from "@deck.gl/extensions/typed";
 import { subtract, distance, dot } from "mathjs";
-import {
-    rgbValues,
-    colorTablesArray,
-    getColors,
-} from "@emerson-eps/color-tables/";
-import {
+import type { colorTablesArray } from "@emerson-eps/color-tables/";
+import { rgbValues, getColors } from "@emerson-eps/color-tables/";
+import type {
     Feature,
     GeometryCollection,
     LineString,
@@ -26,15 +23,12 @@ import {
     GeoJsonProperties,
     Geometry,
 } from "geojson";
-import {
-    LayerPickInfo,
-    PropertyDataType,
-    createPropertyData,
-} from "../utils/layerTools";
+import type { LayerPickInfo, PropertyDataType } from "../utils/layerTools";
+import { createPropertyData } from "../utils/layerTools";
 import { splineRefine, invertPath, GetBoundingBox } from "./utils/spline";
 import { interpolateNumberArray } from "d3";
-import { DeckGLLayerContext } from "../../components/Map";
-import {
+import type { DeckGLLayerContext } from "../../components/Map";
+import type {
     ContinuousLegendDataType,
     DiscreteLegendDataType,
 } from "../../components/ColorLegend";

@@ -1,9 +1,11 @@
-import { CompositeLayer, UpdateParameters } from "@deck.gl/core/typed";
-import PrivateTriangleLayer, { Material } from "./privateTriangleLayer";
-import { ExtendedLayerProps } from "../utils/layerTools";
+import type { UpdateParameters } from "@deck.gl/core/typed";
+import { CompositeLayer } from "@deck.gl/core/typed";
+import type { Material } from "./privateTriangleLayer";
+import PrivateTriangleLayer from "./privateTriangleLayer";
+import type { ExtendedLayerProps } from "../utils/layerTools";
 import { isEqual } from "lodash";
 import { makeFullMesh } from "./webworker";
-import React from "react";
+import type React from "react";
 
 export type Params = {
     vertexArray: Float32Array;

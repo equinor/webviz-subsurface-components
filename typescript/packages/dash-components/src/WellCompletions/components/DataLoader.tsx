@@ -1,10 +1,11 @@
-import React, { PropsWithChildren, ReactNode, useMemo } from "react";
+import type { PropsWithChildren, ReactNode } from "react";
+import React, { useMemo } from "react";
 import { Provider as ReduxProvider } from "react-redux";
 import { createReduxStore } from "../redux/store";
-import { Data, UISettings } from "../redux/types";
+import type { Data, UISettings } from "../redux/types";
 import { findSubzones, preprocessData } from "../utils/dataUtil";
 
-import { Zone } from "../../../../well-completions-plot/src";
+import type { Zone } from "../../../../well-completions-plot/src";
 
 interface Props {
     id: string;

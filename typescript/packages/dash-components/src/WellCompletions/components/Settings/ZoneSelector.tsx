@@ -1,15 +1,13 @@
 import { styled } from "@mui/material/styles";
 import React, { useCallback, useContext, useMemo } from "react";
-import DropdownTreeSelect, {
-    TreeNode,
-    TreeNodeProps,
-} from "react-dropdown-tree-select";
+import type { TreeNode, TreeNodeProps } from "react-dropdown-tree-select";
+import DropdownTreeSelect from "react-dropdown-tree-select";
 import "react-dropdown-tree-select/dist/styles.css";
 import { useDispatch } from "react-redux";
 import { updateFilteredZones } from "../../redux/actions";
 import { findSubzones } from "../../utils/dataUtil";
 import { DataContext } from "../DataLoader";
-import { Zone } from "../../../../../well-completions-plot/src";
+import type { Zone } from "../../../../../well-completions-plot/src";
 
 const PREFIX = "ZoneSelector";
 

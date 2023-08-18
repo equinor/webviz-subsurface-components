@@ -4,7 +4,7 @@ import React from "react";
 import DateTimeSlider from "./DateTimeSlider";
 import FlowRateSelector from "./FlowRateSelector";
 import NodeInfoSelector from "./NodeInfoSelector";
-import { DataInfos } from "../../redux/types";
+import type { DataInfos } from "../../redux/types";
 
 const PREFIX = "SettingsBar";
 

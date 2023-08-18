@@ -1,6 +1,6 @@
 import { testState } from "../test/testReduxState";
 import { rootReducer } from "./reducer";
-import { SortDirection } from "./types";
+import type { SortDirection } from "./types";
 
 describe("test actions", () => {
     it("test updateId", () => {

@@ -1,5 +1,5 @@
-import { MeshType, MeshTypeLines } from "./privateMapLayer";
-import { Params } from "./mapLayer";
+import type { MeshType, MeshTypeLines } from "./privateMapLayer";
+import type { Params } from "./mapLayer";
 
 type Vec = [number, number, number];
 

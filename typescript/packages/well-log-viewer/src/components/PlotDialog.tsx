@@ -1,12 +1,13 @@
-import React, { Component, ReactNode } from "react";
+import type { ReactNode } from "react";
+import React, { Component } from "react";
 
-import { Track, GraphTrack } from "@equinor/videx-wellog";
+import type { Track, GraphTrack } from "@equinor/videx-wellog";
 
-import { TemplatePlot, TemplatePlotTypes } from "./WellLogTemplateTypes";
-import { WellLog } from "./WellLogTypes";
-import { ColorTable } from "./ColorTableTypes";
+import type { TemplatePlot, TemplatePlotTypes } from "./WellLogTemplateTypes";
+import type { WellLog } from "./WellLogTypes";
+import type { ColorTable } from "./ColorTableTypes";
 
-import WellLogView from "./WellLogView";
+import type WellLogView from "./WellLogView";
 
 // material ui
 import {

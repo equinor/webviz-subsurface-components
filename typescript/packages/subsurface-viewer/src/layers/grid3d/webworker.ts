@@ -1,5 +1,5 @@
-import { MeshType, MeshTypeLines } from "./privateLayer";
-import { WebWorkerParams } from "./grid3dLayer";
+import type { MeshType, MeshTypeLines } from "./privateLayer";
+import type { WebWorkerParams } from "./grid3dLayer";
 
 export function makeFullMesh(e: { data: WebWorkerParams }): void {
     class Node {

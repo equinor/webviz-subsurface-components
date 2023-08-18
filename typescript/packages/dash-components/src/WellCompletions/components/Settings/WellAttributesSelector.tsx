@@ -6,7 +6,7 @@ import { SmartNodeSelector } from "@webviz/core-components";
 import React, { useCallback, useContext, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateFilterByAttributes } from "../../redux/actions";
-import { WellCompletionsState } from "../../redux/store";
+import type { WellCompletionsState } from "../../redux/store";
 import {
     computeAllowedAttributeValues,
     // eslint-disable-next-line prettier/prettier

@@ -1,11 +1,12 @@
-import { combineReducers, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import {
+import type { PayloadAction } from "@reduxjs/toolkit";
+import { combineReducers, createSlice } from "@reduxjs/toolkit";
+import type {
     Attributes,
     TimeAggregation,
     // eslint-disable-next-line prettier/prettier
     UISettings,
 } from "./types";
-import { SortDirection } from "../../../../well-completions-plot/src";
+import type { SortDirection } from "../../../../well-completions-plot/src";
 
 export const idSlice = createSlice({
     name: "id",

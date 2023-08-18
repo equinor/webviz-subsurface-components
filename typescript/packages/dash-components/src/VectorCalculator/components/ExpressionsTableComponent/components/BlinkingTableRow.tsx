@@ -1,5 +1,6 @@
 import React from "react";
-import { TableRow, TableRowProps } from "@mui/material";
+import type { TableRowProps } from "@mui/material";
+import { TableRow } from "@mui/material";
 
 import "../../../VectorCalculator.css";
 

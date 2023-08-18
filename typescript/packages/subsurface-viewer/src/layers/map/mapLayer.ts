@@ -1,11 +1,16 @@
-import { CompositeLayer, Color, UpdateParameters } from "@deck.gl/core/typed";
-import privateMapLayer, { Material } from "./privateMapLayer";
-import { ExtendedLayerProps, colorMapFunctionType } from "../utils/layerTools";
+import type { Color, UpdateParameters } from "@deck.gl/core/typed";
+import { CompositeLayer } from "@deck.gl/core/typed";
+import type { Material } from "./privateMapLayer";
+import privateMapLayer from "./privateMapLayer";
+import type {
+    ExtendedLayerProps,
+    colorMapFunctionType,
+} from "../utils/layerTools";
 import { getModelMatrix } from "../utils/layerTools";
 import { isEqual } from "lodash";
 import * as png from "@vivaxy/png";
 import { makeFullMesh } from "./webworker";
-import { Matrix4 } from "math.gl";
+import type { Matrix4 } from "math.gl";
 
 // Rotate x,y around x0, y0 rad radians
 function rotate(

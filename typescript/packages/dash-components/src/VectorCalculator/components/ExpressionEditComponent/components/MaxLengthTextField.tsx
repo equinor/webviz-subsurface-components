@@ -2,7 +2,8 @@
 
 import React from "react";
 
-import { TextField, TextFieldProps } from "@equinor/eds-core-react";
+import type { TextFieldProps } from "@equinor/eds-core-react";
+import { TextField } from "@equinor/eds-core-react";
 
 type Variants = "error" | "default";
 type MaxLengthTextFieldProps = TextFieldProps & {

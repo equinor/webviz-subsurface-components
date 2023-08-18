@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 
 import { getDetailedExpression } from "../../../utils/VectorCalculatorHelperFunctions";
-import { ExpressionType } from "../../../utils/VectorCalculatorTypes";
+import type { ExpressionType } from "../../../utils/VectorCalculatorTypes";
 import { ConfirmDialog } from "../../../utils/ConfirmDialog";
 import {
     isExpressionEdited,
