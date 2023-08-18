@@ -1,52 +1,52 @@
 {
-  "name": "@webviz/subsurface-viewer",
-  "version": "0.0.0",
-  "description": "",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "transpile": "tsc --project ./tsconfig.json",
-    "copy-files": "copyfiles --up 1 \"src/**/*.png\" dist/",
-    "build": "git clean -xdff dist && npm run transpile && npm run copy-files",
-    "test_perf": "jest _performance",
-    "test_correctness": "jest --coverage --testPathIgnorePatterns='_performance'",
-    "test": "jest --coverage",
-    "test:update": "npm test -- --u",
-    "test:watch": "npm test -- --watch",
-    "doc": "git clean -xdff docs && typedoc src"
-  },
-  "author": "Equinor <opensource@equinor.com>",
-  "license": "MPL-2.0",
-  "dependencies": {
-    "@deck.gl/core": "^8.8.25",
-    "@emerson-eps/color-tables": "^0.4.61",
-    "@equinor/eds-core-react": "^0.32.3",
-    "@equinor/eds-icons": "^0.19.1",
-    "@nebula.gl/layers": "^1.0.4",
-    "@reduxjs/toolkit": "^1.7.2",
-    "@vivaxy/png": "^1.3.0",
-    "@webviz/wsc-common": "*",
-    "ajv": "^7.2.1",
-    "convert-units": "^2.3.4",
-    "d3": "^7.8.2",
-    "d3-color": "^3.1.0",
-    "d3-format": "^1.4.5",
-    "deck.gl": "^8.9.19",
-    "gl-matrix": "^3.4.3",
-    "lodash": "^4.17.21",
-    "mathjs": "^9.4.2",
-    "react-redux": "^8.1.1"
-  },
-  "peerDependencies": {
-    "@mui/material": "^5.11",
-    "@mui/system": "^5.11",
-    "react": "^17 || ^18",
-    "react-dom": "^17 || ^18"
-  },
-  "volta": {
-    "node": "16.18.1"
-  }
+    "name": "@webviz/subsurface-viewer",
+    "version": "0.0.0",
+    "description": "",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "transpile": "tsc --project ./tsconfig.json",
+        "copy-files": "copyfiles --up 1 \"src/**/*.png\" dist/",
+        "build": "git clean -xdff dist && npm run transpile && npm run copy-files",
+        "test_perf": "jest _performance",
+        "test_correctness": "jest --coverage --testPathIgnorePatterns='_performance'",
+        "test": "jest --coverage",
+        "test:update": "npm test -- --u",
+        "test:watch": "npm test -- --watch",
+        "doc": "git clean -xdff docs && typedoc src"
+    },
+    "author": "Equinor <opensource@equinor.com>",
+    "license": "MPL-2.0",
+    "dependencies": {
+        "@deck.gl/core": "^8.8.25",
+        "@emerson-eps/color-tables": "^0.4.61",
+        "@equinor/eds-core-react": "^0.32.3",
+        "@equinor/eds-icons": "^0.19.1",
+        "@nebula.gl/layers": "^1.0.4",
+        "@reduxjs/toolkit": "^1.7.2",
+        "@vivaxy/png": "^1.3.0",
+        "@webviz/wsc-common": "*",
+        "ajv": "^7.2.1",
+        "convert-units": "^2.3.4",
+        "d3": "^7.8.2",
+        "d3-color": "^3.1.0",
+        "d3-format": "^1.4.5",
+        "deck.gl": "^8.9.19",
+        "gl-matrix": "^3.4.3",
+        "lodash": "^4.17.21",
+        "mathjs": "^9.4.2",
+        "react-redux": "^8.1.1"
+    },
+    "peerDependencies": {
+        "@mui/material": "^5.11",
+        "@mui/system": "^5.11",
+        "react": "^17 || ^18",
+        "react-dom": "^17 || ^18"
+    },
+    "volta": {
+        "node": "16.18.1"
+    }
 }

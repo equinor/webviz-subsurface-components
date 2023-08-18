@@ -1,33 +1,33 @@
 {
-  "name": "@webviz/group-tree",
-  "version": "0.0.0",
-  "description": "",
-  "main": "src/index.js",
-  "scripts": {
-    "transpile": "tsc --project ./tsconfig.json",
-    "build": "git clean -xdff dist && npm run transpile",
-    "test_perf": "jest _performance",
-    "test_correctness": "jest --coverage --testPathIgnorePatterns='_performance'",
-    "test": "jest --coverage",
-    "test:update": "npm test -- --u",
-    "test:watch": "npm test -- --watch",
-    "doc": "git clean -xdff docs && typedoc src"
-  },
-  "author": "Equinor <opensource@equinor.com>",
-  "license": "MPL-2.0",
-  "dependencies": {
-    "@equinor/eds-core-react": "^0.32.3",
-    "@reduxjs/toolkit": "^1.7.2",
-    "d3": "^7.8.2",
-    "lodash": "^4.17.21",
-    "react-redux": "^8.1.1"
-  },
-  "peerDependencies": {
-    "@mui/material": "^5.11",
-    "react": "^17 || ^18",
-    "react-dom": "^17 || ^18"
-  },
-  "volta": {
-    "node": "16.18.1"
-  }
+    "name": "@webviz/group-tree",
+    "version": "0.0.0",
+    "description": "",
+    "main": "src/index.js",
+    "scripts": {
+        "transpile": "tsc --project ./tsconfig.json",
+        "build": "git clean -xdff dist && npm run transpile",
+        "test_perf": "jest _performance",
+        "test_correctness": "jest --coverage --testPathIgnorePatterns='_performance'",
+        "test": "jest --coverage",
+        "test:update": "npm test -- --u",
+        "test:watch": "npm test -- --watch",
+        "doc": "git clean -xdff docs && typedoc src"
+    },
+    "author": "Equinor <opensource@equinor.com>",
+    "license": "MPL-2.0",
+    "dependencies": {
+        "@equinor/eds-core-react": "^0.32.3",
+        "@reduxjs/toolkit": "^1.7.2",
+        "d3": "^7.8.2",
+        "lodash": "^4.17.21",
+        "react-redux": "^8.1.1"
+    },
+    "peerDependencies": {
+        "@mui/material": "^5.11",
+        "react": "^17 || ^18",
+        "react-dom": "^17 || ^18"
+    },
+    "volta": {
+        "node": "16.18.1"
+    }
 }
