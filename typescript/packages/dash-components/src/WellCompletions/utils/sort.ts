@@ -32,7 +32,7 @@ export const createSortFunction = (
             (sort) =>
                 [sort, createAttributeKeyFunction(sort)] as [
                     string,
-                    (well: WellPlotData) => AttributeType
+                    (well: WellPlotData) => AttributeType,
                 ]
         )
     );

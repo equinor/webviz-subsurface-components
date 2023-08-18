@@ -73,7 +73,7 @@ const defaultProps = {
         number,
         number,
         number,
-        number
+        number,
     ],
     layers: [defaultWellsLayer],
 };
@@ -509,7 +509,7 @@ ViewStateSynchronization.argTypes = {
 export const IsLoadedCallback = (args: SubsurfaceViewerProps) => {
     const [layers, setLayers] = React.useState([defaultWellsLayer] as [
         WellsLayer,
-        MapLayer?
+        MapLayer?,
     ]);
     const [label, setLabel] = React.useState("");
 

@@ -786,6 +786,7 @@ function addPlot(
     el.style.height = "13px";
     parent.appendChild(el);
 
+    // eslint-disable-next-line react/no-deprecated
     ReactDOM.render(
         <PlotPropertiesDialog
             wellLogView={wellLogView}
@@ -845,6 +846,7 @@ function editPlot(
     el.style.height = "13px";
     parent.appendChild(el);
 
+    // eslint-disable-next-line react/no-deprecated
     ReactDOM.render(
         <PlotPropertiesDialog
             templatePlot={templatePlot}
@@ -866,6 +868,7 @@ export function addTrack(
     el.style.height = "13px";
     parent.appendChild(el);
 
+    // eslint-disable-next-line react/no-deprecated
     ReactDOM.render(
         <TrackPropertiesDialog wellLogView={wellLogView} onOK={onOK} />,
         el
@@ -883,6 +886,7 @@ export function editTrack(
     el.style.height = "13px";
     parent.appendChild(el);
 
+    // eslint-disable-next-line react/no-deprecated
     ReactDOM.render(
         <TrackPropertiesDialog
             templateTrack={templateTrack}

@@ -117,7 +117,7 @@ function Row(props: { layer_data: InfoCardDataType }) {
                                                                 number,
                                                                 number,
                                                                 number,
-                                                                number?
+                                                                number?,
                                                             ])
                                                         ).toString(),
                                                     }}

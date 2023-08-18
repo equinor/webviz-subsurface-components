@@ -19,7 +19,7 @@ const layerProps = {
         number,
         number,
         number,
-        number
+        number,
     ],
 };
 

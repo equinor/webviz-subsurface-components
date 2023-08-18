@@ -26,7 +26,7 @@ const testBounds = [432205, 6475078, 437720, 6481113] as [
     number,
     number,
     number,
-    number
+    number,
 ];
 const valueRange = [2782, 3513] as [number, number];
 

@@ -23,7 +23,7 @@ type ActionMap<
                       | VariableVectorMapType[];
               }
             | undefined;
-    }
+    },
 > = {
     [Key in keyof M]: M[Key] extends undefined
         ? {

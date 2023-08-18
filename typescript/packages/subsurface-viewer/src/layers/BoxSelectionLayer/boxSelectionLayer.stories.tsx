@@ -47,7 +47,7 @@ const DECK_PROPS = {
         number,
         number,
         number,
-        number
+        number,
     ],
     layers: [wellsLayer, boxSelectionLayer],
 };

@@ -86,7 +86,7 @@ WithWellsData.args = {
         number,
         number,
         number,
-        number
+        number,
     ],
     resources: {
         wellsData: "./volve_wells.json",

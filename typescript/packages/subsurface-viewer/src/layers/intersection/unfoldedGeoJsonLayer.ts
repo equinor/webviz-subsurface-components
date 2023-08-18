@@ -51,7 +51,7 @@ function getUnfoldedPath(object: Feature): Position[] {
 }
 
 export default class UnfoldedGeoJsonLayer<
-    D extends Feature = Feature
+    D extends Feature = Feature,
 > extends GeoJsonLayer<D> {
     renderLayers(): Layer[] {
         const layers = super.renderLayers() as Layer[];
