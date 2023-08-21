@@ -2,13 +2,16 @@
     "extends": "./tsconfig.json",
     "include": [
         "packages/*/src/",
-        "tsconfig.json",
-        "tsconfig.eslint.json",
-        "package.json",
-        "nx.json",
-        "jest.config.js",
+        "*.json",
+        "*.js",
         "packages/*/*.json",
         "packages/*/*.js"
     ],
-    "exclude": ["node_modules", "src/storybook", "src/test", "./storybook"]
+    "exclude": [
+        "node_modules",
+        "src/storybook",
+        "src/test",
+        "./storybook",
+        "./package-lock.json"
+    ]
 }
