@@ -1,7 +1,7 @@
 import React from "react";
 import { create, all } from "mathjs";
 
-import { ComponentStory, ComponentMeta } from "@storybook/react";
+import type { ComponentStory, ComponentMeta } from "@storybook/react";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 
 import {

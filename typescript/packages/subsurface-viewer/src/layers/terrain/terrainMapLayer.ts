@@ -1,20 +1,19 @@
-import {
-    SimpleMeshLayer,
-    SimpleMeshLayerProps,
-} from "@deck.gl/mesh-layers/typed";
+import type { SimpleMeshLayerProps } from "@deck.gl/mesh-layers/typed";
+import { SimpleMeshLayer } from "@deck.gl/mesh-layers/typed";
 import { COORDINATE_SYSTEM } from "@deck.gl/core/typed";
-import { Color, PickingInfo } from "@deck.gl/core/typed";
+import type { Color, PickingInfo } from "@deck.gl/core/typed";
 import fsShader from "./terrainmap.fs.glsl";
 import GL from "@luma.gl/constants";
 import { Texture2D } from "@luma.gl/webgl";
-import { DeckGLLayerContext } from "../../components/Map";
-import { colorTablesArray, rgbValues } from "@emerson-eps/color-tables/";
+import type { DeckGLLayerContext } from "../../components/Map";
+import type { colorTablesArray } from "@emerson-eps/color-tables/";
+import { rgbValues } from "@emerson-eps/color-tables/";
 import { createDefaultContinuousColorScale } from "@emerson-eps/color-tables/dist/component/Utils/legendCommonFunction";
-import {
-    createPropertyData,
+import type {
     PropertyDataType,
     colorMapFunctionType,
 } from "../utils/layerTools";
+import { createPropertyData } from "../utils/layerTools";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,

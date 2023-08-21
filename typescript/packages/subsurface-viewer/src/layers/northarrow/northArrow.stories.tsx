@@ -1,6 +1,6 @@
 import React from "react";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
-import { ComponentStory, ComponentMeta } from "@storybook/react";
+import type { ComponentStory, ComponentMeta } from "@storybook/react";
 
 export default {
     component: SubsurfaceViewer,

@@ -1,3 +1,10 @@
 package-lock.json
-**/dist
-packages/well-log-viewer/src/demo/example-data/volve_logs.json
+
+coverage
+dist
+docs
+example-data
+node_modules
+src/storybook
+src/test
+/storybook

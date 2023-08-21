@@ -1,7 +1,7 @@
-import { LegendBounds } from "@equinor/videx-wellog/dist/utils/legend-helper";
-import { LegendInfo } from "@equinor/videx-wellog/dist/plots/legend/interfaces";
-import { GradientFillPlotOptions } from "./gradientfill-plot";
-import GradientFillPlot from "./gradientfill-plot";
+import type { LegendBounds } from "@equinor/videx-wellog/dist/utils/legend-helper";
+import type { LegendInfo } from "@equinor/videx-wellog/dist/plots/legend/interfaces";
+import type { GradientFillPlotOptions } from "./gradientfill-plot";
+import type GradientFillPlot from "./gradientfill-plot";
 import { setAttrs } from "@equinor/videx-wellog";
 
 /* Missed exports from "@equinor/videx-wellog !!! */
@@ -10,7 +10,7 @@ declare type D3Selection = any; //import { D3Selection } from "@equinor/videx-we
 import { renderBasicPlotLegend } from "./legend/common"; //import { renderBasicPlotLegend } from "@equinor/videx-wellog/dist/plots/legend/common';
 /* End of missed from "@equinor/videx-wellog */
 
-import { ColorTable } from "../components/ColorTableTypes";
+import type { ColorTable } from "../components/ColorTableTypes";
 import { getInterpolatedColorString } from "./color-table";
 
 import { color4ToString } from "./color-table";

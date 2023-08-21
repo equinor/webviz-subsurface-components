@@ -1,17 +1,16 @@
-import React, { Component, ReactNode } from "react";
+import type { ReactNode } from "react";
+import React, { Component } from "react";
 import { LogViewer } from "@equinor/videx-wellog";
 
 import PropTypes from "prop-types";
 
-import {
-    InterpolatedScaleHandler,
-    ScaleInterpolator,
-} from "@equinor/videx-wellog";
+import type { ScaleInterpolator } from "@equinor/videx-wellog";
+import { InterpolatedScaleHandler } from "@equinor/videx-wellog";
 
-import { Track, GraphTrack, StackedTrack } from "@equinor/videx-wellog";
-import { Plot } from "@equinor/videx-wellog";
+import type { Track, GraphTrack, StackedTrack } from "@equinor/videx-wellog";
+import type { Plot } from "@equinor/videx-wellog";
 
-import {
+import type {
     OverlayClickEvent,
     OverlayMouseMoveEvent,
     OverlayMouseExitEvent,
@@ -24,16 +23,16 @@ import { validateSchema } from "@webviz/wsc-common";
 
 import { select } from "d3";
 
-import { WellLog, WellLogCurve } from "./WellLogTypes";
-import { Template } from "./WellLogTemplateTypes";
-import { ColorTable } from "./ColorTableTypes";
-import { PatternsTable } from "../utils/pattern";
+import type { WellLog, WellLogCurve } from "./WellLogTypes";
+import type { Template } from "./WellLogTemplateTypes";
+import type { ColorTable } from "./ColorTableTypes";
+import type { PatternsTable } from "../utils/pattern";
 
 import { getDiscreteColorAndName, getDiscreteMeta } from "../utils/tracks";
 import { createTracks } from "../utils/tracks";
 import { getScaleTrackNum } from "../utils/tracks";
-import { AxesInfo } from "../utils/tracks";
-import { ExtPlotOptions } from "../utils/tracks";
+import type { AxesInfo } from "../utils/tracks";
+import type { ExtPlotOptions } from "../utils/tracks";
 import { getTrackTemplate } from "../utils/tracks";
 import { isScaleTrack } from "../utils/tracks";
 import { deepCopy } from "../utils/deepcopy";
@@ -47,7 +46,7 @@ import {
 import { getPlotType } from "../utils/tracks";
 import { getAvailableAxes } from "../utils/tracks";
 
-import { TemplatePlot, TemplateTrack } from "./WellLogTemplateTypes";
+import type { TemplatePlot, TemplateTrack } from "./WellLogTemplateTypes";
 
 import {
     removeOverlay,
@@ -773,8 +772,8 @@ function addTrackMouseEventHandlers(
 import ReactDOM from "react-dom";
 import { PlotPropertiesDialog } from "./PlotDialog";
 import { TrackPropertiesDialog } from "./TrackDialog";
-import { DifferentialPlotLegendInfo } from "@equinor/videx-wellog/dist/plots/legend/interfaces";
-import { DifferentialPlotOptions } from "@equinor/videx-wellog/dist/plots/interfaces";
+import type { DifferentialPlotLegendInfo } from "@equinor/videx-wellog/dist/plots/legend/interfaces";
+import type { DifferentialPlotOptions } from "@equinor/videx-wellog/dist/plots/interfaces";
 
 function addPlot(
     parent: HTMLElement,
@@ -786,6 +785,7 @@ function addPlot(
     el.style.height = "13px";
     parent.appendChild(el);
 
+    // eslint-disable-next-line react/no-deprecated
     ReactDOM.render(
         <PlotPropertiesDialog
             wellLogView={wellLogView}
@@ -845,6 +845,7 @@ function editPlot(
     el.style.height = "13px";
     parent.appendChild(el);
 
+    // eslint-disable-next-line react/no-deprecated
     ReactDOM.render(
         <PlotPropertiesDialog
             templatePlot={templatePlot}
@@ -866,6 +867,7 @@ export function addTrack(
     el.style.height = "13px";
     parent.appendChild(el);
 
+    // eslint-disable-next-line react/no-deprecated
     ReactDOM.render(
         <TrackPropertiesDialog wellLogView={wellLogView} onOK={onOK} />,
         el
@@ -883,6 +885,7 @@ export function editTrack(
     el.style.height = "13px";
     parent.appendChild(el);
 
+    // eslint-disable-next-line react/no-deprecated
     ReactDOM.render(
         <TrackPropertiesDialog
             templateTrack={templateTrack}
@@ -926,7 +929,7 @@ export interface WellLogController {
     getTemplate(): Template;
 }
 
-import { Info } from "./InfoTypes";
+import type { Info } from "./InfoTypes";
 
 export interface WellLogViewOptions {
     /**

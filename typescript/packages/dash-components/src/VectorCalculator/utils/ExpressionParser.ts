@@ -1,6 +1,6 @@
 import { create, parseDependencies } from "mathjs";
 
-import { ExpressionParsingData } from "../utils/VectorCalculatorTypes";
+import type { ExpressionParsingData } from "../utils/VectorCalculatorTypes";
 
 const { parse } = create({
     parseDependencies,

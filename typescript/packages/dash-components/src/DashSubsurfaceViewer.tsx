@@ -1,18 +1,18 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { View } from "@deck.gl/core/typed";
-import { colorTablesArray } from "@emerson-eps/color-tables/";
-import SubsurfaceViewer, {
-    SubsurfaceViewerProps,
-} from "@webviz/subsurface-viewer/dist/SubsurfaceViewer";
-import {
+import type { colorTablesArray } from "@emerson-eps/color-tables/";
+import type { SubsurfaceViewerProps } from "@webviz/subsurface-viewer/dist/SubsurfaceViewer";
+import SubsurfaceViewer from "@webviz/subsurface-viewer/dist/SubsurfaceViewer";
+import type {
     ViewsType,
     TooltipCallback,
     ViewStateType,
     BoundsAccessor,
     MapMouseEvent,
 } from "@webviz/subsurface-viewer/dist/components/Map";
-import convert, { Unit } from "convert-units";
+import type { Unit } from "convert-units";
+import convert from "convert-units";
 
 export interface DashSubsurfaceViewerProps {
     id: string;

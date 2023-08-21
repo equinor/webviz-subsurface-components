@@ -1,6 +1,7 @@
-import { Data, TimeAggregation, TimeAggregations, Well } from "../redux/types";
+import type { Data, TimeAggregation, Well } from "../redux/types";
+import { TimeAggregations } from "../redux/types";
 
-import {
+import type {
     AttributeType,
     CompletionPlotData,
     PlotData,

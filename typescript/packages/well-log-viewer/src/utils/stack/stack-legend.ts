@@ -2,14 +2,14 @@ import { select } from "d3";
 /* Missed exports from "@equinor/videx-wellog !!! */
 // eslint-disable-next-line
 declare type D3Selection = any; //import { D3Selection } from "@equinor/videx-wellog/dist/common/interfaces';
-import {
+import type {
     LegendBounds,
     LegendConfig,
     LegendOnUpdateFunction,
 } from "@equinor/videx-wellog/dist/utils/legend-helper";
 import { setAttrs } from "@equinor/videx-wellog";
 
-import { StackedTrack } from "@equinor/videx-wellog";
+import type { StackedTrack } from "@equinor/videx-wellog";
 
 /**
  * Callback when legend needs to be updated

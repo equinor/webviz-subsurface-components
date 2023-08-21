@@ -1,4 +1,5 @@
-import React, { Component, ReactNode } from "react";
+import type { ReactNode } from "react";
+import React, { Component } from "react";
 
 import PropTypes from "prop-types";
 
@@ -9,16 +10,19 @@ import AxisSelector from "./components/AxisSelector";
 
 import ZoomSlider from "./components/ZoomSlider";
 
-import { WellLog } from "./components/WellLogTypes";
-import { Template } from "./components/WellLogTemplateTypes";
-import { ColorTable } from "./components/ColorTableTypes";
-import { PatternsTable } from "./utils/pattern";
+import type { WellLog } from "./components/WellLogTypes";
+import type { Template } from "./components/WellLogTemplateTypes";
+import type { ColorTable } from "./components/ColorTableTypes";
+import type { PatternsTable } from "./utils/pattern";
 
-import { WellLogController, WellPickProps } from "./components/WellLogView";
+import type {
+    WellLogController,
+    WellPickProps,
+} from "./components/WellLogView";
 
-import WellLogView from "./components/WellLogView";
-import { WellLogViewOptions } from "./components/WellLogView";
-import { WellLogSpacerOptions } from "./components/WellLogSpacer";
+import type WellLogView from "./components/WellLogView";
+import type { WellLogViewOptions } from "./components/WellLogView";
+import type { WellLogSpacerOptions } from "./components/WellLogSpacer";
 import { getWellPicks } from "./components/WellLogView";
 
 import { getAvailableAxes } from "./utils/tracks";
@@ -27,9 +31,9 @@ import { checkMinMax } from "./utils/minmax";
 
 import { onTrackMouseEvent } from "./utils/edit-track";
 import { fillInfos } from "./utils/fill-info";
-import { LogViewer } from "@equinor/videx-wellog";
+import type { LogViewer } from "@equinor/videx-wellog";
 
-import { Info, InfoOptions } from "./components/InfoTypes";
+import type { Info, InfoOptions } from "./components/InfoTypes";
 
 import { isEqualRanges } from "./components/WellLogView";
 

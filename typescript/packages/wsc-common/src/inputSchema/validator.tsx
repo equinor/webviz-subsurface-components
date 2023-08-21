@@ -1,5 +1,5 @@
 import Ajv from "ajv";
-import { ErrorObject, ValidateFunction } from "ajv/dist/types/index";
+import type { ErrorObject, ValidateFunction } from "ajv/dist/types/index";
 
 // schema definations
 import wellsSchema from "./Wells.json";

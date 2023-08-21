@@ -4,7 +4,7 @@ import "jest-styled-components";
 import React from "react";
 import { Wrapper } from "./../test/TestWrapper";
 import GroupTreeComponent from "./GroupTreeComponent";
-import { Data } from "../redux/types";
+import type { Data } from "../redux/types";
 
 import exampleData from "../../../../../example-data/group-tree.json";
 

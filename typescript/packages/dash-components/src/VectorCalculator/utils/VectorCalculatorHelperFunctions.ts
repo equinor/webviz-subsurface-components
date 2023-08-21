@@ -1,11 +1,14 @@
 import { v4 as uuidv4 } from "uuid";
 
-import { ExpressionType, VariableVectorMapType } from "./VectorCalculatorTypes";
-import {
-    TreeData,
+import type {
+    ExpressionType,
+    VariableVectorMapType,
+} from "./VectorCalculatorTypes";
+import type {
     TreeDataNode,
     TreeDataNodeMetaData,
 } from "@webviz/core-components";
+import { TreeData } from "@webviz/core-components";
 
 export const getDefaultExpression = (): ExpressionType => {
     return {

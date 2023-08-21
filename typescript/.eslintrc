@@ -1,47 +1,54 @@
 {
-  "parser": "@typescript-eslint/parser",
-  "parserOptions": {
-    "ecmaVersion": 6,
-    "sourceType": "module"
-  },
-  "extends":  [
-    "plugin:react/recommended",
-    "eslint:recommended",
-    "plugin:prettier/recommended"
-  ],
-  "overrides": [
-    {
-      "files": ["*.ts", "*.tsx"],
-      "plugins": ["@typescript-eslint"],
-      "extends": [
+    "parser": "@typescript-eslint/parser",
+    "root": true,
+    "parserOptions": {
+        "ecmaVersion": 6,
+        "sourceType": "module",
+        "project": "./tsconfig.eslint.json",
+        "extraFileExtensions": [".json"]
+    },
+    "extends": [
         "plugin:react/recommended",
-        "plugin:@typescript-eslint/recommended",
+        "eslint:recommended",
         "plugin:prettier/recommended"
-      ]
+    ],
+    "overrides": [
+        {
+            "files": ["*.ts", "*.tsx"],
+            "plugins": ["@typescript-eslint"],
+            "extends": [
+                "plugin:react/recommended",
+                "plugin:@typescript-eslint/recommended",
+                // following raises 833 errors, mainly about unsafe handling of `any`
+                // "plugin:@typescript-eslint/recommended-type-checked",
+                "plugin:prettier/recommended"
+            ],
+            "rules": {
+                "@typescript-eslint/consistent-type-exports": "warn",
+                "@typescript-eslint/consistent-type-imports": "warn"
+            }
+        },
+        {
+            "files": ["*.mdx"],
+            "extends": ["plugin:mdx/recommended"]
+        }
+    ],
+    "settings": {
+        "react": {
+            "version": "detect"
+        }
     },
-    {
-      "files": ["*.mdx"],
-      "extends": ["plugin:mdx/recommended"],
+    "env": {
+        "amd": true,
+        "browser": true,
+        "es6": true,
+        "jasmine": true,
+        "node": true
     },
-  ],
-  "settings": {
-    "react": {
-      "version": "detect"
+    "plugins": ["react-hooks"],
+    "rules": {
+        "react-hooks/rules-of-hooks": "error", // For checking rules of hooks
+        "react-hooks/exhaustive-deps": "error", // For checking hook dependencies
+        "no-nested-ternary": "error"
     }
-  },
-  "env": {
-    "amd": true,
-    "browser": true,
-    "es6": true,
-    "jasmine": true,
-    "node": true
-  },
-  "plugins": [
-    "react-hooks"
-  ],
-  "rules": {
-    "react-hooks/rules-of-hooks": "error", // For checking rules of hooks
-    "react-hooks/exhaustive-deps": "error", // For checking hook dependencies
-    "no-nested-ternary": "error"
-  }
 }

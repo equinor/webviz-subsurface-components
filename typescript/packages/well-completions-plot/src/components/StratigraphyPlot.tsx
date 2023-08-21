@@ -1,6 +1,6 @@
 import React from "react";
-import { Zone } from "../types/dataTypes";
-import { Padding, PlotLayout } from "../types/layoutTypes";
+import type { Zone } from "../types/dataTypes";
+import type { Padding, PlotLayout } from "../types/layoutTypes";
 
 interface StratigraphyPlotProps {
     data: Zone[];

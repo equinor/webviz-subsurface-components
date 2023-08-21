@@ -1,5 +1,5 @@
-import { Well } from "../redux/types";
-import { Zone, Units } from "../../../../well-completions-plot/src";
+import type { Well } from "../redux/types";
+import type { Zone, Units } from "../../../../well-completions-plot/src";
 import { computeDataToPlot } from "./dataUtil";
 
 describe("Data Util", () => {

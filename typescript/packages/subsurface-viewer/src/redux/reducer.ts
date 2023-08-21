@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { combineReducers, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { DrawMode } from "./types";
+import type { PayloadAction } from "@reduxjs/toolkit";
+import { combineReducers, createSlice } from "@reduxjs/toolkit";
+import type { DrawMode } from "./types";
 
 export const specSlice = createSlice({
     name: "spec",

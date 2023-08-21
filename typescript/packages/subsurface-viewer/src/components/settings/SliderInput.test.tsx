@@ -1,7 +1,8 @@
 import { render } from "@testing-library/react";
 import "jest-styled-components";
 import "@testing-library/jest-dom";
-import React, { FormEvent } from "react";
+import type { FormEvent } from "react";
+import React from "react";
 import { EmptyWrapper } from "../../test/TestWrapper";
 import SliderInput from "./SliderInput";
 

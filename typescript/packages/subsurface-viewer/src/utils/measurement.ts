@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 
-import { FeatureOf, LineString, Polygon } from "@nebula.gl/edit-modes";
-import { Position } from "@deck.gl/core/typed";
+import type { FeatureOf, LineString, Polygon } from "@nebula.gl/edit-modes";
+import type { Position } from "@deck.gl/core/typed";
 
 import { segmentReduce, geomReduce } from "@turf/meta";
 

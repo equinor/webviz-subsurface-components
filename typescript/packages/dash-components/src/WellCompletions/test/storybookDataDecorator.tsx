@@ -1,5 +1,6 @@
-import React, { FC } from "react";
-import { Data } from "../redux/types";
+import type { FC } from "react";
+import React from "react";
+import type { Data } from "../redux/types";
 import { DataContext } from "../components/DataLoader";
 
 import exampleData from "../../../../../../example-data/well-completions.json";

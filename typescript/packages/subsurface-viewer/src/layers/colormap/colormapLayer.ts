@@ -1,17 +1,20 @@
-import { BitmapLayer, BitmapLayerProps } from "@deck.gl/layers/typed";
-import { PickingInfo } from "@deck.gl/core/typed";
+import type { BitmapLayerProps } from "@deck.gl/layers/typed";
+import { BitmapLayer } from "@deck.gl/layers/typed";
+import type { PickingInfo } from "@deck.gl/core/typed";
 import GL from "@luma.gl/constants";
 import { Texture2D } from "@luma.gl/webgl";
 
-import { LayerPickInfo } from "../../layers/utils/layerTools";
+import type { LayerPickInfo } from "../../layers/utils/layerTools";
 import { decoder } from "../shader_modules";
-import { decodeRGB, ValueDecoder } from "../utils/propertyMapTools";
-import { getModelMatrix, colorMapFunctionType } from "../utils/layerTools";
+import type { ValueDecoder } from "../utils/propertyMapTools";
+import { decodeRGB } from "../utils/propertyMapTools";
+import type { colorMapFunctionType } from "../utils/layerTools";
+import { getModelMatrix } from "../utils/layerTools";
 import fsColormap from "./colormap.fs.glsl";
-import { DeckGLLayerContext } from "../../components/Map";
-import { colorTablesArray } from "@emerson-eps/color-tables/";
+import type { DeckGLLayerContext } from "../../components/Map";
+import type { colorTablesArray } from "@emerson-eps/color-tables/";
 import { getRgbData } from "@emerson-eps/color-tables";
-import { ContinuousLegendDataType } from "../../components/ColorLegend";
+import type { ContinuousLegendDataType } from "../../components/ColorLegend";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,

@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { Data, DataInfos } from "../redux/types";
+import type { Data, DataInfos } from "../redux/types";
 import DataProvider from "./DataLoader";
 import GroupTreeViewer from "./GroupTreeViewer";
 

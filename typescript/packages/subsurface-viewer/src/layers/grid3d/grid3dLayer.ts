@@ -1,6 +1,11 @@
-import { CompositeLayer, Color } from "@deck.gl/core/typed";
-import privateLayer, { Material } from "./privateLayer";
-import { ExtendedLayerProps, colorMapFunctionType } from "../utils/layerTools";
+import type { Color } from "@deck.gl/core/typed";
+import { CompositeLayer } from "@deck.gl/core/typed";
+import type { Material } from "./privateLayer";
+import privateLayer from "./privateLayer";
+import type {
+    ExtendedLayerProps,
+    colorMapFunctionType,
+} from "../utils/layerTools";
 import { makeFullMesh } from "./webworker";
 import { isEqual } from "lodash";
 import { load, JSONLoader } from "@loaders.gl/core";

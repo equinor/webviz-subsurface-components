@@ -8,7 +8,7 @@ import SubsurfaceViewer from "./SubsurfaceViewer";
 import { colorTables } from "@emerson-eps/color-tables";
 
 import mapData from "../../../../example-data/deckgl-map.json";
-import { Unit } from "convert-units";
+import type { Unit } from "convert-units";
 
 const colorTablesData = colorTables;
 

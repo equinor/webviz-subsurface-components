@@ -1,12 +1,14 @@
 import PropTypes from "prop-types";
 
-import {
-    AttributeTypePropType,
+import type {
     SortDirection,
     Units,
-    UnitsPropType,
     WellInfo,
     Zone,
+} from "../../../../well-completions-plot/src";
+import {
+    AttributeTypePropType,
+    UnitsPropType,
     ZonePropTypes,
 } from "../../../../well-completions-plot/src";
 

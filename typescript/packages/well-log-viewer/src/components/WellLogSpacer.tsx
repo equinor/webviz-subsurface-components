@@ -1,12 +1,15 @@
-import React, { Component, ReactNode } from "react";
+import type { ReactNode } from "react";
+import React, { Component } from "react";
 
 import "./styles.scss";
 
-import { WellLogController, WellPickProps, getWellPicks } from "./WellLogView";
-import WellLogView from "./WellLogView";
+import type { WellLogController, WellPickProps } from "./WellLogView";
+import { getWellPicks } from "./WellLogView";
+import type WellLogView from "./WellLogView";
 
-import { ColorTable } from "./ColorTableTypes";
-import { PatternsTable, createDefs, patternId } from "../utils/pattern";
+import type { ColorTable } from "./ColorTableTypes";
+import type { PatternsTable } from "../utils/pattern";
+import { createDefs, patternId } from "../utils/pattern";
 
 export interface WellLogSpacerOptions {
     /**

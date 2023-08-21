@@ -3,7 +3,7 @@ import { styled } from "@mui/material/styles";
 import { layers } from "@equinor/eds-icons";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { MapState } from "../../redux/store";
+import type { MapState } from "../../redux/store";
 import LayersButton from "./LayersButton";
 import LayerSettingsButton from "./LayerSettingsButton";
 import { getLayersInViewport } from "../../layers/utils/layerTools";

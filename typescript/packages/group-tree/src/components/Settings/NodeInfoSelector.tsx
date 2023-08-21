@@ -3,8 +3,8 @@ import { styled } from "@mui/material/styles";
 import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCurrentNodeInfo } from "../../redux/actions";
-import { GroupTreeState } from "../../redux/store";
-import { DataInfos, DataInfo } from "../../redux/types";
+import type { GroupTreeState } from "../../redux/store";
+import type { DataInfos, DataInfo } from "../../redux/types";
 
 const PREFIX = "NodeInfoSelector";
 

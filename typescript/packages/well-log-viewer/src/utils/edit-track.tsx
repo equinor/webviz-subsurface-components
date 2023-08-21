@@ -1,8 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { Plot } from "@equinor/videx-wellog";
-import WellLogView from "../components/WellLogView";
-import { TrackMouseEvent } from "../components/WellLogView";
+import type { Plot } from "@equinor/videx-wellog";
+import type WellLogView from "../components/WellLogView";
+import type { TrackMouseEvent } from "../components/WellLogView";
 import { SimpleMenu, editPlots } from "../components/LocalMenus";
 
 export function onTrackMouseEvent(
@@ -27,6 +27,7 @@ export function onTrackMouseEvent(
         el.style.width = "10px";
         el.style.height = "3px";
         ev.element.appendChild(el);
+        // eslint-disable-next-line react/no-deprecated
         ReactDOM.render(
             <SimpleMenu
                 type={ev.area}

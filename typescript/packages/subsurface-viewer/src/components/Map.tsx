@@ -1,6 +1,7 @@
 import { JSONConfiguration, JSONConverter } from "@deck.gl/json/typed";
-import DeckGL, { DeckGLRef } from "@deck.gl/react/typed";
-import {
+import type { DeckGLRef } from "@deck.gl/react/typed";
+import DeckGL from "@deck.gl/react/typed";
+import type {
     Color,
     Deck,
     Layer,
@@ -10,21 +11,19 @@ import {
     View,
     Viewport,
     PickingInfo,
-    OrthographicView,
-    OrbitView,
-    PointLight,
 } from "@deck.gl/core/typed";
-import { Feature, FeatureCollection } from "geojson";
+import { OrthographicView, OrbitView, PointLight } from "@deck.gl/core/typed";
+import type { Feature, FeatureCollection } from "geojson";
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import JSON_CONVERTER_CONFIG from "../utils/configuration";
-import { WellsPickInfo } from "../layers/wells/wellsLayer";
+import type { WellsPickInfo } from "../layers/wells/wellsLayer";
 import InfoCard from "./InfoCard";
 import DistanceScale from "./DistanceScale";
 import StatusIndicator from "./StatusIndicator";
-import { colorTablesArray } from "@emerson-eps/color-tables/";
+import type { colorTablesArray } from "@emerson-eps/color-tables/";
 import fitBounds from "../utils/fit-bounds";
 import { validateColorTables, validateLayers } from "@webviz/wsc-common";
-import { LayerPickInfo } from "../layers/utils/layerTools";
+import type { LayerPickInfo } from "../layers/utils/layerTools";
 import { getLayersByType } from "../layers/utils/layerTools";
 import { getWellLayerByTypeAndSelectedWells } from "../layers/utils/layerTools";
 import { WellsLayer, Axes2DLayer, NorthArrow3DLayer } from "../layers";
@@ -35,10 +34,10 @@ import { cloneDeep } from "lodash";
 import { colorTables } from "@emerson-eps/color-tables";
 import { getModelMatrixScale } from "../layers/utils/layerTools";
 import { OrbitController, OrthographicController } from "@deck.gl/core/typed";
-import { MjolnirEvent, MjolnirPointerEvent } from "mjolnir.js";
+import type { MjolnirEvent, MjolnirPointerEvent } from "mjolnir.js";
 import IntersectionView from "../views/intersectionView";
-import { Unit } from "convert-units";
-import { LightsType } from "../SubsurfaceViewer";
+import type { Unit } from "convert-units";
+import type { LightsType } from "../SubsurfaceViewer";
 import {
     _CameraLight as CameraLight,
     AmbientLight,
@@ -49,6 +48,9 @@ import { LineLayer } from "@deck.gl/layers/typed";
 import { Matrix4 } from "@math.gl/core";
 import { fovyToAltitude } from "@math.gl/web-mercator";
 
+/**
+ * 3D bounding box defined as [xmin, ymin, zmin, xmax, ymax, zmax].
+ */
 export type BoundingBox3D = [number, number, number, number, number, number];
 
 const minZoom3D = -12;
@@ -206,15 +208,21 @@ function compareViewsProp(views: ViewsType | undefined): string | undefined {
     return JSON.stringify(copy);
 }
 
+/**
+ * Type of the function returning coordinate boundary for the view defined as [left, bottom, right, top].
+ */
 export type BoundsAccessor = () => [number, number, number, number];
 
 export type TooltipCallback = (
     info: PickingInfo
 ) => string | Record<string, unknown> | null;
 
+/**
+ * Views
+ */
 export interface ViewsType {
     /**
-     * Layout for viewport in specified as [row, column]
+     * Layout for viewport in specified as [row, column].
      */
     layout: [number, number];
 
@@ -225,16 +233,19 @@ export interface ViewsType {
     marginPixels?: number;
 
     /**
-     * Show views label
+     * Show views label.
      */
     showLabel?: boolean;
 
     /**
-     * Layers configuration for multiple viewport
+     * Layers configuration for multiple viewports.
      */
     viewports: ViewportType[];
 }
 
+/**
+ * Viewport type.
+ */
 export interface ViewportType {
     /**
      * Viewport id
@@ -264,6 +275,9 @@ export interface ViewportType {
     isSync?: boolean;
 }
 
+/**
+ * Camera view state.
+ */
 export interface ViewStateType {
     target: number[];
     zoom: number | BoundingBox3D;

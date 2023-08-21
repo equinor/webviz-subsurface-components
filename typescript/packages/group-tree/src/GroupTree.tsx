@@ -6,9 +6,8 @@
 
 import PropTypes from "prop-types";
 import React from "react";
-import GroupTreeComponent, {
-    GroupTreeProps,
-} from "./components/GroupTreeComponent";
+import type { GroupTreeProps } from "./components/GroupTreeComponent";
+import GroupTreeComponent from "./components/GroupTreeComponent";
 
 const GroupTree = (props: GroupTreeProps) => {
     return (

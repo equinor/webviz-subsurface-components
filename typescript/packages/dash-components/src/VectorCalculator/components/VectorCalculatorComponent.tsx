@@ -3,13 +3,13 @@
 import React from "react";
 import Grid from "@mui/material/Grid";
 
-import {
+import type {
     ExpressionType,
     ExternalParseData,
 } from "../utils/VectorCalculatorTypes";
 import { ExpressionsTableComponent } from "./ExpressionsTableComponent";
 import { ExpressionEditComponent } from "./ExpressionEditComponent";
-import { TreeDataNode } from "@webviz/core-components";
+import type { TreeDataNode } from "@webviz/core-components";
 
 import {
     createExpressionTypeFromEditableData,

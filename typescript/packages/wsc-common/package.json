@@ -1,28 +1,29 @@
 {
-  "name": "@webviz/wsc-common",
-  "version": "0.0.0",
-  "description": "Shared functionality for WebViz Subsurface Components",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "transpile": "tsc --project ./tsconfig.json",
-    "copy-files": "copyfiles --up 1 \"src/**/*.png\" dist/",
-    "build": "git clean -xdff dist && npm run transpile && npm run copy-files",
-    "test_perf": "jest _performance",
-    "test_correctness": "jest --coverage --testPathIgnorePatterns='_performance' --passWithNoTests",
-    "test": "jest --coverage",
-    "test:update": "npm test -- --u",
-    "test:watch": "npm test -- --watch"
-  },
-  "author": "Equinor <opensource@equinor.com>",
-  "license": "MPL-2.0",
-  "dependencies": {
-    "ajv": "^7.2.1"
-  },
-  "volta": {
-    "node": "16.18.1"
-  }
+    "name": "@webviz/wsc-common",
+    "version": "0.0.0",
+    "description": "Shared functionality for WebViz Subsurface Components",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "transpile": "tsc --project ./tsconfig.json",
+        "copy-files": "copyfiles --up 1 \"src/**/*.png\" dist/",
+        "build": "git clean -xdff dist && npm run transpile && npm run copy-files",
+        "test_perf": "jest _performance",
+        "test_correctness": "jest --coverage --testPathIgnorePatterns='_performance' --passWithNoTests",
+        "test": "jest --coverage",
+        "test:update": "npm test -- --u",
+        "test:watch": "npm test -- --watch",
+        "doc": "git clean -xdff docs && typedoc src"
+    },
+    "author": "Equinor <opensource@equinor.com>",
+    "license": "MPL-2.0",
+    "dependencies": {
+        "ajv": "^7.2.1"
+    },
+    "volta": {
+        "node": "16.18.1"
+    }
 }

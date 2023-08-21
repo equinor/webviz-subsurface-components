@@ -1,7 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
 
 import React from "react";
-import convert, { Unit } from "convert-units";
+import type { Unit } from "convert-units";
+import convert from "convert-units";
 
 export interface ScaleProps {
     // Needed the zoom value to calculate width in units

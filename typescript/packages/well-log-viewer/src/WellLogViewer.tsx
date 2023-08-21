@@ -3,7 +3,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 
 import WellLogViewWithScroller from "./components/WellLogViewWithScroller";
-import { WellLogViewWithScrollerProps } from "./components/WellLogViewWithScroller";
+import type { WellLogViewWithScrollerProps } from "./components/WellLogViewWithScroller";
 import { argTypesWellLogViewScrollerProp } from "./components/WellLogViewWithScroller";
 //import { _propTypesWellLogView } from "./components/WellLogView";
 
@@ -14,15 +14,15 @@ import AxisSelector from "./components/AxisSelector";
 
 import ZoomSlider from "./components/ZoomSlider";
 
-import { WellLogController } from "./components/WellLogView";
+import type { WellLogController } from "./components/WellLogView";
 
 import { getAvailableAxes } from "./utils/tracks";
 
 import { onTrackMouseEvent } from "./utils/edit-track";
 import { fillInfos } from "./utils/fill-info";
-import { LogViewer } from "@equinor/videx-wellog";
+import type { LogViewer } from "@equinor/videx-wellog";
 
-import { Info, InfoOptions } from "./components/InfoTypes";
+import type { Info, InfoOptions } from "./components/InfoTypes";
 
 export interface WellLogViewerProps extends WellLogViewWithScrollerProps {
     readoutOptions?: InfoOptions; // options for readout

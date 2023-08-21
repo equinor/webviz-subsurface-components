@@ -1,6 +1,7 @@
-import React, { Component, ReactNode } from "react";
+import type { ReactNode } from "react";
+import React, { Component } from "react";
 
-import { Info } from "./InfoTypes";
+import type { Info } from "./InfoTypes";
 
 interface Props {
     header: string;

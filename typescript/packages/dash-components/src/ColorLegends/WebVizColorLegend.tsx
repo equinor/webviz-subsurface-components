@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { ColorLegend } from "@emerson-eps/color-tables";
-import { colorTablesArray } from "@emerson-eps/color-tables/";
+import type { colorTablesArray } from "@emerson-eps/color-tables/";
 
 interface LegendProps {
     colorTables?: colorTablesArray;
