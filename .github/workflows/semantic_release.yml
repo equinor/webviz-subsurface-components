@@ -17,8 +17,11 @@ jobs:
           git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
 
       - run: npm ci
+        working-directory: ./typescript
 
-      - run: npx nx run-many --target=semantic-release --parallel=false
+      - name: Run semantic release
+        working-directory: ./typescript
+        run: npx nx run-many --target=semantic-release --parallel=false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
