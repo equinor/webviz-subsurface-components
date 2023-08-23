@@ -6,5 +6,7 @@
   "branches": [
     "master"
   ],
+  "buildTarget": "build",
+  "outputPath": "dist",
   "dryRun": true
 }
