@@ -1,6 +1,8 @@
-import { COORDINATE_SYSTEM, Color, CompositeLayer } from "@deck.gl/core/typed";
-import { GeoJsonLayer, GeoJsonLayerProps } from "@deck.gl/layers/typed";
-import { Feature } from "geojson";
+import type { Color } from "@deck.gl/core/typed";
+import { COORDINATE_SYSTEM, CompositeLayer } from "@deck.gl/core/typed";
+import type { GeoJsonLayerProps } from "@deck.gl/layers/typed";
+import { GeoJsonLayer } from "@deck.gl/layers/typed";
+import type { Feature } from "geojson";
 import GL from "@luma.gl/constants";
 
 const getColor = (d: Feature): Color => {

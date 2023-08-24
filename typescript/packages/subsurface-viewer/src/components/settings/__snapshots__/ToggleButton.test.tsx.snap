@@ -33,25 +33,6 @@ exports[`Test Toggle Input snapshot test 1`] = `
   border-radius: 50%;
   position: relative;
   grid-area: input;
-  pointer-events: none;
-}
-
-.c5::before {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: auto;
-  min-height: auto;
-  content: '';
-}
-
-.c5::after {
-  position: absolute;
-  top: -4px;
-  left: -4px;
-  width: 48px;
-  height: 48px;
-  content: '';
 }
 
 .c3 {
@@ -62,6 +43,8 @@ exports[`Test Toggle Input snapshot test 1`] = `
   height: 100%;
   grid-area: input;
   margin: 0;
+  position: relative;
+  z-index: 1;
   cursor: pointer;
 }
 
@@ -70,12 +53,12 @@ exports[`Test Toggle Input snapshot test 1`] = `
 }
 
 .c3[data-focus-visible-added]:focus + span {
-  outline: 1px dashed var(--eds_interactive__focus,rgba(0,112,121,1));
+  outline: 2px dashed var(--eds_interactive__focus,rgba(0,112,121,1));
   outline-offset: 0px;
 }
 
 .c3:focus-visible + span {
-  outline: 1px dashed var(--eds_interactive__focus,rgba(0,112,121,1));
+  outline: 2px dashed var(--eds_interactive__focus,rgba(0,112,121,1));
   outline-offset: 0px;
 }
 
@@ -83,6 +66,12 @@ exports[`Test Toggle Input snapshot test 1`] = `
   display: inline-grid;
   vertical-align: middle;
   grid: [input] 1fr / [input] 1fr;
+  place-items: center;
+}
+
+.c4 {
+  width: 48px;
+  aspect-ratio: 1/1;
 }
 
 .c4:checked + span > span {
@@ -154,12 +143,12 @@ exports[`Test Toggle Input snapshot test 1`] = `
   </label>
   <span
     class="c2"
+    style="padding-right: 10px; width: 3rem;"
   >
     <input
       aria-label="Log curves"
       class="c3 c4"
       id="Log curves-switch"
-      style="padding-right: 10px; width: 3rem;"
       type="checkbox"
     />
     <span

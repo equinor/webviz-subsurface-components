@@ -1,14 +1,19 @@
-import { CompositeLayer, Color } from "@deck.gl/core/typed";
-import TerrainMapLayer, { DECODER, Material } from "./terrainMapLayer";
-import { ExtendedLayerProps, colorMapFunctionType } from "../utils/layerTools";
+import type { Color } from "@deck.gl/core/typed";
+import { CompositeLayer } from "@deck.gl/core/typed";
+import type { Material } from "./terrainMapLayer";
+import TerrainMapLayer, { DECODER } from "./terrainMapLayer";
+import type {
+    ExtendedLayerProps,
+    colorMapFunctionType,
+} from "../utils/layerTools";
 import { TerrainLoader } from "@loaders.gl/terrain";
 import { ImageLoader } from "@loaders.gl/images";
 import { load } from "@loaders.gl/core";
 import { Vector3 } from "@math.gl/core";
 import { getModelMatrix } from "../utils/layerTools";
 import { isEqual } from "lodash";
-import { ContinuousLegendDataType } from "../../components/ColorLegend";
-import { Matrix4 } from "math.gl";
+import type { ContinuousLegendDataType } from "../../components/ColorLegend";
+import type { Matrix4 } from "math.gl";
 
 type MeshType = {
     attributes: {
@@ -486,7 +491,7 @@ export default class Map3DLayer extends CompositeLayer<Map3DLayerProps> {
             this.props.frame?.rotPoint ??
             ((isRotPointDefined ? this.props.rotPoint : [minX, minY]) as [
                 number,
-                number
+                number,
             ]);
 
         const rotatingModelMatrix = getModelMatrix(

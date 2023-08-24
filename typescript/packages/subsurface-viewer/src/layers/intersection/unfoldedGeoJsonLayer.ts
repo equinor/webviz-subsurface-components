@@ -1,7 +1,7 @@
-import { Layer, Position, Viewport } from "@deck.gl/core/typed";
+import type { Layer, Position, Viewport } from "@deck.gl/core/typed";
 import { GeoJsonLayer } from "@deck.gl/layers/typed";
-import { Feature } from "geojson";
-import { LineString } from "geojson";
+import type { Feature } from "geojson";
+import type { LineString } from "geojson";
 import { isEqual, zip } from "lodash";
 import { distance } from "mathjs";
 import IntersectionViewport from "../../viewports/intersectionViewport";
@@ -51,7 +51,7 @@ function getUnfoldedPath(object: Feature): Position[] {
 }
 
 export default class UnfoldedGeoJsonLayer<
-    D extends Feature = Feature
+    D extends Feature = Feature,
 > extends GeoJsonLayer<D> {
     renderLayers(): Layer[] {
         const layers = super.renderLayers() as Layer[];

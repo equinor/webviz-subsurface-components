@@ -4,7 +4,7 @@ import "jest-styled-components";
 import "@testing-library/jest-dom";
 import React from "react";
 import ColorLegend from "./ColorLegend";
-import { ExtendedLayer } from "../layers/utils/layerTools";
+import type { ExtendedLayer } from "../layers/utils/layerTools";
 import { colorTables } from "@emerson-eps/color-tables";
 
 describe("Test Color Legend component", () => {

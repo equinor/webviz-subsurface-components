@@ -52,7 +52,7 @@ const Template = (args) => {
     );
 };
 
-const wellLog = require("../../../../../example-data/L898MUD.json")[0];
+const wellLog = require("../../../../../example-data/L898MUD.json")[0];// eslint-disable-line
 export const Default = Template.bind({});
 Default.args = {
     id: "Well-Log-Viewer-With-Scroller",

@@ -1,6 +1,6 @@
 import React from "react";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
-import { ComponentStory, ComponentMeta } from "@storybook/react";
+import type { ComponentStory, ComponentMeta } from "@storybook/react";
 
 import * as SurfacePoints from "./test_data/surfacePoints";
 import * as SurfaceTriangles from "./test_data/surfaceTriangles";

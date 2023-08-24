@@ -1,77 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Test Numeric Input snapshot test 1`] = `
-.c2 {
-  width: 100%;
-  box-sizing: border-box;
-  margin: 0;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  background: var(--eds_ui_background__light,rgba(247,247,247,1));
-  border: none;
-  height: 36px;
-  box-shadow: inset 0px -1px 0px 0px var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
-  outline: 1px solid transparent;
-  outline-offset: 0px;
-  margin: 0;
-  color: var(--eds_text__static_icons__default,rgba(61,61,61,1));
-  font-family: Equinor;
-  font-size: 1.000rem;
-  font-weight: 400;
-  line-height: 1.500em;
-  -webkit-letter-spacing: 0.025em;
-  -moz-letter-spacing: 0.025em;
-  -ms-letter-spacing: 0.025em;
-  letter-spacing: 0.025em;
-  text-align: left;
-  padding-left: 8px;
-  padding-top: 6px;
-  padding-right: 8px;
-  padding-bottom: 6px;
-}
-
-.c2::-webkit-input-placeholder {
-  color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
-}
-
-.c2::-moz-placeholder {
-  color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
-}
-
-.c2:-ms-input-placeholder {
-  color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
-}
-
-.c2::placeholder {
-  color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
-}
-
-.c2:active,
-.c2:focus {
-  outline-offset: 0;
-  box-shadow: none;
-  outline: 2px solid var(--eds_interactive_primary__resting,rgba(0,112,121,1));
-  outline-offset: 0px;
-}
-
-.c2:disabled {
-  color: var(--eds_interactive__disabled__text,rgba(190,190,190,1));
-  cursor: not-allowed;
-  box-shadow: none;
-  outline: none;
-}
-
-.c2:disabled:focus,
-.c2:disabled:active {
-  outline: none;
-}
-
-.c2[readOnly] {
-  background: transparent;
-  box-shadow: none;
-}
-
 .c0 {
   display: -webkit-box;
   display: -webkit-flex;
@@ -98,6 +27,81 @@ exports[`Test Numeric Input snapshot test 1`] = `
   margin: 0;
 }
 
+.c2 {
+  --eds-input-adornment-color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+  --eds-input-color: var(--eds_text__static_icons__default,rgba(61,61,61,1));
+  position: relative;
+  height: 36px;
+  width: 100%;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  border: none;
+  box-sizing: border-box;
+  box-shadow: inset 0px -1px 0px 0px var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+  background: var(--eds-input-background,var(--eds_ui_background__light,rgba(247,247,247,1)));
+  outline: 1px solid transparent;
+  outline-offset: 0px;
+}
+
+.c2:focus-within {
+  box-shadow: none;
+  outline: 2px solid var(--eds_interactive_primary__resting,rgba(0,112,121,1));
+  outline-offset: 0px;
+}
+
+.c2 > input {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.c3 {
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding-left: 8px;
+  padding-top: 6px;
+  padding-right: 8px;
+  padding-bottom: 6px;
+  font-family: Equinor;
+  font-size: 1.000rem;
+  font-weight: 400;
+  -webkit-letter-spacing: 0.025em;
+  -moz-letter-spacing: 0.025em;
+  -ms-letter-spacing: 0.025em;
+  letter-spacing: 0.025em;
+  line-height: 1.500em;
+  outline: none;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+.c3::-webkit-input-placeholder {
+  color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+}
+
+.c3::-moz-placeholder {
+  color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+}
+
+.c3:-ms-input-placeholder {
+  color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+}
+
+.c3::placeholder {
+  color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+}
+
+.c3:disabled {
+  color: var(--eds-input-color);
+  cursor: not-allowed;
+}
+
 <div
   style="display: flex; justify-content: space-between;"
 >
@@ -112,14 +116,19 @@ exports[`Test Numeric Input snapshot test 1`] = `
       Trajectory thickness
     </span>
   </label>
-  <input
+  <div
     class="c2"
-    id="Trajectory thickness-input"
-    min="0"
-    step="1"
     style="font-size: 15px; text-align: right; width: 3rem;"
-    type="number"
-    value="15"
-  />
+  >
+    <input
+      class="c3"
+      id="Trajectory thickness-input"
+      min="0"
+      step="1"
+      style="resize: none;"
+      type="number"
+      value="15"
+    />
+  </div>
 </div>
 `;

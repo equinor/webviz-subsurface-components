@@ -1,29 +1,29 @@
+import type { Track } from "@equinor/videx-wellog";
 import {
-    Track,
     ScaleTrack,
     DualScaleTrack,
     GraphTrack,
     StackedTrack,
 } from "@equinor/videx-wellog";
 
-import { TrackOptions } from "@equinor/videx-wellog/dist/tracks/interfaces";
-import { GraphTrackOptions } from "@equinor/videx-wellog/dist/tracks/graph/interfaces";
-import { StackedTrackOptions } from "@equinor/videx-wellog/dist/tracks/stack/interfaces";
-import { AreaData } from "@equinor/videx-wellog/dist/tracks/stack/interfaces";
+import type { TrackOptions } from "@equinor/videx-wellog/dist/tracks/interfaces";
+import type { GraphTrackOptions } from "@equinor/videx-wellog/dist/tracks/graph/interfaces";
+import type { StackedTrackOptions } from "@equinor/videx-wellog/dist/tracks/stack/interfaces";
+import type { AreaData } from "@equinor/videx-wellog/dist/tracks/stack/interfaces";
 
-import { LegendInfo } from "@equinor/videx-wellog/dist/plots/legend/interfaces";
+import type { LegendInfo } from "@equinor/videx-wellog/dist/plots/legend/interfaces";
 
-import { DifferentialPlotOptions } from "@equinor/videx-wellog/dist/plots/interfaces";
-import { GradientFillPlotOptions } from "./gradientfill-plot";
+import type { DifferentialPlotOptions } from "@equinor/videx-wellog/dist/plots/interfaces";
+import type { GradientFillPlotOptions } from "./gradientfill-plot";
 export interface ExtPlotOptions
     extends GradientFillPlotOptions /*|DifferentialPlotOptions|AreaPlotOptions*/ {
     legendInfo: () => LegendInfo;
 }
 
-import WellLogView from "../components/WellLogView";
+import type WellLogView from "../components/WellLogView";
 
-import { PlotConfig } from "@equinor/videx-wellog/dist/tracks/graph/interfaces";
-import { PlotFactory } from "@equinor/videx-wellog/dist/tracks/graph/interfaces";
+import type { PlotConfig } from "@equinor/videx-wellog/dist/tracks/graph/interfaces";
+import type { PlotFactory } from "@equinor/videx-wellog/dist/tracks/graph/interfaces";
 import { graphLegendConfig, scaleLegendConfig } from "@equinor/videx-wellog";
 import { stackLegendConfig } from "./stack/stack-legend";
 import { getInterpolatedColor } from "./color-table";
@@ -31,14 +31,14 @@ import { getInterpolatedColor } from "./color-table";
 // missed! import { createScale } from "@equinor/videx-wellog/dist/tracks/graph/interfaces";
 import { createScale } from "./graph/factory";
 
-import {
+import type {
     TemplatePlotTypes,
     TemplatePlotProps,
     TemplateTrack,
     TemplatePlot,
     TemplateStyle,
 } from "../components/WellLogTemplateTypes";
-import {
+import type {
     WellLog,
     WellLogCurve,
     WellLogDataRow,
@@ -234,8 +234,8 @@ export function getAvailableAxes(
     return result;
 }
 
+import type { Plot } from "@equinor/videx-wellog";
 import {
-    Plot,
     LinePlot,
     AreaPlot,
     DotPlot,
@@ -348,7 +348,7 @@ function makeDataAccessor2(iData: number, iData2: number) {
     return _dataAccessor.dataAccessor.bind(_dataAccessor);
 }
 
-import { ColorTable } from "../components/ColorTableTypes";
+import type { ColorTable } from "../components/ColorTableTypes";
 
 const defColorTable: ColorTable = {
     name: "not found",
@@ -489,7 +489,7 @@ function getPlotConfig(
     };
 }
 
-import { Domain } from "@equinor/videx-wellog/dist/common/interfaces";
+import type { Domain } from "@equinor/videx-wellog/dist/common/interfaces";
 /**
  * Update Graph-Track Scale according to the first plot
  */
@@ -1344,7 +1344,8 @@ function addStackedTrack(
             );
         }
     } else {
-        if(!meta) // see https://github.com/equinor/webviz-subsurface-components/issues/1613
+        if (!meta)
+            // see https://github.com/equinor/webviz-subsurface-components/issues/1613
             console.error("No color table given in template plot props");
     }
 

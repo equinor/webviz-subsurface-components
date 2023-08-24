@@ -4,7 +4,7 @@ import { render } from "@testing-library/react";
 import "jest-styled-components";
 import "@testing-library/jest-dom";
 import React from "react";
-import { LayersList } from "@deck.gl/core/typed";
+import type { LayersList } from "@deck.gl/core/typed";
 import Map from "./Map";
 import { EmptyWrapper } from "../test/TestWrapper";
 import { colorTables } from "@emerson-eps/color-tables";
@@ -20,13 +20,13 @@ import {
 } from "../layers";
 
 import mapData from "../../../../../example-data/deckgl-map.json";
-import { Unit } from "convert-units";
+import type { Unit } from "convert-units";
 const colorTablesData = colorTables;
 const testBounds = [432205, 6475078, 437720, 6481113] as [
     number,
     number,
     number,
-    number
+    number,
 ];
 const valueRange = [2782, 3513] as [number, number];
 

@@ -1,15 +1,27 @@
-import { LayersList, Layer } from "@deck.gl/core/typed";
-import Map, {
-    ViewsType,
+import type { LayersList } from "@deck.gl/core/typed";
+import { Layer } from "@deck.gl/core/typed";
+import type {
+    BoundsAccessor,
+    MapMouseEvent,
     TooltipCallback,
     ViewStateType,
-    BoundsAccessor,
+    ViewsType,
 } from "./components/Map";
-import { MapMouseEvent, jsonToObject } from "./components/Map";
+import Map, { jsonToObject } from "./components/Map";
 import React from "react";
 import PropTypes from "prop-types";
-import { colorTablesArray } from "@emerson-eps/color-tables/";
-import convert, { Unit } from "convert-units";
+import type { colorTablesArray } from "@emerson-eps/color-tables/";
+import type { Unit } from "convert-units";
+import convert from "convert-units";
+
+export type {
+    BoundsAccessor,
+    MapMouseEvent,
+    TooltipCallback,
+    ViewStateType,
+    ViewsType,
+    colorTablesArray,
+};
 
 export type LightsType = {
     headLight?: {
@@ -25,7 +37,7 @@ export type LightsType = {
             intensity: number;
             position: [number, number, number];
             color?: [number, number, number];
-        }
+        },
     ];
 
     directionalLights?: [
@@ -33,10 +45,13 @@ export type LightsType = {
             intensity: number;
             direction: [number, number, number];
             color?: [number, number, number];
-        }
+        },
     ];
 };
 
+/**
+ * Properties of the SubsurfaceViewer component.
+ */
 export interface SubsurfaceViewerProps {
     id: string;
     resources?: Record<string, unknown>;

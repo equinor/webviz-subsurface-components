@@ -5,10 +5,10 @@ import {
     DiscreteColorLegend,
     ContinuousLegend,
 } from "@emerson-eps/color-tables";
-import { ExtendedLayer } from "../layers/utils/layerTools";
-import { Color } from "@deck.gl/core/typed";
-import { colorTablesArray } from "@emerson-eps/color-tables/";
-import { colorMapFunctionType } from "../layers/utils/layerTools";
+import type { ExtendedLayer } from "../layers/utils/layerTools";
+import type { Color } from "@deck.gl/core/typed";
+import type { colorTablesArray } from "@emerson-eps/color-tables/";
+import type { colorMapFunctionType } from "../layers/utils/layerTools";
 
 interface LegendBaseData {
     title: string;

@@ -1,17 +1,17 @@
-import { PickingInfo } from "@deck.gl/core/typed";
-import { Color } from "@deck.gl/core/typed";
-import {
+import type { PickingInfo } from "@deck.gl/core/typed";
+import type { Color } from "@deck.gl/core/typed";
+import type {
     Layer,
     LayersList,
     LayerManager,
     CompositeLayerProps,
 } from "@deck.gl/core/typed";
 import { Matrix4 } from "math.gl";
-import {
+import type {
     ContinuousLegendDataType,
     DiscreteLegendDataType,
 } from "../../components/ColorLegend";
-import DrawingLayer from "../drawing/drawingLayer";
+import type DrawingLayer from "../drawing/drawingLayer";
 
 export type Position3D = [number, number, number];
 

@@ -1,7 +1,7 @@
 import React from "react";
 import { create, all } from "mathjs";
 
-import { ComponentStory, ComponentMeta } from "@storybook/react";
+import type { ComponentStory, ComponentMeta } from "@storybook/react";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 
 import {
@@ -43,6 +43,7 @@ const defaultProps = {
 const grid3dLayer = {
     "@@type": "Grid3DLayer",
     id: "Grid3DLayer",
+    gridLines: true,
     material: true,
     colorMapName: "Rainbow",
     ZIncreasingDownwards: false,

@@ -1,5 +1,6 @@
-import { combineReducers, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { UISettings } from "./types";
+import type { PayloadAction } from "@reduxjs/toolkit";
+import { combineReducers, createSlice } from "@reduxjs/toolkit";
+import type { UISettings } from "./types";
 
 export const idSlice = createSlice({
     name: "id",

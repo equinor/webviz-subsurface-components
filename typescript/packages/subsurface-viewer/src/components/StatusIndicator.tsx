@@ -1,6 +1,6 @@
 import React from "react";
 import { CircularProgress } from "@equinor/eds-core-react";
-import { Layer, LayersList } from "@deck.gl/core/typed";
+import type { Layer, LayersList } from "@deck.gl/core/typed";
 
 interface StatusIndicatorProps {
     layers: LayersList;

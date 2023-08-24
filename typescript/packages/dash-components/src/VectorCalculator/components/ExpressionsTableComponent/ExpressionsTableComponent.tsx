@@ -14,7 +14,7 @@ import { cloneDeep } from "lodash";
 
 import { StoreActions, useStore } from "../ExpressionsStore";
 import { ExpressionsTable } from "./components/ExpressionsTable";
-import { ExpressionType } from "../../utils/VectorCalculatorTypes";
+import type { ExpressionType } from "../../utils/VectorCalculatorTypes";
 import {
     getAvailableName,
     getDefaultExpression,

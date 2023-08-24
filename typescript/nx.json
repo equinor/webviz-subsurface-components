@@ -8,5 +8,10 @@
                 "cacheableOperations": ["build", "lint", "test", "e2e"]
             }
         }
+    },
+    "targetDefaults": {
+        "build": {
+            "dependsOn": ["^build"]
+        }
     }
 }

@@ -18,13 +18,20 @@
         "target": "es6",
         "allowJs": true,
         "skipLibCheck": true,
-        "resolveJsonModule": true
+        "resolveJsonModule": true,
+        "outDir": "./dist"
     },
     "exclude": [
+        "__mocks__",
+        "cypress",
+        "coverage",
         "**/*.test.tsx",
         "**/test/*.tsx",
         "**/*.stories.tsx",
-        "./cypress.config.ts",
         "**/*.test.ts"
-    ]
+    ],
+    "typedocOptions": {
+        "entryPoints": ["./src/index.ts"],
+        "out": "docs"
+    }
 }

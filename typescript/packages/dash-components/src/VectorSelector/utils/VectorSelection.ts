@@ -5,7 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { TreeNodeSelection, TreeData } from "@webviz/core-components";
+import type { TreeData } from "@webviz/core-components";
+import { TreeNodeSelection } from "@webviz/core-components";
 import { MatchType } from "@webviz/core-components/dist/components/SmartNodeSelector/";
 
 export default class VectorSelection extends TreeNodeSelection {

@@ -3,7 +3,7 @@ import { Provider } from "react-redux";
 import { DataContext } from "../components/DataLoader";
 import { createReduxStore } from "../redux/store";
 import { testState } from "./testReduxState";
-import { Data } from "../redux/types";
+import type { Data } from "../redux/types";
 
 import exampleData from "../../../../../example-data/group-tree.json";
 

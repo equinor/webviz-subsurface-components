@@ -1,7 +1,8 @@
 import { render } from "@testing-library/react";
 import "jest-styled-components";
 import "@testing-library/jest-dom";
-import React, { ChangeEvent } from "react";
+import type { ChangeEvent } from "react";
+import React from "react";
 import { EmptyWrapper } from "../../test/TestWrapper";
 import ToggleButton from "./ToggleButton";
 

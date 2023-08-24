@@ -1,1 +1,7 @@
-src/demo/example-data
+coverage/
+dist/
+docs/
+node_modules/
+
+example-data/
+demo/example-data/

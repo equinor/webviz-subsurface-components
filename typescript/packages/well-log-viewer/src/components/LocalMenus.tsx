@@ -1,15 +1,16 @@
-import React, { Component, ReactNode } from "react";
+import type { ReactNode } from "react";
+import React, { Component } from "react";
 
 import ReactDOM from "react-dom";
 
-import { Track, GraphTrack } from "@equinor/videx-wellog";
+import type { Track, GraphTrack } from "@equinor/videx-wellog";
 
-import { Plot } from "@equinor/videx-wellog";
-import { DifferentialPlotLegendInfo } from "@equinor/videx-wellog/dist/plots/legend/interfaces";
+import type { Plot } from "@equinor/videx-wellog";
+import type { DifferentialPlotLegendInfo } from "@equinor/videx-wellog/dist/plots/legend/interfaces";
 
-import WellLogView from "./WellLogView";
+import type WellLogView from "./WellLogView";
 
-import { ExtPlotOptions } from "../utils/tracks";
+import type { ExtPlotOptions } from "../utils/tracks";
 import { isScaleTrack } from "../utils/tracks";
 
 import Menu from "@mui/material/Menu";
@@ -298,6 +299,7 @@ export function editPlots(
     el.style.width = "10px";
     el.style.height = "13px";
     if (parent) parent.appendChild(el);
+    // eslint-disable-next-line react/no-deprecated
     ReactDOM.render(
         <SimpleMenu
             type="editPlots"
@@ -324,6 +326,7 @@ export function removePlots(
     el.style.width = "10px";
     el.style.height = "13px";
     if (parent) parent.appendChild(el);
+    // eslint-disable-next-line react/no-deprecated
     ReactDOM.render(
         <SimpleMenu
             type="removePlots"

@@ -8,12 +8,12 @@ import {
     TableBody,
     TableCell,
 } from "@mui/material";
-import { TreeDataNode } from "@webviz/core-components";
+import type { TreeDataNode } from "@webviz/core-components";
 import cloneDeep from "lodash/cloneDeep";
 
 import VectorSelector from "../../../../VectorSelector";
 import { StoreActions, useStore } from "../../ExpressionsStore";
-import { VariableVectorMapType } from "../../../utils/VectorCalculatorTypes";
+import type { VariableVectorMapType } from "../../../utils/VectorCalculatorTypes";
 import {
     areVariableVectorMapsEqual,
     createVariableVectorMapFromVariables,

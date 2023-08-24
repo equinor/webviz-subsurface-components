@@ -1,50 +1,38 @@
 {
-  "name": "@webviz/well-log-viewer",
-  "version": "0.0.0",
-  "description": "",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "transpile": "tsc --project ./tsconfig.json",
-    "copy-files": "copyfiles --up 1 \"src/**/*.png\" dist/ && copyfiles --up 1 \"src/**/*.scss\" dist/",
-    "build": "git clean -xdff dist && npm run transpile && npm run copy-files",
-    "test_perf": "jest _performance",
-    "test_correctness": "jest --coverage --testPathIgnorePatterns='_performance'",
-    "test": "jest --coverage",
-    "test:update": "npm test -- --u",
-    "test:watch": "npm test -- --watch"
-  },
-  "author": "Equinor <opensource@equinor.com>",
-  "license": "MPL-2.0",
-  "dependencies": {
-    "@emerson-eps/color-tables": "^0.4.57",
-    "@equinor/videx-wellog": "^0.8.0",
-    "@webviz/subsurface-viewer": "*",
-    "convert-units": "^2.3.4",
-    "d3": "^7.8.2"
-  },
-  "peerDependencies": {
-    "@mui/material": "^5.11",
-    "react": "^17 || ^18",
-    "react-dom": "^17 || ^18"
-  },
-  "nx": {
-    "targets": {
-      "build": {
-        "dependsOn": [
-          {
-            "dependencies": true,
-            "target": "build",
-            "params": "ignore"
-          }
-        ]
-      }
+    "name": "@webviz/well-log-viewer",
+    "version": "0.0.0",
+    "description": "",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "transpile": "tsc --project ./tsconfig.json",
+        "copy-files": "copyfiles --up 1 \"src/**/*.png\" dist/ && copyfiles --up 1 \"src/**/*.scss\" dist/",
+        "build": "git clean -xdff dist && npm run transpile && npm run copy-files",
+        "test_perf": "jest _performance",
+        "test_correctness": "jest --coverage --testPathIgnorePatterns='_performance'",
+        "test": "jest --coverage",
+        "test:update": "npm test -- --u",
+        "test:watch": "npm test -- --watch",
+        "doc": "git clean -xdff docs && typedoc src"
+    },
+    "author": "Equinor <opensource@equinor.com>",
+    "license": "MPL-2.0",
+    "dependencies": {
+        "@emerson-eps/color-tables": "^0.4.61",
+        "@equinor/videx-wellog": "^0.8.0",
+        "@webviz/wsc-common": "*",
+        "convert-units": "^2.3.4",
+        "d3": "^7.8.2"
+    },
+    "peerDependencies": {
+        "@mui/material": "^5.11",
+        "react": "^17 || ^18",
+        "react-dom": "^17 || ^18"
+    },
+    "volta": {
+        "node": "16.18.1"
     }
-  },
-  "volta": {
-    "node": "16.18.1"
-  }
 }

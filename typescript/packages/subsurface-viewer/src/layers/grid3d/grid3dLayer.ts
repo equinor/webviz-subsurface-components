@@ -1,6 +1,11 @@
-import { CompositeLayer, Color } from "@deck.gl/core/typed";
-import privateLayer, { Material } from "./privateLayer";
-import { ExtendedLayerProps, colorMapFunctionType } from "../utils/layerTools";
+import type { Color } from "@deck.gl/core/typed";
+import { CompositeLayer } from "@deck.gl/core/typed";
+import type { Material } from "./privateLayer";
+import privateLayer from "./privateLayer";
+import type {
+    ExtendedLayerProps,
+    colorMapFunctionType,
+} from "../utils/layerTools";
 import { makeFullMesh } from "./webworker";
 import { isEqual } from "lodash";
 import { load, JSONLoader } from "@loaders.gl/core";
@@ -103,6 +108,11 @@ export interface Grid3DLayerProps extends ExtendedLayerProps {
      */
     colorMapFunction?: colorMapFunctionType | false;
 
+    /** Enable lines around cell faces.
+     *  default: true.
+     */
+    gridLines: boolean;
+
     /** Surface material properties.
      * material: true  = default material, coloring depends on surface orientation and lighting.
      *           false = no material,  coloring is independent on surface orientation and lighting.
@@ -133,6 +143,7 @@ const defaultProps = {
     visible: true,
     material: true,
     colorMapName: "",
+    gridLines: true,
     propertyValueRange: [0.0, 1.0],
     depthTest: true,
     ZIncreasingDownwards: true,
@@ -258,6 +269,7 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
                 colorMapRange: this.props.colorMapRange,
                 colorMapClampColor: this.props.colorMapClampColor,
                 colorMapFunction: this.props.colorMapFunction,
+                gridLines: this.props.gridLines,
                 propertyValueRange: this.state["propertyValueRange"],
                 material: this.props.material,
                 depthTest: this.props.depthTest,

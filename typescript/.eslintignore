@@ -1,2 +1,10 @@
 package-lock.json
-**/dist
+
+coverage
+dist
+docs
+example-data
+node_modules
+src/storybook
+src/test
+/storybook
