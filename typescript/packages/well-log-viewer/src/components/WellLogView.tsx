@@ -1652,12 +1652,13 @@ class WellLogView
             return this.props.horizontal ? 3 : 5 /*some default value*/;
         }
     }
-    _forceUpdateTitleTooltips() : void { // workaround to refresh tooltips in videx wellog component
-        if(!this.container) return;
+    _forceUpdateTitleTooltips(): void {
+        // workaround to refresh tooltips in videx wellog component
+        if (!this.container) return;
         const elements = this.container.getElementsByClassName("track-title");
         for (const element of elements) {
-            if(element.textContent)
-                element.setAttribute("title",element.textContent);
+            if (element.textContent)
+                element.setAttribute("title", element.textContent);
             //const title=element.getAttribute("title");
             //console.log(title);
         }
@@ -1782,10 +1783,13 @@ class WellLogView
     }
 
     _editTrack(track: Track, templateTrack: TemplateTrack): void {
-        const titleCompare=track.options.label?.localeCompare(templateTrack.title)
+        const titleCompare = track.options.label?.localeCompare(
+            templateTrack.title
+        );
 
-        if (templateTrack.plots && 
-            templateTrack.plots[0] && 
+        if (
+            templateTrack.plots &&
+            templateTrack.plots[0] &&
             templateTrack.plots[0].type === "stacked"
         ) {
             addOrEditStackedTrack(
@@ -1804,8 +1808,9 @@ class WellLogView
                 false
             );
         }
-        if(titleCompare) // workaround to refresh tooltips in videx wellog component
-            this._forceUpdateTitleTooltips(); 
+        if (titleCompare)
+            // workaround to refresh tooltips in videx wellog component
+            this._forceUpdateTitleTooltips();
         this.onTemplateChanged();
     }
 
