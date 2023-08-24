@@ -510,7 +510,7 @@ function updateGraphTrackScale(track: GraphTrack): void {
         if (!track.options.scale) track.options.scale = "linear";
     }
 
-    if (track.plots.length) {
+    if (track.plots?.length) {
         const plot = track.plots[0];
         track.options.domain = plot.options.domain as Domain;
     }
