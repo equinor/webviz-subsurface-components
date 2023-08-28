@@ -29,7 +29,8 @@
       "plots": [
         {
           "name": "FAULT_PROXIMITY_FLAG",
-          "style": "discrete"
+          "style": "discrete",
+          "showLines": false
         }
       ]
     },
