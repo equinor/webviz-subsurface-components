@@ -1293,7 +1293,9 @@ function addStackedTrack(
     iPrimaryAxis: number,
     templateTrack: TemplateTrack,
     templateStyles?: TemplateStyle[],
-    colorTables?: ColorTable[]
+    colorTables?: ColorTable[], 
+    showLines?: boolean,
+    showLabels?: boolean    
 ): void {
     const templatePlot = templateTrack.plots[0];
     const name = templatePlot.name;
@@ -1349,13 +1351,12 @@ function addStackedTrack(
             console.error("No color table given in template plot props");
     }
 
-    const showLines = true;
     const options: StackedTrackOptions = {
         abbr: name, // name of the only plot
         legendConfig: stackLegendConfig,
         data: createStackData.bind(null, plotData.data, colorTable, meta),
-        showLabels: true,
-        showLines: showLines,
+        showLabels: showLabels===undefined? true: showLabels,
+        showLines: showLines===undefined? true: showLines,
     };
     setStackedTrackOptionFromTemplate(options, templateTrackFullPlot);
     const track = newStackedTrack(options);
@@ -1363,18 +1364,18 @@ function addStackedTrack(
     info.tracks.push(track);
 }
 
-function isStackedTemplateTrack(
+function getTemplateTrackFirstPlotProps(
     templateTrack: TemplateTrack,
     templateStyles?: TemplateStyle[]
 ) {
-    if (!templateTrack.plots) return false;
+    if (!templateTrack.plots) return undefined;
     const templatePlot = templateTrack.plots[0];
-    if (!templatePlot) return false;
+    if (!templatePlot) return undefined;
     const templatePlotProps = getTemplatePlotProps(
         templatePlot,
         templateStyles
     );
-    return templatePlotProps.type === "stacked";
+    return templatePlotProps;
 }
 
 export function createTracks(
@@ -1398,7 +1399,8 @@ export function createTracks(
 
         if (templateTracks) {
             for (const templateTrack of templateTracks) {
-                if (isStackedTemplateTrack(templateTrack, templateStyles)) {
+                const templatePlotProps=getTemplateTrackFirstPlotProps(templateTrack, templateStyles)
+                if (templatePlotProps && templatePlotProps.type === "stacked") { 
                     addStackedTrack(
                         info,
                         welllog,
@@ -1407,7 +1409,9 @@ export function createTracks(
                         iPrimaryAxis,
                         templateTrack,
                         templateStyles,
-                        colorTables
+                        colorTables, 
+                        templatePlotProps.showLines,
+                        templatePlotProps.showLabels                        
                     );
                 } else {
                     addGraphTrack(
