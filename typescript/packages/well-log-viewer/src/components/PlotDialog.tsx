@@ -55,6 +55,12 @@ const colorItems: Record<string, string> = {
     white: "White",
 };
 
+const booleanItems: Record<string, string> = {
+    // language dependent names of plot types
+    false: "No",
+    true: "Yes",
+};
+
 const noneValue = "-";
 
 export function _createItems(items: Record<string, string>): ReactNode[] {
@@ -78,6 +84,9 @@ export function createScaleItems(): ReactNode[] {
 function createColorItems(): ReactNode[] {
     return _createItems(colorItems);
 }
+export function createBooleanItems(): ReactNode[] {
+    return _createItems(booleanItems);
+}
 
 function createColorTableItems(colorTables: ColorTable[]): ReactNode[] {
     const nodes: ReactNode[] = [];
@@ -95,6 +104,44 @@ function createDataItem(item: string): ReactNode {
         <option key={item} value={item}>
             {item}
         </option>
+    );
+}
+
+export function createSelectControl(
+    valueName: string, // use it as "a pointer to member" of an object
+    label: string,
+    nodes: ReactNode[],
+    insertEmpty?: string | boolean
+): ReactNode {
+    let value = (this.state as unknown as Record<string, string>)[valueName];
+    if (insertEmpty) {
+        if (!value) value = noneValue;
+        // insert at the beginning
+        nodes.unshift(
+            <option key={noneValue} value={noneValue}>
+                {insertEmpty == true ? "\u2014" : insertEmpty}
+            </option>
+        );
+    }
+    return (
+        <FormControl fullWidth key={valueName}>
+            <InputLabel>{label}</InputLabel>
+            <NativeSelect
+                value={value}
+                onChange={(event) => {
+                    const value =
+                        event.currentTarget.value === noneValue
+                            ? ""
+                            : event.currentTarget.value;
+
+                    const values = new Object() as Record<string, string>;
+                    values[valueName] = value;
+                    this.setState(values as unknown as State);
+                }}
+            >
+                {nodes}
+            </NativeSelect>
+        </FormControl>
     );
 }
 
@@ -244,78 +291,34 @@ export class PlotPropertiesDialog extends Component<Props, State> {
         return names.map((name) => createDataItem(name));
     }
 
-    createSelectControl(
-        valueName: string, // use it as "a pointer to member" of an object
-        label: string,
-        nodes: ReactNode[],
-        insertEmpty?: string | boolean
-    ): ReactNode {
-        let value = (this.state as unknown as Record<string, string>)[
-            valueName
-        ];
-        if (insertEmpty) {
-            if (!value) value = noneValue;
-            // insert at the beginning
-            nodes.unshift(
-                <option key={noneValue} value={noneValue}>
-                    {insertEmpty == true ? "\u2014" : insertEmpty}
-                </option>
-            );
-        }
-        return (
-            <FormControl fullWidth>
-                <InputLabel>{label}</InputLabel>
-                <NativeSelect
-                    value={value}
-                    onChange={(event) => {
-                        const value =
-                            event.currentTarget.value === noneValue
-                                ? ""
-                                : event.currentTarget.value;
-
-                        const values = new Object() as Record<string, string>;
-                        values[valueName] = value;
-                        this.setState(values as unknown as State);
-                    }}
-                >
-                    {nodes}
-                </NativeSelect>
-            </FormControl>
-        );
-    }
-
     createSelectControlFromType(type: TemplatePlotTypes): ReactNode {
         if (type === "area" || type === "differential") {
             return [
-                this.createSelectControl(
-                    "fill",
-                    "Fill Color",
-                    createColorItems()
-                ),
+                createSelectControl("fill", "Fill Color", createColorItems()),
                 <FormControl fullWidth key="112" />,
                 <FormControl fullWidth key="113" />,
                 this.state.type === "area" ? (
-                    this.createSelectControl(
+                    createSelectControl(
                         "inverseColor",
                         "Inverse Color",
                         createColorItems(),
                         true
                     )
                 ) : (
-                    <FormControl fullWidth />
+                    <FormControl fullWidth key="114" />
                 ),
             ];
         } else if (type === "gradientfill") {
             const colorTables = this.props.wellLogView.props.colorTables;
             [
-                this.createSelectControl(
+                createSelectControl(
                     "colorTable",
                     "Fill Color table",
                     createColorTableItems(colorTables)
                 ),
                 <FormControl fullWidth key="211" />,
                 <FormControl fullWidth key="212" />,
-                this.createSelectControl(
+                createSelectControl(
                     "inverseColorTable",
                     "Inverse Color table",
                     createColorTableItems(colorTables),
@@ -346,12 +349,8 @@ export class PlotPropertiesDialog extends Component<Props, State> {
                         gridTemplateColumns: "1fr 1fr 1fr",
                     }}
                 >
-                    {this.createSelectControl(
-                        "type",
-                        "Type",
-                        createTypeItems()
-                    )}
-                    {this.createSelectControl(
+                    {createSelectControl("type", "Type", createTypeItems())}
+                    {createSelectControl(
                         "scale",
                         "Scale",
                         createScaleItems(),
@@ -359,7 +358,7 @@ export class PlotPropertiesDialog extends Component<Props, State> {
                     )}
                     {this.state.type === "gradientfill" && scale === "linear"
                         ? [
-                              this.createSelectControl(
+                              createSelectControl(
                                   "colorScale",
                                   "Color Scale",
                                   createScaleItems()
@@ -367,12 +366,12 @@ export class PlotPropertiesDialog extends Component<Props, State> {
                           ]
                         : [<FormControl fullWidth key="12" />]}
 
-                    {this.createSelectControl(
+                    {createSelectControl(
                         "name",
                         "Data",
                         this.createDataItems(skipUsed)
                     )}
-                    {this.createSelectControl(
+                    {createSelectControl(
                         "color",
                         this.state.type === "dot" ? "Dot Color" : "Line Color",
                         createColorItems()
@@ -380,17 +379,17 @@ export class PlotPropertiesDialog extends Component<Props, State> {
                     {this.createSelectControlFromType(this.state.type)}
                     {this.state.type === "differential"
                         ? [
-                              this.createSelectControl(
+                              createSelectControl(
                                   "name2",
                                   "Data 2",
                                   this.createDataItems(skipUsed)
                               ),
-                              this.createSelectControl(
+                              createSelectControl(
                                   "color2",
                                   "Line Color 2",
                                   createColorItems()
                               ),
-                              this.createSelectControl(
+                              createSelectControl(
                                   "fill2",
                                   "Fill Color 2",
                                   createColorItems()
