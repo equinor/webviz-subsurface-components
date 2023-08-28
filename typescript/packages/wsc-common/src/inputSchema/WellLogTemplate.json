@@ -96,6 +96,14 @@
                 "fill2": {
                     "$ref": "#/definitions/css_color",
                     "description": "for 'differetial' plot"
+                },
+                "showLabels": {
+                    "type": "boolean",
+                    "description": "for 'stacked' plot"
+                },
+                "showLines": {
+                    "type": "boolean",
+                    "description": "for 'stacked' plot"
                 }
             }
         },
