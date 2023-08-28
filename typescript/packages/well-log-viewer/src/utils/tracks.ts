@@ -1293,7 +1293,9 @@ function addStackedTrack(
     iPrimaryAxis: number,
     templateTrack: TemplateTrack,
     templateStyles?: TemplateStyle[],
-    colorTables?: ColorTable[]
+    colorTables?: ColorTable[],
+    showLines?: boolean,
+    showLabels?: boolean
 ): void {
     const templatePlot = templateTrack.plots[0];
     const name = templatePlot.name;
@@ -1349,13 +1351,16 @@ function addStackedTrack(
             console.error("No color table given in template plot props");
     }
 
-    const showLines = true;
+    const plot = templateTrackFullPlot.plots[0];
+    if (plot) {
+        plot.showLabels = showLabels;
+        plot.showLines = showLines;
+    }
+
     const options: StackedTrackOptions = {
         abbr: name, // name of the only plot
         legendConfig: stackLegendConfig,
         data: createStackData.bind(null, plotData.data, colorTable, meta),
-        showLabels: true,
-        showLines: showLines,
     };
     setStackedTrackOptionFromTemplate(options, templateTrackFullPlot);
     const track = newStackedTrack(options);
@@ -1363,18 +1368,18 @@ function addStackedTrack(
     info.tracks.push(track);
 }
 
-function isStackedTemplateTrack(
+function getTemplateTrackFirstPlotProps(
     templateTrack: TemplateTrack,
     templateStyles?: TemplateStyle[]
 ) {
-    if (!templateTrack.plots) return false;
+    if (!templateTrack.plots) return undefined;
     const templatePlot = templateTrack.plots[0];
-    if (!templatePlot) return false;
+    if (!templatePlot) return undefined;
     const templatePlotProps = getTemplatePlotProps(
         templatePlot,
         templateStyles
     );
-    return templatePlotProps.type === "stacked";
+    return templatePlotProps;
 }
 
 export function createTracks(
@@ -1398,7 +1403,11 @@ export function createTracks(
 
         if (templateTracks) {
             for (const templateTrack of templateTracks) {
-                if (isStackedTemplateTrack(templateTrack, templateStyles)) {
+                const templatePlotProps = getTemplateTrackFirstPlotProps(
+                    templateTrack,
+                    templateStyles
+                );
+                if (templatePlotProps && templatePlotProps.type === "stacked") {
                     addStackedTrack(
                         info,
                         welllog,
@@ -1407,7 +1416,9 @@ export function createTracks(
                         iPrimaryAxis,
                         templateTrack,
                         templateStyles,
-                        colorTables
+                        colorTables,
+                        templatePlotProps.showLines,
+                        templatePlotProps.showLabels
                     );
                 } else {
                     addGraphTrack(
@@ -1475,6 +1486,12 @@ function setStackedTrackOptionFromTemplate(
 ): void {
     options.label = templateTrack.title;
 
+    const plot = templateTrack.plots[0];
+    if (plot) {
+        options.showLabels = plot.showLabels;
+        options.showLines = plot.showLines;
+    }
+
     (options as TrackOptionsEx).__template = deepCopy(templateTrack);
 }
 
@@ -1509,42 +1526,56 @@ export function addOrEditStackedTrack(
     trackCurrent: Track,
     bAfter: boolean
 ): StackedTrack | null {
-    const welllog = wellLogView.props.welllog;
+    const props = wellLogView.props;
+    const welllog = props.welllog;
     const templatePlot = templateTrack.plots[0];
     if (!welllog || !templatePlot) return null;
     const name = templatePlot.name;
-    const colorTable = wellLogView.props.colorTables[0];
+    const templateStyles = props.template.styles;
+    // make full props
+    const templatePlotProps = getTemplatePlotProps(
+        templatePlot,
+        templateStyles
+    );
+
+    const colorTable = props.colorTables.find(
+        (colorTable) => colorTable.name == templatePlotProps.colorTable
+    );
     const meta = getDiscreteMeta(welllog, name);
     const data = welllog.data;
     const curves = welllog.curves;
-    const iCurve = indexOfElementByName(curves, templatePlot.name);
+    const iCurve = indexOfElementByName(curves, name);
     const axes = wellLogView.getAxesInfo();
     const iPrimaryAxis = indexOfElementByNames(
         curves,
         axes.mnemos[axes.primaryAxis]
     );
     const plotData = preparePlotData(data, iCurve, iPrimaryAxis);
+    const stackData = createStackData.bind(
+        null,
+        plotData.data,
+        colorTable,
+        meta
+    );
     if (track) {
         // edit existing track
+        {
+            // force to clear stacked areas
+            track.data = null; // workarond for videx welllog component to force redraw areas with new options (showLines, ...)
+            if (wellLogView.logController)
+                wellLogView.logController.updateTracks();
+        }
         track.options.abbr = name; // name of the only plot
-        track.options.data = createStackData.bind(
-            null,
-            plotData.data,
-            colorTable,
-            meta
-        );
+        track.options.data = stackData;
         track.data = track.options.data;
         setStackedTrackOptionFromTemplate(track.options, templateTrack);
         updateStackedTrackScale(track);
         if (wellLogView.logController) wellLogView.logController.refresh();
     } else {
-        const showLines = true;
         const options: StackedTrackOptions = {
             abbr: name, // name of the only plot
-            data: createStackData.bind(null, plotData.data, colorTable, meta),
+            data: stackData,
             legendConfig: stackLegendConfig,
-            showLabels: true,
-            showLines: showLines,
         };
         setStackedTrackOptionFromTemplate(options, templateTrack);
         track = newStackedTrack(options);
