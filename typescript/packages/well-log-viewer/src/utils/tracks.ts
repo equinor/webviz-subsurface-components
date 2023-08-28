@@ -1293,9 +1293,9 @@ function addStackedTrack(
     iPrimaryAxis: number,
     templateTrack: TemplateTrack,
     templateStyles?: TemplateStyle[],
-    colorTables?: ColorTable[], 
+    colorTables?: ColorTable[],
     showLines?: boolean,
-    showLabels?: boolean    
+    showLabels?: boolean
 ): void {
     const templatePlot = templateTrack.plots[0];
     const name = templatePlot.name;
@@ -1355,8 +1355,8 @@ function addStackedTrack(
         abbr: name, // name of the only plot
         legendConfig: stackLegendConfig,
         data: createStackData.bind(null, plotData.data, colorTable, meta),
-        showLabels: showLabels===undefined? true: showLabels,
-        showLines: showLines===undefined? true: showLines,
+        showLabels: showLabels === undefined ? true : showLabels,
+        showLines: showLines === undefined ? true : showLines,
     };
     setStackedTrackOptionFromTemplate(options, templateTrackFullPlot);
     const track = newStackedTrack(options);
@@ -1399,8 +1399,11 @@ export function createTracks(
 
         if (templateTracks) {
             for (const templateTrack of templateTracks) {
-                const templatePlotProps=getTemplateTrackFirstPlotProps(templateTrack, templateStyles)
-                if (templatePlotProps && templatePlotProps.type === "stacked") { 
+                const templatePlotProps = getTemplateTrackFirstPlotProps(
+                    templateTrack,
+                    templateStyles
+                );
+                if (templatePlotProps && templatePlotProps.type === "stacked") {
                     addStackedTrack(
                         info,
                         welllog,
@@ -1409,9 +1412,9 @@ export function createTracks(
                         iPrimaryAxis,
                         templateTrack,
                         templateStyles,
-                        colorTables, 
+                        colorTables,
                         templatePlotProps.showLines,
-                        templatePlotProps.showLabels                        
+                        templatePlotProps.showLabels
                     );
                 } else {
                     addGraphTrack(
