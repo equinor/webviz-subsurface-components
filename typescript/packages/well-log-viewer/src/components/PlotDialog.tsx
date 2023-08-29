@@ -55,6 +55,12 @@ const colorItems: Record<string, string> = {
     white: "White",
 };
 
+const booleanItems: Record<string, string> = {
+    // language dependent names of plot types
+    false: "No",
+    true: "Yes",
+};
+
 const noneValue = "-";
 
 export function _createItems(items: Record<string, string>): ReactNode[] {
@@ -77,6 +83,9 @@ export function createScaleItems(): ReactNode[] {
 }
 function createColorItems(): ReactNode[] {
     return _createItems(colorItems);
+}
+export function createBooleanItems(): ReactNode[] {
+    return _createItems(booleanItems);
 }
 
 function createColorTableItems(colorTables: ColorTable[]): ReactNode[] {
@@ -263,7 +272,7 @@ export class PlotPropertiesDialog extends Component<Props, State> {
             );
         }
         return (
-            <FormControl fullWidth>
+            <FormControl fullWidth key={valueName}>
                 <InputLabel>{label}</InputLabel>
                 <NativeSelect
                     value={value}
@@ -302,7 +311,7 @@ export class PlotPropertiesDialog extends Component<Props, State> {
                         true
                     )
                 ) : (
-                    <FormControl fullWidth />
+                    <FormControl fullWidth key="114" />
                 ),
             ];
         } else if (type === "gradientfill") {

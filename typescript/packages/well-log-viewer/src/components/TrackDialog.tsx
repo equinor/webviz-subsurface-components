@@ -19,6 +19,7 @@ import { FormControl, InputLabel, NativeSelect } from "@mui/material";
 
 import { createDataItems, dataNames } from "./PlotDialog";
 import { createScaleItems } from "./PlotDialog";
+import { createBooleanItems } from "./PlotDialog";
 import { _createItems } from "./PlotDialog";
 
 const noneValue = "-";
@@ -31,6 +32,9 @@ interface Props {
 interface State extends TemplateTrack {
     stacked: string;
     stackedName: string; // data name
+    showLabels: string;
+    showLines: string;
+
     open: boolean;
 }
 
@@ -58,6 +62,14 @@ export class TrackPropertiesDialog extends Component<Props, State> {
 
                   stacked: this.bStacked ? "1" : "0",
                   stackedName: templateTrack.plots[0]?.name,
+                  showLabels:
+                      templateTrack.plots[0]?.showLabels !== false
+                          ? "true"
+                          : "false",
+                  showLines:
+                      templateTrack.plots[0]?.showLines !== false
+                          ? "true"
+                          : "false",
                   open: true,
               }
             : {
@@ -70,6 +82,8 @@ export class TrackPropertiesDialog extends Component<Props, State> {
 
                   stacked: "0",
                   stackedName: name,
+                  showLabels: "true",
+                  showLines: "true",
                   open: true,
               };
 
@@ -81,11 +95,15 @@ export class TrackPropertiesDialog extends Component<Props, State> {
 
     onOK(): void {
         if (parseInt(this.state.stacked)) {
+            const plot0: TemplatePlot = this.state.plots[0];
             this.state.plots.splice(0, this.state.plots.length); // clear array
             const plot: TemplatePlot = {
+                ...plot0,
                 type: "stacked",
                 name: this.state.stackedName,
-                color: "not used", // not used in stacked
+                showLabels: this.state.showLabels === "true",
+                showLines: this.state.showLines === "true",
+                //color: "not used", // not used in stacked
             };
             this.state.plots.push(plot);
         }
@@ -123,7 +141,7 @@ export class TrackPropertiesDialog extends Component<Props, State> {
             );
         }
         return (
-            <FormControl fullWidth>
+            <FormControl fullWidth key={valueName}>
                 <InputLabel>{label}</InputLabel>
                 <NativeSelect
                     value={value}
@@ -180,21 +198,35 @@ export class TrackPropertiesDialog extends Component<Props, State> {
                     )}
 
                     {parseInt(this.state.stacked)
-                        ? this.createSelectControl(
-                              "stackedName", // data
-                              "Data",
-                              createDataItems(
-                                  this.props.wellLogView.props.welllog,
-                                  null,
+                        ? [
+                              this.createSelectControl(
+                                  "stackedName", // data
+                                  "Data",
+                                  createDataItems(
+                                      this.props.wellLogView.props.welllog,
+                                      null,
+                                      true
+                                  )
+                              ),
+                              this.createSelectControl(
+                                  "showLabels",
+                                  "Labels",
+                                  createBooleanItems()
+                              ),
+                              this.createSelectControl(
+                                  "showLines",
+                                  "Lines",
+                                  createBooleanItems()
+                              ),
+                          ]
+                        : [
+                              this.createSelectControl(
+                                  "scale",
+                                  "Scale",
+                                  createScaleItems(),
                                   true
-                              )
-                          )
-                        : this.createSelectControl(
-                              "scale",
-                              "Scale",
-                              createScaleItems(),
-                              true
-                          )}
+                              ),
+                          ]}
                 </DialogContent>
                 <DialogActions>
                     <Button

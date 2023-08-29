@@ -31,6 +31,9 @@ export type TemplatePlotProps = {
 
     color2?: CSSColor; // for 'differetial' plot
     fill2?: CSSColor; // for 'differetial' plot
+
+    showLabels?: boolean; // for 'stacked' plot
+    showLines?: boolean; // for 'stacked' plot
     //...
 }; // Part of JSON
 
