@@ -1,5 +1,6 @@
+export { default } from "./SubsurfaceViewer";
+
 export type {
-    default,
     BoundsAccessor,
     LightsType,
     MapMouseEvent,
