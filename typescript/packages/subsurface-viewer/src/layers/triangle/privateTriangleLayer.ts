@@ -20,6 +20,7 @@ import fsShader from "./fragment.fs.glsl";
 import vsLineShader from "./vertex_lines.glsl";
 import fsLineShader from "./fragment_lines.glsl";
 import GL from "@luma.gl/constants";
+import { localPhongLighting } from "../shader_modules";
 
 export type GeometryTriangles = {
     drawMode: number;
@@ -104,7 +105,7 @@ export default class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProp
             vs: vsShader,
             fs: fsShader,
             geometry: new Geometry(this.props.geometryTriangles),
-            modules: [project, picking, phongLighting],
+            modules: [project, picking, localPhongLighting],
             isInstanced: false, // This only works when set to false.
         });
 
