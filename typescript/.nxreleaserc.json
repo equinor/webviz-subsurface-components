@@ -1,0 +1,12 @@
+{
+  "changelog": true,
+  "npm": true,
+  "github": true,
+  "repositoryUrl": "https://github.com/equinor/webviz-subsurface-components",
+  "branches": [
+    "master"
+  ],
+  "buildTarget": "build",
+  "outputPath": "dist",
+  "dryRun": true
+}
