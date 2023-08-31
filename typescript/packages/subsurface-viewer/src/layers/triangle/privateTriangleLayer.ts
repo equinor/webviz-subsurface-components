@@ -8,7 +8,6 @@ import {
     Layer,
     picking,
     project,
-    phongLighting,
 } from "@deck.gl/core/typed";
 import type { LayerPickInfo, PropertyDataType } from "../utils/layerTools";
 import { createPropertyData } from "../utils/layerTools";
