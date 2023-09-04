@@ -1,4 +1,4 @@
-const fs = `
+export const fs = `
 // Note: modification of luma.gl's functions to get two sided phong lighting.
 // Ref original file modules/shadertools/src/modules/phong-lighting/phong-lighting.glsl.ts in luma source.
 
