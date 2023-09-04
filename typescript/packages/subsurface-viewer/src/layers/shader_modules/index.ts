@@ -1,2 +1,2 @@
-export { default as decoder } from "./decoder";
-export { default as localPhongLighting } from "./localPhongLighting";
+export { decoder } from "./decoder";
+export { localPhongLighting } from "./localPhongLighting";

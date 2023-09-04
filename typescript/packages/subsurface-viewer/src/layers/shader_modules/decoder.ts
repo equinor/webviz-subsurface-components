@@ -39,7 +39,7 @@ function getUniforms(opts: any): DecoderUniforms | {} {
     return {};
 }
 
-export default {
+export const decoder = {
     name: "decoder",
     fs,
     getUniforms,
