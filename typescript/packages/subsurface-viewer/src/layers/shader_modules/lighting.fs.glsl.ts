@@ -1,4 +1,4 @@
-const fs = `
+export const fs = `
 // Note: modification of luma.gl's functions to get two sided phong lighting.
 // Ref original file modules/shadertools/src/modules/phong-lighting/phong-lighting.glsl.ts in luma source.
 
@@ -42,5 +42,3 @@ vec3 getPhongLightColor(vec3 surfaceColor,vec3 cameraPosition, vec3 position_wor
  return lightColor;
 }
 `;
-
-export default fs;
