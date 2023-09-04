@@ -34,6 +34,11 @@ export function makeFullMesh(e: { data: Params }): void {
         return c as Vec;
     }
 
+    // Check if a number exists and has a defined value.
+    function isDefined(x: unknown): boolean {
+        return typeof x === "number" && !isNaN(x);
+    }
+
     function normalize(a: Vec): void {
         const L = Math.sqrt(a[0] * a[0] + a[1] * a[1] + a[2] * a[2]);
         a[0] /= L;
@@ -66,11 +71,11 @@ export function makeFullMesh(e: { data: Params }): void {
         const i3 = h * nx + (w + 1);
         const i4 = (h - 1) * nx + w;
 
-        const i0_act =                 !isNaN(meshData[i0]); // eslint-disable-line
-        const i1_act = (w - 1) >= 0 && !isNaN(meshData[i1]); // eslint-disable-line
-        const i2_act = (h + 1) < ny && !isNaN(meshData[i2]); // eslint-disable-line
-        const i3_act = (w + 1) < nx && !isNaN(meshData[i3]); // eslint-disable-line
-        const i4_act = (h - 1) >= 0 && !isNaN(meshData[i4]); // eslint-disable-line
+        const i0_act =                 isDefined(meshData[i0]); // eslint-disable-line
+        const i1_act = (w - 1) >= 0 && isDefined(meshData[i1]); // eslint-disable-line
+        const i2_act = (h + 1) < ny && isDefined(meshData[i2]); // eslint-disable-line
+        const i3_act = (w + 1) < nx && isDefined(meshData[i3]); // eslint-disable-line
+        const i4_act = (h - 1) >= 0 && isDefined(meshData[i4]); // eslint-disable-line
 
         const noNormal = [0, 0, 1]; // signals a normal could not be calculated.
         if (!i0_act) {
@@ -200,10 +205,10 @@ export function makeFullMesh(e: { data: Params }): void {
                 const i2 = (h + 1) * nx + (w + 1);
                 const i3 = (h + 1) * nx + w;
 
-                const i0_act = !isMesh || (!isNaN(meshData[i0]) && !isNaN(propertiesData[i0])); // eslint-disable-line
-                const i1_act = !isMesh || (!isNaN(meshData[i1]) && !isNaN(propertiesData[i1])); // eslint-disable-line
-                const i2_act = !isMesh || (!isNaN(meshData[i2]) && !isNaN(propertiesData[i2])); // eslint-disable-line
-                const i3_act = !isMesh || (!isNaN(meshData[i3]) && !isNaN(propertiesData[i3])); // eslint-disable-line
+                const i0_act = !isMesh || (isDefined(meshData[i0]) && isDefined(propertiesData[i0])); // eslint-disable-line
+                const i1_act = !isMesh || (isDefined(meshData[i1]) && isDefined(propertiesData[i1])); // eslint-disable-line
+                const i2_act = !isMesh || (isDefined(meshData[i2]) && isDefined(propertiesData[i2])); // eslint-disable-line
+                const i3_act = !isMesh || (isDefined(meshData[i3]) && isDefined(propertiesData[i3])); // eslint-disable-line
 
                 const hh = ny - h - 1; // See note above.
 
@@ -287,10 +292,10 @@ export function makeFullMesh(e: { data: Params }): void {
                 const normal2 = calcNormal(w + 1, h + 1, nx, ny, isMesh, smoothShading, meshData, ox, oy); // eslint-disable-line
                 const normal3 = calcNormal(w, h + 1, nx, ny, isMesh, smoothShading, meshData, ox, oy);     // eslint-disable-line
 
-                const i0_act = !isMesh || !isNaN(meshData[i0]); // eslint-disable-line
-                const i1_act = !isMesh || !isNaN(meshData[i1]); // eslint-disable-line
-                const i2_act = !isMesh || !isNaN(meshData[i2]); // eslint-disable-line
-                const i3_act = !isMesh || !isNaN(meshData[i3]); // eslint-disable-line
+                const i0_act = !isMesh || isDefined(meshData[i0]); // eslint-disable-line
+                const i1_act = !isMesh || isDefined(meshData[i1]); // eslint-disable-line
+                const i2_act = !isMesh || isDefined(meshData[i2]); // eslint-disable-line
+                const i3_act = !isMesh || isDefined(meshData[i3]); // eslint-disable-line
 
                 const x0 = ox + w * dx;
                 const y0 = oy + hh * dy;
@@ -311,7 +316,7 @@ export function makeFullMesh(e: { data: Params }): void {
                 const propertyIndex = h * (nx - 1) + w; // (nx - 1) -> the width of the property 2D array is one less than for the nodes in this case.
                 const propertyValue = propertiesData[propertyIndex];
 
-                if (isNaN(propertyValue)) {
+                if (!isDefined(propertyValue)) {
                     // Inactive cell, dont draw.
                     continue;
                 }
