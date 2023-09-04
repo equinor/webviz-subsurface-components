@@ -104,7 +104,7 @@ export default class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProp
             vs: vsShader,
             fs: fsShader,
             geometry: new Geometry(this.props.geometryTriangles),
-            modules: [project, picking, localPhongLighting ],
+            modules: [project, picking, localPhongLighting],
             isInstanced: false, // This only works when set to false.
         });
 
