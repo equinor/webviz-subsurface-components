@@ -4,8 +4,8 @@ import {
     Layer,
     picking,
     project,
-    phongLighting,
 } from "@deck.gl/core/typed";
+import { localPhongLighting } from "../shader_modules";
 import type { LayerPickInfo, PropertyDataType } from "../utils/layerTools";
 import { createPropertyData } from "../utils/layerTools";
 import { Model, Geometry } from "@luma.gl/engine";
@@ -173,7 +173,7 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
                 vertexCount: this.props.mesh.vertexCount,
                 indices: this.props.mesh.indices,
             }),
-            modules: [project, picking, phongLighting],
+            modules: [project, picking, localPhongLighting],
             isInstanced: false, // This only works when set to false.
         });
 
