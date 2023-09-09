@@ -1163,7 +1163,7 @@ function getViewState(
     let fb_target = [fb.x, fb.y, z];
     let fb_zoom = fb.zoom;
 
-    if (deck) {
+    if (deck && deck.width > 0 && deck.height > 0) {
         // If there are margins/rulers in the viewport (axes2DLayer) we have to account for that.
         // Camera target should be in the middle of viewport minus the rulers.
         const w_bounds = w;
