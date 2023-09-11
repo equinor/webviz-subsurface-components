@@ -219,7 +219,7 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
     return (
         <Map
             id={id}
-            layers={layerInstances}
+            layers_list={layerInstances}
             bounds={bounds}
             views={views}
             coords={coords}

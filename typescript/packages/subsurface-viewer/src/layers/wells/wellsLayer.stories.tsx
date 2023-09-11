@@ -434,6 +434,54 @@ Wells3d.parameters = {
     },
 };
 
+// Gullfaks wells.
+export const Wells3dGullfaks = Template.bind({});
+Wells3dGullfaks.args = {
+    id: "gullfaks",
+    resources: {
+        wellsData: "./gullfaks.json",
+    },
+    bounds: [450000, 6781000, 464000, 6791000] as [
+        number,
+        number,
+        number,
+        number,
+    ],
+    layers: [
+        {
+            "@@type": "WellsLayer",
+            data: "@@#resources.wellsData",
+            wellHeadStyle: { size: 4 },
+            refine: true,
+            outline: true,
+            enableSimpleRotPan: true,
+        },
+        {
+            "@@type": "AxesLayer",
+            id: "axes-layer",
+            bounds: [450000, 6781000, 0, 464000, 6791000, 3500],
+        },
+    ],
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "a",
+                show3D: true,
+            },
+        ],
+    },
+};
+Wells3dGullfaks.parameters = {
+    docs: {
+        description: {
+            story: "3D gullfaks wells example",
+        },
+        inlineStories: false,
+        iframeHeight: 500,
+    },
+};
+
 export const Wells3dDashed = Template.bind({});
 Wells3dDashed.args = {
     ...defaultProps,

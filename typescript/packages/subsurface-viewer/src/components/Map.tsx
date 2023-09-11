@@ -64,6 +64,15 @@ class ZScaleOrbitController extends OrbitController {
     static setZScaleDown: React.Dispatch<React.SetStateAction<number>> | null =
         null;
 
+    static setIsRotating: React.Dispatch<React.SetStateAction<boolean>> | null =
+        null;
+
+    static setIsRotatingReference(
+        setIsRotating: React.Dispatch<React.SetStateAction<boolean>>
+    ) {
+        ZScaleOrbitController.setIsRotating = setIsRotating;
+    }
+
     static setZScaleUpReference(
         setZScaleUp: React.Dispatch<React.SetStateAction<number>>
     ) {
@@ -77,6 +86,10 @@ class ZScaleOrbitController extends OrbitController {
     }
 
     handleEvent(event: MjolnirEvent): boolean {
+        if (ZScaleOrbitController.setIsRotating) {
+            ZScaleOrbitController.setIsRotating(event.type === "panmove");
+        }
+
         if (ZScaleOrbitController.setZScaleUp === null) {
             return super.handleEvent(event);
         }
@@ -324,7 +337,7 @@ export interface MapProps {
      * Each JSON object will consist of layer type with key as "@@type" and
      * layer specific data, if any.
      */
-    layers?: LayersList;
+    layers_list?: LayersList;
 
     /**
      * Coordinate boundary for the view defined as [left, bottom, right, top].
@@ -559,7 +572,7 @@ function calculateZoomFromBBox3D(
 
 const Map: React.FC<MapProps> = ({
     id,
-    layers,
+    layers_list,
     bounds,
     views,
     coords,
@@ -579,6 +592,28 @@ const Map: React.FC<MapProps> = ({
     lights,
     triggerResetMultipleWells,
 }: MapProps) => {
+    // Detect user rotating/panning.
+    const [isRotState, setIsRotState] = useState<boolean>(false);
+    const [isRotating, setIsRotating] = useState<boolean>(false);
+
+    React.useEffect(() => {
+        ZScaleOrbitController.setIsRotatingReference(setIsRotating);
+    }, [setIsRotating]);
+
+    useEffect(() => {
+        setIsRotState(isRotating);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isRotating]);
+
+    const layers = layers_list?.map((item) => {
+        // Inject property to layer. Layers may draw simplified under rotation/pan.
+        return (item as Layer).clone({
+            // eslint-disable-next-line
+            // @ts-ignore
+            drawSimple: isRotState,
+        });
+    });
+
     const deckRef = useRef<DeckGLRef>(null);
 
     const bboxInitial: BoundingBox3D = [0, 0, 0, 1, 1, 1];
@@ -746,7 +781,8 @@ const Map: React.FC<MapProps> = ({
         });
 
         setDeckGLLayers(layers_copy);
-    }, [layers]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [layers_list, isRotState]);
 
     useEffect(() => {
         if (typeof layers === "undefined") {

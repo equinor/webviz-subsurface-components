@@ -35,6 +35,7 @@ import type {
 import { getLayersById } from "../../layers/utils/layerTools";
 import UnfoldedGeoJsonLayer from "../intersection/unfoldedGeoJsonLayer";
 import GL from "@luma.gl/constants";
+import { isEqual } from "lodash";
 
 type StyleAccessorFunction = (
     object: Feature,
@@ -97,6 +98,10 @@ export interface WellsLayerProps extends ExtendedLayerProps {
      * For example depth of z = 1000 corresponds to -1000 on the z axis. Default true.
      */
     ZIncreasingDownwards: boolean;
+    drawSimple: boolean;
+    /**  If true means that when rotating or panning the view a simplified version of the wells will be drawn for speed reasons.
+     */
+    enableSimpleRotPan: boolean;
 }
 
 const defaultProps = {
@@ -120,6 +125,8 @@ const defaultProps = {
     selectedWell: "@@#editedData.selectedWells", // used to get data from deckgl layer
     depthTest: true,
     ZIncreasingDownwards: true,
+    drawSimple: false,
+    enableSimpleRotPan: false,
 };
 
 export interface LogCurveDataType {
@@ -230,6 +237,39 @@ export function getSize(
 }
 
 export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
+    initializeState(): void {
+        let data = this.props.data as unknown as FeatureCollection;
+        if (typeof data !== "undefined" && !isEqual(data, [])) {
+            const refine = this.props.refine;
+            data = refine
+                ? splineRefine(data) // smooth well paths.
+                : data;
+
+            if (!this.props.ZIncreasingDownwards) {
+                data = invertPath(data);
+            }
+
+            this.setState({
+                ...this.state,
+                data,
+            });
+        }
+    }
+
+    updateState({ props, oldProps }: UpdateParameters<WellsLayer>): void {
+        const needs_reload =
+            !isEqual(props.data, oldProps.data) ||
+            !isEqual(
+                props.ZIncreasingDownwards,
+                oldProps.ZIncreasingDownwards
+            ) ||
+            !isEqual(props.refine, oldProps.refine);
+
+        if (needs_reload) {
+            this.initializeState();
+        }
+    }
+
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any
     onClick(info: WellsPickInfo): boolean {
         // Make selection only when drawing is disabled
@@ -315,14 +355,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             return [];
         }
 
-        let data = this.props.data as unknown as FeatureCollection;
-        if (!this.props.ZIncreasingDownwards) {
-            data = invertPath(data);
-        }
-        const refine = this.props.refine;
-        data = refine
-            ? splineRefine(data) // smooth well paths.
-            : data;
+        const data = this.state["data"];
 
         const is3d = this.context.viewport.constructor === OrbitViewport;
         const positionFormat = "XYZ";
@@ -578,15 +611,19 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             })
         );
 
-        return [
-            outline,
-            log_layer,
-            colors,
-            highlight,
-            highlightMultiWells,
-            selection_layer,
-            names,
-        ];
+        if (this.props.drawSimple && this.props.enableSimpleRotPan) {
+            return [colors] as unknown as LayersList;
+        } else {
+            return [
+                outline,
+                log_layer,
+                colors,
+                highlight,
+                highlightMultiWells,
+                selection_layer,
+                names,
+            ];
+        }
     }
 
     getPickingInfo({ info }: { info: PickingInfo }): WellsPickInfo {
