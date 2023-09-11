@@ -98,10 +98,10 @@ export interface WellsLayerProps extends ExtendedLayerProps {
      * For example depth of z = 1000 corresponds to -1000 on the z axis. Default true.
      */
     ZIncreasingDownwards: boolean;
-    drawSimple: boolean;
+    optimizedRendering: boolean;
     /**  If true means that when rotating or panning the view a simplified version of the wells will be drawn for speed reasons.
      */
-    enableSimpleRotPan: boolean;
+    optimizedInteraction: boolean;
 }
 
 const defaultProps = {
@@ -125,8 +125,8 @@ const defaultProps = {
     selectedWell: "@@#editedData.selectedWells", // used to get data from deckgl layer
     depthTest: true,
     ZIncreasingDownwards: true,
-    drawSimple: false,
-    enableSimpleRotPan: false,
+    optimizedRendering: false,
+    optimizedInteraction: false,
 };
 
 export interface LogCurveDataType {
@@ -611,7 +611,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             })
         );
 
-        if (this.props.drawSimple && this.props.enableSimpleRotPan) {
+        if (this.props.optimizedRendering && this.props.optimizedInteraction) {
             return [colors] as unknown as LayersList;
         } else {
             return [
