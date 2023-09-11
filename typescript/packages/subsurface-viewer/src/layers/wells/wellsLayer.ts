@@ -612,7 +612,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         );
 
         if (this.props.optimizedRendering && this.props.optimizedInteraction) {
-            return [colors] as unknown as LayersList;
+            return [colors];
         } else {
             return [
                 outline,
