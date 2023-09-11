@@ -454,7 +454,7 @@ Wells3dGullfaks.args = {
             wellHeadStyle: { size: 4 },
             refine: true,
             outline: true,
-            enableSimpleRotPan: true,
+            optimizedInteraction: true,
         },
         {
             "@@type": "AxesLayer",

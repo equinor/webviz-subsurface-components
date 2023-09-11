@@ -337,7 +337,7 @@ export interface MapProps {
      * Each JSON object will consist of layer type with key as "@@type" and
      * layer specific data, if any.
      */
-    layers_list?: LayersList;
+    layers?: LayersList;
 
     /**
      * Coordinate boundary for the view defined as [left, bottom, right, top].
@@ -572,7 +572,7 @@ function calculateZoomFromBBox3D(
 
 const Map: React.FC<MapProps> = ({
     id,
-    layers_list,
+    layers,
     bounds,
     views,
     coords,
@@ -605,12 +605,12 @@ const Map: React.FC<MapProps> = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isRotating]);
 
-    const layers = layers_list?.map((item) => {
+    const layers_list = layers?.map((item) => {
         // Inject property to layer. Layers may draw simplified under rotation/pan.
         return (item as Layer).clone({
             // eslint-disable-next-line
             // @ts-ignore
-            drawSimple: isRotState,
+            optimizedRendering: isRotState,
         });
     });
 
@@ -729,21 +729,21 @@ const Map: React.FC<MapProps> = ({
     }, [scaleZDown]);
 
     useEffect(() => {
-        if (typeof layers === "undefined") {
+        if (typeof layers_list === "undefined") {
             return;
         }
 
-        if (layers.length === 0) {
+        if (layers_list.length === 0) {
             // Empty layers array makes deck.gl set deckRef to undefined (no opengl context).
             // Hence insert dummy layer.
             const dummy_layer = new LineLayer({
                 visible: false,
             });
-            layers.push(dummy_layer);
+            layers_list.push(dummy_layer);
         }
 
         // Margins on the viewport are extracted from a potenial axes2D layer.
-        const axes2DLayer = layers?.find((e) => {
+        const axes2DLayer = layers_list?.find((e) => {
             return e?.constructor === Axes2DLayer;
         }) as Axes2DLayer;
 
@@ -766,7 +766,7 @@ const Map: React.FC<MapProps> = ({
 
         setViewPortMargins({ left, right, top, bottom });
 
-        const layers_copy = layers.map((item) => {
+        const layers_copy = layers_list.map((item) => {
             if (item?.constructor.name === NorthArrow3DLayer.name) {
                 return item;
             }
@@ -782,10 +782,10 @@ const Map: React.FC<MapProps> = ({
 
         setDeckGLLayers(layers_copy);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [layers_list, isRotState]);
+    }, [layers, isRotState]);
 
     useEffect(() => {
-        if (typeof layers === "undefined") {
+        if (typeof layers_list === "undefined") {
             return;
         }
 
