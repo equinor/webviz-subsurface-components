@@ -98,10 +98,13 @@ export interface WellsLayerProps extends ExtendedLayerProps {
      * For example depth of z = 1000 corresponds to -1000 on the z axis. Default true.
      */
     ZIncreasingDownwards: boolean;
-    optimizedRendering: boolean;
     /**  If true means that when rotating or panning the view a simplified version of the wells will be drawn for speed reasons.
      */
     optimizedInteraction: boolean;
+
+    /**  For internal use. Indicates if user is roating or panning or not.
+     */
+    optimizedRendering: boolean;
 }
 
 const defaultProps = {
