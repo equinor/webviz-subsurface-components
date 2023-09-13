@@ -107,6 +107,13 @@ export function CatmullRom(
     return [x, y, z] as Position3D;
 }
 
+// Generate a range of numbers with given step length.
+const range = (start: number, stop: number, step: number) =>
+    Array.from(
+        { length: (stop - start) / step + 1 },
+        (_, i) => start + i * step
+    );
+
 /**
  * Will interpolate and refine wellpaths using spline interploation resulting
  * in smoother curves with more points.
@@ -115,7 +122,12 @@ export function CatmullRom(
 export function splineRefine(data_in: FeatureCollection): FeatureCollection {
     const data = cloneDeep(data_in);
 
+
+
     const no_wells = data.features.length;
+
+    console.log("REFINING PATHS no wells: ", no_wells)
+
     for (let well_no = 0; well_no < no_wells; well_no++) {
         const mds = data.features[well_no].properties?.["md"];
         if (mds === undefined) {
@@ -132,7 +144,14 @@ export function splineRefine(data_in: FeatureCollection): FeatureCollection {
         const coords = lineString.coordinates as Position3D[];
 
         const n = coords.length;
-        const ts = n > 3 ? [0.2, 0.4, 0.6, 0.8] : [];
+        //const ts = n > 3 ? [0.2, 0.4, 0.6, 0.8] : [];
+
+        const steps = 50; // 50
+        const step = 1 / steps;
+
+        const aa = range(step, 1 - step, step);
+        const ts = n > 3 ? aa : [];
+
 
         // Point before first.
         const x0 = coords[0][0] - coords[1][0] + coords[0][0];

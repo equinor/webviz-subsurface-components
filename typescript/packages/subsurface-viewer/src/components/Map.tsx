@@ -64,15 +64,6 @@ class ZScaleOrbitController extends OrbitController {
     static setZScaleDown: React.Dispatch<React.SetStateAction<number>> | null =
         null;
 
-    static setIsRotating: React.Dispatch<React.SetStateAction<boolean>> | null =
-        null;
-
-    static setIsRotatingReference(
-        setIsRotating: React.Dispatch<React.SetStateAction<boolean>>
-    ) {
-        ZScaleOrbitController.setIsRotating = setIsRotating;
-    }
-
     static setZScaleUpReference(
         setZScaleUp: React.Dispatch<React.SetStateAction<number>>
     ) {
@@ -86,10 +77,6 @@ class ZScaleOrbitController extends OrbitController {
     }
 
     handleEvent(event: MjolnirEvent): boolean {
-        if (ZScaleOrbitController.setIsRotating) {
-            ZScaleOrbitController.setIsRotating(event.type === "panmove");
-        }
-
         if (ZScaleOrbitController.setZScaleUp === null) {
             return super.handleEvent(event);
         }
@@ -410,6 +397,11 @@ export interface MapProps {
      */
     isLoadedCallback?: (arg: boolean) => void;
 
+
+    onDragStart?: (info: any, event: any) => void;
+    onDragEnd?: (info, event) => void;
+
+
     /**
      * If changed will reset camera to default position.
      */
@@ -588,32 +580,12 @@ const Map: React.FC<MapProps> = ({
     cameraPosition,
     getCameraPosition,
     isLoadedCallback,
+    onDragStart,
+    onDragEnd,
     triggerHome,
     lights,
     triggerResetMultipleWells,
 }: MapProps) => {
-    // Detect user rotating/panning.
-    const [isRotState, setIsRotState] = useState<boolean>(false);
-    const [isRotating, setIsRotating] = useState<boolean>(false);
-
-    React.useEffect(() => {
-        ZScaleOrbitController.setIsRotatingReference(setIsRotating);
-    }, [setIsRotating]);
-
-    useEffect(() => {
-        setIsRotState(isRotating);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isRotating]);
-
-    const layers_list = layers?.map((item) => {
-        // Inject property to layer. Layers may draw simplified under rotation/pan.
-        return (item as Layer).clone({
-            // eslint-disable-next-line
-            // @ts-ignore
-            optimizedRendering: isRotState,
-        });
-    });
-
     const deckRef = useRef<DeckGLRef>(null);
 
     const bboxInitial: BoundingBox3D = [0, 0, 0, 1, 1, 1];
@@ -729,21 +701,21 @@ const Map: React.FC<MapProps> = ({
     }, [scaleZDown]);
 
     useEffect(() => {
-        if (typeof layers_list === "undefined") {
+        if (typeof layers === "undefined") {
             return;
         }
 
-        if (layers_list.length === 0) {
+        if (layers.length === 0) {
             // Empty layers array makes deck.gl set deckRef to undefined (no opengl context).
             // Hence insert dummy layer.
             const dummy_layer = new LineLayer({
                 visible: false,
             });
-            layers_list.push(dummy_layer);
+            layers.push(dummy_layer);
         }
 
         // Margins on the viewport are extracted from a potenial axes2D layer.
-        const axes2DLayer = layers_list?.find((e) => {
+        const axes2DLayer = layers?.find((e) => {
             return e?.constructor === Axes2DLayer;
         }) as Axes2DLayer;
 
@@ -766,7 +738,7 @@ const Map: React.FC<MapProps> = ({
 
         setViewPortMargins({ left, right, top, bottom });
 
-        const layers_copy = layers_list.map((item) => {
+        const layers_copy = layers.map((item) => {
             if (item?.constructor.name === NorthArrow3DLayer.name) {
                 return item;
             }
@@ -782,10 +754,10 @@ const Map: React.FC<MapProps> = ({
 
         setDeckGLLayers(layers_copy);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [layers, isRotState]);
+    }, [layers]);
 
     useEffect(() => {
-        if (typeof layers_list === "undefined") {
+        if (typeof layers === "undefined") {
             return;
         }
 
@@ -1087,6 +1059,8 @@ const Map: React.FC<MapProps> = ({
                 onClick={onClick}
                 onAfterRender={onAfterRender}
                 effects={effects}
+                onDragStart={onDragStart}  // XXX
+                onDragEnd={onDragEnd}
             >
                 {children}
             </DeckGL>

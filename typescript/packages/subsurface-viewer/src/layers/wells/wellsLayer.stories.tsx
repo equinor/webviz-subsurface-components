@@ -435,8 +435,37 @@ Wells3d.parameters = {
 };
 
 // Gullfaks wells.
-export const Wells3dGullfaks = Template.bind({});
-Wells3dGullfaks.args = {
+export const Wells3DGullfaks: ComponentStory<typeof SubsurfaceViewer> = (
+    args
+) => {
+    const [optimizedInteraction, setOptimizedInteraction] =
+        React.useState<boolean>(false);
+
+    const props = {
+        ...args,
+        // onDragStart: () => setOptimizedInteraction(true),
+        // onDragEnd: () => setOptimizedInteraction(false),
+        layers: [
+            {
+                "@@type": "WellsLayer",
+                data: "@@#resources.wellsData",
+                wellHeadStyle: { size: 4 },
+                refine: true,
+                outline: true,
+                optimizedInteraction, // If true will cause wellslayer to draw simplified.
+            },
+            {
+                "@@type": "AxesLayer",
+                id: "axes-layer",
+                bounds: [450000, 6781000, 0, 464000, 6791000, 3500],
+            },
+        ],
+    };
+
+    return <SubsurfaceViewer {...props} />;
+};
+
+Wells3DGullfaks.args = {
     id: "gullfaks",
     resources: {
         wellsData: "./gullfaks.json",
@@ -447,32 +476,18 @@ Wells3dGullfaks.args = {
         number,
         number,
     ],
-    layers: [
-        {
-            "@@type": "WellsLayer",
-            data: "@@#resources.wellsData",
-            wellHeadStyle: { size: 4 },
-            refine: true,
-            outline: true,
-            optimizedInteraction: true,
-        },
-        {
-            "@@type": "AxesLayer",
-            id: "axes-layer",
-            bounds: [450000, 6781000, 0, 464000, 6791000, 3500],
-        },
-    ],
     views: {
         layout: [1, 1],
         viewports: [
             {
-                id: "a",
+                id: "the_view",
                 show3D: true,
             },
         ],
     },
 };
-Wells3dGullfaks.parameters = {
+
+Wells3DGullfaks.parameters = {
     docs: {
         description: {
             story: "3D gullfaks wells example",
