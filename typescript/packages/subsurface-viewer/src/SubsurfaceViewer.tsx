@@ -99,6 +99,9 @@ export interface SubsurfaceViewerProps {
      */
     isLoadedCallback?: (arg: boolean) => void;
 
+    onDragStart?: (info: any, event: any) => void;
+    onDragEnd?: (info, event) => void;
+
     /**
      * If changed will reset camera to default position.
      */
@@ -150,6 +153,8 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
     cameraPosition,
     getCameraPosition,
     isLoadedCallback,
+    onDragStart,
+    onDragEnd,
     triggerHome,
     triggerResetMultipleWells,
     lights,
@@ -234,6 +239,8 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
             cameraPosition={cameraPosition}
             getCameraPosition={getCameraPosition}
             isLoadedCallback={isLoadedCallback}
+            onDragStart={onDragStart}
+            onDragEnd={onDragEnd}
             triggerHome={triggerHome}
             triggerResetMultipleWells={triggerResetMultipleWells}
             lights={lights}

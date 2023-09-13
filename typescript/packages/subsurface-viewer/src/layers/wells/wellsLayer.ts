@@ -98,13 +98,10 @@ export interface WellsLayerProps extends ExtendedLayerProps {
      * For example depth of z = 1000 corresponds to -1000 on the z axis. Default true.
      */
     ZIncreasingDownwards: boolean;
-    /**  If true means that when rotating or panning the view a simplified version of the wells will be drawn for speed reasons.
+    /**  If true means that a simplified representation of the wells will be drawn.
+     *   Useful for example during panning and roation to gain speed.
      */
     optimizedInteraction: boolean;
-
-    /**  For internal use. Indicates if user is roating or panning or not.
-     */
-    optimizedRendering: boolean;
 }
 
 const defaultProps = {
@@ -128,7 +125,6 @@ const defaultProps = {
     selectedWell: "@@#editedData.selectedWells", // used to get data from deckgl layer
     depthTest: true,
     ZIncreasingDownwards: true,
-    optimizedRendering: false,
     optimizedInteraction: false,
 };
 
@@ -376,6 +372,8 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             [GL.POLYGON_OFFSET_FILL]: true,
         };
 
+        const drawSimple = this.props.optimizedInteraction;
+
         const outline = new UnfoldedGeoJsonLayer(
             this.getSubLayerProps({
                 id: "outline",
@@ -385,7 +383,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 positionFormat,
                 pointRadiusUnits: "pixels",
                 lineWidthUnits: "pixels",
-                visible: this.props.outline,
+                visible: this.props.outline && !drawSimple,
                 pointRadiusScale: this.props.pointRadiusScale,
                 lineWidthScale: this.props.lineWidthScale,
                 getLineWidth: getSize(LINE, this.props.lineStyle?.width),
@@ -453,6 +451,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 getFillColor: getColor(this.props.wellHeadStyle?.color),
                 getLineColor: getColor(this.props.lineStyle?.color),
                 parameters,
+                visible: !drawSimple,
             })
         );
 
@@ -480,6 +479,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 getFillColor: [255, 140, 0],
                 getLineColor: [255, 140, 0],
                 parameters,
+                visible: !drawSimple,
             })
         );
 
@@ -492,7 +492,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 widthScale: 10,
                 widthMinPixels: 1,
                 miterLimit: 100,
-                visible: this.props.logCurves,
+                visible: this.props.logCurves && !drawSimple,
                 getPath: (d: LogCurveDataType): Position[] =>
                     getLogPath(
                         data.features,
@@ -546,7 +546,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 widthScale: 10,
                 widthMinPixels: 1,
                 miterLimit: 100,
-                visible: this.props.logCurves,
+                visible: this.props.logCurves && !drawSimple,
                 getPath: (d: LogCurveDataType): Position[] =>
                     getLogPath1(
                         data.features,
@@ -597,7 +597,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             this.getSubLayerProps({
                 id: "names",
                 data: data.features,
-                visible: this.props.wellNameVisible,
+                visible: this.props.wellNameVisible && !drawSimple,
                 getPosition: (d: Feature) =>
                     getAnnotationPosition(
                         d,
@@ -614,19 +614,15 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             })
         );
 
-        if (this.props.optimizedRendering && this.props.optimizedInteraction) {
-            return [colors];
-        } else {
-            return [
-                outline,
-                log_layer,
-                colors,
-                highlight,
-                highlightMultiWells,
-                selection_layer,
-                names,
-            ];
-        }
+        return [
+            outline,
+            log_layer,
+            colors,
+            highlight,
+            highlightMultiWells,
+            selection_layer,
+            names,
+        ];
     }
 
     getPickingInfo({ info }: { info: PickingInfo }): WellsPickInfo {
