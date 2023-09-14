@@ -122,11 +122,12 @@ const range = (start: number, stop: number, step: number) =>
 export function splineRefine(data_in: FeatureCollection): FeatureCollection {
     const data = cloneDeep(data_in);
 
-
-
     const no_wells = data.features.length;
 
-    console.log("REFINING PATHS no wells: ", no_wells)
+    const noSteps = 50;
+    const step = 1 / noSteps;
+
+    const steps = range(step, 1 - step, step);
 
     for (let well_no = 0; well_no < no_wells; well_no++) {
         const mds = data.features[well_no].properties?.["md"];
@@ -144,14 +145,7 @@ export function splineRefine(data_in: FeatureCollection): FeatureCollection {
         const coords = lineString.coordinates as Position3D[];
 
         const n = coords.length;
-        //const ts = n > 3 ? [0.2, 0.4, 0.6, 0.8] : [];
-
-        const steps = 50; // 50
-        const step = 1 / steps;
-
-        const aa = range(step, 1 - step, step);
-        const ts = n > 3 ? aa : [];
-
+        const ts = n > 3 ? steps : [];
 
         // Point before first.
         const x0 = coords[0][0] - coords[1][0] + coords[0][0];
@@ -222,6 +216,64 @@ export function splineRefine(data_in: FeatureCollection): FeatureCollection {
                     newCoordinates.push([x, y, z] as Position3D);
                     newMds[0].push(md);
                 }
+            }
+        }
+
+        newCoordinates.push(coords[n - 1]);
+        newMds[0].push(mds[0][n - 1]);
+
+        (
+            (data.features[well_no].geometry as GeometryCollection)
+                .geometries[1] as LineString
+        ).coordinates = newCoordinates;
+
+        if (data.features[well_no].properties) {
+            data.features[well_no].properties!["md"] = newMds; // eslint-disable-line
+        }
+    }
+
+    return data;
+}
+
+/**
+ * Will reduce/coarse the wellpaths.
+ */
+export function coarsenWells(data_in: FeatureCollection): FeatureCollection {
+    const data = cloneDeep(data_in);
+
+    const no_wells = data.features.length;
+
+    for (let well_no = 0; well_no < no_wells; well_no++) {
+        const mds = data.features[well_no].properties?.["md"];
+        if (mds === undefined) {
+            continue;
+        }
+        const geometryCollection = data.features[well_no]
+            .geometry as GeometryCollection;
+        const lineString = geometryCollection?.geometries[1] as LineString;
+
+        if (lineString.coordinates?.length === undefined) {
+            continue;
+        }
+
+        const coords = lineString.coordinates as Position3D[];
+
+        const n = coords.length;
+
+        const newCoordinates: Position3D[] = [];
+        const newMds: number[][] = [];
+        newMds.push([]);
+
+        newCoordinates.push(coords[0]);
+        newMds[0].push(mds[0][0]);
+
+        for (let i = 1; i < n - 1; i += 1) {
+            if (i % 5) {
+                const P1 = coords[i + 0];
+                const md1 = mds[0][i + 0];
+
+                newCoordinates.push(P1);
+                newMds[0].push(md1);
             }
         }
 

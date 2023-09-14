@@ -25,7 +25,12 @@ import type {
 } from "geojson";
 import type { LayerPickInfo, PropertyDataType } from "../utils/layerTools";
 import { createPropertyData } from "../utils/layerTools";
-import { splineRefine, invertPath, GetBoundingBox } from "./utils/spline";
+import {
+    splineRefine,
+    coarsenWells,
+    invertPath,
+    GetBoundingBox,
+} from "./utils/spline";
 import { interpolateNumberArray } from "d3";
 import type { DeckGLLayerContext } from "../../components/Map";
 import type {
@@ -244,6 +249,8 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 ? splineRefine(data) // smooth well paths.
                 : data;
 
+            const coarseData = coarsenWells(data);
+
             if (!this.props.ZIncreasingDownwards) {
                 data = invertPath(data);
             }
@@ -251,6 +258,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             this.setState({
                 ...this.state,
                 data,
+                coarseData,
             });
         }
     }
@@ -355,6 +363,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         }
 
         const data = this.state["data"];
+        const coarseData = this.state["coarseData"];
 
         const is3d = this.context.viewport.constructor === OrbitViewport;
         const positionFormat = "XYZ";
@@ -372,9 +381,35 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             [GL.POLYGON_OFFSET_FILL]: true,
         };
 
+        // Reduced details when rotating or panning the view if "optimizedInteraction" is set.
         const drawSimple = this.props.optimizedInteraction;
 
-        const outline = new UnfoldedGeoJsonLayer(
+        const simple_layer = new UnfoldedGeoJsonLayer(
+            this.getSubLayerProps({
+                id: "simple",
+                data: coarseData,
+                pickable: false,
+                stroked: false,
+                positionFormat,
+                pointRadiusUnits: "pixels",
+                lineWidthUnits: "pixels",
+                pointRadiusScale: this.props.pointRadiusScale,
+                lineWidthScale: this.props.lineWidthScale,
+                getLineWidth: getSize(LINE, this.props.lineStyle?.width, -1),
+                getPointRadius: getSize(
+                    POINT,
+                    this.props.wellHeadStyle?.size,
+                    -1
+                ),
+                getLineColor: getColor(this.props.lineStyle?.color),
+                getFillColor: getColor(this.props.wellHeadStyle?.color),
+                lineBillboard: false,
+                pointBillboard: false,
+                parameters,
+                visible: drawSimple,
+            })
+        );
+        const outline_layer = new UnfoldedGeoJsonLayer(
             this.getSubLayerProps({
                 id: "outline",
                 data,
@@ -383,7 +418,6 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 positionFormat,
                 pointRadiusUnits: "pixels",
                 lineWidthUnits: "pixels",
-                visible: this.props.outline && !drawSimple,
                 pointRadiusScale: this.props.pointRadiusScale,
                 lineWidthScale: this.props.lineWidthScale,
                 getLineWidth: getSize(LINE, this.props.lineStyle?.width),
@@ -393,10 +427,11 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 lineBillboard: true,
                 pointBillboard: true,
                 parameters,
+                visible: this.props.outline && !drawSimple,
             })
         );
 
-        const colors = new UnfoldedGeoJsonLayer(
+        const colors_layer = new UnfoldedGeoJsonLayer(
             this.getSubLayerProps({
                 id: "colors",
                 data,
@@ -424,11 +459,12 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 lineBillboard: true,
                 pointBillboard: true,
                 parameters,
+                visible: !drawSimple,
             })
         );
 
         // Highlight the selected well.
-        const highlight = new UnfoldedGeoJsonLayer(
+        const highlight_layer = new UnfoldedGeoJsonLayer(
             this.getSubLayerProps({
                 id: "highlight",
                 data: getWellObjectByName(
@@ -451,12 +487,12 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 getFillColor: getColor(this.props.wellHeadStyle?.color),
                 getLineColor: getColor(this.props.lineStyle?.color),
                 parameters,
-                visible: !drawSimple,
+                visible: this.props.logCurves && !drawSimple,
             })
         );
 
         // Highlight the multi selected wells.
-        const highlightMultiWells = new UnfoldedGeoJsonLayer(
+        const highlightMultiWells_layer = new UnfoldedGeoJsonLayer(
             this.getSubLayerProps({
                 id: "highlight2",
                 data: getWellObjectsByName(
@@ -479,7 +515,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 getFillColor: [255, 140, 0],
                 getLineColor: [255, 140, 0],
                 parameters,
-                visible: !drawSimple,
+                visible: this.props.logCurves && !drawSimple,
             })
         );
 
@@ -492,7 +528,6 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 widthScale: 10,
                 widthMinPixels: 1,
                 miterLimit: 100,
-                visible: this.props.logCurves && !drawSimple,
                 getPath: (d: LogCurveDataType): Position[] =>
                     getLogPath(
                         data.features,
@@ -534,6 +569,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                     this.setLegend(value);
                 },
                 parameters,
+                visible: this.props.logCurves && !drawSimple,
             })
         );
 
@@ -546,7 +582,6 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 widthScale: 10,
                 widthMinPixels: 1,
                 miterLimit: 100,
-                visible: this.props.logCurves && !drawSimple,
                 getPath: (d: LogCurveDataType): Position[] =>
                     getLogPath1(
                         data.features,
@@ -589,15 +624,15 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                     this.setLegend(value);
                 },
                 parameters,
+                visible: this.props.logCurves && !drawSimple,
             })
         );
 
         // well name
-        const names = new TextLayer<Feature>(
+        const names_layer = new TextLayer<Feature>(
             this.getSubLayerProps({
                 id: "names",
                 data: data.features,
-                visible: this.props.wellNameVisible && !drawSimple,
                 getPosition: (d: Feature) =>
                     getAnnotationPosition(
                         d,
@@ -611,17 +646,19 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 getAlignmentBaseline: "bottom",
                 getSize: this.props.wellNameSize,
                 parameters,
+                visible: this.props.wellNameVisible && !drawSimple,
             })
         );
 
         return [
-            outline,
+            simple_layer,
+            outline_layer,
             log_layer,
-            colors,
-            highlight,
-            highlightMultiWells,
+            colors_layer,
+            highlight_layer,
+            highlightMultiWells_layer,
             selection_layer,
-            names,
+            names_layer,
         ];
     }
 
