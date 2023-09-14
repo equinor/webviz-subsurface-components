@@ -443,8 +443,8 @@ export const Wells3DGullfaks: ComponentStory<typeof SubsurfaceViewer> = (
 
     const props = {
         ...args,
-        // onDragStart: () => setOptimizedInteraction(true),
-        // onDragEnd: () => setOptimizedInteraction(false),
+        onDragStart: () => setOptimizedInteraction(true),
+        onDragEnd: () => setOptimizedInteraction(false),
         layers: [
             {
                 "@@type": "WellsLayer",

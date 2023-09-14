@@ -99,8 +99,8 @@ export interface SubsurfaceViewerProps {
      */
     isLoadedCallback?: (arg: boolean) => void;
 
-    onDragStart?: (info: any, event: any) => void;
-    onDragEnd?: (info, event) => void;
+    onDragStart?: (info: unknown, event: unknown) => void;
+    onDragEnd?: (info: unknown, event: unknown) => void;
 
     /**
      * If changed will reset camera to default position.
