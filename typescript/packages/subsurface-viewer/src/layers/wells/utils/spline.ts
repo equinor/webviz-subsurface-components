@@ -3,7 +3,7 @@ import type {
     GeometryCollection,
     LineString,
 } from "geojson";
-import { cloneDeep } from "lodash";
+import { cloneDeep, range } from "lodash";
 import type { Position3D } from "../../utils/layerTools";
 
 /**
@@ -107,13 +107,6 @@ export function CatmullRom(
     return [x, y, z] as Position3D;
 }
 
-// Generate a range of numbers with given step length.
-const range = (start: number, stop: number, step: number) =>
-    Array.from(
-        { length: (stop - start) / step + 1 },
-        (_, i) => start + i * step
-    );
-
 /**
  * Will interpolate and refine wellpaths using spline interploation resulting
  * in smoother curves with more points.
@@ -124,10 +117,10 @@ export function splineRefine(data_in: FeatureCollection): FeatureCollection {
 
     const no_wells = data.features.length;
 
-    const noSteps = 50;
+    const noSteps = 5;
     const step = 1 / noSteps;
 
-    const steps = range(step, 1 - step, step);
+    const steps = range(step, 1, step);
 
     for (let well_no = 0; well_no < no_wells; well_no++) {
         const mds = data.features[well_no].properties?.["md"];
