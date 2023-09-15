@@ -384,7 +384,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         // Reduced details when rotating or panning the view if "optimizedInteraction" is set.
         const drawSimple = this.props.optimizedInteraction;
 
-        const simple_layer = new UnfoldedGeoJsonLayer(
+        const simpleLayer = new UnfoldedGeoJsonLayer(
             this.getSubLayerProps({
                 id: "simple",
                 data: coarseData,
@@ -409,7 +409,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 visible: drawSimple,
             })
         );
-        const outline_layer = new UnfoldedGeoJsonLayer(
+        const outlineLayer = new UnfoldedGeoJsonLayer(
             this.getSubLayerProps({
                 id: "outline",
                 data,
@@ -431,7 +431,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             })
         );
 
-        const colors_layer = new UnfoldedGeoJsonLayer(
+        const colorsLayer = new UnfoldedGeoJsonLayer(
             this.getSubLayerProps({
                 id: "colors",
                 data,
@@ -464,7 +464,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         );
 
         // Highlight the selected well.
-        const highlight_layer = new UnfoldedGeoJsonLayer(
+        const highlightLayer = new UnfoldedGeoJsonLayer(
             this.getSubLayerProps({
                 id: "highlight",
                 data: getWellObjectByName(
@@ -519,7 +519,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             })
         );
 
-        const log_layer = new PathLayer<LogCurveDataType>(
+        const logLayer = new PathLayer<LogCurveDataType>(
             this.getSubLayerProps({
                 id: "log_curve",
                 data: this.props.logData,
@@ -573,7 +573,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             })
         );
 
-        const selection_layer = new PathLayer<LogCurveDataType>(
+        const selectionLayer = new PathLayer<LogCurveDataType>(
             this.getSubLayerProps({
                 id: "selection",
                 data: this.props.logData,
@@ -629,7 +629,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         );
 
         // well name
-        const names_layer = new TextLayer<Feature>(
+        const namesLayer = new TextLayer<Feature>(
             this.getSubLayerProps({
                 id: "names",
                 data: data.features,
@@ -651,14 +651,14 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         );
 
         return [
-            simple_layer,
-            outline_layer,
-            log_layer,
-            colors_layer,
-            highlight_layer,
+            simpleLayer,
+            outlineLayer,
+            logLayer,
+            colorsLayer,
+            highlightLayer,
             highlightMultiWells_layer,
-            selection_layer,
-            names_layer,
+            selectionLayer,
+            namesLayer,
         ];
     }
 
