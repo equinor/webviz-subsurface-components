@@ -129,10 +129,17 @@ const defaultProps = {
 
 // This is a private layer used only by the composite Map3DLayer
 export default class privateMapLayer extends Layer<privateMapLayerProps> {
+    get isLoaded(): boolean {
+        return this.state["isLoaded"] ?? false;
+    }
+
     initializeState(context: DeckGLLayerContext): void {
         const { gl } = context;
         const [model_mesh, mesh_lines_model] = this._getModels(gl);
-        this.setState({ models: [model_mesh, mesh_lines_model] });
+        this.setState({
+            models: [model_mesh, mesh_lines_model],
+            isLoaded: false,
+        });
     }
 
     shouldUpdateState({
@@ -276,6 +283,10 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
 
         if (this.props.gridLines) {
             mesh_lines_model.draw();
+        }
+
+        if (!this.state["isLoaded"]) {
+            this.setState({ ...this.state, isLoaded: true });
         }
     }
 
