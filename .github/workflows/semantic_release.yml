@@ -9,7 +9,9 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+        with:
+          persist-credentials: false
 
       - name: configure git
         run: |
@@ -25,3 +27,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.SEMANTIC_RELEASE_GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GIT_AUTHOR_NAME: "hkfb"
+          GIT_AUTHOR_EMAIL: "hkfb@users.noreply.github.com"
+          GIT_COMMITTER_NAME: "hkfb"
+          GIT_COMMITTER_EMAIL: "hkfb@users.noreply.github.com"
