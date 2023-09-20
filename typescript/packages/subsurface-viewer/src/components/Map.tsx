@@ -47,6 +47,7 @@ import { LightingEffect } from "@deck.gl/core/typed";
 import { LineLayer } from "@deck.gl/layers/typed";
 import { Matrix4 } from "@math.gl/core";
 import { fovyToAltitude } from "@math.gl/web-mercator";
+import type { MjolnirGestureEvent } from "mjolnir.js";
 
 /**
  * 3D bounding box defined as [xmin, ymin, zmin, xmax, ymax, zmax].
@@ -397,8 +398,8 @@ export interface MapProps {
      */
     isLoadedCallback?: (arg: boolean) => void;
 
-    onDragStart?: (info: PickingInfo, event: MapMouseEvent) => void;
-    onDragEnd?: (info: PickingInfo, event: MapMouseEvent) => void;
+    onDragStart?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
+    onDragEnd?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
 
     /**
      * If changed will reset camera to default position.

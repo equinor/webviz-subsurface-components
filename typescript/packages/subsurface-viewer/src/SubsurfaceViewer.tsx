@@ -14,6 +14,7 @@ import type { colorTablesArray } from "@emerson-eps/color-tables/";
 import type { Unit } from "convert-units";
 import convert from "convert-units";
 import type { PickingInfo } from "@deck.gl/core/typed";
+import type { MjolnirGestureEvent } from "mjolnir.js";
 
 export type {
     BoundsAccessor,
@@ -100,8 +101,8 @@ export interface SubsurfaceViewerProps {
      */
     isLoadedCallback?: (arg: boolean) => void;
 
-    onDragStart?: (info: PickingInfo, event: MapMouseEvent) => void;
-    onDragEnd?: (info: PickingInfo, event: MapMouseEvent) => void;
+    onDragStart?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
+    onDragEnd?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
 
     /**
      * If changed will reset camera to default position.
