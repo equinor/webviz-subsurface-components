@@ -251,35 +251,22 @@ export function coarsenWells(data_in: FeatureCollection): FeatureCollection {
 
         const coords = lineString.coordinates as Position3D[];
 
-        const n = coords.length;
-
-        const newCoordinates: Position3D[] = [];
-        const newMds: number[][] = [];
-        newMds.push([]);
-
-        newCoordinates.push(coords[0]);
-        newMds[0].push(mds[0][0]);
-
-        for (let i = 1; i < n - 1; i += 1) {
-            if (i % 5) {
-                const P1 = coords[i + 0];
-                const md1 = mds[0][i + 0];
-
-                newCoordinates.push(P1);
-                newMds[0].push(md1);
-            }
-        }
-
-        newCoordinates.push(coords[n - 1]);
-        newMds[0].push(mds[0][n - 1]);
+        // Filter and keep only each tenth pluss first and last elementh.
+        const filterFunc = (
+            __: Position3D,
+            index: number,
+            array: Position3D[]
+        ) => {
+            return index === 0 || index === array.length - 1 || index % 10 == 0;
+        };
 
         (
             (data.features[well_no].geometry as GeometryCollection)
                 .geometries[1] as LineString
-        ).coordinates = newCoordinates;
+        ).coordinates = coords.filter(filterFunc);
 
         if (data.features[well_no].properties) {
-            data.features[well_no].properties!["md"] = newMds; // eslint-disable-line
+            data.features[well_no].properties!["md"] = mds.filter(filterFunc);
         }
     }
 
