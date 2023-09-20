@@ -1,6 +1,7 @@
 # Dash built code
 
 python/webviz_subsurface_components/**/*
+python/dash-components
 webviz_subsurface_components/**/*
 !webviz_subsurface_components/__init__.py
 !webviz_subsurface_components/VectorCalculatorWrapper.py
