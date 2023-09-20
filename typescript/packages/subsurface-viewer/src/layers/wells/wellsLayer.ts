@@ -244,16 +244,16 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
     initializeState(): void {
         let data = this.props.data as unknown as FeatureCollection;
         if (typeof data !== "undefined" && !isEqual(data, [])) {
+            if (!this.props.ZIncreasingDownwards) {
+                data = invertPath(data);
+            }
+
             const refine = this.props.refine;
             data = refine
                 ? splineRefine(data) // smooth well paths.
                 : data;
 
             const coarseData = coarsenWells(data);
-
-            if (!this.props.ZIncreasingDownwards) {
-                data = invertPath(data);
-            }
 
             this.setState({
                 ...this.state,
