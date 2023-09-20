@@ -260,10 +260,7 @@ export function coarsenWells(data_in: FeatureCollection): FeatureCollection {
             return index === 0 || index === array.length - 1 || index % 10 == 0;
         };
 
-        (
-            (data.features[well_no].geometry as GeometryCollection)
-                .geometries[1] as LineString
-        ).coordinates = coords.filter(filterFunc);
+        lineString.coordinates = coords.filter(filterFunc);
 
         if (data.features[well_no].properties) {
             data.features[well_no].properties!["md"] = mds.filter(filterFunc);

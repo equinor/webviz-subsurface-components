@@ -13,6 +13,7 @@ import PropTypes from "prop-types";
 import type { colorTablesArray } from "@emerson-eps/color-tables/";
 import type { Unit } from "convert-units";
 import convert from "convert-units";
+import type { PickingInfo } from "@deck.gl/core/typed";
 
 export type {
     BoundsAccessor,
@@ -99,7 +100,7 @@ export interface SubsurfaceViewerProps {
      */
     isLoadedCallback?: (arg: boolean) => void;
 
-    onDragStart?: (info: unknown, event: unknown) => void;
+    onDragStart?: (info: PickingInfo, event: unknown) => void;
     onDragEnd?: (info: unknown, event: unknown) => void;
 
     /**

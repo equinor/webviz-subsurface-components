@@ -11,6 +11,9 @@ import {
     colorTables,
 } from "@emerson-eps/color-tables";
 import type { MapMouseEvent } from "../../components/Map";
+import WellsLayer from "./wellsLayer";
+import AxesLayer from "../axes/axesLayer";
+
 const PREFIX = "VolveWells";
 
 const classes = {
@@ -446,19 +449,17 @@ export const Wells3DGullfaks: ComponentStory<typeof SubsurfaceViewer> = (
         onDragStart: () => setOptimizedInteraction(true),
         onDragEnd: () => setOptimizedInteraction(false),
         layers: [
-            {
-                "@@type": "WellsLayer",
-                data: "@@#resources.wellsData",
+            new WellsLayer({
+                data: "./gullfaks.json",
                 wellHeadStyle: { size: 4 },
                 refine: true,
                 outline: true,
                 optimizedInteraction, // If true will cause wellslayer to draw simplified.
-            },
-            {
-                "@@type": "AxesLayer",
+            }),
+            new AxesLayer({
                 id: "axes-layer",
                 bounds: [450000, 6781000, 0, 464000, 6791000, 3500],
-            },
+            }),
         ],
     };
 
@@ -467,9 +468,6 @@ export const Wells3DGullfaks: ComponentStory<typeof SubsurfaceViewer> = (
 
 Wells3DGullfaks.args = {
     id: "gullfaks",
-    resources: {
-        wellsData: "./gullfaks.json",
-    },
     bounds: [450000, 6781000, 464000, 6791000] as [
         number,
         number,

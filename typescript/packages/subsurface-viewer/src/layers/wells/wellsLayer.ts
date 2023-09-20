@@ -104,7 +104,7 @@ export interface WellsLayerProps extends ExtendedLayerProps {
      */
     ZIncreasingDownwards: boolean;
     /**  If true means that a simplified representation of the wells will be drawn.
-     *   Useful for example during panning and roation to gain speed.
+     *   Useful for example during panning and rotation to gain speed.
      */
     optimizedInteraction: boolean;
 }
@@ -382,7 +382,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         };
 
         // Reduced details when rotating or panning the view if "optimizedInteraction" is set.
-        const drawSimple = this.props.optimizedInteraction;
+        const fastDrawing = this.props.optimizedInteraction;
 
         const simpleLayer = new UnfoldedGeoJsonLayer(
             this.getSubLayerProps({
@@ -406,7 +406,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 lineBillboard: false,
                 pointBillboard: false,
                 parameters,
-                visible: drawSimple,
+                visible: fastDrawing,
             })
         );
         const outlineLayer = new UnfoldedGeoJsonLayer(
@@ -427,7 +427,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 lineBillboard: true,
                 pointBillboard: true,
                 parameters,
-                visible: this.props.outline && !drawSimple,
+                visible: this.props.outline && !fastDrawing,
             })
         );
 
@@ -459,7 +459,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 lineBillboard: true,
                 pointBillboard: true,
                 parameters,
-                visible: !drawSimple,
+                visible: !fastDrawing,
             })
         );
 
@@ -487,12 +487,12 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 getFillColor: getColor(this.props.wellHeadStyle?.color),
                 getLineColor: getColor(this.props.lineStyle?.color),
                 parameters,
-                visible: this.props.logCurves && !drawSimple,
+                visible: this.props.logCurves && !fastDrawing,
             })
         );
 
         // Highlight the multi selected wells.
-        const highlightMultiWells_layer = new UnfoldedGeoJsonLayer(
+        const highlightMultiWellsLayer = new UnfoldedGeoJsonLayer(
             this.getSubLayerProps({
                 id: "highlight2",
                 data: getWellObjectsByName(
@@ -515,7 +515,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 getFillColor: [255, 140, 0],
                 getLineColor: [255, 140, 0],
                 parameters,
-                visible: this.props.logCurves && !drawSimple,
+                visible: this.props.logCurves && !fastDrawing,
             })
         );
 
@@ -569,7 +569,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                     this.setLegend(value);
                 },
                 parameters,
-                visible: this.props.logCurves && !drawSimple,
+                visible: this.props.logCurves && !fastDrawing,
             })
         );
 
@@ -624,7 +624,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                     this.setLegend(value);
                 },
                 parameters,
-                visible: this.props.logCurves && !drawSimple,
+                visible: this.props.logCurves && !fastDrawing,
             })
         );
 
@@ -646,7 +646,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 getAlignmentBaseline: "bottom",
                 getSize: this.props.wellNameSize,
                 parameters,
-                visible: this.props.wellNameVisible && !drawSimple,
+                visible: this.props.wellNameVisible && !fastDrawing,
             })
         );
 
@@ -656,7 +656,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             logLayer,
             colorsLayer,
             highlightLayer,
-            highlightMultiWells_layer,
+            highlightMultiWellsLayer,
             selectionLayer,
             namesLayer,
         ];

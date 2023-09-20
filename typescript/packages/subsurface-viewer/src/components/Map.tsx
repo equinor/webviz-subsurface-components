@@ -397,8 +397,8 @@ export interface MapProps {
      */
     isLoadedCallback?: (arg: boolean) => void;
 
-    onDragStart?: (info: unknown, event: unknown) => void;
-    onDragEnd?: (info: unknown, event: unknown) => void;
+    onDragStart?: (info: PickingInfo, event: unknown) => void;
+    onDragEnd?: (info: PickingInfo, event: unknown) => void;
 
     /**
      * If changed will reset camera to default position.
