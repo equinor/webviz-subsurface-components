@@ -11,7 +11,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          token: ${{ secrets.SEMANTIC_RELEASE_GITHUB_TOKEN }}
+          persist-credentials: false
+          fetch-depth: 0
 
       - name: configure git
         run: |
@@ -26,4 +27,5 @@ jobs:
         run: npx nx run-many --target=semantic-release --parallel=false
         env:
           GITHUB_TOKEN: ${{ secrets.SEMANTIC_RELEASE_GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.SEMANTIC_RELEASE_GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

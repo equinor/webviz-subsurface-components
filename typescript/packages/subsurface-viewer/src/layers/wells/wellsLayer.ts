@@ -106,7 +106,7 @@ export interface WellsLayerProps extends ExtendedLayerProps {
     /**  If true means that a simplified representation of the wells will be drawn.
      *   Useful for example during panning and rotation to gain speed.
      */
-    fastDrawing: boolean;
+    optimizedInteraction: boolean;
 }
 
 const defaultProps = {
@@ -130,7 +130,7 @@ const defaultProps = {
     selectedWell: "@@#editedData.selectedWells", // used to get data from deckgl layer
     depthTest: true,
     ZIncreasingDownwards: true,
-    fastDrawing: false,
+    optimizedInteraction: false,
 };
 
 export interface LogCurveDataType {
@@ -382,7 +382,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         };
 
         // Reduced details when rotating or panning the view if "fastDrawing " is set.
-        const fastDrawing = this.props.fastDrawing;
+        const fastDrawing = this.props.optimizedInteraction;
 
         const simpleLayer = new UnfoldedGeoJsonLayer(
             this.getSubLayerProps({
