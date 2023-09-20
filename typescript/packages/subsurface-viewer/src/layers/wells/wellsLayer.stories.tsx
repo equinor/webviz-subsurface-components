@@ -441,20 +441,19 @@ Wells3d.parameters = {
 export const Wells3DGullfaks: ComponentStory<typeof SubsurfaceViewer> = (
     args
 ) => {
-    const [optimizedInteraction, setOptimizedInteraction] =
-        React.useState<boolean>(false);
+    const [fastDrawing, setFastDrawing] = React.useState<boolean>(false);
 
     const props = {
         ...args,
-        onDragStart: () => setOptimizedInteraction(true),
-        onDragEnd: () => setOptimizedInteraction(false),
+        onDragStart: () => setFastDrawing(true),
+        onDragEnd: () => setFastDrawing(false),
         layers: [
             new WellsLayer({
                 data: "./gullfaks.json",
                 wellHeadStyle: { size: 4 },
                 refine: true,
                 outline: true,
-                optimizedInteraction, // If true will cause wellslayer to draw simplified.
+                fastDrawing, // If true will cause wellslayer to draw simplified.
             }),
             new AxesLayer({
                 id: "axes-layer",
