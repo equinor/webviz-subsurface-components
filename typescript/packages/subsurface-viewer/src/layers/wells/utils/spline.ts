@@ -5,6 +5,7 @@ import type {
 } from "geojson";
 import { cloneDeep, range } from "lodash";
 import type { Position3D } from "../../utils/layerTools";
+import * as turf from "@turf/turf";
 
 /**
  * Given four points P0, P1, P2, P4 and a argument t in the interval [0,1].
@@ -237,10 +238,6 @@ export function coarsenWells(data_in: FeatureCollection): FeatureCollection {
     const no_wells = data.features.length;
 
     for (let well_no = 0; well_no < no_wells; well_no++) {
-        const mds = data.features[well_no].properties?.["md"];
-        if (mds === undefined) {
-            continue;
-        }
         const geometryCollection = data.features[well_no]
             .geometry as GeometryCollection;
         const lineString = geometryCollection?.geometries[1] as LineString;
@@ -249,22 +246,14 @@ export function coarsenWells(data_in: FeatureCollection): FeatureCollection {
             continue;
         }
 
-        const coords = lineString.coordinates as Position3D[];
-
-        // Filter and keep only each tenth pluss first and last elementh.
-        const filterFunc = (
-            __: Position3D,
-            index: number,
-            array: Position3D[]
-        ) => {
-            return index === 0 || index === array.length - 1 || index % 10 == 0;
+        const options = {
+            tolerance: 0.01,
+            highQuality: false,
+            mutate: false,
         };
 
-        lineString.coordinates = coords.filter(filterFunc);
-
-        if (data.features[well_no].properties) {
-            data.features[well_no].properties!["md"] = mds.filter(filterFunc);
-        }
+        const coordsSimplified = turf.simplify(lineString, options);
+        lineString.coordinates = coordsSimplified.coordinates as Position3D[];
     }
 
     return data;
