@@ -152,9 +152,5 @@
     },
     "workspaces": [
         "packages/*"
-    ],
-    "dependencies": {
-        "@turf/simplify": "^6.5.0",
-        "@turf/turf": "^6.5.0"
-    }
+    ]
 }
