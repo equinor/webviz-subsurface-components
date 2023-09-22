@@ -403,8 +403,8 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 ),
                 getLineColor: getColor(this.props.lineStyle?.color),
                 getFillColor: getColor(this.props.wellHeadStyle?.color),
-                lineBillboard: false,
-                pointBillboard: false,
+                lineBillboard: true,
+                pointBillboard: true,
                 parameters,
                 visible: fastDrawing,
             })
