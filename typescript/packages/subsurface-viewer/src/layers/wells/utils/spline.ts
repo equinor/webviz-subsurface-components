@@ -5,7 +5,7 @@ import type {
 } from "geojson";
 import { cloneDeep, range } from "lodash";
 import type { Position3D } from "../../utils/layerTools";
-import * as turf from "@turf/turf";
+import simplify from "@turf/simplify";
 
 /**
  * Given four points P0, P1, P2, P4 and a argument t in the interval [0,1].
@@ -252,7 +252,7 @@ export function coarsenWells(data_in: FeatureCollection): FeatureCollection {
             mutate: false,
         };
 
-        const coordsSimplified = turf.simplify(lineString, options);
+        const coordsSimplified = simplify(lineString, options);
         lineString.coordinates = coordsSimplified.coordinates as Position3D[];
     }
 
