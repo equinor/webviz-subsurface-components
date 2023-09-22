@@ -438,23 +438,23 @@ Wells3d.parameters = {
 };
 
 // Gullfaks wells.
-export const Wells3DGullfaks: ComponentStory<typeof SubsurfaceViewer> = (
+export const SimplifiedRendering: ComponentStory<typeof SubsurfaceViewer> = (
     args
 ) => {
-    const [optimizedInteraction, setOptimizedInteraction] =
+    const [simplifiedRendering, setSimplifiedRendering] =
         React.useState<boolean>(false);
 
     const props = {
         ...args,
-        onDragStart: () => setOptimizedInteraction(true),
-        onDragEnd: () => setOptimizedInteraction(false),
+        onDragStart: () => setSimplifiedRendering(true),
+        onDragEnd: () => setSimplifiedRendering(false),
         layers: [
             new WellsLayer({
                 data: "./gullfaks.json",
                 wellHeadStyle: { size: 4 },
                 refine: true,
                 outline: true,
-                optimizedInteraction, // If true will cause wellslayer to draw simplified.
+                simplifiedRendering, // If true will cause wellslayer to draw simplified.
             }),
             new AxesLayer({
                 id: "axes-layer",
@@ -466,7 +466,7 @@ export const Wells3DGullfaks: ComponentStory<typeof SubsurfaceViewer> = (
     return <SubsurfaceViewer {...props} />;
 };
 
-Wells3DGullfaks.args = {
+SimplifiedRendering.args = {
     id: "gullfaks",
     bounds: [450000, 6781000, 464000, 6791000] as [
         number,
@@ -485,7 +485,7 @@ Wells3DGullfaks.args = {
     },
 };
 
-Wells3DGullfaks.parameters = {
+SimplifiedRendering.parameters = {
     docs: {
         description: {
             story: "3D gullfaks wells example",
