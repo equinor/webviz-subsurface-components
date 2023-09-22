@@ -13,6 +13,8 @@ import PropTypes from "prop-types";
 import type { colorTablesArray } from "@emerson-eps/color-tables/";
 import type { Unit } from "convert-units";
 import convert from "convert-units";
+import type { PickingInfo } from "@deck.gl/core/typed";
+import type { MjolnirGestureEvent } from "mjolnir.js";
 
 export type {
     BoundsAccessor,
@@ -99,6 +101,9 @@ export interface SubsurfaceViewerProps {
      */
     isLoadedCallback?: (arg: boolean) => void;
 
+    onDragStart?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
+    onDragEnd?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
+
     /**
      * If changed will reset camera to default position.
      */
@@ -150,6 +155,8 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
     cameraPosition,
     getCameraPosition,
     isLoadedCallback,
+    onDragStart,
+    onDragEnd,
     triggerHome,
     triggerResetMultipleWells,
     lights,
@@ -234,6 +241,8 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
             cameraPosition={cameraPosition}
             getCameraPosition={getCameraPosition}
             isLoadedCallback={isLoadedCallback}
+            onDragStart={onDragStart}
+            onDragEnd={onDragEnd}
             triggerHome={triggerHome}
             triggerResetMultipleWells={triggerResetMultipleWells}
             lights={lights}
