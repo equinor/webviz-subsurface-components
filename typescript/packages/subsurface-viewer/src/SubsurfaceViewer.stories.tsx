@@ -505,7 +505,7 @@ ViewStateSynchronization.argTypes = {
     },
 };
 
-export const IsLoadedCallback = (args: SubsurfaceViewerProps) => {
+export const IsRenderedCallback = (args: SubsurfaceViewerProps) => {
     const [layers, setLayers] = React.useState([defaultWellsLayer] as [
         WellsLayer,
         MapLayer?,
@@ -515,6 +515,8 @@ export const IsLoadedCallback = (args: SubsurfaceViewerProps) => {
     const handleChange = () => {
         if (layers.length === 1) {
             setLayers([defaultWellsLayer, meshMapLayerBig]);
+        } else if (layers.length === 2) {
+            setLayers([]);
         } else {
             setLayers([defaultWellsLayer]);
         }
@@ -522,8 +524,8 @@ export const IsLoadedCallback = (args: SubsurfaceViewerProps) => {
 
     const props = {
         ...args,
-        isLoadedCallback: (isLoaded: boolean) => {
-            console.log("isLoadedCallback", isLoaded);
+        isRenderedCallback: (isLoaded: boolean) => {
+            console.log("isRenderedCallback", isLoaded);
             setLabel(isLoaded ? "LOADED" : "NOT LOADED");
             return;
         },
@@ -542,7 +544,7 @@ export const IsLoadedCallback = (args: SubsurfaceViewerProps) => {
     );
 };
 
-IsLoadedCallback.args = {
+IsRenderedCallback.args = {
     id: "DeckGL-Map",
     layers: [meshMapLayerBig, defaultWellsLayer],
     bounds: [432150, 6475800, 439400, 6481501],
@@ -557,12 +559,12 @@ IsLoadedCallback.args = {
     },
 };
 
-IsLoadedCallback.parameters = {
+IsRenderedCallback.parameters = {
     docs: {
         inlineStories: false,
         iframeHeight: 500,
         description: {
-            story: "IsLoadedCallback will report in console when triggered",
+            story: "IsRenderedCallback will report in console when triggered",
         },
     },
 };

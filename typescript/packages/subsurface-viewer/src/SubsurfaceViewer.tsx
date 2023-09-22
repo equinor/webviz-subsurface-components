@@ -99,7 +99,7 @@ export interface SubsurfaceViewerProps {
     /**
      * Will be called after all layers have finished loading data.
      */
-    isLoadedCallback?: (arg: boolean) => void;
+    isRenderedCallback?: (arg: boolean) => void;
 
     onDragStart?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
     onDragEnd?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
@@ -154,7 +154,7 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
     getTooltip,
     cameraPosition,
     getCameraPosition,
-    isLoadedCallback,
+    isRenderedCallback: isRenderedCallback,
     onDragStart,
     onDragEnd,
     triggerHome,
@@ -240,7 +240,7 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
             getTooltip={getTooltip}
             cameraPosition={cameraPosition}
             getCameraPosition={getCameraPosition}
-            isLoadedCallback={isLoadedCallback}
+            isRenderedCallback={isRenderedCallback}
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
             triggerHome={triggerHome}

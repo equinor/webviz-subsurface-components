@@ -396,7 +396,7 @@ export interface MapProps {
     /**
      * Will be called after all layers have finished loading data.
      */
-    isLoadedCallback?: (arg: boolean) => void;
+    isRenderedCallback?: (arg: boolean) => void;
 
     onDragStart?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
     onDragEnd?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
@@ -578,7 +578,7 @@ const Map: React.FC<MapProps> = ({
     getTooltip = defaultTooltip,
     cameraPosition,
     getCameraPosition,
-    isLoadedCallback,
+    isRenderedCallback: isLoadedCallback,
     onDragStart,
     onDragEnd,
     triggerHome,
@@ -708,6 +708,7 @@ const Map: React.FC<MapProps> = ({
             // Empty layers array makes deck.gl set deckRef to undefined (no opengl context).
             // Hence insert dummy layer.
             const dummy_layer = new LineLayer({
+                id: "dummy",
                 visible: false,
             });
             layers.push(dummy_layer);
@@ -917,13 +918,17 @@ const Map: React.FC<MapProps> = ({
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
     const onAfterRender = useCallback(() => {
         if (deckGLLayers) {
-            const state = deckGLLayers.every((layer) => {
+            const loadedState = deckGLLayers.every((layer) => {
                 return (layer as Layer).isLoaded;
             });
-            setIsLoaded(state);
 
+            const emptyLayers = // There will always be a dummy layer. Deck.gl does not like empty array of layers.
+                deckGLLayers.length == 1 &&
+                (deckGLLayers[0] as LineLayer).id === "dummy";
+
+            setIsLoaded(loadedState || emptyLayers);
             if (typeof isLoadedCallback !== "undefined") {
-                isLoadedCallback(state);
+                isLoadedCallback(loadedState);
             }
         }
     }, [deckGLLayers, isLoadedCallback]);
