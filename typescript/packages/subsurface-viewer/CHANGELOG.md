@@ -1,3 +1,10 @@
+## [0.1.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.1.0...subsurface-viewer@0.1.1) (2023-09-22)
+
+
+### Bug Fixes
+
+* Improve "isLoadedCallback" to not return true before first draw of layer not only just when data are loaded. ([#1656](https://github.com/equinor/webviz-subsurface-components/issues/1656)) ([3875f8b](https://github.com/equinor/webviz-subsurface-components/commit/3875f8b55a7d2abf34dca7a82079b602f2741de0))
+
 # 1.0.0 (2023-09-22)
 
 

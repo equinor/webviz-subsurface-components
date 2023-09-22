@@ -7,5 +7,6 @@
     "master"
   ],
   "buildTarget": "${PROJECT_NAME}:build",
-  "outputPath": "${PROJECT_DIR}/dist"
+  "outputPath": "${PROJECT_DIR}/dist",
+  "tagFormat": "${PROJECT_NAME}@${version}"
 }
