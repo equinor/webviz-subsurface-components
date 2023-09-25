@@ -136,9 +136,31 @@ export function splineRefine(data_in: FeatureCollection): FeatureCollection {
             continue;
         }
 
-        const coords = lineString.coordinates as Position3D[];
+        let coords = lineString.coordinates as Position3D[];
+
+        // Filter out consecutive duplicate vertex's.
+        const keep = coords.map((e, index, arr) => {
+            if (index < arr.length - 1) {
+                return (
+                    e[1] !== arr[index + 1][1] &&
+                    e[1] !== arr[index + 1][1] &&
+                    e[2] !== arr[index + 1][2]
+                );
+            }
+            return true;
+        });
+        coords = coords.filter((_e, index) => {
+            return keep[index];
+        });
+        mds[0] = mds[0].filter((_e: number, index: number) => {
+            return keep[index];
+        });
 
         const n = coords.length;
+        if (n <= 1) {
+            continue;
+        }
+
         const ts = n > 3 ? steps : [];
 
         // Point before first.
