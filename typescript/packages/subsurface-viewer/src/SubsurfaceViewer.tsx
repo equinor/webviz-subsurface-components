@@ -97,7 +97,7 @@ export interface SubsurfaceViewerProps {
     getCameraPosition?: (input: ViewStateType) => void;
 
     /**
-     * Will be called after all layers have finished loading data.
+     * Will be called after all layers have rendered data.
      */
     isRenderedCallback?: (arg: boolean) => void;
 

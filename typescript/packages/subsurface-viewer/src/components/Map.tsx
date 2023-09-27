@@ -394,7 +394,7 @@ export interface MapProps {
     getCameraPosition?: (input: ViewStateType) => void;
 
     /**
-     * Will be called after all layers have finished loading data.
+     * Will be called after all layers have rendered data.
      */
     isRenderedCallback?: (arg: boolean) => void;
 
@@ -708,7 +708,7 @@ const Map: React.FC<MapProps> = ({
             // Empty layers array makes deck.gl set deckRef to undefined (no opengl context).
             // Hence insert dummy layer.
             const dummy_layer = new LineLayer({
-                id: "dummy",
+                id: "webviz_internal_dummy_layer",
                 visible: false,
             });
             layers.push(dummy_layer);
@@ -924,7 +924,8 @@ const Map: React.FC<MapProps> = ({
 
             const emptyLayers = // There will always be a dummy layer. Deck.gl does not like empty array of layers.
                 deckGLLayers.length == 1 &&
-                (deckGLLayers[0] as LineLayer).id === "dummy";
+                (deckGLLayers[0] as LineLayer).id ===
+                    "webviz_internal_dummy_layer";
 
             setIsLoaded(loadedState || emptyLayers);
             if (typeof isLoadedCallback !== "undefined") {
