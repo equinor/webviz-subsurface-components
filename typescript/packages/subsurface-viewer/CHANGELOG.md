@@ -1,3 +1,10 @@
+## [0.2.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.2.0...subsurface-viewer@0.2.1) (2023-09-27)
+
+
+### Bug Fixes
+
+* Rename callback to more descriptive name. Also callback should be… ([#1668](https://github.com/equinor/webviz-subsurface-components/issues/1668)) ([0c1baee](https://github.com/equinor/webviz-subsurface-components/commit/0c1baee321cda44e32275babf2ac45e2135432d3)), closes [#1653](https://github.com/equinor/webviz-subsurface-components/issues/1653)
+
 # [0.2.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.1.1...subsurface-viewer@0.2.0) (2023-09-22)
 
 
