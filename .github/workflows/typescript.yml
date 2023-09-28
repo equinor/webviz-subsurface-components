@@ -1,4 +1,4 @@
-name: typescript
+name: webviz-subsurface-components
 
 defaults:
   run:
@@ -17,7 +17,7 @@ on:
     - cron: "0 0 * * *"
 
 jobs:
-  webviz-subsurface-components:
+  typescript:
     # Run on all events defined above, except pushes which are not to master
     if: github.event_name != 'push' || github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
