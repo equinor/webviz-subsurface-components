@@ -30,6 +30,7 @@ import {
     coarsenWells,
     invertPath,
     GetBoundingBox,
+    removeDuplicates as removeDuplicates,
 } from "./utils/spline";
 import { interpolateNumberArray } from "d3";
 import type { DeckGLLayerContext } from "../../components/Map";
@@ -248,6 +249,8 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 data = invertPath(data);
             }
 
+            removeDuplicates(data);
+
             const refine = this.props.refine;
             data = refine
                 ? splineRefine(data) // smooth well paths.
@@ -409,6 +412,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 visible: fastDrawing,
             })
         );
+
         const outlineLayer = new UnfoldedGeoJsonLayer(
             this.getSubLayerProps({
                 id: "outline",
@@ -650,8 +654,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             })
         );
 
-        return [
-            fastLayer,
+        const layers = [
             outlineLayer,
             logLayer,
             colorsLayer,
@@ -660,6 +663,10 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             selectionLayer,
             namesLayer,
         ];
+        if (fastDrawing) {
+            layers.push(fastLayer as UnfoldedGeoJsonLayer);
+        }
+        return layers;
     }
 
     getPickingInfo({ info }: { info: PickingInfo }): WellsPickInfo {

@@ -437,6 +437,40 @@ Wells3d.parameters = {
     },
 };
 
+export const OneWell = Template.bind({});
+OneWell.args = {
+    id: "well_176",
+    bounds: [756125, 166200, 757327, 167938],
+    layers: [
+        {
+            "@@type": "WellsLayer",
+            data: "./well_176.json",
+            refine: true,
+            simplifiedRendering: true,
+        },
+    ],
+
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "a",
+                show3D: true,
+            },
+        ],
+    },
+};
+
+OneWell.parameters = {
+    docs: {
+        description: {
+            story: "One single well with duplicate vertexs example",
+        },
+        inlineStories: false,
+        iframeHeight: 500,
+    },
+};
+
 // Gullfaks wells.
 export const SimplifiedRendering: ComponentStory<typeof SubsurfaceViewer> = (
     args
