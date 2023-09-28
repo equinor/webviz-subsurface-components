@@ -16,6 +16,9 @@ describe("remove duplicates", () => {
     const mds = [0, 1, 2];
     const mdsRes = [1, 2];
 
+    const coordsEmpty: Position3D[] = [];
+    const mdsEmpty: number[] = [];
+
     it("should remove duplicate", () => {
         expect(removeConsecutiveDuplicates(coords, mds).length).toBe(2);
         expect(removeConsecutiveDuplicates(coords, mds)[0]).not.toBe(coords);
@@ -28,5 +31,17 @@ describe("remove duplicates", () => {
         expect(removeConsecutiveDuplicates(coords, mds)[1]).toStrictEqual(
             mdsRes
         );
+    });
+
+    it("should handle empty input (coords)", () => {
+        expect(
+            removeConsecutiveDuplicates(coordsEmpty, mdsEmpty)[0]
+        ).toStrictEqual(coordsEmpty);
+    });
+
+    it("should handle empty input (md's)", () => {
+        expect(
+            removeConsecutiveDuplicates(coordsEmpty, mdsEmpty)[1]
+        ).toStrictEqual(mdsEmpty);
     });
 });
