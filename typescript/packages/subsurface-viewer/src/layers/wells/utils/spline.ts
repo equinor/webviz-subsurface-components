@@ -3,8 +3,9 @@ import type {
     GeometryCollection,
     LineString,
 } from "geojson";
-import { cloneDeep } from "lodash";
+import { cloneDeep, range } from "lodash";
 import type { Position3D } from "../../utils/layerTools";
+import simplify from "@turf/simplify";
 
 /**
  * Given four points P0, P1, P2, P4 and a argument t in the interval [0,1].
@@ -116,6 +117,12 @@ export function splineRefine(data_in: FeatureCollection): FeatureCollection {
     const data = cloneDeep(data_in);
 
     const no_wells = data.features.length;
+
+    const noSteps = 5;
+    const step = 1 / noSteps;
+
+    const steps = range(step, 1, step);
+
     for (let well_no = 0; well_no < no_wells; well_no++) {
         const mds = data.features[well_no].properties?.["md"];
         if (mds === undefined) {
@@ -132,7 +139,7 @@ export function splineRefine(data_in: FeatureCollection): FeatureCollection {
         const coords = lineString.coordinates as Position3D[];
 
         const n = coords.length;
-        const ts = n > 3 ? [0.2, 0.4, 0.6, 0.8] : [];
+        const ts = n > 3 ? steps : [];
 
         // Point before first.
         const x0 = coords[0][0] - coords[1][0] + coords[0][0];
@@ -217,6 +224,36 @@ export function splineRefine(data_in: FeatureCollection): FeatureCollection {
         if (data.features[well_no].properties) {
             data.features[well_no].properties!["md"] = newMds; // eslint-disable-line
         }
+    }
+
+    return data;
+}
+
+/**
+ * Will reduce/coarse the wellpaths.
+ */
+export function coarsenWells(data_in: FeatureCollection): FeatureCollection {
+    const data = cloneDeep(data_in);
+
+    const no_wells = data.features.length;
+
+    for (let well_no = 0; well_no < no_wells; well_no++) {
+        const geometryCollection = data.features[well_no]
+            .geometry as GeometryCollection;
+        const lineString = geometryCollection?.geometries[1] as LineString;
+
+        if (lineString.coordinates?.length === undefined) {
+            continue;
+        }
+
+        const options = {
+            tolerance: 0.01,
+            highQuality: false,
+            mutate: false,
+        };
+
+        const coordsSimplified = simplify(lineString, options);
+        lineString.coordinates = coordsSimplified.coordinates as Position3D[];
     }
 
     return data;

@@ -78,7 +78,7 @@ jobs:
 
           npm config set '//registry.npmjs.org/:_authToken' '${NPM_TOKEN}'
           cd packages/${PACKAGE}
-          npm version --no-git-tag-version ${VERSION}
+          npm version --allow-same-version --no-git-tag-version ${VERSION}
           # Use 'latest' tag if $NPM_PUBLISH_TAG is not set:
           npm publish --access public --tag ${NPM_PUBLISH_TAG:-latest}
 

@@ -13,6 +13,8 @@ import PropTypes from "prop-types";
 import type { colorTablesArray } from "@emerson-eps/color-tables/";
 import type { Unit } from "convert-units";
 import convert from "convert-units";
+import type { PickingInfo } from "@deck.gl/core/typed";
+import type { MjolnirGestureEvent } from "mjolnir.js";
 
 export type {
     BoundsAccessor,
@@ -95,9 +97,12 @@ export interface SubsurfaceViewerProps {
     getCameraPosition?: (input: ViewStateType) => void;
 
     /**
-     * Will be called after all layers have finished loading data.
+     * Will be called after all layers have rendered data.
      */
-    isLoadedCallback?: (arg: boolean) => void;
+    isRenderedCallback?: (arg: boolean) => void;
+
+    onDragStart?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
+    onDragEnd?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
 
     /**
      * If changed will reset camera to default position.
@@ -149,7 +154,9 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
     getTooltip,
     cameraPosition,
     getCameraPosition,
-    isLoadedCallback,
+    isRenderedCallback: isRenderedCallback,
+    onDragStart,
+    onDragEnd,
     triggerHome,
     triggerResetMultipleWells,
     lights,
@@ -233,7 +240,9 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
             getTooltip={getTooltip}
             cameraPosition={cameraPosition}
             getCameraPosition={getCameraPosition}
-            isLoadedCallback={isLoadedCallback}
+            isRenderedCallback={isRenderedCallback}
+            onDragStart={onDragStart}
+            onDragEnd={onDragEnd}
             triggerHome={triggerHome}
             triggerResetMultipleWells={triggerResetMultipleWells}
             lights={lights}
