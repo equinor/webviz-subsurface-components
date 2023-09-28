@@ -46,7 +46,7 @@ jobs:
           # want to limit ourselves to lockfileVersion: 3. 
           # While waiting for dropping node 14 and npm 6 support, we include this manual
           # check:
-          grep -q '"lockfileVersion": 3,' ./typescript/package-lock.json
+          grep -q '"lockfileVersion": 3,' ./package-lock.json
 
           npm ci CYPRESS_INSTALL_BINARY=0 --ignore-scripts
       - name: ⏭️ Modifications when prerelease
@@ -88,7 +88,7 @@ jobs:
       - name: 📚 Update Storybook
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         run: |
-          cp -r ./typescript/storybook-static ..
+          cp -r ./storybook-static ..
 
           git config --local user.email "webviz-github-action"
           git config --local user.name "webviz-github-action"
