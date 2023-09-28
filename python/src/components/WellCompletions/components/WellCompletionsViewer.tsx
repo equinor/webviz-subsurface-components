@@ -137,58 +137,60 @@ export const WellCompletionsViewer: React.FC<WellCompletionsViewerProps> = (
     return (
         <Root className={classes.root}>
             {/* We detect the resize of the element and resize the plot accordingly */}
-            <ReactResizeDetector handleWidth handleHeight>
-                {({ width }) => (
-                    <>
-                        <SettingsBar />
-                        <div
-                            className={classes.main}
-                            style={{
-                                width: `${width}px`,
-                            }}
-                        >
+            <>
+                <ReactResizeDetector handleWidth handleHeight>
+                    {({ width }) => (
+                        <>
+                            <SettingsBar />
                             <div
-                                className={clsx(classes.content, {
-                                    [classes.contentShift]: isDrawerOpen,
-                                })}
-                            >
-                                <WellPagination />
-                                <div
-                                    style={{
-                                        minWidth: `${minWidth}px`,
-                                        minHeight: `${minHeight}px`,
-                                        height: "100%",
-                                    }}
-                                >
-                                    <WellCompletionsPlot
-                                        id={`${props.parentId}-well-completions-plot`}
-                                        timeSteps={data.timeSteps}
-                                        plotData={dataInCurrentPage}
-                                    />
-                                </div>
-                            </div>
-                            {/* Drawer on the right-hand side (hidden by default) that shows the filter options */}
-                            <Drawer
-                                className={clsx(classes.drawer, {
-                                    [classes.drawerShift]: !isDrawerOpen,
-                                })}
-                                classes={{
-                                    paper: classes.drawerPaper,
+                                className={classes.main}
+                                style={{
+                                    width: `${width}px`,
                                 }}
-                                variant="persistent"
-                                anchor="right"
-                                open={isDrawerOpen}
                             >
-                                <Divider />
-                                <ZoneSelector />
-                                <WellFilter />
-                                <HideZeroCompletionsSwitch />
-                                <WellAttributesSelector />
-                            </Drawer>
-                        </div>
-                    </>
-                )}
-            </ReactResizeDetector>
+                                <div
+                                    className={clsx(classes.content, {
+                                        [classes.contentShift]: isDrawerOpen,
+                                    })}
+                                >
+                                    <WellPagination />
+                                    <div
+                                        style={{
+                                            minWidth: `${minWidth}px`,
+                                            minHeight: `${minHeight}px`,
+                                            height: "100%",
+                                        }}
+                                    >
+                                        <WellCompletionsPlot
+                                            id={`${props.parentId}-well-completions-plot`}
+                                            timeSteps={data.timeSteps}
+                                            plotData={dataInCurrentPage}
+                                        />
+                                    </div>
+                                </div>
+                                {/* Drawer on the right-hand side (hidden by default) that shows the filter options */}
+                                <Drawer
+                                    className={clsx(classes.drawer, {
+                                        [classes.drawerShift]: !isDrawerOpen,
+                                    })}
+                                    classes={{
+                                        paper: classes.drawerPaper,
+                                    }}
+                                    variant="persistent"
+                                    anchor="right"
+                                    open={isDrawerOpen}
+                                >
+                                    <Divider />
+                                    <ZoneSelector />
+                                    <WellFilter />
+                                    <HideZeroCompletionsSwitch />
+                                    <WellAttributesSelector />
+                                </Drawer>
+                            </div>
+                        </>
+                    )}
+                </ReactResizeDetector>
+            </>
         </Root>
     );
 };

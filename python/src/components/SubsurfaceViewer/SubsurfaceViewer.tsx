@@ -2,7 +2,10 @@ import React from "react";
 import { SubsurfaceViewerProps } from "@webviz/subsurface-viewer";
 
 const SubsurfaceViewerComponent = React.lazy(
-    () => import("@webviz/subsurface-viewer")
+    () =>
+        import(
+            /* webpackChunkName: "webviz-subsurface-viewer" */ "@webviz/subsurface-viewer"
+        )
 );
 
 const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = (props) => {

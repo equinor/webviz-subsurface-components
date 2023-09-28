@@ -1,12 +1,32 @@
 import React from "react";
 import PropTypes from "prop-types";
-
-import {
-    ExpressionTypePropTypes,
-    ExternalParseDataPropTypes,
-} from "./utils/VectorCalculatorTypes";
 import { VectorCalculatorComponent } from "./components/VectorCalculatorComponent";
 import { StoreProvider } from "./components/ExpressionsStore";
+
+const VariableVectorMapTypePropTypes = {
+    variableName: PropTypes.string.isRequired,
+    vectorName: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
+};
+
+const ExpressionTypePropTypes = {
+    name: PropTypes.string.isRequired,
+    expression: PropTypes.string.isRequired,
+    id: PropTypes.string.isRequired,
+    variableVectorMap: PropTypes.arrayOf(
+        PropTypes.shape(VariableVectorMapTypePropTypes).isRequired
+    ).isRequired,
+    description: PropTypes.string,
+    isValid: PropTypes.bool.isRequired,
+    isDeletable: PropTypes.bool.isRequired,
+};
+
+const ExternalParseDataPropTypes = {
+    expression: PropTypes.string.isRequired,
+    id: PropTypes.string.isRequired,
+    variables: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
+    isValid: PropTypes.bool.isRequired,
+    message: PropTypes.string.isRequired,
+};
 
 /**
  * VectorCalculator is a component that allows to calculate new vectors by creating a mathematical expression

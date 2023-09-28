@@ -1,0 +1,90 @@
+name: webviz-subsurface-components
+
+defaults:
+  run:
+    working-directory: ./python
+
+on:
+  push:
+  pull_request:
+    branches:
+      - master
+  release:
+    types:
+      - published
+  schedule:
+    # Run CI daily and check that tests are working with latest dependencies
+    - cron: "0 0 * * *"
+
+jobs:
+  webviz-subsurface-components:
+    # Run on all events defined above, except pushes which are not to master
+    if: github.event_name != 'push' || github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - python-version: "3.8"
+          - python-version: "3.9"
+          - python-version: "3.10"
+
+    steps:
+      - name: 📖 Checkout commit locally
+        uses: actions/checkout@v3
+
+      - name: 🐍 Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: 📦 Install build dependencies
+        # The deckgl types package runs a postscript to setup, but since we ignore scripts, we need to set it up manually.
+        run: |
+
+          # In https://github.com/equinor/webviz-subsurface-components/pull/1010 we
+          # loosened up npm constraint to include npm version using lockfileVersion: 1
+          # for downstream users. However in the development of this repository we
+          # want to limit ourselves to lockfileVersion: 3. 
+          # While waiting for dropping node 14 and npm 6 support, we include this manual
+          # check:
+          grep -q '"lockfileVersion": 3,' ./package-lock.json
+
+          npm ci
+          pip install .[dependencies]
+          pip install dash[dev]
+
+      - name: 🏗️ Generate Dash components
+        run: |
+          npm run build
+
+      - name: 📦 Install webviz-subsurface-components with dependencies
+        run: |
+          pip install --upgrade pip
+          pip install .[tests]
+
+      - name: 🧾 List all installed packages
+        run: pip freeze
+
+      - name: 🕵️ Check code style, linting and typechecking
+        if: matrix.python-version == '3.8'
+        run: |
+          npm run validate
+          black --check webviz_subsurface_components/ tests/ setup.py examples/
+          pylint webviz_subsurface_components/ setup.py
+          bandit -r -c ./bandit.yml webviz_subsurface_components/ tests/ setup.py examples/
+
+      - name: 🚢 Build and deploy Python package
+        if: github.event_name == 'release' && matrix.python-version == '3.8'
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.pypi_webviz_token }}
+        run: |
+          export SETUPTOOLS_SCM_PRETEND_VERSION=${GITHUB_REF//refs\/tags\//}
+          python -m pip install --upgrade setuptools wheel twine
+          python setup.py sdist bdist_wheel
+          twine upload dist/*

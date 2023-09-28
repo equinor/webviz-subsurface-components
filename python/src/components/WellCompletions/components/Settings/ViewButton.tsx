@@ -1,16 +1,16 @@
-import { Button, Icon, Tooltip } from "@equinor/eds-core-react";
+import { Button, Icon, Tooltip, Menu, Dialog } from "@equinor/eds-core-react";
 import { styled } from "@mui/material/styles";
 import { view_column } from "@equinor/eds-icons";
-import { Box, Menu } from "@mui/material";
 import React from "react";
-import SortButton from "./SortButton";
 import TimeAggregationSelector from "./TimeAggregationSelector";
 import WellsPerPageSelector from "./WellsPerPageSelector";
+import SortTable from "./SortTable";
 
 const PREFIX = "ViewButton";
 
 const classes = {
     paper: `${PREFIX}-paper`,
+    action: `${PREFIX}-action`,
 };
 
 const Root = styled("div")(({ theme }) => ({
@@ -28,38 +28,67 @@ Icon.add({ view_column }); // (this needs only be done once)
  */
 const ViewButton: React.FC = React.memo(() => {
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const [dialogOpen, setDialogOpen] = React.useState<boolean>(false);
 
     // Handlers
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         setAnchorEl(event.currentTarget);
     };
+
     const handleClose = () => {
         setAnchorEl(null);
     };
 
+    const handleCloseDialog = () => {
+        setDialogOpen(!dialogOpen);
+    };
+
     // Render
     return (
-        <Root>
-            <Tooltip title="View">
-                <Button variant="ghost_icon" onClick={handleClick}>
-                    <Icon color="currentColor" name="view_column" />
-                </Button>
-            </Tooltip>
-            <Menu
-                id="view-menu"
-                anchorEl={anchorEl}
-                keepMounted
-                open={Boolean(anchorEl)}
-                onClose={handleClose}
-                classes={{ paper: classes.paper }}
-            >
-                <Box marginY={1}>
-                    <SortButton />
+        <>
+            <Root>
+                <Tooltip title="View">
+                    <Button variant="ghost_icon" onClick={handleClick}>
+                        <Icon color="currentColor" name="view_column" />
+                    </Button>
+                </Tooltip>
+                <Menu
+                    id="view-menu"
+                    anchorEl={anchorEl}
+                    open={Boolean(anchorEl)}
+                    onClose={handleClose}
+                >
+                    <Menu.Item onClick={() => setDialogOpen(true)}>
+                        Sort/Group by Attributes
+                    </Menu.Item>
                     <TimeAggregationSelector />
                     <WellsPerPageSelector />
-                </Box>
-            </Menu>
-        </Root>
+                </Menu>
+            </Root>
+            {dialogOpen && (
+                <Dialog
+                    open={dialogOpen}
+                    style={{ minWidth: "400px" }}
+                    isDismissable
+                    onClose={handleCloseDialog}
+                >
+                    <Dialog.Header>
+                        <Dialog.Title>Well sorting levels</Dialog.Title>
+                    </Dialog.Header>
+                    <Dialog.CustomContent>
+                        <SortTable />
+                    </Dialog.CustomContent>
+                    <Dialog.Actions>
+                        <Button
+                            className={classes.action}
+                            onClick={() => setDialogOpen(false)}
+                        >
+                            OK
+                        </Button>
+                    </Dialog.Actions>
+                </Dialog>
+            )}
+        </>
     );
 });
 

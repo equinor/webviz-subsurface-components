@@ -11,7 +11,7 @@ module.exports = function (env, argv) {
     const output = {
         path: path.join(__dirname, dashLibraryName),
         chunkFilename: "[name].js",
-        filename: `${dashLibraryName}.js`,
+        filename: `${dashLibraryName}.min.js`,
         library: dashLibraryName,
         libraryTarget: "umd",
     };
@@ -22,6 +22,7 @@ module.exports = function (env, argv) {
             amd: "react",
             umd: "react",
             root: "React",
+            window: "react",
         },
         "react-dom": {
             commonjs: "react-dom",
@@ -29,6 +30,7 @@ module.exports = function (env, argv) {
             amd: "react-dom",
             umd: "react-dom",
             root: "ReactDOM",
+            window: "react-dom",
         },
     };
 
@@ -41,11 +43,11 @@ module.exports = function (env, argv) {
         resolve: {
             extensions: [".ts", ".tsx", ".js", ".jsx", ".json"],
         },
-
+        devtool: "source-map",
         module: {
             rules: [
                 {
-                    test: /\.tsx?$/,
+                    test: /\.(t|j)sx?$/,
                     use: [
                         {
                             loader: "ts-loader",
@@ -54,7 +56,7 @@ module.exports = function (env, argv) {
                             },
                         },
                     ],
-                    // exclude: /node_modules/
+                    exclude: /node_modules/,
                 },
                 {
                     test: /\.css$/,
@@ -144,7 +146,7 @@ module.exports = function (env, argv) {
                         chunks: "all",
                         minSize: 0,
                         minChunks: 2,
-                        name: "{{cookiecutter.project_shortname}}-shared",
+                        name: "webviz_subsurface_components-shared",
                     },
                 },
             },
