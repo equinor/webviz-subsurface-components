@@ -54,7 +54,7 @@ export function removeDuplicates(data: FeatureCollection): FeatureCollection {
 
         const n = coords.length;
         if (n != nOrig) {
-            console.warn("Well no ", well_no, " contains duplicates.");
+            console.warn("Well number ", well_no, " contains duplicates.");
         }
         if (n <= 1) {
             continue;
@@ -316,12 +316,12 @@ export function coarsenWells(data_in: FeatureCollection): FeatureCollection {
         }
 
         const n = lineString.coordinates.length;
-        const isHorizontalWell =
+        const isVerticalWell =
             lineString.coordinates[0][0] == lineString.coordinates[n - 1][0] &&
             lineString.coordinates[0][1] == lineString.coordinates[n - 1][1];
 
-        if (isHorizontalWell) {
-            // The simplify algorithm below did not work on horizontal wells hence in this case we only use first and last point.
+        if (isVerticalWell) {
+            // The simplify algorithm below did not work on vertical wells hence in this case we only use first and last point.
             const coordsSimplified = [
                 lineString.coordinates[0],
                 lineString.coordinates[n - 1],

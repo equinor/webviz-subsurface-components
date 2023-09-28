@@ -442,12 +442,11 @@ OneWell.args = {
     id: "well_176",
     bounds: [756125, 166200, 757327, 167938],
     layers: [
-        {
-            "@@type": "WellsLayer",
+        new WellsLayer({
             data: "./well_176.json",
             refine: true,
             simplifiedRendering: true,
-        },
+        }),
     ],
 
     views: {
