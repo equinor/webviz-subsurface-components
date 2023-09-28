@@ -49,9 +49,13 @@ export function removeDuplicates(data: FeatureCollection): FeatureCollection {
 
         let coords = lineString.coordinates as Position3D[];
 
+        const nOrig = coords.length;
         [coords, mds[0]] = removeConsecutiveDuplicates(coords, mds[0]);
 
         const n = coords.length;
+        if (n != nOrig) {
+            console.warn("Well no ", well_no, " contains duplicates.");
+        }
         if (n <= 1) {
             continue;
         }
