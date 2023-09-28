@@ -437,8 +437,8 @@ Wells3d.parameters = {
     },
 };
 
-export const OneWell = Template.bind({});
-OneWell.args = {
+export const WellWithDuplicates = Template.bind({});
+WellWithDuplicates.args = {
     id: "well_176",
     bounds: [756125, 166200, 757327, 167938],
     layers: [
@@ -460,7 +460,7 @@ OneWell.args = {
     },
 };
 
-OneWell.parameters = {
+WellWithDuplicates.parameters = {
     docs: {
         description: {
             story: "One single well with duplicate vertexs example",
