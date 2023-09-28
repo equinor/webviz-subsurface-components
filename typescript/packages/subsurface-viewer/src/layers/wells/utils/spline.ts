@@ -315,13 +315,15 @@ export function coarsenWells(data_in: FeatureCollection): FeatureCollection {
             continue;
         }
 
-        const n = lineString.coordinates.length;
-        const isVerticalWell =
-            lineString.coordinates[0][0] == lineString.coordinates[n - 1][0] &&
-            lineString.coordinates[0][1] == lineString.coordinates[n - 1][1];
+        const isVerticalWell = lineString.coordinates.every(
+            (e) =>
+                e[0] === lineString.coordinates[0][0] &&
+                e[1] === lineString.coordinates[0][1]
+        );
 
         if (isVerticalWell) {
             // The simplify algorithm below did not work on vertical wells hence in this case we only use first and last point.
+            const n = lineString.coordinates.length;
             const coordsSimplified = [
                 lineString.coordinates[0],
                 lineString.coordinates[n - 1],

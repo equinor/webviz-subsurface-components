@@ -437,6 +437,37 @@ Wells3d.parameters = {
     },
 };
 
+export const VerticalWell = Template.bind({});
+VerticalWell.args = {
+    id: "well_176",
+    bounds: [-700, 500, 1400, 1700],
+    layers: [
+        new WellsLayer({
+            data: "./verticalwell.json",
+        }),
+    ],
+
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "verticalwell",
+                show3D: true,
+            },
+        ],
+    },
+};
+
+VerticalWell.parameters = {
+    docs: {
+        description: {
+            story: "One single vertical well",
+        },
+        inlineStories: false,
+        iframeHeight: 500,
+    },
+};
+
 export const WellWithDuplicates = Template.bind({});
 WellWithDuplicates.args = {
     id: "well_176",
