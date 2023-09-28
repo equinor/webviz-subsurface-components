@@ -28,8 +28,8 @@ function valueLabelFormat(value: number /*, index: number*/): string {
 }
 
 class ZoomSlider extends Component<Props, State> {
-    constructor(props: Props, state: State) {
-        super(props, state);
+    constructor(props: Props) {
+        super(props);
 
         const level = convertValueToLevel(this.props.value);
         this.state = {

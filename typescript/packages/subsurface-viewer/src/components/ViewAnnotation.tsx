@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-interface ViewAnnotationProps {
+export interface ViewAnnotationProps {
     id: string;
     children?: React.ReactNode;
 }

@@ -19,12 +19,17 @@ export interface GroupTreeProps {
     /**
      * Arrays of options. Used in drop down selectors.
      */
-    edge_options: DataInfos;
-    node_options: DataInfos;
+    edgeOptions: DataInfos;
+    nodeOptions: DataInfos;
 }
 
 const GroupTreeComponent: React.FC<GroupTreeProps> = React.memo(
-    ({ id, data, edge_options, node_options }: GroupTreeProps) => {
+    ({
+        id,
+        data,
+        edgeOptions: edge_options,
+        nodeOptions: node_options,
+    }: GroupTreeProps) => {
         const [index, setIndex] = useState([0, 0] as [number, number]);
 
         const currentDateTimeChangedCallBack = useCallback(

@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+        "baseUrl": "src",
+        "outDir": "./dist/",
+        "declaration": true,
+        "strict": false,
+        "sourceMap": true,
+        "noImplicitReturns": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noFallthroughCasesInSwitch": true,
+        "noPropertyAccessFromIndexSignature": true,
+        "forceConsistentCasingInFileNames": true,
+        "module": "es6",
+        "moduleResolution": "node",
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
+        "jsx": "react",
+        "target": "es6",
+        "allowJs": true,
+        "skipLibCheck": true,
+        "resolveJsonModule": true
+    },
+    "include": ["./src/lib", "./src/custom.d.ts"]
+}

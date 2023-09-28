@@ -22,7 +22,7 @@ export interface WellLogSpacerOptions {
     wellpickPatternFill?: boolean;
 }
 
-interface Props {
+export interface WellLogSpacerProps {
     width?: number;
 
     controllers: (WellLogController | null)[];
@@ -76,14 +76,14 @@ const pinColor = "rgba(0, 255, 0, 0.1)";
 
 let count = 0;
 
-class WellLogSpacer extends Component<Props /*, State*/> {
+class WellLogSpacer extends Component<WellLogSpacerProps /*, State*/> {
     container: HTMLElement | undefined = undefined;
 
     uid: number = count++; // generate some unique id prefix for pattern ids in SVGs
 
     defs: ReactNode;
 
-    constructor(props: Props) {
+    constructor(props: WellLogSpacerProps) {
         super(props);
         this.defs =
             this.props.options?.wellpickPatternFill &&
@@ -95,7 +95,9 @@ class WellLogSpacer extends Component<Props /*, State*/> {
         this.forceUpdate();
     }
 
-    componentDidUpdate(prevProps: Props /*, prevState: State*/): void {
+    componentDidUpdate(
+        prevProps: WellLogSpacerProps /*, prevState: State*/
+    ): void {
         // called after render()!?
         if (this.props.onCreateSpacer !== prevProps.onCreateSpacer) {
             // update callback to component's caller
@@ -116,7 +118,9 @@ class WellLogSpacer extends Component<Props /*, State*/> {
         }
     }
 
-    shouldComponentUpdate(nextProps: Props /*, nextState: State*/): boolean {
+    shouldComponentUpdate(
+        nextProps: WellLogSpacerProps /*, nextState: State*/
+    ): boolean {
         if (this.props.colorTables !== nextProps.colorTables) {
             return true;
         }

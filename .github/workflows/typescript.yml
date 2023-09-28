@@ -1,0 +1,109 @@
+name: webviz-subsurface-components
+
+defaults:
+  run:
+    working-directory: ./typescript
+
+on:
+  push:
+  pull_request:
+    branches:
+      - master
+  release:
+    types:
+      - published
+  schedule:
+    # Run CI daily and check that tests are working with latest dependencies
+    - cron: "0 0 * * *"
+
+jobs:
+  webviz-subsurface-components:
+    # Run on all events defined above, except pushes which are not to master
+    if: github.event_name != 'push' || github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📖 Checkout commit locally
+        uses: actions/checkout@v3
+
+      - name: 🐍 Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: 📦 Install build dependencies
+        # The deckgl types package runs a postscript to setup, but since we ignore scripts, we need to set it up manually.
+        run: |
+
+          # In https://github.com/equinor/webviz-subsurface-components/pull/1010 we
+          # loosened up npm constraint to include npm version using lockfileVersion: 1
+          # for downstream users. However in the development of this repository we
+          # want to limit ourselves to lockfileVersion: 3. 
+          # While waiting for dropping node 14 and npm 6 support, we include this manual
+          # check:
+          grep -q '"lockfileVersion": 3,' ./typescript/package-lock.json
+
+          npm ci CYPRESS_INSTALL_BINARY=0 --ignore-scripts
+      - name: ⏭️ Modifications when prerelease
+        if: github.event.release.prerelease
+        run: echo "NPM_PUBLISH_TAG=next" >> $GITHUB_ENV
+
+      - name: 🏗️ Build JavaScript part
+        run: |
+          npx nx run-many -t build
+
+      - name: 🕵️ Check code style, linting and typechecking
+        run: |
+          npm run validate
+
+      - name: 🤖 Run correctness tests
+        if: github.event_name != 'release' # Related to https://github.com/equinor/webviz-subsurface-components/issues/409
+        run: |
+          npx nx run-many -t test_correctness
+
+      - name: 🔼 Build and publish Node.js package
+        if: github.event_name == 'release'
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          # Parse mono-repo tag (git tag format: "package@version")
+          echo ${{  github.ref_name }}
+          PACKAGE=`python -c "tag='${{  github.ref_name }}'; print(tag.split('@')[0])"`
+          VERSION=`python -c "tag='${{  github.ref_name }}'; print(tag.split('@')[1])"`
+
+          npm config set '//registry.npmjs.org/:_authToken' '${NPM_TOKEN}'
+          cd packages/${PACKAGE}
+          npm version --no-git-tag-version ${VERSION}
+          # Use 'latest' tag if $NPM_PUBLISH_TAG is not set:
+          npm publish --access public --tag ${NPM_PUBLISH_TAG:-latest}
+
+      - name: 📚 Build Storybook
+        run: npm run build-storybook
+
+      - name: 📚 Update Storybook
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        run: |
+          cp -r ./typescript/storybook-static ..
+
+          git config --local user.email "webviz-github-action"
+          git config --local user.name "webviz-github-action"
+          git fetch origin gh-pages
+          git checkout --track origin/gh-pages
+          git clean -f -f -d -x
+          git rm -r --ignore-unmatch *
+
+          mv ../storybook-static .
+
+          git add .
+
+          if git diff-index --quiet HEAD; then
+            echo "No changes in documentation. Skip documentation deploy."
+          else
+            git commit -m "Update Github Pages"
+            git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" gh-pages
+          fi
