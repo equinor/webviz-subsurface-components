@@ -443,7 +443,7 @@ WellWithDuplicates.args = {
     bounds: [756125, 166200, 757327, 167938],
     layers: [
         new WellsLayer({
-            data: "./well_176.json",
+            data: "./one_well_duplicate_vertexes.json",
             refine: true,
             simplifiedRendering: true,
         }),
