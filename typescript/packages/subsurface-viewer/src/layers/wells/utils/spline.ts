@@ -32,7 +32,7 @@ export function removeConsecutiveDuplicates(
     return [coords, mds];
 }
 
-export function removeDuplicates(data: FeatureCollection): FeatureCollection {
+export function removeDuplicates(data: FeatureCollection): void {
     const no_wells = data.features.length;
     for (let well_no = 0; well_no < no_wells; well_no++) {
         const mds = data.features[well_no].properties?.["md"];
@@ -69,8 +69,6 @@ export function removeDuplicates(data: FeatureCollection): FeatureCollection {
             data.features[well_no].properties!["md"] = mds; // eslint-disable-line
         }
     }
-
-    return data;
 }
 
 /**
