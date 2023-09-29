@@ -30,7 +30,7 @@ import {
     coarsenWells,
     invertPath,
     GetBoundingBox,
-    removeDuplicates as removeDuplicates,
+    removeDuplicates,
 } from "./utils/spline";
 import { interpolateNumberArray } from "d3";
 import type { DeckGLLayerContext } from "../../components/Map";

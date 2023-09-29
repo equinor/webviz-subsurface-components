@@ -13,6 +13,7 @@ import {
 import type { MapMouseEvent } from "../../components/Map";
 import WellsLayer from "./wellsLayer";
 import AxesLayer from "../axes/axesLayer";
+import { generateSynteticWell } from "./utils/generateSynteticWell";
 
 const PREFIX = "VolveWells";
 
@@ -437,13 +438,17 @@ Wells3d.parameters = {
     },
 };
 
-export const VerticalWell = Template.bind({});
-VerticalWell.args = {
+export const VerticalWellWithDuplicates = Template.bind({});
+VerticalWellWithDuplicates.args = {
     id: "well_176",
-    bounds: [-700, 500, 1400, 1700],
+    bounds: [-100, -100, 100, 100],
     layers: [
         new WellsLayer({
-            data: "./verticalwell.json",
+            data: generateSynteticWell(),
+        }),
+        new AxesLayer({
+            id: "axes-layer",
+            bounds: [-100, -100, 0, 100, 100, 500],
         }),
     ],
 
@@ -458,43 +463,10 @@ VerticalWell.args = {
     },
 };
 
-VerticalWell.parameters = {
+VerticalWellWithDuplicates.parameters = {
     docs: {
         description: {
             story: "One single vertical well",
-        },
-        inlineStories: false,
-        iframeHeight: 500,
-    },
-};
-
-export const WellWithDuplicates = Template.bind({});
-WellWithDuplicates.args = {
-    id: "well_176",
-    bounds: [756125, 166200, 757327, 167938],
-    layers: [
-        new WellsLayer({
-            data: "./one_well_duplicate_vertices.json",
-            refine: true,
-            simplifiedRendering: true,
-        }),
-    ],
-
-    views: {
-        layout: [1, 1],
-        viewports: [
-            {
-                id: "a",
-                show3D: true,
-            },
-        ],
-    },
-};
-
-WellWithDuplicates.parameters = {
-    docs: {
-        description: {
-            story: "One single well with duplicate vertexs example",
         },
         inlineStories: false,
         iframeHeight: 500,
