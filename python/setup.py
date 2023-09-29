@@ -40,7 +40,9 @@ setup(
     license=package["license"],
     description=package.get("description", package_name),
     install_requires=INSTALL_REQUIRES,
-    tests_require=TESTS_REQUIRE,
+    extras_require={
+        "tests": TESTS_REQUIRE,
+    },
     classifiers=[
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
