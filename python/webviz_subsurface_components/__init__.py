@@ -62,7 +62,7 @@ async_resources = [
     "subsurface-viewer",
     "view-annotation",
     "view-footer",
-    "well-log-viewer"
+    "well-log-viewer",
 ]
 
 _js_dist = [
@@ -74,13 +74,13 @@ _js_dist = [
         "relative_package_path": "webviz_subsurface_components.min.js.map",
         "namespace": package_name,
         "dynamic": True,
-    }
+    },
 ]
 
 _js_dist.extend(
     [
         {
-            "relative_package_path": "async-webviz-{}.js".format(async_resource),
+            "relative_package_path": f"async-webviz-{async_resource}.js",
             "namespace": package_name,
             "async": True,
         }
@@ -91,7 +91,7 @@ _js_dist.extend(
 _js_dist.extend(
     [
         {
-            "relative_package_path": "async-webviz-{}.js.map".format(async_resource),
+            "relative_package_path": f"async-webviz-{async_resource}.js.map",
             "namespace": package_name,
             "dynamic": True,
         }
