@@ -441,7 +441,7 @@ Wells3d.parameters = {
 export const VerticalWellWithDuplicates = Template.bind({});
 VerticalWellWithDuplicates.args = {
     id: "well_176",
-    bounds: [-100, -100, 100, 100],
+    bounds: [-150, -150, 150, 150],
     layers: [
         new WellsLayer({
             data: generateSynteticWell(),
