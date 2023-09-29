@@ -47,6 +47,7 @@ import { LightingEffect } from "@deck.gl/core/typed";
 import { LineLayer } from "@deck.gl/layers/typed";
 import { Matrix4 } from "@math.gl/core";
 import { fovyToAltitude } from "@math.gl/web-mercator";
+import type { MjolnirGestureEvent } from "mjolnir.js";
 
 /**
  * 3D bounding box defined as [xmin, ymin, zmin, xmax, ymax, zmax].
@@ -393,9 +394,12 @@ export interface MapProps {
     getCameraPosition?: (input: ViewStateType) => void;
 
     /**
-     * Will be called after all layers have finished loading data.
+     * Will be called after all layers have rendered data.
      */
-    isLoadedCallback?: (arg: boolean) => void;
+    isRenderedCallback?: (arg: boolean) => void;
+
+    onDragStart?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
+    onDragEnd?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
 
     /**
      * If changed will reset camera to default position.
@@ -574,7 +578,9 @@ const Map: React.FC<MapProps> = ({
     getTooltip = defaultTooltip,
     cameraPosition,
     getCameraPosition,
-    isLoadedCallback,
+    isRenderedCallback: isLoadedCallback,
+    onDragStart,
+    onDragEnd,
     triggerHome,
     lights,
     triggerResetMultipleWells,
@@ -702,6 +708,7 @@ const Map: React.FC<MapProps> = ({
             // Empty layers array makes deck.gl set deckRef to undefined (no opengl context).
             // Hence insert dummy layer.
             const dummy_layer = new LineLayer({
+                id: "webviz_internal_dummy_layer",
                 visible: false,
             });
             layers.push(dummy_layer);
@@ -746,6 +753,7 @@ const Map: React.FC<MapProps> = ({
         });
 
         setDeckGLLayers(layers_copy);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [layers]);
 
     useEffect(() => {
@@ -910,13 +918,18 @@ const Map: React.FC<MapProps> = ({
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
     const onAfterRender = useCallback(() => {
         if (deckGLLayers) {
-            const state = deckGLLayers.every((layer) => {
+            const loadedState = deckGLLayers.every((layer) => {
                 return (layer as Layer).isLoaded;
             });
-            setIsLoaded(state);
 
+            const emptyLayers = // There will always be a dummy layer. Deck.gl does not like empty array of layers.
+                deckGLLayers.length == 1 &&
+                (deckGLLayers[0] as LineLayer).id ===
+                    "webviz_internal_dummy_layer";
+
+            setIsLoaded(loadedState || emptyLayers);
             if (typeof isLoadedCallback !== "undefined") {
-                isLoadedCallback(state);
+                isLoadedCallback(loadedState);
             }
         }
     }, [deckGLLayers, isLoadedCallback]);
@@ -1051,6 +1064,8 @@ const Map: React.FC<MapProps> = ({
                 onClick={onClick}
                 onAfterRender={onAfterRender}
                 effects={effects}
+                onDragStart={onDragStart}
+                onDragEnd={onDragEnd}
             >
                 {children}
             </DeckGL>
@@ -1163,7 +1178,7 @@ function getViewState(
     let fb_target = [fb.x, fb.y, z];
     let fb_zoom = fb.zoom;
 
-    if (deck) {
+    if (deck && deck.width > 0 && deck.height > 0) {
         // If there are margins/rulers in the viewport (axes2DLayer) we have to account for that.
         // Camera target should be in the middle of viewport minus the rulers.
         const w_bounds = w;

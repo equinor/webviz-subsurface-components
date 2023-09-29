@@ -11,6 +11,9 @@ import {
     colorTables,
 } from "@emerson-eps/color-tables";
 import type { MapMouseEvent } from "../../components/Map";
+import WellsLayer from "./wellsLayer";
+import AxesLayer from "../axes/axesLayer";
+
 const PREFIX = "VolveWells";
 
 const classes = {
@@ -428,6 +431,64 @@ Wells3d.parameters = {
     docs: {
         description: {
             story: "3D wells example",
+        },
+        inlineStories: false,
+        iframeHeight: 500,
+    },
+};
+
+// Gullfaks wells.
+export const SimplifiedRendering: ComponentStory<typeof SubsurfaceViewer> = (
+    args
+) => {
+    const [simplifiedRendering, setSimplifiedRendering] =
+        React.useState<boolean>(false);
+
+    const props = {
+        ...args,
+        onDragStart: () => setSimplifiedRendering(true),
+        onDragEnd: () => setSimplifiedRendering(false),
+        layers: [
+            new WellsLayer({
+                data: "./gullfaks.json",
+                wellHeadStyle: { size: 4 },
+                refine: true,
+                outline: true,
+                simplifiedRendering, // If true will cause wellslayer to draw simplified.
+            }),
+            new AxesLayer({
+                id: "axes-layer",
+                bounds: [450000, 6781000, 0, 464000, 6791000, 3500],
+            }),
+        ],
+    };
+
+    return <SubsurfaceViewer {...props} />;
+};
+
+SimplifiedRendering.args = {
+    id: "gullfaks",
+    bounds: [450000, 6781000, 464000, 6791000] as [
+        number,
+        number,
+        number,
+        number,
+    ],
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "the_view",
+                show3D: true,
+            },
+        ],
+    },
+};
+
+SimplifiedRendering.parameters = {
+    docs: {
+        description: {
+            story: "3D gullfaks wells example",
         },
         inlineStories: false,
         iframeHeight: 500,

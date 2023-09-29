@@ -6,7 +6,7 @@
   "branches": [
     "master"
   ],
-  "buildTarget": "build",
-  "outputPath": "dist",
-  "dryRun": true
+  "buildTarget": "${PROJECT_NAME}:build",
+  "outputPath": "${PROJECT_DIR}/dist",
+  "tagFormat": "${PROJECT_NAME}@${version}"
 }

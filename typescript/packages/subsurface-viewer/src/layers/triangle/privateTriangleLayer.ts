@@ -72,10 +72,14 @@ const defaultProps = {
 
 // This is a private layer used only by the composite TriangleLayer
 export default class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProps> {
+    get isLoaded(): boolean {
+        return this.state["isLoaded"] ?? false;
+    }
+
     initializeState(context: DeckGLLayerContext): void {
         const { gl } = context;
         const [triangleModel, lineMode] = this._getModels(gl);
-        this.setState({ models: [triangleModel, lineMode] });
+        this.setState({ models: [triangleModel, lineMode], isLoaded: false });
     }
 
     shouldUpdateState({
@@ -165,6 +169,10 @@ export default class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProp
 
         if (!this.props.depthTest) {
             gl.enable(GL.DEPTH_TEST);
+        }
+
+        if (!this.state["isLoaded"]) {
+            this.setState({ ...this.state, isLoaded: true });
         }
     }
 
