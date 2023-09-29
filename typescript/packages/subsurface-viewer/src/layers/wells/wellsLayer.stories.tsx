@@ -13,6 +13,7 @@ import {
 import type { MapMouseEvent } from "../../components/Map";
 import WellsLayer from "./wellsLayer";
 import AxesLayer from "../axes/axesLayer";
+import { generateSynteticWell } from "./utils/generateSynteticWell";
 
 const PREFIX = "VolveWells";
 
@@ -431,6 +432,41 @@ Wells3d.parameters = {
     docs: {
         description: {
             story: "3D wells example",
+        },
+        inlineStories: false,
+        iframeHeight: 500,
+    },
+};
+
+export const VerticalWellWithDuplicates = Template.bind({});
+VerticalWellWithDuplicates.args = {
+    id: "well_176",
+    bounds: [-150, -150, 150, 150],
+    layers: [
+        new WellsLayer({
+            data: generateSynteticWell(),
+        }),
+        new AxesLayer({
+            id: "axes-layer",
+            bounds: [-100, -100, 0, 100, 100, 500],
+        }),
+    ],
+
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "verticalwell",
+                show3D: true,
+            },
+        ],
+    },
+};
+
+VerticalWellWithDuplicates.parameters = {
+    docs: {
+        description: {
+            story: "One single vertical well",
         },
         inlineStories: false,
         iframeHeight: 500,
