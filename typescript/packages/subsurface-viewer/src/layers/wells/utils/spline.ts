@@ -11,7 +11,7 @@ export function removeConsecutiveDuplicates(
     coords: Position3D[],
     mds: number[]
 ): [Position3D[], number[]] {
-    // Filter out consecutive duplicate vertex's.
+    // Filter out consecutive duplicate vertices.
     const keep = coords.map((e, index, arr) => {
         if (index < arr.length - 1) {
             return (
