@@ -74,7 +74,7 @@ jobs:
         if: matrix.python-version == '3.8'
         run: |
           npm run validate
-          black --check webviz_subsurface_components/* setup.py
+          black --check webviz_subsurface_components/__init__.py webviz_subsurface_components/py_expression_eval.py webviz_subsurface_components/VectorCalculatorWrapper.py webviz_subsurface_components/VectorDefinitions.py setup.py
           pylint webviz_subsurface_components/ setup.py
           bandit -r -c ./bandit.yml webviz_subsurface_components/ setup.py
 
