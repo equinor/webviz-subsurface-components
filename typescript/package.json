@@ -84,7 +84,6 @@
         "babel-jest": "^29.6.0",
         "babel-loader": "^9.1.2",
         "copyfiles": "^2.0.0",
-        "core-js": "^3.9.1",
         "css-loader": "^5.2.0",
         "css-minimizer-webpack-plugin": "^3.0.1",
         "cssnano": "^5.0.5",
