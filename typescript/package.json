@@ -100,7 +100,6 @@
         "hex-and-rgba": "^2.0.0",
         "html-webpack-plugin": "^5.3.1",
         "husky": "^8.0.3",
-        "indefinitely-typed": "^1.1.0",
         "jest": "^29.6.0",
         "jest-canvas-mock": "^2.5.2",
         "jest-environment-jsdom": "^29.6.0",
