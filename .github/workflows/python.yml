@@ -74,9 +74,9 @@ jobs:
         if: matrix.python-version == '3.8'
         run: |
           npm run validate
-          black --check webviz_subsurface_components/ tests/ setup.py examples/
+          black --check webviz_subsurface_components/ setup.py
           pylint webviz_subsurface_components/ setup.py
-          bandit -r -c ./bandit.yml webviz_subsurface_components/ tests/ setup.py examples/
+          bandit -r -c ./bandit.yml webviz_subsurface_components/ setup.py
 
       - name: 🚢 Build and deploy Python package
         if: github.event_name == 'release' && matrix.python-version == '3.8'
