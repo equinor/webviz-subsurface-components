@@ -25,8 +25,8 @@ GroupTree.propTypes = {
      */
     data: PropTypes.arrayOf(PropTypes.object),
 
-    edgeOptions: PropTypes.arrayOf(PropTypes.object),
-    nodeOptions: PropTypes.arrayOf(PropTypes.object),
+    edge_options: PropTypes.arrayOf(PropTypes.object),
+    node_options: PropTypes.arrayOf(PropTypes.object),
 };
 
 GroupTree.displayName = "GroupTree";

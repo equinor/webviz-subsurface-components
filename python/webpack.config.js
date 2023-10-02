@@ -131,7 +131,7 @@ module.exports = function (env, argv) {
             ],
         },
         optimization: {
-            minimize: false,
+            minimize: true,
             splitChunks: {
                 name: "[name].js",
                 cacheGroups: {
