@@ -7,6 +7,70 @@ import { cloneDeep, range } from "lodash";
 import type { Position3D } from "../../utils/layerTools";
 import simplify from "@turf/simplify";
 
+export function removeConsecutiveDuplicates(
+    coords: Position3D[],
+    mds: number[]
+): [Position3D[], number[]] {
+    // Filter out consecutive duplicate vertices.
+    const keep = coords.map((e, index, arr) => {
+        if (index < arr.length - 1) {
+            return (
+                e[0] !== arr[index + 1][0] ||
+                e[1] !== arr[index + 1][1] ||
+                e[2] !== arr[index + 1][2]
+            );
+        }
+        return true;
+    });
+    coords = coords.filter((_e, index) => {
+        return keep[index];
+    });
+    mds = mds.filter((_e: number, index: number) => {
+        return keep[index];
+    });
+
+    return [coords, mds];
+}
+
+export function removeDuplicates(data: FeatureCollection): void {
+    const no_wells = data.features.length;
+    for (let well_no = 0; well_no < no_wells; well_no++) {
+        const mds = data.features[well_no].properties?.["md"];
+        if (mds === undefined) {
+            continue;
+        }
+        const geometryCollection = data.features[well_no]
+            .geometry as GeometryCollection;
+        const lineString = geometryCollection?.geometries[1] as LineString;
+
+        if (lineString.coordinates?.length === undefined) {
+            continue;
+        }
+
+        let coords = lineString.coordinates as Position3D[];
+
+        const nOrig = coords.length;
+        [coords, mds[0]] = removeConsecutiveDuplicates(coords, mds[0]);
+
+        const n = coords.length;
+        if (n != nOrig) {
+            console.warn("Well number ", well_no, " contains duplicates.");
+        }
+        if (n <= 1) {
+            continue;
+        }
+
+        (
+            (data.features[well_no].geometry as GeometryCollection)
+                .geometries[1] as LineString
+        ).coordinates = coords;
+
+        if (data.features[well_no].properties) {
+            data.features[well_no].properties!["md"] = mds; // eslint-disable-line
+        }
+    }
+}
+
 /**
  * Given four points P0, P1, P2, P4 and a argument t in the interval [0,1].
  * returns function value at t. t == 0 corresponds to P1 and t == 1 corrsponds to P2
@@ -139,6 +203,10 @@ export function splineRefine(data_in: FeatureCollection): FeatureCollection {
         const coords = lineString.coordinates as Position3D[];
 
         const n = coords.length;
+        if (n <= 1) {
+            continue;
+        }
+
         const ts = n > 3 ? steps : [];
 
         // Point before first.
@@ -236,7 +304,6 @@ export function coarsenWells(data_in: FeatureCollection): FeatureCollection {
     const data = cloneDeep(data_in);
 
     const no_wells = data.features.length;
-
     for (let well_no = 0; well_no < no_wells; well_no++) {
         const geometryCollection = data.features[well_no]
             .geometry as GeometryCollection;
@@ -246,14 +313,31 @@ export function coarsenWells(data_in: FeatureCollection): FeatureCollection {
             continue;
         }
 
-        const options = {
-            tolerance: 0.01,
-            highQuality: false,
-            mutate: false,
-        };
+        const isVerticalWell = lineString.coordinates.every(
+            (e) =>
+                e[0] === lineString.coordinates[0][0] &&
+                e[1] === lineString.coordinates[0][1]
+        );
 
-        const coordsSimplified = simplify(lineString, options);
-        lineString.coordinates = coordsSimplified.coordinates as Position3D[];
+        if (isVerticalWell) {
+            // The simplify algorithm below did not work on vertical wells hence in this case we only use first and last point.
+            const n = lineString.coordinates.length;
+            const coordsSimplified = [
+                lineString.coordinates[0],
+                lineString.coordinates[n - 1],
+            ];
+            lineString.coordinates = coordsSimplified;
+        } else {
+            const options = {
+                tolerance: 0.01,
+                highQuality: false,
+                mutate: false,
+            };
+
+            const coordsSimplified = simplify(lineString, options);
+            lineString.coordinates =
+                coordsSimplified.coordinates as Position3D[];
+        }
     }
 
     return data;

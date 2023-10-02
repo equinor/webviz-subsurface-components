@@ -1,3 +1,10 @@
+## [0.2.2](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.2.1...subsurface-viewer@0.2.2) (2023-09-29)
+
+
+### Bug Fixes
+
+* Remove duplicate vertices from well path. May cause crash ([#1667](https://github.com/equinor/webviz-subsurface-components/issues/1667)) ([5d0e858](https://github.com/equinor/webviz-subsurface-components/commit/5d0e858dec0977322e4c90be1d9a5a8dbef71fd9))
+
 ## [0.2.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.2.0...subsurface-viewer@0.2.1) (2023-09-27)
 
 
