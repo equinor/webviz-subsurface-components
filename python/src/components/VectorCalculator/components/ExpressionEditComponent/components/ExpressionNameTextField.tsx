@@ -167,7 +167,11 @@ export const ExpressionNameTextField: React.FC<ExpressionNameTextFieldProps> = (
                 placeholder="New name"
                 onChange={handleInputChange}
                 value={store.state.editableName}
-                variant={textFieldStyleDataState.variant}
+                variant={
+                    textFieldStyleDataState.variant === "default"
+                        ? undefined
+                        : textFieldStyleDataState.variant
+                }
                 inputIcon={textFieldStyleDataState.icon}
                 helperText={textFieldStyleDataState.helperText}
                 disabled={props.disabled}

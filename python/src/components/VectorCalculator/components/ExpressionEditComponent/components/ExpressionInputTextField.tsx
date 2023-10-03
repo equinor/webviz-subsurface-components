@@ -138,7 +138,11 @@ export const ExpressionInputTextField: React.FC<
                 onChange={handleInputChange}
                 value={store.state.editableExpression}
                 disabled={props.disabled}
-                variant={textFieldStyleDataState.variant}
+                variant={
+                    textFieldStyleDataState.variant === "default"
+                        ? undefined
+                        : textFieldStyleDataState.variant
+                }
                 inputIcon={textFieldStyleDataState.icon}
                 helperText={helperText}
             ></TextField>

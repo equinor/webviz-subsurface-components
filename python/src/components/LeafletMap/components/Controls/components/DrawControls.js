@@ -6,8 +6,9 @@
 
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import "!style-loader!css-loader!leaflet-draw/dist/leaflet.draw.css";
+import "leaflet-draw/dist/leaflet.draw.css";
 import L from "leaflet";
+import "leaflet-draw";
 import Context from "../../../utils/context";
 
 import { getShapeType } from "../../../utils/leaflet";

@@ -8,6 +8,7 @@ import { TextField } from "@equinor/eds-core-react";
 type Variants = "error" | "default";
 type MaxLengthTextFieldProps = TextFieldProps & {
     maxLength: number;
+    value?: string;
 };
 
 export const MaxLengthTextField: React.FC<MaxLengthTextFieldProps> = (
@@ -78,7 +79,7 @@ export const MaxLengthTextField: React.FC<MaxLengthTextFieldProps> = (
             {...other}
             onChange={handleOnChange}
             value={props.value}
-            variant={variant}
+            variant={variant === "default" ? undefined : variant}
             helperText={helperText}
         />
     );

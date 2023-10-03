@@ -1,5 +1,8 @@
 const path = require("path");
+const webpack = require("webpack");
 const WebpackDashDynamicImport = require("@plotly/webpack-dash-dynamic-import");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const packagejson = require("./package.json");
 
 const dashLibraryName = packagejson.name.replace(/-/g, "_");
@@ -13,25 +16,12 @@ module.exports = function (env, argv) {
         chunkFilename: "[name].js",
         filename: `${dashLibraryName}.min.js`,
         library: dashLibraryName,
-        libraryTarget: "umd",
+        libraryTarget: "window",
     };
     const externals = {
-        react: {
-            commonjs: "react",
-            commonjs2: "react",
-            amd: "react",
-            umd: "react",
-            root: "React",
-            window: "react",
-        },
-        "react-dom": {
-            commonjs: "react-dom",
-            commonjs2: "react-dom",
-            amd: "react-dom",
-            umd: "react-dom",
-            root: "ReactDOM",
-            window: "react-dom",
-        },
+        react: "React",
+        "react-dom": "ReactDOM",
+        "plotly.js": "Plotly",
     };
 
     return {
@@ -60,40 +50,7 @@ module.exports = function (env, argv) {
                 },
                 {
                     test: /\.css$/,
-                    use: [
-                        {
-                            loader: "style-loader",
-                            options: {
-                                insert: function insertAtTop(element) {
-                                    var parent = document.querySelector("head");
-                                    var lastInsertedElement =
-                                        window._lastElementInsertedByStyleLoader;
-
-                                    if (!lastInsertedElement) {
-                                        parent.insertBefore(
-                                            element,
-                                            parent.firstChild
-                                        );
-                                    } else if (
-                                        lastInsertedElement.nextSibling
-                                    ) {
-                                        parent.insertBefore(
-                                            element,
-                                            lastInsertedElement.nextSibling
-                                        );
-                                    } else {
-                                        parent.appendChild(element);
-                                    }
-
-                                    window._lastElementInsertedByStyleLoader =
-                                        element;
-                                },
-                            },
-                        },
-                        {
-                            loader: "css-loader",
-                        },
-                    ],
+                    use: [MiniCssExtractPlugin.loader, "css-loader"],
                 },
                 {
                     test: /\.scss$/,
@@ -103,28 +60,11 @@ module.exports = function (env, argv) {
                         "sass-loader", // compiles Sass to CSS
                     ],
                 },
-
                 {
                     test: /\.(png|jpe?g|gif|svg)$/i,
                     use: [
                         {
                             loader: "url-loader",
-                            options: {
-                                limit: 8192, // files smaller than 8KB will be inlined as base64, otherwise fallback to file-loader
-                                name: "[path][name].[ext]", // If the file is larger than the limit, output using the same path and name as the original
-                                fallback: "file-loader", // Optional: specify the fallback loader to use when the file size is over the limit
-                            },
-                        },
-                    ],
-                },
-                {
-                    test: /\.(png|jpe?g|gif|svg)$/i, // This regex will handle .png, .jpg, .jpeg, .gif, and .svg files
-                    use: [
-                        {
-                            loader: "file-loader",
-                            options: {
-                                name: "[path][name].[ext]", // Output the images in the same path and with the same name as the original
-                            },
                         },
                     ],
                 },
@@ -151,6 +91,11 @@ module.exports = function (env, argv) {
                 },
             },
         },
-        plugins: [new WebpackDashDynamicImport()],
+        plugins: [
+            new WebpackDashDynamicImport(),
+            new MiniCssExtractPlugin({
+                filename: path.join(dashLibraryName, `${dashLibraryName}.css`),
+            }),
+        ],
     };
 };

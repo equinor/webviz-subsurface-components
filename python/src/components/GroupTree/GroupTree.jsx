@@ -6,9 +6,18 @@ const GroupTreeComponent = React.lazy(() =>
 );
 
 const GroupTree = (props) => {
+    const {
+        edge_options: edgeOptions,
+        node_options: nodeOptions,
+        ...rest
+    } = props;
     return (
         <React.Suspense fallback={<div>Loading...</div>}>
-            <GroupTreeComponent {...props} />
+            <GroupTreeComponent
+                edgeOptions={edgeOptions}
+                nodeOptions={nodeOptions}
+                {...rest}
+            />
         </React.Suspense>
     );
 };
