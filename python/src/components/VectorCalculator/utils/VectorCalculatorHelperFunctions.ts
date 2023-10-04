@@ -7,8 +7,8 @@ import type {
 import type {
     TreeDataNode,
     TreeDataNodeMetaData,
-} from "@webviz/core-components";
-import { TreeData } from "@webviz/core-components";
+} from "@webviz/core-components/dist/components/SmartNodeSelector";
+import { TreeData } from "@webviz/core-components/dist/components/SmartNodeSelector";
 
 export const getDefaultExpression = (): ExpressionType => {
     return {

@@ -6,7 +6,7 @@ import { TextField, Icon } from "@equinor/eds-core-react";
 import { error_filled, warning_filled, thumbs_up } from "@equinor/eds-icons";
 Icon.add({ error_filled, thumbs_up, warning_filled });
 
-import type { TreeDataNode } from "@webviz/core-components";
+import type { TreeDataNode } from "@webviz/core-components/dist/components/SmartNodeSelector";
 
 import { StoreActions, useStore } from "../../ExpressionsStore";
 import {

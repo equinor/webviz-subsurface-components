@@ -9,7 +9,7 @@ import type {
 } from "../utils/VectorCalculatorTypes";
 import { ExpressionsTableComponent } from "./ExpressionsTableComponent";
 import { ExpressionEditComponent } from "./ExpressionEditComponent";
-import type { TreeDataNode } from "@webviz/core-components";
+import type { TreeDataNode } from "@webviz/core-components/dist/components/SmartNodeSelector";
 
 import {
     createExpressionTypeFromEditableData,

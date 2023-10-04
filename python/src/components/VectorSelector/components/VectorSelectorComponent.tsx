@@ -8,8 +8,11 @@ import type React from "react";
 import type {
     SmartNodeSelectorPropsType,
     TreeDataNode,
-} from "@webviz/core-components";
-import { TreeData, SmartNodeSelectorComponent } from "@webviz/core-components";
+} from "@webviz/core-components/dist/components/SmartNodeSelector";
+import {
+    TreeData,
+    SmartNodeSelectorComponent,
+} from "@webviz/core-components/dist/components/SmartNodeSelector";
 import {
     KeyEventType,
     Direction,

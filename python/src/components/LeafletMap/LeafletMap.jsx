@@ -11,6 +11,7 @@ import PropTypes from "prop-types";
 import L from "leaflet";
 import "./layers/L.imageWebGLOverlay";
 import "./layers/L.tileWebGLLayer";
+import "leaflet/dist/leaflet.css";
 
 // Components
 import Controls from "./components/Controls";

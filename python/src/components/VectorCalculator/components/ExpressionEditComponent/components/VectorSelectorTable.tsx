@@ -8,7 +8,7 @@ import {
     TableBody,
     TableCell,
 } from "@mui/material";
-import type { TreeDataNode } from "@webviz/core-components";
+import type { TreeDataNode } from "@webviz/core-components/dist/components/SmartNodeSelector";
 import cloneDeep from "lodash/cloneDeep";
 
 import VectorSelector from "../../../../VectorSelector";

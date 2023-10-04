@@ -2,7 +2,7 @@
 
 import { Typography } from "@equinor/eds-core-react";
 import { styled } from "@mui/material/styles";
-import { SmartNodeSelector } from "@webviz/core-components";
+import { SmartNodeSelector } from "@webviz/core-components/dist/components/SmartNodeSelector";
 import React, { useCallback, useContext, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateFilterByAttributes } from "../../redux/actions";
@@ -10,7 +10,7 @@ import type { WellCompletionsState } from "../../redux/store";
 import {
     computeAllowedAttributeValues,
     // eslint-disable-next-line prettier/prettier
-    extractAttributesTree
+    extractAttributesTree,
 } from "../../utils/dataUtil";
 import { DataContext } from "../DataLoader";
 
