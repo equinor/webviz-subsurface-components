@@ -1,9 +1,9 @@
 import type { MeshType, MeshTypeLines } from "./privateMapLayer";
-import type { Params } from "./mapLayer";
+import type { WebWorkerParams } from "./mapLayer";
 
 type Vec = [number, number, number];
 
-export function makeFullMesh(e: { data: Params }): void {
+export function makeFullMesh(e: { data: WebWorkerParams }): void {
     const params = e.data;
 
     // Keep
@@ -14,12 +14,23 @@ export function makeFullMesh(e: { data: Params }): void {
     const isMesh = params.isMesh;
     const frame = params.frame;
     const smoothShading = params.smoothShading;
+    const ZIncreasingDownwards = params.ZIncreasingDownwards;
+
+    // her er mesh naa en kope saa jeg kan endre den.. men det maa gjøres transferable ...
+    // if (true) {
+    //     for (let i = 0; i < meshData.length; i++) {
+    //         meshData[i] *= -1;
+    //     }
+    // }
+ 
+    const multZ = ZIncreasingDownwards ? 1 : -1;
+    console.log("multZ ", ZIncreasingDownwards, multZ)
 
     function getFloat32ArrayMinMax(data: Float32Array) {
         let max = -99999999;
         let min = 99999999;
         for (let i = 0; i < data.length; i++) {
-            max = data[i] > max ? data[i] : max;
+            max = data[i] > max ? data[i] : max;  // XXX optimaliser dette... gane med multZ overalt??
             min = data[i] < min ? data[i] : min;
         }
         return [min, max];
@@ -55,7 +66,8 @@ export function makeFullMesh(e: { data: Params }): void {
         smoothShading: boolean,
         meshData: Float32Array,
         ox: number,
-        oy: number
+        oy: number,
+        multZ: number
     ) {
         if (!smoothShading) {
             return [1, 1, 1];
@@ -64,6 +76,7 @@ export function makeFullMesh(e: { data: Params }): void {
         if (!isMesh) {
             return [0, 0, 1];
         }
+
 
         const i0 = h * nx + w;
         const i1 = h * nx + (w - 1);
@@ -83,11 +96,11 @@ export function makeFullMesh(e: { data: Params }): void {
         }
 
         const hh = ny - 1 - h; // Note use hh for h for getting y values.
-        const p0 = [ox + w * dx,         oy + hh * dy,        i0_act ? -meshData[i0] : 0]; // eslint-disable-line
-        const p1 = [ ox + (w - 1) * dx,  oy + hh * dy,        i1_act ? -meshData[i1] : 0]; // eslint-disable-line
-        const p2 = [ ox + w * dx,        oy + (hh + 1) * dy,  i2_act ? -meshData[i2] : 0]; // eslint-disable-line
-        const p3 = [ ox + (w + 1) * dx,  oy + hh * dy,        i3_act ? -meshData[i3] : 0]; // eslint-disable-line
-        const p4 = [ ox + w * dx,        oy + (hh - 1) * dy,  i4_act ? -meshData[i4] : 0]; // eslint-disable-line
+        const p0 = [ox + w * dx,         oy + hh * dy,        i0_act ? -meshData[i0] * multZ : 0]; // eslint-disable-line
+        const p1 = [ ox + (w - 1) * dx,  oy + hh * dy,        i1_act ? -meshData[i1] * multZ : 0]; // eslint-disable-line
+        const p2 = [ ox + w * dx,        oy + (hh + 1) * dy,  i2_act ? -meshData[i2] * multZ : 0]; // eslint-disable-line
+        const p3 = [ ox + (w + 1) * dx,  oy + hh * dy,        i3_act ? -meshData[i3] * multZ : 0]; // eslint-disable-line
+        const p4 = [ ox + w * dx,        oy + (hh - 1) * dy,  i4_act ? -meshData[i4] * multZ : 0]; // eslint-disable-line
 
         const v1 = [p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2]] as Vec;
         const v2 = [p2[0] - p0[0], p2[1] - p0[1], p2[2] - p0[2]] as Vec;
@@ -162,7 +175,7 @@ export function makeFullMesh(e: { data: Params }): void {
         );
     }
 
-    const positions: number[] = [];
+    const positions: number[] = [];  // XXX gjor til typed arrays og send rett i daa..a..
     const normals: number[] = [];
     const indices: number[] = [];
     const vertexProperties: number[] = [];
@@ -184,13 +197,13 @@ export function makeFullMesh(e: { data: Params }): void {
 
                 const x0 = ox + w * dx;
                 const y0 = oy + (ny - 1 - h) * dy; // See note above.
-                const z = isMesh ? -meshData[i0] : 0;
+                const z = isMesh ? -meshData[i0] * multZ : 0;
 
                 const propertyValue = propertiesData[i0];
 
                 positions.push(x0, y0, z);
 
-                const normal = calcNormal(w, h, nx, ny, isMesh, smoothShading, meshData, ox, oy); // eslint-disable-line
+                const normal = calcNormal(w, h, nx, ny, isMesh, smoothShading, meshData, ox, oy, multZ); // eslint-disable-line
                 normals.push(normal[0], normal[1], normal[2]);
 
                 vertexProperties.push(propertyValue);
@@ -214,19 +227,19 @@ export function makeFullMesh(e: { data: Params }): void {
 
                 const x0 = ox + w * dx;
                 const y0 = oy + hh * dy;
-                const z0 = isMesh ? -meshData[i0] : 0;
+                const z0 = isMesh ? -meshData[i0] * multZ : 0;
 
                 const x1 = ox + (w + 1) * dx;
                 const y1 = oy + hh * dy;
-                const z1 = isMesh ? -meshData[i1] : 0;
+                const z1 = isMesh ? -meshData[i1] * multZ : 0;
 
                 const x2 = ox + (w + 1) * dx;
                 const y2 = oy + (hh - 1) * dy;
-                const z2 = isMesh ? -meshData[i2] : 0;
+                const z2 = isMesh ? -meshData[i2] * multZ : 0;
 
                 const x3 = ox + w * dx;
                 const y3 = oy + (hh - 1) * dy;
-                const z3 = isMesh ? -meshData[i3] : 0;
+                const z3 = isMesh ? -meshData[i3] * multZ : 0;
 
                 if (i1_act && i3_act) {
                     // diagonal i1, i3
@@ -287,10 +300,10 @@ export function makeFullMesh(e: { data: Params }): void {
                 const i2 = (h + 1) * nx + (w + 1);
                 const i3 = (h + 1) * nx + w;
 
-                const normal0 = calcNormal(w, h, nx, ny, isMesh, smoothShading, meshData, ox, oy);         // eslint-disable-line
-                const normal1 = calcNormal(w + 1, h, nx, ny, isMesh, smoothShading, meshData, ox, oy);     // eslint-disable-line
-                const normal2 = calcNormal(w + 1, h + 1, nx, ny, isMesh, smoothShading, meshData, ox, oy); // eslint-disable-line
-                const normal3 = calcNormal(w, h + 1, nx, ny, isMesh, smoothShading, meshData, ox, oy);     // eslint-disable-line
+                const normal0 = calcNormal(w, h, nx, ny, isMesh, smoothShading, meshData, ox, oy, multZ);         // eslint-disable-line
+                const normal1 = calcNormal(w + 1, h, nx, ny, isMesh, smoothShading, meshData, ox, oy, multZ);     // eslint-disable-line
+                const normal2 = calcNormal(w + 1, h + 1, nx, ny, isMesh, smoothShading, meshData, ox, oy, multZ); // eslint-disable-line
+                const normal3 = calcNormal(w, h + 1, nx, ny, isMesh, smoothShading, meshData, ox, oy, multZ);     // eslint-disable-line
 
                 const i0_act = !isMesh || isDefined(meshData[i0]); // eslint-disable-line
                 const i1_act = !isMesh || isDefined(meshData[i1]); // eslint-disable-line
@@ -299,19 +312,19 @@ export function makeFullMesh(e: { data: Params }): void {
 
                 const x0 = ox + w * dx;
                 const y0 = oy + hh * dy;
-                const z0 = isMesh ? -meshData[i0] : 0;
+                const z0 = isMesh ? -meshData[i0] * multZ : 0;
 
                 const x1 = ox + (w + 1) * dx;
                 const y1 = oy + hh * dy;
-                const z1 = isMesh ? -meshData[i1] : 0;
+                const z1 = isMesh ? -meshData[i1] * multZ : 0;
 
                 const x2 = ox + (w + 1) * dx;
                 const y2 = oy + (hh - 1) * dy; // Note hh - 1 here.
-                const z2 = isMesh ? -meshData[i2] : 0;
+                const z2 = isMesh ? -meshData[i2] * multZ : 0;
 
                 const x3 = ox + w * dx;
                 const y3 = oy + (hh - 1) * dy; // Note hh - 1 here.
-                const z3 = isMesh ? -meshData[i3] : 0;
+                const z3 = isMesh ? -meshData[i3] * multZ : 0;
 
                 const propertyIndex = h * (nx - 1) + w; // (nx - 1) -> the width of the property 2D array is one less than for the nodes in this case.
                 const propertyValue = propertiesData[propertyIndex];
@@ -455,7 +468,7 @@ export function makeFullMesh(e: { data: Params }): void {
     const mesh: MeshType = {
         drawMode: 4, // corresponds to GL.TRIANGLES,
         attributes: {
-            positions: { value: new Float32Array(positions), size: 3 },
+            positions: { value: new Float32Array(positions), size: 3 },  // XXX sende directr typearrays her..
             normals: { value: new Float32Array(normals), size: 3 },
             properties: { value: new Float32Array(vertexProperties), size: 1 },
             vertex_indexs: { value: new Int32Array(vertexIndexs), size: 1 },

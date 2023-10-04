@@ -48,18 +48,18 @@ type Frame = {
     rotPoint?: [number, number];
 };
 
-export type Params = {
+export type WebWorkerParams = {
     meshData: Float32Array;
     propertiesData: Float32Array;
     isMesh: boolean;
     frame: Frame;
     smoothShading: boolean;
+    ZIncreasingDownwards: boolean;
 };
 
 async function load_mesh_and_properties(
     meshData: string | number[] | Float32Array,
-    propertiesData: string | number[] | Float32Array,
-    ZIncreasingDownwards: boolean
+    propertiesData: string | number[] | Float32Array
 ) {
     // Keep
     //const t0 = performance.now();
@@ -166,12 +166,6 @@ async function load_mesh_and_properties(
                 const buffer = await blob_mesh.arrayBuffer();
                 mesh = new Float32Array(buffer);
             }
-        }
-    }
-
-    if (!ZIncreasingDownwards) {
-        for (let i = 0; i < mesh.length; i++) {
-            mesh[i] *= -1;
         }
     }
 
@@ -327,11 +321,7 @@ export default class MapLayer extends CompositeLayer<MapLayerProps> {
         const propertiesData =
             this.props.propertiesData ?? this.props.propertiesUrl;
 
-        const p = load_mesh_and_properties(
-            meshData,
-            propertiesData,
-            this.props.ZIncreasingDownwards
-        );
+        const p = load_mesh_and_properties(meshData, propertiesData);
 
         p.then(([isMesh, meshData, propertiesData]) => {
             // Using inline web worker for calculating the triangle mesh from
@@ -343,12 +333,13 @@ export default class MapLayer extends CompositeLayer<MapLayerProps> {
             const url = URL.createObjectURL(blob);
             const webWorker = new Worker(url);
 
-            const webworkerParams = {
+            const webworkerParams: WebWorkerParams = {
                 meshData,
                 propertiesData,
                 isMesh,
                 frame: this.props.frame,
                 smoothShading: this.props.smoothShading,
+                ZIncreasingDownwards: this.props.ZIncreasingDownwards,
             };
 
             webWorker.postMessage(webworkerParams);

@@ -924,6 +924,7 @@ TypedArrayInput.args = {
             gridLines: false,
             material: true,
             ZIncreasingDownwards: false,
+            contours: [0, 5],
             colorMapFunction: nearestColorMap as colorMapFunctionType,
         }),
         new AxesLayer({
