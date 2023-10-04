@@ -578,7 +578,7 @@ const Map: React.FC<MapProps> = ({
     getTooltip = defaultTooltip,
     cameraPosition,
     getCameraPosition,
-    isRenderedCallback: isLoadedCallback,
+    isRenderedCallback,
     onDragStart,
     onDragEnd,
     triggerHome,
@@ -919,7 +919,9 @@ const Map: React.FC<MapProps> = ({
     const onAfterRender = useCallback(() => {
         if (deckGLLayers) {
             const loadedState = deckGLLayers.every((layer) => {
-                return (layer as Layer).isLoaded;
+                return (
+                    (layer as Layer).isLoaded || !(layer as Layer).props.visible
+                );
             });
 
             const emptyLayers = // There will always be a dummy layer. Deck.gl does not like empty array of layers.
@@ -928,11 +930,11 @@ const Map: React.FC<MapProps> = ({
                     "webviz_internal_dummy_layer";
 
             setIsLoaded(loadedState || emptyLayers);
-            if (typeof isLoadedCallback !== "undefined") {
-                isLoadedCallback(loadedState);
+            if (typeof isRenderedCallback !== "undefined") {
+                isRenderedCallback(loadedState);
             }
         }
-    }, [deckGLLayers, isLoadedCallback]);
+    }, [deckGLLayers, isRenderedCallback]);
 
     // validate layers data
     const [errorText, setErrorText] = useState<string>();
