@@ -1,3 +1,10 @@
+## [0.2.3](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.2.2...subsurface-viewer@0.2.3) (2023-10-04)
+
+
+### Bug Fixes
+
+* "IsRenderedCallack" shold return true for layers which has visible attribute set to false. ([#1682](https://github.com/equinor/webviz-subsurface-components/issues/1682)) ([816dc37](https://github.com/equinor/webviz-subsurface-components/commit/816dc377d31cc4c8b422124f9e9cb921669afd28))
+
 ## [0.2.2](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.2.1...subsurface-viewer@0.2.2) (2023-09-29)
 
 
