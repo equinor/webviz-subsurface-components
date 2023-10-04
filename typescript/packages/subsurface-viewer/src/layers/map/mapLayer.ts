@@ -57,8 +57,8 @@ export type Params = {
 };
 
 async function load_mesh_and_properties(
-    meshData: string | number[],
-    propertiesData: string | number[],
+    meshData: string | number[] | Float32Array,
+    propertiesData: string | number[] | Float32Array,
     ZIncreasingDownwards: boolean
 ) {
     // Keep
@@ -77,7 +77,10 @@ async function load_mesh_and_properties(
 
     //-- PROPERTIES. --
     let properties: Float32Array;
-    if (Array.isArray(propertiesData)) {
+    if (ArrayBuffer.isView(propertiesData)) {
+        // Input data is typed array.
+        properties = propertiesData; // Note no copy. Make sure data is never altered.
+    } else if (Array.isArray(propertiesData)) {
         // Input data is native javascript array.
         properties = new Float32Array(propertiesData);
     } else {
@@ -121,7 +124,10 @@ async function load_mesh_and_properties(
     //-- MESH --
     let mesh: Float32Array = new Float32Array();
     if (isMesh) {
-        if (Array.isArray(meshData)) {
+        if (ArrayBuffer.isView(meshData)) {
+            // Input data is typed array.
+            mesh = meshData; // Note no copy. Make sure data is never altered.
+        } else if (Array.isArray(meshData)) {
             // Input data is native javascript array.
             mesh = new Float32Array(meshData);
         } else {
@@ -169,9 +175,9 @@ async function load_mesh_and_properties(
         }
     }
 
-    //const t1 = performance.now();
     // Keep this.
-    //console.log(`Task loading took ${(t1 - t0) * 0.001}  seconds.`);
+    // const t1 = performance.now();
+    // console.log(`Task loading took ${(t1 - t0) * 0.001}  seconds.`);
 
     return Promise.all([isMesh, mesh, properties]);
 }
@@ -183,7 +189,7 @@ export interface MapLayerProps extends ExtendedLayerProps {
     /**  Url to the height (z values) mesh.
      */
     meshUrl: string; // Deprecated
-    meshData: string | number[];
+    meshData: string | number[] | Float32Array;
 
     /**  Horizontal extent of the terrain mesh. Format:
      {
@@ -203,7 +209,7 @@ export interface MapLayerProps extends ExtendedLayerProps {
      * colored.
      */
     propertiesUrl: string; // Deprecated
-    propertiesData: string | number[];
+    propertiesData: string | number[] | Float32Array;
 
     /**  Contourlines reference point and interval.
      * A value of [-1.0, -1.0] will disable contour lines.

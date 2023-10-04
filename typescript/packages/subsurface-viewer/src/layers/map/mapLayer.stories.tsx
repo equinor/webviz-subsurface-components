@@ -12,10 +12,12 @@ import {
     ColorLegend,
     createColorMapFunction,
 } from "@emerson-eps/color-tables";
-import MapLayer from "./mapLayer";
 import Axes2DLayer from "../axes2d/axes2DLayer";
+import AxesLayer from "../axes/axesLayer";
+import MapLayer from "./mapLayer";
 import { ViewFooter } from "../../components/ViewFooter";
 import { View } from "@deck.gl/core/typed";
+import type { colorMapFunctionType } from "../utils/layerTools";
 
 const PREFIX = "MapLayer3dPng";
 
@@ -867,6 +869,85 @@ NodeCenteredPropMapWithArrayInput.parameters = {
         ...defaultParameters.docs,
         description: {
             story: "Both mesh and property data given as native javascript arrays (as opposed to URL).",
+        },
+    },
+};
+
+function makeGaussian(amplitude, x0, y0, stdX, stdY) {
+    return function (amplitude, x0, y0, stdX, stdY, x, y) {
+        const exponent = -(
+            Math.pow(x - x0, 2) / (2 * Math.pow(stdX, 2)) +
+            Math.pow(y - y0, 2) / (2 * Math.pow(stdY, 2))
+        );
+        return amplitude * Math.pow(Math.E, exponent);
+    }.bind(null, amplitude, x0, y0, stdX, stdY);
+}
+
+function makeData(n: number, amplitude: number): Float32Array {
+    const X0 = 0;
+    const Y0 = 0;
+    const stdX = 75;
+    const stdY = 50;
+    const f = makeGaussian(amplitude, X0, Y0, stdX, stdY);
+
+    const data = new Float32Array(n * n).map((val, index) => {
+        const x = (index % n) - n / 2;
+        const y = Math.floor(index / n) - n / 2;
+        return f(x, y); // keep + 0.3 * Math.random();
+    });
+
+    return data;
+}
+
+//-- NodeCenteredPropMap  with native javascript arrays as input --
+export const TypedArrayInput: ComponentStory<typeof SubsurfaceViewer> = (
+    args
+) => {
+    return <SubsurfaceViewer {...args} />;
+};
+
+// Mesh will be n x n nodes.
+const n = 300;
+
+TypedArrayInput.args = {
+    id: "map",
+    layers: [
+        new MapLayer({
+            frame: {
+                origin: [-n / 2, -n / 2],
+                count: [n, n],
+                increment: [1, 1],
+                rotDeg: 0,
+            },
+            meshData: makeData(n, 99),
+            propertiesData: makeData(n, 1),
+            gridLines: false,
+            material: true,
+            ZIncreasingDownwards: false,
+            colorMapFunction: nearestColorMap as colorMapFunctionType,
+        }),
+        new AxesLayer({
+            ZIncreasingDownwards: false,
+            bounds: [-n / 2, -n / 2, -10, n / 2, n / 2, 60],
+        }),
+    ],
+    bounds: [-n / 2, -n / 2, n / 2, n / 2] as NumberQuad,
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: true,
+            },
+        ],
+    },
+};
+
+TypedArrayInput.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: "Both mesh and property data given as typed arrays arrays (as opposed to URL).",
         },
     },
 };
