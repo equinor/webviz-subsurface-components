@@ -33,7 +33,6 @@ TESTS_REQUIRE = [
 
 setup(
     name=package_name,
-    version=package["version"],
     author=package["author"],
     packages=[package_name],
     include_package_data=True,
@@ -43,6 +42,7 @@ setup(
     extras_require={
         "tests": TESTS_REQUIRE,
     },
+    use_scm_version=True,
     classifiers=[
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
