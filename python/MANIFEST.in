@@ -2,6 +2,9 @@ include webviz_subsurface_components/webviz_subsurface_components.min.js
 include webviz_subsurface_components/webviz_subsurface_components.dev.js
 include webviz_subsurface_components/webviz_subsurface_components.css
 include webviz_subsurface_components/metadata.json
-include webviz_subsurface_components/package.json
+include webviz_subsurface_components/package-info.json
 include webviz_subsurface_components/VectorDefinitions.json
+include webviz_subsurface_components/*.js
+include webviz_subsurface_components/*.js.map
+include webviz_subsurface_components/*.svg
 include README.md

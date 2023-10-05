@@ -59,7 +59,7 @@ export function isEqualArrays(
     return true;
 }
 
-interface Props {
+export interface SyncLogViewerProps {
     /**
      * Object from JSON file describing single well log data.
      */
@@ -251,7 +251,7 @@ interface State {
     sliderValue: number; // value for zoom slider
 }
 
-class SyncLogViewer extends Component<Props, State> {
+class SyncLogViewer extends Component<SyncLogViewerProps, State> {
     public static propTypes: Record<string, unknown>;
 
     controllers: (WellLogController | null)[];
@@ -274,7 +274,7 @@ class SyncLogViewer extends Component<Props, State> {
         onTemplateChangedBind: () => void;
     }[];
 
-    constructor(props: Props) {
+    constructor(props: SyncLogViewerProps) {
         super(props);
 
         const _axes = this.props.welllogs.map((welllog: WellLog) =>
@@ -339,7 +339,10 @@ class SyncLogViewer extends Component<Props, State> {
         this.setSliderValue();
     }
 
-    shouldComponentUpdate(nextProps: Props, nextState: State): boolean {
+    shouldComponentUpdate(
+        nextProps: SyncLogViewerProps,
+        nextState: State
+    ): boolean {
         //?!
         const ret =
             !Object.is(this.props, nextProps) ||
@@ -347,7 +350,9 @@ class SyncLogViewer extends Component<Props, State> {
         return ret;
     }
 
-    componentDidUpdate(prevProps: Props /*, prevState: State*/): void {
+    componentDidUpdate(
+        prevProps: SyncLogViewerProps /*, prevState: State*/
+    ): void {
         if (
             this.props.welllogs !== prevProps.welllogs ||
             this.props.templates !== prevProps.templates ||
