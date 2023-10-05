@@ -92,7 +92,7 @@ jobs:
             exit 0
           fi
 
-          export SETUPTOOLS_SCM_PRETEND_VERSION=${VERSION}
+          sed -i 's/# version = this is set automatically by CI/version="'"$VERSION"'",/' setup.py
           python -m pip install --upgrade setuptools wheel twine
           python setup.py sdist bdist_wheel
           twine upload dist/*
