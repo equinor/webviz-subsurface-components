@@ -33,12 +33,13 @@ TESTS_REQUIRE = [
 
 setup(
     name=package_name,
-    version=package["version"],
+    # version = this is set automatically by CI
     author=package["author"],
     packages=[package_name],
     include_package_data=True,
     license=package["license"],
     description=package.get("description", package_name),
+    url="https://github.com/equinor/webviz-subsurface-components",
     install_requires=INSTALL_REQUIRES,
     extras_require={
         "tests": TESTS_REQUIRE,
