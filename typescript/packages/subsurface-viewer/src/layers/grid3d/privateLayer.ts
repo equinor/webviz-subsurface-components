@@ -12,16 +12,17 @@ import { Model, Geometry } from "@luma.gl/engine";
 import type { DeckGLLayerContext } from "../../components/Map";
 import type {
     ExtendedLayerProps,
-    colorMapFunctionType,
+    colorMapFunctionType,    
 } from "../utils/layerTools";
+
+import { getImageData } from "../utils/layerTools";
+
 import vsShader from "./vertex.glsl";
 import fsShader from "./fragment.fs.glsl";
 import vsLineShader from "./vertex_lines.glsl";
 import fsLineShader from "./fragment_lines.glsl";
 
-import type { colorTablesArray } from "@emerson-eps/color-tables/";
-import { rgbValues } from "@emerson-eps/color-tables/";
-import { createDefaultContinuousColorScale } from "@emerson-eps/color-tables/dist/component/Utils/legendCommonFunction";
+
 import { Texture2D } from "@luma.gl/webgl";
 import GL from "@luma.gl/constants";
 
@@ -62,45 +63,13 @@ export type Material =
       }
     | boolean;
 
-function getImageData(
-    colorMapName: string,
-    colorTables: colorTablesArray,
-    colorMapFunction: colorMapFunctionType | false | undefined
-) {
-    const isColorMapFunctionDefined = typeof colorMapFunction === "function";
-    const isColorMapNameDefined = !!colorMapName;
-
-    const data = new Uint8Array(256 * 3);
-
-    const defaultColorMap = createDefaultContinuousColorScale;
-
-    let colorMap = colorMapFunction;
-    if (!isColorMapFunctionDefined) {
-        colorMap = isColorMapNameDefined
-            ? (value: number) => rgbValues(value, colorMapName, colorTables)
-            : defaultColorMap();
-    }
-
-    for (let i = 0; i < 256; i++) {
-        const value = i / 255.0;
-        const color = colorMap ? colorMap(value) : [0, 0, 0];
-        if (color) {
-            data[3 * i + 0] = color[0];
-            data[3 * i + 1] = color[1];
-            data[3 * i + 2] = color[2];
-        }
-    }
-
-    return data ? data : [0, 0, 0];
-}
-
 export interface privateLayerProps extends ExtendedLayerProps {
     mesh: MeshType;
     meshLines: MeshTypeLines;
     colorMapName: string;
     colorMapRange: [number, number];
     colorMapClampColor: Color | undefined | boolean;
-    colorMapFunction?: colorMapFunctionType | false;
+    colorMapFunction?: colorMapFunctionType ;
     gridLines: boolean;
     propertyValueRange: [number, number];
     depthTest: boolean;
