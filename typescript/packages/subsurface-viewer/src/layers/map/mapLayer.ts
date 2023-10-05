@@ -79,7 +79,7 @@ async function load_mesh_and_properties(
     let properties: Float32Array;
     if (ArrayBuffer.isView(propertiesData)) {
         // Input data is typed array.
-        properties = propertiesData; // Note no copy. Make sure data is never altered.
+        properties = propertiesData; // Note no copy. Make sure input data is not altered.
     } else if (Array.isArray(propertiesData)) {
         // Input data is native javascript array.
         properties = new Float32Array(propertiesData);
@@ -334,7 +334,7 @@ export default class MapLayer extends CompositeLayer<MapLayerProps> {
             const webWorker = new Worker(url);
 
             const webworkerParams: WebWorkerParams = {
-                meshData,
+                meshData,          // https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Transferable_objects
                 propertiesData,
                 isMesh,
                 frame: this.props.frame,
@@ -342,7 +342,23 @@ export default class MapLayer extends CompositeLayer<MapLayerProps> {
                 ZIncreasingDownwards: this.props.ZIncreasingDownwards,
             };
 
+            // Note. Webworker shoud not make data transferable or change them as that will change webviz input data as seen from outside.
+            // webWorker.postMessage(webworkerParams, [meshData.buffer]);   denne sender tranferable men da blir dataene satt til null her.. 
             webWorker.postMessage(webworkerParams);
+
+            console.log("is it moved?? meshData.byteLength", meshData.byteLength); 
+
+    
+            // const nn = 6;
+            // const buffer = new ArrayBuffer(4 * nn,  { maxByteLength: 4 * nn });
+            // const myarray = new Float32Array(buffer);
+            // console.log("myarray.length 1", myarray.length)
+
+            // buffer.resize(4 * 1);
+            // console.log("myarray.length 2", myarray.length) 
+            // myarray[1] = 2; // overskedet memory..
+
+
             webWorker.onmessage = (e) => {
                 const [mesh, mesh_lines, meshZValueRange, propertyValueRange] =
                     e.data;

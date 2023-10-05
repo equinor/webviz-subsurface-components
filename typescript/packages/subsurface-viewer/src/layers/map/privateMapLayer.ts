@@ -165,6 +165,9 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
     //eslint-disable-next-line
     _getModels(gl: any) {
         // MESH MODEL
+
+        //console.log("positions.length ", this.props.mesh.attributes.positions)
+
         const mesh_model = new Model(gl, {
             id: `${this.props.id}-mesh`,
             vs: vsShader,
@@ -173,11 +176,11 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
                 drawMode: this.props.mesh.drawMode,
                 attributes: {
                     positions: this.props.mesh.attributes.positions,
-                    normals: this.props.mesh.attributes.normals,
+                    //normals: this.props.mesh.attributes.normals,
                     properties: this.props.mesh.attributes.properties,
                     vertex_indexs: this.props.mesh.attributes.vertex_indexs,
                 },
-                vertexCount: this.props.mesh.vertexCount,
+                vertexCount: this.props.mesh.vertexCount,  // XXX samme som indices.length, så kan fjernes fra props etc..
                 indices: this.props.mesh.indices,
             }),
             modules: [project, picking, localPhongLighting],
@@ -281,9 +284,10 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
             gl.enable(GL.DEPTH_TEST);
         }
 
-        if (this.props.gridLines) {
-            mesh_lines_model.draw();
-        }
+        // XXX DISABLE FOR NOW
+        // if (this.props.gridLines) {
+        //     mesh_lines_model.draw();
+        // }
 
         if (!this.state["isLoaded"]) {
             this.setState({ ...this.state, isLoaded: true });
