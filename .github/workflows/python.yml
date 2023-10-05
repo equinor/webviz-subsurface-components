@@ -87,7 +87,7 @@ jobs:
           PACKAGE=`python -c "tag='${{  github.ref_name }}'; print(tag.split('@')[0])"`
           VERSION=`python -c "tag='${{  github.ref_name }}'; print(tag.split('@')[1])"`
 
-          IF [[ $PACKAGE != "dash-components" ]]; THEN
+          if [[ $PACKAGE != "dash-components" ]]; then
             echo "Skipping deployment of $PACKAGE"
             exit 0
           fi
