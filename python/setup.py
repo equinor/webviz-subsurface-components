@@ -43,6 +43,7 @@ setup(
         "tests": TESTS_REQUIRE,
     },
     use_scm_version=True,
+    setup_requires=["setuptools_scm~=7.0"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
