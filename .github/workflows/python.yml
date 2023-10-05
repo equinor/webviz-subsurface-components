@@ -81,7 +81,17 @@ jobs:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.pypi_webviz_token }}
         run: |
-          export SETUPTOOLS_SCM_PRETEND_VERSION=${GITHUB_REF//refs\/tags\//}
+          # Parse mono-repo tag (git tag format: "package@version")
+          echo ${{  github.ref_name }}
+          PACKAGE=`python -c "tag='${{  github.ref_name }}'; print(tag.split('@')[0])"`
+          VERSION=`python -c "tag='${{  github.ref_name }}'; print(tag.split('@')[1])"`
+
+          IF [[ $PACKAGE != "dash-components" ]]; THEN
+            echo "Skipping deployment of $PACKAGE"
+            exit 0
+          fi
+
+          export SETUPTOOLS_SCM_PRETEND_VERSION=${VERSION}
           python -m pip install --upgrade setuptools wheel twine
           python setup.py sdist bdist_wheel
           twine upload dist/*
