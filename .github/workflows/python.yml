@@ -62,6 +62,7 @@ jobs:
       - name: 📦 Install webviz-subsurface-components with dependencies
         run: |
           pip install --upgrade pip
+          pip install tables<3.9.0
           pip install .[tests]
 
       - name: 🧾 List all installed packages
