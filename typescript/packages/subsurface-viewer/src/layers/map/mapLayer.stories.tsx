@@ -919,7 +919,7 @@ TypedArrayInput.args = {
                 increment: [1, 1],
                 rotDeg: 0,
             },
-            meshData: makeData(n, 99),
+            meshData: makeData(n, 99),  // XXX hva med a sette noen inactive noder... 
             propertiesData: makeData(n, 1),
             gridLines: false,
             material: true,

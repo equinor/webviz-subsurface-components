@@ -176,11 +176,11 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
                 drawMode: this.props.mesh.drawMode,
                 attributes: {
                     positions: this.props.mesh.attributes.positions,
-                    //normals: this.props.mesh.attributes.normals,
+                    normals: this.props.mesh.attributes.normals,
                     properties: this.props.mesh.attributes.properties,
                     vertex_indexs: this.props.mesh.attributes.vertex_indexs,
                 },
-                vertexCount: this.props.mesh.vertexCount,  // XXX samme som indices.length, så kan fjernes fra props etc..
+                vertexCount: this.props.mesh.vertexCount,  // XXX samme som indices.length, så kan fjernes fra props etc.. nei vent active etc... 
                 indices: this.props.mesh.indices,
             }),
             modules: [project, picking, localPhongLighting],

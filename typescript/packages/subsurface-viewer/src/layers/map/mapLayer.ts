@@ -346,7 +346,7 @@ export default class MapLayer extends CompositeLayer<MapLayerProps> {
             // webWorker.postMessage(webworkerParams, [meshData.buffer]);   denne sender tranferable men da blir dataene satt til null her.. 
             webWorker.postMessage(webworkerParams);
 
-            console.log("is it moved?? meshData.byteLength", meshData.byteLength); 
+            //console.log("is it moved?? meshData.byteLength", meshData.byteLength); 
 
     
             // const nn = 6;

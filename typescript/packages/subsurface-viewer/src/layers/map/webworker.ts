@@ -175,21 +175,32 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
     const nTriangles = nCells * 2;
     const nBytes = 4; // Number of bytes in float32
 
-    const positions_buffer = new ArrayBuffer(nBytes * nNodes * 3,  { maxByteLength: nBytes * nNodes * 3 });
-    const normals_buffer = new ArrayBuffer(nBytes * nNodes * 9,  { maxByteLength: nBytes * nNodes * 9 });
+    // const positions_buffer = new ArrayBuffer(nBytes * nNodes * 3,  { maxByteLength: nBytes * nNodes * 3 });
+    // const normals_buffer = new ArrayBuffer(nBytes * nNodes * 3,  { maxByteLength: nBytes * nNodes * 3 });
 
-    const indices_buffer = new ArrayBuffer(nBytes * nCells * 6,  { maxByteLength: nBytes * nCells * 6 });  // XXX TIL INTEGER?? 3 indicies pr triangle.
-    const vertexProperties_buffer = new ArrayBuffer(nBytes * nNodes,  { maxByteLength: nBytes * nNodes});
-    const vertexIndexs_buffer = new ArrayBuffer(nBytes * nNodes,  { maxByteLength: nBytes * nNodes });
-    const line_positions_buffer = new ArrayBuffer(nBytes * nNodes * 3,  { maxByteLength: nBytes * nNodes * 3 });  // XXX ikke brukt na sett riktig størrelse senere
+    // const indices_buffer = new ArrayBuffer(nBytes * nTriangles * 3,  { maxByteLength: nBytes * nTriangles * 3 });  // XXX TIL INTEGER?? 3 indicies pr triangle.
+    // const vertexProperties_buffer = new ArrayBuffer(nBytes * nNodes,  { maxByteLength: nBytes * nNodes});
+    // const vertexIndexs_buffer = new ArrayBuffer(nBytes * nNodes,  { maxByteLength: nBytes * nNodes });
+    // const line_positions_buffer = new ArrayBuffer(nBytes * nNodes * 3,  { maxByteLength: nBytes * nNodes * 3 });  // XXX ikke brukt na sett riktig størrelse senere
 
     // XXX RENAME THESE TO something with arrays...
-    const positions = new Float32Array(positions_buffer);
-    const normals = new Float32Array(normals_buffer);
-    const indices = new Float32Array(indices_buffer);   // XXX bor ikke denne og fler gjøres til Int array??
-    const vertexProperties = new Float32Array(vertexProperties_buffer);
-    const vertexIndexs = new Float32Array(vertexIndexs_buffer);   // XXX blir brukt av meg i fragment shader for readout..
-    const line_positions = new Float32Array(line_positions_buffer);
+    // const positions = new Float32Array(positions_buffer);
+    // const normals = new Float32Array(normals_buffer);
+    // const indices = new Float32Array(indices_buffer);   // XXX bor ikke denne og fler gjøres til Int array??
+    // const vertexProperties = new Float32Array(vertexProperties_buffer);
+    // const vertexIndexs = new Float32Array(vertexIndexs_buffer);   // XXX blir brukt av meg i fragment shader for readout..
+    // const line_positions = new Float32Array(line_positions_buffer);
+
+    //  NON RESIZABLE
+    const positions = new Float32Array(nNodes * 3);
+    const normals = new Float32Array(nNodes * 3);
+    const indices = new Float32Array(nTriangles * 3);   // XXX bor ikke denne og fler gjøres til Int array??
+    const vertexProperties = new Float32Array(nNodes);
+    const vertexIndexs = new Int32Array(nNodes);   // XXX blir brukt av meg i fragment shader for readout..  
+    const line_positions = new Float32Array(nNodes * 3);  // DER DISISE ZISTE RIKTIG STORRELSE????
+
+    let noActiceIndices = 0;
+
 
     // Note: Assumed layout of the incomming 2D array of data:
     // First coloumn corresponds to lowest x value. Last column highest x value.
@@ -222,6 +233,9 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
                 // normals[3 * i + 0] = normal[0];
                 // normals[3 * i + 1] = normal[1];
                 // normals[3 * i + 2] = normal[2];
+                normals[3 * i + 0] = normal[0];
+                normals[3 * i + 1] = normal[1];
+                normals[3 * i + 2] = normal[2];
 
                 vertexProperties[i] = propertyValue;
                 //vertexIndexs.push(i++);
@@ -240,10 +254,10 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
                 const i2 = (h + 1) * nx + (w + 1);
                 const i3 = (h + 1) * nx + w;
 
-                const i0_act = true; //!isMesh || (isDefined(meshData[i0]) && isDefined(propertiesData[i0])); // eslint-disable-line
-                const i1_act = true; //!isMesh || (isDefined(meshData[i1]) && isDefined(propertiesData[i1])); // eslint-disable-line
-                const i2_act = true; //!isMesh || (isDefined(meshData[i2]) && isDefined(propertiesData[i2])); // eslint-disable-line
-                const i3_act = true; //!isMesh || (isDefined(meshData[i3]) && isDefined(propertiesData[i3])); // eslint-disable-line
+                const i0_act = !isMesh || (isDefined(meshData[i0]) && isDefined(propertiesData[i0])); // eslint-disable-line
+                const i1_act = !isMesh || (isDefined(meshData[i1]) && isDefined(propertiesData[i1])); // eslint-disable-line
+                const i2_act = !isMesh || (isDefined(meshData[i2]) && isDefined(propertiesData[i2])); // eslint-disable-line
+                const i3_act = !isMesh || (isDefined(meshData[i3]) && isDefined(propertiesData[i3])); // eslint-disable-line
 
                 if (i1_act && i3_act) {
                     // diagonal i1, i3
@@ -277,14 +291,14 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
                         indices[i++] = i2;
                     }
                 }
-
-                i++;
             }
         }
+        noActiceIndices = i;
+        console.log("noActiceIndices, i, indices.length: ", noActiceIndices, i, indices.length)
         //console.log("positions.length: ", positions.length)
-        console.log("indices size before resize: ", indices.length, i)
-        indices_buffer.resize(i); // resize from nNodes to potentially fever due to inactive nodes.
-        //console.log("indices size after resize: ", indices.length)
+        // console.log("indices size before resize: ", indices.length, i)
+        // indices_buffer.resize(i * nBytes); // resize from nNodes to potentially fever due to inactive nodes.
+        // console.log("indices size after resize: ", indices.length)
 
 
 
@@ -583,12 +597,12 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
     const mesh: MeshType = {
         drawMode: 4, // corresponds to GL.TRIANGLES,
         attributes: {
-            positions: { value: new Float32Array(positions), size: 3 },  // XXX sende directr typearrays her..
-            normals: { value: new Float32Array(normals), size: 3 },
-            properties: { value: new Float32Array(vertexProperties), size: 1 },
-            vertex_indexs: { value: new Int32Array(vertexIndexs), size: 1 },
+            positions: { value: positions, size: 3 },  // XXX sende directr typearrays her..
+            normals: { value: normals, size: 3 },
+            properties: { value: vertexProperties, size: 1 },
+            vertex_indexs: { value: vertexIndexs, size: 1 },
         },
-        vertexCount: indices.length,
+        vertexCount: noActiceIndices, // indices.length, // XXX paa dennee
         indices: { value: new Uint32Array(indices), size: 1 },
     };
 
