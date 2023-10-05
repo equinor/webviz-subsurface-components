@@ -12,7 +12,7 @@ import { Model, Geometry } from "@luma.gl/engine";
 import type { DeckGLLayerContext } from "../../components/Map";
 import type {
     ExtendedLayerProps,
-    colorMapFunctionType,    
+    colorMapFunctionType,
 } from "../utils/layerTools";
 
 import { getImageData } from "../utils/layerTools";
@@ -21,7 +21,6 @@ import vsShader from "./vertex.glsl";
 import fsShader from "./fragment.fs.glsl";
 import vsLineShader from "./vertex_lines.glsl";
 import fsLineShader from "./fragment_lines.glsl";
-
 
 import { Texture2D } from "@luma.gl/webgl";
 import GL from "@luma.gl/constants";
@@ -69,7 +68,7 @@ export interface privateLayerProps extends ExtendedLayerProps {
     colorMapName: string;
     colorMapRange: [number, number];
     colorMapClampColor: Color | undefined | boolean;
-    colorMapFunction?: colorMapFunctionType ;
+    colorMapFunction?: colorMapFunctionType;
     gridLines: boolean;
     propertyValueRange: [number, number];
     depthTest: boolean;

@@ -190,7 +190,7 @@ export function defineBoundingBox(
  * ColorMapFunction has priority.
  * @param colorMapName Name of the color map in color tables.
  * @param colorTables Color tables.
- * @param colorMapFunction Either a function which returns a color 
+ * @param colorMapFunction Either a function which returns a color
  * or an array representing a constant color.
  * @returns Array of 256 colors.
  */
