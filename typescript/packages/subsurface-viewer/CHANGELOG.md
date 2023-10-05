@@ -1,3 +1,10 @@
+# [0.3.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.2.3...subsurface-viewer@0.3.0) (2023-10-05)
+
+
+### Features
+
+* **grid3d:** constant color for coloring Grid3dLayer ([#1688](https://github.com/equinor/webviz-subsurface-components/issues/1688)) ([718e8a0](https://github.com/equinor/webviz-subsurface-components/commit/718e8a06204fc51c66677415a5bf31ef93860be7))
+
 ## [0.2.3](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.2.2...subsurface-viewer@0.2.3) (2023-10-04)
 
 
