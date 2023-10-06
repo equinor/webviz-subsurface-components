@@ -41,7 +41,7 @@ export type MeshType = {
         properties: { value: Float32Array; size: number };
         vertex_indexs: { value: Int32Array; size: number };
     };
-    vertexCount: number;
+    //vertexCount: number;
     indices: { value: Uint32Array; size: number };
 };
 
@@ -50,7 +50,8 @@ export type MeshTypeLines = {
     attributes: {
         positions: { value: Float32Array; size: number };
     };
-    vertexCount: number;
+    indices: { value: Uint32Array; size: number };
+    //vertexCount: number;
 };
 
 export type Material =
@@ -180,7 +181,7 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
                     properties: this.props.mesh.attributes.properties,
                     vertex_indexs: this.props.mesh.attributes.vertex_indexs,
                 },
-                vertexCount: this.props.mesh.vertexCount,  // XXX samme som indices.length, så kan fjernes fra props etc.. nei vent active etc... 
+                //vertexCount: this.props.mesh.vertexCount,  // XXX SER IKKE UT SOM DENNE TRENGES...samme som indices.length, så kan fjernes fra props etc.. nei vent active etc... 
                 indices: this.props.mesh.indices,
             }),
             modules: [project, picking, localPhongLighting],
@@ -284,10 +285,9 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
             gl.enable(GL.DEPTH_TEST);
         }
 
-        // XXX DISABLE FOR NOW
-        // if (this.props.gridLines) {
-        //     mesh_lines_model.draw();
-        // }
+        if (this.props.gridLines) {
+            mesh_lines_model.draw();
+        }
 
         if (!this.state["isLoaded"]) {
             this.setState({ ...this.state, isLoaded: true });
