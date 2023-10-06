@@ -33,7 +33,6 @@ const DEFAULT_TEXTURE_PARAMETERS = {
 };
 
 export type MeshType = {
-    drawMode?: number; // XXX FJERN
     attributes: {
         positions: { value: Float32Array; size: number };
         TEXCOORD_0?: { value: Float32Array; size: number };
@@ -46,7 +45,6 @@ export type MeshType = {
 };
 
 export type MeshTypeLines = {
-    drawMode: number;  // XXX FJERN
     attributes: {
         positions: { value: Float32Array; size: number };
     };
@@ -166,22 +164,18 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
     //eslint-disable-next-line
     _getModels(gl: any) {
         // MESH MODEL
-
-        //console.log("positions.length ", this.props.mesh.attributes.positions)
-
         const mesh_model = new Model(gl, {
             id: `${this.props.id}-mesh`,
             vs: vsShader,
             fs: fsShader,
             geometry: new Geometry({
-                drawMode: 4, //this.props.mesh.drawMode,  // XXX fjern dramoe den er kjent
+                drawMode: 4, // triangles
                 attributes: {
                     positions: this.props.mesh.attributes.positions,
                     normals: this.props.mesh.attributes.normals,
                     properties: this.props.mesh.attributes.properties,
                     vertex_indexs: this.props.mesh.attributes.vertex_indexs,
                 },
-                //vertexCount: this.props.mesh.vertexCount,  // XXX SER IKKE UT SOM DENNE TRENGES...samme som indices.length, så kan fjernes fra props etc.. nei vent active etc... 
                 indices: this.props.mesh.indices,
             }),
             modules: [project, picking, localPhongLighting],
@@ -193,15 +187,14 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
             id: `${this.props.id}-lines`,
             vs: vsLineShader,
             fs: fsLineShader,
-            // geometry: new Geometry(this.props.meshLines),
             geometry: new Geometry({
-                drawMode: 1, //this.props.mesh.drawMode,  // XXX fjern dramoe den er kjent
+                drawMode: 1, // lines
                 attributes: {
-                    positions: this.props.meshLines.attributes.positions,  // XXX AHA TRENGER IKKE TO POSITIONS SEND BARE EN DE ER JO LIKE
+                    positions: this.props.meshLines.attributes.positions,
                 },
                 indices: this.props.meshLines.indices,
             }),
-            modules: [project],  // [project, picking],
+            modules: [project],
             isInstanced: false,
         });
 

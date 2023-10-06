@@ -54,6 +54,7 @@ export type WebWorkerParams = {
     isMesh: boolean;
     frame: Frame;
     smoothShading: boolean;
+    gridLines: boolean;
     ZIncreasingDownwards: boolean;
 };
 
@@ -334,11 +335,12 @@ export default class MapLayer extends CompositeLayer<MapLayerProps> {
             const webWorker = new Worker(url);
 
             const webworkerParams: WebWorkerParams = {
-                meshData,          // https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Transferable_objects
+                meshData,    // https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Transferable_objects
                 propertiesData,
                 isMesh,
                 frame: this.props.frame,
                 smoothShading: this.props.smoothShading,
+                gridLines: this.props.gridLines,
                 ZIncreasingDownwards: this.props.ZIncreasingDownwards,
             };
 
@@ -346,18 +348,7 @@ export default class MapLayer extends CompositeLayer<MapLayerProps> {
             // webWorker.postMessage(webworkerParams, [meshData.buffer]);   denne sender tranferable men da blir dataene satt til null her.. 
             webWorker.postMessage(webworkerParams);
 
-            //console.log("is it moved?? meshData.byteLength", meshData.byteLength); 
-
-    
-            // const nn = 6;
-            // const buffer = new ArrayBuffer(4 * nn,  { maxByteLength: 4 * nn });
-            // const myarray = new Float32Array(buffer);
-            // console.log("myarray.length 1", myarray.length)
-
-            // buffer.resize(4 * 1);
-            // console.log("myarray.length 2", myarray.length) 
-            // myarray[1] = 2; // overskedet memory..
-
+            //console.log("is it moved?? meshData.byteLength", meshData.byteLength);  // XXX
 
             webWorker.onmessage = (e) => {
                 const [mesh, mesh_lines, meshZValueRange, propertyValueRange] =

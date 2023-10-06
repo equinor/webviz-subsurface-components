@@ -34,7 +34,11 @@ uniform bool isColorMapClampColorTransparent;
 uniform bool smoothShading;
 
 
-void main(void) {
+void main(void) { 
+   // XXX
+   // fragColor = vec4(02., 0.3, 1.0, 0.1); /// XXX NB NB NB NB NBN BN BN BN BNB 
+   // return;
+
    geometry.uv = vTexCoord;
 
    vec3 normal = normals_commonspace;
@@ -42,12 +46,6 @@ void main(void) {
    if (!smoothShading) {
       normal = normalize(cross(dFdx(position_commonspace.xyz), dFdy(position_commonspace.xyz)));
    } 
-
-   // // Discard transparent pixels. KEEP
-   // if (!picking_uActive && isnan(propertyValue)) {
-   //    discard;
-   //    return;
-   // }
    
    //Picking pass.
    if (picking_uActive) {

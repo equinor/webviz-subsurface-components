@@ -14,6 +14,7 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
     const isMesh = params.isMesh;
     const frame = params.frame;
     const smoothShading = params.smoothShading;
+    const gridLines = params.gridLines;
     const ZIncreasingDownwards = params.ZIncreasingDownwards;
 
     // XXX foklar trengs forr aa ikke endre -- men vent.. hvis de blir transferred vil dataene ugyldigjøres i main treadden og endre inputten .. ikke bra..
@@ -71,7 +72,6 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
         if (!isMesh) {
             return [0, 0, 1];
         }
-
 
         const i0 = h * nx + w;
         const i1 = h * nx + (w - 1);
@@ -158,56 +158,42 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
     const dx = frame.increment[0];
     const dy = frame.increment[1];
 
-    const nNodesX = frame.count[0];
-    const nNodesY = frame.count[1];
+    const nx = frame.count[0]; // number of nodes in x direction
+    const ny = frame.count[1];
 
     const propLength = propertiesData.length;
-    const isCellCenteredProperties = propLength === (nNodesX - 1) * (nNodesY - 1);
+    const isCellCenteredProperties = propLength === (nx - 1) * (ny - 1);
 
-    if (
-        propLength !== (nNodesX - 1) * (nNodesY - 1) &&
-        propLength !== nNodesX * nNodesY
-    ) {
+    if (propLength !== (nx - 1) * (ny - 1) && propLength !== nx * ny) {
         console.error(
             "There should be as many property values as nodes (nx*ny) OR as many as cells (nx - 1) * (ny - 1)."
         );
     }
 
-    const nNodes = nNodesX * nNodesY;
-    const nCells = (nNodesX - 1) * (nNodesY - 1);
+    const nNodes = nx * ny;
+    const nCells = (nx - 1) * (ny - 1);
     const nTriangles = nCells * 2;
-    //const nBytes = 4; // Number of bytes in float32
 
-    // const positions_buffer = new ArrayBuffer(nBytes * nNodes * 3,  { maxByteLength: nBytes * nNodes * 3 });
-    // const normals_buffer = new ArrayBuffer(nBytes * nNodes * 3,  { maxByteLength: nBytes * nNodes * 3 });
-
-    // const indices_buffer = new ArrayBuffer(nBytes * nTriangles * 3,  { maxByteLength: nBytes * nTriangles * 3 });  // XXX TIL INTEGER?? 3 indicies pr triangle.
-    // const vertexProperties_buffer = new ArrayBuffer(nBytes * nNodes,  { maxByteLength: nBytes * nNodes});
-    // const vertexIndexs_buffer = new ArrayBuffer(nBytes * nNodes,  { maxByteLength: nBytes * nNodes });
-
-    // const line_positions_buffer = new ArrayBuffer(nBytes * nTriangles * 6,  { maxByteLength: nBytes * nTriangles * 6 });  // XXX ikke brukt na sett riktig størrelse senere
-
-
-    // XXX RENAME THESE TO something with arrays...
-    // const positions = new Float32Array(positions_buffer);
-    // const normals = new Float32Array(normals_buffer);
-    // const indices = new Float32Array(indices_buffer);   // XXX bor ikke denne og fler gjøres til Int array??
-    // const vertexProperties = new Float32Array(vertexProperties_buffer);
-    // const vertexIndexs = new Float32Array(vertexIndexs_buffer);   // XXX blir brukt av meg i fragment shader for readout..
-
-    // const line_positions = new Float32Array(line_positions_buffer);
-
-    //  NON RESIZABLE
-    const positions = new Float32Array(nNodes * 3);
-    const normals = new Float32Array(nNodes * 3);
+    const positions = new Float32Array(
+        isCellCenteredProperties ? nCells * 6 * 3 : nNodes * 3
+    );
+    const normals = new Float32Array(
+        isCellCenteredProperties || !smoothShading ? 0 : nNodes * 3
+    );
     const triangleIndices = new Uint32Array(nTriangles * 3);
-    const vertexProperties = new Float32Array(nNodes);
-    const vertexIndexs = new Int32Array(nNodes);   // XXX blir brukt av meg i fragment shader for readout..  
-
-    const lineIndices = new Uint32Array((nCells) * 4 + (nNodesX-1) * 2 + (nNodesY-1) * 2);  // XXX FIX SJEKK:.. DER DISISE ZISTE RIKTIG STORRELSE????
-
-    let noActiceIndices = 0; // XXX FJERN
-
+    const vertexProperties = new Float32Array(
+        isCellCenteredProperties ? nCells * 6 : nNodes
+    );
+    const vertexIndexs = new Int32Array(
+        isCellCenteredProperties ? nCells * 6 : nNodes
+    );
+    let nLineIndices = 0;
+    if (gridLines) {
+        nLineIndices = isCellCenteredProperties
+            ? nTriangles * 2 * 2
+            : nCells * 4 + (nx - 1) * 2 + (ny - 1) * 2;
+    }
+    const lineIndices = new Uint32Array(nLineIndices);
 
     // Note: Assumed layout of the incomming 2D array of data:
     // First coloumn corresponds to lowest x value. Last column highest x value.
@@ -218,14 +204,14 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
         // PROPERTIES IS SET INTERPOLATED OVER A CELL.
         console.log("PROPERTIES IS SET INTERPOLATED OVER A CELL.")
 
-        // Loop over nodes.
-        let i = 0; // XX rename to index???   node_index
-        for (let h = 0; h < nNodesY; h++) {
-            for (let w = 0; w < nNodesX; w++) {
-                const i0 = h * nNodesX + w;
+        // Loop vertices.
+        let i = 0;
+        for (let h = 0; h < ny; h++) {
+            for (let w = 0; w < nx; w++) {
+                const i0 = h * nx + w;
 
                 const x0 = ox + w * dx;
-                const y0 = oy + (nNodesY - 1 - h) * dy; // See note above.
+                const y0 = oy + (ny - 1 - h) * dy; // See note above.
                 const z = isMesh ? -meshData[i0] * multZ : 0;
 
                 const propertyValue = propertiesData[i0];
@@ -234,10 +220,12 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
                 positions[3 * i + 1] = y0;
                 positions[3 * i + 2] = z;
 
-                const normal = calcNormal(w, h, nNodesX, nNodesY, isMesh, smoothShading, meshData, ox, oy, multZ); // eslint-disable-line
-                normals[3 * i + 0] = normal[0];
-                normals[3 * i + 1] = normal[1];
-                normals[3 * i + 2] = normal[2];
+                if (smoothShading) {
+                    const normal = calcNormal(w, h, nx, ny, isMesh, smoothShading, meshData, ox, oy, multZ); // eslint-disable-line
+                    normals[3 * i + 0] = normal[0];
+                    normals[3 * i + 1] = normal[1];
+                    normals[3 * i + 2] = normal[2];
+                }
 
                 vertexProperties[i] = propertyValue;
                 vertexIndexs[i] = i;
@@ -246,14 +234,15 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
             }
         }
 
+        // Loop cells.
         i = 0;
         let j = 0;
-        for (let h = 0; h < nNodesY - 1; h++) {
-            for (let w = 0; w < nNodesX - 1; w++) {
-                const i0 = h * nNodesX + w;
-                const i1 = h * nNodesX + (w + 1);
-                const i2 = (h + 1) * nNodesX + (w + 1);
-                const i3 = (h + 1) * nNodesX + w;
+        for (let h = 0; h < ny - 1; h++) {
+            for (let w = 0; w < nx - 1; w++) {
+                const i0 = h * nx + w;
+                const i1 = h * nx + (w + 1);
+                const i2 = (h + 1) * nx + (w + 1);
+                const i3 = (h + 1) * nx + w;
 
                 const i0_act = !isMesh || (isDefined(meshData[i0]) && isDefined(propertiesData[i0])); // eslint-disable-line
                 const i1_act = !isMesh || (isDefined(meshData[i1]) && isDefined(propertiesData[i1])); // eslint-disable-line
@@ -294,217 +283,239 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
                 }
 
                 // Lines.
-                if (i0_act && i1_act) {
-                    lineIndices[j++] = i0;
-                    lineIndices[j++] = i1;
-                }
+                if (gridLines) {
+                    if (i0_act && i1_act) {
+                        lineIndices[j++] = i0;
+                        lineIndices[j++] = i1;
+                    }
 
-                if (i0_act && i3_act) {
-                    lineIndices[j++] = i0;
-                    lineIndices[j++] = i3;
-                }
+                    if (i0_act && i3_act) {
+                        lineIndices[j++] = i0;
+                        lineIndices[j++] = i3;
+                    }
 
-                if (h == nNodesY - 2 && i2_act && i3_act) {
-                    lineIndices[j++] = i3;
-                    lineIndices[j++] = i2;
-                }
+                    if (h == ny - 2 && i2_act && i3_act) {
+                        lineIndices[j++] = i3;
+                        lineIndices[j++] = i2;
+                    }
 
-                if (w == nNodesX - 2 && i1_act && i2_act) {
-                    lineIndices[j++] = i1;
-                    lineIndices[j++] = i2;
+                    if (w == nx - 2 && i1_act && i2_act) {
+                        lineIndices[j++] = i1;
+                        lineIndices[j++] = i2;
+                    }
+
+                    // diagonal
+                    if ((i0_act && !i2_act) || (!i0_act && i2_act)) {
+                        lineIndices[j++] = i1;
+                        lineIndices[j++] = i3;
+                    }
+
+                    // diagonal
+                    if ((i3_act && !i1_act) || (!i3_act && i1_act)) {
+                        lineIndices[j++] = i0;
+                        lineIndices[j++] = i2;
+                    }
                 }
             }
         }
-
-        // noActiceIndices = i;  // XXX denne trrenges ikke... 
-        // console.log("noActiceIndices, i, indices.length: ", noActiceIndices, i, triangleIndices.length)
-        //console.log("positions.length: ", positions.length)
-        // console.log("indices size before resize: ", indices.length, i)
-        // indices_buffer.resize(i * nBytes); // resize from nNodes to potentially fever due to inactive nodes.
-        // console.log("indices size after resize: ", indices.length)
-
-
     } else {
-    //     // PROPERTIES IS SET CONSTANT OVER A CELL.
-    //     let i_indices = 0;
-    //     let i_vertices = 0;
-    //     // Loop over cells.
-    //     for (let h = 0; h < ny - 1; h++) {
-    //         for (let w = 0; w < nx - 1; w++) {
-    //             const hh = ny - 1 - h; // See note above.
+        // PROPERTIES IS SET CONSTANT OVER A CELL.
+        console.log("PROPERTIES IS SET CONSTANT OVER A CELL.")
 
-    //             const i0 = h * nx + w;
-    //             const i1 = h * nx + (w + 1);
-    //             const i2 = (h + 1) * nx + (w + 1);
-    //             const i3 = (h + 1) * nx + w;
 
-    //             const normal0 = calcNormal(w, h, nx, ny, isMesh, smoothShading, meshData, ox, oy, multZ);         // eslint-disable-line
-    //             const normal1 = calcNormal(w + 1, h, nx, ny, isMesh, smoothShading, meshData, ox, oy, multZ);     // eslint-disable-line
-    //             const normal2 = calcNormal(w + 1, h + 1, nx, ny, isMesh, smoothShading, meshData, ox, oy, multZ); // eslint-disable-line
-    //             const normal3 = calcNormal(w, h + 1, nx, ny, isMesh, smoothShading, meshData, ox, oy, multZ);     // eslint-disable-line
+        // Loop cells.
+        //let i = 0;  // XXX finn paa noe bedre navn muligens..
+        let i = 0;
+        let j = 0;
+        let k = 0;
+        let l = 0;
+        for (let h = 0; h < ny - 1; h++) {
+            for (let w = 0; w < nx - 1; w++) {
+                const hh = ny - 1 - h; // See note above.
 
-    //             const i0_act = !isMesh || isDefined(meshData[i0]); // eslint-disable-line
-    //             const i1_act = !isMesh || isDefined(meshData[i1]); // eslint-disable-line
-    //             const i2_act = !isMesh || isDefined(meshData[i2]); // eslint-disable-line
-    //             const i3_act = !isMesh || isDefined(meshData[i3]); // eslint-disable-line
+                const i0 = h * nx + w;
+                const i1 = h * nx + (w + 1);
+                const i2 = (h + 1) * nx + (w + 1);
+                const i3 = (h + 1) * nx + w;
 
-    //             const x0 = ox + w * dx;
-    //             const y0 = oy + hh * dy;
-    //             const z0 = isMesh ? -meshData[i0] * multZ : 0;
+                const i0_act = !isMesh || isDefined(meshData[i0]); // eslint-disable-line
+                const i1_act = !isMesh || isDefined(meshData[i1]); // eslint-disable-line
+                const i2_act = !isMesh || isDefined(meshData[i2]); // eslint-disable-line
+                const i3_act = !isMesh || isDefined(meshData[i3]); // eslint-disable-line
 
-    //             const x1 = ox + (w + 1) * dx;
-    //             const y1 = oy + hh * dy;
-    //             const z1 = isMesh ? -meshData[i1] * multZ : 0;
+                // XXX DETTE KAN OPTIMALISERES MER:: FAERRE VERTICES--
 
-    //             const x2 = ox + (w + 1) * dx;
-    //             const y2 = oy + (hh - 1) * dy; // Note hh - 1 here.
-    //             const z2 = isMesh ? -meshData[i2] * multZ : 0;
+                const x0 = ox + w * dx;
+                const y0 = oy + hh * dy;
+                const z0 = isMesh ? -meshData[i0] * multZ : 0;
 
-    //             const x3 = ox + w * dx;
-    //             const y3 = oy + (hh - 1) * dy; // Note hh - 1 here.
-    //             const z3 = isMesh ? -meshData[i3] * multZ : 0;
+                const x1 = ox + (w + 1) * dx;
+                const y1 = oy + hh * dy;
+                const z1 = isMesh ? -meshData[i1] * multZ : 0;
 
-    //             const propertyIndex = h * (nx - 1) + w; // (nx - 1) -> the width of the property 2D array is one less than for the nodes in this case.
-    //             const propertyValue = propertiesData[propertyIndex];
+                const x2 = ox + (w + 1) * dx;
+                const y2 = oy + (hh - 1) * dy; // Note hh - 1 here.
+                const z2 = isMesh ? -meshData[i2] * multZ : 0;
 
-    //             if (!isDefined(propertyValue)) {
-    //                 // Inactive cell, dont draw.
-    //                 continue;
-    //             }
+                const x3 = ox + w * dx;
+                const y3 = oy + (hh - 1) * dy; // Note hh - 1 here.
+                const z3 = isMesh ? -meshData[i3] * multZ : 0;
 
-    //             if (i1_act && i3_act) {
-    //                 // diagonal i1, i3
-    //                 if (i0_act) {
-    //                     // t1 - i0 provoking index.
-    //                     positions.push(x1, y1, z1);
-    //                     positions.push(x3, y3, z3);
-    //                     positions.push(x0, y0, z0);
+                const propertyIndex = h * (nx - 1) + w; // (nx - 1) -> the width of the property 2D array is one less than for the nodes in this case.
+                const propertyValue = propertiesData[propertyIndex];
 
-    //                     normals.push(normal1[0], normal1[1], normal1[2]);
-    //                     normals.push(normal3[0], normal3[1], normal3[2]);
-    //                     normals.push(normal0[0], normal0[1], normal0[2]);
+                // Triangles.
+                if (i1_act && i3_act) {
+                    // diagonal i1, i3
+                    if (i0_act) {
+                        // t1 - i0 provoking index.
+                        triangleIndices[i] = i;
+                        const L1 = i;
+                        i++;
+                        positions[j++] = x1;
+                        positions[j++] = y1;
+                        positions[j++] = z1;
 
-    //                     vertexIndexs.push(
-    //                         i_vertices++,
-    //                         i_vertices++,
-    //                         i_vertices++
-    //                     );
+                        triangleIndices[i] = i;
+                        const L2 = i;
+                        i++;
+                        positions[j++] = x3;
+                        positions[j++] = y3;
+                        positions[j++] = z3;
 
-    //                     indices.push(i_indices++, i_indices++, i_indices++);
-    //                     vertexProperties.push(propertyValue);
-    //                     vertexProperties.push(propertyValue);
-    //                     vertexProperties.push(propertyValue);
+                        triangleIndices[i] = i;
+                        const L3 = i;
+                        i++;
+                        positions[j++] = x0;
+                        positions[j++] = y0;
+                        positions[j++] = z0;
 
-    //                     line_positions.push(x0, y0, z0);
-    //                     line_positions.push(x3, y3, z3);
+                        if (gridLines) {
+                            lineIndices[l++] = L3;
+                            lineIndices[l++] = L1;
 
-    //                     line_positions.push(x0, y0, z0);
-    //                     line_positions.push(x1, y1, z1);
-    //                 }
+                            lineIndices[l++] = L3;
+                            lineIndices[l++] = L2;
+                        }
 
-    //                 if (i2_act) {
-    //                     // t2 - i2 provoking index.
-    //                     positions.push(x1, y1, z1);
-    //                     positions.push(x3, y3, z3);
-    //                     positions.push(x2, y2, z2);
+                        vertexProperties[k++] = propertyValue;
+                        vertexProperties[k++] = propertyValue;
+                        vertexProperties[k++] = propertyValue;
+                    }
 
-    //                     normals.push(normal1[0], normal1[1], normal1[2]);
-    //                     normals.push(normal3[0], normal3[1], normal3[2]);
-    //                     normals.push(normal2[0], normal2[1], normal2[2]);
+                    if (i2_act) {
+                        // t2 - i2 provoking index.
+                        triangleIndices[i] = i;
+                        const L1 = i;
+                        i++;
+                        positions[j++] = x1;
+                        positions[j++] = y1;
+                        positions[j++] = z1;
 
-    //                     vertexIndexs.push(
-    //                         i_vertices++,
-    //                         i_vertices++,
-    //                         i_vertices++
-    //                     );
+                        triangleIndices[i] = i;
+                        const L2 = i;
+                        i++;
+                        positions[j++] = x3;
+                        positions[j++] = y3;
+                        positions[j++] = z3;
 
-    //                     indices.push(i_indices++, i_indices++, i_indices++);
-    //                     vertexProperties.push(propertyValue);
-    //                     vertexProperties.push(propertyValue);
-    //                     vertexProperties.push(propertyValue);
+                        triangleIndices[i] = i;
+                        const L3 = i;
+                        i++;
+                        positions[j++] = x2;
+                        positions[j++] = y2;
+                        positions[j++] = z2;
 
-    //                     line_positions.push(x2, y2, z2);
-    //                     line_positions.push(x3, y3, z3);
+                        if (gridLines) {
+                            lineIndices[l++] = L1;
+                            lineIndices[l++] = L3;
 
-    //                     line_positions.push(x2, y2, z2);
-    //                     line_positions.push(x1, y1, z1);
-    //                 }
+                            lineIndices[l++] = L2;
+                            lineIndices[l++] = L3;
+                        }
+                        vertexProperties[k++] = propertyValue;
+                        vertexProperties[k++] = propertyValue;
+                        vertexProperties[k++] = propertyValue;
+                    }
+                } else if (i0_act && i2_act) {
+                    // diagonal i0, i2
+                    if (i1_act) {
+                        //t1 - i0 provoking index.
+                        triangleIndices[i] = i;
+                        const L1 = i;
+                        i++;
+                        positions[j++] = x1;
+                        positions[j++] = y1;
+                        positions[j++] = z1;
 
-    //                 // diagonal
-    //                 if ((i0_act && !i2_act) || (!i0_act && i2_act)) {
-    //                     line_positions.push(x1, y1, z1);
-    //                     line_positions.push(x3, y3, z3);
-    //                 }
-    //             } else if (i0_act && i2_act) {
-    //                 // diagonal i0, i2
-    //                 if (i1_act) {
-    //                     // t1 - i0 provoking index.
-    //                     positions.push(x1, y1, z1);
-    //                     positions.push(x2, y2, z2);
-    //                     positions.push(x0, y0, z0);
+                        triangleIndices[i] = i;
+                        const L2 = i;
+                        i++;
+                        positions[j++] = x2;
+                        positions[j++] = y2;
+                        positions[j++] = z2;
 
-    //                     normals.push(normal1[0], normal1[1], normal1[2]);
-    //                     normals.push(normal2[0], normal2[1], normal2[2]);
-    //                     normals.push(normal0[0], normal0[1], normal0[2]);
+                        triangleIndices[i] = i;
+                        const L3 = i;
+                        i++;
+                        positions[j++] = x0;
+                        positions[j++] = y0;
+                        positions[j++] = z0;
 
-    //                     vertexIndexs.push(
-    //                         i_vertices++,
-    //                         i_vertices++,
-    //                         i_vertices++
-    //                     );
+                        if (gridLines) {
+                            lineIndices[l++] = L1;
+                            lineIndices[l++] = L3;
 
-    //                     indices.push(i_indices++, i_indices++, i_indices++);
-    //                     vertexProperties.push(propertyValue);
-    //                     vertexProperties.push(propertyValue);
-    //                     vertexProperties.push(propertyValue);
+                            lineIndices[l++] = L1;
+                            lineIndices[l++] = L2;
+                        }
 
-    //                     line_positions.push(x1, y1, z1);
-    //                     line_positions.push(x0, y0, z0);
+                        vertexProperties[k++] = propertyValue;
+                        vertexProperties[k++] = propertyValue;
+                        vertexProperties[k++] = propertyValue;
+                    }
 
-    //                     line_positions.push(x1, y1, z1);
-    //                     line_positions.push(x2, y2, z2);
-    //                 }
+                    if (i3_act) {
+                        // t2 - i2 provoking index.
+                        triangleIndices[i] = i;
+                        const L1 = i;
+                        i++;
+                        positions[j++] = x3;
+                        positions[j++] = y3;
+                        positions[j++] = z3;
 
-    //                 if (i3_act) {
-    //                     // t2 - i2 provoking index.
-    //                     positions.push(x0, y0, z0);
-    //                     positions.push(x3, y3, z3);
-    //                     positions.push(x2, y2, z2);
+                        triangleIndices[i] = i;
+                        const L2 = i;
+                        i++;
+                        positions[j++] = x0;
+                        positions[j++] = y0;
+                        positions[j++] = z0;
 
-    //                     normals.push(normal0[0], normal0[1], normal0[2]);
-    //                     normals.push(normal3[0], normal3[1], normal3[2]);
-    //                     normals.push(normal2[0], normal2[1], normal2[2]);
+                        triangleIndices[i] = i;
+                        const L3 = i;
+                        i++;
+                        positions[j++] = x2;
+                        positions[j++] = y2;
+                        positions[j++] = z2;
 
-    //                     vertexIndexs.push(
-    //                         i_vertices++,
-    //                         i_vertices++,
-    //                         i_vertices++
-    //                     );
+                        if (gridLines) {
+                            lineIndices[l++] = L1;
+                            lineIndices[l++] = L2;
 
-    //                     indices.push(i_indices++, i_indices++, i_indices++);
-    //                     vertexProperties.push(propertyValue);
-    //                     vertexProperties.push(propertyValue);
-    //                     vertexProperties.push(propertyValue);
+                            lineIndices[l++] = L1;
+                            lineIndices[l++] = L3;
+                        }
 
-    //                     line_positions.push(x3, y3, z3);
-    //                     line_positions.push(x0, y0, z0);
-
-    //                     line_positions.push(x3, y3, z3);
-    //                     line_positions.push(x2, y2, z2);
-    //                 }
-
-    //                 // diagonal
-    //                 if ((i3_act && !i1_act) || (!i3_act && i1_act)) {
-    //                     line_positions.push(x0, y0, z0);
-    //                     line_positions.push(x2, y2, z2);
-    //                 }
-    //             }
-        //     }
-        // }
+                        vertexProperties[k++] = propertyValue;
+                        vertexProperties[k++] = propertyValue;
+                        vertexProperties[k++] = propertyValue;
+                    }
+                }
+            }
+        }
     }
 
     const mesh: MeshType = {
-        drawMode: 4, // corresponds to GL.TRIANGLES,
         attributes: {
             positions: { value: positions, size: 3 },  // XXX sende directr typearrays her..
             normals: { value: normals, size: 3 },
@@ -515,9 +526,11 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
     };
 
     const mesh_lines: MeshTypeLines = {
-        drawMode: 1, // corresponds to GL.LINES,
         attributes: {
-            positions: { value: positions, size: 3 },
+            positions: {
+                value: gridLines ? positions : new Float32Array(0),
+                size: 3,
+            },
         },
         indices: { value: lineIndices, size: 1 },
     };
