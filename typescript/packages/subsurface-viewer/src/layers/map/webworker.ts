@@ -158,22 +158,25 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
     const dx = frame.increment[0];
     const dy = frame.increment[1];
 
-    const nx = frame.count[0];
-    const ny = frame.count[1];
+    const nNodesX = frame.count[0];
+    const nNodesY = frame.count[1];
 
     const propLength = propertiesData.length;
-    const isCellCenteredProperties = propLength === (nx - 1) * (ny - 1);
+    const isCellCenteredProperties = propLength === (nNodesX - 1) * (nNodesY - 1);
 
-    if (propLength !== (nx - 1) * (ny - 1) && propLength !== nx * ny) {
+    if (
+        propLength !== (nNodesX - 1) * (nNodesY - 1) &&
+        propLength !== nNodesX * nNodesY
+    ) {
         console.error(
             "There should be as many property values as nodes (nx*ny) OR as many as cells (nx - 1) * (ny - 1)."
         );
     }
 
-    const nNodes = nx * ny;
-    const nCells = (nx - 1) * (ny - 1);
+    const nNodes = nNodesX * nNodesY;
+    const nCells = (nNodesX - 1) * (nNodesY - 1);
     const nTriangles = nCells * 2;
-    const nBytes = 4; // Number of bytes in float32
+    //const nBytes = 4; // Number of bytes in float32
 
     // const positions_buffer = new ArrayBuffer(nBytes * nNodes * 3,  { maxByteLength: nBytes * nNodes * 3 });
     // const normals_buffer = new ArrayBuffer(nBytes * nNodes * 3,  { maxByteLength: nBytes * nNodes * 3 });
@@ -197,12 +200,11 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
     //  NON RESIZABLE
     const positions = new Float32Array(nNodes * 3);
     const normals = new Float32Array(nNodes * 3);
-    const indices = new Uint32Array(nTriangles * 3);   //  INTARRAY!!!   XXX bor ikke denne og fler gjøres til Int array??
+    const triangleIndices = new Uint32Array(nTriangles * 3);
     const vertexProperties = new Float32Array(nNodes);
     const vertexIndexs = new Int32Array(nNodes);   // XXX blir brukt av meg i fragment shader for readout..  
 
-    const line_positions = new Float32Array(nTriangles * 6 * 2); 
-    const line_indices = new Float32Array(nTriangles * 6 * 2);  // XXX FIX SJEKK:.. DER DISISE ZISTE RIKTIG STORRELSE????
+    const lineIndices = new Uint32Array((nCells) * 4 + (nNodesX-1) * 2 + (nNodesY-1) * 2);  // XXX FIX SJEKK:.. DER DISISE ZISTE RIKTIG STORRELSE????
 
     let noActiceIndices = 0; // XXX FJERN
 
@@ -218,208 +220,108 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
 
         // Loop over nodes.
         let i = 0; // XX rename to index???   node_index
-        for (let h = 0; h < ny; h++) {
-            for (let w = 0; w < nx; w++) {
-                const i0 = h * nx + w;
+        for (let h = 0; h < nNodesY; h++) {
+            for (let w = 0; w < nNodesX; w++) {
+                const i0 = h * nNodesX + w;
 
                 const x0 = ox + w * dx;
-                const y0 = oy + (ny - 1 - h) * dy; // See note above.
+                const y0 = oy + (nNodesY - 1 - h) * dy; // See note above.
                 const z = isMesh ? -meshData[i0] * multZ : 0;
 
                 const propertyValue = propertiesData[i0];
 
-                //positions.push(x0, y0, z);
                 positions[3 * i + 0] = x0;
                 positions[3 * i + 1] = y0;
                 positions[3 * i + 2] = z;
 
-                const normal = calcNormal(w, h, nx, ny, isMesh, smoothShading, meshData, ox, oy, multZ); // eslint-disable-line
-                //normals.push(normal[0], normal[1], normal[2]);
-                // normals[3 * i + 0] = normal[0];
-                // normals[3 * i + 1] = normal[1];
-                // normals[3 * i + 2] = normal[2];
+                const normal = calcNormal(w, h, nNodesX, nNodesY, isMesh, smoothShading, meshData, ox, oy, multZ); // eslint-disable-line
                 normals[3 * i + 0] = normal[0];
                 normals[3 * i + 1] = normal[1];
                 normals[3 * i + 2] = normal[2];
 
                 vertexProperties[i] = propertyValue;
-                //vertexIndexs.push(i++);
                 vertexIndexs[i] = i;
 
                 i++;
             }
         }
 
-        //-- TRIANGLES! ----------------------------------
         i = 0;
-        for (let h = 0; h < ny - 1; h++) {
-            for (let w = 0; w < nx - 1; w++) {
-                const i0 = h * nx + w;
-                const i1 = h * nx + (w + 1);
-                const i2 = (h + 1) * nx + (w + 1);
-                const i3 = (h + 1) * nx + w;
+        let j = 0;
+        for (let h = 0; h < nNodesY - 1; h++) {
+            for (let w = 0; w < nNodesX - 1; w++) {
+                const i0 = h * nNodesX + w;
+                const i1 = h * nNodesX + (w + 1);
+                const i2 = (h + 1) * nNodesX + (w + 1);
+                const i3 = (h + 1) * nNodesX + w;
 
                 const i0_act = !isMesh || (isDefined(meshData[i0]) && isDefined(propertiesData[i0])); // eslint-disable-line
                 const i1_act = !isMesh || (isDefined(meshData[i1]) && isDefined(propertiesData[i1])); // eslint-disable-line
                 const i2_act = !isMesh || (isDefined(meshData[i2]) && isDefined(propertiesData[i2])); // eslint-disable-line
                 const i3_act = !isMesh || (isDefined(meshData[i3]) && isDefined(propertiesData[i3])); // eslint-disable-line
 
+                // Triangles.
                 if (i1_act && i3_act) {
                     // diagonal i1, i3
                     if (i0_act) {
-                        //indices.push(i1, i3, i0); // t1 - i0 provoking index.
-                        indices[i++] = i1;
-                        indices[i++] = i3;
-                        indices[i++] = i0;
+                        // t1 - i0 provoking index.
+                        triangleIndices[i++] = i1;
+                        triangleIndices[i++] = i3;
+                        triangleIndices[i++] = i0;
                     }
 
                     if (i2_act) {
-                        //indices.push(i1, i3, i2); // t2 - i2 provoking index.
-                        indices[i++] = i1;
-                        indices[i++] = i3;
-                        indices[i++] = i2;
+                        // t2 - i2 provoking index.
+                        triangleIndices[i++] = i1;
+                        triangleIndices[i++] = i3;
+                        triangleIndices[i++] = i2;
                     }
-                } 
-                else if (i0_act && i2_act) {
+                } else if (i0_act && i2_act) {
                     // diagonal i0, i2
                     if (i1_act) {
-                        //indices.push(i1, i2, i0); // t1 - i0 provoking index.
-                        indices[i++] = i1;
-                        indices[i++] = i2;
-                        indices[i++] = i0;
+                        // t1 - i0 provoking index.
+                        triangleIndices[i++] = i1;
+                        triangleIndices[i++] = i2;
+                        triangleIndices[i++] = i0;
                     }
 
                     if (i3_act) {
-                        //indices.push(i3, i0, i2); // t2 - i2 provoking index.
-                        indices[i++] = i3;
-                        indices[i++] = i0;
-                        indices[i++] = i2;
+                        // t2 - i2 provoking index.
+                        triangleIndices[i++] = i3;
+                        triangleIndices[i++] = i0;
+                        triangleIndices[i++] = i2;
                     }
+                }
+
+                // Lines.
+                if (i0_act && i1_act) {
+                    lineIndices[j++] = i0;
+                    lineIndices[j++] = i1;
+                }
+
+                if (i0_act && i3_act) {
+                    lineIndices[j++] = i0;
+                    lineIndices[j++] = i3;
+                }
+
+                if (h == nNodesY - 2 && i2_act && i3_act) {
+                    lineIndices[j++] = i3;
+                    lineIndices[j++] = i2;
+                }
+
+                if (w == nNodesX - 2 && i1_act && i2_act) {
+                    lineIndices[j++] = i1;
+                    lineIndices[j++] = i2;
                 }
             }
         }
-        noActiceIndices = i;  // XXX denne trrenges ikke... 
-        console.log("noActiceIndices, i, indices.length: ", noActiceIndices, i, indices.length)
+
+        // noActiceIndices = i;  // XXX denne trrenges ikke... 
+        // console.log("noActiceIndices, i, indices.length: ", noActiceIndices, i, triangleIndices.length)
         //console.log("positions.length: ", positions.length)
         // console.log("indices size before resize: ", indices.length, i)
         // indices_buffer.resize(i * nBytes); // resize from nNodes to potentially fever due to inactive nodes.
         // console.log("indices size after resize: ", indices.length)
-
-
-        //-- LINES. ------------------------------------------------
-        i = 0;
-        for (let h = 0; h < ny - 1; h++) {
-            for (let w = 0; w < nx - 1; w++) {
-                const i0 = h * nx + w;
-                const i1 = h * nx + (w + 1);
-                const i2 = (h + 1) * nx + (w + 1);
-                const i3 = (h + 1) * nx + w;
-
-                const i0_act = !isMesh || (isDefined(meshData[i0]) && isDefined(propertiesData[i0])); // eslint-disable-line
-                const i1_act = !isMesh || (isDefined(meshData[i1]) && isDefined(propertiesData[i1])); // eslint-disable-line
-                const i2_act = !isMesh || (isDefined(meshData[i2]) && isDefined(propertiesData[i2])); // eslint-disable-line
-                const i3_act = !isMesh || (isDefined(meshData[i3]) && isDefined(propertiesData[i3])); // eslint-disable-line
-
-                const hh = ny - h - 1; // See note above.
-
-                const x0 = ox + w * dx;
-                const y0 = oy + hh * dy;
-                const z0 = isMesh ? -meshData[i0] * multZ : 0;
-
-                const x1 = ox + (w + 1) * dx;
-                const y1 = oy + hh * dy;
-                const z1 = isMesh ? -meshData[i1] * multZ : 0;
-
-                const x2 = ox + (w + 1) * dx;
-                const y2 = oy + (hh - 1) * dy;
-                const z2 = isMesh ? -meshData[i2] * multZ : 0;
-
-                const x3 = ox + w * dx;
-                const y3 = oy + (hh - 1) * dy;
-                const z3 = isMesh ? -meshData[i3] * multZ : 0;
-
-                if (i1_act && i3_act) {
-                    // diagonal i1, i3
-                    if (i0_act) {
-                        //indices.push(i1, i3, i0); // t1 - i0 provoking index.
-                        // indices[i + 0] = i1;
-                        // indices[i + 1] = i3;
-                        // indices[i + 2] = i0;
-
-                        // // line_positions.push(x0, y0, z0);
-                        // // line_positions.push(x3, y3, z3);
-                        line_positions[i++] = x0;
-                        line_positions[i++] = y0;
-                        line_positions[i++] = z0;
-
-                        line_positions[i++] = x3;
-                        line_positions[i++] = y3;
-                        line_positions[i++] = z3;
-
-
-                        // // line_positions.push(x0, y0, z0);
-                        // // line_positions.push(x1, y1, z1);
-                        // line_positions[i++] = x0;
-                        // line_positions[i++] = y0;
-                        // line_positions[i++] = z0;
-
-                        // line_positions[i++] = x1;
-                        // line_positions[i++] = y1;
-                        // line_positions[i++] = z1;
-                    }
-
-                    if (i2_act) {
-                        // // line_positions.push(x2, y2, z2);
-                        // // line_positions.push(x3, y3, z3);
-                        // line_positions[i++] = x2;
-                        // line_positions[i++] = y2;
-                        // line_positions[i++] = z2;
-
-                        // line_positions[i++] = x3;
-                        // line_positions[i++] = y3;
-                        // line_positions[i++] = z3;
-
-                        // // line_positions.push(x2, y2, z2);
-                        // // line_positions.push(x1, y1, z1);
-                        // line_positions[i++] = x2;
-                        // line_positions[i++] = y2;
-                        // line_positions[i++] = z2;
-
-                        // line_positions[i++] = x1;
-                        // line_positions[i++] = y1;
-                        // line_positions[i++] = z1;
-                    }
-
-                    // diagonal
-                    if ((i0_act && !i2_act) || (!i0_act && i2_act)) {
-                        // line_positions.push(x1, y1, z1);
-                        // line_positions.push(x3, y3, z3);
-                        // line_positions[i++] = x1;
-                        // line_positions[i++] = y1;
-                        // line_positions[i++] = z1;
-
-                        // line_positions[i++] = x3;
-                        // line_positions[i++] = y3;
-                        // line_positions[i++] = z3;
-                    }
-                } else if (i0_act && i2_act) {
-                    // diagonal
-                    if ((i3_act && !i1_act) || (!i3_act && i1_act)) {
-                        // line_positions.push(x0, y0, z0);
-                        // line_positions.push(x2, y2, z2);
-                        // line_positions[i++] = x0;
-                        // line_positions[i++] = y0;
-                        // line_positions[i++] = z0;
-
-                        // line_positions[i++] = x2;
-                        // line_positions[i++] = y2;
-                        // line_positions[i++] = z2;
-                    }
-                }
-
-                //i++;
-            }
-        }
 
 
     } else {
@@ -609,16 +511,15 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
             properties: { value: vertexProperties, size: 1 },
             vertex_indexs: { value: vertexIndexs, size: 1 },
         },
-        //vertexCount: noActiceIndices, // indices.length, // XXX paa dennee
-        indices: { value: indices, size: 1 },
+        indices: { value: triangleIndices, size: 1 },
     };
 
     const mesh_lines: MeshTypeLines = {
         drawMode: 1, // corresponds to GL.LINES,
         attributes: {
-            positions: { value: line_positions, size: 3 },
+            positions: { value: positions, size: 3 },
         },
-        //vertexCount: line_positions.length / 3,
+        indices: { value: lineIndices, size: 1 },
     };
 
     //const t1 = performance.now();

@@ -33,7 +33,7 @@ const DEFAULT_TEXTURE_PARAMETERS = {
 };
 
 export type MeshType = {
-    drawMode?: number;
+    drawMode?: number; // XXX FJERN
     attributes: {
         positions: { value: Float32Array; size: number };
         TEXCOORD_0?: { value: Float32Array; size: number };
@@ -46,7 +46,7 @@ export type MeshType = {
 };
 
 export type MeshTypeLines = {
-    drawMode: number;
+    drawMode: number;  // XXX FJERN
     attributes: {
         positions: { value: Float32Array; size: number };
     };
@@ -174,7 +174,7 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
             vs: vsShader,
             fs: fsShader,
             geometry: new Geometry({
-                drawMode: this.props.mesh.drawMode,
+                drawMode: 4, //this.props.mesh.drawMode,  // XXX fjern dramoe den er kjent
                 attributes: {
                     positions: this.props.mesh.attributes.positions,
                     normals: this.props.mesh.attributes.normals,
@@ -193,8 +193,15 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
             id: `${this.props.id}-lines`,
             vs: vsLineShader,
             fs: fsLineShader,
-            geometry: new Geometry(this.props.meshLines),
-            modules: [project, picking],
+            // geometry: new Geometry(this.props.meshLines),
+            geometry: new Geometry({
+                drawMode: 1, //this.props.mesh.drawMode,  // XXX fjern dramoe den er kjent
+                attributes: {
+                    positions: this.props.meshLines.attributes.positions,  // XXX AHA TRENGER IKKE TO POSITIONS SEND BARE EN DE ER JO LIKE
+                },
+                indices: this.props.meshLines.indices,
+            }),
+            modules: [project],  // [project, picking],
             isInstanced: false,
         });
 
