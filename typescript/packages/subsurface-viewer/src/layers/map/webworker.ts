@@ -364,6 +364,11 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
                 const propertyIndex = h * (nx - 1) + w; // (nx - 1) -> the width of the property 2D array is one less than for the nodes in this case.
                 const propertyValue = propertiesData[propertyIndex];
 
+                if (!isDefined(propertyValue)) {
+                    // Inactive cell, dont draw.
+                    continue;
+                }
+
                 // Triangles.
                 if (i1_act && i3_act) {
                     // diagonal i1, i3
