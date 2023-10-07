@@ -1,4 +1,3 @@
-import type { MeshType, MeshTypeLines } from "./privateMapLayer";
 import type { WebWorkerParams } from "./mapLayer";
 
 type Vec = [number, number, number];
@@ -184,7 +183,7 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
     const vertexProperties = new Float32Array(
         isCellCenteredProperties ? nCells * 6 : nNodes
     );
-    const vertexIndexs = new Int32Array(
+    const vertexIndices = new Int32Array(
         isCellCenteredProperties ? nCells * 6 : nNodes
     );
     let nLineIndices = 0;
@@ -228,7 +227,7 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
                 }
 
                 vertexProperties[i] = propertyValue;
-                vertexIndexs[i] = i;
+                vertexIndices[i] = i;
 
                 i++;
             }
@@ -520,33 +519,23 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
         }
     }
 
-    const mesh: MeshType = {
-        attributes: {
-            positions: { value: positions, size: 3 },  // XXX sende directr typearrays her..
-            normals: { value: normals, size: 3 },
-            properties: { value: vertexProperties, size: 1 },
-            vertex_indexs: { value: vertexIndexs, size: 1 },
-        },
-        indices: { value: triangleIndices, size: 1 },
-    };
-
-    const mesh_lines: MeshTypeLines = {
-        attributes: {
-            positions: {
-                value: gridLines ? positions : new Float32Array(0),
-                size: 3,
-            },
-        },
-        indices: { value: lineIndices, size: 1 },
-    };
-
     //const t1 = performance.now();
     // Keep this.
     //console.log(`Task makeMesh took ${(t1 - t0) * 0.001}  seconds.`);
 
+     // XXX fix denne kommentaren....
     // Note: typescript gives this error "error TS2554: Expected 2-3 arguments, but got 1."
     // Disabling this for now as the second argument should be optional.
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    postMessage([mesh, mesh_lines, meshZValueRange, propertyValueRange]);  // XXX returner heller arrrayenen og lag meshet på utsiden..
+    postMessage([
+        positions,
+        normals,
+        triangleIndices,
+        vertexProperties,
+        vertexIndices,
+        lineIndices,
+        meshZValueRange,
+        propertyValueRange,
+    ]); // XXX returner heller arrrayenen og lag meshet på utsiden..
 }

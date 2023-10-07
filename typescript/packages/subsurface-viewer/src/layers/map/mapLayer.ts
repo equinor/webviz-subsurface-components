@@ -351,13 +351,25 @@ export default class MapLayer extends CompositeLayer<MapLayerProps> {
             //console.log("is it moved?? meshData.byteLength", meshData.byteLength);  // XXX
 
             webWorker.onmessage = (e) => {
-                const [mesh, mesh_lines, meshZValueRange, propertyValueRange] =
-                    e.data;
+                const [
+                    positions,
+                    normals,
+                    triangleIndices,
+                    vertexProperties,
+                    vertexIndices,
+                    lineIndices,
+                    meshZValueRange,
+                    propertyValueRange,
+                ] = e.data;
 
                 this.setState({
                     ...this.state,
-                    mesh,
-                    mesh_lines,
+                    positions,
+                    normals,
+                    triangleIndices,
+                    vertexProperties,
+                    vertexIndices,
+                    lineIndices,
                     propertyValueRange,
                 });
 
@@ -482,8 +494,12 @@ export default class MapLayer extends CompositeLayer<MapLayerProps> {
 
         const layer = new privateMapLayer(
             this.getSubLayerProps({
-                mesh: this.state["mesh"],
-                meshLines: this.state["mesh_lines"],
+                positions: this.state["positions"],
+                normals: this.state["normals"],
+                triangleIndices: this.state["triangleIndices"],
+                vertexProperties: this.state["vertexProperties"],
+                vertexIndices: this.state["vertexIndices"],
+                lineIndices: this.state["lineIndices"],
                 pickable: this.props.pickable,
                 modelMatrix: rotatingModelMatrix,
                 contours: this.props.contours,

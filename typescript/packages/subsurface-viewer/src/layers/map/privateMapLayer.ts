@@ -32,26 +32,6 @@ const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE,
 };
 
-export type MeshType = {
-    attributes: {
-        positions: { value: Float32Array; size: number };
-        TEXCOORD_0?: { value: Float32Array; size: number };
-        normals: { value: Float32Array; size: number };
-        properties: { value: Float32Array; size: number };
-        vertex_indexs: { value: Int32Array; size: number };
-    };
-    //vertexCount: number;
-    indices: { value: Uint32Array; size: number };
-};
-
-export type MeshTypeLines = {
-    attributes: {
-        positions: { value: Float32Array; size: number };
-    };
-    indices: { value: Uint32Array; size: number };
-    //vertexCount: number;
-};
-
 export type Material =
     | {
           ambient: number;
@@ -100,8 +80,12 @@ function getImageData(
 }
 
 export interface privateMapLayerProps extends ExtendedLayerProps {
-    mesh: MeshType;
-    meshLines: MeshTypeLines;
+    positions: Float32Array;
+    normals: Float32Array;
+    triangleIndices: Uint32Array;
+    vertexProperties: Float32Array;
+    vertexIndices: Int32Array;
+    lineIndices: Uint32Array;
     contours: [number, number];
     gridLines: boolean;
     isContoursDepth: boolean;
@@ -171,12 +155,12 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
             geometry: new Geometry({
                 drawMode: 4, // triangles
                 attributes: {
-                    positions: this.props.mesh.attributes.positions,
-                    normals: this.props.mesh.attributes.normals,
-                    properties: this.props.mesh.attributes.properties,
-                    vertex_indexs: this.props.mesh.attributes.vertex_indexs,
+                    positions: { value: this.props.positions, size: 3 },
+                    normals: { value: this.props.normals, size: 3 },
+                    properties: { value: this.props.vertexProperties, size: 1 },
+                    vertex_indexs: { value: this.props.vertexIndices, size: 1 },
                 },
-                indices: this.props.mesh.indices,
+                indices: { value: this.props.triangleIndices, size: 1 },
             }),
             modules: [project, picking, localPhongLighting],
             isInstanced: false, // This only works when set to false.
@@ -190,9 +174,9 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
             geometry: new Geometry({
                 drawMode: 1, // lines
                 attributes: {
-                    positions: this.props.meshLines.attributes.positions,
+                    positions: { value: this.props.positions, size: 3 },
                 },
-                indices: this.props.meshLines.indices,
+                indices: { value: this.props.lineIndices, size: 1 },
             }),
             modules: [project],
             isInstanced: false,
@@ -312,11 +296,11 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
 
         const vertexIndex = 256 * 256 * r + 256 * g + b;
 
-        const vertexs = this.props.mesh.attributes.positions.value;
+        const vertexs = this.props.positions;
         const depth = -vertexs[3 * vertexIndex + 2];
         layer_properties.push(createPropertyData("Depth", depth));
 
-        const properties = this.props.mesh.attributes.properties.value;
+        const properties = this.props.vertexProperties;
         const property = properties[vertexIndex];
         layer_properties.push(createPropertyData("Property", property));
 
