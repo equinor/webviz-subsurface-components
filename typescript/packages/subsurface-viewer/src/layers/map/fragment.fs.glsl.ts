@@ -45,7 +45,12 @@ void main(void) {
 
    if (!smoothShading) {
       normal = normalize(cross(dFdx(position_commonspace.xyz), dFdy(position_commonspace.xyz)));
-   } 
+   }
+
+   // These are sent as Int8
+   normal[0] /= 127.0;
+   normal[1] /= 127.0;
+   normal[2] /= 127.0;
    
    //Picking pass.
    if (picking_uActive) {

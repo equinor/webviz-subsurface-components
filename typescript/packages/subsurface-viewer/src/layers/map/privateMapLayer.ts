@@ -81,7 +81,7 @@ function getImageData(
 
 export interface privateMapLayerProps extends ExtendedLayerProps {
     positions: Float32Array;
-    normals: Float32Array;
+    normals: Int8Array;
     triangleIndices: Uint32Array;
     vertexProperties: Float32Array;
     vertexIndices: Int32Array;
