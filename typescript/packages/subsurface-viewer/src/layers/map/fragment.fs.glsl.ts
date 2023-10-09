@@ -35,24 +35,18 @@ uniform bool smoothShading;
 
 
 void main(void) { 
-   // // XXX
-   //fragColor = vec4(1.0, 0.3, 1.0, 0.1); /// XXX NB NB NB NB NBN BN BN BN BNB 
-   // fragColor = vec4(smoothShading ? 1.0 : 0.0, smoothShading ? 0.0 : 1.0, 0.0, 0.1);
-   // return;
-
    geometry.uv = vTexCoord;
 
    vec3 normal = normals_commonspace;
+   // These are sent as Int8
+   normal[0] /= 127.0;
+   normal[1] /= 127.0;
+   normal[2] /= 127.0;
 
    if (!smoothShading) {
       normal = normalize(cross(dFdx(position_commonspace.xyz), dFdy(position_commonspace.xyz)));
    }
 
-   // These are sent as Int8
-   normal[0] /= 127.0;
-   normal[1] /= 127.0;
-   normal[2] /= 127.0;
-   
    //Picking pass.
    if (picking_uActive) {
       // Express triangle index in 255 system.
