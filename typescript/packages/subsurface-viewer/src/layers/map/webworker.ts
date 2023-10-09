@@ -6,7 +6,7 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
     const params = e.data;
 
     // Keep
-    //const t0 = performance.now();
+    const t0 = performance.now();
 
     const meshData = params.meshData;
     const propertiesData = params.propertiesData;
@@ -519,23 +519,32 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
         }
     }
 
-    //const t1 = performance.now();
+    const t1 = performance.now();
     // Keep this.
-    //console.log(`Task makeMesh took ${(t1 - t0) * 0.001}  seconds.`);
+    console.log(`Task makeMesh took ${(t1 - t0) * 0.001}  seconds.`);
 
-     // XXX fix denne kommentaren....
-    // Note: typescript gives this error "error TS2554: Expected 2-3 arguments, but got 1."
-    // Disabling this for now as the second argument should be optional.
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    postMessage([
-        positions,
-        normals,
-        triangleIndices,
-        vertexProperties,
-        vertexIndices,
-        lineIndices,
-        meshZValueRange,
-        propertyValueRange,
-    ]); // XXX returner heller arrrayenen og lag meshet på utsiden..
+    postMessage(
+        [
+            positions.buffer,
+            normals.buffer,
+            triangleIndices.buffer,
+            vertexProperties.buffer,
+            vertexIndices.buffer,
+            lineIndices.buffer,
+            meshZValueRange,
+            propertyValueRange,
+        ],
+        "*",
+        [
+            positions.buffer,
+            normals.buffer,
+            triangleIndices.buffer,
+            vertexProperties.buffer,
+            vertexIndices.buffer,
+            lineIndices.buffer,
+        ]
+    );
+
+    const transferOk = positions.length == 0;
+    console.log("transferOk", transferOk)
 }

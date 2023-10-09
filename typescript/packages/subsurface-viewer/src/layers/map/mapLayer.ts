@@ -63,7 +63,7 @@ async function load_mesh_and_properties(
     propertiesData: string | number[] | Float32Array
 ) {
     // Keep
-    //const t0 = performance.now();
+    const t0 = performance.now();
 
     const isMesh = typeof meshData !== "undefined";
     const isProperties = typeof propertiesData !== "undefined";
@@ -171,8 +171,8 @@ async function load_mesh_and_properties(
     }
 
     // Keep this.
-    // const t1 = performance.now();
-    // console.log(`Task loading took ${(t1 - t0) * 0.001}  seconds.`);
+    const t1 = performance.now();
+    console.log(`Task loading took ${(t1 - t0) * 0.001}  seconds.`);
 
     return Promise.all([isMesh, mesh, properties]);
 }
@@ -345,22 +345,31 @@ export default class MapLayer extends CompositeLayer<MapLayerProps> {
             };
 
             // Note. Webworker shoud not make data transferable or change them as that will change webviz input data as seen from outside.
-            // webWorker.postMessage(webworkerParams, [meshData.buffer]);   denne sender tranferable men da blir dataene satt til null her.. 
+            // webWorker.postMessage(webworkerParams, [meshData.buffer]);   XXX denne sender tranferable men da blir dataene satt til null her.. 
             webWorker.postMessage(webworkerParams);
 
             //console.log("is it moved?? meshData.byteLength", meshData.byteLength);  // XXX
 
             webWorker.onmessage = (e) => {
                 const [
-                    positions,
-                    normals,
-                    triangleIndices,
-                    vertexProperties,
-                    vertexIndices,
-                    lineIndices,
+                    positionsBuffer,
+                    normalsBuffer,
+                    triangleIndicesBuffer,
+                    vertexPropertiesBuffer,
+                    vertexIndicesBuffer,
+                    lineIndicesBuffer,
                     meshZValueRange,
                     propertyValueRange,
                 ] = e.data;
+
+                const positions = new Float32Array(positionsBuffer);
+                const normals = new Float32Array(normalsBuffer);
+                const triangleIndices = new Uint32Array(triangleIndicesBuffer);
+                const vertexProperties = new Float32Array(
+                    vertexPropertiesBuffer
+                );
+                const vertexIndices = new Int32Array(vertexIndicesBuffer);
+                const lineIndices = new Uint32Array(lineIndicesBuffer);
 
                 this.setState({
                     ...this.state,

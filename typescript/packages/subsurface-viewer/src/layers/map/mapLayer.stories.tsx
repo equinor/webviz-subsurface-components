@@ -884,6 +884,7 @@ function makeGaussian(amplitude, x0, y0, stdX, stdY) {
 }
 
 function makeData(n: number, amplitude: number): Float32Array {
+    const t0 = performance.now();
     const X0 = 0;
     const Y0 = 0;
     const stdX = 75;
@@ -896,6 +897,8 @@ function makeData(n: number, amplitude: number): Float32Array {
         return f(x, y); // keep + 0.3 * Math.random();
     });
 
+    const t1 = performance.now();
+    console.log(`makeData took ${(t1 - t0) * 0.001}  seconds.`);
     return data;
 }
 
@@ -907,7 +910,7 @@ export const TypedArrayInput: ComponentStory<typeof SubsurfaceViewer> = (
 };
 
 // Mesh will be n x n nodes.
-const n = 300;
+const n = 1000;
 
 TypedArrayInput.args = {
     id: "map",
@@ -922,7 +925,7 @@ TypedArrayInput.args = {
             meshData: makeData(n, 99),  // XXX hva med a sette noen inactive noder... 
             propertiesData: makeData(n, 1),
             gridLines: false, // XXX
-            material: true,
+            material: false,
             ZIncreasingDownwards: false,
             contours: [0, 5],
             colorMapFunction: nearestColorMap as colorMapFunctionType,
