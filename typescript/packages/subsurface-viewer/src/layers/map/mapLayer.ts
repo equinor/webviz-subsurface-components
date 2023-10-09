@@ -9,7 +9,7 @@ import type {
 import { getModelMatrix } from "../utils/layerTools";
 import { isEqual } from "lodash";
 import * as png from "@vivaxy/png";
-import { makeFullMesh } from "./webworker";
+import { makeFullMesh } from "./utils";
 import type { Matrix4 } from "math.gl";
 
 // Rotate x,y around x0, y0 rad radians
@@ -48,7 +48,7 @@ type Frame = {
     rotPoint?: [number, number];
 };
 
-export type WebWorkerParams = {
+export type Params = {
     meshData: Float32Array;
     propertiesData: Float32Array;
     isMesh: boolean;
@@ -172,7 +172,7 @@ async function load_mesh_and_properties(
 
     // Keep this.
     const t1 = performance.now();
-    console.log(`Task loading took ${(t1 - t0) * 0.001}  seconds.`);
+    console.debug(`Task loading took ${(t1 - t0) * 0.001}  seconds.`);
 
     return Promise.all([isMesh, mesh, properties]);
 }
@@ -325,17 +325,8 @@ export default class MapLayer extends CompositeLayer<MapLayerProps> {
         const p = load_mesh_and_properties(meshData, propertiesData);
 
         p.then(([isMesh, meshData, propertiesData]) => {
-            // Using inline web worker for calculating the triangle mesh from
-            // loaded input data so not to halt the GUI thread.
-            const blob = new Blob(
-                ["self.onmessage = ", makeFullMesh.toString()],
-                { type: "text/javascript" }
-            );
-            const url = URL.createObjectURL(blob);
-            const webWorker = new Worker(url);
-
-            const webworkerParams: WebWorkerParams = {
-                meshData,    // https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Transferable_objects
+            const params: Params = {
+                meshData,
                 propertiesData,
                 isMesh,
                 frame: this.props.frame,
@@ -344,96 +335,77 @@ export default class MapLayer extends CompositeLayer<MapLayerProps> {
                 ZIncreasingDownwards: this.props.ZIncreasingDownwards,
             };
 
-            // Note. Webworker shoud not make data transferable or change them as that will change webviz input data as seen from outside.
-            // webWorker.postMessage(webworkerParams, [meshData.buffer]);   XXX denne sender tranferable men da blir dataene satt til null her.. 
-            webWorker.postMessage(webworkerParams);
+            const [
+                positions,
+                normals,
+                triangleIndices,
+                vertexProperties,
+                vertexIndices,
+                lineIndices,
+                meshZValueRange,
+                propertyValueRange,
+            ] = makeFullMesh(params);
 
-            //console.log("is it moved?? meshData.byteLength", meshData.byteLength);  // XXX
+            this.setState({
+                ...this.state,
+                positions,
+                normals,
+                triangleIndices,
+                vertexProperties,
+                vertexIndices,
+                lineIndices,
+                propertyValueRange,
+            });
 
-            webWorker.onmessage = (e) => {
-                const [
-                    positionsBuffer,
-                    normalsBuffer,
-                    triangleIndicesBuffer,
-                    vertexPropertiesBuffer,
-                    vertexIndicesBuffer,
-                    lineIndicesBuffer,
-                    meshZValueRange,
-                    propertyValueRange,
-                ] = e.data;
+            if (
+                typeof this.props.setReportedBoundingBox !== "undefined" &&
+                reportBoundingBox
+            ) {
+                const xinc = this.props.frame?.increment?.[0] ?? 0;
+                const yinc = this.props.frame?.increment?.[1] ?? 0;
 
-                const positions = new Float32Array(positionsBuffer);
-                const normals = new Float32Array(normalsBuffer);
-                const triangleIndices = new Uint32Array(triangleIndicesBuffer);
-                const vertexProperties = new Float32Array(
-                    vertexPropertiesBuffer
-                );
-                const vertexIndices = new Int32Array(vertexIndicesBuffer);
-                const lineIndices = new Uint32Array(lineIndicesBuffer);
+                const nnodes_x = this.props.frame?.count?.[0] ?? 2; // number of nodes in x direction
+                const nnodes_y = this.props.frame?.count?.[1] ?? 2;
 
-                this.setState({
-                    ...this.state,
-                    positions,
-                    normals,
-                    triangleIndices,
-                    vertexProperties,
-                    vertexIndices,
-                    lineIndices,
-                    propertyValueRange,
-                });
+                const xMin = this.props.frame?.origin?.[0] ?? 0;
+                const yMin = this.props.frame?.origin?.[1] ?? 0;
+                const zMin = -meshZValueRange[0];
+                const xMax = xMin + xinc * (nnodes_x - 1);
+                const yMax = yMin + yinc * (nnodes_y - 1);
+                const zMax = -meshZValueRange[1];
 
-                if (
-                    typeof this.props.setReportedBoundingBox !== "undefined" &&
-                    reportBoundingBox
-                ) {
-                    const xinc = this.props.frame?.increment?.[0] ?? 0;
-                    const yinc = this.props.frame?.increment?.[1] ?? 0;
+                // If map is rotated the bounding box must reflect that.
+                const center =
+                    this.props.frame.rotPoint ?? this.props.frame.origin;
+                const rotDeg = this.props.frame.rotDeg ?? 0;
+                const rotRad = (rotDeg * (2.0 * Math.PI)) / 360.0;
 
-                    const nnodes_x = this.props.frame?.count?.[0] ?? 2; // number of nodes in x direction
-                    const nnodes_y = this.props.frame?.count?.[1] ?? 2;
+                // Rotate x,y around "center" "rad" radians
+                const [x0, y0] = rotate(xMin, yMin, center[0], center[1], rotRad); // eslint-disable-line
+                const [x1, y1] = rotate(xMax, yMin, center[0], center[1], rotRad); // eslint-disable-line
+                const [x2, y2] = rotate(xMax, yMax, center[0], center[1], rotRad); // eslint-disable-line
+                const [x3, y3] = rotate(xMin, yMax, center[0], center[1], rotRad); // eslint-disable-line
 
-                    const xMin = this.props.frame?.origin?.[0] ?? 0;
-                    const yMin = this.props.frame?.origin?.[1] ?? 0;
-                    const zMin = -meshZValueRange[0];
-                    const xMax = xMin + xinc * (nnodes_x - 1);
-                    const yMax = yMin + yinc * (nnodes_y - 1);
-                    const zMax = -meshZValueRange[1];
+                // Rotated bounds in x/y plane.
+                const x_min = Math.min(x0, x1, x2, x3);
+                const x_max = Math.max(x0, x1, x2, x3);
+                const y_min = Math.min(y0, y1, y2, y3);
+                const y_max = Math.max(y0, y1, y2, y3);
 
-                    // If map is rotated the bounding box must reflect that.
-                    const center =
-                        this.props.frame.rotPoint ?? this.props.frame.origin;
-                    const rotDeg = this.props.frame.rotDeg ?? 0;
-                    const rotRad = (rotDeg * (2.0 * Math.PI)) / 360.0;
+                this.props.setReportedBoundingBox([
+                    x_min,
+                    y_min,
+                    zMin,
+                    x_max,
+                    y_max,
+                    zMax,
+                ]);
+            }
 
-                    // Rotate x,y around "center" "rad" radians
-                    const [x0, y0] = rotate(xMin, yMin, center[0], center[1], rotRad); // eslint-disable-line
-                    const [x1, y1] = rotate(xMax, yMin, center[0], center[1], rotRad); // eslint-disable-line
-                    const [x2, y2] = rotate(xMax, yMax, center[0], center[1], rotRad); // eslint-disable-line
-                    const [x3, y3] = rotate(xMin, yMax, center[0], center[1], rotRad); // eslint-disable-line
-
-                    // Rotated bounds in x/y plane.
-                    const x_min = Math.min(x0, x1, x2, x3);
-                    const x_max = Math.max(x0, x1, x2, x3);
-                    const y_min = Math.min(y0, y1, y2, y3);
-                    const y_max = Math.max(y0, y1, y2, y3);
-
-                    this.props.setReportedBoundingBox([
-                        x_min,
-                        y_min,
-                        zMin,
-                        x_max,
-                        y_max,
-                        zMax,
-                    ]);
-                }
-
-                webWorker.terminate();
-
-                this.setState({
-                    ...this.state,
-                    isFinishedLoading: true,
-                });
-            };
+            this.setState({
+                ...this.state,
+                isFinishedLoading: true,
+            });
         });
     }
 
