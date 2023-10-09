@@ -316,8 +316,8 @@ export function makeFullMesh(params: Params) {
     } else {
         // PROPERTIES IS SET CONSTANT OVER A CELL.
 
+        console.log("PROPERTIES IS SET CONSTANT OVER A CELL.");
         // Loop cells.
-        //let i = 0;  // XXX finn paa noe bedre navn muligens..
         let i = 0;
         let j = 0;
         let k = 0;
@@ -335,8 +335,6 @@ export function makeFullMesh(params: Params) {
                 const i1_act = !isMesh || isDefined(meshData[i1]); // eslint-disable-line
                 const i2_act = !isMesh || isDefined(meshData[i2]); // eslint-disable-line
                 const i3_act = !isMesh || isDefined(meshData[i3]); // eslint-disable-line
-
-                // XXX DETTE KAN OPTIMALISERES MER:: FAERRE VERTICES--
 
                 const x0 = ox + w * dx;
                 const y0 = oy + hh * dy;
@@ -516,6 +514,8 @@ export function makeFullMesh(params: Params) {
     const t1 = performance.now();
     // Keep this.
     console.debug(`Task makeMesh took ${(t1 - t0) * 0.001}  seconds.`);
+
+    //console.log("my postions ", vertexIndices)
 
     return [
         positions,

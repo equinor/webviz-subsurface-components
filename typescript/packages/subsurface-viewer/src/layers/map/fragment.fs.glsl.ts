@@ -35,8 +35,9 @@ uniform bool smoothShading;
 
 
 void main(void) { 
-   // XXX
-   // fragColor = vec4(02., 0.3, 1.0, 0.1); /// XXX NB NB NB NB NBN BN BN BN BNB 
+   // // XXX
+   //fragColor = vec4(1.0, 0.3, 1.0, 0.1); /// XXX NB NB NB NB NBN BN BN BN BNB 
+   // fragColor = vec4(smoothShading ? 1.0 : 0.0, smoothShading ? 0.0 : 1.0, 0.0, 0.1);
    // return;
 
    geometry.uv = vTexCoord;

@@ -107,7 +107,7 @@ const smallLayer = {
         rotDeg: 0,
     },
     propertiesUrl: "small_properties.float32",
-    gridLines: true, // XXX
+    gridLines: true,
     material: false,
     // black to white colors.
     colorMapFunction: (value: number) => [
@@ -134,7 +134,7 @@ const nodeCenteredPropertiesLayer = {
     },
     propertiesUrl:
         "data:text/plain;base64,ZmYmQM3MLEAzMzNAmpk5QM3MDEAzMxNAmpkZQAAAIEBmZuY/MzPzPwAAAEBmZgZAMzOzPwAAwD/NzMw/mpnZPwAAgD/NzIw/mpmZP2Zmpj8=",
-    gridLines: true, // XXX
+    gridLines: true,
     material: true,
     // black to white colors.
     colorMapFunction: (value: number) => [
@@ -193,7 +193,7 @@ const cellCenteredPropertiesLayer = {
         rotDeg: 0,
     },
 
-    gridLines: true, //XXX
+    gridLines: true,
     material: true,
     // black to white colors.
     colorMapFunction: (value: number) => [
@@ -929,7 +929,7 @@ TypedArrayInput.args = {
             },
             meshData,
             propertiesData,
-            gridLines: false, // XXX
+            gridLines: false,
             material: true,
             ZIncreasingDownwards: false,
             contours: [0, 5],

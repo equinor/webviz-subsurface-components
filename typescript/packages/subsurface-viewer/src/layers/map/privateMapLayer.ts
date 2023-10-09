@@ -148,18 +148,24 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
     //eslint-disable-next-line
     _getModels(gl: any) {
         // MESH MODEL
+        let attributes = {
+            positions: { value: this.props.positions, size: 3 },
+            properties: { value: this.props.vertexProperties, size: 1 },
+            vertex_indexs: { value: this.props.vertexIndices, size: 1 },
+        };
+        if (this.props.normals.length > 0) {
+            attributes = {...attributes,
+                normals: { value: this.props.normals, size: 3 },
+            };
+        }
+
         const mesh_model = new Model(gl, {
             id: `${this.props.id}-mesh`,
             vs: vsShader,
             fs: fsShader,
             geometry: new Geometry({
                 drawMode: 4, // triangles
-                attributes: {
-                    positions: { value: this.props.positions, size: 3 },
-                    normals: { value: this.props.normals, size: 3 },
-                    properties: { value: this.props.vertexProperties, size: 1 },
-                    vertex_indexs: { value: this.props.vertexIndices, size: 1 },
-                },
+                attributes,
                 indices: { value: this.props.triangleIndices, size: 1 },
             }),
             modules: [project, picking, localPhongLighting],
@@ -227,7 +233,8 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
         const isColorMapClampColorTransparent: boolean =
             (this.props.colorMapClampColor as boolean) === false;
 
-        const smoothShading = this.props.smoothShading;
+        const smoothShading =
+            this.props.normals.length == 0 ? false : this.props.smoothShading;
 
         gl.enable(GL.POLYGON_OFFSET_FILL);
         if (!this.props.depthTest) {
