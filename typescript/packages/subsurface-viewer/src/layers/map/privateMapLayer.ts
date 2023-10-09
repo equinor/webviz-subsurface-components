@@ -148,24 +148,21 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
     //eslint-disable-next-line
     _getModels(gl: any) {
         // MESH MODEL
-        let attributes = {
-            positions: { value: this.props.positions, size: 3 },
-            properties: { value: this.props.vertexProperties, size: 1 },
-            vertex_indexs: { value: this.props.vertexIndices, size: 1 },
-        };
-        if (this.props.normals.length > 0) {
-            attributes = {...attributes,
-                normals: { value: this.props.normals, size: 3 },
-            };
-        }
-
         const mesh_model = new Model(gl, {
             id: `${this.props.id}-mesh`,
             vs: vsShader,
             fs: fsShader,
             geometry: new Geometry({
                 drawMode: 4, // triangles
-                attributes,
+                attributes: {
+                    positions: { value: this.props.positions, size: 3 },
+                    // Only add normals if they are defined.
+                    ...(this.props.normals.length > 0 && {
+                        normals: { value: this.props.normals, size: 3 },
+                    }),
+                    properties: { value: this.props.vertexProperties, size: 1 },
+                    vertex_indexs: { value: this.props.vertexIndices, size: 1 },
+                },
                 indices: { value: this.props.triangleIndices, size: 1 },
             }),
             modules: [project, picking, localPhongLighting],

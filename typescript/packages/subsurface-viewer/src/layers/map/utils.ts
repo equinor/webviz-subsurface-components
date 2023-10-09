@@ -2,12 +2,11 @@ import type { Params } from "./mapLayer";
 
 type Vec = [number, number, number];
 
-
 function getFloat32ArrayMinMax(data: Float32Array) {
     let max = -99999999;
     let min = 99999999;
     for (let i = 0; i < data.length; i++) {
-        max = data[i] > max ? data[i] : max
+        max = data[i] > max ? data[i] : max;
         min = data[i] < min ? data[i] : min;
     }
     return [min, max];
@@ -316,7 +315,6 @@ export function makeFullMesh(params: Params) {
     } else {
         // PROPERTIES IS SET CONSTANT OVER A CELL.
 
-        console.log("PROPERTIES IS SET CONSTANT OVER A CELL.");
         // Loop cells.
         let i = 0;
         let j = 0;

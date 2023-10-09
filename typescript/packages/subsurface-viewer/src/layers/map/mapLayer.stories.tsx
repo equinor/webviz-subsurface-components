@@ -896,7 +896,6 @@ function makeData(n: number, amplitude: number): Float32Array {
         const y = Math.floor(index / n) - n / 2;
         return f(x, y); // keep + 0.3 * Math.random();
     });
-    console.log("data length", data.length)
 
     const t1 = performance.now();
     console.log(`makeData took ${(t1 - t0) * 0.001}  seconds.`);
@@ -909,13 +908,11 @@ const n = 300;
 const meshData = makeData(n, 99);
 const propertiesData = makeData(n, 1);
 
-
 export const TypedArrayInput: ComponentStory<typeof SubsurfaceViewer> = (
     args
 ) => {
     return <SubsurfaceViewer {...args} />;
 };
-
 
 TypedArrayInput.args = {
     id: "map",
