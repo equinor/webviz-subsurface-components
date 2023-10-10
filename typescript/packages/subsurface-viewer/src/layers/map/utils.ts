@@ -513,8 +513,6 @@ export function makeFullMesh(params: Params) {
     // Keep this.
     console.debug(`Task makeMesh took ${(t1 - t0) * 0.001}  seconds.`);
 
-    //console.log("my postions ", vertexIndices)
-
     return [
         positions,
         normals,
