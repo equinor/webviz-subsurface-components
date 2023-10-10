@@ -14,14 +14,14 @@ import type {
     ExtendedLayerProps,
     colorMapFunctionType,
 } from "../utils/layerTools";
+
+import { getImageData } from "../utils/layerTools";
+
 import vsShader from "./vertex.glsl";
 import fsShader from "./fragment.fs.glsl";
 import vsLineShader from "./vertex_lines.glsl";
 import fsLineShader from "./fragment_lines.glsl";
 
-import type { colorTablesArray } from "@emerson-eps/color-tables/";
-import { rgbValues } from "@emerson-eps/color-tables/";
-import { createDefaultContinuousColorScale } from "@emerson-eps/color-tables/dist/component/Utils/legendCommonFunction";
 import { Texture2D } from "@luma.gl/webgl";
 import GL from "@luma.gl/constants";
 
@@ -40,45 +40,6 @@ export type Material =
           specularColor: [number, number, number];
       }
     | boolean;
-
-function getImageData(
-    colorMapName: string,
-    colorTables: colorTablesArray,
-    colorMapFunction: colorMapFunctionType | undefined
-) {
-    type funcType = (x: number) => Color;
-
-    const isColorMapFunctionDefined = typeof colorMapFunction !== "undefined";
-    const isColorMapNameDefined = !!colorMapName;
-
-    const defaultColorMap = createDefaultContinuousColorScale;
-    let colorMap = defaultColorMap() as unknown as funcType;
-
-    if (isColorMapFunctionDefined) {
-        colorMap =
-            typeof colorMapFunction === "function"
-                ? (colorMapFunction as funcType)
-                : ((() => colorMapFunction) as unknown as funcType);
-    } else if (isColorMapNameDefined) {
-        colorMap = (value: number) =>
-            rgbValues(value, colorMapName, colorTables);
-    }
-
-    const data = new Uint8Array(256 * 3);
-
-    for (let i = 0; i < 256; i++) {
-        const value = i / 255.0;
-        const color = colorMap ? colorMap(value) : [0, 0, 0];
-        if (color) {
-            data[3 * i + 0] = color[0];
-            data[3 * i + 1] = color[1];
-            data[3 * i + 2] = color[2];
-        }
-    }
-
-    return data ? data : [0, 0, 0];
-}
-
 export interface privateMapLayerProps extends ExtendedLayerProps {
     positions: Float32Array;
     normals: Int8Array;

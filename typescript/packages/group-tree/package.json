@@ -2,10 +2,15 @@
     "name": "@webviz/group-tree",
     "version": "1.0.0",
     "description": "",
-    "main": "src/index.js",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "files": [
+        "dist"
+    ],
     "scripts": {
         "transpile": "tsc --project ./tsconfig.json",
-        "build": "git clean -xdff dist && npm run transpile",
+        "copy-files": "copyfiles --up 1 \"src/**/*.css\" dist/",
+        "build": "git clean -xdff dist && npm run transpile && npm run copy-files",
         "test_perf": "jest _performance",
         "test_correctness": "jest --coverage --testPathIgnorePatterns='_performance'",
         "test": "jest --coverage",

@@ -14,8 +14,8 @@ const GroupTree = (props: GroupTreeProps) => {
         <GroupTreeComponent
             id={props.id}
             data={props.data}
-            edge_options={props.edge_options}
-            node_options={props.node_options}
+            edgeOptions={props.edgeOptions}
+            nodeOptions={props.nodeOptions}
         />
     );
 };
@@ -32,8 +32,9 @@ GroupTree.propTypes = {
      */
     data: PropTypes.arrayOf(PropTypes.object),
 
-    edge_options: PropTypes.arrayOf(PropTypes.object),
-    node_options: PropTypes.arrayOf(PropTypes.object),
+    edgeOptions: PropTypes.arrayOf(PropTypes.object),
+    nodeOptions: PropTypes.arrayOf(PropTypes.object),
 };
 
+export type { GroupTreeProps };
 export default GroupTree;

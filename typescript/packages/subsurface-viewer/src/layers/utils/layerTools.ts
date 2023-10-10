@@ -1,5 +1,9 @@
 import type { PickingInfo } from "@deck.gl/core/typed";
 import type { Color } from "@deck.gl/core/typed";
+import type { colorTablesArray } from "@emerson-eps/color-tables/";
+import { rgbValues } from "@emerson-eps/color-tables/";
+import { createDefaultContinuousColorScale } from "@emerson-eps/color-tables/dist/component/Utils/legendCommonFunction";
+
 import type {
     Layer,
     LayersList,
@@ -179,4 +183,51 @@ export function defineBoundingBox(
         maxZ = z > maxZ ? z : maxZ;
     }
     return [minX, minY, minZ, maxX, maxY, maxZ];
+}
+
+/**
+ * Creates an array of 256 colors as RGB triplets in range [0, 1] using the color map or color map function.
+ * ColorMapFunction has priority.
+ * @param colorMapName Name of the color map in color tables.
+ * @param colorTables Color tables.
+ * @param colorMapFunction Either a function which returns a color
+ * or an array representing a constant color.
+ * @returns Array of 256 colors.
+ */
+export function getImageData(
+    colorMapName: string,
+    colorTables: colorTablesArray,
+    colorMapFunction: colorMapFunctionType | undefined
+) {
+    type funcType = (x: number) => Color;
+
+    const isColorMapFunctionDefined = typeof colorMapFunction !== "undefined";
+    const isColorMapNameDefined = !!colorMapName;
+
+    const defaultColorMap = createDefaultContinuousColorScale;
+    let colorMap = defaultColorMap() as unknown as funcType;
+
+    if (isColorMapFunctionDefined) {
+        colorMap =
+            typeof colorMapFunction === "function"
+                ? (colorMapFunction as funcType)
+                : ((() => colorMapFunction) as unknown as funcType);
+    } else if (isColorMapNameDefined) {
+        colorMap = (value: number) =>
+            rgbValues(value, colorMapName, colorTables);
+    }
+
+    const data = new Uint8Array(256 * 3);
+
+    for (let i = 0; i < 256; i++) {
+        const value = i / 255.0;
+        const color = colorMap ? colorMap(value) : [0, 0, 0];
+        if (color) {
+            data[3 * i + 0] = color[0];
+            data[3 * i + 1] = color[1];
+            data[3 * i + 2] = color[2];
+        }
+    }
+
+    return data ? data : [0, 0, 0];
 }
