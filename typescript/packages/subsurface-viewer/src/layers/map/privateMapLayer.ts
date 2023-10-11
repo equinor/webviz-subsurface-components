@@ -114,7 +114,7 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
             vs: vsShader,
             fs: fsShader,
             geometry: new Geometry({
-                drawMode: 4, // triangles
+                drawMode: gl.TRIANGLES,
                 attributes: {
                     positions: { value: this.props.positions, size: 3 },
                     // Only add normals if they are defined.
@@ -136,7 +136,7 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
             vs: vsLineShader,
             fs: fsLineShader,
             geometry: new Geometry({
-                drawMode: 1, // lines
+                drawMode: gl.LINES,
                 attributes: {
                     positions: { value: this.props.positions, size: 3 },
                 },

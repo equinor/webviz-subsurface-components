@@ -63,7 +63,7 @@ async function load_mesh_and_properties(
     propertiesData: string | number[] | Float32Array
 ) {
     // Keep
-    const t0 = performance.now();
+    //const t0 = performance.now();
 
     const isMesh = typeof meshData !== "undefined";
     const isProperties = typeof propertiesData !== "undefined";
@@ -171,8 +171,8 @@ async function load_mesh_and_properties(
     }
 
     // Keep this.
-    const t1 = performance.now();
-    console.debug(`Task loading took ${(t1 - t0) * 0.001}  seconds.`);
+    // const t1 = performance.now();
+    // console.debug(`Task loading took ${(t1 - t0) * 0.001}  seconds.`);
 
     return Promise.all([isMesh, mesh, properties]);
 }

@@ -67,7 +67,7 @@ function calcNormal(
     const i3_act = (w + 1) < nx && isDefined(meshData[i3]); // eslint-disable-line
     const i4_act = (h - 1) >= 0 && isDefined(meshData[i4]); // eslint-disable-line
 
-    const noNormal = [0, 0, 1]; // signals a normal could not be calculated.
+    const noNormal = [0, 0, 0]; // signals a normal could not be calculated.
     if (!i0_act) {
         return noNormal;
     }
@@ -132,7 +132,7 @@ function calcNormal(
 
 export function makeFullMesh(params: Params) {
     // Keep
-    const t0 = performance.now();
+    //const t0 = performance.now();
 
     const meshData = params.meshData;
     const propertiesData = params.propertiesData;
@@ -509,9 +509,9 @@ export function makeFullMesh(params: Params) {
         }
     }
 
-    const t1 = performance.now();
     // Keep this.
-    console.debug(`Task makeMesh took ${(t1 - t0) * 0.001}  seconds.`);
+    // const t1 = performance.now();
+    // console.debug(`Task makeMesh took ${(t1 - t0) * 0.001}  seconds.`);
 
     return [
         positions,

@@ -884,7 +884,6 @@ function makeGaussian(amplitude, x0, y0, stdX, stdY) {
 }
 
 function makeData(n: number, amplitude: number): Float32Array {
-    const t0 = performance.now();
     const X0 = 0;
     const Y0 = 0;
     const stdX = 75;
@@ -897,55 +896,76 @@ function makeData(n: number, amplitude: number): Float32Array {
         return f(x, y); // keep + 0.3 * Math.random();
     });
 
-    const t1 = performance.now();
-    console.log(`makeData took ${(t1 - t0) * 0.001}  seconds.`);
     return data;
 }
 
-//-- NodeCenteredPropMap  with native javascript arrays as input --
-// Mesh will be n x n nodes.
-const n = 300;
-const meshData = makeData(n, 99);
-const propertiesData = makeData(n, 1);
+//-- MapLayer with native javascript arrays as input --
+const TypedArrayInputStory: ComponentStory<typeof SubsurfaceViewer> = (args: {
+    dimension: number;
+}) => {
+    const subsurfaceViewerArgs = {
+        id: "map",
+        layers: [
+            new MapLayer({
+                frame: {
+                    origin: [-args.dimension / 2, -args.dimension / 2],
+                    count: [args.dimension, args.dimension],
+                    increment: [1, 1],
+                    rotDeg: 0,
+                },
+                meshData: makeData(args.dimension, 99),
+                propertiesData: makeData(args.dimension, 1),
+                gridLines: false,
+                material: true,
+                ZIncreasingDownwards: false,
+                contours: [0, 5],
+                colorMapFunction: nearestColorMap as colorMapFunctionType,
+            }),
+            new AxesLayer({
+                ZIncreasingDownwards: false,
+                bounds: [
+                    -args.dimension / 2,
+                    -args.dimension / 2,
+                    -10,
+                    args.dimension / 2,
+                    args.dimension / 2,
+                    60,
+                ],
+            }),
+        ],
+        cameraPosition: {
+            rotationOrbit: 45,
+            rotationX: 45,
+            zoom: [-100, -100, -10, 100, 100, 60],
+            target: [0, 0, 0],
+        },
+        views: {
+            layout: [1, 1],
+            viewports: [
+                {
+                    id: "view_1",
+                    show3D: true,
+                },
+            ],
+        },
+    };
+    return <SubsurfaceViewer {...subsurfaceViewerArgs} />;
+};
 
 export const TypedArrayInput: ComponentStory<typeof SubsurfaceViewer> = (
     args
 ) => {
-    return <SubsurfaceViewer {...args} />;
+    return <TypedArrayInputStory {...args} />;
 };
 
 TypedArrayInput.args = {
-    id: "map",
-    layers: [
-        new MapLayer({
-            frame: {
-                origin: [-n / 2, -n / 2],
-                count: [n, n],
-                increment: [1, 1],
-                rotDeg: 0,
-            },
-            meshData,
-            propertiesData,
-            gridLines: false,
-            material: true,
-            ZIncreasingDownwards: false,
-            contours: [0, 5],
-            colorMapFunction: nearestColorMap as colorMapFunctionType,
-        }),
-        new AxesLayer({
-            ZIncreasingDownwards: false,
-            bounds: [-n / 2, -n / 2, -10, n / 2, n / 2, 60],
-        }),
-    ],
-    bounds: [-n / 2, -n / 2, n / 2, n / 2] as NumberQuad,
-    views: {
-        layout: [1, 1],
-        viewports: [
-            {
-                id: "view_1",
-                show3D: true,
-            },
-        ],
+    dimension: 300,
+};
+
+TypedArrayInput.argTypes = {
+    dimension: {
+        options: 300,
+        control: { type: "range", min: 150, max: 300, step: 1 },
     },
 };
 

@@ -43,7 +43,7 @@ void main(void) {
    normal[1] /= 127.0;
    normal[2] /= 127.0;
 
-   if (!smoothShading) {
+   if (!smoothShading || (normal[0] == 0.0 && normal[1] == 0.0 && normal[2] == 0.0)) {
       normal = normalize(cross(dFdx(position_commonspace.xyz), dFdy(position_commonspace.xyz)));
    }
 
