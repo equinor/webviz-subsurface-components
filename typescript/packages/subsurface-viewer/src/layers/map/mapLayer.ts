@@ -58,7 +58,12 @@ export type Params = {
     ZIncreasingDownwards: boolean;
 };
 
-async function load_mesh_and_properties(
+/**
+ * Will load data for the mesh and the properties. Both of which may be given as arrays (javascript or typed)
+ * or as a URL to the data in binary format.
+ * Return value: A promise with the data given as typed arrays.
+ */
+async function loadMeshAndProperties(
     meshData: string | number[] | Float32Array,
     propertiesData: string | number[] | Float32Array
 ) {
@@ -322,7 +327,7 @@ export default class MapLayer extends CompositeLayer<MapLayerProps> {
         const propertiesData =
             this.props.propertiesData ?? this.props.propertiesUrl;
 
-        const p = load_mesh_and_properties(meshData, propertiesData);
+        const p = loadMeshAndProperties(meshData, propertiesData);
 
         p.then(([isMesh, meshData, propertiesData]) => {
             const params: Params = {

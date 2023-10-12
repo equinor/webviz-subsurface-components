@@ -130,6 +130,9 @@ function calcNormal(
     return mean;
 }
 
+/** Given the input data will build and return the attributes (vertices and indices for triangles and lines)
+ * that is used by WebGl. Using indice, lines and triangles share common vertices to save memory.
+*/
 export function makeFullMesh(params: Params) {
     // Keep
     //const t0 = performance.now();
