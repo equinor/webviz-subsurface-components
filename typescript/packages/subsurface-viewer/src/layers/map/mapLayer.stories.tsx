@@ -5,7 +5,7 @@ import type { ViewsType } from "../../components/Map";
 import { useHoverInfo } from "../../components/Map";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import InfoCard from "../../components/InfoCard";
-import type { ComponentStory, ComponentMeta } from "@storybook/react";
+import type { ComponentStory, ComponentMeta, StoryFn } from "@storybook/react";
 import { Slider } from "@mui/material";
 import {
     ContinuousLegend,
@@ -900,7 +900,7 @@ function makeData(n: number, amplitude: number): Float32Array {
 }
 
 //-- MapLayer with native javascript arrays as input --
-const TypedArrayInputStory: ComponentStory<typeof SubsurfaceViewer> = (args: {
+const TypedArrayInputStory: StoryFn<typeof SubsurfaceViewer> = (args: {
     dimension: number;
 }) => {
     const subsurfaceViewerArgs = {
@@ -952,9 +952,7 @@ const TypedArrayInputStory: ComponentStory<typeof SubsurfaceViewer> = (args: {
     return <SubsurfaceViewer {...subsurfaceViewerArgs} />;
 };
 
-export const TypedArrayInput: ComponentStory<typeof SubsurfaceViewer> = (
-    args
-) => {
+export const TypedArrayInput: StoryFn<typeof SubsurfaceViewer> = (args) => {
     return <TypedArrayInputStory {...args} />;
 };
 
