@@ -177,12 +177,14 @@ export function CatmullRom(
  * in smoother curves with more points.
  * Assumes 3D data.
  */
-export function splineRefine(data_in: FeatureCollection): FeatureCollection {
+export function splineRefine(
+    data_in: FeatureCollection,
+    noSteps = 5
+): FeatureCollection {
     const data = cloneDeep(data_in);
 
     const no_wells = data.features.length;
 
-    const noSteps = 5;
     const step = 1 / noSteps;
 
     const steps = range(step, 1, step);

@@ -90,7 +90,7 @@ export interface WellsLayerProps extends ExtendedLayerProps {
     logrunName: string;
     logRadius: number;
     logCurves: boolean;
-    refine: boolean;
+    refine: boolean | number;
     wellHeadStyle: WellHeadStyleAccessor;
     colorMappingFunction: (x: number) => [number, number, number];
     lineStyle: LineStyleAccessor;
@@ -251,12 +251,18 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
             removeDuplicates(data);
 
-            const refine = this.props.refine;
-            data = refine
-                ? splineRefine(data) // smooth well paths.
-                : data;
-
             const coarseData = coarsenWells(data);
+
+            const doRefine =
+                typeof this.props.refine === "number"
+                    ? (this.props.refine as number) > 1
+                    : (this.props.refine as boolean);
+
+            const noRefineSteps =
+                typeof this.props.refine === "number" ? this.props.refine : 5;
+            data = doRefine
+                ? splineRefine(data, noRefineSteps) // smooth well paths.
+                : data;
 
             this.setState({
                 ...this.state,
