@@ -962,7 +962,6 @@ TypedArrayInput.args = {
 
 TypedArrayInput.argTypes = {
     dimension: {
-        options: 300,
         control: { type: "range", min: 150, max: 300, step: 1 },
     },
 };
