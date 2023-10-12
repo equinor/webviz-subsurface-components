@@ -258,10 +258,10 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                     ? (this.props.refine as number) > 1
                     : (this.props.refine as boolean);
 
-            const noRefineSteps =
+            const stepCount =
                 typeof this.props.refine === "number" ? this.props.refine : 5;
             data = doRefine
-                ? splineRefine(data, noRefineSteps) // smooth well paths.
+                ? splineRefine(data, stepCount) // smooth well paths.
                 : data;
 
             this.setState({
