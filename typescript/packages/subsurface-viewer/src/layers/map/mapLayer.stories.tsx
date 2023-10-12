@@ -5,17 +5,19 @@ import type { ViewsType } from "../../components/Map";
 import { useHoverInfo } from "../../components/Map";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import InfoCard from "../../components/InfoCard";
-import type { ComponentStory, ComponentMeta } from "@storybook/react";
+import type { ComponentStory, ComponentMeta, StoryFn } from "@storybook/react";
 import { Slider } from "@mui/material";
 import {
     ContinuousLegend,
     ColorLegend,
     createColorMapFunction,
 } from "@emerson-eps/color-tables";
-import MapLayer from "./mapLayer";
 import Axes2DLayer from "../axes2d/axes2DLayer";
+import AxesLayer from "../axes/axesLayer";
+import MapLayer from "./mapLayer";
 import { ViewFooter } from "../../components/ViewFooter";
 import { View } from "@deck.gl/core/typed";
+import type { colorMapFunctionType } from "../utils/layerTools";
 
 const PREFIX = "MapLayer3dPng";
 
@@ -179,7 +181,7 @@ const cellCenteredPropertiesLayer = {
 
     // One property pr cell.
     propertiesData: [0.9,  1.0,  1.1, 
-                     0.6,  0.7,  0.8,
+                     0.6,  undefined,  0.8,
                      0.3,  0.4,  0.5, 
                      0.0,  0.1,  0.2],
     /*eslint-enable */
@@ -867,6 +869,108 @@ NodeCenteredPropMapWithArrayInput.parameters = {
         ...defaultParameters.docs,
         description: {
             story: "Both mesh and property data given as native javascript arrays (as opposed to URL).",
+        },
+    },
+};
+
+function makeGaussian(amplitude, x0, y0, stdX, stdY) {
+    return function (amplitude, x0, y0, stdX, stdY, x, y) {
+        const exponent = -(
+            Math.pow(x - x0, 2) / (2 * Math.pow(stdX, 2)) +
+            Math.pow(y - y0, 2) / (2 * Math.pow(stdY, 2))
+        );
+        return amplitude * Math.pow(Math.E, exponent);
+    }.bind(null, amplitude, x0, y0, stdX, stdY);
+}
+
+function makeData(n: number, amplitude: number): Float32Array {
+    const X0 = 0;
+    const Y0 = 0;
+    const stdX = 75;
+    const stdY = 50;
+    const f = makeGaussian(amplitude, X0, Y0, stdX, stdY);
+
+    const data = new Float32Array(n * n).map((val, index) => {
+        const x = (index % n) - n / 2;
+        const y = Math.floor(index / n) - n / 2;
+        return f(x, y); // keep + 0.3 * Math.random();
+    });
+
+    return data;
+}
+
+//-- MapLayer with native javascript arrays as input --
+const TypedArrayInputStory: StoryFn<typeof SubsurfaceViewer> = (args: {
+    dimension: number;
+}) => {
+    const subsurfaceViewerArgs = {
+        id: "map",
+        layers: [
+            new MapLayer({
+                frame: {
+                    origin: [-args.dimension / 2, -args.dimension / 2],
+                    count: [args.dimension, args.dimension],
+                    increment: [1, 1],
+                    rotDeg: 0,
+                },
+                meshData: makeData(args.dimension, 99),
+                propertiesData: makeData(args.dimension, 1),
+                gridLines: false,
+                material: true,
+                ZIncreasingDownwards: false,
+                contours: [0, 5],
+                colorMapFunction: nearestColorMap as colorMapFunctionType,
+            }),
+            new AxesLayer({
+                ZIncreasingDownwards: false,
+                bounds: [
+                    -args.dimension / 2,
+                    -args.dimension / 2,
+                    -10,
+                    args.dimension / 2,
+                    args.dimension / 2,
+                    60,
+                ],
+            }),
+        ],
+        cameraPosition: {
+            rotationOrbit: 45,
+            rotationX: 45,
+            zoom: [-100, -100, -10, 100, 100, 60],
+            target: [0, 0, 0],
+        },
+        views: {
+            layout: [1, 1],
+            viewports: [
+                {
+                    id: "view_1",
+                    show3D: true,
+                },
+            ],
+        },
+    };
+    return <SubsurfaceViewer {...subsurfaceViewerArgs} />;
+};
+
+export const TypedArrayInput: StoryFn<typeof SubsurfaceViewer> = (args) => {
+    return <TypedArrayInputStory {...args} />;
+};
+
+TypedArrayInput.args = {
+    dimension: 300,
+};
+
+TypedArrayInput.argTypes = {
+    dimension: {
+        control: { type: "range", min: 150, max: 300, step: 1 },
+    },
+};
+
+TypedArrayInput.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: "Both mesh and property data given as typed arrays arrays (as opposed to URL).",
         },
     },
 };

@@ -34,21 +34,19 @@ uniform bool isColorMapClampColorTransparent;
 uniform bool smoothShading;
 
 
-void main(void) {
+void main(void) { 
    geometry.uv = vTexCoord;
 
    vec3 normal = normals_commonspace;
+   // These are sent as Int8
+   normal[0] /= 127.0;
+   normal[1] /= 127.0;
+   normal[2] /= 127.0;
 
-   if (!smoothShading) {
+   if (!smoothShading || (normal[0] == 0.0 && normal[1] == 0.0 && normal[2] == 0.0)) {
       normal = normalize(cross(dFdx(position_commonspace.xyz), dFdy(position_commonspace.xyz)));
-   } 
+   }
 
-   // // Discard transparent pixels. KEEP
-   // if (!picking_uActive && isnan(propertyValue)) {
-   //    discard;
-   //    return;
-   // }
-   
    //Picking pass.
    if (picking_uActive) {
       // Express triangle index in 255 system.
