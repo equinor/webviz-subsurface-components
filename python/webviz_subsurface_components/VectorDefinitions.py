@@ -1,6 +1,5 @@
 import json
 import pathlib
-import sys
 from typing import Dict, TypedDict
 
 

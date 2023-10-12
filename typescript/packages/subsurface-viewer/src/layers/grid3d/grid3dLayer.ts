@@ -105,8 +105,10 @@ export interface Grid3DLayerProps extends ExtendedLayerProps {
      * If defined this function will override the color map.
      * Takes a value in the range [0,1] and returns a color.
      * E.g. (x) => [x * 255, x * 255, x * 255]
+     * May also be set as constant color:
+     * E.g. [255, 0, 0] for constant red cells.
      */
-    colorMapFunction?: colorMapFunctionType | false;
+    colorMapFunction?: colorMapFunctionType;
 
     /** Enable lines around cell faces.
      *  default: true.

@@ -15,7 +15,7 @@ const StyledViewFooter = styled("div")(({ theme }) => ({
     display: "tableRow",
 }));
 
-interface ViewFooterProps {
+export interface ViewFooterProps {
     children?: React.ReactNode;
 }
 

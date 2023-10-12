@@ -1,3 +1,31 @@
+## [0.3.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.3.0...subsurface-viewer@0.3.1) (2023-10-12)
+
+
+### Performance Improvements
+
+* Performance improvements to makeFullMesh function in MapLayer  [#1662](https://github.com/equinor/webviz-subsurface-components/issues/1662) ([#1689](https://github.com/equinor/webviz-subsurface-components/issues/1689)) ([f7a79cd](https://github.com/equinor/webviz-subsurface-components/commit/f7a79cdeb4d457106abacb88de2918190e7aba80))
+
+# [0.3.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.2.3...subsurface-viewer@0.3.0) (2023-10-05)
+
+
+### Features
+
+* **grid3d:** constant color for coloring Grid3dLayer ([#1688](https://github.com/equinor/webviz-subsurface-components/issues/1688)) ([718e8a0](https://github.com/equinor/webviz-subsurface-components/commit/718e8a06204fc51c66677415a5bf31ef93860be7))
+
+## [0.2.3](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.2.2...subsurface-viewer@0.2.3) (2023-10-04)
+
+
+### Bug Fixes
+
+* "IsRenderedCallack" shold return true for layers which has visible attribute set to false. ([#1682](https://github.com/equinor/webviz-subsurface-components/issues/1682)) ([816dc37](https://github.com/equinor/webviz-subsurface-components/commit/816dc377d31cc4c8b422124f9e9cb921669afd28))
+
+## [0.2.2](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.2.1...subsurface-viewer@0.2.2) (2023-09-29)
+
+
+### Bug Fixes
+
+* Remove duplicate vertices from well path. May cause crash ([#1667](https://github.com/equinor/webviz-subsurface-components/issues/1667)) ([5d0e858](https://github.com/equinor/webviz-subsurface-components/commit/5d0e858dec0977322e4c90be1d9a5a8dbef71fd9))
+
 ## [0.2.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.2.0...subsurface-viewer@0.2.1) (2023-09-27)
 
 

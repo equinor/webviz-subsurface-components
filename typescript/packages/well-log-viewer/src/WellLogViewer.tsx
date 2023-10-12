@@ -60,7 +60,10 @@ interface State {
     sliderValue: number; // value for zoom slider
 }
 
-class WellLogViewer extends Component<WellLogViewerProps, State> {
+export default class WellLogViewer extends Component<
+    WellLogViewerProps,
+    State
+> {
     public static propTypes: Record<string, unknown>;
 
     controller: WellLogController | null;
@@ -435,5 +438,3 @@ WellLogViewer.propTypes = {
      */
     readoutOptions: InfoOptions_propTypes /*PropTypes.object,*/,
 };
-
-export default WellLogViewer;
