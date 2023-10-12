@@ -179,13 +179,17 @@ export function CatmullRom(
  */
 export function splineRefine(
     data_in: FeatureCollection,
-    noSteps = 5
+    stepCount = 5
 ): FeatureCollection {
+    if (stepCount < 1) {
+        return data_in;
+    }
+
     const data = cloneDeep(data_in);
 
     const no_wells = data.features.length;
 
-    const step = 1 / noSteps;
+    const step = 1 / stepCount;
 
     const steps = range(step, 1, step);
 
