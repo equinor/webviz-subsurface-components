@@ -1,3 +1,10 @@
+## [0.3.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.3.0...subsurface-viewer@0.3.1) (2023-10-12)
+
+
+### Performance Improvements
+
+* Performance improvements to makeFullMesh function in MapLayer  [#1662](https://github.com/equinor/webviz-subsurface-components/issues/1662) ([#1689](https://github.com/equinor/webviz-subsurface-components/issues/1689)) ([f7a79cd](https://github.com/equinor/webviz-subsurface-components/commit/f7a79cdeb4d457106abacb88de2918190e7aba80))
+
 # [0.3.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.2.3...subsurface-viewer@0.3.0) (2023-10-05)
 
 
