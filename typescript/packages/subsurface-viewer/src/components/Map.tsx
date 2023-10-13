@@ -606,7 +606,7 @@ const Map: React.FC<MapProps> = ({
 
     const [deckGLLayers, setDeckGLLayers] = useState<LayersList>([]);
 
-    const [didUserChangeCamera, setDidUserChangeCamera] =
+    const [viewStateChanged, setViewStateChanged] =
         useState<boolean>(false);
 
     const [viewPortMargins, setViewPortMargins] = useState<marginsType>({
@@ -654,7 +654,7 @@ const Map: React.FC<MapProps> = ({
     }, [triggerHome]);
 
     useEffect(() => {
-        if (didUserChangeCamera && !isCameraPositionDefined) {
+        if (viewStateChanged && !isCameraPositionDefined) {
             return;
         }
         const [Views, viewStates] = createViewsAndViewStates(
@@ -668,7 +668,7 @@ const Map: React.FC<MapProps> = ({
 
         setDeckGLViews(Views);
         setViewStates(viewStates);
-        setDidUserChangeCamera(false);
+        setViewStateChanged(false);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         bounds,
@@ -1017,7 +1017,7 @@ const Map: React.FC<MapProps> = ({
             if (getCameraPosition) {
                 getCameraPosition(viewState);
             }
-            setDidUserChangeCamera(true);
+            setViewStateChanged(true);
         },
         [getCameraPosition, viewStates, views?.viewports]
     );
