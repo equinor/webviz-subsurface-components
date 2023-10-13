@@ -1,6 +1,6 @@
 {
     "name": "@webviz/subsurface-viewer",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "description": "",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -35,7 +35,7 @@
         "d3": "^7.8.2",
         "d3-color": "^3.1.0",
         "d3-format": "^1.4.5",
-        "deck.gl": "^8.9.19",
+        "deck.gl": "^8.9.31",
         "gl-matrix": "^3.4.3",
         "lodash": "^4.17.21",
         "mathjs": "^9.4.2",

@@ -1,3 +1,10 @@
+## [0.3.2](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.3.1...subsurface-viewer@0.3.2) (2023-10-13)
+
+
+### Bug Fixes
+
+* View resets to default when adding/removing a layer. [#1690](https://github.com/equinor/webviz-subsurface-components/issues/1690) ([#1691](https://github.com/equinor/webviz-subsurface-components/issues/1691)) ([5ec5d90](https://github.com/equinor/webviz-subsurface-components/commit/5ec5d904c9fe97df4c87ed9fe51bdd30a16a271a))
+
 ## [0.3.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.3.0...subsurface-viewer@0.3.1) (2023-10-12)
 
 
