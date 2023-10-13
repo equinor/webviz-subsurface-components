@@ -1,4 +1,4 @@
-export function generateSynteticWell() {
+export function generateSyntheticWell() {
     const well = {
         type: "FeatureCollection",
         features: [

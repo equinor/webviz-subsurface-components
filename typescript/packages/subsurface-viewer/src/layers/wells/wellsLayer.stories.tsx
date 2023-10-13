@@ -13,7 +13,7 @@ import {
 import type { MapMouseEvent } from "../../components/Map";
 import WellsLayer from "./wellsLayer";
 import AxesLayer from "../axes/axesLayer";
-import { generateSynteticWell } from "./utils/generateSynteticWell";
+import { generateSynteticWell } from "./utils/generateSyntheticWell";
 
 const PREFIX = "VolveWells";
 

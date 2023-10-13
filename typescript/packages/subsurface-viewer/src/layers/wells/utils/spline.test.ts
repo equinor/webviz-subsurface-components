@@ -1,7 +1,7 @@
 import { removeConsecutiveDuplicates, splineRefine } from "./spline";
 import type { Position3D } from "../../utils/layerTools";
-import { volveWells } from "./volve_wells";
-import { generateSynteticWell } from "./generateSynteticWell";
+import { generateSyntheticWell } from "./generateSyntheticWell";
+import type { FeatureCollection } from "geojson";
 
 describe("remove duplicates", () => {
     const coords: Position3D[] = [
@@ -49,20 +49,20 @@ describe("remove duplicates", () => {
 
     // Test splineRefine functions
     it("should not refine if given invalid input", () => {
-        const well = generateSynteticWell();
+        const well = generateSyntheticWell() as unknown as FeatureCollection;
         expect(
-            splineRefine(well, 0).features[0].geometry.geometries[1].coordinates.length
+            splineRefine(well, 0).features[0].geometry.geometries[1].coordinates.length // eslint-disable-line
         ).toStrictEqual(9);
     });
 
     it("should refine and output more vertices if given valid input", () => {
-        const well = generateSynteticWell();
+        const well = generateSyntheticWell();
         expect(
-            splineRefine(well).features[0].geometry.geometries[1].coordinates.length
+            splineRefine(well as unknown as FeatureCollection).features[0].geometry.geometries[1].coordinates.length // eslint-disable-line
         ).toStrictEqual(33);
 
         expect(
-            splineRefine(well, 10).features[0].geometry.geometries[1].coordinates.length
+            splineRefine(well as unknown as FeatureCollection, 10).features[0].geometry.geometries[1].coordinates.length // eslint-disable-line
         ).toStrictEqual(63);
     });
 });
