@@ -15,6 +15,7 @@ import {
     VertexCount as ToroidVertexCount,
 } from "./test_data/PentagonalToroid";
 
+
 export default {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer/Experimental Grid3D",
@@ -195,3 +196,80 @@ PolyhedralCells.args = {
     ],
 };
 PolyhedralCells.parameters = parameters;
+
+
+
+export const Reservoirs = Template.bind({});
+Reservoirs.args = {
+    bounds: [
+        -10193.5771484375,
+        -590.502197265625,
+        127.181640625,
+        6634.9404296875] as NumberQuad,
+    views: {
+        layout: [1, 1] as [number, number],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: true,
+            },
+        ],
+    },
+    id: "grid-3d-reservoir",
+    layers: [
+        {
+            "@@type": "AxesLayer",
+            id: "reservoir-axes",
+            bounds: [ -10193.5771484375,
+                -590.502197265625,
+                1105.5390625,
+                127.181640625,
+                6634.9404296875,
+                3056.038818359375],
+        },
+        {
+            ...grid3dLayer,
+            id: "resGrid",
+            pointsData: "resGrid/points.json",
+            polysData: "resGrid/polys.json",
+            propertiesData: [],
+        },
+    ],
+};
+Reservoirs.parameters = parameters;
+
+
+// // Intersection story.
+// const intersection_axes = {
+//     "@@type": "AxesLayer",
+//     id: "axes-layer2",
+//     bounds: [463256, 5930542.5, -9060, 464465, 5932768, -7999],
+// };
+
+// const intersection = {
+//     "@@type": "Grid3DLayer",
+//     id: "Grid3DLayer",
+//     pointsData: "vtk-grid/intersection_points.json",
+//     polysData: "vtk-grid/intersection_polys.json",
+//     propertiesData: "vtk-grid/intersection_scalar.json",
+//     material: true,
+//     colorMapName: "Rainbow",
+//     scaleZ: 5,
+// };
+
+// export const Intersection = Template.bind({});
+// Intersection.args = {
+//     ...defaultProps,
+//     id: "grid-3d",
+//     layers: [intersection_axes, intersection],
+// };
+
+// Intersection.parameters = {
+//     docs: {
+//         description: {
+//             story: "3D grid intersection geometry using vtk polydata format.",
+//         },
+//         inlineStories: false,
+//         iframeHeight: 500,
+//     },
+// };
