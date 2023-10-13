@@ -11,14 +11,14 @@ import { isEqual } from "lodash";
 import { load, JSONLoader } from "@loaders.gl/core";
 
 export type WebWorkerParams = {
-    points: number[];
-    polys: number[];
-    properties: number[];
+    points: Float32Array;
+    polys: Uint32Array;
+    properties: Float32Array;
     isZIncreasingDownwards: boolean;
 };
 
 function GetBBox(
-    points: number[],
+    points: Float32Array,
     isZIncreasingDownwards: boolean
 ): [number, number, number, number, number, number] {
     let xmax = -99999999;
@@ -44,25 +44,46 @@ function GetBBox(
     return [xmin, ymin, zmin * z_sign, xmax, ymax, zmax * z_sign];
 }
 
+async function loadFloat32Data (data: string | number[] | Float32Array) : Promise<Float32Array> {
+    if (data instanceof Float32Array) {
+        return data;
+    }
+    if (Array.isArray (data)) {
+        return new Float32Array(data);
+    }
+    if (typeof data === "string") {
+        const stringData = await load (data as string, JSONLoader);
+        return new Float32Array (stringData);
+    }
+    return Promise.reject("Grid3DLayer: Unsupported type of input data");
+}
+
+async function loadUint32Data (data: string | number[] | Uint32Array) : Promise<Uint32Array> {
+    if (data instanceof Uint32Array) {
+        return data;
+    }
+    if (Array.isArray (data)) {
+        return new Uint32Array(data);
+    }
+    if (typeof data === "string") {
+        const stringData = await load (data as string, JSONLoader);
+        return new Uint32Array (stringData);
+    }
+    return Promise.reject("Grid3DLayer: Unsupported type of input data");
+}
+
+
 async function load_data(
-    pointsData: string | number[],
-    polysData: string | number[],
-    propertiesData: string | number[]
-) {
-    const points = Array.isArray(pointsData)
-        ? pointsData
-        : await load(pointsData as string, JSONLoader);
-
-    const polys = Array.isArray(polysData)
-        ? polysData
-        : await load(polysData as string, JSONLoader);
-
-    const properties = Array.isArray(propertiesData)
-        ? propertiesData
-        : await load(propertiesData as string, JSONLoader);
-
+    pointsData: string | number[] | Float32Array,
+    polysData: string | number[] | Uint32Array,
+    propertiesData: string | number[] | Float32Array
+) {    
+    const points = await loadFloat32Data (pointsData);
+    const polys = await loadUint32Data (polysData);
+    const properties =  await loadFloat32Data (propertiesData);
     return Promise.all([points, polys, properties]);
 }
+
 
 export interface Grid3DLayerProps extends ExtendedLayerProps {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -71,20 +92,20 @@ export interface Grid3DLayerProps extends ExtendedLayerProps {
     /**  Url or native javascript array. Set of points.
      * [x1, y1, z1, x2, y2, z2, ...]
      */
-    pointsData: string | number[];
+    pointsData: string | number[] | Float32Array;
 
     /**  Url or native javascript array.
      * For each polygon ["number of points in poly", p1, , p2 ... ]
      * Example One polygn ith 4 poitns and one with 3 points.
      * [4, 3, 1, 9, 77, 3, 6, 44, 23]
      */
-    polysData: string | number[];
+    polysData: string | number[] | Uint32Array;
 
     /**  Url or native javascript array..
      *  A scalar property for each polygon.
      * [0.23, 0.11. 0.98, ...]
      */
-    propertiesData: string | number[];
+    propertiesData: string | number[] | Float32Array;
 
     /**  Name of color map. E.g "PORO"
      */

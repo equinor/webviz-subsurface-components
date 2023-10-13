@@ -819,14 +819,15 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
         const i1 = polys[index0];
         const i2 = polys[index1];
 
-        const p1 = get3DPoint(params.points, i1);
-        const p2 = get3DPoint(params.points, i2);
+        // const p1 = [params.points[i1], params.points[i1+1], params.points[i1+2]];
+        // const p2 = [params.points[i2], params.points[i2+1], params.points[i2+2]];
 
-        p1[2] *= z_sign;
-        p2[2] *= z_sign;
+        // p1[2] *= z_sign;
+        // p2[2] *= z_sign;
 
-        out.push(...p1);
-        out.push(...p2);
+        // out.push(...p1);
+        // out.push(...p2);
+        return [i1, i2];
     };
 
     // Keep
@@ -841,7 +842,7 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
     const positions: number[] = [];
     const indices: number[] = [];
     const vertexProperties: number[] = [];
-    const line_positions: number[] = [];
+    const line_indices: number[] = [];
 
     let propertyValueRangeMin = +99999999;
     let propertyValueRangeMax = -99999999;
@@ -870,17 +871,16 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
 
         // Lines.
         for (let j = i + 1; j < i + n; ++j) {
-            getLineSegment(j, j + 1, line_positions);
+            getLineSegment(j, j + 1, line_indices);
         }
-        getLineSegment(i + 1, i + n, line_positions);
+        getLineSegment(i + 1, i + n, line_indices);
 
         const polygon: number[] = [];
-        const vertexIndices: number[] = [];
+        
         for (let p = 1; p <= n; ++p) {
             const i0 = polys[i + p];
-            const point = get3DPoint(params.points, i0);
+            const point = [params.points[i0], params.points[i0+1], params.points[i0+2]];
             point[2] *= z_sign;
-            vertexIndices.push(i0);
             polygon.push(...point);
         }
         // As the triangulation algorythm works in 2D space
@@ -912,9 +912,10 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
     const mesh_lines: MeshTypeLines = {
         drawMode: 1, // corresponds to GL.LINES,
         attributes: {
-            positions: { value: new Float32Array(line_positions), size: 3 },
+            positions: { value: params.points, size: 3 },
+            indices: { value: new Uint16Array(line_indices), size: 1}
         },
-        vertexCount: line_positions.length / 3,
+        vertexCount: line_indices.length / 3,
     };
 
     const t1 = performance.now();

@@ -49,6 +49,7 @@ export type MeshTypeLines = {
     drawMode: number;
     attributes: {
         positions: { value: Float32Array; size: number };
+        indices:   { value: Uint16Array, size: number}
     };
     vertexCount: number;
 };
