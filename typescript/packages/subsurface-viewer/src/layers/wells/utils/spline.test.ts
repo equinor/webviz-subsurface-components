@@ -86,6 +86,8 @@ describe("remove duplicates", () => {
     // Test splineRefine functions
     it("should not refine if given invalid input", () => {
         expect(
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             splineRefine(testWell, 0).features[0].geometry.geometries[1]
                 .coordinates.length
         ).toStrictEqual(9);
@@ -93,11 +95,15 @@ describe("remove duplicates", () => {
 
     it("should refine and output more vertices if given valid input", () => {
         expect(
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             splineRefine(testWell).features[0].geometry.geometries[1]
                 .coordinates.length
         ).toStrictEqual(33);
 
         expect(
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             splineRefine(testWell, 10).features[0].geometry.geometries[1]
                 .coordinates.length
         ).toStrictEqual(63);
