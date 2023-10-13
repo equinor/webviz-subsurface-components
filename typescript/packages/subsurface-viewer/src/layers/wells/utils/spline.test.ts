@@ -2,7 +2,7 @@ import { removeConsecutiveDuplicates, splineRefine } from "./spline";
 import type { Position3D } from "../../utils/layerTools";
 import type { FeatureCollection } from "geojson";
 
-const testWell = {
+const testWell: FeatureCollection = {
     type: "FeatureCollection",
     features: [
         {
@@ -86,23 +86,20 @@ describe("remove duplicates", () => {
     // Test splineRefine functions
     it("should not refine if given invalid input", () => {
         expect(
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            splineRefine(testWell as unknown as FeatureCollection, 0).features[0].geometry.geometries[1].coordinates.length // eslint-disable-line
+            splineRefine(testWell, 0).features[0].geometry.geometries[1]
+                .coordinates.length
         ).toStrictEqual(9);
     });
 
     it("should refine and output more vertices if given valid input", () => {
         expect(
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            splineRefine(testWell as unknown as FeatureCollection).features[0].geometry.geometries[1].coordinates.length // eslint-disable-line
+            splineRefine(testWell).features[0].geometry.geometries[1]
+                .coordinates.length
         ).toStrictEqual(33);
 
         expect(
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            splineRefine(testWell as unknown as FeatureCollection, 10).features[0].geometry.geometries[1].coordinates.length // eslint-disable-line
+            splineRefine(testWell, 10).features[0].geometry.geometries[1]
+                .coordinates.length
         ).toStrictEqual(63);
     });
 });
