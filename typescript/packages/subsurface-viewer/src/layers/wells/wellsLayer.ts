@@ -90,6 +90,11 @@ export interface WellsLayerProps extends ExtendedLayerProps {
     logrunName: string;
     logRadius: number;
     logCurves: boolean;
+    /** If true will refine the well path by interpolating it using a spline and super sample it
+     * so that one by default gets 5 new vertices along the path between each pair of original vertices.
+     * May also be specified as a number greater than 1 in which case the number of new vertices
+     * between pairs of original vertices will be this number.
+     */
     refine: boolean | number;
     wellHeadStyle: WellHeadStyleAccessor;
     colorMappingFunction: (x: number) => [number, number, number];
