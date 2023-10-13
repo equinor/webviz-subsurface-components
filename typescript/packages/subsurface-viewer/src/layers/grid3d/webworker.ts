@@ -827,7 +827,7 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
 
         // out.push(...p1);
         // out.push(...p2);
-        return [i1, i2];
+        return out.push(i1, i2);
     };
 
     // Keep
