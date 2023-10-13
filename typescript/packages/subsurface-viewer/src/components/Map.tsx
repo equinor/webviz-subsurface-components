@@ -606,8 +606,7 @@ const Map: React.FC<MapProps> = ({
 
     const [deckGLLayers, setDeckGLLayers] = useState<LayersList>([]);
 
-    const [viewStateChanged, setViewStateChanged] =
-        useState<boolean>(false);
+    const [viewStateChanged, setViewStateChanged] = useState<boolean>(false);
 
     const [viewPortMargins, setViewPortMargins] = useState<marginsType>({
         left: 0,
