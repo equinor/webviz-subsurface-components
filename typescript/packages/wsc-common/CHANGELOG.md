@@ -1,3 +1,10 @@
+## [0.2.1](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.2.0...wsc-common@0.2.1) (2023-10-13)
+
+
+### Bug Fixes
+
+* bump d3-format from 1.4.5 to 3.1.0 in /typescript ([#1680](https://github.com/equinor/webviz-subsurface-components/issues/1680)) ([91f42d1](https://github.com/equinor/webviz-subsurface-components/commit/91f42d1b47c8c423ae8e4d720daf44f2b24730e4))
+
 # [0.2.0](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.1.0...wsc-common@0.2.0) (2023-09-22)
 
 
