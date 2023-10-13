@@ -827,7 +827,7 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
 
         // out.push(...p1);
         // out.push(...p2);
-        return out.push(i1, i2);
+        out.push(i1, i2);
     };
 
     // Keep
@@ -839,9 +839,9 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
     const properties = params.properties;
     const isZIncreasingDownwards = params.isZIncreasingDownwards;
 
-    const positions: number[] = [];
     const indices: number[] = [];
     const vertexProperties: number[] = [];
+    const triang_indices: number[] = [];
     const line_indices: number[] = [];
 
     let propertyValueRangeMin = +99999999;
@@ -876,12 +876,14 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
         getLineSegment(i + 1, i + n, line_indices);
 
         const polygon: number[] = [];
+        const poly_indices: number [] = [];
         
         for (let p = 1; p <= n; ++p) {
             const i0 = polys[i + p];
-            const point = [params.points[i0], params.points[i0+1], params.points[i0+2]];
+            const point = [params.points[i0*3], params.points[i0*3+1], params.points[i0*3+2]];
             point[2] *= z_sign;
             polygon.push(...point);
+            poly_indices.push (i0);
         }
         // As the triangulation algorythm works in 2D space
         // the polygon should be projected on the plane passing through its points.
@@ -889,7 +891,7 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
         const triangles: number[] = earcut(flatPoly, 2);
 
         for (const t of triangles) {
-            positions.push(...get3DPoint(polygon, t));
+            triang_indices.push(poly_indices[t]);
             vertexProperties.push(propertyValue);
             indices.push(vertexIndex++);
         }
@@ -901,21 +903,22 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
     const mesh: MeshType = {
         drawMode: 4, // corresponds to GL.TRIANGLES,
         attributes: {
-            positions: { value: new Float32Array(positions), size: 3 },
+            positions: { value: params.points, size: 3 },
+            indices: {value: new Uint32Array(triang_indices), size: 1},
             properties: { value: new Float32Array(vertexProperties), size: 1 },
-            vertex_indexs: { value: new Int32Array(indices), size: 1 },
+            vertex_indexs: { value: new Int32Array(triang_indices), size: 1 },
         },
         vertexCount: indices.length,
-        indices: { value: new Uint32Array(indices), size: 1 },
+        //indices: { value: new Uint32Array(indices), size: 1 },
     };
 
     const mesh_lines: MeshTypeLines = {
         drawMode: 1, // corresponds to GL.LINES,
         attributes: {
             positions: { value: params.points, size: 3 },
-            indices: { value: new Uint16Array(line_indices), size: 1}
+            indices: { value: new Uint32Array(line_indices), size: 1}
         },
-        vertexCount: line_indices.length / 3,
+        vertexCount: line_indices.length,
     };
 
     const t1 = performance.now();

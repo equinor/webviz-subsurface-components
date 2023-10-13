@@ -36,20 +36,21 @@ export type MeshType = {
     drawMode?: number;
     attributes: {
         positions: { value: Float32Array; size: number };
+        indices: { value: Uint32Array, size: number};
         TEXCOORD_0?: { value: Float32Array; size: number };
         normals?: { value: Float32Array; size: number };
         properties: { value: Float32Array; size: number };
         vertex_indexs: { value: Int32Array; size: number };
     };
     vertexCount: number;
-    indices: { value: Uint32Array; size: number };
+    //indices: { value: Uint32Array; size: number };
 };
 
 export type MeshTypeLines = {
     drawMode: number;
     attributes: {
         positions: { value: Float32Array; size: number };
-        indices:   { value: Uint16Array, size: number}
+        indices:   { value: Uint32Array, size: number}
     };
     vertexCount: number;
 };
@@ -128,11 +129,12 @@ export default class privateLayer extends Layer<privateLayerProps> {
                 drawMode: this.props.mesh.drawMode,
                 attributes: {
                     positions: this.props.mesh.attributes.positions,
+                    indices: this.props.mesh.attributes.indices,
                     properties: this.props.mesh.attributes.properties,
                     vertex_indexs: this.props.mesh.attributes.vertex_indexs,
                 },
                 vertexCount: this.props.mesh.vertexCount,
-                indices: this.props.mesh.indices,
+                //indices: this.props.mesh.indices,
             }),
             modules: [project, picking, phongLighting],
             isInstanced: false, // This only works when set to false.
@@ -149,6 +151,7 @@ export default class privateLayer extends Layer<privateLayerProps> {
         });
 
         return [mesh_model, mesh_lines_model];
+        
     }
 
     // Signature from the base class, eslint doesn't like the any type.
@@ -252,19 +255,19 @@ export default class privateLayer extends Layer<privateLayerProps> {
         const layer_properties: PropertyDataType[] = [];
 
         // Note these colors are in the 0-255 range.
-        const r = info.color[0];
-        const g = info.color[1];
-        const b = info.color[2];
+        // const r = info.color[0];
+        // const g = info.color[1];
+        // const b = info.color[2];
 
-        const vertexIndex = 256 * 256 * r + 256 * g + b;
+        // const vertexIndex = 256 * 256 * r + 256 * g + b;
 
-        const vertexs = this.props.mesh.attributes.positions.value;
-        const depth = -vertexs[3 * vertexIndex + 2];
-        layer_properties.push(createPropertyData("Depth", depth));
+        // const vertexs = this.props.mesh.attributes.positions.value;
+        // const depth = -vertexs[3 * vertexIndex + 2];
+        layer_properties.push(createPropertyData("Depth", "Picking switched off"));
 
-        const properties = this.props.mesh.attributes.properties.value;
-        const property = properties[vertexIndex];
-        layer_properties.push(createPropertyData("Property", property));
+        // const properties = this.props.mesh.attributes.properties.value;
+        // const property = properties[vertexIndex];
+        // layer_properties.push(createPropertyData("Property", property));
 
         return {
             ...info,
