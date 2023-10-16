@@ -89,19 +89,19 @@ export interface Grid3DLayerProps extends ExtendedLayerProps {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setReportedBoundingBox?: any;
 
-    /**  Url or native javascript array. Set of points.
+    /**  Url, or native, or typed javascript array. Set of points.
      * [x1, y1, z1, x2, y2, z2, ...]
      */
     pointsData: string | number[] | Float32Array;
 
-    /**  Url or native javascript array.
+    /**  Url, or native, or typed javascript array.
      * For each polygon ["number of points in poly", p1, , p2 ... ]
      * Example One polygn ith 4 poitns and one with 3 points.
      * [4, 3, 1, 9, 77, 3, 6, 44, 23]
      */
     polysData: string | number[] | Uint32Array;
 
-    /**  Url or native javascript array..
+    /**  Url, or native, or typed javascript array.
      *  A scalar property for each polygon.
      * [0.23, 0.11. 0.98, ...]
      */
