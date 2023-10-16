@@ -7,17 +7,14 @@ precision highp float;
 // Primitive attributes
 in vec3 positions;
 in float properties;
-//in vec3 normals;
 in vec3 colors;
 
 in int vertex_indexs;
 flat out int vertex_indexs_;
 
-
 // Outputs to fragment shader
 out vec2 vTexCoord;
 out vec3 cameraPosition;
-// out vec3 normals_commonspace;
 out vec4 position_commonspace;
 out vec4 vColor;
 out vec3 worldPos;

@@ -37,15 +37,6 @@ void main(void) {
    if (!nomals_available) {
       normal = normalize(cross(dFdx(position_commonspace.xyz), dFdy(position_commonspace.xyz)));
    } 
-   // else {
-   //    normal = normals_commonspace;
-   // }
-
-   // // Discard transparent pixels. KEEP
-   // if (!picking_uActive && isnan(propertyValue)) {
-   //    discard;
-   //    return;
-   // }
    
    //Picking pass.
    if (picking_uActive) {
