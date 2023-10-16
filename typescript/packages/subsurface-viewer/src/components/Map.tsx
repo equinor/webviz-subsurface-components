@@ -589,6 +589,10 @@ const Map: React.FC<MapProps> = ({
 
     const bboxInitial: BoundingBox3D = [0, 0, 0, 1, 1, 1];
 
+    const isCameraPositionDefined =
+        typeof cameraPosition !== "undefined" &&
+        Object.keys(cameraPosition).length !== 0;
+
     // Deck.gl View's and viewStates as input to Deck.gl
     const [deckGLViews, setDeckGLViews] = useState<View[]>([]);
     const [viewStates, setViewStates] = useState<Record<string, ViewStateType>>(
@@ -601,6 +605,8 @@ const Map: React.FC<MapProps> = ({
         useState<BoundingBox3D>(bboxInitial);
 
     const [deckGLLayers, setDeckGLLayers] = useState<LayersList>([]);
+
+    const [viewStateChanged, setViewStateChanged] = useState<boolean>(false);
 
     const [viewPortMargins, setViewPortMargins] = useState<marginsType>({
         left: 0,
@@ -647,6 +653,9 @@ const Map: React.FC<MapProps> = ({
     }, [triggerHome]);
 
     useEffect(() => {
+        if (viewStateChanged && !isCameraPositionDefined) {
+            return;
+        }
         const [Views, viewStates] = createViewsAndViewStates(
             views,
             viewPortMargins,
@@ -658,6 +667,7 @@ const Map: React.FC<MapProps> = ({
 
         setDeckGLViews(Views);
         setViewStates(viewStates);
+        setViewStateChanged(false);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         bounds,
@@ -848,7 +858,6 @@ const Map: React.FC<MapProps> = ({
                         x: event.offsetCenter.x,
                         y: event.offsetCenter.y,
                         depth: coords.pickDepth ? coords.pickDepth : undefined,
-                        unproject3D: true
                     }) as LayerPickInfo[];
                 pickInfos.forEach((item) => {
                     if (item.properties) {
@@ -1007,6 +1016,7 @@ const Map: React.FC<MapProps> = ({
             if (getCameraPosition) {
                 getCameraPosition(viewState);
             }
+            setViewStateChanged(true);
         },
         [getCameraPosition, viewStates, views?.viewports]
     );
