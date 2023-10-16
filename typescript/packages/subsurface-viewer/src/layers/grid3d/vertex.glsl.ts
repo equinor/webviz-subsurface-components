@@ -10,7 +10,6 @@ in float properties;
 in vec3 colors;
 
 in int vertex_indexs;
-flat out int vertex_indexs_;
 
 // Outputs to fragment shader
 out vec2 vTexCoord;
@@ -20,13 +19,14 @@ out vec4 vColor;
 out vec3 worldPos;
 out float property;
 
+flat out int vertexId;
 
 void main(void) {
    cameraPosition = project_uCameraPosition;
 
    worldPos = positions;
 
-   vertex_indexs_ = vertex_indexs;
+   vertexId = gl_VertexID;
 
    vColor = vec4(colors.rgb, 1.0);
 

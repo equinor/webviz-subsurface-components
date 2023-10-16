@@ -38,8 +38,7 @@ export type MeshType = {
         positions: { value: Float32Array; size: number };        
         TEXCOORD_0?: { value: Float32Array; size: number };
         normals?: { value: Float32Array; size: number };
-        properties: { value: Float32Array; size: number };
-        vertex_indexs: { value: Int32Array; size: number };
+        properties: { value: Float32Array; size: number };        
     };
     vertexCount: number;
     //indices: { value: Uint32Array; size: number };
@@ -128,8 +127,7 @@ export default class privateLayer extends Layer<privateLayerProps> {
                 drawMode: this.props.mesh.drawMode,
                 attributes: {
                     positions: this.props.mesh.attributes.positions,                    
-                    properties: this.props.mesh.attributes.properties,
-                    vertex_indexs: this.props.mesh.attributes.vertex_indexs,
+                    properties: this.props.mesh.attributes.properties,                    
                 },
                 vertexCount: this.props.mesh.vertexCount,
                 //indices: this.props.mesh.indices,

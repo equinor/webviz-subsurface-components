@@ -5,16 +5,16 @@ precision highp float;
 
 in vec2 vTexCoord;
 in vec3 cameraPosition;
-//in vec3 normals_commonspace;
+
 in vec4 position_commonspace;
 in vec4 vColor;
-
-flat in int vertex_indexs_;
 
 out vec4 fragColor;
 
 in vec3 worldPos;
 in float property;
+
+flat in int vertexId;
 
 uniform sampler2D colormap;
 
@@ -45,7 +45,7 @@ void main(void) {
       float g = 0.0;
       float b = 0.0;
   
-      int idx = vertex_indexs_;
+      int idx = vertexId;
   
       if (idx >= (256 * 256) - 1) {
          r = floor(float(idx) / (256.0 * 256.0));

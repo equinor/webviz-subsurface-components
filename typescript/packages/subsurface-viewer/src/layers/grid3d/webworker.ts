@@ -839,7 +839,6 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
     const properties = params.properties;
     const isZIncreasingDownwards = params.isZIncreasingDownwards;
 
-    const vertexIndices: number[] = [];
     const vertexProperties: number[] = [];
     const triang_points: number[] = [];
     const line_indices: number[] = [];
@@ -851,7 +850,6 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
 
     let pn = 0;
     let i = 0;
-    let vertexIndex = 0;
 
     while (i < polys.length) {
         const n = polys[i];
@@ -891,7 +889,6 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
         for (const t of triangles) {
             triang_points.push(...get3DPoint(polygon,t));
             vertexProperties.push(propertyValue);
-            vertexIndices.push(vertexIndex++);
         }
         i = i + n + 1;
     }
@@ -902,10 +899,9 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
         drawMode: 4, // corresponds to GL.TRIANGLES,
         attributes: {
             positions: { value: new Float32Array(triang_points), size: 3 },            
-            properties: { value: new Float32Array(vertexProperties), size: 1 },
-            vertex_indexs: { value: new Int32Array(vertexIndices), size: 1 },
+            properties: { value: new Float32Array(vertexProperties), size: 1 },            
         },
-        vertexCount: vertexIndices.length,      
+        vertexCount: triang_points.length,      
     };
 
     const mesh_lines: MeshTypeLines = {
