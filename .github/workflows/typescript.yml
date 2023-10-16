@@ -88,7 +88,7 @@ jobs:
       - name: 📚 Update Storybook
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         run: |
-          git git clean -xdff ../storybook-static
+          git clean -xdff ../storybook-static
           cp -r ./storybook-static ..
 
           git config --local user.email "webviz-github-action"
