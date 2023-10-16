@@ -35,8 +35,7 @@ const DEFAULT_TEXTURE_PARAMETERS = {
 export type MeshType = {
     drawMode?: number;
     attributes: {
-        positions: { value: Float32Array; size: number };
-        indices: { value: Uint32Array, size: number};
+        positions: { value: Float32Array; size: number };        
         TEXCOORD_0?: { value: Float32Array; size: number };
         normals?: { value: Float32Array; size: number };
         properties: { value: Float32Array; size: number };
@@ -128,8 +127,7 @@ export default class privateLayer extends Layer<privateLayerProps> {
             geometry: new Geometry({
                 drawMode: this.props.mesh.drawMode,
                 attributes: {
-                    positions: this.props.mesh.attributes.positions,
-                    indices: this.props.mesh.attributes.indices,
+                    positions: this.props.mesh.attributes.positions,                    
                     properties: this.props.mesh.attributes.properties,
                     vertex_indexs: this.props.mesh.attributes.vertex_indexs,
                 },

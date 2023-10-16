@@ -839,9 +839,9 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
     const properties = params.properties;
     const isZIncreasingDownwards = params.isZIncreasingDownwards;
 
-    const indices: number[] = [];
+    const vertexIndices: number[] = [];
     const vertexProperties: number[] = [];
-    const triang_indices: number[] = [];
+    const triang_points: number[] = [];
     const line_indices: number[] = [];
 
     let propertyValueRangeMin = +99999999;
@@ -876,14 +876,12 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
         getLineSegment(i + 1, i + n, line_indices);
 
         const polygon: number[] = [];
-        const poly_indices: number [] = [];
         
         for (let p = 1; p <= n; ++p) {
             const i0 = polys[i + p];
             const point = [params.points[i0*3], params.points[i0*3+1], params.points[i0*3+2]];
             point[2] *= z_sign;
-            polygon.push(...point);
-            poly_indices.push (i0);
+            polygon.push(...point);            
         }
         // As the triangulation algorythm works in 2D space
         // the polygon should be projected on the plane passing through its points.
@@ -891,9 +889,9 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
         const triangles: number[] = earcut(flatPoly, 2);
 
         for (const t of triangles) {
-            triang_indices.push(poly_indices[t]);
+            triang_points.push(...get3DPoint(polygon,t));
             vertexProperties.push(propertyValue);
-            indices.push(vertexIndex++);
+            vertexIndices.push(vertexIndex++);
         }
         i = i + n + 1;
     }
@@ -903,13 +901,11 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
     const mesh: MeshType = {
         drawMode: 4, // corresponds to GL.TRIANGLES,
         attributes: {
-            positions: { value: params.points, size: 3 },
-            indices: {value: new Uint32Array(triang_indices), size: 1},
+            positions: { value: new Float32Array(triang_points), size: 3 },            
             properties: { value: new Float32Array(vertexProperties), size: 1 },
-            vertex_indexs: { value: new Int32Array(triang_indices), size: 1 },
+            vertex_indexs: { value: new Int32Array(vertexIndices), size: 1 },
         },
-        vertexCount: indices.length,
-        //indices: { value: new Uint32Array(indices), size: 1 },
+        vertexCount: vertexIndices.length,      
     };
 
     const mesh_lines: MeshTypeLines = {
