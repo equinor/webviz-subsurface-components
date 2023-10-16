@@ -12,7 +12,6 @@ in vec3 colors;
 in int vertex_indexs;
 
 // Outputs to fragment shader
-out vec2 vTexCoord;
 out vec3 cameraPosition;
 out vec4 position_commonspace;
 out vec4 vColor;

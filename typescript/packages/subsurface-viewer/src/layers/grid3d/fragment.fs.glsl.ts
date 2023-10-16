@@ -3,7 +3,6 @@ const fsShader = `#version 300 es
 
 precision highp float;
 
-in vec2 vTexCoord;
 in vec3 cameraPosition;
 
 in vec4 position_commonspace;
@@ -30,14 +29,10 @@ uniform bool isColorMapClampColorTransparent;
 
 
 void main(void) {
-   geometry.uv = vTexCoord;
 
-   vec3 normal = vec3(0.0, 0.0, 1.0);
-   bool nomals_available = false;
-   if (!nomals_available) {
-      normal = normalize(cross(dFdx(position_commonspace.xyz), dFdy(position_commonspace.xyz)));
-   } 
+   vec3 normal = normalize(cross(dFdx(position_commonspace.xyz), dFdy(position_commonspace.xyz)));
    
+
    //Picking pass.
    if (picking_uActive) {
       // Express triangle index in 255 system.
