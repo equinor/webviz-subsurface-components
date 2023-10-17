@@ -1,44 +1,33 @@
 const vsShader = `\
 #version 300 es
-#define SHADER_NAME vertex-shader
-
+#define SHADER_NAME grid3d-vertex-shader
 precision highp float;
 
-// Primitive attributes
-in vec3 positions;
-in float properties;
-in vec3 colors;
 
-attribute vec3 positions64Low;
-
-in int vertex_indexs;
+attribute vec3 positions;
+attribute float properties;
 
 // Outputs to fragment shader
 out vec3 cameraPosition;
 out vec4 position_commonspace;
-out vec4 vColor;
 out float property;
 
-flat out int vertexId;
+flat out int vertexIndex;
 
-const vec3 pickingColor = vec3(1.0, 0.0, 0.0);
+const vec3 pickingColor = vec3(0.0, 1.0, 0.0);
 
-void main(void) {
-   cameraPosition = project_uCameraPosition;
-
+void main(void) { 
    
-   geometry.worldPosition = positions;
-   geometry.pickingColor = pickingColor;
-   vertexId = gl_VertexID;
-
-   vColor = vec4(colors.rgb, 1.0);
-
+   vertexIndex = gl_VertexID;
+   cameraPosition = project_uCameraPosition;
    property = properties;
-   vec4 color = vec4(1.0);
-
-   gl_Position = project_position_to_clipspace(positions, positions64Low, vec3(0.0), geometry.position);
+   geometry.pickingColor = pickingColor;   
+ 
+   position_commonspace = vec4(project_position(positions), 0.0);
+   gl_Position = project_common_position_to_clipspace(position_commonspace);
    DECKGL_FILTER_GL_POSITION(gl_Position, geometry);
 
+   vec4 color = vec4(0.0);
    DECKGL_FILTER_COLOR(color, geometry);
 }
 `;
