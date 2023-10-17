@@ -4,6 +4,7 @@ import {
     Layer,
     picking,
     project,
+    project32,
     phongLighting,
 } from "@deck.gl/core/typed";
 import type { LayerPickInfo, PropertyDataType } from "../utils/layerTools";
@@ -116,13 +117,16 @@ export default class privateLayer extends Layer<privateLayerProps> {
         this.initializeState(context as DeckGLLayerContext);
     }
 
+    getShaders() {
+        return super.getShaders({vs : vsShader, fs: fsShader, modules: [project32, picking, phongLighting]});
+      }
+
     //eslint-disable-next-line
     _getModels(gl: any) {
         // MESH MODEL
         const mesh_model = new Model(gl, {
             id: `${this.props.id}-mesh`,
-            vs: vsShader,
-            fs: fsShader,
+            ...this.getShaders (),
             geometry: new Geometry({
                 drawMode: this.props.mesh.drawMode,
                 attributes: {
@@ -132,7 +136,7 @@ export default class privateLayer extends Layer<privateLayerProps> {
                 vertexCount: this.props.mesh.vertexCount,
                 //indices: this.props.mesh.indices,
             }),
-            modules: [project, picking, phongLighting],
+            //modules: [project, picking, phongLighting],
             isInstanced: false, // This only works when set to false.
         });
 
