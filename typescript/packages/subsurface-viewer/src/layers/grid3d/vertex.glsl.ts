@@ -14,7 +14,7 @@ out float property;
 
 flat out int vertexIndex;
 
-const vec3 pickingColor = vec3(0.0, 1.0, 0.0);
+const vec3 pickingColor = vec3(1.0, 1.0, 0.0);
 
 void main(void) { 
    

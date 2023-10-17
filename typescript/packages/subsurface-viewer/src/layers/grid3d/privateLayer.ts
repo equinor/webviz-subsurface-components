@@ -4,7 +4,7 @@ import {
     Layer,
     picking,
     project,
-    project32,
+    //project32,
     phongLighting,
 } from "@deck.gl/core/typed";
 import type { LayerPickInfo, PropertyDataType } from "../utils/layerTools";
@@ -116,17 +116,13 @@ export default class privateLayer extends Layer<privateLayerProps> {
     updateState({ context }: UpdateParameters<this>): void {
         this.initializeState(context as DeckGLLayerContext);
     }
-
-    getShaders() {
-        return super.getShaders({vs : vsShader, fs: fsShader, modules: [project32, picking, phongLighting]});
-      }
-
     //eslint-disable-next-line
     _getModels(gl: any) {
         // MESH MODEL
         const mesh_model = new Model(gl, {
             id: `${this.props.id}-mesh`,
-            ...this.getShaders (),
+            vs: vsShader,
+            fs: fsShader,
             geometry: new Geometry({
                 drawMode: this.props.mesh.drawMode,
                 attributes: {
@@ -134,9 +130,8 @@ export default class privateLayer extends Layer<privateLayerProps> {
                     properties: this.props.mesh.attributes.properties,                    
                 },
                 vertexCount: this.props.mesh.vertexCount,
-                //indices: this.props.mesh.indices,
             }),
-            //modules: [project, picking, phongLighting],
+            modules: [project, picking, phongLighting],
             isInstanced: false, // This only works when set to false.
         });
 
@@ -255,19 +250,20 @@ export default class privateLayer extends Layer<privateLayerProps> {
         const layer_properties: PropertyDataType[] = [];
 
         // Note these colors are in the 0-255 range.
-        // const r = info.color[0];
-        // const g = info.color[1];
-        // const b = info.color[2];
+        const r = info.color[0];
+        const g = info.color[1];
+        const b = info.color[2];
 
-        // const vertexIndex = 256 * 256 * r + 256 * g + b;
+        const vertexIndex = 256 * 256 * r + 256 * g + b;
 
-        // const vertexs = this.props.mesh.attributes.positions.value;
-        // const depth = -vertexs[3 * vertexIndex + 2];
-        layer_properties.push(createPropertyData("Depth", "Picking switched off"));
+        if (info.coordinate?.[2]) {
+            const depth = info.coordinate[2];
+            layer_properties.push(createPropertyData("Depth", depth));
+        }
 
-        // const properties = this.props.mesh.attributes.properties.value;
-        // const property = properties[vertexIndex];
-        // layer_properties.push(createPropertyData("Property", property));
+        const properties = this.props.mesh.attributes.properties.value;
+        const property = properties[vertexIndex];
+        layer_properties.push(createPropertyData("Property", property));
 
         return {
             ...info,
