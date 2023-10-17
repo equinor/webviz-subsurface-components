@@ -1,3 +1,10 @@
+## [1.1.3](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.1.2...well-log-viewer@1.1.3) (2023-10-17)
+
+
+### Bug Fixes
+
+* bump @equinor/eds-core-react from 0.32.x to 0.33.0 ([#1704](https://github.com/equinor/webviz-subsurface-components/issues/1704)) ([75c5de8](https://github.com/equinor/webviz-subsurface-components/commit/75c5de8cd069a6c0d1d87b54307e23cf5be1b4b3))
+
 ## [1.1.2](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.1.1...well-log-viewer@1.1.2) (2023-10-17)
 
 

@@ -30,7 +30,7 @@
     "dependencies": {
         "@deck.gl/core": "^8.8.25",
         "@emerson-eps/color-tables": "^0.4.61",
-        "@equinor/eds-core-react": "0.32.0",
+        "@equinor/eds-core-react": "0.33.0",
         "@equinor/eds-icons": "^0.19.1",
         "@mui/material": "^5.11",
         "@reduxjs/toolkit": "^1.7.2",

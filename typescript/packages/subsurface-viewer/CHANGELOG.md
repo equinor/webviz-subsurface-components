@@ -1,3 +1,10 @@
+## [0.3.5](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.3.4...subsurface-viewer@0.3.5) (2023-10-17)
+
+
+### Bug Fixes
+
+* bump @equinor/eds-core-react from 0.32.x to 0.33.0 ([#1704](https://github.com/equinor/webviz-subsurface-components/issues/1704)) ([75c5de8](https://github.com/equinor/webviz-subsurface-components/commit/75c5de8cd069a6c0d1d87b54307e23cf5be1b4b3))
+
 ## [0.3.4](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.3.3...subsurface-viewer@0.3.4) (2023-10-17)
 
 
