@@ -101,6 +101,12 @@ exports[`Test Info Card snapshot test when property value provided 1`] = `
   text-align: center;
 }
 
+.c2 {
+  -webkit-transform: none;
+  -ms-transform: none;
+  transform: none;
+}
+
 @media (hover:hover) and (pointer:fine) {
   .c0:hover {
     background: var(--eds_interactive_primary__hover_alt,rgba(222,237,238,1));
@@ -144,7 +150,7 @@ exports[`Test Info Card snapshot test when property value provided 1`] = `
             >
               <svg
                 aria-hidden="true"
-                class=""
+                class="c2"
                 fill="currentColor"
                 height="24px"
                 viewBox="0 0 24 24"
@@ -157,7 +163,6 @@ exports[`Test Info Card snapshot test when property value provided 1`] = `
                   d="m7 14.5 5-5 5 5H7Z"
                   data-testid="eds-icon-path"
                   fill-rule="evenodd"
-                  height="24"
                 />
               </svg>
             </span>
@@ -268,7 +273,7 @@ exports[`Test Info Card snapshot test when property value provided 1`] = `
             >
               <svg
                 aria-hidden="true"
-                class=""
+                class="c2"
                 fill="currentColor"
                 height="24px"
                 viewBox="0 0 24 24"
@@ -281,7 +286,6 @@ exports[`Test Info Card snapshot test when property value provided 1`] = `
                   d="m7 14.5 5-5 5 5H7Z"
                   data-testid="eds-icon-path"
                   fill-rule="evenodd"
-                  height="24"
                 />
               </svg>
             </span>
@@ -465,6 +469,12 @@ exports[`Test Info Card snapshot test with no props 1`] = `
   text-align: center;
 }
 
+.c2 {
+  -webkit-transform: none;
+  -ms-transform: none;
+  transform: none;
+}
+
 @media (hover:hover) and (pointer:fine) {
   .c0:hover {
     background: var(--eds_interactive_primary__hover_alt,rgba(222,237,238,1));
@@ -508,7 +518,7 @@ exports[`Test Info Card snapshot test with no props 1`] = `
             >
               <svg
                 aria-hidden="true"
-                class=""
+                class="c2"
                 fill="currentColor"
                 height="24px"
                 viewBox="0 0 24 24"
@@ -521,7 +531,6 @@ exports[`Test Info Card snapshot test with no props 1`] = `
                   d="m7 14.5 5-5 5 5H7Z"
                   data-testid="eds-icon-path"
                   fill-rule="evenodd"
-                  height="24"
                 />
               </svg>
             </span>
