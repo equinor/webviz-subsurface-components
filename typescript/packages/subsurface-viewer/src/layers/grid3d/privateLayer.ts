@@ -4,7 +4,6 @@ import {
     Layer,
     picking,
     project,
-    //project32,
     phongLighting,
 } from "@deck.gl/core/typed";
 import type { LayerPickInfo, PropertyDataType } from "../utils/layerTools";
@@ -263,7 +262,9 @@ export default class privateLayer extends Layer<privateLayerProps> {
 
         const properties = this.props.mesh.attributes.properties.value;
         const property = properties[vertexIndex];
-        layer_properties.push(createPropertyData("Property", property));
+        if (Number.isFinite (property)) {
+            layer_properties.push(createPropertyData("Property", property));
+        }
 
         return {
             ...info,
