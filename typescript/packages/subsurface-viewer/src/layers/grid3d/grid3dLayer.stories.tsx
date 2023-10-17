@@ -235,6 +235,8 @@ Reservoirs.args = {
             pointsData: "resGrid/points.json",
             polysData: "resGrid/polys.json",
             propertiesData: [],
+            pickable: true,
+            ZIncreasingDownwards: true
         },
     ],
 };
