@@ -89,7 +89,7 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         run: |
           git clean -xdff ../storybook-static
-          cp -r ./storybook-static ..
+          mv ./storybook-static ..
 
           git config --local user.email "webviz-github-action"
           git config --local user.name "webviz-github-action"
