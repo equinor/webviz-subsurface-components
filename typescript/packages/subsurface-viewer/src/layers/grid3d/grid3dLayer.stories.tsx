@@ -176,6 +176,7 @@ PolyhedralCells.args = {
         {
             ...grid3dLayer,
             id: "polyhedral1",
+            pickable: true,
             pointsData: SnubCubePoints.map((v) => 10 * v),
             polysData: SnubCubeFaces,
             propertiesData: Array(SnubCubeVertexCount)
@@ -185,6 +186,7 @@ PolyhedralCells.args = {
         {
             ...grid3dLayer,
             id: "polyhedral2",
+            pickable: true,
             pointsData: ToroidPoints.map((v) => 10 * v).map((v, index) =>
                 index % 3 === 0 ? v + 30 : v
             ),
