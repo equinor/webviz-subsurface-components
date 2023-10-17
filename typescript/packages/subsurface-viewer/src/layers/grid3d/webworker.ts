@@ -818,15 +818,6 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
     const getLineSegment = (index0: number, index1: number, out: number[]) => {
         const i1 = polys[index0];
         const i2 = polys[index1];
-
-        // const p1 = [params.points[i1], params.points[i1+1], params.points[i1+2]];
-        // const p2 = [params.points[i2], params.points[i2+1], params.points[i2+2]];
-
-        // p1[2] *= z_sign;
-        // p2[2] *= z_sign;
-
-        // out.push(...p1);
-        // out.push(...p2);
         out.push(i1, i2);
     };
 
@@ -837,16 +828,13 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
 
     const polys = params.polys;
     const properties = params.properties;
-    const isZIncreasingDownwards = params.isZIncreasingDownwards;
-
+    
     const vertexProperties: number[] = [];
     const triang_points: number[] = [];
     const line_indices: number[] = [];
 
     let propertyValueRangeMin = +99999999;
     let propertyValueRangeMax = -99999999;
-
-    const z_sign = isZIncreasingDownwards ? -1 : 1;
 
     let pn = 0;
     let i = 0;
@@ -877,8 +865,7 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
         
         for (let p = 1; p <= n; ++p) {
             const i0 = polys[i + p];
-            const point = [params.points[i0*3], params.points[i0*3+1], params.points[i0*3+2]];
-            point[2] *= z_sign;
+            const point = [params.points[i0*3], params.points[i0*3+1], params.points[i0*3+2]];            
             polygon.push(...point);            
         }
         // As the triangulation algorythm works in 2D space

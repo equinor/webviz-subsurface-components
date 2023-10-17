@@ -14,12 +14,10 @@ export type WebWorkerParams = {
     points: Float32Array;
     polys: Uint32Array;
     properties: Float32Array;
-    isZIncreasingDownwards: boolean;
 };
 
 function GetBBox(
     points: Float32Array,
-    isZIncreasingDownwards: boolean
 ): [number, number, number, number, number, number] {
     let xmax = -99999999;
     let ymax = -99999999;
@@ -28,8 +26,6 @@ function GetBBox(
     let xmin = 99999999;
     let ymin = 99999999;
     let zmin = 99999999;
-
-    const z_sign = isZIncreasingDownwards ? -1 : 1;
 
     for (let i = 0; i < points.length / 3; i++) {
         xmax = points[3 * i + 0] > xmax ? points[3 * i + 0] : xmax;
@@ -41,7 +37,7 @@ function GetBBox(
         zmax = points[3 * i + 2] > zmax ? points[3 * i + 2] : zmax;
         zmin = points[3 * i + 2] < zmin ? points[3 * i + 2] : zmin;
     }
-    return [xmin, ymin, zmin * z_sign, xmax, ymax, zmax * z_sign];
+    return [xmin, ymin, zmin, xmax, ymax, zmax];
 }
 
 async function loadFloat32Data (data: string | number[] | Float32Array) : Promise<Float32Array> {
@@ -84,6 +80,16 @@ async function load_data(
     return Promise.all([points, polys, properties]);
 }
 
+
+function applyZIncrasingDownward (data: Float32Array, zDownward: boolean) {
+    if (!zDownward) {
+        return;
+    }
+    const count = data.length / 3;
+    for (let i = 0; i < count; ++i) {
+        data[i*3 + 2] *= -1;
+    }
+}
 
 export interface Grid3DLayerProps extends ExtendedLayerProps {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -192,7 +198,9 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
         );
 
         p.then(([points, polys, properties]) => {
-            const bbox = GetBBox(points, this.props.ZIncreasingDownwards);
+
+            applyZIncrasingDownward (points, this.props.ZIncreasingDownwards);
+            const bbox = GetBBox(points);
 
             // Using inline web worker for calculating the triangle mesh from
             // loaded input data so not to halt the GUI thread.
@@ -206,8 +214,7 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
             const webworkerParams: WebWorkerParams = {
                 points,
                 polys,
-                properties,
-                isZIncreasingDownwards: this.props.ZIncreasingDownwards,
+                properties,                
             };
 
             webWorker.postMessage(webworkerParams);
@@ -287,7 +294,7 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
             this.getSubLayerProps({
                 mesh: this.state["mesh"],
                 meshLines: this.state["mesh_lines"],
-                pickable: true,
+                pickable: this.props.pickable,
                 colorMapName: this.props.colorMapName,
                 colorMapRange: this.props.colorMapRange,
                 colorMapClampColor: this.props.colorMapClampColor,
