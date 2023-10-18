@@ -17,7 +17,7 @@ export type WebWorkerParams = {
 };
 
 function GetBBox(
-    points: Float32Array,
+    points: Float32Array
 ): [number, number, number, number, number, number] {
     let xmax = -99999999;
     let ymax = -99999999;
@@ -40,54 +40,56 @@ function GetBBox(
     return [xmin, ymin, zmin, xmax, ymax, zmax];
 }
 
-async function loadFloat32Data (data: string | number[] | Float32Array) : Promise<Float32Array> {
+async function loadFloat32Data(
+    data: string | number[] | Float32Array
+): Promise<Float32Array> {
     if (data instanceof Float32Array) {
         return data;
     }
-    if (Array.isArray (data)) {
+    if (Array.isArray(data)) {
         return new Float32Array(data);
     }
     if (typeof data === "string") {
-        const stringData = await load (data as string, JSONLoader);
-        return new Float32Array (stringData);
+        const stringData = await load(data as string, JSONLoader);
+        return new Float32Array(stringData);
     }
     return Promise.reject("Grid3DLayer: Unsupported type of input data");
 }
 
-async function loadUint32Data (data: string | number[] | Uint32Array) : Promise<Uint32Array> {
+async function loadUint32Data(
+    data: string | number[] | Uint32Array
+): Promise<Uint32Array> {
     if (data instanceof Uint32Array) {
         return data;
     }
-    if (Array.isArray (data)) {
+    if (Array.isArray(data)) {
         return new Uint32Array(data);
     }
     if (typeof data === "string") {
-        const stringData = await load (data as string, JSONLoader);
-        return new Uint32Array (stringData);
+        const stringData = await load(data as string, JSONLoader);
+        return new Uint32Array(stringData);
     }
     return Promise.reject("Grid3DLayer: Unsupported type of input data");
 }
-
 
 async function load_data(
     pointsData: string | number[] | Float32Array,
     polysData: string | number[] | Uint32Array,
     propertiesData: string | number[] | Float32Array
-) {    
-    const points = await loadFloat32Data (pointsData);
-    const polys = await loadUint32Data (polysData);
-    const properties =  await loadFloat32Data (propertiesData);
+) {
+    const points = await loadFloat32Data(pointsData);
+    const polys = await loadUint32Data(polysData);
+    const properties = await loadFloat32Data(propertiesData);
     return Promise.all([points, polys, properties]);
 }
 
-
-function applyZIncrasingDownward (data: Float32Array, zDownward: boolean) {
+function applyZIncrasingDownward(data: Float32Array, zDownward: boolean) {
     if (!zDownward) {
         return;
     }
     const count = data.length / 3;
     for (let i = 0; i < count; ++i) {
-        data[i*3 + 2] *= -1;
+        data[i * 3 + 2] *= -1;
     }
 }
 
@@ -198,8 +200,7 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
         );
 
         p.then(([points, polys, properties]) => {
-
-            applyZIncrasingDownward (points, this.props.ZIncreasingDownwards);
+            applyZIncrasingDownward(points, this.props.ZIncreasingDownwards);
             const bbox = GetBBox(points);
 
             // Using inline web worker for calculating the triangle mesh from
@@ -214,7 +215,7 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
             const webworkerParams: WebWorkerParams = {
                 points,
                 polys,
-                properties,                
+                properties,
             };
 
             webWorker.postMessage(webworkerParams);

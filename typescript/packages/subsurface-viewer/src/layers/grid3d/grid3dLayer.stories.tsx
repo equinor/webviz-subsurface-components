@@ -16,7 +16,6 @@ import {
     VertexCount as ToroidVertexCount,
 } from "./test_data/PentagonalToroid";
 
-
 export default {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer/Experimental Grid3D",

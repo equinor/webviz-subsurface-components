@@ -35,10 +35,10 @@ const DEFAULT_TEXTURE_PARAMETERS = {
 export type MeshType = {
     drawMode?: number;
     attributes: {
-        positions: { value: Float32Array; size: number };        
+        positions: { value: Float32Array; size: number };
         TEXCOORD_0?: { value: Float32Array; size: number };
         normals?: { value: Float32Array; size: number };
-        properties: { value: Float32Array; size: number };        
+        properties: { value: Float32Array; size: number };
     };
     vertexCount: number;
 };
@@ -47,7 +47,7 @@ export type MeshTypeLines = {
     drawMode: number;
     attributes: {
         positions: { value: Float32Array; size: number };
-        indices:   { value: Uint32Array, size: number}
+        indices: { value: Uint32Array; size: number };
     };
     vertexCount: number;
 };
@@ -124,8 +124,8 @@ export default class privateLayer extends Layer<privateLayerProps> {
             geometry: new Geometry({
                 drawMode: this.props.mesh.drawMode,
                 attributes: {
-                    positions: this.props.mesh.attributes.positions,                    
-                    properties: this.props.mesh.attributes.properties,                    
+                    positions: this.props.mesh.attributes.positions,
+                    properties: this.props.mesh.attributes.properties,
                 },
                 vertexCount: this.props.mesh.vertexCount,
             }),
@@ -144,7 +144,6 @@ export default class privateLayer extends Layer<privateLayerProps> {
         });
 
         return [mesh_model, mesh_lines_model];
-        
     }
 
     // Signature from the base class, eslint doesn't like the any type.
@@ -261,7 +260,7 @@ export default class privateLayer extends Layer<privateLayerProps> {
 
         const properties = this.props.mesh.attributes.properties.value;
         const property = properties[vertexIndex];
-        if (Number.isFinite (property)) {
+        if (Number.isFinite(property)) {
             layer_properties.push(createPropertyData("Property", property));
         }
 
