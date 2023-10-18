@@ -90,10 +90,11 @@ export interface WellsLayerProps extends ExtendedLayerProps {
     logrunName: string;
     logRadius: number;
     logCurves: boolean;
-    /** If true will refine the well path by interpolating it using a spline and super sample it
-     * so that one by default gets 5 new vertices along the path between each pair of original vertices.
-     * May also be specified as a number greater than 1 in which case the number of new vertices
-     * between pairs of original vertices will be this number.
+    /** Control to refine the well path by super sampling it using a spline interpolation.
+     * The well path between each pair of original vertices is split into sub-segments along the spline
+     * interpolation.
+     * The number of sub-segments is specified by refine and defaults to 5 if refine is true.
+     * This does multiply the numbers of points describing the well path by this number.
      */
     refine: boolean | number;
     wellHeadStyle: WellHeadStyleAccessor;
