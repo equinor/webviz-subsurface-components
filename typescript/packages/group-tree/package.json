@@ -1,6 +1,6 @@
 {
     "name": "@webviz/group-tree",
-    "version": "1.0.0",
+    "version": "1.0.3",
     "description": "",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -21,7 +21,7 @@
     "author": "Equinor <opensource@equinor.com>",
     "license": "MPL-2.0",
     "dependencies": {
-        "@equinor/eds-core-react": "^0.32.3",
+        "@equinor/eds-core-react": "^0.33.0",
         "@reduxjs/toolkit": "^1.7.2",
         "d3": "^7.8.2",
         "lodash": "^4.17.21",

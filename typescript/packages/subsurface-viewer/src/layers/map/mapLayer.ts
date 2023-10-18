@@ -9,7 +9,7 @@ import type {
 import { getModelMatrix } from "../utils/layerTools";
 import { isEqual } from "lodash";
 import * as png from "@vivaxy/png";
-import { makeFullMesh } from "./webworker";
+import { makeFullMesh } from "./utils";
 import type { Matrix4 } from "math.gl";
 
 // Rotate x,y around x0, y0 rad radians
@@ -54,12 +54,18 @@ export type Params = {
     isMesh: boolean;
     frame: Frame;
     smoothShading: boolean;
+    gridLines: boolean;
+    ZIncreasingDownwards: boolean;
 };
 
-async function load_mesh_and_properties(
-    meshData: string | number[],
-    propertiesData: string | number[],
-    ZIncreasingDownwards: boolean
+/**
+ * Will load data for the mesh and the properties. Both of which may be given as arrays (javascript or typed)
+ * or as a URL to the data in binary format.
+ * Return value: A promise with the data given as typed arrays.
+ */
+async function loadMeshAndProperties(
+    meshData: string | number[] | Float32Array,
+    propertiesData: string | number[] | Float32Array
 ) {
     // Keep
     //const t0 = performance.now();
@@ -77,7 +83,10 @@ async function load_mesh_and_properties(
 
     //-- PROPERTIES. --
     let properties: Float32Array;
-    if (Array.isArray(propertiesData)) {
+    if (ArrayBuffer.isView(propertiesData)) {
+        // Input data is typed array.
+        properties = propertiesData; // Note no copy. Make sure input data is not altered.
+    } else if (Array.isArray(propertiesData)) {
         // Input data is native javascript array.
         properties = new Float32Array(propertiesData);
     } else {
@@ -121,7 +130,10 @@ async function load_mesh_and_properties(
     //-- MESH --
     let mesh: Float32Array = new Float32Array();
     if (isMesh) {
-        if (Array.isArray(meshData)) {
+        if (ArrayBuffer.isView(meshData)) {
+            // Input data is typed array.
+            mesh = meshData; // Note no copy. Make sure data is never altered.
+        } else if (Array.isArray(meshData)) {
             // Input data is native javascript array.
             mesh = new Float32Array(meshData);
         } else {
@@ -163,15 +175,9 @@ async function load_mesh_and_properties(
         }
     }
 
-    if (!ZIncreasingDownwards) {
-        for (let i = 0; i < mesh.length; i++) {
-            mesh[i] *= -1;
-        }
-    }
-
-    //const t1 = performance.now();
     // Keep this.
-    //console.log(`Task loading took ${(t1 - t0) * 0.001}  seconds.`);
+    // const t1 = performance.now();
+    // console.debug(`Task loading took ${(t1 - t0) * 0.001}  seconds.`);
 
     return Promise.all([isMesh, mesh, properties]);
 }
@@ -183,7 +189,7 @@ export interface MapLayerProps extends ExtendedLayerProps {
     /**  Url to the height (z values) mesh.
      */
     meshUrl: string; // Deprecated
-    meshData: string | number[];
+    meshData: string | number[] | Float32Array;
 
     /**  Horizontal extent of the terrain mesh. Format:
      {
@@ -203,7 +209,7 @@ export interface MapLayerProps extends ExtendedLayerProps {
      * colored.
      */
     propertiesUrl: string; // Deprecated
-    propertiesData: string | number[];
+    propertiesData: string | number[] | Float32Array;
 
     /**  Contourlines reference point and interval.
      * A value of [-1.0, -1.0] will disable contour lines.
@@ -321,94 +327,90 @@ export default class MapLayer extends CompositeLayer<MapLayerProps> {
         const propertiesData =
             this.props.propertiesData ?? this.props.propertiesUrl;
 
-        const p = load_mesh_and_properties(
-            meshData,
-            propertiesData,
-            this.props.ZIncreasingDownwards
-        );
+        const p = loadMeshAndProperties(meshData, propertiesData);
 
         p.then(([isMesh, meshData, propertiesData]) => {
-            // Using inline web worker for calculating the triangle mesh from
-            // loaded input data so not to halt the GUI thread.
-            const blob = new Blob(
-                ["self.onmessage = ", makeFullMesh.toString()],
-                { type: "text/javascript" }
-            );
-            const url = URL.createObjectURL(blob);
-            const webWorker = new Worker(url);
-
-            const webworkerParams = {
+            const params: Params = {
                 meshData,
                 propertiesData,
                 isMesh,
                 frame: this.props.frame,
                 smoothShading: this.props.smoothShading,
+                gridLines: this.props.gridLines,
+                ZIncreasingDownwards: this.props.ZIncreasingDownwards,
             };
 
-            webWorker.postMessage(webworkerParams);
-            webWorker.onmessage = (e) => {
-                const [mesh, mesh_lines, meshZValueRange, propertyValueRange] =
-                    e.data;
+            const [
+                positions,
+                normals,
+                triangleIndices,
+                vertexProperties,
+                vertexIndices,
+                lineIndices,
+                meshZValueRange,
+                propertyValueRange,
+            ] = makeFullMesh(params);
 
-                this.setState({
-                    ...this.state,
-                    mesh,
-                    mesh_lines,
-                    propertyValueRange,
-                });
+            this.setState({
+                ...this.state,
+                positions,
+                normals,
+                triangleIndices,
+                vertexProperties,
+                vertexIndices,
+                lineIndices,
+                propertyValueRange,
+            });
 
-                if (
-                    typeof this.props.setReportedBoundingBox !== "undefined" &&
-                    reportBoundingBox
-                ) {
-                    const xinc = this.props.frame?.increment?.[0] ?? 0;
-                    const yinc = this.props.frame?.increment?.[1] ?? 0;
+            if (
+                typeof this.props.setReportedBoundingBox !== "undefined" &&
+                reportBoundingBox
+            ) {
+                const xinc = this.props.frame?.increment?.[0] ?? 0;
+                const yinc = this.props.frame?.increment?.[1] ?? 0;
 
-                    const nnodes_x = this.props.frame?.count?.[0] ?? 2; // number of nodes in x direction
-                    const nnodes_y = this.props.frame?.count?.[1] ?? 2;
+                const nnodes_x = this.props.frame?.count?.[0] ?? 2; // number of nodes in x direction
+                const nnodes_y = this.props.frame?.count?.[1] ?? 2;
 
-                    const xMin = this.props.frame?.origin?.[0] ?? 0;
-                    const yMin = this.props.frame?.origin?.[1] ?? 0;
-                    const zMin = -meshZValueRange[0];
-                    const xMax = xMin + xinc * (nnodes_x - 1);
-                    const yMax = yMin + yinc * (nnodes_y - 1);
-                    const zMax = -meshZValueRange[1];
+                const xMin = this.props.frame?.origin?.[0] ?? 0;
+                const yMin = this.props.frame?.origin?.[1] ?? 0;
+                const zMin = -meshZValueRange[0];
+                const xMax = xMin + xinc * (nnodes_x - 1);
+                const yMax = yMin + yinc * (nnodes_y - 1);
+                const zMax = -meshZValueRange[1];
 
-                    // If map is rotated the bounding box must reflect that.
-                    const center =
-                        this.props.frame.rotPoint ?? this.props.frame.origin;
-                    const rotDeg = this.props.frame.rotDeg ?? 0;
-                    const rotRad = (rotDeg * (2.0 * Math.PI)) / 360.0;
+                // If map is rotated the bounding box must reflect that.
+                const center =
+                    this.props.frame.rotPoint ?? this.props.frame.origin;
+                const rotDeg = this.props.frame.rotDeg ?? 0;
+                const rotRad = (rotDeg * (2.0 * Math.PI)) / 360.0;
 
-                    // Rotate x,y around "center" "rad" radians
-                    const [x0, y0] = rotate(xMin, yMin, center[0], center[1], rotRad); // eslint-disable-line
-                    const [x1, y1] = rotate(xMax, yMin, center[0], center[1], rotRad); // eslint-disable-line
-                    const [x2, y2] = rotate(xMax, yMax, center[0], center[1], rotRad); // eslint-disable-line
-                    const [x3, y3] = rotate(xMin, yMax, center[0], center[1], rotRad); // eslint-disable-line
+                // Rotate x,y around "center" "rad" radians
+                const [x0, y0] = rotate(xMin, yMin, center[0], center[1], rotRad); // eslint-disable-line
+                const [x1, y1] = rotate(xMax, yMin, center[0], center[1], rotRad); // eslint-disable-line
+                const [x2, y2] = rotate(xMax, yMax, center[0], center[1], rotRad); // eslint-disable-line
+                const [x3, y3] = rotate(xMin, yMax, center[0], center[1], rotRad); // eslint-disable-line
 
-                    // Rotated bounds in x/y plane.
-                    const x_min = Math.min(x0, x1, x2, x3);
-                    const x_max = Math.max(x0, x1, x2, x3);
-                    const y_min = Math.min(y0, y1, y2, y3);
-                    const y_max = Math.max(y0, y1, y2, y3);
+                // Rotated bounds in x/y plane.
+                const x_min = Math.min(x0, x1, x2, x3);
+                const x_max = Math.max(x0, x1, x2, x3);
+                const y_min = Math.min(y0, y1, y2, y3);
+                const y_max = Math.max(y0, y1, y2, y3);
 
-                    this.props.setReportedBoundingBox([
-                        x_min,
-                        y_min,
-                        zMin,
-                        x_max,
-                        y_max,
-                        zMax,
-                    ]);
-                }
+                this.props.setReportedBoundingBox([
+                    x_min,
+                    y_min,
+                    zMin,
+                    x_max,
+                    y_max,
+                    zMax,
+                ]);
+            }
 
-                webWorker.terminate();
-
-                this.setState({
-                    ...this.state,
-                    isFinishedLoading: true,
-                });
-            };
+            this.setState({
+                ...this.state,
+                isFinishedLoading: true,
+            });
         });
     }
 
@@ -478,8 +480,12 @@ export default class MapLayer extends CompositeLayer<MapLayerProps> {
 
         const layer = new privateMapLayer(
             this.getSubLayerProps({
-                mesh: this.state["mesh"],
-                meshLines: this.state["mesh_lines"],
+                positions: this.state["positions"],
+                normals: this.state["normals"],
+                triangleIndices: this.state["triangleIndices"],
+                vertexProperties: this.state["vertexProperties"],
+                vertexIndices: this.state["vertexIndices"],
+                lineIndices: this.state["lineIndices"],
                 pickable: this.props.pickable,
                 modelMatrix: rotatingModelMatrix,
                 contours: this.props.contours,

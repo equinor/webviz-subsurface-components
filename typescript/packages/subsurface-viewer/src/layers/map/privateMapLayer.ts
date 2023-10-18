@@ -32,27 +32,6 @@ const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE,
 };
 
-export type MeshType = {
-    drawMode?: number;
-    attributes: {
-        positions: { value: Float32Array; size: number };
-        TEXCOORD_0?: { value: Float32Array; size: number };
-        normals: { value: Float32Array; size: number };
-        properties: { value: Float32Array; size: number };
-        vertex_indexs: { value: Int32Array; size: number };
-    };
-    vertexCount: number;
-    indices: { value: Uint32Array; size: number };
-};
-
-export type MeshTypeLines = {
-    drawMode: number;
-    attributes: {
-        positions: { value: Float32Array; size: number };
-    };
-    vertexCount: number;
-};
-
 export type Material =
     | {
           ambient: number;
@@ -62,8 +41,12 @@ export type Material =
       }
     | boolean;
 export interface privateMapLayerProps extends ExtendedLayerProps {
-    mesh: MeshType;
-    meshLines: MeshTypeLines;
+    positions: Float32Array;
+    normals: Int8Array;
+    triangleIndices: Uint32Array;
+    vertexProperties: Float32Array;
+    vertexIndices: Int32Array;
+    lineIndices: Uint32Array;
     contours: [number, number];
     gridLines: boolean;
     isContoursDepth: boolean;
@@ -131,15 +114,17 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
             vs: vsShader,
             fs: fsShader,
             geometry: new Geometry({
-                drawMode: this.props.mesh.drawMode,
+                drawMode: gl.TRIANGLES,
                 attributes: {
-                    positions: this.props.mesh.attributes.positions,
-                    normals: this.props.mesh.attributes.normals,
-                    properties: this.props.mesh.attributes.properties,
-                    vertex_indexs: this.props.mesh.attributes.vertex_indexs,
+                    positions: { value: this.props.positions, size: 3 },
+                    // Only add normals if they are defined.
+                    ...(this.props.normals.length > 0 && {
+                        normals: { value: this.props.normals, size: 3 },
+                    }),
+                    properties: { value: this.props.vertexProperties, size: 1 },
+                    vertex_indexs: { value: this.props.vertexIndices, size: 1 },
                 },
-                vertexCount: this.props.mesh.vertexCount,
-                indices: this.props.mesh.indices,
+                indices: { value: this.props.triangleIndices, size: 1 },
             }),
             modules: [project, picking, localPhongLighting],
             isInstanced: false, // This only works when set to false.
@@ -150,8 +135,14 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
             id: `${this.props.id}-lines`,
             vs: vsLineShader,
             fs: fsLineShader,
-            geometry: new Geometry(this.props.meshLines),
-            modules: [project, picking],
+            geometry: new Geometry({
+                drawMode: gl.LINES,
+                attributes: {
+                    positions: { value: this.props.positions, size: 3 },
+                },
+                indices: { value: this.props.lineIndices, size: 1 },
+            }),
+            modules: [project],
             isInstanced: false,
         });
 
@@ -200,7 +191,8 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
         const isColorMapClampColorTransparent: boolean =
             (this.props.colorMapClampColor as boolean) === false;
 
-        const smoothShading = this.props.smoothShading;
+        const smoothShading =
+            this.props.normals.length == 0 ? false : this.props.smoothShading;
 
         gl.enable(GL.POLYGON_OFFSET_FILL);
         if (!this.props.depthTest) {
@@ -269,11 +261,11 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
 
         const vertexIndex = 256 * 256 * r + 256 * g + b;
 
-        const vertexs = this.props.mesh.attributes.positions.value;
+        const vertexs = this.props.positions;
         const depth = -vertexs[3 * vertexIndex + 2];
         layer_properties.push(createPropertyData("Depth", depth));
 
-        const properties = this.props.mesh.attributes.properties.value;
+        const properties = this.props.vertexProperties;
         const property = properties[vertexIndex];
         layer_properties.push(createPropertyData("Property", property));
 

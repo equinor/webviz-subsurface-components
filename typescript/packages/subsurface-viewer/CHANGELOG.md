@@ -1,3 +1,38 @@
+## [0.3.5](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.3.4...subsurface-viewer@0.3.5) (2023-10-17)
+
+
+### Bug Fixes
+
+* bump @equinor/eds-core-react from 0.32.x to 0.33.0 ([#1704](https://github.com/equinor/webviz-subsurface-components/issues/1704)) ([75c5de8](https://github.com/equinor/webviz-subsurface-components/commit/75c5de8cd069a6c0d1d87b54307e23cf5be1b4b3))
+
+## [0.3.4](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.3.3...subsurface-viewer@0.3.4) (2023-10-17)
+
+
+### Bug Fixes
+
+* audit fix prod dependencies ([#1707](https://github.com/equinor/webviz-subsurface-components/issues/1707)) ([b5dbcf8](https://github.com/equinor/webviz-subsurface-components/commit/b5dbcf8677d0f0424cfdf4c2d237b378de867e12))
+
+## [0.3.3](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.3.2...subsurface-viewer@0.3.3) (2023-10-13)
+
+
+### Bug Fixes
+
+* bump d3-format from 1.4.5 to 3.1.0 in /typescript ([#1680](https://github.com/equinor/webviz-subsurface-components/issues/1680)) ([91f42d1](https://github.com/equinor/webviz-subsurface-components/commit/91f42d1b47c8c423ae8e4d720daf44f2b24730e4))
+
+## [0.3.2](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.3.1...subsurface-viewer@0.3.2) (2023-10-13)
+
+
+### Bug Fixes
+
+* View resets to default when adding/removing a layer. [#1690](https://github.com/equinor/webviz-subsurface-components/issues/1690) ([#1691](https://github.com/equinor/webviz-subsurface-components/issues/1691)) ([5ec5d90](https://github.com/equinor/webviz-subsurface-components/commit/5ec5d904c9fe97df4c87ed9fe51bdd30a16a271a))
+
+## [0.3.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.3.0...subsurface-viewer@0.3.1) (2023-10-12)
+
+
+### Performance Improvements
+
+* Performance improvements to makeFullMesh function in MapLayer  [#1662](https://github.com/equinor/webviz-subsurface-components/issues/1662) ([#1689](https://github.com/equinor/webviz-subsurface-components/issues/1689)) ([f7a79cd](https://github.com/equinor/webviz-subsurface-components/commit/f7a79cdeb4d457106abacb88de2918190e7aba80))
+
 # [0.3.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.2.3...subsurface-viewer@0.3.0) (2023-10-05)
 
 
