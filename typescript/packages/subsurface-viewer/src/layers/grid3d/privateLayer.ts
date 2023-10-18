@@ -41,7 +41,6 @@ export type MeshType = {
         properties: { value: Float32Array; size: number };        
     };
     vertexCount: number;
-    //indices: { value: Uint32Array; size: number };
 };
 
 export type MeshTypeLines = {
