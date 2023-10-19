@@ -39,16 +39,15 @@ export type MeshType = {
         TEXCOORD_0?: { value: Float32Array; size: number };
         normals?: { value: Float32Array; size: number };
         properties: { value: Float32Array; size: number };
-        vertex_indexs: { value: Int32Array; size: number };
     };
     vertexCount: number;
-    indices: { value: Uint32Array; size: number };
 };
 
 export type MeshTypeLines = {
     drawMode: number;
     attributes: {
         positions: { value: Float32Array; size: number };
+        indices: { value: Uint32Array; size: number };
     };
     vertexCount: number;
 };
@@ -115,7 +114,6 @@ export default class privateLayer extends Layer<privateLayerProps> {
     updateState({ context }: UpdateParameters<this>): void {
         this.initializeState(context as DeckGLLayerContext);
     }
-
     //eslint-disable-next-line
     _getModels(gl: any) {
         // MESH MODEL
@@ -128,10 +126,8 @@ export default class privateLayer extends Layer<privateLayerProps> {
                 attributes: {
                     positions: this.props.mesh.attributes.positions,
                     properties: this.props.mesh.attributes.properties,
-                    vertex_indexs: this.props.mesh.attributes.vertex_indexs,
                 },
                 vertexCount: this.props.mesh.vertexCount,
-                indices: this.props.mesh.indices,
             }),
             modules: [project, picking, phongLighting],
             isInstanced: false, // This only works when set to false.
@@ -257,13 +253,16 @@ export default class privateLayer extends Layer<privateLayerProps> {
 
         const vertexIndex = 256 * 256 * r + 256 * g + b;
 
-        const vertexs = this.props.mesh.attributes.positions.value;
-        const depth = -vertexs[3 * vertexIndex + 2];
-        layer_properties.push(createPropertyData("Depth", depth));
+        if (info.coordinate?.[2]) {
+            const depth = info.coordinate[2];
+            layer_properties.push(createPropertyData("Depth", depth));
+        }
 
         const properties = this.props.mesh.attributes.properties.value;
         const property = properties[vertexIndex];
-        layer_properties.push(createPropertyData("Property", property));
+        if (Number.isFinite(property)) {
+            layer_properties.push(createPropertyData("Property", property));
+        }
 
         return {
             ...info,

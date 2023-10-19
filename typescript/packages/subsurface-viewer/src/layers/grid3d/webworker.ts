@@ -818,15 +818,7 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
     const getLineSegment = (index0: number, index1: number, out: number[]) => {
         const i1 = polys[index0];
         const i2 = polys[index1];
-
-        const p1 = get3DPoint(params.points, i1);
-        const p2 = get3DPoint(params.points, i2);
-
-        p1[2] *= z_sign;
-        p2[2] *= z_sign;
-
-        out.push(...p1);
-        out.push(...p2);
+        out.push(i1, i2);
     };
 
     // Keep
@@ -836,21 +828,16 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
 
     const polys = params.polys;
     const properties = params.properties;
-    const isZIncreasingDownwards = params.isZIncreasingDownwards;
 
-    const positions: number[] = [];
-    const indices: number[] = [];
     const vertexProperties: number[] = [];
-    const line_positions: number[] = [];
+    const triang_points: number[] = [];
+    const line_indices: number[] = [];
 
     let propertyValueRangeMin = +99999999;
     let propertyValueRangeMax = -99999999;
 
-    const z_sign = isZIncreasingDownwards ? -1 : 1;
-
     let pn = 0;
     let i = 0;
-    let vertexIndex = 0;
 
     while (i < polys.length) {
         const n = polys[i];
@@ -870,17 +857,19 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
 
         // Lines.
         for (let j = i + 1; j < i + n; ++j) {
-            getLineSegment(j, j + 1, line_positions);
+            getLineSegment(j, j + 1, line_indices);
         }
-        getLineSegment(i + 1, i + n, line_positions);
+        getLineSegment(i + 1, i + n, line_indices);
 
         const polygon: number[] = [];
-        const vertexIndices: number[] = [];
+
         for (let p = 1; p <= n; ++p) {
             const i0 = polys[i + p];
-            const point = get3DPoint(params.points, i0);
-            point[2] *= z_sign;
-            vertexIndices.push(i0);
+            const point = [
+                params.points[i0 * 3],
+                params.points[i0 * 3 + 1],
+                params.points[i0 * 3 + 2],
+            ];
             polygon.push(...point);
         }
         // As the triangulation algorythm works in 2D space
@@ -889,9 +878,8 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
         const triangles: number[] = earcut(flatPoly, 2);
 
         for (const t of triangles) {
-            positions.push(...get3DPoint(polygon, t));
+            triang_points.push(...get3DPoint(polygon, t));
             vertexProperties.push(propertyValue);
-            indices.push(vertexIndex++);
         }
         i = i + n + 1;
     }
@@ -901,20 +889,19 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
     const mesh: MeshType = {
         drawMode: 4, // corresponds to GL.TRIANGLES,
         attributes: {
-            positions: { value: new Float32Array(positions), size: 3 },
+            positions: { value: new Float32Array(triang_points), size: 3 },
             properties: { value: new Float32Array(vertexProperties), size: 1 },
-            vertex_indexs: { value: new Int32Array(indices), size: 1 },
         },
-        vertexCount: indices.length,
-        indices: { value: new Uint32Array(indices), size: 1 },
+        vertexCount: triang_points.length,
     };
 
     const mesh_lines: MeshTypeLines = {
         drawMode: 1, // corresponds to GL.LINES,
         attributes: {
-            positions: { value: new Float32Array(line_positions), size: 3 },
+            positions: { value: params.points, size: 3 },
+            indices: { value: new Uint32Array(line_indices), size: 1 },
         },
-        vertexCount: line_positions.length / 3,
+        vertexCount: line_indices.length,
     };
 
     const t1 = performance.now();
