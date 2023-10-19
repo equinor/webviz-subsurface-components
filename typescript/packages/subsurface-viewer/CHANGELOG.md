@@ -1,3 +1,10 @@
+# [0.4.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.3.5...subsurface-viewer@0.4.0) (2023-10-19)
+
+
+### Features
+
+* Grid3d Layer API and cursor readout enhancements. ([#1714](https://github.com/equinor/webviz-subsurface-components/issues/1714)) ([147292d](https://github.com/equinor/webviz-subsurface-components/commit/147292dc18e5b715c6ced842d4c779c355d7a5aa))
+
 ## [0.3.5](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.3.4...subsurface-viewer@0.3.5) (2023-10-17)
 
 
