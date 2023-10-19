@@ -9,6 +9,7 @@ import {
     Faces as SnubCubeFaces,
     VertexCount as SnubCubeVertexCount,
 } from "./test_data/TruncatedSnubCube";
+
 import {
     Points as ToroidPoints,
     Faces as ToroidFaces,
@@ -75,6 +76,7 @@ Simgrid.args = {
             pointsData: "vtk-grid/Simgrid_points.json",
             polysData: "vtk-grid/Simgrid_polys.json",
             propertiesData: "vtk-grid/Simgrid_scalar.json",
+            pickable: true,
         },
     ],
 };
@@ -97,6 +99,7 @@ SimgridArrayInput.args = {
             ],
             polysData: [4, 0, 1, 2, 3, 4, 0, 4, 5, 1, 4, 0, 3, 6, 4],
             propertiesData: [0.2, 0.6, 0.8],
+            pickable: true,
         },
     ],
 };
@@ -113,6 +116,7 @@ Simgrid2x.args = {
             pointsData: "vtk-grid/Simgrid2x_points.json",
             polysData: "vtk-grid/Simgrid2x_polys.json",
             propertiesData: "vtk-grid/Simgrid2x_scalar.json",
+            pickable: true,
         },
     ],
 };
@@ -129,6 +133,7 @@ Simgrid4x.args = {
             pointsData: "vtk-grid/Simgrid4x_points.json",
             polysData: "vtk-grid/Simgrid4x_polys.json",
             propertiesData: "vtk-grid/Simgrid4x_scalar.json",
+            pickable: true,
         },
     ],
 };
@@ -145,6 +150,7 @@ Simgrid8xIJonly.args = {
             pointsData: "vtk-grid/Simgrid8xIJonly_points.json",
             polysData: "vtk-grid/Simgrid8xIJonly_polys.json",
             propertiesData: "vtk-grid/Simgrid8xIJonly_scalar.json",
+            pickable: true,
         },
     ],
 };
@@ -175,6 +181,7 @@ PolyhedralCells.args = {
         {
             ...grid3dLayer,
             id: "polyhedral1",
+            pickable: true,
             pointsData: SnubCubePoints.map((v) => 10 * v),
             polysData: SnubCubeFaces,
             propertiesData: Array(SnubCubeVertexCount)
@@ -184,6 +191,7 @@ PolyhedralCells.args = {
         {
             ...grid3dLayer,
             id: "polyhedral2",
+            pickable: true,
             pointsData: ToroidPoints.map((v) => 10 * v).map((v, index) =>
                 index % 3 === 0 ? v + 30 : v
             ),
@@ -195,38 +203,3 @@ PolyhedralCells.args = {
     ],
 };
 PolyhedralCells.parameters = parameters;
-
-// // Intersection story.
-// const intersection_axes = {
-//     "@@type": "AxesLayer",
-//     id: "axes-layer2",
-//     bounds: [463256, 5930542.5, -9060, 464465, 5932768, -7999],
-// };
-
-// const intersection = {
-//     "@@type": "Grid3DLayer",
-//     id: "Grid3DLayer",
-//     pointsData: "vtk-grid/intersection_points.json",
-//     polysData: "vtk-grid/intersection_polys.json",
-//     propertiesData: "vtk-grid/intersection_scalar.json",
-//     material: true,
-//     colorMapName: "Rainbow",
-//     scaleZ: 5,
-// };
-
-// export const Intersection = Template.bind({});
-// Intersection.args = {
-//     ...defaultProps,
-//     id: "grid-3d",
-//     layers: [intersection_axes, intersection],
-// };
-
-// Intersection.parameters = {
-//     docs: {
-//         description: {
-//             story: "3D grid intersection geometry using vtk polydata format.",
-//         },
-//         inlineStories: false,
-//         iframeHeight: 500,
-//     },
-// };

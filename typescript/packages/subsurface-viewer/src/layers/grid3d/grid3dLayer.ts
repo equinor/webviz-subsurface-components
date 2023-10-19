@@ -11,15 +11,13 @@ import { isEqual } from "lodash";
 import { load, JSONLoader } from "@loaders.gl/core";
 
 export type WebWorkerParams = {
-    points: number[];
-    polys: number[];
-    properties: number[];
-    isZIncreasingDownwards: boolean;
+    points: Float32Array;
+    polys: Uint32Array;
+    properties: Float32Array;
 };
 
 function GetBBox(
-    points: number[],
-    isZIncreasingDownwards: boolean
+    points: Float32Array
 ): [number, number, number, number, number, number] {
     let xmax = -99999999;
     let ymax = -99999999;
@@ -28,8 +26,6 @@ function GetBBox(
     let xmin = 99999999;
     let ymin = 99999999;
     let zmin = 99999999;
-
-    const z_sign = isZIncreasingDownwards ? -1 : 1;
 
     for (let i = 0; i < points.length / 3; i++) {
         xmax = points[3 * i + 0] > xmax ? points[3 * i + 0] : xmax;
@@ -41,50 +37,83 @@ function GetBBox(
         zmax = points[3 * i + 2] > zmax ? points[3 * i + 2] : zmax;
         zmin = points[3 * i + 2] < zmin ? points[3 * i + 2] : zmin;
     }
-    return [xmin, ymin, zmin * z_sign, xmax, ymax, zmax * z_sign];
+    return [xmin, ymin, zmin, xmax, ymax, zmax];
+}
+
+async function loadFloat32Data(
+    data: string | number[] | Float32Array
+): Promise<Float32Array> {
+    if (data instanceof Float32Array) {
+        return data;
+    }
+    if (Array.isArray(data)) {
+        return new Float32Array(data);
+    }
+    if (typeof data === "string") {
+        const stringData = await load(data as string, JSONLoader);
+        return new Float32Array(stringData);
+    }
+    return Promise.reject("Grid3DLayer: Unsupported type of input data");
+}
+
+async function loadUint32Data(
+    data: string | number[] | Uint32Array
+): Promise<Uint32Array> {
+    if (data instanceof Uint32Array) {
+        return data;
+    }
+    if (Array.isArray(data)) {
+        return new Uint32Array(data);
+    }
+    if (typeof data === "string") {
+        const stringData = await load(data as string, JSONLoader);
+        return new Uint32Array(stringData);
+    }
+    return Promise.reject("Grid3DLayer: Unsupported type of input data");
 }
 
 async function load_data(
-    pointsData: string | number[],
-    polysData: string | number[],
-    propertiesData: string | number[]
+    pointsData: string | number[] | Float32Array,
+    polysData: string | number[] | Uint32Array,
+    propertiesData: string | number[] | Float32Array
 ) {
-    const points = Array.isArray(pointsData)
-        ? pointsData
-        : await load(pointsData as string, JSONLoader);
-
-    const polys = Array.isArray(polysData)
-        ? polysData
-        : await load(polysData as string, JSONLoader);
-
-    const properties = Array.isArray(propertiesData)
-        ? propertiesData
-        : await load(propertiesData as string, JSONLoader);
-
+    const points = await loadFloat32Data(pointsData);
+    const polys = await loadUint32Data(polysData);
+    const properties = await loadFloat32Data(propertiesData);
     return Promise.all([points, polys, properties]);
+}
+
+function applyZIncrasingDownward(data: Float32Array, zDownward: boolean) {
+    if (!zDownward) {
+        return;
+    }
+    const count = data.length / 3;
+    for (let i = 0; i < count; ++i) {
+        data[i * 3 + 2] *= -1;
+    }
 }
 
 export interface Grid3DLayerProps extends ExtendedLayerProps {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setReportedBoundingBox?: any;
 
-    /**  Url or native javascript array. Set of points.
+    /**  Url, or native, or typed javascript array. Set of points.
      * [x1, y1, z1, x2, y2, z2, ...]
      */
-    pointsData: string | number[];
+    pointsData: string | number[] | Float32Array;
 
-    /**  Url or native javascript array.
+    /**  Url, or native, or typed javascript array.
      * For each polygon ["number of points in poly", p1, , p2 ... ]
      * Example One polygn ith 4 poitns and one with 3 points.
      * [4, 3, 1, 9, 77, 3, 6, 44, 23]
      */
-    polysData: string | number[];
+    polysData: string | number[] | Uint32Array;
 
-    /**  Url or native javascript array..
+    /**  Url, or native, or typed javascript array.
      *  A scalar property for each polygon.
      * [0.23, 0.11. 0.98, ...]
      */
-    propertiesData: string | number[];
+    propertiesData: string | number[] | Float32Array;
 
     /**  Name of color map. E.g "PORO"
      */
@@ -171,7 +200,8 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
         );
 
         p.then(([points, polys, properties]) => {
-            const bbox = GetBBox(points, this.props.ZIncreasingDownwards);
+            applyZIncrasingDownward(points, this.props.ZIncreasingDownwards);
+            const bbox = GetBBox(points);
 
             // Using inline web worker for calculating the triangle mesh from
             // loaded input data so not to halt the GUI thread.
@@ -186,7 +216,6 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
                 points,
                 polys,
                 properties,
-                isZIncreasingDownwards: this.props.ZIncreasingDownwards,
             };
 
             webWorker.postMessage(webworkerParams);
@@ -266,7 +295,7 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
             this.getSubLayerProps({
                 mesh: this.state["mesh"],
                 meshLines: this.state["mesh_lines"],
-                pickable: true,
+                pickable: this.props.pickable,
                 colorMapName: this.props.colorMapName,
                 colorMapRange: this.props.colorMapRange,
                 colorMapClampColor: this.props.colorMapClampColor,
