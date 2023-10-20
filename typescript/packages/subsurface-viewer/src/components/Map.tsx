@@ -1344,8 +1344,8 @@ function createViewsAndViewStates(
 
     const centerOfData = boundingBoxCenter(boundingBox);
 
-    const widthViewPort = deck?.width ?? 1;
-    const heightViewPort = deck?.height ?? 1;
+    const widthViewPort = deck?.width || 1;
+    const heightViewPort = deck?.height || 1;
 
     const mPixels = views?.marginPixels ?? 0;
 
