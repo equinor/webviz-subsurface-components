@@ -1,3 +1,10 @@
+## [0.4.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.4.0...subsurface-viewer@0.4.1) (2023-10-20)
+
+
+### Bug Fixes
+
+* prevent situation where width is defined and 0 ([#1726](https://github.com/equinor/webviz-subsurface-components/issues/1726)) ([54470e6](https://github.com/equinor/webviz-subsurface-components/commit/54470e68a37800a798c184d68d63c180dcb46ca1))
+
 # [0.4.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.3.5...subsurface-viewer@0.4.0) (2023-10-19)
 
 
