@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { styled } from "@mui/material/styles";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
-import type { ComponentStory, ComponentMeta } from "@storybook/react";
+import type { ComponentStory, ComponentMeta, StoryFn } from "@storybook/react";
 import { NativeSelect } from "@equinor/eds-core-react";
 import {
     createColorMapFunction,
@@ -13,6 +13,9 @@ import {
 import type { MapMouseEvent } from "../../components/Map";
 import WellsLayer from "./wellsLayer";
 import AxesLayer from "../axes/axesLayer";
+import type { FeatureCollection } from "geojson";
+import { Slider } from "@mui/material";
+import type { SyntheticEvent } from "react";
 
 const PREFIX = "VolveWells";
 
@@ -450,6 +453,138 @@ AllWellHeadsHidden.parameters = {
         iframeHeight: 500,
     },
 };
+
+
+
+//////////////////////////////////////////////////////////////////////////////////
+const testWell: FeatureCollection = {
+    type: "FeatureCollection",
+    features: [
+        {
+            type: "Feature",
+            geometry: {
+                type: "GeometryCollection",
+                geometries: [
+                    {
+                        type: "Point",
+                        coordinates: [0, 0],
+                    },
+                    {
+                        type: "LineString",
+                        coordinates: [
+                            [0, 0, 0],
+                            [0, 0, -100],
+                            [99, 99, -150],
+                            [99, 0, -250],
+                        ],
+                    },
+                ],
+            },
+            properties: {
+                name: "well99",
+                color: [255, 255, 0, 255],
+                md: [[0, 1, 2, 3, 4, 5, 8, 9]],
+            },
+        },
+    ],
+};
+
+const BBox = [-100, -100, -250, 100, 100, 0] as [
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+];
+
+//export const WellsRefine = Template.bind({});
+export const WellsRefine: StoryFn<typeof SubsurfaceViewer> = (args) => {
+    const [refineNumber, setRefineNumber] = React.useState<number>(1);
+
+    // const colorMap = React.useCallback(
+    //     (value: number) => {
+    //         return createColorMap(breakpoint)(value);
+    //     },
+    //     [breakpoint]
+    // );
+
+    // const layer = {
+    //     ...args?.layers?.[0],
+    //     colorMapFunction: colorMap,
+    // };
+
+    console.log("refineNumber ", refineNumber)
+
+    const props = {
+        ...args,
+        id: "refine-wells",
+        bounds: [-100, -100, 100, 100] as [number, number, number, number],
+        cameraPosition: {
+            rotationOrbit: -45,
+            rotationX: 15,
+            zoom: BBox,
+            target: [0, 0, 0],
+        },
+        layers: [
+            new WellsLayer({
+                data: testWell,
+                refine: refineNumber,
+            }),
+            new AxesLayer({
+                ZIncreasingDownwards: false,
+                bounds: BBox,
+            }),
+        ],
+        views: {
+            layout: [1, 1],
+            viewports: [
+                {
+                    id: "a",
+                    show3D: true,
+                },
+            ],
+        },
+    };
+
+    const handleChange = React.useCallback(
+        (_event: Event | SyntheticEvent, value: number | number[]) => {
+            setRefineNumber(value as number);
+        },
+        []
+    );
+
+    return (
+        <Root>
+            <Slider
+                min={1}
+                max={20}
+                defaultValue={1}
+                step={1}
+                onChangeCommitted={handleChange}
+            />
+            <div className={classes.main}>
+                <SubsurfaceViewer {...props} />
+            </div>
+        </Root>
+    );
+};
+
+WellsRefine.args = {
+};
+
+WellsRefine.parameters = {
+    docs: {
+        description: {
+            story: "3D wells example",
+        },
+        inlineStories: false,
+        iframeHeight: 500,
+    },
+};
+
+
+
 
 export const Wells3d = Template.bind({});
 Wells3d.args = {
