@@ -480,14 +480,14 @@ function calculateZoomFromBBox3D(
         return camera;
     }
 
-    if (typeof deck === "undefined") {
+    if (!deck) {
         camera_.zoom = 0;
         camera_.target = [0, 0, 0];
         return camera_;
     }
 
-    const width = deck.width;
-    const height = deck.height;
+    const width = (deck.width ?? 1) || 1;
+    const height = (deck.height ?? 1) || 1;
 
     // camera fov eye position. see deck.gl file orbit-viewports.ts
     const fovy = 50; // default in deck.gl. May also be set construction OrbitView
@@ -1299,9 +1299,9 @@ function getViewState3D(
 
     let width = xMax - xMin;
     let height = yMax - yMin;
-    if (deck) {
-        width = deck.width;
-        height = deck.height;
+    if (deck?.width && deck?.height) {
+        width = deck.width || 1;
+        height = deck.height || 1;
     }
 
     const target = [
@@ -1344,12 +1344,18 @@ function createViewsAndViewStates(
 
     const centerOfData = boundingBoxCenter(boundingBox);
 
-    const widthViewPort = deck?.width || 1;
-    const heightViewPort = deck?.height || 1;
+    const widthViewPort = deck?.width ?? 1;
+    const heightViewPort = deck?.height ?? 1;
 
     const mPixels = views?.marginPixels ?? 0;
 
-    const isOk = deck && views && views.layout[0] >= 1 && views.layout[1] >= 1;
+    const isOk =
+        deck &&
+        views &&
+        views.layout[0] >= 1 &&
+        views.layout[1] >= 1 &&
+        widthViewPort > 0 &&
+        heightViewPort > 0;
 
     // if props for multiple viewport are not proper, or deck is not yet initialized, return 2d view
     if (!isOk) {
