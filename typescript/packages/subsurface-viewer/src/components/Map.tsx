@@ -480,14 +480,14 @@ function calculateZoomFromBBox3D(
         return camera;
     }
 
-    if (!deck) {
+    if (!deck?.width || !deck?.height) {
         camera_.zoom = 0;
         camera_.target = [0, 0, 0];
         return camera_;
     }
 
-    const width = (deck.width ?? 1) || 1;
-    const height = (deck.height ?? 1) || 1;
+    const width = deck.width;
+    const height = deck.height;
 
     // camera fov eye position. see deck.gl file orbit-viewports.ts
     const fovy = 50; // default in deck.gl. May also be set construction OrbitView
@@ -1299,9 +1299,9 @@ function getViewState3D(
 
     let width = xMax - xMin;
     let height = yMax - yMin;
-    if (deck?.width && deck?.height) {
-        width = deck.width || 1;
-        height = deck.height || 1;
+    if (deck && deck?.width > 0 && deck?.height > 0) {
+        width = deck.width;
+        height = deck.height;
     }
 
     const target = [
