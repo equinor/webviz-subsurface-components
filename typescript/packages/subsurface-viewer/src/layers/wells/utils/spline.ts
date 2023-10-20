@@ -3,7 +3,7 @@ import type {
     GeometryCollection,
     LineString,
 } from "geojson";
-import { cloneDeep, range } from "lodash";
+import { cloneDeep } from "lodash";
 import type { Position3D } from "../../utils/layerTools";
 import simplify from "@turf/simplify";
 
@@ -191,7 +191,9 @@ export function splineRefine(
 
     const step = 1 / stepCount;
 
-    const steps = range(step, 1, step);
+    const steps = Array(stepCount - 1)
+        .fill(0)
+        .map((_x, index) => (index + 1) * step);
 
     for (let well_no = 0; well_no < no_wells; well_no++) {
         const mds = data.features[well_no].properties?.["md"];

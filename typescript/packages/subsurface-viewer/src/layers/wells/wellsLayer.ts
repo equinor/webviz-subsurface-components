@@ -93,8 +93,8 @@ export interface WellsLayerProps extends ExtendedLayerProps {
     /** Control to refine the well path by super sampling it using a spline interpolation.
      * The well path between each pair of original vertices is split into sub-segments along the spline
      * interpolation.
-     * The number of sub-segments is specified by refine and defaults to 5 if refine is true.
-     * This does multiply the numbers of points describing the well path by this number.
+     * The number of new sub-segments between each pair of original vertices is specified by refine
+     * and defaults to 5 if refine is true.
      */
     refine: boolean | number;
     wellHeadStyle: WellHeadStyleAccessor;
@@ -286,7 +286,6 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 oldProps.ZIncreasingDownwards
             ) ||
             !isEqual(props.refine, oldProps.refine);
-
         if (needs_reload) {
             this.initializeState();
         }

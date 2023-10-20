@@ -454,9 +454,6 @@ AllWellHeadsHidden.parameters = {
     },
 };
 
-
-
-//////////////////////////////////////////////////////////////////////////////////
 const testWell: FeatureCollection = {
     type: "FeatureCollection",
     features: [
@@ -473,6 +470,9 @@ const testWell: FeatureCollection = {
                         type: "LineString",
                         coordinates: [
                             [0, 0, 0],
+                            [0, 0, 1],
+                            [0, 0, 2],
+                            [0, 50, -50],
                             [0, 0, -100],
                             [99, 99, -150],
                             [99, 0, -250],
@@ -498,53 +498,23 @@ const BBox = [-100, -100, -250, 100, 100, 0] as [
     number,
 ];
 
-//export const WellsRefine = Template.bind({});
 export const WellsRefine: StoryFn<typeof SubsurfaceViewer> = (args) => {
     const [refineNumber, setRefineNumber] = React.useState<number>(1);
 
-    // const colorMap = React.useCallback(
-    //     (value: number) => {
-    //         return createColorMap(breakpoint)(value);
-    //     },
-    //     [breakpoint]
-    // );
-
-    // const layer = {
-    //     ...args?.layers?.[0],
-    //     colorMapFunction: colorMap,
-    // };
-
-    console.log("refineNumber ", refineNumber)
-
     const props = {
         ...args,
-        id: "refine-wells",
-        bounds: [-100, -100, 100, 100] as [number, number, number, number],
-        cameraPosition: {
-            rotationOrbit: -45,
-            rotationX: 15,
-            zoom: BBox,
-            target: [0, 0, 0],
-        },
         layers: [
-            new WellsLayer({
+            {
+                "@@type": "WellsLayer",
                 data: testWell,
                 refine: refineNumber,
-            }),
-            new AxesLayer({
+            },
+            {
+                "@@type": "AxesLayer",
                 ZIncreasingDownwards: false,
                 bounds: BBox,
-            }),
+            },
         ],
-        views: {
-            layout: [1, 1],
-            viewports: [
-                {
-                    id: "a",
-                    show3D: true,
-                },
-            ],
-        },
     };
 
     const handleChange = React.useCallback(
@@ -556,21 +526,38 @@ export const WellsRefine: StoryFn<typeof SubsurfaceViewer> = (args) => {
 
     return (
         <Root>
-            <Slider
-                min={1}
-                max={20}
-                defaultValue={1}
-                step={1}
-                onChangeCommitted={handleChange}
-            />
             <div className={classes.main}>
                 <SubsurfaceViewer {...props} />
             </div>
+            <Slider
+                min={1}
+                max={10}
+                defaultValue={1}
+                step={1}
+                onChange={handleChange}
+                valueLabelDisplay={"auto"}
+            />
         </Root>
     );
 };
 
 WellsRefine.args = {
+    id: "refine-wells",
+    cameraPosition: {
+        rotationOrbit: -45,
+        rotationX: 15,
+        zoom: BBox,
+        target: [0, 0, 0],
+    },
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "a",
+                show3D: true,
+            },
+        ],
+    },
 };
 
 WellsRefine.parameters = {
@@ -582,9 +569,6 @@ WellsRefine.parameters = {
         iframeHeight: 500,
     },
 };
-
-
-
 
 export const Wells3d = Template.bind({});
 Wells3d.args = {
