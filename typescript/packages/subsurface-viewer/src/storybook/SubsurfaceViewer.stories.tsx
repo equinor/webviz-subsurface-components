@@ -1,4 +1,5 @@
 import React from "react";
+import type { StoryFn } from "@storybook/react";
 import { styled } from "@mui/material/styles";
 import SubsurfaceViewer from "../SubsurfaceViewer";
 import exampleData from "../../../../../example-data/deckgl-map.json";
@@ -605,7 +606,20 @@ MapInContainer.args = {
     ...exampleData[0],
 };
 
-export const ViewMatrixMargin = EditDataTemplate.bind({});
+export const ViewMatrixMargin: StoryFn<typeof SubsurfaceViewer> = (args) => {
+    const props = {
+        ...args,
+    };
+
+    return (
+        <Root>
+            <div className={classes.main}>
+                <SubsurfaceViewer {...props} />
+            </div>
+        </Root>
+    );
+};
+
 ViewMatrixMargin.args = {
     id: "DeckGL-Map",
     layers: [meshMapLayerPng, axes2D],
