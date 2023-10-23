@@ -345,7 +345,6 @@ export default class MapLayer extends CompositeLayer<MapLayerProps> {
                 normals,
                 triangleIndices,
                 vertexProperties,
-                vertexIndices,
                 lineIndices,
                 meshZValueRange,
                 propertyValueRange,
@@ -357,7 +356,6 @@ export default class MapLayer extends CompositeLayer<MapLayerProps> {
                 normals,
                 triangleIndices,
                 vertexProperties,
-                vertexIndices,
                 lineIndices,
                 propertyValueRange,
             });
@@ -484,7 +482,6 @@ export default class MapLayer extends CompositeLayer<MapLayerProps> {
                 normals: this.state["normals"],
                 triangleIndices: this.state["triangleIndices"],
                 vertexProperties: this.state["vertexProperties"],
-                vertexIndices: this.state["vertexIndices"],
                 lineIndices: this.state["lineIndices"],
                 pickable: this.props.pickable,
                 modelMatrix: rotatingModelMatrix,
@@ -499,6 +496,7 @@ export default class MapLayer extends CompositeLayer<MapLayerProps> {
                 material: this.props.material,
                 smoothShading: this.props.smoothShading,
                 depthTest: this.props.depthTest,
+                ZIncreasingDownwards: this.props.ZIncreasingDownwards,
             })
         );
         return [layer];

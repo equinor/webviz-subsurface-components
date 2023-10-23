@@ -5,7 +5,7 @@ import {
     picking,
     project,
 } from "@deck.gl/core/typed";
-import { localPhongLighting } from "../shader_modules";
+import { localPhongLighting, utilities } from "../shader_modules";
 import type { LayerPickInfo, PropertyDataType } from "../utils/layerTools";
 import { createPropertyData } from "../utils/layerTools";
 import { Model, Geometry } from "@luma.gl/engine";
@@ -57,6 +57,7 @@ export interface privateMapLayerProps extends ExtendedLayerProps {
     propertyValueRange: [number, number];
     smoothShading: boolean;
     depthTest: boolean;
+    ZIncreasingDownwards: boolean;
 }
 
 const defaultProps = {
@@ -69,6 +70,7 @@ const defaultProps = {
     propertyValueRange: [0.0, 1.0],
     meshValueRange: [0.0, 1.0],
     depthTest: true,
+    ZIncreasingDownwards: true,
 };
 
 // This is a private layer used only by the composite Map3DLayer
@@ -122,11 +124,10 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
                         normals: { value: this.props.normals, size: 3 },
                     }),
                     properties: { value: this.props.vertexProperties, size: 1 },
-                    vertex_indexs: { value: this.props.vertexIndices, size: 1 },
                 },
                 indices: { value: this.props.triangleIndices, size: 1 },
             }),
-            modules: [project, picking, localPhongLighting],
+            modules: [project, picking, localPhongLighting, utilities],
             isInstanced: false, // This only works when set to false.
         });
 
@@ -261,9 +262,12 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
 
         const vertexIndex = 256 * 256 * r + 256 * g + b;
 
-        const vertexs = this.props.positions;
-        const depth = -vertexs[3 * vertexIndex + 2];
-        layer_properties.push(createPropertyData("Depth", depth));
+        if (info.coordinate?.[2]) {
+            const depth = this.props.ZIncreasingDownwards
+                ? -info.coordinate[2]
+                : info.coordinate[2];
+            layer_properties.push(createPropertyData("Depth", depth));
+        }
 
         const properties = this.props.vertexProperties;
         const property = properties[vertexIndex];

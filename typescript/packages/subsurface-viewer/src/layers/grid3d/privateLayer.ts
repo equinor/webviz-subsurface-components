@@ -4,7 +4,6 @@ import {
     Layer,
     picking,
     project,
-    phongLighting,
 } from "@deck.gl/core/typed";
 import type { LayerPickInfo, PropertyDataType } from "../utils/layerTools";
 import { createPropertyData } from "../utils/layerTools";
@@ -14,16 +13,14 @@ import type {
     ExtendedLayerProps,
     colorMapFunctionType,
 } from "../utils/layerTools";
-
 import { getImageData } from "../utils/layerTools";
-
+import { Texture2D } from "@luma.gl/webgl";
+import GL from "@luma.gl/constants";
 import vsShader from "./vertex.glsl";
 import fsShader from "./fragment.fs.glsl";
 import vsLineShader from "./vertex_lines.glsl";
 import fsLineShader from "./fragment_lines.glsl";
-
-import { Texture2D } from "@luma.gl/webgl";
-import GL from "@luma.gl/constants";
+import { localPhongLighting, utilities } from "../shader_modules";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,
@@ -71,6 +68,7 @@ export interface privateLayerProps extends ExtendedLayerProps {
     gridLines: boolean;
     propertyValueRange: [number, number];
     depthTest: boolean;
+    ZIncreasingDownwards: boolean;
 }
 
 const defaultProps = {
@@ -78,6 +76,7 @@ const defaultProps = {
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
     propertyValueRange: [0.0, 1.0],
     depthTest: true,
+    ZIncreasingDownwards: true,
 };
 
 // This is a private layer used only by the composite Map3DLayer
@@ -129,7 +128,7 @@ export default class privateLayer extends Layer<privateLayerProps> {
                 },
                 vertexCount: this.props.mesh.vertexCount,
             }),
-            modules: [project, picking, phongLighting],
+            modules: [project, picking, localPhongLighting, utilities],
             isInstanced: false, // This only works when set to false.
         });
 
@@ -213,13 +212,19 @@ export default class privateLayer extends Layer<privateLayerProps> {
                 colorMapClampColor,
                 isColorMapClampColorTransparent,
                 isClampColor,
+                ZIncreasingDownwards: this.props.ZIncreasingDownwards,
             })
             .draw();
         gl.disable(gl.POLYGON_OFFSET_FILL);
 
         // Draw lines.
         if (this.props.gridLines) {
-            mesh_lines_model.draw();
+            mesh_lines_model
+                .setUniforms({
+                    ...uniforms,
+                    ZIncreasingDownwards: this.props.ZIncreasingDownwards,
+                })
+                .draw();
         }
 
         if (!this.props.depthTest) {
@@ -254,7 +259,9 @@ export default class privateLayer extends Layer<privateLayerProps> {
         const vertexIndex = 256 * 256 * r + 256 * g + b;
 
         if (info.coordinate?.[2]) {
-            const depth = info.coordinate[2];
+            const depth = this.props.ZIncreasingDownwards
+                ? -info.coordinate[2]
+                : info.coordinate[2];
             layer_properties.push(createPropertyData("Depth", depth));
         }
 

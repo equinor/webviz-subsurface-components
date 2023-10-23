@@ -1,3 +1,17 @@
+## [0.4.3](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.4.2...subsurface-viewer@0.4.3) (2023-10-23)
+
+
+### Bug Fixes
+
+* irrelevant X, Y, Z readout for map layer ([#1731](https://github.com/equinor/webviz-subsurface-components/issues/1731)) ([704334a](https://github.com/equinor/webviz-subsurface-components/commit/704334ac8d63a94136dda0654e9cc6126c56b818)), closes [#1654](https://github.com/equinor/webviz-subsurface-components/issues/1654) [#1724](https://github.com/equinor/webviz-subsurface-components/issues/1724)
+
+## [0.4.2](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.4.1...subsurface-viewer@0.4.2) (2023-10-23)
+
+
+### Bug Fixes
+
+* Grid3DLayer should apply flag "ZIncreasingDownwards" for correct readout of depth. ([#1729](https://github.com/equinor/webviz-subsurface-components/issues/1729)) ([108b660](https://github.com/equinor/webviz-subsurface-components/commit/108b6601b049eb1cc5ed27fc19f25e61c214d09f)), closes [#1723](https://github.com/equinor/webviz-subsurface-components/issues/1723) [#1724](https://github.com/equinor/webviz-subsurface-components/issues/1724)
+
 ## [0.4.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.4.0...subsurface-viewer@0.4.1) (2023-10-20)
 
 

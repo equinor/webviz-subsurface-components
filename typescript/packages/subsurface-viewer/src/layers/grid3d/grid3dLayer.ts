@@ -7,7 +7,6 @@ import type {
     colorMapFunctionType,
 } from "../utils/layerTools";
 import { makeFullMesh } from "./webworker";
-import { isEqual } from "lodash";
 import { load, JSONLoader } from "@loaders.gl/core";
 
 export type WebWorkerParams = {
@@ -81,16 +80,6 @@ async function load_data(
     const polys = await loadUint32Data(polysData);
     const properties = await loadFloat32Data(propertiesData);
     return Promise.all([points, polys, properties]);
-}
-
-function applyZIncrasingDownward(data: Float32Array, zDownward: boolean) {
-    if (!zDownward) {
-        return;
-    }
-    const count = data.length / 3;
-    for (let i = 0; i < count; ++i) {
-        data[i * 3 + 2] *= -1;
-    }
 }
 
 export interface Grid3DLayerProps extends ExtendedLayerProps {
@@ -200,7 +189,6 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
         );
 
         p.then(([points, polys, properties]) => {
-            applyZIncrasingDownward(points, this.props.ZIncreasingDownwards);
             const bbox = GetBBox(points);
 
             // Using inline web worker for calculating the triangle mesh from
@@ -270,11 +258,11 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
         oldProps: Grid3DLayerProps;
     }): void {
         const needs_reload =
-            !isEqual(props.pointsData, oldProps.pointsData) ||
-            !isEqual(props.polysData, oldProps.polysData) ||
-            !isEqual(props.propertiesData, oldProps.propertiesData) ||
-            !isEqual(props.ZIncreasingDownwards, oldProps.ZIncreasingDownwards);
-
+            props.pointsData !== oldProps.pointsData ||
+            props.polysData !== oldProps.polysData ||
+            props.propertiesData !== oldProps.propertiesData ||
+            props.gridLines !== oldProps.gridLines ||
+            props.ZIncreasingDownwards !== oldProps.ZIncreasingDownwards;
         if (needs_reload) {
             this.setState({
                 ...this.state,
@@ -304,6 +292,7 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
                 propertyValueRange: this.state["propertyValueRange"],
                 material: this.props.material,
                 depthTest: this.props.depthTest,
+                ZIncreasingDownwards: this.props.ZIncreasingDownwards,
             })
         );
         return [layer];
