@@ -480,7 +480,7 @@ function calculateZoomFromBBox3D(
         return camera;
     }
 
-    if (typeof deck === "undefined") {
+    if (!deck?.width || !deck?.height) {
         camera_.zoom = 0;
         camera_.target = [0, 0, 0];
         return camera_;
@@ -1299,7 +1299,7 @@ function getViewState3D(
 
     let width = xMax - xMin;
     let height = yMax - yMin;
-    if (deck) {
+    if (deck && deck?.width > 0 && deck?.height > 0) {
         width = deck.width;
         height = deck.height;
     }
@@ -1349,7 +1349,13 @@ function createViewsAndViewStates(
 
     const mPixels = views?.marginPixels ?? 0;
 
-    const isOk = deck && views && views.layout[0] >= 1 && views.layout[1] >= 1;
+    const isOk =
+        deck &&
+        views &&
+        views.layout[0] >= 1 &&
+        views.layout[1] >= 1 &&
+        widthViewPort > 0 &&
+        heightViewPort > 0;
 
     // if props for multiple viewport are not proper, or deck is not yet initialized, return 2d view
     if (!isOk) {
