@@ -183,9 +183,6 @@ export function makeFullMesh(params: Params) {
     const vertexProperties = new Float32Array(
         isCellCenteredProperties ? nCells * 6 : nNodes
     );
-    const vertexIndices = new Int32Array(
-        isCellCenteredProperties ? nCells * 6 : nNodes
-    );
     let nLineIndices = 0;
     if (gridLines) {
         nLineIndices = isCellCenteredProperties
@@ -225,8 +222,6 @@ export function makeFullMesh(params: Params) {
                 }
 
                 vertexProperties[i] = propertyValue;
-                vertexIndices[i] = i;
-
                 i++;
             }
         }
@@ -521,7 +516,6 @@ export function makeFullMesh(params: Params) {
         normals,
         triangleIndices,
         vertexProperties,
-        vertexIndices,
         lineIndices,
         meshZValueRange,
         propertyValueRange,

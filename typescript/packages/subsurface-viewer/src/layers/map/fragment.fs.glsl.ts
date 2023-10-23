@@ -14,9 +14,7 @@ in vec3 normals_commonspace;
 in vec4 position_commonspace;
 in vec4 vColor;
 
-flat in int vertex_indexs_;
-
-out vec4 fragColor;
+flat in int vertexIndex;
 
 in vec3 worldPos;
 in float property;
@@ -48,27 +46,8 @@ void main(void) {
    }
 
    //Picking pass.
-   if (picking_uActive) {
-      // Express triangle index in 255 system.
-      float r = 0.0;
-      float g = 0.0;
-      float b = 0.0;
-  
-      int idx = vertex_indexs_;
-  
-      if (idx >= (256 * 256) - 1) {
-         r = floor(float(idx) / (256.0 * 256.0));
-         idx -= int(r * (256.0 * 256.0));
-      }
-  
-      if (idx >= 256 - 1) {
-         g = floor(float(idx) / 256.0);
-         idx -= int(g * 256.0);
-      }
-  
-      b = float(idx);
-  
-      fragColor = vec4(r / 255.0, g / 255.0, b / 255.0,  1.0);
+   if (picking_uActive && !picking_uAttribute) {
+      gl_FragColor = encodeVertexIndexToRGB(vertexIndex);
       return;
    }
 
@@ -116,9 +95,9 @@ void main(void) {
 
    // Use normal lighting. This has no effect if "material" property is not set.
    vec3 lightColor = lighting_getLightColor(color.rgb, cameraPosition, position_commonspace.xyz, normal);
-   fragColor = vec4(lightColor, 1.0);
+   gl_FragColor = vec4(lightColor, 1.0);
 
-   DECKGL_FILTER_COLOR(fragColor, geometry);
+   DECKGL_FILTER_COLOR(gl_FragColor, geometry);
 }
 `;
 
