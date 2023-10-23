@@ -7,7 +7,6 @@ import type {
     colorMapFunctionType,
 } from "../utils/layerTools";
 import { makeFullMesh } from "./webworker";
-import { isEqual } from "lodash";
 import { load, JSONLoader } from "@loaders.gl/core";
 
 export type WebWorkerParams = {
