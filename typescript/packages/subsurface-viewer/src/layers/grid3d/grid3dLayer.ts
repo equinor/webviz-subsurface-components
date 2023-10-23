@@ -51,7 +51,6 @@ async function loadFloat32Data(
     }
     if (typeof data === "string") {
         const stringData = await load(data as string, JSONLoader);
-        console.log("stringData", stringData)
         return new Float32Array(stringData);
     }
     return Promise.reject("Grid3DLayer: Unsupported type of input data");
