@@ -259,11 +259,11 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
         oldProps: Grid3DLayerProps;
     }): void {
         const needs_reload =
-            !isEqual(props.pointsData, oldProps.pointsData) ||
-            !isEqual(props.polysData, oldProps.polysData) ||
-            !isEqual(props.propertiesData, oldProps.propertiesData) ||
-            !isEqual(props.gridLines, oldProps.gridLines) ||
-            !isEqual(props.ZIncreasingDownwards, oldProps.ZIncreasingDownwards);
+            props.pointsData !== oldProps.pointsData ||
+            props.polysData !== oldProps.polysData ||
+            props.propertiesData !== oldProps.propertiesData ||
+            props.gridLines !== oldProps.gridLines ||
+            props.ZIncreasingDownwards !== oldProps.ZIncreasingDownwards;
         if (needs_reload) {
             this.setState({
                 ...this.state,
