@@ -18,7 +18,7 @@ import {
 
 export default {
     component: SubsurfaceViewer,
-    title: "SubsurfaceViewer/Experimental Grid3D",
+    title: "SubsurfaceViewer/Grid3D",
 } as ComponentMeta<typeof SubsurfaceViewer>;
 
 type NumberQuad = [number, number, number, number];
@@ -47,13 +47,14 @@ const grid3dLayer = {
     gridLines: true,
     material: true,
     colorMapName: "Rainbow",
-    ZIncreasingDownwards: false,
+    ZIncreasingDownwards: true,
 };
 
 const axes = {
     "@@type": "AxesLayer",
     id: "axes-layer2",
     bounds: [453150, 5925800, 0, 469400, 5939500, 2000],
+    ZIncreasingDownwards: true,
 };
 const parameters = {
     docs: {
@@ -161,7 +162,7 @@ const randomFunc = math?.random ? math.random : Math.random;
 
 export const PolyhedralCells = Template.bind({});
 PolyhedralCells.args = {
-    bounds: [-50, -50, 50, 50] as NumberQuad,
+    bounds: [-25, -25, 50, 30] as NumberQuad,
     views: {
         layout: [1, 1] as [number, number],
         viewports: [
@@ -174,9 +175,9 @@ PolyhedralCells.args = {
     id: "grid-3d-polyhedral-cell",
     layers: [
         {
-            "@@type": "AxesLayer",
+            ...axes,
             id: "polyhedral-cells-axes",
-            bounds: [-50, -50, -50, 50, 50, 50],
+            bounds: [-15, -15, -15, 40, 20, 15],
         },
         {
             ...grid3dLayer,

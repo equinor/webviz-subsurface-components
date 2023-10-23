@@ -51,6 +51,7 @@ async function loadFloat32Data(
     }
     if (typeof data === "string") {
         const stringData = await load(data as string, JSONLoader);
+        console.log("stringData", stringData)
         return new Float32Array(stringData);
     }
     return Promise.reject("Grid3DLayer: Unsupported type of input data");
@@ -81,16 +82,6 @@ async function load_data(
     const polys = await loadUint32Data(polysData);
     const properties = await loadFloat32Data(propertiesData);
     return Promise.all([points, polys, properties]);
-}
-
-function applyZIncrasingDownward(data: Float32Array, zDownward: boolean) {
-    if (!zDownward) {
-        return;
-    }
-    const count = data.length / 3;
-    for (let i = 0; i < count; ++i) {
-        data[i * 3 + 2] *= -1;
-    }
 }
 
 export interface Grid3DLayerProps extends ExtendedLayerProps {
@@ -200,7 +191,6 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
         );
 
         p.then(([points, polys, properties]) => {
-            applyZIncrasingDownward(points, this.props.ZIncreasingDownwards);
             const bbox = GetBBox(points);
 
             // Using inline web worker for calculating the triangle mesh from
@@ -273,8 +263,8 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
             !isEqual(props.pointsData, oldProps.pointsData) ||
             !isEqual(props.polysData, oldProps.polysData) ||
             !isEqual(props.propertiesData, oldProps.propertiesData) ||
+            !isEqual(props.gridLines, oldProps.gridLines) ||
             !isEqual(props.ZIncreasingDownwards, oldProps.ZIncreasingDownwards);
-
         if (needs_reload) {
             this.setState({
                 ...this.state,
@@ -304,6 +294,7 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
                 propertyValueRange: this.state["propertyValueRange"],
                 material: this.props.material,
                 depthTest: this.props.depthTest,
+                ZIncreasingDownwards: this.props.ZIncreasingDownwards,
             })
         );
         return [layer];
