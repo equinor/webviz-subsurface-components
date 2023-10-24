@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { styled } from "@mui/material/styles";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
-import type { ComponentStory, ComponentMeta } from "@storybook/react";
+import type { ComponentStory, ComponentMeta, StoryFn } from "@storybook/react";
 import { NativeSelect } from "@equinor/eds-core-react";
 import {
     createColorMapFunction,
@@ -13,9 +13,48 @@ import {
 import type { MapMouseEvent } from "../../components/Map";
 import WellsLayer from "./wellsLayer";
 import AxesLayer from "../axes/axesLayer";
-import { generateSynteticWell } from "./utils/generateSynteticWell";
+import type { FeatureCollection } from "geojson";
+import { Slider } from "@mui/material";
+import type { SyntheticEvent } from "react";
 
 const PREFIX = "VolveWells";
+
+const testWellWithDuplicates = {
+    type: "FeatureCollection",
+    features: [
+        {
+            type: "Feature",
+            geometry: {
+                type: "GeometryCollection",
+                geometries: [
+                    {
+                        type: "Point",
+                        coordinates: [0, 0],
+                    },
+                    {
+                        type: "LineString",
+                        coordinates: [
+                            [0, 0, 0],
+                            [0, 0, -100],
+                            [0, 0, -200],
+                            [0, 0, -300],
+                            [0, 0, -400],
+                            [0, 0, -500],
+                            [0, 0, -600],
+                            [0, 0, -700],
+                            [0, 0, -800],
+                        ],
+                    },
+                ],
+            },
+            properties: {
+                name: "wl6",
+                color: [255, 255, 0, 255],
+                md: [[0, 1, 2, 3, 4, 5, 8, 9]],
+            },
+        },
+    ],
+};
 
 const classes = {
     main: `${PREFIX}-main`,
@@ -415,6 +454,122 @@ AllWellHeadsHidden.parameters = {
     },
 };
 
+const testWell: FeatureCollection = {
+    type: "FeatureCollection",
+    features: [
+        {
+            type: "Feature",
+            geometry: {
+                type: "GeometryCollection",
+                geometries: [
+                    {
+                        type: "Point",
+                        coordinates: [0, 0],
+                    },
+                    {
+                        type: "LineString",
+                        coordinates: [
+                            [0, 0, 0],
+                            [0, 0, 1],
+                            [0, 0, 2],
+                            [0, 50, -50],
+                            [0, 0, -100],
+                            [99, 99, -150],
+                            [99, 0, -250],
+                        ],
+                    },
+                ],
+            },
+            properties: {
+                name: "well99",
+                color: [255, 255, 0, 255],
+                md: [[0, 1, 2, 3, 4, 5, 8, 9]],
+            },
+        },
+    ],
+};
+
+const BBox = [-100, -100, -250, 100, 100, 0] as [
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+];
+
+export const WellsRefine: StoryFn<typeof SubsurfaceViewer> = (args) => {
+    const [refineNumber, setRefineNumber] = React.useState<number>(1);
+
+    const props = {
+        ...args,
+        layers: [
+            {
+                "@@type": "WellsLayer",
+                data: testWell,
+                refine: refineNumber,
+            },
+            {
+                "@@type": "AxesLayer",
+                ZIncreasingDownwards: false,
+                bounds: BBox,
+            },
+        ],
+    };
+
+    const handleChange = React.useCallback(
+        (_event: Event | SyntheticEvent, value: number | number[]) => {
+            setRefineNumber(value as number);
+        },
+        []
+    );
+
+    return (
+        <Root>
+            <div className={classes.main}>
+                <SubsurfaceViewer {...props} />
+            </div>
+            <Slider
+                min={1}
+                max={10}
+                defaultValue={1}
+                step={1}
+                onChange={handleChange}
+                valueLabelDisplay={"auto"}
+            />
+        </Root>
+    );
+};
+
+WellsRefine.args = {
+    id: "refine-wells",
+    cameraPosition: {
+        rotationOrbit: -45,
+        rotationX: 15,
+        zoom: BBox,
+        target: [0, 0, 0],
+    },
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "a",
+                show3D: true,
+            },
+        ],
+    },
+};
+
+WellsRefine.parameters = {
+    docs: {
+        description: {
+            story: "3D wells example",
+        },
+        inlineStories: false,
+        iframeHeight: 500,
+    },
+};
+
 export const Wells3d = Template.bind({});
 Wells3d.args = {
     ...defaultProps,
@@ -444,7 +599,7 @@ VerticalWellWithDuplicates.args = {
     bounds: [-150, -150, 150, 150],
     layers: [
         new WellsLayer({
-            data: generateSynteticWell(),
+            data: testWellWithDuplicates,
         }),
         new AxesLayer({
             id: "axes-layer",

@@ -90,7 +90,13 @@ export interface WellsLayerProps extends ExtendedLayerProps {
     logrunName: string;
     logRadius: number;
     logCurves: boolean;
-    refine: boolean;
+    /** Control to refine the well path by super sampling it using a spline interpolation.
+     * The well path between each pair of original vertices is split into sub-segments along the spline
+     * interpolation.
+     * The number of new sub-segments between each pair of original vertices is specified by refine
+     * and defaults to 5 if refine is true.
+     */
+    refine: boolean | number;
     wellHeadStyle: WellHeadStyleAccessor;
     colorMappingFunction: (x: number) => [number, number, number];
     lineStyle: LineStyleAccessor;
@@ -251,12 +257,18 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
             removeDuplicates(data);
 
-            const refine = this.props.refine;
-            data = refine
-                ? splineRefine(data) // smooth well paths.
-                : data;
-
             const coarseData = coarsenWells(data);
+
+            const doRefine =
+                typeof this.props.refine === "number"
+                    ? (this.props.refine as number) > 1
+                    : (this.props.refine as boolean);
+
+            const stepCount =
+                typeof this.props.refine === "number" ? this.props.refine : 5;
+            data = doRefine
+                ? splineRefine(data, stepCount) // smooth well paths.
+                : data;
 
             this.setState({
                 ...this.state,
@@ -274,7 +286,6 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 oldProps.ZIncreasingDownwards
             ) ||
             !isEqual(props.refine, oldProps.refine);
-
         if (needs_reload) {
             this.initializeState();
         }
