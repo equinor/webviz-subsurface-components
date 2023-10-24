@@ -262,7 +262,7 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
 
         const vertexIndex = 256 * 256 * r + 256 * g + b;
 
-        if (info.coordinate?.[2]) {
+        if (typeof info.coordinate?.[2] !== "undefined") {
             const depth = this.props.ZIncreasingDownwards
                 ? -info.coordinate[2]
                 : info.coordinate[2];
