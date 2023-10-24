@@ -1,3 +1,10 @@
+## [0.5.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.5.0...subsurface-viewer@0.5.1) (2023-10-24)
+
+
+### Bug Fixes
+
+* Grid3DLayer and MapLayer; Fix readout. Depth not reported for value 0. ([#1733](https://github.com/equinor/webviz-subsurface-components/issues/1733)) ([380f3a0](https://github.com/equinor/webviz-subsurface-components/commit/380f3a05f5a96cdf11bbb4e32ca1d39c8f9a3089)), closes [#1729](https://github.com/equinor/webviz-subsurface-components/issues/1729)
+
 # [0.5.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.4.3...subsurface-viewer@0.5.0) (2023-10-24)
 
 
