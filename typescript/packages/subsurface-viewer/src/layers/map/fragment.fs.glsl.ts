@@ -61,10 +61,10 @@ void main(void) {
          color = vec4(colorMapClampColor.rgb, 1.0);
 
       }
-      else if (isColorMapClampColorTransparent) {
-         discard;
-         return;
-      }
+      // else if (isColorMapClampColorTransparent) {
+      //    discard;
+      //    return;
+      // }
       else {
          // Use min/max color to clamp.
          x = max(0.0, x);
