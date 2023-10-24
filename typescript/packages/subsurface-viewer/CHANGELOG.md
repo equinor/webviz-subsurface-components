@@ -1,3 +1,10 @@
+# [0.5.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.4.3...subsurface-viewer@0.5.0) (2023-10-24)
+
+
+### Features
+
+* Enhanced "refine" keyword for wells. ([#1693](https://github.com/equinor/webviz-subsurface-components/issues/1693)) ([0b9c72e](https://github.com/equinor/webviz-subsurface-components/commit/0b9c72e46b61aa768b80eb10ae84384acc53814d))
+
 ## [0.4.3](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.4.2...subsurface-viewer@0.4.3) (2023-10-23)
 
 
