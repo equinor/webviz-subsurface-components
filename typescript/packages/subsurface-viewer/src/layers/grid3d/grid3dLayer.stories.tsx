@@ -47,14 +47,14 @@ const grid3dLayer = {
     gridLines: true,
     material: true,
     colorMapName: "Rainbow",
-    ZIncreasingDownwards: true,
+    ZIncreasingDownwards: false,
 };
 
 const axes = {
     "@@type": "AxesLayer",
     id: "axes-layer2",
-    bounds: [453150, 5925800, 0, 469400, 5939500, 2000],
-    ZIncreasingDownwards: true,
+    bounds: [453150, 5925800, -2000, 469400, 5939500, 0],
+    ZIncreasingDownwards: false,
 };
 const parameters = {
     docs: {
@@ -131,6 +131,7 @@ Simgrid4x.args = {
         axes,
         {
             ...grid3dLayer,
+            ZIncreasingDownwards: false,
             pointsData: "vtk-grid/Simgrid4x_points.json",
             polysData: "vtk-grid/Simgrid4x_polys.json",
             propertiesData: "vtk-grid/Simgrid4x_scalar.json",
