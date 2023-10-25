@@ -1,3 +1,10 @@
+## [0.5.2](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.5.1...subsurface-viewer@0.5.2) (2023-10-25)
+
+
+### Bug Fixes
+
+* infinite loop when rendering Grid3D layer ([#1735](https://github.com/equinor/webviz-subsurface-components/issues/1735)) ([7626fc4](https://github.com/equinor/webviz-subsurface-components/commit/7626fc486c0af6938ba51cd9e937c38daaf722c5)), closes [#1729](https://github.com/equinor/webviz-subsurface-components/issues/1729)
+
 ## [0.5.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.5.0...subsurface-viewer@0.5.1) (2023-10-24)
 
 
