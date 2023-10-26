@@ -16,8 +16,7 @@ export type Params = {
 
 async function loadData(
     pointsData: string | number[],
-    triangleData: string | number[],
-    ZIncreasingDownwards: boolean
+    triangleData: string | number[]
 ) {
     // Keep
     //const t0 = performance.now();
@@ -39,12 +38,6 @@ async function loadData(
         // Load as binary array of floats.
         const buffer = await blob_mesh.arrayBuffer();
         vertexArray = new Float32Array(buffer);
-    }
-
-    if (ZIncreasingDownwards) {
-        for (let i = 0; i < pointsData.length / 3; i++) {
-            vertexArray[3 * i + 2] *= -1;
-        }
     }
 
     //-- Triangle indexes --
@@ -163,11 +156,7 @@ export default class TriangleLayer extends CompositeLayer<TriangleLayerProps> {
         const pointsData = this.props.pointsData;
         const triangleData = this.props.triangleData;
 
-        const p = loadData(
-            pointsData,
-            triangleData,
-            this.props.ZIncreasingDownwards
-        );
+        const p = loadData(pointsData, triangleData);
 
         p.then(([vertexArray, indexArray]) => {
             // Using inline web worker for calculating the triangle mesh from
@@ -289,6 +278,7 @@ export default class TriangleLayer extends CompositeLayer<TriangleLayerProps> {
                 material: this.props.material,
                 smoothShading: this.props.smoothShading,
                 depthTest: this.props.depthTest,
+                ZIncreasingDownwards: this.props.ZIncreasingDownwards,
             })
         );
         return [layer];
