@@ -1,3 +1,10 @@
+## [0.5.3](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.5.2...subsurface-viewer@0.5.3) (2023-10-27)
+
+
+### Bug Fixes
+
+* force publishing a new package ([#1740](https://github.com/equinor/webviz-subsurface-components/issues/1740)) ([64938ee](https://github.com/equinor/webviz-subsurface-components/commit/64938ee977db4ec01c1ea09135827bc2af837018))
+
 ## [0.5.2](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.5.1...subsurface-viewer@0.5.2) (2023-10-25)
 
 
