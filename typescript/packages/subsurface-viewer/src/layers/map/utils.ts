@@ -44,8 +44,7 @@ function calcNormal(
     ox: number,
     oy: number,
     dx: number,
-    dy: number,
-    multZ: number
+    dy: number
 ) {
     if (!smoothShading) {
         return [1, 1, 1];
@@ -73,11 +72,11 @@ function calcNormal(
     }
 
     const hh = ny - 1 - h; // Note use hh for h for getting y values.
-    const p0 = [ox + w * dx,         oy + hh * dy,        i0_act ? -meshData[i0] * multZ : 0]; // eslint-disable-line
-    const p1 = [ ox + (w - 1) * dx,  oy + hh * dy,        i1_act ? -meshData[i1] * multZ : 0]; // eslint-disable-line
-    const p2 = [ ox + w * dx,        oy + (hh + 1) * dy,  i2_act ? -meshData[i2] * multZ : 0]; // eslint-disable-line
-    const p3 = [ ox + (w + 1) * dx,  oy + hh * dy,        i3_act ? -meshData[i3] * multZ : 0]; // eslint-disable-line
-    const p4 = [ ox + w * dx,        oy + (hh - 1) * dy,  i4_act ? -meshData[i4] * multZ : 0]; // eslint-disable-line
+    const p0 = [ox + w * dx,         oy + hh * dy,        i0_act ? meshData[i0] : 0]; // eslint-disable-line
+    const p1 = [ ox + (w - 1) * dx,  oy + hh * dy,        i1_act ? meshData[i1] : 0]; // eslint-disable-line
+    const p2 = [ ox + w * dx,        oy + (hh + 1) * dy,  i2_act ? meshData[i2] : 0]; // eslint-disable-line
+    const p3 = [ ox + (w + 1) * dx,  oy + hh * dy,        i3_act ? meshData[i3] : 0]; // eslint-disable-line
+    const p4 = [ ox + w * dx,        oy + (hh - 1) * dy,  i4_act ? meshData[i4] : 0]; // eslint-disable-line
 
     const v1 = [p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2]] as Vec;
     const v2 = [p2[0] - p0[0], p2[1] - p0[1], p2[2] - p0[2]] as Vec;
@@ -143,9 +142,6 @@ export function makeFullMesh(params: Params) {
     const frame = params.frame;
     const smoothShading = params.smoothShading;
     const gridLines = params.gridLines;
-    const ZIncreasingDownwards = params.ZIncreasingDownwards;
-
-    const multZ = ZIncreasingDownwards ? 1 : -1;
 
     const meshZValueRange = getFloat32ArrayMinMax(meshData);
     const propertyValueRange = getFloat32ArrayMinMax(propertiesData);
@@ -206,7 +202,7 @@ export function makeFullMesh(params: Params) {
 
                 const x0 = ox + w * dx;
                 const y0 = oy + (ny - 1 - h) * dy; // See note above.
-                const z = isMesh ? -meshData[i0] * multZ : 0;
+                const z = isMesh ? meshData[i0] : 0;
 
                 const propertyValue = propertiesData[i0];
 
@@ -215,7 +211,7 @@ export function makeFullMesh(params: Params) {
                 positions[3 * i + 2] = z;
 
                 if (smoothShading) {
-                    const normal = calcNormal(w, h, nx, ny, isMesh, smoothShading, meshData, ox, oy, dx, dy, multZ); // eslint-disable-line
+                    const normal = calcNormal(w, h, nx, ny, isMesh, smoothShading, meshData, ox, oy, dx, dy); // eslint-disable-line
                     normals[3 * i + 0] = normal[0] * 127; // Normalize to signed 8 bit.
                     normals[3 * i + 1] = normal[1] * 127;
                     normals[3 * i + 2] = normal[2] * 127;
@@ -334,19 +330,19 @@ export function makeFullMesh(params: Params) {
 
                 const x0 = ox + w * dx;
                 const y0 = oy + hh * dy;
-                const z0 = isMesh ? -meshData[i0] * multZ : 0;
+                const z0 = isMesh ? meshData[i0] : 0;
 
                 const x1 = ox + (w + 1) * dx;
                 const y1 = oy + hh * dy;
-                const z1 = isMesh ? -meshData[i1] * multZ : 0;
+                const z1 = isMesh ? meshData[i1] : 0;
 
                 const x2 = ox + (w + 1) * dx;
                 const y2 = oy + (hh - 1) * dy; // Note hh - 1 here.
-                const z2 = isMesh ? -meshData[i2] * multZ : 0;
+                const z2 = isMesh ? meshData[i2] : 0;
 
                 const x3 = ox + w * dx;
                 const y3 = oy + (hh - 1) * dy; // Note hh - 1 here.
-                const z3 = isMesh ? -meshData[i3] * multZ : 0;
+                const z3 = isMesh ? meshData[i3] : 0;
 
                 const propertyIndex = h * (nx - 1) + w; // (nx - 1) -> the width of the property 2D array is one less than for the nodes in this case.
                 const propertyValue = propertiesData[propertyIndex];

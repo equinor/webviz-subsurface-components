@@ -20,14 +20,18 @@ out vec3 worldPos;
 out float property;
 flat out int vertexIndex;
 
+uniform bool ZIncreasingDownwards;
 
 void main(void) {
    geometry.pickingColor = vec3(1.0, 1.0, 0.0);
    vertexIndex = gl_VertexID;
 
+   vec3 position = positions;
+   position[2] *= ZIncreasingDownwards ? -1.0 : 1.0;
+
    cameraPosition = project_uCameraPosition;
 
-   worldPos = positions;
+   worldPos = position;
 
    normals_commonspace = normals;
 
@@ -35,7 +39,7 @@ void main(void) {
 
    property = properties;
 
-   position_commonspace = vec4(project_position(positions), 0.0);
+   position_commonspace = vec4(project_position(position), 0.0);
    gl_Position = project_common_position_to_clipspace(position_commonspace);
 
    DECKGL_FILTER_GL_POSITION(gl_Position, geometry);
