@@ -88,8 +88,8 @@ jobs:
       - name: 📚 Update Storybook
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         run: |
-          rm -rf ../storybook-static
-          mv ./storybook-static ..
+          rm -rf ../../storybook-static
+          mv ./storybook-static ../..
 
           git config --local user.email "webviz-github-action"
           git config --local user.name "webviz-github-action"
@@ -98,7 +98,7 @@ jobs:
           git clean -f -f -d -x
           git rm -r --ignore-unmatch *
 
-          mv ../storybook-static .
+          mv ../../storybook-static .
 
           git add .
 
