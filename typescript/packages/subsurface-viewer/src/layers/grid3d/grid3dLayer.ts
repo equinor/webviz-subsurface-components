@@ -1,7 +1,7 @@
 import type { Color } from "@deck.gl/core/typed";
 import { CompositeLayer } from "@deck.gl/core/typed";
-import type { Material } from "./privateLayer";
-import privateLayer from "./privateLayer";
+import type { Material } from "./privateGrid3dLayer";
+import privateLayer from "./privateGrid3dLayer";
 import type {
     ExtendedLayerProps,
     colorMapFunctionType,
