@@ -227,6 +227,7 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
                 isColorMapClampColorTransparent,
                 isClampColor,
                 smoothShading,
+                ZIncreasingDownwards: this.props.ZIncreasingDownwards,
             })
             .draw();
         gl.disable(GL.POLYGON_OFFSET_FILL);
@@ -236,7 +237,12 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
         }
 
         if (this.props.gridLines) {
-            mesh_lines_model.draw();
+            mesh_lines_model
+                .setUniforms({
+                    ...uniforms,
+                    ZIncreasingDownwards: this.props.ZIncreasingDownwards,
+                })
+                .draw();
         }
 
         if (!this.state["isLoaded"]) {
