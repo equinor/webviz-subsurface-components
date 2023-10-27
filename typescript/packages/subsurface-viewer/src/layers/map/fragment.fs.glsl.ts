@@ -94,9 +94,8 @@ void main(void) {
    }
 
    // Use normal lighting. This has no effect if "material" property is not set.
-   vec3 lightColor = lighting_getLightColor(color.rgb, cameraPosition, position_commonspace.xyz, normal);
+   vec3 lightColor = getPhongLightColor(color.rgb, cameraPosition, position_commonspace.xyz, normal);
    gl_FragColor = vec4(lightColor, 1.0);
-
    DECKGL_FILTER_COLOR(gl_FragColor, geometry);
 }
 `;
