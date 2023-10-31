@@ -1,3 +1,10 @@
+## [0.5.4](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.5.3...subsurface-viewer@0.5.4) (2023-10-27)
+
+
+### Performance Improvements
+
+*  Apply flag "ZIncreasingDownwards" in vertex shaders MapLayer. ([#1741](https://github.com/equinor/webviz-subsurface-components/issues/1741)) ([ed85f7f](https://github.com/equinor/webviz-subsurface-components/commit/ed85f7f6bd5e1841518e0c52448e90eba3c8b988)), closes [#1724](https://github.com/equinor/webviz-subsurface-components/issues/1724) [#1737](https://github.com/equinor/webviz-subsurface-components/issues/1737)
+
 ## [0.5.3](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.5.2...subsurface-viewer@0.5.3) (2023-10-27)
 
 

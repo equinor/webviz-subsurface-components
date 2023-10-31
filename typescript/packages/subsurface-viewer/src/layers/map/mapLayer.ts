@@ -55,7 +55,6 @@ export type Params = {
     frame: Frame;
     smoothShading: boolean;
     gridLines: boolean;
-    ZIncreasingDownwards: boolean;
 };
 
 /**
@@ -337,7 +336,6 @@ export default class MapLayer extends CompositeLayer<MapLayerProps> {
                 frame: this.props.frame,
                 smoothShading: this.props.smoothShading,
                 gridLines: this.props.gridLines,
-                ZIncreasingDownwards: this.props.ZIncreasingDownwards,
             };
 
             const [
