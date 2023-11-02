@@ -98,9 +98,9 @@ jobs:
           git clean -f -f -d -x
           git rm -r --ignore-unmatch *
 
-          mv ../../storybook-static .
+          mv ../../storybook-static ..
 
-          git add .
+          git add ../storybook-static
 
           if git diff-index --quiet HEAD; then
             echo "No changes in documentation. Skip documentation deploy."
