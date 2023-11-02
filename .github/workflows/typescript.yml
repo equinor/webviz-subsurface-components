@@ -96,7 +96,7 @@ jobs:
           git fetch origin gh-pages
           git checkout --track origin/gh-pages
           git clean -f -f -d -x
-          git rm -r --ignore-unmatch *
+          git rm -r --ignore-unmatch ../*
 
           mv ../../storybook-static ..
 
