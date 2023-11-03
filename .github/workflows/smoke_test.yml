@@ -2,13 +2,15 @@ name: Smoke Tests
 
 on:
   push:
-    branches: [master]
+    branches:
+      - master
   pull_request:
-    branches: [master]
+    branches:
+      - master
 
 defaults:
   run:
-    working-directory: typescript
+    working-directory: ./typescript
 jobs:
   test:
     name: Smoke Tests
@@ -20,7 +22,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '>= 18'
 
       - name: Install dependencies
         run: npm ci
