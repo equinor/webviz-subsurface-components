@@ -24,12 +24,7 @@ export interface GroupTreeProps {
 }
 
 const GroupTreeComponent: React.FC<GroupTreeProps> = React.memo(
-    ({
-        id,
-        data,
-        edgeOptions,
-        nodeOptions,
-    }: GroupTreeProps) => {
+    ({ id, data, edgeOptions, nodeOptions }: GroupTreeProps) => {
         const [index, setIndex] = useState([0, 0] as [number, number]);
 
         const currentDateTimeChangedCallBack = useCallback(
