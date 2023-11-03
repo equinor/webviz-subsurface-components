@@ -196,8 +196,8 @@ function boundingBoxCenter(box: BoundingBox3D): [number, number, number] {
 // Exclude "layerIds" when monitoring changes to "view" prop as we do not
 // want to recalculate views when the layers change.
 function compareViewsProp(views: ViewsType | undefined): string | undefined {
-    if (typeof views === "undefined") {
-        return views;
+    if (typeof views === "undefined" || Object.keys(views).length === 0) {
+        return undefined;
     }
 
     const copy = cloneDeep(views);
@@ -1352,6 +1352,7 @@ function createViewsAndViewStates(
     const isOk =
         deck &&
         views &&
+        Object.keys(views).length !== 0 &&
         views.layout[0] >= 1 &&
         views.layout[1] >= 1 &&
         widthViewPort > 0 &&

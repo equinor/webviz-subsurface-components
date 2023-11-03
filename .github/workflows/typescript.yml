@@ -108,3 +108,13 @@ jobs:
             git commit -m "Update Github Pages"
             git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" gh-pages
           fi
+
+      - name: Serve Storybook and run tests
+        env:
+            PORT: 8080
+            HOST: 127.0.0.1
+        run: |
+            npx concurrently -k -s first -n "SB,TEST" -c "magenta,blue" \
+              "npx playwright install"  \
+              "npx http-server storybook-static --port $PORT -a $HOST" \
+              "npx wait-on http://$HOST:$PORT/ && npm run storybook:test -- --ci --url http://$HOST:$PORT/"
