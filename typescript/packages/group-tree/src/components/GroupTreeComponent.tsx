@@ -27,8 +27,8 @@ const GroupTreeComponent: React.FC<GroupTreeProps> = React.memo(
     ({
         id,
         data,
-        edgeOptions: edge_options,
-        nodeOptions: node_options,
+        edgeOptions,
+        nodeOptions,
     }: GroupTreeProps) => {
         const [index, setIndex] = useState([0, 0] as [number, number]);
 
@@ -49,14 +49,14 @@ const GroupTreeComponent: React.FC<GroupTreeProps> = React.memo(
             <DataProvider
                 id={id}
                 data={data}
-                edge_options={edge_options}
-                node_options={node_options}
+                edge_options={edgeOptions}
+                node_options={nodeOptions}
                 initial_index={index}
             >
                 <GroupTreeViewer
                     id={id}
-                    edge_options={edge_options}
-                    node_options={node_options}
+                    edge_options={edgeOptions}
+                    node_options={nodeOptions}
                     currentDateTimeChangedCallBack={
                         currentDateTimeChangedCallBack
                     }

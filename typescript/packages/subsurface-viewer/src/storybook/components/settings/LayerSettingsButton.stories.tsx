@@ -6,29 +6,31 @@ export default {
     title: "SubsurfaceViewer/Components/Settings/LayerSettingsButton",
 };
 
-const Template = (args) => {
-    return <LayerSettingsButton layer={args.layer} />;
-};
+// Note: Disabled for now will be fixed later. Missing redux context.
 
-export const DrawingSettings = Template.bind({});
-DrawingSettings.args = {
-    layer: {
-        name: "Drawing",
-        "@@type": "DrawingLayer",
-        id: "drawing-layer",
-        visible: true,
-        mode: "drawLineString",
-    },
-};
+// const Template = (args) => {
+//     return <LayerSettingsButton layer={args.layer} />;
+// };
 
-export const WellsSettings = Template.bind({});
-WellsSettings.args = {
-    layer: {
-        name: "Wells",
-        "@@type": "WellsLayer",
-        id: "wells-layer",
-        opacity: 1,
-        pointRadiusScale: 8,
-        visible: true,
-    },
-};
+// export const DrawingSettings = Template.bind({});
+// DrawingSettings.args = {
+//     layer: {
+//         name: "Drawing",
+//         "@@type": "DrawingLayer",
+//         id: "drawing-layer",
+//         visible: true,
+//         mode: "drawLineString",
+//     },
+// };
+
+// export const WellsSettings = Template.bind({});
+// WellsSettings.args = {
+//     layer: {
+//         name: "Wells",
+//         "@@type": "WellsLayer",
+//         id: "wells-layer",
+//         opacity: 1,
+//         pointRadiusScale: 8,
+//         visible: true,
+//     },
+// };
