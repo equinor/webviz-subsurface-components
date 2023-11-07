@@ -8,7 +8,7 @@ import ClipExtension from "./clip-extension";
 
 export default {
     component: SubsurfaceViewer,
-    title: "SubsurfaceViewer / Clip Extension",
+    title: "SubsurfaceViewer / Unfold Extension",
 };
 
 const StoryTemplate: StoryFn<typeof SubsurfaceViewer> = (args) => {
@@ -27,13 +27,6 @@ const defaultProps = {
                 show3D: true,
                 isSync: false,
             },
-            /*             {
-                id: "intersection_view",
-                name: "Intersection view",
-                show3D: false,
-                layerIds: ["enhanced-path-layer", "wells-layer"],
-                isSync: false,
-            }, */
         ],
     },
 };
@@ -162,7 +155,7 @@ Clipping.args = {
             getFillColor: (d: Feature) => d.properties?.["color"],
             extensions: [CLIP],
             clipBounds: [900, 900, 1300, 1300],
-            clipByInstance: false,
+            clipByInstance: true,
         }),
     ],
 };

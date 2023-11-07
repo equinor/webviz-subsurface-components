@@ -130,6 +130,8 @@ export default class ClipExtension extends LayerExtension {
                 Math.max(corner0[0], corner1[0]),
                 Math.max(corner0[1], corner1[1]),
             ];
+
+            console.log(uniforms.clip_bounds);
         }
     }
 }
