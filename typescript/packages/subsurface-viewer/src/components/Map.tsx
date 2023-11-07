@@ -589,10 +589,6 @@ const Map: React.FC<MapProps> = ({
 
     const bboxInitial: BoundingBox3D = [0, 0, 0, 1, 1, 1];
 
-    const isCameraPositionDefined =
-        typeof cameraPosition !== "undefined" &&
-        Object.keys(cameraPosition).length !== 0;
-
     // Deck.gl View's and viewStates as input to Deck.gl
     const [deckGLViews, setDeckGLViews] = useState<View[]>([]);
     const [viewStates, setViewStates] = useState<Record<string, ViewStateType>>(
@@ -653,9 +649,31 @@ const Map: React.FC<MapProps> = ({
     }, [triggerHome]);
 
     useEffect(() => {
-        if (viewStateChanged && !isCameraPositionDefined) {
+        const isBoundsDefined = typeof bounds !== "undefined";
+        const isCameraPositionDefined =
+            typeof cameraPosition !== "undefined" &&
+            Object.keys(cameraPosition).length !== 0;
+
+        if (viewStateChanged || isBoundsDefined || isCameraPositionDefined) {
+            // User has changed viewState or camera is defined, do not recalculate.
             return;
         }
+        const [Views, viewStates] = createViewsAndViewStates(
+            views,
+            viewPortMargins,
+            bounds,
+            camera,
+            reportedBoundingBoxAcc,
+            deckRef.current?.deck
+        );
+
+        setDeckGLViews(Views);
+        setViewStates(viewStates);
+        setViewStateChanged(false);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [reportedBoundingBoxAcc]);
+
+    useEffect(() => {
         const [Views, viewStates] = createViewsAndViewStates(
             views,
             viewPortMargins,
@@ -673,7 +691,6 @@ const Map: React.FC<MapProps> = ({
         bounds,
         camera,
         deckRef?.current?.deck,
-        reportedBoundingBoxAcc,
         // eslint-disable-next-line react-hooks/exhaustive-deps
         compareViewsProp(views),
     ]);
