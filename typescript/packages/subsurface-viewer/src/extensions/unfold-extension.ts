@@ -20,7 +20,7 @@
 
 import { LayerExtension } from "@deck.gl/core/typed";
 
-import type { Layer, _ShaderModule as ShaderModule } from "@deck.gl/core";
+import type { Layer, _ShaderModule as ShaderModule } from "@deck.gl/core/typed";
 
 const defaultProps = {
     clipBounds: [0, 0, 1, 1],
@@ -106,12 +106,12 @@ export default class UnfoldExtension extends LayerExtension {
 
         // Default behavior: consider a layer instanced if it has attribute `instancePositions`
         let clipByInstance =
-            "instancePositions" in this.getAttributeManager().attributes;
+            "instancePositions" in this.getAttributeManager()!.attributes;
         // Users can override by setting the `clipByInstance` prop
         if (this.props.clipByInstance !== undefined) {
             clipByInstance = Boolean(this.props.clipByInstance);
         }
-        this.state.clipByInstance = clipByInstance;
+        this.state["clipByInstance"] = clipByInstance;
 
         return clipByInstance
             ? {
@@ -130,7 +130,7 @@ export default class UnfoldExtension extends LayerExtension {
         { uniforms }: { uniforms: { clip_bounds: unknown } }
     ): void {
         const { clipBounds } = this.props;
-        if (this.state.clipByInstance) {
+        if (this.state["clipByInstance"]) {
             uniforms.clip_bounds = clipBounds;
         } else {
             const corner0 = this.projectPosition([
