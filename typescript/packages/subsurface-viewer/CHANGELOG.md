@@ -1,3 +1,10 @@
+## [0.5.5](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.5.4...subsurface-viewer@0.5.5) (2023-11-07)
+
+
+### Bug Fixes
+
+* If camera or bounds property is set, the view should not change when adding a layer ([#1762](https://github.com/equinor/webviz-subsurface-components/issues/1762)) ([79d247e](https://github.com/equinor/webviz-subsurface-components/commit/79d247ef9d0b7eb51eca33962a5bf6768be29e4d))
+
 ## [0.5.4](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.5.3...subsurface-viewer@0.5.4) (2023-10-27)
 
 
