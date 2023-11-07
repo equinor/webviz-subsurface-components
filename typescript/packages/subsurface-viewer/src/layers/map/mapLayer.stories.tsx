@@ -558,8 +558,13 @@ export const AddLayer: ComponentStory<typeof SubsurfaceViewer> = (args) => {
 
 AddLayer.args = {
     id: "map",
-
-    bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
+    //bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,  // Keep this line for future testing.
+    cameraPosition: {
+        rotationOrbit: 45,
+        rotationX: -45,
+        zoom: [432150, 6475800, -2000, 439400, 6481500, -3500],
+        target: [0, 0, 0],
+    },
     views: {
         layout: [1, 1],
         viewports: [
