@@ -1,3 +1,10 @@
+## [1.0.4](https://github.com/equinor/webviz-subsurface-components/compare/well-completions-plot@1.0.3...well-completions-plot@1.0.4) (2023-11-09)
+
+
+### Bug Fixes
+
+* bump [@deck](https://github.com/deck).gl/core from 8.9.31 to 8.9.32 in /typescript ([#1764](https://github.com/equinor/webviz-subsurface-components/issues/1764)) ([5ab32b0](https://github.com/equinor/webviz-subsurface-components/commit/5ab32b0db7cac16d027624643604df2ee7402918))
+
 ## [1.0.3](https://github.com/equinor/webviz-subsurface-components/compare/well-completions-plot@1.0.2...well-completions-plot@1.0.3) (2023-10-17)
 
 
