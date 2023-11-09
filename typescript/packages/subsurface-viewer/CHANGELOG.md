@@ -1,3 +1,10 @@
+## [0.5.7](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.5.6...subsurface-viewer@0.5.7) (2023-11-09)
+
+
+### Bug Fixes
+
+* "Grid3DLayer: surfaces are not displayed on firefox" ([#1766](https://github.com/equinor/webviz-subsurface-components/issues/1766)) ([1846a4d](https://github.com/equinor/webviz-subsurface-components/commit/1846a4d2e95d3a1c98b07902cea014e7e0bfc20f))
+
 ## [0.5.6](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.5.5...subsurface-viewer@0.5.6) (2023-11-09)
 
 
