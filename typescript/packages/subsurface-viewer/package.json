@@ -1,6 +1,6 @@
 {
     "name": "@webviz/subsurface-viewer",
-    "version": "0.5.5",
+    "version": "0.5.6",
     "description": "",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -21,7 +21,7 @@
     "author": "Equinor <opensource@equinor.com>",
     "license": "MPL-2.0",
     "dependencies": {
-        "@deck.gl/core": "^8.8.25",
+        "@deck.gl/core": "^8.9.32",
         "@emerson-eps/color-tables": "^0.4.61",
         "@equinor/eds-core-react": "^0.33.0",
         "@equinor/eds-icons": "^0.19.1",
