@@ -1,3 +1,10 @@
+## [0.5.8](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.5.7...subsurface-viewer@0.5.8) (2023-11-10)
+
+
+### Bug Fixes
+
+* Point layer and line layer cursor readout not working ([#1768](https://github.com/equinor/webviz-subsurface-components/issues/1768)) ([6edd53a](https://github.com/equinor/webviz-subsurface-components/commit/6edd53a1523779e995f9a124286a28ceb2756d2d))
+
 ## [0.5.7](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.5.6...subsurface-viewer@0.5.7) (2023-11-09)
 
 
