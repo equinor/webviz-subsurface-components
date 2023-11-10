@@ -1,4 +1,4 @@
-import type { UpdateParameters } from "@deck.gl/core/typed";
+import type { PickingInfo, UpdateParameters } from "@deck.gl/core/typed";
 import { CompositeLayer } from "@deck.gl/core/typed";
 import { PathLayer } from "@deck.gl/layers/typed";
 import { isEqual } from "lodash";
