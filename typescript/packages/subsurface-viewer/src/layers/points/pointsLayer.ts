@@ -1,10 +1,18 @@
-import type { UpdateParameters } from "@deck.gl/core/typed";
+import type { PickingInfo, UpdateParameters } from "@deck.gl/core/typed";
 import { CompositeLayer } from "@deck.gl/core/typed";
 import { ScatterplotLayer } from "@deck.gl/layers/typed";
 import { isEqual } from "lodash";
 
-import type { ExtendedLayerProps } from "../utils/layerTools";
-import { invertZCoordinate, defineBoundingBox } from "../utils/layerTools";
+import type {
+    PropertyDataType,
+    ExtendedLayerProps,
+    LayerPickInfo,
+} from "../utils/layerTools";
+import {
+    createPropertyData,
+    invertZCoordinate,
+    defineBoundingBox,
+} from "../utils/layerTools";
 
 export interface PointsLayerProps extends ExtendedLayerProps {
     /**
@@ -96,6 +104,26 @@ export default class PointsLayer extends CompositeLayer<PointsLayerProps> {
             const dataAttributes = this.rebuildDataAttributes(false);
             this.setState({ dataAttributes });
         }
+    }
+
+    getPickingInfo({ info }: { info: PickingInfo }): LayerPickInfo {
+        if (!info.color) {
+            return info;
+        }
+
+        const layer_properties: PropertyDataType[] = [];
+
+        if (typeof info.coordinate?.[2] !== "undefined") {
+            const depth = this.props.ZIncreasingDownwards
+                ? -info.coordinate[2]
+                : info.coordinate[2];
+            layer_properties.push(createPropertyData("Depth", depth));
+        }
+
+        return {
+            ...info,
+            properties: layer_properties,
+        };
     }
 
     private rebuildDataAttributes(
