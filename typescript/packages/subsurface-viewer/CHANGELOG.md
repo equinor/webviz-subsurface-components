@@ -1,3 +1,10 @@
+## [0.5.10](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.5.9...subsurface-viewer@0.5.10) (2023-11-13)
+
+
+### Bug Fixes
+
+* bump to latest @emerson-eps/color-tables ([#1770](https://github.com/equinor/webviz-subsurface-components/issues/1770)) ([e67a285](https://github.com/equinor/webviz-subsurface-components/commit/e67a2856eced8f987bc61fa4a0a924b5a4886992))
+
 ## [0.5.9](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.5.8...subsurface-viewer@0.5.9) (2023-11-13)
 
 
