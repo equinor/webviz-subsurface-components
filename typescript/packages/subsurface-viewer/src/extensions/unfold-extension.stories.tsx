@@ -5,6 +5,7 @@ import type { Feature } from "geojson";
 import AxesLayer from "../layers/axes/axesLayer";
 import { GeoJsonLayer } from "@deck.gl/layers/typed";
 import ClipExtension from "./clip-extension";
+import { UnfoldExtension } from "./unfold-extension";
 
 export default {
     component: SubsurfaceViewer,
@@ -134,6 +135,18 @@ const IntersectionViewData = {
 
 const CLIP = new ClipExtension();
 
+const DEFAULT_LAYER_PROPS = {
+    id: "enhanced-path-layer",
+    data: IntersectionViewData,
+    lineWidthScale: 1,
+    lineBillboard: true,
+    pointBillboard: true,
+    stroked: true,
+    getPointRadius: 3,
+    getLineColor: (d: Feature) => d.properties?.["color"],
+    getFillColor: (d: Feature) => d.properties?.["color"],
+};
+
 export const Clipping = StoryTemplate.bind({});
 Clipping.args = {
     ...defaultProps,
@@ -144,18 +157,45 @@ Clipping.args = {
             bounds: [300, 800, 400, 1300, 1600, 600],
         }),
         new GeoJsonLayer({
-            id: "enhanced-path-layer",
-            data: IntersectionViewData,
-            lineWidthScale: 1,
-            lineBillboard: true,
-            pointBillboard: true,
-            stroked: true,
-            getPointRadius: 3,
-            getLineColor: (d: Feature) => d.properties?.["color"],
-            getFillColor: (d: Feature) => d.properties?.["color"],
+            ...DEFAULT_LAYER_PROPS,
             extensions: [CLIP],
             clipBounds: [900, 900, 1300, 1300],
             clipByInstance: true,
         }),
     ],
+};
+
+export const Unfolding = StoryTemplate.bind({});
+Unfolding.args = {
+    ...defaultProps,
+    bounds: [500, 1000, 1200, 1500] as [number, number, number, number],
+    layers: [
+        new AxesLayer({
+            id: "axes-layer",
+            bounds: [300, 800, 400, 1300, 1600, 600],
+        }),
+        new GeoJsonLayer({
+            ...DEFAULT_LAYER_PROPS,
+            extensions: [new UnfoldExtension()],
+            clipBounds: [900, 900, 1300, 1300],
+            clipByInstance: true,
+        }),
+        new GeoJsonLayer({
+            ...DEFAULT_LAYER_PROPS,
+            id: "no-extensions",
+        }),
+    ],
+    views: {
+        layout: [1, 2],
+        viewports: [
+            {
+                id: "a",
+                show3D: true,
+            },
+            {
+                id: "b",
+                show3D: false,
+            },
+        ],
+    },
 };

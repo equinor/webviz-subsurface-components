@@ -41,9 +41,18 @@ export type UnfoldExtensionProps = {
 
 const shaderFunction = `
 uniform vec4 clip_bounds;
+uniform float abscissa;
 
 bool clip_isInBounds(vec2 position) {
   return position.x >= clip_bounds[0] && position.y >= clip_bounds[1] && position.x < clip_bounds[2] && position.y < clip_bounds[3];
+}
+
+vec2 transform(vec2 clip_position) {
+    //vec2 world_position = project_clip_
+    float y = clip_position.y * 4.0;
+    return vec2(clip_position.x, y);
+    //return pos.xy;
+    //return pos.xy + vec2(0.1, 0.0);
 }
 `;
 
@@ -52,11 +61,11 @@ bool clip_isInBounds(vec2 position) {
  * e.g. ScatterplotLayer - show if the center of a circle is within bounds
  */
 const shaderModuleVs: ShaderModule = {
-    name: "clip-vs",
+    name: "unfold-vs",
     vs: shaderFunction,
 };
 
-const injectionVs = {
+/* const injectionVs = {
     "vs:#decl": `
 varying float clip_isVisible;
 `,
@@ -70,13 +79,23 @@ varying float clip_isVisible;
   if (clip_isVisible < 0.5) discard;
 `,
 };
+ */
+const injectionVs = {
+    "vs:#decl": `
+  varying vec2 new_position;
+`,
+    "vs:DECKGL_FILTER_GL_POSITION": `
+  new_position = transform(position.xz);
+  position.xy = new_position;
+`,
+};
 
 /*
  * The fragment-shader version clips pixels at the bounds
  * e.g. PolygonLayer - show the part of the polygon that intersect with the bounds
  */
 const shaderModuleFs: ShaderModule = {
-    name: "clip-fs",
+    name: "unfold-fs",
     fs: shaderFunction,
 };
 
@@ -96,7 +115,7 @@ varying vec2 clip_commonPosition;
 };
 
 /** Adds support for clipping rendered layers by rectangular bounds. */
-export default class UnfoldExtension extends LayerExtension {
+export class UnfoldExtension extends LayerExtension {
     static defaultProps = defaultProps;
     static extensionName = "UnfoldExtension";
 
@@ -127,11 +146,15 @@ export default class UnfoldExtension extends LayerExtension {
     /* eslint-disable camelcase */
     draw(
         this: Layer<Required<UnfoldExtensionProps>>,
-        { uniforms }: { uniforms: { clip_bounds: unknown } }
+        { uniforms }: { uniforms: { clip_bounds: unknown, abscissa: unknown } }
     ): void {
         const { clipBounds } = this.props;
+        //console.log("draw");
+        const v = this.context.viewport;
+        //console.log("viewport: ",  v);
         if (this.state["clipByInstance"]) {
             uniforms.clip_bounds = clipBounds;
+            uniforms.abscissa = [0, 100, 200, 500, 700, 800, 850, 900];
         } else {
             const corner0 = this.projectPosition([
                 clipBounds[0],
