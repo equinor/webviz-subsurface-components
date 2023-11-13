@@ -1,18 +1,12 @@
 import type { SyntheticEvent } from "react";
 import React from "react";
 import { styled } from "@mui/material/styles";
-import type { ViewsType } from "../../components/Map";
+import type { BoundingBox3D, ViewsType } from "../../components/Map";
 import { useHoverInfo } from "../../components/Map";
-import SubsurfaceViewer, {
-    SubsurfaceViewerProps,
-} from "../../SubsurfaceViewer";
+import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
+import SubsurfaceViewer from "../../SubsurfaceViewer";
 import InfoCard from "../../components/InfoCard";
-import type {
-    ComponentStory,
-    ComponentMeta,
-    StoryFn,
-    StoryObj,
-} from "@storybook/react";
+import type { ComponentStory, StoryFn } from "@storybook/react";
 import { Slider } from "@mui/material";
 import {
     ContinuousLegend,
@@ -27,8 +21,6 @@ import { View } from "@deck.gl/core/typed";
 import type { colorMapFunctionType } from "../utils/layerTools";
 import NorthArrow3DLayer from "../northarrow/northArrow3DLayer";
 import { ClipExtension } from "@deck.gl/extensions/typed";
-
-type Bounds3D = [number, number, number, number, number, number];
 
 const PREFIX = "MapLayer3dPng";
 
@@ -54,7 +46,7 @@ const Root = styled("div")({
 export default {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer / Map Layer",
-} as ComponentMeta<typeof SubsurfaceViewer>;
+};
 
 type NumberQuad = [number, number, number, number];
 
@@ -285,7 +277,7 @@ const meshMapLayerRotated = {
 const axes_hugin = {
     "@@type": "AxesLayer",
     id: "axes-layer2",
-    bounds: [432150, 6475800, 2000, 439400, 6481500, 3500] as Bounds3D,
+    bounds: [432150, 6475800, 2000, 439400, 6481500, 3500] as BoundingBox3D,
 };
 
 const north_arrow_layer = {
@@ -852,9 +844,9 @@ function makeData(n: number, amplitude: number): Float32Array {
 }
 
 //-- MapLayer with native javascript arrays as input --
-const TypedArrayInputStory: StoryFn<typeof SubsurfaceViewer> = (args: {
-    dimension: number;
-}) => {
+export const TypedArrayInput: StoryFn<
+    SubsurfaceViewerProps & { dimension: number }
+> = (args) => {
     const subsurfaceViewerArgs = {
         id: "map",
         layers: [
@@ -888,16 +880,12 @@ const TypedArrayInputStory: StoryFn<typeof SubsurfaceViewer> = (args: {
         cameraPosition: {
             rotationOrbit: 45,
             rotationX: 45,
-            zoom: [-100, -100, -10, 100, 100, 60],
+            zoom: [-100, -100, -10, 100, 100, 60] as BoundingBox3D,
             target: [0, 0, 0],
         },
         views: DEFAULT_VIEWS,
     };
     return <SubsurfaceViewer {...subsurfaceViewerArgs} />;
-};
-
-export const TypedArrayInput: StoryFn<typeof SubsurfaceViewer> = (args) => {
-    return <TypedArrayInputStory {...args} />;
 };
 
 TypedArrayInput.args = {

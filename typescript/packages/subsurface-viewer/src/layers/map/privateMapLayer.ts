@@ -290,9 +290,9 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
         return super.getShaders({
             vs,
             fs,
-            modules: [project32, picking, localPhongLighting, utilities]});
+            modules: [project32, picking, localPhongLighting, utilities],
+        });
     }
-
 }
 
 privateMapLayer.layerName = "privateMapLayer";
