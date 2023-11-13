@@ -301,7 +301,7 @@ const defaultProps = {
     ZIncreasingDownwards: true,
 };
 
-export default class MapLayer extends CompositeLayer<MapLayerProps> {
+export default class MapLayer<ExtraProps extends {} = {}> extends CompositeLayer<Required<MapLayerProps> & ExtraProps> {
     get isLoaded(): boolean {
         const subLayers = this.getSubLayers();
         const isLoaded =

@@ -3,9 +3,16 @@ import React from "react";
 import { styled } from "@mui/material/styles";
 import type { ViewsType } from "../../components/Map";
 import { useHoverInfo } from "../../components/Map";
-import SubsurfaceViewer from "../../SubsurfaceViewer";
+import SubsurfaceViewer, {
+    SubsurfaceViewerProps,
+} from "../../SubsurfaceViewer";
 import InfoCard from "../../components/InfoCard";
-import type { ComponentStory, ComponentMeta, StoryFn } from "@storybook/react";
+import type {
+    ComponentStory,
+    ComponentMeta,
+    StoryFn,
+    StoryObj,
+} from "@storybook/react";
 import { Slider } from "@mui/material";
 import {
     ContinuousLegend,
@@ -18,6 +25,10 @@ import MapLayer from "./mapLayer";
 import { ViewFooter } from "../../components/ViewFooter";
 import { View } from "@deck.gl/core/typed";
 import type { colorMapFunctionType } from "../utils/layerTools";
+import NorthArrow3DLayer from "../northarrow/northArrow3DLayer";
+import { ClipExtension } from "@deck.gl/extensions/typed";
+
+type Bounds3D = [number, number, number, number, number, number];
 
 const PREFIX = "MapLayer3dPng";
 
@@ -173,17 +184,25 @@ const cellCenteredPropertiesLayer = {
     /*eslint-disable */
     // One depth pr node
     meshData: [
-        1.6, 1.7, 1.8, 1.9,
-        1.2, 1.3, 1.4, 1.5,
-        0.8, 0.9, 1.0, 1.1,
-        0.4, 0.5, 0.6, 0.7,
-        0.0, 0.1, 0.2, 0.3 ],
+        1.6, 1.7, 1.8, 1.9, 1.2, 1.3, 1.4, 1.5, 0.8, 0.9, 1.0, 1.1, 0.4, 0.5,
+        0.6, 0.7, 0.0, 0.1, 0.2, 0.3,
+    ],
 
     // One property pr cell.
-    propertiesData: [0.9,  1.0,  1.1, 
-                     0.6,  undefined,  0.8,
-                     0.3,  0.4,  0.5, 
-                     0.0,  0.1,  0.2],
+    propertiesData: [
+        0.9,
+        1.0,
+        1.1,
+        0.6,
+        undefined,
+        0.8,
+        0.3,
+        0.4,
+        0.5,
+        0.0,
+        0.1,
+        0.2,
+    ],
     /*eslint-enable */
 
     frame: {
@@ -266,7 +285,7 @@ const meshMapLayerRotated = {
 const axes_hugin = {
     "@@type": "AxesLayer",
     id: "axes-layer2",
-    bounds: [432150, 6475800, 2000, 439400, 6481500, 3500],
+    bounds: [432150, 6475800, 2000, 439400, 6481500, 3500] as Bounds3D,
 };
 
 const north_arrow_layer = {
@@ -276,6 +295,16 @@ const north_arrow_layer = {
 
 const defaultArgs = {
     bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
+};
+
+const DEFAULT_VIEWS = {
+    layout: [1, 1] as [number, number],
+    viewports: [
+        {
+            id: "view_1",
+            show3D: true,
+        },
+    ],
 };
 
 const defaultParameters = {
@@ -304,9 +333,7 @@ function createColorMap(breakpoint: number) {
     return (value: number) => breakpointColorMap(value, breakpoint);
 }
 
-export const MapLayer3dPng: ComponentStory<typeof SubsurfaceViewer> = (
-    args
-) => {
+export const MapLayer3dPng: StoryFn<typeof SubsurfaceViewer> = (args) => {
     return <SubsurfaceViewer {...args} />;
 };
 
@@ -315,15 +342,7 @@ MapLayer3dPng.args = {
     layers: [axes_hugin, meshMapLayerPng, north_arrow_layer],
 
     bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
-    views: {
-        layout: [1, 1],
-        viewports: [
-            {
-                id: "view_1",
-                show3D: true,
-            },
-        ],
-    },
+    views: DEFAULT_VIEWS,
 };
 
 MapLayer3dPng.parameters = {
@@ -344,15 +363,7 @@ export const MapLayer3dPngNoBounds: ComponentStory<typeof SubsurfaceViewer> = (
 MapLayer3dPngNoBounds.args = {
     id: "map",
     layers: [axes_hugin, meshMapLayerPng, north_arrow_layer],
-    views: {
-        layout: [1, 1],
-        viewports: [
-            {
-                id: "view_1",
-                show3D: true,
-            },
-        ],
-    },
+    views: DEFAULT_VIEWS,
 };
 
 MapLayer3dPngNoBounds.parameters = {
@@ -382,15 +393,7 @@ ConstantColor.args = {
     ],
 
     bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
-    views: {
-        layout: [1, 1],
-        viewports: [
-            {
-                id: "view_1",
-                show3D: true,
-            },
-        ],
-    },
+    views: DEFAULT_VIEWS,
 };
 
 ConstantColor.parameters = {
@@ -508,15 +511,7 @@ ResetCameraProperty.args = {
         target: [435775, 6478650, -1750],
         zoom: -3.5109619192773796,
     },
-    views: {
-        layout: [1, 1],
-        viewports: [
-            {
-                id: "view_1",
-                show3D: true,
-            },
-        ],
-    },
+    views: DEFAULT_VIEWS,
 };
 
 ResetCameraProperty.parameters = {
@@ -565,15 +560,7 @@ AddLayer.args = {
         zoom: [432150, 6475800, -2000, 439400, 6481500, -3500],
         target: [0, 0, 0],
     },
-    views: {
-        layout: [1, 1],
-        viewports: [
-            {
-                id: "view_1",
-                show3D: true,
-            },
-        ],
-    },
+    views: DEFAULT_VIEWS,
 };
 
 AddLayer.parameters = {
@@ -722,15 +709,7 @@ BigMap3d.args = {
     id: "map",
     layers: [axes_hugin, meshMapLayerBig, north_arrow_layer],
     bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
-    views: {
-        layout: [1, 1],
-        viewports: [
-            {
-                id: "view_1",
-                show3D: true,
-            },
-        ],
-    },
+    views: DEFAULT_VIEWS,
 };
 
 BigMap3d.parameters = {
@@ -755,15 +734,7 @@ SmallMap.args = {
     id: "map",
     layers: [axes_small, smallLayer, north_arrow_layer],
     bounds: [459840.7, 5929826.1, 460540.7, 5930576.1] as NumberQuad,
-    views: {
-        layout: [1, 1],
-        viewports: [
-            {
-                id: "view_1",
-                show3D: true,
-            },
-        ],
-    },
+    views: DEFAULT_VIEWS,
 };
 
 SmallMap.parameters = {
@@ -792,15 +763,7 @@ CellCenteredPropMap.args = {
     id: "map",
     layers: [axes_lite, cellCenteredPropertiesLayer, north_arrow_layer],
     bounds: [-1, -1, 4, 5] as NumberQuad,
-    views: {
-        layout: [1, 1],
-        viewports: [
-            {
-                id: "view_1",
-                show3D: true,
-            },
-        ],
-    },
+    views: DEFAULT_VIEWS,
 };
 
 CellCenteredPropMap.parameters = {
@@ -823,15 +786,7 @@ NodeCenteredPropMap.args = {
     id: "map",
     layers: [axes_lite, nodeCenteredPropertiesLayer, north_arrow_layer],
     bounds: [-1, -1, 4, 5] as NumberQuad,
-    views: {
-        layout: [1, 1],
-        viewports: [
-            {
-                id: "view_1",
-                show3D: true,
-            },
-        ],
-    },
+    views: DEFAULT_VIEWS,
 };
 
 NodeCenteredPropMap.parameters = {
@@ -858,15 +813,7 @@ NodeCenteredPropMapWithArrayInput.args = {
         north_arrow_layer,
     ],
     bounds: [-1, -1, 4, 5] as NumberQuad,
-    views: {
-        layout: [1, 1],
-        viewports: [
-            {
-                id: "view_1",
-                show3D: true,
-            },
-        ],
-    },
+    views: DEFAULT_VIEWS,
 };
 
 NodeCenteredPropMapWithArrayInput.parameters = {
@@ -944,15 +891,7 @@ const TypedArrayInputStory: StoryFn<typeof SubsurfaceViewer> = (args: {
             zoom: [-100, -100, -10, 100, 100, 60],
             target: [0, 0, 0],
         },
-        views: {
-            layout: [1, 1],
-            viewports: [
-                {
-                    id: "view_1",
-                    show3D: true,
-                },
-            ],
-        },
+        views: DEFAULT_VIEWS,
     };
     return <SubsurfaceViewer {...subsurfaceViewerArgs} />;
 };
@@ -1481,9 +1420,7 @@ const ContourLinesStory = (props: {
     );
 };
 
-export const ContourLines: ComponentStory<typeof ContourLinesStory> = (
-    args
-) => {
+export const ContourLines: StoryFn<typeof ContourLinesStory> = (args) => {
     return <ContourLinesStory {...args} />;
 };
 
@@ -1494,4 +1431,59 @@ ContourLines.args = {
     zContourInterval: 100,
     propertyContourInterval: 5000,
     marginPixels: 0,
+};
+
+export const ClippingExtension: StoryFn<
+    SubsurfaceViewerProps & { clipX: number }
+> = (args) => {
+    const rightClipBounds = [
+        args.bounds?.[0] + args.clipX,
+        args.bounds?.[1],
+        args.bounds?.[2],
+        args.bounds?.[3],
+    ];
+    const leftClipBounds = [
+        args.bounds?.[0],
+        args.bounds?.[1],
+        args.bounds?.[0] + args.clipX,
+        args.bounds?.[3],
+    ];
+    const leftMap = new MapLayer({
+        ...defaultMapLayerProps,
+        id: "left",
+        extensions: [new ClipExtension()],
+        clipBounds: leftClipBounds,
+        clipByInstance: true,
+    });
+
+    const rightMap = new MapLayer({
+        ...defaultMapLayerProps,
+        id: "right",
+        colorMapName: "Physics reverse",
+        extensions: [new ClipExtension()],
+        clipBounds: rightClipBounds,
+        clipByInstance: true,
+    });
+
+    const layers = [
+        new AxesLayer({ ...axes_hugin }),
+        leftMap,
+        rightMap,
+        new NorthArrow3DLayer(),
+    ];
+
+    return <SubsurfaceViewer {...args} layers={layers}></SubsurfaceViewer>;
+};
+
+ClippingExtension.args = {
+    id: "map",
+    ...defaultArgs,
+    views: DEFAULT_VIEWS,
+    clipX: 1000,
+};
+
+ClippingExtension.argTypes = {
+    clipX: {
+        control: { type: "range", min: 0, max: 8000, step: 10 },
+    },
 };
