@@ -888,10 +888,6 @@ export const TypedArrayInput: StoryFn<
     return <SubsurfaceViewer {...subsurfaceViewerArgs} />;
 };
 
-/* export const TypedArrayInput: StoryFn<typeof SubsurfaceViewer> = (args) => {
-    return <TypedArrayInputStory {...args} />;
-};
- */
 TypedArrayInput.args = {
     dimension: 300,
 };
