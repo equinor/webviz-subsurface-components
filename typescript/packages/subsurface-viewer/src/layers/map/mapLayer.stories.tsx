@@ -888,6 +888,10 @@ export const TypedArrayInput: StoryFn<
     return <SubsurfaceViewer {...subsurfaceViewerArgs} />;
 };
 
+/* export const TypedArrayInput: StoryFn<typeof SubsurfaceViewer> = (args) => {
+    return <TypedArrayInputStory {...args} />;
+};
+ */
 TypedArrayInput.args = {
     dimension: 300,
 };
@@ -1421,9 +1425,9 @@ ContourLines.args = {
     marginPixels: 0,
 };
 
-export const ClippingExtension: StoryFn<
-    SubsurfaceViewerProps & { clipX: number }
-> = (args) => {
+export const Extensions: StoryFn<SubsurfaceViewerProps & { clipX: number }> = (
+    args
+) => {
     const rightClipBounds = [
         args.bounds?.[0] + args.clipX,
         args.bounds?.[1],
@@ -1463,14 +1467,14 @@ export const ClippingExtension: StoryFn<
     return <SubsurfaceViewer {...args} layers={layers}></SubsurfaceViewer>;
 };
 
-ClippingExtension.args = {
+Extensions.args = {
     id: "map",
     ...defaultArgs,
     views: DEFAULT_VIEWS,
     clipX: 1000,
 };
 
-ClippingExtension.argTypes = {
+Extensions.argTypes = {
     clipX: {
         control: { type: "range", min: 0, max: 8000, step: 10 },
     },
