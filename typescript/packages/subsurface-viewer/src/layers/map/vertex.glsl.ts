@@ -32,6 +32,7 @@ void main(void) {
    cameraPosition = project_uCameraPosition;
 
    worldPos = position;
+   geometry.worldPosition = position;
 
    normals_commonspace = normals;
 

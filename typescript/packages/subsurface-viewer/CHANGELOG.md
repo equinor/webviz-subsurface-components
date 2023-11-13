@@ -1,3 +1,10 @@
+## [0.5.9](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.5.8...subsurface-viewer@0.5.9) (2023-11-13)
+
+
+### Bug Fixes
+
+* honor deck.gl extensions in MapLayer ([#1769](https://github.com/equinor/webviz-subsurface-components/issues/1769)) ([40d8092](https://github.com/equinor/webviz-subsurface-components/commit/40d8092987cec356be386271746f7a028dc354b1))
+
 ## [0.5.8](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.5.7...subsurface-viewer@0.5.8) (2023-11-10)
 
 

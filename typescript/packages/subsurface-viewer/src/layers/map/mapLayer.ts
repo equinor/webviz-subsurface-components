@@ -1,4 +1,9 @@
-import type { Color, UpdateParameters } from "@deck.gl/core/typed";
+import type {
+    Color,
+    CompositeLayerProps,
+    Layer,
+    UpdateParameters,
+} from "@deck.gl/core/typed";
 import { CompositeLayer } from "@deck.gl/core/typed";
 import type { Material } from "./privateMapLayer";
 import privateMapLayer from "./privateMapLayer";
@@ -301,7 +306,9 @@ const defaultProps = {
     ZIncreasingDownwards: true,
 };
 
-export default class MapLayer extends CompositeLayer<MapLayerProps> {
+export default class MapLayer<
+    ExtraProps extends object = object,
+> extends CompositeLayer<Required<MapLayerProps> & ExtraProps> {
     get isLoaded(): boolean {
         const subLayers = this.getSubLayers();
         const isLoaded =
@@ -420,7 +427,17 @@ export default class MapLayer extends CompositeLayer<MapLayerProps> {
         this.rebuildData(reportBoundingBox);
     }
 
-    updateState({ props, oldProps }: UpdateParameters<MapLayer>): void {
+    updateState({
+        props,
+        oldProps,
+    }: UpdateParameters<
+        MapLayer &
+            Layer<
+                Required<MapLayerProps> &
+                    ExtraProps &
+                    Required<CompositeLayerProps>
+            >
+    >): void {
         const needs_reload =
             !isEqual(props.meshUrl, oldProps.meshUrl) ||
             !isEqual(props.propertiesUrl, oldProps.propertiesUrl) ||

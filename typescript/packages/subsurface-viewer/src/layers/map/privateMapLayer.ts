@@ -4,6 +4,7 @@ import {
     Layer,
     picking,
     project,
+    project32,
 } from "@deck.gl/core/typed";
 import { localPhongLighting, utilities } from "../shader_modules";
 import type { LayerPickInfo, PropertyDataType } from "../utils/layerTools";
@@ -17,8 +18,8 @@ import type {
 
 import { getImageData } from "../utils/layerTools";
 
-import vsShader from "./vertex.glsl";
-import fsShader from "./fragment.fs.glsl";
+import vs from "./vertex.glsl";
+import fs from "./fragment.fs.glsl";
 import vsLineShader from "./vertex_lines.glsl";
 import fsLineShader from "./fragment_lines.glsl";
 
@@ -110,11 +111,12 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
 
     //eslint-disable-next-line
     _getModels(gl: any) {
+        const shaders = this.getShaders();
+
         // MESH MODEL
         const mesh_model = new Model(gl, {
             id: `${this.props.id}-mesh`,
-            vs: vsShader,
-            fs: fsShader,
+            ...shaders,
             geometry: new Geometry({
                 drawMode: gl.TRIANGLES,
                 attributes: {
@@ -127,7 +129,6 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
                 },
                 indices: { value: this.props.triangleIndices, size: 1 },
             }),
-            modules: [project, picking, localPhongLighting, utilities],
             isInstanced: false, // This only works when set to false.
         });
 
@@ -283,6 +284,14 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
             ...info,
             properties: layer_properties,
         };
+    }
+
+    getShaders() {
+        return super.getShaders({
+            vs,
+            fs,
+            modules: [project32, picking, localPhongLighting, utilities],
+        });
     }
 }
 
