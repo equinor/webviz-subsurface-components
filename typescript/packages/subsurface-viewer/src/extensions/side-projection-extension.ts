@@ -1,13 +1,13 @@
 import { LayerExtension } from "@deck.gl/core/typed";
 
 import type { Layer, _ShaderModule as ShaderModule } from "@deck.gl/core/typed";
-import { project32, project } from "@deck.gl/core";
+import { project32, project } from "@deck.gl/core/typed";
 
 const defaultProps = {
     sideViewIds: [],
 };
 
-export type SideProjectionExtensionProps = {
+type SideProjectionExtensionProps = {
     sideViewIds?: string[];
 };
 
@@ -29,10 +29,6 @@ vec3 transform(vec3 clip_position) {
 }
 `;
 
-/*
- * The vertex-shader version clips geometries by their anchor position
- * e.g. ScatterplotLayer - show if the center of a circle is within bounds
- */
 const shaderModuleVs: ShaderModule = {
     name: "unfold-vs",
     vs: shaderFunction,
@@ -59,13 +55,15 @@ export class SideProjectionExtension extends LayerExtension {
         };
     }
 
-    /* eslint-disable camelcase */
     draw(
         this: Layer<Required<SideProjectionExtensionProps>>,
-        { uniforms }: {
+        {
+            uniforms,
+        }: {
             uniforms: {
                 side_view: unknown;
-            } }
+            };
+        }
     ): void {
         const { sideViewIds } = this.props;
         const isSideView = sideViewIds.includes(this.context.viewport.id);
