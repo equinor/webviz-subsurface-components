@@ -4,11 +4,11 @@ import React from "react";
 import type { Feature } from "geojson";
 import AxesLayer from "../layers/axes/axesLayer";
 import { GeoJsonLayer } from "@deck.gl/layers/typed";
-import { UnfoldExtension } from "./unfold-extension";
+import { SideProjectionExtension } from "./side-projection-extension";
 
 export default {
     component: SubsurfaceViewer,
-    title: "SubsurfaceViewer / Unfold Extension",
+    title: "SubsurfaceViewer / SideProjectionExtension",
 };
 
 const StoryTemplate: StoryFn<typeof SubsurfaceViewer> = (args) => {
@@ -144,8 +144,8 @@ const DEFAULT_LAYER_PROPS = {
     getFillColor: (d: Feature) => d.properties?.["color"],
 };
 
-export const Unfolding = StoryTemplate.bind({});
-Unfolding.args = {
+export const SideProjection = StoryTemplate.bind({});
+SideProjection.args = {
     ...defaultProps,
     bounds: [500, 1000, 1200, 1500] as [number, number, number, number],
     layers: [
@@ -155,7 +155,7 @@ Unfolding.args = {
         }),
         new GeoJsonLayer({
             ...DEFAULT_LAYER_PROPS,
-            extensions: [new UnfoldExtension()],
+            extensions: [new SideProjectionExtension()],
             sideViewIds: ["intersection"],
         }),
     ],

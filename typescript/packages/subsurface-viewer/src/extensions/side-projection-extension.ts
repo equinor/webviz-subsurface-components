@@ -7,7 +7,7 @@ const defaultProps = {
     sideViewIds: [],
 };
 
-export type UnfoldExtensionProps = {
+export type SideProjectionExtensionProps = {
     sideViewIds?: string[];
 };
 
@@ -48,11 +48,11 @@ const injectionVs = {
 `,
 };
 
-export class UnfoldExtension extends LayerExtension {
+export class SideProjectionExtension extends LayerExtension {
     static defaultProps = defaultProps;
-    static extensionName = "UnfoldExtension";
+    static extensionName = "SideProjectionExtension";
 
-    getShaders(this: Layer<UnfoldExtensionProps>) {
+    getShaders(this: Layer<SideProjectionExtensionProps>) {
         return {
             modules: [shaderModuleVs, project, project32],
             inject: injectionVs,
@@ -61,7 +61,7 @@ export class UnfoldExtension extends LayerExtension {
 
     /* eslint-disable camelcase */
     draw(
-        this: Layer<Required<UnfoldExtensionProps>>,
+        this: Layer<Required<SideProjectionExtensionProps>>,
         { uniforms }: {
             uniforms: {
                 side_view: unknown;
