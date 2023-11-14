@@ -4,7 +4,6 @@ import React from "react";
 import type { Feature } from "geojson";
 import AxesLayer from "../layers/axes/axesLayer";
 import { GeoJsonLayer } from "@deck.gl/layers/typed";
-import ClipExtension from "./clip-extension";
 import { UnfoldExtension } from "./unfold-extension";
 
 export default {
@@ -133,8 +132,6 @@ const IntersectionViewData = {
     ],
 };
 
-const CLIP = new ClipExtension();
-
 const DEFAULT_LAYER_PROPS = {
     id: "enhanced-path-layer",
     data: IntersectionViewData,
@@ -145,24 +142,6 @@ const DEFAULT_LAYER_PROPS = {
     getPointRadius: 3,
     getLineColor: (d: Feature) => d.properties?.["color"],
     getFillColor: (d: Feature) => d.properties?.["color"],
-};
-
-export const Clipping = StoryTemplate.bind({});
-Clipping.args = {
-    ...defaultProps,
-    bounds: [500, 1000, 1200, 1500] as [number, number, number, number],
-    layers: [
-        new AxesLayer({
-            id: "axes-layer",
-            bounds: [300, 800, 400, 1300, 1600, 600],
-        }),
-        new GeoJsonLayer({
-            ...DEFAULT_LAYER_PROPS,
-            extensions: [CLIP],
-            clipBounds: [900, 900, 1300, 1300],
-            clipByInstance: true,
-        }),
-    ],
 };
 
 export const Unfolding = StoryTemplate.bind({});
@@ -190,6 +169,7 @@ Unfolding.args = {
             {
                 id: "intersection",
                 show3D: false,
+                target: [700, -450],
             },
         ],
     },
