@@ -21,6 +21,7 @@
 import { LayerExtension } from "@deck.gl/core/typed";
 
 import type { Layer, _ShaderModule as ShaderModule } from "@deck.gl/core/typed";
+import { project32, project } from "@deck.gl/core";
 
 const defaultProps = {
     clipBounds: [0, 0, 1, 1],
@@ -47,12 +48,15 @@ bool clip_isInBounds(vec2 position) {
   return position.x >= clip_bounds[0] && position.y >= clip_bounds[1] && position.x < clip_bounds[2] && position.y < clip_bounds[3];
 }
 
-vec2 transform(vec2 clip_position) {
-    //vec2 world_position = project_clip_
-    float y = clip_position.y * 4.0;
-    return vec2(clip_position.x, y);
-    //return pos.xy;
-    //return pos.xy + vec2(0.1, 0.0);
+vec3 transform(vec3 clip_position) {
+    vec3 world_position = geometry.worldPosition.xyz;
+    vec4 transformed = vec4(world_position.x, world_position.z, 0.0, 1.0);
+
+    vec4 commonspace = project_position(transformed);
+
+    vec4 clipspace = project_common_position_to_clipspace(commonspace);
+
+    return clipspace.xyz;
 }
 `;
 
@@ -82,11 +86,11 @@ varying float clip_isVisible;
  */
 const injectionVs = {
     "vs:#decl": `
-  varying vec2 new_position;
+  varying vec3 new_position;
 `,
     "vs:DECKGL_FILTER_GL_POSITION": `
-  new_position = transform(position.xz);
-  position.xy = new_position;
+  new_position = transform(position.xyz);
+  position.xyz = new_position;
 `,
 };
 
@@ -134,7 +138,7 @@ export class UnfoldExtension extends LayerExtension {
 
         return clipByInstance
             ? {
-                  modules: [shaderModuleVs],
+                  modules: [shaderModuleVs, project, project32],
                   inject: injectionVs,
               }
             : {
