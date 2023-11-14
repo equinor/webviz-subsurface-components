@@ -177,23 +177,18 @@ Unfolding.args = {
         new GeoJsonLayer({
             ...DEFAULT_LAYER_PROPS,
             extensions: [new UnfoldExtension()],
-            clipBounds: [900, 900, 1300, 1300],
-            clipByInstance: true,
-        }),
-        new GeoJsonLayer({
-            ...DEFAULT_LAYER_PROPS,
-            id: "no-extensions",
+            sideViewIds: ["intersection"],
         }),
     ],
     views: {
         layout: [1, 2],
         viewports: [
             {
-                id: "a",
+                id: "normal",
                 show3D: true,
             },
             {
-                id: "b",
+                id: "intersection",
                 show3D: false,
             },
         ],
