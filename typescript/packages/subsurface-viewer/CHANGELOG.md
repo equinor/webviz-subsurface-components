@@ -1,3 +1,10 @@
+# [0.6.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.5.10...subsurface-viewer@0.6.0) (2023-11-14)
+
+
+### Features
+
+* Side projection extension ([#1772](https://github.com/equinor/webviz-subsurface-components/issues/1772)) ([68f8b2b](https://github.com/equinor/webviz-subsurface-components/commit/68f8b2be8dbc9adfdcd006a5b57b3335d4337dfd))
+
 ## [0.5.10](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.5.9...subsurface-viewer@0.5.10) (2023-11-13)
 
 
