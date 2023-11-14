@@ -149,6 +149,8 @@ export default class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProp
         const uColor = this.props.color.map((x: number) => (x ?? 0) / 255);
         uColor.push(1); // alpha channel.
 
+        console.log("triangle", triangleModel);
+
         if (!this.props.depthTest) {
             gl.disable(GL.DEPTH_TEST);
         }
