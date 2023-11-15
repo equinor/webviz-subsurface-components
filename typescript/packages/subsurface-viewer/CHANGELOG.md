@@ -1,3 +1,24 @@
+# [0.6.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.5.10...subsurface-viewer@0.6.0) (2023-11-14)
+
+
+### Features
+
+* Side projection extension ([#1772](https://github.com/equinor/webviz-subsurface-components/issues/1772)) ([68f8b2b](https://github.com/equinor/webviz-subsurface-components/commit/68f8b2be8dbc9adfdcd006a5b57b3335d4337dfd))
+
+## [0.5.10](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.5.9...subsurface-viewer@0.5.10) (2023-11-13)
+
+
+### Bug Fixes
+
+* bump to latest @emerson-eps/color-tables ([#1770](https://github.com/equinor/webviz-subsurface-components/issues/1770)) ([e67a285](https://github.com/equinor/webviz-subsurface-components/commit/e67a2856eced8f987bc61fa4a0a924b5a4886992))
+
+## [0.5.9](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.5.8...subsurface-viewer@0.5.9) (2023-11-13)
+
+
+### Bug Fixes
+
+* honor deck.gl extensions in MapLayer ([#1769](https://github.com/equinor/webviz-subsurface-components/issues/1769)) ([40d8092](https://github.com/equinor/webviz-subsurface-components/commit/40d8092987cec356be386271746f7a028dc354b1))
+
 ## [0.5.8](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.5.7...subsurface-viewer@0.5.8) (2023-11-10)
 
 
