@@ -42,17 +42,23 @@ WellMarkers.args = {
             "@@type": "AxesLayer",
             id: "well-markers-axes",
             bounds: [-15, -15, -15, 40, 20, 15],
-            ZIncreasingDownwards: false,
+            ZIncreasingDownwards: false,            
+        },
+        {
+            "@@type": "NorthArrow3DLayer",
+            id: "north-arrow-layer",
         },
         {
             "@@type": "WellMarkersLayer",
             id: "well-markers-1",
-            pickable: true,
+            pickable: false,
             data: [
-                {position: [0.0, 0.0, 0.0]},
-                {position: [5.0, 0.0, 5.0]}
+                {position: [0.0, 0.0, 0.0], inclination: 0},
+                {position: [0.0, 0.0, 0.0], inclination: 45},
+                {position: [0.0, 0.0, 0.0], inclination: 90}
             ]
         },
+
     ],
 };
 WellMarkers.parameters = parameters;
