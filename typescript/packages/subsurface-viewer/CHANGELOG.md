@@ -1,3 +1,10 @@
+# [0.7.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.6.0...subsurface-viewer@0.7.0) (2023-11-15)
+
+
+### Features
+
+* Enable left click to specify camera anchor/rotation point [#1775](https://github.com/equinor/webviz-subsurface-components/issues/1775) ([#1776](https://github.com/equinor/webviz-subsurface-components/issues/1776)) ([533f527](https://github.com/equinor/webviz-subsurface-components/commit/533f527938442d82298bc97effd4bd914da2f27e))
+
 # [0.6.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.5.10...subsurface-viewer@0.6.0) (2023-11-14)
 
 
