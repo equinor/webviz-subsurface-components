@@ -286,6 +286,7 @@ export interface ViewStateType {
     rotationOrbit: number;
     minZoom?: number;
     maxZoom?: number;
+    transitionDuration?: number;
 }
 
 interface marginsType {
@@ -917,11 +918,29 @@ const Map: React.FC<MapProps> = ({
             infos: PickingInfo[],
             event: MjolnirEvent
         ): void => {
+            if ((event as MjolnirPointerEvent).leftButton) {
+                // Left button click identifies new camera rotation anchor.
+                const viewstateKeys = Object.keys(viewStates);
+                if (infos.length >= 1 && viewstateKeys.length === 1) {
+                    const info = infos[0];
+                    if (info.coordinate) {
+                        const x = info.coordinate[0];
+                        const y = info.coordinate[1];
+                        const z = info.coordinate[2];
+
+                        const vs = cloneDeep(viewStates);
+                        vs[viewstateKeys[0]].target = [x, y, z];
+                        vs[viewstateKeys[0]].transitionDuration = 1000;
+                        setViewStates(vs);
+                    }
+                }
+            }
+
             if (!onMouseEvent) return;
             const ev = handleMouseEvent(type, infos, event);
             onMouseEvent(ev);
         },
-        [onMouseEvent]
+        [onMouseEvent, viewStates]
     );
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
