@@ -3,8 +3,10 @@ const fsShader = `#version 300 es
 
 precision highp float;
 
+in vec3 color;
+
 void main(void) {
-   gl_FragColor = vec4(1.0, 0.0, 1.0, 1.0);
+   gl_FragColor = vec4(color.rgb * (1.0/ 256.0), 1.0);
    //DECKGL_FILTER_COLOR(gl_FragColor, geometry);
 }
 `;

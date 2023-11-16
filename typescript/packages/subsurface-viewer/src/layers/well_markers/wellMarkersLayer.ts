@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import GL from "@luma.gl/constants";
 import { Geometry, Model } from "@luma.gl/engine";
-import type { Accessor, DefaultProps, LayerContext, Position, UpdateParameters , LayerProps} from "@deck.gl/core/typed";
+import type { Accessor, Color, DefaultProps, LayerContext, Position, UpdateParameters , LayerProps} from "@deck.gl/core/typed";
 import { Layer, project } from "@deck.gl/core/typed";
 import type { ExtendedLayerProps } from "../utils/layerTools";
 
@@ -14,13 +14,17 @@ export type WellMarkersLayerProps = _WellMarkersLayerProps & LayerProps;
 
 export type WellMarkerDataT = {
     position: Position;
+    azimuth: number;
     inclination: number;
+    color: Color;
 }
 
 export interface _WellMarkersLayerProps extends ExtendedLayerProps {
 
     getPosition?: Accessor<WellMarkerDataT, Position>;   
+    getAzimuth?: Accessor<WellMarkerDataT, number>;
     getInclination?: Accessor<WellMarkerDataT, number>;
+    getColor?: Accessor<WellMarkerDataT, Color>;
 }
 
 const defaultProps: DefaultProps<WellMarkersLayerProps> = {
@@ -30,7 +34,9 @@ const defaultProps: DefaultProps<WellMarkersLayerProps> = {
     id: "well-markers",
     visible: true, 
     getPosition: {type: 'accessor', value: (x: WellMarkerDataT) => { return x.position}},
+    getAzimuth:  {type: 'accessor', value: (x: WellMarkerDataT) => { return x.azimuth}},
     getInclination: {type: 'accessor', value: (x: WellMarkerDataT) => { return x.inclination}},
+    getColor: {type: 'accessor', value: (x: WellMarkerDataT) => { return x.color}},
 };
 
 export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
@@ -52,12 +58,26 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
               transition: true,                  
               accessor: 'getPosition'
             },
+            instanceAzimuths: {
+                size: 1,
+                type: GL.DOUBLE,    
+                transition: true,                  
+                accessor: 'getAzimuth',
+                defaultValue: 0
+            },
             instanceInclinations: {
                 size: 1,
                 type: GL.DOUBLE,    
                 transition: true,                  
                 accessor: 'getInclination',
                 defaultValue: 0
+            },
+            instanceColors: {
+                size: 3,
+                type: GL.UNSIGNED_BYTE,    
+                transition: true,                  
+                accessor: 'getColor',
+                defaultValue: [255, 0, 0],
               },
         });
     }
