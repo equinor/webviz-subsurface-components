@@ -6,9 +6,12 @@ attribute vec3 positions;
 attribute vec3 instancePositions;
 attribute float instanceAzimuths;
 attribute float instanceInclinations;
-attribute vec3 instanceColors;
+attribute vec4 instanceColors;
+attribute vec4 instanceOutlineColors;
+
 attribute vec3 instancePickingColors;
 
+uniform bool useOutlineColor;
 
 out vec4 position_commonspace;
 out vec4 color;
@@ -17,7 +20,7 @@ void main(void) {
    geometry.worldPosition = instancePositions;
    geometry.pickingColor  = instancePickingColors;
 
-   color = vec4(instanceColors.rgb, 100);
+   color = useOutlineColor ? instanceOutlineColors : instanceColors;
 
    float sinA = sin (PI / 180.0 * instanceAzimuths);
    float cosA = cos (PI / 180.0 * instanceAzimuths);

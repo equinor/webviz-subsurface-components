@@ -19,6 +19,7 @@ export type WellMarkerDataT = {
     azimuth: number;
     inclination: number;
     color: Color;    
+    outlineColor: Color;
 }
 
 export interface _WellMarkersLayerProps extends ExtendedLayerProps {
@@ -28,6 +29,26 @@ export interface _WellMarkersLayerProps extends ExtendedLayerProps {
     getAzimuth?: Accessor<WellMarkerDataT, number>;
     getInclination?: Accessor<WellMarkerDataT, number>;
     getColor?: Accessor<WellMarkerDataT, Color>;
+    getOutlineColor?: Accessor<WellMarkerDataT, Color>;
+}
+
+const normalizeColor = (color: Color | undefined) : Color => {
+
+    if(!color) {
+        return new Uint8Array([0, 0, 0, 255]);
+    }
+
+    if (color.length > 4) {
+        return new Uint8Array(color.slice(0,4));
+    }
+
+    switch(color.length) {
+        case 0: return new Uint8Array([0, 0, 0, 255]);
+        case 1: return new Uint8Array([...color, 0, 0, 255]);
+        case 2: return new Uint8Array([...color, 0, 255]);
+        case 3: return new Uint8Array([...color, 255]);
+        default: return color;
+    }
 }
 
 const defaultProps: DefaultProps<WellMarkersLayerProps> = {
@@ -40,11 +61,13 @@ const defaultProps: DefaultProps<WellMarkersLayerProps> = {
     getPosition: {type: 'accessor', value: (x: WellMarkerDataT) => { return x.position}},
     getAzimuth:  {type: 'accessor', value: (x: WellMarkerDataT) => { return x.azimuth}},
     getInclination: {type: 'accessor', value: (x: WellMarkerDataT) => { return x.inclination}},
-    getColor: {type: 'accessor', value: (x: WellMarkerDataT) => { return x.color}},
+    getColor: {type: 'accessor', value: (x: WellMarkerDataT) => { return normalizeColor(x.color)}},
+    getOutlineColor: {type: 'accessor', value: (x: WellMarkerDataT) => { return normalizeColor(x.outlineColor)}},
 };
 
 interface IMarkerShape {
     positions: Float32Array;
+    outline: Float32Array;
     drawMode: number;
 }
 
@@ -81,14 +104,22 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
                 defaultValue: 0
             },
             instanceColors: {
-                size: 3,
+                size: 4,
                 type: GL.UNSIGNED_BYTE,    
                 transition: true,                  
                 accessor: 'getColor',
-                defaultValue: [255, 0, 0],
-              },
+                defaultValue: [255, 0, 0, 255],
+            },
+            instanceOutlineColors: {
+                size: 4,
+                type: GL.UNSIGNED_BYTE,    
+                transition: true,                  
+                accessor: 'getOutlineColor',
+                defaultValue: [255, 0, 255, 255],
+            },
         });
-        this.setState ({shapeModel: this._getModel()});
+        const models = this._createModels ();
+        this.setState ({shapeModel: models[0], outlineModel: models[1]});
     }
 
     updateState(params: UpdateParameters<this>) {
@@ -96,9 +127,12 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
     
         if (params.changeFlags.extensionsChanged) {
             this.state?.["shapeModel"]?.delete();
+            this.state?.["outlineModel"]?.delete();
+            const models = this._createModels ();
             this.setState (
                 {   ...this.state,
-                    shapeModel: this._getModel()
+                    shapeModel: models[0],
+                    outlineModel: models[1],
                 }
             );
             this.getAttributeManager()!.invalidateAll();
@@ -106,41 +140,10 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
     }
 
     getModels(): Model[] {
-        if(this.state["shapeModel"]) {
-            return [this.state["shapeModel"]];
+        if(this.state["shapeModel"] && this.state["outlineModel"]) {
+            return [this.state["shapeModel"], this.state["outlineModel"]];
         }
         return [];
-    }
-
-    protected _getModel(): Model {
-
-        const gl = this.context.gl;
-
-        const shape = this.shapes.get (this.props.shape);
-        if (!shape) {
-            return new Model (gl, {
-                id: `${this.props.id}-empty-mesh`,
-                vs: vsShader,
-                fs: fsShader,
-                isInstanced: true, 
-            });
-        }
-        
-        const model = new Model(gl, {
-            id: `${this.props.id}-mesh`,
-            vs: vsShader,
-            fs: fsShader,  
-            geometry: new Geometry({   
-                drawMode: shape.drawMode,                             
-                attributes: {
-                  positions: {size: 3, value: shape.positions}
-                },                
-            }),       
-            modules: [project, picking, utilities],
-            isInstanced: true,       
-            instanceCount: this.getNumInstances()          
-        });
-        return model;
     }
 
     draw(args: {
@@ -152,10 +155,16 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
             return;
         }
         const { uniforms } = args;
-        const model = this.state["shapeModel"];       
-        model.setUniforms({
+        const models = this.getModels ();
+        if (models.length && models.length < 2) {
+            return;
+        }
+        models[0].setUniforms({
              ...uniforms,
         }).draw();        
+        models[1].setUniforms({
+            ...uniforms,
+       }).draw();        
     }
 
     getPickingInfo({ info }: { info: PickingInfo }): LayerPickInfo {
@@ -209,20 +218,96 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
              1.0, -1.0, 0.0
         ]
 
+        const square_outline = [
+            -1.0,  1.0, 0.0,
+             1.0,  1.0, 0.0,
+             1.0, -1.0, 0.0,
+            -1.0, -1.0, 0.0,
+        ]
+
         this.shapes.set ("triangle", {
             drawMode: GL.TRIANGLES,
-            positions: new Float32Array(triangle_positions)
+            positions: new Float32Array(triangle_positions),
+            outline: new Float32Array(triangle_positions),
         });
 
         this.shapes.set ("circle", {
             drawMode: GL.TRIANGLE_FAN,
-            positions: new Float32Array(circle_positions)
+            positions: new Float32Array(circle_positions),
+            outline: new Float32Array(circle_positions.slice(3)),
         });
 
         this.shapes.set ("square", {
             drawMode: GL.TRIANGLE_STRIP,
-            positions: new Float32Array(square_positions)
+            positions: new Float32Array(square_positions),
+            outline: new Float32Array(square_outline),
         });
+    }
+
+    protected _createModels(): Model[] {
+
+        const gl = this.context.gl;
+
+        const shape = this.shapes.get (this.props.shape);
+        if (!shape) {
+            return this._createEmptyModels();
+        }
+        
+        const shapeModel = new Model(gl, {
+            id: `${this.props.id}-mesh`,
+            vs: vsShader,
+            fs: fsShader,  
+            geometry: new Geometry({   
+                drawMode: shape.drawMode,                             
+                attributes: {
+                  positions: {size: 3, value: shape.positions}
+                },                
+            }),       
+            uniforms : {
+                useOutlineColor: false,
+            },
+            modules: [project, picking, utilities],
+            isInstanced: true,       
+            instanceCount: this.getNumInstances()          
+        });
+
+        const outlineModel = new Model(gl, {
+            id: `${this.props.id}-outline`,
+            vs: vsShader,
+            fs: fsShader,  
+            geometry: new Geometry({   
+                drawMode: GL.LINE_LOOP,                             
+                attributes: {
+                  positions: {size: 3, value: shape.outline}
+                },                
+            }),     
+            uniforms : {
+                useOutlineColor: true,
+            },  
+            modules: [project, picking, utilities],
+            isInstanced: true,       
+            instanceCount: this.getNumInstances()          
+        });
+
+        return [shapeModel, outlineModel];
+    }
+
+    protected _createEmptyModels () : Model[] {
+        return [new Model (this.context.gl, {
+            id: `${this.props.id}-empty-mesh`,
+            vs: vsShader,
+            fs: fsShader,
+            isInstanced: true, 
+            instanceCount: 0
+        }),
+        new Model (this.context.gl, {
+            id: `${this.props.id}-empty-outline`,
+            vs: vsShader,
+            fs: fsShader,
+            isInstanced: true, 
+            instanceCount: 0
+        })
+        ];  
     }
 }
 
