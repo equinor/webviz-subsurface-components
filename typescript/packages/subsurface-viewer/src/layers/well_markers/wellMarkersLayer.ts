@@ -50,10 +50,6 @@ interface IMarkerShape {
 
 export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
 
-    state!: {
-        model?: Model;
-    };
-
     private shapes : Map<string,IMarkerShape> = new Map ();
 
     constructor(props: WellMarkersLayerProps) {
@@ -92,26 +88,38 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
                 defaultValue: [255, 0, 0],
               },
         });
+        this.setState ({shapeModel: this._getModel()});
     }
 
     updateState(params: UpdateParameters<this>) {
         super.updateState(params);
     
         if (params.changeFlags.extensionsChanged) {
-          this.state.model?.clear({});
-          this.state.model = this._getModel();
-          this.getAttributeManager()!.invalidateAll();
+            this.state?.["shapeModel"]?.delete();
+            this.setState (
+                {   ...this.state,
+                    shapeModel: this._getModel()
+                }
+            );
+            this.getAttributeManager()!.invalidateAll();
         }
     }
 
-    _getModel(): Model {
+    getModels(): Model[] {
+        if(this.state["shapeModel"]) {
+            return [this.state["shapeModel"]];
+        }
+        return [];
+    }
+
+    protected _getModel(): Model {
 
         const gl = this.context.gl;
 
         const shape = this.shapes.get (this.props.shape);
         if (!shape) {
             return new Model (gl, {
-                id: `${this.props.id}-mesh`,
+                id: `${this.props.id}-empty-mesh`,
                 vs: vsShader,
                 fs: fsShader,
                 isInstanced: true, 
@@ -129,7 +137,8 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
                 },                
             }),       
             modules: [project, picking, utilities],
-            isInstanced: true,                 
+            isInstanced: true,       
+            instanceCount: this.getNumInstances()          
         });
         return model;
     }
@@ -139,11 +148,11 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
         uniforms: number[];
         context: LayerContext;
     }): void {
-        if (!this.state["model"]) {
+        if (!this.state["shapeModel"]) {
             return;
         }
         const { uniforms } = args;
-        const model = this.state["model"];       
+        const model = this.state["shapeModel"];       
         model.setUniforms({
              ...uniforms,
         }).draw();        
