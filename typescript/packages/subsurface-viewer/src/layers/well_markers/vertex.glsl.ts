@@ -1,5 +1,4 @@
-const vsShader = `\
-#version 300 es
+export const vsShader = `#version 300 es
 #define SHADER_NAME well-markers-vertex-shader
 precision highp float;
 
@@ -8,14 +7,17 @@ attribute vec3 instancePositions;
 attribute float instanceAzimuths;
 attribute float instanceInclinations;
 attribute vec3 instanceColors;
+attribute vec3 instancePickingColors;
 
 
 out vec4 position_commonspace;
-out vec3 color;
+out vec4 color;
 
-void main(void) { 
-   
-   color = instanceColors;
+void main(void) {   
+   geometry.worldPosition = instancePositions;
+   geometry.pickingColor  = instancePickingColors;
+
+   color = vec4(instanceColors.rgb, 100);
 
    float sinA = sin (PI / 180.0 * instanceAzimuths);
    float cosA = cos (PI / 180.0 * instanceAzimuths);
@@ -29,7 +31,10 @@ void main(void) {
 
    position_commonspace = vec4(project_position(rotatedPos + instancePositions), 0.0);
    gl_Position = project_common_position_to_clipspace(position_commonspace);
+
+   vec4 dummyColor = vec4(0.0);
+
+   DECKGL_FILTER_GL_POSITION(gl_Position, geometry);
+   DECKGL_FILTER_COLOR(dummyColor, geometry);
 }
 `;
-
-export default vsShader;
