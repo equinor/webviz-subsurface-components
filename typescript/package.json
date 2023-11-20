@@ -40,8 +40,6 @@
     "license": "MPL",
     "devDependencies": {
         "@actions/core": "^1.9.1",
-        "@commitlint/cli": "^17.7.1",
-        "@commitlint/config-conventional": "^17.8.0",
         "@cypress/react18": "^2.0.0",
         "@mdx-js/react": "^2.3.0",
         "@mui/material": "^5.13.7",
