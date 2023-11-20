@@ -55,14 +55,15 @@ WellMarkers.args = {
             id: "well-markers-1",
             pickable: true,
             shape: "triangle",
+            sizeUnits: "pixels",
             data: [
-                {position: [0.0, 0.0, 0.0], azimuth: 0, inclination: 0,  color: [0, 0, 123]},
-                {position: [0.0, 0.0, 0.0], azimuth: 0, inclination: 45, color: [200, 100]},
-                {position: [0.0, 0.0, 0.0], azimuth: 0, inclination: 90, color: [100]},
+                {position: [0.0, 0.0, 0.0], azimuth: 0, inclination: 0,  color: [0, 0, 123], size: 10},
+                {position: [0.0, 0.0, 0.0], azimuth: 0, inclination: 45, color: [200, 100], size: 20},
+                {position: [0.0, 0.0, 0.0], azimuth: 0, inclination: 90, color: [100], size: 30},
 
-                {position: [5.0, 0.0, 5.0001], azimuth: 0,  inclination: 0, color: [100, 0, 0, 100]},
-                {position: [5.0, 0.0, 5.0002], azimuth: 30, inclination: 0, color: [100, 100, 0, 100]},
-                {position: [5.0, 0.0, 5.0003], azimuth: 60, inclination: 0, color: [100, 0, 100, 100]}
+                {position: [5.0, 0.0, 5.0001], azimuth: 0,  inclination: 0, color: [100, 0, 0, 100], size: 5},
+                {position: [5.0, 0.0, 5.0002], azimuth: 30, inclination: 0, color: [100, 100, 0, 100], size: 15},
+                {position: [5.0, 0.0, 5.0003], azimuth: 60, inclination: 0, color: [100, 0, 100, 100], size: 10.5}
             ]            
         },
 
@@ -92,8 +93,9 @@ const generateMarkers = () : WellMarkerDataT[] => {
                 position: [x, y, z],
                 azimuth: az * 180.0 / Math.PI,
                 inclination: Math.asin (Math.cos(incl)) * 180.0 / Math.PI,
-                color: [0, 100, 200, 100],
-                outlineColor: [0, 0, 100, 255]
+                color: [255 * Math.random (), 255 * Math.random (), 255 * Math.random (), 100],
+                outlineColor: [0, 0, 100, 255],
+                size: 0.02 * Math.sqrt (x * x + y * y)
             })
         }
     }
@@ -118,7 +120,7 @@ WellMarkers2.args = {
         {
             "@@type": "AxesLayer",
             id: "well-markers-axes",
-            bounds: [-15, -15, -15, 15, 15, 15],
+            bounds: [-25, -25, -25, 25, 25, 25],
             ZIncreasingDownwards: false,            
         },
         {
@@ -129,7 +131,8 @@ WellMarkers2.args = {
             "@@type": "WellMarkersLayer",
             id: "well-markers-1",
             pickable: true,
-            shape: "square",
+            shape: "circle",
+            sizeUnits: "common",
             data: generateMarkers (),      
         },
 

@@ -1,8 +1,8 @@
 /* eslint-disable prettier/prettier */
 import GL from "@luma.gl/constants";
 import { Geometry, Model } from "@luma.gl/engine";
-import type { Accessor, Color, DefaultProps, LayerContext, Position, PickingInfo, UpdateParameters , LayerProps} from "@deck.gl/core/typed";
-import { Layer, project, picking } from "@deck.gl/core/typed";
+import type { Accessor, Color, DefaultProps, LayerContext, Position, PickingInfo, UpdateParameters , LayerProps, Unit} from "@deck.gl/core/typed";
+import { Layer, project, picking, UNIT } from "@deck.gl/core/typed";
 
 import type { ExtendedLayerProps, LayerPickInfo, PropertyDataType } from "../utils/layerTools";
 import { createPropertyData } from "../utils/layerTools";
@@ -16,6 +16,7 @@ export type WellMarkersLayerProps = _WellMarkersLayerProps & LayerProps;
 
 export type WellMarkerDataT = {
     position: Position;
+    size: number;
     azimuth: number;
     inclination: number;
     color: Color;    
@@ -25,11 +26,13 @@ export type WellMarkerDataT = {
 export interface _WellMarkersLayerProps extends ExtendedLayerProps {
 
     shape: "triangle" | "circle" | "square";
-    getPosition?: Accessor<WellMarkerDataT, Position>;   
+    sizeUnits: Unit;
+    getPosition?: Accessor<WellMarkerDataT, Position>; 
+    getSize?:Accessor<WellMarkerDataT, number>;  
     getAzimuth?: Accessor<WellMarkerDataT, number>;
     getInclination?: Accessor<WellMarkerDataT, number>;
     getColor?: Accessor<WellMarkerDataT, Color>;
-    getOutlineColor?: Accessor<WellMarkerDataT, Color>;
+    getOutlineColor?: Accessor<WellMarkerDataT, Color>;    
 }
 
 const normalizeColor = (color: Color | undefined) : Color => {
@@ -57,8 +60,10 @@ const defaultProps: DefaultProps<WellMarkersLayerProps> = {
     name: "Well Markers",
     id: "well-markers",
     shape: "circle",
+    sizeUnits: "meters",
     visible: true, 
     getPosition: {type: 'accessor', value: (x: WellMarkerDataT) => { return x.position}},
+    getSize: {type: 'accessor', value: (x: WellMarkerDataT) => { return x.size}},
     getAzimuth:  {type: 'accessor', value: (x: WellMarkerDataT) => { return x.azimuth}},
     getInclination: {type: 'accessor', value: (x: WellMarkerDataT) => { return x.inclination}},
     getColor: {type: 'accessor', value: (x: WellMarkerDataT) => { return normalizeColor(x.color)}},
@@ -88,6 +93,13 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
               type: GL.DOUBLE,    
               transition: true,                  
               accessor: 'getPosition'
+            },
+            instanceSizes : {
+                size: 1,
+                type: GL.DOUBLE,
+                transition: true,
+                accessor: 'getSize',
+                defaultValue: 1.0
             },
             instanceAzimuths: {
                 size: 1,
@@ -125,7 +137,7 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
     updateState(params: UpdateParameters<this>) {
         super.updateState(params);
     
-        if (params.changeFlags.extensionsChanged) {
+        if (params.changeFlags.extensionsChanged || params.changeFlags.propsChanged) {
             this.state?.["shapeModel"]?.delete();
             this.state?.["outlineModel"]?.delete();
             const models = this._createModels ();
@@ -161,9 +173,11 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
         }
         models[0].setUniforms({
              ...uniforms,
+             sizeUnits: UNIT[this.props.sizeUnits],
         }).draw();        
         models[1].setUniforms({
             ...uniforms,
+            sizeUnits: UNIT[this.props.sizeUnits],
        }).draw();        
     }
 
