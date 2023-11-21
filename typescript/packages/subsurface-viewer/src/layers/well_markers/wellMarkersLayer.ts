@@ -27,12 +27,13 @@ export interface _WellMarkersLayerProps extends ExtendedLayerProps {
 
     shape: "triangle" | "circle" | "square";
     sizeUnits: Unit;
+    ZIncreasingDownwards: boolean;
     getPosition?: Accessor<WellMarkerDataT, Position>; 
     getSize?:Accessor<WellMarkerDataT, number>;  
     getAzimuth?: Accessor<WellMarkerDataT, number>;
     getInclination?: Accessor<WellMarkerDataT, number>;
     getColor?: Accessor<WellMarkerDataT, Color>;
-    getOutlineColor?: Accessor<WellMarkerDataT, Color>;    
+    getOutlineColor?: Accessor<WellMarkerDataT, Color>;        
 }
 
 const normalizeColor = (color: Color | undefined) : Color => {
@@ -62,6 +63,7 @@ const defaultProps: DefaultProps<WellMarkersLayerProps> = {
     shape: "circle",
     sizeUnits: "meters",
     visible: true, 
+    ZIncreasingDownwards: false,
     getPosition: {type: 'accessor', value: (x: WellMarkerDataT) => { return x.position}},
     getSize: {type: 'accessor', value: (x: WellMarkerDataT) => { return x.size}},
     getAzimuth:  {type: 'accessor', value: (x: WellMarkerDataT) => { return x.azimuth}},
@@ -172,11 +174,13 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
             return;
         }
         models[0].setUniforms({
-             ...uniforms,
-             sizeUnits: UNIT[this.props.sizeUnits],
+            ...uniforms,
+            sizeUnits: UNIT[this.props.sizeUnits],
+            ZIncreasingDownwards: this.props.ZIncreasingDownwards
         }).draw();        
         models[1].setUniforms({
             ...uniforms,
+            ZIncreasingDownwards: this.props.ZIncreasingDownwards,
             sizeUnits: UNIT[this.props.sizeUnits],
        }).draw();        
     }
@@ -197,7 +201,8 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
         }
         
         if (typeof info.coordinate?.[2] !== "undefined") {
-            const depth = info.coordinate[2];
+            let depth = info.coordinate[2];
+            depth = this.props.ZIncreasingDownwards ? -depth : depth;
             layer_properties.push(createPropertyData("Depth", depth));
         }
         return {

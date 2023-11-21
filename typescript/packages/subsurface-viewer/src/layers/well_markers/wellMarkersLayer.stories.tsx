@@ -44,7 +44,7 @@ WellMarkers.args = {
             "@@type": "AxesLayer",
             id: "well-markers-axes",
             bounds: [-15, -15, -15, 40, 20, 15],
-            ZIncreasingDownwards: false,            
+            ZIncreasingDownwards: true,            
         },
         {
             "@@type": "NorthArrow3DLayer",
@@ -56,6 +56,7 @@ WellMarkers.args = {
             pickable: true,
             shape: "triangle",
             sizeUnits: "pixels",
+            ZIncreasingDownwards: true,
             data: [
                 {position: [0.0, 0.0, 0.0], azimuth: 0, inclination: 0,  color: [0, 0, 123], size: 10},
                 {position: [0.0, 0.0, 0.0], azimuth: 0, inclination: 45, color: [200, 100], size: 20},
