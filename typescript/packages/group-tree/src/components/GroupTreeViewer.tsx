@@ -1,15 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
 
 import { styled } from "@mui/material/styles";
-import { cloneDeep } from "lodash";
-import React, { useContext, useEffect, useRef } from "react";
+import React, { useContext, useEffect } from "react";
 import { useSelector } from "react-redux";
 import type { GroupTreeState } from "../redux/store";
 import { DataContext } from "./DataLoader";
-import "./Plot/dynamic_tree.css";
-import GroupTree from "./Plot/group_tree";
+import "./group-tree-plot/src/Plot/dynamic_tree.css";
 import SettingsBar from "./Settings/SettingsBar";
-import type { DataInfos } from "../redux/types";
+import { GroupTreePlot } from "./group-tree-plot/src/GroupTreePlot";
+import { EdgeInfo, NodeInfo } from "./group-tree-plot/src/types";
 
 const PREFIX = "GroupTreeViewer";
 
@@ -27,23 +26,17 @@ const Root = styled("div")(() => ({
     },
 }));
 
-interface Props {
+interface GroupTreeViewerProps {
     id: string;
-    edge_options: DataInfos;
-    node_options: DataInfos;
+    edgeOptions: EdgeInfo[];
+    nodeOptions: NodeInfo[];
     currentDateTimeChangedCallBack: (currentDateTime: string) => void;
 }
 
-const GroupTreeViewer: React.FC<Props> = ({
-    id,
-    edge_options,
-    node_options,
-    currentDateTimeChangedCallBack,
-}: Props) => {
-    const divRef = useRef<HTMLDivElement>(null);
+const GroupTreeViewer: React.FC<GroupTreeViewerProps> = (
+    props: GroupTreeViewerProps
+) => {
     const data = useContext(DataContext);
-
-    const renderer = useRef<GroupTree>();
 
     const currentDateTime = useSelector(
         (state: GroupTreeState) => state.ui.currentDateTime
@@ -56,45 +49,26 @@ const GroupTreeViewer: React.FC<Props> = ({
     );
 
     useEffect(() => {
-        renderer.current = new GroupTree(
-            id,
-            cloneDeep(data),
-            currentFlowRate,
-            currentNodeInfo,
-            currentDateTime,
-            edge_options,
-            node_options
-        );
-    }, [data]);
-
-    useEffect(() => {
-        if (!renderer.current) return;
-
-        renderer.current.update(currentDateTime);
-
-        if (typeof currentDateTimeChangedCallBack !== "undefined") {
-            currentDateTimeChangedCallBack(currentDateTime);
+        if (typeof props.currentDateTimeChangedCallBack !== "undefined") {
+            props.currentDateTimeChangedCallBack(currentDateTime);
         }
     }, [currentDateTime]);
-
-    useEffect(() => {
-        if (!renderer.current) return;
-        renderer.current.flowrate = currentFlowRate;
-    }, [currentFlowRate]);
-
-    useEffect(() => {
-        if (!renderer.current) return;
-        renderer.current.nodeinfo = currentNodeInfo;
-    }, [currentNodeInfo]);
 
     return (
         <Root className={classes.root}>
             <SettingsBar
-                edge_options={edge_options}
-                node_options={node_options}
+                edge_options={props.edgeOptions}
+                node_options={props.nodeOptions}
             />
-            <div id={id} ref={divRef} />
-            {/* <GroupTreePlot root={root} currentFlowRate={currentFlowRate} /> */}
+            <GroupTreePlot
+                id={props.id}
+                datedTrees={data}
+                edgeInfoList={props.edgeOptions}
+                nodeInfoList={props.nodeOptions}
+                selectedEdgeName={currentFlowRate}
+                selectedNodeName={currentNodeInfo}
+                selectedDateTime={currentDateTime}
+            />
         </Root>
     );
 };

@@ -4,7 +4,7 @@ import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCurrentFlowRate } from "../../redux/actions";
 import type { GroupTreeState } from "../../redux/store";
-import type { DataInfos, DataInfo } from "../../redux/types";
+import { EdgeInfo } from "../group-tree-plot/src/types";
 
 const PREFIX = "FlowRateSelector";
 
@@ -20,7 +20,7 @@ const StyledNativeSelect = styled(NativeSelect)(({ theme }) => ({
 }));
 
 interface Props {
-    edge_options: DataInfos;
+    edge_options: EdgeInfo[];
 }
 
 const FlowRateSelector: React.FC<Props> = React.memo(
@@ -46,7 +46,7 @@ const FlowRateSelector: React.FC<Props> = React.memo(
                 value={currentFlowRate}
                 onChange={handleSelectedItemChange}
             >
-                {edge_options.map((key: DataInfo) => (
+                {edge_options.map((key: EdgeInfo) => (
                     <option key={`option-${key.name}`} value={key.name}>
                         {key.label}
                     </option>

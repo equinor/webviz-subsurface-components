@@ -4,7 +4,7 @@ import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCurrentNodeInfo } from "../../redux/actions";
 import type { GroupTreeState } from "../../redux/store";
-import type { DataInfos, DataInfo } from "../../redux/types";
+import { NodeInfo } from "../group-tree-plot/src/types";
 
 const PREFIX = "NodeInfoSelector";
 
@@ -20,7 +20,7 @@ const StyledNativeSelect = styled(NativeSelect)(({ theme }) => ({
 }));
 
 interface Props {
-    node_options: DataInfos;
+    node_options: NodeInfo[];
 }
 
 const NodeInfoSelector: React.FC<Props> = React.memo(
@@ -46,7 +46,7 @@ const NodeInfoSelector: React.FC<Props> = React.memo(
                 value={currentNodeInfo}
                 onChange={handleSelectedItemChange}
             >
-                {node_options.map((key: DataInfo) => (
+                {node_options.map((key: NodeInfo) => (
                     <option key={`option-${key.name}`} value={key.name}>
                         {key.label}
                     </option>

@@ -4,7 +4,7 @@ import React from "react";
 import DateTimeSlider from "./DateTimeSlider";
 import FlowRateSelector from "./FlowRateSelector";
 import NodeInfoSelector from "./NodeInfoSelector";
-import type { DataInfos } from "../../redux/types";
+import { EdgeInfo, NodeInfo } from "../group-tree-plot/src/types";
 
 const PREFIX = "SettingsBar";
 
@@ -26,8 +26,8 @@ const StyledTopBar = styled(TopBar)(() => ({
 }));
 
 interface Props {
-    edge_options: DataInfos;
-    node_options: DataInfos;
+    edge_options: EdgeInfo[];
+    node_options: NodeInfo[];
 }
 
 const SettingsBar: React.FC<Props> = React.memo(

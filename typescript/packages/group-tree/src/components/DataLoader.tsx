@@ -4,18 +4,23 @@ import type { PropsWithChildren, ReactNode } from "react";
 import React, { useMemo } from "react";
 import { Provider as ReduxProvider } from "react-redux";
 import { createReduxStore } from "../redux/store";
-import type { Data, DataInfos, UISettings } from "../redux/types";
+import type { UISettings } from "../redux/types";
+import type {
+    DatedTrees,
+    EdgeInfo,
+    NodeInfo,
+} from "./group-tree-plot/src/types";
 
 interface Props {
     id: string;
-    data: Data;
-    edge_options: DataInfos;
-    node_options: DataInfos;
+    data: DatedTrees;
+    edge_options: EdgeInfo[];
+    node_options: NodeInfo[];
     initial_index: [number, number];
     children: ReactNode;
 }
 
-export const DataContext = React.createContext<Data>([]);
+export const DataContext = React.createContext<DatedTrees>([]);
 
 const DataProvider: React.FC<Props> = ({
     children,

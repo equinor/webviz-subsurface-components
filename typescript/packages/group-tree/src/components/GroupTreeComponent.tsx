@@ -1,7 +1,8 @@
 import React, { useCallback, useState } from "react";
-import type { Data, DataInfos } from "../redux/types";
+
 import DataProvider from "./DataLoader";
 import GroupTreeViewer from "./GroupTreeViewer";
+import { DatedTrees, EdgeInfo, NodeInfo } from "./group-tree-plot/src/types";
 
 //TODO schema check
 export interface GroupTreeProps {
@@ -14,13 +15,13 @@ export interface GroupTreeProps {
     /**
      * Array of JSON objects describing group tree data.
      */
-    data: Data;
+    data: DatedTrees;
 
     /**
      * Arrays of options. Used in drop down selectors.
      */
-    edgeOptions: DataInfos;
-    nodeOptions: DataInfos;
+    edgeOptions: EdgeInfo[];
+    nodeOptions: NodeInfo[];
 }
 
 const GroupTreeComponent: React.FC<GroupTreeProps> = React.memo(
@@ -50,8 +51,8 @@ const GroupTreeComponent: React.FC<GroupTreeProps> = React.memo(
             >
                 <GroupTreeViewer
                     id={id}
-                    edge_options={edgeOptions}
-                    node_options={nodeOptions}
+                    edgeOptions={edgeOptions}
+                    nodeOptions={nodeOptions}
                     currentDateTimeChangedCallBack={
                         currentDateTimeChangedCallBack
                     }
