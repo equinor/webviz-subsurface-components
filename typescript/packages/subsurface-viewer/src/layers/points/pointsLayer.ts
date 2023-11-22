@@ -1,6 +1,5 @@
 import type { PickingInfo, UpdateParameters } from "@deck.gl/core/typed";
 import { CompositeLayer } from "@deck.gl/core/typed";
-import { ScatterplotLayer } from "@deck.gl/layers/typed";
 import { isEqual } from "lodash";
 
 import type {
@@ -13,6 +12,8 @@ import {
     invertZCoordinate,
     defineBoundingBox,
 } from "../utils/layerTools";
+
+import { PrivatePointsLayer } from "./privatePointsLayer";
 
 export interface PointsLayerProps extends ExtendedLayerProps {
     /**
@@ -69,8 +70,8 @@ interface IDataAttributes {
 }
 
 export default class PointsLayer extends CompositeLayer<PointsLayerProps> {
-    renderLayers(): [ScatterplotLayer?] {
-        const layer = new ScatterplotLayer(
+    renderLayers(): [PrivatePointsLayer?] {
+        const layer = new PrivatePointsLayer(
             this.getSubLayerProps({
                 id: "points-layer",
                 pickable: this.props.pickable,
