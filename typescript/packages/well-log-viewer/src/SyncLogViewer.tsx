@@ -277,58 +277,23 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
     constructor(props: SyncLogViewerProps) {
         super(props);
 
-        const _axes = this.props.welllogs.map((welllog: WellLog) =>
-            getAvailableAxes(welllog, this.props.axisMnemos)
-        );
-        const axes = _axes[0];
-        let primaryAxis = axes?.[0];
-        if (this.props.templates[0] && axes) {
-            this.props.templates[0].scale.primary = "tvd"; //!!!!!
-            if (
-                this.props.templates[0] &&
-                this.props.templates[0].scale.primary
-            ) {
-                if (axes.indexOf(this.props.templates[0].scale.primary) >= 0)
-                    primaryAxis = this.props.templates[0].scale.primary;
-            }
-        }
-        if (this.props.primaryAxis) primaryAxis = this.props.primaryAxis;
+        const { axes, primaryAxis } = this.getAxes();
         this.state = {
             primaryAxis: primaryAxis, //"md"
             axes: axes, //["md", "tvd"]
-            infos: [[], []],
 
+            infos: [[], []],
             sliderValue: 4.0, // zoom
         };
 
         this.controllers = [null, null];
         this.spacers = [null, null];
-
         this.collapsedTrackIds = [];
+        this.callbacks = [];
+        this.fillViewCallbacks(this.props.welllogs.length);
 
         this.onChangePrimaryAxis = this.onChangePrimaryAxis.bind(this);
-
-        this.callbacks = [];
-        this.props.welllogs.map((_welllog: WellLog, index: number) => {
-            this.callbacks.push({
-                onCreateControllerBind: this.onCreateController.bind(
-                    this,
-                    index
-                ),
-                onInfoBind: this.onInfo.bind(this, index),
-                onTrackScrollBind: this.onTrackScroll.bind(this, index),
-                onTrackSelectionBind: this.onTrackSelection.bind(this, index),
-                onContentRescaleBind: this.onContentRescale.bind(this, index),
-                onContentSelectionBind: this.onContentSelection.bind(
-                    this,
-                    index
-                ),
-                onTemplateChangedBind: this.onTemplateChanged.bind(this, index),
-            });
-        });
-
         this.onZoomSliderChange = this.onZoomSliderChange.bind(this);
-
         this.onInfoGroupClick = this.onInfoGroupClick.bind(this);
     }
 
@@ -350,6 +315,14 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         return ret;
     }
 
+    UNSAFE_componentWillUpdate(
+        nextProps: SyncLogViewerProps /*, nextState: State*/
+    ): void {
+        // called before render()
+        if (this.props.welllogs.length !== nextProps.welllogs.length)
+            this.fillViewCallbacks(nextProps.welllogs.length); // update this.callbacks[] before render()
+    }
+
     componentDidUpdate(
         prevProps: SyncLogViewerProps /*, prevState: State*/
     ): void {
@@ -357,27 +330,9 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
             this.props.welllogs !== prevProps.welllogs ||
             this.props.templates !== prevProps.templates ||
             this.props.axisMnemos !== prevProps.axisMnemos ||
-            this.props.primaryAxis !== prevProps.primaryAxis /*||
-            this.props.colorTables !== prevProps.colorTables*/
+            this.props.primaryAxis !== prevProps.primaryAxis
         ) {
-            const _axes = this.props.welllogs.map((welllog) =>
-                getAvailableAxes(welllog, this.props.axisMnemos)
-            );
-            const axes = _axes[0];
-            let primaryAxis = axes[0];
-            if (this.props.templates[0]) {
-                this.props.templates[0].scale.primary = "tvd"; //!!!!!
-                if (this.props.templates[0].scale.primary) {
-                    if (
-                        axes.indexOf(this.props.templates[0].scale.primary) < 0
-                    ) {
-                        if (this.props.welllogs === prevProps.welllogs) return; // nothing to update
-                    } else {
-                        primaryAxis = this.props.templates[0].scale.primary;
-                    }
-                }
-            }
-            if (this.props.primaryAxis) primaryAxis = this.props.primaryAxis;
+            const { axes, primaryAxis } = this.getAxes();
             this.setState({
                 primaryAxis: primaryAxis,
                 axes: axes,
@@ -388,7 +343,6 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         if (isEqualRanges(this.props.domain, prevProps.domain)) {
             this.setControllersZoom();
         }
-
         if (
             this.props.wellpicks !== prevProps.wellpicks ||
             !isEqualArrays(
@@ -418,6 +372,51 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                     prevProps.readoutOptions.grouping)
         ) {
             this.updateReadoutPanel();
+        }
+    }
+
+    getPrimaryAxis(axes: string[]): string {
+        if (axes) {
+            const template0 = this.props.templates[0];
+            if (template0) {
+                const scale = template0.scale;
+                if (scale) {
+                    const primary = scale.primary;
+                    if (axes.indexOf(primary) >= 0) return primary;
+                }
+            }
+            return axes[0];
+        }
+        return "tvd"; // some value
+    }
+
+    getAxes() {
+        const _axes = this.props.welllogs.map((welllog: WellLog) =>
+            getAvailableAxes(welllog, this.props.axisMnemos)
+        );
+        const axes = _axes[0];
+        const primaryAxis = this.props.primaryAxis || this.getPrimaryAxis(axes);
+        return { axes, primaryAxis };
+    }
+
+    fillViewCallbacks(nViews: number): void {
+        this.callbacks = [];
+        for (let iView = 0; iView < nViews; iView++) {
+            this.callbacks.push({
+                onCreateControllerBind: this.onCreateController.bind(
+                    this,
+                    iView
+                ),
+                onInfoBind: this.onInfo.bind(this, iView),
+                onTrackScrollBind: this.onTrackScroll.bind(this, iView),
+                onTrackSelectionBind: this.onTrackSelection.bind(this, iView),
+                onContentRescaleBind: this.onContentRescale.bind(this, iView),
+                onContentSelectionBind: this.onContentSelection.bind(
+                    this,
+                    iView
+                ),
+                onTemplateChangedBind: this.onTemplateChanged.bind(this, iView),
+            });
         }
     }
 
