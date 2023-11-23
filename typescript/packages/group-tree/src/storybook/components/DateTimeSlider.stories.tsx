@@ -18,7 +18,13 @@ export default {
 
 const Template = (args) => {
     return (
-        <DataProvider id={args.id} data={args.data}>
+        <DataProvider
+            id={args.id}
+            data={args.data}
+            edgeMetadataList={[]}
+            nodeMetadataList={[]}
+            initialIndices={{ treeIndex: 0, dateIndex: 0 }}
+        >
             <DateTimeSlider />
         </DataProvider>
     );

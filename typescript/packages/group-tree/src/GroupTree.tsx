@@ -14,8 +14,8 @@ const GroupTree = (props: GroupTreeProps) => {
         <GroupTreeComponent
             id={props.id}
             data={props.data}
-            edgeOptions={props.edgeOptions}
-            nodeOptions={props.nodeOptions}
+            edgeMetadataList={props.edgeMetadataList}
+            nodeMetadataList={props.nodeMetadataList}
         />
     );
 };
@@ -32,8 +32,11 @@ GroupTree.propTypes = {
      */
     data: PropTypes.arrayOf(PropTypes.object),
 
-    edgeOptions: PropTypes.arrayOf(PropTypes.object),
-    nodeOptions: PropTypes.arrayOf(PropTypes.object),
+    /**
+     * Arrays of metadata. Used in drop down selectors and tree visualization.
+     */
+    edgeMetadataList: PropTypes.arrayOf(PropTypes.object),
+    nodeMetadataList: PropTypes.arrayOf(PropTypes.object),
 };
 
 export type { GroupTreeProps };

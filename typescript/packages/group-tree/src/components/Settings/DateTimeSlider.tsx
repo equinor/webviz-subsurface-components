@@ -4,8 +4,9 @@ import React, { useCallback, useContext, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCurrentDateTime } from "../../redux/actions";
 import type { GroupTreeState } from "../../redux/store";
-import type { Data, DatedTree } from "../../redux/types";
 import { DataContext } from "../DataLoader";
+
+import { DatedTree, DatedTrees } from "../group-tree-plot/src/types";
 
 const classes = {
     root: "DateTimeSlider-root",
@@ -32,7 +33,7 @@ const EdsSlider = styled(Slider)(() => ({
 }));
 
 const DateTimeSlider: React.FC = React.memo(() => {
-    const data: Data = useContext(DataContext);
+    const data: DatedTrees = useContext(DataContext);
     // Redux
     const dispatch = useDispatch();
 

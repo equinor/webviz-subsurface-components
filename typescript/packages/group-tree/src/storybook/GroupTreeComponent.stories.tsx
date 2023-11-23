@@ -1,22 +1,28 @@
 import React from "react";
 import GroupTreeComponent from "../components/GroupTreeComponent";
 
+import {
+    EdgeMetadata,
+    NodeMetadata,
+} from "../components/group-tree-plot/src/types";
+
 export default {
     component: GroupTreeComponent,
     title: "GroupTree",
 };
 
-const edge_options = [
-    { name: "waterrate", label: "Water Rate", unit: "m3/s" },
-    { name: "oilrate", label: "Oil Rate", unit: "m3/s" },
-    { name: "gasrate", label: "Gas Rate", unit: "m3/s" },
-    { name: "waterinjrate", label: "Water Injection Rate", unit: "m3/s" },
-    { name: "gasinjrate", label: "Gas Injection Rate", unit: "m3/s" },
+const edgeMetadataList: EdgeMetadata[] = [
+    { key: "waterrate", label: "Water Rate", unit: "m3/s" },
+    { key: "oilrate", label: "Oil Rate", unit: "m3/s" },
+    { key: "gasrate", label: "Gas Rate", unit: "m3/s" },
+    { key: "waterinjrate", label: "Water Injection Rate", unit: "m3/s" },
+    { key: "gasinjrate", label: "Gas Injection Rate", unit: "m3/s" },
 ];
 
-const node_options = [
-    { name: "pressure", label: "Pressure", unit: "Bar" },
-    { name: "bhp", label: "Bottom Hole Pressure", unit: "N/m2" },
+const nodeMetadataList: NodeMetadata[] = [
+    { key: "pressure", label: "Pressure", unit: "Bar" },
+    { key: "bhp", label: "Bottom Hole Pressure", unit: "N/m2" },
+    { key: "wmctl", label: "Missing label" },
 ];
 
 const Template = (args) => {
@@ -27,6 +33,6 @@ export const Default = Template.bind({});
 Default.args = {
     id: "grouptree",
     data: require("../../../../../example-data/group-tree.json"),
-    edgeOptions: edge_options,
-    nodeOptions: node_options,
+    edgeMetadataList: edgeMetadataList,
+    nodeMetadataList: nodeMetadataList,
 };

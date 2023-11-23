@@ -2,17 +2,19 @@ import React from "react";
 import DataProvider from "../../components/DataLoader";
 import FlowRateSelector from "../../components/Settings/FlowRateSelector";
 
-const edge_options = [
-    { name: "waterrate", label: "Water Rate" },
-    { name: "oilrate", label: "Oil Rate" },
-    { name: "gasrate", label: "Gas Rate" },
-    { name: "waterinjrate", label: "Water Injection Rate" },
-    { name: "gasinjrate", label: "Gas Injection Rate" },
+import { EdgeMetadata } from "../../components/group-tree-plot/src/types";
+
+const edgeMetadataList: EdgeMetadata[] = [
+    { key: "waterrate", label: "Water Rate" },
+    { key: "oilrate", label: "Oil Rate" },
+    { key: "gasrate", label: "Gas Rate" },
+    { key: "waterinjrate", label: "Water Injection Rate" },
+    { key: "gasinjrate", label: "Gas Injection Rate" },
 ];
 
 export default {
     component: FlowRateSelector,
-    title: "GroupTree/Components/Settings/FLowRateSelector",
+    title: "GroupTree/Components/Settings/FlowRateSelector",
     argTypes: {
         id: {
             description:
@@ -26,8 +28,14 @@ export default {
 
 const Template = (args) => {
     return (
-        <DataProvider id={args.id} data={args.data}>
-            <FlowRateSelector edge_options={edge_options} />
+        <DataProvider
+            id={args.id}
+            data={args.data}
+            edgeMetadataList={edgeMetadataList}
+            nodeMetadataList={[]}
+            initialIndices={{ treeIndex: 0, dateIndex: 0 }}
+        >
+            <FlowRateSelector edgeMetadataList={edgeMetadataList} />
         </DataProvider>
     );
 };
@@ -36,5 +44,5 @@ export const Default = Template.bind({});
 Default.args = {
     id: "grouptree",
     data: require("../../../../../../example-data/group-tree.json"),
-    edge_options,
+    edgeMetadataList,
 };

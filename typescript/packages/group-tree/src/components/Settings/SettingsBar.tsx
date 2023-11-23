@@ -4,7 +4,7 @@ import React from "react";
 import DateTimeSlider from "./DateTimeSlider";
 import FlowRateSelector from "./FlowRateSelector";
 import NodeInfoSelector from "./NodeInfoSelector";
-import { EdgeInfo, NodeInfo } from "../group-tree-plot/src/types";
+import { EdgeMetadata, NodeMetadata } from "../group-tree-plot/src/types";
 
 const PREFIX = "SettingsBar";
 
@@ -25,18 +25,22 @@ const StyledTopBar = styled(TopBar)(() => ({
     },
 }));
 
-interface Props {
-    edge_options: EdgeInfo[];
-    node_options: NodeInfo[];
+interface SettingsBarProps {
+    edgeMetadataList: EdgeMetadata[];
+    nodeMetadataList: NodeMetadata[];
 }
 
-const SettingsBar: React.FC<Props> = React.memo(
-    ({ edge_options, node_options }: Props) => {
+const SettingsBar: React.FC<SettingsBarProps> = React.memo(
+    (props: SettingsBarProps) => {
         return (
             <StyledTopBar className={classes.topBar}>
                 <TopBar.Header className={classes.actions}>
-                    <FlowRateSelector edge_options={edge_options} />
-                    <NodeInfoSelector node_options={node_options} />
+                    <FlowRateSelector
+                        edgeMetadataList={props.edgeMetadataList}
+                    />
+                    <NodeInfoSelector
+                        nodeMetadataList={props.nodeMetadataList}
+                    />
                 </TopBar.Header>
                 <TopBar.Actions className={classes.actions}>
                     <DateTimeSlider />

@@ -7,53 +7,61 @@ import { createReduxStore } from "../redux/store";
 import type { UISettings } from "../redux/types";
 import type {
     DatedTrees,
-    EdgeInfo,
-    NodeInfo,
+    EdgeMetadata,
+    NodeMetadata,
 } from "./group-tree-plot/src/types";
 
-interface Props {
+export type DateTreesIndices = {
+    treeIndex: number;
+    dateIndex: number;
+};
+
+interface DataProviderProps {
     id: string;
     data: DatedTrees;
-    edge_options: EdgeInfo[];
-    node_options: NodeInfo[];
-    initial_index: [number, number];
+    edgeMetadataList: EdgeMetadata[];
+    nodeMetadataList: NodeMetadata[];
+    initialIndices: DateTreesIndices;
     children: ReactNode;
 }
 
 export const DataContext = React.createContext<DatedTrees>([]);
 
-const DataProvider: React.FC<Props> = ({
-    children,
-    id,
-    data,
-    edge_options,
-    node_options,
-    initial_index,
-}: PropsWithChildren<Props>) => {
+const DataProvider: React.FC<DataProviderProps> = (
+    props: PropsWithChildren<DataProviderProps>
+) => {
     const preloadedState = useMemo(() => {
-        // Use "initial_index" from previous data if it refers to a valid date otherwise use first date.
-        const idx1 = initial_index?.[0];
-        const idx2 = initial_index?.[1];
-        const initialDateTime =
-            data.length > idx1 && data[idx1].dates.length > idx2
-                ? data[idx1].dates[idx2]
-                : data[0].dates[0];
+        // Use "initialIndices" from previous data if it refers to a valid date otherwise use first date.
+        const treeIdx = props.initialIndices.treeIndex;
+        const dateIdx = props.initialIndices.dateIndex;
+        const hasValidIndices =
+            props.data.length > treeIdx &&
+            props.data[treeIdx].dates.length > dateIdx;
+        const initialDateTime = hasValidIndices
+            ? props.data[treeIdx].dates[dateIdx]
+            : props.data[0].dates[0];
 
+        // const initialFlowRate = props.edgeMetadataList[0]?.key ?? "";
+        // const initialNodeInfo = props.nodeMetadataList[0]?.key ?? "";
         const initialFlowRate =
-            edge_options?.length > 0 ? edge_options[0].name : "";
+            props.edgeMetadataList?.length > 0
+                ? props.edgeMetadataList[0].key
+                : "";
 
-        const intialNodeInfo =
-            node_options?.length > 0 ? node_options[0].name : "";
+        const initialNodeInfo =
+            props.nodeMetadataList?.length > 0
+                ? props.nodeMetadataList[0].key
+                : "";
 
         return {
-            id: id,
+            id: props.id,
             ui: {
                 currentDateTime: initialDateTime,
                 currentFlowRate: initialFlowRate,
-                currentNodeInfo: intialNodeInfo,
+                currentNodeInfo: initialNodeInfo,
             } as UISettings,
         };
-    }, [id, data]);
+    }, [props.id, props.data]); // Shallow compare does not detect updated data? Will useMemo actually help?
 
     const store = useMemo(
         () => createReduxStore(preloadedState),
@@ -61,8 +69,8 @@ const DataProvider: React.FC<Props> = ({
     );
 
     return (
-        <DataContext.Provider value={data}>
-            <ReduxProvider store={store}>{children}</ReduxProvider>
+        <DataContext.Provider value={props.data}>
+            <ReduxProvider store={store}>{props.children}</ReduxProvider>
         </DataContext.Provider>
     );
 };

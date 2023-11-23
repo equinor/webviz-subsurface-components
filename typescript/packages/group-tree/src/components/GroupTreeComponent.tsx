@@ -1,8 +1,12 @@
 import React, { useCallback, useState } from "react";
 
-import DataProvider from "./DataLoader";
+import DataProvider, { DateTreesIndices } from "./DataLoader";
 import GroupTreeViewer from "./GroupTreeViewer";
-import { DatedTrees, EdgeInfo, NodeInfo } from "./group-tree-plot/src/types";
+import {
+    DatedTrees,
+    EdgeMetadata,
+    NodeMetadata,
+} from "./group-tree-plot/src/types";
 
 //TODO schema check
 export interface GroupTreeProps {
@@ -18,41 +22,47 @@ export interface GroupTreeProps {
     data: DatedTrees;
 
     /**
-     * Arrays of options. Used in drop down selectors.
+     * Arrays of metadata. Used in drop down selectors and tree visualization.
      */
-    edgeOptions: EdgeInfo[];
-    nodeOptions: NodeInfo[];
+    edgeMetadataList: EdgeMetadata[];
+    nodeMetadataList: NodeMetadata[];
 }
 
 const GroupTreeComponent: React.FC<GroupTreeProps> = React.memo(
-    ({ id, data, edgeOptions, nodeOptions }: GroupTreeProps) => {
-        const [index, setIndex] = useState([0, 0] as [number, number]);
+    (props: GroupTreeProps) => {
+        const [indices, setIndices] = useState<DateTreesIndices>({
+            treeIndex: 0,
+            dateIndex: 0,
+        });
 
         const currentDateTimeChangedCallBack = useCallback(
             (currentDateTime: string) => {
-                const current_tree_index = data.findIndex((e) => {
+                const newTreeIndex = props.data.findIndex((e) => {
                     return e.dates.includes(currentDateTime);
                 });
-                const date_index =
-                    data[current_tree_index].dates.indexOf(currentDateTime);
+                const newDateIndex =
+                    props.data[newTreeIndex].dates.indexOf(currentDateTime);
 
-                setIndex([current_tree_index, date_index]);
+                setIndices({
+                    treeIndex: newTreeIndex,
+                    dateIndex: newDateIndex,
+                });
             },
-            [data]
+            [props.data]
         );
 
         return (
             <DataProvider
-                id={id}
-                data={data}
-                edge_options={edgeOptions}
-                node_options={nodeOptions}
-                initial_index={index}
+                id={props.id}
+                data={props.data}
+                edgeMetadataList={props.edgeMetadataList}
+                nodeMetadataList={props.nodeMetadataList}
+                initialIndices={indices}
             >
                 <GroupTreeViewer
-                    id={id}
-                    edgeOptions={edgeOptions}
-                    nodeOptions={nodeOptions}
+                    id={props.id}
+                    edgeMetadataList={props.edgeMetadataList}
+                    nodeMetadataList={props.nodeMetadataList}
                     currentDateTimeChangedCallBack={
                         currentDateTimeChangedCallBack
                     }

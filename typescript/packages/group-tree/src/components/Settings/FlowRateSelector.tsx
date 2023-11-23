@@ -4,7 +4,7 @@ import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCurrentFlowRate } from "../../redux/actions";
 import type { GroupTreeState } from "../../redux/store";
-import { EdgeInfo } from "../group-tree-plot/src/types";
+import { EdgeMetadata } from "../group-tree-plot/src/types";
 
 const PREFIX = "FlowRateSelector";
 
@@ -19,12 +19,12 @@ const StyledNativeSelect = styled(NativeSelect)(({ theme }) => ({
     },
 }));
 
-interface Props {
-    edge_options: EdgeInfo[];
+interface FlowRateSelectorProps {
+    edgeMetadataList: EdgeMetadata[];
 }
 
-const FlowRateSelector: React.FC<Props> = React.memo(
-    ({ edge_options }: Props) => {
+const FlowRateSelector: React.FC<FlowRateSelectorProps> = React.memo(
+    (props: FlowRateSelectorProps) => {
         // Redux
         const dispatch = useDispatch();
         const currentFlowRate = useSelector(
@@ -46,9 +46,9 @@ const FlowRateSelector: React.FC<Props> = React.memo(
                 value={currentFlowRate}
                 onChange={handleSelectedItemChange}
             >
-                {edge_options.map((key: EdgeInfo) => (
-                    <option key={`option-${key.name}`} value={key.name}>
-                        {key.label}
+                {props.edgeMetadataList.map((metadata: EdgeMetadata) => (
+                    <option key={`option-${metadata.key}`} value={metadata.key}>
+                        {metadata.label}
                     </option>
                 ))}
             </StyledNativeSelect>

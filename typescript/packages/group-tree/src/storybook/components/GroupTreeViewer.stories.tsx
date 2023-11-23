@@ -2,17 +2,22 @@ import React from "react";
 import DataProvider from "../../components/DataLoader";
 import GroupTreeViewer from "../../components/GroupTreeViewer";
 
-const edge_options = [
-    { name: "waterrate", label: "Water Rate" },
-    { name: "oilrate", label: "Oil Rate" },
-    { name: "gasrate", label: "Gas Rate" },
-    { name: "waterinjrate", label: "Water Injection Rate" },
-    { name: "gasinjrate", label: "Gas Injection Rate" },
+import {
+    EdgeMetadata,
+    NodeMetadata,
+} from "../../components/group-tree-plot/src/types";
+
+const edgeMetadataList: EdgeMetadata[] = [
+    { key: "waterrate", label: "Water Rate" },
+    { key: "oilrate", label: "Oil Rate" },
+    { key: "gasrate", label: "Gas Rate" },
+    { key: "waterinjrate", label: "Water Injection Rate" },
+    { key: "gasinjrate", label: "Gas Injection Rate" },
 ];
 
-const node_options = [
-    { name: "pressure", label: "Pressure" },
-    { name: "bhp", label: "Bottom Hole Pressure" },
+const nodeMetadataList: NodeMetadata[] = [
+    { key: "pressure", label: "Pressure" },
+    { key: "bhp", label: "Bottom Hole Pressure" },
 ];
 
 export default {
@@ -31,11 +36,18 @@ export default {
 
 const Template = (args) => {
     return (
-        <DataProvider id={args.id} data={args.data}>
+        <DataProvider
+            id={args.id}
+            data={args.data}
+            edgeMetadataList={edgeMetadataList}
+            nodeMetadataList={nodeMetadataList}
+            initialIndices={{ treeIndex: 0, dateIndex: 0 }}
+        >
             <GroupTreeViewer
                 id={args.id}
-                edge_options={edge_options}
-                node_options={node_options}
+                edgeMetadataList={edgeMetadataList}
+                nodeMetadataList={nodeMetadataList}
+                currentDateTimeChangedCallBack={() => {}}
             />
         </DataProvider>
     );
@@ -45,6 +57,6 @@ export const Default = Template.bind({});
 Default.args = {
     id: "grouptree",
     data: require("../../../../../../example-data/group-tree.json"),
-    edge_options,
-    node_options,
+    edgeMetadataList,
+    nodeMetadataList,
 };

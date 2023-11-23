@@ -8,7 +8,7 @@ import { DataContext } from "./DataLoader";
 import "./group-tree-plot/src/Plot/dynamic_tree.css";
 import SettingsBar from "./Settings/SettingsBar";
 import { GroupTreePlot } from "./group-tree-plot/src/GroupTreePlot";
-import { EdgeInfo, NodeInfo } from "./group-tree-plot/src/types";
+import { EdgeMetadata, NodeMetadata } from "./group-tree-plot/src/types";
 
 const PREFIX = "GroupTreeViewer";
 
@@ -28,8 +28,8 @@ const Root = styled("div")(() => ({
 
 interface GroupTreeViewerProps {
     id: string;
-    edgeOptions: EdgeInfo[];
-    nodeOptions: NodeInfo[];
+    edgeMetadataList: EdgeMetadata[];
+    nodeMetadataList: NodeMetadata[];
     currentDateTimeChangedCallBack: (currentDateTime: string) => void;
 }
 
@@ -41,10 +41,10 @@ const GroupTreeViewer: React.FC<GroupTreeViewerProps> = (
     const currentDateTime = useSelector(
         (state: GroupTreeState) => state.ui.currentDateTime
     );
-    const currentFlowRate = useSelector(
+    const currentFlowRateKey = useSelector(
         (state: GroupTreeState) => state.ui.currentFlowRate
     );
-    const currentNodeInfo = useSelector(
+    const currentNodeKey = useSelector(
         (state: GroupTreeState) => state.ui.currentNodeInfo
     );
 
@@ -57,16 +57,16 @@ const GroupTreeViewer: React.FC<GroupTreeViewerProps> = (
     return (
         <Root className={classes.root}>
             <SettingsBar
-                edge_options={props.edgeOptions}
-                node_options={props.nodeOptions}
+                edgeMetadataList={props.edgeMetadataList}
+                nodeMetadataList={props.nodeMetadataList}
             />
             <GroupTreePlot
                 id={props.id}
                 datedTrees={data}
-                edgeInfoList={props.edgeOptions}
-                nodeInfoList={props.nodeOptions}
-                selectedEdgeName={currentFlowRate}
-                selectedNodeName={currentNodeInfo}
+                edgeMetadataList={props.edgeMetadataList}
+                nodeMetadataList={props.nodeMetadataList}
+                selectedEdgeKey={currentFlowRateKey}
+                selectedNodeKey={currentNodeKey}
                 selectedDateTime={currentDateTime}
             />
         </Root>
