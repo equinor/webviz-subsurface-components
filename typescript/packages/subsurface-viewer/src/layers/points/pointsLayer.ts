@@ -41,6 +41,10 @@ export interface PointsLayerProps extends ExtendedLayerProps {
      */
     ZIncreasingDownwards: boolean;
 
+    /** Enable/disable depth testing when rendering layer. Default true.
+     */
+    depthTest: boolean;
+
     // Non public properties:
     setReportedBoundingBox?: React.Dispatch<
         React.SetStateAction<[number, number, number, number, number, number]>
@@ -57,6 +61,7 @@ const defaultProps = {
     pickable: true,
     visible: true,
     ZIncreasingDownwards: true,
+    depthTest: true,
 };
 
 interface IDataAttributes {
@@ -86,6 +91,7 @@ export default class PointsLayer extends CompositeLayer<PointsLayerProps> {
                     getFillColor: [this.props.color],
                     getRadius: [this.props.pointRadius],
                 },
+                depthTest: this.props.depthTest,
             })
         );
         return [layer];
