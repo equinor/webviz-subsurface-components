@@ -23,3 +23,5 @@ For language specific details, see the documentation in `/typescript` or `/pytho
 
 ## Contributing
 Commit messages should follow [Conventional commits format](https://www.conventionalcommits.org/en/v1.0.0/)
+
+# Test snyk
