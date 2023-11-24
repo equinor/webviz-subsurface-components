@@ -1,4 +1,4 @@
-// Node key and values map
+// Node key and values map - one value per date in DatedTree
 export interface NodeData {
     [key: string]: number[];
 }
@@ -9,7 +9,7 @@ export interface NodeMetadata {
     unit?: string;
 }
 
-// Edge key and values map
+// Edge key and values map - value per date in DatedTree
 export interface EdgeData {
     [key: string]: number[];
 }
@@ -27,12 +27,12 @@ export interface RecursiveTreeNode {
     edge_label: string;
     node_data: NodeData;
     edge_data: EdgeData;
-    children: RecursiveTreeNode[];
+    children?: RecursiveTreeNode[];
 }
 
 // Collection of trees with a dates
 export interface DatedTree {
-    dates: [string];
+    dates: string[];
     tree: RecursiveTreeNode;
 }
 
