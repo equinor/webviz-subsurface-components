@@ -1,3 +1,10 @@
+## [1.1.6](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.1.5...well-log-viewer@1.1.6) (2023-11-24)
+
+
+### Bug Fixes
+
+* Refill SyncLogViewer vew callbacks array on template array changing ([#1786](https://github.com/equinor/webviz-subsurface-components/issues/1786)) ([5aec4a0](https://github.com/equinor/webviz-subsurface-components/commit/5aec4a07be5c319dfc541e68f560c27e8eb24bbb))
+
 ## [1.1.5](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.1.4...well-log-viewer@1.1.5) (2023-11-13)
 
 
