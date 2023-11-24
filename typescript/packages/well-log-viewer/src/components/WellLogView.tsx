@@ -1261,7 +1261,7 @@ class WellLogView
     componentDidMount(): void {
         this.createLogViewer();
 
-        this.template = deepCopy(this.props.template); // save external template content to current
+        if (this.props.template) this.template = deepCopy(this.props.template); // save external template content to current
         this.setTracks(true);
     }
 
@@ -1313,7 +1313,8 @@ class WellLogView
             checkSchema = true;
         }
         if (this.props.template !== prevProps.template) {
-            this.template = deepCopy(this.props.template); // save external template content to current
+            if (this.props.template)
+                this.template = deepCopy(this.props.template); // save external template content to current
             shouldSetTracks = true;
             checkSchema = true;
         }
