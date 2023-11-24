@@ -1,3 +1,24 @@
+## [1.1.6](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.1.5...well-log-viewer@1.1.6) (2023-11-24)
+
+
+### Bug Fixes
+
+* Refill SyncLogViewer vew callbacks array on template array changing ([#1786](https://github.com/equinor/webviz-subsurface-components/issues/1786)) ([5aec4a0](https://github.com/equinor/webviz-subsurface-components/commit/5aec4a07be5c319dfc541e68f560c27e8eb24bbb))
+
+## [1.1.5](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.1.4...well-log-viewer@1.1.5) (2023-11-13)
+
+
+### Bug Fixes
+
+* bump to latest @emerson-eps/color-tables ([#1770](https://github.com/equinor/webviz-subsurface-components/issues/1770)) ([e67a285](https://github.com/equinor/webviz-subsurface-components/commit/e67a2856eced8f987bc61fa4a0a924b5a4886992))
+
+## [1.1.4](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.1.3...well-log-viewer@1.1.4) (2023-11-09)
+
+
+### Bug Fixes
+
+* bump [@deck](https://github.com/deck).gl/core from 8.9.31 to 8.9.32 in /typescript ([#1764](https://github.com/equinor/webviz-subsurface-components/issues/1764)) ([5ab32b0](https://github.com/equinor/webviz-subsurface-components/commit/5ab32b0db7cac16d027624643604df2ee7402918))
+
 ## [1.1.3](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.1.2...well-log-viewer@1.1.3) (2023-10-17)
 
 

@@ -1,15 +1,13 @@
 import React from "react";
-import type { ComponentStory, ComponentMeta } from "@storybook/react";
+import type { StoryFn, Meta } from "@storybook/react";
 import { create, all } from "mathjs";
 
 import SubsurfaceViewer from "../../SubsurfaceViewer";
-import { default as PointsLayer } from "./pointsLayer";
-import { default as AxesLayer } from "../axes/axesLayer";
 
 export default {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer / Points Layer",
-} as ComponentMeta<typeof SubsurfaceViewer>;
+} as Meta<typeof SubsurfaceViewer>;
 
 const defaultParameters = {
     docs: {
@@ -19,7 +17,8 @@ const defaultParameters = {
 };
 
 // Small example using PointsLayer.
-const smallPointsLayer = new PointsLayer({
+const smallPointsLayer = {
+    "@@type": "PointsLayer",
     id: "small_points_layer",
     /*eslint-disable */
     pointsData:   [  0,  0,  5,  // Vertex 1, x, y, z
@@ -32,27 +31,26 @@ const smallPointsLayer = new PointsLayer({
                     17,  0,  8
                     ],    
     /*eslint-enable */
-    color: [255, 100, 100],
+    color: [255, 0, 100],
     pointRadius: 10,
     radiusUnits: "pixels",
     ZIncreasingDownwards: true,
-});
+};
 
-const smallAxesLayer = new AxesLayer({
+const smallAxesLayer = {
+    "@@type": "AxesLayer",
     id: "small_axes_layer",
     bounds: [-10, -10, 0, 20, 10, 10],
-});
+};
 
-export const SmallPointsLayer: ComponentStory<typeof SubsurfaceViewer> = (
-    args
-) => {
+export const SmallPointsLayer: StoryFn<typeof SubsurfaceViewer> = (args) => {
     return <SubsurfaceViewer {...args} />;
 };
 
 SmallPointsLayer.args = {
-    id: "map",
+    id: "small-points-map",
     layers: [smallAxesLayer, smallPointsLayer],
-    bounds: [-10, -10, 17, 10],
+    bounds: [-20, -20, 20, 20],
     views: {
         layout: [1, 1],
         viewports: [
@@ -91,7 +89,8 @@ const randomFunc = ((): TRandomNumberFunc => {
     return () => Math.random() * sideSize;
 })();
 
-const hugePointsLayer = new PointsLayer({
+const hugePointsLayer = {
+    "@@type": "PointsLayer",
     id: "huge_points_layer",
     pointsData: Array(pointsCount * 3)
         .fill(0)
@@ -100,21 +99,20 @@ const hugePointsLayer = new PointsLayer({
     pointRadius: 1,
     radiusUnits: "pixels",
     ZIncreasingDownwards: true,
-});
+};
 
-const hugeAxesLayer = new AxesLayer({
+const hugeAxesLayer = {
+    "@@type": "AxesLayer",
     id: "huge_axes_layer",
     bounds: [0, 0, 0, sideSize, sideSize, sideSize],
-});
+};
 
-export const HugePointsLayer: ComponentStory<typeof SubsurfaceViewer> = (
-    args
-) => {
+export const HugePointsLayer: StoryFn<typeof SubsurfaceViewer> = (args) => {
     return <SubsurfaceViewer {...args} />;
 };
 
 HugePointsLayer.args = {
-    id: "map",
+    id: "huge-points-map",
     layers: [hugeAxesLayer, hugePointsLayer],
     bounds: [0, 0, sideSize, sideSize],
     coords: {

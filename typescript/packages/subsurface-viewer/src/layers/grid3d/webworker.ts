@@ -892,7 +892,7 @@ export function makeFullMesh(e: { data: WebWorkerParams }): void {
             positions: { value: new Float32Array(triang_points), size: 3 },
             properties: { value: new Float32Array(vertexProperties), size: 1 },
         },
-        vertexCount: triang_points.length,
+        vertexCount: triang_points.length / 3,
     };
 
     const mesh_lines: MeshTypeLines = {

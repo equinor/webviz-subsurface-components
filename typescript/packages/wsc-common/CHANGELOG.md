@@ -1,3 +1,17 @@
+## [0.2.5](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.2.4...wsc-common@0.2.5) (2023-11-13)
+
+
+### Bug Fixes
+
+* bump to latest @emerson-eps/color-tables ([#1770](https://github.com/equinor/webviz-subsurface-components/issues/1770)) ([e67a285](https://github.com/equinor/webviz-subsurface-components/commit/e67a2856eced8f987bc61fa4a0a924b5a4886992))
+
+## [0.2.4](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.2.3...wsc-common@0.2.4) (2023-11-09)
+
+
+### Bug Fixes
+
+* bump [@deck](https://github.com/deck).gl/core from 8.9.31 to 8.9.32 in /typescript ([#1764](https://github.com/equinor/webviz-subsurface-components/issues/1764)) ([5ab32b0](https://github.com/equinor/webviz-subsurface-components/commit/5ab32b0db7cac16d027624643604df2ee7402918))
+
 ## [0.2.3](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.2.2...wsc-common@0.2.3) (2023-10-17)
 
 
