@@ -184,7 +184,7 @@ export function defineBoundingBox(
         maxZ = z > maxZ ? z : maxZ;
     }
     if (zIncreasingDownwards) {
-        [maxZ, minZ] = [minZ, maxZ];
+        [maxZ, minZ] = [-minZ, -maxZ];
     }
     return [minX, minY, minZ, maxX, maxY, maxZ];
 }
