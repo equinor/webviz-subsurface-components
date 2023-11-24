@@ -44,6 +44,7 @@ uniform bool antialiasing;
 uniform bool billboard;
 uniform int radiusUnits;
 uniform int lineWidthUnits;
+uniform bool ZIncreasingDownwards;
 
 varying vec4 vFillColor;
 varying vec4 vLineColor;
@@ -53,7 +54,14 @@ varying float outerRadiusPixels;
 
 
 void main(void) {
-  geometry.worldPosition = instancePositions;
+  vec3 position = instancePositions;
+  vec3 position64low = instancePositions64Low;
+
+  if(ZIncreasingDownwards) {
+    position.z *= -1.0;
+    position64low.z *= -1.0;
+  }
+  geometry.worldPosition = position;
 
   // Multiply out radius and clamp to limits
   outerRadiusPixels = clamp(
@@ -81,7 +89,7 @@ void main(void) {
   innerUnitRadius = 1.0 - stroked * lineWidthPixels / outerRadiusPixels;
   
   if (billboard) {
-    gl_Position = project_position_to_clipspace(instancePositions, instancePositions64Low, vec3(0.0), geometry.position);
+    gl_Position = project_position_to_clipspace(position, position64low, vec3(0.0), geometry.position);
     DECKGL_FILTER_GL_POSITION(gl_Position, geometry);
     vec3 offset = edgePadding * positions * outerRadiusPixels;
     DECKGL_FILTER_SIZE(offset, geometry);
@@ -89,7 +97,7 @@ void main(void) {
   } else {
     vec3 offset = edgePadding * positions * project_pixel_size(outerRadiusPixels);
     DECKGL_FILTER_SIZE(offset, geometry);
-    gl_Position = project_position_to_clipspace(instancePositions, instancePositions64Low, offset, geometry.position);
+    gl_Position = project_position_to_clipspace(position, position64low, offset, geometry.position);
     DECKGL_FILTER_GL_POSITION(gl_Position, geometry);
   }
 

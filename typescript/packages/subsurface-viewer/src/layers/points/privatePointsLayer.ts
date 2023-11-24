@@ -1,5 +1,7 @@
 import type { ScatterplotLayerProps } from "@deck.gl/layers/typed";
 import { ScatterplotLayer } from "@deck.gl/layers/typed";
+
+import type { NumericArray } from "@math.gl/types";
 import GL from "@luma.gl/constants";
 
 import type { LayerContext } from "@deck.gl/core/typed";
@@ -8,8 +10,11 @@ import { project32, picking } from "@deck.gl/core/typed";
 import vs from "./vertex.glsl";
 import fs from "./fragment.glsl";
 
+type UniformValue = number | boolean | Readonly<NumericArray>;
+
 export interface ExtendedScatterplotLayerProps {
     depthTest: boolean;
+    ZIncreasingDownwards: boolean;
 }
 
 export class PrivatePointsLayer extends ScatterplotLayer<
@@ -26,11 +31,12 @@ export class PrivatePointsLayer extends ScatterplotLayer<
 
     draw(args: {
         moduleParameters?: unknown;
-        uniforms: number[];
+        uniforms: Record<string, UniformValue>;
         context: LayerContext;
     }): void {
-        let restoreDepthTest = false;
+        args.uniforms["ZIncreasingDownwards"] = this.props.ZIncreasingDownwards;
 
+        let restoreDepthTest = false;
         if (
             typeof this.props.depthTest === "boolean" &&
             !this.props.depthTest
@@ -38,7 +44,7 @@ export class PrivatePointsLayer extends ScatterplotLayer<
             restoreDepthTest = true;
             this.context.gl.disable(GL.DEPTH_TEST);
         }
-        super.draw(args);
+        super.draw({ uniforms: args.uniforms });
         if (restoreDepthTest) {
             this.context.gl.enable(GL.DEPTH_TEST);
         }

@@ -63,8 +63,6 @@ void main(void) {
   } else {
     gl_FragColor = vFillColor;
   }
-
-  gl_FragColor = vec4(0.0, 0.5, 0.6, 1.0);
   gl_FragColor.a *= inCircle;
   DECKGL_FILTER_COLOR(gl_FragColor, geometry);
 }
