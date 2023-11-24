@@ -7,11 +7,7 @@ import type {
     ExtendedLayerProps,
     LayerPickInfo,
 } from "../utils/layerTools";
-import {
-    createPropertyData,
-    invertZCoordinate,
-    defineBoundingBox,
-} from "../utils/layerTools";
+import { createPropertyData, defineBoundingBox } from "../utils/layerTools";
 
 import { PrivatePointsLayer } from "./privatePointsLayer";
 
@@ -78,7 +74,6 @@ export default class PointsLayer extends CompositeLayer<PointsLayerProps> {
     renderLayers(): [PrivatePointsLayer?] {
         const layer = new PrivatePointsLayer(
             this.getSubLayerProps({
-                id: "points-layer",
                 pickable: this.props.pickable,
                 billboard: true,
                 data: this.state["dataAttributes"],
@@ -92,6 +87,7 @@ export default class PointsLayer extends CompositeLayer<PointsLayerProps> {
                     getRadius: [this.props.pointRadius],
                 },
                 depthTest: this.props.depthTest,
+                ZIncreasingDownwards: this.props.ZIncreasingDownwards,
             })
         );
         return [layer];
@@ -103,13 +99,14 @@ export default class PointsLayer extends CompositeLayer<PointsLayerProps> {
     }
 
     updateState({ props, oldProps }: UpdateParameters<PointsLayer>): void {
-        const needs_reload =
-            !isEqual(props.pointsData, oldProps.pointsData) ||
-            !isEqual(props.ZIncreasingDownwards, oldProps.ZIncreasingDownwards);
+        const needs_reload = !isEqual(props.pointsData, oldProps.pointsData);
 
         if (needs_reload) {
             const dataAttributes = this.rebuildDataAttributes(false);
             this.setState({ dataAttributes });
+        }
+        if (props.ZIncreasingDownwards != oldProps.ZIncreasingDownwards) {
+            this.updateBoundingBox(true);
         }
     }
 
@@ -140,17 +137,7 @@ export default class PointsLayer extends CompositeLayer<PointsLayerProps> {
         if (!dataArray) {
             return null;
         }
-        if (this.props.ZIncreasingDownwards) {
-            invertZCoordinate(dataArray);
-        }
-        if (
-            typeof this.props.setReportedBoundingBox === "function" &&
-            reportBoundingBox
-        ) {
-            const boundingBox = defineBoundingBox(dataArray);
-            this.props.setReportedBoundingBox(boundingBox);
-        }
-
+        this.updateBoundingBox(reportBoundingBox);
         return {
             length: dataArray.length / 3,
             attributes: {
@@ -167,6 +154,20 @@ export default class PointsLayer extends CompositeLayer<PointsLayerProps> {
             return new Float32Array(this.props.pointsData);
         }
         return new Float32Array();
+    }
+
+    private updateBoundingBox(reportBoundingBox: boolean) {
+        if (
+            this.state["dataAttributes"] &&
+            typeof this.props.setReportedBoundingBox === "function" &&
+            reportBoundingBox
+        ) {
+            const boundingBox = defineBoundingBox(
+                this.state["dataAttributes"],
+                this.props.ZIncreasingDownwards
+            );
+            this.props.setReportedBoundingBox(boundingBox);
+        }
     }
 }
 
