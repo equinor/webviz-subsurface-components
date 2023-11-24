@@ -1,3 +1,10 @@
+# [0.8.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.7.0...subsurface-viewer@0.8.0) (2023-11-24)
+
+
+### Features
+
+* **PointsLayer:**  ZIncreasingDownwards is applied in vertex shader, depthTest flag added ([#1787](https://github.com/equinor/webviz-subsurface-components/issues/1787)) ([99151f4](https://github.com/equinor/webviz-subsurface-components/commit/99151f48a3eadbd9ecd5c4ca9868f44be392ce1f))
+
 # [0.7.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.6.0...subsurface-viewer@0.7.0) (2023-11-15)
 
 
