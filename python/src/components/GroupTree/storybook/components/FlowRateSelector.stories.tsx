@@ -2,7 +2,7 @@ import React from "react";
 import DataProvider from "../../components/DataLoader";
 import FlowRateSelector from "../../components/Settings/FlowRateSelector";
 
-import { EdgeMetadata } from "../../../../group-tree-plot/src/types";
+import { EdgeMetadata } from "@webviz/group-tree-plot";
 
 const edgeMetadataList: EdgeMetadata[] = [
     { key: "waterrate", label: "Water Rate" },

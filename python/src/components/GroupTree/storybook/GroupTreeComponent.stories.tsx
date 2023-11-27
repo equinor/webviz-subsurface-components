@@ -1,7 +1,7 @@
 import React from "react";
 import GroupTreeComponent from "../components/GroupTreeComponent";
 
-import { EdgeMetadata, NodeMetadata } from "../../../group-tree-plot/src/types";
+import { EdgeMetadata, NodeMetadata } from "@webviz/group-tree-plot/src/types";
 
 export default {
     component: GroupTreeComponent,

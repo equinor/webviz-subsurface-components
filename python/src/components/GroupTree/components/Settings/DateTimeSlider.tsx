@@ -6,7 +6,7 @@ import { updateCurrentDateTime } from "../../redux/actions";
 import type { GroupTreeState } from "../../redux/store";
 import { DataContext } from "../DataLoader";
 
-import { DatedTree, DatedTrees } from "../../../../group-tree-plot/src/types";
+import { DatedTree, DatedTrees } from "@webviz/group-tree-plot";
 
 import "./date_time_slider.css";
 

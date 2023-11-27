@@ -5,7 +5,7 @@
  * 9 july 2021: refactored to use new format.
  */
 import * as d3 from "d3";
-import "./Plot/group_tree.css";
+import "./group_tree.css";
 
 /* eslint camelcase: "off" */
 /* eslint array-callback-return: "off" */

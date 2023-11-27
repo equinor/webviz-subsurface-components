@@ -12,35 +12,35 @@ describe.skip("Test GroupTreeViewer", () => {
                 children: (
                     <GroupTreeViewer
                         id={"grouptree"}
-                        edge_options={[
+                        edgeMetadataList={[
                             {
-                                name: "waterrate",
+                                key: "waterrate",
                                 label: "Water Rate",
                             },
                             {
-                                name: "oilrate",
+                                key: "oilrate",
                                 label: "Oil Rate",
                             },
                             {
-                                name: "gasrate",
+                                key: "gasrate",
                                 label: "Gas Rate",
                             },
                             {
-                                name: "waterinjrate",
+                                key: "waterinjrate",
                                 label: "Water Injection Rate",
                             },
                             {
-                                name: "gasinjrate",
+                                key: "gasinjrate",
                                 label: "Gas Injection Rate",
                             },
                         ]}
-                        node_options={[
+                        nodeMetadataList={[
                             {
-                                name: "pressure",
+                                key: "pressure",
                                 label: "Pressure",
                             },
                             {
-                                name: "bhp",
+                                key: "bhp",
                                 label: "Bottom Hole Pressure",
                             },
                         ]}

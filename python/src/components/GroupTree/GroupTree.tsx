@@ -4,19 +4,22 @@
  * https://github.com/plotly/dash/issues/719
  */
 
-import PropTypes from "prop-types";
 import React from "react";
+import PropTypes from "prop-types";
+
 import type { GroupTreeProps } from "./components/GroupTreeComponent";
 import GroupTreeComponent from "./components/GroupTreeComponent";
 
 const GroupTree = (props: GroupTreeProps) => {
     return (
-        <GroupTreeComponent
-            id={props.id}
-            data={props.data}
-            edgeMetadataList={props.edgeMetadataList}
-            nodeMetadataList={props.nodeMetadataList}
-        />
+        <React.Suspense fallback={<div>Loading...</div>}>
+            <GroupTreeComponent
+                id={props.id}
+                data={props.data}
+                edgeMetadataList={props.edgeMetadataList}
+                nodeMetadataList={props.nodeMetadataList}
+            />
+        </React.Suspense>
     );
 };
 
@@ -38,6 +41,8 @@ GroupTree.propTypes = {
     edgeMetadataList: PropTypes.arrayOf(PropTypes.object),
     nodeMetadataList: PropTypes.arrayOf(PropTypes.object),
 };
+
+GroupTree.displayName = "GroupTree";
 
 export type { GroupTreeProps };
 export default GroupTree;

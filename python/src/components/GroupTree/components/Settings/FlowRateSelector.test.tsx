@@ -6,19 +6,22 @@ import React from "react";
 import { testStore, Wrapper } from "../../test/TestWrapper";
 import FlowRateSelector from "./FlowRateSelector";
 
-const edge_options = [
-    { name: "waterrate", label: "Water Rate" },
-    { name: "oilrate", label: "Oil Rate" },
-    { name: "gasrate", label: "Gas Rate" },
-    { name: "waterinjrate", label: "Water Injection Rate" },
-    { name: "gasinjrate", label: "Gas Injection Rate" },
+import { EdgeMetadata } from "@webviz/group-tree-plot";
+
+const edgeMetadataList: EdgeMetadata[] = [
+    { key: "waterrate", label: "Water Rate" },
+    { key: "oilrate", label: "Oil Rate" },
+    { key: "gasrate", label: "Gas Rate" },
+    { key: "waterinjrate", label: "Water Injection Rate" },
+    { key: "gasinjrate", label: "Gas Injection Rate" },
+];
 ];
 
 describe("Test flow rate selector component", () => {
     it("snapshot test", () => {
         const { container } = render(
             Wrapper({
-                children: <FlowRateSelector edge_options={edge_options} />,
+                children: <FlowRateSelector edgeMetadataList={edgeMetadataList} />,
             })
         );
         expect(container.firstChild).toMatchSnapshot();
@@ -26,7 +29,7 @@ describe("Test flow rate selector component", () => {
     it("select 'water rate' option to dispatch redux action", async () => {
         render(
             Wrapper({
-                children: <FlowRateSelector edge_options={edge_options} />,
+                children: <FlowRateSelector edgeMetadataList={edgeMetadataList} />,
             })
         );
         userEvent.selectOptions(

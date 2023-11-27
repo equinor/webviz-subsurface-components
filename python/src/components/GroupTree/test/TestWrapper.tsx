@@ -3,7 +3,6 @@ import { Provider } from "react-redux";
 import { DataContext } from "../components/DataLoader";
 import { createReduxStore } from "../redux/store";
 import { testState } from "./testReduxState";
-import type { Data } from "../redux/types";
 
 import exampleData from "../../../../../example-data/group-tree.json";
 
@@ -17,7 +16,7 @@ export const Wrapper = ({
     children: JSX.Element;
 }): JSX.Element => {
     return (
-        <DataContext.Provider value={exampleData as unknown as Data}>
+        <DataContext.Provider value={JSON.parse(exampleData.toString())}>
             <Provider store={testStore}>{children}</Provider>
         </DataContext.Provider>
     );

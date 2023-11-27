@@ -6,11 +6,12 @@ import { useSelector } from "react-redux";
 import type { GroupTreeState } from "../redux/store";
 import { DataContext } from "./DataLoader";
 import SettingsBar from "./Settings/SettingsBar";
-// import { GroupTreePlot } from "../../../group-tree-plot/src/GroupTreePlot";
-import { EdgeMetadata, NodeMetadata } from "../../../group-tree-plot/src/types";
 
-import { GroupTreePlot } from "../../../group-tree-plot/src/GroupTreePlot";
-import "./Settings/components_styles.css";
+import {
+    GroupTreePlot,
+    EdgeMetadata,
+    NodeMetadata,
+} from "@webviz/group-tree-plot";
 
 const PREFIX = "GroupTreeViewer";
 

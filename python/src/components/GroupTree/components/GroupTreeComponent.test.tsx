@@ -4,7 +4,6 @@ import "jest-styled-components";
 import React from "react";
 import { Wrapper } from "./../test/TestWrapper";
 import GroupTreeComponent from "./GroupTreeComponent";
-import type { Data } from "../redux/types";
 
 import exampleData from "../../../../../example-data/group-tree.json";
 
@@ -15,36 +14,36 @@ describe.skip("Test GroupTree Component", () => {
                 children: (
                     <GroupTreeComponent
                         id={"grouptree"}
-                        data={exampleData as unknown as Data}
-                        edge_options={[
+                        data={JSON.parse(exampleData.toString())}
+                        edgeMetadataList={[
                             {
-                                name: "waterrate",
+                                key: "waterrate",
                                 label: "Water Rate",
                             },
                             {
-                                name: "oilrate",
+                                key: "oilrate",
                                 label: "Oil Rate",
                             },
                             {
-                                name: "gasrate",
+                                key: "gasrate",
                                 label: "Gas Rate",
                             },
                             {
-                                name: "waterinjrate",
+                                key: "waterinjrate",
                                 label: "Water Injection Rate",
                             },
                             {
-                                name: "gasinjrate",
+                                key: "gasinjrate",
                                 label: "Gas Injection Rate",
                             },
                         ]}
-                        node_options={[
+                        nodeMetadataList={[
                             {
-                                name: "pressure",
+                                key: "pressure",
                                 label: "Pressure",
                             },
                             {
-                                name: "bhp",
+                                key: "bhp",
                                 label: "Bottom Hole Pressure",
                             },
                         ]}

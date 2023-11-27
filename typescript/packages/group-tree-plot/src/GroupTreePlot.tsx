@@ -1,7 +1,7 @@
 import React from "react";
 
 import GroupTreeAssembler from "./GroupTreeAssembler/groupTreeAssembler";
-import { DatedTrees, EdgeMetadata, NodeMetadata } from "./types";
+import type { DatedTrees, EdgeMetadata, NodeMetadata } from "./types";
 import { isEqual } from "lodash";
 
 export interface GroupTreePlotProps {
@@ -59,24 +59,26 @@ export const GroupTreePlot: React.FC<GroupTreePlotProps> = (
 
     if (prevSelectedEdgeKey !== props.selectedEdgeKey) {
         setPrevSelectedEdgeKey(props.selectedEdgeKey);
-        if (!groupTreeAssemblerRef.current) return;
-
-        groupTreeAssemblerRef.current.flowrate = props.selectedEdgeKey;
+        if (groupTreeAssemblerRef.current) {
+            groupTreeAssemblerRef.current.flowrate = props.selectedEdgeKey;
+        }
     }
 
     if (prevSelectedNodeKey !== props.selectedNodeKey) {
         setPrevSelectedNodeKey(props.selectedNodeKey);
-        if (!groupTreeAssemblerRef.current) return;
-
-        groupTreeAssemblerRef.current.nodeinfo = props.selectedNodeKey;
+        if (groupTreeAssemblerRef.current) {
+            groupTreeAssemblerRef.current.nodeinfo = props.selectedNodeKey;
+        }
     }
 
     if (prevSelectedDateTime !== props.selectedDateTime) {
         setPrevSelectedDateTime(props.selectedDateTime);
-        if (!groupTreeAssemblerRef.current) return;
-
-        groupTreeAssemblerRef.current.update(props.selectedDateTime);
+        if (groupTreeAssemblerRef.current) {
+            groupTreeAssemblerRef.current.update(props.selectedDateTime);
+        }
     }
 
     return <div id={props.id} ref={divRef} />;
 };
+
+GroupTreePlot.displayName = "GroupTreePlot";

@@ -4,7 +4,7 @@ import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCurrentNodeInfo } from "../../redux/actions";
 import type { GroupTreeState } from "../../redux/store";
-import { NodeMetadata } from "../../../../group-tree-plot/src/types";
+import { NodeMetadata } from "@webviz/group-tree-plot";
 
 const PREFIX = "NodeInfoSelector";
 

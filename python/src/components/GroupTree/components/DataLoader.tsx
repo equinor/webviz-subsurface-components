@@ -9,7 +9,7 @@ import type {
     DatedTrees,
     EdgeMetadata,
     NodeMetadata,
-} from "../../../group-tree-plot/src/types";
+} from "@webviz/group-tree-plot";
 
 export type DateTreesIndices = {
     treeIndex: number;

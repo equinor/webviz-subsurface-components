@@ -1,7 +1,6 @@
-export { GroupTreePlot } from "./GroupTreePlot";
+export { GroupTreePlot, GroupTreePlotProps } from "./GroupTreePlot";
 
 // Export types
-export type { GroupTreePlotProps } from "./GroupTreePlot";
 export type {
     NodeData,
     NodeMetadata,
