@@ -4,7 +4,7 @@ import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCurrentNodeInfo } from "../../redux/actions";
 import type { GroupTreeState } from "../../redux/store";
-import { NodeMetadata } from "../group-tree-plot/src/types";
+import { NodeMetadata } from "../../../../group-tree-plot/src/types";
 
 const PREFIX = "NodeInfoSelector";
 
@@ -32,7 +32,7 @@ const NodeInfoSelector: React.FC<NodeInfoSelectorProps> = React.memo(
         );
         // handlers
         const handleSelectedItemChange = useCallback(
-            (event: { target: { value: unknown } }) => {
+            (event: React.ChangeEvent<HTMLSelectElement>) => {
                 dispatch(updateCurrentNodeInfo(event.target.value as string));
             },
             [dispatch]

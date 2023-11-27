@@ -4,7 +4,7 @@ import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCurrentFlowRate } from "../../redux/actions";
 import type { GroupTreeState } from "../../redux/store";
-import { EdgeMetadata } from "../group-tree-plot/src/types";
+import { EdgeMetadata } from "../../../../group-tree-plot/src/types";
 
 const PREFIX = "FlowRateSelector";
 

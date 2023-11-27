@@ -5,7 +5,7 @@ import SettingsBar from "../../components/Settings/SettingsBar";
 import {
     EdgeMetadata,
     NodeMetadata,
-} from "../../components/group-tree-plot/src/types";
+} from "../../../../group-tree-plot/src/types";
 
 const edgeMetadataList: EdgeMetadata[] = [
     { key: "waterrate", label: "Water Rate" },

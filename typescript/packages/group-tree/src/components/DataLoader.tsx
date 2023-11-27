@@ -9,7 +9,7 @@ import type {
     DatedTrees,
     EdgeMetadata,
     NodeMetadata,
-} from "./group-tree-plot/src/types";
+} from "../../../group-tree-plot/src/types";
 
 export type DateTreesIndices = {
     treeIndex: number;
@@ -41,17 +41,17 @@ const DataProvider: React.FC<DataProviderProps> = (
             ? props.data[treeIdx].dates[dateIdx]
             : props.data[0].dates[0];
 
-        // const initialFlowRate = props.edgeMetadataList[0]?.key ?? "";
-        // const initialNodeInfo = props.nodeMetadataList[0]?.key ?? "";
-        const initialFlowRate =
-            props.edgeMetadataList?.length > 0
-                ? props.edgeMetadataList[0].key
-                : "";
+        const initialFlowRate = props.edgeMetadataList[0]?.key ?? "";
+        const initialNodeInfo = props.nodeMetadataList[0]?.key ?? "";
+        // const initialFlowRate =
+        //     props.edgeMetadataList?.length > 0
+        //         ? props.edgeMetadataList[0].key
+        //         : "";
 
-        const initialNodeInfo =
-            props.nodeMetadataList?.length > 0
-                ? props.nodeMetadataList[0].key
-                : "";
+        // const initialNodeInfo =
+        //     props.nodeMetadataList?.length > 0
+        //         ? props.nodeMetadataList[0].key
+        //         : "";
 
         return {
             id: props.id,

@@ -5,10 +5,12 @@ import React, { useContext, useEffect } from "react";
 import { useSelector } from "react-redux";
 import type { GroupTreeState } from "../redux/store";
 import { DataContext } from "./DataLoader";
-import "./group-tree-plot/src/Plot/dynamic_tree.css";
 import SettingsBar from "./Settings/SettingsBar";
-import { GroupTreePlot } from "./group-tree-plot/src/GroupTreePlot";
-import { EdgeMetadata, NodeMetadata } from "./group-tree-plot/src/types";
+// import { GroupTreePlot } from "../../../group-tree-plot/src/GroupTreePlot";
+import { EdgeMetadata, NodeMetadata } from "../../../group-tree-plot/src/types";
+
+import { GroupTreePlot } from "../../../group-tree-plot/src/GroupTreePlot";
+import "./Settings/components_styles.css";
 
 const PREFIX = "GroupTreeViewer";
 

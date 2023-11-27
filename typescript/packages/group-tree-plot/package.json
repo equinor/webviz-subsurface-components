@@ -1,0 +1,34 @@
+{
+    "name": "@webviz/group-tree-plot",
+    "version": "0.0.1",
+    "description": "",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "files": [
+        "/dist"
+    ],
+    "scripts": {
+        "transpile": "tsc --project ./tsconfig.json",
+        "copy-files": "copyfiles --up 1 \"src/**/*.css\" dist/",
+        "build": "git clean -xdff dist && npm run transpile && npm run copy-files",
+        "test_perf": "jest _performance",
+        "test_correctness": "jest --coverage --testPathIgnorePatterns='_performance'",
+        "test": "jest --coverage",
+        "test:update": "npm test -- --u",
+        "test:watch": "npm test -- --watch",
+        "doc": "git clean -xdff docs && typedoc src"
+    },
+    "author": "Equinor <opensource@equinor.com>",
+    "license": "MPL-2.0",
+    "dependencies": {
+        "d3": "^7.8.2",
+        "lodash": "^4.17.21"
+    },
+    "peerDependencies": {
+        "react": "^17 || ^18",
+        "react-dom": "^17 || ^18"
+    },
+    "volta": {
+        "node": "18.17.0"
+    }
+}

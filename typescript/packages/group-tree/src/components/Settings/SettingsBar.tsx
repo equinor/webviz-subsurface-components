@@ -4,7 +4,10 @@ import React from "react";
 import DateTimeSlider from "./DateTimeSlider";
 import FlowRateSelector from "./FlowRateSelector";
 import NodeInfoSelector from "./NodeInfoSelector";
-import { EdgeMetadata, NodeMetadata } from "../group-tree-plot/src/types";
+import {
+    EdgeMetadata,
+    NodeMetadata,
+} from "../../../../group-tree-plot/src/types";
 
 const PREFIX = "SettingsBar";
 

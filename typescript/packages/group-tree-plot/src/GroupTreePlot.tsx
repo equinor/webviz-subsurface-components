@@ -1,10 +1,10 @@
 import React from "react";
 
-import GroupTree from "./Plot/group_tree";
+import GroupTreeAssembler from "./GroupTreeAssembler/groupTreeAssembler";
 import { DatedTrees, EdgeMetadata, NodeMetadata } from "./types";
 import { isEqual } from "lodash";
 
-interface GroupTreePlotProps {
+export interface GroupTreePlotProps {
     id: string;
     edgeMetadataList: EdgeMetadata[];
     nodeMetadataList: NodeMetadata[];
@@ -18,7 +18,7 @@ export const GroupTreePlot: React.FC<GroupTreePlotProps> = (
     props: GroupTreePlotProps
 ) => {
     const divRef = React.useRef<HTMLDivElement>(null);
-    const groupTreeRef = React.useRef<GroupTree>();
+    const groupTreeAssemblerRef = React.useRef<GroupTreeAssembler>();
 
     // State to ensure divRef is defined before creating GroupTree
     const [isMounted, setIsMounted] = React.useState<boolean>(false);
@@ -42,12 +42,11 @@ export const GroupTreePlot: React.FC<GroupTreePlotProps> = (
 
     if (
         isMounted &&
-        // divRef.current &&
         (!isEqual(prevDatedTrees, props.datedTrees) || prevId !== props.id)
     ) {
         setPrevDatedTrees(props.datedTrees);
         setPrevId(props.id);
-        groupTreeRef.current = new GroupTree(
+        groupTreeAssemblerRef.current = new GroupTreeAssembler(
             props.id,
             props.datedTrees,
             props.selectedEdgeKey,
@@ -60,23 +59,23 @@ export const GroupTreePlot: React.FC<GroupTreePlotProps> = (
 
     if (prevSelectedEdgeKey !== props.selectedEdgeKey) {
         setPrevSelectedEdgeKey(props.selectedEdgeKey);
-        if (!groupTreeRef.current) return;
+        if (!groupTreeAssemblerRef.current) return;
 
-        groupTreeRef.current.flowrate = props.selectedEdgeKey;
+        groupTreeAssemblerRef.current.flowrate = props.selectedEdgeKey;
     }
 
     if (prevSelectedNodeKey !== props.selectedNodeKey) {
         setPrevSelectedNodeKey(props.selectedNodeKey);
-        if (!groupTreeRef.current) return;
+        if (!groupTreeAssemblerRef.current) return;
 
-        groupTreeRef.current.nodeinfo = props.selectedNodeKey;
+        groupTreeAssemblerRef.current.nodeinfo = props.selectedNodeKey;
     }
 
     if (prevSelectedDateTime !== props.selectedDateTime) {
         setPrevSelectedDateTime(props.selectedDateTime);
-        if (!groupTreeRef.current) return;
+        if (!groupTreeAssemblerRef.current) return;
 
-        groupTreeRef.current.update(props.selectedDateTime);
+        groupTreeAssemblerRef.current.update(props.selectedDateTime);
     }
 
     return <div id={props.id} ref={divRef} />;

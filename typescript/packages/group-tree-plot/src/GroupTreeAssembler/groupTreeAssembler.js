@@ -5,6 +5,8 @@
  * 9 july 2021: refactored to use new format.
  */
 import * as d3 from "d3";
+import "./Plot/group_tree.css";
+
 /* eslint camelcase: "off" */
 /* eslint array-callback-return: "off" */
 /* eslint no-return-assign: "off" */
@@ -13,26 +15,31 @@ import * as d3 from "d3";
 /* Fix this lint when rewriting the whole file */
 
 /**
- * Group tree visualization. Creates an _svg, and appends to the assigned element.
- * Draws the tree provided as tree_data
-
- * @constructor
+ * Class to assemble Group tree visualization. Creates an _svg, and appends to the
+ * assigned HTML element. Draws the tree provided as tree_data with the current flow rate,
+ * node info and date time.
+ *
+ * Provides methods to update selected date time, and change flow rate and node info. *
  */
-export default class GroupTree {
+export default class GroupTreeAssembler {
     /**
      *
-     * @param dom_element_id
-     * @param {group-tree-data} tree_data
-     * @param defaultFlowrate
+     * @param dom_element_id - id of the HTML element to append the _svg to
+     * @param {DatedTrees} datedTrees - List of dated tree data structure containing the trees to visualize
+     * @param initialFlowRate - key identifying the initial selected flow rate for the tree edges
+     * @param initialNodeInfo - key identifying the initial selected node info for the tree nodes
+     * @param currentDateTime - the initial/current date time
+     * @param edgeMetadataList - List of metadata for the edge keys in the tree data structure
+     * @param nodeMetadataList - List of metadata for the node keys in the tree data structure
      */
     constructor(
         dom_element_id,
-        tree_data,
-        defaultFlowrate,
-        defaultNodeInfo,
+        datedTrees,
+        initialFlowRate,
+        initialNodeInfo,
         currentDateTime,
-        edge_options,
-        node_options
+        edgeMetadataList,
+        nodeMetadataList
     ) {
         // Add "#" if missing.
         if (dom_element_id.charAt(0) !== "#") {
@@ -40,9 +47,9 @@ export default class GroupTree {
         }
 
         // Map from property to [label/name, unit]
-        const options = [...edge_options, ...node_options];
+        const metadataList = [...edgeMetadataList, ...nodeMetadataList];
         this._propertyToLabelMap = new Map();
-        options.forEach((key) => {
+        metadataList.forEach((key) => {
             this._propertyToLabelMap.set(key.name, [
                 key.label ?? "",
                 key.unit ?? "",
@@ -50,9 +57,9 @@ export default class GroupTree {
         });
 
         // Represent possible empty data by single empty node.
-        if (tree_data.length === 0) {
+        if (datedTrees.length === 0) {
             currentDateTime = "";
-            tree_data = [
+            datedTrees = [
                 {
                     dates: [currentDateTime],
                     tree: {
@@ -65,15 +72,15 @@ export default class GroupTree {
             ];
         }
 
-        this._currentFlowrate = defaultFlowrate;
-        this._currentNodeInfo = defaultNodeInfo;
+        this._currentFlowRate = initialFlowRate;
+        this._currentNodeInfo = initialNodeInfo;
         this._currentDateTime = currentDateTime;
 
         this._transitionTime = 200;
 
         const tree_values = {};
 
-        tree_data.map((datedTree) => {
+        datedTrees.map((datedTree) => {
             let tree = datedTree.tree;
             d3.hierarchy(tree, (d) => d.children).each((node) => {
                 // edge_data
@@ -123,7 +130,7 @@ export default class GroupTree {
 
         this._renderTree = d3.tree().size([height, this._width]);
 
-        this._data = GroupTree.initHierarchies(tree_data, height);
+        this._data = GroupTreeAssembler.initHierarchies(datedTrees, height);
 
         this._currentTree = {};
 
@@ -166,7 +173,7 @@ export default class GroupTree {
      * @param flowrate - key identifying the flowrate of the incoming edge
      */
     set flowrate(flowrate) {
-        this._currentFlowrate = flowrate;
+        this._currentFlowRate = flowrate;
 
         const current_tree_index = this._data.findIndex((e) => {
             return e.dates.includes(this._currentDateTime);
@@ -198,7 +205,7 @@ export default class GroupTree {
     }
 
     get flowrate() {
-        return this._currentFlowrate;
+        return this._currentFlowRate;
     }
 
     set nodeinfo(nodeinfo) {

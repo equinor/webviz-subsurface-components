@@ -6,7 +6,7 @@ import {
     DatedTrees,
     EdgeMetadata,
     NodeMetadata,
-} from "./group-tree-plot/src/types";
+} from "../../../group-tree-plot/src/types";
 
 //TODO schema check
 export interface GroupTreeProps {
