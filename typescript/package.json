@@ -46,7 +46,7 @@
         "@mui/system": "^5.13.7",
         "@nx/jest": "^16.5.0",
         "@storybook/addon-essentials": "^7.0.23",
-        "@storybook/addon-links": "^7.0.23",
+        "@storybook/addon-links": "^7.5.3",
         "@storybook/addon-mdx-gfm": "^7.0.23",
         "@storybook/addon-storysource": "^7.0.23",
         "@storybook/react": "^7.0.23",
