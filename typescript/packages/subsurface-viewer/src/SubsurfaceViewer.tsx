@@ -58,7 +58,11 @@ export interface SubsurfaceViewerProps {
     id: string;
     resources?: Record<string, unknown>;
     layers?: Record<string, unknown>[] | LayersList;
+
     bounds?: [number, number, number, number] | BoundsAccessor;
+    cameraPosition?: ViewStateType | undefined;
+    triggerHome?: number;
+
     views?: ViewsType;
     coords?: {
         visible?: boolean | null;
@@ -96,10 +100,6 @@ export interface SubsurfaceViewerProps {
     onDragStart?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
     onDragEnd?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
 
-    /**
-     * If changed will reset camera to default position.
-     */
-    triggerHome?: number;
     triggerResetMultipleWells?: number;
     /**
      * Range selection of the current well
@@ -113,7 +113,6 @@ export interface SubsurfaceViewerProps {
      * Override default tooltip with a callback.
      */
     getTooltip?: TooltipCallback;
-    cameraPosition?: ViewStateType | undefined;
 
     lights?: LightsType;
 
@@ -125,6 +124,8 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
     resources,
     layers,
     bounds,
+    cameraPosition,
+    triggerHome,
     views,
     coords,
     scale,
@@ -136,12 +137,10 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
     onMouseEvent,
     selection,
     getTooltip,
-    cameraPosition,
     getCameraPosition,
-    isRenderedCallback: isRenderedCallback,
+    isRenderedCallback,
     onDragStart,
     onDragEnd,
-    triggerHome,
     triggerResetMultipleWells,
     lights,
     children,

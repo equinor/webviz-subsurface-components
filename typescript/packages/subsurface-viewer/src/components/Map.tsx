@@ -330,8 +330,22 @@ export interface MapProps {
 
     /**
      * Coordinate boundary for the view defined as [left, bottom, right, top].
+     * Should be used for 2D view only.
      */
     bounds?: [number, number, number, number] | BoundsAccessor;
+
+    /**
+     * Camera state for the view defined as [left, bottom, right, top].
+     * Should be used for 3D view only.
+     * If the zoom is given as a 3D bounding box, the camera state is computed to
+     * display the full box.
+     */
+    cameraPosition?: ViewStateType;
+
+    /**
+     * If changed will reset view settings (bounds or camera) to default position.
+     */
+    triggerHome?: number;
 
     /**
      * Views configuration for map. If not specified, all the layers will be
@@ -402,10 +416,6 @@ export interface MapProps {
     onDragStart?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
     onDragEnd?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
 
-    /**
-     * If changed will reset camera to default position.
-     */
-    triggerHome?: number;
     triggerResetMultipleWells?: number;
     selection?: {
         well: string | undefined;
@@ -417,7 +427,6 @@ export interface MapProps {
     children?: React.ReactNode;
 
     getTooltip?: TooltipCallback;
-    cameraPosition?: ViewStateType;
 }
 
 export interface MapMouseEvent {
@@ -566,6 +575,8 @@ const Map: React.FC<MapProps> = ({
     id,
     layers,
     bounds,
+    cameraPosition,
+    triggerHome,
     views,
     coords,
     scale,
@@ -577,12 +588,10 @@ const Map: React.FC<MapProps> = ({
     selection,
     children,
     getTooltip = defaultTooltip,
-    cameraPosition,
     getCameraPosition,
     isRenderedCallback,
     onDragStart,
     onDragEnd,
-    triggerHome,
     lights,
     triggerResetMultipleWells,
 }: MapProps) => {
@@ -1029,7 +1038,7 @@ const Map: React.FC<MapProps> = ({
         ({ viewId, viewState }: { viewId: string; viewState: any }) => {
             const viewports = views?.viewports || [];
             if (viewState.target.length === 2) {
-                // In orthograpic mode viewState.target contains only x and y. Add existing z value.
+                // In orthographic mode viewState.target contains only x and y. Add existing z value.
                 viewState.target.push(viewStates[viewId].target[2]);
             }
             const isSyncIds = viewports

@@ -1,13 +1,20 @@
 import React from "react";
 import type { StoryFn } from "@storybook/react";
 import { styled } from "@mui/material/styles";
+import type { SubsurfaceViewerProps } from "../SubsurfaceViewer";
 import SubsurfaceViewer from "../SubsurfaceViewer";
 import exampleData from "../../../../../example-data/deckgl-map.json";
+
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
 
 const PREFIX = "Default";
 
 const classes = {
     main: `${PREFIX}-main`,
+    tab: `${PREFIX}-tab`,
 };
 
 const Root = styled("div")({
@@ -47,13 +54,20 @@ export default {
             Each JSON object will consist of layer type with key as `@@type` and layer specific data, if any.",
         },
 
+        cameraPosition: {
+            description: "Camera position to set the point of view.",
+        },
+
         bounds: {
             description:
                 "Coordinate boundary for the view defined as [left, bottom, right, top].",
         },
 
-        zoom: {
-            description: "Zoom level for the view",
+        triggerHome: {
+            description: "Forces resetting to initial home position",
+            control: {
+                type: "number",
+            },
         },
 
         views: {
@@ -118,7 +132,12 @@ export default {
             description: "For reacting to prop changes",
         },
     },
-};
+    args: {
+        // Add a reset button for all the stories.
+        // Somehow, I do not manage to add the triggerHome to the general "unset" controls :/
+        triggerHome: 0,
+    },
+} as ComponentMeta<typeof SubsurfaceViewer>;
 
 // Template for when edited data needs to be captured.
 const EditDataTemplate = (args) => {
@@ -621,6 +640,168 @@ export const ViewMatrixMargin: StoryFn<typeof SubsurfaceViewer> = (args) => {
 };
 
 ViewMatrixMargin.args = {
+    id: "DeckGL-Map",
+    layers: [meshMapLayerPng, axes2D],
+    bounds: [432150, 6475800, 439400, 6481501],
+    views: {
+        layout: [2, 2],
+        marginPixels: 10,
+        showLabel: true,
+        viewports: [
+            {
+                id: "view_1",
+                show3D: false,
+                layerIds: ["mesh-layer-png", "axes-layer"],
+                isSync: true,
+            },
+            {
+                id: "view_2",
+                show3D: false,
+                layerIds: ["mesh-layer-png", "axes-layer"],
+                isSync: true,
+            },
+            {
+                id: "view_3",
+                show3D: false,
+                layerIds: ["mesh-layer-png", "axes-layer"],
+                isSync: false,
+            },
+            {
+                id: "view_4",
+                show3D: false,
+                layerIds: ["mesh-layer-png", "axes-layer"],
+                isSync: false,
+            },
+        ],
+    },
+};
+
+interface TabPanelProps {
+    children?: React.ReactNode;
+    index: number;
+    value: number;
+    renderHiddenTabs: boolean;
+}
+
+const CustomTabPanel: React.FC<TabPanelProps> = (props: TabPanelProps) => {
+    const { children, value, index, renderHiddenTabs, ...other } = props;
+
+    return (
+        <div
+            role="tabpanel"
+            hidden={value !== index}
+            id={`simple-tabpanel-${index}`}
+            aria-labelledby={`simple-tab-${index}`}
+            {...other}
+        >
+            {(value === index || renderHiddenTabs) && (
+                <Box sx={{ p: 3 }}>
+                    <Typography>{children}</Typography>
+                </Box>
+            )}
+        </div>
+    );
+};
+
+const a11yProps = (index: number) => {
+    return {
+        id: `simple-tab-${index}`,
+        "aria-controls": `simple-tabpanel-${index}`,
+    };
+};
+
+type ViewerTabsProps = SubsurfaceViewerProps & { renderHiddenTabs: boolean };
+
+const ViewerTabs: React.FC<ViewerTabsProps> = (
+    props: SubsurfaceViewerProps
+) => {
+    const [value, setValue] = React.useState(0);
+
+    const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+        setValue(newValue);
+    };
+
+    return (
+        <Box sx={{ width: "100%" }}>
+            <Box sx={{ flexDirection: "column" }}>
+                <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+                    <Tabs
+                        value={value}
+                        onChange={handleChange}
+                        aria-label="basic tabs example"
+                    >
+                        <Tab label="Tab One" {...a11yProps(0)} />
+                        <Tab label="Tab Two" {...a11yProps(1)} />
+                        <Tab label="Tab Three" {...a11yProps(2)} />
+                    </Tabs>
+                </Box>
+
+                <Box sx={{ height: "80%" }}>
+                    <CustomTabPanel
+                        value={value}
+                        index={0}
+                        renderHiddenTabs={props.renderHiddenTabs}
+                    >
+                        <div
+                            style={{
+                                height: "65vh",
+                                //width: "50vw",
+                                position: "relative",
+                            }}
+                        >
+                            {<SubsurfaceViewer {...props} />}
+                        </div>
+                    </CustomTabPanel>
+                    <CustomTabPanel
+                        value={value}
+                        index={1}
+                        renderHiddenTabs={props.renderHiddenTabs}
+                    >
+                        <div
+                            style={{
+                                height: "65vh",
+                                //width: "50vw",
+                                position: "relative",
+                            }}
+                        >
+                            {<SubsurfaceViewer {...props} />}
+                        </div>
+                    </CustomTabPanel>
+                    <CustomTabPanel
+                        value={value}
+                        index={2}
+                        renderHiddenTabs={props.renderHiddenTabs}
+                    >
+                        <div
+                            style={{
+                                height: "65vh",
+                                //width: "50vw",
+                                position: "relative",
+                            }}
+                        >
+                            {<SubsurfaceViewer {...props} />}
+                        </div>
+                    </CustomTabPanel>
+                </Box>
+            </Box>
+        </Box>
+    );
+};
+
+export const ViewTabs: StoryFn<typeof ViewerTabs> = (args) => {
+    const props = {
+        ...args,
+    };
+
+    return (
+        <Root>
+            <ViewerTabs {...args}></ViewerTabs>
+        </Root>
+    );
+};
+
+ViewTabs.args = {
+    renderHiddenTabs: true,
     id: "DeckGL-Map",
     layers: [meshMapLayerPng, axes2D],
     bounds: [432150, 6475800, 439400, 6481501],

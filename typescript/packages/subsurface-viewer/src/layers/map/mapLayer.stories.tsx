@@ -1,5 +1,6 @@
 import type { SyntheticEvent } from "react";
 import React from "react";
+import { ComponentMeta } from "@storybook/react";
 import { styled } from "@mui/material/styles";
 import type { BoundingBox3D, ViewsType } from "../../components/Map";
 import { useHoverInfo } from "../../components/Map";
@@ -46,7 +47,12 @@ const Root = styled("div")({
 export default {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer / Map Layer",
-};
+    args: {
+        // Add a reset button for all the stories.
+        // Somehow, I do not manage to add the triggerHome to the general "unset" controls :/
+        triggerHome: 0,
+    },
+} as ComponentMeta<typeof SubsurfaceViewer>;
 
 type NumberQuad = [number, number, number, number];
 
