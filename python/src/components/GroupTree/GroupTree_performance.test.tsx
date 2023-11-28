@@ -3,7 +3,7 @@ import { render } from "@testing-library/react";
 import "jest-styled-components";
 import React, { Profiler } from "react";
 import * as core from "@actions/core";
-import GroupTree from "./GroupTree";
+import { GroupTree } from "./GroupTree";
 import { Wrapper } from "./test/TestWrapper";
 import logTimes, { obj } from "./test/performanceMetrics";
 
@@ -18,7 +18,7 @@ describe("Test GroupTree perfomance", () => {
                         <GroupTree
                             id={"grouptree"}
                             data={exampleData}
-                            edge_options={[
+                            edge_metadata_list={[
                                 {
                                     name: "waterrate",
                                     label: "Water Rate",
@@ -40,7 +40,7 @@ describe("Test GroupTree perfomance", () => {
                                     label: "Gas Injection Rate",
                                 },
                             ]}
-                            node_options={[
+                            node_metadata_list={[
                                 {
                                     name: "pressure",
                                     label: "Pressure",

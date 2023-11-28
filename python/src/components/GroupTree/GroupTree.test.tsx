@@ -3,7 +3,7 @@ import { render } from "@testing-library/react";
 import "jest-styled-components";
 import React from "react";
 import { Wrapper } from "./test/TestWrapper";
-import GroupTree from "./GroupTree";
+import { GroupTree } from "./GroupTree";
 
 import exampleData from "../../../../example-data/group-tree.json";
 
@@ -15,7 +15,7 @@ describe.skip("Test GroupTree Default Component", () => {
                     <GroupTree
                         id={"grouptree"}
                         data={JSON.parse(exampleData.toString())}
-                        edgeMetadataList={[
+                        edge_metadata_list={[
                             {
                                 key: "waterrate",
                                 label: "Water Rate",
@@ -37,7 +37,7 @@ describe.skip("Test GroupTree Default Component", () => {
                                 label: "Gas Injection Rate",
                             },
                         ]}
-                        nodeMetadataList={[
+                        node_metadata_list={[
                             {
                                 key: "pressure",
                                 label: "Pressure",
