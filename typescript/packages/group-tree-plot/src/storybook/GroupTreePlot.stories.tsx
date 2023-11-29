@@ -21,7 +21,7 @@ const edgeMetadataList: EdgeMetadata[] = [
 const nodeMetadataList: NodeMetadata[] = [
     { key: "pressure", label: "Pressure", unit: "Bar" },
     { key: "bhp", label: "Bottom Hole Pressure", unit: "N/m2" },
-    { key: "wmctl", label: "Missing label" },
+    { key: "wmctl", label: "Missing label", unit: "Unknown unit" },
 ];
 
 const Template = (args) => {
