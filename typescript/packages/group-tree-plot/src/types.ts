@@ -23,6 +23,7 @@ export interface EdgeMetadata {
 }
 
 // Recursively defined tree node
+// The snake_case naming is to match the python naming
 export interface RecursiveTreeNode {
     node_type: "Group" | "Well";
     node_label: string;

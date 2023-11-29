@@ -1,11 +1,13 @@
 import React from "react";
-import GroupTreeComponent from "../components/GroupTreeComponent";
+import { GroupTreePlot } from "../GroupTreePlot";
 
-import { EdgeMetadata, NodeMetadata } from "@webviz/group-tree-plot/src/types";
+import type { EdgeMetadata, NodeMetadata } from "../types";
+
+import { exampleDatedTrees } from "../../example-data/dated-trees";
 
 export default {
-    component: GroupTreeComponent,
-    title: "GroupTree",
+    component: GroupTreePlot,
+    title: "GroupTreePlot",
 };
 
 const edgeMetadataList: EdgeMetadata[] = [
@@ -23,13 +25,26 @@ const nodeMetadataList: NodeMetadata[] = [
 ];
 
 const Template = (args) => {
-    return <GroupTreeComponent {...args} />;
+    return (
+        <GroupTreePlot
+            id={args.id}
+            datedTrees={args.datedTrees}
+            edgeMetadataList={args.edgeMetadataList}
+            nodeMetadataList={args.nodeMetadataList}
+            selectedDateTime={args.selectedDateTime}
+            selectedEdgeKey={args.selectedEdgeKey}
+            selectedNodeKey={args.selectedNodeKey}
+        />
+    );
 };
 
 export const Default = Template.bind({});
 Default.args = {
-    id: "grouptree",
-    data: require("../../../../../example-data/group-tree.json"),
+    id: "grouptreeplot",
+    datedTrees: exampleDatedTrees,
     edgeMetadataList: edgeMetadataList,
     nodeMetadataList: nodeMetadataList,
+    selectedDateTime: "2018-02-01",
+    selectedEdgeKey: "oilrate",
+    selectedNodeKey: "pressure",
 };
