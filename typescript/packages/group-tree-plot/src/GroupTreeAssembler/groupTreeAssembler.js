@@ -6,6 +6,7 @@
  */
 import * as d3 from "d3";
 import "./group_tree.css";
+import { cloneDeep } from "lodash";
 
 /* eslint camelcase: "off" */
 /* eslint array-callback-return: "off" */
@@ -41,6 +42,9 @@ export default class GroupTreeAssembler {
         edgeMetadataList,
         nodeMetadataList
     ) {
+        // Cloned as it is mutated within class
+        let clonedDatedTrees = cloneDeep(datedTrees);
+
         // Add "#" if missing.
         if (dom_element_id.charAt(0) !== "#") {
             dom_element_id = "#" + dom_element_id;
@@ -57,9 +61,9 @@ export default class GroupTreeAssembler {
         });
 
         // Represent possible empty data by single empty node.
-        if (datedTrees.length === 0) {
+        if (clonedDatedTrees.length === 0) {
             currentDateTime = "";
-            datedTrees = [
+            clonedDatedTrees = [
                 {
                     dates: [currentDateTime],
                     tree: {
@@ -80,7 +84,7 @@ export default class GroupTreeAssembler {
 
         const tree_values = {};
 
-        datedTrees.map((datedTree) => {
+        clonedDatedTrees.map((datedTree) => {
             let tree = datedTree.tree;
             d3.hierarchy(tree, (d) => d.children).each((node) => {
                 // edge_data
@@ -130,7 +134,10 @@ export default class GroupTreeAssembler {
 
         this._renderTree = d3.tree().size([height, this._width]);
 
-        this._data = GroupTreeAssembler.initHierarchies(datedTrees, height);
+        this._data = GroupTreeAssembler.initHierarchies(
+            clonedDatedTrees,
+            height
+        );
 
         this._currentTree = {};
 
