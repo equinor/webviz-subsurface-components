@@ -42,12 +42,14 @@ export const GroupTreePlot: React.FC<GroupTreePlotProps> = (
 
     if (
         isMounted &&
-        (!isEqual(prevDatedTrees, props.datedTrees) || prevId !== props.id)
+        divRef.current &&
+        (!isEqual(prevDatedTrees, props.datedTrees) ||
+            prevId !== divRef.current.id)
     ) {
         setPrevDatedTrees(props.datedTrees);
-        setPrevId(props.id);
+        setPrevId(divRef.current.id);
         groupTreeAssemblerRef.current = new GroupTreeAssembler(
-            props.id,
+            divRef.current.id,
             props.datedTrees,
             props.selectedEdgeKey,
             props.selectedNodeKey,
