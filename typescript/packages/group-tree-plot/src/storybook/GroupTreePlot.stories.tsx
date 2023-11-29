@@ -5,9 +5,19 @@ import type { EdgeMetadata, NodeMetadata } from "../types";
 
 import { exampleDatedTrees } from "../../example-data/dated-trees";
 
+/**
+ * Storybook test for the group tree plot component
+ */
 export default {
     component: GroupTreePlot,
-    title: "GroupTreePlot",
+    title: "GroupTreePlot/Demo",
+    argTypes: {
+        data: {
+            control: {
+                type: "object",
+            },
+        },
+    },
 };
 
 const edgeMetadataList: EdgeMetadata[] = [
