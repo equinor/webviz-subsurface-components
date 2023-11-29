@@ -43,15 +43,6 @@ const DataProvider: React.FC<DataProviderProps> = (
 
         const initialFlowRate = props.edgeMetadataList[0]?.key ?? "";
         const initialNodeInfo = props.nodeMetadataList[0]?.key ?? "";
-        // const initialFlowRate =
-        //     props.edgeMetadataList?.length > 0
-        //         ? props.edgeMetadataList[0].key
-        //         : "";
-
-        // const initialNodeInfo =
-        //     props.nodeMetadataList?.length > 0
-        //         ? props.nodeMetadataList[0].key
-        //         : "";
 
         return {
             id: props.id,
