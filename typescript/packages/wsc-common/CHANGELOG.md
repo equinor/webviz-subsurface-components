@@ -1,3 +1,10 @@
+## [0.2.6](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.2.5...wsc-common@0.2.6) (2023-11-30)
+
+
+### Bug Fixes
+
+* bump deck.gl from 8.9.31 to 8.9.32 in /typescript ([#1800](https://github.com/equinor/webviz-subsurface-components/issues/1800)) ([393230c](https://github.com/equinor/webviz-subsurface-components/commit/393230c28e4946d9d210ed4a7e33c893fee87bf0))
+
 ## [0.2.5](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.2.4...wsc-common@0.2.5) (2023-11-13)
 
 
