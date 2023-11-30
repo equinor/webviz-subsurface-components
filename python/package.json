@@ -76,7 +76,7 @@
         "eslint-plugin-react-hooks": "^4.6.0",
         "file-loader": "^6.2.0",
         "raw-loader": "^4.0.2",
-        "react-docgen": "^5.4.0",
+        "react-docgen": "^6.0.0",
         "sass": "^1.66.1",
         "sass-loader": "^13.3.2",
         "style-loader": "^3.3.1",
