@@ -1,3 +1,10 @@
+## [1.1.7](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.1.6...well-log-viewer@1.1.7) (2023-11-30)
+
+
+### Bug Fixes
+
+* bump deck.gl from 8.9.31 to 8.9.32 in /typescript ([#1800](https://github.com/equinor/webviz-subsurface-components/issues/1800)) ([393230c](https://github.com/equinor/webviz-subsurface-components/commit/393230c28e4946d9d210ed4a7e33c893fee87bf0))
+
 ## [1.1.6](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.1.5...well-log-viewer@1.1.6) (2023-11-24)
 
 
