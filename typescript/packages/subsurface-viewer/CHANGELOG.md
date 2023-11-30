@@ -1,3 +1,10 @@
+## [0.8.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.8.0...subsurface-viewer@0.8.1) (2023-11-30)
+
+
+### Bug Fixes
+
+* bump deck.gl from 8.9.31 to 8.9.32 in /typescript ([#1800](https://github.com/equinor/webviz-subsurface-components/issues/1800)) ([393230c](https://github.com/equinor/webviz-subsurface-components/commit/393230c28e4946d9d210ed4a7e33c893fee87bf0))
+
 # [0.8.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.7.0...subsurface-viewer@0.8.0) (2023-11-24)
 
 
