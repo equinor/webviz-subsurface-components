@@ -106,9 +106,6 @@ export default class GroupTreeAssembler {
                 .range([2, 100]);
         });
 
-        const select = d3.select(dom_element_id);
-        this._width = select.node().getBoundingClientRect().width;
-
         const margin = {
             top: 10,
             right: 90,
@@ -116,8 +113,16 @@ export default class GroupTreeAssembler {
             left: 90,
         };
 
-        const height = 700 - margin.top - margin.bottom;
-        this._width = this._width - margin.left - margin.right;
+        const select = d3.select(dom_element_id);
+
+        // Svg bounding client rect
+        this._rectWidth = select.node().getBoundingClientRect().width;
+        this._rectHeight = 700;
+        this._rectLeftMargin = -margin.left;
+        this._rectTopMargin = -margin.top;
+
+        const treeHeight = this._rectHeight - margin.top - margin.bottom;
+        this._treeWidth = this._rectWidth - margin.left - margin.right;
 
         // Clear possible existing svg's.
         d3.select(dom_element_id).selectAll("svg").remove();
@@ -125,18 +130,18 @@ export default class GroupTreeAssembler {
         this._svg = d3
             .select(dom_element_id)
             .append("svg")
-            .attr("width", this._width + margin.right + margin.left)
-            .attr("height", height + margin.top + margin.bottom)
+            .attr("width", this._treeWidth + margin.right + margin.left)
+            .attr("height", treeHeight + margin.top + margin.bottom)
             .append("g")
             .attr("transform", `translate(${margin.left},${margin.top})`);
 
         this._textpaths = this._svg.append("g");
 
-        this._renderTree = d3.tree().size([height, this._width]);
+        this._renderTree = d3.tree().size([treeHeight, this._treeWidth]);
 
         this._data = GroupTreeAssembler.initHierarchies(
             clonedDatedTrees,
-            height
+            treeHeight
         );
 
         this._currentTree = {};
@@ -186,9 +191,19 @@ export default class GroupTreeAssembler {
             return e.dates.includes(this._currentDateTime);
         });
 
+        if (current_tree_index === -1) {
+            this._svg.selectAll("path.link").remove();
+            return;
+        }
+
         const date_index = this._data[current_tree_index].dates.indexOf(
             this._currentDateTime
         );
+
+        if (date_index === -1) {
+            this._svg.selectAll("path.link").remove();
+            return;
+        }
 
         this._svg
             .selectAll("path.link")
@@ -222,9 +237,19 @@ export default class GroupTreeAssembler {
             return e.dates.includes(this._currentDateTime);
         });
 
+        if (current_tree_index === -1) {
+            this._svg.selectAll("path.link").remove();
+            return;
+        }
+
         const date_index = this._data[current_tree_index].dates.indexOf(
             this._currentDateTime
         );
+
+        if (date_index === -1) {
+            this._svg.selectAll("path.link").remove();
+            return;
+        }
 
         this._svg
             .selectAll(".grouptree__pressurelabel")
@@ -262,15 +287,21 @@ export default class GroupTreeAssembler {
     update(newDateTime) {
         const self = this;
 
-        self._currentDateTime = newDateTime;
-
         const new_tree_index = self._data.findIndex((e) => {
             return e.dates.includes(newDateTime);
         });
 
         const root = self._data[new_tree_index];
 
-        const date_index = root.dates.indexOf(self._currentDateTime);
+        const date_index = root?.dates.indexOf(newDateTime) ?? -1;
+
+        // Invalid date gives invalid indices
+        const hasInvalidDate =
+            !root || date_index === -1 || new_tree_index === -1;
+
+        if (hasInvalidDate) {
+            self._currentDateTime = newDateTime;
+        }
 
         /**
          * Assigns y coordinates to all tree nodes in the rendered tree.
@@ -527,7 +558,7 @@ export default class GroupTreeAssembler {
         /**
          * Draw new edges, and update existing ones.
          *
-         * @param edges -list of nodes in a tree
+         * @param edges -list of edges in a tree
          * @param flowrate - key identifying the flowrate of the incoming edge
          */
         function updateEdges(edges, flowrate) {
@@ -600,7 +631,7 @@ export default class GroupTreeAssembler {
         /**
          * Add new and update existing texts/textpaths on edges.
          *
-         * @param edges - list of nodes in a tree
+         * @param edges - list of edges in a tree
          */
         function updateEdgeTexts(edges) {
             const textpath = self._textpaths
@@ -628,17 +659,45 @@ export default class GroupTreeAssembler {
             textpath.exit().remove();
         }
 
-        const newTree = cloneExistingNodeStates(
-            growNewTree(this._renderTree(root.tree), this._width),
-            this._currentTree
-        );
+        // Clear any existing error overlay
+        this._svg
+            .selectAll(".error-overlay-background, .error-overlay")
+            .remove();
 
-        // execute visualization operations on enter, update and exit selections
-        updateNodes(newTree.descendants(), this.nodeinfo);
-        updateEdges(newTree.descendants().slice(1), this.flowrate);
-        updateEdgeTexts(newTree.descendants().slice(1));
+        if (hasInvalidDate) {
+            // // Add opacity to overlay background
+            this._svg
+                .append("rect")
+                .attr("class", "error-overlay-background")
+                .attr("width", this._rectWidth)
+                .attr("height", this._rectHeight)
+                .attr("x", this._rectLeftMargin)
+                .attr("y", this._rectTopMargin)
+                .attr("fill", "rgba(255, 255, 255, 0.8)");
 
-        // save the state of the now current tree, before next update
-        this._currentTree = doPostUpdateOperations(newTree);
+            // Show overlay text with error message
+            this._svg
+                .append("text")
+                .attr("class", "error-overlay")
+                .attr("x", this._rectWidth / 2 + 2 * this._rectLeftMargin)
+                .attr("y", this._rectHeight / 2 + 2 * this._rectTopMargin)
+                .style("fill", "red")
+                .style("font-size", "16px")
+                .text("Date not found in data");
+        } else {
+            // Grow new tree
+            const newTree = cloneExistingNodeStates(
+                growNewTree(this._renderTree(root.tree), this._treeWidth),
+                this._currentTree
+            );
+
+            // execute visualization operations on enter, update and exit selections
+            updateNodes(newTree.descendants(), this.nodeinfo);
+            updateEdges(newTree.descendants().slice(1), this.flowrate);
+            updateEdgeTexts(newTree.descendants().slice(1));
+
+            // save the state of the now current tree, before next update
+            this._currentTree = doPostUpdateOperations(newTree);
+        }
     }
 }
