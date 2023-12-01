@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 
 import {
-    DatedTreesPropTypes,
+    DatedTreePropTypes,
     EdgeMetadataPropTypes,
     NodeMetadataPropTypes,
 } from "@webviz/group-tree-plot";
@@ -37,7 +37,7 @@ GroupTree.propTypes = {
     /**
      * Array of JSON objects describing group tree data.
      */
-    data: DatedTreesPropTypes,
+    data: PropTypes.arrayOf(DatedTreePropTypes),
 
     /**
      * Arrays of metadata. Used in drop down selectors and tree visualization.

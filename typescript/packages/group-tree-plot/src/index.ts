@@ -1,8 +1,7 @@
 export { GroupTreePlot } from "./GroupTreePlot";
 
-export type { GroupTreePlotProps } from "./GroupTreePlot";
-
 // Export types
+export type { GroupTreePlotProps } from "./GroupTreePlot";
 export type {
     NodeData,
     NodeDataPropTypes,
@@ -16,6 +15,4 @@ export type {
     RecursiveTreeNodePropTypes,
     DatedTree,
     DatedTreePropTypes,
-    DatedTrees,
-    DatedTreesPropTypes,
 } from "./types";

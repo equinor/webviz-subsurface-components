@@ -6,7 +6,7 @@ import { Provider as ReduxProvider } from "react-redux";
 import { createReduxStore } from "../redux/store";
 import type { UISettings } from "../redux/types";
 import type {
-    DatedTrees,
+    DatedTree,
     EdgeMetadata,
     NodeMetadata,
 } from "@webviz/group-tree-plot";
@@ -18,14 +18,14 @@ export type DateTreesIndices = {
 
 interface DataProviderProps {
     id: string;
-    data: DatedTrees;
+    data: DatedTree[];
     edgeMetadataList: EdgeMetadata[];
     nodeMetadataList: NodeMetadata[];
     initialIndices: DateTreesIndices;
     children: ReactNode;
 }
 
-export const DataContext = React.createContext<DatedTrees>([]);
+export const DataContext = React.createContext<DatedTree[]>([]);
 
 const DataProvider: React.FC<DataProviderProps> = (
     props: PropsWithChildren<DataProviderProps>

@@ -1,4 +1,14 @@
-import { DatedTree, DatedTrees } from "../src/types";
+import { DatedTree } from "../src/types";
+
+/**
+ * This is the dates present in the dates trees example data.
+ */
+export const exampleDates: string[] = [
+    "2018-02-01",
+    "2018-03-01",
+    "2019-02-01",
+    "2019-03-01",
+];
 
 /**
  * This is example data based on the Group Tree data in `group-tree.json`-file found in the `example-data`-folder.
@@ -153,4 +163,4 @@ const secondDatedTree: DatedTree = {
     },
 };
 
-export const exampleDatedTrees: DatedTrees = [firstDatedTree, secondDatedTree];
+export const exampleDatedTrees: DatedTree[] = [firstDatedTree, secondDatedTree];

@@ -39,9 +39,6 @@ export interface DatedTree {
     tree: RecursiveTreeNode;
 }
 
-// List of dated trees
-export type DatedTrees = DatedTree[];
-
 // ---------------------------  PropTypes ---------------------------------------
 
 export const NodeDataPropTypes = PropTypes.objectOf(
@@ -86,6 +83,3 @@ export const DatedTreePropTypes = PropTypes.shape({
     dates: PropTypes.arrayOf(PropTypes.string).isRequired,
     tree: RecursiveTreeNodePropTypes,
 });
-
-// List of dated trees
-export const DatedTreesPropTypes = PropTypes.arrayOf(DatedTreePropTypes);

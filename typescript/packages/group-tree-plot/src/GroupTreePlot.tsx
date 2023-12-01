@@ -1,14 +1,14 @@
 import React from "react";
 
 import GroupTreeAssembler from "./GroupTreeAssembler/groupTreeAssembler";
-import type { DatedTrees, EdgeMetadata, NodeMetadata } from "./types";
+import type { DatedTree, EdgeMetadata, NodeMetadata } from "./types";
 import { isEqual } from "lodash";
 
 export interface GroupTreePlotProps {
     id: string;
     edgeMetadataList: EdgeMetadata[];
     nodeMetadataList: NodeMetadata[];
-    datedTrees: DatedTrees;
+    datedTrees: DatedTree[];
     selectedEdgeKey: string;
     selectedNodeKey: string;
     selectedDateTime: string;
@@ -26,8 +26,9 @@ export const GroupTreePlot: React.FC<GroupTreePlotProps> = (
     // Remove when typescript version is implemented using ref
     const [prevId, setPrevId] = React.useState<string | null>(null);
 
-    const [prevDatedTrees, setPrevDatedTrees] =
-        React.useState<DatedTrees | null>(null);
+    const [prevDatedTrees, setPrevDatedTrees] = React.useState<
+        DatedTree[] | null
+    >(null);
 
     const [prevSelectedEdgeKey, setPrevSelectedEdgeKey] =
         React.useState<string>(props.selectedEdgeKey);

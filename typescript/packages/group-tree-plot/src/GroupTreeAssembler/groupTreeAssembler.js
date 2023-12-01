@@ -26,7 +26,7 @@ export default class GroupTreeAssembler {
     /**
      *
      * @param dom_element_id - id of the HTML element to append the _svg to
-     * @param {DatedTrees} datedTrees - List of dated tree data structure containing the trees to visualize
+     * @param datedTrees - List of dated tree data structure containing the trees to visualize
      * @param initialFlowRate - key identifying the initial selected flow rate for the tree edges
      * @param initialNodeInfo - key identifying the initial selected node info for the tree nodes
      * @param currentDateTime - the initial/current date time

@@ -3,7 +3,10 @@ import { GroupTreePlot } from "../GroupTreePlot";
 
 import type { EdgeMetadata, NodeMetadata } from "../types";
 
-import { exampleDatedTrees } from "../../example-data/dated-trees";
+import {
+    exampleDatedTrees,
+    exampleDates,
+} from "../../example-data/dated-trees";
 
 /**
  * Storybook test for the group tree plot component
@@ -12,10 +15,17 @@ export default {
     component: GroupTreePlot,
     title: "GroupTreePlot/Demo",
     argTypes: {
-        data: {
-            control: {
-                type: "object",
-            },
+        selectedDateTime: {
+            description:
+                "The selected `string` must be a date time present in one of the `dates` arrays in an element of the`datedTrees`-prop.",
+        },
+        selectedEdgeKey: {
+            description:
+                "The selection `string` must be an edge key present in one of the `edge_data` objects in the `tree`-prop of an element in `datedTrees`-prop.",
+        },
+        selectedNodeKey: {
+            description:
+                "The selected `string` must be a node key present in one of the `node_data` objects in the `tree`-prop of an element in `datedTrees`-prop.",
         },
     },
 };
@@ -54,7 +64,7 @@ Default.args = {
     datedTrees: exampleDatedTrees,
     edgeMetadataList: edgeMetadataList,
     nodeMetadataList: nodeMetadataList,
-    selectedDateTime: "2018-02-01",
-    selectedEdgeKey: "oilrate",
+    selectedDateTime: exampleDates[0],
+    selectedEdgeKey: "waterrate",
     selectedNodeKey: "pressure",
 };

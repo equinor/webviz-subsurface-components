@@ -2,11 +2,7 @@ import React, { useCallback, useState } from "react";
 
 import DataProvider, { DateTreesIndices } from "./DataLoader";
 import GroupTreeViewer from "./GroupTreeViewer";
-import {
-    DatedTrees,
-    EdgeMetadata,
-    NodeMetadata,
-} from "@webviz/group-tree-plot";
+import { DatedTree, EdgeMetadata, NodeMetadata } from "@webviz/group-tree-plot";
 
 //TODO schema check
 export interface GroupTreeProps {
@@ -19,7 +15,7 @@ export interface GroupTreeProps {
     /**
      * Array of JSON objects describing group tree data.
      */
-    data: DatedTrees;
+    data: DatedTree[];
 
     /**
      * Arrays of metadata. Used in drop down selectors and tree visualization.

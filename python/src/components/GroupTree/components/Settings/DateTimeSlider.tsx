@@ -6,7 +6,7 @@ import { updateCurrentDateTime } from "../../redux/actions";
 import type { GroupTreeState } from "../../redux/store";
 import { DataContext } from "../DataLoader";
 
-import { DatedTree, DatedTrees } from "@webviz/group-tree-plot";
+import { DatedTree } from "@webviz/group-tree-plot";
 
 import "./date_time_slider.css";
 
@@ -35,7 +35,7 @@ const EdsSlider = styled(Slider)(() => ({
 }));
 
 const DateTimeSlider: React.FC = React.memo(() => {
-    const data: DatedTrees = useContext(DataContext);
+    const data: DatedTree[] = useContext(DataContext);
     // Redux
     const dispatch = useDispatch();
 
