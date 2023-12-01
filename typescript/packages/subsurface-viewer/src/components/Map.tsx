@@ -289,7 +289,7 @@ export interface ViewStateType {
     transitionDuration?: number;
 }
 
-interface marginsType {
+interface MarginsType {
     left: number;
     right: number;
     top: number;
@@ -610,16 +610,7 @@ const Map: React.FC<MapProps> = ({
     const [reportedBoundingBoxAcc, setReportedBoundingBoxAcc] =
         useState<BoundingBox3D>(bboxInitial);
 
-    const [deckGLLayers, setDeckGLLayers] = useState<LayersList>([]);
-
     const [viewStateChanged, setViewStateChanged] = useState<boolean>(false);
-
-    const [viewPortMargins, setViewPortMargins] = useState<marginsType>({
-        left: 0,
-        right: 0,
-        top: 0,
-        bottom: 0,
-    });
 
     const [camera, setCamera] = useState<ViewStateType>();
     React.useEffect(() => {
@@ -735,85 +726,6 @@ const Map: React.FC<MapProps> = ({
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [scaleZDown]);
-
-    useEffect(() => {
-        if (typeof layers === "undefined") {
-            return;
-        }
-
-        if (layers.length === 0) {
-            // Empty layers array makes deck.gl set deckRef to undefined (no opengl context).
-            // Hence insert dummy layer.
-            const dummy_layer = new LineLayer({
-                id: "webviz_internal_dummy_layer",
-                visible: false,
-            });
-            layers.push(dummy_layer);
-        }
-
-        // Margins on the viewport are extracted from a potenial axes2D layer.
-        const axes2DLayer = layers?.find((e) => {
-            return e?.constructor === Axes2DLayer;
-        }) as Axes2DLayer;
-
-        const left =
-            axes2DLayer && axes2DLayer.props.isLeftRuler
-                ? axes2DLayer.props.marginH
-                : 0;
-        const right =
-            axes2DLayer && axes2DLayer.props.isRightRuler
-                ? axes2DLayer.props.marginH
-                : 0;
-        const top =
-            axes2DLayer && axes2DLayer.props.isTopRuler
-                ? axes2DLayer.props.marginV
-                : 0;
-        const bottom =
-            axes2DLayer && axes2DLayer.props.isBottomRuler
-                ? axes2DLayer.props.marginV
-                : 0;
-
-        setViewPortMargins({ left, right, top, bottom });
-
-        const layers_copy = layers.map((item) => {
-            if (item?.constructor.name === NorthArrow3DLayer.name) {
-                return item;
-            }
-
-            // Inject "setReportedBoundingBox" function into layer for it to report
-            // back its respective bounding box.
-            return (item as Layer).clone({
-                // eslint-disable-next-line
-                // @ts-ignore
-                setReportedBoundingBox: setReportedBoundingBox,
-            });
-        });
-
-        setDeckGLLayers(layers_copy);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [layers]);
-
-    useEffect(() => {
-        if (typeof layers === "undefined") {
-            return;
-        }
-
-        const m = getModelMatrixScale(scaleZ);
-
-        const layers_copy = deckGLLayers.map((item) => {
-            if (item?.constructor.name === NorthArrow3DLayer.name) {
-                return item;
-            }
-
-            // Set "modelLayer" matrix to reflect correct z scaling.
-            return (item as Layer).clone({
-                modelMatrix: m,
-            });
-        });
-
-        setDeckGLLayers(layers_copy);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [scaleZ]);
 
     useEffect(() => {
         const layers = deckRef.current?.deck?.props.layers;
@@ -970,6 +882,63 @@ const Map: React.FC<MapProps> = ({
         },
         [callOnMouseEvent, getPickingInfos]
     );
+
+    // compute the viewport margins
+    const viewPortMargins = React.useMemo<MarginsType>(() => {
+        if (typeof layers === "undefined") {
+            return {
+                left: 0,
+                right: 0,
+                top: 0,
+                bottom: 0,
+            };
+        }
+        // Margins on the viewport are extracted from a potential axes2D layer.
+        const axes2DLayer = layers?.find((e) => {
+            return e?.constructor === Axes2DLayer;
+        }) as Axes2DLayer;
+
+        const axes2DProps = axes2DLayer?.props;
+        return {
+            left: axes2DProps?.isLeftRuler ? axes2DProps.marginH : 0,
+            right: axes2DProps?.isRightRuler ? axes2DProps.marginH : 0,
+            top: axes2DProps?.isTopRuler ? axes2DProps.marginV : 0,
+            bottom: axes2DProps?.isBottomRuler ? axes2DProps.marginV : 0,
+        };
+    }, [layers]);
+
+    const deckGLLayers = React.useMemo<LayersList>(() => {
+        if (typeof layers === "undefined") {
+            return [];
+        }
+        if (layers.length === 0) {
+            // Empty layers array makes deck.gl set deckRef to undefined (no OpenGL context).
+            // Hence insert dummy layer.
+            const dummy_layer = new LineLayer({
+                id: "webviz_internal_dummy_layer",
+                visible: false,
+            });
+            layers.push(dummy_layer);
+        }
+
+        const m = getModelMatrixScale(scaleZ);
+
+        return layers.map((item) => {
+            if (item?.constructor.name === NorthArrow3DLayer.name) {
+                return item;
+            }
+
+            return (item as Layer).clone({
+                // Inject "setReportedBoundingBox" function into layer for it to report
+                // back its respective bounding box.
+                // eslint-disable-next-line
+                // @ts-ignore
+                setReportedBoundingBox: setReportedBoundingBox,
+                // Set "modelLayer" matrix to reflect correct z scaling.
+                modelMatrix: m,
+            });
+        });
+    }, [layers, scaleZ]);
 
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
     const onAfterRender = useCallback(() => {
@@ -1214,7 +1183,7 @@ export function jsonToObject(
 
 // return viewstate with computed bounds to fit the data in viewport
 function getViewState(
-    viewPortMargins: marginsType,
+    viewPortMargins: MarginsType,
     bounds_accessor: [number, number, number, number] | BoundsAccessor,
     centerOfData: [number, number, number],
     views: ViewsType | undefined,
@@ -1375,7 +1344,7 @@ function getViewState3D(
 // construct views and viewStates for DeckGL component
 function createViewsAndViewStates(
     views: ViewsType | undefined,
-    viewPortMargins: marginsType,
+    viewPortMargins: MarginsType,
     bounds: [number, number, number, number] | BoundsAccessor | undefined,
     cameraPosition: ViewStateType | undefined,
     boundingBox: [number, number, number, number, number, number],
