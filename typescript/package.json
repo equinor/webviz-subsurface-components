@@ -56,7 +56,7 @@
         "@testing-library/jest-dom": "^5.16.5",
         "@testing-library/react": "^14.0.0",
         "@testing-library/user-event": "^13.1.9",
-        "@theunderscorer/nx-semantic-release": "^2.5.0",
+        "@theunderscorer/nx-semantic-release": "^2.8.0",
         "@types/convert-units": "^2.3.5",
         "@types/d3": "^7.4.3",
         "@types/d3-color": "^3.0.2",
