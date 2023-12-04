@@ -3,6 +3,7 @@ import { CompositeLayer } from "@deck.gl/core/typed";
 import type { Material } from "./privateTriangleLayer";
 import PrivateTriangleLayer from "./privateTriangleLayer";
 import type { ExtendedLayerProps } from "../utils/layerTools";
+import type { ReportBoundingBoxAction } from "../../components/Map";
 import { isEqual } from "lodash";
 import { makeFullMesh } from "./webworker";
 import type React from "react";
@@ -119,9 +120,7 @@ export interface TriangleLayerProps extends ExtendedLayerProps {
     debug: boolean;
 
     // Non public properties:
-    setReportedBoundingBox?: React.Dispatch<
-        React.SetStateAction<[number, number, number, number, number, number]>
-    >;
+    reportBoundingBox?: React.Dispatch<ReportBoundingBoxAction>;
 }
 
 const defaultProps = {
@@ -185,7 +184,7 @@ export default class TriangleLayer extends CompositeLayer<TriangleLayerProps> {
                 });
 
                 if (
-                    typeof this.props.setReportedBoundingBox !== "undefined" &&
+                    typeof this.props.reportBoundingBox !== "undefined" &&
                     reportBoundingBox
                 ) {
                     let xmax = -99999999;
@@ -214,14 +213,9 @@ export default class TriangleLayer extends CompositeLayer<TriangleLayerProps> {
                         zmax = tmp;
                     }
 
-                    this.props.setReportedBoundingBox([
-                        xmin,
-                        ymin,
-                        zmin,
-                        xmax,
-                        ymax,
-                        zmax,
-                    ]);
+                    this.props.reportBoundingBox({
+                        layerBoundingBox: [xmin, ymin, zmin, xmax, ymax, zmax],
+                    });
                 }
 
                 webWorker.terminate();

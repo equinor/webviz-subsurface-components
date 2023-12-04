@@ -8,6 +8,7 @@ import type {
     ExtendedLayerProps,
     LayerPickInfo,
 } from "../utils/layerTools";
+import type { ReportBoundingBoxAction } from "../../components/Map";
 import {
     createPropertyData,
     invertZCoordinate,
@@ -60,9 +61,7 @@ export interface PolylinesLayerProps extends ExtendedLayerProps {
     ZIncreasingDownwards: boolean;
 
     // Non public properties:
-    setReportedBoundingBox?: React.Dispatch<
-        React.SetStateAction<[number, number, number, number, number, number]>
-    >;
+    reportBoundingBox?: React.Dispatch<ReportBoundingBoxAction>;
 }
 
 const defaultProps = {
@@ -139,11 +138,11 @@ export default class PolylinesLayer extends CompositeLayer<PolylinesLayerProps> 
             invertZCoordinate(dataArrays.positions);
         }
         if (
-            typeof this.props.setReportedBoundingBox === "function" &&
+            typeof this.props.reportBoundingBox === "function" &&
             reportBoundingBox
         ) {
             const boundingBox = defineBoundingBox(dataArrays.positions);
-            this.props.setReportedBoundingBox(boundingBox);
+            this.props.reportBoundingBox({ layerBoundingBox: boundingBox });
         }
 
         return {

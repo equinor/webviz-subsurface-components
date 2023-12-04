@@ -6,6 +6,7 @@ import type {
     ExtendedLayerProps,
     colorMapFunctionType,
 } from "../utils/layerTools";
+import type { ReportBoundingBoxAction } from "../../components/Map";
 import { TerrainLoader } from "@loaders.gl/terrain";
 import { ImageLoader } from "@loaders.gl/images";
 import { load } from "@loaders.gl/core";
@@ -280,9 +281,6 @@ async function load_mesh_and_texture(
 }
 
 export interface Map3DLayerProps extends ExtendedLayerProps {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    setReportedBoundingBox?: any;
-
     // Url to png image representing the height mesh.
     mesh: string;
 
@@ -355,6 +353,9 @@ export interface Map3DLayerProps extends ExtendedLayerProps {
 
     // Enable/disable depth testing when rendering layer. Default true.
     depthTest: boolean;
+
+    // Non public properties:
+    reportBoundingBox?: React.Dispatch<ReportBoundingBoxAction>;
 }
 
 const defaultProps = {
@@ -431,15 +432,10 @@ export default class Map3DLayer extends CompositeLayer<Map3DLayerProps> {
             const yMax = isFrame ? yMin + yinc * ycount : bounds[3];
             const zMax = -this.props.meshValueRange[0];
 
-            if (typeof this.props.setReportedBoundingBox !== "undefined") {
-                this.props.setReportedBoundingBox([
-                    xMin,
-                    yMin,
-                    zMin,
-                    xMax,
-                    yMax,
-                    zMax,
-                ]);
+            if (typeof this.props.reportBoundingBox !== "undefined") {
+                this.props.reportBoundingBox({
+                    layerBoundingBox: [xMin, yMin, zMin, xMax, yMax, zMax],
+                });
             }
         });
     }

@@ -184,6 +184,14 @@ function addBoundingBoxes(b1: BoundingBox3D, b2: BoundingBox3D): BoundingBox3D {
     return [xmin, ymin, zmin, xmax, ymax, zmax];
 }
 
+export type ReportBoundingBoxAction = { layerBoundingBox: BoundingBox3D };
+function mapBoundingBoxReducer(
+    mapBoundingBox: BoundingBox3D,
+    action: ReportBoundingBoxAction
+): BoundingBox3D {
+    return addBoundingBoxes(mapBoundingBox, action.layerBoundingBox);
+}
+
 function boundingBoxCenter(box: BoundingBox3D): [number, number, number] {
     const xmin = box[0];
     const ymin = box[1];
@@ -624,10 +632,10 @@ const Map: React.FC<MapProps> = ({
         {}
     );
 
-    const [reportedBoundingBox, setReportedBoundingBox] =
-        useState<BoundingBox3D>(bboxInitial);
-    const [reportedBoundingBoxAcc, setReportedBoundingBoxAcc] =
-        useState<BoundingBox3D>(bboxInitial);
+    const [dataBoundingBox3d, dispatchBoundingBox] = React.useReducer(
+        mapBoundingBoxReducer,
+        bboxInitial
+    );
 
     const [viewStateChanged, setViewStateChanged] = useState<boolean>(false);
 
@@ -656,7 +664,7 @@ const Map: React.FC<MapProps> = ({
             viewPortMargins,
             bounds,
             undefined, // Use bounds not cameraPosition,
-            reportedBoundingBoxAcc,
+            dataBoundingBox3d,
             deckSize
         );
 
@@ -680,7 +688,7 @@ const Map: React.FC<MapProps> = ({
             viewPortMargins,
             bounds,
             camera,
-            reportedBoundingBoxAcc,
+            dataBoundingBox3d,
             deckSize
         );
 
@@ -688,7 +696,7 @@ const Map: React.FC<MapProps> = ({
         setViewStates(viewStates);
         setViewStateChanged(false);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [reportedBoundingBoxAcc]);
+    }, [dataBoundingBox3d]);
 
     useEffect(() => {
         const [Views, viewStates] = createViewsAndViewStates(
@@ -696,7 +704,7 @@ const Map: React.FC<MapProps> = ({
             viewPortMargins,
             bounds,
             camera,
-            reportedBoundingBoxAcc,
+            dataBoundingBox3d,
             deckSize
         );
 
@@ -711,15 +719,6 @@ const Map: React.FC<MapProps> = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
         compareViewsProp(views),
     ]);
-
-    useEffect(() => {
-        const union_of_reported_bboxes = addBoundingBoxes(
-            reportedBoundingBoxAcc,
-            reportedBoundingBox
-        );
-        setReportedBoundingBoxAcc(union_of_reported_bboxes);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [reportedBoundingBox]);
 
     useEffect(() => {
         if (scaleZUp !== Number.MAX_VALUE) {
@@ -945,11 +944,10 @@ const Map: React.FC<MapProps> = ({
             }
 
             return (item as Layer).clone({
-                // Inject "setReportedBoundingBox" function into layer for it to report
-                // back its respective bounding box.
+                // Inject "dispatchBoundingBox" function into layer for it to report back its respective bounding box.
                 // eslint-disable-next-line
                 // @ts-ignore
-                setReportedBoundingBox: setReportedBoundingBox,
+                reportBoundingBox: dispatchBoundingBox,
                 // Set "modelLayer" matrix to reflect correct z scaling.
                 modelMatrix: m,
             });
@@ -1315,7 +1313,7 @@ function getViewState(
 // return viewstate with computed bounds to fit the data in viewport
 function getViewState3D(
     is3D: boolean,
-    bounds: [number, number, number, number, number, number],
+    bounds: BoundingBox3D,
     zoom?: number,
     size: Size
 ): ViewStateType {
@@ -1363,7 +1361,7 @@ function createViewsAndViewStates(
     viewPortMargins: MarginsType,
     bounds: [number, number, number, number] | BoundsAccessor | undefined,
     cameraPosition: ViewStateType | undefined,
-    boundingBox: [number, number, number, number, number, number],
+    boundingBox: BoundingBox3D,
     size: Size
 ): [View[], Record<string, ViewStateType>] {
     const deckgl_views: View[] = [];

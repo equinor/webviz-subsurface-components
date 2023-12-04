@@ -7,6 +7,7 @@ import type {
     ExtendedLayerProps,
     LayerPickInfo,
 } from "../utils/layerTools";
+import type { ReportBoundingBoxAction } from "../../components/Map";
 import { createPropertyData, defineBoundingBox } from "../utils/layerTools";
 
 import { PrivatePointsLayer } from "./privatePointsLayer";
@@ -42,9 +43,7 @@ export interface PointsLayerProps extends ExtendedLayerProps {
     depthTest: boolean;
 
     // Non public properties:
-    setReportedBoundingBox?: React.Dispatch<
-        React.SetStateAction<[number, number, number, number, number, number]>
-    >;
+    reportBoundingBox?: React.Dispatch<ReportBoundingBoxAction>;
 }
 
 const defaultProps = {
@@ -159,14 +158,14 @@ export default class PointsLayer extends CompositeLayer<PointsLayerProps> {
     private updateBoundingBox(reportBoundingBox: boolean) {
         if (
             this.state["dataAttributes"] &&
-            typeof this.props.setReportedBoundingBox === "function" &&
+            typeof this.props.reportBoundingBox === "function" &&
             reportBoundingBox
         ) {
             const boundingBox = defineBoundingBox(
                 this.state["dataAttributes"],
                 this.props.ZIncreasingDownwards
             );
-            this.props.setReportedBoundingBox(boundingBox);
+            this.props.reportBoundingBox({ layerBoundingBox: boundingBox });
         }
     }
 }

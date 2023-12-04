@@ -33,7 +33,10 @@ import {
     removeDuplicates,
 } from "./utils/spline";
 import { interpolateNumberArray } from "d3";
-import type { DeckGLLayerContext } from "../../components/Map";
+import type {
+    ReportBoundingBoxAction,
+    DeckGLLayerContext,
+} from "../../components/Map";
 import type {
     ContinuousLegendDataType,
     DiscreteLegendDataType,
@@ -74,8 +77,8 @@ function onDataLoad(
     }
 ): void {
     const bbox = GetBoundingBox(data as unknown as FeatureCollection);
-    if (typeof context.layer.props.setReportedBoundingBox !== "undefined") {
-        context.layer.props.setReportedBoundingBox(bbox);
+    if (typeof context.layer.props.reportBoundingBox !== "undefined") {
+        context.layer.props.reportBoundingBox({ layerBoundingBox: bbox });
     }
 }
 
@@ -114,6 +117,9 @@ export interface WellsLayerProps extends ExtendedLayerProps {
      *   Useful for example during panning and rotation to gain speed.
      */
     simplifiedRendering: boolean;
+
+    // Non public properties:
+    reportBoundingBox?: React.Dispatch<ReportBoundingBoxAction>;
 }
 
 const defaultProps = {
