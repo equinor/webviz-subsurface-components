@@ -14,25 +14,77 @@ import {fsShader} from "./fragment.glsl";
 
 export type WellMarkersLayerProps = _WellMarkersLayerProps & LayerProps;
 
+/**
+ * Input data of the layer.
+ */
 export type WellMarkerDataT = {
+    /**
+     * Position of a marker center.
+     */
     position: Position;
+
+    /**
+     * Size of a marker in size units.
+     */
     size: number;
+    /**
+     * Azimuth of the a marker in degrees.
+     */
     azimuth: number;
+    /**
+     * Inclination of a marker against vertical direcion in degrees.
+     */
     inclination: number;
+    /**
+     * Fill color of a marker.
+     */
     color: Color;    
+    /**
+     * Outline color of a marker.
+     */
     outlineColor: Color;
 }
-
 export interface _WellMarkersLayerProps extends ExtendedLayerProps {
 
+    /**
+     * Shape of the markers.
+     * @default 'circle'
+     */
     shape: "triangle" | "circle" | "square";
+    /**
+     * The units of the marker size, one of `'meters'`, `'common'`, and `'pixels'`.
+     * @default 'meters'
+    */
     sizeUnits: Unit;
+     /**  If true means that input z values are interpreted as depths.
+     * For example depth of z = 1000 corresponds to -1000 on the z axis.
+     * @default 'true'
+     */
     ZIncreasingDownwards: boolean;
+
+    /**
+     * Center position accessor.
+     */
     getPosition?: Accessor<WellMarkerDataT, Position>; 
+    /**
+     * Size accessor.
+     */
     getSize?:Accessor<WellMarkerDataT, number>;  
+    /**
+     * Azimuth accessor.
+     */
     getAzimuth?: Accessor<WellMarkerDataT, number>;
+    /**
+     * Inclination accessor.
+     */
     getInclination?: Accessor<WellMarkerDataT, number>;
+    /**
+     * Color accessor.
+     */
     getColor?: Accessor<WellMarkerDataT, Color>;
+    /**
+     * Outline color accessor.
+     */
     getOutlineColor?: Accessor<WellMarkerDataT, Color>;        
 }
 
@@ -63,7 +115,7 @@ const defaultProps: DefaultProps<WellMarkersLayerProps> = {
     shape: "circle",
     sizeUnits: "meters",
     visible: true, 
-    ZIncreasingDownwards: false,
+    ZIncreasingDownwards: true,
     getPosition: {type: 'accessor', value: (x: WellMarkerDataT) => { return x.position}},
     getSize: {type: 'accessor', value: (x: WellMarkerDataT) => { return x.size}},
     getAzimuth:  {type: 'accessor', value: (x: WellMarkerDataT) => { return x.azimuth}},
