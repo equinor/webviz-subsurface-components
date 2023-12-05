@@ -1,6 +1,6 @@
 {
     "name": "@webviz/subsurface-viewer",
-    "version": "0.5.8",
+    "version": "0.8.2",
     "description": "",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -22,7 +22,7 @@
     "license": "MPL-2.0",
     "dependencies": {
         "@deck.gl/core": "^8.9.32",
-        "@emerson-eps/color-tables": "^0.4.61",
+        "@emerson-eps/color-tables": "^0.4.71",
         "@equinor/eds-core-react": "^0.33.0",
         "@equinor/eds-icons": "^0.19.1",
         "@nebula.gl/layers": "^1.0.4",
@@ -35,7 +35,7 @@
         "d3": "^7.8.2",
         "d3-color": "^3.1.0",
         "d3-format": "^3.1.0",
-        "deck.gl": "^8.9.31",
+        "deck.gl": "^8.9.32",
         "gl-matrix": "^3.4.3",
         "lodash": "^4.17.21",
         "mathjs": "^9.4.2",

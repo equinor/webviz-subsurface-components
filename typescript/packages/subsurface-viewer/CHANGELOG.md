@@ -1,3 +1,52 @@
+## [0.8.2](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.8.1...subsurface-viewer@0.8.2) (2023-12-04)
+
+
+### Bug Fixes
+
+* bump @equinor/videx-wellog from 0.8.0 to 0.8.1 in /typescript ([#1811](https://github.com/equinor/webviz-subsurface-components/issues/1811)) ([0e6a423](https://github.com/equinor/webviz-subsurface-components/commit/0e6a423b32bdcb1ac78597932ec0821687851dde))
+
+## [0.8.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.8.0...subsurface-viewer@0.8.1) (2023-11-30)
+
+
+### Bug Fixes
+
+* bump deck.gl from 8.9.31 to 8.9.32 in /typescript ([#1800](https://github.com/equinor/webviz-subsurface-components/issues/1800)) ([393230c](https://github.com/equinor/webviz-subsurface-components/commit/393230c28e4946d9d210ed4a7e33c893fee87bf0))
+
+# [0.8.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.7.0...subsurface-viewer@0.8.0) (2023-11-24)
+
+
+### Features
+
+* **PointsLayer:**  ZIncreasingDownwards is applied in vertex shader, depthTest flag added ([#1787](https://github.com/equinor/webviz-subsurface-components/issues/1787)) ([99151f4](https://github.com/equinor/webviz-subsurface-components/commit/99151f48a3eadbd9ecd5c4ca9868f44be392ce1f))
+
+# [0.7.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.6.0...subsurface-viewer@0.7.0) (2023-11-15)
+
+
+### Features
+
+* Enable left click to specify camera anchor/rotation point [#1775](https://github.com/equinor/webviz-subsurface-components/issues/1775) ([#1776](https://github.com/equinor/webviz-subsurface-components/issues/1776)) ([533f527](https://github.com/equinor/webviz-subsurface-components/commit/533f527938442d82298bc97effd4bd914da2f27e))
+
+# [0.6.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.5.10...subsurface-viewer@0.6.0) (2023-11-14)
+
+
+### Features
+
+* Side projection extension ([#1772](https://github.com/equinor/webviz-subsurface-components/issues/1772)) ([68f8b2b](https://github.com/equinor/webviz-subsurface-components/commit/68f8b2be8dbc9adfdcd006a5b57b3335d4337dfd))
+
+## [0.5.10](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.5.9...subsurface-viewer@0.5.10) (2023-11-13)
+
+
+### Bug Fixes
+
+* bump to latest @emerson-eps/color-tables ([#1770](https://github.com/equinor/webviz-subsurface-components/issues/1770)) ([e67a285](https://github.com/equinor/webviz-subsurface-components/commit/e67a2856eced8f987bc61fa4a0a924b5a4886992))
+
+## [0.5.9](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.5.8...subsurface-viewer@0.5.9) (2023-11-13)
+
+
+### Bug Fixes
+
+* honor deck.gl extensions in MapLayer ([#1769](https://github.com/equinor/webviz-subsurface-components/issues/1769)) ([40d8092](https://github.com/equinor/webviz-subsurface-components/commit/40d8092987cec356be386271746f7a028dc354b1))
+
 ## [0.5.8](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.5.7...subsurface-viewer@0.5.8) (2023-11-10)
 
 

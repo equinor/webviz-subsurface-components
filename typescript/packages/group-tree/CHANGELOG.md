@@ -1,3 +1,24 @@
+## [1.0.7](https://github.com/equinor/webviz-subsurface-components/compare/group-tree@1.0.6...group-tree@1.0.7) (2023-12-04)
+
+
+### Bug Fixes
+
+* bump @equinor/videx-wellog from 0.8.0 to 0.8.1 in /typescript ([#1811](https://github.com/equinor/webviz-subsurface-components/issues/1811)) ([0e6a423](https://github.com/equinor/webviz-subsurface-components/commit/0e6a423b32bdcb1ac78597932ec0821687851dde))
+
+## [1.0.6](https://github.com/equinor/webviz-subsurface-components/compare/group-tree@1.0.5...group-tree@1.0.6) (2023-11-30)
+
+
+### Bug Fixes
+
+* bump deck.gl from 8.9.31 to 8.9.32 in /typescript ([#1800](https://github.com/equinor/webviz-subsurface-components/issues/1800)) ([393230c](https://github.com/equinor/webviz-subsurface-components/commit/393230c28e4946d9d210ed4a7e33c893fee87bf0))
+
+## [1.0.5](https://github.com/equinor/webviz-subsurface-components/compare/group-tree@1.0.4...group-tree@1.0.5) (2023-11-13)
+
+
+### Bug Fixes
+
+* bump to latest @emerson-eps/color-tables ([#1770](https://github.com/equinor/webviz-subsurface-components/issues/1770)) ([e67a285](https://github.com/equinor/webviz-subsurface-components/commit/e67a2856eced8f987bc61fa4a0a924b5a4886992))
+
 ## [1.0.4](https://github.com/equinor/webviz-subsurface-components/compare/group-tree@1.0.3...group-tree@1.0.4) (2023-11-09)
 
 
