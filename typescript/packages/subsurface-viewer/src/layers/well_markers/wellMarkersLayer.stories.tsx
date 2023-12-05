@@ -1,11 +1,10 @@
-/* eslint-disable prettier/prettier */
 import React from "react";
 import { create, all } from "mathjs";
 
 import type { StoryFn, Meta } from "@storybook/react";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 
-import type { WellMarkerDataT } from "./wellMarkersLayer" 
+import type { WellMarkerDataT } from "./wellMarkersLayer";
 
 export default {
     component: SubsurfaceViewer,
@@ -40,36 +39,35 @@ const randomFunc = ((): TRandomNumberFunc => {
     return (max: number) => Math.random() * max;
 })();
 
-const generateMarkers = () : WellMarkerDataT[] => {
-
+const generateMarkers = (): WellMarkerDataT[] => {
     const N = 40;
-    const M = 40; 
+    const M = 40;
 
-    const dN = 2 * Math.PI / N;
-    const dM = 5 * Math.PI / M;
+    const dN = (2 * Math.PI) / N;
+    const dM = (5 * Math.PI) / M;
 
-    const res : WellMarkerDataT[] = [];
+    const res: WellMarkerDataT[] = [];
 
     for (let i = 0; i < N; ++i) {
         for (let j = 0; j < M; ++j) {
-            const x = -N/2 + i;
-            const y = -M/2 + j;
-            const az   = dN * i;
+            const x = -N / 2 + i;
+            const y = -M / 2 + j;
+            const az = dN * i;
             const incl = dM * j;
 
-            const z = 5 * (Math.sin (incl)*Math.cos(az));
-            res.push ({
+            const z = 5 * (Math.sin(incl) * Math.cos(az));
+            res.push({
                 position: [x, y, z],
-                azimuth: az * 180.0 / Math.PI,
-                inclination: Math.asin (Math.cos(incl)) * 180.0 / Math.PI,
-                color: [randomFunc (255), randomFunc(255), randomFunc (255), 100],
+                azimuth: (az * 180.0) / Math.PI,
+                inclination: (Math.asin(Math.cos(incl)) * 180.0) / Math.PI,
+                color: [randomFunc(255), randomFunc(255), randomFunc(255), 100],
                 outlineColor: [0, 0, 100, 255],
-                size: 0.02 * Math.sqrt (x * x + y * y)
-            })
+                size: 0.02 * Math.sqrt(x * x + y * y),
+            });
         }
     }
     return res;
-}
+};
 
 export const WellMarkers = Template.bind({});
 
@@ -90,7 +88,7 @@ WellMarkers.args = {
             "@@type": "AxesLayer",
             id: "well-markers-axes",
             bounds: [-25, -25, -25, 25, 25, 25],
-            ZIncreasingDownwards: false,            
+            ZIncreasingDownwards: false,
         },
         {
             "@@type": "NorthArrow3DLayer",
@@ -102,10 +100,8 @@ WellMarkers.args = {
             pickable: true,
             shape: "circle",
             sizeUnits: "common",
-            data: generateMarkers (),      
+            data: generateMarkers(),
         },
-
     ],
 };
 WellMarkers.parameters = parameters;
-
