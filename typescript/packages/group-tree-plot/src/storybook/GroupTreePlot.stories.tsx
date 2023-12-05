@@ -11,23 +11,18 @@ import {
 /**
  * Storybook test for the group tree plot component
  */
-export default {
-    component: GroupTreePlot,
-    title: "GroupTreePlot/Demo",
-    argTypes: {
-        selectedDateTime: {
-            description:
-                "The selected `string` must be a date time present in one of the `dates` arrays in an element of the`datedTrees`-prop.",
-        },
-        selectedEdgeKey: {
-            description:
-                "The selection `string` must be an edge key present in one of the `edge_data` objects in the `tree`-prop of an element in `datedTrees`-prop.",
-        },
-        selectedNodeKey: {
-            description:
-                "The selected `string` must be a node key present in one of the `node_data` objects in the `tree`-prop of an element in `datedTrees`-prop.",
-        },
-    },
+const Template = (args) => {
+    return (
+        <GroupTreePlot
+            id={args.id}
+            datedTrees={args.datedTrees}
+            edgeMetadataList={args.edgeMetadataList}
+            nodeMetadataList={args.nodeMetadataList}
+            selectedDateTime={args.selectedDateTime}
+            selectedEdgeKey={args.selectedEdgeKey}
+            selectedNodeKey={args.selectedNodeKey}
+        />
+    );
 };
 
 const edgeMetadataList: EdgeMetadata[] = [
@@ -44,20 +39,6 @@ const nodeMetadataList: NodeMetadata[] = [
     { key: "wmctl", label: "Missing label", unit: "Unknown unit" },
 ];
 
-const Template = (args) => {
-    return (
-        <GroupTreePlot
-            id={args.id}
-            datedTrees={args.datedTrees}
-            edgeMetadataList={args.edgeMetadataList}
-            nodeMetadataList={args.nodeMetadataList}
-            selectedDateTime={args.selectedDateTime}
-            selectedEdgeKey={args.selectedEdgeKey}
-            selectedNodeKey={args.selectedNodeKey}
-        />
-    );
-};
-
 export const Default = Template.bind({});
 Default.args = {
     id: "grouptreeplot",
@@ -65,6 +46,30 @@ Default.args = {
     edgeMetadataList: edgeMetadataList,
     nodeMetadataList: nodeMetadataList,
     selectedDateTime: exampleDates[0],
-    selectedEdgeKey: "waterrate",
-    selectedNodeKey: "pressure",
+    selectedEdgeKey: edgeMetadataList[0].key,
+    selectedNodeKey: nodeMetadataList[0].key,
+};
+export default {
+    component: GroupTreePlot,
+    title: "GroupTreePlot/Demo",
+    argTypes: {
+        selectedDateTime: {
+            control: "select",
+            options: exampleDates,
+            description:
+                "The selected `string` must be a date time present in one of the `dates` arrays in an element of the`datedTrees`-prop.\n\n **Note:** The options for the date select in this storybook is not updated when the `datedTrees`-prop is updated.\n\n",
+        },
+        selectedEdgeKey: {
+            control: "select",
+            options: edgeMetadataList.map((elm) => elm.key),
+            description:
+                "The selection `string` must be an edge key present in one of the `edge_data` objects in the `tree`-prop of an element in `datedTrees`-prop.\n\n **Note:** The options for the edge key select in this storybook is not updated when the `edgeMetadataList`-prop is updated.\n\n",
+        },
+        selectedNodeKey: {
+            control: "select",
+            options: nodeMetadataList.map((elm) => elm.key),
+            description:
+                "The selected `string` must be a node key present in one of the `node_data` objects in the `tree`-prop of an element in `datedTrees`-prop.\n\n **Note:** The options for the node key select in this storybook is not updated when the `nodeMetadataList`-prop is updated.\n\n",
+        },
+    },
 };

@@ -53,10 +53,10 @@ export default class GroupTreeAssembler {
         // Map from property to [label/name, unit]
         const metadataList = [...edgeMetadataList, ...nodeMetadataList];
         this._propertyToLabelMap = new Map();
-        metadataList.forEach((key) => {
-            this._propertyToLabelMap.set(key.name, [
-                key.label ?? "",
-                key.unit ?? "",
+        metadataList.forEach((elm) => {
+            this._propertyToLabelMap.set(elm.key, [
+                elm.label ?? "",
+                elm.unit ?? "",
             ]);
         });
 
