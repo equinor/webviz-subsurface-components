@@ -14,7 +14,7 @@ import type {
 } from "@deck.gl/core/typed";
 import { OrthographicView, OrbitView, PointLight } from "@deck.gl/core/typed";
 import type { Feature, FeatureCollection } from "geojson";
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import JSON_CONVERTER_CONFIG from "../utils/configuration";
 import type { WellsPickInfo } from "../layers/wells/wellsLayer";
 import InfoCard from "./InfoCard";
@@ -456,8 +456,8 @@ export interface MapMouseEvent {
 }
 
 export function useHoverInfo(): [PickingInfo[], EventCallback] {
-    const [hoverInfo, setHoverInfo] = React.useState<PickingInfo[]>([]);
-    const callback = React.useCallback((pickEvent: MapMouseEvent) => {
+    const [hoverInfo, setHoverInfo] = useState<PickingInfo[]>([]);
+    const callback = useCallback((pickEvent: MapMouseEvent) => {
         setHoverInfo(pickEvent.infos);
     }, []);
     return [hoverInfo, callback];
@@ -605,9 +605,7 @@ const Map: React.FC<MapProps> = ({
     lights,
     triggerResetMultipleWells,
 }: MapProps) => {
-    const deckRef = useRef<DeckGLRef>(null);
-
-    const bboxInitial: BoundingBox3D = [0, 0, 0, 1, 1, 1];
+    const deckRef = React.useRef<DeckGLRef>(null);
 
     // From react doc, ref should not be read nor modified during rendering.
     // Extract the needed size in an effect to respect this rule (which proved true)
@@ -634,15 +632,13 @@ const Map: React.FC<MapProps> = ({
 
     const [dataBoundingBox3d, dispatchBoundingBox] = React.useReducer(
         mapBoundingBoxReducer,
-        bboxInitial
+        [0, 0, 0, 1, 1, 1]
     );
 
     const [viewStateChanged, setViewStateChanged] = useState<boolean>(false);
 
-    const [camera, setCamera] = useState<ViewStateType>();
-    React.useEffect(() => {
-        const camera = calculateZoomFromBBox3D(cameraPosition, deckSize);
-        setCamera(camera);
+    const camera = useMemo<ViewStateType>(() => {
+        return calculateZoomFromBBox3D(cameraPosition, deckSize);
     }, [cameraPosition, deckSize]);
 
     // Used for scaling in z direction using arrow keys.
