@@ -72,14 +72,6 @@ export interface SubsurfaceViewerProps {
         cssStyle?: Record<string, unknown> | null;
     };
     coordinateUnit?: Unit;
-    toolbar?: {
-        visible?: boolean | null;
-    };
-    legend?: {
-        visible?: boolean | null;
-        cssStyle?: Record<string, unknown> | null;
-        horizontal?: boolean | null;
-    };
     colorTables?: colorTablesArray;
     editedData?: Record<string, unknown>;
     setProps?: (data: Record<string, unknown>) => void;
@@ -137,14 +129,6 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
     coords,
     scale,
     coordinateUnit,
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    legend,
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    toolbar,
     colorTables,
     editedData,
     setProps,
@@ -359,34 +343,6 @@ SubsurfaceViewer.propTypes = {
      * Unit for the scale ruler
      */
     coordinateUnit: PropTypes.oneOf(convert().possibilities()),
-
-    /**
-     * @obsolete Toolbar should be added as annotation. This prop has no function.
-     */
-    toolbar: PropTypes.shape({
-        /**
-         * Toggle toolbar visibility
-         */
-        visible: PropTypes.bool,
-    }),
-
-    /**
-     * @obsolete Legends should be added as annotations. This prop has no function.
-     */
-    legend: PropTypes.shape({
-        /**
-         * Toggle component visibility.
-         */
-        visible: PropTypes.bool,
-        /**
-         * Legend css style can be used for positioning.
-         */
-        cssStyle: PropTypes.objectOf(PropTypes.any),
-        /**
-         * Orientation of color legend
-         */
-        horizontal: PropTypes.bool,
-    }),
 
     /**
      * Prop containing color table data
