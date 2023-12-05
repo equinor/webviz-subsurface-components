@@ -54,22 +54,16 @@ export default {
     title: "GroupTreePlot/Demo",
     argTypes: {
         selectedDateTime: {
-            control: "select",
-            options: exampleDates,
             description:
-                "The selected `string` must be a date time present in one of the `dates` arrays in an element of the`datedTrees`-prop.\n\n **Note:** The options for the date select in this storybook is not updated when the `datedTrees`-prop is updated.\n\n",
+                "The selected `string` must be a date time present in one of the `dates` arrays in an element of the`datedTrees`-prop.\n\n",
         },
         selectedEdgeKey: {
-            control: "select",
-            options: edgeMetadataList.map((elm) => elm.key),
             description:
-                "The selection `string` must be an edge key present in one of the `edge_data` objects in the `tree`-prop of an element in `datedTrees`-prop.\n\n **Note:** The options for the edge key select in this storybook is not updated when the `edgeMetadataList`-prop is updated.\n\n",
+                "The selection `string` must be an edge key present in one of the `edge_data` objects in the `tree`-prop of an element in `datedTrees`-prop.\n\n",
         },
         selectedNodeKey: {
-            control: "select",
-            options: nodeMetadataList.map((elm) => elm.key),
             description:
-                "The selected `string` must be a node key present in one of the `node_data` objects in the `tree`-prop of an element in `datedTrees`-prop.\n\n **Note:** The options for the node key select in this storybook is not updated when the `nodeMetadataList`-prop is updated.\n\n",
+                "The selected `string` must be a node key present in one of the `node_data` objects in the `tree`-prop of an element in `datedTrees`-prop.\n\n",
         },
     },
 };
