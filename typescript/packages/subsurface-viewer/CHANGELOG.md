@@ -1,3 +1,10 @@
+# [0.9.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.8.2...subsurface-viewer@0.9.0) (2023-12-05)
+
+
+### Features
+
+* Well Markers Layer ([#1818](https://github.com/equinor/webviz-subsurface-components/issues/1818)) ([194ec51](https://github.com/equinor/webviz-subsurface-components/commit/194ec5101506f9253177c2da1f892aab7c1e0401))
+
 ## [0.8.2](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.8.1...subsurface-viewer@0.8.2) (2023-12-04)
 
 
