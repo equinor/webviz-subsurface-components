@@ -695,9 +695,7 @@ const CustomTabPanel: React.FC<TabPanelProps> = (props: TabPanelProps) => {
             {...other}
         >
             {(value === index || renderHiddenTabs) && (
-                <Box sx={{ p: 3 }}>
-                    <Typography>{children}</Typography>
-                </Box>
+                <Box sx={{ p: 3 }}>{children}</Box>
             )}
         </div>
     );
@@ -708,6 +706,22 @@ const a11yProps = (index: number) => {
         id: `simple-tab-${index}`,
         "aria-controls": `simple-tabpanel-${index}`,
     };
+};
+
+const SubsurfaceWrapper: React.FC<SubsurfaceViewerProps> = (
+    props: SubsurfaceViewerProps
+) => {
+    return (
+        <div
+            style={{
+                height: "65vh",
+                //width: "50vw",
+                position: "relative",
+            }}
+        >
+            <SubsurfaceViewer {...props} />
+        </div>
+    );
 };
 
 type ViewerTabsProps = SubsurfaceViewerProps & { renderHiddenTabs: boolean };
@@ -742,45 +756,21 @@ const ViewerTabs: React.FC<ViewerTabsProps> = (
                         index={0}
                         renderHiddenTabs={props.renderHiddenTabs}
                     >
-                        <div
-                            style={{
-                                height: "65vh",
-                                //width: "50vw",
-                                position: "relative",
-                            }}
-                        >
-                            {<SubsurfaceViewer {...props} />}
-                        </div>
+                        <SubsurfaceWrapper {...props} />
                     </CustomTabPanel>
                     <CustomTabPanel
                         value={value}
                         index={1}
                         renderHiddenTabs={props.renderHiddenTabs}
                     >
-                        <div
-                            style={{
-                                height: "65vh",
-                                //width: "50vw",
-                                position: "relative",
-                            }}
-                        >
-                            {<SubsurfaceViewer {...props} />}
-                        </div>
+                        <SubsurfaceWrapper {...props} />
                     </CustomTabPanel>
                     <CustomTabPanel
                         value={value}
                         index={2}
                         renderHiddenTabs={props.renderHiddenTabs}
                     >
-                        <div
-                            style={{
-                                height: "65vh",
-                                //width: "50vw",
-                                position: "relative",
-                            }}
-                        >
-                            {<SubsurfaceViewer {...props} />}
-                        </div>
+                        <SubsurfaceWrapper {...props} />
                     </CustomTabPanel>
                 </Box>
             </Box>
