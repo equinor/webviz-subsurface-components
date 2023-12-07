@@ -7,7 +7,6 @@ import exampleData from "../../../../../example-data/deckgl-map.json";
 
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 
 const PREFIX = "Default";
