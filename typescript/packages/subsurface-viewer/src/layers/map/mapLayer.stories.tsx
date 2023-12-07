@@ -1,6 +1,6 @@
 import type { SyntheticEvent } from "react";
 import React from "react";
-import { ComponentMeta } from "@storybook/react";
+import type { ComponentMeta } from "@storybook/react";
 import { styled } from "@mui/material/styles";
 import type { BoundingBox3D, ViewsType } from "../../components/Map";
 import { useHoverInfo } from "../../components/Map";

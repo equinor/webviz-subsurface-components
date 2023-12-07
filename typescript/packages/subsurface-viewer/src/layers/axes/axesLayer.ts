@@ -578,9 +578,7 @@ function GetTickLines(
     return [lines, tick_labels];
 }
 
-function GetBoxLines(
-    bounds: BoundingBox3D
-): number[] {
+function GetBoxLines(bounds: BoundingBox3D): number[] {
     const x_min = bounds[0];
     const x_max = bounds[3];
 

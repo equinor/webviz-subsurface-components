@@ -3,7 +3,6 @@ import type { DeckGLRef } from "@deck.gl/react/typed";
 import DeckGL from "@deck.gl/react/typed";
 import type {
     Color,
-    Deck,
     Layer,
     LayersList,
     LayerProps,
@@ -622,6 +621,7 @@ const Map: React.FC<MapProps> = ({
                 height: deckRef.current.deck.height,
             });
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [deckRef.current?.deck?.width, deckRef.current?.deck?.height]);
 
     // Deck.gl View's and viewStates as input to Deck.gl
@@ -637,7 +637,7 @@ const Map: React.FC<MapProps> = ({
 
     const [viewStateChanged, setViewStateChanged] = useState<boolean>(false);
 
-    const camera = useMemo<ViewStateType>(() => {
+    const camera = useMemo<ViewStateType | undefined>(() => {
         return calculateZoomFromBBox3D(cameraPosition, deckSize);
     }, [cameraPosition, deckSize]);
 
@@ -1310,7 +1310,7 @@ function getViewState(
 function getViewState3D(
     is3D: boolean,
     bounds: BoundingBox3D,
-    zoom?: number,
+    zoom: number | undefined,
     size: Size
 ): ViewStateType {
     const xMin = bounds[0];
@@ -1374,15 +1374,15 @@ function createViewsAndViewStates(
     const mPixels = views?.marginPixels ?? 0;
 
     const isOk: boolean =
-        views &&
-        Object.keys(views).length !== 0 &&
-        views.layout[0] >= 1 &&
-        views.layout[1] >= 1 &&
+        views?.layout !== undefined &&
+        views?.layout?.[0] >= 1 &&
+        views?.layout?.[1] >= 1 &&
         widthViewPort > 0 &&
         heightViewPort > 0;
 
     // if props for multiple viewport are not proper, or deck size is not yet initialized, return 2d view
-    if (!isOk) {
+    // add redundant check on views to please lint
+    if (!views || !isOk) {
         deckgl_views.push(
             new OrthographicView({
                 id: "main",
