@@ -1,3 +1,10 @@
+## [0.9.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.9.0...subsurface-viewer@0.9.1) (2023-12-07)
+
+
+### Bug Fixes
+
+* Use double click to center component on mouse position. ([#1821](https://github.com/equinor/webviz-subsurface-components/issues/1821)) ([25448b5](https://github.com/equinor/webviz-subsurface-components/commit/25448b5b306b51b2d4513e9d956faa18e26ec4bd))
+
 # [0.9.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.8.2...subsurface-viewer@0.9.0) (2023-12-05)
 
 
