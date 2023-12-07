@@ -850,7 +850,12 @@ const Map: React.FC<MapProps> = ({
             infos: PickingInfo[],
             event: MjolnirEvent
         ): void => {
-            if ((event as MjolnirPointerEvent).leftButton) {
+            if (
+                (event as MjolnirPointerEvent).leftButton &&
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
+                event.tapCount == 2 // Note. Detect double click.
+            ) {
                 // Left button click identifies new camera rotation anchor.
                 const viewstateKeys = Object.keys(viewStates);
                 if (infos.length >= 1 && viewstateKeys.length === 1) {
