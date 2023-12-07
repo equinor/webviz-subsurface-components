@@ -789,10 +789,6 @@ const ViewerTabs: React.FC<ViewerTabsProps> = (
 };
 
 export const ViewTabs: StoryFn<typeof ViewerTabs> = (args) => {
-    const props = {
-        ...args,
-    };
-
     return (
         <Root>
             <ViewerTabs {...args}></ViewerTabs>
