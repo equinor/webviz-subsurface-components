@@ -6,6 +6,10 @@ import type {
     ExtendedLayerProps,
     colorMapFunctionType,
 } from "../utils/layerTools";
+import type {
+    BoundingBox3D,
+    ReportBoundingBoxAction,
+} from "../../components/Map";
 import { makeFullMesh } from "./webworker";
 import { isEqual } from "lodash";
 import { load, JSONLoader } from "@loaders.gl/core";
@@ -16,9 +20,7 @@ export type WebWorkerParams = {
     properties: Float32Array;
 };
 
-function GetBBox(
-    points: Float32Array
-): [number, number, number, number, number, number] {
+function GetBBox(points: Float32Array): BoundingBox3D {
     let xmax = -99999999;
     let ymax = -99999999;
     let zmax = -99999999;
@@ -84,9 +86,6 @@ async function load_data(
 }
 
 export interface Grid3DLayerProps extends ExtendedLayerProps {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    setReportedBoundingBox?: any;
-
     /**  Url, or native, or typed javascript array. Set of points.
      * [x1, y1, z1, x2, y2, z2, ...]
      */
@@ -155,6 +154,9 @@ export interface Grid3DLayerProps extends ExtendedLayerProps {
      *   For example depth of z = 1000 corresponds to -1000 on the z axis. Default true.
      */
     ZIncreasingDownwards: boolean;
+
+    // Non public properties:
+    reportBoundingBox?: React.Dispatch<ReportBoundingBoxAction>;
 }
 
 const defaultProps = {
@@ -226,10 +228,10 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
                 });
 
                 if (
-                    typeof this.props.setReportedBoundingBox !== "undefined" &&
+                    typeof this.props.reportBoundingBox !== "undefined" &&
                     reportBoundingBox
                 ) {
-                    this.props.setReportedBoundingBox(bbox);
+                    this.props.reportBoundingBox({ layerBoundingBox: bbox });
                 }
 
                 webWorker.terminate();

@@ -11,6 +11,7 @@ import type {
     ExtendedLayerProps,
     colorMapFunctionType,
 } from "../utils/layerTools";
+import type { ReportBoundingBoxAction } from "../../components/Map";
 import { getModelMatrix } from "../utils/layerTools";
 import { isEqual } from "lodash";
 import * as png from "@vivaxy/png";
@@ -187,9 +188,6 @@ async function loadMeshAndProperties(
 }
 
 export interface MapLayerProps extends ExtendedLayerProps {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    setReportedBoundingBox?: any;
-
     /**  Url to the height (z values) mesh.
      */
     meshUrl: string; // Deprecated
@@ -286,6 +284,9 @@ export interface MapLayerProps extends ExtendedLayerProps {
      * For example depth of z = 1000 corresponds to -1000 on the z axis. Default true.
      */
     ZIncreasingDownwards: boolean;
+
+    // Non public properties:
+    reportBoundingBox?: React.Dispatch<ReportBoundingBoxAction>;
 }
 
 const defaultProps = {
@@ -366,7 +367,7 @@ export default class MapLayer<
             });
 
             if (
-                typeof this.props.setReportedBoundingBox !== "undefined" &&
+                typeof this.props.reportBoundingBox !== "undefined" &&
                 reportBoundingBox
             ) {
                 const xinc = this.props.frame?.increment?.[0] ?? 0;
@@ -400,14 +401,9 @@ export default class MapLayer<
                 const y_min = Math.min(y0, y1, y2, y3);
                 const y_max = Math.max(y0, y1, y2, y3);
 
-                this.props.setReportedBoundingBox([
-                    x_min,
-                    y_min,
-                    zMin,
-                    x_max,
-                    y_max,
-                    zMax,
-                ]);
+                this.props.reportBoundingBox({
+                    layerBoundingBox: [x_min, y_min, zMin, x_max, y_max, zMax],
+                });
             }
 
             this.setState({

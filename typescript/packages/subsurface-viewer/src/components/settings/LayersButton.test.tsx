@@ -10,7 +10,15 @@ import LayersButton from "./LayersButton";
 
 import exampleData from "../../../../../../example-data/deckgl-map.json";
 
-const testLayers: Record<string, unknown>[] = exampleData[0].layers;
+// Ensure layers have an id (which is not stored un the example data) to avoid react error messages
+const testLayers: Record<string, unknown>[] = exampleData[0].layers.map(
+    (layer) => {
+        if (layer["id"] === undefined) {
+            layer["id"] = layer["@@type"];
+        }
+        return layer;
+    }
+);
 
 describe("test 'layers' button", () => {
     it("snapshot test", () => {

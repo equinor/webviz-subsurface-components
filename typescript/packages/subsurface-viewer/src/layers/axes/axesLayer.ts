@@ -11,6 +11,10 @@ import {
 } from "@deck.gl/core/typed";
 import BoxLayer from "./boxLayer";
 import type { Position3D, ExtendedLayerProps } from "../utils/layerTools";
+import type {
+    BoundingBox3D,
+    ReportBoundingBoxAction,
+} from "../../components/Map";
 import { TextLayer } from "@deck.gl/layers/typed";
 import { cloneDeep } from "lodash";
 
@@ -20,7 +24,7 @@ export interface AxesLayerProps extends ExtendedLayerProps {
      *  Note that z values are default interptreted as going downwards. See property "ZIncreasingDownwards".
      *  So by default zmax is expected to be bigger than zmin.
      */
-    bounds: [number, number, number, number, number, number];
+    bounds: BoundingBox3D;
     labelColor?: Color;
     labelFontSize?: number;
     fontFamily?: string;
@@ -32,9 +36,7 @@ export interface AxesLayerProps extends ExtendedLayerProps {
     ZIncreasingDownwards: boolean;
 
     // Non public properties:
-    setReportedBoundingBox?: React.Dispatch<
-        React.SetStateAction<[number, number, number, number, number, number]>
-    >;
+    reportBoundingBox?: React.Dispatch<ReportBoundingBoxAction>;
 }
 
 const defaultProps = {
@@ -99,10 +101,10 @@ export default class AxesLayer extends CompositeLayer<AxesLayerProps> {
         this.setState({ box_lines, tick_lines, textlayerData });
 
         if (
-            typeof this.props.setReportedBoundingBox !== "undefined" &&
+            typeof this.props.reportBoundingBox !== "undefined" &&
             reportBoundingBox
         ) {
-            this.props.setReportedBoundingBox(bounds);
+            this.props.reportBoundingBox({ layerBoundingBox: bounds });
         }
     }
 
@@ -242,7 +244,7 @@ function maketextLayerData(
     is_orthographic: boolean,
     tick_lines: number[],
     tick_labels: string[],
-    bounds: [number, number, number, number, number, number],
+    bounds: BoundingBox3D,
     labelFontSize?: number
 ): [TextLayerData] {
     const x_min = bounds[0];
@@ -351,7 +353,7 @@ function GetTicks(
 function GetTickLines(
     isZIncreasingDownwards: boolean,
     is_orthographic: boolean,
-    bounds: [number, number, number, number, number, number],
+    bounds: BoundingBox3D,
     viewport: Viewport
 ): [number[], string[]] {
     const ndecimals = 0;
@@ -576,9 +578,7 @@ function GetTickLines(
     return [lines, tick_labels];
 }
 
-function GetBoxLines(
-    bounds: [number, number, number, number, number, number]
-): number[] {
+function GetBoxLines(bounds: BoundingBox3D): number[] {
     const x_min = bounds[0];
     const x_max = bounds[3];
 
