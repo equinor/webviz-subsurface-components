@@ -1,3 +1,10 @@
+## [0.9.2](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.9.1...subsurface-viewer@0.9.2) (2023-12-08)
+
+
+### Bug Fixes
+
+* camera state when hidden page is rendered ([#1819](https://github.com/equinor/webviz-subsurface-components/issues/1819)) ([422325e](https://github.com/equinor/webviz-subsurface-components/commit/422325e2e47d4a776d4d308f37234fc51d362ece)), closes [#1820](https://github.com/equinor/webviz-subsurface-components/issues/1820)
+
 ## [0.9.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.9.0...subsurface-viewer@0.9.1) (2023-12-07)
 
 
