@@ -130,6 +130,11 @@
             "type": "object",
             "properties": {
                 "title": { "type": "string" },
+                "width": {
+                    "type": "number",
+                    "default": 1.0,
+                    "description": "relative track width"
+                },
                 "required": { "type": "boolean" },
                 "scale": { "$ref": "#/definitions/scale_type" },
                 "domain": { "$ref": "#/definitions/domain" },
