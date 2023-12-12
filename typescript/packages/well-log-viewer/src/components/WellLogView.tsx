@@ -95,16 +95,14 @@ function showSelection(
         const pinelm1 = pinelm.firstElementChild as HTMLElement;
         let min, max;
         if (vPin < vCur) {
-            pinelm1.style[
-                horizontal ? "left" : "top"
-            ] = `${rubberBandOffset}px`;
+            pinelm1.style[horizontal ? "left" : "top"] =
+                `${rubberBandOffset}px`;
             pinelm1.style[horizontal ? "right" : "bottom"] = "";
             min = vPin;
             max = vCur;
         } else {
-            pinelm1.style[
-                horizontal ? "right" : "bottom"
-            ] = `${rubberBandOffset}px`;
+            pinelm1.style[horizontal ? "right" : "bottom"] =
+                `${rubberBandOffset}px`;
             pinelm1.style[horizontal ? "left" : "top"] = "";
             min = vCur;
             max = vPin;
