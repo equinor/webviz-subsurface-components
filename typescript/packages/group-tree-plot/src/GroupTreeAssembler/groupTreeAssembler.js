@@ -17,10 +17,10 @@ import { cloneDeep } from "lodash";
 
 /**
  * Class to assemble Group tree visualization. Creates an _svg, and appends to the
- * assigned HTML element. Draws the tree provided as tree_data with the current flow rate,
+ * assigned HTML element. Draws the tree provided in datedTrees with the current flow rate,
  * node info and date time.
  *
- * Provides methods to update selected date time, and change flow rate and node info. *
+ * Provides methods to update selected date time, and change flow rate and node info.
  */
 export default class GroupTreeAssembler {
     /**

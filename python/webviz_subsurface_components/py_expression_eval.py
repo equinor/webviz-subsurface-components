@@ -33,6 +33,7 @@ GitHub: https://github.com/AxiaCore/py-expression-eval/
 Based on js-expression-eval, by Matthew Crumley
 https://github.com/silentmatt/js-expression-eval
 """
+
 import re
 
 import numpy as np

@@ -14,13 +14,13 @@ const GroupTreeComponent = React.lazy(() =>
 );
 
 export const GroupTree = (props) => {
+    const { edge_metadata_list, node_metadata_list, ...rest } = props;
     return (
         <React.Suspense fallback={<div>Loading...</div>}>
             <GroupTreeComponent
-                id={props.id}
-                data={props.data}
-                edgeMetadataList={props.edge_metadata_list}
-                nodeMetadataList={props.node_metadata_list}
+                edgeMetadataList={edge_metadata_list}
+                nodeMetadataList={node_metadata_list}
+                {...rest}
             />
         </React.Suspense>
     );
