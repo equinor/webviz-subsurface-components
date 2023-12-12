@@ -1,3 +1,10 @@
+# [0.3.0](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.2.7...wsc-common@0.3.0) (2023-12-12)
+
+
+### Features
+
+* WellLogView: Add relative width option in track template  ([#1827](https://github.com/equinor/webviz-subsurface-components/issues/1827)) ([efd9b6e](https://github.com/equinor/webviz-subsurface-components/commit/efd9b6eea5a9b1723f95e2ffe12ffe20a9bdb383)), closes [#1790](https://github.com/equinor/webviz-subsurface-components/issues/1790)
+
 ## [0.2.7](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.2.6...wsc-common@0.2.7) (2023-12-04)
 
 
