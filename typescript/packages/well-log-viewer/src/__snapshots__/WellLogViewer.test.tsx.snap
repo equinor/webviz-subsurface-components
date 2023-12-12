@@ -74,7 +74,7 @@ exports[`Test Well Log Viewer Component snapshot test 1`] = `
               </div>
               <div
                 class="track"
-                style="display: flex; flex: 3;"
+                style="display: flex; flex: 6;"
               >
                 <div
                   class="track-container"

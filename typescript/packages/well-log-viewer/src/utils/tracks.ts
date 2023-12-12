@@ -1277,7 +1277,7 @@ function addGraphTrack(
             data: plotDatas,
             plots: plots,
         };
-        setGraphTrackOptionFromTemplate(options, templateTrack);
+        setGraphTrackOptionsFromTemplate(options, templateTrack);
         options.label = label;
 
         const track = newGraphTrack(options);
@@ -1362,7 +1362,7 @@ function addStackedTrack(
         legendConfig: stackLegendConfig,
         data: createStackData.bind(null, plotData.data, colorTable, meta),
     };
-    setStackedTrackOptionFromTemplate(options, templateTrackFullPlot);
+    setStackedTrackOptionsFromTemplate(options, templateTrackFullPlot);
     const track = newStackedTrack(options);
     updateStackedTrackScale(track);
     info.tracks.push(track);
@@ -1465,34 +1465,39 @@ function addTrack(
     }
 }
 
-function setGraphTrackOptionFromTemplate(
-    options: GraphTrackOptions,
+// Base for Graph and Stacked Options
+function setTrackOptionsFromTemplate(
+    options: TrackOptions,
     templateTrack: TemplateTrack
 ): void {
     options.label = templateTrack.title;
+    if (templateTrack.width !== undefined) options.width = templateTrack.width;
+
+    (options as TrackOptionsEx).__template = deepCopy(templateTrack);
+}
+function setGraphTrackOptionsFromTemplate(
+    options: GraphTrackOptions,
+    templateTrack: TemplateTrack
+): void {
     {
         if (templateTrack.scale) options.scale = templateTrack.scale;
         else delete options.scale;
     }
     //if (force || templateTrack.domain) options.domain = templateTrack.domain;
 
-    (options as TrackOptionsEx).__template = JSON.parse(
-        JSON.stringify(templateTrack)
-    );
+    setTrackOptionsFromTemplate(options, templateTrack);
 }
-function setStackedTrackOptionFromTemplate(
+function setStackedTrackOptionsFromTemplate(
     options: StackedTrackOptions,
     templateTrack: TemplateTrack
 ): void {
-    options.label = templateTrack.title;
-
     const plot = templateTrack.plots[0];
     if (plot) {
         options.showLabels = plot.showLabels;
         options.showLines = plot.showLines;
     }
 
-    (options as TrackOptionsEx).__template = deepCopy(templateTrack);
+    setTrackOptionsFromTemplate(options, templateTrack);
 }
 
 export function addOrEditGraphTrack(
@@ -1504,14 +1509,14 @@ export function addOrEditGraphTrack(
 ): GraphTrack {
     if (track) {
         // edit existing track
-        setGraphTrackOptionFromTemplate(track.options, templateTrack);
+        setGraphTrackOptionsFromTemplate(track.options, templateTrack);
         updateGraphTrackScale(track);
     } else {
         const options: GraphTrackOptions = {
             plots: [],
             data: [],
         };
-        setGraphTrackOptionFromTemplate(options, templateTrack);
+        setGraphTrackOptionsFromTemplate(options, templateTrack);
         track = newGraphTrack(options);
         addTrack(wellLogView, track, trackCurrent, bAfter);
     }
@@ -1568,7 +1573,7 @@ export function addOrEditStackedTrack(
         track.options.abbr = name; // name of the only plot
         track.options.data = stackData;
         track.data = track.options.data;
-        setStackedTrackOptionFromTemplate(track.options, templateTrack);
+        setStackedTrackOptionsFromTemplate(track.options, templateTrack);
         updateStackedTrackScale(track);
         if (wellLogView.logController) wellLogView.logController.refresh();
     } else {
@@ -1577,7 +1582,7 @@ export function addOrEditStackedTrack(
             data: stackData,
             legendConfig: stackLegendConfig,
         };
-        setStackedTrackOptionFromTemplate(options, templateTrack);
+        setStackedTrackOptionsFromTemplate(options, templateTrack);
         track = newStackedTrack(options);
         addTrack(wellLogView, track, trackCurrent, bAfter);
     }

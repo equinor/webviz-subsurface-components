@@ -47,6 +47,13 @@ export interface TemplatePlot extends TemplatePlotProps {
 export type TemplateTrack = {
     title: string;
     required?: boolean;
+    /**
+     * Relative track width when used in a LogController, i.e. a track with width set to
+     * 3 will be three times wider than tracks set to width 1.
+     *
+     * Default is 1
+     */
+    width?: number;
     plots: TemplatePlot[];
     scale?: TemplatePlotScaleTypes; // 'linear' or 'log', default first plot scale
     domain?: [number, number]; // min, max values, default all plots domain
