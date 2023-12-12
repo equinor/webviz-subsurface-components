@@ -35,7 +35,7 @@
         "@mui/material": "^5.11",
         "@reduxjs/toolkit": "^1.7.2",
         "@webviz/core-components": "^0.6.2",
-        "@webviz/group-tree": "file:../typescript/packages/group-tree",
+        "@webviz/group-tree-plot": "file:../typescript/packages/group-tree-plot",
         "@webviz/subsurface-viewer": "file:../typescript/packages/subsurface-viewer",
         "@webviz/well-completions-plot": "file:../typescript/packages/well-completions-plot",
         "@webviz/well-log-viewer": "file:../typescript/packages/well-log-viewer",

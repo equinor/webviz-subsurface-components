@@ -1,21 +1,25 @@
 import React from "react";
 import PropTypes from "prop-types";
 
+import {
+    DatedTreePropTypes,
+    EdgeMetadataPropTypes,
+    NodeMetadataPropTypes,
+} from "@webviz/group-tree-plot";
+
 const GroupTreeComponent = React.lazy(() =>
-    import(/* webpackChunkName: "webviz-group-tree" */ "@webviz/group-tree")
+    import(
+        /* webpackChunkName: "webviz-group-tree" */ "./components/GroupTreeComponent"
+    )
 );
 
-const GroupTree = (props) => {
-    const {
-        edge_options: edgeOptions,
-        node_options: nodeOptions,
-        ...rest
-    } = props;
+export const GroupTree = (props) => {
+    const { edge_metadata_list, node_metadata_list, ...rest } = props;
     return (
         <React.Suspense fallback={<div>Loading...</div>}>
             <GroupTreeComponent
-                edgeOptions={edgeOptions}
-                nodeOptions={nodeOptions}
+                edgeMetadataList={edge_metadata_list}
+                nodeMetadataList={node_metadata_list}
                 {...rest}
             />
         </React.Suspense>
@@ -29,15 +33,17 @@ GroupTree.propTypes = {
      * components in an app.
      */
     id: PropTypes.string.isRequired,
+
     /**
      * Array of JSON objects describing group tree data.
      */
-    data: PropTypes.arrayOf(PropTypes.object),
+    data: PropTypes.arrayOf(DatedTreePropTypes),
 
-    edge_options: PropTypes.arrayOf(PropTypes.object),
-    node_options: PropTypes.arrayOf(PropTypes.object),
+    /**
+     * Arrays of metadata. Used in drop down selectors and tree visualization.
+     */
+    edge_metadata_list: EdgeMetadataPropTypes,
+    node_metadata_list: NodeMetadataPropTypes,
 };
 
 GroupTree.displayName = "GroupTree";
-
-export default GroupTree;

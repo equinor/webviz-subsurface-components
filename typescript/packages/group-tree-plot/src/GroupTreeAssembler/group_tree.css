@@ -1,0 +1,59 @@
+.link {
+    fill: none;
+    stroke: #5c5c5c;
+    opacity: 1;
+}
+
+.grouptree_link {
+    opacity: 0.3;
+}
+
+.grouptree_link__oilrate {
+    stroke: #60be6c;
+}
+
+.grouptree_link__waterrate {
+    stroke: #0d1b9e;
+}
+
+.grouptree_link__gasrate {
+    stroke: #c5221c;
+}
+
+.grouptree_link__waterinjrate {
+    stroke: #00c3ff;
+}
+
+.grouptree_link__gasinjrate {
+    stroke: #d6397a;
+}
+
+.grouptree__node {
+    fill: #fff;
+    stroke: #60be6c;
+    stroke-width: 1px;
+    cursor: default;
+}
+
+.grouptree__nodelabel {
+    font-size: 10px;
+    font-family: sans-serif;
+}
+
+.grouptree__pressurelabel {
+    font-size: 10px;
+    font-family: "Statoil Sans Light", Lucida, Arial, Helvetica, sans-serif;
+}
+
+.grouptree__pressureunit {
+    font-size: 9px;
+}
+
+.grouptree__grupnet_text {
+    font-size: 12px;
+}
+
+.grouptree__node--withchildren {
+    stroke-width: 2.5px;
+    cursor: pointer;
+}

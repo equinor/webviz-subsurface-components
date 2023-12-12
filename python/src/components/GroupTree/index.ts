@@ -1,1 +1,1 @@
-export { default } from "./GroupTree";
+export { GroupTree } from "./GroupTree";

@@ -1,0 +1,30 @@
+/*
+This css is to override default slider css styling for the date time slider
+*/
+
+.slider,
+.slider-inset,
+.slider-overlay {
+    stroke-linecap: round;
+}
+
+.slider {
+    stroke-width: 8px;
+}
+
+.slider-inset {
+    stroke: #b20276;
+    stroke-width: 8px;
+}
+
+.slider-overlay {
+    pointer-events: stroke;
+    cursor: pointer;
+}
+
+.handle {
+    fill: #fff;
+    stroke: #b20276;
+    stroke-opacity: 0.5;
+    stroke-width: 1.25px;
+}
