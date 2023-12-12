@@ -1471,7 +1471,7 @@ function setTrackOptionsFromTemplate(
     templateTrack: TemplateTrack
 ): void {
     options.label = templateTrack.title;
-    options.width = templateTrack.width !== undefined ? templateTrack.width : 1;
+    if (templateTrack.width !== undefined) options.width = templateTrack.width;
 
     (options as TrackOptionsEx).__template = deepCopy(templateTrack);
 }
