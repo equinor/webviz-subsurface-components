@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/equinor/webviz-subsurface-components/compare/well-completions-plot@1.0.7...well-completions-plot@1.1.0) (2023-12-12)
+
+
+### Features
+
+* Split GroupTree into GroupTreePlot-component and settings ([#1794](https://github.com/equinor/webviz-subsurface-components/issues/1794)) ([ef07441](https://github.com/equinor/webviz-subsurface-components/commit/ef07441041f20f360393237ea2e1484355451260))
+
 ## [1.0.7](https://github.com/equinor/webviz-subsurface-components/compare/well-completions-plot@1.0.6...well-completions-plot@1.0.7) (2023-12-04)
 
 
