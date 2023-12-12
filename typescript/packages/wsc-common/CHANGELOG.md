@@ -1,3 +1,10 @@
+# [0.4.0](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.3.0...wsc-common@0.4.0) (2023-12-12)
+
+
+### Features
+
+* Split GroupTree into GroupTreePlot-component and settings ([#1794](https://github.com/equinor/webviz-subsurface-components/issues/1794)) ([ef07441](https://github.com/equinor/webviz-subsurface-components/commit/ef07441041f20f360393237ea2e1484355451260))
+
 # [0.3.0](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.2.7...wsc-common@0.3.0) (2023-12-12)
 
 
