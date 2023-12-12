@@ -20,10 +20,10 @@ import type {
 } from "./components/WellLogTemplateTypes";
 
 import type { WellLog } from "./components/WellLogTypes";
-import welllogsJson from "./demo/example-data/volve_logs.json";
+import welllogsJson from "../../../../example-data/volve_logs.json";
 const welllogs = welllogsJson as unknown as WellLog[];
 
-import templateJson from "./demo/example-data/welllog_template_2.json";
+import templateJson from "../../../../example-data/welllog_template_2.json";
 const template = templateJson as unknown as Template;
 
 import type { ColorTable } from "./components/ColorTableTypes";
@@ -42,8 +42,8 @@ import { deepCopy } from "./utils/deepcopy";
 import type { WellLogViewOptions } from "./components/WellLogView";
 import { isEqualRanges } from "./components/WellLogView";
 
-import wellPicks from "./demo/example-data/wellpicks.json";
-import colorTables from "./demo/example-data/wellpick_colors.json";
+import wellPicks from "../../../../example-data/wellpicks.json";
+import colorTables from "../../../../example-data/wellpick_colors.json";
 
 import { axisTitles, axisMnemos } from "./utils/axes";
 

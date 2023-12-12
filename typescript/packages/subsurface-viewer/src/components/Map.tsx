@@ -3,7 +3,6 @@ import type { DeckGLRef } from "@deck.gl/react/typed";
 import DeckGL from "@deck.gl/react/typed";
 import type {
     Color,
-    Deck,
     Layer,
     LayersList,
     LayerProps,
@@ -14,7 +13,7 @@ import type {
 } from "@deck.gl/core/typed";
 import { OrthographicView, OrbitView, PointLight } from "@deck.gl/core/typed";
 import type { Feature, FeatureCollection } from "geojson";
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import JSON_CONVERTER_CONFIG from "../utils/configuration";
 import type { WellsPickInfo } from "../layers/wells/wellsLayer";
 import InfoCard from "./InfoCard";
@@ -53,6 +52,11 @@ import type { MjolnirGestureEvent } from "mjolnir.js";
  * 3D bounding box defined as [xmin, ymin, zmin, xmax, ymax, zmax].
  */
 export type BoundingBox3D = [number, number, number, number, number, number];
+
+type Size = {
+    width: number;
+    height: number;
+};
 
 const minZoom3D = -12;
 const maxZoom3D = 12;
@@ -179,6 +183,14 @@ function addBoundingBoxes(b1: BoundingBox3D, b2: BoundingBox3D): BoundingBox3D {
     return [xmin, ymin, zmin, xmax, ymax, zmax];
 }
 
+export type ReportBoundingBoxAction = { layerBoundingBox: BoundingBox3D };
+function mapBoundingBoxReducer(
+    mapBoundingBox: BoundingBox3D,
+    action: ReportBoundingBoxAction
+): BoundingBox3D {
+    return addBoundingBoxes(mapBoundingBox, action.layerBoundingBox);
+}
+
 function boundingBoxCenter(box: BoundingBox3D): [number, number, number] {
     const xmin = box[0];
     const ymin = box[1];
@@ -289,7 +301,7 @@ export interface ViewStateType {
     transitionDuration?: number;
 }
 
-interface marginsType {
+interface MarginsType {
     left: number;
     right: number;
     top: number;
@@ -330,8 +342,22 @@ export interface MapProps {
 
     /**
      * Coordinate boundary for the view defined as [left, bottom, right, top].
+     * Should be used for 2D view only.
      */
     bounds?: [number, number, number, number] | BoundsAccessor;
+
+    /**
+     * Camera state for the view defined as [left, bottom, right, top].
+     * Should be used for 3D view only.
+     * If the zoom is given as a 3D bounding box, the camera state is computed to
+     * display the full box.
+     */
+    cameraPosition?: ViewStateType;
+
+    /**
+     * If changed will reset view settings (bounds or camera) to default position.
+     */
+    triggerHome?: number;
 
     /**
      * Views configuration for map. If not specified, all the layers will be
@@ -402,10 +428,6 @@ export interface MapProps {
     onDragStart?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
     onDragEnd?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
 
-    /**
-     * If changed will reset camera to default position.
-     */
-    triggerHome?: number;
     triggerResetMultipleWells?: number;
     selection?: {
         well: string | undefined;
@@ -417,7 +439,6 @@ export interface MapProps {
     children?: React.ReactNode;
 
     getTooltip?: TooltipCallback;
-    cameraPosition?: ViewStateType;
 }
 
 export interface MapMouseEvent {
@@ -434,8 +455,8 @@ export interface MapMouseEvent {
 }
 
 export function useHoverInfo(): [PickingInfo[], EventCallback] {
-    const [hoverInfo, setHoverInfo] = React.useState<PickingInfo[]>([]);
-    const callback = React.useCallback((pickEvent: MapMouseEvent) => {
+    const [hoverInfo, setHoverInfo] = useState<PickingInfo[]>([]);
+    const callback = useCallback((pickEvent: MapMouseEvent) => {
         setHoverInfo(pickEvent.infos);
     }, []);
     return [hoverInfo, callback];
@@ -469,7 +490,7 @@ function adjustCameraTarget(
 
 function calculateZoomFromBBox3D(
     camera: ViewStateType | undefined,
-    deck?: Deck
+    size: Size
 ): ViewStateType | undefined {
     const DEGREES_TO_RADIANS = Math.PI / 180;
     const RADIANS_TO_DEGREES = 180 / Math.PI;
@@ -481,14 +502,11 @@ function calculateZoomFromBBox3D(
         return camera;
     }
 
-    if (!deck?.width || !deck?.height) {
+    if (size.width === 0 || size.height === 0) {
         camera_.zoom = 0;
         camera_.target = [0, 0, 0];
         return camera_;
     }
-
-    const width = deck.width;
-    const height = deck.height;
 
     // camera fov eye position. see deck.gl file orbit-viewports.ts
     const fovy = 50; // default in deck.gl. May also be set construction OrbitView
@@ -512,9 +530,9 @@ function calculateZoomFromBBox3D(
 
     const cameraFovVertical = 50;
     const angle_ver = (cameraFovVertical / 2) * DEGREES_TO_RADIANS;
-    const L = height / 2 / Math.sin(angle_ver);
+    const L = size.height / 2 / Math.sin(angle_ver);
     const r = L * Math.cos(angle_ver);
-    const cameraFov = 2 * Math.atan(width / 2 / r) * RADIANS_TO_DEGREES;
+    const cameraFov = 2 * Math.atan(size.width / 2 / r) * RADIANS_TO_DEGREES;
     const angle_hor = (cameraFov / 2) * DEGREES_TO_RADIANS;
 
     const points: [number, number, number][] = [];
@@ -529,9 +547,9 @@ function calculateZoomFromBBox3D(
 
     let zoom = 999;
     for (const point of points) {
-        const x_ = (point[0] - target[0]) / height;
-        const y_ = (point[1] - target[1]) / height;
-        const z_ = (point[2] - target[2]) / height;
+        const x_ = (point[0] - target[0]) / size.height;
+        const y_ = (point[1] - target[1]) / size.height;
+        const z_ = (point[2] - target[2]) / size.height;
 
         const m = new Matrix4(IDENTITY);
         m.rotateX(camera_.rotationX * DEGREES_TO_RADIANS);
@@ -566,6 +584,8 @@ const Map: React.FC<MapProps> = ({
     id,
     layers,
     bounds,
+    cameraPosition,
+    triggerHome,
     views,
     coords,
     scale,
@@ -577,18 +597,32 @@ const Map: React.FC<MapProps> = ({
     selection,
     children,
     getTooltip = defaultTooltip,
-    cameraPosition,
     getCameraPosition,
     isRenderedCallback,
     onDragStart,
     onDragEnd,
-    triggerHome,
     lights,
     triggerResetMultipleWells,
 }: MapProps) => {
-    const deckRef = useRef<DeckGLRef>(null);
+    const deckRef = React.useRef<DeckGLRef>(null);
 
-    const bboxInitial: BoundingBox3D = [0, 0, 0, 1, 1, 1];
+    // From react doc, ref should not be read nor modified during rendering.
+    // Extract the needed size in an effect to respect this rule (which proved true)
+    const [deckSize, setDeckSize] = useState<Size>({ width: 0, height: 0 });
+    useEffect(() => {
+        if (
+            deckRef.current?.deck?.width &&
+            deckRef.current?.deck?.height &&
+            deckRef.current.deck.width !== deckSize.width &&
+            deckRef.current.deck.height !== deckSize.height
+        ) {
+            setDeckSize({
+                width: deckRef.current.deck.width,
+                height: deckRef.current.deck.height,
+            });
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [deckRef.current?.deck?.width, deckRef.current?.deck?.height]);
 
     // Deck.gl View's and viewStates as input to Deck.gl
     const [deckGLViews, setDeckGLViews] = useState<View[]>([]);
@@ -596,30 +630,16 @@ const Map: React.FC<MapProps> = ({
         {}
     );
 
-    const [reportedBoundingBox, setReportedBoundingBox] =
-        useState<BoundingBox3D>(bboxInitial);
-    const [reportedBoundingBoxAcc, setReportedBoundingBoxAcc] =
-        useState<BoundingBox3D>(bboxInitial);
-
-    const [deckGLLayers, setDeckGLLayers] = useState<LayersList>([]);
+    const [dataBoundingBox3d, dispatchBoundingBox] = React.useReducer(
+        mapBoundingBoxReducer,
+        [0, 0, 0, 1, 1, 1]
+    );
 
     const [viewStateChanged, setViewStateChanged] = useState<boolean>(false);
 
-    const [viewPortMargins, setViewPortMargins] = useState<marginsType>({
-        left: 0,
-        right: 0,
-        top: 0,
-        bottom: 0,
-    });
-
-    const [camera, setCamera] = useState<ViewStateType>();
-    React.useEffect(() => {
-        const camera = calculateZoomFromBBox3D(
-            cameraPosition,
-            deckRef.current?.deck
-        );
-        setCamera(camera);
-    }, [cameraPosition, deckRef?.current?.deck]);
+    const camera = useMemo<ViewStateType | undefined>(() => {
+        return calculateZoomFromBBox3D(cameraPosition, deckSize);
+    }, [cameraPosition, deckSize]);
 
     // Used for scaling in z direction using arrow keys.
     const [scaleZ, setScaleZ] = useState<number>(1);
@@ -640,8 +660,8 @@ const Map: React.FC<MapProps> = ({
             viewPortMargins,
             bounds,
             undefined, // Use bounds not cameraPosition,
-            reportedBoundingBoxAcc,
-            deckRef.current?.deck
+            dataBoundingBox3d,
+            deckSize
         );
 
         setDeckGLViews(Views);
@@ -664,15 +684,15 @@ const Map: React.FC<MapProps> = ({
             viewPortMargins,
             bounds,
             camera,
-            reportedBoundingBoxAcc,
-            deckRef.current?.deck
+            dataBoundingBox3d,
+            deckSize
         );
 
         setDeckGLViews(Views);
         setViewStates(viewStates);
         setViewStateChanged(false);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [reportedBoundingBoxAcc]);
+    }, [dataBoundingBox3d]);
 
     useEffect(() => {
         const [Views, viewStates] = createViewsAndViewStates(
@@ -680,8 +700,8 @@ const Map: React.FC<MapProps> = ({
             viewPortMargins,
             bounds,
             camera,
-            reportedBoundingBoxAcc,
-            deckRef.current?.deck
+            dataBoundingBox3d,
+            deckSize
         );
 
         setDeckGLViews(Views);
@@ -691,19 +711,10 @@ const Map: React.FC<MapProps> = ({
     }, [
         bounds,
         camera,
-        deckRef?.current?.deck,
+        deckSize,
         // eslint-disable-next-line react-hooks/exhaustive-deps
         compareViewsProp(views),
     ]);
-
-    useEffect(() => {
-        const union_of_reported_bboxes = addBoundingBoxes(
-            reportedBoundingBoxAcc,
-            reportedBoundingBox
-        );
-        setReportedBoundingBoxAcc(union_of_reported_bboxes);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [reportedBoundingBox]);
 
     useEffect(() => {
         if (scaleZUp !== Number.MAX_VALUE) {
@@ -726,85 +737,6 @@ const Map: React.FC<MapProps> = ({
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [scaleZDown]);
-
-    useEffect(() => {
-        if (typeof layers === "undefined") {
-            return;
-        }
-
-        if (layers.length === 0) {
-            // Empty layers array makes deck.gl set deckRef to undefined (no opengl context).
-            // Hence insert dummy layer.
-            const dummy_layer = new LineLayer({
-                id: "webviz_internal_dummy_layer",
-                visible: false,
-            });
-            layers.push(dummy_layer);
-        }
-
-        // Margins on the viewport are extracted from a potenial axes2D layer.
-        const axes2DLayer = layers?.find((e) => {
-            return e?.constructor === Axes2DLayer;
-        }) as Axes2DLayer;
-
-        const left =
-            axes2DLayer && axes2DLayer.props.isLeftRuler
-                ? axes2DLayer.props.marginH
-                : 0;
-        const right =
-            axes2DLayer && axes2DLayer.props.isRightRuler
-                ? axes2DLayer.props.marginH
-                : 0;
-        const top =
-            axes2DLayer && axes2DLayer.props.isTopRuler
-                ? axes2DLayer.props.marginV
-                : 0;
-        const bottom =
-            axes2DLayer && axes2DLayer.props.isBottomRuler
-                ? axes2DLayer.props.marginV
-                : 0;
-
-        setViewPortMargins({ left, right, top, bottom });
-
-        const layers_copy = layers.map((item) => {
-            if (item?.constructor.name === NorthArrow3DLayer.name) {
-                return item;
-            }
-
-            // Inject "setReportedBoundingBox" function into layer for it to report
-            // back its respective bounding box.
-            return (item as Layer).clone({
-                // eslint-disable-next-line
-                // @ts-ignore
-                setReportedBoundingBox: setReportedBoundingBox,
-            });
-        });
-
-        setDeckGLLayers(layers_copy);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [layers]);
-
-    useEffect(() => {
-        if (typeof layers === "undefined") {
-            return;
-        }
-
-        const m = getModelMatrixScale(scaleZ);
-
-        const layers_copy = deckGLLayers.map((item) => {
-            if (item?.constructor.name === NorthArrow3DLayer.name) {
-                return item;
-            }
-
-            // Set "modelLayer" matrix to reflect correct z scaling.
-            return (item as Layer).clone({
-                modelMatrix: m,
-            });
-        });
-
-        setDeckGLLayers(layers_copy);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [scaleZ]);
 
     useEffect(() => {
         const layers = deckRef.current?.deck?.props.layers;
@@ -918,7 +850,12 @@ const Map: React.FC<MapProps> = ({
             infos: PickingInfo[],
             event: MjolnirEvent
         ): void => {
-            if ((event as MjolnirPointerEvent).leftButton) {
+            if (
+                (event as MjolnirPointerEvent).leftButton &&
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-expect-error
+                event.tapCount == 2 // Note. Detect double click.
+            ) {
                 // Left button click identifies new camera rotation anchor.
                 const viewstateKeys = Object.keys(viewStates);
                 if (infos.length >= 1 && viewstateKeys.length === 1) {
@@ -961,6 +898,62 @@ const Map: React.FC<MapProps> = ({
         },
         [callOnMouseEvent, getPickingInfos]
     );
+
+    // compute the viewport margins
+    const viewPortMargins = React.useMemo<MarginsType>(() => {
+        if (typeof layers === "undefined") {
+            return {
+                left: 0,
+                right: 0,
+                top: 0,
+                bottom: 0,
+            };
+        }
+        // Margins on the viewport are extracted from a potential axes2D layer.
+        const axes2DLayer = layers?.find((e) => {
+            return e?.constructor === Axes2DLayer;
+        }) as Axes2DLayer;
+
+        const axes2DProps = axes2DLayer?.props;
+        return {
+            left: axes2DProps?.isLeftRuler ? axes2DProps.marginH : 0,
+            right: axes2DProps?.isRightRuler ? axes2DProps.marginH : 0,
+            top: axes2DProps?.isTopRuler ? axes2DProps.marginV : 0,
+            bottom: axes2DProps?.isBottomRuler ? axes2DProps.marginV : 0,
+        };
+    }, [layers]);
+
+    const deckGLLayers = React.useMemo<LayersList>(() => {
+        if (typeof layers === "undefined") {
+            return [];
+        }
+        if (layers.length === 0) {
+            // Empty layers array makes deck.gl set deckRef to undefined (no OpenGL context).
+            // Hence insert dummy layer.
+            const dummy_layer = new LineLayer({
+                id: "webviz_internal_dummy_layer",
+                visible: false,
+            });
+            layers.push(dummy_layer);
+        }
+
+        const m = getModelMatrixScale(scaleZ);
+
+        return layers.map((item) => {
+            if (item?.constructor.name === NorthArrow3DLayer.name) {
+                return item;
+            }
+
+            return (item as Layer).clone({
+                // Inject "dispatchBoundingBox" function into layer for it to report back its respective bounding box.
+                // eslint-disable-next-line
+                // @ts-ignore
+                reportBoundingBox: dispatchBoundingBox,
+                // Set "modelLayer" matrix to reflect correct z scaling.
+                modelMatrix: m,
+            });
+        });
+    }, [layers, scaleZ]);
 
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
     const onAfterRender = useCallback(() => {
@@ -1029,7 +1022,7 @@ const Map: React.FC<MapProps> = ({
         ({ viewId, viewState }: { viewId: string; viewState: any }) => {
             const viewports = views?.viewports || [];
             if (viewState.target.length === 2) {
-                // In orthograpic mode viewState.target contains only x and y. Add existing z value.
+                // In orthographic mode viewState.target contains only x and y. Add existing z value.
                 viewState.target.push(viewStates[viewId].target[2]);
             }
             const isSyncIds = viewports
@@ -1205,12 +1198,12 @@ export function jsonToObject(
 
 // return viewstate with computed bounds to fit the data in viewport
 function getViewState(
-    viewPortMargins: marginsType,
+    viewPortMargins: MarginsType,
     bounds_accessor: [number, number, number, number] | BoundsAccessor,
     centerOfData: [number, number, number],
     views: ViewsType | undefined,
     viewPort: ViewportType,
-    deck?: Deck
+    size: Size
 ): ViewStateType {
     let bounds = [0, 0, 1, 1];
     if (typeof bounds_accessor == "function") {
@@ -1228,7 +1221,7 @@ function getViewState(
     let fb_target = [fb.x, fb.y, z];
     let fb_zoom = fb.zoom;
 
-    if (deck && deck.width > 0 && deck.height > 0) {
+    if (size.width > 0 && size.height > 0) {
         // If there are margins/rulers in the viewport (axes2DLayer) we have to account for that.
         // Camera target should be in the middle of viewport minus the rulers.
         const w_bounds = w;
@@ -1243,8 +1236,8 @@ function getViewState(
         const marginH = (ml > 0 ? ml : 0) + (mr > 0 ? mr : 0);
         const marginV = (mb > 0 ? mb : 0) + (mt > 0 ? mt : 0);
 
-        w = deck.width - marginH; // width of the viewport minus margin.
-        h = deck.height - marginV;
+        w = size.width - marginH; // width of the viewport minus margin.
+        h = size.height - marginV;
 
         // Special case if matrix views.
         // Use width and heigt for a subview instead of full viewport.
@@ -1258,12 +1251,12 @@ function getViewState(
                 const h_ = 99.5 / nY;
 
                 const marginHorPercentage =
-                    100 * 100 * (mPixels / (w_ * deck.width)); //percentage of sub view
+                    100 * 100 * (mPixels / (w_ * size.width)); //percentage of sub view
                 const marginVerPercentage =
-                    100 * 100 * (mPixels / (h_ * deck.height));
+                    100 * 100 * (mPixels / (h_ * size.height));
 
-                const sub_w = (w_ / 100) * deck.width;
-                const sub_h = (h_ / 100) * deck.height;
+                const sub_w = (w_ / 100) * size.width;
+                const sub_h = (h_ / 100) * size.height;
 
                 w = sub_w * (1 - 2 * (marginHorPercentage / 100)) - marginH;
                 h = sub_h * (1 - 2 * (marginVerPercentage / 100)) - marginV;
@@ -1321,9 +1314,9 @@ function getViewState(
 // return viewstate with computed bounds to fit the data in viewport
 function getViewState3D(
     is3D: boolean,
-    bounds: [number, number, number, number, number, number],
-    zoom?: number,
-    deck?: Deck
+    bounds: BoundingBox3D,
+    zoom: number | undefined,
+    size: Size
 ): ViewStateType {
     const xMin = bounds[0];
     const yMin = bounds[1];
@@ -1335,9 +1328,9 @@ function getViewState3D(
 
     let width = xMax - xMin;
     let height = yMax - yMin;
-    if (deck && deck?.width > 0 && deck?.height > 0) {
-        width = deck.width;
-        height = deck.height;
+    if (size.width > 0 && size.height > 0) {
+        width = size.width;
+        height = size.height;
     }
 
     const target = [
@@ -1366,11 +1359,11 @@ function getViewState3D(
 // construct views and viewStates for DeckGL component
 function createViewsAndViewStates(
     views: ViewsType | undefined,
-    viewPortMargins: marginsType,
+    viewPortMargins: MarginsType,
     bounds: [number, number, number, number] | BoundsAccessor | undefined,
     cameraPosition: ViewStateType | undefined,
-    boundingBox: [number, number, number, number, number, number],
-    deck?: Deck
+    boundingBox: BoundingBox3D,
+    size: Size
 ): [View[], Record<string, ViewStateType>] {
     const deckgl_views: View[] = [];
     let viewStates: Record<string, ViewStateType> = {} as Record<
@@ -1380,22 +1373,21 @@ function createViewsAndViewStates(
 
     const centerOfData = boundingBoxCenter(boundingBox);
 
-    const widthViewPort = deck?.width ?? 1;
-    const heightViewPort = deck?.height ?? 1;
+    const widthViewPort = size.width;
+    const heightViewPort = size.height;
 
     const mPixels = views?.marginPixels ?? 0;
 
-    const isOk =
-        deck &&
-        views &&
-        Object.keys(views).length !== 0 &&
-        views.layout[0] >= 1 &&
-        views.layout[1] >= 1 &&
+    const isOk: boolean =
+        views?.layout !== undefined &&
+        views?.layout?.[0] >= 1 &&
+        views?.layout?.[1] >= 1 &&
         widthViewPort > 0 &&
         heightViewPort > 0;
 
-    // if props for multiple viewport are not proper, or deck is not yet initialized, return 2d view
-    if (!isOk) {
+    // if props for multiple viewport are not proper, or deck size is not yet initialized, return 2d view
+    // add redundant check on views to please lint
+    if (!views || !isOk) {
         deckgl_views.push(
             new OrthographicView({
                 id: "main",
@@ -1409,17 +1401,16 @@ function createViewsAndViewStates(
                 near: -99999,
             })
         );
-        viewStates = {
-            ...viewStates,
-            ["dummy"]: {
+        viewStates["dummy"] =
+            cameraPosition ??
+            ({
                 target: [0, 0],
                 zoom: 0,
                 rotationX: 0,
                 rotationOrbit: 0,
                 minZoom: minZoom2D,
                 maxZoom: maxZoom2D,
-            } as ViewStateType,
-        };
+            } as ViewStateType);
     } else {
         let yPos = 0;
         const [nY, nX] = views.layout;
@@ -1502,13 +1493,13 @@ function createViewsAndViewStates(
                               centerOfData,
                               views,
                               currentViewport,
-                              deck
+                              size
                           )
                         : getViewState3D(
                               currentViewport.show3D ?? false,
                               boundingBox,
                               currentViewport.zoom,
-                              deck
+                              size
                           );
                 }
 

@@ -1,3 +1,24 @@
+# [0.10.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.9.2...subsurface-viewer@0.10.0) (2023-12-12)
+
+
+### Features
+
+* WellLogView: Add relative width option in track template  ([#1827](https://github.com/equinor/webviz-subsurface-components/issues/1827)) ([efd9b6e](https://github.com/equinor/webviz-subsurface-components/commit/efd9b6eea5a9b1723f95e2ffe12ffe20a9bdb383)), closes [#1790](https://github.com/equinor/webviz-subsurface-components/issues/1790)
+
+## [0.9.2](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.9.1...subsurface-viewer@0.9.2) (2023-12-08)
+
+
+### Bug Fixes
+
+* camera state when hidden page is rendered ([#1819](https://github.com/equinor/webviz-subsurface-components/issues/1819)) ([422325e](https://github.com/equinor/webviz-subsurface-components/commit/422325e2e47d4a776d4d308f37234fc51d362ece)), closes [#1820](https://github.com/equinor/webviz-subsurface-components/issues/1820)
+
+## [0.9.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.9.0...subsurface-viewer@0.9.1) (2023-12-07)
+
+
+### Bug Fixes
+
+* Use double click to center component on mouse position. ([#1821](https://github.com/equinor/webviz-subsurface-components/issues/1821)) ([25448b5](https://github.com/equinor/webviz-subsurface-components/commit/25448b5b306b51b2d4513e9d956faa18e26ec4bd))
+
 # [0.9.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.8.2...subsurface-viewer@0.9.0) (2023-12-05)
 
 
