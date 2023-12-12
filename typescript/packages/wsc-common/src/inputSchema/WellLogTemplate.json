@@ -132,8 +132,8 @@
                 "title": { "type": "string" },
                 "width": {
                     "type": "number",
-                    "default": 1.0,
-                    "description": "relative track width"
+                    "default": 3.0,
+                    "description": "relative track width (default as in videx-wellog)"
                 },
                 "required": { "type": "boolean" },
                 "scale": { "$ref": "#/definitions/scale_type" },
