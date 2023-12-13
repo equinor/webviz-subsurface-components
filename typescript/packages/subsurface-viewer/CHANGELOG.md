@@ -1,3 +1,10 @@
+# [0.11.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.10.0...subsurface-viewer@0.11.0) (2023-12-12)
+
+
+### Features
+
+* Split GroupTree into GroupTreePlot-component and settings ([#1794](https://github.com/equinor/webviz-subsurface-components/issues/1794)) ([ef07441](https://github.com/equinor/webviz-subsurface-components/commit/ef07441041f20f360393237ea2e1484355451260))
+
 # [0.10.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.9.2...subsurface-viewer@0.10.0) (2023-12-12)
 
 
