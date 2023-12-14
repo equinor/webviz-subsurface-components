@@ -93,7 +93,7 @@
         "jest-environment-jsdom": "^29.7.0",
         "jest-styled-components": "^7.2.0",
         "json-schema": "^0.4.0",
-        "nx": "^16.3.2",
+        "nx": "^999.9.9",
         "postcss": "^8.4.31",
         "prettier": "^3.0.2",
         "process": "^0.11.10",
