@@ -228,8 +228,7 @@ function mapBoundingBoxReducer(
 
 // Exclude "layerIds" when monitoring changes to "view" prop as we do not
 // want to recalculate views when the layers change.
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function compareViewsProp(views: ViewsType | undefined): string | undefined {
     if (views === undefined) {
         return undefined;
