@@ -462,29 +462,30 @@ ScaleZ.parameters = {
     },
 };
 
+const ResetCameraPropertyDefaultCameraPosition = {
+    rotationOrbit: 0,
+    rotationX: 45,
+    target: [435775, 6478650, -2750],
+    zoom: -3.8,
+};
+
 export const ResetCameraProperty: ComponentStory<typeof SubsurfaceViewer> = (
     args
 ) => {
-    const [home, setHome] = React.useState<number>(0);
-    const [camera, setCamera] = React.useState({
-        rotationOrbit: 0,
-        rotationX: 45,
-        target: [435775, 6477650, -1750],
-        zoom: -3.8,
-    });
+    const [camera, setCamera] = React.useState(
+        () => args.cameraPosition ?? ResetCameraPropertyDefaultCameraPosition
+    );
 
-    const handleChange1 = () => {
-        setHome(home + 1);
-    };
-
-    const handleChange2 = () => {
-        setCamera({ ...camera, rotationOrbit: camera.rotationOrbit + 5 });
+    const handleChange = () => {
+        setCamera({
+            ...camera,
+            rotationOrbit: camera.rotationOrbit + 5,
+        });
     };
 
     const props = {
         ...args,
         cameraPosition: camera,
-        triggerHome: home,
     };
 
     return (
@@ -492,8 +493,7 @@ export const ResetCameraProperty: ComponentStory<typeof SubsurfaceViewer> = (
             <div className={classes.main}>
                 <SubsurfaceViewer {...props} />
             </div>
-            <button onClick={handleChange1}> Reset Camera to bounds</button>
-            <button onClick={handleChange2}> Change Camera </button>
+            <button onClick={handleChange}> Change Camera </button>
         </Root>
     );
 };
@@ -503,12 +503,7 @@ ResetCameraProperty.args = {
     layers: [axes_hugin, meshMapLayerPng, north_arrow_layer],
 
     bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
-    cameraPosition: {
-        rotationOrbit: 0,
-        rotationX: 80,
-        target: [435775, 6478650, -1750],
-        zoom: -3.5109619192773796,
-    },
+    cameraPosition: ResetCameraPropertyDefaultCameraPosition,
     views: DEFAULT_VIEWS,
 };
 
@@ -516,9 +511,7 @@ ResetCameraProperty.parameters = {
     docs: {
         ...defaultParameters.docs,
         description: {
-            story: `Example using optional 'triggerHome' property.
-                    When this property is changed camera will reset to home position.
-                    Using the button the property will change its value.`,
+            story: `Pressing the button 'Change Camera' does rotate it.`,
         },
     },
 };

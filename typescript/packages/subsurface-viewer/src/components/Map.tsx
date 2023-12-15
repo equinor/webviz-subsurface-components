@@ -521,18 +521,22 @@ const Map: React.FC<MapProps> = ({
         (x) => x + 1,
         0
     );
-    const [viewController, _] = useState(() => new ViewController(forceUpdate));
+    const viewController = useMemo(() => new ViewController(forceUpdate), []);
 
     // Extract the needed size from onResize function
     const [deckSize, setDeckSize] = useState<Size>({ width: 0, height: 0 });
-    const onResize = useCallback((size: { width: number; height: number }) => {
+    const onResize = useCallback((size: Size) => {
         // exclude {0, 0} size (when rendered hidden pages)
-        if (
-            size.width > 0 &&
-            size.height > 0 &&
-            (size.width !== deckSize.width || size.height !== deckSize.height)
-        ) {
-            setDeckSize(size);
+        if (size.width > 0 && size.height > 0) {
+            setDeckSize((prevSize: Size) => {
+                if (
+                    prevSize?.width !== size.width ||
+                    prevSize?.height !== size.height
+                ) {
+                    return size;
+                }
+                return prevSize;
+            });
         }
     }, []);
 
@@ -847,6 +851,7 @@ const Map: React.FC<MapProps> = ({
             zScale,
         };
         return viewController.getViews(views, state);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         triggerHome,
         cameraPosition,
@@ -1138,10 +1143,9 @@ class ViewController {
             return this.result_.viewState;
         }
 
-        let viewStateCloned = false;
-
         // initialize with last result
-        let viewState = this.result_.viewState;
+        const prevViewState = this.result_.viewState;
+        let viewState = prevViewState;
 
         if (updateViewState || isCacheEmpty) {
             viewState = buildDeckGlViewStates(
@@ -1152,7 +1156,6 @@ class ViewController {
                 state.bounds,
                 state.deckSize
             );
-            viewStateCloned = true;
             // reset state
             this.derivedState_.viewStateChanged = false;
         }
@@ -1168,10 +1171,9 @@ class ViewController {
             this.derivedState_.target &&
             viewStateKeys?.length === 1
         ) {
-            // force copy
-            if (!viewStateCloned) {
-                viewState = cloneDeep(viewState);
-                viewStateCloned = true;
+            // deep clone to notify change (memo checks object address)
+            if (viewState === prevViewState) {
+                viewState = cloneDeep(prevViewState);
             }
             // update target
             viewState[viewStateKeys[0]].target = this.derivedState_.target;
@@ -1180,10 +1182,9 @@ class ViewController {
             this.derivedState_.target = undefined;
         }
         if (updateZScale) {
-            // force copy
-            if (!viewStateCloned) {
-                viewState = cloneDeep(viewState);
-                viewStateCloned = true;
+            // deep clone to notify change (memo checks object address)
+            if (viewState === prevViewState) {
+                viewState = cloneDeep(prevViewState);
             }
             // Z scale to apply to target.
             // - if triggerHome: the target was recomputed from the input data (ie. without any scale applied)
