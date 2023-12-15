@@ -226,27 +226,6 @@ function mapBoundingBoxReducer(
     return boxUnion(mapBoundingBox, action.layerBoundingBox);
 }
 
-// Exclude "layerIds" when monitoring changes to "view" prop as we do not
-// want to recalculate views when the layers change.
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function compareViewsProp(views: ViewsType | undefined): string | undefined {
-    if (views === undefined) {
-        return undefined;
-    }
-
-    const copy = cloneDeep(views);
-    const viewports = copy.viewports.map((e) => {
-        delete e.layerIds;
-        return e;
-    });
-    copy.viewports = viewports;
-    return JSON.stringify(copy);
-}
-
-export type TooltipCallback = (
-    info: PickingInfo
-) => string | Record<string, unknown> | null;
-
 /**
  * Views
  */
