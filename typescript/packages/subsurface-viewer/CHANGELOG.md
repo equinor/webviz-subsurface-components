@@ -1,3 +1,10 @@
+# [0.12.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.11.0...subsurface-viewer@0.12.0) (2023-12-18)
+
+
+### Features
+
+* map refactoring ([#1837](https://github.com/equinor/webviz-subsurface-components/issues/1837)) ([849b839](https://github.com/equinor/webviz-subsurface-components/commit/849b839060bd575eedc0e760f793c090d7567cc6)), closes [#1820](https://github.com/equinor/webviz-subsurface-components/issues/1820)
+
 # [0.11.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.10.0...subsurface-viewer@0.11.0) (2023-12-12)
 
 
