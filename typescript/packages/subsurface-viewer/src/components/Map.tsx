@@ -226,6 +226,10 @@ function mapBoundingBoxReducer(
     return boxUnion(mapBoundingBox, action.layerBoundingBox);
 }
 
+export type TooltipCallback = (
+    info: PickingInfo
+) => string | Record<string, unknown> | null;
+
 /**
  * Views
  */
