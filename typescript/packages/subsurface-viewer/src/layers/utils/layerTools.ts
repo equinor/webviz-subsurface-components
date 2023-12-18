@@ -126,11 +126,13 @@ export function getWellLayerByTypeAndSelectedWells(
     type: string,
     selectedWell: string
 ): LayersList {
-    if (!layers) return [];
+    if (!layers || !selectedWell) {
+        return [];
+    }
     return layers.filter((l) => {
         return (
             l?.constructor.name === type &&
-            (l as NewLayersList).props.data.features.find(
+            (l as NewLayersList).props.data?.features?.find(
                 (item) => item.properties.name === selectedWell
             )
         );

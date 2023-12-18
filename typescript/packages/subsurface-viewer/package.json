@@ -16,6 +16,7 @@
         "test": "jest --coverage",
         "test:update": "npm test -- --u",
         "test:watch": "npm test -- --watch",
+        "test:debug": "node --inspect-brk ../../node_modules/jest/bin/jest.js --coverage=false --runInBand",
         "doc": "git clean -xdff docs && typedoc src"
     },
     "author": "Equinor <opensource@equinor.com>",
