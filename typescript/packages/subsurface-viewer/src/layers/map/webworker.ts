@@ -52,7 +52,9 @@ export function makeFullMesh(e: { data: Params }) {
         smoothShading: boolean,
         meshData: Float32Array,
         ox: number,
-        oy: number
+        oy: number,
+        dx: number,
+        dy: number
     ) {
         if (!smoothShading) {
             return [1, 1, 1];
@@ -74,17 +76,17 @@ export function makeFullMesh(e: { data: Params }) {
         const i3_act = (w + 1) < nx && isDefined(meshData[i3]); // eslint-disable-line
         const i4_act = (h - 1) >= 0 && isDefined(meshData[i4]); // eslint-disable-line
 
-        const noNormal = [0, 0, 1]; // signals a normal could not be calculated.
+        const noNormal = [0, 0, 0]; // signals a normal could not be calculated.
         if (!i0_act) {
             return noNormal;
         }
 
         const hh = ny - 1 - h; // Note use hh for h for getting y values.
-        const p0 = [ox + w * dx,         oy + hh * dy,        i0_act ? -meshData[i0] : 0]; // eslint-disable-line
-        const p1 = [ ox + (w - 1) * dx,  oy + hh * dy,        i1_act ? -meshData[i1] : 0]; // eslint-disable-line
-        const p2 = [ ox + w * dx,        oy + (hh + 1) * dy,  i2_act ? -meshData[i2] : 0]; // eslint-disable-line
-        const p3 = [ ox + (w + 1) * dx,  oy + hh * dy,        i3_act ? -meshData[i3] : 0]; // eslint-disable-line
-        const p4 = [ ox + w * dx,        oy + (hh - 1) * dy,  i4_act ? -meshData[i4] : 0]; // eslint-disable-line
+        const p0 = [ox + w * dx,         oy + hh * dy,        i0_act ? meshData[i0] : 0]; // eslint-disable-line
+        const p1 = [ ox + (w - 1) * dx,  oy + hh * dy,        i1_act ? meshData[i1] : 0]; // eslint-disable-line
+        const p2 = [ ox + w * dx,        oy + (hh + 1) * dy,  i2_act ? meshData[i2] : 0]; // eslint-disable-line
+        const p3 = [ ox + (w + 1) * dx,  oy + hh * dy,        i3_act ? meshData[i3] : 0]; // eslint-disable-line
+        const p4 = [ ox + w * dx,        oy + (hh - 1) * dy,  i4_act ? meshData[i4] : 0]; // eslint-disable-line
 
         const v1 = [p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2]] as Vec;
         const v2 = [p2[0] - p0[0], p2[1] - p0[1], p2[2] - p0[2]] as Vec;
