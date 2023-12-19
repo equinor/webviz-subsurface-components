@@ -92,7 +92,7 @@ const DisplayCameraPositionComponent: React.FC<SubsurfaceViewerProps> = (
 };
 
 const cameraPosition: ViewStateType = {
-    target: [435800, 6478000],
+    target: [435800, 6478000, -2000],
     zoom: -3.5,
     rotationX: 90,
     rotationOrbit: 0,
@@ -170,9 +170,22 @@ export const SyncedMultiView: StoryObj<typeof SyncedMultiViewComponent> = {
     render: (args) => <SyncedMultiViewComponent {...args} />,
 };
 
-const SyncedCameraSettingsComponent = (args: SubsurfaceViewerProps) => {
+type SyncedCameraSettingsProps = SubsurfaceViewerProps & {
+    syncViewers: boolean;
+};
+
+const SyncedCameraSettingsComponent = (args: SyncedCameraSettingsProps) => {
     const [cameraPosition, setCameraPosition] = React.useState(
         args.cameraPosition
+    );
+
+    const updateCamera = React.useCallback(
+        (camera: ViewStateType) => {
+            if (args.syncViewers) {
+                setCameraPosition(camera);
+            }
+        },
+        [args.syncViewers]
     );
 
     React.useEffect(() => {
@@ -184,7 +197,7 @@ const SyncedCameraSettingsComponent = (args: SubsurfaceViewerProps) => {
     const props = {
         ...args,
         cameraPosition,
-        getCameraPosition: setCameraPosition,
+        getCameraPosition: updateCamera,
     };
 
     return (
@@ -200,25 +213,32 @@ const SyncedCameraSettingsComponent = (args: SubsurfaceViewerProps) => {
                     position: "relative",
                 }}
             >
-                <SubsurfaceViewer {...props} />
+                <SubsurfaceViewer {...props} id="left" />
             </div>
             <div
                 style={{
                     position: "relative",
                 }}
             >
-                <SubsurfaceViewer {...props} />
+                <SubsurfaceViewer {...props} id="right" />
             </div>
         </div>
     );
 };
 
-export const SyncedSubsurfaceViewer: StoryObj<typeof SubsurfaceViewer> = {
+export const SyncedSubsurfaceViewers: StoryObj<
+    typeof SyncedCameraSettingsComponent
+> = {
     args: {
+        syncViewers: true,
         id: "volve-wells",
         bounds: volveWellsBounds,
         layers: [volveWellsLayer],
         cameraPosition,
+        views: {
+            layout: [1, 1],
+            viewports: [{ id: "view", show3D: false }],
+        },
     },
     render: (args) => <SyncedCameraSettingsComponent {...args} />,
 };

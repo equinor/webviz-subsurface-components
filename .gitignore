@@ -23,6 +23,9 @@ typescript/storybook-static/**/*
 chromedriver
 chromedriver_linux64.zip
 
+# NX
+.nx/
+
 # Created by .ignore support plugin (hsz.mobi)
 ### VisualStudioCode template
 .vscode/
