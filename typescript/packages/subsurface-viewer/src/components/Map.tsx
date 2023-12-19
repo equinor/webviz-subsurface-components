@@ -1060,20 +1060,6 @@ class ViewController {
         const newViews = this.getDeckGlViews(views, fullState);
         const newViewState = this.getDeckGlViewState(views, fullState);
 
-        if (
-            this.result_.views !== newViews ||
-            this.result_.viewState !== newViewState
-        ) {
-            const viewsMsg = this.result_.views !== newViews ? " views" : "";
-            const stateMsg =
-                this.result_.viewState !== newViewState ? " state" : "";
-            const linkMsg = viewsMsg && stateMsg ? " and" : "";
-
-            console.log(
-                `ViewController returns new${viewsMsg}${linkMsg}${stateMsg}`
-            );
-        }
-
         this.state_ = fullState;
         this.views_ = views;
         this.result_.views = newViews;
@@ -1489,7 +1475,7 @@ function buildDeckGlViews(views: ViewsType | undefined, size: Size): View[] {
     const singleView = nX === 1 && nY === 1;
     if (singleView) {
         // Using 99.5% of viewport to avoid flickering of deckgl canvas
-        return [newView(views.viewports[0], 0, 0, "95%", "95%")];
+        return [newView(views.viewports[0], 0, 0, "99.5%", "99.5%")];
     }
 
     // compute for matrix
