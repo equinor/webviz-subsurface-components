@@ -1,3 +1,10 @@
+## [0.12.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.12.0...subsurface-viewer@0.12.1) (2023-12-19)
+
+
+### Bug Fixes
+
+* regression in viewport size ([#1839](https://github.com/equinor/webviz-subsurface-components/issues/1839)) ([8d8eb7d](https://github.com/equinor/webviz-subsurface-components/commit/8d8eb7de5ec9f54e75c7221ea1d8bcfba68633de)), closes [#1837](https://github.com/equinor/webviz-subsurface-components/issues/1837)
+
 # [0.12.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.11.0...subsurface-viewer@0.12.0) (2023-12-18)
 
 
