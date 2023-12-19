@@ -1773,4 +1773,3 @@ function handleMouseEvent(
     }
     return ev;
 }
-
