@@ -68,7 +68,7 @@
         "@types/react-dom": "^18.2.4",
         "@types/react-redux": "^7.1.25",
         "@types/react-resize-detector": "^6.1.0",
-        "@types/redux-mock-store": "^1.0.3",
+        "@types/redux-mock-store": "^1.0.6",
         "@types/uuid": "^8.3.0",
         "@typescript-eslint/eslint-plugin": "^6.4.0",
         "@typescript-eslint/parser": "^6.13.1",
