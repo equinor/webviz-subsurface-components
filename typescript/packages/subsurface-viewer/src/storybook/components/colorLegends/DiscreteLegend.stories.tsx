@@ -1,12 +1,19 @@
 import React from "react";
+import type { Meta, StoryObj } from "@storybook/react";
+
+import type {
+    DiscreteCodes,
+    colorTablesArray,
+} from "@emerson-eps/color-tables";
 import { DiscreteColorLegend, colorTables } from "@emerson-eps/color-tables";
 
-export default {
+const stories: Meta = {
     component: DiscreteColorLegend,
-    title: "SubsurfaceViewer/Components/ColorLegends/DiscreteColorLegend",
+    title: "SubsurfaceViewer/Components/ColorLegends",
 };
+export default stories;
 
-const discreteData = {
+const discreteData: DiscreteCodes = {
     Above_BCU: [[255, 13, 186, 255], 0],
     ABOVE: [[255, 64, 53, 255], 1],
     H12: [[247, 255, 164, 255], 2],
@@ -15,19 +22,16 @@ const discreteData = {
 };
 const colorName = "Stratigraphy";
 const dataObjectName = "Wells / ZONELOG";
-const position = [16, 10];
 const horizontal = false;
 
-const Template = (args) => {
-    return <DiscreteColorLegend {...args} />;
-};
-
-export const DiscreteTemplate = Template.bind({});
-DiscreteTemplate.args = {
-    discreteData,
-    dataObjectName,
-    position,
-    colorName,
-    colorTables,
-    horizontal,
+export const DiscreteColorLegendStory: StoryObj<typeof DiscreteColorLegend> = {
+    name: "DiscreteColorLegend",
+    args: {
+        discreteData,
+        dataObjectName,
+        colorName,
+        colorTables: colorTables as colorTablesArray,
+        horizontal,
+    },
+    render: (args) => <DiscreteColorLegend {...args} />,
 };
