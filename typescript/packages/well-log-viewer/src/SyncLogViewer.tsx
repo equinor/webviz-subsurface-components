@@ -340,7 +340,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
             });
         }
 
-        if (isEqualRanges(this.props.domain, prevProps.domain)) {
+        if (!isEqualRanges(this.props.domain, prevProps.domain)) {
             this.setControllersZoom();
         }
         if (
@@ -815,7 +815,11 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
     setControllersZoom(): void {
         for (const controller of this.controllers) {
             if (!controller) continue;
-            if (this.props.domain) controller.zoomContentTo(this.props.domain);
+            if (this.props.domain) {
+                controller.zoomContentTo(this.props.domain);
+                //this.forceUpdate();
+                break; // Set the domain only to the first controllers. Another controllers should be set by syncContentDomain or wellpickFlatting options
+            }
         }
     }
     setControllersSelection(): void {
