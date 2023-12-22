@@ -103,7 +103,7 @@ export interface Grid3DLayerProps extends ExtendedLayerProps {
 
     /**  Url, or native, or typed javascript array.
      * For each polygon ["number of points in poly", p1, , p2 ... ]
-     * Example of two polygions: the first polygon with 4 points and the second one with 3 points.
+     * Example of two polygons: the first polygon with 4 points and the second one with 3 points.
      * [4, 3, 1, 9, 77, 3, 6, 44, 23]
      */
     polysData: string | number[] | Uint32Array;
