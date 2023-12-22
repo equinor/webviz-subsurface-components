@@ -85,6 +85,16 @@ async function load_data(
     return Promise.all([points, polys, properties]);
 }
 
+/**
+ * Enumerates possible coloring modes.
+ */
+export enum TGrid3DColoringMode {
+    Property,
+    X,
+    Y,
+    Z,
+}
+
 export interface Grid3DLayerProps extends ExtendedLayerProps {
     /**  Url, or native, or typed javascript array. Set of points.
      * [x1, y1, z1, x2, y2, z2, ...]
@@ -93,7 +103,7 @@ export interface Grid3DLayerProps extends ExtendedLayerProps {
 
     /**  Url, or native, or typed javascript array.
      * For each polygon ["number of points in poly", p1, , p2 ... ]
-     * Example One polygn ith 4 poitns and one with 3 points.
+     * Example of two polygions: the first polygon with 4 points and the second one with 3 points.
      * [4, 3, 1, 9, 77, 3, 6, 44, 23]
      */
     polysData: string | number[] | Uint32Array;
@@ -103,6 +113,12 @@ export interface Grid3DLayerProps extends ExtendedLayerProps {
      * [0.23, 0.11. 0.98, ...]
      */
     propertiesData: string | number[] | Float32Array;
+
+    /**
+     * Defines how the cells are to be colored:
+     * by property value or by a coordinate.
+     */
+    coloringMode: TGrid3DColoringMode;
 
     /**  Name of color map. E.g "PORO"
      */
@@ -165,6 +181,7 @@ const defaultProps = {
     id: "grid-3d-layer",
     visible: true,
     material: true,
+    coloringMode: TGrid3DColoringMode.Property,
     colorMapName: "",
     gridLines: true,
     propertyValueRange: [0.0, 1.0],
@@ -225,6 +242,7 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
                     mesh_lines,
                     propertyValueRange,
                     legend,
+                    bbox,
                 });
 
                 if (
@@ -292,14 +310,29 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
                 colorMapRange: this.props.colorMapRange,
                 colorMapClampColor: this.props.colorMapClampColor,
                 colorMapFunction: this.props.colorMapFunction,
+                coloringMode: this.props.coloringMode,
                 gridLines: this.props.gridLines,
-                propertyValueRange: this.state["propertyValueRange"],
+                propertyValueRange: this.getPropertyValueRange(),
                 material: this.props.material,
                 depthTest: this.props.depthTest,
                 ZIncreasingDownwards: this.props.ZIncreasingDownwards,
             })
         );
         return [layer];
+    }
+
+    private getPropertyValueRange(): [number, number] {
+        const bbox = this.state["bbox"];
+        switch (this.props.coloringMode) {
+            case TGrid3DColoringMode.X:
+                return [bbox[0], bbox[3]];
+            case TGrid3DColoringMode.Y:
+                return [bbox[1], bbox[4]];
+            case TGrid3DColoringMode.Z:
+                return [bbox[2], bbox[5]];
+            default:
+                return this.state["propertyValueRange"];
+        }
     }
 }
 

@@ -1,7 +1,7 @@
 import React from "react";
 import { create, all } from "mathjs";
 
-import type { ComponentStory, ComponentMeta } from "@storybook/react";
+import type { StoryFn, Meta } from "@storybook/react";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 
 import {
@@ -15,15 +15,16 @@ import {
     Faces as ToroidFaces,
     VertexCount as ToroidVertexCount,
 } from "./test_data/PentagonalToroid";
+import { TGrid3DColoringMode } from "./grid3dLayer";
 
 export default {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer/Grid3D",
-} as ComponentMeta<typeof SubsurfaceViewer>;
+} as Meta<typeof SubsurfaceViewer>;
 
 type NumberQuad = [number, number, number, number];
 
-const Template: ComponentStory<typeof SubsurfaceViewer> = (args) => (
+const Template: StoryFn<typeof SubsurfaceViewer> = (args) => (
     <SubsurfaceViewer {...args} />
 );
 
@@ -183,12 +184,16 @@ PolyhedralCells.args = {
         {
             ...grid3dLayer,
             id: "polyhedral1",
+            coloringMode: TGrid3DColoringMode.Y,
             pickable: true,
             pointsData: SnubCubePoints.map((v) => 10 * v),
             polysData: SnubCubeFaces,
             propertiesData: Array(SnubCubeVertexCount)
                 .fill(0)
-                .map(() => randomFunc() * 10),
+                .map(() => randomFunc() * 50),
+            colorMapRange: [-8, 8],
+            colorMapClampColor: [200, 200, 200],
+            colorMapName: "Porosity",
         },
         {
             ...grid3dLayer,
@@ -201,6 +206,7 @@ PolyhedralCells.args = {
             propertiesData: Array(ToroidVertexCount)
                 .fill(0)
                 .map(() => randomFunc() * 10),
+            coloringMode: TGrid3DColoringMode.Property,
         },
     ],
 };
