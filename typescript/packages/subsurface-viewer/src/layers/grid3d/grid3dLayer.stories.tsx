@@ -1,8 +1,8 @@
 import React from "react";
 import { create, all } from "mathjs";
 
-import type { StoryFn, Meta } from "@storybook/react";
-import SubsurfaceViewer from "../../SubsurfaceViewer";
+import type { ComponentStory, ComponentMeta } from "@storybook/react";
+import SubsurfaceViewer, { TGrid3DColoringMode } from "../../SubsurfaceViewer";
 
 import {
     Points as SnubCubePoints,
@@ -15,16 +15,15 @@ import {
     Faces as ToroidFaces,
     VertexCount as ToroidVertexCount,
 } from "./test_data/PentagonalToroid";
-import { TGrid3DColoringMode } from "./grid3dLayer";
 
 export default {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer/Grid3D",
-} as Meta<typeof SubsurfaceViewer>;
+} as ComponentMeta<typeof SubsurfaceViewer>;
 
 type NumberQuad = [number, number, number, number];
 
-const Template: StoryFn<typeof SubsurfaceViewer> = (args) => (
+const Template: ComponentStory<typeof SubsurfaceViewer> = (args) => (
     <SubsurfaceViewer {...args} />
 );
 
