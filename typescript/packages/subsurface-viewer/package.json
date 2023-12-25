@@ -1,6 +1,6 @@
 {
     "name": "@webviz/subsurface-viewer",
-    "version": "0.11.0",
+    "version": "0.12.1",
     "description": "",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -16,6 +16,7 @@
         "test": "jest --coverage",
         "test:update": "npm test -- --u",
         "test:watch": "npm test -- --watch",
+        "test:debug": "node --inspect-brk ../../node_modules/jest/bin/jest.js --coverage=false --runInBand",
         "doc": "git clean -xdff docs && typedoc src"
     },
     "author": "Equinor <opensource@equinor.com>",

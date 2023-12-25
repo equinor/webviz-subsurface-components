@@ -8,6 +8,7 @@ import type { LayersList } from "@deck.gl/core/typed";
 import Map from "./Map";
 import { EmptyWrapper } from "../test/TestWrapper";
 import { colorTables } from "@emerson-eps/color-tables";
+import type { colorTablesArray } from "@emerson-eps/color-tables/";
 import {
     ColormapLayer,
     DrawingLayer,
@@ -21,7 +22,7 @@ import {
 
 import mapData from "../../../../../example-data/deckgl-map.json";
 import type { Unit } from "convert-units";
-const colorTablesData = colorTables;
+const colorTablesData = colorTables as colorTablesArray;
 const testBounds = [432205, 6475078, 437720, 6481113] as [
     number,
     number,
