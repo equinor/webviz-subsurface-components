@@ -86,7 +86,7 @@ async function load_data(
 }
 
 /**
- * Enumerates possible coloring modes.
+ * Enumerates possible coloring modes of Grid3D Layer.
  */
 export enum TGrid3DColoringMode {
     Property,

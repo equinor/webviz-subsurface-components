@@ -7,6 +7,9 @@ import type {
     ViewStateType,
     ViewsType,
 } from "./components/Map";
+
+import { TGrid3DColoringMode } from "./layers/grid3d/grid3dLayer";
+
 import Map, { jsonToObject } from "./components/Map";
 import React from "react";
 import PropTypes from "prop-types";
@@ -24,6 +27,8 @@ export type {
     ViewsType,
     colorTablesArray,
 };
+
+export { TGrid3DColoringMode };
 
 export type LightsType = {
     headLight?: {
