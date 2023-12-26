@@ -15,7 +15,7 @@ INSTALL_REQUIRES = [
 
 TESTS_REQUIRE = [
     "bandit",
-    "black>=20.8b1",
+    "black==23.1.0",
     "dash[testing]",
     "geojson>=2.5.0",
     "jsonpatch>=1.32",
