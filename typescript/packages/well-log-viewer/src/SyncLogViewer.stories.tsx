@@ -359,3 +359,6 @@ Default.args = {
         wellpickPatternFill: true,
     },
 };
+
+export const DiscreteLogs = Template.bind({});
+DiscreteLogs.args = require("../../../../example-data/facies3wells.json");
