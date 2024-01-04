@@ -254,7 +254,6 @@ export default class WellLogViewer extends Component<
     }
 
     render(): JSX.Element {
-        const maxContentZoom = 256;
         return (
             <div style={{ height: "100%", width: "100%", display: "flex" }}>
                 <WellLogViewWithScroller
@@ -263,7 +262,8 @@ export default class WellLogViewer extends Component<
                     colorTables={this.props.colorTables}
                     wellpick={this.props.wellpick}
                     horizontal={this.props.horizontal}
-                    maxContentZoom={maxContentZoom}
+                    domain={this.props.domain}
+                    selection={this.props.selection}
                     primaryAxis={this.state.primaryAxis}
                     axisTitles={this.props.axisTitles}
                     axisMnemos={this.props.axisMnemos}
@@ -309,7 +309,7 @@ export default class WellLogViewer extends Component<
                         >
                             <ZoomSlider
                                 value={this.state.sliderValue}
-                                max={maxContentZoom}
+                                max={this.props.options?.maxContentZoom}
                                 onChange={this.onZoomSliderChange}
                             />
                         </span>
