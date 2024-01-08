@@ -6,7 +6,7 @@
         "startIndex": 3444.392333984375,
         "endIndex": 5316.93115234375,
         "step": 1,
-        "well": "15/9-F-10"
+        "well": "Well 1"
       },
       "curves": [
         {
@@ -761,7 +761,7 @@
         "startIndex": 2741.37109375,
         "endIndex": 3494.989013671875,
         "step": 1,
-        "well": "15/9-F-4"
+        "well": "Well 2"
       },
       "curves": [
         {
@@ -1070,7 +1070,7 @@
         "startIndex": 1349.958984375,
         "endIndex": 3505.352294921875,
         "step": 1,
-        "well": "15/9-F-12"
+        "well": "Well 3"
       },
       "curves": [
         {
