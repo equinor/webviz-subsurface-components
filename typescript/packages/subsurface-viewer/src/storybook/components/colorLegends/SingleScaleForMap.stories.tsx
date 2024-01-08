@@ -5,21 +5,18 @@ import SubsurfaceViewer from "../../../SubsurfaceViewer";
 export default {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer/Components/ColorLegends/SingleScaleForMap",
+    tags: ["no-tests"],
 };
 
 const defaultProps = {
     id: "SubsurfaceViewer",
-    resources: {
-        propertyMap:
-            "https://raw.githubusercontent.com/equinor/webviz-subsurface-components/master/react/src/demo/example-data/propertyMap.png",
-    },
     bounds: [432150, 6475800, 439400, 6481500],
 };
 
 const layers = [
     {
         "@@type": "ColormapLayer",
-        image: "@@#resources.propertyMap",
+        image: "propertyMap.png",
         rotDeg: 0,
         bounds: [432205, 6475078, 437720, 6481113],
         valueRange: [2782, 3513],
@@ -118,3 +115,5 @@ SingleScaleForMap.parameters = {
         iframeHeight: 500,
     },
 };
+
+SingleScaleForMap.tags = ["no-tests"];

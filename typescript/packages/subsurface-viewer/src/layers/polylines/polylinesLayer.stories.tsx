@@ -9,7 +9,8 @@ import { default as AxesLayer } from "../axes/axesLayer";
 export default {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer / Polylines Layer",
-} as ComponentMeta<typeof SubsurfaceViewer>;
+    tags: ["screenshot-test"],
+};
 
 const defaultParameters = {
     docs: {
@@ -22,15 +23,11 @@ const defaultParameters = {
 const smallPolylinesLayer = new PolylinesLayer({
     id: "small_polylines_layer",
     /* eslint-disable */
-    polylinePoints: [0, 0, 0, 
-                    10, 0,  0,
-                    10, 0, 10,    
-                    
-                    -5, -5, 4,
-                    0, -8, 6,
-                    5, 10, 8
+    polylinePoints: [
+        0, 0, 0, 10, 0, 0, 10, 0, 10,
 
-                    ],
+        -5, -5, 4, 0, -8, 6, 5, 10, 8,
+    ],
     /* eslint-enable */
     startIndices: [0, 3],
     polylinesClosed: [true, false],
@@ -75,6 +72,8 @@ SmallPolylinesLayer.parameters = {
         },
     },
 };
+
+SmallPolylinesLayer.tags = ["screenshot-test"];
 
 const sideSize = 10000;
 const pointsCount = 100000;

@@ -38,7 +38,8 @@ import { SimpleMeshLayer } from "@deck.gl/mesh-layers/typed";
 export default {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer",
-} as ComponentMeta<typeof SubsurfaceViewer>;
+    tags: ["screenshot-test"],
+};
 
 const classes = {
     main: "default-main",
@@ -848,3 +849,5 @@ AutoZoomToBoxStory.parameters = {
         },
     },
 };
+
+AutoZoomToBoxStory.tags = ["screenshot-test"];

@@ -1,28 +1,17 @@
-//import { expect } from "@testing-library/jest-dom/extend-expect";
-import type { TestRunnerConfig } from '@storybook/test-runner';
-//import { getJestConfig, waitForPageReady } from '@storybook/test-runner';
+import { getStoryContext, type TestRunnerConfig } from '@storybook/test-runner';
 
 import { toMatchImageSnapshot } from 'jest-image-snapshot';
 
 const customSnapshotsDir = `${process.cwd()}/__snapshots__`;
 
-const config: TestRunnerConfig = {
-  setup() {
-    expect.extend({ toMatchImageSnapshot });
-  },
-  async postVisit(page, context) {
-    // Awaits for the page to be loaded and available including assets (e.g., fonts)
-    //await waitForPageReady(page);
-
-    // Generates a snapshot file based on the story identifier
+const screenshotTest = async (page, context) => {
     let previousScreenshot: Buffer = Buffer.from("");
-    //const screenshot = await page.screenshot();
 
     let stable = false;
 
     const timerStart = new Date();
 
-    const timeout = 10000;
+    const timeout = 5000;
 
     while(!stable) {
         const currentScreenshot = await page.screenshot();
@@ -32,7 +21,11 @@ const config: TestRunnerConfig = {
         else {
             previousScreenshot = currentScreenshot;
         }
-        if (!stable) await new Promise(resolve => setTimeout(resolve, 4000));
+
+        if (!stable) {
+            //await page.waitForTimeout(2000);
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        }
 
         // time out
         const elapsed = new Date().getTime() - timerStart.getTime();
@@ -46,6 +39,28 @@ const config: TestRunnerConfig = {
       customSnapshotIdentifier: context.id,
     });
 
+
+};
+
+const config: TestRunnerConfig = {
+  setup() {
+    //jest.retryTimes(2);
+    //jest.setTimeout(60000);
+
+    expect.extend({ toMatchImageSnapshot });
+  },
+
+/*   async preVisit(page, context) {
+    page.setDefaultTimeout(60000);
+    page.setDefaultNavigationTimeout(60000);
+  }, */
+
+  async postVisit(page, context) {
+    const storyContext = await getStoryContext(page, context);
+
+    if (!storyContext.tags.includes("no-screenshot-test")) {
+        screenshotTest(page, context);
+    }
   },
 };
 

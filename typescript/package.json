@@ -22,7 +22,7 @@
         "validate": "npm run typecheck && npm run lint",
         "storybook": "storybook dev -p 6006",
         "build-storybook": "storybook build",
-        "storybook:test": "test-storybook --maxWorkers=3",
+        "storybook:test": "test-storybook",
         "cy:run": "npx cypress run -b chrome --component --headed",
         "postpack": "npm run tidy-up",
         "git:hooks:enable": "cd .. && husky install",
