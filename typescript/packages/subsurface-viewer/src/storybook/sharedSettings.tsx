@@ -217,8 +217,9 @@ export const customLayerWithTextData = {
         },
     ],
     pickable: true,
-    getPosition: (d) => d.coordinates,
-    getText: (d) => d.name,
+    getPosition: (d: { coordinates: [number, number, number] }) =>
+        d.coordinates,
+    getText: (d: { name: string }) => d.name,
     getColor: [255, 0, 0],
     getSize: 16,
     getAngle: 0,
@@ -239,7 +240,7 @@ export const EditedDataTemplate: React.FC<SubsurfaceViewerProps> = (args) => {
             editedData={editedData}
             setProps={(updatedProps) => {
                 setEditedData(
-                    updatedProps.editedData as Record<string, unknown>
+                    updatedProps["editedData"] as Record<string, unknown>
                 );
             }}
         />
