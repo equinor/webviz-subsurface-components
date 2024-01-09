@@ -1,3 +1,10 @@
+# [0.13.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.12.2...subsurface-viewer@0.13.0) (2024-01-09)
+
+
+### Features
+
+* color Grid3D by coordinates. ([#1844](https://github.com/equinor/webviz-subsurface-components/issues/1844)) ([4d14b59](https://github.com/equinor/webviz-subsurface-components/commit/4d14b59659ddd1e6c2be1722f40c6e9bc33fc7fc))
+
 ## [0.12.2](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.12.1...subsurface-viewer@0.12.2) (2024-01-09)
 
 
