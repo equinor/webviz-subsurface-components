@@ -1,3 +1,10 @@
+## [0.13.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.13.0...subsurface-viewer@0.13.1) (2024-01-09)
+
+
+### Bug Fixes
+
+* camera computation in some cases ([#1860](https://github.com/equinor/webviz-subsurface-components/issues/1860)) ([ded2afe](https://github.com/equinor/webviz-subsurface-components/commit/ded2afe4b4ad70190ab394d1eb3e58515e017466)), closes [#1837](https://github.com/equinor/webviz-subsurface-components/issues/1837)
+
 # [0.13.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.12.2...subsurface-viewer@0.13.0) (2024-01-09)
 
 
