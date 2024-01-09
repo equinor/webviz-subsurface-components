@@ -89,10 +89,10 @@ async function load_data(
  * Enumerates possible coloring modes of Grid3D Layer.
  */
 export enum TGrid3DColoringMode {
-    Property, //Coloring by property
-    X, //Coloring by X
-    Y, //Coloring by Y
-    Z, //Coloring by Z
+    Property,
+    X,
+    Y,
+    Z,
 }
 
 export interface Grid3DLayerProps extends ExtendedLayerProps {
@@ -118,7 +118,7 @@ export interface Grid3DLayerProps extends ExtendedLayerProps {
      * Defines how the cells are to be colored:
      * by property value or by a coordinate.
      */
-    coloringMode: TGrid3DColoringMode;
+    coloringMode?: TGrid3DColoringMode;
 
     /**  Name of color map. E.g "PORO"
      */
