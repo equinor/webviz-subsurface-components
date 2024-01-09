@@ -1,3 +1,10 @@
+## [0.12.2](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.12.1...subsurface-viewer@0.12.2) (2024-01-09)
+
+
+### Performance Improvements
+
+* Reintroduce web worker with transferable objects. ([#1841](https://github.com/equinor/webviz-subsurface-components/issues/1841)) ([45eeb26](https://github.com/equinor/webviz-subsurface-components/commit/45eeb269de43c5295f44bce4e471f811a3ac46e6))
+
 ## [0.12.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.12.0...subsurface-viewer@0.12.1) (2023-12-19)
 
 
