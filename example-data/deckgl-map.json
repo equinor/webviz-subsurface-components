@@ -15,17 +15,6 @@
         "top": 10
       }
     },
-    "legend": {
-      "visible": true,
-      "cssStyle": {
-        "right": 10,
-        "top": 10
-      },
-      "horizontal": false
-    },
-    "toolbar": {
-      "visible": true
-    },
     "coordinateUnit": "m",
     "resources": {
       "propertyMap": "propertyMap.png",
@@ -95,7 +84,10 @@
           3513
         ],
         "rotDeg": 0,
-        "contours": [0, 50.0],
+        "contours": [
+          0,
+          50.0
+        ],
         "isContoursDepth": true,
         "colorMapName": "Physics",
         "colorMapRange": [
@@ -130,7 +122,10 @@
     ],
     "editedData": {},
     "views": {
-      "layout": [1, 1],
+      "layout": [
+        1,
+        1
+      ],
       "showLabel": false,
       "viewports": [
         {

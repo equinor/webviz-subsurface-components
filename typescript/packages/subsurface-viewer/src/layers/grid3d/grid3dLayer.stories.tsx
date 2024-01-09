@@ -18,7 +18,7 @@ import {
 
 export default {
     component: SubsurfaceViewer,
-    title: "SubsurfaceViewer/Grid3D",
+    title: "SubsurfaceViewer/Grid3D Layer",
 } as ComponentMeta<typeof SubsurfaceViewer>;
 
 type NumberQuad = [number, number, number, number];
