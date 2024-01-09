@@ -4,6 +4,7 @@ import React from "react";
 import SyncLogViewer from "./SyncLogViewer";
 import { argTypesSyncLogViewerProp } from "./SyncLogViewer";
 import { colorTables } from "@emerson-eps/color-tables";
+import { ToggleButton } from "@mui/material";
 
 const ComponentCode =
     '<SyncLogViewer id="SyncLogViewer" \r\n' +
@@ -24,6 +25,7 @@ const ComponentCode =
     "/>";
 
 import { axisTitles, axisMnemos } from "./utils/axes";
+import type { WellLog } from "./components/WellLogTypes";
 
 export default {
     component: SyncLogViewer,
@@ -359,3 +361,67 @@ Default.args = {
         wellpickPatternFill: true,
     },
 };
+
+const TemplateWithSelection = (args) => {
+    const [showWell1, setShowWell1] = React.useState(true);
+    const [showWell2, setShowWell2] = React.useState(true);
+    const [showWell3, setShowWell3] = React.useState(true);
+
+    const filtered: WellLog[] = [];
+    if (showWell1) {
+        filtered.push(args.welllogs[0]);
+    }
+    if (showWell2) {
+        filtered.push(args.welllogs[1]);
+    }
+    if (showWell3) {
+        filtered.push(args.welllogs[2]);
+    }
+
+    const argsWithSelection = {
+        ...args,
+        welllogs: filtered,
+    };
+
+    return (
+        <div
+            style={{ height: "92vh", display: "flex", flexDirection: "column" }}
+        >
+            <div style={{ flexDirection: "row" }}>
+                <ToggleButton
+                    value="check"
+                    selected={showWell1}
+                    onChange={() => {
+                        setShowWell1(!showWell1);
+                    }}
+                >
+                    Well 1
+                </ToggleButton>
+                <ToggleButton
+                    value="check"
+                    selected={showWell2}
+                    onChange={() => {
+                        setShowWell2(!showWell2);
+                    }}
+                >
+                    Well 2
+                </ToggleButton>
+                <ToggleButton
+                    value="check"
+                    selected={showWell3}
+                    onChange={() => {
+                        setShowWell3(!showWell3);
+                    }}
+                >
+                    Well 3
+                </ToggleButton>
+            </div>
+            <div style={{ width: "100%", height: "100%", flex: 1 }}>
+                <SyncLogViewer id="SyncLogViewer" {...argsWithSelection} />
+            </div>
+        </div>
+    );
+};
+
+export const DiscreteLogs = TemplateWithSelection.bind({});
+DiscreteLogs.args = require("../../../../example-data/facies3wells.json");
