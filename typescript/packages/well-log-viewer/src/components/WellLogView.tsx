@@ -1254,8 +1254,6 @@ class WellLogView
 
         // set callback to component's caller
         if (this.props.onCreateController) this.props.onCreateController(this);
-
-        this.setControllerZoom();
     }
 
     componentDidMount(): void {
@@ -1462,6 +1460,8 @@ class WellLogView
             );
             addWellPickOverlay(this.logController, this);
         }
+        this.setControllerZoom();
+        this.setControllerSelection();
         this.onTrackScroll();
         this.onTrackSelection();
         this.setInfo(); // Clear old track information

@@ -243,6 +243,8 @@ Default.args = {
     axisTitles: axisTitles,
     axisMnemos: axisMnemos,
     viewTitle: true, // show default welllog view title (a wellname from the welllog)
+    domain: [2500, 4000],
+    selection: [3500, 3700],
     options: {
         hideTrackTitle: false,
         hideTrackLegend: false,
