@@ -77,9 +77,6 @@ type WellLogViewerProps = {
     /** Names for axes */
     axisMnemos?: object;
 
-    /** The maximum zoom value */
-    maxContentZoom?: number;
-
     /** Set to true for default titles or to array of individual well log titles */
     viewTitle?: boolean | string | object; // 'object' might be replaced by a specific type like ReactNode
 
