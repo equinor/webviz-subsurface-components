@@ -1,10 +1,10 @@
+import type { ComponentMeta, ComponentStory } from "@storybook/react";
+import { all, create } from "mathjs";
 import React from "react";
-import type { ComponentStory, ComponentMeta } from "@storybook/react";
-import { create, all } from "mathjs";
 
 import SubsurfaceViewer from "../../SubsurfaceViewer";
-import { default as PolylinesLayer } from "./polylinesLayer";
 import { default as AxesLayer } from "../axes/axesLayer";
+import { default as PolylinesLayer } from "./polylinesLayer";
 
 export default {
     component: SubsurfaceViewer,

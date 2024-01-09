@@ -1,15 +1,50 @@
+import { styled } from "@mui/material/styles";
 import React from "react";
+
+import type { Meta } from "@storybook/react";
+
+import { omit } from "lodash";
+
 import { ContinuousLegend, colorTables } from "@emerson-eps/color-tables";
+import { DEFAULT_STYLE as defaultLegendStyle } from "@emerson-eps/color-tables/dist/component/Legend/constants";
+
 import SubsurfaceViewer from "../../../SubsurfaceViewer";
 
-export default {
+const stories: Meta = {
     component: SubsurfaceViewer,
-    title: "SubsurfaceViewer/Components/ColorLegends/SingleScaleForMap",
-    tags: ["no-tests"],
+    title: "SubsurfaceViewer/Components/ColorLegends",
 };
+export default stories;
+
+const PREFIX = "SingleScaleForMap";
+
+const classes = {
+    main: `${PREFIX}-main`,
+    legend: `${PREFIX}-legend`,
+};
+
+const Root = styled("div")({
+    [`& .${classes.main}`]: {
+        height: 500,
+        width: "100%",
+        border: "1px solid black",
+        position: "absolute",
+    },
+    [`& .${classes.legend}`]: {
+        zIndex: 999,
+        opacity: 1,
+    },
+});
+
+// Remove the left and top keys from the default legend style
+// The Legends from @emerson-eps/color-tables do overwrite the style to {"position": absolute} and cssLegendStyles prop :(
+const legendStyle = omit(defaultLegendStyle, ["left", "top"]);
 
 const defaultProps = {
     id: "SubsurfaceViewer",
+    resources: {
+        propertyMap: "propertyMap.png",
+    },
     bounds: [432150, 6475800, 439400, 6481500],
 };
 
@@ -33,7 +68,8 @@ const horizontal = true;
 const reverseRange = false;
 
 // 4 maps with same color scale for all maps
-const mapWithScaleTemplate = (args) => {
+// ContinuousLegend is overwriting the style to {"position": absolute} and cssLegendStyles :(
+const SubsurfaceViewerWithLegend = (args) => {
     const updatedLayerData = [
         {
             ...args.layers[0],
@@ -41,19 +77,19 @@ const mapWithScaleTemplate = (args) => {
         },
     ];
     return (
-        <div>
-            <div
-                style={{
-                    float: "right",
-                    zIndex: 999,
-                    opacity: 1,
-                    position: "relative",
-                }}
-            >
-                <ContinuousLegend {...args} />
+        <Root className={classes.main}>
+            <div className={classes.legend}>
+                <ContinuousLegend
+                    cssLegendStyles={{
+                        ...legendStyle,
+                        right: "0vw",
+                        top: "0vh",
+                    }}
+                    {...args}
+                />
             </div>
             <SubsurfaceViewer {...args} layers={updatedLayerData} />
-        </div>
+        </Root>
     );
 };
 
