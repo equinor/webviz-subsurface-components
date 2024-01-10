@@ -1,3 +1,10 @@
+## [0.4.2](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.4.1...wsc-common@0.4.2) (2024-01-10)
+
+
+### Bug Fixes
+
+* wrong camera computation in 2D when bounds are provided ([#1863](https://github.com/equinor/webviz-subsurface-components/issues/1863)) ([3baef9f](https://github.com/equinor/webviz-subsurface-components/commit/3baef9f1eb1c2f124f74937a19ce78963b1d7604)), closes [#1837](https://github.com/equinor/webviz-subsurface-components/issues/1837)
+
 ## [0.4.1](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.4.0...wsc-common@0.4.1) (2024-01-10)
 
 
