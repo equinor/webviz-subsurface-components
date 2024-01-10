@@ -70,11 +70,11 @@ export function makeFullMesh(e: { data: Params }) {
         const i3 = h * nx + (w + 1);
         const i4 = (h - 1) * nx + w;
 
-        const i0_act =                 isDefined(meshData[i0]); // eslint-disable-line
-        const i1_act = (w - 1) >= 0 && isDefined(meshData[i1]); // eslint-disable-line
-        const i2_act = (h + 1) < ny && isDefined(meshData[i2]); // eslint-disable-line
-        const i3_act = (w + 1) < nx && isDefined(meshData[i3]); // eslint-disable-line
-        const i4_act = (h - 1) >= 0 && isDefined(meshData[i4]); // eslint-disable-line
+        const i0_act = isDefined(meshData[i0]); // eslint-disable-line
+        const i1_act = w - 1 >= 0 && isDefined(meshData[i1]); // eslint-disable-line
+        const i2_act = h + 1 < ny && isDefined(meshData[i2]); // eslint-disable-line
+        const i3_act = w + 1 < nx && isDefined(meshData[i3]); // eslint-disable-line
+        const i4_act = h - 1 >= 0 && isDefined(meshData[i4]); // eslint-disable-line
 
         const noNormal = [0, 0, 0]; // signals a normal could not be calculated.
         if (!i0_act) {
@@ -82,11 +82,11 @@ export function makeFullMesh(e: { data: Params }) {
         }
 
         const hh = ny - 1 - h; // Note use hh for h for getting y values.
-        const p0 = [ox + w * dx,         oy + hh * dy,        i0_act ? meshData[i0] : 0]; // eslint-disable-line
-        const p1 = [ ox + (w - 1) * dx,  oy + hh * dy,        i1_act ? meshData[i1] : 0]; // eslint-disable-line
-        const p2 = [ ox + w * dx,        oy + (hh + 1) * dy,  i2_act ? meshData[i2] : 0]; // eslint-disable-line
-        const p3 = [ ox + (w + 1) * dx,  oy + hh * dy,        i3_act ? meshData[i3] : 0]; // eslint-disable-line
-        const p4 = [ ox + w * dx,        oy + (hh - 1) * dy,  i4_act ? meshData[i4] : 0]; // eslint-disable-line
+        const p0 = [ox + w * dx, oy + hh * dy, i0_act ? meshData[i0] : 0]; // eslint-disable-line
+        const p1 = [ox + (w - 1) * dx, oy + hh * dy, i1_act ? meshData[i1] : 0]; // eslint-disable-line
+        const p2 = [ox + w * dx, oy + (hh + 1) * dy, i2_act ? meshData[i2] : 0]; // eslint-disable-line
+        const p3 = [ox + (w + 1) * dx, oy + hh * dy, i3_act ? meshData[i3] : 0]; // eslint-disable-line
+        const p4 = [ox + w * dx, oy + (hh - 1) * dy, i4_act ? meshData[i4] : 0]; // eslint-disable-line
 
         const v1 = [p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2]] as Vec;
         const v2 = [p2[0] - p0[0], p2[1] - p0[1], p2[2] - p0[2]] as Vec;
@@ -139,7 +139,8 @@ export function makeFullMesh(e: { data: Params }) {
         return mean;
     }
 
-    const meshZValueRange = getFloat32ArrayMinMax(meshData);
+    // non mesh grids use z = 0 (see below)
+    const meshZValueRange = isMesh ? getFloat32ArrayMinMax(meshData) : [0, 0];
     const propertyValueRange = getFloat32ArrayMinMax(propertiesData);
 
     // Dimensions.
@@ -207,7 +208,19 @@ export function makeFullMesh(e: { data: Params }) {
                 positions[3 * i + 2] = z;
 
                 if (smoothShading) {
-                    const normal = calcNormal(w, h, nx, ny, isMesh, smoothShading, meshData, ox, oy, dx, dy); // eslint-disable-line
+                    const normal = calcNormal(
+                        w,
+                        h,
+                        nx,
+                        ny,
+                        isMesh,
+                        smoothShading,
+                        meshData,
+                        ox,
+                        oy,
+                        dx,
+                        dy
+                    ); // eslint-disable-line
                     normals[3 * i + 0] = normal[0] * 127; // Normalize to signed 8 bit.
                     normals[3 * i + 1] = normal[1] * 127;
                     normals[3 * i + 2] = normal[2] * 127;
@@ -228,10 +241,18 @@ export function makeFullMesh(e: { data: Params }) {
                 const i2 = (h + 1) * nx + (w + 1);
                 const i3 = (h + 1) * nx + w;
 
-                const i0_act = !isMesh || (isDefined(meshData[i0]) && isDefined(propertiesData[i0])); // eslint-disable-line
-                const i1_act = !isMesh || (isDefined(meshData[i1]) && isDefined(propertiesData[i1])); // eslint-disable-line
-                const i2_act = !isMesh || (isDefined(meshData[i2]) && isDefined(propertiesData[i2])); // eslint-disable-line
-                const i3_act = !isMesh || (isDefined(meshData[i3]) && isDefined(propertiesData[i3])); // eslint-disable-line
+                const i0_act =
+                    !isMesh ||
+                    (isDefined(meshData[i0]) && isDefined(propertiesData[i0])); // eslint-disable-line
+                const i1_act =
+                    !isMesh ||
+                    (isDefined(meshData[i1]) && isDefined(propertiesData[i1])); // eslint-disable-line
+                const i2_act =
+                    !isMesh ||
+                    (isDefined(meshData[i2]) && isDefined(propertiesData[i2])); // eslint-disable-line
+                const i3_act =
+                    !isMesh ||
+                    (isDefined(meshData[i3]) && isDefined(propertiesData[i3])); // eslint-disable-line
 
                 // Triangles.
                 if (i1_act && i3_act) {

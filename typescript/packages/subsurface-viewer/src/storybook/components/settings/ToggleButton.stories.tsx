@@ -1,16 +1,16 @@
-import React from "react";
+import type { Meta, StoryObj } from "@storybook/react";
+
 import ToggleButton from "../../../components/settings/ToggleButton";
 
-export default {
+const stories: Meta = {
     component: ToggleButton,
-    title: "SubsurfaceViewer/Components/Settings/Switch",
+    title: "SubsurfaceViewer/Components/Settings",
 };
+export default stories;
 
-const Template = (args) => {
-    return <ToggleButton {...args} />;
-};
-
-export const Default = Template.bind({});
-Default.args = {
-    label: "test",
+export const ToggleButtonStory: StoryObj<typeof ToggleButton> = {
+    name: " ToggleButton",
+    args: {
+        label: "test",
+    },
 };
