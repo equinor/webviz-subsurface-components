@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 
 import type { Feature, FeatureCollection } from "geojson";
-import { cloneDeep, isEmpty } from "lodash";
+import { cloneDeep, isEmpty, isEqual } from "lodash";
 
 import type {
     MjolnirEvent,
@@ -223,7 +223,8 @@ function mapBoundingBoxReducer(
     mapBoundingBox: BoundingBox3D | undefined,
     action: ReportBoundingBoxAction
 ): BoundingBox3D | undefined {
-    return boxUnion(mapBoundingBox, action.layerBoundingBox);
+    const union = boxUnion(mapBoundingBox, action.layerBoundingBox);
+    return isEqual(union, mapBoundingBox) ? mapBoundingBox : union;
 }
 
 export type TooltipCallback = (
@@ -1102,6 +1103,7 @@ class ViewController {
         const updateViewState =
             viewsChanged ||
             triggerHome ||
+            state.camera != this.state_.camera ||
             (!state.viewStateChanged &&
                 state.boundingBox3d !== this.state_.boundingBox3d);
         const needUpdate = updateZScale || updateTarget || updateViewState;
