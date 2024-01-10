@@ -1104,6 +1104,7 @@ class ViewController {
             viewsChanged ||
             triggerHome ||
             state.camera != this.state_.camera ||
+            state.bounds != this.state_.bounds ||
             (!state.viewStateChanged &&
                 state.boundingBox3d !== this.state_.boundingBox3d);
         const needUpdate = updateZScale || updateTarget || updateViewState;
@@ -1523,7 +1524,8 @@ function buildDeckGlViews(views: ViewsType | undefined, size: Size): View[] {
 function updateViewState(
     camera: ViewStateType,
     boundingBox: BoundingBox3D | undefined,
-    size: Size
+    size: Size,
+    is3D = true
 ): ViewStateType {
     if (typeof camera.zoom === "number" && !Number.isNaN(camera.zoom)) {
         return camera;
@@ -1537,6 +1539,12 @@ function updateViewState(
     // return the camera if the bounding box is undefined
     if (boundingBox === undefined) {
         return camera;
+    }
+
+    if (!is3D) {
+        // in 2D, use flat boxes
+        boundingBox[2] = 0;
+        boundingBox[5] = 0;
     }
 
     // clone the camera in case of triggerHome
@@ -1593,6 +1601,12 @@ function computeViewState(
         };
         return updateViewState(defaultCamera, boundingBox, size);
     } else {
+        // If the camera is defined, use it
+        if (isCameraPositionDefined) {
+            const is3D = false;
+            return updateViewState(cameraPosition, boundingBox, size, is3D);
+        }
+
         const centerOfData: [number, number, number] = boundingBox
             ? boxCenter(boundingBox)
             : [0, 0, 0];
@@ -1606,11 +1620,6 @@ function computeViewState(
                 viewPort,
                 size
             );
-        }
-
-        // deprecated in 2D, kept for backward compatibility
-        if (isCameraPositionDefined) {
-            return cameraPosition;
         }
 
         return boundingBox
@@ -1775,3 +1784,4 @@ function handleMouseEvent(
     }
     return ev;
 }
+
