@@ -1,3 +1,10 @@
+## [1.3.4](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.3.3...well-log-viewer@1.3.4) (2024-01-10)
+
+
+### Bug Fixes
+
+* wrong camera computation in 2D when bounds are provided ([#1863](https://github.com/equinor/webviz-subsurface-components/issues/1863)) ([3baef9f](https://github.com/equinor/webviz-subsurface-components/commit/3baef9f1eb1c2f124f74937a19ce78963b1d7604)), closes [#1837](https://github.com/equinor/webviz-subsurface-components/issues/1837)
+
 ## [1.3.3](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.3.2...well-log-viewer@1.3.3) (2024-01-10)
 
 
