@@ -1784,4 +1784,3 @@ function handleMouseEvent(
     }
     return ev;
 }
-
