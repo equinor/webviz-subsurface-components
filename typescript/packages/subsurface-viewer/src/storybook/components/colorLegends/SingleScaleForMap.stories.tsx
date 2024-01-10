@@ -51,7 +51,7 @@ const defaultProps = {
 const layers = [
     {
         "@@type": "ColormapLayer",
-        image: "propertyMap.png",
+        image: "@@#resources.propertyMap",
         rotDeg: 0,
         bounds: [432205, 6475078, 437720, 6481113],
         valueRange: [2782, 3513],
@@ -93,63 +93,62 @@ const SubsurfaceViewerWithLegend = (args) => {
     );
 };
 
-export const SingleScaleForMap = mapWithScaleTemplate.bind({});
-
-SingleScaleForMap.args = {
-    min,
-    max,
-    dataObjectName,
-    position,
-    horizontal,
-    colorTables,
-    colorName: "Rainbow",
-    layers,
-    ...defaultProps,
-    legend: {
-        visible: false,
-    },
-    zoom: -5,
-    reverseRange,
-    views: {
-        layout: [2, 2],
-        showLabel: true,
-        viewports: [
-            {
-                id: "view_1",
-                name: "Colormap layer 1",
-                show3D: false,
-                layerIds: ["colormap-layer"],
+export const ContinuousLegendForSubsurfaceViewer = {
+    name: "ContinuousLegend For SubsurfaceViewer",
+    parameters: {
+        docs: {
+            description: {
+                story: "Four maps with same color scale for all maps",
             },
-            {
-                id: "view_2",
-                name: "Colormap layer 2",
-                show3D: false,
-                layerIds: ["colormap-layer"],
-            },
-            {
-                id: "view_3",
-                name: "Colormap layer 3",
-                show3D: false,
-                layerIds: ["colormap-layer"],
-            },
-            {
-                id: "view_4",
-                name: "Colormap layer 4",
-                show3D: false,
-                layerIds: ["colormap-layer"],
-            },
-        ],
-    },
-};
-
-SingleScaleForMap.parameters = {
-    docs: {
-        description: {
-            story: "Four maps with same color scale for all maps",
+            inlineStories: false,
+            iframeHeight: 500,
         },
-        inlineStories: false,
-        iframeHeight: 500,
     },
+    args: {
+        min,
+        max,
+        dataObjectName,
+        position,
+        horizontal,
+        colorTables,
+        colorName: "Rainbow",
+        layers,
+        ...defaultProps,
+        legend: {
+            visible: false,
+        },
+        zoom: -5,
+        reverseRange,
+        views: {
+            layout: [2, 2],
+            showLabel: true,
+            viewports: [
+                {
+                    id: "view_1",
+                    name: "Colormap layer 1",
+                    show3D: false,
+                    layerIds: ["colormap-layer"],
+                },
+                {
+                    id: "view_2",
+                    name: "Colormap layer 2",
+                    show3D: false,
+                    layerIds: ["colormap-layer"],
+                },
+                {
+                    id: "view_3",
+                    name: "Colormap layer 3",
+                    show3D: false,
+                    layerIds: ["colormap-layer"],
+                },
+                {
+                    id: "view_4",
+                    name: "Colormap layer 4",
+                    show3D: false,
+                    layerIds: ["colormap-layer"],
+                },
+            ],
+        },
+    },
+    render: (args) => <SubsurfaceViewerWithLegend {...args} />,
 };
-
-SingleScaleForMap.tags = ["no-tests"];
