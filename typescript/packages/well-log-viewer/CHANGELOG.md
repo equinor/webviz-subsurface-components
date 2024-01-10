@@ -1,3 +1,10 @@
+## [1.3.3](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.3.2...well-log-viewer@1.3.3) (2024-01-10)
+
+
+### Bug Fixes
+
+* bump mathjs from 9.5.2 to 12.2.1 in /typescript ([#1858](https://github.com/equinor/webviz-subsurface-components/issues/1858)) ([3aa1d7c](https://github.com/equinor/webviz-subsurface-components/commit/3aa1d7c3992fa56a9a25ed3e719014c5b97357ac)), closes [#3109](https://github.com/equinor/webviz-subsurface-components/issues/3109) [#3090](https://github.com/equinor/webviz-subsurface-components/issues/3090) [#3101](https://github.com/equinor/webviz-subsurface-components/issues/3101) [#2766](https://github.com/equinor/webviz-subsurface-components/issues/2766) [#3096](https://github.com/equinor/webviz-subsurface-components/issues/3096) [#2761](https://github.com/equinor/webviz-subsurface-components/issues/2761) [#3095](https://github.com/equinor/webviz-subsurface-components/issues/3095) [#3087](https://github.com/equinor/webviz-subsurface-components/issues/3087) [#3092](https://github.com/equinor/webviz-subsurface-components/issues/3092) [#3094](https://github.com/equinor/webviz-subsurface-components/issues/3094) [#2879](https://github.com/equinor/webviz-subsurface-components/issues/2879) [#2927](https://github.com/equinor/webviz-subsurface-components/issues/2927) [#3014](https://github.com/equinor/webviz-subsurface-components/issues/3014) [#3037](https://github.com/equinor/webviz-subsurface-components/issues/3037) [#3079](https://github.com/equinor/webviz-subsurface-components/issues/3079) [#2919](https://github.com/equinor/webviz-subsurface-components/issues/2919) [#3109](https://github.com/equinor/webviz-subsurface-components/issues/3109)
+
 ## [1.3.2](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.3.1...well-log-viewer@1.3.2) (2024-01-09)
 
 
