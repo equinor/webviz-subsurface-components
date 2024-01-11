@@ -9,14 +9,11 @@ const screenshotTest = async (page, context) => {
 
     let stable = false;
 
-    const timerStart = new Date();
-
-    const timeout = 30000;
     const poll = 2000;
 
     while(!stable) {
         const currentScreenshot = await page.screenshot();
-        if (currentScreenshot === previousScreenshot){
+        if (currentScreenshot.equals(previousScreenshot)){
             stable = true;
         }
         else {
@@ -25,12 +22,6 @@ const screenshotTest = async (page, context) => {
 
         if (!stable) {
             await page.waitForTimeout(poll);
-        }
-
-        // time out
-        const elapsed = new Date().getTime() - timerStart.getTime();
-        if (elapsed > timeout) {
-            break;
         }
     }
 
@@ -45,7 +36,6 @@ const screenshotTest = async (page, context) => {
 const config: TestRunnerConfig = {
   setup() {
     jest.retryTimes(2);
-    //jest.setTimeout(60000);
 
     expect.extend({ toMatchImageSnapshot });
   },
