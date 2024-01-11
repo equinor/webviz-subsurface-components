@@ -28,5 +28,4 @@ module.exports = {
     testPathIgnorePatterns: [path.resolve(__dirname, "node_modules"), "dist"],
     modulePathIgnorePatterns: ["dist"],
     setupFiles: ["jest-canvas-mock"],
-    //testTimeout: 60000,
 };
