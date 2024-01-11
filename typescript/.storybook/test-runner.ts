@@ -1,6 +1,6 @@
-import { toMatchImageSnapshot } from 'jest-image-snapshot';
+import { toMatchImageSnapshot } from "jest-image-snapshot";
 
-import { getStoryContext, type TestRunnerConfig } from '@storybook/test-runner';
+import { getStoryContext, type TestRunnerConfig } from "@storybook/test-runner";
 
 const screenshotTest = async (page, context) => {
     let previousScreenshot: Buffer = Buffer.from("");
@@ -9,12 +9,11 @@ const screenshotTest = async (page, context) => {
 
     const poll = 5000;
 
-    while(!stable) {
+    while (!stable) {
         const currentScreenshot = await page.screenshot();
-        if (currentScreenshot.equals(previousScreenshot)){
+        if (currentScreenshot.equals(previousScreenshot)) {
             stable = true;
-        }
-        else {
+        } else {
             previousScreenshot = currentScreenshot;
         }
 
@@ -24,31 +23,28 @@ const screenshotTest = async (page, context) => {
     }
 
     expect(previousScreenshot).toMatchImageSnapshot({
-      customSnapshotIdentifier: context.id,
+        customSnapshotIdentifier: context.id,
     });
-
-
 };
 
 const config: TestRunnerConfig = {
-  setup() {
-    jest.retryTimes(2);
+    setup() {
+        jest.retryTimes(2);
 
-    expect.extend({ toMatchImageSnapshot });
-  },
+        expect.extend({ toMatchImageSnapshot });
+    },
 
+    async postVisit(page, context) {
+        const storyContext = await getStoryContext(page, context);
 
-  async postVisit(page, context) {
-    const storyContext = await getStoryContext(page, context);
+        if (storyContext.tags.includes("no-test")) {
+            return;
+        }
 
-    if (storyContext.tags.includes("no-test")) {
-      return;
-    }
-
-    if (!storyContext.tags.includes("no-screenshot-test")) {
-        await screenshotTest(page, context);
-    }
-  },
+        if (!storyContext.tags.includes("no-screenshot-test")) {
+            await screenshotTest(page, context);
+        }
+    },
 };
 
 export default config;

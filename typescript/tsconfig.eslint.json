@@ -6,7 +6,8 @@
         "*.json",
         "*.js",
         "packages/*/*.json",
-        "packages/*/*.js"
+        "packages/*/*.js",
+        ".storybook/*",
     ],
     // exclude is overwritten, replicate in .eslintignore
     "exclude": [

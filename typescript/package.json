@@ -17,7 +17,7 @@
     "scripts": {
         "start": "webpack serve --mode development --devtool inline-source-map --entry ./src/demo/index.js --open",
         "typecheck": "tsc --noEmit",
-        "lint": "eslint *.js *.json \"packages/**/*.{js,jsx,ts,tsx,mdx,json}\"",
+        "lint": "eslint *.js *.json \"**/*.{js,jsx,ts,tsx,mdx,json}\" .storybook",
         "format": "npm run lint -- --fix",
         "validate": "npm run typecheck && npm run lint",
         "storybook": "storybook dev -p 6006",

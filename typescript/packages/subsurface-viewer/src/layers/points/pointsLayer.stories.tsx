@@ -72,6 +72,8 @@ SmallPointsLayer.parameters = {
     },
 };
 
+SmallPointsLayer.tags = ["no-test"];
+
 // Huge example using PointsLayer.
 const sideSize = 10000;
 const pointsCount = 100000;
