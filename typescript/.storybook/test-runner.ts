@@ -2,8 +2,6 @@ import { toMatchImageSnapshot } from 'jest-image-snapshot';
 
 import { getStoryContext, type TestRunnerConfig } from '@storybook/test-runner';
 
-const customSnapshotsDir = `${process.cwd()}/__snapshots__`;
-
 const screenshotTest = async (page, context) => {
     let previousScreenshot: Buffer = Buffer.from("");
 
@@ -26,7 +24,6 @@ const screenshotTest = async (page, context) => {
     }
 
     expect(previousScreenshot).toMatchImageSnapshot({
-      customSnapshotsDir,
       customSnapshotIdentifier: context.id,
     });
 
