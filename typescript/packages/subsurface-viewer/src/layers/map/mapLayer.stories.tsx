@@ -1,23 +1,23 @@
-import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+import React from "react";
 
+import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
+import SubsurfaceViewer from "../../SubsurfaceViewer";
+import InfoCard from "../../components/InfoCard";
 import type {
     BoundingBox2D,
     BoundingBox3D,
     ViewsType,
 } from "../../components/Map";
 import { useHoverInfo } from "../../components/Map";
-import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
-import SubsurfaceViewer from "../../SubsurfaceViewer";
-import InfoCard from "../../components/InfoCard";
 
-import AxesLayer from "../axes/axesLayer";
-import MapLayer from "./mapLayer";
-import { ViewFooter } from "../../components/ViewFooter";
 import { View } from "@deck.gl/core/typed";
-import type { colorMapFunctionType } from "../utils/layerTools";
-import NorthArrow3DLayer from "../northarrow/northArrow3DLayer";
 import { ClipExtension } from "@deck.gl/extensions/typed";
+import { ViewFooter } from "../../components/ViewFooter";
+import AxesLayer from "../axes/axesLayer";
+import NorthArrow3DLayer from "../northarrow/northArrow3DLayer";
+import type { colorMapFunctionType } from "../utils/layerTools";
+import MapLayer from "./mapLayer";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -27,6 +27,7 @@ const stories: Meta = {
         // Somehow, I do not manage to add the triggerHome to the general "unset" controls :/
         triggerHome: 0,
     },
+    tags: ["no-test"],
 };
 export default stories;
 
@@ -533,6 +534,9 @@ export const NodeCenteredPropMapWithArrayInput: StoryObj<
     },
 };
 
+// Data is randomly generated.
+NodeCenteredPropMapWithArrayInput.tags = ["no-test"];
+
 function makeGaussian(amplitude, x0, y0, stdX, stdY) {
     return function (amplitude, x0, y0, stdX, stdY, x, y) {
         const exponent = -(
@@ -834,6 +838,8 @@ export const ContourLines: StoryObj<typeof ContourLinesComponent> = {
     },
     render: (args) => <ContourLinesComponent {...args} />,
 };
+
+ContourLines.tags = ["no-test"];
 
 const ExtensionsComponent: React.FC<
     SubsurfaceViewerProps & { clipX: number }

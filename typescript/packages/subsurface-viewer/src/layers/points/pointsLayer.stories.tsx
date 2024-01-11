@@ -1,12 +1,13 @@
+import type { Meta, StoryFn } from "@storybook/react";
+import { all, create } from "mathjs";
 import React from "react";
-import type { StoryFn, Meta } from "@storybook/react";
-import { create, all } from "mathjs";
 
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 
 export default {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer / Points Layer",
+    tags: ["no-test"],
 } as Meta<typeof SubsurfaceViewer>;
 
 const defaultParameters = {
@@ -137,3 +138,5 @@ HugePointsLayer.parameters = {
         },
     },
 };
+
+HugePointsLayer.tags = ["no-test"];

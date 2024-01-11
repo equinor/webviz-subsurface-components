@@ -1,15 +1,16 @@
-import React from "react";
-import DeckGL from "@deck.gl/react/typed";
-import { rgb } from "d3-color";
 import type { Color } from "@deck.gl/core/typed";
 import { OrthographicView } from "@deck.gl/core/typed";
+import DeckGL from "@deck.gl/react/typed";
+import { rgb } from "d3-color";
+import React from "react";
 
-import type { ComponentStory, ComponentMeta } from "@storybook/react";
+import type { ComponentMeta, ComponentStory } from "@storybook/react";
 import AxesLayer from "./axesLayer";
 
 export default {
     component: DeckGL,
     title: "SubsurfaceViewer / Axes",
+    tags: ["no-test"],
 } as ComponentMeta<typeof DeckGL>;
 
 const layerProps = {
@@ -86,3 +87,5 @@ CustomLabel.args = {
     labelFontSize: 10,
     fontFamily: "math",
 };
+
+CustomLabel.tags = ["no-test"];

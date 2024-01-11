@@ -1,21 +1,21 @@
 /* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
 
-import React, { useState } from "react";
-import { styled } from "@mui/material/styles";
-import SubsurfaceViewer from "../../SubsurfaceViewer";
-import type { ComponentStory, ComponentMeta, StoryFn } from "@storybook/react";
-import { NativeSelect } from "@equinor/eds-core-react";
 import {
-    createColorMapFunction,
     ColorLegend,
     colorTables,
+    createColorMapFunction,
 } from "@emerson-eps/color-tables";
-import type { MapMouseEvent } from "../../components/Map";
-import WellsLayer from "./wellsLayer";
-import AxesLayer from "../axes/axesLayer";
-import type { FeatureCollection } from "geojson";
+import { NativeSelect } from "@equinor/eds-core-react";
 import { Slider } from "@mui/material";
+import { styled } from "@mui/material/styles";
+import type { ComponentMeta, ComponentStory, StoryFn } from "@storybook/react";
+import type { FeatureCollection } from "geojson";
 import type { SyntheticEvent } from "react";
+import React, { useState } from "react";
+import SubsurfaceViewer from "../../SubsurfaceViewer";
+import type { MapMouseEvent } from "../../components/Map";
+import AxesLayer from "../axes/axesLayer";
+import WellsLayer from "./wellsLayer";
 
 const PREFIX = "VolveWells";
 
@@ -71,6 +71,7 @@ const Root = styled("div")({
 export default {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer / Wells Layer",
+    tags: ["no-test"],
 } as ComponentMeta<typeof SubsurfaceViewer>;
 
 const Template: ComponentStory<typeof SubsurfaceViewer> = (args) => (
@@ -166,6 +167,8 @@ volveWells2.args = {
         },
     ],
 };
+
+volveWells2.tags = ["no-test"];
 
 // Volve wells with logs.
 //

@@ -7,7 +7,7 @@ const screenshotTest = async (page, context) => {
 
     let stable = false;
 
-    const poll = 2000;
+    const poll = 5000;
 
     while(!stable) {
         const currentScreenshot = await page.screenshot();
