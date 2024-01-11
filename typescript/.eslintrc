@@ -31,10 +31,6 @@
         {
             "files": ["*.mdx"],
             "extends": ["plugin:mdx/recommended"]
-        },
-        {
-            "files": ["*.md"],
-            "extends": ["plugin:md/recommended"]
         }
     ],
     "settings": {

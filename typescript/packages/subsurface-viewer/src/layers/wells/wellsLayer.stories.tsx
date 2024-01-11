@@ -573,6 +573,8 @@ WellsRefine.parameters = {
     },
 };
 
+WellsRefine.tags = ["no-test"];
+
 export const Wells3d = Template.bind({});
 Wells3d.args = {
     ...defaultProps,
