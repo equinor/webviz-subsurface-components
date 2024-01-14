@@ -90,6 +90,9 @@ export function zoomContent(logViewer: LogViewer, zoom: number): boolean {
         // check if new domain is in the base domain
         if (c + d > b2) c = b2 - d;
         if (c - d < b1) c = b1 + d;
+
+        console.log("zoomContent", [c - d, c + d]);
+
         logViewer.zoomTo([c - d, c + d]);
         return true;
     }
@@ -107,6 +110,8 @@ export function scrollContentTo(
 
     const c = b1 + f * w;
     if (c !== d1) {
+        console.log("scrollContentTo", [c, c + d]);
+
         logViewer.zoomTo([c, c + d]);
         return true;
     }
@@ -119,6 +124,8 @@ export function zoomContentTo(
 ): boolean {
     const [d1, d2] = logViewer.domain;
     if (domain[0] !== d1 || domain[1] !== d2) {
+        console.log("zoomContentTo", domain);
+
         logViewer.zoomTo(domain);
         return true;
     }
@@ -131,8 +138,9 @@ export function setContentBaseDomain(
 ): void {
     const [b1, b2] = logViewer.scaleHandler.baseDomain();
     if (b1 !== domain[0] || b2 !== domain[1]) {
-        logViewer.domain = domain;
-        //logViewer.scaleHandler.baseDomain(domain);
+        console.log("setContentBaseDomain", domain);
+        //see logViewer.domain = domain;
+        logViewer.scaleHandler.baseDomain(domain);
         //logViewer.rescale();
     }
 }
@@ -144,8 +152,13 @@ export function getContentBaseDomain(logViewer: LogViewer): [number, number] {
     return [b1, b2];
 }
 
+//import { zoomTransform } from "d3-zoom";
 export function getContentDomain(logViewer: LogViewer): [number, number] {
-    const [d1, d2] = logViewer.domain;
+    //const [d1, d2] = logViewer.domain; // logViewer.scale.domain
+    const [d1, d2] = logViewer.scale.domain();
+    //const [_d1, _d2] = logViewer.scale.range();
+    //const node = logViewer.zoomHandler.node();
+    //const current = zoomTransform(node);
     return [d1, d2];
 }
 

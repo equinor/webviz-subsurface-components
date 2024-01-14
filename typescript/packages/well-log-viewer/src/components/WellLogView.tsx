@@ -714,7 +714,7 @@ function setTracksToController(
     logController.scaleHandler = new InterpolatedScaleHandler(
         scaleInterpolator
     );
-    logController.domain = minmaxPrimaryAxis;
+    setContentBaseDomain(logController, minmaxPrimaryAxis);
     logController.setTracks(tracks);
     return scaleInterpolator;
 }
