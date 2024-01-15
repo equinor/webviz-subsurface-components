@@ -24,8 +24,9 @@ import type WellLogView from "../components/WellLogView";
 
 import type { PlotConfig } from "@equinor/videx-wellog/dist/tracks/graph/interfaces";
 import type { PlotFactory } from "@equinor/videx-wellog/dist/tracks/graph/interfaces";
-import { graphLegendConfig, scaleLegendConfig } from "@equinor/videx-wellog";
+import { graphLegendConfig } from "@equinor/videx-wellog";
 import { stackLegendConfig } from "./stack/stack-legend";
+import { scaleLegendConfig } from "./stack/scale-legend"; // This is fixed implementation of scaleLegendConfig from "@equinor/videx-wellog";
 import { getInterpolatedColor } from "./color-table";
 
 // missed! import { createScale } from "@equinor/videx-wellog/dist/tracks/graph/interfaces";
