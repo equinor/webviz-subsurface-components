@@ -9,4 +9,10 @@ const testRunnerConfig = getJestConfig();
 module.exports = {
     ...testRunnerConfig,
     testTimeout: 60000,
+    maxWorkers: process.env.CI ? 4 : 8,
+    testEnvironmentOptions: {
+        "jest-playwright": {
+            browsers: ["webkit"],
+        }
+    }
 };

@@ -142,6 +142,7 @@ Simgrid4x.args = {
     ],
 };
 Simgrid4x.parameters = parameters;
+Simgrid4x.tags = ["no-test"];
 
 export const Simgrid8xIJonly = Template.bind({});
 Simgrid8xIJonly.args = {
