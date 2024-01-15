@@ -1,3 +1,10 @@
+## [1.3.5](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.3.4...well-log-viewer@1.3.5) (2024-01-15)
+
+
+### Bug Fixes
+
+* legend text position on stack and scale track legends in WellLogView ([#1869](https://github.com/equinor/webviz-subsurface-components/issues/1869)) ([38ea0b6](https://github.com/equinor/webviz-subsurface-components/commit/38ea0b602c1b1eadca0266cdd1b1f87ecf4fdd05)), closes [#1715](https://github.com/equinor/webviz-subsurface-components/issues/1715)
+
 ## [1.3.4](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.3.3...well-log-viewer@1.3.4) (2024-01-10)
 
 
