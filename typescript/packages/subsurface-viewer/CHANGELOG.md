@@ -1,3 +1,10 @@
+## [0.13.4](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.13.3...subsurface-viewer@0.13.4) (2024-01-12)
+
+
+### Bug Fixes
+
+* zoom keys (arrow up and down) only apply to last SubSurfaceViewer ([#1868](https://github.com/equinor/webviz-subsurface-components/issues/1868)) ([a422198](https://github.com/equinor/webviz-subsurface-components/commit/a422198eee9a102db35f0b72e818782f93df8bef))
+
 ## [0.13.3](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.13.2...subsurface-viewer@0.13.3) (2024-01-10)
 
 
