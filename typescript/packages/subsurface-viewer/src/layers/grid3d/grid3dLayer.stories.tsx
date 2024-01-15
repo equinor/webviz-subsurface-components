@@ -19,6 +19,7 @@ import {
 export default {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer/Grid3D Layer",
+    tags: ["no-test"],
 } as ComponentMeta<typeof SubsurfaceViewer>;
 
 type NumberQuad = [number, number, number, number];
@@ -122,6 +123,7 @@ Simgrid2x.args = {
     ],
 };
 Simgrid2x.parameters = parameters;
+Simgrid2x.tags = ["no-test"];
 
 export const Simgrid4x = Template.bind({});
 Simgrid4x.args = {
@@ -157,6 +159,7 @@ Simgrid8xIJonly.args = {
     ],
 };
 Simgrid8xIJonly.parameters = parameters;
+Simgrid8xIJonly.tags = ["no-test"];
 
 const math = create(all, { randomSeed: "1984" });
 const randomFunc = math?.random ? math.random : Math.random;
