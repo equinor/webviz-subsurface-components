@@ -190,7 +190,7 @@ export const argTypesSyncLogViewerProp = {
 
     spacers: {
         description:
-            "Set to true or spacer width or to array of widths if WellLogSpacers should be used",
+            "Set to true or to spacers width or to array of spacer widths if WellLogSpacers should be used",
     },
     wellDistances: {
         description: "Distanses between wells to show on the spacers",
@@ -298,11 +298,12 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
     }
 
     componentDidMount(): void {
-        2;
         this.syncTrackScrollPos(0);
-        console.log("syncContentScrollPos1");
         this.syncContentScrollPos(0);
-        this.setControllersZoom(); // fix after setting the commonBaseDomain
+        { // fix after setting the commonBaseDomain
+          this.setControllersZoom(); 
+          //this.setControllersZoom(); 
+        }
         this.syncContentSelection(0);
         this.setSliderValue();
     }
@@ -357,7 +358,6 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                 prevProps.wellpickFlatting
             )
         ) {
-            console.log("syncContentScrollPos2");
             this.syncContentScrollPos(0); // force to redraw visible domain
         }
 
@@ -469,7 +469,6 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
 
         this.setControllersZoom();
         this.syncTrackScrollPos(iView);
-        console.log("syncContentScrollPos3", iView);
         this.syncContentScrollPos(iView);
         this.syncContentSelection(iView);
     }
@@ -484,7 +483,6 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
     // callback function from WellLogView
     onContentRescale(iView: number): void {
         this.syncTrackScrollPos(iView);
-        console.log("syncContentScrollPos4", iView);
         this.syncContentScrollPos(iView);
         this.syncContentSelection(iView);
 
@@ -515,7 +513,6 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         const controller = this.controllers[iView];
         if (!controller) return;
         controller.zoomContent(value);
-        console.log("syncContentScrollPos5", iView);
         this.syncContentScrollPos(iView);
     }
     // callback function from Scroller
@@ -529,7 +526,6 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         controller.scrollTrackTo(posTrack);
 
         const fContent = this.props.horizontal ? x : y; // fraction
-        console.log("onScrollerScroll scrollContentTo", iView, fContent);
         controller.scrollContentTo(fContent);
 
         const domain = controller.getContentDomain();
@@ -731,12 +727,8 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         }
         const domain = controller.getContentDomain();
 
-        console.log("syncContentScrollPos=", iView, domain);
-
         // synchronize base domains
         updated = this.syncContentBaseDomain();
-
-        if (updated) console.log("updated=", iView, domain);
 
         let j = -1;
         for (const _controller of this.controllers) {
@@ -791,14 +783,12 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         }
 
         if (updated) {
-            /*{ // restore 
-                console.log("syncContentScrollPos=", iView);
-
+            { // restore 
                 const _domain = controller.getContentDomain();
                 if (!isEqDomains(_domain, domain)) {
                     controller.zoomContentTo(domain);
                 }
-            }*/
+            }
 
             for (let i = iView - 1; i <= iView; i++) {
                 const spacer = this.spacers[i];
@@ -1135,6 +1125,7 @@ SyncLogViewer.propTypes = {
      */
     spacers: PropTypes.oneOfType([
         PropTypes.bool,
+        PropTypes.number,
         PropTypes.arrayOf(PropTypes.number),
     ]),
 
