@@ -1108,6 +1108,7 @@ SyncLogViewer.propTypes = {
      */
     spacers: PropTypes.oneOfType([
         PropTypes.bool,
+        PropTypes.number,
         PropTypes.arrayOf(PropTypes.number),
     ]),
 

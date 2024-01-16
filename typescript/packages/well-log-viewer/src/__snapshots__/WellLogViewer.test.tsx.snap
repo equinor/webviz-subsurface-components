@@ -545,7 +545,7 @@ exports[`Test Well Log Viewer Component snapshot test 1`] = `
             style="left: 0%; width: 0%;"
           />
           <span
-            class="MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary css-eg0mwd-MuiSlider-thumb"
+            class="MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary css-jx1sa5-MuiSlider-thumb"
             data-index="0"
             style="left: 0%;"
           >
@@ -566,7 +566,7 @@ exports[`Test Well Log Viewer Component snapshot test 1`] = `
             />
             <span
               aria-hidden="true"
-              class="MuiSlider-valueLabel css-nnid7-MuiSlider-valueLabel"
+              class="MuiSlider-valueLabel css-7d61z1-MuiSlider-valueLabel"
             >
               <span
                 class="MuiSlider-valueLabelCircle"
