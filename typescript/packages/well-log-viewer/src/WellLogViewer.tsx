@@ -170,8 +170,7 @@ export default class WellLogViewer extends Component<
 
     updateReadoutPanel(): void {
         const controller = this.controller;
-        if (controller)
-            controller.selectContent(controller.getContentSelection()); // force to update readout panel
+        if (controller) controller.updateInfo(); // force to update readout panel
     }
 
     // callback function from WellLogView
@@ -246,11 +245,6 @@ export default class WellLogViewer extends Component<
         else delete this.collapsedTrackIds[i];
 
         this.updateReadoutPanel();
-
-        if (this.controller)
-            this.controller.selectContent(
-                this.controller.getContentSelection()
-            ); // force to update readout panel
     }
 
     render(): JSX.Element {

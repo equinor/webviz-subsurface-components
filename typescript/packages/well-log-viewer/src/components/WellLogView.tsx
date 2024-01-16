@@ -925,6 +925,8 @@ export interface WellLogController {
     setSelectedTrackIndices(selection: number[]): boolean;
     getSelectedTrackIndices(): number[];
 
+    updateInfo(): void;
+
     setTemplate(template: Template): void;
     getTemplate(): Template;
 }
@@ -1357,7 +1359,7 @@ class WellLogView
         ) {
             this.onTrackScroll();
             this.onTrackSelection();
-            this.setInfo();
+            this.updateInfo();
         }
 
         if (
@@ -1409,7 +1411,7 @@ class WellLogView
 
             initOverlays(this.logController, this);
         }
-        this.setInfo();
+        this.updateInfo();
     }
     getAxesInfo(): AxesInfo {
         // get Object keys available in the welllog
@@ -1464,7 +1466,7 @@ class WellLogView
         this.setControllerSelection();
         this.onTrackScroll();
         this.onTrackSelection();
-        this.setInfo(); // Clear old track information
+        this.updateInfo(); // Clear old track information
     }
 
     findTrackById(trackId: string | number): Track | undefined {
@@ -1521,7 +1523,7 @@ class WellLogView
     }
 
     onTemplateChanged(): void {
-        this.setInfo();
+        this.updateInfo();
 
         this.template = this._generateTemplate(); // save current template
 
@@ -1608,7 +1610,7 @@ class WellLogView
         this.selPersistent = this.selPinned !== undefined;
 
         this.showSelection();
-        this.setInfo(); // reflect new value in this.selCurrent
+        this.updateInfo(); // reflect new value in this.selCurrent
     }
 
     setContentBaseDomain(domain: [number, number]): void {
@@ -1702,6 +1704,9 @@ class WellLogView
         if (changed) this.onTrackSelection();
         return changed;
     }
+    updateInfo(): void {
+        this.setInfo(); // reflect new value in this.selCurrent
+    }
 
     getTemplate(): Template {
         return this.template;
@@ -1777,7 +1782,7 @@ class WellLogView
                 this.scrollTrackBy(+1);
             else {
                 this.onTrackScroll();
-                this.setInfo();
+                this.updateInfo();
             }
             this.selectTrack(trackNew, true);
         }

@@ -423,7 +423,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
     updateReadoutPanel(): void {
         for (const controller of this.controllers) {
             if (!controller) continue;
-            controller.selectContent(controller.getContentSelection()); // force to update readout panel
+            controller.updateInfo(); // force to update readout panel
         }
     }
 
