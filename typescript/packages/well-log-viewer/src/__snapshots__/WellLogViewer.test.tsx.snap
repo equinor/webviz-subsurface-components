@@ -312,7 +312,9 @@ exports[`Test Well Log Viewer Component snapshot test 1`] = `
               >
                 ⬤
               </td>
-              <td>
+              <td
+                style="white-space: nowrap;"
+              >
                 DEPT
               </td>
               <td
@@ -333,7 +335,9 @@ exports[`Test Well Log Viewer Component snapshot test 1`] = `
               >
                 ⬤
               </td>
-              <td>
+              <td
+                style="white-space: nowrap;"
+              >
                 DVER
               </td>
               <td
@@ -377,7 +381,9 @@ exports[`Test Well Log Viewer Component snapshot test 1`] = `
               >
                 ⬤
               </td>
-              <td>
+              <td
+                style="white-space: nowrap;"
+              >
                 MDIA
               </td>
               <td
@@ -398,7 +404,9 @@ exports[`Test Well Log Viewer Component snapshot test 1`] = `
               >
                 ⬤
               </td>
-              <td>
+              <td
+                style="white-space: nowrap;"
+              >
                 HKLA
               </td>
               <td
@@ -434,7 +442,9 @@ exports[`Test Well Log Viewer Component snapshot test 1`] = `
               >
                 ⬤
               </td>
-              <td>
+              <td
+                style="white-space: nowrap;"
+              >
                 HKLA
               </td>
               <td
@@ -470,7 +480,9 @@ exports[`Test Well Log Viewer Component snapshot test 1`] = `
               >
                 ⬤
               </td>
-              <td>
+              <td
+                style="white-space: nowrap;"
+              >
                 HKLX
               </td>
               <td
@@ -491,7 +503,9 @@ exports[`Test Well Log Viewer Component snapshot test 1`] = `
               >
                 ⬤
               </td>
-              <td>
+              <td
+                style="white-space: nowrap;"
+              >
                 HKLA
               </td>
               <td

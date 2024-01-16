@@ -316,7 +316,9 @@ exports[`Sync Log Viewer snapshot test 1`] = `
               >
                 ⬤
               </td>
-              <td>
+              <td
+                style="white-space: nowrap;"
+              >
                 DEPT
               </td>
               <td
@@ -337,7 +339,9 @@ exports[`Sync Log Viewer snapshot test 1`] = `
               >
                 ⬤
               </td>
-              <td>
+              <td
+                style="white-space: nowrap;"
+              >
                 DVER
               </td>
               <td
@@ -366,7 +370,9 @@ exports[`Sync Log Viewer snapshot test 1`] = `
               >
                 ⬤
               </td>
-              <td>
+              <td
+                style="white-space: nowrap;"
+              >
                 MDIA
               </td>
               <td
@@ -387,7 +393,9 @@ exports[`Sync Log Viewer snapshot test 1`] = `
               >
                 ⬤
               </td>
-              <td>
+              <td
+                style="white-space: nowrap;"
+              >
                 HKLA
               </td>
               <td
@@ -408,7 +416,9 @@ exports[`Sync Log Viewer snapshot test 1`] = `
               >
                 ⬤
               </td>
-              <td>
+              <td
+                style="white-space: nowrap;"
+              >
                 HKLA
               </td>
               <td
@@ -429,7 +439,9 @@ exports[`Sync Log Viewer snapshot test 1`] = `
               >
                 ⬤
               </td>
-              <td>
+              <td
+                style="white-space: nowrap;"
+              >
                 HKLX
               </td>
               <td
@@ -450,7 +462,9 @@ exports[`Sync Log Viewer snapshot test 1`] = `
               >
                 ⬤
               </td>
-              <td>
+              <td
+                style="white-space: nowrap;"
+              >
                 HKLA
               </td>
               <td

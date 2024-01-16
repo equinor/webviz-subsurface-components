@@ -97,8 +97,8 @@ class InfoPanel extends Component<Props> {
             // compress too long names
             name = name.substring(0, 14) + ellipsis;
         // print long names and values with a smaller font size
-        const nameStyle: React.CSSProperties =
-            name.length > 10 ? { fontSize: "x-small" } : {};
+        const nameStyle: React.CSSProperties = { whiteSpace: "nowrap" };
+        if (name.length > 10) nameStyle.fontSize = "x-small";
         let value = formatValue(info.value);
         if (info.discrete)
             value = info.discrete + (value ? nbsp + "(" + value + ")" : "");

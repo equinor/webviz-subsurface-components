@@ -18,7 +18,9 @@ exports[`Test Info panel snapshot test 1`] = `
           >
             ⬤
           </td>
-          <td>
+          <td
+            style="white-space: nowrap;"
+          >
             DVER
           </td>
           <td
@@ -47,7 +49,9 @@ exports[`Test Info panel snapshot test 1`] = `
           >
             ⬤
           </td>
-          <td>
+          <td
+            style="white-space: nowrap;"
+          >
             BDIA
           </td>
           <td
@@ -86,7 +90,9 @@ exports[`Test Info panel snapshot test when value is infinity 1`] = `
           >
             ⬤
           </td>
-          <td>
+          <td
+            style="white-space: nowrap;"
+          >
             DVER
           </td>
           <td
