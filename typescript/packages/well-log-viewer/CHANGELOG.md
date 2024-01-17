@@ -1,3 +1,10 @@
+## [1.3.6](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.3.5...well-log-viewer@1.3.6) (2024-01-17)
+
+
+### Bug Fixes
+
+* InfoPanel drawing in WellLogViewer ([#1877](https://github.com/equinor/webviz-subsurface-components/issues/1877)) ([99eb83b](https://github.com/equinor/webviz-subsurface-components/commit/99eb83bd64232578566286e74c710d469620468f)), closes [#1864](https://github.com/equinor/webviz-subsurface-components/issues/1864) [#1874](https://github.com/equinor/webviz-subsurface-components/issues/1874) [#1878](https://github.com/equinor/webviz-subsurface-components/issues/1878)
+
 ## [1.3.5](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.3.4...well-log-viewer@1.3.5) (2024-01-15)
 
 
