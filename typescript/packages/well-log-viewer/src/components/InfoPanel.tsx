@@ -42,6 +42,9 @@ function formatValue(value: number): string {
     return v;
 }
 
+const bigCircle = "\u2B24";
+const nbsp = "\xA0";
+const ellipsis = "\u2026"; //"…";
 class InfoPanel extends Component<Props> {
     constructor(props: Props) {
         super(props);
@@ -85,20 +88,26 @@ class InfoPanel extends Component<Props> {
             );
         }
 
+        const typeStyle: React.CSSProperties = {
+            color: info.color,
+            fontSize: "small",
+        };
         let name = info.name ? info.name : "?";
-        if (name.length > 15)
+        if (name.length > 16)
             // compress too long names
-            name = name.substring(0, 13) + "…";
+            name = name.substring(0, 14) + ellipsis;
         // print long names and values with a smaller font size
-        const nameStyle: React.CSSProperties =
-            name.length > 10 ? { fontSize: "x-small" } : {};
+        const nameStyle: React.CSSProperties = { whiteSpace: "nowrap" };
+        if (name.length > 10) nameStyle.fontSize = "x-small";
         let value = formatValue(info.value);
         if (info.discrete)
-            value = info.discrete + (value ? "\xA0(" + value + ")" : "");
+            value = info.discrete + (value ? nbsp + "(" + value + ")" : "");
+        if (value === "") value = nbsp; // set some text to force the empty line to have the same height as non-empty line
         const valueStyle: React.CSSProperties = {
             width: "90px",
             paddingLeft: "1.5em",
             textAlign: "right",
+            whiteSpace: "nowrap",
         };
         if (value.length > 10) valueStyle.fontSize = "x-small";
         return (
@@ -109,13 +118,14 @@ class InfoPanel extends Component<Props> {
                     info.name /*Set unique key prop just for react pleasure*/
                 }
             >
-                {/*info.type*/}
-                <td style={{ color: info.color, fontSize: "small" }}>
-                    {"\u2B24" /*big circle*/}
-                </td>
+                <td style={typeStyle}>{bigCircle}</td>
                 <td style={nameStyle}>{name}</td>
-                <td style={valueStyle}>{value}</td>
-                <td style={{ paddingLeft: "0.5em" }}>{info.units}</td>
+                <td style={valueStyle} colSpan={info.discrete ? 2 : 1}>
+                    {value}
+                </td>
+                {!info.discrete ? (
+                    <td style={{ paddingLeft: "0.5em" }}>{info.units}</td>
+                ) : null}
             </tr>
         );
     }
