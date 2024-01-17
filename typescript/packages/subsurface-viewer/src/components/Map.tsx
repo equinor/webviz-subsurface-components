@@ -6,7 +6,6 @@ import { cloneDeep, isEmpty, isEqual } from "lodash";
 import type {
     MjolnirEvent,
     MjolnirGestureEvent,
-    MjolnirKeyEvent,
     MjolnirPointerEvent,
 } from "mjolnir.js";
 
@@ -122,50 +121,22 @@ function getZScaleModifier(arrowEvent: ArrowEvent): number {
     return 1 + scaleFactor;
 }
 
-function convertToArrowEvent(event: MjolnirEvent): ArrowEvent | null {
+function convertToArrowEvent(event: KeyboardEvent): ArrowEvent | null {
     if (event.type === "keydown") {
-        const keyEvent = event as MjolnirKeyEvent;
-        switch (keyEvent.key) {
+        switch (event.key) {
             case "ArrowUp":
             case "ArrowDown":
             case "PageUp":
             case "PageDown":
                 return {
-                    key: keyEvent.key,
-                    shiftModifier: keyEvent.srcEvent.shiftKey,
+                    key: event.key,
+                    shiftModifier: event.shiftKey,
                 };
             default:
                 return null;
         }
     }
     return null;
-}
-
-class ZScaleOrbitController extends OrbitController {
-    static updateZScaleAction: React.Dispatch<ArrowEvent> | null = null;
-
-    static setUpdateZScaleAction(
-        updateZScaleAction: React.Dispatch<ArrowEvent>
-    ) {
-        ZScaleOrbitController.updateZScaleAction = updateZScaleAction;
-    }
-
-    handleEvent(event: MjolnirEvent): boolean {
-        if (ZScaleOrbitController.updateZScaleAction) {
-            const arrowEvent = convertToArrowEvent(event);
-            if (arrowEvent) {
-                ZScaleOrbitController.updateZScaleAction(arrowEvent);
-                return true;
-            }
-        }
-        return super.handleEvent(event);
-    }
-}
-
-class ZScaleOrbitView extends OrbitView {
-    get ControllerType(): typeof OrbitController {
-        return ZScaleOrbitController;
-    }
 }
 
 function parseLights(lights?: LightsType): LightingEffect[] | undefined {
@@ -531,9 +502,6 @@ const Map: React.FC<MapProps> = ({
 
     // Used for scaling in z direction using arrow keys.
     const [zScale, updateZScale] = React.useReducer(updateZScaleReducer, 1);
-    React.useEffect(() => {
-        ZScaleOrbitController.setUpdateZScaleAction(updateZScale);
-    }, [updateZScale]);
 
     // compute the viewport margins
     const viewPortMargins = React.useMemo<MarginsType>(() => {
@@ -577,28 +545,37 @@ const Map: React.FC<MapProps> = ({
     const [selectedWell, setSelectedWell] = useState<string>("");
     const [shiftHeld, setShiftHeld] = useState(false);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    function downHandler({ key }: any) {
-        if (key === "Shift") {
-            setShiftHeld(true);
-        }
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    function upHandler({ key }: any) {
-        if (key === "Shift") {
-            setShiftHeld(false);
-        }
-    }
+    const divRef = React.useRef(null);
 
     useEffect(() => {
-        window.addEventListener("keydown", downHandler);
-        window.addEventListener("keyup", upHandler);
-        return () => {
-            window.removeEventListener("keydown", downHandler);
-            window.removeEventListener("keyup", upHandler);
+        const keyDownHandler = (e: KeyboardEvent) => {
+            const arrowEvent = convertToArrowEvent(e);
+            if (arrowEvent) {
+                updateZScale(arrowEvent);
+                // prevent being handled by regular OrbitController
+                e.stopPropagation();
+            }
+            if (e.key === "Shift") {
+                setShiftHeld(true);
+            }
         };
-    }, []);
+        const keyUpHandler = (e: KeyboardEvent) => {
+            if (e.key === "Shift") {
+                setShiftHeld(false);
+            }
+        };
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const element = divRef.current as any;
+
+        element?.addEventListener("keydown", keyDownHandler, true);
+        element?.addEventListener("keyup", keyUpHandler, true);
+
+        return () => {
+            element?.removeEventListener("keydown", keyDownHandler);
+            element?.removeEventListener("keyup", keyUpHandler);
+        };
+    }, [updateZScale, setShiftHeld]);
 
     useEffect(() => {
         const layers = deckRef.current?.deck?.props.layers;
@@ -851,7 +828,7 @@ const Map: React.FC<MapProps> = ({
     if (!deckGlViews || isEmpty(deckGlViews) || isEmpty(deckGLLayers))
         return null;
     return (
-        <div onContextMenu={(event) => event.preventDefault()}>
+        <div ref={divRef} onContextMenu={(event) => event.preventDefault()}>
             <DeckGL
                 id={id}
                 viewState={deckGlViewState}
@@ -1104,6 +1081,7 @@ class ViewController {
             viewsChanged ||
             triggerHome ||
             state.camera != this.state_.camera ||
+            state.bounds != this.state_.bounds ||
             (!state.viewStateChanged &&
                 state.boundingBox3d !== this.state_.boundingBox3d);
         const needUpdate = updateZScale || updateTarget || updateViewState;
@@ -1391,17 +1369,17 @@ function getViewStateFromBounds(
 ///////////////////////////////////////////////////////////////////////////////////////////
 // build views
 type ViewTypeType =
-    | typeof ZScaleOrbitView
+    | typeof OrbitView
     | typeof IntersectionView
     | typeof OrthographicView;
 function getVT(
     viewport: ViewportType
 ): [
     ViewType: ViewTypeType,
-    Controller: typeof ZScaleOrbitController | typeof OrthographicController,
+    Controller: typeof OrbitController | typeof OrthographicController,
 ] {
     if (viewport.show3D) {
-        return [ZScaleOrbitView, ZScaleOrbitController];
+        return [OrbitView, OrbitController];
     }
     return [
         viewport.id === "intersection_view"
@@ -1523,7 +1501,8 @@ function buildDeckGlViews(views: ViewsType | undefined, size: Size): View[] {
 function updateViewState(
     camera: ViewStateType,
     boundingBox: BoundingBox3D | undefined,
-    size: Size
+    size: Size,
+    is3D = true
 ): ViewStateType {
     if (typeof camera.zoom === "number" && !Number.isNaN(camera.zoom)) {
         return camera;
@@ -1537,6 +1516,12 @@ function updateViewState(
     // return the camera if the bounding box is undefined
     if (boundingBox === undefined) {
         return camera;
+    }
+
+    if (!is3D) {
+        // in 2D, use flat boxes
+        boundingBox[2] = 0;
+        boundingBox[5] = 0;
     }
 
     // clone the camera in case of triggerHome
@@ -1593,6 +1578,12 @@ function computeViewState(
         };
         return updateViewState(defaultCamera, boundingBox, size);
     } else {
+        // If the camera is defined, use it
+        if (isCameraPositionDefined) {
+            const is3D = false;
+            return updateViewState(cameraPosition, boundingBox, size, is3D);
+        }
+
         const centerOfData: [number, number, number] = boundingBox
             ? boxCenter(boundingBox)
             : [0, 0, 0];
@@ -1606,11 +1597,6 @@ function computeViewState(
                 viewPort,
                 size
             );
-        }
-
-        // deprecated in 2D, kept for backward compatibility
-        if (isCameraPositionDefined) {
-            return cameraPosition;
         }
 
         return boundingBox

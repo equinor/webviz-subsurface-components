@@ -1,6 +1,6 @@
 {
     "name": "@webviz/subsurface-viewer",
-    "version": "0.13.1",
+    "version": "0.13.4",
     "description": "",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -39,7 +39,7 @@
         "deck.gl": "^8.9.32",
         "gl-matrix": "^3.4.3",
         "lodash": "^4.17.21",
-        "mathjs": "^9.4.2",
+        "mathjs": "^12.2.1",
         "react-redux": "^8.1.1"
     },
     "peerDependencies": {

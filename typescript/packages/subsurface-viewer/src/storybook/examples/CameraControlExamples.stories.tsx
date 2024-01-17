@@ -60,12 +60,13 @@ const Root = styled("div")({
     },
 });
 
-const CustomTemplate: React.FC<SubsurfaceViewerProps> = (args) => {
-    const [state, setState] = React.useState(args.cameraPosition);
+const DisplayCameraPositionComponent: React.FC<SubsurfaceViewerProps> = (
+    args
+) => {
+    const [cameraState, setCameraState] = React.useState(args.cameraPosition);
 
     const getCameraPosition = React.useCallback((input: ViewStateType) => {
-        setState(input);
-        return input;
+        setCameraState(input);
     }, []);
     return (
         <>
@@ -80,34 +81,34 @@ const CustomTemplate: React.FC<SubsurfaceViewerProps> = (args) => {
                     marginLeft: 200,
                 }}
             >
-                <div>zoom: {state?.zoom}</div>
-                <div>rotationX: {state?.rotationX}</div>
-                <div>rotationOrbit: {state?.rotationOrbit}</div>
-                <div>targetX: {state?.target[0]}</div>
-                <div>targetY: {state?.target[1]}</div>
+                <div>zoom: {cameraState?.zoom}</div>
+                <div>rotationX: {cameraState?.rotationX}</div>
+                <div>rotationOrbit: {cameraState?.rotationOrbit}</div>
+                <div>targetX: {cameraState?.target[0]}</div>
+                <div>targetY: {cameraState?.target[1]}</div>
             </div>
         </>
     );
 };
 
 const cameraPosition: ViewStateType = {
-    target: [437500, 6475000],
-    zoom: -5.0,
+    target: [435800, 6478000, -2000],
+    zoom: -3.5,
     rotationX: 90,
     rotationOrbit: 0,
 };
 
-export const customizedCameraPosition: StoryObj<typeof SubsurfaceViewer> = {
+export const DisplayCameraState: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "volve-wells",
         bounds: volveWellsBounds,
         layers: [volveWellsLayer],
         cameraPosition,
     },
-    render: (args) => <CustomTemplate {...args} />,
+    render: (args) => <DisplayCameraPositionComponent {...args} />,
 };
 
-const ViewStateSynchronizationStory = (args: {
+const SyncedMultiViewComponent = (args: {
     show3d: boolean;
     sync: string[];
 }) => {
@@ -154,9 +155,7 @@ const ViewStateSynchronizationStory = (args: {
     return <SubsurfaceViewer {...subsurfaceViewerArgs} />;
 };
 
-export const ViewStateSynchronization: StoryObj<
-    typeof ViewStateSynchronizationStory
-> = {
+export const SyncedMultiView: StoryObj<typeof SyncedMultiViewComponent> = {
     args: {
         show3d: false,
         sync: ["view_1", "view_2", "view_3", "view_4"],
@@ -168,7 +167,80 @@ export const ViewStateSynchronization: StoryObj<
             control: "check",
         },
     },
-    render: (args) => <ViewStateSynchronizationStory {...args} />,
+    render: (args) => <SyncedMultiViewComponent {...args} />,
+};
+
+type SyncedCameraSettingsProps = SubsurfaceViewerProps & {
+    syncViewers: boolean;
+};
+
+const SyncedCameraSettingsComponent = (args: SyncedCameraSettingsProps) => {
+    const [cameraPosition, setCameraPosition] = React.useState(
+        args.cameraPosition
+    );
+
+    const updateCamera = React.useCallback(
+        (camera: ViewStateType) => {
+            if (args.syncViewers) {
+                setCameraPosition(camera);
+            }
+        },
+        [args.syncViewers]
+    );
+
+    React.useEffect(() => {
+        if (args.cameraPosition) {
+            setCameraPosition({ ...args.cameraPosition });
+        }
+    }, [args.cameraPosition]);
+
+    const props = {
+        ...args,
+        cameraPosition,
+        getCameraPosition: updateCamera,
+    };
+
+    return (
+        <div
+            style={{
+                height: "96vh",
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+            }}
+        >
+            <div
+                style={{
+                    position: "relative",
+                }}
+            >
+                <SubsurfaceViewer {...props} id="left" />
+            </div>
+            <div
+                style={{
+                    position: "relative",
+                }}
+            >
+                <SubsurfaceViewer {...props} id="right" />
+            </div>
+        </div>
+    );
+};
+
+export const SyncedSubsurfaceViewers: StoryObj<
+    typeof SyncedCameraSettingsComponent
+> = {
+    args: {
+        syncViewers: true,
+        id: "volve-wells",
+        bounds: volveWellsBounds,
+        layers: [volveWellsLayer],
+        cameraPosition,
+        views: {
+            layout: [1, 1],
+            viewports: [{ id: "view", show3D: false }],
+        },
+    },
+    render: (args) => <SyncedCameraSettingsComponent {...args} />,
 };
 
 const zoomBox3D: BoundingBox3D = [-325, -450, -25, 125, 150, 125];
