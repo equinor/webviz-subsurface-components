@@ -142,6 +142,8 @@ function addRubberbandOverlay(instance: LogViewer, parent: WellLogView) {
                     instance
                 );
             }
+            parent.setInfo(parent.selCurrent);
+            parent.onContentSelection();
         },
         onMouseExit: (event: OverlayMouseExitEvent) => {
             if (event.target) {
@@ -210,9 +212,6 @@ function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
                     : "-";
                 elem.style.visibility = "visible";
             }
-
-            parent.setInfo(value);
-            parent.onContentSelection();
         },
         onMouseExit: (event: OverlayMouseExitEvent): void => {
             const elem = event.target;
