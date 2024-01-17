@@ -896,8 +896,25 @@ const Map: React.FC<MapProps> = ({
                     style={scale.cssStyle ?? {}}
                 />
             ) : null}
-            <StatusIndicator layers={deckGLLayers} isLoaded={isLoaded} />
-            {coords?.visible ? <InfoCard pickInfos={hoverInfo} /> : null}
+            {!isRenderedCallback && !isLoaded && (
+                <div
+                    style={{
+                        alignItems: "center",
+                        display: "flex",
+                        justifyContent: "center",
+                        position: "absolute",
+                        height: "90%",
+                        width: "90%",
+                        zIndex: 200,
+                    }}
+                >
+                    <StatusIndicator
+                        layers={deckGLLayers}
+                        isLoaded={isLoaded}
+                    />
+                </div>
+            )}
+            {coords?.visible && <InfoCard pickInfos={hoverInfo} />}
             {errorText && (
                 <pre
                     style={{
