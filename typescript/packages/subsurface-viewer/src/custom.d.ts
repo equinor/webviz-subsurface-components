@@ -6,4 +6,3 @@ declare module "*.svg" {
 }
 declare module "*.png";
 declare module "@emerson-eps/color-tables";
-declare module "deck.gl";
