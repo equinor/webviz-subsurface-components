@@ -44,48 +44,52 @@ exports[`Test Map component snapshot test 1`] = `
       style="width: 100px; height: 4px; border: 2px solid; display: inline-block; margin-left: 3px;"
     />
   </div>
-  <div>
-    <svg
-      aria-valuemax="100"
-      aria-valuemin="0"
-      aria-valuenow="0"
-      class="c0"
-      height="48"
-      preserveAspectRatio="xMidYMid meet"
-      role="progressbar"
-      viewBox="24 24 48 48"
-      width="48"
-    >
-      <circle
-        class=""
-        cx="48"
-        cy="48"
-        fill="none"
-        r="22"
-        stroke="var(--eds_infographic_primary__moss_green_13, rgba(222, 237, 238, 1))"
-        stroke-width="4"
-        style="stroke: 138.230; stroke-dashoffset: 138.230px;"
-      />
-      <circle
-        class=""
-        cx="48"
-        cy="48"
-        fill="none"
-        r="22"
-        stroke="var(--eds_infographic_primary__moss_green_100, rgba(0, 112, 121, 1))"
-        stroke-dasharray="138.23007675795088"
-        stroke-linecap="round"
-        stroke-width="4"
-        style="stroke: 138.230; stroke-dashoffset: 138.230px;"
-      />
-    </svg>
-    <output
-      class="c1"
-    >
-      Loading 0%
-    </output>
-    <br />
-    Loading assets...
+  <div
+    style="align-items: center; display: flex; justify-content: center; position: absolute; height: 90%; width: 90%; z-index: 200;"
+  >
+    <div>
+      <svg
+        aria-valuemax="100"
+        aria-valuemin="0"
+        aria-valuenow="0"
+        class="c0"
+        height="48"
+        preserveAspectRatio="xMidYMid meet"
+        role="progressbar"
+        viewBox="24 24 48 48"
+        width="48"
+      >
+        <circle
+          class=""
+          cx="48"
+          cy="48"
+          fill="none"
+          r="22"
+          stroke="var(--eds_infographic_primary__moss_green_13, rgba(222, 237, 238, 1))"
+          stroke-width="4"
+          style="stroke: 138.230; stroke-dashoffset: 138.230px;"
+        />
+        <circle
+          class=""
+          cx="48"
+          cy="48"
+          fill="none"
+          r="22"
+          stroke="var(--eds_infographic_primary__moss_green_100, rgba(0, 112, 121, 1))"
+          stroke-dasharray="138.23007675795088"
+          stroke-linecap="round"
+          stroke-width="4"
+          style="stroke: 138.230; stroke-dashoffset: 138.230px;"
+        />
+      </svg>
+      <output
+        class="c1"
+      >
+        Loading 0%
+      </output>
+      <br />
+      Loading assets...
+    </div>
   </div>
 </div>
 `;
@@ -134,48 +138,52 @@ exports[`Test Map component snapshot test with edited data 1`] = `
       style="width: 100px; height: 4px; border: 2px solid; display: inline-block; margin-left: 3px;"
     />
   </div>
-  <div>
-    <svg
-      aria-valuemax="100"
-      aria-valuemin="0"
-      aria-valuenow="0"
-      class="c0"
-      height="48"
-      preserveAspectRatio="xMidYMid meet"
-      role="progressbar"
-      viewBox="24 24 48 48"
-      width="48"
-    >
-      <circle
-        class=""
-        cx="48"
-        cy="48"
-        fill="none"
-        r="22"
-        stroke="var(--eds_infographic_primary__moss_green_13, rgba(222, 237, 238, 1))"
-        stroke-width="4"
-        style="stroke: 138.230; stroke-dashoffset: 138.230px;"
-      />
-      <circle
-        class=""
-        cx="48"
-        cy="48"
-        fill="none"
-        r="22"
-        stroke="var(--eds_infographic_primary__moss_green_100, rgba(0, 112, 121, 1))"
-        stroke-dasharray="138.23007675795088"
-        stroke-linecap="round"
-        stroke-width="4"
-        style="stroke: 138.230; stroke-dashoffset: 138.230px;"
-      />
-    </svg>
-    <output
-      class="c1"
-    >
-      Loading 0%
-    </output>
-    <br />
-    Loading assets...
+  <div
+    style="align-items: center; display: flex; justify-content: center; position: absolute; height: 90%; width: 90%; z-index: 200;"
+  >
+    <div>
+      <svg
+        aria-valuemax="100"
+        aria-valuemin="0"
+        aria-valuenow="0"
+        class="c0"
+        height="48"
+        preserveAspectRatio="xMidYMid meet"
+        role="progressbar"
+        viewBox="24 24 48 48"
+        width="48"
+      >
+        <circle
+          class=""
+          cx="48"
+          cy="48"
+          fill="none"
+          r="22"
+          stroke="var(--eds_infographic_primary__moss_green_13, rgba(222, 237, 238, 1))"
+          stroke-width="4"
+          style="stroke: 138.230; stroke-dashoffset: 138.230px;"
+        />
+        <circle
+          class=""
+          cx="48"
+          cy="48"
+          fill="none"
+          r="22"
+          stroke="var(--eds_infographic_primary__moss_green_100, rgba(0, 112, 121, 1))"
+          stroke-dasharray="138.23007675795088"
+          stroke-linecap="round"
+          stroke-width="4"
+          style="stroke: 138.230; stroke-dashoffset: 138.230px;"
+        />
+      </svg>
+      <output
+        class="c1"
+      >
+        Loading 0%
+      </output>
+      <br />
+      Loading assets...
+    </div>
   </div>
 </div>
 `;
