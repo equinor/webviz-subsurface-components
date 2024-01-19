@@ -45,7 +45,7 @@ exports[`Test Map component snapshot test 1`] = `
     />
   </div>
   <div
-    style="align-items: center; display: flex; justify-content: center; position: absolute; height: 90%; width: 90%; z-index: 200;"
+    style="display: flex; align-items: flex-end; justify-content: right; position: absolute; height: 90%; width: 90%; bottom: 10px; right: 10px; z-index: 200;"
   >
     <div>
       <svg
@@ -139,7 +139,7 @@ exports[`Test Map component snapshot test with edited data 1`] = `
     />
   </div>
   <div
-    style="align-items: center; display: flex; justify-content: center; position: absolute; height: 90%; width: 90%; z-index: 200;"
+    style="display: flex; align-items: flex-end; justify-content: right; position: absolute; height: 90%; width: 90%; bottom: 10px; right: 10px; z-index: 200;"
   >
     <div>
       <svg
