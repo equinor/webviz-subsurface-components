@@ -1,3 +1,10 @@
+## [1.3.8](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.3.7...well-log-viewer@1.3.8) (2024-01-19)
+
+
+### Bug Fixes
+
+* add missing dependencies ([#1881](https://github.com/equinor/webviz-subsurface-components/issues/1881)) ([7e5fbc4](https://github.com/equinor/webviz-subsurface-components/commit/7e5fbc49d98732e33c4edce90babc52e0ecccf1a))
+
 ## [1.3.7](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.3.6...well-log-viewer@1.3.7) (2024-01-18)
 
 
