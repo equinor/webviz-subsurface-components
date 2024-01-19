@@ -1,3 +1,11 @@
+## [0.13.5](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.13.4...subsurface-viewer@0.13.5) (2024-01-19)
+
+
+### Bug Fixes
+
+* add missing dependencies ([#1881](https://github.com/equinor/webviz-subsurface-components/issues/1881)) ([7e5fbc4](https://github.com/equinor/webviz-subsurface-components/commit/7e5fbc49d98732e33c4edce90babc52e0ecccf1a))
+* remove some unused dependencies ([#1880](https://github.com/equinor/webviz-subsurface-components/issues/1880)) ([3703825](https://github.com/equinor/webviz-subsurface-components/commit/37038250f05b0843a5a632c3e9e176ab15439e30))
+
 ## [0.13.4](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.13.3...subsurface-viewer@0.13.4) (2024-01-12)
 
 
