@@ -414,9 +414,10 @@ export interface MapProps {
     getCameraPosition?: (input: ViewStateType) => void;
 
     /**
-     * Will be called after all layers have rendered data.
+     * Will be called while layers have rendered data.
+     * progress is a number between 0 and 100.
      */
-    isRenderedCallback?: (arg: boolean) => void;
+    onRenderedProgress?: (progress: number) => void;
 
     onDragStart?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
     onDragEnd?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
@@ -462,7 +463,7 @@ const Map: React.FC<MapProps> = ({
     children,
     getTooltip = defaultTooltip,
     getCameraPosition,
-    isRenderedCallback,
+    onRenderedProgress,
     onDragStart,
     onDragEnd,
     lights,
@@ -723,33 +724,40 @@ const Map: React.FC<MapProps> = ({
         });
     }, [layers, zScale]);
 
-    const [isLoaded, setIsLoaded] = useState<boolean>(false);
+    const [loadingProgress, setLoadingProgress] = useState<number>(0);
     const onAfterRender = useCallback(() => {
         if (deckGLLayers) {
-            const loadedState = deckGLLayers.every((layer) => {
-                return (
-                    (layer as Layer).isLoaded || !(layer as Layer).props.visible
-                );
-            });
+            let progress = 100;
 
             const emptyLayers = // There will always be a dummy layer. Deck.gl does not like empty array of layers.
                 deckGLLayers.length == 1 &&
                 (deckGLLayers[0] as LineLayer).id ===
                     "webviz_internal_dummy_layer";
+            if (!emptyLayers) {
+                // compute #done layers / #visible layers percentage
+                const visibleLayers = deckGLLayers.filter(
+                    (layer) => (layer as Layer).props.visible
+                );
+                const loaded = visibleLayers?.filter(
+                    (layer) => (layer as Layer)?.isLoaded
+                ).length;
+                // ceil to ensure reaching 100 (important to check if done)
+                progress = Math.ceil((100 * loaded) / visibleLayers?.length);
+            }
 
-            setIsLoaded(loadedState || emptyLayers);
-            if (isRenderedCallback) {
-                isRenderedCallback(loadedState);
+            setLoadingProgress(progress);
+            if (onRenderedProgress) {
+                onRenderedProgress(progress);
             }
         }
-    }, [deckGLLayers, isRenderedCallback]);
+    }, [deckGLLayers, onRenderedProgress]);
 
     // validate layers data
     const [errorText, setErrorText] = useState<string>();
     useEffect(() => {
         const layers = deckRef.current?.deck?.props.layers as Layer[];
         // this ensures to validate the schemas only once
-        if (checkDatafileSchema && layers && isLoaded) {
+        if (checkDatafileSchema && layers && loadingProgress === 100) {
             try {
                 validateLayers(layers);
                 colorTables && validateColorTables(colorTables);
@@ -761,7 +769,7 @@ const Map: React.FC<MapProps> = ({
         checkDatafileSchema,
         colorTables,
         deckRef?.current?.deck?.props.layers,
-        isLoaded,
+        loadingProgress,
     ]);
 
     const layerFilter = useCallback(
@@ -896,21 +904,23 @@ const Map: React.FC<MapProps> = ({
                     style={scale.cssStyle ?? {}}
                 />
             ) : null}
-            {!isRenderedCallback && !isLoaded && (
+            {!onRenderedProgress && loadingProgress < 100 && (
                 <div
                     style={{
-                        alignItems: "center",
                         display: "flex",
-                        justifyContent: "center",
+                        alignItems: "flex-end",
+                        justifyContent: "right",
                         position: "absolute",
                         height: "90%",
                         width: "90%",
+                        bottom: "10px",
+                        right: "10px",
                         zIndex: 200,
                     }}
                 >
                     <StatusIndicator
-                        layers={deckGLLayers}
-                        isLoaded={isLoaded}
+                        progress={loadingProgress}
+                        label="Loading assets..."
                     />
                 </div>
             )}

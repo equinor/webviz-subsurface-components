@@ -98,9 +98,10 @@ export interface SubsurfaceViewerProps {
     getCameraPosition?: (input: ViewStateType) => void;
 
     /**
-     * Will be called after all layers have rendered data.
+     * Will be called while layers are processed to rendered data.
+     * @param progress vlaue between 0 and 100.
      */
-    isRenderedCallback?: (arg: boolean) => void;
+    onRenderedProgress?: (progress: number) => void;
 
     onDragStart?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
     onDragEnd?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
@@ -143,7 +144,7 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
     selection,
     getTooltip,
     getCameraPosition,
-    isRenderedCallback,
+    onRenderedProgress,
     onDragStart,
     onDragEnd,
     triggerResetMultipleWells,
@@ -228,7 +229,7 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
             getTooltip={getTooltip}
             cameraPosition={cameraPosition}
             getCameraPosition={getCameraPosition}
-            isRenderedCallback={isRenderedCallback}
+            onRenderedProgress={onRenderedProgress}
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
             triggerHome={triggerHome}
