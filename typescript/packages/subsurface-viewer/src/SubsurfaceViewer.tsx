@@ -101,7 +101,7 @@ export interface SubsurfaceViewerProps {
      * Will be called while layers are processed to rendered data.
      * @param progress vlaue between 0 and 100.
      */
-    onRenderedProgress?: (progress: number) => void;
+    onRenderingProgress?: (progress: number) => void;
 
     onDragStart?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
     onDragEnd?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
@@ -144,7 +144,7 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
     selection,
     getTooltip,
     getCameraPosition,
-    onRenderedProgress,
+    onRenderingProgress,
     onDragStart,
     onDragEnd,
     triggerResetMultipleWells,
@@ -229,7 +229,7 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
             getTooltip={getTooltip}
             cameraPosition={cameraPosition}
             getCameraPosition={getCameraPosition}
-            onRenderedProgress={onRenderedProgress}
+            onRenderingProgress={onRenderingProgress}
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
             triggerHome={triggerHome}

@@ -417,7 +417,7 @@ export interface MapProps {
      * Will be called while layers have rendered data.
      * progress is a number between 0 and 100.
      */
-    onRenderedProgress?: (progress: number) => void;
+    onRenderingProgress?: (progress: number) => void;
 
     onDragStart?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
     onDragEnd?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
@@ -463,7 +463,7 @@ const Map: React.FC<MapProps> = ({
     children,
     getTooltip = defaultTooltip,
     getCameraPosition,
-    onRenderedProgress,
+    onRenderingProgress,
     onDragStart,
     onDragEnd,
     lights,
@@ -746,11 +746,11 @@ const Map: React.FC<MapProps> = ({
             }
 
             setLoadingProgress(progress);
-            if (onRenderedProgress) {
-                onRenderedProgress(progress);
+            if (onRenderingProgress) {
+                onRenderingProgress(progress);
             }
         }
-    }, [deckGLLayers, onRenderedProgress]);
+    }, [deckGLLayers, onRenderingProgress]);
 
     // validate layers data
     const [errorText, setErrorText] = useState<string>();
@@ -904,7 +904,7 @@ const Map: React.FC<MapProps> = ({
                     style={scale.cssStyle ?? {}}
                 />
             ) : null}
-            {!onRenderedProgress && loadingProgress < 100 && (
+            {!onRenderingProgress && loadingProgress < 100 && (
                 <div
                     style={{
                         display: "flex",
