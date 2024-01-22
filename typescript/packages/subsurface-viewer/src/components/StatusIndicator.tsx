@@ -1,27 +1,22 @@
 import React from "react";
 import { CircularProgress } from "@equinor/eds-core-react";
-import type { Layer, LayersList } from "@deck.gl/core/typed";
 
 interface StatusIndicatorProps {
-    layers: LayersList;
-    isLoaded: boolean;
-}
-
-function getLoadProgress(layers: LayersList) {
-    const loaded = layers?.filter((layer) => (layer as Layer)?.isLoaded);
-    const count = loaded?.length;
-    const progress = count / layers?.length;
-    return progress * 100;
+    // progress between 0 and 100
+    progress: number | boolean;
+    label: string;
 }
 
 const StatusIndicator: React.FC<StatusIndicatorProps> = ({
-    layers,
-    isLoaded,
+    progress,
+    label,
 }: StatusIndicatorProps) => {
-    if (isLoaded) {
-        return <div />;
+    if (typeof progress === "boolean") {
+        progress = progress ? 100 : 0;
     }
-    const progress = getLoadProgress(layers);
+    if (progress >= 100) {
+        return null;
+    }
     return (
         <div>
             <CircularProgress
@@ -30,7 +25,7 @@ const StatusIndicator: React.FC<StatusIndicatorProps> = ({
                 variant={"determinate"}
             />
             <br />
-            Loading assets...
+            {label}
         </div>
     );
 };
