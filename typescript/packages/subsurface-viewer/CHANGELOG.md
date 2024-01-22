@@ -1,3 +1,10 @@
+## [0.13.7](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.13.6...subsurface-viewer@0.13.7) (2024-01-22)
+
+
+### Bug Fixes
+
+* [NGRM] - For wells the property "ZIncreasingDownwards" does not honor… ([#1886](https://github.com/equinor/webviz-subsurface-components/issues/1886)) ([a88f3c3](https://github.com/equinor/webviz-subsurface-components/commit/a88f3c387c7ba8c5d4ebb300905ebf4fba5707c3))
+
 ## [0.13.6](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.13.5...subsurface-viewer@0.13.6) (2024-01-22)
 
 
