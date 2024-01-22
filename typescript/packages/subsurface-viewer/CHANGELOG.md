@@ -1,3 +1,10 @@
+## [0.13.6](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.13.5...subsurface-viewer@0.13.6) (2024-01-22)
+
+
+### Bug Fixes
+
+* do not display "Loading assets" feedback when isRenderedCallback exists ([#1882](https://github.com/equinor/webviz-subsurface-components/issues/1882)) ([12431d8](https://github.com/equinor/webviz-subsurface-components/commit/12431d8375b869a7a01b14eb70e17fdd8cbe21a0))
+
 ## [0.13.5](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.13.4...subsurface-viewer@0.13.5) (2024-01-19)
 
 
