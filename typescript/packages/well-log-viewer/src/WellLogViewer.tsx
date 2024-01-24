@@ -170,8 +170,7 @@ export default class WellLogViewer extends Component<
 
     updateReadoutPanel(): void {
         const controller = this.controller;
-        if (controller)
-            controller.selectContent(controller.getContentSelection()); // force to update readout panel
+        if (controller) controller.updateInfo(); // force to update readout panel
     }
 
     // callback function from WellLogView
@@ -246,15 +245,9 @@ export default class WellLogViewer extends Component<
         else delete this.collapsedTrackIds[i];
 
         this.updateReadoutPanel();
-
-        if (this.controller)
-            this.controller.selectContent(
-                this.controller.getContentSelection()
-            ); // force to update readout panel
     }
 
     render(): JSX.Element {
-        const maxContentZoom = 256;
         return (
             <div style={{ height: "100%", width: "100%", display: "flex" }}>
                 <WellLogViewWithScroller
@@ -263,7 +256,8 @@ export default class WellLogViewer extends Component<
                     colorTables={this.props.colorTables}
                     wellpick={this.props.wellpick}
                     horizontal={this.props.horizontal}
-                    maxContentZoom={maxContentZoom}
+                    domain={this.props.domain}
+                    selection={this.props.selection}
                     primaryAxis={this.state.primaryAxis}
                     axisTitles={this.props.axisTitles}
                     axisMnemos={this.props.axisMnemos}
@@ -309,7 +303,7 @@ export default class WellLogViewer extends Component<
                         >
                             <ZoomSlider
                                 value={this.state.sliderValue}
-                                max={maxContentZoom}
+                                max={this.props.options?.maxContentZoom}
                                 onChange={this.onZoomSliderChange}
                             />
                         </span>

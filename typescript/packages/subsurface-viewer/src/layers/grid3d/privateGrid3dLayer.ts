@@ -21,6 +21,7 @@ import fsShader from "./fragment.fs.glsl";
 import vsLineShader from "./vertex_lines.glsl";
 import fsLineShader from "./fragment_lines.glsl";
 import { localPhongLighting, utilities } from "../shader_modules";
+import type { TGrid3DColoringMode } from "./grid3dLayer";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,
@@ -65,6 +66,7 @@ export interface privateLayerProps extends ExtendedLayerProps {
     colorMapRange: [number, number];
     colorMapClampColor: Color | undefined | boolean;
     colorMapFunction?: colorMapFunctionType;
+    coloringMode: TGrid3DColoringMode.Property;
     gridLines: boolean;
     propertyValueRange: [number, number];
     depthTest: boolean;
@@ -73,6 +75,8 @@ export interface privateLayerProps extends ExtendedLayerProps {
 
 const defaultProps = {
     colorMapName: "",
+    colorMapClampColor: [200, 200, 200],
+    coloringMode: 0,
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
     propertyValueRange: [0.0, 1.0],
     depthTest: true,
@@ -189,7 +193,6 @@ export default class privateLayer extends Layer<privateLayerProps> {
         if (!this.props.depthTest) {
             gl.disable(gl.DEPTH_TEST);
         }
-
         model_mesh
             .setUniforms({
                 ...uniforms,
@@ -205,11 +208,10 @@ export default class privateLayer extends Layer<privateLayerProps> {
                     ),
                     parameters: DEFAULT_TEXTURE_PARAMETERS,
                 }),
-                valueRangeMin,
-                valueRangeMax,
                 colorMapRangeMin,
                 colorMapRangeMax,
                 colorMapClampColor,
+                coloringMode: this.props.coloringMode,
                 isColorMapClampColorTransparent,
                 isClampColor,
                 ZIncreasingDownwards: this.props.ZIncreasingDownwards,

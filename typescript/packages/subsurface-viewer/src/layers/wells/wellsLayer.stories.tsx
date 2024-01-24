@@ -29,7 +29,7 @@ const testWellWithDuplicates = {
                 geometries: [
                     {
                         type: "Point",
-                        coordinates: [0, 0],
+                        coordinates: [0, 0, 0],
                     },
                     {
                         type: "LineString",
@@ -92,6 +92,7 @@ const defaultProps = {
         {
             "@@type": "WellsLayer",
             data: "@@#resources.wellsData",
+            ZIncreasingDownwards: false,
         },
     ],
 };
@@ -508,6 +509,7 @@ export const WellsRefine: StoryFn<typeof SubsurfaceViewer> = (args) => {
                 "@@type": "WellsLayer",
                 data: testWell,
                 refine: refineNumber,
+                ZIncreasingDownwards: false,
             },
             {
                 "@@type": "AxesLayer",
@@ -600,10 +602,12 @@ VerticalWellWithDuplicates.args = {
     layers: [
         new WellsLayer({
             data: testWellWithDuplicates,
+            ZIncreasingDownwards: false,
         }),
         new AxesLayer({
             id: "axes-layer",
-            bounds: [-100, -100, 0, 100, 100, 500],
+            bounds: [-100, -100, -500, 100, 100, 0],
+            ZIncreasingDownwards: false,
         }),
     ],
 
@@ -646,6 +650,7 @@ export const SimplifiedRendering: ComponentStory<typeof SubsurfaceViewer> = (
                 refine: true,
                 outline: true,
                 simplifiedRendering, // If true will cause wellslayer to draw simplified.
+                ZIncreasingDownwards: false,
             }),
             new AxesLayer({
                 id: "axes-layer",

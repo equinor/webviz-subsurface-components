@@ -7,6 +7,9 @@ import type {
     ViewStateType,
     ViewsType,
 } from "./components/Map";
+
+import { TGrid3DColoringMode } from "./layers/grid3d/grid3dLayer";
+
 import Map, { jsonToObject } from "./components/Map";
 import React from "react";
 import PropTypes from "prop-types";
@@ -24,6 +27,8 @@ export type {
     ViewsType,
     colorTablesArray,
 };
+
+export { TGrid3DColoringMode };
 
 export type LightsType = {
     headLight?: {
@@ -93,9 +98,10 @@ export interface SubsurfaceViewerProps {
     getCameraPosition?: (input: ViewStateType) => void;
 
     /**
-     * Will be called after all layers have rendered data.
+     * Will be called while layers are processed to rendered data.
+     * @param progress vlaue between 0 and 100.
      */
-    isRenderedCallback?: (arg: boolean) => void;
+    onRenderingProgress?: (progress: number) => void;
 
     onDragStart?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
     onDragEnd?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
@@ -138,7 +144,7 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
     selection,
     getTooltip,
     getCameraPosition,
-    isRenderedCallback,
+    onRenderingProgress,
     onDragStart,
     onDragEnd,
     triggerResetMultipleWells,
@@ -223,7 +229,7 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
             getTooltip={getTooltip}
             cameraPosition={cameraPosition}
             getCameraPosition={getCameraPosition}
-            isRenderedCallback={isRenderedCallback}
+            onRenderingProgress={onRenderingProgress}
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
             triggerHome={triggerHome}

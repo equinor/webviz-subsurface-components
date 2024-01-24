@@ -142,6 +142,8 @@ function addRubberbandOverlay(instance: LogViewer, parent: WellLogView) {
                     instance
                 );
             }
+            parent.setInfo(parent.selCurrent);
+            parent.onContentSelection();
         },
         onMouseExit: (event: OverlayMouseExitEvent) => {
             if (event.target) {
@@ -210,9 +212,6 @@ function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
                     : "-";
                 elem.style.visibility = "visible";
             }
-
-            parent.setInfo(value);
-            parent.onContentSelection();
         },
         onMouseExit: (event: OverlayMouseExitEvent): void => {
             const elem = event.target;
@@ -925,6 +924,8 @@ export interface WellLogController {
     setSelectedTrackIndices(selection: number[]): boolean;
     getSelectedTrackIndices(): number[];
 
+    updateInfo(): void;
+
     setTemplate(template: Template): void;
     getTemplate(): Template;
 }
@@ -1254,8 +1255,6 @@ class WellLogView
 
         // set callback to component's caller
         if (this.props.onCreateController) this.props.onCreateController(this);
-
-        this.setControllerZoom();
     }
 
     componentDidMount(): void {
@@ -1359,7 +1358,7 @@ class WellLogView
         ) {
             this.onTrackScroll();
             this.onTrackSelection();
-            this.setInfo();
+            this.updateInfo();
         }
 
         if (
@@ -1411,7 +1410,7 @@ class WellLogView
 
             initOverlays(this.logController, this);
         }
-        this.setInfo();
+        this.updateInfo();
     }
     getAxesInfo(): AxesInfo {
         // get Object keys available in the welllog
@@ -1462,9 +1461,11 @@ class WellLogView
             );
             addWellPickOverlay(this.logController, this);
         }
+        this.setControllerZoom();
+        this.setControllerSelection();
         this.onTrackScroll();
         this.onTrackSelection();
-        this.setInfo(); // Clear old track information
+        this.updateInfo(); // Clear old track information
     }
 
     findTrackById(trackId: string | number): Track | undefined {
@@ -1521,7 +1522,7 @@ class WellLogView
     }
 
     onTemplateChanged(): void {
-        this.setInfo();
+        this.updateInfo();
 
         this.template = this._generateTemplate(); // save current template
 
@@ -1608,7 +1609,7 @@ class WellLogView
         this.selPersistent = this.selPinned !== undefined;
 
         this.showSelection();
-        this.setInfo(); // reflect new value in this.selCurrent
+        this.updateInfo(); // reflect new value in this.selCurrent
     }
 
     setContentBaseDomain(domain: [number, number]): void {
@@ -1702,6 +1703,9 @@ class WellLogView
         if (changed) this.onTrackSelection();
         return changed;
     }
+    updateInfo(): void {
+        this.setInfo(); // reflect new value in this.selCurrent
+    }
 
     getTemplate(): Template {
         return this.template;
@@ -1777,7 +1781,7 @@ class WellLogView
                 this.scrollTrackBy(+1);
             else {
                 this.onTrackScroll();
-                this.setInfo();
+                this.updateInfo();
             }
             this.selectTrack(trackNew, true);
         }

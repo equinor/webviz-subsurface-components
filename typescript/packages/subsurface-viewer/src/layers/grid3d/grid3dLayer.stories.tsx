@@ -2,7 +2,7 @@ import React from "react";
 import { create, all } from "mathjs";
 
 import type { ComponentStory, ComponentMeta } from "@storybook/react";
-import SubsurfaceViewer from "../../SubsurfaceViewer";
+import SubsurfaceViewer, { TGrid3DColoringMode } from "../../SubsurfaceViewer";
 
 import {
     Points as SnubCubePoints,
@@ -18,7 +18,7 @@ import {
 
 export default {
     component: SubsurfaceViewer,
-    title: "SubsurfaceViewer/Grid3D",
+    title: "SubsurfaceViewer/Grid3D Layer",
 } as ComponentMeta<typeof SubsurfaceViewer>;
 
 type NumberQuad = [number, number, number, number];
@@ -183,12 +183,16 @@ PolyhedralCells.args = {
         {
             ...grid3dLayer,
             id: "polyhedral1",
+            coloringMode: TGrid3DColoringMode.Y,
             pickable: true,
             pointsData: SnubCubePoints.map((v) => 10 * v),
             polysData: SnubCubeFaces,
             propertiesData: Array(SnubCubeVertexCount)
                 .fill(0)
-                .map(() => randomFunc() * 10),
+                .map(() => randomFunc() * 50),
+            colorMapRange: [-8, 8],
+            colorMapClampColor: [200, 200, 200],
+            colorMapName: "Porosity",
         },
         {
             ...grid3dLayer,
@@ -201,6 +205,7 @@ PolyhedralCells.args = {
             propertiesData: Array(ToroidVertexCount)
                 .fill(0)
                 .map(() => randomFunc() * 10),
+            coloringMode: TGrid3DColoringMode.Property,
         },
     ],
 };

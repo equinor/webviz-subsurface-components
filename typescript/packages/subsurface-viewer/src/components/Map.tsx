@@ -1,12 +1,11 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 
 import type { Feature, FeatureCollection } from "geojson";
-import { cloneDeep, isEmpty } from "lodash";
+import { cloneDeep, isEmpty, isEqual } from "lodash";
 
 import type {
     MjolnirEvent,
     MjolnirGestureEvent,
-    MjolnirKeyEvent,
     MjolnirPointerEvent,
 } from "mjolnir.js";
 
@@ -122,50 +121,22 @@ function getZScaleModifier(arrowEvent: ArrowEvent): number {
     return 1 + scaleFactor;
 }
 
-function convertToArrowEvent(event: MjolnirEvent): ArrowEvent | null {
+function convertToArrowEvent(event: KeyboardEvent): ArrowEvent | null {
     if (event.type === "keydown") {
-        const keyEvent = event as MjolnirKeyEvent;
-        switch (keyEvent.key) {
+        switch (event.key) {
             case "ArrowUp":
             case "ArrowDown":
             case "PageUp":
             case "PageDown":
                 return {
-                    key: keyEvent.key,
-                    shiftModifier: keyEvent.srcEvent.shiftKey,
+                    key: event.key,
+                    shiftModifier: event.shiftKey,
                 };
             default:
                 return null;
         }
     }
     return null;
-}
-
-class ZScaleOrbitController extends OrbitController {
-    static updateZScaleAction: React.Dispatch<ArrowEvent> | null = null;
-
-    static setUpdateZScaleAction(
-        updateZScaleAction: React.Dispatch<ArrowEvent>
-    ) {
-        ZScaleOrbitController.updateZScaleAction = updateZScaleAction;
-    }
-
-    handleEvent(event: MjolnirEvent): boolean {
-        if (ZScaleOrbitController.updateZScaleAction) {
-            const arrowEvent = convertToArrowEvent(event);
-            if (arrowEvent) {
-                ZScaleOrbitController.updateZScaleAction(arrowEvent);
-                return true;
-            }
-        }
-        return super.handleEvent(event);
-    }
-}
-
-class ZScaleOrbitView extends OrbitView {
-    get ControllerType(): typeof OrbitController {
-        return ZScaleOrbitController;
-    }
 }
 
 function parseLights(lights?: LightsType): LightingEffect[] | undefined {
@@ -223,7 +194,8 @@ function mapBoundingBoxReducer(
     mapBoundingBox: BoundingBox3D | undefined,
     action: ReportBoundingBoxAction
 ): BoundingBox3D | undefined {
-    return boxUnion(mapBoundingBox, action.layerBoundingBox);
+    const union = boxUnion(mapBoundingBox, action.layerBoundingBox);
+    return isEqual(union, mapBoundingBox) ? mapBoundingBox : union;
 }
 
 export type TooltipCallback = (
@@ -442,9 +414,10 @@ export interface MapProps {
     getCameraPosition?: (input: ViewStateType) => void;
 
     /**
-     * Will be called after all layers have rendered data.
+     * Will be called while layers have rendered data.
+     * progress is a number between 0 and 100.
      */
-    isRenderedCallback?: (arg: boolean) => void;
+    onRenderingProgress?: (progress: number) => void;
 
     onDragStart?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
     onDragEnd?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
@@ -490,7 +463,7 @@ const Map: React.FC<MapProps> = ({
     children,
     getTooltip = defaultTooltip,
     getCameraPosition,
-    isRenderedCallback,
+    onRenderingProgress,
     onDragStart,
     onDragEnd,
     lights,
@@ -530,9 +503,6 @@ const Map: React.FC<MapProps> = ({
 
     // Used for scaling in z direction using arrow keys.
     const [zScale, updateZScale] = React.useReducer(updateZScaleReducer, 1);
-    React.useEffect(() => {
-        ZScaleOrbitController.setUpdateZScaleAction(updateZScale);
-    }, [updateZScale]);
 
     // compute the viewport margins
     const viewPortMargins = React.useMemo<MarginsType>(() => {
@@ -576,28 +546,37 @@ const Map: React.FC<MapProps> = ({
     const [selectedWell, setSelectedWell] = useState<string>("");
     const [shiftHeld, setShiftHeld] = useState(false);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    function downHandler({ key }: any) {
-        if (key === "Shift") {
-            setShiftHeld(true);
-        }
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    function upHandler({ key }: any) {
-        if (key === "Shift") {
-            setShiftHeld(false);
-        }
-    }
+    const divRef = React.useRef(null);
 
     useEffect(() => {
-        window.addEventListener("keydown", downHandler);
-        window.addEventListener("keyup", upHandler);
-        return () => {
-            window.removeEventListener("keydown", downHandler);
-            window.removeEventListener("keyup", upHandler);
+        const keyDownHandler = (e: KeyboardEvent) => {
+            const arrowEvent = convertToArrowEvent(e);
+            if (arrowEvent) {
+                updateZScale(arrowEvent);
+                // prevent being handled by regular OrbitController
+                e.stopPropagation();
+            }
+            if (e.key === "Shift") {
+                setShiftHeld(true);
+            }
         };
-    }, []);
+        const keyUpHandler = (e: KeyboardEvent) => {
+            if (e.key === "Shift") {
+                setShiftHeld(false);
+            }
+        };
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const element = divRef.current as any;
+
+        element?.addEventListener("keydown", keyDownHandler, true);
+        element?.addEventListener("keyup", keyUpHandler, true);
+
+        return () => {
+            element?.removeEventListener("keydown", keyDownHandler);
+            element?.removeEventListener("keyup", keyUpHandler);
+        };
+    }, [updateZScale, setShiftHeld]);
 
     useEffect(() => {
         const layers = deckRef.current?.deck?.props.layers;
@@ -745,33 +724,40 @@ const Map: React.FC<MapProps> = ({
         });
     }, [layers, zScale]);
 
-    const [isLoaded, setIsLoaded] = useState<boolean>(false);
+    const [loadingProgress, setLoadingProgress] = useState<number>(0);
     const onAfterRender = useCallback(() => {
         if (deckGLLayers) {
-            const loadedState = deckGLLayers.every((layer) => {
-                return (
-                    (layer as Layer).isLoaded || !(layer as Layer).props.visible
-                );
-            });
+            let progress = 100;
 
             const emptyLayers = // There will always be a dummy layer. Deck.gl does not like empty array of layers.
                 deckGLLayers.length == 1 &&
                 (deckGLLayers[0] as LineLayer).id ===
                     "webviz_internal_dummy_layer";
+            if (!emptyLayers) {
+                // compute #done layers / #visible layers percentage
+                const visibleLayers = deckGLLayers.filter(
+                    (layer) => (layer as Layer).props.visible
+                );
+                const loaded = visibleLayers?.filter(
+                    (layer) => (layer as Layer)?.isLoaded
+                ).length;
+                // ceil to ensure reaching 100 (important to check if done)
+                progress = Math.ceil((100 * loaded) / visibleLayers?.length);
+            }
 
-            setIsLoaded(loadedState || emptyLayers);
-            if (isRenderedCallback) {
-                isRenderedCallback(loadedState);
+            setLoadingProgress(progress);
+            if (onRenderingProgress) {
+                onRenderingProgress(progress);
             }
         }
-    }, [deckGLLayers, isRenderedCallback]);
+    }, [deckGLLayers, onRenderingProgress]);
 
     // validate layers data
     const [errorText, setErrorText] = useState<string>();
     useEffect(() => {
         const layers = deckRef.current?.deck?.props.layers as Layer[];
         // this ensures to validate the schemas only once
-        if (checkDatafileSchema && layers && isLoaded) {
+        if (checkDatafileSchema && layers && loadingProgress === 100) {
             try {
                 validateLayers(layers);
                 colorTables && validateColorTables(colorTables);
@@ -783,7 +769,7 @@ const Map: React.FC<MapProps> = ({
         checkDatafileSchema,
         colorTables,
         deckRef?.current?.deck?.props.layers,
-        isLoaded,
+        loadingProgress,
     ]);
 
     const layerFilter = useCallback(
@@ -850,7 +836,7 @@ const Map: React.FC<MapProps> = ({
     if (!deckGlViews || isEmpty(deckGlViews) || isEmpty(deckGLLayers))
         return null;
     return (
-        <div onContextMenu={(event) => event.preventDefault()}>
+        <div ref={divRef} onContextMenu={(event) => event.preventDefault()}>
             <DeckGL
                 id={id}
                 viewState={deckGlViewState}
@@ -918,8 +904,27 @@ const Map: React.FC<MapProps> = ({
                     style={scale.cssStyle ?? {}}
                 />
             ) : null}
-            <StatusIndicator layers={deckGLLayers} isLoaded={isLoaded} />
-            {coords?.visible ? <InfoCard pickInfos={hoverInfo} /> : null}
+            {!onRenderingProgress && loadingProgress < 100 && (
+                <div
+                    style={{
+                        display: "flex",
+                        alignItems: "flex-end",
+                        justifyContent: "right",
+                        position: "absolute",
+                        height: "90%",
+                        width: "90%",
+                        bottom: "10px",
+                        right: "10px",
+                        zIndex: 200,
+                    }}
+                >
+                    <StatusIndicator
+                        progress={loadingProgress}
+                        label="Loading assets..."
+                    />
+                </div>
+            )}
+            {coords?.visible && <InfoCard pickInfos={hoverInfo} />}
             {errorText && (
                 <pre
                     style={{
@@ -1102,6 +1107,8 @@ class ViewController {
         const updateViewState =
             viewsChanged ||
             triggerHome ||
+            state.camera != this.state_.camera ||
+            state.bounds != this.state_.bounds ||
             (!state.viewStateChanged &&
                 state.boundingBox3d !== this.state_.boundingBox3d);
         const needUpdate = updateZScale || updateTarget || updateViewState;
@@ -1389,17 +1396,17 @@ function getViewStateFromBounds(
 ///////////////////////////////////////////////////////////////////////////////////////////
 // build views
 type ViewTypeType =
-    | typeof ZScaleOrbitView
+    | typeof OrbitView
     | typeof IntersectionView
     | typeof OrthographicView;
 function getVT(
     viewport: ViewportType
 ): [
     ViewType: ViewTypeType,
-    Controller: typeof ZScaleOrbitController | typeof OrthographicController,
+    Controller: typeof OrbitController | typeof OrthographicController,
 ] {
     if (viewport.show3D) {
-        return [ZScaleOrbitView, ZScaleOrbitController];
+        return [OrbitView, OrbitController];
     }
     return [
         viewport.id === "intersection_view"
@@ -1521,7 +1528,8 @@ function buildDeckGlViews(views: ViewsType | undefined, size: Size): View[] {
 function updateViewState(
     camera: ViewStateType,
     boundingBox: BoundingBox3D | undefined,
-    size: Size
+    size: Size,
+    is3D = true
 ): ViewStateType {
     if (typeof camera.zoom === "number" && !Number.isNaN(camera.zoom)) {
         return camera;
@@ -1535,6 +1543,12 @@ function updateViewState(
     // return the camera if the bounding box is undefined
     if (boundingBox === undefined) {
         return camera;
+    }
+
+    if (!is3D) {
+        // in 2D, use flat boxes
+        boundingBox[2] = 0;
+        boundingBox[5] = 0;
     }
 
     // clone the camera in case of triggerHome
@@ -1591,6 +1605,12 @@ function computeViewState(
         };
         return updateViewState(defaultCamera, boundingBox, size);
     } else {
+        // If the camera is defined, use it
+        if (isCameraPositionDefined) {
+            const is3D = false;
+            return updateViewState(cameraPosition, boundingBox, size, is3D);
+        }
+
         const centerOfData: [number, number, number] = boundingBox
             ? boxCenter(boundingBox)
             : [0, 0, 0];
@@ -1604,11 +1624,6 @@ function computeViewState(
                 viewPort,
                 size
             );
-        }
-
-        // deprecated in 2D, kept for backward compatibility
-        if (isCameraPositionDefined) {
-            return cameraPosition;
         }
 
         return boundingBox

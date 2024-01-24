@@ -1,3 +1,59 @@
+## [1.3.8](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.3.7...well-log-viewer@1.3.8) (2024-01-19)
+
+
+### Bug Fixes
+
+* add missing dependencies ([#1881](https://github.com/equinor/webviz-subsurface-components/issues/1881)) ([7e5fbc4](https://github.com/equinor/webviz-subsurface-components/commit/7e5fbc49d98732e33c4edce90babc52e0ecccf1a))
+
+## [1.3.7](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.3.6...well-log-viewer@1.3.7) (2024-01-18)
+
+
+### Bug Fixes
+
+* remove some unused dependencies ([#1880](https://github.com/equinor/webviz-subsurface-components/issues/1880)) ([3703825](https://github.com/equinor/webviz-subsurface-components/commit/37038250f05b0843a5a632c3e9e176ab15439e30))
+
+## [1.3.6](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.3.5...well-log-viewer@1.3.6) (2024-01-17)
+
+
+### Bug Fixes
+
+* InfoPanel drawing in WellLogViewer ([#1877](https://github.com/equinor/webviz-subsurface-components/issues/1877)) ([99eb83b](https://github.com/equinor/webviz-subsurface-components/commit/99eb83bd64232578566286e74c710d469620468f)), closes [#1864](https://github.com/equinor/webviz-subsurface-components/issues/1864) [#1874](https://github.com/equinor/webviz-subsurface-components/issues/1874) [#1878](https://github.com/equinor/webviz-subsurface-components/issues/1878)
+
+## [1.3.5](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.3.4...well-log-viewer@1.3.5) (2024-01-15)
+
+
+### Bug Fixes
+
+* legend text position on stack and scale track legends in WellLogView ([#1869](https://github.com/equinor/webviz-subsurface-components/issues/1869)) ([38ea0b6](https://github.com/equinor/webviz-subsurface-components/commit/38ea0b602c1b1eadca0266cdd1b1f87ecf4fdd05)), closes [#1715](https://github.com/equinor/webviz-subsurface-components/issues/1715)
+
+## [1.3.4](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.3.3...well-log-viewer@1.3.4) (2024-01-10)
+
+
+### Bug Fixes
+
+* wrong camera computation in 2D when bounds are provided ([#1863](https://github.com/equinor/webviz-subsurface-components/issues/1863)) ([3baef9f](https://github.com/equinor/webviz-subsurface-components/commit/3baef9f1eb1c2f124f74937a19ce78963b1d7604)), closes [#1837](https://github.com/equinor/webviz-subsurface-components/issues/1837)
+
+## [1.3.3](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.3.2...well-log-viewer@1.3.3) (2024-01-10)
+
+
+### Bug Fixes
+
+* bump mathjs from 9.5.2 to 12.2.1 in /typescript ([#1858](https://github.com/equinor/webviz-subsurface-components/issues/1858)) ([3aa1d7c](https://github.com/equinor/webviz-subsurface-components/commit/3aa1d7c3992fa56a9a25ed3e719014c5b97357ac)), closes [#3109](https://github.com/equinor/webviz-subsurface-components/issues/3109) [#3090](https://github.com/equinor/webviz-subsurface-components/issues/3090) [#3101](https://github.com/equinor/webviz-subsurface-components/issues/3101) [#2766](https://github.com/equinor/webviz-subsurface-components/issues/2766) [#3096](https://github.com/equinor/webviz-subsurface-components/issues/3096) [#2761](https://github.com/equinor/webviz-subsurface-components/issues/2761) [#3095](https://github.com/equinor/webviz-subsurface-components/issues/3095) [#3087](https://github.com/equinor/webviz-subsurface-components/issues/3087) [#3092](https://github.com/equinor/webviz-subsurface-components/issues/3092) [#3094](https://github.com/equinor/webviz-subsurface-components/issues/3094) [#2879](https://github.com/equinor/webviz-subsurface-components/issues/2879) [#2927](https://github.com/equinor/webviz-subsurface-components/issues/2927) [#3014](https://github.com/equinor/webviz-subsurface-components/issues/3014) [#3037](https://github.com/equinor/webviz-subsurface-components/issues/3037) [#3079](https://github.com/equinor/webviz-subsurface-components/issues/3079) [#2919](https://github.com/equinor/webviz-subsurface-components/issues/2919) [#3109](https://github.com/equinor/webviz-subsurface-components/issues/3109)
+
+## [1.3.2](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.3.1...well-log-viewer@1.3.2) (2024-01-09)
+
+
+### Bug Fixes
+
+* Process initial domain and selection props in WelLogView ([#1861](https://github.com/equinor/webviz-subsurface-components/issues/1861)) ([fb83135](https://github.com/equinor/webviz-subsurface-components/commit/fb8313545655cec9609db968e3b1eb9faba4266b))
+
+## [1.3.1](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.3.0...well-log-viewer@1.3.1) (2024-01-03)
+
+
+### Bug Fixes
+
+* 'domain' prop handling in WellLogViewer/SyncLogViewer ([#1842](https://github.com/equinor/webviz-subsurface-components/issues/1842)) ([5c27b7d](https://github.com/equinor/webviz-subsurface-components/commit/5c27b7dc20c52b28546986b4425bbcdd95830276)), closes [#1773](https://github.com/equinor/webviz-subsurface-components/issues/1773)
+
 # [1.3.0](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.2.0...well-log-viewer@1.3.0) (2023-12-12)
 
 
