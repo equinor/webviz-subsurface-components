@@ -1,20 +1,16 @@
-import type { SyntheticEvent } from "react";
 import React from "react";
-import type { ComponentMeta } from "@storybook/react";
-import { styled } from "@mui/material/styles";
-import type { BoundingBox3D, ViewsType } from "../../components/Map";
+import type { Meta, StoryObj } from "@storybook/react";
+
+import type {
+    BoundingBox2D,
+    BoundingBox3D,
+    ViewsType,
+} from "../../components/Map";
 import { useHoverInfo } from "../../components/Map";
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import InfoCard from "../../components/InfoCard";
-import type { ComponentStory, StoryFn } from "@storybook/react";
-import { Slider } from "@mui/material";
-import {
-    ContinuousLegend,
-    ColorLegend,
-    createColorMapFunction,
-} from "@emerson-eps/color-tables";
-import Axes2DLayer from "../axes2d/axes2DLayer";
+
 import AxesLayer from "../axes/axesLayer";
 import MapLayer from "./mapLayer";
 import { ViewFooter } from "../../components/ViewFooter";
@@ -23,28 +19,7 @@ import type { colorMapFunctionType } from "../utils/layerTools";
 import NorthArrow3DLayer from "../northarrow/northArrow3DLayer";
 import { ClipExtension } from "@deck.gl/extensions/typed";
 
-const PREFIX = "MapLayer3dPng";
-
-const classes = {
-    main: `${PREFIX}-main`,
-    legend: `${PREFIX}-legend`,
-};
-
-const Root = styled("div")({
-    [`& .${classes.main}`]: {
-        height: 500,
-        border: "1px solid black",
-        position: "relative",
-    },
-    [`& .${classes.legend}`]: {
-        width: 100,
-        position: "absolute",
-        top: "0",
-        right: "0",
-    },
-});
-
-export default {
+const stories: Meta = {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer / Map Layer",
     args: {
@@ -52,13 +27,11 @@ export default {
         // Somehow, I do not manage to add the triggerHome to the general "unset" controls :/
         triggerHome: 0,
     },
-} as ComponentMeta<typeof SubsurfaceViewer>;
-
-type NumberQuad = [number, number, number, number];
-
-const valueRange = [-3071, 41048];
+};
+export default stories;
 
 const defaultMapLayerProps = {
+    "@@type": "MapLayer",
     id: "default_map",
     meshData: "hugin_depth_25_m.float32",
     frame: {
@@ -71,17 +44,7 @@ const defaultMapLayerProps = {
     ZIncreasingDownwards: true,
 };
 
-const defaultMapLayer = new MapLayer({ ...defaultMapLayerProps });
-
-const wellsLayer = {
-    "@@type": "WellsLayer",
-    id: "wells-layer",
-    data: "./volve_wells.json",
-    logData: "./volve_logs.json",
-    logrunName: "BLOCKING",
-    logName: "ZONELOG",
-    logColor: "Stratigraphy",
-};
+const defaultMapLayer = { ...defaultMapLayerProps };
 
 // Example using "Map" layer. Uses float32 mesh and properties binary arrays. Not PNG.
 const meshMapLayerBig = {
@@ -280,7 +243,7 @@ const meshMapLayerRotated = {
     colorMapName: "Physics",
 };
 
-const axes_hugin = {
+const axes_hugin_layer = {
     "@@type": "AxesLayer",
     id: "axes-layer2",
     bounds: [432150, 6475800, 2000, 439400, 6481500, 3500] as BoundingBox3D,
@@ -292,7 +255,7 @@ const north_arrow_layer = {
 };
 
 const defaultArgs = {
-    bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
+    bounds: [432150, 6475800, 439400, 6481500] as BoundingBox2D,
 };
 
 const DEFAULT_VIEWS = {
@@ -312,274 +275,48 @@ const defaultParameters = {
     },
 };
 
-function gradientColorMap(x: number) {
-    return [255 - x * 255, 255 - x * 100, 255 * x];
-}
+export const MapLayer3dPng: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "map",
+        layers: [axes_hugin_layer, meshMapLayerPng, north_arrow_layer],
 
-function nearestColorMap(x: number) {
-    if (x > 0.5) return [100, 255, 255];
-    else if (x > 0.1) return [255, 100, 255];
-    return [255, 255, 100];
-}
-
-function breakpointColorMap(x: number, breakpoint: number) {
-    if (x > breakpoint) return [0, 50, 200];
-    return [255, 255, 0];
-}
-
-function createColorMap(breakpoint: number) {
-    return (value: number) => breakpointColorMap(value, breakpoint);
-}
-
-export const MapLayer3dPng: StoryFn<typeof SubsurfaceViewer> = (args) => {
-    return <SubsurfaceViewer {...args} />;
-};
-
-MapLayer3dPng.args = {
-    id: "map",
-    layers: [axes_hugin, meshMapLayerPng, north_arrow_layer],
-
-    bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
-    views: DEFAULT_VIEWS,
-};
-
-MapLayer3dPng.parameters = {
-    docs: {
-        ...defaultParameters.docs,
-        description: {
-            story: "Example using png as mesh and properties data.",
-        },
+        bounds: [432150, 6475800, 439400, 6481500] as BoundingBox2D,
+        views: DEFAULT_VIEWS,
     },
-};
-
-export const MapLayer3dPngNoBounds: ComponentStory<typeof SubsurfaceViewer> = (
-    args
-) => {
-    return <SubsurfaceViewer {...args} />;
-};
-
-MapLayer3dPngNoBounds.args = {
-    id: "map",
-    layers: [axes_hugin, meshMapLayerPng, north_arrow_layer],
-    views: DEFAULT_VIEWS,
-};
-
-MapLayer3dPngNoBounds.parameters = {
-    docs: {
-        ...defaultParameters.docs,
-        description: {
-            story: "If no bounds are specified will results in automatically calcultated camera. Will look at center of bounding box of the data",
-        },
-    },
-};
-
-export const ConstantColor: ComponentStory<typeof SubsurfaceViewer> = (
-    args
-) => {
-    return <SubsurfaceViewer {...args} />;
-};
-
-ConstantColor.args = {
-    id: "map",
-    layers: [
-        axes_hugin,
-        {
-            ...meshMapLayerPng,
-            colorMapFunction: [0, 255, 0], // Use constant color instead of function
-        },
-        north_arrow_layer,
-    ],
-
-    bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
-    views: DEFAULT_VIEWS,
-};
-
-ConstantColor.parameters = {
-    docs: {
-        ...defaultParameters.docs,
-        description: {
-            story: 'Example using the property "colorMapFunction" to color the surface in one color only',
-        },
-    },
-};
-
-export const ScaleZ: ComponentStory<typeof SubsurfaceViewer> = (args) => {
-    const [layers, setLayers] = React.useState([
-        axes_hugin,
-        meshMapLayerPng,
-        north_arrow_layer,
-    ]);
-
-    const handleChange = () => {
-        setLayers([axes_hugin, meshMapLayerPng, wellsLayer, north_arrow_layer]);
-    };
-
-    const props = {
-        ...args,
-        layers,
-    };
-
-    return (
-        <Root>
-            <div className={classes.main}>
-                <SubsurfaceViewer {...props} />
-            </div>
-            <button onClick={handleChange}> Add layer </button>
-        </Root>
-    );
-};
-
-ScaleZ.args = {
-    id: "ScaleZ",
-    layers: [axes_hugin, meshMapLayerPng, wellsLayer, north_arrow_layer],
-    bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
-
-    views: {
-        layout: [1, 2],
-        viewports: [
-            {
-                id: "view_1",
-                layerIds: ["axes-layer2", "mesh-layer", "north-arrow-layer"],
-                show3D: true,
-                isSync: true,
+    parameters: {
+        docs: {
+            ...defaultParameters.docs,
+            description: {
+                story: "Example using png as mesh and properties data.",
             },
-            {
-                id: "view_2",
-                layerIds: ["axes-layer2", "wells-layer", "north-arrow-layer"],
-                show3D: true,
-                isSync: true,
+        },
+    },
+};
+
+export const MapLayer3dPngNoBounds: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "map",
+        layers: [axes_hugin_layer, meshMapLayerPng, north_arrow_layer],
+        views: DEFAULT_VIEWS,
+    },
+    parameters: {
+        docs: {
+            ...defaultParameters.docs,
+            description: {
+                story: "If no bounds are specified will results in automatically calcultated camera. Will look at center of bounding box of the data",
             },
-        ],
-    },
-};
-
-ScaleZ.parameters = {
-    docs: {
-        ...defaultParameters.docs,
-        description: {
-            story: "Example scaling in z direction using arrow up/down buttons.",
         },
     },
 };
 
-export const ResetCameraProperty: ComponentStory<typeof SubsurfaceViewer> = (
-    args
-) => {
-    const [home, setHome] = React.useState<number>(0);
-    const [camera, setCamera] = React.useState({
-        rotationOrbit: 0,
-        rotationX: 45,
-        target: [435775, 6477650, -1750],
-        zoom: -3.8,
-    });
-
-    const handleChange1 = () => {
-        setHome(home + 1);
-    };
-
-    const handleChange2 = () => {
-        setCamera({ ...camera, rotationOrbit: camera.rotationOrbit + 5 });
-    };
-
-    const props = {
-        ...args,
-        cameraPosition: camera,
-        triggerHome: home,
-    };
-
-    return (
-        <Root>
-            <div className={classes.main}>
-                <SubsurfaceViewer {...props} />
-            </div>
-            <button onClick={handleChange1}> Reset Camera to bounds</button>
-            <button onClick={handleChange2}> Change Camera </button>
-        </Root>
-    );
-};
-
-ResetCameraProperty.args = {
-    id: "ResetCameraProperty",
-    layers: [axes_hugin, meshMapLayerPng, north_arrow_layer],
-
-    bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
-    cameraPosition: {
-        rotationOrbit: 0,
-        rotationX: 80,
-        target: [435775, 6478650, -1750],
-        zoom: -3.5109619192773796,
-    },
-    views: DEFAULT_VIEWS,
-};
-
-ResetCameraProperty.parameters = {
-    docs: {
-        ...defaultParameters.docs,
-        description: {
-            story: `Example using optional 'triggerHome' property.
-                    When this property is changed camera will reset to home position.
-                    Using the button the property will change its value.`,
-        },
-    },
-};
-
-export const AddLayer: ComponentStory<typeof SubsurfaceViewer> = (args) => {
-    const [layers, setLayers] = React.useState([
-        axes_hugin,
-        meshMapLayerPng,
-        north_arrow_layer,
-    ]);
-
-    const handleChange = () => {
-        setLayers([axes_hugin, meshMapLayerPng, wellsLayer, north_arrow_layer]);
-    };
-
-    const props = {
-        ...args,
-        layers,
-    };
-
-    return (
-        <Root>
-            <div className={classes.main}>
-                <SubsurfaceViewer {...props} />
-            </div>
-            <button onClick={handleChange}> Add layer </button>
-        </Root>
-    );
-};
-
-AddLayer.args = {
-    id: "map",
-    //bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,  // Keep this line for future testing.
-    cameraPosition: {
-        rotationOrbit: 45,
-        rotationX: -45,
-        zoom: [432150, 6475800, -2000, 439400, 6481500, -3500],
-        target: [0, 0, 0],
-    },
-    views: DEFAULT_VIEWS,
-};
-
-AddLayer.parameters = {
-    docs: {
-        ...defaultParameters.docs,
-        description: {
-            story: `Example using button to add a layer.`,
-        },
-    },
-};
-
-export const MapLayer2d: ComponentStory<typeof SubsurfaceViewer> = (args) => {
-    return <SubsurfaceViewer {...args} />;
-};
-
-const axesLayer2D = new Axes2DLayer({
+const axesLayer2D = {
+    "@@type": "Axes2DLayer",
     id: "axesLayer2D",
     backgroundColor: [0, 255, 255],
-});
+};
 
-const mapLayer = new MapLayer({
+const mapLayer = {
+    "@@type": "MapLayer",
     id: "MapLayer",
     meshUrl: "hugin_depth_25_m.float32",
     frame: {
@@ -594,127 +331,115 @@ const mapLayer = new MapLayer({
     gridLines: false,
     material: true,
     colorMapName: "Physics",
-});
-
-MapLayer2d.args = {
-    id: "map",
-    layers: [mapLayer, axesLayer2D],
-    bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
-    views: {
-        layout: [1, 1],
-        viewports: [
-            {
-                id: "view_1",
-                show3D: false,
-            },
-        ],
-    },
 };
 
-MapLayer2d.parameters = {
-    docs: {
-        ...defaultParameters.docs,
-        description: {
-            story: "Example using png as mesh and properties data.",
+export const MapLayer2d: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "map",
+        layers: [mapLayer, axesLayer2D],
+        bounds: [432150, 6475800, 439400, 6481500] as BoundingBox2D,
+        views: {
+            layout: [1, 1],
+            viewports: [
+                {
+                    id: "view_1",
+                    show3D: false,
+                },
+            ],
         },
     },
-};
-
-export const MapLayer2dDarkMode: ComponentStory<typeof SubsurfaceViewer> = (
-    args
-) => {
-    return <SubsurfaceViewer {...args} />;
+    parameters: {
+        docs: {
+            ...defaultParameters.docs,
+            description: {
+                story: "Example using png as mesh and properties data.",
+            },
+        },
+    },
 };
 
 const white = [255, 255, 255, 255];
 
-MapLayer2dDarkMode.args = {
-    id: "map",
-    layers: [
-        { ...axes_hugin, labelColor: white, axisColor: white },
-        { ...meshMapLayerFloat32, material: false, gridLines: false },
-        { ...north_arrow_layer, color: white },
-    ],
-    bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
-    scale: {
-        visible: true,
-        cssStyle: { color: "white" },
-    },
-    views: {
-        layout: [1, 1],
-        viewports: [
-            {
-                id: "view_1",
-                show3D: false,
-            },
+export const MapLayer2dDarkMode: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "map",
+        layers: [
+            { ...axes_hugin_layer, labelColor: white, axisColor: white },
+            { ...meshMapLayerFloat32, material: false, gridLines: false },
+            { ...north_arrow_layer, color: white },
         ],
-    },
-};
-
-MapLayer2dDarkMode.parameters = {
-    docs: {
-        ...defaultParameters.docs,
-        description: {
-            story: "Example using png as mesh and properties data.",
+        bounds: [432150, 6475800, 439400, 6481500] as BoundingBox2D,
+        scale: {
+            visible: true,
+            cssStyle: { color: "white" },
+        },
+        views: {
+            layout: [1, 1],
+            viewports: [
+                {
+                    id: "view_1",
+                    show3D: false,
+                },
+            ],
         },
     },
-    backgrounds: { default: "dark" },
-};
-
-export const Rotated: ComponentStory<typeof SubsurfaceViewer> = (args) => {
-    return <SubsurfaceViewer {...args} />;
-};
-
-Rotated.args = {
-    id: "map",
-    layers: [axes_hugin, meshMapLayerRotated, north_arrow_layer],
-    bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
-    views: {
-        layout: [1, 1],
-        viewports: [
-            {
-                id: "view_1",
-                show3D: false,
+    parameters: {
+        docs: {
+            ...defaultParameters.docs,
+            description: {
+                story: "Example using png as mesh and properties data.",
             },
-        ],
+        },
+        backgrounds: { default: "dark" },
     },
 };
 
-Rotated.parameters = {
-    docs: {
-        ...defaultParameters.docs,
-        description: {
-            story: "Example using png as mesh and properties data.",
+export const Rotated: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "map",
+        layers: [axes_hugin_layer, meshMapLayerRotated, north_arrow_layer],
+        bounds: [432150, 6475800, 439400, 6481500] as BoundingBox2D,
+        views: {
+            layout: [1, 1],
+            viewports: [
+                {
+                    id: "view_1",
+                    show3D: false,
+                },
+            ],
+        },
+    },
+    parameters: {
+        docs: {
+            ...defaultParameters.docs,
+            description: {
+                story: "Example using png as mesh and properties data.",
+            },
         },
     },
 };
 
-export const BigMap: ComponentStory<typeof SubsurfaceViewer> = (args) => {
-    return <SubsurfaceViewer {...args} />;
+export const BigMap: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "map",
+        layers: [axes_hugin_layer, meshMapLayerBig, north_arrow_layer],
+        bounds: [432150, 6475800, 439400, 6481500] as BoundingBox2D,
+    },
 };
 
-BigMap.args = {
-    id: "map",
-    layers: [axes_hugin, meshMapLayerBig, north_arrow_layer],
-    bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
-};
-
-export const BigMap3d: ComponentStory<typeof SubsurfaceViewer> = (args) => {
-    return <SubsurfaceViewer {...args} />;
-};
-
-BigMap3d.args = {
-    id: "map",
-    layers: [axes_hugin, meshMapLayerBig, north_arrow_layer],
-    bounds: [432150, 6475800, 439400, 6481500] as NumberQuad,
-    views: DEFAULT_VIEWS,
-};
-
-BigMap3d.parameters = {
-    docs: {
-        ...defaultParameters.docs,
-        description: {
-            story: "Example using large map with approx. 1400x1400 cells.",
+export const BigMap3d: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "map",
+        layers: [axes_hugin_layer, meshMapLayerBig, north_arrow_layer],
+        bounds: [432150, 6475800, 439400, 6481500] as BoundingBox2D,
+        views: DEFAULT_VIEWS,
+    },
+    parameters: {
+        docs: {
+            ...defaultParameters.docs,
+            description: {
+                story: "Example using large map with approx. 1400x1400 cells.",
+            },
         },
     },
 };
@@ -724,22 +449,20 @@ const axes_small = {
     id: "axes_small",
     bounds: [459790, 5929776, 0, 460590, 5930626, 30],
 };
-export const SmallMap: ComponentStory<typeof SubsurfaceViewer> = (args) => {
-    return <SubsurfaceViewer {...args} />;
-};
 
-SmallMap.args = {
-    id: "map",
-    layers: [axes_small, smallLayer, north_arrow_layer],
-    bounds: [459840.7, 5929826.1, 460540.7, 5930576.1] as NumberQuad,
-    views: DEFAULT_VIEWS,
-};
-
-SmallMap.parameters = {
-    docs: {
-        ...defaultParameters.docs,
-        description: {
-            story: "4x5 cells.",
+export const SmallMap: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "map",
+        layers: [axes_small, smallLayer, north_arrow_layer],
+        bounds: [459840.7, 5929826.1, 460540.7, 5930576.1] as BoundingBox2D,
+        views: DEFAULT_VIEWS,
+    },
+    parameters: {
+        docs: {
+            ...defaultParameters.docs,
+            description: {
+                story: "4x5 cells.",
+            },
         },
     },
 };
@@ -751,74 +474,61 @@ const axes_lite = {
 };
 
 //-- CellCenteredPropMap --
-export const CellCenteredPropMap: ComponentStory<typeof SubsurfaceViewer> = (
-    args
-) => {
-    return <SubsurfaceViewer {...args} />;
-};
-
-CellCenteredPropMap.args = {
-    id: "map",
-    layers: [axes_lite, cellCenteredPropertiesLayer, north_arrow_layer],
-    bounds: [-1, -1, 4, 5] as NumberQuad,
-    views: DEFAULT_VIEWS,
-};
-
-CellCenteredPropMap.parameters = {
-    docs: {
-        ...defaultParameters.docs,
-        description: {
-            story: "A small map with properties given at cell centers. Each cell will be constant colored",
+export const CellCenteredPropMap: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "map",
+        layers: [axes_lite, cellCenteredPropertiesLayer, north_arrow_layer],
+        bounds: [-1, -1, 4, 5] as BoundingBox2D,
+        views: DEFAULT_VIEWS,
+    },
+    parameters: {
+        docs: {
+            ...defaultParameters.docs,
+            description: {
+                story: "A small map with properties given at cell centers. Each cell will be constant colored",
+            },
         },
     },
 };
 
 //-- NodeCenteredPropMap --
-export const NodeCenteredPropMap: ComponentStory<typeof SubsurfaceViewer> = (
-    args
-) => {
-    return <SubsurfaceViewer {...args} />;
-};
-
-NodeCenteredPropMap.args = {
-    id: "map",
-    layers: [axes_lite, nodeCenteredPropertiesLayer, north_arrow_layer],
-    bounds: [-1, -1, 4, 5] as NumberQuad,
-    views: DEFAULT_VIEWS,
-};
-
-NodeCenteredPropMap.parameters = {
-    docs: {
-        ...defaultParameters.docs,
-        description: {
-            story: "A small map with properties given at nodes. Each cell will be interpolated in color.",
+export const NodeCenteredPropMap: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "map",
+        layers: [axes_lite, nodeCenteredPropertiesLayer, north_arrow_layer],
+        bounds: [-1, -1, 4, 5] as BoundingBox2D,
+        views: DEFAULT_VIEWS,
+    },
+    parameters: {
+        docs: {
+            ...defaultParameters.docs,
+            description: {
+                story: "A small map with properties given at nodes. Each cell will be interpolated in color.",
+            },
         },
     },
 };
 
 //-- NodeCenteredPropMap  with native javascript arrays as input --
-export const NodeCenteredPropMapWithArrayInput: ComponentStory<
+export const NodeCenteredPropMapWithArrayInput: StoryObj<
     typeof SubsurfaceViewer
-> = (args) => {
-    return <SubsurfaceViewer {...args} />;
-};
-
-NodeCenteredPropMapWithArrayInput.args = {
-    id: "map",
-    layers: [
-        axes_lite,
-        nodeCenteredPropertiesLayerWithArrayInput,
-        north_arrow_layer,
-    ],
-    bounds: [-1, -1, 4, 5] as NumberQuad,
-    views: DEFAULT_VIEWS,
-};
-
-NodeCenteredPropMapWithArrayInput.parameters = {
-    docs: {
-        ...defaultParameters.docs,
-        description: {
-            story: "Both mesh and property data given as native javascript arrays (as opposed to URL).",
+> = {
+    args: {
+        id: "map",
+        layers: [
+            axes_lite,
+            nodeCenteredPropertiesLayerWithArrayInput,
+            north_arrow_layer,
+        ],
+        bounds: [-1, -1, 4, 5] as BoundingBox2D,
+        views: DEFAULT_VIEWS,
+    },
+    parameters: {
+        docs: {
+            ...defaultParameters.docs,
+            description: {
+                story: "Both mesh and property data given as native javascript arrays (as opposed to URL).",
+            },
         },
     },
 };
@@ -849,13 +559,21 @@ function makeData(n: number, amplitude: number): Float32Array {
     return data;
 }
 
+function nearestColorMap(x: number) {
+    if (x > 0.5) return [100, 255, 255];
+    else if (x > 0.1) return [255, 100, 255];
+    return [255, 255, 100];
+}
+
 //-- MapLayer with native javascript arrays as input --
-export const TypedArrayInput: StoryFn<
-    SubsurfaceViewerProps & { dimension: number }
-> = (args) => {
+const TypedArrayInputComponent: React.FC<{
+    triggerHome: number;
+    dimension: number;
+}> = (args) => {
     const subsurfaceViewerArgs = {
         id: "map",
         layers: [
+            // Can not use Record<string, unknown> because makeData() is not supported
             new MapLayer({
                 frame: {
                     origin: [-args.dimension / 2, -args.dimension / 2],
@@ -890,100 +608,32 @@ export const TypedArrayInput: StoryFn<
             target: [0, 0, 0],
         },
         views: DEFAULT_VIEWS,
+        triggerHome: args.triggerHome,
     };
     return <SubsurfaceViewer {...subsurfaceViewerArgs} />;
 };
 
-TypedArrayInput.args = {
-    dimension: 300,
-};
-
-TypedArrayInput.argTypes = {
-    dimension: {
-        control: { type: "range", min: 150, max: 300, step: 1 },
+export const TypedArrayInput: StoryObj<typeof TypedArrayInputComponent> = {
+    args: {
+        dimension: 300,
     },
-};
-
-TypedArrayInput.parameters = {
-    docs: {
-        ...defaultParameters.docs,
-        description: {
-            story: "Both mesh and property data given as typed arrays arrays (as opposed to URL).",
+    argTypes: {
+        dimension: {
+            control: { type: "range", min: 150, max: 300, step: 1 },
         },
     },
-};
-
-export const GradientFunctionColorMap: ComponentStory<
-    typeof SubsurfaceViewer
-> = () => {
-    const args = {
-        ...defaultArgs,
-        id: "gradient-color-map",
-        layers: [
-            { ...meshMapLayerFloat32, colorMapFunction: gradientColorMap },
-        ],
-    };
-    return <SubsurfaceViewer {...args} />;
-};
-
-GradientFunctionColorMap.parameters = {
-    docs: {
-        ...defaultParameters.docs,
-        description: {
-            story: "Example using gradient color mapping function.",
-        },
-    },
-};
-
-export const StepFunctionColorMap: ComponentStory<
-    typeof SubsurfaceViewer
-> = () => {
-    const args = {
-        ...defaultArgs,
-        id: "nearest-color-map",
-        layers: [
-            {
-                ...meshMapLayerFloat32,
-                material: true,
-                colorMapFunction: nearestColorMap,
+    parameters: {
+        docs: {
+            ...defaultParameters.docs,
+            description: {
+                story: "Both mesh and property data given as typed arrays arrays (as opposed to URL).",
             },
-        ],
-    };
-
-    return <SubsurfaceViewer {...args} />;
-};
-
-StepFunctionColorMap.parameters = {
-    docs: {
-        ...defaultParameters.docs,
-        description: {
-            story: "Example using step color mapping function.",
         },
     },
+    render: (args) => <TypedArrayInputComponent {...args} />,
 };
 
-export const DefaultColorScale: ComponentStory<
-    typeof SubsurfaceViewer
-> = () => {
-    const args = {
-        ...defaultArgs,
-        id: "default-color-scale",
-        layers: [{ ...meshMapLayerFloat32 }],
-    };
-
-    return <SubsurfaceViewer {...args} />;
-};
-
-DefaultColorScale.parameters = {
-    docs: {
-        ...defaultParameters.docs,
-        description: {
-            story: "Default color scale.",
-        },
-    },
-};
-
-export const Readout: ComponentStory<typeof SubsurfaceViewer> = () => {
+const ReadoutComponent: React.FC = () => {
     const [hoverInfo, hoverCallback] = useHoverInfo();
 
     const args = React.useMemo(() => {
@@ -1006,16 +656,19 @@ export const Readout: ComponentStory<typeof SubsurfaceViewer> = () => {
     );
 };
 
-Readout.parameters = {
-    docs: {
-        ...defaultParameters.docs,
-        description: {
-            story: "Readout example.",
+export const Readout: StoryObj<typeof ReadoutComponent> = {
+    parameters: {
+        docs: {
+            ...defaultParameters.docs,
+            description: {
+                story: "Readout example.",
+            },
         },
     },
+    render: () => <ReadoutComponent />,
 };
 
-export const BigMapWithHole: ComponentStory<typeof SubsurfaceViewer> = () => {
+const BigMapWithHoleComponent: React.FC = () => {
     const [hoverInfo, hoverCallback] = useHoverInfo();
 
     const args = React.useMemo(() => {
@@ -1045,301 +698,30 @@ export const BigMapWithHole: ComponentStory<typeof SubsurfaceViewer> = () => {
     );
 };
 
-BigMapWithHole.parameters = {
-    docs: {
-        ...defaultParameters.docs,
-        description: {
-            story: "Example of map with a hole.",
-        },
-    },
-};
-
-export const BreakpointColorMap: ComponentStory<typeof SubsurfaceViewer> = (
-    args
-) => {
-    const [breakpoint, setBreakpoint] = React.useState<number>(0.5);
-
-    const colorMap = React.useCallback(
-        (value: number) => {
-            return createColorMap(breakpoint)(value);
-        },
-        [breakpoint]
-    );
-
-    const layer = {
-        ...args?.layers?.[0],
-        colorMapFunction: colorMap,
-    };
-
-    const props = {
-        ...args,
-        layers: [layer],
-    };
-
-    const handleChange = React.useCallback(
-        (_event: Event | SyntheticEvent, value: number | number[]) => {
-            setBreakpoint((value as number) / 100);
-        },
-        []
-    );
-
-    return (
-        <Root>
-            <div className={classes.main}>
-                <SubsurfaceViewer {...props} />
-                <div className={classes.legend}>
-                    <ContinuousLegend
-                        min={valueRange[0]}
-                        max={valueRange[1]}
-                        colorMapFunction={colorMap}
-                    />
-                </div>
-            </div>
-            <Slider
-                min={0}
-                max={100}
-                defaultValue={50}
-                step={1}
-                onChangeCommitted={handleChange}
-            />
-        </Root>
-    );
-};
-
-BreakpointColorMap.args = {
-    ...defaultArgs,
-    id: "breakpoint-color-map",
-    layers: [
-        {
-            ...meshMapLayerFloat32,
-            gridLines: false,
-            material: true,
-        },
-    ],
-};
-
-BreakpointColorMap.parameters = {
-    docs: {
-        ...defaultParameters.docs,
-        description: {
-            story: "Example using a color scale with a breakpoint.",
-        },
-    },
-};
-
-export const ColorMapRange: ComponentStory<typeof SubsurfaceViewer> = (
-    args
-) => {
-    const [colorMapUpper, setColorMapUpper] = React.useState<number>(41048);
-
-    const layer = {
-        ...args?.layers?.[0],
-        colorMapRange: [-3071, colorMapUpper],
-    };
-
-    const props = {
-        ...args,
-        layers: [layer],
-    };
-
-    const handleChange = React.useCallback(
-        (_event: unknown, value: number | number[]) => {
-            setColorMapUpper(value as number);
-        },
-        []
-    );
-
-    return (
-        <Root>
-            <div className={classes.main}>
-                <SubsurfaceViewer {...props} />
-            </div>
-            <Slider
-                min={10000}
-                max={41048}
-                defaultValue={41048}
-                step={1000}
-                onChange={handleChange}
-            />
-        </Root>
-    );
-};
-
-ColorMapRange.args = {
-    ...defaultArgs,
-    id: "breakpoint-color-map",
-    layers: [
-        {
-            ...meshMapLayerFloat32,
-            colorMapName: "Seismic",
-            colorMapClampColor: false,
-            gridLines: false,
-            material: true,
-        },
-    ],
-};
-
-ColorMapRange.parameters = {
-    docs: {
-        ...defaultParameters.docs,
-        description: {
-            story: 'Example changing the "ColorMapRange" property using a slider.',
-        },
-    },
-};
-
-// Map layer with color colorselector
-
-const MapLayerColorSelectorTemplate: ComponentStory<typeof SubsurfaceViewer> = (
-    args
-) => {
-    const [colorName, setColorName] = React.useState("Rainbow");
-    const [colorRange, setRange] = React.useState();
-    const [isAuto, setAuto] = React.useState();
-    const [breakPoints, setBreakPoint] = React.useState();
-    const [isLog, setIsLog] = React.useState(false);
-    const [isNearest, setIsNearest] = React.useState(false);
-
-    // user defined breakpoint(domain)
-    const userDefinedBreakPoint = React.useCallback(
-        (data: { colorArray: React.SetStateAction<undefined> }) => {
-            if (data) setBreakPoint(data.colorArray);
-        },
-        []
-    );
-
-    // Get color name from color selector
-    const colorNameFromSelector = React.useCallback(
-        (data: React.SetStateAction<string>) => {
-            setColorName(data);
-        },
-        []
-    );
-
-    // user defined range
-    const userDefinedRange = React.useCallback(
-        (data: {
-            range: React.SetStateAction<undefined>;
-            isAuto: React.SetStateAction<undefined>;
-        }) => {
-            if (data.range) setRange(data.range);
-            setAuto(data.isAuto);
-        },
-        []
-    );
-
-    // Get interpolation method from color selector to layer
-    const getInterpolateMethod = React.useCallback(
-        (data: {
-            isLog: boolean | ((prevState: boolean) => boolean);
-            isNearest: boolean | ((prevState: boolean) => boolean);
-        }) => {
-            setIsLog(data.isLog);
-            setIsNearest(data.isNearest);
-        },
-        []
-    );
-
-    // color map function
-    const colorMapFunc = React.useCallback(() => {
-        return createColorMapFunction(colorName, isLog, isNearest, breakPoints);
-    }, [colorName, isLog, isNearest, breakPoints]);
-
-    const min = 100;
-    const max = 1000;
-
-    const updatedLayerData = [
-        {
-            ...meshMapLayerFloat32,
-            colorMapName: colorName,
-            colorMapRange:
-                colorRange && isAuto == false ? colorRange : [min, max],
-            colorMapFunction: colorMapFunc(),
-        },
-    ];
-    return (
-        <SubsurfaceViewer {...args} layers={updatedLayerData}>
-            {
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                /* @ts-expect-error */
-                <View id="view_1">
-                    <div style={{ marginTop: 50 }}>
-                        <ColorLegend
-                            min={min}
-                            max={max}
-                            colorNameFromSelector={colorNameFromSelector}
-                            getColorRange={userDefinedRange}
-                            getInterpolateMethod={getInterpolateMethod}
-                            getBreakpointValue={userDefinedBreakPoint}
-                            horizontal={true}
-                            numberOfTicks={2}
-                        />
-                    </div>
-                </View>
-            }
-        </SubsurfaceViewer>
-    );
-};
-
-export const ColorSelector = MapLayerColorSelectorTemplate.bind({});
-
-ColorSelector.args = {
-    ...defaultArgs,
-    id: "map_layer_color_selector",
-    legend: {
-        visible: true,
-    },
-    layers: [{ ...meshMapLayerFloat32 }],
-    views: {
-        layout: [1, 1],
-        showLabel: true,
-        viewports: [
-            {
-                id: "view_1",
-                zoom: -4,
+export const BigMapWithHole: StoryObj<typeof BigMapWithHoleComponent> = {
+    parameters: {
+        docs: {
+            ...defaultParameters.docs,
+            description: {
+                story: "Example of map with a hole.",
             },
-        ],
+        },
     },
+    render: () => <BigMapWithHoleComponent />,
 };
 
-const ContourLinesStory = (props: {
+type ContourLinesComponentProps = {
     syncViewports: boolean;
     show3d: boolean;
     contourOffset: number;
     zContourInterval: number;
     propertyContourInterval: number;
     marginPixels: number;
-}) => {
-    const views: ViewsType = {
-        layout: [2, 2],
-        viewports: [
-            {
-                id: "view_1",
-                show3D: props.show3d,
-                layerIds: ["default_map"],
-                isSync: props.syncViewports,
-            },
-            {
-                id: "view_2",
-                show3D: props.show3d,
-                layerIds: ["contours"],
-                isSync: props.syncViewports,
-            },
-            {
-                id: "view_3",
-                show3D: props.show3d,
-                layerIds: ["property_contours"],
-                isSync: props.syncViewports,
-            },
-            {
-                id: "view_4",
-                show3D: props.show3d,
-                layerIds: ["flat"],
-                isSync: props.syncViewports,
-            },
-        ],
-    };
+};
 
+const ContourLinesComponent: React.FC<ContourLinesComponentProps> = (
+    props: ContourLinesComponentProps
+) => {
     const contourMapLayer = new MapLayer({
         ...defaultMapLayerProps,
         id: "contours",
@@ -1353,25 +735,52 @@ const ContourLinesStory = (props: {
         isContoursDepth: false,
     });
 
-    const flatMapLayerProps = {
+    const flatPropertyContourMapLayer = new MapLayer({
         ...defaultMapLayerProps,
         id: "flat",
-        meshData: undefined,
+        meshData: undefined as unknown as string,
         contours: [props.contourOffset, props.propertyContourInterval] as [
             number,
             number,
         ],
-    };
-
-    const flatPropertyContourMapLayer = new MapLayer({
-        ...flatMapLayerProps,
     });
+
+    const views: ViewsType = {
+        layout: [2, 2],
+        showLabel: true,
+        viewports: [
+            {
+                id: "view_1",
+                show3D: props.show3d,
+                layerIds: [defaultMapLayerProps.id],
+                isSync: props.syncViewports,
+            },
+            {
+                id: "view_2",
+                show3D: props.show3d,
+                layerIds: [contourMapLayer.id],
+                isSync: props.syncViewports,
+            },
+            {
+                id: "view_3",
+                show3D: props.show3d,
+                layerIds: [propertyContourMapLayer.id],
+                isSync: props.syncViewports,
+            },
+            {
+                id: "view_4",
+                show3D: props.show3d,
+                layerIds: [flatPropertyContourMapLayer.id],
+                isSync: props.syncViewports,
+            },
+        ],
+    };
 
     return (
         <SubsurfaceViewer
             id={"test"}
             layers={[
-                defaultMapLayer,
+                new MapLayer(defaultMapLayer),
                 contourMapLayer,
                 propertyContourMapLayer,
                 flatPropertyContourMapLayer,
@@ -1414,22 +823,21 @@ const ContourLinesStory = (props: {
     );
 };
 
-export const ContourLines: StoryFn<typeof ContourLinesStory> = (args) => {
-    return <ContourLinesStory {...args} />;
+export const ContourLines: StoryObj<typeof ContourLinesComponent> = {
+    args: {
+        syncViewports: true,
+        show3d: true,
+        contourOffset: 0,
+        zContourInterval: 100,
+        propertyContourInterval: 5000,
+        marginPixels: 0,
+    },
+    render: (args) => <ContourLinesComponent {...args} />,
 };
 
-ContourLines.args = {
-    syncViewports: true,
-    show3d: true,
-    contourOffset: 0,
-    zContourInterval: 100,
-    propertyContourInterval: 5000,
-    marginPixels: 0,
-};
-
-export const Extensions: StoryFn<SubsurfaceViewerProps & { clipX: number }> = (
-    args
-) => {
+const ExtensionsComponent: React.FC<
+    SubsurfaceViewerProps & { clipX: number }
+> = (args) => {
     const rightClipBounds = [
         args.bounds?.[0] + args.clipX,
         args.bounds?.[1],
@@ -1442,6 +850,7 @@ export const Extensions: StoryFn<SubsurfaceViewerProps & { clipX: number }> = (
         args.bounds?.[0] + args.clipX,
         args.bounds?.[3],
     ];
+    // Can not use Record<string, unknown> because extensions will not be supported
     const leftMap = new MapLayer({
         ...defaultMapLayerProps,
         id: "left",
@@ -1460,7 +869,7 @@ export const Extensions: StoryFn<SubsurfaceViewerProps & { clipX: number }> = (
     });
 
     const layers = [
-        new AxesLayer({ ...axes_hugin }),
+        new AxesLayer({ ...axes_hugin_layer }),
         leftMap,
         rightMap,
         new NorthArrow3DLayer(),
@@ -1469,15 +878,17 @@ export const Extensions: StoryFn<SubsurfaceViewerProps & { clipX: number }> = (
     return <SubsurfaceViewer {...args} layers={layers}></SubsurfaceViewer>;
 };
 
-Extensions.args = {
-    id: "map",
-    ...defaultArgs,
-    views: DEFAULT_VIEWS,
-    clipX: 1000,
-};
-
-Extensions.argTypes = {
-    clipX: {
-        control: { type: "range", min: 0, max: 8000, step: 10 },
+export const Extensions: StoryObj<typeof ExtensionsComponent> = {
+    args: {
+        id: "map",
+        ...defaultArgs,
+        views: DEFAULT_VIEWS,
+        clipX: 1000,
     },
+    argTypes: {
+        clipX: {
+            control: { type: "range", min: 0, max: 8000, step: 10 },
+        },
+    },
+    render: (args) => <ExtensionsComponent {...args} />,
 };

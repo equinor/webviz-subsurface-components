@@ -1,17 +1,17 @@
-import React from "react";
+import type { Meta, StoryObj } from "@storybook/react";
+
 import NumericInput from "../../../components/settings/NumericInput";
 
-export default {
+const stories: Meta = {
     component: NumericInput,
-    title: "SubsurfaceViewer/Components/Settings/NumericInput",
+    title: "SubsurfaceViewer/Components/Settings",
 };
+export default stories;
 
-const Template = (args) => {
-    return <NumericInput {...args} />;
-};
-
-export const Default = Template.bind({});
-Default.args = {
-    label: "test",
-    value: 5,
+export const NumericInputStory: StoryObj<typeof NumericInput> = {
+    name: "NumericInput",
+    args: {
+        label: "test",
+        value: 5,
+    },
 };

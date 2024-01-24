@@ -1,3 +1,88 @@
+## [0.13.8](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.13.7...subsurface-viewer@0.13.8) (2024-01-24)
+
+
+### Bug Fixes
+
+* camera update on resize ([#1887](https://github.com/equinor/webviz-subsurface-components/issues/1887)) ([3f7742c](https://github.com/equinor/webviz-subsurface-components/commit/3f7742c98abda59a5c7f9818447eeb2cc052e106))
+
+## [0.13.7](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.13.6...subsurface-viewer@0.13.7) (2024-01-22)
+
+
+### Bug Fixes
+
+* [NGRM] - For wells the property "ZIncreasingDownwards" does not honor… ([#1886](https://github.com/equinor/webviz-subsurface-components/issues/1886)) ([a88f3c3](https://github.com/equinor/webviz-subsurface-components/commit/a88f3c387c7ba8c5d4ebb300905ebf4fba5707c3))
+
+## [0.13.6](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.13.5...subsurface-viewer@0.13.6) (2024-01-22)
+
+
+### Bug Fixes
+
+* do not display "Loading assets" feedback when isRenderedCallback exists ([#1882](https://github.com/equinor/webviz-subsurface-components/issues/1882)) ([12431d8](https://github.com/equinor/webviz-subsurface-components/commit/12431d8375b869a7a01b14eb70e17fdd8cbe21a0))
+
+## [0.13.5](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.13.4...subsurface-viewer@0.13.5) (2024-01-19)
+
+
+### Bug Fixes
+
+* add missing dependencies ([#1881](https://github.com/equinor/webviz-subsurface-components/issues/1881)) ([7e5fbc4](https://github.com/equinor/webviz-subsurface-components/commit/7e5fbc49d98732e33c4edce90babc52e0ecccf1a))
+* remove some unused dependencies ([#1880](https://github.com/equinor/webviz-subsurface-components/issues/1880)) ([3703825](https://github.com/equinor/webviz-subsurface-components/commit/37038250f05b0843a5a632c3e9e176ab15439e30))
+
+## [0.13.4](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.13.3...subsurface-viewer@0.13.4) (2024-01-12)
+
+
+### Bug Fixes
+
+* zoom keys (arrow up and down) only apply to last SubSurfaceViewer ([#1868](https://github.com/equinor/webviz-subsurface-components/issues/1868)) ([a422198](https://github.com/equinor/webviz-subsurface-components/commit/a422198eee9a102db35f0b72e818782f93df8bef))
+
+## [0.13.3](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.13.2...subsurface-viewer@0.13.3) (2024-01-10)
+
+
+### Bug Fixes
+
+* wrong camera computation in 2D when bounds are provided ([#1863](https://github.com/equinor/webviz-subsurface-components/issues/1863)) ([3baef9f](https://github.com/equinor/webviz-subsurface-components/commit/3baef9f1eb1c2f124f74937a19ce78963b1d7604)), closes [#1837](https://github.com/equinor/webviz-subsurface-components/issues/1837)
+
+## [0.13.2](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.13.1...subsurface-viewer@0.13.2) (2024-01-10)
+
+
+### Bug Fixes
+
+* bump mathjs from 9.5.2 to 12.2.1 in /typescript ([#1858](https://github.com/equinor/webviz-subsurface-components/issues/1858)) ([3aa1d7c](https://github.com/equinor/webviz-subsurface-components/commit/3aa1d7c3992fa56a9a25ed3e719014c5b97357ac)), closes [#3109](https://github.com/equinor/webviz-subsurface-components/issues/3109) [#3090](https://github.com/equinor/webviz-subsurface-components/issues/3090) [#3101](https://github.com/equinor/webviz-subsurface-components/issues/3101) [#2766](https://github.com/equinor/webviz-subsurface-components/issues/2766) [#3096](https://github.com/equinor/webviz-subsurface-components/issues/3096) [#2761](https://github.com/equinor/webviz-subsurface-components/issues/2761) [#3095](https://github.com/equinor/webviz-subsurface-components/issues/3095) [#3087](https://github.com/equinor/webviz-subsurface-components/issues/3087) [#3092](https://github.com/equinor/webviz-subsurface-components/issues/3092) [#3094](https://github.com/equinor/webviz-subsurface-components/issues/3094) [#2879](https://github.com/equinor/webviz-subsurface-components/issues/2879) [#2927](https://github.com/equinor/webviz-subsurface-components/issues/2927) [#3014](https://github.com/equinor/webviz-subsurface-components/issues/3014) [#3037](https://github.com/equinor/webviz-subsurface-components/issues/3037) [#3079](https://github.com/equinor/webviz-subsurface-components/issues/3079) [#2919](https://github.com/equinor/webviz-subsurface-components/issues/2919) [#3109](https://github.com/equinor/webviz-subsurface-components/issues/3109)
+
+## [0.13.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.13.0...subsurface-viewer@0.13.1) (2024-01-09)
+
+
+### Bug Fixes
+
+* camera computation in some cases ([#1860](https://github.com/equinor/webviz-subsurface-components/issues/1860)) ([ded2afe](https://github.com/equinor/webviz-subsurface-components/commit/ded2afe4b4ad70190ab394d1eb3e58515e017466)), closes [#1837](https://github.com/equinor/webviz-subsurface-components/issues/1837)
+
+# [0.13.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.12.2...subsurface-viewer@0.13.0) (2024-01-09)
+
+
+### Features
+
+* color Grid3D by coordinates. ([#1844](https://github.com/equinor/webviz-subsurface-components/issues/1844)) ([4d14b59](https://github.com/equinor/webviz-subsurface-components/commit/4d14b59659ddd1e6c2be1722f40c6e9bc33fc7fc))
+
+## [0.12.2](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.12.1...subsurface-viewer@0.12.2) (2024-01-09)
+
+
+### Performance Improvements
+
+* Reintroduce web worker with transferable objects. ([#1841](https://github.com/equinor/webviz-subsurface-components/issues/1841)) ([45eeb26](https://github.com/equinor/webviz-subsurface-components/commit/45eeb269de43c5295f44bce4e471f811a3ac46e6))
+
+## [0.12.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.12.0...subsurface-viewer@0.12.1) (2023-12-19)
+
+
+### Bug Fixes
+
+* regression in viewport size ([#1839](https://github.com/equinor/webviz-subsurface-components/issues/1839)) ([8d8eb7d](https://github.com/equinor/webviz-subsurface-components/commit/8d8eb7de5ec9f54e75c7221ea1d8bcfba68633de)), closes [#1837](https://github.com/equinor/webviz-subsurface-components/issues/1837)
+
+# [0.12.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.11.0...subsurface-viewer@0.12.0) (2023-12-18)
+
+
+### Features
+
+* map refactoring ([#1837](https://github.com/equinor/webviz-subsurface-components/issues/1837)) ([849b839](https://github.com/equinor/webviz-subsurface-components/commit/849b839060bd575eedc0e760f793c090d7567cc6)), closes [#1820](https://github.com/equinor/webviz-subsurface-components/issues/1820)
+
 # [0.11.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.10.0...subsurface-viewer@0.11.0) (2023-12-12)
 
 

@@ -316,12 +316,17 @@ exports[`Sync Log Viewer snapshot test 1`] = `
               >
                 ⬤
               </td>
-              <td>
+              <td
+                style="white-space: nowrap;"
+              >
                 DEPT
               </td>
               <td
-                style="width: 90px; padding-left: 1.5em; text-align: right;"
-              />
+                colspan="1"
+                style="width: 90px; padding-left: 1.5em; text-align: right; white-space: nowrap;"
+              >
+                 
+              </td>
               <td
                 style="padding-left: 0.5em;"
               >
@@ -334,12 +339,17 @@ exports[`Sync Log Viewer snapshot test 1`] = `
               >
                 ⬤
               </td>
-              <td>
+              <td
+                style="white-space: nowrap;"
+              >
                 DVER
               </td>
               <td
-                style="width: 90px; padding-left: 1.5em; text-align: right;"
-              />
+                colspan="1"
+                style="width: 90px; padding-left: 1.5em; text-align: right; white-space: nowrap;"
+              >
+                 
+              </td>
               <td
                 style="padding-left: 0.5em;"
               >
@@ -360,12 +370,17 @@ exports[`Sync Log Viewer snapshot test 1`] = `
               >
                 ⬤
               </td>
-              <td>
+              <td
+                style="white-space: nowrap;"
+              >
                 MDIA
               </td>
               <td
-                style="width: 90px; padding-left: 1.5em; text-align: right;"
-              />
+                colspan="1"
+                style="width: 90px; padding-left: 1.5em; text-align: right; white-space: nowrap;"
+              >
+                 
+              </td>
               <td
                 style="padding-left: 0.5em;"
               >
@@ -378,12 +393,17 @@ exports[`Sync Log Viewer snapshot test 1`] = `
               >
                 ⬤
               </td>
-              <td>
+              <td
+                style="white-space: nowrap;"
+              >
                 HKLA
               </td>
               <td
-                style="width: 90px; padding-left: 1.5em; text-align: right;"
-              />
+                colspan="1"
+                style="width: 90px; padding-left: 1.5em; text-align: right; white-space: nowrap;"
+              >
+                 
+              </td>
               <td
                 style="padding-left: 0.5em;"
               >
@@ -396,12 +416,17 @@ exports[`Sync Log Viewer snapshot test 1`] = `
               >
                 ⬤
               </td>
-              <td>
+              <td
+                style="white-space: nowrap;"
+              >
                 HKLA
               </td>
               <td
-                style="width: 90px; padding-left: 1.5em; text-align: right;"
-              />
+                colspan="1"
+                style="width: 90px; padding-left: 1.5em; text-align: right; white-space: nowrap;"
+              >
+                 
+              </td>
               <td
                 style="padding-left: 0.5em;"
               >
@@ -414,12 +439,17 @@ exports[`Sync Log Viewer snapshot test 1`] = `
               >
                 ⬤
               </td>
-              <td>
+              <td
+                style="white-space: nowrap;"
+              >
                 HKLX
               </td>
               <td
-                style="width: 90px; padding-left: 1.5em; text-align: right;"
-              />
+                colspan="1"
+                style="width: 90px; padding-left: 1.5em; text-align: right; white-space: nowrap;"
+              >
+                 
+              </td>
               <td
                 style="padding-left: 0.5em;"
               >
@@ -432,12 +462,17 @@ exports[`Sync Log Viewer snapshot test 1`] = `
               >
                 ⬤
               </td>
-              <td>
+              <td
+                style="white-space: nowrap;"
+              >
                 HKLA
               </td>
               <td
-                style="width: 90px; padding-left: 1.5em; text-align: right;"
-              />
+                colspan="1"
+                style="width: 90px; padding-left: 1.5em; text-align: right; white-space: nowrap;"
+              >
+                 
+              </td>
               <td
                 style="padding-left: 0.5em;"
               >
@@ -468,7 +503,7 @@ exports[`Sync Log Viewer snapshot test 1`] = `
             style="left: 0%; width: 0%;"
           />
           <span
-            class="MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary css-eg0mwd-MuiSlider-thumb"
+            class="MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary css-jx1sa5-MuiSlider-thumb"
             data-index="0"
             style="left: 0%;"
           >
@@ -489,7 +524,7 @@ exports[`Sync Log Viewer snapshot test 1`] = `
             />
             <span
               aria-hidden="true"
-              class="MuiSlider-valueLabel css-nnid7-MuiSlider-valueLabel"
+              class="MuiSlider-valueLabel css-7d61z1-MuiSlider-valueLabel"
             >
               <span
                 class="MuiSlider-valueLabelCircle"

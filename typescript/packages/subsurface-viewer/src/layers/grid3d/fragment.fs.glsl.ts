@@ -11,15 +11,12 @@ flat in int vertexIndex;
 
 uniform sampler2D colormap;
 
-uniform float valueRangeMin;
-uniform float valueRangeMax;
 uniform float colorMapRangeMin;
 uniform float colorMapRangeMax;
 
 uniform vec3 colorMapClampColor;
 uniform bool isClampColor;
 uniform bool isColorMapClampColorTransparent;
-
 
 void main(void) {
 

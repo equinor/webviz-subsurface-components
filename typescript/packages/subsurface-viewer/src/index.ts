@@ -12,6 +12,8 @@ export type {
     colorTablesArray,
 } from "./SubsurfaceViewer";
 
+export { TGrid3DColoringMode } from "./SubsurfaceViewer";
+
 export type { BoundingBox3D, ViewportType } from "./components/Map";
 
 export type {

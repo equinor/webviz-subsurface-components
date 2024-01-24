@@ -1,6 +1,6 @@
 {
     "name": "@webviz/subsurface-viewer",
-    "version": "0.11.0",
+    "version": "0.13.8",
     "description": "",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -16,12 +16,20 @@
         "test": "jest --coverage",
         "test:update": "npm test -- --u",
         "test:watch": "npm test -- --watch",
+        "test:debug": "node --inspect-brk ../../node_modules/jest/bin/jest.js --coverage=false --runInBand",
         "doc": "git clean -xdff docs && typedoc src"
     },
     "author": "Equinor <opensource@equinor.com>",
     "license": "MPL-2.0",
     "dependencies": {
-        "@deck.gl/core": "^8.9.32",
+        "@deck.gl/aggregation-layers": "^8.9.33",
+        "@deck.gl/core": "^8.9.33",
+        "@deck.gl/extensions": "^8.9.33",
+        "@deck.gl/geo-layers": "^8.9.33",
+        "@deck.gl/json": "^8.9.33",
+        "@deck.gl/layers": "^8.9.33",
+        "@deck.gl/mesh-layers": "^8.9.33",
+        "@deck.gl/react": "^8.9.33",
         "@emerson-eps/color-tables": "^0.4.71",
         "@equinor/eds-core-react": "^0.33.0",
         "@equinor/eds-icons": "^0.19.1",
@@ -35,10 +43,9 @@
         "d3": "^7.8.2",
         "d3-color": "^3.1.0",
         "d3-format": "^3.1.0",
-        "deck.gl": "^8.9.32",
         "gl-matrix": "^3.4.3",
         "lodash": "^4.17.21",
-        "mathjs": "^9.4.2",
+        "mathjs": "^12.2.1",
         "react-redux": "^8.1.1"
     },
     "peerDependencies": {
