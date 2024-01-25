@@ -134,9 +134,9 @@ const IsRenderedComponent: React.FC<SubsurfaceViewerProps> = (
 
     const props2 = {
         ...props,
-        isRenderedCallback: (isLoaded: boolean) => {
-            console.log("isRenderedCallback", isLoaded);
-            setLabel(isLoaded ? "LOADED" : "NOT LOADED");
+        onRenderingProgress: (progress: number) => {
+            console.log("onRenderingProgress", progress);
+            setLabel(progress === 100 ? "LOADED" : `${progress} %`);
         },
         layers,
     };
@@ -148,7 +148,7 @@ const IsRenderedComponent: React.FC<SubsurfaceViewerProps> = (
             </div>
             <label>{"Add big map layer "}</label>
             <button onClick={handleChange}>Change layers</button>
-            <label>State from isRenderedCallback: {label}</label>
+            <label>State from onRenderingProgress: {label}</label>
         </Root>
     );
 };
