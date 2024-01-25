@@ -1205,8 +1205,6 @@ class WellLogView
     selPinned: number | undefined; // pinned position
     selPersistent: boolean | undefined;
 
-    skipOnContentRescale: number;
-
     template: Template;
 
     scaleInterpolator: ScaleInterpolator | undefined;
@@ -1448,7 +1446,6 @@ class WellLogView
         }
 
         if (this.logController) {
-            ++this.skipOnContentRescale;
             const axes = this.getAxesInfo();
             this.scaleInterpolator = setTracksToController(
                 this.logController,
@@ -1458,7 +1455,6 @@ class WellLogView
                 this.props.colorTables
             );
             addWellPickOverlay(this.logController, this);
-            --this.skipOnContentRescale;
         }
         this.setControllerZoom();
         this.setControllerSelection();
