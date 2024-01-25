@@ -2,6 +2,27 @@ import type { LogViewer, Track } from "@equinor/videx-wellog";
 
 import { isScaleTrack } from "../utils/tracks";
 
+import type { Domain } from "@equinor/videx-wellog/dist/common/interfaces";
+
+export function isEqualRanges(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    d1: undefined | [any, any],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    d2: undefined | [any, any]
+): boolean {
+    if (!d1) return !d2;
+    if (!d2) return !d1;
+    return d1[0] === d2[0] && d1[1] === d2[1];
+}
+
+export function isEqDomains(
+    d1: Domain /*[number, number]*/,
+    d2: Domain /*[number, number]*/
+): boolean {
+    const eps: number = Math.abs(d1[1] - d1[0] + (d2[1] - d2[0])) * 0.00001;
+    return Math.abs(d1[0] - d2[0]) < eps && Math.abs(d1[1] - d2[1]) < eps;
+}
+
 export function removeOverlay(logViewer: LogViewer): void {
     logViewer.container.select(".overlay").remove();
     //logViewer.overlay = null;
@@ -90,8 +111,8 @@ export function zoomContent(logViewer: LogViewer, zoom: number): boolean {
         // check if new domain is in the base domain
         if (c + d > b2) c = b2 - d;
         if (c - d < b1) c = b1 + d;
-        logViewer.zoomTo([c - d, c + d]);
-        return true;
+        const domain: [number, number] = [c - d, c + d];
+        return zoomContentTo(logViewer, domain);
     }
     return false;
 }
@@ -106,20 +127,31 @@ export function scrollContentTo(
     const w = b2 - b1 - d; // width of not visible part of content
 
     const c = b1 + f * w;
-    if (c !== d1) {
-        logViewer.zoomTo([c, c + d]);
-        return true;
-    }
-    return false;
+    const domain: [number, number] = [c, c + d];
+    return zoomContentTo(logViewer, domain);
 }
 
 export function zoomContentTo(
     logViewer: LogViewer,
     domain: [number, number]
 ): boolean {
-    const [d1, d2] = logViewer.domain;
-    if (domain[0] !== d1 || domain[1] !== d2) {
+    if (!isEqDomains(logViewer.domain, domain)) {
         logViewer.zoomTo(domain);
+        if (!isEqDomains(logViewer.domain, domain)) {
+            // something went wrong sometimes: retry
+            logViewer.zoomTo(domain);
+            if (!isEqDomains(logViewer.domain, domain)) {
+                // something went very wrong: print warning and retry one more time
+                console.warn(
+                    "zoomContentTo failed. Try to set " +
+                        domain +
+                        " but get " +
+                        logViewer.domain
+                );
+                logViewer.zoomTo(domain);
+            }
+            return true;
+        }
         return true;
     }
     return false;
@@ -144,13 +176,8 @@ export function getContentBaseDomain(logViewer: LogViewer): [number, number] {
     return [b1, b2];
 }
 
-//import { zoomTransform } from "d3-zoom";
 export function getContentDomain(logViewer: LogViewer): [number, number] {
-    //const [d1, d2] = logViewer.domain; // logViewer.scale.domain
-    const [d1, d2] = logViewer.scale.domain();
-    //const [_d1, _d2] = logViewer.scale.range();
-    //const node = logViewer.zoomHandler.node();
-    //const current = zoomTransform(node);
+    const [d1, d2] = logViewer.domain; // same as logViewer.scale.domain()
     return [d1, d2];
 }
 
