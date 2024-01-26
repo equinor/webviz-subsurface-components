@@ -124,6 +124,9 @@ export interface SubsurfaceViewerProps {
 
     children?: React.ReactNode;
 
+    /**
+     * Forces the component to use the records provided in 'layers' prop as is.
+     */
     skipLayerPropsConversion?: boolean;
 }
 
