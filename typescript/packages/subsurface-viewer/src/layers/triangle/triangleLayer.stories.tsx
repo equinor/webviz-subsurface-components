@@ -189,3 +189,55 @@ TwoSideLighting.parameters = {
         },
     },
 };
+
+const typedDataSurfaceLayer = {
+    "@@type": "TriangleLayer",
+    id: "typedData_surface_layer",
+
+    /*eslint-disable */
+    pointsData:  new Float32Array(SurfacePoints.default),
+    triangleData: new Uint32Array(SurfaceTriangles.default),
+
+    color: [100, 100, 255],      // Surface color.
+    gridLines: true,             // If true will draw lines around triangles.
+    material: {
+        ambient: 0.35,
+        diffuse: 0.6,
+        shininess: 100,
+        specularColor: [255, 255, 255]
+    },              // If true will use triangle normals for shading.
+    smoothShading: true,         // If true will use vertex calculated mean normals for shading.
+    ZIncreasingDownwards: true,    
+    /*eslint-enable */
+};
+
+export const TypedArrayInput: ComponentStory<typeof SubsurfaceViewer> = (
+    args
+) => {
+    return <SubsurfaceViewer {...args} />;
+};
+
+TypedArrayInput.args = {
+    id: "map",
+    layers: [surfaceAxesLayer, typedDataSurfaceLayer],
+    bounds: [-2000, -2000, 2500, 2000],
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: true,
+            },
+        ],
+    },
+    skipLayerPropsConversion: true,
+};
+
+TypedArrayInput.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: "Surface data is provided as typed arrays.",
+        },
+    },
+};
