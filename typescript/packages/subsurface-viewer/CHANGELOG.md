@@ -1,3 +1,10 @@
+## [0.13.8](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.13.7...subsurface-viewer@0.13.8) (2024-01-24)
+
+
+### Bug Fixes
+
+* camera update on resize ([#1887](https://github.com/equinor/webviz-subsurface-components/issues/1887)) ([3f7742c](https://github.com/equinor/webviz-subsurface-components/commit/3f7742c98abda59a5c7f9818447eeb2cc052e106))
+
 ## [0.13.7](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.13.6...subsurface-viewer@0.13.7) (2024-01-22)
 
 
