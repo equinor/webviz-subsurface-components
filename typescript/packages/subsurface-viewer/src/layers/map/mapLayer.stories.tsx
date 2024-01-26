@@ -574,7 +574,9 @@ const TypedArrayInputComponent: React.FC<{
         id: "map",
         layers: [
             // Can not use Record<string, unknown> because makeData() is not supported
-            new MapLayer({
+            {
+                "@@type": "MapLayer",
+                id: "mesh-layer-typed-input",
                 frame: {
                     origin: [-args.dimension / 2, -args.dimension / 2],
                     count: [args.dimension, args.dimension],
@@ -588,8 +590,10 @@ const TypedArrayInputComponent: React.FC<{
                 ZIncreasingDownwards: false,
                 contours: [0, 5],
                 colorMapFunction: nearestColorMap as colorMapFunctionType,
-            }),
-            new AxesLayer({
+            },
+            {
+                "@@type": "AxesLayer",
+                id: "axes-typed-input",
                 ZIncreasingDownwards: false,
                 bounds: [
                     -args.dimension / 2,
@@ -599,7 +603,7 @@ const TypedArrayInputComponent: React.FC<{
                     args.dimension / 2,
                     60,
                 ],
-            }),
+            },
         ],
         cameraPosition: {
             rotationOrbit: 45,
@@ -609,6 +613,7 @@ const TypedArrayInputComponent: React.FC<{
         },
         views: DEFAULT_VIEWS,
         triggerHome: args.triggerHome,
+        skipLayerPropsConversion: true,
     };
     return <SubsurfaceViewer {...subsurfaceViewerArgs} />;
 };
