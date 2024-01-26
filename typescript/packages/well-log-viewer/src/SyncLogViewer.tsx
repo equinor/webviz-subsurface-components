@@ -319,30 +319,33 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         nextProps: SyncLogViewerProps /*, nextState: State*/
     ): void {
         // called before render()
-        if (this.props.welllogs.length !== nextProps.welllogs.length) {
-            if (this.controllers.length !== nextProps.welllogs.length) {
-                // move old controllers to new places in the controllers array
-                const controllers: (WellLogController | null)[] = [];
-                for (const wellLog of nextProps.welllogs) {
-                    const index = this.controllers.findIndex(
-                        (controller) => controller?.getWellLog() === wellLog
-                    );
-                    if (index < 0) controllers.push(null);
-                    else controllers.push(this.controllers.splice(index, 1)[0]);
-                }
-                if (controllers.length !== nextProps.welllogs.length)
-                    console.log(
-                        "controllers.length!==nextProps.welllogs.length",
-                        controllers.length,
-                        nextProps.welllogs.length
-                    );
-                this.controllers = controllers;
+        if (this.props.welllogs.length === nextProps.welllogs.length) return;
+        if (this.controllers.length === nextProps.welllogs.length) return;
+        /*
+        // move old controllers to new places in the controllers array
+        const controllers: (WellLogController | null)[] = [];
+        const spacers: (WellLogSpacer | null)[] = [];
+        for (const wellLog of nextProps.welllogs) {
+            const index = this.controllers.findIndex(
+                (controller) => controller?.getWellLog() === wellLog
+            );
+            if (index < 0) {
+                controllers.push(null);
+                spacers.push(null);
             }
-
-            this.spacers.length = nextProps.welllogs.length;
-
-            this.fillViewsCallbacks(nextProps.welllogs.length); // update this.callbacks[] before render()
+            else {
+                controllers.push(this.controllers.splice(index, 1)[0]);
+                spacers.push(this.spacers.splice(index, 1)[0]);
+            }
         }
+        this.controllers = controllers;
+        this.spacers = spacers;
+        */
+        // just resize arrays
+        this.controllers.length = nextProps.welllogs.length;
+        this.spacers.length = nextProps.welllogs.length;
+
+        this.fillViewsCallbacks(nextProps.welllogs.length); // update this.callbacks[] before render()
     }
 
     componentDidUpdate(
@@ -440,9 +443,9 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         });
     }
     fillViewsCallbacks(nViews: number): void {
-        this.callbacks = [];
-        for (let iView = 0; iView < nViews; iView++)
+        for (let iView = this.callbacks.length; iView < nViews; iView++)
             this.fillViewCallbacks(iView);
+        this.callbacks.length = nViews;
     }
 
     updateReadoutPanel(): void {

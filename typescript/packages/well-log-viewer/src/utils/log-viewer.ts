@@ -96,7 +96,6 @@ export function getSelectedTrackIndices(logViewer?: LogViewer): number[] {
 
 export function zoomContent(logViewer: LogViewer, zoom: number): boolean {
     if (!zoom) zoom = 1.0;
-
     const [b1, b2] = logViewer.scaleHandler.baseDomain();
     const [d1, d2] = logViewer.domain;
     const currentZoom = Math.abs(b2 - b1) / Math.abs(d2 - d1);
@@ -123,7 +122,7 @@ export function scrollContentTo(
 ): boolean {
     const [b1, b2] = logViewer.scaleHandler.baseDomain();
     const [d1, d2] = logViewer.domain;
-    const d = d2 - d1;
+    const d = d2 - d1; // width of visible part of content
     const w = b2 - b1 - d; // width of not visible part of content
 
     const c = b1 + f * w;

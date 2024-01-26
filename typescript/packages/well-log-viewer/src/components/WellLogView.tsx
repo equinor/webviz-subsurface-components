@@ -1504,8 +1504,7 @@ class WellLogView
     onContentRescale(): void {
         this.showSelection();
 
-        if (this.props.onContentRescale)
-            this.props.onContentRescale();
+        if (this.props.onContentRescale) this.props.onContentRescale();
     }
 
     onContentSelection(): void {
