@@ -16,21 +16,24 @@ const defaultParameters = {
     },
 };
 
+/*eslint-disable */
+const smallPointsData = [
+    0,  0,  5,  // Vertex 1, x, y, z
+    10,  0,  5,  // Vertex 2, x, y, z
+    10, 10,  5,  // ...
+    0, 10,  0,
+    5, -5, 10,
+    11, -4,  6,
+    11,  0,  7,
+    17,  0,  8
+];
+/*eslint-enable */
+
 // Small example using PointsLayer.
 const smallPointsLayer = {
     "@@type": "PointsLayer",
     id: "small_points_layer",
-    /*eslint-disable */
-    pointsData:   [  0,  0,  5,  // Vertex 1, x, y, z
-                    10,  0,  5,  // Vertex 2, x, y, z
-                    10, 10,  5,  // ...
-                     0, 10,  0,
-                     5, -5, 10,
-                    11, -4,  6,
-                    11,  0,  7,
-                    17,  0,  8
-                    ],    
-    /*eslint-enable */
+    pointsData: smallPointsData,
     color: [255, 0, 100],
     pointRadius: 10,
     radiusUnits: "pixels",
@@ -48,7 +51,7 @@ export const SmallPointsLayer: StoryFn<typeof SubsurfaceViewer> = (args) => {
 };
 
 SmallPointsLayer.args = {
-    id: "small-points-map",
+    id: "small-points",
     layers: [smallAxesLayer, smallPointsLayer],
     bounds: [-20, -20, 20, 20],
     views: {
@@ -66,7 +69,48 @@ SmallPointsLayer.parameters = {
     docs: {
         ...defaultParameters.docs,
         description: {
-            story: "Point coordinates are given as native javascript array.",
+            story: "Point coordinates are given as native JavaScript array.",
+        },
+    },
+};
+
+const smallPointsTypedDataLayer = {
+    "@@type": "PointsLayer",
+    id: "small_points_typed_data_layer",
+    pointsData: new Float32Array(smallPointsData),
+    color: [0, 100, 255],
+    pointRadius: 10,
+    radiusUnits: "pixels",
+    ZIncreasingDownwards: true,
+};
+
+export const SmallPointsLayerTypedArrayInput: StoryFn<
+    typeof SubsurfaceViewer
+> = (args) => {
+    return <SubsurfaceViewer {...args} />;
+};
+
+SmallPointsLayerTypedArrayInput.args = {
+    id: "small-points-typeddata",
+    layers: [smallAxesLayer, smallPointsTypedDataLayer],
+    bounds: [-20, -20, 20, 20],
+    views: {
+        layout: [1, 1],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: true,
+            },
+        ],
+    },
+    skipLayerPropsConversion: true,
+};
+
+SmallPointsLayerTypedArrayInput.parameters = {
+    docs: {
+        ...defaultParameters.docs,
+        description: {
+            story: "Point coordinates are given as JavaScript typed array.",
         },
     },
 };
@@ -133,7 +177,7 @@ HugePointsLayer.parameters = {
     docs: {
         ...defaultParameters.docs,
         description: {
-            story: "Point coordinates are randomly generated in runtime and given as native javascript array.",
+            story: "Point coordinates are randomly generated in runtime and given as native JavaScript array.",
         },
     },
 };
