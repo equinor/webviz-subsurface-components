@@ -1157,7 +1157,8 @@ class ViewController {
             state.camera != this.state_.camera ||
             state.bounds != this.state_.bounds ||
             (!state.viewStateChanged &&
-                state.boundingBox3d !== this.state_.boundingBox3d);
+                (state.boundingBox3d !== this.state_.boundingBox3d ||
+                    state.deckSize != this.state_.deckSize));
         const needUpdate = updateZScale || updateTarget || updateViewState;
 
         const isCacheEmpty = isEmpty(this.result_.viewState);
