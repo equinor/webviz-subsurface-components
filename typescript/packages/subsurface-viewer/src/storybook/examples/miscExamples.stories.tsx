@@ -13,10 +13,12 @@ import {
     customLayerWithPolygonData,
     customLayerWithPolylineData,
     customLayerWithTextData,
-    huginMeshMapLayerPng,
-    subsufaceProps,
-    hugin2DBounds,
+    default2DViews,
     default3DViews,
+    defaultStoryParameters,
+    hugin25mKhNetmapMapLayerPng,
+    hugin2DBounds,
+    subsufaceProps,
 } from "../sharedSettings";
 
 const stories: Meta = {
@@ -83,17 +85,16 @@ const material = {
 export const MapMaterial: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "material",
-        layers: [{ ...huginMeshMapLayerPng, material }],
+        layers: [{ ...hugin25mKhNetmapMapLayerPng, material }],
         bounds: hugin2DBounds,
         views: default3DViews,
     },
     parameters: {
         docs: {
+            ...defaultStoryParameters.docs,
             description: {
                 story: "An example showing example usage of Map3D material property.",
             },
-            inlineStories: false,
-            iframeHeight: 500,
         },
     },
 };
@@ -112,38 +113,28 @@ export const MapClampColor: StoryObj<typeof SubsurfaceViewer> = {
         id: "clampcolor",
         layers: [
             {
-                ...huginMeshMapLayerPng,
+                ...hugin25mKhNetmapMapLayerPng,
                 propertyValueRange,
                 colorMapRange,
                 colorMapClampColor,
             },
         ],
-        bounds: [432150, 6475800, 439400, 6481500],
-        views: {
-            layout: [1, 1],
-            viewports: [
-                {
-                    id: "view_1",
-                    show3D: false,
-                    layerIds: [],
-                },
-            ],
-        },
+        bounds: hugin2DBounds,
+        views: default2DViews,
     },
     parameters: {
         docs: {
+            ...defaultStoryParameters.docs,
             description: {
                 story: 'An example usage of map property `"colorMapClampColor"',
             },
-            inlineStories: false,
-            iframeHeight: 500,
         },
     },
 };
 
 // Example using "colorMapFunction" property.
 const layer = {
-    ...huginMeshMapLayerPng,
+    ...hugin25mKhNetmapMapLayerPng,
     isContoursDepth: true,
     colorMapFunction: (x) => [255 - x * 100, 255 - x * 100, 255 * x], // If defined this function will override the colormap.
 };
@@ -164,17 +155,8 @@ export const colorMapFunction: StoryObj<typeof SubsurfaceViewer> = {
                 ], // If defined this function will override the colormap.
             },
         ],
-        bounds: [432150, 6475800, 439400, 6481500],
-        views: {
-            layout: [1, 1],
-            viewports: [
-                {
-                    id: "view_1",
-                    show3D: true,
-                    layerIds: [],
-                },
-            ],
-        },
+        bounds: hugin2DBounds,
+        views: default3DViews,
     },
 };
 

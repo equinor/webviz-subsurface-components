@@ -1,19 +1,18 @@
-import SubsurfaceViewer from "../SubsurfaceViewer";
-import type { StoryFn } from "@storybook/react";
-import React from "react";
+import type { Meta, StoryObj } from "@storybook/react";
+
 import type { Feature } from "geojson";
-import AxesLayer from "../layers/axes/axesLayer";
 import { GeoJsonLayer } from "@deck.gl/layers/typed";
-import { SideProjectionExtension } from "./side-projection-extension";
 
-export default {
+import SubsurfaceViewer from "../../SubsurfaceViewer";
+
+import AxesLayer from "../../layers/axes/axesLayer";
+import { SideProjectionExtension } from "../../extensions//side-projection-extension";
+
+const stories: Meta = {
     component: SubsurfaceViewer,
-    title: "SubsurfaceViewer / SideProjectionExtension",
+    title: "SubsurfaceViewer / Extensions / SideProjectionExtension",
 };
-
-const StoryTemplate: StoryFn<typeof SubsurfaceViewer> = (args) => {
-    return <SubsurfaceViewer {...args} />;
-};
+export default stories;
 
 const defaultProps = {
     id: "SubsurfaceViewer",
@@ -144,33 +143,34 @@ const DEFAULT_LAYER_PROPS = {
     getFillColor: (d: Feature) => d.properties?.["color"],
 };
 
-export const SideProjection = StoryTemplate.bind({});
-SideProjection.args = {
-    ...defaultProps,
-    bounds: [500, 1000, 1200, 1500] as [number, number, number, number],
-    layers: [
-        new AxesLayer({
-            id: "axes-layer",
-            bounds: [300, 800, 400, 1300, 1600, 600],
-        }),
-        new GeoJsonLayer({
-            ...DEFAULT_LAYER_PROPS,
-            extensions: [new SideProjectionExtension()],
-            sideViewIds: ["intersection"],
-        }),
-    ],
-    views: {
-        layout: [1, 2],
-        viewports: [
-            {
-                id: "normal",
-                show3D: true,
-            },
-            {
-                id: "intersection",
-                show3D: false,
-                target: [700, -450],
-            },
+export const SideProjection: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        ...defaultProps,
+        bounds: [500, 1000, 1200, 1500] as [number, number, number, number],
+        layers: [
+            new AxesLayer({
+                id: "axes-layer",
+                bounds: [300, 800, 400, 1300, 1600, 600],
+            }),
+            new GeoJsonLayer({
+                ...DEFAULT_LAYER_PROPS,
+                extensions: [new SideProjectionExtension()],
+                sideViewIds: ["intersection"],
+            }),
         ],
+        views: {
+            layout: [1, 2],
+            viewports: [
+                {
+                    id: "normal",
+                    show3D: true,
+                },
+                {
+                    id: "intersection",
+                    show3D: false,
+                    target: [700, -450],
+                },
+            ],
+        },
     },
 };

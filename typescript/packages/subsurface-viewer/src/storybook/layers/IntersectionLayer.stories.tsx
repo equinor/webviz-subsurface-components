@@ -1,16 +1,14 @@
-import React from "react";
-import SubsurfaceViewer from "../../SubsurfaceViewer";
-import type { ComponentStory, ComponentMeta } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react";
+
 import type { Feature } from "geojson";
 
-export default {
+import SubsurfaceViewer from "../../SubsurfaceViewer";
+
+const stories: Meta = {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer / Experimental Intersection View",
-} as ComponentMeta<typeof SubsurfaceViewer>;
-
-const StoryTemplate: ComponentStory<typeof SubsurfaceViewer> = (args) => {
-    return <SubsurfaceViewer {...args} />;
 };
+export default stories;
 
 const defaultProps = {
     id: "SubsurfaceViewer",
@@ -58,62 +56,68 @@ const polyline_data = {
 };
 
 // Intersection view example with sample polyline data
-export const WithSamplePolylineData = StoryTemplate.bind({});
-WithSamplePolylineData.args = {
-    ...defaultProps,
-    bounds: [0, 0, 2000, 3000] as [number, number, number, number],
-    layers: [
-        {
-            "@@type": "UnfoldedGeoJsonLayer",
-            id: "enhanced-path-layer",
-            data: polyline_data,
-            lineWidthScale: 20,
-            lineBillboard: true,
-        },
-        {
-            "@@type": "AxesLayer",
-            id: "axes-layer",
-            bounds: [0, 0, 0, 2000, 3000, 1000],
-        },
-    ],
+export const WithSamplePolylineData: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        ...defaultProps,
+        bounds: [0, 0, 2000, 3000] as [number, number, number, number],
+        layers: [
+            {
+                "@@type": "UnfoldedGeoJsonLayer",
+                id: "enhanced-path-layer",
+                data: polyline_data,
+                lineWidthScale: 20,
+                lineBillboard: true,
+            },
+            {
+                "@@type": "AxesLayer",
+                id: "axes-layer",
+                bounds: [0, 0, 0, 2000, 3000, 1000],
+            },
+        ],
+    },
 };
 
 // Intersection view example with wells data
-export const WithWellsData = StoryTemplate.bind({});
-WithWellsData.args = {
-    ...defaultProps,
-    bounds: [432205, 6475078, 437720, 6481113] as [
-        number,
-        number,
-        number,
-        number,
-    ],
-    resources: {
-        wellsData: "./volve_wells.json",
+export const WithWellsData: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        ...defaultProps,
+        bounds: [432205, 6475078, 437720, 6481113] as [
+            number,
+            number,
+            number,
+            number,
+        ],
+        resources: {
+            wellsData: "./volve_wells.json",
+        },
+        layers: [
+            {
+                "@@type": "AxesLayer",
+                id: "axes-layer",
+                bounds: [432205, 6475078, 0, 437720, 6481113, 3500],
+            },
+            {
+                "@@type": "WellsLayer",
+                data: "@@#resources.wellsData",
+                lineStyle: {
+                    width: (
+                        object: Record<string, Record<string, unknown>>
+                    ) => {
+                        if (object["properties"]["name"] === "15/9-F-4")
+                            return 6;
+                        return 0;
+                    },
+                },
+                wellHeadStyle: {
+                    size: (object: Record<string, Record<string, unknown>>) => {
+                        if (object["properties"]["name"] === "15/9-F-4")
+                            return 8;
+                        return 0;
+                    },
+                },
+            },
+        ],
     },
-    layers: [
-        {
-            "@@type": "AxesLayer",
-            id: "axes-layer",
-            bounds: [432205, 6475078, 0, 437720, 6481113, 3500],
-        },
-        {
-            "@@type": "WellsLayer",
-            data: "@@#resources.wellsData",
-            lineStyle: {
-                width: (object: Record<string, Record<string, unknown>>) => {
-                    if (object["properties"]["name"] === "15/9-F-4") return 6;
-                    return 0;
-                },
-            },
-            wellHeadStyle: {
-                size: (object: Record<string, Record<string, unknown>>) => {
-                    if (object["properties"]["name"] === "15/9-F-4") return 8;
-                    return 0;
-                },
-            },
-        },
-    ],
 };
 
 const FencePolygonData = {
@@ -145,25 +149,26 @@ const FencePolygonData = {
 };
 
 // With fence polygon data
-export const FencePolygon = StoryTemplate.bind({});
-FencePolygon.args = {
-    ...defaultProps,
-    bounds: [500, 1000, 1200, 1500] as [number, number, number, number],
-    layers: [
-        {
-            "@@type": "AxesLayer",
-            id: "axes-layer",
-            bounds: [300, 800, 400, 1300, 1600, 600],
-        },
-        {
-            "@@type": "UnfoldedGeoJsonLayer",
-            id: "enhanced-path-layer",
-            data: FencePolygonData,
-            lineWidthScale: 2,
-            lineBillboard: true,
-            stroked: true,
-        },
-    ],
+export const FencePolygon: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        ...defaultProps,
+        bounds: [500, 1000, 1200, 1500] as [number, number, number, number],
+        layers: [
+            {
+                "@@type": "AxesLayer",
+                id: "axes-layer",
+                bounds: [300, 800, 400, 1300, 1600, 600],
+            },
+            {
+                "@@type": "UnfoldedGeoJsonLayer",
+                id: "enhanced-path-layer",
+                data: FencePolygonData,
+                lineWidthScale: 2,
+                lineBillboard: true,
+                stroked: true,
+            },
+        ],
+    },
 };
 
 const IntersectionViewData = {
@@ -268,27 +273,28 @@ const IntersectionViewData = {
 };
 
 // An intersection view example with sample surface, wells data laong with fence.
-export const IntersectionViewExample = StoryTemplate.bind({});
-IntersectionViewExample.args = {
-    ...defaultProps,
-    bounds: [500, 1000, 1200, 1500] as [number, number, number, number],
-    layers: [
-        {
-            "@@type": "AxesLayer",
-            id: "axes-layer",
-            bounds: [300, 800, 400, 1300, 1600, 600],
-        },
-        {
-            "@@type": "UnfoldedGeoJsonLayer",
-            id: "enhanced-path-layer",
-            data: IntersectionViewData,
-            lineWidthScale: 1,
-            lineBillboard: true,
-            pointBillboard: true,
-            stroked: true,
-            getPointRadius: 3,
-            getLineColor: (d: Feature) => d.properties?.["color"],
-            getFillColor: (d: Feature) => d.properties?.["color"],
-        },
-    ],
+export const IntersectionViewExample: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        ...defaultProps,
+        bounds: [500, 1000, 1200, 1500] as [number, number, number, number],
+        layers: [
+            {
+                "@@type": "AxesLayer",
+                id: "axes-layer",
+                bounds: [300, 800, 400, 1300, 1600, 600],
+            },
+            {
+                "@@type": "UnfoldedGeoJsonLayer",
+                id: "enhanced-path-layer",
+                data: IntersectionViewData,
+                lineWidthScale: 1,
+                lineBillboard: true,
+                pointBillboard: true,
+                stroked: true,
+                getPointRadius: 3,
+                getLineColor: (d: Feature) => d.properties?.["color"],
+                getFillColor: (d: Feature) => d.properties?.["color"],
+            },
+        ],
+    },
 };

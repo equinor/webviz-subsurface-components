@@ -1,29 +1,17 @@
-import React from "react";
+import type { Meta, StoryObj } from "@storybook/react";
 import { create, all } from "mathjs";
 
-import type { StoryFn, Meta } from "@storybook/react";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 
-import type { WellMarkerDataT } from "./wellMarkersLayer";
+import type { WellMarkerDataT } from "../../layers/well_markers/wellMarkersLayer";
 
-export default {
+import { defaultStoryParameters } from "../sharedSettings";
+
+const stories: Meta = {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer/Well Markers Layer",
-} as Meta<typeof SubsurfaceViewer>;
-
-const Template: StoryFn<typeof SubsurfaceViewer> = (args) => (
-    <SubsurfaceViewer {...args} />
-);
-
-const parameters = {
-    docs: {
-        description: {
-            story: "Well Markers Layer.",
-        },
-        inlineStories: false,
-        iframeHeight: 500,
-    },
 };
+export default stories;
 
 const math = create(all, { randomSeed: "1984" });
 
@@ -69,39 +57,46 @@ const generateMarkers = (): WellMarkerDataT[] => {
     return res;
 };
 
-export const WellMarkers = Template.bind({});
-
-WellMarkers.args = {
-    bounds: [-25, -25, 50, 30],
-    views: {
-        layout: [1, 1] as [number, number],
-        viewports: [
+export const WellMarkers: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        bounds: [-25, -25, 50, 30],
+        views: {
+            layout: [1, 1] as [number, number],
+            viewports: [
+                {
+                    id: "view_1",
+                    show3D: true,
+                },
+            ],
+        },
+        id: "well-markers-tttt",
+        layers: [
             {
-                id: "view_1",
-                show3D: true,
+                "@@type": "AxesLayer",
+                id: "well-markers-axes",
+                bounds: [-25, -25, -25, 25, 25, 25],
+                ZIncreasingDownwards: false,
+            },
+            {
+                "@@type": "NorthArrow3DLayer",
+                id: "north-arrow-layer",
+            },
+            {
+                "@@type": "WellMarkersLayer",
+                id: "well-markers-1",
+                pickable: true,
+                shape: "circle",
+                sizeUnits: "common",
+                data: generateMarkers(),
             },
         ],
     },
-    id: "well-markers-tttt",
-    layers: [
-        {
-            "@@type": "AxesLayer",
-            id: "well-markers-axes",
-            bounds: [-25, -25, -25, 25, 25, 25],
-            ZIncreasingDownwards: false,
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: "Well Markers Layer.",
+            },
         },
-        {
-            "@@type": "NorthArrow3DLayer",
-            id: "north-arrow-layer",
-        },
-        {
-            "@@type": "WellMarkersLayer",
-            id: "well-markers-1",
-            pickable: true,
-            shape: "circle",
-            sizeUnits: "common",
-            data: generateMarkers(),
-        },
-    ],
+    },
 };
-WellMarkers.parameters = parameters;

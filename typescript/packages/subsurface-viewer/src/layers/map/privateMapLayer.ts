@@ -74,7 +74,7 @@ const defaultProps = {
     ZIncreasingDownwards: true,
 };
 
-// This is a private layer used only by the composite Map3DLayer
+// This is a private layer used only by the composite MapLayer
 export default class privateMapLayer extends Layer<privateMapLayerProps> {
     get isLoaded(): boolean {
         return this.state["isLoaded"] ?? false;
