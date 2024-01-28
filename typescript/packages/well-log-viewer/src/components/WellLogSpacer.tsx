@@ -25,7 +25,7 @@ export interface WellLogSpacerOptions {
 export interface WellLogSpacerProps {
     width?: number;
 
-    controllers: (WellLogController | null)[];
+    controllers: (WellLogController | null)[]; // 2 items
 
     /**
      * Prop containing color table data.
