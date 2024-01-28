@@ -1,3 +1,10 @@
+## [1.3.9](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.3.8...well-log-viewer@1.3.9) (2024-01-28)
+
+
+### Bug Fixes
+
+* Process initial domain and selection props in SyncLogViewer ([#1870](https://github.com/equinor/webviz-subsurface-components/issues/1870)) ([a4ab40c](https://github.com/equinor/webviz-subsurface-components/commit/a4ab40c1290cac27dac162d3b77533b67bcfa3b9)), closes [#1861](https://github.com/equinor/webviz-subsurface-components/issues/1861) [#1862](https://github.com/equinor/webviz-subsurface-components/issues/1862)
+
 ## [1.3.8](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.3.7...well-log-viewer@1.3.8) (2024-01-19)
 
 
