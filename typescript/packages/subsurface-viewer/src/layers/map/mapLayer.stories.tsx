@@ -572,8 +572,7 @@ const TypedArrayInputComponent: React.FC<{
 }> = (args) => {
     const subsurfaceViewerArgs = {
         id: "map",
-        layers: [
-            // Can not use Record<string, unknown> because makeData() is not supported
+        layers: [            
             {
                 "@@type": "MapLayer",
                 id: "mesh-layer-typed-input",
