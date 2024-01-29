@@ -40,7 +40,7 @@ import { getDiscreteMeta, indexOfElementByName } from "./utils/tracks";
 import { deepCopy } from "./utils/deepcopy";
 
 import type { WellLogViewOptions } from "./components/WellLogView";
-import { isEqualRanges } from "./components/WellLogView";
+import { isEqualRanges } from "./utils/log-viewer";
 
 import wellPicks from "../../../../example-data/wellpicks.json";
 import colorTables from "../../../../example-data/wellpick_colors.json";
