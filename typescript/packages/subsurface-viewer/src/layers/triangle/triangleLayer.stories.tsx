@@ -230,7 +230,7 @@ TypedArrayInput.args = {
             },
         ],
     },
-    skipLayerPropsConversion: true,
+    typedArraySupport: true,
 };
 
 TypedArrayInput.parameters = {

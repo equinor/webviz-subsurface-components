@@ -103,7 +103,7 @@ SmallPointsLayerTypedArrayInput.args = {
             },
         ],
     },
-    skipLayerPropsConversion: true,
+    typedArraySupport: true,
 };
 
 SmallPointsLayerTypedArrayInput.parameters = {

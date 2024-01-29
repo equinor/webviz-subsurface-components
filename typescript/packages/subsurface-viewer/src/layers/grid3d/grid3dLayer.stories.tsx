@@ -259,6 +259,6 @@ PolyhedralCellsTypedArrayInput.args = {
             coloringMode: TGrid3DColoringMode.Property,
         },
     ],
-    skipLayerPropsConversion: true,
+    typedArraySupport: true,
 };
 PolyhedralCells.parameters = parameters;

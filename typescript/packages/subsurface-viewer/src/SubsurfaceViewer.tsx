@@ -125,9 +125,9 @@ export interface SubsurfaceViewerProps {
     children?: React.ReactNode;
 
     /**
-     * Forces the component to use the records provided in 'layers' prop as is.
+     * If set to true allows to use typed arrays in layer description JS objects.
      */
-    skipLayerPropsConversion?: boolean;
+    typedArraySupport?: boolean;
 }
 
 const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
@@ -155,7 +155,7 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
     triggerResetMultipleWells,
     lights,
     children,
-    skipLayerPropsConversion,
+    typedArraySupport,
 }: SubsurfaceViewerProps) => {
     // Contains layers data received from map layers by user interaction
     const [layerEditedData, setLayerEditedData] = React.useState(editedData);
@@ -180,7 +180,7 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
         else enumerations.push({ editedData: {} });
 
         //Bypass conversion of layer props through JSON and use them as is.
-        if (skipLayerPropsConversion) {
+        if (typedArraySupport) {
             const layersList = createLayers(
                 layers as Record<string, unknown>[],
                 enumerations

@@ -612,7 +612,7 @@ const TypedArrayInputComponent: React.FC<{
         },
         views: DEFAULT_VIEWS,
         triggerHome: args.triggerHome,
-        skipLayerPropsConversion: true,
+        typedArraySupport: true,
     };
     return <SubsurfaceViewer {...subsurfaceViewerArgs} />;
 };
