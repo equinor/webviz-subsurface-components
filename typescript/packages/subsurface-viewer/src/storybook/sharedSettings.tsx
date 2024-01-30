@@ -114,6 +114,7 @@ export const volveWellsWithLogsLayer = {
     logrunName: "BLOCKING",
     logName: "ZONELOG",
     logColor: "Stratigraphy",
+    ZIncreasingDownwards: false,
 };
 
 // Examples using "Map" layers.
