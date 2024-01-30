@@ -267,7 +267,6 @@ const AutoZoomToBox = (args: SubsurfaceViewerProps) => {
                 material: true,
             }),
         ],
-        views: default3DViews,
         cameraPosition,
     };
 
@@ -303,7 +302,9 @@ const AutoZoomToBox = (args: SubsurfaceViewerProps) => {
 };
 
 export const AutoZoomToBoxStory: StoryObj<typeof SubsurfaceViewer> = {
-    args: {},
+    args: {
+        views: default3DViews,
+    },
     parameters: {
         docs: {
             ...defaultStoryParameters.docs,
