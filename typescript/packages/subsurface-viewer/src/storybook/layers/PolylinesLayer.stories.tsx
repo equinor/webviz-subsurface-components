@@ -66,8 +66,7 @@ type TRandomNumberFunc = () => number;
 const randomFunc = ((): TRandomNumberFunc => {
     if (math.random) {
         return () => {
-            const val = math.random?.(sideSize);
-            return val ? val : 0.0;
+            return math.random(sideSize);
         };
     }
     return () => Math.random() * sideSize;
