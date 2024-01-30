@@ -84,6 +84,7 @@ export const volveWellsLayer = {
     "@@type": "WellsLayer",
     id: "volve-wells",
     data: "./volve_wells.json",
+    ZIncreasingDownwards: false,
 };
 
 export const volveWellsBounds: BoundingBox2D = [
