@@ -44,7 +44,7 @@
         "@mdx-js/react": "^2.3.0",
         "@mui/material": "^5.15.3",
         "@mui/system": "^5.13.7",
-        "@nx/jest": "^16.5.0",
+        "@nx/jest": "^17.3.0",
         "@storybook/addon-essentials": "^7.6.4",
         "@storybook/addon-links": "^7.6.4",
         "@storybook/addon-mdx-gfm": "^7.6.4",
