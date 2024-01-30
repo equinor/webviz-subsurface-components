@@ -1,3 +1,10 @@
+## [0.14.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.14.0...subsurface-viewer@0.14.1) (2024-01-30)
+
+
+### Bug Fixes
+
+* remove dead Map3DLayer ans update stories to V7 ([#1894](https://github.com/equinor/webviz-subsurface-components/issues/1894)) ([394adcd](https://github.com/equinor/webviz-subsurface-components/commit/394adcda6487252ff7f18d7d4d295f625dac9130))
+
 # [0.14.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.13.8...subsurface-viewer@0.14.0) (2024-01-30)
 
 
