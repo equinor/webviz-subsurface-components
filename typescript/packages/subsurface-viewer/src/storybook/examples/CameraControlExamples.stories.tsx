@@ -244,7 +244,6 @@ export const SyncedSubsurfaceViewers: StoryObj<
 };
 
 const zoomBox3D: BoundingBox3D = [-325, -450, -25, 125, 150, 125];
-//const zoomBox3D: BoundingBox3D = [-100, -100, -100,  100, 100, 100];
 
 const AutoZoomToBox = (args: SubsurfaceViewerProps) => {
     const [rotX, setRotX] = React.useState(0);
@@ -259,6 +258,27 @@ const AutoZoomToBox = (args: SubsurfaceViewerProps) => {
 
     const props = {
         ...args,
+        layers: [
+            new AxesLayer({
+                id: "axes",
+                bounds: zoomBox3D,
+                ZIncreasingDownwards: false,
+            }),
+            new SimpleMeshLayer({
+                id: "sphere",
+                data: [{}],
+                mesh: new SphereGeometry({
+                    nlat: 100,
+                    nlong: 100,
+                    radius: 30,
+                }),
+                wireframe: false,
+                getPosition: [0, 0, 0],
+                getColor: [255, 255, 255],
+                material: true,
+            }),
+        ],
+        views: default3DViews,
         cameraPosition,
     };
 
@@ -294,31 +314,7 @@ const AutoZoomToBox = (args: SubsurfaceViewerProps) => {
 };
 
 export const AutoZoomToBoxStory: StoryObj<typeof SubsurfaceViewer> = {
-    args: {
-        id: "DeckGL-Map",
-        layers: [
-            new AxesLayer({
-                id: "polyhedral-cells-axes",
-                bounds: zoomBox3D,
-                ZIncreasingDownwards: false,
-            }),
-            // unfortunately, SimpleMeshLayer can not be specified as a Record<string, any> :(
-            new SimpleMeshLayer({
-                id: "sphere",
-                data: [{}],
-                mesh: new SphereGeometry({
-                    nlat: 100,
-                    nlong: 100,
-                    radius: 30,
-                }),
-                wireframe: false,
-                getPosition: [0, 0, 0],
-                getColor: [255, 255, 255],
-                material: true,
-            }),
-        ],
-        views: default3DViews,
-    },
+    args: {},
     parameters: {
         docs: {
             inlineStories: false,

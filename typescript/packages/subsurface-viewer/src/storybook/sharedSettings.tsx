@@ -98,6 +98,7 @@ export const volveWellsWithLogsLayer = {
     logrunName: "BLOCKING",
     logName: "ZONELOG",
     logColor: "Stratigraphy",
+    ZIncreasingDownwards: false,
 };
 
 // Example using "Map" layer. Uses PNG float for mesh.

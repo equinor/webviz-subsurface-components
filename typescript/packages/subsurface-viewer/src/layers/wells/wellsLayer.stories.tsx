@@ -595,22 +595,30 @@ Wells3d.parameters = {
     },
 };
 
-export const VerticalWellWithDuplicates = Template.bind({});
+export const VerticalWellWithDuplicates: ComponentStory<
+    typeof SubsurfaceViewer
+> = (args) => {
+    const props = {
+        ...args,
+        layers: [
+            new WellsLayer({
+                data: testWellWithDuplicates,
+                ZIncreasingDownwards: false,
+            }),
+            new AxesLayer({
+                id: "axes-layer",
+                bounds: [-100, -100, -500, 100, 100, 0],
+                ZIncreasingDownwards: false,
+            }),
+        ],
+    };
+
+    return <SubsurfaceViewer {...props} />;
+};
+
 VerticalWellWithDuplicates.args = {
     id: "well_176",
     bounds: [-150, -150, 150, 150],
-    layers: [
-        new WellsLayer({
-            data: testWellWithDuplicates,
-            ZIncreasingDownwards: false,
-        }),
-        new AxesLayer({
-            id: "axes-layer",
-            bounds: [-100, -100, -500, 100, 100, 0],
-            ZIncreasingDownwards: false,
-        }),
-    ],
-
     views: {
         layout: [1, 1],
         viewports: [
