@@ -6,7 +6,7 @@ import type {
 } from "@deck.gl/core/typed";
 import { CompositeLayer } from "@deck.gl/core/typed";
 import type { Material } from "./privateMapLayer";
-import privateMapLayer from "./privateMapLayer";
+import PrivateMapLayer from "./privateMapLayer";
 import type {
     ExtendedLayerProps,
     colorMapFunctionType,
@@ -418,7 +418,7 @@ export default class MapLayer<
         }
     }
 
-    renderLayers(): [privateMapLayer?] {
+    renderLayers(): [PrivateMapLayer?] {
         if (Object.keys(this.state).length === 1) {
             // isFinishedLoading only in state
             return [];
@@ -449,7 +449,7 @@ export default class MapLayer<
             );
         }
 
-        const layer = new privateMapLayer(
+        const layer = new PrivateMapLayer(
             this.getSubLayerProps({
                 positions: this.state["positions"],
                 normals: this.state["normals"],

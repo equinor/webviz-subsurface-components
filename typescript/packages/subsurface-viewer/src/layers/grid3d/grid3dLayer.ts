@@ -1,7 +1,7 @@
 import type { Color } from "@deck.gl/core/typed";
 import { CompositeLayer } from "@deck.gl/core/typed";
 import type { Material } from "./privateGrid3dLayer";
-import privateLayer from "./privateGrid3dLayer";
+import PrivateLayer from "./privateGrid3dLayer";
 import type {
     ExtendedLayerProps,
     colorMapFunctionType,
@@ -295,13 +295,13 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
         }
     }
 
-    renderLayers(): [privateLayer?] {
+    renderLayers(): [PrivateLayer?] {
         if (Object.keys(this.state).length === 1) {
             // isFinishedLoading only in state
             return [];
         }
 
-        const layer = new privateLayer(
+        const layer = new PrivateLayer(
             this.getSubLayerProps({
                 mesh: this.state["mesh"],
                 meshLines: this.state["mesh_lines"],

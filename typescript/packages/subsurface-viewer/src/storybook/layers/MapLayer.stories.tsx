@@ -1,6 +1,9 @@
 import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 
+import { ClipExtension } from "@deck.gl/extensions/typed";
+import { View } from "@deck.gl/core/typed";
+
 import type {
     BoundingBox2D,
     BoundingBox3D,
@@ -11,13 +14,23 @@ import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import InfoCard from "../../components/InfoCard";
 
-import AxesLayer from "../axes/axesLayer";
-import MapLayer from "./mapLayer";
+import AxesLayer from "../../layers/axes/axesLayer";
+import MapLayer from "../../layers/map/mapLayer";
 import { ViewFooter } from "../../components/ViewFooter";
-import { View } from "@deck.gl/core/typed";
-import type { colorMapFunctionType } from "../utils/layerTools";
-import NorthArrow3DLayer from "../northarrow/northArrow3DLayer";
-import { ClipExtension } from "@deck.gl/extensions/typed";
+import type { colorMapFunctionType } from "../../layers/utils/layerTools";
+import NorthArrow3DLayer from "../../layers/northarrow/northArrow3DLayer";
+
+import {
+    defaultStoryParameters,
+    default2DViews,
+    default3DViews,
+    huginAxes3DLayer,
+    hugin2DBounds,
+    hugin5mKhNetmapMapLayer,
+    hugin25mKhNetmapMapLayer,
+    hugin25mKhNetmapMapLayerPng,
+    northArrowLayer,
+} from "../sharedSettings";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -30,40 +43,7 @@ const stories: Meta = {
 };
 export default stories;
 
-const defaultMapLayerProps = {
-    "@@type": "MapLayer",
-    id: "default_map",
-    meshData: "hugin_depth_25_m.float32",
-    frame: {
-        origin: [432150, 6475800] as [number, number],
-        count: [291, 229] as [number, number],
-        increment: [25, 25] as [number, number],
-        rotDeg: 0,
-    },
-    propertiesData: "kh_netmap_25_m.float32",
-    ZIncreasingDownwards: true,
-};
-
-const defaultMapLayer = { ...defaultMapLayerProps };
-
-// Example using "Map" layer. Uses float32 mesh and properties binary arrays. Not PNG.
-const meshMapLayerBig = {
-    "@@type": "MapLayer",
-    id: "mesh-layer",
-    meshUrl: "hugin_depth_5_m.float32",
-    frame: {
-        origin: [432150, 6475800],
-        count: [1451, 1141],
-        increment: [5, 5],
-        rotDeg: 0,
-    },
-    propertiesUrl: "kh_netmap_5_m.float32",
-    contours: [0, 100],
-    isContoursDepth: true,
-    gridLines: false,
-    material: true,
-    colorMapName: "Physics",
-};
+const defaultMapLayer = { ...hugin25mKhNetmapMapLayer };
 
 // Small test map. 4 by 5 cells. One inactive node => 4 inactive cells.
 // property values and depth values both from 0 to 29.
@@ -184,108 +164,33 @@ const cellCenteredPropertiesLayer = {
     smoothShading: true,
 };
 
-// Example using "Map" layer. Uses PNG float for mesh and properties.
-const meshMapLayerPng = {
-    "@@type": "MapLayer",
-    id: "mesh-layer",
-    meshUrl: "hugin_depth_25_m.png",
-    frame: {
-        origin: [432150, 6475800],
-        count: [291, 229],
-        increment: [25, 25],
-        rotDeg: 0,
-    },
-    propertiesUrl: "kh_netmap_25_m.png",
-    contours: [0, 100],
-    isContoursDepth: true,
-    gridLines: false,
-    material: true,
-    smoothShading: true,
-    colorMapName: "Physics",
-    ZIncreasingDownwards: true,
-};
-
-// Example using "Map" layer. Uses float32 float for mesh and properties.
-const meshMapLayerFloat32 = {
-    "@@type": "MapLayer",
-    id: "mesh-layer",
-    meshUrl: "hugin_depth_25_m.float32",
-    frame: {
-        origin: [432150, 6475800],
-        count: [291, 229],
-        increment: [25, 25],
-        rotDeg: 0,
-    },
-    propertiesUrl: "kh_netmap_25_m.float32",
-    contours: [0, 100],
-    isContoursDepth: true,
-    gridLines: false,
-    material: false,
-    colorMapName: "Physics",
-};
-
 // Example rotated layer
 const meshMapLayerRotated = {
-    "@@type": "MapLayer",
-    id: "mesh-layer",
-    meshUrl: "hugin_depth_25_m.float32",
+    ...hugin25mKhNetmapMapLayer,
+    id: "rotated-mesh-layer",
     frame: {
-        origin: [432150, 6475800],
-        count: [291, 229],
-        increment: [25, 25],
+        ...hugin25mKhNetmapMapLayer.frame,
         rotDeg: 30,
         //rotPoint: [436000, 6478000],
     },
-    propertiesUrl: "kh_netmap_25_m.float32",
-    contours: [0, 100],
-    isContoursDepth: true,
     material: false,
-    colorMapName: "Physics",
-};
-
-const axes_hugin_layer = {
-    "@@type": "AxesLayer",
-    id: "axes-layer2",
-    bounds: [432150, 6475800, 2000, 439400, 6481500, 3500] as BoundingBox3D,
-};
-
-const north_arrow_layer = {
-    "@@type": "NorthArrow3DLayer",
-    id: "north-arrow-layer",
-};
-
-const defaultArgs = {
-    bounds: [432150, 6475800, 439400, 6481500] as BoundingBox2D,
-};
-
-const DEFAULT_VIEWS = {
-    layout: [1, 1] as [number, number],
-    viewports: [
-        {
-            id: "view_1",
-            show3D: true,
-        },
-    ],
-};
-
-const defaultParameters = {
-    docs: {
-        inlineStories: false,
-        iframeHeight: 500,
-    },
 };
 
 export const MapLayer3dPng: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "map",
-        layers: [axes_hugin_layer, meshMapLayerPng, north_arrow_layer],
+        layers: [
+            huginAxes3DLayer,
+            hugin25mKhNetmapMapLayerPng,
+            northArrowLayer,
+        ],
 
-        bounds: [432150, 6475800, 439400, 6481500] as BoundingBox2D,
-        views: DEFAULT_VIEWS,
+        bounds: hugin2DBounds,
+        views: default3DViews,
     },
     parameters: {
         docs: {
-            ...defaultParameters.docs,
+            ...defaultStoryParameters.docs,
             description: {
                 story: "Example using png as mesh and properties data.",
             },
@@ -296,12 +201,16 @@ export const MapLayer3dPng: StoryObj<typeof SubsurfaceViewer> = {
 export const MapLayer3dPngNoBounds: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "map",
-        layers: [axes_hugin_layer, meshMapLayerPng, north_arrow_layer],
-        views: DEFAULT_VIEWS,
+        layers: [
+            huginAxes3DLayer,
+            hugin25mKhNetmapMapLayerPng,
+            northArrowLayer,
+        ],
+        views: default3DViews,
     },
     parameters: {
         docs: {
-            ...defaultParameters.docs,
+            ...defaultStoryParameters.docs,
             description: {
                 story: "If no bounds are specified will results in automatically calcultated camera. Will look at center of bounding box of the data",
             },
@@ -315,42 +224,16 @@ const axesLayer2D = {
     backgroundColor: [0, 255, 255],
 };
 
-const mapLayer = {
-    "@@type": "MapLayer",
-    id: "MapLayer",
-    meshUrl: "hugin_depth_25_m.float32",
-    frame: {
-        origin: [432150, 6475800],
-        count: [291, 229],
-        increment: [25, 25],
-        rotDeg: 0,
-    },
-    propertiesUrl: "kh_netmap_25_m.float32",
-    contours: [0, 100],
-    isContoursDepth: true,
-    gridLines: false,
-    material: true,
-    colorMapName: "Physics",
-};
-
 export const MapLayer2d: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "map",
-        layers: [mapLayer, axesLayer2D],
-        bounds: [432150, 6475800, 439400, 6481500] as BoundingBox2D,
-        views: {
-            layout: [1, 1],
-            viewports: [
-                {
-                    id: "view_1",
-                    show3D: false,
-                },
-            ],
-        },
+        layers: [hugin25mKhNetmapMapLayer, axesLayer2D],
+        bounds: hugin2DBounds,
+        views: default2DViews,
     },
     parameters: {
         docs: {
-            ...defaultParameters.docs,
+            ...defaultStoryParameters.docs,
             description: {
                 story: "Example using png as mesh and properties data.",
             },
@@ -364,28 +247,24 @@ export const MapLayer2dDarkMode: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "map",
         layers: [
-            { ...axes_hugin_layer, labelColor: white, axisColor: white },
-            { ...meshMapLayerFloat32, material: false, gridLines: false },
-            { ...north_arrow_layer, color: white },
+            { ...huginAxes3DLayer, labelColor: white, axisColor: white },
+            {
+                ...hugin25mKhNetmapMapLayer,
+                material: false,
+                gridLines: false,
+            },
+            { ...northArrowLayer, color: white },
         ],
-        bounds: [432150, 6475800, 439400, 6481500] as BoundingBox2D,
+        bounds: hugin2DBounds,
         scale: {
             visible: true,
             cssStyle: { color: "white" },
         },
-        views: {
-            layout: [1, 1],
-            viewports: [
-                {
-                    id: "view_1",
-                    show3D: false,
-                },
-            ],
-        },
+        views: default2DViews,
     },
     parameters: {
         docs: {
-            ...defaultParameters.docs,
+            ...defaultStoryParameters.docs,
             description: {
                 story: "Example using png as mesh and properties data.",
             },
@@ -397,21 +276,13 @@ export const MapLayer2dDarkMode: StoryObj<typeof SubsurfaceViewer> = {
 export const Rotated: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "map",
-        layers: [axes_hugin_layer, meshMapLayerRotated, north_arrow_layer],
-        bounds: [432150, 6475800, 439400, 6481500] as BoundingBox2D,
-        views: {
-            layout: [1, 1],
-            viewports: [
-                {
-                    id: "view_1",
-                    show3D: false,
-                },
-            ],
-        },
+        layers: [huginAxes3DLayer, meshMapLayerRotated, northArrowLayer],
+        bounds: hugin2DBounds,
+        views: default2DViews,
     },
     parameters: {
         docs: {
-            ...defaultParameters.docs,
+            ...defaultStoryParameters.docs,
             description: {
                 story: "Example using png as mesh and properties data.",
             },
@@ -422,21 +293,21 @@ export const Rotated: StoryObj<typeof SubsurfaceViewer> = {
 export const BigMap: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "map",
-        layers: [axes_hugin_layer, meshMapLayerBig, north_arrow_layer],
-        bounds: [432150, 6475800, 439400, 6481500] as BoundingBox2D,
+        layers: [huginAxes3DLayer, hugin5mKhNetmapMapLayer, northArrowLayer],
+        bounds: hugin2DBounds,
     },
 };
 
 export const BigMap3d: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "map",
-        layers: [axes_hugin_layer, meshMapLayerBig, north_arrow_layer],
-        bounds: [432150, 6475800, 439400, 6481500] as BoundingBox2D,
-        views: DEFAULT_VIEWS,
+        layers: [huginAxes3DLayer, hugin5mKhNetmapMapLayer, northArrowLayer],
+        bounds: hugin2DBounds,
+        views: default3DViews,
     },
     parameters: {
         docs: {
-            ...defaultParameters.docs,
+            ...defaultStoryParameters.docs,
             description: {
                 story: "Example using large map with approx. 1400x1400 cells.",
             },
@@ -453,13 +324,13 @@ const axes_small = {
 export const SmallMap: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "map",
-        layers: [axes_small, smallLayer, north_arrow_layer],
+        layers: [axes_small, smallLayer, northArrowLayer],
         bounds: [459840.7, 5929826.1, 460540.7, 5930576.1] as BoundingBox2D,
-        views: DEFAULT_VIEWS,
+        views: default3DViews,
     },
     parameters: {
         docs: {
-            ...defaultParameters.docs,
+            ...defaultStoryParameters.docs,
             description: {
                 story: "4x5 cells.",
             },
@@ -477,13 +348,13 @@ const axes_lite = {
 export const CellCenteredPropMap: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "map",
-        layers: [axes_lite, cellCenteredPropertiesLayer, north_arrow_layer],
+        layers: [axes_lite, cellCenteredPropertiesLayer, northArrowLayer],
         bounds: [-1, -1, 4, 5] as BoundingBox2D,
-        views: DEFAULT_VIEWS,
+        views: default3DViews,
     },
     parameters: {
         docs: {
-            ...defaultParameters.docs,
+            ...defaultStoryParameters.docs,
             description: {
                 story: "A small map with properties given at cell centers. Each cell will be constant colored",
             },
@@ -495,13 +366,13 @@ export const CellCenteredPropMap: StoryObj<typeof SubsurfaceViewer> = {
 export const NodeCenteredPropMap: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "map",
-        layers: [axes_lite, nodeCenteredPropertiesLayer, north_arrow_layer],
+        layers: [axes_lite, nodeCenteredPropertiesLayer, northArrowLayer],
         bounds: [-1, -1, 4, 5] as BoundingBox2D,
-        views: DEFAULT_VIEWS,
+        views: default3DViews,
     },
     parameters: {
         docs: {
-            ...defaultParameters.docs,
+            ...defaultStoryParameters.docs,
             description: {
                 story: "A small map with properties given at nodes. Each cell will be interpolated in color.",
             },
@@ -518,14 +389,14 @@ export const NodeCenteredPropMapWithArrayInput: StoryObj<
         layers: [
             axes_lite,
             nodeCenteredPropertiesLayerWithArrayInput,
-            north_arrow_layer,
+            northArrowLayer,
         ],
         bounds: [-1, -1, 4, 5] as BoundingBox2D,
-        views: DEFAULT_VIEWS,
+        views: default3DViews,
     },
     parameters: {
         docs: {
-            ...defaultParameters.docs,
+            ...defaultStoryParameters.docs,
             description: {
                 story: "Both mesh and property data given as native javascript arrays (as opposed to URL).",
             },
@@ -610,7 +481,7 @@ const TypedArrayInputComponent: React.FC<{
             zoom: [-100, -100, -10, 100, 100, 60] as BoundingBox3D,
             target: [0, 0, 0],
         },
-        views: DEFAULT_VIEWS,
+        views: default3DViews,
         triggerHome: args.triggerHome,
         typedArraySupport: true,
     };
@@ -628,7 +499,7 @@ export const TypedArrayInput: StoryObj<typeof TypedArrayInputComponent> = {
     },
     parameters: {
         docs: {
-            ...defaultParameters.docs,
+            ...defaultStoryParameters.docs,
             description: {
                 story: "Both mesh and property data given as typed arrays arrays (as opposed to URL).",
             },
@@ -642,9 +513,9 @@ const ReadoutComponent: React.FC = () => {
 
     const args = React.useMemo(() => {
         return {
-            ...defaultArgs,
             id: "readout",
-            layers: [{ ...meshMapLayerFloat32 }],
+            bounds: hugin2DBounds,
+            layers: [{ ...hugin25mKhNetmapMapLayer, material: false }],
             coords: {
                 visible: false,
             },
@@ -663,7 +534,7 @@ const ReadoutComponent: React.FC = () => {
 export const Readout: StoryObj<typeof ReadoutComponent> = {
     parameters: {
         docs: {
-            ...defaultParameters.docs,
+            ...defaultStoryParameters.docs,
             description: {
                 story: "Readout example.",
             },
@@ -677,11 +548,11 @@ const BigMapWithHoleComponent: React.FC = () => {
 
     const args = React.useMemo(() => {
         return {
-            ...defaultArgs,
             id: "readout",
+            bounds: hugin2DBounds,
             layers: [
                 {
-                    ...meshMapLayerBig,
+                    ...hugin5mKhNetmapMapLayer,
                     meshUrl: "hugin_depth_5_m_w_hole.float32",
                     gridLines: false,
                     material: false,
@@ -705,7 +576,7 @@ const BigMapWithHoleComponent: React.FC = () => {
 export const BigMapWithHole: StoryObj<typeof BigMapWithHoleComponent> = {
     parameters: {
         docs: {
-            ...defaultParameters.docs,
+            ...defaultStoryParameters.docs,
             description: {
                 story: "Example of map with a hole.",
             },
@@ -727,20 +598,20 @@ const ContourLinesComponent: React.FC<ContourLinesComponentProps> = (
     props: ContourLinesComponentProps
 ) => {
     const contourMapLayer = new MapLayer({
-        ...defaultMapLayerProps,
+        ...hugin25mKhNetmapMapLayer,
         id: "contours",
         contours: [props.contourOffset, props.zContourInterval],
     });
 
     const propertyContourMapLayer = new MapLayer({
-        ...defaultMapLayerProps,
+        ...hugin25mKhNetmapMapLayer,
         id: "property_contours",
         contours: [props.contourOffset, props.propertyContourInterval],
         isContoursDepth: false,
     });
 
     const flatPropertyContourMapLayer = new MapLayer({
-        ...defaultMapLayerProps,
+        ...hugin25mKhNetmapMapLayer,
         id: "flat",
         meshData: undefined as unknown as string,
         contours: [props.contourOffset, props.propertyContourInterval] as [
@@ -756,7 +627,7 @@ const ContourLinesComponent: React.FC<ContourLinesComponentProps> = (
             {
                 id: "view_1",
                 show3D: props.show3d,
-                layerIds: [defaultMapLayerProps.id],
+                layerIds: [hugin25mKhNetmapMapLayer.id],
                 isSync: props.syncViewports,
             },
             {
@@ -856,24 +727,26 @@ const ExtensionsComponent: React.FC<
     ];
     // Can not use Record<string, unknown> because extensions will not be supported
     const leftMap = new MapLayer({
-        ...defaultMapLayerProps,
+        ...hugin25mKhNetmapMapLayer,
         id: "left",
+        material: false,
         extensions: [new ClipExtension()],
         clipBounds: leftClipBounds,
         clipByInstance: true,
     });
 
     const rightMap = new MapLayer({
-        ...defaultMapLayerProps,
+        ...hugin25mKhNetmapMapLayer,
         id: "right",
         colorMapName: "Physics reverse",
+        material: false,
         extensions: [new ClipExtension()],
         clipBounds: rightClipBounds,
         clipByInstance: true,
     });
 
     const layers = [
-        new AxesLayer({ ...axes_hugin_layer }),
+        new AxesLayer({ ...huginAxes3DLayer }),
         leftMap,
         rightMap,
         new NorthArrow3DLayer(),
@@ -885,8 +758,8 @@ const ExtensionsComponent: React.FC<
 export const Extensions: StoryObj<typeof ExtensionsComponent> = {
     args: {
         id: "map",
-        ...defaultArgs,
-        views: DEFAULT_VIEWS,
+        bounds: hugin2DBounds,
+        views: default3DViews,
         clipX: 1000,
     },
     argTypes: {

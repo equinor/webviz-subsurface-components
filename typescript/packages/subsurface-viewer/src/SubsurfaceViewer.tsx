@@ -1,5 +1,13 @@
-import type { LayersList } from "@deck.gl/core/typed";
+import React from "react";
+import type { PickingInfo, LayersList } from "@deck.gl/core/typed";
 import { Layer } from "@deck.gl/core/typed";
+import PropTypes from "prop-types";
+import type { colorTablesArray } from "@emerson-eps/color-tables/";
+import type { Unit } from "convert-units";
+import convert from "convert-units";
+
+import type { MjolnirGestureEvent } from "mjolnir.js";
+
 import type {
     BoundsAccessor,
     MapMouseEvent,
@@ -11,13 +19,6 @@ import type {
 import { TGrid3DColoringMode } from "./layers/grid3d/grid3dLayer";
 
 import Map, { jsonToObject, createLayers } from "./components/Map";
-import React from "react";
-import PropTypes from "prop-types";
-import type { colorTablesArray } from "@emerson-eps/color-tables/";
-import type { Unit } from "convert-units";
-import convert from "convert-units";
-import type { PickingInfo } from "@deck.gl/core/typed";
-import type { MjolnirGestureEvent } from "mjolnir.js";
 
 export type {
     BoundsAccessor,
