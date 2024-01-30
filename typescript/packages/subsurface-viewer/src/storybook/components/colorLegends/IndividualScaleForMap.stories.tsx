@@ -5,8 +5,13 @@ import { View } from "@deck.gl/core/typed";
 
 import { ColorLegend } from "@emerson-eps/color-tables";
 
-import exampleData from "../../../../../../../example-data/deckgl-map.json";
 import SubsurfaceViewer from "../../../SubsurfaceViewer";
+
+import {
+    colormapLayer,
+    defaultStoryParameters,
+    subsufaceProps,
+} from "../../sharedSettings";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -90,28 +95,25 @@ const EditDataTemplate = (args) => {
 export const IndividualScaleForMap: StoryObj<typeof SubsurfaceViewer> = {
     name: "Individual ContinuousLegend",
     args: {
-        ...exampleData[0],
+        ...subsufaceProps,
         layers: [
+            colormapLayer,
             {
-                ...exampleData[0].layers[0],
-                id: "colormap-layer",
-            },
-            {
-                ...exampleData[0].layers[0],
+                ...colormapLayer,
                 colorMapRange: [3000, 3100],
                 valueRange: [3000, 3100],
                 id: "colormap-2-layer",
                 colorMapName: "Porosity",
             },
             {
-                ...exampleData[0].layers[0],
+                ...colormapLayer,
                 colorMapRange: [3000, 3100],
                 valueRange: [3000, 3100],
                 id: "colormap-3-layer",
                 colorMapName: "Permeability",
             },
             {
-                ...exampleData[0].layers[0],
+                ...colormapLayer,
                 colorMapRange: [3000, 3100],
                 valueRange: [3000, 3100],
                 id: "colormap-4-layer",
@@ -152,11 +154,10 @@ export const IndividualScaleForMap: StoryObj<typeof SubsurfaceViewer> = {
     } as any,
     parameters: {
         docs: {
+            ...defaultStoryParameters.docs,
             description: {
                 story: "Four maps with individual color scales for each map",
             },
-            inlineStories: false,
-            iframeHeight: 500,
         },
     },
     render: (args) => <EditDataTemplate {...args} />,

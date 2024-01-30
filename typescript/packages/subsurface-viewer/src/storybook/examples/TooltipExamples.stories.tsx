@@ -19,7 +19,8 @@ import type {
 } from "../../layers/utils/layerTools";
 
 import {
-    huginMapNetmapPropLayerPng,
+    defaultStoryParameters,
+    hugin25mKhNetmapMapLayer,
     volveWellsBounds,
     volveWellsLayer,
     volveWellsWithLogsLayer,
@@ -59,11 +60,10 @@ export const TooltipApi: StoryObj<typeof SubsurfaceViewer> = {
 
     parameters: {
         docs: {
+            ...defaultStoryParameters.docs,
             description: {
                 story: "Example of overriding the default tooltip, showing measured depth (MD) instead of the default behavior, which is to show the well name.",
             },
-            inlineStories: false,
-            iframeHeight: 500,
         },
     },
 };
@@ -139,11 +139,10 @@ export const TooltipStyle: StoryObj<typeof SubsurfaceViewer> = {
 
     parameters: {
         docs: {
+            ...defaultStoryParameters.docs,
             description: {
                 story: "Example of overriding tooltip style.",
             },
-            inlineStories: false,
-            iframeHeight: 500,
         },
     },
 };
@@ -174,7 +173,7 @@ const MouseEventComponent: React.FC<MouseEvenComponentProps> = (
 
     const subsurfaceProps = React.useMemo<Record<string, unknown>>(() => {
         const props = {
-            layers: [volveWellsWithLogsLayer, huginMapNetmapPropLayerPng],
+            layers: [volveWellsWithLogsLayer, hugin25mKhNetmapMapLayer],
             bounds: volveWellsBounds,
             onMouseEvent: handleEvent,
             views: {

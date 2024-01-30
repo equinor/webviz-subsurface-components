@@ -5,15 +5,16 @@ import {
     picking,
     project,
 } from "@deck.gl/core/typed";
-import type { LayerPickInfo, PropertyDataType } from "../utils/layerTools";
-import { createPropertyData } from "../utils/layerTools";
+
 import { Model, Geometry } from "@luma.gl/engine";
 import type { DeckGLLayerContext } from "../../components/Map";
 import type {
     ExtendedLayerProps,
+    LayerPickInfo,
+    PropertyDataType,
     colorMapFunctionType,
 } from "../utils/layerTools";
-import { getImageData } from "../utils/layerTools";
+import { createPropertyData, getImageData } from "../utils/layerTools";
 import { Texture2D } from "@luma.gl/webgl";
 import GL from "@luma.gl/constants";
 import vsShader from "./vertex.glsl";
@@ -59,7 +60,7 @@ export type Material =
       }
     | boolean;
 
-export interface privateLayerProps extends ExtendedLayerProps {
+export interface PrivateLayerProps extends ExtendedLayerProps {
     mesh: MeshType;
     meshLines: MeshTypeLines;
     colorMapName: string;
@@ -83,8 +84,8 @@ const defaultProps = {
     ZIncreasingDownwards: true,
 };
 
-// This is a private layer used only by the composite Map3DLayer
-export default class privateLayer extends Layer<privateLayerProps> {
+// This is a private layer used only by the composite Grid3DLayer
+export default class PrivateLayer extends Layer<PrivateLayerProps> {
     get isLoaded(): boolean {
         return this.state["isLoaded"] ?? false;
     }
@@ -280,5 +281,5 @@ export default class privateLayer extends Layer<privateLayerProps> {
     }
 }
 
-privateLayer.layerName = "privateLayer";
-privateLayer.defaultProps = defaultProps;
+PrivateLayer.layerName = "PrivateLayer";
+PrivateLayer.defaultProps = defaultProps;
