@@ -6,25 +6,27 @@ import {
     project,
     project32,
 } from "@deck.gl/core/typed";
-import { localPhongLighting, utilities } from "../shader_modules";
-import type { LayerPickInfo, PropertyDataType } from "../utils/layerTools";
-import { createPropertyData } from "../utils/layerTools";
+
+import GL from "@luma.gl/constants";
+import { Texture2D } from "@luma.gl/webgl";
 import { Model, Geometry } from "@luma.gl/engine";
-import type { DeckGLLayerContext } from "../../components/Map";
+
+import { localPhongLighting, utilities } from "../shader_modules";
+
+import { getImageData, createPropertyData } from "../utils/layerTools";
 import type {
+    LayerPickInfo,
+    PropertyDataType,
     ExtendedLayerProps,
     colorMapFunctionType,
 } from "../utils/layerTools";
 
-import { getImageData } from "../utils/layerTools";
+import type { DeckGLLayerContext } from "../../components/Map";
 
 import vs from "./vertex.glsl";
 import fs from "./fragment.fs.glsl";
 import vsLineShader from "./vertex_lines.glsl";
 import fsLineShader from "./fragment_lines.glsl";
-
-import { Texture2D } from "@luma.gl/webgl";
-import GL from "@luma.gl/constants";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,
@@ -41,7 +43,7 @@ export type Material =
           specularColor: [number, number, number];
       }
     | boolean;
-export interface privateMapLayerProps extends ExtendedLayerProps {
+export interface PrivateMapLayerProps extends ExtendedLayerProps {
     positions: Float32Array;
     normals: Int8Array;
     triangleIndices: Uint32Array;
@@ -75,7 +77,7 @@ const defaultProps = {
 };
 
 // This is a private layer used only by the composite MapLayer
-export default class privateMapLayer extends Layer<privateMapLayerProps> {
+export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
     get isLoaded(): boolean {
         return this.state["isLoaded"] ?? false;
     }
@@ -295,5 +297,5 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
     }
 }
 
-privateMapLayer.layerName = "privateMapLayer";
-privateMapLayer.defaultProps = defaultProps;
+PrivateMapLayer.layerName = "privateMapLayer";
+PrivateMapLayer.defaultProps = defaultProps;

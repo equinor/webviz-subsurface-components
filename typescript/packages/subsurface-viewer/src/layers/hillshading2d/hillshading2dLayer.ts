@@ -11,7 +11,7 @@ import type { ReportBoundingBoxAction } from "../../components/Map";
 
 import fsHillshading from "./hillshading2d.fs.glsl";
 
-// Most props are inherited from DeckGL's BitmapLayer. For a full list, see
+// Most props are inherited from DeckGL's BitmapLayer. For a full list, see:
 // https://deck.gl/docs/api-reference/layers/bitmap-layer
 //
 // The property map is encoded in an image and sent in the `image` prop of the BitmapLayer.
