@@ -10,7 +10,7 @@ import type {
 
 import { TGrid3DColoringMode } from "./layers/grid3d/grid3dLayer";
 
-import Map, { jsonToObject } from "./components/Map";
+import Map, { jsonToObject, createLayers } from "./components/Map";
 import React from "react";
 import PropTypes from "prop-types";
 import type { colorTablesArray } from "@emerson-eps/color-tables/";
@@ -123,6 +123,11 @@ export interface SubsurfaceViewerProps {
     lights?: LightsType;
 
     children?: React.ReactNode;
+
+    /**
+     * If set to true allows to use typed arrays in layer description JS objects.
+     */
+    typedArraySupport?: boolean;
 }
 
 const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
@@ -150,6 +155,7 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
     triggerResetMultipleWells,
     lights,
     children,
+    typedArraySupport,
 }: SubsurfaceViewerProps) => {
     // Contains layers data received from map layers by user interaction
     const [layerEditedData, setLayerEditedData] = React.useState(editedData);
@@ -162,6 +168,7 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
             return;
         }
 
+        //The layers have been already created externally.
         if (layers?.[0] instanceof Layer) {
             setLayerInstances(layers as LayersList);
             return;
@@ -171,13 +178,24 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
         if (resources) enumerations.push({ resources: resources });
         if (editedData) enumerations.push({ editedData: editedData });
         else enumerations.push({ editedData: {} });
-        const layersList = jsonToObject(
-            layers as Record<string, unknown>[],
-            enumerations
-        ) as LayersList;
-        setLayerInstances(layersList);
+
+        //Bypass conversion of layer props through JSON and use them as is.
+        if (typedArraySupport) {
+            const layersList = createLayers(
+                layers as Record<string, unknown>[],
+                enumerations
+            ) as LayersList;
+            setLayerInstances(layersList);
+        } else {
+            const layersList = jsonToObject(
+                layers as Record<string, unknown>[],
+                enumerations
+            ) as LayersList;
+            setLayerInstances(layersList);
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [layers]); // Note. Fixing this dependency list may cause infinite recursion.
+
     React.useEffect(() => {
         if (!editedData) return;
 

@@ -95,8 +95,6 @@ export default class WellLogViewer extends Component<
 
         this.collapsedTrackIds = [];
 
-        this.collapsedTrackIds = [];
-
         this.onCreateController = this.onCreateController.bind(this);
 
         this.onInfo = this.onInfo.bind(this);

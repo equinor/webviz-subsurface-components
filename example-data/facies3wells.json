@@ -2246,5 +2246,7 @@
   "syncTrackPos": true,
   "syncContentDomain": true,
   "syncContentSelection": true,
+  "domain": [3000, 4000],
+  "selection": [3400, 3600],
   "syncTemplate": true
 }

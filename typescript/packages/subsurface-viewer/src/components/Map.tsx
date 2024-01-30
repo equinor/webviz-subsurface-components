@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 
 import type { Feature, FeatureCollection } from "geojson";
@@ -10,6 +11,7 @@ import type {
 } from "mjolnir.js";
 
 import { JSONConfiguration, JSONConverter } from "@deck.gl/json/typed";
+
 import type { DeckGLRef } from "@deck.gl/react/typed";
 import DeckGL from "@deck.gl/react/typed";
 import type {
@@ -977,6 +979,35 @@ export function jsonToObject(
 ): LayersList | View[] {
     if (!data) return [];
 
+    const configuration = createConfiguration(enums);
+    const jsonConverter = new JSONConverter({ configuration });
+
+    // remove empty data/layer object
+    const filtered_data = data.filter((value) => !isEmpty(value));
+    return jsonConverter.convert(filtered_data);
+}
+
+export function createLayers(
+    data: Record<string, unknown>[],
+    enums: Record<string, unknown>[] | undefined = undefined
+): LayersList {
+    const configuration = createConfiguration(enums);
+    const layersList: Layer[] = [];
+
+    // remove empty data/layer object
+    const filtered_data = data.filter((value) => !isEmpty(value));
+    for (const layerData of filtered_data) {
+        const layer = createLayer(layerData, configuration);
+        if (layer) {
+            layersList.push(layer);
+        }
+    }
+    return layersList;
+}
+
+function createConfiguration(
+    enums: Record<string, unknown>[] | undefined = undefined
+): JSONConfiguration {
     const configuration = new JSONConfiguration(JSON_CONVERTER_CONFIG);
     enums?.forEach((enumeration) => {
         if (enumeration) {
@@ -987,11 +1018,27 @@ export function jsonToObject(
             });
         }
     });
-    const jsonConverter = new JSONConverter({ configuration });
+    return configuration;
+}
 
-    // remove empty data/layer object
-    const filtered_data = data.filter((value) => !isEmpty(value));
-    return jsonConverter.convert(filtered_data);
+function createLayer(
+    layerData: Record<string, unknown>,
+    configuration: JSONConfiguration
+): Layer | null {
+    const typeKey = configuration.typeKey;
+    const classes = configuration.classes as Record<string, any>;
+    if (layerData[typeKey]) {
+        const type = layerData[typeKey] as string;
+        if (type in classes) {
+            const Class = classes[type];
+
+            // Prepare a props object
+            const props = { ...layerData };
+            delete props[typeKey];
+            return new Class(props);
+        }
+    }
+    return null;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
