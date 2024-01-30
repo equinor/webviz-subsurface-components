@@ -701,7 +701,7 @@ const ContourLinesComponent: React.FC<ContourLinesComponentProps> = (
 export const ContourLines: StoryObj<typeof ContourLinesComponent> = {
     args: {
         syncViewports: true,
-        show3d: true,
+        show3d: false,
         contourOffset: 0,
         zContourInterval: 100,
         propertyContourInterval: 5000,
