@@ -161,6 +161,18 @@ Simgrid8xIJonly.parameters = parameters;
 const math = create(all, { randomSeed: "1984" });
 const randomFunc = math?.random ? math.random : Math.random;
 
+const snubCubePoints = SnubCubePoints.map((v) => 10 * v);
+const snubCubeProperties = Array(SnubCubeVertexCount)
+    .fill(0)
+    .map(() => randomFunc() * 50);
+
+const toroidPoints = ToroidPoints.map((v) => 10 * v).map((v, index) =>
+    index % 3 === 0 ? v + 30 : v
+);
+const toroidProperties = Array(ToroidVertexCount)
+    .fill(0)
+    .map(() => randomFunc() * 10);
+
 export const PolyhedralCells = Template.bind({});
 PolyhedralCells.args = {
     bounds: [-25, -25, 50, 30] as NumberQuad,
@@ -185,11 +197,9 @@ PolyhedralCells.args = {
             id: "polyhedral1",
             coloringMode: TGrid3DColoringMode.Y,
             pickable: true,
-            pointsData: SnubCubePoints.map((v) => 10 * v),
+            pointsData: snubCubePoints,
             polysData: SnubCubeFaces,
-            propertiesData: Array(SnubCubeVertexCount)
-                .fill(0)
-                .map(() => randomFunc() * 50),
+            propertiesData: snubCubeProperties,
             colorMapRange: [-8, 8],
             colorMapClampColor: [200, 200, 200],
             colorMapName: "Porosity",
@@ -198,15 +208,57 @@ PolyhedralCells.args = {
             ...grid3dLayer,
             id: "polyhedral2",
             pickable: true,
-            pointsData: ToroidPoints.map((v) => 10 * v).map((v, index) =>
-                index % 3 === 0 ? v + 30 : v
-            ),
+            pointsData: toroidPoints,
             polysData: ToroidFaces,
-            propertiesData: Array(ToroidVertexCount)
-                .fill(0)
-                .map(() => randomFunc() * 10),
+            propertiesData: toroidProperties,
             coloringMode: TGrid3DColoringMode.Property,
         },
     ],
+};
+PolyhedralCells.parameters = parameters;
+
+export const PolyhedralCellsTypedArrayInput = Template.bind({});
+
+PolyhedralCellsTypedArrayInput.args = {
+    bounds: [-25, -25, 50, 30] as NumberQuad,
+    views: {
+        layout: [1, 1] as [number, number],
+        viewports: [
+            {
+                id: "view_1",
+                show3D: true,
+            },
+        ],
+    },
+    id: "grid-3d-polyhedral-cell-typed-input",
+    layers: [
+        {
+            ...axes,
+            id: "polyhedral-cells-axes-typed-input",
+            bounds: [-15, -15, -15, 40, 20, 15],
+        },
+        {
+            ...grid3dLayer,
+            id: "polyhedral1-typed-input",
+            coloringMode: TGrid3DColoringMode.X,
+            pickable: true,
+            pointsData: new Float32Array(snubCubePoints),
+            polysData: new Uint32Array(SnubCubeFaces),
+            propertiesData: new Float32Array(snubCubeProperties),
+            colorMapRange: [-8, 8],
+            colorMapClampColor: [200, 200, 200],
+            colorMapName: "Rainbow",
+        },
+        {
+            ...grid3dLayer,
+            id: "polyhedral2-typed-input",
+            pickable: true,
+            pointsData: new Float32Array(toroidPoints),
+            polysData: new Uint32Array(ToroidFaces),
+            propertiesData: new Float32Array(toroidProperties),
+            coloringMode: TGrid3DColoringMode.Property,
+        },
+    ],
+    typedArraySupport: true,
 };
 PolyhedralCells.parameters = parameters;
