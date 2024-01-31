@@ -4,14 +4,8 @@ import type { Params } from "./mapLayer";
  * that is used by WebGl. Using indice, lines and triangles share common vertices to save memory.
  */
 export function makeFullMesh(e: { data: Params }) {
-    const [
-        inputMeshData,
-        inputPropertiesData,
-        isMesh,
-        frame,
-        smoothShading,
-        gridLines,
-    ] = e.data;
+    const [meshData, propertiesData, isMesh, frame, smoothShading, gridLines] =
+        e.data;
 
     // Keep
     //const t0 = performance.now();
@@ -144,9 +138,6 @@ export function makeFullMesh(e: { data: Params }) {
         normalize(mean);
         return mean;
     }
-
-    const meshData = inputMeshData as Float32Array;
-    const propertiesData = inputPropertiesData ?? meshData;
 
     // non mesh grids use z = 0 (see below)
     const meshZValueRange = isMesh ? getFloat32ArrayMinMax(meshData) : [0, 0];
@@ -542,7 +533,7 @@ export function makeFullMesh(e: { data: Params }) {
         number[],
         number[],
     ];
-    const webworkerReturnData: returnType = [
+    const webworkerParams: returnType = [
         positions,
         normals,
         triangleIndices,
@@ -553,7 +544,7 @@ export function makeFullMesh(e: { data: Params }) {
     ];
 
     postMessage(
-        webworkerReturnData,
+        webworkerParams,
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         [
