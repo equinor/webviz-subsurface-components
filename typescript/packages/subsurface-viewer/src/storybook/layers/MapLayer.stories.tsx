@@ -43,8 +43,6 @@ const stories: Meta = {
 };
 export default stories;
 
-const defaultMapLayer = { ...hugin25mKhNetmapMapLayer };
-
 // Small test map. 4 by 5 cells. One inactive node => 4 inactive cells.
 // property values and depth values both from 0 to 29.
 // Useful for debugging.
@@ -597,6 +595,12 @@ type ContourLinesComponentProps = {
 const ContourLinesComponent: React.FC<ContourLinesComponentProps> = (
     props: ContourLinesComponentProps
 ) => {
+    const noContourMapLayer = new MapLayer({
+        ...hugin25mKhNetmapMapLayer,
+        id: "no_contours",
+        contours: [-1.0, -1.0],
+    });
+
     const contourMapLayer = new MapLayer({
         ...hugin25mKhNetmapMapLayer,
         id: "contours",
@@ -627,7 +631,7 @@ const ContourLinesComponent: React.FC<ContourLinesComponentProps> = (
             {
                 id: "view_1",
                 show3D: props.show3d,
-                layerIds: [hugin25mKhNetmapMapLayer.id],
+                layerIds: [noContourMapLayer.id],
                 isSync: props.syncViewports,
             },
             {
@@ -655,7 +659,7 @@ const ContourLinesComponent: React.FC<ContourLinesComponentProps> = (
         <SubsurfaceViewer
             id={"test"}
             layers={[
-                new MapLayer(defaultMapLayer),
+                noContourMapLayer,
                 contourMapLayer,
                 propertyContourMapLayer,
                 flatPropertyContourMapLayer,
@@ -701,7 +705,7 @@ const ContourLinesComponent: React.FC<ContourLinesComponentProps> = (
 export const ContourLines: StoryObj<typeof ContourLinesComponent> = {
     args: {
         syncViewports: true,
-        show3d: true,
+        show3d: false,
         contourOffset: 0,
         zContourInterval: 100,
         propertyContourInterval: 5000,
