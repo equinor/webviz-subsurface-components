@@ -597,6 +597,12 @@ type ContourLinesComponentProps = {
 const ContourLinesComponent: React.FC<ContourLinesComponentProps> = (
     props: ContourLinesComponentProps
 ) => {
+    const noContourMapLayer = new MapLayer({
+        ...hugin25mKhNetmapMapLayer,
+        id: "no_contours",
+        contours: [-1.0, -1.0],
+    });
+
     const contourMapLayer = new MapLayer({
         ...hugin25mKhNetmapMapLayer,
         id: "contours",
@@ -627,7 +633,7 @@ const ContourLinesComponent: React.FC<ContourLinesComponentProps> = (
             {
                 id: "view_1",
                 show3D: props.show3d,
-                layerIds: [hugin25mKhNetmapMapLayer.id],
+                layerIds: [noContourMapLayer.id],
                 isSync: props.syncViewports,
             },
             {
@@ -655,7 +661,7 @@ const ContourLinesComponent: React.FC<ContourLinesComponentProps> = (
         <SubsurfaceViewer
             id={"test"}
             layers={[
-                new MapLayer(defaultMapLayer),
+                noContourMapLayer,
                 contourMapLayer,
                 propertyContourMapLayer,
                 flatPropertyContourMapLayer,
