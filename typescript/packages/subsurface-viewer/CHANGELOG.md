@@ -1,3 +1,10 @@
+## [0.14.3](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.14.2...subsurface-viewer@0.14.3) (2024-01-31)
+
+
+### Bug Fixes
+
+* Crash in MapLayer - "Contour Lines" story ([#1899](https://github.com/equinor/webviz-subsurface-components/issues/1899)) ([c9d97c4](https://github.com/equinor/webviz-subsurface-components/commit/c9d97c4c2206fcf3f00ea711a006666af0a6aa7e))
+
 ## [0.14.2](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.14.1...subsurface-viewer@0.14.2) (2024-01-31)
 
 
