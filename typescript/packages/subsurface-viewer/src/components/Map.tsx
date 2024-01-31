@@ -1646,7 +1646,7 @@ function computeViewState(
             );
         }
         const defaultCamera = {
-            target: [],
+            target: [0, 0, 0],
             zoom: NaN,
             rotationX: 45, // look down z -axis at 45 degrees
             rotationOrbit: 0,
