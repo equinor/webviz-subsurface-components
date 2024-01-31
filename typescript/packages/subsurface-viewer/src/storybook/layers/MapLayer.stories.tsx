@@ -43,8 +43,6 @@ const stories: Meta = {
 };
 export default stories;
 
-const defaultMapLayer = { ...hugin25mKhNetmapMapLayer };
-
 // Small test map. 4 by 5 cells. One inactive node => 4 inactive cells.
 // property values and depth values both from 0 to 29.
 // Useful for debugging.
