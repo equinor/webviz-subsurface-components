@@ -43,13 +43,69 @@ type Frame = {
 };
 
 export type Params = [
-    meshData: Float32Array,
-    propertiesData: Float32Array,
+    meshData: Float32Array | null,
+    propertiesData: Float32Array | null,
     isMesh: boolean,
     frame: Frame,
     smoothShading: boolean,
     gridLines: boolean,
 ];
+
+async function loadURLData(url: string): Promise<Float32Array | null> {
+    let res: Float32Array | null = null;
+    const response = await fetch(url);
+    if (!response.ok) {
+        console.error("Could not load ", url);
+    }
+    const blob = await response.blob();
+    const contentType = response.headers.get("content-type");
+    const isPng = contentType === "image/png";
+    if (isPng) {
+        // Load as Png  with abolute float values.
+        res = await new Promise((resolve) => {
+            const fileReader = new FileReader();
+            fileReader.readAsArrayBuffer(blob);
+            fileReader.onload = () => {
+                const arrayBuffer = fileReader.result;
+                const imgData = png.decode(arrayBuffer as ArrayBuffer);
+                const data = imgData.data; // array of int's
+
+                const n = data.length;
+                const buffer = new ArrayBuffer(n);
+                const view = new DataView(buffer);
+                for (let i = 0; i < n; i++) {
+                    view.setUint8(i, data[i]);
+                }
+
+                const floatArray = new Float32Array(buffer);
+                resolve(floatArray);
+            };
+        });
+    } else {
+        // Load as binary array of floats.
+        const buffer = await blob.arrayBuffer();
+        res = new Float32Array(buffer);
+    }
+    return res;
+}
+
+async function loadFloat32Data(
+    data: string | number[] | Float32Array
+): Promise<Float32Array | null> {
+    if (!data) {
+        return null;
+    }
+    if (ArrayBuffer.isView(data)) {
+        // Input data is typed array.
+        return data;
+    } else if (Array.isArray(data)) {
+        // Input data is native javascript array.
+        return new Float32Array(data);
+    } else {
+        // Input data is an URL.
+        return await loadURLData(data);
+    }
+}
 
 /**
  * Will load data for the mesh and the properties. Both of which may be given as arrays (javascript or typed)
@@ -63,116 +119,18 @@ async function loadMeshAndProperties(
     // Keep
     //const t0 = performance.now();
 
-    const isMesh = typeof meshData !== "undefined";
-    const isProperties = typeof propertiesData !== "undefined";
+    const mesh = await loadFloat32Data(meshData);
+    const properties = await loadFloat32Data(propertiesData);
 
-    if (!isMesh && !isProperties) {
-        console.error("Error. One or both of texture and mesh must be given!");
-    }
-
-    if (isMesh && !isProperties) {
-        propertiesData = meshData;
-    }
-
-    //-- PROPERTIES. --
-    let properties: Float32Array;
-    if (ArrayBuffer.isView(propertiesData)) {
-        // Input data is typed array.
-        properties = propertiesData; // Note no copy. Make sure input data is not altered.
-    } else if (Array.isArray(propertiesData)) {
-        // Input data is native javascript array.
-        properties = new Float32Array(propertiesData);
-    } else {
-        // Input data is an URL.
-        const response = await fetch(propertiesData);
-        if (!response.ok) {
-            console.error("Could not load ", propertiesData);
-        }
-
-        const blob = await response.blob();
-        const contentType = response.headers.get("content-type");
-        const isPng = contentType === "image/png";
-        if (isPng) {
-            // Load as Png  with abolute float values.
-            properties = await new Promise((resolve) => {
-                const fileReader = new FileReader();
-                fileReader.readAsArrayBuffer(blob);
-                fileReader.onload = () => {
-                    const arrayBuffer = fileReader.result;
-                    const imgData = png.decode(arrayBuffer as ArrayBuffer);
-                    const data = imgData.data; // array of int's
-
-                    const n = data.length;
-                    const buffer = new ArrayBuffer(n);
-                    const view = new DataView(buffer);
-                    for (let i = 0; i < n; i++) {
-                        view.setUint8(i, data[i]);
-                    }
-
-                    const floatArray = new Float32Array(buffer);
-                    resolve(floatArray);
-                };
-            });
-        } else {
-            // Load as binary array of floats.
-            const buffer = await blob.arrayBuffer();
-            properties = new Float32Array(buffer);
-        }
-    }
-
-    //-- MESH --
-    let mesh: Float32Array = new Float32Array();
-    if (isMesh) {
-        if (ArrayBuffer.isView(meshData)) {
-            // Input data is typed array.
-            mesh = meshData; // Note no copy. Make sure data is never altered.
-        } else if (Array.isArray(meshData)) {
-            // Input data is native javascript array.
-            mesh = new Float32Array(meshData);
-        } else {
-            // Input data is an URL.
-            const response_mesh = await fetch(meshData);
-            if (!response_mesh.ok) {
-                console.error("Could not load mesh");
-            }
-
-            const blob_mesh = await response_mesh.blob();
-            const contentType_mesh = response_mesh.headers.get("content-type");
-            const isPng_mesh = contentType_mesh === "image/png";
-            if (isPng_mesh) {
-                // Load as Png  with abolute float values.
-                mesh = await new Promise((resolve) => {
-                    const fileReader = new FileReader();
-                    fileReader.readAsArrayBuffer(blob_mesh);
-                    fileReader.onload = () => {
-                        const arrayBuffer = fileReader.result;
-                        const imgData = png.decode(arrayBuffer as ArrayBuffer);
-                        const data = imgData.data; // array of int's
-
-                        const n = data.length;
-                        const buffer = new ArrayBuffer(n);
-                        const view = new DataView(buffer);
-                        for (let i = 0; i < n; i++) {
-                            view.setUint8(i, data[i]);
-                        }
-
-                        const floatArray = new Float32Array(buffer);
-                        resolve(floatArray);
-                    };
-                });
-            } else {
-                // Load as binary array of floats.
-                const buffer = await blob_mesh.arrayBuffer();
-                mesh = new Float32Array(buffer);
-            }
-        }
-    }
+    // if (!isMesh && !isProperties) {
+    //     console.error("Error. One or both of texture and mesh must be given!");
+    // }
 
     // Keep this.
     // const t1 = performance.now();
     // console.debug(`Task loading took ${(t1 - t0) * 0.001}  seconds.`);
 
-    return Promise.all([isMesh, mesh, properties]);
+    return Promise.all([mesh, properties]);
 }
 
 export interface MapLayerProps extends ExtendedLayerProps {
@@ -324,7 +282,7 @@ export default class MapLayer<
 
         const p = loadMeshAndProperties(meshData, propertiesData);
 
-        p.then(([isMesh, meshData, propertiesData]) => {
+        p.then(([meshData, propertiesData]) => {
             // Using inline web worker for calculating the triangle mesh from
             // loaded input data so not to halt the GUI thread.
             const blob = new Blob(
@@ -334,19 +292,15 @@ export default class MapLayer<
             const url = URL.createObjectURL(blob);
             const webWorker = new Worker(url);
 
-            const webworkerParams: Params = [
+            const webworkerParams = this.getWebworkerParams(
                 meshData,
-                propertiesData,
-                isMesh,
-                this.props.frame,
-                this.props.smoothShading,
-                this.props.gridLines,
-            ];
+                propertiesData
+            );
 
-            webWorker.postMessage(webworkerParams, [
-                meshData.buffer,
-                propertiesData.buffer,
-            ]); // transferable objects to avoid copying.
+            webWorker.postMessage(
+                webworkerParams.params,
+                webworkerParams?.transferrables
+            );
             webWorker.onmessage = (e) => {
                 const [
                     positions,
@@ -519,6 +473,35 @@ export default class MapLayer<
             })
         );
         return [layer];
+    }
+
+    private getWebworkerParams(
+        meshData: Float32Array | null,
+        propertiesData: Float32Array | null
+    ): { params: Params; transferrables?: Transferable[] } {
+        if (!meshData && !propertiesData) {
+            throw new Error(
+                "Either mesh or properties or the both must be defined"
+            );
+        }
+
+        const params: Params = [
+            meshData,
+            propertiesData,
+            !!meshData,
+            this.props.frame,
+            this.props.smoothShading,
+            this.props.gridLines,
+        ];
+        const transferrables = [
+            meshData?.buffer,
+            propertiesData?.buffer,
+        ].filter((item) => !!item) as ArrayBuffer[];
+
+        if (transferrables.length > 0) {
+            return { params, transferrables };
+        }
+        return { params };
     }
 }
 
