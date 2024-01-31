@@ -1,3 +1,10 @@
+## [0.14.2](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.14.1...subsurface-viewer@0.14.2) (2024-01-31)
+
+
+### Bug Fixes
+
+* mapLayer web worker crashes if no property data provded. ([#1900](https://github.com/equinor/webviz-subsurface-components/issues/1900)) ([8cfa9d8](https://github.com/equinor/webviz-subsurface-components/commit/8cfa9d802a7e86dbdbb9b07fa2d8edda7bc5bafd))
+
 ## [0.14.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.14.0...subsurface-viewer@0.14.1) (2024-01-30)
 
 
