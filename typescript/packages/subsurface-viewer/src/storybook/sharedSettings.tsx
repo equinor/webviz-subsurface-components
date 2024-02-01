@@ -9,6 +9,13 @@ import type { BoundingBox3D } from "../utils/BoundingBox3D";
 
 import exampleData from "../../../../../example-data/deckgl-map.json";
 
+export const defaultStoryParameters = {
+    docs: {
+        inlineStories: false,
+        iframeHeight: 500,
+    },
+};
+
 export const classes = {
     main: "default-main",
 };
@@ -45,12 +52,7 @@ export const hillshadingLayer = {
     id: "hillshading-layer",
 };
 
-// Map3DLayer
-export const map3DLayer = {
-    ...exampleData[0].layers[2],
-    id: "map3d-layer",
-};
-
+// Axes2DLayer
 export const redAxes2DLayer = {
     "@@type": "Axes2DLayer",
     id: "axes-layer",
@@ -80,10 +82,24 @@ export const northArrowLayer = {
     id: "north-arrow-layer",
 };
 
+export const volveWellsResources = {
+    resources: {
+        wellsData: "./volve_wells.json",
+    },
+};
+
+export const volveWellsFromResourcesLayer = {
+    "@@type": "WellsLayer",
+    id: "volve-wells",
+    data: "@@#resources.wellsData",
+    ZIncreasingDownwards: false,
+};
+
 export const volveWellsLayer = {
     "@@type": "WellsLayer",
     id: "volve-wells",
     data: "./volve_wells.json",
+    ZIncreasingDownwards: false,
 };
 
 export const volveWellsBounds: BoundingBox2D = [
@@ -100,48 +116,69 @@ export const volveWellsWithLogsLayer = {
     logColor: "Stratigraphy",
 };
 
-// Example using "Map" layer. Uses PNG float for mesh.
-export const huginMapDepthPropLayerPng = {
+// Examples using "Map" layers.
+// Naming convention
+// - hugin<size>m<property>MapLayer for float32 data
+// - hugin<size>m<property>MapLayerPng for png data
+export const hugin25mDepthMapLayer = {
     "@@type": "MapLayer",
     id: "hugin_depth",
     meshData: "hugin_depth_25_m.float32",
     frame: {
-        origin: [432150, 6475800] as [number, number],
+        origin: hugin2DOrigin,
         count: [291, 229] as [number, number],
         increment: [25, 25] as [number, number],
         rotDeg: 0,
     },
     propertiesData: "hugin_depth_25_m.float32",
     contours: [0, 100] as [number, number],
-    material: false,
+    // default values are:
+    isContoursDepth: true,
+    gridLines: false,
+    smoothShading: true,
+    material: true,
+    //ZIncreasingDownwards: true,
 };
-export const huginMapNetmapPropLayerPng = {
-    ...huginMapDepthPropLayerPng,
+
+export const hugin25mKhNetmapMapLayer = {
+    ...hugin25mDepthMapLayer,
     id: "hugin_kh_netmap",
     propertiesData: "kh_netmap_25_m.float32",
+    colorMapName: "Physics",
 };
 
 // Example using "Map" layer. Uses PNG float for mesh and properties.
-export const huginMeshMapLayerPng = {
-    "@@type": "MapLayer",
-    id: "hugin-mesh-layer",
+export const hugin25mKhNetmapMapLayerPng = {
+    ...hugin25mDepthMapLayer,
     meshData: "hugin_depth_25_m.png",
-    frame: {
-        origin: [432150, 6475800],
-        count: [291, 229],
-        increment: [25, 25],
-        rotDeg: 0,
-    },
     propertiesData: "kh_netmap_25_m.png",
-    contours: [0, 100],
-    isContoursDepth: true,
-    gridLines: false,
-    material: true,
-    smoothShading: true,
     colorMapName: "Physics",
-    ZIncreasingDownwards: true,
 };
 
+export const hugin5mKhNetmapMapLayer = {
+    "@@type": "MapLayer",
+    id: "mesh-layer",
+    meshUrl: "hugin_depth_5_m.float32",
+    frame: {
+        origin: hugin2DOrigin,
+        count: [1451, 1141],
+        increment: [5, 5],
+        rotDeg: 0,
+    },
+    propertiesUrl: "kh_netmap_5_m.float32",
+    contours: [0, 100],
+    colorMapName: "Physics",
+};
+
+export const default2DViews = {
+    layout: [1, 1] as [number, number],
+    viewports: [
+        {
+            id: "view_1",
+            show3D: false,
+        },
+    ],
+};
 export const default3DViews = {
     layout: [1, 1] as [number, number],
     viewports: [
@@ -152,7 +189,7 @@ export const default3DViews = {
     ],
 };
 
-// Data for custome geojson layer with polyline data
+// Data for custom geojson layer with polyline data
 export const customLayerWithPolylineData = {
     "@@type": "GeoJsonLayer",
     id: "geojson-line-layer",

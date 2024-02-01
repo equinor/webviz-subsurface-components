@@ -1,13 +1,21 @@
-/* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
-/* eslint-disable react-hooks/rules-of-hooks  */ // remove when ready to fix these.
+import React from "react";
+import type { Meta, StoryObj } from "@storybook/react";
+
+import type { PickingInfo } from "@deck.gl/core/typed";
 
 import { styled } from "@mui/material/styles";
-import type { Meta } from "@storybook/react";
-import React from "react";
+
 import SubsurfaceViewer from "../../SubsurfaceViewer";
-import type { PickingInfo } from "@deck.gl/core/typed";
-import WellsLayer from "../wells/wellsLayer";
-import BoxSelectionLayer from "./boxSelectionLayer";
+import WellsLayer from "../../layers/wells/wellsLayer";
+import BoxSelectionLayer from "../../layers/BoxSelectionLayer/boxSelectionLayer";
+
+import { volveWellsBounds } from "../sharedSettings";
+
+const stories: Meta = {
+    component: SubsurfaceViewer,
+    title: "SubsurfaceViewer / Box Selection Layer",
+};
+export default stories;
 
 const PREFIX = "boxSelectionLayer";
 
@@ -43,25 +51,16 @@ const wellsLayer = new WellsLayer({
 
 const DECK_PROPS = {
     id: "DeckGL-Map",
-    bounds: [432205, 6475078, 437720, 6481113] as [
-        number,
-        number,
-        number,
-        number,
-    ],
+    bounds: volveWellsBounds,
     layers: [wellsLayer, boxSelectionLayer],
 };
 
-export default {
-    component: SubsurfaceViewer,
-    title: "SubsurfaceViewer / Box Selection Layer",
-} as Meta;
-
-export const boxSelection = ({
-    enableSelection,
-}: {
+type BoxSelectionComponentProps = {
     enableSelection: boolean;
-}) => {
+};
+const BoxSelectionComponent: React.FC<BoxSelectionComponentProps> = ({
+    enableSelection,
+}: BoxSelectionComponentProps) => {
     const deckProps = React.useMemo(
         () => ({
             ...DECK_PROPS,
@@ -85,11 +84,14 @@ export const boxSelection = ({
     );
 };
 
-boxSelection.args = {
-    enableSelection: true,
+export const BoxSelection: StoryObj<typeof BoxSelectionComponent> = {
+    args: {
+        enableSelection: true,
+    },
+    render: (args) => <BoxSelectionComponent {...args} />,
 };
 
-export const boxSelectionWithCallback = () => {
+const BoxSelectionWithCallbackComponent: React.FC = () => {
     const [data, setData] = React.useState<string[]>([]);
     const getSelectedWellsDataCallBack = React.useCallback(
         (pickingInfos: PickingInfo[]) => {
@@ -130,4 +132,10 @@ export const boxSelectionWithCallback = () => {
             </div>
         </Root>
     );
+};
+
+export const BoxSelectionWithCallback: StoryObj<
+    typeof BoxSelectionWithCallbackComponent
+> = {
+    render: () => <BoxSelectionWithCallbackComponent />,
 };
