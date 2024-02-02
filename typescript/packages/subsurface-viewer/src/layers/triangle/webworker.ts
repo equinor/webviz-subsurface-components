@@ -3,7 +3,7 @@ import type { Params } from "./triangleLayer";
 
 type Vec = [number, number, number];
 
-export function makeFullMesh(e: { data: Params }): void {
+export function makeFullMesh(e: { data: Params }) {
     const params = e.data;
 
     const t0 = performance.now();
@@ -155,11 +155,7 @@ export function makeFullMesh(e: { data: Params }): void {
     };
 
     const t1 = performance.now();
-    console.debug(`Task makeMesh took ${(t1 - t0) * 0.001}  seconds.`);
+    console.debug(`Task makeMesh took ${(t1 - t0) * 0.001} seconds.`);
 
-    // Note: typescript gives this error "error TS2554: Expected 2-3 arguments, but got 1."
-    // Disabling this for now as the second argument should be optional.
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    postMessage([geometryTriangles, geometryLines]);
+    return [geometryTriangles, geometryLines];
 }
