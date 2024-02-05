@@ -1,3 +1,10 @@
+## [0.15.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.15.0...subsurface-viewer@0.15.1) (2024-02-05)
+
+
+### Bug Fixes
+
+* Well head position Z value should match the top of the well trajectory by default if not set explicitly ([#1907](https://github.com/equinor/webviz-subsurface-components/issues/1907)) ([67c84d2](https://github.com/equinor/webviz-subsurface-components/commit/67c84d22974a36cc1630fbf4cb7dcd6d97ada12b))
+
 # [0.15.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.14.3...subsurface-viewer@0.15.0) (2024-02-05)
 
 
