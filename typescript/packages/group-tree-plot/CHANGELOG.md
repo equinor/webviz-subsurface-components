@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/equinor/webviz-subsurface-components/compare/group-tree-plot@1.0.4...group-tree-plot@1.1.0) (2024-02-05)
+
+
+### Features
+
+* use webworker pool to control number of workers ([#1905](https://github.com/equinor/webviz-subsurface-components/issues/1905)) ([304c920](https://github.com/equinor/webviz-subsurface-components/commit/304c920fa229bd8bdd70102e48b6a2445c0cd234))
+
 ## [1.0.4](https://github.com/equinor/webviz-subsurface-components/compare/group-tree-plot@1.0.3...group-tree-plot@1.0.4) (2024-01-19)
 
 

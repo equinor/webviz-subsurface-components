@@ -1,6 +1,6 @@
 {
     "name": "@webviz/subsurface-viewer",
-    "version": "0.14.3",
+    "version": "0.15.0",
     "description": "",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -46,7 +46,8 @@
         "gl-matrix": "^3.4.3",
         "lodash": "^4.17.21",
         "mathjs": "^12.2.1",
-        "react-redux": "^8.1.1"
+        "react-redux": "^8.1.1",
+        "workerpool": "^9.1.0"
     },
     "peerDependencies": {
         "@mui/material": "^5.11",
