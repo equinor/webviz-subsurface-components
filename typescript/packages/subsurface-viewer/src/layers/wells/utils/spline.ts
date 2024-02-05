@@ -2,6 +2,7 @@ import type {
     FeatureCollection,
     GeometryCollection,
     LineString,
+    Point,
 } from "geojson";
 import { cloneDeep } from "lodash";
 import type { Position3D } from "../../utils/layerTools";
@@ -387,7 +388,13 @@ export function invertPath(data_in: FeatureCollection): FeatureCollection {
     for (let well_no = 0; well_no < no_wells; well_no++) {
         const geometryCollection = data.features[well_no]
             .geometry as GeometryCollection;
+
         const lineString = geometryCollection?.geometries[1] as LineString;
+
+        const wellHead = geometryCollection?.geometries[0] as Point;
+        if (wellHead.coordinates?.[2]) {
+            wellHead.coordinates[2] *= -1;
+        }
 
         if (lineString.coordinates?.length === undefined) {
             continue;

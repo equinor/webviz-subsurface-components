@@ -23,9 +23,8 @@ import {
     customLayerWithTextData,
     hillshadingLayer,
     hugin2DBounds,
-    huginMapDepthPropLayerPng,
-    huginMapNetmapPropLayerPng,
-    huginMeshMapLayerPng,
+    hugin25mDepthMapLayer,
+    hugin25mKhNetmapMapLayer,
     redAxes2DLayer,
     subsufaceProps,
 } from "../sharedSettings";
@@ -44,18 +43,18 @@ export default stories;
 export const MultiViewAnnotation: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "multi_view_annotation",
-        layers: [huginMapNetmapPropLayerPng, huginMapDepthPropLayerPng],
+        layers: [hugin25mKhNetmapMapLayer, hugin25mDepthMapLayer],
         views: {
             layout: [1, 2],
             showLabel: true,
             viewports: [
                 {
                     id: "view_1",
-                    layerIds: [huginMapDepthPropLayerPng.id],
+                    layerIds: [hugin25mDepthMapLayer.id],
                 },
                 {
                     id: "view_2",
-                    layerIds: [huginMapNetmapPropLayerPng.id],
+                    layerIds: [hugin25mKhNetmapMapLayer.id],
                 },
             ],
         },
@@ -85,7 +84,7 @@ export const MultiViewAnnotation: StoryObj<typeof SubsurfaceViewer> = {
 export const MultiViewsWithEmptyViews: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "view_initialized_as_empty",
-        layers: [huginMapNetmapPropLayerPng, huginMapDepthPropLayerPng],
+        layers: [hugin25mKhNetmapMapLayer, hugin25mDepthMapLayer],
         views: {} as ViewsType,
     },
 };
@@ -150,7 +149,7 @@ export const SyncedMultiView: StoryObj<typeof SubsurfaceViewer> = {
 export const ViewMatrixMargin: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "DeckGL-Map",
-        layers: [huginMeshMapLayerPng, redAxes2DLayer],
+        layers: [hugin25mKhNetmapMapLayer, redAxes2DLayer],
         bounds: hugin2DBounds,
         views: {
             layout: [2, 2],
@@ -160,25 +159,25 @@ export const ViewMatrixMargin: StoryObj<typeof SubsurfaceViewer> = {
                 {
                     id: "view_1",
                     show3D: false,
-                    layerIds: [huginMeshMapLayerPng.id, redAxes2DLayer.id],
+                    layerIds: [hugin25mKhNetmapMapLayer.id, redAxes2DLayer.id],
                     isSync: true,
                 },
                 {
                     id: "view_2",
                     show3D: false,
-                    layerIds: [huginMeshMapLayerPng.id, redAxes2DLayer.id],
+                    layerIds: [hugin25mKhNetmapMapLayer.id, redAxes2DLayer.id],
                     isSync: true,
                 },
                 {
                     id: "view_3",
                     show3D: false,
-                    layerIds: [huginMeshMapLayerPng.id, redAxes2DLayer.id],
+                    layerIds: [hugin25mKhNetmapMapLayer.id, redAxes2DLayer.id],
                     isSync: false,
                 },
                 {
                     id: "view_4",
                     show3D: false,
-                    layerIds: [huginMeshMapLayerPng.id, redAxes2DLayer.id],
+                    layerIds: [hugin25mKhNetmapMapLayer.id, redAxes2DLayer.id],
                     isSync: false,
                 },
             ],
@@ -297,7 +296,7 @@ export const ViewTabs: StoryObj<typeof ViewerTabs> = {
     args: {
         renderHiddenTabs: true,
         id: "DeckGL-Map",
-        layers: [huginMeshMapLayerPng, redAxes2DLayer],
+        layers: [hugin25mKhNetmapMapLayer, redAxes2DLayer],
         bounds: hugin2DBounds,
         views: {
             layout: [2, 2],
@@ -307,25 +306,25 @@ export const ViewTabs: StoryObj<typeof ViewerTabs> = {
                 {
                     id: "view_1",
                     show3D: false,
-                    layerIds: [huginMeshMapLayerPng.id, redAxes2DLayer.id],
+                    layerIds: [hugin25mKhNetmapMapLayer.id, redAxes2DLayer.id],
                     isSync: true,
                 },
                 {
                     id: "view_2",
                     show3D: false,
-                    layerIds: [huginMeshMapLayerPng.id, redAxes2DLayer.id],
+                    layerIds: [hugin25mKhNetmapMapLayer.id, redAxes2DLayer.id],
                     isSync: true,
                 },
                 {
                     id: "view_3",
                     show3D: false,
-                    layerIds: [huginMeshMapLayerPng.id, redAxes2DLayer.id],
+                    layerIds: [hugin25mKhNetmapMapLayer.id, redAxes2DLayer.id],
                     isSync: false,
                 },
                 {
                     id: "view_4",
                     show3D: false,
-                    layerIds: [huginMeshMapLayerPng.id, redAxes2DLayer.id],
+                    layerIds: [hugin25mKhNetmapMapLayer.id, redAxes2DLayer.id],
                     isSync: false,
                 },
             ],

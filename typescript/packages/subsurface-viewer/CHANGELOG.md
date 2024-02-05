@@ -1,3 +1,60 @@
+## [0.14.3](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.14.2...subsurface-viewer@0.14.3) (2024-01-31)
+
+
+### Bug Fixes
+
+* Crash in MapLayer - "Contour Lines" story ([#1899](https://github.com/equinor/webviz-subsurface-components/issues/1899)) ([c9d97c4](https://github.com/equinor/webviz-subsurface-components/commit/c9d97c4c2206fcf3f00ea711a006666af0a6aa7e))
+
+## [0.14.2](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.14.1...subsurface-viewer@0.14.2) (2024-01-31)
+
+
+### Bug Fixes
+
+* mapLayer web worker crashes if no property data provded. ([#1900](https://github.com/equinor/webviz-subsurface-components/issues/1900)) ([8cfa9d8](https://github.com/equinor/webviz-subsurface-components/commit/8cfa9d802a7e86dbdbb9b07fa2d8edda7bc5bafd))
+
+## [0.14.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.14.0...subsurface-viewer@0.14.1) (2024-01-30)
+
+
+### Bug Fixes
+
+* remove dead Map3DLayer ans update stories to V7 ([#1894](https://github.com/equinor/webviz-subsurface-components/issues/1894)) ([394adcd](https://github.com/equinor/webviz-subsurface-components/commit/394adcda6487252ff7f18d7d4d295f625dac9130))
+
+# [0.14.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.13.8...subsurface-viewer@0.14.0) (2024-01-30)
+
+
+### Features
+
+* **SubsurfaceViewer:** Record-based definition of layers that supports TS Objects implemented. ([#1890](https://github.com/equinor/webviz-subsurface-components/issues/1890)) ([73df3da](https://github.com/equinor/webviz-subsurface-components/commit/73df3dacc8e343dfbd3af4380d208fb5bdf31828))
+
+## [0.13.8](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.13.7...subsurface-viewer@0.13.8) (2024-01-24)
+
+
+### Bug Fixes
+
+* camera update on resize ([#1887](https://github.com/equinor/webviz-subsurface-components/issues/1887)) ([3f7742c](https://github.com/equinor/webviz-subsurface-components/commit/3f7742c98abda59a5c7f9818447eeb2cc052e106))
+
+## [0.13.7](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.13.6...subsurface-viewer@0.13.7) (2024-01-22)
+
+
+### Bug Fixes
+
+* [NGRM] - For wells the property "ZIncreasingDownwards" does not honor… ([#1886](https://github.com/equinor/webviz-subsurface-components/issues/1886)) ([a88f3c3](https://github.com/equinor/webviz-subsurface-components/commit/a88f3c387c7ba8c5d4ebb300905ebf4fba5707c3))
+
+## [0.13.6](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.13.5...subsurface-viewer@0.13.6) (2024-01-22)
+
+
+### Bug Fixes
+
+* do not display "Loading assets" feedback when isRenderedCallback exists ([#1882](https://github.com/equinor/webviz-subsurface-components/issues/1882)) ([12431d8](https://github.com/equinor/webviz-subsurface-components/commit/12431d8375b869a7a01b14eb70e17fdd8cbe21a0))
+
+## [0.13.5](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.13.4...subsurface-viewer@0.13.5) (2024-01-19)
+
+
+### Bug Fixes
+
+* add missing dependencies ([#1881](https://github.com/equinor/webviz-subsurface-components/issues/1881)) ([7e5fbc4](https://github.com/equinor/webviz-subsurface-components/commit/7e5fbc49d98732e33c4edce90babc52e0ecccf1a))
+* remove some unused dependencies ([#1880](https://github.com/equinor/webviz-subsurface-components/issues/1880)) ([3703825](https://github.com/equinor/webviz-subsurface-components/commit/37038250f05b0843a5a632c3e9e176ab15439e30))
+
 ## [0.13.4](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.13.3...subsurface-viewer@0.13.4) (2024-01-12)
 
 

@@ -35,12 +35,8 @@ import type { LogViewer } from "@equinor/videx-wellog";
 
 import type { Info, InfoOptions } from "./components/InfoTypes";
 
-import { isEqualRanges } from "./components/WellLogView";
+import { isEqualRanges, isEqDomains } from "./utils/log-viewer";
 
-function isEqDomains(d1: [number, number], d2: [number, number]): boolean {
-    const eps: number = Math.abs(d1[1] - d1[0] + (d2[1] - d2[0])) * 0.00001;
-    return Math.abs(d1[0] - d2[0]) < eps && Math.abs(d1[1] - d2[1]) < eps;
-}
 export function isEqualArrays(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     d1: undefined | any[],
@@ -190,7 +186,7 @@ export const argTypesSyncLogViewerProp = {
 
     spacers: {
         description:
-            "Set to true or spacer width or to array of widths if WellLogSpacers should be used",
+            "Set to true or to spacers width or to array of spacer widths if WellLogSpacers should be used",
     },
     wellDistances: {
         description: "Distanses between wells to show on the spacers",
@@ -286,11 +282,11 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
             sliderValue: 4.0, // zoom
         };
 
-        this.controllers = [null, null];
-        this.spacers = [null, null];
+        this.controllers = [];
+        this.spacers = [];
         this.collapsedTrackIds = [];
         this.callbacks = [];
-        this.fillViewCallbacks(this.props.welllogs.length);
+        this.fillViewsCallbacks(this.props.welllogs.length);
 
         this.onChangePrimaryAxis = this.onChangePrimaryAxis.bind(this);
         this.onZoomSliderChange = this.onZoomSliderChange.bind(this);
@@ -300,6 +296,10 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
     componentDidMount(): void {
         this.syncTrackScrollPos(0);
         this.syncContentScrollPos(0);
+        {
+            // fix after setting the commonBaseDomain
+            this.setControllersZoom();
+        }
         this.syncContentSelection(0);
         this.setSliderValue();
     }
@@ -319,8 +319,33 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         nextProps: SyncLogViewerProps /*, nextState: State*/
     ): void {
         // called before render()
-        if (this.props.welllogs.length !== nextProps.welllogs.length)
-            this.fillViewCallbacks(nextProps.welllogs.length); // update this.callbacks[] before render()
+        if (this.props.welllogs.length === nextProps.welllogs.length) return;
+        if (this.controllers.length === nextProps.welllogs.length) return;
+        /*
+        // move old controllers to new places in the controllers array
+        const controllers: (WellLogController | null)[] = [];
+        const spacers: (WellLogSpacer | null)[] = [];
+        for (const wellLog of nextProps.welllogs) {
+            const index = this.controllers.findIndex(
+                (controller) => controller?.getWellLog() === wellLog
+            );
+            if (index < 0) {
+                controllers.push(null);
+                spacers.push(null);
+            }
+            else {
+                controllers.push(this.controllers.splice(index, 1)[0]);
+                spacers.push(this.spacers.splice(index, 1)[0]);
+            }
+        }
+        this.controllers = controllers;
+        this.spacers = spacers;
+        */
+        // just resize arrays
+        this.controllers.length = nextProps.welllogs.length;
+        this.spacers.length = nextProps.welllogs.length;
+
+        this.fillViewsCallbacks(nextProps.welllogs.length); // update this.callbacks[] before render()
     }
 
     componentDidUpdate(
@@ -340,25 +365,32 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
             });
         }
 
-        if (!isEqualRanges(this.props.domain, prevProps.domain)) {
+        if (
+            this.props.syncContentDomain !== prevProps.syncContentDomain ||
+            !isEqualRanges(this.props.domain, prevProps.domain)
+        ) {
             this.setControllersZoom();
         }
         if (
+            this.props.syncContentDomain !== prevProps.syncContentDomain ||
             this.props.wellpicks !== prevProps.wellpicks ||
             !isEqualArrays(
                 this.props.wellpickFlatting,
                 prevProps.wellpickFlatting
-            )
+            ) ||
+            this.props.welllogs.length !== prevProps.welllogs.length
         ) {
-            this.syncContentScrollPos(0); // force to redraw
+            this.syncContentScrollPos(0); // force to redraw visible domain
         }
 
-        if (isEqualRanges(this.props.selection, prevProps.selection)) {
+        if (!isEqualRanges(this.props.selection, prevProps.selection)) {
             this.setControllersSelection();
         }
 
         if (
-            this.props.syncContentSelection !== prevProps.syncContentSelection
+            this.props.syncContentSelection !==
+                prevProps.syncContentSelection ||
+            this.props.welllogs.length !== prevProps.welllogs.length
         ) {
             this.syncContentSelection(0); // force to redraw selection
         }
@@ -399,31 +431,27 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         return { axes, primaryAxis };
     }
 
-    fillViewCallbacks(nViews: number): void {
-        this.callbacks = [];
-        for (let iView = 0; iView < nViews; iView++) {
-            this.callbacks.push({
-                onCreateControllerBind: this.onCreateController.bind(
-                    this,
-                    iView
-                ),
-                onInfoBind: this.onInfo.bind(this, iView),
-                onTrackScrollBind: this.onTrackScroll.bind(this, iView),
-                onTrackSelectionBind: this.onTrackSelection.bind(this, iView),
-                onContentRescaleBind: this.onContentRescale.bind(this, iView),
-                onContentSelectionBind: this.onContentSelection.bind(
-                    this,
-                    iView
-                ),
-                onTemplateChangedBind: this.onTemplateChanged.bind(this, iView),
-            });
-        }
+    fillViewCallbacks(iView: number): void {
+        this.callbacks.push({
+            onCreateControllerBind: this.onCreateController.bind(this, iView),
+            onInfoBind: this.onInfo.bind(this, iView),
+            onTrackScrollBind: this.onTrackScroll.bind(this, iView),
+            onTrackSelectionBind: this.onTrackSelection.bind(this, iView),
+            onContentRescaleBind: this.onContentRescale.bind(this, iView),
+            onContentSelectionBind: this.onContentSelection.bind(this, iView),
+            onTemplateChangedBind: this.onTemplateChanged.bind(this, iView),
+        });
+    }
+    fillViewsCallbacks(nViews: number): void {
+        for (let iView = this.callbacks.length; iView < nViews; iView++)
+            this.fillViewCallbacks(iView);
+        this.callbacks.length = nViews;
     }
 
     updateReadoutPanel(): void {
         for (const controller of this.controllers) {
             if (!controller) continue;
-            controller.selectContent(controller.getContentSelection()); // force to update readout panel
+            controller.updateInfo(); // force to update readout panel
         }
     }
 
@@ -521,6 +549,9 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         controller.scrollContentTo(fContent);
 
         const domain = controller.getContentDomain();
+        if (domain[0] === 0 && domain[1] === 0)
+            // controller.logController not created yet
+            return;
         for (const _controller of this.controllers) {
             if (!_controller || _controller == controller) continue;
             if (
@@ -584,8 +615,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
             !(this.props.wellpickFlatting && this.props.wellpicks) &&
             this.props.syncContentDomain
         ) {
-            const commonBaseDomain: [number, number] =
-                this.getCommonContentBaseDomain();
+            const commonBaseDomain = this.getCommonContentBaseDomain();
             for (const controller of this.controllers) {
                 if (!controller) continue;
                 const baseDomain = controller.getContentBaseDomain();
@@ -707,6 +737,11 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         const controller = this.controllers[iView];
         if (!controller) return;
 
+        const domain = controller.getContentDomain();
+        if (domain[0] === 0 && domain[1] === 0)
+            // controller.logController not created yet
+            return;
+
         let updated = false;
         const wellpickFlatting = this.props.wellpickFlatting;
         const syncContentDomain = this.props.syncContentDomain;
@@ -718,9 +753,9 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         if (this.props.wellpicks && wellpickFlatting) {
             coeff = this.makeFlattingCoeffs();
         }
+
         // synchronize base domains
         updated = this.syncContentBaseDomain();
-        const domain = controller.getContentDomain();
 
         let j = -1;
         for (const _controller of this.controllers) {
@@ -775,6 +810,13 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         }
 
         if (updated) {
+            {
+                // restore
+                const _domain = controller.getContentDomain();
+                if (!isEqDomains(_domain, domain))
+                    controller.zoomContentTo(domain);
+            }
+
             for (let i = iView - 1; i <= iView; i++) {
                 const spacer = this.spacers[i];
                 if (!spacer) continue;
@@ -818,7 +860,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
             if (this.props.domain) {
                 controller.zoomContentTo(this.props.domain);
                 //this.forceUpdate();
-                break; // Set the domain only to the first controllers. Another controllers should be set by syncContentDomain or wellpickFlatting options
+                if (this.props.syncContentDomain) break; // Set the domain only to the first controllers. Another controllers should be set by syncContentDomain or wellpickFlatting options
             }
         }
     }
@@ -868,6 +910,8 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                 horizontal={this.props.horizontal}
                 axisTitles={this.props.axisTitles}
                 axisMnemos={this.props.axisMnemos}
+                domain={this.props.domain}
+                selection={this.props.selection}
                 primaryAxis={this.state.primaryAxis}
                 options={options}
                 onInfo={callbacks.onInfoBind}
@@ -1108,6 +1152,7 @@ SyncLogViewer.propTypes = {
      */
     spacers: PropTypes.oneOfType([
         PropTypes.bool,
+        PropTypes.number,
         PropTypes.arrayOf(PropTypes.number),
     ]),
 

@@ -16,8 +16,8 @@ export type Params = {
 };
 
 async function loadData(
-    pointsData: string | number[],
-    triangleData: string | number[]
+    pointsData: string | number[] | Float32Array,
+    triangleData: string | number[] | Uint32Array
 ) {
     // Keep
     //const t0 = performance.now();
@@ -27,6 +27,8 @@ async function loadData(
     if (Array.isArray(pointsData)) {
         // Input data is native javascript array.
         vertexArray = new Float32Array(pointsData);
+    } else if (pointsData instanceof Float32Array) {
+        vertexArray = pointsData;
     } else {
         // Input data is an URL.
         const response_mesh = await fetch(pointsData);
@@ -46,6 +48,8 @@ async function loadData(
     if (Array.isArray(triangleData)) {
         // Input data is native javascript array.
         indexArray = new Uint32Array(triangleData);
+    } else if (triangleData instanceof Uint32Array) {
+        indexArray = triangleData;
     } else {
         // Input data is an URL.
         const response_mesh = await fetch(triangleData);
@@ -71,9 +75,9 @@ export interface TriangleLayerProps extends ExtendedLayerProps {
     /** Triangle vertexes.
      * Either an URL or an array of numbers.
      */
-    pointsData: string | number[];
+    pointsData: string | number[] | Float32Array;
 
-    triangleData: string | number[];
+    triangleData: string | number[] | Uint32Array;
 
     color: [number, number, number];
 

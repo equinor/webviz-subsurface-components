@@ -257,7 +257,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
     initializeState(): void {
         let data = this.props.data as unknown as FeatureCollection;
         if (typeof data !== "undefined" && !isEqual(data, [])) {
-            if (!this.props.ZIncreasingDownwards) {
+            if (this.props.ZIncreasingDownwards) {
                 data = invertPath(data);
             }
 

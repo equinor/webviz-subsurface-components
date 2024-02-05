@@ -27,6 +27,7 @@ import type { WellLog, WellLogCurve } from "./WellLogTypes";
 import type { Template } from "./WellLogTemplateTypes";
 import type { ColorTable } from "./ColorTableTypes";
 import type { PatternsTable } from "../utils/pattern";
+import { isEqualRanges } from "../utils/log-viewer";
 
 import { getDiscreteColorAndName, getDiscreteMeta } from "../utils/tracks";
 import { createTracks } from "../utils/tracks";
@@ -95,16 +96,14 @@ function showSelection(
         const pinelm1 = pinelm.firstElementChild as HTMLElement;
         let min, max;
         if (vPin < vCur) {
-            pinelm1.style[
-                horizontal ? "left" : "top"
-            ] = `${rubberBandOffset}px`;
+            pinelm1.style[horizontal ? "left" : "top"] =
+                `${rubberBandOffset}px`;
             pinelm1.style[horizontal ? "right" : "bottom"] = "";
             min = vPin;
             max = vCur;
         } else {
-            pinelm1.style[
-                horizontal ? "right" : "bottom"
-            ] = `${rubberBandOffset}px`;
+            pinelm1.style[horizontal ? "right" : "bottom"] =
+                `${rubberBandOffset}px`;
             pinelm1.style[horizontal ? "left" : "top"] = "";
             min = vCur;
             max = vPin;
@@ -142,6 +141,8 @@ function addRubberbandOverlay(instance: LogViewer, parent: WellLogView) {
                     instance
                 );
             }
+            parent.setInfo(parent.selCurrent);
+            parent.onContentSelection();
         },
         onMouseExit: (event: OverlayMouseExitEvent) => {
             if (event.target) {
@@ -210,9 +211,6 @@ function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
                     : "-";
                 elem.style.visibility = "visible";
             }
-
-            parent.setInfo(value);
-            parent.onContentSelection();
         },
         onMouseExit: (event: OverlayMouseExitEvent): void => {
             const elem = event.target;
@@ -714,7 +712,7 @@ function setTracksToController(
     logController.scaleHandler = new InterpolatedScaleHandler(
         scaleInterpolator
     );
-    logController.domain = minmaxPrimaryAxis;
+    setContentBaseDomain(logController, minmaxPrimaryAxis);
     logController.setTracks(tracks);
     return scaleInterpolator;
 }
@@ -925,8 +923,12 @@ export interface WellLogController {
     setSelectedTrackIndices(selection: number[]): boolean;
     getSelectedTrackIndices(): number[];
 
+    updateInfo(): void;
+
     setTemplate(template: Template): void;
     getTemplate(): Template;
+
+    getWellLog(): WellLog | undefined;
 }
 
 import type { Info } from "./InfoTypes";
@@ -1180,17 +1182,6 @@ export function shouldUpdateWellLogView(
     return false;
 }
 
-export function isEqualRanges(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    d1: undefined | [any, any],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    d2: undefined | [any, any]
-): boolean {
-    if (!d1) return !d2;
-    if (!d2) return !d1;
-    return d1[0] === d2[0] && d1[1] === d2[1];
-}
-
 interface State {
     infos: Info[];
 
@@ -1307,6 +1298,8 @@ class WellLogView
             this.props.options?.checkDatafileSchema !==
                 prevProps.options?.checkDatafileSchema
         ) {
+            selection = this.props.selection;
+            selectedTrackIndices = this.getSelectedTrackIndices();
             shouldSetTracks = true;
             checkSchema = true;
         }
@@ -1349,6 +1342,7 @@ class WellLogView
         if (shouldSetTracks) {
             this.setTracks(checkSchema); // use this.template
             setSelectedTrackIndices(this.logController, selectedTrackIndices);
+            this.setControllerZoom(); // force to show props.domain (important in SyncWellViewer)
             if (selection) this.selectContent(selection);
         } else if (
             this.state.scrollTrackPos !== prevState.scrollTrackPos ||
@@ -1357,7 +1351,7 @@ class WellLogView
         ) {
             this.onTrackScroll();
             this.onTrackSelection();
-            this.setInfo();
+            this.updateInfo();
         }
 
         if (
@@ -1409,7 +1403,7 @@ class WellLogView
 
             initOverlays(this.logController, this);
         }
-        this.setInfo();
+        this.updateInfo();
     }
     getAxesInfo(): AxesInfo {
         // get Object keys available in the welllog
@@ -1462,9 +1456,10 @@ class WellLogView
         }
         this.setControllerZoom();
         this.setControllerSelection();
+        this.setControllerZoom();
         this.onTrackScroll();
         this.onTrackSelection();
-        this.setInfo(); // Clear old track information
+        this.updateInfo(); // Clear old track information
     }
 
     findTrackById(trackId: string | number): Track | undefined {
@@ -1521,7 +1516,7 @@ class WellLogView
     }
 
     onTemplateChanged(): void {
-        this.setInfo();
+        this.updateInfo();
 
         this.template = this._generateTemplate(); // save current template
 
@@ -1530,20 +1525,20 @@ class WellLogView
 
     // content
     zoomContentTo(domain: [number, number]): boolean {
-        if (this.logController)
-            return zoomContentTo(this.logController, domain);
-        return false;
+        if (!this.logController) return false;
+        return zoomContentTo(this.logController, domain);
     }
     scrollContentTo(f: number): boolean {
-        if (this.logController) return scrollContentTo(this.logController, f);
-        return false;
+        if (!this.logController) return false;
+        return scrollContentTo(this.logController, f);
     }
     zoomContent(zoom: number): boolean {
-        if (this.logController) return zoomContent(this.logController, zoom);
-        return false;
+        if (!this.logController) return false;
+        return zoomContent(this.logController, zoom);
     }
     showSelection(): void {
         if (!this.logController) return;
+        const horizontal = this.props.horizontal;
         const elements = this.logController.overlay.elements;
         const rbelm = elements["rubber-band"];
         const pinelm = elements["pinned"];
@@ -1557,7 +1552,7 @@ class WellLogView
                 pinelm,
                 this.selCurrent,
                 this.selPinned,
-                this.props.horizontal,
+                horizontal,
                 this.logController
             );
         }
@@ -1573,12 +1568,7 @@ class WellLogView
                 const elmName = "wp" + horizon;
                 const pinelm = elements[elmName];
                 if (!pinelm) continue;
-                showWellPick(
-                    pinelm,
-                    vPrimary,
-                    this.props.horizontal,
-                    this.logController
-                );
+                showWellPick(pinelm, vPrimary, horizontal, this.logController);
                 if (this.props.patterns) {
                     const elmName1 = "wpFill" + horizon;
                     const pinelm1 = elements[elmName1];
@@ -1589,7 +1579,7 @@ class WellLogView
                             pinelm1,
                             vPrimary,
                             vPrimary2,
-                            this.props.horizontal,
+                            horizontal,
                             this.logController
                         );
                     }
@@ -1608,24 +1598,24 @@ class WellLogView
         this.selPersistent = this.selPinned !== undefined;
 
         this.showSelection();
-        this.setInfo(); // reflect new value in this.selCurrent
+        this.updateInfo(); // reflect new value in this.selCurrent
     }
 
     setContentBaseDomain(domain: [number, number]): void {
-        if (this.logController)
-            setContentBaseDomain(this.logController, domain);
+        if (!this.logController) return;
+        setContentBaseDomain(this.logController, domain);
     }
     getContentBaseDomain(): [number, number] {
-        if (this.logController) return getContentBaseDomain(this.logController);
-        return [0.0, 0.0];
+        if (!this.logController) return [0.0, 0.0];
+        return getContentBaseDomain(this.logController);
     }
     getContentDomain(): [number, number] {
-        if (this.logController) return getContentDomain(this.logController);
-        return [0.0, 0.0];
+        if (!this.logController) return [0.0, 0.0];
+        return getContentDomain(this.logController);
     }
     getContentZoom(): number {
-        if (this.logController) return getContentZoom(this.logController);
-        return 1.0;
+        if (!this.logController) return 1.0;
+        return getContentZoom(this.logController);
     }
     getContentSelection(): [number | undefined, number | undefined] {
         if (!this.logController) return [undefined, undefined];
@@ -1647,11 +1637,9 @@ class WellLogView
         return newPos;
     }
     _maxVisibleTrackNum(): number {
-        if (this.props.options?.maxVisibleTrackNum) {
+        if (this.props.options?.maxVisibleTrackNum)
             return this.props.options?.maxVisibleTrackNum;
-        } else {
-            return this.props.horizontal ? 3 : 5 /*some default value*/;
-        }
+        return this.props.horizontal ? 3 : 5 /*some default value*/;
     }
     _forceUpdateTitleTooltips(): void {
         // workaround to refresh tooltips in videx wellog component
@@ -1660,8 +1648,6 @@ class WellLogView
         for (const element of elements) {
             if (element.textContent)
                 element.setAttribute("title", element.textContent);
-            //const title=element.getAttribute("title");
-            //console.log(title);
         }
     }
 
@@ -1701,6 +1687,13 @@ class WellLogView
         const changed = setSelectedTrackIndices(this.logController, selection);
         if (changed) this.onTrackSelection();
         return changed;
+    }
+    updateInfo(): void {
+        this.setInfo(); // reflect new value in this.selCurrent
+    }
+
+    getWellLog(): WellLog | undefined {
+        return this.props.welllog;
     }
 
     getTemplate(): Template {
@@ -1777,7 +1770,7 @@ class WellLogView
                 this.scrollTrackBy(+1);
             else {
                 this.onTrackScroll();
-                this.setInfo();
+                this.updateInfo();
             }
             this.selectTrack(trackNew, true);
         }

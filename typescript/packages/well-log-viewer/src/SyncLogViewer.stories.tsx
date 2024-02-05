@@ -60,7 +60,7 @@ export default {
         },
         spacers: {
             description:
-                "Set to true or to array of spaser widths if WellLogSpacers should be used",
+                "Set to true or to spacers width or to array of spacer widths if WellLogSpacers should be used",
         },
         wellDistances: {
             description: "Distanses between wells to show on the spacers",

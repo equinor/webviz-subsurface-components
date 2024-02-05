@@ -1,3 +1,17 @@
+## [0.4.4](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.4.3...wsc-common@0.4.4) (2024-01-19)
+
+
+### Bug Fixes
+
+* add missing dependencies ([#1881](https://github.com/equinor/webviz-subsurface-components/issues/1881)) ([7e5fbc4](https://github.com/equinor/webviz-subsurface-components/commit/7e5fbc49d98732e33c4edce90babc52e0ecccf1a))
+
+## [0.4.3](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.4.2...wsc-common@0.4.3) (2024-01-18)
+
+
+### Bug Fixes
+
+* remove some unused dependencies ([#1880](https://github.com/equinor/webviz-subsurface-components/issues/1880)) ([3703825](https://github.com/equinor/webviz-subsurface-components/commit/37038250f05b0843a5a632c3e9e176ab15439e30))
+
 ## [0.4.2](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.4.1...wsc-common@0.4.2) (2024-01-10)
 
 

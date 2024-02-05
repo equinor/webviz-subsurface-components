@@ -1,3 +1,31 @@
+## [1.3.9](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.3.8...well-log-viewer@1.3.9) (2024-01-28)
+
+
+### Bug Fixes
+
+* Process initial domain and selection props in SyncLogViewer ([#1870](https://github.com/equinor/webviz-subsurface-components/issues/1870)) ([a4ab40c](https://github.com/equinor/webviz-subsurface-components/commit/a4ab40c1290cac27dac162d3b77533b67bcfa3b9)), closes [#1861](https://github.com/equinor/webviz-subsurface-components/issues/1861) [#1862](https://github.com/equinor/webviz-subsurface-components/issues/1862)
+
+## [1.3.8](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.3.7...well-log-viewer@1.3.8) (2024-01-19)
+
+
+### Bug Fixes
+
+* add missing dependencies ([#1881](https://github.com/equinor/webviz-subsurface-components/issues/1881)) ([7e5fbc4](https://github.com/equinor/webviz-subsurface-components/commit/7e5fbc49d98732e33c4edce90babc52e0ecccf1a))
+
+## [1.3.7](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.3.6...well-log-viewer@1.3.7) (2024-01-18)
+
+
+### Bug Fixes
+
+* remove some unused dependencies ([#1880](https://github.com/equinor/webviz-subsurface-components/issues/1880)) ([3703825](https://github.com/equinor/webviz-subsurface-components/commit/37038250f05b0843a5a632c3e9e176ab15439e30))
+
+## [1.3.6](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.3.5...well-log-viewer@1.3.6) (2024-01-17)
+
+
+### Bug Fixes
+
+* InfoPanel drawing in WellLogViewer ([#1877](https://github.com/equinor/webviz-subsurface-components/issues/1877)) ([99eb83b](https://github.com/equinor/webviz-subsurface-components/commit/99eb83bd64232578566286e74c710d469620468f)), closes [#1864](https://github.com/equinor/webviz-subsurface-components/issues/1864) [#1874](https://github.com/equinor/webviz-subsurface-components/issues/1874) [#1878](https://github.com/equinor/webviz-subsurface-components/issues/1878)
+
 ## [1.3.5](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.3.4...well-log-viewer@1.3.5) (2024-01-15)
 
 
