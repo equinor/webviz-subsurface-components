@@ -32,16 +32,14 @@ export function removeConsecutiveDuplicates(
 
     return [coords, mds];
 }
-
-export function removeDuplicates(data: FeatureCollection): void {
+// Remove duplicates in well string
+// If z value of well head not defined set it to top of well string.
+export function checkWells(data: FeatureCollection): void {
     const no_wells = data.features.length;
     for (let well_no = 0; well_no < no_wells; well_no++) {
-        const mds = data.features[well_no].properties?.["md"];
-        if (mds === undefined) {
-            continue;
-        }
         const geometryCollection = data.features[well_no]
             .geometry as GeometryCollection;
+
         const lineString = geometryCollection?.geometries[1] as LineString;
 
         if (lineString.coordinates?.length === undefined) {
@@ -49,6 +47,17 @@ export function removeDuplicates(data: FeatureCollection): void {
         }
 
         let coords = lineString.coordinates as Position3D[];
+
+        // If not defined set wellhead z value to top of well string.
+        const wellHead = geometryCollection?.geometries[0] as Point;
+        if (wellHead.coordinates && wellHead.coordinates.length === 2) {
+            wellHead.coordinates.push(coords[0][2]);
+        }
+
+        const mds = data.features[well_no].properties?.["md"];
+        if (mds === undefined) {
+            continue;
+        }
 
         const nOrig = coords.length;
         [coords, mds[0]] = removeConsecutiveDuplicates(coords, mds[0]);
