@@ -47,15 +47,16 @@ const testWellWithDuplicates = {
                 geometries: [
                     {
                         type: "Point",
-                        coordinates: [0, 0, 0],
+                        coordinates: [0, 0],
                     },
                     {
                         type: "LineString",
                         coordinates: [
-                            [0, 0, 0],
                             [0, 0, -100],
                             [0, 0, -200],
                             [0, 0, -300],
+                            [0, 0, -400],
+                            [0, 0, -400],
                             [0, 0, -400],
                             [0, 0, -500],
                             [0, 0, -600],
