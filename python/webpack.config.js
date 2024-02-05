@@ -42,6 +42,11 @@ module.exports = function (env, argv) {
         externals,
         resolve: {
             extensions: [".ts", ".tsx", ".js", ".jsx", ".json"],
+            fallback: {
+                os: false,
+                child_process: false,
+                worker_threads: false,
+            },
         },
         devtool: "source-map",
         module: {
