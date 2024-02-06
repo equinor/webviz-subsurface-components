@@ -1,5 +1,12 @@
+import type React from "react";
+import { isEqual, merge } from "lodash";
+
 import type { Color } from "@deck.gl/core/typed";
 import { CompositeLayer } from "@deck.gl/core/typed";
+import { load, JSONLoader } from "@loaders.gl/core";
+
+import workerpool from "workerpool";
+
 import type { Material } from "./privateGrid3dLayer";
 import PrivateLayer from "./privateGrid3dLayer";
 import type {
@@ -11,8 +18,37 @@ import type {
     ReportBoundingBoxAction,
 } from "../../components/Map";
 import { makeFullMesh } from "./webworker";
-import { isEqual } from "lodash";
-import { load, JSONLoader } from "@loaders.gl/core";
+
+import config from "../../SubsurfaceConfig.json";
+
+function findConfig(
+    config: Record<string, unknown>,
+    path: string[]
+): Record<string, unknown> | undefined {
+    if (!config) {
+        return undefined;
+    }
+    if (path.length === 0) {
+        return config;
+    }
+    const first = path.shift() as string;
+    return findConfig(config[first] as Record<string, unknown>, path);
+}
+
+// init workerpool
+const workerPoolConfig = merge(
+    {},
+    config["config"]["workerpool"],
+    findConfig(config, ["config", "layer", "Grid3DLayer", "workerpool"])
+);
+
+const pool = workerpool.pool({
+    ...{
+        maxWorkers: 10,
+        workerType: "web",
+    },
+    ...workerPoolConfig,
+});
 
 export type WebWorkerParams = {
     points: Float32Array;
@@ -213,12 +249,6 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
 
             // Using inline web worker for calculating the triangle mesh from
             // loaded input data so not to halt the GUI thread.
-            const blob = new Blob(
-                ["self.onmessage = ", makeFullMesh.toString()],
-                { type: "text/javascript" }
-            );
-            const url = URL.createObjectURL(blob);
-            const webWorker = new Worker(url);
 
             const webworkerParams: WebWorkerParams = {
                 points,
@@ -226,9 +256,8 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
                 properties,
             };
 
-            webWorker.postMessage(webworkerParams);
-            webWorker.onmessage = (e) => {
-                const [mesh, mesh_lines, propertyValueRange] = e.data;
+            pool.exec(makeFullMesh, [{ data: webworkerParams }]).then((e) => {
+                const [mesh, mesh_lines, propertyValueRange] = e;
                 const legend = {
                     discrete: false,
                     valueRange: this.props.colorMapRange ?? propertyValueRange,
@@ -252,13 +281,11 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
                     this.props.reportBoundingBox({ layerBoundingBox: bbox });
                 }
 
-                webWorker.terminate();
-
                 this.setState({
                     ...this.state,
                     isFinishedLoading: true,
                 });
-            };
+            });
         });
     }
 

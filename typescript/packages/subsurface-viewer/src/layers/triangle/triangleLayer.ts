@@ -1,5 +1,5 @@
 import type React from "react";
-import { isEqual } from "lodash";
+import { merge, isEqual } from "lodash";
 
 import type { UpdateParameters } from "@deck.gl/core/typed";
 import { CompositeLayer } from "@deck.gl/core/typed";
@@ -12,6 +12,8 @@ import type { ExtendedLayerProps } from "../utils/layerTools";
 import type { ReportBoundingBoxAction } from "../../components/Map";
 import { makeFullMesh } from "./webworker";
 
+import config from "../../SubsurfaceConfig.json";
+
 export type Params = {
     vertexArray: Float32Array;
     indexArray: Uint32Array;
@@ -20,9 +22,18 @@ export type Params = {
 };
 
 // init workerpool
+const workerPoolConfig = merge(
+    {},
+    config["config"]["workerpool"],
+    config["config"]["layer"]["TriangleLayer"]["workerpool"]
+);
+
 const pool = workerpool.pool({
-    maxWorkers: 10,
-    workerType: "web",
+    ...{
+        maxWorkers: 10,
+        workerType: "web",
+    },
+    ...workerPoolConfig,
 });
 
 async function loadData(
