@@ -37,6 +37,13 @@ const pool = workerpool.pool({
     ...workerPoolConfig,
 });
 
+function onTerminateWorker() {
+    const stats = pool.stats();
+    if (stats.busyWorkers === 0 && stats.pendingTasks === 0) {
+        pool.terminate();
+    }
+}
+
 async function loadData(
     pointsData: string | number[] | Float32Array,
     triangleData: string | number[] | Uint32Array
@@ -241,6 +248,8 @@ export default class TriangleLayer extends CompositeLayer<TriangleLayerProps> {
                     ...this.state,
                     isFinishedLoading: true,
                 });
+
+                onTerminateWorker();
             });
         });
     }

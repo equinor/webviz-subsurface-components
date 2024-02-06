@@ -44,6 +44,13 @@ const pool = workerpool.pool({
     ...workerPoolConfig,
 });
 
+function onTerminateWorker() {
+    const stats = pool.stats();
+    if (stats.busyWorkers === 0 && stats.pendingTasks === 0) {
+        pool.terminate();
+    }
+}
+
 // This type describes the mesh' extent in the horizontal plane.
 type Frame = {
     /** mesh origin
@@ -385,6 +392,7 @@ export default class MapLayer<
                             ],
                         });
                     }
+                    onTerminateWorker();
                 }
             ); // end webworker then
         }); // end then

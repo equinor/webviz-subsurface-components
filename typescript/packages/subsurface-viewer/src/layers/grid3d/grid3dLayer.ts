@@ -37,6 +37,13 @@ const pool = workerpool.pool({
     ...workerPoolConfig,
 });
 
+function onTerminateWorker() {
+    const stats = pool.stats();
+    if (stats.busyWorkers === 0 && stats.pendingTasks === 0) {
+        pool.terminate();
+    }
+}
+
 export type WebWorkerParams = {
     points: Float32Array;
     polys: Uint32Array;
@@ -272,6 +279,8 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
                     ...this.state,
                     isFinishedLoading: true,
                 });
+
+                onTerminateWorker();
             });
         });
     }
