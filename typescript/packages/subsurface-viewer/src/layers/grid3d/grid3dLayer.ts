@@ -1,5 +1,5 @@
 import type React from "react";
-import { isEqual, merge } from "lodash";
+import { isEqual } from "lodash";
 
 import type { Color } from "@deck.gl/core/typed";
 import { CompositeLayer } from "@deck.gl/core/typed";
@@ -20,26 +20,13 @@ import type {
 import { makeFullMesh } from "./webworker";
 
 import config from "../../SubsurfaceConfig.json";
-
-function findConfig(
-    config: Record<string, unknown>,
-    path: string[]
-): Record<string, unknown> | undefined {
-    if (!config) {
-        return undefined;
-    }
-    if (path.length === 0) {
-        return config;
-    }
-    const first = path.shift() as string;
-    return findConfig(config[first] as Record<string, unknown>, path);
-}
+import { findConfig } from "../../utils/configTools";
 
 // init workerpool
-const workerPoolConfig = merge(
-    {},
-    config["config"]["workerpool"],
-    findConfig(config, ["config", "layer", "Grid3DLayer", "workerpool"])
+const workerPoolConfig = findConfig(
+    config,
+    "config/workerpool",
+    "config/layer/Grid3DLayer/workerpool"
 );
 
 const pool = workerpool.pool({

@@ -1,5 +1,5 @@
 import type React from "react";
-import { merge, isEqual } from "lodash";
+import { isEqual } from "lodash";
 
 import type { UpdateParameters } from "@deck.gl/core/typed";
 import { CompositeLayer } from "@deck.gl/core/typed";
@@ -13,6 +13,7 @@ import type { ReportBoundingBoxAction } from "../../components/Map";
 import { makeFullMesh } from "./webworker";
 
 import config from "../../SubsurfaceConfig.json";
+import { findConfig } from "../../utils/configTools";
 
 export type Params = {
     vertexArray: Float32Array;
@@ -22,10 +23,10 @@ export type Params = {
 };
 
 // init workerpool
-const workerPoolConfig = merge(
-    {},
-    config["config"]["workerpool"],
-    config["config"]["layer"]["TriangleLayer"]["workerpool"]
+const workerPoolConfig = findConfig(
+    config,
+    "config/workerpool",
+    "config/layer/TriangleLayer/workerpool"
 );
 
 const pool = workerpool.pool({
