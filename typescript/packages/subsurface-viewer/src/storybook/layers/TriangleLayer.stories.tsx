@@ -261,49 +261,10 @@ const buildTrgl = (count: number = 1): number[] => {
     return triangles;
 };
 
-const TrianglesLayerGenerator: React.FC<{
-    triggerHome: number;
-    triangleCount: number;
-}> = (props) => {
-    const tsurfLayer = React.useMemo(() => {
-        return {
-            "@@type": "TriangleLayer",
-            id: `triangles-layer`,
-
-            pointsData: buildTrgl(props.triangleCount),
-
-            triangleData: Array(3 * props.triangleCount)
-                .fill(0)
-                .map((_, i) => i),
-
-            //color: [randomFunc(255), randomFunc(255), randomFunc(255)], // Surface color.
-            gridLines: true, // If true will draw lines around triangles.
-            material: true, // If true will use triangle normals for shading.
-            ZIncreasingDownwards: true,
-            //contours: [0, 1],          // If used will display contour lines.
-        };
-    }, [props.triangleCount]);
-
-    return (
-        <SubsurfaceViewer
-            triggerHome={props.triggerHome}
-            id="many-triangle-layers"
-            layers={[tsurfLayer]}
-            views={default3DViews}
-        />
-    );
-};
-
-export const BigTriangleLayer: StoryObj<typeof TrianglesLayerGenerator> = {
-    args: {
-        triangleCount: 10,
-    },
-    render: (args) => <TrianglesLayerGenerator {...args} />,
-};
-
 const TriangleLayersGenerator: React.FC<{
     triggerHome: number;
     layerCount: number;
+    triangleCount: number;
 }> = (props) => {
     const tsurfLayers = React.useMemo(() => {
         const result: Record<string, unknown>[] = [];
@@ -312,11 +273,13 @@ const TriangleLayersGenerator: React.FC<{
                 "@@type": "TriangleLayer",
                 id: `triangle-layer-${i}`,
 
-                pointsData: buildTrgl(),
+                pointsData: buildTrgl(props.triangleCount),
 
-                triangleData: [2, 1, 0],
+                triangleData: Array(3 * props.triangleCount)
+                    .fill(0)
+                    .map((_, i) => i),
 
-                color: [randomFunc(255), randomFunc(255), randomFunc(255)], // Surface color.
+                //color: [randomFunc(255), randomFunc(255), randomFunc(255)], // Surface color.
                 gridLines: true, // If true will draw lines around triangles.
                 material: true, // If true will use triangle normals for shading.
                 ZIncreasingDownwards: true,
@@ -324,21 +287,22 @@ const TriangleLayersGenerator: React.FC<{
             });
         }
         return result;
-    }, [props.layerCount]);
+    }, [props.layerCount, props.triangleCount]);
 
     return (
         <SubsurfaceViewer
-            id="many-triangle-layers"
             triggerHome={props.triggerHome}
+            id="many-triangle-layers"
             layers={tsurfLayers}
             views={default3DViews}
         />
     );
 };
 
-export const ManyTriangleLayers: StoryObj<typeof TriangleLayersGenerator> = {
+export const TriangleLayers: StoryObj<typeof TriangleLayersGenerator> = {
     args: {
         layerCount: 10,
+        triangleCount: 1000,
     },
     render: (args) => <TriangleLayersGenerator {...args} />,
 };

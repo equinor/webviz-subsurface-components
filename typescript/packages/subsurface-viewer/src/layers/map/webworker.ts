@@ -552,16 +552,5 @@ export function makeFullMesh(e: { data: Params }) {
         propertyValueRange,
     ];
 
-    postMessage(
-        webworkerReturnData,
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        [
-            positions.buffer,
-            normals.buffer,
-            triangleIndices.buffer,
-            vertexProperties.buffer,
-            lineIndices.buffer,
-        ]
-    ); // tranferable objects. No copy.
+    return webworkerReturnData;
 }

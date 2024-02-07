@@ -12,6 +12,9 @@ import type { ExtendedLayerProps } from "../utils/layerTools";
 import type { ReportBoundingBoxAction } from "../../components/Map";
 import { makeFullMesh } from "./webworker";
 
+import config from "../../SubsurfaceConfig.json";
+import { findConfig } from "../../utils/configTools";
+
 export type Params = {
     vertexArray: Float32Array;
     indexArray: Uint32Array;
@@ -20,10 +23,26 @@ export type Params = {
 };
 
 // init workerpool
+const workerPoolConfig = findConfig(
+    config,
+    "config/workerpool",
+    "config/layer/TriangleLayer/workerpool"
+);
+
 const pool = workerpool.pool({
-    maxWorkers: 10,
-    workerType: "web",
+    ...{
+        maxWorkers: 10,
+        workerType: "web",
+    },
+    ...workerPoolConfig,
 });
+
+function onTerminateWorker() {
+    const stats = pool.stats();
+    if (stats.busyWorkers === 0 && stats.pendingTasks === 0) {
+        pool.terminate();
+    }
+}
 
 async function loadData(
     pointsData: string | number[] | Float32Array,
@@ -229,6 +248,8 @@ export default class TriangleLayer extends CompositeLayer<TriangleLayerProps> {
                     ...this.state,
                     isFinishedLoading: true,
                 });
+
+                onTerminateWorker();
             });
         });
     }
