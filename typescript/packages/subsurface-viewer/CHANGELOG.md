@@ -1,3 +1,10 @@
+# [0.16.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.15.1...subsurface-viewer@0.16.0) (2024-02-07)
+
+
+### Features
+
+* use webworker pool for maps and 3D grids ([#1910](https://github.com/equinor/webviz-subsurface-components/issues/1910)) ([e53edd0](https://github.com/equinor/webviz-subsurface-components/commit/e53edd08b4bd837e1edb7d3b541a5b9c1c5f45f0))
+
 ## [0.15.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.15.0...subsurface-viewer@0.15.1) (2024-02-05)
 
 
