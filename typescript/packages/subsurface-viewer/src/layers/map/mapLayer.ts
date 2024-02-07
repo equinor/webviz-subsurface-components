@@ -394,8 +394,8 @@ export default class MapLayer<
                     }
                     onTerminateWorker();
                 }
-            ); // end webworker then
-        }); // end then
+            );
+        });
     }
 
     initializeState(): void {
