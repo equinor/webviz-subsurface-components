@@ -1,3 +1,10 @@
+## [0.16.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.16.0...subsurface-viewer@0.16.1) (2024-02-08)
+
+
+### Bug Fixes
+
+* bump [@deck](https://github.com/deck).gl/react from 8.9.33 to 8.9.34 in /typescript ([#1911](https://github.com/equinor/webviz-subsurface-components/issues/1911)) ([ac4e20c](https://github.com/equinor/webviz-subsurface-components/commit/ac4e20cd1ae321612ad4aff52f90fd5c6de3af97)), closes [#8412](https://github.com/equinor/webviz-subsurface-components/issues/8412) [#8290](https://github.com/equinor/webviz-subsurface-components/issues/8290) [#8347](https://github.com/equinor/webviz-subsurface-components/issues/8347) [#8412](https://github.com/equinor/webviz-subsurface-components/issues/8412) [#8290](https://github.com/equinor/webviz-subsurface-components/issues/8290) [#8347](https://github.com/equinor/webviz-subsurface-components/issues/8347) [#8436](https://github.com/equinor/webviz-subsurface-components/issues/8436) [#8412](https://github.com/equinor/webviz-subsurface-components/issues/8412) [#8290](https://github.com/equinor/webviz-subsurface-components/issues/8290)
+
 # [0.16.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.15.1...subsurface-viewer@0.16.0) (2024-02-07)
 
 
