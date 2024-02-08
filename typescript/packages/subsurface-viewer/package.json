@@ -29,7 +29,7 @@
         "@deck.gl/json": "^8.9.33",
         "@deck.gl/layers": "^8.9.33",
         "@deck.gl/mesh-layers": "^8.9.33",
-        "@deck.gl/react": "^8.9.33",
+        "@deck.gl/react": "^8.9.34",
         "@emerson-eps/color-tables": "^0.4.71",
         "@equinor/eds-core-react": "^0.33.0",
         "@equinor/eds-icons": "^0.19.1",
