@@ -27,28 +27,34 @@ exports[`Test Slider Input snapshot test 1`] = `
   margin: 0;
 }
 
-.c4 {
+.c5 {
   --realWidth: calc(100% - 12px);
+  --background: var(--tooltip-background,var(--eds_interactive_primary__resting,rgba(0,112,121,1)));
   width: -webkit-fit-content;
   width: -moz-fit-content;
   width: fit-content;
-  position: relative;
+  position: absolute;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  border-radius: 4px;
   z-index: 1;
   margin: 0;
   color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
   font-family: Equinor;
-  font-size: 0.625rem;
+  font-size: 0.875rem;
   font-weight: 500;
-  line-height: 1.600em;
-  -webkit-letter-spacing: 0.069em;
-  -moz-letter-spacing: 0.069em;
-  -ms-letter-spacing: 0.069em;
-  letter-spacing: 0.069em;
-  text-transform: uppercase;
+  line-height: 1.143em;
   text-align: left;
-  background: var(--eds_ui_background__default,rgba(255,255,255,1));
-  padding: 0 5px;
-  top: 24px;
+  color: white;
+  background: var(--background);
+  padding: 4px 4px 2px 4px;
+  bottom: calc(100% + 1px);
   pointer-events: none;
   margin-left: calc((var(--val) - var(--min)) / var(--dif) * var(--realWidth));
   -webkit-transform: translate(calc(-1 * calc(var(--realWidth) / 2)));
@@ -56,6 +62,12 @@ exports[`Test Slider Input snapshot test 1`] = `
   transform: translate(calc(-1 * calc(var(--realWidth) / 2)));
   grid-row: 2;
   grid-column: 1 / -1;
+  opacity: var(--showTooltip);
+}
+
+[data-disabled] .c4 {
+  background: var(--eds_interactive__disabled__fill,rgba(234,234,234,1));
+  color: var(--eds_interactive__disabled__text,rgba(190,190,190,1));
 }
 
 .c3 {
@@ -179,11 +191,11 @@ exports[`Test Slider Input snapshot test 1`] = `
   grid-template-columns: 1fr 1fr;
   width: 100%;
   position: relative;
-  background-image: url("data:image/svg+xml,<svg xmlns='http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'><rect x='0' y='11' fill='var(--eds_ui_background__light, rgba(247, 247, 247, 1))' width='100%' height='4' rx='2' /></svg>");background-size:cover;background-repeat:no-repeat;} .c2::after{grid-column:1 / span 2;grid-row:2;height:4px;margin-bottom:9px;-webkit-align-self:end;-ms-flex-item-align:end;align-self:end;content:'';background:var(--background);} .c2::after{margin-right:calc( (var(--max) - var(--value)) / var(--dif) * var(--realWidth) );margin-left:3px;} @media (hover:hover) and (pointer:fine){.c2:hover:not([disabled]){background-image:url("data:image/svg+xml,<svg xmlns='http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'><rect x='0' y='11' fill='var(--eds_ui_background__medium, rgba(220, 220, 220, 1))' width='100%' height='4' rx='2' /></svg>");
+  background-image: url("data:image/svg+xml,<svg xmlns='http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'><rect x='0' y='11' fill='var(--eds_ui_background__light, rgba(247, 247, 247, 1))' width='100%' height='4' rx='2' /></svg>");background-size:cover;background-repeat:no-repeat;} .c2::after{grid-column:1 / span 2;grid-row:2;height:4px;margin-bottom:9px;-webkit-align-self:end;-ms-flex-item-align:end;align-self:end;content:'';background:var(--background);} .c2::after{margin-right:calc( (var(--max) - var(--value)) / var(--dif) * var(--realWidth) );margin-left:3px;} .c2:has(:focus-visible) > output,.c2:hover > output{--showTooltip:1;--tooltip-background:var(--eds_interactive_primary__hover,rgba(0,79,85,1));} @media (hover:hover) and (pointer:fine){.c2:hover:not([data-disabled]){background-image:url("data:image/svg+xml,<svg xmlns='http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'><rect x='0' y='11' fill='var(--eds_ui_background__medium, rgba(220, 220, 220, 1))' width='100%' height='4' rx='2' /></svg>");
 }
 
-.c2:hover:not([disabled])::after {
-  background: var(--eds_interactive_primary__hover,rgba(0,79,85,1));
+.c2:hover:not([data-disabled])::after {
+  background: var(--background-hover);
 }
 
 @media (hover:hover) and (pointer:fine) {
@@ -235,7 +247,7 @@ exports[`Test Slider Input snapshot test 1`] = `
   <div
     class="c2"
     id="Opacity-slider"
-    style="padding-top: 5px; padding-right: 10px; padding-bottom: 25px; width: 3rem; --min: 0; --max: 100; --value: 5000; --background: var(--eds_interactive_primary__resting, rgba(0, 112, 121, 1));"
+    style="padding-top: 5px; padding-right: 10px; padding-bottom: 25px; width: 3rem; --min: 0; --max: 100; --value: 5000; --showTooltip: 0; --background: var(--eds_interactive_primary__resting, rgba(0, 112, 121, 1)); --background-hover: var(--eds_interactive_primary__hover, rgba(0, 79, 85, 1));"
     value="5000"
   >
     <input
@@ -253,7 +265,7 @@ exports[`Test Slider Input snapshot test 1`] = `
       value="5000"
     />
     <output
-      class="c4"
+      class="c4 c5"
       for="Opacity-slider-thumb"
       style="--val: 5000;"
     >
