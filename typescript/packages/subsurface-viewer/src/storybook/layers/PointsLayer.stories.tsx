@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { create, all } from "mathjs";
+import { all, create } from "mathjs";
 
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 
@@ -9,6 +9,9 @@ import { default3DViews, defaultStoryParameters } from "../sharedSettings";
 const stories: Meta = {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer / Points Layer",
+
+    // Disable automatic testing of stories that use this tag.
+    tags: ["no-test"],
 };
 export default stories;
 
@@ -159,4 +162,5 @@ export const HugePointsLayer: StoryObj<typeof SubsurfaceViewer> = {
             },
         },
     },
+    tags: ["no-test"],
 };

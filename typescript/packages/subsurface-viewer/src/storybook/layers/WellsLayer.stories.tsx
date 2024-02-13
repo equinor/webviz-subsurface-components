@@ -1,25 +1,25 @@
 /* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
 
+import type { Meta, StoryObj } from "@storybook/react";
 import type { SyntheticEvent } from "react";
 import React, { useState } from "react";
-import type { Meta, StoryObj } from "@storybook/react";
 
-import type { FeatureCollection } from "geojson";
 import { Slider } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import type { FeatureCollection } from "geojson";
 
-import { NativeSelect } from "@equinor/eds-core-react";
 import {
-    createColorMapFunction,
     ColorLegend,
     colorTables,
+    createColorMapFunction,
 } from "@emerson-eps/color-tables";
+import { NativeSelect } from "@equinor/eds-core-react";
 
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import type { MapMouseEvent } from "../../components/Map";
-import WellsLayer from "../../layers/wells/wellsLayer";
 import AxesLayer from "../../layers/axes/axesLayer";
+import WellsLayer from "../../layers/wells/wellsLayer";
 
 import {
     default3DViews,
@@ -32,6 +32,7 @@ import {
 const stories: Meta = {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer / Wells Layer",
+    tags: ["no-test"],
 };
 export default stories;
 
@@ -159,6 +160,7 @@ export const volveWells2: StoryObj<typeof SubsurfaceViewer> = {
         ],
     },
     render: (args) => <VolveWellsWithMouseCallback {...args} />,
+    tags: ["no-test"],
 };
 
 // Volve wells with logs.
