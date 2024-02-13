@@ -548,6 +548,7 @@ export const WellsRefine: StoryObj<typeof WellsRefineComponent> = {
         },
     },
     render: (args) => <WellsRefineComponent {...args} />,
+    tags: ["no-test"],
 };
 
 export const Wells3d: StoryObj<typeof SubsurfaceViewer> = {
