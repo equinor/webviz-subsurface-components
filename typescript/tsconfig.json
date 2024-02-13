@@ -19,7 +19,7 @@
         "allowJs": true,
         "skipLibCheck": true,
         "resolveJsonModule": true,
-        "outDir": "./dist",
+        "outDir": "./dist"
     },
     "exclude": [
         "__mocks__",
@@ -28,10 +28,10 @@
         "**/*.test.tsx",
         "**/test/*.tsx",
         "**/*.stories.tsx",
-        "**/*.test.ts",
+        "**/*.test.ts"
     ],
     "typedocOptions": {
         "entryPoints": ["./src/index.ts"],
-        "out": "docs",
-    },
+        "out": "docs"
+    }
 }
