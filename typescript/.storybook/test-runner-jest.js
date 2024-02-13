@@ -10,9 +10,9 @@ module.exports = {
     ...testRunnerConfig,
     testTimeout: 60000,
     maxWorkers: process.env.CI ? 4 : 8,
-    testEnvironmentOptions: {
+/*     testEnvironmentOptions: {
         "jest-playwright": {
             browsers: ["webkit"],
         },
-    },
+    }, */
 };
