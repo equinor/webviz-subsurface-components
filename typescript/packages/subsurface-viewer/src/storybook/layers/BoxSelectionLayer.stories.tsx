@@ -14,6 +14,11 @@ import { volveWellsBounds } from "../sharedSettings";
 const stories: Meta = {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer / Box Selection Layer",
+    args: {
+        // Add a reset button for all the stories.
+        // Somehow, I do not manage to add the triggerHome to the general "unset" controls :/
+        triggerHome: 0,
+    },
 };
 export default stories;
 
@@ -56,14 +61,17 @@ const DECK_PROPS = {
 };
 
 type BoxSelectionComponentProps = {
+    triggerHome: number;
     enableSelection: boolean;
 };
 const BoxSelectionComponent: React.FC<BoxSelectionComponentProps> = ({
+    triggerHome,
     enableSelection,
 }: BoxSelectionComponentProps) => {
     const deckProps = React.useMemo(
         () => ({
             ...DECK_PROPS,
+            triggerHome,
             layers: [
                 wellsLayer,
                 new BoxSelectionLayer({
@@ -72,7 +80,7 @@ const BoxSelectionComponent: React.FC<BoxSelectionComponentProps> = ({
                 }),
             ],
         }),
-        [enableSelection]
+        [enableSelection, triggerHome]
     );
 
     return (

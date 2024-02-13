@@ -32,6 +32,11 @@ import {
 const stories: Meta = {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer / Wells Layer",
+    args: {
+        // Add a reset button for all the stories.
+        // Somehow, I do not manage to add the triggerHome to the general "unset" controls :/
+        triggerHome: 0,
+    },
     tags: ["no-test"],
 };
 export default stories;
@@ -48,15 +53,16 @@ const testWellWithDuplicates = {
                 geometries: [
                     {
                         type: "Point",
-                        coordinates: [0, 0, 0],
+                        coordinates: [0, 0],
                     },
                     {
                         type: "LineString",
                         coordinates: [
-                            [0, 0, 0],
                             [0, 0, -100],
                             [0, 0, -200],
                             [0, 0, -300],
+                            [0, 0, -400],
+                            [0, 0, -400],
                             [0, 0, -400],
                             [0, 0, -500],
                             [0, 0, -600],

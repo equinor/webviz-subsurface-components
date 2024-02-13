@@ -10,6 +10,11 @@ import { defaultStoryParameters } from "../sharedSettings";
 const stories: Meta = {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer/Well Markers Layer",
+    args: {
+        // Add a reset button for all the stories.
+        // Somehow, I do not manage to add the triggerHome to the general "unset" controls :/
+        triggerHome: 0,
+    },
 };
 export default stories;
 
@@ -20,8 +25,7 @@ type TRandomNumberFunc = (max: number) => number;
 const randomFunc = ((): TRandomNumberFunc => {
     if (math?.random) {
         return (max: number) => {
-            const val = math.random?.(max);
-            return val ? val : 0.0;
+            return math.random(max);
         };
     }
     return (max: number) => Math.random() * max;

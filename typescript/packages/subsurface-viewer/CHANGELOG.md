@@ -1,3 +1,31 @@
+## [0.16.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.16.0...subsurface-viewer@0.16.1) (2024-02-08)
+
+
+### Bug Fixes
+
+* bump [@deck](https://github.com/deck).gl/react from 8.9.33 to 8.9.34 in /typescript ([#1911](https://github.com/equinor/webviz-subsurface-components/issues/1911)) ([ac4e20c](https://github.com/equinor/webviz-subsurface-components/commit/ac4e20cd1ae321612ad4aff52f90fd5c6de3af97)), closes [#8412](https://github.com/equinor/webviz-subsurface-components/issues/8412) [#8290](https://github.com/equinor/webviz-subsurface-components/issues/8290) [#8347](https://github.com/equinor/webviz-subsurface-components/issues/8347) [#8412](https://github.com/equinor/webviz-subsurface-components/issues/8412) [#8290](https://github.com/equinor/webviz-subsurface-components/issues/8290) [#8347](https://github.com/equinor/webviz-subsurface-components/issues/8347) [#8436](https://github.com/equinor/webviz-subsurface-components/issues/8436) [#8412](https://github.com/equinor/webviz-subsurface-components/issues/8412) [#8290](https://github.com/equinor/webviz-subsurface-components/issues/8290)
+
+# [0.16.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.15.1...subsurface-viewer@0.16.0) (2024-02-07)
+
+
+### Features
+
+* use webworker pool for maps and 3D grids ([#1910](https://github.com/equinor/webviz-subsurface-components/issues/1910)) ([e53edd0](https://github.com/equinor/webviz-subsurface-components/commit/e53edd08b4bd837e1edb7d3b541a5b9c1c5f45f0))
+
+## [0.15.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.15.0...subsurface-viewer@0.15.1) (2024-02-05)
+
+
+### Bug Fixes
+
+* Well head position Z value should match the top of the well trajectory by default if not set explicitly ([#1907](https://github.com/equinor/webviz-subsurface-components/issues/1907)) ([67c84d2](https://github.com/equinor/webviz-subsurface-components/commit/67c84d22974a36cc1630fbf4cb7dcd6d97ada12b))
+
+# [0.15.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.14.3...subsurface-viewer@0.15.0) (2024-02-05)
+
+
+### Features
+
+* use webworker pool to control number of workers ([#1905](https://github.com/equinor/webviz-subsurface-components/issues/1905)) ([304c920](https://github.com/equinor/webviz-subsurface-components/commit/304c920fa229bd8bdd70102e48b6a2445c0cd234))
+
 ## [0.14.3](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.14.2...subsurface-viewer@0.14.3) (2024-01-31)
 
 

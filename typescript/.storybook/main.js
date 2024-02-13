@@ -61,6 +61,9 @@ module.exports = {
                     https: false,
                     crypto: false,
                     stream: false,
+                    os: false,
+                    child_process: false,
+                    worker_threads: false,
                 },
             },
         };
