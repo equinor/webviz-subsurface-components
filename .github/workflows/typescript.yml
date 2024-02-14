@@ -127,8 +127,8 @@ jobs:
 
     container:
       image: mcr.microsoft.com/playwright:v1.39.0-jammy
-      volumes:
-        - ${{ github.workspace }}/typescript:/test
+      #volumes:
+      #  - ${{ github.workspace }}/typescript:/test
       options: --user 1001
 
     steps:
@@ -153,7 +153,6 @@ jobs:
           HOST: 127.0.0.1
 
         run: |
-          cd /test
           ls -la
           ls -la storybook-static
           npx concurrently -k -s first -n "SB,TEST" -c "magenta,blue" \
