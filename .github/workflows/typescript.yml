@@ -129,6 +129,7 @@ jobs:
       image: mcr.microsoft.com/playwright:v1.39.0-jammy
       volumes:
         - ${{ github.workspace }}/typescript:/test
+      options: --user 1001
 
     steps:
       - name: 📖 Checkout commit locally
@@ -138,9 +139,9 @@ jobs:
         run: |
           npm ci CYPRESS_INSTALL_BINARY=0 --ignore-scripts
 
-      #- name: 🏗️ Build packages
-      #  run: |
-      #    npx nx run-many -t build
+      - name: 🏗️ Build packages
+        run: |
+          npx nx run-many -t build
 
       - name: 📚 Build Storybook
         run: npm run build-storybook
