@@ -37,7 +37,6 @@ jobs:
           node-version: 18
 
       - name: 📦 Install build dependencies
-        # The deckgl types package runs a postscript to setup, but since we ignore scripts, we need to set it up manually.
         run: |
 
           # In https://github.com/equinor/webviz-subsurface-components/pull/1010 we
@@ -85,50 +84,38 @@ jobs:
       - name: 📚 Build Storybook
         run: npm run build-storybook
 
-      #- name: Serve Storybook and run tests
-      #  env:
-      #    PORT: 8080
-      #    HOST: 127.0.0.1
-      #  run: |
-      #    npx playwright install --with-deps
-      #    npx concurrently -k -s first -n "SB,TEST" -c "magenta,blue" \
-      #      "npx http-server storybook-static --port $PORT -a $HOST" \
-      #      "npx wait-on http://$HOST:$PORT/ && npm run storybook:test -- --ci --url http://$HOST:$PORT/"
+      - name: 📚 Update Storybook
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        run: |
+          rm -rf ../../storybook-static
+          mv ./storybook-static ../..
 
-      #- name: 📚 Update Storybook
-      #  if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-      #  run: |
-      #    rm -rf ../../storybook-static
-      #    mv ./storybook-static ../..
+          git config --local user.email "webviz-github-action"
+          git config --local user.name "webviz-github-action"
+          git fetch origin gh-pages
+          git checkout --track origin/gh-pages
+          git clean -f -f -d -x
+          git rm -r --ignore-unmatch ../*
 
-      #    git config --local user.email "webviz-github-action"
-      #    git config --local user.name "webviz-github-action"
-      #    git fetch origin gh-pages
-      #    git checkout --track origin/gh-pages
-      #    git clean -f -f -d -x
-      #    git rm -r --ignore-unmatch ../*
+          mv ../../storybook-static ..
 
-      #    mv ../../storybook-static ..
+          git add ../storybook-static
 
-      #    git add ../storybook-static
-
-      #    if git diff-index --quiet HEAD; then
-      #      echo "No changes in documentation. Skip documentation deploy."
-      #    else
-      #      git commit -m "Update Github Pages"
-      #      git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" gh-pages
-      #    fi
+          if git diff-index --quiet HEAD; then
+            echo "No changes in documentation. Skip documentation deploy."
+          else
+            git commit -m "Update Github Pages"
+            git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" gh-pages
+          fi
 
   smoke_tests:
     # Run on all events defined above, except pushes which are not to master
     if: github.event_name != 'push' || github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
-    name: "Run Storybook Smoke Tests"
+    name: "Storybook Smoke Tests"
 
     container:
       image: mcr.microsoft.com/playwright:v1.39.0-jammy
-      #volumes:
-      #  - ${{ github.workspace }}/typescript:/test
       options: --user 1001
 
     steps:
@@ -153,8 +140,6 @@ jobs:
           HOST: 127.0.0.1
 
         run: |
-          ls -la
-          ls -la storybook-static
           npx concurrently -k -s first -n "SB,TEST" -c "magenta,blue" \
             "npx http-server storybook-static --port $PORT -a $HOST" \
             "npx wait-on http://$HOST:$PORT/ && npm run storybook:test -- --ci --url http://$HOST:$PORT/"
