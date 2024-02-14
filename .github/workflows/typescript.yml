@@ -138,6 +138,8 @@ jobs:
 
         run: |
           cd /test
+          ls -la
+          ls -la storybook-static
           npx concurrently -k -s first -n "SB,TEST" -c "magenta,blue" \
             "npx http-server storybook-static --port $PORT -a $HOST" \
             "npx wait-on http://$HOST:$PORT/ && npm run storybook:test -- --ci --url http://$HOST:$PORT/"
