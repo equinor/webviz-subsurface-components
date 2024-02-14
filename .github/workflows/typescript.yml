@@ -128,7 +128,7 @@ jobs:
     container:
       image: mcr.microsoft.com/playwright:v1.39.0-jammy
       volumes:
-        - $GITHUB_WORKSPACE/typescript:/test
+        - ${{ github.workspace }}/typescript:/test
     steps:
       - name: Run smoke tests
 
