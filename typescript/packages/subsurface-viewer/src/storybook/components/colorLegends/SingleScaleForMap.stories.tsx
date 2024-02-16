@@ -1,14 +1,25 @@
 import React from "react";
 import { styled } from "@mui/material/styles";
 
-import type { Meta } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react";
 
 import { omit } from "lodash";
 
+import type {
+    colorTablesArray,
+    ContinuousLegendProps,
+} from "@emerson-eps/color-tables";
 import { ContinuousLegend, colorTables } from "@emerson-eps/color-tables";
 import { DEFAULT_STYLE as defaultLegendStyle } from "@emerson-eps/color-tables/dist/component/Legend/constants";
 
+import type { SubsurfaceViewerProps } from "../../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../../SubsurfaceViewer";
+
+import {
+    colormapLayer,
+    defaultStoryParameters,
+    hugin2DBounds,
+} from "../../sharedSettings";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -45,34 +56,30 @@ const defaultProps = {
     resources: {
         propertyMap: "propertyMap.png",
     },
-    bounds: [432150, 6475800, 439400, 6481500],
+    bounds: hugin2DBounds,
 };
 
-const layers = [
-    {
-        "@@type": "ColormapLayer",
-        image: "@@#resources.propertyMap",
-        rotDeg: 0,
-        bounds: [432205, 6475078, 437720, 6481113],
-        valueRange: [2782, 3513],
-        colorMapRange: [2782, 3513],
-    },
-];
+const layers = [colormapLayer];
 
 // prop for legend
 const min = 0;
 const max = 0.35;
 const dataObjectName = "Legend";
-const position = [16, 10];
 const horizontal = true;
 const reverseRange = false;
+const colorTablesData = colorTables as colorTablesArray;
+
+type SubsurfaceViewerWithLegendProps = SubsurfaceViewerProps &
+    ContinuousLegendProps;
 
 // 4 maps with same color scale for all maps
 // ContinuousLegend is overwriting the style to {"position": absolute} and cssLegendStyles :(
-const SubsurfaceViewerWithLegend = (args) => {
+const SubsurfaceViewerWithLegend: React.FC<SubsurfaceViewerWithLegendProps> = (
+    args
+) => {
     const updatedLayerData = [
         {
-            ...args.layers[0],
+            ...args.layers?.[0],
             colorMapName: args.colorName,
         },
     ];
@@ -93,31 +100,27 @@ const SubsurfaceViewerWithLegend = (args) => {
     );
 };
 
-export const ContinuousLegendForSubsurfaceViewer = {
+export const ContinuousLegendForSubsurfaceViewer: StoryObj<
+    typeof SubsurfaceViewerWithLegend
+> = {
     name: "ContinuousLegend For SubsurfaceViewer",
     parameters: {
         docs: {
+            ...defaultStoryParameters.docs,
             description: {
                 story: "Four maps with same color scale for all maps",
             },
-            inlineStories: false,
-            iframeHeight: 500,
         },
     },
     args: {
         min,
         max,
         dataObjectName,
-        position,
         horizontal,
-        colorTables,
+        colorTables: colorTablesData,
         colorName: "Rainbow",
         layers,
         ...defaultProps,
-        legend: {
-            visible: false,
-        },
-        zoom: -5,
         reverseRange,
         views: {
             layout: [2, 2],

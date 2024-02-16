@@ -1,10 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
 
-import React from "react";
-import SyncLogViewer from "./SyncLogViewer";
-import { argTypesSyncLogViewerProp } from "./SyncLogViewer";
 import { colorTables } from "@emerson-eps/color-tables";
 import { ToggleButton } from "@mui/material";
+import React from "react";
+import SyncLogViewer, { argTypesSyncLogViewerProp } from "./SyncLogViewer";
 
 const ComponentCode =
     '<SyncLogViewer id="SyncLogViewer" \r\n' +
@@ -24,8 +23,8 @@ const ComponentCode =
     "    colorTables={colorTables} \r\n" +
     "/>";
 
-import { axisTitles, axisMnemos } from "./utils/axes";
 import type { WellLog } from "./components/WellLogTypes";
+import { axisMnemos, axisTitles } from "./utils/axes";
 
 export default {
     component: SyncLogViewer,
@@ -61,7 +60,7 @@ export default {
         },
         spacers: {
             description:
-                "Set to true or to array of spaser widths if WellLogSpacers should be used",
+                "Set to true or to spacers width or to array of spacer widths if WellLogSpacers should be used",
         },
         wellDistances: {
             description: "Distanses between wells to show on the spacers",
@@ -111,6 +110,7 @@ export default {
                 "The view title. Set desired string or react element or true for default value from welllog file",
         },
     },
+    tags: ["no-screenshot-test"],
 };
 
 function fillInfo(controller) {
@@ -361,6 +361,8 @@ Default.args = {
         wellpickPatternFill: true,
     },
 };
+
+Default.tags = ["no-screenshot-test"];
 
 const TemplateWithSelection = (args) => {
     const [showWell1, setShowWell1] = React.useState(true);

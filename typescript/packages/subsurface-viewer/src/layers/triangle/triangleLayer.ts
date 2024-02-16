@@ -1,12 +1,19 @@
+import type React from "react";
+import { isEqual } from "lodash";
+
 import type { UpdateParameters } from "@deck.gl/core/typed";
 import { CompositeLayer } from "@deck.gl/core/typed";
+
+import workerpool from "workerpool";
+
 import type { Material } from "./privateTriangleLayer";
 import PrivateTriangleLayer from "./privateTriangleLayer";
 import type { ExtendedLayerProps } from "../utils/layerTools";
 import type { ReportBoundingBoxAction } from "../../components/Map";
-import { isEqual } from "lodash";
 import { makeFullMesh } from "./webworker";
-import type React from "react";
+
+import config from "../../SubsurfaceConfig.json";
+import { findConfig } from "../../utils/configTools";
 
 export type Params = {
     vertexArray: Float32Array;
@@ -15,9 +22,31 @@ export type Params = {
     displayNormals: boolean;
 };
 
+// init workerpool
+const workerPoolConfig = findConfig(
+    config,
+    "config/workerpool",
+    "config/layer/TriangleLayer/workerpool"
+);
+
+const pool = workerpool.pool({
+    ...{
+        maxWorkers: 10,
+        workerType: "web",
+    },
+    ...workerPoolConfig,
+});
+
+function onTerminateWorker() {
+    const stats = pool.stats();
+    if (stats.busyWorkers === 0 && stats.pendingTasks === 0) {
+        pool.terminate();
+    }
+}
+
 async function loadData(
-    pointsData: string | number[],
-    triangleData: string | number[]
+    pointsData: string | number[] | Float32Array,
+    triangleData: string | number[] | Uint32Array
 ) {
     // Keep
     //const t0 = performance.now();
@@ -27,6 +56,8 @@ async function loadData(
     if (Array.isArray(pointsData)) {
         // Input data is native javascript array.
         vertexArray = new Float32Array(pointsData);
+    } else if (pointsData instanceof Float32Array) {
+        vertexArray = pointsData;
     } else {
         // Input data is an URL.
         const response_mesh = await fetch(pointsData);
@@ -42,10 +73,12 @@ async function loadData(
     }
 
     //-- Triangle indexes --
-    let indexArray: Uint32Array = new Uint32Array();
+    let indexArray: Uint32Array;
     if (Array.isArray(triangleData)) {
         // Input data is native javascript array.
         indexArray = new Uint32Array(triangleData);
+    } else if (triangleData instanceof Uint32Array) {
+        indexArray = triangleData;
     } else {
         // Input data is an URL.
         const response_mesh = await fetch(triangleData);
@@ -71,9 +104,9 @@ export interface TriangleLayerProps extends ExtendedLayerProps {
     /** Triangle vertexes.
      * Either an URL or an array of numbers.
      */
-    pointsData: string | number[];
+    pointsData: string | number[] | Float32Array;
 
-    triangleData: string | number[];
+    triangleData: string | number[] | Uint32Array;
 
     color: [number, number, number];
 
@@ -160,12 +193,6 @@ export default class TriangleLayer extends CompositeLayer<TriangleLayerProps> {
         p.then(([vertexArray, indexArray]) => {
             // Using inline web worker for calculating the triangle mesh from
             // loaded input data so not to halt the GUI thread.
-            const blob = new Blob(
-                ["self.onmessage = ", makeFullMesh.toString()],
-                { type: "text/javascript" }
-            );
-            const url = URL.createObjectURL(blob);
-            const webWorker = new Worker(url);
 
             const webworkerParams: Params = {
                 vertexArray,
@@ -174,9 +201,8 @@ export default class TriangleLayer extends CompositeLayer<TriangleLayerProps> {
                 displayNormals: this.props.debug,
             };
 
-            webWorker.postMessage(webworkerParams);
-            webWorker.onmessage = (e) => {
-                const [geometryTriangles, geometryLines] = e.data;
+            pool.exec(makeFullMesh, [{ data: webworkerParams }]).then((e) => {
+                const [geometryTriangles, geometryLines] = e;
 
                 this.setState({
                     geometryTriangles,
@@ -218,13 +244,13 @@ export default class TriangleLayer extends CompositeLayer<TriangleLayerProps> {
                     });
                 }
 
-                webWorker.terminate();
-
                 this.setState({
                     ...this.state,
                     isFinishedLoading: true,
                 });
-            };
+
+                onTerminateWorker();
+            });
         });
     }
 

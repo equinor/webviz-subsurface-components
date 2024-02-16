@@ -16,7 +16,7 @@ export interface PointsLayerProps extends ExtendedLayerProps {
     /**
      * Point positions as [x, y, z, x, y, z....].
      */
-    pointsData: number[];
+    pointsData: number[] | Float32Array;
 
     /**
      * Point color defined as RGB or RGBA array. Each component is in 0-255 range.
@@ -70,6 +70,10 @@ interface IDataAttributes {
 }
 
 export default class PointsLayer extends CompositeLayer<PointsLayerProps> {
+    constructor(props: PointsLayerProps) {
+        super(props);
+    }
+
     renderLayers(): [PrivatePointsLayer?] {
         const layer = new PrivatePointsLayer(
             this.getSubLayerProps({
@@ -152,6 +156,10 @@ export default class PointsLayer extends CompositeLayer<PointsLayerProps> {
         if (Array.isArray(this.props.pointsData)) {
             return new Float32Array(this.props.pointsData);
         }
+        if (this.props.pointsData instanceof Float32Array) {
+            return this.props.pointsData;
+        }
+        console.warn("pointsData is not array");
         return new Float32Array();
     }
 

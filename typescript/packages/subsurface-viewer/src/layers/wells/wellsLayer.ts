@@ -30,7 +30,7 @@ import {
     coarsenWells,
     invertPath,
     GetBoundingBox,
-    removeDuplicates,
+    checkWells,
 } from "./utils/spline";
 import { interpolateNumberArray } from "d3";
 import type {
@@ -257,11 +257,11 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
     initializeState(): void {
         let data = this.props.data as unknown as FeatureCollection;
         if (typeof data !== "undefined" && !isEqual(data, [])) {
-            if (!this.props.ZIncreasingDownwards) {
+            if (this.props.ZIncreasingDownwards) {
                 data = invertPath(data);
             }
 
-            removeDuplicates(data);
+            checkWells(data);
 
             const coarseData = coarsenWells(data);
 

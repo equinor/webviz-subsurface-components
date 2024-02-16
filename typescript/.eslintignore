@@ -8,3 +8,5 @@ node_modules
 src/storybook
 src/test
 /storybook
+storybook-static
+cypress

@@ -20,10 +20,11 @@ import {
 } from "../../layers/grid3d/test_data/TruncatedSnubCube";
 
 import {
-    mainStyle as defaultmainStyle,
+    mainStyle,
     default3DViews,
-    huginMapDepthPropLayerPng,
-    huginMeshMapLayerPng,
+    defaultStoryParameters,
+    hugin25mDepthMapLayer,
+    hugin25mKhNetmapMapLayerPng,
     volveWellsLayer,
     hugin2DBounds,
 } from "../sharedSettings";
@@ -45,7 +46,7 @@ const classes = {
 };
 
 const Root = styled("div")({
-    ...defaultmainStyle,
+    ...mainStyle,
     [`& .${classes.mainWithButton}`]: {
         height: 500,
         border: "1px solid black",
@@ -64,7 +65,7 @@ export const DepthTest: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "DepthTest",
         layers: [
-            huginMapDepthPropLayerPng,
+            hugin25mDepthMapLayer,
             volveWellsLayer,
             volveWellsNoDepthTestLayer,
         ],
@@ -73,17 +74,14 @@ export const DepthTest: StoryObj<typeof SubsurfaceViewer> = {
             viewports: [
                 {
                     id: "view_1",
-                    layerIds: [
-                        huginMapDepthPropLayerPng.id,
-                        volveWellsLayer.id,
-                    ],
+                    layerIds: [hugin25mDepthMapLayer.id, volveWellsLayer.id],
                     show3D: false,
                     isSync: true,
                 },
                 {
                     id: "view_2",
                     layerIds: [
-                        huginMapDepthPropLayerPng.id,
+                        hugin25mDepthMapLayer.id,
                         volveWellsNoDepthTestLayer.id,
                     ],
                     show3D: false,
@@ -124,7 +122,7 @@ const IsRenderedComponent: React.FC<SubsurfaceViewerProps> = (
 
     const handleChange = () => {
         if (layers.length === 1) {
-            setLayers([volveWellsLayer, huginMeshMapLayerPng]);
+            setLayers([volveWellsLayer, hugin25mKhNetmapMapLayerPng]);
         } else if (layers.length === 2) {
             setLayers([]);
         } else {
@@ -134,9 +132,9 @@ const IsRenderedComponent: React.FC<SubsurfaceViewerProps> = (
 
     const props2 = {
         ...props,
-        isRenderedCallback: (isLoaded: boolean) => {
-            console.log("isRenderedCallback", isLoaded);
-            setLabel(isLoaded ? "LOADED" : "NOT LOADED");
+        onRenderingProgress: (progress: number) => {
+            console.log("onRenderingProgress", progress);
+            setLabel(progress === 100 ? "LOADED" : `${progress} %`);
         },
         layers,
     };
@@ -148,7 +146,7 @@ const IsRenderedComponent: React.FC<SubsurfaceViewerProps> = (
             </div>
             <label>{"Add big map layer "}</label>
             <button onClick={handleChange}>Change layers</button>
-            <label>State from isRenderedCallback: {label}</label>
+            <label>State from onRenderingProgress: {label}</label>
         </Root>
     );
 };
@@ -156,22 +154,13 @@ const IsRenderedComponent: React.FC<SubsurfaceViewerProps> = (
 export const IsRenderedCallback: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "DeckGL-Map",
-        layers: [huginMeshMapLayerPng, volveWellsLayer],
+        layers: [hugin25mKhNetmapMapLayerPng, volveWellsLayer],
         bounds: hugin2DBounds,
-        views: {
-            layout: [1, 1],
-            viewports: [
-                {
-                    id: "view_1",
-                    show3D: true,
-                },
-            ],
-        },
+        views: default3DViews,
     },
     parameters: {
         docs: {
-            inlineStories: false,
-            iframeHeight: 500,
+            ...defaultStoryParameters.docs,
             description: {
                 story: "IsRenderedCallback will report in console when triggered",
             },
@@ -358,8 +347,7 @@ export const LightsStory: StoryObj<typeof SubsurfaceViewer> = {
     },
     parameters: {
         docs: {
-            inlineStories: false,
-            iframeHeight: 500,
+            ...defaultStoryParameters.docs,
             description: {
                 story: "Using different light sources",
             },

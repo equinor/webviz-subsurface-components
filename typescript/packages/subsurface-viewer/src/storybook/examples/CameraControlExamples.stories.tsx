@@ -14,13 +14,15 @@ import type { ViewStateType, BoundingBox3D } from "../../components/Map";
 import { AxesLayer } from "../../layers";
 
 import {
-    mainStyle as defaultmainStyle,
+    mainStyle,
     huginAxes3DLayer,
+    default2DViews,
     default3DViews,
+    defaultStoryParameters,
     hugin3DBounds,
-    huginMapDepthPropLayerPng,
-    huginMapNetmapPropLayerPng,
-    huginMeshMapLayerPng,
+    hugin25mDepthMapLayer,
+    hugin25mKhNetmapMapLayer,
+    hugin25mKhNetmapMapLayerPng,
     northArrowLayer,
     volveWellsBounds,
     volveWellsLayer,
@@ -38,20 +40,13 @@ const stories: Meta = {
 };
 export default stories;
 
-const defaultStoryParameters = {
-    docs: {
-        inlineStories: false,
-        iframeHeight: 500,
-    },
-};
-
 const classes = {
     main: "default-main",
     mainWithButton: "mian-with-button",
 };
 
 const Root = styled("div")({
-    ...defaultmainStyle,
+    ...mainStyle,
     [`& .${classes.mainWithButton}`]: {
         height: 500,
         border: "1px solid black",
@@ -115,8 +110,8 @@ const SyncedMultiViewComponent = (args: {
     const subsurfaceViewerArgs: SubsurfaceViewerProps = {
         id: "view_state_synchronization",
         layers: [
-            huginMapNetmapPropLayerPng,
-            huginMapDepthPropLayerPng,
+            hugin25mKhNetmapMapLayer,
+            hugin25mDepthMapLayer,
             volveWellsLayer,
         ],
         views: {
@@ -124,13 +119,13 @@ const SyncedMultiViewComponent = (args: {
             viewports: [
                 {
                     id: "view_1",
-                    layerIds: [huginMapDepthPropLayerPng.id],
+                    layerIds: [hugin25mDepthMapLayer.id],
                     show3D: args.show3d,
                     isSync: args.sync.includes("view_1"),
                 },
                 {
                     id: "view_2",
-                    layerIds: [huginMapNetmapPropLayerPng.id],
+                    layerIds: [hugin25mKhNetmapMapLayer.id],
                     show3D: args.show3d,
                     isSync: args.sync.includes("view_2"),
                 },
@@ -142,10 +137,7 @@ const SyncedMultiViewComponent = (args: {
                 },
                 {
                     id: "view_4",
-                    layerIds: [
-                        volveWellsLayer.id,
-                        huginMapDepthPropLayerPng.id,
-                    ],
+                    layerIds: [volveWellsLayer.id, hugin25mDepthMapLayer.id],
                     show3D: args.show3d,
                     isSync: args.sync.includes("view_4"),
                 },
@@ -235,16 +227,12 @@ export const SyncedSubsurfaceViewers: StoryObj<
         bounds: volveWellsBounds,
         layers: [volveWellsLayer],
         cameraPosition,
-        views: {
-            layout: [1, 1],
-            viewports: [{ id: "view", show3D: false }],
-        },
+        views: default2DViews,
     },
     render: (args) => <SyncedCameraSettingsComponent {...args} />,
 };
 
 const zoomBox3D: BoundingBox3D = [-325, -450, -25, 125, 150, 125];
-//const zoomBox3D: BoundingBox3D = [-100, -100, -100,  100, 100, 100];
 
 const AutoZoomToBox = (args: SubsurfaceViewerProps) => {
     const [rotX, setRotX] = React.useState(0);
@@ -259,6 +247,26 @@ const AutoZoomToBox = (args: SubsurfaceViewerProps) => {
 
     const props = {
         ...args,
+        layers: [
+            new AxesLayer({
+                id: "axes",
+                bounds: zoomBox3D,
+                ZIncreasingDownwards: false,
+            }),
+            new SimpleMeshLayer({
+                id: "sphere",
+                data: [{}],
+                mesh: new SphereGeometry({
+                    nlat: 100,
+                    nlong: 100,
+                    radius: 30,
+                }),
+                wireframe: false,
+                getPosition: [0, 0, 0],
+                getColor: [255, 255, 255],
+                material: true,
+            }),
+        ],
         cameraPosition,
     };
 
@@ -295,34 +303,11 @@ const AutoZoomToBox = (args: SubsurfaceViewerProps) => {
 
 export const AutoZoomToBoxStory: StoryObj<typeof SubsurfaceViewer> = {
     args: {
-        id: "DeckGL-Map",
-        layers: [
-            new AxesLayer({
-                id: "polyhedral-cells-axes",
-                bounds: zoomBox3D,
-                ZIncreasingDownwards: false,
-            }),
-            // unfortunately, SimpleMeshLayer can not be specified as a Record<string, any> :(
-            new SimpleMeshLayer({
-                id: "sphere",
-                data: [{}],
-                mesh: new SphereGeometry({
-                    nlat: 100,
-                    nlong: 100,
-                    radius: 30,
-                }),
-                wireframe: false,
-                getPosition: [0, 0, 0],
-                getColor: [255, 255, 255],
-                material: true,
-            }),
-        ],
         views: default3DViews,
     },
     parameters: {
         docs: {
-            inlineStories: false,
-            iframeHeight: 500,
+            ...defaultStoryParameters.docs,
             description: {
                 story: "",
             },
@@ -334,14 +319,14 @@ export const AutoZoomToBoxStory: StoryObj<typeof SubsurfaceViewer> = {
 const ScaleZComponent: React.FC<SubsurfaceViewerProps> = (args) => {
     const [layers, setLayers] = React.useState([
         huginAxes3DLayer,
-        huginMeshMapLayerPng,
+        hugin25mKhNetmapMapLayerPng,
         northArrowLayer,
     ]);
 
     const handleChange = () => {
         setLayers([
             huginAxes3DLayer,
-            huginMeshMapLayerPng,
+            hugin25mKhNetmapMapLayerPng,
             volveWellsWithLogsLayer,
             northArrowLayer,
         ]);
@@ -367,7 +352,7 @@ export const ScaleZ: StoryObj<typeof SubsurfaceViewer> = {
         id: "ScaleZ",
         layers: [
             huginAxes3DLayer,
-            huginMeshMapLayerPng,
+            hugin25mKhNetmapMapLayerPng,
             volveWellsWithLogsLayer,
             northArrowLayer,
         ],
@@ -380,7 +365,7 @@ export const ScaleZ: StoryObj<typeof SubsurfaceViewer> = {
                     id: "view_1",
                     layerIds: [
                         huginAxes3DLayer.id,
-                        huginMeshMapLayerPng.id,
+                        hugin25mKhNetmapMapLayerPng.id,
                         northArrowLayer.id,
                     ],
                     show3D: true,
@@ -447,7 +432,11 @@ const ResetCameraComponent: React.FC<SubsurfaceViewerProps> = (args) => {
 export const ResetCameraStory: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "ResetCameraProperty",
-        layers: [huginAxes3DLayer, huginMeshMapLayerPng, northArrowLayer],
+        layers: [
+            huginAxes3DLayer,
+            hugin25mKhNetmapMapLayerPng,
+            northArrowLayer,
+        ],
 
         bounds: volveWellsBounds,
         cameraPosition: ResetCameraPropertyDefaultCameraPosition,
@@ -467,13 +456,13 @@ export const ResetCameraStory: StoryObj<typeof SubsurfaceViewer> = {
 const AddLayerComponent: React.FC<SubsurfaceViewerProps> = (args) => {
     const [layers, setLayers] = React.useState([
         huginAxes3DLayer,
-        huginMeshMapLayerPng,
+        hugin25mKhNetmapMapLayerPng,
         northArrowLayer,
     ]);
 
     const handleChange = () => {
         setLayers([
-            huginMeshMapLayerPng,
+            hugin25mKhNetmapMapLayerPng,
             huginAxes3DLayer,
             volveWellsWithLogsLayer,
             northArrowLayer,

@@ -1,5 +1,13 @@
-import type { LayersList } from "@deck.gl/core/typed";
+import React from "react";
+import type { PickingInfo, LayersList } from "@deck.gl/core/typed";
 import { Layer } from "@deck.gl/core/typed";
+import PropTypes from "prop-types";
+import type { colorTablesArray } from "@emerson-eps/color-tables/";
+import type { Unit } from "convert-units";
+import convert from "convert-units";
+
+import type { MjolnirGestureEvent } from "mjolnir.js";
+
 import type {
     BoundsAccessor,
     MapMouseEvent,
@@ -10,14 +18,7 @@ import type {
 
 import { TGrid3DColoringMode } from "./layers/grid3d/grid3dLayer";
 
-import Map, { jsonToObject } from "./components/Map";
-import React from "react";
-import PropTypes from "prop-types";
-import type { colorTablesArray } from "@emerson-eps/color-tables/";
-import type { Unit } from "convert-units";
-import convert from "convert-units";
-import type { PickingInfo } from "@deck.gl/core/typed";
-import type { MjolnirGestureEvent } from "mjolnir.js";
+import Map, { jsonToObject, createLayers } from "./components/Map";
 
 export type {
     BoundsAccessor,
@@ -98,9 +99,10 @@ export interface SubsurfaceViewerProps {
     getCameraPosition?: (input: ViewStateType) => void;
 
     /**
-     * Will be called after all layers have rendered data.
+     * Will be called while layers are processed to rendered data.
+     * @param progress vlaue between 0 and 100.
      */
-    isRenderedCallback?: (arg: boolean) => void;
+    onRenderingProgress?: (progress: number) => void;
 
     onDragStart?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
     onDragEnd?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
@@ -122,6 +124,11 @@ export interface SubsurfaceViewerProps {
     lights?: LightsType;
 
     children?: React.ReactNode;
+
+    /**
+     * If set to true allows to use typed arrays in layer description JS objects.
+     */
+    typedArraySupport?: boolean;
 }
 
 const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
@@ -143,12 +150,13 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
     selection,
     getTooltip,
     getCameraPosition,
-    isRenderedCallback,
+    onRenderingProgress,
     onDragStart,
     onDragEnd,
     triggerResetMultipleWells,
     lights,
     children,
+    typedArraySupport,
 }: SubsurfaceViewerProps) => {
     // Contains layers data received from map layers by user interaction
     const [layerEditedData, setLayerEditedData] = React.useState(editedData);
@@ -161,6 +169,7 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
             return;
         }
 
+        //The layers have been already created externally.
         if (layers?.[0] instanceof Layer) {
             setLayerInstances(layers as LayersList);
             return;
@@ -170,13 +179,24 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
         if (resources) enumerations.push({ resources: resources });
         if (editedData) enumerations.push({ editedData: editedData });
         else enumerations.push({ editedData: {} });
-        const layersList = jsonToObject(
-            layers as Record<string, unknown>[],
-            enumerations
-        ) as LayersList;
-        setLayerInstances(layersList);
+
+        //Bypass conversion of layer props through JSON and use them as is.
+        if (typedArraySupport) {
+            const layersList = createLayers(
+                layers as Record<string, unknown>[],
+                enumerations
+            ) as LayersList;
+            setLayerInstances(layersList);
+        } else {
+            const layersList = jsonToObject(
+                layers as Record<string, unknown>[],
+                enumerations
+            ) as LayersList;
+            setLayerInstances(layersList);
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [layers]); // Note. Fixing this dependency list may cause infinite recursion.
+
     React.useEffect(() => {
         if (!editedData) return;
 
@@ -228,7 +248,7 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
             getTooltip={getTooltip}
             cameraPosition={cameraPosition}
             getCameraPosition={getCameraPosition}
-            isRenderedCallback={isRenderedCallback}
+            onRenderingProgress={onRenderingProgress}
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
             triggerHome={triggerHome}

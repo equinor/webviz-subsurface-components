@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 
 import type { Feature, FeatureCollection } from "geojson";
@@ -10,6 +11,7 @@ import type {
 } from "mjolnir.js";
 
 import { JSONConfiguration, JSONConverter } from "@deck.gl/json/typed";
+
 import type { DeckGLRef } from "@deck.gl/react/typed";
 import DeckGL from "@deck.gl/react/typed";
 import type {
@@ -414,9 +416,10 @@ export interface MapProps {
     getCameraPosition?: (input: ViewStateType) => void;
 
     /**
-     * Will be called after all layers have rendered data.
+     * Will be called while layers have rendered data.
+     * progress is a number between 0 and 100.
      */
-    isRenderedCallback?: (arg: boolean) => void;
+    onRenderingProgress?: (progress: number) => void;
 
     onDragStart?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
     onDragEnd?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
@@ -462,7 +465,7 @@ const Map: React.FC<MapProps> = ({
     children,
     getTooltip = defaultTooltip,
     getCameraPosition,
-    isRenderedCallback,
+    onRenderingProgress,
     onDragStart,
     onDragEnd,
     lights,
@@ -723,33 +726,40 @@ const Map: React.FC<MapProps> = ({
         });
     }, [layers, zScale]);
 
-    const [isLoaded, setIsLoaded] = useState<boolean>(false);
+    const [loadingProgress, setLoadingProgress] = useState<number>(0);
     const onAfterRender = useCallback(() => {
         if (deckGLLayers) {
-            const loadedState = deckGLLayers.every((layer) => {
-                return (
-                    (layer as Layer).isLoaded || !(layer as Layer).props.visible
-                );
-            });
+            let progress = 100;
 
             const emptyLayers = // There will always be a dummy layer. Deck.gl does not like empty array of layers.
                 deckGLLayers.length == 1 &&
                 (deckGLLayers[0] as LineLayer).id ===
                     "webviz_internal_dummy_layer";
+            if (!emptyLayers) {
+                // compute #done layers / #visible layers percentage
+                const visibleLayers = deckGLLayers.filter(
+                    (layer) => (layer as Layer).props.visible
+                );
+                const loaded = visibleLayers?.filter(
+                    (layer) => (layer as Layer)?.isLoaded
+                ).length;
+                // ceil to ensure reaching 100 (important to check if done)
+                progress = Math.ceil((100 * loaded) / visibleLayers?.length);
+            }
 
-            setIsLoaded(loadedState || emptyLayers);
-            if (isRenderedCallback) {
-                isRenderedCallback(loadedState);
+            setLoadingProgress(progress);
+            if (onRenderingProgress) {
+                onRenderingProgress(progress);
             }
         }
-    }, [deckGLLayers, isRenderedCallback]);
+    }, [deckGLLayers, onRenderingProgress]);
 
     // validate layers data
     const [errorText, setErrorText] = useState<string>();
     useEffect(() => {
         const layers = deckRef.current?.deck?.props.layers as Layer[];
         // this ensures to validate the schemas only once
-        if (checkDatafileSchema && layers && isLoaded) {
+        if (checkDatafileSchema && layers && loadingProgress === 100) {
             try {
                 validateLayers(layers);
                 colorTables && validateColorTables(colorTables);
@@ -761,7 +771,7 @@ const Map: React.FC<MapProps> = ({
         checkDatafileSchema,
         colorTables,
         deckRef?.current?.deck?.props.layers,
-        isLoaded,
+        loadingProgress,
     ]);
 
     const layerFilter = useCallback(
@@ -896,8 +906,27 @@ const Map: React.FC<MapProps> = ({
                     style={scale.cssStyle ?? {}}
                 />
             ) : null}
-            <StatusIndicator layers={deckGLLayers} isLoaded={isLoaded} />
-            {coords?.visible ? <InfoCard pickInfos={hoverInfo} /> : null}
+            {!onRenderingProgress && loadingProgress < 100 && (
+                <div
+                    style={{
+                        display: "flex",
+                        alignItems: "flex-end",
+                        justifyContent: "right",
+                        position: "absolute",
+                        height: "90%",
+                        width: "90%",
+                        bottom: "10px",
+                        right: "10px",
+                        zIndex: 200,
+                    }}
+                >
+                    <StatusIndicator
+                        progress={loadingProgress}
+                        label="Loading assets..."
+                    />
+                </div>
+            )}
+            {coords?.visible && <InfoCard pickInfos={hoverInfo} />}
             {errorText && (
                 <pre
                     style={{
@@ -950,6 +979,35 @@ export function jsonToObject(
 ): LayersList | View[] {
     if (!data) return [];
 
+    const configuration = createConfiguration(enums);
+    const jsonConverter = new JSONConverter({ configuration });
+
+    // remove empty data/layer object
+    const filtered_data = data.filter((value) => !isEmpty(value));
+    return jsonConverter.convert(filtered_data);
+}
+
+export function createLayers(
+    data: Record<string, unknown>[],
+    enums: Record<string, unknown>[] | undefined = undefined
+): LayersList {
+    const configuration = createConfiguration(enums);
+    const layersList: Layer[] = [];
+
+    // remove empty data/layer object
+    const filtered_data = data.filter((value) => !isEmpty(value));
+    for (const layerData of filtered_data) {
+        const layer = createLayer(layerData, configuration);
+        if (layer) {
+            layersList.push(layer);
+        }
+    }
+    return layersList;
+}
+
+function createConfiguration(
+    enums: Record<string, unknown>[] | undefined = undefined
+): JSONConfiguration {
     const configuration = new JSONConfiguration(JSON_CONVERTER_CONFIG);
     enums?.forEach((enumeration) => {
         if (enumeration) {
@@ -960,11 +1018,27 @@ export function jsonToObject(
             });
         }
     });
-    const jsonConverter = new JSONConverter({ configuration });
+    return configuration;
+}
 
-    // remove empty data/layer object
-    const filtered_data = data.filter((value) => !isEmpty(value));
-    return jsonConverter.convert(filtered_data);
+function createLayer(
+    layerData: Record<string, unknown>,
+    configuration: JSONConfiguration
+): Layer | null {
+    const typeKey = configuration.typeKey;
+    const classes = configuration.classes as Record<string, any>;
+    if (layerData[typeKey]) {
+        const type = layerData[typeKey] as string;
+        if (type in classes) {
+            const Class = classes[type];
+
+            // Prepare a props object
+            const props = { ...layerData };
+            delete props[typeKey];
+            return new Class(props);
+        }
+    }
+    return null;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -1083,7 +1157,8 @@ class ViewController {
             state.camera != this.state_.camera ||
             state.bounds != this.state_.bounds ||
             (!state.viewStateChanged &&
-                state.boundingBox3d !== this.state_.boundingBox3d);
+                (state.boundingBox3d !== this.state_.boundingBox3d ||
+                    state.deckSize != this.state_.deckSize));
         const needUpdate = updateZScale || updateTarget || updateViewState;
 
         const isCacheEmpty = isEmpty(this.result_.viewState);
@@ -1571,12 +1646,16 @@ function computeViewState(
             );
         }
         const defaultCamera = {
-            target: [],
+            target: [0, 0, 0],
             zoom: NaN,
             rotationX: 45, // look down z -axis at 45 degrees
             rotationOrbit: 0,
         };
-        return updateViewState(defaultCamera, boundingBox, size);
+        return updateViewState(
+            defaultCamera,
+            boundingBox ?? [0, 0, 0, 1, 1, 1],
+            size
+        );
     } else {
         // If the camera is defined, use it
         if (isCameraPositionDefined) {

@@ -44,7 +44,7 @@ export type WellMarkerDataT = {
      */
     azimuth: number;
     /**
-     * Inclination of a marker against vertical direcion in degrees.
+     * Inclination of a marker against vertical direction in degrees.
      */
     inclination: number;
     /**

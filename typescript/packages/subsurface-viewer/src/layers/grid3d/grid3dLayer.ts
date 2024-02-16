@@ -1,7 +1,14 @@
+import type React from "react";
+import { isEqual } from "lodash";
+
 import type { Color } from "@deck.gl/core/typed";
 import { CompositeLayer } from "@deck.gl/core/typed";
+import { load, JSONLoader } from "@loaders.gl/core";
+
+import workerpool from "workerpool";
+
 import type { Material } from "./privateGrid3dLayer";
-import privateLayer from "./privateGrid3dLayer";
+import PrivateLayer from "./privateGrid3dLayer";
 import type {
     ExtendedLayerProps,
     colorMapFunctionType,
@@ -11,8 +18,31 @@ import type {
     ReportBoundingBoxAction,
 } from "../../components/Map";
 import { makeFullMesh } from "./webworker";
-import { isEqual } from "lodash";
-import { load, JSONLoader } from "@loaders.gl/core";
+
+import config from "../../SubsurfaceConfig.json";
+import { findConfig } from "../../utils/configTools";
+
+// init workerpool
+const workerPoolConfig = findConfig(
+    config,
+    "config/workerpool",
+    "config/layer/Grid3DLayer/workerpool"
+);
+
+const pool = workerpool.pool({
+    ...{
+        maxWorkers: 10,
+        workerType: "web",
+    },
+    ...workerPoolConfig,
+});
+
+function onTerminateWorker() {
+    const stats = pool.stats();
+    if (stats.busyWorkers === 0 && stats.pendingTasks === 0) {
+        pool.terminate();
+    }
+}
 
 export type WebWorkerParams = {
     points: Float32Array;
@@ -213,12 +243,6 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
 
             // Using inline web worker for calculating the triangle mesh from
             // loaded input data so not to halt the GUI thread.
-            const blob = new Blob(
-                ["self.onmessage = ", makeFullMesh.toString()],
-                { type: "text/javascript" }
-            );
-            const url = URL.createObjectURL(blob);
-            const webWorker = new Worker(url);
 
             const webworkerParams: WebWorkerParams = {
                 points,
@@ -226,9 +250,8 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
                 properties,
             };
 
-            webWorker.postMessage(webworkerParams);
-            webWorker.onmessage = (e) => {
-                const [mesh, mesh_lines, propertyValueRange] = e.data;
+            pool.exec(makeFullMesh, [{ data: webworkerParams }]).then((e) => {
+                const [mesh, mesh_lines, propertyValueRange] = e;
                 const legend = {
                     discrete: false,
                     valueRange: this.props.colorMapRange ?? propertyValueRange,
@@ -252,13 +275,13 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
                     this.props.reportBoundingBox({ layerBoundingBox: bbox });
                 }
 
-                webWorker.terminate();
-
                 this.setState({
                     ...this.state,
                     isFinishedLoading: true,
                 });
-            };
+
+                onTerminateWorker();
+            });
         });
     }
 
@@ -295,13 +318,13 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
         }
     }
 
-    renderLayers(): [privateLayer?] {
+    renderLayers(): [PrivateLayer?] {
         if (Object.keys(this.state).length === 1) {
             // isFinishedLoading only in state
             return [];
         }
 
-        const layer = new privateLayer(
+        const layer = new PrivateLayer(
             this.getSubLayerProps({
                 mesh: this.state["mesh"],
                 meshLines: this.state["mesh_lines"],
