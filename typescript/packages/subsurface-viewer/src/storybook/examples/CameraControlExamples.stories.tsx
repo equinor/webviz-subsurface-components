@@ -1,5 +1,5 @@
-import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+import React from "react";
 
 import { SimpleMeshLayer } from "@deck.gl/mesh-layers/typed";
 import { SphereGeometry } from "@luma.gl/engine";
@@ -8,21 +8,21 @@ import Box from "@mui/material/Box";
 import Slider from "@mui/material/Slider";
 import { styled } from "@mui/material/styles";
 
-import SubsurfaceViewer from "../../SubsurfaceViewer";
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
-import type { ViewStateType, BoundingBox3D } from "../../components/Map";
+import SubsurfaceViewer from "../../SubsurfaceViewer";
+import type { BoundingBox3D, ViewStateType } from "../../components/Map";
 import { AxesLayer } from "../../layers";
 
 import {
-    mainStyle,
-    huginAxes3DLayer,
     default2DViews,
     default3DViews,
     defaultStoryParameters,
-    hugin3DBounds,
     hugin25mDepthMapLayer,
     hugin25mKhNetmapMapLayer,
     hugin25mKhNetmapMapLayerPng,
+    hugin3DBounds,
+    huginAxes3DLayer,
+    mainStyle,
     northArrowLayer,
     volveWellsBounds,
     volveWellsLayer,
@@ -505,4 +505,83 @@ export const AddLayer: StoryObj<typeof SubsurfaceViewer> = {
         },
     },
     render: (args) => <AddLayerComponent {...args} />,
+};
+
+const ScaleYComponent: React.FC<SubsurfaceViewerProps> = (args) => {
+    const [layers, setLayers] = React.useState([
+        huginAxes3DLayer,
+        hugin25mKhNetmapMapLayerPng,
+        northArrowLayer,
+    ]);
+
+    const handleChange = () => {
+        setLayers([
+            huginAxes3DLayer,
+            hugin25mKhNetmapMapLayerPng,
+            volveWellsWithLogsLayer,
+            northArrowLayer,
+        ]);
+    };
+
+    const props = {
+        ...args,
+        layers,
+    };
+
+    return (
+        <Root>
+            <div className={classes.mainWithButton}>
+                <SubsurfaceViewer {...props} />
+            </div>
+            <button onClick={handleChange}>Add layer</button>
+        </Root>
+    );
+};
+
+export const ScaleY: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "ScaleY",
+        layers: [
+            huginAxes3DLayer,
+            hugin25mKhNetmapMapLayerPng,
+            volveWellsWithLogsLayer,
+            northArrowLayer,
+        ],
+        bounds: volveWellsBounds,
+
+        views: {
+            layout: [1, 2],
+            viewports: [
+                {
+                    id: "view_1",
+                    layerIds: [
+                        huginAxes3DLayer.id,
+                        hugin25mKhNetmapMapLayerPng.id,
+                        northArrowLayer.id,
+                    ],
+                    show3D: false,
+                    isSync: true,
+                },
+                {
+                    id: "view_2",
+                    layerIds: [
+                        huginAxes3DLayer.id,
+                        volveWellsWithLogsLayer.id,
+                        northArrowLayer.id,
+                    ],
+                    show3D: false,
+                    isSync: true,
+                },
+            ],
+        },
+    },
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: "Example scaling in z direction using arrow up/down buttons.",
+            },
+        },
+    },
+    render: (args) => <ScaleYComponent {...args} />,
 };
