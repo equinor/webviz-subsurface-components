@@ -1,3 +1,10 @@
+## [0.5.3](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.5.2...wsc-common@0.5.3) (2024-02-16)
+
+
+### Bug Fixes
+
+* bump [@deck](https://github.com/deck).gl/core from 8.9.33 to 8.9.34 in /typescript ([#1922](https://github.com/equinor/webviz-subsurface-components/issues/1922)) ([94bd152](https://github.com/equinor/webviz-subsurface-components/commit/94bd1524b7cba4d505e559ef9648981b7fdebbca)), closes [#8412](https://github.com/equinor/webviz-subsurface-components/issues/8412) [#8290](https://github.com/equinor/webviz-subsurface-components/issues/8290) [#8347](https://github.com/equinor/webviz-subsurface-components/issues/8347) [#8412](https://github.com/equinor/webviz-subsurface-components/issues/8412) [#8290](https://github.com/equinor/webviz-subsurface-components/issues/8290) [#8347](https://github.com/equinor/webviz-subsurface-components/issues/8347) [#8436](https://github.com/equinor/webviz-subsurface-components/issues/8436) [#8412](https://github.com/equinor/webviz-subsurface-components/issues/8412) [#8290](https://github.com/equinor/webviz-subsurface-components/issues/8290)
+
 ## [0.5.2](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.5.1...wsc-common@0.5.2) (2024-02-13)
 
 
