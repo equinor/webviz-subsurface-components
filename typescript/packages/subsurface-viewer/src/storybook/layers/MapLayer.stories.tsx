@@ -1,34 +1,34 @@
-import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+import React from "react";
 
-import { ClipExtension } from "@deck.gl/extensions/typed";
 import { View } from "@deck.gl/core/typed";
+import { ClipExtension } from "@deck.gl/extensions/typed";
 
+import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
+import SubsurfaceViewer from "../../SubsurfaceViewer";
+import InfoCard from "../../components/InfoCard";
 import type {
     BoundingBox2D,
     BoundingBox3D,
     ViewsType,
 } from "../../components/Map";
 import { useHoverInfo } from "../../components/Map";
-import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
-import SubsurfaceViewer from "../../SubsurfaceViewer";
-import InfoCard from "../../components/InfoCard";
 
+import { ViewFooter } from "../../components/ViewFooter";
 import AxesLayer from "../../layers/axes/axesLayer";
 import MapLayer from "../../layers/map/mapLayer";
-import { ViewFooter } from "../../components/ViewFooter";
-import type { colorMapFunctionType } from "../../layers/utils/layerTools";
 import NorthArrow3DLayer from "../../layers/northarrow/northArrow3DLayer";
+import type { colorMapFunctionType } from "../../layers/utils/layerTools";
 
 import {
-    defaultStoryParameters,
     default2DViews,
     default3DViews,
-    huginAxes3DLayer,
-    hugin2DBounds,
-    hugin5mKhNetmapMapLayer,
+    defaultStoryParameters,
     hugin25mKhNetmapMapLayer,
     hugin25mKhNetmapMapLayerPng,
+    hugin2DBounds,
+    hugin5mKhNetmapMapLayer,
+    huginAxes3DLayer,
     northArrowLayer,
 } from "../sharedSettings";
 
@@ -40,6 +40,9 @@ const stories: Meta = {
         // Somehow, I do not manage to add the triggerHome to the general "unset" controls :/
         triggerHome: 0,
     },
+
+    // Disable automatic tests for stories using the "no-test" tag.
+    tags: ["no-test"],
 };
 export default stories;
 
@@ -400,6 +403,7 @@ export const NodeCenteredPropMapWithArrayInput: StoryObj<
             },
         },
     },
+    tags: ["no-test"],
 };
 
 function makeGaussian(amplitude, x0, y0, stdX, stdY) {

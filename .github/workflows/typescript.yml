@@ -37,7 +37,6 @@ jobs:
           node-version: 18
 
       - name: 📦 Install build dependencies
-        # The deckgl types package runs a postscript to setup, but since we ignore scripts, we need to set it up manually.
         run: |
 
           # In https://github.com/equinor/webviz-subsurface-components/pull/1010 we
@@ -85,16 +84,6 @@ jobs:
       - name: 📚 Build Storybook
         run: npm run build-storybook
 
-      - name: Serve Storybook and run tests
-        env:
-          PORT: 8080
-          HOST: 127.0.0.1
-        run: |
-          npx playwright install
-          npx concurrently -k -s first -n "SB,TEST" -c "magenta,blue" \
-            "npx http-server storybook-static --port $PORT -a $HOST" \
-            "npx wait-on http://$HOST:$PORT/ && npm run storybook:test -- --ci --url http://$HOST:$PORT/"
-
       - name: 📚 Update Storybook
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         run: |
@@ -118,3 +107,39 @@ jobs:
             git commit -m "Update Github Pages"
             git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" gh-pages
           fi
+
+  smoke_tests:
+    # Run on all events defined above, except pushes which are not to master
+    if: github.event_name != 'push' || github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    name: "Storybook Smoke Tests"
+
+    container:
+      image: mcr.microsoft.com/playwright:v1.39.0-jammy
+      options: --user 1001
+
+    steps:
+      - name: 📖 Checkout commit locally
+        uses: actions/checkout@v3
+
+      - name: 📦 Install build dependencies
+        run: |
+          npm ci CYPRESS_INSTALL_BINARY=0 --ignore-scripts
+
+      - name: 🏗️ Build packages
+        run: |
+          npx nx run-many -t build
+
+      - name: 📚 Build Storybook
+        run: npm run build-storybook
+
+      - name: Run smoke tests
+
+        env:
+          PORT: 8080
+          HOST: 127.0.0.1
+
+        run: |
+          npx concurrently -k -s first -n "SB,TEST" -c "magenta,blue" \
+            "npx http-server storybook-static --port $PORT -a $HOST" \
+            "npx wait-on http://$HOST:$PORT/ && npm run storybook:test -- --ci --url http://$HOST:$PORT/"
