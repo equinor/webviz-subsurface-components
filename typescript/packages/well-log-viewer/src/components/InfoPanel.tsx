@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import React, { Component } from "react";
+import { Tooltip } from "@mui/material";
 
 import type { Info } from "./InfoTypes";
 
@@ -60,6 +61,7 @@ class InfoPanel extends Component<Props> {
     }
 
     createRow(info: Info): ReactNode {
+        const autoDescreaseFontSize = false;
         if (info.type === "separator")
             // special case
             return createSeparator();
@@ -93,21 +95,31 @@ class InfoPanel extends Component<Props> {
             fontSize: "small",
         };
         let name = info.name ? info.name : "?";
-        if (name.length > 16)
-            // compress too long names
-            name = name.substring(0, 14) + ellipsis;
+        let tooltip = name;
         // print long names and values with a smaller font size
         const nameStyle: React.CSSProperties = { whiteSpace: "nowrap" };
-        if (name.length > 10) nameStyle.fontSize = "x-small";
+        let maxLen = 11;   
+        if (autoDescreaseFontSize && name.length > 10) {
+            nameStyle.fontSize = "x-small";
+            maxLen= 16;
+        }
+        if (name.length > maxLen) {
+            // compress too long names
+            name = name.substring(0, maxLen-2) + ellipsis;
+        }
+
         let value = formatValue(info.value);
         if (info.discrete)
             value = info.discrete + (value ? nbsp + "(" + value + ")" : "");
         if (value === "") value = nbsp; // set some text to force the empty line to have the same height as non-empty line
         const valueStyle: React.CSSProperties = {
             width: "90px",
+            maxWidth: "90px",
             paddingLeft: "1.5em",
             textAlign: "right",
             whiteSpace: "nowrap",
+            textOverflow: "ellipsis",
+            overflow: "hidden"
         };
         if (value.length > 10) valueStyle.fontSize = "x-small";
         return (
@@ -119,7 +131,11 @@ class InfoPanel extends Component<Props> {
                 }
             >
                 <td style={typeStyle}>{bigCircle}</td>
-                <td style={nameStyle}>{name}</td>
+                <td style={nameStyle}>
+                   {name!==tooltip? 
+                    <Tooltip title={tooltip}>{name}</Tooltip>: 
+                    name}
+                </td>
                 <td style={valueStyle} colSpan={info.discrete ? 2 : 1}>
                     {value}
                 </td>
@@ -132,7 +148,7 @@ class InfoPanel extends Component<Props> {
 
     render(): JSX.Element {
         return (
-            <div style={{ overflowY: "auto", overflowX: "hidden" }}>
+            <div styleName="readout" style={{ overflowY: "auto", overflowX: "hidden" }}>
                 <fieldset>
                     <legend>{this.props.header}</legend>
 

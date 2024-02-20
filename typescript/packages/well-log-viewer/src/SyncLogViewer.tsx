@@ -1014,7 +1014,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                         infos={this.state.infos[index]}
                     />
                 ))}
-                <div style={{ paddingLeft: "10px", display: "flex" }}>
+                <div styleName="zoom" style={{ paddingLeft: "10px", display: "flex" }}>
                     <span>Zoom:</span>
                     <span
                         style={{

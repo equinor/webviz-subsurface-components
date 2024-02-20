@@ -268,6 +268,7 @@ export default class WellLogViewer extends Component<
                     onTemplateChanged={this.onTemplateChanged}
                 />
                 <div
+                    styleName="right-panel"
                     style={{
                         flex: "0, 0",
                         display: "flex",
@@ -291,7 +292,7 @@ export default class WellLogViewer extends Component<
                         infos={this.state.infos}
                     />
                     <br />
-                    <div style={{ paddingLeft: "10px", display: "flex" }}>
+                    <div styleName="zoom" style={{ paddingLeft: "10px", display: "flex" }}>
                         <span>Zoom:</span>
                         <span
                             style={{
