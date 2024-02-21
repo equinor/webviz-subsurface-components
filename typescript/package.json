@@ -112,7 +112,7 @@
         "source-map-loader": "^3.0.0",
         "storybook": "^7.6.4",
         "style-loader": "^2.0.0",
-        "terser-webpack-plugin": "^5.1.1",
+        "terser-webpack-plugin": "^5.3.10",
         "trim": ">=0.0.3",
         "ts-loader": "^9.5.0",
         "typedoc": "^0.25.7",
