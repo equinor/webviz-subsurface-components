@@ -195,6 +195,7 @@ export const TwoSideLighting: StoryObj<typeof SubsurfaceViewer> = {
 const typedDataSurfaceLayer = {
     "@@type": "TriangleLayer",
     id: "typedData_surface_layer",
+    "@@typedArraySupport": true,
 
     /*eslint-disable */
     pointsData: new Float32Array(SurfacePoints.default),
@@ -216,10 +217,9 @@ const typedDataSurfaceLayer = {
 export const TypedArrayInput: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "map",
-        layers: [surfaceAxesLayer, typedDataSurfaceLayer],
+        layerDefinitions: [surfaceAxesLayer, typedDataSurfaceLayer],
         bounds: [-2000, -2000, 2500, 2000],
         views: default3DViews,
-        typedArraySupport: true,
     },
     parameters: {
         docs: {

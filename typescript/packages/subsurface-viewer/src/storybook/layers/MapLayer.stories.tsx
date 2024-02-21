@@ -445,9 +445,10 @@ const TypedArrayInputComponent: React.FC<{
 }> = (args) => {
     const subsurfaceViewerArgs = {
         id: "map",
-        layers: [
+        layerDefinitions: [
             {
                 "@@type": "MapLayer",
+                "@@typedArraySupport": true,
                 id: "mesh-layer-typed-input",
                 frame: {
                     origin: [-args.dimension / 2, -args.dimension / 2],
@@ -485,7 +486,6 @@ const TypedArrayInputComponent: React.FC<{
         },
         views: default3DViews,
         triggerHome: args.triggerHome,
-        typedArraySupport: true,
     };
     return <SubsurfaceViewer {...subsurfaceViewerArgs} />;
 };
