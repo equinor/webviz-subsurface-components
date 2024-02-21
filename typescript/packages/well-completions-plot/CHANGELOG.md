@@ -1,3 +1,10 @@
+## [1.2.4](https://github.com/equinor/webviz-subsurface-components/compare/well-completions-plot@1.2.3...well-completions-plot@1.2.4) (2024-02-21)
+
+
+### Bug Fixes
+
+* bump ip from 2.0.0 to 2.0.1 in /typescript ([#1927](https://github.com/equinor/webviz-subsurface-components/issues/1927)) ([7f3f225](https://github.com/equinor/webviz-subsurface-components/commit/7f3f2255580665d40ad828afe15a3ec73bb7029f))
+
 ## [1.2.3](https://github.com/equinor/webviz-subsurface-components/compare/well-completions-plot@1.2.2...well-completions-plot@1.2.3) (2024-02-16)
 
 
