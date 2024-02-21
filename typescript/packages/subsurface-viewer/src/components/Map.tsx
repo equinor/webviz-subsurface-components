@@ -1651,7 +1651,11 @@ function computeViewState(
             rotationX: 45, // look down z -axis at 45 degrees
             rotationOrbit: 0,
         };
-        return updateViewState(defaultCamera, boundingBox, size);
+        return updateViewState(
+            defaultCamera,
+            boundingBox ?? [0, 0, 0, 1, 1, 1],
+            size
+        );
     } else {
         // If the camera is defined, use it
         if (isCameraPositionDefined) {

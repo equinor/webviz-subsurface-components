@@ -1,14 +1,14 @@
 module.exports = {
-    "presets": [
+    presets: [
         [
             "@babel/preset-env",
             {
-                "targets": {
-                    "esmodules": true
-                }
-            }
+                targets: {
+                    esmodules: true,
+                },
+            },
         ],
         "@babel/preset-react",
-        "@babel/preset-typescript"
+        "@babel/preset-typescript",
     ],
 };

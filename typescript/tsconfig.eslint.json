@@ -6,7 +6,11 @@
         "*.json",
         "*.js",
         "packages/*/*.json",
-        "packages/*/*.js"
+        "packages/*/*.js",
+        ".storybook/*",
+        "*.ts",
+        "__mocks__",
+        "config"
     ],
     // exclude is overwritten, replicate in .eslintignore
     "exclude": [
