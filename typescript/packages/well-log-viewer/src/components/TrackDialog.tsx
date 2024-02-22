@@ -177,6 +177,8 @@ export class TrackPropertiesDialog extends Component<Props, State> {
                     style={{
                         display: "grid",
                         gridTemplateColumns: "1fr 1fr 1fr",
+                        paddingTop: 20,
+                        gap: 10,
                     }}
                 >
                     <TextField

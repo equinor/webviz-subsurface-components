@@ -353,6 +353,8 @@ export class PlotPropertiesDialog extends Component<Props, State> {
                     style={{
                         display: "grid",
                         gridTemplateColumns: "1fr 1fr 1fr",
+                        paddingTop: 20,
+                        gap: 10,
                     }}
                 >
                     {this.createSelectControl(
@@ -374,7 +376,7 @@ export class PlotPropertiesDialog extends Component<Props, State> {
                                   createScaleItems()
                               ),
                           ]
-                        : [<FormControl fullWidth key="12" />]}
+                        : []}
 
                     {this.createSelectControl(
                         "name",
