@@ -17,8 +17,6 @@ import {
 } from "../../layers/grid3d/test_data/PentagonalToroid";
 
 import { default3DViews, defaultStoryParameters } from "../sharedSettings";
-import Grid3DLayer from "../../layers/grid3d/grid3dLayer";
-import { Layer } from "@deck.gl/core/typed";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -215,58 +213,6 @@ export const PolyhedralCells: StoryObj<typeof SubsurfaceViewer> = {
                 propertiesData: toroidProperties,
                 coloringMode: TGrid3DColoringMode.Property,
             },
-        ],
-    },
-    parameters: parameters,
-};
-
-export const MixedLayerDefinitions: StoryObj<typeof SubsurfaceViewer> = {
-    args: {
-        bounds: [-25, -25, 50, 30] as NumberQuad,
-        views: {
-            layout: [1, 1] as [number, number],
-            viewports: [
-                {
-                    id: "view_1",
-                    show3D: true,
-                },
-            ],
-        },
-        id: "grid-3d-polyhedral-cell-typed-input",
-        layerDefinitions: [
-            undefined,
-            {
-                ...axes,
-                id: "polyhedral-cells-axes-typed-input",
-                bounds: [-15, -15, -15, 40, 20, 15],
-            },
-            null,
-            {
-                ...grid3dLayer,
-                id: "polyhedral1-typed-input",
-                "@@typedArraySupport": true,
-                coloringMode: TGrid3DColoringMode.X,
-                pickable: true,
-                pointsData: new Float32Array(snubCubePoints),
-                polysData: new Uint32Array(SnubCubeFaces),
-                propertiesData: new Float32Array(snubCubeProperties),
-                colorMapRange: [-8, 8],
-                colorMapClampColor: [200, 200, 200],
-                colorMapName: "Rainbow",
-            },
-            false,
-            new Grid3DLayer({
-                gridLines: true,
-                material: true,
-                colorMapName: "Rainbow",
-                ZIncreasingDownwards: false,
-                id: "polyhedral2-typed-input",
-                pickable: true,
-                pointsData: new Float32Array(toroidPoints),
-                polysData: new Uint32Array(ToroidFaces),
-                propertiesData: new Float32Array(toroidProperties),
-                coloringMode: TGrid3DColoringMode.Property,
-            }) as unknown as Layer,
         ],
     },
     parameters: parameters,
