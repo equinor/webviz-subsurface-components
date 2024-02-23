@@ -11,9 +11,10 @@ import { styled } from "@mui/material/styles";
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import type { BoundingBox3D, ViewStateType } from "../../components/Map";
-import { AxesLayer } from "../../layers";
+import { Axes2DLayer, AxesLayer } from "../../layers";
 
 import {
+    customLayerWithPolygonDataProps,
     default2DViews,
     default3DViews,
     defaultStoryParameters,
@@ -28,6 +29,7 @@ import {
     volveWellsLayer,
     volveWellsWithLogsLayer,
 } from "../sharedSettings";
+import { GeoJsonLayer } from "@deck.gl/layers/typed";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -54,6 +56,22 @@ const Root = styled("div")({
         position: "relative",
     },
 });
+
+const SQUARE = {
+    type: "Feature",
+    geometry: {
+        type: "Polygon",
+        coordinates: [
+            [
+                [5, 5],
+                [5, 1500],
+                [1500, 1500],
+                [1500, 5],
+                [5, 5],
+            ],
+        ],
+    },
+};
 
 const DisplayCameraPositionComponent: React.FC<SubsurfaceViewerProps> = (
     args
@@ -507,40 +525,45 @@ export const AddLayer: StoryObj<typeof SubsurfaceViewer> = {
     render: (args) => <AddLayerComponent {...args} />,
 };
 
-const ScaleYComponent: React.FC<SubsurfaceViewerProps> = (args) => {
-    return <SubsurfaceViewer {...args} />;
-};
-
-export const ScaleY: StoryObj<typeof SubsurfaceViewer> = {
-    args: {
+const ScaleYComponent = ({ verticalScale }: { verticalScale: number }) => {
+    const viewerProps: SubsurfaceViewerProps = {
         id: "ScaleY",
+        bounds: [-1000, -1000, 3000, 3000],
         layers: [
-            huginAxes3DLayer,
-            hugin25mKhNetmapMapLayerPng,
-            volveWellsWithLogsLayer,
+            new Axes2DLayer({
+                id: "axes",
+            }),
+            new GeoJsonLayer({
+                ...customLayerWithPolygonDataProps,
+                getLineColor: [0, 0, 0],
+                data: SQUARE,
+            }),
         ],
-        bounds: volveWellsBounds,
         views: {
             layout: [1, 1],
             viewports: [
                 {
-                    id: "view_1",
-                    layerIds: [
-                        huginAxes3DLayer.id,
-                        hugin25mKhNetmapMapLayerPng.id,
-                    ],
-                    show3D: false,
-                    isSync: false,
-                    verticalScale: 1,
+                    id: "section",
+                    verticalScale,
                 },
             ],
+        },
+    };
+    return <SubsurfaceViewer {...viewerProps} />;
+};
+
+export const ScaleY: StoryObj<typeof ScaleYComponent> = {
+    args: { verticalScale: 1.5 },
+    argTypes: {
+        verticalScale: {
+            control: { type: "range", min: -1, max: 10, step: 0.1 },
         },
     },
     parameters: {
         docs: {
             ...defaultStoryParameters.docs,
             description: {
-                story: "Example scaling in z direction using arrow up/down buttons.",
+                story: "Vertical scaling example in Orthographic view.",
             },
         },
     },

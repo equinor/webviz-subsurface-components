@@ -1436,11 +1436,14 @@ function getViewStateFromBounds(
     }
 
     const zoom = viewPort.zoom ?? fb_zoom;
-    const verticalScale = viewPort.verticalScale || 1;
+    const scaledZoom: [number, number] = [
+        zoom,
+        zoom / Math.sqrt(Math.max(viewPort.verticalScale || 0, 0) || 1),
+    ];
 
     const view_state: ViewStateType = {
         target: viewPort.target ?? fb_target,
-        zoom: [zoom, zoom / Math.sqrt(verticalScale)],
+        zoom: viewPort.verticalScale ? scaledZoom : zoom,
         rotationX: 90, // look down z -axis
         rotationOrbit: 0,
         minZoom: viewPort.show3D ? minZoom3D : minZoom2D,
