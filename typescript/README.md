@@ -38,7 +38,7 @@ to the module rules in your `webpack.config.js` file. Make sure you have the req
 Vite does support both CSS and SCSS/SASS out of the box. You would only need to install `sass`.
 
 ```shell
-npm i -D sass
+npm i --save-dev sass
 ```
 
 ## How to develop the components
@@ -57,5 +57,25 @@ where package names is either `group-tree`, `subsurface-viewer`, `well-completio
 
 Alternatively you can build all by running e.g.
 ```shell
-npx nx run-many -t build
+npx nx run-many --target build
 ```
+
+## Testing
+
+Two main testing strategies are used.
+
+### Unit & component tests
+
+Unit and component tests are distributed in package subdirectories as `*.test.ts` and `*.test.tsx` files.
+
+Tests can be run using `npx nx run-many --target test_correctness`.
+
+Test snapshots can be updated using `npx nx run-many --target test_correctness -- --updateSnapshot`.
+
+### Smoke tests
+
+Storybook test-runner is used to smoke test all stories in each package.
+
+Tests can be run, given a running (`npm run storybook`) or static storybook, using `npm docker:build && npm run docker:storybook:test`.
+
+Test snapshots can be updated using `npm run docker:storybook:test:update`.

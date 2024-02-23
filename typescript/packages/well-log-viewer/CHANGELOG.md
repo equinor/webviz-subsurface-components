@@ -1,3 +1,17 @@
+## [1.4.4](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.4.3...well-log-viewer@1.4.4) (2024-02-21)
+
+
+### Bug Fixes
+
+* bump ip from 2.0.0 to 2.0.1 in /typescript ([#1927](https://github.com/equinor/webviz-subsurface-components/issues/1927)) ([7f3f225](https://github.com/equinor/webviz-subsurface-components/commit/7f3f2255580665d40ad828afe15a3ec73bb7029f))
+
+## [1.4.3](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.4.2...well-log-viewer@1.4.3) (2024-02-16)
+
+
+### Bug Fixes
+
+* bump [@deck](https://github.com/deck).gl/core from 8.9.33 to 8.9.34 in /typescript ([#1922](https://github.com/equinor/webviz-subsurface-components/issues/1922)) ([94bd152](https://github.com/equinor/webviz-subsurface-components/commit/94bd1524b7cba4d505e559ef9648981b7fdebbca)), closes [#8412](https://github.com/equinor/webviz-subsurface-components/issues/8412) [#8290](https://github.com/equinor/webviz-subsurface-components/issues/8290) [#8347](https://github.com/equinor/webviz-subsurface-components/issues/8347) [#8412](https://github.com/equinor/webviz-subsurface-components/issues/8412) [#8290](https://github.com/equinor/webviz-subsurface-components/issues/8290) [#8347](https://github.com/equinor/webviz-subsurface-components/issues/8347) [#8436](https://github.com/equinor/webviz-subsurface-components/issues/8436) [#8412](https://github.com/equinor/webviz-subsurface-components/issues/8412) [#8290](https://github.com/equinor/webviz-subsurface-components/issues/8290)
+
 ## [1.4.2](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.4.1...well-log-viewer@1.4.2) (2024-02-13)
 
 
