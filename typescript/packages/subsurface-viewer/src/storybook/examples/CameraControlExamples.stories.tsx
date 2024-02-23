@@ -28,6 +28,7 @@ import {
     volveWellsLayer,
     volveWellsWithLogsLayer,
 } from "../sharedSettings";
+import { OrthographicView } from "@deck.gl/core/typed";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -545,32 +546,21 @@ export const ScaleY: StoryObj<typeof SubsurfaceViewer> = {
             huginAxes3DLayer,
             hugin25mKhNetmapMapLayerPng,
             volveWellsWithLogsLayer,
-            northArrowLayer,
         ],
         bounds: volveWellsBounds,
-
+        scale: { visible: false },
         views: {
-            layout: [1, 2],
+            layout: [1, 1],
             viewports: [
                 {
                     id: "view_1",
                     layerIds: [
                         huginAxes3DLayer.id,
                         hugin25mKhNetmapMapLayerPng.id,
-                        northArrowLayer.id,
                     ],
                     show3D: false,
-                    isSync: true,
-                },
-                {
-                    id: "view_2",
-                    layerIds: [
-                        huginAxes3DLayer.id,
-                        volveWellsWithLogsLayer.id,
-                        northArrowLayer.id,
-                    ],
-                    show3D: false,
-                    isSync: true,
+                    isSync: false,
+                    controllerOptions: { zoomAxis: "Y" },
                 },
             ],
         },

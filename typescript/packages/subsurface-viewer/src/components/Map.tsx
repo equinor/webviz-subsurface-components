@@ -1,8 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 
 import type { Feature, FeatureCollection } from "geojson";
-import { cloneDeep, isEmpty, isEqual } from "lodash";
+import { cloneDeep, isArray, isEmpty, isEqual } from "lodash";
 
 import type {
     MjolnirEvent,
@@ -20,9 +19,9 @@ import type {
     LayersList,
     LayerProps,
     LayerContext,
-    View,
     Viewport,
     PickingInfo,
+    View,
 } from "@deck.gl/core/typed";
 import {
     _CameraLight as CameraLight,
@@ -91,8 +90,6 @@ const maxZoom2D = 4;
 type ArrowEvent = {
     key: "ArrowUp" | "ArrowDown" | "PageUp" | "PageDown";
     shiftModifier: boolean;
-    // altModifier: boolean;
-    // ctrlModifier: boolean;
 };
 
 function updateZScaleReducer(zScale: number, action: ArrowEvent): number {
@@ -260,6 +257,8 @@ export interface ViewportType {
     rotationOrbit?: number;
 
     isSync?: boolean;
+
+    controllerOptions?: Record<string, unknown>;
 }
 
 /**
@@ -267,7 +266,7 @@ export interface ViewportType {
  */
 export interface ViewStateType {
     target: number[];
-    zoom: number | BoundingBox3D | undefined;
+    zoom: number | [number, number] | BoundingBox3D | undefined;
     rotationX: number;
     rotationOrbit: number;
     minZoom?: number;
@@ -835,6 +834,15 @@ const Map: React.FC<MapProps> = ({
         viewController,
     ]);
 
+    const lateralZoom = useMemo(() => {
+        const zoom = deckGlViewState[Object.keys(deckGlViewState)[0]]?.zoom;
+        if (isArray(zoom)) {
+            return zoom[0];
+        } else {
+            return zoom ?? -5;
+        }
+    }, [deckGlViewState]);
+
     if (!deckGlViews || isEmpty(deckGlViews) || isEmpty(deckGLLayers))
         return null;
     return (
@@ -898,10 +906,7 @@ const Map: React.FC<MapProps> = ({
             {scale?.visible ? (
                 <DistanceScale
                     {...scale}
-                    zoom={
-                        (deckGlViewState[Object.keys(deckGlViewState)[0]]
-                            ?.zoom as number) ?? -5
-                    }
+                    zoom={lateralZoom}
                     scaleUnit={coordinateUnit}
                     style={scale.cssStyle ?? {}}
                 />
@@ -1026,6 +1031,7 @@ function createLayer(
     configuration: JSONConfiguration
 ): Layer | null {
     const typeKey = configuration.typeKey;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const classes = configuration.classes as Record<string, any>;
     if (layerData[typeKey]) {
         const type = layerData[typeKey] as string;
@@ -1430,9 +1436,11 @@ function getViewStateFromBounds(
         fb_zoom = fb.zoom;
     }
 
+    const zoom = viewPort.zoom ?? fb_zoom;
+
     const view_state: ViewStateType = {
         target: viewPort.target ?? fb_target,
-        zoom: viewPort.zoom ?? fb_zoom,
+        zoom: [zoom, zoom],
         rotationX: 90, // look down z -axis
         rotationOrbit: 0,
         minZoom: viewPort.show3D ? minZoom3D : minZoom2D,
@@ -1447,7 +1455,8 @@ type ViewTypeType =
     | typeof OrbitView
     | typeof IntersectionView
     | typeof OrthographicView;
-function getVT(
+
+function getViewType(
     viewport: ViewportType
 ): [
     ViewType: ViewTypeType,
@@ -1486,12 +1495,13 @@ function newView(
     const far = 9999;
     const near = viewport.show3D ? 0.1 : -9999;
 
-    const [ViewType, Controller] = getVT(viewport);
+    const [ViewType, Controller] = getViewType(viewport);
     return new ViewType({
         id: viewport.id,
         controller: {
             type: Controller,
             doubleClickZoom: false,
+            ...viewport.controllerOptions,
         },
 
         x,
