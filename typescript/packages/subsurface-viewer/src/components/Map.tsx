@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 
 import type { Feature, FeatureCollection } from "geojson";
-import { cloneDeep, isArray, isEmpty, isEqual } from "lodash";
+import { cloneDeep, isEmpty, isEqual } from "lodash";
 
 import type {
     MjolnirEvent,
@@ -19,9 +19,9 @@ import type {
     LayersList,
     LayerProps,
     LayerContext,
+    View,
     Viewport,
     PickingInfo,
-    View,
 } from "@deck.gl/core/typed";
 import {
     _CameraLight as CameraLight,
@@ -62,6 +62,7 @@ import { WellsLayer, Axes2DLayer, NorthArrow3DLayer } from "../layers";
 import IntersectionView from "../views/intersectionView";
 import type { Unit } from "convert-units";
 import type { LightsType } from "../SubsurfaceViewer";
+import { getZoom, useLateralZoom } from "../utils/camera";
 
 /**
  * 3D bounding box defined as [xmin, ymin, zmin, xmax, ymax, zmax].
@@ -833,14 +834,7 @@ const Map: React.FC<MapProps> = ({
         viewController,
     ]);
 
-    const lateralZoom = useMemo(() => {
-        const zoom = deckGlViewState[Object.keys(deckGlViewState)[0]]?.zoom;
-        if (isArray(zoom)) {
-            return zoom[0];
-        } else {
-            return zoom ?? -5;
-        }
-    }, [deckGlViewState]);
+    const lateralZoom = useLateralZoom(deckGlViewState);
 
     if (!deckGlViews || isEmpty(deckGlViews) || isEmpty(deckGLLayers))
         return null;
@@ -1435,15 +1429,9 @@ function getViewStateFromBounds(
         fb_zoom = fb.zoom;
     }
 
-    const zoom = viewPort.zoom ?? fb_zoom;
-    const scaledZoom: [number, number] = [
-        zoom,
-        zoom / Math.sqrt(Math.max(viewPort.verticalScale || 0, 0) || 1),
-    ];
-
     const view_state: ViewStateType = {
         target: viewPort.target ?? fb_target,
-        zoom: viewPort.verticalScale ? scaledZoom : zoom,
+        zoom: getZoom(viewPort, fb_zoom),
         rotationX: 90, // look down z -axis
         rotationOrbit: 0,
         minZoom: viewPort.show3D ? minZoom3D : minZoom2D,
