@@ -28,7 +28,6 @@ import {
     volveWellsLayer,
     volveWellsWithLogsLayer,
 } from "../sharedSettings";
-import { OrthographicView } from "@deck.gl/core/typed";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -509,34 +508,7 @@ export const AddLayer: StoryObj<typeof SubsurfaceViewer> = {
 };
 
 const ScaleYComponent: React.FC<SubsurfaceViewerProps> = (args) => {
-    const [layers, setLayers] = React.useState([
-        huginAxes3DLayer,
-        hugin25mKhNetmapMapLayerPng,
-        northArrowLayer,
-    ]);
-
-    const handleChange = () => {
-        setLayers([
-            huginAxes3DLayer,
-            hugin25mKhNetmapMapLayerPng,
-            volveWellsWithLogsLayer,
-            northArrowLayer,
-        ]);
-    };
-
-    const props = {
-        ...args,
-        layers,
-    };
-
-    return (
-        <Root>
-            <div className={classes.mainWithButton}>
-                <SubsurfaceViewer {...props} />
-            </div>
-            <button onClick={handleChange}>Add layer</button>
-        </Root>
-    );
+    return <SubsurfaceViewer {...args} />;
 };
 
 export const ScaleY: StoryObj<typeof SubsurfaceViewer> = {
@@ -548,7 +520,6 @@ export const ScaleY: StoryObj<typeof SubsurfaceViewer> = {
             volveWellsWithLogsLayer,
         ],
         bounds: volveWellsBounds,
-        scale: { visible: false },
         views: {
             layout: [1, 1],
             viewports: [
@@ -560,7 +531,7 @@ export const ScaleY: StoryObj<typeof SubsurfaceViewer> = {
                     ],
                     show3D: false,
                     isSync: false,
-                    controllerOptions: { zoomAxis: "Y" },
+                    verticalScale: 1,
                 },
             ],
         },

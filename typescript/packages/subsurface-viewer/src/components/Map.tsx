@@ -255,10 +255,9 @@ export interface ViewportType {
     zoom?: number;
     rotationX?: number;
     rotationOrbit?: number;
+    verticalScale?: number;
 
     isSync?: boolean;
-
-    controllerOptions?: Record<string, unknown>;
 }
 
 /**
@@ -1437,10 +1436,11 @@ function getViewStateFromBounds(
     }
 
     const zoom = viewPort.zoom ?? fb_zoom;
+    const verticalScale = viewPort.verticalScale || 1;
 
     const view_state: ViewStateType = {
         target: viewPort.target ?? fb_target,
-        zoom: [zoom, zoom],
+        zoom: [zoom, zoom / Math.sqrt(verticalScale)],
         rotationX: 90, // look down z -axis
         rotationOrbit: 0,
         minZoom: viewPort.show3D ? minZoom3D : minZoom2D,
@@ -1501,7 +1501,6 @@ function newView(
         controller: {
             type: Controller,
             doubleClickZoom: false,
-            ...viewport.controllerOptions,
         },
 
         x,
