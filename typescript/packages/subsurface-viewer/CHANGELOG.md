@@ -1,3 +1,10 @@
+## [0.16.4](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.16.3...subsurface-viewer@0.16.4) (2024-02-21)
+
+
+### Bug Fixes
+
+* bump ip from 2.0.0 to 2.0.1 in /typescript ([#1927](https://github.com/equinor/webviz-subsurface-components/issues/1927)) ([7f3f225](https://github.com/equinor/webviz-subsurface-components/commit/7f3f2255580665d40ad828afe15a3ec73bb7029f))
+
 ## [0.16.3](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.16.2...subsurface-viewer@0.16.3) (2024-02-16)
 
 
