@@ -86,6 +86,7 @@ export const SmallPointsLayer: StoryObj<typeof SubsurfaceViewer> = {
 const smallPointsTypedDataLayer = {
     "@@type": "PointsLayer",
     id: "small_points_typed_data_layer",
+    "@@typedArraySupport": true,
     pointsData: new Float32Array(smallPointsData),
     color: [0, 100, 255],
     pointRadius: 10,
@@ -101,7 +102,6 @@ export const SmallPointsLayerTypedArrayInput: StoryObj<
         layers: [smallAxesLayer, smallPointsTypedDataLayer],
         bounds: [-20, -20, 20, 20],
         views: default3DViews,
-        typedArraySupport: true,
     },
     parameters: {
         docs: {
