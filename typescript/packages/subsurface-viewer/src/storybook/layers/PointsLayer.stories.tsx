@@ -63,7 +63,7 @@ const smallPointsLayer = {
 const smallAxesLayer = {
     "@@type": "AxesLayer",
     id: "small_axes_layer",
-    bounds: [-10, -10, 0, 20, 10, 10],
+    bounds: [-10, -10, 0, 20, 15, 10],
 };
 
 export const SmallPointsLayer: StoryObj<typeof SubsurfaceViewer> = {
