@@ -8,6 +8,7 @@ import SubsurfaceViewer from "../SubsurfaceViewer";
 import type { BoundingBox3D } from "../utils/BoundingBox3D";
 
 import exampleData from "../../../../../example-data/deckgl-map.json";
+import type { GeoJsonLayerProps } from "@deck.gl/layers/typed";
 
 export const defaultStoryParameters = {
     docs: {
@@ -216,10 +217,8 @@ export const customLayerWithPolylineData = {
 };
 
 // Data for custom geojson layer with polygon data
-export const customLayerWithPolygonData = {
-    "@@type": "GeoJsonLayer",
+export const customLayerWithPolygonDataProps: GeoJsonLayerProps = {
     id: "geojson-layer",
-    name: "Polygon",
     data: {
         type: "Feature",
         properties: {},
@@ -241,6 +240,11 @@ export const customLayerWithPolygonData = {
     getLineColor: [0, 255, 255],
     getFillColor: [0, 255, 0],
     opacity: 0.3,
+};
+
+export const customLayerWithPolygonData = {
+    ...customLayerWithPolygonDataProps,
+    "@@type": "GeoJsonLayer",
 };
 
 // Data for custom text layer
