@@ -1,3 +1,24 @@
+## [0.17.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.17.0...subsurface-viewer@0.17.1) (2024-02-26)
+
+
+### Bug Fixes
+
+* bump @equinor/videx-wellog from 0.8.1 to 0.8.5 in /typescript ([#1920](https://github.com/equinor/webviz-subsurface-components/issues/1920)) ([0c40f1b](https://github.com/equinor/webviz-subsurface-components/commit/0c40f1bee86b57e6f515eefd0746aaf1f33f0aa1))
+
+# [0.17.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.16.5...subsurface-viewer@0.17.0) (2024-02-26)
+
+
+### Features
+
+* Vertical scaling for section view ([#1933](https://github.com/equinor/webviz-subsurface-components/issues/1933)) ([65da461](https://github.com/equinor/webviz-subsurface-components/commit/65da4612b5a6628283c507ad5aa252edc7e07b03))
+
+## [0.16.5](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.16.4...subsurface-viewer@0.16.5) (2024-02-23)
+
+
+### Bug Fixes
+
+* bump [@deck](https://github.com/deck).gl/json from 8.9.33 to 8.9.34 in /typescript ([#1930](https://github.com/equinor/webviz-subsurface-components/issues/1930)) ([b87690a](https://github.com/equinor/webviz-subsurface-components/commit/b87690ad92e4e774b9e4ebb34b7e323d1c860e39)), closes [#8412](https://github.com/equinor/webviz-subsurface-components/issues/8412) [#8290](https://github.com/equinor/webviz-subsurface-components/issues/8290) [#8347](https://github.com/equinor/webviz-subsurface-components/issues/8347) [#8412](https://github.com/equinor/webviz-subsurface-components/issues/8412) [#8290](https://github.com/equinor/webviz-subsurface-components/issues/8290) [#8347](https://github.com/equinor/webviz-subsurface-components/issues/8347) [#8436](https://github.com/equinor/webviz-subsurface-components/issues/8436) [#8412](https://github.com/equinor/webviz-subsurface-components/issues/8412) [#8290](https://github.com/equinor/webviz-subsurface-components/issues/8290)
+
 ## [0.16.4](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.16.3...subsurface-viewer@0.16.4) (2024-02-21)
 
 

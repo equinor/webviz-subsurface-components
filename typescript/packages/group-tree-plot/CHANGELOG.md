@@ -1,3 +1,17 @@
+## [1.1.6](https://github.com/equinor/webviz-subsurface-components/compare/group-tree-plot@1.1.5...group-tree-plot@1.1.6) (2024-02-26)
+
+
+### Bug Fixes
+
+* bump @equinor/videx-wellog from 0.8.1 to 0.8.5 in /typescript ([#1920](https://github.com/equinor/webviz-subsurface-components/issues/1920)) ([0c40f1b](https://github.com/equinor/webviz-subsurface-components/commit/0c40f1bee86b57e6f515eefd0746aaf1f33f0aa1))
+
+## [1.1.5](https://github.com/equinor/webviz-subsurface-components/compare/group-tree-plot@1.1.4...group-tree-plot@1.1.5) (2024-02-23)
+
+
+### Bug Fixes
+
+* bump [@deck](https://github.com/deck).gl/json from 8.9.33 to 8.9.34 in /typescript ([#1930](https://github.com/equinor/webviz-subsurface-components/issues/1930)) ([b87690a](https://github.com/equinor/webviz-subsurface-components/commit/b87690ad92e4e774b9e4ebb34b7e323d1c860e39)), closes [#8412](https://github.com/equinor/webviz-subsurface-components/issues/8412) [#8290](https://github.com/equinor/webviz-subsurface-components/issues/8290) [#8347](https://github.com/equinor/webviz-subsurface-components/issues/8347) [#8412](https://github.com/equinor/webviz-subsurface-components/issues/8412) [#8290](https://github.com/equinor/webviz-subsurface-components/issues/8290) [#8347](https://github.com/equinor/webviz-subsurface-components/issues/8347) [#8436](https://github.com/equinor/webviz-subsurface-components/issues/8436) [#8412](https://github.com/equinor/webviz-subsurface-components/issues/8412) [#8290](https://github.com/equinor/webviz-subsurface-components/issues/8290)
+
 ## [1.1.4](https://github.com/equinor/webviz-subsurface-components/compare/group-tree-plot@1.1.3...group-tree-plot@1.1.4) (2024-02-21)
 
 

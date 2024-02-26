@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 
 import type { Feature, FeatureCollection } from "geojson";
@@ -64,7 +63,9 @@ import { WellsLayer, Axes2DLayer, NorthArrow3DLayer } from "../layers";
 
 import IntersectionView from "../views/intersectionView";
 import type { Unit } from "convert-units";
+
 import type { LightsType, TLayerDefinition } from "../SubsurfaceViewer";
+import { getZoom, useLateralZoom } from "../utils/camera";
 
 /**
  * 3D bounding box defined as [xmin, ymin, zmin, xmax, ymax, zmax].
@@ -93,8 +94,6 @@ const maxZoom2D = 4;
 type ArrowEvent = {
     key: "ArrowUp" | "ArrowDown" | "PageUp" | "PageDown";
     shiftModifier: boolean;
-    // altModifier: boolean;
-    // ctrlModifier: boolean;
 };
 
 function updateZScaleReducer(zScale: number, action: ArrowEvent): number {
@@ -260,6 +259,7 @@ export interface ViewportType {
     zoom?: number;
     rotationX?: number;
     rotationOrbit?: number;
+    verticalScale?: number;
 
     isSync?: boolean;
 }
@@ -269,7 +269,7 @@ export interface ViewportType {
  */
 export interface ViewStateType {
     target: number[];
-    zoom: number | BoundingBox3D | undefined;
+    zoom: number | [number, number] | BoundingBox3D | undefined;
     rotationX: number;
     rotationOrbit: number;
     minZoom?: number;
@@ -837,6 +837,8 @@ const Map: React.FC<MapProps> = ({
         viewController,
     ]);
 
+    const lateralZoom = useLateralZoom(deckGlViewState);
+
     if (!deckGlViews || isEmpty(deckGlViews) || isEmpty(deckGLLayers))
         return null;
     return (
@@ -900,10 +902,7 @@ const Map: React.FC<MapProps> = ({
             {scale?.visible ? (
                 <DistanceScale
                     {...scale}
-                    zoom={
-                        (deckGlViewState[Object.keys(deckGlViewState)[0]]
-                            ?.zoom as number) ?? -5
-                    }
+                    zoom={lateralZoom}
                     scaleUnit={coordinateUnit}
                     style={scale.cssStyle ?? {}}
                 />
@@ -1049,6 +1048,7 @@ function createLayer(
     configuration: JSONConfiguration
 ): Layer | null {
     const typeKey = configuration.typeKey;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const classes = configuration.classes as Record<string, any>;
     if (layerData[typeKey]) {
         const type = layerData[typeKey] as string;
@@ -1455,7 +1455,7 @@ function getViewStateFromBounds(
 
     const view_state: ViewStateType = {
         target: viewPort.target ?? fb_target,
-        zoom: viewPort.zoom ?? fb_zoom,
+        zoom: getZoom(viewPort, fb_zoom),
         rotationX: 90, // look down z -axis
         rotationOrbit: 0,
         minZoom: viewPort.show3D ? minZoom3D : minZoom2D,
@@ -1470,7 +1470,8 @@ type ViewTypeType =
     | typeof OrbitView
     | typeof IntersectionView
     | typeof OrthographicView;
-function getVT(
+
+function getViewType(
     viewport: ViewportType
 ): [
     ViewType: ViewTypeType,
@@ -1509,7 +1510,7 @@ function newView(
     const far = 9999;
     const near = viewport.show3D ? 0.1 : -9999;
 
-    const [ViewType, Controller] = getVT(viewport);
+    const [ViewType, Controller] = getViewType(viewport);
     return new ViewType({
         id: viewport.id,
         controller: {
