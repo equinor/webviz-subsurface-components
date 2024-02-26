@@ -1,3 +1,10 @@
+# [0.18.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.17.1...subsurface-viewer@0.18.0) (2024-02-26)
+
+
+### Features
+
+* **subsurface-view:** Mixed layer creation. ([#1929](https://github.com/equinor/webviz-subsurface-components/issues/1929)) ([291c329](https://github.com/equinor/webviz-subsurface-components/commit/291c32980eb1404c797cd7b85c7114fd9e607e5a))
+
 ## [0.17.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.17.0...subsurface-viewer@0.17.1) (2024-02-26)
 
 
