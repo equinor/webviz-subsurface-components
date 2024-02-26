@@ -1,3 +1,10 @@
+# [0.17.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.16.5...subsurface-viewer@0.17.0) (2024-02-26)
+
+
+### Features
+
+* Vertical scaling for section view ([#1933](https://github.com/equinor/webviz-subsurface-components/issues/1933)) ([65da461](https://github.com/equinor/webviz-subsurface-components/commit/65da4612b5a6628283c507ad5aa252edc7e07b03))
+
 ## [0.16.5](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.16.4...subsurface-viewer@0.16.5) (2024-02-23)
 
 
