@@ -217,7 +217,7 @@ const typedDataSurfaceLayer = {
 export const TypedArrayInput: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "map",
-        layerDefinitions: [surfaceAxesLayer, typedDataSurfaceLayer],
+        layers: [surfaceAxesLayer, typedDataSurfaceLayer],
         bounds: [-2000, -2000, 2500, 2000],
         views: default3DViews,
     },

@@ -445,7 +445,7 @@ const TypedArrayInputComponent: React.FC<{
 }> = (args) => {
     const subsurfaceViewerArgs = {
         id: "map",
-        layerDefinitions: [
+        layers: [
             {
                 "@@type": "MapLayer",
                 "@@typedArraySupport": true,

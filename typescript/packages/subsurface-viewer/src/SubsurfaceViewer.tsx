@@ -1,6 +1,5 @@
 import React from "react";
-import type { PickingInfo, LayersList } from "@deck.gl/core/typed";
-import { Layer } from "@deck.gl/core/typed";
+import type { PickingInfo, Layer, LayersList } from "@deck.gl/core/typed";
 import PropTypes from "prop-types";
 import type { colorTablesArray } from "@emerson-eps/color-tables/";
 import type { Unit } from "convert-units";
@@ -18,7 +17,7 @@ import type {
 
 import { TGrid3DColoringMode } from "./layers/grid3d/grid3dLayer";
 
-import Map, { jsonToObject, createLayers } from "./components/Map";
+import Map, { createLayers } from "./components/Map";
 
 export type {
     BoundsAccessor,
@@ -70,16 +69,12 @@ export type TLayerDefinition =
 export interface SubsurfaceViewerProps {
     id: string;
     resources?: Record<string, unknown>;
-    layers?: Record<string, unknown>[] | LayersList;
-
     /**
-     * Array of externally created layers or layer definition records.
-     * Has priority over layers prop if provided.
-     * layers prop is kept for backward compatibility.
+     * Array of externally created layers or layer definition records or JSON strings.
      * Add '@@typedArraySupport' : true in a layer definition in order to
      * use typed arrays as inputs.
      */
-    layerDefinitions?: TLayerDefinition[];
+    layers?: TLayerDefinition[];
 
     bounds?: [number, number, number, number] | BoundsAccessor;
     cameraPosition?: ViewStateType | undefined;
@@ -146,7 +141,6 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
     id,
     resources,
     layers,
-    layerDefinitions,
     bounds,
     cameraPosition,
     triggerHome,
@@ -180,30 +174,14 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
         if (editedData) enumerations.push({ editedData: editedData });
         else enumerations.push({ editedData: {} });
 
-        if (layerDefinitions) {
-            const layersList = createLayers(layerDefinitions, enumerations);
-            setLayerInstances(layersList);
-            return;
-        }
-
         if (!layers) {
             setLayerInstances([]);
             return;
         }
-
-        //The layers have been already created externally.
-        if (layers?.[0] instanceof Layer) {
-            setLayerInstances(layers as LayersList);
-            return;
-        }
-
-        const layersList = jsonToObject(
-            layers as Record<string, unknown>[],
-            enumerations
-        ) as LayersList;
+        const layersList = createLayers(layers, enumerations);
         setLayerInstances(layersList);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [layers, layerDefinitions]); // Note. Fixing this dependency list may cause infinite recursion.
+    }, [layers]); // Note. Fixing this dependency list may cause infinite recursion.
 
     React.useEffect(() => {
         if (!editedData) return;

@@ -69,7 +69,7 @@ const smallAxesLayer = {
 export const SmallPointsLayer: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "small-points",
-        layerDefinitions: [smallAxesLayer, smallPointsLayer],
+        layers: [smallAxesLayer, smallPointsLayer],
         bounds: [-20, -20, 20, 20],
         views: default3DViews,
     },
@@ -99,7 +99,7 @@ export const SmallPointsLayerTypedArrayInput: StoryObj<
 > = {
     args: {
         id: "small-points-typeddata",
-        layerDefinitions: [smallAxesLayer, smallPointsTypedDataLayer],
+        layers: [smallAxesLayer, smallPointsTypedDataLayer],
         bounds: [-20, -20, 20, 20],
         views: default3DViews,
     },

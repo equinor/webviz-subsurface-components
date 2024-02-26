@@ -310,7 +310,7 @@ export const MixedLayerDefinitions: StoryObj<typeof SubsurfaceViewer> = {
             ],
         },
         id: "grid-3d-polyhedral-cell-typed-input",
-        layerDefinitions: [
+        layers: [
             undefined,
             {
                 ...axes,
