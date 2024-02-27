@@ -1,3 +1,10 @@
+## [1.4.7](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.4.6...well-log-viewer@1.4.7) (2024-02-27)
+
+
+### Bug Fixes
+
+* styles for track/plot dialog ([#1932](https://github.com/equinor/webviz-subsurface-components/issues/1932)) ([d23f931](https://github.com/equinor/webviz-subsurface-components/commit/d23f931261937a2eff87afa81fad65e0ed2c25ca))
+
 ## [1.4.6](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.4.5...well-log-viewer@1.4.6) (2024-02-26)
 
 
