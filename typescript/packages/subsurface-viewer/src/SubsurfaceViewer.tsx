@@ -1,6 +1,5 @@
 import React from "react";
-import type { PickingInfo, LayersList } from "@deck.gl/core/typed";
-import { Layer } from "@deck.gl/core/typed";
+import type { PickingInfo, Layer, LayersList } from "@deck.gl/core/typed";
 import PropTypes from "prop-types";
 import type { colorTablesArray } from "@emerson-eps/color-tables/";
 import type { Unit } from "convert-units";
@@ -18,7 +17,7 @@ import type {
 
 import { TGrid3DColoringMode } from "./layers/grid3d/grid3dLayer";
 
-import Map, { jsonToObject, createLayers } from "./components/Map";
+import Map, { createLayers } from "./components/Map";
 
 export type {
     BoundsAccessor,
@@ -57,13 +56,25 @@ export type LightsType = {
     ];
 };
 
+export type TLayerDefinition =
+    | Record<string, unknown>
+    | Layer
+    | false
+    | null
+    | undefined;
+
 /**
  * Properties of the SubsurfaceViewer component.
  */
 export interface SubsurfaceViewerProps {
     id: string;
     resources?: Record<string, unknown>;
-    layers?: Record<string, unknown>[] | LayersList;
+    /**
+     * Array of externally created layers or layer definition records or JSON strings.
+     * Add '@@typedArraySupport' : true in a layer definition in order to
+     * use typed arrays as inputs.
+     */
+    layers?: TLayerDefinition[];
 
     bounds?: [number, number, number, number] | BoundsAccessor;
     cameraPosition?: ViewStateType | undefined;
@@ -124,11 +135,6 @@ export interface SubsurfaceViewerProps {
     lights?: LightsType;
 
     children?: React.ReactNode;
-
-    /**
-     * If set to true allows to use typed arrays in layer description JS objects.
-     */
-    typedArraySupport?: boolean;
 }
 
 const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
@@ -156,7 +162,6 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
     triggerResetMultipleWells,
     lights,
     children,
-    typedArraySupport,
 }: SubsurfaceViewerProps) => {
     // Contains layers data received from map layers by user interaction
     const [layerEditedData, setLayerEditedData] = React.useState(editedData);
@@ -164,36 +169,17 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
     const [layerInstances, setLayerInstances] = React.useState<LayersList>([]);
 
     React.useEffect(() => {
-        if (!layers) {
-            setLayerInstances([]);
-            return;
-        }
-
-        //The layers have been already created externally.
-        if (layers?.[0] instanceof Layer) {
-            setLayerInstances(layers as LayersList);
-            return;
-        }
-
         const enumerations: Record<string, unknown>[] = [];
         if (resources) enumerations.push({ resources: resources });
         if (editedData) enumerations.push({ editedData: editedData });
         else enumerations.push({ editedData: {} });
 
-        //Bypass conversion of layer props through JSON and use them as is.
-        if (typedArraySupport) {
-            const layersList = createLayers(
-                layers as Record<string, unknown>[],
-                enumerations
-            ) as LayersList;
-            setLayerInstances(layersList);
-        } else {
-            const layersList = jsonToObject(
-                layers as Record<string, unknown>[],
-                enumerations
-            ) as LayersList;
-            setLayerInstances(layersList);
+        if (!layers) {
+            setLayerInstances([]);
+            return;
         }
+        const layersList = createLayers(layers, enumerations);
+        setLayerInstances(layersList);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [layers]); // Note. Fixing this dependency list may cause infinite recursion.
 
