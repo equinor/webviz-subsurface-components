@@ -174,9 +174,7 @@ export class TrackPropertiesDialog extends Component<Props, State> {
                 onClose={() => this.setState({ open: false })}
             >
                 <DialogTitle>{title}</DialogTitle>
-                <DialogContent
-                    style={dialogContentStyle}
-                >
+                <DialogContent style={dialogContentStyle}>
                     <TextField
                         id="title"
                         label="Title"

@@ -161,7 +161,7 @@ export const dialogContentStyle = {
     gridTemplateColumns: "1fr 1fr 1fr",
     paddingTop: 20,
     gap: 10,
-}
+};
 
 interface Props {
     templatePlot?: TemplatePlot; // input for editting
@@ -356,9 +356,7 @@ export class PlotPropertiesDialog extends Component<Props, State> {
                 onClose={() => this.setState({ open: false })}
             >
                 <DialogTitle>{title}</DialogTitle>
-                <DialogContent
-                    style={dialogContentStyle}
-                >
+                <DialogContent style={dialogContentStyle}>
                     {this.createSelectControl(
                         "type",
                         "Type",
