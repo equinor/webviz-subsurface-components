@@ -1,8 +1,12 @@
 import React from "react";
+import { create, all } from "mathjs";
+import type { Layer } from "@deck.gl/core/typed";
+
 import type { Meta, StoryObj } from "@storybook/react";
 
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
-import SubsurfaceViewer from "../../SubsurfaceViewer";
+import SubsurfaceViewer, { TGrid3DColoringMode } from "../../SubsurfaceViewer";
+import Grid3DLayer from "../../layers/grid3d/grid3dLayer";
 
 import { argTypes } from "../sharedDoc";
 import type { EditedDataTemplate } from "../sharedSettings";
@@ -20,6 +24,18 @@ import {
     hugin2DBounds,
     subsufaceProps,
 } from "../sharedSettings";
+
+import {
+    Points as SnubCubePoints,
+    Faces as SnubCubeFaces,
+    VertexCount as SnubCubeVertexCount,
+} from "../../layers/grid3d/test_data/TruncatedSnubCube";
+
+import {
+    Points as ToroidPoints,
+    Faces as ToroidFaces,
+    VertexCount as ToroidVertexCount,
+} from "../../layers/grid3d/test_data/PentagonalToroid";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -239,4 +255,96 @@ export const MapInContainer: StoryObj<typeof SubsurfaceViewer> = {
             <SubsurfaceViewer {...args} />
         </Root>
     ),
+};
+
+const math = create(all, { randomSeed: "1984" });
+const randomFunc = math?.random ? math.random : Math.random;
+
+const snubCubePoints = SnubCubePoints.map((v) => 10 * v);
+const snubCubeProperties = Array(SnubCubeVertexCount)
+    .fill(0)
+    .map(() => randomFunc() * 50);
+
+const toroidPoints = ToroidPoints.map((v) => 10 * v).map((v, index) =>
+    index % 3 === 0 ? v + 30 : v
+);
+const toroidProperties = Array(ToroidVertexCount)
+    .fill(0)
+    .map(() => randomFunc() * 10);
+
+const grid3dLayer = {
+    "@@type": "Grid3DLayer",
+    id: "Grid3DLayer",
+    gridLines: true,
+    material: true,
+    colorMapName: "Rainbow",
+    ZIncreasingDownwards: false,
+};
+
+const axes = {
+    "@@type": "AxesLayer",
+    id: "axes-layer2",
+    bounds: [453150, 5925800, -2000, 469400, 5939500, 0],
+    ZIncreasingDownwards: false,
+};
+
+const parameters = {
+    docs: {
+        ...defaultStoryParameters,
+        description: {
+            story: "Demonstrates mixed ways of layer creation.",
+        },
+    },
+};
+
+export const MixedLayerDefinitions: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        bounds: [-25, -25, 50, 30],
+        views: {
+            layout: [1, 1] as [number, number],
+            viewports: [
+                {
+                    id: "view_1",
+                    show3D: true,
+                },
+            ],
+        },
+        id: "grid-3d-polyhedral-cell-typed-input",
+        layers: [
+            undefined,
+            {
+                ...axes,
+                id: "polyhedral-cells-axes-typed-input",
+                bounds: [-15, -15, -15, 40, 20, 15],
+            },
+            null,
+            {
+                ...grid3dLayer,
+                id: "polyhedral1-typed-input",
+                "@@typedArraySupport": true,
+                coloringMode: TGrid3DColoringMode.Y,
+                pickable: true,
+                pointsData: new Float32Array(snubCubePoints),
+                polysData: new Uint32Array(SnubCubeFaces),
+                propertiesData: new Float32Array(snubCubeProperties),
+                colorMapRange: [-8, 8],
+                colorMapClampColor: [200, 200, 200],
+                colorMapName: "Seismic",
+            },
+            false,
+            new Grid3DLayer({
+                gridLines: true,
+                material: true,
+                colorMapName: "Rainbow",
+                ZIncreasingDownwards: false,
+                id: "polyhedral2-typed-input",
+                pickable: true,
+                pointsData: new Float32Array(toroidPoints),
+                polysData: new Uint32Array(ToroidFaces),
+                propertiesData: new Float32Array(toroidProperties),
+                coloringMode: TGrid3DColoringMode.Property,
+            }) as unknown as Layer,
+        ],
+    },
+    parameters: parameters,
 };
