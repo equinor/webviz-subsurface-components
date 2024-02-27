@@ -156,6 +156,13 @@ export function createDataItems(
     return names.map((name) => createDataItem(name));
 }
 
+export const dialogContentStyle = {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr 1fr",
+    paddingTop: 20,
+    gap: 10,
+}
+
 interface Props {
     templatePlot?: TemplatePlot; // input for editting
     onOK: (templatePlot: TemplatePlot) => void;
@@ -350,12 +357,7 @@ export class PlotPropertiesDialog extends Component<Props, State> {
             >
                 <DialogTitle>{title}</DialogTitle>
                 <DialogContent
-                    style={{
-                        display: "grid",
-                        gridTemplateColumns: "1fr 1fr 1fr",
-                        paddingTop: 20,
-                        gap: 10,
-                    }}
+                    style={dialogContentStyle}
                 >
                     {this.createSelectControl(
                         "type",
