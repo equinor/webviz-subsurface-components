@@ -985,18 +985,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
 
     createRightPanel(): ReactNode {
         return (
-            <div
-                key="rightPanel"
-                style={{
-                    flex: "0, 0",
-                    display: "flex",
-                    flexDirection: "column",
-                    height: "100%",
-                    width: "255px",
-                    minWidth: "255px",
-                    maxWidth: "255px",
-                }}
-            >
+            <div key="rightPanel" className="right-panel">
                 <AxisSelector
                     header="Primary scale"
                     axes={this.state.axes}
@@ -1014,14 +1003,9 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                         infos={this.state.infos[index]}
                     />
                 ))}
-                <div styleName="zoom" style={{ paddingLeft: "10px", display: "flex" }}>
-                    <span>Zoom:</span>
-                    <span
-                        style={{
-                            flex: "1 1 100px",
-                            padding: "0 20px 0 10px",
-                        }}
-                    >
+                <div className="zoom">
+                    <span className="zoom-label">Zoom:</span>
+                    <span className="zoom-value">
                         <ZoomSlider
                             value={this.state.sliderValue}
                             max={

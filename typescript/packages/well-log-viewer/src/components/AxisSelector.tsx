@@ -13,7 +13,6 @@ class AxisSelector extends Component<Props> {
     createItem(label: string, value: string): ReactNode {
         return (
             <div key={value}>
-                {/* Set key prop just for react pleasure. See https://reactjs.org/link/warning-keys for more information */}
                 <input
                     type="radio"
                     value={value}
@@ -30,7 +29,9 @@ class AxisSelector extends Component<Props> {
     render(): JSX.Element {
         if (!this.props.axes || this.props.axes.length < 1) return <></>; // nothing to render
         return (
-            <div styleName="axis-selector">
+            <div className="axis-selector">
+                {" "}
+                // for CSS customization
                 <fieldset>
                     <legend>{this.props.header}</legend>
                     {this.props.axes.map((axis) => {
