@@ -46,7 +46,7 @@
         "@cypress/react18": "^2.0.0",
         "@mdx-js/react": "^3.0.1",
         "@mui/material": "^5.15.3",
-        "@mui/system": "^5.15.9",
+        "@mui/system": "^5.15.11",
         "@nx/jest": "^16.5.0",
         "@storybook/addon-essentials": "^7.6.4",
         "@storybook/addon-links": "^7.6.14",
