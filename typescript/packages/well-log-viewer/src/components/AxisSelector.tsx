@@ -30,8 +30,6 @@ class AxisSelector extends Component<Props> {
         if (!this.props.axes || this.props.axes.length < 1) return <></>; // nothing to render
         return (
             <div className="axis-selector">
-                {" "}
-                // for CSS customization
                 <fieldset>
                     <legend>{this.props.header}</legend>
                     {this.props.axes.map((axis) => {

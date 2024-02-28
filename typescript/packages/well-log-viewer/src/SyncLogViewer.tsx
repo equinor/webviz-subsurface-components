@@ -1008,10 +1008,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                     <span className="zoom-value">
                         <ZoomSlider
                             value={this.state.sliderValue}
-                            max={
-                                this.props.welllogOptions?.maxContentZoom ||
-                                256 /*default*/
-                            }
+                            max={this.props.welllogOptions?.maxContentZoom}
                             onChange={this.onZoomSliderChange}
                         />
                     </span>
