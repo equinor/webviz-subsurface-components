@@ -1,6 +1,6 @@
 {
     "name": "@webviz/well-completions-plot",
-    "version": "1.2.6",
+    "version": "1.2.7",
     "description": "",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -21,7 +21,7 @@
     "author": "Equinor <opensource@equinor.com>",
     "license": "MPL-2.0",
     "dependencies": {
-        "react-resize-detector": "^9.1.0",
+        "react-resize-detector": "^10.0.1",
         "react-tooltip": "^4.2.21"
     },
     "volta": {

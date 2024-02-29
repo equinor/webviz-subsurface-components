@@ -21,6 +21,7 @@ import { createDataItems, dataNames } from "./PlotDialog";
 import { createScaleItems } from "./PlotDialog";
 import { createBooleanItems } from "./PlotDialog";
 import { _createItems } from "./PlotDialog";
+import { dialogContentStyle } from "./PlotDialog";
 
 const noneValue = "-";
 
@@ -173,12 +174,7 @@ export class TrackPropertiesDialog extends Component<Props, State> {
                 onClose={() => this.setState({ open: false })}
             >
                 <DialogTitle>{title}</DialogTitle>
-                <DialogContent
-                    style={{
-                        display: "grid",
-                        gridTemplateColumns: "1fr 1fr 1fr",
-                    }}
-                >
+                <DialogContent style={dialogContentStyle}>
                     <TextField
                         id="title"
                         label="Title"

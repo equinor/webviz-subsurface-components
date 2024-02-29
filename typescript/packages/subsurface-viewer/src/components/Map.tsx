@@ -15,7 +15,6 @@ import type { DeckGLRef } from "@deck.gl/react/typed";
 import DeckGL from "@deck.gl/react/typed";
 import type {
     Color,
-    Layer,
     LayersList,
     LayerProps,
     LayerContext,
@@ -23,6 +22,9 @@ import type {
     Viewport,
     PickingInfo,
 } from "@deck.gl/core/typed";
+
+import { Layer } from "@deck.gl/core/typed";
+
 import {
     _CameraLight as CameraLight,
     AmbientLight,
@@ -61,7 +63,8 @@ import { WellsLayer, Axes2DLayer, NorthArrow3DLayer } from "../layers";
 
 import IntersectionView from "../views/intersectionView";
 import type { Unit } from "convert-units";
-import type { LightsType } from "../SubsurfaceViewer";
+
+import type { LightsType, TLayerDefinition } from "../SubsurfaceViewer";
 import { getZoom, useLateralZoom } from "../utils/camera";
 
 /**
@@ -985,22 +988,43 @@ export function jsonToObject(
     return jsonConverter.convert(filtered_data);
 }
 
+/**
+ * Creates layers according to layer definiton Records.
+ * Keeps the relative order of layers.
+ * @param layers Array of layer definition Records or externally created layers.
+ * @returns Array of layer instances.
+ */
 export function createLayers(
-    data: Record<string, unknown>[],
+    layers: TLayerDefinition[],
     enums: Record<string, unknown>[] | undefined = undefined
 ): LayersList {
     const configuration = createConfiguration(enums);
-    const layersList: Layer[] = [];
 
-    // remove empty data/layer object
-    const filtered_data = data.filter((value) => !isEmpty(value));
-    for (const layerData of filtered_data) {
-        const layer = createLayer(layerData, configuration);
-        if (layer) {
-            layersList.push(layer);
+    // remove empty record/layer objects
+    const filtered_layers = layers.filter((value) => !isEmpty(value)) as (
+        | Record<string, unknown>
+        | Layer
+    )[];
+    const layersList = new Array(filtered_layers.length);
+    const jsonLayerIndices: number[] = [];
+    const jsonLayerDefs: Record<string, unknown>[] = [];
+
+    filtered_layers.forEach((layer, index) => {
+        if (layer instanceof Layer) {
+            layersList[index] = layer;
+        } else if (layer["@@typedArraySupport"]) {
+            layersList[index] = createLayer(layer, configuration);
+        } else {
+            jsonLayerDefs.push(layer);
+            jsonLayerIndices.push(index);
         }
-    }
-    return layersList;
+    });
+    const jsonLayers = jsonToObject(jsonLayerDefs, enums);
+    jsonLayers.forEach((layer, index) => {
+        const layerIndex = jsonLayerIndices[index];
+        layersList[layerIndex] = layer;
+    });
+    return layersList.filter((value) => !isEmpty(value));
 }
 
 function createConfiguration(
