@@ -18,13 +18,13 @@ exports[`Sync Log Viewer snapshot test 1`] = `
         >
           <div
             class="welllogview"
-            style="width: 100%; height: 100%; display: flex; flex-direction: column;"
+            style="flex-direction: column;"
           >
             <div
-              style="width: 100%; height: 100%; display: flex; flex-direction: column;"
+              class="view"
             >
               <div
-                class="log-controller"
+                class="container log-controller"
               >
                 <div
                   class="overlay"
@@ -275,9 +275,11 @@ exports[`Sync Log Viewer snapshot test 1`] = `
     </div>
   </div>
   <div
-    style="display: flex; flex-direction: column; height: 100%; width: 255px; min-width: 255px; max-width: 255px;"
+    class="right-panel"
   >
-    <div>
+    <div
+      class="axis-selector"
+    >
       <fieldset>
         <legend>
           Primary scale
@@ -300,61 +302,55 @@ exports[`Sync Log Viewer snapshot test 1`] = `
       </fieldset>
     </div>
     <div
-      style="overflow-y: auto; overflow-x: hidden;"
+      class="readout"
     >
       <fieldset>
         <legend>
           Readout 15/9-19A
         </legend>
-        <table
-          style="border-spacing: 0px; width: 100%;"
-        >
+        <table>
           <tbody>
             <tr>
               <td
-                style="color: black; font-size: small;"
+                class="row-info"
+                style="color: black;"
               >
                 ⬤
               </td>
               <td
-                style="white-space: nowrap;"
-              >
-                DEPT
-              </td>
+                class="row-name"
+                title="DEPT"
+              />
               <td
+                class="row-value"
                 colspan="1"
-                style="width: 90px; padding-left: 1.5em; text-align: right; white-space: nowrap;"
-              >
-                 
-              </td>
+                title=" "
+              />
               <td
-                style="padding-left: 0.5em;"
-              >
-                M
-              </td>
+                class="row-units"
+                title="M"
+              />
             </tr>
             <tr>
               <td
-                style="color: grey; font-size: small;"
+                class="row-info"
+                style="color: grey;"
               >
                 ⬤
               </td>
               <td
-                style="white-space: nowrap;"
-              >
-                DVER
-              </td>
+                class="row-name"
+                title="DVER"
+              />
               <td
+                class="row-value"
                 colspan="1"
-                style="width: 90px; padding-left: 1.5em; text-align: right; white-space: nowrap;"
-              >
-                 
-              </td>
+                title=" "
+              />
               <td
-                style="padding-left: 0.5em;"
-              >
-                M
-              </td>
+                class="row-units"
+                title="M"
+              />
             </tr>
             <tr>
               <td
@@ -366,131 +362,123 @@ exports[`Sync Log Viewer snapshot test 1`] = `
             </tr>
             <tr>
               <td
-                style="color: blue; font-size: small;"
+                class="row-info"
+                style="color: blue;"
               >
                 ⬤
               </td>
               <td
-                style="white-space: nowrap;"
-              >
-                MDIA
-              </td>
+                class="row-name"
+                title="MDIA"
+              />
               <td
+                class="row-value"
                 colspan="1"
-                style="width: 90px; padding-left: 1.5em; text-align: right; white-space: nowrap;"
-              >
-                 
-              </td>
+                title=" "
+              />
               <td
-                style="padding-left: 0.5em;"
-              >
-                KG/L
-              </td>
+                class="row-units"
+                title="KG/L"
+              />
             </tr>
             <tr>
               <td
-                style="color: green; font-size: small;"
+                class="row-info"
+                style="color: green;"
               >
                 ⬤
               </td>
               <td
-                style="white-space: nowrap;"
-              >
-                HKLA
-              </td>
+                class="row-name"
+                title="HKLA"
+              />
               <td
+                class="row-value"
                 colspan="1"
-                style="width: 90px; padding-left: 1.5em; text-align: right; white-space: nowrap;"
-              >
-                 
-              </td>
+                title=" "
+              />
               <td
-                style="padding-left: 0.5em;"
-              >
-                T
-              </td>
+                class="row-units"
+                title="T"
+              />
             </tr>
             <tr>
               <td
-                style="color: blue; font-size: small;"
+                class="row-info"
+                style="color: blue;"
               >
                 ⬤
               </td>
               <td
-                style="white-space: nowrap;"
-              >
-                HKLA
-              </td>
+                class="row-name"
+                title="HKLA"
+              />
               <td
+                class="row-value"
                 colspan="1"
-                style="width: 90px; padding-left: 1.5em; text-align: right; white-space: nowrap;"
-              >
-                 
-              </td>
+                title=" "
+              />
               <td
-                style="padding-left: 0.5em;"
-              >
-                T
-              </td>
+                class="row-units"
+                title="T"
+              />
             </tr>
             <tr>
               <td
-                style="color: blue; font-size: small;"
+                class="row-info"
+                style="color: blue;"
               >
                 ⬤
               </td>
               <td
-                style="white-space: nowrap;"
-              >
-                HKLX
-              </td>
+                class="row-name"
+                title="HKLX"
+              />
               <td
+                class="row-value"
                 colspan="1"
-                style="width: 90px; padding-left: 1.5em; text-align: right; white-space: nowrap;"
-              >
-                 
-              </td>
+                title=" "
+              />
               <td
-                style="padding-left: 0.5em;"
-              >
-                T
-              </td>
+                class="row-units"
+                title="T"
+              />
             </tr>
             <tr>
               <td
-                style="color: orange; font-size: small;"
+                class="row-info"
+                style="color: orange;"
               >
                 ⬤
               </td>
               <td
-                style="white-space: nowrap;"
-              >
-                HKLA
-              </td>
+                class="row-name"
+                title="HKLA"
+              />
               <td
+                class="row-value"
                 colspan="1"
-                style="width: 90px; padding-left: 1.5em; text-align: right; white-space: nowrap;"
-              >
-                 
-              </td>
+                title=" "
+              />
               <td
-                style="padding-left: 0.5em;"
-              >
-                T
-              </td>
+                class="row-units"
+                title="T"
+              />
             </tr>
           </tbody>
         </table>
       </fieldset>
     </div>
     <div
-      style="padding-left: 10px; display: flex;"
+      class="zoom"
     >
-      <span>
+      <span
+        class="zoom-label"
+      >
         Zoom:
       </span>
       <span
-        style="flex: 1 1 100px; padding: 0px 20px 0px 10px;"
+        class="zoom-value"
       >
         <span
           class="MuiSlider-root MuiSlider-colorPrimary MuiSlider-sizeMedium css-187mznn-MuiSlider-root"
