@@ -24,6 +24,8 @@ const screenshotTest = async (page, context) => {
 
     expect(previousScreenshot).toMatchImageSnapshot({
         customSnapshotIdentifier: context.id,
+        failureThreshold: 0.13, // to match images from different OSes and browser version
+        failureThresholdType: "percent",
     });
 };
 
