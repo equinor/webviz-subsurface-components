@@ -105,7 +105,7 @@
         "react-test-renderer": "^18.2.0",
         "redux-mock-store": "^1.5.4",
         "sass": "^1.69.5",
-        "sass-loader": "^13.3.2",
+        "sass-loader": "^14.1.1",
         "source-map-loader": "^3.0.0",
         "storybook": "^7.6.4",
         "style-loader": "^2.0.0",
