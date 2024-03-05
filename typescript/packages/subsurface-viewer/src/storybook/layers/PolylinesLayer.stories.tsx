@@ -77,12 +77,12 @@ const randomFunc = ((): TRandomNumberFunc => {
     return () => Math.random() * sideSize;
 })();
 
+const hugePoints = new Array(pointsCount * 3).fill(0).map(() => randomFunc());
+
 const hugePolylinesLayer = new PolylinesLayer({
     id: "huge_polylines-layer",
 
-    polylinePoints: Array(pointsCount * 3)
-        .fill(0)
-        .map(() => randomFunc()),
+    polylinePoints: hugePoints,
     startIndices: [0],
     color: [0, 100, 100, 40],
 
@@ -108,7 +108,42 @@ export const HugePolylinesLayer: StoryObj<typeof SubsurfaceViewer> = {
         docs: {
             ...defaultStoryParameters.docs,
             description: {
-                story: "Polyline nodes are randomly generated in runtime and given as native javascript array.",
+                story: "Polyline nodes are randomly generated in runtime and given as native javascript arrays.",
+            },
+        },
+    },
+};
+
+export const RandomPolylinesLayerTypedArrayInput: StoryObj<
+    typeof SubsurfaceViewer
+> = {
+    args: {
+        id: "map",
+        layers: [
+            hugeAxesLayer,
+            {
+                "@@type": "PolylinesLayer",
+                "@@typedArraySupport": true,
+                id: "huge_polylines-layer-typedarrays",
+
+                polylinePoints: new Float32Array(hugePoints),
+                startIndices: new Uint32Array([0, pointsCount]),
+                color: [0, 100, 200, 40],
+
+                widthUnits: "pixels",
+                linesWidth: 1,
+
+                ZIncreasingDownwards: true,
+            },
+        ],
+        bounds: [0, 0, sideSize, sideSize],
+        views: default3DViews,
+    },
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: "Polyline nodes are randomly generated in runtime and given as javascript typed arrays.",
             },
         },
     },
