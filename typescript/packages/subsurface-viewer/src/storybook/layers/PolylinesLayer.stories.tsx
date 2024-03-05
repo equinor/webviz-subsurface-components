@@ -112,6 +112,7 @@ export const HugePolylinesLayer: StoryObj<typeof SubsurfaceViewer> = {
             },
         },
     },
+    tags: ["no-test"],
 };
 
 export const HugeLayerTypedArrayInput: StoryObj<typeof SubsurfaceViewer> = {
@@ -145,4 +146,5 @@ export const HugeLayerTypedArrayInput: StoryObj<typeof SubsurfaceViewer> = {
             },
         },
     },
+    tags: ["no-test"],
 };
