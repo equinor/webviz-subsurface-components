@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import React, { Component } from "react";
 
 import PropTypes from "prop-types";
@@ -245,6 +246,36 @@ export default class WellLogViewer extends Component<
         this.updateReadoutPanel();
     }
 
+    createRightPanel(): ReactNode {
+        return (
+            <div key="rightPanel" className="right-panel">
+                <AxisSelector
+                    header="Primary scale"
+                    axes={this.state.axes}
+                    axisLabels={this.props.axisTitles}
+                    value={this.state.primaryAxis}
+                    onChange={this.onChangePrimaryAxis}
+                />
+                <InfoPanel
+                    header="Readout"
+                    onGroupClick={this.onInfoGroupClick}
+                    infos={this.state.infos}
+                />
+                <br />
+                <div className="zoom">
+                    <span className="zoom-label">Zoom:</span>
+                    <span className="zoom-value">
+                        <ZoomSlider
+                            value={this.state.sliderValue}
+                            max={this.props.options?.maxContentZoom}
+                            onChange={this.onZoomSliderChange}
+                        />
+                    </span>
+                </div>
+            </div>
+        );
+    }
+
     render(): JSX.Element {
         return (
             <div style={{ height: "100%", width: "100%", display: "flex" }}>
@@ -267,46 +298,7 @@ export default class WellLogViewer extends Component<
                     onContentSelection={this.onContentSelection}
                     onTemplateChanged={this.onTemplateChanged}
                 />
-                <div
-                    style={{
-                        flex: "0, 0",
-                        display: "flex",
-                        flexDirection: "column",
-                        height: "100%",
-                        width: "255px",
-                        minWidth: "255px",
-                        maxWidth: "255px",
-                    }}
-                >
-                    <AxisSelector
-                        header="Primary scale"
-                        axes={this.state.axes}
-                        axisLabels={this.props.axisTitles}
-                        value={this.state.primaryAxis}
-                        onChange={this.onChangePrimaryAxis}
-                    />
-                    <InfoPanel
-                        header="Readout"
-                        onGroupClick={this.onInfoGroupClick}
-                        infos={this.state.infos}
-                    />
-                    <br />
-                    <div style={{ paddingLeft: "10px", display: "flex" }}>
-                        <span>Zoom:</span>
-                        <span
-                            style={{
-                                flex: "1 1 100px",
-                                padding: "0 20px 0 10px",
-                            }}
-                        >
-                            <ZoomSlider
-                                value={this.state.sliderValue}
-                                max={this.props.options?.maxContentZoom}
-                                onChange={this.onZoomSliderChange}
-                            />
-                        </span>
-                    </div>
-                </div>
+                {this.createRightPanel()}
             </div>
         );
     }

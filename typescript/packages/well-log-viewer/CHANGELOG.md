@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.4.8...well-log-viewer@1.5.0) (2024-03-05)
+
+
+### Features
+
+* Track caption and readout font size and text truncation ([#1941](https://github.com/equinor/webviz-subsurface-components/issues/1941)) ([ff14b41](https://github.com/equinor/webviz-subsurface-components/commit/ff14b4127e8be7ed6793e6b5fb163eb029bdd88a)), closes [#1715](https://github.com/equinor/webviz-subsurface-components/issues/1715) [#1874](https://github.com/equinor/webviz-subsurface-components/issues/1874) [#1888](https://github.com/equinor/webviz-subsurface-components/issues/1888)
+
 ## [1.4.8](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.4.7...well-log-viewer@1.4.8) (2024-02-28)
 
 

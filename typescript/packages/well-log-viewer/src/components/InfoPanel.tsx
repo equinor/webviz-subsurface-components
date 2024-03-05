@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import React, { Component } from "react";
 
+import "./rightPanel.scss";
+
 import type { Info } from "./InfoTypes";
 
 interface Props {
@@ -9,9 +11,9 @@ interface Props {
     onGroupClick?: (trackId: string | number) => void;
 }
 
-function createSeparator() {
+function createSeparator(info: Info) {
     return (
-        <tr key={"separator"}>
+        <tr key={"_separator_" + info.trackId + "." + info.name}>
             {/* Set key prop just for react pleasure. See https://reactjs.org/link/warning-keys for more information */}
             <td colSpan={4}>
                 {" "}
@@ -20,11 +22,6 @@ function createSeparator() {
         </tr>
     );
 }
-
-const styleGroupRow = {
-    backgroundColor: "#ededed",
-    cursor: "pointer",
-};
 
 function formatValue(value: number): string {
     if (!Number.isFinite(value)) return "";
@@ -59,89 +56,83 @@ class InfoPanel extends Component<Props> {
         this.props.onGroupClick(trackId);
     }
 
+    createGroupRow(info: Info): ReactNode {
+        return (
+            <tr
+                className="group-row"
+                key={"_group_" + info.trackId + "." + info.name}
+                onClick={this.onRowClick.bind(this, info.trackId)}
+            >
+                <td style={{ color: info.color }}>
+                    {
+                        info.collapsed
+                            ? "\u25BA"
+                            : "\u25BC" /*right/down-pointing triangle*/
+                    }
+                </td>
+                <td colSpan={3} className="group-row-name">
+                    {info.name}
+                </td>
+            </tr>
+        );
+    }
+
     createRow(info: Info): ReactNode {
+        const autoDescreaseFontSize = false;
         if (info.type === "separator")
             // special case
-            return createSeparator();
+            return createSeparator(info);
 
-        if (info.groupStart !== undefined) {
-            return (
-                <tr
-                    style={styleGroupRow}
-                    key={"_group_" + info.trackId + "." + info.name}
-                    onClick={this.onRowClick.bind(this, info.trackId)}
-                >
-                    <td style={{ color: info.color, fontSize: "small" }}>
-                        {
-                            info.collapsed
-                                ? "\u25BA"
-                                : "\u25BC" /*right/down-pointing triangle*/
-                        }
-                    </td>
-                    <td
-                        colSpan={3}
-                        style={{ fontSize: "small", fontWeight: "bold" }}
-                    >
-                        {info.name}
-                    </td>
-                </tr>
-            );
+        if (info.groupStart !== undefined) return this.createGroupRow(info);
+
+        let name = info.name || "?";
+        const tooltip = name;
+        // print long names and values with a smaller font size
+        const styleInfoName: React.CSSProperties = {};
+        let maxLen = 11;
+        if (autoDescreaseFontSize && name.length > 10) {
+            styleInfoName.fontSize = "x-small";
+            maxLen = 16;
+        }
+        if (name.length > maxLen) {
+            // compress too long names
+            name = name.substring(0, maxLen - 2) + ellipsis;
         }
 
-        const typeStyle: React.CSSProperties = {
-            color: info.color,
-            fontSize: "small",
-        };
-        let name = info.name ? info.name : "?";
-        if (name.length > 16)
-            // compress too long names
-            name = name.substring(0, 14) + ellipsis;
-        // print long names and values with a smaller font size
-        const nameStyle: React.CSSProperties = { whiteSpace: "nowrap" };
-        if (name.length > 10) nameStyle.fontSize = "x-small";
         let value = formatValue(info.value);
         if (info.discrete)
             value = info.discrete + (value ? nbsp + "(" + value + ")" : "");
-        if (value === "") value = nbsp; // set some text to force the empty line to have the same height as non-empty line
-        const valueStyle: React.CSSProperties = {
-            width: "90px",
-            paddingLeft: "1.5em",
-            textAlign: "right",
-            whiteSpace: "nowrap",
-        };
-        if (value.length > 10) valueStyle.fontSize = "x-small";
+        if (value === "") value = nbsp; // set some text to force an empty line to have the same height as non-empty line
+        const styleInfoValue: React.CSSProperties = {};
+        if (autoDescreaseFontSize && value.length > 10)
+            styleInfoValue.fontSize = "x-small";
+        /// style={styleInfoName} title={tooltip!==name? tooltip: undefined}>{name}
         return (
-            <tr
-                key={
-                    info.trackId +
-                    "." +
-                    info.name /*Set unique key prop just for react pleasure*/
-                }
-            >
-                <td style={typeStyle}>{bigCircle}</td>
-                <td style={nameStyle}>{name}</td>
-                <td style={valueStyle} colSpan={info.discrete ? 2 : 1}>
-                    {value}
+            <tr key={info.trackId + "." + info.name}>
+                <td className="row-info" style={{ color: info.color }}>
+                    {bigCircle}
                 </td>
-                {!info.discrete ? (
-                    <td style={{ paddingLeft: "0.5em" }}>{info.units}</td>
-                ) : null}
+                <td className="row-name" title={tooltip}></td>
+                <td
+                    className="row-value"
+                    style={styleInfoValue}
+                    colSpan={info.discrete ? 2 : 1}
+                    title={value}
+                ></td>
+                {!info.discrete && (
+                    <td className="row-units" title={info.units}></td>
+                )}
             </tr>
         );
     }
 
     render(): JSX.Element {
         return (
-            <div style={{ overflowY: "auto", overflowX: "hidden" }}>
+            <div className="readout">
                 <fieldset>
                     <legend>{this.props.header}</legend>
 
-                    <table
-                        style={{
-                            borderSpacing: "0px",
-                            width: "100%",
-                        }}
-                    >
+                    <table>
                         <tbody>
                             {this.props.infos?.map(this.createRow.bind(this))}
                         </tbody>
