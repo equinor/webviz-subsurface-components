@@ -72,7 +72,7 @@ const defaultProps = {
     widthUnits: "pixels",
     linesWidth: 5,
     color: [0, 0, 200, 255],
-    pickable: false,
+    pickable: true,
     visible: true,
     depthTest: true,
     ZIncreasingDownwards: true,
