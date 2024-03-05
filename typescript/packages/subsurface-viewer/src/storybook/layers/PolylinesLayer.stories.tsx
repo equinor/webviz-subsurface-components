@@ -114,9 +114,7 @@ export const HugePolylinesLayer: StoryObj<typeof SubsurfaceViewer> = {
     },
 };
 
-export const RandomPolylinesLayerTypedArrayInput: StoryObj<
-    typeof SubsurfaceViewer
-> = {
+export const HugeLayerTypedArrayInput: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "map",
         layers: [
