@@ -53,7 +53,7 @@ export interface PolylinesLayerProps extends ExtendedLayerProps {
 
     /** Enable/disable depth testing when rendering layer. Default true.
      */
-    depthTest: boolean;
+    depthTest?: boolean;
 
     /**
      * If true means that input z values are interpreted as depths.

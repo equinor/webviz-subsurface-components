@@ -13,7 +13,7 @@ import fs from "./path-layer-fragment.glsl";
 type UniformValue = number | boolean | Readonly<NumericArray>;
 
 export interface ExtendedPathLayerProps {
-    depthTest: boolean;
+    depthTest?: boolean;
     ZIncreasingDownwards: boolean;
 }
 
