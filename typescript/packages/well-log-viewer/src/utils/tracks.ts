@@ -370,9 +370,8 @@ function getColorTable(
         return defColorTable;
     }
     if (id && colorTables) {
-        for (let i = 0; i < colorTables.length; i++) {
-            if (colorTables[i].name == id) return colorTables[i];
-        }
+        const colorTable = colorTables.find((value) => value.name === id);
+        if (colorTable) return colorTable;
         console.error(
             "colorTable id='" + id + "' is not found in getColorTable()"
         );
