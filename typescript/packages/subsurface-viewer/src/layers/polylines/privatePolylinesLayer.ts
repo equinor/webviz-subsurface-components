@@ -1,4 +1,5 @@
-import { PathLayer, PathLayerProps } from "@deck.gl/layers/typed";
+import { PathLayer } from "@deck.gl/layers/typed";
+import type { PathLayerProps } from "@deck.gl/layers/typed";
 
 import type { NumericArray } from "@math.gl/types";
 import GL from "@luma.gl/constants";
