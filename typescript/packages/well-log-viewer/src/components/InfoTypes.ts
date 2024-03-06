@@ -4,7 +4,7 @@ export interface Info {
     color: string;
     value: number;
     discrete?: string /*string for discrete*/;
-    type: string; // "seperator"; "line", "linestep", "area", "dot", ...
+    type: string; // "separator"; "line", "linestep", "area", "dot", ...
     trackId: number | string;
 
     groupStart?: string; // for category

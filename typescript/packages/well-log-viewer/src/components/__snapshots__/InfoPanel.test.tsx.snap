@@ -2,38 +2,34 @@
 
 exports[`Test Info panel snapshot test 1`] = `
 <div
-  style="overflow-y: auto; overflow-x: hidden;"
+  class="readout"
 >
   <fieldset>
     <legend>
       Readout
     </legend>
-    <table
-      style="border-spacing: 0px; width: 100%;"
-    >
+    <table>
       <tbody>
         <tr>
           <td
-            style="color: black; font-size: small;"
+            class="row-info"
+            style="color: black;"
           >
             ⬤
           </td>
           <td
-            style="white-space: nowrap;"
-          >
-            DVER
-          </td>
+            class="row-name"
+            title="DVER"
+          />
           <td
+            class="row-value"
             colspan="1"
-            style="width: 90px; padding-left: 1.5em; text-align: right; white-space: nowrap;"
-          >
-            2366
-          </td>
+            title="2366"
+          />
           <td
-            style="padding-left: 0.5em;"
-          >
-            M
-          </td>
+            class="row-units"
+            title="M"
+          />
         </tr>
         <tr>
           <td
@@ -45,26 +41,24 @@ exports[`Test Info panel snapshot test 1`] = `
         </tr>
         <tr>
           <td
-            style="color: orange; font-size: small;"
+            class="row-info"
+            style="color: orange;"
           >
             ⬤
           </td>
           <td
-            style="white-space: nowrap;"
-          >
-            BDIA
-          </td>
+            class="row-name"
+            title="BDIA"
+          />
           <td
+            class="row-value"
             colspan="1"
-            style="width: 90px; padding-left: 1.5em; text-align: right; white-space: nowrap;"
-          >
-            8.5
-          </td>
+            title="8.5"
+          />
           <td
-            style="padding-left: 0.5em;"
-          >
-            INCH
-          </td>
+            class="row-units"
+            title="INCH"
+          />
         </tr>
       </tbody>
     </table>
@@ -74,38 +68,34 @@ exports[`Test Info panel snapshot test 1`] = `
 
 exports[`Test Info panel snapshot test when value is infinity 1`] = `
 <div
-  style="overflow-y: auto; overflow-x: hidden;"
+  class="readout"
 >
   <fieldset>
     <legend>
       Readout
     </legend>
-    <table
-      style="border-spacing: 0px; width: 100%;"
-    >
+    <table>
       <tbody>
         <tr>
           <td
-            style="color: black; font-size: small;"
+            class="row-info"
+            style="color: black;"
           >
             ⬤
           </td>
           <td
-            style="white-space: nowrap;"
-          >
-            DVER
-          </td>
+            class="row-name"
+            title="DVER"
+          />
           <td
+            class="row-value"
             colspan="1"
-            style="width: 90px; padding-left: 1.5em; text-align: right; white-space: nowrap;"
-          >
-             
-          </td>
+            title=" "
+          />
           <td
-            style="padding-left: 0.5em;"
-          >
-            M
-          </td>
+            class="row-units"
+            title="M"
+          />
         </tr>
       </tbody>
     </table>
