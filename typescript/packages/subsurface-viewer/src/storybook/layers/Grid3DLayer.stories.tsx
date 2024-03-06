@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import type { Meta, StoryObj } from "@storybook/react";
 
 import { create, all } from "mathjs";
@@ -15,6 +16,10 @@ import {
     Faces as ToroidFaces,
     VertexCount as ToroidVertexCount,
 } from "../../layers/grid3d/test_data/PentagonalToroid";
+
+import { gridPoints } from "../../layers/grid3d/test_data/GridPoints";
+import { gridPolygons } from "../../layers/grid3d/test_data/GridPolygons";
+import { gridProperties } from "../../layers/grid3d/test_data/GridProperties";
 
 import { default3DViews, defaultStoryParameters } from "../sharedSettings";
 
@@ -212,6 +217,58 @@ export const PolyhedralCells: StoryObj<typeof SubsurfaceViewer> = {
                 polysData: ToroidFaces,
                 propertiesData: toroidProperties,
                 coloringMode: TGrid3DColoringMode.Property,
+            },
+        ],
+    },
+    parameters: parameters,
+};
+
+const colorTable = new Uint8Array([
+    0, 0, 0,       //0
+    0, 0, 255,     //1 
+    0, 255, 0,     //2 
+    0, 0, 0,       //3 
+    0, 0, 0,       //4 
+    200, 100, 0,   //5 
+    0, 0, 0,       //6 
+    0, 0, 0,       //7 
+    0, 0, 0,       //8
+    255, 0, 0,     //9 
+    0, 0, 0,       // 10
+]);
+
+export const CategoricalProperty: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        bounds: [-2500, -2500, 2500, 2500] as NumberQuad,
+        views: {
+            layout: [1, 1] as [number, number],
+            viewports: [
+                {
+                    id: "view_1",
+                    show3D: true,
+                },
+            ],
+        },
+        id: "grid-3d-categorical_props",
+        layers: [
+            {
+                ...axes,
+                id: "categorical_props-axes",
+                bounds: [-2000, -2200, -2200, 2200, 2000, -1000],
+            },
+            {
+                ...grid3dLayer,
+                "@@typedArraySupport": true,
+                id: "categorical_props",
+                coloringMode: TGrid3DColoringMode.Property,
+                pickable: true,
+                pointsData: new Float32Array(gridPoints),
+                polysData: new Uint32Array(gridPolygons),
+                propertiesData: new Uint16Array(gridProperties),
+                colorMapName: "Seismic",
+                ZIncreasingDownwards: true,
+                colorMapFunction: colorTable,
+                material: false
             },
         ],
     },

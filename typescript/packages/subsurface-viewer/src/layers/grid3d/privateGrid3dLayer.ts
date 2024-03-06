@@ -26,7 +26,7 @@ import type { TGrid3DColoringMode } from "./grid3dLayer";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,
-    [GL.TEXTURE_MAG_FILTER]: GL.LINEAR,
+    [GL.TEXTURE_MAG_FILTER]: GL.NEAREST,
     [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
     [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE,
 };
@@ -194,19 +194,29 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
         if (!this.props.depthTest) {
             gl.disable(gl.DEPTH_TEST);
         }
+
+        const imageData = getImageData(
+            this.props.colorMapName,
+            (this.context as DeckGLLayerContext).userData.colorTables,
+            this.props.colorMapFunction
+        );
+
         model_mesh
             .setUniforms({
                 ...uniforms,
+                isPropertyDiscrete: true,
+                // colormap: new Texture2D(context.gl, {
+                //     width: 256,
+                //     height: 1,
+                //     format: GL.RGB,
+                //     data: imageData,
+                //     parameters: DEFAULT_TEXTURE_PARAMETERS,
+                // }),
                 colormap: new Texture2D(context.gl, {
-                    width: 256,
+                    width: 11,
                     height: 1,
                     format: GL.RGB,
-                    data: getImageData(
-                        this.props.colorMapName,
-                        (this.context as DeckGLLayerContext).userData
-                            .colorTables,
-                        this.props.colorMapFunction
-                    ),
+                    data: this.props.colorMapFunction,
                     parameters: DEFAULT_TEXTURE_PARAMETERS,
                 }),
                 colorMapRangeMin,

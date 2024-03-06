@@ -47,7 +47,7 @@ function onTerminateWorker() {
 export type WebWorkerParams = {
     points: Float32Array;
     polys: Uint32Array;
-    properties: Float32Array;
+    properties: Float32Array | Uint16Array;
 };
 
 function GetBBox(points: Float32Array): BoundingBox3D {
@@ -192,7 +192,7 @@ export interface Grid3DLayerProps extends ExtendedLayerProps {
      * May also be set as constant color:
      * E.g. [255, 0, 0] for constant red cells.
      */
-    colorMapFunction?: colorMapFunctionType | Uint32Array;
+    colorMapFunction?: colorMapFunctionType | Uint8Array;
 
     /** Enable lines around cell faces.
      *  default: true.
