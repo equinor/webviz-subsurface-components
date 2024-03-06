@@ -93,7 +93,7 @@ function addScaleTrackInfos(
         color: "", // dummy value
         value: Number.NaN, // dummy value
         type: "separator",
-        trackId: "separator",
+        trackId: tracks[0]?.id || "separator",
     });
 }
 

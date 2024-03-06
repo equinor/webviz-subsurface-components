@@ -1,3 +1,10 @@
+# [0.19.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.18.1...subsurface-viewer@0.19.0) (2024-03-06)
+
+
+### Features
+
+* PolylinesLayer typed arrays input. ([#1949](https://github.com/equinor/webviz-subsurface-components/issues/1949)) ([0829b5a](https://github.com/equinor/webviz-subsurface-components/commit/0829b5a6b0e1e89d20eee5aa482b88e18f1f696d))
+
 ## [0.18.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.18.0...subsurface-viewer@0.18.1) (2024-02-28)
 
 
