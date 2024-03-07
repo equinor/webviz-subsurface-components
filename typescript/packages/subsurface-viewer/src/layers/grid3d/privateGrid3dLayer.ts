@@ -26,6 +26,13 @@ import type { TGrid3DColoringMode } from "./grid3dLayer";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,
+    [GL.TEXTURE_MAG_FILTER]: GL.LINEAR,
+    [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
+    [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE,
+};
+
+const DISCRETE_TEXTURE_PARAMETERS = {
+    [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,
     [GL.TEXTURE_MAG_FILTER]: GL.NEAREST,
     [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
     [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE,
@@ -84,6 +91,20 @@ const defaultProps = {
     ZIncreasingDownwards: true,
 };
 
+interface IContinuousPropertyUniforms {
+    isPropertyDiscrete: false;
+    colormap: Texture2D;
+    colorMapRangeMin: number;
+    colorMapRangeMax: number;
+    colorMapClampColor: Color | undefined | boolean | number[];
+    isColorMapClampColorTransparent: boolean;
+    isClampColor: boolean;
+}
+
+interface IDiscretePropertyUniforms {
+    isPropertyDiscrete: true;
+    colormap: Texture2D;
+}
 // This is a private layer used only by the composite Grid3DLayer
 export default class PrivateLayer extends Layer<PrivateLayerProps> {
     get isLoaded(): boolean {
@@ -162,32 +183,6 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
 
         const [model_mesh, mesh_lines_model] = this.state["models"];
 
-        const valueRangeMin = this.props.propertyValueRange?.[0] ?? 0.0;
-        const valueRangeMax = this.props.propertyValueRange?.[1] ?? 1.0;
-
-        // If specified color map will extend from colorMapRangeMin to colorMapRangeMax.
-        // Otherwise it will extend from valueRangeMin to valueRangeMax.
-        const colorMapRangeMin = this.props.colorMapRange?.[0] ?? valueRangeMin;
-        const colorMapRangeMax = this.props.colorMapRange?.[1] ?? valueRangeMax;
-
-        const isClampColor: boolean =
-            this.props.colorMapClampColor !== undefined &&
-            this.props.colorMapClampColor !== true &&
-            this.props.colorMapClampColor !== false;
-        let colorMapClampColor = isClampColor
-            ? this.props.colorMapClampColor
-            : [0, 0, 0];
-
-        // Normalize to [0,1] range.
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        colorMapClampColor = (colorMapClampColor as Color).map(
-            (x) => (x ?? 0) / 255
-        );
-
-        const isColorMapClampColorTransparent: boolean =
-            (this.props.colorMapClampColor as boolean) === false;
-
         gl.enable(gl.POLYGON_OFFSET_FILL);
         gl.polygonOffset(1, 1);
 
@@ -195,36 +190,15 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             gl.disable(gl.DEPTH_TEST);
         }
 
-        const imageData = getImageData(
-            this.props.colorMapName,
-            (this.context as DeckGLLayerContext).userData.colorTables,
-            this.props.colorMapFunction
-        );
+        const propertyUniforms = this.isPropertyDiscrete()
+            ? this.getDiscretePropertyUniforms(context)
+            : this.getContinuousPropertyUniforms(context);
 
         model_mesh
             .setUniforms({
                 ...uniforms,
-                isPropertyDiscrete: true,
-                // colormap: new Texture2D(context.gl, {
-                //     width: 256,
-                //     height: 1,
-                //     format: GL.RGB,
-                //     data: imageData,
-                //     parameters: DEFAULT_TEXTURE_PARAMETERS,
-                // }),
-                colormap: new Texture2D(context.gl, {
-                    width: 11,
-                    height: 1,
-                    format: GL.RGB,
-                    data: this.props.colorMapFunction,
-                    parameters: DEFAULT_TEXTURE_PARAMETERS,
-                }),
-                colorMapRangeMin,
-                colorMapRangeMax,
-                colorMapClampColor,
+                ...propertyUniforms,
                 coloringMode: this.props.coloringMode,
-                isColorMapClampColorTransparent,
-                isClampColor,
                 ZIncreasingDownwards: this.props.ZIncreasingDownwards,
             })
             .draw();
@@ -287,6 +261,82 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
         return {
             ...info,
             properties: layer_properties,
+        };
+    }
+
+    private isPropertyDiscrete(): boolean {
+        return this.props.colorMapFunction instanceof Uint8Array;
+    }
+
+    // eslint-disable-next-line
+    private getContinuousPropertyUniforms(context: any): IContinuousPropertyUniforms {
+        const valueRangeMin = this.props.propertyValueRange?.[0] ?? 0.0;
+        const valueRangeMax = this.props.propertyValueRange?.[1] ?? 1.0;
+
+        // If specified color map will extend from colorMapRangeMin to colorMapRangeMax.
+        // Otherwise it will extend from valueRangeMin to valueRangeMax.
+        const colorMapRangeMin = this.props.colorMapRange?.[0] ?? valueRangeMin;
+        const colorMapRangeMax = this.props.colorMapRange?.[1] ?? valueRangeMax;
+
+        const isClampColor: boolean =
+            this.props.colorMapClampColor !== undefined &&
+            this.props.colorMapClampColor !== true &&
+            this.props.colorMapClampColor !== false;
+        let colorMapClampColor = isClampColor
+            ? this.props.colorMapClampColor
+            : [0, 0, 0];
+
+        // Normalize to [0,1] range.
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        colorMapClampColor = (colorMapClampColor as Color).map(
+            (x) => (x ?? 0) / 255
+        );
+
+        const isColorMapClampColorTransparent: boolean =
+            (this.props.colorMapClampColor as boolean) === false;
+
+        const imageData = getImageData(
+            this.props.colorMapName,
+            (this.context as DeckGLLayerContext).userData.colorTables,
+            this.props.colorMapFunction
+        );
+
+        const colormap = new Texture2D(context.gl, {
+            width: 256,
+            height: 1,
+            format: GL.RGB,
+            data: imageData,
+            parameters: DEFAULT_TEXTURE_PARAMETERS,
+        });
+
+        return {
+            isPropertyDiscrete: false,
+            colormap,
+            colorMapRangeMin,
+            colorMapRangeMax,
+            colorMapClampColor,
+            isColorMapClampColorTransparent,
+            isClampColor,
+        };
+    }
+
+    // eslint-disable-next-line
+    private getDiscretePropertyUniforms (context:any): IDiscretePropertyUniforms {
+        const imageData: Uint8Array = this.props
+            .colorMapFunction as unknown as Uint8Array;
+
+        const colormap = new Texture2D(context.gl, {
+            width: imageData.length / 3,
+            height: 1,
+            format: GL.RGB,
+            data: imageData,
+            parameters: DISCRETE_TEXTURE_PARAMETERS,
+        });
+
+        return {
+            isPropertyDiscrete: true,
+            colormap,
         };
     }
 }

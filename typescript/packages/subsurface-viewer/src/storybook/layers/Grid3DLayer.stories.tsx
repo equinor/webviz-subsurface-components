@@ -224,17 +224,17 @@ export const PolyhedralCells: StoryObj<typeof SubsurfaceViewer> = {
 };
 
 const colorTable = new Uint8Array([
-    0, 0, 0,       //0
-    0, 0, 255,     //1 
-    0, 255, 0,     //2 
-    0, 0, 0,       //3 
-    0, 0, 0,       //4 
-    200, 100, 0,   //5 
-    0, 0, 0,       //6 
-    0, 0, 0,       //7 
-    0, 0, 0,       //8
-    255, 0, 0,     //9 
-    0, 0, 0,       // 10
+    100, 0, 0,     // 0
+    0, 0, 255,     // 1 
+    0, 255, 0,     // 2 
+    0, 100, 0,     // 3 
+    0, 0, 100,     // 4 
+    200, 100, 0,   // 5 
+    0, 100, 100,   // 6 
+    100, 0, 100,   // 7 
+    100, 100, 0,   // 8
+    255, 0, 0,     // 9 
+    0, 0,          // 10
 ]);
 
 export const CategoricalProperty: StoryObj<typeof SubsurfaceViewer> = {
