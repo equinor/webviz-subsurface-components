@@ -17,9 +17,9 @@ import {
     VertexCount as ToroidVertexCount,
 } from "../../layers/grid3d/test_data/PentagonalToroid";
 
-import { gridPoints } from "../../layers/grid3d/test_data/GridPoints";
-import { gridPolygons } from "../../layers/grid3d/test_data/GridPolygons";
-import { gridProperties } from "../../layers/grid3d/test_data/GridProperties";
+import * as gridPoints from "../../layers/grid3d/test_data/Points.json";
+import * as gridPolys  from "../../layers/grid3d/test_data/Polys.json";
+import * as gridProps  from "../../layers/grid3d/test_data/Props.json";
 
 import { default3DViews, defaultStoryParameters } from "../sharedSettings";
 
@@ -224,7 +224,7 @@ export const PolyhedralCells: StoryObj<typeof SubsurfaceViewer> = {
 };
 
 const colorTable = new Uint8Array([
-    100, 0, 0,     // 0
+    100, 100, 0,     // 0
     0, 0, 255,     // 1 
     0, 255, 0,     // 2 
     0, 100, 0,     // 3 
@@ -263,8 +263,8 @@ export const CategoricalProperty: StoryObj<typeof SubsurfaceViewer> = {
                 coloringMode: TGrid3DColoringMode.Property,
                 pickable: true,
                 pointsData: new Float32Array(gridPoints),
-                polysData: new Uint32Array(gridPolygons),
-                propertiesData: new Uint16Array(gridProperties),
+                polysData: new Uint32Array(gridPolys),                
+                propertiesData: new Uint16Array(gridProps),
                 colorMapName: "Seismic",
                 ZIncreasingDownwards: true,
                 colorMapFunction: colorTable,
