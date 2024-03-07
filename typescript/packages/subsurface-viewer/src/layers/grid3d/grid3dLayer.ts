@@ -72,43 +72,13 @@ function GetBBox(points: Float32Array): BoundingBox3D {
     return [xmin, ymin, zmin, xmax, ymax, zmax];
 }
 
-async function loadFloat32Data(
-    data: string | number[] | Float32Array
-): Promise<Float32Array> {
-    if (data instanceof Float32Array) {
-        return data;
-    }
-    if (Array.isArray(data)) {
-        return new Float32Array(data);
-    }
-    if (typeof data === "string") {
-        const stringData = await load(data as string, JSONLoader);
-        return new Float32Array(stringData);
-    }
-    return Promise.reject("Grid3DLayer: Unsupported type of input data");
-}
+type TTypedArray = Float32Array | Uint32Array | Uint16Array;
 
-async function loadUint32Data(
-    data: string | number[] | Uint32Array
-): Promise<Uint32Array> {
-    if (data instanceof Uint32Array) {
-        return data;
-    }
-    if (Array.isArray(data)) {
-        return new Uint32Array(data);
-    }
-    if (typeof data === "string") {
-        const stringData = await load(data as string, JSONLoader);
-        return new Uint32Array(stringData);
-    }
-    return Promise.reject("Grid3DLayer: Unsupported type of input data");
-}
-
-async function loadPropertiesData<T extends Float32Array | Uint16Array>(
-    data: string | number[] | Float32Array | Uint16Array,
+async function loadData<T extends TTypedArray>(
+    data: string | number[] | TTypedArray,
     type: { new (data: unknown): T }
-): Promise<Float32Array | Uint16Array> {
-    if (data instanceof Float32Array || data instanceof Uint16Array) {
+): Promise<T> {
+    if (data instanceof type) {
         return data;
     }
     if (Array.isArray(data)) {
@@ -124,14 +94,14 @@ async function loadPropertiesData<T extends Float32Array | Uint16Array>(
 async function load_data(
     pointsData: string | number[] | Float32Array,
     polysData: string | number[] | Uint32Array,
-    propertiesData: string | number[] | Float32Array | Uint16Array,
-    isCategorical: boolean
-) {
-    const points = await loadFloat32Data(pointsData);
-    const polys = await loadUint32Data(polysData);
-    const properties = isCategorical
-        ? await loadPropertiesData(propertiesData, Uint16Array)
-        : await loadPropertiesData(propertiesData, Float32Array);
+    propertiesData: string | number[] | Float32Array | Uint16Array
+): Promise<[Float32Array, Uint32Array, Float32Array | Uint16Array]> {
+    const isDiscrete = propertiesData instanceof Uint16Array;
+    const points = await loadData(pointsData, Float32Array);
+    const polys = await loadData(polysData, Uint32Array);
+    const properties = isDiscrete
+        ? await loadData(propertiesData, Uint16Array)
+        : await loadData(propertiesData, Float32Array);
     return Promise.all([points, polys, properties]);
 }
 
@@ -252,13 +222,10 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
     }
 
     rebuildData(reportBoundingBox: boolean): void {
-        const isCategorical =
-            this.props.colorMapFunction instanceof Uint32Array;
         const p = load_data(
             this.props.pointsData,
             this.props.polysData,
-            this.props.propertiesData,
-            isCategorical
+            this.props.propertiesData
         );
 
         p.then(([points, polys, properties]) => {
