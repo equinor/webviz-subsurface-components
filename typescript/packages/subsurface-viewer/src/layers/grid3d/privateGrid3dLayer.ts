@@ -91,8 +91,7 @@ const defaultProps = {
     ZIncreasingDownwards: true,
 };
 
-interface IContinuousPropertyUniforms {
-    isPropertyDiscrete: false;
+interface IPropertyUniforms {
     colormap: Texture2D;
     colorMapRangeMin: number;
     colorMapRangeMax: number;
@@ -101,10 +100,6 @@ interface IContinuousPropertyUniforms {
     isClampColor: boolean;
 }
 
-interface IDiscretePropertyUniforms {
-    isPropertyDiscrete: true;
-    colormap: Texture2D;
-}
 // This is a private layer used only by the composite Grid3DLayer
 export default class PrivateLayer extends Layer<PrivateLayerProps> {
     get isLoaded(): boolean {
@@ -190,9 +185,7 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             gl.disable(gl.DEPTH_TEST);
         }
 
-        const propertyUniforms = this.isPropertyDiscrete()
-            ? this.getDiscretePropertyUniforms(context)
-            : this.getContinuousPropertyUniforms(context);
+        const propertyUniforms = this.getPropertyUniforms(context);
 
         model_mesh
             .setUniforms({
@@ -264,12 +257,34 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
         };
     }
 
-    private isPropertyDiscrete(): boolean {
-        return this.props.colorMapFunction instanceof Uint8Array;
+    private getImageData(): {
+        imageData: number[] | Uint8Array;
+        count: number;
+        parameters:
+            | typeof DEFAULT_TEXTURE_PARAMETERS
+            | typeof DISCRETE_TEXTURE_PARAMETERS;
+    } {
+        if (this.props.colorMapFunction instanceof Uint8Array) {
+            return {
+                imageData: this.props.colorMapFunction,
+                count: this.props.colorMapFunction.length / 3,
+                parameters: DISCRETE_TEXTURE_PARAMETERS,
+            };
+        }
+        const imageData = getImageData(
+            this.props.colorMapName,
+            (this.context as DeckGLLayerContext).userData.colorTables,
+            this.props.colorMapFunction
+        );
+        return {
+            imageData,
+            count: 256,
+            parameters: DEFAULT_TEXTURE_PARAMETERS,
+        };
     }
 
     // eslint-disable-next-line
-    private getContinuousPropertyUniforms(context: any): IContinuousPropertyUniforms {
+    private getPropertyUniforms(context: any): IPropertyUniforms {
         const valueRangeMin = this.props.propertyValueRange?.[0] ?? 0.0;
         const valueRangeMax = this.props.propertyValueRange?.[1] ?? 1.0;
 
@@ -296,47 +311,23 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
         const isColorMapClampColorTransparent: boolean =
             (this.props.colorMapClampColor as boolean) === false;
 
-        const imageData = getImageData(
-            this.props.colorMapName,
-            (this.context as DeckGLLayerContext).userData.colorTables,
-            this.props.colorMapFunction
-        );
+        const imageData = this.getImageData();
 
         const colormap = new Texture2D(context.gl, {
-            width: 256,
+            width: imageData.count,
             height: 1,
             format: GL.RGB,
-            data: imageData,
-            parameters: DEFAULT_TEXTURE_PARAMETERS,
+            data: imageData.imageData,
+            parameters: imageData.parameters,
         });
 
         return {
-            isPropertyDiscrete: false,
             colormap,
             colorMapRangeMin,
             colorMapRangeMax,
             colorMapClampColor,
             isColorMapClampColorTransparent,
             isClampColor,
-        };
-    }
-
-    // eslint-disable-next-line
-    private getDiscretePropertyUniforms (context:any): IDiscretePropertyUniforms {
-        const imageData: Uint8Array = this.props
-            .colorMapFunction as unknown as Uint8Array;
-
-        const colormap = new Texture2D(context.gl, {
-            width: imageData.length / 3,
-            height: 1,
-            format: GL.RGB,
-            data: imageData,
-            parameters: DISCRETE_TEXTURE_PARAMETERS,
-        });
-
-        return {
-            isPropertyDiscrete: true,
-            colormap,
         };
     }
 }

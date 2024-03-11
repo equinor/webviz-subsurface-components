@@ -171,7 +171,7 @@ const randomFunc = math?.random ? math.random : Math.random;
 const snubCubePoints = SnubCubePoints.map((v) => 10 * v);
 const snubCubeProperties = Array(SnubCubeVertexCount)
     .fill(0)
-    .map(() => randomFunc() * 50);
+    .map(() => 100 + randomFunc() * 50);
 
 const toroidPoints = ToroidPoints.map((v) => 10 * v).map((v, index) =>
     index % 3 === 0 ? v + 30 : v
@@ -179,6 +179,20 @@ const toroidPoints = ToroidPoints.map((v) => 10 * v).map((v, index) =>
 const toroidProperties = Array(ToroidVertexCount)
     .fill(0)
     .map(() => randomFunc() * 10);
+
+const colorTable = new Uint8Array([
+    100, 100, 0,     // 0
+    0, 0, 255,     // 1 
+    0, 255, 0,     // 2 
+    0, 100, 0,     // 3 
+    0, 0, 100,     // 4 
+    200, 100, 0,   // 5 
+    0, 100, 100,   // 6 
+    100, 0, 100,   // 7 
+    100, 100, 0,   // 8
+    255, 0, 0,     // 9 
+    0, 0,          // 10
+]);
 
 export const PolyhedralCells: StoryObj<typeof SubsurfaceViewer> = {
     args: {
@@ -202,12 +216,13 @@ export const PolyhedralCells: StoryObj<typeof SubsurfaceViewer> = {
             {
                 ...grid3dLayer,
                 id: "polyhedral1",
+                "@@typedArraySupport": true,
                 coloringMode: TGrid3DColoringMode.Y,
                 pickable: true,
                 pointsData: snubCubePoints,
                 polysData: SnubCubeFaces,
                 propertiesData: snubCubeProperties,
-                colorMapName: "Porosity",
+                colorMapName: "Porosity",                
             },
             {
                 ...grid3dLayer,
@@ -222,20 +237,6 @@ export const PolyhedralCells: StoryObj<typeof SubsurfaceViewer> = {
     },
     parameters: parameters,
 };
-
-const colorTable = new Uint8Array([
-    100, 100, 0,     // 0
-    0, 0, 255,     // 1 
-    0, 255, 0,     // 2 
-    0, 100, 0,     // 3 
-    0, 0, 100,     // 4 
-    200, 100, 0,   // 5 
-    0, 100, 100,   // 6 
-    100, 0, 100,   // 7 
-    100, 100, 0,   // 8
-    255, 0, 0,     // 9 
-    0, 0,          // 10
-]);
 
 export const CategoricalProperty: StoryObj<typeof SubsurfaceViewer> = {
     args: {
@@ -264,7 +265,7 @@ export const CategoricalProperty: StoryObj<typeof SubsurfaceViewer> = {
                 pickable: true,
                 pointsData: new Float32Array(gridPoints),
                 polysData: new Uint32Array(gridPolys),                
-                propertiesData: new Uint16Array(gridProps),
+                propertiesData: new Uint16Array(gridProps),                
                 colorMapName: "Seismic",
                 ZIncreasingDownwards: true,
                 colorMapFunction: colorTable,

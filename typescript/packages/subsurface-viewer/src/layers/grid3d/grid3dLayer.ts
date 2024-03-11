@@ -91,17 +91,27 @@ async function loadData<T extends TTypedArray>(
     return Promise.reject("Grid3DLayer: Unsupported type of input data");
 }
 
+async function loadPropertiesData(
+    propertiesData: string | number[] | Float32Array | Uint16Array
+): Promise<Float32Array | Uint16Array> {
+    const isPropertiesDiscrete = propertiesData instanceof Uint16Array;
+    return isPropertiesDiscrete
+        ? await loadData(propertiesData, Uint16Array)
+        : await loadData(propertiesData, Float32Array);
+}
+
 async function load_data(
     pointsData: string | number[] | Float32Array,
     polysData: string | number[] | Uint32Array,
-    propertiesData: string | number[] | Float32Array | Uint16Array
+    propertiesData: string | number[] | Float32Array | Uint16Array,
+    loadProperties: boolean
 ): Promise<[Float32Array, Uint32Array, Float32Array | Uint16Array]> {
-    const isDiscrete = propertiesData instanceof Uint16Array;
     const points = await loadData(pointsData, Float32Array);
     const polys = await loadData(polysData, Uint32Array);
-    const properties = isDiscrete
-        ? await loadData(propertiesData, Uint16Array)
-        : await loadData(propertiesData, Float32Array);
+
+    const properties = loadProperties
+        ? await loadPropertiesData(propertiesData)
+        : new Float32Array();
     return Promise.all([points, polys, properties]);
 }
 
@@ -225,7 +235,8 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
         const p = load_data(
             this.props.pointsData,
             this.props.polysData,
-            this.props.propertiesData
+            this.props.propertiesData,
+            this.props.coloringMode === TGrid3DColoringMode.Property
         );
 
         p.then(([points, polys, properties]) => {
@@ -336,13 +347,14 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
 
     private getPropertyValueRange(): [number, number] {
         const bbox = this.state["bbox"];
+        const zSign = this.props.ZIncreasingDownwards ? -1.0 : 1.0;
         switch (this.props.coloringMode) {
             case TGrid3DColoringMode.X:
                 return [bbox[0], bbox[3]];
             case TGrid3DColoringMode.Y:
                 return [bbox[1], bbox[4]];
             case TGrid3DColoringMode.Z:
-                return [bbox[2], bbox[5]];
+                return [zSign * bbox[2], zSign * bbox[5]];
             default:
                 return this.state["propertyValueRange"];
         }

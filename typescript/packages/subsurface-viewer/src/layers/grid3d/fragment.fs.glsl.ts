@@ -17,10 +17,9 @@ uniform float colorMapRangeMax;
 uniform vec3 colorMapClampColor;
 uniform bool isClampColor;
 uniform bool isColorMapClampColorTransparent;
-uniform bool isPropertyDiscrete;
 
 // Calculate color from propertyValue using colormap.
-vec4 getContinuousPropertyColor (float propertyValue) {
+vec4 getPropertyColor (float propertyValue) {
 
    vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
    float x = (propertyValue - colorMapRangeMin) / (colorMapRangeMax - colorMapRangeMin);
@@ -45,24 +44,6 @@ vec4 getContinuousPropertyColor (float propertyValue) {
       color = texture2D(colormap, vec2(x, 0.5));
    }
    return color;
-}
-
-vec4 getDiscretePropertyColor (float propertyValue) {
-
-   ivec2 texSize = textureSize (colormap, 0);
-   float fraction = 1.0 / float(texSize.x);
-   float x = propertyValue * fraction;   
-   vec4 color = texture2D(colormap, vec2(x + fraction / 2.0 , 0.5));
-   return color;
-}
-
-
-vec4 getPropertyColor (float propertyValue) {
-
-   if (isPropertyDiscrete) {
-      return getDiscretePropertyColor (propertyValue);
-   }
-   return getContinuousPropertyColor (propertyValue);
 }
 
 void main(void) {
