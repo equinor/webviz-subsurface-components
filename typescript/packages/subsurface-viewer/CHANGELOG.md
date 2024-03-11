@@ -1,3 +1,10 @@
+# [0.20.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.19.0...subsurface-viewer@0.20.0) (2024-03-11)
+
+
+### Features
+
+* **grid3D:**  Support discrete properties. ([#1953](https://github.com/equinor/webviz-subsurface-components/issues/1953)) ([88bd6df](https://github.com/equinor/webviz-subsurface-components/commit/88bd6dfe265f4b9321cd9107f4e5b820c49fa61e))
+
 # [0.19.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.18.1...subsurface-viewer@0.19.0) (2024-03-06)
 
 
