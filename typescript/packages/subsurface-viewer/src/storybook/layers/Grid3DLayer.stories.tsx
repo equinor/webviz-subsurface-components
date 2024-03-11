@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import type { Meta, StoryObj } from "@storybook/react";
 
 import { create, all } from "mathjs";
@@ -18,8 +17,8 @@ import {
 } from "../../layers/grid3d/test_data/PentagonalToroid";
 
 import * as gridPoints from "../../layers/grid3d/test_data/DiscreteProperty/Points.json";
-import * as gridPolys  from "../../layers/grid3d/test_data/DiscreteProperty/Polys.json";
-import * as gridProps  from "../../layers/grid3d/test_data/DiscreteProperty/Props.json";
+import * as gridPolys from "../../layers/grid3d/test_data/DiscreteProperty/Polys.json";
+import * as gridProps from "../../layers/grid3d/test_data/DiscreteProperty/Props.json";
 
 import { default3DViews, defaultStoryParameters } from "../sharedSettings";
 
@@ -180,8 +179,9 @@ const toroidProperties = Array(ToroidVertexCount)
     .fill(0)
     .map(() => randomFunc() * 10);
 
+/* eslint-disable prettier/prettier */
 const colorTable = new Uint8Array([
-    100, 100, 0,     // 0
+    100, 100, 0,   // 0
     0, 0, 255,     // 1 
     0, 255, 0,     // 2 
     0, 100, 0,     // 3 
@@ -193,6 +193,7 @@ const colorTable = new Uint8Array([
     255, 0, 0,     // 9 
     0, 0,          // 10
 ]);
+/* eslint-enable prettier/prettier */
 
 export const PolyhedralCells: StoryObj<typeof SubsurfaceViewer> = {
     args: {
@@ -215,13 +216,13 @@ export const PolyhedralCells: StoryObj<typeof SubsurfaceViewer> = {
             },
             {
                 ...grid3dLayer,
-                id: "polyhedral1",                
+                id: "polyhedral1",
                 coloringMode: TGrid3DColoringMode.Y,
                 pickable: true,
                 pointsData: snubCubePoints,
                 polysData: SnubCubeFaces,
                 propertiesData: snubCubeProperties,
-                colorMapName: "Porosity",                
+                colorMapName: "Porosity",
             },
             {
                 ...grid3dLayer,
@@ -263,12 +264,12 @@ export const DiscreteProperty: StoryObj<typeof SubsurfaceViewer> = {
                 coloringMode: TGrid3DColoringMode.Property,
                 pickable: true,
                 pointsData: new Float32Array(gridPoints),
-                polysData: new Uint32Array(gridPolys),                
-                propertiesData: new Uint16Array(gridProps),                
+                polysData: new Uint32Array(gridPolys),
+                propertiesData: new Uint16Array(gridProps),
                 colorMapName: "Seismic",
                 ZIncreasingDownwards: true,
                 colorMapFunction: colorTable,
-                material: false
+                material: false,
             },
         ],
     },
