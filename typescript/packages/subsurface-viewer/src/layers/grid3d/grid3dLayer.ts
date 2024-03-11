@@ -47,7 +47,7 @@ function onTerminateWorker() {
 export type WebWorkerParams = {
     points: Float32Array;
     polys: Uint32Array;
-    properties: Float32Array;
+    properties: Float32Array | Uint16Array;
 };
 
 function GetBBox(points: Float32Array): BoundingBox3D {
@@ -72,46 +72,46 @@ function GetBBox(points: Float32Array): BoundingBox3D {
     return [xmin, ymin, zmin, xmax, ymax, zmax];
 }
 
-async function loadFloat32Data(
-    data: string | number[] | Float32Array
-): Promise<Float32Array> {
-    if (data instanceof Float32Array) {
+type TTypedArray = Float32Array | Uint32Array | Uint16Array;
+
+async function loadData<T extends TTypedArray>(
+    data: string | number[] | TTypedArray,
+    type: { new (data: unknown): T }
+): Promise<T> {
+    if (data instanceof type) {
         return data;
     }
     if (Array.isArray(data)) {
-        return new Float32Array(data);
+        return new type(data);
     }
     if (typeof data === "string") {
         const stringData = await load(data as string, JSONLoader);
-        return new Float32Array(stringData);
+        return new type(stringData);
     }
     return Promise.reject("Grid3DLayer: Unsupported type of input data");
 }
 
-async function loadUint32Data(
-    data: string | number[] | Uint32Array
-): Promise<Uint32Array> {
-    if (data instanceof Uint32Array) {
-        return data;
-    }
-    if (Array.isArray(data)) {
-        return new Uint32Array(data);
-    }
-    if (typeof data === "string") {
-        const stringData = await load(data as string, JSONLoader);
-        return new Uint32Array(stringData);
-    }
-    return Promise.reject("Grid3DLayer: Unsupported type of input data");
+async function loadPropertiesData(
+    propertiesData: string | number[] | Float32Array | Uint16Array
+): Promise<Float32Array | Uint16Array> {
+    const isPropertiesDiscrete = propertiesData instanceof Uint16Array;
+    return isPropertiesDiscrete
+        ? await loadData(propertiesData, Uint16Array)
+        : await loadData(propertiesData, Float32Array);
 }
 
 async function load_data(
     pointsData: string | number[] | Float32Array,
     polysData: string | number[] | Uint32Array,
-    propertiesData: string | number[] | Float32Array
-) {
-    const points = await loadFloat32Data(pointsData);
-    const polys = await loadUint32Data(polysData);
-    const properties = await loadFloat32Data(propertiesData);
+    propertiesData: string | number[] | Float32Array | Uint16Array,
+    loadProperties: boolean
+): Promise<[Float32Array, Uint32Array, Float32Array | Uint16Array]> {
+    const points = await loadData(pointsData, Float32Array);
+    const polys = await loadData(polysData, Uint32Array);
+
+    const properties = loadProperties
+        ? await loadPropertiesData(propertiesData)
+        : new Float32Array();
     return Promise.all([points, polys, properties]);
 }
 
@@ -141,8 +141,10 @@ export interface Grid3DLayerProps extends ExtendedLayerProps {
     /**  Url, or native, or typed javascript array.
      *  A scalar property for each polygon.
      * [0.23, 0.11. 0.98, ...]
+     * If propertiesData is provided as Uint16Array it is assumed that all the values are in range [0, N].
+     * If colorMapFunction is Uint8Array the property values are used as color indices.
      */
-    propertiesData: string | number[] | Float32Array;
+    propertiesData: string | number[] | Float32Array | Uint16Array;
 
     /**
      * Defines how the cells are to be colored:
@@ -171,8 +173,9 @@ export interface Grid3DLayerProps extends ExtendedLayerProps {
      * E.g. (x) => [x * 255, x * 255, x * 255]
      * May also be set as constant color:
      * E.g. [255, 0, 0] for constant red cells.
+     * Can be defined as Uint8Array containing [R , G, B] triplets in [0, 255] range each.
      */
-    colorMapFunction?: colorMapFunctionType;
+    colorMapFunction?: colorMapFunctionType | Uint8Array;
 
     /** Enable lines around cell faces.
      *  default: true.
@@ -235,7 +238,8 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
         const p = load_data(
             this.props.pointsData,
             this.props.polysData,
-            this.props.propertiesData
+            this.props.propertiesData,
+            this.props.coloringMode === TGrid3DColoringMode.Property
         );
 
         p.then(([points, polys, properties]) => {
@@ -346,13 +350,14 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
 
     private getPropertyValueRange(): [number, number] {
         const bbox = this.state["bbox"];
+        const zSign = this.props.ZIncreasingDownwards ? -1.0 : 1.0;
         switch (this.props.coloringMode) {
             case TGrid3DColoringMode.X:
                 return [bbox[0], bbox[3]];
             case TGrid3DColoringMode.Y:
                 return [bbox[1], bbox[4]];
             case TGrid3DColoringMode.Z:
-                return [bbox[2], bbox[5]];
+                return [zSign * bbox[2], zSign * bbox[5]];
             default:
                 return this.state["propertyValueRange"];
         }
