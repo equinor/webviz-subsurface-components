@@ -141,6 +141,8 @@ export interface Grid3DLayerProps extends ExtendedLayerProps {
     /**  Url, or native, or typed javascript array.
      *  A scalar property for each polygon.
      * [0.23, 0.11. 0.98, ...]
+     * If propertiesData is provided as Uint16Array it is assumed that all the values are in range [0, N].
+     * If colorMapFunction is Uint8Array the property values are used as color indices.
      */
     propertiesData: string | number[] | Float32Array | Uint16Array;
 
@@ -171,6 +173,7 @@ export interface Grid3DLayerProps extends ExtendedLayerProps {
      * E.g. (x) => [x * 255, x * 255, x * 255]
      * May also be set as constant color:
      * E.g. [255, 0, 0] for constant red cells.
+     * Can be defined as Uint8Array containing [R , G, B] triplets in [0, 255] range each.
      */
     colorMapFunction?: colorMapFunctionType | Uint8Array;
 
