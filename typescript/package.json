@@ -56,7 +56,7 @@
         "@storybook/react-webpack5": "^7.6.4",
         "@storybook/test-runner": "^0.16.0",
         "@testing-library/jest-dom": "^5.16.5",
-        "@testing-library/react": "^14.0.0",
+        "@testing-library/react": "^14.2.1",
         "@testing-library/user-event": "^13.1.9",
         "@theunderscorer/nx-semantic-release": "^2.10.0",
         "@types/convert-units": "^2.3.9",
