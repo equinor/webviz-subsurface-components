@@ -17,9 +17,9 @@ import {
     VertexCount as ToroidVertexCount,
 } from "../../layers/grid3d/test_data/PentagonalToroid";
 
-import * as gridPoints from "../../layers/grid3d/test_data/Points.json";
-import * as gridPolys  from "../../layers/grid3d/test_data/Polys.json";
-import * as gridProps  from "../../layers/grid3d/test_data/Props.json";
+import * as gridPoints from "../../layers/grid3d/test_data/DiscreteProperty/Points.json";
+import * as gridPolys  from "../../layers/grid3d/test_data/DiscreteProperty/Polys.json";
+import * as gridProps  from "../../layers/grid3d/test_data/DiscreteProperty/Props.json";
 
 import { default3DViews, defaultStoryParameters } from "../sharedSettings";
 
@@ -215,8 +215,7 @@ export const PolyhedralCells: StoryObj<typeof SubsurfaceViewer> = {
             },
             {
                 ...grid3dLayer,
-                id: "polyhedral1",
-                "@@typedArraySupport": true,
+                id: "polyhedral1",                
                 coloringMode: TGrid3DColoringMode.Y,
                 pickable: true,
                 pointsData: snubCubePoints,
@@ -238,7 +237,7 @@ export const PolyhedralCells: StoryObj<typeof SubsurfaceViewer> = {
     parameters: parameters,
 };
 
-export const CategoricalProperty: StoryObj<typeof SubsurfaceViewer> = {
+export const DiscreteProperty: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         bounds: [-2500, -2500, 2500, 2500] as NumberQuad,
         views: {
@@ -250,17 +249,17 @@ export const CategoricalProperty: StoryObj<typeof SubsurfaceViewer> = {
                 },
             ],
         },
-        id: "grid-3d-categorical_props",
+        id: "grid-3d-discrete_props",
         layers: [
             {
                 ...axes,
-                id: "categorical_props-axes",
+                id: "discrete_props-axes",
                 bounds: [-2000, -2200, -2200, 2200, 2000, -1000],
             },
             {
                 ...grid3dLayer,
                 "@@typedArraySupport": true,
-                id: "categorical_props",
+                id: "discrete_props",
                 coloringMode: TGrid3DColoringMode.Property,
                 pickable: true,
                 pointsData: new Float32Array(gridPoints),
