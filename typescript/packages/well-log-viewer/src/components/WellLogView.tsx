@@ -1924,45 +1924,25 @@ class WellLogView
         const viewTitle = this.props.viewTitle;
         return (
             <div
-                className="welllogview"
-                style={{
-                    width: "100%",
-                    height: "100%",
-                    display: "flex",
-                    flexDirection: horizontal ? "row" : "column",
-                }}
+                className="welllogview" // for CSS customization
+                style={{ flexDirection: horizontal ? "row" : "column" }}
             >
                 {viewTitle && (
                     <div
-                        style={{
-                            flex: "0, 0",
-                            writingMode: horizontal ? "vertical-lr" : undefined,
-                            transform: horizontal
-                                ? "rotate(180deg)"
-                                : undefined,
-                        }}
-                        className="title"
+                        className={
+                            horizontal ? "title title-horizontal" : "title"
+                        }
                     >
                         {this.createViewTitle(viewTitle)}
                     </div>
                 )}
-                <div
-                    style={{
-                        width: "100%",
-                        height: "100%",
-                        flex: "1, 1",
-                        display: "flex",
-                        flexDirection: "column",
-                    }}
-                >
+                <div className="view">
                     <div
-                        style={{ flex: "1, 1" }}
+                        className="container" // for CSS customization
                         ref={(el) => (this.container = el as HTMLElement)}
                     />
                     {this.state.errorText && (
-                        <div style={{ flex: "0, 0" }} className="error">
-                            {this.state.errorText}
-                        </div>
+                        <div className="error">{this.state.errorText}</div>
                     )}
                 </div>
             </div>
