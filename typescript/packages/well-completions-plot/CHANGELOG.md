@@ -1,3 +1,10 @@
+## [1.2.9](https://github.com/equinor/webviz-subsurface-components/compare/well-completions-plot@1.2.8...well-completions-plot@1.2.9) (2024-03-13)
+
+
+### Bug Fixes
+
+* bump [@deck](https://github.com/deck).gl/core from 8.9.34 to 8.9.35 in /typescript ([#1959](https://github.com/equinor/webviz-subsurface-components/issues/1959)) ([afcb208](https://github.com/equinor/webviz-subsurface-components/commit/afcb20831f5b3ab89d577ef6bb36e951170a6558)), closes [#8533](https://github.com/equinor/webviz-subsurface-components/issues/8533) [#8536](https://github.com/equinor/webviz-subsurface-components/issues/8536) [#8474](https://github.com/equinor/webviz-subsurface-components/issues/8474) [#8454](https://github.com/equinor/webviz-subsurface-components/issues/8454) [#8291](https://github.com/equinor/webviz-subsurface-components/issues/8291) [#8533](https://github.com/equinor/webviz-subsurface-components/issues/8533) [#8536](https://github.com/equinor/webviz-subsurface-components/issues/8536) [#8474](https://github.com/equinor/webviz-subsurface-components/issues/8474) [#8454](https://github.com/equinor/webviz-subsurface-components/issues/8454) [#8291](https://github.com/equinor/webviz-subsurface-components/issues/8291) [#8539](https://github.com/equinor/webviz-subsurface-components/issues/8539) [#8533](https://github.com/equinor/webviz-subsurface-components/issues/8533) [#8547](https://github.com/equinor/webviz-subsurface-components/issues/8547) [#8536](https://github.com/equinor/webviz-subsurface-components/issues/8536) [#8448](https://github.com/equinor/webviz-subsurface-components/issues/8448) [#8474](https://github.com/equinor/webviz-subsurface-components/issues/8474) [#8454](https://github.com/equinor/webviz-subsurface-components/issues/8454) [#8291](https://github.com/equinor/webviz-subsurface-components/issues/8291)
+
 ## [1.2.8](https://github.com/equinor/webviz-subsurface-components/compare/well-completions-plot@1.2.7...well-completions-plot@1.2.8) (2024-03-12)
 
 
