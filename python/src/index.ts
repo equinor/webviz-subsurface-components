@@ -1,6 +1,6 @@
 import DashSubsurfaceViewer from "./components/DashSubsurfaceViewer";
 import SubsurfaceViewer from "./components/SubsurfaceViewer";
-import GroupTree from "./components/GroupTree";
+import { GroupTree } from "./components/GroupTree";
 import HistoryMatch from "./components/HistoryMatch";
 import LeafletMap from "./components/LeafletMap";
 import Map from "./components/Map";

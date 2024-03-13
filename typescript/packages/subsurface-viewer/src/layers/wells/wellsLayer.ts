@@ -30,10 +30,13 @@ import {
     coarsenWells,
     invertPath,
     GetBoundingBox,
-    removeDuplicates,
+    checkWells,
 } from "./utils/spline";
 import { interpolateNumberArray } from "d3";
-import type { DeckGLLayerContext } from "../../components/Map";
+import type {
+    ReportBoundingBoxAction,
+    DeckGLLayerContext,
+} from "../../components/Map";
 import type {
     ContinuousLegendDataType,
     DiscreteLegendDataType,
@@ -74,8 +77,8 @@ function onDataLoad(
     }
 ): void {
     const bbox = GetBoundingBox(data as unknown as FeatureCollection);
-    if (typeof context.layer.props.setReportedBoundingBox !== "undefined") {
-        context.layer.props.setReportedBoundingBox(bbox);
+    if (typeof context.layer.props.reportBoundingBox !== "undefined") {
+        context.layer.props.reportBoundingBox({ layerBoundingBox: bbox });
     }
 }
 
@@ -90,7 +93,13 @@ export interface WellsLayerProps extends ExtendedLayerProps {
     logrunName: string;
     logRadius: number;
     logCurves: boolean;
-    refine: boolean;
+    /** Control to refine the well path by super sampling it using a spline interpolation.
+     * The well path between each pair of original vertices is split into sub-segments along the spline
+     * interpolation.
+     * The number of new sub-segments between each pair of original vertices is specified by refine
+     * and defaults to 5 if refine is true.
+     */
+    refine: boolean | number;
     wellHeadStyle: WellHeadStyleAccessor;
     colorMappingFunction: (x: number) => [number, number, number];
     lineStyle: LineStyleAccessor;
@@ -108,6 +117,9 @@ export interface WellsLayerProps extends ExtendedLayerProps {
      *   Useful for example during panning and rotation to gain speed.
      */
     simplifiedRendering: boolean;
+
+    // Non public properties:
+    reportBoundingBox?: React.Dispatch<ReportBoundingBoxAction>;
 }
 
 const defaultProps = {
@@ -245,18 +257,24 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
     initializeState(): void {
         let data = this.props.data as unknown as FeatureCollection;
         if (typeof data !== "undefined" && !isEqual(data, [])) {
-            if (!this.props.ZIncreasingDownwards) {
+            if (this.props.ZIncreasingDownwards) {
                 data = invertPath(data);
             }
 
-            removeDuplicates(data);
-
-            const refine = this.props.refine;
-            data = refine
-                ? splineRefine(data) // smooth well paths.
-                : data;
+            checkWells(data);
 
             const coarseData = coarsenWells(data);
+
+            const doRefine =
+                typeof this.props.refine === "number"
+                    ? (this.props.refine as number) > 1
+                    : (this.props.refine as boolean);
+
+            const stepCount =
+                typeof this.props.refine === "number" ? this.props.refine : 5;
+            data = doRefine
+                ? splineRefine(data, stepCount) // smooth well paths.
+                : data;
 
             this.setState({
                 ...this.state,
@@ -274,7 +292,6 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 oldProps.ZIncreasingDownwards
             ) ||
             !isEqual(props.refine, oldProps.refine);
-
         if (needs_reload) {
             this.initializeState();
         }

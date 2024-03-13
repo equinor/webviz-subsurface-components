@@ -1,5 +1,12 @@
-import type { LayersList } from "@deck.gl/core/typed";
-import { Layer } from "@deck.gl/core/typed";
+import React from "react";
+import type { PickingInfo, Layer, LayersList } from "@deck.gl/core/typed";
+import PropTypes from "prop-types";
+import type { colorTablesArray } from "@emerson-eps/color-tables/";
+import type { Unit } from "convert-units";
+import convert from "convert-units";
+
+import type { MjolnirGestureEvent } from "mjolnir.js";
+
 import type {
     BoundsAccessor,
     MapMouseEvent,
@@ -7,14 +14,10 @@ import type {
     ViewStateType,
     ViewsType,
 } from "./components/Map";
-import Map, { jsonToObject } from "./components/Map";
-import React from "react";
-import PropTypes from "prop-types";
-import type { colorTablesArray } from "@emerson-eps/color-tables/";
-import type { Unit } from "convert-units";
-import convert from "convert-units";
-import type { PickingInfo } from "@deck.gl/core/typed";
-import type { MjolnirGestureEvent } from "mjolnir.js";
+
+import { TGrid3DColoringMode } from "./layers/grid3d/grid3dLayer";
+
+import Map, { createLayers } from "./components/Map";
 
 export type {
     BoundsAccessor,
@@ -24,6 +27,8 @@ export type {
     ViewsType,
     colorTablesArray,
 };
+
+export { TGrid3DColoringMode };
 
 export type LightsType = {
     headLight?: {
@@ -51,14 +56,30 @@ export type LightsType = {
     ];
 };
 
+export type TLayerDefinition =
+    | Record<string, unknown>
+    | Layer
+    | false
+    | null
+    | undefined;
+
 /**
  * Properties of the SubsurfaceViewer component.
  */
 export interface SubsurfaceViewerProps {
     id: string;
     resources?: Record<string, unknown>;
-    layers?: Record<string, unknown>[] | LayersList;
+    /**
+     * Array of externally created layers or layer definition records or JSON strings.
+     * Add '@@typedArraySupport' : true in a layer definition in order to
+     * use typed arrays as inputs.
+     */
+    layers?: TLayerDefinition[];
+
     bounds?: [number, number, number, number] | BoundsAccessor;
+    cameraPosition?: ViewStateType | undefined;
+    triggerHome?: number;
+
     views?: ViewsType;
     coords?: {
         visible?: boolean | null;
@@ -72,14 +93,6 @@ export interface SubsurfaceViewerProps {
         cssStyle?: Record<string, unknown> | null;
     };
     coordinateUnit?: Unit;
-    toolbar?: {
-        visible?: boolean | null;
-    };
-    legend?: {
-        visible?: boolean | null;
-        cssStyle?: Record<string, unknown> | null;
-        horizontal?: boolean | null;
-    };
     colorTables?: colorTablesArray;
     editedData?: Record<string, unknown>;
     setProps?: (data: Record<string, unknown>) => void;
@@ -97,17 +110,14 @@ export interface SubsurfaceViewerProps {
     getCameraPosition?: (input: ViewStateType) => void;
 
     /**
-     * Will be called after all layers have rendered data.
+     * Will be called while layers are processed to rendered data.
+     * @param progress vlaue between 0 and 100.
      */
-    isRenderedCallback?: (arg: boolean) => void;
+    onRenderingProgress?: (progress: number) => void;
 
     onDragStart?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
     onDragEnd?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
 
-    /**
-     * If changed will reset camera to default position.
-     */
-    triggerHome?: number;
     triggerResetMultipleWells?: number;
     /**
      * Range selection of the current well
@@ -121,7 +131,6 @@ export interface SubsurfaceViewerProps {
      * Override default tooltip with a callback.
      */
     getTooltip?: TooltipCallback;
-    cameraPosition?: ViewStateType | undefined;
 
     lights?: LightsType;
 
@@ -133,18 +142,12 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
     resources,
     layers,
     bounds,
+    cameraPosition,
+    triggerHome,
     views,
     coords,
     scale,
     coordinateUnit,
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    legend,
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    toolbar,
     colorTables,
     editedData,
     setProps,
@@ -152,12 +155,10 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
     onMouseEvent,
     selection,
     getTooltip,
-    cameraPosition,
     getCameraPosition,
-    isRenderedCallback: isRenderedCallback,
+    onRenderingProgress,
     onDragStart,
     onDragEnd,
-    triggerHome,
     triggerResetMultipleWells,
     lights,
     children,
@@ -168,27 +169,20 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
     const [layerInstances, setLayerInstances] = React.useState<LayersList>([]);
 
     React.useEffect(() => {
-        if (!layers) {
-            setLayerInstances([]);
-            return;
-        }
-
-        if (layers?.[0] instanceof Layer) {
-            setLayerInstances(layers as LayersList);
-            return;
-        }
-
         const enumerations: Record<string, unknown>[] = [];
         if (resources) enumerations.push({ resources: resources });
         if (editedData) enumerations.push({ editedData: editedData });
         else enumerations.push({ editedData: {} });
-        const layersList = jsonToObject(
-            layers as Record<string, unknown>[],
-            enumerations
-        ) as LayersList;
+
+        if (!layers) {
+            setLayerInstances([]);
+            return;
+        }
+        const layersList = createLayers(layers, enumerations);
         setLayerInstances(layersList);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [layers]); // Note. Fixing this dependency list may cause infinite recursion.
+
     React.useEffect(() => {
         if (!editedData) return;
 
@@ -240,7 +234,7 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
             getTooltip={getTooltip}
             cameraPosition={cameraPosition}
             getCameraPosition={getCameraPosition}
-            isRenderedCallback={isRenderedCallback}
+            onRenderingProgress={onRenderingProgress}
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
             triggerHome={triggerHome}
@@ -359,34 +353,6 @@ SubsurfaceViewer.propTypes = {
      * Unit for the scale ruler
      */
     coordinateUnit: PropTypes.oneOf(convert().possibilities()),
-
-    /**
-     * @obsolete Toolbar should be added as annotation. This prop has no function.
-     */
-    toolbar: PropTypes.shape({
-        /**
-         * Toggle toolbar visibility
-         */
-        visible: PropTypes.bool,
-    }),
-
-    /**
-     * @obsolete Legends should be added as annotations. This prop has no function.
-     */
-    legend: PropTypes.shape({
-        /**
-         * Toggle component visibility.
-         */
-        visible: PropTypes.bool,
-        /**
-         * Legend css style can be used for positioning.
-         */
-        cssStyle: PropTypes.objectOf(PropTypes.any),
-        /**
-         * Orientation of color legend
-         */
-        horizontal: PropTypes.bool,
-    }),
 
     /**
      * Prop containing color table data

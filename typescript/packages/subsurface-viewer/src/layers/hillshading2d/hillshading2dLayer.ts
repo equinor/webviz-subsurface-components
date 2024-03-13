@@ -7,10 +7,11 @@ import type { ValueDecoder } from "../utils/propertyMapTools";
 import { decodeRGB } from "../utils/propertyMapTools";
 import { getModelMatrix } from "../utils/layerTools";
 import type { LayerPickInfo } from "../../layers/utils/layerTools";
+import type { ReportBoundingBoxAction } from "../../components/Map";
 
 import fsHillshading from "./hillshading2d.fs.glsl";
 
-// Most props are inherited from DeckGL's BitmapLayer. For a full list, see
+// Most props are inherited from DeckGL's BitmapLayer. For a full list, see:
 // https://deck.gl/docs/api-reference/layers/bitmap-layer
 //
 // The property map is encoded in an image and sent in the `image` prop of the BitmapLayer.
@@ -35,8 +36,8 @@ export interface Hillshading2DProps extends BitmapLayerProps {
     // Rotates image around bounds upper left corner counterclockwise in degrees.
     rotDeg: number;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    setReportedBoundingBox?: any;
+    // Non public properties:
+    reportBoundingBox?: React.Dispatch<ReportBoundingBoxAction>;
 }
 
 const defaultProps = {
@@ -76,16 +77,17 @@ export default class Hillshading2DLayer extends BitmapLayer<Hillshading2DProps> 
                 isLoaded: true,
             });
 
-            if (typeof this.props.setReportedBoundingBox !== "undefined") {
-                const xMin = this.props.bounds[0];
-                const yMin = this.props.bounds[1];
+            if (typeof this.props.reportBoundingBox !== "undefined") {
+                const xMin = this.props.bounds[0] as number;
+                const yMin = this.props.bounds[1] as number;
                 const zMin = 1;
-                const xMax = this.props.bounds[2];
-                const yMax = this.props.bounds[3];
+                const xMax = this.props.bounds[2] as number;
+                const yMax = this.props.bounds[3] as number;
                 const zMax = -1;
-                const bbox = [xMin, yMin, zMin, xMax, yMax, zMax];
 
-                this.props.setReportedBoundingBox(bbox);
+                this.props.reportBoundingBox({
+                    layerBoundingBox: [xMin, yMin, zMin, xMax, yMax, zMax],
+                });
             }
         }
 

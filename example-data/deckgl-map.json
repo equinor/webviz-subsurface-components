@@ -15,17 +15,6 @@
         "top": 10
       }
     },
-    "legend": {
-      "visible": true,
-      "cssStyle": {
-        "right": 10,
-        "top": 10
-      },
-      "horizontal": false
-    },
-    "toolbar": {
-      "visible": true
-    },
     "coordinateUnit": "m",
     "resources": {
       "propertyMap": "propertyMap.png",
@@ -76,35 +65,6 @@
         "image": "@@#resources.depthMap"
       },
       {
-        "@@type": "Map3DLayer",
-        "bounds": [
-          432205,
-          6475078,
-          437720,
-          6481113
-        ],
-        "meshMaxError": 5.0,
-        "mesh": "hugin_depth_25_m_normalized_margin.png",
-        "meshValueRange": [
-          2782,
-          3513
-        ],
-        "propertyTexture": "kh_netmap_25_m_normalized_margin.png",
-        "propertyValueRange": [
-          2782,
-          3513
-        ],
-        "rotDeg": 0,
-        "contours": [0, 50.0],
-        "isContoursDepth": true,
-        "colorMapName": "Physics",
-        "colorMapRange": [
-          2782,
-          3513
-        ],
-        "visible": false
-      },
-      {
         "@@type": "WellsLayer",
         "data": "@@#resources.wellsData",
         "logData": "@@#resources.logData",
@@ -130,7 +90,10 @@
     ],
     "editedData": {},
     "views": {
-      "layout": [1, 1],
+      "layout": [
+        1,
+        1
+      ],
       "showLabel": false,
       "viewports": [
         {

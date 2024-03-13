@@ -126,11 +126,13 @@ export function getWellLayerByTypeAndSelectedWells(
     type: string,
     selectedWell: string
 ): LayersList {
-    if (!layers) return [];
+    if (!layers || !selectedWell) {
+        return [];
+    }
     return layers.filter((l) => {
         return (
             l?.constructor.name === type &&
-            (l as NewLayersList).props.data.features.find(
+            (l as NewLayersList).props.data?.features?.find(
                 (item) => item.properties.name === selectedWell
             )
         );
@@ -160,7 +162,8 @@ export function invertZCoordinate(dataArray: Float32Array): void {
 }
 
 export function defineBoundingBox(
-    dataArray: Float32Array
+    dataArray: Float32Array,
+    zIncreasingDownwards: boolean = false
 ): [number, number, number, number, number, number] {
     const length = dataArray.length;
     let minX = Number.POSITIVE_INFINITY;
@@ -181,6 +184,9 @@ export function defineBoundingBox(
         maxX = x > maxX ? x : maxX;
         maxY = y > maxY ? y : maxY;
         maxZ = z > maxZ ? z : maxZ;
+    }
+    if (zIncreasingDownwards) {
+        [maxZ, minZ] = [-minZ, -maxZ];
     }
     return [minX, minY, minZ, maxX, maxY, maxZ];
 }

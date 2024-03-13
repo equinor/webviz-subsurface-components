@@ -2,8 +2,9 @@ import type {
     FeatureCollection,
     GeometryCollection,
     LineString,
+    Point,
 } from "geojson";
-import { cloneDeep, range } from "lodash";
+import { cloneDeep } from "lodash";
 import type { Position3D } from "../../utils/layerTools";
 import simplify from "@turf/simplify";
 
@@ -31,16 +32,14 @@ export function removeConsecutiveDuplicates(
 
     return [coords, mds];
 }
-
-export function removeDuplicates(data: FeatureCollection): void {
+// Remove duplicates in well string
+// If z value of well head not defined set it to top of well string.
+export function checkWells(data: FeatureCollection): void {
     const no_wells = data.features.length;
     for (let well_no = 0; well_no < no_wells; well_no++) {
-        const mds = data.features[well_no].properties?.["md"];
-        if (mds === undefined) {
-            continue;
-        }
         const geometryCollection = data.features[well_no]
             .geometry as GeometryCollection;
+
         const lineString = geometryCollection?.geometries[1] as LineString;
 
         if (lineString.coordinates?.length === undefined) {
@@ -48,6 +47,17 @@ export function removeDuplicates(data: FeatureCollection): void {
         }
 
         let coords = lineString.coordinates as Position3D[];
+
+        // If not defined set wellhead z value to top of well string.
+        const wellHead = geometryCollection?.geometries[0] as Point;
+        if (wellHead.coordinates && wellHead.coordinates.length === 2) {
+            wellHead.coordinates.push(coords[0][2]);
+        }
+
+        const mds = data.features[well_no].properties?.["md"];
+        if (mds === undefined) {
+            continue;
+        }
 
         const nOrig = coords.length;
         [coords, mds[0]] = removeConsecutiveDuplicates(coords, mds[0]);
@@ -177,15 +187,23 @@ export function CatmullRom(
  * in smoother curves with more points.
  * Assumes 3D data.
  */
-export function splineRefine(data_in: FeatureCollection): FeatureCollection {
+export function splineRefine(
+    data_in: FeatureCollection,
+    stepCount = 5
+): FeatureCollection {
+    if (stepCount < 1) {
+        return data_in;
+    }
+
     const data = cloneDeep(data_in);
 
     const no_wells = data.features.length;
 
-    const noSteps = 5;
-    const step = 1 / noSteps;
+    const step = 1 / stepCount;
 
-    const steps = range(step, 1, step);
+    const steps = Array(stepCount - 1)
+        .fill(0)
+        .map((_x, index) => (index + 1) * step);
 
     for (let well_no = 0; well_no < no_wells; well_no++) {
         const mds = data.features[well_no].properties?.["md"];
@@ -379,7 +397,13 @@ export function invertPath(data_in: FeatureCollection): FeatureCollection {
     for (let well_no = 0; well_no < no_wells; well_no++) {
         const geometryCollection = data.features[well_no]
             .geometry as GeometryCollection;
+
         const lineString = geometryCollection?.geometries[1] as LineString;
+
+        const wellHead = geometryCollection?.geometries[0] as Point;
+        if (wellHead.coordinates?.[2]) {
+            wellHead.coordinates[2] *= -1;
+        }
 
         if (lineString.coordinates?.length === undefined) {
             continue;

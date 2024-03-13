@@ -58,6 +58,7 @@ export interface PrivateTriangleLayerProps extends ExtendedLayerProps {
     color: [number, number, number];
     smoothShading: boolean;
     depthTest: boolean;
+    ZIncreasingDownwards: boolean;
 }
 
 const defaultProps = {
@@ -68,6 +69,7 @@ const defaultProps = {
     color: [100, 100, 255],
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
     depthTest: true,
+    ZIncreasingDownwards: true,
 };
 
 // This is a private layer used only by the composite TriangleLayer
@@ -159,12 +161,18 @@ export default class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProp
                 contourInterval,
                 smoothShading,
                 uColor,
+                ZIncreasingDownwards: this.props.ZIncreasingDownwards,
             })
             .draw();
         gl.disable(GL.POLYGON_OFFSET_FILL);
 
         if (this.props.gridLines) {
-            lineModel.draw();
+            lineModel
+                .setUniforms({
+                    ...uniforms,
+                    ZIncreasingDownwards: this.props.ZIncreasingDownwards,
+                })
+                .draw();
         }
 
         if (!this.props.depthTest) {
@@ -186,16 +194,12 @@ export default class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProp
         }
 
         const layer_properties: PropertyDataType[] = [];
-
-        // Note these colors are in the  0-255 range.
-        const r = info.color[0] * 256 * 256;
-        const g = info.color[1] * 256;
-        const b = info.color[2] * 1;
-
-        const depthRange = 10000;
-        const depth = depthRange * ((r + g + b) / (256 * 256 * 256));
-
-        layer_properties.push(createPropertyData("Depth", depth));
+        if (typeof info.coordinate?.[2] !== "undefined") {
+            const depth = this.props.ZIncreasingDownwards
+                ? -info.coordinate[2]
+                : info.coordinate[2];
+            layer_properties.push(createPropertyData("Depth", depth));
+        }
 
         return {
             ...info,

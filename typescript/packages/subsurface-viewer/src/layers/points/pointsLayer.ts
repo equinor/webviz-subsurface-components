@@ -1,16 +1,22 @@
-import type { UpdateParameters } from "@deck.gl/core/typed";
+import type { PickingInfo, UpdateParameters } from "@deck.gl/core/typed";
 import { CompositeLayer } from "@deck.gl/core/typed";
-import { ScatterplotLayer } from "@deck.gl/layers/typed";
 import { isEqual } from "lodash";
 
-import type { ExtendedLayerProps } from "../utils/layerTools";
-import { invertZCoordinate, defineBoundingBox } from "../utils/layerTools";
+import type {
+    PropertyDataType,
+    ExtendedLayerProps,
+    LayerPickInfo,
+} from "../utils/layerTools";
+import type { ReportBoundingBoxAction } from "../../components/Map";
+import { createPropertyData, defineBoundingBox } from "../utils/layerTools";
+
+import { PrivatePointsLayer } from "./privatePointsLayer";
 
 export interface PointsLayerProps extends ExtendedLayerProps {
     /**
      * Point positions as [x, y, z, x, y, z....].
      */
-    pointsData: number[];
+    pointsData: number[] | Float32Array;
 
     /**
      * Point color defined as RGB or RGBA array. Each component is in 0-255 range.
@@ -32,10 +38,12 @@ export interface PointsLayerProps extends ExtendedLayerProps {
      */
     ZIncreasingDownwards: boolean;
 
+    /** Enable/disable depth testing when rendering layer. Default true.
+     */
+    depthTest: boolean;
+
     // Non public properties:
-    setReportedBoundingBox?: React.Dispatch<
-        React.SetStateAction<[number, number, number, number, number, number]>
-    >;
+    reportBoundingBox?: React.Dispatch<ReportBoundingBoxAction>;
 }
 
 const defaultProps = {
@@ -48,6 +56,7 @@ const defaultProps = {
     pickable: true,
     visible: true,
     ZIncreasingDownwards: true,
+    depthTest: true,
 };
 
 interface IDataAttributes {
@@ -61,10 +70,13 @@ interface IDataAttributes {
 }
 
 export default class PointsLayer extends CompositeLayer<PointsLayerProps> {
-    renderLayers(): [ScatterplotLayer?] {
-        const layer = new ScatterplotLayer(
+    constructor(props: PointsLayerProps) {
+        super(props);
+    }
+
+    renderLayers(): [PrivatePointsLayer?] {
+        const layer = new PrivatePointsLayer(
             this.getSubLayerProps({
-                id: "points-layer",
                 pickable: this.props.pickable,
                 billboard: true,
                 data: this.state["dataAttributes"],
@@ -77,6 +89,8 @@ export default class PointsLayer extends CompositeLayer<PointsLayerProps> {
                     getFillColor: [this.props.color],
                     getRadius: [this.props.pointRadius],
                 },
+                depthTest: this.props.depthTest,
+                ZIncreasingDownwards: this.props.ZIncreasingDownwards,
             })
         );
         return [layer];
@@ -88,14 +102,35 @@ export default class PointsLayer extends CompositeLayer<PointsLayerProps> {
     }
 
     updateState({ props, oldProps }: UpdateParameters<PointsLayer>): void {
-        const needs_reload =
-            !isEqual(props.pointsData, oldProps.pointsData) ||
-            !isEqual(props.ZIncreasingDownwards, oldProps.ZIncreasingDownwards);
+        const needs_reload = !isEqual(props.pointsData, oldProps.pointsData);
 
         if (needs_reload) {
             const dataAttributes = this.rebuildDataAttributes(false);
             this.setState({ dataAttributes });
         }
+        if (props.ZIncreasingDownwards != oldProps.ZIncreasingDownwards) {
+            this.updateBoundingBox(true);
+        }
+    }
+
+    getPickingInfo({ info }: { info: PickingInfo }): LayerPickInfo {
+        if (!info.color) {
+            return info;
+        }
+
+        const layer_properties: PropertyDataType[] = [];
+
+        if (typeof info.coordinate?.[2] !== "undefined") {
+            const depth = this.props.ZIncreasingDownwards
+                ? -info.coordinate[2]
+                : info.coordinate[2];
+            layer_properties.push(createPropertyData("Depth", depth));
+        }
+
+        return {
+            ...info,
+            properties: layer_properties,
+        };
     }
 
     private rebuildDataAttributes(
@@ -105,17 +140,7 @@ export default class PointsLayer extends CompositeLayer<PointsLayerProps> {
         if (!dataArray) {
             return null;
         }
-        if (this.props.ZIncreasingDownwards) {
-            invertZCoordinate(dataArray);
-        }
-        if (
-            typeof this.props.setReportedBoundingBox === "function" &&
-            reportBoundingBox
-        ) {
-            const boundingBox = defineBoundingBox(dataArray);
-            this.props.setReportedBoundingBox(boundingBox);
-        }
-
+        this.updateBoundingBox(reportBoundingBox);
         return {
             length: dataArray.length / 3,
             attributes: {
@@ -131,7 +156,25 @@ export default class PointsLayer extends CompositeLayer<PointsLayerProps> {
         if (Array.isArray(this.props.pointsData)) {
             return new Float32Array(this.props.pointsData);
         }
+        if (this.props.pointsData instanceof Float32Array) {
+            return this.props.pointsData;
+        }
+        console.warn("pointsData is not array");
         return new Float32Array();
+    }
+
+    private updateBoundingBox(reportBoundingBox: boolean) {
+        if (
+            this.state["dataAttributes"] &&
+            typeof this.props.reportBoundingBox === "function" &&
+            reportBoundingBox
+        ) {
+            const boundingBox = defineBoundingBox(
+                this.state["dataAttributes"],
+                this.props.ZIncreasingDownwards
+            );
+            this.props.reportBoundingBox({ layerBoundingBox: boundingBox });
+        }
     }
 }
 

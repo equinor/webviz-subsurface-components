@@ -1,13 +1,16 @@
 import type { PickingInfo, Color, UpdateParameters } from "@deck.gl/core/typed";
 import { Layer, picking, project } from "@deck.gl/core/typed";
+
+import GL from "@luma.gl/constants";
+import { Model, Geometry } from "@luma.gl/engine";
+
+import { Vector2 } from "@math.gl/core";
+
 import type { LayerPickInfo, PropertyDataType } from "../utils/layerTools";
 import { createPropertyData } from "../utils/layerTools";
 import type { ExtendedLayerProps } from "../utils/layerTools";
-import { Vector2 } from "@math.gl/core";
 import vertexShader from "./vertex.glsl";
 import fragmentShader from "./fragment.glsl";
-import GL from "@luma.gl/constants";
-import { Model, Geometry } from "@luma.gl/engine";
 
 type PieProperties = [{ color: Color; label: string }];
 

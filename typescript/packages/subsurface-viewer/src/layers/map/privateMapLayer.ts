@@ -4,26 +4,29 @@ import {
     Layer,
     picking,
     project,
+    project32,
 } from "@deck.gl/core/typed";
-import { localPhongLighting } from "../shader_modules";
-import type { LayerPickInfo, PropertyDataType } from "../utils/layerTools";
-import { createPropertyData } from "../utils/layerTools";
+
+import GL from "@luma.gl/constants";
+import { Texture2D } from "@luma.gl/webgl";
 import { Model, Geometry } from "@luma.gl/engine";
-import type { DeckGLLayerContext } from "../../components/Map";
+
+import { localPhongLighting, utilities } from "../shader_modules";
+
+import { getImageData, createPropertyData } from "../utils/layerTools";
 import type {
+    LayerPickInfo,
+    PropertyDataType,
     ExtendedLayerProps,
     colorMapFunctionType,
 } from "../utils/layerTools";
 
-import { getImageData } from "../utils/layerTools";
+import type { DeckGLLayerContext } from "../../components/Map";
 
-import vsShader from "./vertex.glsl";
-import fsShader from "./fragment.fs.glsl";
+import vs from "./vertex.glsl";
+import fs from "./fragment.fs.glsl";
 import vsLineShader from "./vertex_lines.glsl";
 import fsLineShader from "./fragment_lines.glsl";
-
-import { Texture2D } from "@luma.gl/webgl";
-import GL from "@luma.gl/constants";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,
@@ -40,7 +43,7 @@ export type Material =
           specularColor: [number, number, number];
       }
     | boolean;
-export interface privateMapLayerProps extends ExtendedLayerProps {
+export interface PrivateMapLayerProps extends ExtendedLayerProps {
     positions: Float32Array;
     normals: Int8Array;
     triangleIndices: Uint32Array;
@@ -57,6 +60,7 @@ export interface privateMapLayerProps extends ExtendedLayerProps {
     propertyValueRange: [number, number];
     smoothShading: boolean;
     depthTest: boolean;
+    ZIncreasingDownwards: boolean;
 }
 
 const defaultProps = {
@@ -69,10 +73,11 @@ const defaultProps = {
     propertyValueRange: [0.0, 1.0],
     meshValueRange: [0.0, 1.0],
     depthTest: true,
+    ZIncreasingDownwards: true,
 };
 
-// This is a private layer used only by the composite Map3DLayer
-export default class privateMapLayer extends Layer<privateMapLayerProps> {
+// This is a private layer used only by the composite MapLayer
+export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
     get isLoaded(): boolean {
         return this.state["isLoaded"] ?? false;
     }
@@ -108,11 +113,12 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
 
     //eslint-disable-next-line
     _getModels(gl: any) {
+        const shaders = this.getShaders();
+
         // MESH MODEL
         const mesh_model = new Model(gl, {
             id: `${this.props.id}-mesh`,
-            vs: vsShader,
-            fs: fsShader,
+            ...shaders,
             geometry: new Geometry({
                 drawMode: gl.TRIANGLES,
                 attributes: {
@@ -122,11 +128,9 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
                         normals: { value: this.props.normals, size: 3 },
                     }),
                     properties: { value: this.props.vertexProperties, size: 1 },
-                    vertex_indexs: { value: this.props.vertexIndices, size: 1 },
                 },
                 indices: { value: this.props.triangleIndices, size: 1 },
             }),
-            modules: [project, picking, localPhongLighting],
             isInstanced: false, // This only works when set to false.
         });
 
@@ -226,6 +230,7 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
                 isColorMapClampColorTransparent,
                 isClampColor,
                 smoothShading,
+                ZIncreasingDownwards: this.props.ZIncreasingDownwards,
             })
             .draw();
         gl.disable(GL.POLYGON_OFFSET_FILL);
@@ -235,7 +240,12 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
         }
 
         if (this.props.gridLines) {
-            mesh_lines_model.draw();
+            mesh_lines_model
+                .setUniforms({
+                    ...uniforms,
+                    ZIncreasingDownwards: this.props.ZIncreasingDownwards,
+                })
+                .draw();
         }
 
         if (!this.state["isLoaded"]) {
@@ -261,9 +271,12 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
 
         const vertexIndex = 256 * 256 * r + 256 * g + b;
 
-        const vertexs = this.props.positions;
-        const depth = -vertexs[3 * vertexIndex + 2];
-        layer_properties.push(createPropertyData("Depth", depth));
+        if (typeof info.coordinate?.[2] !== "undefined") {
+            const depth = this.props.ZIncreasingDownwards
+                ? -info.coordinate[2]
+                : info.coordinate[2];
+            layer_properties.push(createPropertyData("Depth", depth));
+        }
 
         const properties = this.props.vertexProperties;
         const property = properties[vertexIndex];
@@ -274,7 +287,15 @@ export default class privateMapLayer extends Layer<privateMapLayerProps> {
             properties: layer_properties,
         };
     }
+
+    getShaders() {
+        return super.getShaders({
+            vs,
+            fs,
+            modules: [project32, picking, localPhongLighting, utilities],
+        });
+    }
 }
 
-privateMapLayer.layerName = "privateMapLayer";
-privateMapLayer.defaultProps = defaultProps;
+PrivateMapLayer.layerName = "privateMapLayer";
+PrivateMapLayer.defaultProps = defaultProps;

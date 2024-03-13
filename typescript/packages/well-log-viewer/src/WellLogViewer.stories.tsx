@@ -1,51 +1,50 @@
 /* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
 
 import React from "react";
-import WellLogViewer from "./WellLogViewer";
-import { argTypesWellLogViewerProp } from "./WellLogViewer";
+import WellLogViewer, { argTypesWellLogViewerProp } from "./WellLogViewer";
 
 import exampleData from "../../../../example-data/deckgl-map.json";
 
-import type { WeakValidationMap } from "react";
-import SubsurfaceViewer from "@webviz/subsurface-viewer";
-import type { SubsurfaceViewerProps } from "@webviz/subsurface-viewer";
 import type { Color, LayersList } from "@deck.gl/core/typed";
+import type { SubsurfaceViewerProps } from "@webviz/subsurface-viewer";
+import SubsurfaceViewer from "@webviz/subsurface-viewer";
+import type { WeakValidationMap } from "react";
 
 import type { WellsLayer } from "@webviz/subsurface-viewer/dist/layers";
 import type {
     Template,
-    TemplateTrack,
     TemplatePlot,
     TemplatePlotTypes,
+    TemplateTrack,
 } from "./components/WellLogTemplateTypes";
 
+import welllogsJson from "../../../../example-data/volve_logs.json";
 import type { WellLog } from "./components/WellLogTypes";
-import welllogsJson from "./demo/example-data/volve_logs.json";
 const welllogs = welllogsJson as unknown as WellLog[];
 
-import templateJson from "./demo/example-data/welllog_template_2.json";
+import templateJson from "../../../../example-data/welllog_template_2.json";
 const template = templateJson as unknown as Template;
 
 import type { ColorTable } from "./components/ColorTableTypes";
 
-import type { WellLogController } from "./components/WellLogView";
 import type { LogViewer } from "@equinor/videx-wellog";
-import type { Info } from "./components/InfoTypes";
 import type { MapMouseEvent } from "@webviz/subsurface-viewer/dist/components/Map";
+import type { Info } from "./components/InfoTypes";
+import type { WellLogController } from "./components/WellLogView";
 
 import InfoPanel from "./components/InfoPanel";
 import WellLogViewWithScroller from "./components/WellLogViewWithScroller";
+import { deepCopy } from "./utils/deepcopy";
 import { fillInfos } from "./utils/fill-info";
 import { getDiscreteMeta, indexOfElementByName } from "./utils/tracks";
-import { deepCopy } from "./utils/deepcopy";
 
 import type { WellLogViewOptions } from "./components/WellLogView";
-import { isEqualRanges } from "./components/WellLogView";
+import { isEqualRanges } from "./utils/log-viewer";
 
-import wellPicks from "./demo/example-data/wellpicks.json";
-import colorTables from "./demo/example-data/wellpick_colors.json";
+import colorTables from "../../../../example-data/wellpick_colors.json";
+import wellPicks from "../../../../example-data/wellpicks.json";
 
-import { axisTitles, axisMnemos } from "./utils/axes";
+import { axisMnemos, axisTitles } from "./utils/axes";
 
 const ComponentCode =
     '<WellLogViewer id="WellLogViewer" \r\n' +
@@ -77,6 +76,9 @@ export default {
                 "The ID of this component, used to identify dash components in callbacks. The ID needs to be unique across all of the components in an app.",
         },
     },
+
+    // Disable automatic testing of stories that use this tag.
+    tags: ["no-test"],
 };
 
 function fillInfo(controller) {
@@ -243,6 +245,8 @@ Default.args = {
     axisTitles: axisTitles,
     axisMnemos: axisMnemos,
     viewTitle: true, // show default welllog view title (a wellname from the welllog)
+    domain: [2500, 4000],
+    selection: [3500, 3700],
     options: {
         hideTrackTitle: false,
         hideTrackLegend: false,
@@ -624,3 +628,5 @@ MapAndWellLogViewerStory.args = {
     colorTables: colorTables,
     id: "MapAndWellLog", // redefine id from exampleData[0]
 };
+
+MapAndWellLogViewerStory.tags = ["no-test"];

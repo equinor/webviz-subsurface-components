@@ -11,8 +11,6 @@ flat in int vertexIndex;
 
 uniform sampler2D colormap;
 
-uniform float valueRangeMin;
-uniform float valueRangeMax;
 uniform float colorMapRangeMin;
 uniform float colorMapRangeMax;
 
@@ -20,41 +18,10 @@ uniform vec3 colorMapClampColor;
 uniform bool isClampColor;
 uniform bool isColorMapClampColorTransparent;
 
-vec4 encodeVertexIndexToRGB () {
+// Calculate color from propertyValue using colormap.
+vec4 getPropertyColor (float propertyValue) {
 
-   float r = 0.0;
-   float g = 0.0;
-   float b = 0.0;
-
-   int idx = vertexIndex;
-
-   if (idx >= (256 * 256) - 1) {
-      r = floor(float(idx) / (256.0 * 256.0));
-      idx -= int(r * (256.0 * 256.0));
-   }
-
-   if (idx >= 256 - 1) {
-      g = floor(float(idx) / 256.0);
-      idx -= int(g * 256.0);
-   }
-
-   b = float(idx);
-
-   return vec4(r / 255.0, g / 255.0, b / 255.0, 1.0);   
-}
-
-void main(void) {
-
-   if (picking_uActive && !picking_uAttribute) {
-      gl_FragColor = encodeVertexIndexToRGB ();      
-      return;
-   }
-
-   vec3 normal = normalize(cross(dFdx(position_commonspace.xyz), dFdy(position_commonspace.xyz)));
-   
-   // Calculate color from propertyValue using colormap.
    vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
-   float propertyValue = property;
    float x = (propertyValue - colorMapRangeMin) / (colorMapRangeMax - colorMapRangeMin);
    if (x < 0.0 || x > 1.0) {
       // Out of range. Use clampcolor.
@@ -64,7 +31,7 @@ void main(void) {
       }
       else if (isColorMapClampColorTransparent) {
          discard;
-         return;
+         return color;
       }
       else {
          // Use min/max color to clamp.
@@ -76,10 +43,23 @@ void main(void) {
    else {
       color = texture2D(colormap, vec2(x, 0.5));
    }
+   return color;
+}
 
-   // Use normal lighting. This has no effect if "material" property is not set.
-   vec3 lightColor = lighting_getLightColor(color.rgb, cameraPosition, position_commonspace.xyz, normal);
-   gl_FragColor = vec4(lightColor, 1.0);   
+void main(void) {
+
+   if (picking_uActive && !picking_uAttribute) {
+      gl_FragColor = encodeVertexIndexToRGB(vertexIndex);      
+      return;
+   }
+
+   vec3 normal = normalize(cross(dFdx(position_commonspace.xyz), dFdy(position_commonspace.xyz)));
+      
+   vec4 color = getPropertyColor(property);
+   
+   // Use two sided phong lighting. This has no effect if "material" property is not set.
+   vec3 lightColor = getPhongLightColor(color.rgb, cameraPosition, position_commonspace.xyz, normal);
+   gl_FragColor = vec4(lightColor, 1.0);
    DECKGL_FILTER_COLOR(gl_FragColor, geometry);
 }
 `;

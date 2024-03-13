@@ -1,8 +1,6 @@
 import type { ReactNode } from "react";
 import React, { Component } from "react";
 
-import "./styles.scss";
-
 import type { WellLogController, WellPickProps } from "./WellLogView";
 import { getWellPicks } from "./WellLogView";
 import type WellLogView from "./WellLogView";
@@ -25,7 +23,7 @@ export interface WellLogSpacerOptions {
 export interface WellLogSpacerProps {
     width?: number;
 
-    controllers: (WellLogController | null)[];
+    controllers: (WellLogController | null)[]; // 2 items
 
     /**
      * Prop containing color table data.
@@ -364,25 +362,17 @@ class WellLogSpacer extends Component<WellLogSpacerProps /*, State*/> {
 
         return (
             <div
-                className="welllogspacer"
-                style={{
-                    width: "100%",
-                    height: "100%",
-                    display: "flex",
-                    flexDirection: horizontal ? "row" : "column",
-                }}
+                className="welllogspacer" // for CSS customization
+                style={{ flexDirection: horizontal ? "row" : "column" }}
                 ref={(el) => (this.container = el as HTMLElement)}
             >
                 <div
+                    className={
+                        horizontal ? "welllogspacer-distance-horizontal" : ""
+                    }
                     style={
                         horizontal
                             ? {
-                                  writingMode: horizontal
-                                      ? "vertical-lr"
-                                      : undefined,
-                                  transform: horizontal
-                                      ? "rotate(180deg)"
-                                      : undefined,
                                   width: offsetLeft + "px",
                                   height: height + "px",
                               }
@@ -393,7 +383,7 @@ class WellLogSpacer extends Component<WellLogSpacerProps /*, State*/> {
                     {!controller?.props.options?.hideTrackLegend &&
                     distance !== undefined &&
                     distance.value !== undefined ? (
-                        <div style={{ fontSize: 12, textAlign: "center" }}>
+                        <div className="distance">
                             {"←" +
                                 distance.value.toFixed(0) +
                                 distance.units +

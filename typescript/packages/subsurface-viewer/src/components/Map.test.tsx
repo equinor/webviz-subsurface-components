@@ -8,12 +8,12 @@ import type { LayersList } from "@deck.gl/core/typed";
 import Map from "./Map";
 import { EmptyWrapper } from "../test/TestWrapper";
 import { colorTables } from "@emerson-eps/color-tables";
+import type { colorTablesArray } from "@emerson-eps/color-tables/";
 import {
     ColormapLayer,
     DrawingLayer,
     FaultPolygonsLayer,
     Hillshading2DLayer,
-    Map3DLayer,
     NorthArrow3DLayer,
     PieChartLayer,
     WellsLayer,
@@ -21,7 +21,7 @@ import {
 
 import mapData from "../../../../../example-data/deckgl-map.json";
 import type { Unit } from "convert-units";
-const colorTablesData = colorTables;
+const colorTablesData = colorTables as colorTablesArray;
 const testBounds = [432205, 6475078, 437720, 6481113] as [
     number,
     number,
@@ -44,20 +44,6 @@ const testLayers = [
         valueRange: valueRange,
         rotDeg: 0,
         image: "propertyMap.png",
-    }),
-    new Map3DLayer({
-        bounds: testBounds,
-        meshMaxError: 5.0,
-        mesh: "hugin_depth_25_m_normalized_margin.png",
-        meshValueRange: valueRange,
-        propertyTexture: "kh_netmap_25_m_normalized_margin.png",
-        propertyValueRange: valueRange,
-        rotDeg: 0,
-        contours: [0, 50.0],
-        isContoursDepth: true,
-        colorMapName: "Physics",
-        colorMapRange: valueRange,
-        visible: false,
     }),
     new WellsLayer({
         data: "volve_wells.json",

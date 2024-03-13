@@ -1,0 +1,14 @@
+{
+    "config": {
+        "workerpool": {
+            "maxWorkers": 10
+        },
+        "layer": {
+            "TriangleLayer": {
+                "workerpool": {
+                    "maxWorkers": 10
+                }
+            }
+        }
+    }
+}

@@ -1,28 +1,54 @@
-import type { Color, UpdateParameters } from "@deck.gl/core/typed";
+import type React from "react";
+import { isEqual } from "lodash";
+
+import type {
+    Color,
+    CompositeLayerProps,
+    Layer,
+    UpdateParameters,
+} from "@deck.gl/core/typed";
 import { CompositeLayer } from "@deck.gl/core/typed";
+
+import type { Matrix4 } from "math.gl";
+import * as png from "@vivaxy/png";
+
+import workerpool from "workerpool";
+
 import type { Material } from "./privateMapLayer";
-import privateMapLayer from "./privateMapLayer";
+import PrivateMapLayer from "./privateMapLayer";
 import type {
     ExtendedLayerProps,
     colorMapFunctionType,
 } from "../utils/layerTools";
-import { getModelMatrix } from "../utils/layerTools";
-import { isEqual } from "lodash";
-import * as png from "@vivaxy/png";
-import { makeFullMesh } from "./utils";
-import type { Matrix4 } from "math.gl";
+import type { ReportBoundingBoxAction } from "../../components/Map";
 
-// Rotate x,y around x0, y0 rad radians
-function rotate(
-    x: number,
-    y: number,
-    x0: number,
-    y0: number,
-    rad: number
-): [number, number] {
-    const xRot = Math.cos(rad) * (x - x0) - Math.sin(rad) * (y - y0) + x0; // eslint-disable-line
-    const yRot = Math.sin(rad) * (x - x0) + Math.cos(rad) * (y - y0) + y0; // eslint-disable-line
-    return [xRot, yRot];
+import { getModelMatrix } from "../utils/layerTools";
+import { rotate } from "./utils";
+import { makeFullMesh } from "./webworker";
+
+import config from "../../SubsurfaceConfig.json";
+import { findConfig } from "../../utils/configTools";
+
+// init workerpool
+const workerPoolConfig = findConfig(
+    config,
+    "config/workerpool",
+    "config/layer/MapLayer/workerpool"
+);
+
+const pool = workerpool.pool({
+    ...{
+        maxWorkers: 10,
+        workerType: "web",
+    },
+    ...workerPoolConfig,
+});
+
+function onTerminateWorker() {
+    const stats = pool.stats();
+    if (stats.busyWorkers === 0 && stats.pendingTasks === 0) {
+        pool.terminate();
+    }
 }
 
 // This type describes the mesh' extent in the horizontal plane.
@@ -48,15 +74,70 @@ type Frame = {
     rotPoint?: [number, number];
 };
 
-export type Params = {
-    meshData: Float32Array;
-    propertiesData: Float32Array;
-    isMesh: boolean;
-    frame: Frame;
-    smoothShading: boolean;
-    gridLines: boolean;
-    ZIncreasingDownwards: boolean;
-};
+export type Params = [
+    meshData: Float32Array | null,
+    propertiesData: Float32Array | null,
+    isMesh: boolean,
+    frame: Frame,
+    smoothShading: boolean,
+    gridLines: boolean,
+];
+
+async function loadURLData(url: string): Promise<Float32Array | null> {
+    let res: Float32Array | null = null;
+    const response = await fetch(url);
+    if (!response.ok) {
+        console.error("Could not load ", url);
+    }
+    const blob = await response.blob();
+    const contentType = response.headers.get("content-type");
+    const isPng = contentType === "image/png";
+    if (isPng) {
+        // Load as Png  with abolute float values.
+        res = await new Promise((resolve) => {
+            const fileReader = new FileReader();
+            fileReader.readAsArrayBuffer(blob);
+            fileReader.onload = () => {
+                const arrayBuffer = fileReader.result;
+                const imgData = png.decode(arrayBuffer as ArrayBuffer);
+                const data = imgData.data; // array of int's
+
+                const n = data.length;
+                const buffer = new ArrayBuffer(n);
+                const view = new DataView(buffer);
+                for (let i = 0; i < n; i++) {
+                    view.setUint8(i, data[i]);
+                }
+
+                const floatArray = new Float32Array(buffer);
+                resolve(floatArray);
+            };
+        });
+    } else {
+        // Load as binary array of floats.
+        const buffer = await blob.arrayBuffer();
+        res = new Float32Array(buffer);
+    }
+    return res;
+}
+
+async function loadFloat32Data(
+    data: string | number[] | Float32Array
+): Promise<Float32Array | null> {
+    if (!data) {
+        return null;
+    }
+    if (ArrayBuffer.isView(data)) {
+        // Input data is typed array.
+        return data;
+    } else if (Array.isArray(data)) {
+        // Input data is native javascript array.
+        return new Float32Array(data);
+    } else {
+        // Input data is an URL.
+        return await loadURLData(data);
+    }
+}
 
 /**
  * Will load data for the mesh and the properties. Both of which may be given as arrays (javascript or typed)
@@ -70,122 +151,21 @@ async function loadMeshAndProperties(
     // Keep
     //const t0 = performance.now();
 
-    const isMesh = typeof meshData !== "undefined";
-    const isProperties = typeof propertiesData !== "undefined";
+    const mesh = await loadFloat32Data(meshData);
+    const properties = await loadFloat32Data(propertiesData);
 
-    if (!isMesh && !isProperties) {
-        console.error("Error. One or both of texture and mesh must be given!");
-    }
-
-    if (isMesh && !isProperties) {
-        propertiesData = meshData;
-    }
-
-    //-- PROPERTIES. --
-    let properties: Float32Array;
-    if (ArrayBuffer.isView(propertiesData)) {
-        // Input data is typed array.
-        properties = propertiesData; // Note no copy. Make sure input data is not altered.
-    } else if (Array.isArray(propertiesData)) {
-        // Input data is native javascript array.
-        properties = new Float32Array(propertiesData);
-    } else {
-        // Input data is an URL.
-        const response = await fetch(propertiesData);
-        if (!response.ok) {
-            console.error("Could not load ", propertiesData);
-        }
-
-        const blob = await response.blob();
-        const contentType = response.headers.get("content-type");
-        const isPng = contentType === "image/png";
-        if (isPng) {
-            // Load as Png  with abolute float values.
-            properties = await new Promise((resolve) => {
-                const fileReader = new FileReader();
-                fileReader.readAsArrayBuffer(blob);
-                fileReader.onload = () => {
-                    const arrayBuffer = fileReader.result;
-                    const imgData = png.decode(arrayBuffer as ArrayBuffer);
-                    const data = imgData.data; // array of int's
-
-                    const n = data.length;
-                    const buffer = new ArrayBuffer(n);
-                    const view = new DataView(buffer);
-                    for (let i = 0; i < n; i++) {
-                        view.setUint8(i, data[i]);
-                    }
-
-                    const floatArray = new Float32Array(buffer);
-                    resolve(floatArray);
-                };
-            });
-        } else {
-            // Load as binary array of floats.
-            const buffer = await blob.arrayBuffer();
-            properties = new Float32Array(buffer);
-        }
-    }
-
-    //-- MESH --
-    let mesh: Float32Array = new Float32Array();
-    if (isMesh) {
-        if (ArrayBuffer.isView(meshData)) {
-            // Input data is typed array.
-            mesh = meshData; // Note no copy. Make sure data is never altered.
-        } else if (Array.isArray(meshData)) {
-            // Input data is native javascript array.
-            mesh = new Float32Array(meshData);
-        } else {
-            // Input data is an URL.
-            const response_mesh = await fetch(meshData);
-            if (!response_mesh.ok) {
-                console.error("Could not load mesh");
-            }
-
-            const blob_mesh = await response_mesh.blob();
-            const contentType_mesh = response_mesh.headers.get("content-type");
-            const isPng_mesh = contentType_mesh === "image/png";
-            if (isPng_mesh) {
-                // Load as Png  with abolute float values.
-                mesh = await new Promise((resolve) => {
-                    const fileReader = new FileReader();
-                    fileReader.readAsArrayBuffer(blob_mesh);
-                    fileReader.onload = () => {
-                        const arrayBuffer = fileReader.result;
-                        const imgData = png.decode(arrayBuffer as ArrayBuffer);
-                        const data = imgData.data; // array of int's
-
-                        const n = data.length;
-                        const buffer = new ArrayBuffer(n);
-                        const view = new DataView(buffer);
-                        for (let i = 0; i < n; i++) {
-                            view.setUint8(i, data[i]);
-                        }
-
-                        const floatArray = new Float32Array(buffer);
-                        resolve(floatArray);
-                    };
-                });
-            } else {
-                // Load as binary array of floats.
-                const buffer = await blob_mesh.arrayBuffer();
-                mesh = new Float32Array(buffer);
-            }
-        }
-    }
+    // if (!isMesh && !isProperties) {
+    //     console.error("Error. One or both of texture and mesh must be given!");
+    // }
 
     // Keep this.
     // const t1 = performance.now();
     // console.debug(`Task loading took ${(t1 - t0) * 0.001}  seconds.`);
 
-    return Promise.all([isMesh, mesh, properties]);
+    return Promise.all([mesh, properties]);
 }
 
 export interface MapLayerProps extends ExtendedLayerProps {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    setReportedBoundingBox?: any;
-
     /**  Url to the height (z values) mesh.
      */
     meshUrl: string; // Deprecated
@@ -282,6 +262,9 @@ export interface MapLayerProps extends ExtendedLayerProps {
      * For example depth of z = 1000 corresponds to -1000 on the z axis. Default true.
      */
     ZIncreasingDownwards: boolean;
+
+    // Non public properties:
+    reportBoundingBox?: React.Dispatch<ReportBoundingBoxAction>;
 }
 
 const defaultProps = {
@@ -302,7 +285,9 @@ const defaultProps = {
     ZIncreasingDownwards: true,
 };
 
-export default class MapLayer extends CompositeLayer<MapLayerProps> {
+export default class MapLayer<
+    ExtraProps extends object = object,
+> extends CompositeLayer<Required<MapLayerProps> & ExtraProps> {
     get isLoaded(): boolean {
         const subLayers = this.getSubLayers();
         const isLoaded =
@@ -329,88 +314,87 @@ export default class MapLayer extends CompositeLayer<MapLayerProps> {
 
         const p = loadMeshAndProperties(meshData, propertiesData);
 
-        p.then(([isMesh, meshData, propertiesData]) => {
-            const params: Params = {
+        p.then(([meshData, propertiesData]) => {
+            // Using inline web worker for calculating the triangle mesh from
+            // loaded input data so not to halt the GUI thread.
+
+            const webworkerParams = this.getWebworkerParams(
                 meshData,
-                propertiesData,
-                isMesh,
-                frame: this.props.frame,
-                smoothShading: this.props.smoothShading,
-                gridLines: this.props.gridLines,
-                ZIncreasingDownwards: this.props.ZIncreasingDownwards,
-            };
+                propertiesData
+            );
+            pool.exec(makeFullMesh, [{ data: webworkerParams.params }]).then(
+                (e) => {
+                    const [
+                        positions,
+                        normals,
+                        triangleIndices,
+                        vertexProperties,
+                        lineIndices,
+                        meshZValueRange,
+                        propertyValueRange,
+                    ] = e;
 
-            const [
-                positions,
-                normals,
-                triangleIndices,
-                vertexProperties,
-                vertexIndices,
-                lineIndices,
-                meshZValueRange,
-                propertyValueRange,
-            ] = makeFullMesh(params);
+                    this.setState({
+                        ...this.state,
+                        positions,
+                        normals,
+                        triangleIndices,
+                        vertexProperties,
+                        lineIndices,
+                        propertyValueRange,
+                        isFinishedLoading: true,
+                    });
 
-            this.setState({
-                ...this.state,
-                positions,
-                normals,
-                triangleIndices,
-                vertexProperties,
-                vertexIndices,
-                lineIndices,
-                propertyValueRange,
-            });
+                    if (
+                        typeof this.props.reportBoundingBox !== "undefined" &&
+                        reportBoundingBox
+                    ) {
+                        const xinc = this.props.frame?.increment?.[0] ?? 0;
+                        const yinc = this.props.frame?.increment?.[1] ?? 0;
 
-            if (
-                typeof this.props.setReportedBoundingBox !== "undefined" &&
-                reportBoundingBox
-            ) {
-                const xinc = this.props.frame?.increment?.[0] ?? 0;
-                const yinc = this.props.frame?.increment?.[1] ?? 0;
+                        const nnodes_x = this.props.frame?.count?.[0] ?? 2; // number of nodes in x direction
+                        const nnodes_y = this.props.frame?.count?.[1] ?? 2;
 
-                const nnodes_x = this.props.frame?.count?.[0] ?? 2; // number of nodes in x direction
-                const nnodes_y = this.props.frame?.count?.[1] ?? 2;
+                        const xMin = this.props.frame?.origin?.[0] ?? 0;
+                        const yMin = this.props.frame?.origin?.[1] ?? 0;
+                        const zMin = -meshZValueRange[0];
+                        const xMax = xMin + xinc * (nnodes_x - 1);
+                        const yMax = yMin + yinc * (nnodes_y - 1);
+                        const zMax = -meshZValueRange[1];
 
-                const xMin = this.props.frame?.origin?.[0] ?? 0;
-                const yMin = this.props.frame?.origin?.[1] ?? 0;
-                const zMin = -meshZValueRange[0];
-                const xMax = xMin + xinc * (nnodes_x - 1);
-                const yMax = yMin + yinc * (nnodes_y - 1);
-                const zMax = -meshZValueRange[1];
+                        // If map is rotated the bounding box must reflect that.
+                        const center =
+                            this.props.frame.rotPoint ??
+                            this.props.frame.origin;
+                        const rotDeg = this.props.frame.rotDeg ?? 0;
+                        const rotRad = (rotDeg * (2.0 * Math.PI)) / 360.0;
 
-                // If map is rotated the bounding box must reflect that.
-                const center =
-                    this.props.frame.rotPoint ?? this.props.frame.origin;
-                const rotDeg = this.props.frame.rotDeg ?? 0;
-                const rotRad = (rotDeg * (2.0 * Math.PI)) / 360.0;
+                        // Rotate x,y around "center" "rad" radians
+                        const [x0, y0] = rotate(xMin, yMin, center[0], center[1], rotRad); // eslint-disable-line
+                        const [x1, y1] = rotate(xMax, yMin, center[0], center[1], rotRad); // eslint-disable-line
+                        const [x2, y2] = rotate(xMax, yMax, center[0], center[1], rotRad); // eslint-disable-line
+                        const [x3, y3] = rotate(xMin, yMax, center[0], center[1], rotRad); // eslint-disable-line
 
-                // Rotate x,y around "center" "rad" radians
-                const [x0, y0] = rotate(xMin, yMin, center[0], center[1], rotRad); // eslint-disable-line
-                const [x1, y1] = rotate(xMax, yMin, center[0], center[1], rotRad); // eslint-disable-line
-                const [x2, y2] = rotate(xMax, yMax, center[0], center[1], rotRad); // eslint-disable-line
-                const [x3, y3] = rotate(xMin, yMax, center[0], center[1], rotRad); // eslint-disable-line
+                        // Rotated bounds in x/y plane.
+                        const x_min = Math.min(x0, x1, x2, x3);
+                        const x_max = Math.max(x0, x1, x2, x3);
+                        const y_min = Math.min(y0, y1, y2, y3);
+                        const y_max = Math.max(y0, y1, y2, y3);
 
-                // Rotated bounds in x/y plane.
-                const x_min = Math.min(x0, x1, x2, x3);
-                const x_max = Math.max(x0, x1, x2, x3);
-                const y_min = Math.min(y0, y1, y2, y3);
-                const y_max = Math.max(y0, y1, y2, y3);
-
-                this.props.setReportedBoundingBox([
-                    x_min,
-                    y_min,
-                    zMin,
-                    x_max,
-                    y_max,
-                    zMax,
-                ]);
-            }
-
-            this.setState({
-                ...this.state,
-                isFinishedLoading: true,
-            });
+                        this.props.reportBoundingBox({
+                            layerBoundingBox: [
+                                x_min,
+                                y_min,
+                                zMin,
+                                x_max,
+                                y_max,
+                                zMax,
+                            ],
+                        });
+                    }
+                    onTerminateWorker();
+                }
+            );
         });
     }
 
@@ -424,7 +408,17 @@ export default class MapLayer extends CompositeLayer<MapLayerProps> {
         this.rebuildData(reportBoundingBox);
     }
 
-    updateState({ props, oldProps }: UpdateParameters<MapLayer>): void {
+    updateState({
+        props,
+        oldProps,
+    }: UpdateParameters<
+        MapLayer &
+            Layer<
+                Required<MapLayerProps> &
+                    ExtraProps &
+                    Required<CompositeLayerProps>
+            >
+    >): void {
         const needs_reload =
             !isEqual(props.meshUrl, oldProps.meshUrl) ||
             !isEqual(props.propertiesUrl, oldProps.propertiesUrl) ||
@@ -447,7 +441,7 @@ export default class MapLayer extends CompositeLayer<MapLayerProps> {
         }
     }
 
-    renderLayers(): [privateMapLayer?] {
+    renderLayers(): [PrivateMapLayer?] {
         if (Object.keys(this.state).length === 1) {
             // isFinishedLoading only in state
             return [];
@@ -478,13 +472,12 @@ export default class MapLayer extends CompositeLayer<MapLayerProps> {
             );
         }
 
-        const layer = new privateMapLayer(
+        const layer = new PrivateMapLayer(
             this.getSubLayerProps({
                 positions: this.state["positions"],
                 normals: this.state["normals"],
                 triangleIndices: this.state["triangleIndices"],
                 vertexProperties: this.state["vertexProperties"],
-                vertexIndices: this.state["vertexIndices"],
                 lineIndices: this.state["lineIndices"],
                 pickable: this.props.pickable,
                 modelMatrix: rotatingModelMatrix,
@@ -499,9 +492,39 @@ export default class MapLayer extends CompositeLayer<MapLayerProps> {
                 material: this.props.material,
                 smoothShading: this.props.smoothShading,
                 depthTest: this.props.depthTest,
+                ZIncreasingDownwards: this.props.ZIncreasingDownwards,
             })
         );
         return [layer];
+    }
+
+    private getWebworkerParams(
+        meshData: Float32Array | null,
+        propertiesData: Float32Array | null
+    ): { params: Params; transferrables?: Transferable[] } {
+        if (!meshData && !propertiesData) {
+            throw new Error(
+                "Either mesh or properties or the both must be defined"
+            );
+        }
+
+        const params: Params = [
+            meshData,
+            propertiesData,
+            !!meshData,
+            this.props.frame,
+            this.props.smoothShading,
+            this.props.gridLines,
+        ];
+        const transferrables = [
+            meshData?.buffer,
+            propertiesData?.buffer,
+        ].filter((item) => !!item) as ArrayBuffer[];
+
+        if (transferrables.length > 0) {
+            return { params, transferrables };
+        }
+        return { params };
     }
 }
 

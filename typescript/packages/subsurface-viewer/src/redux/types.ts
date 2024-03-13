@@ -1,6 +1,5 @@
 import { Icon } from "@equinor/eds-core-react";
 import {
-    map,
     well,
     brush,
     fault,
@@ -11,7 +10,6 @@ import {
 
 // (this needs only be done once)
 Icon.add({
-    map,
     well,
     brush,
     fault,
@@ -103,7 +101,6 @@ export const LayerIcons = {
     ColormapLayer: "surface_layer",
     Hillshading2DLayer: "hill_shading",
     WellsLayer: "well",
-    Map3DLayer: "map",
     PieChartLayer: "pie_chart",
     FaultPolygonsLayer: "fault",
     DrawingLayer: "brush",

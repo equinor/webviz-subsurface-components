@@ -44,8 +44,7 @@ class WellLogViewWithScroller extends Component<WellLogViewWithScrollerProps> {
 
     updateReadoutPanel(): void {
         const controller = this.controller;
-        if (controller)
-            controller.selectContent(controller.getContentSelection()); // force to update readout panel
+        if (controller) controller.updateInfo(); // force to update readout panel
     }
 
     // callback function from WellLogView

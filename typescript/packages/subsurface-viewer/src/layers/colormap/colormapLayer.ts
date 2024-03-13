@@ -11,7 +11,10 @@ import { decodeRGB } from "../utils/propertyMapTools";
 import type { colorMapFunctionType } from "../utils/layerTools";
 import { getModelMatrix } from "../utils/layerTools";
 import fsColormap from "./colormap.fs.glsl";
-import type { DeckGLLayerContext } from "../../components/Map";
+import type {
+    DeckGLLayerContext,
+    ReportBoundingBoxAction,
+} from "../../components/Map";
 import type { colorTablesArray } from "@emerson-eps/color-tables/";
 import { getRgbData } from "@emerson-eps/color-tables";
 import type { ContinuousLegendDataType } from "../../components/ColorLegend";
@@ -93,8 +96,8 @@ export interface ColormapLayerProps extends BitmapLayerProps {
     // Rotates image around bounds upper left corner counterclockwise in degrees.
     rotDeg: number;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    setReportedBoundingBox?: any;
+    // Non public properties:
+    reportBoundingBox?: React.Dispatch<ReportBoundingBoxAction>;
 }
 
 const defaultProps = {
@@ -132,16 +135,17 @@ export default class ColormapLayer extends BitmapLayer<ColormapLayerProps> {
                 isLoaded: true,
             });
 
-            if (typeof this.props.setReportedBoundingBox !== "undefined") {
-                const xMin = this.props.bounds[0];
-                const yMin = this.props.bounds[1];
+            if (typeof this.props.reportBoundingBox !== "undefined") {
+                const xMin = this.props.bounds[0] as number;
+                const yMin = this.props.bounds[1] as number;
                 const zMin = 1;
-                const xMax = this.props.bounds[2];
-                const yMax = this.props.bounds[3];
+                const xMax = this.props.bounds[2] as number;
+                const yMax = this.props.bounds[3] as number;
                 const zMax = -1;
-                const bbox = [xMin, yMin, zMin, xMax, yMax, zMax];
 
-                this.props.setReportedBoundingBox(bbox);
+                this.props.reportBoundingBox({
+                    layerBoundingBox: [xMin, yMin, zMin, xMax, yMax, zMax],
+                });
             }
         }
 

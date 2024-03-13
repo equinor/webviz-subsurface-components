@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import React, { Component } from "react";
 
 import PropTypes from "prop-types";
@@ -95,8 +96,6 @@ export default class WellLogViewer extends Component<
 
         this.collapsedTrackIds = [];
 
-        this.collapsedTrackIds = [];
-
         this.onCreateController = this.onCreateController.bind(this);
 
         this.onInfo = this.onInfo.bind(this);
@@ -170,8 +169,7 @@ export default class WellLogViewer extends Component<
 
     updateReadoutPanel(): void {
         const controller = this.controller;
-        if (controller)
-            controller.selectContent(controller.getContentSelection()); // force to update readout panel
+        if (controller) controller.updateInfo(); // force to update readout panel
     }
 
     // callback function from WellLogView
@@ -246,15 +244,39 @@ export default class WellLogViewer extends Component<
         else delete this.collapsedTrackIds[i];
 
         this.updateReadoutPanel();
+    }
 
-        if (this.controller)
-            this.controller.selectContent(
-                this.controller.getContentSelection()
-            ); // force to update readout panel
+    createRightPanel(): ReactNode {
+        return (
+            <div key="rightPanel" className="right-panel">
+                <AxisSelector
+                    header="Primary scale"
+                    axes={this.state.axes}
+                    axisLabels={this.props.axisTitles}
+                    value={this.state.primaryAxis}
+                    onChange={this.onChangePrimaryAxis}
+                />
+                <InfoPanel
+                    header="Readout"
+                    onGroupClick={this.onInfoGroupClick}
+                    infos={this.state.infos}
+                />
+                <br />
+                <div className="zoom">
+                    <span className="zoom-label">Zoom:</span>
+                    <span className="zoom-value">
+                        <ZoomSlider
+                            value={this.state.sliderValue}
+                            max={this.props.options?.maxContentZoom}
+                            onChange={this.onZoomSliderChange}
+                        />
+                    </span>
+                </div>
+            </div>
+        );
     }
 
     render(): JSX.Element {
-        const maxContentZoom = 256;
         return (
             <div style={{ height: "100%", width: "100%", display: "flex" }}>
                 <WellLogViewWithScroller
@@ -263,7 +285,8 @@ export default class WellLogViewer extends Component<
                     colorTables={this.props.colorTables}
                     wellpick={this.props.wellpick}
                     horizontal={this.props.horizontal}
-                    maxContentZoom={maxContentZoom}
+                    domain={this.props.domain}
+                    selection={this.props.selection}
                     primaryAxis={this.state.primaryAxis}
                     axisTitles={this.props.axisTitles}
                     axisMnemos={this.props.axisMnemos}
@@ -275,46 +298,7 @@ export default class WellLogViewer extends Component<
                     onContentSelection={this.onContentSelection}
                     onTemplateChanged={this.onTemplateChanged}
                 />
-                <div
-                    style={{
-                        flex: "0, 0",
-                        display: "flex",
-                        flexDirection: "column",
-                        height: "100%",
-                        width: "255px",
-                        minWidth: "255px",
-                        maxWidth: "255px",
-                    }}
-                >
-                    <AxisSelector
-                        header="Primary scale"
-                        axes={this.state.axes}
-                        axisLabels={this.props.axisTitles}
-                        value={this.state.primaryAxis}
-                        onChange={this.onChangePrimaryAxis}
-                    />
-                    <InfoPanel
-                        header="Readout"
-                        onGroupClick={this.onInfoGroupClick}
-                        infos={this.state.infos}
-                    />
-                    <br />
-                    <div style={{ paddingLeft: "10px", display: "flex" }}>
-                        <span>Zoom:</span>
-                        <span
-                            style={{
-                                flex: "1 1 100px",
-                                padding: "0 20px 0 10px",
-                            }}
-                        >
-                            <ZoomSlider
-                                value={this.state.sliderValue}
-                                max={maxContentZoom}
-                                onChange={this.onZoomSliderChange}
-                            />
-                        </span>
-                    </div>
-                </div>
+                {this.createRightPanel()}
             </div>
         );
     }

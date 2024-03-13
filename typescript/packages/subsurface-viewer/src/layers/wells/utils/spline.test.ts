@@ -1,5 +1,43 @@
-import { removeConsecutiveDuplicates } from "./spline";
+import { removeConsecutiveDuplicates, splineRefine } from "./spline";
 import type { Position3D } from "../../utils/layerTools";
+import type { FeatureCollection } from "geojson";
+
+const testWell: FeatureCollection = {
+    type: "FeatureCollection",
+    features: [
+        {
+            type: "Feature",
+            geometry: {
+                type: "GeometryCollection",
+                geometries: [
+                    {
+                        type: "Point",
+                        coordinates: [0, 0],
+                    },
+                    {
+                        type: "LineString",
+                        coordinates: [
+                            [0, 0, 0],
+                            [0, 0, -100],
+                            [0, 0, -200],
+                            [0, 0, -300],
+                            [0, 0, -400],
+                            [0, 0, -500],
+                            [0, 0, -600],
+                            [0, 0, -700],
+                            [0, 0, -800],
+                        ],
+                    },
+                ],
+            },
+            properties: {
+                name: "wl6",
+                color: [255, 255, 0, 255],
+                md: [[0, 1, 2, 3, 4, 5, 8, 9]],
+            },
+        },
+    ],
+};
 
 describe("remove duplicates", () => {
     const coords: Position3D[] = [
@@ -43,5 +81,31 @@ describe("remove duplicates", () => {
         expect(
             removeConsecutiveDuplicates(coordsEmpty, mdsEmpty)[1]
         ).toStrictEqual(mdsEmpty);
+    });
+
+    // Test splineRefine functions
+    it("should not refine if given invalid input", () => {
+        expect(
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            splineRefine(testWell, 0).features[0].geometry.geometries[1]
+                .coordinates.length
+        ).toStrictEqual(9);
+    });
+
+    it("should refine and output more vertices if given valid input", () => {
+        expect(
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            splineRefine(testWell).features[0].geometry.geometries[1]
+                .coordinates.length
+        ).toStrictEqual(33);
+
+        expect(
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            splineRefine(testWell, 10).features[0].geometry.geometries[1]
+                .coordinates.length
+        ).toStrictEqual(63);
     });
 });

@@ -12,13 +12,13 @@ exports[`Test Well Log View Component with Scroller snapshot test 1`] = `
     >
       <div
         class="welllogview"
-        style="width: 100%; height: 100%; display: flex; flex-direction: column;"
+        style="flex-direction: column;"
       >
         <div
-          style="width: 100%; height: 100%; display: flex; flex-direction: column;"
+          class="view"
         >
           <div
-            class="log-controller"
+            class="container log-controller"
           >
             <div
               class="overlay"
@@ -71,7 +71,7 @@ exports[`Test Well Log View Component with Scroller snapshot test 1`] = `
             </div>
             <div
               class="track"
-              style="display: flex; flex: 3;"
+              style="display: flex; flex: 6;"
             >
               <div
                 class="track-container"
