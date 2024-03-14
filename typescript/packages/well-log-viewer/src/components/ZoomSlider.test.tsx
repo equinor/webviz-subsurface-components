@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import "@testing-library/jest-dom/extend-expect";
 import { render } from "@testing-library/react";
 import "jest-styled-components";
 import React from "react";
