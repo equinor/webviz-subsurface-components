@@ -1,3 +1,10 @@
+## [0.20.4](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.20.3...subsurface-viewer@0.20.4) (2024-03-14)
+
+
+### Bug Fixes
+
+* Wells does not update when property "wellNameAtTop" is changed [#1962](https://github.com/equinor/webviz-subsurface-components/issues/1962) ([#1963](https://github.com/equinor/webviz-subsurface-components/issues/1963)) ([bf318ac](https://github.com/equinor/webviz-subsurface-components/commit/bf318ac37962ff236b97bdca5a2d462a5516b614))
+
 ## [0.20.3](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.20.2...subsurface-viewer@0.20.3) (2024-03-14)
 
 
