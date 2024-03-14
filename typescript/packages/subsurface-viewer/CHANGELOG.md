@@ -1,3 +1,10 @@
+## [0.20.3](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.20.2...subsurface-viewer@0.20.3) (2024-03-14)
+
+
+### Bug Fixes
+
+* "Not able to rotate/pan while loading layers. [#1960](https://github.com/equinor/webviz-subsurface-components/issues/1960)" ([#1961](https://github.com/equinor/webviz-subsurface-components/issues/1961)) ([25f39f4](https://github.com/equinor/webviz-subsurface-components/commit/25f39f44ee815dc2f29ec4922797a1d7a18f9098))
+
 ## [0.20.2](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.20.1...subsurface-viewer@0.20.2) (2024-03-13)
 
 
