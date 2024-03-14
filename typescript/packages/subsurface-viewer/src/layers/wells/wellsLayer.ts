@@ -666,6 +666,13 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 getAnchor: "start",
                 getAlignmentBaseline: "bottom",
                 getSize: this.props.wellNameSize,
+                updateTriggers: {
+                    getPosition: [
+                        this.props.wellNameAtTop,
+                        is3d,
+                        this.props.lineStyle?.color,
+                    ],
+                },
                 parameters,
                 visible: this.props.wellNameVisible && !fastDrawing,
             })

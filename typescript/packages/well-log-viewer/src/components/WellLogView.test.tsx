@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import "@testing-library/jest-dom/extend-expect";
+import { colorTables } from "@emerson-eps/color-tables";
 import { render } from "@testing-library/react";
 import "jest-styled-components";
 import React from "react";
 import WellLogView from "./WellLogView";
-import { colorTables } from "@emerson-eps/color-tables";
 
 const exampleTemplate = require("../../../../../example-data/welllog_template_1.json");
 const exampleWellLog = {

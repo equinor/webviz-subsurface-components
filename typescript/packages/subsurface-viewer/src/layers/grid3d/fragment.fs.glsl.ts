@@ -18,18 +18,10 @@ uniform vec3 colorMapClampColor;
 uniform bool isClampColor;
 uniform bool isColorMapClampColorTransparent;
 
-void main(void) {
+// Calculate color from propertyValue using colormap.
+vec4 getPropertyColor (float propertyValue) {
 
-   if (picking_uActive && !picking_uAttribute) {
-      gl_FragColor = encodeVertexIndexToRGB(vertexIndex);      
-      return;
-   }
-
-   vec3 normal = normalize(cross(dFdx(position_commonspace.xyz), dFdy(position_commonspace.xyz)));
-   
-   // Calculate color from propertyValue using colormap.
    vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
-   float propertyValue = property;
    float x = (propertyValue - colorMapRangeMin) / (colorMapRangeMax - colorMapRangeMin);
    if (x < 0.0 || x > 1.0) {
       // Out of range. Use clampcolor.
@@ -39,7 +31,7 @@ void main(void) {
       }
       else if (isColorMapClampColorTransparent) {
          discard;
-         return;
+         return color;
       }
       else {
          // Use min/max color to clamp.
@@ -51,7 +43,20 @@ void main(void) {
    else {
       color = texture2D(colormap, vec2(x, 0.5));
    }
+   return color;
+}
 
+void main(void) {
+
+   if (picking_uActive && !picking_uAttribute) {
+      gl_FragColor = encodeVertexIndexToRGB(vertexIndex);      
+      return;
+   }
+
+   vec3 normal = normalize(cross(dFdx(position_commonspace.xyz), dFdy(position_commonspace.xyz)));
+      
+   vec4 color = getPropertyColor(property);
+   
    // Use two sided phong lighting. This has no effect if "material" property is not set.
    vec3 lightColor = getPhongLightColor(color.rgb, cameraPosition, position_commonspace.xyz, normal);
    gl_FragColor = vec4(lightColor, 1.0);

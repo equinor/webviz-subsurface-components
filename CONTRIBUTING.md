@@ -31,6 +31,7 @@ In general, we follow the ["fork-and-pull" Git workflow](https://github.com/susa
 ### Pull request checklist
 
 - [ ] Code follows conventions. Validate with `npm run validate` in the `typescript` directory.
+- [ ] All tests are passing. Validate with `npx nx run-many -t test_correctness` in the `typescript` directory.
 - [ ] PR title follows [Conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) convention.
 - [ ] New APIs are documented.
 - [ ] If fixing a bug or introducing a new feature, a [story](https://storybook.js.org/docs/writing-stories) describing the issue is provided.

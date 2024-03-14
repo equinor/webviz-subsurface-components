@@ -1,3 +1,38 @@
+## [0.20.4](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.20.3...subsurface-viewer@0.20.4) (2024-03-14)
+
+
+### Bug Fixes
+
+* Wells does not update when property "wellNameAtTop" is changed [#1962](https://github.com/equinor/webviz-subsurface-components/issues/1962) ([#1963](https://github.com/equinor/webviz-subsurface-components/issues/1963)) ([bf318ac](https://github.com/equinor/webviz-subsurface-components/commit/bf318ac37962ff236b97bdca5a2d462a5516b614))
+
+## [0.20.3](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.20.2...subsurface-viewer@0.20.3) (2024-03-14)
+
+
+### Bug Fixes
+
+* "Not able to rotate/pan while loading layers. [#1960](https://github.com/equinor/webviz-subsurface-components/issues/1960)" ([#1961](https://github.com/equinor/webviz-subsurface-components/issues/1961)) ([25f39f4](https://github.com/equinor/webviz-subsurface-components/commit/25f39f44ee815dc2f29ec4922797a1d7a18f9098))
+
+## [0.20.2](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.20.1...subsurface-viewer@0.20.2) (2024-03-13)
+
+
+### Bug Fixes
+
+* bump [@deck](https://github.com/deck).gl/core from 8.9.34 to 8.9.35 in /typescript ([#1959](https://github.com/equinor/webviz-subsurface-components/issues/1959)) ([afcb208](https://github.com/equinor/webviz-subsurface-components/commit/afcb20831f5b3ab89d577ef6bb36e951170a6558)), closes [#8533](https://github.com/equinor/webviz-subsurface-components/issues/8533) [#8536](https://github.com/equinor/webviz-subsurface-components/issues/8536) [#8474](https://github.com/equinor/webviz-subsurface-components/issues/8474) [#8454](https://github.com/equinor/webviz-subsurface-components/issues/8454) [#8291](https://github.com/equinor/webviz-subsurface-components/issues/8291) [#8533](https://github.com/equinor/webviz-subsurface-components/issues/8533) [#8536](https://github.com/equinor/webviz-subsurface-components/issues/8536) [#8474](https://github.com/equinor/webviz-subsurface-components/issues/8474) [#8454](https://github.com/equinor/webviz-subsurface-components/issues/8454) [#8291](https://github.com/equinor/webviz-subsurface-components/issues/8291) [#8539](https://github.com/equinor/webviz-subsurface-components/issues/8539) [#8533](https://github.com/equinor/webviz-subsurface-components/issues/8533) [#8547](https://github.com/equinor/webviz-subsurface-components/issues/8547) [#8536](https://github.com/equinor/webviz-subsurface-components/issues/8536) [#8448](https://github.com/equinor/webviz-subsurface-components/issues/8448) [#8474](https://github.com/equinor/webviz-subsurface-components/issues/8474) [#8454](https://github.com/equinor/webviz-subsurface-components/issues/8454) [#8291](https://github.com/equinor/webviz-subsurface-components/issues/8291)
+
+## [0.20.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.20.0...subsurface-viewer@0.20.1) (2024-03-12)
+
+
+### Bug Fixes
+
+* bump ajv from 7.2.1 to 8.12.0 in /typescript ([#1947](https://github.com/equinor/webviz-subsurface-components/issues/1947)) ([af95651](https://github.com/equinor/webviz-subsurface-components/commit/af95651f1b4730ce3d31b4f2c5d99d7369b42c9a)), closes [#2190](https://github.com/equinor/webviz-subsurface-components/issues/2190) [#2191](https://github.com/equinor/webviz-subsurface-components/issues/2191) [#2158](https://github.com/equinor/webviz-subsurface-components/issues/2158) [#2194](https://github.com/equinor/webviz-subsurface-components/issues/2194) [#2192](https://github.com/equinor/webviz-subsurface-components/issues/2192) [ajv-validator/ajv#1840](https://github.com/ajv-validator/ajv/issues/1840) [#1840](https://github.com/equinor/webviz-subsurface-components/issues/1840) [#1901](https://github.com/equinor/webviz-subsurface-components/issues/1901) [#1922](https://github.com/equinor/webviz-subsurface-components/issues/1922) [#1862](https://github.com/equinor/webviz-subsurface-components/issues/1862) [#1861](https://github.com/equinor/webviz-subsurface-components/issues/1861) [#1815](https://github.com/equinor/webviz-subsurface-components/issues/1815) [ajv-validator/ajv-keywords#220](https://github.com/ajv-validator/ajv-keywords/issues/220) [#1819](https://github.com/equinor/webviz-subsurface-components/issues/1819) [#1725](https://github.com/equinor/webviz-subsurface-components/issues/1725) [#1757](https://github.com/equinor/webviz-subsurface-components/issues/1757) [#2195](https://github.com/equinor/webviz-subsurface-components/issues/2195) [#1971](https://github.com/equinor/webviz-subsurface-components/issues/1971) [#2194](https://github.com/equinor/webviz-subsurface-components/issues/2194) [#2184](https://github.com/equinor/webviz-subsurface-components/issues/2184) [#2193](https://github.com/equinor/webviz-subsurface-components/issues/2193) [#2183](https://github.com/equinor/webviz-subsurface-components/issues/2183) [#2158](https://github.com/equinor/webviz-subsurface-components/issues/2158) [#2160](https://github.com/equinor/webviz-subsurface-components/issues/2160) [#1935](https://github.com/equinor/webviz-subsurface-components/issues/1935) [#2192](https://github.com/equinor/webviz-subsurface-components/issues/2192) [#1949](https://github.com/equinor/webviz-subsurface-components/issues/1949) [#2191](https://github.com/equinor/webviz-subsurface-components/issues/2191)
+
+# [0.20.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.19.0...subsurface-viewer@0.20.0) (2024-03-11)
+
+
+### Features
+
+* **grid3D:**  Support discrete properties. ([#1953](https://github.com/equinor/webviz-subsurface-components/issues/1953)) ([88bd6df](https://github.com/equinor/webviz-subsurface-components/commit/88bd6dfe265f4b9321cd9107f4e5b820c49fa61e))
+
 # [0.19.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.18.1...subsurface-viewer@0.19.0) (2024-03-06)
 
 
