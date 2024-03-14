@@ -14,6 +14,8 @@ uniform sampler2D colormap;
 uniform float colorMapRangeMin;
 uniform float colorMapRangeMax;
 
+uniform float colorLookupTolerance;
+
 uniform vec3 colorMapClampColor;
 uniform bool isClampColor;
 uniform bool isColorMapClampColorTransparent;
@@ -23,7 +25,7 @@ vec4 getPropertyColor (float propertyValue) {
 
    vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
    float x = (propertyValue - colorMapRangeMin) / (colorMapRangeMax - colorMapRangeMin);
-   if (x < 0.0 || x > 1.0) {
+   if (x < -colorLookupTolerance || x > 1.0 + colorLookupTolerance) {
       // Out of range. Use clampcolor.
       if (isClampColor) {
          color = vec4(colorMapClampColor.rgb, 1.0);
@@ -37,11 +39,11 @@ vec4 getPropertyColor (float propertyValue) {
          // Use min/max color to clamp.
          x = max(0.0, x);
          x = min(1.0, x);
-         color = texture2D(colormap, vec2(x, 0.5));
+         color = texture2D(colormap, vec2(x + colorLookupTolerance , 0.5));
       }
    }
    else {
-      color = texture2D(colormap, vec2(x, 0.5));
+      color = texture2D(colormap, vec2(x + colorLookupTolerance, 0.5));
    }
    return color;
 }

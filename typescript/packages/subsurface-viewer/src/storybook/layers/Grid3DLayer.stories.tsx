@@ -270,6 +270,8 @@ export const DiscreteProperty: StoryObj<typeof SubsurfaceViewer> = {
                 ZIncreasingDownwards: true,
                 colorMapFunction: colorTable,
                 material: false,
+                colorMapRange: [1, 3],
+                colorMapClampColor: [100, 100, 100],
             },
         ],
     },
