@@ -98,7 +98,6 @@ interface IPropertyUniforms {
     colorMapClampColor: Color | undefined | boolean | number[];
     isColorMapClampColorTransparent: boolean;
     isClampColor: boolean;
-    colorLookupTolerance: number;
     isColoringDiscrete: boolean;
     colorMapSize: number;
 }
@@ -109,7 +108,6 @@ interface IImageData {
     parameters:
         | typeof DEFAULT_TEXTURE_PARAMETERS
         | typeof DISCRETE_TEXTURE_PARAMETERS;
-    colorLookupTolerance: number;
     isColoringDiscrete: boolean;
 }
 
@@ -275,7 +273,6 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             data: new Uint8Array([0, 0, 0]),
             count: 1,
             parameters: DISCRETE_TEXTURE_PARAMETERS,
-            colorLookupTolerance: 0.5,
             isColoringDiscrete: true,
         };
     }
@@ -297,8 +294,6 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
                 data: this.props.colorMapFunction,
                 count,
                 parameters,
-                //As the colors are not interpolated a slight offset in the texture is needed to avoid "color fighting" when a color is picked on the border between two colors.
-                colorLookupTolerance: (1.0 / count) * 0.5,
                 isColoringDiscrete,
             };
         }
@@ -311,7 +306,6 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             data,
             count: 256,
             parameters: DEFAULT_TEXTURE_PARAMETERS,
-            colorLookupTolerance: 0.0,
             isColoringDiscrete: false,
         };
     }
@@ -361,7 +355,6 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             colorMapClampColor,
             isColorMapClampColorTransparent,
             isClampColor,
-            colorLookupTolerance: imageData.colorLookupTolerance,
             isColoringDiscrete: imageData.isColoringDiscrete,
             colorMapSize: imageData.count,
         };

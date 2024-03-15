@@ -14,7 +14,6 @@ uniform sampler2D colormap;
 uniform float colorMapRangeMin;
 uniform float colorMapRangeMax;
 
-uniform float colorLookupTolerance;
 uniform bool  isColoringDiscrete;
 uniform float colorMapSize;
 
@@ -38,8 +37,7 @@ vec4 getContinuousPropertyColor (float propertyValue) {
       }
       else {
          // Use min/max color to clamp.
-         x = max(0.0, x);
-         x = min(1.0, x);
+         x = clamp (x, 0.0, 1.0);         
          color = texture2D(colormap, vec2(x, 0.5));
       }
    }
@@ -53,8 +51,9 @@ vec4 getContinuousPropertyColor (float propertyValue) {
 vec4 getDiscretePropertyColor (float propertyValue) {
 
    vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
+   float tolerance = (1.0 / colorMapSize) * 0.5;
      
-   if (propertyValue < colorMapRangeMin - colorLookupTolerance || propertyValue > colorMapRangeMax + colorLookupTolerance) {
+   if (propertyValue < colorMapRangeMin - tolerance || propertyValue > colorMapRangeMax + tolerance) {
       // Out of range. Use clampcolor.
       if (isClampColor) {
          color = vec4(colorMapClampColor.rgb, 1.0);
@@ -65,16 +64,14 @@ vec4 getDiscretePropertyColor (float propertyValue) {
       }
       else {
          // Use min/max color to clamp.
-         float p;
-         p = max(colorMapRangeMin, propertyValue);
-         p = min(colorMapRangeMax, p);
+         float p = clamp (propertyValue, colorMapRangeMin, colorMapRangeMax);
          float x = p / colorMapSize;
          color = texture2D(colormap, vec2(x, 0.5));
       }
    }
    else {
       float x = propertyValue / colorMapSize;
-      color = texture2D(colormap, vec2(x + colorLookupTolerance, 0.5));
+      color = texture2D(colormap, vec2(x + tolerance, 0.5));
    }
    return color;
 }
