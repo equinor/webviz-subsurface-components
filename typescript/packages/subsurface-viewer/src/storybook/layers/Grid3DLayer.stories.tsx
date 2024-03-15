@@ -181,17 +181,18 @@ const toroidProperties = Array(ToroidVertexCount)
 
 /* eslint-disable prettier/prettier */
 const colorTable = new Uint8Array([
-    100, 100, 0,   // 0
-    0, 0, 255,     // 1 
-    0, 255, 0,     // 2 
-    0, 100, 0,     // 3 
-    0, 0, 100,     // 4 
-    200, 100, 0,   // 5 
-    0, 100, 100,   // 6 
-    100, 0, 100,   // 7 
-    100, 100, 0,   // 8
-    255, 0, 0,     // 9 
-    0, 0,          // 10
+    0, 0, 255,     // 0
+    0, 255, 0,     // 1 
+    0, 255, 255,   // 2 
+    255, 0, 0,     // 3 
+    255, 0, 255,   // 4 
+    255, 255, 0,   // 5 
+    0, 0, 100,     // 6 
+    0, 100, 0,     // 7 
+    0, 100, 100,   // 8
+    100, 0, 0,     // 9 
+    100, 0, 100,   // 10
+    100, 100, 0,   // 11
 ]);
 /* eslint-enable prettier/prettier */
 
@@ -238,7 +239,7 @@ export const PolyhedralCells: StoryObj<typeof SubsurfaceViewer> = {
     parameters: parameters,
 };
 
-export const DiscreteProperty: StoryObj<typeof SubsurfaceViewer> = {
+export const DiscretePropertyWithClamping: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         bounds: [-2500, -2500, 2500, 2500] as NumberQuad,
         views: {
@@ -270,7 +271,7 @@ export const DiscreteProperty: StoryObj<typeof SubsurfaceViewer> = {
                 ZIncreasingDownwards: true,
                 colorMapFunction: colorTable,
                 material: false,
-                colorMapRange: [1, 3],
+                colorMapRange: [3, 8],
                 colorMapClampColor: [100, 100, 100],
             },
         ],

@@ -25,14 +25,14 @@ import { localPhongLighting, utilities } from "../shader_modules";
 import type { TGrid3DColoringMode } from "./grid3dLayer";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
-    [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,
+    [GL.TEXTURE_MIN_FILTER]: GL.LINEAR,
     [GL.TEXTURE_MAG_FILTER]: GL.LINEAR,
     [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
     [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE,
 };
 
 const DISCRETE_TEXTURE_PARAMETERS = {
-    [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,
+    [GL.TEXTURE_MIN_FILTER]: GL.NEAREST,
     [GL.TEXTURE_MAG_FILTER]: GL.NEAREST,
     [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
     [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE,
@@ -99,6 +99,8 @@ interface IPropertyUniforms {
     isColorMapClampColorTransparent: boolean;
     isClampColor: boolean;
     colorLookupTolerance: number;
+    isColoringDiscrete: boolean;
+    colorMapSize: number;
 }
 
 // This is a private layer used only by the composite Grid3DLayer
@@ -265,6 +267,7 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             | typeof DEFAULT_TEXTURE_PARAMETERS
             | typeof DISCRETE_TEXTURE_PARAMETERS;
         colorLookupTolerance: number;
+        isColoringDiscrete: boolean;
     } {
         if (this.props.colorMapFunction instanceof Uint8Array) {
             const count = this.props.colorMapFunction.length / 3;
@@ -274,6 +277,7 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
                 parameters: DISCRETE_TEXTURE_PARAMETERS,
                 //As the colors are not interpolated a slight offset in the texture is needed to avoid "color fighting" when a color is picked on the border between two colors.
                 colorLookupTolerance: (1.0 / count) * 0.5,
+                isColoringDiscrete: true,
             };
         }
         const imageData = getImageData(
@@ -286,6 +290,7 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             count: 256,
             parameters: DEFAULT_TEXTURE_PARAMETERS,
             colorLookupTolerance: 0.0,
+            isColoringDiscrete: false,
         };
     }
 
@@ -335,6 +340,8 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             isColorMapClampColorTransparent,
             isClampColor,
             colorLookupTolerance: imageData.colorLookupTolerance,
+            isColoringDiscrete: imageData.isColoringDiscrete,
+            colorMapSize: imageData.count,
         };
     }
 }
