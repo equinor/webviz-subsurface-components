@@ -1,7 +1,13 @@
+import React from "react";
+
 import type { Meta, StoryObj } from "@storybook/react";
 
 import { create, all } from "mathjs";
 
+import type {
+    SubsurfaceViewerProps,
+    TLayerDefinition,
+} from "../../SubsurfaceViewer";
 import SubsurfaceViewer, { TGrid3DColoringMode } from "../../SubsurfaceViewer";
 
 import {
@@ -239,6 +245,29 @@ export const PolyhedralCells: StoryObj<typeof SubsurfaceViewer> = {
     parameters: parameters,
 };
 
+// ---------In-place array data handling (storybook fails to rebuild non JSon data)--------------- //
+const discretePropsLayerId = "discrete_props";
+const layerArrays = {
+    [discretePropsLayerId]: {
+        pointsData: new Float32Array(gridPoints),
+        polysData: new Uint32Array(gridPolys),
+        propertiesData: new Uint16Array(gridProps),
+        colorMapFunction: colorTable,
+    },
+};
+
+function replaceArrays(args: SubsurfaceViewerProps) {
+    args.layers?.forEach((layer: TLayerDefinition) => {
+        const layerId = layer?.["id"] as string | undefined;
+        if (layer && layerId && layerArrays[layerId]) {
+            for (const key in layerArrays[layerId]) {
+                layer[key] = layerArrays[layerId][key];
+            }
+        }
+    });
+    return args;
+}
+
 export const DiscretePropertyWithClamping: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         bounds: [-2500, -2500, 2500, 2500] as NumberQuad,
@@ -261,15 +290,17 @@ export const DiscretePropertyWithClamping: StoryObj<typeof SubsurfaceViewer> = {
             {
                 ...grid3dLayer,
                 "@@typedArraySupport": true,
-                id: "discrete_props",
+                id: discretePropsLayerId,
                 coloringMode: TGrid3DColoringMode.Property,
                 pickable: true,
-                pointsData: new Float32Array(gridPoints),
-                polysData: new Uint32Array(gridPolys),
-                propertiesData: new Uint16Array(gridProps),
+                pointsData: layerArrays[discretePropsLayerId].pointsData,
+                polysData: layerArrays[discretePropsLayerId].polysData,
+                propertiesData:
+                    layerArrays[discretePropsLayerId].propertiesData,
                 colorMapName: "Seismic",
                 ZIncreasingDownwards: true,
-                colorMapFunction: colorTable,
+                colorMapFunction:
+                    layerArrays[discretePropsLayerId].colorMapFunction,
                 material: false,
                 colorMapRange: [3, 8],
                 colorMapClampColor: [100, 100, 100],
@@ -277,4 +308,5 @@ export const DiscretePropertyWithClamping: StoryObj<typeof SubsurfaceViewer> = {
         ],
     },
     parameters: parameters,
+    render: (args) => <SubsurfaceViewer {...replaceArrays(args)} />,
 };
