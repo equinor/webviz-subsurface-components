@@ -103,6 +103,16 @@ interface IPropertyUniforms {
     colorMapSize: number;
 }
 
+interface IImageData {
+    data: number[] | Uint8Array;
+    count: number;
+    parameters:
+        | typeof DEFAULT_TEXTURE_PARAMETERS
+        | typeof DISCRETE_TEXTURE_PARAMETERS;
+    colorLookupTolerance: number;
+    isColoringDiscrete: boolean;
+}
+
 // This is a private layer used only by the composite Grid3DLayer
 export default class PrivateLayer extends Layer<PrivateLayerProps> {
     get isLoaded(): boolean {
@@ -260,19 +270,24 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
         };
     }
 
-    private getImageData(): {
-        imageData: number[] | Uint8Array;
-        count: number;
-        parameters:
-            | typeof DEFAULT_TEXTURE_PARAMETERS
-            | typeof DISCRETE_TEXTURE_PARAMETERS;
-        colorLookupTolerance: number;
-        isColoringDiscrete: boolean;
-    } {
+    private getDefaultImageData(): IImageData {
+        return {
+            data: new Uint8Array([0, 0, 0]),
+            count: 1,
+            parameters: DISCRETE_TEXTURE_PARAMETERS,
+            colorLookupTolerance: 0.5,
+            isColoringDiscrete: true,
+        };
+    }
+
+    private getImageData(): IImageData {
         if (this.props.colorMapFunction instanceof Uint8Array) {
             const count = this.props.colorMapFunction.length / 3;
+            if (count === 0) {
+                return this.getDefaultImageData();
+            }
             return {
-                imageData: this.props.colorMapFunction,
+                data: this.props.colorMapFunction,
                 count,
                 parameters: DISCRETE_TEXTURE_PARAMETERS,
                 //As the colors are not interpolated a slight offset in the texture is needed to avoid "color fighting" when a color is picked on the border between two colors.
@@ -280,13 +295,13 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
                 isColoringDiscrete: true,
             };
         }
-        const imageData = getImageData(
+        const data = getImageData(
             this.props.colorMapName,
             (this.context as DeckGLLayerContext).userData.colorTables,
             this.props.colorMapFunction
         );
         return {
-            imageData,
+            data,
             count: 256,
             parameters: DEFAULT_TEXTURE_PARAMETERS,
             colorLookupTolerance: 0.0,
@@ -328,7 +343,7 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             width: imageData.count,
             height: 1,
             format: GL.RGB,
-            data: imageData.imageData,
+            data: imageData.data,
             parameters: imageData.parameters,
         });
 
