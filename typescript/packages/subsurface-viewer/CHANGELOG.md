@@ -1,3 +1,10 @@
+## [0.20.5](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.20.4...subsurface-viewer@0.20.5) (2024-03-15)
+
+
+### Bug Fixes
+
+* **grid3d:** coloring by discrete property fixed. ([#1966](https://github.com/equinor/webviz-subsurface-components/issues/1966)) ([2de0134](https://github.com/equinor/webviz-subsurface-components/commit/2de01349d0477b1479ff18ddf57e9e3a6620d848))
+
 ## [0.20.4](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.20.3...subsurface-viewer@0.20.4) (2024-03-14)
 
 
