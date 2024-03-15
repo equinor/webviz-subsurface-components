@@ -28,7 +28,7 @@
         "validate": "npm run typecheck && npm run lint"
     },
     "dependencies": {
-        "@deck.gl/core": "^8.8.25",
+        "@deck.gl/core": "^8.9.35",
         "@emerson-eps/color-tables": "^0.4.61",
         "@equinor/eds-core-react": "0.33.0",
         "@equinor/eds-icons": "^0.19.1",
