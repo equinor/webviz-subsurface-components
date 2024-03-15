@@ -22,7 +22,7 @@ import fsShader from "./fragment.fs.glsl";
 import vsLineShader from "./vertex_lines.glsl";
 import fsLineShader from "./fragment_lines.glsl";
 import { localPhongLighting, utilities } from "../shader_modules";
-import type { TGrid3DColoringMode } from "./grid3dLayer";
+import { TGrid3DColoringMode } from "./grid3dLayer";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_MIN_FILTER]: GL.LINEAR,
@@ -286,13 +286,20 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             if (count === 0) {
                 return this.getDefaultImageData();
             }
+
+            const parameters =
+                this.props.coloringMode === TGrid3DColoringMode.Property
+                    ? DISCRETE_TEXTURE_PARAMETERS
+                    : DEFAULT_TEXTURE_PARAMETERS;
+            const isColoringDiscrete =
+                this.props.coloringMode === TGrid3DColoringMode.Property;
             return {
                 data: this.props.colorMapFunction,
                 count,
-                parameters: DISCRETE_TEXTURE_PARAMETERS,
+                parameters,
                 //As the colors are not interpolated a slight offset in the texture is needed to avoid "color fighting" when a color is picked on the border between two colors.
                 colorLookupTolerance: (1.0 / count) * 0.5,
-                isColoringDiscrete: true,
+                isColoringDiscrete,
             };
         }
         const data = getImageData(
