@@ -24,7 +24,7 @@
     "dependencies": {
         "@deck.gl/aggregation-layers": "^8.9.33",
         "@deck.gl/core": "^8.9.35",
-        "@deck.gl/extensions": "^8.9.33",
+        "@deck.gl/extensions": "^8.9.35",
         "@deck.gl/geo-layers": "^8.9.33",
         "@deck.gl/json": "^8.9.34",
         "@deck.gl/layers": "^8.9.33",
