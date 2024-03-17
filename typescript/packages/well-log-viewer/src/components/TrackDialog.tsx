@@ -35,6 +35,7 @@ interface State extends TemplateTrack {
     stackedName: string; // data name
     showLabels: string;
     showLines: string;
+    labelRotation: number;
 
     open: boolean;
 }
@@ -71,6 +72,7 @@ export class TrackPropertiesDialog extends Component<Props, State> {
                       templateTrack.plots[0]?.showLines !== false
                           ? "true"
                           : "false",
+                  labelRotation: templateTrack.plots[0]?.labelRotation || 0,
                   open: true,
               }
             : {
@@ -85,6 +87,7 @@ export class TrackPropertiesDialog extends Component<Props, State> {
                   stackedName: name,
                   showLabels: "true",
                   showLines: "true",
+                  labelRotation: 0,
                   open: true,
               };
 
@@ -104,6 +107,7 @@ export class TrackPropertiesDialog extends Component<Props, State> {
                 name: this.state.stackedName,
                 showLabels: this.state.showLabels === "true",
                 showLines: this.state.showLines === "true",
+                labelRotation: this.state.labelRotation || 0,
                 //color: "not used", // not used in stacked
             };
             this.state.plots.push(plot);
@@ -205,15 +209,23 @@ export class TrackPropertiesDialog extends Component<Props, State> {
                                   )
                               ),
                               this.createSelectControl(
-                                  "showLabels",
-                                  "Labels",
-                                  createBooleanItems()
-                              ),
-                              this.createSelectControl(
                                   "showLines",
                                   "Lines",
                                   createBooleanItems()
                               ),
+                              this.createSelectControl(
+                                "showLabels",
+                                "Labels",
+                                createBooleanItems()
+                            ),
+                            <TextField 
+                                type="number"
+                                id="labelRotation"
+                                label="Labels Rotation"
+                                value={this.state.labelRotation}
+                                onChange={(e)=> {this.setState({ [e.target.id]: Number(e.target.value) } as unknown as State)} }
+                                InputProps={{ inputProps: { min: -180, max: 180, step:10 } }}
+                            />
                           ]
                         : [
                               this.createSelectControl(

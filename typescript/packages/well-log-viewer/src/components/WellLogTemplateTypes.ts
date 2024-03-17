@@ -34,6 +34,7 @@ export type TemplatePlotProps = {
 
     showLabels?: boolean; // for 'stacked' plot
     showLines?: boolean; // for 'stacked' plot
+    labelRotation?: number; // for 'stacked' plot  
     //...
 }; // Part of JSON
 
