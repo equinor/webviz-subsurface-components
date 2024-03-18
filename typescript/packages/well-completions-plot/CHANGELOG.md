@@ -1,3 +1,10 @@
+## [1.2.11](https://github.com/equinor/webviz-subsurface-components/compare/well-completions-plot@1.2.10...well-completions-plot@1.2.11) (2024-03-18)
+
+
+### Bug Fixes
+
+* speedup well log viewer ([#1970](https://github.com/equinor/webviz-subsurface-components/issues/1970)) ([795b4fb](https://github.com/equinor/webviz-subsurface-components/commit/795b4fb6facb2cde5780dac9eaa6b199e7b87bd3))
+
 ## [1.2.10](https://github.com/equinor/webviz-subsurface-components/compare/well-completions-plot@1.2.9...well-completions-plot@1.2.10) (2024-03-15)
 
 
