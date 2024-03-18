@@ -15,7 +15,7 @@ import type { ExtendedLayerProps, Position3D } from "../utils/layerTools";
 import { load } from "@loaders.gl/core";
 import { Texture2D } from "@luma.gl/webgl";
 import { ImageLoader } from "@loaders.gl/images";
-import { vec4, mat4 } from "gl-matrix";
+import { vec4 } from "gl-matrix";
 import type { Color } from "@deck.gl/core/typed";
 import fontAtlasPng from "./font-atlas.png";
 
@@ -140,8 +140,23 @@ const fontInfo = {
 };
 
 export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
-    initializeState(context: LayerContext): void {
-        const { gl } = context;
+    shouldUpdateState() {
+        return true;
+    }
+
+    updateState() {
+        const fontTexture = this.state["fontTexture"];
+        const { label_models, line_model, background_model } =
+            this._getModels(fontTexture);
+
+        this.setState({
+            ...this.state,
+            models: [...label_models, line_model, background_model],
+        });
+    }
+
+    initializeState(): void {
+        const { gl } = this.context;
 
         const promise = load(fontAtlasPng, ImageLoader, {
             image: { type: "data" }, // Will load as ImageData.
@@ -156,14 +171,12 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                 parameters: DEFAULT_TEXTURE_PARAMETERS,
             });
 
+            const { label_models, line_model, background_model } =
+                this._getModels(fontTexture);
+
             this.setState({
                 fontTexture,
-                // Insert a dummy model initially.
-                model: new Model(gl, {
-                    id: "dummy",
-                    vs: lineVertexShader,
-                    fs: lineFragmentShader,
-                }),
+                models: [...label_models, line_model, background_model],
             });
         });
     }
@@ -172,7 +185,8 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         min: number,
         max: number,
         viewSide: ViewSide,
-        pixel2world: number
+        pixel2worldHor: number,
+        pixel2worldVer: number
     ): [number[], LabelData[]] {
         const ndecimals = 0;
         const n_minor_ticks = 3;
@@ -180,8 +194,8 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         const lines: number[] = [];
         const tick_labels = [];
 
-        const mv = this.props.marginV * pixel2world;
-        const mh = this.props.marginH * pixel2world;
+        const mv = this.props.marginV * pixel2worldVer;
+        const mh = this.props.marginH * pixel2worldHor;
 
         const vpBounds = this.context.viewport.getBounds();
         let start;
@@ -201,17 +215,25 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
             x_tick = start;
         }
 
-        const m = 10; // Length in pixels
-        const delta = m * pixel2world;
-
-        const L = LineLengthInPixels(
-            [min, 0, 0],
-            [max, 0, 0],
-            this.context.viewport
-        );
-
-        const isHorizontal =
+        const isTopOrBottomRuler =
             viewSide === ViewSide.Top || viewSide === ViewSide.Bottom;
+
+        const m = 10; // Length in pixels
+        const delta = isTopOrBottomRuler
+            ? m * pixel2worldVer
+            : m * pixel2worldHor;
+
+        const L = isTopOrBottomRuler
+            ? LineLengthInPixels(
+                  [min, 0, 0],
+                  [max, 0, 0],
+                  this.context.viewport
+              )
+            : LineLengthInPixels(
+                  [0, min, 0],
+                  [0, max, 0],
+                  this.context.viewport
+              );
 
         const ticks = GetTicks(min, max, L); // Note: this may be replaced by NiceTicks npm package.
 
@@ -231,7 +253,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
             tick_labels.push(label);
 
             // tick line start
-            if (isHorizontal) {
+            if (isTopOrBottomRuler) {
                 lines.push(tick, y_tick, z_depth); // tick line start
                 lines.push(tick, y_tick + tick_length, z_depth); // tick line end.
             } else {
@@ -254,7 +276,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                 tick_labels.push("");
                 i++;
 
-                if (isHorizontal) {
+                if (isTopOrBottomRuler) {
                     lines.push(tick, y_tick, z_depth); // tick line start
                     lines.push(tick, y_tick + 0.5 * tick_length, z_depth); // tick line end.
                 } else {
@@ -270,7 +292,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                 tick_labels.push("");
                 i++;
 
-                if (isHorizontal) {
+                if (isTopOrBottomRuler) {
                     lines.push(tick, y_tick, z_depth);
                     lines.push(tick, y_tick + 0.5 * tick_length, z_depth);
                 } else {
@@ -411,57 +433,43 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
             return;
         }
 
-        const { gl } = context;
-
-        super.draw({ moduleParameters, uniforms, context }); // For some reason this is neccessary.
-
-        const { projectionMatrix } = this.context.viewport;
-
         //gl.disable(gl.DEPTH_TEST); KEEP for now.
-
-        const { label_models, line_model, background_model } =
-            this._getModels(gl);
-
-        const fontTexture = this.state["fontTexture"];
-        for (const model of label_models) {
-            model.setUniforms({ projectionMatrix, fontTexture }).draw();
-        }
-
-        line_model.draw();
-
-        // When both parameters are negative, (decreased depth), the mesh is pulled towards the camera (hence, gets in front).
-        // When both parameters are positive, (increased depth), the mesh is pushed away from the camera (hence, gets behind).
-        gl.enable(GL.POLYGON_OFFSET_FILL);
-        gl.polygonOffset(1, 1);
-        background_model.draw();
-        gl.disable(GL.POLYGON_OFFSET_FILL);
-
+        super.draw({ moduleParameters, uniforms, context }); // For some reason this is neccessary.
         //gl.enable(gl.DEPTH_TEST);
+        return;
     }
 
-    _getModels(gl: WebGLRenderingContext): {
+    _getModels(fontTexture: Texture2D): {
         label_models: Model[];
         line_model: Model;
         background_model: Model;
     } {
+        const { gl } = this.context;
+
         // Make models for background, lines (tick marcs and axis) and labels.
 
         // Margins.
         const m = 100; // Length in pixels
-        const world_from = this.context.viewport.unproject([0, 0, 0]);
-        const world_to = this.context.viewport.unproject([0, m, 0]);
-        const v = [
+        let world_from = this.context.viewport.unproject([0, 0, 0]);
+        let world_to = this.context.viewport.unproject([m, 0, 0]);
+        let v = [
             world_from[0] - world_to[0],
             world_from[1] - world_to[1],
             world_from[2] - world_to[2],
         ];
+        const pixel2worldHor = Math.sqrt(v[0] * v[0] + v[1] * v[1]) / 100;
 
-        const pixel2world = Math.sqrt(v[0] * v[0] + v[1] * v[1]) / 100;
+        world_from = this.context.viewport.unproject([0, 0, 0]);
+        world_to = this.context.viewport.unproject([0, m, 0]);
+        v = [
+            world_from[0] - world_to[0],
+            world_from[1] - world_to[1],
+            world_from[2] - world_to[2],
+        ];
+        const pixel2worldVer = Math.sqrt(v[0] * v[0] + v[1] * v[1]) / 100;
 
-        const { viewMatrix } = this.context.viewport;
-
-        const mh = this.props.marginH * pixel2world;
-        const mv = this.props.marginV * pixel2world;
+        const mh = this.props.marginH * pixel2worldHor;
+        const mv = this.props.marginV * pixel2worldVer;
 
         const viewport_bounds_w = this.context.viewport.getBounds(); //bounds in world coordinates.
         const xBoundsMin = viewport_bounds_w[0];
@@ -483,6 +491,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         const xmin = xBoundsMin + (isL ? mh : 0);
         const xmax = xBoundsMax - (isR ? mh : 0);
         const ymin = isB ? yBoundsMin + mv : yBoundsMin;
+
         const ymax = isT ? yBoundsMax - mv : yBoundsMax;
 
         //- BOTTOM RULER ----------------------------------------
@@ -500,14 +509,15 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                 xmin,
                 xmax,
                 ViewSide.Bottom,
-                pixel2world
+                pixel2worldHor,
+                pixel2worldVer
             );
             const back_lines: number[] =
                 this.GetBacgroundTriangleLinesHorizontal(
                     xBoundsMin,
                     xBoundsMax,
                     false,
-                    pixel2world
+                    pixel2worldVer
                 );
 
             tick_and_axes_lines = [...tick_and_axes_lines, ...axes, ...ticks];
@@ -529,14 +539,15 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                 xmin,
                 xmax,
                 ViewSide.Top,
-                pixel2world
+                pixel2worldHor,
+                pixel2worldVer
             );
 
             const back_lines = this.GetBacgroundTriangleLinesHorizontal(
                 xBoundsMin,
                 xBoundsMax,
                 true, // isTop
-                pixel2world
+                pixel2worldVer
             );
 
             tick_and_axes_lines = [...tick_and_axes_lines, ...axes, ...ticks];
@@ -558,13 +569,14 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                 ymin,
                 yBoundsMax - mv,
                 ViewSide.Left,
-                pixel2world
+                pixel2worldHor,
+                pixel2worldVer
             );
             const back_lines = this.GetBacgroundTriangleLinesVertical(
                 ymin,
                 ymax,
                 true,
-                pixel2world
+                pixel2worldHor
             );
 
             tick_and_axes_lines = [...tick_and_axes_lines, ...axes, ...ticks];
@@ -586,14 +598,15 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                 ymin,
                 ymax,
                 ViewSide.Right,
-                pixel2world
+                pixel2worldHor,
+                pixel2worldVer
             );
 
             const back_lines = this.GetBacgroundTriangleLinesVertical(
                 ymin,
                 ymax,
                 false,
-                pixel2world
+                pixel2worldHor
             );
 
             tick_and_axes_lines = [...tick_and_axes_lines, ...axes, ...ticks];
@@ -674,7 +687,6 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
             }
 
             const pos_w = vec4.fromValues(x, y, z, 1); // pos world
-            const pos_view = word2view(viewMatrix, pos_w); // pos view
 
             const pixelScale = 8;
 
@@ -715,48 +727,47 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                     const v2 = glyphInfo.y / maxY;
 
                     const h = 1;
-                    const x = pos_view[0];
-                    const y = pos_view[1] - y_aligment_offset;
-                    const z = pos_view[2];
 
                     // 6 vertices per letter
                     // t1
-                    positions[offset + 0] = x + x1 * pixelScale;
-                    positions[offset + 1] = y + 0 * pixelScale;
-                    positions[offset + 2] = z; // Note: may make these vertices 2D.
+                    /*eslint-disable */
+                    positions[offset + 0] = pos_w[0] + x1 * pixelScale * pixel2worldHor; // Add a distance in view coords and convert to world
+                    positions[offset + 1] = pos_w[1] + (0 * pixelScale - y_aligment_offset)* pixel2worldVer;
+                    positions[offset + 2] = pos_w[2];
                     texcoords[offsetTexture + 0] = u1;
                     texcoords[offsetTexture + 1] = v1;
 
-                    positions[offset + 3] = x + x2 * pixelScale;
-                    positions[offset + 4] = y + 0 * pixelScale;
-                    positions[offset + 5] = z;
+                    positions[offset + 3] = pos_w[0] + x2 * pixelScale * pixel2worldHor;
+                    positions[offset + 4] = pos_w[1] + (0 * pixelScale - y_aligment_offset) * pixel2worldVer;
+                    positions[offset + 5] = pos_w[2];
                     texcoords[offsetTexture + 2] = u2;
                     texcoords[offsetTexture + 3] = v1;
 
-                    positions[offset + 6] = x + x1 * pixelScale;
-                    positions[offset + 7] = y + h * pixelScale;
-                    positions[offset + 8] = z;
+                    positions[offset + 6] = pos_w[0] + x1 * pixelScale * pixel2worldHor;
+                    positions[offset + 7] = pos_w[1] + (h * pixelScale - y_aligment_offset) * pixel2worldVer;
+                    positions[offset + 8] = pos_w[2];
                     texcoords[offsetTexture + 4] = u1;
                     texcoords[offsetTexture + 5] = v2;
 
                     // t2
-                    positions[offset + 9] = x + x1 * pixelScale;
-                    positions[offset + 10] = y + h * pixelScale;
-                    positions[offset + 11] = z;
+                    positions[offset + 9] = pos_w[0] + x1 * pixelScale * pixel2worldHor;
+                    positions[offset + 10] = pos_w[1] + (h * pixelScale - y_aligment_offset) * pixel2worldVer;
+                    positions[offset + 11] = pos_w[2];
                     texcoords[offsetTexture + 6] = u1;
                     texcoords[offsetTexture + 7] = v2;
 
-                    positions[offset + 12] = x + x2 * pixelScale;
-                    positions[offset + 13] = y + 0 * pixelScale;
-                    positions[offset + 14] = z;
+                    positions[offset + 12] = pos_w[0] + x2 * pixelScale * pixel2worldHor;
+                    positions[offset + 13] = pos_w[1] + (0 * pixelScale - y_aligment_offset) * pixel2worldVer;
+                    positions[offset + 14] = pos_w[2];
                     texcoords[offsetTexture + 8] = u2;
                     texcoords[offsetTexture + 9] = v1;
 
-                    positions[offset + 15] = x + x2 * pixelScale;
-                    positions[offset + 16] = y + h * pixelScale;
-                    positions[offset + 17] = z;
+                    positions[offset + 15] = pos_w[0] + x2 * pixelScale * pixel2worldHor;
+                    positions[offset + 16] = pos_w[1] + (h * pixelScale - y_aligment_offset) * pixel2worldVer;
+                    positions[offset + 17] = pos_w[2];
                     texcoords[offsetTexture + 10] = u2;
                     texcoords[offsetTexture + 11] = v2;
+                    /*eslint-ensable */
 
                     x1 += 1;
                     offset += 18;
@@ -767,12 +778,16 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                 }
             }
 
-            const id = `${this.props.id}-${label}`;
             const model = new Model(gl, {
-                id,
+                id: `${this.props.id}-${label}`,
                 vs: labelVertexShader,
                 fs: labelFragmentShader,
-                uniforms: { uAxisColor: lineColor, uBackGroundColor: bColor },
+
+                uniforms: {
+                    uAxisColor: lineColor,
+                    uBackGroundColor: bColor,
+                    fontTexture,
+                },
                 geometry: new Geometry({
                     drawMode: GL.TRIANGLES,
                     attributes: {
@@ -801,22 +816,26 @@ Axes2DLayer.defaultProps = defaultProps;
 
 //-- Local help functions. -------------------------------------------------
 
-function word2view(
-    viewMatrix: number[],
-    pos_w: vec4
-): [number, number, number] {
-    const pos_v = vec4.transformMat4(
-        vec4.create(),
-        pos_w,
-        mat4.fromValues(
-            ...(viewMatrix.slice(0, mat4.fromValues.length) as Parameters<
-                typeof mat4.fromValues
-            >)
-        )
-    );
+// KEEP for now.
+// USAGE:
+    // const pos_w = vec4.fromValues(x, y, z, 1); // pos world
+    // const pos_v = multMatVec(viewMatrix, pos_w); // pos view
+// function multMatVec(
+//     viewMatrix: number[],
+//     pos_w: vec4
+// ): [number, number, number] {
+//     const pos_v = vec4.transformMat4(
+//         vec4.create(),
+//         pos_w,
+//         mat4.fromValues(
+//             ...(viewMatrix.slice(0, mat4.fromValues.length) as Parameters<
+//                 typeof mat4.fromValues
+//             >)
+//         )
+//     );
 
-    return pos_v.slice(0, 3) as [number, number, number];
-}
+//     return pos_v.slice(0, 3) as [number, number, number];
+// }
 
 function LineLengthInPixels(
     p0: Position3D,

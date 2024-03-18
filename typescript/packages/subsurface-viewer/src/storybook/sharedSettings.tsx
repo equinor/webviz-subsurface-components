@@ -235,11 +235,12 @@ export const customLayerWithPolygonDataProps: GeoJsonLayerProps = {
             ],
         },
     },
-    getLineWidth: 20,
-    lineWidthMinPixels: 2,
-    getLineColor: [0, 255, 255],
-    getFillColor: [0, 255, 0],
-    opacity: 0.3,
+    getLineWidth: 1,
+    lineWidthMinPixels: 1,
+    lineWidthMaxPixels: 1,
+    getLineColor: [0, 0, 0],
+    getFillColor: [255, 255, 0],
+    opacity: 1.0,
 };
 
 export const customLayerWithPolygonData = {

@@ -1,6 +1,6 @@
 export default `\
 #version 300 es
-#define SHADER_NAME graph-layer-fragment-shader
+#define SHADER_NAME  graph-layer-fragment-shader
 
 precision highp float;
 
@@ -32,6 +32,5 @@ void main(void) {
   float b = x * text_b + (1.0 - x) * bg_b;
 
   fragColor = vec4(r, g, b, 1.0);
-  return;
 }
 `;
