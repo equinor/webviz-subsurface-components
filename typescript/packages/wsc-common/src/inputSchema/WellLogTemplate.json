@@ -97,12 +97,16 @@
                     "$ref": "#/definitions/css_color",
                     "description": "for 'differetial' plot"
                 },
+                "showLines": {
+                    "type": "boolean",
+                    "description": "for 'stacked' plot"
+                },
                 "showLabels": {
                     "type": "boolean",
                     "description": "for 'stacked' plot"
                 },
-                "showLines": {
-                    "type": "boolean",
+                "labelRotation": {
+                    "type": "number",
                     "description": "for 'stacked' plot"
                 }
             }
