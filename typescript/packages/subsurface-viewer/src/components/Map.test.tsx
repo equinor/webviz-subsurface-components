@@ -1,14 +1,11 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import "@testing-library/jest-dom/extend-expect";
-import { render } from "@testing-library/react";
-import "jest-styled-components";
-import "@testing-library/jest-dom";
-import React from "react";
 import type { LayersList } from "@deck.gl/core/typed";
-import Map from "./Map";
-import { EmptyWrapper } from "../test/TestWrapper";
 import { colorTables } from "@emerson-eps/color-tables";
 import type { colorTablesArray } from "@emerson-eps/color-tables/";
+import "@testing-library/jest-dom";
+import { render } from "@testing-library/react";
+import "jest-styled-components";
+import React from "react";
 import {
     ColormapLayer,
     DrawingLayer,
@@ -18,9 +15,11 @@ import {
     PieChartLayer,
     WellsLayer,
 } from "../layers";
+import { EmptyWrapper } from "../test/TestWrapper";
+import Map from "./Map";
 
-import mapData from "../../../../../example-data/deckgl-map.json";
 import type { Unit } from "convert-units";
+import mapData from "../../../../../example-data/deckgl-map.json";
 const colorTablesData = colorTables as colorTablesArray;
 const testBounds = [432205, 6475078, 437720, 6481113] as [
     number,
