@@ -1,3 +1,10 @@
+## [1.5.4](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.5.3...well-log-viewer@1.5.4) (2024-03-18)
+
+
+### Bug Fixes
+
+* speedup well log viewer ([#1970](https://github.com/equinor/webviz-subsurface-components/issues/1970)) ([795b4fb](https://github.com/equinor/webviz-subsurface-components/commit/795b4fb6facb2cde5780dac9eaa6b199e7b87bd3))
+
 ## [1.5.3](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.5.2...well-log-viewer@1.5.3) (2024-03-15)
 
 
