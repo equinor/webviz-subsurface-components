@@ -214,18 +214,29 @@ export class TrackPropertiesDialog extends Component<Props, State> {
                                   createBooleanItems()
                               ),
                               this.createSelectControl(
-                                "showLabels",
-                                "Labels",
-                                createBooleanItems()
-                            ),
-                            <TextField 
-                                type="number"
-                                id="labelRotation"
-                                label="Labels Rotation"
-                                value={this.state.labelRotation}
-                                onChange={(e)=> {this.setState({ [e.target.id]: Number(e.target.value) } as unknown as State)} }
-                                InputProps={{ inputProps: { min: -180, max: 180, step:10 } }}
-                            />
+                                  "showLabels",
+                                  "Labels",
+                                  createBooleanItems()
+                              ),
+                              <TextField
+                                  type="number"
+                                  id="labelRotation"
+                                  label="Labels Rotation"
+                                  key="labelRotation"
+                                  value={this.state.labelRotation}
+                                  onChange={(e) => {
+                                      this.setState({
+                                          [e.target.id]: Number(e.target.value),
+                                      } as unknown as State);
+                                  }}
+                                  InputProps={{
+                                      inputProps: {
+                                          min: -180,
+                                          max: 180,
+                                          step: 10,
+                                      },
+                                  }}
+                              />,
                           ]
                         : [
                               this.createSelectControl(

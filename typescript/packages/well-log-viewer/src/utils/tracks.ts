@@ -1356,7 +1356,7 @@ function addStackedTrack(
     if (plot) {
         plot.showLabels = showLabels;
         plot.showLines = showLines;
-        plot.labelRotation = labelRotation || 0;
+        plot.labelRotation = labelRotation ?? 0;
     }
 
     const options: StackedTrackOptions = {
@@ -1498,7 +1498,7 @@ function setStackedTrackOptionsFromTemplate(
     if (plot) {
         options.showLabels = plot.showLabels;
         options.showLines = plot.showLines;
-        options.labelRotation =plot.labelRotation || 0;
+        options.labelRotation = plot.labelRotation ?? 0;
     }
 
     setTrackOptionsFromTemplate(options, templateTrack);
