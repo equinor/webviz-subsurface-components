@@ -170,7 +170,6 @@ jobs:
         run: npm run build-storybook
 
       - name: Run smoke tests
-
         env:
           PORT: 8080
           HOST: 127.0.0.1
@@ -179,3 +178,25 @@ jobs:
           npx concurrently -k -s first -n "SB,TEST" -c "magenta,blue" \
             "npx http-server storybook-static --port $PORT -a $HOST" \
             "npx wait-on http://$HOST:$PORT/ && npm run docker:storybook:test:update"
+
+      # upload the failure screenshots for reference
+      - name: upload artifacts
+        uses: actions/upload-artifact@v2
+        if: github.event_name != 'release' && failure()
+        with:
+          name: smoke-screenshots
+          path: typescript/packages/**/__image_snapshots__/*.png
+          retention-days: 5
+
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@5a6b15373e5788c38d83296b674ad5abea28085c
+        if: steps.check_file_changed.outputs.status == 'true' && github.event_name == 'push' && (github.ref == 'refs/heads/master' || contains(github.event.head_commit.message, '[deploy test]')) && failure()
+        with:
+          commit-message: updated smoke snapshots
+          title: Smoke tests - New Snapshots generated for the commit "${{ github.event.head_commit.message }}" by ${{ github.event.commits[0].author.email }}
+          body: This is an auto-generated PR to update smoke snapshots.
+          base: smoke-snaps
+          reviewers: ${{ github.event.sender.login }}
+          delete-branch: true
+
