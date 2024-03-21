@@ -24,7 +24,7 @@
         "build-storybook": "storybook build",
         "storybook:test": "test-storybook",
         "docker:build": "docker build --tag wsc_story_test --file Dockerfile.test .",
-        "docker:storybook:test": "docker run -it --rm --mount type=bind,source=./packages,target=/test/packages --network host --ipc=host wsc_story_test",
+        "docker:storybook:test": "docker run -it --rm --mount type=bind,source=$(pwd)/packages,target=/test/packages --network host --ipc=host wsc_story_test",
         "docker:storybook:test:update": "npm run docker:storybook:test -- npm run storybook:test -- --updateSnapshot",
         "cy:run": "npx cypress run -b chrome --component --headed",
         "postpack": "npm run tidy-up",
