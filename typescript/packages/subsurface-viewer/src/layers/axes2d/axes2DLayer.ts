@@ -1,4 +1,4 @@
-import type { Viewport, LayerContext } from "@deck.gl/core/typed";
+import type { Viewport, LayerContext, UpdateParameters } from "@deck.gl/core/typed";
 import {
     Layer,
     project,
@@ -140,8 +140,9 @@ const fontInfo = {
 };
 
 export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
-    shouldUpdateState() {
-        return true;
+    shouldUpdateState({ changeFlags }: UpdateParameters<this>) {
+        console.log(changeFlags.viewportChanged)
+        return changeFlags.viewportChanged;
     }
 
     updateState() {
