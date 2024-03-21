@@ -482,7 +482,7 @@ const TypedArrayInputComponent: React.FC<{
             rotationOrbit: 45,
             rotationX: 45,
             zoom: [-100, -100, -10, 100, 100, 60] as BoundingBox3D,
-            target: [0, 0, 0],
+            target: [],
         },
         views: default3DViews,
         triggerHome: args.triggerHome,

@@ -1623,7 +1623,11 @@ function cameraHasZoom(camera: ViewStateType | undefined): boolean {
  * @returns true if the camera camera target is set.
  */
 function cameraHasTarget(camera: ViewStateType | undefined): boolean {
-    return !!camera && camera.target.length >= 2 && camera.target.length <= 3;
+    return (
+        Array.isArray(camera?.target) &&
+        camera.target.length >= 2 &&
+        camera.target.length <= 3
+    );
 }
 
 /**
@@ -1762,8 +1766,8 @@ function computeViewState(
             );
         }
         const defaultCamera = {
-            target: [0, 0, 0],
-            zoom: NaN,
+            target: [], // force computation from the bounding box 3D
+            zoom: NaN, // force computation from the bounding box 3D
             rotationX: 45, // look down z -axis at 45 degrees
             rotationOrbit: 0,
         };
