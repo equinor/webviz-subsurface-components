@@ -57,13 +57,17 @@ enum ViewSide {
     Top,
 }
 
-const zDepthAxesBackground = 90;
-const zDepthAxesAxis = zDepthAxesBackground + 1;
-const zDepthAxesTicksAndLabels = zDepthAxesAxis + 1;
+const zDepthAxesBackground = 0;
+const zDepthAxesAxis = zDepthAxesBackground + 100;
+const zDepthAxesTicksAndLabels = zDepthAxesAxis;
+
+const tickLineLength = 10;
+const pixelScale = 8;
 
 export interface Axes2DLayerProps extends ExtendedLayerProps {
     marginH: number;
     marginV: number;
+    formatLabelFunc?: (x: number) => string;
     labelColor?: Color;
     labelFontSize?: number;
     fontFamily?: string;
@@ -144,8 +148,20 @@ const fontInfo = {
 };
 
 export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
-    shouldUpdateState({ changeFlags }: UpdateParameters<this>) {
-        return changeFlags.viewportChanged;
+    shouldUpdateState({
+        props,
+        oldProps,
+        context,
+        changeFlags,
+    }: UpdateParameters<this>): boolean {
+        return (
+            super.shouldUpdateState({
+                props,
+                oldProps,
+                context,
+                changeFlags,
+            }) || changeFlags.viewportChanged
+        );
     }
 
     updateState() {
@@ -222,7 +238,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         const isTopOrBottomRuler =
             viewSide === ViewSide.Top || viewSide === ViewSide.Bottom;
 
-        const m = 10; // Length in pixels
+        const m = tickLineLength; // Length in pixels
         const delta = isTopOrBottomRuler
             ? m * pixel2worldVer
             : m * pixel2worldHor;
@@ -253,7 +269,12 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         for (let i = 0; i < ticks.length; i++) {
             const tick = ticks[i];
 
-            const label = tick.toFixed(ndecimals);
+            let label = tick.toFixed(ndecimals);
+            if (this.props.formatLabelFunc) {
+                label = this.props.formatLabelFunc(tick) as string;
+                label = label.replace("e", "E"); // this font atlas does not have "e"
+                label = label.replace("\u2212", "-"); // use standard minus sign
+            }
             tick_labels.push(label);
 
             // tick line start
@@ -648,7 +669,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
 
         //-- Background model --
         // Color on axes background.
-        let bColor = [1.0, 1.0, 1.0, 1.0];
+        let bColor = [0.5, 0.5, 0.5, 1.0];
         if (typeof this.props.backgroundColor !== "undefined") {
             bColor = this.props.backgroundColor as number[];
             if (bColor.length === 3) {
@@ -691,8 +712,6 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
             }
 
             const pos_w = vec4.fromValues(x, y, z, 1); // pos world
-
-            const pixelScale = 8;
 
             const len = label.length;
             const numVertices = len * 6;
@@ -786,7 +805,6 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                 id: `${this.props.id}-${label}`,
                 vs: labelVertexShader,
                 fs: labelFragmentShader,
-
                 uniforms: {
                     uAxisColor: lineColor,
                     uBackGroundColor: bColor,
