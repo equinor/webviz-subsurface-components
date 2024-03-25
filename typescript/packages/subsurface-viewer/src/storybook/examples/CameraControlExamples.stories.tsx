@@ -63,11 +63,11 @@ const SQUARE = {
         type: "Polygon",
         coordinates: [
             [
+                [-5, -5],
+                [-5, 5],
                 [5, 5],
-                [5, 1500],
-                [1500, 1500],
-                [1500, 5],
-                [5, 5],
+                [5, -5],
+                [-5, -5],
             ],
         ],
     },
@@ -528,10 +528,11 @@ export const AddLayer: StoryObj<typeof SubsurfaceViewer> = {
 const ScaleYComponent = ({ verticalScale }: { verticalScale: number }) => {
     const viewerProps: SubsurfaceViewerProps = {
         id: "ScaleY",
-        bounds: [-1000, -1000, 3000, 3000],
+        bounds: [-10, -10, 10, 10],
         layers: [
             new Axes2DLayer({
                 id: "axes",
+                backgroundColor: [0, 155, 155],
             }),
             new GeoJsonLayer({
                 ...customLayerWithPolygonDataProps,
