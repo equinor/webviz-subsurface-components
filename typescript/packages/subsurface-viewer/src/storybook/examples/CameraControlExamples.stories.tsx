@@ -260,7 +260,7 @@ const AutoZoomToBox = (args: SubsurfaceViewerProps) => {
         rotationX: rotX,
         rotationOrbit: rotZ,
         zoom: zoomBox3D,
-        target: [0, 0, 0],
+        target: [],
     };
 
     const props = {
@@ -510,7 +510,7 @@ export const AddLayer: StoryObj<typeof SubsurfaceViewer> = {
             rotationOrbit: 45,
             rotationX: 45,
             zoom: hugin3DBounds,
-            target: [0, 0, 0],
+            target: [],
         },
         views: default3DViews,
     },
