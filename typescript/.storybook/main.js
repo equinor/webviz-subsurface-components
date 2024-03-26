@@ -9,7 +9,6 @@ module.exports = {
         getAbsolutePath("@storybook/addon-essentials"),
         getAbsolutePath("@storybook/addon-actions"),
         getAbsolutePath("@storybook/addon-storysource"),
-        getAbsolutePath("@storybook/addon-mdx-gfm"),
         getAbsolutePath("@storybook/addon-webpack5-compiler-babel"),
     ],
     webpackFinal: (config) => {
