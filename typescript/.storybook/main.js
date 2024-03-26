@@ -2,16 +2,15 @@ import { dirname, join } from "path";
 module.exports = {
     stories: [
         "../packages/*/src/**/*.mdx",
-        "../packages/*/src/**/*.stories.@(js|jsx|ts|tsx)"
+        "../packages/*/src/**/*.stories.@(js|jsx|ts|tsx)",
     ],
     addons: [
         getAbsolutePath("@storybook/addon-links"),
         getAbsolutePath("@storybook/addon-essentials"),
         getAbsolutePath("@storybook/addon-actions"),
-        getAbsolutePath("@storybook/addon-docs"),
         getAbsolutePath("@storybook/addon-storysource"),
         getAbsolutePath("@storybook/addon-mdx-gfm"),
-        "@storybook/addon-webpack5-compiler-babel"
+        getAbsolutePath("@storybook/addon-webpack5-compiler-babel"),
     ],
     webpackFinal: (config) => {
         config.module.rules.push(
