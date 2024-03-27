@@ -179,7 +179,6 @@ jobs:
             "npx http-server storybook-static --port $PORT -a $HOST" \
             "npx wait-on http://$HOST:$PORT/ && npm run storybook:test -- --updateSnapshot --ci --url http://$HOST:$PORT/"
 
-
       # upload the failure screenshots for reference
       # - name: upload artifacts
       #   uses: actions/upload-artifact@v4
@@ -192,7 +191,7 @@ jobs:
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@5a6b15373e5788c38d83296b674ad5abea28085c
-        if: github.event_name == 'push' && (github.ref != 'refs/heads/master' || contains(github.event.head_commit.message, '[deploy test]'))
+        if: github.event_name == 'pull_request' && (github.ref != 'refs/heads/master' || contains(github.event.head_commit.message, '[deploy test]'))
         with:
           commit-message: updated smoke snapshots
           title: Smoke tests - New Snapshots generated for the commit "${{ github.event.head_commit.message }}" by ${{ github.event.commits[0].author.email }}
@@ -200,4 +199,3 @@ jobs:
           base: smoke-snaps
           reviewers: ${{ github.event.sender.login }}
           delete-branch: true
-
