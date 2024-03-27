@@ -20,7 +20,7 @@ const ComponentCode =
 
 import { axisTitles, axisMnemos } from "../utils/axes";
 
-const stories /*: Meta*/ = {
+const stories: Meta = {
     component: WellLogView,
     title: "WellLogViewer/Components/WellLogView",
     parameters: {

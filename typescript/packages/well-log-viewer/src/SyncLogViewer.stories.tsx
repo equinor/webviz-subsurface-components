@@ -430,6 +430,7 @@ const TemplateWithSelection = (args) => {
     );
 };
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const args = require("../../../../example-data/facies3wells.json");
 
 export const DiscreteLogs: StoryObj<typeof TemplateWithSelection> = {
