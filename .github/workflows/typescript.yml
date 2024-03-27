@@ -143,3 +143,59 @@ jobs:
           npx concurrently -k -s first -n "SB,TEST" -c "magenta,blue" \
             "npx http-server storybook-static --port $PORT -a $HOST" \
             "npx wait-on http://$HOST:$PORT/ && npm run storybook:test -- --ci --url http://$HOST:$PORT/"
+
+  smoke_tests_update:
+    # Run on all events defined above, except pushes which are not to master
+    if: github.event_name != 'push' || github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    name: "Storybook Smoke Tests Update"
+
+    container:
+      image: mcr.microsoft.com/playwright:v1.39.0-jammy
+      options: --user 1001
+
+    steps:
+      - name: 📖 Checkout commit locally
+        uses: actions/checkout@v3
+
+      - name: 📦 Install build dependencies
+        run: |
+          npm ci CYPRESS_INSTALL_BINARY=0 --ignore-scripts
+
+      - name: 🏗️ Build packages
+        run: |
+          npx nx run-many -t build
+
+      - name: 📚 Build Storybook
+        run: npm run build-storybook
+
+      - name: Run smoke tests
+        env:
+          PORT: 8080
+          HOST: 127.0.0.1
+
+        run: |
+          npx concurrently -k -s first -n "SB,TEST" -c "magenta,blue" \
+            "npx http-server storybook-static --port $PORT -a $HOST" \
+            "npx wait-on http://$HOST:$PORT/ && npm run storybook:test -- --updateSnapshot --ci --url http://$HOST:$PORT/"
+
+      # upload the failure screenshots for reference
+      # - name: upload artifacts
+      #   uses: actions/upload-artifact@v4
+      #   if: github.event_name != 'release'
+      #   with:
+      #     name: smoke-screenshots
+      #     path: typescript/packages/**/__image_snapshots__/*.png
+      #     retention-days: 5
+
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@5a6b15373e5788c38d83296b674ad5abea28085c
+        if: github.event_name == 'pull_request' && (github.ref != 'refs/heads/master' || contains(github.event.head_commit.message, '[deploy test]'))
+        with:
+          commit-message: updated smoke snapshots
+          title: Smoke tests - New Snapshots generated for the commit "${{ github.event.head_commit.message }}" by ${{ github.event.commits[0].author.email }}
+          body: This is an auto-generated PR to update smoke snapshots.
+          base: smoke-snaps
+          reviewers: ${{ github.event.sender.login }}
+          delete-branch: true
