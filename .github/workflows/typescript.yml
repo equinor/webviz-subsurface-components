@@ -144,9 +144,10 @@ jobs:
             "npx http-server storybook-static --port $PORT -a $HOST" \
             "npx wait-on http://$HOST:$PORT/ && npm run storybook:test -- --ci --url http://$HOST:$PORT/"
 
+  # Update story smoke test snapshots
   smoke_tests_update:
-    # Run on all events defined above, except pushes which are not to master
-    if: github.event_name != 'push' || github.ref == 'refs/heads/master'
+    # Run on push to PR
+    if: github.event_name == 'push' && github.ref != 'refs/heads/master'
     runs-on: ubuntu-latest
     name: "Storybook Smoke Tests Update"
 
@@ -179,7 +180,6 @@ jobs:
             "npx http-server storybook-static --port $PORT -a $HOST" \
             "npx wait-on http://$HOST:$PORT/ && npm run storybook:test -- --updateSnapshot --ci --url http://$HOST:$PORT/"
 
-
       # upload the failure screenshots for reference
       # - name: upload artifacts
       #   uses: actions/upload-artifact@v4
@@ -200,4 +200,3 @@ jobs:
           base: smoke-snaps
           reviewers: ${{ github.event.sender.login }}
           delete-branch: true
-
