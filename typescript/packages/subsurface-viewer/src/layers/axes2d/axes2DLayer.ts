@@ -58,7 +58,7 @@ enum ViewSide {
 }
 
 const zDepthAxesBackground = 0;
-const zDepthAxesAxis = zDepthAxesBackground + 100;
+const zDepthAxesAxis = zDepthAxesBackground + 999;
 const zDepthAxesTicksAndLabels = zDepthAxesAxis;
 
 const tickLineLength = 10;
