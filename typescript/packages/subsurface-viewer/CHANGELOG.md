@@ -1,3 +1,17 @@
+## [0.20.9](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.20.8...subsurface-viewer@0.20.9) (2024-03-25)
+
+
+### Bug Fixes
+
+* disable manipulation and fix matrix error before camera initialization ([#1978](https://github.com/equinor/webviz-subsurface-components/issues/1978)) ([94e070a](https://github.com/equinor/webviz-subsurface-components/commit/94e070ac9860c5e9f7af56b43ccfec9da56273cd))
+
+## [0.20.8](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.20.7...subsurface-viewer@0.20.8) (2024-03-21)
+
+
+### Bug Fixes
+
+* "Incorrect 2D axes rendering with vertical scaling [#1957](https://github.com/equinor/webviz-subsurface-components/issues/1957)" ([#1971](https://github.com/equinor/webviz-subsurface-components/issues/1971)) ([8f24c5e](https://github.com/equinor/webviz-subsurface-components/commit/8f24c5e638d9679a8638de78be8dc686a22ce12f))
+
 ## [0.20.7](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.20.6...subsurface-viewer@0.20.7) (2024-03-18)
 
 
