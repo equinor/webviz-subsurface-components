@@ -1,9 +1,11 @@
+import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
+
 import ZoomSlider from "./ZoomSlider";
 
 const ComponentCode = "<ZoomSlider value={1} max={128}/>";
 
-export default {
+const stories: Meta = {
     component: ZoomSlider,
     title: "WellLogViewer/Components/ZoomSlider",
     parameters: {
@@ -33,6 +35,7 @@ export default {
         },
     },
 };
+export default stories;
 
 const Template = (args) => {
     return (
@@ -45,8 +48,10 @@ const Template = (args) => {
     );
 };
 
-export const Default = Template.bind({});
-Default.args = {
-    value: 1,
-    max: 128,
+export const Default: StoryObj<typeof Template> = {
+    args: {
+        value: 1,
+        max: 128,
+    },
+    render: (args) => <Template {...args} />,
 };

@@ -1,4 +1,7 @@
+import type { Meta, StoryObj } from "@storybook/react";
+import { fn } from "@storybook/test";
 import React from "react";
+
 import WellLogViewWithScroller from "./WellLogViewWithScroller";
 import { argTypesWellLogViewScrollerProp } from "./WellLogViewWithScroller";
 import { colorTables } from "@emerson-eps/color-tables";
@@ -13,7 +16,7 @@ const ComponentCode =
 
 import { axisTitles, axisMnemos } from "../utils/axes";
 
-export default {
+const stories /*: Meta*/ = {
     component: WellLogViewWithScroller,
     title: "WellLogViewer/Components/WellLogViewWithScroller",
     parameters: {
@@ -28,6 +31,16 @@ export default {
             language: "javascript",
         },
     },
+    args: {
+        // must be explicitely set starting storybook V 8
+        onCreateController: fn(),
+        onInfo: fn(),
+        onTrackScroll: fn(),
+        onTrackSelection: fn(),
+        onContentRescale: fn(),
+        onContentSelection: fn(),
+        onScrollerScroll: fn(),
+    },
     argTypes: {
         ...argTypesWellLogViewScrollerProp,
         id: {
@@ -36,6 +49,7 @@ export default {
         },
     },
 };
+export default stories;
 
 const Template = (args) => {
     return (
@@ -52,18 +66,21 @@ const Template = (args) => {
     );
 };
 
-const wellLog = require("../../../../../example-data/L898MUD.json")[0];// eslint-disable-line
-export const Default = Template.bind({});
-Default.args = {
-    id: "Well-Log-Viewer-With-Scroller",
-    horizontal: false,
-    welllog: wellLog,
-    template: require("../../../../../example-data/welllog_template_1.json"),
-    viewTitle: "Well '" + wellLog.header.well + "'",
-    colorTables: colorTables,
-    axisTitles: axisTitles,
-    axisMnemos: axisMnemos,
-    options: {
-        checkDatafileSchema: true,
+const wellLog = require("../../../../../example-data/L898MUD.json")[0]; // eslint-disable-line
+
+export const Default: StoryObj<typeof Template> = {
+    args: {
+        id: "Well-Log-Viewer-With-Scroller",
+        horizontal: false,
+        welllog: wellLog,
+        template: require("../../../../../example-data/welllog_template_1.json"),
+        viewTitle: "Well '" + wellLog.header.well + "'",
+        colorTables: colorTables,
+        axisTitles: axisTitles,
+        axisMnemos: axisMnemos,
+        options: {
+            checkDatafileSchema: true,
+        },
     },
+    render: (args) => <Template {...args} />,
 };
