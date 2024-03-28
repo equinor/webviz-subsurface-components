@@ -1,0 +1,15 @@
+{
+  "changelog": true,
+  "npm": true,
+  "github": true,
+  "githubOptions": {
+    "successComment": ":tada: This issue has been resolved in version ${nextRelease.gitTag} :tada:\n\nThe release is available on [GitHub release](<github_release_url>)"
+  },
+  "repositoryUrl": "https://github.com/equinor/webviz-subsurface-components",
+  "branches": [
+    "master"
+  ],
+  "buildTarget": "${PROJECT_NAME}:build",
+  "outputPath": "${PROJECT_DIR}/dist",
+  "tagFormat": "${PROJECT_NAME}@${version}"
+}

@@ -1,0 +1,38 @@
+import React from "react";
+
+import { WellLog } from "./WellLogTypes";
+import SyncLogViewer from "../SyncLogViewer";
+
+import WellLogZoomSlider from "./WellLogZoomSlider";
+import WellLogInfoPanel from "./WellLogInfoPanel";
+import WellLogAxesPanel from "./WellLogAxesPanel";
+
+export function defaultRightPanel(parent: SyncLogViewer): JSX.Element {
+    return (
+        <div className="right-panel" key="rightPanel">
+            <WellLogAxesPanel
+                callbacksManager={parent.callbacksManagers[0]}
+                header="Primary scale"
+                axisTitles={parent.props.axisTitles}
+                axisMnemos={parent.props.axisMnemos}
+                primaryAxis={parent.getPrimaryAxis()}
+                onChangePrimaryAxis={parent.onChangePrimaryAxis}
+            />
+            {parent.props.welllogs?.map(
+                (welllog: WellLog, iWellLog: number) => (
+                    <WellLogInfoPanel
+                        key={iWellLog}
+                        header={"Readout " + welllog.header.well}
+                        callbacksManager={parent.callbacksManagers[iWellLog]}
+                        readoutOptions={parent.props.readoutOptions}
+                    />
+                )
+            )}
+            <WellLogZoomSlider
+                label="Zoom:"
+                callbacksManager={parent.callbacksManagers[0]}
+                max={parent.props.welllogOptions?.maxContentZoom}
+            />
+        </div>
+    );
+}

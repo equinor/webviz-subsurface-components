@@ -1,0 +1,104 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Test Info panel snapshot test 1`] = `
+<div
+  class="readout"
+>
+  <fieldset>
+    <legend>
+      Readout
+    </legend>
+    <table>
+      <tbody>
+        <tr>
+          <td
+            class="row-info"
+            style="color: black;"
+          >
+            ⬤
+          </td>
+          <td
+            class="row-name"
+            title="DVER"
+          />
+          <td
+            class="row-value"
+            colspan="1"
+            title="2366"
+          />
+          <td
+            class="row-units"
+            title="M"
+          />
+        </tr>
+        <tr>
+          <td
+            colspan="4"
+          >
+             
+            <hr />
+          </td>
+        </tr>
+        <tr>
+          <td
+            class="row-info"
+            style="color: orange;"
+          >
+            ⬤
+          </td>
+          <td
+            class="row-name"
+            title="BDIA"
+          />
+          <td
+            class="row-value"
+            colspan="1"
+            title="8.5"
+          />
+          <td
+            class="row-units"
+            title="INCH"
+          />
+        </tr>
+      </tbody>
+    </table>
+  </fieldset>
+</div>
+`;
+
+exports[`Test Info panel snapshot test when value is infinity 1`] = `
+<div
+  class="readout"
+>
+  <fieldset>
+    <legend>
+      Readout
+    </legend>
+    <table>
+      <tbody>
+        <tr>
+          <td
+            class="row-info"
+            style="color: black;"
+          >
+            ⬤
+          </td>
+          <td
+            class="row-name"
+            title="DVER"
+          />
+          <td
+            class="row-value"
+            colspan="1"
+            title=" "
+          />
+          <td
+            class="row-units"
+            title="M"
+          />
+        </tr>
+      </tbody>
+    </table>
+  </fieldset>
+</div>
+`;

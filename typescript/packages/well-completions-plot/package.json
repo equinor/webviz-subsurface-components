@@ -1,0 +1,30 @@
+{
+    "name": "@webviz/well-completions-plot",
+    "version": "1.2.11",
+    "description": "",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "files": [
+        "/dist"
+    ],
+    "scripts": {
+        "transpile": "tsc --project ./tsconfig.json",
+        "copy-files": "copyfiles --up 1 \"src/**/*.css\" dist/",
+        "build": "git clean -xdff dist && npm run transpile && npm run copy-files",
+        "test_perf": "jest _performance",
+        "test_correctness": "jest --coverage --testPathIgnorePatterns='_performance'",
+        "test": "jest --coverage",
+        "test:update": "npm test -- --u",
+        "test:watch": "npm test -- --watch",
+        "doc": "git clean -xdff docs && typedoc src"
+    },
+    "author": "Equinor <opensource@equinor.com>",
+    "license": "MPL-2.0",
+    "dependencies": {
+        "react-resize-detector": "^10.0.1",
+        "react-tooltip": "^4.2.21"
+    },
+    "volta": {
+        "node": "18.17.0"
+    }
+}

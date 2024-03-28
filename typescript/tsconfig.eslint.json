@@ -1,0 +1,27 @@
+{
+    "extends": "./tsconfig.json",
+    "include": [
+        "packages/*/src/",
+        "packages/*/demo/*.js",
+        "*.json",
+        "*.js",
+        "packages/*/*.json",
+        "packages/*/*.js",
+        ".storybook/*",
+        "*.ts",
+        "__mocks__",
+        "config"
+    ],
+    // exclude is overwritten, replicate in .eslintignore
+    "exclude": [
+        "coverage",
+        "dist",
+        "docs",
+        "example-data",
+        "node_modules",
+        "src/storybook",
+        "src/test",
+        "./storybook",
+        "./package-lock.json"
+    ]
+}

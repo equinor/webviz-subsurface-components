@@ -1,0 +1,11 @@
+version: 2
+updates:
+  # Enable version updates for npm
+  - package-ecosystem: "npm"
+    directory: "/typescript"
+    # Check the npm registry for updates every day (weekdays)
+    schedule:
+      interval: "daily"
+    commit-message:
+      prefix: fix
+      prefix-development: chore

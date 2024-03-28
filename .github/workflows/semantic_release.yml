@@ -1,0 +1,32 @@
+name: Semantic Release
+
+on:
+  push:
+    branches:
+      - 'master'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: configure git
+        run: |
+          git config user.name "hkfb"
+          git config user.email "hkfb@users.noreply.github.com"
+
+      - run: npm ci
+        working-directory: ./typescript
+
+      - name: Run semantic release
+        working-directory: ./typescript
+        run: npx nx run-many --target=semantic-release --parallel=false
+        env:
+          GITHUB_TOKEN: ${{ secrets.SEMANTIC_RELEASE_GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.SEMANTIC_RELEASE_GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

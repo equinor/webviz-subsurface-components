@@ -1,0 +1,616 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Test Info Card snapshot test when property value provided 1`] = `
+.c1 {
+  display: grid;
+  grid-gap: var(--eds_button__gap,8px);
+  grid-auto-flow: column;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  height: 100%;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.c1 > :is(svg,img) {
+  margin-top: var(--eds_button__icon__margin_y,0);
+  margin-bottom: var(--eds_button__icon__margin_y,0);
+}
+
+.c0 {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  position: relative;
+  cursor: pointer;
+  display: inline-block;
+  background: transparent;
+  height: var(--eds_button__height,36px);
+  padding-left: var(--eds_button__padding_x,16px);
+  padding-top: var(--eds_button__padding_y,0);
+  padding-right: var(--eds_button__padding_x,16px);
+  padding-bottom: var(--eds_button__padding_y,0);
+  border: var(--eds_button__border_width,1px) solid transparent;
+  border-radius: var(--eds_button__radius,4px);
+  margin: 0;
+  color: var(--eds_interactive_primary__resting,rgba(0,112,121,1));
+  font-family: Equinor;
+  font-size: var(--eds_button__font_size,0.875rem);
+  font-weight: 500;
+  line-height: 1.143em;
+  text-align: center;
+}
+
+.c0 svg {
+  justify-self: center;
+}
+
+.c0::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: auto;
+  min-height: auto;
+  content: '';
+}
+
+.c0::after {
+  position: absolute;
+  top: -7px;
+  left: -0;
+  width: 100%;
+  height: 48px;
+  content: '';
+}
+
+.c0:focus {
+  outline: none;
+}
+
+.c0[data-focus-visible-added]:focus {
+  outline: 2px dashed rgba(0,112,121,1);
+  outline-offset: 3px;
+}
+
+.c0:focus-visible {
+  outline: 2px dashed rgba(0,112,121,1);
+  outline-offset: 3px;
+}
+
+.c0::-moz-focus-inner {
+  border: 0;
+}
+
+.c0:disabled,
+.c0[aria-disabled='true'] {
+  cursor: not-allowed;
+  background: transparent;
+  border: 1px solid transparent;
+  margin: 0;
+  color: var(--eds_interactive__disabled__text,rgba(190,190,190,1));
+  font-family: Equinor;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.143em;
+  text-align: center;
+}
+
+.c2 {
+  -webkit-transform: none;
+  -ms-transform: none;
+  transform: none;
+}
+
+@media (hover:hover) and (pointer:fine) {
+  .c0:hover {
+    background: var(--eds_interactive_primary__hover_alt,rgba(222,237,238,1));
+    color: var(--eds_interactive_primary__hover,rgba(0,79,85,1));
+    border: 1px solid transparent;
+    border-radius: var(--eds_button__radius,4px);
+  }
+}
+
+@media (hover:hover) and (pointer:fine) {
+  .c0:disabled:hover,
+  .c0[aria-disabled='true']:hover {
+    background: transparent;
+  }
+}
+
+<div
+  class="MuiTableContainer-root css-rorn0c-MuiTableContainer-root"
+>
+  <table
+    aria-label="info-card"
+    class="MuiTable-root css-t8ttc-MuiTable-root"
+  >
+    <tbody
+      class="MuiTableBody-root css-apqrd9-MuiTableBody-root"
+    >
+      <tr
+        class="MuiTableRow-root css-229i8j-MuiTableRow-root"
+      >
+        <td
+          class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-spv49l-MuiTableCell-root"
+        >
+          <button
+            class="c0"
+            style="padding: 0px;"
+            tabindex="0"
+            type="button"
+          >
+            <span
+              class="c1"
+            >
+              <svg
+                aria-hidden="true"
+                class="c2"
+                fill="currentColor"
+                height="24px"
+                viewBox="0 0 24 24"
+                width="24px"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  class=""
+                  clip-rule="evenodd"
+                  d="m7 14.5 5-5 5 5H7Z"
+                  data-testid="eds-icon-path"
+                  fill-rule="evenodd"
+                />
+              </svg>
+            </span>
+          </button>
+        </td>
+        <td
+          class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-1ex1afd-MuiTableCell-root"
+        >
+           
+          Position
+           
+        </td>
+      </tr>
+      <tr
+        class="MuiTableRow-root css-229i8j-MuiTableRow-root"
+      >
+        <td
+          class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-1ex1afd-MuiTableCell-root"
+          colspan="2"
+          style="padding-bottom: 0px; padding-top: 0px;"
+        >
+          <div
+            class="MuiCollapse-root MuiCollapse-vertical MuiCollapse-entered css-pwcg7p-MuiCollapse-root"
+            style="min-height: 0px;"
+          >
+            <div
+              class="MuiCollapse-wrapper MuiCollapse-vertical css-smkl36-MuiCollapse-wrapper"
+            >
+              <div
+                class="MuiCollapse-wrapperInner MuiCollapse-vertical css-9l5vo-MuiCollapse-wrapperInner"
+              >
+                <table
+                  aria-label="properties"
+                  class="MuiTable-root css-rqglhn-MuiTable-root"
+                >
+                  <tbody
+                    class="MuiTableBody-root css-apqrd9-MuiTableBody-root"
+                  >
+                    <tr
+                      class="MuiTableRow-root css-229i8j-MuiTableRow-root"
+                    >
+                      <td
+                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall css-dsuxgy-MuiTableCell-root"
+                        style="padding-left: 10px; padding-right: 10px;"
+                      >
+                        x
+                      </td>
+                      <td
+                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall css-dsuxgy-MuiTableCell-root"
+                        style="text-align: right;"
+                      >
+                        111.00 m
+                      </td>
+                    </tr>
+                    <tr
+                      class="MuiTableRow-root css-229i8j-MuiTableRow-root"
+                    >
+                      <td
+                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall css-dsuxgy-MuiTableCell-root"
+                        style="padding-left: 10px; padding-right: 10px;"
+                      >
+                        y
+                      </td>
+                      <td
+                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall css-dsuxgy-MuiTableCell-root"
+                        style="text-align: right;"
+                      >
+                        222.00 m
+                      </td>
+                    </tr>
+                    <tr
+                      class="MuiTableRow-root css-229i8j-MuiTableRow-root"
+                    >
+                      <td
+                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall css-dsuxgy-MuiTableCell-root"
+                        style="padding-left: 10px; padding-right: 10px;"
+                      >
+                        Hill shading
+                      </td>
+                      <td
+                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall css-dsuxgy-MuiTableCell-root"
+                        style="text-align: right;"
+                      >
+                        3152.02
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </td>
+      </tr>
+      <tr
+        class="MuiTableRow-root css-229i8j-MuiTableRow-root"
+      >
+        <td
+          class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-spv49l-MuiTableCell-root"
+        >
+          <button
+            class="c0"
+            style="padding: 0px;"
+            tabindex="0"
+            type="button"
+          >
+            <span
+              class="c1"
+            >
+              <svg
+                aria-hidden="true"
+                class="c2"
+                fill="currentColor"
+                height="24px"
+                viewBox="0 0 24 24"
+                width="24px"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  class=""
+                  clip-rule="evenodd"
+                  d="m7 14.5 5-5 5 5H7Z"
+                  data-testid="eds-icon-path"
+                  fill-rule="evenodd"
+                />
+              </svg>
+            </span>
+          </button>
+        </td>
+        <td
+          class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-1ex1afd-MuiTableCell-root"
+        >
+           
+          Wells layer
+           
+        </td>
+      </tr>
+      <tr
+        class="MuiTableRow-root css-229i8j-MuiTableRow-root"
+      >
+        <td
+          class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-1ex1afd-MuiTableCell-root"
+          colspan="2"
+          style="padding-bottom: 0px; padding-top: 0px;"
+        >
+          <div
+            class="MuiCollapse-root MuiCollapse-vertical MuiCollapse-entered css-pwcg7p-MuiCollapse-root"
+            style="min-height: 0px;"
+          >
+            <div
+              class="MuiCollapse-wrapper MuiCollapse-vertical css-smkl36-MuiCollapse-wrapper"
+            >
+              <div
+                class="MuiCollapse-wrapperInner MuiCollapse-vertical css-9l5vo-MuiCollapse-wrapperInner"
+              >
+                <table
+                  aria-label="properties"
+                  class="MuiTable-root css-rqglhn-MuiTable-root"
+                >
+                  <tbody
+                    class="MuiTableBody-root css-apqrd9-MuiTableBody-root"
+                  >
+                    <tr
+                      class="MuiTableRow-root css-229i8j-MuiTableRow-root"
+                    >
+                      <td
+                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall css-dsuxgy-MuiTableCell-root"
+                        style="padding-left: 10px; padding-right: 10px;"
+                      >
+                        Poro
+                      </td>
+                      <td
+                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall css-dsuxgy-MuiTableCell-root"
+                        style="text-align: right;"
+                      >
+                        123
+                      </td>
+                    </tr>
+                    <tr
+                      class="MuiTableRow-root css-229i8j-MuiTableRow-root"
+                    >
+                      <td
+                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall css-dsuxgy-MuiTableCell-root"
+                        style="padding-left: 10px; padding-right: 10px;"
+                      >
+                        Perm
+                      </td>
+                      <td
+                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall css-dsuxgy-MuiTableCell-root"
+                        style="text-align: right;"
+                      >
+                        456
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+`;
+
+exports[`Test Info Card snapshot test with no props 1`] = `
+.c1 {
+  display: grid;
+  grid-gap: var(--eds_button__gap,8px);
+  grid-auto-flow: column;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  height: 100%;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.c1 > :is(svg,img) {
+  margin-top: var(--eds_button__icon__margin_y,0);
+  margin-bottom: var(--eds_button__icon__margin_y,0);
+}
+
+.c0 {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  position: relative;
+  cursor: pointer;
+  display: inline-block;
+  background: transparent;
+  height: var(--eds_button__height,36px);
+  padding-left: var(--eds_button__padding_x,16px);
+  padding-top: var(--eds_button__padding_y,0);
+  padding-right: var(--eds_button__padding_x,16px);
+  padding-bottom: var(--eds_button__padding_y,0);
+  border: var(--eds_button__border_width,1px) solid transparent;
+  border-radius: var(--eds_button__radius,4px);
+  margin: 0;
+  color: var(--eds_interactive_primary__resting,rgba(0,112,121,1));
+  font-family: Equinor;
+  font-size: var(--eds_button__font_size,0.875rem);
+  font-weight: 500;
+  line-height: 1.143em;
+  text-align: center;
+}
+
+.c0 svg {
+  justify-self: center;
+}
+
+.c0::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: auto;
+  min-height: auto;
+  content: '';
+}
+
+.c0::after {
+  position: absolute;
+  top: -7px;
+  left: -0;
+  width: 100%;
+  height: 48px;
+  content: '';
+}
+
+.c0:focus {
+  outline: none;
+}
+
+.c0[data-focus-visible-added]:focus {
+  outline: 2px dashed rgba(0,112,121,1);
+  outline-offset: 3px;
+}
+
+.c0:focus-visible {
+  outline: 2px dashed rgba(0,112,121,1);
+  outline-offset: 3px;
+}
+
+.c0::-moz-focus-inner {
+  border: 0;
+}
+
+.c0:disabled,
+.c0[aria-disabled='true'] {
+  cursor: not-allowed;
+  background: transparent;
+  border: 1px solid transparent;
+  margin: 0;
+  color: var(--eds_interactive__disabled__text,rgba(190,190,190,1));
+  font-family: Equinor;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.143em;
+  text-align: center;
+}
+
+.c2 {
+  -webkit-transform: none;
+  -ms-transform: none;
+  transform: none;
+}
+
+@media (hover:hover) and (pointer:fine) {
+  .c0:hover {
+    background: var(--eds_interactive_primary__hover_alt,rgba(222,237,238,1));
+    color: var(--eds_interactive_primary__hover,rgba(0,79,85,1));
+    border: 1px solid transparent;
+    border-radius: var(--eds_button__radius,4px);
+  }
+}
+
+@media (hover:hover) and (pointer:fine) {
+  .c0:disabled:hover,
+  .c0[aria-disabled='true']:hover {
+    background: transparent;
+  }
+}
+
+<div
+  class="MuiTableContainer-root css-rorn0c-MuiTableContainer-root"
+>
+  <table
+    aria-label="info-card"
+    class="MuiTable-root css-t8ttc-MuiTable-root"
+  >
+    <tbody
+      class="MuiTableBody-root css-apqrd9-MuiTableBody-root"
+    >
+      <tr
+        class="MuiTableRow-root css-229i8j-MuiTableRow-root"
+      >
+        <td
+          class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-spv49l-MuiTableCell-root"
+        >
+          <button
+            class="c0"
+            style="padding: 0px;"
+            tabindex="0"
+            type="button"
+          >
+            <span
+              class="c1"
+            >
+              <svg
+                aria-hidden="true"
+                class="c2"
+                fill="currentColor"
+                height="24px"
+                viewBox="0 0 24 24"
+                width="24px"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  class=""
+                  clip-rule="evenodd"
+                  d="m7 14.5 5-5 5 5H7Z"
+                  data-testid="eds-icon-path"
+                  fill-rule="evenodd"
+                />
+              </svg>
+            </span>
+          </button>
+        </td>
+        <td
+          class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-1ex1afd-MuiTableCell-root"
+        >
+           
+          Position
+           
+        </td>
+      </tr>
+      <tr
+        class="MuiTableRow-root css-229i8j-MuiTableRow-root"
+      >
+        <td
+          class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-1ex1afd-MuiTableCell-root"
+          colspan="2"
+          style="padding-bottom: 0px; padding-top: 0px;"
+        >
+          <div
+            class="MuiCollapse-root MuiCollapse-vertical MuiCollapse-entered css-pwcg7p-MuiCollapse-root"
+            style="min-height: 0px;"
+          >
+            <div
+              class="MuiCollapse-wrapper MuiCollapse-vertical css-smkl36-MuiCollapse-wrapper"
+            >
+              <div
+                class="MuiCollapse-wrapperInner MuiCollapse-vertical css-9l5vo-MuiCollapse-wrapperInner"
+              >
+                <table
+                  aria-label="properties"
+                  class="MuiTable-root css-rqglhn-MuiTable-root"
+                >
+                  <tbody
+                    class="MuiTableBody-root css-apqrd9-MuiTableBody-root"
+                  >
+                    <tr
+                      class="MuiTableRow-root css-229i8j-MuiTableRow-root"
+                    >
+                      <td
+                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall css-dsuxgy-MuiTableCell-root"
+                        style="padding-left: 10px; padding-right: 10px;"
+                      >
+                        x
+                      </td>
+                      <td
+                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall css-dsuxgy-MuiTableCell-root"
+                        style="text-align: right;"
+                      >
+                        111.00 m
+                      </td>
+                    </tr>
+                    <tr
+                      class="MuiTableRow-root css-229i8j-MuiTableRow-root"
+                    >
+                      <td
+                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall css-dsuxgy-MuiTableCell-root"
+                        style="padding-left: 10px; padding-right: 10px;"
+                      >
+                        y
+                      </td>
+                      <td
+                        class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall css-dsuxgy-MuiTableCell-root"
+                        style="text-align: right;"
+                      >
+                        222.00 m
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+`;
+
+exports[`Test Info Card undefined coordinates 1`] = `null`;

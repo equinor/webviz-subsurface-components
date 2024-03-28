@@ -1,0 +1,15 @@
+package-lock.json
+
+coverage
+dist
+docs
+example-data
+node_modules
+src/storybook
+src/test
+/storybook
+storybook-static
+cypress
+
+# Eslint gets stuck when parsing these
+packages/subsurface-viewer/src/layers/grid3d/test_data/DiscreteProperty/*.json

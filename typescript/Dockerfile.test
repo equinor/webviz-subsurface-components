@@ -1,0 +1,12 @@
+FROM mcr.microsoft.com/playwright:v1.39.0-jammy
+
+RUN mkdir /test
+WORKDIR /test
+
+COPY package.json /test/
+COPY package-lock.json /test/
+COPY .storybook /test/.storybook
+RUN npm ci
+
+CMD ["npm", "run", "storybook:test", "--", "--url", "http://host.docker.internal:6006/", "--no-index-json"]
+

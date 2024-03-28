@@ -1,0 +1,85 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`test 'layers' button snapshot test 1`] = `
+.c0 {
+  -webkit-transform: none;
+  -ms-transform: none;
+  transform: none;
+}
+
+<div
+  class="css-1c35s4m"
+  id="layers-button-view_1"
+>
+  <button
+    class="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeLarge MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeLarge MuiFab-default css-mm42gz-MuiButtonBase-root-MuiFab-root"
+    id="layers-selector-button"
+    tabindex="0"
+    type="button"
+  >
+    <svg
+      aria-hidden="true"
+      class="c0"
+      fill="currentColor"
+      height="24px"
+      viewBox="0 0 24 24"
+      width="24px"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        class=""
+        clip-rule="evenodd"
+        d="m12 16.465 7.36-5.73L21 9.465l-9-7-9 7 1.63 1.27 7.37 5.73Zm-.01 2.54-7.37-5.73L3 14.535l9 7 9-7-1.63-1.27-7.38 5.74Zm5.75-9.54L12 4.995l-5.74 4.47 5.74 4.47 5.74-4.47Z"
+        data-testid="eds-icon-path"
+        fill-rule="evenodd"
+      />
+    </svg>
+    <span
+      class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+    />
+  </button>
+</div>
+`;
+
+exports[`test 'layers' button test empty MapState/specbase 1`] = `
+.c0 {
+  -webkit-transform: none;
+  -ms-transform: none;
+  transform: none;
+}
+
+<div
+  class="css-1c35s4m"
+  id="layers-button-view_1"
+>
+  <button
+    class="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeLarge MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeLarge MuiFab-default css-mm42gz-MuiButtonBase-root-MuiFab-root"
+    id="layers-selector-button"
+    tabindex="0"
+    type="button"
+  >
+    <svg
+      aria-hidden="true"
+      class="c0"
+      fill="currentColor"
+      height="24px"
+      viewBox="0 0 24 24"
+      width="24px"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        class=""
+        clip-rule="evenodd"
+        d="m12 16.465 7.36-5.73L21 9.465l-9-7-9 7 1.63 1.27 7.37 5.73Zm-.01 2.54-7.37-5.73L3 14.535l9 7 9-7-1.63-1.27-7.38 5.74Zm5.75-9.54L12 4.995l-5.74 4.47 5.74 4.47 5.74-4.47Z"
+        data-testid="eds-icon-path"
+        fill-rule="evenodd"
+      />
+    </svg>
+    <span
+      class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+    />
+  </button>
+</div>
+`;
+
+exports[`test 'layers' button test with no layers present 1`] = `null`;
