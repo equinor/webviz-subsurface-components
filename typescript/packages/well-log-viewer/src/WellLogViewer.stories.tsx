@@ -1,6 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
 
+import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
+
 import WellLogViewer, { argTypesWellLogViewerProp } from "./WellLogViewer";
 
 import exampleData from "../../../../example-data/deckgl-map.json";
@@ -54,7 +56,7 @@ const ComponentCode =
     "    colorTables={colorTables} \r\n" +
     "/>";
 
-export default {
+const stories: Meta = {
     component: WellLogViewer,
     title: "WellLogViewer/Demo/WellLogViewer",
     parameters: {
@@ -80,6 +82,7 @@ export default {
     // Disable automatic testing of stories that use this tag.
     tags: ["no-test"],
 };
+export default stories;
 
 function fillInfo(controller) {
     if (!controller) return "-";
@@ -234,47 +237,51 @@ function addTemplateTrack(
     return templateNew;
 }
 
-export const Default = StoryTemplate.bind({});
-Default.args = {
-    id: "Well-Log-Viewer",
-    horizontal: false,
-    welllog: require("../../../../example-data/L898MUD.json")[0],   // eslint-disable-line
-    template: require("../../../../example-data/welllog_template_1.json"),// eslint-disable-line
-    colorTables: colorTables,
-    wellpick: wellpick,
-    axisTitles: axisTitles,
-    axisMnemos: axisMnemos,
-    viewTitle: true, // show default welllog view title (a wellname from the welllog)
-    domain: [2500, 4000],
-    selection: [3500, 3700],
-    options: {
-        hideTrackTitle: false,
-        hideTrackLegend: false,
-    },
-};
-
-export const Horizontal = StoryTemplate.bind({});
-Horizontal.args = {
-    id: "Well-Log-Viewer-Horizontal",
-    horizontal: true,
-    welllog:
-        require("../../../../example-data/WL_RAW_AAC-BHPR-CAL-DEN-GR-MECH-NEU-NMR-REMP_MWD_3.json")[0],// eslint-disable-line
-    template: require("../../../../example-data/welllog_template_2.json"),// eslint-disable-line
-    colorTables: colorTables,
-    wellpick: wellpick,
-    axisTitles: axisTitles,
-    axisMnemos: axisMnemos,
-    viewTitle: true, // show default welllog view title (a wellname from the welllog)
-};
-Horizontal.parameters = {
-    docs: {
-        description: {
-            story: "An example showing horizontal orientation of the tracks.",
+export const Default: StoryObj<typeof StoryTemplate> = {
+    args: {
+        id: "Well-Log-Viewer",
+        horizontal: false,
+        welllog: require("../../../../example-data/L898MUD.json")[0], // eslint-disable-line
+        template: require("../../../../example-data/welllog_template_1.json"), // eslint-disable-line
+        colorTables: colorTables,
+        wellpick: wellpick,
+        axisTitles: axisTitles,
+        axisMnemos: axisMnemos,
+        viewTitle: true, // show default welllog view title (a wellname from the welllog)
+        domain: [2500, 4000],
+        selection: [3500, 3700],
+        options: {
+            hideTrackTitle: false,
+            hideTrackLegend: false,
         },
     },
+    render: (args) => <StoryTemplate {...args} />,
 };
 
-export class MapAndWellLogViewer extends React.Component<Props, State> {
+export const Horizontal: StoryObj<typeof StoryTemplate> = {
+    args: {
+        id: "Well-Log-Viewer-Horizontal",
+        horizontal: true,
+        welllog:
+            require("../../../../example-data/WL_RAW_AAC-BHPR-CAL-DEN-GR-MECH-NEU-NMR-REMP_MWD_3.json")[0], // eslint-disable-line
+        template: require("../../../../example-data/welllog_template_2.json"), // eslint-disable-line
+        colorTables: colorTables,
+        wellpick: wellpick,
+        axisTitles: axisTitles,
+        axisMnemos: axisMnemos,
+        viewTitle: true, // show default welllog view title (a wellname from the welllog)
+    },
+    parameters: {
+        docs: {
+            description: {
+                story: "An example showing horizontal orientation of the tracks.",
+            },
+        },
+    },
+    render: (args) => <StoryTemplate {...args} />,
+};
+
+class MapAndWellLogViewer extends React.Component<Props, State> {
     public static propTypes?: WeakValidationMap<Props> | undefined;
     constructor(props: Props, state: State) {
         super(props, state);
@@ -591,27 +598,29 @@ if (wells_layer) {
     wells_layer.logColor = "Stratigraphy"; //"Stratigraphy";
 }
 
-export const Discrete = StoryTemplate.bind({});
-Discrete.args = {
-    id: "Well-Log-Viewer-Discrete",
-    horizontal: false,
-    welllog: require("../../../../example-data/volve_logs.json")[0],// eslint-disable-line
-    template: require("../../../../example-data/welllog_template_2.json"),// eslint-disable-line
-    colorTables: colorTables,
-    wellpick: wellpick,
-    axisTitles: axisTitles,
-    axisMnemos: axisMnemos,
-    viewTitle: true, // show default welllog view title (a wellname from the welllog)
-};
-Discrete.parameters = {
-    docs: {
-        description: {
-            story: "An example showing the tracks with discrete logs.",
+export const Discrete: StoryObj<typeof StoryTemplate> = {
+    args: {
+        id: "Well-Log-Viewer-Discrete",
+        horizontal: false,
+        welllog: require("../../../../example-data/volve_logs.json")[0], // eslint-disable-line
+        template: require("../../../../example-data/welllog_template_2.json"), // eslint-disable-line
+        colorTables: colorTables,
+        wellpick: wellpick,
+        axisTitles: axisTitles,
+        axisMnemos: axisMnemos,
+        viewTitle: true, // show default welllog view title (a wellname from the welllog)
+    },
+    parameters: {
+        docs: {
+            description: {
+                story: "An example showing the tracks with discrete logs.",
+            },
         },
     },
+    render: (args) => <StoryTemplate {...args} />,
 };
 
-export const MapAndWellLogViewerStory = (
+const MapAndWellLogViewerStoryComp = (
     args: React.JSX.IntrinsicAttributes &
         React.JSX.IntrinsicClassAttributes<MapAndWellLogViewer> &
         Readonly<Props>
@@ -623,10 +632,14 @@ export const MapAndWellLogViewerStory = (
     );
 };
 
-MapAndWellLogViewerStory.args = {
-    ...exampleData[0],
-    colorTables: colorTables,
-    id: "MapAndWellLog", // redefine id from exampleData[0]
+export const MapAndWellLogViewerStory: StoryObj<
+    typeof MapAndWellLogViewerStoryComp
+> = {
+    args: {
+        ...exampleData[0],
+        colorTables: colorTables,
+        id: "MapAndWellLog", // redefine id from exampleData[0]
+    },
+    tags: ["no-test"],
+    render: (args) => <MapAndWellLogViewerStoryComp {...args} />,
 };
-
-MapAndWellLogViewerStory.tags = ["no-test"];

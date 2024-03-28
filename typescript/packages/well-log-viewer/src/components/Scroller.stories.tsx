@@ -1,4 +1,6 @@
+import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
+
 import Scroller from "./Scroller";
 
 const ComponentCode =
@@ -27,7 +29,7 @@ const ComponentCode =
     "    </div> \r\n" +
     "); \r\n";
 
-export default {
+const stories: Meta = {
     component: Scroller,
     title: "WellLogViewer/Components/Scroller",
     parameters: {
@@ -47,6 +49,7 @@ export default {
         },
     },
 };
+export default stories;
 
 const Template = (args) => {
     const infoRef = React.useRef();
@@ -76,5 +79,7 @@ const Template = (args) => {
     );
 };
 
-export const Default = Template.bind({});
-Default.args = {};
+export const Default: StoryObj<typeof Template> = {
+    args: {},
+    render: (args) => <Template {...args} />,
+};
