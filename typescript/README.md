@@ -45,8 +45,8 @@ npm i --save-dev sass
 
 You will first need to install dev dependencies by
 ```shell
-cd ./react
-npm ci
+cd ./typescript
+npm install
 ```
 
 You can then manually build an components using

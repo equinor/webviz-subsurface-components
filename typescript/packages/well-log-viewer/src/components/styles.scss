@@ -7,7 +7,11 @@
 //$scale_slave_scale_bg: #ff0000;
 
 .welllogview {
-  // for videx-wellog log-controller
+  width: 100%;
+  height: 100%;
+  display: flex;
+
+  // redefine videx-wellog log-controller
   height: inherit;
 
   .track {
@@ -16,6 +20,17 @@
       font-weight: normal;
       color: black;
       font-family: inherit;
+      white-space: nowrap;
+      display: block;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+    .track-legend {
+      /*.scale-title {
+        display: block;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }*/
     }
   }
 
@@ -67,15 +82,34 @@
     background-color: rgb(241, 241, 241);
     font-size: 14px;
     text-align: center;
+    flex: "0, 0",
   }
+  .title-horizontal {
+    writing-mode: vertical-lr;
+    transform: rotate(180deg);
+  }                          
+
+  .view {
+    width: 100%;
+    height: 100%;
+    flex: 1, 1;
+    display: flex;
+    flex-direction: column;
+
+    container { 
+      flex: 1, 1;
+    }
+  }  
 
   .error {
+    flex: 0, 0;
     color: rgb(255, 64, 64);
     background-color: rgb(255, 255, 192)
   }
 
   .wellpick {
     font-size: 9px;
+
     .vertical-text {
       writing-mode: vertical-lr;
       transform: rotate(180deg);
@@ -92,15 +126,30 @@
 }
 
 
-// 
 .welllogspacer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+
+  .welllogspacer-distance-horizontal {
+    writing-mode: vertical-lr;
+    transform: rotate(180deg);
+  }
+  .distance { 
+    font-size: 12;
+    text-align: center;
+  }
+
   .wellpick {
     opacity: 0.9
   }
+
   .wellpick-fill {
     opacity: 0.3
   }
+
   .wellpick-pattern {
     opacity: 0.57
   }
 }
+

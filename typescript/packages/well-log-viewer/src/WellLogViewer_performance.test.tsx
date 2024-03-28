@@ -1,13 +1,12 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import "@testing-library/jest-dom/extend-expect";
+import * as core from "@actions/core";
+import { colorTables } from "@emerson-eps/color-tables";
 import { render } from "@testing-library/react";
 import "jest-styled-components";
 import React, { Profiler } from "react";
-import * as core from "@actions/core";
 import WellLogViewer from "./WellLogViewer";
 import logTimes, { obj } from "./test/performanceMetrics";
-import { axisTitles, axisMnemos } from "./utils/axes";
-import { colorTables } from "@emerson-eps/color-tables";
+import { axisMnemos, axisTitles } from "./utils/axes";
 
 const exampleTemplate = require("../../../../example-data/welllog_template_1.json");
 //const exampleWellLog = require("../../../../example-data/L898MUD.json")[0];

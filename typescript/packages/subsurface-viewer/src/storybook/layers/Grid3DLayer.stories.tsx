@@ -1,7 +1,13 @@
+import React from "react";
+
 import type { Meta, StoryObj } from "@storybook/react";
 
 import { create, all } from "mathjs";
 
+import type {
+    SubsurfaceViewerProps,
+    TLayerDefinition,
+} from "../../SubsurfaceViewer";
 import SubsurfaceViewer, { TGrid3DColoringMode } from "../../SubsurfaceViewer";
 
 import {
@@ -15,6 +21,10 @@ import {
     Faces as ToroidFaces,
     VertexCount as ToroidVertexCount,
 } from "../../layers/grid3d/test_data/PentagonalToroid";
+
+import * as gridPoints from "../../layers/grid3d/test_data/DiscreteProperty/Points.json";
+import * as gridPolys from "../../layers/grid3d/test_data/DiscreteProperty/Polys.json";
+import * as gridProps from "../../layers/grid3d/test_data/DiscreteProperty/Props.json";
 
 import { default3DViews, defaultStoryParameters } from "../sharedSettings";
 
@@ -166,7 +176,7 @@ const randomFunc = math?.random ? math.random : Math.random;
 const snubCubePoints = SnubCubePoints.map((v) => 10 * v);
 const snubCubeProperties = Array(SnubCubeVertexCount)
     .fill(0)
-    .map(() => randomFunc() * 50);
+    .map(() => 100 + randomFunc() * 50);
 
 const toroidPoints = ToroidPoints.map((v) => 10 * v).map((v, index) =>
     index % 3 === 0 ? v + 30 : v
@@ -174,6 +184,23 @@ const toroidPoints = ToroidPoints.map((v) => 10 * v).map((v, index) =>
 const toroidProperties = Array(ToroidVertexCount)
     .fill(0)
     .map(() => randomFunc() * 10);
+
+/* eslint-disable prettier/prettier */
+const colorTable = new Uint8Array([
+    0, 0, 255,     // 0
+    0, 255, 0,     // 1 
+    0, 255, 255,   // 2 
+    255, 0, 0,     // 3 
+    255, 0, 255,   // 4 
+    255, 255, 0,   // 5 
+    0, 0, 100,     // 6 
+    0, 100, 0,     // 7 
+    0, 100, 100,   // 8
+    100, 0, 0,     // 9 
+    100, 0, 100,   // 10
+    100, 100, 0,   // 11
+]);
+/* eslint-enable prettier/prettier */
 
 export const PolyhedralCells: StoryObj<typeof SubsurfaceViewer> = {
     args: {
@@ -216,4 +243,70 @@ export const PolyhedralCells: StoryObj<typeof SubsurfaceViewer> = {
         ],
     },
     parameters: parameters,
+};
+
+// ---------In-place array data handling (storybook fails to rebuild non JSon data)--------------- //
+const discretePropsLayerId = "discrete_props";
+const layerArrays = {
+    [discretePropsLayerId]: {
+        pointsData: new Float32Array(gridPoints),
+        polysData: new Uint32Array(gridPolys),
+        propertiesData: new Uint16Array(gridProps),
+        colorMapFunction: colorTable,
+    },
+};
+
+function replaceArrays(args: SubsurfaceViewerProps) {
+    args.layers?.forEach((layer: TLayerDefinition) => {
+        const layerId = layer?.["id"] as string | undefined;
+        if (layer && layerId && layerArrays[layerId]) {
+            for (const key in layerArrays[layerId]) {
+                layer[key] = layerArrays[layerId][key];
+            }
+        }
+    });
+    return args;
+}
+
+export const DiscretePropertyWithClamping: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        bounds: [-2500, -2500, 2500, 2500] as NumberQuad,
+        views: {
+            layout: [1, 1] as [number, number],
+            viewports: [
+                {
+                    id: "view_1",
+                    show3D: true,
+                },
+            ],
+        },
+        id: "grid-3d-discrete_props",
+        layers: [
+            {
+                ...axes,
+                id: "discrete_props-axes",
+                bounds: [-2000, -2200, -2200, 2200, 2000, -1000],
+            },
+            {
+                ...grid3dLayer,
+                "@@typedArraySupport": true,
+                id: discretePropsLayerId,
+                coloringMode: TGrid3DColoringMode.Property,
+                pickable: true,
+                pointsData: layerArrays[discretePropsLayerId].pointsData,
+                polysData: layerArrays[discretePropsLayerId].polysData,
+                propertiesData:
+                    layerArrays[discretePropsLayerId].propertiesData,
+                colorMapName: "Seismic",
+                ZIncreasingDownwards: true,
+                colorMapFunction:
+                    layerArrays[discretePropsLayerId].colorMapFunction,
+                material: false,
+                colorMapRange: [3, 8],
+                colorMapClampColor: [100, 100, 100],
+            },
+        ],
+    },
+    parameters: parameters,
+    render: (args) => <SubsurfaceViewer {...replaceArrays(args)} />,
 };

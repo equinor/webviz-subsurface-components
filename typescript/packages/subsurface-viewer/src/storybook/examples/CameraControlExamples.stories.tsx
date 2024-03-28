@@ -63,11 +63,11 @@ const SQUARE = {
         type: "Polygon",
         coordinates: [
             [
+                [-5, -5],
+                [-5, 5],
                 [5, 5],
-                [5, 1500],
-                [1500, 1500],
-                [1500, 5],
-                [5, 5],
+                [5, -5],
+                [-5, -5],
             ],
         ],
     },
@@ -260,7 +260,7 @@ const AutoZoomToBox = (args: SubsurfaceViewerProps) => {
         rotationX: rotX,
         rotationOrbit: rotZ,
         zoom: zoomBox3D,
-        target: [0, 0, 0],
+        target: [],
     };
 
     const props = {
@@ -510,7 +510,7 @@ export const AddLayer: StoryObj<typeof SubsurfaceViewer> = {
             rotationOrbit: 45,
             rotationX: 45,
             zoom: hugin3DBounds,
-            target: [0, 0, 0],
+            target: [],
         },
         views: default3DViews,
     },
@@ -528,10 +528,11 @@ export const AddLayer: StoryObj<typeof SubsurfaceViewer> = {
 const ScaleYComponent = ({ verticalScale }: { verticalScale: number }) => {
     const viewerProps: SubsurfaceViewerProps = {
         id: "ScaleY",
-        bounds: [-1000, -1000, 3000, 3000],
+        bounds: [-10, -10, 10, 10],
         layers: [
             new Axes2DLayer({
                 id: "axes",
+                backgroundColor: [0, 155, 155],
             }),
             new GeoJsonLayer({
                 ...customLayerWithPolygonDataProps,

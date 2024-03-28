@@ -51,3 +51,24 @@ export const boxCenter = (box: BoundingBox3D): [number, number, number] => {
         zmin + 0.5 * (zmax - zmin),
     ];
 };
+
+/**
+ * Returns true if the bounding box is not empty.
+ * @param box1 bounding box.
+ * @returns true if the bounding box is not empty.
+ */
+export const isEmpty = (box: BoundingBox3D | undefined): boolean => {
+    if (box == undefined) {
+        return true;
+    }
+    const xmin = box[0];
+    const ymin = box[1];
+    const zmin = box[2];
+
+    const xmax = box[3];
+    const ymax = box[4];
+    const zmax = box[5];
+
+    // the box can be bottom-up in some cases, thus the zmax != zmin
+    return !(xmax > xmin && ymax > ymin && zmax != zmin);
+};

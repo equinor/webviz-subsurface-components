@@ -2,10 +2,10 @@ import React from "react";
 
 import { styled } from "@mui/material/styles";
 
-import type { BoundingBox2D } from "../components/Map";
+import type { BoundingBox2D } from "../utils/BoundingBox2D";
+import type { BoundingBox3D } from "../utils/BoundingBox3D";
 import type { SubsurfaceViewerProps } from "../SubsurfaceViewer";
 import SubsurfaceViewer from "../SubsurfaceViewer";
-import type { BoundingBox3D } from "../utils/BoundingBox3D";
 
 import exampleData from "../../../../../example-data/deckgl-map.json";
 import type { GeoJsonLayerProps } from "@deck.gl/layers/typed";
@@ -235,11 +235,12 @@ export const customLayerWithPolygonDataProps: GeoJsonLayerProps = {
             ],
         },
     },
-    getLineWidth: 20,
-    lineWidthMinPixels: 2,
-    getLineColor: [0, 255, 255],
-    getFillColor: [0, 255, 0],
-    opacity: 0.3,
+    getLineWidth: 1,
+    lineWidthMinPixels: 1,
+    lineWidthMaxPixels: 1,
+    getLineColor: [0, 0, 0],
+    getFillColor: [255, 255, 0],
+    opacity: 1.0,
 };
 
 export const customLayerWithPolygonData = {

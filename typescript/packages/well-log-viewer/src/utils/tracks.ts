@@ -370,9 +370,8 @@ function getColorTable(
         return defColorTable;
     }
     if (id && colorTables) {
-        for (let i = 0; i < colorTables.length; i++) {
-            if (colorTables[i].name == id) return colorTables[i];
-        }
+        const colorTable = colorTables.find((value) => value.name === id);
+        if (colorTable) return colorTable;
         console.error(
             "colorTable id='" + id + "' is not found in getColorTable()"
         );
@@ -1296,7 +1295,8 @@ function addStackedTrack(
     templateStyles?: TemplateStyle[],
     colorTables?: ColorTable[],
     showLines?: boolean,
-    showLabels?: boolean
+    showLabels?: boolean,
+    labelRotation?: number
 ): void {
     const templatePlot = templateTrack.plots[0];
     const name = templatePlot.name;
@@ -1356,6 +1356,7 @@ function addStackedTrack(
     if (plot) {
         plot.showLabels = showLabels;
         plot.showLines = showLines;
+        plot.labelRotation = labelRotation ?? 0;
     }
 
     const options: StackedTrackOptions = {
@@ -1419,7 +1420,8 @@ export function createTracks(
                         templateStyles,
                         colorTables,
                         templatePlotProps.showLines,
-                        templatePlotProps.showLabels
+                        templatePlotProps.showLabels,
+                        templatePlotProps.labelRotation
                     );
                 } else {
                     addGraphTrack(
@@ -1496,6 +1498,7 @@ function setStackedTrackOptionsFromTemplate(
     if (plot) {
         options.showLabels = plot.showLabels;
         options.showLines = plot.showLines;
+        options.labelRotation = plot.labelRotation ?? 0;
     }
 
     setTrackOptionsFromTemplate(options, templateTrack);
