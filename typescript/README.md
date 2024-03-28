@@ -76,6 +76,6 @@ Test snapshots can be updated using `npx nx run-many --target test_correctness -
 
 Storybook test-runner is used to smoke test all stories in each package.
 
-Tests can be run, given a running (`npm run storybook`) or static storybook, using `npm docker:build && npm run docker:storybook:test`.
+Tests can be run, given a running (`npm run storybook`) or static storybook, using `npm run docker:build && npm run docker:storybook:test`.
 
-Test snapshots can be updated using `npm run docker:storybook:test:update`.
+Test snapshots can be updated using `npm run docker:build && npm run docker:storybook:test:update`.

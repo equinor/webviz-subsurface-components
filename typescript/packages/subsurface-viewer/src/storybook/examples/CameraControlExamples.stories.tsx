@@ -63,11 +63,11 @@ const SQUARE = {
         type: "Polygon",
         coordinates: [
             [
-                [-5, -5],
-                [-5, 5],
-                [5, 5],
-                [5, -5],
-                [-5, -5],
+                [-5, -5, 0],
+                [-5, 5, 0],
+                [5, 5, 0],
+                [5, -5, 0],
+                [-5, -5, 0],
             ],
         ],
     },
@@ -546,6 +546,7 @@ const ScaleYComponent = ({ verticalScale }: { verticalScale: number }) => {
                 {
                     id: "section",
                     verticalScale,
+                    zoom: 2,
                 },
             ],
         },
