@@ -1,38 +1,46 @@
 import React from "react";
 
-import { WellLog } from "./WellLogTypes";
-import SyncLogViewer from "../SyncLogViewer";
+import type { WellLog } from "./WellLogTypes";
+import type SyncLogViewer from "../SyncLogViewer";
 
-import WellLogZoomSlider from "./WellLogZoomSlider";
-import WellLogInfoPanel from "./WellLogInfoPanel";
 import WellLogAxesPanel from "./WellLogAxesPanel";
+import WellLogInfoPanel from "./WellLogInfoPanel";
+import WellLogZoomSlider from "./WellLogZoomSlider";
 
-export function defaultRightPanel(parent: SyncLogViewer): JSX.Element {
+export function defaultSidePanel(parent: SyncLogViewer): JSX.Element {
+    const primaryAxis = parent.getAxes().primaryAxis;
     return (
-        <div className="right-panel" key="rightPanel">
+        <div className="side-panel" key="side-panel">
             <WellLogAxesPanel
-                callbacksManager={parent.callbacksManagers[0]}
                 header="Primary scale"
                 axisTitles={parent.props.axisTitles}
                 axisMnemos={parent.props.axisMnemos}
-                primaryAxis={parent.getPrimaryAxis()}
+                primaryAxis={primaryAxis}
                 onChangePrimaryAxis={parent.onChangePrimaryAxis}
+                callbacksManager={parent.callbacksManagers[0]}
             />
             {parent.props.welllogs?.map(
                 (welllog: WellLog, iWellLog: number) => (
                     <WellLogInfoPanel
                         key={iWellLog}
                         header={"Readout " + welllog.header.well}
-                        callbacksManager={parent.callbacksManagers[iWellLog]}
                         readoutOptions={parent.props.readoutOptions}
+                        callbacksManager={parent.callbacksManagers[iWellLog]}
                     />
                 )
             )}
             <WellLogZoomSlider
                 label="Zoom:"
-                callbacksManager={parent.callbacksManagers[0]}
                 max={parent.props.welllogOptions?.maxContentZoom}
+                callbacksManager={parent.callbacksManagers[0]}
             />
         </div>
     );
 }
+
+import type { ViewerLayout } from "./WellLogLayout";
+const defaultLayout: ViewerLayout<SyncLogViewer> = {
+    right: defaultSidePanel,
+};
+
+export default defaultLayout;

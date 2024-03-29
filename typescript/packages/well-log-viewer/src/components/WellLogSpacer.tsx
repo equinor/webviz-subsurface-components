@@ -115,7 +115,7 @@ class WellLogSpacer extends Component<WellLogSpacerProps /*, State*/> {
                 this.props.patterns &&
                 createDefs(this.uid, this.props.patternsTable);
 
-            this.update(); // force to show pattern fill with new this.defs
+            this.forceUpdate(); // force to show pattern fill with new this.defs
         }
     }
 
@@ -169,9 +169,9 @@ class WellLogSpacer extends Component<WellLogSpacerProps /*, State*/> {
         let offsetLeft = 3000;
         let height = 1;
         let width = 1;
-        const controller = this.props.controllers[0] as WellLogView;
+        const controller = this.props.controllers[0] as unknown as WellLogView;
         const logViewer = controller?.logController;
-        const controller2 = this.props.controllers[1] as WellLogView;
+        const controller2 = this.props.controllers[1] as unknown as WellLogView;
         const logViewer2 = controller2?.logController;
         const wps = controller ? getWellPicks(controller) : null;
         const wps2 = controller2 ? getWellPicks(controller2) : null;

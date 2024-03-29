@@ -50,27 +50,25 @@ class WellLogViewWithScroller extends Component<WellLogViewWithScrollerProps> {
     // callback function from WellLogView
     onCreateController(controller: WellLogController): void {
         this.controller = controller;
-        if (this.props.onCreateController)
-            // set callback to component's caller
-            this.props.onCreateController(controller);
+        this.props.onCreateController?.(controller);
     }
     // callback function from WellLogView
     onTrackScroll(): void {
         this.setScrollerPosAndZoom();
-        if (this.props.onTrackScroll) this.props.onTrackScroll();
+        this.props.onTrackScroll?.();
     }
     // callback function from WellLogView
     onTrackSelection(): void {
-        if (this.props.onTrackSelection) this.props.onTrackSelection();
+        this.props.onTrackSelection?.();
     }
     // callback function from WellLogView
     onContentRescale(): void {
         this.setScrollerPosAndZoom();
-        if (this.props.onContentRescale) this.props.onContentRescale();
+        this.props.onContentRescale?.();
     }
     // callback function from WellLogView
     onContentSelection(): void {
-        if (this.props.onContentSelection) this.props.onContentSelection();
+        this.props.onContentSelection?.();
     }
 
     // callback function from Scroller

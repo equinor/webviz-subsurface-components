@@ -1,8 +1,8 @@
-import { Meta, Canvas, Story } from '@storybook/addon-docs';
+import { Meta } from "@storybook/addon-docs";
 
 import imageWellLogViewer from "./WellLogViewer.png";
 
-import imageLayout from "./Layout.png"
+import imageLayout from "./Layout.png";
 
 <Meta title="WellLogViewer/Overview" />
 
@@ -12,8 +12,8 @@ import imageLayout from "./Layout.png"
 
 These stories contain examples of usage of components for visualization of well log data files.
 There are two main examples:
-[WellLogViewer](?path=/story/welllogviewer-overview--page#welllogviewer-component) wich contains essential parts of typical well log viewer
-and [SyncLogViewer](?path=/story/welllogviewer-overview--page#synclogviewer-component) wich contains synchronized views for three different log files.
+[WellLogViewer](#welllogviewer-component) wich contains essential parts of typical well log viewer
+and [SyncLogViewer](#synclogviewer-component) wich contains synchronized views for three different log files.
 
 ## WellLogView component
 
@@ -59,7 +59,7 @@ The number and properties of tracks and curves could be interactively edited by 
 
 _WellLogViewer component architecture._
 
-Auxiliary components could be places in six different positions.
+Auxiliary side panels could be places in six different positions. [An example.](?path=/story/welllogviewer-demo-synclogviewer--custom-layout)
 
 <img src={imageLayout} />
 
@@ -71,4 +71,3 @@ _WellLogViewer component layout._
 It demonstrate how different well log views can be synchronized in such complex programs as well correlation applications.
 
 The component architecture is similar to WellLogViewer's one but contains three views for well logs an three readout panels.
-

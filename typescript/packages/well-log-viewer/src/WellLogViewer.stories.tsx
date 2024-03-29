@@ -27,17 +27,12 @@ const template = templateJson as unknown as Template;
 
 import type { ColorTable } from "./components/ColorTableTypes";
 
-import { MapMouseEvent } from "../SubsurfaceViewer/components/Map";
-import type { LogViewer } from "@equinor/videx-wellog";
 import type { MapMouseEvent } from "@webviz/subsurface-viewer/dist/components/Map";
-import type { Info } from "./components/InfoTypes";
-import type { WellLogController } from "./components/WellLogView";
 
 import WellLogInfoPanel from "./components/WellLogInfoPanel";
 import WellLogViewWithScroller from "./components/WellLogViewWithScroller";
 import { axisTitles, axisMnemos } from "./utils/axes";
 import { deepCopy } from "./utils/deepcopy";
-import { fillInfos } from "./utils/fill-info";
 import { getDiscreteMeta, indexOfElementByName } from "./utils/tracks";
 
 import type { WellLogViewOptions } from "./components/WellLogView";
@@ -45,13 +40,8 @@ import { isEqualRanges } from "./utils/log-viewer";
 
 import { CallbackManager } from "./components/CallbackManager";
 
-import wellPicks from "../../../demo/example-data/wellpicks.json";
-import colorTables from "../../../demo/example-data/wellpick_colors.json";
-
 import colorTables from "../../../../example-data/wellpick_colors.json";
 import wellPicks from "../../../../example-data/wellpicks.json";
-
-import { axisMnemos, axisTitles } from "./utils/axes";
 
 const ComponentCode =
     '<WellLogViewer id="WellLogViewer" \r\n' +
@@ -283,8 +273,8 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
     public static propTypes?: WeakValidationMap<Props> | undefined;
     callbacksManager: CallbackManager;
 
-    constructor(props: Props, state: State) {
-        super(props, state);
+    constructor(props: Props) {
+        super(props);
         this.state = {
             wellIndex: undefined,
             editedData: props.editedData,

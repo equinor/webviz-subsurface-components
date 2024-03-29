@@ -1,10 +1,10 @@
-import type { ReactNode } from "react";
 import React, { Component } from "react";
 
 import PropTypes from "prop-types";
 
-import WellLogLayout, { ViewerLayout } from "./components/WellLogLayout";
-import { defaultRightPanel } from "./components/DefaultWellLogViewerRightPanel";
+import WellLogLayout from "./components/WellLogLayout";
+import type { ViewerLayout } from "./components/WellLogLayout";
+import defaultLayout from "./components/DefaultWellLogViewerLayout";
 
 import WellLogViewWithScroller from "./components/WellLogViewWithScroller";
 import type { WellLogViewWithScrollerProps } from "./components/WellLogViewWithScroller";
@@ -13,26 +13,15 @@ import { argTypesWellLogViewScrollerProp } from "./components/WellLogViewWithScr
 
 import { shouldUpdateWellLogView } from "./components/WellLogView";
 
-
-import InfoPanel from "./components/InfoPanel";
-import AxisSelector from "./components/AxisSelector";
-
-import ZoomSlider from "./components/ZoomSlider";
-
 import type { WellLogController } from "./components/WellLogView";
-
 
 import { getAvailableAxes } from "./utils/tracks";
 
 import { onTrackMouseEvent } from "./utils/edit-track";
 
-
 import { CallbackManager } from "./components/CallbackManager";
 
-import { fillInfos } from "./utils/fill-info";
-import type { LogViewer } from "@equinor/videx-wellog";
-
-import type { Info, InfoOptions } from "./components/InfoTypes";
+import type { InfoOptions } from "./components/InfoTypes";
 
 export interface WellLogViewerProps extends WellLogViewWithScrollerProps {
     readoutOptions?: InfoOptions; // options for readout
@@ -171,67 +160,6 @@ export default class WellLogViewer extends Component<
         return primaryAxis;
     }
 
-    // callback function from Axis selector
-    onChangePrimaryAxis(value: string): void {
-        this.setState({ primaryAxis: value });
-    }
-    // callback function from Zoom slider
-    onZoomSliderChange(value: number): void {
-        const controller = this.controller;
-        if (controller) {
-            controller.zoomContent(value);
-        }
-    }
-
-    // set zoom value to slider
-    setSliderValue(): void {
-        this.setState((state: Readonly<State>) => {
-            if (!this.controller) return null;
-            const zoom = this.controller.getContentZoom();
-            if (Math.abs(Math.log(state.sliderValue / zoom)) < 0.01)
-                return null;
-            return { sliderValue: zoom };
-        });
-    }
-
-    onInfoGroupClick(trackId: string | number): void {
-        const i = this.collapsedTrackIds.indexOf(trackId);
-        if (i < 0) this.collapsedTrackIds.push(trackId);
-        else delete this.collapsedTrackIds[i];
-
-        this.updateReadoutPanel();
-    }
-
-    createRightPanel(): ReactNode {
-        return (
-            <div key="rightPanel" className="right-panel">
-                <AxisSelector
-                    header="Primary scale"
-                    axes={this.state.axes}
-                    axisLabels={this.props.axisTitles}
-                    value={this.state.primaryAxis}
-                    onChange={this.onChangePrimaryAxis}
-                />
-                <InfoPanel
-                    header="Readout"
-                    onGroupClick={this.onInfoGroupClick}
-                    infos={this.state.infos}
-                />
-                <br />
-                <div className="zoom">
-                    <span className="zoom-label">Zoom:</span>
-                    <span className="zoom-value">
-                        <ZoomSlider
-                            value={this.state.sliderValue}
-                            max={this.props.options?.maxContentZoom}
-                            onChange={this.onZoomSliderChange}
-                        />
-                    </span>
-                </div>
-            </div>
-        );
-    }
-
     render(): JSX.Element {
         return (
             <WellLogLayout
@@ -256,8 +184,7 @@ export default class WellLogViewer extends Component<
                         onTemplateChanged={this.onTemplateChanged}
                     />
                 }
-                layout={this.props.layout}
-                defaultRightPanel={defaultRightPanel}
+                layout={this.props.layout || defaultLayout}
             />
         );
     }

@@ -84,6 +84,7 @@ export function createScaleItems(): ReactNode[] {
 function createColorItems(): ReactNode[] {
     return _createItems(colorItems);
 }
+
 export function createBooleanItems(): ReactNode[] {
     return _createItems(booleanItems);
 }
@@ -96,9 +97,7 @@ function createColorTableItems(colorTables: ColorTable[]): ReactNode[] {
         );
     } else
         for (const colorTable of colorTables) {
-            if (colorTable.discrete)
-                // skip discrete color tables
-                continue;
+            if (colorTable.discrete) continue; // skip discrete color tables
             if (!colorTable.name) {
                 console.log(
                     "colorTable.name is empty in createColorTableItems()"

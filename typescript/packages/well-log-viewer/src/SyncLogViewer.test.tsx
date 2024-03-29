@@ -5,16 +5,10 @@ import "jest-styled-components";
 import React from "react";
 import SyncLogViewer from "./SyncLogViewer";
 import { axisTitles, axisMnemos } from "./utils/axes";
-import { colorTables } from "@emerson-eps/color-tables";
-import { ColorTable } from "./components/ColorTableTypes";
+import type { ColorTable } from "./components/ColorTableTypes";
 const exampleColorTable = colorTables as unknown as ColorTable[]; // equivalent types, should be merged
-const exampleWellLog = require("../../../demo/example-data/L898MUD.json")[0];
-const exampleTemplate = require("../../../demo/example-data/welllog_template_1.json");
-import { axisMnemos, axisTitles } from "./utils/axes";
-
 const exampleWellLog = require("../../../../example-data/L898MUD.json")[0];
 const exampleTemplate = require("../../../../example-data/welllog_template_1.json");
-const exampleColorTables = colorTables;
 
 window.ResizeObserver =
     window.ResizeObserver ||

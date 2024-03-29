@@ -1,8 +1,9 @@
 //import React from "react";
-import { LogViewer } from "@equinor/videx-wellog";
+import type { LogViewer } from "@equinor/videx-wellog";
 
-import WellLogView, { WellLogController } from "./WellLogView";
-import { WellLog } from "./WellLogTypes";
+import type { WellLogController } from "./WellLogView";
+import type WellLogView from "./WellLogView";
+import type { WellLog } from "./WellLogTypes";
 
 export class CallbackManager {
     controller: WellLogController | null;
@@ -154,7 +155,7 @@ export class CallbackManager {
     }
 
     updateInfo(): void {
-        const wellLogView = this.controller as unknown as WellLogView; 
+        const wellLogView = this.controller as unknown as WellLogView;
         wellLogView?.setInfo(); // reflect new values
     }
 }

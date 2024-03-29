@@ -1,5 +1,5 @@
 
-.right-panel {
+.side-panel {
   min-width: 255px;
   max-width: 255px;  
   font-size: 12px;    
@@ -70,11 +70,26 @@
     }
   }
   .zoom {
+    padding-top: 5px;
     padding-left: 10px;
     display: flex;
+    .zoom-label {
+        padding-top: 6px;
+        padding-right: 8px;
+    }
     .zoom-value {
         flex: 1 1 100px;
         padding: 0 20px 0 10px;
     }
   } 
+   .scale {
+      padding-left: 10px;
+      display: flex;
+      .scale-label {
+        padding-top: 4px;
+        padding-right: 8px;
+      }
+      .scale-value {
+      }
+  }
 }

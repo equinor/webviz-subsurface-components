@@ -15,8 +15,6 @@ export interface Props<Parent> {
     center?: JSX.Element | ((parent: Parent) => JSX.Element);
 
     layout?: ViewerLayout<Parent>;
-
-    defaultRightPanel?: JSX.Element | ((parent: Parent) => JSX.Element);
 }
 
 const styleHeaderFooter = { flex: "0", width: "100%" };
@@ -47,10 +45,10 @@ export class WellLogLayout<Parent> extends Component<Props<Parent>> {
         let footer: JSX.Element | null;
         const layout = this.props.layout;
         if (!layout) {
-            // use default layout with default right panel
+            // use default empty layout
             header = null;
             left = null;
-            right = this.createPanel(this.props.defaultRightPanel);
+            right = null; //this.createPanel(this.props.defaultSidePanel);
             top = null;
             bottom = null;
             footer = null;

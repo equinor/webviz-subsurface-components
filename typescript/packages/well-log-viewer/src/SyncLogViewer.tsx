@@ -8,8 +8,9 @@ import WellLogViewWithScroller from "./components/WellLogViewWithScroller";
 
 import { CallbackManager } from "./components/CallbackManager";
 
-import WellLogLayout, { ViewerLayout } from "./components/WellLogLayout";
-import { defaultRightPanel } from "./components/DefaultSyncLogViewerRightPanel";
+import type { ViewerLayout } from "./components/WellLogLayout";
+import WellLogLayout from "./components/WellLogLayout";
+import defaultLayout from "./components/DefaultSyncLogViewerLayout";
 
 import type { WellLog } from "./components/WellLogTypes";
 import type { Template } from "./components/WellLogTemplateTypes";
@@ -31,12 +32,6 @@ import { getAvailableAxes } from "./utils/tracks";
 import { checkMinMax } from "./utils/minmax";
 
 import { onTrackMouseEvent } from "./utils/edit-track";
-
-import { InfoOptions } from "./components/InfoTypes";
-
-import { isEqualRanges } from "./components/WellLogView";
-import { fillInfos } from "./utils/fill-info";
-import type { LogViewer } from "@equinor/videx-wellog";
 
 import type { Info, InfoOptions } from "./components/InfoTypes";
 
@@ -157,6 +152,9 @@ export interface SyncLogViewerProps {
      */
     readoutOptions?: InfoOptions; // options for readout
 
+    /**
+     * Side panels layout (default is layout with default right panel)
+     */
     layout?: ViewerLayout<SyncLogViewer>;
 
     // callbacks
@@ -272,7 +270,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
     _isMounted: boolean;
     _inInfoGroupClick: number;
 
-    constructor(props: Props) {
+    constructor(props: SyncLogViewerProps) {
         super(props);
 
         this.spacers = [];
@@ -291,77 +289,18 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
 
         this.onChangePrimaryAxis = this.onChangePrimaryAxis.bind(this);
 
-        this.props.welllogs?.map((_welllog: WellLog, iWellLog: number) => {
-            const callbacksManager = new CallbackManager(
-                () => this.props.welllogs[iWellLog]
-            );
-            this.callbacksManagers.push(callbacksManager);
-
-            const onInfoGroupClickBind = this.onInfoGroupClick.bind(
-                this,
-                iWellLog
-            );
-            callbacksManager.registerCallback(
-                "onInfoGroupClick",
-                onInfoGroupClickBind,
-                true
-            );
-
-            this.callbacks.push({
-                onCreateControllerBind: this.onCreateController.bind(
-                    this,
-                    iWellLog
-                ),
-                onTrackScrollBind: this.onTrackScroll.bind(this, iWellLog),
-                onTrackSelectionBind: this.onTrackSelection.bind(
-                    this,
-                    iWellLog
-                ),
-                onContentRescaleBind: this.onContentRescale.bind(
-                    this,
-                    iWellLog
-                ),
-                onContentSelectionBind: this.onContentSelection.bind(
-                    this,
-                    iWellLog
-                ),
-                onTemplateChangedBind: this.onTemplateChanged.bind(
-                    this,
-                    iWellLog
-                ),
-            });
-        });
-    constructor(props: SyncLogViewerProps) {
-        super(props);
-
-        const { axes, primaryAxis } = this.getAxes();
-        this.state = {
-            primaryAxis: primaryAxis, //"md"
-            axes: axes, //["md", "tvd"]
-
-            infos: [[], []],
-            sliderValue: 4.0, // zoom
-        };
-
-        this.controllers = [];
-        this.spacers = [];
-        this.collapsedTrackIds = [];
-        this.callbacks = [];
         this.fillViewsCallbacks(this.props.welllogs.length);
-
-        this.onChangePrimaryAxis = this.onChangePrimaryAxis.bind(this);
-        this.onZoomSliderChange = this.onZoomSliderChange.bind(this);
-        this.onInfoGroupClick = this.onInfoGroupClick.bind(this);
     }
-
     componentDidMount(): void {
-        this.syncTrackScrollPos(0);
-        this.syncContentScrollPos(0);
+        if (this.props.welllogs.length) {
+            this.syncTrackScrollPos(0);
+            this.syncContentScrollPos(0);
+        }
         {
             // fix after setting the commonBaseDomain
             this.setControllersZoom();
         }
-        this.syncContentSelection(0);
+        if (this.props.welllogs.length) this.syncContentSelection(0);
         this._isMounted = true;
     }
 
@@ -387,7 +326,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
     ): void {
         // called before render()
         if (this.props.welllogs.length === nextProps.welllogs.length) return;
-        if (this.controllers.length === nextProps.welllogs.length) return;
+        if (this.callbacksManagers.length === nextProps.welllogs.length) return;
         /*
         // move old controllers to new places in the controllers array
         const controllers: (WellLogController | null)[] = [];
@@ -409,10 +348,10 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         this.spacers = spacers;
         */
         // just resize arrays
-        this.controllers.length = nextProps.welllogs.length;
+
         this.spacers.length = nextProps.welllogs.length;
 
-        this.fillViewsCallbacks(nextProps.welllogs.length); // update this.callbacks[] before render()
+        this.fillViewsCallbacks(nextProps.welllogs.length); // update this.callbacksManagers and this.callbacks[] before render()
     }
 
     componentDidUpdate(
@@ -424,8 +363,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
             this.props.axisMnemos !== prevProps.axisMnemos ||
             this.props.primaryAxis !== prevProps.primaryAxis
         ) {
-            const primaryAxis = this.getDefaultPrimaryAxis();
-            const { axes, primaryAxis } = this.getAxes();
+            const primaryAxis = this.getAxes().primaryAxis;
             this.setState({
                 primaryAxis: primaryAxis,
             });
@@ -446,7 +384,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
             ) ||
             this.props.welllogs.length !== prevProps.welllogs.length
         ) {
-            this.syncContentScrollPos(0); // force to redraw visible domain
+            if (this.props.welllogs.length) this.syncContentScrollPos(0); // force to redraw visible domain
         }
 
         if (!isEqualRanges(this.props.selection, prevProps.selection)) {
@@ -458,12 +396,10 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                 prevProps.syncContentSelection ||
             this.props.welllogs.length !== prevProps.welllogs.length
         ) {
-            this.syncContentSelection(0); // force to redraw selection
+            if (this.props.welllogs.length) this.syncContentSelection(0); // force to redraw selection
         }
     }
 
-//    getPrimaryAxis(): string {
-//        return this.state.primaryAxis;
     getPrimaryAxis(axes: string[]): string {
         if (axes) {
             const template0 = this.props.templates[0];
@@ -489,9 +425,20 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
     }
 
     fillViewCallbacks(iView: number): void {
+        const callbacksManager = new CallbackManager(
+            () => this.props.welllogs[iView]
+        );
+        this.callbacksManagers.push(callbacksManager);
+
+        const onInfoGroupClickBind = this.onInfoGroupClick.bind(this, iView);
+        callbacksManager.registerCallback(
+            "onInfoGroupClick",
+            onInfoGroupClickBind,
+            true
+        );
+
         this.callbacks.push({
             onCreateControllerBind: this.onCreateController.bind(this, iView),
-            onInfoBind: this.onInfo.bind(this, iView),
             onTrackScrollBind: this.onTrackScroll.bind(this, iView),
             onTrackSelectionBind: this.onTrackSelection.bind(this, iView),
             onContentRescaleBind: this.onContentRescale.bind(this, iView),
@@ -503,14 +450,9 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         for (let iView = this.callbacks.length; iView < nViews; iView++)
             this.fillViewCallbacks(iView);
         this.callbacks.length = nViews;
+        this.callbacksManagers.length = nViews;
     }
 
-    updateReadoutPanel(): void {
-        for (const controller of this.controllers) {
-            if (!controller) continue;
-            controller.updateInfo(); // force to update readout panel
-        }
-    }
     getDefaultPrimaryAxis(): string {
         const _axes = this.props.welllogs?.map((welllog: WellLog) =>
             getAvailableAxes(welllog, this.props.axisMnemos)
@@ -531,13 +473,13 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         return primaryAxis;
     }
 
-    onInfoGroupClick(iWellLog: number, trackId: string | number): void {
+    onInfoGroupClick(iWellLog: number, info: Info): void {
         if (this._inInfoGroupClick) return;
         this._inInfoGroupClick++;
         let i = 0;
         for (const callbacksManager of this.callbacksManagers) {
             if (i != iWellLog)
-                callbacksManager.callCallbacks("onInfoGroupClick", trackId);
+                callbacksManager.callCallbacks("onInfoGroupClick", info);
             i++;
         }
         this._inInfoGroupClick--;
@@ -609,10 +551,10 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
 
         const domain = controller.getContentDomain();
         for (const callbacksManager of this.callbacksManagers) {
-            const _controller = callbacksManager.controller;
-        if (domain[0] === 0 && domain[1] === 0)
-            // controller.logController not created yet
-            return;
+            const _controller = callbacksManager?.controller;
+            if (domain[0] === 0 && domain[1] === 0)
+                // controller.logController not created yet
+                return;
             if (!_controller || _controller == controller) continue;
             if (
                 !(this.props.wellpickFlatting && this.props.wellpicks) &&
@@ -631,7 +573,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         if (!controller) return;
         const trackPos = controller.getTrackScrollPos();
         for (const callbacksManager of this.callbacksManagers) {
-            const _controller = callbacksManager.controller;
+            const _controller = callbacksManager?.controller;
             if (!_controller || _controller == controller) continue;
             if (this.props.syncTrackPos) _controller.scrollTrackTo(trackPos);
         }
@@ -641,7 +583,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         if (!controller) return;
         const trackSelection = controller.getSelectedTrackIndices();
         for (const callbacksManager of this.callbacksManagers) {
-            const _controller = callbacksManager.controller;
+            const _controller = callbacksManager?.controller;
             if (!_controller || _controller == controller) continue;
             if (this.props.syncTemplate)
                 _controller.setSelectedTrackIndices(trackSelection);
@@ -654,7 +596,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
             Number.NEGATIVE_INFINITY,
         ];
         for (const callbacksManager of this.callbacksManagers) {
-            const controller = callbacksManager.controller;
+            const controller = callbacksManager?.controller;
             if (!controller) continue;
             checkMinMax(commonBaseDomain, controller.getContentBaseDomain());
         }
@@ -670,7 +612,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
             const commonBaseDomain: [number, number] =
                 this.getCommonContentBaseDomain();
             for (const callbacksManager of this.callbacksManagers) {
-                const controller = callbacksManager.controller;
+                const controller = callbacksManager?.controller;
                 if (!controller) continue;
                 const baseDomain = controller.getContentBaseDomain();
                 if (!isEqDomains(baseDomain, commonBaseDomain)) {
@@ -814,7 +756,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
 
         let j = -1;
         for (const callbacksManager of this.callbacksManagers) {
-            const _controller = callbacksManager.controller;
+            const _controller = callbacksManager?.controller;
             j++;
             if (!_controller || _controller == controller) continue;
             if (coeff) {
@@ -867,14 +809,14 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
 
         if (updated) {
             for (let i = iWellLog - 1; i <= iWellLog; i++) {
-            {
-                // restore
-                const _domain = controller.getContentDomain();
-                if (!isEqDomains(_domain, domain))
-                    controller.zoomContentTo(domain);
-            }
+                {
+                    // restore
+                    const _domain = controller.getContentDomain();
+                    if (!isEqDomains(_domain, domain))
+                        controller.zoomContentTo(domain);
+                }
 
-//            for (let i = iView - 1; i <= iView; i++) {
+                //            for (let i = iView - 1; i <= iView; i++) {
                 const spacer = this.spacers[i];
                 if (!spacer) continue;
                 spacer.update();
@@ -887,7 +829,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         if (!controller) return;
         const selection = controller.getContentSelection();
         for (const callbacksManager of this.callbacksManagers) {
-            const _controller = callbacksManager.controller;
+            const _controller = callbacksManager?.controller;
             if (!_controller || _controller == controller) continue;
             if (this.props.syncContentSelection) {
                 const _selection = _controller.getContentSelection();
@@ -907,7 +849,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         if (!controller) return;
         const template = controller.getTemplate();
         for (const callbacksManager of this.callbacksManagers) {
-            const _controller = callbacksManager.controller;
+            const _controller = callbacksManager?.controller;
             if (!_controller || _controller == controller) continue;
             if (this.props.syncTemplate) _controller.setTemplate(template);
         }
@@ -915,7 +857,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
 
     setControllersZoom(): void {
         for (const callbacksManager of this.callbacksManagers) {
-            const controller = callbacksManager.controller;
+            const controller = callbacksManager?.controller;
             if (!controller) continue;
             if (this.props.domain) {
                 controller.zoomContentTo(this.props.domain);
@@ -927,7 +869,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
     setControllersSelection(): void {
         if (!this.props.selection) return;
         for (const callbacksManager of this.callbacksManagers) {
-            const controller = callbacksManager.controller;
+            const controller = callbacksManager?.controller;
             if (!controller) continue;
             controller.selectContent(this.props.selection);
         }
@@ -1037,41 +979,6 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         );
     }
 
-    //layout
-    createRightPanel(): ReactNode {
-        return (
-            <div key="rightPanel" className="right-panel">
-                <AxisSelector
-                    header="Primary scale"
-                    axes={this.state.axes}
-                    axisLabels={this.props.axisTitles}
-                    value={this.state.primaryAxis}
-                    onChange={this.onChangePrimaryAxis}
-                />
-                {this.props.welllogs.map((_welllog: WellLog, index: number) => (
-                    <InfoPanel
-                        key={index}
-                        header={
-                            "Readout " + this.props.welllogs[index].header.well
-                        }
-                        onGroupClick={this.onInfoGroupClick}
-                        infos={this.state.infos[index]}
-                    />
-                ))}
-                <div className="zoom">
-                    <span className="zoom-label">Zoom:</span>
-                    <span className="zoom-value">
-                        <ZoomSlider
-                            value={this.state.sliderValue}
-                            max={this.props.welllogOptions?.maxContentZoom}
-                            onChange={this.onZoomSliderChange}
-                        />
-                    </span>
-                </div>
-            </div>
-        );
-    }
-
     render(): JSX.Element {
         return (
             <WellLogLayout
@@ -1096,8 +1003,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                         )}
                     </div>
                 }
-                layout={this.props.layout}
-                defaultRightPanel={defaultRightPanel}
+                layout={this.props.layout || defaultLayout}
             />
         );
     }

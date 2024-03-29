@@ -1601,4 +1601,3 @@ export function hasDifferentialPlot(track: GraphTrack): boolean {
     }
     return false;
 }
-

@@ -3,8 +3,7 @@
 import { colorTables } from "@emerson-eps/color-tables";
 //import { ColorTable } from "./components/ColorTableTypes";
 const exampleColorTable = colorTables; /*as unknown as ColorTable[]*/ // equivalent types, should be merged
-const wellpickColorTable = require("../../../demo/example-data/wellpick_colors.json");
-//                             require("../../../../example-data/wellpick_colors.json"),// eslint-disable-line
+const wellpickColorTable = require("../../../../example-data/wellpick_colors.json"); // eslint-disable-line
 import { ToggleButton } from "@mui/material";
 import React from "react";
 import SyncLogViewer, { argTypesSyncLogViewerProp } from "./SyncLogViewer";
@@ -366,47 +365,63 @@ Default.args = {
     },
 };
 
-//import { defaultRightPanel } from "./components/DefaultSyncLogViewerRightPanel";
-import WellLogZoomSlider from "./components/WellLogZoomSlider";
 import WellLogInfoPanel from "./components/WellLogInfoPanel";
+import WellLogZoomSlider from "./components/WellLogZoomSlider";
 import WellLogScaleSelector from "./components/WellLogScaleSelector";
-//import WellLogAxesPanel from "./components/WellLogAxesPanel";
+import WellInfoIcon from "@mui/icons-material/FormatListBulleted"; // WaterDrop ShowChart, SearchSharp
 
 export const CustomLayout = Template.bind({});
 CustomLayout.args = {
     ...Default.args,
+    wellpicks: undefined,
+    syncContentDomain: false,
     id: "Well-Log-Viewer-Discrete",
     readoutOptions: {
         grouping: "by_track",
     },
     layout: {
-        right: (parent) => (
-            <>
+        right: (parent: SyncLogViewer) => (
+            <div className="side-panel">
                 <div style={{ paddingBottom: "5px" }}>
                     <WellLogScaleSelector
                         label="Scale value:"
                         callbacksManager={parent.callbacksManagers[0]}
                     />
                 </div>
-                <div style={{ width: "255px" }}>
-                    {parent.props.welllogs?.map((_welllog, iWellLog) => (
-                        <WellLogInfoPanel
-                            key={iWellLog}
-                            callbacksManager={
-                                parent.callbacksManagers[iWellLog]
-                            }
-                            readoutOptions={parent.props.readoutOptions}
-                        />
-                    ))}
-                </div>
-            </>
+                {parent.props.welllogs?.map((welllog, iWellLog) => (
+                    <WellLogInfoPanel
+                        key={iWellLog}
+                        header={
+                            <>
+                                <span
+                                    style={{
+                                        fontSize: "18px",
+                                        verticalAlign: "middle",
+                                        paddingRight: "4px",
+                                    }}
+                                >
+                                    <WellInfoIcon fontSize="inherit" />
+                                </span>
+                                <i>{welllog.header.well}</i>
+                            </>
+                        }
+                        readoutOptions={parent.props.readoutOptions}
+                        callbacksManager={parent.callbacksManagers[iWellLog]}
+                    />
+                ))}
+            </div>
         ),
-        bottom: (parent) => (
-            <WellLogZoomSlider
-                label="Zoom:"
-                callbacksManager={parent.callbacksManagers[0]}
-                max={parent.props.options?.maxContentZoom}
-            />
+        bottom: (parent: SyncLogViewer) => (
+            <div
+                className="side-panel"
+                style={{ minWidth: "100%", maxWidth: "100%" }}
+            >
+                <WellLogZoomSlider
+                    label="Zoom:"
+                    max={parent.props.welllogOptions?.maxContentZoom}
+                    callbacksManager={parent.callbacksManagers[0]}
+                />
+            </div>
         ),
     },
 };

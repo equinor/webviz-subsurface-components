@@ -1,20 +1,21 @@
 import React, { Component } from "react";
 
-import { LogViewer } from "@equinor/videx-wellog";
+import type { LogViewer } from "@equinor/videx-wellog";
 //import WellLogView from "./WellLogView";
 //import { isScaleTrack } from "../utils/tracks";
 
-import { CallbackManager } from "./CallbackManager";
+import type { CallbackManager } from "./CallbackManager";
 
 import InfoPanel from "./InfoPanel";
-import { Info, InfoOptions } from "./InfoTypes";
+import type { Info, InfoOptions } from "./InfoTypes";
 
 import { fillInfos } from "../utils/fill-info";
+import "./sidePanel.scss";
 
 interface Props {
     callbacksManager: CallbackManager;
 
-    header?: string;
+    header?: string | JSX.Element;
     readoutOptions?: InfoOptions; // options for readout
 }
 interface State {
@@ -31,7 +32,7 @@ function toggleId(
 }
 
 export class WellLogInfoPanel extends Component<Props, State> {
-    onGroupClick: (trackId: string | number/*info: Info*/) => void;
+    onGroupClick: (info: Info) => void;
     collapsedTrackIds: (string | number)[];
 
     constructor(props: Props) {

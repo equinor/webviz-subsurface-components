@@ -4,13 +4,13 @@ import AxisSelector from "./AxisSelector";
 
 import { getAvailableAxes } from "../utils/tracks";
 
-import { WellLog } from "./WellLogTypes";
-import { CallbackManager } from "./CallbackManager";
+import type { WellLog } from "./WellLogTypes";
+import type { CallbackManager } from "./CallbackManager";
 
 interface Props {
     callbacksManager: CallbackManager;
 
-    header?: string;
+    header?: string | JSX.Element;
 
     /**
      * Log mnemonics for axes
@@ -24,6 +24,11 @@ interface Props {
     primaryAxis: string;
 
     onChangePrimaryAxis: (value: string) => void;
+
+    /**
+     * Hide the component when only one axis is available
+     */
+    autoHide?: boolean;
 }
 interface State {
     axes: string[]; // axes available in welllog
@@ -60,7 +65,7 @@ export class WellLogAxesPanel extends Component<Props, State> {
     }
 
     componentDidUpdate(prevProps: Props): void {
-        const wellog = this.props.callbacksManager.welllog();
+        const wellog = this.props.callbacksManager?.welllog();
         if (
             this.welllog !== wellog ||
             prevProps.axisMnemos !== this.props.axisMnemos
@@ -72,13 +77,14 @@ export class WellLogAxesPanel extends Component<Props, State> {
             });
         }
     }
+
     onChangePrimaryAxis(value: string): void {
         this.setState({ primaryAxis: value });
     }
 
     render(): JSX.Element {
         return (
-            <div>
+            <div className="axes-selector">
                 <AxisSelector
                     header={this.props.header}
                     axes={this.state.axes}
@@ -87,6 +93,7 @@ export class WellLogAxesPanel extends Component<Props, State> {
                     onChange={(value: string) =>
                         this.props.onChangePrimaryAxis(value)
                     }
+                    autoHide={this.props.autoHide}
                 />
             </div>
         );
