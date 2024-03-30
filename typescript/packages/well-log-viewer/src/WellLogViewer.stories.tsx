@@ -31,7 +31,6 @@ import type { MapMouseEvent } from "@webviz/subsurface-viewer/dist/components/Ma
 
 import WellLogInfoPanel from "./components/WellLogInfoPanel";
 import WellLogViewWithScroller from "./components/WellLogViewWithScroller";
-import { axisTitles, axisMnemos } from "./utils/axes";
 import { deepCopy } from "./utils/deepcopy";
 import { getDiscreteMeta, indexOfElementByName } from "./utils/tracks";
 
@@ -42,6 +41,8 @@ import { CallbackManager } from "./components/CallbackManager";
 
 import colorTables from "../../../../example-data/wellpick_colors.json";
 import wellPicks from "../../../../example-data/wellpicks.json";
+
+import { axisMnemos, axisTitles } from "./utils/axes";
 
 const ComponentCode =
     '<WellLogViewer id="WellLogViewer" \r\n' +

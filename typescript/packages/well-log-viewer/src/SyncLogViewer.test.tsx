@@ -4,7 +4,8 @@ import { render } from "@testing-library/react";
 import "jest-styled-components";
 import React from "react";
 import SyncLogViewer from "./SyncLogViewer";
-import { axisTitles, axisMnemos } from "./utils/axes";
+import { axisMnemos, axisTitles } from "./utils/axes";
+
 import type { ColorTable } from "./components/ColorTableTypes";
 const exampleColorTable = colorTables as unknown as ColorTable[]; // equivalent types, should be merged
 const exampleWellLog = require("../../../../example-data/L898MUD.json")[0];
