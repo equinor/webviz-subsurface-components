@@ -5,6 +5,7 @@ import { View } from "@deck.gl/core/typed";
 
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import type { ViewsType } from "../../components/Map";
+import * as d3 from "d3";
 
 import {
     default2DViews,
@@ -30,7 +31,6 @@ const layerProps = {
     isRightRuler: false,
     isBottomRuler: true,
     isTopRuler: false,
-    backgroundColor: [155, 155, 155, 255],
 };
 
 const axes2DLayer = {
@@ -45,6 +45,33 @@ export const Base: StoryObj<typeof SubsurfaceViewer> = {
         layers: [hugin25mKhNetmapMapLayerPng, axes2DLayer],
 
         bounds: hugin2DBounds,
+        views: default2DViews,
+    },
+};
+
+function makeLabelFunction(a: number): string {
+    // Choos exponential format with 3 digits after point.
+    const label = d3.format(".3e")(a);
+    //const label = d3.format(".1f")(a) // fixed decimal  KEEP
+    return label;
+}
+
+export const FormatLabelFunction: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "map",
+        layers: [
+            {
+                "@@type": "AxesLayer",
+                id: "axes-layer2",
+                bounds: [453150, 5925800, 0, 469400, 5939500, 100],
+            },
+            {
+                "@@type": "Axes2DLayer",
+                id: "axes-layer2D-small",
+                ...layerProps,
+                formatLabelFunc: makeLabelFunction,
+            },
+        ],
         views: default2DViews,
     },
 };
@@ -107,26 +134,10 @@ const MatrixStory = () => {
             views={views}
             bounds={hugin2DBounds}
         >
-            {
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                /* @ts-expect-error */
-                <View id="view_1"></View>
-            }
-            {
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                /* @ts-expect-error */
-                <View id="view_2"></View>
-            }
-            {
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                /* @ts-expect-error */
-                <View id="view_3"></View>
-            }
-            {
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                /* @ts-expect-error */
-                <View id="view_4"></View>
-            }
+            {<View id="view_1"></View>}
+            {<View id="view_2"></View>}
+            {<View id="view_3"></View>}
+            {<View id="view_4"></View>}
         </SubsurfaceViewer>
     );
 };

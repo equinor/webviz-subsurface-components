@@ -1,6 +1,6 @@
 {
     "name": "@webviz/subsurface-viewer",
-    "version": "0.20.9",
+    "version": "0.21.0",
     "description": "",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -45,7 +45,7 @@
         "d3-format": "^3.1.0",
         "gl-matrix": "^3.4.3",
         "lodash": "^4.17.21",
-        "mathjs": "^12.2.1",
+        "mathjs": "^12.4.1",
         "react-redux": "^8.1.1",
         "workerpool": "^9.1.0"
     },
