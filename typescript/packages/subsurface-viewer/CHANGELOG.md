@@ -1,3 +1,10 @@
+# [0.21.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.20.10...subsurface-viewer@0.21.0) (2024-04-02)
+
+
+### Features
+
+* Added property "formatLabelFunc" to set a callback funtion for formating label numbers ([#1904](https://github.com/equinor/webviz-subsurface-components/issues/1904)) ([c75be60](https://github.com/equinor/webviz-subsurface-components/commit/c75be60b0a4df44c7bf62374236bf452809300a1))
+
 ## [0.20.10](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.20.9...subsurface-viewer@0.20.10) (2024-03-29)
 
 
