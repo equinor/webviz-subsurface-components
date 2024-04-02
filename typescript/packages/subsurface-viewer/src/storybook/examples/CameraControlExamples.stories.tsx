@@ -570,3 +570,61 @@ export const ScaleY: StoryObj<typeof ScaleYComponent> = {
     },
     render: (args) => <ScaleYComponent {...args} />,
 };
+
+const ScaleYWithCameraPositionComponent = ({
+    verticalScale,
+}: {
+    verticalScale: number;
+}) => {
+    const viewerProps: SubsurfaceViewerProps = {
+        id: "ScaleY",
+        bounds: [-10, -10, 10, 10],
+        layers: [
+            new Axes2DLayer({
+                id: "axes",
+                backgroundColor: [0, 155, 155],
+            }),
+            new GeoJsonLayer({
+                ...customLayerWithPolygonDataProps,
+                getLineColor: [0, 0, 0],
+                data: SQUARE,
+            }),
+        ],
+        views: {
+            layout: [1, 1],
+            viewports: [
+                {
+                    id: "section",
+                    verticalScale,
+                },
+            ],
+        },
+        cameraPosition: {
+            rotationOrbit: 45,
+            rotationX: 45,
+            zoom: 3,
+            target: [],
+        },
+    };
+    return <SubsurfaceViewer {...viewerProps} />;
+};
+
+export const ScaleYWithCameraPosition: StoryObj<
+    typeof ScaleYWithCameraPositionComponent
+> = {
+    args: { verticalScale: 1.5 },
+    argTypes: {
+        verticalScale: {
+            control: { type: "range", min: -1, max: 10, step: 0.1 },
+        },
+    },
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: "Orthographic vertical scaling with multiple camera definitions.",
+            },
+        },
+    },
+    render: (args) => <ScaleYComponent {...args} />,
+};
