@@ -1,15 +1,22 @@
+import _ from "lodash";
 import React from "react";
 import type { ViewStateType, ViewportType } from "../components/Map";
-import _ from "lodash";
+
+/** Scale zoom vertically */
+const scaleZoom = (verticalFactor: number, zoom: number) => {
+    const scaledZoom: [number, number] = [
+        zoom,
+        zoom / Math.sqrt(Math.max(verticalFactor || 0, 0) || 1),
+    ];
+
+    return scaledZoom;
+};
 
 export const getZoom = (viewport: ViewportType, fb_zoom: number) => {
     const zoom = viewport.zoom ?? fb_zoom;
-    const scaledZoom: [number, number] = [
-        zoom,
-        zoom / Math.sqrt(Math.max(viewport.verticalScale || 0, 0) || 1),
-    ];
-
-    return viewport.verticalScale ? scaledZoom : zoom;
+    return viewport.verticalScale
+        ? scaleZoom(viewport.verticalScale, zoom)
+        : zoom;
 };
 
 export const useLateralZoom = (viewState: Record<string, ViewStateType>) => {
@@ -22,4 +29,17 @@ export const useLateralZoom = (viewState: Record<string, ViewStateType>) => {
             return zoom ?? -5;
         }
     }, [viewState]);
+};
+
+/** Apply vertical scale factor to camera in orthographic views. */
+export const scaleCameraZoom = (
+    camera: ViewStateType,
+    verticalScale: number,
+    is3D: boolean
+) => {
+    if (is3D || typeof camera.zoom !== "number") {
+        return camera;
+    }
+    camera.zoom = scaleZoom(verticalScale, camera.zoom);
+    return camera;
 };

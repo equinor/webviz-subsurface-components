@@ -13,6 +13,7 @@ import SubsurfaceViewer from "../../SubsurfaceViewer";
 import type { BoundingBox3D, ViewStateType } from "../../components/Map";
 import { Axes2DLayer, AxesLayer } from "../../layers";
 
+import { GeoJsonLayer } from "@deck.gl/layers/typed";
 import {
     customLayerWithPolygonDataProps,
     default2DViews,
@@ -29,7 +30,6 @@ import {
     volveWellsLayer,
     volveWellsWithLogsLayer,
 } from "../sharedSettings";
-import { GeoJsonLayer } from "@deck.gl/layers/typed";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -579,7 +579,6 @@ const ScaleYWithCameraPositionComponent = ({
 }) => {
     const viewerProps: SubsurfaceViewerProps = {
         id: "ScaleY",
-        bounds: [-10, -10, 10, 10],
         layers: [
             new Axes2DLayer({
                 id: "axes",
@@ -627,5 +626,5 @@ export const ScaleYWithCameraPosition: StoryObj<
             },
         },
     },
-    render: (args) => <ScaleYComponent {...args} />,
+    render: (args) => <ScaleYWithCameraPositionComponent {...args} />,
 };
