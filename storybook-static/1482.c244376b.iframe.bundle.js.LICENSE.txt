@@ -1,5 +1,0 @@
-//!! if (row[1] == null) continue;
-
-//!!! commented to avoid error TS2339: Property 'msOverflowStyle' does not exist on type 'CSSStyleDeclaration'.
-
-//!!! outer.style.msOverflowStyle = 'scrollbar'; // needed for WinJS apps
