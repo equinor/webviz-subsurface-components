@@ -1,6 +1,6 @@
 {
     "name": "@webviz/well-log-viewer",
-    "version": "1.5.2",
+    "version": "1.5.5",
     "description": "",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -22,7 +22,7 @@
     "license": "MPL-2.0",
     "dependencies": {
         "@emerson-eps/color-tables": "^0.4.71",
-        "@equinor/videx-wellog": "^0.8.5",
+        "@equinor/videx-wellog": "^0.9.2",
         "@webviz/wsc-common": "*",
         "convert-units": "^2.3.4",
         "d3": "^7.8.2"

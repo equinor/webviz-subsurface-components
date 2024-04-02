@@ -44,8 +44,14 @@ import { fovyToAltitude } from "@math.gl/web-mercator";
 import { colorTables } from "@emerson-eps/color-tables";
 import type { colorTablesArray } from "@emerson-eps/color-tables/";
 
+import type { BoundingBox2D } from "../utils/BoundingBox2D";
 import type { BoundingBox3D } from "../utils/BoundingBox3D";
-import { boxCenter, boxUnion } from "../utils/BoundingBox3D";
+import {
+    boxCenter,
+    boxUnion,
+    isEmpty as isEmptyBox3D,
+} from "../utils/BoundingBox3D";
+import { isEmpty as isEmptyBox2D } from "../utils/BoundingBox2D";
 import JSON_CONVERTER_CONFIG from "../utils/configuration";
 import type { WellsPickInfo } from "../layers/wells/wellsLayer";
 import InfoCard from "./InfoCard";
@@ -67,14 +73,7 @@ import type { Unit } from "convert-units";
 import type { LightsType, TLayerDefinition } from "../SubsurfaceViewer";
 import { getZoom, useLateralZoom } from "../utils/camera";
 
-/**
- * 3D bounding box defined as [xmin, ymin, zmin, xmax, ymax, zmax].
- */
-export type { BoundingBox3D };
-/**
- * 2D bounding box defined as [left, bottom, right, top]
- */
-export type BoundingBox2D = [number, number, number, number];
+export type { BoundingBox2D, BoundingBox3D };
 /**
  * Type of the function returning coordinate boundary for the view defined as [left, bottom, right, top].
  */
@@ -1080,6 +1079,7 @@ type ViewControllerState = {
 type ViewControllerDerivedState = {
     // Derived state
     target: [number, number, number] | undefined;
+    readyForInteraction: boolean;
     viewStateChanged: boolean;
 };
 type ViewControllerFullState = ViewControllerState & ViewControllerDerivedState;
@@ -1101,11 +1101,13 @@ class ViewController {
         },
         // Derived state
         target: undefined,
+        readyForInteraction: false,
         viewStateChanged: false,
     };
 
     private derivedState_: ViewControllerDerivedState = {
         target: undefined,
+        readyForInteraction: false,
         viewStateChanged: false,
     };
 
@@ -1171,7 +1173,7 @@ class ViewController {
         const triggerHome = state.triggerHome !== this.state_.triggerHome;
         const updateTarget =
             (viewsChanged || state.target !== this.state_?.target) &&
-            state.target !== undefined;
+            state.target != undefined;
         const updateZScale =
             viewsChanged || state.zScale !== this.state_?.zScale || triggerHome;
         const updateViewState =
@@ -1203,6 +1205,12 @@ class ViewController {
                 state.deckSize
             );
             // reset state
+            this.derivedState_.readyForInteraction = canCameraBeDefined(
+                state.camera,
+                state.boundingBox3d,
+                state.bounds,
+                state.deckSize
+            );
             this.derivedState_.viewStateChanged = false;
         }
 
@@ -1252,6 +1260,10 @@ class ViewController {
         viewId: string,
         viewState: ViewStateType
     ): void => {
+        if (!this.derivedState_.readyForInteraction) {
+            // disable interaction if the camera is not defined
+            return;
+        }
         const viewports = this.views_?.viewports ?? [];
         if (viewState.target.length === 2) {
             // In orthographic mode viewState.target contains only x and y. Add existing z value.
@@ -1284,6 +1296,7 @@ class ViewController {
  * Returns the zoom factor allowing to view the complete boundingBox.
  * @param camera camera defining the view orientation.
  * @param boundingBox 3D bounding box to visualize.
+ * @param size widget size.
  * @param fov field of view (see deck.gl file orbit-viewports.ts).
  */
 function computeCameraZoom(
@@ -1292,11 +1305,27 @@ function computeCameraZoom(
     size: Size,
     fovy = 50
 ): number {
+    // constants and camera constants
     const DEGREES_TO_RADIANS = Math.PI / 180;
     const RADIANS_TO_DEGREES = 180 / Math.PI;
     const IDENTITY = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 
     const fD = fovyToAltitude(fovy);
+
+    const cameraFovVertical = 50;
+    const angle_ver = (cameraFovVertical / 2) * DEGREES_TO_RADIANS;
+    const L = size.height / 2 / Math.sin(angle_ver);
+    const r = L * Math.cos(angle_ver);
+    const cameraFov = 2 * Math.atan(size.width / 2 / r) * RADIANS_TO_DEGREES;
+    const angle_hor = (cameraFov / 2) * DEGREES_TO_RADIANS;
+
+    const fwX = fD * Math.tan(angle_hor);
+    const fwY = fD * Math.tan(angle_ver);
+
+    const m = new Matrix4(IDENTITY);
+    m.rotateX(camera.rotationX * DEGREES_TO_RADIANS);
+    m.rotateZ(camera.rotationOrbit * DEGREES_TO_RADIANS);
+    // end of constants and camera constants
 
     const xMin = boundingBox[0];
     const yMin = boundingBox[1];
@@ -1312,22 +1341,16 @@ function computeCameraZoom(
         zMin + (zMax - zMin) / 2,
     ];
 
-    const cameraFovVertical = 50;
-    const angle_ver = (cameraFovVertical / 2) * DEGREES_TO_RADIANS;
-    const L = size.height / 2 / Math.sin(angle_ver);
-    const r = L * Math.cos(angle_ver);
-    const cameraFov = 2 * Math.atan(size.width / 2 / r) * RADIANS_TO_DEGREES;
-    const angle_hor = (cameraFov / 2) * DEGREES_TO_RADIANS;
-
-    const points: [number, number, number][] = [];
-    points.push([xMin, yMin, zMin]);
-    points.push([xMin, yMax, zMin]);
-    points.push([xMax, yMax, zMin]);
-    points.push([xMax, yMin, zMin]);
-    points.push([xMin, yMin, zMax]);
-    points.push([xMin, yMax, zMax]);
-    points.push([xMax, yMax, zMax]);
-    points.push([xMax, yMin, zMax]);
+    const points: [number, number, number][] = [
+        [xMin, yMin, zMin],
+        [xMin, yMax, zMin],
+        [xMax, yMax, zMin],
+        [xMax, yMin, zMin],
+        [xMin, yMin, zMax],
+        [xMin, yMax, zMax],
+        [xMax, yMax, zMax],
+        [xMax, yMin, zMax],
+    ];
 
     let zoom = 999;
     for (const point of points) {
@@ -1335,21 +1358,15 @@ function computeCameraZoom(
         const y_ = (point[1] - target[1]) / size.height;
         const z_ = (point[2] - target[2]) / size.height;
 
-        const m = new Matrix4(IDENTITY);
-        m.rotateX(camera.rotationX * DEGREES_TO_RADIANS);
-        m.rotateZ(camera.rotationOrbit * DEGREES_TO_RADIANS);
-
         const [x, y, z] = m.transformAsVector([x_, y_, z_]);
         if (y >= 0) {
             // These points will actually appear further away when zooming in.
             continue;
         }
 
-        const fwX = fD * Math.tan(angle_hor);
         let y_new = fwX / (Math.abs(x) / y - fwX / fD);
         const zoom_x = Math.log2(y_new / y);
 
-        const fwY = fD * Math.tan(angle_ver);
         y_new = fwY / (Math.abs(z) / y - fwY / fD);
         const zoom_z = Math.log2(y_new / y);
 
@@ -1369,7 +1386,7 @@ function getViewStateFromBounds(
     views: ViewsType | undefined,
     viewPort: ViewportType,
     size: Size
-): ViewStateType | undefined {
+): ViewStateType {
     const bounds =
         typeof bounds_accessor == "function"
             ? bounds_accessor()
@@ -1490,8 +1507,8 @@ function getViewType(
 
 function areViewsValid(views: ViewsType | undefined, size: Size): boolean {
     const isInvalid: boolean =
-        views?.viewports === undefined ||
-        views?.layout === undefined ||
+        views?.viewports == undefined ||
+        views?.layout == undefined ||
         !views?.layout?.[0] ||
         !views?.layout?.[1] ||
         !size.width ||
@@ -1535,7 +1552,7 @@ function buildDeckGlViews(views: ViewsType | undefined, size: Size): View[] {
         return [
             new OrthographicView({
                 id: "main",
-                controller: { doubleClickZoom: false },
+                controller: null,
                 x: "0%",
                 y: "0%",
                 width: "100%",
@@ -1592,29 +1609,98 @@ function buildDeckGlViews(views: ViewsType | undefined, size: Size): View[] {
 }
 
 /**
+ * Returns true if the camera zoom is set.
+ * @param camera to be tested
+ * @returns true if the camera camera zoom is set.
+ */
+function cameraHasZoom(camera: ViewStateType | undefined): boolean {
+    return typeof camera?.zoom === "number" && !Number.isNaN(camera.zoom);
+}
+
+/**
+ * Returns true if the camera target is set.
+ * @param camera to be tested
+ * @returns true if the camera camera target is set.
+ */
+function cameraHasTarget(camera: ViewStateType | undefined): boolean {
+    return (
+        Array.isArray(camera?.target) &&
+        camera.target.length >= 2 &&
+        camera.target.length <= 3
+    );
+}
+
+/**
+ * Returns true if the camera is fully defined.
+ * This ensures that the corresponding projection matrix is inversible.
+ * @param camera to be tested
+ * @returns true if the camera is fully defined.
+ */
+function isCameraDefined(camera: ViewStateType | undefined): boolean {
+    return cameraHasZoom(camera) && cameraHasTarget(camera);
+}
+
+/**
+ * Returns true if the camera is fully defined.
+ * This ensures that the corresponding projection matrix is inversible.
+ * @param camera to be tested
+ * @returns true if the camera is fully defined.
+ */
+function cameraDefinesBoundingBox(camera: ViewStateType | undefined): boolean {
+    return (
+        Array.isArray(camera?.zoom) &&
+        !isEmptyBox3D(camera.zoom as BoundingBox3D)
+    );
+}
+
+/**
+ * Returns true if the camera can be defined from the parameters.
+ * @param camera to be tested
+ * @param boundingBox fallback bounding box, if the camera zoom is not a zoom value nor a bounding box.
+ * @param size widget size in pixels.
+ * @returns true if the camera can be defined from the parameters.
+ */
+function canCameraBeDefined(
+    camera: ViewStateType | undefined,
+    boundingBox: BoundingBox3D | undefined,
+    bounds: BoundingBox2D | BoundsAccessor | undefined,
+    size: Size
+): boolean {
+    if (isCameraDefined(camera)) {
+        return true;
+    }
+    return (
+        size.height > 0 &&
+        size.width > 0 &&
+        (cameraDefinesBoundingBox(camera) ||
+            !isEmptyBox3D(boundingBox) ||
+            !isEmptyBox2D(typeof bounds === "function" ? bounds() : bounds))
+    );
+}
+
+/**
  * Returns the camera if it is fully specified (ie. the zoom is a valid number), otherwise computes
  * the zoom to visualize the complete camera boundingBox if set, the provided boundingBox otherwise.
- * @param camera input camera
- * @param boundingBox fallback bounding box, if the camera zoom is not zoom a value nor a bounding box
+ * @param camera input camera.
+ * @param boundingBox fallback bounding box, if the camera zoom is not a zoom value nor a bounding box.
+ * @param size widget size in pixels.
  */
 function updateViewState(
     camera: ViewStateType,
-    boundingBox: BoundingBox3D | undefined,
+    boundingBox: BoundingBox3D,
     size: Size,
     is3D = true
 ): ViewStateType {
-    if (typeof camera.zoom === "number" && !Number.isNaN(camera.zoom)) {
+    if (isCameraDefined(camera)) {
         return camera;
     }
 
     // update the camera to see the whole boundingBox
-    if (Array.isArray(camera.zoom)) {
+    if (
+        Array.isArray(camera.zoom) &&
+        !isEmptyBox3D(camera.zoom as BoundingBox3D)
+    ) {
         boundingBox = camera.zoom as BoundingBox3D;
-    }
-
-    // return the camera if the bounding box is undefined
-    if (boundingBox === undefined) {
-        return camera;
     }
 
     if (!is3D) {
@@ -1625,8 +1711,12 @@ function updateViewState(
 
     // clone the camera in case of triggerHome
     const camera_ = cloneDeep(camera);
-    camera_.zoom = computeCameraZoom(camera, boundingBox, size);
-    camera_.target = boxCenter(boundingBox);
+    if (!cameraHasZoom(camera_)) {
+        camera_.zoom = computeCameraZoom(camera, boundingBox, size);
+    }
+    if (!cameraHasTarget(camera_)) {
+        camera_.target = boxCenter(boundingBox);
+    }
     camera_.minZoom = camera_.minZoom ?? minZoom3D;
     camera_.maxZoom = camera_.maxZoom ?? maxZoom3D;
     return camera_;
@@ -1644,10 +1734,17 @@ function computeViewState(
     viewportMargins: MarginsType,
     views: ViewsType | undefined,
     size: Size
-): ViewStateType | undefined {
+): ViewStateType {
     // If the camera is defined, use it
-    const isCameraPositionDefined = cameraPosition !== undefined;
-    const isBoundsDefined = bounds !== undefined;
+    const isCameraPositionDefined = cameraPosition != undefined;
+    const isBoundsDefined =
+        bounds &&
+        !isEmptyBox2D(typeof bounds == "function" ? bounds() : bounds);
+
+    // defaults to avoid non invertible matrix issues while picking
+    if (!boundingBox || isEmptyBox3D(boundingBox)) {
+        boundingBox = [-1, -1, -1, 1, 1, 1];
+    }
 
     if (viewPort.show3D ?? false) {
         // If the camera is defined, use it
@@ -1657,9 +1754,8 @@ function computeViewState(
 
         // deprecated in 3D, kept for backward compatibility
         if (isBoundsDefined) {
-            const centerOfData: [number, number, number] = boundingBox
-                ? boxCenter(boundingBox)
-                : [0, 0, 0];
+            const centerOfData: [number, number, number] =
+                boxCenter(boundingBox);
             return getViewStateFromBounds(
                 viewportMargins,
                 bounds,
@@ -1670,16 +1766,12 @@ function computeViewState(
             );
         }
         const defaultCamera = {
-            target: [0, 0, 0],
-            zoom: NaN,
+            target: [], // force computation from the bounding box 3D
+            zoom: NaN, // force computation from the bounding box 3D
             rotationX: 45, // look down z -axis at 45 degrees
             rotationOrbit: 0,
         };
-        return updateViewState(
-            defaultCamera,
-            boundingBox ?? [0, 0, 0, 1, 1, 1],
-            size
-        );
+        return updateViewState(defaultCamera, boundingBox, size);
     } else {
         // If the camera is defined, use it
         if (isCameraPositionDefined) {
@@ -1687,9 +1779,7 @@ function computeViewState(
             return updateViewState(cameraPosition, boundingBox, size, is3D);
         }
 
-        const centerOfData: [number, number, number] = boundingBox
-            ? boxCenter(boundingBox)
-            : [0, 0, 0];
+        const centerOfData: [number, number, number] = boxCenter(boundingBox);
         // if bounds are defined, use them
         if (isBoundsDefined) {
             return getViewStateFromBounds(
@@ -1702,22 +1792,15 @@ function computeViewState(
             );
         }
 
-        return boundingBox
-            ? getViewStateFromBounds(
-                  viewportMargins,
-                  // use the bounding box to extract the 2D bounds
-                  [
-                      boundingBox[0],
-                      boundingBox[1],
-                      boundingBox[3],
-                      boundingBox[4],
-                  ],
-                  centerOfData,
-                  views,
-                  viewPort,
-                  size
-              )
-            : undefined;
+        return getViewStateFromBounds(
+            viewportMargins,
+            // use the bounding box to extract the 2D bounds
+            [boundingBox[0], boundingBox[1], boundingBox[3], boundingBox[4]],
+            centerOfData,
+            views,
+            viewPort,
+            size
+        );
     }
 }
 
@@ -1749,7 +1832,7 @@ function buildDeckGlViewStates(
             views,
             size
         );
-        return viewState ? { [views.viewports[0].id]: viewState } : {};
+        return { [views.viewports[0].id]: viewState };
     }
 
     // compute for matrix
