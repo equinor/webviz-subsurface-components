@@ -2,52 +2,7 @@ import "jest";
 
 import { renderHook } from "@testing-library/react";
 import type { ViewStateType, ViewportType } from "../components/Map";
-import { getZoom, scaleCameraZoom, useLateralZoom } from "./camera";
-
-describe("Test camera zoom scaling", () => {
-    const defaultCamera = {
-        zoom: 1,
-        target: [],
-        rotationX: 0,
-        rotationOrbit: 0,
-    };
-
-    it("Test no changes in 3D", () => {
-        const is3D = true;
-        const verticalScale = 1;
-        const camera = scaleCameraZoom(defaultCamera, verticalScale, is3D);
-        expect(camera).toBe(defaultCamera);
-    });
-
-    it("Test no scaling", () => {
-        const is3D = false;
-        const verticalScale = 1;
-        const camera = scaleCameraZoom(defaultCamera, verticalScale, is3D);
-        expect(camera).toBe(defaultCamera);
-    });
-
-    it("Test scaling", () => {
-        const is3D = false;
-        const verticalScale = 4;
-        const camera = scaleCameraZoom(defaultCamera, verticalScale, is3D);
-        console.log(camera);
-        expect(camera).toEqual({ ...defaultCamera, zoom: [1, 2] });
-    });
-
-    it("Test negative scaling", () => {
-        const is3D = false;
-        const verticalScale = -1;
-        const camera = scaleCameraZoom(defaultCamera, verticalScale, is3D);
-        expect(camera).toBe(defaultCamera);
-    });
-
-    it("Test NaN", () => {
-        const is3D = false;
-        const verticalScale = NaN;
-        const camera = scaleCameraZoom(defaultCamera, verticalScale, is3D);
-        expect(camera).toBe(defaultCamera);
-    });
-});
+import { getZoom, useLateralZoom } from "./camera";
 
 describe("Test zoom", () => {
     const defaultZoom = 3;

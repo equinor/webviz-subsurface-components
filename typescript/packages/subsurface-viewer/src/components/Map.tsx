@@ -71,7 +71,7 @@ import type { Unit } from "convert-units";
 import IntersectionView from "../views/intersectionView";
 
 import type { LightsType, TLayerDefinition } from "../SubsurfaceViewer";
-import { getZoom, scaleCameraZoom, useLateralZoom } from "../utils/camera";
+import { getZoom, useLateralZoom } from "../utils/camera";
 
 export type { BoundingBox2D, BoundingBox3D };
 /**
@@ -1614,7 +1614,10 @@ function buildDeckGlViews(views: ViewsType | undefined, size: Size): View[] {
  * @returns true if the camera camera zoom is set.
  */
 function cameraHasZoom(camera: ViewStateType | undefined): boolean {
-    return typeof camera?.zoom === "number" && !Number.isNaN(camera.zoom);
+    const zoom = camera?.zoom;
+    const isNumber = typeof zoom === "number" && !Number.isNaN(zoom);
+    const isXy = Array.isArray(zoom) && zoom.length == 2;
+    return isNumber || isXy;
 }
 
 /**
@@ -1689,11 +1692,10 @@ function updateViewState(
     camera: ViewStateType,
     boundingBox: BoundingBox3D,
     size: Size,
-    is3D = true,
-    verticalScale = 1
+    is3D = true
 ): ViewStateType {
     if (isCameraDefined(camera)) {
-        return scaleCameraZoom(camera, verticalScale, is3D);
+        return camera;
     }
 
     // update the camera to see the whole boundingBox
@@ -1720,8 +1722,7 @@ function updateViewState(
     }
     camera_.minZoom = camera_.minZoom ?? minZoom3D;
     camera_.maxZoom = camera_.maxZoom ?? maxZoom3D;
-
-    return scaleCameraZoom(camera_, verticalScale, is3D);
+    return camera_;
 }
 
 /**
@@ -1778,13 +1779,7 @@ function computeViewState(
         // If the camera is defined, use it
         if (isCameraPositionDefined) {
             const is3D = false;
-            return updateViewState(
-                cameraPosition,
-                boundingBox,
-                size,
-                is3D,
-                viewPort.verticalScale
-            );
+            return updateViewState(cameraPosition, boundingBox, size, is3D);
         }
 
         const centerOfData: [number, number, number] = boxCenter(boundingBox);

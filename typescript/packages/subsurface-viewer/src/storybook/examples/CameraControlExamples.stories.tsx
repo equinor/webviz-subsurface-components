@@ -31,6 +31,8 @@ import {
     volveWellsWithLogsLayer,
 } from "../sharedSettings";
 
+import { scaleZoom } from "../..";
+
 const stories: Meta = {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer/Examples/Camera",
@@ -577,6 +579,8 @@ const ScaleYWithCameraPositionComponent = ({
 }: {
     verticalScale: number;
 }) => {
+    const zoom = 3;
+    const xyZoom = scaleZoom(verticalScale, zoom);
     const viewerProps: SubsurfaceViewerProps = {
         id: "ScaleY",
         layers: [
@@ -602,7 +606,7 @@ const ScaleYWithCameraPositionComponent = ({
         cameraPosition: {
             rotationOrbit: 45,
             rotationX: 45,
-            zoom: 3,
+            zoom: xyZoom,
             target: [],
         },
     };
