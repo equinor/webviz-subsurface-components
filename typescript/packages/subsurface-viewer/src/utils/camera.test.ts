@@ -1,8 +1,53 @@
 import "jest";
 
-import { getZoom, useLateralZoom } from "./camera";
-import type { ViewStateType, ViewportType } from "../components/Map";
 import { renderHook } from "@testing-library/react";
+import type { ViewStateType, ViewportType } from "../components/Map";
+import { getZoom, scaleCameraZoom, useLateralZoom } from "./camera";
+
+describe("Test camera zoom scaling", () => {
+    const defaultCamera = {
+        zoom: 1,
+        target: [],
+        rotationX: 0,
+        rotationOrbit: 0,
+    };
+
+    it("Test no changes in 3D", () => {
+        const is3D = true;
+        const verticalScale = 1;
+        const camera = scaleCameraZoom(defaultCamera, verticalScale, is3D);
+        expect(camera).toEqual(defaultCamera);
+    });
+
+    it("Test no scaling", () => {
+        const is3D = false;
+        const verticalScale = 1;
+        const camera = scaleCameraZoom(defaultCamera, verticalScale, is3D);
+        expect(camera).toEqual({ ...defaultCamera, zoom: [1, 1] });
+    });
+
+    it("Test scaling", () => {
+        const is3D = false;
+        const verticalScale = 4;
+        const camera = scaleCameraZoom(defaultCamera, verticalScale, is3D);
+        console.log(camera);
+        expect(camera).toEqual({ ...defaultCamera, zoom: [1, 2] });
+    });
+
+    it("Test negative scaling", () => {
+        const is3D = false;
+        const verticalScale = -1;
+        const camera = scaleCameraZoom(defaultCamera, verticalScale, is3D);
+        expect(camera).toEqual({ ...defaultCamera, zoom: [1, 1] });
+    });
+
+    it("Test NaN", () => {
+        const is3D = false;
+        const verticalScale = NaN;
+        const camera = scaleCameraZoom(defaultCamera, verticalScale, is3D);
+        expect(camera).toEqual({ ...defaultCamera, zoom: [1, 1] });
+    });
+});
 
 describe("Test zoom", () => {
     const defaultZoom = 3;
@@ -22,7 +67,7 @@ describe("Test zoom", () => {
     it("Test vertical scale", () => {
         const viewport: ViewportType = { id: "", zoom: 10, verticalScale: 4 };
         const zoom = getZoom(viewport, defaultZoom);
-        expect(zoom).toEqual([viewport.zoom, 5]);
+        expect(zoom).toEqual([viewport.zoom, 20]);
     });
 
     it("Test zero scale", () => {

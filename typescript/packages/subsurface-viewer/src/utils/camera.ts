@@ -6,7 +6,7 @@ import type { ViewStateType, ViewportType } from "../components/Map";
 const scaleZoom = (verticalFactor: number, zoom: number) => {
     const scaledZoom: [number, number] = [
         zoom,
-        zoom / Math.sqrt(Math.max(verticalFactor || 0, 0) || 1),
+        zoom * Math.sqrt(Math.max(verticalFactor || 0, 0) || 1),
     ];
 
     return scaledZoom;
@@ -40,6 +40,6 @@ export const scaleCameraZoom = (
     if (is3D || typeof camera.zoom !== "number") {
         return camera;
     }
-    camera.zoom = scaleZoom(verticalScale, camera.zoom);
-    return camera;
+    const zoom = scaleZoom(verticalScale, camera.zoom);
+    return { ...camera, zoom };
 };

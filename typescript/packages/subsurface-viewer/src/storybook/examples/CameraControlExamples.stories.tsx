@@ -612,7 +612,7 @@ const ScaleYWithCameraPositionComponent = ({
 export const ScaleYWithCameraPosition: StoryObj<
     typeof ScaleYWithCameraPositionComponent
 > = {
-    args: { verticalScale: 1.5 },
+    args: { verticalScale: 2.5 },
     argTypes: {
         verticalScale: {
             control: { type: "range", min: -1, max: 10, step: 0.1 },

@@ -1,9 +1,9 @@
-import type { Layer, LayersList, PickingInfo } from "@deck.gl/core/typed";
+import React from "react";
+import type { PickingInfo, Layer, LayersList } from "@deck.gl/core/typed";
+import PropTypes from "prop-types";
 import type { colorTablesArray } from "@emerson-eps/color-tables/";
 import type { Unit } from "convert-units";
 import convert from "convert-units";
-import PropTypes from "prop-types";
-import React from "react";
 
 import type { MjolnirGestureEvent } from "mjolnir.js";
 
@@ -25,10 +25,10 @@ export type {
     TooltipCallback,
     ViewStateType,
     ViewsType,
-    colorTablesArray
+    colorTablesArray,
 };
 
-    export { TGrid3DColoringMode };
+export { TGrid3DColoringMode };
 
 export type LightsType = {
     headLight?: {
