@@ -33,7 +33,7 @@ function getScale(
     ];
     const n: number = ticks.length;
     for (let i = 0; i + 2 < n; i++) {
-        if (scale < -ticks[i]) continue;
+        if (scale < ticks[i]) continue;
         r = ticks[i + 2];
         break;
     }
