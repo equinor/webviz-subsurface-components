@@ -15,17 +15,17 @@ export function defaultSidePanel(parent: WellLogViewer): JSX.Element {
                 axisMnemos={parent.props.axisMnemos}
                 primaryAxis={parent.getPrimaryAxis()}
                 onChangePrimaryAxis={parent.onChangePrimaryAxis}
-                callbacksManager={parent.callbacksManager}
+                callbackManager={parent.callbackManager}
             />
             <WellLogInfoPanel
                 header="Readout"
                 readoutOptions={parent.props.readoutOptions}
-                callbacksManager={parent.callbacksManager}
+                callbackManager={parent.callbackManager}
             />
             <WellLogZoomSlider
                 label="Zoom:"
                 max={parent.props.options?.maxContentZoom}
-                callbacksManager={parent.callbacksManager}
+                callbackManager={parent.callbackManager}
             />
         </div>
     );

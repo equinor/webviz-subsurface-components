@@ -63,7 +63,7 @@ export default class WellLogViewer extends Component<
 > {
     public static propTypes: Record<string, unknown>;
 
-    callbacksManager: CallbackManager;
+    callbackManager: CallbackManager;
 
     constructor(props: WellLogViewerProps) {
         super(props);
@@ -72,7 +72,7 @@ export default class WellLogViewer extends Component<
             primaryAxis: this.getDefaultPrimaryAxis(), //"md"
         };
 
-        this.callbacksManager = new CallbackManager(() => this.props.welllog);
+        this.callbackManager = new CallbackManager(() => this.props.welllog);
 
         this.onCreateController = this.onCreateController.bind(this);
 
@@ -85,27 +85,27 @@ export default class WellLogViewer extends Component<
 
     // callback function from WellLogView
     onCreateController(controller: WellLogController): void {
-        this.callbacksManager.onCreateController(controller);
+        this.callbackManager.onCreateController(controller);
         this.props.onCreateController?.(controller); // call callback to component's caller
     }
     // callback function from WellLogView
     onContentRescale(): void {
-        this.callbacksManager.onContentRescale();
+        this.callbackManager.onContentRescale();
         this.props.onContentRescale?.(); // call callback to component's caller
     }
     // callback function from WellLogView
     onContentSelection(): void {
-        this.callbacksManager.onContentSelection();
+        this.callbackManager.onContentSelection();
         this.props.onContentSelection?.(); // call callback to component's caller
     }
     // callback function from WellLogView
     onTemplateChanged(): void {
-        this.callbacksManager.onTemplateChanged();
+        this.callbackManager.onTemplateChanged();
         this.props.onTemplateChanged?.(); // call callback to component's caller
     }
     // callback function from Axis selector
     onChangePrimaryAxis(value: string): void {
-        this.callbacksManager.onChangePrimaryAxis(value);
+        this.callbackManager.onChangePrimaryAxis(value);
     }
 
     componentDidMount(): void {
@@ -113,7 +113,7 @@ export default class WellLogViewer extends Component<
     }
 
     componentWillUnmount(): void {
-        this.callbacksManager.unregisterAll();
+        this.callbackManager.unregisterAll();
     }
 
     shouldComponentUpdate(
@@ -178,7 +178,7 @@ export default class WellLogViewer extends Component<
                         // callbacks
                         onTrackMouseEvent={onTrackMouseEvent}
                         onCreateController={this.onCreateController}
-                        onInfo={this.callbacksManager.onInfo}
+                        onInfo={this.callbackManager.onInfo}
                         onContentRescale={this.onContentRescale}
                         onContentSelection={this.onContentSelection}
                         onTemplateChanged={this.onTemplateChanged}

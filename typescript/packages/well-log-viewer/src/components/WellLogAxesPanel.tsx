@@ -8,7 +8,7 @@ import type { WellLog } from "./WellLogTypes";
 import type { CallbackManager } from "./CallbackManager";
 
 interface Props {
-    callbacksManager: CallbackManager;
+    callbackManager: CallbackManager;
 
     header?: string | JSX.Element;
 
@@ -41,7 +41,7 @@ export class WellLogAxesPanel extends Component<Props, State> {
     constructor(props: Props) {
         super(props);
 
-        this.welllog = this.props.callbacksManager.welllog();
+        this.welllog = this.props.callbackManager.welllog();
         const axes = getAvailableAxes(this.welllog, this.props.axisMnemos);
 
         this.state = {
@@ -51,21 +51,21 @@ export class WellLogAxesPanel extends Component<Props, State> {
 
         this.onChangePrimaryAxis = this.onChangePrimaryAxis.bind(this);
 
-        this.props.callbacksManager.registerCallback(
+        this.props.callbackManager.registerCallback(
             "onChangePrimaryAxis",
             this.onChangePrimaryAxis
         );
     }
 
     componentWillUnmount(): void {
-        this.props.callbacksManager.unregisterCallback(
+        this.props.callbackManager.unregisterCallback(
             "onChangePrimaryAxis",
             this.onChangePrimaryAxis
         );
     }
 
     componentDidUpdate(prevProps: Props): void {
-        const wellog = this.props.callbacksManager?.welllog();
+        const wellog = this.props.callbackManager?.welllog();
         if (
             this.welllog !== wellog ||
             prevProps.axisMnemos !== this.props.axisMnemos

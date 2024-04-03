@@ -5,7 +5,7 @@ import ScaleSelector from "./ScaleSelector";
 import type { CallbackManager } from "./CallbackManager";
 
 interface Props {
-    callbacksManager: CallbackManager | undefined;
+    callbackManager: CallbackManager | undefined;
 
     label?: string | JSX.Element;
     values?: number[];
@@ -24,13 +24,13 @@ export class WellLogScaleSelector extends Component<Props, State> {
 
         this.onScaleChange = this.onScaleChange.bind(this);
         this.onContentRescale = this.onContentRescale.bind(this);
-        this.props.callbacksManager?.registerCallback(
+        this.props.callbackManager?.registerCallback(
             "onContentRescale",
             this.onContentRescale
         );
     }
     componentWillUnmount(): void {
-        this.props.callbacksManager?.unregisterCallback(
+        this.props.callbackManager?.unregisterCallback(
             "onContentRescale",
             this.onContentRescale
         );
@@ -38,14 +38,14 @@ export class WellLogScaleSelector extends Component<Props, State> {
 
     // callback function from Vertical Scale combobox
     onScaleChange(value: number): void {
-        const controller = this.props.callbacksManager?.controller;
+        const controller = this.props.callbackManager?.controller;
         if (!controller) return;
         controller.setContentScale(value);
     }
 
     onContentRescale(): void {
         this.setState((state: Readonly<State>) => {
-            const controller = this.props.callbacksManager?.controller;
+            const controller = this.props.callbackManager?.controller;
             if (!controller) return null;
             const scale = controller.getContentScale();
             if (Math.abs(state.scale - scale) < 1) return null;

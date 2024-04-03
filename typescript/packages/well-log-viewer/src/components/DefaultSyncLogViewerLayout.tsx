@@ -17,7 +17,7 @@ export function defaultSidePanel(parent: SyncLogViewer): JSX.Element {
                 axisMnemos={parent.props.axisMnemos}
                 primaryAxis={primaryAxis}
                 onChangePrimaryAxis={parent.onChangePrimaryAxis}
-                callbacksManager={parent.callbacksManagers[0]}
+                callbackManager={parent.callbackManagers[0]}
             />
             {parent.props.welllogs?.map(
                 (welllog: WellLog, iWellLog: number) => (
@@ -25,14 +25,14 @@ export function defaultSidePanel(parent: SyncLogViewer): JSX.Element {
                         key={iWellLog}
                         header={"Readout " + welllog.header.well}
                         readoutOptions={parent.props.readoutOptions}
-                        callbacksManager={parent.callbacksManagers[iWellLog]}
+                        callbackManager={parent.callbackManagers[iWellLog]}
                     />
                 )
             )}
             <WellLogZoomSlider
                 label="Zoom:"
                 max={parent.props.welllogOptions?.maxContentZoom}
-                callbacksManager={parent.callbacksManagers[0]}
+                callbackManager={parent.callbackManagers[0]}
             />
         </div>
     );

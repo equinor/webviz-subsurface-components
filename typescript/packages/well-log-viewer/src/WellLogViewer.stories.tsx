@@ -279,7 +279,7 @@ export const Horizontal: StoryObj<typeof StoryTemplate> = {
 
 class MapAndWellLogViewer extends React.Component<Props, State> {
     public static propTypes?: WeakValidationMap<Props> | undefined;
-    callbacksManager: CallbackManager;
+    callbackManager: CallbackManager;
 
     constructor(props: Props) {
         super(props);
@@ -293,7 +293,7 @@ class MapAndWellLogViewer extends React.Component<Props, State> {
 
         this.onMapMouseEvent = this.onMapMouseEvent.bind(this);
 
-        this.callbacksManager = new CallbackManager(() => {
+        this.callbackManager = new CallbackManager(() => {
             return this.state.wellIndex === undefined
                 ? undefined
                 : welllogs[this.state.wellIndex];
@@ -305,7 +305,7 @@ class MapAndWellLogViewer extends React.Component<Props, State> {
             0;
         }
         if (!isEqualRanges(this.state.selection, prevState.selection)) {
-            const controller = this.callbacksManager.controller;
+            const controller = this.callbackManager.controller;
             if (controller && this.state.selection) {
                 controller.selectContent([
                     this.state.selection[0],
@@ -315,13 +315,13 @@ class MapAndWellLogViewer extends React.Component<Props, State> {
         }
     }
     componentWillUnmount(): void {
-        this.callbacksManager.unregisterAll();
+        this.callbackManager.unregisterAll();
     }
 
     onContentSelection(): void {
-        this.callbacksManager.onContentSelection();
+        this.callbackManager.onContentSelection();
 
-        const controller = this.callbacksManager.controller;
+        const controller = this.callbackManager.controller;
         if (!controller) return;
         const selection = controller.getContentSelection();
 
@@ -334,7 +334,7 @@ class MapAndWellLogViewer extends React.Component<Props, State> {
         }
     }
     onTrackScroll(): void {
-        const controller = this.callbacksManager.controller;
+        const controller = this.callbackManager.controller;
         if (!controller) return;
         const iTrack = controller.getTrackScrollPos();
         if (iTrack >= 0) {
@@ -419,7 +419,7 @@ class MapAndWellLogViewer extends React.Component<Props, State> {
                     };
                 });
 
-                const controller = this.callbacksManager.controller;
+                const controller = this.callbackManager.controller;
                 if (controller) {
                     const wellsLayer = findWellsLayer(event);
                     if (wellsLayer) {
@@ -549,16 +549,16 @@ class MapAndWellLogViewer extends React.Component<Props, State> {
                                 maxVisibleTrackNum: 1,
                             }}
                             onCreateController={
-                                this.callbacksManager.onCreateController
+                                this.callbackManager.onCreateController
                             }
-                            onInfo={this.callbacksManager.onInfo}
+                            onInfo={this.callbackManager.onInfo}
                             onContentSelection={this.onContentSelection}
                             onTrackScroll={this.onTrackScroll}
                         />
                     </div>
                     <WellLogInfoPanel
                         header="Readout"
-                        callbacksManager={this.callbacksManager}
+                        callbackManager={this.callbackManager}
                     />
                 </div>
             </div>

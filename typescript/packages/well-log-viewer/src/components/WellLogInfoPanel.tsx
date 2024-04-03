@@ -13,7 +13,7 @@ import { fillInfos } from "../utils/fill-info";
 import "./sidePanel.scss";
 
 interface Props {
-    callbacksManager: CallbackManager;
+    callbackManager: CallbackManager;
 
     header?: string | JSX.Element;
     readoutOptions?: InfoOptions; // options for readout
@@ -45,23 +45,23 @@ export class WellLogInfoPanel extends Component<Props, State> {
         this.onInfo = this.onInfo.bind(this);
         this.onInfoGroupClick = this.onInfoGroupClick.bind(this);
 
-        const callbacksManager = this.props.callbacksManager;
-        callbacksManager.registerCallback("onInfo", this.onInfo);
-        callbacksManager.registerCallback(
+        const callbackManager = this.props.callbackManager;
+        callbackManager.registerCallback("onInfo", this.onInfo);
+        callbackManager.registerCallback(
             "onInfoGroupClick",
             this.onInfoGroupClick,
             true
         );
 
-        this.onGroupClick = callbacksManager.callCallbacks.bind(
-            callbacksManager,
+        this.onGroupClick = callbackManager.callCallbacks.bind(
+            callbackManager,
             "onInfoGroupClick"
         );
     }
     componentWillUnmount(): void {
-        const callbacksManager = this.props.callbacksManager;
-        callbacksManager.unregisterCallback("onInfo", this.onInfo);
-        callbacksManager.unregisterCallback(
+        const callbackManager = this.props.callbackManager;
+        callbackManager.unregisterCallback("onInfo", this.onInfo);
+        callbackManager.unregisterCallback(
             "onInfoGroupClick",
             this.onInfoGroupClick
         );
@@ -76,7 +76,7 @@ export class WellLogInfoPanel extends Component<Props, State> {
                 this.props.readoutOptions.grouping !==
                     prevProps.readoutOptions.grouping)
         ) {
-            this.props.callbacksManager.updateInfo(); // force onInfo callback to be called
+            this.props.callbackManager.updateInfo(); // force onInfo callback to be called
         }
     }
 
@@ -101,7 +101,7 @@ export class WellLogInfoPanel extends Component<Props, State> {
     onInfoGroupClick(info: Info): void {
         const collapsedTrackIds = this.collapsedTrackIds;
         /* 
-        const controller = this.props.callbacksManager.controller;
+        const controller = this.props.callbackManager.controller;
         if (controller) { // info.trackId could be for another controller so map iTrack to trackid for the curent controller
             const wellLogView = controller as WellLogView;
             const logController = wellLogView.logController;
@@ -122,7 +122,7 @@ export class WellLogInfoPanel extends Component<Props, State> {
             // old code
             toggleId(collapsedTrackIds, info.trackId);
         }
-        this.props.callbacksManager.updateInfo(); // force to get onInfo call from WellLogView
+        this.props.callbackManager.updateInfo(); // force to get onInfo call from WellLogView
     }
 
     render(): JSX.Element {

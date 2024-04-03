@@ -6,6 +6,8 @@ import { colorTables } from "@emerson-eps/color-tables";
 //import { ColorTable } from "./components/ColorTableTypes";
 const exampleColorTable = colorTables; /*as unknown as ColorTable[]*/ // equivalent types, should be merged
 const wellpickColorTable = require("../../../../example-data/wellpick_colors.json"); // eslint-disable-line
+const wellpick = require("../../../../example-data/wellpicks.json");// eslint-disable-line
+
 import { ToggleButton } from "@mui/material";
 
 import SyncLogViewer, { argTypesSyncLogViewerProp } from "./SyncLogViewer";
@@ -137,11 +139,11 @@ function fillInfo(controller) {
         "]" +
         (selection[0] !== undefined
             ? ", selected: [" +
-            selection[0].toFixed(0) +
-            (selection[1] !== undefined
-                ? ", " + selection[1].toFixed(0)
-                : "") +
-            "]"
+              selection[0].toFixed(0) +
+              (selection[1] !== undefined
+                  ? ", " + selection[1].toFixed(0)
+                  : "") +
+              "]"
             : "")
     );
 }
@@ -317,24 +319,24 @@ export const Default: StoryObj<typeof Template> = {
             require("../../../../example-data/synclog_template.json"), // eslint-disable-line
             require("../../../../example-data/synclog_template.json"), // eslint-disable-line
         ],
-        colorTables: colorTables,
+        colorTables: exampleColorTable,
         wellpicks: [
             {
-                wellpick: require("../../../../example-data/wellpicks.json")[0], // eslint-disable-line
+                wellpick: wellpick[0],
                 name: "HORIZON",
-                colorTables: require("../../../../example-data/wellpick_colors.json"), // eslint-disable-line
+                colorTables: wellpickColorTable,
                 color: "Stratigraphy",
             },
             {
-                wellpick: require("../../../../example-data/wellpicks.json")[1], // eslint-disable-line
+                wellpick: wellpick[1],
                 name: "HORIZON",
-                colorTables: require("../../../../example-data/wellpick_colors.json"), // eslint-disable-line
+                colorTables: wellpickColorTable, // eslint-disable-line
                 color: "Stratigraphy",
             },
             {
-                wellpick: require("../../../../example-data/wellpicks.json")[0], // eslint-disable-line
+                wellpick: wellpick[2],
                 name: "HORIZON",
-                colorTables: require("../../../../example-data/wellpick_colors.json"), // eslint-disable-line
+                colorTables: wellpickColorTable, // eslint-disable-line
                 color: "Stratigraphy",
             },
         ],
@@ -390,7 +392,7 @@ CustomLayout.args = {
                 <div style={{ paddingBottom: "5px" }}>
                     <WellLogScaleSelector
                         label="Scale value:"
-                        callbacksManager={parent.callbacksManagers[0]}
+                        callbackManager={parent.callbackManagers[0]}
                     />
                 </div>
                 {parent.props.welllogs?.map((welllog, iWellLog) => (
@@ -411,7 +413,7 @@ CustomLayout.args = {
                             </>
                         }
                         readoutOptions={parent.props.readoutOptions}
-                        callbacksManager={parent.callbacksManagers[iWellLog]}
+                        callbackManager={parent.callbackManagers[iWellLog]}
                     />
                 ))}
             </div>
@@ -424,7 +426,7 @@ CustomLayout.args = {
                 <WellLogZoomSlider
                     label="Zoom:"
                     max={parent.props.welllogOptions?.maxContentZoom}
-                    callbacksManager={parent.callbacksManagers[0]}
+                    callbackManager={parent.callbackManagers[0]}
                 />
             </div>
         ),
