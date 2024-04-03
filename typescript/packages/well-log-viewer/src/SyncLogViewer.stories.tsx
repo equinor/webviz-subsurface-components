@@ -334,7 +334,7 @@ export const Default: StoryObj<typeof Template> = {
                 color: "Stratigraphy",
             },
             {
-                wellpick: wellpick[2],
+                wellpick: wellpick[0],
                 name: "HORIZON",
                 colorTables: wellpickColorTable, // eslint-disable-line
                 color: "Stratigraphy",
