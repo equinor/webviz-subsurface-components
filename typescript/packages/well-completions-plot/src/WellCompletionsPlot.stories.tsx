@@ -1,4 +1,6 @@
+import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
+
 import { WellCompletionsPlot } from "./WellCompletionsPlot";
 import type { PlotData } from "./index";
 
@@ -12,7 +14,7 @@ import {
 /**
  * Storybook test for the well completions plot component
  */
-export default {
+const stories: Meta = {
     component: WellCompletionsPlot,
     title: "WellCompletionsPlot/Demo",
     argTypes: {
@@ -23,6 +25,7 @@ export default {
         },
     },
 };
+export default stories;
 
 const Template = (data) => {
     const [plotData, setPlotData] = React.useState<PlotData>(data.plotData);
@@ -72,10 +75,10 @@ const Template = (data) => {
         </>
     );
 };
-export const WellCompletionsPlotStory = Template.bind({});
-
-//Inject test input data
-WellCompletionsPlotStory.args = {
-    plotData: firstPlotData,
-    timeSteps: timeSteps,
+export const WellCompletionsPlotStory: StoryObj<typeof Template> = {
+    args: {
+        plotData: firstPlotData,
+        timeSteps: timeSteps,
+    },
+    render: (args) => <Template {...args} />,
 };
