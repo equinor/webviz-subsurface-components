@@ -1,4 +1,6 @@
+import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
+
 import WellLogView from "./WellLogView";
 import { argTypesWellLogViewProp } from "./WellLogView";
 import { colorTables } from "@emerson-eps/color-tables";
@@ -18,7 +20,7 @@ const ComponentCode =
 
 import { axisTitles, axisMnemos } from "../utils/axes";
 
-export default {
+const stories: Meta = {
     component: WellLogView,
     title: "WellLogViewer/Components/WellLogView",
     parameters: {
@@ -41,6 +43,7 @@ export default {
         },
     },
 };
+export default stories;
 
 const Template = (args) => {
     return (
@@ -52,33 +55,37 @@ const Template = (args) => {
     );
 };
 
-export const Default = Template.bind({});
-Default.args = {
-    id: "Well-Log-View",
-    horizontal: false,
-    welllog: welllogDefault,
-    template: require("../../../../../example-data/welllog_template_1.json"),
-    viewTitle: (
-        <div>
-            <i>Well</i> <b>{welllogDefault.header.well}</b>
-        </div>
-    ),
-    colorTables: colorTables,
-    axisTitles: axisTitles,
-    axisMnemos: axisMnemos,
+export const Default: StoryObj<typeof Template> = {
+    args: {
+        id: "Well-Log-View",
+        horizontal: false,
+        welllog: welllogDefault,
+        template: require("../../../../../example-data/welllog_template_1.json"),
+        viewTitle: (
+            <div>
+                <i>Well</i> <b>{welllogDefault.header.well}</b>
+            </div>
+        ),
+        colorTables: colorTables,
+        axisTitles: axisTitles,
+        axisMnemos: axisMnemos,
+    },
+    render: (args) => <Template {...args} />,
 };
 
-export const Discrete = Template.bind({});
-Discrete.args = {
-    id: "Well-Log-View-Discrete",
-    horizontal: false,
-    welllog: welllogDiscrete,
-    template: require("../../../../../example-data/welllog_template_2.json"),
-    viewTitle: "Well '" + welllogDiscrete.header.well + "'",
-    colorTables: colorTables,
-    axisTitles: axisTitles,
-    axisMnemos: axisMnemos,
-    options: {
-        checkDatafileSchema: true,
+export const Discrete: StoryObj<typeof Template> = {
+    args: {
+        id: "Well-Log-View-Discrete",
+        horizontal: false,
+        welllog: welllogDiscrete,
+        template: require("../../../../../example-data/welllog_template_2.json"),
+        viewTitle: "Well '" + welllogDiscrete.header.well + "'",
+        colorTables: colorTables,
+        axisTitles: axisTitles,
+        axisMnemos: axisMnemos,
+        options: {
+            checkDatafileSchema: true,
+        },
     },
+    render: (args) => <Template {...args} />,
 };

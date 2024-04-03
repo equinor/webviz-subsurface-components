@@ -1,11 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
+import type { Meta, StoryObj } from "@storybook/react";
+import React from "react";
 
 import { colorTables } from "@emerson-eps/color-tables";
 //import { ColorTable } from "./components/ColorTableTypes";
 const exampleColorTable = colorTables; /*as unknown as ColorTable[]*/ // equivalent types, should be merged
 const wellpickColorTable = require("../../../../example-data/wellpick_colors.json"); // eslint-disable-line
 import { ToggleButton } from "@mui/material";
-import React from "react";
+
 import SyncLogViewer, { argTypesSyncLogViewerProp } from "./SyncLogViewer";
 
 const ComponentCode =
@@ -29,7 +31,7 @@ const ComponentCode =
 import type { WellLog } from "./components/WellLogTypes";
 import { axisMnemos, axisTitles } from "./utils/axes";
 
-export default {
+const stories: Meta = {
     component: SyncLogViewer,
     title: "WellLogViewer/Demo/SyncLogViewer",
     parameters: {
@@ -115,6 +117,7 @@ export default {
     },
     tags: ["no-screenshot-test"],
 };
+export default stories;
 
 function fillInfo(controller) {
     if (!controller) return "-";
@@ -134,11 +137,11 @@ function fillInfo(controller) {
         "]" +
         (selection[0] !== undefined
             ? ", selected: [" +
-              selection[0].toFixed(0) +
-              (selection[1] !== undefined
-                  ? ", " + selection[1].toFixed(0)
-                  : "") +
-              "]"
+            selection[0].toFixed(0) +
+            (selection[1] !== undefined
+                ? ", " + selection[1].toFixed(0)
+                : "") +
+            "]"
             : "")
     );
 }
@@ -296,73 +299,75 @@ const patternNamesEnglish = [
     "Vulcanic",
 ];
 
-export const Default = Template.bind({});
-Default.args = {
-    id: "Sync-Log-Viewer",
-    syncTrackPos: true,
-    syncContentDomain: true,
-    syncContentSelection: true,
-    syncTemplate: true,
-    horizontal: false,
+export const Default: StoryObj<typeof Template> = {
+    args: {
+        id: "Sync-Log-Viewer",
+        syncTrackPos: true,
+        syncContentDomain: true,
+        syncContentSelection: true,
+        syncTemplate: true,
+        horizontal: false,
 
-    welllogs: [
-        require("../../../../example-data/L898MUD.json")[0],    // eslint-disable-line
-        require("../../../../example-data/L916MUD.json")[0],// eslint-disable-line
-        require("../../../../example-data/Lis1.json")[0],// eslint-disable-line
-    ],
-    templates: [
-        require("../../../../example-data/synclog_template.json"),// eslint-disable-line
-        require("../../../../example-data/synclog_template.json"),// eslint-disable-line
-    ],
-    colorTables: exampleColorTable,
-    wellpicks: [
-        {
-            wellpick: require("../../../../example-data/wellpicks.json")[0],// eslint-disable-line
-            name: "HORIZON",
-            colorTables: wellpickColorTable,
-            color: "Stratigraphy",
+        welllogs: [
+            require("../../../../example-data/L898MUD.json")[0], // eslint-disable-line
+            require("../../../../example-data/L916MUD.json")[0], // eslint-disable-line
+            require("../../../../example-data/Lis1.json")[0], // eslint-disable-line
+        ],
+        templates: [
+            require("../../../../example-data/synclog_template.json"), // eslint-disable-line
+            require("../../../../example-data/synclog_template.json"), // eslint-disable-line
+        ],
+        colorTables: colorTables,
+        wellpicks: [
+            {
+                wellpick: require("../../../../example-data/wellpicks.json")[0], // eslint-disable-line
+                name: "HORIZON",
+                colorTables: require("../../../../example-data/wellpick_colors.json"), // eslint-disable-line
+                color: "Stratigraphy",
+            },
+            {
+                wellpick: require("../../../../example-data/wellpicks.json")[1], // eslint-disable-line
+                name: "HORIZON",
+                colorTables: require("../../../../example-data/wellpick_colors.json"), // eslint-disable-line
+                color: "Stratigraphy",
+            },
+            {
+                wellpick: require("../../../../example-data/wellpicks.json")[0], // eslint-disable-line
+                name: "HORIZON",
+                colorTables: require("../../../../example-data/wellpick_colors.json"), // eslint-disable-line
+                color: "Stratigraphy",
+            },
+        ],
+        patternsTable: {
+            patternSize: 24,
+            patternImages: patternImages,
+            names: patternNamesEnglish,
         },
-        {
-            wellpick: require("../../../../example-data/wellpicks.json")[1],// eslint-disable-line
-            name: "HORIZON",
-            colorTables: wellpickColorTable,
-            color: "Stratigraphy",
+        patterns: require("../../../../example-data/horizon_patterns.json"), // eslint-disable-line
+
+        wellpickFlatting: ["Hor_2", "Hor_4"],
+
+        spacers: [312, 255],
+        wellDistances: {
+            units: "m",
+            distances: [2048.3, 512.7],
         },
-        {
-            wellpick: require("../../../../example-data/wellpicks.json")[0],// eslint-disable-line
-            name: "HORIZON",
-            colorTables: wellpickColorTable,
-            color: "Stratigraphy",
+
+        axisTitles: axisTitles,
+        axisMnemos: axisMnemos,
+
+        viewTitles: true, // show default welllog view titles (a wellname from the welllog)
+
+        welllogOptions: {
+            wellpickColorFill: true,
+            wellpickPatternFill: true,
         },
-    ],
-    patternsTable: {
-        patternSize: 24,
-        patternImages: patternImages,
-        names: patternNamesEnglish,
+        spacerOptions: {
+            wellpickColorFill: true,
+            wellpickPatternFill: true,
+        },
     },
-    patterns: require("../../../../example-data/horizon_patterns.json"),// eslint-disable-line
-
-    wellpickFlatting: ["Hor_2", "Hor_4"],
-
-    spacers: [312, 255],
-    wellDistances: {
-        units: "m",
-        distances: [2048.3, 512.7],
-    },
-
-    axisTitles: axisTitles,
-    axisMnemos: axisMnemos,
-
-    viewTitles: true, // show default welllog view titles (a wellname from the welllog)
-
-    welllogOptions: {
-        wellpickColorFill: true,
-        wellpickPatternFill: true,
-    },
-    spacerOptions: {
-        wellpickColorFill: true,
-        wellpickPatternFill: true,
-    },
+    render: (args) => <Template {...args} />,
 };
 
 import WellLogInfoPanel from "./components/WellLogInfoPanel";
@@ -496,5 +501,10 @@ const TemplateWithSelection = (args) => {
     );
 };
 
-export const DiscreteLogs = TemplateWithSelection.bind({});
-DiscreteLogs.args = require("../../../../example-data/facies3wells.json");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const args = require("../../../../example-data/facies3wells.json");
+
+export const DiscreteLogs: StoryObj<typeof TemplateWithSelection> = {
+    args: args,
+    render: (args) => <TemplateWithSelection {...args} />,
+};
