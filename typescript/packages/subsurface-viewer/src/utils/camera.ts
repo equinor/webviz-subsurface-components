@@ -37,7 +37,16 @@ export const scaleCameraZoom = (
     verticalScale: number,
     is3D: boolean
 ) => {
-    if (is3D || typeof camera.zoom !== "number") {
+    // Prevent changing identity of camera object unnecessarily in order to prevent
+    // unnecessary hook triggers.
+    if (
+        is3D ||
+        typeof camera.zoom !== "number" ||
+        verticalScale === 1 ||
+        verticalScale <= 0 ||
+        Number.isNaN(verticalScale) ||
+        Number.isNaN(camera.zoom)
+    ) {
         return camera;
     }
     const zoom = scaleZoom(verticalScale, camera.zoom);

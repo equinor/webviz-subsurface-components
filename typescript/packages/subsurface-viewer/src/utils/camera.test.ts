@@ -16,14 +16,14 @@ describe("Test camera zoom scaling", () => {
         const is3D = true;
         const verticalScale = 1;
         const camera = scaleCameraZoom(defaultCamera, verticalScale, is3D);
-        expect(camera).toEqual(defaultCamera);
+        expect(camera).toBe(defaultCamera);
     });
 
     it("Test no scaling", () => {
         const is3D = false;
         const verticalScale = 1;
         const camera = scaleCameraZoom(defaultCamera, verticalScale, is3D);
-        expect(camera).toEqual({ ...defaultCamera, zoom: [1, 1] });
+        expect(camera).toBe(defaultCamera);
     });
 
     it("Test scaling", () => {
@@ -38,14 +38,14 @@ describe("Test camera zoom scaling", () => {
         const is3D = false;
         const verticalScale = -1;
         const camera = scaleCameraZoom(defaultCamera, verticalScale, is3D);
-        expect(camera).toEqual({ ...defaultCamera, zoom: [1, 1] });
+        expect(camera).toBe(defaultCamera);
     });
 
     it("Test NaN", () => {
         const is3D = false;
         const verticalScale = NaN;
         const camera = scaleCameraZoom(defaultCamera, verticalScale, is3D);
-        expect(camera).toEqual({ ...defaultCamera, zoom: [1, 1] });
+        expect(camera).toBe(defaultCamera);
     });
 });
 
