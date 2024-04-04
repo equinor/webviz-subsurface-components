@@ -256,11 +256,23 @@ const layerArrays = {
     },
 };
 
-function replaceArrays(args: SubsurfaceViewerProps) {
+function replaceAllArrays(args: SubsurfaceViewerProps) {
     args.layers?.forEach((layer: TLayerDefinition) => {
         const layerId = layer?.["id"] as string | undefined;
         if (layer && layerId && layerArrays[layerId]) {
             for (const key in layerArrays[layerId]) {
+                layer[key] = layerArrays[layerId][key];
+            }
+        }
+    });
+    return args;
+}
+
+function replaceArrays(args: SubsurfaceViewerProps, keys: string[]) {
+    args.layers?.forEach((layer: TLayerDefinition) => {
+        const layerId = layer?.["id"] as string | undefined;
+        if (layer && layerId && layerArrays[layerId]) {
+            for (const key in keys) {
                 layer[key] = layerArrays[layerId][key];
             }
         }
@@ -308,5 +320,57 @@ export const DiscretePropertyWithClamping: StoryObj<typeof SubsurfaceViewer> = {
         ],
     },
     parameters: parameters,
-    render: (args) => <SubsurfaceViewer {...replaceArrays(args)} />,
+    render: (args) => <SubsurfaceViewer {...replaceAllArrays(args)} />,
+};
+
+export const CustomColorFuncWithClamping: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        bounds: [-2500, -2500, 2500, 2500] as NumberQuad,
+        views: {
+            layout: [1, 1] as [number, number],
+            viewports: [
+                {
+                    id: "view_1",
+                    show3D: true,
+                },
+            ],
+        },
+        id: "grid-3d-discrete_props",
+        layers: [
+            {
+                ...axes,
+                id: "discrete_props-axes",
+                bounds: [-2000, -2200, -2200, 2200, 2000, -1000],
+            },
+            {
+                ...grid3dLayer,
+                "@@typedArraySupport": true,
+                id: discretePropsLayerId,
+                coloringMode: TGrid3DColoringMode.Property,
+                pickable: true,
+                pointsData: layerArrays[discretePropsLayerId].pointsData,
+                polysData: layerArrays[discretePropsLayerId].polysData,
+                propertiesData:
+                    layerArrays[discretePropsLayerId].propertiesData,
+                colorMapName: "Seismic",
+                ZIncreasingDownwards: true,
+                colorMapFunction: function (v) {
+                    return [255 * v, 0, 255 * (1 - v)];
+                },
+                material: false,
+                colorMapRange: [3, 10],
+                colorMapClampColor: [100, 100, 100],
+            },
+        ],
+    },
+    parameters: parameters,
+    render: (args) => (
+        <SubsurfaceViewer
+            {...replaceArrays(args, [
+                "pointsData",
+                "polysData",
+                "propertiesData",
+            ])}
+        />
+    ),
 };
