@@ -258,26 +258,31 @@ const layerArrays = {
 
 function replaceAllArrays(args: SubsurfaceViewerProps) {
     args.layers?.forEach((layer: TLayerDefinition) => {
-        const layerId = layer?.["id"] as string | undefined;
-        if (layer && layerId && layerArrays[layerId]) {
-            for (const key in layerArrays[layerId]) {
-                layer[key] = layerArrays[layerId][key];
-            }
-        }
+        replaceLayerArrays(layer);
     });
     return args;
 }
 
 function replaceArrays(args: SubsurfaceViewerProps, keys: string[]) {
     args.layers?.forEach((layer: TLayerDefinition) => {
-        const layerId = layer?.["id"] as string | undefined;
-        if (layer && layerId && layerArrays[layerId]) {
-            for (const key in keys) {
-                layer[key] = layerArrays[layerId][key];
-            }
-        }
+        replaceLayerArrays(layer, keys);
     });
     return args;
+}
+
+function replaceLayerArrays(
+    layer: TLayerDefinition,
+    keys: string[] | undefined = undefined
+) {
+    const layerId = layer?.["id"] as string | undefined;
+    if (layer && layerId && layerArrays[layerId]) {
+        if (!keys) {
+            keys = Object.keys(layerArrays[layerId]) as string[];
+        }
+        for (const key of keys) {
+            layer[key] = layerArrays[layerId][key];
+        }
+    }
 }
 
 export const DiscretePropertyWithClamping: StoryObj<typeof SubsurfaceViewer> = {
