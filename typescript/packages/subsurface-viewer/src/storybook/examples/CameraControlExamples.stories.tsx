@@ -13,6 +13,7 @@ import SubsurfaceViewer from "../../SubsurfaceViewer";
 import type { BoundingBox3D, ViewStateType } from "../../components/Map";
 import { Axes2DLayer, AxesLayer } from "../../layers";
 
+import { GeoJsonLayer } from "@deck.gl/layers/typed";
 import {
     customLayerWithPolygonDataProps,
     default2DViews,
@@ -29,7 +30,8 @@ import {
     volveWellsLayer,
     volveWellsWithLogsLayer,
 } from "../sharedSettings";
-import { GeoJsonLayer } from "@deck.gl/layers/typed";
+
+import { scaleZoom } from "../..";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -72,6 +74,16 @@ const SQUARE = {
         ],
     },
 };
+
+const SQUARE_GEOMETRY_LAYER = new GeoJsonLayer({
+    ...customLayerWithPolygonDataProps,
+    data: SQUARE,
+});
+
+const AXES2D = new Axes2DLayer({
+    id: "axes",
+    backgroundColor: [0, 155, 155],
+});
 
 const DisplayCameraPositionComponent: React.FC<SubsurfaceViewerProps> = (
     args
@@ -529,17 +541,7 @@ const ScaleYComponent = ({ verticalScale }: { verticalScale: number }) => {
     const viewerProps: SubsurfaceViewerProps = {
         id: "ScaleY",
         bounds: [-10, -10, 10, 10],
-        layers: [
-            new Axes2DLayer({
-                id: "axes",
-                backgroundColor: [0, 155, 155],
-            }),
-            new GeoJsonLayer({
-                ...customLayerWithPolygonDataProps,
-                getLineColor: [0, 0, 0],
-                data: SQUARE,
-            }),
-        ],
+        layers: [AXES2D, SQUARE_GEOMETRY_LAYER],
         views: {
             layout: [1, 1],
             viewports: [
@@ -570,4 +572,44 @@ export const ScaleY: StoryObj<typeof ScaleYComponent> = {
         },
     },
     render: (args) => <ScaleYComponent {...args} />,
+};
+
+const ScaleYWithCameraPositionComponent = ({
+    verticalScale,
+}: {
+    verticalScale: number;
+}) => {
+    const zoom = 3;
+    const xyZoom = scaleZoom(verticalScale, zoom);
+    const viewerProps: SubsurfaceViewerProps = {
+        id: "ScaleY",
+        layers: [AXES2D, SQUARE_GEOMETRY_LAYER],
+        cameraPosition: {
+            rotationOrbit: 0,
+            rotationX: 0,
+            zoom: xyZoom,
+            target: [1, 1, 1],
+        },
+    };
+    return <SubsurfaceViewer {...viewerProps} />;
+};
+
+export const ScaleYWithCameraPosition: StoryObj<
+    typeof ScaleYWithCameraPositionComponent
+> = {
+    args: { verticalScale: 2.5 },
+    argTypes: {
+        verticalScale: {
+            control: { type: "range", min: -1, max: 10, step: 0.1 },
+        },
+    },
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: "Orthographic vertical scaling with multiple camera definitions.",
+            },
+        },
+    },
+    render: (args) => <ScaleYWithCameraPositionComponent {...args} />,
 };

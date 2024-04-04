@@ -10,6 +10,7 @@ export type {
     ViewStateType,
     ViewsType,
     colorTablesArray,
+    TLayerDefinition,
 } from "./SubsurfaceViewer";
 
 export { TGrid3DColoringMode } from "./SubsurfaceViewer";
@@ -25,3 +26,5 @@ export type {
     LayerPickInfo,
     PropertyDataType,
 } from "./layers/utils/layerTools";
+
+export { proportionalZoom, scaleZoom } from "./utils/camera";

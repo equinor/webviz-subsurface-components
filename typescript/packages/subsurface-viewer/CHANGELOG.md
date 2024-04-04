@@ -1,3 +1,17 @@
+## [0.22.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.22.0...subsurface-viewer@0.22.1) (2024-04-04)
+
+
+### Bug Fixes
+
+* **grid3d:** Color fighting with clamp color is fixed. ([#1998](https://github.com/equinor/webviz-subsurface-components/issues/1998)) ([4b83d1a](https://github.com/equinor/webviz-subsurface-components/commit/4b83d1a033e21bf84e05af276c84df7210db106b))
+
+# [0.22.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.21.0...subsurface-viewer@0.22.0) (2024-04-04)
+
+
+### Features
+
+* Allow camera xy scaling ([#2002](https://github.com/equinor/webviz-subsurface-components/issues/2002)) ([0635f5e](https://github.com/equinor/webviz-subsurface-components/commit/0635f5e1f268a99ab0755c66522ba83f056f1365))
+
 # [0.21.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.20.10...subsurface-viewer@0.21.0) (2024-04-02)
 
 
