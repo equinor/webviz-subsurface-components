@@ -1,3 +1,10 @@
+# [0.6.0](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.5.12...wsc-common@0.6.0) (2024-04-04)
+
+
+### Features
+
+* Allow camera xy scaling ([#2002](https://github.com/equinor/webviz-subsurface-components/issues/2002)) ([0635f5e](https://github.com/equinor/webviz-subsurface-components/commit/0635f5e1f268a99ab0755c66522ba83f056f1365))
+
 ## [0.5.12](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.5.11...wsc-common@0.5.12) (2024-03-29)
 
 
