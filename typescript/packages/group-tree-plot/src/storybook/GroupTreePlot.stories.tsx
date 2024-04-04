@@ -1,4 +1,6 @@
+import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
+
 import { GroupTreePlot } from "../GroupTreePlot";
 
 import type { EdgeMetadata, NodeMetadata } from "../types";
@@ -8,9 +10,30 @@ import {
     exampleDates,
 } from "../../example-data/dated-trees";
 
+const stories: Meta = {
+    component: GroupTreePlot,
+    title: "GroupTreePlot/Demo",
+    argTypes: {
+        selectedDateTime: {
+            description:
+                "The selected `string` must be a date time present in one of the `dates` arrays in an element of the`datedTrees`-prop.\n\n",
+        },
+        selectedEdgeKey: {
+            description:
+                "The selection `string` must be an edge key present in one of the `edge_data` objects in the `tree`-prop of an element in `datedTrees`-prop.\n\n",
+        },
+        selectedNodeKey: {
+            description:
+                "The selected `string` must be a node key present in one of the `node_data` objects in the `tree`-prop of an element in `datedTrees`-prop.\n\n",
+        },
+    },
+};
+export default stories;
+
 /**
  * Storybook test for the group tree plot component
  */
+
 const Template = (args) => {
     return (
         <GroupTreePlot
@@ -39,31 +62,15 @@ const nodeMetadataList: NodeMetadata[] = [
     { key: "wmctl", label: "Missing label", unit: "Unknown unit" },
 ];
 
-export const Default = Template.bind({});
-Default.args = {
-    id: "grouptreeplot",
-    datedTrees: exampleDatedTrees,
-    edgeMetadataList: edgeMetadataList,
-    nodeMetadataList: nodeMetadataList,
-    selectedDateTime: exampleDates[0],
-    selectedEdgeKey: edgeMetadataList[0].key,
-    selectedNodeKey: nodeMetadataList[0].key,
-};
-export default {
-    component: GroupTreePlot,
-    title: "GroupTreePlot/Demo",
-    argTypes: {
-        selectedDateTime: {
-            description:
-                "The selected `string` must be a date time present in one of the `dates` arrays in an element of the`datedTrees`-prop.\n\n",
-        },
-        selectedEdgeKey: {
-            description:
-                "The selection `string` must be an edge key present in one of the `edge_data` objects in the `tree`-prop of an element in `datedTrees`-prop.\n\n",
-        },
-        selectedNodeKey: {
-            description:
-                "The selected `string` must be a node key present in one of the `node_data` objects in the `tree`-prop of an element in `datedTrees`-prop.\n\n",
-        },
+export const Default: StoryObj<typeof Template> = {
+    args: {
+        id: "grouptreeplot",
+        datedTrees: exampleDatedTrees,
+        edgeMetadataList: edgeMetadataList,
+        nodeMetadataList: nodeMetadataList,
+        selectedDateTime: exampleDates[0],
+        selectedEdgeKey: edgeMetadataList[0].key,
+        selectedNodeKey: nodeMetadataList[0].key,
     },
+    render: (args) => <Template {...args} />,
 };
