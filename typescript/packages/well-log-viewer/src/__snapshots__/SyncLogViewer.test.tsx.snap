@@ -2,13 +2,13 @@
 
 exports[`Sync Log Viewer snapshot test 1`] = `
 <div
-  style="height: 100%; width: 100%; display: flex; flex-direction: column;"
+  class="welllog-layout"
 >
   <div
-    style="flex: 1; height: 0%; width: 100%; display: flex; flex-direction: row;"
+    class="interior"
   >
     <div
-      style="flex: 1; height: 100%; width: 0%; display: flex; flex-direction: column;"
+      class="middle"
     >
       <div
         style="height: 0%; flex: 1; display: flex; flex-direction: row;"
@@ -282,7 +282,7 @@ exports[`Sync Log Viewer snapshot test 1`] = `
       </div>
     </div>
     <div
-      style="flex: 0 0px; height: 100%;"
+      class="left-right"
     >
       <div
         class="side-panel"
