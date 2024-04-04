@@ -9,8 +9,7 @@
     ],
     "scripts": {
         "transpile": "tsc --project ./tsconfig.json",
-        "copy-files": "copyfiles --up 1 \"src/**/*.png\" dist/",
-        "build": "git clean -xdff dist && npm run transpile && npm run copy-files",
+        "build": "git clean -xdff dist && npm run transpile",
         "test_perf": "jest _performance",
         "test_correctness": "jest --coverage --testPathIgnorePatterns='_performance' --passWithNoTests",
         "test": "jest --coverage",

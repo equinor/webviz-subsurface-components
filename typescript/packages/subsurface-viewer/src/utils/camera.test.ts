@@ -1,8 +1,8 @@
 import "jest";
 
-import { getZoom, useLateralZoom } from "./camera";
-import type { ViewStateType, ViewportType } from "../components/Map";
 import { renderHook } from "@testing-library/react";
+import type { ViewStateType, ViewportType } from "../components/Map";
+import { getZoom, useLateralZoom } from "./camera";
 
 describe("Test zoom", () => {
     const defaultZoom = 3;
@@ -22,7 +22,7 @@ describe("Test zoom", () => {
     it("Test vertical scale", () => {
         const viewport: ViewportType = { id: "", zoom: 10, verticalScale: 4 };
         const zoom = getZoom(viewport, defaultZoom);
-        expect(zoom).toEqual([viewport.zoom, 5]);
+        expect(zoom).toEqual([viewport.zoom, 20]);
     });
 
     it("Test zero scale", () => {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { Feature, FeatureCollection } from "geojson";
 import { cloneDeep, isEmpty, isEqual } from "lodash";
@@ -11,23 +11,23 @@ import type {
 
 import { JSONConfiguration, JSONConverter } from "@deck.gl/json/typed";
 
-import type { DeckGLRef } from "@deck.gl/react/typed";
-import DeckGL from "@deck.gl/react/typed";
 import type {
     Color,
-    LayersList,
-    LayerProps,
     LayerContext,
+    LayerProps,
+    LayersList,
+    PickingInfo,
     View,
     Viewport,
-    PickingInfo,
 } from "@deck.gl/core/typed";
+import type { DeckGLRef } from "@deck.gl/react/typed";
+import DeckGL from "@deck.gl/react/typed";
 
 import { Layer } from "@deck.gl/core/typed";
 
 import {
-    _CameraLight as CameraLight,
     AmbientLight,
+    _CameraLight as CameraLight,
     DirectionalLight,
     LightingEffect,
     OrbitController,
@@ -44,31 +44,31 @@ import { fovyToAltitude } from "@math.gl/web-mercator";
 import { colorTables } from "@emerson-eps/color-tables";
 import type { colorTablesArray } from "@emerson-eps/color-tables/";
 
+import { validateColorTables, validateLayers } from "@webviz/wsc-common";
+import { Axes2DLayer, NorthArrow3DLayer, WellsLayer } from "../layers";
+import type { LayerPickInfo } from "../layers/utils/layerTools";
+import {
+    getLayersByType,
+    getModelMatrixScale,
+    getWellLayerByTypeAndSelectedWells,
+} from "../layers/utils/layerTools";
+import type { WellsPickInfo } from "../layers/wells/wellsLayer";
 import type { BoundingBox2D } from "../utils/BoundingBox2D";
+import { isEmpty as isEmptyBox2D } from "../utils/BoundingBox2D";
 import type { BoundingBox3D } from "../utils/BoundingBox3D";
 import {
     boxCenter,
     boxUnion,
     isEmpty as isEmptyBox3D,
 } from "../utils/BoundingBox3D";
-import { isEmpty as isEmptyBox2D } from "../utils/BoundingBox2D";
 import JSON_CONVERTER_CONFIG from "../utils/configuration";
-import type { WellsPickInfo } from "../layers/wells/wellsLayer";
-import InfoCard from "./InfoCard";
-import DistanceScale from "./DistanceScale";
-import StatusIndicator from "./StatusIndicator";
 import fitBounds from "../utils/fit-bounds";
-import { validateColorTables, validateLayers } from "@webviz/wsc-common";
-import type { LayerPickInfo } from "../layers/utils/layerTools";
-import {
-    getModelMatrixScale,
-    getLayersByType,
-    getWellLayerByTypeAndSelectedWells,
-} from "../layers/utils/layerTools";
-import { WellsLayer, Axes2DLayer, NorthArrow3DLayer } from "../layers";
+import DistanceScale from "./DistanceScale";
+import InfoCard from "./InfoCard";
+import StatusIndicator from "./StatusIndicator";
 
-import IntersectionView from "../views/intersectionView";
 import type { Unit } from "convert-units";
+import IntersectionView from "../views/intersectionView";
 
 import type { LightsType, TLayerDefinition } from "../SubsurfaceViewer";
 import { getZoom, useLateralZoom } from "../utils/camera";
@@ -1614,7 +1614,10 @@ function buildDeckGlViews(views: ViewsType | undefined, size: Size): View[] {
  * @returns true if the camera camera zoom is set.
  */
 function cameraHasZoom(camera: ViewStateType | undefined): boolean {
-    return typeof camera?.zoom === "number" && !Number.isNaN(camera.zoom);
+    const zoom = camera?.zoom;
+    const isNumber = typeof zoom === "number" && !Number.isNaN(zoom);
+    const isXy = Array.isArray(zoom) && zoom.length == 2;
+    return isNumber || isXy;
 }
 
 /**
