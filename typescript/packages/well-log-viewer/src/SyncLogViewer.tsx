@@ -244,6 +244,10 @@ export const argTypesSyncLogViewerProp = {
         description:
             "Set to true for default titles or to array of individial welllog titles",
     },
+    layout: {
+        description:
+            "Side panels layout (default is layout with default right panel",
+    },
     // callbacks...
 };
 

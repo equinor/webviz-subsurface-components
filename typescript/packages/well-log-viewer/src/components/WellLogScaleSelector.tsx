@@ -8,10 +8,11 @@ interface Props {
     callbackManager: CallbackManager | undefined;
 
     label?: string | JSX.Element;
-    values?: number[];
+    values?: number[]; // Available scale values array
+    round?: boolean | number; // round the value to a "good" number
 }
 interface State {
-    scale: number; // value for scale combo
+    value: number; // value for scale combo
 }
 
 export class WellLogScaleSelector extends Component<Props, State> {
@@ -19,10 +20,10 @@ export class WellLogScaleSelector extends Component<Props, State> {
         super(props);
 
         this.state = {
-            scale: 1.0,
+            value: 1.0,
         };
 
-        this.onScaleChange = this.onScaleChange.bind(this);
+        this.onChange = this.onChange.bind(this);
         this.onContentRescale = this.onContentRescale.bind(this);
         this.props.callbackManager?.registerCallback(
             "onContentRescale",
@@ -37,7 +38,7 @@ export class WellLogScaleSelector extends Component<Props, State> {
     }
 
     // callback function from Vertical Scale combobox
-    onScaleChange(value: number): void {
+    onChange(value: number): void {
         const controller = this.props.callbackManager?.controller;
         if (!controller) return;
         controller.setContentScale(value);
@@ -47,10 +48,10 @@ export class WellLogScaleSelector extends Component<Props, State> {
         this.setState((state: Readonly<State>) => {
             const controller = this.props.callbackManager?.controller;
             if (!controller) return null;
-            const scale = controller.getContentScale();
-            if (Math.abs(state.scale - scale) < 1) return null;
+            const value = controller.getContentScale();
+            if (Math.abs(state.value - value) < 1) return null;
             return {
-                scale: scale,
+                value: value,
             };
         });
     }
@@ -63,9 +64,10 @@ export class WellLogScaleSelector extends Component<Props, State> {
                 )}
                 <span className="scale-value">
                     <ScaleSelector
-                        onScaleChange={this.onScaleChange}
+                        onChange={this.onChange}
                         values={this.props.values}
-                        scale={this.state.scale}
+                        value={this.state.value}
+                        round={this.props.round}
                     />
                 </span>
             </div>

@@ -1,25 +1,23 @@
 import React, { Component } from "react";
 
+import "./WellLogLayout.scss";
+
 export interface ViewerLayout<Parent> {
-    header?: JSX.Element | ((parent: Parent) => JSX.Element);
-    left?: JSX.Element | ((parent: Parent) => JSX.Element);
-    right?: JSX.Element | ((parent: Parent) => JSX.Element);
-    top?: JSX.Element | ((parent: Parent) => JSX.Element);
-    bottom?: JSX.Element | ((parent: Parent) => JSX.Element);
-    footer?: JSX.Element | ((parent: Parent) => JSX.Element);
+    header?: ((parent: Parent) => JSX.Element) | JSX.Element | string;
+    left?: ((parent: Parent) => JSX.Element) | JSX.Element | string;
+    right?: ((parent: Parent) => JSX.Element) | JSX.Element | string;
+    top?: ((parent: Parent) => JSX.Element) | JSX.Element | string;
+    bottom?: ((parent: Parent) => JSX.Element) | JSX.Element | string;
+    footer?: ((parent: Parent) => JSX.Element) | JSX.Element | string;
 }
 
-export interface Props<Parent> {
+interface Props<Parent> {
     parent: Parent;
 
-    center?: JSX.Element | ((parent: Parent) => JSX.Element);
+    center?: ((parent: Parent) => JSX.Element) | JSX.Element | string;
 
     layout?: ViewerLayout<Parent>;
 }
-
-const styleHeaderFooter = { flex: "0", width: "100%" };
-const styleTopBottom = { flex: "0" };
-const styleLeftRight = { flex: "0", height: "100%" };
 
 export class WellLogLayout<Parent> extends Component<Props<Parent>> {
     constructor(props: Props<Parent>) {
@@ -27,31 +25,31 @@ export class WellLogLayout<Parent> extends Component<Props<Parent>> {
     }
 
     createPanel(
-        panel?: JSX.Element | ((parent: Parent) => JSX.Element)
-    ): JSX.Element | null {
-        if (typeof panel == "function") return panel(this.props.parent);
-        if (typeof panel == "object") return panel; // JSX.Element
-        return null;
+        panel?: JSX.Element | string | ((parent: Parent) => JSX.Element)
+    ): JSX.Element | string | undefined {
+        if (typeof panel === "function") return panel(this.props.parent);
+        if (typeof panel === "object") return panel; // JSX.Element
+        return panel; // JSX.Element | string
     }
 
     render(): JSX.Element {
         const center = this.createPanel(this.props.center);
 
-        let header: JSX.Element | null;
-        let left: JSX.Element | null;
-        let right: JSX.Element | null;
-        let top: JSX.Element | null;
-        let bottom: JSX.Element | null;
-        let footer: JSX.Element | null;
+        let header: JSX.Element | string | undefined;
+        let left: JSX.Element | string | undefined;
+        let right: JSX.Element | string | undefined;
+        let top: JSX.Element | string | undefined;
+        let bottom: JSX.Element | string | undefined;
+        let footer: JSX.Element | string | undefined;
         const layout = this.props.layout;
         if (!layout) {
             // use default empty layout
-            header = null;
-            left = null;
-            right = null; //this.createPanel(this.props.defaultSidePanel);
-            top = null;
-            bottom = null;
-            footer = null;
+            header = undefined;
+            left = undefined;
+            right = undefined;
+            top = undefined;
+            bottom = undefined;
+            footer = undefined;
         } else {
             header = this.createPanel(layout.header);
             left = this.createPanel(layout.left);
@@ -62,41 +60,18 @@ export class WellLogLayout<Parent> extends Component<Props<Parent>> {
         }
 
         return (
-            <div
-                style={{
-                    height: "100%",
-                    width: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                }}
-            >
-                {header && <div style={styleHeaderFooter}>{header}</div>}
-                <div
-                    style={{
-                        flex: "1",
-                        height: "0%",
-                        width: "100%",
-                        display: "flex",
-                        flexDirection: "row",
-                    }}
-                >
-                    {left && <div style={styleLeftRight}>{left}</div>}
-                    <div
-                        style={{
-                            flex: "1",
-                            height: "100%",
-                            width: "0%",
-                            display: "flex",
-                            flexDirection: "column",
-                        }}
-                    >
-                        {top && <div style={styleTopBottom}>{top}</div>}
+            <div className="welllog-layout">
+                {header && <div className="header-footer">{header}</div>}
+                <div className="interior">
+                    {left && <div className="left-right">{left}</div>}
+                    <div className="middle">
+                        {top && <div className="top-bottom">{top}</div>}
                         {center /* The main view component */}
-                        {bottom && <div style={styleTopBottom}>{bottom}</div>}
+                        {bottom && <div className="top-bottom">{bottom}</div>}
                     </div>
-                    {right && <div style={styleLeftRight}>{right}</div>}
+                    {right && <div className="left-right">{right}</div>}
                 </div>
-                {footer && <div style={styleHeaderFooter}>{footer}</div>}
+                {footer && <div className="header-footer">{footer}</div>}
             </div>
         );
     }

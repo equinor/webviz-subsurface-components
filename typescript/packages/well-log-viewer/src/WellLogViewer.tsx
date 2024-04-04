@@ -50,6 +50,10 @@ export const argTypesWellLogViewerProp = {
         }
         */
     },
+    layout: {
+        description:
+            "Side panels layout (default is layout with default right panel",
+    },
     // callbacks...
 };
 

@@ -3,7 +3,6 @@ import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 
 import { colorTables } from "@emerson-eps/color-tables";
-//import { ColorTable } from "./components/ColorTableTypes";
 const exampleColorTable = colorTables; /*as unknown as ColorTable[]*/ // equivalent types, should be merged
 const wellpickColorTable = require("../../../../example-data/wellpick_colors.json"); // eslint-disable-line
 const wellpick = require("../../../../example-data/wellpicks.json");// eslint-disable-line
@@ -115,6 +114,10 @@ const stories: Meta = {
         viewTitles: {
             description:
                 "The view title. Set desired string or react element or true for default value from welllog file",
+        },
+        layout: {
+            description:
+                "Side panels layout (default is layout with default right panel",
         },
     },
     tags: ["no-screenshot-test"],
@@ -376,7 +379,12 @@ import WellLogInfoPanel from "./components/WellLogInfoPanel";
 import WellLogZoomSlider from "./components/WellLogZoomSlider";
 import WellLogScaleSelector from "./components/WellLogScaleSelector";
 import WellInfoIcon from "@mui/icons-material/FormatListBulleted"; // WaterDrop ShowChart, SearchSharp
-
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+const iconStyle = {
+    fontSize: "18px",
+    verticalAlign: "middle",
+    paddingRight: "4px",
+};
 export const CustomLayout = Template.bind({});
 CustomLayout.args = {
     ...Default.args,
@@ -387,11 +395,13 @@ CustomLayout.args = {
         grouping: "by_track",
     },
     layout: {
+        // function to create react component
         right: (parent: SyncLogViewer) => (
             <div className="side-panel">
                 <div style={{ paddingBottom: "5px" }}>
                     <WellLogScaleSelector
                         label="Scale value:"
+                        round={true}
                         callbackManager={parent.callbackManagers[0]}
                     />
                 </div>
@@ -400,13 +410,7 @@ CustomLayout.args = {
                         key={iWellLog}
                         header={
                             <>
-                                <span
-                                    style={{
-                                        fontSize: "18px",
-                                        verticalAlign: "middle",
-                                        paddingRight: "4px",
-                                    }}
-                                >
+                                <span style={iconStyle}>
                                     <WellInfoIcon fontSize="inherit" />
                                 </span>
                                 <i>{welllog.header.well}</i>
@@ -430,6 +434,27 @@ CustomLayout.args = {
                 />
             </div>
         ),
+
+        // react component
+        left: (
+            <>
+                <div
+                    style={{
+                        textOrientation: "mixed",
+                        writingMode: "vertical-rl",
+                        fontSize: "10pt",
+                        paddingTop: "20px",
+                        paddingLeft: "5px",
+                    }}
+                >
+                    Depth
+                </div>
+                <ArrowDownwardIcon />
+            </>
+        ),
+
+        // simple text
+        header: "Customized layout example",
     },
 };
 CustomLayout.parameters = {

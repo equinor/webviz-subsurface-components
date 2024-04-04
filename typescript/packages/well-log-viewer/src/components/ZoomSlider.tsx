@@ -3,7 +3,7 @@ import React, { Component } from "react";
 import Slider from "@mui/material/Slider";
 
 interface Props {
-    onChange: (value: number) => void;
+    onChange: (value: number) => void; // zoom value callback
     value: number; // zoom value.
 
     max?: number; // max zoom value. default 256

@@ -10,7 +10,7 @@ import WellLogZoomSlider from "./WellLogZoomSlider";
 export function defaultSidePanel(parent: SyncLogViewer): JSX.Element {
     const primaryAxis = parent.getAxes().primaryAxis;
     return (
-        <div className="side-panel" key="side-panel">
+        <div className="side-panel">
             <WellLogAxesPanel
                 header="Primary scale"
                 axisTitles={parent.props.axisTitles}

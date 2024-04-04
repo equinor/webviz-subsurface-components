@@ -1,16 +1,13 @@
 import React, { Component } from "react";
 
 import type { LogViewer } from "@equinor/videx-wellog";
-//import WellLogView from "./WellLogView";
-//import { isScaleTrack } from "../utils/tracks";
 
 import type { CallbackManager } from "./CallbackManager";
-
 import InfoPanel from "./InfoPanel";
 import type { Info, InfoOptions } from "./InfoTypes";
 
 import { fillInfos } from "../utils/fill-info";
-import "./sidePanel.scss";
+import "./SidePanel.scss";
 
 interface Props {
     callbackManager: CallbackManager;
@@ -58,6 +55,11 @@ export class WellLogInfoPanel extends Component<Props, State> {
             "onInfoGroupClick"
         );
     }
+
+    componentDidMount(): void {
+        this.props.callbackManager.updateInfo(); // force onInfo callback to be called
+    }
+
     componentWillUnmount(): void {
         const callbackManager = this.props.callbackManager;
         callbackManager.unregisterCallback("onInfo", this.onInfo);
