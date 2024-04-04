@@ -75,6 +75,16 @@ const SQUARE = {
     },
 };
 
+const SQUARE_GEOMETRY_LAYER = new GeoJsonLayer({
+    ...customLayerWithPolygonDataProps,
+    data: SQUARE,
+});
+
+const AXES2D = new Axes2DLayer({
+    id: "axes",
+    backgroundColor: [0, 155, 155],
+});
+
 const DisplayCameraPositionComponent: React.FC<SubsurfaceViewerProps> = (
     args
 ) => {
@@ -531,17 +541,7 @@ const ScaleYComponent = ({ verticalScale }: { verticalScale: number }) => {
     const viewerProps: SubsurfaceViewerProps = {
         id: "ScaleY",
         bounds: [-10, -10, 10, 10],
-        layers: [
-            new Axes2DLayer({
-                id: "axes",
-                backgroundColor: [0, 155, 155],
-            }),
-            new GeoJsonLayer({
-                ...customLayerWithPolygonDataProps,
-                getLineColor: [0, 0, 0],
-                data: SQUARE,
-            }),
-        ],
+        layers: [AXES2D, SQUARE_GEOMETRY_LAYER],
         views: {
             layout: [1, 1],
             viewports: [
@@ -583,31 +583,12 @@ const ScaleYWithCameraPositionComponent = ({
     const xyZoom = scaleZoom(verticalScale, zoom);
     const viewerProps: SubsurfaceViewerProps = {
         id: "ScaleY",
-        layers: [
-            new Axes2DLayer({
-                id: "axes",
-                backgroundColor: [0, 155, 155],
-            }),
-            new GeoJsonLayer({
-                ...customLayerWithPolygonDataProps,
-                getLineColor: [0, 0, 0],
-                data: SQUARE,
-            }),
-        ],
-        views: {
-            layout: [1, 1],
-            viewports: [
-                {
-                    id: "section",
-                    verticalScale,
-                },
-            ],
-        },
+        layers: [AXES2D, SQUARE_GEOMETRY_LAYER],
         cameraPosition: {
-            rotationOrbit: 45,
-            rotationX: 45,
+            rotationOrbit: 0,
+            rotationX: 0,
             zoom: xyZoom,
-            target: [],
+            target: [1, 1, 1],
         },
     };
     return <SubsurfaceViewer {...viewerProps} />;
