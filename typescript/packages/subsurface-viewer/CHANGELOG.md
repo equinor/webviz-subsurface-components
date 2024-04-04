@@ -1,3 +1,10 @@
+## [0.22.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.22.0...subsurface-viewer@0.22.1) (2024-04-04)
+
+
+### Bug Fixes
+
+* **grid3d:** Color fighting with clamp color is fixed. ([#1998](https://github.com/equinor/webviz-subsurface-components/issues/1998)) ([4b83d1a](https://github.com/equinor/webviz-subsurface-components/commit/4b83d1a033e21bf84e05af276c84df7210db106b))
+
 # [0.22.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.21.0...subsurface-viewer@0.22.0) (2024-04-04)
 
 
