@@ -1,14 +1,12 @@
 import type { ReactNode } from "react";
 import React, { Component } from "react";
 
-import "./rightPanel.scss";
-
 import type { Info } from "./InfoTypes";
 
 interface Props {
-    header: string;
+    header?: string | JSX.Element;
     infos: Info[];
-    onGroupClick?: (trackId: string | number) => void;
+    onGroupClick?: (info: Info) => void;
 }
 
 function createSeparator(info: Info) {
@@ -49,11 +47,10 @@ class InfoPanel extends Component<Props> {
     }
 
     onRowClick(
-        trackId: string | number /*,
+        info: Info /*,
         ev: React.MouseEvent<HTMLTableRowElement>*/
     ): void {
-        if (!this.props.onGroupClick) return;
-        this.props.onGroupClick(trackId);
+        this.props.onGroupClick?.(info);
     }
 
     createGroupRow(info: Info): ReactNode {
@@ -61,7 +58,7 @@ class InfoPanel extends Component<Props> {
             <tr
                 className="group-row"
                 key={"_group_" + info.trackId + "." + info.name}
-                onClick={this.onRowClick.bind(this, info.trackId)}
+                onClick={() => this.onRowClick(info)}
             >
                 <td style={{ color: info.color }}>
                     {
@@ -115,7 +112,6 @@ class InfoPanel extends Component<Props> {
                 <td className="row-name" title={tooltip}></td>
                 <td
                     className="row-value"
-                    style={styleInfoValue}
                     colSpan={info.discrete ? 2 : 1}
                     title={value}
                 ></td>
@@ -127,11 +123,11 @@ class InfoPanel extends Component<Props> {
     }
 
     render(): JSX.Element {
+        const header = this.props.header;
         return (
             <div className="readout">
                 <fieldset>
-                    <legend>{this.props.header}</legend>
-
+                    {header && <legend>{header}</legend>}
                     <table>
                         <tbody>
                             {this.props.infos?.map(this.createRow.bind(this))}

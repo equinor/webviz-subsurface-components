@@ -2,6 +2,8 @@ import { Meta } from "@storybook/blocks";
 
 import imageWellLogViewer from "./WellLogViewer.png";
 
+import imageLayout from "./Layout.png";
+
 <Meta title="WellLogViewer/Overview" />
 
 # WellLogView examples
@@ -10,8 +12,8 @@ import imageWellLogViewer from "./WellLogViewer.png";
 
 These stories contain examples of usage of components for visualization of well log data files.
 There are two main examples:
-[WellLogViewer](?path=/story/welllogviewer-overview--page#welllogviewer-component) wich contains essential parts of typical well log viewer
-and [SyncLogViewer](?path=/story/welllogviewer-overview--page#synclogviewer-component) wich contains synchronized views for three different log files.
+[WellLogViewer](#welllogviewer-component) wich contains essential parts of typical well log viewer
+and [SyncLogViewer](#synclogviewer-component) wich contains synchronized views for three different log files.
 
 ## WellLogView component
 
@@ -56,6 +58,18 @@ The number and properties of tracks and curves could be interactively edited by 
 <img src={imageWellLogViewer} />
 
 _WellLogViewer component architecture._
+
+Auxiliary side panels could be places in six different positions. [An example.](?path=/story/welllogviewer-demo-synclogviewer--custom-layout)
+
+<img src={imageLayout} />
+_WellLogViewer component layout._
+
+WebLogViewer (and SyncLogViewer) have a prop “layout” which could contain information about desirable side panels and their position.
+If the prop is undefined a default panel is generated at the right position.
+
+All panels could obtain useful information about current zoom, visible area, readings and so on in the same way is it done in a default implementation.
+(DefaultWellLogViewerLayout.tsx DefaultSyncLogViewerLayout.tsx)
+A class CallbackManager allows side panel and its components to obtain various notifications from WellLogView object.
 
 ## SyncLogViewer component
 

@@ -3,6 +3,10 @@ import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 
 import { colorTables } from "@emerson-eps/color-tables";
+const exampleColorTable = colorTables; /*as unknown as ColorTable[]*/ // equivalent types, should be merged
+const wellpickColorTable = require("../../../../example-data/wellpick_colors.json"); // eslint-disable-line
+const wellpick = require("../../../../example-data/wellpicks.json");// eslint-disable-line
+
 import { ToggleButton } from "@mui/material";
 
 import SyncLogViewer, { argTypesSyncLogViewerProp } from "./SyncLogViewer";
@@ -111,6 +115,10 @@ const stories: Meta = {
             description:
                 "The view title. Set desired string or react element or true for default value from welllog file",
         },
+        layout: {
+            description:
+                "Side panels layout (default is layout with default right panel",
+        },
     },
     tags: ["no-screenshot-test"],
 };
@@ -150,20 +158,20 @@ const Template = (args) => {
     };
     const [controller, setController] = React.useState(null); // the first WellLog
     const onCreateController = React.useCallback(
-        (iView, controller) => {
-            if (iView === 0) setController(controller);
+        (iWellLog, controller) => {
+            if (iWellLog === 0) setController(controller);
         },
         [controller]
     );
     const onContentRescale = React.useCallback(
-        (iView) => {
-            if (iView === 0) setInfo(fillInfo(controller));
+        (iWellLog) => {
+            if (iWellLog === 0) setInfo(fillInfo(controller));
         },
         [controller]
     );
     const onContentSelection = React.useCallback(
-        (/*_iView*/) => {
-            /*if(iView===0)*/ setInfo(fillInfo(controller));
+        (/*iWellLog*/) => {
+            /*if(iWellLog===0)*/ setInfo(fillInfo(controller));
         },
         [controller]
     );
@@ -314,24 +322,24 @@ export const Default: StoryObj<typeof Template> = {
             require("../../../../example-data/synclog_template.json"), // eslint-disable-line
             require("../../../../example-data/synclog_template.json"), // eslint-disable-line
         ],
-        colorTables: colorTables,
+        colorTables: exampleColorTable,
         wellpicks: [
             {
-                wellpick: require("../../../../example-data/wellpicks.json")[0], // eslint-disable-line
+                wellpick: wellpick[0],
                 name: "HORIZON",
-                colorTables: require("../../../../example-data/wellpick_colors.json"), // eslint-disable-line
+                colorTables: wellpickColorTable,
                 color: "Stratigraphy",
             },
             {
-                wellpick: require("../../../../example-data/wellpicks.json")[1], // eslint-disable-line
+                wellpick: wellpick[1],
                 name: "HORIZON",
-                colorTables: require("../../../../example-data/wellpick_colors.json"), // eslint-disable-line
+                colorTables: wellpickColorTable, // eslint-disable-line
                 color: "Stratigraphy",
             },
             {
-                wellpick: require("../../../../example-data/wellpicks.json")[0], // eslint-disable-line
+                wellpick: wellpick[0],
                 name: "HORIZON",
-                colorTables: require("../../../../example-data/wellpick_colors.json"), // eslint-disable-line
+                colorTables: wellpickColorTable, // eslint-disable-line
                 color: "Stratigraphy",
             },
         ],
@@ -365,6 +373,96 @@ export const Default: StoryObj<typeof Template> = {
         },
     },
     render: (args) => <Template {...args} />,
+};
+
+import WellLogInfoPanel from "./components/WellLogInfoPanel";
+import WellLogZoomSlider from "./components/WellLogZoomSlider";
+import WellLogScaleSelector from "./components/WellLogScaleSelector";
+import WellInfoIcon from "@mui/icons-material/FormatListBulleted"; // WaterDrop ShowChart, SearchSharp
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+const iconStyle = {
+    fontSize: "18px",
+    verticalAlign: "middle",
+    paddingRight: "4px",
+};
+export const CustomLayout = Template.bind({});
+CustomLayout.args = {
+    ...Default.args,
+    wellpicks: undefined,
+    syncContentDomain: false,
+    id: "Well-Log-Viewer-Discrete",
+    readoutOptions: {
+        grouping: "by_track",
+    },
+    layout: {
+        // function to create react component
+        right: (parent: SyncLogViewer) => (
+            <div className="side-panel">
+                <div style={{ paddingBottom: "5px" }}>
+                    <WellLogScaleSelector
+                        label="Scale value:"
+                        round={true}
+                        callbackManager={parent.callbackManagers[0]}
+                    />
+                </div>
+                {parent.props.welllogs?.map((welllog, iWellLog) => (
+                    <WellLogInfoPanel
+                        key={iWellLog}
+                        header={
+                            <>
+                                <span style={iconStyle}>
+                                    <WellInfoIcon fontSize="inherit" />
+                                </span>
+                                <i>{welllog.header.well}</i>
+                            </>
+                        }
+                        readoutOptions={parent.props.readoutOptions}
+                        callbackManager={parent.callbackManagers[iWellLog]}
+                    />
+                ))}
+            </div>
+        ),
+        bottom: (parent: SyncLogViewer) => (
+            <div
+                className="side-panel"
+                style={{ minWidth: "100%", maxWidth: "100%" }}
+            >
+                <WellLogZoomSlider
+                    label="Zoom:"
+                    max={parent.props.welllogOptions?.maxContentZoom}
+                    callbackManager={parent.callbackManagers[0]}
+                />
+            </div>
+        ),
+
+        // react component
+        left: (
+            <>
+                <div
+                    style={{
+                        textOrientation: "mixed",
+                        writingMode: "vertical-rl",
+                        fontSize: "10pt",
+                        paddingTop: "20px",
+                        paddingLeft: "5px",
+                    }}
+                >
+                    Depth
+                </div>
+                <ArrowDownwardIcon />
+            </>
+        ),
+
+        // simple text
+        header: "Customized layout example",
+    },
+};
+CustomLayout.parameters = {
+    docs: {
+        description: {
+            story: "An example custom component layout.",
+        },
+    },
 };
 
 Default.tags = ["no-screenshot-test"];

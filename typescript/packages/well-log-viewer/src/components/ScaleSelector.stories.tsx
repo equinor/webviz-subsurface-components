@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 
-import ZoomSlider from "./ZoomSlider";
+import ScaleSelector from "./ScaleSelector";
 
-const ComponentCode = "<ZoomSlider value={1} max={128}/>";
+const ComponentCode = "<ScaleSelector value={1} max={128}/>";
 
 const stories: Meta = {
-    component: ZoomSlider,
-    title: "WellLogViewer/Components/ZoomSlider",
+    component: ScaleSelector,
+    title: "WellLogViewer/Components/ScaleSelector",
     parameters: {
         docs: {
             description: {
@@ -21,17 +21,18 @@ const stories: Meta = {
         },
     },
     argTypes: {
-        value: {
-            description: "Zoom value (default 1)",
+        values: {
+            description: "Available scale values array",
         },
-        max: {
-            description: "Max zoom value (default 256)",
+        value: {
+            description: "A value to show in the combobox",
         },
         onChange: {
-            description: "zoom value callback",
+            description: "A callback to recieve current value selected by user",
         },
-        step: {
-            description: "zoom level step (default 0.5)",
+        round: {
+            description:
+                'round the value to a "good" number (true for auto or number for rounding step)',
         },
     },
 };
@@ -45,16 +46,14 @@ const Template = (args) => {
 
     return (
         <div>
-            <div style={{ width: "97%", height: "100%", flex: 1 }}>
-                Zoom:
-                <ZoomSlider
-                    id="ZoomSlider"
-                    {...args}
-                    onChange={function (value: number): void {
-                        setInfo("zoom value=" + value);
-                    }}
-                />
-            </div>
+            Scale:
+            <ScaleSelector
+                id="ScaleSelector"
+                {...args}
+                onChange={function (value: number): void {
+                    setInfo("scale value=" + value);
+                }}
+            />
             <div ref={infoRef}>&nbsp;</div>
         </div>
     );
@@ -62,8 +61,8 @@ const Template = (args) => {
 
 export const Default: StoryObj<typeof Template> = {
     args: {
-        value: 1,
-        max: 128,
+        value: 10000,
+        round: true,
     },
     render: (args) => <Template {...args} />,
 };

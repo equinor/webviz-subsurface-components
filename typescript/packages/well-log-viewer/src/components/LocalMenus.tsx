@@ -16,14 +16,14 @@ import { isScaleTrack } from "../utils/tracks";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 
-export interface SimpleMenuProps {
+export interface Props {
     anchorEl: HTMLElement;
     wellLogView: WellLogView;
     track: Track;
     type: string;
     plotName?: string;
 }
-export interface SimpleMenuState {
+export interface State {
     anchorEl: HTMLElement | null;
 }
 
@@ -43,7 +43,7 @@ function getPlotTitle(plot: Plot): string {
     return title;
 }
 
-export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
+export class SimpleMenu extends Component<Props, State> {
     addTrack: () => void;
     editTrack: () => void;
     removeTrack: () => void;
@@ -52,7 +52,7 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
     editPlots: () => void;
     removePlots: () => void;
 
-    constructor(props: SimpleMenuProps) {
+    constructor(props: Props) {
         super(props);
         this.state = { anchorEl: this.props.anchorEl };
 
@@ -90,7 +90,7 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
             this.props.track
         );
     }
-    componentDidUpdate(prevProps: SimpleMenuProps): void {
+    componentDidUpdate(prevProps: Props): void {
         if (this.props.anchorEl !== prevProps.anchorEl) {
             this.setState((_state, props) => {
                 return { anchorEl: props.anchorEl };
@@ -196,7 +196,7 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
     render(): JSX.Element {
         if (this.props.type == "removePlots") {
             return (
-                <div>
+                <div className="local-menu">
                     <Menu
                         id="simple-menu"
                         anchorEl={this.state.anchorEl}
@@ -209,9 +209,10 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
                     </Menu>
                 </div>
             );
-        } else if (this.props.type == "editPlots") {
+        }
+        if (this.props.type == "editPlots") {
             return (
-                <div>
+                <div className="local-menu">
                     <Menu
                         id="simple-menu"
                         anchorEl={this.state.anchorEl}
@@ -225,10 +226,9 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
                 </div>
             );
         }
-
         if (this.props.type == "title") {
             return (
-                <div>
+                <div className="local-menu">
                     <Menu
                         id="simple-menu"
                         anchorEl={this.state.anchorEl}
@@ -259,7 +259,7 @@ export class SimpleMenu extends Component<SimpleMenuProps, SimpleMenuState> {
         };
 
         return (
-            <div>
+            <div className="local-menu">
                 <Menu
                     id="simple-menu"
                     anchorEl={this.state.anchorEl}

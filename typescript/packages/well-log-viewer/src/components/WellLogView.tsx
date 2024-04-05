@@ -472,6 +472,15 @@ function posWellPickTitles(instance: LogViewer, parent: WellLogView) {
 }
 
 function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
+    {
+        /* clear old wellpicks */
+        for (const elmName in instance.overlay.elements) {
+            if (elmName.substring(0, 2) == "wp")
+                // "wpFill" + horizon; "wp" + horizon;
+                instance.overlay.remove(elmName); // clear old if exists
+        }
+    }
+
     const wellpick = parent.props.wellpick;
     if (!wellpick) return;
 
@@ -505,7 +514,6 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
               );
 
         const elmName = "wp" + horizon;
-        instance.overlay.remove(elmName); // clear old if exists
         const pinelm = instance.overlay.create(elmName, {});
 
         const rgba =
@@ -585,7 +593,6 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
         {
             // Filling
             const elmName = "wpFill" + horizon;
-            instance.overlay.remove(elmName); // clear old if exists
             if (wellpickPatternFill || wellpickColorFill) {
                 const pinelm = instance.overlay.create(elmName, {});
                 const pin = select(pinelm)
@@ -698,7 +705,7 @@ function setTracksToController(
     axes: AxesInfo,
     welllog: WellLog | undefined, // JSON Log Format
     template: Template, // JSON
-    colorTables: ColorTable[] // JSON
+    colorTables?: ColorTable[] // JSON
 ): ScaleInterpolator {
     const { tracks, minmaxPrimaryAxis, primaries, secondaries } = createTracks(
         welllog,
@@ -913,6 +920,8 @@ export interface WellLogController {
     getContentDomain(): [number, number]; // visible range
     getContentZoom(): number;
     getContentSelection(): [number | undefined, number | undefined]; // [current, pinned]
+    setContentScale(value: number): void;
+    getContentScale(): number;
 
     scrollTrackTo(pos: number): void;
     scrollTrackBy(delta: number): void;
@@ -929,6 +938,39 @@ export interface WellLogController {
     getTemplate(): Template;
 
     getWellLog(): WellLog | undefined;
+}
+
+export function getContentBaseScale(
+    controller: WellLogController | null,
+    horizontal: boolean | undefined
+): number {
+    if (controller) {
+        const base = controller.getContentBaseDomain();
+        const wellLogView = controller as unknown as WellLogView;
+        const logController = wellLogView.logController;
+        if (logController) {
+            const overlay = logController?.overlay;
+            const source = overlay?.elm.node();
+            if (source) {
+                const clientSize = horizontal
+                    ? source.clientWidth
+                    : source.clientHeight;
+                const m = clientSize * (0.0254 / 96); // "screen" CSS height in meters
+                return (base[1] - base[0]) / m;
+            }
+        }
+    }
+    return 16000;
+}
+export function setContentScale(
+    controller: WellLogController | null,
+    horizontal: boolean | undefined,
+    value: number
+): void {
+    if (controller) {
+        const zoom = getContentBaseScale(controller, horizontal) / value;
+        controller.zoomContent(zoom);
+    }
 }
 
 import type { Info } from "./InfoTypes";
@@ -1133,11 +1175,6 @@ export function shouldUpdateWellLogView(
     // Props could contain some unknown object key:value so we should ignore they
     // so compare only known key:values
     if (props.horizontal !== nextProps.horizontal) return true;
-    if (props.options?.hideTrackTitle !== nextProps.options?.hideTrackTitle)
-        return true;
-    if (props.options?.hideTrackLegend !== nextProps.options?.hideTrackLegend)
-        return true;
-
     if (props.welllog !== nextProps.welllog) return true;
     if (props.template !== nextProps.template) return true;
     if (props.colorTables !== nextProps.colorTables) return true;
@@ -1145,7 +1182,15 @@ export function shouldUpdateWellLogView(
     if (props.primaryAxis !== nextProps.primaryAxis) return true;
     if (props.axisTitles !== nextProps.axisTitles) return true;
     if (props.axisMnemos !== nextProps.axisMnemos) return true;
+    if (props.viewTitle !== nextProps.viewTitle) return true;
 
+    if (!isEqualRanges(props.domain, nextProps.domain)) return true;
+    if (!isEqualRanges(props.selection, nextProps.selection)) return true;
+
+    if (props.options?.hideTrackTitle !== nextProps.options?.hideTrackTitle)
+        return true;
+    if (props.options?.hideTrackLegend !== nextProps.options?.hideTrackLegend)
+        return true;
     if (
         props.options?.maxVisibleTrackNum !==
         nextProps.options?.maxVisibleTrackNum
@@ -1153,9 +1198,6 @@ export function shouldUpdateWellLogView(
         return true;
     if (props.options?.maxContentZoom !== nextProps.options?.maxContentZoom)
         return true;
-
-    if (!isEqualRanges(props.domain, nextProps.domain)) return true;
-    if (!isEqualRanges(props.selection, nextProps.selection)) return true;
 
     if (
         props.options?.checkDatafileSchema !==
@@ -1174,8 +1216,6 @@ export function shouldUpdateWellLogView(
     )
         return true;
 
-    if (props.viewTitle !== nextProps.viewTitle) return true;
-
     // callbacks
     // ignore all?
 
@@ -1186,7 +1226,7 @@ interface State {
     infos: Info[];
 
     scrollTrackPos: number; // the first visible non-scale track number
-    errorText?: string;
+    errorText?: string | JSX.Element;
 }
 
 class WellLogView
@@ -1207,6 +1247,8 @@ class WellLogView
 
     scaleInterpolator: ScaleInterpolator | undefined;
 
+    _isMount: boolean;
+
     constructor(props: WellLogViewProps) {
         super(props);
         this.container = undefined;
@@ -1215,16 +1257,20 @@ class WellLogView
         this.selPinned = undefined;
         this.selPersistent = undefined;
 
-        this.resizeObserver = new ResizeObserver((entries) => {
-            const entry = entries[0];
-            if (entry && entry.target) {
-                //const Width = (entry.target as HTMLElement).offsetWidth;
-                //const Height = (entry.target as HTMLElement).offsetHeight;
+        this.resizeObserver = new ResizeObserver(
+            (entries: ResizeObserverEntry[]): void => {
+                const entry = entries[0];
+                if (entry && entry.target) {
+                    //const Width = (entry.target as HTMLElement).offsetWidth;
+                    //const Height = (entry.target as HTMLElement).offsetHeight;
 
-                if (this.logController)
-                    posWellPickTitles(this.logController, this);
+                    if (this.logController)
+                        posWellPickTitles(this.logController, this);
+
+                    this.onContentRescale();
+                }
             }
-        });
+        );
 
         this.template = {
             name: "",
@@ -1244,14 +1290,24 @@ class WellLogView
         this.onTrackMouseEvent = this.onTrackMouseEvent.bind(this);
 
         // set callback to component's caller
-        if (this.props.onCreateController) this.props.onCreateController(this);
+        this.props.onCreateController?.(this);
+
+        this.setControllerZoom();
+
+        this._isMount = false;
     }
 
     componentDidMount(): void {
         this.createLogViewer();
 
-        if (this.props.template) this.template = deepCopy(this.props.template); // save external template content to current
+        this.template = deepCopy(this.props.template); // save external template content to current
         this.setTracks(true);
+
+        this._isMount = true;
+    }
+
+    componentWillUnmount(): void {
+        this._isMount = false;
     }
 
     shouldComponentUpdate(
@@ -1269,8 +1325,7 @@ class WellLogView
         // Typical usage (don't forget to compare props):
         if (this.props.onCreateController !== prevProps.onCreateController) {
             // update callback to component's caller
-            if (this.props.onCreateController)
-                this.props.onCreateController(this);
+            this.props.onCreateController?.(this);
         }
 
         let selectedTrackIndices: number[] = []; // Indices to restore
@@ -1482,10 +1537,10 @@ class WellLogView
         const iTo = iFrom + this._maxVisibleTrackNum();
         if (this.logController) scrollTracksTo(this.logController, iFrom, iTo);
 
-        if (this.props.onTrackScroll) this.props.onTrackScroll();
+        this.props.onTrackScroll?.();
     }
     onTrackSelection(): void {
-        if (this.props.onTrackSelection) this.props.onTrackSelection();
+        this.props.onTrackSelection?.();
     }
 
     setInfo(x: number = Number.NaN): void {
@@ -1502,17 +1557,16 @@ class WellLogView
     onContentRescale(): void {
         this.showSelection();
 
-        if (this.props.onContentRescale) this.props.onContentRescale();
+        this.props.onContentRescale?.();
     }
 
     onContentSelection(): void {
         this.showSelection();
-        if (this.props.onContentSelection) this.props.onContentSelection();
+        this.props.onContentSelection?.();
     }
 
     onTrackMouseEvent(ev: TrackMouseEvent): void {
-        if (this.props.onTrackMouseEvent)
-            this.props.onTrackMouseEvent(this, ev);
+        this.props.onTrackMouseEvent?.(this, ev);
     }
 
     onTemplateChanged(): void {
@@ -1520,7 +1574,7 @@ class WellLogView
 
         this.template = this._generateTemplate(); // save current template
 
-        if (this.props.onTemplateChanged) this.props.onTemplateChanged();
+        this.props.onTemplateChanged?.();
     }
 
     // content
@@ -1621,6 +1675,14 @@ class WellLogView
         if (!this.logController) return [undefined, undefined];
         return [this.selCurrent, this.selPinned];
     }
+    setContentScale(value: number): void {
+        return setContentScale(this, this.props.horizontal, value);
+    }
+    getContentScale(): number {
+        const zoomValue = this.getContentZoom();
+        const baseScale = getContentBaseScale(this, this.props.horizontal);
+        return baseScale / zoomValue;
+    }
 
     // tracks
     _graphTrackMax(): number {
@@ -1660,11 +1722,12 @@ class WellLogView
     }
 
     scrollTrackTo(pos: number): void {
-        this.setState((state: Readonly<State>) => {
-            const newPos = this._newTrackScrollPos(pos);
-            if (state.scrollTrackPos === newPos) return null;
-            return { scrollTrackPos: newPos };
-        });
+        if (this._isMount)
+            this.setState((state: Readonly<State>) => {
+                const newPos = this._newTrackScrollPos(pos);
+                if (state.scrollTrackPos === newPos) return null;
+                return { scrollTrackPos: newPos };
+            });
     }
     getTrackScrollPos(): number {
         return this.state.scrollTrackPos;
@@ -1908,15 +1971,11 @@ class WellLogView
     }
 
     createViewTitle(
-        viewTitle: string | boolean | JSX.Element | undefined
+        viewTitle: string | boolean | JSX.Element //| undefined
     ): ReactNode {
-        if (typeof viewTitle === "object" /*react element*/) {
-            return viewTitle;
-        } else if (viewTitle === true) {
-            return this.props.welllog?.header.well;
-        }
-
-        return viewTitle;
+        if (typeof viewTitle === "object" /*react element*/) return viewTitle;
+        if (viewTitle === true) return this.props.welllog?.header.well;
+        return viewTitle; // string
     }
 
     render(): JSX.Element {

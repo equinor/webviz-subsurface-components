@@ -80,6 +80,7 @@ class WellLogSpacer extends Component<WellLogSpacerProps /*, State*/> {
     uid: number = count++; // generate some unique id prefix for pattern ids in SVGs
 
     defs: ReactNode;
+    _isMount: boolean;
 
     constructor(props: WellLogSpacerProps) {
         super(props);
@@ -87,10 +88,12 @@ class WellLogSpacer extends Component<WellLogSpacerProps /*, State*/> {
             this.props.options?.wellpickPatternFill &&
             this.props.patterns &&
             createDefs(this.uid, this.props.patternsTable);
+
+        this._isMount = false;
     }
 
     update(): void {
-        this.forceUpdate();
+        if (this._isMount) this.forceUpdate();
     }
 
     componentDidUpdate(
@@ -99,7 +102,7 @@ class WellLogSpacer extends Component<WellLogSpacerProps /*, State*/> {
         // called after render()!?
         if (this.props.onCreateSpacer !== prevProps.onCreateSpacer) {
             // update callback to component's caller
-            if (this.props.onCreateSpacer) this.props.onCreateSpacer(this);
+            this.props.onCreateSpacer?.(this);
         }
         if (
             this.props.patternsTable !== prevProps.patternsTable ||
@@ -144,6 +147,13 @@ class WellLogSpacer extends Component<WellLogSpacerProps /*, State*/> {
         return false;
     }
 
+    componentDidMount(): void {
+        this._isMount = true;
+    }
+    componentWillUnmount(): void {
+        this._isMount = false;
+    }
+
     render(): JSX.Element {
         const horizontal = this.props.horizontal;
 
@@ -159,9 +169,9 @@ class WellLogSpacer extends Component<WellLogSpacerProps /*, State*/> {
         let offsetLeft = 3000;
         let height = 1;
         let width = 1;
-        const controller = this.props.controllers[0] as WellLogView;
+        const controller = this.props.controllers[0] as unknown as WellLogView;
         const logViewer = controller?.logController;
-        const controller2 = this.props.controllers[1] as WellLogView;
+        const controller2 = this.props.controllers[1] as unknown as WellLogView;
         const logViewer2 = controller2?.logController;
         const wps = controller ? getWellPicks(controller) : null;
         const wps2 = controller2 ? getWellPicks(controller2) : null;
