@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.6.0...well-log-viewer@1.7.0) (2024-04-05)
+
+
+### Features
+
+* Customizable WellLog Viewer Layout ([#1363](https://github.com/equinor/webviz-subsurface-components/issues/1363)) ([dc956e8](https://github.com/equinor/webviz-subsurface-components/commit/dc956e82f84e04f1719b859829301d8cf6b3b8aa)), closes [#1702](https://github.com/equinor/webviz-subsurface-components/issues/1702) [#1239](https://github.com/equinor/webviz-subsurface-components/issues/1239)
+
 # [1.6.0](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.5.5...well-log-viewer@1.6.0) (2024-04-04)
 
 
