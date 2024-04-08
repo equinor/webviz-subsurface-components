@@ -2,269 +2,277 @@
 
 exports[`Sync Log Viewer snapshot test 1`] = `
 <div
-  style="height: 100%; width: 100%; display: flex; flex-direction: row;"
+  class="welllog-layout"
 >
   <div
-    style="height: 100%; width: 255px; flex: 1 1; display: flex; flex-direction: row;"
+    class="interior"
   >
     <div
-      style="overflow: scroll; width: 100%; height: 100%;"
+      class="middle"
     >
       <div
-        style="width: 0px; height: 0px;"
+        style="height: 0%; flex: 1; display: flex; flex-direction: row;"
       >
         <div
-          style="position: absolute;"
+          style="overflow: scroll; width: 100%; height: 100%;"
         >
           <div
-            class="welllogview"
-            style="flex-direction: column;"
+            style="width: 0px; height: 0px;"
           >
             <div
-              class="view"
+              style="position: absolute;"
             >
               <div
-                class="container log-controller"
+                class="welllogview"
+                style="flex-direction: column;"
               >
                 <div
-                  class="overlay"
-                  style="width: 0px; left: 0px; overflow: hidden;"
+                  class="view"
                 >
                   <div
-                    class="depth"
-                    style="position: absolute; pointer-events: none; visibility: hidden;"
-                  />
-                  <div
-                    class="rubber-band"
-                    style="position: relative; pointer-events: none; height: 9px; width: 100%; visibility: hidden;"
+                    class="container log-controller"
                   >
                     <div
-                      style="height: 1px; width: 100%; top: 4.5px; position: relative;"
-                    />
-                  </div>
-                  <div
-                    class="pinned"
-                    style="position: absolute; pointer-events: none; height: 9px; width: 100%; left: 0px; visibility: hidden;"
-                  >
+                      class="overlay"
+                      style="width: 0px; left: 0px; overflow: hidden;"
+                    >
+                      <div
+                        class="depth"
+                        style="position: absolute; pointer-events: none; visibility: hidden;"
+                      />
+                      <div
+                        class="rubber-band"
+                        style="position: relative; pointer-events: none; height: 9px; width: 100%; visibility: hidden;"
+                      >
+                        <div
+                          style="height: 1px; width: 100%; top: 4.5px; position: relative;"
+                        />
+                      </div>
+                      <div
+                        class="pinned"
+                        style="position: absolute; pointer-events: none; height: 9px; width: 100%; left: 0px; visibility: hidden;"
+                      >
+                        <div
+                          style="height: 1px; width: 100%; top: 4.5px; position: absolute;"
+                        />
+                      </div>
+                    </div>
                     <div
-                      style="height: 1px; width: 100%; top: 4.5px; position: absolute;"
-                    />
-                  </div>
-                </div>
-                <div
-                  class="track"
-                  style="max-width: 50px; flex: 2;"
-                >
-                  <div
-                    class="track-container"
-                  >
-                    <svg
-                      style="position: absolute;"
-                    />
-                  </div>
-                </div>
-                <div
-                  class="track"
-                  style="max-width: 50px; flex: 2;"
-                >
-                  <div
-                    class="track-container"
-                  >
-                    <svg
-                      style="position: absolute;"
-                    />
-                  </div>
-                </div>
-                <div
-                  class="track"
-                  style="display: flex; flex: 6;"
-                >
-                  <div
-                    class="track-container"
-                  >
-                    <canvas
-                      style="position: absolute;"
-                    />
-                  </div>
-                </div>
-                <div
-                  class="track"
-                  style="display: flex; flex: 3;"
-                >
-                  <div
-                    class="track-container"
-                  >
-                    <canvas
-                      style="position: absolute;"
-                    />
-                  </div>
-                </div>
-                <div
-                  class="track"
-                  style="display: flex; flex: 3;"
-                >
-                  <div
-                    class="track-container"
-                  >
-                    <canvas
-                      style="position: absolute;"
-                    />
-                  </div>
-                </div>
-                <div
-                  class="track"
-                  style="display: none; flex: 3;"
-                >
-                  <div
-                    class="track-container"
-                  >
-                    <canvas
-                      style="position: absolute;"
-                    />
-                  </div>
-                </div>
-                <div
-                  class="track"
-                  style="display: none; flex: 3;"
-                >
-                  <div
-                    class="track-container"
-                  >
-                    <canvas
-                      style="position: absolute;"
-                    />
-                  </div>
-                </div>
-                <div
-                  class="track"
-                  style="display: none; flex: 3;"
-                >
-                  <div
-                    class="track-container"
-                  >
-                    <canvas
-                      style="position: absolute;"
-                    />
-                  </div>
-                </div>
-                <div
-                  class="track"
-                  style="display: none; flex: 3;"
-                >
-                  <div
-                    class="track-container"
-                  >
-                    <canvas
-                      style="position: absolute;"
-                    />
-                  </div>
-                </div>
-                <div
-                  class="track"
-                  style="display: none; flex: 3;"
-                >
-                  <div
-                    class="track-container"
-                  >
-                    <canvas
-                      style="position: absolute;"
-                    />
-                  </div>
-                </div>
-                <div
-                  class="track"
-                  style="display: none; flex: 3;"
-                >
-                  <div
-                    class="track-container"
-                  >
-                    <canvas
-                      style="position: absolute;"
-                    />
-                  </div>
-                </div>
-                <div
-                  class="track"
-                  style="display: none; flex: 3;"
-                >
-                  <div
-                    class="track-container"
-                  >
-                    <canvas
-                      style="position: absolute;"
-                    />
-                  </div>
-                </div>
-                <div
-                  class="track"
-                  style="display: none; flex: 3;"
-                >
-                  <div
-                    class="track-container"
-                  >
-                    <canvas
-                      style="position: absolute;"
-                    />
-                  </div>
-                </div>
-                <div
-                  class="track"
-                  style="display: none; flex: 3;"
-                >
-                  <div
-                    class="track-container"
-                  >
-                    <canvas
-                      style="position: absolute;"
-                    />
-                  </div>
-                </div>
-                <div
-                  class="track"
-                  style="display: none; flex: 3;"
-                >
-                  <div
-                    class="track-container"
-                  >
-                    <canvas
-                      style="position: absolute;"
-                    />
-                  </div>
-                </div>
-                <div
-                  class="track"
-                  style="display: none; flex: 3;"
-                >
-                  <div
-                    class="track-container"
-                  >
-                    <canvas
-                      style="position: absolute;"
-                    />
-                  </div>
-                </div>
-                <div
-                  class="track"
-                  style="display: none; flex: 3;"
-                >
-                  <div
-                    class="track-container"
-                  >
-                    <canvas
-                      style="position: absolute;"
-                    />
-                  </div>
-                </div>
-                <div
-                  class="track"
-                  style="display: none; flex: 3;"
-                >
-                  <div
-                    class="track-container"
-                  >
-                    <canvas
-                      style="position: absolute;"
-                    />
+                      class="track"
+                      style="max-width: 50px; flex: 2;"
+                    >
+                      <div
+                        class="track-container"
+                      >
+                        <svg
+                          style="position: absolute;"
+                        />
+                      </div>
+                    </div>
+                    <div
+                      class="track"
+                      style="max-width: 50px; flex: 2;"
+                    >
+                      <div
+                        class="track-container"
+                      >
+                        <svg
+                          style="position: absolute;"
+                        />
+                      </div>
+                    </div>
+                    <div
+                      class="track"
+                      style="display: flex; flex: 6;"
+                    >
+                      <div
+                        class="track-container"
+                      >
+                        <canvas
+                          style="position: absolute;"
+                        />
+                      </div>
+                    </div>
+                    <div
+                      class="track"
+                      style="display: flex; flex: 3;"
+                    >
+                      <div
+                        class="track-container"
+                      >
+                        <canvas
+                          style="position: absolute;"
+                        />
+                      </div>
+                    </div>
+                    <div
+                      class="track"
+                      style="display: flex; flex: 3;"
+                    >
+                      <div
+                        class="track-container"
+                      >
+                        <canvas
+                          style="position: absolute;"
+                        />
+                      </div>
+                    </div>
+                    <div
+                      class="track"
+                      style="display: none; flex: 3;"
+                    >
+                      <div
+                        class="track-container"
+                      >
+                        <canvas
+                          style="position: absolute;"
+                        />
+                      </div>
+                    </div>
+                    <div
+                      class="track"
+                      style="display: none; flex: 3;"
+                    >
+                      <div
+                        class="track-container"
+                      >
+                        <canvas
+                          style="position: absolute;"
+                        />
+                      </div>
+                    </div>
+                    <div
+                      class="track"
+                      style="display: none; flex: 3;"
+                    >
+                      <div
+                        class="track-container"
+                      >
+                        <canvas
+                          style="position: absolute;"
+                        />
+                      </div>
+                    </div>
+                    <div
+                      class="track"
+                      style="display: none; flex: 3;"
+                    >
+                      <div
+                        class="track-container"
+                      >
+                        <canvas
+                          style="position: absolute;"
+                        />
+                      </div>
+                    </div>
+                    <div
+                      class="track"
+                      style="display: none; flex: 3;"
+                    >
+                      <div
+                        class="track-container"
+                      >
+                        <canvas
+                          style="position: absolute;"
+                        />
+                      </div>
+                    </div>
+                    <div
+                      class="track"
+                      style="display: none; flex: 3;"
+                    >
+                      <div
+                        class="track-container"
+                      >
+                        <canvas
+                          style="position: absolute;"
+                        />
+                      </div>
+                    </div>
+                    <div
+                      class="track"
+                      style="display: none; flex: 3;"
+                    >
+                      <div
+                        class="track-container"
+                      >
+                        <canvas
+                          style="position: absolute;"
+                        />
+                      </div>
+                    </div>
+                    <div
+                      class="track"
+                      style="display: none; flex: 3;"
+                    >
+                      <div
+                        class="track-container"
+                      >
+                        <canvas
+                          style="position: absolute;"
+                        />
+                      </div>
+                    </div>
+                    <div
+                      class="track"
+                      style="display: none; flex: 3;"
+                    >
+                      <div
+                        class="track-container"
+                      >
+                        <canvas
+                          style="position: absolute;"
+                        />
+                      </div>
+                    </div>
+                    <div
+                      class="track"
+                      style="display: none; flex: 3;"
+                    >
+                      <div
+                        class="track-container"
+                      >
+                        <canvas
+                          style="position: absolute;"
+                        />
+                      </div>
+                    </div>
+                    <div
+                      class="track"
+                      style="display: none; flex: 3;"
+                    >
+                      <div
+                        class="track-container"
+                      >
+                        <canvas
+                          style="position: absolute;"
+                        />
+                      </div>
+                    </div>
+                    <div
+                      class="track"
+                      style="display: none; flex: 3;"
+                    >
+                      <div
+                        class="track-container"
+                      >
+                        <canvas
+                          style="position: absolute;"
+                        />
+                      </div>
+                    </div>
+                    <div
+                      class="track"
+                      style="display: none; flex: 3;"
+                    >
+                      <div
+                        class="track-container"
+                      >
+                        <canvas
+                          style="position: absolute;"
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -273,260 +281,268 @@ exports[`Sync Log Viewer snapshot test 1`] = `
         </div>
       </div>
     </div>
-  </div>
-  <div
-    class="right-panel"
-  >
     <div
-      class="axis-selector"
+      class="left-right"
     >
-      <fieldset>
-        <legend>
-          Primary scale
-        </legend>
-        <div>
-          <input
-            checked=""
-            type="radio"
-            value="md"
-          />
-          MD
-        </div>
-        <div>
-          <input
-            type="radio"
-            value="tvd"
-          />
-          TVD
-        </div>
-      </fieldset>
-    </div>
-    <div
-      class="readout"
-    >
-      <fieldset>
-        <legend>
-          Readout 15/9-19A
-        </legend>
-        <table>
-          <tbody>
-            <tr>
-              <td
-                class="row-info"
-                style="color: black;"
-              >
-                ⬤
-              </td>
-              <td
-                class="row-name"
-                title="DEPT"
-              />
-              <td
-                class="row-value"
-                colspan="1"
-                title=" "
-              />
-              <td
-                class="row-units"
-                title="M"
-              />
-            </tr>
-            <tr>
-              <td
-                class="row-info"
-                style="color: grey;"
-              >
-                ⬤
-              </td>
-              <td
-                class="row-name"
-                title="DVER"
-              />
-              <td
-                class="row-value"
-                colspan="1"
-                title=" "
-              />
-              <td
-                class="row-units"
-                title="M"
-              />
-            </tr>
-            <tr>
-              <td
-                colspan="4"
-              >
-                 
-                <hr />
-              </td>
-            </tr>
-            <tr>
-              <td
-                class="row-info"
-                style="color: blue;"
-              >
-                ⬤
-              </td>
-              <td
-                class="row-name"
-                title="MDIA"
-              />
-              <td
-                class="row-value"
-                colspan="1"
-                title=" "
-              />
-              <td
-                class="row-units"
-                title="KG/L"
-              />
-            </tr>
-            <tr>
-              <td
-                class="row-info"
-                style="color: green;"
-              >
-                ⬤
-              </td>
-              <td
-                class="row-name"
-                title="HKLA"
-              />
-              <td
-                class="row-value"
-                colspan="1"
-                title=" "
-              />
-              <td
-                class="row-units"
-                title="T"
-              />
-            </tr>
-            <tr>
-              <td
-                class="row-info"
-                style="color: blue;"
-              >
-                ⬤
-              </td>
-              <td
-                class="row-name"
-                title="HKLA"
-              />
-              <td
-                class="row-value"
-                colspan="1"
-                title=" "
-              />
-              <td
-                class="row-units"
-                title="T"
-              />
-            </tr>
-            <tr>
-              <td
-                class="row-info"
-                style="color: blue;"
-              >
-                ⬤
-              </td>
-              <td
-                class="row-name"
-                title="HKLX"
-              />
-              <td
-                class="row-value"
-                colspan="1"
-                title=" "
-              />
-              <td
-                class="row-units"
-                title="T"
-              />
-            </tr>
-            <tr>
-              <td
-                class="row-info"
-                style="color: orange;"
-              >
-                ⬤
-              </td>
-              <td
-                class="row-name"
-                title="HKLA"
-              />
-              <td
-                class="row-value"
-                colspan="1"
-                title=" "
-              />
-              <td
-                class="row-units"
-                title="T"
-              />
-            </tr>
-          </tbody>
-        </table>
-      </fieldset>
-    </div>
-    <div
-      class="zoom"
-    >
-      <span
-        class="zoom-label"
+      <div
+        class="side-panel"
       >
-        Zoom:
-      </span>
-      <span
-        class="zoom-value"
-      >
-        <span
-          class="MuiSlider-root MuiSlider-colorPrimary MuiSlider-sizeMedium css-187mznn-MuiSlider-root"
+        <div
+          class="axes-selector"
+        >
+          <div
+            class="axis-selector"
+          >
+            <fieldset>
+              <legend>
+                Primary scale
+              </legend>
+              <div>
+                <input
+                  checked=""
+                  type="radio"
+                  value="md"
+                />
+                MD
+              </div>
+              <div>
+                <input
+                  type="radio"
+                  value="tvd"
+                />
+                TVD
+              </div>
+            </fieldset>
+          </div>
+        </div>
+        <div
+          class="readout"
+        >
+          <fieldset>
+            <legend>
+              Readout 15/9-19A
+            </legend>
+            <table>
+              <tbody>
+                <tr>
+                  <td
+                    class="row-info"
+                    style="color: black;"
+                  >
+                    ⬤
+                  </td>
+                  <td
+                    class="row-name"
+                    title="DEPT"
+                  />
+                  <td
+                    class="row-value"
+                    colspan="1"
+                    title=" "
+                  />
+                  <td
+                    class="row-units"
+                    title="M"
+                  />
+                </tr>
+                <tr>
+                  <td
+                    class="row-info"
+                    style="color: grey;"
+                  >
+                    ⬤
+                  </td>
+                  <td
+                    class="row-name"
+                    title="DVER"
+                  />
+                  <td
+                    class="row-value"
+                    colspan="1"
+                    title=" "
+                  />
+                  <td
+                    class="row-units"
+                    title="M"
+                  />
+                </tr>
+                <tr>
+                  <td
+                    colspan="4"
+                  >
+                     
+                    <hr />
+                  </td>
+                </tr>
+                <tr>
+                  <td
+                    class="row-info"
+                    style="color: blue;"
+                  >
+                    ⬤
+                  </td>
+                  <td
+                    class="row-name"
+                    title="MDIA"
+                  />
+                  <td
+                    class="row-value"
+                    colspan="1"
+                    title=" "
+                  />
+                  <td
+                    class="row-units"
+                    title="KG/L"
+                  />
+                </tr>
+                <tr>
+                  <td
+                    class="row-info"
+                    style="color: green;"
+                  >
+                    ⬤
+                  </td>
+                  <td
+                    class="row-name"
+                    title="HKLA"
+                  />
+                  <td
+                    class="row-value"
+                    colspan="1"
+                    title=" "
+                  />
+                  <td
+                    class="row-units"
+                    title="T"
+                  />
+                </tr>
+                <tr>
+                  <td
+                    class="row-info"
+                    style="color: blue;"
+                  >
+                    ⬤
+                  </td>
+                  <td
+                    class="row-name"
+                    title="HKLA"
+                  />
+                  <td
+                    class="row-value"
+                    colspan="1"
+                    title=" "
+                  />
+                  <td
+                    class="row-units"
+                    title="T"
+                  />
+                </tr>
+                <tr>
+                  <td
+                    class="row-info"
+                    style="color: blue;"
+                  >
+                    ⬤
+                  </td>
+                  <td
+                    class="row-name"
+                    title="HKLX"
+                  />
+                  <td
+                    class="row-value"
+                    colspan="1"
+                    title=" "
+                  />
+                  <td
+                    class="row-units"
+                    title="T"
+                  />
+                </tr>
+                <tr>
+                  <td
+                    class="row-info"
+                    style="color: orange;"
+                  >
+                    ⬤
+                  </td>
+                  <td
+                    class="row-name"
+                    title="HKLA"
+                  />
+                  <td
+                    class="row-value"
+                    colspan="1"
+                    title=" "
+                  />
+                  <td
+                    class="row-units"
+                    title="T"
+                  />
+                </tr>
+              </tbody>
+            </table>
+          </fieldset>
+        </div>
+        <div
+          class="zoom"
         >
           <span
-            class="MuiSlider-rail css-14pt78w-MuiSlider-rail"
-          />
-          <span
-            class="MuiSlider-track css-1gv0vcd-MuiSlider-track"
-            style="left: 0%; width: 0%;"
-          />
-          <span
-            class="MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary css-jx1sa5-MuiSlider-thumb"
-            data-index="0"
-            style="left: 0%;"
+            class="zoom-label"
           >
-            <input
-              aria-labelledby="non-linear-slider"
-              aria-orientation="horizontal"
-              aria-valuemax="256"
-              aria-valuemin="1"
-              aria-valuenow="1"
-              aria-valuetext="1"
-              data-index="0"
-              max="8"
-              min="0"
-              step="0.5"
-              style="border: 0px; height: 100%; margin: -1px; overflow: hidden; padding: 0px; position: absolute; white-space: nowrap; width: 100%; direction: ltr;"
-              type="range"
-              value="0"
-            />
+            Zoom:
+          </span>
+          <span
+            class="zoom-value"
+          >
             <span
-              aria-hidden="true"
-              class="MuiSlider-valueLabel css-7d61z1-MuiSlider-valueLabel"
+              class="MuiSlider-root MuiSlider-colorPrimary MuiSlider-sizeMedium css-187mznn-MuiSlider-root"
             >
               <span
-                class="MuiSlider-valueLabelCircle"
+                class="MuiSlider-rail css-14pt78w-MuiSlider-rail"
+              />
+              <span
+                class="MuiSlider-track css-1gv0vcd-MuiSlider-track"
+                style="left: 0%; width: 0%;"
+              />
+              <span
+                class="MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary css-jx1sa5-MuiSlider-thumb"
+                data-index="0"
+                style="left: 0%;"
               >
+                <input
+                  aria-labelledby="non-linear-slider"
+                  aria-orientation="horizontal"
+                  aria-valuemax="256"
+                  aria-valuemin="1"
+                  aria-valuenow="1"
+                  aria-valuetext="1"
+                  data-index="0"
+                  max="8"
+                  min="0"
+                  step="0.5"
+                  style="border: 0px; height: 100%; margin: -1px; overflow: hidden; padding: 0px; position: absolute; white-space: nowrap; width: 100%; direction: ltr;"
+                  type="range"
+                  value="0"
+                />
                 <span
-                  class="MuiSlider-valueLabelLabel"
+                  aria-hidden="true"
+                  class="MuiSlider-valueLabel css-7d61z1-MuiSlider-valueLabel"
                 >
-                  1
+                  <span
+                    class="MuiSlider-valueLabelCircle"
+                  >
+                    <span
+                      class="MuiSlider-valueLabelLabel"
+                    >
+                      1
+                    </span>
+                  </span>
                 </span>
               </span>
             </span>
           </span>
-        </span>
-      </span>
+        </div>
+      </div>
     </div>
   </div>
 </div>

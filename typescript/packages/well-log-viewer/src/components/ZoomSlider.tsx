@@ -3,7 +3,7 @@ import React, { Component } from "react";
 import Slider from "@mui/material/Slider";
 
 interface Props {
-    onChange: (value: number) => void;
+    onChange: (value: number) => void; // zoom value callback
     value: number; // zoom value.
 
     max?: number; // max zoom value. default 256
@@ -53,15 +53,14 @@ class ZoomSlider extends Component<Props, State> {
         _event: Event,
         level: number | number[] // zoom level
     ): void {
-        if (typeof level === "number") {
-            this.setState((state: Readonly<State>) => {
-                if (state.level === level) return null;
-                if (this.props.onChange)
-                    this.props.onChange(convertLevelToValue(level));
-                else console.error("ZoomSlider props.onChange not set");
-                return { level: level as number };
-            });
-        }
+        if (typeof level !== "number") return;
+        this.setState((state: Readonly<State>) => {
+            if (state.level === level) return null;
+            if (this.props.onChange)
+                this.props.onChange(convertLevelToValue(level));
+            else console.error("ZoomSlider props.onChange not set");
+            return { level: level as number };
+        });
     }
 
     render(): JSX.Element {

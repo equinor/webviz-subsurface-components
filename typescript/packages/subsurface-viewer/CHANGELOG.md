@@ -1,3 +1,31 @@
+## [0.22.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.22.0...subsurface-viewer@0.22.1) (2024-04-04)
+
+
+### Bug Fixes
+
+* **grid3d:** Color fighting with clamp color is fixed. ([#1998](https://github.com/equinor/webviz-subsurface-components/issues/1998)) ([4b83d1a](https://github.com/equinor/webviz-subsurface-components/commit/4b83d1a033e21bf84e05af276c84df7210db106b))
+
+# [0.22.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.21.0...subsurface-viewer@0.22.0) (2024-04-04)
+
+
+### Features
+
+* Allow camera xy scaling ([#2002](https://github.com/equinor/webviz-subsurface-components/issues/2002)) ([0635f5e](https://github.com/equinor/webviz-subsurface-components/commit/0635f5e1f268a99ab0755c66522ba83f056f1365))
+
+# [0.21.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.20.10...subsurface-viewer@0.21.0) (2024-04-02)
+
+
+### Features
+
+* Added property "formatLabelFunc" to set a callback funtion for formating label numbers ([#1904](https://github.com/equinor/webviz-subsurface-components/issues/1904)) ([c75be60](https://github.com/equinor/webviz-subsurface-components/commit/c75be60b0a4df44c7bf62374236bf452809300a1))
+
+## [0.20.10](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.20.9...subsurface-viewer@0.20.10) (2024-03-29)
+
+
+### Bug Fixes
+
+* bump mathjs from 12.2.1 to 12.4.1 in /typescript ([#1994](https://github.com/equinor/webviz-subsurface-components/issues/1994)) ([4180945](https://github.com/equinor/webviz-subsurface-components/commit/41809453eb5172511a8eca6077a77499437e076c)), closes [#3177](https://github.com/equinor/webviz-subsurface-components/issues/3177) [#3151](https://github.com/equinor/webviz-subsurface-components/issues/3151) [#3172](https://github.com/equinor/webviz-subsurface-components/issues/3172) [#3163](https://github.com/equinor/webviz-subsurface-components/issues/3163) [#3162](https://github.com/equinor/webviz-subsurface-components/issues/3162) [#3164](https://github.com/equinor/webviz-subsurface-components/issues/3164) [#3175](https://github.com/equinor/webviz-subsurface-components/issues/3175) [#3167](https://github.com/equinor/webviz-subsurface-components/issues/3167) [#3154](https://github.com/equinor/webviz-subsurface-components/issues/3154) [#2968](https://github.com/equinor/webviz-subsurface-components/issues/2968) [#3149](https://github.com/equinor/webviz-subsurface-components/issues/3149) [#3100](https://github.com/equinor/webviz-subsurface-components/issues/3100) [#3136](https://github.com/equinor/webviz-subsurface-components/issues/3136) [#3156](https://github.com/equinor/webviz-subsurface-components/issues/3156) [#3153](https://github.com/equinor/webviz-subsurface-components/issues/3153) [#3158](https://github.com/equinor/webviz-subsurface-components/issues/3158) [#3157](https://github.com/equinor/webviz-subsurface-components/issues/3157) [#3150](https://github.com/equinor/webviz-subsurface-components/issues/3150) [#3143](https://github.com/equinor/webviz-subsurface-components/issues/3143) [#3150](https://github.com/equinor/webviz-subsurface-components/issues/3150) [#3123](https://github.com/equinor/webviz-subsurface-components/issues/3123) [#3027](https://github.com/equinor/webviz-subsurface-components/issues/3027) [#3114](https://github.com/equinor/webviz-subsurface-components/issues/3114) [#3175](https://github.com/equinor/webviz-subsurface-components/issues/3175) [#3172](https://github.com/equinor/webviz-subsurface-components/issues/3172)
+
 ## [0.20.9](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.20.8...subsurface-viewer@0.20.9) (2024-03-25)
 
 

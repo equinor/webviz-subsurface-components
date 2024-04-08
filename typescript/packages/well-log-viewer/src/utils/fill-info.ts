@@ -83,6 +83,7 @@ function addScaleTrackInfos(
             color: iPlot == 0 ? "black" : "grey", //??
             value: _x,
             type: "", // "scale"
+            iTrack: -1,
             trackId: track.id,
         });
         iPlot++;
@@ -93,6 +94,7 @@ function addScaleTrackInfos(
         color: "", // dummy value
         value: Number.NaN, // dummy value
         type: "separator",
+        iTrack: -1,
         trackId: tracks[0]?.id || "separator",
     });
 }
@@ -132,6 +134,7 @@ export function fillInfos(
                 value: Number.NaN, // dummy value,
                 type: "track",
                 collapsed: collapsed,
+                iTrack: iTrack - 1,
                 trackId: track.id,
                 groupStart: "!",
             });
@@ -169,6 +172,7 @@ export function fillInfos(
                     value: value,
                     discrete: discrete,
                     type: "stacked", //??
+                    iTrack: iTrack - 1,
                     trackId: trackStacked.id,
                 });
             } else {
@@ -196,6 +200,7 @@ export function fillInfos(
                             (options1 ? options1.color : options.color) || "",
                         value: getValue(x, data, type),
                         type: type,
+                        iTrack: iTrack - 1,
                         trackId: track.id,
                     });
 
@@ -209,6 +214,7 @@ export function fillInfos(
                                 "",
                             value: getValue(x, data, type),
                             type: type,
+                            iTrack: iTrack - 1,
                             trackId: "_" + track.id,
                         });
                     }

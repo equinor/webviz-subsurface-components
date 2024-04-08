@@ -2,11 +2,15 @@ import type { ReactNode } from "react";
 import React, { Component } from "react";
 
 interface Props {
-    header: string; // language dependent string
+    header?: string | JSX.Element; // language dependent string
     axes: string[];
-    axisLabels: Record<string, string>; // language dependent strings
+    axisTitles: Record<string, string>; // language dependent strings
     value: string;
     onChange: (value: string) => void;
+    /**
+     * Hide the component when only one axis is available
+     */
+    autoHide?: boolean;
 }
 
 class AxisSelector extends Component<Props> {
@@ -27,15 +31,15 @@ class AxisSelector extends Component<Props> {
     }
 
     render(): JSX.Element {
-        if (!this.props.axes || this.props.axes.length < 1) return <></>; // nothing to render
+        if (this.props.autoHide && this.props.axes.length <= 1) return <></>; // do not need to render anything
         return (
             <div className="axis-selector">
                 <fieldset>
                     <legend>{this.props.header}</legend>
                     {this.props.axes.map((axis) => {
                         return this.createItem(
-                            this.props.axisLabels
-                                ? this.props.axisLabels[axis]
+                            this.props.axisTitles
+                                ? this.props.axisTitles[axis]
                                 : axis,
                             axis
                         );
