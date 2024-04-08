@@ -1,16 +1,18 @@
+import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
+
 import ZoomSlider from "./ZoomSlider";
 
 const ComponentCode = "<ZoomSlider value={1} max={128}/>";
 
-export default {
+const stories: Meta = {
     component: ZoomSlider,
     title: "WellLogViewer/Components/ZoomSlider",
     parameters: {
         docs: {
             description: {
                 component:
-                    "An auxiliary component for WellLogViewer demo component. Used for setting a zoom factor to well log tracks",
+                    "An auxiliary component for WellLogViewer/SyncLogViewer component. Used for setting a zoom factor to well log tracks",
             },
         },
         componentSource: {
@@ -33,20 +35,35 @@ export default {
         },
     },
 };
+export default stories;
 
 const Template = (args) => {
+    const infoRef = React.useRef();
+    const setInfo = function (info) {
+        if (infoRef.current) infoRef.current.innerHTML = info;
+    };
+
     return (
-        <div style={{ height: "92vh" }}>
+        <div>
             <div style={{ width: "97%", height: "100%", flex: 1 }}>
                 Zoom:
-                <ZoomSlider id="ZoomSlider" {...args} />
+                <ZoomSlider
+                    id="ZoomSlider"
+                    {...args}
+                    onChange={function (value: number): void {
+                        setInfo("zoom value=" + value);
+                    }}
+                />
             </div>
+            <div ref={infoRef}>&nbsp;</div>
         </div>
     );
 };
 
-export const Default = Template.bind({});
-Default.args = {
-    value: 1,
-    max: 128,
+export const Default: StoryObj<typeof Template> = {
+    args: {
+        value: 1,
+        max: 128,
+    },
+    render: (args) => <Template {...args} />,
 };

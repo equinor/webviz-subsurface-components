@@ -1,8 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
+import type { Meta, StoryObj } from "@storybook/react";
+import React from "react";
 
 import { colorTables } from "@emerson-eps/color-tables";
+const exampleColorTable = colorTables; /*as unknown as ColorTable[]*/ // equivalent types, should be merged
+const wellpickColorTable = require("../../../../example-data/wellpick_colors.json"); // eslint-disable-line
+const wellpick = require("../../../../example-data/wellpicks.json");// eslint-disable-line
+
 import { ToggleButton } from "@mui/material";
-import React from "react";
+
 import SyncLogViewer, { argTypesSyncLogViewerProp } from "./SyncLogViewer";
 
 const ComponentCode =
@@ -26,7 +32,7 @@ const ComponentCode =
 import type { WellLog } from "./components/WellLogTypes";
 import { axisMnemos, axisTitles } from "./utils/axes";
 
-export default {
+const stories: Meta = {
     component: SyncLogViewer,
     title: "WellLogViewer/Demo/SyncLogViewer",
     parameters: {
@@ -109,9 +115,14 @@ export default {
             description:
                 "The view title. Set desired string or react element or true for default value from welllog file",
         },
+        layout: {
+            description:
+                "Side panels layout (default is layout with default right panel",
+        },
     },
     tags: ["no-screenshot-test"],
 };
+export default stories;
 
 function fillInfo(controller) {
     if (!controller) return "-";
@@ -147,20 +158,20 @@ const Template = (args) => {
     };
     const [controller, setController] = React.useState(null); // the first WellLog
     const onCreateController = React.useCallback(
-        (iView, controller) => {
-            if (iView === 0) setController(controller);
+        (iWellLog, controller) => {
+            if (iWellLog === 0) setController(controller);
         },
         [controller]
     );
     const onContentRescale = React.useCallback(
-        (iView) => {
-            if (iView === 0) setInfo(fillInfo(controller));
+        (iWellLog) => {
+            if (iWellLog === 0) setInfo(fillInfo(controller));
         },
         [controller]
     );
     const onContentSelection = React.useCallback(
-        (/*_iView*/) => {
-            /*if(iView===0)*/ setInfo(fillInfo(controller));
+        (/*iWellLog*/) => {
+            /*if(iWellLog===0)*/ setInfo(fillInfo(controller));
         },
         [controller]
     );
@@ -293,72 +304,164 @@ const patternNamesEnglish = [
     "Vulcanic",
 ];
 
-export const Default = Template.bind({});
-Default.args = {
-    id: "Sync-Log-Viewer",
-    syncTrackPos: true,
-    syncContentDomain: true,
-    syncContentSelection: true,
-    syncTemplate: true,
-    horizontal: false,
+export const Default: StoryObj<typeof Template> = {
+    args: {
+        id: "Sync-Log-Viewer",
+        syncTrackPos: true,
+        syncContentDomain: true,
+        syncContentSelection: true,
+        syncTemplate: true,
+        horizontal: false,
 
-    welllogs: [
-        require("../../../../example-data/L898MUD.json")[0],    // eslint-disable-line
-        require("../../../../example-data/L916MUD.json")[0],// eslint-disable-line
-        require("../../../../example-data/Lis1.json")[0],// eslint-disable-line
-    ],
-    templates: [
-        require("../../../../example-data/synclog_template.json"),// eslint-disable-line
-        require("../../../../example-data/synclog_template.json"),// eslint-disable-line
-    ],
-    colorTables: colorTables,
-    wellpicks: [
-        {
-            wellpick: require("../../../../example-data/wellpicks.json")[0],// eslint-disable-line
-            name: "HORIZON",
-            colorTables: require("../../../../example-data/wellpick_colors.json"),// eslint-disable-line
-            color: "Stratigraphy",
+        welllogs: [
+            require("../../../../example-data/L898MUD.json")[0], // eslint-disable-line
+            require("../../../../example-data/L916MUD.json")[0], // eslint-disable-line
+            require("../../../../example-data/Lis1.json")[0], // eslint-disable-line
+        ],
+        templates: [
+            require("../../../../example-data/synclog_template.json"), // eslint-disable-line
+            require("../../../../example-data/synclog_template.json"), // eslint-disable-line
+        ],
+        colorTables: exampleColorTable,
+        wellpicks: [
+            {
+                wellpick: wellpick[0],
+                name: "HORIZON",
+                colorTables: wellpickColorTable,
+                color: "Stratigraphy",
+            },
+            {
+                wellpick: wellpick[1],
+                name: "HORIZON",
+                colorTables: wellpickColorTable, // eslint-disable-line
+                color: "Stratigraphy",
+            },
+            {
+                wellpick: wellpick[0],
+                name: "HORIZON",
+                colorTables: wellpickColorTable, // eslint-disable-line
+                color: "Stratigraphy",
+            },
+        ],
+        patternsTable: {
+            patternSize: 24,
+            patternImages: patternImages,
+            names: patternNamesEnglish,
         },
-        {
-            wellpick: require("../../../../example-data/wellpicks.json")[1],// eslint-disable-line
-            name: "HORIZON",
-            colorTables: require("../../../../example-data/wellpick_colors.json"),// eslint-disable-line
-            color: "Stratigraphy",
+        patterns: require("../../../../example-data/horizon_patterns.json"), // eslint-disable-line
+
+        wellpickFlatting: ["Hor_2", "Hor_4"],
+
+        spacers: [312, 255],
+        wellDistances: {
+            units: "m",
+            distances: [2048.3, 512.7],
         },
-        {
-            wellpick: require("../../../../example-data/wellpicks.json")[0],// eslint-disable-line
-            name: "HORIZON",
-            colorTables: require("../../../../example-data/wellpick_colors.json"),// eslint-disable-line
-            color: "Stratigraphy",
+
+        axisTitles: axisTitles,
+        axisMnemos: axisMnemos,
+
+        viewTitles: true, // show default welllog view titles (a wellname from the welllog)
+
+        welllogOptions: {
+            wellpickColorFill: true,
+            wellpickPatternFill: true,
         },
-    ],
-    patternsTable: {
-        patternSize: 24,
-        patternImages: patternImages,
-        names: patternNamesEnglish,
+        spacerOptions: {
+            wellpickColorFill: true,
+            wellpickPatternFill: true,
+        },
     },
-    patterns: require("../../../../example-data/horizon_patterns.json"),// eslint-disable-line
+    render: (args) => <Template {...args} />,
+};
 
-    wellpickFlatting: ["Hor_2", "Hor_4"],
-
-    spacers: [312, 255],
-    wellDistances: {
-        units: "m",
-        distances: [2048.3, 512.7],
+import WellLogInfoPanel from "./components/WellLogInfoPanel";
+import WellLogZoomSlider from "./components/WellLogZoomSlider";
+import WellLogScaleSelector from "./components/WellLogScaleSelector";
+import WellInfoIcon from "@mui/icons-material/FormatListBulleted"; // WaterDrop ShowChart, SearchSharp
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+const iconStyle = {
+    fontSize: "18px",
+    verticalAlign: "middle",
+    paddingRight: "4px",
+};
+export const CustomLayout = Template.bind({});
+CustomLayout.args = {
+    ...Default.args,
+    wellpicks: undefined,
+    syncContentDomain: false,
+    id: "Well-Log-Viewer-Discrete",
+    readoutOptions: {
+        grouping: "by_track",
     },
+    layout: {
+        // function to create react component
+        right: (parent: SyncLogViewer) => (
+            <div className="side-panel">
+                <div style={{ paddingBottom: "5px" }}>
+                    <WellLogScaleSelector
+                        label="Scale value:"
+                        round={true}
+                        callbackManager={parent.callbackManagers[0]}
+                    />
+                </div>
+                {parent.props.welllogs?.map((welllog, iWellLog) => (
+                    <WellLogInfoPanel
+                        key={iWellLog}
+                        header={
+                            <>
+                                <span style={iconStyle}>
+                                    <WellInfoIcon fontSize="inherit" />
+                                </span>
+                                <i>{welllog.header.well}</i>
+                            </>
+                        }
+                        readoutOptions={parent.props.readoutOptions}
+                        callbackManager={parent.callbackManagers[iWellLog]}
+                    />
+                ))}
+            </div>
+        ),
+        bottom: (parent: SyncLogViewer) => (
+            <div
+                className="side-panel"
+                style={{ minWidth: "100%", maxWidth: "100%" }}
+            >
+                <WellLogZoomSlider
+                    label="Zoom:"
+                    max={parent.props.welllogOptions?.maxContentZoom}
+                    callbackManager={parent.callbackManagers[0]}
+                />
+            </div>
+        ),
 
-    axisTitles: axisTitles,
-    axisMnemos: axisMnemos,
+        // react component
+        left: (
+            <>
+                <div
+                    style={{
+                        textOrientation: "mixed",
+                        writingMode: "vertical-rl",
+                        fontSize: "10pt",
+                        paddingTop: "20px",
+                        paddingLeft: "5px",
+                    }}
+                >
+                    Depth
+                </div>
+                <ArrowDownwardIcon />
+            </>
+        ),
 
-    viewTitles: true, // show default welllog view titles (a wellname from the welllog)
-
-    welllogOptions: {
-        wellpickColorFill: true,
-        wellpickPatternFill: true,
+        // simple text
+        header: "Customized layout example",
     },
-    spacerOptions: {
-        wellpickColorFill: true,
-        wellpickPatternFill: true,
+};
+CustomLayout.parameters = {
+    docs: {
+        description: {
+            story: "An example custom component layout.",
+        },
     },
 };
 
@@ -425,5 +528,10 @@ const TemplateWithSelection = (args) => {
     );
 };
 
-export const DiscreteLogs = TemplateWithSelection.bind({});
-DiscreteLogs.args = require("../../../../example-data/facies3wells.json");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const args = require("../../../../example-data/facies3wells.json");
+
+export const DiscreteLogs: StoryObj<typeof TemplateWithSelection> = {
+    args: args,
+    render: (args) => <TemplateWithSelection {...args} />,
+};

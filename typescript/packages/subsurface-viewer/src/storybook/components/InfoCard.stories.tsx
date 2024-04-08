@@ -1,39 +1,40 @@
+import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
-import InfoCard from "../../components/InfoCard";
 
-export default {
+import InfoCard from "../../components/InfoCard";
+import { type LayerPickInfo } from "../../layers/utils/layerTools";
+
+const stories: Meta = {
     component: InfoCard,
     title: "SubsurfaceViewer/Components/InfoCard",
 };
+export default stories;
 
-const Template = (args) => <InfoCard {...args} />;
-
-export const SingleProperty = Template.bind({});
-SingleProperty.args = {
-    pickInfos: [
-        {
-            x: 152,
-            y: 254,
-            radius: 1,
-            depth: 638,
-            coordinate: [111, 222],
-        },
-    ],
+export const SingleProperty: StoryObj<typeof InfoCard> = {
+    args: {
+        pickInfos: [
+            {
+                x: 152,
+                y: 254,
+                coordinate: [111, 222],
+            } as LayerPickInfo,
+        ],
+    },
+    render: (args) => <InfoCard {...args} />,
 };
 
-export const MutipleProperties = Template.bind({});
-MutipleProperties.args = {
-    pickInfos: [
-        {
-            x: 152,
-            y: 254,
-            radius: 1,
-            depth: 638,
-            coordinate: [111, 222],
-        },
-        {
-            layer: { id: "wells-layer" },
-            property: { name: "Poro WellA", value: 123 },
-        },
-    ],
+export const MutipleProperties: StoryObj<typeof InfoCard> = {
+    args: {
+        pickInfos: [
+            {
+                x: 152,
+                y: 254,
+                coordinate: [111, 222],
+            } as LayerPickInfo,
+            {
+                layer: { id: "wells-layer" },
+                property: { name: "Poro WellA", value: 123 },
+            },
+        ],
+    },
 };

@@ -1,6 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
 
+import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
+
 import WellLogViewer, { argTypesWellLogViewerProp } from "./WellLogViewer";
 
 import exampleData from "../../../../example-data/deckgl-map.json";
@@ -27,19 +29,17 @@ const template = templateJson as unknown as Template;
 
 import type { ColorTable } from "./components/ColorTableTypes";
 
-import type { LogViewer } from "@equinor/videx-wellog";
 import type { MapMouseEvent } from "@webviz/subsurface-viewer/dist/components/Map";
-import type { Info } from "./components/InfoTypes";
-import type { WellLogController } from "./components/WellLogView";
 
-import InfoPanel from "./components/InfoPanel";
+import WellLogInfoPanel from "./components/WellLogInfoPanel";
 import WellLogViewWithScroller from "./components/WellLogViewWithScroller";
 import { deepCopy } from "./utils/deepcopy";
-import { fillInfos } from "./utils/fill-info";
 import { getDiscreteMeta, indexOfElementByName } from "./utils/tracks";
 
 import type { WellLogViewOptions } from "./components/WellLogView";
 import { isEqualRanges } from "./utils/log-viewer";
+
+import { CallbackManager } from "./components/CallbackManager";
 
 import colorTables from "../../../../example-data/wellpick_colors.json";
 import wellPicks from "../../../../example-data/wellpicks.json";
@@ -54,7 +54,7 @@ const ComponentCode =
     "    colorTables={colorTables} \r\n" +
     "/>";
 
-export default {
+const stories: Meta = {
     component: WellLogViewer,
     title: "WellLogViewer/Demo/WellLogViewer",
     parameters: {
@@ -80,6 +80,7 @@ export default {
     // Disable automatic testing of stories that use this tag.
     tags: ["no-test"],
 };
+export default stories;
 
 function fillInfo(controller) {
     if (!controller) return "-";
@@ -182,8 +183,6 @@ interface Props extends SubsurfaceViewerProps {
 
 interface State {
     wellIndex: number | undefined;
-    infos: Info[];
-    controller?: WellLogController;
     editedData?: Record<string, unknown>;
 
     layers?: LayersList;
@@ -234,62 +233,71 @@ function addTemplateTrack(
     return templateNew;
 }
 
-export const Default = StoryTemplate.bind({});
-Default.args = {
-    id: "Well-Log-Viewer",
-    horizontal: false,
-    welllog: require("../../../../example-data/L898MUD.json")[0],   // eslint-disable-line
-    template: require("../../../../example-data/welllog_template_1.json"),// eslint-disable-line
-    colorTables: colorTables,
-    wellpick: wellpick,
-    axisTitles: axisTitles,
-    axisMnemos: axisMnemos,
-    viewTitle: true, // show default welllog view title (a wellname from the welllog)
-    domain: [2500, 4000],
-    selection: [3500, 3700],
-    options: {
-        hideTrackTitle: false,
-        hideTrackLegend: false,
-    },
-};
-
-export const Horizontal = StoryTemplate.bind({});
-Horizontal.args = {
-    id: "Well-Log-Viewer-Horizontal",
-    horizontal: true,
-    welllog:
-        require("../../../../example-data/WL_RAW_AAC-BHPR-CAL-DEN-GR-MECH-NEU-NMR-REMP_MWD_3.json")[0],// eslint-disable-line
-    template: require("../../../../example-data/welllog_template_2.json"),// eslint-disable-line
-    colorTables: colorTables,
-    wellpick: wellpick,
-    axisTitles: axisTitles,
-    axisMnemos: axisMnemos,
-    viewTitle: true, // show default welllog view title (a wellname from the welllog)
-};
-Horizontal.parameters = {
-    docs: {
-        description: {
-            story: "An example showing horizontal orientation of the tracks.",
+export const Default: StoryObj<typeof StoryTemplate> = {
+    args: {
+        id: "Well-Log-Viewer",
+        horizontal: false,
+        welllog: require("../../../../example-data/L898MUD.json")[0], // eslint-disable-line
+        template: require("../../../../example-data/welllog_template_1.json"), // eslint-disable-line
+        colorTables: colorTables,
+        wellpick: wellpick,
+        axisTitles: axisTitles,
+        axisMnemos: axisMnemos,
+        viewTitle: true, // show default welllog view title (a wellname from the welllog)
+        domain: [2500, 4000],
+        selection: [3500, 3700],
+        options: {
+            hideTrackTitle: false,
+            hideTrackLegend: false,
         },
     },
+    render: (args) => <StoryTemplate {...args} />,
 };
 
-export class MapAndWellLogViewer extends React.Component<Props, State> {
+export const Horizontal: StoryObj<typeof StoryTemplate> = {
+    args: {
+        id: "Well-Log-Viewer-Horizontal",
+        horizontal: true,
+        welllog:
+            require("../../../../example-data/WL_RAW_AAC-BHPR-CAL-DEN-GR-MECH-NEU-NMR-REMP_MWD_3.json")[0], // eslint-disable-line
+        template: require("../../../../example-data/welllog_template_2.json"), // eslint-disable-line
+        colorTables: colorTables,
+        wellpick: wellpick,
+        axisTitles: axisTitles,
+        axisMnemos: axisMnemos,
+        viewTitle: true, // show default welllog view title (a wellname from the welllog)
+    },
+    parameters: {
+        docs: {
+            description: {
+                story: "An example showing horizontal orientation of the tracks.",
+            },
+        },
+    },
+    render: (args) => <StoryTemplate {...args} />,
+};
+
+class MapAndWellLogViewer extends React.Component<Props, State> {
     public static propTypes?: WeakValidationMap<Props> | undefined;
-    constructor(props: Props, state: State) {
-        super(props, state);
+    callbackManager: CallbackManager;
+
+    constructor(props: Props) {
+        super(props);
         this.state = {
             wellIndex: undefined,
-            infos: [],
             editedData: props.editedData,
             layers: props.layers as LayersList,
         };
-        this.onInfo = this.onInfo.bind(this);
-        this.onCreateController = this.onCreateController.bind(this);
         this.onContentSelection = this.onContentSelection.bind(this);
         this.onTrackScroll = this.onTrackScroll.bind(this);
 
-        this.onMouseEvent = this.onMouseEvent.bind(this);
+        this.onMapMouseEvent = this.onMapMouseEvent.bind(this);
+
+        this.callbackManager = new CallbackManager(() => {
+            return this.state.wellIndex === undefined
+                ? undefined
+                : welllogs[this.state.wellIndex];
+        });
     }
     componentDidUpdate(prevProps: Props, prevState: State): void {
         if (this.props.editedData !== prevProps.editedData) {
@@ -297,7 +305,7 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
             0;
         }
         if (!isEqualRanges(this.state.selection, prevState.selection)) {
-            const controller = this.state.controller;
+            const controller = this.callbackManager.controller;
             if (controller && this.state.selection) {
                 controller.selectContent([
                     this.state.selection[0],
@@ -306,29 +314,14 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
             }
         }
     }
-    onInfo(
-        x: number,
-        logController: LogViewer,
-        iFrom: number,
-        iTo: number
-    ): void {
-        const infos = fillInfos(
-            x,
-            logController,
-            iFrom,
-            iTo,
-            [] //this.collapsedTrackIds,
-            //this.props.readoutOptions
-        );
-
-        this.setState({ infos: infos });
+    componentWillUnmount(): void {
+        this.callbackManager.unregisterAll();
     }
 
-    onCreateController(controller: WellLogController): void {
-        this.setState({ controller: controller });
-    }
     onContentSelection(): void {
-        const controller = this.state.controller;
+        this.callbackManager.onContentSelection();
+
+        const controller = this.callbackManager.controller;
         if (!controller) return;
         const selection = controller.getContentSelection();
 
@@ -341,7 +334,7 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
         }
     }
     onTrackScroll(): void {
-        const controller = this.state.controller;
+        const controller = this.callbackManager.controller;
         if (!controller) return;
         const iTrack = controller.getTrackScrollPos();
         if (iTrack >= 0) {
@@ -372,6 +365,7 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                             layers: layers as LayersList,
                         });
 
+                        /*
                         // Force to rerender ColorLegend after
                         setTimeout(() => {
                             const layers = deepCopy(this.props.layers);
@@ -379,13 +373,14 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                                 layers: layers as LayersList,
                             });
                         }, 200);
+                        */
                     }
                 }
             }
         }
     }
 
-    onMouseEvent(event: MapMouseEvent): void {
+    onMapMouseEvent(event: MapMouseEvent): void {
         if (event.wellname !== undefined) {
             if (event.type == "click") {
                 const iWell = findWellLogIndex(welllogs, event.wellname);
@@ -424,7 +419,7 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                     };
                 });
 
-                const controller = this.state.controller;
+                const controller = this.callbackManager.controller;
                 if (controller) {
                     const wellsLayer = findWellsLayer(event);
                     if (wellsLayer) {
@@ -500,7 +495,6 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
             <div style={{ height: "100%", width: "100%", display: "flex" }}>
                 <div
                     style={{
-                        height: "100%",
                         width: "70%",
                         position: "relative",
                     }}
@@ -510,7 +504,7 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                             {...this.props}
                             layers={this.state.layers}
                             editedData={this.state.editedData}
-                            onMouseEvent={this.onMouseEvent}
+                            onMouseEvent={this.onMapMouseEvent}
                             selection={{
                                 well: wellName,
                                 selection: this.state.selection,
@@ -520,7 +514,6 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                 </div>
                 <div
                     style={{
-                        height: "85%",
                         width: "30%",
                         display: "flex",
                         flexDirection: "column",
@@ -528,8 +521,8 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                 >
                     <div
                         style={{
-                            flex: "1 1",
-                            height: "90%",
+                            flex: "1",
+                            height: "0%",
                             minWidth: "25px",
                             width: "100%",
                         }}
@@ -555,23 +548,18 @@ export class MapAndWellLogViewer extends React.Component<Props, State> {
                                     this.props.checkDatafileSchema,
                                 maxVisibleTrackNum: 1,
                             }}
-                            onInfo={this.onInfo}
-                            onCreateController={this.onCreateController}
+                            onCreateController={
+                                this.callbackManager.onCreateController
+                            }
+                            onInfo={this.callbackManager.onInfo}
                             onContentSelection={this.onContentSelection}
                             onTrackScroll={this.onTrackScroll}
                         />
                     </div>
-                    <div
-                        style={{
-                            flex: "0 0",
-                            display: "flex",
-                            flexDirection: "column",
-                            height: "100%",
-                            width: "100%",
-                        }}
-                    >
-                        <InfoPanel header="Readout" infos={this.state.infos} />
-                    </div>
+                    <WellLogInfoPanel
+                        header="Readout"
+                        callbackManager={this.callbackManager}
+                    />
                 </div>
             </div>
         );
@@ -591,27 +579,29 @@ if (wells_layer) {
     wells_layer.logColor = "Stratigraphy"; //"Stratigraphy";
 }
 
-export const Discrete = StoryTemplate.bind({});
-Discrete.args = {
-    id: "Well-Log-Viewer-Discrete",
-    horizontal: false,
-    welllog: require("../../../../example-data/volve_logs.json")[0],// eslint-disable-line
-    template: require("../../../../example-data/welllog_template_2.json"),// eslint-disable-line
-    colorTables: colorTables,
-    wellpick: wellpick,
-    axisTitles: axisTitles,
-    axisMnemos: axisMnemos,
-    viewTitle: true, // show default welllog view title (a wellname from the welllog)
-};
-Discrete.parameters = {
-    docs: {
-        description: {
-            story: "An example showing the tracks with discrete logs.",
+export const Discrete: StoryObj<typeof StoryTemplate> = {
+    args: {
+        id: "Well-Log-Viewer-Discrete",
+        horizontal: false,
+        welllog: require("../../../../example-data/volve_logs.json")[0], // eslint-disable-line
+        template: require("../../../../example-data/welllog_template_2.json"), // eslint-disable-line
+        colorTables: colorTables,
+        wellpick: wellpick,
+        axisTitles: axisTitles,
+        axisMnemos: axisMnemos,
+        viewTitle: true, // show default welllog view title (a wellname from the welllog)
+    },
+    parameters: {
+        docs: {
+            description: {
+                story: "An example showing the tracks with discrete logs.",
+            },
         },
     },
+    render: (args) => <StoryTemplate {...args} />,
 };
 
-export const MapAndWellLogViewerStory = (
+const MapAndWellLogViewerStoryComp = (
     args: React.JSX.IntrinsicAttributes &
         React.JSX.IntrinsicClassAttributes<MapAndWellLogViewer> &
         Readonly<Props>
@@ -623,10 +613,14 @@ export const MapAndWellLogViewerStory = (
     );
 };
 
-MapAndWellLogViewerStory.args = {
-    ...exampleData[0],
-    colorTables: colorTables,
-    id: "MapAndWellLog", // redefine id from exampleData[0]
+export const MapAndWellLogViewerStory: StoryObj<
+    typeof MapAndWellLogViewerStoryComp
+> = {
+    args: {
+        ...exampleData[0],
+        colorTables: colorTables,
+        id: "MapAndWellLog", // redefine id from exampleData[0]
+    },
+    tags: ["no-test"],
+    render: (args) => <MapAndWellLogViewerStoryComp {...args} />,
 };
-
-MapAndWellLogViewerStory.tags = ["no-test"];

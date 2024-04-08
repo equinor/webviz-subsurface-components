@@ -7,6 +7,8 @@ export interface Info {
     type: string; // "separator"; "line", "linestep", "area", "dot", ...
     trackId: number | string;
 
+    iTrack: number; // Template Track Number
+
     groupStart?: string; // for category
     collapsed?: boolean; // group is collapsed
 }

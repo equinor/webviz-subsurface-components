@@ -27,4 +27,14 @@ exports[`Test Axis Selector snapshot test 1`] = `
 </div>
 `;
 
-exports[`Test Axis Selector test when there no axes- empty rendering 1`] = `null`;
+exports[`Test Axis Selector test when there no axes- empty rendering 1`] = `
+<div
+  class="axis-selector"
+>
+  <fieldset>
+    <legend>
+      Primary scale
+    </legend>
+  </fieldset>
+</div>
+`;
