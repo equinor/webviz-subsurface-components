@@ -574,48 +574,6 @@ export const ScaleY: StoryObj<typeof ScaleYComponent> = {
     render: (args) => <ScaleYComponent {...args} />,
 };
 
-const ScaleVertical3dComponent = ({
-    verticalScale,
-}: {
-    verticalScale: number;
-}) => {
-    const viewerProps: SubsurfaceViewerProps = {
-        id: "ScaleY",
-        bounds: [-10, -10, 10, 10],
-        layers: [AXES2D, SQUARE_GEOMETRY_LAYER],
-        views: {
-            layout: [1, 1],
-            viewports: [
-                {
-                    id: "section",
-                    verticalScale,
-                    zoom: 2,
-                    show3D: true,
-                },
-            ],
-        },
-    };
-    return <SubsurfaceViewer {...viewerProps} />;
-};
-
-export const ScaleVertical3d: StoryObj<typeof ScaleVertical3dComponent> = {
-    args: { verticalScale: 1.5 },
-    argTypes: {
-        verticalScale: {
-            control: { type: "range", min: -1, max: 10, step: 0.1 },
-        },
-    },
-    parameters: {
-        docs: {
-            ...defaultStoryParameters.docs,
-            description: {
-                story: "Vertical scaling example in panoramic view.",
-            },
-        },
-    },
-    render: (args) => <ScaleVertical3dComponent {...args} />,
-};
-
 const ScaleYWithCameraPositionComponent = ({
     verticalScale,
 }: {
@@ -654,4 +612,51 @@ export const ScaleYWithCameraPosition: StoryObj<
         },
     },
     render: (args) => <ScaleYWithCameraPositionComponent {...args} />,
+};
+
+const ScaleVertical3dComponent = ({
+    verticalScale,
+}: {
+    verticalScale: number;
+}) => {
+    const viewerProps: SubsurfaceViewerProps = {
+        id: "ScaleY",
+        bounds: volveWellsBounds,
+        layers: [huginAxes3DLayer, hugin25mDepthMapLayer],
+        views: {
+            layout: [1, 1],
+            viewports: [
+                {
+                    id: "section",
+                    verticalScale,
+                    show3D: true,
+                },
+            ],
+        },
+        cameraPosition: {
+            rotationX: 0,
+            target: [],
+            rotationOrbit: 90,
+            zoom: -3,
+        },
+    };
+    return <SubsurfaceViewer {...viewerProps} />;
+};
+
+export const ScaleVertical3d: StoryObj<typeof ScaleVertical3dComponent> = {
+    args: { verticalScale: 1.5 },
+    argTypes: {
+        verticalScale: {
+            control: { type: "range", min: -1, max: 10, step: 0.1 },
+        },
+    },
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: "Vertical scaling example in panoramic view.",
+            },
+        },
+    },
+    render: (args) => <ScaleVertical3dComponent {...args} />,
 };

@@ -52,14 +52,12 @@ function convertToArrowEvent(event: KeyboardEvent): ArrowEvent | null {
     return null;
 }
 
-export function useHandleRescale(): [
-    number,
-    React.MutableRefObject<null>,
-    boolean,
-] {
+export function useHandleRescale(): {
+    zScale: number;
+    divRef: React.MutableRefObject<null>;
+} {
     // Used for scaling in z direction using arrow keys.
     const [zScale, updateZScale] = React.useReducer(updateZScaleReducer, 1);
-    const [shiftHeld, setShiftHeld] = useState(false);
 
     const divRef = React.useRef(null);
 
@@ -71,6 +69,33 @@ export function useHandleRescale(): [
                 // prevent being handled by regular OrbitController
                 e.stopPropagation();
             }
+        };
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const element = divRef.current as any;
+
+        // Listen for keypress events.
+        element?.addEventListener("keydown", keyDownHandler, true);
+
+        return () => {
+            element?.removeEventListener("keydown", keyDownHandler);
+        };
+    }, [updateZScale, divRef]);
+
+    return { zScale, divRef };
+}
+
+export function useShiftHeld(): {
+    divRef: React.MutableRefObject<null>;
+    shiftHeld: boolean;
+} {
+    // Used for scaling in z direction using arrow keys.
+    const [shiftHeld, setShiftHeld] = useState(false);
+
+    const divRef = React.useRef(null);
+
+    React.useEffect(() => {
+        const keyDownHandler = (e: KeyboardEvent) => {
             if (e.key === "Shift") {
                 setShiftHeld(true);
             }
@@ -91,7 +116,7 @@ export function useHandleRescale(): [
             element?.removeEventListener("keydown", keyDownHandler);
             element?.removeEventListener("keyup", keyUpHandler);
         };
-    }, [updateZScale, setShiftHeld, divRef]);
+    }, [setShiftHeld, divRef]);
 
-    return [zScale, divRef, shiftHeld];
+    return { divRef, shiftHeld };
 }

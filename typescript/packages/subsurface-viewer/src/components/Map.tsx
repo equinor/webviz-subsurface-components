@@ -23,12 +23,11 @@ import type {
 import type { DeckGLRef } from "@deck.gl/react/typed";
 import DeckGL from "@deck.gl/react/typed";
 
-import { Layer } from "@deck.gl/core/typed";
-
 import {
     AmbientLight,
     _CameraLight as CameraLight,
     DirectionalLight,
+    Layer,
     LightingEffect,
     OrbitController,
     OrbitView,
@@ -72,7 +71,12 @@ import IntersectionView from "../views/intersectionView";
 
 import type { LightsType, TLayerDefinition } from "../SubsurfaceViewer";
 import { getZoom, useLateralZoom } from "../utils/camera";
-import { useHandleRescale } from "../utils/event";
+import { useHandleRescale, useShiftHeld } from "../utils/event";
+
+import type { ViewportType } from "../views/viewport";
+import { useVerticalScale } from "../views/viewport";
+
+import { mergeRefs } from "react-merge-refs";
 
 export type { BoundingBox2D, BoundingBox3D };
 /**
@@ -177,39 +181,6 @@ export interface ViewsType {
      * Layers configuration for multiple viewports.
      */
     viewports: ViewportType[];
-}
-
-/**
- * Viewport type.
- */
-export interface ViewportType {
-    /**
-     * Viewport id
-     */
-    id: string;
-
-    /**
-     * Viewport name
-     */
-    name?: string;
-
-    /**
-     * If true, displays map in 3D view, default is 2D view (false)
-     */
-    show3D?: boolean;
-
-    /**
-     * Layers to be displayed on viewport
-     */
-    layerIds?: string[];
-
-    target?: [number, number];
-    zoom?: number;
-    rotationX?: number;
-    rotationOrbit?: number;
-    verticalScale?: number | (() => number);
-
-    isSync?: boolean;
 }
 
 /**
@@ -453,8 +424,17 @@ const Map: React.FC<MapProps> = ({
         undefined
     );
 
+    // Get vertical scaling factor defined in viewports.
+    const verticalScale = useVerticalScale(views?.viewports);
+
     // Used for scaling in z direction using arrow keys.
-    const [zScale, divRef, shiftHeld] = useHandleRescale();
+    const { zScale: zReScale, divRef: zScaleRef } = useHandleRescale();
+
+    const { shiftHeld, divRef: shiftHeldRef } = useShiftHeld();
+
+    const divRef = mergeRefs([zScaleRef, shiftHeldRef]);
+
+    const zScale = verticalScale ?? zReScale;
 
     // compute the viewport margins
     const viewPortMargins = React.useMemo<MarginsType>(() => {
