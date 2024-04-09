@@ -76,7 +76,7 @@ import { useHandleRescale, useShiftHeld } from "../utils/event";
 import type { ViewportType } from "../views/viewport";
 import { useVerticalScale } from "../views/viewport";
 
-import { mergeRefs } from "react-merge-refs";
+import mergeRefs from "merge-refs";
 
 export type { BoundingBox2D, BoundingBox3D };
 /**
@@ -432,7 +432,10 @@ const Map: React.FC<MapProps> = ({
 
     const { shiftHeld, divRef: shiftHeldRef } = useShiftHeld();
 
-    const divRef = mergeRefs([zScaleRef, shiftHeldRef]);
+    const divRef = mergeRefs(
+        zScaleRef,
+        shiftHeldRef
+    ) as React.Ref<HTMLDivElement>;
 
     const zScale = verticalScale ?? zReScale;
 
