@@ -147,6 +147,12 @@ export interface Grid3DLayerProps extends ExtendedLayerProps {
     propertiesData: string | number[] | Float32Array | Uint16Array;
 
     /**
+     * Discrete propety names to be displayed in cursor readouts.
+     * If colorMapFunction is Uint8Array the property values are used as property name indices.
+     */
+    propertyNames?: string[];
+
+    /**
      * Defines how the cells are to be colored:
      * by property value or by a coordinate.
      */
@@ -203,12 +209,6 @@ export interface Grid3DLayerProps extends ExtendedLayerProps {
      *   For example depth of z = 1000 corresponds to -1000 on the z axis. Default true.
      */
     ZIncreasingDownwards: boolean;
-
-    /**
-     * Discrete propety names to be displayed in cursor readouts.
-     * If colorMapFunction is Uint8Array the property values are used as indices of this array.
-     */
-    propertyNames?: string[];
 
     // Non public properties:
     reportBoundingBox?: React.Dispatch<ReportBoundingBoxAction>;
