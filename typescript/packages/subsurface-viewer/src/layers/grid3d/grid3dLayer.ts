@@ -148,7 +148,7 @@ export interface Grid3DLayerProps extends ExtendedLayerProps {
 
     /**
      * Discrete propety names to be displayed in cursor readouts.
-     * If colorMapFunction is Uint8Array the property values are used as property name indices.
+     * The property values are used as property name indices.
      */
     propertyNames?: string[];
 
