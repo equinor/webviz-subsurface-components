@@ -200,6 +200,21 @@ const colorTable = new Uint8Array([
     100, 0, 100,   // 10
     100, 100, 0,   // 11
 ]);
+
+const propertyNames = [
+    "blue",         // 0
+    "green",        // 1
+    "cyan",         // 2
+    "red",          // 3
+    "magenta",      // 4
+    "yellow",       // 5
+    "dark blue",    // 6
+    "dark green",   // 7
+    "dark cyan",    // 8
+    "dark red",     // 9
+    "dark magenta", // 10
+    "dark yellow",  // 11
+]
 /* eslint-enable prettier/prettier */
 
 export const PolyhedralCells: StoryObj<typeof SubsurfaceViewer> = {
@@ -314,6 +329,7 @@ export const DiscretePropertyWithClamping: StoryObj<typeof SubsurfaceViewer> = {
                 polysData: layerArrays[discretePropsLayerId].polysData,
                 propertiesData:
                     layerArrays[discretePropsLayerId].propertiesData,
+                propertyNames: propertyNames,
                 colorMapName: "Seismic",
                 ZIncreasingDownwards: true,
                 colorMapFunction:
