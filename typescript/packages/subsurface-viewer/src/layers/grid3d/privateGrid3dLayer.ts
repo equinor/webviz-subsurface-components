@@ -77,7 +77,7 @@ export interface PrivateLayerProps extends ExtendedLayerProps {
     coloringMode: TGrid3DColoringMode.Property;
     gridLines: boolean;
     propertyValueRange: [number, number];
-    propertyNames?: string[];
+    discretePropertyNames?: string[];
     depthTest: boolean;
     ZIncreasingDownwards: boolean;
 }
@@ -261,7 +261,8 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
         const propertyValue = properties[vertexIndex];
         if (Number.isFinite(propertyValue)) {
             const propertyText =
-                this.props.propertyNames?.[propertyValue] ?? propertyValue;
+                this.props.discretePropertyNames?.[propertyValue] ??
+                propertyValue;
             layer_properties.push(createPropertyData("Property", propertyText));
         }
 

@@ -150,7 +150,7 @@ export interface Grid3DLayerProps extends ExtendedLayerProps {
      * Discrete propety names to be displayed in cursor readouts.
      * The property values are used as property name indices.
      */
-    propertyNames?: string[];
+    discretePropertyNames?: string[];
 
     /**
      * Defines how the cells are to be colored:
@@ -346,7 +346,7 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
                 coloringMode: this.props.coloringMode,
                 gridLines: this.props.gridLines,
                 propertyValueRange: this.getPropertyValueRange(),
-                propertyNames: this.props.propertyNames,
+                discretePropertyNames: this.props.discretePropertyNames,
                 material: this.props.material,
                 depthTest: this.props.depthTest,
                 ZIncreasingDownwards: this.props.ZIncreasingDownwards,

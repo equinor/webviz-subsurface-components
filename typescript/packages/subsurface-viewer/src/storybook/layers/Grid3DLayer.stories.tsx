@@ -329,7 +329,7 @@ export const DiscretePropertyWithClamping: StoryObj<typeof SubsurfaceViewer> = {
                 polysData: layerArrays[discretePropsLayerId].polysData,
                 propertiesData:
                     layerArrays[discretePropsLayerId].propertiesData,
-                propertyNames: propertyNames,
+                discretePropertyNames: propertyNames,
                 colorMapName: "Seismic",
                 ZIncreasingDownwards: true,
                 colorMapFunction:
