@@ -173,7 +173,7 @@ export interface Grid3DLayerProps extends ExtendedLayerProps {
      * E.g. (x) => [x * 255, x * 255, x * 255]
      * May also be set as constant color:
      * E.g. [255, 0, 0] for constant red cells.
-     * Can be defined as Uint8Array containing [R , G, B] triplets in [0, 255] range each.
+     * Can be defined as Uint8Array containing [R, G, B] triplets in [0, 255] range each.
      */
     colorMapFunction?: colorMapFunctionType | Uint8Array;
 
@@ -203,6 +203,12 @@ export interface Grid3DLayerProps extends ExtendedLayerProps {
      *   For example depth of z = 1000 corresponds to -1000 on the z axis. Default true.
      */
     ZIncreasingDownwards: boolean;
+
+    /**
+     * Discrete propety names to be displayed in cursor readouts.
+     * If colorMapFunction is Uint8Array the property values are used as indices of this array.
+     */
+    propertyNames?: string[];
 
     // Non public properties:
     reportBoundingBox?: React.Dispatch<ReportBoundingBoxAction>;
@@ -340,6 +346,7 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
                 coloringMode: this.props.coloringMode,
                 gridLines: this.props.gridLines,
                 propertyValueRange: this.getPropertyValueRange(),
+                propertyNames: this.props.propertyNames,
                 material: this.props.material,
                 depthTest: this.props.depthTest,
                 ZIncreasingDownwards: this.props.ZIncreasingDownwards,
