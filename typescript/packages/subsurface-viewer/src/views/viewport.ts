@@ -35,11 +35,11 @@ export interface ViewportType {
     isSync?: boolean;
 }
 
-export const useVerticalScale = (viewport: ViewportType[] | undefined) => {
+export const useVerticalScale = (viewports: ViewportType[] | undefined) => {
     return React.useMemo(() => {
-        if (!viewport) {
+        if (!viewports) {
             return 1;
         }
-        return viewport.find((item) => !!item.verticalScale)?.verticalScale;
-    }, [viewport]);
+        return viewports.find((item) => !!item.verticalScale)?.verticalScale;
+    }, [viewports]);
 };

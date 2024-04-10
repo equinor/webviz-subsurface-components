@@ -428,7 +428,8 @@ const Map: React.FC<MapProps> = ({
     const verticalScale = useVerticalScale(views?.viewports);
 
     // Used for scaling in z direction using arrow keys.
-    const { zScale: zReScale, divRef: zScaleRef } = useHandleRescale();
+    const { zScale: zReScale, divRef: zScaleRef } =
+        useHandleRescale(!!verticalScale);
 
     const { shiftHeld, divRef: shiftHeldRef } = useShiftHeld();
 

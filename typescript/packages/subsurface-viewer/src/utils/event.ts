@@ -52,7 +52,7 @@ function convertToArrowEvent(event: KeyboardEvent): ArrowEvent | null {
     return null;
 }
 
-export function useHandleRescale(): {
+export function useHandleRescale(disable = false): {
     zScale: number;
     divRef: React.MutableRefObject<null>;
 } {
@@ -62,6 +62,9 @@ export function useHandleRescale(): {
     const divRef = React.useRef(null);
 
     React.useEffect(() => {
+        if (disable) {
+            return;
+        }
         const keyDownHandler = (e: KeyboardEvent) => {
             const arrowEvent = convertToArrowEvent(e);
             if (arrowEvent) {
@@ -80,7 +83,7 @@ export function useHandleRescale(): {
         return () => {
             element?.removeEventListener("keydown", keyDownHandler);
         };
-    }, [updateZScale, divRef]);
+    }, [updateZScale, divRef, disable]);
 
     return { zScale, divRef };
 }
