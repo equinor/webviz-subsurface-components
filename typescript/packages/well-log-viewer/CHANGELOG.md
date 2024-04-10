@@ -1,3 +1,10 @@
+## [1.7.1](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.7.0...well-log-viewer@1.7.1) (2024-04-10)
+
+
+### Bug Fixes
+
+* honor vertical scale prop in 3D ([#2013](https://github.com/equinor/webviz-subsurface-components/issues/2013)) ([d8585de](https://github.com/equinor/webviz-subsurface-components/commit/d8585de621367d9039c4aea3ecf873c08ea7b0f7))
+
 # [1.7.0](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.6.0...well-log-viewer@1.7.0) (2024-04-05)
 
 
