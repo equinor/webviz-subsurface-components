@@ -1,3 +1,10 @@
+## [0.6.1](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.6.0...wsc-common@0.6.1) (2024-04-10)
+
+
+### Bug Fixes
+
+* honor vertical scale prop in 3D ([#2013](https://github.com/equinor/webviz-subsurface-components/issues/2013)) ([d8585de](https://github.com/equinor/webviz-subsurface-components/commit/d8585de621367d9039c4aea3ecf873c08ea7b0f7))
+
 # [0.6.0](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.5.12...wsc-common@0.6.0) (2024-04-04)
 
 
