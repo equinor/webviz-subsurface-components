@@ -1,3 +1,10 @@
+## [0.23.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.23.0...subsurface-viewer@0.23.1) (2024-04-10)
+
+
+### Bug Fixes
+
+* honor vertical scale prop in 3D ([#2013](https://github.com/equinor/webviz-subsurface-components/issues/2013)) ([d8585de](https://github.com/equinor/webviz-subsurface-components/commit/d8585de621367d9039c4aea3ecf873c08ea7b0f7))
+
 # [0.23.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.22.1...subsurface-viewer@0.23.0) (2024-04-09)
 
 
