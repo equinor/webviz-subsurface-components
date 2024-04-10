@@ -1,25 +1,21 @@
-export { default } from "./SubsurfaceViewer";
 export { default as DashSubsurfaceViewer } from "./DashSubsurfaceViewer";
+export { default } from "./SubsurfaceViewer";
 
 export type {
     BoundsAccessor,
     LightsType,
     MapMouseEvent,
     SubsurfaceViewerProps,
+    TLayerDefinition,
     TooltipCallback,
     ViewStateType,
     ViewsType,
     colorTablesArray,
-    TLayerDefinition,
 } from "./SubsurfaceViewer";
 
 export { TGrid3DColoringMode } from "./SubsurfaceViewer";
 
-export type {
-    BoundingBox2D,
-    BoundingBox3D,
-    ViewportType,
-} from "./components/Map";
+export type { BoundingBox2D, BoundingBox3D } from "./components/Map";
 
 export type {
     ExtendedLayerProps,
@@ -28,3 +24,5 @@ export type {
 } from "./layers/utils/layerTools";
 
 export { proportionalZoom, scaleZoom } from "./utils/camera";
+
+export type { ViewportType } from "./views/viewport";

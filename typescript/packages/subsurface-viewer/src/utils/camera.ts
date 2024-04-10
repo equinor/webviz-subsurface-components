@@ -1,6 +1,7 @@
 import _ from "lodash";
 import React from "react";
-import type { ViewStateType, ViewportType } from "../components/Map";
+import type { ViewStateType } from "../components/Map";
+import type { ViewportType } from "../views/viewport";
 
 /** Grows a dimension proportionally to a scale factor. */
 export const proportionalZoom = (zoom: number, scaleFactor: number) => {
@@ -19,6 +20,11 @@ export const scaleZoom = (verticalFactor: number, zoom: number) => {
 
 export const getZoom = (viewport: ViewportType, fb_zoom: number) => {
     const zoom = viewport.zoom ?? fb_zoom;
+
+    if (viewport.show3D) {
+        return zoom;
+    }
+
     return viewport.verticalScale
         ? scaleZoom(viewport.verticalScale, zoom)
         : zoom;
