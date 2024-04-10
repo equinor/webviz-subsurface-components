@@ -1,3 +1,10 @@
+# [0.23.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.22.1...subsurface-viewer@0.23.0) (2024-04-09)
+
+
+### Features
+
+* **grid3d:** discrete property names are displayed in the readouts. ([#2012](https://github.com/equinor/webviz-subsurface-components/issues/2012)) ([bb22093](https://github.com/equinor/webviz-subsurface-components/commit/bb2209322932abab5731661640b254d09a339a92))
+
 ## [0.22.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.22.0...subsurface-viewer@0.22.1) (2024-04-04)
 
 
