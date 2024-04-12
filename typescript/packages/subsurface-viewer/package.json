@@ -28,7 +28,7 @@
         "@deck.gl/geo-layers": "^8.9.35",
         "@deck.gl/json": "^8.9.35",
         "@deck.gl/layers": "^8.9.35",
-        "@deck.gl/mesh-layers": "^8.9.35",
+        "@deck.gl/mesh-layers": "^9.0.7",
         "@deck.gl/react": "^8.9.35",
         "@emerson-eps/color-tables": "^0.4.71",
         "@equinor/eds-core-react": "^0.36.0",
