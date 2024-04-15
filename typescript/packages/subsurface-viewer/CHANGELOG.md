@@ -1,3 +1,10 @@
+# [0.24.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.23.1...subsurface-viewer@0.24.0) (2024-04-15)
+
+
+### Features
+
+* move vertical scale to SubsurfaceViewer props ([#2016](https://github.com/equinor/webviz-subsurface-components/issues/2016)) ([c193ee0](https://github.com/equinor/webviz-subsurface-components/commit/c193ee0613fdcb2f414c782cef3889069e33e6a8))
+
 ## [0.23.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.23.0...subsurface-viewer@0.23.1) (2024-04-10)
 
 
