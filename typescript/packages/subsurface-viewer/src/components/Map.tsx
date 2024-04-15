@@ -1091,9 +1091,6 @@ class ViewController {
                     state.deckSize != this.state_.deckSize));
         const needUpdate = updateZScale || updateTarget || updateViewState;
 
-        console.log("getDeckGlViewState: viewsChanged: ", viewsChanged);
-        console.log("getDeckGlViewState: updateViewState: ", updateViewState);
-
         const isCacheEmpty = isEmpty(this.result_.viewState);
         if (!isCacheEmpty && !needUpdate) {
             return this.result_.viewState;
@@ -1104,7 +1101,6 @@ class ViewController {
         let viewState = prevViewState;
 
         if (updateViewState || isCacheEmpty) {
-            console.log("getDeckGlViewState: buildDeckGlViewSTates");
             viewState = buildDeckGlViewStates(
                 views,
                 state.viewPortMargins,
