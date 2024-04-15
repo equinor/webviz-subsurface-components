@@ -356,6 +356,9 @@ export interface MapProps {
     children?: React.ReactNode;
 
     getTooltip?: TooltipCallback;
+
+    /** A vertical scale factor, used to scale items in the view vertically */
+    verticalScale?: number;
 }
 
 function defaultTooltip(info: PickingInfo) {
@@ -391,6 +394,7 @@ const Map: React.FC<MapProps> = ({
     onDragEnd,
     lights,
     triggerResetMultipleWells,
+    verticalScale,
 }: MapProps) => {
     // From react doc, ref should not be read nor modified during rendering.
     const deckRef = React.useRef<DeckGLRef>(null);
@@ -425,11 +429,12 @@ const Map: React.FC<MapProps> = ({
     );
 
     // Get vertical scaling factor defined in viewports.
-    const verticalScale = useVerticalScale(views?.viewports);
+    const viewportVerticalScale = useVerticalScale(views?.viewports);
 
     // Used for scaling in z direction using arrow keys.
-    const { zScale: zReScale, divRef: zScaleRef } =
-        useHandleRescale(!!verticalScale);
+    const { zScale: zReScale, divRef: zScaleRef } = useHandleRescale(
+        !!(verticalScale ?? viewportVerticalScale)
+    );
 
     const { shiftHeld, divRef: shiftHeldRef } = useShiftHeld();
 
@@ -438,7 +443,7 @@ const Map: React.FC<MapProps> = ({
         shiftHeldRef
     ) as React.Ref<HTMLDivElement>;
 
-    const zScale = verticalScale ?? zReScale;
+    const zScale = verticalScale ?? viewportVerticalScale ?? zReScale;
 
     // compute the viewport margins
     const viewPortMargins = React.useMemo<MarginsType>(() => {
@@ -1086,6 +1091,9 @@ class ViewController {
                     state.deckSize != this.state_.deckSize));
         const needUpdate = updateZScale || updateTarget || updateViewState;
 
+        console.log("getDeckGlViewState: viewsChanged: ", viewsChanged);
+        console.log("getDeckGlViewState: updateViewState: ", updateViewState);
+
         const isCacheEmpty = isEmpty(this.result_.viewState);
         if (!isCacheEmpty && !needUpdate) {
             return this.result_.viewState;
@@ -1096,6 +1104,7 @@ class ViewController {
         let viewState = prevViewState;
 
         if (updateViewState || isCacheEmpty) {
+            console.log("getDeckGlViewState: buildDeckGlViewSTates");
             viewState = buildDeckGlViewStates(
                 views,
                 state.viewPortMargins,

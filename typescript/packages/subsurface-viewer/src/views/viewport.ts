@@ -29,7 +29,8 @@ export interface ViewportType {
     rotationX?: number;
     rotationOrbit?: number;
 
-    /** A vertical scale factor, used to scale items in the viewport vertically */
+    /** @deprecated Please use top-level verticalScale instead for 3D and cameraPosition.zoom for 2D.
+     * A vertical scale factor, used to scale items in the viewport vertically. */
     verticalScale?: number;
 
     isSync?: boolean;

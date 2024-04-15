@@ -59,6 +59,13 @@ const Root = styled("div")({
     },
 });
 
+const SIDE_CAMERA = {
+    rotationX: 0,
+    target: [],
+    rotationOrbit: 90,
+    zoom: -3,
+};
+
 const SQUARE = {
     type: "Feature",
     geometry: {
@@ -623,22 +630,9 @@ const ScaleVertical3dComponent = ({
         id: "ScaleY",
         bounds: volveWellsBounds,
         layers: [huginAxes3DLayer, hugin25mDepthMapLayer],
-        views: {
-            layout: [1, 1],
-            viewports: [
-                {
-                    id: "section",
-                    verticalScale,
-                    show3D: true,
-                },
-            ],
-        },
-        cameraPosition: {
-            rotationX: 0,
-            target: [],
-            rotationOrbit: 90,
-            zoom: -3,
-        },
+        views: default3DViews,
+        cameraPosition: SIDE_CAMERA,
+        verticalScale,
     };
     return <SubsurfaceViewer {...viewerProps} />;
 };
