@@ -1,7 +1,8 @@
 import "jest";
 
 import { renderHook } from "@testing-library/react";
-import type { ViewStateType, ViewportType } from "../components/Map";
+import type { ViewStateType } from "../components/Map";
+import type { ViewportType } from "../views/viewport";
 import { getZoom, useLateralZoom } from "./camera";
 
 describe("Test zoom", () => {

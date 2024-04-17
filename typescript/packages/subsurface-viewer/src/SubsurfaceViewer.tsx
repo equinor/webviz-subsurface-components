@@ -135,6 +135,9 @@ export interface SubsurfaceViewerProps {
     lights?: LightsType;
 
     children?: React.ReactNode;
+
+    /** A vertical scale factor, used to scale items in the view vertically */
+    verticalScale?: number;
 }
 
 const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
@@ -162,6 +165,7 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
     triggerResetMultipleWells,
     lights,
     children,
+    verticalScale,
 }: SubsurfaceViewerProps) => {
     // Contains layers data received from map layers by user interaction
     const [layerEditedData, setLayerEditedData] = React.useState(editedData);
@@ -240,6 +244,7 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
             triggerHome={triggerHome}
             triggerResetMultipleWells={triggerResetMultipleWells}
             lights={lights}
+            verticalScale={verticalScale}
         >
             {children}
         </Map>

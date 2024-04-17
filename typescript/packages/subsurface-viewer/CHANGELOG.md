@@ -1,3 +1,24 @@
+# [0.24.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.23.1...subsurface-viewer@0.24.0) (2024-04-15)
+
+
+### Features
+
+* move vertical scale to SubsurfaceViewer props ([#2016](https://github.com/equinor/webviz-subsurface-components/issues/2016)) ([c193ee0](https://github.com/equinor/webviz-subsurface-components/commit/c193ee0613fdcb2f414c782cef3889069e33e6a8))
+
+## [0.23.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.23.0...subsurface-viewer@0.23.1) (2024-04-10)
+
+
+### Bug Fixes
+
+* honor vertical scale prop in 3D ([#2013](https://github.com/equinor/webviz-subsurface-components/issues/2013)) ([d8585de](https://github.com/equinor/webviz-subsurface-components/commit/d8585de621367d9039c4aea3ecf873c08ea7b0f7))
+
+# [0.23.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.22.1...subsurface-viewer@0.23.0) (2024-04-09)
+
+
+### Features
+
+* **grid3d:** discrete property names are displayed in the readouts. ([#2012](https://github.com/equinor/webviz-subsurface-components/issues/2012)) ([bb22093](https://github.com/equinor/webviz-subsurface-components/commit/bb2209322932abab5731661640b254d09a339a92))
+
 ## [0.22.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.22.0...subsurface-viewer@0.22.1) (2024-04-04)
 
 

@@ -1,3 +1,10 @@
+## [1.1.13](https://github.com/equinor/webviz-subsurface-components/compare/group-tree-plot@1.1.12...group-tree-plot@1.1.13) (2024-04-10)
+
+
+### Bug Fixes
+
+* honor vertical scale prop in 3D ([#2013](https://github.com/equinor/webviz-subsurface-components/issues/2013)) ([d8585de](https://github.com/equinor/webviz-subsurface-components/commit/d8585de621367d9039c4aea3ecf873c08ea7b0f7))
+
 ## [1.1.12](https://github.com/equinor/webviz-subsurface-components/compare/group-tree-plot@1.1.11...group-tree-plot@1.1.12) (2024-03-29)
 
 
