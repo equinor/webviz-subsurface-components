@@ -31,6 +31,7 @@ const layerProps = {
     isRightRuler: false,
     isBottomRuler: true,
     isTopRuler: false,
+    labelFontSizePt: 9,
 };
 
 const axes2DLayer = {
