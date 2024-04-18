@@ -697,7 +697,9 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         //-- Labels model--
         const label_models: Model[] = [];
 
-        const pixelScale = GetPixelsScale(this.props.labelFontSizePt);
+        const pixelScale = GetPixelsScale(
+            this.props.labelFontSizePt ?? defaultProps.labelFontSizePt
+        );
 
         for (const item of labelData) {
             const x = item.pos[0];
