@@ -33,7 +33,7 @@ export function abscissaTransform(
                 geometry.coordinates = transformedCoordinates;
             } else if ("Point" === geometry.type) {
                 const coordinates = geometry.coordinates;
-                geometry.coordinates = [0, coordinates[2]];
+                geometry.coordinates = [0, coordinates[2], 0];
             }
         }
     }
