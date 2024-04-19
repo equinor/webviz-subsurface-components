@@ -32,6 +32,7 @@ import {
     volveWellsResources,
 } from "../sharedSettings";
 import { Axes2DLayer } from "../../layers";
+import type { LayerProps } from "@deck.gl/core/typed";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -859,7 +860,7 @@ const VOLVE_WELLS_PROPS = {
 const WELLS_UNFOLDED = new WellsLayer({
     ...VOLVE_WELLS_PROPS,
     id: "unfolded",
-    dataTransform: abscissaTransform,
+    dataTransform: abscissaTransform as LayerProps["dataTransform"],
 });
 
 /** Example well with unfolded projection */

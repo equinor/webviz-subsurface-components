@@ -42,7 +42,6 @@ import type {
     DiscreteLegendDataType,
 } from "../../components/ColorLegend";
 import { getLayersById } from "../../layers/utils/layerTools";
-import { UnfoldedGeoJsonLayer } from "../UnfoldedGeoJsonLayer/unfoldedGeoJsonLayer";
 import GL from "@luma.gl/constants";
 import { isEqual } from "lodash";
 
@@ -120,9 +119,6 @@ export interface WellsLayerProps extends ExtendedLayerProps {
 
     // Non public properties:
     reportBoundingBox?: React.Dispatch<ReportBoundingBoxAction>;
-
-    /** If true, projects well trajectories unfolded onto an XY plane.  */
-    unfoldedProjection?: boolean;
 }
 
 const defaultProps = {
@@ -147,7 +143,6 @@ const defaultProps = {
     depthTest: true,
     ZIncreasingDownwards: true,
     simplifiedRendering: false,
-    unfoldedProjection: false,
 };
 
 export interface LogCurveDataType {
@@ -408,8 +403,6 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         // Reduced details when rotating or panning the view if "fastDrawing " is set.
         const fastDrawing = this.props.simplifiedRendering;
 
-        const unfoldedProjection = this.props.unfoldedProjection;
-
         const defaultLayerProps = {
             data,
             pickable: false,
@@ -472,49 +465,29 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             visible: this.props.logCurves && !fastDrawing,
         });
 
-        const fastLayer = unfoldedProjection
-            ? new UnfoldedGeoJsonLayer(fastLayerProps)
-            : new GeoJsonLayer(fastLayerProps);
+        const highlightMultiWellsLayerProps = this.getSubLayerProps({
+            ...defaultLayerProps,
+            id: "highlight2",
+            data: getWellObjectsByName(
+                data.features,
+                this.state["selectedMultiWells"]
+            ),
+            getPointRadius: getSize(POINT, this.props.wellHeadStyle?.size, 2),
+            getFillColor: [255, 140, 0],
+            getLineColor: [255, 140, 0],
+            visible: this.props.logCurves && !fastDrawing,
+        });
 
-        const outlineLayer = unfoldedProjection
-            ? new UnfoldedGeoJsonLayer(outlineLayerProps)
-            : new GeoJsonLayer(outlineLayerProps);
-
-        const colorsLayer = unfoldedProjection
-            ? new UnfoldedGeoJsonLayer(colorsLayerProps)
-            : new GeoJsonLayer(colorsLayerProps);
+        const fastLayer = new GeoJsonLayer(fastLayerProps);
+        const outlineLayer = new GeoJsonLayer(outlineLayerProps);
+        const colorsLayer = new GeoJsonLayer(colorsLayerProps);
 
         // Highlight the selected well.
-        const highlightLayer = unfoldedProjection
-            ? new UnfoldedGeoJsonLayer(highlightLayerProps)
-            : new GeoJsonLayer(highlightLayerProps);
+        const highlightLayer = new GeoJsonLayer(highlightLayerProps);
 
         // Highlight the multi selected wells.
-        const highlightMultiWellsLayer = new UnfoldedGeoJsonLayer(
-            this.getSubLayerProps({
-                id: "highlight2",
-                data: getWellObjectsByName(
-                    data.features,
-                    this.state["selectedMultiWells"]
-                ),
-                pickable: false,
-                stroked: false,
-                positionFormat,
-                pointRadiusUnits: "pixels",
-                lineWidthUnits: "pixels",
-                pointRadiusScale: this.props.pointRadiusScale,
-                lineWidthScale: this.props.lineWidthScale,
-                getLineWidth: getSize(LINE, this.props.lineStyle?.width, -1),
-                getPointRadius: getSize(
-                    POINT,
-                    this.props.wellHeadStyle?.size,
-                    2
-                ),
-                getFillColor: [255, 140, 0],
-                getLineColor: [255, 140, 0],
-                parameters,
-                visible: this.props.logCurves && !fastDrawing,
-            })
+        const highlightMultiWellsLayer = new GeoJsonLayer(
+            highlightMultiWellsLayerProps
         );
 
         const logLayer = new PathLayer<LogCurveDataType>(
@@ -731,15 +704,6 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             logName: log_property?.name || "",
         };
     }
-    /*     dataTransform(data: FeatureCollection) {
-            console.log(data);
-            return data;
-        } */
-    /*     project(coordinates) {
-            console.log(coordinates);
-            return coordinates;
-        } */
-
 }
 
 WellsLayer.layerName = "WellsLayer";

@@ -18,6 +18,7 @@ function computeUnfoldedPath(worldCoordinates: Position[]): Position[] {
     return vAbscissa as Position[];
 }
 
+/** Projects well trajectories unfolded onto an XY plane.  */
 export function abscissaTransform(
     featureCollection: FeatureCollection<GeometryCollection>
 ) {
