@@ -1,7 +1,9 @@
 {
     "name": "@webviz/subsurface-viewer",
     "version": "0.24.1",
-    "description": "",
+    "description": "3D visualization component for subsurface reservoir data",
+    "keywords": ["subsurface", "react", "wells", "welllogs", "grids", "faults", "reservoir"],
+    "homepage": "https://github.com/equinor/webviz-subsurface-components",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "files": [

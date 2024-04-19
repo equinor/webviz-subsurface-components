@@ -770,7 +770,7 @@ const reverseRange = false;
 
 //eslint-disable-next-line
 const WellLayerTemplate: React.FC = (args: any) => {
-    const [getColorName, setColorName] = React.useState("Rainbow");
+    const [colorName, setColorName] = React.useState("Rainbow");
 
     const [isLog, setIsLog] = React.useState(false);
 
@@ -793,12 +793,12 @@ const WellLayerTemplate: React.FC = (args: any) => {
         {
             ...args.wellLayers[0],
             colorMappingFunction: createColorMapFunction(
-                getColorName,
+                colorName,
                 true,
                 true,
                 []
             ),
-            logColor: getColorName ? getColorName : wellLayers[0].logColor,
+            logColor: colorName || wellLayers[0].logColor,
             isLog: isLog,
         },
     ];
