@@ -920,6 +920,7 @@ function GetTicks(
 
 function GetPixelsScale(labelFontSizePt: number): number {
     // Estimated number of pixels from baseline to top of font.
+    // Linear interpolation base on this table: https://reeddesign.co.uk/test/points-pixels.html
     const px = Math.max(0, (8 / 9) * labelFontSizePt);
     return px;
 }
