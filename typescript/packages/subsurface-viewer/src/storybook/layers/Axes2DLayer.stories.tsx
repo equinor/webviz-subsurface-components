@@ -31,7 +31,6 @@ const layerProps = {
     isRightRuler: false,
     isBottomRuler: true,
     isTopRuler: false,
-    labelFontSizePt: 9,
 };
 
 const axes2DLayer = {
@@ -44,6 +43,19 @@ export const Base: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "map",
         layers: [hugin25mKhNetmapMapLayerPng, axes2DLayer],
+
+        bounds: hugin2DBounds,
+        views: default2DViews,
+    },
+};
+
+export const FontSize: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "fontsize",
+        layers: [
+            hugin25mKhNetmapMapLayerPng,
+            { ...axes2DLayer, labelFontSizePt: 9 },
+        ],
 
         bounds: hugin2DBounds,
         views: default2DViews,
