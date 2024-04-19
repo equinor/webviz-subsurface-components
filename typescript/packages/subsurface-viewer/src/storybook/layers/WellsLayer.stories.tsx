@@ -21,13 +21,17 @@ import type { MapMouseEvent } from "../../components/Map";
 import AxesLayer from "../../layers/axes/axesLayer";
 import WellsLayer from "../../layers/wells/wellsLayer";
 
+import { abscissaTransform } from "../../layers/wells/utils/abscissaTransform";
+
 import {
+    default2DViews,
     default3DViews,
     defaultStoryParameters,
     volveWellsBounds,
     volveWellsFromResourcesLayer,
     volveWellsResources,
 } from "../sharedSettings";
+import { Axes2DLayer } from "../../layers";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -845,4 +849,42 @@ export const LegendWithColorSelector: StoryObj<typeof WellLayerTemplate> = {
         },
     },
     render: (args) => <WellLayerTemplate {...args} />,
+};
+
+const VOLVE_WELLS_PROPS = {
+    id: "volve",
+    data: "./volve_wells.json",
+    ZIncreasingDownwards: false,
+};
+const WELLS_UNFOLDED = new WellsLayer({
+    ...VOLVE_WELLS_PROPS,
+    id: "unfolded",
+    dataTransform: abscissaTransform,
+});
+
+/** Example well with unfolded projection */
+export const UnfoldedProjection: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "some-id",
+        layers: [WELLS_UNFOLDED, new Axes2DLayer()],
+        views: {
+            ...default2DViews,
+            viewports: [
+                {
+                    id: "viewport1",
+                    target: [2000, -1500],
+                    zoom: -2.5,
+                },
+            ],
+        },
+        bounds: [0, -1000, 4000, 0],
+    },
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: "Unfolded projection",
+            },
+        },
+    },
 };
