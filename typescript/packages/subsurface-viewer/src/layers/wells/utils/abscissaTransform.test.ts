@@ -63,5 +63,4 @@ describe("Transform well trajectory", () => {
         expect(trajectory.coordinates[1][1]).toStrictEqual(-1000);
         expect(trajectory.coordinates[2][0]).toBeCloseTo(2828.4271);
     });
-
 });
