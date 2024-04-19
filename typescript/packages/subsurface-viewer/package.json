@@ -1,6 +1,6 @@
 {
     "name": "@webviz/subsurface-viewer",
-    "version": "0.24.0",
+    "version": "0.24.1",
     "description": "",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -48,7 +48,7 @@
         "mathjs": "^12.4.1",
         "merge-refs": "^1.2.2",
         "react-redux": "^8.1.1",
-        "workerpool": "^9.1.0"
+        "workerpool": "^9.1.1"
     },
     "peerDependencies": {
         "@mui/material": "^5.11",
