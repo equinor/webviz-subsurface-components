@@ -33,3 +33,6 @@ export type { WellsLayerProps } from "./wells/wellsLayer";
 export { default as WellMarkersLayerProps } from "./well_markers/wellMarkersLayer";
 export type { Grid3DLayerProps } from "./grid3d/grid3dLayer";
 export type { BoxSelectionLayerProps } from "./BoxSelectionLayer/boxSelectionLayer";
+
+// Export layer utility functions
+export { abscissaTransform } from "./wells/utils/abscissaTransform";
