@@ -279,7 +279,7 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
             const depth =
                 (this.props.ZIncreasingDownwards
                     ? -info.coordinate[2]
-                    : info.coordinate[2]) / zScale;
+                    : info.coordinate[2]) / Math.max(0.001, zScale);
 
             layer_properties.push(createPropertyData("Depth", depth));
         }
