@@ -1,3 +1,31 @@
+## [0.24.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.24.0...subsurface-viewer@0.24.1) (2024-04-18)
+
+
+### Bug Fixes
+
+* bump workerpool from 9.1.0 to 9.1.1 in /typescript ([#2020](https://github.com/equinor/webviz-subsurface-components/issues/2020)) ([40bf4e8](https://github.com/equinor/webviz-subsurface-components/commit/40bf4e8187592ac87ac2591ab7b9ff378bea6188)), closes [#439](https://github.com/equinor/webviz-subsurface-components/issues/439) [#439](https://github.com/equinor/webviz-subsurface-components/issues/439) [#440](https://github.com/equinor/webviz-subsurface-components/issues/440) [#436](https://github.com/equinor/webviz-subsurface-components/issues/436) [#434](https://github.com/equinor/webviz-subsurface-components/issues/434) [#433](https://github.com/equinor/webviz-subsurface-components/issues/433) [#426](https://github.com/equinor/webviz-subsurface-components/issues/426)
+
+# [0.24.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.23.1...subsurface-viewer@0.24.0) (2024-04-15)
+
+
+### Features
+
+* move vertical scale to SubsurfaceViewer props ([#2016](https://github.com/equinor/webviz-subsurface-components/issues/2016)) ([c193ee0](https://github.com/equinor/webviz-subsurface-components/commit/c193ee0613fdcb2f414c782cef3889069e33e6a8))
+
+## [0.23.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.23.0...subsurface-viewer@0.23.1) (2024-04-10)
+
+
+### Bug Fixes
+
+* honor vertical scale prop in 3D ([#2013](https://github.com/equinor/webviz-subsurface-components/issues/2013)) ([d8585de](https://github.com/equinor/webviz-subsurface-components/commit/d8585de621367d9039c4aea3ecf873c08ea7b0f7))
+
+# [0.23.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.22.1...subsurface-viewer@0.23.0) (2024-04-09)
+
+
+### Features
+
+* **grid3d:** discrete property names are displayed in the readouts. ([#2012](https://github.com/equinor/webviz-subsurface-components/issues/2012)) ([bb22093](https://github.com/equinor/webviz-subsurface-components/commit/bb2209322932abab5731661640b254d09a339a92))
+
 ## [0.22.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.22.0...subsurface-viewer@0.22.1) (2024-04-04)
 
 

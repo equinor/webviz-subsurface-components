@@ -23,12 +23,11 @@ import type {
 import type { DeckGLRef } from "@deck.gl/react/typed";
 import DeckGL from "@deck.gl/react/typed";
 
-import { Layer } from "@deck.gl/core/typed";
-
 import {
     AmbientLight,
     _CameraLight as CameraLight,
     DirectionalLight,
+    Layer,
     LightingEffect,
     OrbitController,
     OrbitView,
@@ -72,6 +71,12 @@ import IntersectionView from "../views/intersectionView";
 
 import type { LightsType, TLayerDefinition } from "../SubsurfaceViewer";
 import { getZoom, useLateralZoom } from "../utils/camera";
+import { useHandleRescale, useShiftHeld } from "../utils/event";
+
+import type { ViewportType } from "../views/viewport";
+import { useVerticalScale } from "../views/viewport";
+
+import mergeRefs from "merge-refs";
 
 export type { BoundingBox2D, BoundingBox3D };
 /**
@@ -88,58 +93,6 @@ const minZoom3D = -12;
 const maxZoom3D = 12;
 const minZoom2D = -12;
 const maxZoom2D = 4;
-
-// https://developer.mozilla.org/docs/Web/API/KeyboardEvent
-type ArrowEvent = {
-    key: "ArrowUp" | "ArrowDown" | "PageUp" | "PageDown";
-    shiftModifier: boolean;
-};
-
-function updateZScaleReducer(zScale: number, action: ArrowEvent): number {
-    return zScale * getZScaleModifier(action);
-}
-
-function getZScaleModifier(arrowEvent: ArrowEvent): number {
-    let scaleFactor = 0;
-    switch (arrowEvent.key) {
-        case "ArrowUp":
-            scaleFactor = 0.05;
-            break;
-        case "ArrowDown":
-            scaleFactor = -0.05;
-            break;
-        case "PageUp":
-            scaleFactor = 0.25;
-            break;
-        case "PageDown":
-            scaleFactor = -0.25;
-            break;
-        default:
-            break;
-    }
-    if (arrowEvent.shiftModifier) {
-        scaleFactor /= 5;
-    }
-    return 1 + scaleFactor;
-}
-
-function convertToArrowEvent(event: KeyboardEvent): ArrowEvent | null {
-    if (event.type === "keydown") {
-        switch (event.key) {
-            case "ArrowUp":
-            case "ArrowDown":
-            case "PageUp":
-            case "PageDown":
-                return {
-                    key: event.key,
-                    shiftModifier: event.shiftKey,
-                };
-            default:
-                return null;
-        }
-    }
-    return null;
-}
 
 function parseLights(lights?: LightsType): LightingEffect[] | undefined {
     if (!lights) {
@@ -228,39 +181,6 @@ export interface ViewsType {
      * Layers configuration for multiple viewports.
      */
     viewports: ViewportType[];
-}
-
-/**
- * Viewport type.
- */
-export interface ViewportType {
-    /**
-     * Viewport id
-     */
-    id: string;
-
-    /**
-     * Viewport name
-     */
-    name?: string;
-
-    /**
-     * If true, displays map in 3D view, default is 2D view (false)
-     */
-    show3D?: boolean;
-
-    /**
-     * Layers to be displayed on viewport
-     */
-    layerIds?: string[];
-
-    target?: [number, number];
-    zoom?: number;
-    rotationX?: number;
-    rotationOrbit?: number;
-    verticalScale?: number;
-
-    isSync?: boolean;
 }
 
 /**
@@ -436,6 +356,9 @@ export interface MapProps {
     children?: React.ReactNode;
 
     getTooltip?: TooltipCallback;
+
+    /** A vertical scale factor, used to scale items in the view vertically */
+    verticalScale?: number;
 }
 
 function defaultTooltip(info: PickingInfo) {
@@ -471,6 +394,7 @@ const Map: React.FC<MapProps> = ({
     onDragEnd,
     lights,
     triggerResetMultipleWells,
+    verticalScale,
 }: MapProps) => {
     // From react doc, ref should not be read nor modified during rendering.
     const deckRef = React.useRef<DeckGLRef>(null);
@@ -504,8 +428,22 @@ const Map: React.FC<MapProps> = ({
         undefined
     );
 
+    // Get vertical scaling factor defined in viewports.
+    const viewportVerticalScale = useVerticalScale(views?.viewports);
+
     // Used for scaling in z direction using arrow keys.
-    const [zScale, updateZScale] = React.useReducer(updateZScaleReducer, 1);
+    const { zScale: zReScale, divRef: zScaleRef } = useHandleRescale(
+        !!(verticalScale ?? viewportVerticalScale)
+    );
+
+    const { shiftHeld, divRef: shiftHeldRef } = useShiftHeld();
+
+    const divRef = mergeRefs(
+        zScaleRef,
+        shiftHeldRef
+    ) as React.Ref<HTMLDivElement>;
+
+    const zScale = verticalScale ?? viewportVerticalScale ?? zReScale;
 
     // compute the viewport margins
     const viewPortMargins = React.useMemo<MarginsType>(() => {
@@ -547,39 +485,6 @@ const Map: React.FC<MapProps> = ({
     // multiple well layers
     const [multipleWells, setMultipleWells] = useState<string[]>([]);
     const [selectedWell, setSelectedWell] = useState<string>("");
-    const [shiftHeld, setShiftHeld] = useState(false);
-
-    const divRef = React.useRef(null);
-
-    useEffect(() => {
-        const keyDownHandler = (e: KeyboardEvent) => {
-            const arrowEvent = convertToArrowEvent(e);
-            if (arrowEvent) {
-                updateZScale(arrowEvent);
-                // prevent being handled by regular OrbitController
-                e.stopPropagation();
-            }
-            if (e.key === "Shift") {
-                setShiftHeld(true);
-            }
-        };
-        const keyUpHandler = (e: KeyboardEvent) => {
-            if (e.key === "Shift") {
-                setShiftHeld(false);
-            }
-        };
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const element = divRef.current as any;
-
-        element?.addEventListener("keydown", keyDownHandler, true);
-        element?.addEventListener("keyup", keyUpHandler, true);
-
-        return () => {
-            element?.removeEventListener("keydown", keyDownHandler);
-            element?.removeEventListener("keyup", keyUpHandler);
-        };
-    }, [updateZScale, setShiftHeld]);
 
     useEffect(() => {
         const layers = deckRef.current?.deck?.props.layers;
