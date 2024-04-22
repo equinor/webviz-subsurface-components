@@ -1,3 +1,10 @@
+## [0.25.2](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.25.1...subsurface-viewer@0.25.2) (2024-04-22)
+
+
+### Bug Fixes
+
+* Incorrect depth readout after vertical re-scaling ([#2028](https://github.com/equinor/webviz-subsurface-components/issues/2028)) ([6b67634](https://github.com/equinor/webviz-subsurface-components/commit/6b676348c86cc84dbef4570081af88ff8bff5ed7))
+
 ## [0.25.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.25.0...subsurface-viewer@0.25.1) (2024-04-22)
 
 
