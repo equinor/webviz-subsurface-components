@@ -21,13 +21,18 @@ import type { MapMouseEvent } from "../../components/Map";
 import AxesLayer from "../../layers/axes/axesLayer";
 import WellsLayer from "../../layers/wells/wellsLayer";
 
+import { abscissaTransform } from "../../layers/wells/utils/abscissaTransform";
+
 import {
+    default2DViews,
     default3DViews,
     defaultStoryParameters,
     volveWellsBounds,
     volveWellsFromResourcesLayer,
     volveWellsResources,
 } from "../sharedSettings";
+import { Axes2DLayer } from "../../layers";
+import type { LayerProps } from "@deck.gl/core/typed";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -765,7 +770,7 @@ const reverseRange = false;
 
 //eslint-disable-next-line
 const WellLayerTemplate: React.FC = (args: any) => {
-    const [getColorName, setColorName] = React.useState("Rainbow");
+    const [colorName, setColorName] = React.useState("Rainbow");
 
     const [isLog, setIsLog] = React.useState(false);
 
@@ -788,12 +793,12 @@ const WellLayerTemplate: React.FC = (args: any) => {
         {
             ...args.wellLayers[0],
             colorMappingFunction: createColorMapFunction(
-                getColorName,
+                colorName,
                 true,
                 true,
                 []
             ),
-            logColor: getColorName ? getColorName : wellLayers[0].logColor,
+            logColor: colorName || wellLayers[0].logColor,
             isLog: isLog,
         },
     ];
@@ -845,4 +850,42 @@ export const LegendWithColorSelector: StoryObj<typeof WellLayerTemplate> = {
         },
     },
     render: (args) => <WellLayerTemplate {...args} />,
+};
+
+const VOLVE_WELLS_PROPS = {
+    id: "volve",
+    data: "./volve_wells.json",
+    ZIncreasingDownwards: false,
+};
+const WELLS_UNFOLDED = new WellsLayer({
+    ...VOLVE_WELLS_PROPS,
+    id: "unfolded",
+    dataTransform: abscissaTransform as LayerProps["dataTransform"],
+});
+
+/** Example well with unfolded projection */
+export const UnfoldedProjection: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "some-id",
+        layers: [WELLS_UNFOLDED, new Axes2DLayer()],
+        views: {
+            ...default2DViews,
+            viewports: [
+                {
+                    id: "viewport1",
+                    target: [2000, -1500],
+                    zoom: -2.5,
+                },
+            ],
+        },
+        bounds: [0, -1000, 4000, 0],
+    },
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: "Unfolded projection",
+            },
+        },
+    },
 };
