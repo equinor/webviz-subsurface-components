@@ -1,3 +1,10 @@
+## [0.25.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.25.0...subsurface-viewer@0.25.1) (2024-04-22)
+
+
+### Bug Fixes
+
+*  "[NGRM] - Axes2DLayer; Introduce a property "labelFontSizePt" to enable controlling the size of the labels" ([#2024](https://github.com/equinor/webviz-subsurface-components/issues/2024)) ([2e5da41](https://github.com/equinor/webviz-subsurface-components/commit/2e5da41a613f45010aa1b69514920fe48b8c026a))
+
 # [0.25.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.24.1...subsurface-viewer@0.25.0) (2024-04-22)
 
 
