@@ -143,9 +143,9 @@ export function CatmullRom(
     const ttt = t * t * t;
 
     // disable eslint for some lines due to readability.
-    const dist_p0_p1 = Math.sqrt((P1[0]-P0[0])*(P1[0]-P0[0]) + (P1[1]-P0[1])*(P1[1]-P0[1]) + (P1[2]-P0[2])*(P1[2]-P0[2]) ); // eslint-disable-line
-    const dist_p1_p2 = Math.sqrt((P1[0]-P2[0])*(P1[0]-P2[0]) + (P1[1]-P2[1])*(P1[1]-P2[1]) + (P1[2]-P2[2])*(P1[2]-P2[2]) ); // eslint-disable-line
-    const dist_p2_p3 = Math.sqrt((P3[0]-P2[0])*(P3[0]-P2[0]) + (P3[1]-P2[1])*(P3[1]-P2[1]) + (P3[2]-P2[2])*(P3[2]-P2[2]) ); // eslint-disable-line
+    const dist_p0_p1 = Math.sqrt((P1[0] - P0[0]) * (P1[0] - P0[0]) + (P1[1] - P0[1]) * (P1[1] - P0[1]) + (P1[2] - P0[2]) * (P1[2] - P0[2])); // eslint-disable-line
+    const dist_p1_p2 = Math.sqrt((P1[0] - P2[0]) * (P1[0] - P2[0]) + (P1[1] - P2[1]) * (P1[1] - P2[1]) + (P1[2] - P2[2]) * (P1[2] - P2[2])); // eslint-disable-line
+    const dist_p2_p3 = Math.sqrt((P3[0] - P2[0]) * (P3[0] - P2[0]) + (P3[1] - P2[1]) * (P3[1] - P2[1]) + (P3[2] - P2[2]) * (P3[2] - P2[2])); // eslint-disable-line
 
     const t01 = Math.pow(dist_p0_p1, alpha);
     const t12 = Math.pow(dist_p1_p2, alpha);
@@ -188,9 +188,9 @@ export function CatmullRom(
  * Assumes 3D data.
  */
 export function splineRefine(
-    data_in: FeatureCollection,
+    data_in: FeatureCollection<GeometryCollection>,
     stepCount = 5
-): FeatureCollection {
+): FeatureCollection<GeometryCollection> {
     if (stepCount < 1) {
         return data_in;
     }
@@ -210,8 +210,7 @@ export function splineRefine(
         if (mds === undefined) {
             continue;
         }
-        const geometryCollection = data.features[well_no]
-            .geometry as GeometryCollection;
+        const geometryCollection = data.features[well_no].geometry;
         const lineString = geometryCollection?.geometries[1] as LineString;
 
         if (lineString.coordinates?.length === undefined) {
@@ -390,13 +389,14 @@ export function flattenPath(data_in: FeatureCollection): FeatureCollection {
     return data;
 }
 
-export function invertPath(data_in: FeatureCollection): FeatureCollection {
+export function invertPath(
+    data_in: FeatureCollection<GeometryCollection>
+): FeatureCollection<GeometryCollection> {
     const data = cloneDeep(data_in);
 
     const no_wells = data.features.length;
     for (let well_no = 0; well_no < no_wells; well_no++) {
-        const geometryCollection = data.features[well_no]
-            .geometry as GeometryCollection;
+        const geometryCollection = data.features[well_no].geometry;
 
         const lineString = geometryCollection?.geometries[1] as LineString;
 
@@ -417,8 +417,7 @@ export function invertPath(data_in: FeatureCollection): FeatureCollection {
         });
 
         (
-            (data.features[well_no].geometry as GeometryCollection)
-                .geometries[1] as LineString
+            data.features[well_no].geometry.geometries[1] as LineString
         ).coordinates = coords_inverted;
     }
 

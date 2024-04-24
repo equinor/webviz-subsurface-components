@@ -860,7 +860,7 @@ const VOLVE_WELLS_PROPS = {
 const WELLS_UNFOLDED = new WellsLayer({
     ...VOLVE_WELLS_PROPS,
     id: "unfolded",
-    dataTransform: abscissaTransform as LayerProps["dataTransform"],
+    section: true,
 });
 
 /** Example well with unfolded projection */
