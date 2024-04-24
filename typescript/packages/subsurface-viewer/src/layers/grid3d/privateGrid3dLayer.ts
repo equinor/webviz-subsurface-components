@@ -22,7 +22,8 @@ import fsShader from "./fragment.fs.glsl";
 import vsLineShader from "./vertex_lines.glsl";
 import fsLineShader from "./fragment_lines.glsl";
 import { localPhongLighting, utilities } from "../shader_modules";
-import { IDiscretePropertyValueName, TGrid3DColoringMode } from "./grid3dLayer";
+import { TGrid3DColoringMode } from "./grid3dLayer";
+import type { IDiscretePropertyValueName } from "./grid3dLayer";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_MIN_FILTER]: GL.LINEAR,
