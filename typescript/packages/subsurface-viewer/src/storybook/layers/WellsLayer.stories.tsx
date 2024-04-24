@@ -21,8 +21,6 @@ import type { MapMouseEvent } from "../../components/Map";
 import AxesLayer from "../../layers/axes/axesLayer";
 import WellsLayer from "../../layers/wells/wellsLayer";
 
-import { abscissaTransform } from "../../layers/wells/utils/abscissaTransform";
-
 import {
     default2DViews,
     default3DViews,
@@ -32,7 +30,6 @@ import {
     volveWellsResources,
 } from "../sharedSettings";
 import { Axes2DLayer } from "../../layers";
-import type { LayerProps } from "@deck.gl/core/typed";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
