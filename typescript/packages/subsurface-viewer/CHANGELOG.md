@@ -1,3 +1,10 @@
+# [0.26.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.25.2...subsurface-viewer@0.26.0) (2024-04-24)
+
+
+### Features
+
+* **grid3d:** Discrete property value in grid readouts ([#2032](https://github.com/equinor/webviz-subsurface-components/issues/2032)) ([fc4e196](https://github.com/equinor/webviz-subsurface-components/commit/fc4e196d5897983cbbb7dbdfe21f9279f933015f))
+
 ## [0.25.2](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.25.1...subsurface-viewer@0.25.2) (2024-04-22)
 
 
