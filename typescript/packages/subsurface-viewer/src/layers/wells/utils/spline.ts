@@ -302,8 +302,7 @@ export function splineRefine(
         newMds[0].push(mds[0][n - 1]);
 
         (
-            (data.features[well_no].geometry as GeometryCollection)
-                .geometries[1] as LineString
+            data.features[well_no].geometry.geometries[1] as LineString
         ).coordinates = newCoordinates;
 
         if (data.features[well_no].properties) {
