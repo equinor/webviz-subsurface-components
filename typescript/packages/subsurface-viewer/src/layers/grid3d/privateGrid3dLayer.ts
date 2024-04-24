@@ -23,6 +23,7 @@ import vsLineShader from "./vertex_lines.glsl";
 import fsLineShader from "./fragment_lines.glsl";
 import { localPhongLighting, utilities } from "../shader_modules";
 import { TGrid3DColoringMode } from "./grid3dLayer";
+import type { IDiscretePropertyValueName } from "./grid3dLayer";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_MIN_FILTER]: GL.LINEAR,
@@ -77,7 +78,7 @@ export interface PrivateLayerProps extends ExtendedLayerProps {
     coloringMode: TGrid3DColoringMode.Property;
     gridLines: boolean;
     propertyValueRange: [number, number];
-    discretePropertyNames?: string[];
+    discretePropertyValueNames?: IDiscretePropertyValueName[];
     depthTest: boolean;
     ZIncreasingDownwards: boolean;
 }
@@ -258,12 +259,26 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
         }
 
         const properties = this.props.mesh.attributes.properties.value;
-        const propertyValue = properties[vertexIndex];
-        if (Number.isFinite(propertyValue)) {
-            const propertyText =
-                this.props.discretePropertyNames?.[propertyValue] ??
-                propertyValue;
-            layer_properties.push(createPropertyData("Property", propertyText));
+        const propertyIndex = properties[vertexIndex];
+        if (Number.isFinite(propertyIndex)) {
+            if (this.props.discretePropertyValueNames) {
+                const propertyText =
+                    this.props.discretePropertyValueNames[propertyIndex].name ??
+                    propertyIndex;
+                const propertyValue =
+                    this.props.discretePropertyValueNames[propertyIndex]
+                        .value ?? propertyIndex;
+                layer_properties.push(
+                    createPropertyData("Property", propertyText)
+                );
+                layer_properties.push(
+                    createPropertyData("Value", propertyValue)
+                );
+            } else {
+                layer_properties.push(
+                    createPropertyData("Property", propertyIndex)
+                );
+            }
         }
 
         return {
