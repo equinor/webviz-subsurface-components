@@ -1,3 +1,17 @@
+## [0.6.2](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.6.1...wsc-common@0.6.2) (2024-04-18)
+
+
+### Bug Fixes
+
+* bump workerpool from 9.1.0 to 9.1.1 in /typescript ([#2020](https://github.com/equinor/webviz-subsurface-components/issues/2020)) ([40bf4e8](https://github.com/equinor/webviz-subsurface-components/commit/40bf4e8187592ac87ac2591ab7b9ff378bea6188)), closes [#439](https://github.com/equinor/webviz-subsurface-components/issues/439) [#439](https://github.com/equinor/webviz-subsurface-components/issues/439) [#440](https://github.com/equinor/webviz-subsurface-components/issues/440) [#436](https://github.com/equinor/webviz-subsurface-components/issues/436) [#434](https://github.com/equinor/webviz-subsurface-components/issues/434) [#433](https://github.com/equinor/webviz-subsurface-components/issues/433) [#426](https://github.com/equinor/webviz-subsurface-components/issues/426)
+
+## [0.6.1](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.6.0...wsc-common@0.6.1) (2024-04-10)
+
+
+### Bug Fixes
+
+* honor vertical scale prop in 3D ([#2013](https://github.com/equinor/webviz-subsurface-components/issues/2013)) ([d8585de](https://github.com/equinor/webviz-subsurface-components/commit/d8585de621367d9039c4aea3ecf873c08ea7b0f7))
+
 # [0.6.0](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.5.12...wsc-common@0.6.0) (2024-04-04)
 
 

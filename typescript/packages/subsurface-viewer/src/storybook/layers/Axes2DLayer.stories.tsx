@@ -49,6 +49,19 @@ export const Base: StoryObj<typeof SubsurfaceViewer> = {
     },
 };
 
+export const FontSize: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "fontsize",
+        layers: [
+            hugin25mKhNetmapMapLayerPng,
+            { ...axes2DLayer, labelFontSizePt: 9 },
+        ],
+
+        bounds: hugin2DBounds,
+        views: default2DViews,
+    },
+};
+
 function makeLabelFunction(a: number): string {
     // Choos exponential format with 3 digits after point.
     const label = d3.format(".3e")(a);
