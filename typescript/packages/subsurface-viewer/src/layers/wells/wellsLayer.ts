@@ -1,49 +1,58 @@
 import type {
+    Color,
     Layer,
-    LayersList,
     LayerData,
-    UpdateParameters,
+    LayersList,
     PickingInfo,
+    Position,
+    UpdateParameters,
 } from "@deck.gl/core/typed";
+
 import { CompositeLayer, OrbitViewport } from "@deck.gl/core/typed";
-import type { ExtendedLayerProps } from "../utils/layerTools";
-import { isDrawingEnabled } from "../utils/layerTools";
-import { GeoJsonLayer, PathLayer, TextLayer } from "@deck.gl/layers/typed";
-import type { Color, Position } from "@deck.gl/core/typed";
+
+import type {
+    ExtendedLayerProps,
+    LayerPickInfo,
+    PropertyDataType,
+} from "../utils/layerTools";
+
+import { createPropertyData, isDrawingEnabled } from "../utils/layerTools";
+
 import { PathStyleExtension } from "@deck.gl/extensions/typed";
-import { subtract, distance, dot } from "mathjs";
+import { GeoJsonLayer, PathLayer, TextLayer } from "@deck.gl/layers/typed";
 import type { colorTablesArray } from "@emerson-eps/color-tables/";
-import { rgbValues, getColors } from "@emerson-eps/color-tables/";
+import { getColors, rgbValues } from "@emerson-eps/color-tables/";
 import type {
     Feature,
-    GeometryCollection,
-    LineString,
-    Point,
     FeatureCollection,
     GeoJsonProperties,
     Geometry,
+    GeometryCollection,
+    LineString,
+    Point,
 } from "geojson";
-import type { LayerPickInfo, PropertyDataType } from "../utils/layerTools";
-import { createPropertyData } from "../utils/layerTools";
-import {
-    splineRefine,
-    coarsenWells,
-    invertPath,
-    GetBoundingBox,
-    checkWells,
-} from "./utils/spline";
+import { distance, dot, subtract } from "mathjs";
+
+import GL from "@luma.gl/constants";
 import { interpolateNumberArray } from "d3";
-import type {
-    ReportBoundingBoxAction,
-    DeckGLLayerContext,
-} from "../../components/Map";
+import { isEmpty, isEqual } from "lodash";
 import type {
     ContinuousLegendDataType,
     DiscreteLegendDataType,
 } from "../../components/ColorLegend";
+import type {
+    DeckGLLayerContext,
+    ReportBoundingBoxAction,
+} from "../../components/Map";
 import { getLayersById } from "../../layers/utils/layerTools";
-import GL from "@luma.gl/constants";
-import { isEqual } from "lodash";
+import { abscissaTransform } from "./utils/abscissaTransform";
+import {
+    GetBoundingBox,
+    checkWells,
+    coarsenWells,
+    invertPath,
+    splineRefine,
+} from "./utils/spline";
 
 type StyleAccessorFunction = (
     object: Feature,
@@ -117,6 +126,9 @@ export interface WellsLayerProps extends ExtendedLayerProps {
      */
     simplifiedRendering: boolean;
 
+    /** Sectional projection of data */
+    section?: boolean;
+
     // Non public properties:
     reportBoundingBox?: React.Dispatch<ReportBoundingBoxAction>;
 }
@@ -143,6 +155,7 @@ const defaultProps = {
     depthTest: true,
     ZIncreasingDownwards: true,
     simplifiedRendering: false,
+    section: false,
 };
 
 export interface LogCurveDataType {
@@ -254,33 +267,39 @@ export function getSize(
 
 export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
     initializeState(): void {
-        let data = this.props.data as unknown as FeatureCollection;
-        if (typeof data !== "undefined" && !isEqual(data, [])) {
-            if (this.props.ZIncreasingDownwards) {
-                data = invertPath(data);
-            }
+        let data = this.props.data as FeatureCollection<GeometryCollection>;
+        const refine = this.props.refine;
 
-            checkWells(data);
-
-            const coarseData = coarsenWells(data);
-
-            const doRefine =
-                typeof this.props.refine === "number"
-                    ? (this.props.refine as number) > 1
-                    : (this.props.refine as boolean);
-
-            const stepCount =
-                typeof this.props.refine === "number" ? this.props.refine : 5;
-            data = doRefine
-                ? splineRefine(data, stepCount) // smooth well paths.
-                : data;
-
-            this.setState({
-                ...this.state,
-                data,
-                coarseData,
-            });
+        if (!data || isEmpty(data)) {
+            return;
         }
+
+        if (this.props.ZIncreasingDownwards) {
+            data = invertPath(data);
+        }
+
+        if (this.props.section) {
+            data = abscissaTransform(data);
+        }
+
+        checkWells(data);
+
+        const coarseData = coarsenWells(data);
+
+        const doRefine =
+            typeof refine === "number" ? refine > 1 : (refine as boolean);
+
+        const stepCount = typeof refine === "number" ? refine : 5;
+
+        data = doRefine
+            ? splineRefine(data, stepCount) // smooth well paths.
+            : data;
+
+        this.setState({
+            ...this.state,
+            data,
+            coarseData,
+        });
     }
 
     updateState({ props, oldProps }: UpdateParameters<WellsLayer>): void {
@@ -657,7 +676,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         if (!md_property) {
             md_property = getLogProperty(
                 coordinate,
-                (this.props.data as unknown as FeatureCollection).features,
+                (this.props.data as FeatureCollection).features,
                 info.object,
                 this.props.logrunName,
                 "MD"
@@ -672,7 +691,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         if (!tvd_property) {
             tvd_property = getLogProperty(
                 coordinate,
-                (this.props.data as unknown as FeatureCollection).features,
+                (this.props.data as FeatureCollection).features,
                 info.object,
                 this.props.logrunName,
                 "TVD"
@@ -680,7 +699,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         }
         const log_property = getLogProperty(
             coordinate,
-            (this.props.data as unknown as FeatureCollection).features,
+            (this.props.data as FeatureCollection).features,
             info.object,
             this.props.logrunName,
             this.props.logName
