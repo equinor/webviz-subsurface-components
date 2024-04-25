@@ -1,11 +1,11 @@
 import type {
-    Layer,
-    LayersList,
-    LayerData,
-    UpdateParameters,
-    PickingInfo,
     Color,
+    Layer,
+    LayerData,
+    LayersList,
+    PickingInfo,
     Position,
+    UpdateParameters,
 } from "@deck.gl/core/typed";
 
 import { CompositeLayer, OrbitViewport } from "@deck.gl/core/typed";
@@ -16,43 +16,43 @@ import type {
     PropertyDataType,
 } from "../utils/layerTools";
 
-import { isDrawingEnabled, createPropertyData } from "../utils/layerTools";
+import { createPropertyData, isDrawingEnabled } from "../utils/layerTools";
 
-import { GeoJsonLayer, PathLayer, TextLayer } from "@deck.gl/layers/typed";
 import { PathStyleExtension } from "@deck.gl/extensions/typed";
-import { subtract, distance, dot } from "mathjs";
+import { GeoJsonLayer, PathLayer, TextLayer } from "@deck.gl/layers/typed";
 import type { colorTablesArray } from "@emerson-eps/color-tables/";
-import { rgbValues, getColors } from "@emerson-eps/color-tables/";
+import { getColors, rgbValues } from "@emerson-eps/color-tables/";
 import type {
     Feature,
-    GeometryCollection,
-    LineString,
-    Point,
     FeatureCollection,
     GeoJsonProperties,
     Geometry,
+    GeometryCollection,
+    LineString,
+    Point,
 } from "geojson";
+import { distance, dot, subtract } from "mathjs";
 
-import {
-    splineRefine,
-    coarsenWells,
-    invertPath,
-    GetBoundingBox,
-    checkWells,
-} from "./utils/spline";
+import GL from "@luma.gl/constants";
 import { interpolateNumberArray } from "d3";
-import type {
-    ReportBoundingBoxAction,
-    DeckGLLayerContext,
-} from "../../components/Map";
+import { isEmpty, isEqual } from "lodash";
 import type {
     ContinuousLegendDataType,
     DiscreteLegendDataType,
 } from "../../components/ColorLegend";
+import type {
+    DeckGLLayerContext,
+    ReportBoundingBoxAction,
+} from "../../components/Map";
 import { getLayersById } from "../../layers/utils/layerTools";
-import GL from "@luma.gl/constants";
-import { isEqual } from "lodash";
 import { abscissaTransform } from "./utils/abscissaTransform";
+import {
+    GetBoundingBox,
+    checkWells,
+    coarsenWells,
+    invertPath,
+    splineRefine,
+} from "./utils/spline";
 
 type StyleAccessorFunction = (
     object: Feature,
@@ -270,7 +270,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         let data = this.props.data as FeatureCollection<GeometryCollection>;
         const refine = this.props.refine;
 
-        if (typeof data === "undefined" || isEqual(data, [])) {
+        if (!data || isEmpty(data)) {
             return;
         }
 
