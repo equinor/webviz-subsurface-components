@@ -1,3 +1,10 @@
+# [0.27.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.26.0...subsurface-viewer@0.27.0) (2024-04-25)
+
+
+### Features
+
+* add section projection option to wells layer ([#2033](https://github.com/equinor/webviz-subsurface-components/issues/2033)) ([b6fc1d3](https://github.com/equinor/webviz-subsurface-components/commit/b6fc1d3a0613dd0945541872f3ff5809922e49cb))
+
 # [0.26.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.25.2...subsurface-viewer@0.26.0) (2024-04-24)
 
 
