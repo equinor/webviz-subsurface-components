@@ -1,7 +1,17 @@
 {
     "name": "@webviz/subsurface-viewer",
-    "version": "0.24.0",
-    "description": "",
+    "version": "0.27.0",
+    "description": "3D visualization component for subsurface reservoir data",
+    "keywords": [
+        "subsurface",
+        "react",
+        "wells",
+        "welllogs",
+        "grids",
+        "faults",
+        "reservoir"
+    ],
+    "homepage": "https://github.com/equinor/webviz-subsurface-components",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "files": [
@@ -48,7 +58,7 @@
         "mathjs": "^12.4.1",
         "merge-refs": "^1.2.2",
         "react-redux": "^8.1.1",
-        "workerpool": "^9.1.0"
+        "workerpool": "^9.1.1"
     },
     "peerDependencies": {
         "@mui/material": "^5.11",

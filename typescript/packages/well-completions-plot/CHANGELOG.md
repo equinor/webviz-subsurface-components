@@ -1,3 +1,10 @@
+## [1.2.14](https://github.com/equinor/webviz-subsurface-components/compare/well-completions-plot@1.2.13...well-completions-plot@1.2.14) (2024-04-18)
+
+
+### Bug Fixes
+
+* bump workerpool from 9.1.0 to 9.1.1 in /typescript ([#2020](https://github.com/equinor/webviz-subsurface-components/issues/2020)) ([40bf4e8](https://github.com/equinor/webviz-subsurface-components/commit/40bf4e8187592ac87ac2591ab7b9ff378bea6188)), closes [#439](https://github.com/equinor/webviz-subsurface-components/issues/439) [#439](https://github.com/equinor/webviz-subsurface-components/issues/439) [#440](https://github.com/equinor/webviz-subsurface-components/issues/440) [#436](https://github.com/equinor/webviz-subsurface-components/issues/436) [#434](https://github.com/equinor/webviz-subsurface-components/issues/434) [#433](https://github.com/equinor/webviz-subsurface-components/issues/433) [#426](https://github.com/equinor/webviz-subsurface-components/issues/426)
+
 ## [1.2.13](https://github.com/equinor/webviz-subsurface-components/compare/well-completions-plot@1.2.12...well-completions-plot@1.2.13) (2024-04-10)
 
 

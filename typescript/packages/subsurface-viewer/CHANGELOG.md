@@ -1,3 +1,45 @@
+# [0.27.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.26.0...subsurface-viewer@0.27.0) (2024-04-25)
+
+
+### Features
+
+* add section projection option to wells layer ([#2033](https://github.com/equinor/webviz-subsurface-components/issues/2033)) ([b6fc1d3](https://github.com/equinor/webviz-subsurface-components/commit/b6fc1d3a0613dd0945541872f3ff5809922e49cb))
+
+# [0.26.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.25.2...subsurface-viewer@0.26.0) (2024-04-24)
+
+
+### Features
+
+* **grid3d:** Discrete property value in grid readouts ([#2032](https://github.com/equinor/webviz-subsurface-components/issues/2032)) ([fc4e196](https://github.com/equinor/webviz-subsurface-components/commit/fc4e196d5897983cbbb7dbdfe21f9279f933015f))
+
+## [0.25.2](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.25.1...subsurface-viewer@0.25.2) (2024-04-22)
+
+
+### Bug Fixes
+
+* Incorrect depth readout after vertical re-scaling ([#2028](https://github.com/equinor/webviz-subsurface-components/issues/2028)) ([6b67634](https://github.com/equinor/webviz-subsurface-components/commit/6b676348c86cc84dbef4570081af88ff8bff5ed7))
+
+## [0.25.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.25.0...subsurface-viewer@0.25.1) (2024-04-22)
+
+
+### Bug Fixes
+
+*  "[NGRM] - Axes2DLayer; Introduce a property "labelFontSizePt" to enable controlling the size of the labels" ([#2024](https://github.com/equinor/webviz-subsurface-components/issues/2024)) ([2e5da41](https://github.com/equinor/webviz-subsurface-components/commit/2e5da41a613f45010aa1b69514920fe48b8c026a))
+
+# [0.25.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.24.1...subsurface-viewer@0.25.0) (2024-04-22)
+
+
+### Features
+
+* add abscissa transform utility function for wells ([#2026](https://github.com/equinor/webviz-subsurface-components/issues/2026)) ([e75580c](https://github.com/equinor/webviz-subsurface-components/commit/e75580c169ffe460ee2f6b1d54f241cf3f89898f)), closes [#2019](https://github.com/equinor/webviz-subsurface-components/issues/2019)
+
+## [0.24.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.24.0...subsurface-viewer@0.24.1) (2024-04-18)
+
+
+### Bug Fixes
+
+* bump workerpool from 9.1.0 to 9.1.1 in /typescript ([#2020](https://github.com/equinor/webviz-subsurface-components/issues/2020)) ([40bf4e8](https://github.com/equinor/webviz-subsurface-components/commit/40bf4e8187592ac87ac2591ab7b9ff378bea6188)), closes [#439](https://github.com/equinor/webviz-subsurface-components/issues/439) [#439](https://github.com/equinor/webviz-subsurface-components/issues/439) [#440](https://github.com/equinor/webviz-subsurface-components/issues/440) [#436](https://github.com/equinor/webviz-subsurface-components/issues/436) [#434](https://github.com/equinor/webviz-subsurface-components/issues/434) [#433](https://github.com/equinor/webviz-subsurface-components/issues/433) [#426](https://github.com/equinor/webviz-subsurface-components/issues/426)
+
 # [0.24.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.23.1...subsurface-viewer@0.24.0) (2024-04-15)
 
 
