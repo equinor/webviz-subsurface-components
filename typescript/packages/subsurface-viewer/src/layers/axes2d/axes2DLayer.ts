@@ -234,15 +234,15 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
 
         const L = isTopOrBottomRuler
             ? LineLengthInPixels(
-                [min, 0, 0],
-                [max, 0, 0],
-                this.context.viewport
-            )
+                  [min, 0, 0],
+                  [max, 0, 0],
+                  this.context.viewport
+              )
             : LineLengthInPixels(
-                [0, min, 0],
-                [0, max, 0],
-                this.context.viewport
-            );
+                  [0, min, 0],
+                  [0, max, 0],
+                  this.context.viewport
+              );
 
         const ticks = GetTicks(min, max, L); // Note: this may be replaced by NiceTicks npm package.
 

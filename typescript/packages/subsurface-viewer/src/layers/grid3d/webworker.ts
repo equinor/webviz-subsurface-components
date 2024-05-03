@@ -676,7 +676,7 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
                     p.y > py !== p.next.y > py &&
                     p.next.y !== p.y &&
                     px <
-                    ((p.next.x - p.x) * (py - p.y)) / (p.next.y - p.y) + p.x
+                        ((p.next.x - p.x) * (py - p.y)) / (p.next.y - p.y) + p.x
                 )
                     inside = !inside;
                 p = p.next;

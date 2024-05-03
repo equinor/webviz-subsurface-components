@@ -82,8 +82,8 @@ interface IImageData {
     data: number[] | Uint8Array;
     count: number;
     parameters:
-    | typeof DEFAULT_TEXTURE_PARAMETERS
-    | typeof DISCRETE_TEXTURE_PARAMETERS;
+        | typeof DEFAULT_TEXTURE_PARAMETERS
+        | typeof DISCRETE_TEXTURE_PARAMETERS;
     isColoringDiscrete: boolean;
 }
 
