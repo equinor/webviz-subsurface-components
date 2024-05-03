@@ -1,8 +1,6 @@
-import type { BitmapLayerProps } from "@deck.gl/layers/typed";
-import { BitmapLayer } from "@deck.gl/layers/typed";
-import type { PickingInfo } from "@deck.gl/core/typed";
-import GL from "@luma.gl/constants";
-import { Texture2D } from "@luma.gl/webgl";
+import type { BitmapLayerPickingInfo, BitmapLayerProps } from "@deck.gl/layers";
+import { BitmapLayer } from "@deck.gl/layers";
+import type { PickingInfo } from "@deck.gl/core";
 
 import type { LayerPickInfo } from "../../layers/utils/layerTools";
 import { decoder } from "../shader_modules";
@@ -18,13 +16,6 @@ import type {
 import type { colorTablesArray } from "@emerson-eps/color-tables/";
 import { getRgbData } from "@emerson-eps/color-tables";
 import type { ContinuousLegendDataType } from "../../components/ColorLegend";
-
-const DEFAULT_TEXTURE_PARAMETERS = {
-    [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,
-    [GL.TEXTURE_MAG_FILTER]: GL.LINEAR,
-    [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
-    [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE,
-};
 
 function getImageData(
     colorMapName: string,
@@ -129,12 +120,8 @@ export default class ColormapLayer extends BitmapLayer<ColormapLayerProps> {
 
     // Signature from the base class, eslint doesn't like the any type.
     // eslint-disable-next-line
-    draw({ moduleParameters, uniforms, context }: any): void {
-        if (!this.state["isLoaded"]) {
-            this.setState({
-                isLoaded: true,
-            });
-
+    draw({ moduleParameters, uniforms }: any): void {
+        if (!this.isLoaded) {
             if (typeof this.props.reportBoundingBox !== "undefined") {
                 const xMin = this.props.bounds[0] as number;
                 const yMin = this.props.bounds[1] as number;
@@ -173,22 +160,22 @@ export default class ColormapLayer extends BitmapLayer<ColormapLayerProps> {
         const colorMapRangeMin = this.props.colorMapRange?.[0] ?? valueRangeMin;
         const colorMapRangeMax = this.props.colorMapRange?.[1] ?? valueRangeMax;
 
+        const colormap = this.context.device.createTexture({
+            width: 256,
+            height: 1,
+            format: "rgb8unorm-webgl",
+            data: getImageData(
+                this.props.colorMapName,
+                (this.context as DeckGLLayerContext).userData.colorTables,
+                this.props.colorMapFunction
+            ),
+        });
+
         super.draw({
             uniforms: {
                 ...uniforms,
                 // Send the colormap texture to the shader.
-                colormap: new Texture2D(context.gl, {
-                    width: 256,
-                    height: 1,
-                    format: GL.RGB,
-                    data: getImageData(
-                        this.props.colorMapName,
-                        (this.context as DeckGLLayerContext).userData
-                            .colorTables,
-                        this.props.colorMapFunction
-                    ),
-                    parameters: DEFAULT_TEXTURE_PARAMETERS,
-                }),
+                colormap,
                 valueRangeMin,
                 valueRangeMax,
                 colorMapRangeMin,
@@ -209,9 +196,13 @@ export default class ColormapLayer extends BitmapLayer<ColormapLayerProps> {
         return parentShaders;
     }
 
-    getPickingInfo({ info }: { info: PickingInfo }): LayerPickInfo {
-        if (this.state["pickingDisabled"] || !info.color) {
-            return info;
+    getPickingInfo({
+        info,
+    }: {
+        info: PickingInfo;
+    }): BitmapLayerPickingInfo & LayerPickInfo {
+        if (this.state["disablePicking"] || !info.color) {
+            return info as BitmapLayerPickingInfo;
         }
 
         const mergedDecoder = {
@@ -228,7 +219,7 @@ export default class ColormapLayer extends BitmapLayer<ColormapLayerProps> {
             // For more details, see https://deck.gl/docs/developer-guide/custom-layers/picking
             index: 0,
             propertyValue: val,
-        };
+        } as unknown as BitmapLayerPickingInfo;
     }
 
     getLegendData(): ContinuousLegendDataType {

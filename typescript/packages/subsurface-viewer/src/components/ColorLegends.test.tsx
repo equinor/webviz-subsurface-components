@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+import type { Layer } from "@deck.gl/core";
+import "@testing-library/jest-dom";
 import { render } from "@testing-library/react";
 import "jest-styled-components";
-import "@testing-library/jest-dom";
 import React from "react";
-import ColorLegends from "./ColorLegends";
-import type { Layer } from "@deck.gl/core/typed";
 import { getLayersInViewport } from "../layers/utils/layerTools";
+import ColorLegends from "./ColorLegends";
 
 import { colorTables } from "@emerson-eps/color-tables";
 

@@ -1,26 +1,26 @@
-import type React from "react";
 import { isEqual } from "lodash";
+import type React from "react";
 
 import type {
     Color,
     CompositeLayerProps,
     Layer,
     UpdateParameters,
-} from "@deck.gl/core/typed";
-import { CompositeLayer } from "@deck.gl/core/typed";
+} from "@deck.gl/core";
+import { CompositeLayer } from "@deck.gl/core";
 
-import type { Matrix4 } from "math.gl";
 import * as png from "@vivaxy/png";
+import type { Matrix4 } from "math.gl";
 
 import workerpool from "workerpool";
 
-import type { Material } from "./privateMapLayer";
-import PrivateMapLayer from "./privateMapLayer";
+import type { ReportBoundingBoxAction } from "../../components/Map";
 import type {
     ExtendedLayerProps,
     colorMapFunctionType,
 } from "../utils/layerTools";
-import type { ReportBoundingBoxAction } from "../../components/Map";
+import type { Material } from "./privateMapLayer";
+import PrivateMapLayer from "./privateMapLayer";
 
 import { getModelMatrix } from "../utils/layerTools";
 import { rotate } from "./utils";
@@ -295,7 +295,8 @@ export default class MapLayer<
             subLayers.length > 0 && // Note super version differs only in this. It returns true on empty array.
             subLayers.every((layer) => layer.isLoaded);
 
-        const isFinished = this.state?.["isFinishedLoading"] ?? false;
+        const isFinished =
+            (this.state?.["isFinishedLoading"] as boolean) ?? false;
         return isLoaded && isFinished;
     }
 
@@ -413,11 +414,11 @@ export default class MapLayer<
         oldProps,
     }: UpdateParameters<
         MapLayer &
-            Layer<
-                Required<MapLayerProps> &
-                    ExtraProps &
-                    Required<CompositeLayerProps>
-            >
+        Layer<
+            Required<MapLayerProps> &
+            ExtraProps &
+            Required<CompositeLayerProps>
+        >
     >): void {
         const needs_reload =
             !isEqual(props.meshUrl, oldProps.meshUrl) ||

@@ -1,11 +1,11 @@
-import type { PickingInfo, LayersList } from "@deck.gl/core/typed";
-import { CompositeLayer } from "@deck.gl/core/typed";
-import { SelectionLayer } from "@nebula.gl/layers";
-import { GeoJsonLayer } from "@deck.gl/layers/typed";
+import { SelectionLayer } from "@deck.gl-community/editable-layers";
+import type { Color, LayersList, PickingInfo } from "@deck.gl/core";
+import { CompositeLayer } from "@deck.gl/core";
+import type { GeoJsonLayerProps } from "@deck.gl/layers";
+import { GeoJsonLayer } from "@deck.gl/layers";
+import type { Feature } from "geojson";
 import type { ExtendedLayerProps } from "../utils/layerTools";
 import { getSize } from "../wells/wellsLayer";
-import type { Color } from "@deck.gl/core/typed";
-import type { Feature } from "geojson";
 
 export interface BoxSelectionLayerProps extends ExtendedLayerProps {
     mode: string; // One of modes in MODE_MAP
@@ -83,7 +83,7 @@ export default class BoxSelectionLayer extends CompositeLayer<BoxSelectionLayerP
         const positionFormat = isOrthographic ? "XY" : "XYZ";
         const geoJsonLayer = new GeoJsonLayer({
             id: "geoJson",
-            data: this.state["data"],
+            data: this.state["data"] as GeoJsonLayerProps["data"],
             pickable: false,
             stroked: false,
             positionFormat,
@@ -101,7 +101,6 @@ export default class BoxSelectionLayer extends CompositeLayer<BoxSelectionLayerP
             getLineColor: [255, 140, 0],
         });
         const selectionLayer = new SelectionLayer(
-            // @ts-expect-error: EditableGeoJsonLayer from nebula.gl has no typing
             this.getSubLayerProps({
                 id: "selection",
                 selectionType: "rectangle",
@@ -122,7 +121,6 @@ export default class BoxSelectionLayer extends CompositeLayer<BoxSelectionLayerP
                 lineWidthMinPixels: 3,
             })
         );
-        // @ts-expect-error: EditableGeoJsonLayer from nebula.gl has no typing
         return [selectionLayer, geoJsonLayer];
     }
 }

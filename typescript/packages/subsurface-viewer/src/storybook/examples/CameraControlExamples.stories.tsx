@@ -13,7 +13,7 @@ import SubsurfaceViewer from "../../SubsurfaceViewer";
 import type { BoundingBox3D, ViewStateType } from "../../components/Map";
 import { Axes2DLayer, AxesLayer } from "../../layers";
 
-import { GeoJsonLayer } from "@deck.gl/layers/typed";
+import { GeoJsonLayer } from "@deck.gl/layers";
 import {
     customLayerWithPolygonDataProps,
     default2DViews,

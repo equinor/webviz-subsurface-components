@@ -1,28 +1,28 @@
 import type {
+    LayerContext,
     PickingInfo,
     UpdateParameters,
-    LayerContext,
-} from "@deck.gl/core/typed";
-import {
-    COORDINATE_SYSTEM,
-    Layer,
-    picking,
-    project,
-} from "@deck.gl/core/typed";
-import type { LayerPickInfo, PropertyDataType } from "../utils/layerTools";
-import { createPropertyData } from "../utils/layerTools";
-import { Model, Geometry } from "@luma.gl/engine";
+} from "@deck.gl/core";
+import { COORDINATE_SYSTEM, Layer, picking, project } from "@deck.gl/core";
+import { GL } from "@luma.gl/constants";
+import type { GeometryProps } from "@luma.gl/engine";
+import { Geometry, Model } from "@luma.gl/engine";
+import type { Device, UniformValue } from "@luma.gl/core";
 import type { DeckGLLayerContext } from "../../components/Map";
-import type { ExtendedLayerProps } from "../utils/layerTools";
-import vsShader from "./vertex.glsl";
-import fsShader from "./fragment.fs.glsl";
-import vsLineShader from "./vertex_lines.glsl";
-import fsLineShader from "./fragment_lines.glsl";
-import GL from "@luma.gl/constants";
 import { localPhongLighting } from "../shader_modules";
+import type {
+    ExtendedLayerProps,
+    LayerPickInfo,
+    PropertyDataType,
+} from "../utils/layerTools";
+import { createPropertyData } from "../utils/layerTools";
+import fsShader from "./fragment.fs.glsl";
+import fsLineShader from "./fragment_lines.glsl";
+import vsShader from "./vertex.glsl";
+import vsLineShader from "./vertex_lines.glsl";
 
 export type GeometryTriangles = {
-    drawMode: number;
+    topology: GeometryProps["topology"];
     attributes: {
         positions: { value: Float32Array; size: number };
         TEXCOORD_0?: { value: Float32Array; size: number };
@@ -34,7 +34,7 @@ export type GeometryTriangles = {
 };
 
 export type GeometryLines = {
-    drawMode: number;
+    topology: GeometryProps["topology"];
     attributes: {
         positions: { value: Float32Array; size: number };
     };
@@ -43,11 +43,11 @@ export type GeometryLines = {
 
 export type Material =
     | {
-          ambient: number;
-          diffuse: number;
-          shininess: number;
-          specularColor: [number, number, number];
-      }
+        ambient: number;
+        diffuse: number;
+        shininess: number;
+        specularColor: [number, number, number];
+    }
     | boolean;
 
 export interface PrivateTriangleLayerProps extends ExtendedLayerProps {
@@ -75,11 +75,11 @@ const defaultProps = {
 // This is a private layer used only by the composite TriangleLayer
 export default class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProps> {
     get isLoaded(): boolean {
-        return this.state["isLoaded"] ?? false;
+        return this.isLoaded ?? false;
     }
 
     initializeState(context: DeckGLLayerContext): void {
-        const { gl } = context;
+        const gl = context.device;
         const [triangleModel, lineMode] = this._getModels(gl);
         this.setState({ models: [triangleModel, lineMode], isLoaded: false });
     }
@@ -104,7 +104,7 @@ export default class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProp
         this.initializeState(context as DeckGLLayerContext);
     }
 
-    _getModels(gl: WebGLRenderingContext): [unknown, unknown] {
+    _getModels(gl: Device): [unknown, unknown] {
         const triangleModel = new Model(gl, {
             id: `${this.props.id}-mesh`,
             vs: vsShader,
@@ -128,7 +128,7 @@ export default class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProp
 
     draw(args: {
         moduleParameters?: unknown;
-        uniforms: number[];
+        uniforms: UniformValue;
         context: LayerContext;
     }): void {
         if (!this.state["models"]) {
@@ -141,7 +141,7 @@ export default class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProp
         const contourReferencePoint = this.props.contours[0] ?? -1.0;
         const contourInterval = this.props.contours[1] ?? -1.0;
 
-        const [triangleModel, lineModel] = this.state["models"];
+        const [triangleModel, lineModel] = this.state["models"] as Model[];
 
         const smoothShading = this.props.smoothShading;
 
@@ -154,25 +154,25 @@ export default class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProp
         }
         gl.enable(GL.POLYGON_OFFSET_FILL);
         gl.polygonOffset(1, 1);
-        triangleModel
-            .setUniforms({
-                ...uniforms,
-                contourReferencePoint,
-                contourInterval,
-                smoothShading,
-                uColor,
-                ZIncreasingDownwards: this.props.ZIncreasingDownwards,
-            })
-            .draw();
+        triangleModel.setUniforms({
+            uniforms,
+            contourReferencePoint,
+            contourInterval,
+            smoothShading,
+            uColor,
+            ZIncreasingDownwards: this.props.ZIncreasingDownwards,
+        });
+
+        triangleModel.draw(context.renderPass);
+
         gl.disable(GL.POLYGON_OFFSET_FILL);
 
         if (this.props.gridLines) {
-            lineModel
-                .setUniforms({
-                    ...uniforms,
-                    ZIncreasingDownwards: this.props.ZIncreasingDownwards,
-                })
-                .draw();
+            lineModel.setUniforms({
+                uniforms,
+                ZIncreasingDownwards: this.props.ZIncreasingDownwards,
+            });
+            lineModel.draw(context.renderPass);
         }
 
         if (!this.props.depthTest) {
