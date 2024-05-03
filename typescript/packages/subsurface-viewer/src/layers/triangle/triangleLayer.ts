@@ -1,15 +1,15 @@
-import type React from "react";
 import { isEqual } from "lodash";
+import type React from "react";
 
-import type { UpdateParameters } from "@deck.gl/core/typed";
-import { CompositeLayer } from "@deck.gl/core/typed";
+import type { UpdateParameters } from "@deck.gl/core";
+import { CompositeLayer } from "@deck.gl/core";
 
 import workerpool from "workerpool";
 
+import type { ReportBoundingBoxAction } from "../../components/Map";
+import type { ExtendedLayerProps } from "../utils/layerTools";
 import type { Material } from "./privateTriangleLayer";
 import PrivateTriangleLayer from "./privateTriangleLayer";
-import type { ExtendedLayerProps } from "../utils/layerTools";
-import type { ReportBoundingBoxAction } from "../../components/Map";
 import { makeFullMesh } from "./webworker";
 
 import config from "../../SubsurfaceConfig.json";
@@ -180,7 +180,9 @@ export default class TriangleLayer extends CompositeLayer<TriangleLayerProps> {
             subLayers.length > 0 &&
             subLayers.every((layer) => layer.isLoaded);
 
-        const isFinished = this.state?.["isFinishedLoading"] ?? false;
+        const isFinishedLoading = this.state?.["isFinishedLoading"] as boolean;
+        const isFinished = isFinishedLoading ?? false;
+        //const isFinished = this.state?.["isFinishedLoading"] ?? false;
         return isLoaded && isFinished;
     }
 

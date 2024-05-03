@@ -7,19 +7,20 @@ import {
     MapView,
     OrbitView,
     OrthographicView,
-} from "@deck.gl/core/typed";
+} from "@deck.gl/core";
 
-import * as AggregationLayers from "@deck.gl/aggregation-layers/typed";
-import * as GeoLayers from "@deck.gl/geo-layers/typed";
-import * as Layers from "@deck.gl/layers/typed";
-import * as MeshLayers from "@deck.gl/mesh-layers/typed";
-import { EditableGeoJsonLayer } from "@nebula.gl/layers";
+import * as AggregationLayers from "@deck.gl/aggregation-layers";
+import * as GeoLayers from "@deck.gl/geo-layers";
+import * as Layers from "@deck.gl/layers";
+import * as MeshLayers from "@deck.gl/mesh-layers";
+//import { EditableGeoJsonLayer } from "@nebula.gl/layers";
 
 import { registerLoaders } from "@loaders.gl/core";
 import GL from "@luma.gl/constants";
 
 import * as CustomLayers from "../layers";
 import * as CustomViews from "../views";
+import { EditableGeoJsonLayer } from "@deck.gl-community/editable-layers";
 
 // Note: deck already registers JSONLoader...
 registerLoaders([]);

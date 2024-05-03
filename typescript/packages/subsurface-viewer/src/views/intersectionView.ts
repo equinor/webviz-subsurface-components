@@ -1,11 +1,12 @@
-import type { OrthographicViewState } from "@deck.gl/core/typed";
-import { View } from "@deck.gl/core/typed";
+import type { OrthographicViewState } from "@deck.gl/core";
+import { View } from "@deck.gl/core";
+import type { CommonViewProps } from "@deck.gl/core/dist/views/view";
 import IntersectionViewport from "../viewports/intersectionViewport";
 
 // IntersectionViewState and IntersectionViewProps may need to have its own implementation when defining pan and zoom controls
 export type IntersectionViewState = OrthographicViewState;
 
-type IntersectionViewProps = {
+type IntersectionViewProps = CommonViewProps<IntersectionViewState> & {
     /** Distance of near clipping plane. Default `0.1`. */
     near?: number;
     /** Distance of far clipping plane. Default `1000`. */

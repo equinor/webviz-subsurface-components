@@ -1,4 +1,4 @@
-import GL from "@luma.gl/constants";
+//import { GL } from "@luma.gl/constants";
 import { Geometry, Model } from "@luma.gl/engine";
 import type {
     Accessor,
@@ -10,8 +10,10 @@ import type {
     UpdateParameters,
     LayerProps,
     Unit,
-} from "@deck.gl/core/typed";
-import { Layer, project, picking, UNIT } from "@deck.gl/core/typed";
+} from "@deck.gl/core";
+import { Layer, project, picking, UNIT } from "@deck.gl/core";
+import type { UniformValue } from "@luma.gl/core";
+import type { GeometryProps } from "@luma.gl/engine";
 
 import type {
     ExtendedLayerProps,
@@ -171,7 +173,8 @@ const defaultProps: DefaultProps<WellMarkersLayerProps> = {
 interface IMarkerShape {
     positions: Float32Array;
     outline: Float32Array;
-    drawMode: number;
+    drawMode: GeometryProps["topology"];
+    //drawMode: number;
 }
 
 export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
@@ -186,41 +189,41 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
         this.getAttributeManager()!.addInstanced({
             instancePositions: {
                 size: 3,
-                type: GL.DOUBLE,
+                type: "float64",
                 transition: true,
                 accessor: "getPosition",
             },
             instanceSizes: {
                 size: 1,
-                type: GL.DOUBLE,
+                type: "float64",
                 transition: true,
                 accessor: "getSize",
                 defaultValue: 1.0,
             },
             instanceAzimuths: {
                 size: 1,
-                type: GL.DOUBLE,
+                type: "float64",
                 transition: true,
                 accessor: "getAzimuth",
                 defaultValue: 0,
             },
             instanceInclinations: {
                 size: 1,
-                type: GL.DOUBLE,
+                type: "float64",
                 transition: true,
                 accessor: "getInclination",
                 defaultValue: 0,
             },
             instanceColors: {
                 size: 4,
-                type: GL.UNSIGNED_BYTE,
+                type: "uint8",
                 transition: true,
                 accessor: "getColor",
                 defaultValue: [255, 0, 0, 255],
             },
             instanceOutlineColors: {
                 size: 4,
-                type: GL.UNSIGNED_BYTE,
+                type: "uint8",
                 transition: true,
                 accessor: "getOutlineColor",
                 defaultValue: [255, 0, 255, 255],
@@ -230,15 +233,17 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
         this.setState({ shapeModel: models[0], outlineModel: models[1] });
     }
 
-    updateState(params: UpdateParameters<this>) {
+    updateState(params: UpdateParameters<Layer<WellMarkersLayerProps>>) {
         super.updateState(params);
 
         if (
             params.changeFlags.extensionsChanged ||
             params.changeFlags.propsChanged
         ) {
-            this.state?.["shapeModel"]?.delete();
-            this.state?.["outlineModel"]?.delete();
+            const oldShapeModel = this.state?.["shapeModel"] as Model;
+            oldShapeModel.destroy();
+            const oldOutlineModel = this.state?.["outlineModel"] as Model;
+            oldOutlineModel.destroy();
             const models = this._createModels();
             this.setState({
                 ...this.state,
@@ -251,14 +256,17 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
 
     getModels(): Model[] {
         if (this.state["shapeModel"] && this.state["outlineModel"]) {
-            return [this.state["shapeModel"], this.state["outlineModel"]];
+            return [
+                this.state["shapeModel"] as Model,
+                this.state["outlineModel"] as Model,
+            ];
         }
         return [];
     }
 
     draw(args: {
         moduleParameters?: unknown;
-        uniforms: number[];
+        uniforms: Record<string, UniformValue>;
         context: LayerContext;
     }): void {
         if (!this.state["shapeModel"]) {
@@ -269,20 +277,19 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
         if (models.length && models.length < 2) {
             return;
         }
-        models[0]
-            .setUniforms({
-                ...uniforms,
-                sizeUnits: UNIT[this.props.sizeUnits],
-                ZIncreasingDownwards: this.props.ZIncreasingDownwards,
-            })
-            .draw();
-        models[1]
-            .setUniforms({
-                ...uniforms,
-                ZIncreasingDownwards: this.props.ZIncreasingDownwards,
-                sizeUnits: UNIT[this.props.sizeUnits],
-            })
-            .draw();
+        models[0].setUniforms({
+            ...uniforms,
+            sizeUnits: UNIT[this.props.sizeUnits],
+            ZIncreasingDownwards: this.props.ZIncreasingDownwards,
+        });
+
+        models[0].draw(args.context.renderPass);
+        models[1].setUniforms({
+            ...uniforms,
+            ZIncreasingDownwards: this.props.ZIncreasingDownwards,
+            sizeUnits: UNIT[this.props.sizeUnits],
+        });
+        models[1].draw(args.context.renderPass);
     }
 
     getPickingInfo({ info }: { info: PickingInfo }): LayerPickInfo {
@@ -342,26 +349,26 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
         ];
 
         this.shapes.set("triangle", {
-            drawMode: GL.TRIANGLES,
+            drawMode: "triangle-list",
             positions: new Float32Array(triangle_positions),
             outline: new Float32Array(triangle_positions),
         });
 
         this.shapes.set("circle", {
-            drawMode: GL.TRIANGLE_FAN,
+            drawMode: "triangle-fan-webgl",
             positions: new Float32Array(circle_positions),
             outline: new Float32Array(circle_positions.slice(3)),
         });
 
         this.shapes.set("square", {
-            drawMode: GL.TRIANGLE_STRIP,
+            drawMode: "triangle-strip",
             positions: new Float32Array(square_positions),
             outline: new Float32Array(square_outline),
         });
     }
 
     protected _createModels(): Model[] {
-        const gl = this.context.gl;
+        const gl = this.context.device;
 
         const shape = this.shapes.get(this.props.shape);
         if (!shape) {
@@ -373,7 +380,7 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
             vs: vsShader,
             fs: fsShader,
             geometry: new Geometry({
-                drawMode: shape.drawMode,
+                topology: shape.drawMode,
                 attributes: {
                     positions: { size: 3, value: shape.positions },
                 },
@@ -391,7 +398,7 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
             vs: vsShader,
             fs: fsShader,
             geometry: new Geometry({
-                drawMode: GL.LINE_LOOP,
+                topology: "line-loop-webgl",
                 attributes: {
                     positions: { size: 3, value: shape.outline },
                 },
@@ -409,14 +416,14 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
 
     protected _createEmptyModels(): Model[] {
         return [
-            new Model(this.context.gl, {
+            new Model(this.context.device, {
                 id: `${this.props.id}-empty-mesh`,
                 vs: vsShader,
                 fs: fsShader,
                 isInstanced: true,
                 instanceCount: 0,
             }),
-            new Model(this.context.gl, {
+            new Model(this.context.device, {
                 id: `${this.props.id}-empty-outline`,
                 vs: vsShader,
                 fs: fsShader,

@@ -676,7 +676,7 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
                     p.y > py !== p.next.y > py &&
                     p.next.y !== p.y &&
                     px <
-                        ((p.next.x - p.x) * (py - p.y)) / (p.next.y - p.y) + p.x
+                    ((p.next.x - p.x) * (py - p.y)) / (p.next.y - p.y) + p.x
                 )
                     inside = !inside;
                 p = p.next;
@@ -1044,8 +1044,9 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
         console.log("Number of polygons: ", pn);
         console.log("Number of triangles: ", meshArrays.counts.triangles);
 
+
         const mesh: MeshType = {
-            drawMode: 4, // corresponds to GL.TRIANGLES,
+            drawMode:  "triangle-list",
             attributes: {
                 positions: { value: meshArrays.arrays.trianglePoints, size: 3 },
                 properties: { value: meshArrays.arrays.properties, size: 1 },
@@ -1055,13 +1056,14 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
         };
 
         const mesh_lines: MeshTypeLines = {
-            drawMode: 1, // corresponds to GL.LINES,
+            drawMode: "line-list",
             attributes: {
                 positions: { value: params.points, size: 3 },
                 indices: { value: meshArrays.arrays.lineIndices, size: 1 },
             },
             vertexCount: linesVertexCount,
         };
+
 
         const t1 = performance.now();
         //Keep this.

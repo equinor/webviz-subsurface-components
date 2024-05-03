@@ -1,13 +1,10 @@
-import type { PickingInfo, UpdateParameters, Color } from "@deck.gl/core/typed";
-import {
-    COORDINATE_SYSTEM,
-    Layer,
-    picking,
-    project,
-} from "@deck.gl/core/typed";
-
-import { Model, Geometry } from "@luma.gl/engine";
+import type { Color, PickingInfo, UpdateParameters } from "@deck.gl/core";
+import { COORDINATE_SYSTEM, Layer, picking, project } from "@deck.gl/core";
+import type { Texture } from "@luma.gl/core";
+import type { GeometryProps } from "@luma.gl/engine";
+import { Geometry, Model } from "@luma.gl/engine";
 import type { DeckGLLayerContext } from "../../components/Map";
+import { localPhongLighting, utilities } from "../shader_modules";
 import type {
     ExtendedLayerProps,
     LayerPickInfo,
@@ -15,32 +12,31 @@ import type {
     colorMapFunctionType,
 } from "../utils/layerTools";
 import { createPropertyData, getImageData } from "../utils/layerTools";
-import { Texture2D } from "@luma.gl/webgl";
-import GL from "@luma.gl/constants";
-import vsShader from "./vertex.glsl";
 import fsShader from "./fragment.fs.glsl";
-import vsLineShader from "./vertex_lines.glsl";
 import fsLineShader from "./fragment_lines.glsl";
-import { localPhongLighting, utilities } from "../shader_modules";
+import type { IDiscretePropertyValueName } from "./grid3dLayer";
+
 import {
     TGrid3DColoringMode,
     type IDiscretePropertyValueName,
 } from "./grid3dLayer";
 
 import type { MeshType, MeshTypeLines } from "./typeDefs";
+import vsShader from "./vertex.glsl";  // XXX er disse brukt
+import vsLineShader from "./vertex_lines.glsl";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
-    [GL.TEXTURE_MIN_FILTER]: GL.LINEAR,
-    [GL.TEXTURE_MAG_FILTER]: GL.LINEAR,
-    [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
-    [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE,
+    textureMinFilter: "linear",
+    textureMagFilter: "linear",
+    textureWrapS: "clamp-to-edge",
+    textureWrapT: "clamp-to-edge",
 };
 
 const DISCRETE_TEXTURE_PARAMETERS = {
-    [GL.TEXTURE_MIN_FILTER]: GL.NEAREST,
-    [GL.TEXTURE_MAG_FILTER]: GL.NEAREST,
-    [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
-    [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE,
+    textureMinFilter: "nearest",
+    textureMagFilter: "nearest",
+    textureWrapS: "clamp-to-edge",
+    textureWrapT: "clamp-to-edge",
 };
 
 export interface PrivateLayerProps extends ExtendedLayerProps {
@@ -72,6 +68,7 @@ interface IPropertyUniforms {
     colormap: Texture2D;
     valueRangeMin: number;
     valueRangeMax: number;
+    colormap: Texture;
     colorMapRangeMin: number;
     colorMapRangeMax: number;
     colorMapClampColor: Color | undefined | boolean | number[];
@@ -85,15 +82,15 @@ interface IImageData {
     data: number[] | Uint8Array;
     count: number;
     parameters:
-        | typeof DEFAULT_TEXTURE_PARAMETERS
-        | typeof DISCRETE_TEXTURE_PARAMETERS;
+    | typeof DEFAULT_TEXTURE_PARAMETERS
+    | typeof DISCRETE_TEXTURE_PARAMETERS;
     isColoringDiscrete: boolean;
 }
 
 // This is a private layer used only by the composite Grid3DLayer
 export default class PrivateLayer extends Layer<PrivateLayerProps> {
     get isLoaded(): boolean {
-        return this.state["isLoaded"] ?? false;
+        return (this.state["isLoaded"] as boolean) ?? false;
     }
 
     initializeState(context: DeckGLLayerContext): void {
@@ -132,7 +129,8 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             vs: vsShader,
             fs: fsShader,
             geometry: new Geometry({
-                drawMode: this.props.mesh.drawMode,
+                //drawMode: this.props.mesh.drawMode,
+                topology: this.props.mesh.drawMode ?? "triangle-list",
                 attributes: {
                     positions: this.props.mesh.attributes.positions,
                     properties: this.props.mesh.attributes.properties,
@@ -167,7 +165,7 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
         const { uniforms, context } = args;
         const { gl } = context;
 
-        const [model_mesh, mesh_lines_model] = this.state["models"];
+        const [model_mesh, mesh_lines_model] = this.state["models"] as Model[];
 
         gl.enable(gl.POLYGON_OFFSET_FILL);
         gl.polygonOffset(1, 1);
@@ -178,24 +176,22 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
 
         const propertyUniforms = this.getPropertyUniforms(context);
 
-        model_mesh
-            .setUniforms({
-                ...uniforms,
-                ...propertyUniforms,
-                coloringMode: this.props.coloringMode,
-                ZIncreasingDownwards: this.props.ZIncreasingDownwards,
-            })
-            .draw();
+        model_mesh.setUniforms({
+            ...uniforms,
+            ...propertyUniforms,
+            coloringMode: this.props.coloringMode,
+            ZIncreasingDownwards: this.props.ZIncreasingDownwards,
+        });
+        model_mesh.draw(gl);
         gl.disable(gl.POLYGON_OFFSET_FILL);
 
         // Draw lines.
         if (this.props.gridLines) {
-            mesh_lines_model
-                .setUniforms({
-                    ...uniforms,
-                    ZIncreasingDownwards: this.props.ZIncreasingDownwards,
-                })
-                .draw();
+            mesh_lines_model.setUniforms({
+                ...uniforms,
+                ZIncreasingDownwards: this.props.ZIncreasingDownwards,
+            });
+            mesh_lines_model.draw(gl);
         }
 
         if (!this.props.depthTest) {
@@ -354,14 +350,13 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
 
         const imageData = this.getImageData();
 
-        const colormap = new Texture2D(context.gl, {
+        const colormap = context.device.createTexture({
             width: imageData.count,
             height: 1,
-            format: GL.RGB,
+            format: "uint8",
             data: imageData.data,
             parameters: imageData.parameters,
         });
-
         return {
             colormap,
             valueRangeMin,
