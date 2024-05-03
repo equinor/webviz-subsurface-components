@@ -45,11 +45,11 @@ const DEFAULT_TEXTURE_PARAMETERS = {
 
 export type Material =
     | {
-        ambient: number;
-        diffuse: number;
-        shininess: number;
-        specularColor: [number, number, number];
-    }
+          ambient: number;
+          diffuse: number;
+          shininess: number;
+          specularColor: [number, number, number];
+      }
     | boolean;
 export interface PrivateMapLayerProps extends ExtendedLayerProps {
     positions: Float32Array;

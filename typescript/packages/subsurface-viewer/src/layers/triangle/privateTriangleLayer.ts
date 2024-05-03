@@ -43,11 +43,11 @@ export type GeometryLines = {
 
 export type Material =
     | {
-        ambient: number;
-        diffuse: number;
-        shininess: number;
-        specularColor: [number, number, number];
-    }
+          ambient: number;
+          diffuse: number;
+          shininess: number;
+          specularColor: [number, number, number];
+      }
     | boolean;
 
 export interface PrivateTriangleLayerProps extends ExtendedLayerProps {

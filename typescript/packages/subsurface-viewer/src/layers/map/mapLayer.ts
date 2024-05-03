@@ -414,11 +414,11 @@ export default class MapLayer<
         oldProps,
     }: UpdateParameters<
         MapLayer &
-        Layer<
-            Required<MapLayerProps> &
-            ExtraProps &
-            Required<CompositeLayerProps>
-        >
+            Layer<
+                Required<MapLayerProps> &
+                    ExtraProps &
+                    Required<CompositeLayerProps>
+            >
     >): void {
         const needs_reload =
             !isEqual(props.meshUrl, oldProps.meshUrl) ||

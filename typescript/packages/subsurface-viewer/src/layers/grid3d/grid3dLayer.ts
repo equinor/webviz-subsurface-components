@@ -76,7 +76,7 @@ type TTypedArray = Float32Array | Uint32Array | Uint16Array;
 
 async function loadData<T extends TTypedArray>(
     data: string | number[] | TTypedArray,
-    type: { new(data: unknown): T }
+    type: { new (data: unknown): T }
 ): Promise<T> {
     if (data instanceof type) {
         return data;
