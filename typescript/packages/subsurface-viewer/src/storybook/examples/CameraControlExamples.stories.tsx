@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 
-import { SimpleMeshLayer } from "@deck.gl/mesh-layers/typed";
+import { SimpleMeshLayer } from "@deck.gl/mesh-layers";
 import { SphereGeometry } from "@luma.gl/engine";
 
 import Box from "@mui/material/Box";
