@@ -1,5 +1,5 @@
-import type { PickingInfo } from "@deck.gl/core/typed";
-import type { Color } from "@deck.gl/core/typed";
+import type { PickingInfo } from "@deck.gl/core";
+import type { Color } from "@deck.gl/core";
 import type { colorTablesArray } from "@emerson-eps/color-tables/";
 import { rgbValues } from "@emerson-eps/color-tables/";
 import { createDefaultContinuousColorScale } from "@emerson-eps/color-tables/dist/component/Utils/legendCommonFunction";
@@ -9,7 +9,7 @@ import type {
     LayersList,
     LayerManager,
     CompositeLayerProps,
-} from "@deck.gl/core/typed";
+} from "@deck.gl/core";
 import { Matrix4 } from "math.gl";
 import type {
     ContinuousLegendDataType,

@@ -1,16 +1,19 @@
-import type { PickingInfo, Color, UpdateParameters } from "@deck.gl/core/typed";
-import { Layer, picking, project } from "@deck.gl/core/typed";
+import type { Color, PickingInfo, UpdateParameters } from "@deck.gl/core";
+import { Layer, picking, project } from "@deck.gl/core";
 
-import GL from "@luma.gl/constants";
-import { Model, Geometry } from "@luma.gl/engine";
+import { GL } from "@luma.gl/constants";
+import { Geometry, Model } from "@luma.gl/engine";
 
 import { Vector2 } from "@math.gl/core";
 
-import type { LayerPickInfo, PropertyDataType } from "../utils/layerTools";
+import type {
+    ExtendedLayerProps,
+    LayerPickInfo,
+    PropertyDataType,
+} from "../utils/layerTools";
 import { createPropertyData } from "../utils/layerTools";
-import type { ExtendedLayerProps } from "../utils/layerTools";
-import vertexShader from "./vertex.glsl";
 import fragmentShader from "./fragment.glsl";
+import vertexShader from "./vertex.glsl";
 
 type PieProperties = [{ color: Color; label: string }];
 
@@ -153,7 +156,7 @@ export default class PieChartLayer extends Layer<PieChartLayerProps<PiesData>> {
             vs: vertexShader,
             fs: fragmentShader,
             geometry: new Geometry({
-                drawMode: GL.TRIANGLES,
+                topology: "triangle-list",
                 attributes: {
                     positions: { value: new Float32Array(vertexs), size: 3 },
                     colors: { value: new Float32Array(colors), size: 3 },
@@ -197,13 +200,14 @@ export default class PieChartLayer extends Layer<PieChartLayerProps<PiesData>> {
         const pixels2world = d / npixels;
         const scale = pixels2world;
 
-        const model = this.state["model"];
+        const model = this.state["model"] as Model;
 
         if (!this.props.depthTest) {
             gl.disable(GL.DEPTH_TEST);
         }
 
-        model.setUniforms({ scale }).draw();
+        model.setUniforms({ scale });
+        gl.draw(model);
 
         if (!this.props.depthTest) {
             gl.enable(GL.DEPTH_TEST);
@@ -225,7 +229,8 @@ export default class PieChartLayer extends Layer<PieChartLayerProps<PiesData>> {
 
         const pieIndex = 256 * 256 * r + 256 * g + b;
 
-        const [pie_label, pie_frac] = this.state["pieInfo"][pieIndex];
+        const pieInfo = this.state["pieInfo"] as string[][];
+        const [pie_label, pie_frac] = pieInfo[pieIndex];
         const layer_properties: PropertyDataType[] = [];
         layer_properties.push(createPropertyData(pie_label, pie_frac));
 

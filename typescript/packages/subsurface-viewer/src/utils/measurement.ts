@@ -1,9 +1,13 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 
-import type { FeatureOf, LineString, Polygon } from "@nebula.gl/edit-modes";
-import type { Position } from "@deck.gl/core/typed";
+import type {
+    FeatureOf,
+    LineString,
+    Polygon,
+} from "@deck.gl-community/editable-layers";
+import type { Position } from "@deck.gl/core";
 
-import { segmentReduce, geomReduce } from "@turf/meta";
+import { geomReduce, segmentReduce } from "@turf/meta";
 
 export function length(geojson: FeatureOf<LineString>): number {
     // Calculate distance from 2-vertex line segments

@@ -1,16 +1,16 @@
 import type {
-    Viewport,
+    Color,
     LayerContext,
     UpdateParameters,
-} from "@deck.gl/core/typed";
-import { Layer, project, OrthographicViewport } from "@deck.gl/core/typed";
-import GL from "@luma.gl/constants";
-import { Model, Geometry } from "@luma.gl/engine";
+    Viewport,
+} from "@deck.gl/core";
+import { Layer, OrthographicViewport, project } from "@deck.gl/core";
+//import GL from "@luma.gl/constants";
+import { Geometry, Model } from "@luma.gl/engine";
 import { Vector3 } from "@math.gl/core";
-import type { Color } from "@deck.gl/core/typed";
-import vertexShader from "./northarrow-vertex.glsl";
-import fragmentShader from "./northarrow-fragment.glsl";
 import type { ExtendedLayerProps } from "../utils/layerTools";
+import fragmentShader from "./northarrow-fragment.glsl";
+import vertexShader from "./northarrow-vertex.glsl";
 
 export interface NorthArrow3DLayerProps extends ExtendedLayerProps {
     color: Color;
@@ -103,7 +103,7 @@ export default class NorthArrow3DLayer extends Layer<NorthArrow3DLayerProps> {
             fs: fragmentShader,
             uniforms: { uColor: color },
             geometry: new Geometry({
-                drawMode: GL.LINES,
+                topology: "line-list",
                 attributes: {
                     positions: new Float32Array(lines),
                 },

@@ -1,11 +1,15 @@
-import { render, screen } from "@testing-library/react";
-import "jest-styled-components";
+import type { Layer } from "@deck.gl/core";
 import "@testing-library/jest-dom";
-import React from "react";
-import InfoCard from "./InfoCard";
+import {
+    render,
+    screen,
+    waitForElementToBeRemoved,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { Layer } from "@deck.gl/core/typed";
+import "jest-styled-components";
+import React from "react";
 import type { LayerPickInfo } from "../layers/utils/layerTools";
+import InfoCard from "./InfoCard";
 
 describe("Test Info Card", () => {
     it("snapshot test with no props", () => {
