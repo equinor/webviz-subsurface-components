@@ -16,7 +16,7 @@ import * as MeshLayers from "@deck.gl/mesh-layers";
 //import { EditableGeoJsonLayer } from "@nebula.gl/layers";
 
 import { registerLoaders } from "@loaders.gl/core";
-import GL from "@luma.gl/constants";
+//import GL from "@luma.gl/constants";
 
 import * as CustomLayers from "../layers";
 import * as CustomViews from "../views";
@@ -54,7 +54,7 @@ export default {
     // Will be resolved as `<enum-name>.<enum-value>`
     enumerations: {
         COORDINATE_SYSTEM,
-        GL,
+        //GL,
     },
 
     // Constants that should be resolved with the provided values by JSON converter

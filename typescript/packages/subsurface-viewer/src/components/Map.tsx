@@ -709,7 +709,7 @@ const Map: React.FC<MapProps> = ({
         [getCameraPosition, viewController]
     );
 
-    const effects = parseLights(lights);
+    const effects = parseLights(lights) ?? [];
 
     const [deckGlViews, deckGlViewState] = useMemo(() => {
         const state = {
