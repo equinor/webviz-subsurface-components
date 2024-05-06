@@ -21,8 +21,7 @@ const defaultProps = {
 
 export default class BoxLayer extends Layer<BoxLayerProps> {
     initializeState(context: DeckGLLayerContext): void {
-        const gl = context.device;
-        this.setState(this._getModels(gl));
+        this.setState(this._getModels(context.device));
     }
 
     shouldUpdateState(): boolean {
@@ -30,8 +29,7 @@ export default class BoxLayer extends Layer<BoxLayerProps> {
     }
 
     updateState({ context }: UpdateParameters<this>): void {
-        const { gl } = context;
-        this.setState(this._getModels(gl));
+        this.setState(this._getModels(context.device));
     }
 
     //eslint-disable-next-line
