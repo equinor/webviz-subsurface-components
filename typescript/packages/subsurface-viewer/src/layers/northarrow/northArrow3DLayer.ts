@@ -5,8 +5,8 @@ import type {
     Viewport,
 } from "@deck.gl/core";
 import { Layer, OrthographicViewport, project } from "@deck.gl/core";
-//import GL from "@luma.gl/constants";
 import { Geometry, Model } from "@luma.gl/engine";
+import type { Device } from "@luma.gl/core";
 import { Vector3 } from "@math.gl/core";
 import type { ExtendedLayerProps } from "../utils/layerTools";
 import fragmentShader from "./northarrow-fragment.glsl";
@@ -26,8 +26,7 @@ const defaultProps = {
 
 export default class NorthArrow3DLayer extends Layer<NorthArrow3DLayerProps> {
     initializeState(context: LayerContext): void {
-        const { gl } = context;
-        this.setState(this._getModels(gl));
+        this.setState(this._getModels(context.device));
     }
 
     shouldUpdateState(): boolean {
@@ -35,8 +34,8 @@ export default class NorthArrow3DLayer extends Layer<NorthArrow3DLayerProps> {
     }
 
     updateState({ context }: UpdateParameters<this>): void {
-        if (context.gl) {
-            this.setState(this._getModels(context.gl));
+        if (context.device) {
+            this.setState(this._getModels(context.device));
         }
     }
 
@@ -49,8 +48,7 @@ export default class NorthArrow3DLayer extends Layer<NorthArrow3DLayerProps> {
         gl.enable(gl.DEPTH_TEST);
     }
 
-    //eslint-disable-next-line
-    _getModels(gl: any) {
+    _getModels(gl: Device) {
         const model_lines = GetArrowLines();
 
         const is_orthographic =
