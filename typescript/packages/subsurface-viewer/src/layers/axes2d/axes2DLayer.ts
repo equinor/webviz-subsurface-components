@@ -12,7 +12,7 @@ import {
 } from "@deck.gl/core";
 import { load } from "@loaders.gl/core";
 import { ImageLoader } from "@loaders.gl/images";
-import type { UniformValue } from "@luma.gl/core";
+import type { UniformValue, SamplerProps } from "@luma.gl/core";
 import { Geometry, Model } from "@luma.gl/engine";
 import { vec4 } from "gl-matrix";
 import type { ExtendedLayerProps, Position3D } from "../utils/layerTools";
@@ -21,6 +21,13 @@ import labelFragmentShader from "./label-fragment.glsl";
 import labelVertexShader from "./label-vertex.glsl";
 import lineFragmentShader from "./line-fragment.glsl";
 import lineVertexShader from "./line-vertex.glsl";
+
+const DEFAULT_TEXTURE_PARAMETERS: SamplerProps = {
+    minFilter: "linear",
+    magFilter: "linear",
+    addressModeU: "clamp-to-edge",
+    addressModeV: "clamp-to-edge",
+};
 
 enum TEXT_ANCHOR {
     start = 0,
@@ -178,6 +185,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                 height: data.height,
                 format: "rgb8unorm-webgl",
                 data: data as ImageBitmap,
+                sampler: DEFAULT_TEXTURE_PARAMETERS,
             });
 
             const { label_models, line_model, background_model } =
@@ -234,15 +242,15 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
 
         const L = isTopOrBottomRuler
             ? LineLengthInPixels(
-                  [min, 0, 0],
-                  [max, 0, 0],
-                  this.context.viewport
-              )
+                [min, 0, 0],
+                [max, 0, 0],
+                this.context.viewport
+            )
             : LineLengthInPixels(
-                  [0, min, 0],
-                  [0, max, 0],
-                  this.context.viewport
-              );
+                [0, min, 0],
+                [0, max, 0],
+                this.context.viewport
+            );
 
         const ticks = GetTicks(min, max, L); // Note: this may be replaced by NiceTicks npm package.
 
