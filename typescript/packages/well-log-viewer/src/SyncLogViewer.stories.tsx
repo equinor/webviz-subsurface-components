@@ -157,9 +157,13 @@ const Template = (args) => {
         if (infoRef.current) infoRef.current.innerHTML = info;
     };
     const [controller, setController] = React.useState(null); // the first WellLog
+    const [controllers, setControllers] = React.useState([]); // all WellLogs
+
     const onCreateController = React.useCallback(
         (iWellLog, controller) => {
             if (iWellLog === 0) setController(controller);
+
+            setControllers(prev => ([...prev, controller]));
         },
         [controller]
     );
@@ -176,6 +180,15 @@ const Template = (args) => {
         [controller]
     );
 
+    const handleClick = function () {
+        for (let ctrl of controllers)
+        {
+            if (ctrl) {
+                ctrl.setControllerDefaultZoom();
+            };
+        }
+    };
+
     return (
         <div
             style={{ height: "92vh", display: "flex", flexDirection: "column" }}
@@ -190,7 +203,12 @@ const Template = (args) => {
                 />
             </div>
             {/* Print info for the first WellLog */}
-            <div ref={infoRef} style={{ width: "100%", flex: 0 }}></div>
+            <div style={{ display: "flex"}}>
+                <div ref={infoRef} style={{ display: "inline-block" }}></div>
+                <div> 
+                    <button onClick={handleClick} style={{ display: "inline-block", marginLeft: "10px"}}> Reset </button>
+                </div>
+            </div>
         </div>
     );
 };
@@ -483,6 +501,27 @@ const TemplateWithSelection = (args) => {
         filtered.push(args.welllogs[2]);
     }
 
+    const [controller, setController] = React.useState(null); // the first WellLog
+    const [controllers, setControllers] = React.useState([]); // all WellLogs
+
+    const onCreateController = React.useCallback(
+        (iView, controller) => {
+            if (iView === 0) setController(controller);
+
+            setControllers(prev => ([...prev, controller]));
+        },
+        [controller]
+    );
+
+    const handleClick = function () {
+        for (let ctrl of controllers)
+        {
+            if (ctrl) {
+                ctrl.setControllerDefaultZoom();
+            };
+        }
+    };
+
     const argsWithSelection = {
         ...args,
         welllogs: filtered,
@@ -520,9 +559,14 @@ const TemplateWithSelection = (args) => {
                 >
                     Well 3
                 </ToggleButton>
+                <button onClick={handleClick} style={{marginLeft: "10px", float: "right"}}> Reset </button>
             </div>
             <div style={{ width: "100%", height: "100%", flex: 1 }}>
-                <SyncLogViewer id="SyncLogViewer" {...argsWithSelection} />
+                <SyncLogViewer 
+                    id="SyncLogViewer" 
+                    {...argsWithSelection} 
+                    onCreateController={onCreateController}
+                />
             </div>
         </div>
     );
