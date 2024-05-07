@@ -7,9 +7,9 @@ precision highp float;
 out vec4 fragColor;
 
 void main(void) {
-  
+
   // Picking pass.
-  if (picking_uActive) {
+  if (picking.isActive > 0.5) {
     discard;
     return;
   }
