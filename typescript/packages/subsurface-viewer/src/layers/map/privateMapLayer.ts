@@ -108,7 +108,12 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
     //eslint-disable-next-line
     _getModels(gl: any) {
         const colormap: Texture = gl.createTexture({
-            sampler: { addressModeU: "clamp-to-edge" },
+            sampler: {
+                addressModeU: "clamp-to-edge",
+                addressModeV: "clamp-to-edge",
+                minFilter: "linear",
+                magFilter: "linear",
+            },
             width: 256,
             height: 1,
             format: "rgb8unorm-webgl",
