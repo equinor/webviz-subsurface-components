@@ -127,6 +127,11 @@ const StoryTemplate = (args) => {
     const onContentSelection = React.useCallback(() => {
         setInfo(fillInfo(controller));
     }, [controller]);
+    const handleClick = () => {
+        if (controller) {
+            controller.setControllerDefaultZoom();
+        }
+    };
 
     return (
         <div
@@ -141,7 +146,12 @@ const StoryTemplate = (args) => {
                     onContentSelection={onContentSelection}
                 />
             </div>
-            <div ref={infoRef} style={{ width: "100%", flex: 0 }}></div>
+            <div style={{ display: "flex", flexDirection: "row" }}>
+                <div ref={infoRef}></div>
+                <button onClick={handleClick} style={{ marginLeft: 10 }}>
+                    Reset
+                </button>
+            </div>
         </div>
     );
 };

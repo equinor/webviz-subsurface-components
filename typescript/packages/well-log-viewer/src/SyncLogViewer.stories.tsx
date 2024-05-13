@@ -10,6 +10,7 @@ const wellpick = require("../../../../example-data/wellpicks.json");// eslint-di
 import { ToggleButton } from "@mui/material";
 
 import SyncLogViewer, { argTypesSyncLogViewerProp } from "./SyncLogViewer";
+import type { WellLogController } from "./components/WellLogView";
 
 const ComponentCode =
     '<SyncLogViewer id="SyncLogViewer" \r\n' +
@@ -156,10 +157,17 @@ const Template = (args) => {
     const setInfo = function (info) {
         if (infoRef.current) infoRef.current.innerHTML = info;
     };
+
     const [controller, setController] = React.useState(null); // the first WellLog
+    const [controllers, setControllers] = React.useState<WellLogController[]>(
+        []
+    ); // all WellLogs
+
     const onCreateController = React.useCallback(
         (iWellLog, controller) => {
             if (iWellLog === 0) setController(controller);
+
+            setControllers((prev) => [...prev, controller]);
         },
         [controller]
     );
@@ -175,6 +183,13 @@ const Template = (args) => {
         },
         [controller]
     );
+    const handleClick = function () {
+        for (const ctrl of controllers) {
+            if (ctrl) {
+                ctrl.setControllerDefaultZoom();
+            }
+        }
+    };
 
     return (
         <div
@@ -190,7 +205,12 @@ const Template = (args) => {
                 />
             </div>
             {/* Print info for the first WellLog */}
-            <div ref={infoRef} style={{ width: "100%", flex: 0 }}></div>
+            <div style={{ display: "flex", flexDirection: "row" }}>
+                <div ref={infoRef}></div>
+                <button onClick={handleClick} style={{ marginLeft: 10 }}>
+                    Reset
+                </button>
+            </div>
         </div>
     );
 };
@@ -472,6 +492,14 @@ const TemplateWithSelection = (args) => {
     const [showWell2, setShowWell2] = React.useState(true);
     const [showWell3, setShowWell3] = React.useState(true);
 
+    const [controllers, setControllers] = React.useState<WellLogController[]>(
+        []
+    ); // all WellLogs
+
+    const onCreateController = React.useCallback((iWellLog, controller) => {
+        setControllers((prev) => [...prev, controller]);
+    }, []);
+
     const filtered: WellLog[] = [];
     if (showWell1) {
         filtered.push(args.welllogs[0]);
@@ -482,6 +510,13 @@ const TemplateWithSelection = (args) => {
     if (showWell3) {
         filtered.push(args.welllogs[2]);
     }
+    const handleClick = function () {
+        for (const ctrl of controllers) {
+            if (ctrl) {
+                ctrl.setControllerDefaultZoom();
+            }
+        }
+    };
 
     const argsWithSelection = {
         ...args,
@@ -520,9 +555,16 @@ const TemplateWithSelection = (args) => {
                 >
                     Well 3
                 </ToggleButton>
+                <button onClick={handleClick} style={{ float: "right" }}>
+                    Reset
+                </button>
             </div>
             <div style={{ width: "100%", height: "100%", flex: 1 }}>
-                <SyncLogViewer id="SyncLogViewer" {...argsWithSelection} />
+                <SyncLogViewer
+                    id="SyncLogViewer"
+                    {...argsWithSelection}
+                    onCreateController={onCreateController}
+                />
             </div>
         </div>
     );
