@@ -134,5 +134,8 @@
     },
     "workspaces": [
         "packages/*"
-    ]
+    ],
+    "dependencies": {
+        "@luma.gl/webgpu": "^9.0.12"
+    }
 }

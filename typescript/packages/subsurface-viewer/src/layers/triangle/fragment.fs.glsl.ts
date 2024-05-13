@@ -14,7 +14,6 @@ in vec4 position_commonspace;
 in vec3 worldPos;
 in float property;
 
-uniform sampler2D colormap;
 uniform vec4 uColor;
 uniform bool smoothShading;
 
