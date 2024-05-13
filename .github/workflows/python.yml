@@ -23,21 +23,26 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10"]
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
 
     steps:
       - name: 📖 Checkout commit locally
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: 🐍 Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+      - name: 🐍 Set up Python 3.8
+        uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: 3.8  # For compiling the JavaScript part we need dash<2.5, which is not supported on recent versions of Python
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
+
+      - name: 🐍 Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
 
       - name: 📦 Install build dependencies
         # The deckgl types package runs a postscript to setup, but since we ignore scripts, we need to set it up manually.
