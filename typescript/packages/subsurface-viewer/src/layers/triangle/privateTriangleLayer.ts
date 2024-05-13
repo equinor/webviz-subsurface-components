@@ -43,11 +43,11 @@ export type GeometryLines = {
 
 export type Material =
     | {
-        ambient: number;
-        diffuse: number;
-        shininess: number;
-        specularColor: [number, number, number];
-    }
+          ambient: number;
+          diffuse: number;
+          shininess: number;
+          specularColor: [number, number, number];
+      }
     | boolean;
 
 export interface PrivateTriangleLayerProps extends ExtendedLayerProps {
@@ -74,10 +74,14 @@ const defaultProps = {
 
 // This is a private layer used only by the composite TriangleLayer
 export default class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProps> {
+    get isLoaded(): boolean {
+        return (this.state["isLoaded"] as boolean) ?? false;
+    }
+
     initializeState(context: DeckGLLayerContext): void {
         const gl = context.device;
-        const [triangleModel, lineMode] = this._getModels(gl);
-        this.setState({ models: [triangleModel, lineMode], isLoaded: false });
+        const [triangleModel, lineModel] = this._getModels(gl);
+        this.setState({ models: [triangleModel, lineModel], isLoaded: false });
     }
 
     shouldUpdateState({
@@ -151,7 +155,7 @@ export default class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProp
         gl.enable(GL.POLYGON_OFFSET_FILL);
         gl.polygonOffset(1, 1);
         triangleModel.setUniforms({
-            uniforms,
+            ...uniforms,
             contourReferencePoint,
             contourInterval,
             smoothShading,
@@ -165,7 +169,7 @@ export default class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProp
 
         if (this.props.gridLines) {
             lineModel.setUniforms({
-                uniforms,
+                ...uniforms,
                 ZIncreasingDownwards: this.props.ZIncreasingDownwards,
             });
             lineModel.draw(context.renderPass);
