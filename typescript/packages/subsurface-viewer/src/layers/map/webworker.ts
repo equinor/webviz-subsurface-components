@@ -178,7 +178,7 @@ export function makeFullMesh(e: { data: Params }) {
     const positions = new Float32Array(
         isCellCenteredProperties ? nCells * 6 * 3 : nNodes * 3
     );
-    const normals = new Int8Array(
+    const normals = new Float32Array(
         isCellCenteredProperties || !smoothShading ? 0 : nNodes * 3
     );
     const triangleIndices = new Uint32Array(nTriangles * 3);
@@ -230,9 +230,9 @@ export function makeFullMesh(e: { data: Params }) {
                         dx,
                         dy
                     ); // eslint-disable-line
-                    normals[3 * i + 0] = normal[0] * 127; // Normalize to signed 8 bit.
-                    normals[3 * i + 1] = normal[1] * 127;
-                    normals[3 * i + 2] = normal[2] * 127;
+                    normals[3 * i + 0] = normal[0];
+                    normals[3 * i + 1] = normal[1];
+                    normals[3 * i + 2] = normal[2];
                 }
 
                 vertexProperties[i] = propertyValue;
@@ -535,7 +535,7 @@ export function makeFullMesh(e: { data: Params }) {
 
     type returnType = [
         Float32Array,
-        Int8Array,
+        Float32Array,
         Uint32Array,
         Float32Array,
         Uint32Array,
