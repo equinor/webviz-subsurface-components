@@ -22,13 +22,6 @@ import labelVertexShader from "./label-vertex.glsl";
 import lineFragmentShader from "./line-fragment.glsl";
 import lineVertexShader from "./line-vertex.glsl";
 
-const DEFAULT_TEXTURE_PARAMETERS: SamplerProps = {
-    minFilter: "linear",
-    magFilter: "linear",
-    addressModeU: "clamp-to-edge",
-    addressModeV: "clamp-to-edge",
-};
-
 enum TEXT_ANCHOR {
     start = 0,
     middle = 1,
@@ -179,13 +172,18 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
             image: { type: "data" }, // Will load as ImageData.
         });
 
-        promise.then((data) => {
+        promise.then((data: ImageBitmap) => {
             const fontTexture = this.context.device.createTexture({
                 width: data.width,
                 height: data.height,
                 format: "rgb8unorm-webgl",
                 data: data as ImageBitmap,
-                sampler: DEFAULT_TEXTURE_PARAMETERS,
+                sampler: {
+                    addressModeU: "clamp-to-edge",
+                    addressModeV: "clamp-to-edge",
+                    minFilter: "linear",
+                    magFilter: "linear",
+                },
             });
 
             const { label_models, line_model, background_model } =
@@ -809,6 +807,8 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                 uniforms: {
                     uAxisColor: lineColor,
                     uBackGroundColor: bColor,
+                },
+                bindings: {
                     fontTexture,
                 },
                 geometry: new Geometry({
