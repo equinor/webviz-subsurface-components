@@ -174,7 +174,6 @@ interface IMarkerShape {
     positions: Float32Array;
     outline: Float32Array;
     drawMode: GeometryProps["topology"];
-    //drawMode: number;
 }
 
 export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
@@ -235,7 +234,6 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
 
     updateState(params: UpdateParameters<Layer<WellMarkersLayerProps>>) {
         super.updateState(params);
-
         if (
             params.changeFlags.extensionsChanged ||
             params.changeFlags.propsChanged
@@ -244,6 +242,7 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
             oldShapeModel.destroy();
             const oldOutlineModel = this.state?.["outlineModel"] as Model;
             oldOutlineModel.destroy();
+
             const models = this._createModels();
             this.setState({
                 ...this.state,
@@ -272,6 +271,7 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
         if (!this.state["shapeModel"]) {
             return;
         }
+
         const { uniforms } = args;
         const models = this.getModels();
         if (models.length && models.length < 2) {
@@ -282,8 +282,8 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
             sizeUnits: UNIT[this.props.sizeUnits],
             ZIncreasingDownwards: this.props.ZIncreasingDownwards,
         });
-
         models[0].draw(args.context.renderPass);
+
         models[1].setUniforms({
             ...uniforms,
             ZIncreasingDownwards: this.props.ZIncreasingDownwards,
@@ -323,6 +323,14 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
             ...info,
             properties: layer_properties,
         };
+    }
+
+    getShaders() {
+        return super.getShaders({
+            vs: vsShader,
+            fs: fsShader,
+            modules: [project, picking, utilities],
+        });
     }
 
     private initShapes() {
@@ -375,10 +383,12 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
             return this._createEmptyModels();
         }
 
+        const shaders = this.getShaders();
+
         const shapeModel = new Model(gl, {
             id: `${this.props.id}-mesh`,
-            vs: vsShader,
-            fs: fsShader,
+            ...shaders,
+            bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
             geometry: new Geometry({
                 topology: shape.drawMode,
                 attributes: {
@@ -388,15 +398,14 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
             uniforms: {
                 useOutlineColor: false,
             },
-            modules: [project, picking, utilities],
             isInstanced: true,
             instanceCount: this.getNumInstances(),
         });
 
         const outlineModel = new Model(gl, {
             id: `${this.props.id}-outline`,
-            vs: vsShader,
-            fs: fsShader,
+            ...shaders,
+            bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
             geometry: new Geometry({
                 topology: "line-loop-webgl",
                 attributes: {
@@ -406,7 +415,6 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
             uniforms: {
                 useOutlineColor: true,
             },
-            modules: [project, picking, utilities],
             isInstanced: true,
             instanceCount: this.getNumInstances(),
         });

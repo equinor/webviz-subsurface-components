@@ -5,9 +5,10 @@ precision highp float;
 
 in vec4 color;
 
-void main(void) {
+out vec4 fragColor;
 
-   gl_FragColor = vec4(color.rgba * (1.0 / 255.0));
-   DECKGL_FILTER_COLOR(gl_FragColor, geometry);
+void main(void) {
+   fragColor = vec4(color.rgba * (1.0 / 255.0));
+   DECKGL_FILTER_COLOR(fragColor, geometry);
 }
 `;
