@@ -134,10 +134,8 @@ const StoryTemplate = (args) => {
     };
 
     return (
-        <div
-            style={{ height: "92vh", display: "flex", flexDirection: "column" }}
-        >
-            <div style={{ width: "100%", height: "100%", flex: 1 }}>
+        <div>
+            <div style={{ height: "92vh", width: "100%" }}>
                 <WellLogViewer
                     id="WellLogViewer"
                     {...args}
@@ -146,7 +144,7 @@ const StoryTemplate = (args) => {
                     onContentSelection={onContentSelection}
                 />
             </div>
-            <div style={{ display: "flex", flexDirection: "row" }}>
+            <div style={{ display: "inline-flex" }}>
                 <div ref={infoRef}></div>
                 <button onClick={handleClick} style={{ marginLeft: 10 }}>
                     Reset
