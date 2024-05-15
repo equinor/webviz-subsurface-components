@@ -12,7 +12,7 @@ import {
 } from "@deck.gl/core";
 import { load } from "@loaders.gl/core";
 import { ImageLoader } from "@loaders.gl/images";
-import type { UniformValue, SamplerProps } from "@luma.gl/core";
+import type { UniformValue } from "@luma.gl/core";
 import { Geometry, Model } from "@luma.gl/engine";
 import { vec4 } from "gl-matrix";
 import type { ExtendedLayerProps, Position3D } from "../utils/layerTools";
@@ -172,7 +172,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
             image: { type: "data" }, // Will load as ImageData.
         });
 
-        promise.then((data: ImageBitmap) => {
+        promise.then((data) => {
             const fontTexture = this.context.device.createTexture({
                 width: data.width,
                 height: data.height,
@@ -240,15 +240,15 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
 
         const L = isTopOrBottomRuler
             ? LineLengthInPixels(
-                [min, 0, 0],
-                [max, 0, 0],
-                this.context.viewport
-            )
+                  [min, 0, 0],
+                  [max, 0, 0],
+                  this.context.viewport
+              )
             : LineLengthInPixels(
-                [0, min, 0],
-                [0, max, 0],
-                this.context.viewport
-            );
+                  [0, min, 0],
+                  [0, max, 0],
+                  this.context.viewport
+              );
 
         const ticks = GetTicks(min, max, L); // Note: this may be replaced by NiceTicks npm package.
 
@@ -809,6 +809,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                     uBackGroundColor: bColor,
                 },
                 bindings: {
+                    // @ts-ignore 
                     fontTexture,
                 },
                 geometry: new Geometry({
@@ -822,7 +823,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                     },
                     vertexCount: positions.length / 3,
                 }),
-
+                bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
                 modules: [project],
                 isInstanced: false,
             });

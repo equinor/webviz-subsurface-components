@@ -155,7 +155,7 @@ export default class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProp
         gl.enable(GL.POLYGON_OFFSET_FILL);
         gl.polygonOffset(1, 1);
         triangleModel.setUniforms({
-            ...uniforms,
+            uniforms,
             contourReferencePoint,
             contourInterval,
             smoothShading,
@@ -169,7 +169,7 @@ export default class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProp
 
         if (this.props.gridLines) {
             lineModel.setUniforms({
-                ...uniforms,
+                uniforms,
                 ZIncreasingDownwards: this.props.ZIncreasingDownwards,
             });
             lineModel.draw(context.renderPass);
