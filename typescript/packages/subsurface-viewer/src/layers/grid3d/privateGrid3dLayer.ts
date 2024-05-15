@@ -10,6 +10,7 @@ import type {
     SamplerProps,
     Texture,
     TextureProps,
+    TextureData,
 } from "@luma.gl/core";
 import type { GeometryProps } from "@luma.gl/engine";
 import { Geometry, Model } from "@luma.gl/engine";
@@ -81,7 +82,7 @@ interface IPropertyUniforms {
     colormap: Texture;
     colorMapRangeMin: number;
     colorMapRangeMax: number;
-    colorMapClampColor: Color | undefined | boolean | number[];
+    colorMapClampColor?: Color | undefined | boolean | number[];
     isColorMapClampColorTransparent: boolean;
     isClampColor: boolean;
     isColoringDiscrete: boolean;
@@ -330,7 +331,6 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
         };
     }
 
-    // eslint-disable-next-line
     private getPropertyUniforms(): IPropertyUniforms {
         const valueRangeMin = this.props.propertyValueRange?.[0] ?? 0.0;
         const valueRangeMax = this.props.propertyValueRange?.[1] ?? 1.0;
@@ -346,14 +346,12 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             this.props.colorMapClampColor !== false;
         let colorMapClampColor = isClampColor
             ? this.props.colorMapClampColor
-            : [0, 0, 0];
+            : ([0, 0, 0] as Color);
 
         // Normalize to [0,1] range.
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
         colorMapClampColor = (colorMapClampColor as Color).map(
             (x) => (x ?? 0) / 255
-        );
+        ) as Color;
 
         const isColorMapClampColorTransparent: boolean =
             (this.props.colorMapClampColor as boolean) === false;
@@ -365,7 +363,7 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             valueRangeMax,
             colorMapRangeMin,
             colorMapRangeMax,
-            colorMapClampColor,
+            ...(colorMapClampColor ? { colorMapClampColor } : {}),
             isColorMapClampColorTransparent,
             isClampColor,
             isColoringDiscrete: imageData.isColoringDiscrete,
@@ -395,7 +393,7 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
                 width: imageData.count,
                 height: 1,
                 format: "rgb8unorm-webgl",
-                data: imageData.data,
+                data: imageData.data as TextureData,
                 sampler,
             });
 
@@ -412,7 +410,7 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             width: 256,
             height: 1,
             format: "rgb8unorm-webgl",
-            data,
+            data: data as TextureData,
         });
         return colormap;
     }

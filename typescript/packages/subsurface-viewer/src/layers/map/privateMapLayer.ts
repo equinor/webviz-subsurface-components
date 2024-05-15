@@ -243,7 +243,7 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
 
         if (this.props.gridLines) {
             mesh_lines_model.setUniforms({
-                ...uniforms,
+                uniforms,
                 ZIncreasingDownwards: this.props.ZIncreasingDownwards,
             });
             mesh_lines_model.draw(context.renderPass);
