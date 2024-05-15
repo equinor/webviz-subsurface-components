@@ -1,6 +1,16 @@
-import type { Color, PickingInfo, UpdateParameters } from "@deck.gl/core";
+import type {
+    Color,
+    PickingInfo,
+    UpdateParameters,
+    LayerContext,
+} from "@deck.gl/core";
 import { COORDINATE_SYSTEM, Layer, picking, project } from "@deck.gl/core";
-import type { Texture } from "@luma.gl/core";
+import type {
+    UniformValue,
+    SamplerProps,
+    Texture,
+    TextureProps,
+} from "@luma.gl/core";
 import type { GeometryProps } from "@luma.gl/engine";
 import { Geometry, Model } from "@luma.gl/engine";
 import type { DeckGLLayerContext } from "../../components/Map";
@@ -25,18 +35,18 @@ import type { MeshType, MeshTypeLines } from "./typeDefs";
 import vsShader from "./vertex.glsl";  // XXX er disse brukt
 import vsLineShader from "./vertex_lines.glsl";
 
-const DEFAULT_TEXTURE_PARAMETERS = {
-    textureMinFilter: "linear",
-    textureMagFilter: "linear",
-    textureWrapS: "clamp-to-edge",
-    textureWrapT: "clamp-to-edge",
+const DEFAULT_TEXTURE_PARAMETERS: SamplerProps = {
+    addressModeU: "clamp-to-edge",
+    addressModeV: "clamp-to-edge",
+    minFilter: "linear",
+    magFilter: "linear",
 };
 
-const DISCRETE_TEXTURE_PARAMETERS = {
-    textureMinFilter: "nearest",
-    textureMagFilter: "nearest",
-    textureWrapS: "clamp-to-edge",
-    textureWrapT: "clamp-to-edge",
+const DISCRETE_TEXTURE_PARAMETERS: SamplerProps = {
+    minFilter: "nearest",
+    magFilter: "nearest",
+    addressModeU: "clamp-to-edge",
+    addressModeV: "clamp-to-edge",
 };
 
 export interface PrivateLayerProps extends ExtendedLayerProps {
@@ -75,7 +85,6 @@ interface IPropertyUniforms {
     isColorMapClampColorTransparent: boolean;
     isClampColor: boolean;
     isColoringDiscrete: boolean;
-    colorMapSize: number;
 }
 
 interface IImageData {
@@ -94,8 +103,7 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
     }
 
     initializeState(context: DeckGLLayerContext): void {
-        const { gl } = context;
-        const [model_mesh, mesh_lines_model] = this._getModels(gl);
+        const [model_mesh, mesh_lines_model] = this._getModels(context);
         this.setState({
             models: [model_mesh, mesh_lines_model],
             isLoaded: false,
@@ -121,15 +129,16 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
     updateState({ context }: UpdateParameters<this>): void {
         this.initializeState(context as DeckGLLayerContext);
     }
+
     //eslint-disable-next-line
-    _getModels(gl: any) {
-        // MESH MODEL
-        const mesh_model = new Model(gl, {
+    _getModels(context: DeckGLLayerContext) {
+        const propertyUniforms = this.getPropertyUniforms();
+        const colormap = this.getTexture(context);
+        const mesh_model = new Model(context.device, {
             id: `${this.props.id}-mesh`,
             vs: vsShader,
             fs: fsShader,
             geometry: new Geometry({
-                //drawMode: this.props.mesh.drawMode,
                 topology: this.props.mesh.drawMode ?? "triangle-list",
                 attributes: {
                     positions: this.props.mesh.attributes.positions,
@@ -138,16 +147,28 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
                 },
                 vertexCount: this.props.mesh.vertexCount,
             }),
+            bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
+            uniforms: {
+                ...propertyUniforms,
+                coloringMode: this.props.coloringMode,
+                ZIncreasingDownwards: this.props.ZIncreasingDownwards,
+            },
+            bindings: {
+                colormap,
+            },
             modules: [project, picking, localPhongLighting, utilities],
-            isInstanced: false, // This only works when set to false.
+            isInstanced: false,
         });
 
-        // MESH LINES
-        const mesh_lines_model = new Model(gl, {
+        const mesh_lines_model = new Model(context.device, {
             id: `${this.props.id}-lines`,
             vs: vsLineShader,
             fs: fsLineShader,
             geometry: new Geometry(this.props.meshLines),
+            bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
+            uniforms: {
+                ZIncreasingDownwards: this.props.ZIncreasingDownwards,
+            },
             modules: [project, picking],
             isInstanced: false,
         });
@@ -155,14 +176,16 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
         return [mesh_model, mesh_lines_model];
     }
 
-    // Signature from the base class, eslint doesn't like the any type.
-    // eslint-disable-next-line
-    draw(args: any): void {
+    draw(args: {
+        moduleParameters?: unknown;
+        uniforms: UniformValue;
+        context: LayerContext;
+    }): void {
         if (!this.state["models"]) {
             return;
         }
 
-        const { uniforms, context } = args;
+        const { context } = args;
         const { gl } = context;
 
         const [model_mesh, mesh_lines_model] = this.state["models"] as Model[];
@@ -174,24 +197,11 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             gl.disable(gl.DEPTH_TEST);
         }
 
-        const propertyUniforms = this.getPropertyUniforms(context);
-
-        model_mesh.setUniforms({
-            ...uniforms,
-            ...propertyUniforms,
-            coloringMode: this.props.coloringMode,
-            ZIncreasingDownwards: this.props.ZIncreasingDownwards,
-        });
-        model_mesh.draw(gl);
+        model_mesh.draw(context.renderPass);
         gl.disable(gl.POLYGON_OFFSET_FILL);
 
-        // Draw lines.
         if (this.props.gridLines) {
-            mesh_lines_model.setUniforms({
-                ...uniforms,
-                ZIncreasingDownwards: this.props.ZIncreasingDownwards,
-            });
-            mesh_lines_model.draw(gl);
+            mesh_lines_model.draw(context.renderPass);
         }
 
         if (!this.props.depthTest) {
@@ -321,7 +331,7 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
     }
 
     // eslint-disable-next-line
-    private getPropertyUniforms(context: any): IPropertyUniforms {
+    private getPropertyUniforms(): IPropertyUniforms {
         const valueRangeMin = this.props.propertyValueRange?.[0] ?? 0.0;
         const valueRangeMax = this.props.propertyValueRange?.[1] ?? 1.0;
 
@@ -350,15 +360,7 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
 
         const imageData = this.getImageData();
 
-        const colormap = context.device.createTexture({
-            width: imageData.count,
-            height: 1,
-            format: "uint8",
-            data: imageData.data,
-            parameters: imageData.parameters,
-        });
         return {
-            colormap,
             valueRangeMin,
             valueRangeMax,
             colorMapRangeMin,
@@ -367,8 +369,52 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             isColorMapClampColorTransparent,
             isClampColor,
             isColoringDiscrete: imageData.isColoringDiscrete,
-            colorMapSize: imageData.count,
         };
+    }
+    private getTexture(context: DeckGLLayerContext): Texture<TextureProps> {
+        if (this.props.colorMapFunction instanceof Uint8Array) {
+            const imageData = this.getImageData();
+            const count = this.props.colorMapFunction.length / 3;
+            if (count === 0) {
+                const colormap = context.device.createTexture({
+                    width: imageData.count,
+                    height: 1,
+                    format: "rgb8unorm-webgl",
+                    data: new Uint8Array([0, 0, 0, 0, 0, 0]),
+                    sampler: DISCRETE_TEXTURE_PARAMETERS,
+                });
+                return colormap;
+            }
+
+            const sampler =
+                this.props.coloringMode === TGrid3DColoringMode.Property
+                    ? DISCRETE_TEXTURE_PARAMETERS
+                    : DEFAULT_TEXTURE_PARAMETERS;
+
+            const colormap = context.device.createTexture({
+                width: imageData.count,
+                height: 1,
+                format: "rgb8unorm-webgl",
+                data: imageData.data,
+                sampler,
+            });
+
+            return colormap;
+        }
+
+        const data = getImageData(
+            this.props.colorMapName,
+            (this.context as DeckGLLayerContext).userData.colorTables,
+            this.props.colorMapFunction
+        );
+
+        const colormap = context.device.createTexture({
+            width: 256,
+            height: 1,
+            format: "rgb8unorm-webgl",
+            data,
+        });
+        return colormap;
     }
 }
 

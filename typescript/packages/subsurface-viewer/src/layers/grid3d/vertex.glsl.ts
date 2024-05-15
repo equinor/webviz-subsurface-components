@@ -3,8 +3,8 @@ const vsShader = `\
 #define SHADER_NAME grid3d-vertex-shader
 precision highp float;
 
-attribute vec3 positions;
-attribute float properties;
+in vec3 positions;
+in float properties;
 attribute vec3 normals;
 
 uniform lowp int coloringMode;
