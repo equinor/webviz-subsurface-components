@@ -3,8 +3,8 @@ const vsShader = `\
 #define SHADER_NAME grid3d-vertex-shader
 precision highp float;
 
-attribute vec3 positions;
-attribute float properties;
+in vec3 positions;
+in float properties;
 uniform int coloringMode;
 
 // Outputs to fragment shader
