@@ -1,50 +1,58 @@
 import type {
+    Color,
     Layer,
-    LayersList,
     LayerData,
-    UpdateParameters,
+    LayersList,
     PickingInfo,
+    Position,
+    UpdateParameters,
 } from "@deck.gl/core/typed";
+
 import { CompositeLayer, OrbitViewport } from "@deck.gl/core/typed";
-import type { ExtendedLayerProps } from "../utils/layerTools";
-import { isDrawingEnabled } from "../utils/layerTools";
-import { PathLayer, TextLayer } from "@deck.gl/layers/typed";
-import type { Color, Position } from "@deck.gl/core/typed";
+
+import type {
+    ExtendedLayerProps,
+    LayerPickInfo,
+    PropertyDataType,
+} from "../utils/layerTools";
+
+import { createPropertyData, isDrawingEnabled } from "../utils/layerTools";
+
 import { PathStyleExtension } from "@deck.gl/extensions/typed";
-import { subtract, distance, dot } from "mathjs";
+import { GeoJsonLayer, PathLayer, TextLayer } from "@deck.gl/layers/typed";
 import type { colorTablesArray } from "@emerson-eps/color-tables/";
-import { rgbValues, getColors } from "@emerson-eps/color-tables/";
+import { getColors, rgbValues } from "@emerson-eps/color-tables/";
 import type {
     Feature,
-    GeometryCollection,
-    LineString,
-    Point,
     FeatureCollection,
     GeoJsonProperties,
     Geometry,
+    GeometryCollection,
+    LineString,
+    Point,
 } from "geojson";
-import type { LayerPickInfo, PropertyDataType } from "../utils/layerTools";
-import { createPropertyData } from "../utils/layerTools";
-import {
-    splineRefine,
-    coarsenWells,
-    invertPath,
-    GetBoundingBox,
-    checkWells,
-} from "./utils/spline";
+import { distance, dot, subtract } from "mathjs";
+
+import GL from "@luma.gl/constants";
 import { interpolateNumberArray } from "d3";
-import type {
-    ReportBoundingBoxAction,
-    DeckGLLayerContext,
-} from "../../components/Map";
+import { isEmpty, isEqual } from "lodash";
 import type {
     ContinuousLegendDataType,
     DiscreteLegendDataType,
 } from "../../components/ColorLegend";
+import type {
+    DeckGLLayerContext,
+    ReportBoundingBoxAction,
+} from "../../components/Map";
 import { getLayersById } from "../../layers/utils/layerTools";
-import UnfoldedGeoJsonLayer from "../intersection/unfoldedGeoJsonLayer";
-import GL from "@luma.gl/constants";
-import { isEqual } from "lodash";
+import { abscissaTransform } from "./utils/abscissaTransform";
+import {
+    GetBoundingBox,
+    checkWells,
+    coarsenWells,
+    invertPath,
+    splineRefine,
+} from "./utils/spline";
 
 type StyleAccessorFunction = (
     object: Feature,
@@ -118,6 +126,9 @@ export interface WellsLayerProps extends ExtendedLayerProps {
      */
     simplifiedRendering: boolean;
 
+    /** Sectional projection of data */
+    section?: boolean;
+
     // Non public properties:
     reportBoundingBox?: React.Dispatch<ReportBoundingBoxAction>;
 }
@@ -144,6 +155,7 @@ const defaultProps = {
     depthTest: true,
     ZIncreasingDownwards: true,
     simplifiedRendering: false,
+    section: false,
 };
 
 export interface LogCurveDataType {
@@ -255,33 +267,39 @@ export function getSize(
 
 export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
     initializeState(): void {
-        let data = this.props.data as unknown as FeatureCollection;
-        if (typeof data !== "undefined" && !isEqual(data, [])) {
-            if (this.props.ZIncreasingDownwards) {
-                data = invertPath(data);
-            }
+        let data = this.props.data as FeatureCollection<GeometryCollection>;
+        const refine = this.props.refine;
 
-            checkWells(data);
-
-            const coarseData = coarsenWells(data);
-
-            const doRefine =
-                typeof this.props.refine === "number"
-                    ? (this.props.refine as number) > 1
-                    : (this.props.refine as boolean);
-
-            const stepCount =
-                typeof this.props.refine === "number" ? this.props.refine : 5;
-            data = doRefine
-                ? splineRefine(data, stepCount) // smooth well paths.
-                : data;
-
-            this.setState({
-                ...this.state,
-                data,
-                coarseData,
-            });
+        if (!data || isEmpty(data)) {
+            return;
         }
+
+        if (this.props.ZIncreasingDownwards) {
+            data = invertPath(data);
+        }
+
+        if (this.props.section) {
+            data = abscissaTransform(data);
+        }
+
+        checkWells(data);
+
+        const coarseData = coarsenWells(data);
+
+        const doRefine =
+            typeof refine === "number" ? refine > 1 : (refine as boolean);
+
+        const stepCount = typeof refine === "number" ? refine : 5;
+
+        data = doRefine
+            ? splineRefine(data, stepCount) // smooth well paths.
+            : data;
+
+        this.setState({
+            ...this.state,
+            data,
+            coarseData,
+        });
     }
 
     updateState({ props, oldProps }: UpdateParameters<WellsLayer>): void {
@@ -404,140 +422,91 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         // Reduced details when rotating or panning the view if "fastDrawing " is set.
         const fastDrawing = this.props.simplifiedRendering;
 
-        const fastLayer = new UnfoldedGeoJsonLayer(
-            this.getSubLayerProps({
-                id: "simple",
-                data: coarseData,
-                pickable: false,
-                stroked: false,
-                positionFormat,
-                pointRadiusUnits: "pixels",
-                lineWidthUnits: "pixels",
-                pointRadiusScale: this.props.pointRadiusScale,
-                lineWidthScale: this.props.lineWidthScale,
-                getLineWidth: getSize(LINE, this.props.lineStyle?.width, -1),
-                getPointRadius: getSize(
-                    POINT,
-                    this.props.wellHeadStyle?.size,
-                    -1
-                ),
-                getLineColor: getColor(this.props.lineStyle?.color),
-                getFillColor: getColor(this.props.wellHeadStyle?.color),
-                lineBillboard: true,
-                pointBillboard: true,
-                parameters,
-                visible: fastDrawing,
-            })
-        );
+        const defaultLayerProps = {
+            data,
+            pickable: false,
+            stroked: false,
+            positionFormat,
+            pointRadiusUnits: "pixels",
+            lineWidthUnits: "pixels",
+            pointRadiusScale: this.props.pointRadiusScale,
+            lineWidthScale: this.props.lineWidthScale,
+            getLineWidth: getSize(LINE, this.props.lineStyle?.width, -1),
+            getPointRadius: getSize(POINT, this.props.wellHeadStyle?.size, -1),
+            lineBillboard: true,
+            pointBillboard: true,
+            parameters,
+            visible: fastDrawing,
+        };
 
-        const outlineLayer = new UnfoldedGeoJsonLayer(
-            this.getSubLayerProps({
-                id: "outline",
-                data,
-                pickable: false,
-                stroked: false,
-                positionFormat,
-                pointRadiusUnits: "pixels",
-                lineWidthUnits: "pixels",
-                pointRadiusScale: this.props.pointRadiusScale,
-                lineWidthScale: this.props.lineWidthScale,
-                getLineWidth: getSize(LINE, this.props.lineStyle?.width),
-                getPointRadius: getSize(POINT, this.props.wellHeadStyle?.size),
-                extensions: extensions,
-                getDashArray: getDashFactor(this.props.lineStyle?.dash),
-                lineBillboard: true,
-                pointBillboard: true,
-                parameters,
-                visible: this.props.outline && !fastDrawing,
-            })
-        );
+        const colorsLayerProps = this.getSubLayerProps({
+            ...defaultLayerProps,
+            id: "colors",
+            pickable: true,
+            extensions,
+            getDashArray: getDashFactor(
+                this.props.lineStyle?.dash,
+                getSize(LINE, this.props.lineStyle?.width),
+                -1
+            ),
+            visible: !fastDrawing,
+            getLineColor: getColor(this.props.lineStyle?.color),
+            getFillColor: getColor(this.props.wellHeadStyle?.color),
+        });
 
-        const colorsLayer = new UnfoldedGeoJsonLayer(
-            this.getSubLayerProps({
-                id: "colors",
-                data,
-                pickable: true,
-                stroked: false,
-                positionFormat,
-                pointRadiusUnits: "pixels",
-                lineWidthUnits: "pixels",
-                pointRadiusScale: this.props.pointRadiusScale,
-                lineWidthScale: this.props.lineWidthScale,
-                getLineWidth: getSize(LINE, this.props.lineStyle?.width, -1),
-                getPointRadius: getSize(
-                    POINT,
-                    this.props.wellHeadStyle?.size,
-                    -1
-                ),
-                getFillColor: getColor(this.props.wellHeadStyle?.color),
-                getLineColor: getColor(this.props.lineStyle?.color),
-                extensions: extensions,
-                getDashArray: getDashFactor(
-                    this.props.lineStyle?.dash,
-                    getSize(LINE, this.props.lineStyle?.width),
-                    -1
-                ),
-                lineBillboard: true,
-                pointBillboard: true,
-                parameters,
-                visible: !fastDrawing,
-            })
-        );
+        const fastLayerProps = this.getSubLayerProps({
+            ...defaultLayerProps,
+            id: "simple",
+            data: coarseData,
+            positionFormat,
+            getLineColor: getColor(this.props.lineStyle?.color),
+            getFillColor: getColor(this.props.wellHeadStyle?.color),
+        });
+
+        const outlineLayerProps = this.getSubLayerProps({
+            ...defaultLayerProps,
+            id: "outline",
+            getLineWidth: getSize(LINE, this.props.lineStyle?.width),
+            getPointRadius: getSize(POINT, this.props.wellHeadStyle?.size),
+            extensions,
+            getDashArray: getDashFactor(this.props.lineStyle?.dash),
+            visible: this.props.outline && !fastDrawing,
+        });
+
+        const highlightLayerProps = this.getSubLayerProps({
+            ...defaultLayerProps,
+            id: "highlight",
+            data: getWellObjectByName(data.features, this.props.selectedWell),
+            getLineWidth: getSize(LINE, this.props.lineStyle?.width, 2),
+            getPointRadius: getSize(POINT, this.props.wellHeadStyle?.size, 2),
+            getLineColor: getColor(this.props.lineStyle?.color),
+            getFillColor: getColor(this.props.wellHeadStyle?.color),
+            visible: this.props.logCurves && !fastDrawing,
+        });
+
+        const highlightMultiWellsLayerProps = this.getSubLayerProps({
+            ...defaultLayerProps,
+            id: "highlight2",
+            data: getWellObjectsByName(
+                data.features,
+                this.state["selectedMultiWells"]
+            ),
+            getPointRadius: getSize(POINT, this.props.wellHeadStyle?.size, 2),
+            getFillColor: [255, 140, 0],
+            getLineColor: [255, 140, 0],
+            visible: this.props.logCurves && !fastDrawing,
+        });
+
+        const fastLayer = new GeoJsonLayer(fastLayerProps);
+        const outlineLayer = new GeoJsonLayer(outlineLayerProps);
+        const colorsLayer = new GeoJsonLayer(colorsLayerProps);
 
         // Highlight the selected well.
-        const highlightLayer = new UnfoldedGeoJsonLayer(
-            this.getSubLayerProps({
-                id: "highlight",
-                data: getWellObjectByName(
-                    data.features,
-                    this.props.selectedWell
-                ),
-                pickable: false,
-                stroked: false,
-                positionFormat,
-                pointRadiusUnits: "pixels",
-                lineWidthUnits: "pixels",
-                pointRadiusScale: this.props.pointRadiusScale,
-                lineWidthScale: this.props.lineWidthScale,
-                getLineWidth: getSize(LINE, this.props.lineStyle?.width, 2),
-                getPointRadius: getSize(
-                    POINT,
-                    this.props.wellHeadStyle?.size,
-                    2
-                ),
-                getFillColor: getColor(this.props.wellHeadStyle?.color),
-                getLineColor: getColor(this.props.lineStyle?.color),
-                parameters,
-                visible: this.props.logCurves && !fastDrawing,
-            })
-        );
+        const highlightLayer = new GeoJsonLayer(highlightLayerProps);
 
         // Highlight the multi selected wells.
-        const highlightMultiWellsLayer = new UnfoldedGeoJsonLayer(
-            this.getSubLayerProps({
-                id: "highlight2",
-                data: getWellObjectsByName(
-                    data.features,
-                    this.state["selectedMultiWells"]
-                ),
-                pickable: false,
-                stroked: false,
-                positionFormat,
-                pointRadiusUnits: "pixels",
-                lineWidthUnits: "pixels",
-                pointRadiusScale: this.props.pointRadiusScale,
-                lineWidthScale: this.props.lineWidthScale,
-                getLineWidth: getSize(LINE, this.props.lineStyle?.width, -1),
-                getPointRadius: getSize(
-                    POINT,
-                    this.props.wellHeadStyle?.size,
-                    2
-                ),
-                getFillColor: [255, 140, 0],
-                getLineColor: [255, 140, 0],
-                parameters,
-                visible: this.props.logCurves && !fastDrawing,
-            })
+        const highlightMultiWellsLayer = new GeoJsonLayer(
+            highlightMultiWellsLayerProps
         );
 
         const logLayer = new PathLayer<LogCurveDataType>(
@@ -688,7 +657,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             namesLayer,
         ];
         if (fastDrawing) {
-            layers.push(fastLayer as UnfoldedGeoJsonLayer);
+            layers.push(fastLayer);
         }
         return layers;
     }
@@ -707,7 +676,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         if (!md_property) {
             md_property = getLogProperty(
                 coordinate,
-                (this.props.data as unknown as FeatureCollection).features,
+                (this.props.data as FeatureCollection).features,
                 info.object,
                 this.props.logrunName,
                 "MD"
@@ -722,7 +691,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         if (!tvd_property) {
             tvd_property = getLogProperty(
                 coordinate,
-                (this.props.data as unknown as FeatureCollection).features,
+                (this.props.data as FeatureCollection).features,
                 info.object,
                 this.props.logrunName,
                 "TVD"
@@ -730,7 +699,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         }
         const log_property = getLogProperty(
             coordinate,
-            (this.props.data as unknown as FeatureCollection).features,
+            (this.props.data as FeatureCollection).features,
             info.object,
             this.props.logrunName,
             this.props.logName
@@ -766,6 +735,7 @@ WellsLayer.defaultProps = {
             layer: Layer;
         }
     ): void => onDataLoad(data, context),
+    //dataTransform,
 };
 
 //================= Local help functions. ==================

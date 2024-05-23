@@ -62,15 +62,13 @@ const zDepthAxesAxis = zDepthAxesBackground + 999;
 const zDepthAxesTicksAndLabels = zDepthAxesAxis;
 
 const tickLineLength = 10;
-const pixelScale = 8;
 
 export interface Axes2DLayerProps extends ExtendedLayerProps {
     marginH: number;
     marginV: number;
     formatLabelFunc?: (x: number) => string;
     labelColor?: Color;
-    labelFontSize?: number;
-    fontFamily?: string;
+    labelFontSizePt?: number;
     axisColor?: Color;
     backgroundColor?: Color;
     isLeftRuler: boolean;
@@ -91,6 +89,7 @@ const defaultProps = {
     isRightRuler: false,
     isBottomRuler: true,
     isTopRuler: false,
+    labelFontSizePt: 9,
 };
 
 // FONT ATLAS
@@ -698,6 +697,10 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         //-- Labels model--
         const label_models: Model[] = [];
 
+        const pixelScale = GetPixelsScale(
+            this.props.labelFontSizePt ?? defaultProps.labelFontSizePt
+        );
+
         for (const item of labelData) {
             const x = item.pos[0];
             const y = item.pos[1];
@@ -913,4 +916,11 @@ function GetTicks(
     }
 
     return ticks;
+}
+
+function GetPixelsScale(labelFontSizePt: number): number {
+    // Estimated number of pixels from baseline to top of font.
+    // Linear interpolation based on this table: https://reeddesign.co.uk/test/points-pixels.html
+    const px = Math.max(0, (8 / 9) * labelFontSizePt);
+    return px;
 }

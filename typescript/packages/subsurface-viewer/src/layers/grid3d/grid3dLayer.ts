@@ -125,6 +125,11 @@ export enum TGrid3DColoringMode {
     Z,
 }
 
+export interface IDiscretePropertyValueName {
+    value: number;
+    name: string;
+}
+
 export interface Grid3DLayerProps extends ExtendedLayerProps {
     /**  Url, or native, or typed javascript array. Set of points.
      * [x1, y1, z1, x2, y2, z2, ...]
@@ -145,6 +150,12 @@ export interface Grid3DLayerProps extends ExtendedLayerProps {
      * If colorMapFunction is Uint8Array the property values are used as color indices.
      */
     propertiesData: string | number[] | Float32Array | Uint16Array;
+
+    /**
+     * Discrete propety value-name pairs to be displayed in cursor readouts.
+     * The property values are used as the array indices.
+     */
+    discretePropertyValueNames?: IDiscretePropertyValueName[];
 
     /**
      * Defines how the cells are to be colored:
@@ -173,7 +184,7 @@ export interface Grid3DLayerProps extends ExtendedLayerProps {
      * E.g. (x) => [x * 255, x * 255, x * 255]
      * May also be set as constant color:
      * E.g. [255, 0, 0] for constant red cells.
-     * Can be defined as Uint8Array containing [R , G, B] triplets in [0, 255] range each.
+     * Can be defined as Uint8Array containing [R, G, B] triplets in [0, 255] range each.
      */
     colorMapFunction?: colorMapFunctionType | Uint8Array;
 
@@ -340,6 +351,8 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
                 coloringMode: this.props.coloringMode,
                 gridLines: this.props.gridLines,
                 propertyValueRange: this.getPropertyValueRange(),
+                discretePropertyValueNames:
+                    this.props.discretePropertyValueNames,
                 material: this.props.material,
                 depthTest: this.props.depthTest,
                 ZIncreasingDownwards: this.props.ZIncreasingDownwards,

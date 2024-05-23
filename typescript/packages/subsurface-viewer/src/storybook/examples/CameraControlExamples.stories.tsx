@@ -59,6 +59,13 @@ const Root = styled("div")({
     },
 });
 
+const SIDE_CAMERA = {
+    rotationX: 0,
+    target: [],
+    rotationOrbit: 90,
+    zoom: -3,
+};
+
 const SQUARE = {
     type: "Feature",
     geometry: {
@@ -612,4 +619,38 @@ export const ScaleYWithCameraPosition: StoryObj<
         },
     },
     render: (args) => <ScaleYWithCameraPositionComponent {...args} />,
+};
+
+const ScaleVertical3dComponent = ({
+    verticalScale,
+}: {
+    verticalScale: number;
+}) => {
+    const viewerProps: SubsurfaceViewerProps = {
+        id: "ScaleY",
+        bounds: volveWellsBounds,
+        layers: [huginAxes3DLayer, hugin25mDepthMapLayer],
+        views: default3DViews,
+        cameraPosition: SIDE_CAMERA,
+        verticalScale,
+    };
+    return <SubsurfaceViewer {...viewerProps} />;
+};
+
+export const ScaleVertical3d: StoryObj<typeof ScaleVertical3dComponent> = {
+    args: { verticalScale: 1.5 },
+    argTypes: {
+        verticalScale: {
+            control: { type: "range", min: -1, max: 10, step: 0.1 },
+        },
+    },
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: "Vertical scaling example in panoramic view.",
+            },
+        },
+    },
+    render: (args) => <ScaleVertical3dComponent {...args} />,
 };

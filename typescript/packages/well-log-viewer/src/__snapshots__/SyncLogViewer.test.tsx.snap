@@ -495,17 +495,17 @@ exports[`Sync Log Viewer snapshot test 1`] = `
             class="zoom-value"
           >
             <span
-              class="MuiSlider-root MuiSlider-colorPrimary MuiSlider-sizeMedium css-187mznn-MuiSlider-root"
+              class="MuiSlider-root MuiSlider-colorPrimary MuiSlider-sizeMedium css-188mx6n-MuiSlider-root"
             >
               <span
-                class="MuiSlider-rail css-14pt78w-MuiSlider-rail"
+                class="MuiSlider-rail css-7o8aqz-MuiSlider-rail"
               />
               <span
-                class="MuiSlider-track css-1gv0vcd-MuiSlider-track"
+                class="MuiSlider-track css-ttgsjq-MuiSlider-track"
                 style="left: 0%; width: 0%;"
               />
               <span
-                class="MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary css-jx1sa5-MuiSlider-thumb"
+                class="MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary css-1as9v07-MuiSlider-thumb"
                 data-index="0"
                 style="left: 0%;"
               >
@@ -526,7 +526,7 @@ exports[`Sync Log Viewer snapshot test 1`] = `
                 />
                 <span
                   aria-hidden="true"
-                  class="MuiSlider-valueLabel css-7d61z1-MuiSlider-valueLabel"
+                  class="MuiSlider-valueLabel css-14gyywz-MuiSlider-valueLabel"
                 >
                   <span
                     class="MuiSlider-valueLabelCircle"
