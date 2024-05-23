@@ -1,6 +1,6 @@
 {
     "name": "@webviz/well-log-viewer",
-    "version": "1.7.3",
+    "version": "1.7.4",
     "description": "",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -33,6 +33,6 @@
         "react-dom": "^17 || ^18"
     },
     "volta": {
-        "node": "18.17.0"
+        "node": "18.19.0"
     }
 }
