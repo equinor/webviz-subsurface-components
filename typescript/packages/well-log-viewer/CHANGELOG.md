@@ -1,3 +1,10 @@
+## [1.7.3](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.7.2...well-log-viewer@1.7.3) (2024-05-23)
+
+
+### Bug Fixes
+
+* remove duplicated file ([#2051](https://github.com/equinor/webviz-subsurface-components/issues/2051)) ([1a8d63c](https://github.com/equinor/webviz-subsurface-components/commit/1a8d63c1d7ad4d07bb6f2fbdd7a12282fa6beca8))
+
 ## [1.7.2](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.7.1...well-log-viewer@1.7.2) (2024-04-18)
 
 
