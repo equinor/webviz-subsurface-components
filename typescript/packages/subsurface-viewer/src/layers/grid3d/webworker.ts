@@ -887,7 +887,7 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
     console.log("Number of polygons: ", pn);
 
     const mesh: MeshType = {
-        drawMode: 4, // corresponds to GL.TRIANGLES,
+        drawMode: "triangle-list",
         attributes: {
             positions: { value: new Float32Array(triang_points), size: 3 },
             properties: { value: new Float32Array(vertexProperties), size: 1 },
@@ -896,7 +896,7 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
     };
 
     const mesh_lines: MeshTypeLines = {
-        drawMode: 1, // corresponds to GL.LINES,
+        topology: "line-list",
         attributes: {
             positions: { value: params.points, size: 3 },
             indices: { value: new Uint32Array(line_indices), size: 1 },

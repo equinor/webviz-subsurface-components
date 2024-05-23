@@ -1,22 +1,22 @@
-import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { format } from "d3-format";
+import React from "react";
 
 import type { Feature } from "geojson";
 
-import type { PickingInfo } from "@deck.gl/core/typed";
-import { View } from "@deck.gl/core/typed";
+import type { PickingInfo } from "@deck.gl/core";
+import { View } from "@deck.gl/core";
 
 import SubsurfaceViewer from "../../SubsurfaceViewer";
-import type { MapMouseEvent, TooltipCallback } from "../../components/Map";
-import type { WellsPickInfo } from "../../layers/wells/wellsLayer";
 import InfoCard from "../../components/InfoCard";
+import type { MapMouseEvent, TooltipCallback } from "../../components/Map";
 import { ViewFooter } from "../../components/ViewFooter";
 import type {
     ExtendedLayerProps,
     LayerPickInfo,
     PropertyDataType,
 } from "../../layers/utils/layerTools";
+import type { WellsPickInfo } from "../../layers/wells/wellsLayer";
 
 import {
     defaultStoryParameters,

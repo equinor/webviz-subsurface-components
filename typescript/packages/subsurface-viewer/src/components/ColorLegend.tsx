@@ -6,7 +6,7 @@ import {
     ContinuousLegend,
 } from "@emerson-eps/color-tables";
 import type { ExtendedLayer } from "../layers/utils/layerTools";
-import type { Color } from "@deck.gl/core/typed";
+import type { Color } from "@deck.gl/core";
 import type { colorTablesArray } from "@emerson-eps/color-tables/";
 import type { colorMapFunctionType } from "../layers/utils/layerTools";
 
@@ -41,7 +41,11 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
         DiscreteLegendDataType | ContinuousLegendDataType
     >();
     React.useEffect(() => {
-        const legend_data = layer.getLegendData?.() ?? layer.state?.["legend"];
+        const legend_data =
+            layer.getLegendData?.() ??
+            (layer.state?.["legend"] as
+                | DiscreteLegendDataType
+                | ContinuousLegendDataType);
         setLegendData(legend_data);
     }, [layer.props, layer.state?.["legend"]]);
 

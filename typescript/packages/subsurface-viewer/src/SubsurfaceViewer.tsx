@@ -1,5 +1,5 @@
 import React from "react";
-import type { PickingInfo, Layer, LayersList } from "@deck.gl/core/typed";
+import type { PickingInfo, Layer, LayersList } from "@deck.gl/core";
 import PropTypes from "prop-types";
 import type { colorTablesArray } from "@emerson-eps/color-tables/";
 import type { Unit } from "convert-units";

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { isEmpty } from "lodash";
-import type { LayerProps } from "@deck.gl/core/typed";
+import type { LayerProps } from "@deck.gl/core";
 import {
     ToggleTypeProps,
     MenuTypeProps,

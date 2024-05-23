@@ -1,7 +1,8 @@
-import { LayerExtension } from "@deck.gl/core/typed";
+import { LayerExtension } from "@deck.gl/core";
 
-import type { Layer, _ShaderModule as ShaderModule } from "@deck.gl/core/typed";
-import { project32, project } from "@deck.gl/core/typed";
+import type { ShaderModule } from "@luma.gl/shadertools";
+import type { Layer } from "@deck.gl/core";
+import { project32, project } from "@deck.gl/core";
 
 const defaultProps = {
     sideViewIds: [],

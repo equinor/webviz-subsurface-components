@@ -136,7 +136,7 @@ export function makeFullMesh(e: { data: Params }) {
     }
 
     const geometryTriangles: GeometryTriangles = {
-        drawMode: 4, // corresponds to GL.TRIANGLES,
+        topology: "triangle-list",
         attributes: {
             positions: { value: new Float32Array(vertexArray), size: 3 },
             normals: { value: new Float32Array(vertexsNormals), size: 3 },
@@ -147,7 +147,7 @@ export function makeFullMesh(e: { data: Params }) {
     };
 
     const geometryLines: GeometryLines = {
-        drawMode: 1, // corresponds to GL.LINES,
+        topology: "line-list",
         attributes: {
             positions: { value: new Float32Array(line_positions), size: 3 },
         },

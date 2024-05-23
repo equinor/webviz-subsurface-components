@@ -1,7 +1,7 @@
-import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+import React from "react";
 
-import { View } from "@deck.gl/core/typed";
+import { View } from "@deck.gl/core";
 
 import { ColorLegend } from "@emerson-eps/color-tables";
 

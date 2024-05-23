@@ -3,11 +3,6 @@ const fsShader = `#version 300 es
 
 precision highp float;
 
-
-uniform bool isContoursDepth;
-uniform float contourReferencePoint;
-uniform float contourInterval;
-
 in vec2 vTexCoord;
 in vec3 cameraPosition;
 in vec3 normals_commonspace;
@@ -19,7 +14,13 @@ flat in int vertexIndex;
 in vec3 worldPos;
 in float property;
 
+out vec4 fragColor;
+
 uniform sampler2D colormap;
+
+uniform bool isContoursDepth;
+uniform float contourReferencePoint;
+uniform float contourInterval;
 
 uniform float valueRangeMin;
 uniform float valueRangeMax;
@@ -31,27 +32,22 @@ uniform bool isClampColor;
 uniform bool isColorMapClampColorTransparent;
 uniform bool smoothShading;
 
-
 void main(void) { 
    geometry.uv = vTexCoord;
 
    vec3 normal = normals_commonspace;
-   // These are sent as Int8
-   normal[0] /= 127.0;
-   normal[1] /= 127.0;
-   normal[2] /= 127.0;
 
    if (!smoothShading || (normal[0] == 0.0 && normal[1] == 0.0 && normal[2] == 0.0)) {
       normal = normalize(cross(dFdx(position_commonspace.xyz), dFdy(position_commonspace.xyz)));
    }
 
    //Picking pass.
-   if (picking_uActive && !picking_uAttribute) {
-      gl_FragColor = encodeVertexIndexToRGB(vertexIndex);
+   if (picking.isActive > 0.5 && !(picking.isAttribute > 0.5)) {
+      fragColor = encodeVertexIndexToRGB(vertexIndex);
       return;
    }
 
-   vec4 color = vec4(1.0, 1.0, 1.0,  1.0);;
+   vec4 color = vec4(1.0, 1.0, 1.0,  1.0);
    float propertyValue = property;
 
    float x = (propertyValue - colorMapRangeMin) / (colorMapRangeMax - colorMapRangeMin);
@@ -70,17 +66,15 @@ void main(void) {
          x = max(0.0, x);
          x = min(1.0, x);
 
-         color = texture2D(colormap, vec2(x, 0.5));
+         color = texture(colormap, vec2(x, 0.5));
       }
    }
    else {
-      color = texture2D(colormap, vec2(x, 0.5));
+      color = texture(colormap, vec2(x, 0.5));
    }
 
-  
    bool is_contours = contourReferencePoint != -1.0 && contourInterval != -1.0;
    if (is_contours) {
-      // Contours are made of either depths or properties.
       float val = isContoursDepth ? (abs(worldPos.z) - contourReferencePoint) / contourInterval
                                   : (propertyValue - contourReferencePoint) / contourInterval;
 
@@ -95,8 +89,8 @@ void main(void) {
 
    // Use two sided phong lighting. This has no effect if "material" property is not set.
    vec3 lightColor = getPhongLightColor(color.rgb, cameraPosition, position_commonspace.xyz, normal);
-   gl_FragColor = vec4(lightColor, 1.0);
-   DECKGL_FILTER_COLOR(gl_FragColor, geometry);
+   fragColor = vec4(lightColor, 1.0);
+   DECKGL_FILTER_COLOR(fragColor, geometry);
 }
 `;
 

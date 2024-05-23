@@ -1,39 +1,33 @@
-import type { PickingInfo, UpdateParameters, Color } from "@deck.gl/core/typed";
+import type {
+    Color,
+    LayerContext,
+    PickingInfo,
+    UpdateParameters,
+} from "@deck.gl/core";
 import {
     COORDINATE_SYSTEM,
     Layer,
     picking,
     project,
     project32,
-} from "@deck.gl/core/typed";
+} from "@deck.gl/core";
 
-import GL from "@luma.gl/constants";
-import { Texture2D } from "@luma.gl/webgl";
-import { Model, Geometry } from "@luma.gl/engine";
-
+//import GL from "@luma.gl/constants";
+import type { UniformValue, TextureData, Texture } from "@luma.gl/core";
+import { Geometry, Model } from "@luma.gl/engine";
 import { localPhongLighting, utilities } from "../shader_modules";
-
-import { getImageData, createPropertyData } from "../utils/layerTools";
 import type {
+    ExtendedLayerProps,
     LayerPickInfo,
     PropertyDataType,
-    ExtendedLayerProps,
     colorMapFunctionType,
 } from "../utils/layerTools";
-
+import { createPropertyData, getImageData } from "../utils/layerTools";
 import type { DeckGLLayerContext } from "../../components/Map";
-
-import vs from "./vertex.glsl";
 import fs from "./fragment.fs.glsl";
-import vsLineShader from "./vertex_lines.glsl";
 import fsLineShader from "./fragment_lines.glsl";
-
-const DEFAULT_TEXTURE_PARAMETERS = {
-    [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,
-    [GL.TEXTURE_MAG_FILTER]: GL.LINEAR,
-    [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
-    [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE,
-};
+import vs from "./vertex.glsl";
+import vsLineShader from "./vertex_lines.glsl";
 
 export type Material =
     | {
@@ -45,7 +39,7 @@ export type Material =
     | boolean;
 export interface PrivateMapLayerProps extends ExtendedLayerProps {
     positions: Float32Array;
-    normals: Int8Array;
+    normals: Float32Array;
     triangleIndices: Uint32Array;
     vertexProperties: Float32Array;
     vertexIndices: Int32Array;
@@ -79,14 +73,14 @@ const defaultProps = {
 // This is a private layer used only by the composite MapLayer
 export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
     get isLoaded(): boolean {
-        return this.state["isLoaded"] ?? false;
+        return (this.state["isLoaded"] as boolean) ?? false;
     }
 
     initializeState(context: DeckGLLayerContext): void {
-        const { gl } = context;
-        const [model_mesh, mesh_lines_model] = this._getModels(gl);
+        const gl = context.device;
+        const [mesh_model, mesh_lines_model] = this._getModels(gl);
         this.setState({
-            models: [model_mesh, mesh_lines_model],
+            models: [mesh_model, mesh_lines_model],
             isLoaded: false,
         });
     }
@@ -113,61 +107,27 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
 
     //eslint-disable-next-line
     _getModels(gl: any) {
-        const shaders = this.getShaders();
+        const colormap: Texture = gl.createTexture({
+            sampler: {
+                addressModeU: "clamp-to-edge",
+                addressModeV: "clamp-to-edge",
+                minFilter: "linear",
+                magFilter: "linear",
+            },
+            width: 256,
+            height: 1,
+            format: "rgb8unorm-webgl",
+            data: getImageData(
+                this.props.colorMapName,
+                (this.context as DeckGLLayerContext).userData.colorTables,
+                this.props.colorMapFunction
+            ) as TextureData,
+        });
 
         // MESH MODEL
-        const mesh_model = new Model(gl, {
-            id: `${this.props.id}-mesh`,
-            ...shaders,
-            geometry: new Geometry({
-                drawMode: gl.TRIANGLES,
-                attributes: {
-                    positions: { value: this.props.positions, size: 3 },
-                    // Only add normals if they are defined.
-                    ...(this.props.normals.length > 0 && {
-                        normals: { value: this.props.normals, size: 3 },
-                    }),
-                    properties: { value: this.props.vertexProperties, size: 1 },
-                },
-                indices: { value: this.props.triangleIndices, size: 1 },
-            }),
-            isInstanced: false, // This only works when set to false.
-        });
-
-        // MESH LINES
-        const mesh_lines_model = new Model(gl, {
-            id: `${this.props.id}-lines`,
-            vs: vsLineShader,
-            fs: fsLineShader,
-            geometry: new Geometry({
-                drawMode: gl.LINES,
-                attributes: {
-                    positions: { value: this.props.positions, size: 3 },
-                },
-                indices: { value: this.props.lineIndices, size: 1 },
-            }),
-            modules: [project],
-            isInstanced: false,
-        });
-
-        return [mesh_model, mesh_lines_model];
-    }
-
-    // Signature from the base class, eslint doesn't like the any type.
-    // eslint-disable-next-line
-    draw(args: any): void {
-        if (!this.state["models"]) {
-            return;
-        }
-
-        const { uniforms, context } = args;
-        const { gl } = context;
-
         const contourReferencePoint = this.props.contours[0] ?? -1.0;
         const contourInterval = this.props.contours[1] ?? -1.0;
         const isContoursDepth = this.props.isContoursDepth;
-
-        const [model_mesh, mesh_lines_model] = this.state["models"];
 
         const valueRangeMin = this.props.propertyValueRange[0] ?? 0.0;
         const valueRangeMax = this.props.propertyValueRange[1] ?? 1.0;
@@ -198,30 +158,26 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
         const smoothShading =
             this.props.normals.length == 0 ? false : this.props.smoothShading;
 
-        gl.enable(GL.POLYGON_OFFSET_FILL);
-        if (!this.props.depthTest) {
-            gl.disable(GL.DEPTH_TEST);
-        }
-
-        gl.polygonOffset(1, 1);
-        model_mesh
-            .setUniforms({
-                ...uniforms,
+        const mesh_model = new Model(gl, {
+            id: `${this.props.id}-mesh`,
+            ...this.getShaders(),
+            geometry: new Geometry({
+                topology: "triangle-list",
+                attributes: {
+                    positions: { value: this.props.positions, size: 3 },
+                    // Only add normals if they are defined.
+                    ...(this.props.normals.length > 0 && {
+                        normals: { value: this.props.normals, size: 3 },
+                    }),
+                    properties: { value: this.props.vertexProperties, size: 1 },
+                },
+                indices: { value: this.props.triangleIndices, size: 1 },
+            }),
+            bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
+            uniforms: {
                 contourReferencePoint,
                 contourInterval,
                 isContoursDepth,
-                colormap: new Texture2D(context.gl, {
-                    width: 256,
-                    height: 1,
-                    format: GL.RGB,
-                    data: getImageData(
-                        this.props.colorMapName,
-                        (this.context as DeckGLLayerContext).userData
-                            .colorTables,
-                        this.props.colorMapFunction
-                    ),
-                    parameters: DEFAULT_TEXTURE_PARAMETERS,
-                }),
                 valueRangeMin,
                 valueRangeMax,
                 colorMapRangeMin,
@@ -231,21 +187,66 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
                 isClampColor,
                 smoothShading,
                 ZIncreasingDownwards: this.props.ZIncreasingDownwards,
-            })
-            .draw();
-        gl.disable(GL.POLYGON_OFFSET_FILL);
+            },
+            bindings: {
+                colormap: colormap,
+            },
+            isInstanced: false,
+        });
+
+        // MESH LINES
+        const mesh_lines_model = new Model(gl, {
+            id: `${this.props.id}-lines`,
+            vs: vsLineShader,
+            fs: fsLineShader,
+            geometry: new Geometry({
+                topology: "line-list",
+                attributes: {
+                    positions: { value: this.props.positions, size: 3 },
+                },
+                indices: { value: this.props.lineIndices, size: 1 },
+            }),
+            bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
+            modules: [project],
+            isInstanced: false,
+        });
+
+        return [mesh_model, mesh_lines_model];
+    }
+
+    draw(args: {
+        moduleParameters?: unknown;
+        uniforms: UniformValue;
+        context: LayerContext;
+    }): void {
+        if (!this.state["models"]) {
+            return;
+        }
+
+        const { uniforms, context } = args;
+        const { gl } = context;
+
+        const [mesh_model, mesh_lines_model] = this.state["models"] as Model[];
+
+        gl.enable(gl.POLYGON_OFFSET_FILL);
+        if (!this.props.depthTest) {
+            gl.disable(gl.DEPTH_TEST);
+        }
+
+        gl.polygonOffset(1, 1);
+        mesh_model.draw(context.renderPass);
+        gl.disable(gl.POLYGON_OFFSET_FILL);
 
         if (!this.props.depthTest) {
-            gl.enable(GL.DEPTH_TEST);
+            gl.enable(gl.DEPTH_TEST);
         }
 
         if (this.props.gridLines) {
-            mesh_lines_model
-                .setUniforms({
-                    ...uniforms,
-                    ZIncreasingDownwards: this.props.ZIncreasingDownwards,
-                })
-                .draw();
+            mesh_lines_model.setUniforms({
+                uniforms,
+                ZIncreasingDownwards: this.props.ZIncreasingDownwards,
+            });
+            mesh_lines_model.draw(context.renderPass);
         }
 
         if (!this.state["isLoaded"]) {
