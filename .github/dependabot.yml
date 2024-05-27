@@ -9,3 +9,30 @@ updates:
     commit-message:
       prefix: fix
       prefix-development: chore
+    # Create a group of dependencies to be updated together in one pull request
+    groups:
+      react_group:
+        # Define patterns to include dependencies in the group (based on
+        # dependency name)
+        applies-to: version-updates # Applies the group rule to version updates
+        patterns:
+          - "react" # Group the react package
+          - "react-dom" # Group the react-dom package
+          - "@types/react" # Group all the react types dependencies
+          - "@types/react-dom" # Group all the react-dom types dependencies
+          # exclude react-redux as it drops the support for react 17
+      # Specify a name for the group, which will be used in pull request titles
+      # and branch names
+      deckgl_group:
+        # Define patterns to include dependencies in the group (based on
+        # dependency name)
+        applies-to: version-updates # Applies the group rule to version updates
+        patterns:
+          - "@deck.gl/*" # Group all the deckgl dependencies
+      storybook_group:
+        # Define patterns to include dependencies in the group (based on
+        # dependency name)
+        applies-to: version-updates # Applies the group rule to version updates
+        patterns:
+          - "storybook" # Group the storybook package
+          - "@storybook/*" # Group all the storybook dependencies
