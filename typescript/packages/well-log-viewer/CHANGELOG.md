@@ -1,3 +1,10 @@
+# [1.8.0](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.7.4...well-log-viewer@1.8.0) (2024-05-28)
+
+
+### Features
+
+* WLV callback to reset component to given props ([#1993](https://github.com/equinor/webviz-subsurface-components/issues/1993)) ([#2047](https://github.com/equinor/webviz-subsurface-components/issues/2047)) ([18ea7cb](https://github.com/equinor/webviz-subsurface-components/commit/18ea7cb11252b613e44f12208b672ad4bda30cd9))
+
 ## [1.7.4](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.7.3...well-log-viewer@1.7.4) (2024-05-23)
 
 
