@@ -1,3 +1,10 @@
+## [1.1.16](https://github.com/equinor/webviz-subsurface-components/compare/group-tree-plot@1.1.15...group-tree-plot@1.1.16) (2024-05-29)
+
+
+### Bug Fixes
+
+* bump ajv from 8.12.0 to 8.14.0 in /typescript ([#2075](https://github.com/equinor/webviz-subsurface-components/issues/2075)) ([e7194a4](https://github.com/equinor/webviz-subsurface-components/commit/e7194a4b6fd7ce706bbd44ec774c408de92053b8)), closes [ajv-validator/ajv#2424](https://github.com/ajv-validator/ajv/issues/2424) [ajv-validator/ajv#2410](https://github.com/ajv-validator/ajv/issues/2410) [ajv-validator/ajv#2428](https://github.com/ajv-validator/ajv/issues/2428) [ajv-validator/ajv#2431](https://github.com/ajv-validator/ajv/issues/2431) [#2427](https://github.com/equinor/webviz-subsurface-components/issues/2427) [ajv-validator/ajv#2433](https://github.com/ajv-validator/ajv/issues/2433) [ajv-validator/ajv#2440](https://github.com/ajv-validator/ajv/issues/2440) [ajv-validator/ajv#2410](https://github.com/ajv-validator/ajv/issues/2410) [#2440](https://github.com/equinor/webviz-subsurface-components/issues/2440) [#2427](https://github.com/equinor/webviz-subsurface-components/issues/2427) [#2433](https://github.com/equinor/webviz-subsurface-components/issues/2433) [#2431](https://github.com/equinor/webviz-subsurface-components/issues/2431) [#2428](https://github.com/equinor/webviz-subsurface-components/issues/2428) [#2410](https://github.com/equinor/webviz-subsurface-components/issues/2410) [#2424](https://github.com/equinor/webviz-subsurface-components/issues/2424) [#2423](https://github.com/equinor/webviz-subsurface-components/issues/2423) [#2421](https://github.com/equinor/webviz-subsurface-components/issues/2421) [#2406](https://github.com/equinor/webviz-subsurface-components/issues/2406) [#2402](https://github.com/equinor/webviz-subsurface-components/issues/2402)
+
 ## [1.1.15](https://github.com/equinor/webviz-subsurface-components/compare/group-tree-plot@1.1.14...group-tree-plot@1.1.15) (2024-05-23)
 
 
