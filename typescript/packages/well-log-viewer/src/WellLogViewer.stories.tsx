@@ -127,12 +127,15 @@ const StoryTemplate = (args) => {
     const onContentSelection = React.useCallback(() => {
         setInfo(fillInfo(controller));
     }, [controller]);
+    const handleClick = () => {
+        if (controller) {
+            controller.setControllerDefaultZoom();
+        }
+    };
 
     return (
-        <div
-            style={{ height: "92vh", display: "flex", flexDirection: "column" }}
-        >
-            <div style={{ width: "100%", height: "100%", flex: 1 }}>
+        <div>
+            <div style={{ height: "92vh", width: "100%" }}>
                 <WellLogViewer
                     id="WellLogViewer"
                     {...args}
@@ -141,7 +144,12 @@ const StoryTemplate = (args) => {
                     onContentSelection={onContentSelection}
                 />
             </div>
-            <div ref={infoRef} style={{ width: "100%", flex: 0 }}></div>
+            <div style={{ display: "inline-flex" }}>
+                <div ref={infoRef}></div>
+                <button onClick={handleClick} style={{ marginLeft: 10 }}>
+                    Reset
+                </button>
+            </div>
         </div>
     );
 };

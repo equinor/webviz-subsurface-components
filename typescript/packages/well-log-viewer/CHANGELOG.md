@@ -1,3 +1,31 @@
+## [1.8.1](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.8.0...well-log-viewer@1.8.1) (2024-05-29)
+
+
+### Bug Fixes
+
+* bump ajv from 8.12.0 to 8.14.0 in /typescript ([#2075](https://github.com/equinor/webviz-subsurface-components/issues/2075)) ([e7194a4](https://github.com/equinor/webviz-subsurface-components/commit/e7194a4b6fd7ce706bbd44ec774c408de92053b8)), closes [ajv-validator/ajv#2424](https://github.com/ajv-validator/ajv/issues/2424) [ajv-validator/ajv#2410](https://github.com/ajv-validator/ajv/issues/2410) [ajv-validator/ajv#2428](https://github.com/ajv-validator/ajv/issues/2428) [ajv-validator/ajv#2431](https://github.com/ajv-validator/ajv/issues/2431) [#2427](https://github.com/equinor/webviz-subsurface-components/issues/2427) [ajv-validator/ajv#2433](https://github.com/ajv-validator/ajv/issues/2433) [ajv-validator/ajv#2440](https://github.com/ajv-validator/ajv/issues/2440) [ajv-validator/ajv#2410](https://github.com/ajv-validator/ajv/issues/2410) [#2440](https://github.com/equinor/webviz-subsurface-components/issues/2440) [#2427](https://github.com/equinor/webviz-subsurface-components/issues/2427) [#2433](https://github.com/equinor/webviz-subsurface-components/issues/2433) [#2431](https://github.com/equinor/webviz-subsurface-components/issues/2431) [#2428](https://github.com/equinor/webviz-subsurface-components/issues/2428) [#2410](https://github.com/equinor/webviz-subsurface-components/issues/2410) [#2424](https://github.com/equinor/webviz-subsurface-components/issues/2424) [#2423](https://github.com/equinor/webviz-subsurface-components/issues/2423) [#2421](https://github.com/equinor/webviz-subsurface-components/issues/2421) [#2406](https://github.com/equinor/webviz-subsurface-components/issues/2406) [#2402](https://github.com/equinor/webviz-subsurface-components/issues/2402)
+
+# [1.8.0](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.7.4...well-log-viewer@1.8.0) (2024-05-28)
+
+
+### Features
+
+* WLV callback to reset component to given props ([#1993](https://github.com/equinor/webviz-subsurface-components/issues/1993)) ([#2047](https://github.com/equinor/webviz-subsurface-components/issues/2047)) ([18ea7cb](https://github.com/equinor/webviz-subsurface-components/commit/18ea7cb11252b613e44f12208b672ad4bda30cd9))
+
+## [1.7.4](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.7.3...well-log-viewer@1.7.4) (2024-05-23)
+
+
+### Bug Fixes
+
+* [Snyk] Security upgrade @nx/jest from 16.5.0 to 16.9.0 ([#2048](https://github.com/equinor/webviz-subsurface-components/issues/2048)) ([288a626](https://github.com/equinor/webviz-subsurface-components/commit/288a6263bcff3a53d072c999e691abb930acf3b8)), closes [#19302](https://github.com/equinor/webviz-subsurface-components/issues/19302) [#19287](https://github.com/equinor/webviz-subsurface-components/issues/19287) [#19299](https://github.com/equinor/webviz-subsurface-components/issues/19299) [#19296](https://github.com/equinor/webviz-subsurface-components/issues/19296) [#19281](https://github.com/equinor/webviz-subsurface-components/issues/19281) [#19298](https://github.com/equinor/webviz-subsurface-components/issues/19298) [#19187](https://github.com/equinor/webviz-subsurface-components/issues/19187) [#18172](https://github.com/equinor/webviz-subsurface-components/issues/18172) [#19081](https://github.com/equinor/webviz-subsurface-components/issues/19081) [#19082](https://github.com/equinor/webviz-subsurface-components/issues/19082) [#19227](https://github.com/equinor/webviz-subsurface-components/issues/19227) [#19201](https://github.com/equinor/webviz-subsurface-components/issues/19201) [#19214](https://github.com/equinor/webviz-subsurface-components/issues/19214) [#19288](https://github.com/equinor/webviz-subsurface-components/issues/19288) [#19289](https://github.com/equinor/webviz-subsurface-components/issues/19289) [#17971](https://github.com/equinor/webviz-subsurface-components/issues/17971) [#18506](https://github.com/equinor/webviz-subsurface-components/issues/18506) [#18904](https://github.com/equinor/webviz-subsurface-components/issues/18904) [#19154](https://github.com/equinor/webviz-subsurface-components/issues/19154) [#19133](https://github.com/equinor/webviz-subsurface-components/issues/19133) [#19176](https://github.com/equinor/webviz-subsurface-components/issues/19176) [#1](https://github.com/equinor/webviz-subsurface-components/issues/1) [#19283](https://github.com/equinor/webviz-subsurface-components/issues/19283) [#19191](https://github.com/equinor/webviz-subsurface-components/issues/19191) [#19237](https://github.com/equinor/webviz-subsurface-components/issues/19237)
+
+## [1.7.3](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.7.2...well-log-viewer@1.7.3) (2024-05-23)
+
+
+### Bug Fixes
+
+* remove duplicated file ([#2051](https://github.com/equinor/webviz-subsurface-components/issues/2051)) ([1a8d63c](https://github.com/equinor/webviz-subsurface-components/commit/1a8d63c1d7ad4d07bb6f2fbdd7a12282fa6beca8))
+
 ## [1.7.2](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.7.1...well-log-viewer@1.7.2) (2024-04-18)
 
 

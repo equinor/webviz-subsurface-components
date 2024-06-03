@@ -9,3 +9,42 @@ updates:
     commit-message:
       prefix: fix
       prefix-development: chore
+    # Create a group of dependencies to be updated together in one pull request:
+    # https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+    groups:
+      # Group name is used in pull request titles and branch names
+      nx:
+        applies-to: version-updates # Applies the group rule to version updates
+        patterns: # Define patterns to include dependencies in the group (based on dependency name)
+          - "nx" # Group the "nx" dependency
+          - "@nx/jest" # Group the "@nx/jest" dependency
+      # Other groups are not documented ;)
+      react:
+        applies-to: version-updates
+        patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
+          # exclude react-redux as it drops the support for react 17
+      deckgl:
+        applies-to: version-updates
+        patterns:
+          - "@deck.gl/*"
+      storybook:
+        applies-to: version-updates
+        patterns:
+          - "storybook"
+          - "@storybook/*"
+      typescript-eslint:
+        applies-to: version-updates
+        patterns:
+          - "@typescript-eslint/*"
+      eslint-plugin:
+        applies-to: version-updates
+        patterns:
+          - "eslint-plugin-*"
+      testing-library:
+        applies-to: version-updates
+        patterns:
+          - "@testing-library/*"

@@ -1528,6 +1528,10 @@ class WellLogView
     setControllerSelection(): void {
         if (this.props.selection) this.selectContent(this.props.selection);
     }
+    setControllerDefaultZoom(): void {
+        if (this.props.domain) this.zoomContentTo(this.props.domain);
+        else this.zoomContentTo(this.getContentBaseDomain());
+    }
 
     /**
       Display current state of track scrolling

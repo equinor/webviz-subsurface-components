@@ -1,8 +1,12 @@
 import { removeConsecutiveDuplicates, splineRefine } from "./spline";
 import type { Position3D } from "../../utils/layerTools";
-import type { FeatureCollection } from "geojson";
+import type {
+    FeatureCollection,
+    GeometryCollection,
+    LineString,
+} from "geojson";
 
-const testWell: FeatureCollection = {
+const testWell: FeatureCollection<GeometryCollection> = {
     type: "FeatureCollection",
     features: [
         {
@@ -85,27 +89,19 @@ describe("remove duplicates", () => {
 
     // Test splineRefine functions
     it("should not refine if given invalid input", () => {
-        expect(
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            splineRefine(testWell, 0).features[0].geometry.geometries[1]
-                .coordinates.length
-        ).toStrictEqual(9);
+        const refined = splineRefine(testWell, 0);
+        const geometry = refined.features[0].geometry
+            .geometries[1] as LineString;
+        expect(geometry.coordinates.length).toStrictEqual(9);
     });
 
     it("should refine and output more vertices if given valid input", () => {
-        expect(
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            splineRefine(testWell).features[0].geometry.geometries[1]
-                .coordinates.length
-        ).toStrictEqual(33);
+        let refined = splineRefine(testWell);
+        let geometry = refined.features[0].geometry.geometries[1] as LineString;
+        expect(geometry.coordinates.length).toStrictEqual(33);
 
-        expect(
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            splineRefine(testWell, 10).features[0].geometry.geometries[1]
-                .coordinates.length
-        ).toStrictEqual(63);
+        refined = splineRefine(testWell, 10);
+        geometry = refined.features[0].geometry.geometries[1] as LineString;
+        expect(geometry.coordinates.length).toStrictEqual(63);
     });
 });
