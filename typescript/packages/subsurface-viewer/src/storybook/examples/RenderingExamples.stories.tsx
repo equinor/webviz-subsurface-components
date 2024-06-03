@@ -8,6 +8,7 @@ import { SphereGeometry } from "@luma.gl/engine";
 import Slider from "@mui/material/Slider";
 import Stack from "@mui/material/Stack";
 import Switch from "@mui/material/Switch";
+import TextField from "@mui/material/TextField";
 import { styled } from "@mui/material/styles";
 
 import SubsurfaceViewer from "../../SubsurfaceViewer";
@@ -169,56 +170,304 @@ export const IsRenderedCallback: StoryObj<typeof SubsurfaceViewer> = {
     render: (args) => <IsRenderedComponent {...args} />,
 };
 
+interface ICoordinates {
+    x: number;
+    y: number;
+    z: number;
+}
+
+type IColor = [number, number, number];
+
+interface ILight {
+    active: boolean;
+    label: string;
+    intensity: number;
+    color: IColor;
+    coordinates?: ICoordinates;
+}
+
+interface CoordInputProps {
+    label: string;
+    value: number;
+    setValue: any;
+}
+
+function CoordField({ label, value, setValue: setCoord }: CoordInputProps) {
+    const handleChange = (event) => {
+        const { value } = event.target;
+        // Allow only valid float numbers with up to two decimal places
+        if (/^-?\d*\.?\d{0,2}$/.test(value)) {
+            setCoord(value);
+        }
+    };
+
+    return (
+        <TextField
+            label={label}
+            value={value}
+            onChange={handleChange}
+            inputProps={{
+                inputMode: "decimal",
+                pattern: "^-?d*.?d{0,2}$",
+            }}
+            size="small"
+            style={{ width: 80 }}
+        />
+    );
+}
+
+interface CoordinatesEditorProps {
+    label: string;
+    coordinates: ICoordinates;
+    setCoordinates: any;
+}
+
+function CoordinatesEditor({
+    label,
+    coordinates,
+    setCoordinates,
+}: CoordinatesEditorProps) {
+    return (
+        <>
+            <label>{label}</label>
+            <CoordField
+                label="X"
+                value={coordinates.x}
+                setValue={(val) => setCoordinates({ ...coordinates, x: val })}
+            />
+            <CoordField
+                label="Y"
+                value={coordinates.y}
+                setValue={(val) => setCoordinates({ ...coordinates, y: val })}
+            />
+            <CoordField
+                label="Z"
+                value={coordinates.z}
+                setValue={(val) => setCoordinates({ ...coordinates, z: val })}
+            />
+        </>
+    );
+}
+
+interface LightEditorProps {
+    lightName: string;
+    light: ILight | ILight[];
+    setLight: any;
+}
+
+function LightEditor({ lightName, light, setLight }: LightEditorProps) {
+    if (!Array.isArray(light)) {
+        return (
+            <Stack>
+                <Stack direction={"row"} alignItems={"center"}>
+                    <label>{lightName}</label>
+                    <Switch
+                        value={true}
+                        onClick={() => {
+                            setLight({ ...light, active: !light.active });
+                        }}
+                    />
+                </Stack>
+                <Slider
+                    defaultValue={100 * light.intensity}
+                    min={0}
+                    max={100}
+                    valueLabelDisplay={"auto"}
+                    onChange={(_event: Event, value: number | number[]) => {
+                        setLight({
+                            ...light,
+                            intensity: (value as number) / 100,
+                        });
+                    }}
+                />
+                {light.coordinates && <p>COORDINATES</p>}
+            </Stack>
+        );
+    }
+    return (
+        <Stack>
+            <label>{lightName}</label>
+            {light.map((l, i) => (
+                <div key={i}>
+                    <Stack direction={"row"} alignItems={"center"}>
+                        <label>{`Light # ${i}`}</label>
+                        <Switch
+                            value={true}
+                            onClick={() => {
+                                setLight(
+                                    light.map((l, li) =>
+                                        li === i
+                                            ? { ...l, active: !l.active }
+                                            : l
+                                    )
+                                );
+                            }}
+                        />
+                    </Stack>
+                    <Slider
+                        defaultValue={100 * light[i].intensity}
+                        min={0}
+                        max={100}
+                        valueLabelDisplay={"auto"}
+                        onChange={(_event: Event, value: number | number[]) => {
+                            setLight(
+                                light.map((l, li) =>
+                                    li === i
+                                        ? {
+                                              ...l,
+                                              intensity:
+                                                  (value as number) / 100,
+                                          }
+                                        : l
+                                )
+                            );
+                        }}
+                    />
+                    {light[i].coordinates && (
+                        <CoordinatesEditor
+                            coordinates={light[i].coordinates}
+                            setCoordinates={(coords: ICoordinates) => {
+                                setLight(
+                                    light.map((l, li) =>
+                                        li === i
+                                            ? {
+                                                  ...l,
+                                                  coordinates: coords,
+                                              }
+                                            : l
+                                    )
+                                );
+                            }}
+                        />
+                    )}
+                </div>
+            ))}
+        </Stack>
+    );
+}
+
+/*
+                    
+
+*/
+
+const defaultAmbient: ILight = {
+    label: "Ambient Light",
+    active: false,
+    intensity: 1,
+    color: [255, 255, 255],
+};
+const defaultHeadLight: ILight = {
+    label: "Head Light",
+    active: false,
+    intensity: 0.6,
+    color: [255, 255, 255],
+};
+const defaultPointLights: ILight[] = [
+    {
+        label: "Point Light 1",
+        active: false,
+        intensity: 0.5,
+        color: [0, 255, 0],
+        coordinates: { x: -50, y: -50, z: -50 },
+    },
+    {
+        label: "Point Light 2",
+        active: false,
+        intensity: 0.5,
+        color: [0, 255, 255],
+        coordinates: { x: -50, y: -50, z: 50 },
+    },
+];
+const defaultDirectionalLights: ILight[] = [
+    {
+        label: "Directional Light 1",
+        active: false,
+        intensity: 1.0,
+        color: [255, 255, 255],
+        coordinates: { x: -1, y: 3, z: -1 },
+    },
+    {
+        label: "Directional Light 2",
+        active: false,
+        intensity: 0.9,
+        color: [255, 255, 255],
+        coordinates: { x: 1, y: -8, z: -2.5 },
+    },
+];
+
 const LightsStoryComponent: React.FC<SubsurfaceViewerProps> = (
     args: SubsurfaceViewerProps
 ) => {
-    const [headLight, setHeadLight] = React.useState(false);
-    const [ambientLight, setAmbientLight] = React.useState(false);
-    const [pointLight, setPointLight] = React.useState(false);
-    const [directionalLight, setDirectionalLight] = React.useState(false);
-
-    const [headLightIntensity, setHeadLightIntensity] = React.useState(1.0);
-    const [ambientLightIntensity, setAmbientLightIntensity] =
-        React.useState(1.0);
-    const [pointLightIntensity, setPointLightIntensity] = React.useState(1.0);
-    const [directionslLightIntensity, setDirectionslLightIntensity] =
-        React.useState(1.0);
+    const [ambientLight, setAmbientLight] = React.useState<ILight>(
+        () => defaultAmbient
+    );
+    const [headLight, setHeadLight] = React.useState<ILight>(
+        () => defaultHeadLight
+    );
+    const [pointLights, setPointLights] = React.useState<ILight[]>(
+        () => defaultPointLights
+    );
+    const [directionalLights, setDirectionalLights] = React.useState<ILight[]>(
+        () => defaultDirectionalLights
+    );
 
     let lights = {} as LightsType;
 
-    if (headLight) {
-        lights = { ...lights, headLight: { intensity: headLightIntensity } };
-    }
-    if (ambientLight) {
+    if (ambientLight.active) {
         lights = {
             ...lights,
-            ambientLight: { intensity: ambientLightIntensity },
+            ambientLight: {
+                intensity: ambientLight.intensity,
+                color: ambientLight.color,
+            },
+        };
+    }
+    if (headLight.active) {
+        lights = {
+            ...lights,
+            headLight: {
+                intensity: headLight.intensity,
+                color: headLight.color,
+            },
         };
     }
 
-    if (pointLight) {
+    if (pointLights) {
         lights = {
             ...lights,
-            pointLights: [
-                {
-                    intensity: pointLightIntensity,
-                    position: [-50, -50, -50],
-                    color: [0, 255, 0],
-                },
-            ],
+            pointLights: pointLights
+                .filter((l) => l.active)
+                .map((l) => {
+                    return {
+                        intensity: l.intensity,
+                        color: l.color,
+                        position: [
+                            l.coordinates?.x ?? 0,
+                            l.coordinates?.y ?? 0,
+                            l.coordinates?.z ?? 0,
+                        ],
+                    };
+                }),
         };
     }
 
-    if (directionalLight) {
+    if (directionalLights) {
         lights = {
             ...lights,
-            directionalLights: [
-                {
-                    intensity: directionslLightIntensity,
-                    direction: [-1, 0, -1],
-                    color: [255, 0, 0],
-                },
-            ],
+            directionalLights: directionalLights
+                .filter((l) => l.active)
+                .map((l) => {
+                    return {
+                        intensity: l.intensity,
+                        color: l.color,
+                        direction: [
+                            l.coordinates?.x ?? 0,
+                            l.coordinates?.y ?? 0,
+                            l.coordinates?.z ?? 0,
+                        ],
+                    };
+                }),
         };
     }
 
@@ -232,80 +481,31 @@ const LightsStoryComponent: React.FC<SubsurfaceViewerProps> = (
             <div className={classes.mainWithButton}>
                 <SubsurfaceViewer {...props} />
             </div>
-            <Stack direction={"row"} alignItems={"center"} spacing={10}>
-                <Stack>
-                    <Stack direction={"row"} alignItems={"center"}>
-                        <label>{"Head Light "}</label>
-                        <Switch
-                            onClick={() => {
-                                setHeadLight(!headLight);
-                            }}
-                        />
-                    </Stack>
-                    <Slider
-                        defaultValue={100}
-                        valueLabelDisplay={"auto"}
-                        onChange={(_event: Event, value: number | number[]) => {
-                            setHeadLightIntensity((value as number) / 100);
-                        }}
+            <Stack direction={"row"} alignItems={"top"} spacing={10}>
+                <LightEditor
+                    lightName="AmbientLight"
+                    light={ambientLight}
+                    setLight={setAmbientLight}
+                />
+                <LightEditor
+                    lightName="HeadLight"
+                    light={headLight}
+                    setLight={setHeadLight}
+                />
+                {
+                    <LightEditor
+                        lightName="Point Lights"
+                        light={pointLights}
+                        setLight={setPointLights}
                     />
-                </Stack>
-
-                <Stack>
-                    <Stack direction={"row"} alignItems={"center"}>
-                        <label>{"Ambient Light "}</label>
-                        <Switch
-                            onClick={() => {
-                                setAmbientLight(!ambientLight);
-                            }}
-                        />
-                    </Stack>
-                    <Slider
-                        defaultValue={100}
-                        valueLabelDisplay={"auto"}
-                        onChange={(_event: Event, value: number | number[]) => {
-                            setAmbientLightIntensity((value as number) / 100);
-                        }}
+                }
+                {
+                    <LightEditor
+                        lightName="DirectionalLights"
+                        light={directionalLights}
+                        setLight={setDirectionalLights}
                     />
-                </Stack>
-
-                <Stack>
-                    <Stack direction={"row"} alignItems={"center"}>
-                        <label>{"Point Light "}</label>
-                        <Switch
-                            onClick={() => {
-                                setPointLight(!pointLight);
-                            }}
-                        />
-                    </Stack>
-                    <Slider
-                        defaultValue={100}
-                        valueLabelDisplay={"auto"}
-                        onChange={(_event: Event, value: number | number[]) => {
-                            setPointLightIntensity((value as number) / 100);
-                        }}
-                    />
-                </Stack>
-
-                <Stack>
-                    <Stack direction={"row"} alignItems={"center"}>
-                        <label>{"Directional Light "}</label>
-                        <Switch
-                            onClick={() => {
-                                setDirectionalLight(!directionalLight);
-                            }}
-                        />
-                    </Stack>
-                    <Slider
-                        defaultValue={100}
-                        valueLabelDisplay={"auto"}
-                        onChange={(_event: Event, value: number | number[]) => {
-                            setDirectionslLightIntensity(
-                                (value as number) / 100
-                            );
-                        }}
-                    />
-                </Stack>
+                }
             </Stack>
         </Root>
     );

@@ -100,43 +100,38 @@ function parseLights(lights?: LightsType): LightingEffect[] | undefined {
     }
 
     const effects = [];
-    let lightsObj = {};
-
-    if (lights.headLight) {
-        const headLight = new CameraLight({
-            intensity: lights.headLight.intensity,
-            color: lights.headLight.color ?? [255, 255, 255],
-        });
-        lightsObj = { ...lightsObj, headLight };
-    }
+    const lightsObj: Record<
+        string,
+        PointLight | DirectionalLight | AmbientLight
+    > = {};
 
     if (lights.ambientLight) {
-        const ambientLight = new AmbientLight({
+        lightsObj["AmbientLight"] = new AmbientLight({
             intensity: lights.ambientLight.intensity,
             color: lights.ambientLight.color ?? [255, 255, 255],
         });
-        lightsObj = { ...lightsObj, ambientLight };
     }
 
-    if (lights.pointLights) {
-        for (const light of lights.pointLights) {
-            const pointLight = new PointLight({
-                ...light,
-                color: light.color ?? [255, 255, 255],
-            });
-            lightsObj = { ...lightsObj, pointLight };
-        }
+    if (lights.headLight) {
+        lightsObj["HeadLight"] = new CameraLight({
+            intensity: lights.headLight.intensity,
+            color: lights.headLight.color ?? [255, 255, 255],
+        });
     }
 
-    if (lights.directionalLights) {
-        for (const light of lights.directionalLights) {
-            const directionalLight = new DirectionalLight({
-                ...light,
-                color: light.color ?? [255, 255, 255],
-            });
-            lightsObj = { ...lightsObj, directionalLight };
-        }
-    }
+    lights.pointLights?.forEach((light, index) => {
+        lightsObj[`PointLight_${index}`] = new PointLight({
+            ...light,
+            color: light.color ?? [255, 255, 255],
+        });
+    });
+
+    lights.directionalLights?.forEach((light, index) => {
+        lightsObj[`DirectionalLight_${index}`] = new DirectionalLight({
+            ...light,
+            color: light.color ?? [255, 255, 255],
+        });
+    });
 
     const lightingEffect = new LightingEffect(lightsObj);
     effects.push(lightingEffect);
