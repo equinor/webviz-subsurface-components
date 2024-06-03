@@ -189,6 +189,7 @@ interface ILight {
 interface CoordInputProps {
     label: string;
     value: number;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setValue: any;
 }
 
@@ -219,6 +220,7 @@ function CoordField({ label, value, setValue: setCoord }: CoordInputProps) {
 interface CoordinatesEditorProps {
     label: string;
     coordinates: ICoordinates;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setCoordinates: any;
 }
 
@@ -252,6 +254,7 @@ function CoordinatesEditor({
 interface LightEditorProps {
     lightName: string;
     light: ILight | ILight[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setLight: any;
 }
 
