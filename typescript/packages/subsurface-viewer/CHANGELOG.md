@@ -1,3 +1,10 @@
+## [0.27.5](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.27.4...subsurface-viewer@0.27.5) (2024-06-04)
+
+
+### Bug Fixes
+
+* **grid3d:** getPickingInfo reworked. ([#2084](https://github.com/equinor/webviz-subsurface-components/issues/2084)) ([847a84f](https://github.com/equinor/webviz-subsurface-components/commit/847a84fcf737dbcde1a9741a985cff84574f5753))
+
 ## [0.27.4](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.27.3...subsurface-viewer@0.27.4) (2024-06-04)
 
 
