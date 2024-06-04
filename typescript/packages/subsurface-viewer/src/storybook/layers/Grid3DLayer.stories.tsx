@@ -206,7 +206,7 @@ const propertyValueNames = [
     { value: 2, name:"green"},         // 1
     { value: 5, name: "cyan"},         // 2
     { value: 6, name: "red"},          // 3
-    { value: -8, name: "magenta"},      // 4
+    { value: -8, name: "magenta"},     // 4
     { value: 9, name: "yellow"},       // 5
     { value: 20, name: "dark blue"},   // 6
     { value: 30, name: "dark green"},  // 7
