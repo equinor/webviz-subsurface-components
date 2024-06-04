@@ -1,3 +1,10 @@
+## [0.27.3](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.27.2...subsurface-viewer@0.27.3) (2024-06-03)
+
+
+### Bug Fixes
+
+* only last point or directional light is taken into account ([#2079](https://github.com/equinor/webviz-subsurface-components/issues/2079)) ([2811222](https://github.com/equinor/webviz-subsurface-components/commit/281122298a3277a0c40404853f315b6c77519a0a))
+
 ## [0.27.2](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.27.1...subsurface-viewer@0.27.2) (2024-05-29)
 
 
