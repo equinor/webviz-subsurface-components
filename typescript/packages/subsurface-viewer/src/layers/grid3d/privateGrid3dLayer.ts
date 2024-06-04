@@ -260,7 +260,7 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
 
         const properties = this.props.mesh.attributes.properties.value;
         const propertyIndex = properties[vertexIndex];
-        if (Number.isFinite(propertyIndex)) {
+        if (this.checkPropertyIndex(propertyIndex)) {
             if (this.props.discretePropertyValueNames) {
                 const propertyText =
                     this.props.discretePropertyValueNames[propertyIndex].name ??
@@ -285,6 +285,14 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             ...info,
             properties: layer_properties,
         };
+    }
+
+    private checkPropertyIndex(index: number): boolean {
+        const length = this.props.discretePropertyValueNames?.length;
+        if (!length) {
+            return false;
+        }
+        return Number.isFinite(index) && index >= 0 && index < length;
     }
 
     private getDefaultImageData(): IImageData {
