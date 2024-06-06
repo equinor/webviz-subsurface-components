@@ -540,39 +540,6 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
 
         if (this._isMounted) this.setState({ primaryAxis: value });
     }
-    /*
-    // callback function from Scroller
-    onScrollerScroll(iWellLog: number, x: number, y: number): void {
-        const controller = this.callbackManagers[iWellLog].controller;
-        if (!controller) return;
-
-        const posMax = controller.getTrackScrollPosMax();
-        let posTrack = (this.props.horizontal ? y : x) * posMax;
-        posTrack = Math.round(posTrack);
-        controller.scrollTrackTo(posTrack);
-
-        const fContent = this.props.horizontal ? x : y; // fraction
-        controller.scrollContentTo(fContent);
-
-        const domain = controller.getContentDomain();
-        for (const callbackManager of this.callbackManagers) {
-            const _controller = callbackManager?.controller;
-            if (domain[0] === 0 && domain[1] === 0)
-                // controller.logController not created yet
-                return;
-            if (!_controller || _controller === controller) continue;
-            if (
-                !(this.props.wellpickFlatting && this.props.wellpicks) &&
-                this.props.syncContentDomain
-            ) {
-                const _domain = _controller.getContentDomain();
-                if (!isEqDomains(_domain, domain))
-                    _controller.zoomContentTo(domain);
-            }
-            if (this.props.syncTrackPos) _controller.scrollTrackTo(posTrack);
-        }
-    }
-    */
 
     syncTrackScrollPos(iWellLog: number): void {
         const controller = this.callbackManagers[iWellLog].controller;
