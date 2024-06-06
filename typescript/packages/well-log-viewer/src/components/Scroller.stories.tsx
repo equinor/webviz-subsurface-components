@@ -12,8 +12,8 @@ const ComponentCode =
     '    <div style={{ height: "92vh" }}> \r\n' +
     "        <Scroller \r\n" +
     "            ref={(el) => { \r\n" +
-    "                el.zoom(10, 10); \r\n" +
-    "                el.scrollTo(0.2, 0.2); \r\n" +
+    "                el?.zoom(10, 10); \r\n" +
+    "                el?.scrollTo(0.2, 0.2); \r\n" +
     "            }} \r\n" +
     "            onScroll={(x, y) => { \r\n" +
     "                setInfo( \r\n" +
@@ -60,8 +60,8 @@ const Template = (args) => {
         <div style={{ height: "92vh" }}>
             <Scroller
                 ref={(el) => {
-                    el.zoom(10, 10);
-                    el.scrollTo(0.2, 0.2);
+                    el?.zoom(10, 10);
+                    el?.scrollTo(0.2, 0.2);
                 }}
                 onScroll={(x, y) => {
                     setInfo(
