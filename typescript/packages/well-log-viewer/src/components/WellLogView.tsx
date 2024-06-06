@@ -915,7 +915,7 @@ export interface WellLogController {
     scrollContentTo(f: number): boolean; // fraction of content
     zoomContent(zoom: number): void;
     selectContent(selection: [number | undefined, number | undefined]): void;
-    setContentBaseDomain(domain: [number, number]): void;
+    setContentBaseDomain(domain: [number, number]): boolean;
     getContentBaseDomain(): [number, number]; // full scale range
     getContentDomain(): [number, number]; // visible range
     getContentZoom(): number;
@@ -1659,9 +1659,9 @@ class WellLogView
         this.updateInfo(); // reflect new value in this.selCurrent
     }
 
-    setContentBaseDomain(domain: [number, number]): void {
-        if (!this.logController) return;
-        setContentBaseDomain(this.logController, domain);
+    setContentBaseDomain(domain: [number, number]): boolean {
+        if (!this.logController) return false;
+        return setContentBaseDomain(this.logController, domain);
     }
     getContentBaseDomain(): [number, number] {
         if (!this.logController) return [0.0, 0.0];
