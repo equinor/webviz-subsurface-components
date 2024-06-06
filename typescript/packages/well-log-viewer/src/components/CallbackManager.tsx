@@ -114,7 +114,7 @@ export class CallbackManager {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         const table = this[name + "Callbacks"];
-        if(!table) return;
+        if (!table) return;
         for (const callback of table) callback(...args);
     }
 
