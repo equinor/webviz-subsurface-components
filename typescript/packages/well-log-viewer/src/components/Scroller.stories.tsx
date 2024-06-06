@@ -70,7 +70,7 @@ const Template = (args) => {
                             ", Y=" +
                             y.toFixed(2)
                     );
-                    args.onScroll?(x, y); // for storybook addon Actions Tab
+                    args.onScroll?.(x, y); // for storybook addon Actions Tab
                 }}
             >
                 <div ref={infoRef}></div>
