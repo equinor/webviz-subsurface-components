@@ -510,7 +510,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
     }
     // callback function from WellLogView
     onContentRescale(iWellLog: number): void {
-        this.callbackManagers[iWellLog].onContentRescale();
+        this.callbackManagers[iWellLog]?.onContentRescale();
 
         this.syncTrackScrollPos(iWellLog);
         this.syncContentScrollPos(iWellLog);
