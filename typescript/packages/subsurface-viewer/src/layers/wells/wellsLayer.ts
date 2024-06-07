@@ -667,6 +667,11 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
         const coordinate = (info.coordinate || [0, 0, 0]) as Position;
 
+        const zScale = this.props.modelMatrix ? this.props.modelMatrix[10] : 1;
+        if (typeof coordinate[2] !== "undefined") {
+            coordinate[2] /= Math.max(0.001, zScale);
+        }
+
         let md_property = getMdProperty(
             coordinate,
             info.object as Feature,

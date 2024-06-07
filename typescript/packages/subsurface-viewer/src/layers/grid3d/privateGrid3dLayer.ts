@@ -251,10 +251,13 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
 
         const vertexIndex = 256 * 256 * r + 256 * g + b;
 
+        const zScale = this.props.modelMatrix ? this.props.modelMatrix[10] : 1;
+
         if (typeof info.coordinate?.[2] !== "undefined") {
-            const depth = this.props.ZIncreasingDownwards
-                ? -info.coordinate[2]
-                : info.coordinate[2];
+            const depth =
+                (this.props.ZIncreasingDownwards
+                    ? -info.coordinate[2]
+                    : info.coordinate[2]) / Math.max(0.001, zScale);
             layer_properties.push(createPropertyData("Depth", depth));
         }
 
