@@ -340,7 +340,7 @@ export const DiscretePropertyWithClamping: StoryObj<typeof SubsurfaceViewer> = {
                     shininess: 32,
                     specularColor: [255, 255, 255],
                 },
-                colorMapRange: [0, 20],
+                colorMapRange: [3, 8],
                 colorMapClampColor: [100, 100, 100],
             },
         ],
