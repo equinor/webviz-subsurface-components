@@ -1,3 +1,10 @@
+## [0.27.6](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.27.5...subsurface-viewer@0.27.6) (2024-06-07)
+
+
+### Bug Fixes
+
+* **grid3d:** faces are lighted by average normal. ([#2091](https://github.com/equinor/webviz-subsurface-components/issues/2091)) ([ae139d0](https://github.com/equinor/webviz-subsurface-components/commit/ae139d0290fa7a5c9a44252d4fc5bfdfdf193e4a))
+
 ## [0.27.5](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.27.4...subsurface-viewer@0.27.5) (2024-06-04)
 
 
