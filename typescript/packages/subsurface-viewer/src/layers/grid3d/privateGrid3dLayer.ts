@@ -260,19 +260,14 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
 
         const properties = this.props.mesh.attributes.properties.value;
         const propertyIndex = properties[vertexIndex];
-        if (this.checkPropertyIndex(propertyIndex)) {
-            if (this.props.discretePropertyValueNames) {
-                const propertyText =
-                    this.props.discretePropertyValueNames[propertyIndex].name ??
-                    propertyIndex;
-                const propertyValue =
-                    this.props.discretePropertyValueNames[propertyIndex]
-                        .value ?? propertyIndex;
+        if (Number.isFinite(propertyIndex)) {
+            const propertyText = this.getPropertyText(propertyIndex);
+            if (propertyText) {
                 layer_properties.push(
-                    createPropertyData("Property", propertyText)
+                    createPropertyData("Property", propertyText.text)
                 );
                 layer_properties.push(
-                    createPropertyData("Value", propertyValue)
+                    createPropertyData("Value", propertyText.value)
                 );
             } else {
                 layer_properties.push(
@@ -287,12 +282,23 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
         };
     }
 
-    private checkPropertyIndex(index: number): boolean {
-        const length = this.props.discretePropertyValueNames?.length;
-        if (!length) {
-            return false;
+    private getPropertyText(
+        index: number
+    ): { text: string | number; value: number } | undefined {
+        if (!this.props.discretePropertyValueNames) {
+            return undefined;
         }
-        return Number.isFinite(index) && index >= 0 && index < length;
+        if (
+            index < 0 ||
+            index >= this.props.discretePropertyValueNames.length
+        ) {
+            return undefined;
+        }
+        const valueName = this.props.discretePropertyValueNames[index];
+        return {
+            text: valueName.name,
+            value: valueName.value,
+        };
     }
 
     private getDefaultImageData(): IImageData {

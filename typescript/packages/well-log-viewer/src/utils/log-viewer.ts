@@ -159,13 +159,15 @@ export function zoomContentTo(
 export function setContentBaseDomain(
     logViewer: LogViewer,
     domain: [number, number]
-): void {
+): boolean {
     const [b1, b2] = logViewer.scaleHandler.baseDomain();
     if (b1 !== domain[0] || b2 !== domain[1]) {
         logViewer.domain = domain;
         // logViewer.scaleHandler.baseDomain(domain);
         // logViewer.rescale();
+        return true;
     }
+    return false;
 }
 
 ////////// utilities
