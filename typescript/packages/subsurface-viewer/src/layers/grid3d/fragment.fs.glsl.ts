@@ -6,8 +6,8 @@ precision highp float;
 in vec3 cameraPosition;
 in vec4 position_commonspace;
 in float property;
-in vec3 normal;
 
+flat in vec3 normal;
 flat in int vertexIndex;
 
 uniform sampler2D colormap;

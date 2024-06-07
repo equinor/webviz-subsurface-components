@@ -13,8 +13,8 @@ uniform int coloringMode;
 out vec3 cameraPosition;
 out vec4 position_commonspace;
 out float property;
-out vec3 normal;
 
+flat out vec3 normal;
 flat out int vertexIndex;
 
 uniform bool ZIncreasingDownwards;
@@ -28,9 +28,12 @@ void main(void) {
    geometry.pickingColor = pickingColor;
 
    normal = normals;
-
    vec3 position = positions;
-   position.z *= ZIncreasingDownwards ? -1.0 : 1.0;
+
+   float zSign = ZIncreasingDownwards ? -1.0 : 1.0;
+
+   position.z *= zSign;
+   normal.z   *= zSign;
 
    switch(coloringMode) {
       case 0: property = properties; break;
