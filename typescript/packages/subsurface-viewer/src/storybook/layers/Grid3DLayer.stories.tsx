@@ -334,8 +334,13 @@ export const DiscretePropertyWithClamping: StoryObj<typeof SubsurfaceViewer> = {
                 ZIncreasingDownwards: true,
                 colorMapFunction:
                     layerArrays[discretePropsLayerId].colorMapFunction,
-                material: false,
-                colorMapRange: [3, 8],
+                material: {
+                    ambient: 0.5,
+                    diffuse: 0.5,
+                    shininess: 32,
+                    specularColor: [255, 255, 255],
+                },
+                colorMapRange: [0, 20],
                 colorMapClampColor: [100, 100, 100],
             },
         ],
