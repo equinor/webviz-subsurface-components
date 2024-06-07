@@ -44,7 +44,7 @@ export type MeshType = {
     attributes: {
         positions: { value: Float32Array; size: number };
         TEXCOORD_0?: { value: Float32Array; size: number };
-        normals?: { value: Float32Array; size: number };
+        normals: { value: Float32Array; size: number };
         properties: { value: Float32Array; size: number };
     };
     vertexCount: number;
@@ -159,6 +159,7 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
                 attributes: {
                     positions: this.props.mesh.attributes.positions,
                     properties: this.props.mesh.attributes.properties,
+                    normals: this.props.mesh.attributes.normals,
                 },
                 vertexCount: this.props.mesh.vertexCount,
             }),

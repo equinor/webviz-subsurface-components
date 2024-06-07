@@ -5,12 +5,15 @@ precision highp float;
 
 attribute vec3 positions;
 attribute float properties;
+attribute vec3 normals;
+
 uniform int coloringMode;
 
 // Outputs to fragment shader
 out vec3 cameraPosition;
 out vec4 position_commonspace;
 out float property;
+out vec3 normal;
 
 flat out int vertexIndex;
 
@@ -23,6 +26,8 @@ void main(void) {
    vertexIndex = gl_VertexID;
    cameraPosition = project_uCameraPosition;   
    geometry.pickingColor = pickingColor;
+
+   normal = normals;
 
    vec3 position = positions;
    position.z *= ZIncreasingDownwards ? -1.0 : 1.0;

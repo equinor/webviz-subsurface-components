@@ -6,6 +6,7 @@ precision highp float;
 in vec3 cameraPosition;
 in vec4 position_commonspace;
 in float property;
+in vec3 normal;
 
 flat in int vertexIndex;
 
@@ -89,8 +90,6 @@ void main(void) {
       gl_FragColor = encodeVertexIndexToRGB(vertexIndex);      
       return;
    }
-
-   vec3 normal = normalize(cross(dFdx(position_commonspace.xyz), dFdy(position_commonspace.xyz)));
       
    vec4 color = getPropertyColor(property);
    
