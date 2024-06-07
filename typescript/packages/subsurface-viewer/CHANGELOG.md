@@ -1,3 +1,10 @@
+## [0.27.7](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.27.6...subsurface-viewer@0.27.7) (2024-06-07)
+
+
+### Bug Fixes
+
+* "Incorrect depth readout in Grid3D layer after vertical re-scaling " ([#2092](https://github.com/equinor/webviz-subsurface-components/issues/2092)) ([f28b18a](https://github.com/equinor/webviz-subsurface-components/commit/f28b18a2d0fa1aa4de2564d6d9679cda05079ea5))
+
 ## [0.27.6](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.27.5...subsurface-viewer@0.27.6) (2024-06-07)
 
 
