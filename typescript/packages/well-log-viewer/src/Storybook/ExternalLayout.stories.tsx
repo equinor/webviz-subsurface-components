@@ -36,5 +36,9 @@ export default meta;
 
 export const RTCTabsLayout: StoryObj<typeof RTCWellLogViewer> = {
     decorators: [tabDecorator],
-    render: () => <RTCWellLogViewer />,
+    render: () => (
+        <React.StrictMode>
+            <RTCWellLogViewer />,
+        </React.StrictMode>
+    ),
 };
