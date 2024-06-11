@@ -7,8 +7,8 @@ import { Provider, useDispatch, useSelector } from "react-redux";
 import type { GridDirection } from "@mui/material";
 import { Grid } from "@mui/material";
 
-import type { TabItem } from "./mui-components";
-import { Tabs } from "./mui-components";
+import type { TabItem } from "./MuiComponents";
+import { Tabs } from "./MuiComponents";
 
 export interface ITabState {
     value: number;

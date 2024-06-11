@@ -21,7 +21,7 @@ const buildId = (id: string): string => {
     return id.replace(/ /g, "").toLowerCase();
 };
 
-export type TooltipProps = Pick<
+type TooltipProps = Pick<
     MuiTooltipProps,
     "children" | "title" | "placement" | "id" | "followCursor"
 > & { disable?: boolean; fullWidth?: boolean };
@@ -204,7 +204,7 @@ type TabPanelProps = {
  * @param props the component properties
  * @returns the created TabPanel component
  */
-export const TabPanel: React.FC<TabPanelProps> = (props) => {
+const TabPanel: React.FC<TabPanelProps> = (props) => {
     return (
         <div
             role="tabpanel"
@@ -241,7 +241,7 @@ export type TabItem = {
  * @param handleSelectedTab function that is called when new tab is selected.
  * @param groupIndex is the index of the current collection inside a group.
  */
-export type TabsProps = {
+type TabsProps = {
     name: string;
     tabs: TabItem[];
     width?: string | number;
