@@ -44,7 +44,7 @@ export type MeshType = {
     attributes: {
         positions: { value: Float32Array; size: number };
         TEXCOORD_0?: { value: Float32Array; size: number };
-        normals?: { value: Float32Array; size: number };
+        normals: { value: Float32Array; size: number };
         properties: { value: Float32Array; size: number };
     };
     vertexCount: number;
@@ -159,6 +159,7 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
                 attributes: {
                     positions: this.props.mesh.attributes.positions,
                     properties: this.props.mesh.attributes.properties,
+                    normals: this.props.mesh.attributes.normals,
                 },
                 vertexCount: this.props.mesh.vertexCount,
             }),
@@ -251,10 +252,13 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
 
         const vertexIndex = 256 * 256 * r + 256 * g + b;
 
+        const zScale = this.props.modelMatrix ? this.props.modelMatrix[10] : 1;
+
         if (typeof info.coordinate?.[2] !== "undefined") {
-            const depth = this.props.ZIncreasingDownwards
-                ? -info.coordinate[2]
-                : info.coordinate[2];
+            const depth =
+                (this.props.ZIncreasingDownwards
+                    ? -info.coordinate[2]
+                    : info.coordinate[2]) / Math.max(0.001, zScale);
             layer_properties.push(createPropertyData("Depth", depth));
         }
 
