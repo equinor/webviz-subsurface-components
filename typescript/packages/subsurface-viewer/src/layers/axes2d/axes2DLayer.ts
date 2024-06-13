@@ -83,7 +83,7 @@ const defaultProps = {
     id: "axes2d-layer",
     visible: true,
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-    marginH: 80, // Horizontal margin (in pixles)
+    marginH: 81, // Horizontal margin (in pixles)
     marginV: 30, // Vertical margin (in pixles)
     isLeftRuler: true,
     isRightRuler: false,
