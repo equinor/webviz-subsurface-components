@@ -821,6 +821,24 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
         out.push(i1, i2);
     };
 
+    const averageNormal = (points: number[], triangles: number[]): number[] => {
+        const res = [0, 0, 0];
+
+        for (let i = 0; i < triangles.length; i += 3) {
+            const p0 = get3DPoint(points, triangles[i]);
+            const p1 = get3DPoint(points, triangles[i + 1]);
+            const p2 = get3DPoint(points, triangles[i + 2]);
+
+            const v1 = substractPoints(p1, p0);
+            const v2 = substractPoints(p2, p0);
+            const normal = crossProduct(v1, v2);
+            res[0] += normal[0];
+            res[1] += normal[1];
+            res[2] += normal[2];
+        }
+        return normalize(res);
+    };
+
     // Keep
     const t0 = performance.now();
 
@@ -832,6 +850,7 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
     const vertexProperties: number[] = [];
     const triang_points: number[] = [];
     const line_indices: number[] = [];
+    const triangleNormals: number[] = [];
 
     let propertyValueRangeMin = +99999999;
     let propertyValueRangeMax = -99999999;
@@ -877,9 +896,12 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
         const flatPoly = projectPolygon(polygon);
         const triangles: number[] = earcut(flatPoly, 2);
 
+        const normal = averageNormal(polygon, triangles);
+
         for (const t of triangles) {
             triang_points.push(...get3DPoint(polygon, t));
             vertexProperties.push(propertyValue);
+            triangleNormals.push(...normal);
         }
         i = i + n + 1;
     }
@@ -891,6 +913,7 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
         attributes: {
             positions: { value: new Float32Array(triang_points), size: 3 },
             properties: { value: new Float32Array(vertexProperties), size: 1 },
+            normals: { value: new Float32Array(triangleNormals), size: 3 },
         },
         vertexCount: triang_points.length / 3,
     };
