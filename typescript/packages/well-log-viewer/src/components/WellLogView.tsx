@@ -175,6 +175,12 @@ function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
     const horizontal = parent.props.horizontal;
     const elm = instance.overlay.create("depth", {
         onClick: (event: OverlayClickEvent): void => {
+            if (
+                parent.props.options?.hideCurrentPosition ||
+                parent.props.options?.hideSelectionInterval
+            )
+                return;
+
             const { caller, x, y } = event;
             const value = caller.scale.invert(horizontal ? x : y);
             const elem = event.target;
@@ -261,7 +267,10 @@ function addPinnedValueOverlay(instance: LogViewer, parent: WellLogView) {
                     }
                 } else {
                     parent.selPinned = instance.scale.invert(v);
-                    if (parent.selCurrent === undefined)
+                    if (
+                        parent.selCurrent === undefined &&
+                        !parent.props.options?.hideCurrentPosition
+                    )
                         parent.selCurrent = parent.selPinned;
 
                     const rbelm = instance.overlay.elements["rubber-band"];
@@ -1005,6 +1014,14 @@ export interface WellLogViewOptions {
      * Hide Legends on the tracks
      */
     hideTrackLegend?: boolean;
+    /**
+     * Hide current position. Default is false
+     */
+    hideCurrentPosition?: boolean;
+    /**
+     * Hide selection interval. Default is false
+     */
+    hideSelectionInterval?: boolean;
 }
 
 export interface WellLogViewProps {
@@ -1596,6 +1613,11 @@ class WellLogView
     }
     showSelection(): void {
         if (!this.logController) return;
+        if (this.props.options?.hideCurrentPosition)
+            this.selCurrent = undefined;
+        if (this.props.options?.hideSelectionInterval)
+            this.selPinned = undefined;
+
         const horizontal = this.props.horizontal;
         const elements = this.logController.overlay.elements;
         const rbelm = elements["rubber-band"];
@@ -2038,6 +2060,16 @@ const WellLogViewOptions_propTypes = PropTypes.shape({
      * Hide legends of the track. Default is false
      */
     hideTrackLegend: PropTypes.bool,
+
+    /**
+     * Hide current position. Default is false
+     */
+    hideCurrentPosition: PropTypes.bool,
+
+    /**
+     * Hide selection interval. Default is false
+     */
+    hideSelectionInterval: PropTypes.bool,
 });
 
 WellLogView.propTypes = _propTypesWellLogView();

@@ -1035,6 +1035,14 @@ const WellLogViewOptions_propTypes = PropTypes.shape({
      * Hide legends of the track. Default is false
      */
     hideTrackLegend: PropTypes.bool,
+    /**
+     * Hide current position. Default is false
+     */
+    hideCurrentPosition: PropTypes.bool,
+    /**
+     * Hide selection interval. Default is false
+     */
+    hideSelectionInterval: PropTypes.bool,
 });
 
 const InfoOptions_propTypes = PropTypes.shape({
