@@ -510,7 +510,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
     }
     // callback function from WellLogView
     onContentRescale(iWellLog: number): void {
-        this.callbackManagers[iWellLog].onContentRescale();
+        this.callbackManagers[iWellLog]?.onContentRescale();
 
         this.syncTrackScrollPos(iWellLog);
         this.syncContentScrollPos(iWellLog);
@@ -540,37 +540,6 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
 
         if (this._isMounted) this.setState({ primaryAxis: value });
     }
-    // callback function from Scroller
-    onScrollerScroll(iWellLog: number, x: number, y: number): void {
-        const controller = this.callbackManagers[iWellLog].controller;
-        if (!controller) return;
-
-        const posMax = controller.getTrackScrollPosMax();
-        let posTrack = (this.props.horizontal ? y : x) * posMax;
-        posTrack = Math.round(posTrack);
-        controller.scrollTrackTo(posTrack);
-
-        const fContent = this.props.horizontal ? x : y; // fraction
-        controller.scrollContentTo(fContent);
-
-        const domain = controller.getContentDomain();
-        for (const callbackManager of this.callbackManagers) {
-            const _controller = callbackManager?.controller;
-            if (domain[0] === 0 && domain[1] === 0)
-                // controller.logController not created yet
-                return;
-            if (!_controller || _controller == controller) continue;
-            if (
-                !(this.props.wellpickFlatting && this.props.wellpicks) &&
-                this.props.syncContentDomain
-            ) {
-                const _domain = _controller.getContentDomain();
-                if (!isEqDomains(_domain, domain))
-                    _controller.zoomContentTo(domain);
-            }
-            if (this.props.syncTrackPos) _controller.scrollTrackTo(posTrack);
-        }
-    }
 
     syncTrackScrollPos(iWellLog: number): void {
         const controller = this.callbackManagers[iWellLog].controller;
@@ -578,7 +547,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         const trackPos = controller.getTrackScrollPos();
         for (const callbackManager of this.callbackManagers) {
             const _controller = callbackManager?.controller;
-            if (!_controller || _controller == controller) continue;
+            if (!_controller || _controller === controller) continue;
             if (this.props.syncTrackPos) _controller.scrollTrackTo(trackPos);
         }
     }
@@ -588,7 +557,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         const trackSelection = controller.getSelectedTrackIndices();
         for (const callbackManager of this.callbackManagers) {
             const _controller = callbackManager?.controller;
-            if (!_controller || _controller == controller) continue;
+            if (!_controller || _controller === controller) continue;
             if (this.props.syncTemplate)
                 _controller.setSelectedTrackIndices(trackSelection);
         }
@@ -620,8 +589,8 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                 if (!controller) continue;
                 const baseDomain = controller.getContentBaseDomain();
                 if (!isEqDomains(baseDomain, commonBaseDomain)) {
-                    controller.setContentBaseDomain(commonBaseDomain);
-                    updated = true;
+                    if (controller.setContentBaseDomain(commonBaseDomain))
+                        updated = true;
                 }
             }
         }
@@ -735,6 +704,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         return { A: flattingA, B: flattingB, newBaseDomain: newBaseDomain };
     }
 
+    skipSiblings: number[] = [];
     syncContentScrollPos(iWellLog: number): void {
         const controller = this.callbackManagers[iWellLog].controller;
         if (!controller) return;
@@ -759,57 +729,68 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         updated = this.syncContentBaseDomain();
 
         let j = -1;
-        for (const callbackManager of this.callbackManagers) {
-            const _controller = callbackManager?.controller;
-            j++;
-            if (!_controller || _controller == controller) continue;
-            if (coeff) {
-                // wellpick flatting
-                const a = coeff.A[iWellLog][j];
-                const b = coeff.B[iWellLog][j];
 
-                const domainNew: [number, number] = [
-                    a * domain[0] + b,
-                    a * domain[1] + b,
-                ];
-                const _domain = _controller.getContentDomain();
-                if (
-                    Number.isFinite(domainNew[0]) &&
-                    Number.isFinite(domainNew[1])
-                ) {
-                    if (!isEqDomains(_domain, domainNew)) {
-                        _controller.zoomContentTo(domainNew);
-                        updated = true;
-                    }
+        const index = this.skipSiblings.findIndex(
+            (val: number) => val === iWellLog
+        );
+        if (index >= 0) {
+            this.skipSiblings.splice(index, 1);
+        } else
+            for (const callbackManager of this.callbackManagers) {
+                const _controller = callbackManager?.controller;
+                j++;
+                if (!_controller || _controller === controller) continue;
+                if (coeff) {
+                    // wellpick flatting
+                    const a = coeff.A[iWellLog][j];
+                    const b = coeff.B[iWellLog][j];
 
-                    // sync scroll bar: not work yet
-                    const baseDomain = _controller.getContentBaseDomain();
-                    //const newBaseDomain = coeff.newBaseDomain[j];
-                    const newBaseDomain: [number, number] = [
-                        domainNew[0],
-                        domainNew[1],
+                    const domainNew: [number, number] = [
+                        a * domain[0] + b,
+                        a * domain[1] + b,
                     ];
-                    if (baseDomain[0] < newBaseDomain[0])
-                        newBaseDomain[0] = baseDomain[0];
-                    if (baseDomain[1] > newBaseDomain[1])
-                        newBaseDomain[1] = baseDomain[1];
+                    const _domain = _controller.getContentDomain();
                     if (
-                        Number.isFinite(newBaseDomain[0]) &&
-                        Number.isFinite(newBaseDomain[1])
-                    )
-                        if (!isEqDomains(baseDomain, newBaseDomain)) {
-                            //_controller.setContentBaseDomain(newBaseDomain);
-                            //updated = true;
+                        Number.isFinite(domainNew[0]) &&
+                        Number.isFinite(domainNew[1])
+                    ) {
+                        if (!isEqDomains(_domain, domainNew)) {
+                            if (_controller.zoomContentTo(domainNew)) {
+                                this.skipSiblings.push(j);
+                                updated = true;
+                            }
                         }
-                }
-            } else if (syncContentDomain) {
-                const _domain = _controller.getContentDomain();
-                if (!isEqDomains(_domain, domain)) {
-                    _controller.zoomContentTo(domain);
-                    updated = true;
+
+                        // sync scroll bar: not work yet
+                        const baseDomain = _controller.getContentBaseDomain();
+                        //const newBaseDomain = coeff.newBaseDomain[j];
+                        const newBaseDomain: [number, number] = [
+                            domainNew[0],
+                            domainNew[1],
+                        ];
+                        if (baseDomain[0] < newBaseDomain[0])
+                            newBaseDomain[0] = baseDomain[0];
+                        if (baseDomain[1] > newBaseDomain[1])
+                            newBaseDomain[1] = baseDomain[1];
+                        if (
+                            Number.isFinite(newBaseDomain[0]) &&
+                            Number.isFinite(newBaseDomain[1])
+                        )
+                            if (!isEqDomains(baseDomain, newBaseDomain)) {
+                                //if(_controller.setContentBaseDomain(newBaseDomain))
+                                //    updated = true;
+                            }
+                    }
+                } else if (syncContentDomain) {
+                    const _domain = _controller.getContentDomain();
+                    if (!isEqDomains(_domain, domain)) {
+                        if (_controller.zoomContentTo(domain)) {
+                            this.skipSiblings.push(j);
+                            updated = true;
+                        }
+                    }
                 }
             }
-        }
 
         if (updated) {
             for (let i = iWellLog - 1; i <= iWellLog; i++) {
@@ -820,7 +801,6 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                         controller.zoomContentTo(domain);
                 }
 
-                //            for (let i = iView - 1; i <= iView; i++) {
                 const spacer = this.spacers[i];
                 if (!spacer) continue;
                 spacer.update();
@@ -834,7 +814,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         const selection = controller.getContentSelection();
         for (const callbackManager of this.callbackManagers) {
             const _controller = callbackManager?.controller;
-            if (!_controller || _controller == controller) continue;
+            if (!_controller || _controller === controller) continue;
             if (this.props.syncContentSelection) {
                 const _selection = _controller.getContentSelection();
                 if (!isEqualRanges(_selection, selection))
@@ -854,7 +834,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         const template = controller.getTemplate();
         for (const callbackManager of this.callbackManagers) {
             const _controller = callbackManager?.controller;
-            if (!_controller || _controller == controller) continue;
+            if (!_controller || _controller === controller) continue;
             if (this.props.syncTemplate) _controller.setTemplate(template);
         }
     }
@@ -900,6 +880,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         };
         return (
             <WellLogViewWithScroller
+                iWellLogView={index}
                 key={index}
                 welllog={wellLog}
                 viewTitle={viewTitle}

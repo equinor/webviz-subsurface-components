@@ -7,6 +7,7 @@ in vec3 cameraPosition;
 in vec4 position_commonspace;
 in float property;
 
+flat in vec3 normal;
 flat in int vertexIndex;
 
 uniform sampler2D colormap;
@@ -89,8 +90,6 @@ void main(void) {
       gl_FragColor = encodeVertexIndexToRGB(vertexIndex);      
       return;
    }
-
-   vec3 normal = normalize(cross(dFdx(position_commonspace.xyz), dFdy(position_commonspace.xyz)));
       
    vec4 color = getPropertyColor(property);
    

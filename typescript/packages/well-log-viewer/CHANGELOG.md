@@ -1,3 +1,10 @@
+## [1.8.2](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.8.1...well-log-viewer@1.8.2) (2024-06-06)
+
+
+### Bug Fixes
+
+* Smooth SLV scrolling ([#2087](https://github.com/equinor/webviz-subsurface-components/issues/2087)) ([6b16d30](https://github.com/equinor/webviz-subsurface-components/commit/6b16d3047e803175192903206b8027c42d354405)), closes [#2035](https://github.com/equinor/webviz-subsurface-components/issues/2035)
+
 ## [1.8.1](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.8.0...well-log-viewer@1.8.1) (2024-05-29)
 
 

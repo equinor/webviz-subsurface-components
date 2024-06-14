@@ -206,7 +206,7 @@ const propertyValueNames = [
     { value: 2, name:"green"},         // 1
     { value: 5, name: "cyan"},         // 2
     { value: 6, name: "red"},          // 3
-    { value: -8, name: "magenta"},      // 4
+    { value: -8, name: "magenta"},     // 4
     { value: 9, name: "yellow"},       // 5
     { value: 20, name: "dark blue"},   // 6
     { value: 30, name: "dark green"},  // 7
@@ -334,7 +334,12 @@ export const DiscretePropertyWithClamping: StoryObj<typeof SubsurfaceViewer> = {
                 ZIncreasingDownwards: true,
                 colorMapFunction:
                     layerArrays[discretePropsLayerId].colorMapFunction,
-                material: false,
+                material: {
+                    ambient: 0.5,
+                    diffuse: 0.5,
+                    shininess: 32,
+                    specularColor: [255, 255, 255],
+                },
                 colorMapRange: [3, 8],
                 colorMapClampColor: [100, 100, 100],
             },

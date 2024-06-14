@@ -1,3 +1,38 @@
+## [0.27.7](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.27.6...subsurface-viewer@0.27.7) (2024-06-07)
+
+
+### Bug Fixes
+
+* "Incorrect depth readout in Grid3D layer after vertical re-scaling " ([#2092](https://github.com/equinor/webviz-subsurface-components/issues/2092)) ([f28b18a](https://github.com/equinor/webviz-subsurface-components/commit/f28b18a2d0fa1aa4de2564d6d9679cda05079ea5))
+
+## [0.27.6](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.27.5...subsurface-viewer@0.27.6) (2024-06-07)
+
+
+### Bug Fixes
+
+* **grid3d:** faces are lighted by average normal. ([#2091](https://github.com/equinor/webviz-subsurface-components/issues/2091)) ([ae139d0](https://github.com/equinor/webviz-subsurface-components/commit/ae139d0290fa7a5c9a44252d4fc5bfdfdf193e4a))
+
+## [0.27.5](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.27.4...subsurface-viewer@0.27.5) (2024-06-04)
+
+
+### Bug Fixes
+
+* **grid3d:** getPickingInfo reworked. ([#2084](https://github.com/equinor/webviz-subsurface-components/issues/2084)) ([847a84f](https://github.com/equinor/webviz-subsurface-components/commit/847a84fcf737dbcde1a9741a985cff84574f5753))
+
+## [0.27.4](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.27.3...subsurface-viewer@0.27.4) (2024-06-04)
+
+
+### Bug Fixes
+
+* **Grid3D:** crash in getPickingInfo fixed ([#2083](https://github.com/equinor/webviz-subsurface-components/issues/2083)) ([03738b6](https://github.com/equinor/webviz-subsurface-components/commit/03738b69fc15cf61da81949d91aa24b0f51d45d3))
+
+## [0.27.3](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.27.2...subsurface-viewer@0.27.3) (2024-06-03)
+
+
+### Bug Fixes
+
+* only last point or directional light is taken into account ([#2079](https://github.com/equinor/webviz-subsurface-components/issues/2079)) ([2811222](https://github.com/equinor/webviz-subsurface-components/commit/281122298a3277a0c40404853f315b6c77519a0a))
+
 ## [0.27.2](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.27.1...subsurface-viewer@0.27.2) (2024-05-29)
 
 

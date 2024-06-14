@@ -71,8 +71,15 @@ class WellLogViewWithScroller extends Component<WellLogViewWithScrollerProps> {
         this.props.onContentSelection?.();
     }
 
+    skipScrollNotification: number = 0;
     // callback function from Scroller
     onScrollerScroll(x: number, y: number): void {
+        if (this.skipScrollNotification) {
+            // the notification is self-induced
+            this.skipScrollNotification--;
+            return;
+        }
+
         const controller = this.controller;
         if (!controller) return;
         const fContent = this.props.horizontal ? x : y; // fraction
@@ -148,7 +155,9 @@ class WellLogViewWithScroller extends Component<WellLogViewWithScrollerProps> {
                 this.props.horizontal ? (x = _x) : (y = _y);
             }
         }
-        if (shouldUpdateScroller) scroller.scrollTo(x, y);
+        if (shouldUpdateScroller) {
+            if (scroller.scrollTo(x, y)) this.skipScrollNotification++; // skip self-induced notification
+        }
     }
 
     render(): JSX.Element {

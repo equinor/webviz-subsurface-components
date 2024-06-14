@@ -43,13 +43,6 @@ export class WellLogInfoPanel extends Component<Props, State> {
         this.onInfoGroupClick = this.onInfoGroupClick.bind(this);
 
         const callbackManager = this.props.callbackManager;
-        callbackManager.registerCallback("onInfo", this.onInfo);
-        callbackManager.registerCallback(
-            "onInfoGroupClick",
-            this.onInfoGroupClick,
-            true
-        );
-
         this.onGroupClick = callbackManager.callCallbacks.bind(
             callbackManager,
             "onInfoGroupClick"
@@ -57,6 +50,14 @@ export class WellLogInfoPanel extends Component<Props, State> {
     }
 
     componentDidMount(): void {
+        const callbackManager = this.props.callbackManager;
+        callbackManager.registerCallback("onInfo", this.onInfo);
+        callbackManager.registerCallback(
+            "onInfoGroupClick",
+            this.onInfoGroupClick,
+            true
+        );
+
         this.props.callbackManager.updateInfo(); // force onInfo callback to be called
     }
 
