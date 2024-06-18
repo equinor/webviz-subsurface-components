@@ -86,6 +86,7 @@ async function loadData<T extends TTypedArray>(
     }
     if (typeof data === "string") {
         const extension = data.split(".").pop()?.toLowerCase();
+        // Data is a file name with .json extension
         if (extension === "json") {
             const stringData = await load(data, JSONLoader);
             return new type(stringData);
