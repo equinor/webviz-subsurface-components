@@ -85,8 +85,17 @@ async function loadData<T extends TTypedArray>(
         return new type(data);
     }
     if (typeof data === "string") {
-        const stringData = await load(data as string, JSONLoader);
-        return new type(stringData);
+        const extension = data.split(".").pop()?.toLowerCase();
+        if (extension === "json") {
+            const stringData = await load(data, JSONLoader);
+            return new type(stringData);
+        }
+        const response = await fetch(data);
+        if (response.ok) {
+            const blob = await response.blob();
+            const buffer = await blob.arrayBuffer();
+            return new type(buffer);
+        }
     }
     return Promise.reject("Grid3DLayer: Unsupported type of input data");
 }
