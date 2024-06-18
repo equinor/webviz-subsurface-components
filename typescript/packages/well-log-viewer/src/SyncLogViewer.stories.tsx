@@ -386,6 +386,8 @@ export const Default: StoryObj<typeof Template> = {
         welllogOptions: {
             wellpickColorFill: true,
             wellpickPatternFill: true,
+            hideCurrentPosition: false,
+            hideSelectionInterval: false,
         },
         spacerOptions: {
             wellpickColorFill: true,

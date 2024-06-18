@@ -1,3 +1,10 @@
+# [1.9.0](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.8.2...well-log-viewer@1.9.0) (2024-06-18)
+
+
+### Features
+
+* Provide API to disable selection interval on WLV\SLV ([#2073](https://github.com/equinor/webviz-subsurface-components/issues/2073)) ([#2100](https://github.com/equinor/webviz-subsurface-components/issues/2100)) ([40ef7a1](https://github.com/equinor/webviz-subsurface-components/commit/40ef7a15159f395e2c3e42975de18ad1c28d45b3))
+
 ## [1.8.2](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.8.1...well-log-viewer@1.8.2) (2024-06-06)
 
 
