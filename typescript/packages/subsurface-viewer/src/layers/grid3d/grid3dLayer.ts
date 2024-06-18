@@ -7,7 +7,7 @@ import { load, JSONLoader } from "@loaders.gl/core";
 
 import workerpool from "workerpool";
 
-import type { Material } from "./privateGrid3dLayer";
+import type { Material } from "./typeDefs";
 import PrivateLayer from "./privateGrid3dLayer";
 import type {
     ExtendedLayerProps,
