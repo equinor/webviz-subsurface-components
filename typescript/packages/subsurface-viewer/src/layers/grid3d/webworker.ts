@@ -815,12 +815,6 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
         return res;
     };
 
-    const getLineSegment = (index0: number, index1: number, out: number[]) => {
-        const i1 = polys[index0];
-        const i2 = polys[index1];
-        out.push(i1, i2);
-    };
-
     const averageNormal = (points: number[], triangles: number[]): number[] => {
         const res = [0, 0, 0];
 
@@ -839,6 +833,95 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
         return normalize(res);
     };
 
+    interface IPrimitiveCounts {
+        triangles: number;
+        lineSegments: number;
+    }
+
+    interface IMeshArrays {
+        trianglePoints: Float32Array;
+        triangleNormals: Float32Array;
+        properties: Float32Array;
+        lineIndices: Uint32Array;
+    }
+
+    const getPrimitiveCounts = (polys: Uint32Array): IPrimitiveCounts => {
+        let triangles = 0;
+        let lineSegments = 0;
+        let i = 0;
+        while (i < polys.length) {
+            triangles += polys[i] - 2;
+            lineSegments += polys[i];
+            i += polys[i] + 1;
+        }
+        return { triangles, lineSegments };
+    };
+
+    const tryCreateArrays = (counts: IPrimitiveCounts): IMeshArrays | null => {
+        try {
+            const trianglePoints = new Float32Array(counts.triangles * 9); // 3 points * 3 coordinates per point per 1 triangle
+            const triangleNormals = new Float32Array(counts.triangles * 9); // 3 points * 3 coordinates per point per 1 triangle
+            const properties = new Float32Array(counts.triangles * 3); // 3 points per 1 triangle
+            const lineIndices = new Uint32Array(counts.lineSegments * 2); // 2 point indices per segment
+            return {
+                trianglePoints,
+                triangleNormals,
+                properties,
+                lineIndices,
+            };
+        } catch (error) {
+            console.log(error);
+            return null;
+        }
+    };
+
+    const createArrays = (
+        counts: IPrimitiveCounts
+    ): { arrays: IMeshArrays | null; counts: IPrimitiveCounts } | null => {
+        const currentCounts = {
+            ...counts,
+        };
+        let res: IMeshArrays | null = null;
+        do {
+            res = tryCreateArrays(currentCounts);
+            if (res === null) {
+                currentCounts.triangles -= counts.triangles * 0.1;
+                currentCounts.lineSegments -= counts.lineSegments * 0.1;
+                console.warn("Arrays size reduced!");
+            }
+        } while (res === null && currentCounts.triangles > 0);
+        return {
+            arrays: res,
+            counts: currentCounts,
+        };
+    };
+
+    const createEmptyMeshes = () => {
+        const mesh: MeshType = {
+            drawMode: 4, // corresponds to GL.TRIANGLES,
+            attributes: {
+                positions: { value: new Float32Array(), size: 3 },
+                properties: { value: new Float32Array(), size: 1 },
+                normals: { value: new Float32Array(), size: 3 },
+            },
+            vertexCount: 0,
+        };
+
+        const mesh_lines: MeshTypeLines = {
+            drawMode: 1, // corresponds to GL.LINES,
+            attributes: {
+                positions: { value: new Float32Array(), size: 3 },
+                indices: { value: new Uint32Array(), size: 1 },
+            },
+            vertexCount: 0,
+        };
+        return [
+            mesh,
+            mesh_lines,
+            [propertyValueRangeMin, propertyValueRangeMax],
+        ];
+    };
+
     // Keep
     const t0 = performance.now();
 
@@ -847,89 +930,126 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
     const polys = params.polys;
     const properties = params.properties;
 
-    const vertexProperties: number[] = [];
-    const triang_points: number[] = [];
-    const line_indices: number[] = [];
-    const triangleNormals: number[] = [];
-
     let propertyValueRangeMin = +99999999;
     let propertyValueRangeMax = -99999999;
 
     let pn = 0;
     let i = 0;
 
-    while (i < polys.length) {
-        const n = polys[i];
-        const propertyValue = properties[pn++];
+    const counts = getPrimitiveCounts(polys);
+    const arrays = createArrays(counts);
 
-        if (propertyValue !== null) {
-            // For some reason propertyValue happens to be null.
-            propertyValueRangeMin =
-                propertyValue < propertyValueRangeMin
-                    ? propertyValue
-                    : propertyValueRangeMin;
-            propertyValueRangeMax =
-                propertyValue > propertyValueRangeMax
-                    ? propertyValue
-                    : propertyValueRangeMax;
-        }
-
-        // Lines.
-        for (let j = i + 1; j < i + n; ++j) {
-            getLineSegment(j, j + 1, line_indices);
-        }
-        getLineSegment(i + 1, i + n, line_indices);
-
-        const polygon: number[] = [];
-
-        for (let p = 1; p <= n; ++p) {
-            const i0 = polys[i + p];
-            const point = [
-                params.points[i0 * 3],
-                params.points[i0 * 3 + 1],
-                params.points[i0 * 3 + 2],
-            ];
-            polygon.push(...point);
-        }
-        // As the triangulation algorythm works in 2D space
-        // the polygon should be projected on the plane passing through its points.
-        const flatPoly = projectPolygon(polygon);
-        const triangles: number[] = earcut(flatPoly, 2);
-
-        const normal = averageNormal(polygon, triangles);
-
-        for (const t of triangles) {
-            triang_points.push(...get3DPoint(polygon, t));
-            vertexProperties.push(propertyValue);
-            triangleNormals.push(...normal);
-        }
-        i = i + n + 1;
+    if (!arrays?.arrays) {
+        return createEmptyMeshes();
     }
 
-    console.log("Number of polygons: ", pn);
+    let arraysIndex = 0;
+    let propertyIndex = 0;
+    let linesIndex = 0;
 
-    const mesh: MeshType = {
-        drawMode: 4, // corresponds to GL.TRIANGLES,
-        attributes: {
-            positions: { value: new Float32Array(triang_points), size: 3 },
-            properties: { value: new Float32Array(vertexProperties), size: 1 },
-            normals: { value: new Float32Array(triangleNormals), size: 3 },
-        },
-        vertexCount: triang_points.length / 3,
-    };
+    const trianglesVertexCount = arrays.arrays.trianglePoints.length / 3;
+    const linesVertexCount = arrays.arrays.lineIndices.length;
 
-    const mesh_lines: MeshTypeLines = {
-        drawMode: 1, // corresponds to GL.LINES,
-        attributes: {
-            positions: { value: params.points, size: 3 },
-            indices: { value: new Uint32Array(line_indices), size: 1 },
-        },
-        vertexCount: line_indices.length,
-    };
+    try {
+        while (
+            i < polys.length &&
+            arraysIndex < arrays.arrays.trianglePoints.length - 3
+        ) {
+            const n = polys[i];
+            const propertyValue = properties[pn++];
 
-    const t1 = performance.now();
-    //Keep this.
-    console.log(`Task makeMesh took ${(t1 - t0) * 0.001}  seconds.`);
+            if (propertyValue !== null) {
+                // For some reason propertyValue happens to be null.
+                propertyValueRangeMin =
+                    propertyValue < propertyValueRangeMin
+                        ? propertyValue
+                        : propertyValueRangeMin;
+                propertyValueRangeMax =
+                    propertyValue > propertyValueRangeMax
+                        ? propertyValue
+                        : propertyValueRangeMax;
+            }
 
-    return [mesh, mesh_lines, [propertyValueRangeMin, propertyValueRangeMax]];
+            // Lines.
+            for (let j = i + 1; j < i + n; ++j) {
+                arrays.arrays.lineIndices[linesIndex] = polys[j];
+                arrays.arrays.lineIndices[linesIndex + 1] = polys[j + 1];
+                linesIndex += 2;
+            }
+            arrays.arrays.lineIndices[linesIndex] = polys[i + 1];
+            arrays.arrays.lineIndices[linesIndex + 1] = polys[i + n];
+            linesIndex += 2;
+
+            const polygon: number[] = [];
+
+            for (let p = 1; p <= n; ++p) {
+                const i0 = polys[i + p];
+                const point = [
+                    params.points[i0 * 3],
+                    params.points[i0 * 3 + 1],
+                    params.points[i0 * 3 + 2],
+                ];
+                polygon.push(...point);
+            }
+            // As the triangulation algorythm works in 2D space
+            // the polygon should be projected on the plane passing through its points.
+            const flatPoly = projectPolygon(polygon);
+            const triangles: number[] = earcut(flatPoly, 2);
+
+            const normal = averageNormal(polygon, triangles);
+
+            for (const t of triangles) {
+                const point = get3DPoint(polygon, t);
+
+                arrays.arrays.trianglePoints[arraysIndex] = point[0];
+                arrays.arrays.trianglePoints[arraysIndex + 1] = point[1];
+                arrays.arrays.trianglePoints[arraysIndex + 2] = point[2];
+
+                arrays.arrays.triangleNormals[arraysIndex] = normal[0];
+                arrays.arrays.triangleNormals[arraysIndex + 1] = normal[1];
+                arrays.arrays.triangleNormals[arraysIndex + 2] = normal[2];
+
+                arrays.arrays.properties[propertyIndex] = propertyValue;
+
+                arraysIndex += 3;
+                propertyIndex += 1;
+            }
+            i = i + n + 1;
+        }
+
+        console.log("Number of polygons: ", pn);
+        console.log("Number of triangles: ", arrays.counts.triangles);
+
+        const mesh: MeshType = {
+            drawMode: 4, // corresponds to GL.TRIANGLES,
+            attributes: {
+                positions: { value: arrays.arrays.trianglePoints, size: 3 },
+                properties: { value: arrays.arrays.properties, size: 1 },
+                normals: { value: arrays.arrays.triangleNormals, size: 3 },
+            },
+            vertexCount: trianglesVertexCount,
+        };
+
+        const mesh_lines: MeshTypeLines = {
+            drawMode: 1, // corresponds to GL.LINES,
+            attributes: {
+                positions: { value: params.points, size: 3 },
+                indices: { value: arrays.arrays.lineIndices, size: 1 },
+            },
+            vertexCount: linesVertexCount,
+        };
+
+        const t1 = performance.now();
+        //Keep this.
+        console.log(`Task makeMesh took ${(t1 - t0) * 0.001}  seconds.`);
+
+        return [
+            mesh,
+            mesh_lines,
+            [propertyValueRangeMin, propertyValueRangeMax],
+        ];
+    } catch (error) {
+        console.log("Grid3d webworker failed with error: ", error);
+        return createEmptyMeshes();
+    }
 }
