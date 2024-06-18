@@ -875,7 +875,7 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
         }
     };
 
-    const createArrays = (
+    const createMeshArrays = (
         counts: IPrimitiveCounts
     ): { arrays: IMeshArrays | null; counts: IPrimitiveCounts } | null => {
         const currentCounts = {
@@ -937,9 +937,9 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
     let i = 0;
 
     const counts = getPrimitiveCounts(polys);
-    const arrays = createArrays(counts);
+    const meshArrays = createMeshArrays(counts);
 
-    if (!arrays?.arrays) {
+    if (!meshArrays?.arrays) {
         return createEmptyMeshes();
     }
 
@@ -947,13 +947,13 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
     let propertyIndex = 0;
     let linesIndex = 0;
 
-    const trianglesVertexCount = arrays.arrays.trianglePoints.length / 3;
-    const linesVertexCount = arrays.arrays.lineIndices.length;
+    const trianglesVertexCount = meshArrays.arrays.trianglePoints.length / 3;
+    const linesVertexCount = meshArrays.arrays.lineIndices.length;
 
     try {
         while (
             i < polys.length &&
-            arraysIndex < arrays.arrays.trianglePoints.length - 3
+            arraysIndex < meshArrays.arrays.trianglePoints.length - 3
         ) {
             const n = polys[i];
             const propertyValue = properties[pn++];
@@ -972,12 +972,12 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
 
             // Lines.
             for (let j = i + 1; j < i + n; ++j) {
-                arrays.arrays.lineIndices[linesIndex] = polys[j];
-                arrays.arrays.lineIndices[linesIndex + 1] = polys[j + 1];
+                meshArrays.arrays.lineIndices[linesIndex] = polys[j];
+                meshArrays.arrays.lineIndices[linesIndex + 1] = polys[j + 1];
                 linesIndex += 2;
             }
-            arrays.arrays.lineIndices[linesIndex] = polys[i + 1];
-            arrays.arrays.lineIndices[linesIndex + 1] = polys[i + n];
+            meshArrays.arrays.lineIndices[linesIndex] = polys[i + 1];
+            meshArrays.arrays.lineIndices[linesIndex + 1] = polys[i + n];
             linesIndex += 2;
 
             const polygon: number[] = [];
@@ -1001,15 +1001,15 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
             for (const t of triangles) {
                 const point = get3DPoint(polygon, t);
 
-                arrays.arrays.trianglePoints[arraysIndex] = point[0];
-                arrays.arrays.trianglePoints[arraysIndex + 1] = point[1];
-                arrays.arrays.trianglePoints[arraysIndex + 2] = point[2];
+                meshArrays.arrays.trianglePoints[arraysIndex] = point[0];
+                meshArrays.arrays.trianglePoints[arraysIndex + 1] = point[1];
+                meshArrays.arrays.trianglePoints[arraysIndex + 2] = point[2];
 
-                arrays.arrays.triangleNormals[arraysIndex] = normal[0];
-                arrays.arrays.triangleNormals[arraysIndex + 1] = normal[1];
-                arrays.arrays.triangleNormals[arraysIndex + 2] = normal[2];
+                meshArrays.arrays.triangleNormals[arraysIndex] = normal[0];
+                meshArrays.arrays.triangleNormals[arraysIndex + 1] = normal[1];
+                meshArrays.arrays.triangleNormals[arraysIndex + 2] = normal[2];
 
-                arrays.arrays.properties[propertyIndex] = propertyValue;
+                meshArrays.arrays.properties[propertyIndex] = propertyValue;
 
                 arraysIndex += 3;
                 propertyIndex += 1;
@@ -1018,14 +1018,14 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
         }
 
         console.log("Number of polygons: ", pn);
-        console.log("Number of triangles: ", arrays.counts.triangles);
+        console.log("Number of triangles: ", meshArrays.counts.triangles);
 
         const mesh: MeshType = {
             drawMode: 4, // corresponds to GL.TRIANGLES,
             attributes: {
-                positions: { value: arrays.arrays.trianglePoints, size: 3 },
-                properties: { value: arrays.arrays.properties, size: 1 },
-                normals: { value: arrays.arrays.triangleNormals, size: 3 },
+                positions: { value: meshArrays.arrays.trianglePoints, size: 3 },
+                properties: { value: meshArrays.arrays.properties, size: 1 },
+                normals: { value: meshArrays.arrays.triangleNormals, size: 3 },
             },
             vertexCount: trianglesVertexCount,
         };
@@ -1034,7 +1034,7 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
             drawMode: 1, // corresponds to GL.LINES,
             attributes: {
                 positions: { value: params.points, size: 3 },
-                indices: { value: arrays.arrays.lineIndices, size: 1 },
+                indices: { value: meshArrays.arrays.lineIndices, size: 1 },
             },
             vertexCount: linesVertexCount,
         };
