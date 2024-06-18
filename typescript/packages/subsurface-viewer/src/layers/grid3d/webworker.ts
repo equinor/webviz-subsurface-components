@@ -846,8 +846,8 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
     }
 
     /**
-     * Computes number of WebGL primitives needed to represent grid mesh.
-     * @param polys Array describing face polygons in the format.
+     * Computes number of WebGL primitives needed to represent a grid mesh.
+     * @param polys Array describing face polygons.
      * @returns Object contaning the number of triangles and 2-point line segments.
      */
     const getPrimitiveCounts = (polys: Uint32Array): IPrimitiveCounts => {
@@ -886,7 +886,7 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
     };
 
     /**
-     * * Creates arrays for WebGL data.
+     * Creates arrays for WebGL data.
      * @param counts Number of WebGL primitives.
      * @returns Arrays of the length enough to contain WebGL data for the given number of triangles and line segments.
      * If fails, reduces the number of primitives by 10% and tries again. Null is returned if zero count of primitives reached.
