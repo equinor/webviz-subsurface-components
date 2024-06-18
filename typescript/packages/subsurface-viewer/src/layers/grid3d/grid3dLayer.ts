@@ -90,6 +90,7 @@ async function loadData<T extends TTypedArray>(
             const stringData = await load(data, JSONLoader);
             return new type(stringData);
         }
+        // It is assumed that the data is a file containing raw array of bytes.
         const response = await fetch(data);
         if (response.ok) {
             const blob = await response.blob();

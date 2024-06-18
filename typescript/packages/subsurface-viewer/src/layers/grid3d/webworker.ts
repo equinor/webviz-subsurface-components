@@ -845,6 +845,11 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
         lineIndices: Uint32Array;
     }
 
+    /**
+     * Computes number of WebGL primitives needed to represent grid mesh.
+     * @param polys Array describing face polygons in the format.
+     * @returns Object contaning the number of triangles and 2-point line segments.
+     */
     const getPrimitiveCounts = (polys: Uint32Array): IPrimitiveCounts => {
         let triangles = 0;
         let lineSegments = 0;
@@ -857,6 +862,11 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
         return { triangles, lineSegments };
     };
 
+    /**
+     * Creates arrays for WebGL data.
+     * @param counts Numbers of WebGL primitives.
+     * @returns Arrays of the length enough to contain WebGL data for the given number of primitives, null otherwise.
+     */
     const tryCreateArrays = (counts: IPrimitiveCounts): IMeshArrays | null => {
         try {
             const trianglePoints = new Float32Array(counts.triangles * 9); // 3 points * 3 coordinates per point per 1 triangle
@@ -875,6 +885,13 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
         }
     };
 
+    /**
+     * * Creates arrays for WebGL data.
+     * @param counts Number of WebGL primitives.
+     * @returns Arrays of the length enough to contain WebGL data for the given number of triangles and line segments.
+     * If fails, reduces the number of primitives by 10% and tries again. Null is returned if zero count of primitives reached.
+     * Counts returned contain the actual number of primitives the arrays are created for.
+     */
     const createMeshArrays = (
         counts: IPrimitiveCounts
     ): { arrays: IMeshArrays | null; counts: IPrimitiveCounts } | null => {
@@ -896,6 +913,10 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
         };
     };
 
+    /**
+     * Creates empty meshes.
+     * @returns Empty meshes with empty data arrays and zero vertex counts.
+     */
     const createEmptyMeshes = () => {
         const mesh: MeshType = {
             drawMode: 4, // corresponds to GL.TRIANGLES,
