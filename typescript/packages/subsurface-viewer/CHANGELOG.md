@@ -1,3 +1,10 @@
+## [0.27.8](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.27.7...subsurface-viewer@0.27.8) (2024-06-19)
+
+
+### Bug Fixes
+
+* **grid3d:** Memory usage reduced. ([#2107](https://github.com/equinor/webviz-subsurface-components/issues/2107)) ([5ad9468](https://github.com/equinor/webviz-subsurface-components/commit/5ad94689c388b32dea6d1ee78183918d473460b3))
+
 ## [0.27.7](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.27.6...subsurface-viewer@0.27.7) (2024-06-07)
 
 
