@@ -1,6 +1,6 @@
 {
     "name": "@webviz/subsurface-viewer",
-    "version": "0.27.7",
+    "version": "0.27.8",
     "description": "3D visualization component for subsurface reservoir data",
     "keywords": [
         "subsurface",
