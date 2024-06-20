@@ -22,8 +22,12 @@ import fsShader from "./fragment.fs.glsl";
 import vsLineShader from "./vertex_lines.glsl";
 import fsLineShader from "./fragment_lines.glsl";
 import { localPhongLighting, utilities } from "../shader_modules";
-import { TGrid3DColoringMode } from "./grid3dLayer";
-import type { IDiscretePropertyValueName } from "./grid3dLayer";
+import {
+    TGrid3DColoringMode,
+    type IDiscretePropertyValueName,
+} from "./grid3dLayer";
+
+import type { MeshType, MeshTypeLines } from "./typeDefs";
 
 const DEFAULT_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_MIN_FILTER]: GL.LINEAR,
@@ -38,35 +42,6 @@ const DISCRETE_TEXTURE_PARAMETERS = {
     [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
     [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE,
 };
-
-export type MeshType = {
-    drawMode?: number;
-    attributes: {
-        positions: { value: Float32Array; size: number };
-        TEXCOORD_0?: { value: Float32Array; size: number };
-        normals: { value: Float32Array; size: number };
-        properties: { value: Float32Array; size: number };
-    };
-    vertexCount: number;
-};
-
-export type MeshTypeLines = {
-    drawMode: number;
-    attributes: {
-        positions: { value: Float32Array; size: number };
-        indices: { value: Uint32Array; size: number };
-    };
-    vertexCount: number;
-};
-
-export type Material =
-    | {
-          ambient: number;
-          diffuse: number;
-          shininess: number;
-          specularColor: [number, number, number];
-      }
-    | boolean;
 
 export interface PrivateLayerProps extends ExtendedLayerProps {
     mesh: MeshType;
