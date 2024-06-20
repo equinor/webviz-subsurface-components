@@ -1738,17 +1738,6 @@ class WellLogView
                 element.setAttribute("title", element.textContent);
         }
     }
-    _forceUpdateTitleTooltips(): void {
-        // workaround to refresh tooltips in videx wellog component
-        if (!this.container) return;
-        const elements = this.container.getElementsByClassName("track-title");
-        for (const element of elements) {
-            if (element.textContent)
-                element.setAttribute("title", element.textContent);
-            //const title=element.getAttribute("title");
-            //console.log(title);
-        }
-    }
 
     scrollTrackBy(delta: number): void {
         this.setState((state: Readonly<State>) => ({
