@@ -281,6 +281,8 @@ export const Default: StoryObj<typeof StoryTemplate> = {
         options: {
             hideTrackTitle: false,
             hideTrackLegend: false,
+            hideCurrentPosition: false,
+            hideSelectionInterval: false,
         },
     },
     render: (args) => <StoryTemplate {...args} />,

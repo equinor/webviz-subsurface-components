@@ -7,7 +7,7 @@ import { load, JSONLoader } from "@loaders.gl/core";
 
 import workerpool from "workerpool";
 
-import type { Material } from "./privateGrid3dLayer";
+import type { Material } from "./typeDefs";
 import PrivateLayer from "./privateGrid3dLayer";
 import type {
     ExtendedLayerProps,
@@ -85,8 +85,19 @@ async function loadData<T extends TTypedArray>(
         return new type(data);
     }
     if (typeof data === "string") {
-        const stringData = await load(data as string, JSONLoader);
-        return new type(stringData);
+        const extension = data.split(".").pop()?.toLowerCase();
+        // Data is a file name with .json extension
+        if (extension === "json") {
+            const stringData = await load(data, JSONLoader);
+            return new type(stringData);
+        }
+        // It is assumed that the data is a file containing raw array of bytes.
+        const response = await fetch(data);
+        if (response.ok) {
+            const blob = await response.blob();
+            const buffer = await blob.arrayBuffer();
+            return new type(buffer);
+        }
     }
     return Promise.reject("Grid3DLayer: Unsupported type of input data");
 }
