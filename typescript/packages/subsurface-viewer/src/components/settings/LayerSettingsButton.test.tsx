@@ -59,34 +59,37 @@ describe("test layers settings button", () => {
     });
 
     it("should close menu when clicked on backdrop", async () => {
+        const user = userEvent.setup();
         drawingLayer &&
             render(
                 EmptyWrapper({
                     children: <LayerSettingsButton layer={drawingLayer} />,
                 })
             );
-        userEvent.click(screen.getByRole("button"));
+        await user.click(screen.getByRole("button"));
         const layer_settings_menu = screen.getByRole("menu");
         expect(layer_settings_menu).toBeInTheDocument();
-        userEvent.click(document.body);
+        await user.click(document.body);
         await waitFor(() => expect(layer_settings_menu).not.toBeVisible());
     });
 
     it("should close menu when clicked twice on layers button", async () => {
+        const user = userEvent.setup();
         drawingLayer &&
             render(
                 EmptyWrapper({
                     children: <LayerSettingsButton layer={drawingLayer} />,
                 })
             );
-        userEvent.click(screen.getByRole("button"));
+        await user.click(screen.getByRole("button"));
         const layer_settings_menu = screen.getByRole("menu");
         expect(layer_settings_menu).toBeInTheDocument();
-        userEvent.click(screen.getByRole("button"));
+        await user.click(screen.getByRole("button"));
         await waitFor(() => expect(layer_settings_menu).not.toBeVisible());
     });
 
     it("tests toggle button", async () => {
+        const user = userEvent.setup();
         const wells_layer = layers.find(
             (item) => item["@@type"] === "WellsLayer"
         );
@@ -96,12 +99,13 @@ describe("test layers settings button", () => {
                     children: <LayerSettingsButton layer={wells_layer} />,
                 })
             );
-        userEvent.click(screen.getByRole("button"));
+        await user.click(screen.getByRole("button"));
         const wells_layer_settings_menu = screen.getByRole("menu");
         expect(wells_layer_settings_menu).toBeInTheDocument();
     });
 
     it("tests numeric input", async () => {
+        const user = userEvent.setup();
         const wells_layer = layers.find(
             (item) => item["@@type"] === "WellsLayer"
         );
@@ -111,12 +115,13 @@ describe("test layers settings button", () => {
                     children: <LayerSettingsButton layer={wells_layer} />,
                 })
             );
-        userEvent.click(screen.getByRole("button"));
+        await user.click(screen.getByRole("button"));
         const wells_layer_settings_menu = screen.getByRole("menu");
         expect(wells_layer_settings_menu).toBeInTheDocument();
     });
 
     it("tests slider input", async () => {
+        const user = userEvent.setup();
         const wells_layer = layers.find(
             (item) => item["@@type"] === "WellsLayer"
         );
@@ -126,7 +131,7 @@ describe("test layers settings button", () => {
                     children: <LayerSettingsButton layer={wells_layer} />,
                 })
             );
-        userEvent.click(screen.getByRole("button"));
+        await user.click(screen.getByRole("button"));
         const wells_layer_settings_menu = screen.getByRole("menu");
         expect(wells_layer_settings_menu).toBeInTheDocument();
     });

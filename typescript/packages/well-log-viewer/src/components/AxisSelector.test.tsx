@@ -19,8 +19,9 @@ describe("Test Axis Selector", () => {
         expect(container.firstChild).toMatchSnapshot();
     });
     // Below test is failing
-    it("update axis to TVD", () => {
+    it("update axis to TVD", async () => {
         const mockFn = jest.fn();
+        const user = userEvent.setup();
         render(
             <AxisSelector
                 header="Primary scale"
@@ -31,7 +32,7 @@ describe("Test Axis Selector", () => {
             />
         );
         const axis_selectors = screen.getAllByRole("radio");
-        userEvent.click(axis_selectors[1]);
+        await user.click(axis_selectors[1]);
         expect(mockFn).toHaveBeenCalledTimes(1);
         expect(mockFn).toHaveBeenCalledWith("tvd");
     });
