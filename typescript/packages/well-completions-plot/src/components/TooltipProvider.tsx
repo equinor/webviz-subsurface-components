@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 import React from "react";
-import ReactTooltip from "react-tooltip";
+import { Tooltip as ReactTooltip } from "react-tooltip";
 
 const TooltipContext = React.createContext<{
     setContent: React.Dispatch<React.SetStateAction<React.FC | null>>;
@@ -35,7 +35,7 @@ const TooltipProvider: React.FC<PropsWithChildren<unknown>> = ({
             {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-expect-error
-                <ReactTooltip id="plot-tooltip" getContent={() => Content} />
+                <ReactTooltip id="plot-tooltip" content={() => Content} />
             }
         </TooltipContext.Provider>
     );
