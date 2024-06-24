@@ -13,11 +13,15 @@ import { argTypesWellLogViewScrollerProp } from "./components/WellLogViewWithScr
 
 import { shouldUpdateWellLogView } from "./components/WellLogView";
 
-import type { WellLogController } from "./components/WellLogView";
+import type {
+    WellLogController,
+    TrackMouseEvent,
+} from "./components/WellLogView";
+import type WellLogView from "./components/WellLogView";
 
 import { getAvailableAxes } from "./utils/tracks";
 
-import { onTrackMouseEvent } from "./utils/edit-track";
+import { onTrackMouseEventDefault } from "./utils/edit-track";
 
 import { CallbackManager } from "./components/CallbackManager";
 
@@ -32,6 +36,8 @@ export interface WellLogViewerProps extends WellLogViewWithScrollerProps {
     onContentRescale?: () => void;
     onContentSelection?: () => void;
     onTemplateChanged?: () => void;
+
+    onTrackMouseEvent?: (wellLogView: WellLogView, ev: TrackMouseEvent) => void;
 
     onCreateController?: (controller: WellLogController) => void;
 }
@@ -180,7 +186,10 @@ export default class WellLogViewer extends Component<
                         options={this.props.options}
                         primaryAxis={this.state.primaryAxis}
                         // callbacks
-                        onTrackMouseEvent={onTrackMouseEvent}
+                        onTrackMouseEvent={
+                            this.props.onTrackMouseEvent ||
+                            onTrackMouseEventDefault
+                        }
                         onCreateController={this.onCreateController}
                         onInfo={this.callbackManager.onInfo}
                         onContentRescale={this.onContentRescale}

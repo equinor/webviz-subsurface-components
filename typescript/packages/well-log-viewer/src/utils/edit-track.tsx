@@ -5,7 +5,7 @@ import type WellLogView from "../components/WellLogView";
 import type { TrackMouseEvent } from "../components/WellLogView";
 import { SimpleMenu, editPlots } from "../components/LocalMenus";
 
-export function onTrackMouseEvent(
+export function onTrackMouseEventDefault(
     wellLogView: WellLogView,
     ev: TrackMouseEvent
 ): void {

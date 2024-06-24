@@ -10,7 +10,11 @@ const wellpick = require("../../../../example-data/wellpicks.json");// eslint-di
 import { ToggleButton } from "@mui/material";
 
 import SyncLogViewer, { argTypesSyncLogViewerProp } from "./SyncLogViewer";
-import type { WellLogController } from "./components/WellLogView";
+import type WellLogView from "./components/WellLogView";
+import type {
+    WellLogController,
+    TrackMouseEvent,
+} from "./components/WellLogView";
 
 const ComponentCode =
     '<SyncLogViewer id="SyncLogViewer" \r\n' +
@@ -190,6 +194,18 @@ const Template = (args) => {
             }
         }
     };
+    const [checked, setChecked] = React.useState(false);
+    const handleChange = () => {
+        setChecked(!checked);
+    };
+    /* eslint-disable */ // no-unused-vars
+    function onTrackMouseEventCustom(
+        wellLogView: WellLogView,
+        ev: TrackMouseEvent
+    ): void {
+        //custom function to disable the context menu
+    }
+    /* eslint-enable */ // no-unused-vars
 
     return (
         <div
@@ -202,11 +218,19 @@ const Template = (args) => {
                     onCreateController={onCreateController}
                     onContentRescale={onContentRescale}
                     onContentSelection={onContentSelection}
+                    onTrackMouseEvent={checked ? onTrackMouseEventCustom : null}
                 />
             </div>
             {/* Print info for the first WellLog */}
             <div style={{ display: "flex", flexDirection: "row" }}>
                 <div ref={infoRef}></div>
+                <label style={{ marginLeft: 10 }}>disable context menu</label>
+                <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={handleChange}
+                    title="Disable context menu"
+                />
                 <button onClick={handleClick} style={{ marginLeft: 10 }}>
                     Reset
                 </button>
