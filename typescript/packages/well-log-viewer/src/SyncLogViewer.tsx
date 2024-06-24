@@ -23,7 +23,10 @@ import type {
 } from "./components/WellLogView";
 
 import type WellLogView from "./components/WellLogView";
-import type { WellLogViewOptions } from "./components/WellLogView";
+import type {
+    WellLogViewOptions,
+    TrackMouseEvent,
+} from "./components/WellLogView";
 import type { WellLogSpacerOptions } from "./components/WellLogSpacer";
 import { getWellPicks } from "./components/WellLogView";
 
@@ -31,7 +34,7 @@ import { getAvailableAxes } from "./utils/tracks";
 
 import { checkMinMax } from "./utils/minmax";
 
-import { onTrackMouseEvent } from "./utils/edit-track";
+import { onTrackMouseEventDefault } from "./utils/edit-track";
 
 import type { Info, InfoOptions } from "./components/InfoTypes";
 
@@ -161,6 +164,8 @@ export interface SyncLogViewerProps {
     onContentRescale?: (iWellLog: number) => void;
     onContentSelection?: (iWellLog: number) => void;
     onTemplateChanged?: (iWellLog: number) => void;
+
+    onTrackMouseEvent?: (wellLogView: WellLogView, ev: TrackMouseEvent) => void;
 
     onCreateController?: (
         iWellLog: number,
@@ -898,7 +903,9 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                 options={options}
                 onInfo={callbackManager.onInfo}
                 onCreateController={callbacks.onCreateControllerBind}
-                onTrackMouseEvent={onTrackMouseEvent}
+                onTrackMouseEvent={
+                    this.props.onTrackMouseEvent || onTrackMouseEventDefault
+                }
                 onTrackScroll={callbacks.onTrackScrollBind}
                 onTrackSelection={callbacks.onTrackSelectionBind}
                 onContentRescale={callbacks.onContentRescaleBind}

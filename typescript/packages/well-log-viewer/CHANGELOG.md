@@ -1,3 +1,10 @@
+# [1.10.0](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.9.0...well-log-viewer@1.10.0) (2024-06-23)
+
+
+### Features
+
+* Provide means to disable the internal MB3 menu ([#2052](https://github.com/equinor/webviz-subsurface-components/issues/2052)) ([#2113](https://github.com/equinor/webviz-subsurface-components/issues/2113)) ([9dfc645](https://github.com/equinor/webviz-subsurface-components/commit/9dfc645e16bd41fc3064be54bd6944d0f9fecf67))
+
 # [1.9.0](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.8.2...well-log-viewer@1.9.0) (2024-06-18)
 
 
