@@ -22,7 +22,7 @@
     "license": "MPL-2.0",
     "dependencies": {
         "react-resize-detector": "^10.0.1",
-        "react-tooltip": "^4.2.21"
+        "react-tooltip": "^5.27.0"
     },
     "volta": {
         "node": "18.19.0"
