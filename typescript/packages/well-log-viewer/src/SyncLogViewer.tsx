@@ -547,7 +547,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
     }
 
     syncTrackScrollPos(iWellLog: number): void {
-        const controller = this.callbackManagers[iWellLog].controller;
+        const controller = this.callbackManagers[iWellLog]?.controller;
         if (!controller) return;
         const trackPos = controller.getTrackScrollPos();
         for (const callbackManager of this.callbackManagers) {
@@ -557,7 +557,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         }
     }
     syncTrackSelection(iWellLog: number): void {
-        const controller = this.callbackManagers[iWellLog].controller;
+        const controller = this.callbackManagers[iWellLog]?.controller;
         if (!controller) return;
         const trackSelection = controller.getSelectedTrackIndices();
         for (const callbackManager of this.callbackManagers) {
@@ -711,7 +711,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
 
     skipSiblings: number[] = [];
     syncContentScrollPos(iWellLog: number): void {
-        const controller = this.callbackManagers[iWellLog].controller;
+        const controller = this.callbackManagers[iWellLog]?.controller;
         if (!controller) return;
 
         const domain = controller.getContentDomain();
@@ -814,7 +814,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
     }
 
     syncContentSelection(iWellLog: number): void {
-        const controller = this.callbackManagers[iWellLog].controller;
+        const controller = this.callbackManagers[iWellLog]?.controller;
         if (!controller) return;
         const selection = controller.getContentSelection();
         for (const callbackManager of this.callbackManagers) {
@@ -834,7 +834,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
     }
 
     syncTemplate(iWellLog: number): void {
-        const controller = this.callbackManagers[iWellLog].controller;
+        const controller = this.callbackManagers[iWellLog]?.controller;
         if (!controller) return;
         const template = controller.getTemplate();
         for (const callbackManager of this.callbackManagers) {
