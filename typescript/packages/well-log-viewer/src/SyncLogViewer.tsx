@@ -23,7 +23,10 @@ import type {
 } from "./components/WellLogView";
 
 import type WellLogView from "./components/WellLogView";
-import type { WellLogViewOptions } from "./components/WellLogView";
+import type {
+    WellLogViewOptions,
+    TrackMouseEvent,
+} from "./components/WellLogView";
 import type { WellLogSpacerOptions } from "./components/WellLogSpacer";
 import { getWellPicks } from "./components/WellLogView";
 
@@ -31,7 +34,7 @@ import { getAvailableAxes } from "./utils/tracks";
 
 import { checkMinMax } from "./utils/minmax";
 
-import { onTrackMouseEvent } from "./utils/edit-track";
+import { onTrackMouseEventDefault } from "./utils/edit-track";
 
 import type { Info, InfoOptions } from "./components/InfoTypes";
 
@@ -161,6 +164,8 @@ export interface SyncLogViewerProps {
     onContentRescale?: (iWellLog: number) => void;
     onContentSelection?: (iWellLog: number) => void;
     onTemplateChanged?: (iWellLog: number) => void;
+
+    onTrackMouseEvent?: (wellLogView: WellLogView, ev: TrackMouseEvent) => void;
 
     onCreateController?: (
         iWellLog: number,
@@ -542,7 +547,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
     }
 
     syncTrackScrollPos(iWellLog: number): void {
-        const controller = this.callbackManagers[iWellLog].controller;
+        const controller = this.callbackManagers[iWellLog]?.controller;
         if (!controller) return;
         const trackPos = controller.getTrackScrollPos();
         for (const callbackManager of this.callbackManagers) {
@@ -552,7 +557,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         }
     }
     syncTrackSelection(iWellLog: number): void {
-        const controller = this.callbackManagers[iWellLog].controller;
+        const controller = this.callbackManagers[iWellLog]?.controller;
         if (!controller) return;
         const trackSelection = controller.getSelectedTrackIndices();
         for (const callbackManager of this.callbackManagers) {
@@ -706,7 +711,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
 
     skipSiblings: number[] = [];
     syncContentScrollPos(iWellLog: number): void {
-        const controller = this.callbackManagers[iWellLog].controller;
+        const controller = this.callbackManagers[iWellLog]?.controller;
         if (!controller) return;
 
         const domain = controller.getContentDomain();
@@ -809,7 +814,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
     }
 
     syncContentSelection(iWellLog: number): void {
-        const controller = this.callbackManagers[iWellLog].controller;
+        const controller = this.callbackManagers[iWellLog]?.controller;
         if (!controller) return;
         const selection = controller.getContentSelection();
         for (const callbackManager of this.callbackManagers) {
@@ -829,7 +834,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
     }
 
     syncTemplate(iWellLog: number): void {
-        const controller = this.callbackManagers[iWellLog].controller;
+        const controller = this.callbackManagers[iWellLog]?.controller;
         if (!controller) return;
         const template = controller.getTemplate();
         for (const callbackManager of this.callbackManagers) {
@@ -898,7 +903,9 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                 options={options}
                 onInfo={callbackManager.onInfo}
                 onCreateController={callbacks.onCreateControllerBind}
-                onTrackMouseEvent={onTrackMouseEvent}
+                onTrackMouseEvent={
+                    this.props.onTrackMouseEvent || onTrackMouseEventDefault
+                }
                 onTrackScroll={callbacks.onTrackScrollBind}
                 onTrackSelection={callbacks.onTrackSelectionBind}
                 onContentRescale={callbacks.onContentRescaleBind}

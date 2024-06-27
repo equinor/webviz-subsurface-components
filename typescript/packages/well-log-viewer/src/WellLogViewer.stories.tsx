@@ -36,7 +36,11 @@ import WellLogViewWithScroller from "./components/WellLogViewWithScroller";
 import { deepCopy } from "./utils/deepcopy";
 import { getDiscreteMeta, indexOfElementByName } from "./utils/tracks";
 
-import type { WellLogViewOptions } from "./components/WellLogView";
+import type WellLogView from "./components/WellLogView";
+import type {
+    WellLogViewOptions,
+    TrackMouseEvent,
+} from "./components/WellLogView";
 import { isEqualRanges } from "./utils/log-viewer";
 
 import { CallbackManager } from "./components/CallbackManager";
@@ -132,6 +136,18 @@ const StoryTemplate = (args) => {
             controller.setControllerDefaultZoom();
         }
     };
+    const [checked, setChecked] = React.useState(false);
+    const handleChange = () => {
+        setChecked(!checked);
+    };
+    /* eslint-disable */ // no-unused-vars
+    function onTrackMouseEventCustom(
+        wellLogView: WellLogView,
+        ev: TrackMouseEvent
+    ): void {
+        //custom function to disable the context menu
+    }
+    /* eslint-enable */ // no-unused-vars
 
     return (
         <div>
@@ -142,10 +158,18 @@ const StoryTemplate = (args) => {
                     onCreateController={onCreateController}
                     onContentRescale={onContentRescale}
                     onContentSelection={onContentSelection}
+                    onTrackMouseEvent={checked ? onTrackMouseEventCustom : null}
                 />
             </div>
             <div style={{ display: "inline-flex" }}>
                 <div ref={infoRef}></div>
+                <label style={{ marginLeft: 10 }}>disable context menu</label>
+                <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={handleChange}
+                    title="Disable context menu"
+                />
                 <button onClick={handleClick} style={{ marginLeft: 10 }}>
                     Reset
                 </button>
