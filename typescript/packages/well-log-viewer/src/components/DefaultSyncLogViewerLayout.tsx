@@ -23,7 +23,7 @@ export function defaultSidePanel(parent: SyncLogViewer): JSX.Element {
                 (welllog: WellLog, iWellLog: number) => (
                     <WellLogInfoPanel
                         key={iWellLog}
-                        header={"Readout " + welllog.header.well}
+                        header={"Readout " + welllog?.header.well}
                         readoutOptions={parent.props.readoutOptions}
                         callbackManager={parent.callbackManagers[iWellLog]}
                     />
