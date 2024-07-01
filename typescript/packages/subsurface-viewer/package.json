@@ -1,6 +1,6 @@
 {
     "name": "@webviz/subsurface-viewer",
-    "version": "0.27.8",
+    "version": "0.27.9",
     "description": "3D visualization component for subsurface reservoir data",
     "keywords": [
         "subsurface",
@@ -55,7 +55,7 @@
         "d3-format": "^3.1.0",
         "gl-matrix": "^3.4.3",
         "lodash": "^4.17.21",
-        "mathjs": "^12.4.1",
+        "mathjs": "^13.0.0",
         "merge-refs": "^1.2.2",
         "react-redux": "^8.1.1",
         "workerpool": "^9.1.1"

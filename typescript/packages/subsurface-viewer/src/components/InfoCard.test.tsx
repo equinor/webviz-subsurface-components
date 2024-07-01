@@ -1,8 +1,4 @@
-import {
-    render,
-    screen,
-    waitForElementToBeRemoved,
-} from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import "jest-styled-components";
 import "@testing-library/jest-dom";
 import React from "react";
@@ -38,6 +34,7 @@ describe("Test Info Card", () => {
         expect(container.firstChild).toMatchSnapshot();
     });
     it("collapse infocard", async () => {
+        const user = userEvent.setup();
         render(
             <InfoCard
                 pickInfos={[
@@ -53,8 +50,9 @@ describe("Test Info Card", () => {
         );
         const collapse_button = screen.getByRole("button", { name: "" });
         expect(screen.getByText("111.00 m")).toBeVisible();
-        userEvent.click(collapse_button);
-        await waitForElementToBeRemoved(() => screen.getByText("111.00 m"));
+        await user.click(collapse_button);
+        // use queryByText because getByText does throw an error if not found.
+        expect(screen.queryByText("111.00 m")).toBeNull();
     });
     it("undefined coordinates", async () => {
         const { container } = render(

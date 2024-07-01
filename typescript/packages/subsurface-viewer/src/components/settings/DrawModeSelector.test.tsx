@@ -22,6 +22,7 @@ describe("Test draw-mode menu", () => {
         expect(container.firstChild).toMatchSnapshot();
     });
     it("select option to dispatch redux action", async () => {
+        const user = userEvent.setup();
         render(
             EmptyWrapper({
                 children: (
@@ -37,7 +38,7 @@ describe("Test draw-mode menu", () => {
         expect(
             screen.getByRole("combobox", { name: /draw mode/i })
         ).toHaveDisplayValue("Create polyline");
-        userEvent.selectOptions(
+        await user.selectOptions(
             screen.getByRole("combobox", { name: /draw mode/i }),
             "View"
         );

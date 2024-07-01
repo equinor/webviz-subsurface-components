@@ -39,8 +39,8 @@ export const WellCompletionsPlot: React.FC<WellCompletionsPlotProps> =
                     ref={ref as React.LegacyRef<HTMLDivElement>}
                     id={props.id}
                     className={"WellCompletionsPlot"}
-                    data-tip
-                    data-for="plot-tooltip"
+                    data-tooltip-id="plot-tooltip"
+                    data-tooltip-float={true}
                 >
                     {layout && props.plotData && (
                         <svg

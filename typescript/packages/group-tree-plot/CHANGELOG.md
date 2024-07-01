@@ -1,3 +1,10 @@
+## [1.1.17](https://github.com/equinor/webviz-subsurface-components/compare/group-tree-plot@1.1.16...group-tree-plot@1.1.17) (2024-06-24)
+
+
+### Bug Fixes
+
+* bump react-tooltip from 4.5.1 to 5.27.0 in /typescript ([#2104](https://github.com/equinor/webviz-subsurface-components/issues/2104)) ([28bd015](https://github.com/equinor/webviz-subsurface-components/commit/28bd01575e1a07225224343bc5acfe079f7e4396)), closes [ReactTooltip/react-tooltip#1148](https://github.com/ReactTooltip/react-tooltip/issues/1148) [ReactTooltip/react-tooltip#1196](https://github.com/ReactTooltip/react-tooltip/issues/1196) [ReactTooltip/react-tooltip#1194](https://github.com/ReactTooltip/react-tooltip/issues/1194) [ReactTooltip/react-tooltip#1187](https://github.com/ReactTooltip/react-tooltip/issues/1187) [ReactTooltip/react-tooltip#1171](https://github.com/ReactTooltip/react-tooltip/issues/1171) [ReactTooltip/react-tooltip#1169](https://github.com/ReactTooltip/react-tooltip/issues/1169) [ReactTooltip/react-tooltip#1168](https://github.com/ReactTooltip/react-tooltip/issues/1168) [ReactTooltip/react-tooltip#1170](https://github.com/ReactTooltip/react-tooltip/issues/1170) [ReactTooltip/react-tooltip#1172](https://github.com/ReactTooltip/react-tooltip/issues/1172) [#1196](https://github.com/equinor/webviz-subsurface-components/issues/1196) [#1148](https://github.com/equinor/webviz-subsurface-components/issues/1148)
+
 ## [1.1.16](https://github.com/equinor/webviz-subsurface-components/compare/group-tree-plot@1.1.15...group-tree-plot@1.1.16) (2024-05-29)
 
 

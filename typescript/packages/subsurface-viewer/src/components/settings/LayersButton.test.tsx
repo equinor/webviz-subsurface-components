@@ -36,6 +36,7 @@ describe("test 'layers' button", () => {
         expect(container.firstChild).toMatchSnapshot();
     });
     it("click to dispatch redux action", async () => {
+        const user = userEvent.setup();
         Icon.add({ layers });
         render(
             EmptyWrapper({
@@ -47,10 +48,11 @@ describe("test 'layers' button", () => {
                 ),
             })
         );
-        userEvent.click(screen.getByRole("button"));
+        await user.click(screen.getByRole("button"));
         expect(screen.getByRole("menu")).toBeInTheDocument();
     });
     it("should close menu when clicked on backdrop", async () => {
+        const user = userEvent.setup();
         render(
             EmptyWrapper({
                 children: (
@@ -61,13 +63,14 @@ describe("test 'layers' button", () => {
                 ),
             })
         );
-        userEvent.click(screen.getByRole("button"));
+        await user.click(screen.getByRole("button"));
         const layers_menu = screen.getByRole("menu");
         expect(layers_menu).toBeInTheDocument();
-        userEvent.click(document.body);
+        await user.click(document.body);
         await waitFor(() => expect(layers_menu).not.toBeVisible());
     });
     it("should close menu when clicked twice on layers button", async () => {
+        const user = userEvent.setup();
         render(
             EmptyWrapper({
                 children: (
@@ -78,10 +81,10 @@ describe("test 'layers' button", () => {
                 ),
             })
         );
-        userEvent.click(screen.getByRole("button"));
+        await user.click(screen.getByRole("button"));
         const layers_menu = screen.getByRole("menu");
         expect(layers_menu).toBeInTheDocument();
-        userEvent.click(screen.getByRole("button"));
+        await user.click(screen.getByRole("button"));
         await waitFor(() => expect(layers_menu).not.toBeVisible());
     });
     it("test empty MapState/specbase", () => {
