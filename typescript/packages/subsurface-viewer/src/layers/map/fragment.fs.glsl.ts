@@ -55,12 +55,7 @@ void main(void) {
    float propertyValue = property;
 
    // This may happen due to GPU interpolation precision causing color artifacts.
-   if (propertyValue < valueRangeMin ) {
-     propertyValue = valueRangeMin;
-   }
-   else if (propertyValue > valueRangeMax) {
-     propertyValue = valueRangeMax;
-   }
+   propertyValue = clamp(propertyValue, valueRangeMin, valueRangeMax);
 
    float x = (propertyValue - colorMapRangeMin) / (colorMapRangeMax - colorMapRangeMin);
    if (x < 0.0 || x > 1.0) {
