@@ -54,6 +54,14 @@ void main(void) {
    vec4 color = vec4(1.0, 1.0, 1.0,  1.0);;
    float propertyValue = property;
 
+   // This may happen due to GPU interpolation precision causing color artifacts.
+   if (propertyValue < valueRangeMin ) {
+     propertyValue = valueRangeMin;
+   }
+   else if (propertyValue > valueRangeMax) {
+     propertyValue = valueRangeMax;
+   }
+
    float x = (propertyValue - colorMapRangeMin) / (colorMapRangeMax - colorMapRangeMin);
    if (x < 0.0 || x > 1.0) {
       // Out of range. Use clampcolor.
