@@ -337,16 +337,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
     }
 
     beforeRender(): void {
-        // Are we adding new items to the list?
-        // Capture the scroll position so we can adjust scroll later.
-        /*
-        if (prevProps.list.length < this.props.list.length) {
-          const list = this.listRef.current;
-          return list.scrollHeight - list.scrollTop;
-        }
-        */
         // called before render()
-        //if (prevProps.welllogs.length === this.props.welllogs.length) return;
         if (this.callbackManagers.length === this.props.welllogs.length) return;
         this.spacers.length = this.props.welllogs.length;
 
