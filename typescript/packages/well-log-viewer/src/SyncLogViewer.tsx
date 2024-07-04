@@ -425,10 +425,10 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         this.callbacks.length = nViews;
         this.callbackManagers.length = nViews;
 
-        /*for (let iView = nViews; iView < this.controllers.length; iView++) {
+        for (let iView = nViews; iView < this.controllers.length; iView++) {
             console.assert(this.controllers[iView]);
-            this.onDeleteController(iView,this.controllers[iView]);
-        }*/
+            this.onDeleteController(iView, this.controllers[iView]);
+        }
         this.controllers.length = nViews;
     }
 
@@ -956,32 +956,30 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
     render(): JSX.Element {
         this.beforeRender();
         return (
-            <React.StrictMode>
-                <WellLogLayout
-                    parent={this}
-                    center={
-                        <div
-                            style={{
-                                height: "0%",
-                                //width: "255px" /*some small value to be grown by flex*/,
-                                flex: "1",
-                                display: "flex",
-                                flexDirection: this.props.horizontal
-                                    ? "column"
-                                    : "row",
-                            }}
-                        >
-                            {this.props.welllogs?.map(
-                                (_welllog: WellLog, index: number) => [
-                                    index ? this.createSpacer(index) : null,
-                                    this.createView(index),
-                                ]
-                            )}
-                        </div>
-                    }
-                    layout={this.props.layout || defaultLayout}
-                />
-            </React.StrictMode>
+            <WellLogLayout
+                parent={this}
+                center={
+                    <div
+                        style={{
+                            height: "0%",
+                            //width: "255px" /*some small value to be grown by flex*/,
+                            flex: "1",
+                            display: "flex",
+                            flexDirection: this.props.horizontal
+                                ? "column"
+                                : "row",
+                        }}
+                    >
+                        {this.props.welllogs?.map(
+                            (_welllog: WellLog, index: number) => [
+                                index ? this.createSpacer(index) : null,
+                                this.createView(index),
+                            ]
+                        )}
+                    </div>
+                }
+                layout={this.props.layout || defaultLayout}
+            />
         );
     }
 }
