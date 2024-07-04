@@ -4,6 +4,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 
 import WellLogViewer, { argTypesWellLogViewerProp } from "./WellLogViewer";
+import type { WellLogController } from "./components/WellLogView";
 
 import exampleData from "../../../../example-data/deckgl-map.json";
 
@@ -86,7 +87,7 @@ const stories: Meta = {
 };
 export default stories;
 
-function fillInfo(controller) {
+function fillInfo(controller: WellLogController | undefined) {
     if (!controller) return "-";
     const baseDomain = controller.getContentBaseDomain();
     const domain = controller.getContentDomain();
@@ -118,7 +119,9 @@ const StoryTemplate = (args) => {
     const setInfo = function (info) {
         if (infoRef.current) infoRef.current.innerHTML = info;
     };
-    const [controller, setController] = React.useState(null);
+    const [controller, setController] = React.useState<
+        WellLogController | undefined
+    >(undefined);
     const onCreateController = React.useCallback(
         (controller) => {
             setController(controller);

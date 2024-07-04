@@ -25,13 +25,18 @@ export class WellLogScaleSelector extends Component<Props, State> {
 
         this.onChange = this.onChange.bind(this);
         this.onContentRescale = this.onContentRescale.bind(this);
-        this.props.callbackManager?.registerCallback(
+    }
+    componentDidMount(): void {
+        const callbackManager = this.props.callbackManager;
+        callbackManager?.registerCallback(
             "onContentRescale",
             this.onContentRescale
         );
     }
+
     componentWillUnmount(): void {
-        this.props.callbackManager?.unregisterCallback(
+        const callbackManager = this.props.callbackManager;
+        callbackManager?.unregisterCallback(
             "onContentRescale",
             this.onContentRescale
         );

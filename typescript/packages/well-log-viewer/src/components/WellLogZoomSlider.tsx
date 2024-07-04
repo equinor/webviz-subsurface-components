@@ -23,15 +23,19 @@ export class WellLogZoomSlider extends Component<Props, State> {
 
         this.onContentRescale = this.onContentRescale.bind(this);
         this.onZoomSliderChange = this.onZoomSliderChange.bind(this);
+    }
 
-        this.props.callbackManager?.registerCallback(
+    componentDidMount(): void {
+        const callbackManager = this.props.callbackManager;
+        callbackManager?.registerCallback(
             "onContentRescale",
             this.onContentRescale
         );
     }
 
     componentWillUnmount(): void {
-        this.props.callbackManager?.unregisterCallback(
+        const callbackManager = this.props.callbackManager;
+        callbackManager?.unregisterCallback(
             "onContentRescale",
             this.onContentRescale
         );
