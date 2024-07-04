@@ -1315,17 +1315,16 @@ class WellLogView
     }
 
     componentDidMount(): void {
-        if (this._isMount) return; // anti-StrictMode workaround
-
         this._isMount = true;
-        this.createLogViewer();
-
         this.template = deepCopy(this.props.template); // save external template content to current
-        this.setTracks(true);
+
+        if (!this.logController) {
+            this.createLogViewer();
+            this.setTracks(true);
+        }
     }
 
     componentWillUnmount(): void {
-        if (this._isMount) return; // anti-StrictMode workaround
         this._isMount = false;
     }
 

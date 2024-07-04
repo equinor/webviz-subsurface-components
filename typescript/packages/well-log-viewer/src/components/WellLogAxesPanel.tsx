@@ -62,7 +62,7 @@ export class WellLogAxesPanel extends Component<Props, State> {
 
     componentWillUnmount(): void {
         const callbackManager = this.props.callbackManager;
-        callbackManager.unregisterCallback(
+        callbackManager?.unregisterCallback(
             "onChangePrimaryAxis",
             this.onChangePrimaryAxis
         );

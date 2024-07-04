@@ -303,10 +303,11 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         };
 
         this.onChangePrimaryAxis = this.onChangePrimaryAxis.bind(this);
+
+        this.beforeRender(this.props);
     }
     componentDidMount(): void {
         this._isMounted = true;
-        this.fillViewsCallbacks(this.props.welllogs.length);
 
         if (this.props.welllogs.length) {
             this.syncTrackScrollPos(0);
@@ -333,15 +334,17 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         const ret =
             !Object.is(this.props, nextProps) ||
             !Object.is(this.state, nextState);
+
+        if (ret) this.beforeRender(nextProps);
         return ret;
     }
 
-    beforeRender(): void {
-        // called before render()
-        if (this.callbackManagers.length === this.props.welllogs.length) return;
-        this.spacers.length = this.props.welllogs.length;
+    beforeRender(props: SyncLogViewerProps): void {
+        // called before render() but not inside it to avoid onDeleteController notifications
+        if (this.callbackManagers.length === props.welllogs.length) return;
+        this.spacers.length = props.welllogs.length;
 
-        this.fillViewsCallbacks(this.props.welllogs.length); // update this.callbackManagers and this.callbacks[] before render()
+        this.fillViewsCallbacks(props.welllogs.length); // update this.callbackManagers and this.callbacks[] before render()
     }
 
     componentDidUpdate(
@@ -945,7 +948,6 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
     }
 
     render(): JSX.Element {
-        this.beforeRender();
         return (
             <WellLogLayout
                 parent={this}

@@ -170,13 +170,13 @@ const Template = (args) => {
         (iWellLog: number, controller: WellLogController) => {
             setControllers((prev) => [...prev, controller]);
         },
-        [controllers]
+        []
     );
     const onDeleteController = React.useCallback(
         (iWellLog: number, controller: WellLogController) => {
             setControllers((prev) => prev.filter((c) => c !== controller));
         },
-        [controllers]
+        []
     );
     const onContentRescale = React.useCallback(
         (iWellLog: number) => {
@@ -429,7 +429,6 @@ import WellLogScaleSelector from "./components/WellLogScaleSelector";
 import WellInfoIcon from "@mui/icons-material/FormatListBulleted"; // WaterDrop ShowChart, SearchSharp
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 
-import assert from "assert";
 const iconStyle = {
     fontSize: "18px",
     verticalAlign: "middle",
@@ -564,7 +563,7 @@ const TemplateWithSelection = (args: { welllogs: WellLog[] }) => {
                     value="check"
                     selected={showWell1 && !!args.welllogs[0]}
                     onChange={() => {
-                        if (!args.welllogs[0]) assert("!args.welllogs[0]");
+                        if (!args.welllogs[1]) alert("No args.welllogs[0]");
                         setShowWell1(!showWell1);
                     }}
                 >
@@ -574,7 +573,7 @@ const TemplateWithSelection = (args: { welllogs: WellLog[] }) => {
                     value="check"
                     selected={showWell2 && !!args.welllogs[1]}
                     onChange={() => {
-                        if (!args.welllogs[1]) alert("!args.welllogs[1]");
+                        if (!args.welllogs[1]) alert("No args.welllogs[1]");
                         setShowWell2(!showWell2);
                     }}
                 >
@@ -584,7 +583,7 @@ const TemplateWithSelection = (args: { welllogs: WellLog[] }) => {
                     value="check"
                     selected={showWell3 && !!args.welllogs[2]}
                     onChange={() => {
-                        if (!args.welllogs[2]) alert("!args.welllogs[2]");
+                        if (!args.welllogs[2]) alert("No args.welllogs[2]");
                         setShowWell3(!showWell3);
                     }}
                 >

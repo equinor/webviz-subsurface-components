@@ -58,7 +58,7 @@ export class WellLogInfoPanel extends Component<Props, State> {
             true
         );
 
-        this.props.callbackManager.updateInfo(); // force onInfo callback to be called
+        callbackManager.updateInfo(); // force onInfo callback to be called
     }
 
     componentWillUnmount(): void {
