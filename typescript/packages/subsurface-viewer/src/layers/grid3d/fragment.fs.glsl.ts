@@ -12,6 +12,8 @@ flat in int vertexIndex;
 
 uniform sampler2D colormap;
 
+uniform float valueRangeMin;
+uniform float valueRangeMax;
 uniform float colorMapRangeMin;
 uniform float colorMapRangeMax;
 
@@ -26,8 +28,12 @@ uniform bool isColorMapClampColorTransparent;
 vec4 getContinuousPropertyColor (float propertyValue) {
 
    vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
+
+   // This may happen due to GPU interpolation precision causing color artifacts.
+   propertyValue = clamp(propertyValue, valueRangeMin, valueRangeMax);
+
    float x = (propertyValue - colorMapRangeMin) / (colorMapRangeMax - colorMapRangeMin);
-   if (x < 0.0 - 1e-4 || x > 1.0 + 1e-4) {
+   if (x < 0.0 || x > 1.0) {
       // Out of range. Use clampcolor.
       if (isClampColor) {
          color = vec4(colorMapClampColor.rgb, 1.0);
