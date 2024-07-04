@@ -29,11 +29,8 @@ vec4 getContinuousPropertyColor (float propertyValue) {
 
    vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
 
-   // This may happen due to GPU interpolation precision causing color artifacts.
-   propertyValue = clamp(propertyValue, valueRangeMin, valueRangeMax);
-
    float x = (propertyValue - colorMapRangeMin) / (colorMapRangeMax - colorMapRangeMin);
-   if (x < 0.0 || x > 1.0) {
+   if (x < 0.0 - 1e-4 || x > 1.0 + 1e-4) {
       // Out of range. Use clampcolor.
       if (isClampColor) {
          color = vec4(colorMapClampColor.rgb, 1.0);
@@ -58,8 +55,9 @@ vec4 getContinuousPropertyColor (float propertyValue) {
 vec4 getDiscretePropertyColor (float propertyValue) {
 
    vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
-    
-   if (propertyValue < colorMapRangeMin || propertyValue > colorMapRangeMax) {
+   float tolerance = (1.0 / colorMapSize) * 0.5;
+
+   if (propertyValue < colorMapRangeMin - tolerance || propertyValue > colorMapRangeMax + tolerance) {
       // Out of range. Use clampcolor.
       if (isClampColor) {
          color = vec4(colorMapClampColor.rgb, 1.0);
@@ -77,7 +75,7 @@ vec4 getDiscretePropertyColor (float propertyValue) {
    }
    else {
       float x = propertyValue / colorMapSize;
-      color = texture2D(colormap, vec2(x, 0.5));
+      color = texture2D(colormap, vec2(x + tolerance, 0.5));
    }
    return color;
 }
