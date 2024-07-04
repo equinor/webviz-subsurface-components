@@ -58,9 +58,8 @@ vec4 getContinuousPropertyColor (float propertyValue) {
 vec4 getDiscretePropertyColor (float propertyValue) {
 
    vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
-   float tolerance = (1.0 / colorMapSize) * 0.5;
-     
-   if (propertyValue < colorMapRangeMin - tolerance || propertyValue > colorMapRangeMax + tolerance) {
+    
+   if (propertyValue < colorMapRangeMin || propertyValue > colorMapRangeMax) {
       // Out of range. Use clampcolor.
       if (isClampColor) {
          color = vec4(colorMapClampColor.rgb, 1.0);
@@ -78,7 +77,7 @@ vec4 getDiscretePropertyColor (float propertyValue) {
    }
    else {
       float x = propertyValue / colorMapSize;
-      color = texture2D(colormap, vec2(x + tolerance, 0.5));
+      color = texture2D(colormap, vec2(x, 0.5));
    }
    return color;
 }
@@ -96,8 +95,10 @@ void main(void) {
       gl_FragColor = encodeVertexIndexToRGB(vertexIndex);      
       return;
    }
-      
-   vec4 color = getPropertyColor(property);
+   
+   float propertyValue = clamp(property, valueRangeMin, valueRangeMax);
+
+   vec4 color = getPropertyColor(propertyValue);
    
    // Use two sided phong lighting. This has no effect if "material" property is not set.
    vec3 lightColor = getPhongLightColor(color.rgb, cameraPosition, position_commonspace.xyz, normal);
