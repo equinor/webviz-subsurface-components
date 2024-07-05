@@ -5,7 +5,8 @@ precision highp float;
 
 in vec3 cameraPosition;
 in vec4 position_commonspace;
-in float property;
+flat in float property;
+in float property_interpolated;
 
 flat in vec3 normal;
 flat in int vertexIndex;
@@ -19,18 +20,18 @@ uniform float colorMapRangeMax;
 
 uniform bool  isColoringDiscrete;
 uniform float colorMapSize;
+uniform highp int coloringMode;
 
 uniform vec3 colorMapClampColor;
 uniform bool isClampColor;
 uniform bool isColorMapClampColorTransparent;
 
-// Calculate color from propertyValue using continuous colormap.
 vec4 getContinuousPropertyColor (float propertyValue) {
 
    vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
 
    float x = (propertyValue - colorMapRangeMin) / (colorMapRangeMax - colorMapRangeMin);
-   if (x < 0.0 - 1e-4 || x > 1.0 + 1e-4) {
+   if (x < 0.0 || x > 1.0) {
       // Out of range. Use clampcolor.
       if (isClampColor) {
          color = vec4(colorMapClampColor.rgb, 1.0);
@@ -94,7 +95,9 @@ void main(void) {
       return;
    }
    
-   float propertyValue = clamp(property, valueRangeMin, valueRangeMax);
+   // Property values other than X,Y or Z are passed as "flat" i.e. constant over faces.
+   float propertyValue = coloringMode == 0 ? property : property_interpolated;
+   propertyValue = clamp(propertyValue, valueRangeMin, valueRangeMax);
 
    vec4 color = getPropertyColor(propertyValue);
    
