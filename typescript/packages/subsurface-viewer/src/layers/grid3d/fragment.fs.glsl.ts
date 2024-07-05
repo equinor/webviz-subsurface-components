@@ -31,7 +31,7 @@ vec4 getContinuousPropertyColor (float propertyValue) {
    vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
 
    float x = (propertyValue - colorMapRangeMin) / (colorMapRangeMax - colorMapRangeMin);
-   if (x < 0.0 - 1e-4 || x > 1.0 + 1e-4) {
+   if (x < 0.0 || x > 1.0) {
       // Out of range. Use clampcolor.
       if (isClampColor) {
          color = vec4(colorMapClampColor.rgb, 1.0);
