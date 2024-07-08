@@ -38,6 +38,7 @@ import { getDiscreteMeta, indexOfElementByName } from "./utils/tracks";
 
 import type WellLogView from "./components/WellLogView";
 import type {
+    WellLogController,
     WellLogViewOptions,
     TrackMouseEvent,
 } from "./components/WellLogView";
@@ -118,7 +119,8 @@ const StoryTemplate = (args) => {
     const setInfo = function (info) {
         if (infoRef.current) infoRef.current.innerHTML = info;
     };
-    const [controller, setController] = React.useState(null);
+    const [controller, setController] =
+        React.useState<WellLogController | null>(null);
     const onCreateController = React.useCallback(
         (controller) => {
             setController(controller);
