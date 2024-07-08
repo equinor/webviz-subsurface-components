@@ -7,7 +7,7 @@ attribute vec3 positions;
 attribute float properties;
 attribute vec3 normals;
 
-uniform int coloringMode;
+uniform lowp int coloringMode;
 
 // Outputs to fragment shader
 out vec3 cameraPosition;
