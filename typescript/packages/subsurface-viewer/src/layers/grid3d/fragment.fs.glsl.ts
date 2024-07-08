@@ -20,7 +20,7 @@ uniform float colorMapRangeMax;
 
 uniform bool  isColoringDiscrete;
 uniform float colorMapSize;
-uniform highp int coloringMode;
+uniform lowp int coloringMode;
 
 uniform vec3 colorMapClampColor;
 uniform bool isClampColor;
