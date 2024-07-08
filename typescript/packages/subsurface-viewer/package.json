@@ -45,7 +45,7 @@
         "@equinor/eds-icons": "^0.21.0",
         "@nebula.gl/layers": "^1.0.4",
         "@reduxjs/toolkit": "^1.7.2",
-        "@turf/simplify": "^6.5.0",
+        "@turf/simplify": "^7.0.0",
         "@vivaxy/png": "^1.3.0",
         "@webviz/wsc-common": "*",
         "ajv": "^8.16.0",
