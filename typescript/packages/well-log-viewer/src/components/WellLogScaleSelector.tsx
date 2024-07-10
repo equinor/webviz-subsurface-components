@@ -26,20 +26,34 @@ export class WellLogScaleSelector extends Component<Props, State> {
         this.onChange = this.onChange.bind(this);
         this.onContentRescale = this.onContentRescale.bind(this);
     }
-    componentDidMount(): void {
-        const callbackManager = this.props.callbackManager;
+
+    registerCallbacks(callbackManager: CallbackManager | undefined): void {
         callbackManager?.registerCallback(
             "onContentRescale",
             this.onContentRescale
         );
     }
 
-    componentWillUnmount(): void {
-        const callbackManager = this.props.callbackManager;
+    unregisterCallbacks(callbackManager: CallbackManager | undefined): void {
         callbackManager?.unregisterCallback(
             "onContentRescale",
             this.onContentRescale
         );
+    }
+
+    componentDidMount(): void {
+        this.registerCallbacks(this.props.callbackManager);
+    }
+
+    componentWillUnmount(): void {
+        this.unregisterCallbacks(this.props.callbackManager);
+    }
+
+    componentDidUpdate(prevProps: Props): void {
+        if (prevProps.callbackManager !== this.props.callbackManager) {
+            this.unregisterCallbacks(prevProps.callbackManager);
+            this.registerCallbacks(this.props.callbackManager);
+        }
     }
 
     // callback function from Vertical Scale combobox
