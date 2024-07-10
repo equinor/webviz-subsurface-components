@@ -106,11 +106,11 @@ function fillInfo(controller: WellLogController | undefined) {
         "]" +
         (selection[0] !== undefined
             ? ", selected: [" +
-            selection[0].toFixed(0) +
-            (selection[1] !== undefined
-                ? ", " + selection[1].toFixed(0)
-                : "") +
-            "]"
+              selection[0].toFixed(0) +
+              (selection[1] !== undefined
+                  ? ", " + selection[1].toFixed(0)
+                  : "") +
+              "]"
             : "")
     );
 }
@@ -507,12 +507,12 @@ class MapAndWellLogViewer extends React.Component<Props, State> {
                         style={{
                             color: wellColor
                                 ? "rgb(" +
-                                wellColor[0] +
-                                "," +
-                                wellColor[1] +
-                                "," +
-                                wellColor[2] +
-                                ")"
+                                  wellColor[0] +
+                                  "," +
+                                  wellColor[1] +
+                                  "," +
+                                  wellColor[2] +
+                                  ")"
                                 : undefined,
                             fontSize: "small",
                         }}
