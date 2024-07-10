@@ -931,6 +931,7 @@ export interface WellLogController {
     getContentSelection(): [number | undefined, number | undefined]; // [current, pinned]
     setContentScale(value: number): void;
     getContentScale(): number;
+    setControllerDefaultZoom(): void;
 
     scrollTrackTo(pos: number): void;
     scrollTrackBy(delta: number): void;

@@ -7,12 +7,13 @@ attribute vec3 positions;
 attribute float properties;
 attribute vec3 normals;
 
-uniform int coloringMode;
+uniform lowp int coloringMode;
 
 // Outputs to fragment shader
 out vec3 cameraPosition;
 out vec4 position_commonspace;
-out float property;
+flat out float property;
+out float property_interpolated;
 
 flat out vec3 normal;
 flat out int vertexIndex;
@@ -37,9 +38,9 @@ void main(void) {
 
    switch(coloringMode) {
       case 0: property = properties; break;
-      case 1: property = position.x; break;
-      case 2: property = position.y; break;
-      case 3: property = position.z; break;
+      case 1: property_interpolated = position.x; break;
+      case 2: property_interpolated = position.y; break;
+      case 3: property_interpolated = position.z; break;
       default: property = properties; break;
    }
 
