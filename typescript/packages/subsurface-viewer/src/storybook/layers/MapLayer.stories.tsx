@@ -72,6 +72,26 @@ const smallLayer = {
     colorMapClampColor: [255, 0, 0],
 };
 
+const artefactsMapLayer = {
+    "@@type": "MapLayer",
+    id: "artefacts-map-layer",
+    meshData: "ArtefactsMap/points.bin",
+    frame: {
+        origin: [1134, 9317.966796875],
+        count: [81, 92],
+        increment: [101.04595712679287, -100.58940471369598],
+
+        rotDeg: 0.10652954894901544,
+    },
+    propertiesData: "ArtefactsMap/properties.bin",
+    gridLines: false,
+    material: false,
+    // black to white colors.
+    colorMapFunction: [0, 0, 0],
+    colorMapRange: [-0.01, 33], // actual range is [0, 34.764503479003906]
+    colorMapClampColor: [0, 255, 0],
+};
+
 // This layer has as many property values as depth values hence each cell will be interpolated in color.
 const nodeCenteredPropertiesLayer = {
     "@@type": "MapLayer",
@@ -322,6 +342,12 @@ const axes_small = {
     bounds: [459790, 5929776, 0, 460590, 5930626, 30],
 };
 
+const axes_artefact_map = {
+    "@@type": "AxesLayer",
+    id: "axes_artefact_map",
+    bounds: [0, 0, 0, 10000, 10000, 30],
+};
+
 export const SmallMap: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "map",
@@ -334,6 +360,23 @@ export const SmallMap: StoryObj<typeof SubsurfaceViewer> = {
             ...defaultStoryParameters.docs,
             description: {
                 story: "4x5 cells.",
+            },
+        },
+    },
+};
+
+export const MapWithArtefacts: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "artefacts-map",
+        layers: [axes_artefact_map, artefactsMapLayer],
+        bounds: [0, 0, 10000, 10000] as BoundingBox2D,
+        views: default3DViews,
+    },
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: "Map with color artefacts.",
             },
         },
     },
