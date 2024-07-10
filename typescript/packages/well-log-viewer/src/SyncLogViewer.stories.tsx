@@ -10,8 +10,8 @@ const wellpick = require("../../../../example-data/wellpicks.json");// eslint-di
 import { ToggleButton } from "@mui/material";
 
 import SyncLogViewer, { argTypesSyncLogViewerProp } from "./SyncLogViewer";
-import type WellLogView from "./components/WellLogView";
 import type {
+    WellLogView,
     WellLogController,
     TrackMouseEvent,
 } from "./components/WellLogView";

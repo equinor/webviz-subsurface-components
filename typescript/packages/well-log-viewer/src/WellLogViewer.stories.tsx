@@ -4,7 +4,6 @@ import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 
 import WellLogViewer, { argTypesWellLogViewerProp } from "./WellLogViewer";
-import type { WellLogController } from "./components/WellLogView";
 
 import exampleData from "../../../../example-data/deckgl-map.json";
 
