@@ -162,7 +162,8 @@ const Template = (args) => {
         if (infoRef.current) infoRef.current.innerHTML = info;
     };
 
-    const [controller, setController] = React.useState(null); // the first WellLog
+    const [controller, setController] =
+        React.useState<WellLogController | null>(null); // the first WellLog
     const [controllers, setControllers] = React.useState<WellLogController[]>(
         []
     ); // all WellLogs
