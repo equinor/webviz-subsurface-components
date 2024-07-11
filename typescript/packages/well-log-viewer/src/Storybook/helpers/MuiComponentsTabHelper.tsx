@@ -66,7 +66,11 @@ const TestComponentArea: React.FC<React.PropsWithChildren> = ({ children }) => {
     const tab = useSelector(getTabValue);
 
     const renderer = (ref: React.MutableRefObject<null>): React.JSX.Element => {
-        return <div ref={ref}> {children} </div>;
+        return (
+            <div ref={ref} style={{ height: "100%", width: "100%" }}>
+                {children}
+            </div>
+        );
     };
 
     const testComponent = renderTestComponent(renderer, ref, tab);
