@@ -827,6 +827,20 @@ function fillPlotTemplate(
     const scale =
         templateTrack?.scale !== options.scale ? options.scale : undefined;
 
+    let colorTableName = "";
+    if (typeof options.colorTable === "function") {
+        colorTableName = "Function";
+    } else if (options.colorTable) {
+        colorTableName = options.colorTable.name;
+    }
+
+    let inverseColorTableName = "";
+    if (typeof options.inverseColorTable === "function") {
+        inverseColorTableName = "Function";
+    } else if (options.inverseColorTable) {
+        inverseColorTableName = options.inverseColorTable.name;
+    }
+
     return {
         style: undefined, // No style for this full Plot options.
         type: getPlotType(plot),
@@ -838,10 +852,8 @@ function fillPlotTemplate(
         inverseColor: options.inverseColor || "",
         fill: (options1 ? options1.fill : options.fill) || "",
         fill2: options2 ? options2.fill : "",
-        colorTable: options.colorTable ? options.colorTable.name : "",
-        inverseColorTable: options.inverseColorTable
-            ? options.inverseColorTable.name
-            : "",
+        colorTable: colorTableName,
+        inverseColorTable: inverseColorTableName,
         colorScale: options.colorScale,
         inverseColorScale: options.inverseColorScale,
     };
@@ -2096,7 +2108,7 @@ export function _propTypesWellLogView(): Record<string, unknown> {
         /**
          * Prop containing color table data for discrete well logs
          */
-        colorTables: PropTypes.array, //.isRequired,
+        colorTables: PropTypes.any, //.isRequired,
 
         /**
          * Well picks data
