@@ -29,7 +29,7 @@ function toggleId(
 }
 
 export class WellLogInfoPanel extends Component<Props, State> {
-    onGroupClick: (info: Info) => void;
+    onGroupClick?: (info: Info) => void;
     collapsedTrackIds: (string | number)[];
 
     constructor(props: Props) {
@@ -41,28 +41,25 @@ export class WellLogInfoPanel extends Component<Props, State> {
 
         this.onInfo = this.onInfo.bind(this);
         this.onInfoGroupClick = this.onInfoGroupClick.bind(this);
+        this.onGroupClick = undefined;
+    }
 
-        const callbackManager = this.props.callbackManager;
+    registerCallBacks(callbackManager: CallbackManager | undefined): void {
+        if (!callbackManager) return;
         this.onGroupClick = callbackManager.callCallbacks.bind(
             callbackManager,
             "onInfoGroupClick"
         );
-    }
-
-    componentDidMount(): void {
-        const callbackManager = this.props.callbackManager;
         callbackManager.registerCallback("onInfo", this.onInfo);
         callbackManager.registerCallback(
             "onInfoGroupClick",
             this.onInfoGroupClick,
             true
         );
-
-        this.props.callbackManager.updateInfo(); // force onInfo callback to be called
     }
-
-    componentWillUnmount(): void {
-        const callbackManager = this.props.callbackManager;
+    unregisterCallBacks(callbackManager: CallbackManager | undefined): void {
+        if (!callbackManager) return;
+        this.onGroupClick = undefined;
         callbackManager.unregisterCallback("onInfo", this.onInfo);
         callbackManager.unregisterCallback(
             "onInfoGroupClick",
@@ -70,7 +67,23 @@ export class WellLogInfoPanel extends Component<Props, State> {
         );
     }
 
+    componentDidMount(): void {
+        const callbackManager = this.props.callbackManager;
+        this.registerCallBacks(callbackManager);
+
+        callbackManager.updateInfo(); // force onInfo callback to be called
+    }
+
+    componentWillUnmount(): void {
+        const callbackManager = this.props.callbackManager;
+        this.unregisterCallBacks(callbackManager);
+    }
+
     componentDidUpdate(prevProps: Props /*, prevState: State*/): void {
+        if (prevProps.callbackManager !== this.props.callbackManager) {
+            this.unregisterCallBacks(prevProps.callbackManager);
+            this.registerCallBacks(this.props.callbackManager);
+        }
         if (
             this.props.readoutOptions &&
             (!prevProps.readoutOptions ||

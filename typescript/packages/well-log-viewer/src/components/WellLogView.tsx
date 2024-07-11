@@ -952,6 +952,8 @@ export interface WellLogController {
     getTemplate(): Template;
 
     getWellLog(): WellLog | undefined;
+
+    setControllerDefaultZoom(): void; // utility function
 }
 
 export function getContentBaseScale(
@@ -1314,18 +1316,17 @@ class WellLogView
         // set callback to component's caller
         this.props.onCreateController?.(this);
 
-        this.setControllerZoom();
-
         this._isMount = false;
     }
 
     componentDidMount(): void {
-        this.createLogViewer();
-
-        this.template = deepCopy(this.props.template); // save external template content to current
-        this.setTracks(true);
-
         this._isMount = true;
+        this.template = deepCopy(this.props.template); // save external template content to current
+
+        if (!this.logController) {
+            this.createLogViewer();
+            this.setTracks(true);
+        }
     }
 
     componentWillUnmount(): void {

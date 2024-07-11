@@ -8,14 +8,13 @@ import WellLogInfoPanel from "./WellLogInfoPanel";
 import WellLogZoomSlider from "./WellLogZoomSlider";
 
 export function defaultSidePanel(parent: SyncLogViewer): JSX.Element {
-    const primaryAxis = parent.getAxes().primaryAxis;
     return (
         <div className="side-panel">
             <WellLogAxesPanel
                 header="Primary scale"
                 axisTitles={parent.props.axisTitles}
                 axisMnemos={parent.props.axisMnemos}
-                primaryAxis={primaryAxis}
+                primaryAxis={parent.getPrimaryAxis()}
                 onChangePrimaryAxis={parent.onChangePrimaryAxis}
                 callbackManager={parent.callbackManagers[0]}
             />
