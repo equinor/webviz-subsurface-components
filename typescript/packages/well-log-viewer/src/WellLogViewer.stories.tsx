@@ -87,7 +87,7 @@ const stories: Meta = {
 };
 export default stories;
 
-function fillInfo(controller) {
+function fillInfo(controller: WellLogController | undefined) {
     if (!controller) return "-";
     const baseDomain = controller.getContentBaseDomain();
     const domain = controller.getContentDomain();
@@ -119,8 +119,9 @@ const StoryTemplate = (args) => {
     const setInfo = function (info) {
         if (infoRef.current) infoRef.current.innerHTML = info;
     };
-    const [controller, setController] =
-        React.useState<WellLogController | null>(null);
+    const [controller, setController] = React.useState<
+        WellLogController | undefined
+    >(undefined);
     const onCreateController = React.useCallback(
         (controller) => {
             setController(controller);
