@@ -20,12 +20,12 @@ export function isEqDomains(
     d2: Domain /*[number, number]*/
 ): boolean {
     if (
-        Number.isNaN(d1[1]) &&
-        Number.isNaN(d1[0]) &&
-        Number.isNaN(d2[1]) &&
+        Number.isNaN(d1[1]) ||
+        Number.isNaN(d1[0]) ||
+        Number.isNaN(d2[1]) ||
         Number.isNaN(d2[0])
     )
-        return true;
+        return true; // let's assume all invalid domains are equivalent
     const eps: number = Math.abs(d1[1] - d1[0] + (d2[1] - d2[0])) * 0.00001;
     return Math.abs(d1[0] - d2[0]) < eps && Math.abs(d1[1] - d2[1]) < eps;
 }
