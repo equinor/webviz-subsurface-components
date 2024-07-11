@@ -76,7 +76,7 @@ export const FormatLabelFunction: StoryObj<typeof SubsurfaceViewer> = {
             {
                 "@@type": "AxesLayer",
                 id: "axes-layer2",
-                bounds: [453150, 5925800, 0, 469400, 5939500, 100],
+                bounds: [453150, 5925800, 50, 469400, 5939500, 100],
             },
             {
                 "@@type": "Axes2DLayer",
