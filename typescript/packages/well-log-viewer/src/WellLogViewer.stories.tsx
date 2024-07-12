@@ -268,13 +268,23 @@ function addTemplateTrack(
     return templateNew;
 }
 
+// Custom function to demonstrate the ability to specify a function instead of color tables
+function colorTableFunc(v: number): [number, number, number] {
+    if (v >= 0 && v < 0.25) return [255, 0.0, 0.0];
+    else if (v >= 0.25 && v < 0.5) return [182, 182, 0.0];
+    else if (v >= 0.5 && v < 0.75) return [0.0, 255, 0.0];
+    else if (v >= 0.75 && v < 1) return [0.0, 182, 182];
+    else if (v == 1) return [0.0, 0.0, 255];
+    else return [0, 0, 0];
+}
+
 export const Default: StoryObj<typeof StoryTemplate> = {
     args: {
         id: "Well-Log-Viewer",
         horizontal: false,
         welllog: require("../../../../example-data/L898MUD.json")[0], // eslint-disable-line
         template: require("../../../../example-data/welllog_template_1.json"), // eslint-disable-line
-        colorTables: colorTables,
+        colorTables: colorTableFunc,
         wellpick: wellpick,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,

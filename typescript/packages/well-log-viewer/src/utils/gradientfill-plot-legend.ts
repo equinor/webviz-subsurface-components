@@ -29,7 +29,6 @@ function createGradient(
         .attr("x2", "100%") //since it's a horizontal linear gradient
         .attr("y1", "0%")
         .attr("y2", "0%");
-    const colors = colorTable.colors;
     if (rLogarithmic !== undefined) {
         const yDelta = Math.log(rLogarithmic); // log(max/min)
         const d = rLogarithmic - 1;
@@ -44,12 +43,24 @@ function createGradient(
                 .style("stop-color", c);
         }
     } else {
-        for (let i = 0; i < colors.length; i++) {
-            const color = colors[i];
-            const c = color4ToString(color);
-            lg.append("stop")
-                .attr("offset", color[0] * 100.0 + "%")
-                .style("stop-color", c);
+        if (typeof colorTable === "function") {
+            const nIntervals = 5;
+            for (let i = 0; i < nIntervals; i++) {
+                const fraction = i / nIntervals;
+                const c = getInterpolatedColorString(colorTable, fraction);
+                lg.append("stop")
+                    .attr("offset", fraction * 100.0 + "%")
+                    .style("stop-color", c);
+            }
+        } else {
+            const colors = colorTable.colors;
+            for (let i = 0; i < colors.length; i++) {
+                const color = colors[i];
+                const c = color4ToString(color);
+                lg.append("stop")
+                    .attr("offset", color[0] * 100.0 + "%")
+                    .style("stop-color", c);
+            }
         }
     }
     return id;
