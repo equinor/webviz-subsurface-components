@@ -838,10 +838,14 @@ function fillPlotTemplate(
         inverseColor: options.inverseColor || "",
         fill: (options1 ? options1.fill : options.fill) || "",
         fill2: options2 ? options2.fill : "",
-        colorTable: options.colorTable ? options.colorTable.name : "",
-        inverseColorTable: options.inverseColorTable
-            ? options.inverseColorTable.name
-            : "",
+        colorTable:
+            typeof options.colorTable === "function"
+                ? "Function"
+                : options.colorTable?.name ?? "",
+        inverseColorTable:
+            typeof options.inverseColorTable === "function"
+                ? "Function"
+                : options.inverseColorTable?.name ?? "",
         colorScale: options.colorScale,
         inverseColorScale: options.inverseColorScale,
     };
@@ -2098,7 +2102,7 @@ export function _propTypesWellLogView(): Record<string, unknown> {
         /**
          * Prop containing color table data for discrete well logs
          */
-        colorTables: PropTypes.array, //.isRequired,
+        colorTables: PropTypes.any, //.isRequired,
 
         /**
          * Well picks data
