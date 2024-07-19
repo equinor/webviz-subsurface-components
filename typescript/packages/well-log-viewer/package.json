@@ -32,6 +32,10 @@
         "react": "^17 || ^18",
         "react-dom": "^17 || ^18"
     },
+    "devDependencies": {
+        "@reduxjs/toolkit": "^2.2.6",
+        "react-redux": "^9.1.2"
+    },
     "volta": {
         "node": "18.19.0"
     }
