@@ -1,3 +1,10 @@
+# [1.12.0](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.11.0...well-log-viewer@1.12.0) (2024-07-19)
+
+
+### Features
+
+* add support for react-redux v9 and @reduxjs/toolkit v2 as optional peer dependencies ([#2166](https://github.com/equinor/webviz-subsurface-components/issues/2166)) ([b6ef951](https://github.com/equinor/webviz-subsurface-components/commit/b6ef951c346b4e0ca0f1ee9668a2c05fcf58cd6a))
+
 # [1.11.0](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.10.1...well-log-viewer@1.11.0) (2024-07-18)
 
 
