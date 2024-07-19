@@ -1,3 +1,10 @@
+# [0.28.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.27.10...subsurface-viewer@0.28.0) (2024-07-19)
+
+
+### Features
+
+* add support for react-redux v9 and @reduxjs/toolkit v2 as optional peer dependencies ([#2166](https://github.com/equinor/webviz-subsurface-components/issues/2166)) ([b6ef951](https://github.com/equinor/webviz-subsurface-components/commit/b6ef951c346b4e0ca0f1ee9668a2c05fcf58cd6a))
+
 ## [0.27.10](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.27.9...subsurface-viewer@0.27.10) (2024-07-18)
 
 
