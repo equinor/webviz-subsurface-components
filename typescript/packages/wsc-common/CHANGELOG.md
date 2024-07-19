@@ -1,3 +1,10 @@
+# [0.7.0](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.6.6...wsc-common@0.7.0) (2024-07-19)
+
+
+### Features
+
+* add support for react-redux v9 and @reduxjs/toolkit v2 as optional peer dependencies ([#2166](https://github.com/equinor/webviz-subsurface-components/issues/2166)) ([b6ef951](https://github.com/equinor/webviz-subsurface-components/commit/b6ef951c346b4e0ca0f1ee9668a2c05fcf58cd6a))
+
 ## [0.6.6](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.6.5...wsc-common@0.6.6) (2024-07-18)
 
 
