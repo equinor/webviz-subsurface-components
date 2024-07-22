@@ -12,7 +12,6 @@ import type {
     TextureProps,
     TextureData,
 } from "@luma.gl/core";
-import type { GeometryProps } from "@luma.gl/engine";
 import { Geometry, Model } from "@luma.gl/engine";
 import type { DeckGLLayerContext } from "../../components/Map";
 import { localPhongLighting, utilities } from "../shader_modules";
@@ -25,7 +24,6 @@ import type {
 import { createPropertyData, getImageData } from "../utils/layerTools";
 import fsShader from "./fragment.fs.glsl";
 import fsLineShader from "./fragment_lines.glsl";
-import type { IDiscretePropertyValueName } from "./grid3dLayer";
 
 import {
     TGrid3DColoringMode,
@@ -33,7 +31,7 @@ import {
 } from "./grid3dLayer";
 
 import type { MeshType, MeshTypeLines } from "./typeDefs";
-import vsShader from "./vertex.glsl";  // XXX er disse brukt
+import vsShader from "./vertex.glsl";
 import vsLineShader from "./vertex_lines.glsl";
 
 const DEFAULT_TEXTURE_PARAMETERS: SamplerProps = {
@@ -76,10 +74,8 @@ const defaultProps = {
 };
 
 interface IPropertyUniforms {
-    colormap: Texture2D;
     valueRangeMin: number;
     valueRangeMax: number;
-    colormap: Texture;
     colorMapRangeMin: number;
     colorMapRangeMax: number;
     colorMapClampColor?: Color | undefined | boolean | number[];

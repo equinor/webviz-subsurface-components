@@ -5,7 +5,7 @@ precision highp float;
 
 in vec3 positions;
 in float properties;
-attribute vec3 normals;
+in vec3 normals;
 
 uniform lowp int coloringMode;
 
