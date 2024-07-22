@@ -17,7 +17,6 @@ import type {
     ExtendedLayerProps,
     colorMapFunctionType,
 } from "../utils/layerTools";
-import PrivateLayer from "./privateGrid3dLayer";
 import { makeFullMesh } from "./webworker";
 
 import config from "../../SubsurfaceConfig.json";

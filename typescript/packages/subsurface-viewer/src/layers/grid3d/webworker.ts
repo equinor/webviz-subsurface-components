@@ -922,7 +922,7 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
      */
     const createEmptyMeshes = () => {
         const mesh: MeshType = {
-            drawMode: 4, // corresponds to GL.TRIANGLES,
+            drawMode: "triangle-list",
             attributes: {
                 positions: { value: new Float32Array(), size: 3 },
                 properties: { value: new Float32Array(), size: 1 },
@@ -932,7 +932,8 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
         };
 
         const mesh_lines: MeshTypeLines = {
-            drawMode: 1, // corresponds to GL.LINES,
+            drawMode: "line-list",
+            topology: "line-list",
             attributes: {
                 positions: { value: new Float32Array(), size: 3 },
                 indices: { value: new Uint32Array(), size: 1 },
@@ -1044,9 +1045,8 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
         console.log("Number of polygons: ", pn);
         console.log("Number of triangles: ", meshArrays.counts.triangles);
 
-
         const mesh: MeshType = {
-            drawMode:  "triangle-list",
+            drawMode: "triangle-list",
             attributes: {
                 positions: { value: meshArrays.arrays.trianglePoints, size: 3 },
                 properties: { value: meshArrays.arrays.properties, size: 1 },
@@ -1057,13 +1057,13 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
 
         const mesh_lines: MeshTypeLines = {
             drawMode: "line-list",
+            topology: "line-list",
             attributes: {
                 positions: { value: params.points, size: 3 },
                 indices: { value: meshArrays.arrays.lineIndices, size: 1 },
             },
             vertexCount: linesVertexCount,
         };
-
 
         const t1 = performance.now();
         //Keep this.
