@@ -1,16 +1,16 @@
 import type {
-    Viewport,
+    Color,
     LayerContext,
     UpdateParameters,
-} from "@deck.gl/core/typed";
-import { Layer, project, OrthographicViewport } from "@deck.gl/core/typed";
-import GL from "@luma.gl/constants";
-import { Model, Geometry } from "@luma.gl/engine";
+    Viewport,
+} from "@deck.gl/core";
+import { Layer, OrthographicViewport, project } from "@deck.gl/core";
+import { Geometry, Model } from "@luma.gl/engine";
+import type { Device } from "@luma.gl/core";
 import { Vector3 } from "@math.gl/core";
-import type { Color } from "@deck.gl/core/typed";
-import vertexShader from "./northarrow-vertex.glsl";
-import fragmentShader from "./northarrow-fragment.glsl";
 import type { ExtendedLayerProps } from "../utils/layerTools";
+import fragmentShader from "./northarrow-fragment.glsl";
+import vertexShader from "./northarrow-vertex.glsl";
 
 export interface NorthArrow3DLayerProps extends ExtendedLayerProps {
     color: Color;
@@ -26,8 +26,7 @@ const defaultProps = {
 
 export default class NorthArrow3DLayer extends Layer<NorthArrow3DLayerProps> {
     initializeState(context: LayerContext): void {
-        const { gl } = context;
-        this.setState(this._getModels(gl));
+        this.setState(this._getModels(context.device));
     }
 
     shouldUpdateState(): boolean {
@@ -35,8 +34,8 @@ export default class NorthArrow3DLayer extends Layer<NorthArrow3DLayerProps> {
     }
 
     updateState({ context }: UpdateParameters<this>): void {
-        if (context.gl) {
-            this.setState(this._getModels(context.gl));
+        if (context.device) {
+            this.setState(this._getModels(context.device));
         }
     }
 
@@ -49,8 +48,7 @@ export default class NorthArrow3DLayer extends Layer<NorthArrow3DLayerProps> {
         gl.enable(gl.DEPTH_TEST);
     }
 
-    //eslint-disable-next-line
-    _getModels(gl: any) {
+    _getModels(gl: Device) {
         const model_lines = GetArrowLines();
 
         const is_orthographic =
@@ -103,7 +101,7 @@ export default class NorthArrow3DLayer extends Layer<NorthArrow3DLayerProps> {
             fs: fragmentShader,
             uniforms: { uColor: color },
             geometry: new Geometry({
-                drawMode: GL.LINES,
+                topology: "line-list",
                 attributes: {
                     positions: new Float32Array(lines),
                 },

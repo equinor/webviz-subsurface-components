@@ -1,7 +1,6 @@
-import type { Layer, Position, Viewport } from "@deck.gl/core/typed";
-import { GeoJsonLayer } from "@deck.gl/layers/typed";
-import type { Feature } from "geojson";
-import type { LineString } from "geojson";
+import type { Layer, Position, Viewport } from "@deck.gl/core";
+import { GeoJsonLayer } from "@deck.gl/layers";
+import type { Feature, LineString } from "geojson";
 import { isEqual, zip } from "lodash";
 import { distance } from "mathjs";
 import IntersectionViewport from "../../viewports/intersectionViewport";

@@ -1,14 +1,12 @@
-import type { ScatterplotLayerProps } from "@deck.gl/layers/typed";
-import { ScatterplotLayer } from "@deck.gl/layers/typed";
+import type { ScatterplotLayerProps } from "@deck.gl/layers";
+import { ScatterplotLayer } from "@deck.gl/layers";
 
+import { GL } from "@luma.gl/constants";
 import type { NumericArray } from "@math.gl/types";
-import GL from "@luma.gl/constants";
 
-import type { LayerContext } from "@deck.gl/core/typed";
-import { project32, picking } from "@deck.gl/core/typed";
+import type { LayerContext } from "@deck.gl/core";
 
 import vs from "./vertex.glsl";
-import fs from "./fragment.glsl";
 
 type UniformValue = number | boolean | Readonly<NumericArray>;
 
@@ -26,7 +24,10 @@ export class PrivatePointsLayer extends ScatterplotLayer<
     }
 
     getShaders() {
-        return { vs, fs, modules: [project32, picking] };
+        const defaultShaders = super.getShaders();
+
+        // Inject custom vertex shader.
+        return { ...defaultShaders, vs };
     }
 
     draw(args: {

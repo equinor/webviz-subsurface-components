@@ -1,5 +1,7 @@
+import type { GeometryProps } from "@luma.gl/engine";
+
 export type MeshType = {
-    drawMode?: number;
+    drawMode: GeometryProps["topology"];
     attributes: {
         positions: { value: Float32Array; size: number };
         TEXCOORD_0?: { value: Float32Array; size: number };
@@ -10,7 +12,8 @@ export type MeshType = {
 };
 
 export type MeshTypeLines = {
-    drawMode: number;
+    drawMode: GeometryProps["topology"];
+    topology: GeometryProps["topology"];
     attributes: {
         positions: { value: Float32Array; size: number };
         indices: { value: Uint32Array; size: number };

@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 
-import { View } from "@deck.gl/core/typed";
-import { ClipExtension } from "@deck.gl/extensions/typed";
+import { View } from "@deck.gl/core";
+import { ClipExtension } from "@deck.gl/extensions";
 
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";

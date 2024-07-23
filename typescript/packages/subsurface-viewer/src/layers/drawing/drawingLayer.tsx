@@ -3,26 +3,26 @@ import type {
     PickingInfo,
     LayerContext,
     LayersList,
-} from "@deck.gl/core/typed";
-import { COORDINATE_SYSTEM, CompositeLayer } from "@deck.gl/core/typed";
+} from "@deck.gl/core";
+import { COORDINATE_SYSTEM, CompositeLayer } from "@deck.gl/core";
 import type { ExtendedLayerProps, LayerPickInfo } from "../utils/layerTools";
+import {
+    ModifyMode,
+    ImmutableFeatureCollection,
+    DrawLineStringMode,
+    DrawPolygonMode,
+    ViewMode,
+    DrawPointMode,
+    TransformMode,
+} from "@deck.gl-community/editable-layers";
 import type {
     EditAction,
     Feature,
     FeatureCollection,
     GeoJsonEditMode,
     ModeProps,
-} from "@nebula.gl/edit-modes";
-import {
-    DrawLineStringMode,
-    DrawPointMode,
-    DrawPolygonMode,
-    ImmutableFeatureCollection,
-    ModifyMode,
-    TransformMode,
-    ViewMode,
-} from "@nebula.gl/edit-modes";
-import { EditableGeoJsonLayer } from "@nebula.gl/layers";
+    EditableGeoJsonLayer,
+} from "@deck.gl-community/editable-layers";
 import type { DeckGLLayerContext } from "../../components/Map";
 import { area, length } from "../../utils/measurement";
 
@@ -212,8 +212,12 @@ export default class DrawingLayer extends CompositeLayer<DrawingLayerProps> {
     // Return the line color based on the selection status.
     // The same can be done for other features (polygons, points etc).
     _getLineColor(feature: Feature): Color {
-        const is_feature_selected = this.state["selectedFeatureIndexes"].some(
-            (i: number) => this.state["data"].features[i] === feature
+        const selectedFeatureIndexes = this.state[
+            "selectedFeatureIndexes"
+        ] as number[];
+        const data = this.state["data"] as FeatureCollection;
+        const is_feature_selected = selectedFeatureIndexes.some(
+            (i: number) => (data.features[i] as unknown as Feature) === feature
         );
         if (is_feature_selected) {
             return SELECTED_LINE_COLOR;

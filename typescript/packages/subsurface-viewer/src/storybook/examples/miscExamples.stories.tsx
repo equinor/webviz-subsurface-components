@@ -1,6 +1,6 @@
+import type { Layer } from "@deck.gl/core";
+import { all, create } from "mathjs";
 import React from "react";
-import { create, all } from "mathjs";
-import type { Layer } from "@deck.gl/core/typed";
 
 import type { Meta, StoryObj } from "@storybook/react";
 
@@ -26,14 +26,14 @@ import {
 } from "../sharedSettings";
 
 import {
-    Points as SnubCubePoints,
     Faces as SnubCubeFaces,
+    Points as SnubCubePoints,
     VertexCount as SnubCubeVertexCount,
 } from "../../layers/grid3d/test_data/TruncatedSnubCube";
 
 import {
-    Points as ToroidPoints,
     Faces as ToroidFaces,
+    Points as ToroidPoints,
     VertexCount as ToroidVertexCount,
 } from "../../layers/grid3d/test_data/PentagonalToroid";
 

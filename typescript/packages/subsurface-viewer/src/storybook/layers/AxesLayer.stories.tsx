@@ -3,9 +3,9 @@ import React from "react";
 
 import { rgb } from "d3-color";
 
-import type { Color } from "@deck.gl/core/typed";
-import { OrthographicView } from "@deck.gl/core/typed";
-import DeckGL from "@deck.gl/react/typed";
+import type { Color } from "@deck.gl/core";
+import { OrthographicView } from "@deck.gl/core";
+import DeckGL from "@deck.gl/react";
 
 import AxesLayer from "../../layers/axes/axesLayer";
 

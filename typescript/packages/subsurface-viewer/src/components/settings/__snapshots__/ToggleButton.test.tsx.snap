@@ -2,17 +2,11 @@
 
 exports[`Test Toggle Input snapshot test 1`] = `
 .c0 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-pack: justify;
-  -webkit-justify-content: space-between;
-  -ms-flex-pack: justify;
   justify-content: space-between;
   position: relative;
   margin: 0;
-  color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+  color: var(--eds_text__static_icons__tertiary, rgba(111, 111, 111, 1));
   font-family: Equinor;
   font-size: 0.750rem;
   font-weight: 500;
@@ -20,7 +14,7 @@ exports[`Test Toggle Input snapshot test 1`] = `
   text-align: left;
   margin-left: 8px;
   margin-right: 8px;
-  color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+  color: var(--eds_text__static_icons__tertiary, rgba(111, 111, 111, 1));
 }
 
 .c1 {
@@ -36,8 +30,6 @@ exports[`Test Toggle Input snapshot test 1`] = `
 }
 
 .c3 {
-  -webkit-appearance: none;
-  -moz-appearance: none;
   appearance: none;
   width: 100%;
   height: 100%;
@@ -52,20 +44,20 @@ exports[`Test Toggle Input snapshot test 1`] = `
   outline: none;
 }
 
-.c3[data-focus-visible-added]:focus + span {
-  outline: 2px dashed var(--eds_interactive__focus,rgba(0,112,121,1));
+.c3[data-focus-visible-added]:focus+span {
+  outline: 2px dashed var(--eds_interactive__focus, rgba(0, 112, 121, 1));
   outline-offset: 0px;
 }
 
-.c3:focus-visible + span {
-  outline: 2px dashed var(--eds_interactive__focus,rgba(0,112,121,1));
+.c3:focus-visible+span {
+  outline: 2px dashed var(--eds_interactive__focus, rgba(0, 112, 121, 1));
   outline-offset: 0px;
 }
 
 .c2 {
   display: inline-grid;
   vertical-align: middle;
-  grid: [input] 1fr / [input] 1fr;
+  grid: [input] 1fr/[input] 1fr;
   place-items: center;
   isolation: isolate;
 }
@@ -75,23 +67,21 @@ exports[`Test Toggle Input snapshot test 1`] = `
   aspect-ratio: 1/1;
 }
 
-.c4:checked + span > span {
-  background-color: var(--eds_interactive_primary__selected_highlight,rgba(230,250,236,1));
+.c4:checked+span>span {
+  background-color: var(--eds_interactive_primary__selected_highlight, rgba(230, 250, 236, 1));
 }
 
-.c4:checked + span > span:last-child {
-  -webkit-transform: translate(105%,-50%);
-  -ms-transform: translate(105%,-50%);
+.c4:checked+span>span:last-child {
   transform: translate(105%,-50%);
-  background-color: var(--eds_interactive_primary__resting,rgba(0,112,121,1));
+  background-color: var(--eds_interactive_primary__resting, rgba(0, 112, 121, 1));
 }
 
-.c4:hover + span {
-  background-color: var(--eds_interactive_primary__hover_alt,rgba(222,237,238,1));
+.c4:hover+span {
+  background-color: var(--eds_interactive_primary__hover_alt, rgba(222, 237, 238, 1));
 }
 
-.c4:hover + span > span:last-child {
-  background-color: var(--eds_interactive_primary__hover,rgba(0,79,85,1));
+.c4:hover+span>span:last-child {
+  background-color: var(--eds_interactive_primary__hover, rgba(0, 79, 85, 1));
 }
 
 .c6 {
@@ -99,32 +89,25 @@ exports[`Test Toggle Input snapshot test 1`] = `
   border: none;
   width: 32px;
   height: 8px;
-  background-color: var(--eds_ui_background__medium,rgba(220,220,220,1));
+  background-color: var(--eds_ui_background__medium, rgba(220, 220, 220, 1));
   position: absolute;
   left: 50%;
   top: 50%;
-  -webkit-transform: translate(-50%,-50%);
-  -ms-transform: translate(-50%,-50%);
   transform: translate(-50%,-50%);
-  -webkit-transition: background 0.36s;
   transition: background 0.36s;
 }
 
 .c7 {
-  background-color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
-  box-shadow: 0 1px 5px rgba(0,0,0,0.2),0 3px 4px rgba(0,0,0,0.12),0 2px 4px rgba(0,0,0,0.14);
+  background-color: var(--eds_text__static_icons__tertiary, rgba(111, 111, 111, 1));
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2),0 3px 4px rgba(0, 0, 0, 0.12),0 2px 4px rgba(0, 0, 0, 0.14);
   width: 16px;
   height: 16px;
   border-radius: 50%;
   display: inline-block;
   position: absolute;
   top: 50%;
-  -webkit-transform: translate(0,-50%);
-  -ms-transform: translate(0,-50%);
   transform: translate(0,-50%);
   left: 4px;
-  -webkit-transition: -webkit-transform 0.36s cubic-bezier(0.78,0.14,0.15,0.86);
-  -webkit-transition: transform 0.36s cubic-bezier(0.78,0.14,0.15,0.86);
   transition: transform 0.36s cubic-bezier(0.78,0.14,0.15,0.86);
 }
 

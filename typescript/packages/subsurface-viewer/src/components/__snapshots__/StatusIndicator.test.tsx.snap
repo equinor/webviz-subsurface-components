@@ -3,8 +3,6 @@
 exports[`Test Status Indicator snapshot test with no props 1`] = `
 .c0 {
   display: inline-block;
-  -webkit-transform: rotate(-90deg);
-  -ms-transform: rotate(-90deg);
   transform: rotate(-90deg);
 }
 
@@ -15,7 +13,6 @@ exports[`Test Status Indicator snapshot test with no props 1`] = `
   padding: 0;
   margin: -1px;
   overflow: hidden;
-  -webkit-clip: rect(0,0,0,0);
   clip: rect(0,0,0,0);
   white-space: nowrap;
   border-width: 0;

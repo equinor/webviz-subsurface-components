@@ -2,8 +2,6 @@
 
 exports[`test layers settings button snapshot test 1`] = `
 .c0 {
-  -webkit-transform: none;
-  -ms-transform: none;
   transform: none;
 }
 

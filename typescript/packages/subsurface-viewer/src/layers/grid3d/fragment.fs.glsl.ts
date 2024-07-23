@@ -11,6 +11,8 @@ in float property_interpolated;
 flat in vec3 normal;
 flat in int vertexIndex;
 
+out vec4 fragColor;
+
 uniform sampler2D colormap;
 
 uniform float valueRangeMin;
@@ -43,11 +45,11 @@ vec4 getContinuousPropertyColor (float propertyValue) {
       else {
          // Use min/max color to clamp.
          x = clamp (x, 0.0, 1.0);         
-         color = texture2D(colormap, vec2(x, 0.5));
+         color = texture(colormap, vec2(x, 0.5));
       }
    }
    else {
-      color = texture2D(colormap, vec2(x, 0.5));
+      color = texture(colormap, vec2(x, 0.5));
    }
    return color;
 }
@@ -71,12 +73,12 @@ vec4 getDiscretePropertyColor (float propertyValue) {
          // Use min/max color to clamp.
          float p = clamp (propertyValue, colorMapRangeMin, colorMapRangeMax);
          float x = p / colorMapSize;
-         color = texture2D(colormap, vec2(x, 0.5));
+         color = texture(colormap, vec2(x, 0.5));
       }
    }
    else {
       float x = propertyValue / colorMapSize;
-      color = texture2D(colormap, vec2(x + tolerance, 0.5));
+      color = texture(colormap, vec2(x + tolerance, 0.5));
    }
    return color;
 }
@@ -90,8 +92,8 @@ vec4 getPropertyColor (float propertyValue) {
 
 void main(void) {
 
-   if (picking_uActive && !picking_uAttribute) {
-      gl_FragColor = encodeVertexIndexToRGB(vertexIndex);      
+   if (picking.isActive > 0.5 && !(picking.isAttribute > 0.5)) {
+      fragColor = encodeVertexIndexToRGB(vertexIndex);      
       return;
    }
    
@@ -103,8 +105,8 @@ void main(void) {
    
    // Use two sided phong lighting. This has no effect if "material" property is not set.
    vec3 lightColor = getPhongLightColor(color.rgb, cameraPosition, position_commonspace.xyz, normal);
-   gl_FragColor = vec4(lightColor, 1.0);
-   DECKGL_FILTER_COLOR(gl_FragColor, geometry);
+   fragColor = vec4(lightColor, 1.0);
+   DECKGL_FILTER_COLOR(fragColor, geometry);
 }
 `;
 

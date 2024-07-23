@@ -1,13 +1,13 @@
-import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+import React from "react";
 
-import type { PickingInfo } from "@deck.gl/core/typed";
+import type { PickingInfo } from "@deck.gl/core";
 
 import { styled } from "@mui/material/styles";
 
 import SubsurfaceViewer from "../../SubsurfaceViewer";
-import WellsLayer from "../../layers/wells/wellsLayer";
 import BoxSelectionLayer from "../../layers/BoxSelectionLayer/boxSelectionLayer";
+import WellsLayer from "../../layers/wells/wellsLayer";
 
 import { volveWellsBounds } from "../sharedSettings";
 

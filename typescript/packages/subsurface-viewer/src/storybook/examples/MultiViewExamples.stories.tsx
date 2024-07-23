@@ -1,12 +1,12 @@
-import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+import React from "react";
 
-import { View } from "@deck.gl/core/typed";
+import { View } from "@deck.gl/core";
 import { ContinuousLegend } from "@emerson-eps/color-tables";
 
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
+import Tab from "@mui/material/Tab";
+import Tabs from "@mui/material/Tabs";
 
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
@@ -22,9 +22,9 @@ import {
     customLayerWithPolylineData,
     customLayerWithTextData,
     hillshadingLayer,
-    hugin2DBounds,
     hugin25mDepthMapLayer,
     hugin25mKhNetmapMapLayer,
+    hugin2DBounds,
     redAxes2DLayer,
     subsufaceProps,
 } from "../sharedSettings";

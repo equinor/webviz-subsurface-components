@@ -1,6 +1,6 @@
-import { GeoJsonLayer } from "@deck.gl/layers/typed";
+import type { PickingInfo } from "@deck.gl/core";
+import { GeoJsonLayer } from "@deck.gl/layers";
 import type { Feature } from "geojson";
-import type { PickingInfo } from "@deck.gl/core/typed";
 import type { DeckGLLayerContext } from "../../components/Map";
 import { isDrawingEnabled } from "../utils/layerTools";
 

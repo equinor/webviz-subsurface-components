@@ -5,18 +5,12 @@ exports[`Test Info Card snapshot test when property value provided 1`] = `
   display: grid;
   grid-gap: var(--eds_button__gap,8px);
   grid-auto-flow: column;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
   align-items: center;
   height: 100%;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  -ms-flex-pack: center;
   justify-content: center;
 }
 
-.c1 > :is(svg,img) {
+.c1>:is(svg,img) {
   margin-top: var(--eds_button__icon__margin_y,0);
   margin-bottom: var(--eds_button__icon__margin_y,0);
 }
@@ -25,23 +19,22 @@ exports[`Test Info Card snapshot test when property value provided 1`] = `
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  -webkit-text-decoration: none;
   text-decoration: none;
   position: relative;
   cursor: pointer;
   display: inline-block;
   background: transparent;
-  height: var(--eds_button__height,36px);
-  padding-left: var(--eds_button__padding_x,16px);
-  padding-top: var(--eds_button__padding_y,0);
-  padding-right: var(--eds_button__padding_x,16px);
-  padding-bottom: var(--eds_button__padding_y,0);
-  border: var(--eds_button__border_width,1px) solid transparent;
-  border-radius: var(--eds_button__radius,4px);
+  height: var(--eds_button__height, 36px);
+  padding-left: var(--eds_button__padding_x, 16px);
+  padding-top: var(--eds_button__padding_y, 0);
+  padding-right: var(--eds_button__padding_x, 16px);
+  padding-bottom: var(--eds_button__padding_y, 0);
+  border: var(--eds_button__border_width, 1px) solid transparent;
+  border-radius: var(--eds_button__radius, 4px);
   margin: 0;
-  color: var(--eds_interactive_primary__resting,rgba(0,112,121,1));
+  color: var(--eds_interactive_primary__resting, rgba(0, 112, 121, 1));
   font-family: Equinor;
-  font-size: var(--eds_button__font_size,0.875rem);
+  font-size: var(--eds_button__font_size, 0.875rem);
   font-weight: 500;
   line-height: 1.143em;
   text-align: center;
@@ -74,12 +67,12 @@ exports[`Test Info Card snapshot test when property value provided 1`] = `
 }
 
 .c0[data-focus-visible-added]:focus {
-  outline: 2px dashed rgba(0,112,121,1);
+  outline: 2px dashed rgba(0, 112, 121, 1);
   outline-offset: 3px;
 }
 
 .c0:focus-visible {
-  outline: 2px dashed rgba(0,112,121,1);
+  outline: 2px dashed rgba(0, 112, 121, 1);
   outline-offset: 3px;
 }
 
@@ -93,7 +86,7 @@ exports[`Test Info Card snapshot test when property value provided 1`] = `
   background: transparent;
   border: 1px solid transparent;
   margin: 0;
-  color: var(--eds_interactive__disabled__text,rgba(190,190,190,1));
+  color: var(--eds_interactive__disabled__text, rgba(190, 190, 190, 1));
   font-family: Equinor;
   font-size: 0.875rem;
   font-weight: 500;
@@ -102,17 +95,15 @@ exports[`Test Info Card snapshot test when property value provided 1`] = `
 }
 
 .c2 {
-  -webkit-transform: none;
-  -ms-transform: none;
   transform: none;
 }
 
 @media (hover:hover) and (pointer:fine) {
   .c0:hover {
-    background: var(--eds_interactive_primary__hover_alt,rgba(222,237,238,1));
-    color: var(--eds_interactive_primary__hover,rgba(0,79,85,1));
+    background: var(--eds_interactive_primary__hover_alt, rgba(222, 237, 238, 1));
+    color: var(--eds_interactive_primary__hover, rgba(0, 79, 85, 1));
     border: 1px solid transparent;
-    border-radius: var(--eds_button__radius,4px);
+    border-radius: var(--eds_button__radius, 4px);
   }
 }
 
@@ -373,18 +364,12 @@ exports[`Test Info Card snapshot test with no props 1`] = `
   display: grid;
   grid-gap: var(--eds_button__gap,8px);
   grid-auto-flow: column;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
   align-items: center;
   height: 100%;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  -ms-flex-pack: center;
   justify-content: center;
 }
 
-.c1 > :is(svg,img) {
+.c1>:is(svg,img) {
   margin-top: var(--eds_button__icon__margin_y,0);
   margin-bottom: var(--eds_button__icon__margin_y,0);
 }
@@ -393,23 +378,22 @@ exports[`Test Info Card snapshot test with no props 1`] = `
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  -webkit-text-decoration: none;
   text-decoration: none;
   position: relative;
   cursor: pointer;
   display: inline-block;
   background: transparent;
-  height: var(--eds_button__height,36px);
-  padding-left: var(--eds_button__padding_x,16px);
-  padding-top: var(--eds_button__padding_y,0);
-  padding-right: var(--eds_button__padding_x,16px);
-  padding-bottom: var(--eds_button__padding_y,0);
-  border: var(--eds_button__border_width,1px) solid transparent;
-  border-radius: var(--eds_button__radius,4px);
+  height: var(--eds_button__height, 36px);
+  padding-left: var(--eds_button__padding_x, 16px);
+  padding-top: var(--eds_button__padding_y, 0);
+  padding-right: var(--eds_button__padding_x, 16px);
+  padding-bottom: var(--eds_button__padding_y, 0);
+  border: var(--eds_button__border_width, 1px) solid transparent;
+  border-radius: var(--eds_button__radius, 4px);
   margin: 0;
-  color: var(--eds_interactive_primary__resting,rgba(0,112,121,1));
+  color: var(--eds_interactive_primary__resting, rgba(0, 112, 121, 1));
   font-family: Equinor;
-  font-size: var(--eds_button__font_size,0.875rem);
+  font-size: var(--eds_button__font_size, 0.875rem);
   font-weight: 500;
   line-height: 1.143em;
   text-align: center;
@@ -442,12 +426,12 @@ exports[`Test Info Card snapshot test with no props 1`] = `
 }
 
 .c0[data-focus-visible-added]:focus {
-  outline: 2px dashed rgba(0,112,121,1);
+  outline: 2px dashed rgba(0, 112, 121, 1);
   outline-offset: 3px;
 }
 
 .c0:focus-visible {
-  outline: 2px dashed rgba(0,112,121,1);
+  outline: 2px dashed rgba(0, 112, 121, 1);
   outline-offset: 3px;
 }
 
@@ -461,7 +445,7 @@ exports[`Test Info Card snapshot test with no props 1`] = `
   background: transparent;
   border: 1px solid transparent;
   margin: 0;
-  color: var(--eds_interactive__disabled__text,rgba(190,190,190,1));
+  color: var(--eds_interactive__disabled__text, rgba(190, 190, 190, 1));
   font-family: Equinor;
   font-size: 0.875rem;
   font-weight: 500;
@@ -470,17 +454,15 @@ exports[`Test Info Card snapshot test with no props 1`] = `
 }
 
 .c2 {
-  -webkit-transform: none;
-  -ms-transform: none;
   transform: none;
 }
 
 @media (hover:hover) and (pointer:fine) {
   .c0:hover {
-    background: var(--eds_interactive_primary__hover_alt,rgba(222,237,238,1));
-    color: var(--eds_interactive_primary__hover,rgba(0,79,85,1));
+    background: var(--eds_interactive_primary__hover_alt, rgba(222, 237, 238, 1));
+    color: var(--eds_interactive_primary__hover, rgba(0, 79, 85, 1));
     border: 1px solid transparent;
-    border-radius: var(--eds_button__radius,4px);
+    border-radius: var(--eds_button__radius, 4px);
   }
 }
 

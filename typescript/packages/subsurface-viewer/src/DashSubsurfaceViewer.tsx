@@ -1,7 +1,7 @@
 import React from "react";
 import type { SubsurfaceViewerProps } from "./SubsurfaceViewer";
 import SubsurfaceViewer from "./SubsurfaceViewer";
-import { View } from "@deck.gl/core/typed";
+import { View } from "@deck.gl/core";
 
 function mapAnnotation(annotationContainers: React.ReactNode) {
     return React.Children.map(annotationContainers, (annotationContainer) => {
