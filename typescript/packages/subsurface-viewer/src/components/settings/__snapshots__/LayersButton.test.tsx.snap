@@ -2,8 +2,6 @@
 
 exports[`test 'layers' button snapshot test 1`] = `
 .c0 {
-  -webkit-transform: none;
-  -ms-transform: none;
   transform: none;
 }
 
@@ -43,8 +41,6 @@ exports[`test 'layers' button snapshot test 1`] = `
 
 exports[`test 'layers' button test empty MapState/specbase 1`] = `
 .c0 {
-  -webkit-transform: none;
-  -ms-transform: none;
   transform: none;
 }
 
