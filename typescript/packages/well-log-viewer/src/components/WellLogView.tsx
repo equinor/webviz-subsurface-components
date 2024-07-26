@@ -1267,6 +1267,8 @@ class WellLogView
     selPinned: number | undefined; // pinned position
     selPersistent: boolean | undefined;
 
+    isDefZoom: boolean;
+
     template: Template;
 
     scaleInterpolator: ScaleInterpolator | undefined;
@@ -1280,6 +1282,8 @@ class WellLogView
         this.selCurrent = undefined;
         this.selPinned = undefined;
         this.selPersistent = undefined;
+
+        this.isDefZoom = false;
 
         this.resizeObserver = new ResizeObserver(
             (entries: ResizeObserverEntry[]): void => {
@@ -1554,6 +1558,7 @@ class WellLogView
     setControllerDefaultZoom(): void {
         if (this.props.domain) this.zoomContentTo(this.props.domain);
         else this.zoomContentTo(this.getContentBaseDomain());
+        this.isDefZoom = true;
     }
 
     /**
@@ -1610,6 +1615,10 @@ class WellLogView
         return zoomContentTo(this.logController, domain);
     }
     scrollContentTo(f: number): boolean {
+        if (this.isDefZoom) {
+            this.isDefZoom = false;
+            return false;
+        }
         if (!this.logController) return false;
         return scrollContentTo(this.logController, f);
     }
