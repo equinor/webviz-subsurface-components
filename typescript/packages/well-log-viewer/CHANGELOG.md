@@ -1,3 +1,10 @@
+## [1.12.1](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.12.0...well-log-viewer@1.12.1) (2024-07-29)
+
+
+### Bug Fixes
+
+* need to reset twice to go back ([#2151](https://github.com/equinor/webviz-subsurface-components/issues/2151)) ([#2173](https://github.com/equinor/webviz-subsurface-components/issues/2173)) ([7308582](https://github.com/equinor/webviz-subsurface-components/commit/7308582ae2464fb2661de3fa0e9fe39563719c49))
+
 # [1.12.0](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.11.0...well-log-viewer@1.12.0) (2024-07-19)
 
 
