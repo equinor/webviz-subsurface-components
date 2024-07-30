@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/equinor/webviz-subsurface-components/compare/group-tree-plot@1.2.0...group-tree-plot@1.2.1) (2024-07-30)
+
+
+### Bug Fixes
+
+* bump fast-xml-parser from 4.4.0 to 4.4.1 in /typescript ([#2175](https://github.com/equinor/webviz-subsurface-components/issues/2175)) ([1f5f2bf](https://github.com/equinor/webviz-subsurface-components/commit/1f5f2bfc04033901f093d6501cf19752a3889d38)), closes [#634](https://github.com/equinor/webviz-subsurface-components/issues/634) [#653](https://github.com/equinor/webviz-subsurface-components/issues/653) [#662](https://github.com/equinor/webviz-subsurface-components/issues/662) [#654](https://github.com/equinor/webviz-subsurface-components/issues/654) [#647](https://github.com/equinor/webviz-subsurface-components/issues/647) [#581](https://github.com/equinor/webviz-subsurface-components/issues/581) [#582](https://github.com/equinor/webviz-subsurface-components/issues/582) [#645](https://github.com/equinor/webviz-subsurface-components/issues/645) [#633](https://github.com/equinor/webviz-subsurface-components/issues/633) [#607](https://github.com/equinor/webviz-subsurface-components/issues/607) [#608](https://github.com/equinor/webviz-subsurface-components/issues/608) [#610](https://github.com/equinor/webviz-subsurface-components/issues/610) [#589](https://github.com/equinor/webviz-subsurface-components/issues/589) [#585](https://github.com/equinor/webviz-subsurface-components/issues/585) [#598](https://github.com/equinor/webviz-subsurface-components/issues/598) [#595](https://github.com/equinor/webviz-subsurface-components/issues/595) [#634](https://github.com/equinor/webviz-subsurface-components/issues/634) [#653](https://github.com/equinor/webviz-subsurface-components/issues/653) [#662](https://github.com/equinor/webviz-subsurface-components/issues/662) [#658](https://github.com/equinor/webviz-subsurface-components/issues/658) [#659](https://github.com/equinor/webviz-subsurface-components/issues/659)
+
 # [1.2.0](https://github.com/equinor/webviz-subsurface-components/compare/group-tree-plot@1.1.18...group-tree-plot@1.2.0) (2024-07-19)
 
 
