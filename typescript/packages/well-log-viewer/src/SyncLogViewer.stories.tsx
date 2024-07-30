@@ -10,8 +10,8 @@ const wellpick = require("../../../../example-data/wellpicks.json");// eslint-di
 import { ToggleButton } from "@mui/material";
 
 import SyncLogViewer, { argTypesSyncLogViewerProp } from "./SyncLogViewer";
-import type WellLogView from "./components/WellLogView";
 import type {
+    WellLogView,
     WellLogController,
     TrackMouseEvent,
 } from "./components/WellLogView";
@@ -129,7 +129,7 @@ const stories: Meta = {
 };
 export default stories;
 
-function fillInfo(controller) {
+function fillInfo(controller: WellLogController | undefined) {
     if (!controller) return "-";
     const baseDomain = controller.getContentBaseDomain();
     const domain = controller.getContentDomain();
@@ -158,40 +158,41 @@ function fillInfo(controller) {
 
 const Template = (args) => {
     const infoRef = React.useRef();
-    const setInfo = function (info) {
+    const setInfo = function (info: string) {
         if (infoRef.current) infoRef.current.innerHTML = info;
     };
 
-    const [controller, setController] = React.useState(null); // the first WellLog
     const [controllers, setControllers] = React.useState<WellLogController[]>(
         []
     ); // all WellLogs
 
     const onCreateController = React.useCallback(
-        (iWellLog, controller) => {
-            if (iWellLog === 0) setController(controller);
-
+        (iWellLog: number, controller: WellLogController) => {
             setControllers((prev) => [...prev, controller]);
         },
-        [controller]
+        []
+    );
+    const onDeleteController = React.useCallback(
+        (iWellLog: number, controller: WellLogController) => {
+            setControllers((prev) => prev.filter((c) => c !== controller));
+        },
+        []
     );
     const onContentRescale = React.useCallback(
-        (iWellLog) => {
-            if (iWellLog === 0) setInfo(fillInfo(controller));
+        (iWellLog: number) => {
+            if (iWellLog === 0) setInfo(fillInfo(controllers[0]));
         },
-        [controller]
+        [controllers]
     );
     const onContentSelection = React.useCallback(
         (/*iWellLog*/) => {
-            /*if(iWellLog===0)*/ setInfo(fillInfo(controller));
+            /*if(iWellLog===0)*/ setInfo(fillInfo(controllers[0]));
         },
-        [controller]
+        [controllers]
     );
     const handleClick = function () {
         for (const ctrl of controllers) {
-            if (ctrl) {
-                ctrl.setControllerDefaultZoom();
-            }
+            if (ctrl) ctrl.setControllerDefaultZoom();
         }
     };
     const [checked, setChecked] = React.useState(false);
@@ -216,6 +217,7 @@ const Template = (args) => {
                     id="SyncLogViewer"
                     {...args}
                     onCreateController={onCreateController}
+                    onDeleteController={onDeleteController}
                     onContentRescale={onContentRescale}
                     onContentSelection={onContentSelection}
                     onTrackMouseEvent={checked ? onTrackMouseEventCustom : null}
@@ -426,6 +428,7 @@ import WellLogZoomSlider from "./components/WellLogZoomSlider";
 import WellLogScaleSelector from "./components/WellLogScaleSelector";
 import WellInfoIcon from "@mui/icons-material/FormatListBulleted"; // WaterDrop ShowChart, SearchSharp
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+
 const iconStyle = {
     fontSize: "18px",
     verticalAlign: "middle",
@@ -513,7 +516,7 @@ CustomLayout.parameters = {
 
 Default.tags = ["no-screenshot-test"];
 
-const TemplateWithSelection = (args) => {
+const TemplateWithSelection = (args: { welllogs: WellLog[] }) => {
     const [showWell1, setShowWell1] = React.useState(true);
     const [showWell2, setShowWell2] = React.useState(true);
     const [showWell3, setShowWell3] = React.useState(true);
@@ -522,25 +525,27 @@ const TemplateWithSelection = (args) => {
         []
     ); // all WellLogs
 
-    const onCreateController = React.useCallback((iWellLog, controller) => {
-        setControllers((prev) => [...prev, controller]);
-    }, []);
+    const onCreateController = React.useCallback(
+        (iWellLog: number, controller: WellLogController) => {
+            setControllers((prev) => [...prev, controller]);
+        },
+        []
+    );
+    const onDeleteController = React.useCallback(
+        (iWellLog: number, controller: WellLogController) => {
+            setControllers((prev) => prev.filter((c) => c !== controller));
+        },
+        []
+    );
 
     const filtered: WellLog[] = [];
-    if (showWell1) {
-        filtered.push(args.welllogs[0]);
-    }
-    if (showWell2) {
-        filtered.push(args.welllogs[1]);
-    }
-    if (showWell3) {
-        filtered.push(args.welllogs[2]);
-    }
+    if (showWell1 && args.welllogs[0]) filtered.push(args.welllogs[0]);
+    if (showWell2 && args.welllogs[1]) filtered.push(args.welllogs[1]);
+    if (showWell3 && args.welllogs[2]) filtered.push(args.welllogs[2]);
+
     const handleClick = function () {
         for (const ctrl of controllers) {
-            if (ctrl) {
-                ctrl.setControllerDefaultZoom();
-            }
+            if (ctrl) ctrl.setControllerDefaultZoom();
         }
     };
 
@@ -556,8 +561,9 @@ const TemplateWithSelection = (args) => {
             <div style={{ flexDirection: "row" }}>
                 <ToggleButton
                     value="check"
-                    selected={showWell1}
+                    selected={showWell1 && !!args.welllogs[0]}
                     onChange={() => {
+                        if (!args.welllogs[1]) alert("No args.welllogs[0]");
                         setShowWell1(!showWell1);
                     }}
                 >
@@ -565,8 +571,9 @@ const TemplateWithSelection = (args) => {
                 </ToggleButton>
                 <ToggleButton
                     value="check"
-                    selected={showWell2}
+                    selected={showWell2 && !!args.welllogs[1]}
                     onChange={() => {
+                        if (!args.welllogs[1]) alert("No args.welllogs[1]");
                         setShowWell2(!showWell2);
                     }}
                 >
@@ -574,8 +581,9 @@ const TemplateWithSelection = (args) => {
                 </ToggleButton>
                 <ToggleButton
                     value="check"
-                    selected={showWell3}
+                    selected={showWell3 && !!args.welllogs[2]}
                     onChange={() => {
+                        if (!args.welllogs[2]) alert("No args.welllogs[2]");
                         setShowWell3(!showWell3);
                     }}
                 >
@@ -590,6 +598,7 @@ const TemplateWithSelection = (args) => {
                     id="SyncLogViewer"
                     {...argsWithSelection}
                     onCreateController={onCreateController}
+                    onDeleteController={onDeleteController}
                 />
             </div>
         </div>

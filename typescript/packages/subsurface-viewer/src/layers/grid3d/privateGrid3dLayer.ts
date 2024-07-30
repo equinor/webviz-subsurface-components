@@ -70,6 +70,8 @@ const defaultProps = {
 
 interface IPropertyUniforms {
     colormap: Texture2D;
+    valueRangeMin: number;
+    valueRangeMax: number;
     colorMapRangeMin: number;
     colorMapRangeMax: number;
     colorMapClampColor: Color | undefined | boolean | number[];
@@ -362,6 +364,8 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
 
         return {
             colormap,
+            valueRangeMin,
+            valueRangeMax,
             colorMapRangeMin,
             colorMapRangeMax,
             colorMapClampColor,

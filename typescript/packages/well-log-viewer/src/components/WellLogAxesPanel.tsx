@@ -50,21 +50,35 @@ export class WellLogAxesPanel extends Component<Props, State> {
         };
 
         this.onChangePrimaryAxis = this.onChangePrimaryAxis.bind(this);
+    }
 
-        this.props.callbackManager.registerCallback(
+    registerCallbacks(callbackManager: CallbackManager): void {
+        callbackManager?.registerCallback(
             "onChangePrimaryAxis",
             this.onChangePrimaryAxis
         );
+    }
+    unregisterCallbacks(callbackManager: CallbackManager): void {
+        callbackManager?.unregisterCallback(
+            "onChangePrimaryAxis",
+            this.onChangePrimaryAxis
+        );
+    }
+
+    componentDidMount(): void {
+        this.registerCallbacks(this.props.callbackManager);
     }
 
     componentWillUnmount(): void {
-        this.props.callbackManager.unregisterCallback(
-            "onChangePrimaryAxis",
-            this.onChangePrimaryAxis
-        );
+        this.unregisterCallbacks(this.props.callbackManager);
     }
 
     componentDidUpdate(prevProps: Props): void {
+        if (prevProps.callbackManager !== this.props.callbackManager) {
+            this.unregisterCallbacks(prevProps.callbackManager);
+            this.registerCallbacks(this.props.callbackManager);
+        }
+
         const wellog = this.props.callbackManager?.welllog();
         if (
             this.welllog !== wellog ||

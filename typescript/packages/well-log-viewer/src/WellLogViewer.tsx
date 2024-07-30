@@ -115,11 +115,17 @@ export default class WellLogViewer extends Component<
     }
     // callback function from Axis selector
     onChangePrimaryAxis(value: string): void {
+        this.setState({ primaryAxis: value });
         this.callbackManager.onChangePrimaryAxis(value);
     }
 
     componentDidMount(): void {
         this.onContentRescale();
+        const controller = this.callbackManager?.controller;
+        if (controller) {
+            const trackPos = controller.getTrackScrollPos();
+            controller.scrollTrackTo(trackPos);
+        }
     }
 
     componentWillUnmount(): void {
@@ -147,9 +153,8 @@ export default class WellLogViewer extends Component<
             this.props.axisMnemos !== prevProps.axisMnemos ||
             this.props.primaryAxis !== prevProps.primaryAxis
         ) {
-            this.setState({
-                primaryAxis: this.getDefaultPrimaryAxis(),
-            });
+            const value = this.getDefaultPrimaryAxis();
+            this.onChangePrimaryAxis(value);
         }
     }
 
@@ -157,16 +162,24 @@ export default class WellLogViewer extends Component<
         return this.state.primaryAxis;
     }
     getDefaultPrimaryAxis(): string {
+        if (this.props.primaryAxis) return this.props.primaryAxis;
+
         const axes = getAvailableAxes(
             this.props.welllog,
             this.props.axisMnemos
         );
         let primaryAxis = axes[0];
-        if (this.props.template && this.props.template.scale.primary) {
-            if (axes.indexOf(this.props.template.scale.primary) >= 0)
-                primaryAxis = this.props.template.scale.primary;
+        const template = this.props.template;
+        if (template) {
+            const scale = template.scale;
+            if (scale) {
+                let primary = scale.primary;
+                if (!primary) primary = "tvd"; //!!!!!
+                if (primary && axes) {
+                    if (axes.indexOf(primary) >= 0) primaryAxis = primary;
+                }
+            }
         }
-        if (this.props.primaryAxis) primaryAxis = this.props.primaryAxis;
         return primaryAxis;
     }
 
@@ -177,21 +190,26 @@ export default class WellLogViewer extends Component<
                 center={
                     <WellLogViewWithScroller
                         welllog={this.props.welllog}
+                        viewTitle={this.props.viewTitle}
                         template={this.props.template}
                         colorTables={this.props.colorTables}
                         wellpick={this.props.wellpick}
+                        patternsTable={this.props.patternsTable}
+                        patterns={this.props.patterns}
                         horizontal={this.props.horizontal}
                         axisTitles={this.props.axisTitles}
                         axisMnemos={this.props.axisMnemos}
-                        options={this.props.options}
+                        domain={this.props.domain}
+                        selection={this.props.selection}
                         primaryAxis={this.state.primaryAxis}
+                        options={this.props.options}
                         // callbacks
+                        onInfo={this.callbackManager.onInfo}
+                        onCreateController={this.onCreateController}
                         onTrackMouseEvent={
                             this.props.onTrackMouseEvent ||
                             onTrackMouseEventDefault
                         }
-                        onCreateController={this.onCreateController}
-                        onInfo={this.callbackManager.onInfo}
                         onContentRescale={this.onContentRescale}
                         onContentSelection={this.onContentSelection}
                         onTemplateChanged={this.onTemplateChanged}
@@ -260,7 +278,7 @@ WellLogViewer.propTypes = {
     /**
      * Prop containing color table data
      */
-    colorTables: PropTypes.array, //.isRequired,
+    colorTables: PropTypes.any, //.isRequired,
 
     /**
      * Orientation of the track plots on the screen. Default is false
