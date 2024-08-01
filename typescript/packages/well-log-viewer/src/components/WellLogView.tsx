@@ -838,10 +838,14 @@ function fillPlotTemplate(
         inverseColor: options.inverseColor || "",
         fill: (options1 ? options1.fill : options.fill) || "",
         fill2: options2 ? options2.fill : "",
-        colorTable: options.colorTable ? options.colorTable.name : "",
-        inverseColorTable: options.inverseColorTable
-            ? options.inverseColorTable.name
-            : "",
+        colorTable:
+            typeof options.colorTable === "function"
+                ? "Function"
+                : options.colorTable?.name ?? "",
+        inverseColorTable:
+            typeof options.inverseColorTable === "function"
+                ? "Function"
+                : options.inverseColorTable?.name ?? "",
         colorScale: options.colorScale,
         inverseColorScale: options.inverseColorScale,
     };
@@ -1263,6 +1267,8 @@ class WellLogView
     selPinned: number | undefined; // pinned position
     selPersistent: boolean | undefined;
 
+    isDefZoom: boolean;
+
     template: Template;
 
     scaleInterpolator: ScaleInterpolator | undefined;
@@ -1276,6 +1282,8 @@ class WellLogView
         this.selCurrent = undefined;
         this.selPinned = undefined;
         this.selPersistent = undefined;
+
+        this.isDefZoom = false;
 
         this.resizeObserver = new ResizeObserver(
             (entries: ResizeObserverEntry[]): void => {
@@ -1550,6 +1558,7 @@ class WellLogView
     setControllerDefaultZoom(): void {
         if (this.props.domain) this.zoomContentTo(this.props.domain);
         else this.zoomContentTo(this.getContentBaseDomain());
+        this.isDefZoom = true;
     }
 
     /**
@@ -1606,6 +1615,10 @@ class WellLogView
         return zoomContentTo(this.logController, domain);
     }
     scrollContentTo(f: number): boolean {
+        if (this.isDefZoom) {
+            this.isDefZoom = false;
+            return false;
+        }
         if (!this.logController) return false;
         return scrollContentTo(this.logController, f);
     }
@@ -2098,7 +2111,7 @@ export function _propTypesWellLogView(): Record<string, unknown> {
         /**
          * Prop containing color table data for discrete well logs
          */
-        colorTables: PropTypes.array, //.isRequired,
+        colorTables: PropTypes.any, //.isRequired,
 
         /**
          * Well picks data

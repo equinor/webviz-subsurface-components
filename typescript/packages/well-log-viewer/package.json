@@ -1,6 +1,6 @@
 {
     "name": "@webviz/well-log-viewer",
-    "version": "1.10.1",
+    "version": "1.12.2",
     "description": "",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -31,6 +31,10 @@
         "@mui/material": "^5.11",
         "react": "^17 || ^18",
         "react-dom": "^17 || ^18"
+    },
+    "devDependencies": {
+        "@reduxjs/toolkit": "^2.2.6",
+        "react-redux": "^9.1.2"
     },
     "volta": {
         "node": "18.19.0"

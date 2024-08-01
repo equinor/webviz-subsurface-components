@@ -278,7 +278,7 @@ WellLogViewer.propTypes = {
     /**
      * Prop containing color table data
      */
-    colorTables: PropTypes.array, //.isRequired,
+    colorTables: PropTypes.any, //.isRequired,
 
     /**
      * Orientation of the track plots on the screen. Default is false
