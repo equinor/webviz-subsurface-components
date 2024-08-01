@@ -28,7 +28,7 @@ const RTCWellLogViewer: React.FunctionComponent = () => {
 
 // storybook page
 const meta: Meta<typeof RTCWellLogViewer> = {
-    title: "WellLogViewer / Examples / classification layout",
+    title: "WellLogViewer/Demo/ClassificationLayout",
     component: RTCWellLogViewer,
 };
 
