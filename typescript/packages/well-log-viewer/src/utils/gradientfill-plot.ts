@@ -12,8 +12,8 @@ import type { ColorTable } from "../components/ColorTableTypes";
 import type { AreaPlotOptions } from "@equinor/videx-wellog/dist/plots/interfaces";
 
 export interface GradientFillPlotOptions extends AreaPlotOptions {
-    colorTable?: ColorTable;
-    inverseColorTable?: ColorTable;
+    colorTable?: ColorTable | ((v: number) => [number, number, number]);
+    inverseColorTable?: ColorTable | ((v: number) => [number, number, number]);
     colorScale?: "linear" | "log";
     inverseColorScale?: "linear" | "log";
 }
@@ -27,7 +27,7 @@ function createGradient(
     horizontal: boolean | undefined,
     plotdata: number[][],
     xscale: Scale,
-    colorTable: ColorTable,
+    colorTable: ColorTable | ((v: number) => [number, number, number]),
     scale: undefined | string // "linear" | "log"
 ): CanvasGradient {
     const dataFrom = plotdata[0];

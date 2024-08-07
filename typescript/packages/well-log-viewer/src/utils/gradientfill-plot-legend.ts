@@ -17,7 +17,7 @@ import { color4ToString } from "./color-table";
 let __idGradient = 0;
 function createGradient(
     g: D3Selection,
-    colorTable: ColorTable,
+    colorTable: ColorTable | ((v: number) => [number, number, number]),
     rLogarithmic?: number
 ): string {
     const id = "grad" + ++__idGradient; // generate unique id

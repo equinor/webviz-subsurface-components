@@ -91,12 +91,6 @@ export function createBooleanItems(): ReactNode[] {
 
 function createColorTableItems(colorTables: ColorTable[]): ReactNode[] {
     const nodes: ReactNode[] = [];
-
-    if (typeof colorTables === "function") {
-        nodes.push(<option key="Function"> Function </option>);
-        return nodes;
-    }
-
     if (!colorTables) {
         console.error(
             "colorTables is missed or empty in createColorTableItems()"
@@ -223,10 +217,7 @@ export class PlotPropertiesDialog extends Component<Props, State> {
 
                   // for 'gradientfill' plot
                   colorTable:
-                      typeof this.props.wellLogView.props.colorTables ===
-                      "function"
-                          ? "Function"
-                          : this.props.wellLogView.props.colorTables?.[0]?.name,
+                      this.props.wellLogView.props.colorTables?.[0]?.name,
                   inverseColorTable: undefined,
                   colorScale: undefined,
                   inverseColorScale: undefined,
