@@ -1,3 +1,10 @@
+## [1.12.3](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.12.2...well-log-viewer@1.12.3) (2024-08-11)
+
+
+### Bug Fixes
+
+* change implementation color function ([#2054](https://github.com/equinor/webviz-subsurface-components/issues/2054)) ([#2183](https://github.com/equinor/webviz-subsurface-components/issues/2183)) ([ac582e2](https://github.com/equinor/webviz-subsurface-components/commit/ac582e21fa918f09e264b0edada4f75c01edbfdc))
+
 ## [1.12.2](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.12.1...well-log-viewer@1.12.2) (2024-07-30)
 
 
