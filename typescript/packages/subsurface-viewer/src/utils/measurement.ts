@@ -16,7 +16,7 @@ export function length(geojson: FeatureOf<LineString>): number {
         geojson,
         function (previousValue?: number, segment?: FeatureOf<LineString>) {
             if (segment === undefined || previousValue === undefined) return 0;
-            const coords = segment.geometry.coordinates;
+            const coords = segment.geometry.coordinates as Position[];
             return previousValue + distance(coords[0], coords[1]);
         },
         0
