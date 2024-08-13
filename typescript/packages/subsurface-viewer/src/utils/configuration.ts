@@ -13,14 +13,11 @@ import * as AggregationLayers from "@deck.gl/aggregation-layers";
 import * as GeoLayers from "@deck.gl/geo-layers";
 import * as Layers from "@deck.gl/layers";
 import * as MeshLayers from "@deck.gl/mesh-layers";
-//import { EditableGeoJsonLayer } from "@nebula.gl/layers";
 
 import { registerLoaders } from "@loaders.gl/core";
-//import GL from "@luma.gl/constants";
 
 import * as CustomLayers from "../layers";
 import * as CustomViews from "../views";
-import { EditableGeoJsonLayer } from "@deck.gl-community/editable-layers";
 
 // Note: deck already registers JSONLoader...
 registerLoaders([]);
@@ -42,9 +39,7 @@ export default {
         AggregationLayers,
         GeoLayers,
         MeshLayers,
-        CustomLayers,
-        // Any non-standard views or layers
-        { EditableGeoJsonLayer }
+        CustomLayers
     ),
 
     // Functions that should be executed by JSON converter
@@ -54,7 +49,6 @@ export default {
     // Will be resolved as `<enum-name>.<enum-value>`
     enumerations: {
         COORDINATE_SYSTEM,
-        //GL,
     },
 
     // Constants that should be resolved with the provided values by JSON converter
