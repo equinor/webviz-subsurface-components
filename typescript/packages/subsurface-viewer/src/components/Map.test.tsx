@@ -3,9 +3,9 @@
 //import { colorTables } from "@emerson-eps/color-tables";
 //import type { colorTablesArray } from "@emerson-eps/color-tables/";
 import "@testing-library/jest-dom";
-//import { render } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import "jest-styled-components";
-// import React from "react";
+import React from "react";
 // import {
 //     ColormapLayer,
 //     DrawingLayer,
@@ -16,7 +16,7 @@ import "jest-styled-components";
 //     WellsLayer,
 // } from "../layers";
 // import { EmptyWrapper } from "../test/TestWrapper";
-// import Map from "./Map";
+import Map from "./Map";
 
 // import type { Unit } from "convert-units";
 // import mapData from "../../../../../example-data/deckgl-map.json";

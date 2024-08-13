@@ -1,15 +1,8 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-//import { colorTables } from "@emerson-eps/color-tables";
 import "@testing-library/jest-dom";
-//import { render } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import "jest-styled-components";
-// import React from "react";
-// import SubsurfaceViewer from "./SubsurfaceViewer";
-
-// import type { Unit } from "convert-units";
-// import mapData from "../../../../example-data/deckgl-map.json";
-
-// const colorTablesData = colorTables;
+import React from "react";
+import SubsurfaceViewer from "./SubsurfaceViewer";
 
 describe("Test Map component", () => {
     it("snapshot test", () => {
