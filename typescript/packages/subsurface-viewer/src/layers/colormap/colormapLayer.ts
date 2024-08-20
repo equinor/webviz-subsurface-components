@@ -112,9 +112,6 @@ const defaultProps = {
 
 export default class ColormapLayer extends BitmapLayer<ColormapLayerProps> {
     initializeState(): void {
-        this.setState({
-            isLoaded: false,
-        });
         super.initializeState();
     }
 
@@ -171,11 +168,12 @@ export default class ColormapLayer extends BitmapLayer<ColormapLayerProps> {
             ),
         });
 
+        this.state.model?.setBindings({ colormap });
+
         super.draw({
             uniforms: {
                 ...uniforms,
                 // Send the colormap texture to the shader.
-                colormap,
                 valueRangeMin,
                 valueRangeMax,
                 colorMapRangeMin,
