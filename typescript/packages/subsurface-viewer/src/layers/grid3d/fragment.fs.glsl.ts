@@ -20,7 +20,7 @@ uniform float valueRangeMax;
 uniform float colorMapRangeMin;
 uniform float colorMapRangeMax;
 
-uniform bool  isColoringDiscrete;
+uniform bool isColoringDiscrete;
 uniform float colorMapSize;
 uniform lowp int coloringMode;
 

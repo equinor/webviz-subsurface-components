@@ -82,6 +82,7 @@ interface IPropertyUniforms {
     isColorMapClampColorTransparent: boolean;
     isClampColor: boolean;
     isColoringDiscrete: boolean;
+    colorMapSize: number;
 }
 
 interface IImageData {
@@ -363,6 +364,7 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             isColorMapClampColorTransparent,
             isClampColor,
             isColoringDiscrete: imageData.isColoringDiscrete,
+            colorMapSize: imageData.count,
         };
     }
     private getTexture(context: DeckGLLayerContext): Texture<TextureProps> {
