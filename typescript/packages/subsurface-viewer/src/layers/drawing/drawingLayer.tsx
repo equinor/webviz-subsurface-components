@@ -1,6 +1,5 @@
 import type {
     EditAction,
-    EditableGeoJsonLayer,
     Feature,
     FeatureCollection,
     GeoJsonEditMode,
@@ -10,6 +9,7 @@ import {
     DrawLineStringMode,
     DrawPointMode,
     DrawPolygonMode,
+    EditableGeoJsonLayer,
     ImmutableFeatureCollection,
     ModifyMode,
     TransformMode,
@@ -154,9 +154,9 @@ export default class DrawingLayer extends CompositeLayer<DrawingLayerProps> {
         if (!info.object) return info;
         const feature = info.object;
         let measurement;
-        if (feature.geometry.type === "LineString") {
+        if (feature.geometry?.type === "LineString") {
             measurement = length(feature);
-        } else if (feature.geometry.type === "Polygon") {
+        } else if (feature.geometry?.type === "Polygon") {
             measurement = area(feature);
         } else return info;
         return {
@@ -249,7 +249,6 @@ export default class DrawingLayer extends CompositeLayer<DrawingLayerProps> {
             },
         });
 
-        // @ts-expect-error: EditableGeoJsonLayer from nebula.gl has no typing
         return [new EditableGeoJsonLayer(sub_layer_props)];
     }
 }

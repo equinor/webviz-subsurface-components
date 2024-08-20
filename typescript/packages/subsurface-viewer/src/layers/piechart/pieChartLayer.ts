@@ -60,8 +60,7 @@ export default class PieChartLayer extends Layer<PieChartLayerProps<PiesData>> {
         if (!this.state?.["model"]) {
             const pieData = this.props.data as unknown as PiesData;
             if (pieData?.pies) {
-                const { gl } = context;
-                this.setState(this.getModel(gl, pieData));
+                this.setState(this.getModel(context.device, pieData));
             }
         }
     }
@@ -207,7 +206,7 @@ export default class PieChartLayer extends Layer<PieChartLayerProps<PiesData>> {
         }
 
         model.setUniforms({ scale });
-        gl.draw(model);
+        model.draw(context.renderPass);
 
         if (!this.props.depthTest) {
             gl.enable(GL.DEPTH_TEST);
