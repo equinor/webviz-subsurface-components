@@ -199,7 +199,7 @@ export default class ColormapLayer extends BitmapLayer<ColormapLayerProps> {
     }: {
         info: PickingInfo;
     }): BitmapLayerPickingInfo & LayerPickInfo {
-        if (this.state["disablePicking"] || !info.color) {
+        if (!info.color) {
             return info as BitmapLayerPickingInfo;
         }
 

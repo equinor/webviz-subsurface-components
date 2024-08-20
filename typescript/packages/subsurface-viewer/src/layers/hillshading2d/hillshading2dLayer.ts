@@ -148,7 +148,7 @@ export default class Hillshading2DLayer extends BitmapLayer<Hillshading2DProps> 
     }: {
         info: PickingInfo;
     }): BitmapLayerPickingInfo & LayerPickInfo {
-        if (this.state.disablePicking || !info.color) {
+        if (!info.color) {
             return info as BitmapLayerPickingInfo;
         }
 
