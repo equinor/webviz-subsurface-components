@@ -916,6 +916,16 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
         };
     };
 
+    const isPropertyValueDefined = (
+        value: number,
+        undefinedValue: number
+    ): boolean => {
+        return (
+            value !== null &&
+            !(Number.isNaN(value) || Math.abs(value - undefinedValue) < 0.001)
+        );
+    };
+
     /**
      * Creates empty meshes.
      * @returns Empty meshes with empty data arrays and zero vertex counts.
@@ -954,8 +964,8 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
     const polys = params.polys;
     const properties = params.properties;
 
-    let propertyValueRangeMin = +99999999;
-    let propertyValueRangeMax = -99999999;
+    let propertyValueRangeMin = Number.POSITIVE_INFINITY;
+    let propertyValueRangeMax = Number.NEGATIVE_INFINITY;
 
     let pn = 0;
     let i = 0;
@@ -980,9 +990,9 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
             arraysIndex < meshArrays.arrays.trianglePoints.length - 3
         ) {
             const n = polys[i];
-            const propertyValue = properties[pn++];
+            let propertyValue = properties[pn++];
 
-            if (propertyValue !== null) {
+            if (isPropertyValueDefined(propertyValue, params.undefinedValue)) {
                 // For some reason propertyValue happens to be null.
                 propertyValueRangeMin =
                     propertyValue < propertyValueRangeMin
@@ -992,8 +1002,9 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
                     propertyValue > propertyValueRangeMax
                         ? propertyValue
                         : propertyValueRangeMax;
+            } else {
+                propertyValue = Number.NaN;
             }
-
             // Lines.
             for (let j = i + 1; j < i + n; ++j) {
                 meshArrays.arrays.lineIndices[linesIndex] = polys[j];
@@ -1043,6 +1054,8 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
 
         console.log("Number of polygons: ", pn);
         console.log("Number of triangles: ", meshArrays.counts.triangles);
+        console.log([propertyValueRangeMin, propertyValueRangeMax]);
+        console.log("webworker undefval", params.undefinedValue);
 
         const mesh: MeshType = {
             drawMode: 4, // corresponds to GL.TRIANGLES,

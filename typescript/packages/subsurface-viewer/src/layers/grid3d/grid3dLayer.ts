@@ -48,6 +48,7 @@ export type WebWorkerParams = {
     points: Float32Array;
     polys: Uint32Array;
     properties: Float32Array | Uint16Array;
+    undefinedValue: number;
 };
 
 function GetBBox(points: Float32Array): BoundingBox3D {
@@ -199,6 +200,10 @@ export interface Grid3DLayerProps extends ExtendedLayerProps {
      */
     colorMapFunction?: colorMapFunctionType | Uint8Array;
 
+    undefinedPropertyValue?: number;
+
+    undefinedPropertyColor?: [number, number, number];
+
     /** Enable lines around cell faces.
      *  default: true.
      */
@@ -274,6 +279,7 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
                 points,
                 polys,
                 properties,
+                undefinedValue: this.getUndefinedPropertyValue(),
             };
 
             pool.exec(makeFullMesh, [{ data: webworkerParams }]).then((e) => {
@@ -349,6 +355,11 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
             // isFinishedLoading only in state
             return [];
         }
+        const undefinedColor = this.getUndefinedPropertyColor();
+        const undefinedValue = this.getUndefinedPropertyValue();
+
+        console.log("undefinedColor: ", undefinedColor);
+        console.log("undefinedValue: ", undefinedValue);
 
         const layer = new PrivateLayer(
             this.getSubLayerProps({
@@ -358,6 +369,8 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
                 colorMapName: this.props.colorMapName,
                 colorMapRange: this.props.colorMapRange,
                 colorMapClampColor: this.props.colorMapClampColor,
+                undefinedPropertyValue: undefinedValue,
+                undefinedPropertyColor: undefinedColor,
                 colorMapFunction: this.props.colorMapFunction,
                 coloringMode: this.props.coloringMode,
                 gridLines: this.props.gridLines,
@@ -385,6 +398,20 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
             default:
                 return this.state["propertyValueRange"];
         }
+    }
+
+    private getUndefinedPropertyValue(): number {
+        if (typeof this.props.undefinedPropertyValue === "number") {
+            return this.props.undefinedPropertyValue;
+        }
+        if (this.props.propertiesData instanceof Uint16Array) {
+            return 0xffff;
+        }
+        return Number.NaN;
+    }
+
+    private getUndefinedPropertyColor(): [number, number, number] {
+        return this.props.undefinedPropertyColor ?? [0.8, 0.8, 0.8];
     }
 }
 

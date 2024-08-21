@@ -453,7 +453,7 @@ const Map: React.FC<MapProps> = ({
         // Margins on the viewport are extracted from a potential axes2D layer.
         const axes2DLayer = layers?.find((e) => {
             return e?.constructor === Axes2DLayer;
-        }) as Axes2DLayer;
+        }) as unknown as Axes2DLayer;
 
         const axes2DProps = axes2DLayer?.props;
         return {

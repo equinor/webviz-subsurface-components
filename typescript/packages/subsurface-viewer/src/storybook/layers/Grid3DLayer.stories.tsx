@@ -178,6 +178,15 @@ const snubCubeProperties = Array(SnubCubeVertexCount)
     .fill(0)
     .map(() => 100 + randomFunc() * 50);
 
+snubCubeProperties[1] = snubCubeProperties[0];
+snubCubeProperties[2] = snubCubeProperties[0];
+snubCubeProperties[3] = snubCubeProperties[0];
+snubCubeProperties[4] = snubCubeProperties[0];
+snubCubeProperties[5] = snubCubeProperties[0];
+snubCubeProperties[6] = snubCubeProperties[0];
+snubCubeProperties[7] = snubCubeProperties[0];
+snubCubeProperties[8] = snubCubeProperties[0];
+
 const toroidPoints = ToroidPoints.map((v) => 10 * v).map((v, index) =>
     index % 3 === 0 ? v + 30 : v
 );
@@ -185,6 +194,12 @@ const toroidProperties = Array(ToroidVertexCount)
     .fill(0)
     .map(() => randomFunc() * 10);
 
+// toroidProperties[0] = Number.NaN;
+// toroidProperties[1] = Number.NaN;
+// toroidProperties[2] = Number.NaN;
+// toroidProperties[3] = Number.NaN;
+// toroidProperties[4] = Number.NaN;
+// toroidProperties[5] = Number.NaN;
 /* eslint-disable prettier/prettier */
 const colorTable = new Uint8Array([
     0, 0, 255,     // 0
@@ -236,16 +251,18 @@ export const PolyhedralCells: StoryObj<typeof SubsurfaceViewer> = {
                 id: "polyhedral-cells-axes",
                 bounds: [-15, -15, -15, 40, 20, 15],
             },
-            {
-                ...grid3dLayer,
-                id: "polyhedral1",
-                coloringMode: TGrid3DColoringMode.Y,
-                pickable: true,
-                pointsData: snubCubePoints,
-                polysData: SnubCubeFaces,
-                propertiesData: snubCubeProperties,
-                colorMapName: "Porosity",
-            },
+            // {
+            //     ...grid3dLayer,
+            //     id: "polyhedral1",
+            //     //coloringMode: TGrid3DColoringMode.Y,
+            //     pickable: true,
+            //     pointsData: snubCubePoints,
+            //     polysData: SnubCubeFaces,
+            //     propertiesData: snubCubeProperties,
+            //     colorMapName: "Porosity",
+            //     undefinedPropertyValue: snubCubeProperties[0],
+            //     undefinedPropertyColor: [0.0, 1.0, 0.0],
+            // },
             {
                 ...grid3dLayer,
                 id: "polyhedral2",
@@ -254,6 +271,7 @@ export const PolyhedralCells: StoryObj<typeof SubsurfaceViewer> = {
                 polysData: ToroidFaces,
                 propertiesData: toroidProperties,
                 coloringMode: TGrid3DColoringMode.Property,
+                undefinedPropertyValue: toroidProperties[15],
             },
         ],
     },
