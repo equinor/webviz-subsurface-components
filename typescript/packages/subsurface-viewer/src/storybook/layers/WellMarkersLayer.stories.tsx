@@ -63,7 +63,7 @@ const generateMarkers = (): WellMarkerDataT[] => {
 
 export const WellMarkers: StoryObj<typeof SubsurfaceViewer> = {
     args: {
-        bounds: [-25, -25, 50, 30],
+        bounds: [-30, -30, 30, 30],
         views: {
             layout: [1, 1] as [number, number],
             viewports: [

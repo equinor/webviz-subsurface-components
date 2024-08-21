@@ -1,10 +1,11 @@
-const fsColormap = `#define SHADER_NAME colormap-shader
+const fsColormap = `#version 300 es
+#define SHADER_NAME colormap-shader
 
-#ifdef GL_ES
 precision highp float;
-#endif
 
-varying vec2 vTexCoord;
+in vec2 vTexCoord;
+
+out vec4 fragColor;
 
 uniform sampler2D bitmapTexture; // Property map
 uniform sampler2D colormap;
@@ -12,11 +13,11 @@ uniform sampler2D colormap;
 uniform float opacity;
 
 void main(void) {
-  vec4 bitmapColor = texture2D(bitmapTexture, vTexCoord);
+  vec4 bitmapColor = texture(bitmapTexture, vTexCoord);
 
   // If it's a picking pass, we just return the raw property map value.
-  if (picking_uActive) {
-    gl_FragColor = bitmapColor;
+  if (picking.isActive > 0.5) {
+    fragColor = bitmapColor;
     return;
   }
 
@@ -25,16 +26,16 @@ void main(void) {
   // The resulting val will be in [0, 1] interval, so we can use it directly as a texture coord
   // to sample from the colormap.
   // 0 => Leftmost color in the colormap, 1 => rightmost color, linearly interpolated in between.
-  vec4 color = texture2D(colormap, vec2(val, 0.5));
+  vec4 color = texture(colormap, vec2(val, 0.5));
 
   // The final pixel opacity is the combination of the user provided image-wide opacity,
   // the colormap opacity at the sampled pixel and the property map opacity of the sampled pixel.
-  gl_FragColor = vec4(color.rgb, color.a * bitmapColor.a * opacity);
+  fragColor = vec4(color.rgb, color.a * bitmapColor.a * opacity);
 
   // Support for existing functionality that comes from the BitmapLayer, such as desaturate, tintColor etc.
   // See https://deck.gl/docs/api-reference/layers/bitmap-layer#render-options for more details.
   geometry.uv = vTexCoord;
-  DECKGL_FILTER_COLOR(gl_FragColor, geometry);
+  DECKGL_FILTER_COLOR(fragColor, geometry);
 
 }
 `;

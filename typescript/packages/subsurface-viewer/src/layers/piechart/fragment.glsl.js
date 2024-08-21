@@ -13,7 +13,7 @@ in vec4 vColor;
 void main(void) {
 
   //Picking pass.
-  if (picking_uActive) {
+  if (picking.isActive > 0.5) {
      // Express triangle index in 255 system.
      float r = 0.0;
      float g = 0.0;

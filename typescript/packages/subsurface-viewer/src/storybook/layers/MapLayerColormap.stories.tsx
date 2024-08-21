@@ -1,16 +1,16 @@
+import type { Meta, StoryObj } from "@storybook/react";
 import type { SyntheticEvent } from "react";
 import React from "react";
-import type { Meta, StoryObj } from "@storybook/react";
 
 import { Slider } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
-import { View } from "@deck.gl/core/typed";
+import { View } from "@deck.gl/core";
 
 import type { ColorLegendProps } from "@emerson-eps/color-tables";
 import {
-    ContinuousLegend,
     ColorLegend,
+    ContinuousLegend,
     createColorMapFunction,
 } from "@emerson-eps/color-tables";
 
@@ -20,10 +20,10 @@ import SubsurfaceViewer from "../../SubsurfaceViewer";
 import {
     default3DViews,
     defaultStoryParameters,
-    hugin2DBounds,
-    huginAxes3DLayer,
     hugin25mKhNetmapMapLayer,
     hugin25mKhNetmapMapLayerPng,
+    hugin2DBounds,
+    huginAxes3DLayer,
     northArrowLayer,
 } from "../sharedSettings";
 

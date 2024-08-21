@@ -6,9 +6,9 @@ import type {
     PickingInfo,
     Position,
     UpdateParameters,
-} from "@deck.gl/core/typed";
+} from "@deck.gl/core";
 
-import { CompositeLayer, OrbitViewport } from "@deck.gl/core/typed";
+import { CompositeLayer, OrbitViewport } from "@deck.gl/core";
 
 import type {
     ExtendedLayerProps,
@@ -18,8 +18,8 @@ import type {
 
 import { createPropertyData, isDrawingEnabled } from "../utils/layerTools";
 
-import { PathStyleExtension } from "@deck.gl/extensions/typed";
-import { GeoJsonLayer, PathLayer, TextLayer } from "@deck.gl/layers/typed";
+import { PathStyleExtension } from "@deck.gl/extensions";
+import { GeoJsonLayer, PathLayer, TextLayer } from "@deck.gl/layers";
 import type { colorTablesArray } from "@emerson-eps/color-tables/";
 import { getColors, rgbValues } from "@emerson-eps/color-tables/";
 import type {
@@ -33,7 +33,7 @@ import type {
 } from "geojson";
 import { distance, dot, subtract } from "mathjs";
 
-import GL from "@luma.gl/constants";
+import { GL } from "@luma.gl/constants";
 import { interpolateNumberArray } from "d3";
 import { isEmpty, isEqual } from "lodash";
 import type {
@@ -400,8 +400,8 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             return [];
         }
 
-        const data = this.state["data"];
-        const coarseData = this.state["coarseData"];
+        const data = this.state["data"] as FeatureCollection;
+        const coarseData = this.state["coarseData"] as FeatureCollection;
 
         const is3d = this.context.viewport.constructor === OrbitViewport;
         const positionFormat = "XYZ";
@@ -489,7 +489,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             id: "highlight2",
             data: getWellObjectsByName(
                 data.features,
-                this.state["selectedMultiWells"]
+                this.state["selectedMultiWells"] as string[]
             ),
             getPointRadius: getSize(POINT, this.props.wellHeadStyle?.size, 2),
             getFillColor: [255, 140, 0],
@@ -576,8 +576,8 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                     getLogPath1(
                         data.features,
                         d,
-                        this.state["well"],
-                        this.state["selection"],
+                        this.state["well"] as string,
+                        this.state["selection"] as [number, number],
                         this.props.logrunName,
                         this.props.lineStyle?.color
                     ),
@@ -585,8 +585,8 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                     getLogColor1(
                         data.features,
                         d,
-                        this.state["well"],
-                        this.state["selection"],
+                        this.state["well"] as string,
+                        this.state["selection"] as [number, number],
                         this.props.logrunName
                     ),
                 getWidth: (d: LogCurveDataType): number | number[] =>

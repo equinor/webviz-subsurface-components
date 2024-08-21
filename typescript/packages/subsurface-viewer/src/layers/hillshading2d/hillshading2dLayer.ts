@@ -1,13 +1,14 @@
-import type { BitmapLayerProps } from "@deck.gl/layers/typed";
-import { BitmapLayer } from "@deck.gl/layers/typed";
-import type { PickingInfo, Texture } from "@deck.gl/core/typed";
+import type { PickingInfo } from "@deck.gl/core";
+import type { Texture } from "@luma.gl/core";
+import type { BitmapLayerPickingInfo, BitmapLayerProps } from "@deck.gl/layers";
+import { BitmapLayer } from "@deck.gl/layers";
 
+import type { ReportBoundingBoxAction } from "../../components/Map";
+import type { LayerPickInfo } from "../../layers/utils/layerTools";
 import { decoder } from "../shader_modules";
+import { getModelMatrix } from "../utils/layerTools";
 import type { ValueDecoder } from "../utils/propertyMapTools";
 import { decodeRGB } from "../utils/propertyMapTools";
-import { getModelMatrix } from "../utils/layerTools";
-import type { LayerPickInfo } from "../../layers/utils/layerTools";
-import type { ReportBoundingBoxAction } from "../../components/Map";
 
 import fsHillshading from "./hillshading2d.fs.glsl";
 
@@ -63,20 +64,13 @@ const defaultProps = {
 
 export default class Hillshading2DLayer extends BitmapLayer<Hillshading2DProps> {
     initializeState(): void {
-        this.setState({
-            isLoaded: false,
-        });
         super.initializeState();
     }
 
     // Signature from the base class, eslint doesn't like the any type.
     // eslint-disable-next-line
     draw({ moduleParameters, uniforms }: any): void {
-        if (!this.state["isLoaded"]) {
-            this.setState({
-                isLoaded: true,
-            });
-
+        if (!this.isLoaded) {
             if (typeof this.props.reportBoundingBox !== "undefined") {
                 const xMin = this.props.bounds[0] as number;
                 const yMin = this.props.bounds[1] as number;
@@ -149,9 +143,13 @@ export default class Hillshading2DLayer extends BitmapLayer<Hillshading2DProps> 
         return parentShaders;
     }
 
-    getPickingInfo({ info }: { info: PickingInfo }): LayerPickInfo {
-        if (this.state["pickingDisabled"] || !info.color) {
-            return info;
+    getPickingInfo({
+        info,
+    }: {
+        info: PickingInfo;
+    }): BitmapLayerPickingInfo & LayerPickInfo {
+        if (!info.color) {
+            return info as BitmapLayerPickingInfo;
         }
 
         const mergedDecoder = {
@@ -168,7 +166,7 @@ export default class Hillshading2DLayer extends BitmapLayer<Hillshading2DProps> 
             // For more details, see https://deck.gl/docs/developer-guide/custom-layers/picking
             index: 0,
             propertyValue: val,
-        };
+        } as unknown as BitmapLayerPickingInfo;
     }
 }
 
