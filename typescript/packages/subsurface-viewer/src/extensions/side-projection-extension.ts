@@ -3,6 +3,7 @@ import { LayerExtension } from "@deck.gl/core";
 import type { ShaderModule } from "@luma.gl/shadertools";
 import type { Layer } from "@deck.gl/core";
 import { project32, project } from "@deck.gl/core";
+import { glsl } from "@luma.gl/shadertools";
 
 const defaultProps = {
     sideViewIds: [],
@@ -12,7 +13,7 @@ type SideProjectionExtensionProps = {
     sideViewIds?: string[];
 };
 
-const shaderFunction = `
+const shaderFunction = glsl`
 uniform float side_view;
 
 vec3 transform(vec3 clip_position) {
@@ -36,10 +37,10 @@ const shaderModuleVs: ShaderModule = {
 };
 
 const injectionVs = {
-    "vs:#decl": `
-  varying vec3 new_position;
+    "vs:#decl": glsl`
+  vec3 new_position;
 `,
-    "vs:DECKGL_FILTER_GL_POSITION": `
+    "vs:DECKGL_FILTER_GL_POSITION": glsl`
   new_position = transform(position.xyz);
   position.xyz = new_position;
 `,
