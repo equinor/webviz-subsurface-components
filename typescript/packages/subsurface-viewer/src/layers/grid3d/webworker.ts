@@ -921,8 +921,7 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
         undefinedValue: number
     ): boolean => {
         return (
-            value !== null &&
-            !(Number.isNaN(value) || Math.abs(value - undefinedValue) < 0.001)
+            value !== null && !(Number.isNaN(value) || value === undefinedValue)
         );
     };
 
