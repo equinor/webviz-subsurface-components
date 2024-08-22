@@ -921,6 +921,7 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
         undefinedValue: number
     ): boolean => {
         return (
+            // For some reason propertyValue happens to be null.
             value !== null && !(Number.isNaN(value) || value === undefinedValue)
         );
     };
@@ -993,7 +994,6 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
             let propertyValue = properties[pn++];
 
             if (isPropertyValueDefined(propertyValue, params.undefinedValue)) {
-                // For some reason propertyValue happens to be null.
                 propertyValueRangeMin =
                     propertyValue < propertyValueRangeMin
                         ? propertyValue

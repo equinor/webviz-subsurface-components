@@ -178,8 +178,6 @@ const snubCubeProperties = Array(SnubCubeVertexCount)
     .fill(0)
     .map(() => 100 + randomFunc() * 50);
 
-snubCubeProperties[0] = Number.MAX_VALUE;
-
 const toroidPoints = ToroidPoints.map((v) => 10 * v).map((v, index) =>
     index % 3 === 0 ? v + 30 : v
 );
@@ -187,6 +185,7 @@ const toroidProperties = Array(ToroidVertexCount)
     .fill(0)
     .map(() => randomFunc() * 10);
 
+/* eslint-disable prettier/prettier */
 const colorTable = new Uint8Array([
     0, 0, 255,     // 0
     0, 255, 0,     // 1 
@@ -246,8 +245,6 @@ export const PolyhedralCells: StoryObj<typeof SubsurfaceViewer> = {
                 polysData: SnubCubeFaces,
                 propertiesData: snubCubeProperties,
                 colorMapName: "Porosity",
-                undefinedPropertyValue: snubCubeProperties[0],
-                undefinedPropertyColor: [0.0, 1.0, 0.0],
             },
             {
                 ...grid3dLayer,
