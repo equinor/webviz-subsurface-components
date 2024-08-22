@@ -1,4 +1,4 @@
-import type { Color } from "@deck.gl/core/typed";
+import type { Color } from "@deck.gl/core";
 
 // Parameters used to decode a float value from RGB pixels.
 export interface ValueDecoder {

@@ -1,13 +1,13 @@
-import type { PickingInfo, UpdateParameters } from "@deck.gl/core/typed";
-import { CompositeLayer } from "@deck.gl/core/typed";
+import type { PickingInfo, UpdateParameters } from "@deck.gl/core";
+import { CompositeLayer } from "@deck.gl/core";
 import { isEqual } from "lodash";
 
+import type { ReportBoundingBoxAction } from "../../components/Map";
 import type {
-    PropertyDataType,
     ExtendedLayerProps,
     LayerPickInfo,
+    PropertyDataType,
 } from "../utils/layerTools";
-import type { ReportBoundingBoxAction } from "../../components/Map";
 import { createPropertyData, defineBoundingBox } from "../utils/layerTools";
 
 import { PrivatePolylinesLayer } from "./privatePolylinesLayer";
@@ -92,6 +92,8 @@ interface IDataAttributes {
 
 export default class PolylinesLayer extends CompositeLayer<PolylinesLayerProps> {
     renderLayers(): [PrivatePolylinesLayer?] {
+        const data = this.state["dataAttributes"] as IDataAttributes;
+        const _pathType: PathType = data.pathType as PathType;
         const layer = new PrivatePolylinesLayer(
             this.getSubLayerProps({
                 id: "polylines-layer",
@@ -100,8 +102,8 @@ export default class PolylinesLayer extends CompositeLayer<PolylinesLayerProps> 
                 billboard: true,
                 jointRounded: true,
                 capRounded: true,
-                data: this.state["dataAttributes"],
-                _pathType: this.state["dataAttributes"].pathType,
+                data,
+                _pathType,
                 getColor: () => this.props.color,
                 getWidth: () => this.props.linesWidth,
 

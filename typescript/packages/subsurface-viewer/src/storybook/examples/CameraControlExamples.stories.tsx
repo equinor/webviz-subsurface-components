@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 
-import { SimpleMeshLayer } from "@deck.gl/mesh-layers/typed";
+import { SimpleMeshLayer } from "@deck.gl/mesh-layers";
 import { SphereGeometry } from "@luma.gl/engine";
 
 import Box from "@mui/material/Box";
@@ -13,7 +13,7 @@ import SubsurfaceViewer from "../../SubsurfaceViewer";
 import type { BoundingBox3D, ViewStateType } from "../../components/Map";
 import { Axes2DLayer, AxesLayer } from "../../layers";
 
-import { GeoJsonLayer } from "@deck.gl/layers/typed";
+import { GeoJsonLayer } from "@deck.gl/layers";
 import {
     customLayerWithPolygonDataProps,
     default2DViews,

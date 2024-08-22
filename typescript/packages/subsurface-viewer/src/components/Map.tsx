@@ -9,7 +9,7 @@ import type {
     MjolnirPointerEvent,
 } from "mjolnir.js";
 
-import { JSONConfiguration, JSONConverter } from "@deck.gl/json/typed";
+import { JSONConfiguration, JSONConverter } from "@deck.gl/json";
 
 import type {
     Color,
@@ -19,9 +19,9 @@ import type {
     PickingInfo,
     View,
     Viewport,
-} from "@deck.gl/core/typed";
-import type { DeckGLRef } from "@deck.gl/react/typed";
-import DeckGL from "@deck.gl/react/typed";
+} from "@deck.gl/core";
+import type { DeckGLRef } from "@deck.gl/react";
+import DeckGL from "@deck.gl/react";
 
 import {
     AmbientLight,
@@ -34,8 +34,8 @@ import {
     OrthographicController,
     OrthographicView,
     PointLight,
-} from "@deck.gl/core/typed";
-import { LineLayer } from "@deck.gl/layers/typed";
+} from "@deck.gl/core";
+import { LineLayer } from "@deck.gl/layers";
 
 import { Matrix4 } from "@math.gl/core";
 import { fovyToAltitude } from "@math.gl/web-mercator";
@@ -453,7 +453,7 @@ const Map: React.FC<MapProps> = ({
         // Margins on the viewport are extracted from a potential axes2D layer.
         const axes2DLayer = layers?.find((e) => {
             return e?.constructor === Axes2DLayer;
-        }) as Axes2DLayer;
+        }) as unknown as Axes2DLayer;
 
         const axes2DProps = axes2DLayer?.props;
         return {
@@ -471,7 +471,7 @@ const Map: React.FC<MapProps> = ({
             const wellslayer = getLayersByType(
                 layers,
                 WellsLayer.name
-            )?.[0] as WellsLayer;
+            )?.[0] as unknown as WellsLayer;
 
             wellslayer?.setSelection(selection?.well, selection?.selection);
         }
@@ -488,7 +488,7 @@ const Map: React.FC<MapProps> = ({
                 layers,
                 "WellsLayer",
                 selectedWell
-            )?.[0] as WellsLayer;
+            )?.[0] as unknown as WellsLayer;
             wellslayer?.setMultiSelection(multipleWells);
         }
     }, [multipleWells, selectedWell]);
@@ -709,7 +709,7 @@ const Map: React.FC<MapProps> = ({
         [getCameraPosition, viewController]
     );
 
-    const effects = parseLights(lights);
+    const effects = parseLights(lights) ?? [];
 
     const [deckGlViews, deckGlViewState] = useMemo(() => {
         const state = {
