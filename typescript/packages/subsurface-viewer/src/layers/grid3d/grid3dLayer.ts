@@ -200,8 +200,18 @@ export interface Grid3DLayerProps extends ExtendedLayerProps {
      */
     colorMapFunction?: colorMapFunctionType | Uint8Array;
 
+    /**
+     * Value in propertiesData indicating that the property is undefined.
+     * When propertiesData is Uint16Array the value is index in discretePropertyValueNames if provided.
+     * By default, it is assumed to be NaN for Float32 properties data and 0xFFFF for UInt16.
+     */
     undefinedPropertyValue?: number;
 
+    /**
+     * Color for the cells with undefined property value.
+     * Is not overridden by and used prior to colorMapFunction.
+     * By default, Light gray if not provided.
+     */
     undefinedPropertyColor?: [number, number, number];
 
     /** Enable lines around cell faces.
