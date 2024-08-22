@@ -204,6 +204,8 @@ export interface Grid3DLayerProps extends ExtendedLayerProps {
      * Value in propertiesData indicating that the property is undefined.
      * When propertiesData is Uint16Array the value is index in discretePropertyValueNames if provided.
      * By default, it is assumed to be NaN for Float32 properties data and 0xFFFF for UInt16.
+     * Note: in case of floating point properties exact comparison is performed so use the same
+     * constant value both in propertiesData array and as undefinedPropertyValue.
      */
     undefinedPropertyValue?: number;
 
