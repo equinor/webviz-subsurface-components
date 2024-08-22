@@ -187,13 +187,6 @@ const toroidProperties = Array(ToroidVertexCount)
     .fill(0)
     .map(() => randomFunc() * 10);
 
-// toroidProperties[0] = Number.NaN;
-// toroidProperties[1] = Number.NaN;
-// toroidProperties[2] = Number.NaN;
-// toroidProperties[3] = Number.NaN;
-// toroidProperties[4] = Number.NaN;
-// toroidProperties[5] = Number.NaN;
-/* eslint-disable prettier/prettier */
 const colorTable = new Uint8Array([
     0, 0, 255,     // 0
     0, 255, 0,     // 1 
@@ -247,7 +240,7 @@ export const PolyhedralCells: StoryObj<typeof SubsurfaceViewer> = {
             {
                 ...grid3dLayer,
                 id: "polyhedral1",
-                //coloringMode: TGrid3DColoringMode.Y,
+                coloringMode: TGrid3DColoringMode.Y,
                 pickable: true,
                 pointsData: snubCubePoints,
                 polysData: SnubCubeFaces,
@@ -264,8 +257,6 @@ export const PolyhedralCells: StoryObj<typeof SubsurfaceViewer> = {
                 polysData: ToroidFaces,
                 propertiesData: toroidProperties,
                 coloringMode: TGrid3DColoringMode.Property,
-                undefinedPropertyValue: toroidProperties[15],
-                undefinedPropertyColor: [0, 0, 0],
             },
         ],
     },
@@ -399,8 +390,6 @@ export const CustomColorFuncWithClamping: StoryObj<typeof SubsurfaceViewer> = {
                 material: false,
                 colorMapRange: [3, 10],
                 colorMapClampColor: [100, 100, 100],
-                undefinedPropertyValue: 4,
-                undefinedPropertyColor: [0, 0, 0],
             },
         ],
     },
@@ -430,11 +419,11 @@ export const DiscretePropertyWithUndefinedValues: StoryObj<
                 },
             ],
         },
-        id: "grid-3d-discrete_props",
+        id: "grid-3d-discrete-props-undef-vals",
         layers: [
             {
                 ...axes,
-                id: "discrete_props-axes",
+                id: "discrete-props-undef-vals-axes",
                 bounds: [-2000, -2200, -2200, 2200, 2000, -1000],
             },
             {

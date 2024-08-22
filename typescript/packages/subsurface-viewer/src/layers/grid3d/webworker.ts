@@ -1055,8 +1055,6 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
 
         console.log("Number of polygons: ", pn);
         console.log("Number of triangles: ", meshArrays.counts.triangles);
-        console.log([propertyValueRangeMin, propertyValueRangeMax]);
-        console.log("webworker undefval", params.undefinedValue);
 
         const mesh: MeshType = {
             drawMode: "triangle-list",

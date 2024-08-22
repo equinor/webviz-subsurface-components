@@ -359,9 +359,6 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
         const undefinedColor = this.getUndefinedPropertyColor();
         const undefinedValue = this.getUndefinedPropertyValue();
 
-        console.log("undefinedColor: ", undefinedColor);
-        console.log("undefinedValue: ", undefinedValue);
-
         const layer = new PrivateLayer(
             this.getSubLayerProps({
                 mesh: this.state["mesh"],
