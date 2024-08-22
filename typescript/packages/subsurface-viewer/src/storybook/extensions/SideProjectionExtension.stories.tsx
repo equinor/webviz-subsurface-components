@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
+import { GeoJsonLayer } from "@deck.gl/layers";
 import type { Feature } from "geojson";
-import { GeoJsonLayer } from "@deck.gl/layers/typed";
 
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 
-import AxesLayer from "../../layers/axes/axesLayer";
 import { SideProjectionExtension } from "../../extensions//side-projection-extension";
+import AxesLayer from "../../layers/axes/axesLayer";
 
 const stories: Meta = {
     component: SubsurfaceViewer,

@@ -1,22 +1,22 @@
-import type React from "react";
 import { isEqual } from "lodash";
+import type React from "react";
 
-import type { Color } from "@deck.gl/core/typed";
-import { CompositeLayer } from "@deck.gl/core/typed";
-import { load, JSONLoader } from "@loaders.gl/core";
+import type { Color } from "@deck.gl/core";
+import { CompositeLayer } from "@deck.gl/core";
+import { JSONLoader, load } from "@loaders.gl/core";
 
 import workerpool from "workerpool";
 
 import type { Material } from "./typeDefs";
 import PrivateLayer from "./privateGrid3dLayer";
 import type {
-    ExtendedLayerProps,
-    colorMapFunctionType,
-} from "../utils/layerTools";
-import type {
     BoundingBox3D,
     ReportBoundingBoxAction,
 } from "../../components/Map";
+import type {
+    ExtendedLayerProps,
+    colorMapFunctionType,
+} from "../utils/layerTools";
 import { makeFullMesh } from "./webworker";
 
 import config from "../../SubsurfaceConfig.json";
@@ -257,7 +257,8 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
             subLayers.length > 0 &&
             subLayers.every((layer) => layer.isLoaded);
 
-        const isFinished = this.state?.["isFinishedLoading"] ?? false;
+        const isFinished =
+            (this.state?.["isFinishedLoading"] as boolean) ?? false;
         return isLoaded && isFinished;
     }
 
@@ -386,7 +387,7 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
     }
 
     private getPropertyValueRange(): [number, number] {
-        const bbox = this.state["bbox"];
+        const bbox = this.state["bbox"] as BoundingBox3D;
         const zSign = this.props.ZIncreasingDownwards ? -1.0 : 1.0;
         switch (this.props.coloringMode) {
             case TGrid3DColoringMode.X:
@@ -396,7 +397,7 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
             case TGrid3DColoringMode.Z:
                 return [zSign * bbox[2], zSign * bbox[5]];
             default:
-                return this.state["propertyValueRange"];
+                return this.state["propertyValueRange"] as [number, number];
         }
     }
 

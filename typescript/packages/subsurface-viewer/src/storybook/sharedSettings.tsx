@@ -2,13 +2,13 @@ import React from "react";
 
 import { styled } from "@mui/material/styles";
 
-import type { BoundingBox2D } from "../utils/BoundingBox2D";
-import type { BoundingBox3D } from "../utils/BoundingBox3D";
 import type { SubsurfaceViewerProps } from "../SubsurfaceViewer";
 import SubsurfaceViewer from "../SubsurfaceViewer";
+import type { BoundingBox2D } from "../utils/BoundingBox2D";
+import type { BoundingBox3D } from "../utils/BoundingBox3D";
 
+import type { GeoJsonLayerProps } from "@deck.gl/layers";
 import exampleData from "../../../../../example-data/deckgl-map.json";
-import type { GeoJsonLayerProps } from "@deck.gl/layers/typed";
 
 export const defaultStoryParameters = {
     docs: {

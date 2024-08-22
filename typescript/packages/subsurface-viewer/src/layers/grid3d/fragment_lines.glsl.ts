@@ -7,13 +7,6 @@ precision highp float;
 out vec4 fragColor;
 
 void main(void) {
-  
-  // Picking pass.
-  if (picking_uActive) {
-    discard;
-    return;
-  }
-
   fragColor = vec4(0.0, 0.0, 0.0, 1.0);
 }
 `;

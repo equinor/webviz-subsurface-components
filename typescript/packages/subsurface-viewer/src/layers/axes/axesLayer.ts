@@ -1,22 +1,22 @@
 import type {
     Color,
-    Viewport,
-    UpdateParameters,
     LayersList,
-} from "@deck.gl/core/typed";
+    UpdateParameters,
+    Viewport,
+} from "@deck.gl/core";
 import {
     COORDINATE_SYSTEM,
     CompositeLayer,
     OrthographicViewport,
-} from "@deck.gl/core/typed";
-import BoxLayer from "./boxLayer";
-import type { Position3D, ExtendedLayerProps } from "../utils/layerTools";
+} from "@deck.gl/core";
+import { TextLayer } from "@deck.gl/layers";
+import { cloneDeep } from "lodash";
 import type {
     BoundingBox3D,
     ReportBoundingBoxAction,
 } from "../../components/Map";
-import { TextLayer } from "@deck.gl/layers/typed";
-import { cloneDeep } from "lodash";
+import type { ExtendedLayerProps, Position3D } from "../utils/layerTools";
+import BoxLayer from "./boxLayer";
 
 export interface AxesLayerProps extends ExtendedLayerProps {
     /**
@@ -184,7 +184,10 @@ export default class AxesLayer extends CompositeLayer<AxesLayerProps> {
         const is_orthographic =
             this.context.viewport.constructor === OrthographicViewport;
 
-        const lines = [...this.state["box_lines"], ...this.state["tick_lines"]];
+        const boxLines = this.state["box_lines"] as number[];
+        const tickLines = this.state["tick_lines"] as number[];
+
+        const lines = [...boxLines, ...tickLines];
 
         const box_layer = new BoxLayer(
             this.getSubLayerProps({
