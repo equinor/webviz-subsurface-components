@@ -1,5 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
-
 import React from "react";
 import type { Unit } from "convert-units";
 import convert from "convert-units";
@@ -21,12 +19,12 @@ const roundToStep = function (num: number, step: number) {
     return Math.floor(num / step + 0.5) * step;
 };
 
-const DistanceScale: React.FC<ScaleProps> = ({
-    zoom,
-    incrementValue,
-    widthPerUnit,
-    style,
-    scaleUnit,
+export const DistanceScale: React.FC<ScaleProps> = ({
+    zoom = -3,
+    incrementValue = 100,
+    widthPerUnit = 100,
+    style = { top: 10, left: 10 },
+    scaleUnit = "m",
 }: ScaleProps) => {
     if (!zoom || !widthPerUnit || !incrementValue || !scaleUnit) return null;
 
@@ -74,12 +72,3 @@ const DistanceScale: React.FC<ScaleProps> = ({
         </div>
     );
 };
-
-DistanceScale.defaultProps = {
-    zoom: -3,
-    incrementValue: 100,
-    widthPerUnit: 100,
-    scaleUnit: "m",
-};
-
-export default DistanceScale;
