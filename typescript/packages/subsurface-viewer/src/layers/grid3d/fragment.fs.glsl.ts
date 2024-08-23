@@ -25,13 +25,13 @@ uniform float colorMapSize;
 uniform lowp int coloringMode;
 
 uniform vec3 colorMapClampColor;
+uniform vec3 undefinedPropertyColor;
 uniform bool isClampColor;
 uniform bool isColorMapClampColorTransparent;
 
 vec4 getContinuousPropertyColor (float propertyValue) {
-
+   
    vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
-
    float x = (propertyValue - colorMapRangeMin) / (colorMapRangeMax - colorMapRangeMin);
    if (x < 0.0 || x > 1.0) {
       // Out of range. Use clampcolor.
@@ -96,13 +96,18 @@ void main(void) {
       fragColor = encodeVertexIndexToRGB(vertexIndex);      
       return;
    }
-   
+
+   if (coloringMode == 0 && isnan(property)) {
+      fragColor = vec4(undefinedPropertyColor.rgb, 1.0); 
+      return;
+   } 
+       
    // Property values other than X,Y or Z are passed as "flat" i.e. constant over faces.
    float propertyValue = coloringMode == 0 ? property : property_interpolated;
    propertyValue = clamp(propertyValue, valueRangeMin, valueRangeMax);
 
    vec4 color = getPropertyColor(propertyValue);
-   
+
    // Use two sided phong lighting. This has no effect if "material" property is not set.
    vec3 lightColor = getPhongLightColor(color.rgb, cameraPosition, position_commonspace.xyz, normal);
    fragColor = vec4(lightColor, 1.0);
