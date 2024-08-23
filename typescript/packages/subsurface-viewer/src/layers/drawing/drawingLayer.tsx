@@ -1,30 +1,30 @@
 import type {
-    Color,
-    PickingInfo,
-    LayerContext,
-    LayersList,
-} from "@deck.gl/core/typed";
-import { COORDINATE_SYSTEM, CompositeLayer } from "@deck.gl/core/typed";
-import type { ExtendedLayerProps, LayerPickInfo } from "../utils/layerTools";
-import type {
     EditAction,
     Feature,
     FeatureCollection,
     GeoJsonEditMode,
     ModeProps,
-} from "@nebula.gl/edit-modes";
+} from "@deck.gl-community/editable-layers";
 import {
     DrawLineStringMode,
     DrawPointMode,
     DrawPolygonMode,
+    EditableGeoJsonLayer,
     ImmutableFeatureCollection,
     ModifyMode,
     TransformMode,
     ViewMode,
-} from "@nebula.gl/edit-modes";
-import { EditableGeoJsonLayer } from "@nebula.gl/layers";
+} from "@deck.gl-community/editable-layers";
+import type {
+    Color,
+    LayerContext,
+    LayersList,
+    PickingInfo,
+} from "@deck.gl/core";
+import { COORDINATE_SYSTEM, CompositeLayer } from "@deck.gl/core";
 import type { DeckGLLayerContext } from "../../components/Map";
 import { area, length } from "../../utils/measurement";
+import type { ExtendedLayerProps, LayerPickInfo } from "../utils/layerTools";
 
 // Custom drawing mode that deletes the selected GeoJson feature when releasing the Delete key.
 class CustomModifyMode extends ModifyMode {
@@ -154,9 +154,9 @@ export default class DrawingLayer extends CompositeLayer<DrawingLayerProps> {
         if (!info.object) return info;
         const feature = info.object;
         let measurement;
-        if (feature.geometry.type === "LineString") {
+        if (feature.geometry?.type === "LineString") {
             measurement = length(feature);
-        } else if (feature.geometry.type === "Polygon") {
+        } else if (feature.geometry?.type === "Polygon") {
             measurement = area(feature);
         } else return info;
         return {
@@ -212,8 +212,12 @@ export default class DrawingLayer extends CompositeLayer<DrawingLayerProps> {
     // Return the line color based on the selection status.
     // The same can be done for other features (polygons, points etc).
     _getLineColor(feature: Feature): Color {
-        const is_feature_selected = this.state["selectedFeatureIndexes"].some(
-            (i: number) => this.state["data"].features[i] === feature
+        const selectedFeatureIndexes = this.state[
+            "selectedFeatureIndexes"
+        ] as number[];
+        const data = this.state["data"] as FeatureCollection;
+        const is_feature_selected = selectedFeatureIndexes.some(
+            (i: number) => (data.features[i] as unknown as Feature) === feature
         );
         if (is_feature_selected) {
             return SELECTED_LINE_COLOR;
@@ -245,7 +249,6 @@ export default class DrawingLayer extends CompositeLayer<DrawingLayerProps> {
             },
         });
 
-        // @ts-expect-error: EditableGeoJsonLayer from nebula.gl has no typing
         return [new EditableGeoJsonLayer(sub_layer_props)];
     }
 }

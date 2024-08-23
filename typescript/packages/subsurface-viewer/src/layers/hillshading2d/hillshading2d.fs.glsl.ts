@@ -1,10 +1,11 @@
-const fsHillshading = `#define SHADER_NAME hillshading2d-shader
+const fsHillshading = `#version 300 es
+#define SHADER_NAME hillshading2d-shader
 
-#ifdef GL_ES
 precision highp float;
-#endif
 
-varying vec2 vTexCoord;
+in vec2 vTexCoord;
+
+out vec4 fragColor;
 
 uniform sampler2D bitmapTexture; // Property map
 uniform vec2 bitmapResolution;
@@ -20,8 +21,9 @@ uniform float opacity;
 vec3 normal(float val) {
   vec2 dr = 1.0 / bitmapResolution;
   float p0 = valueRangeSize * val;
-  float px = valueRangeSize * decode_rgb2float(texture2D(bitmapTexture, vTexCoord + vec2(1.0, 0.0) / bitmapResolution).rgb);
-  float py = valueRangeSize * decode_rgb2float(texture2D(bitmapTexture, vTexCoord + vec2(0.0, 1.0) / bitmapResolution).rgb);
+
+  float px = valueRangeSize * decode_rgb2float(texture(bitmapTexture, vTexCoord + vec2(1.0, 0.0) / bitmapResolution).rgb);
+  float py = valueRangeSize * decode_rgb2float(texture(bitmapTexture, vTexCoord + vec2(0.0, 1.0) / bitmapResolution).rgb);
   vec3 dx = vec3(1.0, 0.0, px - p0);
   vec3 dy = vec3(0.0, 1.0, py - p0);
 
@@ -35,11 +37,11 @@ float shadow(vec3 normal) {
 }
 
 void main(void) {
-  vec4 bitmapColor = texture2D(bitmapTexture, vTexCoord);
+  vec4 bitmapColor = texture(bitmapTexture, vTexCoord);
 
   // If it's a picking pass, we just return the raw property map value.
-  if (picking_uActive) {
-    gl_FragColor = bitmapColor;
+  if (picking.isActive > 0.5) {
+    fragColor = bitmapColor;
     return;
   }
 
@@ -52,10 +54,10 @@ void main(void) {
   // opacity 0 if pixel is completely in the light, opacity 1 if pixel is completely in the shadow.
   // The property map opacity (some portions of the property map can be transparent) and
   // the user provided image-wide opacity value are also taken into account.
-  gl_FragColor = vec4(vec3(0.0), (1.0-shadow) * bitmapColor.a * opacity);
+  fragColor = vec4(vec3(0.0), (1.0-shadow) * bitmapColor.a * opacity);
 
   geometry.uv = vTexCoord;
-  DECKGL_FILTER_COLOR(gl_FragColor, geometry);
+  DECKGL_FILTER_COLOR(fragColor, geometry);
 }
 `;
 

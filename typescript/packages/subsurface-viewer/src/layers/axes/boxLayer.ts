@@ -1,11 +1,10 @@
-import type { Color, UpdateParameters } from "@deck.gl/core/typed";
-import { COORDINATE_SYSTEM, Layer, project } from "@deck.gl/core/typed";
-import GL from "@luma.gl/constants";
-import { Model, Geometry } from "@luma.gl/engine";
-import fragmentShader from "./axes-fragment.glsl";
-import gridVertex from "./grid-vertex.glsl";
+import type { Color, UpdateParameters } from "@deck.gl/core";
+import { COORDINATE_SYSTEM, Layer, project } from "@deck.gl/core";
+import { Geometry, Model } from "@luma.gl/engine";
 import type { DeckGLLayerContext } from "../../components/Map";
 import type { ExtendedLayerProps } from "../utils/layerTools";
+import fragmentShader from "./axes-fragment.glsl";
+import gridVertex from "./grid-vertex.glsl";
 
 export interface BoxLayerProps extends ExtendedLayerProps {
     lines: [number]; // from pt , to pt.
@@ -22,8 +21,7 @@ const defaultProps = {
 
 export default class BoxLayer extends Layer<BoxLayerProps> {
     initializeState(context: DeckGLLayerContext): void {
-        const { gl } = context;
-        this.setState(this._getModels(gl));
+        this.setState(this._getModels(context.device));
     }
 
     shouldUpdateState(): boolean {
@@ -31,8 +29,7 @@ export default class BoxLayer extends Layer<BoxLayerProps> {
     }
 
     updateState({ context }: UpdateParameters<this>): void {
-        const { gl } = context;
-        this.setState(this._getModels(gl));
+        this.setState(this._getModels(context.device));
     }
 
     //eslint-disable-next-line
@@ -44,7 +41,7 @@ export default class BoxLayer extends Layer<BoxLayerProps> {
             fs: fragmentShader,
             uniforms: { uColor: color },
             geometry: new Geometry({
-                drawMode: GL.LINES,
+                topology: "line-list",
                 attributes: {
                     positions: new Float32Array(this.props.lines),
                 },

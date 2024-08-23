@@ -1,9 +1,8 @@
-import type { Color } from "@deck.gl/core/typed";
-import { COORDINATE_SYSTEM, CompositeLayer } from "@deck.gl/core/typed";
-import type { GeoJsonLayerProps } from "@deck.gl/layers/typed";
-import { GeoJsonLayer } from "@deck.gl/layers/typed";
+import type { Color } from "@deck.gl/core";
+import { COORDINATE_SYSTEM, CompositeLayer } from "@deck.gl/core";
+import type { GeoJsonLayerProps } from "@deck.gl/layers";
+import { GeoJsonLayer } from "@deck.gl/layers";
 import type { Feature } from "geojson";
-import GL from "@luma.gl/constants";
 
 const getColor = (d: Feature): Color => {
     const c: Color = d?.properties?.["color"];
@@ -44,7 +43,7 @@ export default class FaultPolygonsLayer extends CompositeLayer<FaultPolygonsLaye
                     d?.properties?.["color"] ?? [0, 0, 0, 255],
                 getFillColor: getColor,
                 parameters: {
-                    [GL.DEPTH_TEST]: this.props.depthTest,
+                    depthTest: this.props.depthTest,
                 },
             })
         );

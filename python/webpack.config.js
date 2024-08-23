@@ -52,6 +52,12 @@ module.exports = function (env, argv) {
         module: {
             rules: [
                 {
+                    test: /\.m?js/,
+                    resolve: {
+                        fullySpecified: false,
+                    },
+                },
+                {
                     test: /\.(t|j)sx?$/,
                     use: [
                         {
