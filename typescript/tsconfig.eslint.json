@@ -19,9 +19,6 @@
         "docs",
         "example-data",
         "node_modules",
-        "src/storybook",
-        "src/test",
-        "./storybook",
         "./package-lock.json"
     ]
 }

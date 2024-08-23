@@ -1,7 +1,9 @@
+// @ts-expect-error TS7016
 import { toMatchImageSnapshot } from "jest-image-snapshot";
 
 import { getStoryContext, type TestRunnerConfig } from "@storybook/test-runner";
 
+// @ts-expect-error TS7006
 const screenshotTest = async (page, context) => {
     let previousScreenshot: Buffer = Buffer.from("");
 
@@ -22,6 +24,7 @@ const screenshotTest = async (page, context) => {
         }
     }
 
+    // @ts-expect-error TS2551
     expect(previousScreenshot).toMatchImageSnapshot({
         customSnapshotIdentifier: context.id,
     });

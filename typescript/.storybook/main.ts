@@ -86,6 +86,7 @@ const config: StorybookConfig = {
 };
 export default config;
 
+// @ts-expect-error TS7006
 function getAbsolutePath(value) {
     return dirname(require.resolve(join(value, "package.json")));
 }

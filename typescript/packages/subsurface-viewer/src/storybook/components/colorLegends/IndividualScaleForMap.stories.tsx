@@ -20,6 +20,7 @@ const stories: Meta = {
 export default stories;
 
 // Template for when edited data needs to be captured.
+// @ts-expect-error TS7006
 const EditDataTemplate = (args) => {
     const [editedData, setEditedData] = React.useState(args.editedData);
     React.useEffect(() => {
@@ -30,6 +31,7 @@ const EditDataTemplate = (args) => {
             {...args}
             editedData={editedData}
             setProps={(updatedProps) => {
+                // @ts-expect-error TS4111
                 setEditedData(updatedProps.editedData);
             }}
         >

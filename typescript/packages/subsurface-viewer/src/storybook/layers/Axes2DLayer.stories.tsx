@@ -147,9 +147,17 @@ const MatrixStory = () => {
             views={views}
             bounds={hugin2DBounds}
         >
+            {/*
+             // @ts-expect-error TS2786 */}
             {<View id="view_1"></View>}
+            {/*
+             // @ts-expect-error TS2786 */}
             {<View id="view_2"></View>}
+            {/*
+             // @ts-expect-error TS2786 */}
             {<View id="view_3"></View>}
+            {/*
+             // @ts-expect-error TS2786 */}
             {<View id="view_4"></View>}
         </SubsurfaceViewer>
     );

@@ -289,12 +289,16 @@ function replaceLayerArrays(
     layer: TLayerDefinition,
     keys: string[] | undefined = undefined
 ) {
+    // @ts-expect-error TS7053
     const layerId = layer?.["id"] as string | undefined;
+    // @ts-expect-error TS7053
     if (layer && layerId && layerArrays[layerId]) {
         if (!keys) {
+            // @ts-expect-error TS7053
             keys = Object.keys(layerArrays[layerId]) as string[];
         }
         for (const key of keys) {
+            // @ts-expect-error TS7053
             layer[key] = layerArrays[layerId][key];
         }
     }
@@ -380,6 +384,7 @@ export const CustomColorFuncWithClamping: StoryObj<typeof SubsurfaceViewer> = {
                     layerArrays[discretePropsLayerId].propertiesData,
                 colorMapName: "Seismic",
                 ZIncreasingDownwards: true,
+                // @ts-expect-error TS7006
                 colorMapFunction: function (v) {
                     return [255 * v, 0, 255 * (1 - v)];
                 },

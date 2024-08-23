@@ -16,11 +16,14 @@ export default {
 };
 
 // Template for when edited data needs to be captured.
+// @ts-expect-error TS7006
 const StoryTemplate = (args) => {
     return <SubsurfaceViewer {...args} />;
 };
 
+// @ts-expect-error TS2555
 export const WellsLayerValidation = StoryTemplate.bind();
+// @ts-expect-error TS2339
 WellsLayerValidation.args = {
     ...exampleData[0],
     layers: [
@@ -39,7 +42,9 @@ WellsLayerValidation.args = {
     checkDatafileSchema: true,
 };
 
+// @ts-expect-error TS2555
 export const PieLayerValidation = StoryTemplate.bind();
+// @ts-expect-error TS2339
 PieLayerValidation.args = {
     ...exampleData[0],
     layers: [
@@ -51,7 +56,9 @@ PieLayerValidation.args = {
     checkDatafileSchema: true,
 };
 
+// @ts-expect-error TS2555
 export const GridLayerValidation = StoryTemplate.bind();
+// @ts-expect-error TS2339
 GridLayerValidation.args = {
     ...exampleData[0],
     layers: [
@@ -64,7 +71,9 @@ GridLayerValidation.args = {
     checkDatafileSchema: true,
 };
 
+// @ts-expect-error TS2555
 export const FaultPolygonsValidation = StoryTemplate.bind();
+// @ts-expect-error TS2339
 FaultPolygonsValidation.args = {
     ...exampleData[0],
     layers: [
@@ -76,7 +85,9 @@ FaultPolygonsValidation.args = {
     checkDatafileSchema: true,
 };
 
+// @ts-expect-error TS2555
 export const ColorTableValidation = StoryTemplate.bind();
+// @ts-expect-error TS2339
 ColorTableValidation.args = {
     ...exampleData[0],
     layers: [

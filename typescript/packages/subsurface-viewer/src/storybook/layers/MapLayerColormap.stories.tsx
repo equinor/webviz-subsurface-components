@@ -7,6 +7,7 @@ import { styled } from "@mui/material/styles";
 
 import { View } from "@deck.gl/core";
 
+// @ts-expect-error TS6133
 import type { ColorLegendProps } from "@emerson-eps/color-tables";
 import {
     ColorLegend,
@@ -166,6 +167,7 @@ export const DefaultColorScale: StoryObj<typeof SubsurfaceViewer> = {
 };
 
 const BreakpointColorMapComponent: React.FC<
+    // @ts-expect-error TS2709
     SubsurfaceViewerProps & ColorLegendProps
 > = (props) => {
     const [breakpoint, setBreakpoint] = React.useState<number>(0.5);
