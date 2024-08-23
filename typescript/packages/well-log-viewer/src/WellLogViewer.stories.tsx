@@ -291,7 +291,7 @@ export const Default: StoryObj<typeof StoryTemplate> = {
     render: (args) => <StoryTemplate {...args} />,
 };
 
-export const ColorFunc: StoryObj<typeof StoryTemplate> = {
+export const ColorByFunctionTBD: StoryObj<typeof StoryTemplate> = {
     args: {
         id: "Well-Log-Viewer",
         horizontal: false,
@@ -317,9 +317,9 @@ export const ColorFunc: StoryObj<typeof StoryTemplate> = {
             styles: [
                 {
                     name: "HKL",
-                    type: "gradientfill",
-                    //colorTable: (value: number) => value < 100 ? [1, 0, 0] : [[0, 1, 1]],
-                    colorTable: "Physics",
+                    type: "gradientfill", // Is this the correct type for using color function?
+                    colorTable: (value: number) =>
+                        value < 100 ? [1, 0, 0] : [[0, 1, 1]],
                     color: "green",
                 },
             ],
