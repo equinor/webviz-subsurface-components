@@ -54,6 +54,8 @@ export interface PrivateLayerProps extends ExtendedLayerProps {
     colorMapName: string;
     colorMapRange: [number, number];
     colorMapClampColor: Color | undefined | boolean;
+    undefinedPropertyValue: number;
+    undefinedPropertyColor: [number, number, number];
     colorMapFunction?: colorMapFunctionType;
     coloringMode: TGrid3DColoringMode.Property;
     gridLines: boolean;
@@ -79,6 +81,7 @@ interface IPropertyUniforms {
     colorMapRangeMin: number;
     colorMapRangeMax: number;
     colorMapClampColor?: Color | undefined | boolean | number[];
+    undefinedPropertyColor: [number, number, number];
     isColorMapClampColorTransparent: boolean;
     isClampColor: boolean;
     isColoringDiscrete: boolean;
@@ -360,6 +363,7 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             valueRangeMax,
             colorMapRangeMin,
             colorMapRangeMax,
+            undefinedPropertyColor: this.props.undefinedPropertyColor,
             ...(colorMapClampColor ? { colorMapClampColor } : {}),
             isColorMapClampColorTransparent,
             isClampColor,
