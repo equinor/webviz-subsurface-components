@@ -26,6 +26,7 @@ import { onTrackMouseEventDefault } from "./utils/edit-track";
 import { CallbackManager } from "./components/CallbackManager";
 
 import type { InfoOptions } from "./components/InfoTypes";
+import { LogViewer } from "@equinor/videx-wellog";
 
 export interface WellLogViewerProps extends WellLogViewWithScrollerProps {
     readoutOptions?: InfoOptions; // options for readout
@@ -119,6 +120,11 @@ export default class WellLogViewer extends Component<
         this.callbackManager.onChangePrimaryAxis(value);
     }
 
+    onInfo(x: number, logController: LogViewer, iFrom: number, iTo: number) {
+        this.callbackManager.onInfo(x, logController, iFrom, iTo);
+        this.props.onInfo?.(x, logController, iFrom, iTo);
+    }
+
     componentDidMount(): void {
         this.onContentRescale();
         const controller = this.callbackManager?.controller;
@@ -204,7 +210,7 @@ export default class WellLogViewer extends Component<
                         primaryAxis={this.state.primaryAxis}
                         options={this.props.options}
                         // callbacks
-                        onInfo={this.callbackManager.onInfo}
+                        onInfo={this.onInfo}
                         onCreateController={this.onCreateController}
                         onTrackMouseEvent={
                             this.props.onTrackMouseEvent ||
