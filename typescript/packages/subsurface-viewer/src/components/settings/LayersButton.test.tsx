@@ -13,7 +13,9 @@ import exampleData from "../../../../../../example-data/deckgl-map.json";
 // Ensure layers have an id (which is not stored un the example data) to avoid react error messages
 const testLayers: Record<string, unknown>[] = exampleData[0].layers.map(
     (layer) => {
+        // @ts-expect-error TS7053
         if (layer["id"] === undefined) {
+            // @ts-expect-error TS7053
             layer["id"] = layer["@@type"];
         }
         return layer;

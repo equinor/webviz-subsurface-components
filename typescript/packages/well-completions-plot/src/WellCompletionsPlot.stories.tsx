@@ -27,6 +27,7 @@ const stories: Meta = {
 };
 export default stories;
 
+// @ts-expect-error TS7006
 const Template = (data) => {
     const [plotData, setPlotData] = React.useState<PlotData>(data.plotData);
     const [timeSteps, setTimeSteps] = React.useState<string[]>(data.timeSteps);

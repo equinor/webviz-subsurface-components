@@ -11,6 +11,7 @@ import { ToggleButton } from "@mui/material";
 
 import SyncLogViewer, { argTypesSyncLogViewerProp } from "./SyncLogViewer";
 import type {
+    // @ts-expect-error TS2614
     WellLogView,
     WellLogController,
     TrackMouseEvent,
@@ -38,6 +39,7 @@ import type { WellLog } from "./components/WellLogTypes";
 import { axisMnemos, axisTitles } from "./utils/axes";
 
 const stories: Meta = {
+    // @ts-expect-error TS2322
     component: SyncLogViewer,
     title: "WellLogViewer/Demo/SyncLogViewer",
     parameters: {
@@ -156,9 +158,11 @@ function fillInfo(controller: WellLogController | undefined) {
     );
 }
 
+// @ts-expect-error TS7006
 const Template = (args) => {
     const infoRef = React.useRef();
     const setInfo = function (info: string) {
+        // @ts-expect-error TS2339
         if (infoRef.current) infoRef.current.innerHTML = info;
     };
 
@@ -167,12 +171,14 @@ const Template = (args) => {
     ); // all WellLogs
 
     const onCreateController = React.useCallback(
+        // @ts-expect-error TS6133
         (iWellLog: number, controller: WellLogController) => {
             setControllers((prev) => [...prev, controller]);
         },
         []
     );
     const onDeleteController = React.useCallback(
+        // @ts-expect-error TS6133
         (iWellLog: number, controller: WellLogController) => {
             setControllers((prev) => prev.filter((c) => c !== controller));
         },
@@ -201,7 +207,9 @@ const Template = (args) => {
     };
     /* eslint-disable */ // no-unused-vars
     function onTrackMouseEventCustom(
+        // @ts-expect-error TS6133
         wellLogView: WellLogView,
+        // @ts-expect-error TS6133
         ev: TrackMouseEvent
     ): void {
         //custom function to disable the context menu
@@ -225,6 +233,8 @@ const Template = (args) => {
             </div>
             {/* Print info for the first WellLog */}
             <div style={{ display: "flex", flexDirection: "row" }}>
+                {/*
+                 // @ts-expect-error TS2322 */}
                 <div ref={infoRef}></div>
                 <label style={{ marginLeft: 10 }}>disable context menu</label>
                 <input
@@ -435,6 +445,7 @@ const iconStyle = {
     paddingRight: "4px",
 };
 export const CustomLayout = Template.bind({});
+// @ts-expect-error TS2339
 CustomLayout.args = {
     ...Default.args,
     wellpicks: undefined,
@@ -506,6 +517,7 @@ CustomLayout.args = {
         header: "Customized layout example",
     },
 };
+// @ts-expect-error TS2339
 CustomLayout.parameters = {
     docs: {
         description: {
@@ -526,12 +538,14 @@ const TemplateWithSelection = (args: { welllogs: WellLog[] }) => {
     ); // all WellLogs
 
     const onCreateController = React.useCallback(
+        // @ts-expect-error TS6133
         (iWellLog: number, controller: WellLogController) => {
             setControllers((prev) => [...prev, controller]);
         },
         []
     );
     const onDeleteController = React.useCallback(
+        // @ts-expect-error TS6133
         (iWellLog: number, controller: WellLogController) => {
             setControllers((prev) => prev.filter((c) => c !== controller));
         },
@@ -594,6 +608,8 @@ const TemplateWithSelection = (args: { welllogs: WellLog[] }) => {
                 </button>
             </div>
             <div style={{ width: "100%", height: "100%", flex: 1 }}>
+                {/*
+                 // @ts-expect-error TS2739 */}
                 <SyncLogViewer
                     id="SyncLogViewer"
                     {...argsWithSelection}

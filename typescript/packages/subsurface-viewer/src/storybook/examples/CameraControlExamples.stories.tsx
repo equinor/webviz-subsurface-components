@@ -84,6 +84,7 @@ const SQUARE = {
 
 const SQUARE_GEOMETRY_LAYER = new GeoJsonLayer({
     ...customLayerWithPolygonDataProps,
+    // @ts-expect-error TS2322
     data: SQUARE,
 });
 
