@@ -94,7 +94,18 @@ export interface SubsurfaceViewerProps {
     };
     coordinateUnit?: Unit;
     colorTables?: colorTablesArray;
+
+    /**
+     * @deprecated Used by layers to propagate state to component, eg. selected
+     * wells from the Wells layer. Use client code to handle layer state
+     * instead.
+     */
     editedData?: Record<string, unknown>;
+    /**
+     * @deprecated Used by layers to propagate state to component, eg. selected
+     * wells from the Wells layer. Use client code to handle layer state
+     * instead.
+     */
     setProps?: (data: Record<string, unknown>) => void;
 
     /**

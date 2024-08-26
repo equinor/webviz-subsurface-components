@@ -310,12 +310,16 @@ export interface MapProps {
     colorTables?: colorTablesArray;
 
     /**
-     * Prop containing edited data from layers
+     * @deprecated Used by layers to propagate state to component, eg. selected
+     * wells from the Wells layer. Use client code to handle layer state
+     * instead.
      */
     editedData?: Record<string, unknown>;
 
     /**
-     * For reacting to prop changes
+     * @deprecated Used by layers to propagate state to component, eg. selected
+     * wells from the Wells layer. Use client code to handle layer state
+     * instead.
      */
     setEditedData?: (data: Record<string, unknown>) => void;
 
