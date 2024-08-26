@@ -317,6 +317,7 @@ export const ColorByFunctionTBD: StoryObj<typeof StoryTemplate> = {
                     title: "Multiple",
                     width: 6,
                     plots: [
+                        // @ts-expect-error TS2739
                         {
                             name: "HKLA",
                             style: "HKL",
@@ -328,13 +329,16 @@ export const ColorByFunctionTBD: StoryObj<typeof StoryTemplate> = {
                 {
                     name: "HKL",
                     type: "gradientfill", // Is this the correct type for using color function?
+                    // @ts-expect-error TS2322
                     colorTable: (value: number) =>
                         value < 100 ? [1, 0, 0] : [[0, 1, 1]],
                     color: "green",
                 },
             ],
         },
+        // @ts-expect-error TS2322
         colorTables: colorTables,
+        // @ts-expect-error TS2322
         wellpick: wellpick,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
