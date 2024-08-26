@@ -291,6 +291,56 @@ export const Default: StoryObj<typeof StoryTemplate> = {
     render: (args) => <StoryTemplate {...args} />,
 };
 
+export const ColorByFunctionTBD: StoryObj<typeof StoryTemplate> = {
+    args: {
+        id: "Well-Log-Viewer",
+        horizontal: false,
+        welllog: require("../../../../example-data/L898MUD.json")[0], // eslint-disable-line
+        template: {
+            name: "Template 1",
+            scale: {
+                primary: "md",
+                allowSecondary: true,
+            },
+            tracks: [
+                {
+                    title: "Multiple",
+                    width: 6,
+                    plots: [
+                        {
+                            name: "HKLA",
+                            style: "HKL",
+                        },
+                    ],
+                },
+            ],
+            styles: [
+                {
+                    name: "HKL",
+                    type: "gradientfill", // Is this the correct type for using color function?
+                    colorTable: (value: number) =>
+                        value < 100 ? [1, 0, 0] : [[0, 1, 1]],
+                    color: "green",
+                },
+            ],
+        },
+        colorTables: colorTables,
+        wellpick: wellpick,
+        axisTitles: axisTitles,
+        axisMnemos: axisMnemos,
+        viewTitle: true, // show default welllog view title (a wellname from the welllog)
+        domain: [2500, 4000],
+        selection: [3500, 3700],
+        options: {
+            hideTrackTitle: false,
+            hideTrackLegend: false,
+            hideCurrentPosition: false,
+            hideSelectionInterval: false,
+        },
+    },
+    render: (args) => <StoryTemplate {...args} />,
+};
+
 export const Horizontal: StoryObj<typeof StoryTemplate> = {
     args: {
         id: "Well-Log-Viewer-Horizontal",
