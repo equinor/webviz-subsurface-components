@@ -381,7 +381,7 @@ const Map: React.FC<MapProps> = ({
     triggerHome,
     views = DEFAULT_VIEWS,
     coords = { visible: true, multiPicking: true, pickDepth: 10 },
-    scale = { visible: true },
+    scale = { visible: true, cssStyle: { top: 10, left: 10 } },
     coordinateUnit = "m",
     colorTables = defaultColorTables,
     setEditedData,

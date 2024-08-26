@@ -23,7 +23,7 @@ export const DistanceScale: React.FC<ScaleProps> = ({
     zoom = -3,
     incrementValue = 100,
     widthPerUnit = 100,
-    style = { top: 10, left: 10 },
+    style,
     scaleUnit = "m",
 }: ScaleProps) => {
     if (!zoom || !widthPerUnit || !incrementValue || !scaleUnit) return null;
