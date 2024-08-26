@@ -17,6 +17,7 @@ const ComponentCode =
 import { axisTitles, axisMnemos } from "../utils/axes";
 
 const stories: Meta = {
+    // @ts-expect-error TS2322
     component: WellLogViewWithScroller,
     title: "WellLogViewer/Components/WellLogViewWithScroller",
     parameters: {
@@ -51,6 +52,7 @@ const stories: Meta = {
 };
 export default stories;
 
+// @ts-expect-error TS7006
 const Template = (args) => {
     return (
         <div

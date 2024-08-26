@@ -51,16 +51,21 @@ const stories: Meta = {
 };
 export default stories;
 
+// @ts-expect-error TS7006
 const Template = (args) => {
     const infoRef = React.useRef();
+    // @ts-expect-error TS7006
     const setInfo = function (info) {
+        // @ts-expect-error TS2339
         if (infoRef.current) infoRef.current.innerHTML = info;
     };
     return (
         <div style={{ height: "92vh" }}>
             <Scroller
                 ref={(el) => {
+                    // @ts-expect-error TS18047
                     el.zoom(10, 10);
+                    // @ts-expect-error TS18047
                     el.scrollTo(0.2, 0.2);
                 }}
                 onScroll={(x, y) => {
@@ -73,6 +78,8 @@ const Template = (args) => {
                     args.onScroll(x, y); // for storybook addon Actions Tab
                 }}
             >
+                {/*
+                 // @ts-expect-error TS2322 */}
                 <div ref={infoRef}></div>
             </Scroller>
         </div>

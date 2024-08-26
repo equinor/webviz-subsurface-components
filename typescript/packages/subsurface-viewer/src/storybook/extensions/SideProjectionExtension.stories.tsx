@@ -152,6 +152,7 @@ export const SideProjection: StoryObj<typeof SubsurfaceViewer> = {
                 id: "axes-layer",
                 bounds: [300, 800, 400, 1300, 1600, 600],
             }),
+            // @ts-expect-error TS2345
             new GeoJsonLayer({
                 ...DEFAULT_LAYER_PROPS,
                 extensions: [new SideProjectionExtension()],

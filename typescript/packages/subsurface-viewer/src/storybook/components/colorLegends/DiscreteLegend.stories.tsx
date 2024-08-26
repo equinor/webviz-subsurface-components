@@ -1,6 +1,7 @@
 import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 
+// @ts-expect-error TS6192
 import type {
     DiscreteCodes,
     colorTablesArray,
@@ -13,6 +14,7 @@ const stories: Meta = {
 };
 export default stories;
 
+// @ts-expect-error TS2709
 const discreteData: DiscreteCodes = {
     Above_BCU: [[255, 13, 186, 255], 0],
     ABOVE: [[255, 64, 53, 255], 1],
@@ -30,6 +32,7 @@ export const DiscreteColorLegendStory: StoryObj<typeof DiscreteColorLegend> = {
         discreteData,
         dataObjectName,
         colorName,
+        // @ts-expect-error TS2709
         colorTables: colorTables as colorTablesArray,
         horizontal,
     },

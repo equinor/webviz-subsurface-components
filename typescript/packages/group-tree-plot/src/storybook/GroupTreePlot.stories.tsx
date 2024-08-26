@@ -34,6 +34,7 @@ export default stories;
  * Storybook test for the group tree plot component
  */
 
+// @ts-expect-error TS7006
 const Template = (args) => {
     return (
         <GroupTreePlot
