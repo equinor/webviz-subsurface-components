@@ -2,7 +2,7 @@ import { render } from "@testing-library/react";
 import "jest-styled-components";
 import "@testing-library/jest-dom";
 import React from "react";
-import DistanceScale from "./DistanceScale";
+import { DistanceScale } from "./DistanceScale";
 
 describe("Test Color Legend", () => {
     it("snapshot test with default props", () => {
