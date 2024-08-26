@@ -262,6 +262,7 @@ export const PolyhedralCells: StoryObj<typeof SubsurfaceViewer> = {
 
 // ---------In-place array data handling (storybook fails to rebuild non JSon data)--------------- //
 const discretePropsLayerId = "discrete_props";
+
 const layerArrays = {
     [discretePropsLayerId]: {
         pointsData: new Float32Array(gridPoints),
@@ -391,6 +392,59 @@ export const CustomColorFuncWithClamping: StoryObj<typeof SubsurfaceViewer> = {
                 material: false,
                 colorMapRange: [3, 10],
                 colorMapClampColor: [100, 100, 100],
+            },
+        ],
+    },
+    parameters: parameters,
+    render: (args) => (
+        <SubsurfaceViewer
+            {...replaceArrays(args, [
+                "pointsData",
+                "polysData",
+                "propertiesData",
+            ])}
+        />
+    ),
+};
+
+export const DiscretePropertyWithUndefinedValues: StoryObj<
+    typeof SubsurfaceViewer
+> = {
+    args: {
+        bounds: [-2500, -2500, 2500, 2500] as NumberQuad,
+        views: {
+            layout: [1, 1] as [number, number],
+            viewports: [
+                {
+                    id: "view_1",
+                    show3D: true,
+                },
+            ],
+        },
+        id: "grid-3d-discrete-props-undef-vals",
+        layers: [
+            {
+                ...axes,
+                id: "discrete-props-undef-vals-axes",
+                bounds: [-2000, -2200, -2200, 2200, 2000, -1000],
+            },
+            {
+                ...grid3dLayer,
+                "@@typedArraySupport": true,
+                id: discretePropsLayerId,
+                coloringMode: TGrid3DColoringMode.Property,
+                colorMapFunction:
+                    layerArrays[discretePropsLayerId].colorMapFunction,
+                discretePropertyValueNames: propertyValueNames,
+                pickable: true,
+                pointsData: layerArrays[discretePropsLayerId].pointsData,
+                polysData: layerArrays[discretePropsLayerId].polysData,
+                propertiesData:
+                    layerArrays[discretePropsLayerId].propertiesData,
+                colorMapName: "Rainbow",
+                ZIncreasingDownwards: true,
+                material: false,
+                undefinedPropertyValue: 4,
             },
         ],
     },
