@@ -87,6 +87,7 @@ export default class WellLogViewer extends Component<
 
         this.onCreateController = this.onCreateController.bind(this);
 
+        this.onInfo = this.onInfo.bind(this);
         this.onContentRescale = this.onContentRescale.bind(this);
         this.onContentSelection = this.onContentSelection.bind(this);
         this.onTemplateChanged = this.onTemplateChanged.bind(this);
