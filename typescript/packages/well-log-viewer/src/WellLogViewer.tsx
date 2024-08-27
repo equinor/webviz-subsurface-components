@@ -19,14 +19,14 @@ import type {
 } from "./components/WellLogView";
 import type WellLogView from "./components/WellLogView";
 
-import { getAvailableAxes } from "./utils/tracks";
+import { getAvailableAxes, toggleId } from "./utils/tracks";
 
 import { onTrackMouseEventDefault } from "./utils/edit-track";
 
 import { CallbackManager } from "./components/CallbackManager";
 
 import type { Info, InfoOptions } from "./components/InfoTypes";
-import { LogViewer } from "@equinor/videx-wellog";
+import type { LogViewer } from "@equinor/videx-wellog";
 import { fillInfos } from "./utils/fill-info";
 
 export interface WellLogViewerProps extends WellLogViewWithScrollerProps {
@@ -66,15 +66,6 @@ export const argTypesWellLogViewerProp = {
     // callbacks...
 };
 
-function toggleId(
-    trackIds: (string | number)[],
-    trackId: string | number
-): void {
-    const i = trackIds.indexOf(trackId);
-    if (i < 0) trackIds.push(trackId);
-    else trackIds.splice(i, 1);
-}
-
 interface State {
     primaryAxis: string; // for WellLogView
 }
@@ -108,6 +99,12 @@ export default class WellLogViewer extends Component<
         this.onInfoGroupClick = this.onInfoGroupClick.bind(this);
 
         this.onChangePrimaryAxis = this.onChangePrimaryAxis.bind(this);
+
+        this.callbackManager.registerCallback(
+            "onInfoGroupClick",
+            this.onInfoGroupClick,
+            true
+        );
 
         if (props.onInfoFilled) {
             this.callbackManager.registerCallback(
@@ -190,8 +187,6 @@ export default class WellLogViewer extends Component<
             this.collapsedTrackIds,
             infoOptions
         );
-
-        console.log(interpolatedData);
 
         this.callbackManager.onInfoFilled(interpolatedData);
     }

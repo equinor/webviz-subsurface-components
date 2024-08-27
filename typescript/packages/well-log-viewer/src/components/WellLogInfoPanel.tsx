@@ -35,6 +35,11 @@ export class WellLogInfoPanel extends Component<Props, State> {
         if (!callbackManager) return;
 
         callbackManager.registerCallback("onInfoFilled", this.onInfoFilled);
+
+        this.onGroupClick = callbackManager.callCallbacks.bind(
+            callbackManager,
+            "onInfoGroupClick"
+        );
     }
     unregisterCallBacks(callbackManager: CallbackManager | undefined): void {
         if (!callbackManager) return;
