@@ -245,6 +245,7 @@ type ViewerTabsProps = SubsurfaceViewerProps & { renderHiddenTabs: boolean };
 const ViewerTabs: React.FC<ViewerTabsProps> = (props: ViewerTabsProps) => {
     const [value, setValue] = React.useState(0);
 
+    // @ts-expect-error TS6133
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
     };

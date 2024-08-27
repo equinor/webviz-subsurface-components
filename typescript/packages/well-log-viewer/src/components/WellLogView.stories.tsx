@@ -21,6 +21,7 @@ const ComponentCode =
 import { axisTitles, axisMnemos } from "../utils/axes";
 
 const stories: Meta = {
+    // @ts-expect-error TS2322
     component: WellLogView,
     title: "WellLogViewer/Components/WellLogView",
     parameters: {
@@ -45,6 +46,7 @@ const stories: Meta = {
 };
 export default stories;
 
+// @ts-expect-error TS7006
 const Template = (args) => {
     return (
         <div style={{ height: "92vh" }}>

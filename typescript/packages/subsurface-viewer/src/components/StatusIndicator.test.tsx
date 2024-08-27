@@ -7,6 +7,7 @@ import StatusIndicator from "./StatusIndicator";
 describe("Test Status Indicator", () => {
     it("snapshot test with no props", () => {
         const { container } = render(
+            // @ts-expect-error TS2322
             <StatusIndicator layers={[]} isLoaded={true} />
         );
         expect(container.firstChild).toMatchSnapshot();
