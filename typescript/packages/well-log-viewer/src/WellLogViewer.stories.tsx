@@ -395,7 +395,7 @@ export const OnInfoFilledEvent: StoryObj<typeof StoryTemplate> = {
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
         viewTitle: true, // show default welllog view title (a wellname from the welllog)
-        layout: { right: false },
+        layout: { right: undefined },
     },
     parameters: {
         docs: {
@@ -407,7 +407,7 @@ export const OnInfoFilledEvent: StoryObj<typeof StoryTemplate> = {
     render: (args) => <StoryTemplateWithCustomPanel {...args} />,
 };
 
-function StoryTemplateWithCustomPanel(args): JSX.Element {
+function StoryTemplateWithCustomPanel(args: unknown[]): JSX.Element {
     const [infos, setInfos] = React.useState<Info[]>([]);
     const [showPanel, setShowPanel] = React.useState<boolean>(false);
 
