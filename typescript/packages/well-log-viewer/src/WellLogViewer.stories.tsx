@@ -390,7 +390,10 @@ export const OnInfoFilledEvent: StoryObj<typeof StoryTemplate> = {
             require("../../../../example-data/WL_RAW_AAC-BHPR-CAL-DEN-GR-MECH-NEU-NMR-REMP_MWD_3.json")[0], // eslint-disable-line
         template: require("../../../../example-data/welllog_template_2.json"), // eslint-disable-line
 
+        // @ts-expect-error TS2322
         colorTables: colorTables,
+        // @ts-expect-error TS2322
+
         wellpick: wellpick,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
@@ -407,7 +410,7 @@ export const OnInfoFilledEvent: StoryObj<typeof StoryTemplate> = {
     render: (args) => <StoryTemplateWithCustomPanel {...args} />,
 };
 
-function StoryTemplateWithCustomPanel(args: unknown[]): JSX.Element {
+function StoryTemplateWithCustomPanel(props: WellLogViewerProps): JSX.Element {
     const [infos, setInfos] = React.useState<Info[]>([]);
     const [showPanel, setShowPanel] = React.useState<boolean>(false);
 
@@ -421,7 +424,7 @@ function StoryTemplateWithCustomPanel(args: unknown[]): JSX.Element {
             onMouseEnter={() => setShowPanel(true)}
             onMouseLeave={() => setShowPanel(false)}
         >
-            <StoryTemplate {...args} onInfoFilled={handleInfoFilled} />
+            <StoryTemplate {...props} onInfoFilled={handleInfoFilled} />
             {showPanel && <CustomInfoPanel infos={infos} />}
         </div>
     );
