@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import React from "react";
+import React, { useEffect } from "react";
 
 import { SimpleMeshLayer } from "@deck.gl/mesh-layers";
 import { SphereGeometry } from "@luma.gl/engine";
@@ -32,6 +32,7 @@ import {
 } from "../sharedSettings";
 
 import { scaleZoom } from "../..";
+import { useHandleRescale, useScaleFactor } from "../../utils/event";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -653,4 +654,47 @@ export const ScaleVertical3d: StoryObj<typeof ScaleVertical3dComponent> = {
         },
     },
     render: (args) => <ScaleVertical3dComponent {...args} />,
+};
+
+const ScaleVerticalCallbackComponent = ({
+    verticalScale,
+}: {
+    verticalScale: number;
+}) => {
+    const { factor: scaleFactor, setFactor, divRef } = useScaleFactor();
+
+    React.useEffect(() => {
+        setFactor(verticalScale);
+    }, [setFactor, verticalScale]);
+
+    const viewerProps: SubsurfaceViewerProps = {
+        id: "ScaleY",
+        bounds: volveWellsBounds,
+        layers: [huginAxes3DLayer, hugin25mDepthMapLayer],
+        views: default3DViews,
+        cameraPosition: SIDE_CAMERA,
+        verticalScale: scaleFactor,
+        innerRef: divRef,
+    };
+    return <SubsurfaceViewer {...viewerProps} />;
+};
+
+export const ScaleVerticalCallback: StoryObj<
+    typeof ScaleVerticalCallbackComponent
+> = {
+    args: { verticalScale: 1.5 },
+    argTypes: {
+        verticalScale: {
+            control: { type: "range", min: -1, max: 10, step: 0.1 },
+        },
+    },
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: "Vertical scaling example in panoramic view.",
+            },
+        },
+    },
+    render: (args) => <ScaleVerticalCallbackComponent {...args} />,
 };

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { Dispatch, useState } from "react";
 
 // https://developer.mozilla.org/docs/Web/API/KeyboardEvent
 type ArrowEvent = {
@@ -51,6 +51,36 @@ function convertToArrowEvent(event: KeyboardEvent): ArrowEvent | null {
     }
     return null;
 }
+
+export const useScaleFactor = () => {
+    const [factor, setFactor] = React.useState(1);
+
+    const divRef = React.useRef<HTMLElement>(null);
+
+    React.useEffect(() => {
+        const keyDownHandler = (e: KeyboardEvent) => {
+            const arrowEvent = convertToArrowEvent(e);
+            if (!arrowEvent) {
+                return;
+            }
+
+            setFactor((oldValue) => updateZScaleReducer(oldValue, arrowEvent));
+
+            // prevent being handled by regular OrbitController
+            e.stopPropagation();
+        };
+
+        const element = divRef.current;
+
+        // Listen for keypress events.
+        element?.addEventListener("keydown", keyDownHandler, true);
+
+        return () => {
+            element?.removeEventListener("keydown", keyDownHandler);
+        };
+    }, [divRef]);
+    return { factor, setFactor, divRef };
+};
 
 export function useHandleRescale(disable = false): {
     zScale: number;

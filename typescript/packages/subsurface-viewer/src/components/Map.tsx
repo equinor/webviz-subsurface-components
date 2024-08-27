@@ -20,7 +20,7 @@ import type {
     View,
     Viewport,
 } from "@deck.gl/core";
-import type { DeckGLRef } from "@deck.gl/react";
+import type { DeckGLProps, DeckGLRef } from "@deck.gl/react";
 import DeckGL from "@deck.gl/react";
 
 import {
@@ -354,6 +354,9 @@ export interface MapProps {
 
     /** A vertical scale factor, used to scale items in the view vertically */
     verticalScale?: number;
+
+    innerRef?: React.Ref<HTMLElement>;
+    //ref?: React.ForwardedRef<HTMLElement>;
 }
 
 function defaultTooltip(info: PickingInfo) {
@@ -390,6 +393,7 @@ const Map: React.FC<MapProps> = ({
     lights,
     triggerResetMultipleWells,
     verticalScale,
+    innerRef,
 }: MapProps) => {
     // From react doc, ref should not be read nor modified during rendering.
     const deckRef = React.useRef<DeckGLRef>(null);
@@ -427,16 +431,19 @@ const Map: React.FC<MapProps> = ({
     const viewportVerticalScale = useVerticalScale(views?.viewports);
 
     // Used for scaling in z direction using arrow keys.
+    //const { zScale: zReScale, divRef: zScaleRef }: { zScale: number, divRef?: React.MutableRefObject<null> }
+    //= typeof verticalScale == "function" ?
+    //verticalScale() : { zScale: verticalScale ?? 1 };
+
     const { zScale: zReScale, divRef: zScaleRef } = useHandleRescale(
         !!(verticalScale ?? viewportVerticalScale)
     );
 
     const { shiftHeld, divRef: shiftHeldRef } = useShiftHeld();
 
-    const divRef = mergeRefs(
-        zScaleRef,
-        shiftHeldRef
-    ) as React.Ref<HTMLDivElement>;
+    //console.log("Map: innerRef: ", innerRef);
+    //const divRef = mergeRefs(ref, shiftHeldRef) as React.Ref<HTMLDivElement>;
+    const divRef = innerRef;
 
     const zScale = verticalScale ?? viewportVerticalScale ?? zReScale;
 

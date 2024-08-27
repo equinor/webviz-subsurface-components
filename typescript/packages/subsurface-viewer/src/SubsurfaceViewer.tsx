@@ -1,15 +1,16 @@
-import React from "react";
-import type { PickingInfo, Layer, LayersList } from "@deck.gl/core";
-import PropTypes from "prop-types";
+import type { Layer, LayersList, PickingInfo } from "@deck.gl/core";
 import type { colorTablesArray } from "@emerson-eps/color-tables/";
 import type { Unit } from "convert-units";
 import convert from "convert-units";
+import PropTypes from "prop-types";
+import React from "react";
 
 import type { MjolnirGestureEvent } from "mjolnir.js";
 
 import type {
     BoundsAccessor,
     MapMouseEvent,
+    MapProps,
     TooltipCallback,
     ViewStateType,
     ViewsType,
@@ -18,17 +19,16 @@ import type {
 import { TGrid3DColoringMode } from "./layers/grid3d/grid3dLayer";
 
 import Map, { createLayers } from "./components/Map";
+import { DeckGLProps, DeckGLRef } from "@deck.gl/react";
 
 export type {
-    BoundsAccessor,
-    MapMouseEvent,
+    BoundsAccessor, colorTablesArray, MapMouseEvent,
     TooltipCallback,
     ViewStateType,
-    ViewsType,
-    colorTablesArray,
+    ViewsType
 };
 
-export { TGrid3DColoringMode };
+    export { TGrid3DColoringMode };
 
 export type LightsType = {
     headLight?: {
@@ -66,7 +66,7 @@ export type TLayerDefinition =
 /**
  * Properties of the SubsurfaceViewer component.
  */
-export interface SubsurfaceViewerProps {
+export interface SubsurfaceViewerProps extends Pick<MapProps, "innerRef"> {
     id: string;
     resources?: Record<string, unknown>;
     /**
@@ -166,7 +166,10 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
     lights,
     children,
     verticalScale,
+    innerRef,
 }: SubsurfaceViewerProps) => {
+    //console.log("SubsurfaceViewer: innerRef: ", innerRef as object);
+
     // Contains layers data received from map layers by user interaction
     const [layerEditedData, setLayerEditedData] = React.useState(editedData);
 
@@ -245,6 +248,7 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
             triggerResetMultipleWells={triggerResetMultipleWells}
             lights={lights}
             verticalScale={verticalScale}
+            innerRef={innerRef}
         >
             {children}
         </Map>
