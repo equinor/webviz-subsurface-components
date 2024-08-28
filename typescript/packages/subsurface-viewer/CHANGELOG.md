@@ -1,3 +1,15 @@
+# [0.29.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.28.2...subsurface-viewer@0.29.0) (2024-08-28)
+
+
+### Bug Fixes
+
+* remove defaultProps from function components ([#2201](https://github.com/equinor/webviz-subsurface-components/issues/2201)) ([389db32](https://github.com/equinor/webviz-subsurface-components/commit/389db3208fd02a3dccbf1cc7020fc3e0035432a7))
+
+
+### Features
+
+* **grid3d:** Specific color for undefined property values. ([#2197](https://github.com/equinor/webviz-subsurface-components/issues/2197)) ([597a3ae](https://github.com/equinor/webviz-subsurface-components/commit/597a3ae105835343519fadbb5558d9eddef1e7f5))
+
 ## [0.28.2](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.28.1...subsurface-viewer@0.28.2) (2024-08-22)
 
 
