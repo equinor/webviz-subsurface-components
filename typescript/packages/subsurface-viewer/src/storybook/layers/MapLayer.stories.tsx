@@ -40,9 +40,6 @@ const stories: Meta = {
         // Somehow, I do not manage to add the triggerHome to the general "unset" controls :/
         triggerHome: 0,
     },
-
-    // Disable automatic tests for stories using the "no-test" tag.
-    tags: ["no-test"],
 };
 export default stories;
 
