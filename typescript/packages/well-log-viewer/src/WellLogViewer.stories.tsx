@@ -51,8 +51,6 @@ import { CallbackManager } from "./components/CallbackManager";
 import colorTables from "../../../../example-data/wellpick_colors.json";
 import wellPicks from "../../../../example-data/wellpicks.json";
 
-import { axisMnemos, axisTitles } from "./utils/axes";
-
 import type { Info } from "./components/InfoTypes";
 import type WellLogView from "./components/WellLogView";
 import { axisMnemos, axisTitles } from "./utils/axes";
