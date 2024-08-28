@@ -1,3 +1,10 @@
+## [1.12.5](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.12.4...well-log-viewer@1.12.5) (2024-08-28)
+
+
+### Bug Fixes
+
+* Emit interpolated curve information ([#2205](https://github.com/equinor/webviz-subsurface-components/issues/2205)) ([f996eea](https://github.com/equinor/webviz-subsurface-components/commit/f996eea59c83d6078f1932dfd9863eca79a4dfcc)), closes [#2196](https://github.com/equinor/webviz-subsurface-components/issues/2196)
+
 ## [1.12.4](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.12.3...well-log-viewer@1.12.4) (2024-08-22)
 
 

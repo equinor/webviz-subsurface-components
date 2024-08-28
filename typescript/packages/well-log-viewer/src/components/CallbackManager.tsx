@@ -4,6 +4,7 @@ import type { LogViewer } from "@equinor/videx-wellog";
 import type { WellLogController } from "./WellLogView";
 import type WellLogView from "./WellLogView";
 import type { WellLog } from "./WellLogTypes";
+import type { Info } from "../components/InfoTypes";
 
 export class CallbackManager {
     controller: WellLogController | null;
@@ -20,6 +21,7 @@ export class CallbackManager {
     onContentSelectionCallbacks: (() => void)[];
     onTemplateChangedCallbacks: (() => void)[];
     onChangePrimaryAxisCallbacks: ((primaryAxis: string) => void)[];
+    onInfoFilledCallbacks: ((computedInfo: Info[]) => void)[];
 
     constructor(welllog: () => WellLog | undefined) {
         this.welllog = welllog;
@@ -32,8 +34,11 @@ export class CallbackManager {
         this.onTemplateChangedCallbacks = [];
         this.onChangePrimaryAxisCallbacks = [];
 
+        this.onInfoFilledCallbacks = [];
+
         this.onCreateController = this.onCreateController.bind(this);
         this.onInfo = this.onInfo.bind(this);
+        this.onInfoFilled = this.onInfoFilled.bind(this);
         this.onContentRescale = this.onContentRescale.bind(this);
         this.onContentSelection = this.onContentSelection.bind(this);
         this.onTemplateChanged = this.onTemplateChanged.bind(this);
@@ -133,6 +138,11 @@ export class CallbackManager {
     ): void {
         for (const onInfo of this.onInfoCallbacks)
             onInfo(x, logController, iFrom, iTo);
+    }
+
+    onInfoFilled(infos: Info[]): void {
+        for (const onInfoFilled of this.onInfoFilledCallbacks)
+            onInfoFilled(infos);
     }
     // callback function from WellLogView
     onContentRescale(): void {
