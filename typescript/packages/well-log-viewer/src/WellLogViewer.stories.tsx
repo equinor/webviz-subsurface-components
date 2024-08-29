@@ -40,9 +40,9 @@ import { deepCopy } from "./utils/deepcopy";
 import { getDiscreteMeta, indexOfElementByName } from "./utils/tracks";
 
 import type {
+    TrackMouseEvent,
     WellLogController,
     WellLogViewOptions,
-    TrackMouseEvent,
 } from "./components/WellLogView";
 import { isEqualRanges } from "./utils/log-viewer";
 
@@ -51,10 +51,9 @@ import { CallbackManager } from "./components/CallbackManager";
 import colorTables from "../../../../example-data/wellpick_colors.json";
 import wellPicks from "../../../../example-data/wellpicks.json";
 
-import { axisMnemos, axisTitles } from "./utils/axes";
-
 import type { Info } from "./components/InfoTypes";
 import type WellLogView from "./components/WellLogView";
+import { axisMnemos, axisTitles } from "./utils/axes";
 
 const ComponentCode =
     '<WellLogViewer id="WellLogViewer" \r\n' +
@@ -87,9 +86,6 @@ const stories: Meta = {
                 "The ID of this component, used to identify dash components in callbacks. The ID needs to be unique across all of the components in an app.",
         },
     },
-
-    // Disable automatic testing of stories that use this tag.
-    tags: ["no-test"],
 };
 export default stories;
 
