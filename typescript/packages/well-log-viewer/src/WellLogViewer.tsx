@@ -19,13 +19,15 @@ import type {
 } from "./components/WellLogView";
 import type WellLogView from "./components/WellLogView";
 
-import { getAvailableAxes } from "./utils/tracks";
+import { getAvailableAxes, toggleId } from "./utils/tracks";
 
 import { onTrackMouseEventDefault } from "./utils/edit-track";
 
 import { CallbackManager } from "./components/CallbackManager";
 
-import type { InfoOptions } from "./components/InfoTypes";
+import type { Info, InfoOptions } from "./components/InfoTypes";
+import type { LogViewer } from "@equinor/videx-wellog";
+import { fillInfos } from "./utils/fill-info";
 
 export interface WellLogViewerProps extends WellLogViewWithScrollerProps {
     readoutOptions?: InfoOptions; // options for readout
@@ -37,6 +39,7 @@ export interface WellLogViewerProps extends WellLogViewWithScrollerProps {
     onContentSelection?: () => void;
     onTemplateChanged?: () => void;
 
+    onInfoFilled?: (computedInfo: Info[]) => void;
     onTrackMouseEvent?: (wellLogView: WellLogView, ev: TrackMouseEvent) => void;
 
     onCreateController?: (controller: WellLogController) => void;
@@ -74,6 +77,7 @@ export default class WellLogViewer extends Component<
     public static propTypes: Record<string, unknown>;
 
     callbackManager: CallbackManager;
+    collapsedTrackIds: (string | number)[];
 
     constructor(props: WellLogViewerProps) {
         super(props);
@@ -83,14 +87,58 @@ export default class WellLogViewer extends Component<
         };
 
         this.callbackManager = new CallbackManager(() => this.props.welllog);
+        this.collapsedTrackIds = [];
 
         this.onCreateController = this.onCreateController.bind(this);
 
+        this.onInfo = this.onInfo.bind(this);
         this.onContentRescale = this.onContentRescale.bind(this);
         this.onContentSelection = this.onContentSelection.bind(this);
         this.onTemplateChanged = this.onTemplateChanged.bind(this);
+        this.fillInfo = this.fillInfo.bind(this);
+        this.onInfoGroupClick = this.onInfoGroupClick.bind(this);
 
         this.onChangePrimaryAxis = this.onChangePrimaryAxis.bind(this);
+
+        this.callbackManager.registerCallback(
+            "onInfoGroupClick",
+            this.onInfoGroupClick,
+            true
+        );
+
+        if (props.onInfoFilled) {
+            this.callbackManager.registerCallback(
+                "onInfoFilled",
+                props.onInfoFilled
+            );
+        }
+    }
+
+    onInfoGroupClick(info: Info): void {
+        const collapsedTrackIds = this.collapsedTrackIds;
+        /* 
+        const controller = this.props.callbackManager.controller;
+        if (controller) { // info.trackId could be for another controller so map iTrack to trackid for the curent controller
+            const wellLogView = controller as WellLogView;
+            const logController = wellLogView.logController;
+            const tracks = logController?.tracks;
+            if (tracks) {
+                let iTrack = 0;
+                for (const track of tracks) {
+                    if (isScaleTrack(track)) continue;
+                    if (info.iTrack == iTrack) {
+                        toggleId(collapsedTrackIds, track.id);
+                        break;
+                    }
+                    iTrack++;
+                }
+            }
+        }
+        else*/ {
+            // old code
+            toggleId(collapsedTrackIds, info.trackId);
+        }
+        this.callbackManager.updateInfo(); // force to get onInfo call from WellLogView
     }
 
     // callback function from WellLogView
@@ -117,6 +165,30 @@ export default class WellLogViewer extends Component<
     onChangePrimaryAxis(value: string): void {
         this.setState({ primaryAxis: value });
         this.callbackManager.onChangePrimaryAxis(value);
+    }
+
+    onInfo(x: number, logController: LogViewer, iFrom: number, iTo: number) {
+        this.callbackManager.onInfo(x, logController, iFrom, iTo);
+        this.props.onInfo?.(x, logController, iFrom, iTo);
+
+        this.fillInfo(x, logController, iFrom, iTo);
+    }
+
+    fillInfo(x: number, logController: LogViewer, iFrom: number, iTo: number) {
+        if (this.callbackManager.onInfoFilledCallbacks.length < 1) return;
+
+        const infoOptions = this.props.readoutOptions;
+
+        const interpolatedData = fillInfos(
+            x,
+            logController,
+            iFrom,
+            iTo,
+            this.collapsedTrackIds,
+            infoOptions
+        );
+
+        this.callbackManager.onInfoFilled(interpolatedData);
     }
 
     componentDidMount(): void {
@@ -204,7 +276,7 @@ export default class WellLogViewer extends Component<
                         primaryAxis={this.state.primaryAxis}
                         options={this.props.options}
                         // callbacks
-                        onInfo={this.callbackManager.onInfo}
+                        onInfo={this.onInfo}
                         onCreateController={this.onCreateController}
                         onTrackMouseEvent={
                             this.props.onTrackMouseEvent ||

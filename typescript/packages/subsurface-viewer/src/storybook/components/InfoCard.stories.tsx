@@ -32,6 +32,7 @@ export const MutipleProperties: StoryObj<typeof InfoCard> = {
                 coordinate: [111, 222],
             } as LayerPickInfo,
             {
+                // @ts-expect-error TS2740
                 layer: { id: "wells-layer" },
                 property: { name: "Poro WellA", value: 123 },
             },

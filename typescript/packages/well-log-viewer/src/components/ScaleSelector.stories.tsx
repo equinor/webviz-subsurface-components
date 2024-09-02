@@ -38,9 +38,12 @@ const stories: Meta = {
 };
 export default stories;
 
+// @ts-expect-error TS7006
 const Template = (args) => {
     const infoRef = React.useRef();
+    // @ts-expect-error TS7006
     const setInfo = function (info) {
+        // @ts-expect-error TS2339
         if (infoRef.current) infoRef.current.innerHTML = info;
     };
 
@@ -54,6 +57,8 @@ const Template = (args) => {
                     setInfo("scale value=" + value);
                 }}
             />
+            {/*
+             // @ts-expect-error TS2322 */}
             <div ref={infoRef}>&nbsp;</div>
         </div>
     );

@@ -3,11 +3,14 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 
-import WellLogViewer, { argTypesWellLogViewerProp } from "./WellLogViewer";
+import WellLogViewer, {
+    argTypesWellLogViewerProp,
+    type WellLogViewerProps,
+} from "./WellLogViewer";
 
 import exampleData from "../../../../example-data/deckgl-map.json";
 
-import type { Color, LayersList } from "@deck.gl/core/typed";
+import type { Color, LayersList } from "@deck.gl/core";
 import type { SubsurfaceViewerProps } from "@webviz/subsurface-viewer";
 import SubsurfaceViewer from "@webviz/subsurface-viewer";
 import type { WeakValidationMap } from "react";
@@ -36,11 +39,10 @@ import WellLogViewWithScroller from "./components/WellLogViewWithScroller";
 import { deepCopy } from "./utils/deepcopy";
 import { getDiscreteMeta, indexOfElementByName } from "./utils/tracks";
 
-import type WellLogView from "./components/WellLogView";
 import type {
+    TrackMouseEvent,
     WellLogController,
     WellLogViewOptions,
-    TrackMouseEvent,
 } from "./components/WellLogView";
 import { isEqualRanges } from "./utils/log-viewer";
 
@@ -49,6 +51,8 @@ import { CallbackManager } from "./components/CallbackManager";
 import colorTables from "../../../../example-data/wellpick_colors.json";
 import wellPicks from "../../../../example-data/wellpicks.json";
 
+import type { Info } from "./components/InfoTypes";
+import type WellLogView from "./components/WellLogView";
 import { axisMnemos, axisTitles } from "./utils/axes";
 
 const ComponentCode =
@@ -60,6 +64,7 @@ const ComponentCode =
     "/>";
 
 const stories: Meta = {
+    // @ts-expect-error TS2322
     component: WellLogViewer,
     title: "WellLogViewer/Demo/WellLogViewer",
     parameters: {
@@ -81,9 +86,6 @@ const stories: Meta = {
                 "The ID of this component, used to identify dash components in callbacks. The ID needs to be unique across all of the components in an app.",
         },
     },
-
-    // Disable automatic testing of stories that use this tag.
-    tags: ["no-test"],
 };
 export default stories;
 
@@ -114,16 +116,17 @@ function fillInfo(controller: WellLogController | undefined) {
     );
 }
 
-const StoryTemplate = (args) => {
+const StoryTemplate = (args: WellLogViewerProps) => {
     const infoRef = React.useRef();
-    const setInfo = function (info) {
+    const setInfo = function (info: string) {
+        // @ts-expect-error TS2339
         if (infoRef.current) infoRef.current.innerHTML = info;
     };
     const [controller, setController] = React.useState<
         WellLogController | undefined
     >(undefined);
     const onCreateController = React.useCallback(
-        (controller) => {
+        (controller: React.SetStateAction<WellLogController | undefined>) => {
             setController(controller);
         },
         [controller]
@@ -145,8 +148,8 @@ const StoryTemplate = (args) => {
     };
     /* eslint-disable */ // no-unused-vars
     function onTrackMouseEventCustom(
-        wellLogView: WellLogView,
-        ev: TrackMouseEvent
+        _wellLogView: WellLogView,
+        _ev: TrackMouseEvent
     ): void {
         //custom function to disable the context menu
     }
@@ -161,10 +164,13 @@ const StoryTemplate = (args) => {
                     onCreateController={onCreateController}
                     onContentRescale={onContentRescale}
                     onContentSelection={onContentSelection}
+                    // @ts-expect-error TS2322
                     onTrackMouseEvent={checked ? onTrackMouseEventCustom : null}
                 />
             </div>
             <div style={{ display: "inline-flex" }}>
+                {/*
+                 // @ts-expect-error TS2322 */}
                 <div ref={infoRef}></div>
                 <label style={{ marginLeft: 10 }}>disable context menu</label>
                 <input
@@ -274,7 +280,9 @@ export const Default: StoryObj<typeof StoryTemplate> = {
         horizontal: false,
         welllog: require("../../../../example-data/L898MUD.json")[0], // eslint-disable-line
         template: require("../../../../example-data/welllog_template_1.json"), // eslint-disable-line
+        // @ts-expect-error TS2322
         colorTables: colorTables,
+        // @ts-expect-error TS2322
         wellpick: wellpick,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
@@ -307,6 +315,7 @@ export const ColorByFunctionTBD: StoryObj<typeof StoryTemplate> = {
                     title: "Multiple",
                     width: 6,
                     plots: [
+                        // @ts-expect-error TS2739
                         {
                             name: "HKLA",
                             style: "HKL",
@@ -318,13 +327,16 @@ export const ColorByFunctionTBD: StoryObj<typeof StoryTemplate> = {
                 {
                     name: "HKL",
                     type: "gradientfill", // Is this the correct type for using color function?
+                    // @ts-expect-error TS2322
                     colorTable: (value: number) =>
                         value < 100 ? [1, 0, 0] : [[0, 1, 1]],
                     color: "green",
                 },
             ],
         },
+        // @ts-expect-error TS2322
         colorTables: colorTables,
+        // @ts-expect-error TS2322
         wellpick: wellpick,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
@@ -348,7 +360,9 @@ export const Horizontal: StoryObj<typeof StoryTemplate> = {
         welllog:
             require("../../../../example-data/WL_RAW_AAC-BHPR-CAL-DEN-GR-MECH-NEU-NMR-REMP_MWD_3.json")[0], // eslint-disable-line
         template: require("../../../../example-data/welllog_template_2.json"), // eslint-disable-line
+        // @ts-expect-error TS2322
         colorTables: colorTables,
+        // @ts-expect-error TS2322
         wellpick: wellpick,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
@@ -363,6 +377,102 @@ export const Horizontal: StoryObj<typeof StoryTemplate> = {
     },
     render: (args) => <StoryTemplate {...args} />,
 };
+
+export const OnInfoFilledEvent: StoryObj<typeof StoryTemplate> = {
+    args: {
+        id: "Well-Log-Viewer-OnInfoFilled",
+        horizontal: true,
+        welllog:
+            require("../../../../example-data/WL_RAW_AAC-BHPR-CAL-DEN-GR-MECH-NEU-NMR-REMP_MWD_3.json")[0], // eslint-disable-line
+        template: require("../../../../example-data/welllog_template_2.json"), // eslint-disable-line
+
+        // @ts-expect-error TS2322
+        colorTables: colorTables,
+        // @ts-expect-error TS2322
+
+        wellpick: wellpick,
+        axisTitles: axisTitles,
+        axisMnemos: axisMnemos,
+        viewTitle: true, // show default welllog view title (a wellname from the welllog)
+        layout: { right: undefined },
+    },
+    parameters: {
+        docs: {
+            description: {
+                story: 'You can get the computed information at the current selection by using the "onInfoFilled" event. The event is called both externally (via the callback property), or internally (using the callback manager). This example shows an external floating panel using the callback property',
+            },
+        },
+    },
+    render: (args) => <StoryTemplateWithCustomPanel {...args} />,
+};
+
+function StoryTemplateWithCustomPanel(props: WellLogViewerProps): JSX.Element {
+    const [infos, setInfos] = React.useState<Info[]>([]);
+    const [showPanel, setShowPanel] = React.useState<boolean>(false);
+
+    const handleInfoFilled = React.useCallback((newInfos: Info[]) => {
+        setInfos(newInfos);
+    }, []);
+
+    return (
+        <div
+            // Show/hide the panel when we move the mouse away from the story
+            onMouseEnter={() => setShowPanel(true)}
+            onMouseLeave={() => setShowPanel(false)}
+        >
+            <StoryTemplate {...props} onInfoFilled={handleInfoFilled} />
+            {showPanel && <CustomInfoPanel infos={infos} />}
+        </div>
+    );
+}
+
+function CustomInfoPanel(props: { infos: Info[] }) {
+    const [mousePosition, setMousePosition] = React.useState({
+        x: -1000,
+        y: -1000,
+    });
+    React.useEffect(() => {
+        const updateMousePos = (evt: MouseEvent) => {
+            setMousePosition({ x: evt.clientX, y: evt.clientY });
+        };
+
+        window.addEventListener("mousemove", updateMousePos);
+        return () => window.removeEventListener("mousemove", updateMousePos);
+    }, []);
+
+    return (
+        <div
+            style={{
+                position: "fixed",
+                left: mousePosition.x + 20,
+                top: mousePosition.y + 2,
+                padding: "0.25rem",
+                border: "solid gray 1px",
+                borderRadius: "0.25rem",
+                zIndex: 9999,
+                background: "white",
+                pointerEvents: "none",
+            }}
+        >
+            <div>
+                {props.infos?.map((i: Info) => {
+                    if (i.type === "separator") return null;
+                    else
+                        return (
+                            <div key={i.trackId}>
+                                <span style={{ fontWeight: 700 }}>
+                                    {i.name}
+                                </span>
+                                <span> {i.value.toFixed(3)}</span>
+
+                                <span> {i.units}</span>
+                            </div>
+                        );
+                })}
+            </div>
+        </div>
+    );
+}
 
 class MapAndWellLogViewer extends React.Component<Props, State> {
     public static propTypes?: WeakValidationMap<Props> | undefined;
@@ -589,6 +699,7 @@ class MapAndWellLogViewer extends React.Component<Props, State> {
                     <div>
                         <SubsurfaceViewer
                             {...this.props}
+                            // @ts-expect-error TS2322
                             layers={this.state.layers}
                             editedData={this.state.editedData}
                             onMouseEvent={this.onMapMouseEvent}
@@ -672,7 +783,9 @@ export const Discrete: StoryObj<typeof StoryTemplate> = {
         horizontal: false,
         welllog: require("../../../../example-data/volve_logs.json")[0], // eslint-disable-line
         template: require("../../../../example-data/welllog_template_2.json"), // eslint-disable-line
+        // @ts-expect-error TS2322
         colorTables: colorTables,
+        // @ts-expect-error TS2322
         wellpick: wellpick,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
@@ -705,6 +818,7 @@ export const MapAndWellLogViewerStory: StoryObj<
 > = {
     args: {
         ...exampleData[0],
+        // @ts-expect-error TS2322
         colorTables: colorTables,
         id: "MapAndWellLog", // redefine id from exampleData[0]
     },

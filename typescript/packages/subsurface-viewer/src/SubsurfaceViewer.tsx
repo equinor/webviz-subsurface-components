@@ -95,7 +95,18 @@ export interface SubsurfaceViewerProps extends Pick<MapProps, "innerRef"> {
     };
     coordinateUnit?: Unit;
     colorTables?: colorTablesArray;
+
+    /**
+     * @deprecated Used by layers to propagate state to component, eg. selected
+     * wells from the Wells layer. Use client code to handle layer state
+     * instead.
+     */
     editedData?: Record<string, unknown>;
+    /**
+     * @deprecated Used by layers to propagate state to component, eg. selected
+     * wells from the Wells layer. Use client code to handle layer state
+     * instead.
+     */
     setProps?: (data: Record<string, unknown>) => void;
 
     /**
@@ -252,16 +263,6 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
             {children}
         </Map>
     );
-};
-
-SubsurfaceViewer.defaultProps = {
-    views: {
-        layout: [1, 1],
-        marginPixels: 0,
-        showLabel: false,
-        viewports: [{ id: "main-view", show3D: false, layerIds: [] }],
-    },
-    checkDatafileSchema: false,
 };
 
 SubsurfaceViewer.propTypes = {

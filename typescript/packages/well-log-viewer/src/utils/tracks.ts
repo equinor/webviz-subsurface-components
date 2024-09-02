@@ -1604,3 +1604,12 @@ export function hasDifferentialPlot(track: GraphTrack): boolean {
     }
     return false;
 }
+
+export function toggleId(
+    trackIds: (string | number)[],
+    trackId: string | number
+): void {
+    const i = trackIds.indexOf(trackId);
+    if (i < 0) trackIds.push(trackId);
+    else trackIds.splice(i, 1);
+}

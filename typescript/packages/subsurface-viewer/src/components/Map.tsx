@@ -40,7 +40,7 @@ import { LineLayer } from "@deck.gl/layers";
 import { Matrix4 } from "@math.gl/core";
 import { fovyToAltitude } from "@math.gl/web-mercator";
 
-import { colorTables } from "@emerson-eps/color-tables";
+import { colorTables as defaultColorTables } from "@emerson-eps/color-tables";
 import type { colorTablesArray } from "@emerson-eps/color-tables/";
 
 import { validateColorTables, validateLayers } from "@webviz/wsc-common";
@@ -62,7 +62,7 @@ import {
 } from "../utils/BoundingBox3D";
 import JSON_CONVERTER_CONFIG from "../utils/configuration";
 import fitBounds from "../utils/fit-bounds";
-import DistanceScale from "./DistanceScale";
+import { DistanceScale } from "./DistanceScale";
 import InfoCard from "./InfoCard";
 import StatusIndicator from "./StatusIndicator";
 
@@ -93,6 +93,13 @@ const minZoom3D = -12;
 const maxZoom3D = 12;
 const minZoom2D = -12;
 const maxZoom2D = 4;
+
+const DEFAULT_VIEWS: ViewsType = {
+    layout: [1, 1],
+    showLabel: false,
+    marginPixels: 0,
+    viewports: [{ id: "main-view", show3D: false, layerIds: [] }],
+};
 
 function parseLights(lights?: LightsType): LightingEffect[] | undefined {
     if (!lights) {
@@ -298,7 +305,7 @@ export interface MapProps {
     coordinateUnit?: Unit;
 
     /**
-     * Parameters to control toolbar
+     * @deprecated Not in use
      */
     toolbar?: {
         visible?: boolean | null;
@@ -310,12 +317,16 @@ export interface MapProps {
     colorTables?: colorTablesArray;
 
     /**
-     * Prop containing edited data from layers
+     * @deprecated Used by layers to propagate state to component, eg. selected
+     * wells from the Wells layer. Use client code to handle layer state
+     * instead.
      */
     editedData?: Record<string, unknown>;
 
     /**
-     * For reacting to prop changes
+     * @deprecated Used by layers to propagate state to component, eg. selected
+     * wells from the Wells layer. Use client code to handle layer state
+     * instead.
      */
     setEditedData?: (data: Record<string, unknown>) => void;
 
@@ -375,13 +386,13 @@ const Map: React.FC<MapProps> = ({
     bounds,
     cameraPosition,
     triggerHome,
-    views,
-    coords,
-    scale,
-    coordinateUnit,
-    colorTables,
+    views = DEFAULT_VIEWS,
+    coords = { visible: true, multiPicking: true, pickDepth: 10 },
+    scale = { visible: true, cssStyle: { top: 10, left: 10 } },
+    coordinateUnit = "m",
+    colorTables = defaultColorTables,
     setEditedData,
-    checkDatafileSchema,
+    checkDatafileSchema = false,
     onMouseEvent,
     selection,
     children,
@@ -847,31 +858,6 @@ const Map: React.FC<MapProps> = ({
             )}
         </div>
     );
-};
-
-Map.defaultProps = {
-    coords: {
-        visible: true,
-        multiPicking: true,
-        pickDepth: 10,
-    },
-    scale: {
-        visible: true,
-        incrementValue: 100,
-        widthPerUnit: 100,
-        cssStyle: { top: 10, left: 10 },
-    },
-    toolbar: {
-        visible: false,
-    },
-    coordinateUnit: "m",
-    views: {
-        layout: [1, 1],
-        showLabel: false,
-        viewports: [{ id: "main-view", show3D: false, layerIds: [] }],
-    },
-    colorTables: colorTables,
-    checkDatafileSchema: false,
 };
 
 export default Map;
