@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import React, { useEffect } from "react";
+import React from "react";
 
 import { SimpleMeshLayer } from "@deck.gl/mesh-layers";
 import { SphereGeometry } from "@luma.gl/engine";
@@ -32,7 +32,7 @@ import {
 } from "../sharedSettings";
 
 import { scaleZoom } from "../..";
-import { useHandleRescale, useScaleFactor } from "../../utils/event";
+import { useScaleFactor } from "../../utils/event";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -60,11 +60,18 @@ const Root = styled("div")({
     },
 });
 
+const CAMERA_POSITION: ViewStateType = {
+    target: [435800, 6478000, -2000],
+    zoom: -3.5,
+    rotationX: 90,
+    rotationOrbit: 0,
+};
+
 const SIDE_CAMERA = {
     rotationX: 0,
-    target: [],
+    target: [435800, 6478000, -4000],
     rotationOrbit: 90,
-    zoom: -3,
+    zoom: -3.3,
 };
 
 const SQUARE = {
@@ -93,6 +100,12 @@ const AXES2D = new Axes2DLayer({
     id: "axes",
     backgroundColor: [0, 155, 155],
 });
+
+const DEFAULT_PROPS = {
+    id: "default",
+    layers: [huginAxes3DLayer, hugin25mDepthMapLayer],
+    views: default3DViews,
+};
 
 const DisplayCameraPositionComponent: React.FC<SubsurfaceViewerProps> = (
     args
@@ -125,19 +138,12 @@ const DisplayCameraPositionComponent: React.FC<SubsurfaceViewerProps> = (
     );
 };
 
-const cameraPosition: ViewStateType = {
-    target: [435800, 6478000, -2000],
-    zoom: -3.5,
-    rotationX: 90,
-    rotationOrbit: 0,
-};
-
 export const DisplayCameraState: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "volve-wells",
         bounds: volveWellsBounds,
         layers: [volveWellsLayer],
-        cameraPosition,
+        CAMERA_POSITION,
     },
     render: (args) => <DisplayCameraPositionComponent {...args} />,
 };
@@ -265,7 +271,7 @@ export const SyncedSubsurfaceViewers: StoryObj<
         id: "volve-wells",
         bounds: volveWellsBounds,
         layers: [volveWellsLayer],
-        cameraPosition,
+        CAMERA_POSITION,
         views: default2DViews,
     },
     render: (args) => <SyncedCameraSettingsComponent {...args} />,
@@ -629,10 +635,7 @@ const ScaleVertical3dComponent = ({
     verticalScale: number;
 }) => {
     const viewerProps: SubsurfaceViewerProps = {
-        id: "ScaleY",
-        bounds: volveWellsBounds,
-        layers: [huginAxes3DLayer, hugin25mDepthMapLayer],
-        views: default3DViews,
+        ...DEFAULT_PROPS,
         cameraPosition: SIDE_CAMERA,
         verticalScale,
     };
@@ -657,32 +660,27 @@ export const ScaleVertical3d: StoryObj<typeof ScaleVertical3dComponent> = {
     render: (args) => <ScaleVertical3dComponent {...args} />,
 };
 
-const ScaleVerticalCallbackComponent = ({
+const ScaleFactorHookComponent = ({
     verticalScale,
 }: {
     verticalScale: number;
 }) => {
-    const { factor: scaleFactor, setFactor, divRef } = useScaleFactor();
+    const { factor: scaleFactor, setFactor, elementRef } = useScaleFactor();
 
     React.useEffect(() => {
         setFactor(verticalScale);
     }, [setFactor, verticalScale]);
 
     const viewerProps: SubsurfaceViewerProps = {
-        id: "ScaleY",
-        bounds: volveWellsBounds,
-        layers: [huginAxes3DLayer, hugin25mDepthMapLayer],
-        views: default3DViews,
+        ...DEFAULT_PROPS,
         cameraPosition: SIDE_CAMERA,
         verticalScale: scaleFactor,
-        innerRef: divRef,
+        innerRef: elementRef,
     };
     return <SubsurfaceViewer {...viewerProps} />;
 };
 
-export const ScaleVerticalCallback: StoryObj<
-    typeof ScaleVerticalCallbackComponent
-> = {
+export const ScaleFactorHook: StoryObj<typeof ScaleFactorHookComponent> = {
     args: { verticalScale: 1.5 },
     argTypes: {
         verticalScale: {
@@ -693,9 +691,9 @@ export const ScaleVerticalCallback: StoryObj<
         docs: {
             ...defaultStoryParameters.docs,
             description: {
-                story: "Vertical scaling example in panoramic view.",
+                story: "Using a hook to control vertical scaling either via props or keyboard shortcuts.",
             },
         },
     },
-    render: (args) => <ScaleVerticalCallbackComponent {...args} />,
+    render: (args) => <ScaleFactorHookComponent {...args} />,
 };

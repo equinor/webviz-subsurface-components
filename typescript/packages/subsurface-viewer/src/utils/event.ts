@@ -55,7 +55,7 @@ function convertToArrowEvent(event: KeyboardEvent): ArrowEvent | null {
 export const useScaleFactor = () => {
     const [factor, setFactor] = React.useState(1);
 
-    const divRef = React.useRef<HTMLElement>(null);
+    const elementRef = React.useRef<HTMLElement>(null);
 
     React.useEffect(() => {
         const keyDownHandler = (e: KeyboardEvent) => {
@@ -70,7 +70,7 @@ export const useScaleFactor = () => {
             e.stopPropagation();
         };
 
-        const element = divRef.current;
+        const element = elementRef.current;
 
         // Listen for keypress events.
         element?.addEventListener("keydown", keyDownHandler, true);
@@ -78,8 +78,8 @@ export const useScaleFactor = () => {
         return () => {
             element?.removeEventListener("keydown", keyDownHandler);
         };
-    }, [divRef]);
-    return { factor, setFactor, divRef };
+    }, [elementRef]);
+    return { factor, setFactor, elementRef };
 };
 
 export function useShiftHeld(): {
