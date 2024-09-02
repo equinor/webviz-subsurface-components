@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { userEvent } from "@storybook/test";
 import React from "react";
 
 import { SimpleMeshLayer } from "@deck.gl/mesh-layers";
@@ -696,4 +697,16 @@ export const ScaleFactorHook: StoryObj<typeof ScaleFactorHookComponent> = {
         },
     },
     render: (args) => <ScaleFactorHookComponent {...args} />,
+    play: async () => {
+        const delay = 500;
+        const canvas = document.querySelector("canvas");
+
+        if (canvas) {
+            userEvent.click(canvas);
+        }
+
+        await userEvent.keyboard("[ArrowUp]", { delay });
+        await userEvent.keyboard("[ArrowDown]", { delay });
+        await userEvent.keyboard("[ArrowUp]", { delay });
+    },
 };

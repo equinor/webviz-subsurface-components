@@ -13,6 +13,7 @@ const config: StorybookConfig = {
         getAbsolutePath("@storybook/addon-actions"),
         getAbsolutePath("@storybook/addon-storysource"),
         getAbsolutePath("@storybook/addon-webpack5-compiler-babel"),
+        getAbsolutePath("@storybook/addon-interactions"),
     ],
     webpackFinal: async (config) => {
         return {
