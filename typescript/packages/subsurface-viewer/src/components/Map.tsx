@@ -71,7 +71,7 @@ import IntersectionView from "../views/intersectionView";
 
 import type { LightsType, TLayerDefinition } from "../SubsurfaceViewer";
 import { getZoom, useLateralZoom } from "../utils/camera";
-import { useHandleRescale, useShiftHeld } from "../utils/event";
+import { useHandleRescale, useScaleFactor, useShiftHeld } from "../utils/event";
 
 import type { ViewportType } from "../views/viewport";
 import { useVerticalScale } from "../views/viewport";
@@ -431,19 +431,19 @@ const Map: React.FC<MapProps> = ({
     const viewportVerticalScale = useVerticalScale(views?.viewports);
 
     // Used for scaling in z direction using arrow keys.
-    //const { zScale: zReScale, divRef: zScaleRef }: { zScale: number, divRef?: React.MutableRefObject<null> }
-    //= typeof verticalScale == "function" ?
-    //verticalScale() : { zScale: verticalScale ?? 1 };
-
-    const { zScale: zReScale, divRef: zScaleRef } = useHandleRescale(
-        !!(verticalScale ?? viewportVerticalScale)
-    );
+    const { factor: zReScale, divRef: zScaleRef } = useScaleFactor();
 
     const { shiftHeld, divRef: shiftHeldRef } = useShiftHeld();
 
-    //console.log("Map: innerRef: ", innerRef);
-    //const divRef = mergeRefs(ref, shiftHeldRef) as React.Ref<HTMLDivElement>;
-    const divRef = innerRef;
+    // Prevent using internal hook for manipulating vertical scale when the vertical
+    // scale is explicitly defined.
+    const overrideVerticalScaling = verticalScale ?? viewportVerticalScale;
+
+    const divRef = mergeRefs(
+        overrideVerticalScaling ? undefined : zScaleRef,
+        shiftHeldRef,
+        innerRef
+    ) as React.Ref<HTMLDivElement>;
 
     const zScale = verticalScale ?? viewportVerticalScale ?? zReScale;
 
