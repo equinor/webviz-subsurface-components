@@ -1,11 +1,9 @@
-import type { Layer, LayersList, PickingInfo } from "@deck.gl/core";
+import type { Layer, LayersList } from "@deck.gl/core";
 import type { colorTablesArray } from "@emerson-eps/color-tables/";
 import type { Unit } from "convert-units";
 import convert from "convert-units";
 import PropTypes from "prop-types";
 import React from "react";
-
-import type { MjolnirGestureEvent } from "mjolnir.js";
 
 import type {
     BoundsAccessor,

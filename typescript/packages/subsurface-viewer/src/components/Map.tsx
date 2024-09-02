@@ -71,7 +71,7 @@ import IntersectionView from "../views/intersectionView";
 
 import type { LightsType, TLayerDefinition } from "../SubsurfaceViewer";
 import { getZoom, useLateralZoom } from "../utils/camera";
-import { useHandleRescale, useScaleFactor, useShiftHeld } from "../utils/event";
+import { useScaleFactor, useShiftHeld } from "../utils/event";
 
 import type { ViewportType } from "../views/viewport";
 import { useVerticalScale } from "../views/viewport";

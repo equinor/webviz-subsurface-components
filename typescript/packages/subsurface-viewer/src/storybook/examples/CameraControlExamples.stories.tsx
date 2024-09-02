@@ -143,7 +143,7 @@ export const DisplayCameraState: StoryObj<typeof SubsurfaceViewer> = {
         id: "volve-wells",
         bounds: volveWellsBounds,
         layers: [volveWellsLayer],
-        CAMERA_POSITION,
+        cameraPosition: CAMERA_POSITION,
     },
     render: (args) => <DisplayCameraPositionComponent {...args} />,
 };
@@ -271,7 +271,7 @@ export const SyncedSubsurfaceViewers: StoryObj<
         id: "volve-wells",
         bounds: volveWellsBounds,
         layers: [volveWellsLayer],
-        CAMERA_POSITION,
+        cameraPosition: CAMERA_POSITION,
         views: default2DViews,
     },
     render: (args) => <SyncedCameraSettingsComponent {...args} />,

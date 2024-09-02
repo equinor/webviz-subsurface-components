@@ -1,4 +1,4 @@
-import React, { Dispatch, useState } from "react";
+import React, { useState } from "react";
 
 // https://developer.mozilla.org/docs/Web/API/KeyboardEvent
 type ArrowEvent = {
