@@ -26,3 +26,5 @@ export type {
 export { proportionalZoom, scaleZoom } from "./utils/camera";
 
 export type { ViewportType } from "./views/viewport";
+
+export { useScaleFactor } from "./utils/event";

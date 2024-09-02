@@ -19,16 +19,17 @@ import type {
 import { TGrid3DColoringMode } from "./layers/grid3d/grid3dLayer";
 
 import Map, { createLayers } from "./components/Map";
-import { DeckGLProps, DeckGLRef } from "@deck.gl/react";
 
 export type {
-    BoundsAccessor, colorTablesArray, MapMouseEvent,
+    BoundsAccessor,
+    colorTablesArray,
+    MapMouseEvent,
     TooltipCallback,
     ViewStateType,
-    ViewsType
+    ViewsType,
 };
 
-    export { TGrid3DColoringMode };
+export { TGrid3DColoringMode };
 
 export type LightsType = {
     headLight?: {
@@ -166,10 +167,8 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
     lights,
     children,
     verticalScale,
-    innerRef,
+    ...args
 }: SubsurfaceViewerProps) => {
-    //console.log("SubsurfaceViewer: innerRef: ", innerRef as object);
-
     // Contains layers data received from map layers by user interaction
     const [layerEditedData, setLayerEditedData] = React.useState(editedData);
 
@@ -248,7 +247,7 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
             triggerResetMultipleWells={triggerResetMultipleWells}
             lights={lights}
             verticalScale={verticalScale}
-            innerRef={innerRef}
+            {...args}
         >
             {children}
         </Map>

@@ -20,7 +20,7 @@ import type {
     View,
     Viewport,
 } from "@deck.gl/core";
-import type { DeckGLProps, DeckGLRef } from "@deck.gl/react";
+import type { DeckGLRef } from "@deck.gl/react";
 import DeckGL from "@deck.gl/react";
 
 import {
