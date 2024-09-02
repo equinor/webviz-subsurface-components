@@ -67,9 +67,8 @@ export type TLayerDefinition =
 /**
  * Properties of the SubsurfaceViewer component.
  */
-export interface SubsurfaceViewerProps extends Pick<MapProps, "innerRef"> {
-    id: string;
-    resources?: Record<string, unknown>;
+export interface SubsurfaceViewerProps
+    extends Omit<MapProps, "layers" | "setEditedData" | "toolbar"> {
     /**
      * Array of externally created layers or layer definition records or JSON strings.
      * Add '@@typedArraySupport' : true in a layer definition in order to
@@ -77,79 +76,12 @@ export interface SubsurfaceViewerProps extends Pick<MapProps, "innerRef"> {
      */
     layers?: TLayerDefinition[];
 
-    bounds?: [number, number, number, number] | BoundsAccessor;
-    cameraPosition?: ViewStateType | undefined;
-    triggerHome?: number;
-
-    views?: ViewsType;
-    coords?: {
-        visible?: boolean | null;
-        multiPicking?: boolean | null;
-        pickDepth?: number | null;
-    };
-    scale?: {
-        visible?: boolean | null;
-        incrementValue?: number | null;
-        widthPerUnit?: number | null;
-        cssStyle?: Record<string, unknown> | null;
-    };
-    coordinateUnit?: Unit;
-    colorTables?: colorTablesArray;
-
-    /**
-     * @deprecated Used by layers to propagate state to component, eg. selected
-     * wells from the Wells layer. Use client code to handle layer state
-     * instead.
-     */
-    editedData?: Record<string, unknown>;
     /**
      * @deprecated Used by layers to propagate state to component, eg. selected
      * wells from the Wells layer. Use client code to handle layer state
      * instead.
      */
     setProps?: (data: Record<string, unknown>) => void;
-
-    /**
-     * Validate JSON datafile against schema
-     */
-    checkDatafileSchema?: boolean;
-
-    /**
-     * For get mouse events
-     */
-    onMouseEvent?: (event: MapMouseEvent) => void;
-
-    getCameraPosition?: (input: ViewStateType) => void;
-
-    /**
-     * Will be called while layers are processed to rendered data.
-     * @param progress vlaue between 0 and 100.
-     */
-    onRenderingProgress?: (progress: number) => void;
-
-    onDragStart?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
-    onDragEnd?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
-
-    triggerResetMultipleWells?: number;
-    /**
-     * Range selection of the current well
-     */
-    selection?: {
-        well: string | undefined;
-        selection: [number | undefined, number | undefined] | undefined;
-    };
-
-    /**
-     * Override default tooltip with a callback.
-     */
-    getTooltip?: TooltipCallback;
-
-    lights?: LightsType;
-
-    children?: React.ReactNode;
-
-    /** A vertical scale factor, used to scale items in the view vertically */
-    verticalScale?: number;
 }
 
 const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({

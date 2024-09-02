@@ -344,7 +344,7 @@ export interface MapProps {
 
     /**
      * Will be called while layers have rendered data.
-     * progress is a number between 0 and 100.
+     * @param progress value between 0 and 100.
      */
     onRenderingProgress?: (progress: number) => void;
 
@@ -352,6 +352,10 @@ export interface MapProps {
     onDragEnd?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
 
     triggerResetMultipleWells?: number;
+
+    /**
+     * Range selection of the current well
+     */
     selection?: {
         well: string | undefined;
         selection: [number | undefined, number | undefined] | undefined;
@@ -361,13 +365,15 @@ export interface MapProps {
 
     children?: React.ReactNode;
 
+    /**
+     * Override default tooltip with a callback.
+     */
     getTooltip?: TooltipCallback;
 
     /** A vertical scale factor, used to scale items in the view vertically */
     verticalScale?: number;
 
     innerRef?: React.Ref<HTMLElement>;
-    //ref?: React.ForwardedRef<HTMLElement>;
 }
 
 function defaultTooltip(info: PickingInfo) {
