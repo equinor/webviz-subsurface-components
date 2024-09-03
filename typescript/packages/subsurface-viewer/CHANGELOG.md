@@ -1,3 +1,22 @@
+## [0.29.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.29.0...subsurface-viewer@0.29.1) (2024-08-30)
+
+
+### Bug Fixes
+
+* bump mathjs from 12.4.3 to 13.1.1 in /typescript ([#2208](https://github.com/equinor/webviz-subsurface-components/issues/2208)) ([901093e](https://github.com/equinor/webviz-subsurface-components/commit/901093e079fd4c8b8c94de50b8e96ba0c7a3e212)), closes [#3228](https://github.com/equinor/webviz-subsurface-components/issues/3228) [#3196](https://github.com/equinor/webviz-subsurface-components/issues/3196) [#3235](https://github.com/equinor/webviz-subsurface-components/issues/3235) [#3241](https://github.com/equinor/webviz-subsurface-components/issues/3241) [#3242](https://github.com/equinor/webviz-subsurface-components/issues/3242) [#3244](https://github.com/equinor/webviz-subsurface-components/issues/3244) [#3238](https://github.com/equinor/webviz-subsurface-components/issues/3238) [#3150](https://github.com/equinor/webviz-subsurface-components/issues/3150) [#3252](https://github.com/equinor/webviz-subsurface-components/issues/3252) [#3232](https://github.com/equinor/webviz-subsurface-components/issues/3232) [#3229](https://github.com/equinor/webviz-subsurface-components/issues/3229) [#2286](https://github.com/equinor/webviz-subsurface-components/issues/2286) [#3230](https://github.com/equinor/webviz-subsurface-components/issues/3230) [#3223](https://github.com/equinor/webviz-subsurface-components/issues/3223) [#3227](https://github.com/equinor/webviz-subsurface-components/issues/3227) [#3255](https://github.com/equinor/webviz-subsurface-components/issues/3255) [#3228](https://github.com/equinor/webviz-subsurface-components/issues/3228) [#3252](https://github.com/equinor/webviz-subsurface-components/issues/3252)
+
+# [0.29.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.28.2...subsurface-viewer@0.29.0) (2024-08-28)
+
+
+### Bug Fixes
+
+* remove defaultProps from function components ([#2201](https://github.com/equinor/webviz-subsurface-components/issues/2201)) ([389db32](https://github.com/equinor/webviz-subsurface-components/commit/389db3208fd02a3dccbf1cc7020fc3e0035432a7))
+
+
+### Features
+
+* **grid3d:** Specific color for undefined property values. ([#2197](https://github.com/equinor/webviz-subsurface-components/issues/2197)) ([597a3ae](https://github.com/equinor/webviz-subsurface-components/commit/597a3ae105835343519fadbb5558d9eddef1e7f5))
+
 ## [0.28.2](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.28.1...subsurface-viewer@0.28.2) (2024-08-22)
 
 

@@ -40,9 +40,9 @@ import { deepCopy } from "./utils/deepcopy";
 import { getDiscreteMeta, indexOfElementByName } from "./utils/tracks";
 
 import type {
+    TrackMouseEvent,
     WellLogController,
     WellLogViewOptions,
-    TrackMouseEvent,
 } from "./components/WellLogView";
 import { isEqualRanges } from "./utils/log-viewer";
 
@@ -51,8 +51,9 @@ import { CallbackManager } from "./components/CallbackManager";
 import colorTables from "../../../../example-data/wellpick_colors.json";
 import wellPicks from "../../../../example-data/wellpicks.json";
 
-import { axisMnemos, axisTitles } from "./utils/axes";
+import type { Info } from "./components/InfoTypes";
 import type WellLogView from "./components/WellLogView";
+import { axisMnemos, axisTitles } from "./utils/axes";
 
 const ComponentCode =
     '<WellLogViewer id="WellLogViewer" \r\n' +
@@ -85,9 +86,6 @@ const stories: Meta = {
                 "The ID of this component, used to identify dash components in callbacks. The ID needs to be unique across all of the components in an app.",
         },
     },
-
-    // Disable automatic testing of stories that use this tag.
-    tags: ["no-test"],
 };
 export default stories;
 
@@ -379,6 +377,102 @@ export const Horizontal: StoryObj<typeof StoryTemplate> = {
     },
     render: (args) => <StoryTemplate {...args} />,
 };
+
+export const OnInfoFilledEvent: StoryObj<typeof StoryTemplate> = {
+    args: {
+        id: "Well-Log-Viewer-OnInfoFilled",
+        horizontal: true,
+        welllog:
+            require("../../../../example-data/WL_RAW_AAC-BHPR-CAL-DEN-GR-MECH-NEU-NMR-REMP_MWD_3.json")[0], // eslint-disable-line
+        template: require("../../../../example-data/welllog_template_2.json"), // eslint-disable-line
+
+        // @ts-expect-error TS2322
+        colorTables: colorTables,
+        // @ts-expect-error TS2322
+
+        wellpick: wellpick,
+        axisTitles: axisTitles,
+        axisMnemos: axisMnemos,
+        viewTitle: true, // show default welllog view title (a wellname from the welllog)
+        layout: { right: undefined },
+    },
+    parameters: {
+        docs: {
+            description: {
+                story: 'You can get the computed information at the current selection by using the "onInfoFilled" event. The event is called both externally (via the callback property), or internally (using the callback manager). This example shows an external floating panel using the callback property',
+            },
+        },
+    },
+    render: (args) => <StoryTemplateWithCustomPanel {...args} />,
+};
+
+function StoryTemplateWithCustomPanel(props: WellLogViewerProps): JSX.Element {
+    const [infos, setInfos] = React.useState<Info[]>([]);
+    const [showPanel, setShowPanel] = React.useState<boolean>(false);
+
+    const handleInfoFilled = React.useCallback((newInfos: Info[]) => {
+        setInfos(newInfos);
+    }, []);
+
+    return (
+        <div
+            // Show/hide the panel when we move the mouse away from the story
+            onMouseEnter={() => setShowPanel(true)}
+            onMouseLeave={() => setShowPanel(false)}
+        >
+            <StoryTemplate {...props} onInfoFilled={handleInfoFilled} />
+            {showPanel && <CustomInfoPanel infos={infos} />}
+        </div>
+    );
+}
+
+function CustomInfoPanel(props: { infos: Info[] }) {
+    const [mousePosition, setMousePosition] = React.useState({
+        x: -1000,
+        y: -1000,
+    });
+    React.useEffect(() => {
+        const updateMousePos = (evt: MouseEvent) => {
+            setMousePosition({ x: evt.clientX, y: evt.clientY });
+        };
+
+        window.addEventListener("mousemove", updateMousePos);
+        return () => window.removeEventListener("mousemove", updateMousePos);
+    }, []);
+
+    return (
+        <div
+            style={{
+                position: "fixed",
+                left: mousePosition.x + 20,
+                top: mousePosition.y + 2,
+                padding: "0.25rem",
+                border: "solid gray 1px",
+                borderRadius: "0.25rem",
+                zIndex: 9999,
+                background: "white",
+                pointerEvents: "none",
+            }}
+        >
+            <div>
+                {props.infos?.map((i: Info) => {
+                    if (i.type === "separator") return null;
+                    else
+                        return (
+                            <div key={i.trackId}>
+                                <span style={{ fontWeight: 700 }}>
+                                    {i.name}
+                                </span>
+                                <span> {i.value.toFixed(3)}</span>
+
+                                <span> {i.units}</span>
+                            </div>
+                        );
+                })}
+            </div>
+        </div>
+    );
+}
 
 class MapAndWellLogViewer extends React.Component<Props, State> {
     public static propTypes?: WeakValidationMap<Props> | undefined;
