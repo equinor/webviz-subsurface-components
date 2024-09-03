@@ -99,19 +99,6 @@ export default class WellLogViewer extends Component<
         this.onInfoGroupClick = this.onInfoGroupClick.bind(this);
 
         this.onChangePrimaryAxis = this.onChangePrimaryAxis.bind(this);
-
-        this.callbackManager.registerCallback(
-            "onInfoGroupClick",
-            this.onInfoGroupClick,
-            true
-        );
-
-        if (props.onInfoFilled) {
-            this.callbackManager.registerCallback(
-                "onInfoFilled",
-                props.onInfoFilled
-            );
-        }
     }
 
     onInfoGroupClick(info: Info): void {
@@ -192,6 +179,19 @@ export default class WellLogViewer extends Component<
     }
 
     componentDidMount(): void {
+        this.callbackManager.registerCallback(
+            "onInfoGroupClick",
+            this.onInfoGroupClick,
+            true
+        );
+
+        if (this.props.onInfoFilled) {
+            this.callbackManager.registerCallback(
+                "onInfoFilled",
+                this.props.onInfoFilled
+            );
+        }
+
         this.onContentRescale();
         const controller = this.callbackManager?.controller;
         if (controller) {
