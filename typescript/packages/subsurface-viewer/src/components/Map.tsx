@@ -373,6 +373,10 @@ export interface MapProps {
     /** A vertical scale factor, used to scale items in the view vertically */
     verticalScale?: number;
 
+    /**
+     * A reference to a wrapped div element, which can be used to attach
+     * an event listener.
+     */
     innerRef?: React.Ref<HTMLElement>;
 }
 

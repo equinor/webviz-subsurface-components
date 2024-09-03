@@ -52,6 +52,12 @@ function convertToArrowEvent(event: KeyboardEvent): ArrowEvent | null {
     return null;
 }
 
+/**
+ * A hook for listening to key arrow events.
+ * @returns an object containing the factor state, a callback for altering
+ * the state, and a ref that is used to attach the event listener used for
+ * keyboard events.
+ */
 export const useScaleFactor = () => {
     const [factor, setFactor] = React.useState(1);
 
