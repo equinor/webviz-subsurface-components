@@ -1,3 +1,10 @@
+## [1.12.7](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.12.6...well-log-viewer@1.12.7) (2024-09-03)
+
+
+### Bug Fixes
+
+* Well Log Viewer - Moved callback subscription to well-log-viewer mounted hook ([#2217](https://github.com/equinor/webviz-subsurface-components/issues/2217)) ([c0e5c97](https://github.com/equinor/webviz-subsurface-components/commit/c0e5c974d315b7d755db3222c91dcf21212786a7)), closes [#2216](https://github.com/equinor/webviz-subsurface-components/issues/2216) [#2196](https://github.com/equinor/webviz-subsurface-components/issues/2196)
+
 ## [1.12.6](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.12.5...well-log-viewer@1.12.6) (2024-08-30)
 
 
