@@ -1,3 +1,10 @@
+# [0.30.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.29.1...subsurface-viewer@0.30.0) (2024-09-04)
+
+
+### Features
+
+* Add hook for vertical scaling ([#2218](https://github.com/equinor/webviz-subsurface-components/issues/2218)) ([64ea951](https://github.com/equinor/webviz-subsurface-components/commit/64ea951b919ab04b8e2a37233da7d2058afb6220))
+
 ## [0.29.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.29.0...subsurface-viewer@0.29.1) (2024-08-30)
 
 
