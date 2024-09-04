@@ -71,7 +71,7 @@ import IntersectionView from "../views/intersectionView";
 
 import type { LightsType, TLayerDefinition } from "../SubsurfaceViewer";
 import { getZoom, useLateralZoom } from "../utils/camera";
-import { useHandleRescale, useShiftHeld } from "../utils/event";
+import { useScaleFactor, useShiftHeld } from "../utils/event";
 
 import type { ViewportType } from "../views/viewport";
 import { useVerticalScale } from "../views/viewport";
@@ -344,7 +344,7 @@ export interface MapProps {
 
     /**
      * Will be called while layers have rendered data.
-     * progress is a number between 0 and 100.
+     * @param progress value between 0 and 100.
      */
     onRenderingProgress?: (progress: number) => void;
 
@@ -352,6 +352,10 @@ export interface MapProps {
     onDragEnd?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
 
     triggerResetMultipleWells?: number;
+
+    /**
+     * Range selection of the current well
+     */
     selection?: {
         well: string | undefined;
         selection: [number | undefined, number | undefined] | undefined;
@@ -361,10 +365,19 @@ export interface MapProps {
 
     children?: React.ReactNode;
 
+    /**
+     * Override default tooltip with a callback.
+     */
     getTooltip?: TooltipCallback;
 
     /** A vertical scale factor, used to scale items in the view vertically */
     verticalScale?: number;
+
+    /**
+     * A reference to a wrapped div element, which can be used to attach
+     * an event listener.
+     */
+    innerRef?: React.Ref<HTMLElement>;
 }
 
 function defaultTooltip(info: PickingInfo) {
@@ -401,6 +414,7 @@ const Map: React.FC<MapProps> = ({
     lights,
     triggerResetMultipleWells,
     verticalScale,
+    innerRef,
 }: MapProps) => {
     // From react doc, ref should not be read nor modified during rendering.
     const deckRef = React.useRef<DeckGLRef>(null);
@@ -438,15 +452,18 @@ const Map: React.FC<MapProps> = ({
     const viewportVerticalScale = useVerticalScale(views?.viewports);
 
     // Used for scaling in z direction using arrow keys.
-    const { zScale: zReScale, divRef: zScaleRef } = useHandleRescale(
-        !!(verticalScale ?? viewportVerticalScale)
-    );
+    const { factor: zReScale, elementRef: zScaleRef } = useScaleFactor();
 
     const { shiftHeld, divRef: shiftHeldRef } = useShiftHeld();
 
+    // Prevent using internal hook for manipulating vertical scale when the vertical
+    // scale is explicitly defined.
+    const overrideVerticalScaling = verticalScale ?? viewportVerticalScale;
+
     const divRef = mergeRefs(
-        zScaleRef,
-        shiftHeldRef
+        overrideVerticalScaling ? undefined : zScaleRef,
+        shiftHeldRef,
+        innerRef
     ) as React.Ref<HTMLDivElement>;
 
     const zScale = verticalScale ?? viewportVerticalScale ?? zReScale;
