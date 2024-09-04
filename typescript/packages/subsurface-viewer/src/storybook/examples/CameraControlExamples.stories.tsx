@@ -677,6 +677,7 @@ const ScaleFactorHookComponent = ({
         cameraPosition: SIDE_CAMERA,
         verticalScale: scaleFactor,
         innerRef: elementRef,
+        coords: { visible: false },
     };
     return <SubsurfaceViewer {...viewerProps} />;
 };
@@ -702,7 +703,7 @@ export const ScaleFactorHook: StoryObj<typeof ScaleFactorHookComponent> = {
         const canvas = document.querySelector("canvas");
 
         if (canvas) {
-            userEvent.click(canvas);
+            await userEvent.click(canvas);
         }
 
         await userEvent.keyboard("[ArrowUp]", { delay });
