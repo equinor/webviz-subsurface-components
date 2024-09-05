@@ -30,7 +30,7 @@ import type {
 import type { WellLogSpacerOptions } from "./components/WellLogSpacer";
 import { getWellPicks } from "./components/WellLogView";
 
-import { getAvailableAxes } from "./utils/tracks";
+import { getAvailableAxes, toggleId } from "./utils/tracks";
 
 import { checkMinMax } from "./utils/minmax";
 
@@ -39,6 +39,8 @@ import { onTrackMouseEventDefault } from "./utils/edit-track";
 import type { Info, InfoOptions } from "./components/InfoTypes";
 
 import { isEqualRanges, isEqDomains } from "./utils/log-viewer";
+import type { LogViewer } from "@equinor/videx-wellog";
+import { fillInfos } from "./utils/fill-info";
 
 export function isEqualArrays(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -161,6 +163,14 @@ export interface SyncLogViewerProps {
     layout?: ViewerLayout<SyncLogViewer>;
 
     // callbacks
+    onInfo?: (
+        iWellLog: number,
+        x: number,
+        logController: LogViewer,
+        iFrom: number,
+        iTo: number
+    ) => void;
+    onInfoFilled?: (iWellLog: number, infos: Info[]) => void;
     onContentRescale?: (iWellLog: number) => void;
     onContentSelection?: (iWellLog: number) => void;
     onTemplateChanged?: (iWellLog: number) => void;
@@ -278,8 +288,15 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         onContentRescaleBind: () => void;
         onContentSelectionBind: () => void;
         onTemplateChangedBind: () => void;
+        onInfoBind: (
+            x: number,
+            logController: LogViewer,
+            iFrom: number,
+            iTo: number
+        ) => void;
     }[];
 
+    collapsedTrackIds: (string | number)[][];
     controllers: WellLogController[]; // for onDeletecontroller implementation
 
     _isMounted: boolean;
@@ -292,6 +309,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
 
         this.callbacks = [];
         this.callbackManagers = [];
+        this.collapsedTrackIds = [];
 
         this.controllers = [];
 
@@ -392,6 +410,9 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
     }
 
     fillViewCallbacks(iView: number): void {
+        const collapsedTrackIds: (string | number)[] = [];
+        this.collapsedTrackIds.push(collapsedTrackIds);
+
         const callbackManager = new CallbackManager(
             () => this.props.welllogs[iView]
         );
@@ -404,7 +425,17 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
             true
         );
 
+        // const onInfoFilled = this.onInfoFilled.bind(this, iView);
+        const onInfoFilled = (infos: Info[]) => {
+            this.props.onInfoFilled?.(iView, infos);
+        };
+
+        if (this.props.onInfoFilled) {
+            callbackManager.registerCallback("onInfoFilled", onInfoFilled);
+        }
+
         this.callbacks.push({
+            onInfoBind: this.onInfo.bind(this, iView),
             onCreateControllerBind: this.onCreateController.bind(this, iView),
             onTrackScrollBind: this.onTrackScroll.bind(this, iView),
             onTrackSelectionBind: this.onTrackSelection.bind(this, iView),
@@ -461,7 +492,49 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                 callbackManager.callCallbacks("onInfoGroupClick", info);
             i++;
         }
+
+        // Collapse this views info group
+        const collapsedTrackIds = this.collapsedTrackIds[iWellLog];
+        toggleId(collapsedTrackIds, info.trackId);
+        this.callbackManagers[iWellLog].updateInfo();
+
         this._inInfoGroupClick--;
+    }
+
+    onInfo(
+        iWellLog: number,
+        x: number,
+        logController: LogViewer,
+        iFrom: number,
+        iTo: number
+    ) {
+        this.callbackManagers[iWellLog].onInfo(x, logController, iFrom, iTo);
+        this.props.onInfo?.(iWellLog, x, logController, iFrom, iTo);
+
+        this.fillInfo(iWellLog, x, logController, iFrom, iTo);
+    }
+
+    fillInfo(
+        iWellLog: number,
+        x: number,
+        logController: LogViewer,
+        iFrom: number,
+        iTo: number
+    ) {
+        // Skip computations if no-one is listening to the result
+        if (this.callbackManagers[iWellLog].onInfoFilledCallbacks.length < 1)
+            return;
+
+        const interpolatedData = fillInfos(
+            x,
+            logController,
+            iFrom,
+            iTo,
+            this.collapsedTrackIds[iWellLog],
+            this.props.readoutOptions
+        );
+
+        this.callbackManagers[iWellLog].onInfoFilled(interpolatedData);
     }
 
     // callback function from WellLogView
@@ -845,7 +918,6 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
 
     createView(index: number): ReactNode {
         const callbacks = this.callbacks[index];
-        const callbackManager = this.callbackManagers[index];
         const wellLog = this.props.welllogs[index];
         const templates = this.props.templates;
         const template = templates[index] ? templates[index] : templates[0];
@@ -877,7 +949,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                 primaryAxis={this.state.primaryAxis}
                 options={options}
                 // callbacks
-                onInfo={callbackManager.onInfo}
+                onInfo={callbacks.onInfoBind}
                 onCreateController={callbacks.onCreateControllerBind}
                 onTrackMouseEvent={
                     this.props.onTrackMouseEvent || onTrackMouseEventDefault

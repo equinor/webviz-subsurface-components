@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
-import DistanceScale from "../../components/DistanceScale";
+import { DistanceScale } from "../../components/DistanceScale";
 
 const stories: Meta = {
     component: DistanceScale,

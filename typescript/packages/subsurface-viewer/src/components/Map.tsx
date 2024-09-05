@@ -40,7 +40,7 @@ import { LineLayer } from "@deck.gl/layers";
 import { Matrix4 } from "@math.gl/core";
 import { fovyToAltitude } from "@math.gl/web-mercator";
 
-import { colorTables } from "@emerson-eps/color-tables";
+import { colorTables as defaultColorTables } from "@emerson-eps/color-tables";
 import type { colorTablesArray } from "@emerson-eps/color-tables/";
 
 import { validateColorTables, validateLayers } from "@webviz/wsc-common";
@@ -62,7 +62,7 @@ import {
 } from "../utils/BoundingBox3D";
 import JSON_CONVERTER_CONFIG from "../utils/configuration";
 import fitBounds from "../utils/fit-bounds";
-import DistanceScale from "./DistanceScale";
+import { DistanceScale } from "./DistanceScale";
 import InfoCard from "./InfoCard";
 import StatusIndicator from "./StatusIndicator";
 
@@ -71,7 +71,7 @@ import IntersectionView from "../views/intersectionView";
 
 import type { LightsType, TLayerDefinition } from "../SubsurfaceViewer";
 import { getZoom, useLateralZoom } from "../utils/camera";
-import { useHandleRescale, useShiftHeld } from "../utils/event";
+import { useScaleFactor, useShiftHeld } from "../utils/event";
 
 import type { ViewportType } from "../views/viewport";
 import { useVerticalScale } from "../views/viewport";
@@ -93,6 +93,13 @@ const minZoom3D = -12;
 const maxZoom3D = 12;
 const minZoom2D = -12;
 const maxZoom2D = 4;
+
+const DEFAULT_VIEWS: ViewsType = {
+    layout: [1, 1],
+    showLabel: false,
+    marginPixels: 0,
+    viewports: [{ id: "main-view", show3D: false, layerIds: [] }],
+};
 
 function parseLights(lights?: LightsType): LightingEffect[] | undefined {
     if (!lights) {
@@ -298,7 +305,7 @@ export interface MapProps {
     coordinateUnit?: Unit;
 
     /**
-     * Parameters to control toolbar
+     * @deprecated Not in use
      */
     toolbar?: {
         visible?: boolean | null;
@@ -310,12 +317,16 @@ export interface MapProps {
     colorTables?: colorTablesArray;
 
     /**
-     * Prop containing edited data from layers
+     * @deprecated Used by layers to propagate state to component, eg. selected
+     * wells from the Wells layer. Use client code to handle layer state
+     * instead.
      */
     editedData?: Record<string, unknown>;
 
     /**
-     * For reacting to prop changes
+     * @deprecated Used by layers to propagate state to component, eg. selected
+     * wells from the Wells layer. Use client code to handle layer state
+     * instead.
      */
     setEditedData?: (data: Record<string, unknown>) => void;
 
@@ -333,7 +344,7 @@ export interface MapProps {
 
     /**
      * Will be called while layers have rendered data.
-     * progress is a number between 0 and 100.
+     * @param progress value between 0 and 100.
      */
     onRenderingProgress?: (progress: number) => void;
 
@@ -341,6 +352,10 @@ export interface MapProps {
     onDragEnd?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
 
     triggerResetMultipleWells?: number;
+
+    /**
+     * Range selection of the current well
+     */
     selection?: {
         well: string | undefined;
         selection: [number | undefined, number | undefined] | undefined;
@@ -350,10 +365,19 @@ export interface MapProps {
 
     children?: React.ReactNode;
 
+    /**
+     * Override default tooltip with a callback.
+     */
     getTooltip?: TooltipCallback;
 
     /** A vertical scale factor, used to scale items in the view vertically */
     verticalScale?: number;
+
+    /**
+     * A reference to a wrapped div element, which can be used to attach
+     * an event listener.
+     */
+    innerRef?: React.Ref<HTMLElement>;
 }
 
 function defaultTooltip(info: PickingInfo) {
@@ -372,13 +396,13 @@ const Map: React.FC<MapProps> = ({
     bounds,
     cameraPosition,
     triggerHome,
-    views,
-    coords,
-    scale,
-    coordinateUnit,
-    colorTables,
+    views = DEFAULT_VIEWS,
+    coords = { visible: true, multiPicking: true, pickDepth: 10 },
+    scale = { visible: true, cssStyle: { top: 10, left: 10 } },
+    coordinateUnit = "m",
+    colorTables = defaultColorTables,
     setEditedData,
-    checkDatafileSchema,
+    checkDatafileSchema = false,
     onMouseEvent,
     selection,
     children,
@@ -390,6 +414,7 @@ const Map: React.FC<MapProps> = ({
     lights,
     triggerResetMultipleWells,
     verticalScale,
+    innerRef,
 }: MapProps) => {
     // From react doc, ref should not be read nor modified during rendering.
     const deckRef = React.useRef<DeckGLRef>(null);
@@ -427,15 +452,18 @@ const Map: React.FC<MapProps> = ({
     const viewportVerticalScale = useVerticalScale(views?.viewports);
 
     // Used for scaling in z direction using arrow keys.
-    const { zScale: zReScale, divRef: zScaleRef } = useHandleRescale(
-        !!(verticalScale ?? viewportVerticalScale)
-    );
+    const { factor: zReScale, elementRef: zScaleRef } = useScaleFactor();
 
     const { shiftHeld, divRef: shiftHeldRef } = useShiftHeld();
 
+    // Prevent using internal hook for manipulating vertical scale when the vertical
+    // scale is explicitly defined.
+    const overrideVerticalScaling = verticalScale ?? viewportVerticalScale;
+
     const divRef = mergeRefs(
-        zScaleRef,
-        shiftHeldRef
+        overrideVerticalScaling ? undefined : zScaleRef,
+        shiftHeldRef,
+        innerRef
     ) as React.Ref<HTMLDivElement>;
 
     const zScale = verticalScale ?? viewportVerticalScale ?? zReScale;
@@ -840,31 +868,6 @@ const Map: React.FC<MapProps> = ({
             )}
         </div>
     );
-};
-
-Map.defaultProps = {
-    coords: {
-        visible: true,
-        multiPicking: true,
-        pickDepth: 10,
-    },
-    scale: {
-        visible: true,
-        incrementValue: 100,
-        widthPerUnit: 100,
-        cssStyle: { top: 10, left: 10 },
-    },
-    toolbar: {
-        visible: false,
-    },
-    coordinateUnit: "m",
-    views: {
-        layout: [1, 1],
-        showLabel: false,
-        viewports: [{ id: "main-view", show3D: false, layerIds: [] }],
-    },
-    colorTables: colorTables,
-    checkDatafileSchema: false,
 };
 
 export default Map;

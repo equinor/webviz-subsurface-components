@@ -12,7 +12,6 @@ import AxesLayer from "../../layers/axes/axesLayer";
 const stories: Meta = {
     component: DeckGL,
     title: "SubsurfaceViewer / AxesLayer",
-    tags: ["no-test"],
 };
 export default stories;
 
@@ -101,5 +100,4 @@ export const CustomLabel: StoryObj<typeof CustomLabelsComponent> = {
         fontFamily: "math",
     },
     render: (args) => <CustomLabelsComponent {...args} />,
-    tags: ["no-test"],
 };

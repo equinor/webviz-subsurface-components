@@ -1,3 +1,17 @@
+# [0.8.0](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.7.3...wsc-common@0.8.0) (2024-09-04)
+
+
+### Features
+
+* Add hook for vertical scaling ([#2218](https://github.com/equinor/webviz-subsurface-components/issues/2218)) ([64ea951](https://github.com/equinor/webviz-subsurface-components/commit/64ea951b919ab04b8e2a37233da7d2058afb6220))
+
+## [0.7.3](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.7.2...wsc-common@0.7.3) (2024-08-30)
+
+
+### Bug Fixes
+
+* bump mathjs from 12.4.3 to 13.1.1 in /typescript ([#2208](https://github.com/equinor/webviz-subsurface-components/issues/2208)) ([901093e](https://github.com/equinor/webviz-subsurface-components/commit/901093e079fd4c8b8c94de50b8e96ba0c7a3e212)), closes [#3228](https://github.com/equinor/webviz-subsurface-components/issues/3228) [#3196](https://github.com/equinor/webviz-subsurface-components/issues/3196) [#3235](https://github.com/equinor/webviz-subsurface-components/issues/3235) [#3241](https://github.com/equinor/webviz-subsurface-components/issues/3241) [#3242](https://github.com/equinor/webviz-subsurface-components/issues/3242) [#3244](https://github.com/equinor/webviz-subsurface-components/issues/3244) [#3238](https://github.com/equinor/webviz-subsurface-components/issues/3238) [#3150](https://github.com/equinor/webviz-subsurface-components/issues/3150) [#3252](https://github.com/equinor/webviz-subsurface-components/issues/3252) [#3232](https://github.com/equinor/webviz-subsurface-components/issues/3232) [#3229](https://github.com/equinor/webviz-subsurface-components/issues/3229) [#2286](https://github.com/equinor/webviz-subsurface-components/issues/2286) [#3230](https://github.com/equinor/webviz-subsurface-components/issues/3230) [#3223](https://github.com/equinor/webviz-subsurface-components/issues/3223) [#3227](https://github.com/equinor/webviz-subsurface-components/issues/3227) [#3255](https://github.com/equinor/webviz-subsurface-components/issues/3255) [#3228](https://github.com/equinor/webviz-subsurface-components/issues/3228) [#3252](https://github.com/equinor/webviz-subsurface-components/issues/3252)
+
 ## [0.7.2](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.7.1...wsc-common@0.7.2) (2024-08-22)
 
 

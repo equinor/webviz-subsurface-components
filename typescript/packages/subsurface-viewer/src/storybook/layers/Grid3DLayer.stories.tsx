@@ -262,6 +262,7 @@ export const PolyhedralCells: StoryObj<typeof SubsurfaceViewer> = {
 
 // ---------In-place array data handling (storybook fails to rebuild non JSon data)--------------- //
 const discretePropsLayerId = "discrete_props";
+
 const layerArrays = {
     [discretePropsLayerId]: {
         pointsData: new Float32Array(gridPoints),
@@ -289,12 +290,16 @@ function replaceLayerArrays(
     layer: TLayerDefinition,
     keys: string[] | undefined = undefined
 ) {
+    // @ts-expect-error TS7053
     const layerId = layer?.["id"] as string | undefined;
+    // @ts-expect-error TS7053
     if (layer && layerId && layerArrays[layerId]) {
         if (!keys) {
+            // @ts-expect-error TS7053
             keys = Object.keys(layerArrays[layerId]) as string[];
         }
         for (const key of keys) {
+            // @ts-expect-error TS7053
             layer[key] = layerArrays[layerId][key];
         }
     }
@@ -380,12 +385,66 @@ export const CustomColorFuncWithClamping: StoryObj<typeof SubsurfaceViewer> = {
                     layerArrays[discretePropsLayerId].propertiesData,
                 colorMapName: "Seismic",
                 ZIncreasingDownwards: true,
+                // @ts-expect-error TS7006
                 colorMapFunction: function (v) {
                     return [255 * v, 0, 255 * (1 - v)];
                 },
                 material: false,
                 colorMapRange: [3, 10],
                 colorMapClampColor: [100, 100, 100],
+            },
+        ],
+    },
+    parameters: parameters,
+    render: (args) => (
+        <SubsurfaceViewer
+            {...replaceArrays(args, [
+                "pointsData",
+                "polysData",
+                "propertiesData",
+            ])}
+        />
+    ),
+};
+
+export const DiscretePropertyWithUndefinedValues: StoryObj<
+    typeof SubsurfaceViewer
+> = {
+    args: {
+        bounds: [-2500, -2500, 2500, 2500] as NumberQuad,
+        views: {
+            layout: [1, 1] as [number, number],
+            viewports: [
+                {
+                    id: "view_1",
+                    show3D: true,
+                },
+            ],
+        },
+        id: "grid-3d-discrete-props-undef-vals",
+        layers: [
+            {
+                ...axes,
+                id: "discrete-props-undef-vals-axes",
+                bounds: [-2000, -2200, -2200, 2200, 2000, -1000],
+            },
+            {
+                ...grid3dLayer,
+                "@@typedArraySupport": true,
+                id: discretePropsLayerId,
+                coloringMode: TGrid3DColoringMode.Property,
+                colorMapFunction:
+                    layerArrays[discretePropsLayerId].colorMapFunction,
+                discretePropertyValueNames: propertyValueNames,
+                pickable: true,
+                pointsData: layerArrays[discretePropsLayerId].pointsData,
+                polysData: layerArrays[discretePropsLayerId].polysData,
+                propertiesData:
+                    layerArrays[discretePropsLayerId].propertiesData,
+                colorMapName: "Rainbow",
+                ZIncreasingDownwards: true,
+                material: false,
+                undefinedPropertyValue: 4,
             },
         ],
     },

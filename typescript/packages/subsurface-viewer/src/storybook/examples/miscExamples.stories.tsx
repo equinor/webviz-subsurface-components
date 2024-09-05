@@ -40,6 +40,7 @@ import {
 const stories: Meta = {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer/Examples",
+    // @ts-expect-error TS2322
     argTypes: argTypes,
     args: {
         // Add a reset button for all the stories.
@@ -152,6 +153,7 @@ export const MapClampColor: StoryObj<typeof SubsurfaceViewer> = {
 const layer = {
     ...hugin25mKhNetmapMapLayerPng,
     isContoursDepth: true,
+    // @ts-expect-error TS7006
     colorMapFunction: (x) => [255 - x * 100, 255 - x * 100, 255 * x], // If defined this function will override the colormap.
 };
 export const colorMapFunction: StoryObj<typeof SubsurfaceViewer> = {
@@ -164,6 +166,7 @@ export const colorMapFunction: StoryObj<typeof SubsurfaceViewer> = {
             {
                 ...colormapLayer,
                 image: "propertyMap.png",
+                // @ts-expect-error TS7006
                 colorMapFunction: (x) => [
                     255 - x * 100,
                     255 - x * 100,
@@ -208,6 +211,7 @@ const SelectableFeatureComponent: React.FC<SubsurfaceViewerProps> = (args) => {
                 editedData={editedData}
                 setProps={(updatedProps) => {
                     setEditedData(
+                        // @ts-expect-error TS4111
                         updatedProps.editedData as Record<string, unknown>
                     );
                 }}

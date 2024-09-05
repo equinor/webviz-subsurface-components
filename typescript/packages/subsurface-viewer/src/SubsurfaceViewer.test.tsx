@@ -20,6 +20,7 @@ describe("Test Map component", () => {
                 coords={mapData[0].coords}
                 scale={mapData[0].scale}
                 coordinateUnit={mapData[0].coordinateUnit as Unit}
+                // @ts-expect-error TS2322
                 legend={mapData[0].legend}
                 editedData={mapData[0].editedData}
                 views={{
@@ -47,6 +48,7 @@ describe("Test Map component", () => {
                 coords={mapData[0].coords}
                 scale={mapData[0].scale}
                 coordinateUnit={mapData[0].coordinateUnit as Unit}
+                // @ts-expect-error TS2322
                 legend={mapData[0].legend}
                 editedData={{}}
                 views={{
@@ -75,6 +77,7 @@ describe("Test Map component", () => {
                 coords={mapData[0].coords}
                 scale={mapData[0].scale}
                 coordinateUnit={mapData[0].coordinateUnit as Unit}
+                // @ts-expect-error TS2339
                 legend={mapData[0].legend}
                 editedData={mapData[0].editedData}
                 views={{

@@ -21,6 +21,7 @@ import type { MapMouseEvent } from "../../components/Map";
 import AxesLayer from "../../layers/axes/axesLayer";
 import WellsLayer from "../../layers/wells/wellsLayer";
 
+import { Axes2DLayer } from "../../layers";
 import {
     default2DViews,
     default3DViews,
@@ -29,7 +30,6 @@ import {
     volveWellsFromResourcesLayer,
     volveWellsResources,
 } from "../sharedSettings";
-import { Axes2DLayer } from "../../layers";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -39,7 +39,6 @@ const stories: Meta = {
         // Somehow, I do not manage to add the triggerHome to the general "unset" controls :/
         triggerHome: 0,
     },
-    tags: ["no-test"],
 };
 export default stories;
 

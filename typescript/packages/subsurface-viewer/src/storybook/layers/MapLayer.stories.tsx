@@ -40,9 +40,6 @@ const stories: Meta = {
         // Somehow, I do not manage to add the triggerHome to the general "unset" controls :/
         triggerHome: 0,
     },
-
-    // Disable automatic tests for stories using the "no-test" tag.
-    tags: ["no-test"],
 };
 export default stories;
 
@@ -449,7 +446,9 @@ export const NodeCenteredPropMapWithArrayInput: StoryObj<
     tags: ["no-test"],
 };
 
+// @ts-expect-error TS7006
 function makeGaussian(amplitude, x0, y0, stdX, stdY) {
+    // @ts-expect-error TS7006
     return function (amplitude, x0, y0, stdX, stdY, x, y) {
         const exponent = -(
             Math.pow(x - x0, 2) / (2 * Math.pow(stdX, 2)) +
@@ -466,6 +465,7 @@ function makeData(n: number, amplitude: number): Float32Array {
     const stdY = 50;
     const f = makeGaussian(amplitude, X0, Y0, stdX, stdY);
 
+    // @ts-expect-error TS6133
     const data = new Float32Array(n * n).map((val, index) => {
         const x = (index % n) - n / 2;
         const y = Math.floor(index / n) - n / 2;
@@ -765,15 +765,23 @@ const ExtensionsComponent: React.FC<
     SubsurfaceViewerProps & { clipX: number }
 > = (args) => {
     const rightClipBounds = [
+        // @ts-expect-error TS7053
         args.bounds?.[0] + args.clipX,
+        // @ts-expect-error TS7053
         args.bounds?.[1],
+        // @ts-expect-error TS7053
         args.bounds?.[2],
+        // @ts-expect-error TS7053
         args.bounds?.[3],
     ];
     const leftClipBounds = [
+        // @ts-expect-error TS7053
         args.bounds?.[0],
+        // @ts-expect-error TS7053
         args.bounds?.[1],
+        // @ts-expect-error TS7053
         args.bounds?.[0] + args.clipX,
+        // @ts-expect-error TS7053
         args.bounds?.[3],
     ];
     // Can not use Record<string, unknown> because extensions will not be supported
