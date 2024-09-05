@@ -412,7 +412,9 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
 
     private getUndefinedPropertyValue(): number {
         if (typeof this.props.undefinedPropertyValue === "number") {
-            return this.props.undefinedPropertyValue;
+            //Precision should be reduced to single for correct comparing property values
+            // with undefined property value in the webworker.
+            return new Float32Array([this.props.undefinedPropertyValue])[0];
         }
         if (this.props.propertiesData instanceof Uint16Array) {
             return 0xffff;
@@ -421,7 +423,23 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
     }
 
     private getUndefinedPropertyColor(): [number, number, number] {
+        const colorFunc = this.props.colorMapFunction;
+        if (
+            this.props.propertiesData.length === 0 &&
+            this.isColorMapFunctionConstantColor(colorFunc)
+        ) {
+            return [colorFunc[0] / 255, colorFunc[1] / 255, colorFunc[2] / 255];
+        }
         return this.props.undefinedPropertyColor ?? [0.8, 0.8, 0.8];
+    }
+
+    private isColorMapFunctionConstantColor(
+        colorFunc: Uint8Array | colorMapFunctionType | undefined
+    ): colorFunc is Uint8Array {
+        return (
+            (Array.isArray(colorFunc) || colorFunc instanceof Uint8Array) &&
+            colorFunc.length >= 3
+        );
     }
 }
 
