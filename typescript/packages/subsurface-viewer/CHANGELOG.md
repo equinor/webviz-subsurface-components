@@ -1,3 +1,10 @@
+## [0.30.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.30.0...subsurface-viewer@0.30.1) (2024-09-05)
+
+
+### Bug Fixes
+
+* **grid3d:** Fixed coloring if no property data proived ([#2224](https://github.com/equinor/webviz-subsurface-components/issues/2224)) ([3216861](https://github.com/equinor/webviz-subsurface-components/commit/3216861d1e2c24e70bee593836329429aa56ef3c))
+
 # [0.30.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.29.1...subsurface-viewer@0.30.0) (2024-09-04)
 
 
