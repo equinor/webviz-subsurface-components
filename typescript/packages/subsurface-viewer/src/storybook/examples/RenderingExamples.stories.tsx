@@ -2,7 +2,7 @@ import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 
 import type { Layer } from "@deck.gl/core";
-import { SimpleMeshLayer } from "@deck.gl/mesh-layers/typed";
+import { SimpleMeshLayer } from "@deck.gl/mesh-layers";
 import { SphereGeometry } from "@luma.gl/engine";
 
 import Slider from "@mui/material/Slider";
@@ -194,6 +194,7 @@ interface CoordInputProps {
 }
 
 function CoordField({ label, value, setValue: setCoord }: CoordInputProps) {
+    // @ts-expect-error TS7006
     const handleChange = (event) => {
         const { value } = event.target;
         // Allow only valid float numbers with up to two decimal places
@@ -235,16 +236,19 @@ function CoordinatesEditor({
             <CoordField
                 label="X"
                 value={coordinates.x}
+                // @ts-expect-error TS7006
                 setValue={(val) => setCoordinates({ ...coordinates, x: val })}
             />
             <CoordField
                 label="Y"
                 value={coordinates.y}
+                // @ts-expect-error TS7006
                 setValue={(val) => setCoordinates({ ...coordinates, y: val })}
             />
             <CoordField
                 label="Z"
                 value={coordinates.z}
+                // @ts-expect-error TS7006
                 setValue={(val) => setCoordinates({ ...coordinates, z: val })}
             />
         </>
@@ -290,6 +294,8 @@ function LightEditor({ lightName, light, setLight }: LightEditorProps) {
     return (
         <Stack>
             <label>{lightName}</label>
+            {/*
+             // @ts-expect-error TS6133 */}
             {light.map((l, i) => (
                 <div key={i}>
                     <Stack direction={"row"} alignItems={"center"}>
@@ -328,6 +334,7 @@ function LightEditor({ lightName, light, setLight }: LightEditorProps) {
                     />
                     {light[i].coordinates && (
                         <CoordinatesEditor
+                            // @ts-expect-error TS2322
                             coordinates={light[i].coordinates}
                             setCoordinates={(coords: ICoordinates) => {
                                 setLight(
@@ -439,6 +446,7 @@ const LightsStoryComponent: React.FC<SubsurfaceViewerProps> = (
     if (pointLights) {
         lights = {
             ...lights,
+            // @ts-expect-error TS2322
             pointLights: pointLights
                 .filter((l) => l.active)
                 .map((l) => {
@@ -458,6 +466,7 @@ const LightsStoryComponent: React.FC<SubsurfaceViewerProps> = (
     if (directionalLights) {
         lights = {
             ...lights,
+            // @ts-expect-error TS2322
             directionalLights: directionalLights
                 .filter((l) => l.active)
                 .map((l) => {
@@ -537,6 +546,7 @@ export const LightsStory: StoryObj<typeof SubsurfaceViewer> = {
                 getColor: [255, 255, 255],
                 material: true,
             }),
+            // @ts-expect-error TS2352
             new Grid3DLayer({
                 id: "Grid3DLayer",
                 material: true,

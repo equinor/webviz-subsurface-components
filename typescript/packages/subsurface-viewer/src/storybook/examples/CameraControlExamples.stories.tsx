@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { userEvent } from "@storybook/test";
 import React from "react";
 
-import { SimpleMeshLayer } from "@deck.gl/mesh-layers/typed";
+import { SimpleMeshLayer } from "@deck.gl/mesh-layers";
 import { SphereGeometry } from "@luma.gl/engine";
 
 import Box from "@mui/material/Box";
@@ -13,7 +14,7 @@ import SubsurfaceViewer from "../../SubsurfaceViewer";
 import type { BoundingBox3D, ViewStateType } from "../../components/Map";
 import { Axes2DLayer, AxesLayer } from "../../layers";
 
-import { GeoJsonLayer } from "@deck.gl/layers/typed";
+import { GeoJsonLayer } from "@deck.gl/layers";
 import {
     customLayerWithPolygonDataProps,
     default2DViews,
@@ -32,6 +33,7 @@ import {
 } from "../sharedSettings";
 
 import { scaleZoom } from "../..";
+import { useScaleFactor } from "../../utils/event";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -59,11 +61,18 @@ const Root = styled("div")({
     },
 });
 
+const CAMERA_POSITION: ViewStateType = {
+    target: [435800, 6478000, -2000],
+    zoom: -3.5,
+    rotationX: 90,
+    rotationOrbit: 0,
+};
+
 const SIDE_CAMERA = {
     rotationX: 0,
-    target: [],
+    target: [435800, 6478000, -4000],
     rotationOrbit: 90,
-    zoom: -3,
+    zoom: -3.3,
 };
 
 const SQUARE = {
@@ -84,6 +93,7 @@ const SQUARE = {
 
 const SQUARE_GEOMETRY_LAYER = new GeoJsonLayer({
     ...customLayerWithPolygonDataProps,
+    // @ts-expect-error TS2322
     data: SQUARE,
 });
 
@@ -91,6 +101,12 @@ const AXES2D = new Axes2DLayer({
     id: "axes",
     backgroundColor: [0, 155, 155],
 });
+
+const DEFAULT_PROPS = {
+    id: "default",
+    layers: [huginAxes3DLayer, hugin25mDepthMapLayer],
+    views: default3DViews,
+};
 
 const DisplayCameraPositionComponent: React.FC<SubsurfaceViewerProps> = (
     args
@@ -123,19 +139,12 @@ const DisplayCameraPositionComponent: React.FC<SubsurfaceViewerProps> = (
     );
 };
 
-const cameraPosition: ViewStateType = {
-    target: [435800, 6478000, -2000],
-    zoom: -3.5,
-    rotationX: 90,
-    rotationOrbit: 0,
-};
-
 export const DisplayCameraState: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "volve-wells",
         bounds: volveWellsBounds,
         layers: [volveWellsLayer],
-        cameraPosition,
+        cameraPosition: CAMERA_POSITION,
     },
     render: (args) => <DisplayCameraPositionComponent {...args} />,
 };
@@ -263,7 +272,7 @@ export const SyncedSubsurfaceViewers: StoryObj<
         id: "volve-wells",
         bounds: volveWellsBounds,
         layers: [volveWellsLayer],
-        cameraPosition,
+        cameraPosition: CAMERA_POSITION,
         views: default2DViews,
     },
     render: (args) => <SyncedCameraSettingsComponent {...args} />,
@@ -627,10 +636,7 @@ const ScaleVertical3dComponent = ({
     verticalScale: number;
 }) => {
     const viewerProps: SubsurfaceViewerProps = {
-        id: "ScaleY",
-        bounds: volveWellsBounds,
-        layers: [huginAxes3DLayer, hugin25mDepthMapLayer],
-        views: default3DViews,
+        ...DEFAULT_PROPS,
         cameraPosition: SIDE_CAMERA,
         verticalScale,
     };
@@ -653,4 +659,55 @@ export const ScaleVertical3d: StoryObj<typeof ScaleVertical3dComponent> = {
         },
     },
     render: (args) => <ScaleVertical3dComponent {...args} />,
+};
+
+const ScaleFactorHookComponent = ({
+    verticalScale,
+}: {
+    verticalScale: number;
+}) => {
+    const { factor: scaleFactor, setFactor, elementRef } = useScaleFactor();
+
+    React.useEffect(() => {
+        setFactor(verticalScale);
+    }, [setFactor, verticalScale]);
+
+    const viewerProps: SubsurfaceViewerProps = {
+        ...DEFAULT_PROPS,
+        cameraPosition: SIDE_CAMERA,
+        verticalScale: scaleFactor,
+        innerRef: elementRef,
+        coords: { visible: false },
+    };
+    return <SubsurfaceViewer {...viewerProps} />;
+};
+
+export const ScaleFactorHook: StoryObj<typeof ScaleFactorHookComponent> = {
+    args: { verticalScale: 1.5 },
+    argTypes: {
+        verticalScale: {
+            control: { type: "range", min: -1, max: 10, step: 0.1 },
+        },
+    },
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: "Using a hook to control vertical scaling either via props or keyboard shortcuts.",
+            },
+        },
+    },
+    render: (args) => <ScaleFactorHookComponent {...args} />,
+    play: async () => {
+        const delay = 500;
+        const canvas = document.querySelector("canvas");
+
+        if (canvas) {
+            await userEvent.click(canvas);
+        }
+
+        await userEvent.keyboard("[ArrowUp]", { delay });
+        await userEvent.keyboard("[ArrowDown]", { delay });
+        await userEvent.keyboard("[ArrowUp]", { delay });
+    },
 };

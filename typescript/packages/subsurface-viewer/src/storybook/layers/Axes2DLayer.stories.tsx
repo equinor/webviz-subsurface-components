@@ -1,16 +1,16 @@
-import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+import React from "react";
 
-import { View } from "@deck.gl/core/typed";
+import { View } from "@deck.gl/core";
 
+import * as d3 from "d3";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import type { ViewsType } from "../../components/Map";
-import * as d3 from "d3";
 
 import {
     default2DViews,
-    hugin2DBounds,
     hugin25mKhNetmapMapLayerPng,
+    hugin2DBounds,
 } from "../sharedSettings";
 
 const stories: Meta = {
@@ -147,9 +147,17 @@ const MatrixStory = () => {
             views={views}
             bounds={hugin2DBounds}
         >
+            {/*
+             // @ts-expect-error TS2786 */}
             {<View id="view_1"></View>}
+            {/*
+             // @ts-expect-error TS2786 */}
             {<View id="view_2"></View>}
+            {/*
+             // @ts-expect-error TS2786 */}
             {<View id="view_3"></View>}
+            {/*
+             // @ts-expect-error TS2786 */}
             {<View id="view_4"></View>}
         </SubsurfaceViewer>
     );

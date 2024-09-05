@@ -1,14 +1,13 @@
-import { PathLayer } from "@deck.gl/layers/typed";
-import type { PathLayerProps } from "@deck.gl/layers/typed";
+import type { PathLayerProps } from "@deck.gl/layers";
+import { PathLayer } from "@deck.gl/layers";
 
 import type { NumericArray } from "@math.gl/types";
-import GL from "@luma.gl/constants";
 
-import type { LayerContext } from "@deck.gl/core/typed";
-import { project32, picking } from "@deck.gl/core/typed";
+import type { LayerContext } from "@deck.gl/core";
+import { picking, project32 } from "@deck.gl/core";
 
-import vs from "./path-layer-vertex.glsl";
 import fs from "./path-layer-fragment.glsl";
+import vs from "./path-layer-vertex.glsl";
 
 type UniformValue = number | boolean | Readonly<NumericArray>;
 
@@ -36,17 +35,19 @@ export class PrivatePolylinesLayer extends PathLayer<
     }): void {
         args.uniforms["ZIncreasingDownwards"] = this.props.ZIncreasingDownwards;
 
+        const { gl } = this.context;
+
         let restoreDepthTest = false;
         if (
             typeof this.props.depthTest === "boolean" &&
             !this.props.depthTest
         ) {
             restoreDepthTest = true;
-            this.context.gl.disable(GL.DEPTH_TEST);
+            gl.disable(gl.DEPTH_TEST);
         }
         super.draw({ uniforms: args.uniforms });
         if (restoreDepthTest) {
-            this.context.gl.enable(GL.DEPTH_TEST);
+            gl.enable(gl.DEPTH_TEST);
         }
     }
 }

@@ -916,13 +916,23 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
         };
     };
 
+    const isPropertyValueDefined = (
+        value: number,
+        undefinedValue: number
+    ): boolean => {
+        return (
+            // For some reason propertyValue happens to be null.
+            value !== null && !(Number.isNaN(value) || value === undefinedValue)
+        );
+    };
+
     /**
      * Creates empty meshes.
      * @returns Empty meshes with empty data arrays and zero vertex counts.
      */
     const createEmptyMeshes = () => {
         const mesh: MeshType = {
-            drawMode: 4, // corresponds to GL.TRIANGLES,
+            drawMode: "triangle-list",
             attributes: {
                 positions: { value: new Float32Array(), size: 3 },
                 properties: { value: new Float32Array(), size: 1 },
@@ -932,7 +942,8 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
         };
 
         const mesh_lines: MeshTypeLines = {
-            drawMode: 1, // corresponds to GL.LINES,
+            drawMode: "line-list",
+            topology: "line-list",
             attributes: {
                 positions: { value: new Float32Array(), size: 3 },
                 indices: { value: new Uint32Array(), size: 1 },
@@ -954,8 +965,8 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
     const polys = params.polys;
     const properties = params.properties;
 
-    let propertyValueRangeMin = +99999999;
-    let propertyValueRangeMax = -99999999;
+    let propertyValueRangeMin = Number.POSITIVE_INFINITY;
+    let propertyValueRangeMax = Number.NEGATIVE_INFINITY;
 
     let pn = 0;
     let i = 0;
@@ -980,10 +991,9 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
             arraysIndex < meshArrays.arrays.trianglePoints.length - 3
         ) {
             const n = polys[i];
-            const propertyValue = properties[pn++];
+            let propertyValue = properties[pn++];
 
-            if (propertyValue !== null) {
-                // For some reason propertyValue happens to be null.
+            if (isPropertyValueDefined(propertyValue, params.undefinedValue)) {
                 propertyValueRangeMin =
                     propertyValue < propertyValueRangeMin
                         ? propertyValue
@@ -992,8 +1002,9 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
                     propertyValue > propertyValueRangeMax
                         ? propertyValue
                         : propertyValueRangeMax;
+            } else {
+                propertyValue = Number.NaN;
             }
-
             // Lines.
             for (let j = i + 1; j < i + n; ++j) {
                 meshArrays.arrays.lineIndices[linesIndex] = polys[j];
@@ -1045,7 +1056,7 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
         console.log("Number of triangles: ", meshArrays.counts.triangles);
 
         const mesh: MeshType = {
-            drawMode: 4, // corresponds to GL.TRIANGLES,
+            drawMode: "triangle-list",
             attributes: {
                 positions: { value: meshArrays.arrays.trianglePoints, size: 3 },
                 properties: { value: meshArrays.arrays.properties, size: 1 },
@@ -1055,7 +1066,8 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
         };
 
         const mesh_lines: MeshTypeLines = {
-            drawMode: 1, // corresponds to GL.LINES,
+            drawMode: "line-list",
+            topology: "line-list",
             attributes: {
                 positions: { value: params.points, size: 3 },
                 indices: { value: meshArrays.arrays.lineIndices, size: 1 },

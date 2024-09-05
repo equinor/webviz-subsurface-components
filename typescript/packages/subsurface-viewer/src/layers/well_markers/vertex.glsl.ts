@@ -2,26 +2,22 @@ export const vsShader = `#version 300 es
 #define SHADER_NAME well-markers-vertex-shader
 precision highp float;
 
-attribute vec3 positions;
-attribute vec3 instancePositions;
-attribute float instanceSizes;
-attribute float instanceAzimuths;
-attribute float instanceInclinations;
-attribute vec4 instanceColors;
-attribute vec4 instanceOutlineColors;
-
-attribute vec3 instancePickingColors;
+in vec3 positions;
+in vec3 instancePositions;
+in float instanceSizes;
+in float instanceAzimuths;
+in float instanceInclinations;
+in vec4 instanceColors;
+in vec4 instanceOutlineColors;
+in vec3 instancePickingColors;
 
 uniform int sizeUnits;
 uniform bool ZIncreasingDownwards;
 uniform bool useOutlineColor;
 
-
-out vec4 position_commonspace;
 out vec4 color;
 
-void main(void) {   
-
+void main(void) {
    vec3 position = instancePositions;
    position.z *= (ZIncreasingDownwards? -1.0 : 1.0);
 
@@ -44,7 +40,7 @@ void main(void) {
    mat3 sizeMatrix    = mat3(vec3(projectedSize, 0.0, 0.0), vec3(0.0, projectedSize, 0.0), vec3(0.0, 0.0, 1.0));
    vec3 rotatedPos    = azimuthMatrix * inclMatrix * sizeMatrix *positions;
 
-   position_commonspace = vec4(project_position(rotatedPos + position), 0.0);
+   vec4 position_commonspace = vec4(project_position(rotatedPos + position), 0.0);
    gl_Position = project_common_position_to_clipspace(position_commonspace);
 
    vec4 dummyColor = vec4(0.0);

@@ -52,30 +52,31 @@ function convertToArrowEvent(event: KeyboardEvent): ArrowEvent | null {
     return null;
 }
 
-export function useHandleRescale(disable = false): {
-    zScale: number;
-    divRef: React.MutableRefObject<null>;
-} {
-    // Used for scaling in z direction using arrow keys.
-    const [zScale, updateZScale] = React.useReducer(updateZScaleReducer, 1);
+/**
+ * A hook for listening to key arrow events.
+ * @returns an object containing the factor state, a callback for altering
+ * the state, and a ref that is used to attach the event listener used for
+ * keyboard events.
+ */
+export const useScaleFactor = () => {
+    const [factor, setFactor] = React.useState(1);
 
-    const divRef = React.useRef(null);
+    const elementRef = React.useRef<HTMLElement>(null);
 
     React.useEffect(() => {
-        if (disable) {
-            return;
-        }
         const keyDownHandler = (e: KeyboardEvent) => {
             const arrowEvent = convertToArrowEvent(e);
-            if (arrowEvent) {
-                updateZScale(arrowEvent);
-                // prevent being handled by regular OrbitController
-                e.stopPropagation();
+            if (!arrowEvent) {
+                return;
             }
+
+            setFactor((oldValue) => updateZScaleReducer(oldValue, arrowEvent));
+
+            // prevent being handled by regular OrbitController
+            e.stopPropagation();
         };
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const element = divRef.current as any;
+        const element = elementRef.current;
 
         // Listen for keypress events.
         element?.addEventListener("keydown", keyDownHandler, true);
@@ -83,10 +84,9 @@ export function useHandleRescale(disable = false): {
         return () => {
             element?.removeEventListener("keydown", keyDownHandler);
         };
-    }, [updateZScale, divRef, disable]);
-
-    return { zScale, divRef };
-}
+    }, [elementRef]);
+    return { factor, setFactor, elementRef };
+};
 
 export function useShiftHeld(): {
     divRef: React.MutableRefObject<null>;

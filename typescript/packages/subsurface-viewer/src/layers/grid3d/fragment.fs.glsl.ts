@@ -11,6 +11,8 @@ in float property_interpolated;
 flat in vec3 normal;
 flat in int vertexIndex;
 
+out vec4 fragColor;
+
 uniform sampler2D colormap;
 
 uniform float valueRangeMin;
@@ -18,18 +20,18 @@ uniform float valueRangeMax;
 uniform float colorMapRangeMin;
 uniform float colorMapRangeMax;
 
-uniform bool  isColoringDiscrete;
+uniform bool isColoringDiscrete;
 uniform float colorMapSize;
 uniform lowp int coloringMode;
 
 uniform vec3 colorMapClampColor;
+uniform vec3 undefinedPropertyColor;
 uniform bool isClampColor;
 uniform bool isColorMapClampColorTransparent;
 
 vec4 getContinuousPropertyColor (float propertyValue) {
-
+   
    vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
-
    float x = (propertyValue - colorMapRangeMin) / (colorMapRangeMax - colorMapRangeMin);
    if (x < 0.0 || x > 1.0) {
       // Out of range. Use clampcolor.
@@ -43,11 +45,11 @@ vec4 getContinuousPropertyColor (float propertyValue) {
       else {
          // Use min/max color to clamp.
          x = clamp (x, 0.0, 1.0);         
-         color = texture2D(colormap, vec2(x, 0.5));
+         color = texture(colormap, vec2(x, 0.5));
       }
    }
    else {
-      color = texture2D(colormap, vec2(x, 0.5));
+      color = texture(colormap, vec2(x, 0.5));
    }
    return color;
 }
@@ -71,12 +73,12 @@ vec4 getDiscretePropertyColor (float propertyValue) {
          // Use min/max color to clamp.
          float p = clamp (propertyValue, colorMapRangeMin, colorMapRangeMax);
          float x = p / colorMapSize;
-         color = texture2D(colormap, vec2(x, 0.5));
+         color = texture(colormap, vec2(x, 0.5));
       }
    }
    else {
       float x = propertyValue / colorMapSize;
-      color = texture2D(colormap, vec2(x + tolerance, 0.5));
+      color = texture(colormap, vec2(x + tolerance, 0.5));
    }
    return color;
 }
@@ -90,21 +92,26 @@ vec4 getPropertyColor (float propertyValue) {
 
 void main(void) {
 
-   if (picking_uActive && !picking_uAttribute) {
-      gl_FragColor = encodeVertexIndexToRGB(vertexIndex);      
+   if (picking.isActive > 0.5 && !(picking.isAttribute > 0.5)) {
+      fragColor = encodeVertexIndexToRGB(vertexIndex);      
       return;
    }
-   
+
+   if (coloringMode == 0 && isnan(property)) {
+      fragColor = vec4(undefinedPropertyColor.rgb, 1.0); 
+      return;
+   } 
+       
    // Property values other than X,Y or Z are passed as "flat" i.e. constant over faces.
    float propertyValue = coloringMode == 0 ? property : property_interpolated;
    propertyValue = clamp(propertyValue, valueRangeMin, valueRangeMax);
 
    vec4 color = getPropertyColor(propertyValue);
-   
+
    // Use two sided phong lighting. This has no effect if "material" property is not set.
    vec3 lightColor = getPhongLightColor(color.rgb, cameraPosition, position_commonspace.xyz, normal);
-   gl_FragColor = vec4(lightColor, 1.0);
-   DECKGL_FILTER_COLOR(gl_FragColor, geometry);
+   fragColor = vec4(lightColor, 1.0);
+   DECKGL_FILTER_COLOR(fragColor, geometry);
 }
 `;
 

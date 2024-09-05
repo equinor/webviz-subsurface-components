@@ -1,15 +1,14 @@
-import React from "react";
-import type { PickingInfo, Layer, LayersList } from "@deck.gl/core/typed";
-import PropTypes from "prop-types";
+import type { Layer, LayersList } from "@deck.gl/core";
 import type { colorTablesArray } from "@emerson-eps/color-tables/";
 import type { Unit } from "convert-units";
 import convert from "convert-units";
-
-import type { MjolnirGestureEvent } from "mjolnir.js";
+import PropTypes from "prop-types";
+import React from "react";
 
 import type {
     BoundsAccessor,
     MapMouseEvent,
+    MapProps,
     TooltipCallback,
     ViewStateType,
     ViewsType,
@@ -21,11 +20,11 @@ import Map, { createLayers } from "./components/Map";
 
 export type {
     BoundsAccessor,
+    colorTablesArray,
     MapMouseEvent,
     TooltipCallback,
     ViewStateType,
     ViewsType,
-    colorTablesArray,
 };
 
 export { TGrid3DColoringMode };
@@ -66,9 +65,8 @@ export type TLayerDefinition =
 /**
  * Properties of the SubsurfaceViewer component.
  */
-export interface SubsurfaceViewerProps {
-    id: string;
-    resources?: Record<string, unknown>;
+export interface SubsurfaceViewerProps
+    extends Omit<MapProps, "layers" | "setEditedData" | "toolbar"> {
     /**
      * Array of externally created layers or layer definition records or JSON strings.
      * Add '@@typedArraySupport' : true in a layer definition in order to
@@ -76,68 +74,12 @@ export interface SubsurfaceViewerProps {
      */
     layers?: TLayerDefinition[];
 
-    bounds?: [number, number, number, number] | BoundsAccessor;
-    cameraPosition?: ViewStateType | undefined;
-    triggerHome?: number;
-
-    views?: ViewsType;
-    coords?: {
-        visible?: boolean | null;
-        multiPicking?: boolean | null;
-        pickDepth?: number | null;
-    };
-    scale?: {
-        visible?: boolean | null;
-        incrementValue?: number | null;
-        widthPerUnit?: number | null;
-        cssStyle?: Record<string, unknown> | null;
-    };
-    coordinateUnit?: Unit;
-    colorTables?: colorTablesArray;
-    editedData?: Record<string, unknown>;
+    /**
+     * @deprecated Used by layers to propagate state to component, eg. selected
+     * wells from the Wells layer. Use client code to handle layer state
+     * instead.
+     */
     setProps?: (data: Record<string, unknown>) => void;
-
-    /**
-     * Validate JSON datafile against schema
-     */
-    checkDatafileSchema?: boolean;
-
-    /**
-     * For get mouse events
-     */
-    onMouseEvent?: (event: MapMouseEvent) => void;
-
-    getCameraPosition?: (input: ViewStateType) => void;
-
-    /**
-     * Will be called while layers are processed to rendered data.
-     * @param progress vlaue between 0 and 100.
-     */
-    onRenderingProgress?: (progress: number) => void;
-
-    onDragStart?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
-    onDragEnd?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
-
-    triggerResetMultipleWells?: number;
-    /**
-     * Range selection of the current well
-     */
-    selection?: {
-        well: string | undefined;
-        selection: [number | undefined, number | undefined] | undefined;
-    };
-
-    /**
-     * Override default tooltip with a callback.
-     */
-    getTooltip?: TooltipCallback;
-
-    lights?: LightsType;
-
-    children?: React.ReactNode;
-
-    /** A vertical scale factor, used to scale items in the view vertically */
-    verticalScale?: number;
 }
 
 const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
@@ -166,6 +108,7 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
     lights,
     children,
     verticalScale,
+    ...args
 }: SubsurfaceViewerProps) => {
     // Contains layers data received from map layers by user interaction
     const [layerEditedData, setLayerEditedData] = React.useState(editedData);
@@ -245,20 +188,11 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
             triggerResetMultipleWells={triggerResetMultipleWells}
             lights={lights}
             verticalScale={verticalScale}
+            {...args}
         >
             {children}
         </Map>
     );
-};
-
-SubsurfaceViewer.defaultProps = {
-    views: {
-        layout: [1, 1],
-        marginPixels: 0,
-        showLabel: false,
-        viewports: [{ id: "main-view", show3D: false, layerIds: [] }],
-    },
-    checkDatafileSchema: false,
 };
 
 SubsurfaceViewer.propTypes = {

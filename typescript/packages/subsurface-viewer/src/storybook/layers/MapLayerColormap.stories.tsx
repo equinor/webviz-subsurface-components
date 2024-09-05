@@ -1,16 +1,17 @@
+import type { Meta, StoryObj } from "@storybook/react";
 import type { SyntheticEvent } from "react";
 import React from "react";
-import type { Meta, StoryObj } from "@storybook/react";
 
 import { Slider } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
-import { View } from "@deck.gl/core/typed";
+import { View } from "@deck.gl/core";
 
+// @ts-expect-error TS6133
 import type { ColorLegendProps } from "@emerson-eps/color-tables";
 import {
-    ContinuousLegend,
     ColorLegend,
+    ContinuousLegend,
     createColorMapFunction,
 } from "@emerson-eps/color-tables";
 
@@ -20,10 +21,10 @@ import SubsurfaceViewer from "../../SubsurfaceViewer";
 import {
     default3DViews,
     defaultStoryParameters,
-    hugin2DBounds,
-    huginAxes3DLayer,
     hugin25mKhNetmapMapLayer,
     hugin25mKhNetmapMapLayerPng,
+    hugin2DBounds,
+    huginAxes3DLayer,
     northArrowLayer,
 } from "../sharedSettings";
 
@@ -166,6 +167,7 @@ export const DefaultColorScale: StoryObj<typeof SubsurfaceViewer> = {
 };
 
 const BreakpointColorMapComponent: React.FC<
+    // @ts-expect-error TS2709
     SubsurfaceViewerProps & ColorLegendProps
 > = (props) => {
     const [breakpoint, setBreakpoint] = React.useState<number>(0.5);

@@ -3,16 +3,15 @@ import React from "react";
 
 import { rgb } from "d3-color";
 
-import type { Color } from "@deck.gl/core/typed";
-import { OrthographicView } from "@deck.gl/core/typed";
-import DeckGL from "@deck.gl/react/typed";
+import type { Color } from "@deck.gl/core";
+import { OrthographicView } from "@deck.gl/core";
+import DeckGL from "@deck.gl/react";
 
 import AxesLayer from "../../layers/axes/axesLayer";
 
 const stories: Meta = {
     component: DeckGL,
     title: "SubsurfaceViewer / AxesLayer",
-    tags: ["no-test"],
 };
 export default stories;
 
@@ -101,5 +100,4 @@ export const CustomLabel: StoryObj<typeof CustomLabelsComponent> = {
         fontFamily: "math",
     },
     render: (args) => <CustomLabelsComponent {...args} />,
-    tags: ["no-test"],
 };

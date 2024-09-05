@@ -1,34 +1,26 @@
 import type {
-    Viewport,
+    Color,
     LayerContext,
     UpdateParameters,
-} from "@deck.gl/core/typed";
+    Viewport,
+} from "@deck.gl/core";
 import {
-    Layer,
-    project,
-    OrthographicViewport,
     COORDINATE_SYSTEM,
-} from "@deck.gl/core/typed";
-import GL from "@luma.gl/constants";
-import { Model, Geometry } from "@luma.gl/engine";
-import labelVertexShader from "./label-vertex.glsl";
-import labelFragmentShader from "./label-fragment.glsl";
-import lineVertexShader from "./line-vertex.glsl";
-import lineFragmentShader from "./line-fragment.glsl";
-import type { ExtendedLayerProps, Position3D } from "../utils/layerTools";
+    Layer,
+    OrthographicViewport,
+    project,
+} from "@deck.gl/core";
 import { load } from "@loaders.gl/core";
-import { Texture2D } from "@luma.gl/webgl";
 import { ImageLoader } from "@loaders.gl/images";
+import type { UniformValue } from "@luma.gl/core";
+import { Geometry, Model } from "@luma.gl/engine";
 import { vec4 } from "gl-matrix";
-import type { Color } from "@deck.gl/core/typed";
+import type { ExtendedLayerProps, Position3D } from "../utils/layerTools";
 import fontAtlasPng from "./font-atlas.png";
-
-const DEFAULT_TEXTURE_PARAMETERS = {
-    [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,
-    [GL.TEXTURE_MAG_FILTER]: GL.LINEAR,
-    [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
-    [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE,
-};
+import labelFragmentShader from "./label-fragment.glsl";
+import labelVertexShader from "./label-vertex.glsl";
+import lineFragmentShader from "./line-fragment.glsl";
+import lineVertexShader from "./line-vertex.glsl";
 
 enum TEXT_ANCHOR {
     start = 0,
@@ -165,8 +157,9 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
 
     updateState() {
         const fontTexture = this.state["fontTexture"];
-        const { label_models, line_model, background_model } =
-            this._getModels(fontTexture);
+        const { label_models, line_model, background_model } = this._getModels(
+            fontTexture as UniformValue
+        );
 
         this.setState({
             ...this.state,
@@ -175,23 +168,26 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
     }
 
     initializeState(): void {
-        const { gl } = this.context;
-
         const promise = load(fontAtlasPng, ImageLoader, {
             image: { type: "data" }, // Will load as ImageData.
         });
 
-        promise.then((data: ImageData) => {
-            const fontTexture = new Texture2D(gl, {
+        promise.then((data) => {
+            const fontTexture = this.context.device.createTexture({
                 width: data.width,
                 height: data.height,
-                format: GL.RGB,
-                data,
-                parameters: DEFAULT_TEXTURE_PARAMETERS,
+                format: "rgb8unorm-webgl",
+                data: data as ImageBitmap,
+                sampler: {
+                    addressModeU: "clamp-to-edge",
+                    addressModeV: "clamp-to-edge",
+                    minFilter: "linear",
+                    magFilter: "linear",
+                },
             });
 
             const { label_models, line_model, background_model } =
-                this._getModels(fontTexture);
+                this._getModels(fontTexture as unknown as UniformValue);
 
             this.setState({
                 fontTexture,
@@ -352,7 +348,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         const p4 = [x_min_w, y_min, zDepth];
 
         /*eslint-disable */
-        const background_lines: number[] = [ 
+        const background_lines: number[] = [
             ...p1, ...p2, ...p4,  // triangle 1
             ...p2, ...p4, ...p3,  // triangle 2 
         ];
@@ -381,7 +377,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         const p4 = [x_min, y_min_w, zDepth];
 
         /*eslint-disable */
-        const background_lines: number[] = [ 
+        const background_lines: number[] = [
             ...p1, ...p2, ...p4,  // triangle 1
             ...p2, ...p4, ...p3,  // triangle 2 
         ];
@@ -463,12 +459,12 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         return;
     }
 
-    _getModels(fontTexture: Texture2D): {
+    _getModels(fontTexture: UniformValue): {
         label_models: Model[];
         line_model: Model;
         background_model: Model;
     } {
-        const { gl } = this.context;
+        const gl = this.context.device;
 
         // Make models for background, lines (tick marcs and axis) and labels.
 
@@ -655,7 +651,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
             fs: lineFragmentShader,
             uniforms: { uColor: lineColor },
             geometry: new Geometry({
-                drawMode: GL.LINES,
+                topology: "line-list",
                 attributes: {
                     positions: new Float32Array(tick_and_axes_lines),
                 },
@@ -683,7 +679,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
             fs: lineFragmentShader,
             uniforms: { uColor: bColor },
             geometry: new Geometry({
-                drawMode: GL.TRIANGLES,
+                topology: "triangle-list",
                 attributes: {
                     positions: new Float32Array(background_lines),
                 },
@@ -758,7 +754,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                     // t1
                     /*eslint-disable */
                     positions[offset + 0] = pos_w[0] + x1 * pixelScale * pixel2worldHor; // Add a distance in view coords and convert to world
-                    positions[offset + 1] = pos_w[1] + (0 * pixelScale - y_aligment_offset)* pixel2worldVer;
+                    positions[offset + 1] = pos_w[1] + (0 * pixelScale - y_aligment_offset) * pixel2worldVer;
                     positions[offset + 2] = pos_w[2];
                     texcoords[offsetTexture + 0] = u1;
                     texcoords[offsetTexture + 1] = v1;
@@ -811,10 +807,13 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                 uniforms: {
                     uAxisColor: lineColor,
                     uBackGroundColor: bColor,
+                },
+                bindings: {
+                    // @ts-ignore 
                     fontTexture,
                 },
                 geometry: new Geometry({
-                    drawMode: GL.TRIANGLES,
+                    topology: "triangle-list",
                     attributes: {
                         positions,
                         vTexCoord: {
@@ -824,7 +823,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                     },
                     vertexCount: positions.length / 3,
                 }),
-
+                bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
                 modules: [project],
                 isInstanced: false,
             });
@@ -843,8 +842,8 @@ Axes2DLayer.defaultProps = defaultProps;
 
 // KEEP for now.
 // USAGE:
-    // const pos_w = vec4.fromValues(x, y, z, 1); // pos world
-    // const pos_v = multMatVec(viewMatrix, pos_w); // pos view
+// const pos_w = vec4.fromValues(x, y, z, 1); // pos world
+// const pos_v = multMatVec(viewMatrix, pos_w); // pos view
 // function multMatVec(
 //     viewMatrix: number[],
 //     pos_w: vec4

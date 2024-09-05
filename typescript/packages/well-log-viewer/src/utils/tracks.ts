@@ -362,18 +362,18 @@ const defColorTable: ColorTable = {
 };
 
 function getColorTable(
-    id: string | undefined,
+    id: string | ((v: number) => [number, number, number]) | undefined,
     colorTables?: ColorTable[]
-): ColorTable | undefined {
+): ColorTable | ((v: number) => [number, number, number]) | undefined {
+    if (id && typeof id === "function") {
+        return id;
+    }
     if (id && typeof id !== "string") {
         console.log("colorTable id='" + id + "' is not string");
         return defColorTable;
     }
     if (id && colorTables) {
-        const colorTable =
-            typeof colorTables === "function"
-                ? colorTables
-                : colorTables.find((value) => value.name === id);
+        const colorTable = colorTables.find((value) => value.name === id);
         if (colorTable) return colorTable;
         console.error(
             "colorTable id='" + id + "' is not found in getColorTable()"
@@ -1603,4 +1603,13 @@ export function hasDifferentialPlot(track: GraphTrack): boolean {
         if (type === "differential") return true;
     }
     return false;
+}
+
+export function toggleId(
+    trackIds: (string | number)[],
+    trackId: string | number
+): void {
+    const i = trackIds.indexOf(trackId);
+    if (i < 0) trackIds.push(trackId);
+    else trackIds.splice(i, 1);
 }
