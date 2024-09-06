@@ -1,3 +1,10 @@
+## [0.30.2](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.30.1...subsurface-viewer@0.30.2) (2024-09-06)
+
+
+### Bug Fixes
+
+* **grid3:** Grid3dLayer coloring by constant color fixed ([#2227](https://github.com/equinor/webviz-subsurface-components/issues/2227)) ([0a7d89f](https://github.com/equinor/webviz-subsurface-components/commit/0a7d89fc8d2edf8b9d46dda7f39c7ec62d574f2d))
+
 ## [0.30.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.30.0...subsurface-viewer@0.30.1) (2024-09-05)
 
 
