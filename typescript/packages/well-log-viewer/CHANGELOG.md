@@ -1,3 +1,10 @@
+## [1.13.1](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.13.0...well-log-viewer@1.13.1) (2024-09-06)
+
+
+### Bug Fixes
+
+* div size in the RTC Tab Layout story ([#2153](https://github.com/equinor/webviz-subsurface-components/issues/2153)) ([6b6a3bd](https://github.com/equinor/webviz-subsurface-components/commit/6b6a3bddc9f8fecb6da76d607e30eab722d5bee2)), closes [#2015](https://github.com/equinor/webviz-subsurface-components/issues/2015)
+
 # [1.13.0](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.12.7...well-log-viewer@1.13.0) (2024-09-04)
 
 
