@@ -98,7 +98,8 @@ void main(void) {
    }
 
    if (coloringMode == 0 && isnan(property)) {
-      fragColor = vec4(undefinedPropertyColor.rgb, 1.0); 
+      vec3 lightColor = getPhongLightColor(undefinedPropertyColor.rgb, cameraPosition, position_commonspace.xyz, normal);
+      fragColor = vec4(lightColor, 1.0);      
       return;
    } 
        
