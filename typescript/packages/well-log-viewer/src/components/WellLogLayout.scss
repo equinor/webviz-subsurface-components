@@ -9,7 +9,7 @@
   }
   .interior {
     flex: 1;
-    height: 0%;
+    height: 0pt;
     width: 100%;
     display: flex;
     flex-direction: row;
@@ -20,7 +20,7 @@
   .middle{
     flex: 1;
     height: 100%;
-    width: 0%;
+    width: 0pt;
     display: flex;
     flex-direction: column;
   }
