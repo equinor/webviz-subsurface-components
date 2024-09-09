@@ -13,5 +13,14 @@
         "build": {
             "dependsOn": ["^build"]
         }
+    },
+    "release": {
+        "version": { "conventionalCommits": true },
+        "projectsRelationship": "independent",
+        "changelog": {
+            "projectChangelogs": {
+                "createRelease": "github"
+            }
+        }
     }
 }
