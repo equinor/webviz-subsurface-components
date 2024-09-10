@@ -77,3 +77,8 @@ A class CallbackManager allows side panel and its components to obtain various n
 It demonstrate how different well log views can be synchronized in such complex programs as well correlation applications.
 
 The component architecture is similar to WellLogViewer's one but contains three views for well logs an three readout panels.
+
+When SyncLogViewer has more than one WellLogView different synchonization modes between them could be applied.
+- Selections synchronization could be turn on with syncContentSelection prop.
+- Visible areas synchronization could be turn on with syncContentDomain prop.
+- Another way to synchronize visible area is using of wellpicks flatting (wellpickFlatting prop) when some wellpick are aligned to one flat line.
