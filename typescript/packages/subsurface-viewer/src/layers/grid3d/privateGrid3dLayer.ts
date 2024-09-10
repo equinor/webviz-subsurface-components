@@ -415,6 +415,7 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
 
         const colormap = context.device.createTexture({
             ...textureProps,
+            height: 1,
             data: data as TextureData,
         });
         return colormap;

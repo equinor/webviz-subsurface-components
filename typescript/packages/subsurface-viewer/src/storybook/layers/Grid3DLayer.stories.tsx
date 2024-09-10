@@ -296,7 +296,7 @@ const layerArrays = {
         pointsData: new Float32Array(gridPoints),
         polysData: new Uint32Array(gridPolys),
         propertiesData: new Uint16Array(gridProps),
-        colorMapFunction: new Uint16Array(CATEGORICAL_COLOR_TABLE.flat()),
+        colorMapFunction: new Uint8Array(CATEGORICAL_COLOR_TABLE.flat()),
     },
 };
 
