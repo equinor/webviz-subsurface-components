@@ -442,7 +442,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         }
 
         const { gl } = context;
-        gl.enable(gl.POLYGON_OFFSET_FILL);
+        //gl.enable(gl.POLYGON_OFFSET_FILL); KEEP disable for now. The smoke test does not generate al ltickmarks with this
 
         const models = this.getModels();
         const n = models.length;
@@ -453,19 +453,20 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         }
 
         // background
-        gl.polygonOffset(0, 0);
+        //gl.polygonOffset(1, 1);
         models[n - 1].draw(context.renderPass);
 
         // lines
-        gl.polygonOffset(0, -1);
+        //gl.polygonOffset(-1, -2);
         models[n - 2].draw(context.renderPass);
 
         // labels
+        //gl.polygonOffset(-1, -3);
         for (let i = 0; i < n - 2; i++) {
             models[i].draw(context.renderPass);
         }
 
-        gl.disable(gl.POLYGON_OFFSET_FILL);
+        //gl.disable(gl.POLYGON_OFFSET_FILL);
         return;
     }
 
