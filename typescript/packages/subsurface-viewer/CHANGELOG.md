@@ -1,3 +1,10 @@
+## [0.30.3](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.30.2...subsurface-viewer@0.30.3) (2024-09-11)
+
+
+### Bug Fixes
+
+* **subsurface-viewer:** fix color map sampling for 3D grids ([#2234](https://github.com/equinor/webviz-subsurface-components/issues/2234)) ([43cf1b9](https://github.com/equinor/webviz-subsurface-components/commit/43cf1b9a900d18cf4bb61a7062cc8c6de5588080))
+
 ## [0.30.2](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.30.1...subsurface-viewer@0.30.2) (2024-09-06)
 
 
