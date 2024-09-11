@@ -27,6 +27,9 @@ import * as gridPolys from "../../layers/grid3d/test_data/DiscreteProperty/Polys
 import * as gridProps from "../../layers/grid3d/test_data/DiscreteProperty/Props.json";
 
 import { default3DViews, defaultStoryParameters } from "../sharedSettings";
+import type { Grid3DLayerProps } from "../../layers";
+import { AxesLayer, Grid3DLayer } from "../../layers";
+import type { CompositeLayer } from "@deck.gl/core";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -69,6 +72,31 @@ const parameters = {
             story: "Simgrid.",
         },
     },
+};
+
+const SIMPLE_GEOMETRY = {
+    points: [
+        [0, 0, 0],
+        [100, 0, 0],
+        [100, 100, 0],
+        [0, 100, 0],
+        [200, 100, 0],
+        [200, 0, 0],
+    ],
+    polygons: [4, 0, 1, 2, 3, 4, 1, 2, 4, 5],
+};
+
+const SIMPLE_GEOMETRY_LAYER = {
+    ...grid3dLayer,
+    pickable: true,
+    pointsData: new Float32Array(SIMPLE_GEOMETRY.points.flat()),
+    polysData: new Uint32Array(SIMPLE_GEOMETRY.polygons),
+};
+
+const CATEGORICAL_COLOR_MAP = (value: number) => CATEGORICAL_COLOR_TABLE[value];
+
+const BLUE_RED_HEAT_MAP = (value: number): [number, number, number] => {
+    return [value * 255, 0, (1 - value) * 255];
 };
 
 export const Simgrid: StoryObj<typeof SubsurfaceViewer> = {
@@ -186,20 +214,20 @@ const toroidProperties = Array(ToroidVertexCount)
     .map(() => randomFunc() * 10);
 
 /* eslint-disable prettier/prettier */
-const colorTable = new Uint8Array([
-    0, 0, 255,     // 0
-    0, 255, 0,     // 1 
-    0, 255, 255,   // 2 
-    255, 0, 0,     // 3 
-    255, 0, 255,   // 4 
-    255, 255, 0,   // 5 
-    0, 0, 100,     // 6 
-    0, 100, 0,     // 7 
-    0, 100, 100,   // 8
-    100, 0, 0,     // 9 
-    100, 0, 100,   // 10
-    100, 100, 0,   // 11
-]);
+const CATEGORICAL_COLOR_TABLE: [number, number, number][] = [
+    [0, 0, 255],     // 0
+    [0, 255, 0],     // 1 
+    [0, 255, 255],   // 2 
+    [255, 0, 0],     // 3 
+    [255, 0, 255],   // 4 
+    [255, 255, 0],   // 5 
+    [0, 0, 100],     // 6 
+    [0, 100, 0],     // 7 
+    [0, 100, 100],   // 8
+    [100, 0, 0],     // 9 
+    [100, 0, 100],   // 10
+    [100, 100, 0],   // 11
+];
 
 const propertyValueNames = [
     { value: 1, name: "blue"},         // 0
@@ -214,7 +242,7 @@ const propertyValueNames = [
     { value: 10, name: "dark red"},    // 9
     { value: 3, name: "dark magenta"}, // 10
     { value: -10, name: "dark yellow"},// 11
-]
+];
 /* eslint-enable prettier/prettier */
 
 export const PolyhedralCells: StoryObj<typeof SubsurfaceViewer> = {
@@ -268,7 +296,7 @@ const layerArrays = {
         pointsData: new Float32Array(gridPoints),
         polysData: new Uint32Array(gridPolys),
         propertiesData: new Uint16Array(gridProps),
-        colorMapFunction: colorTable,
+        colorMapFunction: new Uint8Array(CATEGORICAL_COLOR_TABLE.flat()),
     },
 };
 
@@ -304,6 +332,45 @@ function replaceLayerArrays(
         }
     }
 }
+
+export const ContinuousProperty: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "grid-property",
+        layers: [
+            new AxesLayer({
+                ...axes,
+                bounds: [-300, -300, -2200, 300, 300, -1000],
+            }),
+            new Grid3DLayer({
+                ...SIMPLE_GEOMETRY_LAYER,
+                propertiesData: new Float32Array([-1, 100.5]),
+                colorMapFunction: BLUE_RED_HEAT_MAP,
+            }) as CompositeLayer<Grid3DLayerProps>,
+        ],
+    },
+    parameters: parameters,
+    render: (args) => <SubsurfaceViewer {...args} />,
+};
+
+export const DiscreteProperty: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "grid-property",
+        layers: [
+            new AxesLayer({
+                ...axes,
+                bounds: [-300, -300, -2200, 300, 300, -1000],
+            }),
+            new Grid3DLayer({
+                ...SIMPLE_GEOMETRY_LAYER,
+                propertiesData: new Uint16Array([0, 1]),
+                discretePropertyValueNames: propertyValueNames,
+                colorMapFunction: CATEGORICAL_COLOR_MAP,
+            }) as CompositeLayer<Grid3DLayerProps>,
+        ],
+    },
+    parameters: parameters,
+    render: (args) => <SubsurfaceViewer {...args} />,
+};
 
 export const DiscretePropertyWithClamping: StoryObj<typeof SubsurfaceViewer> = {
     args: {

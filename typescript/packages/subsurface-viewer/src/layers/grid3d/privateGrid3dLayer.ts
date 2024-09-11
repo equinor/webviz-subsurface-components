@@ -372,14 +372,20 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
         };
     }
     private getTexture(context: DeckGLLayerContext): Texture<TextureProps> {
+        const textureProps: TextureProps = {
+            sampler: DEFAULT_TEXTURE_PARAMETERS,
+            width: 256,
+            height: 1,
+            format: "rgb8unorm-webgl",
+        };
+
         if (this.props.colorMapFunction instanceof Uint8Array) {
             const imageData = this.getImageData();
             const count = this.props.colorMapFunction.length / 3;
             if (count === 0) {
                 const colormap = context.device.createTexture({
+                    ...textureProps,
                     width: imageData.count,
-                    height: 1,
-                    format: "rgb8unorm-webgl",
                     data: new Uint8Array([0, 0, 0, 0, 0, 0]),
                     sampler: DISCRETE_TEXTURE_PARAMETERS,
                 });
@@ -392,9 +398,8 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
                     : DEFAULT_TEXTURE_PARAMETERS;
 
             const colormap = context.device.createTexture({
+                ...textureProps,
                 width: imageData.count,
-                height: 1,
-                format: "rgb8unorm-webgl",
                 data: imageData.data as TextureData,
                 sampler,
             });
@@ -409,9 +414,8 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
         );
 
         const colormap = context.device.createTexture({
-            width: 256,
+            ...textureProps,
             height: 1,
-            format: "rgb8unorm-webgl",
             data: data as TextureData,
         });
         return colormap;
