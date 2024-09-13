@@ -9,6 +9,7 @@ import type {
     BoundsAccessor,
     MapMouseEvent,
     MapProps,
+    Point3D,
     TooltipCallback,
     ViewStateType,
     ViewsType,
@@ -41,7 +42,7 @@ export type LightsType = {
     pointLights?: [
         {
             intensity: number;
-            position: [number, number, number];
+            position: Point3D;
             color?: [number, number, number];
         },
     ];
@@ -49,7 +50,7 @@ export type LightsType = {
     directionalLights?: [
         {
             intensity: number;
-            direction: [number, number, number];
+            direction: Point3D;
             color?: [number, number, number];
         },
     ];

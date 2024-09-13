@@ -30,9 +30,6 @@ export const argTypes = {
 
     triggerHome: {
         description: "Forces resetting to initial home position",
-        control: {
-            type: "number",
-        },
     },
 
     views: {

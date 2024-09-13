@@ -52,9 +52,9 @@ import {
     getWellLayerByTypeAndSelectedWells,
 } from "../layers/utils/layerTools";
 import type { WellsPickInfo } from "../layers/wells/wellsLayer";
-import type { BoundingBox2D } from "../utils/BoundingBox2D";
+import type { BoundingBox2D, Point2D } from "../utils/BoundingBox2D";
 import { isEmpty as isEmptyBox2D } from "../utils/BoundingBox2D";
-import type { BoundingBox3D } from "../utils/BoundingBox3D";
+import type { BoundingBox3D, Point3D } from "../utils/BoundingBox3D";
 import {
     boxCenter,
     boxUnion,
@@ -78,7 +78,7 @@ import { useVerticalScale } from "../views/viewport";
 
 import mergeRefs from "merge-refs";
 
-export type { BoundingBox2D, BoundingBox3D };
+export type { BoundingBox2D, BoundingBox3D, Point2D, Point3D };
 /**
  * Type of the function returning coordinate boundary for the view defined as [left, bottom, right, top].
  */
@@ -166,7 +166,7 @@ export interface ViewsType {
     /**
      * Layout for viewport in specified as [row, column].
      */
-    layout: [number, number];
+    layout: Point2D;
 
     /**
      * Number of pixels used for the margin in matrix mode.
@@ -189,8 +189,8 @@ export interface ViewsType {
  * Camera view state.
  */
 export interface ViewStateType {
-    target: number[];
-    zoom: number | [number, number] | BoundingBox3D | undefined;
+    target: Point2D | Point3D;
+    zoom: number | Point2D | BoundingBox3D | undefined;
     rotationX: number;
     rotationOrbit: number;
     minZoom?: number;
@@ -591,7 +591,7 @@ const Map: React.FC<MapProps> = ({
                 if (infos.length >= 1) {
                     if (infos[0].coordinate) {
                         viewController.setTarget(
-                            infos[0].coordinate as [number, number, number]
+                            infos[0].coordinate as Point3D
                         );
                     }
                 }
@@ -981,7 +981,7 @@ type ViewControllerState = {
 };
 type ViewControllerDerivedState = {
     // Derived state
-    target: [number, number, number] | undefined;
+    target: Point3D | undefined;
     readyForInteraction: boolean;
     viewStateChanged: boolean;
 };
@@ -1027,7 +1027,7 @@ class ViewController {
         this.rerender_ = rerender;
     }
 
-    public readonly setTarget = (target: [number, number, number]) => {
+    public readonly setTarget = (target: Point3D) => {
         this.derivedState_.target = [target[0], target[1], target[2]];
         this.rerender_();
     };
@@ -1104,6 +1104,7 @@ class ViewController {
                 state.viewPortMargins,
                 state.camera,
                 state.boundingBox3d,
+                state.zScale,
                 state.bounds,
                 state.deckSize
             );
@@ -1150,9 +1151,8 @@ class ViewController {
                 state.zScale / (triggerHome ? 1 : this.state_.zScale);
             // update target
             for (const key in viewState) {
-                const t = viewState[key].target;
-                if (t) {
-                    viewState[key].target = [t[0], t[1], t[2] * targetScale];
+                if (viewState[key].target) {
+                    applyZScale(viewState[key].target as Point3D, targetScale);
                 }
             }
         }
@@ -1170,7 +1170,9 @@ class ViewController {
         const viewports = this.views_?.viewports ?? [];
         if (viewState.target.length === 2) {
             // In orthographic mode viewState.target contains only x and y. Add existing z value.
-            viewState.target.push(this.result_.viewState[viewId].target[2]);
+            viewState.target.push(
+                this.result_.viewState[viewId].target[2] ?? 1
+            );
         }
         const isSyncIds = viewports
             .filter((item) => item.isSync)
@@ -1244,7 +1246,7 @@ function computeCameraZoom(
         zMin + (zMax - zMin) / 2,
     ];
 
-    const points: [number, number, number][] = [
+    const points: Point3D[] = [
         [xMin, yMin, zMin],
         [xMin, yMax, zMin],
         [xMax, yMax, zMin],
@@ -1285,7 +1287,7 @@ function computeCameraZoom(
 function getViewStateFromBounds(
     viewPortMargins: MarginsType,
     bounds_accessor: BoundingBox2D | BoundsAccessor,
-    target: [number, number, number],
+    target: Point3D,
     views: ViewsType | undefined,
     viewPort: ViewportType,
     size: Size
@@ -1301,7 +1303,7 @@ function getViewStateFromBounds(
     const z = target[2];
 
     const fb = fitBounds({ width: w, height: h, bounds });
-    let fb_target = [fb.x, fb.y, z];
+    let fb_target: Point3D = [fb.x, fb.y, z];
     let fb_zoom = fb.zoom;
 
     if (size.width > 0 && size.height > 0) {
@@ -1585,6 +1587,18 @@ function canCameraBeDefined(
 }
 
 /**
+ * Applies the zScale to the camera target.
+ * This is needed, as the camera target is specified in world coordinates, while the Z scale
+ * is applied to the transformation matrix of the object coordinates. The target must be applied
+ * the same scale to be consistent with the display.
+ * @param target camera target that must take into account the Z scale.
+ * @param zScale Z scale.
+ */
+function applyZScale(target: Point3D, zScale: number): void {
+    target[2] = target[2] * zScale;
+}
+
+/**
  * Returns the camera if it is fully specified (ie. the zoom is a valid number), otherwise computes
  * the zoom to visualize the complete camera boundingBox if set, the provided boundingBox otherwise.
  * @param camera input camera.
@@ -1594,10 +1608,15 @@ function canCameraBeDefined(
 function updateViewState(
     camera: ViewStateType,
     boundingBox: BoundingBox3D,
+    zScale: number,
     size: Size,
     is3D = true
 ): ViewStateType {
     if (isCameraDefined(camera)) {
+        if (is3D) {
+            // apply zScaling to target (target is in real coordinates while zScaling is applied to matrix transform)
+            applyZScale(camera.target as Point3D, zScale);
+        }
         return camera;
     }
 
@@ -1622,6 +1641,10 @@ function updateViewState(
     }
     if (!cameraHasTarget(camera_)) {
         camera_.target = boxCenter(boundingBox);
+        if (is3D) {
+            // apply zScaling to target (target is in real coordinates while zScaling is applied to matrix transform)
+            applyZScale(camera.target as Point3D, zScale);
+        }
     }
     camera_.minZoom = camera_.minZoom ?? minZoom3D;
     camera_.maxZoom = camera_.maxZoom ?? maxZoom3D;
@@ -1636,6 +1659,7 @@ function computeViewState(
     viewPort: ViewportType,
     cameraPosition: ViewStateType | undefined,
     boundingBox: BoundingBox3D | undefined,
+    zScale: number,
     bounds: BoundingBox2D | BoundsAccessor | undefined,
     viewportMargins: MarginsType,
     views: ViewsType | undefined,
@@ -1655,13 +1679,12 @@ function computeViewState(
     if (viewPort.show3D ?? false) {
         // If the camera is defined, use it
         if (isCameraPositionDefined) {
-            return updateViewState(cameraPosition, boundingBox, size);
+            return updateViewState(cameraPosition, boundingBox, zScale, size);
         }
 
         // deprecated in 3D, kept for backward compatibility
         if (isBoundsDefined) {
-            const centerOfData: [number, number, number] =
-                boxCenter(boundingBox);
+            const centerOfData: Point3D = boxCenter(boundingBox);
             return getViewStateFromBounds(
                 viewportMargins,
                 bounds,
@@ -1671,21 +1694,27 @@ function computeViewState(
                 size
             );
         }
-        const defaultCamera = {
-            target: [], // force computation from the bounding box 3D
+        const defaultCamera: ViewStateType = {
+            target: [] as unknown as Point3D, // force computation from the bounding box 3D
             zoom: NaN, // force computation from the bounding box 3D
             rotationX: 45, // look down z -axis at 45 degrees
             rotationOrbit: 0,
         };
-        return updateViewState(defaultCamera, boundingBox, size);
+        return updateViewState(defaultCamera, boundingBox, zScale, size);
     } else {
         // If the camera is defined, use it
         if (isCameraPositionDefined) {
             const is3D = false;
-            return updateViewState(cameraPosition, boundingBox, size, is3D);
+            return updateViewState(
+                cameraPosition,
+                boundingBox,
+                zScale,
+                size,
+                is3D
+            );
         }
 
-        const centerOfData: [number, number, number] = boxCenter(boundingBox);
+        const centerOfData: Point3D = boxCenter(boundingBox);
         // if bounds are defined, use them
         if (isBoundsDefined) {
             return getViewStateFromBounds(
@@ -1715,6 +1744,7 @@ function buildDeckGlViewStates(
     viewPortMargins: MarginsType,
     cameraPosition: ViewStateType | undefined,
     boundingBox: BoundingBox3D | undefined,
+    zScale: number,
     bounds: BoundingBox2D | BoundsAccessor | undefined,
     size: Size
 ): Record<string, ViewStateType> {
@@ -1733,6 +1763,7 @@ function buildDeckGlViewStates(
             views.viewports[0],
             cameraPosition,
             boundingBox,
+            zScale,
             bounds,
             viewPortMargins,
             views,
@@ -1758,6 +1789,7 @@ function buildDeckGlViewStates(
                 currentViewport,
                 cameraPosition,
                 boundingBox,
+                zScale,
                 bounds,
                 viewPortMargins,
                 views,
