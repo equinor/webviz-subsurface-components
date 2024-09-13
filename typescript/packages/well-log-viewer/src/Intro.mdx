@@ -32,14 +32,17 @@ It is based on the JavaScript Object Notation open standard (RFC 8259).
 Full description of the format could be found on the site https://jsonwelllogformat.org .
 
 The file format could be described with a following
-[JSON schema](https://github.com/equinor/webviz-subsurface-components/blob/master/react/src/lib/inputSchema/WellLog.json)
+[JSON schema](https://github.com/equinor/webviz-subsurface-components/blob/master/typescript/packages/wsc-common/src/inputSchema/WellLogs.json)
 
 #### Template Format
 
 The JSON file describing content of well log view: what tracks should be displayed and what curves it should contains.
 
 The file format could be described with a following
-[JSON schema](https://github.com/equinor/webviz-subsurface-components/blob/master/react/src/lib/inputSchema/WellLogTemplate.json)
+[JSON schema](https://github.com/equinor/webviz-subsurface-components/blob/master/typescript/packages/wsc-common/src/inputSchema/WellLogTemplate.json)
+
+See also [wsc-common](/https://github.com/equinor/webviz-subsurface-components/tree/master/typescript/packages/wsc-common) package
+which could vaidate data against appropriate schema
 
 #### Color Table Format
 
@@ -77,3 +80,21 @@ A class CallbackManager allows side panel and its components to obtain various n
 It demonstrate how different well log views can be synchronized in such complex programs as well correlation applications.
 
 The component architecture is similar to WellLogViewer's one but contains three views for well logs an three readout panels.
+
+When SyncLogViewer has more than one WellLogView different synchonization modes between them could be applied.
+
+-   Selections synchronization could be turn on with syncContentSelection prop.
+-   Visible areas synchronization could be turn on with syncContentDomain prop.
+-   Another way to synchronize visible area is using of wellpicks flatting (wellpickFlatting prop) when some wellpick are aligned to one flat line.
+
+# Implementaion notes
+
+## WellLogView component
+
+In addition to the videx-wellog functionality, drawing wellpicks and filling the areas between them are added.
+It is implemented with additional overlay for videx-wellog (see function addWellPickOverlay in components\WellLogView.tsx)
+
+## SyncLogViewer component
+
+In addition to WellLogViewer component SyncLogViewer use WellLogSpacer component to fill area between well logs.
+Its appearance is controlled with spacers and wellDistances props of SyncLogViewer
