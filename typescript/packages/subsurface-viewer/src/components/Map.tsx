@@ -189,7 +189,7 @@ export interface ViewsType {
  * Camera view state.
  */
 export interface ViewStateType {
-    target: Point2D | Point3D;
+    target: Point2D | Point3D | undefined;
     zoom: number | Point2D | BoundingBox3D | undefined;
     rotationX: number;
     rotationOrbit: number;
@@ -1152,7 +1152,7 @@ class ViewController {
             // update target
             for (const key in viewState) {
                 if (viewState[key].target) {
-                    applyZScale(viewState[key].target as Point3D, targetScale);
+                    applyZScale(viewState[key].target, targetScale);
                 }
             }
         }
@@ -1168,10 +1168,10 @@ class ViewController {
             return;
         }
         const viewports = this.views_?.viewports ?? [];
-        if (viewState.target.length === 2) {
+        if (viewState.target?.length === 2) {
             // In orthographic mode viewState.target contains only x and y. Add existing z value.
             viewState.target.push(
-                this.result_.viewState[viewId].target[2] ?? 1
+                this.result_.viewState[viewId].target?.[2] ?? 1
             );
         }
         const isSyncIds = viewports
@@ -1594,8 +1594,13 @@ function canCameraBeDefined(
  * @param target camera target that must take into account the Z scale.
  * @param zScale Z scale.
  */
-function applyZScale(target: Point3D, zScale: number): void {
-    target[2] = target[2] * zScale;
+function applyZScale(
+    target: Point2D | Point3D | undefined,
+    zScale: number
+): void {
+    if (target?.[2]) {
+        target[2] = target[2] * zScale;
+    }
 }
 
 /**
@@ -1615,7 +1620,7 @@ function updateViewState(
     if (isCameraDefined(camera)) {
         if (is3D) {
             // apply zScaling to target (target is in real coordinates while zScaling is applied to matrix transform)
-            applyZScale(camera.target as Point3D, zScale);
+            applyZScale(camera.target, zScale);
         }
         return camera;
     }
@@ -1643,7 +1648,7 @@ function updateViewState(
         camera_.target = boxCenter(boundingBox);
         if (is3D) {
             // apply zScaling to target (target is in real coordinates while zScaling is applied to matrix transform)
-            applyZScale(camera.target as Point3D, zScale);
+            applyZScale(camera.target, zScale);
         }
     }
     camera_.minZoom = camera_.minZoom ?? minZoom3D;
@@ -1695,7 +1700,7 @@ function computeViewState(
             );
         }
         const defaultCamera: ViewStateType = {
-            target: [] as unknown as Point3D, // force computation from the bounding box 3D
+            target: undefined, // force computation from the bounding box 3D
             zoom: NaN, // force computation from the bounding box 3D
             rotationX: 45, // look down z -axis at 45 degrees
             rotationOrbit: 0,

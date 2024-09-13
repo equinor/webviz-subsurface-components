@@ -542,7 +542,7 @@ export const WellsRefine: StoryObj<typeof WellsRefineComponent> = {
             rotationOrbit: -45,
             rotationX: 15,
             zoom: BBox,
-            target: [],
+            target: undefined,
         },
         views: default3DViews,
     },

@@ -40,7 +40,6 @@ import {
 const stories: Meta = {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer/Examples",
-    // @ts-expect-error TS2322
     argTypes: argTypes,
     args: {
         // Add a reset button for all the stories.
