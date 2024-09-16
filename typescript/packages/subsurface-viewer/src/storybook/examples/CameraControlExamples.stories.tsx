@@ -43,8 +43,7 @@ const stories: Meta = {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer/Examples/Camera",
     args: {
-        // Add a reset button for all the stories.
-        // Somehow, I do not manage to add the triggerHome to the general "unset" controls :/
+        // Add some common controls for all the stories.
         triggerHome: 0,
     },
 };
@@ -74,7 +73,7 @@ const CAMERA_POSITION: ViewStateType = {
 
 const SIDE_CAMERA = {
     rotationX: 0,
-    target: [435800, 6478000, -4000] as Point3D,
+    target: [435800, 6478000, -3250] as Point3D,
     rotationOrbit: 90,
     zoom: -3.3,
 };
@@ -634,15 +633,15 @@ export const ScaleYWithCameraPosition: StoryObj<
     render: (args) => <ScaleYWithCameraPositionComponent {...args} />,
 };
 
-const ScaleVertical3dComponent = ({
-    verticalScale,
-}: {
-    verticalScale: number;
-}) => {
+const ScaleVertical3dComponent = (
+    props: SubsurfaceViewerProps & {
+        verticalScale: number;
+    }
+) => {
     const viewerProps: SubsurfaceViewerProps = {
         ...DEFAULT_PROPS,
         cameraPosition: SIDE_CAMERA,
-        verticalScale,
+        ...props,
     };
     return <SubsurfaceViewer {...viewerProps} />;
 };
@@ -665,20 +664,21 @@ export const ScaleVertical3d: StoryObj<typeof ScaleVertical3dComponent> = {
     render: (args) => <ScaleVertical3dComponent {...args} />,
 };
 
-const ScaleFactorHookComponent = ({
-    verticalScale,
-}: {
-    verticalScale: number;
-}) => {
+const ScaleFactorHookComponent = (
+    props: SubsurfaceViewerProps & {
+        verticalScale: number;
+    }
+) => {
     const { factor: scaleFactor, setFactor, elementRef } = useScaleFactor();
 
     React.useEffect(() => {
-        setFactor(verticalScale);
-    }, [setFactor, verticalScale]);
+        setFactor(props.verticalScale);
+    }, [setFactor, props.verticalScale]);
 
     const viewerProps: SubsurfaceViewerProps = {
         ...DEFAULT_PROPS,
         cameraPosition: SIDE_CAMERA,
+        ...props,
         verticalScale: scaleFactor,
         innerRef: elementRef,
         coords: { visible: false },

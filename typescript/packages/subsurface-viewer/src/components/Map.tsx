@@ -590,7 +590,7 @@ const Map: React.FC<MapProps> = ({
                 // Left button click identifies new camera rotation anchor.
                 if (infos.length >= 1) {
                     if (infos[0].coordinate) {
-                        viewController.setTarget(
+                        viewController.setScaledTarget(
                             infos[0].coordinate as Point3D
                         );
                     }
@@ -981,13 +981,22 @@ type ViewControllerState = {
 };
 type ViewControllerDerivedState = {
     // Derived state
-    target: Point3D | undefined;
+    cameraClone: ViewStateType | undefined; // clone of the camera
+    eventTarget: Point3D | undefined; // target set by events
     readyForInteraction: boolean;
     viewStateChanged: boolean;
 };
 type ViewControllerFullState = ViewControllerState & ViewControllerDerivedState;
+
 class ViewController {
     private rerender_: React.DispatchWithoutAction;
+
+    private derivedState_: ViewControllerDerivedState = {
+        cameraClone: undefined,
+        eventTarget: undefined,
+        readyForInteraction: false,
+        viewStateChanged: false,
+    };
 
     private state_: ViewControllerFullState = {
         triggerHome: undefined,
@@ -1003,15 +1012,7 @@ class ViewController {
             bottom: 0,
         },
         // Derived state
-        target: undefined,
-        readyForInteraction: false,
-        viewStateChanged: false,
-    };
-
-    private derivedState_: ViewControllerDerivedState = {
-        target: undefined,
-        readyForInteraction: false,
-        viewStateChanged: false,
+        ...this.derivedState_,
     };
 
     private views_: ViewsType | undefined = undefined;
@@ -1027,8 +1028,13 @@ class ViewController {
         this.rerender_ = rerender;
     }
 
-    public readonly setTarget = (target: Point3D) => {
-        this.derivedState_.target = [target[0], target[1], target[2]];
+    /**
+     * Sets the target from picks, which comes from the displayed
+     * scaled data.
+     * @param target scaled 3D point.
+     */
+    public readonly setScaledTarget = (target: Point3D) => {
+        this.derivedState_.eventTarget = [target[0], target[1], target[2]];
         this.rerender_();
     };
 
@@ -1040,7 +1046,10 @@ class ViewController {
         const newViews = this.getDeckGlViews(views, fullState);
         const newViewState = this.getDeckGlViewState(views, fullState);
 
-        this.state_ = fullState;
+        // do not update this.state_ as it has not yet been applied
+        if (!isEmpty(newViewState)) {
+            this.state_ = fullState;
+        }
         this.views_ = views;
         this.result_.views = newViews;
         this.result_.viewState = newViewState;
@@ -1051,7 +1060,12 @@ class ViewController {
     private readonly consolidateState = (
         state: ViewControllerState
     ): ViewControllerFullState => {
-        return { ...state, ...this.derivedState_ };
+        const fullState = { ...state, ...this.derivedState_ };
+        if (fullState.camera != this.state_.camera) {
+            // create a clone of the camera property to avoid editing it
+            fullState.cameraClone = cloneDeep(fullState.camera);
+        }
+        return fullState;
     };
 
     // returns the DeckGL views (ie. view position and viewport)
@@ -1075,8 +1089,12 @@ class ViewController {
         const viewsChanged = views != this.views_;
         const triggerHome = state.triggerHome !== this.state_.triggerHome;
         const updateTarget =
-            (viewsChanged || state.target !== this.state_?.target) &&
-            state.target != undefined;
+            (viewsChanged || state.eventTarget !== this.state_.eventTarget) &&
+            state.eventTarget != undefined;
+        // reset old zScale if new camera
+        if (state.camera != this.state_.camera) {
+            this.state_.zScale = 1;
+        }
         const updateZScale =
             viewsChanged || state.zScale !== this.state_?.zScale || triggerHome;
         const updateViewState =
@@ -1102,15 +1120,16 @@ class ViewController {
             viewState = buildDeckGlViewStates(
                 views,
                 state.viewPortMargins,
-                state.camera,
+                state.cameraClone,
                 state.boundingBox3d,
                 state.zScale,
+                this.state_.zScale,
                 state.bounds,
                 state.deckSize
             );
             // reset state
             this.derivedState_.readyForInteraction = canCameraBeDefined(
-                state.camera,
+                state.cameraClone,
                 state.boundingBox3d,
                 state.bounds,
                 state.deckSize
@@ -1126,7 +1145,7 @@ class ViewController {
         const viewStateKeys = Object.keys(viewState);
         if (
             updateTarget &&
-            this.derivedState_.target &&
+            this.derivedState_.eventTarget &&
             viewStateKeys?.length === 1
         ) {
             // deep clone to notify change (memo checks object address)
@@ -1134,10 +1153,10 @@ class ViewController {
                 viewState = cloneDeep(prevViewState);
             }
             // update target
-            viewState[viewStateKeys[0]].target = this.derivedState_.target;
+            viewState[viewStateKeys[0]].target = this.derivedState_.eventTarget;
             viewState[viewStateKeys[0]].transitionDuration = 1000;
             // reset
-            this.derivedState_.target = undefined;
+            this.derivedState_.eventTarget = undefined;
         }
         if (updateZScale) {
             // deep clone to notify change (memo checks object address)
@@ -1148,7 +1167,8 @@ class ViewController {
             // - if triggerHome: the target was recomputed from the input data (ie. without any scale applied)
             // - otherwise: previous scale (ie. this.state_.zScale) was already applied, and must be "reverted"
             const targetScale =
-                state.zScale / (triggerHome ? 1 : this.state_.zScale);
+                state.zScale /
+                (triggerHome ? state.zScale : this.state_.zScale);
             // update target
             for (const key in viewState) {
                 if (viewState[key].target) {
@@ -1665,6 +1685,7 @@ function computeViewState(
     cameraPosition: ViewStateType | undefined,
     boundingBox: BoundingBox3D | undefined,
     zScale: number,
+    oldZScale: number,
     bounds: BoundingBox2D | BoundsAccessor | undefined,
     viewportMargins: MarginsType,
     views: ViewsType | undefined,
@@ -1684,7 +1705,12 @@ function computeViewState(
     if (viewPort.show3D ?? false) {
         // If the camera is defined, use it
         if (isCameraPositionDefined) {
-            return updateViewState(cameraPosition, boundingBox, zScale, size);
+            return updateViewState(
+                cameraPosition,
+                boundingBox,
+                zScale / (oldZScale || 1),
+                size
+            );
         }
 
         // deprecated in 3D, kept for backward compatibility
@@ -1750,6 +1776,7 @@ function buildDeckGlViewStates(
     cameraPosition: ViewStateType | undefined,
     boundingBox: BoundingBox3D | undefined,
     zScale: number,
+    oldZScale: number,
     bounds: BoundingBox2D | BoundsAccessor | undefined,
     size: Size
 ): Record<string, ViewStateType> {
@@ -1769,6 +1796,7 @@ function buildDeckGlViewStates(
             cameraPosition,
             boundingBox,
             zScale,
+            oldZScale,
             bounds,
             viewPortMargins,
             views,
@@ -1795,6 +1823,7 @@ function buildDeckGlViewStates(
                 cameraPosition,
                 boundingBox,
                 zScale,
+                oldZScale,
                 bounds,
                 viewPortMargins,
                 views,
