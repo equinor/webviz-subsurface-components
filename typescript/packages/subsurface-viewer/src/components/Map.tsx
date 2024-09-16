@@ -1679,13 +1679,18 @@ function computeViewState(
         };
         return updateViewState(defaultCamera, boundingBox, size);
     } else {
+        const is3D = false;
+
         // If the camera is defined, use it
         if (isCameraPositionDefined) {
-            const is3D = false;
             return updateViewState(cameraPosition, boundingBox, size, is3D);
         }
 
         const centerOfData: [number, number, number] = boxCenter(boundingBox);
+
+        // In 2D set camera target (centerOfDatea) to 0; Zoom scales world around target.
+        centerOfData[2] = 0;
+
         // if bounds are defined, use them
         if (isBoundsDefined) {
             return getViewStateFromBounds(

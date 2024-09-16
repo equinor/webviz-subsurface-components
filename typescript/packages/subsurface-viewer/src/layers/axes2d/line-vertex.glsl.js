@@ -4,10 +4,13 @@ export default `\
 
 precision highp float;
 
+uniform float uClipZ;
+
 in vec3 positions;
 
 void main(void) {
    vec3 position_commonspace = project_position(positions);
-   gl_Position = project_common_position_to_clipspace(vec4(position_commonspace, 0.0));
+   vec4 position_clipspace = project_common_position_to_clipspace(vec4(position_commonspace, 1.0));
+   gl_Position = vec4(position_clipspace.x, position_clipspace.y, uClipZ, position_clipspace.w);
 }
 `;
