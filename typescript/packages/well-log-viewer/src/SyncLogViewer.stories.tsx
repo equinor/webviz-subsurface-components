@@ -408,7 +408,7 @@ export const Default: StoryObj<typeof Template> = {
 
         wellpickFlatting: ["Hor_2", "Hor_4"],
 
-        spacers: [312, 255],
+        spacers: [80, 66],
         wellDistances: {
             units: "m",
             distances: [2048.3, 512.7],

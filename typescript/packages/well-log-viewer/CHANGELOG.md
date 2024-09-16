@@ -1,3 +1,10 @@
+## [1.13.3](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.13.2...well-log-viewer@1.13.3) (2024-09-16)
+
+
+### Bug Fixes
+
+* pass width prop to spacer component to be used for initial layout calculation ([#2245](https://github.com/equinor/webviz-subsurface-components/issues/2245)) ([2fa3b1d](https://github.com/equinor/webviz-subsurface-components/commit/2fa3b1d6bd6d3705feae472ed42185de79eff059)), closes [#2241](https://github.com/equinor/webviz-subsurface-components/issues/2241)
+
 ## [1.13.2](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.13.1...well-log-viewer@1.13.2) (2024-09-11)
 
 

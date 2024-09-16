@@ -967,7 +967,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         if (!this.props.spacers) return null;
         const prev = index - 1;
 
-        let width = 255;
+        let width = 75;
         if (typeof this.props.spacers !== "boolean") {
             width =
                 typeof this.props.spacers === "number"
@@ -975,7 +975,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                     : this.props.spacers[prev]; // individual width
         }
 
-        if (width === undefined) width = 255; // set some default value
+        if (width === undefined) width = 75; // set some default value
         if (!width) return null;
 
         return (
@@ -1007,6 +1007,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                               ]
                             : []
                     }
+                    width={width}
                     patternsTable={this.props.patternsTable}
                     patterns={this.props.patterns}
                     options={this.props.spacerOptions}
