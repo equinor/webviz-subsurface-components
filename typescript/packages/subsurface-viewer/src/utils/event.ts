@@ -58,8 +58,8 @@ function convertToArrowEvent(event: KeyboardEvent): ArrowEvent | null {
  * the state, and a ref that is used to attach the event listener used for
  * keyboard events.
  */
-export const useScaleFactor = () => {
-    const [factor, setFactor] = React.useState(1);
+export const useScaleFactor = (initialValue?: number) => {
+    const [factor, setFactor] = React.useState(initialValue ?? 1);
 
     const elementRef = React.useRef<HTMLElement>(null);
 
