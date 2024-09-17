@@ -1,3 +1,10 @@
+## [0.30.6](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.30.5...subsurface-viewer@0.30.6) (2024-09-17)
+
+
+### Bug Fixes
+
+* allow initializing scaling factor value ([#2248](https://github.com/equinor/webviz-subsurface-components/issues/2248)) ([10b1901](https://github.com/equinor/webviz-subsurface-components/commit/10b190147c749bc2558bc2216fc50184a2675b17))
+
 ## [0.30.5](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.30.4...subsurface-viewer@0.30.5) (2024-09-16)
 
 
