@@ -14,7 +14,7 @@ import defaultLayout from "./components/DefaultSyncLogViewerLayout";
 
 import type { WellLog } from "./components/WellLogTypes";
 import type { Template } from "./components/WellLogTemplateTypes";
-import type { ColorTable } from "./components/ColorTableTypes";
+import type { ColorTable, ColorFunction } from "./components/ColorTableTypes";
 import type { PatternsTable } from "./utils/pattern";
 
 import type {
@@ -74,6 +74,10 @@ export interface SyncLogViewerProps {
      * Prop containing color table data.
      */
     colorTables: ColorTable[];
+    /**
+     * Prop containing color function table array.
+     */
+    colorFunctions: ColorFunction[];
     /**
      * Set to true for default titles or to array of individial welllog titles
      */
@@ -938,6 +942,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                 viewTitle={viewTitle}
                 template={template}
                 colorTables={this.props.colorTables}
+                colorFunctions={this.props.colorFunctions}
                 wellpick={this.props.wellpicks?.[index]}
                 patternsTable={this.props.patternsTable}
                 patterns={this.props.patterns}
@@ -999,6 +1004,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                         value: this.props.wellDistances?.distances[prev],
                     }}
                     colorTables={this.props.colorTables}
+                    colorFunctions={this.props.colorFunctions}
                     wellpicks={
                         this.props.wellpicks
                             ? [
@@ -1138,7 +1144,7 @@ SyncLogViewer.propTypes = {
     wellpickFlatting: PropTypes.arrayOf(PropTypes.string),
 
     /**
-     * Set to true or to array of spaser widths if WellLogSpacers should be used
+     * Set to true or to array of spacer widths if WellLogSpacers should be used
      */
     spacers: PropTypes.oneOfType([
         PropTypes.bool,

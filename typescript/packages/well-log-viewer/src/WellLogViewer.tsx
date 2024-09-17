@@ -265,6 +265,7 @@ export default class WellLogViewer extends Component<
                         viewTitle={this.props.viewTitle}
                         template={this.props.template}
                         colorTables={this.props.colorTables}
+                        colorFunctions={this.props.colorFunctions}
                         wellpick={this.props.wellpick}
                         patternsTable={this.props.patternsTable}
                         patterns={this.props.patterns}

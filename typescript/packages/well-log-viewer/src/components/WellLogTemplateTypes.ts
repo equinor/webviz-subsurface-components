@@ -24,8 +24,10 @@ export type TemplatePlotProps = {
 
     fill?: CSSColor; // for 'area' plot
     fillOpacity?: number; // for 'area' and 'gradientfill' plots! default 0.25
-    colorTable?: string | ((v: number) => [number, number, number]); // table id (name) for 'gradientfill' plot
-    inverseColorTable?: string | ((v: number) => [number, number, number]); // table id (name) for 'gradientfill' plot
+    colorTable?: string; // color table id (name) for 'gradientfill' plot
+    colorFunction?: string; // color function id (name) for 'gradientfill' plot
+    inverseColorTable1?: string; // color table id (name) for 'gradientfill' plot
+    inverseColorFunction?: string; // color function id (name) for 'gradientfill' plot
     colorScale?: TemplatePlotScaleTypes; // for 'linear' plot scale. default equal to plot scale
     inverseColorScale?: TemplatePlotScaleTypes; // for 'linear' plot scale. default equal to plot scale
 

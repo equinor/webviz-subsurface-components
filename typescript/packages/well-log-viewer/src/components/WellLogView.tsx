@@ -17,6 +17,8 @@ import type {
     OverlayRescaleEvent,
 } from "@equinor/videx-wellog/dist/ui/interfaces";
 
+import { isFunction } from "../utils/color-table";
+
 import "./styles.scss";
 
 import { validateSchema } from "@webviz/wsc-common";
@@ -25,7 +27,7 @@ import { select } from "d3";
 
 import type { WellLog, WellLogCurve } from "./WellLogTypes";
 import type { Template } from "./WellLogTemplateTypes";
-import type { ColorTable } from "./ColorTableTypes";
+import type { ColorTable, ColorFunction } from "./ColorTableTypes";
 import type { PatternsTable } from "../utils/pattern";
 import { isEqualRanges } from "../utils/log-viewer";
 
@@ -313,6 +315,11 @@ export interface WellPickProps {
      */
     colorTables: ColorTable[];
     color: string; // "Stratigraphy" ...
+    /**
+     * Prop containing color function array for well picks
+     */
+    colorFunctions: ColorFunction[];
+    colorFunction: string;
 }
 
 const wpSize = 3; //9;
@@ -431,12 +438,23 @@ export function getWellPicks(wellLogView: WellLogView): WellPick[] {
             const vSecondary =
                 primaryAxis === "md" ? scaleInterpolator?.reverse(vMD) : vMD;
 
-            const colorTable = wellpick.colorTables.find(
-                (colorTable) => colorTable.name == wellpick.color
-            );
+            let colorTableOrFunction: ColorTable | ColorFunction | undefined;
+            if (wellpick.color)
+                colorTableOrFunction = wellpick.colorTables.find(
+                    (colorTable) => colorTable.name == wellpick.color
+                );
+            else if (wellpick.colorFunction)
+                colorTableOrFunction = wellpick.colorFunctions.find(
+                    (colorFunction) =>
+                        colorFunction.name == wellpick.colorFunction
+                );
 
             const meta = getDiscreteMeta(wellpick.wellpick, wellpick.name);
-            const { color } = getDiscreteColorAndName(d[c], colorTable, meta);
+            const { color } = getDiscreteColorAndName(
+                d[c],
+                colorTableOrFunction,
+                meta
+            );
 
             const wp = { vMD, vPrimary, vSecondary, horizon, color };
             wps.push(wp);
@@ -714,14 +732,16 @@ function setTracksToController(
     axes: AxesInfo,
     welllog: WellLog | undefined, // JSON Log Format
     template: Template, // JSON
-    colorTables?: ColorTable[] // JSON
+    colorTables?: ColorTable[], // JSON
+    colorFunctions?: ColorFunction[] // JS code
 ): ScaleInterpolator {
     const { tracks, minmaxPrimaryAxis, primaries, secondaries } = createTracks(
         welllog,
         axes,
         template.tracks,
         template.styles,
-        colorTables
+        colorTables,
+        colorFunctions
     );
     logController.reset();
     const scaleInterpolator = createScaleInterpolator(primaries, secondaries);
@@ -838,14 +858,18 @@ function fillPlotTemplate(
         inverseColor: options.inverseColor || "",
         fill: (options1 ? options1.fill : options.fill) || "",
         fill2: options2 ? options2.fill : "",
-        colorTable:
-            typeof options.colorTable === "function"
-                ? "Function"
-                : options.colorTable?.name ?? "",
-        inverseColorTable:
-            typeof options.inverseColorTable === "function"
-                ? "Function"
-                : options.inverseColorTable?.name ?? "",
+        colorTable: isFunction(options.colorTableOrFunction)
+            ? ""
+            : options.colorTableOrFunction?.name ?? "",
+        colorFunction: !isFunction(options.colorTableOrFunction)
+            ? ""
+            : options.colorTableOrFunction?.name ?? "",
+        inverseColorTable1: isFunction(options.inverseColorTableOrFunction)
+            ? ""
+            : options.inverseColorTableOrFunction?.name ?? "",
+        inverseColorFunction: isFunction(options.inverseColorTableOrFunction)
+            ? ""
+            : options.inverseColorTableOrFunction?.name ?? "",
         colorScale: options.colorScale,
         inverseColorScale: options.inverseColorScale,
     };
@@ -1048,6 +1072,11 @@ export interface WellLogViewProps {
     colorTables: ColorTable[];
 
     /**
+     * Prop containing color table data for discrete well logs
+     */
+    colorFunctions: ColorFunction[];
+
+    /**
      * Well Picks data
      */
     wellpick?: WellPickProps;
@@ -1149,7 +1178,12 @@ export const argTypesWellLogViewProp = {
         description: "Prop containing track template data.",
     },
     colorTables: {
-        description: "Prop containing color table data for discrete well logs.",
+        description:
+            "Prop containing color table data for discrete well logs and gradient plots.",
+    },
+    colorFunctions: {
+        description:
+            "Prop containing color function tablefor discrete well logs and gradient plots.",
     },
     wellpick: {
         description: "Well Picks data",
@@ -1202,6 +1236,7 @@ export function shouldUpdateWellLogView(
     if (props.welllog !== nextProps.welllog) return true;
     if (props.template !== nextProps.template) return true;
     if (props.colorTables !== nextProps.colorTables) return true;
+    if (props.colorFunctions !== nextProps.colorFunctions) return true;
     if (props.wellpick !== nextProps.wellpick) return true;
     if (props.primaryAxis !== nextProps.primaryAxis) return true;
     if (props.axisTitles !== nextProps.axisTitles) return true;
@@ -1396,7 +1431,10 @@ class WellLogView
             selectedTrackIndices = this.getSelectedTrackIndices();
             shouldSetTracks = true;
         }
-        if (this.props.colorTables !== prevProps.colorTables) {
+        if (
+            this.props.colorTables !== prevProps.colorTables ||
+            this.props.colorFunctions !== prevProps.colorFunctions
+        ) {
             selection = this.getContentSelection();
             selectedTrackIndices = this.getSelectedTrackIndices();
             shouldSetTracks = true; // force to repaint
@@ -1532,7 +1570,8 @@ class WellLogView
                 axes,
                 this.props.welllog,
                 this.template,
-                this.props.colorTables
+                this.props.colorTables,
+                this.props.colorFunctions
             );
             addWellPickOverlay(this.logController, this);
         }
@@ -2109,9 +2148,14 @@ export function _propTypesWellLogView(): Record<string, unknown> {
         template: PropTypes.object.isRequired,
 
         /**
-         * Prop containing color table data for discrete well logs
+         * Prop containing color table data for discrete well logs and gradient fill plots
          */
         colorTables: PropTypes.any, //.isRequired,
+
+        /**
+         * Prop containing color function table for discrete well logs and gradient fill plots
+         */
+        colorFunctions: PropTypes.any, //.isRequired,
 
         /**
          * Well picks data

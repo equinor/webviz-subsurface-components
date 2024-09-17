@@ -5,7 +5,7 @@ import type { WellLogController, WellPickProps } from "./WellLogView";
 import { getWellPicks } from "./WellLogView";
 import type WellLogView from "./WellLogView";
 
-import type { ColorTable } from "./ColorTableTypes";
+import type { ColorTable, ColorFunction } from "./ColorTableTypes";
 import type { PatternsTable } from "../utils/pattern";
 import { createDefs, patternId } from "../utils/pattern";
 
@@ -29,6 +29,10 @@ export interface WellLogSpacerProps {
      * Prop containing color table data.
      */
     colorTables: ColorTable[];
+    /**
+     * Prop containing color function table.
+     */
+    colorFunctions: ColorFunction[];
     /**
      * Well Picks data
      */
@@ -122,7 +126,10 @@ class WellLogSpacer extends Component<WellLogSpacerProps /*, State*/> {
     shouldComponentUpdate(
         nextProps: WellLogSpacerProps /*, nextState: State*/
     ): boolean {
-        if (this.props.colorTables !== nextProps.colorTables) {
+        if (
+            this.props.colorTables !== nextProps.colorTables ||
+            this.props.colorFunctions !== nextProps.colorFunctions
+        ) {
             return true;
         }
         if (this.props.controllers !== nextProps.controllers) {

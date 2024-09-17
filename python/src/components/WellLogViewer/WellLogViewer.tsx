@@ -56,6 +56,10 @@ type WellLogViewerProps = {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     colorTables: any[]; // specify the exact type if known
 
+    /** Prop containing color function table */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    colorFunctions: any[]; // specify the exact type if known
+
     /** Orientation of the track plots on the screen. Default is false */
     horizontal?: boolean;
 

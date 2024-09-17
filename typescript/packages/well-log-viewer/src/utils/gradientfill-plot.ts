@@ -7,19 +7,21 @@ import type { DefinedFunction } from "@equinor/videx-wellog/dist/plots/interface
 import renderGradientFillPlotLegend from "./gradientfill-plot-legend";
 import { getInterpolatedColorString } from "./color-table";
 
-import type { ColorTable } from "../components/ColorTableTypes";
+import type { ColorTable, ColorFunction } from "../components/ColorTableTypes";
 
 import type { AreaPlotOptions } from "@equinor/videx-wellog/dist/plots/interfaces";
 
 export interface GradientFillPlotOptions extends AreaPlotOptions {
-    colorTable?: ColorTable | ((v: number) => [number, number, number]);
-    inverseColorTable?: ColorTable | ((v: number) => [number, number, number]);
+    colorFunction?: string;
+    inverseColorFunction?: string;
+    colorTableOrFunction?: ColorTable | ColorFunction;
+    inverseColorTableOrFunction?: ColorTable | ColorFunction;
     colorScale?: "linear" | "log";
     inverseColorScale?: "linear" | "log";
 }
 
 /*
- * Create gradient based on colorTable
+ * Create gradient based on colorTable/colorFunction
  */
 function createGradient(
     ctx: CanvasRenderingContext2D,
@@ -27,7 +29,7 @@ function createGradient(
     horizontal: boolean | undefined,
     plotdata: number[][],
     xscale: Scale,
-    colorTable: ColorTable | ((v: number) => [number, number, number]),
+    colorTableOrFunction: ColorTable | ColorFunction,
     scale: undefined | string // "linear" | "log"
 ): CanvasGradient {
     const dataFrom = plotdata[0];
@@ -49,7 +51,7 @@ function createGradient(
             const stop = (data[0] - xFrom) / xDelta;
             if (0 <= stop && stop <= 1.0) {
                 const v = (Math.log(data[1]) - yFrom) / yDelta;
-                const c = getInterpolatedColorString(colorTable, v);
+                const c = getInterpolatedColorString(colorTableOrFunction, v);
                 gradient.addColorStop(stop, c);
             }
         }
@@ -65,7 +67,7 @@ function createGradient(
             const stop = (data[0] - xFrom) / xDelta;
             if (0 <= stop && stop <= 1.0) {
                 const v = (data[1] - yFrom) / yDelta;
-                const c = getInterpolatedColorString(colorTable, v);
+                const c = getInterpolatedColorString(colorTableOrFunction, v);
                 gradient.addColorStop(stop, c);
             }
         }
@@ -130,7 +132,7 @@ export default class GradientFillPlot extends Plot {
 
         ctx.globalAlpha = options.fillOpacity || 1;
 
-        if (options.inverseColor || options.inverseColorTable) {
+        if (options.inverseColor || options.inverseColorFunction) {
             const inverseValue = useMinAsBase ? rmax : rmin;
 
             const inverseAreaFunction = area()
@@ -155,15 +157,15 @@ export default class GradientFillPlot extends Plot {
             inverseAreaFunction(plotdata);
             ctx.fillStyle = options.inverseColor || "";
             /* Start GradientFill code */
-            const colorTable = options.inverseColorTable;
-            if (colorTable)
+            const colorTableOrFunction = options.inverseColorTableOrFunction;
+            if (colorTableOrFunction)
                 ctx.fillStyle = createGradient(
                     ctx,
                     scale,
                     options.horizontal,
                     plotdata,
                     xscale,
-                    colorTable,
+                    colorTableOrFunction,
                     options.inverseColorScale ||
                         options.colorScale ||
                         options.scale
@@ -179,15 +181,15 @@ export default class GradientFillPlot extends Plot {
 
         ctx.fillStyle = options.fill || options.color || "";
         /* Start GradientFill code */
-        const colorTable = options.colorTable;
-        if (colorTable)
+        const colorTableOrFunction = options.colorTableOrFunction;
+        if (colorTableOrFunction)
             ctx.fillStyle = createGradient(
                 ctx,
                 scale,
                 options.horizontal,
                 plotdata,
                 xscale,
-                colorTable,
+                colorTableOrFunction,
                 options.colorScale || options.scale
             );
         /* End GradientFill code */

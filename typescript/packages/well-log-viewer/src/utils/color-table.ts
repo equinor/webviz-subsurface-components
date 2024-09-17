@@ -1,4 +1,4 @@
-import type { ColorTable } from "../components/ColorTableTypes";
+import type { ColorTable, ColorFunction } from "../components/ColorTableTypes";
 
 /*
   Binary serach in array of elements [number, ...]
@@ -69,19 +69,28 @@ export function getExactColor(
 }
 */
 
+export function isFunction(
+    colorTableOrFunction: ColorTable | ColorFunction | undefined
+): boolean {
+    if (!colorTableOrFunction) return false;
+    return !!(colorTableOrFunction as ColorFunction).func;
+}
+
 /*
   get HTML string with interpolated color value in #xxxxxx format
 */
 export function getInterpolatedColor(
-    colorTable: ColorTable | ((v: number) => [number, number, number]),
+    colorTableOrFunction: ColorTable | ColorFunction,
     v: number
 ): [number, number, number] {
-    // TODO: Do not compute these 3 constants (cNaN, cBelow, cAbove) every time!
-
-    if (typeof colorTable === "function") {
-        return colorTable(v);
+    if (isFunction(colorTableOrFunction)) {
+        const colorFunction: ColorFunction =
+            colorTableOrFunction as ColorFunction;
+        return colorFunction.func(v);
     }
 
+    const colorTable: ColorTable = colorTableOrFunction as ColorTable;
+    // TODO: Do not compute these 3 constants (cNaN, cBelow, cAbove) every time!
     const cNaN: [number, number, number] = colorTable.colorNaN
         ? colorTable.colorNaN
         : [255, 255, 255]; // "white"
@@ -119,13 +128,16 @@ export function getInterpolatedColor(
   get HTML string with interpolated color value in #xxxxxx format
 */
 export function getInterpolatedColorString(
-    colorTable: ColorTable | ((v: number) => [number, number, number]),
+    colorTableOrFunction: ColorTable | ColorFunction,
     v: number
 ): string {
-    if (typeof colorTable === "function") {
-        return colorToString(colorTable(v), "#ffffff");
+    if (isFunction(colorTableOrFunction)) {
+        const colorFunction: ColorFunction =
+            colorTableOrFunction as ColorFunction;
+        return colorToString(colorFunction.func(v), "#ffffff");
     }
 
+    const colorTable: ColorTable = colorTableOrFunction as ColorTable;
     // TODO: Do not compute these 3 constants (cNaN, cBelow, cAbove) every time!
     const cNaN = colorToString(colorTable.colorNaN, "#ffffff"); // "white"
 

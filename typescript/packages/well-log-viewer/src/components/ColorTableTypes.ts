@@ -1,9 +1,6 @@
-export interface ColorTable {
+import type { colorTablesObj } from "@emerson-eps/color-tables/dist/component/colorTableTypes";
+export type ColorTable = colorTablesObj;
+export type ColorFunction = {
     name: string;
-    colors: [number, number, number, number][];
-    discrete?: boolean; // default false
-
-    colorNaN?: [number, number, number]; // default "white"
-    colorBelow?: [number, number, number]; // default colorNaN
-    colorAbove?: [number, number, number]; // default colorBelow
-}
+    func: (v: number) => [number, number, number];
+};

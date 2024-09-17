@@ -5,7 +5,7 @@ import type { Track, GraphTrack } from "@equinor/videx-wellog";
 
 import type { TemplatePlot, TemplatePlotTypes } from "./WellLogTemplateTypes";
 import type { WellLog } from "./WellLogTypes";
-import type { ColorTable } from "./ColorTableTypes";
+import type { ColorTable, ColorFunction } from "./ColorTableTypes";
 
 import type WellLogView from "./WellLogView";
 
@@ -89,24 +89,39 @@ export function createBooleanItems(): ReactNode[] {
     return _createItems(booleanItems);
 }
 
-function createColorTableItems(colorTables: ColorTable[]): ReactNode[] {
+function createColorTableItems(
+    colorTables: ColorTable[],
+    colorFunctions: ColorFunction[]
+): ReactNode[] {
     const nodes: ReactNode[] = [];
-    if (!colorTables) {
+    if (!colorTables && !colorFunctions) {
         console.error(
-            "colorTables is missed or empty in createColorTableItems()"
+            "colorTables and colorFunctions are missed or empty in createColorTableItems()"
         );
-    } else
-        for (const colorTable of colorTables) {
-            if (colorTable.discrete) continue; // skip discrete color tables
-            if (!colorTable.name) {
-                console.log(
-                    "colorTable.name is empty in createColorTableItems()"
-                );
+    } else {
+        if (colorTables)
+            for (const colorTable of colorTables) {
+                if (colorTable.discrete) continue; // skip discrete color tables
+                const name = colorTable.name;
+                if (!name) {
+                    console.error(
+                        "colorTable.name is empty in createColorTableItems()"
+                    );
+                }
+                nodes.push(<option key={name}>{name}</option>);
             }
-            nodes.push(
-                <option key={colorTable.name}>{colorTable.name}</option>
-            );
-        }
+        if (colorFunctions)
+            for (const colorFunction of colorFunctions) {
+                let name = colorFunction.name;
+                if (!name) {
+                    console.error(
+                        "colorFunction.name is empty in createColorTableItems()"
+                    );
+                }
+                name = "@" + name; // insert function sign
+                nodes.push(<option key={name}>{name}</option>);
+            }
+    }
     return nodes;
 }
 
@@ -218,7 +233,10 @@ export class PlotPropertiesDialog extends Component<Props, State> {
                   // for 'gradientfill' plot
                   colorTable:
                       this.props.wellLogView.props.colorTables?.[0]?.name,
-                  inverseColorTable: undefined,
+                  colorFunction:
+                      this.props.wellLogView.props.colorFunctions?.[0]?.name,
+                  inverseColorTable1: undefined,
+                  inverseColorFunction: undefined,
                   colorScale: undefined,
                   inverseColorScale: undefined,
 
@@ -335,18 +353,19 @@ export class PlotPropertiesDialog extends Component<Props, State> {
             ];
         } else if (type === "gradientfill") {
             const colorTables = this.props.wellLogView.props.colorTables;
+            const colorFunctions = this.props.wellLogView.props.colorFunctions;
             return [
                 this.createSelectControl(
                     "colorTable",
                     "Fill Color table",
-                    createColorTableItems(colorTables)
+                    createColorTableItems(colorTables, colorFunctions)
                 ),
                 <FormControl fullWidth key="211" />,
                 <FormControl fullWidth key="212" />,
                 this.createSelectControl(
                     "inverseColorTable",
                     "Inverse Color table",
-                    createColorTableItems(colorTables),
+                    createColorTableItems(colorTables, colorFunctions),
                     true
                 ),
             ];

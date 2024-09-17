@@ -73,11 +73,19 @@
 
                 "colorTable": {
                     "type": "string",
-                    "description": "table id (name) for 'gradientfill' plot"
+                    "description": "color table id (name) for 'gradientfill' plot"
                 },
                 "inverseColorTable": {
                     "type": "string",
-                    "description": "table id (name) for 'gradientfill' plot"
+                    "description": "color table id (name) for 'gradientfill' plot"
+                },
+                "colorFunction": {
+                    "type": "string",
+                    "description": "color function id (name) for 'gradientfill' plot"
+                },
+                "inverseColorFunction": {
+                    "type": "string",
+                    "description": "color function id (name) for 'gradientfill' plot"
                 },
 
                 "colorScale": {

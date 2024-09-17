@@ -30,7 +30,7 @@ const welllogs = welllogsJson as unknown as WellLog[];
 import templateJson from "../../../../example-data/welllog_template_2.json";
 const template = templateJson as unknown as Template;
 
-import type { ColorTable } from "./components/ColorTableTypes";
+import type { ColorTable, ColorFunction } from "./components/ColorTableTypes";
 
 import type { MapMouseEvent } from "@webviz/subsurface-viewer/dist/components/Map";
 
@@ -49,6 +49,24 @@ import { isEqualRanges } from "./utils/log-viewer";
 import { CallbackManager } from "./components/CallbackManager";
 
 import colorTables from "../../../../example-data/wellpick_colors.json";
+const colorFunctions: ColorFunction[] = [
+    {
+        name: "Gray func",
+        func: (v: number) => [v * 255, v * 255, v * 255],
+    },
+    {
+        name: "Red func",
+        func: (v: number) => [v * 255, 0, 0],
+    },
+    {
+        name: "Green func",
+        func: (v: number) => [0, v * 255, 0],
+    },
+    {
+        name: "Blue func",
+        func: (v: number) => [0, 0, v * 255],
+    },
+];
 import wellPicks from "../../../../example-data/wellpicks.json";
 
 import type { Info } from "./components/InfoTypes";
@@ -336,6 +354,7 @@ export const ColorByFunctionTBD: StoryObj<typeof StoryTemplate> = {
         },
         // @ts-expect-error TS2322
         colorTables: colorTables,
+        colorFunctions: colorFunctions,
         // @ts-expect-error TS2322
         wellpick: wellpick,
         axisTitles: axisTitles,
