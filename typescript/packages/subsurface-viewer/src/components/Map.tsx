@@ -166,7 +166,7 @@ export interface ViewsType {
     /**
      * Layout for viewport in specified as [row, column].
      */
-    layout: Point2D;
+    layout: [number, number];
 
     /**
      * Number of pixels used for the margin in matrix mode.
