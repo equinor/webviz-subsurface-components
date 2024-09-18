@@ -687,7 +687,7 @@ const ScaleFactorHookComponent = (
 };
 
 export const ScaleFactorHook: StoryObj<typeof ScaleFactorHookComponent> = {
-    args: { verticalScale: 1.5 },
+    args: { verticalScale: 1 },
     argTypes: {
         verticalScale: {
             control: { type: "range", min: -1, max: 10, step: 0.1 },

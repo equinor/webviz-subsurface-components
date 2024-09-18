@@ -131,6 +131,9 @@ class WellLogSpacer extends Component<WellLogSpacerProps /*, State*/> {
         if (this.props.wellpicks !== nextProps.wellpicks) {
             return true;
         }
+        if (this.props.width !== nextProps.width) {
+            return true;
+        }
 
         if (
             this.props.options?.wellpickColorFill !==
@@ -168,7 +171,7 @@ class WellLogSpacer extends Component<WellLogSpacerProps /*, State*/> {
         let offsetTop = 3000; // try to draw initially out of screen
         let offsetLeft = 3000;
         let height = 1;
-        let width = 1;
+        let width = this.props.width ?? 1;
         const controller = this.props.controllers[0] as unknown as WellLogView;
         const logViewer = controller?.logController;
         const controller2 = this.props.controllers[1] as unknown as WellLogView;
