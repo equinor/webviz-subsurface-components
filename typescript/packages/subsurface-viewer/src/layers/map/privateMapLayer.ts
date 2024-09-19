@@ -4,16 +4,10 @@ import type {
     PickingInfo,
     UpdateParameters,
 } from "@deck.gl/core";
-import {
-    COORDINATE_SYSTEM,
-    Layer,
-    picking,
-    project,
-    project32,
-} from "@deck.gl/core";
+import { COORDINATE_SYSTEM, Layer, picking, project32 } from "@deck.gl/core";
 
 //import GL from "@luma.gl/constants";
-import type { UniformValue, TextureData, Texture } from "@luma.gl/core";
+import type { Device, UniformValue, TextureData, Texture } from "@luma.gl/core";
 import { Geometry, Model } from "@luma.gl/engine";
 import { localPhongLighting, utilities } from "../shader_modules";
 import type {
@@ -105,9 +99,8 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
         this.initializeState(context as DeckGLLayerContext);
     }
 
-    //eslint-disable-next-line
-    _getModels(gl: any) {
-        const colormap: Texture = gl.createTexture({
+    _getModels(device: Device) {
+        const colormap: Texture = device.createTexture({
             sampler: {
                 addressModeU: "clamp-to-edge",
                 addressModeV: "clamp-to-edge",
@@ -158,7 +151,7 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
         const smoothShading =
             this.props.normals.length == 0 ? false : this.props.smoothShading;
 
-        const mesh_model = new Model(gl, {
+        const mesh_model = new Model(device, {
             id: `${this.props.id}-mesh`,
             ...this.getShaders(),
             geometry: new Geometry({
@@ -195,7 +188,7 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
         });
 
         // MESH LINES
-        const mesh_lines_model = new Model(gl, {
+        const mesh_lines_model = new Model(device, {
             id: `${this.props.id}-lines`,
             vs: vsLineShader,
             fs: fsLineShader,
@@ -207,7 +200,7 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
                 indices: { value: this.props.lineIndices, size: 1 },
             }),
             bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
-            modules: [project],
+            modules: [project32],
             isInstanced: false,
         });
 

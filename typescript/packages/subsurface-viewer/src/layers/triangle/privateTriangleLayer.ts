@@ -3,7 +3,7 @@ import type {
     PickingInfo,
     UpdateParameters,
 } from "@deck.gl/core";
-import { COORDINATE_SYSTEM, Layer, picking, project } from "@deck.gl/core";
+import { COORDINATE_SYSTEM, Layer, picking, project32 } from "@deck.gl/core";
 import { GL } from "@luma.gl/constants";
 import type { GeometryProps } from "@luma.gl/engine";
 import { Geometry, Model } from "@luma.gl/engine";
@@ -104,22 +104,22 @@ export default class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProp
         this.initializeState(context as DeckGLLayerContext);
     }
 
-    _getModels(gl: Device): [unknown, unknown] {
-        const triangleModel = new Model(gl, {
+    _getModels(device: Device): [unknown, unknown] {
+        const triangleModel = new Model(device, {
             id: `${this.props.id}-mesh`,
             vs: vsShader,
             fs: fsShader,
             geometry: new Geometry(this.props.geometryTriangles),
-            modules: [project, picking, localPhongLighting],
+            modules: [project32, picking, localPhongLighting],
             isInstanced: false, // This only works when set to false.
         });
 
-        const lineModel = new Model(gl, {
+        const lineModel = new Model(device, {
             id: `${this.props.id}-lines`,
             vs: vsLineShader,
             fs: fsLineShader,
             geometry: new Geometry(this.props.geometryLines),
-            modules: [project, picking],
+            modules: [project32, picking],
             isInstanced: false,
         });
 
