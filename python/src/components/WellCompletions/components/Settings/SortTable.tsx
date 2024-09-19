@@ -6,7 +6,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteSortKey, updateSortKey } from "../../redux/actions";
 import type { WellCompletionsState } from "../../redux/store";
-import { SortBy, SortDirection } from "@webviz/well-completions-plot";
+import { SortWellsBy, SortDirection } from "@webviz/well-completions-plot";
 
 const PREFIX = "SortTable";
 
@@ -49,7 +49,7 @@ const SortTable: React.FC = React.memo(() => {
     const [sortKeyToAdd, setSortKeyToAdd] = useState<string>();
     // Sort direction in the placeholder row
     const [sortDirectionToAdd, setSortDirectionToAdd] = useState<SortDirection>(
-        SortDirection.Ascending
+        SortDirection.ASCENDING
     );
 
     // Redux
@@ -64,9 +64,9 @@ const SortTable: React.FC = React.memo(() => {
     // Apart from the user defined attribute, we can also sort by well name, stratigraphy depth etc
     const sortKeys = useMemo(() => {
         const keys = new Set<string>([
-            SortBy.Name,
-            SortBy.StratigraphyDepth,
-            SortBy.CompletionDate,
+            SortWellsBy.WELL_NAME,
+            SortWellsBy.STRATIGRAPHY_DEPTH,
+            SortWellsBy.EARLIEST_COMPLETION_DATE,
         ]);
         attributeKeys.forEach((key) => keys.add(key));
         return keys;
@@ -99,9 +99,9 @@ const SortTable: React.FC = React.memo(() => {
     const onSortDirectionToAddChange = useCallback(
         () =>
             setSortDirectionToAdd(
-                sortDirectionToAdd === SortDirection.Ascending
-                    ? SortDirection.Descending
-                    : SortDirection.Ascending
+                sortDirectionToAdd === SortDirection.ASCENDING
+                    ? SortDirection.DESCENDING
+                    : SortDirection.ASCENDING
             ),
         [setSortDirectionToAdd, sortDirectionToAdd]
     );
@@ -147,9 +147,9 @@ const SortTable: React.FC = React.memo(() => {
                                         onUpdateSortKey(
                                             sortKey,
                                             sortBy[sortKey] ===
-                                                SortDirection.Ascending
-                                                ? SortDirection.Descending
-                                                : SortDirection.Ascending
+                                                SortDirection.ASCENDING
+                                                ? SortDirection.DESCENDING
+                                                : SortDirection.ASCENDING
                                         )
                                     }
                                 >

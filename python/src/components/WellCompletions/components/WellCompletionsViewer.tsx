@@ -163,7 +163,9 @@ export const WellCompletionsViewer: React.FC<WellCompletionsViewerProps> = (
                                     >
                                         <WellCompletionsPlot
                                             id={`${props.parentId}-well-completions-plot`}
-                                            timeSteps={data.timeSteps}
+                                            sortedCompletionDates={
+                                                data.timeSteps
+                                            }
                                             plotData={dataInCurrentPage}
                                         />
                                     </div>
