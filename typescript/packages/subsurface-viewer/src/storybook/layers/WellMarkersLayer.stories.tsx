@@ -11,8 +11,7 @@ const stories: Meta = {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer/Well Markers Layer",
     args: {
-        // Add a reset button for all the stories.
-        // Somehow, I do not manage to add the triggerHome to the general "unset" controls :/
+        // Add some common controls for all the stories.
         triggerHome: 0,
     },
 };

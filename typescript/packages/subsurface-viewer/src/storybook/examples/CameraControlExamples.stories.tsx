@@ -11,7 +11,11 @@ import { styled } from "@mui/material/styles";
 
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
-import type { BoundingBox3D, ViewStateType } from "../../components/Map";
+import type {
+    BoundingBox3D,
+    Point3D,
+    ViewStateType,
+} from "../../components/Map";
 import { Axes2DLayer, AxesLayer } from "../../layers";
 
 import { GeoJsonLayer } from "@deck.gl/layers";
@@ -39,8 +43,7 @@ const stories: Meta = {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer/Examples/Camera",
     args: {
-        // Add a reset button for all the stories.
-        // Somehow, I do not manage to add the triggerHome to the general "unset" controls :/
+        // Add some common controls for all the stories.
         triggerHome: 0,
     },
 };
@@ -62,7 +65,7 @@ const Root = styled("div")({
 });
 
 const CAMERA_POSITION: ViewStateType = {
-    target: [435800, 6478000, -2000],
+    target: [435800, 6478000, -2000] as Point3D,
     zoom: -3.5,
     rotationX: 90,
     rotationOrbit: 0,
@@ -70,7 +73,7 @@ const CAMERA_POSITION: ViewStateType = {
 
 const SIDE_CAMERA = {
     rotationX: 0,
-    target: [435800, 6478000, -4000],
+    target: [435800, 6478000, -3250] as Point3D,
     rotationOrbit: 90,
     zoom: -3.3,
 };
@@ -132,8 +135,8 @@ const DisplayCameraPositionComponent: React.FC<SubsurfaceViewerProps> = (
                 <div>zoom: {cameraState?.zoom}</div>
                 <div>rotationX: {cameraState?.rotationX}</div>
                 <div>rotationOrbit: {cameraState?.rotationOrbit}</div>
-                <div>targetX: {cameraState?.target[0]}</div>
-                <div>targetY: {cameraState?.target[1]}</div>
+                <div>targetX: {cameraState?.target?.[0]}</div>
+                <div>targetY: {cameraState?.target?.[1]}</div>
             </div>
         </>
     );
@@ -288,7 +291,7 @@ const AutoZoomToBox = (args: SubsurfaceViewerProps) => {
         rotationX: rotX,
         rotationOrbit: rotZ,
         zoom: zoomBox3D,
-        target: [],
+        target: undefined,
     };
 
     const props = {
@@ -444,7 +447,7 @@ export const ScaleZ: StoryObj<typeof SubsurfaceViewer> = {
 const ResetCameraPropertyDefaultCameraPosition = {
     rotationOrbit: 0,
     rotationX: 45,
-    target: [435775, 6478650, -2750],
+    target: [435775, 6478650, -2750] as Point3D,
     zoom: -3.8,
 };
 
@@ -538,7 +541,7 @@ export const AddLayer: StoryObj<typeof SubsurfaceViewer> = {
             rotationOrbit: 45,
             rotationX: 45,
             zoom: hugin3DBounds,
-            target: [],
+            target: undefined,
         },
         views: default3DViews,
     },
@@ -630,15 +633,15 @@ export const ScaleYWithCameraPosition: StoryObj<
     render: (args) => <ScaleYWithCameraPositionComponent {...args} />,
 };
 
-const ScaleVertical3dComponent = ({
-    verticalScale,
-}: {
-    verticalScale: number;
-}) => {
+const ScaleVertical3dComponent = (
+    props: SubsurfaceViewerProps & {
+        verticalScale: number;
+    }
+) => {
     const viewerProps: SubsurfaceViewerProps = {
         ...DEFAULT_PROPS,
         cameraPosition: SIDE_CAMERA,
-        verticalScale,
+        ...props,
     };
     return <SubsurfaceViewer {...viewerProps} />;
 };
@@ -661,20 +664,21 @@ export const ScaleVertical3d: StoryObj<typeof ScaleVertical3dComponent> = {
     render: (args) => <ScaleVertical3dComponent {...args} />,
 };
 
-const ScaleFactorHookComponent = ({
-    verticalScale,
-}: {
-    verticalScale: number;
-}) => {
+const ScaleFactorHookComponent = (
+    props: SubsurfaceViewerProps & {
+        verticalScale: number;
+    }
+) => {
     const { factor: scaleFactor, setFactor, elementRef } = useScaleFactor();
 
     React.useEffect(() => {
-        setFactor(verticalScale);
-    }, [setFactor, verticalScale]);
+        setFactor(props.verticalScale);
+    }, [setFactor, props.verticalScale]);
 
     const viewerProps: SubsurfaceViewerProps = {
         ...DEFAULT_PROPS,
         cameraPosition: SIDE_CAMERA,
+        ...props,
         verticalScale: scaleFactor,
         innerRef: elementRef,
         coords: { visible: false },

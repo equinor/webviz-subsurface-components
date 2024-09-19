@@ -31,11 +31,16 @@ export const boxUnion = (
 };
 
 /**
+ * 3D point defined as [x, y].
+ */
+export type Point2D = [number, number];
+
+/**
  * Returns the center of the bounding box.
  * @param box1 bounding box.
  * @returns the center of the bounding box.
  */
-export const boxCenter = (box: BoundingBox2D): [number, number] => {
+export const boxCenter = (box: BoundingBox2D): Point2D => {
     const xmin = box[0];
     const ymin = box[1];
 
