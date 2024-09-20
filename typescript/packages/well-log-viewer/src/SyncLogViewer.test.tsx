@@ -34,6 +34,7 @@ describe("Sync Log Viewer", () => {
                 welllogs={[exampleWellLog]} // the same log for all wellog viewers
                 templates={[exampleTemplate]} // the same template for all wellog viewers
                 colorTables={exampleColorTable} // the same colortables for all wellog viewers
+                colorFunctions={[]} // not used
             />
         );
         expect(container.firstChild).toMatchSnapshot();

@@ -4,6 +4,9 @@ import { render } from "@testing-library/react";
 import "jest-styled-components";
 import React from "react";
 import WellLogViewWithScroller from "./WellLogViewWithScroller";
+import type { ColorTable } from "./components/ColorTableTypes";
+
+const exampleColorTable = colorTables as ColorTable[];
 
 const welllog = require("../../../../../example-data/L898MUD.json")[0];
 const template = require("../../../../../example-data/welllog_template_1.json");
@@ -22,7 +25,8 @@ describe("Test Well Log View Component with Scroller", () => {
             <WellLogViewWithScroller
                 welllog={welllog}
                 template={template}
-                colorTables={colorTables}
+                colorTables={exampleColorTable}
+                colorFunctions={[]}
                 primaryAxis={"md"}
                 axisTitles={{
                     md: "MD",

@@ -49,7 +49,9 @@ import { isEqualRanges } from "./utils/log-viewer";
 import { CallbackManager } from "./components/CallbackManager";
 
 import colorTables from "../../../../example-data/wellpick_colors.json";
-const colorFunctions: ColorFunction[] = [
+const exampleColorTable = colorTables as ColorTable[];
+
+const exampleColorFunctions: ColorFunction[] = [
     {
         name: "Gray func",
         func: (v: number) => [v * 255, v * 255, v * 255],
@@ -66,6 +68,11 @@ const colorFunctions: ColorFunction[] = [
         name: "Blue func",
         func: (v: number) => [0, 0, v * 255],
     },
+    {
+        name: "Step func",
+        func: (v: number) =>
+            v < 0.5 ? [v * 255, 0, 0] : [0, v * 255, v * 255],
+    },
 ];
 import wellPicks from "../../../../example-data/wellpicks.json";
 
@@ -78,7 +85,7 @@ const ComponentCode =
     "    horizontal=false \r\n" +
     '    welllog={require("../../../../example-data/L898MUD.json")[0]} \r\n' +
     '    template={require("../../../../example-data/welllog_template_1.json")} \r\n' +
-    "    colorTables={colorTables} \r\n" +
+    "    colorTables={exampleColorTable} \r\n" +
     "/>";
 
 const stories: Meta = {
@@ -208,7 +215,7 @@ const StoryTemplate = (args: WellLogViewerProps) => {
 const wellpick = {
     wellpick: wellPicks[0],
     name: "HORIZON",
-    colorTables: colorTables,
+    colorTables: exampleColorTable,
     color: "Stratigraphy",
 };
 
@@ -299,7 +306,8 @@ export const Default: StoryObj<typeof StoryTemplate> = {
         welllog: require("../../../../example-data/L898MUD.json")[0], // eslint-disable-line
         template: require("../../../../example-data/welllog_template_1.json"), // eslint-disable-line
         // @ts-expect-error TS2322
-        colorTables: colorTables,
+        colorTables: exampleColorTable,
+        colorFunctions: [],
         // @ts-expect-error TS2322
         wellpick: wellpick,
         axisTitles: axisTitles,
@@ -317,7 +325,7 @@ export const Default: StoryObj<typeof StoryTemplate> = {
     render: (args) => <StoryTemplate {...args} />,
 };
 
-export const ColorByFunctionTBD: StoryObj<typeof StoryTemplate> = {
+export const ColorByFunction: StoryObj<typeof StoryTemplate> = {
     args: {
         id: "Well-Log-Viewer",
         horizontal: false,
@@ -345,16 +353,14 @@ export const ColorByFunctionTBD: StoryObj<typeof StoryTemplate> = {
                 {
                     name: "HKL",
                     type: "gradientfill", // Is this the correct type for using color function?
-                    // @ts-expect-error TS2322
-                    colorTable: (value: number) =>
-                        value < 100 ? [1, 0, 0] : [[0, 1, 1]],
+                    colorFunction: "Step func",
                     color: "green",
                 },
             ],
         },
         // @ts-expect-error TS2322
-        colorTables: colorTables,
-        colorFunctions: colorFunctions,
+        colorTables: exampleColorTable,
+        colorFunctions: exampleColorFunctions,
         // @ts-expect-error TS2322
         wellpick: wellpick,
         axisTitles: axisTitles,
@@ -380,7 +386,7 @@ export const Horizontal: StoryObj<typeof StoryTemplate> = {
             require("../../../../example-data/WL_RAW_AAC-BHPR-CAL-DEN-GR-MECH-NEU-NMR-REMP_MWD_3.json")[0], // eslint-disable-line
         template: require("../../../../example-data/welllog_template_2.json"), // eslint-disable-line
         // @ts-expect-error TS2322
-        colorTables: colorTables,
+        colorTables: exampleColorTable,
         // @ts-expect-error TS2322
         wellpick: wellpick,
         axisTitles: axisTitles,
@@ -406,7 +412,7 @@ export const OnInfoFilledEvent: StoryObj<typeof StoryTemplate> = {
         template: require("../../../../example-data/welllog_template_2.json"), // eslint-disable-line
 
         // @ts-expect-error TS2322
-        colorTables: colorTables,
+        colorTables: exampleColorTable,
         // @ts-expect-error TS2322
 
         wellpick: wellpick,

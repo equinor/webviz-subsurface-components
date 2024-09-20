@@ -2,8 +2,10 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 
+import type { ColorTable } from "./components/ColorTableTypes";
+
 import { colorTables } from "@emerson-eps/color-tables";
-const exampleColorTable = colorTables; /*as unknown as ColorTable[]*/ // equivalent types, should be merged
+const exampleColorTable = colorTables as ColorTable[];
 const wellpickColorTable = require("../../../../example-data/wellpick_colors.json"); // eslint-disable-line
 const wellpick = require("../../../../example-data/wellpicks.json");// eslint-disable-line
 
@@ -379,6 +381,7 @@ export const Default: StoryObj<typeof Template> = {
             require("../../../../example-data/synclog_template.json"), // eslint-disable-line
         ],
         colorTables: exampleColorTable,
+        colorFunctions: [],
         wellpicks: [
             {
                 wellpick: wellpick[0],

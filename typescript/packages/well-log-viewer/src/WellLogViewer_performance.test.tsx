@@ -7,6 +7,7 @@ import React, { Profiler } from "react";
 import WellLogViewer from "./WellLogViewer";
 import logTimes, { obj } from "./test/performanceMetrics";
 import { axisMnemos, axisTitles } from "./utils/axes";
+import type { ColorTable } from "./components/ColorTableTypes";
 
 const exampleTemplate = require("../../../../example-data/welllog_template_1.json");
 //const exampleWellLog = require("../../../../example-data/L898MUD.json")[0];
@@ -15,7 +16,7 @@ const exampleWellLog = {
     curves: [],
     data: [],
 };
-const exampleColorTable = colorTables;
+const exampleColorTable = colorTables as ColorTable[];
 
 window.ResizeObserver =
     window.ResizeObserver ||
@@ -41,6 +42,7 @@ describe("Well Log Viewer perfomance", () => {
                     axisMnemos={axisMnemos}
                     template={exampleTemplate}
                     colorTables={exampleColorTable}
+                    colorFunctions={[]}
                     onContentRescale={function (): void {
                         // todo: fix the test
                         // commented to make test pass

@@ -5,11 +5,12 @@ import "jest-styled-components";
 import React from "react";
 import WellLogViewer from "./WellLogViewer";
 import type { WellLogController } from "./components/WellLogView";
+import type { ColorTable } from "./components/ColorTableTypes";
 import { axisMnemos, axisTitles } from "./utils/axes";
 
 const exampleTemplate = require("../../../../example-data/welllog_template_1.json");
 const exampleWellLog = require("../../../../example-data/L898MUD.json")[0];
-const exampleColorTable = colorTables;
+const exampleColorTable = colorTables as ColorTable[];
 
 window.ResizeObserver =
     window.ResizeObserver ||
@@ -31,6 +32,7 @@ describe("Test Well Log Viewer Component", () => {
                 welllog={exampleWellLog}
                 template={exampleTemplate}
                 colorTables={exampleColorTable}
+                colorFunctions={[]} // not used
                 horizontal={true}
                 primaryAxis={"md"}
                 axisTitles={axisTitles}

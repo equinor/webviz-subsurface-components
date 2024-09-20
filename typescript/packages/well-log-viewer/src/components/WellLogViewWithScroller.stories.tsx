@@ -5,13 +5,15 @@ import React from "react";
 import WellLogViewWithScroller from "./WellLogViewWithScroller";
 import { argTypesWellLogViewScrollerProp } from "./WellLogViewWithScroller";
 import { colorTables } from "@emerson-eps/color-tables";
+import type { ColorTable } from "./components/ColorTableTypes";
+const exampleColorTable = colorTables as ColorTable[];
 
 const ComponentCode =
     '<WellLogViewWithScroller id="WellLogViewWithScroller" \r\n' +
     "    horizontal=false \r\n" +
     '    welllog={require("../../../../../example-data/L898MUD.json")[0]} \r\n' +
     '    template={require("../../../../../example-data/welllog_template_1.json")} \r\n' +
-    "    colorTables={colorTables} \r\n" +
+    "    colorTables={exampleColorTable} \r\n" +
     "/>";
 
 import { axisTitles, axisMnemos } from "../utils/axes";
@@ -77,7 +79,8 @@ export const Default: StoryObj<typeof Template> = {
         welllog: wellLog,
         template: require("../../../../../example-data/welllog_template_1.json"),
         viewTitle: "Well '" + wellLog.header.well + "'",
-        colorTables: colorTables,
+        colorTables: exampleColorTable,
+        colorFunctions: [],
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
         options: {

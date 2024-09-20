@@ -38,7 +38,7 @@ import type { AxesInfo } from "../utils/tracks";
 import type { ExtPlotOptions } from "../utils/tracks";
 import { getTrackTemplate } from "../utils/tracks";
 import { isScaleTrack } from "../utils/tracks";
-import { deepCopy, deepCopyTemplate } from "../utils/deepcopy";
+import { deepCopy } from "../utils/deepcopy";
 
 import {
     addOrEditGraphTrack,
@@ -1360,7 +1360,7 @@ class WellLogView
 
     componentDidMount(): void {
         this._isMount = true;
-        this.template = deepCopyTemplate(this.props.template); // save external template content to current
+        this.template = deepCopy(this.props.template); // save external template content to current
 
         if (!this.logController) {
             this.createLogViewer();
@@ -1422,7 +1422,7 @@ class WellLogView
         }
         if (this.props.template !== prevProps.template) {
             if (this.props.template)
-                this.template = deepCopyTemplate(this.props.template); // save external template content to current
+                this.template = deepCopy(this.props.template); // save external template content to current
             shouldSetTracks = true;
             checkSchema = true;
         }
