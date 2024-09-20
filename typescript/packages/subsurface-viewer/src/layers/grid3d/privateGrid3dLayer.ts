@@ -352,6 +352,14 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
         const colorMapClampColorUniform = colorMapClampColor.map(
             (x) => (x ?? 0) / 255
         );
+
+        const undefinedPropertyColorUniform =
+            this.props.undefinedPropertyColor.map((x) => (x ?? 0) / 255) as [
+                number,
+                number,
+                number,
+            ];
+
         const isColorMapClampColorTransparent: boolean =
             (this.props.colorMapClampColor as boolean) === false;
 
@@ -362,7 +370,7 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             valueRangeMax,
             colorMapRangeMin,
             colorMapRangeMax,
-            undefinedPropertyColor: this.props.undefinedPropertyColor,
+            undefinedPropertyColor: undefinedPropertyColorUniform,
             colorMapClampColor: Array.from(colorMapClampColorUniform),
             isColorMapClampColorTransparent,
             isClampColor,

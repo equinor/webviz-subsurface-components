@@ -430,7 +430,7 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
         ) {
             return [colorFunc[0] / 255, colorFunc[1] / 255, colorFunc[2] / 255];
         }
-        return this.props.undefinedPropertyColor ?? [0.8, 0.8, 0.8];
+        return this.props.undefinedPropertyColor ?? [204, 204, 204];
     }
 
     private isColorMapFunctionConstantColor(
