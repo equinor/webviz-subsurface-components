@@ -55,8 +55,13 @@ export function compareWellPlotDataValues<WellPlotData>(
     if (aValue === bValue) {
         return 0;
     }
-
-    if (aValue === undefined || bValue === undefined || aValue < bValue) {
+    if (aValue === undefined) {
+        return sortDirection === SortDirection.ASCENDING ? 1 : -1;
+    }
+    if (bValue === undefined) {
+        return sortDirection === SortDirection.ASCENDING ? -1 : 1;
+    }
+    if (aValue < bValue) {
         return sortDirection === SortDirection.ASCENDING ? -1 : 1;
     }
     return sortDirection === SortDirection.ASCENDING ? 1 : -1;

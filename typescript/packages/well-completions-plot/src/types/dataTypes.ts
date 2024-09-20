@@ -16,7 +16,7 @@ export enum SortWellsBy {
 export const SortWellsByEnumToStringMapping = {
     [SortWellsBy.WELL_NAME]: "Well name",
     [SortWellsBy.STRATIGRAPHY_DEPTH]: "Stratigraphy depth",
-    [SortWellsBy.EARLIEST_COMPLETION_DATE]: "Earliest comp date",
+    [SortWellsBy.EARLIEST_COMPLETION_DATE]: "Earliest completion date",
 };
 
 export interface Zone {
