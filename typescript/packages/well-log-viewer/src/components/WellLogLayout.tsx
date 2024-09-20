@@ -27,12 +27,18 @@ export class WellLogLayout<Parent> extends Component<Props<Parent>> {
     createPanel(
         panel?: JSX.Element | string | ((parent: Parent) => JSX.Element)
     ): JSX.Element | string | undefined {
-        if (typeof panel === "function") return panel(this.props.parent);
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
+        if (typeof panel === "function")
+            // eslint-disable-next-line react/prop-types
+            return panel(this.props.parent);
         if (typeof panel === "object") return panel; // JSX.Element
         return panel; // JSX.Element | string
     }
 
     render(): JSX.Element {
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         const center = this.createPanel(this.props.center);
 
         let header: JSX.Element | string | undefined;
@@ -41,6 +47,8 @@ export class WellLogLayout<Parent> extends Component<Props<Parent>> {
         let top: JSX.Element | string | undefined;
         let bottom: JSX.Element | string | undefined;
         let footer: JSX.Element | string | undefined;
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         const layout = this.props.layout;
         if (!layout) {
             // use default empty layout
@@ -51,11 +59,23 @@ export class WellLogLayout<Parent> extends Component<Props<Parent>> {
             bottom = undefined;
             footer = undefined;
         } else {
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             header = this.createPanel(layout.header);
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             left = this.createPanel(layout.left);
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             right = this.createPanel(layout.right);
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             top = this.createPanel(layout.top);
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             bottom = this.createPanel(layout.bottom);
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             footer = this.createPanel(layout.footer);
         }
 

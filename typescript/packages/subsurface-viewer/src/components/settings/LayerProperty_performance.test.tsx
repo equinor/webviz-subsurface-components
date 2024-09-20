@@ -16,6 +16,8 @@ describe("Test Layer Property", () => {
         const drawing_layer = layers.find(
             (item) => item["@@type"] === "DrawingLayer"
         );
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
         drawing_layer &&
             render(
                 EmptyWrapper({

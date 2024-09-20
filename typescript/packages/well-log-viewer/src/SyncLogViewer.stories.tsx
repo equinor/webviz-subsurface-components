@@ -251,6 +251,7 @@ const Template = (args) => {
     );
 };
 
+/* eslint-disable @typescript-eslint/no-require-imports */
 const patternImages = [
     require("../../../../example-data/patterns/Anhydrite.gif"),
     require("../../../../example-data/patterns/Bitumenious.gif"),
@@ -305,6 +306,8 @@ const patternImages = [
     require("../../../../example-data/patterns/Vertical_tuffitt.gif"),
     require("../../../../example-data/patterns/Vulcanic.gif"),
 ];
+/* eslint-enable @typescript-eslint/no-require-imports */
+
 const patternNamesEnglish = [
     "Anhydrite",
     "Bitumenious",
@@ -621,7 +624,7 @@ const TemplateWithSelection = (args: { welllogs: WellLog[] }) => {
     );
 };
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const args = require("../../../../example-data/facies3wells.json");
 
 export const DiscreteLogs: StoryObj<typeof TemplateWithSelection> = {

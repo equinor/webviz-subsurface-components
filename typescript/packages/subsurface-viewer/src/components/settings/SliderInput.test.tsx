@@ -18,6 +18,8 @@ describe("Test Slider Input", () => {
                         max={100}
                         step={2}
                         onChange={(e: FormEvent<HTMLDivElement>) => {
+                            // TODO: Fix this the next time the file is edited.
+                            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
                             e;
                         }}
                     />

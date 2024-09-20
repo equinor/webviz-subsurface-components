@@ -46,32 +46,50 @@ export class TrackPropertiesDialog extends Component<Props, State> {
         super(props);
         let name = "";
         const names = dataNames(
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             this.props.wellLogView.props.welllog,
             null,
             true
         );
         if (names[0]) name = names[0];
 
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         const templateTrack = this.props.templateTrack;
         this.bStacked =
             templateTrack &&
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             templateTrack.plots &&
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             templateTrack.plots[0] &&
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             templateTrack.plots[0].type === "stacked";
         this.state = templateTrack
             ? {
                   ...templateTrack,
 
                   stacked: this.bStacked ? "1" : "0",
+                  // TODO: Fix this the next time the file is edited.
+                  // eslint-disable-next-line react/prop-types
                   stackedName: templateTrack.plots[0]?.name,
                   showLabels:
+                      // TODO: Fix this the next time the file is edited.
+                      // eslint-disable-next-line react/prop-types
                       templateTrack.plots[0]?.showLabels !== false
                           ? "true"
                           : "false",
                   showLines:
+                      // TODO: Fix this the next time the file is edited.
+                      // eslint-disable-next-line react/prop-types
                       templateTrack.plots[0]?.showLines !== false
                           ? "true"
                           : "false",
+                  // TODO: Fix this the next time the file is edited.
+                  // eslint-disable-next-line react/prop-types
                   labelRotation: templateTrack.plots[0]?.labelRotation || 0,
                   open: true,
               }
@@ -112,6 +130,8 @@ export class TrackPropertiesDialog extends Component<Props, State> {
             };
             this.state.plots.push(plot);
         }
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         this.props.onOK(this.state);
         this.closeDialog();
     }
@@ -168,6 +188,8 @@ export class TrackPropertiesDialog extends Component<Props, State> {
     }
 
     render(): JSX.Element {
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         const templateTrack = this.props.templateTrack;
         const title = templateTrack ? "Edit track" : "Add New Track";
         return (
@@ -203,6 +225,8 @@ export class TrackPropertiesDialog extends Component<Props, State> {
                                   "stackedName", // data
                                   "Data",
                                   createDataItems(
+                                      // TODO: Fix this the next time the file is edited.
+                                      // eslint-disable-next-line react/prop-types
                                       this.props.wellLogView.props.welllog,
                                       null,
                                       true

@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import type { ReactNode } from "react";
 import React, { Component } from "react";
 import { LogViewer } from "@equinor/videx-wellog";
