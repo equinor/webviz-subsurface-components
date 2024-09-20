@@ -9,6 +9,7 @@ export default defineConfig({
         },
         video: false,
         setupNodeEvents(on, config) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
             getCompareSnapshotsPlugin(on, config),
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore

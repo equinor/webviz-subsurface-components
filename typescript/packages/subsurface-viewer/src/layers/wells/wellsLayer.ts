@@ -1046,6 +1046,8 @@ function getLogColor(
             const dl_attrs = Object.entries(attributesObject).find(
                 ([, value]) => value[1] == log_value
             )?.[1];
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
             dl_attrs
                 ? log_color.push(dl_attrs[0])
                 : log_color.push([0, 0, 0, 0]); // use transparent for undefined/null log values

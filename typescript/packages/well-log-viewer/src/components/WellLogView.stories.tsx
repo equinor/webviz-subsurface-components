@@ -62,6 +62,8 @@ export const Default: StoryObj<typeof Template> = {
         id: "Well-Log-View",
         horizontal: false,
         welllog: welllogDefault,
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
         template: require("../../../../../example-data/welllog_template_1.json"),
         viewTitle: (
             <div>
@@ -80,6 +82,8 @@ export const Discrete: StoryObj<typeof Template> = {
         id: "Well-Log-View-Discrete",
         horizontal: false,
         welllog: welllogDiscrete,
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
         template: require("../../../../../example-data/welllog_template_2.json"),
         viewTitle: "Well '" + welllogDiscrete.header.well + "'",
         colorTables: colorTables,

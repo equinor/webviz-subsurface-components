@@ -15,6 +15,8 @@ describe("Test Numeric Input", () => {
                         label="Trajectory thickness"
                         value={15}
                         onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                            // TODO: Fix this the next time the file is edited.
+                            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
                             e;
                         }}
                     />

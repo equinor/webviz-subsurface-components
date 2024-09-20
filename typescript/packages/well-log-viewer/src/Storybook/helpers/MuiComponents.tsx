@@ -104,7 +104,7 @@ type TabTitle = {
 type TabsBarProps = {
     currentTab: number;
     name: string;
-    // eslint-disable-next-line @typescript-eslint/ban-types
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
     onTabChange: (e: React.ChangeEvent<{}>, newValue: number) => void;
     titles: TabTitle[];
 };
@@ -283,7 +283,7 @@ export const Tabs: React.FC<TabsProps> = (props) => {
         setCurrentTab(props.selectedTab ? props.selectedTab : 0);
     }, [props]);
 
-    // eslint-disable-next-line @typescript-eslint/ban-types
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
     const handleChange = (_e: React.ChangeEvent<{}>, newValue: number) => {
         setCurrentTab(newValue);
         if (props.handleSelectedTab) {
