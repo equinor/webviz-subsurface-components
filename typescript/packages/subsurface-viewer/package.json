@@ -1,6 +1,6 @@
 {
     "name": "@webviz/subsurface-viewer",
-    "version": "0.30.8",
+    "version": "0.30.9",
     "description": "3D visualization component for subsurface reservoir data",
     "keywords": [
         "subsurface",
@@ -35,6 +35,7 @@
         "@deck.gl-community/editable-layers": "^9.0.3",
         "@deck.gl/aggregation-layers": "^9.0.29",
         "@deck.gl/core": "^9.0.29",
+        "@deck.gl/extensions": "^9.0.29",
         "@deck.gl/geo-layers": "^9.0.29",
         "@deck.gl/json": "^9.0.29",
         "@deck.gl/layers": "^9.0.29",
