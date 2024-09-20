@@ -9,6 +9,8 @@ import logTimes, { obj } from "./test/performanceMetrics";
 import { axisMnemos, axisTitles } from "./utils/axes";
 import type { ColorTable } from "./components/ColorTableTypes";
 
+// TODO: Fix this the next time the file is edited.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const exampleTemplate = require("../../../../example-data/welllog_template_1.json");
 //const exampleWellLog = require("../../../../example-data/L898MUD.json")[0];
 const exampleWellLog = {

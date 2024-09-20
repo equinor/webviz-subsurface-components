@@ -8,7 +8,11 @@ import type { ColorTable } from "./components/ColorTableTypes";
 
 const exampleColorTable = colorTables as ColorTable[];
 
+// TODO: Fix this the next time the file is edited.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const welllog = require("../../../../../example-data/L898MUD.json")[0];
+// TODO: Fix this the next time the file is edited.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const template = require("../../../../../example-data/welllog_template_1.json");
 
 window.ResizeObserver =

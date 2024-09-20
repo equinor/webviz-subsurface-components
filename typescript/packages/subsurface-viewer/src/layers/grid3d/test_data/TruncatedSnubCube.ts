@@ -5,6 +5,7 @@
  * http://dmccooey.com/polyhedra/CanonicalTruncatedLsnubCube.html
  */
 
+/* eslint-disable no-loss-of-precision */
 const C0  = 0.0302251764772701090307923300606
 const C1  = 0.0363071672915951331148593569212
 const C2  = 0.0409778062246362225458193945047
@@ -78,6 +79,7 @@ const C69 = 0.927848015760027714252783557760
 const C70 = 0.930337880764612328053786329055496
 const C71 = 0.931009593453156729363470630779
 const C72 = 0.9320409293065338248817734612548
+/* eslint-enable no-loss-of-precision */
 
 export const Points = [ 
 C72, -C25,  -C2,

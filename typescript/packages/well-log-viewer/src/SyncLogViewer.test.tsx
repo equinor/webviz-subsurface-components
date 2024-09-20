@@ -8,7 +8,11 @@ import { axisMnemos, axisTitles } from "./utils/axes";
 
 import type { ColorTable } from "./components/ColorTableTypes";
 const exampleColorTable = colorTables as unknown as ColorTable[]; // equivalent types, should be merged
+// TODO: Fix this the next time the file is edited.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const exampleWellLog = require("../../../../example-data/L898MUD.json")[0];
+// TODO: Fix this the next time the file is edited.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const exampleTemplate = require("../../../../example-data/welllog_template_1.json");
 
 window.ResizeObserver =

@@ -208,7 +208,11 @@ export class PlotPropertiesDialog extends Component<Props, State> {
         if (names[0]) name2 = name = names[0];
         if (names[1]) name2 = names[1];
 
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         const trackTemplate = getTrackTemplate(this.props.track);
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         const templatePlot = this.props.templatePlot;
         this.state = templatePlot
             ? {
@@ -232,6 +236,8 @@ export class PlotPropertiesDialog extends Component<Props, State> {
 
                   // for 'gradientfill' plot
                   colorTable:
+                      // TODO: Fix this the next time the file is edited.
+                      // eslint-disable-next-line react/prop-types
                       this.props.wellLogView.props.colorTables?.[0]?.name,
                   colorFunction:
                       this.props.wellLogView.props.colorFunctions?.[0]?.name,
@@ -260,6 +266,8 @@ export class PlotPropertiesDialog extends Component<Props, State> {
                     this.setState({ inverseColor: "" });
             } else if (this.state.type === "differential") {
                 if (!this.state.name2) {
+                    // TODO: Fix this the next time the file is edited.
+                    // eslint-disable-next-line react/prop-types
                     const skipUsed = this.props.templatePlot
                         ? false
                         : true; /*??*/
@@ -270,6 +278,8 @@ export class PlotPropertiesDialog extends Component<Props, State> {
     }
 
     onOK(): void {
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         this.props.onOK(this.state);
         this.closeDialog();
     }
@@ -280,7 +290,11 @@ export class PlotPropertiesDialog extends Component<Props, State> {
 
     dataNames(skipUsed: boolean): string[] {
         return dataNames(
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             this.props.wellLogView.props.welllog,
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             skipUsed ? this.props.track : null
         );
     }
@@ -352,6 +366,8 @@ export class PlotPropertiesDialog extends Component<Props, State> {
                 ),
             ];
         } else if (type === "gradientfill") {
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             const colorTables = this.props.wellLogView.props.colorTables;
             const colorFunctions = this.props.wellLogView.props.colorFunctions;
             return [
@@ -375,8 +391,14 @@ export class PlotPropertiesDialog extends Component<Props, State> {
     }
 
     render(): JSX.Element {
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         const trackTemplate = getTrackTemplate(this.props.track);
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         const title = this.props.templatePlot ? "Edit plot" : "Add New Plot";
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         const skipUsed = this.props.templatePlot ? false : true; /*??*/
         const scale = this.state.scale || trackTemplate.scale;
         return (

@@ -1,6 +1,6 @@
 {
     "name": "@webviz/wsc-common",
-    "version": "0.8.1",
+    "version": "0.8.2",
     "description": "Shared functionality for WebViz Subsurface Components",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -20,7 +20,7 @@
     "author": "Equinor <opensource@equinor.com>",
     "license": "MPL-2.0",
     "dependencies": {
-        "@deck.gl/core": "^9.0.27",
+        "@deck.gl/core": "^9.0.29",
         "ajv": "^8.12.0"
     },
     "volta": {

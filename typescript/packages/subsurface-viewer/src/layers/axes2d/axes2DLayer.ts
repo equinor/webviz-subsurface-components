@@ -8,7 +8,7 @@ import {
     COORDINATE_SYSTEM,
     Layer,
     OrthographicViewport,
-    project,
+    project32,
 } from "@deck.gl/core";
 import { load } from "@loaders.gl/core";
 import { ImageLoader } from "@loaders.gl/images";
@@ -470,7 +470,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
     } {
         // Make models for background, lines (tick marks and axis) and labels.
 
-        const gl = this.context.device;
+        const device = this.context.device;
 
         // Margins.
         const m = 100; // Length in pixels
@@ -646,7 +646,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
             lineColor = lineColor.map((x) => (x ?? 0) / 255);
         }
 
-        const line_model = new Model(gl, {
+        const line_model = new Model(device, {
             id: `${this.props.id}-lines`,
             vs: lineVertexShader,
             fs: lineFragmentShader,
@@ -659,7 +659,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                 vertexCount: tick_and_axes_lines.length / 3,
             }),
 
-            modules: [project],
+            modules: [project32],
             isInstanced: false,
         });
 
@@ -674,7 +674,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
             bColor = bColor.map((x) => (x ?? 0) / 255);
         }
 
-        const background_model = new Model(gl, {
+        const background_model = new Model(device, {
             id: `${this.props.id}-background`,
             vs: lineVertexShader,
             fs: lineFragmentShader,
@@ -687,7 +687,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                 vertexCount: background_lines.length / 3,
             }),
 
-            modules: [project],
+            modules: [project32],
             isInstanced: false,
         });
 
@@ -801,7 +801,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                 }
             }
 
-            const model = new Model(gl, {
+            const model = new Model(device, {
                 id: `${this.props.id}-${label}`,
                 vs: labelVertexShader,
                 fs: labelFragmentShader,
@@ -825,7 +825,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                     vertexCount: positions.length / 3,
                 }),
                 bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
-                modules: [project],
+                modules: [project32],
                 isInstanced: false,
             });
 

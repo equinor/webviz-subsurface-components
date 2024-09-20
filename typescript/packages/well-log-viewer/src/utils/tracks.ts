@@ -611,6 +611,8 @@ function updateStackedTrackScale(track: StackedTrack): void {
 
     //if (!track.options.scale) throw Error("Invalid track.options.scale!");
     //track.trackScale = createScale(track.options.scale, track.options.domain);
+    // TODO: Fix this the next time the file is edited.
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     track.xscale;
 }
 

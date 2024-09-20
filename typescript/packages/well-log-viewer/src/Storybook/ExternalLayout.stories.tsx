@@ -8,7 +8,7 @@ import SyncLogViewer from "../SyncLogViewer";
 
 import { tabDecorator } from "./helpers/MuiComponentsTabHelper";
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
 const args = require("../../../../../example-data/facies3wells.json");
 
 const RTCWellLogViewer: React.FunctionComponent = () => {

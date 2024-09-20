@@ -50,6 +50,8 @@ class InfoPanel extends Component<Props> {
         info: Info /*,
         ev: React.MouseEvent<HTMLTableRowElement>*/
     ): void {
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         this.props.onGroupClick?.(info);
     }
 
@@ -123,6 +125,8 @@ class InfoPanel extends Component<Props> {
     }
 
     render(): JSX.Element {
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         const header = this.props.header;
         return (
             <div className="readout">
@@ -130,6 +134,8 @@ class InfoPanel extends Component<Props> {
                     {header && <legend>{header}</legend>}
                     <table>
                         <tbody>
+                            {/* TODO: Fix this the next time the file is edited. */}
+                            {/* eslint-disable-next-line react/prop-types */}
                             {this.props.infos?.map(this.createRow.bind(this))}
                         </tbody>
                     </table>

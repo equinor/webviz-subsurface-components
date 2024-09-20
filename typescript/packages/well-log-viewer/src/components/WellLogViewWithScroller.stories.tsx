@@ -77,6 +77,8 @@ export const Default: StoryObj<typeof Template> = {
         id: "Well-Log-Viewer-With-Scroller",
         horizontal: false,
         welllog: wellLog,
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
         template: require("../../../../../example-data/welllog_template_1.json"),
         viewTitle: "Well '" + wellLog.header.well + "'",
         colorTables: exampleColorTable,

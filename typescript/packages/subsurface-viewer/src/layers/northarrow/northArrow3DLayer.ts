@@ -4,7 +4,7 @@ import type {
     UpdateParameters,
     Viewport,
 } from "@deck.gl/core";
-import { Layer, OrthographicViewport, project } from "@deck.gl/core";
+import { Layer, OrthographicViewport, project32 } from "@deck.gl/core";
 import { Geometry, Model } from "@luma.gl/engine";
 import type { Device } from "@luma.gl/core";
 import { Vector3 } from "@math.gl/core";
@@ -48,7 +48,7 @@ export default class NorthArrow3DLayer extends Layer<NorthArrow3DLayerProps> {
         gl.enable(gl.DEPTH_TEST);
     }
 
-    _getModels(gl: Device) {
+    _getModels(device: Device) {
         const model_lines = GetArrowLines();
 
         const is_orthographic =
@@ -95,11 +95,11 @@ export default class NorthArrow3DLayer extends Layer<NorthArrow3DLayerProps> {
         const color = this.props.color.map((x?: number) => (x ?? 0) / 255);
         color[3] = 1;
 
-        const grids = new Model(gl, {
+        const grids = new Model(device, {
             id: `${this.props.id}-grids`,
             vs: vertexShader,
             fs: fragmentShader,
-            uniforms: { uColor: color },
+            uniforms: { uColor: Array.from(color) },
             geometry: new Geometry({
                 topology: "line-list",
                 attributes: {
@@ -108,7 +108,7 @@ export default class NorthArrow3DLayer extends Layer<NorthArrow3DLayerProps> {
                 vertexCount: lines.length / 3,
             }),
 
-            modules: [project],
+            modules: [project32],
             isInstanced: false, // This only works when set to false.
         });
 
