@@ -88,8 +88,7 @@ class Scroller extends Component<Props> {
      */
     onScroll(): void {
         const elOuter = this.scroller;
-        if (!elOuter)
-            return;
+        if (!elOuter) return;
         // notify parent
         // TODO: Fix this the next time the file is edited.
         // eslint-disable-next-line react/prop-types

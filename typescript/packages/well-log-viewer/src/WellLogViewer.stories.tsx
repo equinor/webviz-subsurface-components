@@ -550,14 +550,13 @@ class MapAndWellLogViewer extends React.Component<Props, State> {
             if (track) {
                 const templatePlot = track.plots[0];
                 if (templatePlot) {
-                    const wells_layer = (
+                    const wells_layer =
                         // TODO: Fix this the next time the file is edited.
                         // eslint-disable-next-line react/prop-types
-                        (this.props.layers as Record<string, unknown>[])
-                    )?.find(
-                        (item: Record<string, unknown>) =>
-                            item["@@type"] === "WellsLayer"
-                    );
+                        (this.props.layers as Record<string, unknown>[])?.find(
+                            (item: Record<string, unknown>) =>
+                                item["@@type"] === "WellsLayer"
+                        );
                     if (
                         wells_layer &&
                         wells_layer["logName"] !== templatePlot.name

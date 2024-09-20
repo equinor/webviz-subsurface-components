@@ -79,11 +79,15 @@ export class TrackPropertiesDialog extends Component<Props, State> {
                   showLabels:
                       // TODO: Fix this the next time the file is edited.
                       // eslint-disable-next-line react/prop-types
-                      templateTrack.plots[0]?.showLabels !== false ? "true" : "false",
+                      templateTrack.plots[0]?.showLabels !== false
+                          ? "true"
+                          : "false",
                   showLines:
                       // TODO: Fix this the next time the file is edited.
                       // eslint-disable-next-line react/prop-types
-                      templateTrack.plots[0]?.showLines !== false ? "true" : "false",
+                      templateTrack.plots[0]?.showLines !== false
+                          ? "true"
+                          : "false",
                   // TODO: Fix this the next time the file is edited.
                   // eslint-disable-next-line react/prop-types
                   labelRotation: templateTrack.plots[0]?.labelRotation || 0,

@@ -122,8 +122,8 @@ class WellLogSpacer extends Component<WellLogSpacerProps /*, State*/> {
             this.props.patterns !== prevProps.patterns || // TODO: Fix this the next time the file is edited.
             // eslint-disable-next-line react/prop-types
             this.props.options?.wellpickPatternFill !== // TODO: Fix this the next time the file is edited.
-            // eslint-disable-next-line react/prop-types
-            prevProps.options?.wellpickPatternFill
+                // eslint-disable-next-line react/prop-types
+                prevProps.options?.wellpickPatternFill
         ) {
             this.defs =
                 // TODO: Fix this the next time the file is edited.
@@ -482,13 +482,15 @@ class WellLogSpacer extends Component<WellLogSpacerProps /*, State*/> {
                                     // TODO: Fix this the next time the file is edited.
                                     // eslint-disable-next-line react/prop-types
                                     this.props.options?.wellpickColorFill &&
-                                        value.color && <polygon
-                                        key={index}
-                                        fill={value.color}
-                                        className="wellpick-fill" // for CSS customization
-                                        stroke="none"
-                                        points={fillPoints[index]}
-                                    />,
+                                        value.color && (
+                                            <polygon
+                                                key={index}
+                                                fill={value.color}
+                                                className="wellpick-fill" // for CSS customization
+                                                stroke="none"
+                                                points={fillPoints[index]}
+                                            />
+                                        ),
                                     value.pattern && (
                                         <polygon
                                             key={"p" + index}

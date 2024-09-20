@@ -150,11 +150,14 @@ export class SimpleMenu extends Component<Props, State> {
                     this.handleClickItem(
                         // TODO: Fix this the next time the file is edited.
                         // eslint-disable-next-line react/prop-types
-                        this.props.wellLogView.removeTrackPlot.bind(// TODO: Fix this the next time the file is edited.
-                        // eslint-disable-next-line react/prop-types
-                        this.props.wellLogView, // TODO: Fix this the next time the file is edited.
-                        // eslint-disable-next-line react/prop-types
-                        this.props.track as GraphTrack, plot)
+                        this.props.wellLogView.removeTrackPlot.bind(
+                            // TODO: Fix this the next time the file is edited.
+                            // eslint-disable-next-line react/prop-types
+                            this.props.wellLogView, // TODO: Fix this the next time the file is edited.
+                            // eslint-disable-next-line react/prop-types
+                            this.props.track as GraphTrack,
+                            plot
+                        )
                     )
                 }
             >
@@ -197,11 +200,15 @@ export class SimpleMenu extends Component<Props, State> {
                     this.handleClickItem(
                         // TODO: Fix this the next time the file is edited.
                         // eslint-disable-next-line react/prop-types
-                        this.props.wellLogView.editPlot.bind(// TODO: Fix this the next time the file is edited.
-                        // eslint-disable-next-line react/prop-types
-                        this.props.wellLogView, this.state.anchorEl, // TODO: Fix this the next time the file is edited.
-                        // eslint-disable-next-line react/prop-types
-                        this.props.track, plot)
+                        this.props.wellLogView.editPlot.bind(
+                            // TODO: Fix this the next time the file is edited.
+                            // eslint-disable-next-line react/prop-types
+                            this.props.wellLogView,
+                            this.state.anchorEl, // TODO: Fix this the next time the file is edited.
+                            // eslint-disable-next-line react/prop-types
+                            this.props.track,
+                            plot
+                        )
                     )
                 }
             >

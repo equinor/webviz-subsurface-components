@@ -85,12 +85,12 @@ export class WellLogInfoPanel extends Component<Props, State> {
                 // TODO: Fix this the next time the file is edited.
                 // eslint-disable-next-line react/prop-types
                 this.props.readoutOptions.allTracks !== // TODO: Fix this the next time the file is edited.
+                    // eslint-disable-next-line react/prop-types
+                    prevProps.readoutOptions.allTracks || // TODO: Fix this the next time the file is edited.
                 // eslint-disable-next-line react/prop-types
-                prevProps.readoutOptions.allTracks || // TODO: Fix this the next time the file is edited.
-            // eslint-disable-next-line react/prop-types
-            this.props.readoutOptions.grouping !== // TODO: Fix this the next time the file is edited.
-            // eslint-disable-next-line react/prop-types
-            prevProps.readoutOptions.grouping)
+                this.props.readoutOptions.grouping !== // TODO: Fix this the next time the file is edited.
+                    // eslint-disable-next-line react/prop-types
+                    prevProps.readoutOptions.grouping)
         ) {
             // TODO: Fix this the next time the file is edited.
             // eslint-disable-next-line react/prop-types

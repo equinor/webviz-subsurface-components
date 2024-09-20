@@ -87,13 +87,13 @@ export class WellLogZoomSlider extends Component<Props, State> {
 
     render(): JSX.Element {
         return (
-            (<div className="zoom">
+            <div className="zoom">
                 {/* TODO: Fix this the next time the file is edited. */}
                 {/* eslint-disable-next-line react/prop-types */}
                 {this.props.label && (
                     // TODO: Fix this the next time the file is edited.
                     // eslint-disable-next-line react/prop-types
-                    (<span className="zoom-label">{this.props.label}</span>)
+                    <span className="zoom-label">{this.props.label}</span>
                 )}
                 <span className="zoom-value">
                     <ZoomSlider
@@ -104,7 +104,7 @@ export class WellLogZoomSlider extends Component<Props, State> {
                         onChange={this.onZoomSliderChange}
                     />
                 </span>
-            </div>)
+            </div>
         );
     }
 }

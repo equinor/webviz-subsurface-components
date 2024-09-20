@@ -37,8 +37,7 @@ class AxisSelector extends Component<Props> {
     render(): JSX.Element {
         // TODO: Fix this the next time the file is edited.
         // eslint-disable-next-line react/prop-types
-        if (this.props.autoHide && this.props.axes.length <= 1)
-            return <></>; // do not need to render anything
+        if (this.props.autoHide && this.props.axes.length <= 1) return <></>; // do not need to render anything
         return (
             <div className="axis-selector">
                 <fieldset>
@@ -51,9 +50,10 @@ class AxisSelector extends Component<Props> {
                         return this.createItem(
                             // TODO: Fix this the next time the file is edited.
                             // eslint-disable-next-line react/prop-types
-                            this.props.axisTitles ? // TODO: Fix this the next time the file is edited.
-                            // eslint-disable-next-line react/prop-types
-                            this.props.axisTitles[axis] : axis,
+                            this.props.axisTitles // TODO: Fix this the next time the file is edited.
+                                ? // eslint-disable-next-line react/prop-types
+                                  this.props.axisTitles[axis]
+                                : axis,
                             axis
                         );
                     })}

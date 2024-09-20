@@ -299,7 +299,8 @@ export default class WellLogViewer extends Component<
                         onTrackMouseEvent={
                             // TODO: Fix this the next time the file is edited.
                             // eslint-disable-next-line react/prop-types
-                            this.props.onTrackMouseEvent || onTrackMouseEventDefault
+                            this.props.onTrackMouseEvent ||
+                            onTrackMouseEventDefault
                         }
                         onContentRescale={this.onContentRescale}
                         onContentSelection={this.onContentSelection}

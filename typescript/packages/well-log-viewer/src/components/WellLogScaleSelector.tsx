@@ -91,13 +91,13 @@ export class WellLogScaleSelector extends Component<Props, State> {
 
     render(): JSX.Element {
         return (
-            (<div className="scale">
+            <div className="scale">
                 {/* TODO: Fix this the next time the file is edited. */}
                 {/* eslint-disable-next-line react/prop-types */}
                 {this.props.label && (
                     // TODO: Fix this the next time the file is edited.
                     // eslint-disable-next-line react/prop-types
-                    (<span className="scale-label">{this.props.label}</span>)
+                    <span className="scale-label">{this.props.label}</span>
                 )}
                 <span className="scale-value">
                     <ScaleSelector
@@ -111,7 +111,7 @@ export class WellLogScaleSelector extends Component<Props, State> {
                         round={this.props.round}
                     />
                 </span>
-            </div>)
+            </div>
         );
     }
 }

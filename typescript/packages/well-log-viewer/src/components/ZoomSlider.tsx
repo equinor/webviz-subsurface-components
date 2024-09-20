@@ -64,11 +64,11 @@ class ZoomSlider extends Component<Props, State> {
             if (state.level === level) return null;
             // TODO: Fix this the next time the file is edited.
             // eslint-disable-next-line react/prop-types
-            if (this.props.onChange) // TODO: Fix this the next time the file is edited.
-            // eslint-disable-next-line react/prop-types
-            this.props.onChange(convertLevelToValue(level));
-            else
-                console.error("ZoomSlider props.onChange not set");
+            if (this.props.onChange)
+                // TODO: Fix this the next time the file is edited.
+                // eslint-disable-next-line react/prop-types
+                this.props.onChange(convertLevelToValue(level));
+            else console.error("ZoomSlider props.onChange not set");
             return { level: level as number };
         });
     }
