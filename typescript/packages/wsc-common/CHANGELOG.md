@@ -1,3 +1,10 @@
+## [0.8.3](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.8.2...wsc-common@0.8.3) (2024-09-20)
+
+
+### Bug Fixes
+
+* subsurface release ([#2252](https://github.com/equinor/webviz-subsurface-components/issues/2252)) ([84a4ad7](https://github.com/equinor/webviz-subsurface-components/commit/84a4ad7031fa3f24a89ffbd4c1796f0603e2d1ec))
+
 ## [0.8.2](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.8.1...wsc-common@0.8.2) (2024-09-20)
 
 

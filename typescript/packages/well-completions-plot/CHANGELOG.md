@@ -1,3 +1,10 @@
+## [1.4.3](https://github.com/equinor/webviz-subsurface-components/compare/well-completions-plot@1.4.2...well-completions-plot@1.4.3) (2024-09-20)
+
+
+### Bug Fixes
+
+* subsurface release ([#2252](https://github.com/equinor/webviz-subsurface-components/issues/2252)) ([84a4ad7](https://github.com/equinor/webviz-subsurface-components/commit/84a4ad7031fa3f24a89ffbd4c1796f0603e2d1ec))
+
 ## [1.4.2](https://github.com/equinor/webviz-subsurface-components/compare/well-completions-plot@1.4.1...well-completions-plot@1.4.2) (2024-09-20)
 
 
