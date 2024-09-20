@@ -1,3 +1,10 @@
+## [0.30.7](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.30.6...subsurface-viewer@0.30.7) (2024-09-19)
+
+
+### Bug Fixes
+
+* reloading page fails to reset the camera target correctly if Z s… ([#2244](https://github.com/equinor/webviz-subsurface-components/issues/2244)) ([46810ae](https://github.com/equinor/webviz-subsurface-components/commit/46810ae33ca45782b6c86d5c19e9817c38658d04))
+
 ## [0.30.6](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.30.5...subsurface-viewer@0.30.6) (2024-09-17)
 
 

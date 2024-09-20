@@ -36,8 +36,7 @@ const stories: Meta = {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer / Map Layer",
     args: {
-        // Add a reset button for all the stories.
-        // Somehow, I do not manage to add the triggerHome to the general "unset" controls :/
+        // Add some common controls for all the stories.
         triggerHome: 0,
     },
 };
@@ -525,7 +524,7 @@ const TypedArrayInputComponent: React.FC<{
             rotationOrbit: 45,
             rotationX: 45,
             zoom: [-100, -100, -10, 100, 100, 60] as BoundingBox3D,
-            target: [],
+            target: undefined,
         },
         views: default3DViews,
         triggerHome: args.triggerHome,

@@ -52,9 +52,9 @@ import {
     getWellLayerByTypeAndSelectedWells,
 } from "../layers/utils/layerTools";
 import type { WellsPickInfo } from "../layers/wells/wellsLayer";
-import type { BoundingBox2D } from "../utils/BoundingBox2D";
+import type { BoundingBox2D, Point2D } from "../utils/BoundingBox2D";
 import { isEmpty as isEmptyBox2D } from "../utils/BoundingBox2D";
-import type { BoundingBox3D } from "../utils/BoundingBox3D";
+import type { BoundingBox3D, Point3D } from "../utils/BoundingBox3D";
 import {
     boxCenter,
     boxUnion,
@@ -78,7 +78,7 @@ import { useVerticalScale } from "../views/viewport";
 
 import mergeRefs from "merge-refs";
 
-export type { BoundingBox2D, BoundingBox3D };
+export type { BoundingBox2D, BoundingBox3D, Point2D, Point3D };
 /**
  * Type of the function returning coordinate boundary for the view defined as [left, bottom, right, top].
  */
@@ -189,8 +189,8 @@ export interface ViewsType {
  * Camera view state.
  */
 export interface ViewStateType {
-    target: number[];
-    zoom: number | [number, number] | BoundingBox3D | undefined;
+    target: Point2D | Point3D | undefined;
+    zoom: number | Point2D | BoundingBox3D | undefined;
     rotationX: number;
     rotationOrbit: number;
     minZoom?: number;
@@ -590,8 +590,8 @@ const Map: React.FC<MapProps> = ({
                 // Left button click identifies new camera rotation anchor.
                 if (infos.length >= 1) {
                     if (infos[0].coordinate) {
-                        viewController.setTarget(
-                            infos[0].coordinate as [number, number, number]
+                        viewController.setScaledTarget(
+                            infos[0].coordinate as Point3D
                         );
                     }
                 }
@@ -981,13 +981,22 @@ type ViewControllerState = {
 };
 type ViewControllerDerivedState = {
     // Derived state
-    target: [number, number, number] | undefined;
+    cameraClone: ViewStateType | undefined; // clone of the camera
+    eventTarget: Point3D | undefined; // target set by events
     readyForInteraction: boolean;
     viewStateChanged: boolean;
 };
 type ViewControllerFullState = ViewControllerState & ViewControllerDerivedState;
+
 class ViewController {
     private rerender_: React.DispatchWithoutAction;
+
+    private derivedState_: ViewControllerDerivedState = {
+        cameraClone: undefined,
+        eventTarget: undefined,
+        readyForInteraction: false,
+        viewStateChanged: false,
+    };
 
     private state_: ViewControllerFullState = {
         triggerHome: undefined,
@@ -1003,15 +1012,7 @@ class ViewController {
             bottom: 0,
         },
         // Derived state
-        target: undefined,
-        readyForInteraction: false,
-        viewStateChanged: false,
-    };
-
-    private derivedState_: ViewControllerDerivedState = {
-        target: undefined,
-        readyForInteraction: false,
-        viewStateChanged: false,
+        ...this.derivedState_,
     };
 
     private views_: ViewsType | undefined = undefined;
@@ -1027,8 +1028,13 @@ class ViewController {
         this.rerender_ = rerender;
     }
 
-    public readonly setTarget = (target: [number, number, number]) => {
-        this.derivedState_.target = [target[0], target[1], target[2]];
+    /**
+     * Sets the target from picks, which comes from the displayed
+     * scaled data.
+     * @param target scaled 3D point.
+     */
+    public readonly setScaledTarget = (target: Point3D) => {
+        this.derivedState_.eventTarget = [target[0], target[1], target[2]];
         this.rerender_();
     };
 
@@ -1040,7 +1046,10 @@ class ViewController {
         const newViews = this.getDeckGlViews(views, fullState);
         const newViewState = this.getDeckGlViewState(views, fullState);
 
-        this.state_ = fullState;
+        // do not update this.state_ as it has not yet been applied
+        if (!isEmpty(newViewState)) {
+            this.state_ = fullState;
+        }
         this.views_ = views;
         this.result_.views = newViews;
         this.result_.viewState = newViewState;
@@ -1051,7 +1060,12 @@ class ViewController {
     private readonly consolidateState = (
         state: ViewControllerState
     ): ViewControllerFullState => {
-        return { ...state, ...this.derivedState_ };
+        const fullState = { ...state, ...this.derivedState_ };
+        if (fullState.camera != this.state_.camera) {
+            // create a clone of the camera property to avoid editing it
+            fullState.cameraClone = cloneDeep(fullState.camera);
+        }
+        return fullState;
     };
 
     // returns the DeckGL views (ie. view position and viewport)
@@ -1075,8 +1089,12 @@ class ViewController {
         const viewsChanged = views != this.views_;
         const triggerHome = state.triggerHome !== this.state_.triggerHome;
         const updateTarget =
-            (viewsChanged || state.target !== this.state_?.target) &&
-            state.target != undefined;
+            (viewsChanged || state.eventTarget !== this.state_.eventTarget) &&
+            state.eventTarget != undefined;
+        // reset old zScale if new camera
+        if (state.camera != this.state_.camera) {
+            this.state_.zScale = 1;
+        }
         const updateZScale =
             viewsChanged || state.zScale !== this.state_?.zScale || triggerHome;
         const updateViewState =
@@ -1102,14 +1120,16 @@ class ViewController {
             viewState = buildDeckGlViewStates(
                 views,
                 state.viewPortMargins,
-                state.camera,
+                state.cameraClone,
                 state.boundingBox3d,
+                state.zScale,
+                this.state_.zScale,
                 state.bounds,
                 state.deckSize
             );
             // reset state
             this.derivedState_.readyForInteraction = canCameraBeDefined(
-                state.camera,
+                state.cameraClone,
                 state.boundingBox3d,
                 state.bounds,
                 state.deckSize
@@ -1125,7 +1145,7 @@ class ViewController {
         const viewStateKeys = Object.keys(viewState);
         if (
             updateTarget &&
-            this.derivedState_.target &&
+            this.derivedState_.eventTarget &&
             viewStateKeys?.length === 1
         ) {
             // deep clone to notify change (memo checks object address)
@@ -1133,10 +1153,10 @@ class ViewController {
                 viewState = cloneDeep(prevViewState);
             }
             // update target
-            viewState[viewStateKeys[0]].target = this.derivedState_.target;
+            viewState[viewStateKeys[0]].target = this.derivedState_.eventTarget;
             viewState[viewStateKeys[0]].transitionDuration = 1000;
             // reset
-            this.derivedState_.target = undefined;
+            this.derivedState_.eventTarget = undefined;
         }
         if (updateZScale) {
             // deep clone to notify change (memo checks object address)
@@ -1147,12 +1167,12 @@ class ViewController {
             // - if triggerHome: the target was recomputed from the input data (ie. without any scale applied)
             // - otherwise: previous scale (ie. this.state_.zScale) was already applied, and must be "reverted"
             const targetScale =
-                state.zScale / (triggerHome ? 1 : this.state_.zScale);
+                state.zScale /
+                (triggerHome ? state.zScale : this.state_.zScale);
             // update target
             for (const key in viewState) {
-                const t = viewState[key].target;
-                if (t) {
-                    viewState[key].target = [t[0], t[1], t[2] * targetScale];
+                if (viewState[key].target) {
+                    applyZScale(viewState[key].target, targetScale);
                 }
             }
         }
@@ -1168,9 +1188,11 @@ class ViewController {
             return;
         }
         const viewports = this.views_?.viewports ?? [];
-        if (viewState.target.length === 2) {
+        if (viewState.target?.length === 2) {
             // In orthographic mode viewState.target contains only x and y. Add existing z value.
-            viewState.target.push(this.result_.viewState[viewId].target[2]);
+            viewState.target.push(
+                this.result_.viewState[viewId].target?.[2] ?? 1
+            );
         }
         const isSyncIds = viewports
             .filter((item) => item.isSync)
@@ -1244,7 +1266,7 @@ function computeCameraZoom(
         zMin + (zMax - zMin) / 2,
     ];
 
-    const points: [number, number, number][] = [
+    const points: Point3D[] = [
         [xMin, yMin, zMin],
         [xMin, yMax, zMin],
         [xMax, yMax, zMin],
@@ -1285,7 +1307,7 @@ function computeCameraZoom(
 function getViewStateFromBounds(
     viewPortMargins: MarginsType,
     bounds_accessor: BoundingBox2D | BoundsAccessor,
-    target: [number, number, number],
+    target: Point3D,
     views: ViewsType | undefined,
     viewPort: ViewportType,
     size: Size
@@ -1301,7 +1323,7 @@ function getViewStateFromBounds(
     const z = target[2];
 
     const fb = fitBounds({ width: w, height: h, bounds });
-    let fb_target = [fb.x, fb.y, z];
+    let fb_target: Point3D = [fb.x, fb.y, z];
     let fb_zoom = fb.zoom;
 
     if (size.width > 0 && size.height > 0) {
@@ -1585,6 +1607,23 @@ function canCameraBeDefined(
 }
 
 /**
+ * Applies the zScale to the camera target.
+ * This is needed, as the camera target is specified in world coordinates, while the Z scale
+ * is applied to the transformation matrix of the object coordinates. The target must be applied
+ * the same scale to be consistent with the display.
+ * @param target camera target that must take into account the Z scale.
+ * @param zScale Z scale.
+ */
+function applyZScale(
+    target: Point2D | Point3D | undefined,
+    zScale: number
+): void {
+    if (target?.[2]) {
+        target[2] = target[2] * zScale;
+    }
+}
+
+/**
  * Returns the camera if it is fully specified (ie. the zoom is a valid number), otherwise computes
  * the zoom to visualize the complete camera boundingBox if set, the provided boundingBox otherwise.
  * @param camera input camera.
@@ -1594,10 +1633,15 @@ function canCameraBeDefined(
 function updateViewState(
     camera: ViewStateType,
     boundingBox: BoundingBox3D,
+    zScale: number,
     size: Size,
     is3D = true
 ): ViewStateType {
     if (isCameraDefined(camera)) {
+        if (is3D) {
+            // apply zScaling to target (target is in real coordinates while zScaling is applied to matrix transform)
+            applyZScale(camera.target, zScale);
+        }
         return camera;
     }
 
@@ -1622,6 +1666,10 @@ function updateViewState(
     }
     if (!cameraHasTarget(camera_)) {
         camera_.target = boxCenter(boundingBox);
+        if (is3D) {
+            // apply zScaling to target (target is in real coordinates while zScaling is applied to matrix transform)
+            applyZScale(camera.target, zScale);
+        }
     }
     camera_.minZoom = camera_.minZoom ?? minZoom3D;
     camera_.maxZoom = camera_.maxZoom ?? maxZoom3D;
@@ -1636,6 +1684,8 @@ function computeViewState(
     viewPort: ViewportType,
     cameraPosition: ViewStateType | undefined,
     boundingBox: BoundingBox3D | undefined,
+    zScale: number,
+    oldZScale: number,
     bounds: BoundingBox2D | BoundsAccessor | undefined,
     viewportMargins: MarginsType,
     views: ViewsType | undefined,
@@ -1655,13 +1705,17 @@ function computeViewState(
     if (viewPort.show3D ?? false) {
         // If the camera is defined, use it
         if (isCameraPositionDefined) {
-            return updateViewState(cameraPosition, boundingBox, size);
+            return updateViewState(
+                cameraPosition,
+                boundingBox,
+                zScale / (oldZScale || 1),
+                size
+            );
         }
 
         // deprecated in 3D, kept for backward compatibility
         if (isBoundsDefined) {
-            const centerOfData: [number, number, number] =
-                boxCenter(boundingBox);
+            const centerOfData: Point3D = boxCenter(boundingBox);
             return getViewStateFromBounds(
                 viewportMargins,
                 bounds,
@@ -1671,24 +1725,30 @@ function computeViewState(
                 size
             );
         }
-        const defaultCamera = {
-            target: [], // force computation from the bounding box 3D
+        const defaultCamera: ViewStateType = {
+            target: undefined, // force computation from the bounding box 3D
             zoom: NaN, // force computation from the bounding box 3D
             rotationX: 45, // look down z -axis at 45 degrees
             rotationOrbit: 0,
         };
-        return updateViewState(defaultCamera, boundingBox, size);
+        return updateViewState(defaultCamera, boundingBox, zScale, size);
     } else {
         const is3D = false;
 
         // If the camera is defined, use it
         if (isCameraPositionDefined) {
-            return updateViewState(cameraPosition, boundingBox, size, is3D);
+            return updateViewState(
+                cameraPosition,
+                boundingBox,
+                zScale,
+                size,
+                is3D
+            );
         }
 
-        const centerOfData: [number, number, number] = boxCenter(boundingBox);
+        const centerOfData: Point3D = boxCenter(boundingBox);
 
-        // In 2D set camera target (centerOfDatea) to 0; Zoom scales world around target.
+        // In 2D set camera target (centerOfData) to 0; Zoom scales world around target.
         centerOfData[2] = 0;
 
         // if bounds are defined, use them
@@ -1720,6 +1780,8 @@ function buildDeckGlViewStates(
     viewPortMargins: MarginsType,
     cameraPosition: ViewStateType | undefined,
     boundingBox: BoundingBox3D | undefined,
+    zScale: number,
+    oldZScale: number,
     bounds: BoundingBox2D | BoundsAccessor | undefined,
     size: Size
 ): Record<string, ViewStateType> {
@@ -1738,6 +1800,8 @@ function buildDeckGlViewStates(
             views.viewports[0],
             cameraPosition,
             boundingBox,
+            zScale,
+            oldZScale,
             bounds,
             viewPortMargins,
             views,
@@ -1763,6 +1827,8 @@ function buildDeckGlViewStates(
                 currentViewport,
                 cameraPosition,
                 boundingBox,
+                zScale,
+                oldZScale,
                 bounds,
                 viewPortMargins,
                 views,

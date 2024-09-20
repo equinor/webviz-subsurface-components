@@ -35,8 +35,7 @@ const stories: Meta = {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer / Wells Layer",
     args: {
-        // Add a reset button for all the stories.
-        // Somehow, I do not manage to add the triggerHome to the general "unset" controls :/
+        // Add some common controls for all the stories.
         triggerHome: 0,
     },
 };
@@ -542,7 +541,7 @@ export const WellsRefine: StoryObj<typeof WellsRefineComponent> = {
             rotationOrbit: -45,
             rotationX: 15,
             zoom: BBox,
-            target: [],
+            target: undefined,
         },
         views: default3DViews,
     },

@@ -33,11 +33,16 @@ export const boxUnion = (
 };
 
 /**
+ * 3D point defined as [x, y, z].
+ */
+export type Point3D = [number, number, number];
+
+/**
  * Returns the center of the bounding box.
  * @param box1 bounding box.
  * @returns the center of the bounding box.
  */
-export const boxCenter = (box: BoundingBox3D): [number, number, number] => {
+export const boxCenter = (box: BoundingBox3D): Point3D => {
     const xmin = box[0];
     const ymin = box[1];
     const zmin = box[2];
