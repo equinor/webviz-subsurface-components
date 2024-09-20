@@ -340,12 +340,8 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
 
         /*eslint-disable */
         const background_lines: number[] = [
-            ...p1,
-            ...p2,
-            ...p4, // triangle 1
-            ...p2,
-            ...p4,
-            ...p3, // triangle 2
+            ...p1, ...p2, ...p4,  // triangle 1
+            ...p2, ...p4, ...p3,  // triangle 2 
         ];
         /*eslint-enable */
 
@@ -372,12 +368,8 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
 
         /*eslint-disable */
         const background_lines: number[] = [
-            ...p1,
-            ...p2,
-            ...p4, // triangle 1
-            ...p2,
-            ...p4,
-            ...p3, // triangle 2
+            ...p1, ...p2, ...p4,  // triangle 1
+            ...p2, ...p4, ...p3,  // triangle 2 
         ];
         /*eslint-enable */
 
@@ -762,57 +754,39 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                     // 6 vertices per letter
                     // t1
                     /*eslint-disable */
-                    positions[offset + 0] =
-                        pos_w[0] + x1 * pixelScale * pixel2worldHor; // Add a distance in view coords and convert to world
-                    positions[offset + 1] =
-                        pos_w[1] +
-                        (0 * pixelScale - y_alignment_offset) * pixel2worldVer;
+                    positions[offset + 0] = pos_w[0] + x1 * pixelScale * pixel2worldHor; // Add a distance in view coords and convert to world
+                    positions[offset + 1] = pos_w[1] + (0 * pixelScale - y_alignment_offset) * pixel2worldVer;
                     positions[offset + 2] = pos_w[2];
                     texcoords[offsetTexture + 0] = u1;
                     texcoords[offsetTexture + 1] = v1;
 
-                    positions[offset + 3] =
-                        pos_w[0] + x2 * pixelScale * pixel2worldHor;
-                    positions[offset + 4] =
-                        pos_w[1] +
-                        (0 * pixelScale - y_alignment_offset) * pixel2worldVer;
+                    positions[offset + 3] = pos_w[0] + x2 * pixelScale * pixel2worldHor;
+                    positions[offset + 4] = pos_w[1] + (0 * pixelScale - y_alignment_offset) * pixel2worldVer;
                     positions[offset + 5] = pos_w[2];
                     texcoords[offsetTexture + 2] = u2;
                     texcoords[offsetTexture + 3] = v1;
 
-                    positions[offset + 6] =
-                        pos_w[0] + x1 * pixelScale * pixel2worldHor;
-                    positions[offset + 7] =
-                        pos_w[1] +
-                        (h * pixelScale - y_alignment_offset) * pixel2worldVer;
+                    positions[offset + 6] = pos_w[0] + x1 * pixelScale * pixel2worldHor;
+                    positions[offset + 7] = pos_w[1] + (h * pixelScale - y_alignment_offset) * pixel2worldVer;
                     positions[offset + 8] = pos_w[2];
                     texcoords[offsetTexture + 4] = u1;
                     texcoords[offsetTexture + 5] = v2;
 
                     // t2
-                    positions[offset + 9] =
-                        pos_w[0] + x1 * pixelScale * pixel2worldHor;
-                    positions[offset + 10] =
-                        pos_w[1] +
-                        (h * pixelScale - y_alignment_offset) * pixel2worldVer;
+                    positions[offset + 9] = pos_w[0] + x1 * pixelScale * pixel2worldHor;
+                    positions[offset + 10] = pos_w[1] + (h * pixelScale - y_alignment_offset) * pixel2worldVer;
                     positions[offset + 11] = pos_w[2];
                     texcoords[offsetTexture + 6] = u1;
                     texcoords[offsetTexture + 7] = v2;
 
-                    positions[offset + 12] =
-                        pos_w[0] + x2 * pixelScale * pixel2worldHor;
-                    positions[offset + 13] =
-                        pos_w[1] +
-                        (0 * pixelScale - y_alignment_offset) * pixel2worldVer;
+                    positions[offset + 12] = pos_w[0] + x2 * pixelScale * pixel2worldHor;
+                    positions[offset + 13] = pos_w[1] + (0 * pixelScale - y_alignment_offset) * pixel2worldVer;
                     positions[offset + 14] = pos_w[2];
                     texcoords[offsetTexture + 8] = u2;
                     texcoords[offsetTexture + 9] = v1;
 
-                    positions[offset + 15] =
-                        pos_w[0] + x2 * pixelScale * pixel2worldHor;
-                    positions[offset + 16] =
-                        pos_w[1] +
-                        (h * pixelScale - y_alignment_offset) * pixel2worldVer;
+                    positions[offset + 15] = pos_w[0] + x2 * pixelScale * pixel2worldHor;
+                    positions[offset + 16] = pos_w[1] + (h * pixelScale - y_alignment_offset) * pixel2worldVer;
                     positions[offset + 17] = pos_w[2];
                     texcoords[offsetTexture + 10] = u2;
                     texcoords[offsetTexture + 11] = v2;

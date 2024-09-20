@@ -80,7 +80,7 @@ interface IPropertyUniforms {
     valueRangeMax: number;
     colorMapRangeMin: number;
     colorMapRangeMax: number;
-    colorMapClampColor?: number[];
+    colorMapClampColor: number[];
     undefinedPropertyColor: [number, number, number];
     isColorMapClampColorTransparent: boolean;
     isClampColor: boolean;
@@ -349,10 +349,9 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
         ) as Color;
 
         // Normalize to [0,1] range.
-        const colorMapClampColorUniform = Array.from(
-            colorMapClampColor.map((x) => (x ?? 0) / 255)
+        const colorMapClampColorUniform = colorMapClampColor.map(
+            (x) => (x ?? 0) / 255
         );
-
         const isColorMapClampColorTransparent: boolean =
             (this.props.colorMapClampColor as boolean) === false;
 
@@ -364,7 +363,7 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             colorMapRangeMin,
             colorMapRangeMax,
             undefinedPropertyColor: this.props.undefinedPropertyColor,
-            ...(colorMapClampColorUniform ? { colorMapClampColorUniform } : {}),
+            colorMapClampColor: Array.from(colorMapClampColorUniform),
             isColorMapClampColorTransparent,
             isClampColor,
             isColoringDiscrete: imageData.isColoringDiscrete,
