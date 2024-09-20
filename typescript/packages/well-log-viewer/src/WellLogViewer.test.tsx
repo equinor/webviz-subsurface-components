@@ -7,7 +7,11 @@ import WellLogViewer from "./WellLogViewer";
 import type { WellLogController } from "./components/WellLogView";
 import { axisMnemos, axisTitles } from "./utils/axes";
 
+// TODO: Fix this the next time the file is edited.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const exampleTemplate = require("../../../../example-data/welllog_template_1.json");
+// TODO: Fix this the next time the file is edited.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const exampleWellLog = require("../../../../example-data/L898MUD.json")[0];
 const exampleColorTable = colorTables;
 

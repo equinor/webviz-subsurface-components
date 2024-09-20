@@ -691,6 +691,8 @@ const Map: React.FC<MapProps> = ({
         if (checkDatafileSchema && layers && loadingProgress === 100) {
             try {
                 validateLayers(layers);
+                // TODO: Fix this the next time the file is edited.
+                // eslint-disable-next-line @typescript-eslint/no-unused-expressions
                 colorTables && validateColorTables(colorTables);
             } catch (e) {
                 setErrorText(String(e));

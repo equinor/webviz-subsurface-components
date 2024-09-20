@@ -42,22 +42,34 @@ export class WellLogScaleSelector extends Component<Props, State> {
     }
 
     componentDidMount(): void {
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         this.registerCallbacks(this.props.callbackManager);
     }
 
     componentWillUnmount(): void {
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         this.unregisterCallbacks(this.props.callbackManager);
     }
 
     componentDidUpdate(prevProps: Props): void {
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         if (prevProps.callbackManager !== this.props.callbackManager) {
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             this.unregisterCallbacks(prevProps.callbackManager);
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             this.registerCallbacks(this.props.callbackManager);
         }
     }
 
     // callback function from Vertical Scale combobox
     onChange(value: number): void {
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         const controller = this.props.callbackManager?.controller;
         if (!controller) return;
         controller.setContentScale(value);
@@ -65,6 +77,8 @@ export class WellLogScaleSelector extends Component<Props, State> {
 
     onContentRescale(): void {
         this.setState((state: Readonly<State>) => {
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             const controller = this.props.callbackManager?.controller;
             if (!controller) return null;
             const value = controller.getContentScale();
@@ -77,19 +91,27 @@ export class WellLogScaleSelector extends Component<Props, State> {
 
     render(): JSX.Element {
         return (
-            <div className="scale">
+            (<div className="scale">
+                {/* TODO: Fix this the next time the file is edited. */}
+                {/* eslint-disable-next-line react/prop-types */}
                 {this.props.label && (
-                    <span className="scale-label">{this.props.label}</span>
+                    // TODO: Fix this the next time the file is edited.
+                    // eslint-disable-next-line react/prop-types
+                    (<span className="scale-label">{this.props.label}</span>)
                 )}
                 <span className="scale-value">
                     <ScaleSelector
                         onChange={this.onChange}
+                        // TODO: Fix this the next time the file is edited.
+                        // eslint-disable-next-line react/prop-types
                         values={this.props.values}
                         value={this.state.value}
+                        // TODO: Fix this the next time the file is edited.
+                        // eslint-disable-next-line react/prop-types
                         round={this.props.round}
                     />
                 </span>
-            </div>
+            </div>)
         );
     }
 }

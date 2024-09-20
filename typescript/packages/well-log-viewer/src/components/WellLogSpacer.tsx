@@ -85,8 +85,13 @@ class WellLogSpacer extends Component<WellLogSpacerProps /*, State*/> {
     constructor(props: WellLogSpacerProps) {
         super(props);
         this.defs =
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             this.props.options?.wellpickPatternFill &&
-            this.props.patterns &&
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
+            this.props.patterns && // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             createDefs(this.uid, this.props.patternsTable);
 
         this._isMount = false;
@@ -100,19 +105,34 @@ class WellLogSpacer extends Component<WellLogSpacerProps /*, State*/> {
         prevProps: WellLogSpacerProps /*, prevState: State*/
     ): void {
         // called after render()!?
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         if (this.props.onCreateSpacer !== prevProps.onCreateSpacer) {
             // update callback to component's caller
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             this.props.onCreateSpacer?.(this);
         }
         if (
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             this.props.patternsTable !== prevProps.patternsTable ||
-            this.props.patterns !== prevProps.patterns ||
-            this.props.options?.wellpickPatternFill !==
-                prevProps.options?.wellpickPatternFill
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
+            this.props.patterns !== prevProps.patterns || // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
+            this.props.options?.wellpickPatternFill !== // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
+            prevProps.options?.wellpickPatternFill
         ) {
             this.defs =
+                // TODO: Fix this the next time the file is edited.
+                // eslint-disable-next-line react/prop-types
                 this.props.options?.wellpickPatternFill &&
-                this.props.patterns &&
+                // TODO: Fix this the next time the file is edited.
+                // eslint-disable-next-line react/prop-types
+                this.props.patterns && // TODO: Fix this the next time the file is edited.
+                // eslint-disable-next-line react/prop-types
                 createDefs(this.uid, this.props.patternsTable);
 
             this.forceUpdate(); // force to show pattern fill with new this.defs
@@ -122,26 +142,40 @@ class WellLogSpacer extends Component<WellLogSpacerProps /*, State*/> {
     shouldComponentUpdate(
         nextProps: WellLogSpacerProps /*, nextState: State*/
     ): boolean {
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         if (this.props.colorTables !== nextProps.colorTables) {
             return true;
         }
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         if (this.props.controllers !== nextProps.controllers) {
             return true;
         }
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         if (this.props.wellpicks !== nextProps.wellpicks) {
             return true;
         }
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         if (this.props.width !== nextProps.width) {
             return true;
         }
 
         if (
-            this.props.options?.wellpickColorFill !==
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
+            this.props.options?.wellpickColorFill !== // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             nextProps.options?.wellpickColorFill
         )
             return true;
         if (
-            this.props.options?.wellpickPatternFill !==
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
+            this.props.options?.wellpickPatternFill !== // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             nextProps.options?.wellpickPatternFill
         ) {
             return true;
@@ -158,6 +192,8 @@ class WellLogSpacer extends Component<WellLogSpacerProps /*, State*/> {
     }
 
     render(): JSX.Element {
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         const horizontal = this.props.horizontal;
 
         let ymax = 0;
@@ -171,9 +207,15 @@ class WellLogSpacer extends Component<WellLogSpacerProps /*, State*/> {
         let offsetTop = 3000; // try to draw initially out of screen
         let offsetLeft = 3000;
         let height = 1;
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         let width = this.props.width ?? 1;
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         const controller = this.props.controllers[0] as unknown as WellLogView;
         const logViewer = controller?.logController;
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         const controller2 = this.props.controllers[1] as unknown as WellLogView;
         const logViewer2 = controller2?.logController;
         const wps = controller ? getWellPicks(controller) : null;
@@ -199,8 +241,13 @@ class WellLogSpacer extends Component<WellLogSpacerProps /*, State*/> {
             //const offset = wpSize / 2;
 
             const patterns =
+                // TODO: Fix this the next time the file is edited.
+                // eslint-disable-next-line react/prop-types
                 this.props.options?.wellpickPatternFill &&
-                this.props.patternsTable &&
+                // TODO: Fix this the next time the file is edited.
+                // eslint-disable-next-line react/prop-types
+                this.props.patternsTable && // TODO: Fix this the next time the file is edited.
+                // eslint-disable-next-line react/prop-types
                 this.props.patterns;
 
             for (const wp of wps) {
@@ -371,6 +418,8 @@ class WellLogSpacer extends Component<WellLogSpacerProps /*, State*/> {
             );
         });
 
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         const distance = this.props.distance;
 
         return (
@@ -395,10 +444,16 @@ class WellLogSpacer extends Component<WellLogSpacerProps /*, State*/> {
                     {!controller?.props.options?.hideTrackTitle ? <br /> : null}
                     {!controller?.props.options?.hideTrackLegend &&
                     distance !== undefined &&
+                    // TODO: Fix this the next time the file is edited.
+                    // eslint-disable-next-line react/prop-types
                     distance.value !== undefined ? (
                         <div className="distance">
                             {"←" +
+                                // TODO: Fix this the next time the file is edited.
+                                // eslint-disable-next-line react/prop-types
                                 distance.value.toFixed(0) +
+                                // TODO: Fix this the next time the file is edited.
+                                // eslint-disable-next-line react/prop-types
                                 distance.units +
                                 "→"}
                         </div>
@@ -424,16 +479,16 @@ class WellLogSpacer extends Component<WellLogSpacerProps /*, State*/> {
                         {picks.map(
                             (value, index) =>
                                 index + 1 < picks.length && [
+                                    // TODO: Fix this the next time the file is edited.
+                                    // eslint-disable-next-line react/prop-types
                                     this.props.options?.wellpickColorFill &&
-                                        value.color && (
-                                            <polygon
-                                                key={index}
-                                                fill={value.color}
-                                                className="wellpick-fill" // for CSS customization
-                                                stroke="none"
-                                                points={fillPoints[index]}
-                                            />
-                                        ),
+                                        value.color && <polygon
+                                        key={index}
+                                        fill={value.color}
+                                        className="wellpick-fill" // for CSS customization
+                                        stroke="none"
+                                        points={fillPoints[index]}
+                                    />,
                                     value.pattern && (
                                         <polygon
                                             key={"p" + index}

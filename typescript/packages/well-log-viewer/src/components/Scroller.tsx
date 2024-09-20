@@ -88,8 +88,11 @@ class Scroller extends Component<Props> {
      */
     onScroll(): void {
         const elOuter = this.scroller;
-        if (!elOuter) return;
+        if (!elOuter)
+            return;
         // notify parent
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         this.props.onScroll?.(this.getScrollX(), this.getScrollY());
     }
 
@@ -164,6 +167,8 @@ class Scroller extends Component<Props> {
                         ref={(el) => (this.content = el as HTMLDivElement)}
                         style={{ position: "absolute" }}
                     >
+                        {/* TODO: Fix this the next time the file is edited. */}
+                        {/* eslint-disable-next-line react/prop-types */}
                         {this.props.children}
                     </div>
                 </div>

@@ -482,7 +482,11 @@ class MapAndWellLogViewer extends React.Component<Props, State> {
         super(props);
         this.state = {
             wellIndex: undefined,
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             editedData: props.editedData,
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             layers: props.layers as LayersList,
         };
         this.onContentSelection = this.onContentSelection.bind(this);
@@ -497,8 +501,14 @@ class MapAndWellLogViewer extends React.Component<Props, State> {
         });
     }
     componentDidUpdate(prevProps: Props, prevState: State): void {
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         if (this.props.editedData !== prevProps.editedData) {
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             this.setState({ editedData: this.props.editedData });
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
             0;
         }
         if (!isEqualRanges(this.state.selection, prevState.selection)) {
@@ -541,7 +551,9 @@ class MapAndWellLogViewer extends React.Component<Props, State> {
                 const templatePlot = track.plots[0];
                 if (templatePlot) {
                     const wells_layer = (
-                        this.props.layers as Record<string, unknown>[]
+                        // TODO: Fix this the next time the file is edited.
+                        // eslint-disable-next-line react/prop-types
+                        (this.props.layers as Record<string, unknown>[])
                     )?.find(
                         (item: Record<string, unknown>) =>
                             item["@@type"] === "WellsLayer"
@@ -557,6 +569,8 @@ class MapAndWellLogViewer extends React.Component<Props, State> {
                         );
                         if (colorTable) wells_layer["logColor"] = colorTable;
 
+                        // TODO: Fix this the next time the file is edited.
+                        // eslint-disable-next-line react/prop-types
                         const layers = deepCopy(this.props.layers);
                         this.setState({
                             layers: layers as LayersList,
@@ -732,6 +746,8 @@ class MapAndWellLogViewer extends React.Component<Props, State> {
                                     : undefined
                             }
                             template={template}
+                            // TODO: Fix this the next time the file is edited.
+                            // eslint-disable-next-line react/prop-types
                             colorTables={this.props.colorTables as ColorTable[]}
                             // @aspentech: This issue needs to get sorted out, there seems to be a compatibility issue with the JSON file and the prop type
                             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -743,6 +759,8 @@ class MapAndWellLogViewer extends React.Component<Props, State> {
                             viewTitle={viewTitle}
                             options={{
                                 checkDatafileSchema:
+                                    // TODO: Fix this the next time the file is edited.
+                                    // eslint-disable-next-line react/prop-types
                                     this.props.checkDatafileSchema,
                                 maxVisibleTrackNum: 1,
                             }}

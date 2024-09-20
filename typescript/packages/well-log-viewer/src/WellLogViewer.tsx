@@ -131,21 +131,29 @@ export default class WellLogViewer extends Component<
     // callback function from WellLogView
     onCreateController(controller: WellLogController): void {
         this.callbackManager.onCreateController(controller);
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         this.props.onCreateController?.(controller); // call callback to component's caller
     }
     // callback function from WellLogView
     onContentRescale(): void {
         this.callbackManager.onContentRescale();
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         this.props.onContentRescale?.(); // call callback to component's caller
     }
     // callback function from WellLogView
     onContentSelection(): void {
         this.callbackManager.onContentSelection();
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         this.props.onContentSelection?.(); // call callback to component's caller
     }
     // callback function from WellLogView
     onTemplateChanged(): void {
         this.callbackManager.onTemplateChanged();
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         this.props.onTemplateChanged?.(); // call callback to component's caller
     }
     // callback function from Axis selector
@@ -156,6 +164,8 @@ export default class WellLogViewer extends Component<
 
     onInfo(x: number, logController: LogViewer, iFrom: number, iTo: number) {
         this.callbackManager.onInfo(x, logController, iFrom, iTo);
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         this.props.onInfo?.(x, logController, iFrom, iTo);
 
         this.fillInfo(x, logController, iFrom, iTo);
@@ -185,9 +195,13 @@ export default class WellLogViewer extends Component<
             true
         );
 
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         if (this.props.onInfoFilled) {
             this.callbackManager.registerCallback(
                 "onInfoFilled",
+                // TODO: Fix this the next time the file is edited.
+                // eslint-disable-next-line react/prop-types
                 this.props.onInfoFilled
             );
         }
@@ -266,7 +280,11 @@ export default class WellLogViewer extends Component<
                         template={this.props.template}
                         colorTables={this.props.colorTables}
                         wellpick={this.props.wellpick}
+                        // TODO: Fix this the next time the file is edited.
+                        // eslint-disable-next-line react/prop-types
                         patternsTable={this.props.patternsTable}
+                        // TODO: Fix this the next time the file is edited.
+                        // eslint-disable-next-line react/prop-types
                         patterns={this.props.patterns}
                         horizontal={this.props.horizontal}
                         axisTitles={this.props.axisTitles}
@@ -279,14 +297,17 @@ export default class WellLogViewer extends Component<
                         onInfo={this.onInfo}
                         onCreateController={this.onCreateController}
                         onTrackMouseEvent={
-                            this.props.onTrackMouseEvent ||
-                            onTrackMouseEventDefault
+                            // TODO: Fix this the next time the file is edited.
+                            // eslint-disable-next-line react/prop-types
+                            this.props.onTrackMouseEvent || onTrackMouseEventDefault
                         }
                         onContentRescale={this.onContentRescale}
                         onContentSelection={this.onContentSelection}
                         onTemplateChanged={this.onTemplateChanged}
                     />
                 }
+                // TODO: Fix this the next time the file is edited.
+                // eslint-disable-next-line react/prop-types
                 layout={this.props.layout || defaultLayout}
             />
         );

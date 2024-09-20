@@ -31,6 +31,8 @@ class ZoomSlider extends Component<Props, State> {
     constructor(props: Props) {
         super(props);
 
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         const level = convertValueToLevel(this.props.value);
         this.state = {
             level: level,
@@ -39,8 +41,12 @@ class ZoomSlider extends Component<Props, State> {
     }
 
     componentDidUpdate(prevProps: Props): void {
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         if (this.props.value !== prevProps.value) {
             this.setState((state: Readonly<State>) => {
+                // TODO: Fix this the next time the file is edited.
+                // eslint-disable-next-line react/prop-types
                 const level = convertValueToLevel(this.props.value);
                 if (state.level == level) return null;
                 return { level: level };
@@ -56,9 +62,13 @@ class ZoomSlider extends Component<Props, State> {
         if (typeof level !== "number") return;
         this.setState((state: Readonly<State>) => {
             if (state.level === level) return null;
-            if (this.props.onChange)
-                this.props.onChange(convertLevelToValue(level));
-            else console.error("ZoomSlider props.onChange not set");
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
+            if (this.props.onChange) // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
+            this.props.onChange(convertLevelToValue(level));
+            else
+                console.error("ZoomSlider props.onChange not set");
             return { level: level as number };
         });
     }
@@ -69,7 +79,11 @@ class ZoomSlider extends Component<Props, State> {
                 value={this.state.level}
                 defaultValue={0}
                 min={0}
+                // TODO: Fix this the next time the file is edited.
+                // eslint-disable-next-line react/prop-types
                 step={this.props.step || 0.5}
+                // TODO: Fix this the next time the file is edited.
+                // eslint-disable-next-line react/prop-types
                 max={convertValueToLevel(this.props.max || 256)}
                 scale={convertLevelToValue} // convert zoom level to zoom value function
                 onChange={this.onChange}

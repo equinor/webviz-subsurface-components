@@ -40,22 +40,34 @@ export class WellLogZoomSlider extends Component<Props, State> {
     }
 
     componentDidMount(): void {
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         this.registerCallbacks(this.props.callbackManager);
     }
 
     componentWillUnmount(): void {
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         this.unregisterCallbacks(this.props.callbackManager);
     }
 
     componentDidUpdate(prevProps: Props): void {
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         if (prevProps.callbackManager !== this.props.callbackManager) {
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             this.unregisterCallbacks(prevProps.callbackManager);
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             this.registerCallbacks(this.props.callbackManager);
         }
     }
 
     onContentRescale(): void {
         this.setState((state: Readonly<State>) => {
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             const controller = this.props.callbackManager?.controller;
             if (!controller) return null;
             const zoom = controller.getContentZoom();
@@ -68,23 +80,31 @@ export class WellLogZoomSlider extends Component<Props, State> {
 
     // callback function from zoom slider
     onZoomSliderChange(zoom: number): void {
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         this.props.callbackManager?.controller?.zoomContent(zoom);
     }
 
     render(): JSX.Element {
         return (
-            <div className="zoom">
+            (<div className="zoom">
+                {/* TODO: Fix this the next time the file is edited. */}
+                {/* eslint-disable-next-line react/prop-types */}
                 {this.props.label && (
-                    <span className="zoom-label">{this.props.label}</span>
+                    // TODO: Fix this the next time the file is edited.
+                    // eslint-disable-next-line react/prop-types
+                    (<span className="zoom-label">{this.props.label}</span>)
                 )}
                 <span className="zoom-value">
                     <ZoomSlider
                         value={this.state.zoomValue}
+                        // TODO: Fix this the next time the file is edited.
+                        // eslint-disable-next-line react/prop-types
                         max={this.props.max}
                         onChange={this.onZoomSliderChange}
                     />
                 </span>
-            </div>
+            </div>)
         );
     }
 }
