@@ -376,7 +376,7 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
     }
 
     protected _createModels(): Model[] {
-        const gl = this.context.device;
+        const device = this.context.device;
 
         const shape = this.shapes.get(this.props.shape);
         if (!shape) {
@@ -385,7 +385,7 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
 
         const shaders = this.getShaders();
 
-        const shapeModel = new Model(gl, {
+        const shapeModel = new Model(device, {
             id: `${this.props.id}-mesh`,
             ...shaders,
             bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
@@ -402,7 +402,7 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
             instanceCount: this.getNumInstances(),
         });
 
-        const outlineModel = new Model(gl, {
+        const outlineModel = new Model(device, {
             id: `${this.props.id}-outline`,
             ...shaders,
             bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
