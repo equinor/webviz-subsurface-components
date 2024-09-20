@@ -5,225 +5,81 @@
  * http://dmccooey.com/polyhedra/CanonicalTruncatedLsnubCube.html
  */
 
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C0  = 0.0302251764772701090307923300606;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C1  = 0.0363071672915951331148593569212;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C2  = 0.0409778062246362225458193945047;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C3  = 0.0456429395787649414224784522932;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C4  = 0.0517249303930899655065454791538;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C5  = 0.0874428904727683864261001346480;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C6  = 0.0889753108130376311630881430690;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C7  = 0.09641163211454776963649003756654;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C8  = 0.103835000017680081843811562026;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C9  = 0.105367420357949326580799570447;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C10 = 0.2450214662773631071920643581053;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C11 = 0.252134792945065226794434215441;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C12 = 0.255788526486979252796077241708;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C13 = 0.259407893525480844065447649862;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C14 = 0.266521220193182963667817507199;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C15 = 0.3029689425643569933701316598948;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C16 = 0.3107539819206035142821858189547;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C17 = 0.313739895806156433849991991246;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C18 = 0.316683657123930328933830649928;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C19 = 0.324468696480176849845884808988;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C20 = 0.341582160313331475749836432441;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C21 = 0.342151628299672471981879473588;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C22 = 0.349638984338757152241767048476;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C23 = 0.357079364582979470793901403586;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C24 = 0.357648832569320467025944444734;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C25 = 0.391940478946977214295158968170;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C26 = 0.402215383307808349008215898526;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C27 = 0.402717409481951931035229823292;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C28 = 0.403165328501965936057855186908;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C29 = 0.413440232862797070770912117264;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C30 = 0.422352352366772596332884976776;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C31 = 0.4257635648947751879276442138453;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C32 = 0.431361914520635145594778682227;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C33 = 0.436902308455866726256044549281;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C34 = 0.4403135209838693178508037863502;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C35 = 0.471479357405498664795143730174;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C36 = 0.475460037919842252621946008390;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C37 = 0.480492220013909699306611793938;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C38 = 0.485459845508251798486260261531;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C39 = 0.489440526022595386313062539748;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C40 = 0.631997406136481720130022548434;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C41 = 0.635861486054042501323957014766;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C42 = 0.639842166568386089150759292982;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C43 = 0.641002732085134761084968597476;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C44 = 0.6420771755897582912639852396851;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C45 = 0.643938080377665686012635061440;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C46 = 0.647947477795687904773262748842;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C47 = 0.649921936021662660284721984233;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C49 = 0.685557959079109566018258809311;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C48 = 0.651928158310031492600065027059;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C50 = 0.688969171607112157613018046380;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C51 = 0.693068385870940239724468173151;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C52 = 0.697074482834413973235521502239;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C53 = 0.700485695362416564830280739309;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C54 = 0.765729043260772372082807472863;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C55 = 0.769169895674212281964023549568;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C56 = 0.7697393636605532781960665907152;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C57 = 0.772041383352407496366556208990;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C58 = 0.773210830287960287716720126734;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C59 = 0.774276392373779698479782155693;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C60 = 0.774791316052818233077479806902;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C61 = 0.779739171248962824060380843856;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C62 = 0.780308639235303820292423885003;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C63 = 0.780588732465414822763530891820;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C64 = 0.922705157019364016574154365883;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C65 = 0.923736492872741112092457196358;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C66 = 0.924408205561285513402141498082;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C67 = 0.926898070565870127203144269378;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C68 = 0.927435346016054600951910190606;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C69 = 0.927848015760027714252783557760;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C70 = 0.930337880764612328053786329055496;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C71 = 0.931009593453156729363470630779;
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line no-loss-of-precision
-const C72 = 0.9320409293065338248817734612548;
+/* eslint-disable no-loss-of-precision */
+const C0  = 0.0302251764772701090307923300606
+const C1  = 0.0363071672915951331148593569212
+const C2  = 0.0409778062246362225458193945047
+const C3  = 0.0456429395787649414224784522932
+const C4  = 0.0517249303930899655065454791538
+const C5  = 0.0874428904727683864261001346480
+const C6  = 0.0889753108130376311630881430690
+const C7  = 0.09641163211454776963649003756654
+const C8  = 0.103835000017680081843811562026
+const C9  = 0.105367420357949326580799570447
+const C10 = 0.2450214662773631071920643581053
+const C11 = 0.252134792945065226794434215441
+const C12 = 0.255788526486979252796077241708
+const C13 = 0.259407893525480844065447649862
+const C14 = 0.266521220193182963667817507199
+const C15 = 0.3029689425643569933701316598948
+const C16 = 0.3107539819206035142821858189547
+const C17 = 0.313739895806156433849991991246
+const C18 = 0.316683657123930328933830649928
+const C19 = 0.324468696480176849845884808988
+const C20 = 0.341582160313331475749836432441
+const C21 = 0.342151628299672471981879473588
+const C22 = 0.349638984338757152241767048476
+const C23 = 0.357079364582979470793901403586
+const C24 = 0.357648832569320467025944444734
+const C25 = 0.391940478946977214295158968170
+const C26 = 0.402215383307808349008215898526
+const C27 = 0.402717409481951931035229823292
+const C28 = 0.403165328501965936057855186908
+const C29 = 0.413440232862797070770912117264
+const C30 = 0.422352352366772596332884976776
+const C31 = 0.4257635648947751879276442138453
+const C32 = 0.431361914520635145594778682227
+const C33 = 0.436902308455866726256044549281
+const C34 = 0.4403135209838693178508037863502
+const C35 = 0.471479357405498664795143730174
+const C36 = 0.475460037919842252621946008390
+const C37 = 0.480492220013909699306611793938
+const C38 = 0.485459845508251798486260261531
+const C39 = 0.489440526022595386313062539748
+const C40 = 0.631997406136481720130022548434
+const C41 = 0.635861486054042501323957014766
+const C42 = 0.639842166568386089150759292982
+const C43 = 0.641002732085134761084968597476
+const C44 = 0.6420771755897582912639852396851
+const C45 = 0.643938080377665686012635061440
+const C46 = 0.647947477795687904773262748842
+const C47 = 0.649921936021662660284721984233
+const C49 = 0.685557959079109566018258809311
+const C48 = 0.651928158310031492600065027059
+const C50 = 0.688969171607112157613018046380
+const C51 = 0.693068385870940239724468173151
+const C52 = 0.697074482834413973235521502239
+const C53 = 0.700485695362416564830280739309
+const C54 = 0.765729043260772372082807472863
+const C55 = 0.769169895674212281964023549568
+const C56 = 0.7697393636605532781960665907152
+const C57 = 0.772041383352407496366556208990
+const C58 = 0.773210830287960287716720126734
+const C59 = 0.774276392373779698479782155693
+const C60 = 0.774791316052818233077479806902
+const C61 = 0.779739171248962824060380843856
+const C62 = 0.780308639235303820292423885003
+const C63 = 0.780588732465414822763530891820
+const C64 = 0.922705157019364016574154365883
+const C65 = 0.923736492872741112092457196358
+const C66 = 0.924408205561285513402141498082
+const C67 = 0.926898070565870127203144269378
+const C68 = 0.927435346016054600951910190606
+const C69 = 0.927848015760027714252783557760
+const C70 = 0.930337880764612328053786329055496
+const C71 = 0.931009593453156729363470630779
+const C72 = 0.9320409293065338248817734612548
+/* eslint-enable no-loss-of-precision */
 
 export const Points = [ 
 C72, -C25,  -C2,

@@ -251,164 +251,63 @@ const Template = (args) => {
     );
 };
 
+/* eslint-disable @typescript-eslint/no-require-imports */
 const patternImages = [
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Anhydrite.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Bitumenious.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Browncoal.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Calcareous_dolostone.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Chalk.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Clay.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Coal.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Conglomerate.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Diamond_lines.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Dolomitic_limestone.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Dolostone.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Downward_lines.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Dykes_and_sills.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/EmptyFile.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Fissile_mud.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Fissile_silt.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Grid_lines.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Gypsum.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Gypsum_anhydrite_unspecified.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Halite.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Horizontal_dashed.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Horizontal_lines.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Intrusive.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Limestone.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Mafic_plutonic.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Marl.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Metamorphic.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Mud.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Raster.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Salt_general.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Sand.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Sediment_breccia.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Shale.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Silicic_plutonic.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Silt.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Tuffitt.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Upward_lines.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Vertical_bitumenious.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Vertical_calcareous_dolostone.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Vertical_chalk.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Vertical_claystone.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Vertical_dashed.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Vertical_dolomitic_limestone.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Vertical_dolostone.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Vertical_fissile_mudstone.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Vertical_fissile_siltstone.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Vertical_limestone.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Vertical_lines.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Vertical_marl.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Vertical_shale.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Vertical_tuffitt.gif"),
-    // TODO: Fix this the next time the file is edited.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require("../../../../example-data/patterns/Vulcanic.gif"),
 ];
+/* eslint-enable @typescript-eslint/no-require-imports */
+
 const patternNamesEnglish = [
     "Anhydrite",
     "Bitumenious",
@@ -725,7 +624,7 @@ const TemplateWithSelection = (args: { welllogs: WellLog[] }) => {
     );
 };
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const args = require("../../../../example-data/facies3wells.json");
 
 export const DiscreteLogs: StoryObj<typeof TemplateWithSelection> = {
