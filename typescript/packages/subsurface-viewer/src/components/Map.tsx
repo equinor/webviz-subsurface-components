@@ -92,7 +92,7 @@ type Size = {
 const minZoom3D = -12;
 const maxZoom3D = 12;
 const minZoom2D = -12;
-const maxZoom2D = 4;
+const maxZoom2D = 12;
 
 const DEFAULT_VIEWS: ViewsType = {
     layout: [1, 1],
@@ -1397,13 +1397,17 @@ function getViewStateFromBounds(
         fb_zoom = fb.zoom;
     }
 
+    // For large numbers (like utm coordinates) max zoom is limited in 2D to avoid numerical imprecision.
+    const isLarge = Math.max(bounds[0], bounds[1]) > 99999;
+    const max2DZoom = isLarge ? 3 : maxZoom2D;
+
     const view_state: ViewStateType = {
         target: viewPort.target ?? fb_target,
         zoom: getZoom(viewPort, fb_zoom),
         rotationX: 90, // look down z -axis
         rotationOrbit: 0,
         minZoom: viewPort.show3D ? minZoom3D : minZoom2D,
-        maxZoom: viewPort.show3D ? maxZoom3D : maxZoom2D,
+        maxZoom: viewPort.show3D ? maxZoom3D : max2DZoom,
     };
     return view_state;
 }
@@ -1750,7 +1754,7 @@ function computeViewState(
 
         const centerOfData: Point3D = boxCenter(boundingBox);
 
-        // In 2D set camera target (centerOfData) to 0; Zoom scales world around target.
+        // In 2D set camera target (centerOfData) to 0. Zoom scales world around target.
         centerOfData[2] = 0;
 
         // if bounds are defined, use them
