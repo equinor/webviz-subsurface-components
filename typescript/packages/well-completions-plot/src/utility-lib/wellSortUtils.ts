@@ -70,6 +70,8 @@ export function compareWellPlotDataValues<WellPlotData>(
 /**
  * Compare two WellPlotData elements based on the attribute to sort by and direction
  *
+ * When a and b are equal, the original order is preserved (ref. Array.prototype.sort()).
+ *
  * @param a First element for comparison
  * @param b Second element for comparison
  * @param sortWellsBy Sort method to use
@@ -96,7 +98,9 @@ export function compareWellsBySortByAndDirection(
 /**
  * Create sorted array of WellPlotData objects
  *
- * Sort the provided array of well according to selected SortWellsBy and sort direction
+ * Sort the provided array of well according to selected SortWellsBy and sort direction.
+ *
+ * When two elements are equal, the original order is preserved (ref. Array.prototype.sort()).
  *
  * @param wells Array of WellPlotData objects to sort
  * @param sortWellsBy Sort wells by selection
@@ -111,6 +115,7 @@ export function createSortedWells(
     const getWellPlotDataCompareValue =
         createGetWellPlotDataCompareValueFunction(sortWellsBy);
 
+    // Equal a and b elements will keep their original order
     const sortedWellsArray = Array.from(wells).sort((a, b) =>
         compareWellPlotDataValues(
             a,
