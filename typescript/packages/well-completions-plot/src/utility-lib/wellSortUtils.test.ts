@@ -263,6 +263,16 @@ describe("createSortedWells", () => {
         attributes: {},
     };
 
+    const mockWellPlotDataNeverOpen: WellPlotData = {
+        name: "Well Never Open",
+        completions: [
+            { open: 0, zoneIndex: 15, khMean: 0, khMin: 0, khMax: 0, shut: 0 },
+            { open: 0, zoneIndex: 25, khMean: 0, khMin: 0, khMax: 0, shut: 0 },
+        ],
+        earliestCompDateIndex: 1,
+        attributes: {},
+    };
+
     it("should sort wells by WELL_NAME in ascending order", () => {
         const sortedWells = createSortedWells(
             [mockWellPlotDataB, mockWellPlotDataA, mockWellPlotDataC],
@@ -291,7 +301,12 @@ describe("createSortedWells", () => {
 
     it("should sort wells by STRATIGRAPHY_DEPTH in ascending order", () => {
         const sortedWells = createSortedWells(
-            [mockWellPlotDataB, mockWellPlotDataA, mockWellPlotDataC],
+            [
+                mockWellPlotDataB,
+                mockWellPlotDataA,
+                mockWellPlotDataNeverOpen,
+                mockWellPlotDataC,
+            ],
             SortWellsBy.STRATIGRAPHY_DEPTH,
             SortDirection.ASCENDING
         );
@@ -299,16 +314,23 @@ describe("createSortedWells", () => {
             mockWellPlotDataC,
             mockWellPlotDataA,
             mockWellPlotDataB,
+            mockWellPlotDataNeverOpen,
         ]);
     });
 
     it("should sort wells by STRATIGRAPHY_DEPTH in descending order", () => {
         const sortedWells = createSortedWells(
-            [mockWellPlotDataA, mockWellPlotDataB, mockWellPlotDataC],
+            [
+                mockWellPlotDataA,
+                mockWellPlotDataB,
+                mockWellPlotDataNeverOpen,
+                mockWellPlotDataC,
+            ],
             SortWellsBy.STRATIGRAPHY_DEPTH,
             SortDirection.DESCENDING
         );
         expect(sortedWells).toEqual([
+            mockWellPlotDataNeverOpen,
             mockWellPlotDataB,
             mockWellPlotDataA,
             mockWellPlotDataC,
