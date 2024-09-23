@@ -4,7 +4,7 @@ import type {
     UpdateParameters,
     LayerContext,
 } from "@deck.gl/core";
-import { COORDINATE_SYSTEM, Layer, picking, project } from "@deck.gl/core";
+import { COORDINATE_SYSTEM, Layer, picking, project32 } from "@deck.gl/core";
 import type {
     UniformValue,
     SamplerProps,
@@ -80,7 +80,7 @@ interface IPropertyUniforms {
     valueRangeMax: number;
     colorMapRangeMin: number;
     colorMapRangeMax: number;
-    colorMapClampColor?: Color | undefined | boolean | number[];
+    colorMapClampColor: number[];
     undefinedPropertyColor: [number, number, number];
     isColorMapClampColorTransparent: boolean;
     isClampColor: boolean;
@@ -157,7 +157,7 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             bindings: {
                 colormap,
             },
-            modules: [project, picking, localPhongLighting, utilities],
+            modules: [project32, picking, localPhongLighting, utilities],
             isInstanced: false,
         });
 
@@ -170,7 +170,7 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             uniforms: {
                 ZIncreasingDownwards: this.props.ZIncreasingDownwards,
             },
-            modules: [project, picking],
+            modules: [project32, picking],
             isInstanced: false,
         });
 
@@ -344,14 +344,21 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             this.props.colorMapClampColor !== undefined &&
             this.props.colorMapClampColor !== true &&
             this.props.colorMapClampColor !== false;
-        let colorMapClampColor = isClampColor
-            ? this.props.colorMapClampColor
-            : ([0, 0, 0] as Color);
+        const colorMapClampColor = (
+            isClampColor ? this.props.colorMapClampColor : [0, 0, 0]
+        ) as Color;
 
         // Normalize to [0,1] range.
-        colorMapClampColor = (colorMapClampColor as Color).map(
+        const colorMapClampColorUniform = colorMapClampColor.map(
             (x) => (x ?? 0) / 255
-        ) as Color;
+        );
+
+        const undefinedPropertyColorUniform =
+            this.props.undefinedPropertyColor.map((x) => (x ?? 0) / 255) as [
+                number,
+                number,
+                number,
+            ];
 
         const isColorMapClampColorTransparent: boolean =
             (this.props.colorMapClampColor as boolean) === false;
@@ -363,8 +370,8 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             valueRangeMax,
             colorMapRangeMin,
             colorMapRangeMax,
-            undefinedPropertyColor: this.props.undefinedPropertyColor,
-            ...(colorMapClampColor ? { colorMapClampColor } : {}),
+            undefinedPropertyColor: undefinedPropertyColorUniform,
+            colorMapClampColor: Array.from(colorMapClampColorUniform),
             isColorMapClampColorTransparent,
             isClampColor,
             isColoringDiscrete: imageData.isColoringDiscrete,

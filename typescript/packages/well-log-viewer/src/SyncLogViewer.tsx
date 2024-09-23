@@ -427,9 +427,13 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
 
         // const onInfoFilled = this.onInfoFilled.bind(this, iView);
         const onInfoFilled = (infos: Info[]) => {
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             this.props.onInfoFilled?.(iView, infos);
         };
 
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         if (this.props.onInfoFilled) {
             callbackManager.registerCallback("onInfoFilled", onInfoFilled);
         }
@@ -509,6 +513,8 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         iTo: number
     ) {
         this.callbackManagers[iWellLog].onInfo(x, logController, iFrom, iTo);
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         this.props.onInfo?.(iWellLog, x, logController, iFrom, iTo);
 
         this.fillInfo(iWellLog, x, logController, iFrom, iTo);
@@ -541,6 +547,8 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
     onCreateController(iWellLog: number, controller: WellLogController): void {
         this.callbackManagers[iWellLog]?.onCreateController(controller);
         // set callback to component's caller
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         this.props.onCreateController?.(iWellLog, controller);
 
         this.setControllersZoom();
@@ -551,6 +559,8 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         this.controllers[iWellLog] = controller;
     }
     onDeleteController(iWellLog: number, controller: WellLogController): void {
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         this.props.onDeleteController?.(iWellLog, controller);
     }
     // callback function from WellLogView
@@ -569,6 +579,8 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         this.syncContentScrollPos(iWellLog);
         this.syncContentSelection(iWellLog);
 
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         this.props.onContentRescale?.(iWellLog);
     }
     // callback function from WellLogView
@@ -576,6 +588,8 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         this.callbackManagers[iWellLog]?.onContentSelection();
 
         this.syncContentSelection(iWellLog);
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         this.props.onContentSelection?.(iWellLog);
     }
     // callback function from WellLogView
@@ -584,6 +598,8 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
 
         this.syncTemplate(iWellLog);
 
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         this.props.onTemplateChanged?.(iWellLog);
     }
     // callback function from Axis selector
@@ -952,6 +968,8 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                 onInfo={callbacks.onInfoBind}
                 onCreateController={callbacks.onCreateControllerBind}
                 onTrackMouseEvent={
+                    // TODO: Fix this the next time the file is edited.
+                    // eslint-disable-next-line react/prop-types
                     this.props.onTrackMouseEvent || onTrackMouseEventDefault
                 }
                 onTrackScroll={callbacks.onTrackScrollBind}
@@ -1010,6 +1028,8 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                     width={width}
                     patternsTable={this.props.patternsTable}
                     patterns={this.props.patterns}
+                    // TODO: Fix this the next time the file is edited.
+                    // eslint-disable-next-line react/prop-types
                     options={this.props.spacerOptions}
                     horizontal={this.props.horizontal}
                     onCreateSpacer={(spacer: WellLogSpacer): void => {
@@ -1044,6 +1064,8 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                         )}
                     </div>
                 }
+                // TODO: Fix this the next time the file is edited.
+                // eslint-disable-next-line react/prop-types
                 layout={this.props.layout || defaultLayout}
             />
         );

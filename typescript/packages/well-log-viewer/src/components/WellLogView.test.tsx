@@ -5,6 +5,8 @@ import "jest-styled-components";
 import React from "react";
 import WellLogView from "./WellLogView";
 
+// TODO: Fix this the next time the file is edited.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const exampleTemplate = require("../../../../../example-data/welllog_template_1.json");
 const exampleWellLog = {
     header: {},

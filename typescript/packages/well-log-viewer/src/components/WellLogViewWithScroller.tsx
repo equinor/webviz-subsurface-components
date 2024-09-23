@@ -50,24 +50,34 @@ class WellLogViewWithScroller extends Component<WellLogViewWithScrollerProps> {
     // callback function from WellLogView
     onCreateController(controller: WellLogController): void {
         this.controller = controller;
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         this.props.onCreateController?.(controller);
     }
     // callback function from WellLogView
     onTrackScroll(): void {
         this.setScrollerPosAndZoom();
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         this.props.onTrackScroll?.();
     }
     // callback function from WellLogView
     onTrackSelection(): void {
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         this.props.onTrackSelection?.();
     }
     // callback function from WellLogView
     onContentRescale(): void {
         this.setScrollerPosAndZoom();
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         this.props.onContentRescale?.();
     }
     // callback function from WellLogView
     onContentSelection(): void {
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         this.props.onContentSelection?.();
     }
 
@@ -82,8 +92,12 @@ class WellLogViewWithScroller extends Component<WellLogViewWithScrollerProps> {
 
         const controller = this.controller;
         if (!controller) return;
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         const fContent = this.props.horizontal ? x : y; // fraction
         controller.scrollContentTo(fContent);
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         const posTrack = this.calcPosTrack(this.props.horizontal ? y : x);
         controller.scrollTrackTo(posTrack);
     }
@@ -124,12 +138,20 @@ class WellLogViewWithScroller extends Component<WellLogViewWithScrollerProps> {
         } else {
             const contentZoom = controller.getContentZoom();
             const trackZoom = controller.getTrackZoom();
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             xZoom = this.props.horizontal ? contentZoom : trackZoom;
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             yZoom = this.props.horizontal ? trackZoom : contentZoom;
 
             const fContent = this.getContentPosFraction();
             const fTrack = this.getTrackPosFraction();
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             x = this.props.horizontal ? fContent : fTrack;
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             y = this.props.horizontal ? fTrack : fContent;
         }
 
@@ -141,17 +163,29 @@ class WellLogViewWithScroller extends Component<WellLogViewWithScrollerProps> {
             const _x = scroller.getScrollX();
             const _y = scroller.getScrollY();
             const _posTrack = this.calcPosTrack(
+                // TODO: Fix this the next time the file is edited.
+                // eslint-disable-next-line react/prop-types
                 this.props.horizontal ? _y : _x
             );
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             const posTrack = this.calcPosTrack(this.props.horizontal ? y : x);
             if (posTrack === _posTrack) {
                 shouldUpdateScroller--;
+                // TODO: Fix this the next time the file is edited.
+                // eslint-disable-next-line @typescript-eslint/no-unused-expressions, react/prop-types
                 this.props.horizontal ? (y = _y) : (x = _x);
             }
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             const _fContent = this.props.horizontal ? _x : _y;
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             const fContent = this.props.horizontal ? x : y;
             if (Math.abs(fContent - _fContent) < 0.001) {
                 shouldUpdateScroller--;
+                // TODO: Fix this the next time the file is edited.
+                // eslint-disable-next-line @typescript-eslint/no-unused-expressions, react/prop-types
                 this.props.horizontal ? (x = _x) : (y = _y);
             }
         }

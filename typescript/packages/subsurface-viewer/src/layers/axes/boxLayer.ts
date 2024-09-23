@@ -1,6 +1,9 @@
 import type { Color, UpdateParameters } from "@deck.gl/core";
-import { COORDINATE_SYSTEM, Layer, project } from "@deck.gl/core";
+import { COORDINATE_SYSTEM, Layer, project32 } from "@deck.gl/core";
+
+import type { Device } from "@luma.gl/core";
 import { Geometry, Model } from "@luma.gl/engine";
+
 import type { DeckGLLayerContext } from "../../components/Map";
 import type { ExtendedLayerProps } from "../utils/layerTools";
 import fragmentShader from "./axes-fragment.glsl";
@@ -32,14 +35,13 @@ export default class BoxLayer extends Layer<BoxLayerProps> {
         this.setState(this._getModels(context.device));
     }
 
-    //eslint-disable-next-line
-    _getModels(gl: any) {
+    _getModels(device: Device) {
         const color = this.props.color.map((x) => (x ?? 0) / 255);
-        const grids = new Model(gl, {
+        const grids = new Model(device, {
             id: `${this.props.id}-grids`,
             vs: gridVertex,
             fs: fragmentShader,
-            uniforms: { uColor: color },
+            uniforms: { uColor: Array.from(color) },
             geometry: new Geometry({
                 topology: "line-list",
                 attributes: {
@@ -47,7 +49,7 @@ export default class BoxLayer extends Layer<BoxLayerProps> {
                 },
                 vertexCount: this.props.lines.length / 3,
             }),
-            modules: [project],
+            modules: [project32],
             isInstanced: false, // This only works when set to false.
         });
 

@@ -1,6 +1,7 @@
 import type { Color, PickingInfo, UpdateParameters } from "@deck.gl/core";
-import { Layer, picking, project } from "@deck.gl/core";
+import { Layer, picking, project32 } from "@deck.gl/core";
 
+import type { Device } from "@luma.gl/core";
 import { GL } from "@luma.gl/constants";
 import { Geometry, Model } from "@luma.gl/engine";
 
@@ -65,8 +66,7 @@ export default class PieChartLayer extends Layer<PieChartLayerProps<PiesData>> {
         }
     }
 
-    //eslint-disable-next-line
-    getModel(gl: any, pieData: PiesData) {
+    getModel(device: Device, pieData: PiesData) {
         const vertexs: number[] = [];
         const colors: number[] = [];
         const mx: number[] = [];
@@ -150,7 +150,7 @@ export default class PieChartLayer extends Layer<PieChartLayerProps<PiesData>> {
             }
         }
 
-        const model = new Model(gl, {
+        const model = new Model(device, {
             id: `${this.props.id}-pie`,
             vs: vertexShader,
             fs: fragmentShader,
@@ -167,7 +167,7 @@ export default class PieChartLayer extends Layer<PieChartLayerProps<PiesData>> {
                 vertexCount: vertexs.length / 3,
             }),
 
-            modules: [project, picking],
+            modules: [project32, picking],
             isInstanced: false, // This only works when set to false.
         });
 

@@ -48,30 +48,52 @@ export class WellLogInfoPanel extends Component<Props, State> {
     }
 
     componentDidMount(): void {
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         const callbackManager = this.props.callbackManager;
         this.registerCallBacks(callbackManager);
 
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         callbackManager.updateInfo(); // force onInfo callback to be called
     }
 
     componentWillUnmount(): void {
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         const callbackManager = this.props.callbackManager;
         this.unregisterCallBacks(callbackManager);
     }
 
     componentDidUpdate(prevProps: Props /*, prevState: State*/): void {
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         if (prevProps.callbackManager !== this.props.callbackManager) {
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             this.unregisterCallBacks(prevProps.callbackManager);
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             this.registerCallBacks(this.props.callbackManager);
         }
         if (
-            this.props.readoutOptions &&
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
+            this.props.readoutOptions && // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             (!prevProps.readoutOptions ||
-                this.props.readoutOptions.allTracks !==
-                    prevProps.readoutOptions.allTracks ||
-                this.props.readoutOptions.grouping !==
+                // TODO: Fix this the next time the file is edited.
+                // eslint-disable-next-line react/prop-types
+                this.props.readoutOptions.allTracks !== // TODO: Fix this the next time the file is edited.
+                    // eslint-disable-next-line react/prop-types
+                    prevProps.readoutOptions.allTracks || // TODO: Fix this the next time the file is edited.
+                // eslint-disable-next-line react/prop-types
+                this.props.readoutOptions.grouping !== // TODO: Fix this the next time the file is edited.
+                    // eslint-disable-next-line react/prop-types
                     prevProps.readoutOptions.grouping)
         ) {
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             this.props.callbackManager.updateInfo(); // force onInfo callback to be called
         }
     }
@@ -84,6 +106,8 @@ export class WellLogInfoPanel extends Component<Props, State> {
     render(): JSX.Element {
         return (
             <InfoPanel
+                // TODO: Fix this the next time the file is edited.
+                // eslint-disable-next-line react/prop-types
                 header={this.props.header}
                 infos={this.state.infos}
                 onGroupClick={this.onGroupClick}

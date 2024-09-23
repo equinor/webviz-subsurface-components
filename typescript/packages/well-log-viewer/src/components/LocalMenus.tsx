@@ -54,45 +54,73 @@ export class SimpleMenu extends Component<Props, State> {
 
     constructor(props: Props) {
         super(props);
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         this.state = { anchorEl: this.props.anchorEl };
 
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         const wellLogView = this.props.wellLogView;
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         this.addTrack = wellLogView.addTrack.bind(
             wellLogView,
             this.state.anchorEl,
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             this.props.track
         );
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         this.editTrack = wellLogView.editTrack.bind(
             wellLogView,
             this.state.anchorEl,
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             this.props.track
         );
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         this.removeTrack = wellLogView.removeTrack.bind(
             wellLogView,
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             this.props.track
         );
 
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         this.addPlot = wellLogView.addPlot.bind(
             wellLogView,
             this.state.anchorEl,
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             this.props.track
         );
         this.editPlots = editPlots.bind(
             null,
             this.state.anchorEl,
             wellLogView,
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             this.props.track
         );
         this.removePlots = removePlots.bind(
             null,
             this.state.anchorEl,
             wellLogView,
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             this.props.track
         );
     }
     componentDidUpdate(prevProps: Props): void {
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         if (this.props.anchorEl !== prevProps.anchorEl) {
             this.setState((_state, props) => {
+                // TODO: Fix this the next time the file is edited.
+                // eslint-disable-next-line react/prop-types
                 return { anchorEl: props.anchorEl };
             });
         }
@@ -120,8 +148,13 @@ export class SimpleMenu extends Component<Props, State> {
                 key={plot.id}
                 onClick={() =>
                     this.handleClickItem(
+                        // TODO: Fix this the next time the file is edited.
+                        // eslint-disable-next-line react/prop-types
                         this.props.wellLogView.removeTrackPlot.bind(
-                            this.props.wellLogView,
+                            // TODO: Fix this the next time the file is edited.
+                            // eslint-disable-next-line react/prop-types
+                            this.props.wellLogView, // TODO: Fix this the next time the file is edited.
+                            // eslint-disable-next-line react/prop-types
                             this.props.track as GraphTrack,
                             plot
                         )
@@ -135,13 +168,23 @@ export class SimpleMenu extends Component<Props, State> {
 
     menuRemovePlotItems(): ReactNode[] {
         const nodes: ReactNode[] = [];
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         const welllog = this.props.wellLogView.props.welllog;
         if (welllog) {
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             const track = this.props.track;
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             const plots = (track as GraphTrack).plots;
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             const curves = welllog.curves;
             for (const plot of plots) {
                 const iCurve = plot.id as number;
+                // TODO: Fix this the next time the file is edited.
+                // eslint-disable-next-line react/prop-types
                 const title = getPlotTitle(plot) || curves[iCurve].name;
                 nodes.push(this.createRemovePlotMenuItem(title, plot));
             }
@@ -155,9 +198,14 @@ export class SimpleMenu extends Component<Props, State> {
                 key={plot.id}
                 onClick={() =>
                     this.handleClickItem(
+                        // TODO: Fix this the next time the file is edited.
+                        // eslint-disable-next-line react/prop-types
                         this.props.wellLogView.editPlot.bind(
+                            // TODO: Fix this the next time the file is edited.
+                            // eslint-disable-next-line react/prop-types
                             this.props.wellLogView,
-                            this.state.anchorEl,
+                            this.state.anchorEl, // TODO: Fix this the next time the file is edited.
+                            // eslint-disable-next-line react/prop-types
                             this.props.track,
                             plot
                         )
@@ -171,13 +219,23 @@ export class SimpleMenu extends Component<Props, State> {
 
     menuEditPlotItems(): ReactNode[] {
         const nodes: ReactNode[] = [];
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         const welllog = this.props.wellLogView.props.welllog;
         if (welllog) {
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             const track = this.props.track;
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             const plots = (track as GraphTrack).plots;
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             const curves = welllog.curves;
             for (const plot of plots) {
                 const iCurve = plot.id as number;
+                // TODO: Fix this the next time the file is edited.
+                // eslint-disable-next-line react/prop-types
                 const title = getPlotTitle(plot) || curves[iCurve].name;
                 nodes.push(this.createEditPlotMenuItem(title, plot));
             }
@@ -194,6 +252,8 @@ export class SimpleMenu extends Component<Props, State> {
     }
 
     render(): JSX.Element {
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         if (this.props.type == "removePlots") {
             return (
                 <div className="local-menu">
@@ -210,6 +270,8 @@ export class SimpleMenu extends Component<Props, State> {
                 </div>
             );
         }
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         if (this.props.type == "editPlots") {
             return (
                 <div className="local-menu">
@@ -226,6 +288,8 @@ export class SimpleMenu extends Component<Props, State> {
                 </div>
             );
         }
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         if (this.props.type == "title") {
             return (
                 <div className="local-menu">
@@ -246,10 +310,16 @@ export class SimpleMenu extends Component<Props, State> {
 
         // For this.props.type == "legends" or this.props.type == "container"
 
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         const track = this.props.track;
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
         const plots = (track as GraphTrack).plots;
 
         const createMenuItem = (track: GraphTrack): React.ReactNode => {
+            // TODO: Fix this the next time the file is edited.
+            // eslint-disable-next-line react/prop-types
             if ((track as GraphTrack).options.plotFactory) {
                 return [this.createMenuItem("Add plot", this.addPlot)];
             } else if (!isScaleTrack(track)) {
@@ -269,6 +339,8 @@ export class SimpleMenu extends Component<Props, State> {
                     onContextMenu={this.handleContextMenu.bind(this)}
                 >
                     {createMenuItem(track as GraphTrack)}
+                    {/* TODO: Fix this the next time the file is edited. */}
+                    {/* eslint-disable-next-line react/prop-types */}
                     {plots && plots.length
                         ? [
                               this.createMenuItem("Edit plot", this.editPlots),
