@@ -441,8 +441,6 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
             return;
         }
 
-        const { gl } = context;
-
         const models = this.getModels();
         const n = models.length;
 
