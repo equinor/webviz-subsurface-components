@@ -1,3 +1,10 @@
+## [0.30.10](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.30.9...subsurface-viewer@0.30.10) (2024-09-23)
+
+
+### Bug Fixes
+
+* color of undefined value for 3D grids is incorrect ([#2253](https://github.com/equinor/webviz-subsurface-components/issues/2253)) ([d53b213](https://github.com/equinor/webviz-subsurface-components/commit/d53b21345a46fc5105fb8ff81ae7d0ce78f3e40c))
+
 ## [0.30.9](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.30.8...subsurface-viewer@0.30.9) (2024-09-20)
 
 
