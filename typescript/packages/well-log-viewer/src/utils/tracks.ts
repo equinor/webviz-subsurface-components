@@ -374,7 +374,6 @@ function getColorFunction(
         }
         console.log("colorFunctions is not given in getColorFunction()");
     }
-    console.log("colorFunction id='" + id + "' is not given");
     return undefined;
 }
 

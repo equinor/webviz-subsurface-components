@@ -10,3 +10,9 @@ export function isFunction(colorFunction: ColorFunction | undefined): boolean {
     if (!colorFunction) return false;
     return !!(colorFunction as colorFunctionsObj).func;
 }
+
+import PropTypes from "prop-types";
+export const ColorFunctionType = PropTypes.oneOfType([
+    PropTypes.func,
+    PropTypes.object,
+]);

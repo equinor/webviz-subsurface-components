@@ -27,6 +27,7 @@ import { select } from "d3";
 import type { WellLog, WellLogCurve } from "./WellLogTypes";
 import type { Template } from "./WellLogTemplateTypes";
 import type { ColorFunction } from "./ColorTableTypes";
+import { ColorFunctionType } from "./ColorTableTypes";
 import type { PatternsTable } from "../utils/pattern";
 import { isEqualRanges } from "../utils/log-viewer";
 
@@ -2101,32 +2102,32 @@ export function _propTypesWellLogView(): Record<string, unknown> {
         /**
          * An object from JSON file describing well log data
          */
-        welllog: PropTypes.objectOf<WellLog>, //.isRequired,
+        welllog: PropTypes.object /*Of<WellLog>*/.isRequired,
 
         /**
          * Prop containing track template data
          */
-        template: PropTypes.objectOf<Template>, //.isRequired,
+        template: PropTypes.object /*Of<Template>*/.isRequired,
 
         /**
          * Prop containing color function/table table for discrete well logs and gradient fill plots
          */
-        colorFunctions: PropTypes.arrayOf<ColorFunction>, //.isRequired,
+        colorFunctions: PropTypes.arrayOf(ColorFunctionType).isRequired,
 
         /**
          * Well picks data
          */
-        wellpicks: PropTypes.arrayOf<WellPickProps>,
+        wellpicks: PropTypes.array /*Of<WellPickProps>*/,
 
         /**
          * Patterns table
          */
-        patternsTable: PropTypes.objectOf<PatternsTable>,
+        patternsTable: PropTypes.object /*Of<PatternsTable>*/,
 
         /**
          * Horizon to pattern index map
          */
-        patterns: PropTypes.arrayOf<[string, number]>,
+        patterns: PropTypes.array /*Of<[string, number]>*/,
 
         /**
          * Orientation of the track plots on the screen. Default is false
@@ -2141,12 +2142,12 @@ export function _propTypesWellLogView(): Record<string, unknown> {
         /**
          * Log mnemonics for axes
          */
-        axisTitles: PropTypes.objectOf<Record<string, string>>,
+        axisTitles: PropTypes.object /*Of<Record<string, string>>*/,
 
         /**
          * Names for axes
          */
-        axisMnemos: PropTypes.objectOf<Record<string, string>>,
+        axisMnemos: PropTypes.object /*Of<Record<string, string>>*/,
 
         /**
          * Set to true for default title or to some string or JSX.Element
@@ -2154,7 +2155,7 @@ export function _propTypesWellLogView(): Record<string, unknown> {
         viewTitle: PropTypes.oneOfType([
             PropTypes.bool,
             PropTypes.string,
-            PropTypes.object /* react element */,
+            PropTypes.element, //object /* react element */,
         ]),
 
         /**

@@ -15,6 +15,7 @@ import defaultLayout from "./components/DefaultSyncLogViewerLayout";
 import type { WellLog } from "./components/WellLogTypes";
 import type { Template } from "./components/WellLogTemplateTypes";
 import type { ColorFunction } from "./components/ColorTableTypes";
+import { ColorFunctionType } from "./components/ColorTableTypes";
 import type { PatternsTable } from "./utils/pattern";
 
 import type {
@@ -1142,21 +1143,21 @@ SyncLogViewer.propTypes = {
     /**
      * Prop containing color function/table data
      */
-    colorFunctions: PropTypes.arrayOf<ColorFunction>, //.isRequired,
+    colorFunctions: PropTypes.arrayOf(ColorFunctionType).isRequired,
 
     /**
      * Well Picks data array
      */
-    wellpicks: PropTypes.arrayOf<WellPickProps>,
+    wellpicks: PropTypes.array /*Of<WellPickProps>*/,
 
     /**
      * Patterns table
      */
-    patternsTable: PropTypes.objectOf<PatternsTable>,
+    patternsTable: PropTypes.object /*Of<PatternsTable>*/,
     /**
      * Horizon to pattern index map
      */
-    patterns: PropTypes.arrayOf<[string, number]>,
+    patterns: PropTypes.array /*Of<[string, number]>*/,
 
     /**
      * Horizon names for wellpick flatting (pan and zoom)
@@ -1175,7 +1176,7 @@ SyncLogViewer.propTypes = {
     /**
      * Distanses between wells to show on the spacers
      */
-    wellDistances: PropTypes.objectOf<WellDistances>,
+    wellDistances: PropTypes.object /*Of<WellDistances>*/,
 
     /**
      * Orientation of the track plots on the screen. Default is false
@@ -1190,12 +1191,12 @@ SyncLogViewer.propTypes = {
     /**
      * Log mnemonics for axes
      */
-    axisTitles: PropTypes.objectOf<Record<string, string>>,
+    axisTitles: PropTypes.object /*Of<Record<string, string>>*/,
 
     /**
      * Names for axes
      */
-    axisMnemos: PropTypes.objectOf<Record<string, string>>,
+    axisMnemos: PropTypes.object /*Of<Record<string, string>>*/,
 
     /**
      * The maximum zoom value

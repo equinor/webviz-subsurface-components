@@ -9,10 +9,7 @@ import defaultLayout from "./components/DefaultWellLogViewerLayout";
 import WellLogViewWithScroller from "./components/WellLogViewWithScroller";
 import type { WellLogViewWithScrollerProps } from "./components/WellLogViewWithScroller";
 import { argTypesWellLogViewScrollerProp } from "./components/WellLogViewWithScroller";
-import type { ColorFunction } from "./components/ColorTableTypes";
-import type { WellPickProps } from "./components/WellLogView";
-import type { Template } from "./components/WellLogTemplateTypes";
-import type { WellLog } from "./components/WellLogTypes";
+import { ColorFunctionType } from "./components/ColorTableTypes";
 //import { _propTypesWellLogView } from "./components/WellLogView";
 
 import { shouldUpdateWellLogView } from "./components/WellLogView";
@@ -365,17 +362,17 @@ WellLogViewer.propTypes = {
     /**
      * An object from JSON file describing well log data
      */
-    welllog: PropTypes.objectOf<WellLog>, //.isRequired,
+    welllog: PropTypes.object /*Of<WellLog>*/.isRequired,
 
     /**
      * Prop containing track template data
      */
-    template: PropTypes.objectOf<Template>, //.isRequired,
+    template: PropTypes.object /*Of<Template>*/.isRequired,
 
     /**
      * Prop containing color table data
      */
-    colorFunctions: PropTypes.arrayOf<ColorFunction>, //.isRequired,
+    colorFunctions: PropTypes.arrayOf(ColorFunctionType).isRequired,
 
     /**
      * Orientation of the track plots on the screen. Default is false
@@ -395,7 +392,7 @@ WellLogViewer.propTypes = {
     /**
      * Well picks data
      */
-    wellpick: PropTypes.objectOf<WellPickProps>,
+    wellpick: PropTypes.object /*Of<WellPickProps>*/,
 
     /**
      * Primary axis id: " md", "tvd", "time"...
@@ -405,12 +402,12 @@ WellLogViewer.propTypes = {
     /**
      * Log mnemonics for axes
      */
-    axisTitles: PropTypes.objectOf<Record<string, string>>,
+    axisTitles: PropTypes.object /*Of<Record<string, string>>*/,
 
     /**
      * Names for axes
      */
-    axisMnemos: PropTypes.objectOf<Record<string, string>>,
+    axisMnemos: PropTypes.object /*Of<Record<string, string>>*/,
 
     /**
      * Set to true for default titles or to array of individial welllog titles
