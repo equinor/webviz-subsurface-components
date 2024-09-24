@@ -1,3 +1,10 @@
+## [0.30.12](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.30.11...subsurface-viewer@0.30.12) (2024-09-24)
+
+
+### Bug Fixes
+
+* "[NGRM]: zooming using mouse scroll wheel is limited [#2240](https://github.com/equinor/webviz-subsurface-components/issues/2240)" ([#2260](https://github.com/equinor/webviz-subsurface-components/issues/2260)) ([ad379c0](https://github.com/equinor/webviz-subsurface-components/commit/ad379c0baccfae155de1e3998e6d13fade8c8c88))
+
 ## [0.30.11](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.30.10...subsurface-viewer@0.30.11) (2024-09-24)
 
 
