@@ -3,7 +3,7 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 import { combineReducers, createSlice } from "@reduxjs/toolkit";
 import type { DrawMode } from "./types";
 
-export const specSlice: any = createSlice({
+export const specSlice = createSlice({
     name: "spec",
     initialState: {} as Record<string, unknown>,
     reducers: {
