@@ -1857,7 +1857,7 @@
           "name": "discrete",
           "type": "stacked",
           "color": "red",
-          "colorTable": "Stratigraphy"
+          "colorFunction": "Stratigraphy"
         },
         { "name": "categorical", "type": "stacked", "color": "green" }
       ]
@@ -1909,7 +1909,7 @@
           "name": "discrete",
           "type": "stacked",
           "color": "red",
-          "colorTable": "Stratigraphy"
+          "colorFunction": "Stratigraphy"
         },
         { "name": "categorical", "type": "stacked", "color": "green" }
       ]
@@ -1961,13 +1961,13 @@
           "name": "discrete",
           "type": "stacked",
           "color": "red",
-          "colorTable": "Stratigraphy"
+          "colorFunction": "Stratigraphy"
         },
         { "name": "categorical", "type": "stacked", "color": "green" }
       ]
     }
   ],
-  "colorTables": [
+  "colorFunctions": [
     {
       "name": "Physics",
       "discrete": false,
