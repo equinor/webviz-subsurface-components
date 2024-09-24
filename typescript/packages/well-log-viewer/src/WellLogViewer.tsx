@@ -9,6 +9,10 @@ import defaultLayout from "./components/DefaultWellLogViewerLayout";
 import WellLogViewWithScroller from "./components/WellLogViewWithScroller";
 import type { WellLogViewWithScrollerProps } from "./components/WellLogViewWithScroller";
 import { argTypesWellLogViewScrollerProp } from "./components/WellLogViewWithScroller";
+import type { ColorFunction } from "./components/ColorTableTypes";
+import type { WellPickProps } from "./components/WellLogView";
+import type { Template } from "./components/WellLogTemplateTypes";
+import type { WellLog } from "./components/WellLogTypes";
 //import { _propTypesWellLogView } from "./components/WellLogView";
 
 import { shouldUpdateWellLogView } from "./components/WellLogView";
@@ -279,15 +283,9 @@ export default class WellLogViewer extends Component<
                         welllog={this.props.welllog}
                         viewTitle={this.props.viewTitle}
                         template={this.props.template}
-                        // TODO: Fix this the next time the file is edited.
-                        // eslint-disable-next-line react/prop-types
                         colorFunctions={this.props.colorFunctions}
                         wellpick={this.props.wellpick}
-                        // TODO: Fix this the next time the file is edited.
-                        // eslint-disable-next-line react/prop-types
                         patternsTable={this.props.patternsTable}
-                        // TODO: Fix this the next time the file is edited.
-                        // eslint-disable-next-line react/prop-types
                         patterns={this.props.patterns}
                         horizontal={this.props.horizontal}
                         axisTitles={this.props.axisTitles}
@@ -367,17 +365,17 @@ WellLogViewer.propTypes = {
     /**
      * An object from JSON file describing well log data
      */
-    welllog: PropTypes.object.isRequired,
+    welllog: PropTypes.objectOf<WellLog>, //.isRequired,
 
     /**
      * Prop containing track template data
      */
-    template: PropTypes.object.isRequired,
+    template: PropTypes.objectOf<Template>, //.isRequired,
 
     /**
      * Prop containing color table data
      */
-    colorTables: PropTypes.any, //.isRequired,
+    colorFunctions: PropTypes.arrayOf<ColorFunction>, //.isRequired,
 
     /**
      * Orientation of the track plots on the screen. Default is false
@@ -397,7 +395,7 @@ WellLogViewer.propTypes = {
     /**
      * Well picks data
      */
-    wellpick: PropTypes.object,
+    wellpick: PropTypes.objectOf<WellPickProps>,
 
     /**
      * Primary axis id: " md", "tvd", "time"...
@@ -407,12 +405,12 @@ WellLogViewer.propTypes = {
     /**
      * Log mnemonics for axes
      */
-    axisTitles: PropTypes.object,
+    axisTitles: PropTypes.objectOf<Record<string, string>>,
 
     /**
      * Names for axes
      */
-    axisMnemos: PropTypes.object,
+    axisMnemos: PropTypes.objectOf<Record<string, string>>,
 
     /**
      * Set to true for default titles or to array of individial welllog titles

@@ -1156,7 +1156,7 @@ SyncLogViewer.propTypes = {
     /**
      * Horizon to pattern index map
      */
-    patterns: PropTypes.array, // [string, number][];
+    patterns: PropTypes.arrayOf<[string, number]>,
 
     /**
      * Horizon names for wellpick flatting (pan and zoom)
@@ -1190,12 +1190,12 @@ SyncLogViewer.propTypes = {
     /**
      * Log mnemonics for axes
      */
-    axisTitles: PropTypes.object,
+    axisTitles: PropTypes.objectOf<Record<string, string>>,
 
     /**
      * Names for axes
      */
-    axisMnemos: PropTypes.object,
+    axisMnemos: PropTypes.objectOf<Record<string, string>>,
 
     /**
      * The maximum zoom value

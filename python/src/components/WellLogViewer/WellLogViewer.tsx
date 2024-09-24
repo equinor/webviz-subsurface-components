@@ -10,6 +10,7 @@ const WellLogViewerComponent = React.lazy(() =>
 );
 
 import type { ColorFunction } from "../components/ColorTableTypes";
+import type { WellPickProps } from "../components/WellLogView";
 
 // react-docgen / dash-generate-components/extract-meta.js does not properly parse
 // the imported WellLogViewerProps. Hence, we have to recreate them here.
@@ -67,7 +68,7 @@ type WellLogViewerProps = {
     selection?: number[];
 
     /** Well picks data */
-    wellpick?: object;
+    wellpick?: WellPickProps;
 
     /** Primary axis id: " md", "tvd", "time"... */
     primaryAxis?: string;

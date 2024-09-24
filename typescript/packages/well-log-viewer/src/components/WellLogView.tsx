@@ -2101,12 +2101,12 @@ export function _propTypesWellLogView(): Record<string, unknown> {
         /**
          * An object from JSON file describing well log data
          */
-        welllog: PropTypes.object, //.isRequired,
+        welllog: PropTypes.objectOf<WellLog>, //.isRequired,
 
         /**
          * Prop containing track template data
          */
-        template: PropTypes.object.isRequired,
+        template: PropTypes.objectOf<Template>, //.isRequired,
 
         /**
          * Prop containing color function/table table for discrete well logs and gradient fill plots
@@ -2116,17 +2116,17 @@ export function _propTypesWellLogView(): Record<string, unknown> {
         /**
          * Well picks data
          */
-        wellpick: PropTypes.object,
+        wellpicks: PropTypes.arrayOf<WellPickProps>,
 
         /**
          * Patterns table
          */
-        patternsTable: PropTypes.object,
+        patternsTable: PropTypes.objectOf<PatternsTable>,
 
         /**
          * Horizon to pattern index map
          */
-        patterns: PropTypes.array, // [string, number][];
+        patterns: PropTypes.arrayOf<[string, number]>,
 
         /**
          * Orientation of the track plots on the screen. Default is false
@@ -2141,12 +2141,12 @@ export function _propTypesWellLogView(): Record<string, unknown> {
         /**
          * Log mnemonics for axes
          */
-        axisTitles: PropTypes.object,
+        axisTitles: PropTypes.objectOf<Record<string, string>>,
 
         /**
          * Names for axes
          */
-        axisMnemos: PropTypes.object,
+        axisMnemos: PropTypes.objectOf<Record<string, string>>,
 
         /**
          * Set to true for default title or to some string or JSX.Element

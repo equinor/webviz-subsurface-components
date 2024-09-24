@@ -15,11 +15,11 @@ export type CSSColor = string;
 // rgbcolor pattern:  "^rgb\\((25[0-5]|2[0-4][0-9]|1[0-9]?[0-9]?|[1-9][0-9]?|[0-9]), ?(25[0-5]|2[0-4][0-9]|1[0-9]?[0-9]?|[1-9][0-9]?|[0-9]), ?(25[0-5]|2[0-4][0-9]|1[0-9]?[0-9]?|[1-9][0-9]?|[0-9])\\)$"
 
 export type TemplatePlotProps = {
-    type?: TemplatePlotTypes; // should be given or get from a style!
+    type?: TemplatePlotTypes; // should be given or got from a style!
     scale?: TemplatePlotScaleTypes; // 'linear' or 'log', default 'linear'
     domain?: [number, number]; // min, max values
 
-    color?: CSSColor; // color of colorFunction should be given or get from a style!
+    color?: CSSColor; // color of colorFunction should be given or got from a style!
     inverseColor?: CSSColor;
 
     fill?: CSSColor; // for 'area' plot
