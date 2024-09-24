@@ -5,15 +5,15 @@ import React from "react";
 import WellLogViewWithScroller from "./WellLogViewWithScroller";
 import { argTypesWellLogViewScrollerProp } from "./WellLogViewWithScroller";
 import { colorTables } from "@emerson-eps/color-tables";
-import type { ColorTable } from "./components/ColorTableTypes";
-const exampleColorTable = colorTables as ColorTable[];
+import type { ColorFunction } from "./ColorTableTypes";
+const exampleColorFunctions = colorTables as ColorFunction[];
 
 const ComponentCode =
     '<WellLogViewWithScroller id="WellLogViewWithScroller" \r\n' +
     "    horizontal=false \r\n" +
     '    welllog={require("../../../../../example-data/L898MUD.json")[0]} \r\n' +
     '    template={require("../../../../../example-data/welllog_template_1.json")} \r\n' +
-    "    colorTables={exampleColorTable} \r\n" +
+    "    colorFunctions={exampleColorFunctions} \r\n" +
     "/>";
 
 import { axisTitles, axisMnemos } from "../utils/axes";
@@ -55,7 +55,7 @@ const stories: Meta = {
 export default stories;
 
 // @ts-expect-error TS7006
-const Template = (args) => {
+const Template = (args: WellLogViewWithScrollerProps) => {
     return (
         <div
             style={{ height: "92vh", display: "flex", flexDirection: "column" }}
@@ -81,8 +81,7 @@ export const Default: StoryObj<typeof Template> = {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         template: require("../../../../../example-data/welllog_template_1.json"),
         viewTitle: "Well '" + wellLog.header.well + "'",
-        colorTables: exampleColorTable,
-        colorFunctions: [],
+        colorFunctions: exampleColorFunctions,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
         options: {

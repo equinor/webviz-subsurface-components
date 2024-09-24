@@ -275,10 +275,12 @@ export default class WellLogViewer extends Component<
                 parent={this}
                 center={
                     <WellLogViewWithScroller
+                        /* just copy all props without primaryAxis */
                         welllog={this.props.welllog}
                         viewTitle={this.props.viewTitle}
                         template={this.props.template}
-                        colorTables={this.props.colorTables}
+                        // TODO: Fix this the next time the file is edited.
+                        // eslint-disable-next-line react/prop-types
                         colorFunctions={this.props.colorFunctions}
                         wellpick={this.props.wellpick}
                         // TODO: Fix this the next time the file is edited.
@@ -292,8 +294,10 @@ export default class WellLogViewer extends Component<
                         axisMnemos={this.props.axisMnemos}
                         domain={this.props.domain}
                         selection={this.props.selection}
-                        primaryAxis={this.state.primaryAxis}
                         options={this.props.options}
+                        /* end of copy props */
+
+                        primaryAxis={this.state.primaryAxis}
                         // callbacks
                         onInfo={this.onInfo}
                         onCreateController={this.onCreateController}

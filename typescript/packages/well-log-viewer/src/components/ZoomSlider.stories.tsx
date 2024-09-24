@@ -40,8 +40,7 @@ export default stories;
 // @ts-expect-error TS7006
 const Template = (args) => {
     const infoRef = React.useRef();
-    // @ts-expect-error TS7006
-    const setInfo = function (info) {
+    const setInfo = function (info: string) {
         // @ts-expect-error TS2339
         if (infoRef.current) infoRef.current.innerHTML = info;
     };

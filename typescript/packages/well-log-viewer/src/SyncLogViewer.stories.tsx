@@ -2,11 +2,11 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 
-import type { ColorTable } from "./components/ColorTableTypes";
-
 import { colorTables } from "@emerson-eps/color-tables";
-const exampleColorTable = colorTables as ColorTable[];
+import type { ColorFunction } from "./components/ColorTableTypes";
+const exampleColorFunctions = colorTables as ColorFunction[];
 const wellpickColorTable = require("../../../../example-data/wellpick_colors.json"); // eslint-disable-line
+const wellpickColorFunctions = wellpickColorTable as ColorFunction[];
 const wellpick = require("../../../../example-data/wellpicks.json");// eslint-disable-line
 
 import { ToggleButton } from "@mui/material";
@@ -17,6 +17,7 @@ import type {
     WellLogView,
     WellLogController,
     TrackMouseEvent,
+    WellPickProps,
 } from "./components/WellLogView";
 
 const ComponentCode =
@@ -34,7 +35,7 @@ const ComponentCode =
     '       require("../../../../example-data/synclog_template.json"), \r\n' +
     '       require("../../../../example-data/synclog_template.json"), \r\n' +
     "    } \r\n" +
-    "    colorTables={colorTables} \r\n" +
+    "    colorFunctions={colorFunctions} \r\n" +
     "/>";
 
 import type { WellLog } from "./components/WellLogTypes";
@@ -67,8 +68,8 @@ const stories: Meta = {
         templates: {
             description: "Array of track template data.",
         },
-        colorTables: {
-            description: "Prop containing color table data.",
+        colorFunctions: {
+            description: "Prop containing color function/table data.",
         },
         wellpickFlatting: {
             description: "Horizon names for wellpick flatting",
@@ -161,7 +162,7 @@ function fillInfo(controller: WellLogController | undefined) {
 }
 
 // @ts-expect-error TS7006
-const Template = (args) => {
+const Template = (args: SyncLogViewerProps) => {
     const infoRef = React.useRef();
     const setInfo = function (info: string) {
         // @ts-expect-error TS2339
@@ -365,6 +366,27 @@ const patternNamesEnglish = [
     "Vulcanic",
 ];
 
+const exampleWellPicks: WellPickProps[] = [
+    {
+        wellpick: wellpick[0],
+        name: "HORIZON",
+        colorFunctions: wellpickColorFunctions,
+        colorFunction: "Stratigraphy",
+    },
+    {
+        wellpick: wellpick[1],
+        name: "HORIZON",
+        colorFunctions: wellpickColorFunctions,
+        colorFunction: "Stratigraphy",
+    },
+    {
+        wellpick: wellpick[0],
+        name: "HORIZON",
+        colorFunctions: wellpickColorFunctions,
+        colorFunction: "Stratigraphy",
+    },
+];
+
 export const Default: StoryObj<typeof Template> = {
     args: {
         id: "Sync-Log-Viewer",
@@ -383,28 +405,8 @@ export const Default: StoryObj<typeof Template> = {
             require("../../../../example-data/synclog_template.json"), // eslint-disable-line
             require("../../../../example-data/synclog_template.json"), // eslint-disable-line
         ],
-        colorTables: exampleColorTable,
-        colorFunctions: [],
-        wellpicks: [
-            {
-                wellpick: wellpick[0],
-                name: "HORIZON",
-                colorTables: wellpickColorTable,
-                color: "Stratigraphy",
-            },
-            {
-                wellpick: wellpick[1],
-                name: "HORIZON",
-                colorTables: wellpickColorTable, // eslint-disable-line
-                color: "Stratigraphy",
-            },
-            {
-                wellpick: wellpick[0],
-                name: "HORIZON",
-                colorTables: wellpickColorTable, // eslint-disable-line
-                color: "Stratigraphy",
-            },
-        ],
+        colorFunctions: exampleColorFunctions,
+        wellpicks: exampleWellPicks,
         patternsTable: {
             patternSize: 24,
             patternImages: patternImages,

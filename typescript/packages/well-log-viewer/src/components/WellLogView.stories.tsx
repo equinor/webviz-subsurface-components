@@ -4,6 +4,8 @@ import React from "react";
 import WellLogView from "./WellLogView";
 import { argTypesWellLogViewProp } from "./WellLogView";
 import { colorTables } from "@emerson-eps/color-tables";
+import type { ColorFunction } from "./ColorTableTypes";
+const exampleColorFunctions = colorTables as ColorFunction[];
 
 import L898MUD from "../../../../../example-data/L898MUD.json";
 import volve_logs from "../../../../../example-data/volve_logs.json";
@@ -15,7 +17,7 @@ const ComponentCode =
     "    horizontal=false \r\n" +
     '    welllog={require("../../../../../example-data/L898MUD.json")[0]} \r\n' +
     '    template={require("../../../../../example-data/welllog_template_1.json")} \r\n' +
-    "    colorTables={colorTables} \r\n" +
+    "    colorFunctions={exampleColorFunctions} \r\n" +
     "/>";
 
 import { axisTitles, axisMnemos } from "../utils/axes";
@@ -47,7 +49,7 @@ const stories: Meta = {
 export default stories;
 
 // @ts-expect-error TS7006
-const Template = (args) => {
+const Template = (args: WellLogViewerProps) => {
     return (
         <div style={{ height: "92vh" }}>
             <div style={{ width: "100%", height: "100%" }}>
@@ -70,7 +72,7 @@ export const Default: StoryObj<typeof Template> = {
                 <i>Well</i> <b>{welllogDefault.header.well}</b>
             </div>
         ),
-        colorTables: colorTables,
+        colorFunctions: exampleColorFunctions,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
     },
@@ -86,7 +88,7 @@ export const Discrete: StoryObj<typeof Template> = {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         template: require("../../../../../example-data/welllog_template_2.json"),
         viewTitle: "Well '" + welllogDiscrete.header.well + "'",
-        colorTables: colorTables,
+        colorFunctions: exampleColorFunctions,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
         options: {

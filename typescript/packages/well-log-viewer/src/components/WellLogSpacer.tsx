@@ -5,7 +5,7 @@ import type { WellLogController, WellPickProps } from "./WellLogView";
 import { getWellPicks } from "./WellLogView";
 import type WellLogView from "./WellLogView";
 
-import type { ColorTable, ColorFunction } from "./ColorTableTypes";
+import type { ColorFunction } from "./ColorTableTypes";
 import type { PatternsTable } from "../utils/pattern";
 import { createDefs, patternId } from "../utils/pattern";
 
@@ -26,11 +26,7 @@ export interface WellLogSpacerProps {
     controllers: (WellLogController | null)[]; // 2 items
 
     /**
-     * Prop containing color table data.
-     */
-    colorTables: ColorTable[];
-    /**
-     * Prop containing color function table.
+     * Prop containing color function/table data.
      */
     colorFunctions: ColorFunction[];
     /**
@@ -148,10 +144,7 @@ class WellLogSpacer extends Component<WellLogSpacerProps /*, State*/> {
     ): boolean {
         // TODO: Fix this the next time the file is edited.
         // eslint-disable-next-line react/prop-types
-        if (
-            this.props.colorTables !== nextProps.colorTables ||
-            this.props.colorFunctions !== nextProps.colorFunctions
-        ) {
+        if (this.props.colorFunctions !== nextProps.colorFunctions) {
             return true;
         }
         // TODO: Fix this the next time the file is edited.

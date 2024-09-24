@@ -5,7 +5,7 @@ import type { Track, GraphTrack } from "@equinor/videx-wellog";
 
 import type { TemplatePlot, TemplatePlotTypes } from "./WellLogTemplateTypes";
 import type { WellLog } from "./WellLogTypes";
-import type { ColorTable, ColorFunction } from "./ColorTableTypes";
+import type { ColorFunction } from "./ColorTableTypes";
 
 import type WellLogView from "./WellLogView";
 
@@ -89,38 +89,24 @@ export function createBooleanItems(): ReactNode[] {
     return _createItems(booleanItems);
 }
 
-function createColorTableItems(
-    colorTables: ColorTable[],
+function createColorFunctionItems(
     colorFunctions: ColorFunction[]
 ): ReactNode[] {
     const nodes: ReactNode[] = [];
-    if (!colorTables && !colorFunctions) {
+    if (!colorFunctions || !colorFunctions.length) {
         console.error(
-            "colorTables and colorFunctions are missed or empty in createColorTableItems()"
+            "colorFunctions are missed or empty in createColorFunctionItems()"
         );
     } else {
-        if (colorTables)
-            for (const colorTable of colorTables) {
-                if (colorTable.discrete) continue; // skip discrete color tables
-                const name = colorTable.name;
-                if (!name) {
-                    console.error(
-                        "colorTable.name is empty in createColorTableItems()"
-                    );
-                }
-                nodes.push(<option key={name}>{name}</option>);
+        for (const colorFunction of colorFunctions) {
+            const name = colorFunction.name;
+            if (!name) {
+                console.error(
+                    "colorFunction.name is empty in createColorFunctionItems()"
+                );
             }
-        if (colorFunctions)
-            for (const colorFunction of colorFunctions) {
-                let name = colorFunction.name;
-                if (!name) {
-                    console.error(
-                        "colorFunction.name is empty in createColorTableItems()"
-                    );
-                }
-                name = "@" + name; // insert function sign
-                nodes.push(<option key={name}>{name}</option>);
-            }
+            nodes.push(<option key={name}>{name}</option>);
+        }
     }
     return nodes;
 }
@@ -199,6 +185,13 @@ interface State extends TemplatePlot {
     open: boolean;
 }
 
+function templatePlotPlus(templatePlot: TemplatePlot) {
+    return {
+        colorFunction: templatePlot.colorFunction,
+        inverseColorFunction: templatePlot.inverseColorFunction,
+    };
+}
+
 export class PlotPropertiesDialog extends Component<Props, State> {
     constructor(props: Props) {
         super(props);
@@ -217,6 +210,7 @@ export class PlotPropertiesDialog extends Component<Props, State> {
         this.state = templatePlot
             ? {
                   ...templatePlot,
+                  ...templatePlotPlus(templatePlot),
 
                   open: true,
               }
@@ -235,13 +229,10 @@ export class PlotPropertiesDialog extends Component<Props, State> {
                   inverseColor: "",
 
                   // for 'gradientfill' plot
-                  colorTable:
+                  colorFunction:
                       // TODO: Fix this the next time the file is edited.
                       // eslint-disable-next-line react/prop-types
-                      this.props.wellLogView.props.colorTables?.[0]?.name,
-                  colorFunction:
                       this.props.wellLogView.props.colorFunctions?.[0]?.name,
-                  inverseColorTable1: undefined,
                   inverseColorFunction: undefined,
                   colorScale: undefined,
                   inverseColorScale: undefined,
@@ -368,20 +359,19 @@ export class PlotPropertiesDialog extends Component<Props, State> {
         } else if (type === "gradientfill") {
             // TODO: Fix this the next time the file is edited.
             // eslint-disable-next-line react/prop-types
-            const colorTables = this.props.wellLogView.props.colorTables;
             const colorFunctions = this.props.wellLogView.props.colorFunctions;
             return [
                 this.createSelectControl(
-                    "colorTable",
+                    "colorFunction",
                     "Fill Color table",
-                    createColorTableItems(colorTables, colorFunctions)
+                    createColorFunctionItems(colorFunctions)
                 ),
                 <FormControl fullWidth key="211" />,
                 <FormControl fullWidth key="212" />,
                 this.createSelectControl(
-                    "inverseColorTable",
+                    "inverseColorFunction",
                     "Inverse Color table",
-                    createColorTableItems(colorTables, colorFunctions),
+                    createColorFunctionItems(colorFunctions),
                     true
                 ),
             ];

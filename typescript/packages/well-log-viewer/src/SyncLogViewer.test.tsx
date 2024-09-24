@@ -6,8 +6,8 @@ import React from "react";
 import SyncLogViewer from "./SyncLogViewer";
 import { axisMnemos, axisTitles } from "./utils/axes";
 
-import type { ColorTable } from "./components/ColorTableTypes";
-const exampleColorTable = colorTables as unknown as ColorTable[]; // equivalent types, should be merged
+import type { ColorFunction } from "./components/ColorTableTypes";
+const exampleColorFunction = colorTables as unknown as ColorFunction[];
 // TODO: Fix this the next time the file is edited.
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const exampleWellLog = require("../../../../example-data/L898MUD.json")[0];
@@ -37,8 +37,7 @@ describe("Sync Log Viewer", () => {
                 axisMnemos={axisMnemos}
                 welllogs={[exampleWellLog]} // the same log for all wellog viewers
                 templates={[exampleTemplate]} // the same template for all wellog viewers
-                colorTables={exampleColorTable} // the same colortables for all wellog viewers
-                colorFunctions={[]} // not used
+                colorFunctions={exampleColorFunction} // the same colortables for all wellog viewers
             />
         );
         expect(container.firstChild).toMatchSnapshot();

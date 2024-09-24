@@ -4,9 +4,9 @@ import { render } from "@testing-library/react";
 import "jest-styled-components";
 import React from "react";
 import WellLogViewWithScroller from "./WellLogViewWithScroller";
-import type { ColorTable } from "./components/ColorTableTypes";
 
-const exampleColorTable = colorTables as ColorTable[];
+import type { ColorFunction } from "./ColorTableTypes";
+const exampleColorFunctions = colorTables as ColorFunction[];
 
 // TODO: Fix this the next time the file is edited.
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -29,8 +29,7 @@ describe("Test Well Log View Component with Scroller", () => {
             <WellLogViewWithScroller
                 welllog={welllog}
                 template={template}
-                colorTables={exampleColorTable}
-                colorFunctions={[]}
+                colorFunctions={exampleColorFunctions}
                 primaryAxis={"md"}
                 axisTitles={{
                     md: "MD",

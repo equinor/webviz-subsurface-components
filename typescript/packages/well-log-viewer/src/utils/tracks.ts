@@ -302,7 +302,7 @@ function getTemplatePlotProps(
             options.fillOpacity = 0.0;
         }
     } else if (options.type === "gradientfill") {
-        if (!options.colorTable && !options.colorFunction) {
+        if (!options.colorFunction) {
             //options.fill = generateColor();
             options.fillOpacity = 0.0;
         }
@@ -349,10 +349,10 @@ function makeDataAccessor2(iData: number, iData2: number) {
     return _dataAccessor.dataAccessor.bind(_dataAccessor);
 }
 
-import type { ColorTable, ColorFunction } from "../components/ColorTableTypes";
+import type { ColorFunction } from "../components/ColorTableTypes";
 
-const defColorTable: ColorTable = {
-    name: "not found",
+const defColorFunction: ColorFunction = {
+    name: "Not found",
     discrete: false,
     colors: [
         [0.0, 1.0, 0.0, 0.0],
@@ -361,57 +361,30 @@ const defColorTable: ColorTable = {
     ],
 };
 
-function getColorTable(
-    id: string | undefined,
-    colorTables: ColorTable[] | undefined
-): ColorTable | undefined {
-    if (id && typeof id !== "string") {
-        console.log("colorTable id='" + id + "' is not string");
-        return defColorTable;
-    }
-    if (id && colorTables) {
-        const colorTable = colorTables.find((value) => value.name === id);
-        if (colorTable) return colorTable;
-        console.error(
-            "colorTable id='" + id + "' is not found in getColorTable()"
-        );
-        return defColorTable;
-    }
-    if (id && !colorTables)
-        console.log("colorTables is not given in getColorTable()");
-    return undefined; //defColorTable;
-}
-
 function getColorFunction(
-    id: string,
+    id: string | undefined,
     colorFunctions: ColorFunction[] | undefined
 ): ColorFunction | undefined {
-    if (id && typeof id !== "string") {
-        console.log("colorFunction id='" + id + "' is not string");
-        return undefined;
-    }
-    if (id && colorFunctions) {
-        const colorFunction = colorFunctions.find((value) => value.name === id);
-        if (colorFunction) return colorFunction;
-        console.error(
-            "colorFunction id='" + id + "' is not found in getColorFunction()"
-        );
-        return undefined;
-    }
-    if (id && !colorFunctions)
+    if (id) {
+        if (typeof id !== "string") {
+            console.log("colorFunction id='" + id + "' is not a string");
+            return defColorFunction;
+        }
+        if (colorFunctions) {
+            const colorFunction = colorFunctions.find(
+                (value) => value.name === id
+            );
+            if (colorFunction) return colorFunction;
+            console.error(
+                "colorFunction id='" +
+                    id +
+                    "' is not found in getColorFunction()"
+            );
+            return defColorFunction;
+        }
         console.log("colorFunctions is not given in getColorFunction()");
-    return undefined; //defColorTable;
-}
-
-function getColorTableOrFunction(
-    idTable: string | undefined,
-    colorTables: ColorTable[] | undefined,
-    idFunction: string | undefined,
-    colorFunctions: ColorFunction[] | undefined
-): ColorTable | ColorFunction | undefined {
-    if (idTable) return getColorTable(idTable, colorTables);
-    if (idFunction) return getColorFunction(idFunction, colorFunctions);
-    return undefined;
+    }
+    return defColorFunction;
 }
 
 function getPlotOptions(
@@ -422,7 +395,6 @@ function getPlotOptions(
     iPlot: number,
     curve2: WellLogCurve | undefined, //"differential" plot
     iPlot2: number, //"differential" plot
-    colorTables?: ColorTable[], //"gradientfill" plot
     colorFunctions?: ColorFunction[] //"gradientfill" plot
 ): ExtPlotOptions {
     const scale = templatePlotProps.scale || trackScale || "linear"; //"linear" or "log"
@@ -452,15 +424,11 @@ function getPlotOptions(
         useMinAsBase: true, // for 'area' and 'gradientfill'!
 
         //GradientFillPlotOptions
-        colorTableOrFunction: getColorTableOrFunction(
-            templatePlotProps.colorTable,
-            colorTables,
+        colorFunction: getColorFunction(
             templatePlotProps.colorFunction,
             colorFunctions
         ),
-        inverseColorTableOrFunction: getColorTableOrFunction(
-            templatePlotProps.inverseColorTable1,
-            colorTables,
+        inverseColorFunction: getColorFunction(
             templatePlotProps.inverseColorFunction,
             colorFunctions
         ),
@@ -511,7 +479,6 @@ function getPlotConfig(
     iPlot: number,
     curve2: WellLogCurve | undefined,
     iPlot2: number,
-    colorTables: ColorTable[] | undefined,
     colorFunctions: ColorFunction[] | undefined
 ): PlotConfig {
     return {
@@ -525,7 +492,6 @@ function getPlotConfig(
             iPlot,
             curve2,
             iPlot2,
-            colorTables,
             colorFunctions
         ),
     };
@@ -658,7 +624,6 @@ function addGraphTrackPlot(
         const plotDatas = track.options.data;
         const plots = track.plots;
 
-        const colorTables = wellLogView.props.colorTables;
         const colorFunctions = wellLogView.props.colorFunctions;
 
         let iCurve2 = -1;
@@ -692,7 +657,6 @@ function addGraphTrackPlot(
             plotDatas.length,
             curve2,
             plotDatas.length + 1,
-            colorTables,
             colorFunctions
         );
 
@@ -760,7 +724,6 @@ function editGraphTrackPlot(
         const plotDatas = track.options.data;
         const plots = track.plots;
 
-        const colorTables = wellLogView.props.colorTables;
         const colorFunctions = wellLogView.props.colorFunctions;
 
         let iCurve2 = -1;
@@ -794,7 +757,6 @@ function editGraphTrackPlot(
             plotDatas.length,
             curve2,
             plotDatas.length + 1,
-            colorTables,
             colorFunctions
         );
 
@@ -928,7 +890,7 @@ const mapStringToNum = new Map();
 
 export function getDiscreteColorAndName(
     value: number | string | null,
-    colorTableOrFunction: ColorTable | ColorFunction | undefined,
+    colorFunction: ColorFunction | undefined,
     meta?: DiscreteMeta | null
 ): { color: number[]; name: string } {
     let color: number[];
@@ -938,7 +900,7 @@ export function getDiscreteColorAndName(
         // use discrete metadata from WellLog JSON file
         const { objects, iColor, iCode } = meta;
         let object: [] | undefined = undefined;
-        if (typeof value == "string") {
+        if (typeof value === "string") {
             // value is key
             name = value;
             object = objects[value];
@@ -956,10 +918,10 @@ export function getDiscreteColorAndName(
             }
         }
         /*if(object)*/ {
-            if (colorTableOrFunction) {
+            if (colorFunction) {
                 // get color from the table
                 color = getInterpolatedColor(
-                    colorTableOrFunction,
+                    colorFunction,
                     !object
                         ? Number.NaN
                         : // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -972,7 +934,7 @@ export function getDiscreteColorAndName(
         }
     } else {
         name = value.toString();
-        if (colorTableOrFunction) {
+        if (colorFunction) {
             // get color from the table
             if (typeof value == "string") {
                 let v: number;
@@ -983,10 +945,10 @@ export function getDiscreteColorAndName(
                     v = iStringToNum;
                     iStringToNum++;
                 }
-                color = getInterpolatedColor(colorTableOrFunction, v);
+                color = getInterpolatedColor(colorFunction, v);
             } else {
                 color = getInterpolatedColor(
-                    colorTableOrFunction,
+                    colorFunction,
                     parseInt(value.toString())
                 );
             }
@@ -1002,14 +964,10 @@ function createAreaData(
     from: number,
     to: number,
     value: number | string,
-    colorTableOrFunction: ColorTable | ColorFunction | undefined,
+    colorFunction: ColorFunction | undefined,
     meta?: DiscreteMeta | null
 ): AreaData | null {
-    const { color, name } = getDiscreteColorAndName(
-        value,
-        colorTableOrFunction,
-        meta
-    );
+    const { color, name } = getDiscreteColorAndName(value, colorFunction, meta);
     return {
         from: from,
         to: to,
@@ -1025,7 +983,7 @@ function createAreaData(
 
 async function createStackData(
     data: [number | null, number | string | null][],
-    colorTableOrFunction: ColorTable | ColorFunction | undefined,
+    colorFunction: ColorFunction | undefined,
     meta: DiscreteMeta | undefined | null
 ) {
     const arr: AreaData[] = new Array<AreaData>();
@@ -1068,13 +1026,7 @@ async function createStackData(
         if (!area && value !== null && value !== undefined && p[0] !== null) {
             // new value is not null
             // create new interval colored and labeled for the value
-            area = createAreaData(
-                boundary,
-                p[0],
-                value,
-                colorTableOrFunction,
-                meta
-            );
+            area = createAreaData(boundary, p[0], value, colorFunction, meta);
         }
         prev = p;
     }
@@ -1265,7 +1217,6 @@ function addGraphTrack(
     iPrimaryAxis: number,
     templateTrack: TemplateTrack,
     templateStyles: TemplateStyle[] | undefined,
-    colorTables: ColorTable[] | undefined,
     colorFunctions: ColorFunction[] | undefined
 ): void {
     const plotDatas: [number | null, number | string | null][][] = [];
@@ -1320,7 +1271,6 @@ function addGraphTrack(
                 plotDatas.length,
                 curve2,
                 plotDatas.length + 1,
-                colorTables,
                 colorFunctions
             );
 
@@ -1353,7 +1303,6 @@ function addStackedTrack(
     iPrimaryAxis: number,
     templateTrack: TemplateTrack,
     templateStyles?: TemplateStyle[],
-    colorTables?: ColorTable[],
     colorFunctions?: ColorFunction[],
     showLines?: boolean,
     showLabels?: boolean,
@@ -1393,38 +1342,22 @@ function addStackedTrack(
                 "' not found. Use default"
         );
 
-    let colorTableOrFunction: ColorTable | ColorFunction | undefined =
-        undefined;
-    if (templatePlotProps.colorTable || templatePlotProps.colorFunction) {
-        if (colorTables) {
-            colorTableOrFunction = colorTables.find(
-                (colorTable) => colorTable.name == templatePlotProps.colorTable
-            );
-            if (!colorTableOrFunction)
-                console.error(
-                    "Missed '" + templatePlotProps.colorTable + "' color table"
-                );
-        } else {
-            console.error(
-                "No color tables file given for '" +
-                    templatePlotProps.colorTable +
-                    "' color table"
-            );
-        }
+    let colorFunction: ColorFunction | undefined = undefined;
+    if (templatePlotProps.colorFunction) {
         if (colorFunctions) {
-            colorTableOrFunction = colorFunctions.find(
-                (colorTable) =>
-                    colorTable.name == templatePlotProps.colorFunction
+            colorFunction = colorFunctions.find(
+                (colorFunction) =>
+                    colorFunction.name == templatePlotProps.colorFunction
             );
-            if (!colorTableOrFunction)
+            if (!colorFunction)
                 console.error(
                     "Missed '" +
                         templatePlotProps.colorFunction +
-                        "' color function"
+                        "' color function/table"
                 );
         } else {
             console.error(
-                "No color function array given for '" +
+                "No color function/table array given for '" +
                     templatePlotProps.colorFunction +
                     "' color function"
             );
@@ -1432,7 +1365,9 @@ function addStackedTrack(
     } else {
         if (!meta)
             // see https://github.com/equinor/webviz-subsurface-components/issues/1613
-            console.error("No color table given in template plot props");
+            console.error(
+                "No color function/table given in template plot props"
+            );
     }
 
     const plot = templateTrackFullPlot.plots[0];
@@ -1445,12 +1380,7 @@ function addStackedTrack(
     const options: StackedTrackOptions = {
         abbr: name, // name of the only plot
         legendConfig: stackLegendConfig,
-        data: createStackData.bind(
-            null,
-            plotData.data,
-            colorTableOrFunction,
-            meta
-        ),
+        data: createStackData.bind(null, plotData.data, colorFunction, meta),
     };
     setStackedTrackOptionsFromTemplate(options, templateTrackFullPlot);
     const track = newStackedTrack(options);
@@ -1477,7 +1407,6 @@ export function createTracks(
     axes: AxesInfo,
     templateTracks: TemplateTrack[], // Part of JSON
     templateStyles?: TemplateStyle[], // Part of JSON
-    colorTables?: ColorTable[], // JSON
     colorFunctions?: ColorFunction[] // JS code
 ): TracksInfo {
     const info = new TracksInfo();
@@ -1507,7 +1436,6 @@ export function createTracks(
                         iPrimaryAxis,
                         templateTrack,
                         templateStyles,
-                        colorTables,
                         colorFunctions,
                         templatePlotProps.showLines,
                         templatePlotProps.showLabels,
@@ -1522,7 +1450,6 @@ export function createTracks(
                         iPrimaryAxis,
                         templateTrack,
                         templateStyles,
-                        colorTables,
                         colorFunctions
                     );
                 }
@@ -1638,16 +1565,9 @@ export function addOrEditStackedTrack(
         templateStyles
     );
 
-    let colorTableOrFunction: ColorTable | ColorFunction | undefined;
-    if (templatePlotProps.colorTable)
-        colorTableOrFunction = props.colorTables.find(
-            (colorTable) => colorTable.name == templatePlotProps.colorTable
-        );
-    else if (!colorTableOrFunction && props.colorFunctions)
-        colorTableOrFunction = props.colorFunctions.find(
-            (colorFunction) =>
-                colorFunction.name == templatePlotProps.colorFunction
-        );
+    const colorFunction = props.colorFunctions?.find(
+        (colorFunction) => colorFunction.name == templatePlotProps.colorFunction
+    );
     const meta = getDiscreteMeta(welllog, name);
     const data = welllog.data;
     const curves = welllog.curves;
@@ -1661,7 +1581,7 @@ export function addOrEditStackedTrack(
     const stackData = createStackData.bind(
         null,
         plotData.data,
-        colorTableOrFunction,
+        colorFunction,
         meta
     );
     if (track) {

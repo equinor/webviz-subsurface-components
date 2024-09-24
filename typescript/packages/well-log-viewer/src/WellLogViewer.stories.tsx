@@ -30,7 +30,7 @@ const welllogs = welllogsJson as unknown as WellLog[];
 import templateJson from "../../../../example-data/welllog_template_2.json";
 const template = templateJson as unknown as Template;
 
-import type { ColorTable, ColorFunction } from "./components/ColorTableTypes";
+import type { ColorFunction } from "./components/ColorTableTypes";
 
 import type { MapMouseEvent } from "@webviz/subsurface-viewer/dist/components/Map";
 
@@ -49,29 +49,28 @@ import { isEqualRanges } from "./utils/log-viewer";
 import { CallbackManager } from "./components/CallbackManager";
 
 import colorTables from "../../../../example-data/wellpick_colors.json";
-const exampleColorTable = colorTables as ColorTable[];
-
 const exampleColorFunctions: ColorFunction[] = [
+    // copy color tables and add some color functions
+    ...(colorTables as ColorFunction[]),
     {
-        name: "Gray func",
+        name: "Grey scale",
         func: (v: number) => [v * 255, v * 255, v * 255],
     },
     {
-        name: "Red func",
+        name: "Red scale",
         func: (v: number) => [v * 255, 0, 0],
     },
     {
-        name: "Green func",
+        name: "Green scale",
         func: (v: number) => [0, v * 255, 0],
     },
     {
-        name: "Blue func",
+        name: "Blue scale",
         func: (v: number) => [0, 0, v * 255],
     },
     {
         name: "Step func",
-        func: (v: number) =>
-            v < 0.5 ? [v * 255, 0, 0] : [0, v * 255, v * 255],
+        func: (v: number) => (v < 0.5 ? [255, 0, 0] : [0, 255, 255]),
     },
 ];
 import wellPicks from "../../../../example-data/wellpicks.json";
@@ -85,7 +84,7 @@ const ComponentCode =
     "    horizontal=false \r\n" +
     '    welllog={require("../../../../example-data/L898MUD.json")[0]} \r\n' +
     '    template={require("../../../../example-data/welllog_template_1.json")} \r\n' +
-    "    colorTables={exampleColorTable} \r\n" +
+    "    colorFunctions={exampleColorFunctions} \r\n" +
     "/>";
 
 const stories: Meta = {
@@ -215,16 +214,16 @@ const StoryTemplate = (args: WellLogViewerProps) => {
 const wellpick = {
     wellpick: wellPicks[0],
     name: "HORIZON",
-    colorTables: exampleColorTable,
+    colorFunctions: exampleColorFunctions,
     color: "Stratigraphy",
 };
 
-function getTemplatePlotColorTable(
+function getTemplatePlotColorFunction(
     template: Template,
     templatePlot: TemplatePlot
 ) {
-    let colorTable = templatePlot.colorTable;
-    if (!colorTable && templatePlot.style) {
+    let colorFunction = templatePlot.colorFunction;
+    if (!colorFunction && templatePlot.style) {
         const templateStyles = template.styles;
         if (templateStyles) {
             const iStyle = indexOfElementByName(
@@ -233,11 +232,11 @@ function getTemplatePlotColorTable(
             );
             if (iStyle >= 0) {
                 const style = templateStyles[iStyle];
-                colorTable = style.colorTable;
+                colorFunction = style.colorFunction;
             }
         }
     }
-    return colorTable;
+    return colorFunction;
 }
 
 interface Props extends SubsurfaceViewerProps {
@@ -305,9 +304,7 @@ export const Default: StoryObj<typeof StoryTemplate> = {
         horizontal: false,
         welllog: require("../../../../example-data/L898MUD.json")[0], // eslint-disable-line
         template: require("../../../../example-data/welllog_template_1.json"), // eslint-disable-line
-        // @ts-expect-error TS2322
-        colorTables: exampleColorTable,
-        colorFunctions: [],
+        colorFunctions: exampleColorFunctions,
         // @ts-expect-error TS2322
         wellpick: wellpick,
         axisTitles: axisTitles,
@@ -352,14 +349,13 @@ export const ColorByFunction: StoryObj<typeof StoryTemplate> = {
             styles: [
                 {
                     name: "HKL",
-                    type: "gradientfill", // Is this the correct type for using color function?
+                    type: "gradientfill",
                     colorFunction: "Step func",
+                    inverseColorFunction: "Grey scale",
                     color: "green",
                 },
             ],
         },
-        // @ts-expect-error TS2322
-        colorTables: exampleColorTable,
         colorFunctions: exampleColorFunctions,
         // @ts-expect-error TS2322
         wellpick: wellpick,
@@ -385,8 +381,7 @@ export const Horizontal: StoryObj<typeof StoryTemplate> = {
         welllog:
             require("../../../../example-data/WL_RAW_AAC-BHPR-CAL-DEN-GR-MECH-NEU-NMR-REMP_MWD_3.json")[0], // eslint-disable-line
         template: require("../../../../example-data/welllog_template_2.json"), // eslint-disable-line
-        // @ts-expect-error TS2322
-        colorTables: exampleColorTable,
+        colorFunctions: exampleColorFunctions,
         // @ts-expect-error TS2322
         wellpick: wellpick,
         axisTitles: axisTitles,
@@ -410,11 +405,8 @@ export const OnInfoFilledEvent: StoryObj<typeof StoryTemplate> = {
         welllog:
             require("../../../../example-data/WL_RAW_AAC-BHPR-CAL-DEN-GR-MECH-NEU-NMR-REMP_MWD_3.json")[0], // eslint-disable-line
         template: require("../../../../example-data/welllog_template_2.json"), // eslint-disable-line
-
+        colorFunctions: exampleColorFunctions,
         // @ts-expect-error TS2322
-        colorTables: exampleColorTable,
-        // @ts-expect-error TS2322
-
         wellpick: wellpick,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
@@ -587,7 +579,7 @@ class MapAndWellLogViewer extends React.Component<Props, State> {
                         wells_layer["logName"] !== templatePlot.name
                     ) {
                         wells_layer["logName"] = templatePlot.name;
-                        const colorTable = getTemplatePlotColorTable(
+                        const colorTable = getTemplatePlotColorFunction(
                             template,
                             templatePlot
                         );
@@ -770,9 +762,11 @@ class MapAndWellLogViewer extends React.Component<Props, State> {
                                     : undefined
                             }
                             template={template}
-                            // TODO: Fix this the next time the file is edited.
-                            // eslint-disable-next-line react/prop-types
-                            colorTables={this.props.colorTables as ColorTable[]}
+                            colorFunctions={
+                                // TODO: Fix this the next time the file is edited.
+                                // eslint-disable-next-line react/prop-types
+                                this.props.colorTables as ColorFunction[]
+                            }
                             // @aspentech: This issue needs to get sorted out, there seems to be a compatibility issue with the JSON file and the prop type
                             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                             // @ts-ignore
@@ -825,8 +819,7 @@ export const Discrete: StoryObj<typeof StoryTemplate> = {
         horizontal: false,
         welllog: require("../../../../example-data/volve_logs.json")[0], // eslint-disable-line
         template: require("../../../../example-data/welllog_template_2.json"), // eslint-disable-line
-        // @ts-expect-error TS2322
-        colorTables: colorTables,
+        colorFunctions: exampleColorFunctions,
         // @ts-expect-error TS2322
         wellpick: wellpick,
         axisTitles: axisTitles,
