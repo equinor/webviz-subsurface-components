@@ -996,8 +996,29 @@ type ViewControllerFullState = ViewControllerState & ViewControllerDerivedState;
 class ViewController {
     private rerender_: React.DispatchWithoutAction;
 
-    private derivedState_: ViewControllerDerivedState;
-    private state_: ViewControllerFullState;
+    private derivedState_: ViewControllerDerivedState = {
+        scaledCameraClone: undefined,
+        eventTarget: undefined,
+        readyForInteraction: false,
+        viewStateChanged: false,
+    };
+
+    private state_: ViewControllerFullState = {
+        triggerHome: undefined,
+        camera: undefined,
+        bounds: undefined,
+        boundingBox3d: undefined,
+        deckSize: { width: 0, height: 0 },
+        zScale: 1,
+        viewPortMargins: {
+            left: 0,
+            right: 0,
+            top: 0,
+            bottom: 0,
+        },
+        // Derived state
+        ...this.derivedState_,
+    };
 
     private views_: ViewsType | undefined = undefined;
     private result_: {
@@ -1010,30 +1031,6 @@ class ViewController {
 
     public constructor(rerender: React.DispatchWithoutAction) {
         this.rerender_ = rerender;
-
-        this.derivedState_ = {
-            scaledCameraClone: undefined,
-            eventTarget: undefined,
-            readyForInteraction: false,
-            viewStateChanged: false,
-        };
-
-        this.state_ = {
-            triggerHome: undefined,
-            camera: undefined,
-            bounds: undefined,
-            boundingBox3d: undefined,
-            deckSize: { width: 0, height: 0 },
-            zScale: 1,
-            viewPortMargins: {
-                left: 0,
-                right: 0,
-                top: 0,
-                bottom: 0,
-            },
-            // Derived state
-            ...this.derivedState_,
-        };
     }
 
     /**
