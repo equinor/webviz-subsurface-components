@@ -1,6 +1,6 @@
 {
     "name": "@webviz/well-log-viewer",
-    "version": "1.13.5",
+    "version": "1.13.6",
     "description": "",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
