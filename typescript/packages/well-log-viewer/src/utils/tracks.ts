@@ -351,16 +351,6 @@ function makeDataAccessor2(iData: number, iData2: number) {
 
 import type { ColorFunction } from "../components/ColorTableTypes";
 
-const defColorFunction: ColorFunction = {
-    name: "Not found",
-    discrete: false,
-    colors: [
-        [0.0, 1.0, 0.0, 0.0],
-        [0.5, 0.5, 0.0, 0.0],
-        [1.0, 1.0, 0.0, 0.0],
-    ],
-};
-
 function getColorFunction(
     id: string | undefined,
     colorFunctions: ColorFunction[] | undefined
@@ -368,7 +358,7 @@ function getColorFunction(
     if (id) {
         if (typeof id !== "string") {
             console.log("colorFunction id='" + id + "' is not a string");
-            return defColorFunction;
+            return undefined;
         }
         if (colorFunctions) {
             const colorFunction = colorFunctions.find(
@@ -380,11 +370,12 @@ function getColorFunction(
                     id +
                     "' is not found in getColorFunction()"
             );
-            return defColorFunction;
+            return undefined;
         }
         console.log("colorFunctions is not given in getColorFunction()");
     }
-    return defColorFunction;
+    console.log("colorFunction id='" + id + "' is not given");
+    return undefined;
 }
 
 function getPlotOptions(
@@ -483,7 +474,8 @@ function getPlotConfig(
 ): PlotConfig {
     return {
         id: id,
-        type: templatePlotProps.type,
+        type:
+            templatePlotProps.type === undefined ? "" : templatePlotProps.type,
         options: getPlotOptions(
             templatePlotProps,
             trackScale,
@@ -1406,8 +1398,8 @@ export function createTracks(
     welllog: WellLog | undefined,
     axes: AxesInfo,
     templateTracks: TemplateTrack[], // Part of JSON
-    templateStyles?: TemplateStyle[], // Part of JSON
-    colorFunctions?: ColorFunction[] // JS code
+    templateStyles: TemplateStyle[] | undefined, // Part of JSON
+    colorFunctions: ColorFunction[] // JS code or JSON color table
 ): TracksInfo {
     const info = new TracksInfo();
     if (welllog) {

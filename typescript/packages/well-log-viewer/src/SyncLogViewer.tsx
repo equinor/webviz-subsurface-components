@@ -60,6 +60,11 @@ export function isEqualArrays(
     return true;
 }
 
+export type WellDistances = {
+    units: string;
+    distances: (number | undefined)[];
+};
+
 export interface SyncLogViewerProps {
     /**
      * Object from JSON file describing single well log data.
@@ -107,10 +112,7 @@ export interface SyncLogViewerProps {
     /**
      * Distanses between wells to show on the spacers
      */
-    wellDistances?: {
-        units: string;
-        distances: (number | undefined)[];
-    };
+    wellDistances?: WellDistances;
 
     /**
      * Orientation of the track plots on the screen.
@@ -1140,17 +1142,17 @@ SyncLogViewer.propTypes = {
     /**
      * Prop containing color function/table data
      */
-    colorFunctions: PropTypes.array.isRequired,
+    colorFunctions: PropTypes.arrayOf<ColorFunction>, //.isRequired,
 
     /**
      * Well Picks data array
      */
-    wellpicks: PropTypes.array,
+    wellpicks: PropTypes.arrayOf<WellPickProps>,
 
     /**
      * Patterns table
      */
-    patternsTable: PropTypes.object,
+    patternsTable: PropTypes.objectOf<PatternsTable>,
     /**
      * Horizon to pattern index map
      */
@@ -1173,7 +1175,7 @@ SyncLogViewer.propTypes = {
     /**
      * Distanses between wells to show on the spacers
      */
-    wellDistances: PropTypes.object,
+    wellDistances: PropTypes.objectOf<WellDistances>,
 
     /**
      * Orientation of the track plots on the screen. Default is false

@@ -619,7 +619,7 @@ const TemplateWithSelection = (args: { welllogs: WellLog[] }) => {
                 {/*
                  // @ts-expect-error TS2739 */}
                 <SyncLogViewer
-                    id="SyncLogViewer"
+                    id="SyncLogViewer2"
                     {...argsWithSelection}
                     onCreateController={onCreateController}
                     onDeleteController={onDeleteController}

@@ -34,7 +34,7 @@ export interface SettingsProps {
 
 const Settings: React.FC<SettingsProps> = React.memo(
     ({ viewportId, layerIds }: SettingsProps) => {
-        const spec : any = useSelector((st: MapState) => st.spec);
+        const spec = useSelector((st: MapState) => st.spec);
         const [layersInView, setLayersInView] = useState<
             Record<string, unknown>[]
         >([]);

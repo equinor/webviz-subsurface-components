@@ -719,7 +719,7 @@ function setTracksToController(
     axes: AxesInfo,
     welllog: WellLog | undefined, // JSON Log Format
     template: Template, // JSON
-    colorFunctions?: ColorFunction[] // JS code array or JSON file for pure color tables array without color functions elements
+    colorFunctions: ColorFunction[] // JS code array or JSON file for pure color tables array without color functions elements
 ): ScaleInterpolator {
     const { tracks, minmaxPrimaryAxis, primaries, secondaries } = createTracks(
         welllog,
@@ -2111,7 +2111,7 @@ export function _propTypesWellLogView(): Record<string, unknown> {
         /**
          * Prop containing color function/table table for discrete well logs and gradient fill plots
          */
-        colorFunctions: PropTypes.array.isRequired,
+        colorFunctions: PropTypes.arrayOf<ColorFunction>, //.isRequired,
 
         /**
          * Well picks data

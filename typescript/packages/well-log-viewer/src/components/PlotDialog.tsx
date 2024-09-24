@@ -335,7 +335,7 @@ export class PlotPropertiesDialog extends Component<Props, State> {
         );
     }
 
-    createSelectControlFromType(type: TemplatePlotTypes): ReactNode {
+    createSelectControlFromType(type?: TemplatePlotTypes): ReactNode {
         if (type === "area" || type === "differential") {
             return [
                 this.createSelectControl(

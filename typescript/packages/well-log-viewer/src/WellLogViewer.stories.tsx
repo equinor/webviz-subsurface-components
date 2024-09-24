@@ -338,7 +338,6 @@ export const ColorByFunction: StoryObj<typeof StoryTemplate> = {
                     title: "Multiple",
                     width: 6,
                     plots: [
-                        // @ts-expect-error TS2739
                         {
                             name: "HKLA",
                             style: "HKL",
@@ -352,7 +351,6 @@ export const ColorByFunction: StoryObj<typeof StoryTemplate> = {
                     type: "gradientfill",
                     colorFunction: "Step func",
                     inverseColorFunction: "Grey scale",
-                    color: "green",
                 },
             ],
         },
