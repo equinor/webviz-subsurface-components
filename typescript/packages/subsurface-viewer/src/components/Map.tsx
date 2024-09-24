@@ -971,6 +971,9 @@ function createLayer(
 ///////////////////////////////////////////////////////////////////////////////////////////
 // View Controller
 // Implements the algorithms to compute the views and the view state
+type ScaledCamera = ViewStateType & {
+    scale: number;
+};
 type ViewControllerState = {
     // Explicit state
     triggerHome: number | undefined;
@@ -983,7 +986,7 @@ type ViewControllerState = {
 };
 type ViewControllerDerivedState = {
     // Derived state
-    cameraClone: ViewStateType | undefined; // clone of the camera
+    scaledCameraClone: ScaledCamera | undefined; // clone of the camera
     eventTarget: Point3D | undefined; // target set by events
     readyForInteraction: boolean;
     viewStateChanged: boolean;
@@ -993,29 +996,8 @@ type ViewControllerFullState = ViewControllerState & ViewControllerDerivedState;
 class ViewController {
     private rerender_: React.DispatchWithoutAction;
 
-    private derivedState_: ViewControllerDerivedState = {
-        cameraClone: undefined,
-        eventTarget: undefined,
-        readyForInteraction: false,
-        viewStateChanged: false,
-    };
-
-    private state_: ViewControllerFullState = {
-        triggerHome: undefined,
-        camera: undefined,
-        bounds: undefined,
-        boundingBox3d: undefined,
-        deckSize: { width: 0, height: 0 },
-        zScale: 1,
-        viewPortMargins: {
-            left: 0,
-            right: 0,
-            top: 0,
-            bottom: 0,
-        },
-        // Derived state
-        ...this.derivedState_,
-    };
+    private derivedState_: ViewControllerDerivedState;
+    private state_: ViewControllerFullState;
 
     private views_: ViewsType | undefined = undefined;
     private result_: {
@@ -1028,6 +1010,30 @@ class ViewController {
 
     public constructor(rerender: React.DispatchWithoutAction) {
         this.rerender_ = rerender;
+
+        this.derivedState_ = {
+            scaledCameraClone: undefined,
+            eventTarget: undefined,
+            readyForInteraction: false,
+            viewStateChanged: false,
+        };
+
+        this.state_ = {
+            triggerHome: undefined,
+            camera: undefined,
+            bounds: undefined,
+            boundingBox3d: undefined,
+            deckSize: { width: 0, height: 0 },
+            zScale: 1,
+            viewPortMargins: {
+                left: 0,
+                right: 0,
+                top: 0,
+                bottom: 0,
+            },
+            // Derived state
+            ...this.derivedState_,
+        };
     }
 
     /**
@@ -1063,9 +1069,17 @@ class ViewController {
         state: ViewControllerState
     ): ViewControllerFullState => {
         const fullState = { ...state, ...this.derivedState_ };
-        if (fullState.camera != this.state_.camera) {
+        if (
+            fullState.camera != this.state_.camera ||
+            !fullState.scaledCameraClone
+        ) {
             // create a clone of the camera property to avoid editing it
-            fullState.cameraClone = cloneDeep(fullState.camera);
+            fullState.scaledCameraClone = fullState.camera
+                ? {
+                      ...(cloneDeep(fullState.camera) as ViewStateType),
+                      scale: 1,
+                  }
+                : undefined;
         }
         return fullState;
     };
@@ -1122,16 +1136,15 @@ class ViewController {
             viewState = buildDeckGlViewStates(
                 views,
                 state.viewPortMargins,
-                state.cameraClone,
+                state.scaledCameraClone,
                 state.boundingBox3d,
                 state.zScale,
-                this.state_.zScale,
                 state.bounds,
                 state.deckSize
             );
             // reset state
             this.derivedState_.readyForInteraction = canCameraBeDefined(
-                state.cameraClone,
+                state.scaledCameraClone,
                 state.boundingBox3d,
                 state.bounds,
                 state.deckSize
@@ -1666,7 +1679,7 @@ function updateViewState(
     }
 
     // clone the camera in case of triggerHome
-    const camera_ = cloneDeep(camera);
+    const camera_ = camera; //cloneDeep(camera);
     if (!cameraHasZoom(camera_)) {
         camera_.zoom = computeCameraZoom(camera, boundingBox, size);
     }
@@ -1688,17 +1701,16 @@ function updateViewState(
  */
 function computeViewState(
     viewPort: ViewportType,
-    cameraPosition: ViewStateType | undefined,
+    scaledCamera: ScaledCamera | undefined,
     boundingBox: BoundingBox3D | undefined,
     zScale: number,
-    oldZScale: number,
     bounds: BoundingBox2D | BoundsAccessor | undefined,
     viewportMargins: MarginsType,
     views: ViewsType | undefined,
     size: Size
 ): ViewStateType {
     // If the camera is defined, use it
-    const isCameraPositionDefined = cameraPosition != undefined;
+    const isCameraPositionDefined = scaledCamera != undefined;
     const isBoundsDefined =
         bounds &&
         !isEmptyBox2D(typeof bounds == "function" ? bounds() : bounds);
@@ -1712,9 +1724,9 @@ function computeViewState(
         // If the camera is defined, use it
         if (isCameraPositionDefined) {
             return updateViewState(
-                cameraPosition,
+                scaledCamera,
                 boundingBox,
-                zScale / (oldZScale || 1),
+                zScale / (scaledCamera.scale || 1),
                 size
             );
         }
@@ -1744,7 +1756,7 @@ function computeViewState(
         // If the camera is defined, use it
         if (isCameraPositionDefined) {
             return updateViewState(
-                cameraPosition,
+                scaledCamera,
                 boundingBox,
                 zScale,
                 size,
@@ -1784,10 +1796,9 @@ function computeViewState(
 function buildDeckGlViewStates(
     views: ViewsType | undefined,
     viewPortMargins: MarginsType,
-    cameraPosition: ViewStateType | undefined,
+    scaledCamera: ScaledCamera | undefined,
     boundingBox: BoundingBox3D | undefined,
     zScale: number,
-    oldZScale: number,
     bounds: BoundingBox2D | BoundsAccessor | undefined,
     size: Size
 ): Record<string, ViewStateType> {
@@ -1804,10 +1815,9 @@ function buildDeckGlViewStates(
     if (singleView) {
         const viewState = computeViewState(
             views.viewports[0],
-            cameraPosition,
+            scaledCamera,
             boundingBox,
             zScale,
-            oldZScale,
             bounds,
             viewPortMargins,
             views,
@@ -1831,10 +1841,9 @@ function buildDeckGlViewStates(
             const currentViewport: ViewportType = views.viewports[resultLength];
             const currentViewState = computeViewState(
                 currentViewport,
-                cameraPosition,
+                scaledCamera,
                 boundingBox,
                 zScale,
-                oldZScale,
                 bounds,
                 viewPortMargins,
                 views,

@@ -15,7 +15,12 @@ export type {
 
 export { TGrid3DColoringMode } from "./SubsurfaceViewer";
 
-export type { BoundingBox2D, BoundingBox3D } from "./components/Map";
+export type {
+    BoundingBox2D,
+    BoundingBox3D,
+    Point2D,
+    Point3D,
+} from "./components/Map";
 
 export type {
     ExtendedLayerProps,
