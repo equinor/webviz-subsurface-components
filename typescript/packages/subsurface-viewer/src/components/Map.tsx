@@ -1675,21 +1675,19 @@ function updateViewState(
         boundingBox[5] = 0;
     }
 
-    // clone the camera in case of triggerHome
-    const camera_ = camera; //cloneDeep(camera);
-    if (!cameraHasZoom(camera_)) {
-        camera_.zoom = computeCameraZoom(camera, boundingBox, size);
+    if (!cameraHasZoom(camera)) {
+        camera.zoom = computeCameraZoom(camera, boundingBox, size);
     }
-    if (!cameraHasTarget(camera_)) {
-        camera_.target = boxCenter(boundingBox);
+    if (!cameraHasTarget(camera)) {
+        camera.target = boxCenter(boundingBox);
         if (is3D) {
             // apply zScaling to target (target is in real coordinates while zScaling is applied to matrix transform)
             applyZScale(camera.target, zScale);
         }
     }
-    camera_.minZoom = camera_.minZoom ?? minZoom3D;
-    camera_.maxZoom = camera_.maxZoom ?? maxZoom3D;
-    return camera_;
+    camera.minZoom = camera.minZoom ?? minZoom3D;
+    camera.maxZoom = camera.maxZoom ?? maxZoom3D;
+    return camera;
 }
 
 /**
