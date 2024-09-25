@@ -141,9 +141,8 @@ function fillInfo(controller: WellLogController | undefined) {
 }
 
 const StoryTemplate = (args: WellLogViewerProps) => {
-    const infoRef = React.useRef();
-    const setInfo = function (info: string) {
-        // @ts-expect-error TS2339
+    const infoRef = React.useRef<HTMLDivElement | null>(null);
+    const setInfo = function (info: string): void {
         if (infoRef.current) infoRef.current.innerHTML = info;
     };
     const [controller, setController] = React.useState<
@@ -188,13 +187,12 @@ const StoryTemplate = (args: WellLogViewerProps) => {
                     onCreateController={onCreateController}
                     onContentRescale={onContentRescale}
                     onContentSelection={onContentSelection}
-                    // @ts-expect-error TS2322
-                    onTrackMouseEvent={checked ? onTrackMouseEventCustom : null}
+                    onTrackMouseEvent={
+                        checked ? onTrackMouseEventCustom : undefined
+                    }
                 />
             </div>
             <div style={{ display: "inline-flex" }}>
-                {/*
-                 // @ts-expect-error TS2322 */}
                 <div ref={infoRef}></div>
                 <label style={{ marginLeft: 10 }}>disable context menu</label>
                 <input

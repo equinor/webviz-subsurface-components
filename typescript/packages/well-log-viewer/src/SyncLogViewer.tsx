@@ -66,13 +66,13 @@ export type WellDistances = {
     units: string;
     distances: (number | undefined)[];
 };
-export const WellDistancesType = {
+export const WellDistancesType = PropTypes.shape({
     units: PropTypes.string.isRequired,
     distances:
         PropTypes
             .array /*Of(PropTypes.oneOf([PropTypes.number, PropTypes.undefined])*/
             .isRequired,
-};
+});
 
 export interface SyncLogViewerProps {
     /**
@@ -1086,7 +1086,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
 }
 
 ///
-const WellLogViewOptions_propTypes = PropTypes.shape({
+export const WellLogViewOptionsTypes = PropTypes.shape({
     /**
      * The maximum zoom value
      */
@@ -1117,7 +1117,7 @@ const WellLogViewOptions_propTypes = PropTypes.shape({
     hideSelectionInterval: PropTypes.bool,
 });
 
-const InfoOptions_propTypes = PropTypes.shape({
+export const InfoOptionsTypes = PropTypes.shape({
     /**
      * Show not only visible tracks
      */
@@ -1238,12 +1238,12 @@ SyncLogViewer.propTypes = {
     /**
      * WellLogView additional options
      */
-    welllogOptions: WellLogViewOptions_propTypes /*PropTypes.object,*/,
+    welllogOptions: WellLogViewOptionsTypes,
 
     /**
      * Options for readout panel
      */
-    readoutOptions: InfoOptions_propTypes /*PropTypes.object,*/,
+    readoutOptions: InfoOptionsTypes,
 
     /**
      * Synchronize the first visible track number in views

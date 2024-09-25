@@ -12,6 +12,7 @@ const wellpick = require("../../../../example-data/wellpicks.json");// eslint-di
 import { ToggleButton } from "@mui/material";
 
 import SyncLogViewer, { argTypesSyncLogViewerProp } from "./SyncLogViewer";
+import type { SyncLogViewerProps } from "./SyncLogViewer";
 import type {
     // @ts-expect-error TS2614
     WellLogView,
@@ -161,11 +162,9 @@ function fillInfo(controller: WellLogController | undefined) {
     );
 }
 
-// @ts-expect-error TS7006
 const Template = (args: SyncLogViewerProps) => {
-    const infoRef = React.useRef();
+    const infoRef = React.useRef<HTMLDivElement | null>(null);
     const setInfo = function (info: string) {
-        // @ts-expect-error TS2339
         if (infoRef.current) infoRef.current.innerHTML = info;
     };
 
@@ -231,13 +230,13 @@ const Template = (args: SyncLogViewerProps) => {
                     onDeleteController={onDeleteController}
                     onContentRescale={onContentRescale}
                     onContentSelection={onContentSelection}
-                    onTrackMouseEvent={checked ? onTrackMouseEventCustom : null}
+                    onTrackMouseEvent={
+                        checked ? onTrackMouseEventCustom : undefined
+                    }
                 />
             </div>
             {/* Print info for the first WellLog */}
             <div style={{ display: "flex", flexDirection: "row" }}>
-                {/*
-                 // @ts-expect-error TS2322 */}
                 <div ref={infoRef}></div>
                 <label style={{ marginLeft: 10 }}>disable context menu</label>
                 <input
@@ -389,7 +388,7 @@ const exampleWellPicks: WellPickProps[] = [
 
 export const Default: StoryObj<typeof Template> = {
     args: {
-        id: "Sync-Log-Viewer",
+        //id: "Sync-Log-Viewer",
         syncTrackPos: true,
         syncContentDomain: true,
         syncContentSelection: true,
@@ -410,7 +409,7 @@ export const Default: StoryObj<typeof Template> = {
         patternsTable: {
             patternSize: 24,
             patternImages: patternImages,
-            names: patternNamesEnglish,
+            patternNames: patternNamesEnglish,
         },
         patterns: require("../../../../example-data/horizon_patterns.json"), // eslint-disable-line
 

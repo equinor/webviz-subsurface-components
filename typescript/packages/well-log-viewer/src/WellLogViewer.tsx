@@ -318,7 +318,7 @@ export default class WellLogViewer extends Component<
 }
 
 ///
-const WellLogViewOptions_propTypes = PropTypes.shape({
+export const WellLogViewOptionsTypes = PropTypes.shape({
     /**
      * The maximum zoom value
      */
@@ -341,7 +341,7 @@ const WellLogViewOptions_propTypes = PropTypes.shape({
     hideTrackLegend: PropTypes.bool,
 });
 
-const InfoOptions_propTypes = PropTypes.shape({
+export const InfoOptionsTypes = PropTypes.shape({
     /**
      * Show not only visible tracks
      */
@@ -364,7 +364,7 @@ WellLogViewer.propTypes = {
     /**
      * An object from JSON file describing well log data
      */
-    welllog: PropTypes.object /*Of<WellLog>*/.isRequired,
+    welllog: PropTypes.object /*Of<WellLog>*/,
 
     /**
      * Prop containing track template data
@@ -417,16 +417,16 @@ WellLogViewer.propTypes = {
     viewTitle: PropTypes.oneOfType([
         PropTypes.bool,
         PropTypes.string,
-        PropTypes.object /* react element */,
+        PropTypes.element /* react element */,
     ]),
 
     /**
      * WellLogView additional options
      */
-    options: WellLogViewOptions_propTypes /*PropTypes.object,*/,
+    options: WellLogViewOptionsTypes,
 
     /**
      * Options for readout panel
      */
-    readoutOptions: InfoOptions_propTypes /*PropTypes.object,*/,
+    readoutOptions: InfoOptionsTypes,
 };

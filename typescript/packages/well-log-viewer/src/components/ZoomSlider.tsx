@@ -2,7 +2,7 @@ import React, { Component } from "react";
 
 import Slider from "@mui/material/Slider";
 
-interface Props {
+export interface ZoomSliderProps {
     onChange: (value: number) => void; // zoom value callback
     value: number; // zoom value.
 
@@ -27,8 +27,8 @@ function valueLabelFormat(value: number /*, index: number*/): string {
     return value.toFixed(Number.isInteger(value) || value > 20 ? 0 : 1);
 }
 
-class ZoomSlider extends Component<Props, State> {
-    constructor(props: Props) {
+class ZoomSlider extends Component<ZoomSliderProps, State> {
+    constructor(props: ZoomSliderProps) {
         super(props);
 
         // TODO: Fix this the next time the file is edited.
@@ -40,7 +40,7 @@ class ZoomSlider extends Component<Props, State> {
         this.onChange = this.onChange.bind(this);
     }
 
-    componentDidUpdate(prevProps: Props): void {
+    componentDidUpdate(prevProps: ZoomSliderProps): void {
         // TODO: Fix this the next time the file is edited.
         // eslint-disable-next-line react/prop-types
         if (this.props.value !== prevProps.value) {

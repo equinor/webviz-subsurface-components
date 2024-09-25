@@ -1,6 +1,6 @@
 import React from "react";
 
-interface Props {
+export interface ScaleSelectorProps {
     values?: number[]; // Available scale values array
     value: number; // value for scale combo
     round?: boolean | number; // round the value to a "good" number (true for auto or number for rounding step)
@@ -63,7 +63,7 @@ const defValues: number[] = [
     100, 200, 500, 1000 /* 1 cm == 10 m */, 2000, 5000, 10000, 20000, 50000,
 ];
 
-export function ScaleSelector(props: Props): JSX.Element {
+export function ScaleSelector(props: ScaleSelectorProps): JSX.Element {
     const [value, setValue] = React.useState(props.value);
     React.useEffect(() => {
         setValue(props.value);

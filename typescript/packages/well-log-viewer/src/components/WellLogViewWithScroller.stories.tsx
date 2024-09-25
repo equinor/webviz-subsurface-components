@@ -3,6 +3,7 @@ import { fn } from "@storybook/test";
 import React from "react";
 
 import WellLogViewWithScroller from "./WellLogViewWithScroller";
+import type { WellLogViewWithScrollerProps } from "./WellLogViewWithScroller";
 import { argTypesWellLogViewScrollerProp } from "./WellLogViewWithScroller";
 import { colorTables } from "@emerson-eps/color-tables";
 import type { ColorFunction } from "./ColorTableTypes";
@@ -54,7 +55,6 @@ const stories: Meta = {
 };
 export default stories;
 
-// @ts-expect-error TS7006
 const Template = (args: WellLogViewWithScrollerProps) => {
     return (
         <div
@@ -74,7 +74,7 @@ const wellLog = require("../../../../../example-data/L898MUD.json")[0]; // eslin
 
 export const Default: StoryObj<typeof Template> = {
     args: {
-        id: "Well-Log-Viewer-With-Scroller",
+        //id: "Well-Log-Viewer-With-Scroller",
         horizontal: false,
         welllog: wellLog,
         // TODO: Fix this the next time the file is edited.

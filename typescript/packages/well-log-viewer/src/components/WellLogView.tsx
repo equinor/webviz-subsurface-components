@@ -634,8 +634,7 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
                         .style("background-color", rgba);
                 }
                 if (wellpickPatternFill) {
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                    const pattern = patterns!.find(
+                    const pattern = patterns.find(
                         (value: [string, number]) => value[0] === horizon
                     );
 
@@ -2061,7 +2060,7 @@ class WellLogView
     }
 }
 
-const WellLogViewOptions_propTypes = PropTypes.shape({
+export const WellLogViewOptionsTypes = PropTypes.shape({
     /**
      * The maximum zoom value
      */
@@ -2112,7 +2111,7 @@ export function _propTypesWellLogView(): Record<string, unknown> {
         /**
          * An object from JSON file describing well log data
          */
-        welllog: PropTypes.object /*Of<WellLog>*/.isRequired,
+        welllog: PropTypes.object /*Of<WellLog>*/,
 
         /**
          * Prop containing track template data
@@ -2165,7 +2164,7 @@ export function _propTypesWellLogView(): Record<string, unknown> {
         viewTitle: PropTypes.oneOfType([
             PropTypes.bool,
             PropTypes.string,
-            PropTypes.element, //object /* react element */,
+            PropTypes.element /* react element */,
         ]),
 
         /**
@@ -2181,7 +2180,7 @@ export function _propTypesWellLogView(): Record<string, unknown> {
         /**
          * Additional options
          */
-        options: WellLogViewOptions_propTypes,
+        options: WellLogViewOptionsTypes,
     };
 }
 

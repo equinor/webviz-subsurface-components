@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 
 import WellLogView from "./WellLogView";
+import type { WellLogViewProps } from "./WellLogView";
 import { argTypesWellLogViewProp } from "./WellLogView";
 import { colorTables } from "@emerson-eps/color-tables";
 import type { ColorFunction } from "./ColorTableTypes";
@@ -10,7 +11,8 @@ const exampleColorFunctions = colorTables as ColorFunction[];
 import L898MUD from "../../../../../example-data/L898MUD.json";
 import volve_logs from "../../../../../example-data/volve_logs.json";
 const welllogDefault = L898MUD[0];
-const welllogDiscrete = volve_logs[0];
+import type { WellLog } from "./WellLogTypes";
+const welllogDiscrete = volve_logs[0] as unknown as WellLog; // TODO: harmonize WellLog type and JSON log export!
 
 const ComponentCode =
     '<WellLogView id="WellLogView" \r\n' +
@@ -48,8 +50,7 @@ const stories: Meta = {
 };
 export default stories;
 
-// @ts-expect-error TS7006
-const Template = (args: WellLogViewerProps) => {
+const Template = (args: WellLogViewProps) => {
     return (
         <div style={{ height: "92vh" }}>
             <div style={{ width: "100%", height: "100%" }}>
@@ -61,7 +62,7 @@ const Template = (args: WellLogViewerProps) => {
 
 export const Default: StoryObj<typeof Template> = {
     args: {
-        id: "Well-Log-View",
+        //id: "Well-Log-View",
         horizontal: false,
         welllog: welllogDefault,
         // TODO: Fix this the next time the file is edited.
@@ -81,7 +82,7 @@ export const Default: StoryObj<typeof Template> = {
 
 export const Discrete: StoryObj<typeof Template> = {
     args: {
-        id: "Well-Log-View-Discrete",
+        //id: "Well-Log-View-Discrete",
         horizontal: false,
         welllog: welllogDiscrete,
         // TODO: Fix this the next time the file is edited.
