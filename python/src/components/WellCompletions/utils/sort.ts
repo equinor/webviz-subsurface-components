@@ -2,27 +2,29 @@ import type {
     AttributeType,
     WellPlotData,
 } from "@webviz/well-completions-plot";
-import { SortBy, SortDirection } from "@webviz/well-completions-plot";
+import {
+    createGetWellPlotDataCompareValueFunction,
+    SortWellsBy,
+    SortDirection,
+} from "@webviz/well-completions-plot";
 
 // Default sort methods
 export const createAttributeKeyFunction = (
     sortMethod: string
 ): ((well: WellPlotData) => AttributeType) => {
-    switch (sortMethod) {
-        case SortBy.Name:
-            return (well) => well.name;
-        case SortBy.StratigraphyDepth:
-            return (well) =>
-                well.completions.find(
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                    (_, index) => well.completions[index]!.open > 0
-                )?.zoneIndex;
-        case SortBy.CompletionDate:
-            return (well) => well.earliestCompDateIndex;
-        default:
-            return (well) => well.attributes[sortMethod];
+    // If sortMethod is in SortWellsBy enums
+    const isValidSortWellsByEnum = Object.values(SortWellsBy).includes(
+        sortMethod as SortWellsBy
+    );
+    if (isValidSortWellsByEnum) {
+        const sortWellsBy = sortMethod as SortWellsBy;
+        return createGetWellPlotDataCompareValueFunction(sortWellsBy);
     }
+
+    // Otherwise return a function that returns the attribute value
+    return (well) => well.attributes[sortMethod] as AttributeType;
 };
+
 export const createSortFunction = (
     sortBy: Record<string, SortDirection>
 ): ((a: WellPlotData, b: WellPlotData) => 0 | 1 | -1) => {
@@ -46,9 +48,9 @@ export const createSortFunction = (
             if (
                 aAttribute === undefined ||
                 bAttribute === undefined ||
-                (sortBy[sort] === SortDirection.Ascending &&
+                (sortBy[sort] === SortDirection.ASCENDING &&
                     aAttribute < bAttribute) ||
-                (sortBy[sort] !== SortDirection.Ascending &&
+                (sortBy[sort] !== SortDirection.ASCENDING &&
                     aAttribute > bAttribute)
             )
                 return -1;

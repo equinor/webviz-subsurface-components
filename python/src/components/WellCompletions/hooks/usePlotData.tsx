@@ -4,14 +4,13 @@ import { useSelector } from "react-redux";
 import { DataContext } from "../components/DataLoader";
 import type { WellCompletionsState } from "../redux/store";
 import type { Well } from "../redux/types";
+import { computeDataToPlot, createAttributePredicate } from "../utils/dataUtil";
 import {
-    computeDataToPlot,
-    createAttributePredicate,
-    findSubzones,
-} from "../utils/dataUtil";
+    createWellNameRegexMatcher,
+    populateSubzonesArray,
+} from "@webviz/well-completions-plot";
 import type { PlotData, Zone } from "@webviz/well-completions-plot";
 import { createSortFunction } from "../utils/sort";
-import { getRegexPredicate } from "../utils/stringUtil";
 
 export const usePlotData = (): PlotData => {
     //Redux states
@@ -39,8 +38,8 @@ export const usePlotData = (): PlotData => {
         (state: WellCompletionsState) => state.ui.sortBy
     );
     //Memo
-    const wellNameRegex = useMemo(
-        () => getRegexPredicate(wellSearchText),
+    const wellNameRegexMatcher = useMemo(
+        () => createWellNameRegexMatcher(wellSearchText),
         [wellSearchText]
     );
     const wellAttributePredicate = useMemo(
@@ -52,16 +51,19 @@ export const usePlotData = (): PlotData => {
             data
                 ? Array.from(data.wells as Well[]).filter(
                       (well) =>
-                          wellNameRegex(well.name) &&
+                          wellNameRegexMatcher(well.name) &&
                           wellAttributePredicate(well)
                   )
                 : [],
-        [data, wellNameRegex, wellAttributePredicate]
+        [data, wellNameRegexMatcher, wellAttributePredicate]
     );
     const filteredSubzones = useMemo(() => {
         const allSubzones: Zone[] = [];
+        for (const zone of data.stratigraphy) {
+            populateSubzonesArray(zone, allSubzones);
+        }
+
         const filteredZoneSet = new Set(filteredZones);
-        data.stratigraphy.forEach((zone) => findSubzones(zone, allSubzones));
         return allSubzones.filter((zone) => filteredZoneSet.has(zone.name));
     }, [data, filteredZones]);
 

@@ -5,9 +5,9 @@ import DropdownTreeSelect from "react-dropdown-tree-select";
 import "react-dropdown-tree-select/dist/styles.css";
 import { useDispatch } from "react-redux";
 import { updateFilteredZones } from "../../redux/actions";
-import { findSubzones } from "../../utils/dataUtil";
 import { DataContext } from "../DataLoader";
 import type { Zone } from "@webviz/well-completions-plot";
+import { populateSubzonesArray } from "@webviz/well-completions-plot";
 
 const PREFIX = "ZoneSelector";
 
@@ -60,7 +60,7 @@ export const findSelectedZones = (
         result: Zone[]
     ) => {
         if (selectedNodeNames.has("All") || selectedNodeNames.has(zone.name))
-            findSubzones(zone, result);
+            populateSubzonesArray(zone, result);
         else if (zone.subzones)
             zone.subzones.forEach((subzone) =>
                 searchZone(subzone, selectedNodeNames, result)

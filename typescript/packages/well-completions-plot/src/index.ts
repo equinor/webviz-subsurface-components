@@ -2,8 +2,8 @@ export { WellCompletionsPlot } from "./WellCompletionsPlot";
 
 export {
     AttributeTypePropType,
-    SortBy,
-    SortByEnumToStringMapping,
+    SortWellsBy,
+    SortWellsByEnumToStringMapping,
     SortDirection,
     UnitsPropType,
     WellInfoPropType,
@@ -18,3 +18,16 @@ export type {
     WellPlotData,
     Zone,
 } from "./types/dataTypes";
+export { createWellNameRegexMatcher } from "./utility-lib/stringUtils";
+export {
+    extractSubzones,
+    areCompletionsPlotDataValuesEqual,
+    populateSubzonesArray,
+} from "./utility-lib/dataTypeUtils";
+export {
+    createGetWellPlotDataCompareValueFunction,
+    compareWellPlotDataValues,
+    compareWellsBySortByAndDirection,
+    createSortedWells,
+    createSortedWellsFromSequence,
+} from "./utility-lib/wellSortUtils";
