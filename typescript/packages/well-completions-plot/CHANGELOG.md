@@ -1,3 +1,10 @@
+## [1.4.5](https://github.com/equinor/webviz-subsurface-components/compare/well-completions-plot@1.4.4...well-completions-plot@1.4.5) (2024-09-25)
+
+
+### Bug Fixes
+
+* camera settings not respected when trigger home ([#2265](https://github.com/equinor/webviz-subsurface-components/issues/2265)) ([6045633](https://github.com/equinor/webviz-subsurface-components/commit/604563389892a168ca53434c0e9ee70369867b8d))
+
 ## [1.4.4](https://github.com/equinor/webviz-subsurface-components/compare/well-completions-plot@1.4.3...well-completions-plot@1.4.4) (2024-09-24)
 
 
