@@ -9,7 +9,9 @@ import defaultLayout from "./components/DefaultWellLogViewerLayout";
 import WellLogViewWithScroller from "./components/WellLogViewWithScroller";
 import type { WellLogViewWithScrollerProps } from "./components/WellLogViewWithScroller";
 import { argTypesWellLogViewScrollerProp } from "./components/WellLogViewWithScroller";
+import { TemplateType } from "./components/WellLogTemplateTypes";
 import { ColorFunctionType } from "./components/ColorTableTypes";
+import { WellPickPropsType } from "./components/WellLogView";
 //import { _propTypesWellLogView } from "./components/WellLogView";
 
 import { shouldUpdateWellLogView } from "./components/WellLogView";
@@ -367,7 +369,7 @@ WellLogViewer.propTypes = {
     /**
      * Prop containing track template data
      */
-    template: PropTypes.object /*Of<Template>*/.isRequired,
+    template: TemplateType.isRequired,
 
     /**
      * Prop containing color table data
@@ -392,7 +394,7 @@ WellLogViewer.propTypes = {
     /**
      * Well picks data
      */
-    wellpick: PropTypes.object /*Of<WellPickProps>*/,
+    wellpicks: PropTypes.arrayOf(WellPickPropsType),
 
     /**
      * Primary axis id: " md", "tvd", "time"...

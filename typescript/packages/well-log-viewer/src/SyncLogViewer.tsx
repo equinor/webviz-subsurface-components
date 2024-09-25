@@ -16,12 +16,13 @@ import type { WellLog } from "./components/WellLogTypes";
 import type { Template } from "./components/WellLogTemplateTypes";
 import type { ColorFunction } from "./components/ColorTableTypes";
 import { ColorFunctionType } from "./components/ColorTableTypes";
-import type { PatternsTable } from "./utils/pattern";
-
+import type { PatternsTable, Pattern } from "./utils/pattern";
+import { PatternsTableType, PatternsType } from "./utils/pattern";
 import type {
     WellLogController,
     WellPickProps,
 } from "./components/WellLogView";
+import { WellPickPropsType } from "./components/WellLogView";
 
 import type WellLogView from "./components/WellLogView";
 import type {
@@ -65,6 +66,13 @@ export type WellDistances = {
     units: string;
     distances: (number | undefined)[];
 };
+export const WellDistancesType = {
+    units: PropTypes.string.isRequired,
+    distances:
+        PropTypes
+            .array /*Of(PropTypes.oneOf([PropTypes.number, PropTypes.undefined])*/
+            .isRequired,
+};
 
 export interface SyncLogViewerProps {
     /**
@@ -99,7 +107,7 @@ export interface SyncLogViewerProps {
     /**
      * Horizon to pattern index map
      */
-    patterns?: [string, number][];
+    patterns?: Pattern[];
 
     /**
      * Horizon names for wellpick flatting (pan and zoom)
@@ -1148,16 +1156,16 @@ SyncLogViewer.propTypes = {
     /**
      * Well Picks data array
      */
-    wellpicks: PropTypes.array /*Of<WellPickProps>*/,
+    wellpicks: PropTypes.arrayOf(WellPickPropsType),
 
     /**
      * Patterns table
      */
-    patternsTable: PropTypes.object /*Of<PatternsTable>*/,
+    patternsTable: PatternsTableType,
     /**
      * Horizon to pattern index map
      */
-    patterns: PropTypes.array /*Of<[string, number]>*/,
+    patterns: PropTypes.arrayOf(PatternsType),
 
     /**
      * Horizon names for wellpick flatting (pan and zoom)
@@ -1176,7 +1184,7 @@ SyncLogViewer.propTypes = {
     /**
      * Distanses between wells to show on the spacers
      */
-    wellDistances: PropTypes.object /*Of<WellDistances>*/,
+    wellDistances: WellDistancesType,
 
     /**
      * Orientation of the track plots on the screen. Default is false

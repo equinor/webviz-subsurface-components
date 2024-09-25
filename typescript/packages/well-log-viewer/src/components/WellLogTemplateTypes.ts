@@ -74,3 +74,15 @@ export interface Template {
     styles?: TemplateStyle[];
     //...
 } // JSON
+
+import PropTypes from "prop-types";
+export const TemplateType = PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    scale: PropTypes.shape({
+        primary: PropTypes.string.isRequired,
+        allowSecondary: PropTypes.bool,
+    }).isRequired,
+    tracks: PropTypes.array /*Of<TemplateTrack>*/.isRequired,
+    styles: PropTypes.array /*Of<TemplateStyle>*/,
+    //...
+});

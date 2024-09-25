@@ -26,9 +26,11 @@ import { select } from "d3";
 
 import type { WellLog, WellLogCurve } from "./WellLogTypes";
 import type { Template } from "./WellLogTemplateTypes";
+import { TemplateType } from "./WellLogTemplateTypes";
 import type { ColorFunction } from "./ColorTableTypes";
 import { ColorFunctionType } from "./ColorTableTypes";
-import type { PatternsTable } from "../utils/pattern";
+import type { PatternsTable, Pattern } from "../utils/pattern";
+import { PatternsTableType, PatternsType } from "../utils/pattern";
 import { isEqualRanges } from "../utils/log-viewer";
 
 import { getDiscreteColorAndName, getDiscreteMeta } from "../utils/tracks";
@@ -316,6 +318,14 @@ export interface WellPickProps {
     colorFunctions: ColorFunction[];
     colorFunction: string; // "Stratigraphy" ..., "Step func", ...
 }
+
+export const WellPickPropsType = PropTypes.shape({
+    wellpick: PropTypes.object /*Of<WellLog>*/.isRequired, // JSON Log Format
+    name: PropTypes.string.isRequired,
+    md: PropTypes.string,
+    colorFunctions: PropTypes.arrayOf(ColorFunctionType).isRequired,
+    colorFunction: PropTypes.string.isRequired,
+});
 
 const wpSize = 3; //9;
 const wpOffset = wpSize / 2;
@@ -1060,7 +1070,7 @@ export interface WellLogViewProps {
     /**
      * Horizon to pattern index map
      */
-    patterns?: [string, number][];
+    patterns?: Pattern[];
 
     /**
      * Orientation of the track plots on the screen.
@@ -2107,7 +2117,7 @@ export function _propTypesWellLogView(): Record<string, unknown> {
         /**
          * Prop containing track template data
          */
-        template: PropTypes.object /*Of<Template>*/.isRequired,
+        template: TemplateType.isRequired,
 
         /**
          * Prop containing color function/table table for discrete well logs and gradient fill plots
@@ -2117,17 +2127,17 @@ export function _propTypesWellLogView(): Record<string, unknown> {
         /**
          * Well picks data
          */
-        wellpicks: PropTypes.array /*Of<WellPickProps>*/,
+        wellpicks: PropTypes.arrayOf(WellPickPropsType),
 
         /**
          * Patterns table
          */
-        patternsTable: PropTypes.object /*Of<PatternsTable>*/,
+        patternsTable: PatternsTableType,
 
         /**
          * Horizon to pattern index map
          */
-        patterns: PropTypes.array /*Of<[string, number]>*/,
+        patterns: PropTypes.arrayOf(PatternsType),
 
         /**
          * Orientation of the track plots on the screen. Default is false

@@ -6,7 +6,7 @@ import { getWellPicks } from "./WellLogView";
 import type WellLogView from "./WellLogView";
 
 import type { ColorFunction } from "./ColorTableTypes";
-import type { PatternsTable } from "../utils/pattern";
+import type { PatternsTable, Pattern } from "../utils/pattern";
 import { createDefs, patternId } from "../utils/pattern";
 
 export interface WellLogSpacerOptions {
@@ -42,7 +42,7 @@ export interface WellLogSpacerProps {
     /**
      * Horizon to pattern index map
      */
-    patterns?: [string, number][];
+    patterns?: Pattern[];
 
     /**
      * Distanse between wells to show on the spacer
