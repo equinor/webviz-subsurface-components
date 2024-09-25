@@ -5,7 +5,7 @@ import { WellCompletionsPlot } from "./WellCompletionsPlot";
 import type { PlotData } from "./index";
 
 import {
-    timeSteps,
+    sortedCompletionDates,
     firstPlotData,
     secondPlotData,
     thirdPlotData,
@@ -30,13 +30,15 @@ export default stories;
 // @ts-expect-error TS7006
 const Template = (data) => {
     const [plotData, setPlotData] = React.useState<PlotData>(data.plotData);
-    const [timeSteps, setTimeSteps] = React.useState<string[]>(data.timeSteps);
+    const [sortedCompletionDates, setSortedCompletionDates] = React.useState<
+        string[]
+    >(data.sortedCompletionDates);
 
     const [prevData, setPrevData] = React.useState(data);
     if (data !== prevData) {
         setPrevData(data);
         setPlotData(data.plotData);
-        setTimeSteps(data.timeSteps);
+        setSortedCompletionDates(data.sortedCompletionDates);
     }
 
     const handleFirstButtonClick = () => {
@@ -70,7 +72,7 @@ const Template = (data) => {
                 <WellCompletionsPlot
                     id={"test"}
                     plotData={plotData}
-                    timeSteps={timeSteps}
+                    sortedCompletionDates={sortedCompletionDates}
                 />
             </div>
         </>
@@ -79,7 +81,7 @@ const Template = (data) => {
 export const WellCompletionsPlotStory: StoryObj<typeof Template> = {
     args: {
         plotData: firstPlotData,
-        timeSteps: timeSteps,
+        sortedCompletionDates: sortedCompletionDates,
     },
     render: (args) => <Template {...args} />,
 };

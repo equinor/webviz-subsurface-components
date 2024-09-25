@@ -1,4 +1,4 @@
-import { capitalizeFirstLetter } from "./stringUtil";
+import { capitalizeFirstLetter } from "./stringUtils";
 
 describe("capitalize the first letter", () => {
     it("should capitalize the first letter", () => {
