@@ -3,9 +3,10 @@ import React, { useMemo } from "react";
 import { Provider as ReduxProvider } from "react-redux";
 import { createReduxStore } from "../redux/store";
 import type { Data, UISettings } from "../redux/types";
-import { findSubzones, preprocessData } from "../utils/dataUtil";
+import { preprocessData } from "../utils/dataUtil";
 
 import type { Zone } from "@webviz/well-completions-plot";
+import { populateSubzonesArray } from "@webviz/well-completions-plot";
 
 interface Props {
     id: string;
@@ -35,7 +36,10 @@ const DataProvider: React.FC<Props> = ({
 }: PropsWithChildren<Props>) => {
     const allSubzones = useMemo(() => {
         const subzones: Zone[] = [];
-        data.stratigraphy.forEach((zone) => findSubzones(zone, subzones));
+        for (const zone of data.stratigraphy) {
+            populateSubzonesArray(zone, subzones);
+        }
+
         return subzones.map((zone) => zone.name);
     }, [data.stratigraphy]);
 

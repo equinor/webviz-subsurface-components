@@ -6,7 +6,11 @@ import { PlotData } from "../src/index";
  * Some data has been removed to make the example data smaller. Mainly it's less time steps and less wells, but the data
  * is to show how the plot occurs with given PlotData data structure.
  */
-export const timeSteps: string[] = ["2000-02-01", "2000-06-01", "2000-10-01"];
+export const sortedCompletionDates: string[] = [
+    "2000-02-01",
+    "2000-06-01",
+    "2000-10-01",
+];
 export const firstPlotData: PlotData = {
     stratigraphy: [
         {
@@ -68,7 +72,7 @@ export const firstPlotData: PlotData = {
     ],
     wells: [
         {
-            name: "OP_1",
+            name: "PP_1",
             completions: [
                 {
                     zoneIndex: 0,
