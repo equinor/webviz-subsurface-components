@@ -1,3 +1,10 @@
+## [0.8.5](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.8.4...wsc-common@0.8.5) (2024-09-25)
+
+
+### Bug Fixes
+
+* camera settings not respected when trigger home ([#2265](https://github.com/equinor/webviz-subsurface-components/issues/2265)) ([6045633](https://github.com/equinor/webviz-subsurface-components/commit/604563389892a168ca53434c0e9ee70369867b8d))
+
 ## [0.8.4](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.8.3...wsc-common@0.8.4) (2024-09-24)
 
 
