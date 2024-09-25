@@ -517,14 +517,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
 
         //- BOTTOM RULER ----------------------------------------
         if (isB) {
-            const axes = [
-                xmin,
-                yBoundsMin + mv,
-                zDepthAxes,
-                xmax,
-                yBoundsMin + mv,
-                zDepthAxes,
-            ];
+            const axes = [xmin, ymin, zDepthAxes, xmax, ymin, zDepthAxes];
 
             const [ticks, labels] = this.GetTickLinesAndLabels(
                 xmin,
@@ -548,14 +541,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
 
         //- TOP RULER ----------------------------------------
         if (isT) {
-            const axes = [
-                xmin,
-                yBoundsMax - mv,
-                zDepthAxes,
-                xmax,
-                yBoundsMax - mv,
-                zDepthAxes,
-            ];
+            const axes = [xmin, ymax, zDepthAxes, xmax, ymax, zDepthAxes];
             const [ticks, labels] = this.GetTickLinesAndLabels(
                 xmin,
                 xmax,
@@ -578,17 +564,10 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
 
         //- LEFT RULER ----------------------------------------
         if (isL) {
-            const axes = [
-                xBoundsMin + mh,
-                ymin,
-                zDepthAxes,
-                xBoundsMin + mh,
-                ymax,
-                zDepthAxes,
-            ];
+            const axes = [xmin, ymin, zDepthAxes, xmin, ymax, zDepthAxes];
             const [ticks, labels] = this.GetTickLinesAndLabels(
                 ymin,
-                yBoundsMax - mv,
+                ymax,
                 ViewSide.Left,
                 pixel2worldHor,
                 pixel2worldVer
@@ -607,14 +586,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
 
         //- RIGHT RULER ----------------------------------------
         if (isR) {
-            const axes = [
-                xBoundsMax - mh,
-                ymin,
-                zDepthAxes,
-                xBoundsMax - mh,
-                ymax,
-                zDepthAxes,
-            ];
+            const axes = [xmax, ymin, zDepthAxes, xmax, ymax, zDepthAxes];
             const [ticks, labels] = this.GetTickLinesAndLabels(
                 ymin,
                 ymax,
