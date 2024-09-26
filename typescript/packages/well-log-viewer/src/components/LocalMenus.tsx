@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import React, { Component } from "react";
-
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 
 import type { Track, GraphTrack } from "@equinor/videx-wellog";
 
@@ -371,15 +370,13 @@ export function editPlots(
     el.style.width = "10px";
     el.style.height = "13px";
     if (parent) parent.appendChild(el);
-    // eslint-disable-next-line react/no-deprecated
-    ReactDOM.render(
+    createRoot(el).render(
         <SimpleMenu
             type="editPlots"
             anchorEl={el}
             wellLogView={wellLogView}
             track={track}
-        />,
-        el
+        />
     );
 }
 
@@ -398,14 +395,12 @@ export function removePlots(
     el.style.width = "10px";
     el.style.height = "13px";
     if (parent) parent.appendChild(el);
-    // eslint-disable-next-line react/no-deprecated
-    ReactDOM.render(
+    createRoot(el).render(
         <SimpleMenu
             type="removePlots"
             anchorEl={el}
             wellLogView={wellLogView}
             track={track}
-        />,
-        el
+        />
     );
 }

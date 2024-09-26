@@ -73,23 +73,15 @@ export class TrackPropertiesDialog extends Component<Props, State> {
                   ...templateTrack,
 
                   stacked: this.bStacked ? "1" : "0",
-                  // TODO: Fix this the next time the file is edited.
-                  // eslint-disable-next-line react/prop-types
                   stackedName: templateTrack.plots[0]?.name,
                   showLabels:
-                      // TODO: Fix this the next time the file is edited.
-                      // eslint-disable-next-line react/prop-types
                       templateTrack.plots[0]?.showLabels !== false
                           ? "true"
                           : "false",
                   showLines:
-                      // TODO: Fix this the next time the file is edited.
-                      // eslint-disable-next-line react/prop-types
                       templateTrack.plots[0]?.showLines !== false
                           ? "true"
                           : "false",
-                  // TODO: Fix this the next time the file is edited.
-                  // eslint-disable-next-line react/prop-types
                   labelRotation: templateTrack.plots[0]?.labelRotation || 0,
                   open: true,
               }
@@ -206,6 +198,7 @@ export class TrackPropertiesDialog extends Component<Props, State> {
                         label="Title"
                         value={this.state.title}
                         onChange={this.onChange}
+                        variant="standard"
                     ></TextField>
 
                     {templateTrack ? (
@@ -253,6 +246,7 @@ export class TrackPropertiesDialog extends Component<Props, State> {
                                           [e.target.id]: Number(e.target.value),
                                       } as unknown as State);
                                   }}
+                                  variant="standard"
                                   InputProps={{
                                       inputProps: {
                                           min: -180,

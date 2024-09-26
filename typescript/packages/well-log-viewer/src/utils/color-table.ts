@@ -1,6 +1,6 @@
 import type {
-    colorFunctionsObj,
     ColorMapFunction,
+    ColorFunction,
     ColorTable,
 } from "../components/ColorTableTypes";
 import { isFunction } from "../components/ColorTableTypes";
@@ -78,15 +78,15 @@ export function getExactColor(
   get HTML string with interpolated color value in #xxxxxx format
 */
 export function getInterpolatedColor(
-    colorFunction: ColorMapFunction,
+    colorMapFunction: ColorMapFunction,
     v: number
 ): [number, number, number] {
-    if (isFunction(colorFunction)) {
-        const func = colorFunction as colorFunctionsObj;
+    if (isFunction(colorMapFunction)) {
+        const func = colorMapFunction as ColorFunction;
         return func.func(v);
     }
 
-    const table = colorFunction as ColorTable;
+    const table = colorMapFunction as ColorTable;
     // TODO: Do not compute these 3 constants (cNaN, cBelow, cAbove) every time!
     const cNaN: [number, number, number] = table.colorNaN
         ? table.colorNaN
@@ -125,15 +125,15 @@ export function getInterpolatedColor(
   get HTML string with interpolated color value in #xxxxxx format
 */
 export function getInterpolatedColorString(
-    colorFunction: ColorMapFunction,
+    colorMapFunction: ColorMapFunction,
     v: number
 ): string {
-    if (isFunction(colorFunction)) {
-        const func = colorFunction as colorFunctionsObj;
+    if (isFunction(colorMapFunction)) {
+        const func = colorMapFunction as ColorFunction;
         return colorToString(func.func(v), "#ffffff");
     }
 
-    const colorTable = colorFunction as ColorTable;
+    const colorTable = colorMapFunction as ColorTable;
     // TODO: Do not compute these 3 constants (cNaN, cBelow, cAbove) every time!
     const cNaN = colorToString(colorTable.colorNaN, "#ffffff"); // "white"
 

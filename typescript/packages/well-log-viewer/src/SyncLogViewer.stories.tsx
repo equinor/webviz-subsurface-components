@@ -2,20 +2,19 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 
-import { colorTables } from "@emerson-eps/color-tables";
 import type { ColorMapFunction } from "./components/ColorTableTypes";
+import { colorTables } from "@emerson-eps/color-tables";
 const exampleColorFunctions = colorTables as ColorMapFunction[];
-const wellpickColorTable = require("../../../../example-data/wellpick_colors.json"); // eslint-disable-line
-const wellpickColorFunctions = wellpickColorTable as ColorMapFunction[];
-const wellpick = require("../../../../example-data/wellpicks.json");// eslint-disable-line
+import wellpickColorTables from "../../../../example-data/wellpick_colors.json";
+const wellpickColorMapFunctions = wellpickColorTables as ColorMapFunction[];
+import wellpicks from "../../../../example-data/wellpicks.json";
 
 import { ToggleButton } from "@mui/material";
 
 import SyncLogViewer, { argTypesSyncLogViewerProp } from "./SyncLogViewer";
 import type { SyncLogViewerProps } from "./SyncLogViewer";
+import type WellLogView from "./components/WellLogView";
 import type {
-    // @ts-expect-error TS2614
-    WellLogView,
     WellLogController,
     TrackMouseEvent,
     WellPickProps,
@@ -36,7 +35,7 @@ const ComponentCode =
     '       require("../../../../example-data/synclog_template.json"), \r\n' +
     '       require("../../../../example-data/synclog_template.json"), \r\n' +
     "    } \r\n" +
-    "    colorFunctions={colorFunctions} \r\n" +
+    "    colorMapFunctions={colorMapFunctions} \r\n" +
     "/>";
 
 import type { WellLog } from "./components/WellLogTypes";
@@ -69,7 +68,7 @@ const stories: Meta = {
         templates: {
             description: "Array of track template data.",
         },
-        colorFunctions: {
+        colorMapFunctions: {
             description: "Prop containing color function/table data.",
         },
         wellpickFlatting: {
@@ -174,26 +173,26 @@ const Template = (args: SyncLogViewerProps) => {
 
     const onCreateController = React.useCallback(
         // @ts-expect-error TS6133
-        (iWellLog: number, controller: WellLogController) => {
+        (iWellLog: number, controller: WellLogController): void => {
             setControllers((prev) => [...prev, controller]);
         },
         []
     );
     const onDeleteController = React.useCallback(
         // @ts-expect-error TS6133
-        (iWellLog: number, controller: WellLogController) => {
+        (iWellLog: number, controller: WellLogController): void => {
             setControllers((prev) => prev.filter((c) => c !== controller));
         },
         []
     );
     const onContentRescale = React.useCallback(
-        (iWellLog: number) => {
+        (iWellLog: number): void => {
             if (iWellLog === 0) setInfo(fillInfo(controllers[0]));
         },
         [controllers]
     );
     const onContentSelection = React.useCallback(
-        (/*iWellLog*/) => {
+        (/*iWellLog*/): void => {
             /*if(iWellLog===0)*/ setInfo(fillInfo(controllers[0]));
         },
         [controllers]
@@ -204,7 +203,7 @@ const Template = (args: SyncLogViewerProps) => {
         }
     };
     const [checked, setChecked] = React.useState(false);
-    const handleChange = () => {
+    const handleChange = (): void => {
         setChecked(!checked);
     };
     /* eslint-disable */ // no-unused-vars
@@ -367,22 +366,22 @@ const patternNamesEnglish = [
 
 const exampleWellPicks: WellPickProps[] = [
     {
-        wellpick: wellpick[0],
+        wellpick: wellpicks[0],
         name: "HORIZON",
-        colorFunctions: wellpickColorFunctions,
-        colorFunction: "Stratigraphy",
+        colorMapFunctions: wellpickColorMapFunctions,
+        colorMapFunction: "Stratigraphy",
     },
     {
-        wellpick: wellpick[1],
+        wellpick: wellpicks[1],
         name: "HORIZON",
-        colorFunctions: wellpickColorFunctions,
-        colorFunction: "Stratigraphy",
+        colorMapFunctions: wellpickColorMapFunctions,
+        colorMapFunction: "Stratigraphy",
     },
     {
-        wellpick: wellpick[0],
+        wellpick: wellpicks[0],
         name: "HORIZON",
-        colorFunctions: wellpickColorFunctions,
-        colorFunction: "Stratigraphy",
+        colorMapFunctions: wellpickColorMapFunctions,
+        colorMapFunction: "Stratigraphy",
     },
 ];
 
@@ -404,7 +403,7 @@ export const Default: StoryObj<typeof Template> = {
             require("../../../../example-data/synclog_template.json"), // eslint-disable-line
             require("../../../../example-data/synclog_template.json"), // eslint-disable-line
         ],
-        colorFunctions: exampleColorFunctions,
+        colorMapFunctions: exampleColorFunctions,
         wellpicks: exampleWellPicks,
         patternsTable: {
             patternSize: 24,
@@ -583,7 +582,7 @@ const TemplateWithSelection = (args: { welllogs: WellLog[] }) => {
                 <ToggleButton
                     value="check"
                     selected={showWell1 && !!args.welllogs[0]}
-                    onChange={() => {
+                    onChange={(): void => {
                         if (!args.welllogs[1]) alert("No args.welllogs[0]");
                         setShowWell1(!showWell1);
                     }}
@@ -593,7 +592,7 @@ const TemplateWithSelection = (args: { welllogs: WellLog[] }) => {
                 <ToggleButton
                     value="check"
                     selected={showWell2 && !!args.welllogs[1]}
-                    onChange={() => {
+                    onChange={(): void => {
                         if (!args.welllogs[1]) alert("No args.welllogs[1]");
                         setShowWell2(!showWell2);
                     }}
@@ -603,7 +602,7 @@ const TemplateWithSelection = (args: { welllogs: WellLog[] }) => {
                 <ToggleButton
                     value="check"
                     selected={showWell3 && !!args.welllogs[2]}
-                    onChange={() => {
+                    onChange={(): void => {
                         if (!args.welllogs[2]) alert("No args.welllogs[2]");
                         setShowWell3(!showWell3);
                     }}

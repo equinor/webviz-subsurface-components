@@ -12,14 +12,14 @@ import type { ColorMapFunction } from "../components/ColorTableTypes";
 import type { AreaPlotOptions } from "@equinor/videx-wellog/dist/plots/interfaces";
 
 export interface GradientFillPlotOptions extends AreaPlotOptions {
-    colorFunction?: ColorMapFunction;
-    inverseColorFunction?: ColorMapFunction;
+    colorMapFunction?: ColorMapFunction;
+    inverseColorMapFunction?: ColorMapFunction;
     colorScale?: "linear" | "log";
     inverseColorScale?: "linear" | "log";
 }
 
 /*
- * Create gradient based on colorTable/colorFunction
+ * Create gradient based on ColorTable/ColorFunction
  */
 function createGradient(
     ctx: CanvasRenderingContext2D,
@@ -27,7 +27,7 @@ function createGradient(
     horizontal: boolean | undefined,
     plotdata: number[][],
     xscale: Scale,
-    colorFunction: ColorMapFunction,
+    colorMapFunction: ColorMapFunction,
     scale: undefined | string // "linear" | "log"
 ): CanvasGradient {
     const dataFrom = plotdata[0];
@@ -49,7 +49,7 @@ function createGradient(
             const stop = (data[0] - xFrom) / xDelta;
             if (0 <= stop && stop <= 1.0) {
                 const v = (Math.log(data[1]) - yFrom) / yDelta;
-                const c = getInterpolatedColorString(colorFunction, v);
+                const c = getInterpolatedColorString(colorMapFunction, v);
                 gradient.addColorStop(stop, c);
             }
         }
@@ -65,7 +65,7 @@ function createGradient(
             const stop = (data[0] - xFrom) / xDelta;
             if (0 <= stop && stop <= 1.0) {
                 const v = (data[1] - yFrom) / yDelta;
-                const c = getInterpolatedColorString(colorFunction, v);
+                const c = getInterpolatedColorString(colorMapFunction, v);
                 gradient.addColorStop(stop, c);
             }
         }
@@ -130,7 +130,7 @@ export default class GradientFillPlot extends Plot {
 
         ctx.globalAlpha = options.fillOpacity || 1;
 
-        if (options.inverseColor || options.inverseColorFunction) {
+        if (options.inverseColor || options.inverseColorMapFunction) {
             const inverseValue = useMinAsBase ? rmax : rmin;
 
             const inverseAreaFunction = area()
@@ -155,15 +155,15 @@ export default class GradientFillPlot extends Plot {
             inverseAreaFunction(plotdata);
             ctx.fillStyle = options.inverseColor || "";
             /* Start GradientFill code */
-            const colorFunction = options.inverseColorFunction;
-            if (colorFunction)
+            const colorMapFunction = options.inverseColorMapFunction;
+            if (colorMapFunction)
                 ctx.fillStyle = createGradient(
                     ctx,
                     scale,
                     options.horizontal,
                     plotdata,
                     xscale,
-                    colorFunction,
+                    colorMapFunction,
                     options.inverseColorScale ||
                         options.colorScale ||
                         options.scale
@@ -179,15 +179,15 @@ export default class GradientFillPlot extends Plot {
 
         ctx.fillStyle = options.fill || options.color || "";
         /* Start GradientFill code */
-        const colorFunction = options.colorFunction;
-        if (colorFunction)
+        const colorMapFunction = options.colorMapFunction;
+        if (colorMapFunction)
             ctx.fillStyle = createGradient(
                 ctx,
                 scale,
                 options.horizontal,
                 plotdata,
                 xscale,
-                colorFunction,
+                colorMapFunction,
                 options.colorScale || options.scale
             );
         /* End GradientFill code */

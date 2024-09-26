@@ -35,7 +35,7 @@ describe("Test Well Log Viewer Component", () => {
                 }}
                 welllog={exampleWellLog}
                 template={exampleTemplate}
-                colorFunctions={exampleColorFunctions}
+                colorMapFunctions={exampleColorFunctions}
                 horizontal={true}
                 primaryAxis={"md"}
                 axisTitles={axisTitles}

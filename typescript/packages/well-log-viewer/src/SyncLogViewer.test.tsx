@@ -37,7 +37,7 @@ describe("Sync Log Viewer", () => {
                 axisMnemos={axisMnemos}
                 welllogs={[exampleWellLog]} // the same log for all wellog viewers
                 templates={[exampleTemplate]} // the same template for all wellog viewers
-                colorFunctions={exampleColorFunction} // the same colortables for all wellog viewers
+                colorMapFunctions={exampleColorFunction} // the same colortables for all wellog viewers
             />
         );
         expect(container.firstChild).toMatchSnapshot();

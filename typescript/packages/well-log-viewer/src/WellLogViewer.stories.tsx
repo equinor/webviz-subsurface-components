@@ -19,7 +19,7 @@ import type { WellsLayer } from "@webviz/subsurface-viewer/dist/layers";
 import type {
     Template,
     TemplatePlot,
-    TemplatePlotTypes,
+    TemplatePlotType,
     TemplateTrack,
 } from "./components/WellLogTemplateTypes";
 
@@ -43,11 +43,18 @@ import type {
     TrackMouseEvent,
     WellLogController,
     WellLogViewOptions,
+    WellPickProps,
 } from "./components/WellLogView";
+
 import { isEqualRanges } from "./utils/log-viewer";
 
 import { CallbackManager } from "./components/CallbackManager";
 
+import type { Info } from "./components/InfoTypes";
+import type WellLogView from "./components/WellLogView";
+import { axisMnemos, axisTitles } from "./utils/axes";
+
+import wellpicks from "../../../../example-data/wellpicks.json";
 import colorTables from "../../../../example-data/wellpick_colors.json";
 const exampleColorFunctions: ColorMapFunction[] = [
     // copy color tables and add some color functions
@@ -73,18 +80,13 @@ const exampleColorFunctions: ColorMapFunction[] = [
         func: (v: number) => (v < 0.5 ? [255, 0, 0] : [0, 255, 255]),
     },
 ];
-import wellPicks from "../../../../example-data/wellpicks.json";
-
-import type { Info } from "./components/InfoTypes";
-import type WellLogView from "./components/WellLogView";
-import { axisMnemos, axisTitles } from "./utils/axes";
 
 const ComponentCode =
     '<WellLogViewer id="WellLogViewer" \r\n' +
     "    horizontal=false \r\n" +
     '    welllog={require("../../../../example-data/L898MUD.json")[0]} \r\n' +
     '    template={require("../../../../example-data/welllog_template_1.json")} \r\n' +
-    "    colorFunctions={exampleColorFunctions} \r\n" +
+    "    colorMapFunctions={exampleColorFunctions} \r\n" +
     "/>";
 
 const stories: Meta = {
@@ -166,7 +168,7 @@ const StoryTemplate = (args: WellLogViewerProps) => {
         }
     };
     const [checked, setChecked] = React.useState(false);
-    const handleChange = () => {
+    const handleChange = (): void => {
         setChecked(!checked);
     };
     /* eslint-disable */ // no-unused-vars
@@ -209,19 +211,19 @@ const StoryTemplate = (args: WellLogViewerProps) => {
     );
 };
 
-const wellpick = {
-    wellpick: wellPicks[0],
+const wellpick: WellPickProps = {
+    wellpick: wellpicks[0],
     name: "HORIZON",
-    colorFunctions: exampleColorFunctions,
-    color: "Stratigraphy",
+    colorMapFunctions: exampleColorFunctions,
+    colorMapFunction: "Stratigraphy",
 };
 
 function getTemplatePlotColorFunction(
     template: Template,
     templatePlot: TemplatePlot
 ): string | undefined {
-    let colorFunction = templatePlot.colorFunction;
-    if (!colorFunction && templatePlot.style) {
+    let colorMapFunction = templatePlot.colorMapFunction;
+    if (!colorMapFunction && templatePlot.style) {
         const templateStyles = template.styles;
         if (templateStyles) {
             const iStyle = indexOfElementByName(
@@ -230,11 +232,11 @@ function getTemplatePlotColorFunction(
             );
             if (iStyle >= 0) {
                 const style = templateStyles[iStyle];
-                colorFunction = style.colorFunction;
+                colorMapFunction = style.colorMapFunction;
             }
         }
     }
-    return colorFunction;
+    return colorMapFunction;
 }
 
 interface Props extends SubsurfaceViewerProps {
@@ -271,7 +273,7 @@ function findLog(template: Template, logName: string): number {
     );
 }
 
-function detectType(welllog: WellLog, logName: string): TemplatePlotTypes {
+function detectType(welllog: WellLog, logName: string): TemplatePlotType {
     if (welllog) {
         const meta = getDiscreteMeta(welllog, logName); // non-standard extention of WellLog JSON file
         if (meta) return "stacked";
@@ -285,7 +287,7 @@ function addTemplateTrack(
     logName: string
 ): Template {
     // add missed TemplateTrack for the given logName
-    const type: TemplatePlotTypes = detectType(welllog, logName);
+    const type: TemplatePlotType = detectType(welllog, logName);
     const templateNew = deepCopy(template);
     const templateTrack: TemplateTrack = {
         title: logName,
@@ -298,12 +300,11 @@ function addTemplateTrack(
 
 export const Default: StoryObj<typeof StoryTemplate> = {
     args: {
-        id: "Well-Log-Viewer",
+        //id: "Well-Log-Viewer",
         horizontal: false,
         welllog: require("../../../../example-data/L898MUD.json")[0], // eslint-disable-line
         template: require("../../../../example-data/welllog_template_1.json"), // eslint-disable-line
-        colorFunctions: exampleColorFunctions,
-        // @ts-expect-error TS2322
+        colorMapFunctions: exampleColorFunctions,
         wellpick: wellpick,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
@@ -322,7 +323,7 @@ export const Default: StoryObj<typeof StoryTemplate> = {
 
 export const ColorByFunction: StoryObj<typeof StoryTemplate> = {
     args: {
-        id: "Well-Log-Viewer",
+        //id: "Well-Log-Viewer",
         horizontal: false,
         welllog: require("../../../../example-data/L898MUD.json")[0], // eslint-disable-line
         template: {
@@ -347,13 +348,12 @@ export const ColorByFunction: StoryObj<typeof StoryTemplate> = {
                 {
                     name: "HKL",
                     type: "gradientfill",
-                    colorFunction: "Step func",
-                    inverseColorFunction: "Grey scale",
+                    colorMapFunction: "Step func",
+                    inverseColorMapFunction: "Grey scale",
                 },
             ],
         },
-        colorFunctions: exampleColorFunctions,
-        // @ts-expect-error TS2322
+        colorMapFunctions: exampleColorFunctions,
         wellpick: wellpick,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
@@ -372,13 +372,12 @@ export const ColorByFunction: StoryObj<typeof StoryTemplate> = {
 
 export const Horizontal: StoryObj<typeof StoryTemplate> = {
     args: {
-        id: "Well-Log-Viewer-Horizontal",
+        //id: "Well-Log-Viewer-Horizontal",
         horizontal: true,
         welllog:
             require("../../../../example-data/WL_RAW_AAC-BHPR-CAL-DEN-GR-MECH-NEU-NMR-REMP_MWD_3.json")[0], // eslint-disable-line
         template: require("../../../../example-data/welllog_template_2.json"), // eslint-disable-line
-        colorFunctions: exampleColorFunctions,
-        // @ts-expect-error TS2322
+        colorMapFunctions: exampleColorFunctions,
         wellpick: wellpick,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
@@ -396,13 +395,12 @@ export const Horizontal: StoryObj<typeof StoryTemplate> = {
 
 export const OnInfoFilledEvent: StoryObj<typeof StoryTemplate> = {
     args: {
-        id: "Well-Log-Viewer-OnInfoFilled",
+        //id: "Well-Log-Viewer-OnInfoFilled",
         horizontal: true,
         welllog:
             require("../../../../example-data/WL_RAW_AAC-BHPR-CAL-DEN-GR-MECH-NEU-NMR-REMP_MWD_3.json")[0], // eslint-disable-line
         template: require("../../../../example-data/welllog_template_2.json"), // eslint-disable-line
-        colorFunctions: exampleColorFunctions,
-        // @ts-expect-error TS2322
+        colorMapFunctions: exampleColorFunctions,
         wellpick: wellpick,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
@@ -439,7 +437,7 @@ function StoryTemplateWithCustomPanel(props: WellLogViewerProps): JSX.Element {
     );
 }
 
-function CustomInfoPanel(props: { infos: Info[] }): retrun {
+function CustomInfoPanel(props: { infos: Info[] }): JSX.Element {
     const [mousePosition, setMousePosition] = React.useState({
         x: -1000,
         y: -1000,
@@ -507,7 +505,7 @@ class MapAndWellLogViewer extends React.Component<Props, State> {
 
         this.onMapMouseEvent = this.onMapMouseEvent.bind(this);
 
-        this.callbackManager = new CallbackManager(() => {
+        this.callbackManager = new CallbackManager((): WellLog | undefined => {
             return this.state.wellIndex === undefined
                 ? undefined
                 : welllogs[this.state.wellIndex];
@@ -758,7 +756,7 @@ class MapAndWellLogViewer extends React.Component<Props, State> {
                                     : undefined
                             }
                             template={template}
-                            colorFunctions={
+                            colorMapFunctions={
                                 // TODO: Fix this the next time the file is edited.
                                 // eslint-disable-next-line react/prop-types
                                 this.props.colorTables as ColorMapFunction[]
@@ -806,17 +804,16 @@ const wells_layer = exampleData[0].layers.find(
 );
 if (wells_layer) {
     wells_layer.logName = "ZONE_MAIN"; //
-    wells_layer.logColor = "Stratigraphy"; //"Stratigraphy";
+    wells_layer.logColor = "Stratigraphy";
 }
 
 export const Discrete: StoryObj<typeof StoryTemplate> = {
     args: {
-        id: "Well-Log-Viewer-Discrete",
+        //id: "Well-Log-Viewer-Discrete",
         horizontal: false,
         welllog: require("../../../../example-data/volve_logs.json")[0], // eslint-disable-line
         template: require("../../../../example-data/welllog_template_2.json"), // eslint-disable-line
-        colorFunctions: exampleColorFunctions,
-        // @ts-expect-error TS2322
+        colorMapFunctions: exampleColorFunctions,
         wellpick: wellpick,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,

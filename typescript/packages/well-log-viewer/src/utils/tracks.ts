@@ -33,7 +33,7 @@ import { getInterpolatedColor } from "./color-table";
 import { createScale } from "./graph/factory";
 
 import type {
-    TemplatePlotTypes,
+    TemplatePlotType,
     TemplatePlotProps,
     TemplateTrack,
     TemplatePlot,
@@ -246,7 +246,7 @@ import {
     LineStepPlot,
 } from "@equinor/videx-wellog";
 import GradientFillPlot from "../utils/gradientfill-plot";
-export function getPlotType(plot: Plot): TemplatePlotTypes {
+export function getPlotType(plot: Plot): TemplatePlotType {
     if (plot instanceof GradientFillPlot) return "gradientfill";
     if (plot instanceof LinePlot) return "line";
     if (plot instanceof AreaPlot) return "area";
@@ -304,7 +304,7 @@ function getTemplatePlotProps(
             options.fillOpacity = 0.0;
         }
     } else if (options.type === "gradientfill") {
-        if (!options.colorFunction) {
+        if (!options.colorMapFunction) {
             //options.fill = generateColor();
             options.fillOpacity = 0.0;
         }
@@ -353,26 +353,26 @@ function makeDataAccessor2(iData: number, iData2: number) {
 
 function getColorFunction(
     id: string | undefined,
-    colorFunctions: ColorMapFunction[] | undefined
+    colorMapFunctions: ColorMapFunction[] | undefined
 ): ColorMapFunction | undefined {
     if (id) {
         if (typeof id !== "string") {
-            console.log("colorFunction id='" + id + "' is not a string");
+            console.log("colorMapFunction id='" + id + "' is not a string");
             return undefined;
         }
-        if (colorFunctions) {
-            const colorFunction = colorFunctions.find(
+        if (colorMapFunctions) {
+            const colorMapFunction = colorMapFunctions.find(
                 (value) => value.name === id
             );
-            if (colorFunction) return colorFunction;
+            if (colorMapFunction) return colorMapFunction;
             console.error(
-                "colorFunction id='" +
+                "colorMapFunction id='" +
                     id +
                     "' is not found in getColorFunction()"
             );
             return undefined;
         }
-        console.log("colorFunctions is not given in getColorFunction()");
+        console.log("colorMapFunctions is not given in getColorFunction()");
     }
     return undefined;
 }
@@ -385,7 +385,7 @@ function getPlotOptions(
     iPlot: number,
     curve2: WellLogCurve | undefined, //"differential" plot
     iPlot2: number, //"differential" plot
-    colorFunctions?: ColorMapFunction[] //"gradientfill" plot
+    colorMapFunctions?: ColorMapFunction[] //"gradientfill" plot
 ): ExtPlotOptions {
     const scale = templatePlotProps.scale || trackScale || "linear"; //"linear" or "log"
     const domain = (
@@ -414,13 +414,13 @@ function getPlotOptions(
         useMinAsBase: true, // for 'area' and 'gradientfill'!
 
         //GradientFillPlotOptions
-        colorFunction: getColorFunction(
-            templatePlotProps.colorFunction,
-            colorFunctions
+        colorMapFunction: getColorFunction(
+            templatePlotProps.colorMapFunction,
+            colorMapFunctions
         ),
-        inverseColorFunction: getColorFunction(
-            templatePlotProps.inverseColorFunction,
-            colorFunctions
+        inverseColorMapFunction: getColorFunction(
+            templatePlotProps.inverseColorMapFunction,
+            colorMapFunctions
         ),
         colorScale: templatePlotProps.colorScale,
         inverseColorScale: templatePlotProps.inverseColorScale,
@@ -469,7 +469,7 @@ function getPlotConfig(
     iPlot: number,
     curve2: WellLogCurve | undefined,
     iPlot2: number,
-    colorFunctions: ColorMapFunction[] | undefined
+    colorMapFunctions: ColorMapFunction[] | undefined
 ): PlotConfig {
     return {
         id: id,
@@ -483,7 +483,7 @@ function getPlotConfig(
             iPlot,
             curve2,
             iPlot2,
-            colorFunctions
+            colorMapFunctions
         ),
     };
 }
@@ -615,7 +615,7 @@ function addGraphTrackPlot(
         const plotDatas = track.options.data;
         const plots = track.plots;
 
-        const colorFunctions = wellLogView.props.colorFunctions;
+        const colorMapFunctions = wellLogView.props.colorMapFunctions;
 
         let iCurve2 = -1;
         let curve2: WellLogCurve | undefined = undefined;
@@ -648,7 +648,7 @@ function addGraphTrackPlot(
             plotDatas.length,
             curve2,
             plotDatas.length + 1,
-            colorFunctions
+            colorMapFunctions
         );
 
         plotDatas.push(plotData.data);
@@ -715,7 +715,7 @@ function editGraphTrackPlot(
         const plotDatas = track.options.data;
         const plots = track.plots;
 
-        const colorFunctions = wellLogView.props.colorFunctions;
+        const colorMapFunctions = wellLogView.props.colorMapFunctions;
 
         let iCurve2 = -1;
         let curve2: WellLogCurve | undefined = undefined;
@@ -748,7 +748,7 @@ function editGraphTrackPlot(
             plotDatas.length,
             curve2,
             plotDatas.length + 1,
-            colorFunctions
+            colorMapFunctions
         );
 
         plotDatas.push(plotData.data);
@@ -881,7 +881,7 @@ const mapStringToNum = new Map();
 
 export function getDiscreteColorAndName(
     value: number | string | null,
-    colorFunction: ColorMapFunction | undefined,
+    colorMapFunction: ColorMapFunction | undefined,
     meta?: DiscreteMeta | null
 ): { color: number[]; name: string } {
     let color: number[];
@@ -890,7 +890,7 @@ export function getDiscreteColorAndName(
     if (meta) {
         // use discrete metadata from WellLog JSON file
         const { objects, iColor, iCode } = meta;
-        let object: [] | undefined = undefined;
+        let object: (number[] | number)[] | undefined = undefined;
         if (typeof value === "string") {
             // value is key
             name = value;
@@ -909,23 +909,23 @@ export function getDiscreteColorAndName(
             }
         }
         /*if(object)*/ {
-            if (colorFunction) {
+            if (colorMapFunction) {
                 // get color from the table
                 color = getInterpolatedColor(
-                    colorFunction,
+                    colorMapFunction,
                     !object
                         ? Number.NaN
                         : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                          parseFloat((object[iCode] as any).toString()) // parseInt for discrete log
+                          parseFloat((object[iCode] as number).toString()) // parseInt for discrete log
                 );
             } else {
                 // get color from the meta (obsolete?)
-                color = object ? object[iColor] : [255, 25, 25];
+                color = object ? (object[iColor] as number[]) : [255, 25, 25];
             }
         }
     } else {
         name = value.toString();
-        if (colorFunction) {
+        if (colorMapFunction) {
             // get color from the table
             if (typeof value == "string") {
                 let v: number;
@@ -936,10 +936,10 @@ export function getDiscreteColorAndName(
                     v = iStringToNum;
                     iStringToNum++;
                 }
-                color = getInterpolatedColor(colorFunction, v);
+                color = getInterpolatedColor(colorMapFunction, v);
             } else {
                 color = getInterpolatedColor(
-                    colorFunction,
+                    colorMapFunction,
                     parseInt(value.toString())
                 );
             }
@@ -955,10 +955,14 @@ function createAreaData(
     from: number,
     to: number,
     value: number | string,
-    colorFunction: ColorMapFunction | undefined,
+    colorMapFunction: ColorMapFunction | undefined,
     meta?: DiscreteMeta | null
 ): AreaData | null {
-    const { color, name } = getDiscreteColorAndName(value, colorFunction, meta);
+    const { color, name } = getDiscreteColorAndName(
+        value,
+        colorMapFunction,
+        meta
+    );
     return {
         from: from,
         to: to,
@@ -974,7 +978,7 @@ function createAreaData(
 
 async function createStackData(
     data: [number | null, number | string | null][],
-    colorFunction: ColorMapFunction | undefined,
+    colorMapFunction: ColorMapFunction | undefined,
     meta: DiscreteMeta | undefined | null
 ): Promise<AreaData[]> {
     const arr: AreaData[] = new Array<AreaData>();
@@ -1017,7 +1021,13 @@ async function createStackData(
         if (!area && value !== null && value !== undefined && p[0] !== null) {
             // new value is not null
             // create new interval colored and labeled for the value
-            area = createAreaData(boundary, p[0], value, colorFunction, meta);
+            area = createAreaData(
+                boundary,
+                p[0],
+                value,
+                colorMapFunction,
+                meta
+            );
         }
         prev = p;
     }
@@ -1208,7 +1218,7 @@ function addGraphTrack(
     iPrimaryAxis: number,
     templateTrack: TemplateTrack,
     templateStyles: TemplateStyle[] | undefined,
-    colorFunctions: ColorMapFunction[] | undefined
+    colorMapFunctions: ColorMapFunction[] | undefined
 ): void {
     const plotDatas: [number | null, number | string | null][][] = [];
     const plots: PlotConfig[] = [];
@@ -1262,7 +1272,7 @@ function addGraphTrack(
                 plotDatas.length,
                 curve2,
                 plotDatas.length + 1,
-                colorFunctions
+                colorMapFunctions
             );
 
             plotDatas.push(plotData.data);
@@ -1294,7 +1304,7 @@ function addStackedTrack(
     iPrimaryAxis: number,
     templateTrack: TemplateTrack,
     templateStyles?: TemplateStyle[],
-    colorFunctions?: ColorMapFunction[],
+    colorMapFunctions?: ColorMapFunction[],
     showLines?: boolean,
     showLabels?: boolean,
     labelRotation?: number
@@ -1333,23 +1343,23 @@ function addStackedTrack(
                 "' not found. Use default"
         );
 
-    let colorFunction: ColorMapFunction | undefined = undefined;
-    if (templatePlotProps.colorFunction) {
-        if (colorFunctions) {
-            colorFunction = colorFunctions.find(
-                (colorFunction) =>
-                    colorFunction.name == templatePlotProps.colorFunction
+    let colorMapFunction: ColorMapFunction | undefined = undefined;
+    if (templatePlotProps.colorMapFunction) {
+        if (colorMapFunctions) {
+            colorMapFunction = colorMapFunctions.find(
+                (colorMapFunction) =>
+                    colorMapFunction.name == templatePlotProps.colorMapFunction
             );
-            if (!colorFunction)
+            if (!colorMapFunction)
                 console.error(
                     "Missed '" +
-                        templatePlotProps.colorFunction +
+                        templatePlotProps.colorMapFunction +
                         "' color function/table"
                 );
         } else {
             console.error(
                 "No color function/table array given for '" +
-                    templatePlotProps.colorFunction +
+                    templatePlotProps.colorMapFunction +
                     "' color function"
             );
         }
@@ -1371,7 +1381,7 @@ function addStackedTrack(
     const options: StackedTrackOptions = {
         abbr: name, // name of the only plot
         legendConfig: stackLegendConfig,
-        data: createStackData.bind(null, plotData.data, colorFunction, meta),
+        data: createStackData.bind(null, plotData.data, colorMapFunction, meta),
     };
     setStackedTrackOptionsFromTemplate(options, templateTrackFullPlot);
     const track = newStackedTrack(options);
@@ -1398,7 +1408,7 @@ export function createTracks(
     axes: AxesInfo,
     templateTracks: TemplateTrack[], // Part of JSON
     templateStyles: TemplateStyle[] | undefined, // Part of JSON
-    colorFunctions: ColorMapFunction[] // JS code or JSON color table
+    colorMapFunctions: ColorMapFunction[] // JS code or JSON color table
 ): TracksInfo {
     const info = new TracksInfo();
     if (welllog) {
@@ -1427,7 +1437,7 @@ export function createTracks(
                         iPrimaryAxis,
                         templateTrack,
                         templateStyles,
-                        colorFunctions,
+                        colorMapFunctions,
                         templatePlotProps.showLines,
                         templatePlotProps.showLabels,
                         templatePlotProps.labelRotation
@@ -1441,7 +1451,7 @@ export function createTracks(
                         iPrimaryAxis,
                         templateTrack,
                         templateStyles,
-                        colorFunctions
+                        colorMapFunctions
                     );
                 }
             }
@@ -1556,8 +1566,9 @@ export function addOrEditStackedTrack(
         templateStyles
     );
 
-    const colorFunction = props.colorFunctions?.find(
-        (colorFunction) => colorFunction.name == templatePlotProps.colorFunction
+    const colorMapFunction = props.colorMapFunctions?.find(
+        (colorMapFunction) =>
+            colorMapFunction.name == templatePlotProps.colorMapFunction
     );
     const meta = getDiscreteMeta(welllog, name);
     const data = welllog.data;
@@ -1572,7 +1583,7 @@ export function addOrEditStackedTrack(
     const stackData = createStackData.bind(
         null,
         plotData.data,
-        colorFunction,
+        colorMapFunction,
         meta
     );
     if (track) {

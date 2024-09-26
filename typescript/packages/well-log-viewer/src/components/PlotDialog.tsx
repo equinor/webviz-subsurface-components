@@ -3,7 +3,7 @@ import React, { Component } from "react";
 
 import type { Track, GraphTrack } from "@equinor/videx-wellog";
 
-import type { TemplatePlot, TemplatePlotTypes } from "./WellLogTemplateTypes";
+import type { TemplatePlot, TemplatePlotType } from "./WellLogTemplateTypes";
 import type { WellLog } from "./WellLogTypes";
 import type { ColorMapFunction } from "./ColorTableTypes";
 
@@ -90,19 +90,19 @@ export function createBooleanItems(): ReactNode[] {
 }
 
 function createColorFunctionItems(
-    colorFunctions: ColorMapFunction[]
+    colorMapFunctions: ColorMapFunction[]
 ): ReactNode[] {
     const nodes: ReactNode[] = [];
-    if (!colorFunctions || !colorFunctions.length) {
+    if (!colorMapFunctions || !colorMapFunctions.length) {
         console.error(
-            "colorFunctions are missed or empty in createColorFunctionItems()"
+            "colorMapFunctions are missed or empty in createColorFunctionItems()"
         );
     } else {
-        for (const colorFunction of colorFunctions) {
-            const name = colorFunction.name;
+        for (const colorMapFunction of colorMapFunctions) {
+            const name = colorMapFunction.name;
             if (!name) {
                 console.error(
-                    "colorFunction.name is empty in createColorFunctionItems()"
+                    "colorMapFunction.name is empty in createColorFunctionItems()"
                 );
             }
             nodes.push(<option key={name}>{name}</option>);
@@ -220,11 +220,11 @@ export class PlotPropertiesDialog extends Component<Props, State> {
                   inverseColor: "",
 
                   // for 'gradientfill' plot
-                  colorFunction:
+                  colorMapFunction:
                       // TODO: Fix this the next time the file is edited.
                       // eslint-disable-next-line react/prop-types
-                      this.props.wellLogView.props.colorFunctions?.[0]?.name,
-                  inverseColorFunction: undefined,
+                      this.props.wellLogView.props.colorMapFunctions?.[0]?.name,
+                  inverseColorMapFunction: undefined,
                   colorScale: undefined,
                   inverseColorScale: undefined,
 
@@ -326,7 +326,7 @@ export class PlotPropertiesDialog extends Component<Props, State> {
         );
     }
 
-    createSelectControlFromType(type?: TemplatePlotTypes): ReactNode {
+    createSelectControlFromType(type?: TemplatePlotType): ReactNode {
         if (type === "area" || type === "differential") {
             return [
                 this.createSelectControl(
@@ -350,19 +350,20 @@ export class PlotPropertiesDialog extends Component<Props, State> {
         } else if (type === "gradientfill") {
             // TODO: Fix this the next time the file is edited.
             // eslint-disable-next-line react/prop-types
-            const colorFunctions = this.props.wellLogView.props.colorFunctions;
+            const colorMapFunctions =
+                this.props.wellLogView.props.colorMapFunctions;
             return [
                 this.createSelectControl(
-                    "colorFunction",
+                    "colorMapFunction",
                     "Fill Color function/table",
-                    createColorFunctionItems(colorFunctions)
+                    createColorFunctionItems(colorMapFunctions)
                 ),
                 <FormControl fullWidth key="211" />,
                 <FormControl fullWidth key="212" />,
                 this.createSelectControl(
-                    "inverseColorFunction",
+                    "inverseColorMapFunction",
                     "Inverse Color function/table",
-                    createColorFunctionItems(colorFunctions),
+                    createColorFunctionItems(colorMapFunctions),
                     true
                 ),
             ];

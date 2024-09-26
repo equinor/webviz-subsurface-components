@@ -15,9 +15,9 @@ import defaultLayout from "./components/DefaultSyncLogViewerLayout";
 import type { WellLog } from "./components/WellLogTypes";
 import type { Template } from "./components/WellLogTemplateTypes";
 import type { ColorMapFunction } from "./components/ColorTableTypes";
-import { ColorFunctionType } from "./components/ColorTableTypes";
+import { ColorFunctionType } from "./components/CommonPropTypes";
 import type { PatternsTable, Pattern } from "./utils/pattern";
-import { PatternsTableType, PatternsType } from "./utils/pattern";
+import { PatternsTableType, PatternsType } from "./components/CommonPropTypes";
 import type {
     WellLogController,
     WellPickProps,
@@ -70,7 +70,7 @@ export const WellDistancesType = PropTypes.shape({
     units: PropTypes.string.isRequired,
     distances:
         PropTypes
-            .array /*Of(PropTypes.oneOf([PropTypes.number, PropTypes.undefined])*/
+            .array /*Of(PropTypes.oneOfType([PropTypes.number, PropTypes.undefined])*/
             .isRequired,
 });
 
@@ -88,7 +88,7 @@ export interface SyncLogViewerProps {
     /**
      * Prop containing color function/table array.
      */
-    colorFunctions: ColorMapFunction[];
+    colorMapFunctions: ColorMapFunction[];
 
     /**
      * Set to true for default titles or to array of individial welllog titles
@@ -211,7 +211,7 @@ export const argTypesSyncLogViewerProp = {
     templates: {
         description: "Array of track template data.",
     },
-    colorFunctions: {
+    colorMapFunctions: {
         description: "Prop containing color function/table data.",
     },
     wellpicks: {
@@ -966,7 +966,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                 welllog={wellLog}
                 viewTitle={viewTitle}
                 template={template}
-                colorFunctions={this.props.colorFunctions}
+                colorMapFunctions={this.props.colorMapFunctions}
                 wellpick={this.props.wellpicks?.[index]}
                 patternsTable={this.props.patternsTable}
                 patterns={this.props.patterns}
@@ -1029,7 +1029,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                             : "",
                         value: this.props.wellDistances?.distances[prev],
                     }}
-                    colorFunctions={this.props.colorFunctions}
+                    colorMapFunctions={this.props.colorMapFunctions}
                     wellpicks={
                         this.props.wellpicks
                             ? [
@@ -1151,7 +1151,7 @@ SyncLogViewer.propTypes = {
     /**
      * Prop containing color function/table data
      */
-    colorFunctions: PropTypes.arrayOf(ColorFunctionType).isRequired,
+    colorMapFunctions: PropTypes.arrayOf(ColorFunctionType).isRequired,
 
     /**
      * Well Picks data array

@@ -35,7 +35,7 @@ describe("Test Well Log View Component", () => {
                     hideTrackTitle: true,
                 }}
                 template={exampleTemplate}
-                colorFunctions={exampleColorFunctions}
+                colorMapFunctions={exampleColorFunctions}
                 primaryAxis={"md"}
                 axisTitles={{
                     md: "MD",

@@ -1,21 +1,15 @@
 import type { colorTablesObj } from "@emerson-eps/color-tables/dist/component/colorTableTypes";
 export type ColorTable = colorTablesObj;
-export type colorFunctionsObj = {
+export type ColorFunction = {
     name: string;
-    func: (v: number) => [number, number, number];
+    func: (v: number) => [number, number, number]; // input number is between 0.0 and 1.0; returned numbers are between 0 and 255
 };
 
-export type ColorMapFunction = ColorTable | colorFunctionsObj;
+export type ColorMapFunction = ColorTable | ColorFunction;
 
 export function isFunction(
-    colorFunction: ColorMapFunction | undefined
+    colorMapFunction: ColorMapFunction | undefined
 ): boolean {
-    if (!colorFunction) return false;
-    return !!(colorFunction as colorFunctionsObj).func;
+    if (!colorMapFunction) return false;
+    return !!(colorMapFunction as ColorFunction).func;
 }
-
-import PropTypes from "prop-types";
-export const ColorFunctionType = PropTypes.oneOfType([
-    PropTypes.func,
-    PropTypes.object,
-]);

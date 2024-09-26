@@ -43,7 +43,7 @@ describe("Well Log Viewer perfomance", () => {
                     axisTitles={axisTitles}
                     axisMnemos={axisMnemos}
                     template={exampleTemplate}
-                    colorFunctions={exampleColorFunctions}
+                    colorMapFunctions={exampleColorFunctions}
                     onContentRescale={function (): void {
                         // todo: fix the test
                         // commented to make test pass

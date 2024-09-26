@@ -28,7 +28,7 @@ export interface WellLogSpacerProps {
     /**
      * Prop containing color function/table data.
      */
-    colorFunctions: ColorMapFunction[];
+    colorMapFunctions: ColorMapFunction[];
     /**
      * Well Picks data
      */
@@ -144,7 +144,7 @@ class WellLogSpacer extends Component<WellLogSpacerProps /*, State*/> {
     ): boolean {
         // TODO: Fix this the next time the file is edited.
         // eslint-disable-next-line react/prop-types
-        if (this.props.colorFunctions !== nextProps.colorFunctions) {
+        if (this.props.colorMapFunctions !== nextProps.colorMapFunctions) {
             return true;
         }
         // TODO: Fix this the next time the file is edited.

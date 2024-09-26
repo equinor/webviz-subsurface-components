@@ -29,7 +29,7 @@ describe("Test Well Log View Component with Scroller", () => {
             <WellLogViewWithScroller
                 welllog={welllog}
                 template={template}
-                colorFunctions={exampleColorFunctions}
+                colorMapFunctions={exampleColorFunctions}
                 primaryAxis={"md"}
                 axisTitles={{
                     md: "MD",

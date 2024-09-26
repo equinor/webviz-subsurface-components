@@ -22,7 +22,7 @@ import { color4ToString } from "./color-table";
 let __idGradient = 0;
 function createGradient(
     g: D3Selection,
-    colorFunction: ColorMapFunction,
+    colorMapFunction: ColorMapFunction,
     rLogarithmic?: number
 ): string {
     const id = "grad" + ++__idGradient; // generate unique id
@@ -42,23 +42,26 @@ function createGradient(
             const fraction = i / nIntervals;
             const y = 1 + fraction * d;
             const v = Math.log(y) / yDelta;
-            const c = getInterpolatedColorString(colorFunction, v);
+            const c = getInterpolatedColorString(colorMapFunction, v);
             lg.append("stop")
                 .attr("offset", fraction * 100.0 + "%")
                 .style("stop-color", c);
         }
     } else {
-        if (isFunction(colorFunction)) {
+        if (isFunction(colorMapFunction)) {
             const nIntervals = 25; // set some not very big value to smooth filling
             for (let i = 0; i <= nIntervals; i++) {
                 const fraction = i / nIntervals;
-                const c = getInterpolatedColorString(colorFunction, fraction);
+                const c = getInterpolatedColorString(
+                    colorMapFunction,
+                    fraction
+                );
                 lg.append("stop")
                     .attr("offset", fraction * 100.0 + "%")
                     .style("stop-color", c);
             }
         } else {
-            const table = colorFunction as ColorTable;
+            const table = colorMapFunction as ColorTable;
             const colors = table.colors;
             for (let i = 0; i < colors.length; i++) {
                 const color = colors[i];
@@ -87,7 +90,7 @@ export default function renderGradientFillPlotLegend(
     const shadeY = top;
     const fillOpacity = Math.min((options.fillOpacity || 0.0) + 0.25, 1);
 
-    if (options.inverseColor || options.inverseColorFunction) {
+    if (options.inverseColor || options.inverseColorMapFunction) {
         const [min, max] = plot.scale.domain();
         const minIsLeft = min <= max;
         const centerX = left + width / 2;
@@ -107,28 +110,28 @@ export default function renderGradientFillPlotLegend(
                 : plot.options.color;
 
         /* Start GradientFill code */
-        let colorFunction: ColorMapFunction | undefined =
+        let colorMapFunction: ColorMapFunction | undefined =
             useMinAsBase && minIsLeft
-                ? options.colorFunction
-                : options.inverseColorFunction;
-        if (colorFunction) {
+                ? options.colorMapFunction
+                : options.inverseColorMapFunction;
+        if (colorMapFunction) {
             const id = createGradient(
                 g,
-                colorFunction,
+                colorMapFunction,
                 options.scale === "linear" && options.colorScale === "log"
                     ? max / min
                     : undefined
             );
             fillNrm = "url(#" + id + ")";
         }
-        colorFunction =
+        colorMapFunction =
             useMinAsBase && minIsLeft
-                ? options.inverseColorFunction
-                : options.colorFunction;
-        if (colorFunction) {
+                ? options.inverseColorMapFunction
+                : options.colorMapFunction;
+        if (colorMapFunction) {
             const id = createGradient(
                 g,
-                colorFunction,
+                colorMapFunction,
                 options.scale === "linear" &&
                     (options.inverseColorScale || options.colorScale) === "log"
                     ? max / min
@@ -158,12 +161,12 @@ export default function renderGradientFillPlotLegend(
     } else {
         let fillNrm = plot.options.color; // see area-plot-legend.ts! should be? plot.options.fill || plot.options.color;
         /* Start GradientFill code */
-        const colorFunction = options.colorFunction;
-        if (colorFunction) {
+        const colorMapFunction = options.colorMapFunction;
+        if (colorMapFunction) {
             const [min, max] = plot.scale.domain();
             const id = createGradient(
                 g,
-                colorFunction,
+                colorMapFunction,
                 options.scale === "linear" && options.colorScale === "log"
                     ? max / min
                     : undefined

@@ -8,14 +8,6 @@ export interface PatternsTable {
 }
 export type Pattern = [string, number];
 
-import PropTypes from "prop-types";
-export const PatternsTableType = PropTypes.shape({
-    patternSize: PropTypes.number.isRequired,
-    patternImages: PropTypes.arrayOf(PropTypes.string).isRequired,
-    patternNames: PropTypes.arrayOf(PropTypes.string),
-});
-export const PatternsType = PropTypes.array; /*Of<string, number>*/ // [string, number]
-
 export function patternId(uid: number, index: number): string {
     return "pattern" + uid + "_" + index;
 }

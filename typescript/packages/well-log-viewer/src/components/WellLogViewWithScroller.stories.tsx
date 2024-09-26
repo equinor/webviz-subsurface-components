@@ -14,7 +14,7 @@ const ComponentCode =
     "    horizontal=false \r\n" +
     '    welllog={require("../../../../../example-data/L898MUD.json")[0]} \r\n' +
     '    template={require("../../../../../example-data/welllog_template_1.json")} \r\n' +
-    "    colorFunctions={exampleColorFunctions} \r\n" +
+    "    colorMapFunctions={exampleColorFunctions} \r\n" +
     "/>";
 
 import { axisTitles, axisMnemos } from "../utils/axes";
@@ -81,7 +81,7 @@ export const Default: StoryObj<typeof Template> = {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         template: require("../../../../../example-data/welllog_template_1.json"),
         viewTitle: "Well '" + wellLog.header.well + "'",
-        colorFunctions: exampleColorFunctions,
+        colorMapFunctions: exampleColorFunctions,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
         options: {

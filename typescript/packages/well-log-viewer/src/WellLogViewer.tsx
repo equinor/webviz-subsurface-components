@@ -9,8 +9,7 @@ import defaultLayout from "./components/DefaultWellLogViewerLayout";
 import WellLogViewWithScroller from "./components/WellLogViewWithScroller";
 import type { WellLogViewWithScrollerProps } from "./components/WellLogViewWithScroller";
 import { argTypesWellLogViewScrollerProp } from "./components/WellLogViewWithScroller";
-import { TemplateType } from "./components/WellLogTemplateTypes";
-import { ColorFunctionType } from "./components/ColorTableTypes";
+import { TemplateType, ColorFunctionType } from "./components/CommonPropTypes";
 import { WellPickPropsType } from "./components/WellLogView";
 //import { _propTypesWellLogView } from "./components/WellLogView";
 
@@ -292,7 +291,7 @@ export default class WellLogViewer extends Component<
                         welllog={this.props.welllog}
                         viewTitle={this.props.viewTitle}
                         template={this.props.template}
-                        colorFunctions={this.props.colorFunctions}
+                        colorMapFunctions={this.props.colorMapFunctions}
                         wellpick={this.props.wellpick}
                         patternsTable={this.props.patternsTable}
                         patterns={this.props.patterns}
@@ -384,7 +383,7 @@ WellLogViewer.propTypes = {
     /**
      * Prop containing color table data
      */
-    colorFunctions: PropTypes.arrayOf(ColorFunctionType).isRequired,
+    colorMapFunctions: PropTypes.arrayOf(ColorFunctionType).isRequired,
 
     /**
      * Orientation of the track plots on the screen. Default is false
