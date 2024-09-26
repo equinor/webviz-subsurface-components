@@ -22,7 +22,6 @@ const WellTooltipContent: React.FC<WellTooltipContentProps> = (
     return (
         <table style={{ color: "#fff" }}>
             <tbody>
-                {/* earliest completion date */}
                 <tr key={`well-tooltip-${props.name}-earliest-comp`}>
                     <td>
                         <b>
