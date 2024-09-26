@@ -13,8 +13,8 @@ const exampleWellLog = {
     curves: [],
     data: [],
 };
-import type { ColorFunction } from "./ColorTableTypes";
-const exampleColorFunctions = colorTables as ColorFunction[];
+import type { ColorMapFunction } from "./ColorTableTypes";
+const exampleColorFunctions = colorTables as ColorMapFunction[];
 
 window.ResizeObserver =
     window.ResizeObserver ||

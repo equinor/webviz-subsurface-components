@@ -165,7 +165,12 @@ export default class WellLogViewer extends Component<
         this.callbackManager.onChangePrimaryAxis(value);
     }
 
-    onInfo(x: number, logController: LogViewer, iFrom: number, iTo: number) {
+    onInfo(
+        x: number,
+        logController: LogViewer,
+        iFrom: number,
+        iTo: number
+    ): void {
         this.callbackManager.onInfo(x, logController, iFrom, iTo);
         // TODO: Fix this the next time the file is edited.
         // eslint-disable-next-line react/prop-types
@@ -174,7 +179,12 @@ export default class WellLogViewer extends Component<
         this.fillInfo(x, logController, iFrom, iTo);
     }
 
-    fillInfo(x: number, logController: LogViewer, iFrom: number, iTo: number) {
+    fillInfo(
+        x: number,
+        logController: LogViewer,
+        iFrom: number,
+        iTo: number
+    ): void {
         if (this.callbackManager.onInfoFilledCallbacks.length < 1) return;
 
         const infoOptions = this.props.readoutOptions;

@@ -5,8 +5,8 @@ import WellLogView from "./WellLogView";
 import type { WellLogViewProps } from "./WellLogView";
 import { argTypesWellLogViewProp } from "./WellLogView";
 import { colorTables } from "@emerson-eps/color-tables";
-import type { ColorFunction } from "./ColorTableTypes";
-const exampleColorFunctions = colorTables as ColorFunction[];
+import type { ColorMapFunction } from "./ColorTableTypes";
+const exampleColorFunctions = colorTables as ColorMapFunction[];
 
 import L898MUD from "../../../../../example-data/L898MUD.json";
 import volve_logs from "../../../../../example-data/volve_logs.json";

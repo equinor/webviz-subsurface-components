@@ -6,8 +6,8 @@ import React from "react";
 import SyncLogViewer from "./SyncLogViewer";
 import { axisMnemos, axisTitles } from "./utils/axes";
 
-import type { ColorFunction } from "./components/ColorTableTypes";
-const exampleColorFunction = colorTables as unknown as ColorFunction[];
+import type { ColorMapFunction } from "./components/ColorTableTypes";
+const exampleColorFunction = colorTables as ColorMapFunction[];
 // TODO: Fix this the next time the file is edited.
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const exampleWellLog = require("../../../../example-data/L898MUD.json")[0];

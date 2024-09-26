@@ -30,7 +30,7 @@ const welllogs = welllogsJson as unknown as WellLog[];
 import templateJson from "../../../../example-data/welllog_template_2.json";
 const template = templateJson as unknown as Template;
 
-import type { ColorFunction } from "./components/ColorTableTypes";
+import type { ColorMapFunction } from "./components/ColorTableTypes";
 
 import type { MapMouseEvent } from "@webviz/subsurface-viewer/dist/components/Map";
 
@@ -49,9 +49,9 @@ import { isEqualRanges } from "./utils/log-viewer";
 import { CallbackManager } from "./components/CallbackManager";
 
 import colorTables from "../../../../example-data/wellpick_colors.json";
-const exampleColorFunctions: ColorFunction[] = [
+const exampleColorFunctions: ColorMapFunction[] = [
     // copy color tables and add some color functions
-    ...(colorTables as ColorFunction[]),
+    ...(colorTables as ColorMapFunction[]),
     {
         name: "Grey scale",
         func: (v: number) => [v * 255, v * 255, v * 255],
@@ -113,7 +113,7 @@ const stories: Meta = {
 };
 export default stories;
 
-function fillInfo(controller: WellLogController | undefined) {
+function fillInfo(controller: WellLogController | undefined): string {
     if (!controller) return "-";
     const baseDomain = controller.getContentBaseDomain();
     const domain = controller.getContentDomain();
@@ -154,13 +154,13 @@ const StoryTemplate = (args: WellLogViewerProps) => {
         },
         [controller]
     );
-    const onContentRescale = React.useCallback(() => {
+    const onContentRescale = React.useCallback((): void => {
         setInfo(fillInfo(controller));
     }, [controller]);
-    const onContentSelection = React.useCallback(() => {
+    const onContentSelection = React.useCallback((): void => {
         setInfo(fillInfo(controller));
     }, [controller]);
-    const handleClick = () => {
+    const handleClick = (): void => {
         if (controller) {
             controller.setControllerDefaultZoom();
         }
@@ -219,7 +219,7 @@ const wellpick = {
 function getTemplatePlotColorFunction(
     template: Template,
     templatePlot: TemplatePlot
-) {
+): string | undefined {
     let colorFunction = templatePlot.colorFunction;
     if (!colorFunction && templatePlot.style) {
         const templateStyles = template.styles;
@@ -439,7 +439,7 @@ function StoryTemplateWithCustomPanel(props: WellLogViewerProps): JSX.Element {
     );
 }
 
-function CustomInfoPanel(props: { infos: Info[] }) {
+function CustomInfoPanel(props: { infos: Info[] }): retrun {
     const [mousePosition, setMousePosition] = React.useState({
         x: -1000,
         y: -1000,
@@ -761,7 +761,7 @@ class MapAndWellLogViewer extends React.Component<Props, State> {
                             colorFunctions={
                                 // TODO: Fix this the next time the file is edited.
                                 // eslint-disable-next-line react/prop-types
-                                this.props.colorTables as ColorFunction[]
+                                this.props.colorTables as ColorMapFunction[]
                             }
                             // @aspentech: This issue needs to get sorted out, there seems to be a compatibility issue with the JSON file and the prop type
                             // eslint-disable-next-line @typescript-eslint/ban-ts-comment

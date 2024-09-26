@@ -5,7 +5,7 @@ import type { Track, GraphTrack } from "@equinor/videx-wellog";
 
 import type { TemplatePlot, TemplatePlotTypes } from "./WellLogTemplateTypes";
 import type { WellLog } from "./WellLogTypes";
-import type { ColorFunction } from "./ColorTableTypes";
+import type { ColorMapFunction } from "./ColorTableTypes";
 
 import type WellLogView from "./WellLogView";
 
@@ -90,7 +90,7 @@ export function createBooleanItems(): ReactNode[] {
 }
 
 function createColorFunctionItems(
-    colorFunctions: ColorFunction[]
+    colorFunctions: ColorMapFunction[]
 ): ReactNode[] {
     const nodes: ReactNode[] = [];
     if (!colorFunctions || !colorFunctions.length) {
@@ -185,13 +185,6 @@ interface State extends TemplatePlot {
     open: boolean;
 }
 
-function templatePlotPlus(templatePlot: TemplatePlot) {
-    return {
-        colorFunction: templatePlot.colorFunction,
-        inverseColorFunction: templatePlot.inverseColorFunction,
-    };
-}
-
 export class PlotPropertiesDialog extends Component<Props, State> {
     constructor(props: Props) {
         super(props);
@@ -210,8 +203,6 @@ export class PlotPropertiesDialog extends Component<Props, State> {
         this.state = templatePlot
             ? {
                   ...templatePlot,
-                  ...templatePlotPlus(templatePlot),
-
                   open: true,
               }
             : {

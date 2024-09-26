@@ -9,7 +9,7 @@ const WellLogViewerComponent = React.lazy(() =>
     }))
 );
 
-import type { ColorFunction } from "../components/ColorTableTypes";
+import type { ColorMapFunction } from "../components/ColorTableTypes";
 import type { WellPickProps } from "../components/WellLogView";
 
 // react-docgen / dash-generate-components/extract-meta.js does not properly parse
@@ -56,7 +56,7 @@ type WellLogViewerProps = {
     template: object;
 
     /** Prop containing color function/table array */
-    colorFunctions: ColorFunction[]; 
+    colorFunctions: ColorMapFunction[]; 
 
     /** Orientation of the track plots on the screen. Default is false */
     horizontal?: boolean;

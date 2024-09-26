@@ -3,10 +3,10 @@ import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 
 import { colorTables } from "@emerson-eps/color-tables";
-import type { ColorFunction } from "./components/ColorTableTypes";
-const exampleColorFunctions = colorTables as ColorFunction[];
+import type { ColorMapFunction } from "./components/ColorTableTypes";
+const exampleColorFunctions = colorTables as ColorMapFunction[];
 const wellpickColorTable = require("../../../../example-data/wellpick_colors.json"); // eslint-disable-line
-const wellpickColorFunctions = wellpickColorTable as ColorFunction[];
+const wellpickColorFunctions = wellpickColorTable as ColorMapFunction[];
 const wellpick = require("../../../../example-data/wellpicks.json");// eslint-disable-line
 
 import { ToggleButton } from "@mui/material";
@@ -135,7 +135,7 @@ const stories: Meta = {
 };
 export default stories;
 
-function fillInfo(controller: WellLogController | undefined) {
+function fillInfo(controller: WellLogController | undefined): string {
     if (!controller) return "-";
     const baseDomain = controller.getContentBaseDomain();
     const domain = controller.getContentDomain();
@@ -164,7 +164,7 @@ function fillInfo(controller: WellLogController | undefined) {
 
 const Template = (args: SyncLogViewerProps) => {
     const infoRef = React.useRef<HTMLDivElement | null>(null);
-    const setInfo = function (info: string) {
+    const setInfo = function (info: string): void {
         if (infoRef.current) infoRef.current.innerHTML = info;
     };
 
@@ -198,7 +198,7 @@ const Template = (args: SyncLogViewerProps) => {
         },
         [controllers]
     );
-    const handleClick = function () {
+    const handleClick = function (): void {
         for (const ctrl of controllers) {
             if (ctrl) ctrl.setControllerDefaultZoom();
         }
@@ -564,7 +564,7 @@ const TemplateWithSelection = (args: { welllogs: WellLog[] }) => {
     if (showWell2 && args.welllogs[1]) filtered.push(args.welllogs[1]);
     if (showWell3 && args.welllogs[2]) filtered.push(args.welllogs[2]);
 
-    const handleClick = function () {
+    const handleClick = function (): void {
         for (const ctrl of controllers) {
             if (ctrl) ctrl.setControllerDefaultZoom();
         }

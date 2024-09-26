@@ -7,7 +7,7 @@ import React, { Profiler } from "react";
 import WellLogViewer from "./WellLogViewer";
 import logTimes, { obj } from "./test/performanceMetrics";
 import { axisMnemos, axisTitles } from "./utils/axes";
-import type { ColorFunction } from "./components/ColorTableTypes";
+import type { ColorMapFunction } from "./components/ColorTableTypes";
 
 // TODO: Fix this the next time the file is edited.
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -18,7 +18,7 @@ const exampleWellLog = {
     curves: [],
     data: [],
 };
-const exampleColorFunctions = colorTables as ColorFunction[];
+const exampleColorFunctions = colorTables as ColorMapFunction[];
 
 window.ResizeObserver =
     window.ResizeObserver ||

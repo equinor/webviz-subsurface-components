@@ -10,8 +10,10 @@ declare type D3Selection = any; //import { D3Selection } from "@equinor/videx-we
 import { renderBasicPlotLegend } from "./legend/common"; //import { renderBasicPlotLegend } from "@equinor/videx-wellog/dist/plots/legend/common';
 /* End of missed from "@equinor/videx-wellog */
 
-import type { colorTablesObj } from "@emerson-eps/color-tables/dist/component/colorTableTypes";
-import type { ColorFunction } from "../components/ColorTableTypes";
+import type {
+    ColorMapFunction,
+    ColorTable,
+} from "../components/ColorTableTypes";
 import { isFunction } from "../components/ColorTableTypes";
 import { getInterpolatedColorString } from "./color-table";
 
@@ -20,7 +22,7 @@ import { color4ToString } from "./color-table";
 let __idGradient = 0;
 function createGradient(
     g: D3Selection,
-    colorFunction: ColorFunction,
+    colorFunction: ColorMapFunction,
     rLogarithmic?: number
 ): string {
     const id = "grad" + ++__idGradient; // generate unique id
@@ -56,7 +58,7 @@ function createGradient(
                     .style("stop-color", c);
             }
         } else {
-            const table = colorFunction as colorTablesObj;
+            const table = colorFunction as ColorTable;
             const colors = table.colors;
             for (let i = 0; i < colors.length; i++) {
                 const color = colors[i];
@@ -105,7 +107,7 @@ export default function renderGradientFillPlotLegend(
                 : plot.options.color;
 
         /* Start GradientFill code */
-        let colorFunction: ColorFunction | undefined =
+        let colorFunction: ColorMapFunction | undefined =
             useMinAsBase && minIsLeft
                 ? options.colorFunction
                 : options.inverseColorFunction;

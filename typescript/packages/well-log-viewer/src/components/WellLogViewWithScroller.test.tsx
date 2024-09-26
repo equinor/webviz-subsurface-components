@@ -5,8 +5,8 @@ import "jest-styled-components";
 import React from "react";
 import WellLogViewWithScroller from "./WellLogViewWithScroller";
 
-import type { ColorFunction } from "./ColorTableTypes";
-const exampleColorFunctions = colorTables as ColorFunction[];
+import type { ColorMapFunction } from "./ColorTableTypes";
+const exampleColorFunctions = colorTables as ColorMapFunction[];
 
 // TODO: Fix this the next time the file is edited.
 // eslint-disable-next-line @typescript-eslint/no-require-imports

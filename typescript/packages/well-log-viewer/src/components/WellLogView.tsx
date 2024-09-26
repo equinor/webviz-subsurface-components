@@ -27,7 +27,7 @@ import { select } from "d3";
 import type { WellLog, WellLogCurve } from "./WellLogTypes";
 import type { Template } from "./WellLogTemplateTypes";
 import { TemplateType } from "./WellLogTemplateTypes";
-import type { ColorFunction } from "./ColorTableTypes";
+import type { ColorMapFunction } from "./ColorTableTypes";
 import { ColorFunctionType } from "./ColorTableTypes";
 import type { PatternsTable, Pattern } from "../utils/pattern";
 import { PatternsTableType, PatternsType } from "../utils/pattern";
@@ -315,7 +315,7 @@ export interface WellPickProps {
     /**
      * Prop containing color tables or color functions array for well picks
      */
-    colorFunctions: ColorFunction[];
+    colorFunctions: ColorMapFunction[];
     colorFunction: string; // "Stratigraphy" ..., "Step func", ...
 }
 
@@ -729,7 +729,7 @@ function setTracksToController(
     axes: AxesInfo,
     welllog: WellLog | undefined, // JSON Log Format
     template: Template, // JSON
-    colorFunctions: ColorFunction[] // JS code array or JSON file for pure color tables array without color functions elements
+    colorFunctions: ColorMapFunction[] // JS code array or JSON file for pure color tables array without color functions elements
 ): ScaleInterpolator {
     const { tracks, minmaxPrimaryAxis, primaries, secondaries } = createTracks(
         welllog,
@@ -1054,7 +1054,7 @@ export interface WellLogViewProps {
     /**
       Prop containing color table or color functions array for discrete well logs
      */
-    colorFunctions: ColorFunction[];
+    colorFunctions: ColorMapFunction[];
 
     /**
      * Well Picks data

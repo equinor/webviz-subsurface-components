@@ -7,13 +7,13 @@ import type { DefinedFunction } from "@equinor/videx-wellog/dist/plots/interface
 import renderGradientFillPlotLegend from "./gradientfill-plot-legend";
 import { getInterpolatedColorString } from "./color-table";
 
-import type { ColorFunction } from "../components/ColorTableTypes";
+import type { ColorMapFunction } from "../components/ColorTableTypes";
 
 import type { AreaPlotOptions } from "@equinor/videx-wellog/dist/plots/interfaces";
 
 export interface GradientFillPlotOptions extends AreaPlotOptions {
-    colorFunction?: ColorFunction;
-    inverseColorFunction?: ColorFunction;
+    colorFunction?: ColorMapFunction;
+    inverseColorFunction?: ColorMapFunction;
     colorScale?: "linear" | "log";
     inverseColorScale?: "linear" | "log";
 }
@@ -27,7 +27,7 @@ function createGradient(
     horizontal: boolean | undefined,
     plotdata: number[][],
     xscale: Scale,
-    colorFunction: ColorFunction,
+    colorFunction: ColorMapFunction,
     scale: undefined | string // "linear" | "log"
 ): CanvasGradient {
     const dataFrom = plotdata[0];

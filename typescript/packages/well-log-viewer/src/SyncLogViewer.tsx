@@ -14,7 +14,7 @@ import defaultLayout from "./components/DefaultSyncLogViewerLayout";
 
 import type { WellLog } from "./components/WellLogTypes";
 import type { Template } from "./components/WellLogTemplateTypes";
-import type { ColorFunction } from "./components/ColorTableTypes";
+import type { ColorMapFunction } from "./components/ColorTableTypes";
 import { ColorFunctionType } from "./components/ColorTableTypes";
 import type { PatternsTable, Pattern } from "./utils/pattern";
 import { PatternsTableType, PatternsType } from "./utils/pattern";
@@ -88,7 +88,7 @@ export interface SyncLogViewerProps {
     /**
      * Prop containing color function/table array.
      */
-    colorFunctions: ColorFunction[];
+    colorFunctions: ColorMapFunction[];
 
     /**
      * Set to true for default titles or to array of individial welllog titles
@@ -524,7 +524,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         logController: LogViewer,
         iFrom: number,
         iTo: number
-    ) {
+    ): void {
         this.callbackManagers[iWellLog].onInfo(x, logController, iFrom, iTo);
         // TODO: Fix this the next time the file is edited.
         // eslint-disable-next-line react/prop-types
@@ -539,7 +539,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         logController: LogViewer,
         iFrom: number,
         iTo: number
-    ) {
+    ): void {
         // Skip computations if no-one is listening to the result
         if (this.callbackManagers[iWellLog].onInfoFilledCallbacks.length < 1)
             return;
