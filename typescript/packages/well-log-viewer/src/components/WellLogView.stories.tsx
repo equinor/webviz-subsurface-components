@@ -6,7 +6,7 @@ import type { WellLogViewProps } from "./WellLogView";
 import { argTypesWellLogViewProp } from "./WellLogView";
 import { colorTables } from "@emerson-eps/color-tables";
 import type { ColorMapFunction } from "./ColorTableTypes";
-const exampleColorFunctions = colorTables as ColorMapFunction[];
+const exampleColorMapFunctions = colorTables as ColorMapFunction[];
 
 import L898MUD from "../../../../../example-data/L898MUD.json";
 import volve_logs from "../../../../../example-data/volve_logs.json";
@@ -19,7 +19,7 @@ const ComponentCode =
     "    horizontal=false \r\n" +
     '    welllog={require("../../../../../example-data/L898MUD.json")[0]} \r\n' +
     '    template={require("../../../../../example-data/welllog_template_1.json")} \r\n' +
-    "    colorMapFunctions={exampleColorFunctions} \r\n" +
+    "    colorMapFunctions={exampleColorMapFunctions} \r\n" +
     "/>";
 
 import { axisTitles, axisMnemos } from "../utils/axes";
@@ -73,7 +73,7 @@ export const Default: StoryObj<typeof Template> = {
                 <i>Well</i> <b>{welllogDefault.header.well}</b>
             </div>
         ),
-        colorMapFunctions: exampleColorFunctions,
+        colorMapFunctions: exampleColorMapFunctions,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
     },
@@ -89,7 +89,7 @@ export const Discrete: StoryObj<typeof Template> = {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         template: require("../../../../../example-data/welllog_template_2.json"),
         viewTitle: "Well '" + welllogDiscrete.header.well + "'",
-        colorMapFunctions: exampleColorFunctions,
+        colorMapFunctions: exampleColorMapFunctions,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
         options: {

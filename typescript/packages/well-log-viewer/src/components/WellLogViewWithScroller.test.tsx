@@ -6,7 +6,7 @@ import React from "react";
 import WellLogViewWithScroller from "./WellLogViewWithScroller";
 
 import type { ColorMapFunction } from "./ColorTableTypes";
-const exampleColorFunctions = colorTables as ColorMapFunction[];
+const exampleColorMapFunctions = colorTables as ColorMapFunction[];
 
 // TODO: Fix this the next time the file is edited.
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -29,7 +29,7 @@ describe("Test Well Log View Component with Scroller", () => {
             <WellLogViewWithScroller
                 welllog={welllog}
                 template={template}
-                colorMapFunctions={exampleColorFunctions}
+                colorMapFunctions={exampleColorMapFunctions}
                 primaryAxis={"md"}
                 axisTitles={{
                     md: "MD",

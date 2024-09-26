@@ -56,7 +56,7 @@ import { axisMnemos, axisTitles } from "./utils/axes";
 
 import wellpicks from "../../../../example-data/wellpicks.json";
 import colorTables from "../../../../example-data/wellpick_colors.json";
-const exampleColorFunctions: ColorMapFunction[] = [
+const exampleColorMapFunctions: ColorMapFunction[] = [
     // copy color tables and add some color functions
     ...(colorTables as ColorMapFunction[]),
     {
@@ -86,7 +86,7 @@ const ComponentCode =
     "    horizontal=false \r\n" +
     '    welllog={require("../../../../example-data/L898MUD.json")[0]} \r\n' +
     '    template={require("../../../../example-data/welllog_template_1.json")} \r\n' +
-    "    colorMapFunctions={exampleColorFunctions} \r\n" +
+    "    colorMapFunctions={exampleColorMapFunctions} \r\n" +
     "/>";
 
 const stories: Meta = {
@@ -214,7 +214,7 @@ const StoryTemplate = (args: WellLogViewerProps) => {
 const wellpick: WellPickProps = {
     wellpick: wellpicks[0],
     name: "HORIZON",
-    colorMapFunctions: exampleColorFunctions,
+    colorMapFunctions: exampleColorMapFunctions,
     colorMapFunction: "Stratigraphy",
 };
 
@@ -304,7 +304,7 @@ export const Default: StoryObj<typeof StoryTemplate> = {
         horizontal: false,
         welllog: require("../../../../example-data/L898MUD.json")[0], // eslint-disable-line
         template: require("../../../../example-data/welllog_template_1.json"), // eslint-disable-line
-        colorMapFunctions: exampleColorFunctions,
+        colorMapFunctions: exampleColorMapFunctions,
         wellpick: wellpick,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
@@ -353,7 +353,7 @@ export const ColorByFunction: StoryObj<typeof StoryTemplate> = {
                 },
             ],
         },
-        colorMapFunctions: exampleColorFunctions,
+        colorMapFunctions: exampleColorMapFunctions,
         wellpick: wellpick,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
@@ -377,7 +377,7 @@ export const Horizontal: StoryObj<typeof StoryTemplate> = {
         welllog:
             require("../../../../example-data/WL_RAW_AAC-BHPR-CAL-DEN-GR-MECH-NEU-NMR-REMP_MWD_3.json")[0], // eslint-disable-line
         template: require("../../../../example-data/welllog_template_2.json"), // eslint-disable-line
-        colorMapFunctions: exampleColorFunctions,
+        colorMapFunctions: exampleColorMapFunctions,
         wellpick: wellpick,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
@@ -400,7 +400,7 @@ export const OnInfoFilledEvent: StoryObj<typeof StoryTemplate> = {
         welllog:
             require("../../../../example-data/WL_RAW_AAC-BHPR-CAL-DEN-GR-MECH-NEU-NMR-REMP_MWD_3.json")[0], // eslint-disable-line
         template: require("../../../../example-data/welllog_template_2.json"), // eslint-disable-line
-        colorMapFunctions: exampleColorFunctions,
+        colorMapFunctions: exampleColorMapFunctions,
         wellpick: wellpick,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
@@ -813,7 +813,7 @@ export const Discrete: StoryObj<typeof StoryTemplate> = {
         horizontal: false,
         welllog: require("../../../../example-data/volve_logs.json")[0], // eslint-disable-line
         template: require("../../../../example-data/welllog_template_2.json"), // eslint-disable-line
-        colorMapFunctions: exampleColorFunctions,
+        colorMapFunctions: exampleColorMapFunctions,
         wellpick: wellpick,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,

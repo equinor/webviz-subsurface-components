@@ -4,7 +4,7 @@ import React from "react";
 
 import type { ColorMapFunction } from "./components/ColorTableTypes";
 import { colorTables } from "@emerson-eps/color-tables";
-const exampleColorFunctions = colorTables as ColorMapFunction[];
+const exampleColorMapFunctions = colorTables as ColorMapFunction[];
 import wellpickColorTables from "../../../../example-data/wellpick_colors.json";
 const wellpickColorMapFunctions = wellpickColorTables as ColorMapFunction[];
 import wellpicks from "../../../../example-data/wellpicks.json";
@@ -403,7 +403,7 @@ export const Default: StoryObj<typeof Template> = {
             require("../../../../example-data/synclog_template.json"), // eslint-disable-line
             require("../../../../example-data/synclog_template.json"), // eslint-disable-line
         ],
-        colorMapFunctions: exampleColorFunctions,
+        colorMapFunctions: exampleColorMapFunctions,
         wellpicks: exampleWellPicks,
         patternsTable: {
             patternSize: 24,

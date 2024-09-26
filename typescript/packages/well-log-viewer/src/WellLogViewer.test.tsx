@@ -14,7 +14,7 @@ const exampleTemplate = require("../../../../example-data/welllog_template_1.jso
 // TODO: Fix this the next time the file is edited.
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const exampleWellLog = require("../../../../example-data/L898MUD.json")[0];
-const exampleColorFunctions = colorTables as ColorMapFunction[];
+const exampleColorMapFunctions = colorTables as ColorMapFunction[];
 
 window.ResizeObserver =
     window.ResizeObserver ||
@@ -35,7 +35,7 @@ describe("Test Well Log Viewer Component", () => {
                 }}
                 welllog={exampleWellLog}
                 template={exampleTemplate}
-                colorMapFunctions={exampleColorFunctions}
+                colorMapFunctions={exampleColorMapFunctions}
                 horizontal={true}
                 primaryAxis={"md"}
                 axisTitles={axisTitles}

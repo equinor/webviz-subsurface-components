@@ -7,14 +7,14 @@ import type { WellLogViewWithScrollerProps } from "./WellLogViewWithScroller";
 import { argTypesWellLogViewScrollerProp } from "./WellLogViewWithScroller";
 import { colorTables } from "@emerson-eps/color-tables";
 import type { ColorMapFunction } from "./ColorTableTypes";
-const exampleColorFunctions = colorTables as ColorMapFunction[];
+const exampleColorMapFunctions = colorTables as ColorMapFunction[];
 
 const ComponentCode =
     '<WellLogViewWithScroller id="WellLogViewWithScroller" \r\n' +
     "    horizontal=false \r\n" +
     '    welllog={require("../../../../../example-data/L898MUD.json")[0]} \r\n' +
     '    template={require("../../../../../example-data/welllog_template_1.json")} \r\n' +
-    "    colorMapFunctions={exampleColorFunctions} \r\n" +
+    "    colorMapFunctions={exampleColorMapFunctions} \r\n" +
     "/>";
 
 import { axisTitles, axisMnemos } from "../utils/axes";
@@ -81,7 +81,7 @@ export const Default: StoryObj<typeof Template> = {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         template: require("../../../../../example-data/welllog_template_1.json"),
         viewTitle: "Well '" + wellLog.header.well + "'",
-        colorMapFunctions: exampleColorFunctions,
+        colorMapFunctions: exampleColorMapFunctions,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
         options: {
