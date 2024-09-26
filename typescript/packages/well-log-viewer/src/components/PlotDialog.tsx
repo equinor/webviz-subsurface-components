@@ -363,14 +363,14 @@ export class PlotPropertiesDialog extends Component<Props, State> {
             return [
                 this.createSelectControl(
                     "colorFunction",
-                    "Fill Color table",
+                    "Fill Color function/table",
                     createColorFunctionItems(colorFunctions)
                 ),
                 <FormControl fullWidth key="211" />,
                 <FormControl fullWidth key="212" />,
                 this.createSelectControl(
                     "inverseColorFunction",
-                    "Inverse Color table",
+                    "Inverse Color function/table",
                     createColorFunctionItems(colorFunctions),
                     true
                 ),
