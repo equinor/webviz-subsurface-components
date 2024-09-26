@@ -11,5 +11,9 @@
   ],
   "buildTarget": "${PROJECT_NAME}:build",
   "outputPath": "${PROJECT_DIR}/dist",
-  "tagFormat": "${PROJECT_NAME}@${version}"
+  "tagFormat": "${PROJECT_NAME}@${version}",
+  "releaseRules": [
+    { "type": "feat!", "release": "major" },
+    { "type": "fix!", "release": "major" }
+  ]
 }
