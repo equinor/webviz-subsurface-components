@@ -27,6 +27,7 @@ export const createWellNameRegexMatcher = (
         const prevChar = index === 0 ? undefined : pattern.charAt(index - 1);
 
         if (prevChar === undefined || !SPECIAL_ESCAPE.includes(prevChar)) {
+            // Add a dot before each "*" and "?" unless it's preceded by a dot already or a closing brace
             if (SPECIAL_CHARACTERS.includes(character)) {
                 processed.push(".");
                 if (character === "?") continue; // '?' is replaced with '.'
