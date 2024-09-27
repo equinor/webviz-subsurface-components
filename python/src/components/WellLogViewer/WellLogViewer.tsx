@@ -9,7 +9,7 @@ const WellLogViewerComponent = React.lazy(() =>
     }))
 );
 
-import type { ColorMapFunction } from "../components/ColorTableTypes";
+import type ColorMapFunction from "../components/ColorMapFunction";
 import type { WellPickProps } from "../components/WellLogView";
 
 // react-docgen / dash-generate-components/extract-meta.js does not properly parse

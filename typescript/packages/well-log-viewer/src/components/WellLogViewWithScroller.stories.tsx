@@ -6,7 +6,7 @@ import WellLogViewWithScroller from "./WellLogViewWithScroller";
 import type { WellLogViewWithScrollerProps } from "./WellLogViewWithScroller";
 import { argTypesWellLogViewScrollerProp } from "./WellLogViewWithScroller";
 import { colorTables } from "@emerson-eps/color-tables";
-import type { ColorMapFunction } from "./ColorTableTypes";
+import type ColorMapFunction from "./ColorMapFunction";
 const exampleColorMapFunctions = colorTables as ColorMapFunction[];
 
 const ComponentCode =

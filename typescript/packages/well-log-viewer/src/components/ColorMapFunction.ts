@@ -13,3 +13,5 @@ export function isFunction(
     if (!colorMapFunction) return false;
     return !!(colorMapFunction as ColorFunction).func;
 }
+
+export default ColorMapFunction;

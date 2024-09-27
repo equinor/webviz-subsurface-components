@@ -28,7 +28,7 @@ import { select } from "d3";
 import type { WellLog, WellLogCurve } from "./WellLogTypes";
 import type { Template } from "./WellLogTemplateTypes";
 import { TemplateType } from "./CommonPropTypes";
-import type { ColorMapFunction } from "./ColorTableTypes";
+import type ColorMapFunction from "./ColorMapFunction";
 import { ColorFunctionType } from "./CommonPropTypes";
 import type { PatternsTable, Pattern } from "../utils/pattern";
 import { PatternsTableType, PatternsType } from "./CommonPropTypes";

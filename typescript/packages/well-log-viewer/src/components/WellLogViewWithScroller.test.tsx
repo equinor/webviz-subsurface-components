@@ -5,7 +5,7 @@ import "jest-styled-components";
 import React from "react";
 import WellLogViewWithScroller from "./WellLogViewWithScroller";
 
-import type { ColorMapFunction } from "./ColorTableTypes";
+import type ColorMapFunction from "./ColorMapFunction";
 const exampleColorMapFunctions = colorTables as ColorMapFunction[];
 
 // TODO: Fix this the next time the file is edited.

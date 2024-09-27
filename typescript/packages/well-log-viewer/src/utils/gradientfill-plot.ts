@@ -7,7 +7,7 @@ import type { DefinedFunction } from "@equinor/videx-wellog/dist/plots/interface
 import renderGradientFillPlotLegend from "./gradientfill-plot-legend";
 import { getInterpolatedColorString } from "./color-table";
 
-import type { ColorMapFunction } from "../components/ColorTableTypes";
+import type ColorMapFunction from "../components/ColorMapFunction";
 
 import type { AreaPlotOptions } from "@equinor/videx-wellog/dist/plots/interfaces";
 

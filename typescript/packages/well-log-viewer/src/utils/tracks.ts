@@ -47,7 +47,7 @@ import type {
     WellLogMetadataDiscreteObjects,
 } from "../components/WellLogTypes";
 
-import type { ColorMapFunction } from "../components/ColorTableTypes";
+import type ColorMapFunction from "../components/ColorMapFunction";
 
 import {
     checkMinMaxValue,

@@ -14,7 +14,7 @@ import defaultLayout from "./components/DefaultSyncLogViewerLayout";
 
 import type { WellLog } from "./components/WellLogTypes";
 import type { Template } from "./components/WellLogTemplateTypes";
-import type { ColorMapFunction } from "./components/ColorTableTypes";
+import type ColorMapFunction from "./components/ColorMapFunction";
 import { ColorFunctionType } from "./components/CommonPropTypes";
 import type { PatternsTable, Pattern } from "./utils/pattern";
 import { PatternsTableType, PatternsType } from "./components/CommonPropTypes";

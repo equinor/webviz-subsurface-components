@@ -13,8 +13,8 @@ import { renderBasicPlotLegend } from "./legend/common"; //import { renderBasicP
 import type {
     ColorMapFunction,
     ColorTable,
-} from "../components/ColorTableTypes";
-import { isFunction } from "../components/ColorTableTypes";
+} from "../components/ColorMapFunction";
+import { isFunction } from "../components/ColorMapFunction";
 import { getInterpolatedColorString } from "./color-table";
 
 import { color4ToString } from "./color-table";
