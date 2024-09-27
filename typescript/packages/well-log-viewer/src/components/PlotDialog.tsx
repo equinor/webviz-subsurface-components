@@ -5,7 +5,7 @@ import type { Track, GraphTrack } from "@equinor/videx-wellog";
 
 import type { TemplatePlot, TemplatePlotType } from "./WellLogTemplateTypes";
 import type { WellLog } from "./WellLogTypes";
-import type { ColorMapFunction } from "./ColorTableTypes";
+import type ColorMapFunction from "./ColorMapFunction";
 
 import type WellLogView from "./WellLogView";
 

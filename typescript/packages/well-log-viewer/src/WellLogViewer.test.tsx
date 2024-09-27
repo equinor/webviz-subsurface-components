@@ -5,7 +5,7 @@ import "jest-styled-components";
 import React from "react";
 import WellLogViewer from "./WellLogViewer";
 import type { WellLogController } from "./components/WellLogView";
-import type { ColorMapFunction } from "./components/ColorTableTypes";
+import type ColorMapFunction from "./components/ColorMapFunction";
 import { axisMnemos, axisTitles } from "./utils/axes";
 
 // TODO: Fix this the next time the file is edited.

@@ -30,7 +30,7 @@ const welllogs = welllogsJson as unknown as WellLog[];
 import templateJson from "../../../../example-data/welllog_template_2.json";
 const template = templateJson as unknown as Template;
 
-import type { ColorMapFunction } from "./components/ColorTableTypes";
+import type ColorMapFunction from "./components/ColorMapFunction";
 
 import type { MapMouseEvent } from "@webviz/subsurface-viewer/dist/components/Map";
 

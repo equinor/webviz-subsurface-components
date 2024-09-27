@@ -49,7 +49,6 @@ const Template = (args: ScaleSelectorProps) => {
         <div>
             Scale:
             <ScaleSelector
-                //id="ScaleSelector"
                 {...args}
                 onChange={function (value: number): void {
                     setInfo("scale value=" + value);

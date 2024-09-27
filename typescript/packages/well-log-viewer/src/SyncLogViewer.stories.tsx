@@ -2,7 +2,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 
-import type { ColorMapFunction } from "./components/ColorTableTypes";
+import type ColorMapFunction from "./components/ColorMapFunction";
 import { colorTables } from "@emerson-eps/color-tables";
 const exampleColorMapFunctions = colorTables as ColorMapFunction[];
 import wellpickColorTables from "../../../../example-data/wellpick_colors.json";
@@ -21,7 +21,7 @@ import type {
 } from "./components/WellLogView";
 
 const ComponentCode =
-    '<SyncLogViewer id="SyncLogViewer" \r\n' +
+    "<SyncLogViewer id='SyncLogViewer' \r\n" +
     "    syncTrackPos==true \r\n" +
     "    syncContentDomain=true \r\n" +
     "    syncContentSelection=true \r\n" +
@@ -534,7 +534,7 @@ CustomLayout.parameters = {
 
 Default.tags = ["no-screenshot-test"];
 
-const TemplateWithSelection = (args: { welllogs: WellLog[] }) => {
+const TemplateWithSelection = (args: SyncLogViewerProps) => {
     const [showWell1, setShowWell1] = React.useState(true);
     const [showWell2, setShowWell2] = React.useState(true);
     const [showWell3, setShowWell3] = React.useState(true);
@@ -614,8 +614,6 @@ const TemplateWithSelection = (args: { welllogs: WellLog[] }) => {
                 </button>
             </div>
             <div style={{ width: "100%", height: "100%", flex: 1 }}>
-                {/*
-                 // @ts-expect-error TS2739 */}
                 <SyncLogViewer
                     id="SyncLogViewer2"
                     {...argsWithSelection}

@@ -7,7 +7,7 @@ import React, { Profiler } from "react";
 import WellLogViewer from "./WellLogViewer";
 import logTimes, { obj } from "./test/performanceMetrics";
 import { axisMnemos, axisTitles } from "./utils/axes";
-import type { ColorMapFunction } from "./components/ColorTableTypes";
+import type ColorMapFunction from "./components/ColorMapFunction";
 
 // TODO: Fix this the next time the file is edited.
 // eslint-disable-next-line @typescript-eslint/no-require-imports
