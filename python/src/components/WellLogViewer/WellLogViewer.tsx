@@ -56,7 +56,7 @@ type WellLogViewerProps = {
     template: object;
 
     /** Prop containing color function/table array */
-    colorFunctions: ColorMapFunction[];
+    colorMapFunctions: ColorMapFunction[];
 
     /** Orientation of the track plots on the screen. Default is false */
     horizontal?: boolean;
