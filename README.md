@@ -16,10 +16,10 @@ For language specific details, see the documentation in `/typescript` or `/pytho
   [![@webviz/subsurface-viewer](https://badge.fury.io/js/@webviz%2Fsubsurface-viewer.svg)](https://badge.fury.io/js/@webviz%2Fsubsurface-viewer)
 - [Well Log Viewer](https://equinor.github.io/webviz-subsurface-components/storybook-static/?path=/docs/welllogviewer-overview--docs) - visualization of well logs as tracks.
   [![@webviz/well-log-viewer](https://badge.fury.io/js/@webviz%2Fwell-log-viewer.svg)](https://badge.fury.io/js/@webviz%2Fwell-log-viewer)
-- [Well Completions Plot](https://equinor.github.io/webviz-subsurface-components/storybook-static/?path=/docs/wellcompletions-demo--docs) - time step visualization of well completions.
+- [Well Completions Plot](https://equinor.github.io/webviz-subsurface-components/storybook-static/?path=/docs/wellcompletionsplot-demo--docs) - time step visualization of well completions.
   [![@webviz/well-completions-plot](https://badge.fury.io/js/@webviz%2Fwell-completions-plot.svg)](https://badge.fury.io/js/@webviz%2Fwell-completions-plot)
-- [Group Tree](https://equinor.github.io/webviz-subsurface-components/storybook-static/?path=/docs/grouptree--docs) - flow rate tree visualization.
-  [![@webviz/group-tree](https://badge.fury.io/js/@webviz%2Fgroup-tree.svg)](https://badge.fury.io/js/@webviz%2Fgroup-tree)
+- [Group Tree Plot](https://equinor.github.io/webviz-subsurface-components/storybook-static/?path=/docs/grouptreeplot-demo--docs) - flow rate tree visualization.
+  [![@webviz/group-tree-plot](https://badge.fury.io/js/@webviz%2Fgroup-tree-plot.svg)](https://badge.fury.io/js/@webviz%2Fgroup-tree-plot)
 
 ## Contributing
 

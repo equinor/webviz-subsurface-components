@@ -2,8 +2,11 @@
 
 import React from "react";
 import type { AttributeType, PlotData, WellPlotData } from "../types/dataTypes";
-import { SortBy, SortByEnumToStringMapping } from "../types/dataTypes";
-import { capitalizeFirstLetter } from "../utils/stringUtil";
+import {
+    SortWellsBy,
+    SortWellsByEnumToStringMapping,
+} from "../types/dataTypes";
+import { capitalizeFirstLetter } from "../private-utils/stringUtils";
 import { useTooltip } from "./TooltipProvider";
 import type { Padding, PlotLayout } from "../types/layoutTypes";
 
@@ -19,11 +22,14 @@ const WellTooltipContent: React.FC<WellTooltipContentProps> = (
     return (
         <table style={{ color: "#fff" }}>
             <tbody>
-                {/* earliest completion date */}
                 <tr key={`well-tooltip-${props.name}-earliest-comp`}>
                     <td>
                         <b>
-                            {SortByEnumToStringMapping[SortBy.CompletionDate]}
+                            {
+                                SortWellsByEnumToStringMapping[
+                                    SortWellsBy.EARLIEST_COMPLETION_DATE
+                                ]
+                            }
                         </b>
                     </td>
                     <td>{props.earliestCompDate}</td>
@@ -43,7 +49,7 @@ const WellTooltipContent: React.FC<WellTooltipContentProps> = (
 WellTooltipContent.displayName = "WellTooltipContent";
 
 interface WellsPlotProps {
-    timeSteps: string[];
+    sortedCompletionDates: string[]; // Array of string dates/time steps in increasing order;
     plotData: PlotData;
     layout: PlotLayout;
     padding: Padding;
@@ -64,13 +70,13 @@ export const WellsPlot: React.FC<WellsPlotProps> = (props: WellsPlotProps) => {
                 <WellTooltipContent
                     name={well.name}
                     earliestCompDate={
-                        props.timeSteps[well.earliestCompDateIndex]
+                        props.sortedCompletionDates[well.earliestCompDateIndex]
                     }
                     attributes={well.attributes}
                 />
             ));
         },
-        [setContent, props.timeSteps]
+        [setContent, props.sortedCompletionDates]
     );
 
     const onMouseOut = React.useCallback(

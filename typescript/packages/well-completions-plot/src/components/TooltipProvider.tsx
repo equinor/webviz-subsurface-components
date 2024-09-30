@@ -19,7 +19,6 @@ const TooltipContext = React.createContext<{
 const TooltipProvider: React.FC<PropsWithChildren<unknown>> = ({
     children,
 }: PropsWithChildren<unknown>) => {
-    // State
     const [Content, setContent] = React.useState<React.FC | null>(null);
 
     const value = React.useMemo(
@@ -32,11 +31,7 @@ const TooltipProvider: React.FC<PropsWithChildren<unknown>> = ({
     return (
         <TooltipContext.Provider value={value}>
             {children}
-            {
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-expect-error
-                <ReactTooltip id="plot-tooltip" content={() => Content} />
-            }
+            {<ReactTooltip id="plot-tooltip">{Content}</ReactTooltip>}
         </TooltipContext.Provider>
     );
 };

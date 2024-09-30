@@ -10,6 +10,7 @@ import type {
     WellPlotData,
     Zone,
 } from "@webviz/well-completions-plot";
+import { areCompletionsPlotDataValuesEqual } from "@webviz/well-completions-plot";
 
 /**
  * Preprocess the input data by finding the earliest completion date
@@ -132,18 +133,6 @@ export const createAttributePredicate = (
 };
 
 /**
- * DFS to find all leaf nodes
- * @param zone
- * @param result
- * @returns
- */
-export const findSubzones = (zone: Zone, result: Zone[]): void => {
-    if (zone === undefined) return;
-    if (zone.subzones === undefined || zone.subzones.length === 0)
-        result.push(zone);
-    else zone.subzones.forEach((zone) => findSubzones(zone, result));
-};
-/**
  * Util method to prepare stratigraphy and well data from the given time step range and other settings for plotting
  * @param subzones
  * @param wells
@@ -210,7 +199,7 @@ export const computeDataToPlot = (
             //If value changed
             if (
                 completionsPlotData.length === 0 ||
-                !isCompletionValuesEqual(
+                !areCompletionsPlotDataValuesEqual(
                     completionsPlotData[completionsPlotData.length - 1],
                     newCompletion
                 )
@@ -230,13 +219,3 @@ export const computeDataToPlot = (
         units: units,
     };
 };
-
-const isCompletionValuesEqual = (
-    completion1: CompletionPlotData,
-    completion2: CompletionPlotData
-) =>
-    completion1.open === completion2.open &&
-    completion1.shut === completion2.shut &&
-    completion1.khMean === completion2.khMean &&
-    completion1.khMin === completion2.khMin &&
-    completion1.khMax === completion2.khMax;

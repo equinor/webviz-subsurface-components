@@ -3,20 +3,20 @@ import type React from "react";
 
 export type AttributeType = string | number | boolean | undefined;
 export enum SortDirection {
-    Ascending = "Ascending",
-    Descending = "Descending",
+    ASCENDING = "Ascending",
+    DESCENDING = "Descending",
 }
 
-export enum SortBy {
-    Name = "well name",
-    StratigraphyDepth = "stratigraphy depth",
-    CompletionDate = "earliest comp date",
+export enum SortWellsBy {
+    WELL_NAME = "well_name",
+    STRATIGRAPHY_DEPTH = "stratigraphy_depth",
+    EARLIEST_COMPLETION_DATE = "earliest_completion_date",
 }
 
-export const SortByEnumToStringMapping = {
-    [SortBy.Name]: "Well name",
-    [SortBy.StratigraphyDepth]: "Stratigraphy depth",
-    [SortBy.CompletionDate]: "Earliest comp date",
+export const SortWellsByEnumToStringMapping = {
+    [SortWellsBy.WELL_NAME]: "Well name",
+    [SortWellsBy.STRATIGRAPHY_DEPTH]: "Stratigraphy depth",
+    [SortWellsBy.EARLIEST_COMPLETION_DATE]: "Earliest completion date",
 };
 
 export interface Zone {

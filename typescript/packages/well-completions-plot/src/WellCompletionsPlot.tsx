@@ -3,7 +3,7 @@ import { useResizeDetector } from "react-resize-detector";
 import { TooltipProvider } from "./components/TooltipProvider";
 import { CompletionsPlot } from "./components/CompletionsPlot";
 import type { Padding } from "./types/layoutTypes";
-import { createLayout } from "./utils/layoutUtils";
+import { createLayout } from "./private-utils/layoutUtils";
 import { StratigraphyPlot } from "./components/StratigraphyPlot";
 import { WellsPlot } from "./components/WellsPlot";
 
@@ -13,7 +13,7 @@ import "./WellCompletionsPlot.css";
 
 export interface WellCompletionsPlotProps {
     id: string;
-    timeSteps: string[];
+    sortedCompletionDates: string[]; // Array of string dates/time steps in increasing order;
     plotData: PlotData;
 }
 
@@ -55,7 +55,9 @@ export const WellCompletionsPlot: React.FC<WellCompletionsPlotProps> =
                                 padding={padding}
                             />
                             <WellsPlot
-                                timeSteps={props.timeSteps}
+                                sortedCompletionDates={
+                                    props.sortedCompletionDates
+                                }
                                 plotData={props.plotData}
                                 layout={layout}
                                 padding={padding}
