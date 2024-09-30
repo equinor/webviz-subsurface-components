@@ -4,7 +4,7 @@ import React, { Component } from "react";
 import type { Track, GraphTrack } from "@equinor/videx-wellog";
 
 import type { TemplatePlot, TemplatePlotTypes } from "./WellLogTemplateTypes";
-import type { WellLog } from "./WellLogTypes";
+import type { WellLogCollection } from "./WellLogTypes";
 import type { ColorTable } from "./ColorTableTypes";
 
 import type WellLogView from "./WellLogView";
@@ -119,17 +119,20 @@ function createDataItem(item: string): ReactNode {
 }
 
 export function dataNames(
-    welllog: WellLog | undefined,
+    welllog: WellLogCollection,
     track: Track | null,
     discrete?: boolean
 ): string[] {
-    const names: string[] = [];
-    if (welllog) {
+    // The same curve might show multiple times across log sets, using a set to discard duplicates
+    // ! This is only okay because we always just use the first instance of the curve anyways
+    const names = new Set<string>();
+
+    for (const logSet of welllog) {
         const skipUsed = !!track;
         const plots = track ? (track as GraphTrack).plots : undefined;
         const abbr = track ? track.options.abbr : undefined;
 
-        const curves = welllog.curves;
+        const curves = logSet.curves;
         let iCurve = 0;
         for (const curve of curves) {
             if (
@@ -151,15 +154,15 @@ export function dataNames(
                 // Scale tracks?
                 bUsed = true;
             }
-            if (!bUsed || !skipUsed) names.push(curve.name);
+            if (!bUsed || !skipUsed) names.add(curve.name);
             iCurve++;
         }
     }
-    return names;
+    return Array.from(names);
 }
 
 export function createDataItems(
-    welllog: WellLog | undefined,
+    welllog: WellLogCollection,
     track: Track | null,
     discrete?: boolean
 ): ReactNode[] {
@@ -193,11 +196,7 @@ export class PlotPropertiesDialog extends Component<Props, State> {
         if (names[0]) name2 = name = names[0];
         if (names[1]) name2 = names[1];
 
-        // TODO: Fix this the next time the file is edited.
-        // eslint-disable-next-line react/prop-types
         const trackTemplate = getTrackTemplate(this.props.track);
-        // TODO: Fix this the next time the file is edited.
-        // eslint-disable-next-line react/prop-types
         const templatePlot = this.props.templatePlot;
         this.state = templatePlot
             ? {
@@ -221,8 +220,6 @@ export class PlotPropertiesDialog extends Component<Props, State> {
 
                   // for 'gradientfill' plot
                   colorTable:
-                      // TODO: Fix this the next time the file is edited.
-                      // eslint-disable-next-line react/prop-types
                       this.props.wellLogView.props.colorTables?.[0]?.name,
                   inverseColorTable: undefined,
                   colorScale: undefined,
@@ -248,8 +245,6 @@ export class PlotPropertiesDialog extends Component<Props, State> {
                     this.setState({ inverseColor: "" });
             } else if (this.state.type === "differential") {
                 if (!this.state.name2) {
-                    // TODO: Fix this the next time the file is edited.
-                    // eslint-disable-next-line react/prop-types
                     const skipUsed = this.props.templatePlot
                         ? false
                         : true; /*??*/
@@ -260,8 +255,6 @@ export class PlotPropertiesDialog extends Component<Props, State> {
     }
 
     onOK(): void {
-        // TODO: Fix this the next time the file is edited.
-        // eslint-disable-next-line react/prop-types
         this.props.onOK(this.state);
         this.closeDialog();
     }
@@ -272,11 +265,7 @@ export class PlotPropertiesDialog extends Component<Props, State> {
 
     dataNames(skipUsed: boolean): string[] {
         return dataNames(
-            // TODO: Fix this the next time the file is edited.
-            // eslint-disable-next-line react/prop-types
-            this.props.wellLogView.props.welllog,
-            // TODO: Fix this the next time the file is edited.
-            // eslint-disable-next-line react/prop-types
+            this.props.wellLogView.welllogCollection,
             skipUsed ? this.props.track : null
         );
     }
@@ -348,8 +337,6 @@ export class PlotPropertiesDialog extends Component<Props, State> {
                 ),
             ];
         } else if (type === "gradientfill") {
-            // TODO: Fix this the next time the file is edited.
-            // eslint-disable-next-line react/prop-types
             const colorTables = this.props.wellLogView.props.colorTables;
             return [
                 this.createSelectControl(
@@ -372,14 +359,8 @@ export class PlotPropertiesDialog extends Component<Props, State> {
     }
 
     render(): JSX.Element {
-        // TODO: Fix this the next time the file is edited.
-        // eslint-disable-next-line react/prop-types
         const trackTemplate = getTrackTemplate(this.props.track);
-        // TODO: Fix this the next time the file is edited.
-        // eslint-disable-next-line react/prop-types
         const title = this.props.templatePlot ? "Edit plot" : "Add New Plot";
-        // TODO: Fix this the next time the file is edited.
-        // eslint-disable-next-line react/prop-types
         const skipUsed = this.props.templatePlot ? false : true; /*??*/
         const scale = this.state.scale || trackTemplate.scale;
         return (

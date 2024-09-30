@@ -2,17 +2,19 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 
-import { colorTables } from "@emerson-eps/color-tables";
-const exampleColorTable = colorTables; /*as unknown as ColorTable[]*/ // equivalent types, should be merged
-const wellpickColorTable = require("../../../../example-data/wellpick_colors.json"); // eslint-disable-line
-const wellpick = require("../../../../example-data/wellpicks.json");// eslint-disable-line
-
 import { ToggleButton } from "@mui/material";
+import { colorTables } from "@emerson-eps/color-tables";
+import wellpickColorTableJson from "../../../../example-data/wellpick_colors.json";
+import wellpicksJson from "../../../../example-data/wellpicks.json";
+import horizonPatternsJson from "../../../../example-data/horizon_patterns.json";
+
+const exampleColorTable = colorTables as unknown as ColorTable[];
+const wellpicks = wellpicksJson as unknown as WellLogSet[];
+const wellpickColorTable = wellpickColorTableJson as unknown as ColorTable[];
 
 import SyncLogViewer, { argTypesSyncLogViewerProp } from "./SyncLogViewer";
+import type { SyncLogViewerProps } from "./SyncLogViewer";
 import type {
-    // @ts-expect-error TS2614
-    WellLogView,
     WellLogController,
     TrackMouseEvent,
 } from "./components/WellLogView";
@@ -35,7 +37,6 @@ const ComponentCode =
     "    colorTables={colorTables} \r\n" +
     "/>";
 
-import type { WellLog } from "./components/WellLogTypes";
 import { axisMnemos, axisTitles } from "./utils/axes";
 
 const stories: Meta = {
@@ -158,8 +159,7 @@ function fillInfo(controller: WellLogController | undefined) {
     );
 }
 
-// @ts-expect-error TS7006
-const Template = (args) => {
+const Template = (args: SyncLogViewerProps) => {
     const infoRef = React.useRef();
     const setInfo = function (info: string) {
         // @ts-expect-error TS2339
@@ -171,15 +171,13 @@ const Template = (args) => {
     ); // all WellLogs
 
     const onCreateController = React.useCallback(
-        // @ts-expect-error TS6133
-        (iWellLog: number, controller: WellLogController) => {
+        (_iWellLog: number, controller: WellLogController) => {
             setControllers((prev) => [...prev, controller]);
         },
         []
     );
     const onDeleteController = React.useCallback(
-        // @ts-expect-error TS6133
-        (iWellLog: number, controller: WellLogController) => {
+        (_iWellLog: number, controller: WellLogController) => {
             setControllers((prev) => prev.filter((c) => c !== controller));
         },
         []
@@ -207,10 +205,8 @@ const Template = (args) => {
     };
     /* eslint-disable */ // no-unused-vars
     function onTrackMouseEventCustom(
-        // @ts-expect-error TS6133
-        wellLogView: WellLogView,
-        // @ts-expect-error TS6133
-        ev: TrackMouseEvent
+        _wellLogView: WellLogView,
+        _ev: TrackMouseEvent
     ): void {
         //custom function to disable the context menu
     }
@@ -228,7 +224,9 @@ const Template = (args) => {
                     onDeleteController={onDeleteController}
                     onContentRescale={onContentRescale}
                     onContentSelection={onContentSelection}
-                    onTrackMouseEvent={checked ? onTrackMouseEventCustom : null}
+                    onTrackMouseEvent={
+                        checked ? onTrackMouseEventCustom : undefined
+                    }
                 />
             </div>
             {/* Print info for the first WellLog */}
@@ -384,30 +382,31 @@ export const Default: StoryObj<typeof Template> = {
         colorTables: exampleColorTable,
         wellpicks: [
             {
-                wellpick: wellpick[0],
+                wellpick: wellpicks[0],
                 name: "HORIZON",
                 colorTables: wellpickColorTable,
                 color: "Stratigraphy",
             },
             {
-                wellpick: wellpick[1],
+                wellpick: wellpicks[1],
                 name: "HORIZON",
-                colorTables: wellpickColorTable, // eslint-disable-line
+                colorTables: wellpickColorTable,
                 color: "Stratigraphy",
             },
             {
-                wellpick: wellpick[0],
+                wellpick: wellpicks[0],
                 name: "HORIZON",
-                colorTables: wellpickColorTable, // eslint-disable-line
+                colorTables: wellpickColorTable,
                 color: "Stratigraphy",
             },
         ],
         patternsTable: {
             patternSize: 24,
             patternImages: patternImages,
-            names: patternNamesEnglish,
+            patternNames: patternNamesEnglish,
         },
-        patterns: require("../../../../example-data/horizon_patterns.json"), // eslint-disable-line
+        // @ts-expect-error Can't be bothered to fix this
+        patterns: horizonPatternsJson,
 
         wellpickFlatting: ["Hor_2", "Hor_4"],
 
@@ -441,14 +440,18 @@ import WellLogZoomSlider from "./components/WellLogZoomSlider";
 import WellLogScaleSelector from "./components/WellLogScaleSelector";
 import WellInfoIcon from "@mui/icons-material/FormatListBulleted"; // WaterDrop ShowChart, SearchSharp
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import type { WellLogCollection, WellLogSet } from "./components/WellLogTypes";
+import type WellLogView from "./components/WellLogView";
+import type { ColorTable } from "./components/ColorTableTypes";
 
 const iconStyle = {
     fontSize: "18px",
     verticalAlign: "middle",
     paddingRight: "4px",
 };
+
 export const CustomLayout = Template.bind({});
-// @ts-expect-error TS2339
+
 CustomLayout.args = {
     ...Default.args,
     wellpicks: undefined,
@@ -468,7 +471,7 @@ CustomLayout.args = {
                         callbackManager={parent.callbackManagers[0]}
                     />
                 </div>
-                {parent.props.welllogs?.map((welllog, iWellLog) => (
+                {parent.welllogCollections?.map((welllog, iWellLog) => (
                     <WellLogInfoPanel
                         key={iWellLog}
                         header={
@@ -476,7 +479,7 @@ CustomLayout.args = {
                                 <span style={iconStyle}>
                                     <WellInfoIcon fontSize="inherit" />
                                 </span>
-                                <i>{welllog.header.well}</i>
+                                <i>{welllog[0]?.header.well}</i>
                             </>
                         }
                         readoutOptions={parent.props.readoutOptions}
@@ -520,7 +523,6 @@ CustomLayout.args = {
         header: "Customized layout example",
     },
 };
-// @ts-expect-error TS2339
 CustomLayout.parameters = {
     docs: {
         description: {
@@ -531,7 +533,9 @@ CustomLayout.parameters = {
 
 Default.tags = ["no-screenshot-test"];
 
-const TemplateWithSelection = (args: { welllogs: WellLog[] }) => {
+const TemplateWithSelection = (args: SyncLogViewerProps) => {
+    const { welllogs, ...restOfArgs } = args;
+
     const [showWell1, setShowWell1] = React.useState(true);
     const [showWell2, setShowWell2] = React.useState(true);
     const [showWell3, setShowWell3] = React.useState(true);
@@ -541,24 +545,23 @@ const TemplateWithSelection = (args: { welllogs: WellLog[] }) => {
     ); // all WellLogs
 
     const onCreateController = React.useCallback(
-        // @ts-expect-error TS6133
         (iWellLog: number, controller: WellLogController) => {
             setControllers((prev) => [...prev, controller]);
         },
         []
     );
     const onDeleteController = React.useCallback(
-        // @ts-expect-error TS6133
         (iWellLog: number, controller: WellLogController) => {
             setControllers((prev) => prev.filter((c) => c !== controller));
         },
         []
     );
 
-    const filtered: WellLog[] = [];
-    if (showWell1 && args.welllogs[0]) filtered.push(args.welllogs[0]);
-    if (showWell2 && args.welllogs[1]) filtered.push(args.welllogs[1]);
-    if (showWell3 && args.welllogs[2]) filtered.push(args.welllogs[2]);
+    const filtered: (WellLogCollection | WellLogSet)[] = [];
+
+    if (showWell1 && welllogs[0]) filtered.push(welllogs[0]);
+    if (showWell2 && welllogs[1]) filtered.push(welllogs[1]);
+    if (showWell3 && welllogs[2]) filtered.push(welllogs[2]);
 
     const handleClick = function () {
         for (const ctrl of controllers) {
@@ -566,8 +569,8 @@ const TemplateWithSelection = (args: { welllogs: WellLog[] }) => {
         }
     };
 
-    const argsWithSelection = {
-        ...args,
+    const argsWithSelection: SyncLogViewerProps = {
+        ...restOfArgs,
         welllogs: filtered,
     };
 
@@ -611,8 +614,6 @@ const TemplateWithSelection = (args: { welllogs: WellLog[] }) => {
                 </button>
             </div>
             <div style={{ width: "100%", height: "100%", flex: 1 }}>
-                {/*
-                 // @ts-expect-error TS2739 */}
                 <SyncLogViewer
                     id="SyncLogViewer"
                     {...argsWithSelection}

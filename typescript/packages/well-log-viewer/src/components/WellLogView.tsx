@@ -24,7 +24,12 @@ import { validateSchema } from "@webviz/wsc-common";
 
 import { select } from "d3";
 
-import type { WellLog, WellLogCurve } from "./WellLogTypes";
+import type {
+    WellLogCollection,
+    WellLogCurve,
+    WellLogSet,
+} from "./WellLogTypes";
+
 import type { Template } from "./WellLogTemplateTypes";
 import type { ColorTable } from "./ColorTableTypes";
 import type { PatternsTable } from "../utils/pattern";
@@ -65,6 +70,9 @@ import {
     getSelectedTrackIndices,
     setSelectedTrackIndices,
 } from "../utils/log-viewer";
+
+import type { Info } from "./InfoTypes";
+import { getWellLogFromProps } from "../utils/well-log";
 
 const rubberBandSize = 9;
 const rubberBandOffset = rubberBandSize / 2;
@@ -306,7 +314,7 @@ function addPinnedValueOverlay(instance: LogViewer, parent: WellLogView) {
 }
 
 export interface WellPickProps {
-    wellpick: WellLog; // JSON Log Format
+    wellpick: WellLogSet; // JSON Log Format
     name: string; //  "HORIZON"
     md?: string; //  Log mnemonics for depth log. default is "MD"
     /**
@@ -713,7 +721,7 @@ function createScaleInterpolator(
 function setTracksToController(
     logController: LogViewer,
     axes: AxesInfo,
-    welllog: WellLog | undefined, // JSON Log Format
+    welllog: WellLogCollection, // JSON Log Format
     template: Template, // JSON
     colorTables?: ColorTable[] // JSON
 ): ScaleInterpolator {
@@ -952,7 +960,7 @@ export interface WellLogController {
     setTemplate(template: Template): void;
     getTemplate(): Template;
 
-    getWellLog(): WellLog | undefined;
+    getWellLog(): WellLogCollection | WellLogSet | undefined;
 
     setControllerDefaultZoom(): void; // utility function
 }
@@ -989,8 +997,6 @@ export function setContentScale(
         controller.zoomContent(zoom);
     }
 }
-
-import type { Info } from "./InfoTypes";
 
 export interface WellLogViewOptions {
     /**
@@ -1036,7 +1042,7 @@ export interface WellLogViewProps {
     /**
      * Object from JSON file describing single well log data.
      */
-    welllog: WellLog | undefined;
+    welllog: WellLogCollection | WellLogSet | undefined;
 
     /**
      * Prop containing track template data.
@@ -1260,6 +1266,7 @@ class WellLogView
 {
     public static propTypes: Record<string, unknown>;
 
+    welllogCollection: WellLogCollection;
     container?: HTMLElement;
     resizeObserver: ResizeObserver;
 
@@ -1278,6 +1285,9 @@ class WellLogView
 
     constructor(props: WellLogViewProps) {
         super(props);
+
+        this.welllogCollection = getWellLogFromProps(props);
+
         this.container = undefined;
         this.logController = undefined;
         this.selCurrent = undefined;
@@ -1385,6 +1395,7 @@ class WellLogView
             selectedTrackIndices = this.getSelectedTrackIndices();
             shouldSetTracks = true;
             checkSchema = true;
+            this.welllogCollection = getWellLogFromProps(this.props);
         }
         if (this.props.template !== prevProps.template) {
             if (this.props.template)
@@ -1491,7 +1502,7 @@ class WellLogView
     getAxesInfo(): AxesInfo {
         // get Object keys available in the welllog
         const axes = getAvailableAxes(
-            this.props.welllog,
+            this.welllogCollection,
             this.props.axisMnemos
         );
         const primaryAxisIndex = axes.findIndex(
@@ -1519,7 +1530,9 @@ class WellLogView
             try {
                 validateSchema(this.template, "WellLogTemplate");
                 if (this.props.options?.checkDatafileSchema) {
-                    validateSchema(this.props.welllog, "WellLog");
+                    this.welllogCollection.forEach((wellLogSet) =>
+                        validateSchema(wellLogSet, "WellLog")
+                    );
                 }
             } catch (e) {
                 this.setState({ errorText: String(e) });
@@ -1531,7 +1544,7 @@ class WellLogView
             this.scaleInterpolator = setTracksToController(
                 this.logController,
                 axes,
-                this.props.welllog,
+                this.welllogCollection,
                 this.template,
                 this.props.colorTables
             );
@@ -1797,7 +1810,7 @@ class WellLogView
         this.setInfo(); // reflect new value in this.selCurrent
     }
 
-    getWellLog(): WellLog | undefined {
+    getWellLog(): WellLogCollection | WellLogSet | undefined {
         return this.props.welllog;
     }
 
@@ -1825,7 +1838,7 @@ class WellLogView
             }
         }
         const axes = getAvailableAxes(
-            this.props.welllog,
+            this.welllogCollection,
             this.props.axisMnemos
         );
         return {
@@ -2016,7 +2029,7 @@ class WellLogView
         viewTitle: string | boolean | JSX.Element //| undefined
     ): ReactNode {
         if (typeof viewTitle === "object" /*react element*/) return viewTitle;
-        if (viewTitle === true) return this.props.welllog?.header.well;
+        if (viewTitle === true) return this.welllogCollection[0]?.header.well;
         return viewTitle; // string
     }
 
@@ -2102,7 +2115,7 @@ export function _propTypesWellLogView(): Record<string, unknown> {
         /**
          * An object from JSON file describing well log data
          */
-        welllog: PropTypes.object, //.isRequired,
+        welllog: PropTypes.oneOfType([PropTypes.object, PropTypes.array]), //.isRequired,
 
         /**
          * Prop containing track template data

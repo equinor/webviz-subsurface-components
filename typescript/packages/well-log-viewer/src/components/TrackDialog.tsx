@@ -46,27 +46,17 @@ export class TrackPropertiesDialog extends Component<Props, State> {
         super(props);
         let name = "";
         const names = dataNames(
-            // TODO: Fix this the next time the file is edited.
-            // eslint-disable-next-line react/prop-types
-            this.props.wellLogView.props.welllog,
+            this.props.wellLogView.welllogCollection,
             null,
             true
         );
         if (names[0]) name = names[0];
 
-        // TODO: Fix this the next time the file is edited.
-        // eslint-disable-next-line react/prop-types
         const templateTrack = this.props.templateTrack;
         this.bStacked =
             templateTrack &&
-            // TODO: Fix this the next time the file is edited.
-            // eslint-disable-next-line react/prop-types
             templateTrack.plots &&
-            // TODO: Fix this the next time the file is edited.
-            // eslint-disable-next-line react/prop-types
             templateTrack.plots[0] &&
-            // TODO: Fix this the next time the file is edited.
-            // eslint-disable-next-line react/prop-types
             templateTrack.plots[0].type === "stacked";
         this.state = templateTrack
             ? {
@@ -130,8 +120,6 @@ export class TrackPropertiesDialog extends Component<Props, State> {
             };
             this.state.plots.push(plot);
         }
-        // TODO: Fix this the next time the file is edited.
-        // eslint-disable-next-line react/prop-types
         this.props.onOK(this.state);
         this.closeDialog();
     }
@@ -188,8 +176,6 @@ export class TrackPropertiesDialog extends Component<Props, State> {
     }
 
     render(): JSX.Element {
-        // TODO: Fix this the next time the file is edited.
-        // eslint-disable-next-line react/prop-types
         const templateTrack = this.props.templateTrack;
         const title = templateTrack ? "Edit track" : "Add New Track";
         return (
@@ -225,9 +211,7 @@ export class TrackPropertiesDialog extends Component<Props, State> {
                                   "stackedName", // data
                                   "Data",
                                   createDataItems(
-                                      // TODO: Fix this the next time the file is edited.
-                                      // eslint-disable-next-line react/prop-types
-                                      this.props.wellLogView.props.welllog,
+                                      this.props.wellLogView.welllogCollection,
                                       null,
                                       true
                                   )
