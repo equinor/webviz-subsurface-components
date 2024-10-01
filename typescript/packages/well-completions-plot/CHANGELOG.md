@@ -1,3 +1,10 @@
+## [1.5.2](https://github.com/equinor/webviz-subsurface-components/compare/well-completions-plot@1.5.1...well-completions-plot@1.5.2) (2024-10-01)
+
+
+### Bug Fixes
+
+* bump @equinor/videx-wellog from 0.10.0 to 0.10.5 in /typescript ([#2271](https://github.com/equinor/webviz-subsurface-components/issues/2271)) ([14cf2c3](https://github.com/equinor/webviz-subsurface-components/commit/14cf2c36b5498f113e0e9ef4547b685db74f7985))
+
 ## [1.5.1](https://github.com/equinor/webviz-subsurface-components/compare/well-completions-plot@1.5.0...well-completions-plot@1.5.1) (2024-09-30)
 
 
