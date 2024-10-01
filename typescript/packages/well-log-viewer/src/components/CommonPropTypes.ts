@@ -40,8 +40,8 @@ const templatePlotPropsType = {
 
     fill: CSSColorType,
     fillOpacity: PropTypes.number,
-    colorMapFunction: PropTypes.string,
-    inverseColorMapFunction: PropTypes.string,
+    colorMapFunctionName: PropTypes.string,
+    inverseColorMapFunctionName: PropTypes.string,
     colorScale: TemplatePlotScaleType,
     inverseColorScale: TemplatePlotScaleType,
 

@@ -28,7 +28,7 @@ import { select } from "d3";
 import type { WellLog, WellLogCurve } from "./WellLogTypes";
 import type { Template } from "./WellLogTemplateTypes";
 import { TemplateType } from "./CommonPropTypes";
-import type ColorMapFunction from "./ColorMapFunction";
+import type { ColorMapFunction } from "./ColorMapFunction";
 import { ColorFunctionType } from "./CommonPropTypes";
 import type { PatternsTable, Pattern } from "../utils/pattern";
 import { PatternsTableType, PatternsType } from "./CommonPropTypes";
@@ -259,7 +259,7 @@ function addPinnedValueOverlay(instance: LogViewer, parent: WellLogView) {
             const v = horizontal ? event.x : event.y;
             const pinelm = event.target;
             if (pinelm) {
-                if (pinelm.style.visibility == "visible") {
+                if (pinelm.style.visibility === "visible") {
                     if (!parent.selPersistent) {
                         parent.selPersistent = true;
                     } else {
@@ -317,7 +317,7 @@ export interface WellPickProps {
      * Prop containing color tables or color functions array for well picks
      */
     colorMapFunctions: ColorMapFunction[];
-    colorMapFunction: string; // "Stratigraphy" ..., "Step func", ...
+    colorMapFunctionName: string; // "Stratigraphy" ..., "Step func", ...
 }
 
 export const WellPickPropsType = PropTypes.shape({
@@ -325,7 +325,7 @@ export const WellPickPropsType = PropTypes.shape({
     name: PropTypes.string.isRequired,
     md: PropTypes.string,
     colorMapFunctions: PropTypes.arrayOf(ColorFunctionType).isRequired,
-    colorMapFunction: PropTypes.string.isRequired,
+    colorMapFunctionName: PropTypes.string.isRequired,
 });
 
 const wpSize = 3; //9;
@@ -446,7 +446,7 @@ export function getWellPicks(wellLogView: WellLogView): WellPick[] {
 
             const colorMapFunction = wellpick.colorMapFunctions.find(
                 (colorMapFunction) =>
-                    colorMapFunction.name == wellpick.colorMapFunction
+                    colorMapFunction.name === wellpick.colorMapFunctionName
             );
 
             const meta = getDiscreteMeta(wellpick.wellpick, wellpick.name);
@@ -502,7 +502,7 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
     {
         /* clear old wellpicks */
         for (const elmName in instance.overlay.elements) {
-            if (elmName.substring(0, 2) == "wp")
+            if (elmName.substring(0, 2) === "wp")
                 // "wpFill" + horizon; "wp" + horizon;
                 instance.overlay.remove(elmName); // clear old if exists
         }
@@ -844,7 +844,7 @@ function fillPlotTemplate(
     return {
         style: undefined, // No style for this full Plot options.
         type: getPlotType(plot),
-        scale: scale == "log" || scale == "linear" ? scale : undefined,
+        scale: scale === "log" || scale === "linear" ? scale : undefined,
         name: (legend1 && legend1.label ? legend1.label : legend.label) || "",
         name2: legend2 && legend2.label ? legend2.label : "",
         color: (options1 ? options1.color : options.color) || "",
@@ -852,8 +852,9 @@ function fillPlotTemplate(
         inverseColor: options.inverseColor || "",
         fill: (options1 ? options1.fill : options.fill) || "",
         fill2: options2 ? options2.fill : "",
-        colorMapFunction: options.colorMapFunction?.name ?? "",
-        inverseColorMapFunction: options.inverseColorMapFunction?.name ?? "",
+        colorMapFunctionName: options.colorMapFunction?.name ?? "",
+        inverseColorMapFunctionName:
+            options.inverseColorMapFunction?.name ?? "",
         colorScale: options.colorScale,
         inverseColorScale: options.inverseColorScale,
     };

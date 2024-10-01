@@ -18,9 +18,9 @@ function getValueOnInterval(
     row: number[],
     type: string
 ): number {
-    if (rowPrev[0] == null) return Number.NaN;
+    if (rowPrev[0] === null) return Number.NaN;
     if (type === "linestep") {
-        if (row[1] == null) return Number.NaN;
+        if (row[1] === null) return Number.NaN;
         return row[1]; //!! not rowPrev[1] !!
     }
 
@@ -28,16 +28,16 @@ function getValueOnInterval(
     const f = x - rowPrev[0];
     if (type === "dot") {
         if (f < d * 0.5) {
-            if (rowPrev[1] == null) return Number.NaN;
+            if (rowPrev[1] === null) return Number.NaN;
             return rowPrev[1];
         }
-        if (row[1] == null) return Number.NaN;
+        if (row[1] === null) return Number.NaN;
         return row[1];
     }
 
     // "line", "area", "gradientfill"
-    if (rowPrev[1] == null) return Number.NaN;
-    if (row[1] == null) return Number.NaN;
+    if (rowPrev[1] === null) return Number.NaN;
+    if (row[1] === null) return Number.NaN;
     const mul = d ? (row[1] - rowPrev[1]) / d : 1.0;
     return f * mul + rowPrev[1];
 }
@@ -48,8 +48,8 @@ function getValue(x: number, data: [], type: string): number {
         const n = data.length;
         for (let i = 0; i < n; i++) {
             const row = data[i];
-            //if (row[0] == null) continue;
-            //!! if (row[1] == null) continue;
+            //if (row[0] === null) continue;
+            //!! if (row[1] === null) continue;
             if (x < row[0]) {
                 if (!i) break;
                 const rowPrev = data[i - 1];
@@ -80,7 +80,7 @@ function addScaleTrackInfos(
         infos.push({
             name: track.options.abbr,
             units: track.options.units,
-            color: iPlot == 0 ? "black" : "grey", //??
+            color: iPlot === 0 ? "black" : "grey", //??
             value: _x,
             type: "", // "scale"
             iTrack: -1,

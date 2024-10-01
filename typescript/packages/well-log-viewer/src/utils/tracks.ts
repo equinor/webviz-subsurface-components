@@ -47,7 +47,7 @@ import type {
     WellLogMetadataDiscreteObjects,
 } from "../components/WellLogTypes";
 
-import type ColorMapFunction from "../components/ColorMapFunction";
+import type { ColorMapFunction } from "../components/ColorMapFunction";
 
 import {
     checkMinMaxValue,
@@ -65,7 +65,7 @@ export function indexOfElementByName(array: Named[], name: string): number {
         const nameUpper = name.toUpperCase();
         let i = 0;
         for (const element of array) {
-            if (element.name && element.name.toUpperCase() == nameUpper) {
+            if (element.name && element.name.toUpperCase() === nameUpper) {
                 return i;
             }
             i++;
@@ -145,10 +145,10 @@ function preparePlotData(
     let i = 0;
     for (const row of data) {
         let value = row[iCurve];
-        if (typeof value == "number") checkMinMaxValue(plot.minmax, value);
+        if (typeof value === "number") checkMinMaxValue(plot.minmax, value);
         const primary: number =
             iPrimaryAxis >= 0 ? (row[iPrimaryAxis] as number) : i++;
-        if (primary == null)
+        if (primary === null)
             // videx library do not like such data
             value = null; // force a gap in the graph
         checkMinMaxValue(plot.minmaxPrimaryAxis, primary);
@@ -164,9 +164,9 @@ function shortDescription(description: string): string {
     //"1  BVW:CPI:rC:0001:v1",
     //"02 DRAW DOWN PRESSURE",
     if ("0" <= description[0] && description[0] <= "9") {
-        if (description[1] == " ") return description.substring(2);
+        if (description[1] === " ") return description.substring(2);
         else if ("0" <= description[1] && description[2] <= "9")
-            if (description[2] == " ") return description.substring(3);
+            if (description[2] === " ") return description.substring(3);
     }
     return description;
 }
@@ -304,7 +304,7 @@ function getTemplatePlotProps(
             options.fillOpacity = 0.0;
         }
     } else if (options.type === "gradientfill") {
-        if (!options.colorMapFunction) {
+        if (!options.colorMapFunctionName) {
             //options.fill = generateColor();
             options.fillOpacity = 0.0;
         }
@@ -352,22 +352,22 @@ function makeDataAccessor2(iData: number, iData2: number) {
 }
 
 function getColorFunction(
-    id: string | undefined,
+    name: string | undefined,
     colorMapFunctions: ColorMapFunction[] | undefined
 ): ColorMapFunction | undefined {
-    if (id) {
-        if (typeof id !== "string") {
-            console.log("colorMapFunction id='" + id + "' is not a string");
+    if (name) {
+        if (typeof name !== "string") {
+            console.log("colorMapFunction name='" + name + "' is not a string");
             return undefined;
         }
         if (colorMapFunctions) {
             const colorMapFunction = colorMapFunctions.find(
-                (value) => value.name === id
+                (colorMapFunction) => colorMapFunction.name === name
             );
             if (colorMapFunction) return colorMapFunction;
             console.error(
                 "colorMapFunction id='" +
-                    id +
+                    name +
                     "' is not found in getColorFunction()"
             );
             return undefined;
@@ -415,11 +415,11 @@ function getPlotOptions(
 
         //GradientFillPlotOptions
         colorMapFunction: getColorFunction(
-            templatePlotProps.colorMapFunction,
+            templatePlotProps.colorMapFunctionName,
             colorMapFunctions
         ),
         inverseColorMapFunction: getColorFunction(
-            templatePlotProps.inverseColorMapFunction,
+            templatePlotProps.inverseColorMapFunctionName,
             colorMapFunctions
         ),
         colorScale: templatePlotProps.colorScale,
@@ -886,7 +886,7 @@ export function getDiscreteColorAndName(
 ): { color: number[]; name: string } {
     let color: number[];
     let name: string;
-    if (value == null) value = Number.NaN;
+    if (value === null) value = Number.NaN;
     if (meta) {
         // use discrete metadata from WellLog JSON file
         const { objects, iColor, iCode } = meta;
@@ -927,7 +927,7 @@ export function getDiscreteColorAndName(
         name = value.toString();
         if (colorMapFunction) {
             // get color from the table
-            if (typeof value == "string") {
+            if (typeof value === "string") {
                 let v: number;
                 if (mapStringToNum.has(value)) {
                     v = mapStringToNum.get(value);
@@ -1336,7 +1336,7 @@ function addStackedTrack(
     // curve.valueType could be "integer", "string"
 
     const meta = getDiscreteMeta(welllog, name);
-    if (!meta && curve.valueType == "integer")
+    if (!meta && curve.valueType === "integer")
         console.log(
             "Discrete meta information for '" +
                 name +
@@ -1344,22 +1344,23 @@ function addStackedTrack(
         );
 
     let colorMapFunction: ColorMapFunction | undefined = undefined;
-    if (templatePlotProps.colorMapFunction) {
+    if (templatePlotProps.colorMapFunctionName) {
         if (colorMapFunctions) {
             colorMapFunction = colorMapFunctions.find(
                 (colorMapFunction) =>
-                    colorMapFunction.name == templatePlotProps.colorMapFunction
+                    colorMapFunction.name ===
+                    templatePlotProps.colorMapFunctionName
             );
             if (!colorMapFunction)
                 console.error(
                     "Missed '" +
-                        templatePlotProps.colorMapFunction +
+                        templatePlotProps.colorMapFunctionName +
                         "' color function/table"
                 );
         } else {
             console.error(
                 "No color function/table array given for '" +
-                    templatePlotProps.colorMapFunction +
+                    templatePlotProps.colorMapFunctionName +
                     "' color function"
             );
         }
@@ -1471,7 +1472,7 @@ function addTrack(
         let order = 0;
         for (const track of wellLogView.logController.tracks) {
             track.order = order++;
-            if (trackCurrent == track) {
+            if (trackCurrent === track) {
                 if (bAfter) {
                     // add after
                     trackNew.order = order++;
@@ -1566,9 +1567,9 @@ export function addOrEditStackedTrack(
         templateStyles
     );
 
-    const colorMapFunction = props.colorMapFunctions?.find(
+    const colorMapFunctionName = props.colorMapFunctions?.find(
         (colorMapFunction) =>
-            colorMapFunction.name == templatePlotProps.colorMapFunction
+            colorMapFunction.name === templatePlotProps.colorMapFunctionName
     );
     const meta = getDiscreteMeta(welllog, name);
     const data = welllog.data;
@@ -1583,7 +1584,7 @@ export function addOrEditStackedTrack(
     const stackData = createStackData.bind(
         null,
         plotData.data,
-        colorMapFunction,
+        colorMapFunctionName,
         meta
     );
     if (track) {

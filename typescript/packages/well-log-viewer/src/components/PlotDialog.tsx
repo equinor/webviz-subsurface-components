@@ -5,7 +5,7 @@ import type { Track, GraphTrack } from "@equinor/videx-wellog";
 
 import type { TemplatePlot, TemplatePlotType } from "./WellLogTemplateTypes";
 import type { WellLog } from "./WellLogTypes";
-import type ColorMapFunction from "./ColorMapFunction";
+import type { ColorMapFunction } from "./ColorMapFunction";
 
 import type WellLogView from "./WellLogView";
 
@@ -144,7 +144,7 @@ export function dataNames(
             if (plots) {
                 // GraphTrack
                 for (const plot of plots)
-                    if (plot.id == iCurve) {
+                    if (plot.id === iCurve) {
                         bUsed = true;
                         break;
                     }
@@ -220,11 +220,11 @@ export class PlotPropertiesDialog extends Component<Props, State> {
                   inverseColor: "",
 
                   // for 'gradientfill' plot
-                  colorMapFunction:
+                  colorMapFunctionName:
                       // TODO: Fix this the next time the file is edited.
                       // eslint-disable-next-line react/prop-types
                       this.props.wellLogView.props.colorMapFunctions?.[0]?.name,
-                  inverseColorMapFunction: undefined,
+                  inverseColorMapFunctionName: undefined,
                   colorScale: undefined,
                   inverseColorScale: undefined,
 
@@ -300,7 +300,7 @@ export class PlotPropertiesDialog extends Component<Props, State> {
             // insert at the beginning
             nodes.unshift(
                 <option key={noneValue} value={noneValue}>
-                    {insertEmpty == true ? "\u2014" : insertEmpty}
+                    {insertEmpty === true ? "\u2014" : insertEmpty}
                 </option>
             );
         }
@@ -354,14 +354,14 @@ export class PlotPropertiesDialog extends Component<Props, State> {
                 this.props.wellLogView.props.colorMapFunctions;
             return [
                 this.createSelectControl(
-                    "colorMapFunction",
+                    "colorMapFunctionName",
                     "Fill Color function/table",
                     createColorFunctionItems(colorMapFunctions)
                 ),
                 <FormControl fullWidth key="211" />,
                 <FormControl fullWidth key="212" />,
                 this.createSelectControl(
-                    "inverseColorMapFunction",
+                    "inverseColorMapFunctionName",
                     "Inverse Color function/table",
                     createColorFunctionItems(colorMapFunctions),
                     true

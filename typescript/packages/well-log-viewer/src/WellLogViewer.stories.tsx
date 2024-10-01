@@ -30,7 +30,7 @@ const welllogs = welllogsJson as unknown as WellLog[];
 import templateJson from "../../../../example-data/welllog_template_2.json";
 const template = templateJson as unknown as Template;
 
-import type ColorMapFunction from "./components/ColorMapFunction";
+import type { ColorMapFunction } from "./components/ColorMapFunction";
 
 import type { MapMouseEvent } from "@webviz/subsurface-viewer/dist/components/Map";
 
@@ -215,15 +215,15 @@ const wellpick: WellPickProps = {
     wellpick: wellpicks[0],
     name: "HORIZON",
     colorMapFunctions: exampleColorMapFunctions,
-    colorMapFunction: "Stratigraphy",
+    colorMapFunctionName: "Stratigraphy",
 };
 
-function getTemplatePlotColorFunction(
+function getTemplatePlotColorFunctionName(
     template: Template,
     templatePlot: TemplatePlot
 ): string | undefined {
-    let colorMapFunction = templatePlot.colorMapFunction;
-    if (!colorMapFunction && templatePlot.style) {
+    let colorMapFunctionName = templatePlot.colorMapFunctionName;
+    if (!colorMapFunctionName && templatePlot.style) {
         const templateStyles = template.styles;
         if (templateStyles) {
             const iStyle = indexOfElementByName(
@@ -232,11 +232,11 @@ function getTemplatePlotColorFunction(
             );
             if (iStyle >= 0) {
                 const style = templateStyles[iStyle];
-                colorMapFunction = style.colorMapFunction;
+                colorMapFunctionName = style.colorMapFunctionName;
             }
         }
     }
-    return colorMapFunction;
+    return colorMapFunctionName;
 }
 
 interface Props extends SubsurfaceViewerProps {
@@ -348,8 +348,8 @@ export const ColorByFunction: StoryObj<typeof StoryTemplate> = {
                 {
                     name: "HKL",
                     type: "gradientfill",
-                    colorMapFunction: "Step func",
-                    inverseColorMapFunction: "Grey scale",
+                    colorMapFunctionName: "Step func",
+                    inverseColorMapFunctionName: "Grey scale",
                 },
             ],
         },
@@ -573,7 +573,7 @@ class MapAndWellLogViewer extends React.Component<Props, State> {
                         wells_layer["logName"] !== templatePlot.name
                     ) {
                         wells_layer["logName"] = templatePlot.name;
-                        const colorTable = getTemplatePlotColorFunction(
+                        const colorTable = getTemplatePlotColorFunctionName(
                             template,
                             templatePlot
                         );
@@ -603,7 +603,7 @@ class MapAndWellLogViewer extends React.Component<Props, State> {
 
     onMapMouseEvent(event: MapMouseEvent): void {
         if (event.wellname !== undefined) {
-            if (event.type == "click") {
+            if (event.type === "click") {
                 const iWell = findWellLogIndex(welllogs, event.wellname);
                 this.setState((state: Readonly<State>) => {
                     //if (state.wellIndex === iWell) return null;

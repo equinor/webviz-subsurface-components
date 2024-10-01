@@ -115,7 +115,7 @@ export default class WellLogViewer extends Component<
                 let iTrack = 0;
                 for (const track of tracks) {
                     if (isScaleTrack(track)) continue;
-                    if (info.iTrack == iTrack) {
+                    if (info.iTrack === iTrack) {
                         toggleId(collapsedTrackIds, track.id);
                         break;
                     }

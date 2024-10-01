@@ -253,7 +253,7 @@ export class SimpleMenu extends Component<Props, State> {
     render(): JSX.Element {
         // TODO: Fix this the next time the file is edited.
         // eslint-disable-next-line react/prop-types
-        if (this.props.type == "removePlots") {
+        if (this.props.type === "removePlots") {
             return (
                 <div className="local-menu">
                     <Menu
@@ -271,7 +271,7 @@ export class SimpleMenu extends Component<Props, State> {
         }
         // TODO: Fix this the next time the file is edited.
         // eslint-disable-next-line react/prop-types
-        if (this.props.type == "editPlots") {
+        if (this.props.type === "editPlots") {
             return (
                 <div className="local-menu">
                     <Menu
@@ -289,7 +289,7 @@ export class SimpleMenu extends Component<Props, State> {
         }
         // TODO: Fix this the next time the file is edited.
         // eslint-disable-next-line react/prop-types
-        if (this.props.type == "title") {
+        if (this.props.type === "title") {
             return (
                 <div className="local-menu">
                     <Menu
@@ -307,7 +307,7 @@ export class SimpleMenu extends Component<Props, State> {
             );
         }
 
-        // For this.props.type == "legends" or this.props.type == "container"
+        // For this.props.type === "legends" or this.props.type === "container"
 
         // TODO: Fix this the next time the file is edited.
         // eslint-disable-next-line react/prop-types

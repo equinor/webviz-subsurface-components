@@ -5,7 +5,7 @@ import WellLogView from "./WellLogView";
 import type { WellLogViewProps } from "./WellLogView";
 import { argTypesWellLogViewProp } from "./WellLogView";
 import { colorTables } from "@emerson-eps/color-tables";
-import type ColorMapFunction from "./ColorMapFunction";
+import type { ColorMapFunction } from "./ColorMapFunction";
 const exampleColorMapFunctions = colorTables as ColorMapFunction[];
 
 import L898MUD from "../../../../../example-data/L898MUD.json";

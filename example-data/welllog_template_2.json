@@ -191,7 +191,7 @@
     {
       "name": "discrete",
       "type": "stacked",
-      "colorMapFunction": "Stratigraphy"
+      "colorMapFunctionName": "Stratigraphy"
     }
   ]
 }

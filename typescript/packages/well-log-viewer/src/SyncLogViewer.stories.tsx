@@ -2,7 +2,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 
-import type ColorMapFunction from "./components/ColorMapFunction";
+import type { ColorMapFunction } from "./components/ColorMapFunction";
 import { colorTables } from "@emerson-eps/color-tables";
 const exampleColorMapFunctions = colorTables as ColorMapFunction[];
 import wellpickColorTables from "../../../../example-data/wellpick_colors.json";
@@ -369,19 +369,19 @@ const exampleWellPicks: WellPickProps[] = [
         wellpick: wellpicks[0],
         name: "HORIZON",
         colorMapFunctions: wellpickColorMapFunctions,
-        colorMapFunction: "Stratigraphy",
+        colorMapFunctionName: "Stratigraphy",
     },
     {
         wellpick: wellpicks[1],
         name: "HORIZON",
         colorMapFunctions: wellpickColorMapFunctions,
-        colorMapFunction: "Stratigraphy",
+        colorMapFunctionName: "Stratigraphy",
     },
     {
         wellpick: wellpicks[0],
         name: "HORIZON",
         colorMapFunctions: wellpickColorMapFunctions,
-        colorMapFunction: "Stratigraphy",
+        colorMapFunctionName: "Stratigraphy",
     },
 ];
 

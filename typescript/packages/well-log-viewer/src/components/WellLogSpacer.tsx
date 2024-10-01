@@ -5,7 +5,7 @@ import type { WellLogController, WellPickProps } from "./WellLogView";
 import { getWellPicks } from "./WellLogView";
 import type WellLogView from "./WellLogView";
 
-import type ColorMapFunction from "./ColorMapFunction";
+import type { ColorMapFunction } from "./ColorMapFunction";
 import type { PatternsTable, Pattern } from "../utils/pattern";
 import { createDefs, patternId } from "../utils/pattern";
 

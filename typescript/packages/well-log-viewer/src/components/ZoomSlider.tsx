@@ -48,7 +48,7 @@ class ZoomSlider extends Component<ZoomSliderProps, State> {
                 // TODO: Fix this the next time the file is edited.
                 // eslint-disable-next-line react/prop-types
                 const level = convertValueToLevel(this.props.value);
-                if (state.level == level) return null;
+                if (state.level === level) return null;
                 return { level: level };
             });
         }
