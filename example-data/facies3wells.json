@@ -1909,7 +1909,7 @@
           "name": "discrete",
           "type": "stacked",
           "color": "red",
-          "colorFunction": "Stratigraphy"
+          "colorMapFunctionName": "Stratigraphy"
         },
         { "name": "categorical", "type": "stacked", "color": "green" }
       ]
@@ -1961,7 +1961,7 @@
           "name": "discrete",
           "type": "stacked",
           "color": "red",
-          "colorFunction": "Stratigraphy"
+          "colorMapFunctionName": "Stratigraphy"
         },
         { "name": "categorical", "type": "stacked", "color": "green" }
       ]
