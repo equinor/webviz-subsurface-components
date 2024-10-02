@@ -1,3 +1,10 @@
+## [0.30.16](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.30.15...subsurface-viewer@0.30.16) (2024-10-02)
+
+
+### Bug Fixes
+
+* bump workerpool from 9.1.1 to 9.1.3 in /typescript ([#2285](https://github.com/equinor/webviz-subsurface-components/issues/2285)) ([3fbca68](https://github.com/equinor/webviz-subsurface-components/commit/3fbca688370243c33bbd9fe10534b088d2fa4964)), closes [#388](https://github.com/equinor/webviz-subsurface-components/issues/388) [#460](https://github.com/equinor/webviz-subsurface-components/issues/460) [#461](https://github.com/equinor/webviz-subsurface-components/issues/461) [#455](https://github.com/equinor/webviz-subsurface-components/issues/455) [#446](https://github.com/equinor/webviz-subsurface-components/issues/446) [#455](https://github.com/equinor/webviz-subsurface-components/issues/455) [#447](https://github.com/equinor/webviz-subsurface-components/issues/447) [#453](https://github.com/equinor/webviz-subsurface-components/issues/453) [#446](https://github.com/equinor/webviz-subsurface-components/issues/446) [#446](https://github.com/equinor/webviz-subsurface-components/issues/446)
+
 ## [0.30.15](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@0.30.14...subsurface-viewer@0.30.15) (2024-10-01)
 
 
