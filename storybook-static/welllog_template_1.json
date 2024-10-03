@@ -54,8 +54,8 @@
                     "name": "HKLA",
                     "type": "gradientfill",
                     "color": "blue",
-                    "colorTable": "Physics",
-                    "inverseColorTable": "Physics"
+                    "colorMapFunctionName": "Physics",
+                    "inverseColorMapFunctionName": "Physics"
                 }
             ]
         },
@@ -196,7 +196,7 @@
         {
             "name": "HKL",
             "type": "gradientfill",
-            "colorTable": "Physics",
+            "colorMapFunctionName": "Physics",
             "color": "green"
         },
         {
