@@ -75,7 +75,7 @@ export interface SyncLogViewerProps {
      */
     colorTables: ColorTable[];
     /**
-     * Set to true for default titles or to array of individial welllog titles
+     * Set to true for default titles or to array of individial well log titles
      */
     viewTitles?: boolean | (boolean | string | JSX.Element)[];
 
@@ -261,7 +261,7 @@ export const argTypesSyncLogViewerProp = {
     },
     viewTitles: {
         description:
-            "Set to true for default titles or to array of individial welllog titles",
+            "Set to true for default titles or to array of individial well log titles",
     },
     layout: {
         description:
@@ -279,7 +279,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
 
     spacers: (WellLogSpacer | null)[];
 
-    welllogCollections: WellLogCollection[];
+    wellLogCollections: WellLogCollection[];
 
     callbackManagers: CallbackManager[];
 
@@ -307,7 +307,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
     constructor(props: SyncLogViewerProps) {
         super(props);
 
-        this.welllogCollections = getWelllogCollectionsFromProps(props);
+        this.wellLogCollections = getWellLogCollectionsFromProps(props);
 
         this.spacers = [];
 
@@ -331,7 +331,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
     componentDidMount(): void {
         this._isMounted = true;
 
-        if (this.welllogCollections.length) {
+        if (this.wellLogCollections.length) {
             this.syncTrackScrollPos(0);
             this.syncContentScrollPos(0);
         }
@@ -339,7 +339,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
             // fix after setting the commonBaseDomain
             this.setControllersZoom();
         }
-        if (this.welllogCollections.length) this.syncContentSelection(0);
+        if (this.wellLogCollections.length) this.syncContentSelection(0);
     }
 
     componentWillUnmount(): void {
@@ -363,13 +363,13 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
 
     beforeRender(nextProps: SyncLogViewerProps): void {
         // called before render() but not inside it to avoid onDeleteController notifications
-        this.welllogCollections = getWelllogCollectionsFromProps(nextProps);
+        this.wellLogCollections = getWellLogCollectionsFromProps(nextProps);
 
-        if (this.callbackManagers.length === this.welllogCollections.length)
+        if (this.callbackManagers.length === this.wellLogCollections.length)
             return;
-        this.spacers.length = this.welllogCollections.length;
+        this.spacers.length = this.wellLogCollections.length;
 
-        this.fillViewsCallbacks(this.welllogCollections.length); // update this.callbackManagers and this.callbacks[] before render()
+        this.fillViewsCallbacks(this.wellLogCollections.length); // update this.callbackManagers and this.callbacks[] before render()
     }
 
     componentDidUpdate(
@@ -421,7 +421,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         this.collapsedTrackIds.push(collapsedTrackIds);
 
         const callbackManager = new CallbackManager(
-            () => this.welllogCollections[iView]
+            () => this.wellLogCollections[iView]
         );
         this.callbackManagers.push(callbackManager);
 
@@ -475,7 +475,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
     getDefaultPrimaryAxis(): string {
         if (this.props.primaryAxis) return this.props.primaryAxis;
 
-        const _axes = this.welllogCollections?.map((collection) =>
+        const _axes = this.wellLogCollections?.map((collection) =>
             getAvailableAxes(collection, this.props.axisMnemos)
         );
         const axes = _axes?.[0];
@@ -941,7 +941,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
 
     createView(index: number): ReactNode {
         const callbacks = this.callbacks[index];
-        const wellLog = this.welllogCollections[index];
+        const wellLog = this.wellLogCollections[index];
         const templates = this.props.templates;
         const template = templates[index] ? templates[index] : templates[0];
         const viewTitles = this.props.viewTitles;
@@ -1063,7 +1063,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                                 : "row",
                         }}
                     >
-                        {this.welllogCollections.map(
+                        {this.wellLogCollections.map(
                             (_collection, index: number) => [
                                 index ? this.createSpacer(index) : null,
                                 this.createView(index),
@@ -1079,7 +1079,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
     }
 }
 
-function getWelllogCollectionsFromProps(props: SyncLogViewerProps) {
+function getWellLogCollectionsFromProps(props: SyncLogViewerProps) {
     return props.welllogs.map((setOrCollection) => {
         if (Array.isArray(setOrCollection)) return setOrCollection;
         else return [setOrCollection];
@@ -1223,7 +1223,7 @@ SyncLogViewer.propTypes = {
     selection: PropTypes.arrayOf(PropTypes.number),
 
     /**
-     * Set to true for default titles or to array of individial welllog titles
+     * Set to true for default titles or to array of individial well log titles
      */
     viewTitles: PropTypes.oneOfType([
         PropTypes.bool,

@@ -18,11 +18,11 @@ export function defaultSidePanel(parent: SyncLogViewer): JSX.Element {
                 onChangePrimaryAxis={parent.onChangePrimaryAxis}
                 callbackManager={parent.callbackManagers[0]}
             />
-            {parent.welllogCollections?.map(
-                (welllog: WellLogCollection, iWellLog: number) => (
+            {parent.wellLogCollections?.map(
+                (wellLog: WellLogCollection, iWellLog: number) => (
                     <WellLogInfoPanel
                         key={iWellLog}
-                        header={"Readout " + welllog[0]?.header.well}
+                        header={"Readout " + wellLog[0]?.header.well}
                         readoutOptions={parent.props.readoutOptions}
                         callbackManager={parent.callbackManagers[iWellLog]}
                     />

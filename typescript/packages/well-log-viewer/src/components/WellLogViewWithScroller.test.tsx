@@ -7,7 +7,7 @@ import WellLogViewWithScroller from "./WellLogViewWithScroller";
 
 // TODO: Fix this the next time the file is edited.
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const welllog = require("../../../../../example-data/L898MUD.json")[0];
+const wellLog = require("../../../../../example-data/L898MUD.json")[0];
 // TODO: Fix this the next time the file is edited.
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const template = require("../../../../../example-data/welllog_template_1.json");
@@ -24,7 +24,7 @@ describe("Test Well Log View Component with Scroller", () => {
     it("snapshot test", () => {
         const { container } = render(
             <WellLogViewWithScroller
-                welllog={welllog}
+                welllog={wellLog}
                 template={template}
                 colorTables={colorTables}
                 primaryAxis={"md"}

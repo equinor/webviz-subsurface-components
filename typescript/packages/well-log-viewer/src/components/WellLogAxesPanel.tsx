@@ -31,18 +31,18 @@ interface Props {
     autoHide?: boolean;
 }
 interface State {
-    axes: string[]; // axes available in welllog
+    axes: string[]; // axes available in well log
     primaryAxis: string;
 }
 
 export class WellLogAxesPanel extends Component<Props, State> {
-    welllog: WellLogCollection | undefined;
+    wellLog: WellLogCollection | undefined;
 
     constructor(props: Props) {
         super(props);
 
-        this.welllog = this.props.callbackManager.welllog() ?? [];
-        const axes = getAvailableAxes(this.welllog, this.props.axisMnemos);
+        this.wellLog = this.props.callbackManager.wellLog() ?? [];
+        const axes = getAvailableAxes(this.wellLog, this.props.axisMnemos);
 
         this.state = {
             axes: axes,
@@ -79,14 +79,14 @@ export class WellLogAxesPanel extends Component<Props, State> {
             this.registerCallbacks(this.props.callbackManager);
         }
 
-        const wellog = this.props.callbackManager?.welllog();
+        const wellog = this.props.callbackManager?.wellLog();
         if (
-            this.welllog !== wellog ||
+            this.wellLog !== wellog ||
             prevProps.axisMnemos !== this.props.axisMnemos
         ) {
-            this.welllog = wellog;
+            this.wellLog = wellog;
             const axes = getAvailableAxes(
-                this.welllog ?? [],
+                this.wellLog ?? [],
                 this.props.axisMnemos
             );
             this.setState({

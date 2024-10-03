@@ -8,7 +8,7 @@ import type { WellLogCollection } from "./WellLogTypes";
 
 export class CallbackManager {
     controller: WellLogController | null;
-    welllog: () => WellLogCollection | undefined;
+    wellLog: () => WellLogCollection | undefined;
 
     onCreateControllerCallbacks: ((controller: WellLogController) => void)[];
     onInfoCallbacks: ((
@@ -23,8 +23,8 @@ export class CallbackManager {
     onChangePrimaryAxisCallbacks: ((primaryAxis: string) => void)[];
     onInfoFilledCallbacks: ((computedInfo: Info[]) => void)[];
 
-    constructor(welllog: () => WellLogCollection | undefined) {
-        this.welllog = welllog;
+    constructor(wellLog: () => WellLogCollection | undefined) {
+        this.wellLog = wellLog;
         this.controller = null;
 
         this.onCreateControllerCallbacks = [];

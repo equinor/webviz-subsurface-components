@@ -721,12 +721,12 @@ function createScaleInterpolator(
 function setTracksToController(
     logController: LogViewer,
     axes: AxesInfo,
-    welllog: WellLogCollection, // JSON Log Format
+    wellLog: WellLogCollection, // JSON Log Format
     template: Template, // JSON
     colorTables?: ColorTable[] // JSON
 ): ScaleInterpolator {
     const { tracks, minmaxPrimaryAxis, primaries, secondaries } = createTracks(
-        welllog,
+        wellLog,
         axes,
         template.tracks,
         template.styles,
@@ -1045,6 +1045,11 @@ export interface WellLogViewProps {
     welllog: WellLogCollection | WellLogSet | undefined;
 
     /**
+     * TODO: Fix this for all public
+     */
+    // wellLogCollection: WellLogCollection | undefined;
+
+    /**
      * Prop containing track template data.
      */
     template: Template;
@@ -1090,7 +1095,7 @@ export interface WellLogViewProps {
     axisMnemos: Record<string, string[]>;
 
     /**
-     * The view title. Set desired string or react element or true for default value from welllog file
+     * The view title. Set desired string or react element or true for default value from well log file
      */
     viewTitle?: boolean | string | JSX.Element;
 
@@ -1185,7 +1190,7 @@ export const argTypesWellLogViewProp = {
     },
     viewTitle: {
         description:
-            "The view title. Set desired string or react element or true for default value from welllog file",
+            "The view title. Set desired string or react element or true for default value from well log file",
     },
     options: {
         description:
@@ -1266,7 +1271,7 @@ class WellLogView
 {
     public static propTypes: Record<string, unknown>;
 
-    welllogCollection: WellLogCollection;
+    wellLogCollection: WellLogCollection;
     container?: HTMLElement;
     resizeObserver: ResizeObserver;
 
@@ -1286,7 +1291,7 @@ class WellLogView
     constructor(props: WellLogViewProps) {
         super(props);
 
-        this.welllogCollection = getWellLogFromProps(props);
+        this.wellLogCollection = getWellLogFromProps(props);
 
         this.container = undefined;
         this.logController = undefined;
@@ -1395,7 +1400,7 @@ class WellLogView
             selectedTrackIndices = this.getSelectedTrackIndices();
             shouldSetTracks = true;
             checkSchema = true;
-            this.welllogCollection = getWellLogFromProps(this.props);
+            this.wellLogCollection = getWellLogFromProps(this.props);
         }
         if (this.props.template !== prevProps.template) {
             if (this.props.template)
@@ -1500,9 +1505,9 @@ class WellLogView
         this.updateInfo();
     }
     getAxesInfo(): AxesInfo {
-        // get Object keys available in the welllog
+        // get Object keys available in the well log
         const axes = getAvailableAxes(
-            this.welllogCollection,
+            this.wellLogCollection,
             this.props.axisMnemos
         );
         const primaryAxisIndex = axes.findIndex(
@@ -1530,7 +1535,7 @@ class WellLogView
             try {
                 validateSchema(this.template, "WellLogTemplate");
                 if (this.props.options?.checkDatafileSchema) {
-                    this.welllogCollection.forEach((wellLogSet) =>
+                    this.wellLogCollection.forEach((wellLogSet) =>
                         validateSchema(wellLogSet, "WellLog")
                     );
                 }
@@ -1544,7 +1549,7 @@ class WellLogView
             this.scaleInterpolator = setTracksToController(
                 this.logController,
                 axes,
-                this.welllogCollection,
+                this.wellLogCollection,
                 this.template,
                 this.props.colorTables
             );
@@ -1838,7 +1843,7 @@ class WellLogView
             }
         }
         const axes = getAvailableAxes(
-            this.welllogCollection,
+            this.wellLogCollection,
             this.props.axisMnemos
         );
         return {
@@ -2029,7 +2034,7 @@ class WellLogView
         viewTitle: string | boolean | JSX.Element //| undefined
     ): ReactNode {
         if (typeof viewTitle === "object" /*react element*/) return viewTitle;
-        if (viewTitle === true) return this.welllogCollection[0]?.header.well;
+        if (viewTitle === true) return this.wellLogCollection[0]?.header.well;
         return viewTitle; // string
     }
 

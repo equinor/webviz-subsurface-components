@@ -35,12 +35,12 @@ import type {
 } from "../../components/WellLogTypes";
 import type { WellLogViewOptions } from "../../components/WellLogView";
 
-import welllogsJson from "../../../../../../example-data/volve_logs.json";
+import wellLogsJson from "../../../../../../example-data/volve_logs.json";
 import templateJson from "../../../../../../example-data/welllog_template_2.json";
 import colorTables from "../../../../../../example-data/wellpick_colors.json";
 import wellPicks from "../../../../../../example-data/wellpicks.json";
 
-const welllogs = welllogsJson as unknown as WellLogCollection;
+const wellLogs = wellLogsJson as unknown as WellLogCollection;
 const template = templateJson as unknown as Template;
 
 const wellpick = {
@@ -89,10 +89,10 @@ function findWellsLayer(event: MapMouseEvent) {
 }
 
 function findWellLogIndex(
-    welllog: WellLogCollection,
+    wellLog: WellLogCollection,
     wellName: string
 ): number {
-    return welllog.findIndex((logSet) => logSet.header.well === wellName);
+    return wellLog.findIndex((logSet) => logSet.header.well === wellName);
 }
 
 function findLog(template: Template, logName: string): number {
@@ -102,11 +102,11 @@ function findLog(template: Template, logName: string): number {
 }
 
 function detectType(
-    welllogSet: WellLogSet,
+    wellLogSet: WellLogSet,
     logName: string
 ): TemplatePlotTypes {
-    if (welllogSet) {
-        const meta = getDiscreteMeta(welllogSet, logName); // non-standard extention of WellLog JSON file
+    if (wellLogSet) {
+        const meta = getDiscreteMeta(wellLogSet, logName); // non-standard extention of WellLog JSON file
         if (meta) return "stacked";
     }
     return "line";
@@ -114,11 +114,11 @@ function detectType(
 
 function addTemplateTrack(
     template: Template,
-    welllogSet: WellLogSet,
+    wellLogSet: WellLogSet,
     logName: string
 ): Template {
     // add missed TemplateTrack for the given logName
-    const type: TemplatePlotTypes = detectType(welllogSet, logName);
+    const type: TemplatePlotTypes = detectType(wellLogSet, logName);
     const templateNew = deepCopy(template);
     const templateTrack: TemplateTrack = {
         title: logName,
@@ -133,7 +133,7 @@ export interface MapAndWellLogViewerProps extends SubsurfaceViewerProps {
     /**
      * Options for well log view
      */
-    welllogOptions?: WellLogViewOptions;
+    wellLogOptions?: WellLogViewOptions;
 }
 
 export class MapAndWellLogViewer extends React.Component<
@@ -159,7 +159,7 @@ export class MapAndWellLogViewer extends React.Component<
 
         this.callbackManager = new CallbackManager(() => {
             if (this.state.wellIndex === undefined) return undefined;
-            const logset = welllogs[this.state.wellIndex];
+            const logset = wellLogs[this.state.wellIndex];
 
             if (logset) return [logset];
             else return [];
@@ -244,7 +244,7 @@ export class MapAndWellLogViewer extends React.Component<
         // TODO: This event is broken within MapViewer, and MapMouseEvent is never given with a wellname. Might need to be fixed in a PR there
         if (event.wellname !== undefined) {
             if (event.type == "click") {
-                const iWell = findWellLogIndex(welllogs, event.wellname);
+                const iWell = findWellLogIndex(wellLogs, event.wellname);
                 this.setState((state: Readonly<State>) => {
                     let selection:
                         | [number | undefined, number | undefined]
@@ -286,11 +286,11 @@ export class MapAndWellLogViewer extends React.Component<
                         const logName = wellsLayer.props?.logName;
                         let iTrack = findLog(template, logName);
                         if (iTrack < 0) {
-                            //const welllog = info.object is Feature or WellLog;
-                            const welllog = welllogs[iWell];
+                            //const wellLog = info.object is Feature or WellLog;
+                            const wellLog = wellLogs[iWell];
                             const templateNew = addTemplateTrack(
                                 template,
-                                welllog,
+                                wellLog,
                                 logName
                             );
                             controller.setTemplate(templateNew);
@@ -389,7 +389,7 @@ export class MapAndWellLogViewer extends React.Component<
                         <WellLogViewWithScroller
                             welllog={
                                 wellIndex !== undefined
-                                    ? welllogs[wellIndex]
+                                    ? wellLogs[wellIndex]
                                     : undefined
                             }
                             template={template}

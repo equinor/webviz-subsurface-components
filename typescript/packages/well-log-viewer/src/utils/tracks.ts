@@ -220,11 +220,11 @@ type Named = {
 };
 
 export function getAvailableAxes(
-    welllog: WellLogCollection,
+    wellLog: WellLogCollection,
     axisMnemos: Record<string, string[]>
 ): string[] {
     const result: string[] = [];
-    const curves = getAllWellLogCurves(welllog);
+    const curves = getAllWellLogCurves(wellLog);
 
     for (const key in axisMnemos) {
         const i = indexOfElementByNames(curves, axisMnemos[key]);
@@ -603,18 +603,18 @@ function addGraphTrackPlot(
 
     const axes = wellLogView.getAxesInfo();
     const plotFactory = track.options.plotFactory;
-    const welllog = wellLogView.welllogCollection;
+    const wellLog = wellLogView.wellLogCollection;
     const colorTables = wellLogView.props.colorTables;
     const plotDatas = track.options.data;
     const plots = track.plots;
 
-    if (plotFactory && welllog.length) {
-        const plotSetup = setupPlot(welllog, templatePlot.name, axes);
+    if (plotFactory && wellLog.length) {
+        const plotSetup = setupPlot(wellLog, templatePlot.name, axes);
 
         if (!plotSetup) return minmaxPrimaryAxis;
 
         const { plotData, curve, iCurve, minmax, iSet } = plotSetup;
-        const plotSetup2 = maybeSetupPlot2(welllog, templatePlot, axes);
+        const plotSetup2 = maybeSetupPlot2(wellLog, templatePlot, axes);
 
         checkSetupMinMax(plotSetup, plotSetup2, minmaxPrimaryAxis);
 
@@ -669,17 +669,17 @@ function editGraphTrackPlot(
 
     const axes = wellLogView.getAxesInfo();
     const plotFactory = track.options.plotFactory;
-    const welllog = wellLogView.welllogCollection;
+    const wellLog = wellLogView.wellLogCollection;
     const plotDatas = track.options.data;
     const plots = track.plots;
 
-    if (plotFactory && welllog.length) {
-        const plotSetup = setupPlot(welllog, templatePlot.name, axes);
+    if (plotFactory && wellLog.length) {
+        const plotSetup = setupPlot(wellLog, templatePlot.name, axes);
 
         if (!plotSetup) return minmaxPrimaryAxis;
 
         const { plotData, curve, iCurve, iSet, minmax } = plotSetup;
-        const plotSetup2 = maybeSetupPlot2(welllog, templatePlot, axes);
+        const plotSetup2 = maybeSetupPlot2(wellLog, templatePlot, axes);
 
         checkSetupMinMax(plotSetup, plotSetup2, minmaxPrimaryAxis);
 
@@ -982,10 +982,10 @@ function newStackedTrack(options: StackedTrackOptions): StackedTrack {
 }
 
 export function getDiscreteMeta(
-    welllogSet: WellLogSet,
+    wellLogSet: WellLogSet,
     name: string
 ): DiscreteMeta | null {
-    const metadataTable = getDiscreteMetaDataByName(welllogSet, name);
+    const metadataTable = getDiscreteMetaDataByName(wellLogSet, name);
 
     if (metadataTable) {
         // there is a metadata for given log name
@@ -1078,7 +1078,7 @@ function addScaleTracks(
     axesInfo: AxesInfo,
     wellLog: WellLogCollection
 ): void {
-    // All sets is  assumed to include the main axis curve, so we just look at the first curve well-log set here
+    // All sets is  assumed to include the main axis curve, so we just look at the first curve well log set here
     const data = wellLog[0].data;
     const curves = wellLog[0].curves;
     const axisIndices = getAxisIndices(curves, axesInfo);
@@ -1165,15 +1165,15 @@ type PlotSetup = {
 };
 
 function setupPlot(
-    welllog: WellLogCollection,
+    wellLog: WellLogCollection,
     plotName: string,
     axesInfo: AxesInfo
 ): PlotSetup | null {
-    const { iCurve, iSet } = findSetAndCurveIndex(welllog, plotName);
+    const { iCurve, iSet } = findSetAndCurveIndex(wellLog, plotName);
 
     if (iCurve < 0) return null;
 
-    const sourceLogSet = welllog[iSet];
+    const sourceLogSet = wellLog[iSet];
     const data = sourceLogSet.data;
     const curves = sourceLogSet.curves;
     const curve = curves[iCurve];
@@ -1197,12 +1197,12 @@ function setupPlot(
 }
 
 function maybeSetupPlot2(
-    welllog: WellLogCollection,
+    wellLog: WellLogCollection,
     templatePlot: TemplatePlot,
     axesInfo: AxesInfo
 ): PlotSetup | null {
     if (templatePlot.type !== "differential") return null;
-    else return setupPlot(welllog, templatePlot.name2 as string, axesInfo);
+    else return setupPlot(wellLog, templatePlot.name2 as string, axesInfo);
 }
 
 function checkSetupMinMax(
@@ -1220,7 +1220,7 @@ function checkSetupMinMax(
 
 function addGraphTrack(
     info: TracksInfo,
-    welllog: WellLogCollection,
+    wellLog: WellLogCollection,
     axesInfo: AxesInfo,
     templateTrack: TemplateTrack,
     templateStyles?: TemplateStyle[],
@@ -1233,12 +1233,12 @@ function addGraphTrack(
 
     if (templateTrack.plots)
         for (const templatePlot of templateTrack.plots) {
-            const plotSetup = setupPlot(welllog, templatePlot.name, axesInfo);
+            const plotSetup = setupPlot(wellLog, templatePlot.name, axesInfo);
 
             if (!plotSetup) continue; // Plot couldnt be set up, skip adding this track
             const { plotData, curve, minmax, iCurve, iSet } = plotSetup;
 
-            const plotSetup2 = maybeSetupPlot2(welllog, templatePlot, axesInfo);
+            const plotSetup2 = maybeSetupPlot2(wellLog, templatePlot, axesInfo);
 
             // Apply min-max index values to entire track
             checkSetupMinMax(plotSetup, plotSetup2, info.minmaxPrimaryAxis);
@@ -1287,7 +1287,7 @@ function addGraphTrack(
 }
 function addStackedTrack(
     info: TracksInfo,
-    welllog: WellLogCollection,
+    wellLog: WellLogCollection,
     axesInfo: AxesInfo,
     templateTrack: TemplateTrack,
     templateStyles?: TemplateStyle[],
@@ -1295,7 +1295,7 @@ function addStackedTrack(
 ): void {
     const templatePlot = templateTrack.plots[0];
     const name = templatePlot.name;
-    const plotSetup = setupPlot(welllog, name, axesInfo);
+    const plotSetup = setupPlot(wellLog, name, axesInfo);
 
     if (!plotSetup) return;
     const { plotData, curve, sourceLogSet } = plotSetup;
@@ -1362,23 +1362,23 @@ function addStackedTrack(
 }
 
 export function createTracks(
-    welllog: WellLogCollection,
+    wellLog: WellLogCollection,
     axes: AxesInfo,
     templateTracks: TemplateTrack[], // Part of JSON
     templateStyles?: TemplateStyle[], // Part of JSON
     colorTables?: ColorTable[] // JSON
 ): TracksInfo {
-    if (!welllog?.length) return new TracksInfo();
+    if (!wellLog?.length) return new TracksInfo();
 
     const info = new TracksInfo();
 
-    addScaleTracks(info, axes, welllog);
+    addScaleTracks(info, axes, wellLog);
 
     for (const templateTrack of templateTracks) {
         if (isStackedTrack(templateTrack, templateStyles)) {
             addStackedTrack(
                 info,
-                welllog,
+                wellLog,
                 axes,
                 templateTrack,
                 templateStyles,
@@ -1387,7 +1387,7 @@ export function createTracks(
         } else {
             addGraphTrack(
                 info,
-                welllog,
+                wellLog,
                 axes,
                 templateTrack,
                 templateStyles,
@@ -1493,10 +1493,10 @@ export function addOrEditStackedTrack(
     bAfter: boolean
 ): StackedTrack | null {
     const props = wellLogView.props;
-    const welllog = wellLogView.welllogCollection;
+    const wellLog = wellLogView.wellLogCollection;
     const templatePlot = templateTrack.plots[0];
 
-    if (!welllog || !templatePlot) return null;
+    if (!wellLog || !templatePlot) return null;
 
     const name = templatePlot.name;
     const templateStyles = props.template.styles;
@@ -1510,11 +1510,11 @@ export function addOrEditStackedTrack(
         (colorTable) => colorTable.name == templatePlotProps.colorTable
     );
 
-    const { iCurve, iSet } = findSetAndCurveIndex(welllog, name);
+    const { iCurve, iSet } = findSetAndCurveIndex(wellLog, name);
 
     if (iCurve < 0) return null; // curve not found
 
-    const sourceLogSet = welllog[iSet];
+    const sourceLogSet = wellLog[iSet];
     const meta = getDiscreteMeta(sourceLogSet, name);
     const data = sourceLogSet.data;
     const curves = sourceLogSet.curves;
@@ -1534,7 +1534,7 @@ export function addOrEditStackedTrack(
         // edit existing track
         {
             // force to clear stacked areas
-            track.data = null; // workarond for videx welllog component to force redraw areas with new options (showLines, ...)
+            track.data = null; // workarond for videx well log component to force redraw areas with new options (showLines, ...)
             if (wellLogView.logController)
                 wellLogView.logController.updateTracks();
         }

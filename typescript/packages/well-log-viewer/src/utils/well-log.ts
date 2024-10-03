@@ -116,7 +116,7 @@ export function getWellLogFromProps(
 }
 
 export function getCurveFromVidexPlotId(
-    welllog: WellLogCollection,
+    wellLogCollection: WellLogCollection,
     trackId: string
 ): WellLogCurve {
     if (!trackId.match(/^\d+-\d+$/)) {
@@ -125,5 +125,5 @@ export function getCurveFromVidexPlotId(
 
     const [iSet, iCurve] = trackId.split("-").map(Number);
 
-    return welllog[iSet].curves[iCurve];
+    return wellLogCollection[iSet].curves[iCurve];
 }

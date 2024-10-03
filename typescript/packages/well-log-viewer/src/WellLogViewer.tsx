@@ -80,17 +80,19 @@ export default class WellLogViewer extends Component<
 
     callbackManager: CallbackManager;
     collapsedTrackIds: (string | number)[];
-    welllog: WellLogCollection;
+    wellLogCollection: WellLogCollection;
 
     constructor(props: WellLogViewerProps) {
         super(props);
-        this.welllog = getWellLogFromProps(props);
+        this.wellLogCollection = getWellLogFromProps(props);
 
         this.state = {
             primaryAxis: this.getDefaultPrimaryAxis(), //"md"
         };
 
-        this.callbackManager = new CallbackManager(() => this.welllog);
+        this.callbackManager = new CallbackManager(
+            () => this.wellLogCollection
+        );
         this.collapsedTrackIds = [];
 
         this.onCreateController = this.onCreateController.bind(this);
@@ -243,7 +245,7 @@ export default class WellLogViewer extends Component<
             this.props.axisMnemos !== prevProps.axisMnemos ||
             this.props.primaryAxis !== prevProps.primaryAxis
         ) {
-            this.welllog = getWellLogFromProps(this.props);
+            this.wellLogCollection = getWellLogFromProps(this.props);
 
             const value = this.getDefaultPrimaryAxis();
             this.onChangePrimaryAxis(value);
@@ -256,7 +258,10 @@ export default class WellLogViewer extends Component<
     getDefaultPrimaryAxis(): string {
         if (this.props.primaryAxis) return this.props.primaryAxis;
 
-        const axes = getAvailableAxes(this.welllog, this.props.axisMnemos);
+        const axes = getAvailableAxes(
+            this.wellLogCollection,
+            this.props.axisMnemos
+        );
 
         let primaryAxis = axes[0];
         const template = this.props.template;
@@ -406,7 +411,7 @@ WellLogViewer.propTypes = {
     axisMnemos: PropTypes.object,
 
     /**
-     * Set to true for default titles or to array of individial welllog titles
+     * Set to true for default titles or to array of individial well log titles
      */
     viewTitle: PropTypes.oneOfType([
         PropTypes.bool,

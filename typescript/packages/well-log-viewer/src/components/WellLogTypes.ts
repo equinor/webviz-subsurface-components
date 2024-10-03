@@ -55,6 +55,6 @@ export type WellLogSet = {
 }; // JSON object from a file;
 
 /**
- * @deprecated "well-log" is too ambigous. Use WellLogSet instead
+ * @deprecated "well log" is too ambigous. Use WellLogSet instead
  */
 export type WellLog = WellLogSet;

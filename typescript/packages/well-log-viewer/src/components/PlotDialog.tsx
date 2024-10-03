@@ -119,7 +119,7 @@ function createDataItem(item: string): ReactNode {
 }
 
 export function dataNames(
-    welllog: WellLogCollection,
+    wellLog: WellLogCollection,
     track: Track | null,
     discrete?: boolean
 ): string[] {
@@ -127,7 +127,7 @@ export function dataNames(
     // ! This is only okay because we always just use the first instance of the curve anyways
     const names = new Set<string>();
 
-    for (const logSet of welllog) {
+    for (const logSet of wellLog) {
         const skipUsed = !!track;
         const plots = track ? (track as GraphTrack).plots : undefined;
         const abbr = track ? track.options.abbr : undefined;
@@ -162,11 +162,11 @@ export function dataNames(
 }
 
 export function createDataItems(
-    welllog: WellLogCollection,
+    wellLog: WellLogCollection,
     track: Track | null,
     discrete?: boolean
 ): ReactNode[] {
-    const names = dataNames(welllog, track, discrete);
+    const names = dataNames(wellLog, track, discrete);
     return names.map((name) => createDataItem(name));
 }
 
@@ -265,7 +265,7 @@ export class PlotPropertiesDialog extends Component<Props, State> {
 
     dataNames(skipUsed: boolean): string[] {
         return dataNames(
-            this.props.wellLogView.welllogCollection,
+            this.props.wellLogView.wellLogCollection,
             skipUsed ? this.props.track : null
         );
     }

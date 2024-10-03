@@ -46,7 +46,7 @@ export class TrackPropertiesDialog extends Component<Props, State> {
         super(props);
         let name = "";
         const names = dataNames(
-            this.props.wellLogView.welllogCollection,
+            this.props.wellLogView.wellLogCollection,
             null,
             true
         );
@@ -211,7 +211,7 @@ export class TrackPropertiesDialog extends Component<Props, State> {
                                   "stackedName", // data
                                   "Data",
                                   createDataItems(
-                                      this.props.wellLogView.welllogCollection,
+                                      this.props.wellLogView.wellLogCollection,
                                       null,
                                       true
                                   )

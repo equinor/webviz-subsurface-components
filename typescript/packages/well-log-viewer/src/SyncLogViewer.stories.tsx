@@ -121,7 +121,7 @@ const stories: Meta = {
         },
         viewTitles: {
             description:
-                "The view title. Set desired string or react element or true for default value from welllog file",
+                "The view title. Set desired string or react element or true for default value from well log file",
         },
         layout: {
             description:
@@ -419,7 +419,7 @@ export const Default: StoryObj<typeof Template> = {
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
 
-        viewTitles: true, // show default welllog view titles (a wellname from the welllog)
+        viewTitles: true, // show default well log view titles (a wellname from the well log)
 
         welllogOptions: {
             wellpickColorFill: true,
@@ -471,7 +471,7 @@ CustomLayout.args = {
                         callbackManager={parent.callbackManagers[0]}
                     />
                 </div>
-                {parent.welllogCollections?.map((welllog, iWellLog) => (
+                {parent.wellLogCollections?.map((wellLog, iWellLog) => (
                     <WellLogInfoPanel
                         key={iWellLog}
                         header={
@@ -479,7 +479,7 @@ CustomLayout.args = {
                                 <span style={iconStyle}>
                                     <WellInfoIcon fontSize="inherit" />
                                 </span>
-                                <i>{welllog[0]?.header.well}</i>
+                                <i>{wellLog[0]?.header.well}</i>
                             </>
                         }
                         readoutOptions={parent.props.readoutOptions}

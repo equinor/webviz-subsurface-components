@@ -20,7 +20,7 @@ import type {
 } from "./components/WellLogView";
 
 import exampleData from "../../../../example-data/deckgl-map.json";
-import welllogsJson from "../../../../example-data/volve_logs.json";
+import wellLogsJson from "../../../../example-data/volve_logs.json";
 import templateJson from "../../../../example-data/welllog_template_2.json";
 import colorTablesJson from "../../../../example-data/wellpick_colors.json";
 import wellPicks from "../../../../example-data/wellpicks.json";
@@ -30,7 +30,7 @@ import { MapAndWellLogViewer } from "./Storybook/examples/MapAndWellLogViewer";
 import { axisMnemos, axisTitles } from "./utils/axes";
 import type { ColorTable } from "./components/ColorTableTypes";
 
-const welllogs = welllogsJson as unknown as WellLogCollection;
+const wellLogs = wellLogsJson as unknown as WellLogCollection;
 const template = templateJson as unknown as Template;
 const colorTables = colorTablesJson as unknown as ColorTable[];
 
@@ -184,7 +184,7 @@ export const Default: StoryObj<typeof StoryTemplate> = {
         wellpick: wellpick,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
-        viewTitle: true, // show default welllog view title (a wellname from the welllog)
+        viewTitle: true, // show default well log view title (a wellname from the well log)
         domain: [2500, 4000],
         selection: [3500, 3700],
         options: {
@@ -237,7 +237,7 @@ export const ColorByFunctionTBD: StoryObj<typeof StoryTemplate> = {
         wellpick: wellpick,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
-        viewTitle: true, // show default welllog view title (a wellname from the welllog)
+        viewTitle: true, // show default well log view title (a wellname from the well log)
         domain: [2500, 4000],
         selection: [3500, 3700],
         options: {
@@ -262,7 +262,7 @@ export const Horizontal: StoryObj<typeof StoryTemplate> = {
         wellpick: wellpick,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
-        viewTitle: true, // show default welllog view title (a wellname from the welllog)
+        viewTitle: true, // show default well log view title (a wellname from the well log)
     },
     parameters: {
         docs: {
@@ -288,7 +288,7 @@ export const OnInfoFilledEvent: StoryObj<typeof StoryTemplate> = {
         wellpick: wellpick,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
-        viewTitle: true, // show default welllog view title (a wellname from the welllog)
+        viewTitle: true, // show default well log view title (a wellname from the well log)
         layout: { right: undefined },
     },
     parameters: {
@@ -393,7 +393,7 @@ export const Discrete: StoryObj<typeof StoryTemplate> = {
         wellpick: wellpick,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
-        viewTitle: true, // show default welllog view title (a wellname from the welllog)
+        viewTitle: true, // show default well log view title (a wellname from the well log)
     },
     parameters: {
         docs: {
@@ -410,7 +410,7 @@ export const MultipleWellLog: StoryObj<typeof StoryTemplate> = {
         id: "Well-Log-Viewer-Discrete",
         horizontal: false,
         welllog: [
-            welllogs[0],
+            wellLogs[0],
             {
                 // Sharing the discrete config across all logs for simplicity
                 metadata_discrete: {
@@ -426,7 +426,7 @@ export const MultipleWellLog: StoryObj<typeof StoryTemplate> = {
                 },
                 header: {
                     name: "The second log",
-                    well: welllogs[0].header.well,
+                    well: wellLogs[0].header.well,
                 },
                 curves: [
                     {
@@ -471,7 +471,7 @@ export const MultipleWellLog: StoryObj<typeof StoryTemplate> = {
         wellpick: undefined,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
-        viewTitle: true, // show default welllog view title (a wellname from the welllog)
+        viewTitle: true, // show default well log view title (a wellname from the well log)
     },
     parameters: {
         docs: {
