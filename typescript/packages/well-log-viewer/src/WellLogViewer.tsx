@@ -29,7 +29,7 @@ import type { Info, InfoOptions } from "./components/InfoTypes";
 import type { LogViewer } from "@equinor/videx-wellog";
 import { fillInfos } from "./utils/fill-info";
 import { getWellLogFromProps } from "./utils/well-log";
-import type { WellLogCollection } from "./components/WellLogTypes";
+import type { WellLogSet } from "./components/WellLogTypes";
 
 export interface WellLogViewerProps extends WellLogViewWithScrollerProps {
     readoutOptions?: InfoOptions; // options for readout
@@ -80,19 +80,17 @@ export default class WellLogViewer extends Component<
 
     callbackManager: CallbackManager;
     collapsedTrackIds: (string | number)[];
-    wellLogCollection: WellLogCollection;
+    wellLogSets: WellLogSet[];
 
     constructor(props: WellLogViewerProps) {
         super(props);
-        this.wellLogCollection = getWellLogFromProps(props);
+        this.wellLogSets = getWellLogFromProps(props);
 
         this.state = {
             primaryAxis: this.getDefaultPrimaryAxis(), //"md"
         };
 
-        this.callbackManager = new CallbackManager(
-            () => this.wellLogCollection
-        );
+        this.callbackManager = new CallbackManager(() => this.wellLogSets);
         this.collapsedTrackIds = [];
 
         this.onCreateController = this.onCreateController.bind(this);
@@ -245,7 +243,7 @@ export default class WellLogViewer extends Component<
             this.props.axisMnemos !== prevProps.axisMnemos ||
             this.props.primaryAxis !== prevProps.primaryAxis
         ) {
-            this.wellLogCollection = getWellLogFromProps(this.props);
+            this.wellLogSets = getWellLogFromProps(this.props);
 
             const value = this.getDefaultPrimaryAxis();
             this.onChangePrimaryAxis(value);
@@ -258,10 +256,7 @@ export default class WellLogViewer extends Component<
     getDefaultPrimaryAxis(): string {
         if (this.props.primaryAxis) return this.props.primaryAxis;
 
-        const axes = getAvailableAxes(
-            this.wellLogCollection,
-            this.props.axisMnemos
-        );
+        const axes = getAvailableAxes(this.wellLogSets, this.props.axisMnemos);
 
         let primaryAxis = axes[0];
         const template = this.props.template;

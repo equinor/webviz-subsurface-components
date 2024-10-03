@@ -1,25 +1,20 @@
 import _ from "lodash";
 import type {
-    WellLogCollection,
     WellLogCurve,
     WellLogMetadataDiscrete,
     WellLogSet,
 } from "../components/WellLogTypes";
 import type { AxesInfo } from "./tracks";
+import type { WellLogViewProps } from "../components/WellLogView";
 
-export function getAllWellLogCurves(
-    wellLog: WellLogCollection
-): WellLogCurve[] {
-    return _.flatMap<WellLogCollection, WellLogCurve>(
-        wellLog,
-        _.iteratee("curves")
-    );
+export function getAllWellLogCurves(wellLog: WellLogSet[]): WellLogCurve[] {
+    return _.flatMap<WellLogSet[], WellLogCurve>(wellLog, _.iteratee("curves"));
 }
 
 type CurveIndex = { iCurve: number; iSet: number };
 
 export function findSetAndCurveIndex(
-    wellLog: WellLogCollection,
+    wellLog: WellLogSet[],
     curveName: string
 ): CurveIndex {
     let iCurve = -1;
@@ -94,14 +89,10 @@ function findIndexByMemos(curves: WellLogCurve[], memos: string[]): number {
     return curves.findIndex(({ name }) => memos.includes(name.toUpperCase()));
 }
 
-type PropWithWellLogOrSet = {
-    welllog: WellLogCollection | WellLogSet | undefined;
-};
+// type PropWithWellLogOrSet = Pick<WellLogViewProps, "welllog" | "wellLogSets">;
 
-export function getWellLogFromProps(
-    props: PropWithWellLogOrSet
-): WellLogCollection {
-    let ret: WellLogCollection = [];
+export function getWellLogFromProps(props: WellLogViewProps): WellLogSet[] {
+    let ret: WellLogSet[] = [];
 
     if (Array.isArray(props.welllog)) ret = props.welllog;
     else if (props.welllog) ret = [props.welllog];
@@ -116,7 +107,7 @@ export function getWellLogFromProps(
 }
 
 export function getCurveFromVidexPlotId(
-    wellLogCollection: WellLogCollection,
+    wellLogSets: WellLogSet[],
     trackId: string
 ): WellLogCurve {
     if (!trackId.match(/^\d+-\d+$/)) {
@@ -125,5 +116,5 @@ export function getCurveFromVidexPlotId(
 
     const [iSet, iCurve] = trackId.split("-").map(Number);
 
-    return wellLogCollection[iSet].curves[iCurve];
+    return wellLogSets[iSet].curves[iCurve];
 }

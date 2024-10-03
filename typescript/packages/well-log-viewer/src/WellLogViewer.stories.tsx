@@ -12,7 +12,7 @@ import type {
     Template,
     TemplateTrack,
 } from "./components/WellLogTemplateTypes";
-import type { WellLogCollection } from "./components/WellLogTypes";
+import type { WellLogSet } from "./components/WellLogTypes";
 import type WellLogView from "./components/WellLogView";
 import type {
     TrackMouseEvent,
@@ -30,7 +30,7 @@ import { MapAndWellLogViewer } from "./Storybook/examples/MapAndWellLogViewer";
 import { axisMnemos, axisTitles } from "./utils/axes";
 import type { ColorTable } from "./components/ColorTableTypes";
 
-const wellLogs = wellLogsJson as unknown as WellLogCollection;
+const wellLogs = wellLogsJson as unknown as WellLogSet[];
 const template = templateJson as unknown as Template;
 const colorTables = colorTablesJson as unknown as ColorTable[];
 

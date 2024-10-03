@@ -12,7 +12,7 @@ import type { ViewerLayout } from "./components/WellLogLayout";
 import WellLogLayout from "./components/WellLogLayout";
 import defaultLayout from "./components/DefaultSyncLogViewerLayout";
 
-import type { WellLogCollection, WellLogSet } from "./components/WellLogTypes";
+import type { WellLogSet } from "./components/WellLogTypes";
 import type { Template } from "./components/WellLogTemplateTypes";
 import type { ColorTable } from "./components/ColorTableTypes";
 import type { PatternsTable } from "./utils/pattern";
@@ -62,9 +62,15 @@ export function isEqualArrays(
 
 export interface SyncLogViewerProps {
     /**
-     * Object from JSON file describing single well log data.
+     * An array of JSON well log objects. A synced well log is created per entry.
+     * @deprecated use wellLogCollections instead
      */
-    welllogs: (WellLogSet | WellLogCollection)[];
+    welllogs?: (WellLogSet | WellLogSet[])[];
+
+    /**
+     * An array of collections of well log sets. A synced well log is created per entry
+     */
+    wellLogCollections?: WellLogSet[][];
 
     /**
      * Prop containing track templates data.
@@ -279,7 +285,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
 
     spacers: (WellLogSpacer | null)[];
 
-    wellLogCollections: WellLogCollection[];
+    wellLogCollections: WellLogSet[][];
 
     callbackManagers: CallbackManager[];
 
@@ -398,9 +404,9 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                 this.props.wellpickFlatting,
                 prevProps.wellpickFlatting
             ) ||
-            this.props.welllogs.length !== prevProps.welllogs.length
+            this.props.welllogs?.length !== prevProps.welllogs?.length
         ) {
-            if (this.props.welllogs.length) this.syncContentScrollPos(0); // force to redraw visible domain
+            if (this.props.welllogs?.length) this.syncContentScrollPos(0); // force to redraw visible domain
         }
 
         if (!isEqualRanges(this.props.selection, prevProps.selection)) {
@@ -410,9 +416,9 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         if (
             this.props.syncContentSelection !==
                 prevProps.syncContentSelection ||
-            this.props.welllogs.length !== prevProps.welllogs.length
+            this.props.welllogs?.length !== prevProps.welllogs?.length
         ) {
-            if (this.props.welllogs.length) this.syncContentSelection(0); // force to redraw selection
+            if (this.props.welllogs?.length) this.syncContentSelection(0); // force to redraw selection
         }
     }
 
@@ -1080,7 +1086,9 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
 }
 
 function getWellLogCollectionsFromProps(props: SyncLogViewerProps) {
-    return props.welllogs.map((setOrCollection) => {
+    const collectionProp = props.wellLogCollections ?? props.welllogs ?? [];
+
+    return collectionProp.map((setOrCollection) => {
         if (Array.isArray(setOrCollection)) return setOrCollection;
         else return [setOrCollection];
     });
@@ -1140,9 +1148,15 @@ SyncLogViewer.propTypes = {
     id: PropTypes.string.isRequired,
 
     /**
-     * Array of JSON objects describing well log data
+     * An array of JSON well log objects. A synced well log is created per entry.
+     * @deprecated use wellLogCollections instead
      */
-    welllogs: PropTypes.array.isRequired,
+    welllogs: PropTypes.array,
+
+    /**
+     * An array of collections of well log sets. A synced well log is created per entry
+     */
+    wellLogCollections: PropTypes.arrayOf(PropTypes.object),
 
     /**
      * Prop containing track template data

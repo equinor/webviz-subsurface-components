@@ -15,7 +15,7 @@ import { isScaleTrack } from "../utils/tracks";
 
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import type { WellLogCollection } from "./WellLogTypes";
+import type { WellLogSet } from "./WellLogTypes";
 import { getCurveFromVidexPlotId } from "../utils/well-log";
 
 export interface Props {
@@ -29,7 +29,7 @@ export interface State {
     anchorEl: HTMLElement | null;
 }
 
-function getPlotTitle(plot: Plot, wellLog: WellLogCollection): string {
+function getPlotTitle(plot: Plot, wellLog: WellLogSet[]): string {
     let title = "";
     const extOptions = plot.options as ExtPlotOptions;
     const legend = extOptions.legendInfo();
@@ -142,7 +142,7 @@ export class SimpleMenu extends Component<Props, State> {
 
     menuRemovePlotItems(): ReactNode[] {
         const nodes: ReactNode[] = [];
-        const wellLog = this.props.wellLogView.wellLogCollection;
+        const wellLog = this.props.wellLogView.wellLogSets;
 
         if (!wellLog.length) return nodes;
 
@@ -178,7 +178,7 @@ export class SimpleMenu extends Component<Props, State> {
 
     menuEditPlotItems(): ReactNode[] {
         const nodes: ReactNode[] = [];
-        const wellLog = this.props.wellLogView.wellLogCollection;
+        const wellLog = this.props.wellLogView.wellLogSets;
 
         if (!wellLog.length) return nodes;
 

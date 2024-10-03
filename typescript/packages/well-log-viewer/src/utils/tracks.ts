@@ -40,7 +40,6 @@ import type {
     TemplateStyle,
 } from "../components/WellLogTemplateTypes";
 import type {
-    WellLogCollection,
     WellLogSet,
     WellLogCurve,
     WellLogDataRow,
@@ -220,7 +219,7 @@ type Named = {
 };
 
 export function getAvailableAxes(
-    wellLog: WellLogCollection,
+    wellLog: WellLogSet[],
     axisMnemos: Record<string, string[]>
 ): string[] {
     const result: string[] = [];
@@ -603,7 +602,7 @@ function addGraphTrackPlot(
 
     const axes = wellLogView.getAxesInfo();
     const plotFactory = track.options.plotFactory;
-    const wellLog = wellLogView.wellLogCollection;
+    const wellLog = wellLogView.wellLogSets;
     const colorTables = wellLogView.props.colorTables;
     const plotDatas = track.options.data;
     const plots = track.plots;
@@ -669,7 +668,7 @@ function editGraphTrackPlot(
 
     const axes = wellLogView.getAxesInfo();
     const plotFactory = track.options.plotFactory;
-    const wellLog = wellLogView.wellLogCollection;
+    const wellLog = wellLogView.wellLogSets;
     const plotDatas = track.options.data;
     const plots = track.plots;
 
@@ -1076,7 +1075,7 @@ function getAxisTitle(axes: AxesInfo, axisName: string): string {
 function addScaleTracks(
     info: TracksInfo,
     axesInfo: AxesInfo,
-    wellLog: WellLogCollection
+    wellLog: WellLogSet[]
 ): void {
     // All sets is  assumed to include the main axis curve, so we just look at the first curve well log set here
     const data = wellLog[0].data;
@@ -1165,7 +1164,7 @@ type PlotSetup = {
 };
 
 function setupPlot(
-    wellLog: WellLogCollection,
+    wellLog: WellLogSet[],
     plotName: string,
     axesInfo: AxesInfo
 ): PlotSetup | null {
@@ -1197,7 +1196,7 @@ function setupPlot(
 }
 
 function maybeSetupPlot2(
-    wellLog: WellLogCollection,
+    wellLog: WellLogSet[],
     templatePlot: TemplatePlot,
     axesInfo: AxesInfo
 ): PlotSetup | null {
@@ -1220,7 +1219,7 @@ function checkSetupMinMax(
 
 function addGraphTrack(
     info: TracksInfo,
-    wellLog: WellLogCollection,
+    wellLog: WellLogSet[],
     axesInfo: AxesInfo,
     templateTrack: TemplateTrack,
     templateStyles?: TemplateStyle[],
@@ -1287,7 +1286,7 @@ function addGraphTrack(
 }
 function addStackedTrack(
     info: TracksInfo,
-    wellLog: WellLogCollection,
+    wellLog: WellLogSet[],
     axesInfo: AxesInfo,
     templateTrack: TemplateTrack,
     templateStyles?: TemplateStyle[],
@@ -1362,7 +1361,7 @@ function addStackedTrack(
 }
 
 export function createTracks(
-    wellLog: WellLogCollection,
+    wellLog: WellLogSet[],
     axes: AxesInfo,
     templateTracks: TemplateTrack[], // Part of JSON
     templateStyles?: TemplateStyle[], // Part of JSON
@@ -1493,7 +1492,7 @@ export function addOrEditStackedTrack(
     bAfter: boolean
 ): StackedTrack | null {
     const props = wellLogView.props;
-    const wellLog = wellLogView.wellLogCollection;
+    const wellLog = wellLogView.wellLogSets;
     const templatePlot = templateTrack.plots[0];
 
     if (!wellLog || !templatePlot) return null;

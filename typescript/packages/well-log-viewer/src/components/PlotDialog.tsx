@@ -4,7 +4,7 @@ import React, { Component } from "react";
 import type { Track, GraphTrack } from "@equinor/videx-wellog";
 
 import type { TemplatePlot, TemplatePlotTypes } from "./WellLogTemplateTypes";
-import type { WellLogCollection } from "./WellLogTypes";
+import type { WellLogSet } from "./WellLogTypes";
 import type { ColorTable } from "./ColorTableTypes";
 
 import type WellLogView from "./WellLogView";
@@ -119,7 +119,7 @@ function createDataItem(item: string): ReactNode {
 }
 
 export function dataNames(
-    wellLog: WellLogCollection,
+    wellLog: WellLogSet[],
     track: Track | null,
     discrete?: boolean
 ): string[] {
@@ -162,7 +162,7 @@ export function dataNames(
 }
 
 export function createDataItems(
-    wellLog: WellLogCollection,
+    wellLog: WellLogSet[],
     track: Track | null,
     discrete?: boolean
 ): ReactNode[] {
@@ -265,7 +265,7 @@ export class PlotPropertiesDialog extends Component<Props, State> {
 
     dataNames(skipUsed: boolean): string[] {
         return dataNames(
-            this.props.wellLogView.wellLogCollection,
+            this.props.wellLogView.wellLogSets,
             skipUsed ? this.props.track : null
         );
     }

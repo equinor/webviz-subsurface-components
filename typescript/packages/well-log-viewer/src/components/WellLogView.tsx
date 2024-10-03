@@ -24,11 +24,7 @@ import { validateSchema } from "@webviz/wsc-common";
 
 import { select } from "d3";
 
-import type {
-    WellLogCollection,
-    WellLogCurve,
-    WellLogSet,
-} from "./WellLogTypes";
+import type { WellLogCurve, WellLogSet } from "./WellLogTypes";
 
 import type { Template } from "./WellLogTemplateTypes";
 import type { ColorTable } from "./ColorTableTypes";
@@ -721,7 +717,7 @@ function createScaleInterpolator(
 function setTracksToController(
     logController: LogViewer,
     axes: AxesInfo,
-    wellLog: WellLogCollection, // JSON Log Format
+    wellLog: WellLogSet[], // JSON Log Format
     template: Template, // JSON
     colorTables?: ColorTable[] // JSON
 ): ScaleInterpolator {
@@ -960,7 +956,7 @@ export interface WellLogController {
     setTemplate(template: Template): void;
     getTemplate(): Template;
 
-    getWellLog(): WellLogCollection | WellLogSet | undefined;
+    getWellLog(): WellLogSet[] | WellLogSet | undefined;
 
     setControllerDefaultZoom(): void; // utility function
 }
@@ -1040,14 +1036,16 @@ export interface WellLogViewOptions {
 
 export interface WellLogViewProps {
     /**
-     * Object from JSON file describing single well log data.
+     * Object from JSON file describing one or more sets of well log data.
+     * @depreacted Use `wellLogSets` instead
      */
-    welllog: WellLogCollection | WellLogSet | undefined;
+    welllog?: WellLogSet[] | WellLogSet;
 
     /**
-     * TODO: Fix this for all public
+     * Array from JSON file; describes a series of well log data sets.
+     * Assumes each set is for the same well. (For differing wells, use SyncLogViewer instead)
      */
-    // wellLogCollection: WellLogCollection | undefined;
+    wellLogSets?: WellLogSet[];
 
     /**
      * Prop containing track template data.
@@ -1156,6 +1154,10 @@ export const argTypesWellLogViewProp = {
     },
     welllog: {
         description: "JSON object describing well log data.",
+    },
+    wellLogSets: {
+        description:
+            "Array from JSON file; describes a series of well log data sets. Assumes each set is for the same well. (For differing wells, use SyncLogViewer instead)",
     },
     template: {
         description: "Prop containing track template data.",
@@ -1271,7 +1273,7 @@ class WellLogView
 {
     public static propTypes: Record<string, unknown>;
 
-    wellLogCollection: WellLogCollection;
+    wellLogSets: WellLogSet[];
     container?: HTMLElement;
     resizeObserver: ResizeObserver;
 
@@ -1291,7 +1293,7 @@ class WellLogView
     constructor(props: WellLogViewProps) {
         super(props);
 
-        this.wellLogCollection = getWellLogFromProps(props);
+        this.wellLogSets = getWellLogFromProps(props);
 
         this.container = undefined;
         this.logController = undefined;
@@ -1400,7 +1402,7 @@ class WellLogView
             selectedTrackIndices = this.getSelectedTrackIndices();
             shouldSetTracks = true;
             checkSchema = true;
-            this.wellLogCollection = getWellLogFromProps(this.props);
+            this.wellLogSets = getWellLogFromProps(this.props);
         }
         if (this.props.template !== prevProps.template) {
             if (this.props.template)
@@ -1506,10 +1508,7 @@ class WellLogView
     }
     getAxesInfo(): AxesInfo {
         // get Object keys available in the well log
-        const axes = getAvailableAxes(
-            this.wellLogCollection,
-            this.props.axisMnemos
-        );
+        const axes = getAvailableAxes(this.wellLogSets, this.props.axisMnemos);
         const primaryAxisIndex = axes.findIndex(
             (value: string) => value === this.props.primaryAxis
         );
@@ -1535,7 +1534,7 @@ class WellLogView
             try {
                 validateSchema(this.template, "WellLogTemplate");
                 if (this.props.options?.checkDatafileSchema) {
-                    this.wellLogCollection.forEach((wellLogSet) =>
+                    this.wellLogSets.forEach((wellLogSet) =>
                         validateSchema(wellLogSet, "WellLog")
                     );
                 }
@@ -1549,7 +1548,7 @@ class WellLogView
             this.scaleInterpolator = setTracksToController(
                 this.logController,
                 axes,
-                this.wellLogCollection,
+                this.wellLogSets,
                 this.template,
                 this.props.colorTables
             );
@@ -1815,7 +1814,7 @@ class WellLogView
         this.setInfo(); // reflect new value in this.selCurrent
     }
 
-    getWellLog(): WellLogCollection | WellLogSet | undefined {
+    getWellLog(): WellLogSet[] | WellLogSet | undefined {
         return this.props.welllog;
     }
 
@@ -1842,10 +1841,7 @@ class WellLogView
                 tracks.push(deepCopy(templateTrack));
             }
         }
-        const axes = getAvailableAxes(
-            this.wellLogCollection,
-            this.props.axisMnemos
-        );
+        const axes = getAvailableAxes(this.wellLogSets, this.props.axisMnemos);
         return {
             name: template.name,
             scale: {
@@ -2034,7 +2030,7 @@ class WellLogView
         viewTitle: string | boolean | JSX.Element //| undefined
     ): ReactNode {
         if (typeof viewTitle === "object" /*react element*/) return viewTitle;
-        if (viewTitle === true) return this.wellLogCollection[0]?.header.well;
+        if (viewTitle === true) return this.wellLogSets[0]?.header.well;
         return viewTitle; // string
     }
 
@@ -2121,6 +2117,12 @@ export function _propTypesWellLogView(): Record<string, unknown> {
          * An object from JSON file describing well log data
          */
         welllog: PropTypes.oneOfType([PropTypes.object, PropTypes.array]), //.isRequired,
+
+        /**
+         * Array from JSON file; describes a series of well log data sets.
+         * Assumes each set is for the same well. (For differing wells, use SyncLogViewer instead)
+         */
+        wellLogSets: PropTypes.arrayOf(PropTypes.object),
 
         /**
          * Prop containing track template data

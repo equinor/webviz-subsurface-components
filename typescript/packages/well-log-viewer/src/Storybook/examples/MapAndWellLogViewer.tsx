@@ -29,10 +29,7 @@ import { axisMnemos, axisTitles } from "../../utils/axes";
 import { deepCopy } from "../../utils/deepcopy";
 import { getDiscreteMeta, indexOfElementByName } from "../../utils/tracks";
 
-import type {
-    WellLogCollection,
-    WellLogSet,
-} from "../../components/WellLogTypes";
+import type { WellLogSet } from "../../components/WellLogTypes";
 import type { WellLogViewOptions } from "../../components/WellLogView";
 
 import wellLogsJson from "../../../../../../example-data/volve_logs.json";
@@ -40,7 +37,7 @@ import templateJson from "../../../../../../example-data/welllog_template_2.json
 import colorTables from "../../../../../../example-data/wellpick_colors.json";
 import wellPicks from "../../../../../../example-data/wellpicks.json";
 
-const wellLogs = wellLogsJson as unknown as WellLogCollection;
+const wellLogs = wellLogsJson as unknown as WellLogSet[];
 const template = templateJson as unknown as Template;
 
 const wellpick = {
@@ -88,10 +85,7 @@ function findWellsLayer(event: MapMouseEvent) {
     return info?.layer as WellsLayer;
 }
 
-function findWellLogIndex(
-    wellLog: WellLogCollection,
-    wellName: string
-): number {
+function findWellLogIndex(wellLog: WellLogSet[], wellName: string): number {
     return wellLog.findIndex((logSet) => logSet.header.well === wellName);
 }
 

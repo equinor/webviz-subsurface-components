@@ -44,8 +44,6 @@ export type WellLogMetadataDiscrete = {
     objects: WellLogMetadataDiscreteObjects;
 }; // a part of JSON
 
-export type WellLogCollection = WellLogSet[];
-
 export type WellLogSet = {
     header: WellLogHeader;
     curves: WellLogCurve[];

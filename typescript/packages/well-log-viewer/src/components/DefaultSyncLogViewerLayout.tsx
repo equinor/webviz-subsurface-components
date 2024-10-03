@@ -1,6 +1,6 @@
 import React from "react";
 
-import type { WellLogCollection } from "./WellLogTypes";
+import type { WellLogSet } from "./WellLogTypes";
 import type SyncLogViewer from "../SyncLogViewer";
 
 import WellLogAxesPanel from "./WellLogAxesPanel";
@@ -19,7 +19,7 @@ export function defaultSidePanel(parent: SyncLogViewer): JSX.Element {
                 callbackManager={parent.callbackManagers[0]}
             />
             {parent.wellLogCollections?.map(
-                (wellLog: WellLogCollection, iWellLog: number) => (
+                (wellLog: WellLogSet[], iWellLog: number) => (
                     <WellLogInfoPanel
                         key={iWellLog}
                         header={"Readout " + wellLog[0]?.header.well}

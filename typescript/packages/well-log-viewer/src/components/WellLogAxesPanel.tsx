@@ -5,7 +5,7 @@ import AxisSelector from "./AxisSelector";
 import { getAvailableAxes } from "../utils/tracks";
 
 import type { CallbackManager } from "./CallbackManager";
-import type { WellLogCollection } from "./WellLogTypes";
+import type { WellLogSet } from "./WellLogTypes";
 
 interface Props {
     callbackManager: CallbackManager;
@@ -36,7 +36,7 @@ interface State {
 }
 
 export class WellLogAxesPanel extends Component<Props, State> {
-    wellLog: WellLogCollection | undefined;
+    wellLog: WellLogSet[] | undefined;
 
     constructor(props: Props) {
         super(props);

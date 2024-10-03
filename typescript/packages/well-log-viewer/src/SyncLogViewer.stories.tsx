@@ -440,7 +440,7 @@ import WellLogZoomSlider from "./components/WellLogZoomSlider";
 import WellLogScaleSelector from "./components/WellLogScaleSelector";
 import WellInfoIcon from "@mui/icons-material/FormatListBulleted"; // WaterDrop ShowChart, SearchSharp
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
-import type { WellLogCollection, WellLogSet } from "./components/WellLogTypes";
+import type { WellLogSet } from "./components/WellLogTypes";
 import type WellLogView from "./components/WellLogView";
 import type { ColorTable } from "./components/ColorTableTypes";
 
@@ -534,7 +534,7 @@ CustomLayout.parameters = {
 Default.tags = ["no-screenshot-test"];
 
 const TemplateWithSelection = (args: SyncLogViewerProps) => {
-    const { welllogs, ...restOfArgs } = args;
+    const { welllogs = [], ...restOfArgs } = args;
 
     const [showWell1, setShowWell1] = React.useState(true);
     const [showWell2, setShowWell2] = React.useState(true);
@@ -557,7 +557,7 @@ const TemplateWithSelection = (args: SyncLogViewerProps) => {
         []
     );
 
-    const filtered: (WellLogCollection | WellLogSet)[] = [];
+    const filtered: (WellLogSet[] | WellLogSet)[] = [];
 
     if (showWell1 && welllogs[0]) filtered.push(welllogs[0]);
     if (showWell2 && welllogs[1]) filtered.push(welllogs[1]);
@@ -581,9 +581,9 @@ const TemplateWithSelection = (args: SyncLogViewerProps) => {
             <div style={{ flexDirection: "row" }}>
                 <ToggleButton
                     value="check"
-                    selected={showWell1 && !!args.welllogs[0]}
+                    selected={showWell1 && !!welllogs[0]}
                     onChange={() => {
-                        if (!args.welllogs[1]) alert("No args.welllogs[0]");
+                        if (!welllogs[1]) alert("No args.welllogs[0]");
                         setShowWell1(!showWell1);
                     }}
                 >
@@ -591,9 +591,9 @@ const TemplateWithSelection = (args: SyncLogViewerProps) => {
                 </ToggleButton>
                 <ToggleButton
                     value="check"
-                    selected={showWell2 && !!args.welllogs[1]}
+                    selected={showWell2 && !!welllogs[1]}
                     onChange={() => {
-                        if (!args.welllogs[1]) alert("No args.welllogs[1]");
+                        if (!welllogs[1]) alert("No args.welllogs[1]");
                         setShowWell2(!showWell2);
                     }}
                 >
@@ -601,9 +601,9 @@ const TemplateWithSelection = (args: SyncLogViewerProps) => {
                 </ToggleButton>
                 <ToggleButton
                     value="check"
-                    selected={showWell3 && !!args.welllogs[2]}
+                    selected={showWell3 && !!welllogs[2]}
                     onChange={() => {
-                        if (!args.welllogs[2]) alert("No args.welllogs[2]");
+                        if (!welllogs[2]) alert("No args.welllogs[2]");
                         setShowWell3(!showWell3);
                     }}
                 >
