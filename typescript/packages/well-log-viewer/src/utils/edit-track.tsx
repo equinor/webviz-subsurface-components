@@ -1,5 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import type { Plot } from "@equinor/videx-wellog";
 import type WellLogView from "../components/WellLogView";
 import type { TrackMouseEvent } from "../components/WellLogView";
@@ -27,15 +27,13 @@ export function onTrackMouseEventDefault(
         el.style.width = "10px";
         el.style.height = "3px";
         ev.element.appendChild(el);
-        // eslint-disable-next-line react/no-deprecated
-        ReactDOM.render(
+        createRoot(el).render(
             <SimpleMenu
                 type={ev.area}
                 anchorEl={el}
                 wellLogView={wellLogView}
                 track={track}
-            />,
-            el
+            />
         );
     }
 }

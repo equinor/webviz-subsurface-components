@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 
 import Scroller from "./Scroller";
+import type { ScrollerProps } from "./Scroller";
 
 const ComponentCode =
     "const infoRef = React.useRef(); \r\n" +
@@ -12,8 +13,8 @@ const ComponentCode =
     '    <div style={{ height: "92vh" }}> \r\n' +
     "        <Scroller \r\n" +
     "            ref={(el) => { \r\n" +
-    "                el.zoom(10, 10); \r\n" +
-    "                el.scrollTo(0.2, 0.2); \r\n" +
+    "                el?.zoom(10, 10); \r\n" +
+    "                el?.scrollTo(0.2, 0.2); \r\n" +
     "            }} \r\n" +
     "            onScroll={(x, y) => { \r\n" +
     "                setInfo( \r\n" +
@@ -51,21 +52,17 @@ const stories: Meta = {
 };
 export default stories;
 
-// @ts-expect-error TS7006
-const Template = (args) => {
-    const infoRef = React.useRef();
-    // @ts-expect-error TS7006
-    const setInfo = function (info) {
-        // @ts-expect-error TS2339
+const Template = (args: ScrollerProps) => {
+    const infoRef = React.useRef<HTMLDivElement | null>(null);
+    const setInfo = function (info: string): void {
         if (infoRef.current) infoRef.current.innerHTML = info;
     };
     return (
         <div style={{ height: "92vh" }}>
             <Scroller
                 ref={(el) => {
-                    // @ts-expect-error TS18047
+                    if (!el) return;
                     el.zoom(10, 10);
-                    // @ts-expect-error TS18047
                     el.scrollTo(0.2, 0.2);
                 }}
                 onScroll={(x, y) => {
@@ -75,11 +72,9 @@ const Template = (args) => {
                             ", Y=" +
                             y.toFixed(2)
                     );
-                    args.onScroll(x, y); // for storybook addon Actions Tab
+                    args.onScroll?.(x, y);
                 }}
             >
-                {/*
-                 // @ts-expect-error TS2322 */}
                 <div ref={infoRef}></div>
             </Scroller>
         </div>

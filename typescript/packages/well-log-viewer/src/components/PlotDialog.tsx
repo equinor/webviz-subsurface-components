@@ -3,9 +3,9 @@ import React, { Component } from "react";
 
 import type { Track, GraphTrack } from "@equinor/videx-wellog";
 
-import type { TemplatePlot, TemplatePlotTypes } from "./WellLogTemplateTypes";
+import type { TemplatePlot, TemplatePlotType } from "./WellLogTemplateTypes";
 import type { WellLog } from "./WellLogTypes";
-import type { ColorTable } from "./ColorTableTypes";
+import type { ColorMapFunction } from "./ColorMapFunction";
 
 import type WellLogView from "./WellLogView";
 
@@ -89,24 +89,25 @@ export function createBooleanItems(): ReactNode[] {
     return _createItems(booleanItems);
 }
 
-function createColorTableItems(colorTables: ColorTable[]): ReactNode[] {
+function createColorFunctionItems(
+    colorMapFunctions: ColorMapFunction[]
+): ReactNode[] {
     const nodes: ReactNode[] = [];
-    if (!colorTables) {
+    if (!colorMapFunctions || !colorMapFunctions.length) {
         console.error(
-            "colorTables is missed or empty in createColorTableItems()"
+            "colorMapFunctions are missed or empty in createColorFunctionItems()"
         );
-    } else
-        for (const colorTable of colorTables) {
-            if (colorTable.discrete) continue; // skip discrete color tables
-            if (!colorTable.name) {
-                console.log(
-                    "colorTable.name is empty in createColorTableItems()"
+    } else {
+        for (const colorMapFunction of colorMapFunctions) {
+            const name = colorMapFunction.name;
+            if (!name) {
+                console.error(
+                    "colorMapFunction.name is empty in createColorFunctionItems()"
                 );
             }
-            nodes.push(
-                <option key={colorTable.name}>{colorTable.name}</option>
-            );
+            nodes.push(<option key={name}>{name}</option>);
         }
+    }
     return nodes;
 }
 
@@ -143,7 +144,7 @@ export function dataNames(
             if (plots) {
                 // GraphTrack
                 for (const plot of plots)
-                    if (plot.id == iCurve) {
+                    if (plot.id === iCurve) {
                         bUsed = true;
                         break;
                     }
@@ -202,7 +203,6 @@ export class PlotPropertiesDialog extends Component<Props, State> {
         this.state = templatePlot
             ? {
                   ...templatePlot,
-
                   open: true,
               }
             : {
@@ -220,11 +220,11 @@ export class PlotPropertiesDialog extends Component<Props, State> {
                   inverseColor: "",
 
                   // for 'gradientfill' plot
-                  colorTable:
+                  colorMapFunctionName:
                       // TODO: Fix this the next time the file is edited.
                       // eslint-disable-next-line react/prop-types
-                      this.props.wellLogView.props.colorTables?.[0]?.name,
-                  inverseColorTable: undefined,
+                      this.props.wellLogView.props.colorMapFunctions?.[0]?.name,
+                  inverseColorMapFunctionName: undefined,
                   colorScale: undefined,
                   inverseColorScale: undefined,
 
@@ -300,7 +300,7 @@ export class PlotPropertiesDialog extends Component<Props, State> {
             // insert at the beginning
             nodes.unshift(
                 <option key={noneValue} value={noneValue}>
-                    {insertEmpty == true ? "\u2014" : insertEmpty}
+                    {insertEmpty === true ? "\u2014" : insertEmpty}
                 </option>
             );
         }
@@ -326,7 +326,7 @@ export class PlotPropertiesDialog extends Component<Props, State> {
         );
     }
 
-    createSelectControlFromType(type: TemplatePlotTypes): ReactNode {
+    createSelectControlFromType(type?: TemplatePlotType): ReactNode {
         if (type === "area" || type === "differential") {
             return [
                 this.createSelectControl(
@@ -350,19 +350,20 @@ export class PlotPropertiesDialog extends Component<Props, State> {
         } else if (type === "gradientfill") {
             // TODO: Fix this the next time the file is edited.
             // eslint-disable-next-line react/prop-types
-            const colorTables = this.props.wellLogView.props.colorTables;
+            const colorMapFunctions =
+                this.props.wellLogView.props.colorMapFunctions;
             return [
                 this.createSelectControl(
-                    "colorTable",
-                    "Fill Color table",
-                    createColorTableItems(colorTables)
+                    "colorMapFunctionName",
+                    "Fill Color function/table",
+                    createColorFunctionItems(colorMapFunctions)
                 ),
                 <FormControl fullWidth key="211" />,
                 <FormControl fullWidth key="212" />,
                 this.createSelectControl(
-                    "inverseColorTable",
-                    "Inverse Color table",
-                    createColorTableItems(colorTables),
+                    "inverseColorMapFunctionName",
+                    "Inverse Color function/table",
+                    createColorFunctionItems(colorMapFunctions),
                     true
                 ),
             ];

@@ -2,23 +2,26 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 
+import type { ColorMapFunction } from "./components/ColorMapFunction";
 import { colorTables } from "@emerson-eps/color-tables";
-const exampleColorTable = colorTables; /*as unknown as ColorTable[]*/ // equivalent types, should be merged
-const wellpickColorTable = require("../../../../example-data/wellpick_colors.json"); // eslint-disable-line
-const wellpick = require("../../../../example-data/wellpicks.json");// eslint-disable-line
+const exampleColorMapFunctions = colorTables as ColorMapFunction[];
+import wellpickColorTables from "../../../../example-data/wellpick_colors.json";
+const wellpickColorMapFunctions = wellpickColorTables as ColorMapFunction[];
+import wellpicks from "../../../../example-data/wellpicks.json";
 
 import { ToggleButton } from "@mui/material";
 
 import SyncLogViewer, { argTypesSyncLogViewerProp } from "./SyncLogViewer";
+import type { SyncLogViewerProps } from "./SyncLogViewer";
+import type WellLogView from "./components/WellLogView";
 import type {
-    // @ts-expect-error TS2614
-    WellLogView,
     WellLogController,
     TrackMouseEvent,
+    WellPickProps,
 } from "./components/WellLogView";
 
 const ComponentCode =
-    '<SyncLogViewer id="SyncLogViewer" \r\n' +
+    "<SyncLogViewer id='SyncLogViewer' \r\n" +
     "    syncTrackPos==true \r\n" +
     "    syncContentDomain=true \r\n" +
     "    syncContentSelection=true \r\n" +
@@ -32,7 +35,7 @@ const ComponentCode =
     '       require("../../../../example-data/synclog_template.json"), \r\n' +
     '       require("../../../../example-data/synclog_template.json"), \r\n' +
     "    } \r\n" +
-    "    colorTables={colorTables} \r\n" +
+    "    colorMapFunctions={colorMapFunctions} \r\n" +
     "/>";
 
 import type { WellLog } from "./components/WellLogTypes";
@@ -65,8 +68,8 @@ const stories: Meta = {
         templates: {
             description: "Array of track template data.",
         },
-        colorTables: {
-            description: "Prop containing color table data.",
+        colorMapFunctions: {
+            description: "Prop containing color function/table data.",
         },
         wellpickFlatting: {
             description: "Horizon names for wellpick flatting",
@@ -131,7 +134,7 @@ const stories: Meta = {
 };
 export default stories;
 
-function fillInfo(controller: WellLogController | undefined) {
+function fillInfo(controller: WellLogController | undefined): string {
     if (!controller) return "-";
     const baseDomain = controller.getContentBaseDomain();
     const domain = controller.getContentDomain();
@@ -158,11 +161,9 @@ function fillInfo(controller: WellLogController | undefined) {
     );
 }
 
-// @ts-expect-error TS7006
-const Template = (args) => {
-    const infoRef = React.useRef();
-    const setInfo = function (info: string) {
-        // @ts-expect-error TS2339
+const Template = (args: SyncLogViewerProps) => {
+    const infoRef = React.useRef<HTMLDivElement | null>(null);
+    const setInfo = function (info: string): void {
         if (infoRef.current) infoRef.current.innerHTML = info;
     };
 
@@ -172,37 +173,37 @@ const Template = (args) => {
 
     const onCreateController = React.useCallback(
         // @ts-expect-error TS6133
-        (iWellLog: number, controller: WellLogController) => {
+        (iWellLog: number, controller: WellLogController): void => {
             setControllers((prev) => [...prev, controller]);
         },
         []
     );
     const onDeleteController = React.useCallback(
         // @ts-expect-error TS6133
-        (iWellLog: number, controller: WellLogController) => {
+        (iWellLog: number, controller: WellLogController): void => {
             setControllers((prev) => prev.filter((c) => c !== controller));
         },
         []
     );
     const onContentRescale = React.useCallback(
-        (iWellLog: number) => {
+        (iWellLog: number): void => {
             if (iWellLog === 0) setInfo(fillInfo(controllers[0]));
         },
         [controllers]
     );
     const onContentSelection = React.useCallback(
-        (/*iWellLog*/) => {
+        (/*iWellLog*/): void => {
             /*if(iWellLog===0)*/ setInfo(fillInfo(controllers[0]));
         },
         [controllers]
     );
-    const handleClick = function () {
+    const handleClick = function (): void {
         for (const ctrl of controllers) {
             if (ctrl) ctrl.setControllerDefaultZoom();
         }
     };
     const [checked, setChecked] = React.useState(false);
-    const handleChange = () => {
+    const handleChange = (): void => {
         setChecked(!checked);
     };
     /* eslint-disable */ // no-unused-vars
@@ -228,13 +229,13 @@ const Template = (args) => {
                     onDeleteController={onDeleteController}
                     onContentRescale={onContentRescale}
                     onContentSelection={onContentSelection}
-                    onTrackMouseEvent={checked ? onTrackMouseEventCustom : null}
+                    onTrackMouseEvent={
+                        checked ? onTrackMouseEventCustom : undefined
+                    }
                 />
             </div>
             {/* Print info for the first WellLog */}
             <div style={{ display: "flex", flexDirection: "row" }}>
-                {/*
-                 // @ts-expect-error TS2322 */}
                 <div ref={infoRef}></div>
                 <label style={{ marginLeft: 10 }}>disable context menu</label>
                 <input
@@ -363,9 +364,30 @@ const patternNamesEnglish = [
     "Vulcanic",
 ];
 
+const exampleWellPicks: WellPickProps[] = [
+    {
+        wellpick: wellpicks[0],
+        name: "HORIZON",
+        colorMapFunctions: wellpickColorMapFunctions,
+        colorMapFunctionName: "Stratigraphy",
+    },
+    {
+        wellpick: wellpicks[1],
+        name: "HORIZON",
+        colorMapFunctions: wellpickColorMapFunctions,
+        colorMapFunctionName: "Stratigraphy",
+    },
+    {
+        wellpick: wellpicks[0],
+        name: "HORIZON",
+        colorMapFunctions: wellpickColorMapFunctions,
+        colorMapFunctionName: "Stratigraphy",
+    },
+];
+
 export const Default: StoryObj<typeof Template> = {
     args: {
-        id: "Sync-Log-Viewer",
+        //id: "Sync-Log-Viewer",
         syncTrackPos: true,
         syncContentDomain: true,
         syncContentSelection: true,
@@ -381,31 +403,12 @@ export const Default: StoryObj<typeof Template> = {
             require("../../../../example-data/synclog_template.json"), // eslint-disable-line
             require("../../../../example-data/synclog_template.json"), // eslint-disable-line
         ],
-        colorTables: exampleColorTable,
-        wellpicks: [
-            {
-                wellpick: wellpick[0],
-                name: "HORIZON",
-                colorTables: wellpickColorTable,
-                color: "Stratigraphy",
-            },
-            {
-                wellpick: wellpick[1],
-                name: "HORIZON",
-                colorTables: wellpickColorTable, // eslint-disable-line
-                color: "Stratigraphy",
-            },
-            {
-                wellpick: wellpick[0],
-                name: "HORIZON",
-                colorTables: wellpickColorTable, // eslint-disable-line
-                color: "Stratigraphy",
-            },
-        ],
+        colorMapFunctions: exampleColorMapFunctions,
+        wellpicks: exampleWellPicks,
         patternsTable: {
             patternSize: 24,
             patternImages: patternImages,
-            names: patternNamesEnglish,
+            patternNames: patternNamesEnglish,
         },
         patterns: require("../../../../example-data/horizon_patterns.json"), // eslint-disable-line
 
@@ -531,7 +534,7 @@ CustomLayout.parameters = {
 
 Default.tags = ["no-screenshot-test"];
 
-const TemplateWithSelection = (args: { welllogs: WellLog[] }) => {
+const TemplateWithSelection = (args: SyncLogViewerProps) => {
     const [showWell1, setShowWell1] = React.useState(true);
     const [showWell2, setShowWell2] = React.useState(true);
     const [showWell3, setShowWell3] = React.useState(true);
@@ -560,7 +563,7 @@ const TemplateWithSelection = (args: { welllogs: WellLog[] }) => {
     if (showWell2 && args.welllogs[1]) filtered.push(args.welllogs[1]);
     if (showWell3 && args.welllogs[2]) filtered.push(args.welllogs[2]);
 
-    const handleClick = function () {
+    const handleClick = function (): void {
         for (const ctrl of controllers) {
             if (ctrl) ctrl.setControllerDefaultZoom();
         }
@@ -579,7 +582,7 @@ const TemplateWithSelection = (args: { welllogs: WellLog[] }) => {
                 <ToggleButton
                     value="check"
                     selected={showWell1 && !!args.welllogs[0]}
-                    onChange={() => {
+                    onChange={(): void => {
                         if (!args.welllogs[1]) alert("No args.welllogs[0]");
                         setShowWell1(!showWell1);
                     }}
@@ -589,7 +592,7 @@ const TemplateWithSelection = (args: { welllogs: WellLog[] }) => {
                 <ToggleButton
                     value="check"
                     selected={showWell2 && !!args.welllogs[1]}
-                    onChange={() => {
+                    onChange={(): void => {
                         if (!args.welllogs[1]) alert("No args.welllogs[1]");
                         setShowWell2(!showWell2);
                     }}
@@ -599,7 +602,7 @@ const TemplateWithSelection = (args: { welllogs: WellLog[] }) => {
                 <ToggleButton
                     value="check"
                     selected={showWell3 && !!args.welllogs[2]}
-                    onChange={() => {
+                    onChange={(): void => {
                         if (!args.welllogs[2]) alert("No args.welllogs[2]");
                         setShowWell3(!showWell3);
                     }}
@@ -611,10 +614,8 @@ const TemplateWithSelection = (args: { welllogs: WellLog[] }) => {
                 </button>
             </div>
             <div style={{ width: "100%", height: "100%", flex: 1 }}>
-                {/*
-                 // @ts-expect-error TS2739 */}
                 <SyncLogViewer
-                    id="SyncLogViewer"
+                    id="SyncLogViewer2"
                     {...argsWithSelection}
                     onCreateController={onCreateController}
                     onDeleteController={onDeleteController}

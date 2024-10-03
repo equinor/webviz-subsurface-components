@@ -6,6 +6,7 @@ export interface PatternsTable {
     patternImages: string[];
     patternNames?: string[];
 }
+export type Pattern = [string, number];
 
 export function patternId(uid: number, index: number): string {
     return "pattern" + uid + "_" + index;

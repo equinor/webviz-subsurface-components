@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 
 import ZoomSlider from "./ZoomSlider";
+import type { ZoomSliderProps } from "./ZoomSlider";
 
 const ComponentCode = "<ZoomSlider value={1} max={128}/>";
 
@@ -37,12 +38,9 @@ const stories: Meta = {
 };
 export default stories;
 
-// @ts-expect-error TS7006
-const Template = (args) => {
-    const infoRef = React.useRef();
-    // @ts-expect-error TS7006
-    const setInfo = function (info) {
-        // @ts-expect-error TS2339
+const Template = (args: ZoomSliderProps) => {
+    const infoRef = React.useRef<HTMLDivElement | null>(null);
+    const setInfo = function (info: string): void {
         if (infoRef.current) infoRef.current.innerHTML = info;
     };
 
@@ -51,15 +49,12 @@ const Template = (args) => {
             <div style={{ width: "97%", height: "100%", flex: 1 }}>
                 Zoom:
                 <ZoomSlider
-                    id="ZoomSlider"
                     {...args}
                     onChange={function (value: number): void {
                         setInfo("zoom value=" + value);
                     }}
                 />
             </div>
-            {/*
-             // @ts-expect-error TS2322 */}
             <div ref={infoRef}>&nbsp;</div>
         </div>
     );

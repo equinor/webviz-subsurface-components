@@ -89,7 +89,7 @@ export function roundMinMax(minmax: [number, number]): [number, number] {
         }
     }
     if (k < kmin) {
-        const j = q == 2.0 ? 5 : 2;
+        const j = q === 2.0 ? 5 : 2;
         if (k1 >= 0) k = (k1 / j) * j;
         else k = ((k1 - j + 1) / j) * j;
         if (k2 - k > kmin) {

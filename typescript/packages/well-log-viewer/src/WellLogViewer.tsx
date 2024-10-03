@@ -9,6 +9,8 @@ import defaultLayout from "./components/DefaultWellLogViewerLayout";
 import WellLogViewWithScroller from "./components/WellLogViewWithScroller";
 import type { WellLogViewWithScrollerProps } from "./components/WellLogViewWithScroller";
 import { argTypesWellLogViewScrollerProp } from "./components/WellLogViewWithScroller";
+import { TemplateType, ColorFunctionType } from "./components/CommonPropTypes";
+import { WellPickPropsType } from "./components/WellLogView";
 //import { _propTypesWellLogView } from "./components/WellLogView";
 
 import { shouldUpdateWellLogView } from "./components/WellLogView";
@@ -113,7 +115,7 @@ export default class WellLogViewer extends Component<
                 let iTrack = 0;
                 for (const track of tracks) {
                     if (isScaleTrack(track)) continue;
-                    if (info.iTrack == iTrack) {
+                    if (info.iTrack === iTrack) {
                         toggleId(collapsedTrackIds, track.id);
                         break;
                     }
@@ -162,7 +164,12 @@ export default class WellLogViewer extends Component<
         this.callbackManager.onChangePrimaryAxis(value);
     }
 
-    onInfo(x: number, logController: LogViewer, iFrom: number, iTo: number) {
+    onInfo(
+        x: number,
+        logController: LogViewer,
+        iFrom: number,
+        iTo: number
+    ): void {
         this.callbackManager.onInfo(x, logController, iFrom, iTo);
         // TODO: Fix this the next time the file is edited.
         // eslint-disable-next-line react/prop-types
@@ -171,7 +178,12 @@ export default class WellLogViewer extends Component<
         this.fillInfo(x, logController, iFrom, iTo);
     }
 
-    fillInfo(x: number, logController: LogViewer, iFrom: number, iTo: number) {
+    fillInfo(
+        x: number,
+        logController: LogViewer,
+        iFrom: number,
+        iTo: number
+    ): void {
         if (this.callbackManager.onInfoFilledCallbacks.length < 1) return;
 
         const infoOptions = this.props.readoutOptions;
@@ -275,24 +287,23 @@ export default class WellLogViewer extends Component<
                 parent={this}
                 center={
                     <WellLogViewWithScroller
+                        /* just copy all props without primaryAxis */
                         welllog={this.props.welllog}
                         viewTitle={this.props.viewTitle}
                         template={this.props.template}
-                        colorTables={this.props.colorTables}
+                        colorMapFunctions={this.props.colorMapFunctions}
                         wellpick={this.props.wellpick}
-                        // TODO: Fix this the next time the file is edited.
-                        // eslint-disable-next-line react/prop-types
                         patternsTable={this.props.patternsTable}
-                        // TODO: Fix this the next time the file is edited.
-                        // eslint-disable-next-line react/prop-types
                         patterns={this.props.patterns}
                         horizontal={this.props.horizontal}
                         axisTitles={this.props.axisTitles}
                         axisMnemos={this.props.axisMnemos}
                         domain={this.props.domain}
                         selection={this.props.selection}
-                        primaryAxis={this.state.primaryAxis}
                         options={this.props.options}
+                        /* end of copy props */
+
+                        primaryAxis={this.state.primaryAxis}
                         // callbacks
                         onInfo={this.onInfo}
                         onCreateController={this.onCreateController}
@@ -316,7 +327,7 @@ export default class WellLogViewer extends Component<
 }
 
 ///
-const WellLogViewOptions_propTypes = PropTypes.shape({
+export const WellLogViewOptionsTypes = PropTypes.shape({
     /**
      * The maximum zoom value
      */
@@ -339,7 +350,7 @@ const WellLogViewOptions_propTypes = PropTypes.shape({
     hideTrackLegend: PropTypes.bool,
 });
 
-const InfoOptions_propTypes = PropTypes.shape({
+export const InfoOptionsTypes = PropTypes.shape({
     /**
      * Show not only visible tracks
      */
@@ -362,17 +373,17 @@ WellLogViewer.propTypes = {
     /**
      * An object from JSON file describing well log data
      */
-    welllog: PropTypes.object.isRequired,
+    welllog: PropTypes.object /*Of<WellLog>*/,
 
     /**
      * Prop containing track template data
      */
-    template: PropTypes.object.isRequired,
+    template: TemplateType.isRequired,
 
     /**
      * Prop containing color table data
      */
-    colorTables: PropTypes.any, //.isRequired,
+    colorMapFunctions: PropTypes.arrayOf(ColorFunctionType).isRequired,
 
     /**
      * Orientation of the track plots on the screen. Default is false
@@ -392,7 +403,7 @@ WellLogViewer.propTypes = {
     /**
      * Well picks data
      */
-    wellpick: PropTypes.object,
+    wellpicks: PropTypes.arrayOf(WellPickPropsType),
 
     /**
      * Primary axis id: " md", "tvd", "time"...
@@ -402,12 +413,12 @@ WellLogViewer.propTypes = {
     /**
      * Log mnemonics for axes
      */
-    axisTitles: PropTypes.object,
+    axisTitles: PropTypes.object /*Of<Record<string, string>>*/,
 
     /**
      * Names for axes
      */
-    axisMnemos: PropTypes.object,
+    axisMnemos: PropTypes.object /*Of<Record<string, string>>*/,
 
     /**
      * Set to true for default titles or to array of individial welllog titles
@@ -415,16 +426,16 @@ WellLogViewer.propTypes = {
     viewTitle: PropTypes.oneOfType([
         PropTypes.bool,
         PropTypes.string,
-        PropTypes.object /* react element */,
+        PropTypes.element /* react element */,
     ]),
 
     /**
      * WellLogView additional options
      */
-    options: WellLogViewOptions_propTypes /*PropTypes.object,*/,
+    options: WellLogViewOptionsTypes,
 
     /**
      * Options for readout panel
      */
-    readoutOptions: InfoOptions_propTypes /*PropTypes.object,*/,
+    readoutOptions: InfoOptionsTypes,
 };

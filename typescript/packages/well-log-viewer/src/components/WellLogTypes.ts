@@ -36,7 +36,10 @@ export type WellLogCurve = {
 }; // a part of JSON
 export type WellLogDataRow = (number | string | null)[];
 
-export type WellLogMetadataDiscreteObjects = Record<string, []>;
+export type WellLogMetadataDiscreteObjects = Record<
+    string,
+    (number[] | number)[]
+>;
 // data example: { "Above_BCU": [ [255,13,186,255], 0 ], "ABOVE": ...  }
 
 export type WellLogMetadataDiscrete = {

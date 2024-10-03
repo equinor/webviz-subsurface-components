@@ -19,7 +19,7 @@ function getScrollbarSizes(): { vertical: number; horizontal: number } {
     return { vertical, horizontal };
 }
 
-interface Props {
+export interface ScrollerProps {
     /**
      * callback with new scroll positions
      */
@@ -27,13 +27,13 @@ interface Props {
     children?: ReactNode;
 }
 
-class Scroller extends Component<Props> {
+class Scroller extends Component<ScrollerProps> {
     scroller: HTMLDivElement | null; // Outer
     scrollable: HTMLDivElement | null; // Inner
     content: HTMLDivElement | null; // Content over inner
     resizeObserver: ResizeObserver;
 
-    constructor(props: Props) {
+    constructor(props: ScrollerProps) {
         super(props);
         this.scroller = null;
         this.scrollable = null;

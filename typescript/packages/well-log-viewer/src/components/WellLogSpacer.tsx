@@ -5,8 +5,8 @@ import type { WellLogController, WellPickProps } from "./WellLogView";
 import { getWellPicks } from "./WellLogView";
 import type WellLogView from "./WellLogView";
 
-import type { ColorTable } from "./ColorTableTypes";
-import type { PatternsTable } from "../utils/pattern";
+import type { ColorMapFunction } from "./ColorMapFunction";
+import type { PatternsTable, Pattern } from "../utils/pattern";
 import { createDefs, patternId } from "../utils/pattern";
 
 export interface WellLogSpacerOptions {
@@ -26,9 +26,9 @@ export interface WellLogSpacerProps {
     controllers: (WellLogController | null)[]; // 2 items
 
     /**
-     * Prop containing color table data.
+     * Prop containing color function/table data.
      */
-    colorTables: ColorTable[];
+    colorMapFunctions: ColorMapFunction[];
     /**
      * Well Picks data
      */
@@ -42,7 +42,7 @@ export interface WellLogSpacerProps {
     /**
      * Horizon to pattern index map
      */
-    patterns?: [string, number][];
+    patterns?: Pattern[];
 
     /**
      * Distanse between wells to show on the spacer
@@ -144,7 +144,7 @@ class WellLogSpacer extends Component<WellLogSpacerProps /*, State*/> {
     ): boolean {
         // TODO: Fix this the next time the file is edited.
         // eslint-disable-next-line react/prop-types
-        if (this.props.colorTables !== nextProps.colorTables) {
+        if (this.props.colorMapFunctions !== nextProps.colorMapFunctions) {
             return true;
         }
         // TODO: Fix this the next time the file is edited.

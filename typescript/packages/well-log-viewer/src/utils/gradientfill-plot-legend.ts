@@ -10,14 +10,19 @@ declare type D3Selection = any; //import { D3Selection } from "@equinor/videx-we
 import { renderBasicPlotLegend } from "./legend/common"; //import { renderBasicPlotLegend } from "@equinor/videx-wellog/dist/plots/legend/common';
 /* End of missed from "@equinor/videx-wellog */
 
-import type { ColorTable } from "../components/ColorTableTypes";
+import type {
+    ColorMapFunction,
+    ColorTable,
+} from "../components/ColorMapFunction";
+import { isFunction } from "../components/ColorMapFunction";
 import { getInterpolatedColorString } from "./color-table";
 
 import { color4ToString } from "./color-table";
+
 let __idGradient = 0;
 function createGradient(
     g: D3Selection,
-    colorTable: ColorTable | ((v: number) => [number, number, number]),
+    colorMapFunction: ColorMapFunction,
     rLogarithmic?: number
 ): string {
     const id = "grad" + ++__idGradient; // generate unique id
@@ -37,23 +42,27 @@ function createGradient(
             const fraction = i / nIntervals;
             const y = 1 + fraction * d;
             const v = Math.log(y) / yDelta;
-            const c = getInterpolatedColorString(colorTable, v);
+            const c = getInterpolatedColorString(colorMapFunction, v);
             lg.append("stop")
                 .attr("offset", fraction * 100.0 + "%")
                 .style("stop-color", c);
         }
     } else {
-        if (typeof colorTable === "function") {
-            const nIntervals = 5;
-            for (let i = 0; i < nIntervals; i++) {
+        if (isFunction(colorMapFunction)) {
+            const nIntervals = 25; // set some not very big value to smooth filling
+            for (let i = 0; i <= nIntervals; i++) {
                 const fraction = i / nIntervals;
-                const c = getInterpolatedColorString(colorTable, fraction);
+                const c = getInterpolatedColorString(
+                    colorMapFunction,
+                    fraction
+                );
                 lg.append("stop")
                     .attr("offset", fraction * 100.0 + "%")
                     .style("stop-color", c);
             }
         } else {
-            const colors = colorTable.colors;
+            const table = colorMapFunction as ColorTable;
+            const colors = table.colors;
             for (let i = 0; i < colors.length; i++) {
                 const color = colors[i];
                 const c = color4ToString(color);
@@ -81,7 +90,7 @@ export default function renderGradientFillPlotLegend(
     const shadeY = top;
     const fillOpacity = Math.min((options.fillOpacity || 0.0) + 0.25, 1);
 
-    if (options.inverseColor || options.inverseColorTable) {
+    if (options.inverseColor || options.inverseColorMapFunction) {
         const [min, max] = plot.scale.domain();
         const minIsLeft = min <= max;
         const centerX = left + width / 2;
@@ -101,28 +110,28 @@ export default function renderGradientFillPlotLegend(
                 : plot.options.color;
 
         /* Start GradientFill code */
-        let colorTable =
+        let colorMapFunction: ColorMapFunction | undefined =
             useMinAsBase && minIsLeft
-                ? options.colorTable
-                : options.inverseColorTable;
-        if (colorTable) {
+                ? options.colorMapFunction
+                : options.inverseColorMapFunction;
+        if (colorMapFunction) {
             const id = createGradient(
                 g,
-                colorTable,
+                colorMapFunction,
                 options.scale === "linear" && options.colorScale === "log"
                     ? max / min
                     : undefined
             );
             fillNrm = "url(#" + id + ")";
         }
-        colorTable =
+        colorMapFunction =
             useMinAsBase && minIsLeft
-                ? options.inverseColorTable
-                : options.colorTable;
-        if (colorTable) {
+                ? options.inverseColorMapFunction
+                : options.colorMapFunction;
+        if (colorMapFunction) {
             const id = createGradient(
                 g,
-                colorTable,
+                colorMapFunction,
                 options.scale === "linear" &&
                     (options.inverseColorScale || options.colorScale) === "log"
                     ? max / min
@@ -152,12 +161,12 @@ export default function renderGradientFillPlotLegend(
     } else {
         let fillNrm = plot.options.color; // see area-plot-legend.ts! should be? plot.options.fill || plot.options.color;
         /* Start GradientFill code */
-        const colorTable = options.colorTable;
-        if (colorTable) {
+        const colorMapFunction = options.colorMapFunction;
+        if (colorMapFunction) {
             const [min, max] = plot.scale.domain();
             const id = createGradient(
                 g,
-                colorTable,
+                colorMapFunction,
                 options.scale === "linear" && options.colorScale === "log"
                     ? max / min
                     : undefined

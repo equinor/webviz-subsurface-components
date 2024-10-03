@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import type { ReactNode } from "react";
 import React, { Component } from "react";
+import { createRoot } from "react-dom/client";
 import { LogViewer } from "@equinor/videx-wellog";
 
 import PropTypes from "prop-types";
@@ -26,8 +27,11 @@ import { select } from "d3";
 
 import type { WellLog, WellLogCurve } from "./WellLogTypes";
 import type { Template } from "./WellLogTemplateTypes";
-import type { ColorTable } from "./ColorTableTypes";
-import type { PatternsTable } from "../utils/pattern";
+import { TemplateType } from "./CommonPropTypes";
+import type { ColorMapFunction } from "./ColorMapFunction";
+import { ColorFunctionType } from "./CommonPropTypes";
+import type { PatternsTable, Pattern } from "../utils/pattern";
+import { PatternsTableType, PatternsType } from "./CommonPropTypes";
 import { isEqualRanges } from "../utils/log-viewer";
 
 import { getDiscreteColorAndName, getDiscreteMeta } from "../utils/tracks";
@@ -37,7 +41,7 @@ import type { AxesInfo } from "../utils/tracks";
 import type { ExtPlotOptions } from "../utils/tracks";
 import { getTrackTemplate } from "../utils/tracks";
 import { isScaleTrack } from "../utils/tracks";
-import { deepCopy, deepCopyTemplate } from "../utils/deepcopy";
+import { deepCopy } from "../utils/deepcopy";
 
 import {
     addOrEditGraphTrack,
@@ -255,7 +259,7 @@ function addPinnedValueOverlay(instance: LogViewer, parent: WellLogView) {
             const v = horizontal ? event.x : event.y;
             const pinelm = event.target;
             if (pinelm) {
-                if (pinelm.style.visibility == "visible") {
+                if (pinelm.style.visibility === "visible") {
                     if (!parent.selPersistent) {
                         parent.selPersistent = true;
                     } else {
@@ -310,11 +314,19 @@ export interface WellPickProps {
     name: string; //  "HORIZON"
     md?: string; //  Log mnemonics for depth log. default is "MD"
     /**
-     * Prop containing color table data for well picks
+     * Prop containing color tables or color functions array for well picks
      */
-    colorTables: ColorTable[];
-    color: string; // "Stratigraphy" ...
+    colorMapFunctions: ColorMapFunction[];
+    colorMapFunctionName: string; // "Stratigraphy" ..., "Step func", ...
 }
+
+export const WellPickPropsType = PropTypes.shape({
+    wellpick: PropTypes.object /*Of<WellLog>*/.isRequired, // JSON Log Format
+    name: PropTypes.string.isRequired,
+    md: PropTypes.string,
+    colorMapFunctions: PropTypes.arrayOf(ColorFunctionType).isRequired,
+    colorMapFunctionName: PropTypes.string.isRequired,
+});
 
 const wpSize = 3; //9;
 const wpOffset = wpSize / 2;
@@ -432,12 +444,17 @@ export function getWellPicks(wellLogView: WellLogView): WellPick[] {
             const vSecondary =
                 primaryAxis === "md" ? scaleInterpolator?.reverse(vMD) : vMD;
 
-            const colorTable = wellpick.colorTables.find(
-                (colorTable) => colorTable.name == wellpick.color
+            const colorMapFunction = wellpick.colorMapFunctions.find(
+                (colorMapFunction) =>
+                    colorMapFunction.name === wellpick.colorMapFunctionName
             );
 
             const meta = getDiscreteMeta(wellpick.wellpick, wellpick.name);
-            const { color } = getDiscreteColorAndName(d[c], colorTable, meta);
+            const { color } = getDiscreteColorAndName(
+                d[c],
+                colorMapFunction,
+                meta
+            );
 
             const wp = { vMD, vPrimary, vSecondary, horizon, color };
             wps.push(wp);
@@ -485,7 +502,7 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
     {
         /* clear old wellpicks */
         for (const elmName in instance.overlay.elements) {
-            if (elmName.substring(0, 2) == "wp")
+            if (elmName.substring(0, 2) === "wp")
                 // "wpFill" + horizon; "wp" + horizon;
                 instance.overlay.remove(elmName); // clear old if exists
         }
@@ -619,8 +636,7 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
                         .style("background-color", rgba);
                 }
                 if (wellpickPatternFill) {
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                    const pattern = patterns!.find(
+                    const pattern = patterns.find(
                         (value: [string, number]) => value[0] === horizon
                     );
 
@@ -715,14 +731,14 @@ function setTracksToController(
     axes: AxesInfo,
     welllog: WellLog | undefined, // JSON Log Format
     template: Template, // JSON
-    colorTables?: ColorTable[] // JSON
+    colorMapFunctions: ColorMapFunction[] // JS code array or JSON file for pure color tables array without color functions elements
 ): ScaleInterpolator {
     const { tracks, minmaxPrimaryAxis, primaries, secondaries } = createTracks(
         welllog,
         axes,
         template.tracks,
         template.styles,
-        colorTables
+        colorMapFunctions
     );
     logController.reset();
     const scaleInterpolator = createScaleInterpolator(primaries, secondaries);
@@ -784,7 +800,6 @@ function addTrackMouseEventHandlers(
     }
 }
 
-import ReactDOM from "react-dom";
 import { PlotPropertiesDialog } from "./PlotDialog";
 import { TrackPropertiesDialog } from "./TrackDialog";
 import type { DifferentialPlotLegendInfo } from "@equinor/videx-wellog/dist/plots/legend/interfaces";
@@ -800,14 +815,12 @@ function addPlot(
     el.style.height = "13px";
     parent.appendChild(el);
 
-    // eslint-disable-next-line react/no-deprecated
-    ReactDOM.render(
+    createRoot(el).render(
         <PlotPropertiesDialog
             wellLogView={wellLogView}
             track={track}
             onOK={wellLogView.addTrackPlot.bind(wellLogView, track)}
-        />,
-        el
+        />
     );
 }
 
@@ -831,7 +844,7 @@ function fillPlotTemplate(
     return {
         style: undefined, // No style for this full Plot options.
         type: getPlotType(plot),
-        scale: scale == "log" || scale == "linear" ? scale : undefined,
+        scale: scale === "log" || scale === "linear" ? scale : undefined,
         name: (legend1 && legend1.label ? legend1.label : legend.label) || "",
         name2: legend2 && legend2.label ? legend2.label : "",
         color: (options1 ? options1.color : options.color) || "",
@@ -839,14 +852,9 @@ function fillPlotTemplate(
         inverseColor: options.inverseColor || "",
         fill: (options1 ? options1.fill : options.fill) || "",
         fill2: options2 ? options2.fill : "",
-        colorTable:
-            typeof options.colorTable === "function"
-                ? "Function"
-                : options.colorTable?.name ?? "",
-        inverseColorTable:
-            typeof options.inverseColorTable === "function"
-                ? "Function"
-                : options.inverseColorTable?.name ?? "",
+        colorMapFunctionName: options.colorMapFunction?.name ?? "",
+        inverseColorMapFunctionName:
+            options.inverseColorMapFunction?.name ?? "",
         colorScale: options.colorScale,
         inverseColorScale: options.inverseColorScale,
     };
@@ -864,15 +872,13 @@ function editPlot(
     el.style.height = "13px";
     parent.appendChild(el);
 
-    // eslint-disable-next-line react/no-deprecated
-    ReactDOM.render(
+    createRoot(el).render(
         <PlotPropertiesDialog
             templatePlot={templatePlot}
             wellLogView={wellLogView}
             track={track}
             onOK={onOK}
-        />,
-        el
+        />
     );
 }
 
@@ -886,10 +892,8 @@ export function addTrack(
     el.style.height = "13px";
     parent.appendChild(el);
 
-    // eslint-disable-next-line react/no-deprecated
-    ReactDOM.render(
-        <TrackPropertiesDialog wellLogView={wellLogView} onOK={onOK} />,
-        el
+    createRoot(el).render(
+        <TrackPropertiesDialog wellLogView={wellLogView} onOK={onOK} />
     );
 }
 
@@ -904,14 +908,12 @@ export function editTrack(
     el.style.height = "13px";
     parent.appendChild(el);
 
-    // eslint-disable-next-line react/no-deprecated
-    ReactDOM.render(
+    createRoot(el).render(
         <TrackPropertiesDialog
             templateTrack={templateTrack}
             wellLogView={wellLogView}
             onOK={onOK}
-        />,
-        el
+        />
     );
 }
 
@@ -1044,9 +1046,9 @@ export interface WellLogViewProps {
     template: Template;
 
     /**
-     * Prop containing color table data for discrete well logs
+      Prop containing color table or color functions array for discrete well logs
      */
-    colorTables: ColorTable[];
+    colorMapFunctions: ColorMapFunction[];
 
     /**
      * Well Picks data
@@ -1061,7 +1063,7 @@ export interface WellLogViewProps {
     /**
      * Horizon to pattern index map
      */
-    patterns?: [string, number][];
+    patterns?: Pattern[];
 
     /**
      * Orientation of the track plots on the screen.
@@ -1149,8 +1151,9 @@ export const argTypesWellLogViewProp = {
     template: {
         description: "Prop containing track template data.",
     },
-    colorTables: {
-        description: "Prop containing color table data for discrete well logs.",
+    colorMapFunctions: {
+        description:
+            "Prop containing color function tablefor discrete well logs and gradient plots.",
     },
     wellpick: {
         description: "Well Picks data",
@@ -1202,7 +1205,7 @@ export function shouldUpdateWellLogView(
     if (props.horizontal !== nextProps.horizontal) return true;
     if (props.welllog !== nextProps.welllog) return true;
     if (props.template !== nextProps.template) return true;
-    if (props.colorTables !== nextProps.colorTables) return true;
+    if (props.colorMapFunctions !== nextProps.colorMapFunctions) return true;
     if (props.wellpick !== nextProps.wellpick) return true;
     if (props.primaryAxis !== nextProps.primaryAxis) return true;
     if (props.axisTitles !== nextProps.axisTitles) return true;
@@ -1326,7 +1329,7 @@ class WellLogView
 
     componentDidMount(): void {
         this._isMount = true;
-        this.template = deepCopyTemplate(this.props.template); // save external template content to current
+        this.template = deepCopy(this.props.template); // save external template content to current
 
         if (!this.logController) {
             this.createLogViewer();
@@ -1388,7 +1391,7 @@ class WellLogView
         }
         if (this.props.template !== prevProps.template) {
             if (this.props.template)
-                this.template = deepCopyTemplate(this.props.template); // save external template content to current
+                this.template = deepCopy(this.props.template); // save external template content to current
             shouldSetTracks = true;
             checkSchema = true;
         }
@@ -1397,7 +1400,7 @@ class WellLogView
             selectedTrackIndices = this.getSelectedTrackIndices();
             shouldSetTracks = true;
         }
-        if (this.props.colorTables !== prevProps.colorTables) {
+        if (this.props.colorMapFunctions !== prevProps.colorMapFunctions) {
             selection = this.getContentSelection();
             selectedTrackIndices = this.getSelectedTrackIndices();
             shouldSetTracks = true; // force to repaint
@@ -1533,7 +1536,7 @@ class WellLogView
                 axes,
                 this.props.welllog,
                 this.template,
-                this.props.colorTables
+                this.props.colorMapFunctions
             );
             addWellPickOverlay(this.logController, this);
         }
@@ -1882,9 +1885,16 @@ class WellLogView
     }
 
     _editTrack(track: Track, templateTrack: TemplateTrack): void {
-        const titleCompare = track.options.label?.localeCompare(
-            templateTrack.title
-        );
+        let titleCompare: number;
+        if (!templateTrack.title) {
+            titleCompare = track.options.label ? 1 : 0;
+        } else if (track.options.label) {
+            titleCompare = track.options.label.localeCompare(
+                templateTrack.title
+            );
+        } else {
+            titleCompare = -1;
+        }
 
         if (
             templateTrack.plots &&
@@ -2051,7 +2061,7 @@ class WellLogView
     }
 }
 
-const WellLogViewOptions_propTypes = PropTypes.shape({
+export const WellLogViewOptionsTypes = PropTypes.shape({
     /**
      * The maximum zoom value
      */
@@ -2102,32 +2112,32 @@ export function _propTypesWellLogView(): Record<string, unknown> {
         /**
          * An object from JSON file describing well log data
          */
-        welllog: PropTypes.object, //.isRequired,
+        welllog: PropTypes.object /*Of<WellLog>*/,
 
         /**
          * Prop containing track template data
          */
-        template: PropTypes.object.isRequired,
+        template: TemplateType.isRequired,
 
         /**
-         * Prop containing color table data for discrete well logs
+         * Prop containing color function/table table for discrete well logs and gradient fill plots
          */
-        colorTables: PropTypes.any, //.isRequired,
+        colorMapFunctions: PropTypes.arrayOf(ColorFunctionType).isRequired,
 
         /**
          * Well picks data
          */
-        wellpick: PropTypes.object,
+        wellpicks: PropTypes.arrayOf(WellPickPropsType),
 
         /**
          * Patterns table
          */
-        patternsTable: PropTypes.object,
+        patternsTable: PatternsTableType,
 
         /**
          * Horizon to pattern index map
          */
-        patterns: PropTypes.array, // [string, number][];
+        patterns: PropTypes.arrayOf(PatternsType),
 
         /**
          * Orientation of the track plots on the screen. Default is false
@@ -2142,12 +2152,12 @@ export function _propTypesWellLogView(): Record<string, unknown> {
         /**
          * Log mnemonics for axes
          */
-        axisTitles: PropTypes.object,
+        axisTitles: PropTypes.object /*Of<Record<string, string>>*/,
 
         /**
          * Names for axes
          */
-        axisMnemos: PropTypes.object,
+        axisMnemos: PropTypes.object /*Of<Record<string, string>>*/,
 
         /**
          * Set to true for default title or to some string or JSX.Element
@@ -2155,7 +2165,7 @@ export function _propTypesWellLogView(): Record<string, unknown> {
         viewTitle: PropTypes.oneOfType([
             PropTypes.bool,
             PropTypes.string,
-            PropTypes.object /* react element */,
+            PropTypes.element /* react element */,
         ]),
 
         /**
@@ -2171,7 +2181,7 @@ export function _propTypesWellLogView(): Record<string, unknown> {
         /**
          * Additional options
          */
-        options: WellLogViewOptions_propTypes,
+        options: WellLogViewOptionsTypes,
     };
 }
 

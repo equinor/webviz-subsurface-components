@@ -1,4 +1,9 @@
-import type { ColorTable } from "../components/ColorTableTypes";
+import type {
+    ColorMapFunction,
+    ColorFunction,
+    ColorTable,
+} from "../components/ColorMapFunction";
+import { isFunction } from "../components/ColorMapFunction";
 
 /*
   Binary serach in array of elements [number, ...]
@@ -32,7 +37,7 @@ export function colorToString(
         (color[0] << 16) |
         (color[1] << 8) |
         color[2];
-    return "#" + p.toString(16).substr(1); // cut the first (additional) character and add leading '#' character
+    return "#" + p.toString(16).substring(1); // cut the first (additional) character and add leading '#' character
 }
 /*
   get HTML string in #xxxxxx format with color value given in the [1],[2],[3] elements of array (skip the first element [0] containing stop value)
@@ -42,7 +47,7 @@ export function color4ToString(
 ): string {
     // see colorToString()
     const p = 0x1000000 | (color[1] << 16) | (color[2] << 8) | color[3];
-    return "#" + p.toString(16).substr(1);
+    return "#" + p.toString(16).substring(1);
 }
 
 /*
@@ -73,31 +78,32 @@ export function getExactColor(
   get HTML string with interpolated color value in #xxxxxx format
 */
 export function getInterpolatedColor(
-    colorTable: ColorTable | ((v: number) => [number, number, number]),
+    colorMapFunction: ColorMapFunction,
     v: number
 ): [number, number, number] {
-    // TODO: Do not compute these 3 constants (cNaN, cBelow, cAbove) every time!
-
-    if (typeof colorTable === "function") {
-        return colorTable(v);
+    if (isFunction(colorMapFunction)) {
+        const func = colorMapFunction as ColorFunction;
+        return func.func(v);
     }
 
-    const cNaN: [number, number, number] = colorTable.colorNaN
-        ? colorTable.colorNaN
+    const table = colorMapFunction as ColorTable;
+    // TODO: Do not compute these 3 constants (cNaN, cBelow, cAbove) every time!
+    const cNaN: [number, number, number] = table.colorNaN
+        ? table.colorNaN
         : [255, 255, 255]; // "white"
     if (Number.isNaN(v)) {
         return cNaN;
     }
 
-    const colors = colorTable.colors;
+    const colors = table.colors;
     const j = binarySearch(colors, v);
 
-    const cBelow = colorTable.colorBelow ? colorTable.colorBelow : cNaN;
+    const cBelow = table.colorBelow ? table.colorBelow : cNaN;
     if (j <= 0) {
         return cBelow;
     }
 
-    const cAbove = colorTable.colorAbove ? colorTable.colorAbove : cBelow;
+    const cAbove = table.colorAbove ? table.colorAbove : cBelow;
     if (j >= colors.length) {
         return cAbove;
     }
@@ -119,13 +125,15 @@ export function getInterpolatedColor(
   get HTML string with interpolated color value in #xxxxxx format
 */
 export function getInterpolatedColorString(
-    colorTable: ColorTable | ((v: number) => [number, number, number]),
+    colorMapFunction: ColorMapFunction,
     v: number
 ): string {
-    if (typeof colorTable === "function") {
-        return colorToString(colorTable(v), "#ffffff");
+    if (isFunction(colorMapFunction)) {
+        const func = colorMapFunction as ColorFunction;
+        return colorToString(func.func(v), "#ffffff");
     }
 
+    const colorTable = colorMapFunction as ColorTable;
     // TODO: Do not compute these 3 constants (cNaN, cBelow, cAbove) every time!
     const cNaN = colorToString(colorTable.colorNaN, "#ffffff"); // "white"
 
@@ -150,7 +158,7 @@ export function getInterpolatedColorString(
             ((color0[1] + f * (color[1] - color0[1])) << 16) |
             ((color0[2] + f * (color[2] - color0[2])) << 8) |
             (color0[3] + f * (color[3] - color0[3]));
-        c = "#" + p.toString(16).substr(1);
+        c = "#" + p.toString(16).substring(1);
         if (c.length !== 7) {
             console.error("wrong color table ");
             console.log(c, p, p.toString(16), f, color, color0);

@@ -3,15 +3,18 @@ import { fn } from "@storybook/test";
 import React from "react";
 
 import WellLogViewWithScroller from "./WellLogViewWithScroller";
+import type { WellLogViewWithScrollerProps } from "./WellLogViewWithScroller";
 import { argTypesWellLogViewScrollerProp } from "./WellLogViewWithScroller";
 import { colorTables } from "@emerson-eps/color-tables";
+import type { ColorMapFunction } from "./ColorMapFunction";
+const exampleColorMapFunctions = colorTables as ColorMapFunction[];
 
 const ComponentCode =
     '<WellLogViewWithScroller id="WellLogViewWithScroller" \r\n' +
     "    horizontal=false \r\n" +
     '    welllog={require("../../../../../example-data/L898MUD.json")[0]} \r\n' +
     '    template={require("../../../../../example-data/welllog_template_1.json")} \r\n' +
-    "    colorTables={colorTables} \r\n" +
+    "    colorMapFunctions={exampleColorMapFunctions} \r\n" +
     "/>";
 
 import { axisTitles, axisMnemos } from "../utils/axes";
@@ -52,8 +55,7 @@ const stories: Meta = {
 };
 export default stories;
 
-// @ts-expect-error TS7006
-const Template = (args) => {
+const Template = (args: WellLogViewWithScrollerProps) => {
     return (
         <div
             style={{ height: "92vh", display: "flex", flexDirection: "column" }}
@@ -72,14 +74,14 @@ const wellLog = require("../../../../../example-data/L898MUD.json")[0]; // eslin
 
 export const Default: StoryObj<typeof Template> = {
     args: {
-        id: "Well-Log-Viewer-With-Scroller",
+        //id: "Well-Log-Viewer-With-Scroller",
         horizontal: false,
         welllog: wellLog,
         // TODO: Fix this the next time the file is edited.
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         template: require("../../../../../example-data/welllog_template_1.json"),
         viewTitle: "Well '" + wellLog.header.well + "'",
-        colorTables: colorTables,
+        colorMapFunctions: exampleColorMapFunctions,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
         options: {
