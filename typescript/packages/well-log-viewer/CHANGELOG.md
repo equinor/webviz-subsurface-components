@@ -1,3 +1,19 @@
+# [2.0.0](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.13.11...well-log-viewer@2.0.0) (2024-10-03)
+
+
+### Features
+
+* ColorMapFunction type in WellLogView ([#2249](https://github.com/equinor/webviz-subsurface-components/issues/2249)) ([96bcab4](https://github.com/equinor/webviz-subsurface-components/commit/96bcab47057864dd8c0aa0946adc9e3809a9fc3f)), closes [#2054](https://github.com/equinor/webviz-subsurface-components/issues/2054) [#2259](https://github.com/equinor/webviz-subsurface-components/issues/2259)
+
+
+### BREAKING CHANGES
+
+* - colorMapFunctions array replaces colorTables array to combine color
+tables and functions in single array
+- colorMapFunctionName and reverseColorMapFunctionName references
+replace colorTable and reverseColorTable references (JSON files also
+should be changed)
+
 ## [1.13.11](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@1.13.10...well-log-viewer@1.13.11) (2024-10-03)
 
 
