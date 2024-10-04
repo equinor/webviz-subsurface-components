@@ -1045,10 +1045,10 @@ class ViewController {
             this.result_.deckglViewStates[vsKey].target = target;
             this.result_.deckglViewStates[vsKey].transitionDuration = 1000;
             // update target of deckglViewStates with the scaled event target
-            this.result_.viewStates[vsKey].target = target;
-            applyInversedZScale(
-                this.result_.viewStates[vsKey].target,
-                this.state_.zScale
+            this.result_.viewStates[vsKey].target = inversedZScaled(
+                target,
+                this.state_.zScale,
+                this.result_.viewStates[vsKey].target
             );
 
             this.rerender_();
@@ -1169,8 +1169,7 @@ class ViewController {
             // update target
             for (const key in deckglViewStates) {
                 if (deckglViewStates[key].target) {
-                    applyZScaledTarget(
-                        deckglViewStates[key].target,
+                    deckglViewStates[key].target = zScaledTarget(
                         viewStates[key].target,
                         state.zScale
                     );
@@ -1217,7 +1216,8 @@ class ViewController {
                         ...tempViewStates[key],
                         target: inversedZScaled(
                             tempViewStates[key].target,
-                            this.state_.zScale
+                            this.state_.zScale,
+                            this.result_.viewStates[key].target
                         ),
                     },
                 };
@@ -1234,7 +1234,8 @@ class ViewController {
                     ...viewState,
                     target: inversedZScaled(
                         viewState.target,
-                        this.state_.zScale
+                        this.state_.zScale,
+                        this.result_.viewStates[viewId].target
                     ),
                 },
             };
@@ -1652,44 +1653,69 @@ function applyZScale(
     target: Point2D | Point3D | undefined,
     zScale: number
 ): void {
-    if (target?.[2]) {
+    if (target?.[2] != undefined) {
         target[2] = target[2] * zScale;
     }
 }
-function applyInversedZScale(
-    target: Point2D | Point3D | undefined,
-    zScale: number
-): void {
-    if (zScale != 1 && zScale != 0) {
-        if (target?.[2]) {
-            target[2] = target[2] / zScale;
-        }
-    }
-}
+
 /**
- * Applies the zScale to the camera target.
+ * Returns a z-scaled target.
  * This is needed, as the camera target is specified in world coordinates, while the Z scale
  * is applied to the transformation matrix of the object coordinates. The target must be applied
  * the same scale to be consistent with the display.
- * @param lhs camera target that must take into account the Z scale.
- * @param rhs camera target without Z scale.
+ * @param target camera target that must take into account the Z scale.
  * @param zScale Z scale.
  */
-function applyZScaledTarget(
-    lhs: Point2D | Point3D | undefined,
-    rhs: Point2D | Point3D | undefined,
-    zScale: number
-): void {
-    if (lhs?.[2] && rhs?.[2] && zScale != 1) {
-        lhs[2] = rhs[2] * zScale;
-    }
-}
-function inversedZScaled(
+function zScaledTarget(
     target: Point2D | Point3D | undefined,
     zScale: number
 ): Point2D | Point3D | undefined {
-    if (!target?.[2]) return target;
-    return [target[0], target[1], target[2] / (zScale || 1)];
+    if (!target) {
+        return undefined;
+    }
+    if (target[2] == undefined) {
+        return [target[0], target[1]];
+    }
+
+    return [target[0], target[1], target[2] * zScale];
+}
+
+/**
+ * Returns an inverted z-scaled target.
+ * This is needed, as the camera target is specified in world coordinates, while the Z scale
+ * is applied to the transformation matrix of the object coordinates. The target must be applied
+ * the same scale to be consistent with the display.
+ * @param target camera scaled target.
+ * @param zScale Z scale.
+ * @param unscaledTarget last known unscaled target which can be taken as a fallback.
+ */
+function inversedZScaled(
+    target: Point2D | Point3D | undefined,
+    zScale: number,
+    unscaledTarget?: Point2D | Point3D | undefined
+): Point2D | Point3D | undefined {
+    if (!target) {
+        return undefined;
+    }
+    if (target[2] == undefined) {
+        return [target[0], target[1]];
+    }
+    if (zScale != 0) {
+        return [target[0], target[1], target[2] / zScale];
+    }
+
+    if (
+        unscaledTarget?.[2] != undefined &&
+        target[0] === unscaledTarget?.[0] &&
+        target[1] === unscaledTarget?.[1]
+    ) {
+        return [
+            target[0],
+            target[1],
+            target[2] ? target[2] : unscaledTarget[2],
+        ];
+    }
+    return [target[0], target[1], target[2]];
 }
 
 /**
