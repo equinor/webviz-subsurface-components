@@ -377,7 +377,7 @@ exports[`Sync Log Viewer snapshot test 1`] = `
                 <tr>
                   <td
                     class="row-info"
-                    style="color: blue;"
+                    style="color: red;"
                   >
                     ⬤
                   </td>
