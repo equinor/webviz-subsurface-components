@@ -416,6 +416,7 @@ export const Discrete: StoryObj<typeof StoryTemplate> = {
 
 export const LogWithDifferentSets: StoryObj<typeof StoryTemplate> = {
     args: {
+        colorMapFunctions: [],
         wellLogSets: [
             {
                 header: wellLogs[0].header,

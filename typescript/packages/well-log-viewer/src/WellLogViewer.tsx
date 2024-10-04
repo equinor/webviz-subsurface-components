@@ -30,7 +30,7 @@ import { CallbackManager } from "./components/CallbackManager";
 import type { Info, InfoOptions } from "./components/InfoTypes";
 import type { LogViewer } from "@equinor/videx-wellog";
 import { fillInfos } from "./utils/fill-info";
-import { getWellLogFromProps } from "./utils/well-log";
+import { getWellLogSetsFromProps } from "./utils/well-log";
 import type { WellLogSet } from "./components/WellLogTypes";
 
 export interface WellLogViewerProps extends WellLogViewWithScrollerProps {
@@ -86,7 +86,7 @@ export default class WellLogViewer extends Component<
 
     constructor(props: WellLogViewerProps) {
         super(props);
-        this.wellLogSets = getWellLogFromProps(props);
+        this.wellLogSets = getWellLogSetsFromProps(props);
 
         this.state = {
             primaryAxis: this.getDefaultPrimaryAxis(), //"md"
@@ -251,11 +251,12 @@ export default class WellLogViewer extends Component<
     ): void {
         if (
             this.props.welllog !== prevProps.welllog ||
+            this.props.wellLogSets !== prevProps.wellLogSets ||
             this.props.template !== prevProps.template ||
             this.props.axisMnemos !== prevProps.axisMnemos ||
             this.props.primaryAxis !== prevProps.primaryAxis
         ) {
-            this.wellLogSets = getWellLogFromProps(this.props);
+            this.wellLogSets = getWellLogSetsFromProps(this.props);
 
             const value = this.getDefaultPrimaryAxis();
             this.onChangePrimaryAxis(value);
@@ -293,6 +294,7 @@ export default class WellLogViewer extends Component<
                     <WellLogViewWithScroller
                         /* just copy all props without primaryAxis */
                         welllog={this.props.welllog}
+                        wellLogSets={this.props.wellLogSets}
                         viewTitle={this.props.viewTitle}
                         template={this.props.template}
                         colorMapFunctions={this.props.colorMapFunctions}

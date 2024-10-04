@@ -684,7 +684,11 @@ export const LogsWithDifferentSets: StoryObj<typeof Template> = {
         },
     },
     args: {
-        axisTitles: axisTitles,
+        axisTitles: {
+            md: "MD",
+            tvd: "TVD",
+            time: "TIME",
+        },
         axisMnemos: axisMnemos,
         syncContentSelection: true,
         viewTitles: true,
@@ -693,6 +697,7 @@ export const LogsWithDifferentSets: StoryObj<typeof Template> = {
             units: "m",
             distances: [2048.3, 512.7],
         },
+        colorMapFunctions: exampleColorMapFunctions,
         templates: [verySimpleTemplate, verySimpleTemplate],
         wellLogCollections: [
             [

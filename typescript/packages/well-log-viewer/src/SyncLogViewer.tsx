@@ -396,6 +396,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
     ): void {
         if (
             this.props.welllogs !== prevProps.welllogs ||
+            this.props.wellLogCollections !== prevProps.wellLogCollections ||
             this.props.templates !== prevProps.templates ||
             this.props.axisMnemos !== prevProps.axisMnemos ||
             this.props.primaryAxis !== prevProps.primaryAxis
@@ -417,7 +418,9 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                 this.props.wellpickFlatting,
                 prevProps.wellpickFlatting
             ) ||
-            this.props.welllogs?.length !== prevProps.welllogs?.length
+            this.props.welllogs?.length !== prevProps.welllogs?.length ||
+            this.props.wellLogCollections?.length !==
+                prevProps.wellLogCollections?.length
         ) {
             if (this.props.welllogs?.length) this.syncContentScrollPos(0); // force to redraw visible domain
         }
@@ -431,7 +434,11 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                 prevProps.syncContentSelection ||
             this.props.welllogs?.length !== prevProps.welllogs?.length
         ) {
-            if (this.props.welllogs?.length) this.syncContentSelection(0); // force to redraw selection
+            if (
+                this.props.welllogs?.length ??
+                this.props.wellLogCollections?.length
+            )
+                this.syncContentSelection(0); // force to redraw selection
         }
     }
 
@@ -1169,7 +1176,7 @@ SyncLogViewer.propTypes = {
     /**
      * An array of collections of well log sets. A synced well log is created per entry
      */
-    wellLogCollections: PropTypes.arrayOf(PropTypes.object),
+    wellLogCollections: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.object)),
 
     /**
      * Prop containing track template data

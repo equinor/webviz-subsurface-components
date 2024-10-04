@@ -40,13 +40,6 @@ import wellPicks from "../../../../../../example-data/wellpicks.json";
 const wellLogs = wellLogsJson as unknown as WellLogSet[];
 const template = templateJson as unknown as Template;
 
-const wellpick = {
-    wellpick: wellPicks[0],
-    name: "HORIZON",
-    colorTables: colorTables,
-    color: "Stratigraphy",
-};
-
 const exampleColorMapFunctions: ColorMapFunction[] = [
     // copy color tables and add some color functions
     ...(colorTables as ColorMapFunction[]),
@@ -71,6 +64,13 @@ const exampleColorMapFunctions: ColorMapFunction[] = [
         func: (v: number) => (v < 0.5 ? [255, 0, 0] : [0, 255, 255]),
     },
 ];
+
+const wellpick = {
+    wellpick: wellPicks[0],
+    name: "HORIZON",
+    colorMapFunctions: exampleColorMapFunctions,
+    color: "Stratigraphy",
+};
 
 function getTemplatePlotColorFunctionName(
     template: Template,

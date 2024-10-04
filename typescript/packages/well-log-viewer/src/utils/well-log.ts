@@ -89,13 +89,12 @@ function findIndexByMemos(curves: WellLogCurve[], memos: string[]): number {
     return curves.findIndex(({ name }) => memos.includes(name.toUpperCase()));
 }
 
-// type PropWithWellLogOrSet = Pick<WellLogViewProps, "welllog" | "wellLogSets">;
-
-export function getWellLogFromProps(props: WellLogViewProps): WellLogSet[] {
+export function getWellLogSetsFromProps(props: WellLogViewProps): WellLogSet[] {
     let ret: WellLogSet[] = [];
+    const setsProp = props.wellLogSets ?? props.welllog ?? [];
 
-    if (Array.isArray(props.welllog)) ret = props.welllog;
-    else if (props.welllog) ret = [props.welllog];
+    if (Array.isArray(setsProp)) ret = setsProp;
+    else if (setsProp) ret = [setsProp];
 
     if (_.chain(ret).map("header.well").uniq().value().length > 1) {
         console.warn(

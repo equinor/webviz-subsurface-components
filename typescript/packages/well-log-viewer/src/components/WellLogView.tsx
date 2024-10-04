@@ -72,7 +72,7 @@ import {
 } from "../utils/log-viewer";
 
 import type { Info } from "./InfoTypes";
-import { getWellLogFromProps } from "../utils/well-log";
+import { getWellLogSetsFromProps } from "../utils/well-log";
 
 const rubberBandSize = 9;
 const rubberBandOffset = rubberBandSize / 2;
@@ -1217,6 +1217,7 @@ export function shouldUpdateWellLogView(
     // so compare only known key:values
     if (props.horizontal !== nextProps.horizontal) return true;
     if (props.welllog !== nextProps.welllog) return true;
+    if (props.wellLogSets !== nextProps.wellLogSets) return true;
     if (props.template !== nextProps.template) return true;
     if (props.colorMapFunctions !== nextProps.colorMapFunctions) return true;
     if (props.wellpick !== nextProps.wellpick) return true;
@@ -1296,7 +1297,7 @@ class WellLogView
     constructor(props: WellLogViewProps) {
         super(props);
 
-        this.wellLogSets = getWellLogFromProps(props);
+        this.wellLogSets = getWellLogSetsFromProps(props);
 
         this.container = undefined;
         this.logController = undefined;
@@ -1398,6 +1399,7 @@ class WellLogView
 
         if (
             this.props.welllog !== prevProps.welllog ||
+            this.props.wellLogSets !== prevProps.wellLogSets ||
             this.props.options?.checkDatafileSchema !==
                 prevProps.options?.checkDatafileSchema
         ) {
@@ -1405,7 +1407,7 @@ class WellLogView
             selectedTrackIndices = this.getSelectedTrackIndices();
             shouldSetTracks = true;
             checkSchema = true;
-            this.wellLogSets = getWellLogFromProps(this.props);
+            this.wellLogSets = getWellLogSetsFromProps(this.props);
         }
         if (this.props.template !== prevProps.template) {
             if (this.props.template)
