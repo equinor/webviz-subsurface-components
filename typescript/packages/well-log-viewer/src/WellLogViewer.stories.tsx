@@ -21,8 +21,8 @@ import exampleData from "../../../../example-data/deckgl-map.json";
 import wellLogsJson from "../../../../example-data/volve_logs.json";
 import templateJson from "../../../../example-data/welllog_template_2.json";
 
-import type { MapAndWellLogViewerProps } from "./Storybook/examples/MapAndWellLogViewer";
-import { MapAndWellLogViewer } from "./Storybook/examples/MapAndWellLogViewer";
+import type { MapAndWellLogViewerProps } from "./Storybook/examples/MapAndWellLogViewer.story-example";
+import { MapAndWellLogViewer } from "./Storybook/examples/MapAndWellLogViewer.story-example";
 import { axisMnemos, axisTitles } from "./utils/axes";
 
 const wellLogs = wellLogsJson as unknown as WellLogSet[];

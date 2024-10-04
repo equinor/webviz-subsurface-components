@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
+
 import SubsurfaceViewer from "@webviz/subsurface-viewer";
 import type { WeakValidationMap } from "react";
 import React from "react";

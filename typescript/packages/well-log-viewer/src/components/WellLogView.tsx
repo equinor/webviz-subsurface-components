@@ -733,12 +733,12 @@ function createScaleInterpolator(
 function setTracksToController(
     logController: LogViewer,
     axes: AxesInfo,
-    wellLog: WellLogSet[], // JSON Log Format
+    wellLogSets: WellLogSet[], // JSON Log Format
     template: Template, // JSON
     colorMapFunctions: ColorMapFunction[] // JS code array or JSON file for pure color tables array without color functions elements
 ): ScaleInterpolator {
     const { tracks, minmaxPrimaryAxis, primaries, secondaries } = createTracks(
-        wellLog,
+        wellLogSets,
         axes,
         template.tracks,
         template.styles,
@@ -1820,7 +1820,7 @@ class WellLogView
     }
 
     getWellLog(): WellLogSet[] | WellLogSet | undefined {
-        return this.props.welllog;
+        return this.props.wellLogSets ?? this.props.welllog;
     }
 
     getTemplate(): Template {
