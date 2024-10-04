@@ -455,8 +455,10 @@ const iconStyle = {
     paddingRight: "4px",
 };
 
+// ? What does this custom layout thing do?
 export const CustomLayout = Template.bind({});
 
+// @ts-expect-error TS2339
 CustomLayout.args = {
     ...Default.args,
     wellpicks: undefined,
@@ -528,6 +530,7 @@ CustomLayout.args = {
         header: "Customized layout example",
     },
 };
+// @ts-expect-error TS2339
 CustomLayout.parameters = {
     docs: {
         description: {
@@ -550,13 +553,13 @@ const TemplateWithSelection = (args: SyncLogViewerProps) => {
     ); // all WellLogs
 
     const onCreateController = React.useCallback(
-        (iWellLog: number, controller: WellLogController) => {
+        (_iWellLog: number, controller: WellLogController) => {
             setControllers((prev) => [...prev, controller]);
         },
         []
     );
     const onDeleteController = React.useCallback(
-        (iWellLog: number, controller: WellLogController) => {
+        (_iWellLog: number, controller: WellLogController) => {
             setControllers((prev) => prev.filter((c) => c !== controller));
         },
         []
