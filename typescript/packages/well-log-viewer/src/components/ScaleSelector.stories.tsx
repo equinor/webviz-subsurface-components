@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 
 import ScaleSelector from "./ScaleSelector";
+import type { ScaleSelectorProps } from "./ScaleSelector";
 
 const ComponentCode = "<ScaleSelector value={1} max={128}/>";
 
@@ -38,12 +39,9 @@ const stories: Meta = {
 };
 export default stories;
 
-// @ts-expect-error TS7006
-const Template = (args) => {
-    const infoRef = React.useRef();
-    // @ts-expect-error TS7006
-    const setInfo = function (info) {
-        // @ts-expect-error TS2339
+const Template = (args: ScaleSelectorProps) => {
+    const infoRef = React.useRef<HTMLDivElement | null>(null);
+    const setInfo = function (info: string): void {
         if (infoRef.current) infoRef.current.innerHTML = info;
     };
 
@@ -51,14 +49,11 @@ const Template = (args) => {
         <div>
             Scale:
             <ScaleSelector
-                id="ScaleSelector"
                 {...args}
                 onChange={function (value: number): void {
                     setInfo("scale value=" + value);
                 }}
             />
-            {/*
-             // @ts-expect-error TS2322 */}
             <div ref={infoRef}>&nbsp;</div>
         </div>
     );

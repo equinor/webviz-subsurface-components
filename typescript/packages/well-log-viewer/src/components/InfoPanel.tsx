@@ -9,7 +9,7 @@ interface Props {
     onGroupClick?: (info: Info) => void;
 }
 
-function createSeparator(info: Info) {
+function createSeparator(info: Info): JSX.Element {
     return (
         <tr key={"_separator_" + info.trackId + "." + info.name}>
             {/* Set key prop just for react pleasure. See https://reactjs.org/link/warning-keys for more information */}

@@ -71,13 +71,13 @@
                     "description": "for 'area' and 'gradientfill' plots"
                 },
 
-                "colorTable": {
+                "colorMapFunctionName": {
                     "type": "string",
-                    "description": "table id (name) for 'gradientfill' plot"
+                    "description": "color function/table id (name) for 'gradientfill' plot"
                 },
-                "inverseColorTable": {
+                "inverseColorMapFunctionName": {
                     "type": "string",
-                    "description": "table id (name) for 'gradientfill' plot"
+                    "description": "color function/table id (name) for 'gradientfill' plot"
                 },
 
                 "colorScale": {

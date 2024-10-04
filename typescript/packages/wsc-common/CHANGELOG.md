@@ -1,3 +1,40 @@
+# [1.0.0](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.8.9...wsc-common@1.0.0) (2024-10-03)
+
+
+### Features
+
+* ColorMapFunction type in WellLogView ([#2249](https://github.com/equinor/webviz-subsurface-components/issues/2249)) ([96bcab4](https://github.com/equinor/webviz-subsurface-components/commit/96bcab47057864dd8c0aa0946adc9e3809a9fc3f)), closes [#2054](https://github.com/equinor/webviz-subsurface-components/issues/2054) [#2259](https://github.com/equinor/webviz-subsurface-components/issues/2259)
+
+
+### BREAKING CHANGES
+
+* - colorMapFunctions array replaces colorTables array to combine color
+tables and functions in single array
+- colorMapFunctionName and reverseColorMapFunctionName references
+replace colorTable and reverseColorTable references (JSON files also
+should be changed)
+
+## [0.8.9](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.8.8...wsc-common@0.8.9) (2024-10-03)
+
+
+### Bug Fixes
+
+* bump the deckgl group in /typescript with 8 updates ([#2287](https://github.com/equinor/webviz-subsurface-components/issues/2287)) ([5fdf178](https://github.com/equinor/webviz-subsurface-components/commit/5fdf17866bec4ba55d5cb2047978bc7b96cea4b4)), closes [#9196](https://github.com/equinor/webviz-subsurface-components/issues/9196) [#9137](https://github.com/equinor/webviz-subsurface-components/issues/9137) [#9196](https://github.com/equinor/webviz-subsurface-components/issues/9196) [#9137](https://github.com/equinor/webviz-subsurface-components/issues/9137) [#9196](https://github.com/equinor/webviz-subsurface-components/issues/9196) [#9137](https://github.com/equinor/webviz-subsurface-components/issues/9137) [#9196](https://github.com/equinor/webviz-subsurface-components/issues/9196) [#9137](https://github.com/equinor/webviz-subsurface-components/issues/9137) [#9196](https://github.com/equinor/webviz-subsurface-components/issues/9196) [#9137](https://github.com/equinor/webviz-subsurface-components/issues/9137) [#9196](https://github.com/equinor/webviz-subsurface-components/issues/9196) [#9137](https://github.com/equinor/webviz-subsurface-components/issues/9137) [#9196](https://github.com/equinor/webviz-subsurface-components/issues/9196) [#9137](https://github.com/equinor/webviz-subsurface-components/issues/9137) [#9196](https://github.com/equinor/webviz-subsurface-components/issues/9196) [#9137](https://github.com/equinor/webviz-subsurface-components/issues/9137) [#9196](https://github.com/equinor/webviz-subsurface-components/issues/9196) [#9137](https://github.com/equinor/webviz-subsurface-components/issues/9137) [#9196](https://github.com/equinor/webviz-subsurface-components/issues/9196) [#9137](https://github.com/equinor/webviz-subsurface-components/issues/9137) [#9196](https://github.com/equinor/webviz-subsurface-components/issues/9196) [#9137](https://github.com/equinor/webviz-subsurface-components/issues/9137) [#9196](https://github.com/equinor/webviz-subsurface-components/issues/9196) [#9137](https://github.com/equinor/webviz-subsurface-components/issues/9137) [#9196](https://github.com/equinor/webviz-subsurface-components/issues/9196) [#9137](https://github.com/equinor/webviz-subsurface-components/issues/9137) [#9196](https://github.com/equinor/webviz-subsurface-components/issues/9196) [#9137](https://github.com/equinor/webviz-subsurface-components/issues/9137) [#9196](https://github.com/equinor/webviz-subsurface-components/issues/9196) [#9137](https://github.com/equinor/webviz-subsurface-components/issues/9137) [#9196](https://github.com/equinor/webviz-subsurface-components/issues/9196) [#9137](https://github.com/equinor/webviz-subsurface-components/issues/9137) [#9196](https://github.com/equinor/webviz-subsurface-components/issues/9196) [#9137](https://github.com/equinor/webviz-subsurface-components/issues/9137) [#9196](https://github.com/equinor/webviz-subsurface-components/issues/9196) [#9137](https://github.com/equinor/webviz-subsurface-components/issues/9137) [#9196](https://github.com/equinor/webviz-subsurface-components/issues/9196) [#9137](https://github.com/equinor/webviz-subsurface-components/issues/9137) [#9196](https://github.com/equinor/webviz-subsurface-components/issues/9196) [#9137](https://github.com/equinor/webviz-subsurface-components/issues/9137) [#9196](https://github.com/equinor/webviz-subsurface-components/issues/9196) [#9137](https://github.com/equinor/webviz-subsurface-components/issues/9137) [#9196](https://github.com/equinor/webviz-subsurface-components/issues/9196) [#9137](https://github.com/equinor/webviz-subsurface-components/issues/9137) [#9196](https://github.com/equinor/webviz-subsurface-components/issues/9196) [#9137](https://github.com/equinor/webviz-subsurface-components/issues/9137) [#9196](https://github.com/equinor/webviz-subsurface-components/issues/9196) [#9137](https://github.com/equinor/webviz-subsurface-components/issues/9137)
+
+## [0.8.8](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.8.7...wsc-common@0.8.8) (2024-10-02)
+
+
+### Bug Fixes
+
+* bump workerpool from 9.1.1 to 9.1.3 in /typescript ([#2285](https://github.com/equinor/webviz-subsurface-components/issues/2285)) ([3fbca68](https://github.com/equinor/webviz-subsurface-components/commit/3fbca688370243c33bbd9fe10534b088d2fa4964)), closes [#388](https://github.com/equinor/webviz-subsurface-components/issues/388) [#460](https://github.com/equinor/webviz-subsurface-components/issues/460) [#461](https://github.com/equinor/webviz-subsurface-components/issues/461) [#455](https://github.com/equinor/webviz-subsurface-components/issues/455) [#446](https://github.com/equinor/webviz-subsurface-components/issues/446) [#455](https://github.com/equinor/webviz-subsurface-components/issues/455) [#447](https://github.com/equinor/webviz-subsurface-components/issues/447) [#453](https://github.com/equinor/webviz-subsurface-components/issues/453) [#446](https://github.com/equinor/webviz-subsurface-components/issues/446) [#446](https://github.com/equinor/webviz-subsurface-components/issues/446)
+
+## [0.8.7](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.8.6...wsc-common@0.8.7) (2024-10-01)
+
+
+### Bug Fixes
+
+* bump @equinor/videx-wellog from 0.10.0 to 0.10.5 in /typescript ([#2271](https://github.com/equinor/webviz-subsurface-components/issues/2271)) ([14cf2c3](https://github.com/equinor/webviz-subsurface-components/commit/14cf2c36b5498f113e0e9ef4547b685db74f7985))
+
 ## [0.8.6](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.8.5...wsc-common@0.8.6) (2024-09-30)
 
 

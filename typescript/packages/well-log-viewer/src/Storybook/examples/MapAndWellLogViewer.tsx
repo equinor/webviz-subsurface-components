@@ -1,7 +1,7 @@
 import SubsurfaceViewer from "@webviz/subsurface-viewer";
 import type { WeakValidationMap } from "react";
 import React from "react";
-import type { ColorTable } from "../../components/ColorTableTypes";
+import type { ColorMapFunction } from "../../components/ColorMapFunction";
 import WellLogInfoPanel from "../../components/WellLogInfoPanel";
 import WellLogViewWithScroller from "../../components/WellLogViewWithScroller";
 
@@ -11,7 +11,7 @@ import { CallbackManager } from "../../components/CallbackManager";
 import type {
     Template,
     TemplatePlot,
-    TemplatePlotTypes,
+    TemplatePlotType,
     TemplateTrack,
 } from "../../components/WellLogTemplateTypes";
 
@@ -47,12 +47,37 @@ const wellpick = {
     color: "Stratigraphy",
 };
 
-function getTemplatePlotColorTable(
+const exampleColorMapFunctions: ColorMapFunction[] = [
+    // copy color tables and add some color functions
+    ...(colorTables as ColorMapFunction[]),
+    {
+        name: "Grey scale",
+        func: (v: number) => [v * 255, v * 255, v * 255],
+    },
+    {
+        name: "Red scale",
+        func: (v: number) => [v * 255, 0, 0],
+    },
+    {
+        name: "Green scale",
+        func: (v: number) => [0, v * 255, 0],
+    },
+    {
+        name: "Blue scale",
+        func: (v: number) => [0, 0, v * 255],
+    },
+    {
+        name: "Step func",
+        func: (v: number) => (v < 0.5 ? [255, 0, 0] : [0, 255, 255]),
+    },
+];
+
+function getTemplatePlotColorFunctionName(
     template: Template,
     templatePlot: TemplatePlot
-) {
-    let colorTable = templatePlot.colorTable;
-    if (!colorTable && templatePlot.style) {
+): string | undefined {
+    let colorMapFunctionName = templatePlot.colorMapFunctionName;
+    if (!colorMapFunctionName && templatePlot.style) {
         const templateStyles = template.styles;
         if (templateStyles) {
             const iStyle = indexOfElementByName(
@@ -61,11 +86,11 @@ function getTemplatePlotColorTable(
             );
             if (iStyle >= 0) {
                 const style = templateStyles[iStyle];
-                colorTable = style.colorTable;
+                colorMapFunctionName = style.colorMapFunctionName;
             }
         }
     }
-    return colorTable;
+    return colorMapFunctionName;
 }
 
 interface State {
@@ -95,10 +120,7 @@ function findLog(template: Template, logName: string): number {
     );
 }
 
-function detectType(
-    wellLogSet: WellLogSet,
-    logName: string
-): TemplatePlotTypes {
+function detectType(wellLogSet: WellLogSet, logName: string): TemplatePlotType {
     if (wellLogSet) {
         const meta = getDiscreteMeta(wellLogSet, logName); // non-standard extention of WellLog JSON file
         if (meta) return "stacked";
@@ -112,7 +134,7 @@ function addTemplateTrack(
     logName: string
 ): Template {
     // add missed TemplateTrack for the given logName
-    const type: TemplatePlotTypes = detectType(wellLogSet, logName);
+    const type: TemplatePlotType = detectType(wellLogSet, logName);
     const templateNew = deepCopy(template);
     const templateTrack: TemplateTrack = {
         title: logName,
@@ -216,7 +238,7 @@ export class MapAndWellLogViewer extends React.Component<
                         wells_layer["logName"] !== templatePlot.name
                     ) {
                         wells_layer["logName"] = templatePlot.name;
-                        const colorTable = getTemplatePlotColorTable(
+                        const colorTable = getTemplatePlotColorFunctionName(
                             template,
                             templatePlot
                         );
@@ -237,7 +259,7 @@ export class MapAndWellLogViewer extends React.Component<
 
         // TODO: This event is broken within MapViewer, and MapMouseEvent is never given with a wellname. Might need to be fixed in a PR there
         if (event.wellname !== undefined) {
-            if (event.type == "click") {
+            if (event.type === "click") {
                 const iWell = findWellLogIndex(wellLogs, event.wellname);
                 this.setState((state: Readonly<State>) => {
                     let selection:
@@ -387,7 +409,7 @@ export class MapAndWellLogViewer extends React.Component<
                                     : undefined
                             }
                             template={template}
-                            colorTables={this.props.colorTables as ColorTable[]}
+                            colorMapFunctions={exampleColorMapFunctions}
                             // @aspentech: This issue needs to get sorted out, there seems to be a compatibility issue with the JSON file and the prop type
                             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                             // @ts-ignore

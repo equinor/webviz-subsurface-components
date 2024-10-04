@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import React, { Component } from "react";
-
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 
 import type { Track, GraphTrack } from "@equinor/videx-wellog";
 
@@ -201,7 +200,7 @@ export class SimpleMenu extends Component<Props, State> {
     }
 
     render(): JSX.Element {
-        if (this.props.type == "removePlots") {
+        if (this.props.type === "removePlots") {
             return (
                 <div className="local-menu">
                     <Menu
@@ -217,7 +216,7 @@ export class SimpleMenu extends Component<Props, State> {
                 </div>
             );
         }
-        if (this.props.type == "editPlots") {
+        if (this.props.type === "editPlots") {
             return (
                 <div className="local-menu">
                     <Menu
@@ -233,7 +232,7 @@ export class SimpleMenu extends Component<Props, State> {
                 </div>
             );
         }
-        if (this.props.type == "title") {
+        if (this.props.type === "title") {
             return (
                 <div className="local-menu">
                     <Menu
@@ -251,7 +250,7 @@ export class SimpleMenu extends Component<Props, State> {
             );
         }
 
-        // For this.props.type == "legends" or this.props.type == "container"
+        // For this.props.type === "legends" or this.props.type === "container"
 
         const track = this.props.track;
         const plots = (track as GraphTrack).plots;
@@ -308,15 +307,13 @@ export function editPlots(
     el.style.width = "10px";
     el.style.height = "13px";
     if (parent) parent.appendChild(el);
-    // eslint-disable-next-line react/no-deprecated
-    ReactDOM.render(
+    createRoot(el).render(
         <SimpleMenu
             type="editPlots"
             anchorEl={el}
             wellLogView={wellLogView}
             track={track}
-        />,
-        el
+        />
     );
 }
 
@@ -335,14 +332,12 @@ export function removePlots(
     el.style.width = "10px";
     el.style.height = "13px";
     if (parent) parent.appendChild(el);
-    // eslint-disable-next-line react/no-deprecated
-    ReactDOM.render(
+    createRoot(el).render(
         <SimpleMenu
             type="removePlots"
             anchorEl={el}
             wellLogView={wellLogView}
             track={track}
-        />,
-        el
+        />
     );
 }

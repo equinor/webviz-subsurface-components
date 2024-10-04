@@ -14,13 +14,15 @@ import defaultLayout from "./components/DefaultSyncLogViewerLayout";
 
 import type { WellLogSet } from "./components/WellLogTypes";
 import type { Template } from "./components/WellLogTemplateTypes";
-import type { ColorTable } from "./components/ColorTableTypes";
-import type { PatternsTable } from "./utils/pattern";
-
+import type { ColorMapFunction } from "./components/ColorMapFunction";
+import { ColorFunctionType } from "./components/CommonPropTypes";
+import type { PatternsTable, Pattern } from "./utils/pattern";
+import { PatternsTableType, PatternsType } from "./components/CommonPropTypes";
 import type {
     WellLogController,
     WellPickProps,
 } from "./components/WellLogView";
+import { WellPickPropsType } from "./components/WellLogView";
 
 import type WellLogView from "./components/WellLogView";
 import type {
@@ -60,6 +62,18 @@ export function isEqualArrays(
     return true;
 }
 
+export type WellDistances = {
+    units: string;
+    distances: (number | undefined)[];
+};
+export const WellDistancesType = PropTypes.shape({
+    units: PropTypes.string.isRequired,
+    distances:
+        PropTypes
+            .array /*Of(PropTypes.oneOfType([PropTypes.number, PropTypes.undefined])*/
+            .isRequired,
+});
+
 export interface SyncLogViewerProps {
     /**
      * An array of JSON well log objects. A synced well log is created per entry.
@@ -76,10 +90,12 @@ export interface SyncLogViewerProps {
      * Prop containing track templates data.
      */
     templates: Template[];
+
     /**
-     * Prop containing color table data.
+     * Prop containing color function/table array.
      */
-    colorTables: ColorTable[];
+    colorMapFunctions: ColorMapFunction[];
+
     /**
      * Set to true for default titles or to array of individial well log titles
      */
@@ -97,7 +113,7 @@ export interface SyncLogViewerProps {
     /**
      * Horizon to pattern index map
      */
-    patterns?: [string, number][];
+    patterns?: Pattern[];
 
     /**
      * Horizon names for wellpick flatting (pan and zoom)
@@ -111,10 +127,7 @@ export interface SyncLogViewerProps {
     /**
      * Distanses between wells to show on the spacers
      */
-    wellDistances?: {
-        units: string;
-        distances: (number | undefined)[];
-    };
+    wellDistances?: WellDistances;
 
     /**
      * Orientation of the track plots on the screen.
@@ -204,8 +217,8 @@ export const argTypesSyncLogViewerProp = {
     templates: {
         description: "Array of track template data.",
     },
-    colorTables: {
-        description: "Prop containing color table data.",
+    colorMapFunctions: {
+        description: "Prop containing color function/table data.",
     },
     wellpicks: {
         description: "Well Picks data array",
@@ -524,7 +537,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         logController: LogViewer,
         iFrom: number,
         iTo: number
-    ) {
+    ): void {
         this.callbackManagers[iWellLog].onInfo(x, logController, iFrom, iTo);
         // TODO: Fix this the next time the file is edited.
         // eslint-disable-next-line react/prop-types
@@ -539,7 +552,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         logController: LogViewer,
         iFrom: number,
         iTo: number
-    ) {
+    ): void {
         // Skip computations if no-one is listening to the result
         if (this.callbackManagers[iWellLog].onInfoFilledCallbacks.length < 1)
             return;
@@ -966,7 +979,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                 welllog={wellLog}
                 viewTitle={viewTitle}
                 template={template}
-                colorTables={this.props.colorTables}
+                colorMapFunctions={this.props.colorMapFunctions}
                 wellpick={this.props.wellpicks?.[index]}
                 patternsTable={this.props.patternsTable}
                 patterns={this.props.patterns}
@@ -1029,7 +1042,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                             : "",
                         value: this.props.wellDistances?.distances[prev],
                     }}
-                    colorTables={this.props.colorTables}
+                    colorMapFunctions={this.props.colorMapFunctions}
                     wellpicks={
                         this.props.wellpicks
                             ? [
@@ -1095,7 +1108,7 @@ function getWellLogCollectionsFromProps(props: SyncLogViewerProps) {
 }
 
 ///
-const WellLogViewOptions_propTypes = PropTypes.shape({
+export const WellLogViewOptionsTypes = PropTypes.shape({
     /**
      * The maximum zoom value
      */
@@ -1126,7 +1139,7 @@ const WellLogViewOptions_propTypes = PropTypes.shape({
     hideSelectionInterval: PropTypes.bool,
 });
 
-const InfoOptions_propTypes = PropTypes.shape({
+export const InfoOptionsTypes = PropTypes.shape({
     /**
      * Show not only visible tracks
      */
@@ -1164,23 +1177,23 @@ SyncLogViewer.propTypes = {
     templates: PropTypes.array.isRequired,
 
     /**
-     * Prop containing color table data
+     * Prop containing color function/table data
      */
-    colorTables: PropTypes.array.isRequired,
+    colorMapFunctions: PropTypes.arrayOf(ColorFunctionType).isRequired,
 
     /**
      * Well Picks data array
      */
-    wellpicks: PropTypes.array,
+    wellpicks: PropTypes.arrayOf(WellPickPropsType),
 
     /**
      * Patterns table
      */
-    patternsTable: PropTypes.object,
+    patternsTable: PatternsTableType,
     /**
      * Horizon to pattern index map
      */
-    patterns: PropTypes.array, // [string, number][];
+    patterns: PropTypes.arrayOf(PatternsType),
 
     /**
      * Horizon names for wellpick flatting (pan and zoom)
@@ -1188,7 +1201,7 @@ SyncLogViewer.propTypes = {
     wellpickFlatting: PropTypes.arrayOf(PropTypes.string),
 
     /**
-     * Set to true or to array of spaser widths if WellLogSpacers should be used
+     * Set to true or to array of spacer widths if WellLogSpacers should be used
      */
     spacers: PropTypes.oneOfType([
         PropTypes.bool,
@@ -1199,7 +1212,7 @@ SyncLogViewer.propTypes = {
     /**
      * Distanses between wells to show on the spacers
      */
-    wellDistances: PropTypes.object,
+    wellDistances: WellDistancesType,
 
     /**
      * Orientation of the track plots on the screen. Default is false
@@ -1214,12 +1227,12 @@ SyncLogViewer.propTypes = {
     /**
      * Log mnemonics for axes
      */
-    axisTitles: PropTypes.object,
+    axisTitles: PropTypes.object /*Of<Record<string, string>>*/,
 
     /**
      * Names for axes
      */
-    axisMnemos: PropTypes.object,
+    axisMnemos: PropTypes.object /*Of<Record<string, string>>*/,
 
     /**
      * The maximum zoom value
@@ -1253,12 +1266,12 @@ SyncLogViewer.propTypes = {
     /**
      * WellLogView additional options
      */
-    welllogOptions: WellLogViewOptions_propTypes /*PropTypes.object,*/,
+    welllogOptions: WellLogViewOptionsTypes,
 
     /**
      * Options for readout panel
      */
-    readoutOptions: InfoOptions_propTypes /*PropTypes.object,*/,
+    readoutOptions: InfoOptionsTypes,
 
     /**
      * Synchronize the first visible track number in views

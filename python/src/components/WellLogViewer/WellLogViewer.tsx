@@ -9,6 +9,9 @@ const WellLogViewerComponent = React.lazy(() =>
     }))
 );
 
+import type { ColorMapFunction } from "../components/ColorMapFunction";
+import type { WellPickProps } from "../components/WellLogView";
+
 // react-docgen / dash-generate-components/extract-meta.js does not properly parse
 // the imported WellLogViewerProps. Hence, we have to recreate them here.
 /**
@@ -52,9 +55,8 @@ type WellLogViewerProps = {
     /** Prop containing track template data */
     template: object;
 
-    /** Prop containing color table data */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    colorTables: any[]; // specify the exact type if known
+    /** Prop containing color function/table array */
+    colorMapFunctions: ColorMapFunction[];
 
     /** Orientation of the track plots on the screen. Default is false */
     horizontal?: boolean;
@@ -66,16 +68,16 @@ type WellLogViewerProps = {
     selection?: number[];
 
     /** Well picks data */
-    wellpick?: object;
+    wellpick?: WellPickProps;
 
     /** Primary axis id: " md", "tvd", "time"... */
     primaryAxis?: string;
 
     /** Log mnemonics for axes */
-    axisTitles?: object;
+    axisTitles?: Record<string, string>;
 
     /** Names for axes */
-    axisMnemos?: object;
+    axisMnemos?: Record<string, string[]>;
 
     /** Set to true for default titles or to array of individual well log titles */
     viewTitle?: boolean | string | object; // 'object' might be replaced by a specific type like ReactNode

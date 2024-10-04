@@ -5,6 +5,9 @@ import "jest-styled-components";
 import React from "react";
 import WellLogViewWithScroller from "./WellLogViewWithScroller";
 
+import type { ColorMapFunction } from "./ColorMapFunction";
+const exampleColorMapFunctions = colorTables as ColorMapFunction[];
+
 // TODO: Fix this the next time the file is edited.
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const wellLog = require("../../../../../example-data/L898MUD.json")[0];
@@ -26,7 +29,7 @@ describe("Test Well Log View Component with Scroller", () => {
             <WellLogViewWithScroller
                 welllog={wellLog}
                 template={template}
-                colorTables={colorTables}
+                colorMapFunctions={exampleColorMapFunctions}
                 primaryAxis={"md"}
                 axisTitles={{
                     md: "MD",

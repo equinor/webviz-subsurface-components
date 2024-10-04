@@ -13,7 +13,8 @@ const exampleWellLog = {
     curves: [],
     data: [],
 };
-const exampleColorTable = colorTables;
+import type { ColorMapFunction } from "./ColorMapFunction";
+const exampleColorMapFunctions = colorTables as ColorMapFunction[];
 
 window.ResizeObserver =
     window.ResizeObserver ||
@@ -34,7 +35,7 @@ describe("Test Well Log View Component", () => {
                     hideTrackTitle: true,
                 }}
                 template={exampleTemplate}
-                colorTables={exampleColorTable}
+                colorMapFunctions={exampleColorMapFunctions}
                 primaryAxis={"md"}
                 axisTitles={{
                     md: "MD",

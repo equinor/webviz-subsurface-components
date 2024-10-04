@@ -5,6 +5,7 @@ import "jest-styled-components";
 import React from "react";
 import WellLogViewer from "./WellLogViewer";
 import type { WellLogController } from "./components/WellLogView";
+import type { ColorMapFunction } from "./components/ColorMapFunction";
 import { axisMnemos, axisTitles } from "./utils/axes";
 
 // TODO: Fix this the next time the file is edited.
@@ -13,7 +14,7 @@ const exampleTemplate = require("../../../../example-data/welllog_template_1.jso
 // TODO: Fix this the next time the file is edited.
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const exampleWellLog = require("../../../../example-data/L898MUD.json")[0];
-const exampleColorTable = colorTables;
+const exampleColorMapFunctions = colorTables as ColorMapFunction[];
 
 window.ResizeObserver =
     window.ResizeObserver ||
@@ -34,7 +35,7 @@ describe("Test Well Log Viewer Component", () => {
                 }}
                 welllog={exampleWellLog}
                 template={exampleTemplate}
-                colorTables={exampleColorTable}
+                colorMapFunctions={exampleColorMapFunctions}
                 horizontal={true}
                 primaryAxis={"md"}
                 axisTitles={axisTitles}

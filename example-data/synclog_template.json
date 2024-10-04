@@ -133,7 +133,7 @@
         {
             "name": "HKL",
             "type": "gradientfill",
-            "colorTable": "Physics",
+            "colorFunction": "Physics",
             "color": "green"
         },
         {
