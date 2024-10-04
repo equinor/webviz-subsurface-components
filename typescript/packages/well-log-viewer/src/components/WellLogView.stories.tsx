@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 
 import WellLogView from "./WellLogView";
+import type { WellLogSet } from "./WellLogTypes";
 import type { WellLogViewProps } from "./WellLogView";
 import { argTypesWellLogViewProp } from "./WellLogView";
 import { colorTables } from "@emerson-eps/color-tables";
@@ -11,7 +12,7 @@ const exampleColorMapFunctions = colorTables as ColorMapFunction[];
 import L898MUD from "../../../../../example-data/L898MUD.json";
 import volve_logs from "../../../../../example-data/volve_logs.json";
 const wellLogDefault = L898MUD[0];
-const wellLogDiscrete = volve_logs[0];
+const wellLogDiscrete = volve_logs[0] as unknown as WellLogSet;
 // import type { WellLog } from "./WellLogTypes";
 
 const ComponentCode =
@@ -84,7 +85,7 @@ export const Discrete: StoryObj<typeof Template> = {
     args: {
         //id: "Well-Log-View-Discrete",
         horizontal: false,
-        welllog: wellLogDiscrete,
+        welllog: wellLogDiscrete as WellLogSet,
         // TODO: Fix this the next time the file is edited.
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         template: require("../../../../../example-data/welllog_template_2.json"),
