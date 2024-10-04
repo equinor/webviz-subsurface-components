@@ -988,14 +988,31 @@ type ViewControllerDerivedState = {
 };
 type ViewControllerFullState = ViewControllerState & ViewControllerDerivedState;
 
+/**
+ * The `ViewController` class manages the state and interactions for a 3D view.
+ * It handles the rendering, view state updates, and synchronization of multiple views.
+ *
+ * @classdesc This class is responsible for managing the state of a 3D view, including
+ *            camera settings, viewports, and interaction readiness. It provides methods
+ *            to set targets, get views, and handle view state changes.
+ */
 class ViewController {
+    /**
+     * Function to trigger a re-render.
+     */
     private rerender_: React.DispatchWithoutAction;
 
+    /**
+     * Derived state for interaction readiness and view state changes.
+     */
     private derivedState_: ViewControllerDerivedState = {
         readyForInteraction: false,
         viewStateChanged: false,
     };
 
+    /**
+     * Full state including camera settings, bounds, and deck size.
+     */
     private state_: ViewControllerFullState = {
         triggerHome: undefined,
         camera: undefined,
@@ -1013,10 +1030,28 @@ class ViewController {
         ...this.derivedState_,
     };
 
+    /**
+     * The current views being managed.
+     */
     private views_: ViewsType | undefined = undefined;
+
+    /**
+     * The result object containing views and view states.
+     */
     private result_: {
+        /**
+         * The views sent to DeckGL.
+         */
         views: View[];
+
+        /**
+         * The view states sent to DeckGL, where the vertical scale has been applied.
+         */
         deckglViewStates: Record<string, ViewStateType>;
+
+        /**
+         * The view states as known by the client code, without vertical scale.
+         */
         viewStates: Record<string, ViewStateType>;
     } = {
         views: [],
@@ -1024,13 +1059,17 @@ class ViewController {
         viewStates: {},
     };
 
+    /**
+     * Constructs a new instance of the Map component.
+     *
+     * @param rerender - A function to trigger a re-render of the component.
+     */
     public constructor(rerender: React.DispatchWithoutAction) {
         this.rerender_ = rerender;
     }
 
     /**
-     * Sets the target from picks, which comes from the displayed
-     * scaled data.
+     * Sets the target from picks, which comes from the displayed scaled data.
      * @param target scaled 3D point.
      */
     public readonly setScaledTarget = (target: Point3D) => {
@@ -1055,6 +1094,12 @@ class ViewController {
         }
     };
 
+    /**
+     * Retrieves the views and their corresponding view states to be sent to DeckGL.
+     * @param views - The requested views.
+     * @param state - The current state.
+     * @returns The new views and their corresponding view states.
+     */
     public readonly getViews = (
         views: ViewsType | undefined,
         state: ViewControllerState
@@ -1075,14 +1120,23 @@ class ViewController {
         return [newDeckglViews, newDeckglViewState];
     };
 
-    // consolidate "controlled" state (ie. set by parent) with "uncontrolled" state
+    /**
+     * Consolidates the controlled state (ie. set by parent) with the uncontrolled state.
+     * @param state - The current state.
+     * @returns The consolidated state.
+     */
     private readonly consolidateState = (
         state: ViewControllerState
     ): ViewControllerFullState => {
         return { ...state, ...this.derivedState_ };
     };
 
-    // returns the DeckGL views (ie. view position and viewport)
+    /**
+     * Returns the DeckGL views (ie. view position and viewport) based on the input views and current state.
+     * @param views - The requested views.
+     * @param state - The current state.
+     * @returns The DeckGL views.
+     */
     private readonly getDeckGlViews = (
         views: ViewsType | undefined,
         state: ViewControllerFullState
@@ -1101,7 +1155,7 @@ class ViewController {
      * based on the input views and current state.
      * @param views requested views.
      * @param state current state.
-     * @returns
+     * @returns The DeckGL view states and the corresponding view states in user space.
      */
     private readonly getDeckGlAndUserViewStates = (
         views: ViewsType | undefined,
@@ -1179,6 +1233,12 @@ class ViewController {
         return [deckglViewStates, viewStates];
     };
 
+    /**
+     * Handles changes to the view state.
+     * @param viewId - The ID of the view.
+     * @param viewState - The new view state.
+     * @param getCameraPosition - A function to get the camera position.
+     */
     public readonly onViewStateChange = (
         viewId: string,
         viewState: ViewStateType,
