@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import _ from "lodash";
 import React from "react";
 
 import WellLogViewer, {
@@ -8,10 +7,7 @@ import WellLogViewer, {
 } from "./WellLogViewer";
 
 import type { Info } from "./components/InfoTypes";
-import type {
-    Template,
-    TemplateTrack,
-} from "./components/WellLogTemplateTypes";
+import type { Template } from "./components/WellLogTemplateTypes";
 import type { WellLogSet } from "./components/WellLogTypes";
 import type WellLogView from "./components/WellLogView";
 import type {
@@ -256,7 +252,7 @@ export const Horizontal: StoryObj<typeof StoryTemplate> = {
         horizontal: true,
         welllog:
             require("../../../../example-data/WL_RAW_AAC-BHPR-CAL-DEN-GR-MECH-NEU-NMR-REMP_MWD_3.json")[0], // eslint-disable-line
-        template: require("../../../../example-data/welllog_template_2.json"), // eslint-disable-line
+        template: template,
         colorTables: colorTables,
         // @ts-expect-error TS2322
         wellpick: wellpick,
@@ -280,7 +276,7 @@ export const OnInfoFilledEvent: StoryObj<typeof StoryTemplate> = {
         horizontal: true,
         welllog:
             require("../../../../example-data/WL_RAW_AAC-BHPR-CAL-DEN-GR-MECH-NEU-NMR-REMP_MWD_3.json")[0], // eslint-disable-line
-        template: require("../../../../example-data/welllog_template_2.json"), // eslint-disable-line
+        template: template,
 
         colorTables: colorTables,
         // @ts-expect-error TS2322
@@ -387,7 +383,7 @@ export const Discrete: StoryObj<typeof StoryTemplate> = {
         id: "Well-Log-Viewer-Discrete",
         horizontal: false,
         welllog: require("../../../../example-data/volve_logs.json")[0], // eslint-disable-line
-        template: require("../../../../example-data/welllog_template_2.json"), // eslint-disable-line
+        template: template,
         colorTables: colorTables,
         // @ts-expect-error TS2322
         wellpick: wellpick,
@@ -405,12 +401,53 @@ export const Discrete: StoryObj<typeof StoryTemplate> = {
     render: (args) => <StoryTemplate {...args} />,
 };
 
-export const MultipleWellLog: StoryObj<typeof StoryTemplate> = {
+export const LogWithDifferentSets: StoryObj<typeof StoryTemplate> = {
     args: {
-        id: "Well-Log-Viewer-Discrete",
-        horizontal: false,
-        welllog: [
-            wellLogs[0],
+        id: "Log-With-Different-Sets",
+        wellLogSets: [
+            {
+                header: wellLogs[0].header,
+                curves: [
+                    {
+                        name: "MD",
+                        description: "continuous",
+                        quantity: "m",
+                        unit: "m",
+                        valueType: "float",
+                        dimensions: 1,
+                    },
+                    {
+                        name: "PORO",
+                        description: "continuous",
+                        quantity: "",
+                        unit: "",
+                        valueType: "float",
+                        dimensions: 1,
+                    },
+                ],
+
+                data: [
+                    [3700, 45],
+                    [3725, 78],
+                    [3750, 12],
+                    [3775, 34],
+                    [3800, 89],
+                    [3825, 67],
+                    [3850, 90],
+                    [3875, 11],
+                    [3900, 78],
+                    [3925, 34],
+                    [3950, 56],
+                    [3975, 89],
+                    [4000, 67],
+                    [4025, 11],
+                    [4050, 45],
+                    [4075, 78],
+                    [4100, 34],
+                    [4125, 89],
+                ],
+            },
+
             {
                 // Sharing the discrete config across all logs for simplicity
                 metadata_discrete: {
@@ -437,6 +474,7 @@ export const MultipleWellLog: StoryObj<typeof StoryTemplate> = {
                         valueType: "float",
                         dimensions: 1,
                     },
+
                     {
                         name: "FLAG_EXAMPLE",
                         description: "discrete with different sampling",
@@ -445,30 +483,54 @@ export const MultipleWellLog: StoryObj<typeof StoryTemplate> = {
                         valueType: "integer",
                         dimensions: 1,
                     },
+
+                    {
+                        name: "BAD_CONT",
+                        description:
+                            "A continuous curve with a really bad sampling rate",
+                        quantity: "m",
+                        unit: "m",
+                        valueType: "integer",
+                        dimensions: 1,
+                    },
                 ],
                 data: [
-                    [3800, null],
-                    [3870, 0],
-                    [4000, 1],
+                    [3800, null, 2],
+                    [3870, 0, 2.4],
+                    [4000, 1, 0.4],
                 ],
             },
         ],
 
-        template: _.assign({}, template, {
+        template: {
+            name: "aaa",
+            scale: { primary: "md" },
             tracks: [
                 {
+                    title: "Discrete, from set 1",
                     plots: [
                         {
                             name: "FLAG_EXAMPLE",
                             type: "stacked",
+                            color: "",
                         },
                     ],
                 },
-                template.tracks[1],
-            ] as TemplateTrack[],
-        }),
-        colorTables: colorTables,
-        wellpick: undefined,
+
+                {
+                    title: "Continuous, from both sets",
+                    plots: [
+                        { name: "PORO", type: "line", color: "red" },
+                        { name: "BAD_CONT", type: "line", color: "blue" },
+                    ],
+                },
+
+                {
+                    title: "Continuous, from set 2",
+                    plots: [{ name: "PORO", type: "line", color: "red" }],
+                },
+            ],
+        },
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
         viewTitle: true, // show default well log view title (a wellname from the well log)
