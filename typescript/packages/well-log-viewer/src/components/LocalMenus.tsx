@@ -44,7 +44,7 @@ function getPlotTitle(plot: Plot, wellLog: WellLogSet[]): string {
 
     if (!title) {
         // Extract the title from the well log
-        title = getCurveFromVidexPlotId(wellLog, plot.id as string).name;
+        title = getCurveFromVidexPlotId(wellLog, plot.id as string)?.name ?? "";
     }
     return title;
 }
