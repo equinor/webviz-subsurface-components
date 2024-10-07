@@ -287,28 +287,16 @@ export default class WellLogViewer extends Component<
     }
 
     render(): JSX.Element {
+        // Copy and pass all props to view-component, expect primary-axis
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { primaryAxis: _, ...otherProps } = this.props;
+
         return (
             <WellLogLayout
                 parent={this}
                 center={
                     <WellLogViewWithScroller
-                        /* just copy all props without primaryAxis */
-                        welllog={this.props.welllog}
-                        wellLogSets={this.props.wellLogSets}
-                        viewTitle={this.props.viewTitle}
-                        template={this.props.template}
-                        colorMapFunctions={this.props.colorMapFunctions}
-                        wellpick={this.props.wellpick}
-                        patternsTable={this.props.patternsTable}
-                        patterns={this.props.patterns}
-                        horizontal={this.props.horizontal}
-                        axisTitles={this.props.axisTitles}
-                        axisMnemos={this.props.axisMnemos}
-                        domain={this.props.domain}
-                        selection={this.props.selection}
-                        options={this.props.options}
-                        /* end of copy props */
-
+                        {...otherProps}
                         primaryAxis={this.state.primaryAxis}
                         // callbacks
                         onInfo={this.onInfo}
