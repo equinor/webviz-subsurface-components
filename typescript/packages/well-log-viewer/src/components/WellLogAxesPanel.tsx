@@ -4,8 +4,8 @@ import AxisSelector from "./AxisSelector";
 
 import { getAvailableAxes } from "../utils/tracks";
 
-import type { WellLog } from "./WellLogTypes";
 import type { CallbackManager } from "./CallbackManager";
+import type { WellLogSet } from "./WellLogTypes";
 
 interface Props {
     callbackManager: CallbackManager;
@@ -31,27 +31,21 @@ interface Props {
     autoHide?: boolean;
 }
 interface State {
-    axes: string[]; // axes available in welllog
+    axes: string[]; // axes available in well log
     primaryAxis: string;
 }
 
 export class WellLogAxesPanel extends Component<Props, State> {
-    welllog: WellLog | undefined;
+    wellLogSets: WellLogSet[] | undefined;
 
     constructor(props: Props) {
         super(props);
 
-        // TODO: Fix this the next time the file is edited.
-        // eslint-disable-next-line react/prop-types
-        this.welllog = this.props.callbackManager.welllog();
-        // TODO: Fix this the next time the file is edited.
-        // eslint-disable-next-line react/prop-types
-        const axes = getAvailableAxes(this.welllog, this.props.axisMnemos);
+        this.wellLogSets = this.props.callbackManager.getWellLogSets() ?? [];
+        const axes = getAvailableAxes(this.wellLogSets, this.props.axisMnemos);
 
         this.state = {
             axes: axes,
-            // TODO: Fix this the next time the file is edited.
-            // eslint-disable-next-line react/prop-types
             primaryAxis: this.props.primaryAxis,
         };
 
@@ -72,42 +66,29 @@ export class WellLogAxesPanel extends Component<Props, State> {
     }
 
     componentDidMount(): void {
-        // TODO: Fix this the next time the file is edited.
-        // eslint-disable-next-line react/prop-types
         this.registerCallbacks(this.props.callbackManager);
     }
 
     componentWillUnmount(): void {
-        // TODO: Fix this the next time the file is edited.
-        // eslint-disable-next-line react/prop-types
         this.unregisterCallbacks(this.props.callbackManager);
     }
 
     componentDidUpdate(prevProps: Props): void {
-        // TODO: Fix this the next time the file is edited.
-        // eslint-disable-next-line react/prop-types
         if (prevProps.callbackManager !== this.props.callbackManager) {
-            // TODO: Fix this the next time the file is edited.
-            // eslint-disable-next-line react/prop-types
             this.unregisterCallbacks(prevProps.callbackManager);
-            // TODO: Fix this the next time the file is edited.
-            // eslint-disable-next-line react/prop-types
             this.registerCallbacks(this.props.callbackManager);
         }
 
-        // TODO: Fix this the next time the file is edited.
-        // eslint-disable-next-line react/prop-types
-        const wellog = this.props.callbackManager?.welllog();
+        const wellog = this.props.callbackManager?.getWellLogSets();
         if (
-            this.welllog !== wellog ||
-            // TODO: Fix this the next time the file is edited.
-            // eslint-disable-next-line react/prop-types
+            this.wellLogSets !== wellog ||
             prevProps.axisMnemos !== this.props.axisMnemos
         ) {
-            this.welllog = wellog;
-            // TODO: Fix this the next time the file is edited.
-            // eslint-disable-next-line react/prop-types
-            const axes = getAvailableAxes(this.welllog, this.props.axisMnemos);
+            this.wellLogSets = wellog;
+            const axes = getAvailableAxes(
+                this.wellLogSets ?? [],
+                this.props.axisMnemos
+            );
             this.setState({
                 axes: axes,
             });
@@ -122,21 +103,13 @@ export class WellLogAxesPanel extends Component<Props, State> {
         return (
             <div className="axes-selector">
                 <AxisSelector
-                    // TODO: Fix this the next time the file is edited.
-                    // eslint-disable-next-line react/prop-types
                     header={this.props.header}
                     axes={this.state.axes}
                     value={this.state.primaryAxis}
-                    // TODO: Fix this the next time the file is edited.
-                    // eslint-disable-next-line react/prop-types
                     axisTitles={this.props.axisTitles}
                     onChange={(value: string) =>
-                        // TODO: Fix this the next time the file is edited.
-                        // eslint-disable-next-line react/prop-types
                         this.props.onChangePrimaryAxis(value)
                     }
-                    // TODO: Fix this the next time the file is edited.
-                    // eslint-disable-next-line react/prop-types
                     autoHide={this.props.autoHide}
                 />
             </div>

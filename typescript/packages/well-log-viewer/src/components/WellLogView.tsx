@@ -25,7 +25,8 @@ import { validateSchema } from "@webviz/wsc-common";
 
 import { select } from "d3";
 
-import type { WellLog, WellLogCurve } from "./WellLogTypes";
+import type { WellLogCurve, WellLogSet } from "./WellLogTypes";
+
 import type { Template } from "./WellLogTemplateTypes";
 import { TemplateType } from "./CommonPropTypes";
 import type { ColorMapFunction } from "./ColorMapFunction";
@@ -69,6 +70,9 @@ import {
     getSelectedTrackIndices,
     setSelectedTrackIndices,
 } from "../utils/log-viewer";
+
+import type { Info } from "./InfoTypes";
+import { getWellLogSetsFromProps } from "../utils/well-log";
 
 const rubberBandSize = 9;
 const rubberBandOffset = rubberBandSize / 2;
@@ -310,7 +314,7 @@ function addPinnedValueOverlay(instance: LogViewer, parent: WellLogView) {
 }
 
 export interface WellPickProps {
-    wellpick: WellLog; // JSON Log Format
+    wellpick: WellLogSet; // JSON Log Format
     name: string; //  "HORIZON"
     md?: string; //  Log mnemonics for depth log. default is "MD"
     /**
@@ -729,12 +733,12 @@ function createScaleInterpolator(
 function setTracksToController(
     logController: LogViewer,
     axes: AxesInfo,
-    welllog: WellLog | undefined, // JSON Log Format
+    wellLogSets: WellLogSet[], // JSON Log Format
     template: Template, // JSON
     colorMapFunctions: ColorMapFunction[] // JS code array or JSON file for pure color tables array without color functions elements
 ): ScaleInterpolator {
     const { tracks, minmaxPrimaryAxis, primaries, secondaries } = createTracks(
-        welllog,
+        wellLogSets,
         axes,
         template.tracks,
         template.styles,
@@ -954,7 +958,7 @@ export interface WellLogController {
     setTemplate(template: Template): void;
     getTemplate(): Template;
 
-    getWellLog(): WellLog | undefined;
+    getWellLog(): WellLogSet[] | WellLogSet | undefined;
 
     setControllerDefaultZoom(): void; // utility function
 }
@@ -991,8 +995,6 @@ export function setContentScale(
         controller.zoomContent(zoom);
     }
 }
-
-import type { Info } from "./InfoTypes";
 
 export interface WellLogViewOptions {
     /**
@@ -1036,9 +1038,16 @@ export interface WellLogViewOptions {
 
 export interface WellLogViewProps {
     /**
-     * Object from JSON file describing single well log data.
+     * Object from JSON file describing one or more sets of well log data.
+     * @deprecated Use `wellLogSets` instead
      */
-    welllog: WellLog | undefined;
+    welllog?: WellLogSet[] | WellLogSet;
+
+    /**
+     * Array from JSON file; describes a series of well log data sets.
+     * Assumes each set is for the same well. (For differing wells, use SyncLogViewer instead)
+     */
+    wellLogSets?: WellLogSet[];
 
     /**
      * Prop containing track template data.
@@ -1086,7 +1095,7 @@ export interface WellLogViewProps {
     axisMnemos: Record<string, string[]>;
 
     /**
-     * The view title. Set desired string or react element or true for default value from welllog file
+     * The view title. Set desired string or react element or true for default value from well log file
      */
     viewTitle?: boolean | string | JSX.Element;
 
@@ -1146,7 +1155,12 @@ export const argTypesWellLogViewProp = {
         description: "Orientation of the track plots on the screen.", // defaultValue: false
     },
     welllog: {
-        description: "JSON object describing well log data.",
+        description:
+            "JSON object describing well log data.\n<i>Depreacted — Use <b>wellLogSets</b> instead.</i>",
+    },
+    wellLogSets: {
+        description:
+            "Array from JSON file; describes a series of well log data sets. Assumes each set is for the same well. (For differing wells, use SyncLogViewer instead)",
     },
     template: {
         description: "Prop containing track template data.",
@@ -1182,7 +1196,7 @@ export const argTypesWellLogViewProp = {
     },
     viewTitle: {
         description:
-            "The view title. Set desired string or react element or true for default value from welllog file",
+            "The view title. Set desired string or react element or true for default value from well log file",
     },
     options: {
         description:
@@ -1203,6 +1217,7 @@ export function shouldUpdateWellLogView(
     // Props could contain some unknown object key:value so we should ignore they
     // so compare only known key:values
     if (props.horizontal !== nextProps.horizontal) return true;
+    if (props.wellLogSets !== nextProps.wellLogSets) return true;
     if (props.welllog !== nextProps.welllog) return true;
     if (props.template !== nextProps.template) return true;
     if (props.colorMapFunctions !== nextProps.colorMapFunctions) return true;
@@ -1263,6 +1278,7 @@ class WellLogView
 {
     public static propTypes: Record<string, unknown>;
 
+    wellLogSets: WellLogSet[];
     container?: HTMLElement;
     resizeObserver: ResizeObserver;
 
@@ -1281,6 +1297,9 @@ class WellLogView
 
     constructor(props: WellLogViewProps) {
         super(props);
+
+        this.wellLogSets = getWellLogSetsFromProps(props);
+
         this.container = undefined;
         this.logController = undefined;
         this.selCurrent = undefined;
@@ -1381,6 +1400,7 @@ class WellLogView
 
         if (
             this.props.welllog !== prevProps.welllog ||
+            this.props.wellLogSets !== prevProps.wellLogSets ||
             this.props.options?.checkDatafileSchema !==
                 prevProps.options?.checkDatafileSchema
         ) {
@@ -1388,6 +1408,7 @@ class WellLogView
             selectedTrackIndices = this.getSelectedTrackIndices();
             shouldSetTracks = true;
             checkSchema = true;
+            this.wellLogSets = getWellLogSetsFromProps(this.props);
         }
         if (this.props.template !== prevProps.template) {
             if (this.props.template)
@@ -1492,11 +1513,8 @@ class WellLogView
         this.updateInfo();
     }
     getAxesInfo(): AxesInfo {
-        // get Object keys available in the welllog
-        const axes = getAvailableAxes(
-            this.props.welllog,
-            this.props.axisMnemos
-        );
+        // get Object keys available in the well log
+        const axes = getAvailableAxes(this.wellLogSets, this.props.axisMnemos);
         const primaryAxisIndex = axes.findIndex(
             (value: string) => value === this.props.primaryAxis
         );
@@ -1522,7 +1540,9 @@ class WellLogView
             try {
                 validateSchema(this.template, "WellLogTemplate");
                 if (this.props.options?.checkDatafileSchema) {
-                    validateSchema(this.props.welllog, "WellLog");
+                    this.wellLogSets.forEach((wellLogSet) =>
+                        validateSchema(wellLogSet, "WellLog")
+                    );
                 }
             } catch (e) {
                 this.setState({ errorText: String(e) });
@@ -1534,7 +1554,7 @@ class WellLogView
             this.scaleInterpolator = setTracksToController(
                 this.logController,
                 axes,
-                this.props.welllog,
+                this.wellLogSets,
                 this.template,
                 this.props.colorMapFunctions
             );
@@ -1800,8 +1820,15 @@ class WellLogView
         this.setInfo(); // reflect new value in this.selCurrent
     }
 
-    getWellLog(): WellLog | undefined {
-        return this.props.welllog;
+    /**
+     * @deprecated Use getWellLogSets instead
+     */
+    getWellLog(): WellLogSet[] | WellLogSet | undefined {
+        return this.props.wellLogSets ?? this.props.welllog;
+    }
+
+    getWellLogSets(): WellLogSet[] | WellLogSet | undefined {
+        return this.props.wellLogSets ?? this.props.welllog;
     }
 
     getTemplate(): Template {
@@ -1827,10 +1854,7 @@ class WellLogView
                 tracks.push(deepCopy(templateTrack));
             }
         }
-        const axes = getAvailableAxes(
-            this.props.welllog,
-            this.props.axisMnemos
-        );
+        const axes = getAvailableAxes(this.wellLogSets, this.props.axisMnemos);
         return {
             name: template.name,
             scale: {
@@ -2026,7 +2050,7 @@ class WellLogView
         viewTitle: string | boolean | JSX.Element //| undefined
     ): ReactNode {
         if (typeof viewTitle === "object" /*react element*/) return viewTitle;
-        if (viewTitle === true) return this.props.welllog?.header.well;
+        if (viewTitle === true) return this.wellLogSets[0]?.header.well;
         return viewTitle; // string
     }
 
@@ -2112,7 +2136,13 @@ export function _propTypesWellLogView(): Record<string, unknown> {
         /**
          * An object from JSON file describing well log data
          */
-        welllog: PropTypes.object /*Of<WellLog>*/,
+        welllog: PropTypes.oneOfType([PropTypes.object, PropTypes.array]), //.isRequired,
+
+        /**
+         * Array from JSON file; describes a series of well log data sets.
+         * Assumes each set is for the same well. (For differing wells, use SyncLogViewer instead)
+         */
+        wellLogSets: PropTypes.arrayOf(PropTypes.object),
 
         /**
          * Prop containing track template data

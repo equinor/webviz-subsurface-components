@@ -2,18 +2,25 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 
-import type { ColorMapFunction } from "./components/ColorMapFunction";
-import { colorTables } from "@emerson-eps/color-tables";
-const exampleColorMapFunctions = colorTables as ColorMapFunction[];
-import wellpickColorTables from "../../../../example-data/wellpick_colors.json";
-const wellpickColorMapFunctions = wellpickColorTables as ColorMapFunction[];
-import wellpicks from "../../../../example-data/wellpicks.json";
-
 import { ToggleButton } from "@mui/material";
+import { colorTables } from "@emerson-eps/color-tables";
+import type { ColorMapFunction } from "./components/ColorMapFunction";
+
+import wellpicksJson from "../../../../example-data/wellpicks.json";
+import wellpickColorTablesJson from "../../../../example-data/wellpick_colors.json";
+
+const exampleColorMapFunctions = colorTables as ColorMapFunction[];
+const wellpickColorMapFunctions = wellpickColorTablesJson as ColorMapFunction[];
+// const wellpickColorTable = wellpickColorTableJson as unknown as ColorMapFunction[];
+const wellpicks = wellpicksJson as unknown as WellLogSet[];
+// const exampleColorTable = colorTables as unknown as ColorMapFunction[];
+
+import horizonPatternsJson from "../../../../example-data/horizon_patterns.json";
 
 import SyncLogViewer, { argTypesSyncLogViewerProp } from "./SyncLogViewer";
 import type { SyncLogViewerProps } from "./SyncLogViewer";
 import type WellLogView from "./components/WellLogView";
+
 import type {
     WellLogController,
     TrackMouseEvent,
@@ -38,7 +45,6 @@ const ComponentCode =
     "    colorMapFunctions={colorMapFunctions} \r\n" +
     "/>";
 
-import type { WellLog } from "./components/WellLogTypes";
 import { axisMnemos, axisTitles } from "./utils/axes";
 
 const stories: Meta = {
@@ -123,7 +129,7 @@ const stories: Meta = {
         },
         viewTitles: {
             description:
-                "The view title. Set desired string or react element or true for default value from welllog file",
+                "The view title. Set desired string or react element or true for default value from well log file",
         },
         layout: {
             description:
@@ -172,15 +178,13 @@ const Template = (args: SyncLogViewerProps) => {
     ); // all WellLogs
 
     const onCreateController = React.useCallback(
-        // @ts-expect-error TS6133
-        (iWellLog: number, controller: WellLogController): void => {
+        (_iWellLog: number, controller: WellLogController): void => {
             setControllers((prev) => [...prev, controller]);
         },
         []
     );
     const onDeleteController = React.useCallback(
-        // @ts-expect-error TS6133
-        (iWellLog: number, controller: WellLogController): void => {
+        (_iWellLog: number, controller: WellLogController): void => {
             setControllers((prev) => prev.filter((c) => c !== controller));
         },
         []
@@ -208,10 +212,8 @@ const Template = (args: SyncLogViewerProps) => {
     };
     /* eslint-disable */ // no-unused-vars
     function onTrackMouseEventCustom(
-        // @ts-expect-error TS6133
-        wellLogView: WellLogView,
-        // @ts-expect-error TS6133
-        ev: TrackMouseEvent
+        _wellLogView: WellLogView,
+        _ev: TrackMouseEvent
     ): void {
         //custom function to disable the context menu
     }
@@ -410,7 +412,8 @@ export const Default: StoryObj<typeof Template> = {
             patternImages: patternImages,
             patternNames: patternNamesEnglish,
         },
-        patterns: require("../../../../example-data/horizon_patterns.json"), // eslint-disable-line
+        // @ts-expect-error Can't be bothered to fix this
+        patterns: horizonPatternsJson,
 
         wellpickFlatting: ["Hor_2", "Hor_4"],
 
@@ -423,7 +426,7 @@ export const Default: StoryObj<typeof Template> = {
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
 
-        viewTitles: true, // show default welllog view titles (a wellname from the welllog)
+        viewTitles: true, // show default well log view titles (a wellname from the well log)
 
         welllogOptions: {
             wellpickColorFill: true,
@@ -444,13 +447,17 @@ import WellLogZoomSlider from "./components/WellLogZoomSlider";
 import WellLogScaleSelector from "./components/WellLogScaleSelector";
 import WellInfoIcon from "@mui/icons-material/FormatListBulleted"; // WaterDrop ShowChart, SearchSharp
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import type { WellLogSet } from "./components/WellLogTypes";
 
 const iconStyle = {
     fontSize: "18px",
     verticalAlign: "middle",
     paddingRight: "4px",
 };
+
+// ? What does this custom layout thing do?
 export const CustomLayout = Template.bind({});
+
 // @ts-expect-error TS2339
 CustomLayout.args = {
     ...Default.args,
@@ -471,7 +478,7 @@ CustomLayout.args = {
                         callbackManager={parent.callbackManagers[0]}
                     />
                 </div>
-                {parent.props.welllogs?.map((welllog, iWellLog) => (
+                {parent.wellLogCollections?.map((wellLog, iWellLog) => (
                     <WellLogInfoPanel
                         key={iWellLog}
                         header={
@@ -479,7 +486,7 @@ CustomLayout.args = {
                                 <span style={iconStyle}>
                                     <WellInfoIcon fontSize="inherit" />
                                 </span>
-                                <i>{welllog.header.well}</i>
+                                <i>{wellLog[0]?.header.well}</i>
                             </>
                         }
                         readoutOptions={parent.props.readoutOptions}
@@ -535,6 +542,8 @@ CustomLayout.parameters = {
 Default.tags = ["no-screenshot-test"];
 
 const TemplateWithSelection = (args: SyncLogViewerProps) => {
+    const { welllogs = [], ...restOfArgs } = args;
+
     const [showWell1, setShowWell1] = React.useState(true);
     const [showWell2, setShowWell2] = React.useState(true);
     const [showWell3, setShowWell3] = React.useState(true);
@@ -544,24 +553,23 @@ const TemplateWithSelection = (args: SyncLogViewerProps) => {
     ); // all WellLogs
 
     const onCreateController = React.useCallback(
-        // @ts-expect-error TS6133
-        (iWellLog: number, controller: WellLogController) => {
+        (_iWellLog: number, controller: WellLogController) => {
             setControllers((prev) => [...prev, controller]);
         },
         []
     );
     const onDeleteController = React.useCallback(
-        // @ts-expect-error TS6133
-        (iWellLog: number, controller: WellLogController) => {
+        (_iWellLog: number, controller: WellLogController) => {
             setControllers((prev) => prev.filter((c) => c !== controller));
         },
         []
     );
 
-    const filtered: WellLog[] = [];
-    if (showWell1 && args.welllogs[0]) filtered.push(args.welllogs[0]);
-    if (showWell2 && args.welllogs[1]) filtered.push(args.welllogs[1]);
-    if (showWell3 && args.welllogs[2]) filtered.push(args.welllogs[2]);
+    const filtered: (WellLogSet[] | WellLogSet)[] = [];
+
+    if (showWell1 && welllogs[0]) filtered.push(welllogs[0]);
+    if (showWell2 && welllogs[1]) filtered.push(welllogs[1]);
+    if (showWell3 && welllogs[2]) filtered.push(welllogs[2]);
 
     const handleClick = function (): void {
         for (const ctrl of controllers) {
@@ -569,8 +577,8 @@ const TemplateWithSelection = (args: SyncLogViewerProps) => {
         }
     };
 
-    const argsWithSelection = {
-        ...args,
+    const argsWithSelection: SyncLogViewerProps = {
+        ...restOfArgs,
         welllogs: filtered,
     };
 
@@ -581,9 +589,9 @@ const TemplateWithSelection = (args: SyncLogViewerProps) => {
             <div style={{ flexDirection: "row" }}>
                 <ToggleButton
                     value="check"
-                    selected={showWell1 && !!args.welllogs[0]}
+                    selected={showWell1 && !!welllogs[0]}
                     onChange={(): void => {
-                        if (!args.welllogs[1]) alert("No args.welllogs[0]");
+                        if (!welllogs[1]) alert("No args.welllogs[0]");
                         setShowWell1(!showWell1);
                     }}
                 >
@@ -591,9 +599,9 @@ const TemplateWithSelection = (args: SyncLogViewerProps) => {
                 </ToggleButton>
                 <ToggleButton
                     value="check"
-                    selected={showWell2 && !!args.welllogs[1]}
+                    selected={showWell2 && !!welllogs[1]}
                     onChange={(): void => {
-                        if (!args.welllogs[1]) alert("No args.welllogs[1]");
+                        if (!welllogs[1]) alert("No args.welllogs[1]");
                         setShowWell2(!showWell2);
                     }}
                 >
@@ -601,9 +609,9 @@ const TemplateWithSelection = (args: SyncLogViewerProps) => {
                 </ToggleButton>
                 <ToggleButton
                     value="check"
-                    selected={showWell3 && !!args.welllogs[2]}
+                    selected={showWell3 && !!welllogs[2]}
                     onChange={(): void => {
-                        if (!args.welllogs[2]) alert("No args.welllogs[2]");
+                        if (!welllogs[2]) alert("No args.welllogs[2]");
                         setShowWell3(!showWell3);
                     }}
                 >
@@ -631,4 +639,157 @@ const args = require("../../../../example-data/facies3wells.json");
 export const DiscreteLogs: StoryObj<typeof TemplateWithSelection> = {
     args: args,
     render: (args) => <TemplateWithSelection {...args} />,
+};
+
+import syncTemplateJson from "../../../../example-data/synclog_template.json";
+import L898MUDJson from "../../../../example-data/L898MUD.json";
+import L916MUDJson from "../../../../example-data/L916MUD.json";
+import type { Template as TemplateType } from "./components/WellLogTemplateTypes";
+
+const verySimpleTemplate: TemplateType = {
+    name: "Something simple",
+    scale: syncTemplateJson.scale,
+    tracks: [
+        {
+            title: "MDOA + BAD_CONT",
+            plots: [
+                {
+                    name: "MDOA",
+                    type: "line",
+                    color: "green",
+                },
+                {
+                    name: "BAD_CONT",
+                    color: "blue",
+                    type: "area",
+                },
+            ],
+        },
+
+        {
+            title: "",
+            plots: [
+                {
+                    name: "FLAG_EXAMPLE",
+                    color: "red",
+                    type: "stacked",
+                },
+            ],
+        },
+    ],
+};
+
+export const LogsWithDifferentSets: StoryObj<typeof Template> = {
+    render: (args) => <Template {...args} />,
+    parameters: {
+        docs: {
+            description: {
+                story: "An example of two synced well logs, each including a second log with a different sampling rate",
+            },
+        },
+    },
+    args: {
+        axisTitles: {
+            md: "MD",
+            tvd: "TVD",
+            time: "TIME",
+        },
+        axisMnemos: axisMnemos,
+        syncContentSelection: true,
+        viewTitles: true,
+        spacers: [80, 66],
+        wellDistances: {
+            units: "m",
+            distances: [2048.3, 512.7],
+        },
+        colorMapFunctions: exampleColorMapFunctions,
+        templates: [verySimpleTemplate, verySimpleTemplate],
+        wellLogCollections: [
+            [
+                ...L916MUDJson,
+                {
+                    header: L916MUDJson[0].header,
+                    curves: [
+                        {
+                            name: "DEPT",
+                            description: null,
+                            quantity: null,
+                            unit: "M",
+                            valueType: "float",
+                            dimensions: 1,
+                        },
+                        {
+                            name: "DVER",
+                            description: "continuous",
+                            quantity: "m",
+                            unit: "m",
+                            valueType: "float",
+                            dimensions: 1,
+                        },
+
+                        {
+                            name: "FLAG_EXAMPLE",
+                            description: "discrete with different sampling",
+                            quantity: "DISC",
+                            unit: "DISC",
+                            valueType: "integer",
+                            dimensions: 1,
+                        },
+                    ],
+                    data: [
+                        [2966, 2254.3, null],
+                        [3297, 2533.72, 0],
+                        [4123, 3251.07, 1],
+                    ],
+                    metadata_discrete: {
+                        FLAG_EXAMPLE: {
+                            attributes: ["color", "code"],
+                            objects: {
+                                no: [[244, 237, 255, 255], 0],
+                                yes: [[255, 171, 178, 255], 1],
+                            },
+                        },
+                    },
+                },
+            ],
+            [
+                ...L898MUDJson,
+                {
+                    header: L898MUDJson[0].header,
+                    curves: [
+                        {
+                            name: "DEPT",
+                            description: null,
+                            quantity: null,
+                            unit: "M",
+                            valueType: "float",
+                            dimensions: 1,
+                        },
+                        {
+                            name: "DVER",
+                            description: "continuous",
+                            quantity: "m",
+                            unit: "m",
+                            valueType: "float",
+                            dimensions: 1,
+                        },
+
+                        {
+                            name: "BAD_CONT",
+                            description: "continuous with different sampling",
+                            quantity: "m",
+                            unit: "m",
+                            valueType: "integer",
+                            dimensions: 1,
+                        },
+                    ],
+                    data: [
+                        [2977, 2263.39, 0.1],
+                        [3606, 2792.98, 4],
+                        [4129, 3256.31, 2],
+                    ],
+                },
+            ],
+        ],
+    },
 };

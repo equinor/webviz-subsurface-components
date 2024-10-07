@@ -3,12 +3,17 @@ import type { LogViewer } from "@equinor/videx-wellog";
 
 import type { WellLogController } from "./WellLogView";
 import type WellLogView from "./WellLogView";
-import type { WellLog } from "./WellLogTypes";
 import type { Info } from "../components/InfoTypes";
+import type { WellLogSet } from "./WellLogTypes";
 
 export class CallbackManager {
     controller: WellLogController | null;
-    welllog: () => WellLog | undefined;
+
+    /**
+     * @deprecated use getWellLogSets instead
+     */
+    welllog: () => WellLogSet | undefined;
+    getWellLogSets: () => WellLogSet[] | undefined;
 
     onCreateControllerCallbacks: ((controller: WellLogController) => void)[];
     onInfoCallbacks: ((
@@ -23,8 +28,10 @@ export class CallbackManager {
     onChangePrimaryAxisCallbacks: ((primaryAxis: string) => void)[];
     onInfoFilledCallbacks: ((computedInfo: Info[]) => void)[];
 
-    constructor(welllog: () => WellLog | undefined) {
-        this.welllog = welllog;
+    constructor(wellLogSetsGetter: () => WellLogSet[] | undefined) {
+        this.getWellLogSets = wellLogSetsGetter;
+        this.welllog = () => this.getWellLogSets()?.[0];
+
         this.controller = null;
 
         this.onCreateControllerCallbacks = [];

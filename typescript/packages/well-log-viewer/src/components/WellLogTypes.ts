@@ -47,10 +47,15 @@ export type WellLogMetadataDiscrete = {
     objects: WellLogMetadataDiscreteObjects;
 }; // a part of JSON
 
-export type WellLog = {
+export type WellLogSet = {
     header: WellLogHeader;
     curves: WellLogCurve[];
     data: WellLogDataRow[];
 
     metadata_discrete?: Record<string, WellLogMetadataDiscrete>;
-}; // JSON object from a file
+}; // JSON object from a file;
+
+/**
+ * @deprecated "well log" is too ambigous. Use WellLogSet instead
+ */
+export type WellLog = WellLogSet;

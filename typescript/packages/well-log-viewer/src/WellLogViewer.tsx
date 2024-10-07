@@ -30,6 +30,8 @@ import { CallbackManager } from "./components/CallbackManager";
 import type { Info, InfoOptions } from "./components/InfoTypes";
 import type { LogViewer } from "@equinor/videx-wellog";
 import { fillInfos } from "./utils/fill-info";
+import { getWellLogSetsFromProps } from "./utils/well-log";
+import type { WellLogSet } from "./components/WellLogTypes";
 
 export interface WellLogViewerProps extends WellLogViewWithScrollerProps {
     readoutOptions?: InfoOptions; // options for readout
@@ -80,15 +82,17 @@ export default class WellLogViewer extends Component<
 
     callbackManager: CallbackManager;
     collapsedTrackIds: (string | number)[];
+    wellLogSets: WellLogSet[];
 
     constructor(props: WellLogViewerProps) {
         super(props);
+        this.wellLogSets = getWellLogSetsFromProps(props);
 
         this.state = {
             primaryAxis: this.getDefaultPrimaryAxis(), //"md"
         };
 
-        this.callbackManager = new CallbackManager(() => this.props.welllog);
+        this.callbackManager = new CallbackManager(() => this.wellLogSets);
         this.collapsedTrackIds = [];
 
         this.onCreateController = this.onCreateController.bind(this);
@@ -246,11 +250,14 @@ export default class WellLogViewer extends Component<
         prevProps: WellLogViewerProps /*, prevState: State*/
     ): void {
         if (
+            this.props.wellLogSets !== prevProps.wellLogSets ||
             this.props.welllog !== prevProps.welllog ||
             this.props.template !== prevProps.template ||
             this.props.axisMnemos !== prevProps.axisMnemos ||
             this.props.primaryAxis !== prevProps.primaryAxis
         ) {
+            this.wellLogSets = getWellLogSetsFromProps(this.props);
+
             const value = this.getDefaultPrimaryAxis();
             this.onChangePrimaryAxis(value);
         }
@@ -262,10 +269,8 @@ export default class WellLogViewer extends Component<
     getDefaultPrimaryAxis(): string {
         if (this.props.primaryAxis) return this.props.primaryAxis;
 
-        const axes = getAvailableAxes(
-            this.props.welllog,
-            this.props.axisMnemos
-        );
+        const axes = getAvailableAxes(this.wellLogSets, this.props.axisMnemos);
+
         let primaryAxis = axes[0];
         const template = this.props.template;
         if (template) {
@@ -282,34 +287,21 @@ export default class WellLogViewer extends Component<
     }
 
     render(): JSX.Element {
+        // Copy and pass all props to view-component, expect primary-axis
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { primaryAxis: _, ...otherProps } = this.props;
+
         return (
             <WellLogLayout
                 parent={this}
                 center={
                     <WellLogViewWithScroller
-                        /* just copy all props without primaryAxis */
-                        welllog={this.props.welllog}
-                        viewTitle={this.props.viewTitle}
-                        template={this.props.template}
-                        colorMapFunctions={this.props.colorMapFunctions}
-                        wellpick={this.props.wellpick}
-                        patternsTable={this.props.patternsTable}
-                        patterns={this.props.patterns}
-                        horizontal={this.props.horizontal}
-                        axisTitles={this.props.axisTitles}
-                        axisMnemos={this.props.axisMnemos}
-                        domain={this.props.domain}
-                        selection={this.props.selection}
-                        options={this.props.options}
-                        /* end of copy props */
-
+                        {...otherProps}
                         primaryAxis={this.state.primaryAxis}
                         // callbacks
                         onInfo={this.onInfo}
                         onCreateController={this.onCreateController}
                         onTrackMouseEvent={
-                            // TODO: Fix this the next time the file is edited.
-                            // eslint-disable-next-line react/prop-types
                             this.props.onTrackMouseEvent ||
                             onTrackMouseEventDefault
                         }
@@ -318,8 +310,6 @@ export default class WellLogViewer extends Component<
                         onTemplateChanged={this.onTemplateChanged}
                     />
                 }
-                // TODO: Fix this the next time the file is edited.
-                // eslint-disable-next-line react/prop-types
                 layout={this.props.layout || defaultLayout}
             />
         );
@@ -373,7 +363,13 @@ WellLogViewer.propTypes = {
     /**
      * An object from JSON file describing well log data
      */
-    welllog: PropTypes.object /*Of<WellLog>*/,
+    welllog: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
+
+    /**
+     * Array from JSON file; describes a series of well log data sets.
+     * Assumes each set is for the same well. (For differing wells, use SyncLogViewer instead)
+     */
+    wellLogSets: PropTypes.arrayOf(PropTypes.object),
 
     /**
      * Prop containing track template data
@@ -421,7 +417,7 @@ WellLogViewer.propTypes = {
     axisMnemos: PropTypes.object /*Of<Record<string, string>>*/,
 
     /**
-     * Set to true for default titles or to array of individial welllog titles
+     * Set to true for default titles or to array of individial well log titles
      */
     viewTitle: PropTypes.oneOfType([
         PropTypes.bool,
