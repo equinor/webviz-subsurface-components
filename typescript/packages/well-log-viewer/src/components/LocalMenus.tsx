@@ -28,7 +28,7 @@ export interface State {
     anchorEl: HTMLElement | null;
 }
 
-function getPlotTitle(plot: Plot, wellLog: WellLogSet[]): string {
+function getPlotTitle(plot: Plot, wellLogSets: WellLogSet[]): string {
     let title = "";
     const extOptions = plot.options as ExtPlotOptions;
     const legend = extOptions.legendInfo();
@@ -44,7 +44,8 @@ function getPlotTitle(plot: Plot, wellLog: WellLogSet[]): string {
 
     if (!title) {
         // Extract the title from the well log
-        title = getCurveFromVidexPlotId(wellLog, plot.id as string)?.name ?? "";
+        title =
+            getCurveFromVidexPlotId(wellLogSets, plot.id as string)?.name ?? "";
     }
     return title;
 }
@@ -141,15 +142,15 @@ export class SimpleMenu extends Component<Props, State> {
 
     menuRemovePlotItems(): ReactNode[] {
         const nodes: ReactNode[] = [];
-        const wellLog = this.props.wellLogView.wellLogSets;
+        const wellLogSets = this.props.wellLogView.wellLogSets;
 
-        if (!wellLog.length) return nodes;
+        if (!wellLogSets.length) return nodes;
 
         const track = this.props.track;
         const plots = (track as GraphTrack).plots;
 
         for (const plot of plots) {
-            const title = getPlotTitle(plot, wellLog);
+            const title = getPlotTitle(plot, wellLogSets);
             nodes.push(this.createRemovePlotMenuItem(title, plot));
         }
         return nodes;
@@ -177,14 +178,14 @@ export class SimpleMenu extends Component<Props, State> {
 
     menuEditPlotItems(): ReactNode[] {
         const nodes: ReactNode[] = [];
-        const wellLog = this.props.wellLogView.wellLogSets;
+        const wellLogSets = this.props.wellLogView.wellLogSets;
 
-        if (!wellLog.length) return nodes;
+        if (!wellLogSets.length) return nodes;
 
         const track = this.props.track;
         const plots = (track as GraphTrack).plots;
         for (const plot of plots) {
-            const title = getPlotTitle(plot, wellLog);
+            const title = getPlotTitle(plot, wellLogSets);
             nodes.push(this.createEditPlotMenuItem(title, plot));
         }
 

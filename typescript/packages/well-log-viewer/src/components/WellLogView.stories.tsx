@@ -65,7 +65,7 @@ export const Default: StoryObj<typeof Template> = {
     args: {
         //id: "Well-Log-View",
         horizontal: false,
-        welllog: wellLogDefault,
+        wellLogSets: [wellLogDefault],
         // TODO: Fix this the next time the file is edited.
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         template: require("../../../../../example-data/welllog_template_1.json"),
@@ -85,7 +85,7 @@ export const Discrete: StoryObj<typeof Template> = {
     args: {
         //id: "Well-Log-View-Discrete",
         horizontal: false,
-        welllog: wellLogDiscrete as WellLogSet,
+        wellLogSets: [wellLogDiscrete] as WellLogSet[],
         // TODO: Fix this the next time the file is edited.
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         template: require("../../../../../example-data/welllog_template_2.json"),

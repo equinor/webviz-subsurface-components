@@ -19,10 +19,10 @@ export function defaultSidePanel(parent: SyncLogViewer): JSX.Element {
                 callbackManager={parent.callbackManagers[0]}
             />
             {parent.wellLogCollections?.map(
-                (wellLog: WellLogSet[], iWellLog: number) => (
+                (wellLogSets: WellLogSet[], iWellLog: number) => (
                     <WellLogInfoPanel
                         key={iWellLog}
-                        header={"Readout " + wellLog[0]?.header.well}
+                        header={"Readout " + wellLogSets[0]?.header.well}
                         readoutOptions={parent.props.readoutOptions}
                         callbackManager={parent.callbackManagers[iWellLog]}
                     />

@@ -27,7 +27,7 @@ describe("Test Well Log View Component with Scroller", () => {
     it("snapshot test", () => {
         const { container } = render(
             <WellLogViewWithScroller
-                welllog={wellLog}
+                wellLogSets={[wellLog]}
                 template={template}
                 colorMapFunctions={exampleColorMapFunctions}
                 primaryAxis={"md"}

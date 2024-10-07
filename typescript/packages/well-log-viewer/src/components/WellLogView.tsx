@@ -1039,7 +1039,7 @@ export interface WellLogViewOptions {
 export interface WellLogViewProps {
     /**
      * Object from JSON file describing one or more sets of well log data.
-     * @depreacted Use `wellLogSets` instead
+     * @deprecated Use `wellLogSets` instead
      */
     welllog?: WellLogSet[] | WellLogSet;
 
@@ -1155,7 +1155,8 @@ export const argTypesWellLogViewProp = {
         description: "Orientation of the track plots on the screen.", // defaultValue: false
     },
     welllog: {
-        description: "JSON object describing well log data.",
+        description:
+            "JSON object describing well log data.\n<i>Depreacted — Use <b>wellLogSets</b> instead.</i>",
     },
     wellLogSets: {
         description:
@@ -1216,8 +1217,8 @@ export function shouldUpdateWellLogView(
     // Props could contain some unknown object key:value so we should ignore they
     // so compare only known key:values
     if (props.horizontal !== nextProps.horizontal) return true;
-    if (props.welllog !== nextProps.welllog) return true;
     if (props.wellLogSets !== nextProps.wellLogSets) return true;
+    if (props.welllog !== nextProps.welllog) return true;
     if (props.template !== nextProps.template) return true;
     if (props.colorMapFunctions !== nextProps.colorMapFunctions) return true;
     if (props.wellpick !== nextProps.wellpick) return true;
@@ -1819,7 +1820,14 @@ class WellLogView
         this.setInfo(); // reflect new value in this.selCurrent
     }
 
+    /**
+     * @deprecated Use getWellLogSets instead
+     */
     getWellLog(): WellLogSet[] | WellLogSet | undefined {
+        return this.props.wellLogSets ?? this.props.welllog;
+    }
+
+    getWellLogSets(): WellLogSet[] | WellLogSet | undefined {
         return this.props.wellLogSets ?? this.props.welllog;
     }
 

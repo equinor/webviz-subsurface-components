@@ -212,7 +212,12 @@ export const argTypesSyncLogViewerProp = {
             "The ID of this component, used to identify dash components in callbacks. The ID needs to be unique across all of the components in an app.",
     },
     welllogs: {
-        description: "Array of JSON objects describing well log data.",
+        description:
+            "Array of JSON objects describing well log data.\n<i>Depreacted — Use <b>wellLogCollections</b> instead.</i>",
+    },
+    wellLogCollections: {
+        description:
+            "An array of collections of well log sets. A synced well log is created per entry",
     },
     templates: {
         description: "Array of track template data.",
@@ -394,9 +399,13 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
     componentDidUpdate(
         prevProps: SyncLogViewerProps /*, prevState: State, snapshot*/
     ): void {
+        // Always prioritize wellLogCollections if it's set
+        const logCollectionKey = this.props.wellLogCollections
+            ? "wellLogCollections"
+            : "welllogs";
+
         if (
-            this.props.welllogs !== prevProps.welllogs ||
-            this.props.wellLogCollections !== prevProps.wellLogCollections ||
+            this.props[logCollectionKey] !== prevProps[logCollectionKey] ||
             this.props.templates !== prevProps.templates ||
             this.props.axisMnemos !== prevProps.axisMnemos ||
             this.props.primaryAxis !== prevProps.primaryAxis
@@ -418,11 +427,11 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                 this.props.wellpickFlatting,
                 prevProps.wellpickFlatting
             ) ||
-            this.props.welllogs?.length !== prevProps.welllogs?.length ||
-            this.props.wellLogCollections?.length !==
-                prevProps.wellLogCollections?.length
+            this.props[logCollectionKey]?.length !==
+                prevProps[logCollectionKey]?.length
         ) {
-            if (this.props.welllogs?.length) this.syncContentScrollPos(0); // force to redraw visible domain
+            if (this.props[logCollectionKey]?.length)
+                this.syncContentScrollPos(0); // force to redraw visible domain
         }
 
         if (!isEqualRanges(this.props.selection, prevProps.selection)) {
@@ -432,12 +441,10 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         if (
             this.props.syncContentSelection !==
                 prevProps.syncContentSelection ||
-            this.props.welllogs?.length !== prevProps.welllogs?.length
+            this.props[logCollectionKey]?.length !==
+                prevProps[logCollectionKey]?.length
         ) {
-            if (
-                this.props.welllogs?.length ??
-                this.props.wellLogCollections?.length
-            )
+            if (this.props[logCollectionKey]?.length)
                 this.syncContentSelection(0); // force to redraw selection
         }
     }

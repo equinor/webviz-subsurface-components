@@ -250,8 +250,8 @@ export default class WellLogViewer extends Component<
         prevProps: WellLogViewerProps /*, prevState: State*/
     ): void {
         if (
-            this.props.welllog !== prevProps.welllog ||
             this.props.wellLogSets !== prevProps.wellLogSets ||
+            this.props.welllog !== prevProps.welllog ||
             this.props.template !== prevProps.template ||
             this.props.axisMnemos !== prevProps.axisMnemos ||
             this.props.primaryAxis !== prevProps.primaryAxis

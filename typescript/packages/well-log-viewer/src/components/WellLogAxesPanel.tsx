@@ -36,13 +36,13 @@ interface State {
 }
 
 export class WellLogAxesPanel extends Component<Props, State> {
-    wellLog: WellLogSet[] | undefined;
+    wellLogSets: WellLogSet[] | undefined;
 
     constructor(props: Props) {
         super(props);
 
-        this.wellLog = this.props.callbackManager.wellLog() ?? [];
-        const axes = getAvailableAxes(this.wellLog, this.props.axisMnemos);
+        this.wellLogSets = this.props.callbackManager.getWellLogSets() ?? [];
+        const axes = getAvailableAxes(this.wellLogSets, this.props.axisMnemos);
 
         this.state = {
             axes: axes,
@@ -79,14 +79,14 @@ export class WellLogAxesPanel extends Component<Props, State> {
             this.registerCallbacks(this.props.callbackManager);
         }
 
-        const wellog = this.props.callbackManager?.wellLog();
+        const wellog = this.props.callbackManager?.getWellLogSets();
         if (
-            this.wellLog !== wellog ||
+            this.wellLogSets !== wellog ||
             prevProps.axisMnemos !== this.props.axisMnemos
         ) {
-            this.wellLog = wellog;
+            this.wellLogSets = wellog;
             const axes = getAvailableAxes(
-                this.wellLog ?? [],
+                this.wellLogSets ?? [],
                 this.props.axisMnemos
             );
             this.setState({
