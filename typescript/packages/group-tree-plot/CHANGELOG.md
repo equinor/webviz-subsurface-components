@@ -1,3 +1,10 @@
+## [1.3.10](https://github.com/equinor/webviz-subsurface-components/compare/group-tree-plot@1.3.9...group-tree-plot@1.3.10) (2024-10-04)
+
+
+### Bug Fixes
+
+* bump @equinor/videx-wellog from 0.10.5 to 0.10.6 in /typescript ([#2290](https://github.com/equinor/webviz-subsurface-components/issues/2290)) ([fd8b0cd](https://github.com/equinor/webviz-subsurface-components/commit/fd8b0cd693ee4de6a590c23a70dd2a09d914f83f))
+
 ## [1.3.9](https://github.com/equinor/webviz-subsurface-components/compare/group-tree-plot@1.3.8...group-tree-plot@1.3.9) (2024-10-03)
 
 

@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@1.0.0...wsc-common@1.0.1) (2024-10-04)
+
+
+### Bug Fixes
+
+* bump @equinor/videx-wellog from 0.10.5 to 0.10.6 in /typescript ([#2290](https://github.com/equinor/webviz-subsurface-components/issues/2290)) ([fd8b0cd](https://github.com/equinor/webviz-subsurface-components/commit/fd8b0cd693ee4de6a590c23a70dd2a09d914f83f))
+
 # [1.0.0](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@0.8.9...wsc-common@1.0.0) (2024-10-03)
 
 

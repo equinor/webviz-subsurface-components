@@ -730,12 +730,12 @@ const Map: React.FC<MapProps> = ({
 
     const onViewStateChange = useCallback(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ({ viewId, viewState }: { viewId: string; viewState: any }) => {
-            viewController.onViewStateChange(viewId, viewState);
-            if (getCameraPosition) {
-                getCameraPosition(viewState);
-            }
-        },
+        ({ viewId, viewState }: { viewId: string; viewState: any }) =>
+            viewController.onViewStateChange(
+                viewId,
+                viewState,
+                getCameraPosition
+            ),
         [getCameraPosition, viewController]
     );
 
@@ -971,9 +971,6 @@ function createLayer(
 ///////////////////////////////////////////////////////////////////////////////////////////
 // View Controller
 // Implements the algorithms to compute the views and the view state
-type ScaledCamera = ViewStateType & {
-    scale: number;
-};
 type ViewControllerState = {
     // Explicit state
     triggerHome: number | undefined;
@@ -986,23 +983,36 @@ type ViewControllerState = {
 };
 type ViewControllerDerivedState = {
     // Derived state
-    scaledCameraClone: ScaledCamera | undefined; // clone of the camera
-    eventTarget: Point3D | undefined; // target set by events
     readyForInteraction: boolean;
     viewStateChanged: boolean;
 };
 type ViewControllerFullState = ViewControllerState & ViewControllerDerivedState;
 
+/**
+ * The `ViewController` class manages the state and interactions for a 3D view.
+ * It handles the rendering, view state updates, and synchronization of multiple views.
+ *
+ * @classdesc This class is responsible for managing the state of a 3D view, including
+ *            camera settings, viewports, and interaction readiness. It provides methods
+ *            to set targets, get views, and handle view state changes.
+ */
 class ViewController {
+    /**
+     * Function to trigger a re-render.
+     */
     private rerender_: React.DispatchWithoutAction;
 
+    /**
+     * Derived state for interaction readiness and view state changes.
+     */
     private derivedState_: ViewControllerDerivedState = {
-        scaledCameraClone: undefined,
-        eventTarget: undefined,
         readyForInteraction: false,
         viewStateChanged: false,
     };
 
+    /**
+     * Full state including camera settings, bounds, and deck size.
+     */
     private state_: ViewControllerFullState = {
         triggerHome: undefined,
         camera: undefined,
@@ -1020,68 +1030,113 @@ class ViewController {
         ...this.derivedState_,
     };
 
+    /**
+     * The current views being managed.
+     */
     private views_: ViewsType | undefined = undefined;
+
+    /**
+     * The result object containing views and view states.
+     */
     private result_: {
+        /**
+         * The views sent to DeckGL.
+         */
         views: View[];
-        viewState: Record<string, ViewStateType>;
+
+        /**
+         * The view states sent to DeckGL, where the vertical scale has been applied.
+         */
+        deckglViewStates: Record<string, ViewStateType>;
+
+        /**
+         * The view states as known by the client code, without vertical scale.
+         */
+        viewStates: Record<string, ViewStateType>;
     } = {
         views: [],
-        viewState: {},
+        deckglViewStates: {},
+        viewStates: {},
     };
 
+    /**
+     * Constructs a new instance of the Map component.
+     *
+     * @param rerender - A function to trigger a re-render of the component.
+     */
     public constructor(rerender: React.DispatchWithoutAction) {
         this.rerender_ = rerender;
     }
 
     /**
-     * Sets the target from picks, which comes from the displayed
-     * scaled data.
+     * Sets the target from picks, which comes from the displayed scaled data.
      * @param target scaled 3D point.
      */
     public readonly setScaledTarget = (target: Point3D) => {
-        this.derivedState_.eventTarget = [target[0], target[1], target[2]];
-        this.rerender_();
+        const vsKey = Object.keys(this.result_.deckglViewStates).at(0);
+        if (vsKey) {
+            // deep clone to notify change (memo checks object address)
+            this.result_.deckglViewStates = cloneDeep(
+                this.result_.deckglViewStates
+            );
+
+            // update target of deckglViewStates with the scaled event target
+            this.result_.deckglViewStates[vsKey].target = target;
+            this.result_.deckglViewStates[vsKey].transitionDuration = 1000;
+            // update target of deckglViewStates with the scaled event target
+            this.result_.viewStates[vsKey].target = inversedZScaled(
+                target,
+                this.state_.zScale,
+                this.result_.viewStates[vsKey].target
+            );
+
+            this.rerender_();
+        }
     };
 
+    /**
+     * Retrieves the views and their corresponding view states to be sent to DeckGL.
+     * @param views - The requested views.
+     * @param state - The current state.
+     * @returns The new views and their corresponding view states.
+     */
     public readonly getViews = (
         views: ViewsType | undefined,
         state: ViewControllerState
     ): [View[], Record<string, ViewStateType>] => {
         const fullState = this.consolidateState(state);
-        const newViews = this.getDeckGlViews(views, fullState);
-        const newViewState = this.getDeckGlViewState(views, fullState);
+        const newDeckglViews = this.getDeckGlViews(views, fullState);
+        const [newDeckglViewState, newViewStates] =
+            this.getDeckGlAndUserViewStates(views, fullState);
 
         // do not update this.state_ as it has not yet been applied
-        if (!isEmpty(newViewState)) {
+        if (!isEmpty(newDeckglViewState)) {
             this.state_ = fullState;
         }
         this.views_ = views;
-        this.result_.views = newViews;
-        this.result_.viewState = newViewState;
-        return [newViews, newViewState];
+        this.result_.views = newDeckglViews;
+        this.result_.deckglViewStates = newDeckglViewState;
+        this.result_.viewStates = newViewStates;
+        return [newDeckglViews, newDeckglViewState];
     };
 
-    // consolidate "controlled" state (ie. set by parent) with "uncontrolled" state
+    /**
+     * Consolidates the controlled state (ie. set by parent) with the uncontrolled state.
+     * @param state - The current state.
+     * @returns The consolidated state.
+     */
     private readonly consolidateState = (
         state: ViewControllerState
     ): ViewControllerFullState => {
-        const fullState = { ...state, ...this.derivedState_ };
-        if (
-            fullState.camera != this.state_.camera ||
-            !fullState.scaledCameraClone
-        ) {
-            // create a clone of the camera property to avoid editing it
-            fullState.scaledCameraClone = fullState.camera
-                ? {
-                      ...(cloneDeep(fullState.camera) as ViewStateType),
-                      scale: 1,
-                  }
-                : undefined;
-        }
-        return fullState;
+        return { ...state, ...this.derivedState_ };
     };
 
-    // returns the DeckGL views (ie. view position and viewport)
+    /**
+     * Returns the DeckGL views (ie. view position and viewport) based on the input views and current state.
+     * @param views - The requested views.
+     * @param state - The current state.
+     * @returns The DeckGL views.
+     */
     private readonly getDeckGlViews = (
         views: ViewsType | undefined,
         state: ViewControllerFullState
@@ -1094,20 +1149,20 @@ class ViewController {
         return buildDeckGlViews(views, state.deckSize);
     };
 
-    // returns the DeckGL views state(s) (ie. camera settings applied to individual views)
-    private readonly getDeckGlViewState = (
+    /**
+     * Returns the scaled DeckGL view state(s) (ie. camera settings applied to individual views)
+     * and the corresponding view states in user space (ie. not scaled by the zScale)
+     * based on the input views and current state.
+     * @param views requested views.
+     * @param state current state.
+     * @returns The DeckGL view states and the corresponding view states in user space.
+     */
+    private readonly getDeckGlAndUserViewStates = (
         views: ViewsType | undefined,
         state: ViewControllerFullState
-    ): Record<string, ViewStateType> => {
+    ): [Record<string, ViewStateType>, Record<string, ViewStateType>] => {
         const viewsChanged = views != this.views_;
         const triggerHome = state.triggerHome !== this.state_.triggerHome;
-        const updateTarget =
-            (viewsChanged || state.eventTarget !== this.state_.eventTarget) &&
-            state.eventTarget != undefined;
-        // reset old zScale if new camera
-        if (state.camera != this.state_.camera) {
-            this.state_.zScale = 1;
-        }
         const updateZScale =
             viewsChanged || state.zScale !== this.state_?.zScale || triggerHome;
         const updateViewState =
@@ -1118,82 +1173,76 @@ class ViewController {
             (!state.viewStateChanged &&
                 (state.boundingBox3d !== this.state_.boundingBox3d ||
                     state.deckSize != this.state_.deckSize));
-        const needUpdate = updateZScale || updateTarget || updateViewState;
+        const needUpdate = updateZScale || updateViewState;
 
-        const isCacheEmpty = isEmpty(this.result_.viewState);
+        const isCacheEmpty = isEmpty(this.result_.deckglViewStates);
         if (!isCacheEmpty && !needUpdate) {
-            return this.result_.viewState;
+            return [this.result_.deckglViewStates, this.result_.viewStates];
         }
 
         // initialize with last result
-        const prevViewState = this.result_.viewState;
-        let viewState = prevViewState;
+        const prevDeckglViewStates = this.result_.deckglViewStates;
+        let viewStates = this.result_.viewStates;
+        let deckglViewStates = this.result_.deckglViewStates;
 
         if (updateViewState || isCacheEmpty) {
-            viewState = buildDeckGlViewStates(
+            viewStates = buildViewStates(
                 views,
                 state.viewPortMargins,
-                state.scaledCameraClone,
+                state.camera,
                 state.boundingBox3d,
-                state.zScale,
                 state.bounds,
                 state.deckSize
             );
+            // create corresponding scaled states, to be handed over to DeckGL
+            deckglViewStates = buildScaledViewStates(viewStates, state.zScale);
+
             // reset state
             this.derivedState_.readyForInteraction = canCameraBeDefined(
-                state.scaledCameraClone,
+                state.camera,
                 state.boundingBox3d,
                 state.bounds,
                 state.deckSize
             );
             this.derivedState_.viewStateChanged = false;
+
+            return [deckglViewStates, viewStates];
         }
 
         // check if view state could be computed
-        if (isEmpty(viewState)) {
-            return viewState;
+        if (isEmpty(viewStates)) {
+            return [deckglViewStates, viewStates];
         }
 
-        const viewStateKeys = Object.keys(viewState);
-        if (
-            updateTarget &&
-            this.derivedState_.eventTarget &&
-            viewStateKeys?.length === 1
-        ) {
-            // deep clone to notify change (memo checks object address)
-            if (viewState === prevViewState) {
-                viewState = cloneDeep(prevViewState);
-            }
-            // update target
-            viewState[viewStateKeys[0]].target = this.derivedState_.eventTarget;
-            viewState[viewStateKeys[0]].transitionDuration = 1000;
-            // reset
-            this.derivedState_.eventTarget = undefined;
-        }
         if (updateZScale) {
             // deep clone to notify change (memo checks object address)
-            if (viewState === prevViewState) {
-                viewState = cloneDeep(prevViewState);
+            if (deckglViewStates === prevDeckglViewStates) {
+                deckglViewStates = cloneDeep(prevDeckglViewStates);
             }
             // Z scale to apply to target.
-            // - if triggerHome: the target was recomputed from the input data (ie. without any scale applied)
-            // - otherwise: previous scale (ie. this.state_.zScale) was already applied, and must be "reverted"
-            const targetScale =
-                state.zScale /
-                (triggerHome ? state.zScale : this.state_.zScale);
             // update target
-            for (const key in viewState) {
-                if (viewState[key].target) {
-                    applyZScale(viewState[key].target, targetScale);
+            for (const key in deckglViewStates) {
+                if (deckglViewStates[key].target) {
+                    deckglViewStates[key].target = zScaledTarget(
+                        viewStates[key].target,
+                        state.zScale
+                    );
                 }
             }
         }
-        return viewState;
+        return [deckglViewStates, viewStates];
     };
 
+    /**
+     * Handles changes to the view state.
+     * @param viewId - The ID of the view.
+     * @param viewState - The new view state.
+     * @param getCameraPosition - A function to get the camera position.
+     */
     public readonly onViewStateChange = (
         viewId: string,
-        viewState: ViewStateType
+        viewState: ViewStateType,
+        getCameraPosition: ((input: ViewStateType) => void) | undefined
     ): void => {
         if (!this.derivedState_.readyForInteraction) {
             // disable interaction if the camera is not defined
@@ -1203,26 +1252,56 @@ class ViewController {
         if (viewState.target?.length === 2) {
             // In orthographic mode viewState.target contains only x and y. Add existing z value.
             viewState.target.push(
-                this.result_.viewState[viewId].target?.[2] ?? 1
+                this.result_.deckglViewStates[viewId].target?.[2] ?? 1
             );
         }
         const isSyncIds = viewports
             .filter((item) => item.isSync)
             .map((item) => item.id);
         if (isSyncIds?.includes(viewId)) {
-            const viewStateTable = this.views_?.viewports
+            const syncedViewStates = this.views_?.viewports
                 .filter((item) => item.isSync)
                 .map((item) => [item.id, viewState]);
-            const tempViewStates = Object.fromEntries(viewStateTable ?? []);
-            this.result_.viewState = {
-                ...this.result_.viewState,
+            const tempViewStates = Object.fromEntries(syncedViewStates ?? []);
+            this.result_.deckglViewStates = {
+                ...this.result_.deckglViewStates,
                 ...tempViewStates,
             };
+            // update corresponding view state
+            const keys = Object.keys(tempViewStates);
+            keys.forEach((key) => {
+                this.result_.viewStates = {
+                    ...this.result_.viewStates,
+                    [key]: {
+                        ...tempViewStates[key],
+                        target: inversedZScaled(
+                            tempViewStates[key].target,
+                            this.state_.zScale,
+                            this.result_.viewStates[key].target
+                        ),
+                    },
+                };
+            });
         } else {
-            this.result_.viewState = {
-                ...this.result_.viewState,
+            this.result_.deckglViewStates = {
+                ...this.result_.deckglViewStates,
                 [viewId]: viewState,
             };
+            // update corresponding view state
+            this.result_.viewStates = {
+                ...this.result_.viewStates,
+                [viewId]: {
+                    ...viewState,
+                    target: inversedZScaled(
+                        viewState.target,
+                        this.state_.zScale,
+                        this.result_.viewStates[viewId].target
+                    ),
+                },
+            };
+        }
+        if (getCameraPosition) {
+            getCameraPosition(this.result_.viewStates[viewId]);
         }
         this.derivedState_.viewStateChanged = true;
         this.rerender_();
@@ -1634,9 +1713,69 @@ function applyZScale(
     target: Point2D | Point3D | undefined,
     zScale: number
 ): void {
-    if (target?.[2]) {
+    if (target?.[2] != undefined) {
         target[2] = target[2] * zScale;
     }
+}
+
+/**
+ * Returns a z-scaled target.
+ * This is needed, as the camera target is specified in world coordinates, while the Z scale
+ * is applied to the transformation matrix of the object coordinates. The target must be applied
+ * the same scale to be consistent with the display.
+ * @param target camera target that must take into account the Z scale.
+ * @param zScale Z scale.
+ */
+function zScaledTarget(
+    target: Point2D | Point3D | undefined,
+    zScale: number
+): Point2D | Point3D | undefined {
+    if (!target) {
+        return undefined;
+    }
+    if (target[2] == undefined) {
+        return [target[0], target[1]];
+    }
+
+    return [target[0], target[1], target[2] * zScale];
+}
+
+/**
+ * Returns an inverted z-scaled target.
+ * This is needed, as the camera target is specified in world coordinates, while the Z scale
+ * is applied to the transformation matrix of the object coordinates. The target must be applied
+ * the same scale to be consistent with the display.
+ * @param target camera scaled target.
+ * @param zScale Z scale.
+ * @param unscaledTarget last known unscaled target which can be taken as a fallback.
+ */
+function inversedZScaled(
+    target: Point2D | Point3D | undefined,
+    zScale: number,
+    unscaledTarget?: Point2D | Point3D | undefined
+): Point2D | Point3D | undefined {
+    if (!target) {
+        return undefined;
+    }
+    if (target[2] == undefined) {
+        return [target[0], target[1]];
+    }
+    if (zScale != 0) {
+        return [target[0], target[1], target[2] / zScale];
+    }
+
+    if (
+        unscaledTarget?.[2] != undefined &&
+        target[0] === unscaledTarget?.[0] &&
+        target[1] === unscaledTarget?.[1]
+    ) {
+        return [
+            target[0],
+            target[1],
+            target[2] ? target[2] : unscaledTarget[2],
+        ];
+    }
+    return [target[0], target[1], target[2]];
 }
 
 /**
@@ -1649,15 +1788,10 @@ function applyZScale(
 function updateViewState(
     camera: ViewStateType,
     boundingBox: BoundingBox3D,
-    zScale: number,
     size: Size,
     is3D = true
 ): ViewStateType {
     if (isCameraDefined(camera)) {
-        if (is3D) {
-            // apply zScaling to target (target is in real coordinates while zScaling is applied to matrix transform)
-            applyZScale(camera.target, zScale);
-        }
         return camera;
     }
 
@@ -1680,10 +1814,6 @@ function updateViewState(
     }
     if (!cameraHasTarget(camera)) {
         camera.target = boxCenter(boundingBox);
-        if (is3D) {
-            // apply zScaling to target (target is in real coordinates while zScaling is applied to matrix transform)
-            applyZScale(camera.target, zScale);
-        }
     }
     camera.minZoom = camera.minZoom ?? minZoom3D;
     camera.maxZoom = camera.maxZoom ?? maxZoom3D;
@@ -1696,9 +1826,8 @@ function updateViewState(
  */
 function computeViewState(
     viewPort: ViewportType,
-    scaledCamera: ScaledCamera | undefined,
+    scaledCamera: ViewStateType | undefined,
     boundingBox: BoundingBox3D | undefined,
-    zScale: number,
     bounds: BoundingBox2D | BoundsAccessor | undefined,
     viewportMargins: MarginsType,
     views: ViewsType | undefined,
@@ -1718,12 +1847,7 @@ function computeViewState(
     if (viewPort.show3D ?? false) {
         // If the camera is defined, use it
         if (isCameraPositionDefined) {
-            return updateViewState(
-                scaledCamera,
-                boundingBox,
-                zScale / (scaledCamera.scale || 1),
-                size
-            );
+            return updateViewState(scaledCamera, boundingBox, size);
         }
 
         // deprecated in 3D, kept for backward compatibility
@@ -1744,19 +1868,13 @@ function computeViewState(
             rotationX: 45, // look down z -axis at 45 degrees
             rotationOrbit: 0,
         };
-        return updateViewState(defaultCamera, boundingBox, zScale, size);
+        return updateViewState(defaultCamera, boundingBox, size);
     } else {
         const is3D = false;
 
         // If the camera is defined, use it
         if (isCameraPositionDefined) {
-            return updateViewState(
-                scaledCamera,
-                boundingBox,
-                zScale,
-                size,
-                is3D
-            );
+            return updateViewState(scaledCamera, boundingBox, size, is3D);
         }
 
         const centerOfData: Point3D = boxCenter(boundingBox);
@@ -1788,12 +1906,23 @@ function computeViewState(
     }
 }
 
-function buildDeckGlViewStates(
+/**
+ * Builds the view states for the DeckGL views.
+ * These view states are in user space (ie. not scaled by the zScale).
+ * @param views requested views.
+ * @param viewPortMargins margin between the viewports.
+ * @param scaledCamera camera to apply to the views.
+ * @param boundingBox data bounding box, used if no target nor bounding box is specified by the camera
+ * @param zScale vertical scale.
+ * @param bounds displayed 2D bounds in 2D view.
+ * @param size deck component size.
+ * @returns
+ */
+function buildViewStates(
     views: ViewsType | undefined,
     viewPortMargins: MarginsType,
-    scaledCamera: ScaledCamera | undefined,
+    scaledCamera: ViewStateType | undefined,
     boundingBox: BoundingBox3D | undefined,
-    zScale: number,
     bounds: BoundingBox2D | BoundsAccessor | undefined,
     size: Size
 ): Record<string, ViewStateType> {
@@ -1812,7 +1941,6 @@ function buildDeckGlViewStates(
             views.viewports[0],
             scaledCamera,
             boundingBox,
-            zScale,
             bounds,
             viewPortMargins,
             views,
@@ -1838,7 +1966,6 @@ function buildDeckGlViewStates(
                 currentViewport,
                 scaledCamera,
                 boundingBox,
-                zScale,
                 bounds,
                 viewPortMargins,
                 views,
@@ -1850,6 +1977,28 @@ function buildDeckGlViewStates(
                     [currentViewport.id]: currentViewState,
                 };
             }
+        }
+    }
+    return result;
+}
+
+/**
+ * Builds the scaled view states for the DeckGL views.
+ * These view states are scaled by the zScale.
+ * They shared all the fields except the scaled target with the provided view states.
+ * @param viewStates view states in user space.
+ * @param zScale vertical scale.
+ * @returns
+ */
+function buildScaledViewStates(
+    viewStates: Record<string, ViewStateType>,
+    zScale: number
+): Record<string, ViewStateType> {
+    const result: Record<string, ViewStateType> = cloneDeep(viewStates);
+    for (const key in result) {
+        const viewState = result[key];
+        if (viewState) {
+            applyZScale(viewState.target, zScale);
         }
     }
     return result;
