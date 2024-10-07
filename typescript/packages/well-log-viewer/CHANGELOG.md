@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@2.0.1...well-log-viewer@2.1.0) (2024-10-07)
+
+
+### Features
+
+* Well log viewer - multiple well log support ([#2279](https://github.com/equinor/webviz-subsurface-components/issues/2279)) ([aca4b1b](https://github.com/equinor/webviz-subsurface-components/commit/aca4b1b16b7e56b0887a810ea8f1d139b6cd02c4))
+
 ## [2.0.1](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@2.0.0...well-log-viewer@2.0.1) (2024-10-04)
 
 
