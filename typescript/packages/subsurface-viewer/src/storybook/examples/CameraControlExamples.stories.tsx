@@ -1,3 +1,5 @@
+import { cloneDeep } from "lodash";
+
 import type { Meta, StoryObj } from "@storybook/react";
 import { userEvent } from "@storybook/test";
 import React from "react";
@@ -452,20 +454,35 @@ const ResetCameraPropertyDefaultCameraPosition = {
 };
 
 const ResetCameraComponent: React.FC<SubsurfaceViewerProps> = (args) => {
-    const [camera, setCamera] = React.useState(
-        () => args.cameraPosition ?? ResetCameraPropertyDefaultCameraPosition
-    );
+    const currentCameraRef = React.useRef<ViewStateType | null>(null);
 
-    const handleChange = () => {
-        setCamera({
-            ...camera,
-            rotationOrbit: camera.rotationOrbit + 5,
-        });
-    };
+    const initialCamera = React.useMemo(() => {
+        currentCameraRef.current = cloneDeep(
+            args.cameraPosition ?? ResetCameraPropertyDefaultCameraPosition
+        );
+        return currentCameraRef.current;
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [args.cameraPosition, args.triggerHome]);
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [_camera, setCamera] = React.useState(() => initialCamera);
+
+    const onCameraChanged = React.useCallback((camera: ViewStateType) => {
+        currentCameraRef.current = camera;
+    }, []);
+
+    const rotateCamera = React.useCallback(() => {
+        currentCameraRef.current = cloneDeep(currentCameraRef.current);
+        if (currentCameraRef.current) {
+            currentCameraRef.current.rotationOrbit += 5;
+            setCamera(currentCameraRef.current);
+        }
+    }, []);
 
     const props = {
         ...args,
-        cameraPosition: camera,
+        getCameraPosition: onCameraChanged,
+        cameraPosition: currentCameraRef.current ?? undefined,
     };
 
     return (
@@ -473,14 +490,14 @@ const ResetCameraComponent: React.FC<SubsurfaceViewerProps> = (args) => {
             <div className={classes.mainWithButton}>
                 <SubsurfaceViewer {...props} />
             </div>
-            <button onClick={handleChange}> Change Camera </button>
+            <button onClick={rotateCamera}> Rotate Camera </button>
         </Root>
     );
 };
 
-export const ResetCameraStory: StoryObj<typeof SubsurfaceViewer> = {
+export const RotateCameraStory: StoryObj<typeof SubsurfaceViewer> = {
     args: {
-        id: "ResetCameraProperty",
+        id: "RotateCameraProperty",
         layers: [
             huginAxes3DLayer,
             hugin25mKhNetmapMapLayerPng,
