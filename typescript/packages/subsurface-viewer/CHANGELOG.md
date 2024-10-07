@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.0.1...subsurface-viewer@1.0.2) (2024-10-07)
+
+
+### Bug Fixes
+
+* camera vertical scale issue ([#2292](https://github.com/equinor/webviz-subsurface-components/issues/2292)) ([d7ae8db](https://github.com/equinor/webviz-subsurface-components/commit/d7ae8dbecf9e4134aa55fef4fe35030258ed9491))
+
 ## [1.0.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.0.0...subsurface-viewer@1.0.1) (2024-10-04)
 
 
