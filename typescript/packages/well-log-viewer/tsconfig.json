@@ -11,6 +11,6 @@
         "src/Storybook/",
         "./**/*.test.tsx",
         "./**/*.stories.tsx",
-        "./**/*.stories.mdx",
+        "./**/*.stories.mdx"
     ]
 }
