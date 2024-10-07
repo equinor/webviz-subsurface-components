@@ -683,7 +683,9 @@ export const LogsWithDifferentSets: StoryObj<typeof Template> = {
     render: (args) => <Template {...args} />,
     parameters: {
         docs: {
-            story: "An example of two synced well logs, each including a second log with a different sampling rate",
+            description: {
+                story: "An example of two synced well logs, each including a second log with a different sampling rate",
+            },
         },
     },
     args: {
