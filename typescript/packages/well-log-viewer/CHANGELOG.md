@@ -1,3 +1,10 @@
+## [2.1.1](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@2.1.0...well-log-viewer@2.1.1) (2024-10-08)
+
+
+### Bug Fixes
+
+* bump react-tooltip from 5.27.0 to 5.28.0 in /typescript ([#2300](https://github.com/equinor/webviz-subsurface-components/issues/2300)) ([e355c99](https://github.com/equinor/webviz-subsurface-components/commit/e355c9952d2deaca78620256eff2be8e77ca7a28)), closes [#1209](https://github.com/equinor/webviz-subsurface-components/issues/1209) [ReactTooltip/react-tooltip#1213](https://github.com/ReactTooltip/react-tooltip/issues/1213) [ReactTooltip/react-tooltip#1211](https://github.com/ReactTooltip/react-tooltip/issues/1211) [ReactTooltip/react-tooltip#1213](https://github.com/ReactTooltip/react-tooltip/issues/1213) [ReactTooltip/react-tooltip#1211](https://github.com/ReactTooltip/react-tooltip/issues/1211) [ReactTooltip/react-tooltip#1203](https://github.com/ReactTooltip/react-tooltip/issues/1203) [ReactTooltip/react-tooltip#1205](https://github.com/ReactTooltip/react-tooltip/issues/1205) [#1209](https://github.com/equinor/webviz-subsurface-components/issues/1209) [#1213](https://github.com/equinor/webviz-subsurface-components/issues/1213)
+
 # [2.1.0](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@2.0.1...well-log-viewer@2.1.0) (2024-10-07)
 
 
