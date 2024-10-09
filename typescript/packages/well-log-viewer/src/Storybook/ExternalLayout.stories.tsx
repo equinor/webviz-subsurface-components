@@ -17,7 +17,10 @@ const RTCWellLogViewer: React.FunctionComponent = () => {
             <div style={{ width: "100%", height: "100%" }}>
                 <div
                     data-testid="well-log-views"
-                    style={{ width: "100%", height: "90vh" }}
+                    style={{
+                        width: "1700px",
+                        height: "80vh",
+                    }}
                 >
                     <SyncLogViewer {...{ ...args, id: "c1" }} />
                 </div>
