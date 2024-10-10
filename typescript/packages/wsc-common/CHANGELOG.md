@@ -1,3 +1,10 @@
+## [1.0.4](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@1.0.3...wsc-common@1.0.4) (2024-10-10)
+
+
+### Bug Fixes
+
+* bump react-resize-detector from 10.0.1 to 11.0.1 in /typescript ([#2305](https://github.com/equinor/webviz-subsurface-components/issues/2305)) ([80f879e](https://github.com/equinor/webviz-subsurface-components/commit/80f879e7e429b714a04e50533317efe78880e82f)), closes [maslianok/react-resize-detector#254](https://github.com/maslianok/react-resize-detector/issues/254)
+
 ## [1.0.3](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@1.0.2...wsc-common@1.0.3) (2024-10-09)
 
 
