@@ -21,7 +21,7 @@
     "author": "Equinor <opensource@equinor.com>",
     "license": "MPL-2.0",
     "dependencies": {
-        "react-resize-detector": "^10.0.1",
+        "react-resize-detector": "^11.0.1",
         "react-tooltip": "^5.28.0"
     },
     "volta": {
