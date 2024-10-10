@@ -1,3 +1,10 @@
+## [2.1.3](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@2.1.2...well-log-viewer@2.1.3) (2024-10-10)
+
+
+### Bug Fixes
+
+* bump react-resize-detector from 10.0.1 to 11.0.1 in /typescript ([#2305](https://github.com/equinor/webviz-subsurface-components/issues/2305)) ([80f879e](https://github.com/equinor/webviz-subsurface-components/commit/80f879e7e429b714a04e50533317efe78880e82f)), closes [maslianok/react-resize-detector#254](https://github.com/maslianok/react-resize-detector/issues/254)
+
 ## [2.1.2](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@2.1.1...well-log-viewer@2.1.2) (2024-10-09)
 
 
