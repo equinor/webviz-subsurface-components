@@ -1,3 +1,10 @@
+## [1.3.15](https://github.com/equinor/webviz-subsurface-components/compare/group-tree-plot@1.3.14...group-tree-plot@1.3.15) (2024-10-11)
+
+
+### Bug Fixes
+
+* bump mathjs from 13.1.1 to 13.2.0 in /typescript ([#2308](https://github.com/equinor/webviz-subsurface-components/issues/2308)) ([82aba49](https://github.com/equinor/webviz-subsurface-components/commit/82aba49945ad1858e0c7ab9022d7cb6c4fd5b004)), closes [#3256](https://github.com/equinor/webviz-subsurface-components/issues/3256) [#3251](https://github.com/equinor/webviz-subsurface-components/issues/3251) [#3253](https://github.com/equinor/webviz-subsurface-components/issues/3253) [#3257](https://github.com/equinor/webviz-subsurface-components/issues/3257) [#3259](https://github.com/equinor/webviz-subsurface-components/issues/3259) [#3246](https://github.com/equinor/webviz-subsurface-components/issues/3246) [#3267](https://github.com/equinor/webviz-subsurface-components/issues/3267) [#3272](https://github.com/equinor/webviz-subsurface-components/issues/3272) [#3](https://github.com/equinor/webviz-subsurface-components/issues/3)
+
 ## [1.3.14](https://github.com/equinor/webviz-subsurface-components/compare/group-tree-plot@1.3.13...group-tree-plot@1.3.14) (2024-10-11)
 
 
