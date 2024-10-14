@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.0.7...subsurface-viewer@1.1.0) (2024-10-14)
+
+
+### Features
+
+* expose `pickingRadius` as prop in `Map.tsx` in `SubsurfaceViewer` package ([#2313](https://github.com/equinor/webviz-subsurface-components/issues/2313)) ([817cdeb](https://github.com/equinor/webviz-subsurface-components/commit/817cdeb02ec8f0bf3341d189dbe47b59f29f2ee7))
+
 ## [1.0.7](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.0.6...subsurface-viewer@1.0.7) (2024-10-11)
 
 
