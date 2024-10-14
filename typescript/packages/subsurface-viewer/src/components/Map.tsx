@@ -378,6 +378,11 @@ export interface MapProps {
      * an event listener.
      */
     innerRef?: React.Ref<HTMLElement>;
+
+    /**
+     * Extra pixels around the pointer to include while picking.
+     */
+    pickingRadius?: number;
 }
 
 function defaultTooltip(info: PickingInfo) {
@@ -415,6 +420,7 @@ const Map: React.FC<MapProps> = ({
     triggerResetMultipleWells,
     verticalScale,
     innerRef,
+    pickingRadius,
 }: MapProps) => {
     // From react doc, ref should not be read nor modified during rendering.
     const deckRef = React.useRef<DeckGLRef>(null);
@@ -825,6 +831,7 @@ const Map: React.FC<MapProps> = ({
                 onDragStart={onDragStart}
                 onDragEnd={onDragEnd}
                 onResize={onResize}
+                pickingRadius={pickingRadius}
             >
                 {children}
             </DeckGL>

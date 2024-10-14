@@ -312,6 +312,11 @@ SubsurfaceViewer.propTypes = {
      * Validate JSON datafile against schema
      */
     checkDatafileSchema: PropTypes.bool,
+
+    /**
+     * Extra pixels around the pointer to include while picking.
+     */
+    pickingRadius: PropTypes.number,
 };
 
 export default SubsurfaceViewer;
