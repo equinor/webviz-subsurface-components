@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.1.0...subsurface-viewer@1.1.1) (2024-10-14)
+
+
+### Bug Fixes
+
+* incorrect interface of `ColormapLayer` ([#2314](https://github.com/equinor/webviz-subsurface-components/issues/2314)) ([46176b7](https://github.com/equinor/webviz-subsurface-components/commit/46176b7b87ef9ae86dfe119d8eb87902d316a90f)), closes [#2310](https://github.com/equinor/webviz-subsurface-components/issues/2310)
+
 # [1.1.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.0.7...subsurface-viewer@1.1.0) (2024-10-14)
 
 
