@@ -6,7 +6,7 @@ export type MeshType = {
         positions: { value: Float32Array; size: number };
         TEXCOORD_0?: { value: Float32Array; size: number };
         normals: { value: Float32Array; size: number };
-        properties: { value: Float32Array; size: number };
+        properties?: { value: Float32Array; size: number };
     };
     vertexCount: number;
 };

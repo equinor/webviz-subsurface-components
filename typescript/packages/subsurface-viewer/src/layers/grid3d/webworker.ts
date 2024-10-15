@@ -841,7 +841,7 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
     interface IMeshArrays {
         trianglePoints: Float32Array;
         triangleNormals: Float32Array;
-        properties: Float32Array;
+        properties?: Float32Array;
         lineIndices: Uint32Array;
     }
 
@@ -870,11 +870,16 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
      * @param counts Numbers of WebGL primitives.
      * @returns Arrays of the length enough to contain WebGL data for the given number of primitives, null otherwise.
      */
-    const tryCreateArrays = (counts: IPrimitiveCounts): IMeshArrays | null => {
+    const tryCreateArrays = (
+        counts: IPrimitiveCounts,
+        withProperties: boolean
+    ): IMeshArrays | null => {
         try {
             const trianglePoints = new Float32Array(counts.triangles * 9); // 3 points * 3 coordinates per point per 1 triangle
             const triangleNormals = new Float32Array(counts.triangles * 9); // 3 points * 3 coordinates per point per 1 triangle
-            const properties = new Float32Array(counts.triangles * 3); // 3 points per 1 triangle
+            const properties = withProperties
+                ? new Float32Array(counts.triangles * 3) // 3 points per 1 triangle
+                : undefined;
             const lineIndices = new Uint32Array(counts.lineSegments * 2); // 2 point indices per segment
             return {
                 trianglePoints,
@@ -896,14 +901,15 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
      * Counts returned contain the actual number of primitives the arrays are created for.
      */
     const createMeshArrays = (
-        counts: IPrimitiveCounts
+        counts: IPrimitiveCounts,
+        withProperties: boolean
     ): { arrays: IMeshArrays | null; counts: IPrimitiveCounts } | null => {
         const currentCounts = {
             ...counts,
         };
         let res: IMeshArrays | null = null;
         do {
-            res = tryCreateArrays(currentCounts);
+            res = tryCreateArrays(currentCounts, withProperties);
             if (res === null) {
                 currentCounts.triangles -= counts.triangles * 0.1;
                 currentCounts.lineSegments -= counts.lineSegments * 0.1;
@@ -930,12 +936,14 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
      * Creates empty meshes.
      * @returns Empty meshes with empty data arrays and zero vertex counts.
      */
-    const createEmptyMeshes = () => {
+    const createEmptyMeshes = (withProperties: boolean) => {
         const mesh: MeshType = {
             drawMode: "triangle-list",
             attributes: {
                 positions: { value: new Float32Array(), size: 3 },
-                properties: { value: new Float32Array(), size: 1 },
+                properties: withProperties
+                    ? { value: new Float32Array(), size: 1 }
+                    : undefined,
                 normals: { value: new Float32Array(), size: 3 },
             },
             vertexCount: 0,
@@ -972,10 +980,10 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
     let i = 0;
 
     const counts = getPrimitiveCounts(polys);
-    const meshArrays = createMeshArrays(counts);
+    const meshArrays = createMeshArrays(counts, !!properties);
 
     if (!meshArrays?.arrays) {
-        return createEmptyMeshes();
+        return createEmptyMeshes(!!properties);
     }
 
     let arraysIndex = 0;
@@ -991,9 +999,12 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
             arraysIndex < meshArrays.arrays.trianglePoints.length - 3
         ) {
             const n = polys[i];
-            let propertyValue = properties[pn++];
+            let propertyValue = properties?.[pn++];
 
-            if (isPropertyValueDefined(propertyValue, params.undefinedValue)) {
+            if (
+                propertyValue != undefined &&
+                isPropertyValueDefined(propertyValue, params.undefinedValue)
+            ) {
                 propertyValueRangeMin =
                     propertyValue < propertyValueRangeMin
                         ? propertyValue
@@ -1044,7 +1055,9 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
                 meshArrays.arrays.triangleNormals[arraysIndex + 1] = normal[1];
                 meshArrays.arrays.triangleNormals[arraysIndex + 2] = normal[2];
 
-                meshArrays.arrays.properties[propertyIndex] = propertyValue;
+                if (meshArrays.arrays.properties) {
+                    meshArrays.arrays.properties[propertyIndex] = propertyValue;
+                }
 
                 arraysIndex += 3;
                 propertyIndex += 1;
@@ -1059,7 +1072,9 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
             drawMode: "triangle-list",
             attributes: {
                 positions: { value: meshArrays.arrays.trianglePoints, size: 3 },
-                properties: { value: meshArrays.arrays.properties, size: 1 },
+                properties: meshArrays.arrays.properties
+                    ? { value: meshArrays.arrays.properties, size: 1 }
+                    : undefined,
                 normals: { value: meshArrays.arrays.triangleNormals, size: 3 },
             },
             vertexCount: trianglesVertexCount,
@@ -1086,6 +1101,6 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
         ];
     } catch (error) {
         console.log("Grid3d webworker failed with error: ", error);
-        return createEmptyMeshes();
+        return createEmptyMeshes(!!properties);
     }
 }

@@ -47,7 +47,7 @@ function onTerminateWorker() {
 export type WebWorkerParams = {
     points: Float32Array;
     polys: Uint32Array;
-    properties: Float32Array | Uint16Array;
+    properties: Float32Array | Uint16Array | undefined;
     undefinedValue: number;
 };
 
@@ -115,15 +115,18 @@ async function loadPropertiesData(
 async function load_data(
     pointsData: string | number[] | Float32Array,
     polysData: string | number[] | Uint32Array,
-    propertiesData: string | number[] | Float32Array | Uint16Array,
+    propertiesData: string | number[] | Float32Array | Uint16Array | undefined,
     loadProperties: boolean
-): Promise<[Float32Array, Uint32Array, Float32Array | Uint16Array]> {
+): Promise<
+    [Float32Array, Uint32Array, Float32Array | Uint16Array | undefined]
+> {
     const points = await loadData(pointsData, Float32Array);
     const polys = await loadData(polysData, Uint32Array);
 
-    const properties = loadProperties
-        ? await loadPropertiesData(propertiesData)
-        : new Float32Array();
+    const properties =
+        loadProperties && propertiesData
+            ? await loadPropertiesData(propertiesData)
+            : undefined;
     return Promise.all([points, polys, properties]);
 }
 
@@ -193,7 +196,7 @@ export interface Grid3DLayerProps extends ExtendedLayerProps {
      * If propertiesData is provided as Uint16Array it is assumed that all the values are in range [0, N].
      * If colorMapFunction is Uint8Array the property values are used as color indices.
      */
-    propertiesData: string | number[] | Float32Array | Uint16Array;
+    propertiesData: string | number[] | Float32Array | Uint16Array | undefined;
 
     /**
      * Discrete propety value-name pairs to be displayed in cursor readouts.
@@ -431,14 +434,15 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
 
     private getPropertyValueRange(): [number, number] {
         const bbox = this.state["bbox"] as BoundingBox3D;
-        const zSign = this.props.ZIncreasingDownwards ? -1.0 : 1.0;
         switch (this.props.coloringMode) {
             case TGrid3DColoringMode.X:
                 return [bbox[0], bbox[3]];
             case TGrid3DColoringMode.Y:
                 return [bbox[1], bbox[4]];
             case TGrid3DColoringMode.Z:
-                return [zSign * bbox[2], zSign * bbox[5]];
+                return this.props.ZIncreasingDownwards
+                    ? [-bbox[5], -bbox[2]]
+                    : [bbox[2], bbox[5]];
             default:
                 return this.state["propertyValueRange"] as [number, number];
         }
@@ -459,7 +463,7 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
     private getUndefinedPropertyColor(): [number, number, number] {
         const colorFunc = this.props.colorMapFunction;
         if (
-            this.props.propertiesData.length === 0 &&
+            this.props.propertiesData?.length === 0 &&
             this.isColorMapFunctionConstantColor(colorFunc)
         ) {
             return [colorFunc[0], colorFunc[1], colorFunc[2]];
