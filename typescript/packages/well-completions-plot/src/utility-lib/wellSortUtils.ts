@@ -2,26 +2,32 @@ import { SortWellsBy, SortDirection } from "../types/dataTypes";
 import type { WellPlotData } from "../types/dataTypes";
 
 /**
- * Create function returning the compare value for the WellPlotData object.
+ * Create function returning the compare value(s) for the WellPlotData object.
  *
- * Returns a callable function which returns the compare value for a WellPlotData object based on given SortWellsBy.
+ * Returns a callable function which returns the compare value(s) for a WellPlotData object based on given SortWellsBy.
  * Can be used for for sorting list WellPlotData objects. I.e. provide the well
- * and return the name, or index to sort by. If the value is not found, undefined is returned.
+ * and return the name, index to sort by, or an array of zone indices from lowest to highest. If the value is not found, undefined is returned.
  *
  * @param sortWellsBy Sort method wanted when using the compare value
- * @returns Function returning the compare value for a WellPlotData object, based on the provided SortWellsBy
+ * @returns Function returning the compare value(s) for a WellPlotData object, based on the provided SortWellsBy
  */
 export function createGetWellPlotDataCompareValueFunction(
     sortWellsBy: SortWellsBy
-): (well: WellPlotData) => string | number | undefined {
+): (well: WellPlotData) => string | number | number[] | undefined {
     if (sortWellsBy === SortWellsBy.WELL_NAME) {
         return (well: WellPlotData) => well.name;
     }
     if (sortWellsBy === SortWellsBy.STRATIGRAPHY_DEPTH) {
-        return (well: WellPlotData) =>
-            well.completions.find(
-                (_, index) => well.completions[index]!.open > 0
-            )?.zoneIndex;
+        // Returns an array of increasing zone indices with completion open > 0 to sort by
+        // This assumes that that increasing index is increased stratigraphic depth (must be pre-processed)
+        return (well: WellPlotData) => {
+            const sortedZoneIndicesWithOpenCompletions = well.completions
+                .filter((_, index) => well.completions[index]!.open > 0)
+                .map((elm) => elm.zoneIndex)
+                .sort((a, b) => a - b);
+
+            return sortedZoneIndicesWithOpenCompletions;
+        };
     }
     if (sortWellsBy === SortWellsBy.EARLIEST_COMPLETION_DATE) {
         // Returns earliest completion date index, i.e. assuming sorted array of completion dates
@@ -37,7 +43,7 @@ export function createGetWellPlotDataCompareValueFunction(
  *
  * @param a First element for comparison
  * @param b Second element for comparison
- * @param getWellPlotDataCompareValueFunction Callback for getting the WellPlotData object value to compare by
+ * @param getWellPlotDataCompareValueFunction Callback for getting the WellPlotData object value(s) to compare by.
  * @param sortDirection Direction to sort by
  * @returns 0 if equal. For ascending: -1 if a is less than b, 1 if a is greater than b. For descending: 1 if a is less than b, -1 if a is greater than b.
  */
@@ -46,11 +52,21 @@ export function compareWellPlotDataValues<WellPlotData>(
     b: WellPlotData,
     getWellPlotDataCompareValueFunction: (
         item: WellPlotData
-    ) => string | number | undefined,
+    ) => string | number | number[] | undefined,
     sortDirection: SortDirection
 ): 0 | 1 | -1 {
+    if (a === b) {
+        // Compare by reference for early exit
+        return 0;
+    }
+
     const aValue = getWellPlotDataCompareValueFunction(a);
     const bValue = getWellPlotDataCompareValueFunction(b);
+
+    // Return type of compare values should be equal
+    if (typeof aValue !== typeof bValue) {
+        return 0;
+    }
 
     if (aValue === bValue) {
         return 0;
@@ -61,9 +77,46 @@ export function compareWellPlotDataValues<WellPlotData>(
     if (bValue === undefined) {
         return sortDirection === SortDirection.ASCENDING ? -1 : 1;
     }
+    if (Array.isArray(aValue) && Array.isArray(bValue)) {
+        if (aValue.length === 0 && bValue.length === 0) {
+            return 0;
+        }
+        if (aValue.length === 0) {
+            // 'a' has no completions, place it last
+            return sortDirection === SortDirection.ASCENDING ? 1 : -1;
+        }
+        if (bValue.length === 0) {
+            // 'b' has no completions, place it last
+            return sortDirection === SortDirection.ASCENDING ? -1 : 1;
+        }
+
+        // Compare arrays element by element for the common length
+        // - The well with lowest element at given index is considered less
+        const commonLength = Math.min(aValue.length, bValue.length);
+        for (let i = 0; i < commonLength; i++) {
+            if (aValue[i] < bValue[i]) {
+                return sortDirection === SortDirection.ASCENDING ? -1 : 1;
+            }
+            if (aValue[i] > bValue[i]) {
+                return sortDirection === SortDirection.ASCENDING ? 1 : -1;
+            }
+        }
+
+        // If the common parts are equal, compare by length - longest first (i.e. more completions)
+        if (aValue.length < bValue.length) {
+            return sortDirection === SortDirection.ASCENDING ? 1 : -1;
+        }
+        if (aValue.length > bValue.length) {
+            return sortDirection === SortDirection.ASCENDING ? -1 : 1;
+        }
+
+        // The arrays are equal
+        return 0;
+    }
     if (aValue < bValue) {
         return sortDirection === SortDirection.ASCENDING ? -1 : 1;
     }
+
     return sortDirection === SortDirection.ASCENDING ? 1 : -1;
 }
 
