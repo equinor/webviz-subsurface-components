@@ -11,15 +11,22 @@ import { tabDecorator } from "./helpers/MuiComponentsTabHelper";
 // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
 const args = require("../../../../../example-data/facies3wells.json");
 
-const RTCWellLogViewer: React.FunctionComponent = () => {
+interface IRTCWellLogViewerProps {
+    width?: string;
+}
+
+const RTCWellLogViewer: React.FunctionComponent<IRTCWellLogViewerProps> = (
+    props
+) => {
     return (
         <Grid container direction={"column"} justifyContent="flex-start">
             <div style={{ width: "100%", height: "100%" }}>
                 <div
                     data-testid="well-log-views"
                     style={{
-                        width: "1700px",
+                        width: props.width ?? "100%",
                         height: "80vh",
+                        position: "relative",
                     }}
                 >
                     <SyncLogViewer {...{ ...args, id: "c1" }} />
@@ -42,6 +49,15 @@ export const RTCTabsLayout: StoryObj<typeof RTCWellLogViewer> = {
     render: () => (
         <React.StrictMode>
             <RTCWellLogViewer />
+        </React.StrictMode>
+    ),
+};
+
+export const RTCTabsLayoutWithScrollbar: StoryObj<typeof RTCWellLogViewer> = {
+    decorators: [tabDecorator],
+    render: () => (
+        <React.StrictMode>
+            <RTCWellLogViewer {...{ width: "1700px" }} />
         </React.StrictMode>
     ),
 };
