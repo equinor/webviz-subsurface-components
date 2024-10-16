@@ -66,7 +66,7 @@ describe("compareWellPlotDataValues", () => {
         completions: [
             { open: 1, zoneIndex: 10, khMean: 0, khMin: 0, khMax: 0, shut: 0 },
             { open: 0, zoneIndex: 15, khMean: 0, khMin: 0, khMax: 0, shut: 0 },
-            { open: 1, zoneIndex: 25, khMean: 0, khMin: 0, khMax: 0, shut: 0 },            
+            { open: 1, zoneIndex: 25, khMean: 0, khMin: 0, khMax: 0, shut: 0 },
         ],
         earliestCompDateIndex: 10,
         attributes: {},
@@ -234,7 +234,7 @@ describe("compareWellsBySortByAndDirection", () => {
         completions: [
             { open: 1, zoneIndex: 10, khMean: 0, khMin: 0, khMax: 0, shut: 0 },
             { open: 0, zoneIndex: 15, khMean: 0, khMin: 0, khMax: 0, shut: 0 },
-            { open: 1, zoneIndex: 25, khMean: 0, khMin: 0, khMax: 0, shut: 0 },            
+            { open: 1, zoneIndex: 25, khMean: 0, khMin: 0, khMax: 0, shut: 0 },
         ],
         earliestCompDateIndex: 10,
         attributes: {},
@@ -649,5 +649,5 @@ describe("createSortedWellsFromSequence", () => {
         );
 
         expect(sortedWells).toEqual([mockWellPlotDataA]);
-    });   
+    });
 });
