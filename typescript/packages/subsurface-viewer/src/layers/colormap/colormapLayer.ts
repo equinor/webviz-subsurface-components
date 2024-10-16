@@ -2,7 +2,10 @@ import type { BitmapLayerPickingInfo, BitmapLayerProps } from "@deck.gl/layers";
 import { BitmapLayer } from "@deck.gl/layers";
 import type { PickingInfo } from "@deck.gl/core";
 
-import type { LayerPickInfo } from "../../layers/utils/layerTools";
+import type {
+    LayerPickInfo,
+    TypeAndNameLayerProps,
+} from "../../layers/utils/layerTools";
 import { decoder } from "../shader_modules";
 import type { ValueDecoder } from "../utils/propertyMapTools";
 import { decodeRGB } from "../utils/propertyMapTools";
@@ -66,7 +69,9 @@ function getImageData(
 // and RGB(255, 255, 255) to the maximum value in valueRange, thus giving us the full
 // > 16mil possible values for any property value range.
 // We also support property maps with an alpha channel. See colormap.fs.glsl for more details.
-export interface ColormapLayerProps extends BitmapLayerProps {
+export interface ColormapLayerProps
+    extends BitmapLayerProps,
+        TypeAndNameLayerProps {
     // Name of color map.
     colorMapName: string;
 

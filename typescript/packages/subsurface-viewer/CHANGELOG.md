@@ -1,3 +1,38 @@
+## [1.1.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.1.0...subsurface-viewer@1.1.1) (2024-10-14)
+
+
+### Bug Fixes
+
+* incorrect interface of `ColormapLayer` ([#2314](https://github.com/equinor/webviz-subsurface-components/issues/2314)) ([46176b7](https://github.com/equinor/webviz-subsurface-components/commit/46176b7b87ef9ae86dfe119d8eb87902d316a90f)), closes [#2310](https://github.com/equinor/webviz-subsurface-components/issues/2310)
+
+# [1.1.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.0.7...subsurface-viewer@1.1.0) (2024-10-14)
+
+
+### Features
+
+* expose `pickingRadius` as prop in `Map.tsx` in `SubsurfaceViewer` package ([#2313](https://github.com/equinor/webviz-subsurface-components/issues/2313)) ([817cdeb](https://github.com/equinor/webviz-subsurface-components/commit/817cdeb02ec8f0bf3341d189dbe47b59f29f2ee7))
+
+## [1.0.7](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.0.6...subsurface-viewer@1.0.7) (2024-10-11)
+
+
+### Bug Fixes
+
+* bump mathjs from 13.1.1 to 13.2.0 in /typescript ([#2308](https://github.com/equinor/webviz-subsurface-components/issues/2308)) ([82aba49](https://github.com/equinor/webviz-subsurface-components/commit/82aba49945ad1858e0c7ab9022d7cb6c4fd5b004)), closes [#3256](https://github.com/equinor/webviz-subsurface-components/issues/3256) [#3251](https://github.com/equinor/webviz-subsurface-components/issues/3251) [#3253](https://github.com/equinor/webviz-subsurface-components/issues/3253) [#3257](https://github.com/equinor/webviz-subsurface-components/issues/3257) [#3259](https://github.com/equinor/webviz-subsurface-components/issues/3259) [#3246](https://github.com/equinor/webviz-subsurface-components/issues/3246) [#3267](https://github.com/equinor/webviz-subsurface-components/issues/3267) [#3272](https://github.com/equinor/webviz-subsurface-components/issues/3272) [#3](https://github.com/equinor/webviz-subsurface-components/issues/3)
+
+## [1.0.6](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.0.5...subsurface-viewer@1.0.6) (2024-10-11)
+
+
+### Bug Fixes
+
+* bump @turf/simplify from 7.0.0 to 7.1.0 in /typescript ([#2309](https://github.com/equinor/webviz-subsurface-components/issues/2309)) ([0b9903a](https://github.com/equinor/webviz-subsurface-components/commit/0b9903a2aff77331b2a8ca1c9e0e2c35cfab28e7)), closes [Turfjs/turf#2618](https://github.com/Turfjs/turf/issues/2618) [Turfjs/turf#2612](https://github.com/Turfjs/turf/issues/2612) [Turfjs/turf#2621](https://github.com/Turfjs/turf/issues/2621) [Turfjs/turf#2623](https://github.com/Turfjs/turf/issues/2623) [Turfjs/turf#2631](https://github.com/Turfjs/turf/issues/2631) [Turfjs/turf#2644](https://github.com/Turfjs/turf/issues/2644) [Turfjs/turf#2645](https://github.com/Turfjs/turf/issues/2645) [Turfjs/turf#2646](https://github.com/Turfjs/turf/issues/2646) [Turfjs/turf#2648](https://github.com/Turfjs/turf/issues/2648) [Turfjs/turf#2649](https://github.com/Turfjs/turf/issues/2649) [Turfjs/turf#2602](https://github.com/Turfjs/turf/issues/2602) [Turfjs/turf#2650](https://github.com/Turfjs/turf/issues/2650) [Turfjs/turf#2651](https://github.com/Turfjs/turf/issues/2651) [Turfjs/turf#2652](https://github.com/Turfjs/turf/issues/2652) [Turfjs/turf#2653](https://github.com/Turfjs/turf/issues/2653) [Turfjs/turf#2654](https://github.com/Turfjs/turf/issues/2654) [Turfjs/turf#2655](https://github.com/Turfjs/turf/issues/2655) [Turfjs/turf#2593](https://github.com/Turfjs/turf/issues/2593) [Turfjs/turf#2664](https://github.com/Turfjs/turf/issues/2664) [Turfjs/turf#2665](https://github.com/Turfjs/turf/issues/2665) [Turfjs/turf#2668](https://github.com/Turfjs/turf/issues/2668) [Turfjs/turf#2669](https://github.com/Turfjs/turf/issues/2669) [Turfjs/turf#2659](https://github.com/Turfjs/turf/issues/2659) [Turfjs/turf#2636](https://github.com/Turfjs/turf/issues/2636) [Turfjs/turf#2563](https://github.com/Turfjs/turf/issues/2563) [Turfjs/turf#2674](https://github.com/Turfjs/turf/issues/2674) [Turfjs/turf#2673](https://github.com/Turfjs/turf/issues/2673) [Turfjs/turf#2574](https://github.com/Turfjs/turf/issues/2574) [Turfjs/turf#2675](https://github.com/Turfjs/turf/issues/2675) [Turfjs/turf#2671](https://github.com/Turfjs/turf/issues/2671) [Turfjs/turf#2676](https://github.com/Turfjs/turf/issues/2676) [Turfjs/turf#2677](https://github.com/Turfjs/turf/issues/2677) [Turfjs/turf#2688](https://github.com/Turfjs/turf/issues/2688) [Turfjs/turf#2635](https://github.com/Turfjs/turf/issues/2635) [Turfjs/turf#2689](https://github.com/Turfjs/turf/issues/2689) [Turfjs/turf#2692](https://github.com/Turfjs/turf/issues/2692) [Turfjs/turf#2693](https://github.com/Turfjs/turf/issues/2693) [Turfjs/turf#2624](https://github.com/Turfjs/turf/issues/2624) [Turfjs/turf#2683](https://github.com/Turfjs/turf/issues/2683) [Turfjs/turf#2696](https://github.com/Turfjs/turf/issues/2696) [Turfjs/turf#2618](https://github.com/Turfjs/turf/issues/2618) [Turfjs/turf#2593](https://github.com/Turfjs/turf/issues/2593) [Turfjs/turf#2665](https://github.com/Turfjs/turf/issues/2665) [Turfjs/turf#2659](https://github.com/Turfjs/turf/issues/2659) [Turfjs/turf#2636](https://github.com/Turfjs/turf/issues/2636) [Turfjs/turf#2563](https://github.com/Turfjs/turf/issues/2563) [#2696](https://github.com/equinor/webviz-subsurface-components/issues/2696) [#2683](https://github.com/equinor/webviz-subsurface-components/issues/2683) [#2624](https://github.com/equinor/webviz-subsurface-components/issues/2624) [#2693](https://github.com/equinor/webviz-subsurface-components/issues/2693) [#2692](https://github.com/equinor/webviz-subsurface-components/issues/2692) [#2635](https://github.com/equinor/webviz-subsurface-components/issues/2635) [#2688](https://github.com/equinor/webviz-subsurface-components/issues/2688) [#2677](https://github.com/equinor/webviz-subsurface-components/issues/2677)
+
+## [1.0.5](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.0.4...subsurface-viewer@1.0.5) (2024-10-10)
+
+
+### Bug Fixes
+
+* bump react-resize-detector from 10.0.1 to 11.0.1 in /typescript ([#2305](https://github.com/equinor/webviz-subsurface-components/issues/2305)) ([80f879e](https://github.com/equinor/webviz-subsurface-components/commit/80f879e7e429b714a04e50533317efe78880e82f)), closes [maslianok/react-resize-detector#254](https://github.com/maslianok/react-resize-detector/issues/254)
+
 ## [1.0.4](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.0.3...subsurface-viewer@1.0.4) (2024-10-09)
 
 

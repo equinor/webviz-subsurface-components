@@ -22,10 +22,14 @@ export type Position3D = [number, number, number];
 // Return a color given a number in the [0,1] range.
 export type colorMapFunctionType = (x: number) => [number, number, number];
 
-export interface ExtendedLayerProps extends CompositeLayerProps {
+export interface TypeAndNameLayerProps {
     "@@type"?: string;
     name: string;
 }
+
+export interface ExtendedLayerProps
+    extends CompositeLayerProps,
+        TypeAndNameLayerProps {}
 
 export interface ExtendedLayer extends Layer {
     getLegendData?: () => DiscreteLegendDataType | ContinuousLegendDataType;
