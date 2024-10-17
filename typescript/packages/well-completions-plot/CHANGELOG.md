@@ -1,3 +1,10 @@
+## [1.5.11](https://github.com/equinor/webviz-subsurface-components/compare/well-completions-plot@1.5.10...well-completions-plot@1.5.11) (2024-10-17)
+
+
+### Bug Fixes
+
+* Improve sort by stratigraphy depth in utility-lib for well-completions-plot ([#2321](https://github.com/equinor/webviz-subsurface-components/issues/2321)) ([a50506d](https://github.com/equinor/webviz-subsurface-components/commit/a50506d14a5703dfd953ca6723057beafdfa8d6b))
+
 ## [1.5.10](https://github.com/equinor/webviz-subsurface-components/compare/well-completions-plot@1.5.9...well-completions-plot@1.5.10) (2024-10-11)
 
 
