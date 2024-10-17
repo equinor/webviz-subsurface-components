@@ -1,3 +1,10 @@
+## [2.1.6](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@2.1.5...well-log-viewer@2.1.6) (2024-10-17)
+
+
+### Bug Fixes
+
+* prevent update of scroll position when component is hidden ([#2322](https://github.com/equinor/webviz-subsurface-components/issues/2322)) ([c9a2e25](https://github.com/equinor/webviz-subsurface-components/commit/c9a2e250fe7ef5d7f52a2893581b6e7be09dcad3))
+
 ## [2.1.5](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@2.1.4...well-log-viewer@2.1.5) (2024-10-11)
 
 
