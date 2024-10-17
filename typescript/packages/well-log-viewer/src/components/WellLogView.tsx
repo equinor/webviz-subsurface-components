@@ -1318,7 +1318,11 @@ class WellLogView
                     if (this.logController)
                         posWellPickTitles(this.logController, this);
 
-                    this.onContentRescale();
+                    if (
+                        entry.contentRect.width > 0 &&
+                        entry.contentRect.height > 0
+                    )
+                        this.onContentRescale();
                 }
             }
         );
