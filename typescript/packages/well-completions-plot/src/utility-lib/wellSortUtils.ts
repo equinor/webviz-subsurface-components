@@ -5,8 +5,13 @@ import type { WellPlotData } from "../types/dataTypes";
  * Create function returning the compare value(s) for the WellPlotData object.
  *
  * Returns a callable function which returns the compare value(s) for a WellPlotData object based on given SortWellsBy.
- * Can be used for for sorting list WellPlotData objects. I.e. provide the well
- * and return the name, index to sort by, or an array of zone indices from lowest to highest. If the value is not found, undefined is returned.
+ * Can be used for for sorting list WellPlotData objects. I.e. provide the well and return the name to sort by, index to sort by,
+ * or an array of zone indices with open completions, sorted from lowest to highest, to sort by. If the value is not found,
+ * undefined is returned.
+ *
+ * * `(well: WellPlotData) => number[]`: For comparison value as array of zone indices: The lowest zone index is considered as the most shallow, and higher
+ * indices are considered deeper. The array is sorted from lowest to highest index. This assumes that zone indices are
+ * pre-processed to represent increasing stratigraphic depth.
  *
  * @param sortWellsBy Sort method wanted when using the compare value
  * @returns Function returning the compare value(s) for a WellPlotData object, based on the provided SortWellsBy
@@ -40,6 +45,14 @@ export function createGetWellPlotDataCompareValueFunction(
 
 /**
  * Compare two WellPlotData elements based on the value from getWellPlotDataCompareValueFunction and requested direction
+ *
+ * * `getWellPlotDataCompareValueFunction => number[]`: When compare value is number[], each well gets an array of numerical
+ * values for comparison. The comparison is done by index based iteration for the common number of indices, and comparing the
+ * element values at given index of the two arrays. The well with the lowest value at the given index is considered less, whilst
+ * the well with the highest value at given index is considered greater, for ascending order and opposite for descending. If all
+ * elements for index based iteration is considered equal, the array lengths are checked. The longest array will be considered
+ * less for ascending order (prioritized first), and greater for descending order (prioritized last). Otherwise the arrays are
+ * considered equal.
  *
  * @param a First element for comparison
  * @param b Second element for comparison
@@ -82,16 +95,16 @@ export function compareWellPlotDataValues<WellPlotData>(
             return 0;
         }
         if (aValue.length === 0) {
-            // 'a' has no completions, place it last
+            // 'a' has no compare values, place it last
             return sortDirection === SortDirection.ASCENDING ? 1 : -1;
         }
         if (bValue.length === 0) {
-            // 'b' has no completions, place it last
+            // 'b' has no compare values, place it last
             return sortDirection === SortDirection.ASCENDING ? -1 : 1;
         }
 
-        // Compare arrays element by element for the common length
-        // - The well with lowest element at given index is considered less
+        // Compare arrays index based for the common length
+        // - The well with lowest value at given index is considered less
         const commonLength = Math.min(aValue.length, bValue.length);
         for (let i = 0; i < commonLength; i++) {
             if (aValue[i] < bValue[i]) {
@@ -102,7 +115,7 @@ export function compareWellPlotDataValues<WellPlotData>(
             }
         }
 
-        // If the common parts are equal, compare by length - longest first (i.e. more completions)
+        // If the common parts are equal, compare by length - longest first (e.g. more completions)
         if (aValue.length < bValue.length) {
             return sortDirection === SortDirection.ASCENDING ? 1 : -1;
         }
