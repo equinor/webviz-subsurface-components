@@ -544,7 +544,7 @@ const Map: React.FC<MapProps> = ({
                     pickInfo.layer.context.deck.pickMultipleObjects({
                         x: event.offsetCenter.x,
                         y: event.offsetCenter.y,
-                        depth: coords.pickDepth ? coords.pickDepth : undefined,
+                        depth: coords.pickDepth ?? undefined,
                         unproject3D: true,
                     }) as LayerPickInfo[];
                 pickInfos.forEach((item) => {
