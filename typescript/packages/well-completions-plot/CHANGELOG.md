@@ -1,3 +1,10 @@
+## [1.5.12](https://github.com/equinor/webviz-subsurface-components/compare/well-completions-plot@1.5.11...well-completions-plot@1.5.12) (2024-10-22)
+
+
+### Bug Fixes
+
+* bump @emerson-eps/color-tables to 0.4.85 in subsurface-viewer, well-log-viewer and python ([#2326](https://github.com/equinor/webviz-subsurface-components/issues/2326)) ([750f605](https://github.com/equinor/webviz-subsurface-components/commit/750f605ece508ab1853da4ddf4b730090e873fec))
+
 ## [1.5.11](https://github.com/equinor/webviz-subsurface-components/compare/well-completions-plot@1.5.10...well-completions-plot@1.5.11) (2024-10-17)
 
 
