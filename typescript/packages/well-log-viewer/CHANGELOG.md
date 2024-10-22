@@ -1,3 +1,10 @@
+## [2.1.7](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@2.1.6...well-log-viewer@2.1.7) (2024-10-22)
+
+
+### Bug Fixes
+
+* bump @emerson-eps/color-tables to 0.4.85 in subsurface-viewer, well-log-viewer and python ([#2326](https://github.com/equinor/webviz-subsurface-components/issues/2326)) ([750f605](https://github.com/equinor/webviz-subsurface-components/commit/750f605ece508ab1853da4ddf4b730090e873fec))
+
 ## [2.1.6](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@2.1.5...well-log-viewer@2.1.6) (2024-10-17)
 
 
