@@ -15,7 +15,7 @@ import type {
 } from "../../components/Map";
 import type {
     ExtendedLayerProps,
-    colorMapFunctionType,
+    ColorMapFunctionType,
 } from "../utils/layerTools";
 import { makeFullMesh } from "./webworker";
 
@@ -198,7 +198,7 @@ export interface Grid3DLayerProps extends ExtendedLayerProps {
      * E.g. [255, 0, 0] for constant red cells.
      * Can be defined as Uint8Array containing [R, G, B] triplets in [0, 255] range each.
      */
-    colorMapFunction?: colorMapFunctionType | Uint8Array;
+    colorMapFunction?: ColorMapFunctionType | Uint8Array;
 
     /**
      * Value in propertiesData indicating that the property is undefined.
@@ -434,7 +434,7 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
     }
 
     private isColorMapFunctionConstantColor(
-        colorFunc: Uint8Array | colorMapFunctionType | undefined
+        colorFunc: Uint8Array | ColorMapFunctionType | undefined
     ): colorFunc is Uint8Array {
         return (
             (Array.isArray(colorFunc) || colorFunc instanceof Uint8Array) &&

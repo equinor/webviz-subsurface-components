@@ -14,7 +14,7 @@ import type {
     ExtendedLayerProps,
     LayerPickInfo,
     PropertyDataType,
-    colorMapFunctionType,
+    ColorMapFunctionType,
 } from "../utils/layerTools";
 import { createPropertyData, getImageData } from "../utils/layerTools";
 import type { DeckGLLayerContext } from "../../components/Map";
@@ -44,7 +44,7 @@ export interface PrivateMapLayerProps extends ExtendedLayerProps {
     colorMapName: string;
     colorMapRange: [number, number];
     colorMapClampColor: Color | undefined | boolean;
-    colorMapFunction?: colorMapFunctionType;
+    colorMapFunction?: ColorMapFunctionType;
     propertyValueRange: [number, number];
     smoothShading: boolean;
     depthTest: boolean;

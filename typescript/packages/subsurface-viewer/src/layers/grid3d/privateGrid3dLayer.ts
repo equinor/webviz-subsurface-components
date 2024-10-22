@@ -19,7 +19,7 @@ import type {
     ExtendedLayerProps,
     LayerPickInfo,
     PropertyDataType,
-    colorMapFunctionType,
+    ColorMapFunctionType,
 } from "../utils/layerTools";
 import { createPropertyData, getImageData } from "../utils/layerTools";
 import fsShader from "./fragment.fs.glsl";
@@ -56,7 +56,7 @@ export interface PrivateLayerProps extends ExtendedLayerProps {
     colorMapClampColor: Color | undefined | boolean;
     undefinedPropertyValue: number;
     undefinedPropertyColor: [number, number, number];
-    colorMapFunction?: colorMapFunctionType;
+    colorMapFunction?: ColorMapFunctionType;
     coloringMode: TGrid3DColoringMode.Property;
     gridLines: boolean;
     propertyValueRange: [number, number];

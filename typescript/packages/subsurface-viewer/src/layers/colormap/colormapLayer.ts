@@ -9,7 +9,7 @@ import type {
 import { decoder } from "../shader_modules";
 import type { ValueDecoder } from "../utils/propertyMapTools";
 import { decodeRGB } from "../utils/propertyMapTools";
-import type { colorMapFunctionType } from "../utils/layerTools";
+import type { ColorMapFunctionType } from "../utils/layerTools";
 import { getModelMatrix } from "../utils/layerTools";
 import fsColormap from "./colormap.fs.glsl";
 import type {
@@ -23,7 +23,7 @@ import type { ContinuousLegendDataType } from "../../components/ColorLegend";
 function getImageData(
     colorMapName: string,
     colorTables: colorTablesArray,
-    colorMapFunction?: colorMapFunctionType
+    colorMapFunction?: ColorMapFunctionType
 ) {
     const isColorMapFunctionDefined = typeof colorMapFunction !== "undefined";
 
@@ -32,7 +32,7 @@ function getImageData(
     for (let i = 0; i < 256; i++) {
         const value = i / 255.0;
         const rgb = isColorMapFunctionDefined
-            ? (colorMapFunction as colorMapFunctionType)(i / 255)
+            ? (colorMapFunction as ColorMapFunctionType)(i / 255)
             : getRgbData(value, colorMapName, colorTables);
         let color: number[] = [];
         if (rgb != undefined) {
@@ -78,7 +78,7 @@ export interface ColormapLayerProps
     // Optional function property.
     // If defined this function will override the color map.
     // Takes a value in the range [0,1] and returns a color.
-    colorMapFunction?: colorMapFunctionType;
+    colorMapFunction?: ColorMapFunctionType;
 
     // Min and max property values.
     valueRange: [number, number];

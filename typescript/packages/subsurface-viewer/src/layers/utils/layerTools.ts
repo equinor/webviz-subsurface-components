@@ -20,7 +20,7 @@ import type DrawingLayer from "../drawing/drawingLayer";
 export type Position3D = [number, number, number];
 
 // Return a color given a number in the [0,1] range.
-export type colorMapFunctionType = (x: number) => [number, number, number];
+export type ColorMapFunctionType = (x: number) => [number, number, number];
 
 export interface TypeAndNameLayerProps {
     "@@type"?: string;
@@ -207,7 +207,7 @@ export function defineBoundingBox(
 export function getImageData(
     colorMapName: string,
     colorTables: colorTablesArray,
-    colorMapFunction: colorMapFunctionType | undefined
+    colorMapFunction: ColorMapFunctionType | undefined
 ) {
     type funcType = (x: number) => Color;
 

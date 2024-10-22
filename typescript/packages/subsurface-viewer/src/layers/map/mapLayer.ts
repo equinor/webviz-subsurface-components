@@ -17,7 +17,7 @@ import workerpool from "workerpool";
 import type { ReportBoundingBoxAction } from "../../components/Map";
 import type {
     ExtendedLayerProps,
-    colorMapFunctionType,
+    ColorMapFunctionType,
 } from "../utils/layerTools";
 import type { Material } from "./privateMapLayer";
 import PrivateMapLayer from "./privateMapLayer";
@@ -234,7 +234,7 @@ export interface MapLayerProps extends ExtendedLayerProps {
      * May also be set as constant color:
      * E.g. [255, 0, 0] for constant red surface.
      */
-    colorMapFunction?: colorMapFunctionType;
+    colorMapFunction?: ColorMapFunctionType;
 
     /**  Surface material properties.
      * material: true  = default material, coloring depends on surface orientation and lighting.
