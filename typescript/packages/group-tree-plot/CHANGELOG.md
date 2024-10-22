@@ -1,3 +1,10 @@
+## [1.3.16](https://github.com/equinor/webviz-subsurface-components/compare/group-tree-plot@1.3.15...group-tree-plot@1.3.16) (2024-10-22)
+
+
+### Bug Fixes
+
+* bump @emerson-eps/color-tables to 0.4.85 in subsurface-viewer, well-log-viewer and python ([#2326](https://github.com/equinor/webviz-subsurface-components/issues/2326)) ([750f605](https://github.com/equinor/webviz-subsurface-components/commit/750f605ece508ab1853da4ddf4b730090e873fec))
+
 ## [1.3.15](https://github.com/equinor/webviz-subsurface-components/compare/group-tree-plot@1.3.14...group-tree-plot@1.3.15) (2024-10-11)
 
 
