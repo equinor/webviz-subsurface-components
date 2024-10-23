@@ -131,10 +131,42 @@ async function load_data(
  * Enumerates possible coloring modes of Grid3D Layer.
  */
 export enum TGrid3DColoringMode {
+    /** A continuous property is provided to colorize the cells. */
     Property,
+    /** A discrete property is provided to colorize the cells. */
+    DiscreteProperty,
+    /** Coloring using the X value of the cell nodes. */
     X,
+    /** Coloring using the Y value of the cell nodes. */
     Y,
+    /** Coloring using the Z value of the cell nodes. */
     Z,
+}
+
+/**
+ * Returns true if the coloring mode is geometric, that is based on the X, Y or Z coordinates
+ * of the cell nodes. In that case no explicit property data is required.
+ * @param coloringMode coloring mode.
+ * @returns true if the coloring mode is geometric.
+ */
+export function isGeometricProperty(
+    coloringMode: TGrid3DColoringMode
+): boolean {
+    return (
+        coloringMode === TGrid3DColoringMode.X ||
+        coloringMode === TGrid3DColoringMode.Y ||
+        coloringMode === TGrid3DColoringMode.Z
+    );
+}
+
+/**
+ * Returns true if the coloring mode is discrete. In that case an explicit property data is required,
+ * with integer values ranging from 0 to N, where N is the number of discrete property values.
+ * @param coloringMode coloring mode
+ * @returns true if the property values are discrete.
+ */
+export function isDiscreteProperty(coloringMode: TGrid3DColoringMode): boolean {
+    return coloringMode === TGrid3DColoringMode.DiscreteProperty;
 }
 
 export interface IDiscretePropertyValueName {
@@ -279,7 +311,9 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
             this.props.pointsData,
             this.props.polysData,
             this.props.propertiesData,
-            this.props.coloringMode === TGrid3DColoringMode.Property
+            !isGeometricProperty(
+                this.props.coloringMode ?? TGrid3DColoringMode.Property
+            )
         );
 
         p.then(([points, polys, properties]) => {
