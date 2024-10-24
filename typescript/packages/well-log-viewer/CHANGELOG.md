@@ -1,3 +1,10 @@
+## [2.1.8](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@2.1.7...well-log-viewer@2.1.8) (2024-10-24)
+
+
+### Bug Fixes
+
+* bump workerpool from 9.1.3 to 9.2.0 in subsurface-viewer ([#2331](https://github.com/equinor/webviz-subsurface-components/issues/2331)) ([4391b74](https://github.com/equinor/webviz-subsurface-components/commit/4391b74cdde7bd91c0bcc9c8cd398a528b815782))
+
 ## [2.1.7](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@2.1.6...well-log-viewer@2.1.7) (2024-10-22)
 
 
