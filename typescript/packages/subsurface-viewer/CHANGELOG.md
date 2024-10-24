@@ -1,3 +1,10 @@
+## [1.1.3](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.1.2...subsurface-viewer@1.1.3) (2024-10-24)
+
+
+### Bug Fixes
+
+* bump workerpool from 9.1.3 to 9.2.0 in subsurface-viewer ([#2331](https://github.com/equinor/webviz-subsurface-components/issues/2331)) ([4391b74](https://github.com/equinor/webviz-subsurface-components/commit/4391b74cdde7bd91c0bcc9c8cd398a528b815782))
+
 ## [1.1.2](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.1.1...subsurface-viewer@1.1.2) (2024-10-22)
 
 
