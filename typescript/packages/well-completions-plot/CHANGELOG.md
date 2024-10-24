@@ -1,3 +1,10 @@
+## [1.5.13](https://github.com/equinor/webviz-subsurface-components/compare/well-completions-plot@1.5.12...well-completions-plot@1.5.13) (2024-10-24)
+
+
+### Bug Fixes
+
+* bump workerpool from 9.1.3 to 9.2.0 in subsurface-viewer ([#2331](https://github.com/equinor/webviz-subsurface-components/issues/2331)) ([4391b74](https://github.com/equinor/webviz-subsurface-components/commit/4391b74cdde7bd91c0bcc9c8cd398a528b815782))
+
 ## [1.5.12](https://github.com/equinor/webviz-subsurface-components/compare/well-completions-plot@1.5.11...well-completions-plot@1.5.12) (2024-10-22)
 
 
