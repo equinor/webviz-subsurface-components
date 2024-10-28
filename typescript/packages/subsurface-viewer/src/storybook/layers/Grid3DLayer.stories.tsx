@@ -131,34 +131,34 @@ function discreteProperty(cellCountU: number, cellCountV: number) {
 
 /* eslint-disable prettier/prettier */
 const CATEGORICAL_COLOR_TABLE: [number, number, number][] = [
-    [0, 0, 255],     // 0
-    [0, 255, 0],     // 1 
-    [0, 255, 255],   // 2 
-    [255, 0, 0],     // 3 
-    [255, 0, 255],   // 4 
-    [255, 255, 0],   // 5 
-    [0, 0, 100],     // 6 
-    [0, 100, 0],     // 7 
-    [0, 100, 100],   // 8
-    [100, 0, 0],     // 9 
-    [100, 0, 100],   // 10
-    [100, 100, 0],   // 11
+    [0, 0, 255], // 0
+    [0, 255, 0], // 1
+    [0, 255, 255], // 2
+    [255, 0, 0], // 3
+    [255, 0, 255], // 4
+    [255, 255, 0], // 5
+    [0, 0, 100], // 6
+    [0, 100, 0], // 7
+    [0, 100, 100], // 8
+    [100, 0, 0], // 9
+    [100, 0, 100], // 10
+    [100, 100, 0], // 11
     [100, 100, 255], // 12
 ];
 
 const propertyValueNames = [
-    { value: 1, name: "blue"},         // 0
-    { value: 2, name:"green"},         // 1
-    { value: 5, name: "cyan"},         // 2
-    { value: 6, name: "red"},          // 3
-    { value: -8, name: "magenta"},     // 4
-    { value: 9, name: "yellow"},       // 5
-    { value: 20, name: "dark blue"},   // 6
-    { value: 30, name: "dark green"},  // 7
-    { value: 15, name: "dark cyan"},   // 8
-    { value: 10, name: "dark red"},    // 9
-    { value: 3, name: "dark magenta"}, // 10
-    { value: -10, name: "dark yellow"},// 11
+    { value: 1, name: "blue" }, // 0
+    { value: 2, name: "green" }, // 1
+    { value: 5, name: "cyan" }, // 2
+    { value: 6, name: "red" }, // 3
+    { value: -8, name: "magenta" }, // 4
+    { value: 9, name: "yellow" }, // 5
+    { value: 20, name: "dark blue" }, // 6
+    { value: 30, name: "dark green" }, // 7
+    { value: 15, name: "dark cyan" }, // 8
+    { value: 10, name: "dark red" }, // 9
+    { value: 3, name: "dark magenta" }, // 10
+    { value: -10, name: "dark yellow" }, // 11
     { value: -10, name: "Lite blue" }, // 12
 ];
 /* eslint-enable prettier/prettier */
@@ -235,13 +235,20 @@ function replaceLayerNonJson(
     layer: TLayerDefinition,
     keys: string[] | undefined = undefined
 ) {
-    const layerId = layer?.["id"] as string | undefined;
-    if (layer && layerId && layerNonJson[layerId]) {
-        if (!keys) {
-            keys = Object.keys(layerNonJson[layerId]) as string[];
-        }
-        for (const key of keys) {
-            layer[key] = layerNonJson[layerId][key];
+    const localLayer = layer as Record<string, unknown>;
+    const layerId = localLayer["id"] as string | undefined;
+    if (layer && layerId && layerId) {
+        for (const nonJsonKey in layerNonJson) {
+            if (nonJsonKey === layerId) {
+                if (!keys) {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    keys = Object.keys((layerNonJson as any)[nonJsonKey]);
+                }
+                for (const key of keys) {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    localLayer[key] = (layerNonJson as any)[nonJsonKey][key];
+                }
+            }
         }
     }
 }
