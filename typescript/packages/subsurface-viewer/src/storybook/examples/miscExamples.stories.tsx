@@ -119,9 +119,9 @@ export const MapMaterial: StoryObj<typeof SubsurfaceViewer> = {
 // Given as array of three values (r,g,b) e.g: [255, 0, 0]
 // If not set (undefined) or set to true, it will clamp to color map min and max values.
 // If set to false the clamp color will be completely transparent.
-const propertyValueRange = [2782, 3513];
-const colorMapRange = [3000, 3513];
-const colorMapClampColor = [0, 255, 0]; // a color e.g. [0, 255, 0],  false, true or undefined.
+const propertyValueRange = [-1870, 41000];
+const colorMapRange = [100, 20000];
+const colorMapClampColor = [255, 255, 0]; // a color e.g. [0, 255, 0],  false, true or undefined.
 
 export const MapClampColor: StoryObj<typeof SubsurfaceViewer> = {
     args: {

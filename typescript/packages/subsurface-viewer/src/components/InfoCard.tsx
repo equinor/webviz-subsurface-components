@@ -178,6 +178,17 @@ const InfoCard: React.FC<InfoCardProps> = (props: InfoCardProps) => {
             name: "y",
             value: Number(topObject.coordinate[1]).toFixed(2).toString() + " m",
         });
+        if (
+            topObject.coordinate[2] != undefined &&
+            !Number.isNaN(topObject.coordinate[2])
+        ) {
+            xy_properties.push({
+                name: "z",
+                value:
+                    Number(topObject.coordinate[2]).toFixed(2).toString() +
+                    " m",
+            });
+        }
 
         const info_card_data: InfoCardDataType[] = [];
         info_card_data.push({
