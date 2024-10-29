@@ -1,3 +1,10 @@
+## [1.1.5](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.1.4...subsurface-viewer@1.1.5) (2024-10-29)
+
+
+### Bug Fixes
+
+* colors of displayed discrete property values should not be affected by colormap range. ([#2337](https://github.com/equinor/webviz-subsurface-components/issues/2337)) ([e1843df](https://github.com/equinor/webviz-subsurface-components/commit/e1843df791ae585bd59d4b903e62946fbb616572))
+
 ## [1.1.4](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.1.3...subsurface-viewer@1.1.4) (2024-10-25)
 
 
