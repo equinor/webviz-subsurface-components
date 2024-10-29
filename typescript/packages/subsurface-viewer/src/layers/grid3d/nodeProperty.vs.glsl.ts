@@ -1,7 +1,6 @@
 const vsShader = `\
 #version 300 es
 #define SHADER_NAME grid3d-node-vertex-shader
-//precision highp float;
 
 in vec3 positions;
 in vec3 normals;
@@ -34,11 +33,19 @@ void main(void) {
    normal.z   *= zSign;
 
    switch(coloringMode) {
-      case 2: property = position.x; break;
-      case 3: property = position.y; break;
-      case 4: property = position.z; break;
+      case 2:
+         property = position.x;
+         break;
+      case 3:
+         property = position.y;
+         break;
+      case 4:
+         property = position.z;
+         break;
       // case 0 or default should never be used
-      default: property = position.z; break;
+      default:
+         property = position.z;
+         break;
    }
 
    position_commonspace = vec4(project_position(position), 0.0);

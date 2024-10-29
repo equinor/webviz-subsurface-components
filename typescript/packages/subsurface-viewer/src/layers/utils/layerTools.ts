@@ -19,8 +19,10 @@ import type DrawingLayer from "../drawing/drawingLayer";
 
 export type Position3D = [number, number, number];
 
-// Return a color given a number in the [0,1] range.
+/** Type of functions returning a color from a value in the [0,1] range. */
 export type ColorMapFunctionType = (x: number) => [number, number, number];
+/** @deprecated Use ColorMapFunctionType instead. */
+export type colorMapFunctionType = ColorMapFunctionType;
 
 export interface TypeAndNameLayerProps {
     "@@type"?: string;

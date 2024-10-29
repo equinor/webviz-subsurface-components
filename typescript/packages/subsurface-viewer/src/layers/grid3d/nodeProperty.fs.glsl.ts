@@ -1,7 +1,6 @@
 const fsShader = `\
 #version 300 es
 #define SHADER_NAME grid3d-node-fragment-shader
-//precision highp float;
 
 in vec3 cameraPosition;
 in vec4 position_commonspace;
@@ -24,8 +23,8 @@ uniform bool isClampColor;
 
 vec4 getPropertyColor (float propertyValue) {
    vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
-   float x = (propertyValue - colorMapRangeMin) / (colorMapRangeMax - colorMapRangeMin);
-   if (x < 0.0 || x > 1.0) {
+   float normalizedValue = (propertyValue - colorMapRangeMin) / (colorMapRangeMax - colorMapRangeMin);
+   if (normalizedValue < 0.0 || normalizedValue > 1.0) {
       // Out of range. Use clampcolor.
       if (isClampColor) {
          color = colorMapClampColor;
@@ -35,12 +34,12 @@ vec4 getPropertyColor (float propertyValue) {
       }
       else {
          // Use min/max color to clamp.
-         x = clamp (x, 0.0, 1.0);         
-         color = texture(colormap, vec2(x, 0.5));
+         normalizedValue = clamp (normalizedValue, 0.0, 1.0);         
+         color = texture(colormap, vec2(normalizedValue, 0.5));
       }
    }
    else {
-      color = texture(colormap, vec2(x, 0.5));
+      color = texture(colormap, vec2(normalizedValue, 0.5));
    }
    return color;
 }
