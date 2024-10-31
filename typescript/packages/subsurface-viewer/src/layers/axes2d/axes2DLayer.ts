@@ -424,7 +424,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
     GetBackgroundTriangleLinesVertical(
         y_min_w: number,
         y_max_w: number,
-        isLeft: boolean, // left or right ruler.
+        isLeft: boolean // left or right ruler.
     ): number[] {
         const mh = this.state["mh"] as number;
 
@@ -563,7 +563,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         const isL = this.props.isLeftRuler;
         const isR = this.props.isRightRuler;
 
-        const xmin = xBoundsMin + (isL ? mh : 0);  // XXX
+        const xmin = xBoundsMin + (isL ? mh : 0);
         const xmax = xBoundsMax - (isR ? mh : 0);
         const ymin = isB ? yBoundsMin + mv : yBoundsMin;
         const ymax = isT ? yBoundsMax - mv : yBoundsMax;
