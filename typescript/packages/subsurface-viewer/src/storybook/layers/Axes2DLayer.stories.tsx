@@ -24,8 +24,8 @@ const stories: Meta = {
 export default stories;
 
 const layerProps = {
-    marginH: 80, // Horizontal margin (in pixels)
-    marginV: 30, // Vertical margin (in pixels)
+    minimalMarginH: 80, // Horizontal margin (in pixels)
+    minimalMarginV: 30, // Vertical margin (in pixels)
     isLeftRuler: true,
     isRightRuler: false,
     isBottomRuler: true,
@@ -62,7 +62,7 @@ export const FontSize: StoryObj<typeof SubsurfaceViewer> = {
 };
 
 function makeLabelFunction(a: number): string {
-    // Choos exponential format with 3 digits after point.
+    // Choose exponential format with 3 digits after point.
     const label = d3.format(".3e")(a);
     //const label = d3.format(".1f")(a) // fixed decimal  KEEP
     return label;
