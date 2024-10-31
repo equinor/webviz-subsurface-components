@@ -490,11 +490,13 @@ const Map: React.FC<MapProps> = ({
         }) as unknown as Axes2DLayer;
 
         const axes2DProps = axes2DLayer?.props;
+        const marginV = axes2DProps?.minimalMarginV ?? axes2DProps?.marginV;
+        const marginH = axes2DProps?.minimalMarginH ?? axes2DProps?.marginH;
         return {
-            left: axes2DProps?.isLeftRuler ? axes2DProps.marginH : 0,
-            right: axes2DProps?.isRightRuler ? axes2DProps.marginH : 0,
-            top: axes2DProps?.isTopRuler ? axes2DProps.marginV : 0,
-            bottom: axes2DProps?.isBottomRuler ? axes2DProps.marginV : 0,
+            left: axes2DProps?.isLeftRuler ? marginH : 0,
+            right: axes2DProps?.isRightRuler ? marginH : 0,
+            top: axes2DProps?.isTopRuler ? marginV : 0,
+            bottom: axes2DProps?.isBottomRuler ? marginV : 0,
         };
     }, [layers]);
 
