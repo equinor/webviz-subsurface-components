@@ -162,19 +162,31 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
 
     updateState() {
         // Calculating margins.
+
+        // Note due to vertical scaling pixel2world mapping may dffer in X and Y direction.
         const m = 100; // Length in pixels
-        const world_from = this.context.viewport.unproject([0, 0, 0]);
-        const world_to = this.context.viewport.unproject([m, 0, 0]);
-        const v = [
+        let world_from = this.context.viewport.unproject([0, 0, 0]);
+        let world_to = this.context.viewport.unproject([m, 0, 0]);
+        let v = [
             world_from[0] - world_to[0],
             world_from[1] - world_to[1],
             world_from[2] - world_to[2],
         ];
-        const pixel2world = Math.sqrt(v[0] * v[0] + v[1] * v[1]) / m;
+        const pixel2worldHor = Math.sqrt(v[0] * v[0] + v[1] * v[1]) / m;
+
+        world_from = this.context.viewport.unproject([0, 0, 0]);
+        world_to = this.context.viewport.unproject([0, m, 0]);
+        v = [
+            world_from[0] - world_to[0],
+            world_from[1] - world_to[1],
+            world_from[2] - world_to[2],
+        ];
+        const pixel2worldVer = Math.sqrt(v[0] * v[0] + v[1] * v[1]) / m;
+
         const marginV = this.props.minimalMarginV ?? this.props.marginV;
         const marginH = this.props.minimalMarginH ?? this.props.marginH;
-        let mv = marginV * pixel2world;
-        let mh = marginH * pixel2world;
+        let mv = marginV * pixel2worldVer;
+        let mh = marginH * pixel2worldHor;
 
         // If specified horisontal margin (mh) is to small for the label, increase it.
         const fontSizePixels = GetPixelsScale(
@@ -196,7 +208,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
             console.warn(
                 "Axes2DLayer. Vertical margin to small. Using calculated size."
             );
-            mv = minimalPixelMarginV * pixel2world;
+            mv = minimalPixelMarginV * pixel2worldVer;
         }
 
         const noLettersH = Math.max(
@@ -209,14 +221,15 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
             console.warn(
                 "Axes2DLayer. Horizontal margin to small. Using calculated size."
             );
-            mh = minimalPixelMarginH * pixel2world;
+            mh = minimalPixelMarginH * pixel2worldHor;
         }
 
         this.setState({
             ...this.state,
             mv,
             mh,
-            pixel2world,
+            pixel2worldVer,
+            pixel2worldHor,
         });
 
         const fontTexture = this.state["fontTexture"];
@@ -288,7 +301,8 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
 
         const mv = this.state["mv"] as number;
         const mh = this.state["mh"] as number;
-        const pixel2world = this.state["pixel2world"] as number;
+        const pixel2worldVer = this.state["pixel2worldVer"] as number;
+        const pixel2worldHor = this.state["pixel2worldHor"] as number;
 
         const vpBounds = this.context.viewport.getBounds();
         let start;
@@ -312,7 +326,9 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
             viewSide === ViewSide.Top || viewSide === ViewSide.Bottom;
 
         const m = tickLineLength; // Length in pixels
-        const delta = m * pixel2world;
+        const delta = isTopOrBottomRuler
+            ? m * pixel2worldVer
+            : m * pixel2worldHor;
 
         const L = isTopOrBottomRuler
             ? LineLengthInPixels(
@@ -546,7 +562,8 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         // Margins.
         const mv = this.state["mv"] as number;
         const mh = this.state["mh"] as number;
-        const pixel2world = this.state["pixel2world"] as number;
+        const pixel2worldVer = this.state["pixel2worldVer"] as number;
+        const pixel2worldHor = this.state["pixel2worldHor"] as number;
 
         const viewport_bounds_w = this.context.viewport.getBounds(); //bounds in world coordinates.
         const xBoundsMin = viewport_bounds_w[0];
@@ -767,39 +784,39 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                     // 6 vertices per letter
                     // t1
                     /*eslint-disable */
-                    positions[offset + 0] = pos_w[0] + x1 * pixelScale * pixel2world; // Add a distance in view coords and convert to world
-                    positions[offset + 1] = pos_w[1] + (0 * pixelScale - y_alignment_offset) * pixel2world;
+                    positions[offset + 0] = pos_w[0] + x1 * pixelScale * pixel2worldHor; // Add a distance in view coords and convert to world
+                    positions[offset + 1] = pos_w[1] + (0 * pixelScale - y_alignment_offset) * pixel2worldVer;
                     positions[offset + 2] = pos_w[2];
                     texcoords[offsetTexture + 0] = u1;
                     texcoords[offsetTexture + 1] = v1;
 
-                    positions[offset + 3] = pos_w[0] + x2 * pixelScale * pixel2world;
-                    positions[offset + 4] = pos_w[1] + (0 * pixelScale - y_alignment_offset) * pixel2world;
+                    positions[offset + 3] = pos_w[0] + x2 * pixelScale * pixel2worldHor;
+                    positions[offset + 4] = pos_w[1] + (0 * pixelScale - y_alignment_offset) * pixel2worldVer;
                     positions[offset + 5] = pos_w[2];
                     texcoords[offsetTexture + 2] = u2;
                     texcoords[offsetTexture + 3] = v1;
 
-                    positions[offset + 6] = pos_w[0] + x1 * pixelScale * pixel2world;
-                    positions[offset + 7] = pos_w[1] + (h * pixelScale - y_alignment_offset) * pixel2world;
+                    positions[offset + 6] = pos_w[0] + x1 * pixelScale * pixel2worldHor;
+                    positions[offset + 7] = pos_w[1] + (h * pixelScale - y_alignment_offset) * pixel2worldVer;
                     positions[offset + 8] = pos_w[2];
                     texcoords[offsetTexture + 4] = u1;
                     texcoords[offsetTexture + 5] = v2;
 
                     // t2
-                    positions[offset + 9] = pos_w[0] + x1 * pixelScale * pixel2world;
-                    positions[offset + 10] = pos_w[1] + (h * pixelScale - y_alignment_offset) * pixel2world;
+                    positions[offset + 9] = pos_w[0] + x1 * pixelScale * pixel2worldHor;
+                    positions[offset + 10] = pos_w[1] + (h * pixelScale - y_alignment_offset) * pixel2worldVer;
                     positions[offset + 11] = pos_w[2];
                     texcoords[offsetTexture + 6] = u1;
                     texcoords[offsetTexture + 7] = v2;
 
-                    positions[offset + 12] = pos_w[0] + x2 * pixelScale * pixel2world;
-                    positions[offset + 13] = pos_w[1] + (0 * pixelScale - y_alignment_offset) * pixel2world;
+                    positions[offset + 12] = pos_w[0] + x2 * pixelScale * pixel2worldHor;
+                    positions[offset + 13] = pos_w[1] + (0 * pixelScale - y_alignment_offset) * pixel2worldVer;
                     positions[offset + 14] = pos_w[2];
                     texcoords[offsetTexture + 8] = u2;
                     texcoords[offsetTexture + 9] = v1;
 
-                    positions[offset + 15] = pos_w[0] + x2 * pixelScale * pixel2world;
-                    positions[offset + 16] = pos_w[1] + (h * pixelScale - y_alignment_offset) * pixel2world;
+                    positions[offset + 15] = pos_w[0] + x2 * pixelScale * pixel2worldHor;
+                    positions[offset + 16] = pos_w[1] + (h * pixelScale - y_alignment_offset) * pixel2worldVer;
                     positions[offset + 17] = pos_w[2];
                     texcoords[offsetTexture + 10] = u2;
                     texcoords[offsetTexture + 11] = v2;
