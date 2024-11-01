@@ -59,8 +59,12 @@ export interface Axes2DLayerProps extends ExtendedLayerProps {
     /** Minimal vertical pixel size margin. May be larger if this number is to small for the lable.
      */
     minimalMarginV: number;
-    marginH: number; // @deprecated Use "mininalMarginH"
-    marginV: number; // @deprecated Use "mininalMarginV"
+    /** @deprecated Use "mininalMarginH"
+     */
+    marginH: number;
+    /** @deprecated Use "mininalMarginV"
+     */
+    marginV: number;
     formatLabelFunc?: (x: number) => string;
     labelColor?: Color;
     labelFontSizePt?: number;
