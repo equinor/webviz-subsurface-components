@@ -59,8 +59,8 @@ export interface Axes2DLayerProps extends ExtendedLayerProps {
     /** Minimal vertical pixel size margin. May be larger if this number is to small for the lable.
      */
     minimalMarginV: number;
-    marginH: number; // Deprecated.Use "mininalMarginH"
-    marginV: number; // Deprecated.Use "mininalMarginV"
+    marginH: number; // @deprecated Use "mininalMarginH"
+    marginV: number; // @deprecated Use "mininalMarginV"
     formatLabelFunc?: (x: number) => string;
     labelColor?: Color;
     labelFontSizePt?: number;
@@ -165,21 +165,21 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
 
         // Note due to vertical scaling pixel2world mapping may dffer in X and Y direction.
         const m = 100; // Length in pixels
-        let world_from = this.context.viewport.unproject([0, 0, 0]);
-        let world_to = this.context.viewport.unproject([m, 0, 0]);
+        let worldFrom = this.context.viewport.unproject([0, 0, 0]);
+        let worldTo = this.context.viewport.unproject([m, 0, 0]);
         let v = [
-            world_from[0] - world_to[0],
-            world_from[1] - world_to[1],
-            world_from[2] - world_to[2],
+            worldFrom[0] - worldTo[0],
+            worldFrom[1] - worldTo[1],
+            worldFrom[2] - worldTo[2],
         ];
         const pixel2worldHor = Math.sqrt(v[0] * v[0] + v[1] * v[1]) / m;
 
-        world_from = this.context.viewport.unproject([0, 0, 0]);
-        world_to = this.context.viewport.unproject([0, m, 0]);
+        worldFrom = this.context.viewport.unproject([0, 0, 0]);
+        worldTo = this.context.viewport.unproject([0, m, 0]);
         v = [
-            world_from[0] - world_to[0],
-            world_from[1] - world_to[1],
-            world_from[2] - world_to[2],
+            worldFrom[0] - worldTo[0],
+            worldFrom[1] - worldTo[1],
+            worldFrom[2] - worldTo[2],
         ];
         const pixel2worldVer = Math.sqrt(v[0] * v[0] + v[1] * v[1]) / m;
 
@@ -192,9 +192,9 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         const fontSizePixels = GetPixelsScale(
             this.props.labelFontSizePt ?? defaultProps.labelFontSizePt
         );
-        const viewport_bounds_w = this.context.viewport.getBounds(); //bounds in world coordinates.
-        const yBoundsMin = viewport_bounds_w[1];
-        const yBoundsMax = viewport_bounds_w[3];
+        const viewportBoundsW = this.context.viewport.getBounds(); //bounds in world coordinates.
+        const yBoundsMin = viewportBoundsW[1];
+        const yBoundsMax = viewportBoundsW[3];
         const isB = this.props.isBottomRuler;
         const isT = this.props.isTopRuler;
         const ymin = isB ? yBoundsMin + mv : yBoundsMin;
@@ -205,9 +205,6 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         const minimalPixelMarginV = nPixelsV + 2 * tickLineLength;
 
         if (this.props.marginV < minimalPixelMarginV) {
-            console.warn(
-                "Axes2DLayer. Vertical margin to small. Using calculated size."
-            );
             mv = minimalPixelMarginV * pixel2worldVer;
         }
 
@@ -218,9 +215,6 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         const nPixelsH = fontSizePixels * noLettersH;
         const minimalPixelMarginH = nPixelsH + 2 * tickLineLength;
         if (this.props.marginH < minimalPixelMarginH) {
-            console.warn(
-                "Axes2DLayer. Horizontal margin to small. Using calculated size."
-            );
             mh = minimalPixelMarginH * pixel2worldHor;
         }
 
@@ -233,9 +227,11 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         });
 
         const fontTexture = this.state["fontTexture"];
-        const { label_models, line_model, background_model } = this._getModels(
-            fontTexture as UniformValue
-        );
+        const {
+            labelModels,
+            lineModel: lineModel,
+            backgroundModel: backgroundModel,
+        } = this._getModels(fontTexture as UniformValue);
 
         this.setState({
             ...this.state,
@@ -245,7 +241,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
 
         this.setState({
             ...this.state,
-            models: [...label_models, line_model, background_model],
+            models: [...labelModels, lineModel, backgroundModel],
         });
     }
 
@@ -268,12 +264,13 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                 },
             });
 
-            const { label_models, line_model, background_model } =
-                this._getModels(fontTexture as unknown as UniformValue);
+            const { labelModels, lineModel, backgroundModel } = this._getModels(
+                fontTexture as unknown as UniformValue
+            );
 
             this.setState({
                 fontTexture,
-                models: [...label_models, line_model, background_model],
+                models: [...labelModels, lineModel, backgroundModel],
             });
         });
     }
@@ -553,9 +550,9 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
 
     // Make models for background, lines (tick marks and axis) and labels.
     _getModels(fontTexture: UniformValue): {
-        label_models: Model[];
-        line_model: Model;
-        background_model: Model;
+        labelModels: Model[];
+        lineModel: Model;
+        backgroundModel: Model;
     } {
         const device = this.context.device;
 
@@ -676,7 +673,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
             lineColor = lineColor.map((x) => (x ?? 0) / 255);
         }
 
-        const line_model = new Model(device, {
+        const lineModel = new Model(device, {
             id: `${this.props.id}-lines`,
             vs: lineVertexShader,
             fs: lineFragmentShader,
@@ -704,7 +701,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
             bColor = bColor.map((x) => (x ?? 0) / 255);
         }
 
-        const background_model = new Model(device, {
+        const backgroundModel = new Model(device, {
             id: `${this.props.id}-background`,
             vs: lineVertexShader,
             fs: lineFragmentShader,
@@ -722,7 +719,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         });
 
         //-- Labels model--
-        const label_models: Model[] = [];
+        const labelModels: Model[] = [];
 
         const pixelScale = GetPixelsScale(
             this.props.labelFontSizePt ?? defaultProps.labelFontSizePt
@@ -859,10 +856,10 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                 isInstanced: false,
             });
 
-            label_models.push(model);
+            labelModels.push(model);
         }
 
-        return { label_models, line_model, background_model };
+        return { labelModels: labelModels, lineModel: lineModel, backgroundModel: backgroundModel };
     }
 }
 
