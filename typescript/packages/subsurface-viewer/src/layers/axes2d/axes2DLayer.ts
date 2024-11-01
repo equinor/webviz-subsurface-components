@@ -209,8 +209,8 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         }
 
         const noLettersH = Math.max(
-            this.toString(ymin, 0).length,
-            this.toString(ymax, 0).length
+            this.makeLabel(ymin, 0).length,
+            this.makeLabel(ymax, 0).length
         );
         const nPixelsH = fontSizePixels * noLettersH;
         const minimalPixelMarginH = nPixelsH + 2 * tickLineLength;
@@ -275,7 +275,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         });
     }
 
-    toString(n: number, ndecimals: number): string {
+    makeLabel(n: number, ndecimals: number): string {
         let label = n.toFixed(ndecimals);
         if (this.props.formatLabelFunc) {
             label = this.props.formatLabelFunc(n) as string;
@@ -349,7 +349,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         for (let i = 0; i < ticks.length; i++) {
             const tick = ticks[i];
 
-            const label = this.toString(tick, ndecimals);
+            const label = this.makeLabel(tick, ndecimals);
             tick_labels.push(label);
 
             // tick line start
