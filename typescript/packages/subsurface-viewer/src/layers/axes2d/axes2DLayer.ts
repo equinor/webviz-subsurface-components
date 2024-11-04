@@ -189,8 +189,8 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
 
         const marginV = this.props.minimalMarginV ?? this.props.marginV;
         const marginH = this.props.minimalMarginH ?? this.props.marginH;
-        let mv = marginV * pixel2worldVer;
-        let mh = marginH * pixel2worldHor;
+        let worldMarginV = marginV * pixel2worldVer;
+        let worldMarginH = marginH * pixel2worldHor;
 
         // If specified horisontal margin (mh) is to small for the label, increase it.
         const fontSizePixels = GetPixelsScale(
@@ -201,31 +201,31 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         const yBoundsMax = viewportBoundsW[3];
         const isB = this.props.isBottomRuler;
         const isT = this.props.isTopRuler;
-        const ymin = isB ? yBoundsMin + mv : yBoundsMin;
-        const ymax = isT ? yBoundsMax - mv : yBoundsMax;
+        const ymin = isB ? yBoundsMin + worldMarginV : yBoundsMin;
+        const ymax = isT ? yBoundsMax - worldMarginV : yBoundsMax;
 
-        const noLettersV = 1;
-        const nPixelsV = fontSizePixels * noLettersV;
-        const minimalPixelMarginV = nPixelsV + 2 * tickLineLength;
+        const numLettersV = 1;
+        const numPixelsV = fontSizePixels * numLettersV;
+        const minimalPixelMarginV = numPixelsV + 2 * tickLineLength;
 
-        if (this.props.marginV < minimalPixelMarginV) {
-            mv = minimalPixelMarginV * pixel2worldVer;
+        if (marginV < minimalPixelMarginV) {
+            worldMarginV = minimalPixelMarginV * pixel2worldVer;
         }
 
-        const noLettersH = Math.max(
+        const numLettersH = Math.max(
             this.makeLabel(ymin, 0).length,
             this.makeLabel(ymax, 0).length
         );
-        const nPixelsH = fontSizePixels * noLettersH;
-        const minimalPixelMarginH = nPixelsH + 2 * tickLineLength;
-        if (this.props.marginH < minimalPixelMarginH) {
-            mh = minimalPixelMarginH * pixel2worldHor;
+        const numPixelsH = fontSizePixels * numLettersH;
+        const minimalPixelMarginH = numPixelsH + 2 * tickLineLength;
+        if (marginH < minimalPixelMarginH) {
+            worldMarginH = minimalPixelMarginH * pixel2worldHor;
         }
 
         this.setState({
             ...this.state,
-            mv,
-            mh,
+            worldMarginV,
+            worldMarginH,
             pixel2worldVer,
             pixel2worldHor,
         });
@@ -239,8 +239,8 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
 
         this.setState({
             ...this.state,
-            mv,
-            mh,
+            mv: worldMarginV,
+            mh: worldMarginH,
         });
 
         this.setState({
@@ -300,8 +300,8 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         const lines: number[] = [];
         const tick_labels = [];
 
-        const mv = this.state["mv"] as number;
-        const mh = this.state["mh"] as number;
+        const worldMarginV = this.state["worldMarginV"] as number;
+        const worldMarginH = this.state["worldMarginH"] as number;
         const pixel2worldVer = this.state["pixel2worldVer"] as number;
         const pixel2worldHor = this.state["pixel2worldHor"] as number;
 
@@ -310,16 +310,16 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         let y_tick = 0;
         let x_tick = 0;
         if (viewSide === ViewSide.Top) {
-            start = vpBounds[3] - mv;
+            start = vpBounds[3] - worldMarginV;
             y_tick = start;
         } else if (viewSide === ViewSide.Bottom) {
-            start = vpBounds[1] + mv;
+            start = vpBounds[1] + worldMarginV;
             y_tick = start;
         } else if (viewSide === ViewSide.Left) {
-            start = vpBounds[0] + mh;
+            start = vpBounds[0] + worldMarginH;
             x_tick = start;
         } else if (viewSide === ViewSide.Right) {
-            start = vpBounds[2] - mh;
+            start = vpBounds[2] - worldMarginH;
             x_tick = start;
         }
 
@@ -416,12 +416,12 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         x_max_w: number,
         isTop: boolean
     ): number[] {
-        const mv = this.state["mv"] as number;
+        const worldMarginV = this.state["worldMarginV"] as number;
 
         const vp_bounds = this.context.viewport.getBounds(); // [xmin, ymin, xmax, ymax]
 
-        const y_max = isTop ? vp_bounds[3] : vp_bounds[1] + mv;
-        const y_min = isTop ? vp_bounds[3] - mv : vp_bounds[1];
+        const y_max = isTop ? vp_bounds[3] : vp_bounds[1] + worldMarginV;
+        const y_min = isTop ? vp_bounds[3] - worldMarginV : vp_bounds[1];
 
         const p1 = [x_min_w, y_max, zDepthAxes];
         const p2 = [x_max_w, y_max, zDepthAxes];
@@ -443,12 +443,12 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         y_max_w: number,
         isLeft: boolean // left or right ruler.
     ): number[] {
-        const mh = this.state["mh"] as number;
+        const worldMarginH = this.state["worldMarginH"] as number;
 
         const vp_bounds = this.context.viewport.getBounds(); // [xmin, ymin, xmax, ymax]
 
-        const x_max = isLeft ? vp_bounds[0] + mh : vp_bounds[2];
-        const x_min = isLeft ? vp_bounds[0] : vp_bounds[2] - mh;
+        const x_max = isLeft ? vp_bounds[0] + worldMarginH : vp_bounds[2];
+        const x_min = isLeft ? vp_bounds[0] : vp_bounds[2] - worldMarginH;
 
         const p1 = [x_max, y_min_w, zDepthAxes];
         const p2 = [x_max, y_max_w, zDepthAxes];
@@ -561,8 +561,8 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         const device = this.context.device;
 
         // Margins.
-        const mv = this.state["mv"] as number;
-        const mh = this.state["mh"] as number;
+        const worldMarginV = this.state["worldMarginV"] as number;
+        const worldMarginH = this.state["worldMarginH"] as number;
         const pixel2worldVer = this.state["pixel2worldVer"] as number;
         const pixel2worldHor = this.state["pixel2worldHor"] as number;
 
@@ -581,10 +581,10 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         const isL = this.props.isLeftRuler;
         const isR = this.props.isRightRuler;
 
-        const xmin = xBoundsMin + (isL ? mh : 0);
-        const xmax = xBoundsMax - (isR ? mh : 0);
-        const ymin = isB ? yBoundsMin + mv : yBoundsMin;
-        const ymax = isT ? yBoundsMax - mv : yBoundsMax;
+        const xmin = xBoundsMin + (isL ? worldMarginH : 0);
+        const xmax = xBoundsMax - (isR ? worldMarginH : 0);
+        const ymin = isB ? yBoundsMin + worldMarginV : yBoundsMin;
+        const ymax = isT ? yBoundsMax - worldMarginV : yBoundsMax;
 
         //- BOTTOM RULER ----------------------------------------
         if (isB) {
