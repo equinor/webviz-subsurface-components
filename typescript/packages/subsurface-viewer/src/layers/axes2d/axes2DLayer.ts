@@ -53,16 +53,16 @@ const zDepthAxes = 0;
 const tickLineLength = 10;
 
 export interface Axes2DLayerProps extends ExtendedLayerProps {
-    /** Minimal horizontal pixel size margin. May be larger if this number is to small for the lable.
+    /** Minimal horizontal pixel size margin. May be larger if this number is to small for the label.
      */
     minimalMarginH: number;
-    /** Minimal vertical pixel size margin. May be larger if this number is to small for the lable.
+    /** Minimal vertical pixel size margin. May be larger if this number is to small for the label.
      */
     minimalMarginV: number;
-    /** @deprecated Use "mininalMarginH"
+    /** @deprecated Use "minimalMarginH"
      */
     marginH: number;
-    /** @deprecated Use "mininalMarginV"
+    /** @deprecated Use "minimalMarginV"
      */
     marginV: number;
     formatLabelFunc?: (x: number) => string;
@@ -167,7 +167,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
     updateState() {
         // Calculating margins.
 
-        // Note due to vertical scaling pixel2world mapping may dffer in X and Y direction.
+        // Note due to vertical scaling pixel2world mapping may differ in X and Y direction.
         const m = 100; // Length in pixels
         let worldFrom = this.context.viewport.unproject([0, 0, 0]);
         let worldTo = this.context.viewport.unproject([m, 0, 0]);
