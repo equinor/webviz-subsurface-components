@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.1.5...subsurface-viewer@1.2.0) (2024-11-05)
+
+
+### Features
+
+* [NGRM]:  Axes2D Margins. If default or set value is to small the margin will get autocalculated [#2342](https://github.com/equinor/webviz-subsurface-components/issues/2342) ([#2343](https://github.com/equinor/webviz-subsurface-components/issues/2343)) ([c097a18](https://github.com/equinor/webviz-subsurface-components/commit/c097a18d293a04f492e34f86e29844db5be10a24))
+
 ## [1.1.5](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.1.4...subsurface-viewer@1.1.5) (2024-10-29)
 
 
