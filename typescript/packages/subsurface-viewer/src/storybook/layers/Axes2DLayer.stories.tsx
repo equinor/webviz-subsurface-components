@@ -48,6 +48,32 @@ export const Base: StoryObj<typeof SubsurfaceViewer> = {
     },
 };
 
+export const AutoMarginSmall: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "map",
+        layers: [
+            hugin25mKhNetmapMapLayerPng,
+            { ...axes2DLayer, minimalMarginH: 1 }, // small margin will cause auto calculation of size to prevent clipping.
+        ],
+
+        bounds: hugin2DBounds,
+        views: default2DViews,
+    },
+};
+
+export const AutoMarginLarge: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "map",
+        layers: [
+            hugin25mKhNetmapMapLayerPng,
+            { ...axes2DLayer, minimalMarginH: 100 },
+        ],
+
+        bounds: hugin2DBounds,
+        views: default2DViews,
+    },
+};
+
 export const FontSize: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "fontsize",
