@@ -17,6 +17,8 @@ const stories: Meta = {
         selectedDateTime: {
             description:
                 "The selected `string` must be a date time present in one of the `dates` arrays in an element of the`datedTrees`-prop.\n\n",
+            options: exampleDates,
+            control: { type: "select" },
         },
         selectedEdgeKey: {
             description:
@@ -34,7 +36,6 @@ export default stories;
  * Storybook test for the group tree plot component
  */
 
-// @ts-expect-error TS7006
 const Template = (args) => {
     return (
         <GroupTreePlot
@@ -60,7 +61,7 @@ const edgeMetadataList: EdgeMetadata[] = [
 const nodeMetadataList: NodeMetadata[] = [
     { key: "pressure", label: "Pressure", unit: "Bar" },
     { key: "bhp", label: "Bottom Hole Pressure", unit: "N/m2" },
-    { key: "wmctl", label: "Missing label", unit: "Unknown unit" },
+    { key: "wmctl", label: "" },
 ];
 
 export const Default: StoryObj<typeof Template> = {
