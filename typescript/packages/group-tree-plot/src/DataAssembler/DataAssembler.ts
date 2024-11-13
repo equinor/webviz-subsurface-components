@@ -10,25 +10,6 @@ import type {
 import _ from "lodash";
 import { printTreeValue } from "../utils";
 
-export enum AssemblerEvent {
-    TREE_CHANGED,
-    DATE_CHANGED,
-    ERROR,
-}
-
-const FALLBACK_DATE_TREE_DATA: DatedTree[] = [
-    {
-        dates: ["UNKOWN"],
-        tree: {
-            node_type: "Group",
-            node_label: "NO DATA",
-            edge_label: "NO DATA",
-            node_data: {},
-            edge_data: {},
-        },
-    },
-];
-
 export default class DataAssembler {
     datedTrees: DatedTree[];
     edgeMetadataList: EdgeMetadata[];
@@ -53,8 +34,7 @@ export default class DataAssembler {
             this.datedTrees = datedTrees;
         } else {
             // ? Should we just throw instead?
-            console.warn("Tree-list is empty");
-            this.datedTrees = FALLBACK_DATE_TREE_DATA;
+            throw new Error("Tree-list is empty");
         }
 
         this._propertyToLabelMap = new Map();
@@ -132,20 +112,8 @@ export default class DataAssembler {
             throw new Error("Invalid date for data assembler");
         }
 
-        const treeChanged = this._currentTreeIndex !== newTreeIdx;
-        const dateChanged = this._currentTreeIndex !== newTreeIdx;
-
-        // TODO: Is there any bigger recalculations that must be done here?
         this._currentTreeIndex = newTreeIdx;
         this._currentDateIndex = newDateIdx;
-
-        // Notify subscribers that something changed
-        if (treeChanged) {
-            this._notifyEventListeners(AssemblerEvent.TREE_CHANGED);
-        }
-        if (dateChanged) {
-            this._notifyEventListeners(AssemblerEvent.DATE_CHANGED);
-        }
     }
 
     getActiveTree() {
@@ -159,31 +127,6 @@ export default class DataAssembler {
         if (!maxVal) return 2;
 
         return d3.scaleLinear().domain([0, maxVal]).range([2, 100])(value);
-    }
-
-    private _eventListeners: Map<AssemblerEvent, Set<() => void>> = new Map();
-
-    registerEventListener(event: AssemblerEvent, listener: () => void) {
-        const listeners = this._eventListeners.get(event) ?? new Set();
-
-        listeners.add(listener);
-        this._eventListeners.set(event, listeners);
-
-        return () => this.removeEventListener(event, listener);
-    }
-
-    removeEventListener(event: AssemblerEvent, listener: () => void) {
-        const listeners = this._eventListeners.get(event) ?? new Set();
-
-        listeners.delete(listener);
-
-        this._eventListeners.set(event, listeners);
-    }
-
-    private _notifyEventListeners(event: AssemblerEvent) {
-        const listeners = this._eventListeners.get(event) ?? [];
-
-        listeners.forEach((fn) => fn());
     }
 }
 

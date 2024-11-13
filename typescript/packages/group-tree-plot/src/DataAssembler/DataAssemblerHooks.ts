@@ -7,7 +7,7 @@ import type {
     NodeData,
     NodeMetadata,
 } from "../types";
-import DataAssembler, { AssemblerEvent } from "./DataAssembler";
+import DataAssembler from "./DataAssembler";
 
 export function useDataAssembler(
     datedTrees: DatedTree[],
@@ -27,25 +27,8 @@ export function useDataAssembler(
     return dataAssembler;
 }
 
-function makeStoreSubscriberFunc(
-    assembler: DataAssembler,
-    changeEvent: AssemblerEvent
-) {
-    return (onStoreChange: () => void) => {
-        const unsub = assembler.registerEventListener(
-            changeEvent,
-            onStoreChange
-        );
-
-        return () => unsub;
-    };
-}
-
 export function useDataAssemblerTree(assembler: DataAssembler) {
-    return React.useSyncExternalStore(
-        makeStoreSubscriberFunc(assembler, AssemblerEvent.TREE_CHANGED),
-        () => assembler.getActiveTree()
-    );
+    return assembler.getActiveTree();
 }
 
 export function useDataAssemblerPropertyValue(
@@ -53,18 +36,12 @@ export function useDataAssemblerPropertyValue(
     data: NodeData | EdgeData,
     property: string
 ): number | null {
-    return React.useSyncExternalStore(
-        makeStoreSubscriberFunc(assembler, AssemblerEvent.DATE_CHANGED),
-        () => assembler.getPropertyValue(data, property)
-    );
+    return assembler.getPropertyValue(data, property);
 }
 
 export function useDataAssemblerTooltip(
     assembler: DataAssembler,
     data: NodeData | EdgeData
 ): string {
-    return React.useSyncExternalStore(
-        makeStoreSubscriberFunc(assembler, AssemblerEvent.DATE_CHANGED),
-        () => assembler.getTooltip(data)
-    );
+    return assembler.getTooltip(data);
 }
