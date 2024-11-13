@@ -21,6 +21,8 @@ import { cloneDeep } from "lodash";
  * node info and date time.
  *
  * Provides methods to update selected date time, and change flow rate and node info.
+ *
+ * @deprecated See 'TreePlotRender.tsx' instead. Component kept for historical purposes
  */
 export default class GroupTreeAssembler {
     /**
