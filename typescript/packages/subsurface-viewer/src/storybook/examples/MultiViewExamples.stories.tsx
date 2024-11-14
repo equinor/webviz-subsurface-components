@@ -388,17 +388,19 @@ export const MultiViewPicking: StoryObj<typeof SubsurfaceViewer> = {
         },
     },
     render: (args) => <MultiViewPickingExample {...args} />,
-    play: async () => {
+    play: async (args) => {
         const delay = 500;
         const canvas = document.querySelector("canvas");
 
-        if (!canvas) {
+        const layout = args.args.views?.layout;
+
+        if (!canvas || !layout) {
             return;
         }
 
         const leftViewCenterPosition = {
-            x: canvas.clientLeft + canvas.clientWidth / 4,
-            y: canvas.clientTop + canvas.clientHeight / 2,
+            x: canvas.clientLeft + canvas.clientWidth / layout[1] / 2,
+            y: canvas.clientTop + canvas.clientHeight / layout[0] / 2,
         };
 
         await fireEvent.mouseMove(canvas, { clientX: 0, clientY: 0, delay });
