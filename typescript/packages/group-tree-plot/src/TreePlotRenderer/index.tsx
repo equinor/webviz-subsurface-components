@@ -77,38 +77,34 @@ export default function TreePlotRenderer(
     );
 
     return (
-        <>
-            <g
-                transform={`translate(${PLOT_MARGINS.left},${PLOT_MARGINS.top})`}
+        <g transform={`translate(${PLOT_MARGINS.left},${PLOT_MARGINS.top})`}>
+            <TransitionGroup
+                component={null}
+                childFactory={(child) =>
+                    React.cloneElement(child, { oldNodeTree, nodeTree })
+                }
             >
-                <TransitionGroup
-                    component={null}
-                    childFactory={(child) =>
-                        React.cloneElement(child, { oldNodeTree, nodeTree })
-                    }
-                >
-                    {nodeTree.links().map((link) => (
-                        // @ts-expect-error Missing props are injected by child-factory above
-                        <TransitionTreeEdge
-                            key={computeLinkId(link)}
-                            link={link}
-                            dataAssembler={props.dataAssembler}
-                            primaryEdgeProperty={props.primaryEdgeProperty}
-                        />
-                    ))}
+                {nodeTree.links().map((link) => (
+                    // @ts-expect-error Missing props are injected by child-factory above
+                    <TransitionTreeEdge
+                        key={computeLinkId(link)}
+                        link={link}
+                        dataAssembler={props.dataAssembler}
+                        primaryEdgeProperty={props.primaryEdgeProperty}
+                    />
+                ))}
 
-                    {nodeTree.descendants().map((node) => (
-                        // @ts-expect-error Missing props are injected by child-factory above
-                        <TransitionTreeNode
-                            key={computeNodeId(node)}
-                            primaryNodeProperty={props.primaryNodeProperty}
-                            dataAssembler={props.dataAssembler}
-                            node={node}
-                            onNodeClick={toggleShowChildren}
-                        />
-                    ))}
-                </TransitionGroup>
-            </g>
-        </>
+                {nodeTree.descendants().map((node) => (
+                    // @ts-expect-error Missing props are injected by child-factory above
+                    <TransitionTreeNode
+                        key={computeNodeId(node)}
+                        primaryNodeProperty={props.primaryNodeProperty}
+                        dataAssembler={props.dataAssembler}
+                        node={node}
+                        onNodeClick={toggleShowChildren}
+                    />
+                ))}
+            </TransitionGroup>
+        </g>
     );
 }

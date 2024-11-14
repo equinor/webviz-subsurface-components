@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+
 import React from "react";
 
 import { GroupTreePlot } from "../GroupTreePlot";
@@ -9,6 +10,7 @@ import {
     exampleDatedTrees,
     exampleDates,
 } from "../../example-data/dated-trees";
+import _ from "lodash";
 
 const stories: Meta = {
     component: GroupTreePlot,
@@ -74,5 +76,81 @@ export const Default: StoryObj<typeof Template> = {
         selectedEdgeKey: edgeMetadataList[0].key,
         selectedNodeKey: nodeMetadataList[0].key,
     },
-    render: (args) => <Template {...args} />,
+    render: (args) => {
+        const CONTAINER_HEIGHT = 700;
+        const CONTAINER_WIDTH = 938;
+
+        return (
+            <div
+                style={{
+                    width: CONTAINER_WIDTH,
+                    height: CONTAINER_HEIGHT,
+                }}
+            >
+                <Template {...args} />
+            </div>
+        );
+    },
+};
+
+export const Resizable: StoryObj<typeof Template> = {
+    parameters: {
+        docs: {
+            description: {
+                story: "The component dynamically resizes itself to fit it's parent container",
+            },
+        },
+    },
+    args: {
+        id: "grouptreeplot",
+        datedTrees: exampleDatedTrees,
+        edgeMetadataList: edgeMetadataList,
+        nodeMetadataList: nodeMetadataList,
+        selectedDateTime: exampleDates[0],
+        selectedEdgeKey: edgeMetadataList[0].key,
+        selectedNodeKey: nodeMetadataList[0].key,
+    },
+    render: (args) => {
+        // Wrapping comp to showcase resizing
+        function RandomSizeDiv(props: {
+            children: React.ReactNode;
+        }): React.ReactNode {
+            const [targetHeight, setTargetHeight] = React.useState(400);
+            const [targetWidth, setTargetWidth] = React.useState(400);
+
+            const rerollSize = React.useCallback(() => {
+                setTargetHeight(_.random(400, 700));
+                setTargetWidth(_.random(400, 700));
+            }, []);
+
+            return (
+                <div
+                    style={{
+                        height: 700,
+                        width: 700,
+                    }}
+                >
+                    <button onClick={rerollSize}>Randomize size</button>
+                    <div
+                        style={{
+                            marginTop: "0.25rem",
+                            background: "rgb(0,0,255,0.2)",
+                            height: targetHeight,
+                            width: targetWidth,
+                            transition: "height, width",
+                            transitionDuration: "200ms",
+                        }}
+                    >
+                        {props.children}
+                    </div>
+                </div>
+            );
+        }
+
+        return (
+            <RandomSizeDiv>
+                <Template {...args} />
+            </RandomSizeDiv>
+        );
+    },
 };
