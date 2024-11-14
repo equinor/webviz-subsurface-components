@@ -2,7 +2,6 @@
     fill: none;
     stroke: #5c5c5c;
     opacity: 1;
-    animation-timing-function: cubic-bezier(0.75, 0.1, 0.25, 0.9);
 }
 
 .grouptree_link {
