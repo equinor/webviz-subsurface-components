@@ -13,8 +13,10 @@ export function useDataAssembler(
     datedTrees: DatedTree[],
     edgeMetadataList: EdgeMetadata[],
     nodeMetadataList: NodeMetadata[]
-): DataAssembler {
+): DataAssembler | null {
     const dataAssembler = React.useMemo(() => {
+        if (datedTrees.length === 0) return null;
+
         const assembler = new DataAssembler(
             datedTrees,
             edgeMetadataList,

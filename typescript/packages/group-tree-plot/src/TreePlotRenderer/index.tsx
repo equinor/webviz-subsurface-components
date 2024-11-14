@@ -24,7 +24,7 @@ export type TreePlotRendererProps = {
 const PLOT_MARGINS = {
     top: 10,
     right: 120,
-    bottom: 30,
+    bottom: 10,
     left: 70,
 };
 
@@ -38,15 +38,15 @@ export default function TreePlotRenderer(
         Record<string, boolean>
     >({});
 
+    const heightPadding = PLOT_MARGINS.top + PLOT_MARGINS.bottom;
+    const widthPadding = PLOT_MARGINS.left + PLOT_MARGINS.right;
+    const layoutHeight = props.height - heightPadding;
+    const layoutWidth = props.width - widthPadding;
 
     const treeLayout = React.useMemo(() => {
-        // TODO: Remove constant number
-        const treeHeight =
-            props.height - PLOT_MARGINS.top - PLOT_MARGINS.bottom;
-        const treeWidth = props.width - PLOT_MARGINS.left - PLOT_MARGINS.right;
-
-        return d3.tree<RecursiveTreeNode>().size([treeHeight, treeWidth]);
-    }, [props.height, props.width]);
+        // Note that we invert height / width to render the tree sideways
+        return d3.tree<RecursiveTreeNode>().size([layoutHeight, layoutWidth]);
+    }, [layoutHeight, layoutWidth]);
 
     const lastComputedTreeRef =
         React.useRef<d3.HierarchyPointNode<RecursiveTreeNode> | null>(null);
@@ -78,7 +78,7 @@ export default function TreePlotRenderer(
     );
 
     return (
-        <svg height={props.height} width={props.width}>
+        <>
             <g
                 transform={`translate(${PLOT_MARGINS.left},${PLOT_MARGINS.top})`}
             >
@@ -110,6 +110,6 @@ export default function TreePlotRenderer(
                     ))}
                 </TransitionGroup>
             </g>
-        </svg>
+        </>
     );
 }

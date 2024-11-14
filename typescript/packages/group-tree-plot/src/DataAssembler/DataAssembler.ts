@@ -33,7 +33,6 @@ export default class DataAssembler {
         if (datedTrees.length) {
             this.datedTrees = datedTrees;
         } else {
-            // ? Should we just throw instead?
             throw new Error("Tree-list is empty");
         }
 
@@ -64,6 +63,25 @@ export default class DataAssembler {
 
         this._currentTreeIndex = 0;
         this._currentDateIndex = 0;
+    }
+
+    setActiveDate(newDate: string) {
+        const [newTreeIdx, newDateIdx] = findTreeAndDateIndex(
+            newDate,
+            this.datedTrees
+        );
+
+        // I do think these will always both be -1, or not -1, so checking both might be excessive
+        if (newTreeIdx === -1 || newDateIdx == -1) {
+            throw new Error("Invalid date for data assembler");
+        }
+
+        this._currentTreeIndex = newTreeIdx;
+        this._currentDateIndex = newDateIdx;
+    }
+
+    getActiveTree(): DatedTree {
+        return this.datedTrees[this._currentTreeIndex];
     }
 
     getTooltip(data: NodeData | EdgeData) {
@@ -98,26 +116,6 @@ export default class DataAssembler {
             label !== "" ? label : _.upperFirst(propertyKey),
             unit !== "" ? unit : "?",
         ];
-    }
-
-    setActiveDate(newDate: string) {
-        const [newTreeIdx, newDateIdx] = findTreeAndDateIndex(
-            newDate,
-            this.datedTrees
-        );
-
-        // I do think these will always both be -1, or not -1, so checking both might be excessive
-        if (newTreeIdx === -1 || newDateIdx == -1) {
-            // TODO: Somehow propagate this error to renderers
-            throw new Error("Invalid date for data assembler");
-        }
-
-        this._currentTreeIndex = newTreeIdx;
-        this._currentDateIndex = newDateIdx;
-    }
-
-    getActiveTree() {
-        return this.datedTrees[this._currentTreeIndex] ?? null;
     }
 
     normalizeValue(property: string, value: number) {
