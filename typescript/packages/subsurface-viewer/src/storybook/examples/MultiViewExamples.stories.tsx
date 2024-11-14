@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { fireEvent } from "@storybook/test";
 import React from "react";
 
 import type { PickingInfo, Viewport } from "@deck.gl/core";
@@ -94,7 +95,7 @@ type PickingInfoPerView = Record<
     {
         x: number | null;
         y: number | null;
-        properties: { name: string; value: number; color?: string }[];
+        properties: PickingInfoProperty[];
     }
 >;
 
@@ -387,6 +388,26 @@ export const MultiViewPicking: StoryObj<typeof SubsurfaceViewer> = {
         },
     },
     render: (args) => <MultiViewPickingExample {...args} />,
+    play: async () => {
+        const delay = 500;
+        const canvas = document.querySelector("canvas");
+
+        if (!canvas) {
+            return;
+        }
+
+        const leftViewCenterPosition = {
+            x: canvas.clientLeft + canvas.clientWidth / 4,
+            y: canvas.clientTop + canvas.clientHeight / 2,
+        };
+
+        await fireEvent.mouseMove(canvas, { clientX: 0, clientY: 0, delay });
+        await fireEvent.mouseMove(canvas, {
+            clientX: leftViewCenterPosition.x,
+            clientY: leftViewCenterPosition.y,
+            delay,
+        });
+    },
 };
 
 export const MultiViewsWithEmptyViews: StoryObj<typeof SubsurfaceViewer> = {
