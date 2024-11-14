@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.2.1...subsurface-viewer@1.3.0) (2024-11-14)
+
+
+### Features
+
+* Exposing reference to deck.gl instance as deckGlRef prop in Map component ([#2366](https://github.com/equinor/webviz-subsurface-components/issues/2366)) ([565a408](https://github.com/equinor/webviz-subsurface-components/commit/565a4089674c9e647132ebafc2e34634c0fd0525))
+
 ## [1.2.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.2.0...subsurface-viewer@1.2.1) (2024-11-11)
 
 
