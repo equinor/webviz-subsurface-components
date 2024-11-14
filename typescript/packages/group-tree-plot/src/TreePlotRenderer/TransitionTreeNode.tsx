@@ -23,6 +23,11 @@ export type TransitionTreeNodeProps = {
     oldNodeTree: d3.HierarchyPointNode<RecursiveTreeNode> | null;
 
     in: boolean;
+
+    onNodeClick?: (
+        node: TransitionTreeNodeProps["node"],
+        evt: React.MouseEvent<SVGGElement, MouseEvent>
+    ) => void;
 };
 
 export function TransitionTreeNode(
@@ -33,7 +38,8 @@ export function TransitionTreeNode(
         React.useState<TransitionStatus>("exited");
 
     const recursiveTreeNode = props.node.data;
-    const isLeaf = !props.node.children;
+    const isLeaf = !recursiveTreeNode.children;
+    const canBeExpanded = !props.node.children && recursiveTreeNode.children;
     const nodeLabel = recursiveTreeNode.node_label;
 
     let circleClass = "grouptree__node";
@@ -148,11 +154,13 @@ export function TransitionTreeNode(
                 className="node"
                 // ! Defaulting to opacity=0 to avoid flickering. D3 will override this in the transition hooks
                 opacity={0}
+                cursor={!isLeaf ? "pointer" : undefined}
+                onClick={(evt) => props.onNodeClick?.(props.node, evt)}
             >
                 <circle className={circleClass} r={15} />
                 <text
                     className="grouptree__nodelabel"
-                    dy=".35em"
+                    dominantBaseline="middle"
                     x={isLeaf ? 21 : -21}
                     textAnchor={isLeaf ? "start" : "end"}
                 >
@@ -176,6 +184,12 @@ export function TransitionTreeNode(
                     {primaryUnit}
                 </text>
                 <title>{toolTip}</title>
+
+                {canBeExpanded && (
+                    <HiddenChildren
+                        hiddenChildren={recursiveTreeNode.children ?? []}
+                    />
+                )}
             </g>
         </Transition>
     );

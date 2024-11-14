@@ -34,6 +34,11 @@ export default function TreePlotRenderer(
     const activeTree = useDataAssemblerTree(props.dataAssembler);
     const rootTreeNode = activeTree.tree;
 
+    const [nodeHideChildren, setNodeHideChildren] = React.useState<
+        Record<string, boolean>
+    >({});
+
+
     const treeLayout = React.useMemo(() => {
         // TODO: Remove constant number
         const treeHeight =
@@ -48,13 +53,29 @@ export default function TreePlotRenderer(
 
     const [nodeTree, oldNodeTree] = React.useMemo(() => {
         const previousTree = lastComputedTreeRef.current;
-        const hierarcy = d3.hierarchy(rootTreeNode);
+        const hierarcy = d3.hierarchy(rootTreeNode, (datum) => {
+            if (nodeHideChildren[datum.node_label]) return null;
+            else return datum.children;
+        });
+
         const tree = treeLayout(hierarcy);
 
         lastComputedTreeRef.current = tree;
 
         return [tree, previousTree];
-    }, [treeLayout, rootTreeNode]);
+    }, [treeLayout, rootTreeNode, nodeHideChildren]);
+
+    const toggleShowChildren = React.useCallback(
+        (node: D3TreeNode) => {
+            const label = node.data.node_label;
+            const existingVal = nodeHideChildren[label];
+            setNodeHideChildren({
+                ...nodeHideChildren,
+                [label]: Boolean(node.children?.length) && !existingVal,
+            });
+        },
+        [nodeHideChildren]
+    );
 
     return (
         <svg height={props.height} width={props.width}>
@@ -84,6 +105,7 @@ export default function TreePlotRenderer(
                             primaryNodeProperty={props.primaryNodeProperty}
                             dataAssembler={props.dataAssembler}
                             node={node}
+                            onNodeClick={toggleShowChildren}
                         />
                     ))}
                 </TransitionGroup>
