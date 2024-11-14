@@ -1,10 +1,10 @@
 import _ from "lodash";
 import type DataAssembler from "./DataAssembler/DataAssembler";
-import type { RecursiveTreeNode } from "./types";
+import type { D3TreeEdge, D3TreeNode } from "./types";
 
 export const TREE_TRANSITION_DURATION = 200;
 
-export function computeNodeId(node: d3.HierarchyPointNode<RecursiveTreeNode>) {
+export function computeNodeId(node: D3TreeNode) {
     if (!node.parent) {
         return node.data.node_label;
     } else {
@@ -12,7 +12,7 @@ export function computeNodeId(node: d3.HierarchyPointNode<RecursiveTreeNode>) {
     }
 }
 
-export function computeLinkId(link: d3.HierarchyPointLink<RecursiveTreeNode>) {
+export function computeLinkId(link: D3TreeEdge) {
     return `path ${computeNodeId(link.target)}`;
 }
 
@@ -22,9 +22,9 @@ export function printTreeValue(value: number | null): string {
 }
 
 export function findClosestVisibleInNewTree(
-    targetNode: d3.HierarchyPointNode<RecursiveTreeNode>,
-    newTreeRoot: d3.HierarchyPointNode<RecursiveTreeNode> | null
-): d3.HierarchyPointNode<RecursiveTreeNode> | null {
+    targetNode: D3TreeNode,
+    newTreeRoot: D3TreeNode | null
+): D3TreeNode | null {
     if (!newTreeRoot) return null;
 
     // Get a path of d3 nodes from the root to the treeNode
@@ -60,8 +60,8 @@ export function findClosestVisibleInNewTree(
 
 export function findClosestVisibleParent(
     assembler: DataAssembler,
-    treeNode: d3.HierarchyPointNode<RecursiveTreeNode>
-): d3.HierarchyPointNode<RecursiveTreeNode> | null {
+    treeNode: D3TreeNode
+): D3TreeNode | null {
     const activeTreeRoot = assembler.getActiveTree()?.tree;
     if (!activeTreeRoot) return null;
 
@@ -97,9 +97,7 @@ export function findClosestVisibleParent(
     return visibleParent;
 }
 
-export function diagonalPath(
-    link: d3.HierarchyPointLink<RecursiveTreeNode>
-): string {
+export function diagonalPath(link: D3TreeEdge): string {
     const { source, target } = link;
 
     const avgY = (target.y + source.y) / 2;

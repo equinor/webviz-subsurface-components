@@ -2,7 +2,7 @@ import React from "react";
 import * as d3 from "d3";
 
 import type { ReactNode } from "react";
-import type { RecursiveTreeNode } from "../types";
+import type { D3TreeNode, RecursiveTreeNode } from "../types";
 import type DataAssembler from "../DataAssembler/DataAssembler";
 
 import "./group_tree.css";
@@ -48,8 +48,7 @@ export default function TreePlotRenderer(
         return d3.tree<RecursiveTreeNode>().size([layoutHeight, layoutWidth]);
     }, [layoutHeight, layoutWidth]);
 
-    const lastComputedTreeRef =
-        React.useRef<d3.HierarchyPointNode<RecursiveTreeNode> | null>(null);
+    const lastComputedTreeRef = React.useRef<D3TreeNode | null>(null);
 
     const [nodeTree, oldNodeTree] = React.useMemo(() => {
         const previousTree = lastComputedTreeRef.current;

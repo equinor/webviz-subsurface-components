@@ -11,18 +11,18 @@ import {
     useDataAssemblerPropertyValue,
     useDataAssemblerTooltip,
 } from "../DataAssembler/DataAssemblerHooks";
-import type { RecursiveTreeNode } from "../types";
+import type { D3TreeEdge, D3TreeNode } from "../types";
 import type DataAssembler from "../DataAssembler/DataAssembler";
 
 export type TreeEdgeProps = {
-    link: d3.HierarchyPointLink<RecursiveTreeNode>;
+    link: D3TreeEdge;
     dataAssembler: DataAssembler;
     primaryEdgeProperty: string;
     transitionState?: TransitionStatus;
 
     // Kinda messy solution for this, might warrant a change in the future
-    nodeTree: d3.HierarchyPointNode<RecursiveTreeNode>;
-    oldNodeTree: d3.HierarchyPointNode<RecursiveTreeNode> | null;
+    nodeTree: D3TreeNode;
+    oldNodeTree: D3TreeNode | null;
 
     in?: boolean;
 };

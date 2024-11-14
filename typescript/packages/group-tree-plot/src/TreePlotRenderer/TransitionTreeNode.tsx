@@ -5,7 +5,7 @@ import {
     useDataAssemblerPropertyValue,
     useDataAssemblerTooltip,
 } from "../DataAssembler/DataAssemblerHooks";
-import type { RecursiveTreeNode } from "../types";
+import type { D3TreeNode } from "../types";
 import {
     findClosestVisibleInNewTree,
     printTreeValue,
@@ -13,14 +13,15 @@ import {
 } from "../utils";
 
 import * as d3 from "d3";
+import { HiddenChildren } from "./HiddenChildren";
 
 export type TransitionTreeNodeProps = {
     primaryNodeProperty: string;
     dataAssembler: DataAssembler;
-    node: d3.HierarchyPointNode<RecursiveTreeNode>;
+    node: D3TreeNode;
 
-    nodeTree: d3.HierarchyPointNode<RecursiveTreeNode>;
-    oldNodeTree: d3.HierarchyPointNode<RecursiveTreeNode> | null;
+    nodeTree: D3TreeNode;
+    oldNodeTree: D3TreeNode | null;
 
     in: boolean;
 
