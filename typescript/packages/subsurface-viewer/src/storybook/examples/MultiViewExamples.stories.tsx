@@ -1,7 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 
-import { PickingInfo, View, Viewport } from "@deck.gl/core";
+import type { PickingInfo } from "@deck.gl/core";
+import { View, Viewport } from "@deck.gl/core";
+import type { DeckGLRef } from "@deck.gl/react";
+
 import { ContinuousLegend } from "@emerson-eps/color-tables";
 
 import Box from "@mui/material/Box";
@@ -28,7 +31,6 @@ import {
     redAxes2DLayer,
     subsufaceProps,
 } from "../sharedSettings";
-import { DeckGLRef } from "@deck.gl/react";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -247,6 +249,118 @@ class MultiViewPickingInfoAssembler {
     }
 }
 
+function ExampleReadoutComponent(props: {
+    viewId: string;
+    pickingInfoPerView: PickingInfoPerView;
+}): React.ReactNode {
+    return (
+        <div
+            style={{
+                position: "absolute",
+                bottom: 8,
+                left: 8,
+                background: "#fff",
+                padding: 8,
+                borderRadius: 4,
+                display: "grid",
+                gridTemplateColumns: "8rem auto",
+                border: "1px solid #ccc",
+            }}
+        >
+            <div>X:</div>
+            <div>{props.pickingInfoPerView[props.viewId]?.x ?? "-"}</div>
+            <div>Y:</div>
+            <div>{props.pickingInfoPerView[props.viewId]?.y ?? "-"}</div>
+            {props.pickingInfoPerView[props.viewId]?.properties?.map(
+                (el, i) => (
+                    <React.Fragment key={`${el.name}-${i}`}>
+                        <div>{el.name}</div>
+                        <div>{el.value.toFixed(3)}</div>
+                    </React.Fragment>
+                )
+            ) ?? ""}
+        </div>
+    );
+}
+
+function MultiViewPickingExample(
+    props: SubsurfaceViewerProps
+): React.ReactNode {
+    const [pickingInfoPerView, setPickingInfoPerView] =
+        React.useState<PickingInfoPerView>(
+            props.views?.viewports.reduce((acc, viewport) => {
+                acc[viewport.id] = {
+                    x: null,
+                    y: null,
+                    properties: [],
+                };
+                return acc;
+            }, {} as PickingInfoPerView) ?? {}
+        );
+
+    const deckGlRef = React.useRef<DeckGLRef>(null);
+    const assembler = React.useRef<MultiViewPickingInfoAssembler | null>(null);
+
+    React.useEffect(function onMountEffect() {
+        assembler.current = new MultiViewPickingInfoAssembler(
+            deckGlRef.current
+        );
+
+        const unsubscribe = assembler.current.subscribe((info) => {
+            setPickingInfoPerView(info);
+        });
+
+        return function onUnmountEffect() {
+            unsubscribe();
+        };
+    }, []);
+
+    function handleMouseEvent(event: MapMouseEvent) {
+        if (event.type === "hover") {
+            assembler.current?.getMultiViewPickingInfo(event);
+        }
+    }
+
+    return (
+        <div style={{ width: "100%", height: "90vh", position: "relative" }}>
+            <SubsurfaceViewer
+                {...props}
+                deckGlRef={deckGlRef}
+                onMouseEvent={handleMouseEvent}
+                coords={{
+                    visible: false,
+                    multiPicking: true,
+                }}
+            >
+                {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    /* @ts-expect-error */
+                    <View id="view_1">
+                        <ContinuousLegend min={-3071} max={41048} />
+                        <ViewFooter>kH netmap</ViewFooter>
+                        <ExampleReadoutComponent
+                            viewId="view_1"
+                            pickingInfoPerView={pickingInfoPerView}
+                        />
+                    </View>
+                }
+                {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    /* @ts-expect-error */
+                    <View id="view_2">
+                        <ContinuousLegend min={2725} max={3396} />
+                        <ViewFooter>Hugin</ViewFooter>
+                        <ExampleReadoutComponent
+                            viewId="view_2"
+                            pickingInfoPerView={pickingInfoPerView}
+                        />
+                    </View>
+                }
+            </SubsurfaceViewer>
+        </div>
+    );
+}
+
 export const MultiViewPicking: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "multi_view_picking",
@@ -268,137 +382,7 @@ export const MultiViewPicking: StoryObj<typeof SubsurfaceViewer> = {
             ],
         },
     },
-    render: (args) => {
-        const [pickingInfoPerView, setPickingInfoPerView] =
-            React.useState<PickingInfoPerView>(
-                args.views?.viewports.reduce((acc, viewport) => {
-                    acc[viewport.id] = {
-                        x: null,
-                        y: null,
-                        properties: [],
-                    };
-                    return acc;
-                }, {} as PickingInfoPerView) ?? {}
-            );
-
-        const deckGlRef = React.useRef<DeckGLRef>(null);
-        const assembler = React.useRef<MultiViewPickingInfoAssembler | null>(
-            null
-        );
-
-        React.useEffect(function onMountEffect() {
-            assembler.current = new MultiViewPickingInfoAssembler(
-                deckGlRef.current
-            );
-
-            const unsubscribe = assembler.current.subscribe((info) => {
-                setPickingInfoPerView(info);
-            });
-
-            return function onUnmountEffect() {
-                unsubscribe();
-            };
-        }, []);
-
-        function handleMouseEvent(event: MapMouseEvent) {
-            if (event.type === "hover") {
-                assembler.current?.getMultiViewPickingInfo(event);
-            }
-        }
-
-        return (
-            <div
-                style={{ width: "100%", height: "90vh", position: "relative" }}
-            >
-                <SubsurfaceViewer
-                    {...args}
-                    deckGlRef={deckGlRef}
-                    onMouseEvent={handleMouseEvent}
-                    coords={{
-                        visible: false,
-                        multiPicking: true,
-                    }}
-                >
-                    {
-                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                        /* @ts-expect-error */
-                        <View id="view_1">
-                            <ContinuousLegend min={-3071} max={41048} />
-                            <ViewFooter>kH netmap</ViewFooter>
-                            <div
-                                style={{
-                                    position: "absolute",
-                                    bottom: 8,
-                                    left: 8,
-                                    background: "#fff",
-                                    padding: 8,
-                                    borderRadius: 4,
-                                    display: "grid",
-                                    gridTemplateColumns: "8rem auto",
-                                    border: "1px solid #ccc",
-                                }}
-                            >
-                                <div>X:</div>
-                                <div>
-                                    {pickingInfoPerView["view_1"]?.x ?? "-"}
-                                </div>
-                                <div>Y:</div>
-                                <div>
-                                    {pickingInfoPerView["view_1"]?.y ?? "-"}
-                                </div>
-                                {pickingInfoPerView["view_1"]?.properties?.map(
-                                    (el, i) => (
-                                        <React.Fragment key={`${el.name}-${i}`}>
-                                            <div>{el.name}</div>
-                                            <div>{el.value}</div>
-                                        </React.Fragment>
-                                    )
-                                ) ?? ""}
-                            </div>
-                        </View>
-                    }
-                    {
-                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                        /* @ts-expect-error */
-                        <View id="view_2">
-                            <ContinuousLegend min={2725} max={3396} />
-                            <ViewFooter>Hugin</ViewFooter>
-                            <div
-                                style={{
-                                    position: "absolute",
-                                    bottom: 8,
-                                    left: 8,
-                                    background: "#fff",
-                                    padding: 8,
-                                    borderRadius: 4,
-                                    display: "grid",
-                                    gridTemplateColumns: "8rem auto",
-                                    border: "1px solid #ccc",
-                                }}
-                            >
-                                <div>X:</div>
-                                <div>
-                                    {pickingInfoPerView["view_2"]?.x ?? "-"}
-                                </div>
-                                <div>Y:</div>
-                                <div>
-                                    {pickingInfoPerView["view_2"]?.y ?? "-"}
-                                </div>
-                                {pickingInfoPerView["view_2"]?.properties?.map(
-                                    (el, i) => (
-                                        <React.Fragment key={`${el.name}-${i}`}>
-                                            <div>{el.name}</div>
-                                            <div>{el.value}</div>
-                                        </React.Fragment>
-                                    )
-                                ) ?? ""}
-                            </div>
-                        </View>
-                    }
-                </SubsurfaceViewer>
-            </div>
-        );
-    },
+    render: (args) => <MultiViewPickingExample {...args} />,
 };
 
 export const MultiViewsWithEmptyViews: StoryObj<typeof SubsurfaceViewer> = {
