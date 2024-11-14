@@ -268,9 +268,13 @@ function ExampleReadoutComponent(props: {
             }}
         >
             <div>X:</div>
-            <div>{props.pickingInfoPerView[props.viewId]?.x ?? "-"}</div>
+            <div>
+                {props.pickingInfoPerView[props.viewId]?.x?.toFixed(3) ?? "-"}
+            </div>
             <div>Y:</div>
-            <div>{props.pickingInfoPerView[props.viewId]?.y ?? "-"}</div>
+            <div>
+                {props.pickingInfoPerView[props.viewId]?.y?.toFixed(3) ?? "-"}
+            </div>
             {props.pickingInfoPerView[props.viewId]?.properties?.map(
                 (el, i) => (
                     <React.Fragment key={`${el.name}-${i}`}>
