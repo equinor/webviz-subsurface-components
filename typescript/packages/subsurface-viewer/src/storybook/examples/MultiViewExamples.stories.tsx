@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 
-import type { PickingInfo } from "@deck.gl/core";
-import { View, Viewport } from "@deck.gl/core";
+import type { PickingInfo, Viewport } from "@deck.gl/core";
+import { View } from "@deck.gl/core";
 import type { DeckGLRef } from "@deck.gl/react";
 
 import { ContinuousLegend } from "@emerson-eps/color-tables";
