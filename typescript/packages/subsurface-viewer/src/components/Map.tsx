@@ -383,6 +383,11 @@ export interface MapProps {
      * Extra pixels around the pointer to include while picking.
      */
     pickingRadius?: number;
+
+    /**
+     * The reference to the deck.gl instance.
+     */
+    deckGlRef?: React.ForwardedRef<DeckGLRef>;
 }
 
 function defaultTooltip(info: PickingInfo) {
@@ -421,9 +426,15 @@ const Map: React.FC<MapProps> = ({
     verticalScale,
     innerRef,
     pickingRadius,
+    deckGlRef,
 }: MapProps) => {
     // From react doc, ref should not be read nor modified during rendering.
     const deckRef = React.useRef<DeckGLRef>(null);
+
+    React.useImperativeHandle<DeckGLRef | null, DeckGLRef | null>(
+        deckGlRef,
+        () => deckRef.current
+    );
 
     const [applyViewController, forceUpdate] = React.useReducer(
         (x) => x + 1,

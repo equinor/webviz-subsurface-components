@@ -1,7 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { fireEvent, userEvent } from "@storybook/test";
 import React from "react";
 
+import type { PickingInfo, Viewport } from "@deck.gl/core";
 import { View } from "@deck.gl/core";
+import type { DeckGLRef } from "@deck.gl/react";
+
 import { ContinuousLegend } from "@emerson-eps/color-tables";
 
 import Box from "@mui/material/Box";
@@ -10,7 +14,7 @@ import Tabs from "@mui/material/Tabs";
 
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
-import type { ViewsType } from "../../components/Map";
+import type { MapMouseEvent, ViewsType } from "../../components/Map";
 import { ViewFooter } from "../../components/ViewFooter";
 
 import {
@@ -78,6 +82,340 @@ export const MultiViewAnnotation: StoryObj<typeof SubsurfaceViewer> = {
             }
         </SubsurfaceViewer>
     ),
+};
+
+type PickingInfoProperty = {
+    name: string;
+    value: number;
+    color?: string;
+};
+
+type PickingInfoPerView = Record<
+    string,
+    {
+        x: number | null;
+        y: number | null;
+        properties: PickingInfoProperty[];
+    }
+>;
+
+class MultiViewPickingInfoAssembler {
+    private _deckGl: DeckGLRef | null = null;
+    private _multiPicking: boolean;
+    private _subscribers: Set<(info: PickingInfoPerView) => void> = new Set();
+
+    constructor(deckGL: DeckGLRef | null, multiPicking: boolean = false) {
+        this._deckGl = deckGL;
+        this._multiPicking = multiPicking;
+    }
+
+    setDeckGL(deckGL: DeckGLRef) {
+        this._deckGl = deckGL;
+    }
+
+    subscribe(callback: (info: PickingInfoPerView) => void): () => void {
+        this._subscribers.add(callback);
+
+        return () => {
+            this._subscribers.delete(callback);
+        };
+    }
+
+    private publish(info: PickingInfoPerView) {
+        for (const subscriber of this._subscribers) {
+            subscriber(info);
+        }
+    }
+
+    getMultiViewPickingInfo(hoverEvent: MapMouseEvent) {
+        if (!this._deckGl?.deck) {
+            return;
+        }
+
+        const viewports = this._deckGl.deck?.getViewports();
+        if (!viewports) {
+            return;
+        }
+
+        if (hoverEvent.infos.length === 0) {
+            return;
+        }
+
+        const activeViewportId = hoverEvent.infos[0].viewport?.id;
+
+        if (!activeViewportId) {
+            return;
+        }
+
+        const eventScreenCoordinate: [number, number] = [
+            hoverEvent.infos[0].x,
+            hoverEvent.infos[0].y,
+        ];
+
+        this.assembleMultiViewPickingInfo(
+            eventScreenCoordinate,
+            activeViewportId,
+            viewports
+        ).then((info) => {
+            this.publish(info);
+        });
+    }
+
+    private async assembleMultiViewPickingInfo(
+        eventScreenCoordinate: [number, number],
+        activeViewportId: string,
+        viewports: Viewport[]
+    ): Promise<PickingInfoPerView> {
+        return new Promise((resolve, reject) => {
+            const deck = this._deckGl?.deck;
+            if (!deck) {
+                reject("DeckGL not initialized");
+                return;
+            }
+            const activeViewport = viewports.find(
+                (el) => el.id === activeViewportId
+            );
+            if (!activeViewport) {
+                reject("Active viewport not found");
+                return;
+            }
+
+            const activeViewportRelativeScreenCoordinates: [number, number] = [
+                eventScreenCoordinate[0] - activeViewport.x,
+                eventScreenCoordinate[1] - activeViewport.y,
+            ];
+
+            const worldCoordinate = activeViewport.unproject(
+                activeViewportRelativeScreenCoordinates
+            );
+
+            const collectedPickingInfo: PickingInfoPerView = {};
+            for (const viewport of viewports) {
+                const [relativeScreenX, relativeScreenY] =
+                    viewport.project(worldCoordinate);
+
+                let pickingInfo: PickingInfo[] = [];
+                if (this._multiPicking) {
+                    pickingInfo = deck.pickMultipleObjects({
+                        x: relativeScreenX + viewport.x,
+                        y: relativeScreenY + viewport.y,
+                        unproject3D: true,
+                    });
+                } else {
+                    const obj = deck.pickObject({
+                        x: relativeScreenX + viewport.x,
+                        y: relativeScreenY + viewport.y,
+                        unproject3D: true,
+                    });
+                    pickingInfo = obj ? [obj] : [];
+                }
+
+                if (pickingInfo) {
+                    const collectedProperties: PickingInfoProperty[] = [];
+                    for (const info of pickingInfo) {
+                        if (
+                            !("properties" in info) ||
+                            !Array.isArray(info.properties)
+                        ) {
+                            continue;
+                        }
+
+                        const properties = info.properties;
+
+                        for (const property of properties) {
+                            collectedProperties.push({
+                                name: property.name,
+                                value: property.value,
+                                color: property.color,
+                            });
+                        }
+                    }
+
+                    collectedPickingInfo[viewport.id] = {
+                        x: worldCoordinate[0],
+                        y: worldCoordinate[1],
+                        properties: collectedProperties,
+                    };
+                } else {
+                    collectedPickingInfo[viewport.id] = {
+                        x: null,
+                        y: null,
+                        properties: [],
+                    };
+                }
+            }
+
+            resolve(collectedPickingInfo);
+        });
+    }
+}
+
+function ExampleReadoutComponent(props: {
+    viewId: string;
+    pickingInfoPerView: PickingInfoPerView;
+}): React.ReactNode {
+    return (
+        <div
+            style={{
+                position: "absolute",
+                bottom: 8,
+                left: 8,
+                background: "#fff",
+                padding: 8,
+                borderRadius: 4,
+                display: "grid",
+                gridTemplateColumns: "8rem auto",
+                border: "1px solid #ccc",
+            }}
+        >
+            <div>X:</div>
+            <div>
+                {props.pickingInfoPerView[props.viewId]?.x?.toFixed(3) ?? "-"}
+            </div>
+            <div>Y:</div>
+            <div>
+                {props.pickingInfoPerView[props.viewId]?.y?.toFixed(3) ?? "-"}
+            </div>
+            {props.pickingInfoPerView[props.viewId]?.properties?.map(
+                (el, i) => (
+                    <React.Fragment key={`${el.name}-${i}`}>
+                        <div>{el.name}</div>
+                        <div>{el.value.toFixed(3)}</div>
+                    </React.Fragment>
+                )
+            ) ?? ""}
+        </div>
+    );
+}
+
+function MultiViewPickingExample(
+    props: SubsurfaceViewerProps
+): React.ReactNode {
+    const [pickingInfoPerView, setPickingInfoPerView] =
+        React.useState<PickingInfoPerView>(
+            props.views?.viewports.reduce((acc, viewport) => {
+                acc[viewport.id] = {
+                    x: null,
+                    y: null,
+                    properties: [],
+                };
+                return acc;
+            }, {} as PickingInfoPerView) ?? {}
+        );
+
+    const deckGlRef = React.useRef<DeckGLRef>(null);
+    const assembler = React.useRef<MultiViewPickingInfoAssembler | null>(null);
+
+    React.useEffect(function onMountEffect() {
+        assembler.current = new MultiViewPickingInfoAssembler(
+            deckGlRef.current
+        );
+
+        const unsubscribe = assembler.current.subscribe((info) => {
+            setPickingInfoPerView(info);
+        });
+
+        return function onUnmountEffect() {
+            unsubscribe();
+        };
+    }, []);
+
+    function handleMouseEvent(event: MapMouseEvent) {
+        if (event.type === "hover") {
+            assembler.current?.getMultiViewPickingInfo(event);
+        }
+    }
+
+    return (
+        <div style={{ width: "100%", height: "90vh", position: "relative" }}>
+            <SubsurfaceViewer
+                {...props}
+                deckGlRef={deckGlRef}
+                onMouseEvent={handleMouseEvent}
+                coords={{
+                    visible: false,
+                    multiPicking: true,
+                }}
+            >
+                {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    /* @ts-expect-error */
+                    <View id="view_1">
+                        <ContinuousLegend min={-3071} max={41048} />
+                        <ViewFooter>kH netmap</ViewFooter>
+                        <ExampleReadoutComponent
+                            viewId="view_1"
+                            pickingInfoPerView={pickingInfoPerView}
+                        />
+                    </View>
+                }
+                {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    /* @ts-expect-error */
+                    <View id="view_2">
+                        <ContinuousLegend min={2725} max={3396} />
+                        <ViewFooter>Hugin</ViewFooter>
+                        <ExampleReadoutComponent
+                            viewId="view_2"
+                            pickingInfoPerView={pickingInfoPerView}
+                        />
+                    </View>
+                }
+            </SubsurfaceViewer>
+        </div>
+    );
+}
+
+export const MultiViewPicking: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "multi_view_picking",
+        layers: [hugin25mKhNetmapMapLayer, hugin25mDepthMapLayer],
+        views: {
+            layout: [1, 2],
+            showLabel: true,
+            viewports: [
+                {
+                    id: "view_1",
+                    layerIds: [hugin25mDepthMapLayer.id],
+                    isSync: true,
+                },
+                {
+                    id: "view_2",
+                    layerIds: [hugin25mKhNetmapMapLayer.id],
+                    isSync: true,
+                },
+            ],
+        },
+    },
+    render: (args) => <MultiViewPickingExample {...args} />,
+    play: async (args) => {
+        const delay = 500;
+        const canvas = document.querySelector("canvas");
+
+        if (canvas) {
+            await userEvent.click(canvas, { delay });
+        }
+
+        const layout = args.args.views?.layout;
+
+        if (!canvas || !layout) {
+            return;
+        }
+
+        const leftViewCenterPosition = {
+            x: canvas.clientLeft + canvas.clientWidth / layout[1] / 2,
+            y: canvas.clientTop + canvas.clientHeight / layout[0] / 2,
+        };
+
+        await userEvent.hover(canvas, { delay });
+
+        await fireEvent.mouseMove(canvas, { clientX: 0, clientY: 0, delay });
+        await fireEvent.mouseMove(canvas, {
+            clientX: leftViewCenterPosition.x,
+            clientY: leftViewCenterPosition.y,
+            delay,
+        });
+    },
 };
 
 export const MultiViewsWithEmptyViews: StoryObj<typeof SubsurfaceViewer> = {
