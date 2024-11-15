@@ -53,7 +53,17 @@ const zDepthAxes = 0;
 const tickLineLength = 10;
 
 export interface Axes2DLayerProps extends ExtendedLayerProps {
+    /** Minimal horizontal pixel size margin. May be larger if this number is to small for the label.
+     */
+    minimalMarginH: number;
+    /** Minimal vertical pixel size margin. May be larger if this number is to small for the label.
+     */
+    minimalMarginV: number;
+    /** @deprecated Use "minimalMarginH"
+     */
     marginH: number;
+    /** @deprecated Use "minimalMarginV"
+     */
     marginV: number;
     formatLabelFunc?: (x: number) => string;
     labelColor?: Color;
@@ -72,8 +82,10 @@ const defaultProps = {
     id: "axes2d-layer",
     visible: true,
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-    marginH: 80, // Horizontal margin (in pixles)
-    marginV: 30, // Vertical margin (in pixles)
+    minimalMarginH: 80,
+    minimalMarginV: 30,
+    marginH: 80,
+    marginV: 30,
     isLeftRuler: true,
     isRightRuler: false,
     isBottomRuler: true,
@@ -153,14 +165,87 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
     }
 
     updateState() {
-        const fontTexture = this.state["fontTexture"];
-        const { label_models, line_model, background_model } = this._getModels(
-            fontTexture as UniformValue
+        // Calculating margins.
+
+        // Note due to vertical scaling pixel2world mapping may differ in X and Y direction.
+        const m = 100; // Length in pixels
+        let worldFrom = this.context.viewport.unproject([0, 0, 0]);
+        let worldTo = this.context.viewport.unproject([m, 0, 0]);
+        let v = [
+            worldFrom[0] - worldTo[0],
+            worldFrom[1] - worldTo[1],
+            worldFrom[2] - worldTo[2],
+        ];
+        const pixel2worldHor = Math.sqrt(v[0] * v[0] + v[1] * v[1]) / m;
+
+        worldFrom = this.context.viewport.unproject([0, 0, 0]);
+        worldTo = this.context.viewport.unproject([0, m, 0]);
+        v = [
+            worldFrom[0] - worldTo[0],
+            worldFrom[1] - worldTo[1],
+            worldFrom[2] - worldTo[2],
+        ];
+        const pixel2worldVer = Math.sqrt(v[0] * v[0] + v[1] * v[1]) / m;
+
+        const marginV = this.props.minimalMarginV ?? this.props.marginV;
+        const marginH = this.props.minimalMarginH ?? this.props.marginH;
+        let worldMarginV = marginV * pixel2worldVer;
+        let worldMarginH = marginH * pixel2worldHor;
+
+        // If specified horisontal margin (mh) is to small for the label, increase it.
+        const fontSizePixels = GetPixelsScale(
+            this.props.labelFontSizePt ?? defaultProps.labelFontSizePt
         );
+        const viewportBoundsW = this.context.viewport.getBounds(); //bounds in world coordinates.
+        const yBoundsMin = viewportBoundsW[1];
+        const yBoundsMax = viewportBoundsW[3];
+        const isB = this.props.isBottomRuler;
+        const isT = this.props.isTopRuler;
+        const ymin = isB ? yBoundsMin + worldMarginV : yBoundsMin;
+        const ymax = isT ? yBoundsMax - worldMarginV : yBoundsMax;
+
+        const numLettersV = 1;
+        const numPixelsV = fontSizePixels * numLettersV;
+        const minimalPixelMarginV = numPixelsV + 2 * tickLineLength;
+
+        if (marginV < minimalPixelMarginV) {
+            worldMarginV = minimalPixelMarginV * pixel2worldVer;
+        }
+
+        const numLettersH = Math.max(
+            this.makeLabel(ymin, 0).length,
+            this.makeLabel(ymax, 0).length
+        );
+        const numPixelsH = fontSizePixels * numLettersH;
+        const minimalPixelMarginH = numPixelsH + 2 * tickLineLength;
+        if (marginH < minimalPixelMarginH) {
+            worldMarginH = minimalPixelMarginH * pixel2worldHor;
+        }
 
         this.setState({
             ...this.state,
-            models: [...label_models, line_model, background_model],
+            worldMarginV,
+            worldMarginH,
+            pixel2worldVer,
+            pixel2worldHor,
+        });
+
+        const fontTexture = this.state["fontTexture"];
+        const {
+            labelModels,
+            lineModel: lineModel,
+            backgroundModel: backgroundModel,
+        } = this._getModels(fontTexture as UniformValue);
+
+        this.setState({
+            ...this.state,
+            mv: worldMarginV,
+            mh: worldMarginH,
+        });
+
+        this.setState({
+            ...this.state,
+            models: [...labelModels, lineModel, backgroundModel],
         });
     }
 
@@ -183,22 +268,31 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                 },
             });
 
-            const { label_models, line_model, background_model } =
-                this._getModels(fontTexture as unknown as UniformValue);
+            const { labelModels, lineModel, backgroundModel } = this._getModels(
+                fontTexture as unknown as UniformValue
+            );
 
             this.setState({
                 fontTexture,
-                models: [...label_models, line_model, background_model],
+                models: [...labelModels, lineModel, backgroundModel],
             });
         });
+    }
+
+    makeLabel(n: number, ndecimals: number): string {
+        let label = n.toFixed(ndecimals);
+        if (this.props.formatLabelFunc) {
+            label = this.props.formatLabelFunc(n) as string;
+            label = label.replace("e", "E"); // this font atlas does not have "e"
+            label = label.replace("\u2212", "-"); // use standard minus sign
+        }
+        return label;
     }
 
     GetTickLinesAndLabels(
         min: number,
         max: number,
-        viewSide: ViewSide,
-        pixel2worldHor: number,
-        pixel2worldVer: number
+        viewSide: ViewSide
     ): [number[], LabelData[]] {
         const ndecimals = 0;
         const n_minor_ticks = 3;
@@ -206,24 +300,26 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         const lines: number[] = [];
         const tick_labels = [];
 
-        const mv = this.props.marginV * pixel2worldVer;
-        const mh = this.props.marginH * pixel2worldHor;
+        const worldMarginV = this.state["worldMarginV"] as number;
+        const worldMarginH = this.state["worldMarginH"] as number;
+        const pixel2worldVer = this.state["pixel2worldVer"] as number;
+        const pixel2worldHor = this.state["pixel2worldHor"] as number;
 
         const vpBounds = this.context.viewport.getBounds();
         let start;
         let y_tick = 0;
         let x_tick = 0;
         if (viewSide === ViewSide.Top) {
-            start = vpBounds[3] - mv;
+            start = vpBounds[3] - worldMarginV;
             y_tick = start;
         } else if (viewSide === ViewSide.Bottom) {
-            start = vpBounds[1] + mv;
+            start = vpBounds[1] + worldMarginV;
             y_tick = start;
         } else if (viewSide === ViewSide.Left) {
-            start = vpBounds[0] + mh;
+            start = vpBounds[0] + worldMarginH;
             x_tick = start;
         } else if (viewSide === ViewSide.Right) {
-            start = vpBounds[2] - mh;
+            start = vpBounds[2] - worldMarginH;
             x_tick = start;
         }
 
@@ -257,12 +353,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         for (let i = 0; i < ticks.length; i++) {
             const tick = ticks[i];
 
-            let label = tick.toFixed(ndecimals);
-            if (this.props.formatLabelFunc) {
-                label = this.props.formatLabelFunc(tick) as string;
-                label = label.replace("e", "E"); // this font atlas does not have "e"
-                label = label.replace("\u2212", "-"); // use standard minus sign
-            }
+            const label = this.makeLabel(tick, ndecimals);
             tick_labels.push(label);
 
             // tick line start
@@ -323,15 +414,14 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
     GetBackgroundTriangleLinesHorizontal(
         x_min_w: number,
         x_max_w: number,
-        isTop: boolean,
-        pixel2world: number
+        isTop: boolean
     ): number[] {
-        const mv = this.props.marginV * pixel2world;
+        const worldMarginV = this.state["worldMarginV"] as number;
 
         const vp_bounds = this.context.viewport.getBounds(); // [xmin, ymin, xmax, ymax]
 
-        const y_max = isTop ? vp_bounds[3] : vp_bounds[1] + mv;
-        const y_min = isTop ? vp_bounds[3] - mv : vp_bounds[1];
+        const y_max = isTop ? vp_bounds[3] : vp_bounds[1] + worldMarginV;
+        const y_min = isTop ? vp_bounds[3] - worldMarginV : vp_bounds[1];
 
         const p1 = [x_min_w, y_max, zDepthAxes];
         const p2 = [x_max_w, y_max, zDepthAxes];
@@ -351,15 +441,14 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
     GetBackgroundTriangleLinesVertical(
         y_min_w: number,
         y_max_w: number,
-        isLeft: boolean, // left or right ruler.
-        pixel2world: number
+        isLeft: boolean // left or right ruler.
     ): number[] {
-        const mh = this.props.marginH * pixel2world;
+        const worldMarginH = this.state["worldMarginH"] as number;
 
         const vp_bounds = this.context.viewport.getBounds(); // [xmin, ymin, xmax, ymax]
 
-        const x_max = isLeft ? vp_bounds[0] + mh : vp_bounds[2];
-        const x_min = isLeft ? vp_bounds[0] : vp_bounds[2] - mh;
+        const x_max = isLeft ? vp_bounds[0] + worldMarginH : vp_bounds[2];
+        const x_min = isLeft ? vp_bounds[0] : vp_bounds[2] - worldMarginH;
 
         const p1 = [x_max, y_min_w, zDepthAxes];
         const p2 = [x_max, y_max_w, zDepthAxes];
@@ -463,37 +552,19 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         return;
     }
 
+    // Make models for background, lines (tick marks and axis) and labels.
     _getModels(fontTexture: UniformValue): {
-        label_models: Model[];
-        line_model: Model;
-        background_model: Model;
+        labelModels: Model[];
+        lineModel: Model;
+        backgroundModel: Model;
     } {
-        // Make models for background, lines (tick marks and axis) and labels.
-
         const device = this.context.device;
 
         // Margins.
-        const m = 100; // Length in pixels
-        let world_from = this.context.viewport.unproject([0, 0, 0]);
-        let world_to = this.context.viewport.unproject([m, 0, 0]);
-        let v = [
-            world_from[0] - world_to[0],
-            world_from[1] - world_to[1],
-            world_from[2] - world_to[2],
-        ];
-        const pixel2worldHor = Math.sqrt(v[0] * v[0] + v[1] * v[1]) / m;
-
-        world_from = this.context.viewport.unproject([0, 0, 0]);
-        world_to = this.context.viewport.unproject([0, m, 0]);
-        v = [
-            world_from[0] - world_to[0],
-            world_from[1] - world_to[1],
-            world_from[2] - world_to[2],
-        ];
-        const pixel2worldVer = Math.sqrt(v[0] * v[0] + v[1] * v[1]) / m;
-
-        const mh = this.props.marginH * pixel2worldHor;
-        const mv = this.props.marginV * pixel2worldVer;
+        const worldMarginV = this.state["worldMarginV"] as number;
+        const worldMarginH = this.state["worldMarginH"] as number;
+        const pixel2worldVer = this.state["pixel2worldVer"] as number;
+        const pixel2worldHor = this.state["pixel2worldHor"] as number;
 
         const viewport_bounds_w = this.context.viewport.getBounds(); //bounds in world coordinates.
         const xBoundsMin = viewport_bounds_w[0];
@@ -510,10 +581,10 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         const isL = this.props.isLeftRuler;
         const isR = this.props.isRightRuler;
 
-        const xmin = xBoundsMin + (isL ? mh : 0);
-        const xmax = xBoundsMax - (isR ? mh : 0);
-        const ymin = isB ? yBoundsMin + mv : yBoundsMin;
-        const ymax = isT ? yBoundsMax - mv : yBoundsMax;
+        const xmin = xBoundsMin + (isL ? worldMarginH : 0);
+        const xmax = xBoundsMax - (isR ? worldMarginH : 0);
+        const ymin = isB ? yBoundsMin + worldMarginV : yBoundsMin;
+        const ymax = isT ? yBoundsMax - worldMarginV : yBoundsMax;
 
         //- BOTTOM RULER ----------------------------------------
         if (isB) {
@@ -522,16 +593,13 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
             const [ticks, labels] = this.GetTickLinesAndLabels(
                 xmin,
                 xmax,
-                ViewSide.Bottom,
-                pixel2worldHor,
-                pixel2worldVer
+                ViewSide.Bottom
             );
             const back_lines: number[] =
                 this.GetBackgroundTriangleLinesHorizontal(
                     xBoundsMin,
                     xBoundsMax,
-                    false,
-                    pixel2worldVer
+                    false
                 );
 
             tick_and_axes_lines = [...tick_and_axes_lines, ...axes, ...ticks];
@@ -545,16 +613,13 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
             const [ticks, labels] = this.GetTickLinesAndLabels(
                 xmin,
                 xmax,
-                ViewSide.Top,
-                pixel2worldHor,
-                pixel2worldVer
+                ViewSide.Top
             );
 
             const back_lines = this.GetBackgroundTriangleLinesHorizontal(
                 xBoundsMin,
                 xBoundsMax,
-                true, // isTop
-                pixel2worldVer
+                true // isTop
             );
 
             tick_and_axes_lines = [...tick_and_axes_lines, ...axes, ...ticks];
@@ -568,15 +633,12 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
             const [ticks, labels] = this.GetTickLinesAndLabels(
                 ymin,
                 ymax,
-                ViewSide.Left,
-                pixel2worldHor,
-                pixel2worldVer
+                ViewSide.Left
             );
             const back_lines = this.GetBackgroundTriangleLinesVertical(
                 ymin,
                 ymax,
-                true,
-                pixel2worldHor
+                true
             );
 
             tick_and_axes_lines = [...tick_and_axes_lines, ...axes, ...ticks];
@@ -590,16 +652,13 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
             const [ticks, labels] = this.GetTickLinesAndLabels(
                 ymin,
                 ymax,
-                ViewSide.Right,
-                pixel2worldHor,
-                pixel2worldVer
+                ViewSide.Right
             );
 
             const back_lines = this.GetBackgroundTriangleLinesVertical(
                 ymin,
                 ymax,
-                false,
-                pixel2worldHor
+                false
             );
 
             tick_and_axes_lines = [...tick_and_axes_lines, ...axes, ...ticks];
@@ -618,7 +677,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
             lineColor = lineColor.map((x) => (x ?? 0) / 255);
         }
 
-        const line_model = new Model(device, {
+        const lineModel = new Model(device, {
             id: `${this.props.id}-lines`,
             vs: lineVertexShader,
             fs: lineFragmentShader,
@@ -646,7 +705,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
             bColor = bColor.map((x) => (x ?? 0) / 255);
         }
 
-        const background_model = new Model(device, {
+        const backgroundModel = new Model(device, {
             id: `${this.props.id}-background`,
             vs: lineVertexShader,
             fs: lineFragmentShader,
@@ -664,7 +723,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         });
 
         //-- Labels model--
-        const label_models: Model[] = [];
+        const labelModels: Model[] = [];
 
         const pixelScale = GetPixelsScale(
             this.props.labelFontSizePt ?? defaultProps.labelFontSizePt
@@ -801,10 +860,10 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                 isInstanced: false,
             });
 
-            label_models.push(model);
+            labelModels.push(model);
         }
 
-        return { label_models, line_model, background_model };
+        return { labelModels: labelModels, lineModel: lineModel, backgroundModel: backgroundModel };
     }
 }
 

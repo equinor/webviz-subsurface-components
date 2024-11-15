@@ -383,6 +383,11 @@ export interface MapProps {
      * Extra pixels around the pointer to include while picking.
      */
     pickingRadius?: number;
+
+    /**
+     * The reference to the deck.gl instance.
+     */
+    deckGlRef?: React.ForwardedRef<DeckGLRef>;
 }
 
 function defaultTooltip(info: PickingInfo) {
@@ -421,9 +426,15 @@ const Map: React.FC<MapProps> = ({
     verticalScale,
     innerRef,
     pickingRadius,
+    deckGlRef,
 }: MapProps) => {
     // From react doc, ref should not be read nor modified during rendering.
     const deckRef = React.useRef<DeckGLRef>(null);
+
+    React.useImperativeHandle<DeckGLRef | null, DeckGLRef | null>(
+        deckGlRef,
+        () => deckRef.current
+    );
 
     const [applyViewController, forceUpdate] = React.useReducer(
         (x) => x + 1,
@@ -490,11 +501,13 @@ const Map: React.FC<MapProps> = ({
         }) as unknown as Axes2DLayer;
 
         const axes2DProps = axes2DLayer?.props;
+        const marginV = axes2DProps?.minimalMarginV ?? axes2DProps?.marginV;
+        const marginH = axes2DProps?.minimalMarginH ?? axes2DProps?.marginH;
         return {
-            left: axes2DProps?.isLeftRuler ? axes2DProps.marginH : 0,
-            right: axes2DProps?.isRightRuler ? axes2DProps.marginH : 0,
-            top: axes2DProps?.isTopRuler ? axes2DProps.marginV : 0,
-            bottom: axes2DProps?.isBottomRuler ? axes2DProps.marginV : 0,
+            left: axes2DProps?.isLeftRuler ? marginH : 0,
+            right: axes2DProps?.isRightRuler ? marginH : 0,
+            top: axes2DProps?.isTopRuler ? marginV : 0,
+            bottom: axes2DProps?.isBottomRuler ? marginV : 0,
         };
     }, [layers]);
 
