@@ -4,7 +4,7 @@ import React from "react";
 
 import { GroupTreePlot } from "../GroupTreePlot";
 
-import type { EdgeMetadata, NodeMetadata } from "../types";
+import type { DatedTree, EdgeMetadata, NodeMetadata } from "../types";
 
 import {
     exampleDatedTrees,
@@ -38,7 +38,15 @@ export default stories;
  * Storybook test for the group tree plot component
  */
 
-const Template = (args) => {
+const Template = (args: {
+    id: string;
+    datedTrees: DatedTree[];
+    edgeMetadataList: EdgeMetadata[];
+    nodeMetadataList: NodeMetadata[];
+    selectedDateTime: string;
+    selectedEdgeKey: string;
+    selectedNodeKey: string;
+}) => {
     return (
         <GroupTreePlot
             id={args.id}
@@ -124,12 +132,7 @@ export const Resizable: StoryObj<typeof Template> = {
             }, []);
 
             return (
-                <div
-                    style={{
-                        height: 700,
-                        width: 700,
-                    }}
-                >
+                <div style={{ height: 700, width: 700 }}>
                     <button onClick={rerollSize}>Randomize size</button>
                     <div
                         style={{
