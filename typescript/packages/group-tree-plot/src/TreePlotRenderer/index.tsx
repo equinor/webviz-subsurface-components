@@ -43,25 +43,33 @@ export default function TreePlotRenderer(
     const layoutHeight = props.height - heightPadding;
     const layoutWidth = props.width - widthPadding;
 
-    const treeLayout = React.useMemo(() => {
-        // Note that we invert height / width to render the tree sideways
-        return d3.tree<RecursiveTreeNode>().size([layoutHeight, layoutWidth]);
-    }, [layoutHeight, layoutWidth]);
+    const treeLayout = React.useMemo(
+        function computeLayout() {
+            // Note that we invert height / width to render the tree sideways
+            return d3
+                .tree<RecursiveTreeNode>()
+                .size([layoutHeight, layoutWidth]);
+        },
+        [layoutHeight, layoutWidth]
+    );
 
-    const nodeTree = React.useMemo(() => {
-        const hierarcy = d3.hierarchy(rootTreeNode, (datum) => {
-            if (nodeHideChildren[datum.node_label]) return null;
-            else return datum.children;
-        });
+    const nodeTree = React.useMemo(
+        function computeTree() {
+            const hierarcy = d3.hierarchy(rootTreeNode, (datum) => {
+                if (nodeHideChildren[datum.node_label]) return null;
+                else return datum.children;
+            });
 
-        return treeLayout(hierarcy);
-    }, [treeLayout, rootTreeNode, nodeHideChildren]);
+            return treeLayout(hierarcy);
+        },
+        [treeLayout, rootTreeNode, nodeHideChildren]
+    );
 
     // Storing the previous value so entering nodes know where to expand from
     const oldNodeTree = usePrevious(nodeTree);
 
-    const toggleShowChildren = React.useCallback(
-        (node: D3TreeNode) => {
+    const toggleChildVisiblity = React.useCallback(
+        function toggleChildVisiblity(node: D3TreeNode) {
             const label = node.data.node_label;
             const existingVal = nodeHideChildren[label];
             setNodeHideChildren({
@@ -97,7 +105,7 @@ export default function TreePlotRenderer(
                         primaryNodeProperty={props.primaryNodeProperty}
                         dataAssembler={props.dataAssembler}
                         node={node}
-                        onNodeClick={toggleShowChildren}
+                        onNodeClick={toggleChildVisiblity}
                     />
                 ))}
             </TransitionGroup>

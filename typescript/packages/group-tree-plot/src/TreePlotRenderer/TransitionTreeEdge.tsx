@@ -59,57 +59,60 @@ export function TransitionTreeEdge(props: TreeEdgeProps): React.ReactNode {
         mainTreeNode.edge_data
     );
 
-    const onTransitionEnter = React.useCallback(() => {
-        const isAppearing = transitionState === "exited";
-        const alreadyExiting = transitionState === "exiting";
+    const onTransitionEnter = React.useCallback(
+        function onTransitionEnter() {
+            const isAppearing = transitionState === "exited";
+            const alreadyExiting = transitionState === "exiting";
 
-        const node = d3.select(pathRef.current);
-        const labelNode = d3.select(labelRef.current);
-        const targetPath = diagonalPath(props.link);
+            const node = d3.select(pathRef.current);
+            const labelNode = d3.select(labelRef.current);
+            const targetPath = diagonalPath(props.link);
 
-        setTransitionState("entering");
+            setTransitionState("entering");
 
-        if (alreadyExiting) {
-            node.interrupt();
-        }
+            if (alreadyExiting) {
+                node.interrupt();
+            }
 
-        if (isAppearing) {
-            const closestVisibleParent = findClosestVisibleInNewTree(
-                props.link.target,
-                props.oldNodeTree
-            );
+            if (isAppearing) {
+                const closestVisibleParent = findClosestVisibleInNewTree(
+                    props.link.target,
+                    props.oldNodeTree
+                );
 
-            const expandFrom = closestVisibleParent ?? props.nodeTree;
-            const initPath = diagonalPath({
-                source: expandFrom,
-                target: expandFrom,
-            });
+                const expandFrom = closestVisibleParent ?? props.nodeTree;
+                const initPath = diagonalPath({
+                    source: expandFrom,
+                    target: expandFrom,
+                });
 
-            node.attr("d", initPath).attr("stroke-width", strokeWidth / 4);
+                node.attr("d", initPath).attr("stroke-width", strokeWidth / 4);
 
-            labelNode.style("fill-opacity", 0);
-        }
+                labelNode.style("fill-opacity", 0);
+            }
 
-        node.transition()
-            .duration(TREE_TRANSITION_DURATION)
-            .ease(d3.easeCubicInOut)
-            .attr("d", targetPath)
-            .attr("stroke-width", strokeWidth)
-            .on("end", () => {
-                setTransitionState("entered");
-            });
+            node.transition()
+                .duration(TREE_TRANSITION_DURATION)
+                .ease(d3.easeCubicInOut)
+                .attr("d", targetPath)
+                .attr("stroke-width", strokeWidth)
+                .on("end", () => {
+                    setTransitionState("entered");
+                });
 
-        labelNode
-            .transition()
-            .duration(TREE_TRANSITION_DURATION)
-            .style("fill-opacity", 1);
-    }, [
-        props.link,
-        props.oldNodeTree,
-        strokeWidth,
-        transitionState,
-        props.nodeTree,
-    ]);
+            labelNode
+                .transition()
+                .duration(TREE_TRANSITION_DURATION)
+                .style("fill-opacity", 1);
+        },
+        [
+            props.link,
+            props.oldNodeTree,
+            strokeWidth,
+            transitionState,
+            props.nodeTree,
+        ]
+    );
 
     const onTransitionExit = React.useCallback(() => {
         setTransitionState("exiting");

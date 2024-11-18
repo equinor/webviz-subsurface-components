@@ -17,11 +17,7 @@ export interface GroupTreePlotProps {
     selectedDateTime: string;
 }
 
-// TODO: Should be dynamic instead
-
-export const GroupTreePlot: React.FC<GroupTreePlotProps> = (
-    props: GroupTreePlotProps
-) => {
+export function GroupTreePlot(props: GroupTreePlotProps): React.ReactNode {
     let errorMsg = "";
 
     // References to handle resizing
@@ -103,6 +99,6 @@ export const GroupTreePlot: React.FC<GroupTreePlotProps> = (
             {errorMsg && <PlotErrorOverlay message={errorMsg} />}
         </svg>
     );
-};
+}
 
 GroupTreePlot.displayName = "GroupTreePlot";

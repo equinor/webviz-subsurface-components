@@ -39,8 +39,9 @@ export function TransitionTreeNode(
         React.useState<TransitionStatus>("exited");
 
     const recursiveTreeNode = props.node.data;
-    const isLeaf = !recursiveTreeNode.children;
-    const canBeExpanded = !props.node.children && recursiveTreeNode.children;
+    // ! This is whether the node is a leaf *in the actual tree*, not the rendered one
+    const isLeaf = !recursiveTreeNode.children?.length;
+    const canBeExpanded = !props.node.children?.length && !isLeaf;
     const nodeLabel = recursiveTreeNode.node_label;
 
     let circleClass = "grouptree__node";
@@ -63,68 +64,74 @@ export function TransitionTreeNode(
         recursiveTreeNode.node_data
     );
 
-    const onTransitionEnter = React.useCallback(() => {
-        const isAppearing = transitionState === "exited";
-        const alreadyExiting = transitionState === "exiting";
+    const onTransitionEnter = React.useCallback(
+        function onTransitionEnter() {
+            const isAppearing = transitionState === "exited";
+            const alreadyExiting = transitionState === "exiting";
 
-        setTransitionState("entering");
+            setTransitionState("entering");
 
-        const node = d3.select(rootRef.current);
+            const node = d3.select(rootRef.current);
 
-        if (alreadyExiting) {
-            node.interrupt();
-        }
+            if (alreadyExiting) {
+                node.interrupt();
+            }
 
-        if (isAppearing) {
+            if (isAppearing) {
+                const closestVisibleParent = findClosestVisibleInNewTree(
+                    props.node,
+                    props.oldNodeTree
+                );
+
+                const expandFrom = closestVisibleParent ?? props.nodeTree;
+                const initTransform = `translate(${expandFrom.y},${expandFrom.x})`;
+
+                node.attr("transform", initTransform).attr("opacity", 0);
+            }
+
+            node.transition()
+                .duration(TREE_TRANSITION_DURATION)
+                .ease(d3.easeCubicInOut)
+                .attr("transform", targetTransform)
+                .attr("opacity", 1)
+                .on("end", () => {
+                    setTransitionState("entered");
+                });
+        },
+        [
+            props.oldNodeTree,
+            props.node,
+            props.nodeTree,
+            transitionState,
+            targetTransform,
+        ]
+    );
+
+    const onTransitionExit = React.useCallback(
+        function onTransitionExit() {
+            setTransitionState("exiting");
+
+            const node = d3.select(rootRef.current);
+
             const closestVisibleParent = findClosestVisibleInNewTree(
                 props.node,
-                props.oldNodeTree
+                props.nodeTree
             );
 
-            const expandFrom = closestVisibleParent ?? props.nodeTree;
-            const initTransform = `translate(${expandFrom.y},${expandFrom.x})`;
+            const retractTo = closestVisibleParent ?? props.node;
+            const targetTransform = `translate(${retractTo.y},${retractTo.x})`;
 
-            node.attr("transform", initTransform).attr("opacity", 0);
-        }
-
-        node.transition()
-            .duration(TREE_TRANSITION_DURATION)
-            .ease(d3.easeCubicInOut)
-            .attr("transform", targetTransform)
-            .attr("opacity", 1)
-            .on("end", () => {
-                setTransitionState("entered");
-            });
-    }, [
-        props.oldNodeTree,
-        props.node,
-        props.nodeTree,
-        transitionState,
-        targetTransform,
-    ]);
-
-    const onTransitionExit = React.useCallback(() => {
-        setTransitionState("exiting");
-
-        const node = d3.select(rootRef.current);
-
-        const closestVisibleParent = findClosestVisibleInNewTree(
-            props.node,
-            props.nodeTree
-        );
-
-        const retractTo = closestVisibleParent ?? props.node;
-        const targetTransform = `translate(${retractTo.y},${retractTo.x})`;
-
-        node.transition()
-            .duration(TREE_TRANSITION_DURATION)
-            .ease(d3.easeCubicInOut)
-            .attr("transform", targetTransform)
-            .attr("opacity", 0)
-            .on("end", () => {
-                setTransitionState("exited");
-            });
-    }, [props.node, props.nodeTree]);
+            node.transition()
+                .duration(TREE_TRANSITION_DURATION)
+                .ease(d3.easeCubicInOut)
+                .attr("transform", targetTransform)
+                .attr("opacity", 0)
+                .on("end", () => {
+                    setTransitionState("exited");
+                });
+        },
+        [props.node, props.nodeTree]
+    );
 
     // Animate other changes
     // TODO: Gets desynced with exiting animation if you spam new dates
