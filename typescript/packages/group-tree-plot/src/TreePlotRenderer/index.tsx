@@ -7,7 +7,7 @@ import type DataAssembler from "../DataAssembler/DataAssembler";
 
 import "./group_tree.css";
 import { useDataAssemblerTree } from "../DataAssembler/DataAssemblerHooks";
-import { computeLinkId, computeNodeId } from "../utils";
+import { computeLinkId, computeNodeId, usePrevious } from "../utils";
 import { TransitionGroup } from "react-transition-group";
 import { TransitionTreeEdge } from "./TransitionTreeEdge";
 import { TransitionTreeNode } from "./TransitionTreeNode";
@@ -48,21 +48,17 @@ export default function TreePlotRenderer(
         return d3.tree<RecursiveTreeNode>().size([layoutHeight, layoutWidth]);
     }, [layoutHeight, layoutWidth]);
 
-    const lastComputedTreeRef = React.useRef<D3TreeNode | null>(null);
-
-    const [nodeTree, oldNodeTree] = React.useMemo(() => {
-        const previousTree = lastComputedTreeRef.current;
+    const nodeTree = React.useMemo(() => {
         const hierarcy = d3.hierarchy(rootTreeNode, (datum) => {
             if (nodeHideChildren[datum.node_label]) return null;
             else return datum.children;
         });
 
-        const tree = treeLayout(hierarcy);
-
-        lastComputedTreeRef.current = tree;
-
-        return [tree, previousTree];
+        return treeLayout(hierarcy);
     }, [treeLayout, rootTreeNode, nodeHideChildren]);
+
+    // Storing the previous value so entering nodes know where to expand from
+    const oldNodeTree = usePrevious(nodeTree);
 
     const toggleShowChildren = React.useCallback(
         (node: D3TreeNode) => {

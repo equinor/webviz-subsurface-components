@@ -1,6 +1,7 @@
 import _ from "lodash";
 import type DataAssembler from "./DataAssembler/DataAssembler";
 import type { D3TreeEdge, D3TreeNode } from "./types";
+import React from "react";
 
 export const TREE_TRANSITION_DURATION = 200;
 
@@ -109,4 +110,13 @@ export function diagonalPath(link: D3TreeEdge): string {
             ${avgY} ${target.x}, \
             ${target.y} ${target.x}
         `;
+}
+
+export function usePrevious<T>(value: T): T | null {
+    const oldValRef = React.useRef<T | null>(null);
+    React.useEffect(() => {
+        oldValRef.current = value;
+    }, [value]);
+
+    return oldValRef.current;
 }
