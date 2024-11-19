@@ -152,7 +152,6 @@ export function TransitionTreeEdge(props: TreeEdgeProps): React.ReactNode {
     const isEntered = transitionState === "entered";
     if (isEntered) {
         d3.select(pathRef.current)
-            .interrupt()
             .transition()
             .duration(TREE_TRANSITION_DURATION)
             .ease(d3.easeCubicInOut)

@@ -1,18 +1,17 @@
+import React from "react";
+import _ from "lodash";
 import type { Meta, StoryObj } from "@storybook/react";
 
-import React from "react";
+import { GroupTreePlot, type GroupTreePlotProps } from "../GroupTreePlot";
 
-import { GroupTreePlot } from "../GroupTreePlot";
-
-import type { DatedTree, EdgeMetadata, NodeMetadata } from "../types";
+import type { EdgeMetadata, NodeMetadata } from "../types";
 
 import {
     exampleDatedTrees,
     exampleDates,
 } from "../../example-data/dated-trees";
-import _ from "lodash";
 
-const stories: Meta = {
+const stories: Meta<GroupTreePlotProps> = {
     component: GroupTreePlot,
     title: "GroupTreePlot/Demo",
     argTypes: {
@@ -30,6 +29,10 @@ const stories: Meta = {
             description:
                 "The selected `string` must be a node key present in one of the `node_data` objects in the `tree`-prop of an element in `datedTrees`-prop.\n\n",
         },
+        initialVisibleDepth: {
+            description:
+                "When initially rendering the tree, automatically collapse all nodes at or below this depth",
+        },
     },
 };
 export default stories;
@@ -38,15 +41,7 @@ export default stories;
  * Storybook test for the group tree plot component
  */
 
-const Template = (args: {
-    id: string;
-    datedTrees: DatedTree[];
-    edgeMetadataList: EdgeMetadata[];
-    nodeMetadataList: NodeMetadata[];
-    selectedDateTime: string;
-    selectedEdgeKey: string;
-    selectedNodeKey: string;
-}) => {
+const Template = (args: GroupTreePlotProps) => {
     return (
         <GroupTreePlot
             id={args.id}
@@ -56,6 +51,7 @@ const Template = (args: {
             selectedDateTime={args.selectedDateTime}
             selectedEdgeKey={args.selectedEdgeKey}
             selectedNodeKey={args.selectedNodeKey}
+            initialVisibleDepth={args.initialVisibleDepth}
         />
     );
 };

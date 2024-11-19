@@ -16,9 +16,10 @@ export type TreePlotRendererProps = {
     dataAssembler: DataAssembler;
     primaryEdgeProperty: string;
     primaryNodeProperty: string;
-    // TODO: Make dynamic
     height: number;
     width: number;
+
+    initialVisibleDepth?: number;
 };
 
 const PLOT_MARGINS = {
@@ -34,7 +35,7 @@ export default function TreePlotRenderer(
     const activeTree = useDataAssemblerTree(props.dataAssembler);
     const rootTreeNode = activeTree.tree;
 
-    const [nodeHideChildren, setNodeHideChildren] = React.useState<
+    const [nodeCollapseFlags, setNodeCollapseFlags] = React.useState<
         Record<string, boolean>
     >({});
 
@@ -55,29 +56,51 @@ export default function TreePlotRenderer(
 
     const nodeTree = React.useMemo(
         function computeTree() {
-            const hierarcy = d3.hierarchy(rootTreeNode, (datum) => {
-                if (nodeHideChildren[datum.node_label]) return null;
-                else return datum.children;
-            });
+            const hierarcy = d3
+                // .hierarchy(rootTreeNode).
+                .hierarchy(rootTreeNode, (datum) => {
+                    // Stop traversal at all collapsed nodes
+                    if (nodeCollapseFlags[datum.node_label]) return null;
+                    else return datum.children;
+                })
+                .each((node) => {
+                    // Secondary collapse-run; collapse nodes based on `props.initialVisibleDepth`. Keep explicitly expanded nodes open
+                    const nodeLabel = node.data.node_label;
+                    if (props.initialVisibleDepth == null) return;
+                    if (nodeCollapseFlags[nodeLabel] === false) return;
+
+                    if (node.depth >= props.initialVisibleDepth) {
+                        node.children = undefined;
+                    }
+                });
 
             return treeLayout(hierarcy);
         },
-        [treeLayout, rootTreeNode, nodeHideChildren]
+        [treeLayout, rootTreeNode, nodeCollapseFlags, props.initialVisibleDepth]
     );
 
     // Storing the previous value so entering nodes know where to expand from
     const oldNodeTree = usePrevious(nodeTree);
 
-    const toggleChildVisiblity = React.useCallback(
-        function toggleChildVisiblity(node: D3TreeNode) {
+    const toggleNodeCollapse = React.useCallback(
+        function toggleNodeCollapse(node: D3TreeNode) {
             const label = node.data.node_label;
-            const existingVal = nodeHideChildren[label];
-            setNodeHideChildren({
-                ...nodeHideChildren,
-                [label]: Boolean(node.children?.length) && !existingVal,
-            });
+            const existingVal = nodeCollapseFlags[label];
+
+            const newVal = Boolean(node.children?.length) && !existingVal;
+            const newFlags = { ...nodeCollapseFlags, [label]: newVal };
+
+            // When closing a node, reset any stored flag for all children
+            if (newVal) {
+                node.descendants()
+                    // descendants() includes this node, slice to skip it
+                    .slice(1)
+                    .forEach(({ data }) => delete newFlags[data.node_label]);
+            }
+
+            setNodeCollapseFlags(newFlags);
         },
-        [nodeHideChildren]
+        [nodeCollapseFlags]
     );
 
     return (
@@ -105,7 +128,7 @@ export default function TreePlotRenderer(
                         primaryNodeProperty={props.primaryNodeProperty}
                         dataAssembler={props.dataAssembler}
                         node={node}
-                        onNodeClick={toggleChildVisiblity}
+                        onNodeClick={toggleNodeCollapse}
                     />
                 ))}
             </TransitionGroup>

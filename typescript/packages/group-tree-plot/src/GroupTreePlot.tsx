@@ -15,6 +15,8 @@ export interface GroupTreePlotProps {
     selectedEdgeKey: string;
     selectedNodeKey: string;
     selectedDateTime: string;
+
+    initialVisibleDepth?: number;
 }
 
 export function GroupTreePlot(props: GroupTreePlotProps): React.ReactNode {
@@ -93,6 +95,7 @@ export function GroupTreePlot(props: GroupTreePlotProps): React.ReactNode {
                     primaryNodeProperty={props.selectedNodeKey}
                     width={svgWidth}
                     height={svgHeight}
+                    initialVisibleDepth={props.initialVisibleDepth}
                 />
             )}
 
