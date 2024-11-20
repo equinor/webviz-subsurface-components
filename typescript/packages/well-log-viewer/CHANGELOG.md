@@ -1,3 +1,10 @@
+# [2.2.0](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@2.1.10...well-log-viewer@2.2.0) (2024-11-20)
+
+
+### Features
+
+* Add and event to indicate mouse has left tracks area ([#2377](https://github.com/equinor/webviz-subsurface-components/issues/2377)) ([2a3558e](https://github.com/equinor/webviz-subsurface-components/commit/2a3558e159ea746911138bc0e101e7c0cc0efeb6))
+
 ## [2.1.10](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@2.1.9...well-log-viewer@2.1.10) (2024-11-11)
 
 
