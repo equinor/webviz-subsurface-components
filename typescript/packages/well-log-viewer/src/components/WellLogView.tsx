@@ -230,6 +230,7 @@ function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
         onMouseExit: (event: OverlayMouseExitEvent): void => {
             const elem = event.target;
             if (elem) elem.style.visibility = "hidden";
+            parent.onTrackMouseLeaveEvent();
         },
         onRescale: (event: OverlayRescaleEvent): void => {
             const elem = event.target;
@@ -1144,6 +1145,12 @@ export interface WellLogViewProps {
      * called when mouse click on a track
      */
     onTrackMouseEvent?: (wellLogView: WellLogView, ev: TrackMouseEvent) => void;
+
+    /**
+     * called when mouse cursor leaves track area;
+     */
+    onTrackMouseLeaveEvent?: () => void;
+
     /**
      * called when template is changed
      */
@@ -1627,6 +1634,10 @@ class WellLogView
 
     onTrackMouseEvent(ev: TrackMouseEvent): void {
         this.props.onTrackMouseEvent?.(this, ev);
+    }
+
+    onTrackMouseLeaveEvent(): void {
+        this.props.onTrackMouseLeaveEvent?.();
     }
 
     onTemplateChanged(): void {

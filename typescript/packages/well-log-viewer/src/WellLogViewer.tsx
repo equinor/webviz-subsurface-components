@@ -45,6 +45,7 @@ export interface WellLogViewerProps extends WellLogViewWithScrollerProps {
 
     onInfoFilled?: (computedInfo: Info[]) => void;
     onTrackMouseEvent?: (wellLogView: WellLogView, ev: TrackMouseEvent) => void;
+    onTrackMouseLeaveEvent?: () => void;
 
     onCreateController?: (controller: WellLogController) => void;
 }
@@ -304,6 +305,9 @@ export default class WellLogViewer extends Component<
                         onTrackMouseEvent={
                             this.props.onTrackMouseEvent ||
                             onTrackMouseEventDefault
+                        }
+                        onTrackMouseLeaveEvent={
+                            this.props.onTrackMouseLeaveEvent
                         }
                         onContentRescale={this.onContentRescale}
                         onContentSelection={this.onContentSelection}
