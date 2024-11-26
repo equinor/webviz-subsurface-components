@@ -1287,6 +1287,7 @@ class WellLogView
 
     wellLogSets: WellLogSet[];
     container?: HTMLElement;
+    title?: HTMLElement;
     resizeObserver: ResizeObserver;
 
     logController?: LogViewer;
@@ -1570,6 +1571,7 @@ class WellLogView
                 this.props.colorMapFunctions
             );
             addWellPickOverlay(this.logController, this);
+            this._updateWellLogTitle();
         }
         this.setControllerZoom();
         this.setControllerSelection();
@@ -1790,6 +1792,11 @@ class WellLogView
         for (const element of elements) {
             if (element.textContent)
                 element.setAttribute("title", element.textContent);
+        }
+    }
+    _updateWellLogTitle(): void {
+        if (this.title && this.props.viewTitle === true) {
+            this.title.textContent = this.wellLogSets[0]?.header.well ?? null;
         }
     }
 
@@ -2082,6 +2089,7 @@ class WellLogView
                         className={
                             horizontal ? "title title-horizontal" : "title"
                         }
+                        ref={(el) => (this.title = el as HTMLElement)}
                     >
                         {this.createViewTitle(viewTitle)}
                     </div>
