@@ -1,3 +1,10 @@
+## [2.2.2](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@2.2.1...well-log-viewer@2.2.2) (2024-11-26)
+
+
+### Bug Fixes
+
+* Update title after setting tracks ([#2384](https://github.com/equinor/webviz-subsurface-components/issues/2384)) ([6e0e046](https://github.com/equinor/webviz-subsurface-components/commit/6e0e0465f026bf2389757d3367b24bbb450f1abc))
+
 ## [2.2.1](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@2.2.0...well-log-viewer@2.2.1) (2024-11-25)
 
 
