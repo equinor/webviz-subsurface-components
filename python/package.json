@@ -28,7 +28,8 @@
         "validate": "npm run typecheck && npm run lint"
     },
     "dependencies": {
-        "@deck.gl/core": "^8.9.35",
+        "@deck.gl/core": "^9.0.36",
+        "@deck.gl/react": "^9.0.36",
         "@emerson-eps/color-tables": "^0.4.85",
         "@equinor/eds-core-react": "0.33.0",
         "@equinor/eds-icons": "^0.19.1",
@@ -45,8 +46,8 @@
         "leaflet-draw": "^1.0.4",
         "lodash": "^4.17.21",
         "mathjs": "^9.4.2",
-        "react": "^18.2.0",
-        "react-dom": "^18.2.0",
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1",
         "react-dropdown-tree-select": "^2.8.0",
         "react-redux": "^8.1.1",
         "react-resize-detector": "^9.0.0"
@@ -61,7 +62,7 @@
         "@types/leaflet": "^1.8.0",
         "@types/leaflet-draw": "^1.0.8",
         "@types/lodash": "^4.14.199",
-        "@types/react": "^18.2.7",
+        "@types/react": "^18.3.12",
         "@types/react-dom": "^18.2.7",
         "@typescript-eslint/eslint-plugin": "^6.4.0",
         "@typescript-eslint/parser": "^6.4.0",

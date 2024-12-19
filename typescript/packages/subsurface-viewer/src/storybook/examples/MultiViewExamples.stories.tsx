@@ -2,9 +2,10 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { fireEvent, userEvent } from "@storybook/test";
 import React from "react";
 
-import type { PickingInfo, Viewport } from "@deck.gl/core";
 import { View } from "@deck.gl/core";
-import type { DeckGLRef } from "@deck.gl/react";
+import { useMultiViewPicking } from "../../hooks/useMultiViewPicking";
+import { useMultiViewCursorTracking } from "../../hooks/useMultiViewCursorTracking";
+import type { PickingInfoPerView } from "../../hooks/useMultiViewPicking";
 
 import { ContinuousLegend } from "@emerson-eps/color-tables";
 
@@ -13,7 +14,7 @@ import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
-import SubsurfaceViewer from "../../SubsurfaceViewer";
+import SubsurfaceViewer, { ViewStateType } from "../../SubsurfaceViewer";
 import type { MapMouseEvent, ViewsType } from "../../components/Map";
 import { ViewFooter } from "../../components/ViewFooter";
 
@@ -32,6 +33,7 @@ import {
     redAxes2DLayer,
     subsufaceProps,
 } from "../sharedSettings";
+import { DeckGLRef } from "@deck.gl/react";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -84,172 +86,6 @@ export const MultiViewAnnotation: StoryObj<typeof SubsurfaceViewer> = {
     ),
 };
 
-type PickingInfoProperty = {
-    name: string;
-    value: number;
-    color?: string;
-};
-
-type PickingInfoPerView = Record<
-    string,
-    {
-        x: number | null;
-        y: number | null;
-        properties: PickingInfoProperty[];
-    }
->;
-
-class MultiViewPickingInfoAssembler {
-    private _deckGl: DeckGLRef | null = null;
-    private _multiPicking: boolean;
-    private _subscribers: Set<(info: PickingInfoPerView) => void> = new Set();
-
-    constructor(deckGL: DeckGLRef | null, multiPicking: boolean = false) {
-        this._deckGl = deckGL;
-        this._multiPicking = multiPicking;
-    }
-
-    setDeckGL(deckGL: DeckGLRef) {
-        this._deckGl = deckGL;
-    }
-
-    subscribe(callback: (info: PickingInfoPerView) => void): () => void {
-        this._subscribers.add(callback);
-
-        return () => {
-            this._subscribers.delete(callback);
-        };
-    }
-
-    private publish(info: PickingInfoPerView) {
-        for (const subscriber of this._subscribers) {
-            subscriber(info);
-        }
-    }
-
-    getMultiViewPickingInfo(hoverEvent: MapMouseEvent) {
-        if (!this._deckGl?.deck) {
-            return;
-        }
-
-        const viewports = this._deckGl.deck?.getViewports();
-        if (!viewports) {
-            return;
-        }
-
-        if (hoverEvent.infos.length === 0) {
-            return;
-        }
-
-        const activeViewportId = hoverEvent.infos[0].viewport?.id;
-
-        if (!activeViewportId) {
-            return;
-        }
-
-        const eventScreenCoordinate: [number, number] = [
-            hoverEvent.infos[0].x,
-            hoverEvent.infos[0].y,
-        ];
-
-        this.assembleMultiViewPickingInfo(
-            eventScreenCoordinate,
-            activeViewportId,
-            viewports
-        ).then((info) => {
-            this.publish(info);
-        });
-    }
-
-    private async assembleMultiViewPickingInfo(
-        eventScreenCoordinate: [number, number],
-        activeViewportId: string,
-        viewports: Viewport[]
-    ): Promise<PickingInfoPerView> {
-        return new Promise((resolve, reject) => {
-            const deck = this._deckGl?.deck;
-            if (!deck) {
-                reject("DeckGL not initialized");
-                return;
-            }
-            const activeViewport = viewports.find(
-                (el) => el.id === activeViewportId
-            );
-            if (!activeViewport) {
-                reject("Active viewport not found");
-                return;
-            }
-
-            const activeViewportRelativeScreenCoordinates: [number, number] = [
-                eventScreenCoordinate[0] - activeViewport.x,
-                eventScreenCoordinate[1] - activeViewport.y,
-            ];
-
-            const worldCoordinate = activeViewport.unproject(
-                activeViewportRelativeScreenCoordinates
-            );
-
-            const collectedPickingInfo: PickingInfoPerView = {};
-            for (const viewport of viewports) {
-                const [relativeScreenX, relativeScreenY] =
-                    viewport.project(worldCoordinate);
-
-                let pickingInfo: PickingInfo[] = [];
-                if (this._multiPicking) {
-                    pickingInfo = deck.pickMultipleObjects({
-                        x: relativeScreenX + viewport.x,
-                        y: relativeScreenY + viewport.y,
-                        unproject3D: true,
-                    });
-                } else {
-                    const obj = deck.pickObject({
-                        x: relativeScreenX + viewport.x,
-                        y: relativeScreenY + viewport.y,
-                        unproject3D: true,
-                    });
-                    pickingInfo = obj ? [obj] : [];
-                }
-
-                if (pickingInfo) {
-                    const collectedProperties: PickingInfoProperty[] = [];
-                    for (const info of pickingInfo) {
-                        if (
-                            !("properties" in info) ||
-                            !Array.isArray(info.properties)
-                        ) {
-                            continue;
-                        }
-
-                        const properties = info.properties;
-
-                        for (const property of properties) {
-                            collectedProperties.push({
-                                name: property.name,
-                                value: property.value,
-                                color: property.color,
-                            });
-                        }
-                    }
-
-                    collectedPickingInfo[viewport.id] = {
-                        x: worldCoordinate[0],
-                        y: worldCoordinate[1],
-                        properties: collectedProperties,
-                    };
-                } else {
-                    collectedPickingInfo[viewport.id] = {
-                        x: null,
-                        y: null,
-                        properties: [],
-                    };
-                }
-            }
-
-            resolve(collectedPickingInfo);
-        });
-    }
-}
-
 function ExampleReadoutComponent(props: {
     viewId: string;
     pickingInfoPerView: PickingInfoPerView;
@@ -270,17 +106,30 @@ function ExampleReadoutComponent(props: {
         >
             <div>X:</div>
             <div>
-                {props.pickingInfoPerView[props.viewId]?.x?.toFixed(3) ?? "-"}
+                {props.pickingInfoPerView[props.viewId]?.coordinates
+                    ?.at(0)
+                    ?.toFixed(3) ?? "-"}
             </div>
             <div>Y:</div>
             <div>
-                {props.pickingInfoPerView[props.viewId]?.y?.toFixed(3) ?? "-"}
+                {props.pickingInfoPerView[props.viewId]?.coordinates
+                    ?.at(1)
+                    ?.toFixed(3) ?? "-"}
             </div>
-            {props.pickingInfoPerView[props.viewId]?.properties?.map(
-                (el, i) => (
-                    <React.Fragment key={`${el.name}-${i}`}>
-                        <div>{el.name}</div>
-                        <div>{el.value.toFixed(3)}</div>
+            {props.pickingInfoPerView[props.viewId]?.layerPickingInfo.map(
+                (el) => (
+                    <React.Fragment key={`${el.layerId}`}>
+                        <div style={{ fontWeight: "bold" }}>{el.layerName}</div>
+                        {el.properties.map((prop, i) => (
+                            <React.Fragment key={`${el.layerId}-${i}}`}>
+                                <div style={{ gridColumn: 1 }}>{prop.name}</div>
+                                <div>
+                                    {typeof prop.value === "string"
+                                        ? prop.value
+                                        : prop.value.toFixed(3)}
+                                </div>
+                            </React.Fragment>
+                        ))}
                     </React.Fragment>
                 )
             ) ?? ""}
@@ -291,50 +140,73 @@ function ExampleReadoutComponent(props: {
 function MultiViewPickingExample(
     props: SubsurfaceViewerProps
 ): React.ReactNode {
-    const [pickingInfoPerView, setPickingInfoPerView] =
-        React.useState<PickingInfoPerView>(
-            props.views?.viewports.reduce((acc, viewport) => {
-                acc[viewport.id] = {
-                    x: null,
-                    y: null,
-                    properties: [],
-                };
-                return acc;
-            }, {} as PickingInfoPerView) ?? {}
-        );
-
     const deckGlRef = React.useRef<DeckGLRef>(null);
-    const assembler = React.useRef<MultiViewPickingInfoAssembler | null>(null);
+    const [mouseHover, setMouseHover] = React.useState<boolean>(false);
+    const [cameraPosition, setCameraPosition] = React.useState<
+        ViewStateType | undefined
+    >(undefined);
 
-    React.useEffect(function onMountEffect() {
-        assembler.current = new MultiViewPickingInfoAssembler(
-            deckGlRef.current
-        );
-
-        const unsubscribe = assembler.current.subscribe((info) => {
-            setPickingInfoPerView(info);
+    const { getPickingInfo, activeViewportId, pickingInfoPerView } =
+        useMultiViewPicking({
+            deckGlRef,
+            multiPicking: true,
+            pickDepth: 2,
         });
-
-        return function onUnmountEffect() {
-            unsubscribe();
-        };
-    }, []);
 
     function handleMouseEvent(event: MapMouseEvent) {
         if (event.type === "hover") {
-            assembler.current?.getMultiViewPickingInfo(event);
+            getPickingInfo(event);
         }
     }
 
+    const viewports = props.views?.viewports ?? [];
+    const layers = props.layers ?? [];
+
+    const { viewports: adjustedViewports, layers: adjustedLayers } =
+        useMultiViewCursorTracking({
+            activeViewportId,
+            worldCoordinates:
+                pickingInfoPerView[activeViewportId]?.coordinates ?? null,
+            viewports,
+            layers,
+            crosshairProps: {
+                color: [255, 255, 255, 255],
+                sizePx: 32,
+                visible: mouseHover,
+            },
+        });
+
     return (
-        <div style={{ width: "100%", height: "90vh", position: "relative" }}>
+        <div
+            style={{ width: "100%", height: "90vh", position: "relative" }}
+            onMouseEnter={() => setMouseHover(true)}
+            onMouseLeave={() => setMouseHover(false)}
+            onBlur={() => setMouseHover(false)}
+            onFocus={() => setMouseHover(true)}
+        >
             <SubsurfaceViewer
                 {...props}
+                getCameraPosition={(position) => setCameraPosition(position)}
+                layers={adjustedLayers}
+                views={{
+                    ...props.views,
+
+                    viewports: adjustedViewports,
+                    layout: props.views?.layout ?? [1, 2],
+                }}
                 deckGlRef={deckGlRef}
+                cameraPosition={cameraPosition}
                 onMouseEvent={handleMouseEvent}
                 coords={{
                     visible: false,
                     multiPicking: true,
+                }}
+                scale={{
+                    visible: true,
+                    cssStyle: {
+                        right: 10,
+                        top: 10,
+                    },
                 }}
             >
                 {
