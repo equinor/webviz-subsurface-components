@@ -5,10 +5,14 @@ import {
     ViewStateType,
 } from "@webviz/subsurface-viewer";
 import { DeckGLRef } from "@deck.gl/react";
-import { PickingInfoPerView, useMultiViewPicking } from "@webviz/subsurface-viewer/src/hooks/useMultiViewPicking";
+import {
+    PickingInfoPerView,
+    useMultiViewPicking,
+} from "@webviz/subsurface-viewer/src/hooks/useMultiViewPicking";
 import { useMultiViewCursorTracking } from "@webviz/subsurface-viewer/src/hooks/useMultiViewCursorTracking";
 import { isEqual } from "lodash";
 import ViewAnnotation from "../ViewAnnotation/ViewAnnotation";
+import ReadoutComponent from "../ReadoutComponent";
 
 const SubsurfaceViewerComponent = React.lazy(() =>
     import(
@@ -102,18 +106,47 @@ function MultiViewSubsurfaceViewer(
                 visible: mouseHover,
             },
         });
-    
-    const children = React.Children.toArray(props.children);
-    for (const viewport of adjustedViewports) {
-        children.push(
-            <ViewAnnotation key={viewport.id} id={viewport.id}>
-                <ReadoutComponent
-                    viewId={viewport.id}
-                    pickingInfoPerView={pickingInfoPerView}
-                />
-            </ViewAnnotation>
-        );
-    }
+
+    const foundViewAnnotations: string[] = [];
+    const children = React.Children.map(props.children, (child) => {
+        // Child wrapped in DashWrapper
+        if (
+            React.isValidElement(child) &&
+            typeof child.props === "object" &&
+            Object.keys(child.props).includes("_dashprivate_layout") &&
+            child.props._dashprivate_layout.type === "ViewAnnotation"
+        ) {
+            const id = child.props._dashprivate_layout.props.id;
+            const readout = adjustedViewports.find(
+                (viewport) => viewport.id === id
+            );
+            if (!readout) {
+                return child;
+            }
+            foundViewAnnotations.push(id);
+            const newChild = React.cloneElement(child, {
+                // @ts-expect-error - this is proven to be a valid prop in Dash components
+                _dashprivate_layout: {
+                    ...child.props._dashprivate_layout,
+                    props: {
+                        ...child.props._dashprivate_layout.props,
+                        children: [
+                            ...child.props._dashprivate_layout.props.children,
+                            {
+                                type: "ReadoutComponent",
+                                props: {
+                                    viewId: id,
+                                    pickingInfoPerView,
+                                },
+                                namespace: "webviz_subsurface_components",
+                            },
+                        ],
+                    },
+                },
+            });
+            return newChild;
+        }
+    });
 
     return (
         <div
@@ -124,7 +157,7 @@ function MultiViewSubsurfaceViewer(
         >
             <SubsurfaceViewerComponent
                 {...props}
-                coords={{visible: false}}
+                coords={{ visible: false }}
                 onMouseEvent={handleMouseEvent}
                 layers={adjustedLayers}
                 views={{
@@ -141,68 +174,6 @@ function MultiViewSubsurfaceViewer(
         </div>
     );
 }
-
-function ReadoutComponent(props: {
-    viewId: string;
-    pickingInfoPerView: PickingInfoPerView;
-}): React.ReactNode {
-    return (
-        <div
-            style={{
-                position: "absolute",
-                bottom: 8,
-                left: 8,
-                background: "#fff",
-                padding: 8,
-                borderRadius: 4,
-                display: "grid",
-                gridTemplateColumns: "8rem auto",
-                border: "1px solid #ccc",
-                fontSize: "0.8rem",
-            }}
-        >
-            <div>X:</div>
-            <div>
-                {roundToSignificant(props.pickingInfoPerView[props.viewId]?.coordinates
-                    ?.at(0))}
-            </div>
-            <div>Y:</div>
-            <div>
-            {roundToSignificant(props.pickingInfoPerView[props.viewId]?.coordinates
-                    ?.at(1))}
-            </div>
-            {props.pickingInfoPerView[props.viewId]?.layerPickingInfo.map(
-                (el) => (
-                    <React.Fragment key={`${el.layerId}`}>
-                        <div style={{ fontWeight: "bold" }}>{el.layerName}</div>
-                        {el.properties.map((prop, i) => (
-                            <React.Fragment key={`${el.layerId}-${i}}`}>
-                                <div style={{ gridColumn: 1 }}>{prop.name}</div>
-                                <div>
-                                    {typeof prop.value === "string"
-                                        ? prop.value
-                                        : roundToSignificant(prop.value)}
-                                </div>
-                            </React.Fragment>
-                        ))}
-                    </React.Fragment>
-                )
-            ) ?? ""}
-        </div>
-    );
-}
-
-const roundToSignificant = function (num: number | undefined) {
-    if (num === undefined) {
-        return "-";
-    }
-    // Returns two significant figures (non-zero) for numbers with an absolute value less
-    // than 1, and two decimal places for numbers with an absolute value greater
-    // than 1.
-    return parseFloat(
-        num.toExponential(Math.max(1, 2 + Math.log10(Math.abs(num))))
-    );
-};
 
 SubsurfaceViewer.displayName = "SubsurfaceViewer";
 
