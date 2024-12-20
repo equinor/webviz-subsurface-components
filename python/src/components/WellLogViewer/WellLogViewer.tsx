@@ -9,7 +9,6 @@ const WellLogViewerComponent = React.lazy(() =>
     }))
 );
 
-
 // react-docgen / dash-generate-components/extract-meta.js does not properly parse
 // the imported WellLogViewerProps. Hence, we have to recreate them here.
 type WellLogViewOptions = {
@@ -51,7 +50,7 @@ type WellLogViewerProps = {
     template: object;
 
     /** Prop containing color function/table array */
-    colorMapFunctions: any;
+    colorMapFunctions: unknown;
 
     /** Orientation of the track plots on the screen. Default is false */
     horizontal?: boolean;
@@ -63,7 +62,7 @@ type WellLogViewerProps = {
     selection?: number[];
 
     /** Well picks data */
-    wellpick?: any;
+    wellpick?: unknown;
 
     /** Primary axis id: " md", "tvd", "time"... */
     primaryAxis?: string;

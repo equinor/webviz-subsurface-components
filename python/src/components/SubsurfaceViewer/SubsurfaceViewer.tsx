@@ -5,14 +5,9 @@ import {
     ViewStateType,
 } from "@webviz/subsurface-viewer";
 import { DeckGLRef } from "@deck.gl/react";
-import {
-    PickingInfoPerView,
-    useMultiViewPicking,
-} from "@webviz/subsurface-viewer/src/hooks/useMultiViewPicking";
+import { useMultiViewPicking } from "@webviz/subsurface-viewer/src/hooks/useMultiViewPicking";
 import { useMultiViewCursorTracking } from "@webviz/subsurface-viewer/src/hooks/useMultiViewCursorTracking";
 import { isEqual } from "lodash";
-import ViewAnnotation from "../ViewAnnotation/ViewAnnotation";
-import ReadoutComponent from "../ReadoutComponent";
 
 const SubsurfaceViewerComponent = React.lazy(() =>
     import(
