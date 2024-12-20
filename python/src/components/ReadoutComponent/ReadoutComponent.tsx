@@ -10,7 +10,7 @@ function ReadoutComponent(props: {
         <div
             style={{
                 position: "absolute",
-                bottom: 16,
+                bottom: 24,
                 left: 8,
                 background: "#fff",
                 padding: 8,
