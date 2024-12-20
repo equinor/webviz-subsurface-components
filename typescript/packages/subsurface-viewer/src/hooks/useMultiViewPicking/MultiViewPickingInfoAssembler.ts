@@ -21,11 +21,13 @@ export type PickingInfoPerView = Record<
 >;
 
 function hasPropertiesArray(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     obj: any
 ): obj is { properties: PropertyDataType[] } {
     return obj && Array.isArray(obj.properties);
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function hasSingleProperty(obj: any): obj is { propertyValue: number } {
     return (
         obj && "propertyValue" in obj && typeof obj.propertyValue === "number"
