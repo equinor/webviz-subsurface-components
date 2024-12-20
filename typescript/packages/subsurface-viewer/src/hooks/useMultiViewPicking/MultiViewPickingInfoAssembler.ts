@@ -1,6 +1,10 @@
 import type { PickingInfo, Viewport } from "@deck.gl/core";
-import { DeckGLRef } from "@deck.gl/react";
-import { ExtendedLayerProps, MapMouseEvent, PropertyDataType } from "../../";
+import type { DeckGLRef } from "@deck.gl/react";
+import type {
+    ExtendedLayerProps,
+    MapMouseEvent,
+    PropertyDataType,
+} from "../../";
 
 export type LayerPickingInfo = {
     layerId: string;
@@ -16,12 +20,16 @@ export type PickingInfoPerView = Record<
     }
 >;
 
-function hasPropertiesArray(obj: any): obj is { properties: PropertyDataType[] } {
+function hasPropertiesArray(
+    obj: any
+): obj is { properties: PropertyDataType[] } {
     return obj && Array.isArray(obj.properties);
 }
 
 function hasSingleProperty(obj: any): obj is { propertyValue: number } {
-    return obj && "propertyValue" in obj && typeof obj.propertyValue === "number";
+    return (
+        obj && "propertyValue" in obj && typeof obj.propertyValue === "number"
+    );
 }
 
 export type MultiViewPickingInfoAssemblerOptions = {
@@ -36,11 +44,15 @@ export interface MultiViewPickingInfoAssemblerSubscriberCallback {
 export class MultiViewPickingInfoAssembler {
     private _deckGl: DeckGLRef | null = null;
     private _options: MultiViewPickingInfoAssemblerOptions;
-    private _subscribers: Set<MultiViewPickingInfoAssemblerSubscriberCallback> = new Set();
+    private _subscribers: Set<MultiViewPickingInfoAssemblerSubscriberCallback> =
+        new Set();
 
     constructor(
         deckGL: DeckGLRef | null,
-        options: MultiViewPickingInfoAssemblerOptions = { multiPicking: false, pickDepth: 1 }
+        options: MultiViewPickingInfoAssemblerOptions = {
+            multiPicking: false,
+            pickDepth: 1,
+        }
     ) {
         this._deckGl = deckGL;
         this._options = options;
@@ -50,7 +62,9 @@ export class MultiViewPickingInfoAssembler {
         this._deckGl = deckGL;
     }
 
-    subscribe(callback: MultiViewPickingInfoAssemblerSubscriberCallback): () => void {
+    subscribe(
+        callback: MultiViewPickingInfoAssemblerSubscriberCallback
+    ): () => void {
         this._subscribers.add(callback);
 
         return () => {
@@ -84,9 +98,16 @@ export class MultiViewPickingInfoAssembler {
             return;
         }
 
-        const eventScreenCoordinate: [number, number] = [hoverEvent.infos[0].x, hoverEvent.infos[0].y];
+        const eventScreenCoordinate: [number, number] = [
+            hoverEvent.infos[0].x,
+            hoverEvent.infos[0].y,
+        ];
 
-        this.assembleMultiViewPickingInfo(eventScreenCoordinate, activeViewportId, viewports).then((info) => {
+        this.assembleMultiViewPickingInfo(
+            eventScreenCoordinate,
+            activeViewportId,
+            viewports
+        ).then((info) => {
             this.publish(info, activeViewportId);
         });
     }
@@ -102,7 +123,9 @@ export class MultiViewPickingInfoAssembler {
                 reject("DeckGL not initialized");
                 return;
             }
-            const activeViewport = viewports.find((el) => el.id === activeViewportId);
+            const activeViewport = viewports.find(
+                (el) => el.id === activeViewportId
+            );
             if (!activeViewport) {
                 reject("Active viewport not found");
                 return;
@@ -113,11 +136,14 @@ export class MultiViewPickingInfoAssembler {
                 eventScreenCoordinate[1] - activeViewport.y,
             ];
 
-            const worldCoordinate = activeViewport.unproject(activeViewportRelativeScreenCoordinates);
+            const worldCoordinate = activeViewport.unproject(
+                activeViewportRelativeScreenCoordinates
+            );
 
             const collectedPickingInfo: PickingInfoPerView = {};
             for (const viewport of viewports) {
-                const [relativeScreenX, relativeScreenY] = viewport.project(worldCoordinate);
+                const [relativeScreenX, relativeScreenY] =
+                    viewport.project(worldCoordinate);
 
                 let pickingInfo: PickingInfo[] = [];
                 if (this._options.multiPicking) {
@@ -150,14 +176,22 @@ export class MultiViewPickingInfoAssembler {
                             continue;
                         }
 
-                        if (collectedLayerPickingInfo.find((el) => el.layerId === info.layer?.id)) {
+                        if (
+                            collectedLayerPickingInfo.find(
+                                (el) => el.layerId === info.layer?.id
+                            )
+                        ) {
                             continue;
                         }
 
                         const layerId = info.layer.id;
-                        const layerName = (info.layer.props as unknown as ExtendedLayerProps).name;
+                        const layerName = (
+                            info.layer.props as unknown as ExtendedLayerProps
+                        ).name;
 
-                        let layerPickingInfo = collectedLayerPickingInfo.find((el) => el.layerId === layerId);
+                        let layerPickingInfo = collectedLayerPickingInfo.find(
+                            (el) => el.layerId === layerId
+                        );
 
                         if (!layerPickingInfo) {
                             collectedLayerPickingInfo.push({
@@ -165,7 +199,10 @@ export class MultiViewPickingInfoAssembler {
                                 layerName,
                                 properties: [],
                             });
-                            layerPickingInfo = collectedLayerPickingInfo[collectedLayerPickingInfo.length - 1];
+                            layerPickingInfo =
+                                collectedLayerPickingInfo[
+                                    collectedLayerPickingInfo.length - 1
+                                ];
                         }
 
                         if (hasOneProperty) {

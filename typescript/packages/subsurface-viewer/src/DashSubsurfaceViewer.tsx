@@ -7,7 +7,14 @@ import { ViewAnnotation } from "./components/ViewAnnotation";
 function mapAnnotation(annotationContainers: React.ReactNode) {
     return React.Children.map(annotationContainers, (annotationContainer) => {
         let viewId = (annotationContainer as React.ReactElement).props.id;
-        if (React.isValidElement(annotationContainer) && (annotationContainer.type === ViewAnnotation || (annotationContainer.props instanceof Object && Object.keys(annotationContainer.props).includes("_dashprivate_layout")))) {
+        if (
+            React.isValidElement(annotationContainer) &&
+            (annotationContainer.type === ViewAnnotation ||
+                (annotationContainer.props instanceof Object &&
+                    Object.keys(annotationContainer.props).includes(
+                        "_dashprivate_layout"
+                    )))
+        ) {
             viewId = annotationContainer.props._dashprivate_layout.props.id;
         }
         if (!viewId) {

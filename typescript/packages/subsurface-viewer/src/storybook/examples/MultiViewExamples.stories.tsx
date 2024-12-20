@@ -14,7 +14,8 @@ import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
-import SubsurfaceViewer, { ViewStateType } from "../../SubsurfaceViewer";
+import SubsurfaceViewer from "../../SubsurfaceViewer";
+import type { ViewStateType } from "../../SubsurfaceViewer";
 import type { MapMouseEvent, ViewsType } from "../../components/Map";
 import { ViewFooter } from "../../components/ViewFooter";
 
@@ -33,7 +34,7 @@ import {
     redAxes2DLayer,
     subsufaceProps,
 } from "../sharedSettings";
-import { DeckGLRef } from "@deck.gl/react";
+import type { DeckGLRef } from "@deck.gl/react";
 
 const stories: Meta = {
     component: SubsurfaceViewer,

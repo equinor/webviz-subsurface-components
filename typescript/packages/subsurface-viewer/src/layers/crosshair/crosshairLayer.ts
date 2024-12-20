@@ -1,5 +1,7 @@
-import { CompositeLayer, DefaultProps } from "@deck.gl/core";
+import { CompositeLayer } from "@deck.gl/core";
 import { IconLayer } from "@deck.gl/layers";
+
+import type { DefaultProps } from "@deck.gl/core";
 
 function makeCrossHairSvg(color: [number, number, number, number]): string {
     return `<?xml version="1.0" encoding="utf-8"?>
