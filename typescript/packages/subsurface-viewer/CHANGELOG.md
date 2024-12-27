@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.3.1...subsurface-viewer@1.4.0) (2024-12-27)
+
+
+### Features
+
+* Hooks for multi-picking and cursor-tracking, changes to `python` directory to provide functionality in Dash ([#2398](https://github.com/equinor/webviz-subsurface-components/issues/2398)) ([eb14505](https://github.com/equinor/webviz-subsurface-components/commit/eb14505e278be53b14a1f5c9324b42ab72c5401f))
+
 ## [1.3.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.3.0...subsurface-viewer@1.3.1) (2024-11-25)
 
 
