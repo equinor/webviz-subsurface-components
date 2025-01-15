@@ -8,11 +8,11 @@ import {
     TREE_TRANSITION_DURATION,
 } from "../utils";
 import {
+    type DataAssembler,
     useDataAssemblerPropertyValue,
     useDataAssemblerTooltip,
-} from "../DataAssembler/DataAssemblerHooks";
+} from "../utils/DataAssembler";
 import type { D3TreeEdge, D3TreeNode } from "../types";
-import type DataAssembler from "../DataAssembler/DataAssembler";
 
 export type TreeEdgeProps = {
     link: D3TreeEdge;

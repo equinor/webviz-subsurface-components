@@ -3,10 +3,12 @@ import * as d3 from "d3";
 
 import type { ReactNode } from "react";
 import type { D3TreeNode, RecursiveTreeNode } from "../types";
-import type DataAssembler from "../DataAssembler/DataAssembler";
 
 import "./group_tree.css";
-import { useDataAssemblerTree } from "../DataAssembler/DataAssemblerHooks";
+import {
+    type DataAssembler,
+    useDataAssemblerTree,
+} from "../utils/DataAssembler";
 import { computeLinkId, computeNodeId, usePrevious } from "../utils";
 import { TransitionGroup } from "react-transition-group";
 import { TransitionTreeEdge } from "./TransitionTreeEdge";

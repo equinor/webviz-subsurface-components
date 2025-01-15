@@ -1,10 +1,10 @@
 import React from "react";
-import type DataAssembler from "../DataAssembler/DataAssembler";
 import { Transition, type TransitionStatus } from "react-transition-group";
 import {
+    type DataAssembler,
     useDataAssemblerPropertyValue,
     useDataAssemblerTooltip,
-} from "../DataAssembler/DataAssemblerHooks";
+} from "../utils/DataAssembler";
 import type { D3TreeNode } from "../types";
 import {
     findClosestVisibleInNewTree,

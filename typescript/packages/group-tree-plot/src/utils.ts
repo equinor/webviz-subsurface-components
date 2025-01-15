@@ -1,5 +1,5 @@
 import _ from "lodash";
-import type DataAssembler from "./DataAssembler/DataAssembler";
+import type { DataAssembler } from "./utils/DataAssembler";
 import type { D3TreeEdge, D3TreeNode } from "./types";
 import React from "react";
 

@@ -3,9 +3,8 @@ import _ from "lodash";
 
 import type { DatedTree, EdgeMetadata, NodeMetadata } from "./types";
 import TreePlotRenderer from "./TreePlotRenderer/index";
-import { useDataAssembler } from "./DataAssembler/DataAssemblerHooks";
 import { PlotErrorOverlay } from "./PlotErrorOverlay";
-import type DataAssembler from "./DataAssembler/DataAssembler";
+import { type DataAssembler, useDataAssembler } from "./utils/DataAssembler";
 
 export interface GroupTreePlotProps {
     id: string;
