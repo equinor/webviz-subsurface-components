@@ -8,7 +8,7 @@ import type {
     NodeMetadata,
 } from "../types";
 import _ from "lodash";
-import { printTreeValue } from "../utils";
+import { printTreeValue } from "./treePlot";
 import React from "react";
 
 export class DataAssembler {

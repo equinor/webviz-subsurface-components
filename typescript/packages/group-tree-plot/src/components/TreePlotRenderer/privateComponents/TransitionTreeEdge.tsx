@@ -2,17 +2,15 @@ import React from "react";
 import { Transition, type TransitionStatus } from "react-transition-group";
 
 import * as d3 from "d3";
-import {
-    diagonalPath,
-    findClosestVisibleInNewTree,
-    TREE_TRANSITION_DURATION,
-} from "../utils";
+import { diagonalPath } from "../../../utils/treePlot";
+import { findClosestVisibleInNewTree } from "../../../utils/treePlot";
+import { TREE_TRANSITION_DURATION } from "../../../GroupTreePlot";
 import {
     type DataAssembler,
     useDataAssemblerPropertyValue,
     useDataAssemblerTooltip,
-} from "../utils/DataAssembler";
-import type { D3TreeEdge, D3TreeNode } from "../types";
+} from "../../../utils/dataAssembler";
+import type { D3TreeEdge, D3TreeNode } from "../../../types";
 
 export type TreeEdgeProps = {
     link: D3TreeEdge;

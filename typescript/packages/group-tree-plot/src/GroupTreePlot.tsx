@@ -1,10 +1,14 @@
 import React from "react";
 import _ from "lodash";
 
+import "./group_tree.css";
+
 import type { DatedTree, EdgeMetadata, NodeMetadata } from "./types";
-import TreePlotRenderer from "./TreePlotRenderer/index";
-import { PlotErrorOverlay } from "./PlotErrorOverlay";
-import { type DataAssembler, useDataAssembler } from "./utils/DataAssembler";
+import { TreePlotRenderer } from "./components/TreePlotRenderer";
+import { PlotErrorOverlay } from "./components/PlotErrorOverlay";
+import { type DataAssembler, useDataAssembler } from "./utils/dataAssembler";
+
+export const TREE_TRANSITION_DURATION = 200;
 
 export interface GroupTreePlotProps {
     id: string;

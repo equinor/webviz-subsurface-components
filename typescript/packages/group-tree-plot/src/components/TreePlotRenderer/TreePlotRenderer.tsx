@@ -2,17 +2,18 @@ import React from "react";
 import * as d3 from "d3";
 
 import type { ReactNode } from "react";
-import type { D3TreeNode, RecursiveTreeNode } from "../types";
+import type { D3TreeNode, RecursiveTreeNode } from "../../types";
 
-import "./group_tree.css";
 import {
     type DataAssembler,
     useDataAssemblerTree,
-} from "../utils/DataAssembler";
-import { computeLinkId, computeNodeId, usePrevious } from "../utils";
+} from "../../utils/dataAssembler";
+import { usePrevious } from "../../utils/hooks";
+import { computeLinkId } from "../../utils/treePlot";
+import { computeNodeId } from "../../utils/treePlot";
 import { TransitionGroup } from "react-transition-group";
-import { TransitionTreeEdge } from "./TransitionTreeEdge";
-import { TransitionTreeNode } from "./TransitionTreeNode";
+import { TransitionTreeEdge } from "./privateComponents/TransitionTreeEdge";
+import { TransitionTreeNode } from "./privateComponents/TransitionTreeNode";
 
 export type TreePlotRendererProps = {
     dataAssembler: DataAssembler;
@@ -31,9 +32,7 @@ const PLOT_MARGINS = {
     left: 70,
 };
 
-export default function TreePlotRenderer(
-    props: TreePlotRendererProps
-): ReactNode {
+export function TreePlotRenderer(props: TreePlotRendererProps): ReactNode {
     const activeTree = useDataAssemblerTree(props.dataAssembler);
     const rootTreeNode = activeTree.tree;
 

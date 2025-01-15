@@ -4,13 +4,11 @@ import {
     type DataAssembler,
     useDataAssemblerPropertyValue,
     useDataAssemblerTooltip,
-} from "../utils/DataAssembler";
-import type { D3TreeNode } from "../types";
-import {
-    findClosestVisibleInNewTree,
-    printTreeValue,
-    TREE_TRANSITION_DURATION,
-} from "../utils";
+} from "../../../utils/dataAssembler";
+import type { D3TreeNode } from "../../../types";
+import { findClosestVisibleInNewTree } from "../../../utils/treePlot";
+import { printTreeValue } from "../../../utils/treePlot";
+import { TREE_TRANSITION_DURATION } from "../../../GroupTreePlot";
 
 import * as d3 from "d3";
 import { HiddenChildren } from "./HiddenChildren";

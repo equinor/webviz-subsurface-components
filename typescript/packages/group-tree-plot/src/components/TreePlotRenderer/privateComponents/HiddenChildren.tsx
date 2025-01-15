@@ -1,5 +1,5 @@
 import React from "react";
-import type { RecursiveTreeNode } from "../types";
+import type { RecursiveTreeNode } from "../../../types";
 
 export type HiddenChildrenProps = {
     hiddenChildren: RecursiveTreeNode[];
