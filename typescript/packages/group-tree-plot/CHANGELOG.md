@@ -1,3 +1,10 @@
+## [1.3.21](https://github.com/equinor/webviz-subsurface-components/compare/group-tree-plot@1.3.20...group-tree-plot@1.3.21) (2025-01-16)
+
+
+### Bug Fixes
+
+* [Snyk] Security upgrade postcss from 8.4.49 to 8.5.0 ([#2403](https://github.com/equinor/webviz-subsurface-components/issues/2403)) ([ca5160e](https://github.com/equinor/webviz-subsurface-components/commit/ca5160e3e06393da12698752eebdb151b46c08d4))
+
 ## [1.3.20](https://github.com/equinor/webviz-subsurface-components/compare/group-tree-plot@1.3.19...group-tree-plot@1.3.20) (2024-11-25)
 
 
