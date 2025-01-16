@@ -1,3 +1,10 @@
+## [1.0.12](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@1.0.11...wsc-common@1.0.12) (2025-01-16)
+
+
+### Bug Fixes
+
+* [Snyk] Security upgrade postcss from 8.4.49 to 8.5.0 ([#2403](https://github.com/equinor/webviz-subsurface-components/issues/2403)) ([ca5160e](https://github.com/equinor/webviz-subsurface-components/commit/ca5160e3e06393da12698752eebdb151b46c08d4))
+
 ## [1.0.11](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@1.0.10...wsc-common@1.0.11) (2024-11-25)
 
 
