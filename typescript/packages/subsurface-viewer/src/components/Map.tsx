@@ -407,7 +407,7 @@ const Map: React.FC<MapProps> = ({
     cameraPosition,
     triggerHome,
     views = DEFAULT_VIEWS,
-    coords = { visible: true, multiPicking: true, pickDepth: 10 },
+    coords = { visible: true, multiPicking: true, pickDepth: 2 },
     scale = { visible: true, cssStyle: { top: 10, left: 10 } },
     coordinateUnit = "m",
     colorTables = defaultColorTables,
