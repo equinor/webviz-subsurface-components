@@ -6,7 +6,12 @@ import React, { useState } from "react";
 
 import { Slider } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import type { FeatureCollection } from "geojson";
+import type {
+    FeatureCollection,
+    GeoJsonProperties,
+    GeometryCollection,
+    LineString,
+} from "geojson";
 
 import {
     ColorLegend,
@@ -34,6 +39,10 @@ import {
     volveWellsFromResourcesLayer,
     volveWellsResources,
 } from "../sharedSettings";
+import { simplify } from "../../layers/utils/simplify";
+import type { Position3D } from "../../layers/utils/layerTools";
+import { ViewFooter } from "../../components/ViewFooter";
+import { View } from "@deck.gl/core";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -679,7 +688,6 @@ const ReducedWellNameClutterComponent: React.FC<ClutterProps> = (
                 wellHeadStyle: { size: 4 },
                 wellNameSize: 9,
                 hideOverlappingWellNames: props.hideOverlappingWellNames,
-                refine: true,
                 outline: true,
                 ZIncreasingDownwards: false,
             }),
@@ -735,7 +743,6 @@ const ReducedWellNameClutterComponent2D: React.FC<ClutterProps> = (
                 wellNameAtTop: props.wellNamePositionPercentage,
                 wellHeadStyle: { size: 4 },
                 hideOverlappingWellNames: props.hideOverlappingWellNames,
-                refine: true,
                 outline: true,
                 ZIncreasingDownwards: false,
             }),
@@ -767,6 +774,117 @@ export const ReducedWellNameClutter2D: StoryObj<
         wellNamePositionPercentage: 0,
     },
     render: (args) => <ReducedWellNameClutterComponent2D {...args} />,
+};
+
+type CoarseWellFactorProps = {
+    coarseWellsToleranceFactor: number;
+};
+
+const CoarseWellFactorComponent: React.FC<CoarseWellFactorProps> = (
+    props: CoarseWellFactorProps = {
+        coarseWellsToleranceFactor: 0.01,
+    }
+) => {
+    const [coarseWellsToleranceFactor, setCoarseWellsToleranceFactor] =
+        useState<number>(0.01);
+    const [n, setN] = useState<number>(1);
+    if (props.coarseWellsToleranceFactor != coarseWellsToleranceFactor) {
+        setCoarseWellsToleranceFactor(props.coarseWellsToleranceFactor);
+        setN(n + 1);
+    }
+
+    const propsWithLayers = {
+        id: "clutter",
+        cameraPosition: {
+            rotationOrbit: 45,
+            rotationX: 15,
+            zoom: -4,
+            target: undefined,
+        },
+        layers: [
+            new WellsLayer({
+                data: n % 2 ? "./gullfaks.json" : "./gullfaks.json ", // Note: trick needed to force dataTransform to recalculate.
+                wellNameVisible: true,
+                wellNameSize: 9,
+                wellNameAtTop: true,
+                wellHeadStyle: { size: 4 },
+                hideOverlappingWellNames: true,
+                outline: true,
+                ZIncreasingDownwards: false,
+                // eslint-disable-next-line
+                // @ts-ignore
+                dataTransform: (data_in) => {
+                    // Simplify well paths by reducing number of segments/nodes.
+                    const data =
+                        data_in as FeatureCollection<GeometryCollection>;
+
+                    const no_wells = data.features.length;
+                    for (let well_no = 0; well_no < no_wells; well_no++) {
+                        const geometryCollection = data.features[well_no]
+                            .geometry as GeometryCollection;
+                        const lineString = geometryCollection
+                            ?.geometries[1] as LineString;
+
+                        if (lineString.coordinates?.length === undefined) {
+                            continue;
+                        }
+
+                        const properties = data.features[well_no]
+                            .properties as GeoJsonProperties;
+                        if (properties) {
+                            const mds = properties["md"][0];
+                            const [newPoints, newMds] = simplify(
+                                lineString.coordinates as Position3D[],
+                                mds,
+                                props.coarseWellsToleranceFactor
+                            );
+                            lineString.coordinates = newPoints as Position3D[];
+
+                            properties["md"][0] = newMds;
+                        }
+                    }
+
+                    return data;
+                },
+            }),
+            new AxesLayer({
+                id: "axes-layer",
+                bounds: [450000, 6781000, 0, 464000, 6791000, 3500],
+            }),
+        ],
+        bounds: [450000, 6781000, 464000, 6791000] as BoundingBox2D,
+        views: {
+            layout: [1, 1] as [number, number],
+            viewports: [
+                {
+                    id: "view_1",
+                    show3D: true,
+                },
+            ],
+        },
+    };
+
+    return (
+        <SubsurfaceViewer {...propsWithLayers}>
+            {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                /* @ts-expect-error */
+                <View id="view_1">
+                    <ViewFooter>
+                        Coarsen wells using &quot;dataTransform&quot; property.
+                        Adjustable factor typical range: [0.001, 1000]
+                    </ViewFooter>
+                </View>
+            }
+        </SubsurfaceViewer>
+    );
+};
+
+export const CoarseWellFactor: StoryObj<typeof CoarseWellFactorComponent> = {
+    args: {
+        coarseWellsToleranceFactor: 0.01,
+    },
+    render: (args) => <CoarseWellFactorComponent {...args} />,
 };
 
 export const Wells3dDashed: StoryObj<typeof SubsurfaceViewer> = {
