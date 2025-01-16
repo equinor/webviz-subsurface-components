@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.4.0...subsurface-viewer@1.4.1) (2025-01-16)
+
+
+### Bug Fixes
+
+* [Snyk] Security upgrade postcss from 8.4.49 to 8.5.0 ([#2403](https://github.com/equinor/webviz-subsurface-components/issues/2403)) ([ca5160e](https://github.com/equinor/webviz-subsurface-components/commit/ca5160e3e06393da12698752eebdb151b46c08d4))
+
 # [1.4.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.3.1...subsurface-viewer@1.4.0) (2024-12-27)
 
 
