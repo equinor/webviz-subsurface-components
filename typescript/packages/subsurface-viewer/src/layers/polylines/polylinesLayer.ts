@@ -11,7 +11,6 @@ import type {
 import { createPropertyData, defineBoundingBox } from "../utils/layerTools";
 
 import { PrivatePolylinesLayer } from "./privatePolylinesLayer";
-import { NumberArray } from "math.gl";
 
 type IsPolylineClosedFunc = (index: number) => boolean;
 
@@ -31,7 +30,7 @@ export interface PolylinesLayerProps extends ExtendedLayerProps {
       Start indices of the polylines counted in vertex indices.
       For example, if there are 3 polylines of 2, 3, and 4 vertices each, startIndices should be [0, 2, 5].
      */
-    startIndices: number[] | (Uint32Array & NumberArray);
+    startIndices: number[] | Uint32Array;
 
     /** Array of boolean flags or a single value indicating whether the polylines are closed.
      *  The polylines are considered to be open if not set.
@@ -191,7 +190,7 @@ export default class PolylinesLayer extends CompositeLayer<PolylinesLayerProps> 
         pathType: PathType;
     } {
         // The input arrays can be used as deck.gl binary inputs.
-        // Explicit pathType prevents deck.gl from additional computations.
+        // Explicit pathType prevents deck.gl from addtional computations.
         if (
             this.props.polylinePoints instanceof Float32Array &&
             this.props.startIndices instanceof Uint32Array &&
