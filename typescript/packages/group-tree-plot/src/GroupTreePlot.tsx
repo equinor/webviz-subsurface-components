@@ -6,7 +6,10 @@ import "./group_tree.css";
 import type { DatedTree, EdgeMetadata, NodeMetadata } from "./types";
 import { TreePlotRenderer } from "./components/TreePlotRenderer";
 import { PlotErrorOverlay } from "./components/PlotErrorOverlay";
-import { type DataAssembler, useDataAssembler } from "./utils/dataAssembler";
+import {
+    useDataAssembler,
+    useUpdateAssemblerDate,
+} from "./utils/dataAssembler";
 
 export const TREE_TRANSITION_DURATION = 200;
 
@@ -23,39 +26,23 @@ export interface GroupTreePlotProps {
 }
 
 export function GroupTreePlot(props: GroupTreePlotProps): React.ReactNode {
-    let errorMsg = "";
-
     // References to handle resizing
     const svgRootRef = React.useRef<SVGSVGElement | null>(null);
     const [svgHeight, setSvgHeight] = React.useState<number>(0);
     const [svgWidth, setSvgWidth] = React.useState<number>(0);
 
-    // Data update props
-    const [prevDate, setPrevDate] = React.useState<string | null>(null);
-
-    // Storing a copy of the last successfully assembeled data to render when data becomes invalid
-    const lastValidDataAssembler = React.useRef<DataAssembler | null>(null);
-
-    const dataAssembler = useDataAssembler(
+    const [dataAssembler, initError] = useDataAssembler(
         props.datedTrees,
         props.edgeMetadataList,
         props.nodeMetadataList
     );
 
-    if (dataAssembler === null) {
-        errorMsg = "Invalid data for assembler";
-    } else if (dataAssembler !== lastValidDataAssembler.current) {
-        lastValidDataAssembler.current = dataAssembler;
-    }
+    const dateUpdateError = useUpdateAssemblerDate(
+        dataAssembler,
+        props.selectedDateTime
+    );
 
-    if (dataAssembler && props.selectedDateTime !== prevDate) {
-        try {
-            dataAssembler.setActiveDate(props.selectedDateTime);
-            setPrevDate(props.selectedDateTime);
-        } catch (error) {
-            errorMsg = (error as Error).message;
-        }
-    }
+    const errorToPrint = initError ?? dateUpdateError;
 
     // Mount hook
     React.useEffect(function setupResizeObserver() {
@@ -85,15 +72,18 @@ export function GroupTreePlot(props: GroupTreePlotProps): React.ReactNode {
         const resizeObserver = new ResizeObserver(debouncedResizeObserverCheck);
         resizeObserver.observe(svgElement);
 
-        // Unsubscribe on unmount
-        return () => resizeObserver.unobserve(svgElement);
+        // Cleanup on unmount
+        return () => {
+            debouncedResizeObserverCheck.cancel();
+            resizeObserver.disconnect();
+        };
     }, []);
 
     return (
-        <svg ref={svgRootRef} height={"100%"} width={"100%"}>
-            {lastValidDataAssembler.current && svgHeight && svgWidth && (
+        <svg ref={svgRootRef} height="100%" width="100%">
+            {dataAssembler && svgHeight && svgWidth && (
                 <TreePlotRenderer
-                    dataAssembler={lastValidDataAssembler.current}
+                    dataAssembler={dataAssembler}
                     primaryEdgeProperty={props.selectedEdgeKey}
                     primaryNodeProperty={props.selectedNodeKey}
                     width={svgWidth}
@@ -102,7 +92,7 @@ export function GroupTreePlot(props: GroupTreePlotProps): React.ReactNode {
                 />
             )}
 
-            {errorMsg && <PlotErrorOverlay message={errorMsg} />}
+            {errorToPrint && <PlotErrorOverlay message={errorToPrint} />}
         </svg>
     );
 }

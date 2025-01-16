@@ -19,23 +19,21 @@ export class DataAssembler {
     private _propertyToLabelMap: Map<string, [label: string, unit: string]>;
     private _propertyMaxVals: Map<string, number>;
 
-    private _currentTreeIndex = -1;
-    private _currentDateIndex = -1;
+    private _currentTreeIndex = 0;
+    private _currentDateIndex = 0;
 
     constructor(
         datedTrees: DatedTree[],
         edgeMetadataList: EdgeMetadata[],
         nodeMetadataList: NodeMetadata[]
     ) {
+        // Guard - Require atleast one tree to be given.
+        if (!datedTrees.length) throw new Error("Tree-list is empty");
+
+        this.datedTrees = datedTrees;
+
         this.edgeMetadataList = edgeMetadataList;
         this.nodeMetadataList = nodeMetadataList;
-
-        // Represent possible empty data by single empty node.
-        if (datedTrees.length) {
-            this.datedTrees = datedTrees;
-        } else {
-            throw new Error("Tree-list is empty");
-        }
 
         this._propertyToLabelMap = new Map();
         [...edgeMetadataList, ...nodeMetadataList].forEach((elm) => {
@@ -61,9 +59,6 @@ export class DataAssembler {
                 });
             });
         });
-
-        this._currentTreeIndex = 0;
-        this._currentDateIndex = 0;
     }
 
     setActiveDate(newDate: string) {
@@ -85,7 +80,7 @@ export class DataAssembler {
         return this.datedTrees[this._currentTreeIndex];
     }
 
-    getTooltip(data: NodeData | EdgeData) {
+    getTooltip(data: NodeData | EdgeData): string {
         if (this._currentDateIndex === -1) return "";
 
         let text = "";
@@ -101,7 +96,10 @@ export class DataAssembler {
         return text.trimEnd();
     }
 
-    getPropertyValue(data: EdgeData | NodeData, property: string) {
+    getPropertyValue(
+        data: EdgeData | NodeData,
+        property: string
+    ): number | null {
         if (this._currentDateIndex === -1) return null;
 
         const value = data[property]?.[this._currentDateIndex];
@@ -109,7 +107,7 @@ export class DataAssembler {
         return value ?? null;
     }
 
-    getPropertyInfo(propertyKey: string) {
+    getPropertyInfo(propertyKey: string): [string, string] {
         const infos = this._propertyToLabelMap.get(propertyKey);
         const [label, unit] = infos ?? ["", ""];
 
@@ -119,7 +117,7 @@ export class DataAssembler {
         ];
     }
 
-    normalizeValue(property: string, value: number) {
+    normalizeValue(property: string, value: number): number {
         const maxVal = this._propertyMaxVals.get(property);
 
         // Invalid property, return a default of 2
@@ -148,11 +146,45 @@ function findTreeAndDateIndex(
     // No matching entry found
     return [-1, -1];
 }
+/**
+ * Updates the active date in a data-assembler instance.
+ * @param dataAssembler An instance of DataAssembler
+ * @param targetDate A date string
+ * @returns An error message, if the date was invalid
+ */
+export function useUpdateAssemblerDate(
+    dataAssembler: DataAssembler | null,
+    targetDate: string
+): string | void {
+    const [prevDate, setPrevDate] = React.useState<string | null>(null);
+
+    if (!dataAssembler || targetDate === prevDate) return;
+
+    try {
+        dataAssembler.setActiveDate(targetDate);
+        setPrevDate(targetDate);
+    } catch (error) {
+        return (error as Error).message;
+    }
+}
+
+/**
+ * Initializes a memoized data-assembler instance. Creates a new instance everytime data changes, but returns the last valid instance if the new data is invalid.
+ * @param datedTrees A list of dated trees. *Assumes all node labels are unique across all node types*
+ * @param edgeMetadataList Dated metadata for each tree edge
+ * @param nodeMetadataList Dated metadata for each tree node
+ * @returns A data-assembler instance, and an error message (if the instance could not be created)
+ */
 export function useDataAssembler(
     datedTrees: DatedTree[],
     edgeMetadataList: EdgeMetadata[],
     nodeMetadataList: NodeMetadata[]
-): DataAssembler | null {
+): [DataAssembler | null, string] {
+    // Store a status message to track if data was valid
+    let errorMsg = "";
+    // Storing a copy of the last successfully assembeled data to render when data becomes invalid
+    const lastValidDataAssembler = React.useRef<DataAssembler | null>(null);
+
     const dataAssembler = React.useMemo(() => {
         if (datedTrees.length === 0) return null;
 
@@ -165,21 +197,11 @@ export function useDataAssembler(
         return assembler;
     }, [datedTrees, edgeMetadataList, nodeMetadataList]);
 
-    return dataAssembler;
-}
-export function useDataAssemblerTree(assembler: DataAssembler) {
-    return assembler.getActiveTree();
-}
-export function useDataAssemblerPropertyValue(
-    assembler: DataAssembler,
-    data: NodeData | EdgeData,
-    property: string
-): number | null {
-    return assembler.getPropertyValue(data, property);
-}
-export function useDataAssemblerTooltip(
-    assembler: DataAssembler,
-    data: NodeData | EdgeData
-): string {
-    return assembler.getTooltip(data);
+    if (dataAssembler === null) {
+        errorMsg = "Invalid data for assembler";
+    } else if (dataAssembler !== lastValidDataAssembler.current) {
+        lastValidDataAssembler.current = dataAssembler;
+    }
+
+    return [lastValidDataAssembler.current, errorMsg];
 }

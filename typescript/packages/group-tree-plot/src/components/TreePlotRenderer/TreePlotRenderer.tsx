@@ -3,14 +3,10 @@ import * as d3 from "d3";
 
 import type { ReactNode } from "react";
 import type { D3TreeNode, RecursiveTreeNode } from "../../types";
+import type { DataAssembler } from "../../utils/dataAssembler";
 
-import {
-    type DataAssembler,
-    useDataAssemblerTree,
-} from "../../utils/dataAssembler";
-import { usePrevious } from "../../utils/hooks";
-import { computeLinkId } from "../../utils/treePlot";
-import { computeNodeId } from "../../utils/treePlot";
+import { usePrevious } from "../../utils/usePrevious";
+import { computeLinkId, computeNodeId } from "../../utils/treePlot";
 import { TransitionGroup } from "react-transition-group";
 import { TransitionTreeEdge } from "./privateComponents/TransitionTreeEdge";
 import { TransitionTreeNode } from "./privateComponents/TransitionTreeNode";
@@ -33,7 +29,7 @@ const PLOT_MARGINS = {
 };
 
 export function TreePlotRenderer(props: TreePlotRendererProps): ReactNode {
-    const activeTree = useDataAssemblerTree(props.dataAssembler);
+    const activeTree = props.dataAssembler.getActiveTree();
     const rootTreeNode = activeTree.tree;
 
     const [nodeCollapseFlags, setNodeCollapseFlags] = React.useState<
@@ -57,25 +53,27 @@ export function TreePlotRenderer(props: TreePlotRendererProps): ReactNode {
 
     const nodeTree = React.useMemo(
         function computeTree() {
-            const hierarcy = d3
-                // .hierarchy(rootTreeNode).
-                .hierarchy(rootTreeNode, (datum) => {
-                    // Stop traversal at all collapsed nodes
-                    if (nodeCollapseFlags[datum.node_label]) return null;
-                    else return datum.children;
-                })
-                .each((node) => {
-                    // Secondary collapse-run; collapse nodes based on `props.initialVisibleDepth`. Keep explicitly expanded nodes open
-                    const nodeLabel = node.data.node_label;
-                    if (props.initialVisibleDepth == null) return;
-                    if (nodeCollapseFlags[nodeLabel] === false) return;
+            const hierarchy = d3.hierarchy(rootTreeNode).each((node) => {
+                // Collapse nodes based on collapse flags and minimum depth
+                // ! I'd argue that it'd be more correct to collapse nodes using the hierarchy constructor:
+                //      d3.hierarchy(rootTreeNode, (datum) => {
+                //        if(someCheck) return null
+                //        else return datum.children
+                //      })
+                // However, nodes are being collapsed after-the-fact here, since we need the depth value for implicit collapses, and it's not available in the constructor
 
-                    if (node.depth >= props.initialVisibleDepth) {
-                        node.children = undefined;
-                    }
-                });
+                const collapseFlag = nodeCollapseFlags[computeNodeId(node)];
+                const visibleDepth =
+                    props.initialVisibleDepth ?? Number.MAX_SAFE_INTEGER;
 
-            return treeLayout(hierarcy);
+                // Return only if collapse flag is *explicitly* set to false
+                if (collapseFlag === false) return;
+                if (node.depth >= visibleDepth || collapseFlag === true) {
+                    node.children = undefined;
+                }
+            });
+
+            return treeLayout(hierarchy);
         },
         [treeLayout, rootTreeNode, nodeCollapseFlags, props.initialVisibleDepth]
     );
@@ -83,26 +81,28 @@ export function TreePlotRenderer(props: TreePlotRendererProps): ReactNode {
     // Storing the previous value so entering nodes know where to expand from
     const oldNodeTree = usePrevious(nodeTree);
 
-    const toggleNodeCollapse = React.useCallback(
-        function toggleNodeCollapse(node: D3TreeNode) {
-            const label = node.data.node_label;
-            const existingVal = nodeCollapseFlags[label];
+    function toggleNodeCollapse(node: D3TreeNode) {
+        const nodeIdent = computeNodeId(node);
+        // Might be collapsed implicitly due to visibleDepth prop
+        const collapsed = Boolean(node.children?.length);
 
-            const newVal = Boolean(node.children?.length) && !existingVal;
-            const newFlags = { ...nodeCollapseFlags, [label]: newVal };
+        setNodeCollapseFlags((prev) => {
+            const existingVal = prev[nodeIdent];
+
+            const newVal = collapsed && !existingVal;
+            const newFlags = { ...prev, [nodeIdent]: newVal };
 
             // When closing a node, reset any stored flag for all children
             if (newVal) {
                 node.descendants()
                     // descendants() includes this node, slice to skip it
                     .slice(1)
-                    .forEach(({ data }) => delete newFlags[data.node_label]);
+                    .forEach((child) => delete newFlags[computeNodeId(child)]);
             }
 
-            setNodeCollapseFlags(newFlags);
-        },
-        [nodeCollapseFlags]
-    );
+            return newFlags;
+        });
+    }
 
     return (
         <g transform={`translate(${PLOT_MARGINS.left},${PLOT_MARGINS.top})`}>

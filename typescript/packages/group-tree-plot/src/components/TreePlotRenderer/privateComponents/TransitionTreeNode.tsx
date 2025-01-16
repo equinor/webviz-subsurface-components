@@ -1,10 +1,6 @@
 import React from "react";
 import { Transition, type TransitionStatus } from "react-transition-group";
-import {
-    type DataAssembler,
-    useDataAssemblerPropertyValue,
-    useDataAssemblerTooltip,
-} from "../../../utils/dataAssembler";
+import type { DataAssembler } from "../../../utils/dataAssembler";
 import type { D3TreeNode } from "../../../types";
 import { findClosestVisibleInNewTree } from "../../../utils/treePlot";
 import { printTreeValue } from "../../../utils/treePlot";
@@ -37,6 +33,7 @@ export function TransitionTreeNode(
         React.useState<TransitionStatus>("exited");
 
     const recursiveTreeNode = props.node.data;
+    const nodeData = recursiveTreeNode.node_data;
     // ! This is whether the node is a leaf *in the actual tree*, not the rendered one
     const isLeaf = !recursiveTreeNode.children?.length;
     const canBeExpanded = !props.node.children?.length && !isLeaf;
@@ -51,15 +48,10 @@ export function TransitionTreeNode(
         props.primaryNodeProperty
     );
 
-    const primaryNodeValue = useDataAssemblerPropertyValue(
-        props.dataAssembler,
-        recursiveTreeNode.node_data,
+    const toolTip = props.dataAssembler.getTooltip(nodeData);
+    const primaryNodeValue = props.dataAssembler.getPropertyValue(
+        nodeData,
         props.primaryNodeProperty
-    );
-
-    const toolTip = useDataAssemblerTooltip(
-        props.dataAssembler,
-        recursiveTreeNode.node_data
     );
 
     const onTransitionEnter = React.useCallback(

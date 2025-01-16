@@ -5,11 +5,7 @@ import * as d3 from "d3";
 import { diagonalPath } from "../../../utils/treePlot";
 import { findClosestVisibleInNewTree } from "../../../utils/treePlot";
 import { TREE_TRANSITION_DURATION } from "../../../GroupTreePlot";
-import {
-    type DataAssembler,
-    useDataAssemblerPropertyValue,
-    useDataAssemblerTooltip,
-} from "../../../utils/dataAssembler";
+import type { DataAssembler } from "../../../utils/dataAssembler";
 import type { D3TreeEdge, D3TreeNode } from "../../../types";
 
 export type TreeEdgeProps = {
@@ -36,25 +32,22 @@ export function TransitionTreeEdge(props: TreeEdgeProps): React.ReactNode {
     const linkPath = diagonalPath(props.link);
 
     const mainTreeNode = props.link.target.data;
+    const edgeData = mainTreeNode.edge_data;
+
     const linkId = React.useId();
 
     const groupPropertyStrokeClass = `grouptree_link__${props.primaryEdgeProperty}`;
 
+    const edgeTooltip = props.dataAssembler.getTooltip(edgeData);
     const edgeValue =
-        useDataAssemblerPropertyValue(
-            props.dataAssembler,
-            mainTreeNode.edge_data,
+        props.dataAssembler.getPropertyValue(
+            edgeData,
             props.primaryEdgeProperty
         ) ?? 0;
 
     const strokeWidth = props.dataAssembler.normalizeValue(
         props.primaryEdgeProperty,
         edgeValue
-    );
-
-    const edgeTooltip = useDataAssemblerTooltip(
-        props.dataAssembler,
-        mainTreeNode.edge_data
     );
 
     const onTransitionEnter = React.useCallback(
