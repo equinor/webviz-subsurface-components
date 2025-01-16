@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.4.1...subsurface-viewer@1.5.0) (2025-01-16)
+
+
+### Features
+
+* Fixes: [NGRM]: Slow readout caused by high pick depth when displaying readout data. ([#2407](https://github.com/equinor/webviz-subsurface-components/issues/2407)) ([68b82ea](https://github.com/equinor/webviz-subsurface-components/commit/68b82eaa8094dfd3bc15ffaee419dd65fe1aa97a))
+
 ## [1.4.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.4.0...subsurface-viewer@1.4.1) (2025-01-16)
 
 
