@@ -45,10 +45,8 @@ export function printTreeValue(value: number | null): string {
  */
 export function findClosestVisibleInNewTree(
     targetNode: D3TreeNode,
-    newTreeRoot: D3TreeNode | null
-): D3TreeNode | null {
-    if (!newTreeRoot) return null;
-
+    newTreeRoot: D3TreeNode
+): D3TreeNode {
     // Traverse upwards to build the expected path to the original node
     let pathToNode = [targetNode];
     let traversingNode = targetNode;
@@ -57,11 +55,12 @@ export function findClosestVisibleInNewTree(
         pathToNode = [traversingNode, ...pathToNode];
     }
 
-    let visibleParent = null;
-    let childrenInTree = [newTreeRoot];
+    // Assume that the tree root will always be an available visible parent
+    let visibleParent = newTreeRoot;
+    let childrenInTree = visibleParent.children ?? [];
 
     // Using the computed path, traverse downwards in the new tree structure as far as possible
-    for (let i = 0; i < pathToNode.length; i++) {
+    for (let i = 1; i < pathToNode.length; i++) {
         const pathNode = pathToNode[i];
 
         const nodeId = computeNodeId(pathNode);

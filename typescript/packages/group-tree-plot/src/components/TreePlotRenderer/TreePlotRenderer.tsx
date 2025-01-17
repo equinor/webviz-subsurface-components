@@ -10,6 +10,7 @@ import { computeLinkId, computeNodeId } from "../../utils/treePlot";
 import { TransitionGroup } from "react-transition-group";
 import { TransitionTreeEdge } from "./privateComponents/TransitionTreeEdge";
 import { TransitionTreeNode } from "./privateComponents/TransitionTreeNode";
+import _ from "lodash";
 
 export type TreePlotRendererProps = {
     dataAssembler: DataAssembler;
@@ -79,7 +80,7 @@ export function TreePlotRenderer(props: TreePlotRendererProps): ReactNode {
     );
 
     // Storing the previous value so entering nodes know where to expand from
-    const oldNodeTree = usePrevious(nodeTree);
+    const oldNodeTree = usePreviousTree(nodeTree);
 
     function toggleNodeCollapse(node: D3TreeNode) {
         const nodeIdent = computeNodeId(node);
@@ -135,4 +136,17 @@ export function TreePlotRenderer(props: TreePlotRendererProps): ReactNode {
             </TransitionGroup>
         </g>
     );
+}
+
+function usePreviousTree(treeRootNode: D3TreeNode): D3TreeNode {
+    // Make the first "old" tree be just the root, so everything expands from the root
+    const initRoot: D3TreeNode = _.clone(treeRootNode);
+    initRoot.children = undefined;
+
+    const oldNodeTree = React.useRef<D3TreeNode>(initRoot);
+    React.useEffect(() => {
+        oldNodeTree.current = treeRootNode;
+    }, [treeRootNode]);
+
+    return oldNodeTree.current;
 }

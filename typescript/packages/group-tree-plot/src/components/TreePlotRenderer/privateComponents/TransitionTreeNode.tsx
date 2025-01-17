@@ -15,7 +15,7 @@ export type TransitionTreeNodeProps = {
     node: D3TreeNode;
 
     nodeTree: D3TreeNode;
-    oldNodeTree: D3TreeNode | null;
+    oldNodeTree: D3TreeNode;
 
     in: boolean;
 

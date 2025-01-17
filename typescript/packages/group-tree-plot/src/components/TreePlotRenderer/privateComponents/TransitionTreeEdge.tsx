@@ -16,7 +16,7 @@ export type TreeEdgeProps = {
 
     // Kinda messy solution for this, might warrant a change in the future
     nodeTree: D3TreeNode;
-    oldNodeTree: D3TreeNode | null;
+    oldNodeTree: D3TreeNode;
 
     in?: boolean;
 };
