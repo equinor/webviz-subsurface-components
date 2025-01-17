@@ -1,16 +1,16 @@
 import React from "react";
+import type { ReactNode } from "react";
+import _ from "lodash";
 import * as d3 from "d3";
 
-import type { ReactNode } from "react";
+import { AnimatePresence } from "motion/react";
+
 import type { D3TreeNode, RecursiveTreeNode } from "../../types";
 import type { DataAssembler } from "../../utils/dataAssembler";
 
-import { usePrevious } from "../../utils/usePrevious";
 import { computeLinkId, computeNodeId } from "../../utils/treePlot";
-import { TransitionGroup } from "react-transition-group";
 import { TransitionTreeEdge } from "./privateComponents/TransitionTreeEdge";
 import { TransitionTreeNode } from "./privateComponents/TransitionTreeNode";
-import _ from "lodash";
 
 export type TreePlotRendererProps = {
     dataAssembler: DataAssembler;
@@ -107,33 +107,27 @@ export function TreePlotRenderer(props: TreePlotRendererProps): ReactNode {
 
     return (
         <g transform={`translate(${PLOT_MARGINS.left},${PLOT_MARGINS.top})`}>
-            <TransitionGroup
-                component={null}
-                childFactory={(child) =>
-                    React.cloneElement(child, { oldNodeTree, nodeTree })
-                }
-            >
+            <AnimatePresence custom={nodeTree}>
                 {nodeTree.links().map((link) => (
-                    // @ts-expect-error Missing props are injected by child-factory above
                     <TransitionTreeEdge
                         key={computeLinkId(link)}
                         link={link}
                         dataAssembler={props.dataAssembler}
                         primaryEdgeProperty={props.primaryEdgeProperty}
+                        oldNodeTree={oldNodeTree}
                     />
                 ))}
-
                 {nodeTree.descendants().map((node) => (
-                    // @ts-expect-error Missing props are injected by child-factory above
                     <TransitionTreeNode
                         key={computeNodeId(node)}
                         primaryNodeProperty={props.primaryNodeProperty}
                         dataAssembler={props.dataAssembler}
                         node={node}
+                        oldNodeTree={oldNodeTree}
                         onNodeClick={toggleNodeCollapse}
                     />
                 ))}
-            </TransitionGroup>
+            </AnimatePresence>
         </g>
     );
 }

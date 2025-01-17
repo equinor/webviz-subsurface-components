@@ -11,8 +11,6 @@ import {
     useUpdateAssemblerDate,
 } from "./utils/dataAssembler";
 
-export const TREE_TRANSITION_DURATION = 200;
-
 export interface GroupTreePlotProps {
     id: string;
     edgeMetadataList: EdgeMetadata[];
