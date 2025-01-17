@@ -195,6 +195,7 @@ export interface SyncLogViewerProps {
     onTemplateChanged?: (iWellLog: number) => void;
 
     onTrackMouseEvent?: (wellLogView: WellLogView, ev: TrackMouseEvent) => void;
+    onTrackMouseLeaveEvent?: () => void;
 
     onCreateController?: (
         iWellLog: number,
@@ -1012,6 +1013,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                     // eslint-disable-next-line react/prop-types
                     this.props.onTrackMouseEvent || onTrackMouseEventDefault
                 }
+                onTrackMouseLeaveEvent={this.props.onTrackMouseLeaveEvent}
                 onTrackScroll={callbacks.onTrackScrollBind}
                 onTrackSelection={callbacks.onTrackSelectionBind}
                 onContentRescale={callbacks.onContentRescaleBind}

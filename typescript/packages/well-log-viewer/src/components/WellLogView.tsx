@@ -230,6 +230,7 @@ function addReadoutOverlay(instance: LogViewer, parent: WellLogView) {
         onMouseExit: (event: OverlayMouseExitEvent): void => {
             const elem = event.target;
             if (elem) elem.style.visibility = "hidden";
+            parent.onTrackMouseLeaveEvent();
         },
         onRescale: (event: OverlayRescaleEvent): void => {
             const elem = event.target;
@@ -1144,6 +1145,12 @@ export interface WellLogViewProps {
      * called when mouse click on a track
      */
     onTrackMouseEvent?: (wellLogView: WellLogView, ev: TrackMouseEvent) => void;
+
+    /**
+     * called when mouse cursor leaves track area;
+     */
+    onTrackMouseLeaveEvent?: () => void;
+
     /**
      * called when template is changed
      */
@@ -1280,6 +1287,7 @@ class WellLogView
 
     wellLogSets: WellLogSet[];
     container?: HTMLElement;
+    title?: HTMLElement;
     resizeObserver: ResizeObserver;
 
     logController?: LogViewer;
@@ -1563,6 +1571,7 @@ class WellLogView
                 this.props.colorMapFunctions
             );
             addWellPickOverlay(this.logController, this);
+            this._updateWellLogTitle();
         }
         this.setControllerZoom();
         this.setControllerSelection();
@@ -1627,6 +1636,10 @@ class WellLogView
 
     onTrackMouseEvent(ev: TrackMouseEvent): void {
         this.props.onTrackMouseEvent?.(this, ev);
+    }
+
+    onTrackMouseLeaveEvent(): void {
+        this.props.onTrackMouseLeaveEvent?.();
     }
 
     onTemplateChanged(): void {
@@ -1779,6 +1792,11 @@ class WellLogView
         for (const element of elements) {
             if (element.textContent)
                 element.setAttribute("title", element.textContent);
+        }
+    }
+    _updateWellLogTitle(): void {
+        if (this.title && this.props.viewTitle === true) {
+            this.title.textContent = this.wellLogSets[0]?.header.well ?? null;
         }
     }
 
@@ -2071,6 +2089,7 @@ class WellLogView
                         className={
                             horizontal ? "title title-horizontal" : "title"
                         }
+                        ref={(el) => (this.title = el as HTMLElement)}
                     >
                         {this.createViewTitle(viewTitle)}
                     </div>

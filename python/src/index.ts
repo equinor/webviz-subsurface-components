@@ -1,4 +1,3 @@
-import DashSubsurfaceViewer from "./components/DashSubsurfaceViewer";
 import SubsurfaceViewer from "./components/SubsurfaceViewer";
 import { GroupTree } from "./components/GroupTree";
 import HistoryMatch from "./components/HistoryMatch";
@@ -10,6 +9,7 @@ import VectorSelector from "./components/VectorSelector";
 import { WellCompletions } from "./components/WellCompletions";
 import { VectorCalculator } from "./components/VectorCalculator";
 import WellLogViewer from "./components/WellLogViewer";
+import ReadoutComponent from "./components/ReadoutComponent";
 import SyncLogViewer from "./components/WellLogViewer";
 import WebVizContinuousLegend from "./components/ColorLegends/WebVizContinuousLegend";
 import WebVizDiscreteLegend from "./components/ColorLegends/WebVizDiscreteLegend";
@@ -30,12 +30,13 @@ export {
      * @deprecated Use the {@link SubsurfaceViewer} component instead.
      */
     SubsurfaceViewer as DeckGLMap, // For backwards compatibility
-    DashSubsurfaceViewer,
+    SubsurfaceViewer as DashSubsurfaceViewer, // For backwards compatibility
     VectorSelector,
     WellCompletions,
     VectorCalculator,
     GroupTree,
     WellLogViewer,
+    ReadoutComponent,
     SyncLogViewer,
     WebVizContinuousLegend,
     WebVizDiscreteLegend,
