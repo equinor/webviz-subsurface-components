@@ -27,16 +27,13 @@ export function TransitionTreeEdge(props: TreeEdgeProps): React.ReactNode {
     const groupPropertyStrokeClass = `grouptree_link__${props.primaryEdgeProperty}`;
 
     const edgeTooltip = props.dataAssembler.getTooltip(edgeData);
-    const edgeValue =
-        props.dataAssembler.getPropertyValue(
-            edgeData,
-            props.primaryEdgeProperty
-        ) ?? 0;
-
-    const strokeWidth = props.dataAssembler.normalizeValue(
-        props.primaryEdgeProperty,
-        edgeValue
+    const normalizedValue = props.dataAssembler.normalizeValue(
+        edgeData,
+        props.primaryEdgeProperty
     );
+
+    // Keep minimum width at 2 so line doesnt dissapear
+    const strokeWidth = Math.max(normalizedValue, 2);
 
     const motionProps = useCollapseMotionProps(
         props.link.target,
@@ -59,7 +56,7 @@ export function TransitionTreeEdge(props: TreeEdgeProps): React.ReactNode {
                 {...motionProps}
                 id={linkId}
                 className={`link grouptree_link ${groupPropertyStrokeClass}`}
-                strokeDasharray={edgeValue > 0 ? "none" : "5,5"}
+                strokeDasharray={normalizedValue > 0 ? "none" : "5,5"}
             >
                 <title>{edgeTooltip}</title>
             </motion.path>

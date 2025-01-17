@@ -11,6 +11,10 @@ import _ from "lodash";
 import { printTreeValue } from "./treePlot";
 import React from "react";
 
+/**
+ * Utility class to assemble and combine data for one or more dated flow network trees.
+ * The instance allows setting an active date, and provides methods to get data and labels pertaining to the given date
+ */
 export class DataAssembler {
     datedTrees: DatedTree[];
     edgeMetadataList: EdgeMetadata[];
@@ -22,6 +26,12 @@ export class DataAssembler {
     private _currentTreeIndex = 0;
     private _currentDateIndex = 0;
 
+    /**
+     * @param datedTrees A list of dated tree objects. List cannot be empty
+     * @param edgeMetadataList A list of labels and units to use when representing values from tree edges
+     * @param nodeMetadataList A list of labels and units to use when representing values from tree nodes
+     * @throws Throws if dated tree list is empty
+     */
     constructor(
         datedTrees: DatedTree[],
         edgeMetadataList: EdgeMetadata[],
@@ -61,6 +71,11 @@ export class DataAssembler {
         });
     }
 
+    /**
+     * Changes the active date for the instance. Raises if date is invalid
+     * @param newDate A date string, formatted as YYYY-MM-DD (eg. 2001-01-30)
+     * @throws Will throw if the date is invalid, or if no tree uses the given date
+     */
     setActiveDate(newDate: string) {
         const [newTreeIdx, newDateIdx] = findTreeAndDateIndex(
             newDate,
@@ -68,7 +83,7 @@ export class DataAssembler {
         );
 
         // I do think these will always both be -1, or not -1, so checking both might be excessive
-        if (newTreeIdx === -1 || newDateIdx == -1) {
+        if (newTreeIdx === -1 || newDateIdx === -1) {
             throw new Error("Invalid date for data assembler");
         }
 
@@ -76,10 +91,19 @@ export class DataAssembler {
         this._currentDateIndex = newDateIdx;
     }
 
+    /**
+     * Gets the currently active tree
+     * @returns A dated tree
+     */
     getActiveTree(): DatedTree {
         return this.datedTrees[this._currentTreeIndex];
     }
 
+    /**
+     * Pretty-prints all values in the given object with labels and units added
+     * @param data Data from a node or edge
+     * @returns A formatted string presenation of the data value
+     */
     getTooltip(data: NodeData | EdgeData): string {
         if (this._currentDateIndex === -1) return "";
 
@@ -96,6 +120,12 @@ export class DataAssembler {
         return text.trimEnd();
     }
 
+    /**
+     * Gets a property's value at the currently active date
+     * @param data Data from a node or edge
+     * @param property A key for a property
+     * @returns The value, if found
+     */
     getPropertyValue(
         data: EdgeData | NodeData,
         property: string
@@ -107,6 +137,11 @@ export class DataAssembler {
         return value ?? null;
     }
 
+    /**
+     * Gets the label and unit strings for a given property
+     * @param propertyKey The key for the property
+     * @returns The label and unit for the propert. If not found, label defaults to "", and unit defaults to "?"
+     */
     getPropertyInfo(propertyKey: string): [string, string] {
         const infos = this._propertyToLabelMap.get(propertyKey);
         const [label, unit] = infos ?? ["", ""];
@@ -117,11 +152,19 @@ export class DataAssembler {
         ];
     }
 
-    normalizeValue(property: string, value: number): number {
+    /**
+     * Returns a property's value to a normalized value between 2 and 100. A value of 0 will be returned as is.
+     * Will also return 0 if no data is found
+     * @param data Data object to take data from
+     * @param property The property key to take from
+     * @returns The normalized value.
+     */
+    normalizeValue(data: EdgeData | NodeData, property: string): number {
+        const value = this.getPropertyValue(data, property) ?? 0;
         const maxVal = this._propertyMaxVals.get(property);
 
-        // Invalid property, return a default of 2
-        if (!maxVal) return 2;
+        // Dont normalize 0 or invalid properties
+        if (!maxVal || value === 0) return 0;
 
         return d3.scaleLinear().domain([0, maxVal]).range([2, 100])(value);
     }
