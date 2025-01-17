@@ -152,7 +152,7 @@ const secondDatedTree: DatedTree = {
                 },
                 edge_label: "VFP14",
                 edge_data: {
-                    waterrate: [20, 30],
+                    waterrate: [20, 0],
                     oilrate: [30, 40],
                     gasrate: [40, 50],
                     waterinjrate: [50, 60],
