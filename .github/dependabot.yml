@@ -21,6 +21,9 @@ updates:
       # Other groups are not documented ;)
       react:
         applies-to: version-updates
+        update-types:
+          - "minor"
+          - "patch"
         patterns:
           - "react"
           - "react-dom"
@@ -29,6 +32,9 @@ updates:
           # exclude react-redux as it drops the support for react 17
       deckgl:
         applies-to: version-updates
+        update-types:
+          - "minor"
+          - "patch"
         patterns:
           - "@deck.gl/*"
       storybook:
