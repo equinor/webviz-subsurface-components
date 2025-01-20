@@ -1,3 +1,10 @@
+## [1.5.19](https://github.com/equinor/webviz-subsurface-components/compare/well-completions-plot@1.5.18...well-completions-plot@1.5.19) (2025-01-20)
+
+
+### Bug Fixes
+
+* [Snyk] Security upgrade terser-webpack-plugin from 5.3.10 to 5.3.11 ([#2395](https://github.com/equinor/webviz-subsurface-components/issues/2395)) ([2a9a06f](https://github.com/equinor/webviz-subsurface-components/commit/2a9a06f4526736622025811e9248995f2783a039))
+
 ## [1.5.18](https://github.com/equinor/webviz-subsurface-components/compare/well-completions-plot@1.5.17...well-completions-plot@1.5.18) (2025-01-17)
 
 
