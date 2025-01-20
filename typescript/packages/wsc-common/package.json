@@ -1,6 +1,6 @@
 {
     "name": "@webviz/wsc-common",
-    "version": "1.0.13",
+    "version": "1.0.14",
     "description": "Shared functionality for WebViz Subsurface Components",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
