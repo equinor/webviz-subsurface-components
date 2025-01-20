@@ -20,7 +20,7 @@ import type {
     View,
     Viewport,
 } from "@deck.gl/core";
-import type { DeckGLRef } from "@deck.gl/react";
+import type { DeckGLProps, DeckGLRef } from "@deck.gl/react";
 import DeckGL from "@deck.gl/react";
 
 import {
@@ -350,6 +350,16 @@ export interface MapProps {
 
     onDragStart?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
     onDragEnd?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
+    onDrag?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
+
+    /**
+     * Override default cursor with a callback.
+     * @param cursorState
+     * @returns cursor string
+     * @default "grabbing" when dragging, "default" otherwise
+     * @see https://developer.mozilla.org/en-US/docs/Web/CSS/cursor
+     */
+    getCursor?: DeckGLProps["getCursor"];
 
     triggerResetMultipleWells?: number;
 
@@ -421,6 +431,8 @@ const Map: React.FC<MapProps> = ({
     onRenderingProgress,
     onDragStart,
     onDragEnd,
+    onDrag,
+    getCursor,
     lights,
     triggerResetMultipleWells,
     verticalScale,
@@ -758,6 +770,20 @@ const Map: React.FC<MapProps> = ({
         [getCameraPosition, viewController]
     );
 
+    const getCursorFunc = useCallback(
+        function getCursorFunc(
+            cursorState: Parameters<
+                Exclude<DeckGLProps["getCursor"], undefined>
+            >[0]
+        ): string {
+            if (getCursor) {
+                return getCursor(cursorState);
+            }
+            return cursorState.isDragging ? "grabbing" : "default";
+        },
+        [getCursor]
+    );
+
     const effects = parseLights(lights) ?? [];
 
     const [deckGlViews, deckGlViewState] = useMemo(() => {
@@ -831,9 +857,7 @@ const Map: React.FC<MapProps> = ({
                     },
                     colorTables: colorTables,
                 }}
-                getCursor={({ isDragging }): string =>
-                    isDragging ? "grabbing" : "default"
-                }
+                getCursor={getCursorFunc}
                 getTooltip={getTooltip}
                 ref={deckRef}
                 onViewStateChange={onViewStateChange}
@@ -843,6 +867,7 @@ const Map: React.FC<MapProps> = ({
                 effects={effects}
                 onDragStart={onDragStart}
                 onDragEnd={onDragEnd}
+                onDrag={onDrag}
                 onResize={onResize}
                 pickingRadius={pickingRadius}
             >

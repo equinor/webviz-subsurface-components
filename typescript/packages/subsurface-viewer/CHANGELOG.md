@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.5.2...subsurface-viewer@1.6.0) (2025-01-20)
+
+
+### Features
+
+* Expose `onDrag` and `getCursor` functions from `DeckGL` component ([#2415](https://github.com/equinor/webviz-subsurface-components/issues/2415)) ([fa51d16](https://github.com/equinor/webviz-subsurface-components/commit/fa51d16bb95a3405cd90751be3512300a98f8994))
+
 ## [1.5.2](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.5.1...subsurface-viewer@1.5.2) (2025-01-20)
 
 
