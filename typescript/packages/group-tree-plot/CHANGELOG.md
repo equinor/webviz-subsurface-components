@@ -1,3 +1,10 @@
+## [1.3.24](https://github.com/equinor/webviz-subsurface-components/compare/group-tree-plot@1.3.23...group-tree-plot@1.3.24) (2025-01-22)
+
+
+### Bug Fixes
+
+* conflict with new [@deck](https://github.com/deck).gl version 9.1 ([#2419](https://github.com/equinor/webviz-subsurface-components/issues/2419)) ([19e7e3c](https://github.com/equinor/webviz-subsurface-components/commit/19e7e3cc0e4da9238a31c8ea19408f8347d365a1))
+
 ## [1.3.23](https://github.com/equinor/webviz-subsurface-components/compare/group-tree-plot@1.3.22...group-tree-plot@1.3.23) (2025-01-20)
 
 
