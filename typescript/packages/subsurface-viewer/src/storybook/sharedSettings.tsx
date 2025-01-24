@@ -94,6 +94,7 @@ export const volveWellsFromResourcesLayer = {
     id: "volve-wells",
     data: "@@#resources.wellsData",
     ZIncreasingDownwards: false,
+    wellNameVisible: true,
 };
 
 export const volveWellsLayer = {

@@ -7,9 +7,9 @@ import type {
     Position,
     UpdateParameters,
 } from "@deck.gl/core";
-
+import { CollisionFilterExtension } from "@deck.gl/extensions";
+import { CollisionModifierExtension } from "../../extensions/collision-modifier-extension";
 import { CompositeLayer, OrbitViewport } from "@deck.gl/core";
-
 import type {
     ExtendedLayerProps,
     LayerPickInfo,
@@ -115,6 +115,10 @@ export interface WellsLayerProps extends ExtendedLayerProps {
     wellNameAtTop: boolean;
     wellNameSize: number;
     wellNameColor: Color;
+    /**  If true will prevent well name cluttering by not displaying overlapping names.
+     * default false.
+     */
+    wellNameReduceClutter: boolean;
     isLog: boolean;
     depthTest: boolean;
     /**  If true means that input z values are interpreted as depths.
@@ -151,6 +155,7 @@ const defaultProps = {
     wellNameAtTop: false,
     wellNameSize: 14,
     wellNameColor: [0, 0, 0, 255],
+    wellNameReduceClutter: false,
     selectedWell: "@@#editedData.selectedWells", // used to get data from deckgl layer
     depthTest: true,
     ZIncreasingDownwards: true,
@@ -618,7 +623,41 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             })
         );
 
-        // well name
+        // Reduced cluttering properties
+        const clutterProps = {
+            background: true,
+            collisionEnabled: true,
+            getCollisionPriority: (d: Feature<Geometry, GeoJsonProperties>) => {
+                const labelSize = d.properties?.["name"].length ?? 1;
+                //return labelSize;
+                if (is3d) {
+                    // In 3D prioritize according to label size.
+                    return labelSize;
+                } else {
+                    // In 2D prioritize according z height.
+                    const labelPosition = getAnnotationPosition(
+                        d,
+                        this.props.wellNameAtTop,
+                        true,
+                        this.props.lineStyle?.color
+                    );
+
+                    const priority = labelPosition
+                        ? (labelPosition?.[2] ?? 1) / 10 + Math.random() // priority must be in [-1000, 1000]
+                        : labelSize;
+                    return priority;
+                }
+            },
+            collisionTestProps: {
+                sizeScale: 2,
+            },
+            collisionGroup: "nobodys",
+            extensions: [
+                new CollisionFilterExtension(),
+                new CollisionModifierExtension(),
+            ],
+        };
+
         const namesLayer = new TextLayer<Feature>(
             this.getSubLayerProps({
                 id: "names",
@@ -644,6 +683,8 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 },
                 parameters,
                 visible: this.props.wellNameVisible && !fastDrawing,
+
+                ...(this.props.wellNameReduceClutter ? clutterProps : {}),
             })
         );
 
@@ -799,8 +840,8 @@ function getAnnotationPosition(
     color_accessor: ColorAccessor
 ): Position | null {
     if (name_at_top) {
+        // Read top position from Point geometry, if not present, read it from LineString geometry
         let top;
-
         // Read top position from Point geometry, if not present, read it from LineString geometry
         const well_head = getWellHeadPosition(well_data);
         if (well_data) top = well_head;
