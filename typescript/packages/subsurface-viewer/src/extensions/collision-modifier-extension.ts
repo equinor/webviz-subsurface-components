@@ -1,5 +1,5 @@
-import { LayerExtension } from "@deck.gl/core";
 import type { Layer } from "@deck.gl/core";
+import { CollisionFilterExtension } from "@deck.gl/extensions";
 
 const injectionVs = {
     "vs:DECKGL_FILTER_COLOR": `
@@ -7,13 +7,11 @@ const injectionVs = {
     `,
 };
 
-export class CollisionModifierExtension extends LayerExtension {
-    static defaultProps = {};
-    static extensionName = "CollisionModifierExtension";
-
+export class CollisionModifierExtension extends CollisionFilterExtension {
     getShaders(this: Layer) {
+        const superShaders = super.getShaders();
         return {
-            modules: [],
+            ...superShaders,
             inject: injectionVs,
         };
     }

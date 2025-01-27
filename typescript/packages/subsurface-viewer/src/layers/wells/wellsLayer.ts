@@ -7,7 +7,6 @@ import type {
     Position,
     UpdateParameters,
 } from "@deck.gl/core";
-import { CollisionFilterExtension } from "@deck.gl/extensions";
 import { CollisionModifierExtension } from "../../extensions/collision-modifier-extension";
 import { CompositeLayer, OrbitViewport } from "@deck.gl/core";
 import type {
@@ -652,10 +651,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 sizeScale: 2,
             },
             collisionGroup: "nobodys",
-            extensions: [
-                new CollisionFilterExtension(),
-                new CollisionModifierExtension(),
-            ],
+            extensions: [new CollisionModifierExtension()],
         };
 
         const namesLayer = new TextLayer<Feature>(
