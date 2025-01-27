@@ -20,7 +20,7 @@
 
 export default `\
 #version 300 es
-#define SHADER_NAME path-layer-vertex-shader
+#define SHADER_NAME polylines-vertex-shader
 
 in vec2 positions;
 

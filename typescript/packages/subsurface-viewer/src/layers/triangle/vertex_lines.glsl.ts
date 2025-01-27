@@ -1,6 +1,6 @@
 export default `\
 #version 300 es
-#define SHADER_NAME vertex-lines-shader
+#define SHADER_NAME triangle-lines-vertex-shader
 
 precision highp float;
 

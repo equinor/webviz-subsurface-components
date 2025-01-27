@@ -1,6 +1,6 @@
 const vsShader = `\
 #version 300 es
-#define SHADER_NAME vertex-shader
+#define SHADER_NAME triangle-vertex-shader
 
 precision highp float;
 

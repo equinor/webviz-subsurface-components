@@ -20,7 +20,7 @@
 
 export default `\
 #version 300 es
-#define SHADER_NAME path-layer-fragment-shader
+#define SHADER_NAME polylines-fragment-shader
 
 precision highp float;
 

@@ -1,9 +1,4 @@
-import type {
-    Color,
-    LayerContext,
-    UpdateParameters,
-    Viewport,
-} from "@deck.gl/core";
+import type { Color, UpdateParameters, Viewport } from "@deck.gl/core";
 import {
     COORDINATE_SYSTEM,
     Layer,
@@ -153,7 +148,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         oldProps,
         context,
         changeFlags,
-    }: UpdateParameters<this>): boolean {
+    }: UpdateParameters<Layer<Axes2DLayerProps>>): boolean {
         return (
             super.shouldUpdateState({
                 props,
@@ -514,13 +509,8 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         return labels;
     }
 
-    draw({
-        context,
-    }: {
-        moduleParameters: unknown;
-        uniforms: unknown;
-        context: LayerContext;
-    }): void {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    draw(opts: any): void {
         const is_orthographic =
             this.context.viewport.constructor === OrthographicViewport;
         if (
@@ -539,14 +529,14 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         }
 
         // background
-        models[n - 1].draw(context.renderPass);
+        models[n - 1].draw(opts.context.renderPass);
 
         // lines
-        models[n - 2].draw(context.renderPass);
+        models[n - 2].draw(opts.context.renderPass);
 
         // labels
         for (let i = 0; i < n - 2; i++) {
-            models[i].draw(context.renderPass);
+            models[i].draw(opts.context.renderPass);
         }
 
         return;
@@ -863,7 +853,11 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
             labelModels.push(model);
         }
 
-        return { labelModels: labelModels, lineModel: lineModel, backgroundModel: backgroundModel };
+        return {
+            labelModels: labelModels,
+            lineModel: lineModel,
+            backgroundModel: backgroundModel,
+        };
     }
 }
 

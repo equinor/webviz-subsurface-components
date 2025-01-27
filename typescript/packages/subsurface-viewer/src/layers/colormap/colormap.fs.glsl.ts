@@ -1,5 +1,5 @@
 const fsColormap = `#version 300 es
-#define SHADER_NAME colormap-shader
+#define SHADER_NAME colormap-fragment-shader
 
 precision highp float;
 
@@ -36,7 +36,6 @@ void main(void) {
   // See https://deck.gl/docs/api-reference/layers/bitmap-layer#render-options for more details.
   geometry.uv = vTexCoord;
   DECKGL_FILTER_COLOR(fragColor, geometry);
-
 }
 `;
 
