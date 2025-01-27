@@ -3,10 +3,6 @@ const fsShader = `#version 300 es
 
 precision highp float;
 
-uniform bool isContoursDepth;
-uniform float contourReferencePoint;
-uniform float contourInterval;
-
 in vec2 vTexCoord;
 in vec3 cameraPosition;
 in vec3 normals_commonspace;
@@ -14,23 +10,20 @@ in vec4 position_commonspace;
 in vec3 worldPos;
 in float property;
 
-uniform vec4 uColor;
-uniform bool smoothShading;
-
 out vec4 fragColor;
 
 void main(void) {
    vec3 normal = normals_commonspace;
 
-   if (!smoothShading) {
+   if (!layer.smoothShading) {
       normal = normalize(cross(dFdx(position_commonspace.xyz), dFdy(position_commonspace.xyz)));
    } 
 
-   vec4 color = uColor;
-   bool is_contours = contourReferencePoint != -1.0 && contourInterval != -1.0;
+   vec4 color = layer.uColor;
+   bool is_contours = layer.contourReferencePoint != -1.0 && layer.contourInterval != -1.0;
    if (is_contours) {
       // Contours are made of either depths or properties.
-      float val = (abs(worldPos.z) - contourReferencePoint) / contourInterval;
+      float val = (abs(worldPos.z) - layer.contourReferencePoint) / layer.contourInterval;
 
       float f  = fract(val);
       float df = fwidth(val);
