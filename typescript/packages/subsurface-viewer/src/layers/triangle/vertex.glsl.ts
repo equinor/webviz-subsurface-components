@@ -16,8 +16,6 @@ out vec4 position_commonspace;
 out vec3 worldPos;
 out float property;
 
-uniform bool ZIncreasingDownwards;
-
 const vec3 pickingColor = vec3(1.0, 1.0, 0.0);
 
 void main(void) {
@@ -26,7 +24,7 @@ void main(void) {
    cameraPosition = project_uCameraPosition;
 
    vec3 position = positions;
-   position[2] *= ZIncreasingDownwards ? -1.0 : 1.0;
+   position[2] *= layer.ZIncreasingDownwards ? -1.0 : 1.0;
 
    worldPos = position;
 

@@ -152,7 +152,7 @@ export default class ColormapLayer extends BitmapLayer<ColormapLayerProps> {
                 this.props.bounds[3] as number
             ),
         };
-        super.setModuleParameters(mergedModuleParams);
+        super.setShaderModuleProps(mergedModuleParams);
 
         const valueRangeMin = this.props.valueRange[0] ?? 0.0;
         const valueRangeMax = this.props.valueRange[1] ?? 1.0;
@@ -177,7 +177,7 @@ export default class ColormapLayer extends BitmapLayer<ColormapLayerProps> {
 
         super.draw({
             uniforms: {
-                ...uniforms,
+                //...uniforms,
                 // Send the colormap texture to the shader.
                 valueRangeMin,
                 valueRangeMax,
