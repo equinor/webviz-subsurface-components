@@ -1,6 +1,6 @@
 export default `\
 #version 300 es
-#define SHADER_NAME axes2dlayer-line-vertex-shader
+#define SHADER_NAME axes2d-line-vertex-shader
 
 precision highp float;
 

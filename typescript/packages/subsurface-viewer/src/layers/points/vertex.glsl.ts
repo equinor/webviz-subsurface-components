@@ -20,7 +20,7 @@
 
 export default `\
 #version 300 es
-#define SHADER_NAME points-layer-vertex-shader
+#define SHADER_NAME points-vertex-shader
 
 in vec3 positions;
 

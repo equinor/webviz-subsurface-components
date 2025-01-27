@@ -7,7 +7,7 @@ import type {
 import { COORDINATE_SYSTEM, Layer, picking, project32 } from "@deck.gl/core";
 
 //import GL from "@luma.gl/constants";
-import type { Device, UniformValue, TextureData, Texture } from "@luma.gl/core";
+import type { Device, UniformValue, Texture } from "@luma.gl/core";
 import { Geometry, Model } from "@luma.gl/engine";
 import { localPhongLighting, utilities } from "../shader_modules";
 import type {
@@ -114,7 +114,7 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
                 this.props.colorMapName,
                 (this.context as DeckGLLayerContext).userData.colorTables,
                 this.props.colorMapFunction
-            ) as TextureData,
+            ),
         });
 
         // MESH MODEL

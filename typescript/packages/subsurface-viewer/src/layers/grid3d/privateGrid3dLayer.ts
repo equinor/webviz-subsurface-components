@@ -10,7 +10,6 @@ import type {
     SamplerProps,
     Texture,
     TextureProps,
-    TextureData,
 } from "@luma.gl/core";
 import { Geometry, Model } from "@luma.gl/engine";
 import type { DeckGLLayerContext } from "../../components/Map";
@@ -122,7 +121,7 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
         oldProps,
         context,
         changeFlags,
-    }: UpdateParameters<this>): boolean {
+    }: UpdateParameters<Layer<PrivateLayerProps>>): boolean {
         return (
             super.shouldUpdateState({
                 props,
@@ -133,7 +132,7 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
         );
     }
 
-    updateState({ context }: UpdateParameters<this>): void {
+    updateState({ context }: UpdateParameters<Layer<PrivateLayerProps>>): void {
         this.initializeState(context as DeckGLLayerContext);
     }
 
@@ -227,8 +226,8 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
         return this.nullPickingColor() as unknown as number;
     }
 
-    encodePickingColor(): number[] {
-        return this.nullPickingColor();
+    encodePickingColor(): [number, number, number] {
+        return this.nullPickingColor() as [number, number, number];
     }
 
     getPickingInfo({ info }: { info: PickingInfo }): LayerPickInfo {
@@ -395,9 +394,7 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             colorMapSize: coloringHints.colormapSize,
         };
     }
-    private getColormapTexture(
-        context: DeckGLLayerContext
-    ): Texture<TextureProps> {
+    private getColormapTexture(context: DeckGLLayerContext): Texture {
         const textureProps: TextureProps = {
             sampler: DEFAULT_TEXTURE_PARAMETERS,
             width: 256,
@@ -420,14 +417,14 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             const colormapData =
                 this.props.colorMapFunction instanceof Uint8Array
                     ? this.props.colorMapFunction
-                    : (getImageData(
+                    : getImageData(
                           this.props.colorMapName,
                           (this.context as DeckGLLayerContext).userData
                               .colorTables,
                           this.props.colorMapFunction,
                           colormapHints.colormapSize,
                           colormapHints.discreteData
-                      ) as TextureData);
+                      );
 
             const colormap = context.device.createTexture({
                 ...textureProps,
@@ -447,7 +444,7 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
 
         const colormap = context.device.createTexture({
             ...textureProps,
-            data: data as TextureData,
+            data: data,
         });
         return colormap;
     }

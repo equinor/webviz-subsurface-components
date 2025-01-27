@@ -363,7 +363,7 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
         });
 
         this.shapes.set("circle", {
-            drawMode: "triangle-fan-webgl",
+            drawMode: "triangle-strip",
             positions: new Float32Array(circle_positions),
             outline: new Float32Array(circle_positions.slice(3)),
         });
@@ -407,7 +407,7 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
             ...shaders,
             bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
             geometry: new Geometry({
-                topology: "line-loop-webgl",
+                topology: "line-strip",
                 attributes: {
                     positions: { size: 3, value: shape.outline },
                 },
