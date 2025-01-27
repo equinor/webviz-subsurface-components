@@ -3,7 +3,9 @@ import { CollisionFilterExtension } from "@deck.gl/extensions";
 
 const injectionVs = {
     "vs:DECKGL_FILTER_COLOR": `
-    color.a = 1.0 / collision_fade;  // Note: this will counteract the fading of the labels caused by deck.gl's CollisionFilterExtension
+    if (collision_fade != 0.0) {
+      color.a = 1.0 / collision_fade;  // Note: this will counteract the fading of the labels caused by deck.gl's CollisionFilterExtension
+    }
     `,
 };
 

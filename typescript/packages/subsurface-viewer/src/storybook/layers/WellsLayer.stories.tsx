@@ -659,7 +659,7 @@ export const SimplifiedRendering: StoryObj<typeof SubsurfaceViewer> = {
 };
 
 type ClutterProps = {
-    wellNameReduceClutter: boolean;
+    hideOverlappingWellNames: boolean;
     wellNameAtTop: boolean;
 };
 
@@ -674,7 +674,7 @@ const ReducedWellNameClutterComponent: React.FC<ClutterProps> = (
                 wellNameVisible: true,
                 wellNameAtTop: props.wellNameAtTop,
                 wellHeadStyle: { size: 4 },
-                wellNameReduceClutter: props.wellNameReduceClutter,
+                hideOverlappingWellNames: props.hideOverlappingWellNames,
                 refine: true,
                 outline: true,
                 ZIncreasingDownwards: false,
@@ -712,7 +712,7 @@ export const ReducedWellNameClutter3D: StoryObj<
     typeof ReducedWellNameClutterComponent
 > = {
     args: {
-        wellNameReduceClutter: false,
+        hideOverlappingWellNames: false,
         wellNameAtTop: true,
     },
     render: (args) => <ReducedWellNameClutterComponent {...args} />,
@@ -729,7 +729,7 @@ const ReducedWellNameClutterComponent2D: React.FC<ClutterProps> = (
                 wellNameVisible: true,
                 wellNameAtTop: props.wellNameAtTop,
                 wellHeadStyle: { size: 4 },
-                wellNameReduceClutter: props.wellNameReduceClutter,
+                hideOverlappingWellNames: props.hideOverlappingWellNames,
                 refine: true,
                 outline: true,
                 ZIncreasingDownwards: false,
@@ -758,7 +758,7 @@ export const ReducedWellNameClutter2D: StoryObj<
     typeof ReducedWellNameClutterComponent
 > = {
     args: {
-        wellNameReduceClutter: false,
+        hideOverlappingWellNames: false,
         wellNameAtTop: true,
     },
     render: (args) => <ReducedWellNameClutterComponent2D {...args} />,

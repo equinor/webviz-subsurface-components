@@ -52,6 +52,10 @@ import {
     invertPath,
     splineRefine,
 } from "./utils/spline";
+import { create, all } from "mathjs";
+
+const math = create(all, { randomSeed: "a" });
+const randomFunc = math?.random ? math.random : Math.random;
 
 type StyleAccessorFunction = (
     object: Feature,
@@ -117,7 +121,7 @@ export interface WellsLayerProps extends ExtendedLayerProps {
     /**  If true will prevent well name cluttering by not displaying overlapping names.
      * default false.
      */
-    wellNameReduceClutter: boolean;
+    hideOverlappingWellNames: boolean;
     isLog: boolean;
     depthTest: boolean;
     /**  If true means that input z values are interpreted as depths.
@@ -154,7 +158,7 @@ const defaultProps = {
     wellNameAtTop: false,
     wellNameSize: 14,
     wellNameColor: [0, 0, 0, 255],
-    wellNameReduceClutter: false,
+    hideOverlappingWellNames: false,
     selectedWell: "@@#editedData.selectedWells", // used to get data from deckgl layer
     depthTest: true,
     ZIncreasingDownwards: true,
@@ -628,7 +632,6 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             collisionEnabled: true,
             getCollisionPriority: (d: Feature<Geometry, GeoJsonProperties>) => {
                 const labelSize = d.properties?.["name"].length ?? 1;
-                //return labelSize;
                 if (is3d) {
                     // In 3D prioritize according to label size.
                     return labelSize;
@@ -642,13 +645,13 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                     );
 
                     const priority = labelPosition
-                        ? (labelPosition?.[2] ?? 1) / 10 + Math.random() // priority must be in [-1000, 1000]
+                        ? (labelPosition?.[2] ?? 1) / 10 + randomFunc() // priority must be in [-1000, 1000]
                         : labelSize;
                     return priority;
                 }
             },
             collisionTestProps: {
-                sizeScale: 2,
+                sizeScale: 1,
             },
             collisionGroup: "nobodys",
             extensions: [new CollisionModifierExtension()],
@@ -680,7 +683,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 parameters,
                 visible: this.props.wellNameVisible && !fastDrawing,
 
-                ...(this.props.wellNameReduceClutter ? clutterProps : {}),
+                ...(this.props.hideOverlappingWellNames ? clutterProps : {}),
             })
         );
 
