@@ -1,15 +1,10 @@
-import type {
-    LayerContext,
-    LayerProps,
-    PickingInfo,
-    UpdateParameters,
-} from "@deck.gl/core";
+import type { LayerProps, PickingInfo, UpdateParameters } from "@deck.gl/core";
 import { COORDINATE_SYSTEM, Layer, picking, project32 } from "@deck.gl/core";
 
 import { GL } from "@luma.gl/constants";
 import type { GeometryProps } from "@luma.gl/engine";
 import { Geometry, Model } from "@luma.gl/engine";
-import type { Device, UniformValue } from "@luma.gl/core";
+import type { Device } from "@luma.gl/core";
 import type { ShaderModule } from "@luma.gl/shadertools";
 
 import type { DeckGLLayerContext } from "../../components/Map";
@@ -78,81 +73,6 @@ const defaultProps = {
     ZIncreasingDownwards: true,
 };
 
-const lineShaderUniformBlock = `\
-uniform lineLayerUniforms {
-    uniform bool ZIncreasingDownwards;
-} layer;
-`;
-
-type LineShaderUniformsType = { ZIncreasingDownwards: boolean };
-
-const lineShaderUniforms = {
-    name: "layer",
-    // vs: lineShaderUniformBlock,
-    // fs: lineShaderUniformBlock,
-    getUniforms: (props: Partial<PrivateTriangleLayerProps>) => {
-        return {
-            ZIncreasingDownwards:
-                props.ZIncreasingDownwards ?? defaultProps.ZIncreasingDownwards,
-        };
-    },
-    uniformTypes: {
-        ZIncreasingDownwards: "f32",
-    },
-} as const satisfies ShaderModule<LayerProps, LineShaderUniformsType>;
-
-const triangleShaderUniformBlock = `\
-uniform triangleLayerUniforms {
-    uniform bool isContoursDepth;
-    uniform float contourReferencePoint;
-    uniform float contourInterval;
-    uniform vec4 uColor;
-    uniform bool smoothShading;
-    uniform bool ZIncreasingDownwards;
-} layer;
-`;
-
-type TriangleShaderUniformsType = {
-    isContoursDepth: boolean;
-    contourReferencePoint: number;
-    contourInterval: number;
-    uColor: [number, number, number, number];
-    smoothShading: boolean;
-    ZIncreasingDownwards: boolean;
-};
-
-const triangleShaderUniforms = {
-    name: "layer",
-    vs: triangleShaderUniformBlock,
-    fs: triangleShaderUniformBlock,
-    getUniforms: (props: Partial<PrivateTriangleLayerProps>) => {
-        return {
-            isContoursDepth: defaultProps.isContoursDepth,
-            contourReferencePoint:
-                props.contours?.[0] ?? defaultProps.contours[0],
-            contourInterval: props.contours?.[1] ?? defaultProps.contours[1],
-            // Normalize to [0,1] range.
-            uColor: [
-                ...(props.color ?? defaultProps.color).map(
-                    (x: number) => (x ?? 0) / 255
-                ),
-                1 /* alpha channel */,
-            ] as [number, number, number, number],
-            smoothShading: props.smoothShading ?? defaultProps.smoothShading,
-            ZIncreasingDownwards:
-                props.ZIncreasingDownwards ?? defaultProps.ZIncreasingDownwards,
-        };
-    },
-    uniformTypes: {
-        isContoursDepth: "u32",
-        contourReferencePoint: "f32",
-        contourInterval: "f32",
-        uColor: "vec4<f32>",
-        smoothShading: "u32",
-        ZIncreasingDownwards: "u32",
-    },
-} as const satisfies ShaderModule<LayerProps, TriangleShaderUniformsType>;
-
 // This is a private layer used only by the composite TriangleLayer
 export default class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProps> {
     get isLoaded(): boolean {
@@ -185,13 +105,19 @@ export default class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProp
         this.initializeState(context as DeckGLLayerContext);
     }
 
-    _getModels(device: Device): [unknown, unknown] {
+    _getModels(device: Device): [Model, Model] {
         const triangleModel = new Model(device, {
             id: `${this.props.id}-mesh`,
-            vs: vsLineShader,
-            fs: fsLineShader,
+            vs: vsShader,
+            fs: fsShader,
+            bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
             geometry: new Geometry(this.props.geometryTriangles),
-            modules: [project32, picking, localPhongLighting],
+            modules: [
+                project32,
+                picking,
+                localPhongLighting,
+                trianglesUniforms,
+            ],
             isInstanced: false, // This only works when set to false.
         });
 
@@ -199,25 +125,30 @@ export default class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProp
             id: `${this.props.id}-lines`,
             vs: vsLineShader,
             fs: fsLineShader,
+            bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
             geometry: new Geometry(this.props.geometryLines),
-            modules: [project32, picking],
+            modules: [project32, picking, triangleMeshUniforms],
             isInstanced: false,
         });
 
         return [triangleModel, lineModel];
     }
 
-    draw(args: {
-        moduleParameters?: unknown;
-        uniforms: UniformValue;
-        context: LayerContext;
-    }): void {
+    // DrawOptions is not exported by deck.gl :/
+    // DrawOptions = {
+    //     renderPass: RenderPass;
+    //     shaderModuleProps: any;
+    //     uniforms: any;
+    //     parameters: any;
+    //     context: LayerContext;
+    //   }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    draw(args: any): void {
         if (!this.state["models"]) {
             return;
         }
 
-        const { context } = args;
-        const { gl } = context;
+        const { gl } = args.context;
 
         const [triangleModel, lineModel] = this.state["models"] as Model[];
 
@@ -227,16 +158,42 @@ export default class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProp
         gl.enable(GL.POLYGON_OFFSET_FILL);
         gl.polygonOffset(1, 1);
         triangleModel.shaderInputs.setProps({
-            uniforms: lineShaderUniforms,
+            ...args.uniforms,
+            triangles: {
+                isContoursDepth: defaultProps.isContoursDepth,
+                contourReferencePoint:
+                    this.props.contours?.[0] ?? defaultProps.contours[0],
+                contourInterval:
+                    this.props.contours?.[1] ?? defaultProps.contours[1],
+                // Normalize to [0,1] range.
+                uColor: [
+                    ...(this.props.color ?? defaultProps.color).map(
+                        (x: number) => (x ?? 0) / 255
+                    ),
+                    1 /* alpha channel */,
+                ] as [number, number, number, number],
+                smoothShading:
+                    this.props.smoothShading ?? defaultProps.smoothShading,
+                ZIncreasingDownwards:
+                    this.props.ZIncreasingDownwards ??
+                    defaultProps.ZIncreasingDownwards,
+            },
         });
 
-        triangleModel.draw(context.renderPass);
+        triangleModel.draw(args.context.renderPass);
 
         gl.disable(GL.POLYGON_OFFSET_FILL);
 
         if (this.props.gridLines) {
-            lineModel.shaderInputs.setProps({ uniforms: lineShaderUniforms });
-            lineModel.draw(context.renderPass);
+            lineModel.shaderInputs.setProps({
+                ...args.uniforms,
+                triangleMesh: {
+                    ZIncreasingDownwards:
+                        this.props.ZIncreasingDownwards ??
+                        defaultProps.ZIncreasingDownwards,
+                },
+            });
+            lineModel.draw(args.context.renderPass);
         }
 
         if (!this.props.depthTest) {
@@ -276,3 +233,56 @@ export default class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProp
 
 PrivateTriangleLayer.layerName = "privateTriangleLayer";
 PrivateTriangleLayer.defaultProps = defaultProps;
+
+const triangleMeshUniformsBlock = `\
+uniform triangleMeshUniforms {
+    uniform bool ZIncreasingDownwards;
+} triangleMesh;
+`;
+
+type TriangleMeshUniformsType = { ZIncreasingDownwards: boolean };
+
+// NOTE: this must exactly the same name than in the uniform block
+const triangleMeshUniforms = {
+    name: "triangleMesh",
+    vs: triangleMeshUniformsBlock,
+    fs: undefined,
+    uniformTypes: {
+        ZIncreasingDownwards: "f32",
+    },
+} as const satisfies ShaderModule<LayerProps, TriangleMeshUniformsType>;
+
+const triangleUniformsBlock = /*glsl*/ `\
+uniform trianglesUniforms {
+    uniform bool isContoursDepth;
+    uniform float contourReferencePoint;
+    uniform float contourInterval;
+    uniform vec4 uColor;
+    uniform bool smoothShading;
+    uniform bool ZIncreasingDownwards;
+} triangles;
+`;
+
+type TriangleUniformsType = {
+    isContoursDepth: boolean;
+    contourReferencePoint: number;
+    contourInterval: number;
+    uColor: [number, number, number, number];
+    smoothShading: boolean;
+    ZIncreasingDownwards: boolean;
+};
+
+// NOTE: this must exactly the same name than in the uniform block
+const trianglesUniforms = {
+    name: "triangles",
+    vs: triangleUniformsBlock,
+    fs: triangleUniformsBlock,
+    uniformTypes: {
+        isContoursDepth: "u32",
+        contourReferencePoint: "f32",
+        contourInterval: "f32",
+        uColor: "vec4<f32>",
+        smoothShading: "u32",
+        ZIncreasingDownwards: "u32",
+    },
+} as const satisfies ShaderModule<LayerProps, TriangleUniformsType>;
