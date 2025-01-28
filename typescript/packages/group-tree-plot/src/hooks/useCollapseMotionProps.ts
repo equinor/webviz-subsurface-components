@@ -5,7 +5,7 @@ import type {
     Transition,
 } from "motion/dist/react";
 import type { D3TreeNode } from "../types";
-import { findClosestVisibleInNewTree } from "./treePlot";
+import { findClosestVisibleInNewTree } from "../utils/treePlot";
 
 /**
  * Settings for the tree's animation timing

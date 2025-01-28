@@ -6,9 +6,9 @@ import * as d3 from "d3";
 import { AnimatePresence } from "motion/react";
 
 import type { D3TreeNode, RecursiveTreeNode } from "../../types";
-import type { DataAssembler } from "../../utils/dataAssembler";
+import type { DataAssembler } from "../../utils/DataAssembler";
 
-import { computeLinkId, computeNodeId } from "../../utils/treePlot";
+import { makeLinkId, makeNodeId } from "../../utils/treePlot";
 import { TransitionTreeEdge } from "./privateComponents/TransitionTreeEdge";
 import { TransitionTreeNode } from "./privateComponents/TransitionTreeNode";
 
@@ -63,7 +63,7 @@ export function TreePlotRenderer(props: TreePlotRendererProps): ReactNode {
                 //      })
                 // However, nodes are being collapsed after-the-fact here, since we need the depth value for implicit collapses, and it's not available in the constructor
 
-                const collapseFlag = nodeCollapseFlags[computeNodeId(node)];
+                const collapseFlag = nodeCollapseFlags[makeNodeId(node)];
                 const visibleDepth =
                     props.initialVisibleDepth ?? Number.MAX_SAFE_INTEGER;
 
@@ -83,7 +83,7 @@ export function TreePlotRenderer(props: TreePlotRendererProps): ReactNode {
     const oldNodeTree = usePreviousTree(nodeTree);
 
     function toggleNodeCollapse(node: D3TreeNode) {
-        const nodeIdent = computeNodeId(node);
+        const nodeIdent = makeNodeId(node);
         // Might be collapsed implicitly due to visibleDepth prop
         const collapsed = Boolean(node.children?.length);
 
@@ -98,7 +98,7 @@ export function TreePlotRenderer(props: TreePlotRendererProps): ReactNode {
                 node.descendants()
                     // descendants() includes this node, slice to skip it
                     .slice(1)
-                    .forEach((child) => delete newFlags[computeNodeId(child)]);
+                    .forEach((child) => delete newFlags[makeNodeId(child)]);
             }
 
             return newFlags;
@@ -110,7 +110,7 @@ export function TreePlotRenderer(props: TreePlotRendererProps): ReactNode {
             <AnimatePresence custom={nodeTree}>
                 {nodeTree.links().map((link) => (
                     <TransitionTreeEdge
-                        key={computeLinkId(link)}
+                        key={makeLinkId(link)}
                         link={link}
                         dataAssembler={props.dataAssembler}
                         primaryEdgeProperty={props.primaryEdgeProperty}
@@ -119,7 +119,7 @@ export function TreePlotRenderer(props: TreePlotRendererProps): ReactNode {
                 ))}
                 {nodeTree.descendants().map((node) => (
                     <TransitionTreeNode
-                        key={computeNodeId(node)}
+                        key={makeNodeId(node)}
                         primaryNodeProperty={props.primaryNodeProperty}
                         dataAssembler={props.dataAssembler}
                         node={node}

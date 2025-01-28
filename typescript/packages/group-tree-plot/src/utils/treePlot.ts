@@ -10,7 +10,7 @@ import type { HierarchyNode } from "d3";
  * @param node A node in the tree
  * @returns A unique identifier
  */
-export function computeNodeId(node: HierarchyNode<RecursiveTreeNode>): string {
+export function makeNodeId(node: HierarchyNode<RecursiveTreeNode>): string {
     // It's technically possible for a group to have the same name as a well, so it should be enough to simply append the type in front of the label
     const type = node.data.node_type;
     const label = node.data.node_label;
@@ -23,8 +23,8 @@ export function computeNodeId(node: HierarchyNode<RecursiveTreeNode>): string {
  * @param link A link in the tree
  * @returns A unique path identifier
  */
-export function computeLinkId(link: D3TreeEdge): string {
-    return `path ${computeNodeId(link.target)}`;
+export function makeLinkId(link: D3TreeEdge): string {
+    return `path ${makeNodeId(link.target)}`;
 }
 
 /**
@@ -63,10 +63,10 @@ export function findClosestVisibleInNewTree(
     for (let i = 1; i < pathToNode.length; i++) {
         const pathNode = pathToNode[i];
 
-        const nodeId = computeNodeId(pathNode);
+        const nodeId = makeNodeId(pathNode);
 
         const foundChild = childrenInTree.find(
-            (node) => computeNodeId(node) === nodeId
+            (node) => makeNodeId(node) === nodeId
         );
 
         // Previous node was the last visible parent for the node

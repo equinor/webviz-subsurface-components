@@ -1,9 +1,9 @@
 import React from "react";
 import { motion } from "motion/react";
-import type { DataAssembler } from "../../../utils/dataAssembler";
+import type { DataAssembler } from "../../../utils/DataAssembler";
 import type { D3TreeNode } from "../../../types";
 import { printTreeValue } from "../../../utils/treePlot";
-import { useCollapseMotionProps } from "../../../utils/useCollapseMotionProps";
+import { useCollapseMotionProps } from "../../../hooks/useCollapseMotionProps";
 
 import { HiddenChildren } from "./HiddenChildren";
 

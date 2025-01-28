@@ -9,7 +9,7 @@ import { PlotErrorOverlay } from "./components/PlotErrorOverlay";
 import {
     useDataAssembler,
     useUpdateAssemblerDate,
-} from "./utils/dataAssembler";
+} from "./utils/DataAssembler";
 
 export interface GroupTreePlotProps {
     id: string;

@@ -3,9 +3,9 @@ import React from "react";
 import { motion } from "motion/react";
 
 import { diagonalPath } from "../../../utils/treePlot";
-import type { DataAssembler } from "../../../utils/dataAssembler";
+import type { DataAssembler } from "../../../utils/DataAssembler";
 import type { D3TreeEdge, D3TreeNode } from "../../../types";
-import { useCollapseMotionProps } from "../../../utils/useCollapseMotionProps";
+import { useCollapseMotionProps } from "../../../hooks/useCollapseMotionProps";
 
 export type TreeEdgeProps = {
     link: D3TreeEdge;
