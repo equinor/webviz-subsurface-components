@@ -1,4 +1,3 @@
-//import { GL } from "@luma.gl/constants";
 import { Geometry, Model } from "@luma.gl/engine";
 import type {
     Accessor,
