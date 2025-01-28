@@ -1,8 +1,8 @@
 import { fs } from "./lighting.fs.glsl";
-import { phongLighting } from "@luma.gl/shadertools";
+import { phongMaterial, lighting } from "@luma.gl/shadertools";
 
 export const localPhongLighting = {
     name: "localPhongLighting",
     fs,
-    dependencies: [phongLighting],
+    dependencies: [phongMaterial, lighting],
 };

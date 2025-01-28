@@ -9,33 +9,33 @@ vec3 getPhongLightColor(vec3 surfaceColor, vec3 light_direction, vec3 view_direc
 
   float specular_angle = abs(dot(normal_worldspace, halfway_direction));
 
-  float specular = pow(specular_angle, lighting_uShininess);       
-  return (lambertian * lighting_uDiffuse * surfaceColor + specular * lighting_uSpecularColor) * color;    
+  float specular = pow(specular_angle, material.shininess);       
+  return (lambertian * material.diffuse * surfaceColor + specular * material.specularColor) * color;    
 }
 
 vec3 getPhongLightColor(vec3 surfaceColor,vec3 cameraPosition, vec3 position_worldspace, vec3 normal_worldspace) {
 
  vec3 lightColor = surfaceColor;
 
- if (lighting_uEnabled) {
+ if (lighting.enabled != 0) {
    vec3 view_direction = normalize(cameraPosition - position_worldspace);
-   lightColor = lighting_uAmbient * surfaceColor * lighting_uAmbientLight.color;
+   lightColor = material.ambient * surfaceColor * lighting.ambientColor;
 
    for (int i = 0; i < MAX_LIGHTS; i++) {
-     if (i >= lighting_uPointLightCount) {
+     if (i >= lighting.pointLightCount) {
        break;
      }
-     PointLight pointLight = lighting_uPointLight[i];
+     PointLight pointLight = lighting_getPointLight(i);
      vec3 light_position_worldspace = pointLight.position;
      vec3 light_direction = normalize(light_position_worldspace - position_worldspace);
      lightColor += getPhongLightColor(surfaceColor, light_direction, view_direction, normal_worldspace, pointLight.color);
    }
 
    for (int i = 0; i < MAX_LIGHTS; i++) {
-     if (i >= lighting_uDirectionalLightCount) {
+     if (i >= lighting.pointLightCount) {
        break;
      }
-     DirectionalLight directionalLight = lighting_uDirectionalLight[i];
+     DirectionalLight directionalLight = lighting_getDirectionalLight(i);
      lightColor += getPhongLightColor(surfaceColor, -directionalLight.direction, view_direction, normal_worldspace, directionalLight.color);
    }
  }
