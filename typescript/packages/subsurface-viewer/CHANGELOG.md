@@ -1,3 +1,24 @@
+## [1.6.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.6.0...subsurface-viewer@1.6.1) (2025-01-22)
+
+
+### Bug Fixes
+
+* conflict with new [@deck](https://github.com/deck).gl version 9.1 ([#2419](https://github.com/equinor/webviz-subsurface-components/issues/2419)) ([19e7e3c](https://github.com/equinor/webviz-subsurface-components/commit/19e7e3cc0e4da9238a31c8ea19408f8347d365a1))
+
+# [1.6.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.5.2...subsurface-viewer@1.6.0) (2025-01-20)
+
+
+### Features
+
+* Expose `onDrag` and `getCursor` functions from `DeckGL` component ([#2415](https://github.com/equinor/webviz-subsurface-components/issues/2415)) ([fa51d16](https://github.com/equinor/webviz-subsurface-components/commit/fa51d16bb95a3405cd90751be3512300a98f8994))
+
+## [1.5.2](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.5.1...subsurface-viewer@1.5.2) (2025-01-20)
+
+
+### Bug Fixes
+
+* [Snyk] Security upgrade terser-webpack-plugin from 5.3.10 to 5.3.11 ([#2395](https://github.com/equinor/webviz-subsurface-components/issues/2395)) ([2a9a06f](https://github.com/equinor/webviz-subsurface-components/commit/2a9a06f4526736622025811e9248995f2783a039))
+
 ## [1.5.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.5.0...subsurface-viewer@1.5.1) (2025-01-17)
 
 

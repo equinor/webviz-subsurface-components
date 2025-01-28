@@ -1,3 +1,17 @@
+## [2.2.6](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@2.2.5...well-log-viewer@2.2.6) (2025-01-22)
+
+
+### Bug Fixes
+
+* conflict with new [@deck](https://github.com/deck).gl version 9.1 ([#2419](https://github.com/equinor/webviz-subsurface-components/issues/2419)) ([19e7e3c](https://github.com/equinor/webviz-subsurface-components/commit/19e7e3cc0e4da9238a31c8ea19408f8347d365a1))
+
+## [2.2.5](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@2.2.4...well-log-viewer@2.2.5) (2025-01-20)
+
+
+### Bug Fixes
+
+* [Snyk] Security upgrade terser-webpack-plugin from 5.3.10 to 5.3.11 ([#2395](https://github.com/equinor/webviz-subsurface-components/issues/2395)) ([2a9a06f](https://github.com/equinor/webviz-subsurface-components/commit/2a9a06f4526736622025811e9248995f2783a039))
+
 ## [2.2.4](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@2.2.3...well-log-viewer@2.2.4) (2025-01-17)
 
 
