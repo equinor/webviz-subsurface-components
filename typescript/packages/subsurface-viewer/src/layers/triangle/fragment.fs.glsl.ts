@@ -15,20 +15,20 @@ out vec4 fragColor;
 void main(void) {
    vec3 normal = normals_commonspace;
 
-   if (!layer.smoothShading) {
+   if (!triangles.smoothShading) {
       normal = normalize(cross(dFdx(position_commonspace.xyz), dFdy(position_commonspace.xyz)));
    } 
 
-   vec4 color = layer.uColor;
-   bool is_contours = layer.contourReferencePoint != -1.0 && layer.contourInterval != -1.0;
+   vec4 color = triangles.uColor;
+   bool is_contours = triangles.contourReferencePoint != -1.0 && triangles.contourInterval != -1.0;
    if (is_contours) {
       // Contours are made of either depths or properties.
-      float val = (abs(worldPos.z) - layer.contourReferencePoint) / layer.contourInterval;
+      float val = (abs(worldPos.z) - triangles.contourReferencePoint) / triangles.contourInterval;
 
       float f  = fract(val);
       float df = fwidth(val);
 
-      // keep: float c = smoothstep(df * 1.0, df * 2.0, f); // smootstep from/to no of pixels distance fronm contour line.
+      // keep: float c = smoothstep(df * 1.0, df * 2.0, f); // smoothstep from/to no of pixels distance from contour line.
       float c = smoothstep(0.0, df * 2.0, f);
 
       color = color * vec4(c, c, c, 1.0);
