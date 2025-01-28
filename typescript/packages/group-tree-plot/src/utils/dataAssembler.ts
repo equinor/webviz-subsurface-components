@@ -20,7 +20,7 @@ export class DataAssembler {
     edgeMetadataList: EdgeMetadata[];
     nodeMetadataList: NodeMetadata[];
 
-    private _propertyToLabelMap: Map<string, [label: string, unit: string]>;
+    private _propertyToLabelMap: Map<string, [label?: string, unit?: string]>;
     private _propertyMaxVals: Map<string, number>;
 
     private _currentTreeIndex = 0;
@@ -47,10 +47,7 @@ export class DataAssembler {
 
         this._propertyToLabelMap = new Map();
         [...edgeMetadataList, ...nodeMetadataList].forEach((elm) => {
-            this._propertyToLabelMap.set(elm.key, [
-                elm.label ?? "",
-                elm.unit ?? "",
-            ]);
+            this._propertyToLabelMap.set(elm.key, [elm.label, elm.unit]);
         });
 
         this._propertyMaxVals = new Map();
@@ -142,14 +139,13 @@ export class DataAssembler {
      * @param propertyKey The key for the property
      * @returns The label and unit for the property. If not found, label defaults to "", and unit defaults to "?"
      */
-    getPropertyInfo(propertyKey: string): [string, string] {
-        const infos = this._propertyToLabelMap.get(propertyKey);
-        const [label, unit] = infos ?? ["", ""];
+    getPropertyInfo(propertyKey: string): [label: string, unit: string] {
+        const [label, unit] = this._propertyToLabelMap.get(propertyKey) ?? [];
 
-        return [
-            label !== "" ? label : _.upperFirst(propertyKey),
-            unit !== "" ? unit : "?",
-        ];
+        const sanitzedLabel = _.upperFirst(label ?? "");
+        const sanitzedUnit = unit ?? "?";
+
+        return [sanitzedLabel, sanitzedUnit];
     }
 
     /**
