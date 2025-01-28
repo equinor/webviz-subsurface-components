@@ -8,10 +8,10 @@ import type { HierarchyNode } from "d3";
 /**
  * Computes a unique node identifier that should be unique across the entire tree
  * @param node A node in the tree
- * @returns A unique identifer
+ * @returns A unique identifier
  */
 export function computeNodeId(node: HierarchyNode<RecursiveTreeNode>): string {
-    // It's techincally possible for a group to have the same name as a well, so it should be enough to simply append the type infront of the label
+    // It's technically possible for a group to have the same name as a well, so it should be enough to simply append the type in front of the label
     const type = node.data.node_type;
     const label = node.data.node_label;
 
@@ -38,7 +38,7 @@ export function printTreeValue(value: number | null): string {
 }
 
 /**
- * Given a node in a tree, this method find's that nodes closest visible ancestor in different tree-structure.
+ * Given a node in a tree, this method finds that node's closest visible ancestor in another tree-structure.
  * @param targetNode Some tree-node *from the initial tree*.
  * @param newTreeRoot  The root *of the new tree structure*
  * @returns A visible node in the new tree that's the closest to the target-node. Defaults to the tree root.

@@ -37,7 +37,7 @@ export class DataAssembler {
         edgeMetadataList: EdgeMetadata[],
         nodeMetadataList: NodeMetadata[]
     ) {
-        // Guard - Require atleast one tree to be given.
+        // Guard - Require at least one tree to be given.
         if (!datedTrees.length) throw new Error("Tree-list is empty");
 
         this.datedTrees = datedTrees;
@@ -102,7 +102,7 @@ export class DataAssembler {
     /**
      * Pretty-prints all values in the given object with labels and units added
      * @param data Data from a node or edge
-     * @returns A formatted string presenation of the data value
+     * @returns A formatted string presentation of the data value
      */
     getTooltip(data: NodeData | EdgeData): string {
         if (this._currentDateIndex === -1) return "";
@@ -140,7 +140,7 @@ export class DataAssembler {
     /**
      * Gets the label and unit strings for a given property
      * @param propertyKey The key for the property
-     * @returns The label and unit for the propert. If not found, label defaults to "", and unit defaults to "?"
+     * @returns The label and unit for the property. If not found, label defaults to "", and unit defaults to "?"
      */
     getPropertyInfo(propertyKey: string): [string, string] {
         const infos = this._propertyToLabelMap.get(propertyKey);
@@ -163,7 +163,7 @@ export class DataAssembler {
         const value = this.getPropertyValue(data, property) ?? 0;
         const maxVal = this._propertyMaxVals.get(property);
 
-        // Dont normalize 0 or invalid properties
+        // Don't normalize 0 or invalid properties
         if (!maxVal || value === 0) return 0;
 
         return d3.scaleLinear().domain([0, maxVal]).range([2, 100])(value);
@@ -212,7 +212,7 @@ export function useUpdateAssemblerDate(
 }
 
 /**
- * Initializes a memoized data-assembler instance. Creates a new instance everytime data changes, but returns the last valid instance if the new data is invalid.
+ * Initializes a memoized data-assembler instance. Creates a new instance every time data changes, but returns the last valid instance if the new data is invalid.
  * @param datedTrees A list of dated trees. *Assumes all node labels are unique across all node types*
  * @param edgeMetadataList Dated metadata for each tree edge
  * @param nodeMetadataList Dated metadata for each tree node
@@ -225,7 +225,7 @@ export function useDataAssembler(
 ): [DataAssembler | null, string] {
     // Store a status message to track if data was valid
     let errorMsg = "";
-    // Storing a copy of the last successfully assembeled data to render when data becomes invalid
+    // Storing a copy of the last successfully assembled data to render when data becomes invalid
     const lastValidDataAssembler = React.useRef<DataAssembler | null>(null);
 
     const dataAssembler = React.useMemo(() => {
