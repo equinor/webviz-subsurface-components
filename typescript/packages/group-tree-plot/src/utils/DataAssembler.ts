@@ -142,10 +142,10 @@ export class DataAssembler {
     getPropertyInfo(propertyKey: string): [label: string, unit: string] {
         const [label, unit] = this._propertyToLabelMap.get(propertyKey) ?? [];
 
-        const sanitzedLabel = _.upperFirst(label ?? "");
-        const sanitzedUnit = unit ?? "?";
+        const sanitizedLabel = _.upperFirst(label ?? "");
+        const sanitizedUnit = unit ?? "?";
 
-        return [sanitzedLabel, sanitzedUnit];
+        return [sanitizedLabel, sanitizedUnit];
     }
 
     /**
