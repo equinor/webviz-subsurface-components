@@ -7,11 +7,13 @@ import type {
     Position,
     UpdateParameters,
 } from "@deck.gl/core";
+import { Vector2 } from "@math.gl/core";
 import { CollisionModifierExtension } from "../../extensions/collision-modifier-extension";
 import { CompositeLayer, OrbitViewport } from "@deck.gl/core";
 import type {
     ExtendedLayerProps,
     LayerPickInfo,
+    Position3D,
     PropertyDataType,
 } from "../utils/layerTools";
 
@@ -115,7 +117,10 @@ export interface WellsLayerProps extends ExtendedLayerProps {
     colorMappingFunction: (x: number) => [number, number, number];
     lineStyle: LineStyleAccessor;
     wellNameVisible: boolean;
-    wellNameAtTop: boolean;
+    /** It true place name at top, if false at bottom.
+     *  If given as a number between 0 and 100,  will place name at this percentage of trajectory from top.
+     */
+    wellNameAtTop: boolean | number;
     wellNameSize: number;
     wellNameColor: Color;
     /**  If true will prevent well name cluttering by not displaying overlapping names.
@@ -155,7 +160,7 @@ const defaultProps = {
     refine: false,
     visible: true,
     wellNameVisible: false,
-    wellNameAtTop: false,
+    wellNameAtTop: true,
     wellNameSize: 14,
     wellNameColor: [0, 0, 0, 255],
     hideOverlappingWellNames: false,
@@ -307,7 +312,23 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             ...this.state,
             data,
             coarseData,
+            camChange: 0,
         });
+    }
+
+    shouldUpdateState({ changeFlags }: UpdateParameters<this>): boolean {
+        if (changeFlags.viewportChanged) {
+            this.setState({
+                ...this.state,
+                camChange: (this.state["camChange"] as number) + 1,
+            });
+        }
+
+        return (
+            changeFlags.viewportChanged ||
+            changeFlags.propsOrDataChanged ||
+            typeof changeFlags.updateTriggersChanged === "object"
+        );
     }
 
     updateState({ props, oldProps }: UpdateParameters<WellsLayer>): void {
@@ -356,14 +377,6 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         }
     }
 
-    shouldUpdateState({ changeFlags }: UpdateParameters<this>): boolean {
-        return (
-            changeFlags.viewportChanged ||
-            changeFlags.propsOrDataChanged ||
-            typeof changeFlags.updateTriggersChanged === "object"
-        );
-    }
-
     getLegendData(
         value: LogCurveDataType[]
     ): ContinuousLegendDataType | DiscreteLegendDataType | null {
@@ -401,6 +414,99 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
     setupLegend(): void {
         const data = this.getLogCurveData();
         if (data) this.setLegend(data);
+    }
+
+    // return position for well name and icon
+    getAnnotationPosition(
+        well_data: Feature,
+        name_at_top: boolean | number,
+        view_is_3d: boolean,
+        color_accessor: ColorAccessor
+    ): Position | null {
+        if (typeof name_at_top === "number") {
+            // Return a pos "name_at_top" percent down the trajectory
+            const pos = this.getTrajMidPoint(
+                name_at_top,
+                well_data,
+                (this.props.data as unknown as FeatureCollection).features
+            )[1];
+
+            // using z=0 for orthographic view to keep label above other other layers
+            if (pos) return view_is_3d ? pos : [pos[0], pos[1], 0];
+        } else if (name_at_top) {
+            // Read top position from Point geometry, if not present, read it from LineString geometry
+            let top;
+            // Read top position from Point geometry, if not present, read it from LineString geometry
+            const well_head = getWellHeadPosition(well_data);
+            if (well_data) top = well_head;
+            else {
+                const trajectory = getTrajectory(well_data, color_accessor);
+                top = trajectory?.at(0);
+            }
+
+            // using z=0 for orthographic view to keep label above other other layers
+            if (top) return view_is_3d ? top : [top[0], top[1], 0];
+        } else {
+            let bot;
+            // if trajectory is not present, return top position from Point geometry
+            const trajectory = getTrajectory(well_data, color_accessor);
+            if (trajectory) bot = trajectory?.at(-1);
+            else bot = getWellHeadPosition(well_data);
+
+            // using z=0 for orthographic view to keep label above other other layers
+            if (bot) return view_is_3d ? bot : [bot[0], bot[1], 0];
+        }
+        return null;
+    }
+
+    getTrajMidPoint(
+        percent: boolean | number,
+        well_data: Feature,
+        features: Feature<Geometry, GeoJsonProperties>[]
+    ): [number, Position3D] {
+        const wellName = well_data.properties?.["name"];
+        const well_object = getWellObjectByName(features, wellName);
+        if (!well_object) {
+            return [0, [0, 0, 0]];
+        }
+
+        let proportion = 0;
+        if (typeof percent === "number") {
+            proportion = Math.min(Math.max(0, percent), 100) / 100;
+        } else {
+            proportion = percent ? 0 : 1;
+        }
+
+        const well_xyz = getTrajectory(well_object, undefined);
+        const n = well_xyz?.length ?? 2;
+        if (well_xyz && n >= 2) {
+            const i = Math.min(Math.floor(proportion * n), n - 2);
+            const pi1 = well_xyz[i];
+            const pi2 = well_xyz[i + 1];
+            const p1 = new Vector2(this.project(pi1 as number[]));
+            const p2 = new Vector2(this.project(pi2 as number[]));
+            const pMid: Position3D = [
+                pi1[0] + (pi2[0] - pi1[0]) / 2,
+                pi1[1] + (pi2[1] - pi1[1]) / 2,
+                pi1?.[2] ?? 0 + (pi2?.[2] ?? 0 - (pi1?.[2] ?? 0)) / 2,
+            ];
+            const v = new Vector2(p2[0] - p1[0], -(p2[1] - p1[1]));
+            v.normalize();
+            const rad = Math.atan2(v[1], v[0]) as number;
+            const deg = rad * (180 / 3.14159);
+            let a = deg;
+            if (deg > 90) {
+                a = deg - 180;
+            } else if (deg < -90) {
+                a = deg + 180;
+            }
+            if (typeof percent == "boolean" || percent == 0 || percent == 100) {
+                // At top or bottom well names should be horizontal.
+                a = 0;
+            }
+            return [a, pMid];
+        }
+        return [0, [0, 0, 0]];
     }
 
     renderLayers(): LayersList {
@@ -637,7 +743,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                     return labelSize;
                 } else {
                     // In 2D prioritize according z height.
-                    const labelPosition = getAnnotationPosition(
+                    const labelPosition = this.getAnnotationPosition(
                         d,
                         this.props.wellNameAtTop,
                         true,
@@ -662,18 +768,30 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 id: "names",
                 data: data.features,
                 getPosition: (d: Feature) =>
-                    getAnnotationPosition(
+                    this.getAnnotationPosition(
                         d,
                         this.props.wellNameAtTop,
                         is3d,
                         this.props.lineStyle?.color
                     ),
+                getAngle: (f: Feature) => {
+                    const a = this.getTrajMidPoint(
+                        this.props.wellNameAtTop,
+                        f,
+                        (this.props.data as unknown as FeatureCollection)
+                            .features
+                    );
+                    const text_angle = a[0];
+                    return text_angle;
+                },
+
                 getText: (d: Feature) => d.properties?.["name"],
                 getColor: this.props.wellNameColor,
                 getAnchor: "start",
                 getAlignmentBaseline: "bottom",
                 getSize: this.props.wellNameSize,
                 updateTriggers: {
+                    getAngle: [this.state["camChange"]],
                     getPosition: [
                         this.props.wellNameAtTop,
                         is3d,
@@ -829,39 +947,6 @@ function getDiscreteLogMetadata(d: LogCurveDataType, log_name: string) {
 
 function isSelectedLogRun(d: LogCurveDataType, logrun_name: string): boolean {
     return d.header.name.toLowerCase() === logrun_name.toLowerCase();
-}
-
-// return position for well name and icon
-function getAnnotationPosition(
-    well_data: Feature,
-    name_at_top: boolean,
-    view_is_3d: boolean,
-    color_accessor: ColorAccessor
-): Position | null {
-    if (name_at_top) {
-        // Read top position from Point geometry, if not present, read it from LineString geometry
-        let top;
-        // Read top position from Point geometry, if not present, read it from LineString geometry
-        const well_head = getWellHeadPosition(well_data);
-        if (well_data) top = well_head;
-        else {
-            const trajectory = getTrajectory(well_data, color_accessor);
-            top = trajectory?.at(0);
-        }
-
-        // using z=0 for orthographic view to keep label above other other layers
-        if (top) return view_is_3d ? top : [top[0], top[1], 0];
-    } else {
-        let bot;
-        // if trajectory is not present, return top position from Point geometry
-        const trajectory = getTrajectory(well_data, color_accessor);
-        if (trajectory) bot = trajectory?.at(-1);
-        else bot = getWellHeadPosition(well_data);
-
-        // using z=0 for orthographic view to keep label above other other layers
-        if (bot) return view_is_3d ? bot : [bot[0], bot[1], 0];
-    }
-    return null;
 }
 
 function getWellObjectByName(

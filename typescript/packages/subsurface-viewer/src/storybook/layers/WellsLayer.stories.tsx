@@ -564,7 +564,11 @@ export const WellsRefine: StoryObj<typeof WellsRefineComponent> = {
 export const Wells3d: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         ...defaultProps,
-        layers: [volveWellsFromResourcesLayer],
+        layers: [
+            {
+                ...volveWellsFromResourcesLayer,
+            },
+        ],
         views: default3DViews,
     },
     parameters: {
@@ -660,7 +664,7 @@ export const SimplifiedRendering: StoryObj<typeof SubsurfaceViewer> = {
 
 type ClutterProps = {
     hideOverlappingWellNames: boolean;
-    wellNameAtTop: boolean;
+    wellNamePositionPercentage: boolean | number;
 };
 
 const ReducedWellNameClutterComponent: React.FC<ClutterProps> = (
@@ -672,8 +676,9 @@ const ReducedWellNameClutterComponent: React.FC<ClutterProps> = (
             new WellsLayer({
                 data: "./gullfaks.json",
                 wellNameVisible: true,
-                wellNameAtTop: props.wellNameAtTop,
+                wellNameAtTop: props.wellNamePositionPercentage,
                 wellHeadStyle: { size: 4 },
+                wellNameSize: 9,
                 hideOverlappingWellNames: props.hideOverlappingWellNames,
                 refine: true,
                 outline: true,
@@ -713,7 +718,7 @@ export const ReducedWellNameClutter3D: StoryObj<
 > = {
     args: {
         hideOverlappingWellNames: false,
-        wellNameAtTop: true,
+        wellNamePositionPercentage: 0,
     },
     render: (args) => <ReducedWellNameClutterComponent {...args} />,
 };
@@ -727,7 +732,8 @@ const ReducedWellNameClutterComponent2D: React.FC<ClutterProps> = (
             new WellsLayer({
                 data: "./gullfaks.json",
                 wellNameVisible: true,
-                wellNameAtTop: props.wellNameAtTop,
+                wellNameSize: 9,
+                wellNameAtTop: props.wellNamePositionPercentage,
                 wellHeadStyle: { size: 4 },
                 hideOverlappingWellNames: props.hideOverlappingWellNames,
                 refine: true,
@@ -759,7 +765,7 @@ export const ReducedWellNameClutter2D: StoryObj<
 > = {
     args: {
         hideOverlappingWellNames: false,
-        wellNameAtTop: true,
+        wellNamePositionPercentage: 0,
     },
     render: (args) => <ReducedWellNameClutterComponent2D {...args} />,
 };
