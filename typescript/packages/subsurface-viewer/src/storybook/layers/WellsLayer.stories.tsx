@@ -622,7 +622,6 @@ const SimplifiedRenderingComponent: React.FC<SubsurfaceViewerProps> = (
         layers: [
             new WellsLayer({
                 data: "./gullfaks.json",
-                wellNameVisible: true,
                 wellNameAtTop: true,
                 wellHeadStyle: { size: 4 },
                 refine: true,
@@ -717,7 +716,7 @@ export const ReducedWellNameClutter3D: StoryObj<
     typeof ReducedWellNameClutterComponent
 > = {
     args: {
-        hideOverlappingWellNames: false,
+        hideOverlappingWellNames: true,
         wellNamePositionPercentage: 0,
     },
     render: (args) => <ReducedWellNameClutterComponent {...args} />,
@@ -764,7 +763,7 @@ export const ReducedWellNameClutter2D: StoryObj<
     typeof ReducedWellNameClutterComponent
 > = {
     args: {
-        hideOverlappingWellNames: false,
+        hideOverlappingWellNames: true,
         wellNamePositionPercentage: 0,
     },
     render: (args) => <ReducedWellNameClutterComponent2D {...args} />,

@@ -54,6 +54,7 @@ import {
     invertPath,
     splineRefine,
 } from "./utils/spline";
+import { clamp } from "lodash";
 
 type StyleAccessorFunction = (
     object: Feature,
@@ -413,13 +414,16 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
     }
 
     // return position for well name and icon
-    annotationPosition(
+    getAnnotationPosition(
         well_data: Feature,
-        name_at_top: boolean | number,
+        annotation_position: boolean | number,
         view_is_3d: boolean,
         color_accessor: ColorAccessor
     ): Position | null {
-        const percentage = Math.min(Math.max(0, Number(name_at_top)), 100);
+        const percentage =
+            Number(annotation_position) *
+            (typeof annotation_position === "boolean" ? 100 : 1);
+        clamp(percentage, 0, 100);
         if (percentage > 0 && percentage < 100) {
             // Return a pos "name_at_top" percent down the trajectory
             const pos = this.getTrajMidPoint(
@@ -733,7 +737,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                     return labelSize;
                 } else {
                     // In 2D prioritize according z height.
-                    const labelPosition = this.annotationPosition(
+                    const labelPosition = this.getAnnotationPosition(
                         d,
                         this.props.wellNameAtTop,
                         true,
@@ -758,7 +762,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 id: "names",
                 data: data.features,
                 getPosition: (d: Feature) =>
-                    this.annotationPosition(
+                    this.getAnnotationPosition(
                         d,
                         this.props.wellNameAtTop,
                         is3d,
