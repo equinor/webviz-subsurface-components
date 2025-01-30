@@ -54,10 +54,6 @@ import {
     invertPath,
     splineRefine,
 } from "./utils/spline";
-import { create, all } from "mathjs";
-
-const math = create(all, { randomSeed: "a" });
-const randomFunc = math?.random ? math.random : Math.random;
 
 type StyleAccessorFunction = (
     object: Feature,
@@ -417,28 +413,29 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
     }
 
     // return position for well name and icon
-    getAnnotationPosition(
+    annotationPosition(
         well_data: Feature,
         name_at_top: boolean | number,
         view_is_3d: boolean,
         color_accessor: ColorAccessor
     ): Position | null {
-        if (typeof name_at_top === "number") {
+        const percentage = Math.min(Math.max(0, Number(name_at_top)), 100);
+        if (percentage > 0 && percentage < 100) {
             // Return a pos "name_at_top" percent down the trajectory
             const pos = this.getTrajMidPoint(
-                name_at_top,
+                percentage,
                 well_data,
                 (this.props.data as unknown as FeatureCollection).features
             )[1];
 
             // using z=0 for orthographic view to keep label above other other layers
             if (pos) return view_is_3d ? pos : [pos[0], pos[1], 0];
-        } else if (name_at_top) {
+        } else if (percentage == 0) {
             // Read top position from Point geometry, if not present, read it from LineString geometry
             let top;
             // Read top position from Point geometry, if not present, read it from LineString geometry
             const well_head = getWellHeadPosition(well_data);
-            if (well_data) top = well_head;
+            if (well_head) top = well_head;
             else {
                 const trajectory = getTrajectory(well_data, color_accessor);
                 top = trajectory?.at(0);
@@ -460,7 +457,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
     }
 
     getTrajMidPoint(
-        percent: boolean | number,
+        percent: number,
         well_data: Feature,
         features: Feature<Geometry, GeoJsonProperties>[]
     ): [number, Position3D] {
@@ -470,17 +467,10 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             return [0, [0, 0, 0]];
         }
 
-        let proportion = 0;
-        if (typeof percent === "number") {
-            proportion = Math.min(Math.max(0, percent), 100) / 100;
-        } else {
-            proportion = percent ? 0 : 1;
-        }
-
         const well_xyz = getTrajectory(well_object, undefined);
         const n = well_xyz?.length ?? 2;
         if (well_xyz && n >= 2) {
-            const i = Math.min(Math.floor(proportion * n), n - 2);
+            const i = Math.min(Math.floor((percent / 100) * n), n - 2);
             const pi1 = well_xyz[i];
             const pi2 = well_xyz[i + 1];
             const p1 = new Vector2(this.project(pi1 as number[]));
@@ -743,7 +733,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                     return labelSize;
                 } else {
                     // In 2D prioritize according z height.
-                    const labelPosition = this.getAnnotationPosition(
+                    const labelPosition = this.annotationPosition(
                         d,
                         this.props.wellNameAtTop,
                         true,
@@ -751,7 +741,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                     );
 
                     const priority = labelPosition
-                        ? (labelPosition?.[2] ?? 1) / 10 + randomFunc() // priority must be in [-1000, 1000]
+                        ? (labelPosition?.[2] ?? 1) / 10 // priority must be in [-1000, 1000]
                         : labelSize;
                     return priority;
                 }
@@ -768,15 +758,16 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 id: "names",
                 data: data.features,
                 getPosition: (d: Feature) =>
-                    this.getAnnotationPosition(
+                    this.annotationPosition(
                         d,
                         this.props.wellNameAtTop,
                         is3d,
                         this.props.lineStyle?.color
                     ),
                 getAngle: (f: Feature) => {
+                    const percentage = Math.min(Math.max(0, Number(this.props.wellNameAtTop)), 100);
                     const a = this.getTrajMidPoint(
-                        this.props.wellNameAtTop,
+                        percentage,
                         f,
                         (this.props.data as unknown as FeatureCollection)
                             .features
