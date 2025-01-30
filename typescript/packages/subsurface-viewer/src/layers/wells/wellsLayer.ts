@@ -765,7 +765,10 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                         this.props.lineStyle?.color
                     ),
                 getAngle: (f: Feature) => {
-                    const percentage = Math.min(Math.max(0, Number(this.props.wellNameAtTop)), 100);
+                    const percentage = Math.min(
+                        Math.max(0, Number(this.props.wellNameAtTop)),
+                        100
+                    );
                     const a = this.getTrajMidPoint(
                         percentage,
                         f,
