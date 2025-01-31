@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.6.1...subsurface-viewer@1.7.0) (2025-01-31)
+
+
+### Features
+
+* Well clutter ([#2424](https://github.com/equinor/webviz-subsurface-components/issues/2424)) ([7ceedaf](https://github.com/equinor/webviz-subsurface-components/commit/7ceedafcc4c0f1eff4dcfe578a88b7f6f7404887))
+
 ## [1.6.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.6.0...subsurface-viewer@1.6.1) (2025-01-22)
 
 

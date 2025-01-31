@@ -17,7 +17,11 @@ import { NativeSelect } from "@equinor/eds-core-react";
 
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
-import type { MapMouseEvent } from "../../components/Map";
+import type {
+    MapMouseEvent,
+    Point3D,
+    BoundingBox2D,
+} from "../../components/Map";
 import AxesLayer from "../../layers/axes/axesLayer";
 import WellsLayer from "../../layers/wells/wellsLayer";
 
@@ -560,7 +564,11 @@ export const WellsRefine: StoryObj<typeof WellsRefineComponent> = {
 export const Wells3d: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         ...defaultProps,
-        layers: [volveWellsFromResourcesLayer],
+        layers: [
+            {
+                ...volveWellsFromResourcesLayer,
+            },
+        ],
         views: default3DViews,
     },
     parameters: {
@@ -614,6 +622,7 @@ const SimplifiedRenderingComponent: React.FC<SubsurfaceViewerProps> = (
         layers: [
             new WellsLayer({
                 data: "./gullfaks.json",
+                wellNameAtTop: true,
                 wellHeadStyle: { size: 4 },
                 refine: true,
                 outline: true,
@@ -650,6 +659,114 @@ export const SimplifiedRendering: StoryObj<typeof SubsurfaceViewer> = {
         },
     },
     render: (args) => <SimplifiedRenderingComponent {...args} />,
+};
+
+type ClutterProps = {
+    hideOverlappingWellNames: boolean;
+    wellNamePositionPercentage: boolean | number;
+};
+
+const ReducedWellNameClutterComponent: React.FC<ClutterProps> = (
+    props: ClutterProps
+) => {
+    const propsWithLayers = {
+        id: "clutter",
+        layers: [
+            new WellsLayer({
+                data: "./gullfaks.json",
+                wellNameVisible: true,
+                wellNameAtTop: props.wellNamePositionPercentage,
+                wellHeadStyle: { size: 4 },
+                wellNameSize: 9,
+                hideOverlappingWellNames: props.hideOverlappingWellNames,
+                refine: true,
+                outline: true,
+                ZIncreasingDownwards: false,
+            }),
+            new AxesLayer({
+                id: "axes-layer",
+                bounds: [450000, 6781000, 0, 464000, 6791000, 3500],
+            }),
+        ],
+        cameraPosition: {
+            rotationOrbit: 45,
+            rotationX: 45,
+            zoom: -4,
+            target: [
+                (450000 + 464000) / 2,
+                (6781000 + 6791000) / 2,
+                -3500 / 2,
+            ] as Point3D,
+        },
+        views: {
+            layout: [1, 1] as [number, number],
+            viewports: [
+                {
+                    id: "view_1",
+                    show3D: true,
+                },
+            ],
+        },
+    };
+
+    return <SubsurfaceViewer {...propsWithLayers} />;
+};
+
+export const ReducedWellNameClutter3D: StoryObj<
+    typeof ReducedWellNameClutterComponent
+> = {
+    args: {
+        hideOverlappingWellNames: true,
+        wellNamePositionPercentage: 0,
+    },
+    render: (args) => <ReducedWellNameClutterComponent {...args} />,
+};
+
+const ReducedWellNameClutterComponent2D: React.FC<ClutterProps> = (
+    props: ClutterProps
+) => {
+    const propsWithLayers = {
+        id: "clutter",
+        layers: [
+            new WellsLayer({
+                data: "./gullfaks.json",
+                wellNameVisible: true,
+                wellNameSize: 9,
+                wellNameAtTop: props.wellNamePositionPercentage,
+                wellHeadStyle: { size: 4 },
+                hideOverlappingWellNames: props.hideOverlappingWellNames,
+                refine: true,
+                outline: true,
+                ZIncreasingDownwards: false,
+            }),
+            new AxesLayer({
+                id: "axes-layer",
+                bounds: [450000, 6781000, 0, 464000, 6791000, 3500],
+            }),
+        ],
+        bounds: [450000, 6781000, 464000, 6791000] as BoundingBox2D,
+        views: {
+            layout: [1, 1] as [number, number],
+            viewports: [
+                {
+                    id: "view_1",
+                    show3D: false,
+                },
+            ],
+        },
+    };
+
+    return <SubsurfaceViewer {...propsWithLayers} />;
+};
+
+export const ReducedWellNameClutter2D: StoryObj<
+    typeof ReducedWellNameClutterComponent
+> = {
+    args: {
+        hideOverlappingWellNames: true,
+        wellNamePositionPercentage: 0,
+    },
+    render: (args) => <ReducedWellNameClutterComponent2D {...args} />,
 };
 
 export const Wells3dDashed: StoryObj<typeof SubsurfaceViewer> = {
