@@ -420,7 +420,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         clamp(percentage, 0, 100);
 
         // Return a pos "annotation_position" percent down the trajectory
-        const pos = this.getTrajPontAtPercentage(
+        const pos = this.getTrajPointAtPercentage(
             percentage,
             well_data,
             (this.props.data as unknown as FeatureCollection).features
@@ -434,7 +434,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
     }
 
     // Return angle and position a given percentage down the trajectory.
-    getTrajPontAtPercentage(
+    getTrajPointAtPercentage(
         percent: number,
         well_data: Feature,
         features: Feature<Geometry, GeoJsonProperties>[]
@@ -771,7 +771,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                         return 0;
                     }
 
-                    const a = this.getTrajPontAtPercentage(
+                    const a = this.getTrajPointAtPercentage(
                         percentage,
                         f,
                         (this.props.data as unknown as FeatureCollection)
