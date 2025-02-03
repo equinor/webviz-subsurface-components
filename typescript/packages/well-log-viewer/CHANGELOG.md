@@ -1,3 +1,10 @@
+# [2.3.0](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@2.2.6...well-log-viewer@2.3.0) (2025-02-03)
+
+
+### Features
+
+* GroupTreePlot --- Refactor to typescript + better D3 and React integration + some small features ([#2367](https://github.com/equinor/webviz-subsurface-components/issues/2367)) ([a7cfab2](https://github.com/equinor/webviz-subsurface-components/commit/a7cfab2e0789790d932feee9d6cdbc5e45791226)), closes [#1829](https://github.com/equinor/webviz-subsurface-components/issues/1829)
+
 ## [2.2.6](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@2.2.5...well-log-viewer@2.2.6) (2025-01-22)
 
 
