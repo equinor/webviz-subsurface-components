@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/equinor/webviz-subsurface-components/compare/group-tree-plot@1.3.24...group-tree-plot@1.4.0) (2025-02-03)
+
+
+### Features
+
+* GroupTreePlot --- Refactor to typescript + better D3 and React integration + some small features ([#2367](https://github.com/equinor/webviz-subsurface-components/issues/2367)) ([a7cfab2](https://github.com/equinor/webviz-subsurface-components/commit/a7cfab2e0789790d932feee9d6cdbc5e45791226)), closes [#1829](https://github.com/equinor/webviz-subsurface-components/issues/1829)
+
 ## [1.3.24](https://github.com/equinor/webviz-subsurface-components/compare/group-tree-plot@1.3.23...group-tree-plot@1.3.24) (2025-01-22)
 
 
