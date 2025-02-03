@@ -456,7 +456,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         const w = this.context.viewport.width;
         const h = this.context.viewport.height;
 
-        const percentages = [50, 25, 75, 12.5, 87.5, 37.5, 62.6];
+        const percentages = [50, 25, 75, 12.5, 87.5, 37.5, 62.5];
 
         const n = well_xyz?.length ?? 2;
         if (well_xyz && n >= 2) {
@@ -761,8 +761,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                     this.getAnnotationPosition(
                         d,
                         this.props.wellNameAtTop,
-                        is3d,
-                        this.props.lineStyle?.color
+                        is3d
                     ),
                 getAngle: (f: Feature) => {
                     const percentage =
