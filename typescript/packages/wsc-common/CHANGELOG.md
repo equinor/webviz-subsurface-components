@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@1.0.15...wsc-common@1.1.0) (2025-02-03)
+
+
+### Features
+
+* GroupTreePlot --- Refactor to typescript + better D3 and React integration + some small features ([#2367](https://github.com/equinor/webviz-subsurface-components/issues/2367)) ([a7cfab2](https://github.com/equinor/webviz-subsurface-components/commit/a7cfab2e0789790d932feee9d6cdbc5e45791226)), closes [#1829](https://github.com/equinor/webviz-subsurface-components/issues/1829)
+
 ## [1.0.15](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@1.0.14...wsc-common@1.0.15) (2025-01-22)
 
 
