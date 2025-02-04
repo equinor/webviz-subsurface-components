@@ -117,6 +117,10 @@ export interface WellsLayerProps extends ExtendedLayerProps {
      *  If given as a number between 0 and 100,  will place name at this percentage of trajectory from top.
      */
     wellNameAtTop: boolean | number;
+    /** It true label position will be auto calculated if possible to be inside view volume at all times.
+     *  default false.
+     */
+    wellNameAutoPosition: boolean;
     wellNameSize: number;
     wellNameColor: Color;
     /**  If true will prevent well name cluttering by not displaying overlapping names.
@@ -157,6 +161,7 @@ const defaultProps = {
     visible: true,
     wellNameVisible: false,
     wellNameAtTop: true,
+    wellNameAutoPosition: false,
     wellNameSize: 14,
     wellNameColor: [0, 0, 0, 255],
     hideOverlappingWellNames: false,
@@ -466,12 +471,13 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                     pi1?.[2] ?? 0 + (pi2?.[2] ?? 0 - (pi1?.[2] ?? 0)) / 2,
                 ];
 
-                const ps = this.project(p);
-
-                if (ps[0] < 0 || ps[0] > w || ps[1] < 0 || ps[1] > h) {
-                    // If the label is outside view/camera, reposition it
-                    percent = percentages.shift() as number;
-                    continue;
+                if (this.props.wellNameAutoPosition) {
+                    const ps = this.project(p);
+                    if (ps[0] < 0 || ps[0] > w || ps[1] < 0 || ps[1] > h) {
+                        // If the label is outside view/camera, reposition it
+                        percent = percentages.shift() as number;
+                        continue;
+                    }
                 }
 
                 const v = new Vector2(p2[0] - p1[0], -(p2[1] - p1[1]));
