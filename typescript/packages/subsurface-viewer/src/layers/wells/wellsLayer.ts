@@ -413,17 +413,20 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         if (data) this.setLegend(data);
     }
 
+    getWellNamePositionAlongTrajectory(wellNameAtTop: boolean | number) {
+        if (typeof wellNameAtTop === "number") {
+            return clamp(Number(wellNameAtTop), 0, 100);
+        }
+        return wellNameAtTop ? 0 : 100;
+    }
+
     // return position for well name and icon
     getAnnotationPosition(
         well_data: Feature,
-        annotation_position: boolean | number,
+        percentage: number,
         view_is_3d: boolean,
         color_accessor: ColorAccessor
     ): Position | null {
-        const percentage =
-            Number(annotation_position) *
-            (typeof annotation_position === "boolean" ? 100 : 1);
-        clamp(percentage, 0, 100);
         if (percentage > 0 && percentage < 100) {
             // Return a pos "name_at_top" percent down the trajectory
             const pos = this.getTrajMidPoint(
@@ -739,7 +742,9 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                     // In 2D prioritize according z height.
                     const labelPosition = this.getAnnotationPosition(
                         d,
-                        this.props.wellNameAtTop,
+                        this.getWellNamePositionAlongTrajectory(
+                            this.props.wellNameAtTop
+                        ),
                         true,
                         this.props.lineStyle?.color
                     );
@@ -764,15 +769,17 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 getPosition: (d: Feature) =>
                     this.getAnnotationPosition(
                         d,
-                        this.props.wellNameAtTop,
+                        this.getWellNamePositionAlongTrajectory(
+                            this.props.wellNameAtTop
+                        ),
                         is3d,
                         this.props.lineStyle?.color
                     ),
                 getAngle: (f: Feature) => {
-                    const percentage = Math.min(
-                        Math.max(0, Number(this.props.wellNameAtTop)),
-                        100
+                    const percentage = this.getWellNamePositionAlongTrajectory(
+                        this.props.wellNameAtTop
                     );
+
                     const a = this.getTrajMidPoint(
                         percentage,
                         f,
