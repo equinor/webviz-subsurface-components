@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/equinor/webviz-subsurface-components/compare/group-tree-plot@1.4.0...group-tree-plot@1.4.1) (2025-02-06)
+
+
+### Bug Fixes
+
+* wellNamePosition behavior is inverted when specifying a boolean ([#2434](https://github.com/equinor/webviz-subsurface-components/issues/2434)) ([3c218d0](https://github.com/equinor/webviz-subsurface-components/commit/3c218d0cb7eec1d44b88ec15b6478de332fcb387)), closes [#2432](https://github.com/equinor/webviz-subsurface-components/issues/2432)
+
 # [1.4.0](https://github.com/equinor/webviz-subsurface-components/compare/group-tree-plot@1.3.24...group-tree-plot@1.4.0) (2025-02-03)
 
 
