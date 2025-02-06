@@ -12,7 +12,7 @@ in vec3 colors;
 
 // Outputs to fragment shader
 out vec2 vTexCoord;
-out vec3 cameraPosition;
+out vec3 cameraPosition_;
 out vec3 normals_commonspace;
 out vec4 position_commonspace;
 out vec4 vColor;
@@ -20,16 +20,14 @@ out vec3 worldPos;
 out float property;
 flat out int vertexIndex;
 
-uniform bool ZIncreasingDownwards;
-
 void main(void) {
    geometry.pickingColor = vec3(1.0, 1.0, 0.0);
    vertexIndex = gl_VertexID;
 
    vec3 position = positions;
-   position[2] *= ZIncreasingDownwards ? -1.0 : 1.0;
+   position[2] *= map.ZIncreasingDownwards ? -1.0 : 1.0;
 
-   cameraPosition = project_uCameraPosition;
+   cameraPosition_ = project.cameraPosition;
 
    worldPos = position;
    geometry.worldPosition = position;
