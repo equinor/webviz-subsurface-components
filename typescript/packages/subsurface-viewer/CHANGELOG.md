@@ -1,3 +1,10 @@
+## [1.8.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.8.0...subsurface-viewer@1.8.1) (2025-02-06)
+
+
+### Bug Fixes
+
+* wellNamePosition behavior is inverted when specifying a boolean ([#2434](https://github.com/equinor/webviz-subsurface-components/issues/2434)) ([3c218d0](https://github.com/equinor/webviz-subsurface-components/commit/3c218d0cb7eec1d44b88ec15b6478de332fcb387)), closes [#2432](https://github.com/equinor/webviz-subsurface-components/issues/2432)
+
 # [1.8.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.7.0...subsurface-viewer@1.8.0) (2025-02-03)
 
 
