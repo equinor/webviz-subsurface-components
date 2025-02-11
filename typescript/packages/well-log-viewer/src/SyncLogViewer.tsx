@@ -14,7 +14,7 @@ import defaultLayout from "./components/DefaultSyncLogViewerLayout";
 
 import type { WellLogSet } from "./components/WellLogTypes";
 import type { Template } from "./components/WellLogTemplateTypes";
-import type { ColorMapFunction } from "./components/ColorMapFunction";
+import type { ColorMapFunction } from "./utils/color-function";
 import { ColorFunctionType } from "./components/CommonPropTypes";
 import type { PatternsTable, Pattern } from "./utils/pattern";
 import { PatternsTableType, PatternsType } from "./components/CommonPropTypes";
@@ -32,7 +32,8 @@ import type {
 import type { WellLogSpacerOptions } from "./components/WellLogSpacer";
 import { getWellPicks } from "./components/WellLogView";
 
-import { getAvailableAxes, toggleId } from "./utils/tracks";
+import { toggleId } from "./utils/arrays";
+import { getAvailableAxes } from "./utils/well-log";
 
 import { checkMinMax } from "./utils/minmax";
 

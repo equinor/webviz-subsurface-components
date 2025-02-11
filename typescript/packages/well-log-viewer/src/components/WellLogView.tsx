@@ -29,17 +29,18 @@ import type { WellLogCurve, WellLogSet } from "./WellLogTypes";
 
 import type { Template } from "./WellLogTemplateTypes";
 import { TemplateType } from "./CommonPropTypes";
-import type { ColorMapFunction } from "./ColorMapFunction";
+import type { ColorMapFunction } from "../utils/color-function";
 import { ColorFunctionType } from "./CommonPropTypes";
 import type { PatternsTable, Pattern } from "../utils/pattern";
 import { PatternsTableType, PatternsType } from "./CommonPropTypes";
 import { isEqualRanges } from "../utils/log-viewer";
 
-import { getDiscreteColorAndName, getDiscreteMeta } from "../utils/tracks";
+import { getDiscreteMeta } from "../utils/well-log";
+import { getDiscreteColorAndName } from "../utils/well-log";
 import { createTracks } from "../utils/tracks";
 import { getScaleTrackNum } from "../utils/tracks";
-import type { AxesInfo } from "../utils/tracks";
-import type { ExtPlotOptions } from "../utils/tracks";
+import type { AxesInfo } from "../utils/axes";
+import type { ExtPlotOptions } from "../utils/plots";
 import { getTrackTemplate } from "../utils/tracks";
 import { isScaleTrack } from "../utils/tracks";
 import { deepCopy } from "../utils/deepcopy";
@@ -50,8 +51,8 @@ import {
     addOrEditStackedTrack,
     removeGraphTrackPlot,
 } from "../utils/tracks";
-import { getPlotType } from "../utils/tracks";
-import { getAvailableAxes } from "../utils/tracks";
+import { getPlotType } from "../utils/plots";
+import { getAvailableAxes } from "../utils/well-log";
 
 import type { TemplatePlot, TemplateTrack } from "./WellLogTemplateTypes";
 

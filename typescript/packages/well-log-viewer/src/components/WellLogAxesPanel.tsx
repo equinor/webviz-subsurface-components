@@ -2,7 +2,7 @@ import React, { Component } from "react";
 
 import AxisSelector from "./AxisSelector";
 
-import { getAvailableAxes } from "../utils/tracks";
+import { getAvailableAxes } from "../utils/well-log";
 
 import type { CallbackManager } from "./CallbackManager";
 import type { WellLogSet } from "./WellLogTypes";

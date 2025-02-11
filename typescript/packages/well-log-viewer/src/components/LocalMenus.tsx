@@ -9,7 +9,7 @@ import type { DifferentialPlotLegendInfo } from "@equinor/videx-wellog/dist/plot
 
 import type WellLogView from "./WellLogView";
 
-import type { ExtPlotOptions } from "../utils/tracks";
+import type { ExtPlotOptions } from "../utils/plots";
 import { isScaleTrack } from "../utils/tracks";
 
 import Menu from "@mui/material/Menu";

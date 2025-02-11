@@ -21,7 +21,8 @@ import type {
 } from "./components/WellLogView";
 import type WellLogView from "./components/WellLogView";
 
-import { getAvailableAxes, toggleId } from "./utils/tracks";
+import { toggleId } from "./utils/arrays";
+import { getAvailableAxes } from "./utils/well-log";
 
 import { onTrackMouseEventDefault } from "./utils/edit-track";
 
