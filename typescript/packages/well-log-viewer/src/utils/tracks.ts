@@ -96,6 +96,14 @@ function indexOfElementByNames(array: Named[], names: string[]): number {
     return -1;
 }
 
+export function elementByName<T extends Named>(
+    namedArr: T[],
+    name: string
+): T | undefined {
+    const idx = indexOfElementByName(namedArr, name);
+    return namedArr[idx];
+}
+
 const __colors = [
     "red",
     "blue",
@@ -269,50 +277,55 @@ function isValidPlotType(plotType: string): boolean {
     );
 }
 
-function getTemplatePlotProps(
+function mergePlotAndStyle(
     templatePlot: TemplatePlot,
     templateStyles?: TemplateStyle[]
-): TemplatePlotProps {
-    const iStyle =
-        templatePlot.style && templateStyles
-            ? indexOfElementByName(templateStyles, templatePlot.style)
-            : -1;
-    const options =
-        iStyle >= 0 && templateStyles
-            ? { ...templateStyles[iStyle], ...templatePlot }
-            : { ...templatePlot };
-    if (!options.type) options.type = defPlotType;
-    if (!isValidPlotType(options.type)) {
+): TemplatePlot {
+    if (!templateStyles || !templatePlot.style) return { ...templatePlot };
+
+    const style = elementByName(templateStyles, templatePlot.style) ?? {};
+
+    return { ...style, ...templatePlot };
+}
+
+function applyTemplateStyle(
+    templatePlot: TemplatePlot,
+    templateStyles?: TemplateStyle[]
+): TemplatePlot {
+    const styledTemplate = mergePlotAndStyle(templatePlot, templateStyles);
+
+    if (!styledTemplate.type) styledTemplate.type = defPlotType;
+    if (!isValidPlotType(styledTemplate.type)) {
         console.error(
             "unknown plot type '" +
-                options.type +
+                styledTemplate.type +
                 "': use default type '" +
                 defPlotType +
                 "'"
         );
-        options.type = defPlotType;
+        styledTemplate.type = defPlotType;
     }
-    if (options.type !== "stacked") {
-        if (!options.color) options.color = generateColor();
+    if (styledTemplate.type !== "stacked") {
+        if (!styledTemplate.color) styledTemplate.color = generateColor();
     }
 
-    if (options.type === "area") {
-        if (!options.fill) {
-            //options.fill = generateColor();
-            options.fillOpacity = 0.0;
+    if (styledTemplate.type === "area") {
+        if (!styledTemplate.fill) {
+            //styledTemplate.fill = generateColor();
+            styledTemplate.fillOpacity = 0.0;
         }
-    } else if (options.type === "gradientfill") {
-        if (!options.colorMapFunctionName) {
-            //options.fill = generateColor();
-            options.fillOpacity = 0.0;
+    } else if (styledTemplate.type === "gradientfill") {
+        if (!styledTemplate.colorMapFunctionName) {
+            //styledTemplate.fill = generateColor();
+            styledTemplate.fillOpacity = 0.0;
         }
-    } else if (options.type === "differential") {
+    } else if (styledTemplate.type === "differential") {
         // "differential" plot
-        if (!options.fill) options.fill = generateColor();
-        if (!options.color2) options.color2 = generateColor();
-        if (!options.fill2) options.fill2 = generateColor();
+        if (!styledTemplate.fill) styledTemplate.fill = generateColor();
+        if (!styledTemplate.color2) styledTemplate.color2 = generateColor();
+        if (!styledTemplate.fill2) styledTemplate.fill2 = generateColor();
     }
-    return options;
+    return styledTemplate;
 }
 
 function isStackedTrack(
@@ -604,23 +617,24 @@ function addGraphTrackPlot(
     const plots = track.plots;
 
     if (plotFactory && wellLog.length) {
-        const plotSetup = setupPlot(wellLog, templatePlot.name, axes);
+        // Make full props
+        const styledTemplatePlot = applyTemplateStyle(
+            templatePlot,
+            /*templateStyles*/ []
+        );
+
+        const plotSetup = setupPlot(wellLog, styledTemplatePlot, axes);
 
         if (!plotSetup) return minmaxPrimaryAxis;
 
         const { plotData, curve, iCurve, minmax, iSet } = plotSetup;
-        const plotSetup2 = maybeSetupPlot2(wellLog, templatePlot, axes);
+        const plotSetup2 = setupPlot(wellLog, styledTemplatePlot, axes, true);
 
         checkSetupMinMax(plotSetup, plotSetup2, minmaxPrimaryAxis);
 
-        // Make full props
-        const templatePlotProps = getTemplatePlotProps(
-            templatePlot,
-            /*templateStyles*/ []
-        );
         const p = getPlotConfig(
             `${iSet}-${iCurve}`,
-            templatePlotProps,
+            styledTemplatePlot,
             templateTrack.scale,
             minmax,
             curve,
@@ -641,7 +655,7 @@ function addGraphTrackPlot(
         const plot = createPlot(p, track.trackScale);
         if (plot) {
             plots.push(plot);
-            templateTrack.plots.push(templatePlot);
+            templateTrack.plots.push(styledTemplatePlot);
             updateGraphTrackScale(track);
             track.prepareData();
         }
@@ -669,25 +683,26 @@ function editGraphTrackPlot(
     const plots = track.plots;
 
     if (plotFactory && wellLog.length) {
-        const plotSetup = setupPlot(wellLog, templatePlot.name, axes);
+        // Make full props
+        const styledTemplatePlot = applyTemplateStyle(
+            templatePlot,
+            /*templateStyles*/ []
+        );
+
+        const plotSetup = setupPlot(wellLog, styledTemplatePlot, axes);
 
         if (!plotSetup) return minmaxPrimaryAxis;
 
         const { plotData, curve, iCurve, iSet, minmax } = plotSetup;
-        const plotSetup2 = maybeSetupPlot2(wellLog, templatePlot, axes);
+        const plotSetup2 = setupPlot(wellLog, styledTemplatePlot, axes, true);
 
         checkSetupMinMax(plotSetup, plotSetup2, minmaxPrimaryAxis);
 
         const colorMapFunctions = wellLogView.props.colorMapFunctions;
 
-        // Make full props
-        const templatePlotProps = getTemplatePlotProps(
-            templatePlot,
-            /*templateStyles*/ []
-        );
         const p = getPlotConfig(
             `${iSet}-${iCurve}`,
-            templatePlotProps,
+            styledTemplatePlot,
             templateTrack.scale,
             minmax,
             curve,
@@ -712,7 +727,7 @@ function editGraphTrackPlot(
             const plotNew = createPlot(p, track.trackScale);
             if (plotNew) {
                 plots[iPlot] = plotNew; // replace plot
-                templateTrack.plots[iPlot] = templatePlot;
+                templateTrack.plots[iPlot] = styledTemplatePlot;
                 updateGraphTrackScale(track);
                 track.prepareData();
             }
@@ -1171,11 +1186,15 @@ type PlotSetup = {
 
 function setupPlot(
     wellLog: WellLogSet[],
-    plotName: string,
-    axesInfo: AxesInfo
+    templatePlot: TemplatePlot,
+    axesInfo: AxesInfo,
+    useSecondCurve?: boolean
 ): PlotSetup | null {
-    const { iCurve, iSet } = findSetAndCurveIndex(wellLog, plotName);
+    const curveName = useSecondCurve ? templatePlot.name2 : templatePlot.name;
+    if (useSecondCurve && templatePlot.type !== "differential") return null;
+    if (!curveName) return null;
 
+    const { iCurve, iSet } = findSetAndCurveIndex(wellLog, curveName);
     if (iCurve < 0) return null;
 
     const sourceLogSet = wellLog[iSet];
@@ -1185,7 +1204,8 @@ function setupPlot(
     const dimensions = curve.dimensions ?? 1;
 
     if (dimensions !== 1) return null;
-    if (curve.valueType === "string") return null;
+    if (curve.valueType === "string" && templatePlot.type !== "stacked")
+        return null;
 
     const axisIndices = getAxisIndices(sourceLogSet.curves, axesInfo);
     const plotData = preparePlotData(data, iCurve, axisIndices.primary);
@@ -1199,15 +1219,6 @@ function setupPlot(
         plotData,
         minmax,
     };
-}
-
-function maybeSetupPlot2(
-    wellLog: WellLogSet[],
-    templatePlot: TemplatePlot,
-    axesInfo: AxesInfo
-): PlotSetup | null {
-    if (templatePlot.type !== "differential") return null;
-    else return setupPlot(wellLog, templatePlot.name2 as string, axesInfo);
 }
 
 function checkSetupMinMax(
@@ -1238,25 +1249,29 @@ function addGraphTrack(
 
     if (templateTrack.plots)
         for (const templatePlot of templateTrack.plots) {
-            const plotSetup = setupPlot(wellLog, templatePlot.name, axesInfo);
-
-            if (!plotSetup) continue; // Plot couldnt be set up, skip adding this track
-            const { plotData, curve, minmax, iCurve, iSet } = plotSetup;
-
-            const plotSetup2 = maybeSetupPlot2(wellLog, templatePlot, axesInfo);
-
-            // Apply min-max index values to entire track
-            checkSetupMinMax(plotSetup, plotSetup2, info.minmaxPrimaryAxis);
-
-            // make full props
-            const templatePlotProps = getTemplatePlotProps(
+            const styledTemplatePlot = applyTemplateStyle(
                 templatePlot,
                 templateStyles
             );
 
+            const plotSetup = setupPlot(wellLog, styledTemplatePlot, axesInfo);
+
+            if (!plotSetup) continue; // Plot couldnt be set up, skip adding this track
+            const { plotData, curve, minmax, iCurve, iSet } = plotSetup;
+
+            const plotSetup2 = setupPlot(
+                wellLog,
+                styledTemplatePlot,
+                axesInfo,
+                true
+            );
+
+            // Apply min-max index values to entire track
+            checkSetupMinMax(plotSetup, plotSetup2, info.minmaxPrimaryAxis);
+
             const p = getPlotConfig(
                 `${iSet}-${iCurve}`,
-                templatePlotProps,
+                styledTemplatePlot,
                 templateTrack.scale,
                 minmax,
                 curve,
@@ -1299,23 +1314,21 @@ function addStackedTrack(
     colorMapFunctions?: ColorMapFunction[]
 ): void {
     const templatePlot = templateTrack.plots[0];
-    const name = templatePlot.name;
-    const plotSetup = setupPlot(wellLog, name, axesInfo);
+    const styledTemplatePlot = applyTemplateStyle(templatePlot, templateStyles);
+
+    const name = styledTemplatePlot.name;
+
+    const plotSetup = setupPlot(wellLog, styledTemplatePlot, axesInfo);
 
     if (!plotSetup) return;
     const { plotData, curve, sourceLogSet } = plotSetup;
 
-    // make full props
-    const templatePlotProps = getTemplatePlotProps(
-        templatePlot,
-        templateStyles
-    );
     const templateTrackFullPlot = deepCopy(templateTrack);
     const label = makeTrackHeader([curve], templateTrack);
     const meta = getDiscreteMeta(sourceLogSet, name);
 
     templateTrackFullPlot.title = label;
-    templateTrackFullPlot.plots[0].type = templatePlotProps.type;
+    templateTrackFullPlot.plots[0].type = styledTemplatePlot.type;
 
     // curve.valueType could be "integer", "string"
 
@@ -1327,23 +1340,23 @@ function addStackedTrack(
         );
 
     let colorMapFunction: ColorMapFunction | undefined = undefined;
-    if (templatePlotProps.colorMapFunctionName) {
+    if (styledTemplatePlot.colorMapFunctionName) {
         if (colorMapFunctions) {
             colorMapFunction = colorMapFunctions.find(
                 (colorMapFunction) =>
                     colorMapFunction.name ===
-                    templatePlotProps.colorMapFunctionName
+                    styledTemplatePlot.colorMapFunctionName
             );
             if (!colorMapFunction)
                 console.error(
                     "Missed '" +
-                        templatePlotProps.colorMapFunctionName +
+                        styledTemplatePlot.colorMapFunctionName +
                         "' color function/table"
                 );
         } else {
             console.error(
                 "No color function/table array given for '" +
-                    templatePlotProps.colorMapFunctionName +
+                    styledTemplatePlot.colorMapFunctionName +
                     "' color function"
             );
         }
@@ -1357,9 +1370,9 @@ function addStackedTrack(
 
     const plot = templateTrackFullPlot.plots[0];
     if (plot) {
-        plot.showLabels = templatePlotProps.showLabels;
-        plot.showLines = templatePlotProps.showLines;
-        plot.labelRotation = templatePlotProps.labelRotation ?? 0;
+        plot.showLabels = styledTemplatePlot.showLabels;
+        plot.showLines = styledTemplatePlot.showLines;
+        plot.labelRotation = styledTemplatePlot.labelRotation ?? 0;
     }
 
     const options: StackedTrackOptions = {
@@ -1507,22 +1520,18 @@ export function addOrEditStackedTrack(
     bAfter: boolean
 ): StackedTrack | null {
     const props = wellLogView.props;
+    const templateStyles = props.template.styles;
     const wellLog = wellLogView.wellLogSets;
     const templatePlot = templateTrack.plots[0];
 
     if (!wellLog || !templatePlot) return null;
 
-    const name = templatePlot.name;
-    const templateStyles = props.template.styles;
-    // make full props
-    const templatePlotProps = getTemplatePlotProps(
-        templatePlot,
-        templateStyles
-    );
+    const fullTemplatePlot = applyTemplateStyle(templatePlot, templateStyles);
+    const name = fullTemplatePlot.name;
 
     const colorMapFunctionName = props.colorMapFunctions?.find(
         (colorMapFunction) =>
-            colorMapFunction.name === templatePlotProps.colorMapFunctionName
+            colorMapFunction.name === fullTemplatePlot.colorMapFunctionName
     );
 
     const { iCurve, iSet } = findSetAndCurveIndex(wellLog, name);

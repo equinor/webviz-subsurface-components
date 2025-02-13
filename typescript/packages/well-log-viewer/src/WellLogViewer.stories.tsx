@@ -396,8 +396,38 @@ export const Discrete: StoryObj<typeof StoryTemplate> = {
     args: {
         //id: "Well-Log-Viewer-Discrete",
         horizontal: false,
-        welllog: require("../../../../example-data/volve_logs.json")[0], // eslint-disable-line
-        template: template,
+        wellLogSets: [
+            {
+                ...wellLogs[0],
+                // Inject a curve with a "string" valuetype, to showcase that's a thing
+                curves: [
+                    ...wellLogs[0].curves,
+                    {
+                        name: "STRING_CURVE",
+                        description:
+                            "A discrete curve with a string value type",
+                        quantity: "DISC",
+                        unit: "DISC",
+                        valueType: "string",
+                        dimensions: 1,
+                    },
+                ],
+                data: wellLogs[0].data.map((d) => {
+                    if ((d[0] as number) <= 3900) return [...d, "FOO"];
+                    else return [...d, "BAR"];
+                }),
+            },
+        ],
+        template: {
+            ...template,
+            tracks: [
+                {
+                    title: "string discrete",
+                    plots: [{ name: "STRING_CURVE", style: "discrete" }],
+                },
+                ...template.tracks,
+            ],
+        },
         colorMapFunctions: exampleColorMapFunctions,
         wellpick: wellpick,
         axisTitles: axisTitles,
