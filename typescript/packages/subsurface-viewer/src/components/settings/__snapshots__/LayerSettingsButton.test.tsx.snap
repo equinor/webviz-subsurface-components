@@ -1,10 +1,147 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`test layers settings button snapshot test 1`] = `
+.c6 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  -webkit-align-items: flex-end;
+  -webkit-box-align: flex-end;
+  -ms-flex-align: flex-end;
+  align-items: flex-end;
+  position: relative;
+  margin: 0;
+  color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+  font-family: Equinor;
+  font-size: 0.750rem;
+  font-weight: 500;
+  line-height: 1.333em;
+  text-align: left;
+  margin-left: 8px;
+  margin-right: 8px;
+  color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+}
+
+.c7 {
+  margin: 0;
+}
+
 .c0 {
   -webkit-transform: none;
   -ms-transform: none;
   transform: none;
+}
+
+.c2 {
+  background: var(--eds_ui_background__default,rgba(255,255,255,1));
+  box-shadow: 0 1px 5px rgba(0,0,0,0.2),0 3px 4px rgba(0,0,0,0.12),0 2px 4px rgba(0,0,0,0.14);
+}
+
+.c4 {
+  position: relative;
+  list-style: none;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  margin: 0;
+  padding-left: 0px;
+  padding-top: 8px;
+  padding-right: 0px;
+  padding-bottom: 8px;
+}
+
+.c4 li:first-child {
+  z-index: 3;
+}
+
+.c3 {
+  width: 100%;
+  min-width: -webkit-fit-content;
+  min-width: -moz-fit-content;
+  min-width: fit-content;
+  border-radius: 4px;
+}
+
+.c1 {
+  inset: unset;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  overflow: visible;
+  background-color: transparent;
+}
+
+.c1::backdrop {
+  background-color: transparent;
+}
+
+.c5 {
+  min-width: 100px;
+  width: 100%;
+}
+
+.c8 {
+  border: none;
+  border-radius: 0;
+  box-shadow: inset 0 -1px 0 0 var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+  margin: 0;
+  color: var(--eds_text__static_icons__default,rgba(61,61,61,1));
+  font-family: Equinor;
+  font-size: 1.000rem;
+  font-weight: 400;
+  line-height: 1.500em;
+  -webkit-letter-spacing: 0.025em;
+  -moz-letter-spacing: 0.025em;
+  -ms-letter-spacing: 0.025em;
+  letter-spacing: 0.025em;
+  text-align: left;
+  padding-left: 8px;
+  padding-top: 6px;
+  padding-right: 8px;
+  padding-bottom: 6px;
+  padding-right: calc(8px *2 + 24px);
+  display: block;
+  margin: 0;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%236f6f6f' d='M7 9.5l5 5 5-5H7z'/%3E%3C/svg%3E"),linear-gradient( to bottom,var(--eds_ui_background__light,rgba(247,247,247,1)) 0%,var(--eds_ui_background__light,rgba(247,247,247,1)) 100% );
+  background-repeat: no-repeat,repeat;
+  background-position: right 8px top 50%;
+  width: 100%;
+}
+
+.c8:active,
+.c8:focus {
+  box-shadow: none;
+  outline: 2px solid var(--eds_interactive_primary__resting,rgba(0,112,121,1));
+  outline-offset: 0px;
+}
+
+.c8:disabled {
+  color: var(--eds_interactive__disabled__text,rgba(190,190,190,1));
+  background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23bebebe' d='M7 9.5l5 5 5-5H7z'/%3E%3C/svg%3E"),linear-gradient( to bottom,var(--eds_ui_background__light,rgba(247,247,247,1)) 0%,var(--eds_ui_background__light,rgba(247,247,247,1)) 100% );
+  cursor: not-allowed;
+  box-shadow: none;
+  outline: none;
+}
+
+.c8:disabled .arrow-icon {
+  fill: red;
+}
+
+.c8:disabled:focus,
+.c8:disabled:active {
+  outline: none;
 }
 
 <div
@@ -37,5 +174,57 @@ exports[`test layers settings button snapshot test 1`] = `
       class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
     />
   </button>
+  <div
+    class="c1"
+    data-floating-ui-focusable=""
+    popover="manual"
+    style="position: absolute; top: 0px; left: 0px;"
+    tabindex="-1"
+  >
+    <div
+      class="c2 c3 LayerSettingsButton-menu"
+    >
+      <div
+        aria-labelledby="drawing-layer-button"
+        class="c4"
+        role="menu"
+      >
+        <div
+          class="c5"
+        >
+          <label
+            class="c6"
+            for="drawing-layer-mode-selector"
+          >
+            <span
+              class="c7"
+            >
+              Draw mode
+            </span>
+          </label>
+          <select
+            class="c8"
+            id="drawing-layer-mode-selector"
+          >
+            <option>
+              View
+            </option>
+            <option>
+              Edit
+            </option>
+            <option>
+              Create point
+            </option>
+            <option>
+              Create polyline
+            </option>
+            <option>
+              Create polygon
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 `;
