@@ -1,3 +1,10 @@
+## [2.3.2](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@2.3.1...well-log-viewer@2.3.2) (2025-02-13)
+
+
+### Bug Fixes
+
+* Fixed string type logs not being rendered ([#2440](https://github.com/equinor/webviz-subsurface-components/issues/2440)) ([90acb69](https://github.com/equinor/webviz-subsurface-components/commit/90acb693fc467b98f73a63377a1a125ce7b66898))
+
 ## [2.3.1](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@2.3.0...well-log-viewer@2.3.1) (2025-02-06)
 
 
