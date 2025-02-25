@@ -1,3 +1,10 @@
+## [2.3.3](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@2.3.2...well-log-viewer@2.3.3) (2025-02-25)
+
+
+### Bug Fixes
+
+* bump @equinor/videx-wellog from 0.10.6 to 0.10.9 in /typescript ([#2446](https://github.com/equinor/webviz-subsurface-components/issues/2446)) ([554e258](https://github.com/equinor/webviz-subsurface-components/commit/554e258d08a257d4c18eb6c2693dfc73cb75f81c)), closes [equinor/videx-wellog#286](https://github.com/equinor/videx-wellog/issues/286) [equinor/videx-wellog#288](https://github.com/equinor/videx-wellog/issues/288) [equinor/videx-wellog#291](https://github.com/equinor/videx-wellog/issues/291) [equinor/videx-wellog#292](https://github.com/equinor/videx-wellog/issues/292) [equinor/videx-wellog#293](https://github.com/equinor/videx-wellog/issues/293)
+
 ## [2.3.2](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@2.3.1...well-log-viewer@2.3.2) (2025-02-13)
 
 
