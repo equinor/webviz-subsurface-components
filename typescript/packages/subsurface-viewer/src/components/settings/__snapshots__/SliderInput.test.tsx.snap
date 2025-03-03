@@ -10,6 +10,10 @@ exports[`Test Slider Input snapshot test 1`] = `
   -webkit-justify-content: space-between;
   -ms-flex-pack: justify;
   justify-content: space-between;
+  -webkit-align-items: flex-end;
+  -webkit-box-align: flex-end;
+  -ms-flex-align: flex-end;
+  align-items: flex-end;
   position: relative;
   margin: 0;
   color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
