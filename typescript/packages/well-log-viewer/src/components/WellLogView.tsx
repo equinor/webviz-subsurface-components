@@ -1,79 +1,83 @@
-/* eslint-disable react/prop-types */
+import "./styles.scss";
+
+import { select } from "d3";
 import type { ReactNode } from "react";
 import React, { Component } from "react";
 import { createRoot } from "react-dom/client";
-import { LogViewer } from "@equinor/videx-wellog";
-
 import PropTypes from "prop-types";
 
-import type { ScaleInterpolator } from "@equinor/videx-wellog";
-import { InterpolatedScaleHandler } from "@equinor/videx-wellog";
-
-import type { Track, GraphTrack, StackedTrack } from "@equinor/videx-wellog";
-import type { Plot } from "@equinor/videx-wellog";
-
+import { LogViewer } from "@equinor/videx-wellog";
+import type { ScaleInterpolator, Plot, Track } from "@equinor/videx-wellog";
 import type {
     OverlayClickEvent,
-    OverlayMouseMoveEvent,
     OverlayMouseExitEvent,
+    OverlayMouseMoveEvent,
     OverlayRescaleEvent,
 } from "@equinor/videx-wellog/dist/ui/interfaces";
-
-import "./styles.scss";
-
+import type { DifferentialPlotOptions } from "@equinor/videx-wellog/dist/plots/interfaces";
+import type { DifferentialPlotLegendInfo } from "@equinor/videx-wellog/dist/plots/legend/interfaces";
 import { validateSchema } from "@webviz/wsc-common";
 
-import { select } from "d3";
-
-import type { WellLogCurve, WellLogSet } from "./WellLogTypes";
-
-import type { Template } from "./WellLogTemplateTypes";
-import { TemplateType } from "./CommonPropTypes";
-import type { ColorMapFunction } from "../utils/color-function";
-import { ColorFunctionType } from "./CommonPropTypes";
-import type { PatternsTable, Pattern } from "../utils/pattern";
-import { PatternsTableType, PatternsType } from "./CommonPropTypes";
-import { isEqualRanges } from "../utils/log-viewer";
-
-import { getDiscreteMeta } from "../utils/well-log";
-import { getDiscreteColorAndName } from "../utils/well-log";
-import { createTracks } from "../utils/tracks";
-import { getScaleTrackNum } from "../utils/tracks";
 import type { AxesInfo } from "../utils/axes";
-import type { ExtPlotOptions } from "../utils/plots";
-import { getTrackTemplate } from "../utils/tracks";
-import { isScaleTrack } from "../utils/tracks";
+import type { ColorMapFunction } from "../utils/color-function";
 import { deepCopy } from "../utils/deepcopy";
-
 import {
-    addOrEditGraphTrack,
-    addOrEditGraphTrackPlot,
-    addOrEditStackedTrack,
-    removeGraphTrackPlot,
-} from "../utils/tracks";
-import { getPlotType } from "../utils/plots";
-import { getAvailableAxes } from "../utils/well-log";
-
-import type { TemplatePlot, TemplateTrack } from "./WellLogTemplateTypes";
-
-import {
-    removeOverlay,
-    zoomContent,
-    scrollContentTo,
-    zoomContentTo,
-    setContentBaseDomain,
+    createNewViewTrack,
+    adjustControllerToModifiedTrack,
+    getTrackIndex,
+    setUpScaleInterpolator,
     getContentBaseDomain,
     getContentDomain,
     getContentZoom,
-    scrollTracksTo,
-    isTrackSelected,
-    selectTrack,
     getSelectedTrackIndices,
+    isTrackSelected,
+    removeOverlay,
+    scrollContentTo,
+    scrollTracksTo,
+    selectTrack,
+    setContentBaseDomain,
     setSelectedTrackIndices,
+    zoomContent,
+    zoomContentTo,
+    editViewTrack,
+    removeViewTrack,
 } from "../utils/log-viewer";
+import { isEqualRanges } from "../utils/arrays";
+import type { Pattern, PatternsTable } from "../utils/pattern";
+import type { ExtPlotOptions } from "../utils/plots";
+import { getPlotType } from "../utils/plots";
+import {
+    addPlotToTrack,
+    createWellLogTracks,
+    editTrackPlot,
+    getScaleTrackNum,
+    getTrackTemplate,
+    isScaleTrack,
+    removeTrackPlot,
+} from "../utils/tracks";
+import { getStyledTemplateTracks } from "../utils/template";
+import {
+    getDiscreteColorAndName,
+    getDiscreteMeta,
+    getAvailableAxes,
+    getWellLogSetsFromProps,
+} from "../utils/well-log";
 
+import {
+    ColorFunctionType,
+    PatternsTableType,
+    PatternsType,
+    TemplateType,
+} from "./CommonPropTypes";
 import type { Info } from "./InfoTypes";
-import { getWellLogSetsFromProps } from "../utils/well-log";
+import { PlotPropertiesDialog } from "./PlotDialog";
+import { TrackPropertiesDialog } from "./TrackDialog";
+import type { WellLogCurve, WellLogSet } from "./WellLogTypes";
+import type {
+    Template,
+    TemplatePlot,
+    TemplateTrack,
+} from "./WellLogTemplateTypes";
 
 const rubberBandSize = 9;
 const rubberBandOffset = rubberBandSize / 2;
@@ -648,7 +652,6 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
 
                     if (pattern !== undefined) {
                         const imageIndex = pattern[1];
-                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                         const patternImage = patternImages![imageIndex];
                         pin.append("div")
                             .classed("wellpick-pattern", true) // for CSS customization
@@ -682,77 +685,33 @@ function initOverlays(instance: LogViewer, parent: WellLogView) {
     addWellPickOverlay(instance, parent);
 }
 
-function createInterpolator(from: Float32Array, to: Float32Array) {
-    // 'from' array could be non monotonous (TVD) so we could not use binary search!
-
-    // Calculate linear interpolation factor between the nodes
-    const mul = new Float32Array(from.length);
-    const n = from.length;
-    for (let i = 0; i < n; i++) {
-        if (!i) mul[i] = 0;
-        else {
-            const d = from[i] - from[i - 1];
-            mul[i] = d ? (to[i] - to[i - 1]) / d : 1.0;
-        }
-    }
-
-    return (x: number, expand: boolean): number => {
-        for (let i = 0; i < n; i++) {
-            if (x < from[i]) {
-                if (!i) return expand ? to[0] : Number.NaN;
-                return (x - from[i]) * mul[i] + to[i];
-            }
-        }
-        return expand ? to[n ? n - 1 : 0] : Number.NaN;
-    };
-}
-
-function createScaleInterpolator(
-    primaries: Float32Array,
-    secondaries: Float32Array
-): ScaleInterpolator {
-    const primary2secondary = createInterpolator(primaries, secondaries);
-    const secondary2primary = createInterpolator(secondaries, primaries);
-
-    const forward = (v: number): number => {
-        // SecondaryAxis => PrimaryAxis
-        return secondary2primary(v, false);
-    };
-    const reverse = (v: number): number => {
-        // PrimaryAxis => SecondaryAxis
-        return primary2secondary(v, false);
-    };
-    return {
-        forward,
-        reverse,
-        forwardInterpolatedDomain: (domain: number[]) =>
-            domain.map((v) => secondary2primary(v, true)),
-        reverseInterpolatedDomain: (domain: number[]) =>
-            domain.map((v) => primary2secondary(v, true)),
-    };
-}
-
 function setTracksToController(
     logController: LogViewer,
     axes: AxesInfo,
     wellLogSets: WellLogSet[], // JSON Log Format
-    template: Template, // JSON
+    templateTracks: TemplateTrack[], // JSON
     colorMapFunctions: ColorMapFunction[] // JS code array or JSON file for pure color tables array without color functions elements
 ): ScaleInterpolator {
-    const { tracks, minmaxPrimaryAxis, primaries, secondaries } = createTracks(
+    const { tracks, minmaxPrimaryAxis: minmaxPrimaryAxis } =
+        createWellLogTracks(
         wellLogSets,
         axes,
-        template.tracks,
-        template.styles,
+            templateTracks,
         colorMapFunctions
     );
     logController.reset();
-    const scaleInterpolator = createScaleInterpolator(primaries, secondaries);
-    logController.scaleHandler = new InterpolatedScaleHandler(
-        scaleInterpolator
+
+    const scaleInterpolator = setUpScaleInterpolator(
+        logController,
+        // ! We assume each set has the same index curves, so we just use the first one
+        wellLogSets[0],
+        axes
     );
+
     setContentBaseDomain(logController, minmaxPrimaryAxis);
+
     logController.setTracks(tracks);
+
     return scaleInterpolator;
 }
 
@@ -805,11 +764,6 @@ function addTrackMouseEventHandlers(
                 );
     }
 }
-
-import { PlotPropertiesDialog } from "./PlotDialog";
-import { TrackPropertiesDialog } from "./TrackDialog";
-import type { DifferentialPlotLegendInfo } from "@equinor/videx-wellog/dist/plots/legend/interfaces";
-import type { DifferentialPlotOptions } from "@equinor/videx-wellog/dist/plots/interfaces";
 
 function addPlot(
     parent: HTMLElement,
@@ -1424,8 +1378,7 @@ class WellLogView
             this.wellLogSets = getWellLogSetsFromProps(this.props);
         }
         if (this.props.template !== prevProps.template) {
-            if (this.props.template)
-                this.template = deepCopy(this.props.template); // save external template content to current
+            this.setTemplate(this.props.template, true);
             shouldSetTracks = true;
             checkSchema = true;
         }
@@ -1850,14 +1803,27 @@ class WellLogView
         return this.props.wellLogSets ?? this.props.welllog;
     }
 
-    getWellLogSets(): WellLogSet[] | WellLogSet | undefined {
-        return this.props.wellLogSets ?? this.props.welllog;
+    getWellLogSets(): WellLogSet[] | undefined {
+        if (this.props.wellLogSets) return this.props.wellLogSets;
+        if (Array.isArray(this.props.welllog)) return this.props.welllog;
+        if (this.props.welllog) return [this.props.welllog];
+
+        return undefined;
     }
 
     getTemplate(): Template {
         return this.template;
     }
-    setTemplate(template: Template): void {
+
+    getStyledTemplate(): Template {
+        return {
+            ...this.template,
+            tracks: getStyledTemplateTracks(this.template),
+            styles: [],
+        };
+    }
+
+    setTemplate(template: Template, noEmit?: boolean): void {
         const tNew = JSON.stringify(template);
         const t = JSON.stringify(this.template);
         if (t !== tNew) {
@@ -1890,89 +1856,64 @@ class WellLogView
         };
     }
 
-    // editting
-    _addTrack(trackCurrent: Track, templateTrack: TemplateTrack): void {
-        templateTrack.required = true; // user's tracks could be empty
-        const bAfter = true;
+    // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+    // Track management -- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+    _addTrack(clickedTrack: Track, templateTrack: TemplateTrack): void {
+        if (!this.logController)
+            return console.warn("Log controller not initialized");
 
-        let trackNew: Track | null;
-        if (
-            templateTrack.plots &&
-            templateTrack.plots[0] &&
-            templateTrack.plots[0].type === "stacked"
-        ) {
-            trackNew = addOrEditStackedTrack(
-                this,
-                null,
+        // User's track might be empty, but we should show it regardless
+        templateTrack.required = true;
+
+        const iClickedTrack = getTrackIndex(this.logController, clickedTrack);
+        // Always add the new track to the right of the one that was clicked
+        const iNewTrack = iClickedTrack + 1;
+
+        const newTrack = createNewViewTrack(
+            this.logController,
                 templateTrack,
-                trackCurrent,
-                bAfter
-            );
-        } else {
-            trackNew = addOrEditGraphTrack(
-                this,
-                null,
-                templateTrack,
-                trackCurrent,
-                bAfter
-            );
-        }
-        if (trackNew) {
+            iNewTrack,
+            this.getAxesInfo(),
+            this.getWellLogSets() ?? []
+        );
+
+        if (!newTrack) return;
             this.onTemplateChanged();
 
-            if (bAfter)
-                // force new track to be visible when added after the current
+        this.selectTrack(newTrack, true);
+        // Scroll one step, to make sure the newly created one stays in view
                 this.scrollTrackBy(+1);
-            else {
                 this.onTrackScroll();
-                this.updateInfo();
-            }
-            this.selectTrack(trackNew, true);
-        }
     }
 
-    _editTrack(track: Track, templateTrack: TemplateTrack): void {
-        let titleCompare: number;
-        if (!templateTrack.title) {
-            titleCompare = track.options.label ? 1 : 0;
-        } else if (track.options.label) {
-            titleCompare = track.options.label.localeCompare(
-                templateTrack.title
-            );
-        } else {
-            titleCompare = -1;
-        }
+    _editTrack(track: Track, newTemplateTrack: TemplateTrack): void {
+        if (!this.logController)
+            return console.warn("Log controller not initialized");
 
-        if (
-            templateTrack.plots &&
-            templateTrack.plots[0] &&
-            templateTrack.plots[0].type === "stacked"
-        ) {
-            addOrEditStackedTrack(
-                this,
-                track as StackedTrack,
-                templateTrack,
+        const oldTitle = track.options.label ?? "";
+        const newTitle = newTemplateTrack.title ?? "";
+        const titleChanged = !oldTitle.localeCompare(newTitle);
+
+        editViewTrack(
+            this.logController,
                 track,
-                false
-            );
-        } else {
-            addOrEditGraphTrack(
-                this,
-                track as GraphTrack,
-                templateTrack,
-                track,
-                false
-            );
-        }
-        if (titleCompare)
+            newTemplateTrack,
+            this.getAxesInfo(),
+            this.getWellLogSets() ?? [],
+            this.props.colorMapFunctions
+        );
+
+        if (titleChanged)
             // workaround to refresh tooltips in videx wellog component
             this._forceUpdateTitleTooltips();
         this.onTemplateChanged();
     }
 
     removeTrack(track: Track): void {
-        if (this.logController) {
-            this.logController.removeTrack(track);
+        if (!this.logController)
+            return console.warn("Log controller not initialized");
+
+        removeViewTrack(this.logController, track);
 
             this.onTrackScroll();
             this.onTrackSelection();
@@ -2005,35 +1946,58 @@ class WellLogView
         return changed;
     }
 
+    // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+    // Track plot management - --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
     addTrackPlot(track: Track, templatePlot: TemplatePlot): void {
-        addOrEditGraphTrackPlot(this, track as GraphTrack, null, templatePlot);
+        if (!this.logController)
+            return console.warn("Log controller not initialized");
+
+        addPlotToTrack(
+            track,
+            templatePlot,
+            this.getWellLogSets() ?? [],
+            this.getAxesInfo(),
+            this.props.colorMapFunctions
+        );
+
+        adjustControllerToModifiedTrack(this.logController, track);
         this.onTemplateChanged();
     }
 
-    _editTrackPlot(
-        track: Track,
-        plot: Plot,
-        _templatePlot: TemplatePlot
-    ): void {
-        const templatePlot = { ..._templatePlot };
+    _editTrackPlot(track: Track, plot: Plot, templatePlot: TemplatePlot): void {
+        if (!this.logController)
+            return console.warn("Log controller not initialized");
+
         /* We have special option for track scale!
         const templateTrack = getTrackTemplate(track);
         if (templatePlot.scale === templateTrack.scale)
             templatePlot.scale = undefined;
         */
 
-        addOrEditGraphTrackPlot(this, track as GraphTrack, plot, templatePlot);
+        editTrackPlot(
+            track,
+            plot,
+            templatePlot,
+            this.getWellLogSets() ?? [],
+            this.getAxesInfo(),
+            this.props.colorMapFunctions
+        );
+
+        adjustControllerToModifiedTrack(this.logController, track);
         this.onTemplateChanged();
     }
 
     removeTrackPlot(track: Track, plot: Plot): void {
-        removeGraphTrackPlot(this, track as GraphTrack, plot);
-        const templateTrack = getTrackTemplate(track);
-        templateTrack.required = true; // user's tracks could be empty
+        if (!this.logController)
+            return console.warn("Log controller not initialized");
+
+        removeTrackPlot(track, plot);
+        adjustControllerToModifiedTrack(this.logController, track);
         this.onTemplateChanged();
     }
 
-    // Dialog functions
+    // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+    // Menu event bindings --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
     addTrack(parent: HTMLElement | null, trackCurrent: Track): void {
         if (parent) {
             addTrack(parent, this, this._addTrack.bind(this, trackCurrent));

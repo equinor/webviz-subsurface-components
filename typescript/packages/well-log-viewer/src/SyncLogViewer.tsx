@@ -41,27 +41,11 @@ import { onTrackMouseEventDefault } from "./utils/edit-track";
 
 import type { Info, InfoOptions } from "./components/InfoTypes";
 
-import { isEqualRanges, isEqDomains } from "./utils/log-viewer";
+import { isEqDomains } from "./utils/arrays";
+import { isEqualRanges } from "./utils/arrays";
 import type { LogViewer } from "@equinor/videx-wellog";
 import { fillInfos } from "./utils/fill-info";
-
-export function isEqualArrays(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    d1: undefined | any[],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    d2: undefined | any[]
-): boolean {
-    if (!d1) return !d2;
-    if (!d2) return !d1;
-
-    const n = d1.length;
-    if (n !== d2.length) return false;
-
-    for (let i = 0; i < n; i++) {
-        if (d1[i] !== d2[i]) return false;
-    }
-    return true;
-}
+import { isEqualArrays } from "./utils/arrays";
 
 export type WellDistances = {
     units: string;

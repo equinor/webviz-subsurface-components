@@ -1,5 +1,8 @@
+/**
+ * Utilities for configuring and creating plots for well log visualization.
+ */
+import type { GraphTrack, Plot } from "@equinor/videx-wellog";
 import {
-    type Plot,
     LinePlot,
     AreaPlot,
     DotPlot,
@@ -7,36 +10,50 @@ import {
     LineStepPlot,
 } from "@equinor/videx-wellog";
 import type { PlotConfig } from "@equinor/videx-wellog/dist/tracks/graph/interfaces";
-import type {
-    DataAccessorFunction,
-    DifferentialPlotOptions,
-} from "@equinor/videx-wellog/dist/plots/interfaces";
+import type { DataAccessorFunction } from "@equinor/videx-wellog/dist/plots/interfaces";
 import type { LegendInfo } from "@equinor/videx-wellog/dist/plots/legend/interfaces";
 import { type AreaData } from "@equinor/videx-wellog";
 
 import type {
     TemplatePlot,
-    TemplatePlotProps,
     TemplatePlotType,
-    TemplateStyle,
+    TemplateTrack,
 } from "../components/WellLogTemplateTypes";
 import type {
     WellLogCurve,
     WellLogDataRow,
     WellLogSet,
 } from "../components/WellLogTypes";
+
+import { type AxesInfo } from "./axes";
 import type { ColorMapFunction } from "./color-function";
+import { getColorMapFunction } from "./color-function";
 
 import GradientFillPlot, {
     type GradientFillPlotOptions,
 } from "./gradientfill-plot";
 import { checkMinMaxValue, roundLogMinMax, roundMinMax } from "./minmax";
-import { elementByName } from "./arrays";
-import { generateColor } from "./generateColor";
-import { getColorMapFunction } from "./color-function";
-import { type DiscreteMeta, getDiscreteColorAndName } from "./well-log";
+import {
+    type DiscreteMeta,
+    getDiscreteColorAndName,
+    findSetAndCurveIndex,
+    getAxisIndices,
+} from "./well-log";
 
+export const DEFAULT_SCALE = "linear";
 export const DEFAULT_PLOT_TYPE = "line";
+
+/**
+ * Extension of videx plot options, to expose legendInfo() function.
+ */
+export interface ExtPlotOptions
+    extends GradientFillPlotOptions /*|DifferentialPlotOptions|AreaPlotOptions*/ {
+    legendInfo: () => LegendInfo;
+}
+
+/**
+ * Worker object containing all necessary information to create a plot.
+ */
 export type PlotSetup = {
     iCurve: number;
     iSet: number;
@@ -48,26 +65,32 @@ export type PlotSetup = {
     isSecondary: boolean;
 };
 
-export interface ExtPlotOptions
-    extends GradientFillPlotOptions /*|DifferentialPlotOptions|AreaPlotOptions*/ {
-    legendInfo: () => LegendInfo;
-}
-
+/**
+ * Data-class used when translating JSON well-log data to videx-data
+ */
 export class PlotData {
     minmax: [number, number];
     minmaxPrimaryAxis: [number, number];
     data: [number | null, number | string | null][];
 
     constructor() {
+        this.data = [];
         this.minmax = [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY];
         this.minmaxPrimaryAxis = [
             Number.POSITIVE_INFINITY,
             Number.NEGATIVE_INFINITY,
         ];
-        this.data = [];
     }
 }
 
+/**
+ * Prepares plot data from well log data rows.
+ *
+ * @param data - An row of data from a JSON Well-log.
+ * @param iCurve - The index of the curve to be plotted.
+ * @param iPrimaryAxis - The index of the primary axis. If negative, the index will be used as the primary axis.
+ * @returns A PlotData object containing the prepared plot data.
+ */
 export function preparePlotData(
     data: WellLogDataRow[],
     iCurve: number,
@@ -90,14 +113,14 @@ export function preparePlotData(
     return plot;
 }
 
-/*
+/**
+ * Maps a videx plot type to their respective plot-template option
  * `LinePlot` - linear line graph
  * `LineStepPlot` - linear stepladder graph
  * `AreaPlot` - area graph
  * `DotPlot` - discrete points graph
  * `DifferentialPlot` - differential graph, for correlation of two data series.
  */
-
 export function getPlotType(plot: Plot): TemplatePlotType {
     if (plot instanceof GradientFillPlot) return "gradientfill";
     if (plot instanceof LinePlot) return "line";
@@ -108,97 +131,42 @@ export function getPlotType(plot: Plot): TemplatePlotType {
     return "";
 }
 
-export function isValidPlotType(plotType: string): boolean {
-    return (
-        [
-            "line",
-            "linestep",
-            "dot",
-            "area",
-            "differential",
-            "gradientfill",
-
-            "stacked",
-        ].indexOf(plotType) >= 0
-    );
-}
-
-function mergePlotAndStyle(
+function getScaledDomain(
     templatePlot: TemplatePlot,
-    templateStyles?: TemplateStyle[]
-): TemplatePlot {
-    if (!templateStyles || !templatePlot.style) return { ...templatePlot };
+    scale: string,
+    minmax: [number, number]
+): [number, number] {
+    if (templatePlot.domain) return templatePlot.domain;
+    if (scale === "log") return roundLogMinMax(minmax);
+    if (
+        templatePlot.type === "gradientfill" &&
+        templatePlot.colorScale === "log"
+    )
+        return roundLogMinMax(minmax);
 
-    const style = elementByName(templateStyles, templatePlot.style) ?? {};
-
-    return { ...style, ...templatePlot };
+    return roundMinMax(minmax);
 }
 
-export function applyTemplateStyle(
-    templatePlot: TemplatePlot,
-    templateStyles?: TemplateStyle[]
-): TemplatePlot {
-    const styledTemplate = mergePlotAndStyle(templatePlot, templateStyles);
+function makeLegendInfoFunc(
+    curve1: WellLogCurve,
+    curve2?: WellLogCurve
+): () => LegendInfo {
+    return () => ({
+        label: curve1.name,
+        unit: curve1.unit ?? "",
 
-    if (!styledTemplate.type) styledTemplate.type = DEFAULT_PLOT_TYPE;
-    if (!isValidPlotType(styledTemplate.type)) {
-        console.error(
-            "unknown plot type '" +
-                styledTemplate.type +
-                "': use default type '" +
-                DEFAULT_PLOT_TYPE +
-                "'"
-        );
-        styledTemplate.type = DEFAULT_PLOT_TYPE;
-    }
-    if (styledTemplate.type !== "stacked") {
-        if (!styledTemplate.color) styledTemplate.color = generateColor();
-    }
-
-    if (styledTemplate.type === "area") {
-        if (!styledTemplate.fill) {
-            //styledTemplate.fill = generateColor();
-            styledTemplate.fillOpacity = 0.0;
-        }
-    } else if (styledTemplate.type === "gradientfill") {
-        if (!styledTemplate.colorMapFunctionName) {
-            //styledTemplate.fill = generateColor();
-            styledTemplate.fillOpacity = 0.0;
-        }
-    } else if (styledTemplate.type === "differential") {
-        // "differential" plot
-        if (!styledTemplate.fill) styledTemplate.fill = generateColor();
-        if (!styledTemplate.color2) styledTemplate.color2 = generateColor();
-        if (!styledTemplate.fill2) styledTemplate.fill2 = generateColor();
-    }
-    return styledTemplate;
-}
-
-export function getPlotConfig(
-    id: string | number,
-    templatePlotProps: TemplatePlotProps,
-    trackScale: string | undefined, // track scale
-    minmax: [number, number],
-    curve: WellLogCurve,
-    iPlot: number,
-    curve2: WellLogCurve | undefined,
-    iPlot2: number,
-    colorMapFunctions: ColorMapFunction[] | undefined
-): PlotConfig {
-    return {
-        id: id,
-        type: templatePlotProps.type ?? "",
-        options: getPlotOptions(
-            templatePlotProps,
-            trackScale,
-            minmax,
-            curve,
-            iPlot,
-            curve2,
-            iPlot2,
-            colorMapFunctions
-        ),
-    };
+        // DifferentialPlotLegendInfo,
+        serie1: {
+            show: true,
+            label: curve1.name,
+            unit: curve1.unit ?? "",
+        },
+        serie2: {
+            show: true,
+            label: curve2?.name ?? "",
+            unit: curve2?.unit ?? "",
+        },
+    });
 }
 class DataAccessor {
     iData: number;
@@ -231,85 +199,108 @@ function makeDataAccessorFunc(
     return _dataAccessor.access.bind(_dataAccessor);
 }
 
-export function getPlotOptions(
-    templatePlotProps: TemplatePlotProps,
-    trackScale: string | undefined, // track scale
-    minmax: [number, number],
-    curve: WellLogCurve,
-    iPlot: number,
-    curve2: WellLogCurve | undefined, //"differential" plot
-    iPlot2: number, //"differential" plot
-    colorMapFunctions?: ColorMapFunction[] //"gradientfill" plot
+/**
+ * Builds a valid videx configuration for a plot, based on setups and templates
+ *
+ * @param plotSetup - The setup information for the primary plot.
+ * @param plotSetup2 - The setup information for the secondary plot, if any.
+ * @param trackTemplate - The template for the track.
+ * @param colorMapFunctions - An array of color map functions, for coloring the plot.
+ * @param iData - The index of the parent track's data array that corresponds to the primary plot.
+ * @param iData2 - The index for the secondary curve, if any.
+ * @returns The configuration for the plot.
+ */
+export function buildPlotConfig(
+    plotSetup: PlotSetup,
+    plotSetup2: PlotSetup | null,
+    trackTemplate: TemplateTrack,
+    colorMapFunctions: ColorMapFunction[] | undefined,
+    iData: number,
+    iData2: number
+): PlotConfig {
+    const { iCurve, iSet, templatePlot } = plotSetup;
+
+    return {
+        id: `${iSet}-${iCurve}`,
+        type: templatePlot.type ?? DEFAULT_PLOT_TYPE,
+        options: buildPlotOptions(
+            plotSetup,
+            plotSetup2,
+            trackTemplate,
+            colorMapFunctions,
+            iData,
+            iData2
+        ),
+    };
+}
+
+function buildPlotOptions(
+    plotSetup: PlotSetup,
+    plotSetup2: PlotSetup | null,
+    trackTemplate: TemplateTrack,
+    colorMapFunctions: ColorMapFunction[] | undefined,
+    iData: number,
+    iData2: number
 ): ExtPlotOptions {
-    const scale = templatePlotProps.scale || trackScale || "linear"; //"linear" or "log"
-    const domain = (
-        scale === "log" ||
-            (templatePlotProps.type === "gradientfill" &&
-                templatePlotProps.colorScale === "log")
-            ? roundLogMinMax
-            : roundMinMax
-    )(minmax);
+    const { minmax, templatePlot } = plotSetup;
+    const scale = templatePlot.scale || trackTemplate.scale || DEFAULT_SCALE;
 
-    const options: ExtPlotOptions = {
-        dataAccessor: makeDataAccessorFunc(iPlot, curve2 ? iPlot2 : undefined),
+    const domain = getScaledDomain(templatePlot, scale, minmax);
 
-        scale: scale,
-        domain: templatePlotProps.domain || domain,
+    const colorMapFunction = getColorMapFunction(
+        templatePlot.colorMapFunctionName,
+        colorMapFunctions
+    );
+    const inverseColorMapFunction = getColorMapFunction(
+        templatePlot.inverseColorMapFunctionName,
+        colorMapFunctions
+    );
 
-        color: templatePlotProps.color,
-        inverseColor: templatePlotProps.inverseColor,
+    const dataAccessorFunc = makeDataAccessorFunc(
+        iData,
+        plotSetup2 ? iData2 : undefined
+    );
 
-        fill: templatePlotProps.fill, // for 'area'!
-        fillOpacity: templatePlotProps.fillOpacity
-            ? templatePlotProps.fillOpacity
-            : 0.25, // for 'area' and 'gradientfill'!
+    const legendInfoFunc = makeLegendInfoFunc(
+        plotSetup.curve,
+        plotSetup2?.curve
+    );
+
+    const fillOpacity = templatePlot.fillOpacity ?? 0.25;
+
+    return {
+        dataAccessor: dataAccessorFunc,
+        legendInfo: legendInfoFunc,
+
+        scale,
+        domain,
+
+        color: templatePlot.color,
+        inverseColor: templatePlot.inverseColor,
+        fill: templatePlot.fill, // for 'area'!
+        fillOpacity, // for 'area' and 'gradientfill'!
         useMinAsBase: true, // for 'area' and 'gradientfill'!
 
-        //GradientFillPlotOptions
-        colorMapFunction: getColorMapFunction(
-            templatePlotProps.colorMapFunctionName,
-            colorMapFunctions
-        ),
-        inverseColorMapFunction: getColorMapFunction(
-            templatePlotProps.inverseColorMapFunctionName,
-            colorMapFunctions
-        ),
-        colorScale: templatePlotProps.colorScale,
-        inverseColorScale: templatePlotProps.inverseColorScale,
+        colorMapFunction,
+        inverseColorMapFunction,
+        colorScale: templatePlot.colorScale,
+        inverseColorScale: templatePlot.inverseColorScale,
 
-        legendInfo: () => ({
-            label: curve.name,
-            unit: curve.unit ? curve.unit : "",
-
-            // DifferentialPlotLegendInfo,
-            serie1: {
-                show: true,
-                label: curve.name,
-                unit: curve.unit ? curve.unit : "",
-            },
-            serie2: {
-                show: true,
-                label: curve2 ? curve2.name : "",
-                unit: curve2 && curve2.unit ? curve2.unit : "",
-            },
-        }),
+        // @ts-expect-error Somethings wrong with the typing here,
+        serie1: {
+            scale: scale, //"linear" or "log"
+            domain: domain,
+            color: templatePlot.color,
+            fill: templatePlot.fill,
+        },
+        serie2: {
+            // ? =scale2, =domain2 ?
+            scale: scale,
+            domain: domain,
+            color: templatePlot.color2,
+            fill: templatePlot.fill2,
+        },
     };
-
-    (options as DifferentialPlotOptions).serie1 = {
-        scale: scale, //"linear" or "log"
-        domain: domain,
-        color: templatePlotProps.color,
-        fill: templatePlotProps.fill,
-    };
-    (options as DifferentialPlotOptions).serie2 = {
-        // ? =scale2, =domain2 ?
-        scale: scale,
-        domain: domain,
-        color: templatePlotProps.color2,
-        fill: templatePlotProps.fill2,
-    };
-
-    return options;
 }
 
 function createAreaData(
@@ -337,6 +328,15 @@ function createAreaData(
     };
 }
 
+/**
+ * Creates an array of `AreaData` objects that together form a discrete stacked graph.
+ *
+ * @param data - An array of key-value tuple rows.
+ * @param colorMapFunction - A function that maps values to colors. Can be undefined.
+ * @param meta - Metadata defining how a value is represented (i.e label and color).
+ *
+ * @returns A promise that resolves to an array of `AreaData` objects.
+ */
 export async function createStackData(
     data: [number | null, number | string | null][],
     colorMapFunction: ColorMapFunction | undefined,
@@ -396,4 +396,102 @@ export async function createStackData(
         // store the area
         arr.push(area);
     return arr;
+}
+
+/**
+ * Sets up the plot configuration for a given well log set and template plot.
+ *
+ * @param wellLog - A JSON well-log set to source data from.
+ * @param templatePlot - The template plot configuration.
+ * @param axesInfo - Information about the log's axes.
+ * @param useSecondCurve - Optional flag to indicate that the "name2" curve should be used
+ * @returns A PlotSetup object containing the plot configuration, or null if the setup is invalid.
+ */
+export function setupPlot(
+    wellLog: WellLogSet[],
+    templatePlot: TemplatePlot,
+    axesInfo: AxesInfo,
+    useSecondCurve?: boolean
+): PlotSetup | null {
+    const curveName = useSecondCurve ? templatePlot.name2 : templatePlot.name;
+    if (useSecondCurve && templatePlot.type !== "differential") return null;
+    if (!curveName) return null;
+
+    const { iCurve, iSet } = findSetAndCurveIndex(wellLog, curveName);
+    if (iCurve < 0) return null;
+
+    const sourceLogSet = wellLog[iSet];
+    const data = sourceLogSet.data;
+    const curves = sourceLogSet.curves;
+    const curve = curves[iCurve];
+    const dimensions = curve.dimensions ?? 1;
+
+    if (dimensions !== 1) return null;
+    if (curve.valueType === "string" && templatePlot.type !== "stacked")
+        return null;
+
+    const axisIndices = getAxisIndices(sourceLogSet.curves, axesInfo);
+    const plotData = preparePlotData(data, iCurve, axisIndices.primary);
+    const minmax: [number, number] = [plotData.minmax[0], plotData.minmax[1]];
+
+    return {
+        iCurve,
+        iSet,
+        sourceLogSet,
+        curve,
+        plotData,
+        minmax,
+        templatePlot,
+        isSecondary: Boolean(useSecondCurve),
+    };
+}
+
+/**
+ * Generates setup objects for all relevant plots in a given template (aka, curve 1 and sometimes 2)
+ * @param templatePlot A template config for a plot
+ * @param wellLogSets A JSON Well-Log data set to source from
+ * @param axesInfo Information about the axes to be used
+ * @returns An array of all successfully created plot setups
+ */
+export function setupTrackPlot(
+    templatePlot: TemplatePlot,
+    wellLogSets: WellLogSet[],
+    axesInfo: AxesInfo
+): PlotSetup[] {
+    const retArr: PlotSetup[] = [];
+
+    const plotSetup = setupPlot(wellLogSets, templatePlot, axesInfo);
+    const plotSetup2 = setupPlot(wellLogSets, templatePlot, axesInfo, true);
+
+    if (plotSetup) retArr.push(plotSetup);
+    if (plotSetup2) retArr.push(plotSetup2);
+
+    return retArr;
+}
+
+/**
+ * Builds a graph plot using internals from an existing track
+ *
+ * @param plotConfig - The configuration for the plot to be created.
+ * @param track - The graph track containing options and scale information.
+ * @returns The created plot.
+ */
+// Somewhat hacky approach to generate a valid plot instance, for when you're adding a plot to an existing track
+export function buildGraphPlotFromTrackOptions(
+    plotConfig: PlotConfig,
+    track: GraphTrack
+): Plot {
+    const factory = track.options.plotFactory;
+    const scale = track.scale;
+
+    if (!factory) {
+        throw Error(`No plot factory found in track!`);
+    }
+    if (!factory[plotConfig.type]) {
+        throw Error(
+            `No factory function for creating '${plotConfig.type}'-plot!`
+        );
+    }
+
+    return factory[plotConfig.type](plotConfig, scale);
 }
