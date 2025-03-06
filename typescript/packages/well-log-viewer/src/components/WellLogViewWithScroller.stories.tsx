@@ -1,12 +1,18 @@
+import { colorTables } from "@emerson-eps/color-tables";
 import type { Meta, StoryObj } from "@storybook/react";
 import { fn } from "@storybook/test";
 import React from "react";
 
+import type { Template as TemplateType } from "./WellLogTemplateTypes";
 import WellLogViewWithScroller from "./WellLogViewWithScroller";
 import type { WellLogViewWithScrollerProps } from "./WellLogViewWithScroller";
 import { argTypesWellLogViewScrollerProp } from "./WellLogViewWithScroller";
-import { colorTables } from "@emerson-eps/color-tables";
-import type { ColorMapFunction } from "./ColorMapFunction";
+import { axisTitles, axisMnemos } from "../utils/axes";
+import type { ColorMapFunction } from "../utils/color-function";
+
+import wellLog898MudJson from "../../../../../example-data/L898MUD.json";
+import templateJson1 from "../../../../../example-data/welllog_template_1.json";
+
 const exampleColorMapFunctions = colorTables as ColorMapFunction[];
 
 const ComponentCode =
@@ -17,10 +23,7 @@ const ComponentCode =
     "    colorMapFunctions={exampleColorMapFunctions} \r\n" +
     "/>";
 
-import { axisTitles, axisMnemos } from "../utils/axes";
-
-const stories: Meta = {
-    // @ts-expect-error TS2322
+const stories: Meta<WellLogViewWithScrollerProps> = {
     component: WellLogViewWithScroller,
     title: "WellLogViewer/Components/WellLogViewWithScroller",
     parameters: {
@@ -43,15 +46,8 @@ const stories: Meta = {
         onTrackSelection: fn(),
         onContentRescale: fn(),
         onContentSelection: fn(),
-        onScrollerScroll: fn(),
     },
-    argTypes: {
-        ...argTypesWellLogViewScrollerProp,
-        id: {
-            description:
-                "The ID of this component, used to identify dash components in callbacks. The ID needs to be unique across all of the components in an app.",
-        },
-    },
+    argTypes: argTypesWellLogViewScrollerProp,
 };
 export default stories;
 
@@ -70,17 +66,12 @@ const Template = (args: WellLogViewWithScrollerProps) => {
     );
 };
 
-const wellLog = require("../../../../../example-data/L898MUD.json")[0]; // eslint-disable-line
-
 export const Default: StoryObj<typeof Template> = {
     args: {
-        //id: "Well-Log-Viewer-With-Scroller",
         horizontal: false,
-        welllog: wellLog,
-        // TODO: Fix this the next time the file is edited.
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        template: require("../../../../../example-data/welllog_template_1.json"),
-        viewTitle: "Well '" + wellLog.header.well + "'",
+        wellLogSets: wellLog898MudJson,
+        template: templateJson1 as TemplateType,
+        viewTitle: "Well '" + wellLog898MudJson[0].header.well + "'",
         colorMapFunctions: exampleColorMapFunctions,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
