@@ -909,11 +909,14 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
     syncTemplate(iWellLog: number): void {
         const controller = this.callbackManagers[iWellLog]?.controller;
         if (!controller) return;
+        if (!this.props.syncTemplate) return;
+
         const template = controller.getTemplate();
         for (const callbackManager of this.callbackManagers) {
             const _controller = callbackManager?.controller;
             if (!_controller || _controller === controller) continue;
-            if (this.props.syncTemplate) _controller.setTemplate(template);
+
+            _controller.setTemplate(template, true);
         }
     }
 

@@ -694,11 +694,11 @@ function setTracksToController(
 ): ScaleInterpolator {
     const { tracks, minmaxPrimaryAxis: minmaxPrimaryAxis } =
         createWellLogTracks(
-        wellLogSets,
-        axes,
+            wellLogSets,
+            axes,
             templateTracks,
-        colorMapFunctions
-    );
+            colorMapFunctions
+        );
     logController.reset();
 
     const scaleInterpolator = setUpScaleInterpolator(
@@ -911,7 +911,7 @@ export interface WellLogController {
 
     updateInfo(): void;
 
-    setTemplate(template: Template): void;
+    setTemplate(template: Template, noEmit?: boolean): void;
     getTemplate(): Template;
 
     getWellLog(): WellLogSet[] | WellLogSet | undefined;
@@ -1521,7 +1521,7 @@ class WellLogView
                 this.logController,
                 axes,
                 this.wellLogSets,
-                this.template,
+                this.getStyledTemplate().tracks,
                 this.props.colorMapFunctions
             );
             addWellPickOverlay(this.logController, this);
@@ -1596,12 +1596,10 @@ class WellLogView
         this.props.onTrackMouseLeaveEvent?.();
     }
 
-    onTemplateChanged(): void {
+    onTemplateChanged(noEmit?: boolean): void {
         this.updateInfo();
 
-        this.template = this._generateTemplate(); // save current template
-
-        this.props.onTemplateChanged?.();
+        if (!noEmit) this.props.onTemplateChanged?.();
     }
 
     // content
@@ -1826,14 +1824,16 @@ class WellLogView
     setTemplate(template: Template, noEmit?: boolean): void {
         const tNew = JSON.stringify(template);
         const t = JSON.stringify(this.template);
+
         if (t !== tNew) {
             this.template = JSON.parse(tNew); // save external template content to current
             this.setTracks(true);
-            /* not sure */ this.onTemplateChanged();
+            // Update pre-computed styles
+            this.onTemplateChanged(noEmit);
         }
     }
 
-    _generateTemplate(): Template {
+    _recomputeTemplateFromController(): void {
         const template = this.template;
         const tracks: TemplateTrack[] = [];
         if (this.logController) {
@@ -1844,7 +1844,9 @@ class WellLogView
             }
         }
         const axes = getAvailableAxes(this.wellLogSets, this.props.axisMnemos);
-        return {
+
+        // Apply the new template
+        this.setTemplate({
             name: template.name,
             scale: {
                 primary: this.props.primaryAxis || "" /* no scale track */,
@@ -1853,7 +1855,7 @@ class WellLogView
             },
             tracks: tracks,
             styles: template.styles,
-        };
+        });
     }
 
     // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -1871,19 +1873,20 @@ class WellLogView
 
         const newTrack = createNewViewTrack(
             this.logController,
-                templateTrack,
+            templateTrack,
             iNewTrack,
             this.getAxesInfo(),
             this.getWellLogSets() ?? []
         );
 
         if (!newTrack) return;
-            this.onTemplateChanged();
+
+        this._recomputeTemplateFromController();
 
         this.selectTrack(newTrack, true);
         // Scroll one step, to make sure the newly created one stays in view
-                this.scrollTrackBy(+1);
-                this.onTrackScroll();
+        this.scrollTrackBy(+1);
+        this.onTrackScroll();
     }
 
     _editTrack(track: Track, newTemplateTrack: TemplateTrack): void {
@@ -1896,7 +1899,7 @@ class WellLogView
 
         editViewTrack(
             this.logController,
-                track,
+            track,
             newTemplateTrack,
             this.getAxesInfo(),
             this.getWellLogSets() ?? [],
@@ -1906,7 +1909,8 @@ class WellLogView
         if (titleChanged)
             // workaround to refresh tooltips in videx wellog component
             this._forceUpdateTitleTooltips();
-        this.onTemplateChanged();
+
+        this._recomputeTemplateFromController();
     }
 
     removeTrack(track: Track): void {
@@ -1915,10 +1919,9 @@ class WellLogView
 
         removeViewTrack(this.logController, track);
 
-            this.onTrackScroll();
-            this.onTrackSelection();
-            this.onTemplateChanged();
-        }
+        this.onTrackScroll();
+        this.onTrackSelection();
+        this._recomputeTemplateFromController();
     }
 
     isTrackSelected(track: Track): boolean {
@@ -1961,7 +1964,7 @@ class WellLogView
         );
 
         adjustControllerToModifiedTrack(this.logController, track);
-        this.onTemplateChanged();
+        this._recomputeTemplateFromController();
     }
 
     _editTrackPlot(track: Track, plot: Plot, templatePlot: TemplatePlot): void {
@@ -1984,7 +1987,7 @@ class WellLogView
         );
 
         adjustControllerToModifiedTrack(this.logController, track);
-        this.onTemplateChanged();
+        this._recomputeTemplateFromController();
     }
 
     removeTrackPlot(track: Track, plot: Plot): void {
@@ -1993,7 +1996,7 @@ class WellLogView
 
         removeTrackPlot(track, plot);
         adjustControllerToModifiedTrack(this.logController, track);
-        this.onTemplateChanged();
+        this._recomputeTemplateFromController();
     }
 
     // --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
