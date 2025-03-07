@@ -1,12 +1,14 @@
 import type {
     FeatureCollection,
+    GeoJsonProperties,
     GeometryCollection,
     LineString,
     Point,
 } from "geojson";
 import { cloneDeep } from "lodash";
+import { simplify } from "../../utils/simplify";
+
 import type { Position3D } from "../../utils/layerTools";
-import simplify from "@turf/simplify";
 
 export function removeConsecutiveDuplicates(
     coords: Position3D[],
@@ -316,7 +318,9 @@ export function splineRefine(
 /**
  * Will reduce/coarse the wellpaths.
  */
-export function coarsenWells(data_in: FeatureCollection): FeatureCollection {
+export function coarsenWells(
+    data_in: FeatureCollection<GeometryCollection>
+): FeatureCollection<GeometryCollection> {
     const data = cloneDeep(data_in);
 
     const no_wells = data.features.length;
@@ -329,30 +333,17 @@ export function coarsenWells(data_in: FeatureCollection): FeatureCollection {
             continue;
         }
 
-        const isVerticalWell = lineString.coordinates.every(
-            (e) =>
-                e[0] === lineString.coordinates[0][0] &&
-                e[1] === lineString.coordinates[0][1]
-        );
-
-        if (isVerticalWell) {
-            // The simplify algorithm below did not work on vertical wells hence in this case we only use first and last point.
-            const n = lineString.coordinates.length;
-            const coordsSimplified = [
-                lineString.coordinates[0],
-                lineString.coordinates[n - 1],
-            ];
-            lineString.coordinates = coordsSimplified;
-        } else {
-            const options = {
-                tolerance: 0.01,
-                highQuality: false,
-                mutate: false,
-            };
-
-            const coordsSimplified = simplify(lineString, options);
-            lineString.coordinates =
-                coordsSimplified.coordinates as Position3D[];
+        const properties = data.features[well_no]
+            .properties as GeoJsonProperties;
+        if (properties) {
+            const mds = properties["md"][0];
+            const [newPoints, newMds] = simplify(
+                lineString.coordinates as Position3D[],
+                mds,
+                0.01
+            );
+            lineString.coordinates = newPoints as Position3D[];
+            properties["md"][0] = newMds;
         }
     }
 
