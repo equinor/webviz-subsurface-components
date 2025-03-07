@@ -6,8 +6,6 @@ import React from "react";
 import WellLogInfoPanel from "../../components/WellLogInfoPanel";
 import WellLogViewWithScroller from "../../components/WellLogViewWithScroller";
 
-import { isEqualRanges } from "../../utils/log-viewer";
-
 import { CallbackManager } from "../../components/CallbackManager";
 import type {
     Template,
@@ -37,7 +35,7 @@ import templateJson from "../../../../../../example-data/welllog_template_2.json
 import colorTables from "../../../../../../example-data/wellpick_colors.json";
 import wellPicks from "../../../../../../example-data/wellpicks.json";
 import type { ColorMapFunction } from "../../utils/color-function";
-import { indexOfElementByName } from "../../utils/arrays";
+import { indexOfElementByName, isEqualRanges } from "../../utils/arrays";
 import { getDiscreteMeta } from "../../utils/well-log";
 
 const wellLogs = wellLogsJson as unknown as WellLogSet[];
