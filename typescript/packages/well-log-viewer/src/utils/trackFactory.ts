@@ -15,10 +15,10 @@ import {
     createPlotType,
     defaultPlotFactory,
     graphLegendConfig,
-    scaleLegendConfig,
 } from "@equinor/videx-wellog";
 
 import GradientFillPlot from "./gradientfill-plot";
+import { scaleLegendConfig } from "./stack/scale-legend";
 
 /**
  * Creates a new GraphTrack with default options and custom configuration.
