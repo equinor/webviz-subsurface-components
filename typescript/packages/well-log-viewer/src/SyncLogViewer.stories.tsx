@@ -1,31 +1,53 @@
-/* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
-import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 
+import type { Meta, StoryObj } from "@storybook/react";
+
 import { ToggleButton } from "@mui/material";
+
 import { colorTables } from "@emerson-eps/color-tables";
-import type { ColorMapFunction } from "./components/ColorMapFunction";
 
-import wellpicksJson from "../../../../example-data/wellpicks.json";
-import wellpickColorTablesJson from "../../../../example-data/wellpick_colors.json";
-
-const exampleColorMapFunctions = colorTables as ColorMapFunction[];
-const wellpickColorMapFunctions = wellpickColorTablesJson as ColorMapFunction[];
-// const wellpickColorTable = wellpickColorTableJson as unknown as ColorMapFunction[];
-const wellpicks = wellpicksJson as unknown as WellLogSet[];
-// const exampleColorTable = colorTables as unknown as ColorMapFunction[];
-
-import horizonPatternsJson from "../../../../example-data/horizon_patterns.json";
-
+import {
+    patternImages,
+    patternNamesEnglish,
+} from "./Storybook/helpers/patternImages";
 import SyncLogViewer, { argTypesSyncLogViewerProp } from "./SyncLogViewer";
 import type { SyncLogViewerProps } from "./SyncLogViewer";
-import type WellLogView from "./components/WellLogView";
+
+import type { ColorMapFunction } from "./utils/color-function";
+import type { Pattern } from "./utils/pattern";
 
 import type {
     WellLogController,
     TrackMouseEvent,
     WellPickProps,
 } from "./components/WellLogView";
+
+import { axisMnemos, axisTitles } from "./utils/axes";
+import type WellLogView from "./components/WellLogView";
+import type { Template as TemplateType } from "./components/WellLogTemplateTypes";
+import type { WellLogSet } from "./components/WellLogTypes";
+
+// Example data and templates
+import horizonPatternsJson from "../../../../example-data/horizon_patterns.json";
+import wellpicksJson from "../../../../example-data/wellpicks.json";
+import wellpickColorTablesJson from "../../../../example-data/wellpick_colors.json";
+import syncTemplateJson from "../../../../example-data/synclog_template.json";
+import L898MUDJson from "../../../../example-data/L898MUD.json";
+import L916MUDJson from "../../../../example-data/L916MUD.json";
+import List1Json from "../../../../example-data/Lis1.json";
+import facies3WellsJson from "../../../../example-data/facies3wells.json";
+
+const exampleColorMapFunctions = colorTables as ColorMapFunction[];
+const wellpickColorMapFunctions = wellpickColorTablesJson as ColorMapFunction[];
+const horizonPatterns = horizonPatternsJson as Pattern[];
+
+const syncTemplate = syncTemplateJson as TemplateType;
+
+const wellpicks = wellpicksJson as WellLogSet[];
+const L898MUD = L898MUDJson as WellLogSet[];
+const L916MUD = L916MUDJson as WellLogSet[];
+const List1 = List1Json as WellLogSet[];
+const facies3Wells = facies3WellsJson as unknown as SyncLogViewerProps;
 
 const ComponentCode =
     "<SyncLogViewer id='SyncLogViewer' \r\n" +
@@ -45,12 +67,11 @@ const ComponentCode =
     "    colorMapFunctions={colorMapFunctions} \r\n" +
     "/>";
 
-import { axisMnemos, axisTitles } from "./utils/axes";
-
-const stories: Meta = {
-    // @ts-expect-error TS2322
+const stories: Meta<SyncLogViewerProps> = {
     component: SyncLogViewer,
     title: "WellLogViewer/Demo/SyncLogViewer",
+    argTypes: argTypesSyncLogViewerProp,
+    tags: ["no-screenshot-test"],
     parameters: {
         docs: {
             description: {
@@ -62,81 +83,6 @@ const stories: Meta = {
             language: "javascript",
         },
     },
-    argTypes: {
-        ...argTypesSyncLogViewerProp,
-        /*id: {
-            description:
-                "The ID of this component, used to identify dash components in callbacks. The ID needs to be unique across all of the components in an app.",
-        },
-        welllogs: {
-            description: "Array of JSON objects describing well log data.",
-        },
-        templates: {
-            description: "Array of track template data.",
-        },
-        colorMapFunctions: {
-            description: "Prop containing color function/table data.",
-        },
-        wellpickFlatting: {
-            description: "Horizon names for wellpick flatting",
-        },
-        spacers: {
-            description:
-                "Set to true or to spacers width or to array of spacer widths if WellLogSpacers should be used",
-        },
-        wellDistances: {
-            description: "Distanses between wells to show on the spacers",
-        },
-        */
-        horizontal: {
-            description: "Orientation of the track plots on the screen.", // defaultValue: false
-        },
-        syncTrackPos: {
-            description: "Synchronize first visible track", // defaultValue: false
-        },
-        syncContentDomain: {
-            description: "Synchronize visible content domain (pan and zoom)", // defaultValue: false
-        },
-        syncContentSelection: {
-            description: "Synchronize content selection", // defaultValue: false
-        },
-        syncTemplate: {
-            description: "Synchronize templates in the views", // defaultValue: false
-        },
-        welllogOptions: {
-            description:
-                "Options for well log view:<br/>" +
-                "maxContentZoom: The maximum zoom value (default 256)<br/>" +
-                "maxVisibleTrackNum: The maximum number of visible tracks<br/>" +
-                "checkDatafileSchema: Validate JSON datafile against schema<br/>" +
-                "hideTrackTitle: Hide titles on the tracks<br/>" +
-                "hideLegend: Hide legends on the tracks.",
-        },
-        spacerOptions: {
-            description: "Options for well log spacer",
-        },
-        readoutOptions: {
-            description:
-                "Options for readout panel.<br/>" +
-                "allTracks: boolean — Show not only visible tracks,<br/>" +
-                "grouping: string — How group values.",
-        },
-        domain: {
-            description: "Initial visible interval of the log data.",
-        },
-        selection: {
-            description: "Initial selected interval of the log data.",
-        },
-        viewTitles: {
-            description:
-                "The view title. Set desired string or react element or true for default value from well log file",
-        },
-        layout: {
-            description:
-                "Side panels layout (default is layout with default right panel",
-        },
-    },
-    tags: ["no-screenshot-test"],
 };
 export default stories;
 
@@ -215,7 +161,8 @@ const Template = (args: SyncLogViewerProps) => {
         _wellLogView: WellLogView,
         _ev: TrackMouseEvent
     ): void {
-        //custom function to disable the context menu
+        // Custom function to disable the context menu
+        // No-op on purpose
     }
     /* eslint-enable */ // no-unused-vars
 
@@ -254,118 +201,6 @@ const Template = (args: SyncLogViewerProps) => {
     );
 };
 
-/* eslint-disable @typescript-eslint/no-require-imports */
-const patternImages = [
-    require("../../../../example-data/patterns/Anhydrite.gif"),
-    require("../../../../example-data/patterns/Bitumenious.gif"),
-    require("../../../../example-data/patterns/Browncoal.gif"),
-    require("../../../../example-data/patterns/Calcareous_dolostone.gif"),
-    require("../../../../example-data/patterns/Chalk.gif"),
-    require("../../../../example-data/patterns/Clay.gif"),
-    require("../../../../example-data/patterns/Coal.gif"),
-    require("../../../../example-data/patterns/Conglomerate.gif"),
-    require("../../../../example-data/patterns/Diamond_lines.gif"),
-    require("../../../../example-data/patterns/Dolomitic_limestone.gif"),
-    require("../../../../example-data/patterns/Dolostone.gif"),
-    require("../../../../example-data/patterns/Downward_lines.gif"),
-    require("../../../../example-data/patterns/Dykes_and_sills.gif"),
-    require("../../../../example-data/patterns/EmptyFile.gif"),
-    require("../../../../example-data/patterns/Fissile_mud.gif"),
-    require("../../../../example-data/patterns/Fissile_silt.gif"),
-    require("../../../../example-data/patterns/Grid_lines.gif"),
-    require("../../../../example-data/patterns/Gypsum.gif"),
-    require("../../../../example-data/patterns/Gypsum_anhydrite_unspecified.gif"),
-    require("../../../../example-data/patterns/Halite.gif"),
-    require("../../../../example-data/patterns/Horizontal_dashed.gif"),
-    require("../../../../example-data/patterns/Horizontal_lines.gif"),
-    require("../../../../example-data/patterns/Intrusive.gif"),
-    require("../../../../example-data/patterns/Limestone.gif"),
-    require("../../../../example-data/patterns/Mafic_plutonic.gif"),
-    require("../../../../example-data/patterns/Marl.gif"),
-    require("../../../../example-data/patterns/Metamorphic.gif"),
-    require("../../../../example-data/patterns/Mud.gif"),
-    require("../../../../example-data/patterns/Raster.gif"),
-    require("../../../../example-data/patterns/Salt_general.gif"),
-    require("../../../../example-data/patterns/Sand.gif"),
-    require("../../../../example-data/patterns/Sediment_breccia.gif"),
-    require("../../../../example-data/patterns/Shale.gif"),
-    require("../../../../example-data/patterns/Silicic_plutonic.gif"),
-    require("../../../../example-data/patterns/Silt.gif"),
-    require("../../../../example-data/patterns/Tuffitt.gif"),
-    require("../../../../example-data/patterns/Upward_lines.gif"),
-    require("../../../../example-data/patterns/Vertical_bitumenious.gif"),
-    require("../../../../example-data/patterns/Vertical_calcareous_dolostone.gif"),
-    require("../../../../example-data/patterns/Vertical_chalk.gif"),
-    require("../../../../example-data/patterns/Vertical_claystone.gif"),
-    require("../../../../example-data/patterns/Vertical_dashed.gif"),
-    require("../../../../example-data/patterns/Vertical_dolomitic_limestone.gif"),
-    require("../../../../example-data/patterns/Vertical_dolostone.gif"),
-    require("../../../../example-data/patterns/Vertical_fissile_mudstone.gif"),
-    require("../../../../example-data/patterns/Vertical_fissile_siltstone.gif"),
-    require("../../../../example-data/patterns/Vertical_limestone.gif"),
-    require("../../../../example-data/patterns/Vertical_lines.gif"),
-    require("../../../../example-data/patterns/Vertical_marl.gif"),
-    require("../../../../example-data/patterns/Vertical_shale.gif"),
-    require("../../../../example-data/patterns/Vertical_tuffitt.gif"),
-    require("../../../../example-data/patterns/Vulcanic.gif"),
-];
-/* eslint-enable @typescript-eslint/no-require-imports */
-
-const patternNamesEnglish = [
-    "Anhydrite",
-    "Bitumenious",
-    "Browncoal",
-    "Calcareous Dolostone",
-    "Chalk",
-    "Clay",
-    "Coal",
-    "Conglomerate",
-    "Diamond_lines",
-    "Dolomitic_limestone",
-    "Dolostone",
-    "Downward Lines",
-    "Dykes and Sills",
-    "EmptyFile",
-    "Fissile Mud",
-    "Fissile Silt",
-    "Grid Lines",
-    "Gypsum",
-    "Gypsum Anhydrite Unspecified",
-    "Halite",
-    "Horizontal Dashed",
-    "Horizontal Lines",
-    "Intrusive",
-    "Limestone",
-    "Mafic Plutonic",
-    "Marl",
-    "Metamorphic",
-    "Mud",
-    "Raster",
-    "Salt General",
-    "Sand",
-    "Sediment Breccia",
-    "Shale",
-    "Silicic Plutonic",
-    "Silt",
-    "Tuffitt",
-    "Upward lines",
-    "Vertical Bitumenious",
-    "Vertical Calcareous Dolostone",
-    "Vertical Chalk",
-    "Vertical Claystone",
-    "Vertical Dashed",
-    "Vertical Dolomitic Limestone",
-    "Vertical Dolostone",
-    "Vertical Fissile Mudstone",
-    "Vertical Fissile Siltstone",
-    "Vertical Limestone",
-    "Vertical Lines",
-    "Vertical Marl",
-    "Vertical Shale",
-    "Vertical Tuffitt",
-    "Vulcanic",
-];
-
 const exampleWellPicks: WellPickProps[] = [
     {
         wellpick: wellpicks[0],
@@ -389,22 +224,14 @@ const exampleWellPicks: WellPickProps[] = [
 
 export const Default: StoryObj<typeof Template> = {
     args: {
-        //id: "Sync-Log-Viewer",
         syncTrackPos: true,
         syncContentDomain: true,
         syncContentSelection: true,
         syncTemplate: true,
         horizontal: false,
 
-        welllogs: [
-            require("../../../../example-data/L898MUD.json")[0], // eslint-disable-line
-            require("../../../../example-data/L916MUD.json")[0], // eslint-disable-line
-            require("../../../../example-data/Lis1.json")[0], // eslint-disable-line
-        ],
-        templates: [
-            require("../../../../example-data/synclog_template.json"), // eslint-disable-line
-            require("../../../../example-data/synclog_template.json"), // eslint-disable-line
-        ],
+        welllogs: [L898MUD[0], L916MUD[0], List1[0]],
+        templates: [syncTemplate, syncTemplate],
         colorMapFunctions: exampleColorMapFunctions,
         wellpicks: exampleWellPicks,
         patternsTable: {
@@ -412,8 +239,7 @@ export const Default: StoryObj<typeof Template> = {
             patternImages: patternImages,
             patternNames: patternNamesEnglish,
         },
-        // @ts-expect-error Can't be bothered to fix this
-        patterns: horizonPatternsJson,
+        patterns: horizonPatterns,
 
         wellpickFlatting: ["Hor_2", "Hor_4"],
 
@@ -440,103 +266,6 @@ export const Default: StoryObj<typeof Template> = {
         },
     },
     render: (args) => <Template {...args} />,
-};
-
-import WellLogInfoPanel from "./components/WellLogInfoPanel";
-import WellLogZoomSlider from "./components/WellLogZoomSlider";
-import WellLogScaleSelector from "./components/WellLogScaleSelector";
-import WellInfoIcon from "@mui/icons-material/FormatListBulleted"; // WaterDrop ShowChart, SearchSharp
-import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
-import type { WellLogSet } from "./components/WellLogTypes";
-
-const iconStyle = {
-    fontSize: "18px",
-    verticalAlign: "middle",
-    paddingRight: "4px",
-};
-
-// ? What does this custom layout thing do?
-export const CustomLayout = Template.bind({});
-
-// @ts-expect-error TS2339
-CustomLayout.args = {
-    ...Default.args,
-    wellpicks: undefined,
-    syncContentDomain: false,
-    id: "Well-Log-Viewer-Discrete",
-    readoutOptions: {
-        grouping: "by_track",
-    },
-    layout: {
-        // function to create react component
-        right: (parent: SyncLogViewer) => (
-            <div className="side-panel">
-                <div style={{ paddingBottom: "5px" }}>
-                    <WellLogScaleSelector
-                        label="Scale value:"
-                        round={true}
-                        callbackManager={parent.callbackManagers[0]}
-                    />
-                </div>
-                {parent.wellLogCollections?.map((wellLog, iWellLog) => (
-                    <WellLogInfoPanel
-                        key={iWellLog}
-                        header={
-                            <>
-                                <span style={iconStyle}>
-                                    <WellInfoIcon fontSize="inherit" />
-                                </span>
-                                <i>{wellLog[0]?.header.well}</i>
-                            </>
-                        }
-                        readoutOptions={parent.props.readoutOptions}
-                        callbackManager={parent.callbackManagers[iWellLog]}
-                    />
-                ))}
-            </div>
-        ),
-        bottom: (parent: SyncLogViewer) => (
-            <div
-                className="side-panel"
-                style={{ minWidth: "100%", maxWidth: "100%" }}
-            >
-                <WellLogZoomSlider
-                    label="Zoom:"
-                    max={parent.props.welllogOptions?.maxContentZoom}
-                    callbackManager={parent.callbackManagers[0]}
-                />
-            </div>
-        ),
-
-        // react component
-        left: (
-            <>
-                <div
-                    style={{
-                        textOrientation: "mixed",
-                        writingMode: "vertical-rl",
-                        fontSize: "10pt",
-                        paddingTop: "20px",
-                        paddingLeft: "5px",
-                    }}
-                >
-                    Depth
-                </div>
-                <ArrowDownwardIcon />
-            </>
-        ),
-
-        // simple text
-        header: "Customized layout example",
-    },
-};
-// @ts-expect-error TS2339
-CustomLayout.parameters = {
-    docs: {
-        description: {
-            story: "An example custom component layout.",
-        },
-    },
 };
 
 Default.tags = ["no-screenshot-test"];
@@ -623,7 +352,6 @@ const TemplateWithSelection = (args: SyncLogViewerProps) => {
             </div>
             <div style={{ width: "100%", height: "100%", flex: 1 }}>
                 <SyncLogViewer
-                    id="SyncLogViewer2"
                     {...argsWithSelection}
                     onCreateController={onCreateController}
                     onDeleteController={onDeleteController}
@@ -633,18 +361,10 @@ const TemplateWithSelection = (args: SyncLogViewerProps) => {
     );
 };
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const args = require("../../../../example-data/facies3wells.json");
-
 export const DiscreteLogs: StoryObj<typeof TemplateWithSelection> = {
-    args: args,
+    args: facies3Wells,
     render: (args) => <TemplateWithSelection {...args} />,
 };
-
-import syncTemplateJson from "../../../../example-data/synclog_template.json";
-import L898MUDJson from "../../../../example-data/L898MUD.json";
-import L916MUDJson from "../../../../example-data/L916MUD.json";
-import type { Template as TemplateType } from "./components/WellLogTemplateTypes";
 
 const verySimpleTemplate: TemplateType = {
     name: "Something simple",

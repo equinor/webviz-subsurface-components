@@ -8,9 +8,9 @@ import type { DifferentialPlotLegendInfo } from "@equinor/videx-wellog/dist/plot
 import type { DifferentialPlotOptions } from "@equinor/videx-wellog/dist/plots/interfaces";
 import type { LogViewer } from "@equinor/videx-wellog";
 
-import type { ExtPlotOptions } from "./tracks";
+import type { ExtPlotOptions } from "./plots";
 import { isScaleTrack } from "./tracks";
-import { getPlotType } from "./tracks";
+import { getPlotType } from "./plots";
 
 function getValueOnInterval(
     x: number,

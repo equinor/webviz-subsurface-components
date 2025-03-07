@@ -5,8 +5,8 @@ import "jest-styled-components";
 import React from "react";
 import WellLogViewer from "./WellLogViewer";
 import type { WellLogController } from "./components/WellLogView";
-import type { ColorMapFunction } from "./components/ColorMapFunction";
 import { axisMnemos, axisTitles } from "./utils/axes";
+import type { ColorMapFunction } from "./utils/color-function";
 
 // TODO: Fix this the next time the file is edited.
 // eslint-disable-next-line @typescript-eslint/no-require-imports

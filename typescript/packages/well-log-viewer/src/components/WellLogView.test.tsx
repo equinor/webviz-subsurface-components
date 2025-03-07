@@ -1,20 +1,20 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+import React from "react";
 import { colorTables } from "@emerson-eps/color-tables";
 import { render } from "@testing-library/react";
 import "jest-styled-components";
-import React from "react";
 import WellLogView from "./WellLogView";
+import type { Template } from "./WellLogTemplateTypes";
+import type { ColorMapFunction } from "../utils/color-function";
 
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const exampleTemplate = require("../../../../../example-data/welllog_template_1.json");
+import viewerTemplateJson from "../../../../../example-data/welllog_template_1.json";
+
+const viewerTemplate = viewerTemplateJson as Template;
+const exampleColorMapFunctions = colorTables as ColorMapFunction[];
 const exampleWellLog = {
     header: {},
     curves: [],
     data: [],
 };
-import type { ColorMapFunction } from "./ColorMapFunction";
-const exampleColorMapFunctions = colorTables as ColorMapFunction[];
 
 window.ResizeObserver =
     window.ResizeObserver ||
@@ -28,13 +28,13 @@ describe("Test Well Log View Component", () => {
     it("snapshot test", () => {
         const { container } = render(
             <WellLogView
-                welllog={exampleWellLog}
+                wellLogSets={[exampleWellLog]}
                 options={{
                     checkDatafileSchema: true,
                     hideTrackLegend: true,
                     hideTrackTitle: true,
                 }}
-                template={exampleTemplate}
+                template={viewerTemplate}
                 colorMapFunctions={exampleColorMapFunctions}
                 primaryAxis={"md"}
                 axisTitles={{

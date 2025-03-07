@@ -1,9 +1,9 @@
-import type {
-    ColorMapFunction,
-    ColorFunction,
-    ColorTable,
-} from "../components/ColorMapFunction";
-import { isFunction } from "../components/ColorMapFunction";
+import {
+    type ColorMapFunction,
+    type ColorFunction,
+    type ColorTable,
+    isFunction,
+} from "./color-function";
 
 /*
   Binary serach in array of elements [number, ...]

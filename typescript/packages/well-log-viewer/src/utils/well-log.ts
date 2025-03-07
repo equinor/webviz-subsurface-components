@@ -6,10 +6,14 @@ import _ from "lodash";
 import type {
     WellLogCurve,
     WellLogMetadataDiscrete,
+    WellLogMetadataDiscreteObjects,
     WellLogSet,
 } from "../components/WellLogTypes";
-import type { AxesInfo } from "./tracks";
 import type { WellLogViewProps } from "../components/WellLogView";
+import type { ColorMapFunction } from "./color-function";
+import type { AxesInfo } from "./axes";
+import { indexOfElementByNames } from "./arrays";
+import { getInterpolatedColor } from "./color-table";
 
 /**
  * Get all well log curves from a collection of well log sets
@@ -137,6 +141,21 @@ function findIndexByMemos(curves: WellLogCurve[], memos: string[]): number {
     return curves.findIndex(({ name }) => memos.includes(name.toUpperCase()));
 }
 
+export function getAvailableAxes(
+    wellLog: WellLogSet[],
+    axisMnemos: Record<string, string[]>
+): string[] {
+    const result: string[] = [];
+    const curves = getAllWellLogCurves(wellLog);
+
+    for (const key in axisMnemos) {
+        const i = indexOfElementByNames(curves, axisMnemos[key]);
+        if (i >= 0) result.push(key);
+    }
+
+    return result;
+}
+
 /**
  * Extracts well log sets from the properties of a WellLogView component.
  * Prioritizes the `wellLogSets` property, but uses the depreacted `welllog` property as a fallback.
@@ -177,4 +196,109 @@ export function getCurveFromVidexPlotId(
     const [iSet, iCurve] = trackId.split("-").map(Number);
 
     return wellLogSets[iSet]?.curves[iCurve];
+}
+
+export interface DiscreteMeta {
+    iCode: number;
+    iColor: number;
+    objects: WellLogMetadataDiscreteObjects;
+}
+let iStringToNum = 0;
+const mapStringToNum = new Map();
+
+export function getDiscreteMeta(
+    wellLogSet: WellLogSet,
+    name: string
+): DiscreteMeta | null {
+    const metadataTable = getDiscreteMetaDataByName(wellLogSet, name);
+
+    if (metadataTable) {
+        // there is a metadata for given log name
+        const attributes = metadataTable.attributes; // ["color", "code"]
+        if (attributes) {
+            const iCode = attributes.indexOf("code");
+            const iColor = attributes.indexOf("color");
+            if (iColor >= 0 && iCode >= 0)
+                // all values are OK
+                return {
+                    iCode: iCode,
+                    iColor: iColor,
+                    objects: metadataTable.objects, // [attr1,attr2]                ,
+                };
+        }
+    }
+
+    return null; // something went wrong
+}
+
+export function getDiscreteColorAndName(
+    value: number | string | null,
+    colorMapFunction: ColorMapFunction | undefined,
+    meta?: DiscreteMeta | null
+): { color: number[]; name: string } {
+    let color: number[];
+    let name: string;
+    if (value === null) value = Number.NaN;
+    if (meta) {
+        // use discrete metadata from WellLog JSON file
+        const { objects, iColor, iCode } = meta;
+        let object: (number[] | number)[] | undefined = undefined;
+        if (typeof value === "string") {
+            // value is key
+            name = value;
+            object = objects[value];
+        } else {
+            // usual discrete log
+            name = value.toString();
+            for (const t in objects) {
+                const obj = objects[t];
+                if (value === obj[iCode]) {
+                    // value is code
+                    name = t;
+                    object = obj;
+                    break;
+                }
+            }
+        }
+        /*if(object)*/ {
+            if (colorMapFunction) {
+                // get color from the table
+                color = getInterpolatedColor(
+                    colorMapFunction,
+                    !object
+                        ? Number.NaN
+                        : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                          parseFloat((object[iCode] as number).toString()) // parseInt for discrete log
+                );
+            } else {
+                // get color from the meta (obsolete?)
+                color = object ? (object[iColor] as number[]) : [255, 25, 25];
+            }
+        }
+    } else {
+        name = value.toString();
+        if (colorMapFunction) {
+            // get color from the table
+            if (typeof value === "string") {
+                let v: number;
+                if (mapStringToNum.has(value)) {
+                    v = mapStringToNum.get(value);
+                } else {
+                    mapStringToNum.set(value, iStringToNum);
+                    v = iStringToNum;
+                    iStringToNum++;
+                }
+                color = getInterpolatedColor(colorMapFunction, v);
+            } else {
+                color = getInterpolatedColor(
+                    colorMapFunction,
+                    parseInt(value.toString())
+                );
+            }
+        } else {
+            // get default color
+            color = [224, 224, 224];
+        }
+    }
+    return { color, name };
 }

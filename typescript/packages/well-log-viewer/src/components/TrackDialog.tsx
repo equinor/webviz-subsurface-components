@@ -22,6 +22,7 @@ import { createScaleItems } from "./PlotDialog";
 import { createBooleanItems } from "./PlotDialog";
 import { _createItems } from "./PlotDialog";
 import { dialogContentStyle } from "./PlotDialog";
+import _ from "lodash";
 
 const noneValue = "-";
 
@@ -48,7 +49,7 @@ export class TrackPropertiesDialog extends Component<Props, State> {
         const names = dataNames(this.props.wellLogView.wellLogSets, null, true);
         if (names[0]) name = names[0];
 
-        const templateTrack = this.props.templateTrack;
+        const templateTrack = _.cloneDeep(this.props.templateTrack);
         this.bStacked =
             templateTrack &&
             templateTrack.plots &&

@@ -8,7 +8,6 @@ import WellLogViewer, {
 
 import type { Info } from "./components/InfoTypes";
 import type { Template } from "./components/WellLogTemplateTypes";
-import type { ColorMapFunction } from "./components/ColorMapFunction";
 import type { WellLogSet } from "./components/WellLogTypes";
 import type WellLogView from "./components/WellLogView";
 import type {
@@ -17,22 +16,31 @@ import type {
     WellPickProps,
 } from "./components/WellLogView";
 
-import exampleData from "../../../../example-data/deckgl-map.json";
-import wellLogsJson from "../../../../example-data/volve_logs.json";
-import templateJson from "../../../../example-data/welllog_template_2.json";
-
 import type { MapAndWellLogViewerProps } from "./Storybook/examples/MapAndWellLogViewer";
 import { MapAndWellLogViewer } from "./Storybook/examples/MapAndWellLogViewer";
 import { axisMnemos, axisTitles } from "./utils/axes";
+import type { ColorMapFunction, ColorTable } from "./utils/color-function";
+
+import exampleDeckglArgsJson from "../../../../example-data/deckgl-map.json";
+import wellLogsJson from "../../../../example-data/volve_logs.json";
+import wellLogl898MUDJson from "../../../../example-data/L898MUD.json";
+import wellLogMWD3Json from "../../../../example-data/WL_RAW_AAC-BHPR-CAL-DEN-GR-MECH-NEU-NMR-REMP_MWD_3.json";
+import templateJson1 from "../../../../example-data/welllog_template_1.json";
+import templateJson2 from "../../../../example-data/welllog_template_2.json";
+import wellpicksJson from "../../../../example-data/wellpicks.json";
+import colorTablesJson from "../../../../example-data/wellpick_colors.json";
+
+const exampleColorFunctions = colorTablesJson as ColorMapFunction[];
+const exampleColorTables = colorTablesJson as ColorTable[];
 
 const wellLogs = wellLogsJson as unknown as WellLogSet[];
-const template = templateJson as unknown as Template;
+const wellLogl898MUD = wellLogl898MUDJson as WellLogSet[];
+const template1 = templateJson1 as unknown as Template;
+const template2 = templateJson2 as unknown as Template;
 
-import wellpicks from "../../../../example-data/wellpicks.json";
-import colorTables from "../../../../example-data/wellpick_colors.json";
 const exampleColorMapFunctions: ColorMapFunction[] = [
     // copy color tables and add some color functions
-    ...(colorTables as ColorMapFunction[]),
+    ...exampleColorFunctions,
     {
         name: "Grey scale",
         func: (v: number) => [v * 255, v * 255, v * 255],
@@ -63,10 +71,10 @@ const ComponentCode =
     "    colorMapFunctions={exampleColorMapFunctions} \r\n" +
     "/>";
 
-const stories: Meta = {
-    // @ts-expect-error TS2322
+const stories: Meta<WellLogViewerProps> = {
     component: WellLogViewer,
     title: "WellLogViewer/Demo/WellLogViewer",
+    argTypes: argTypesWellLogViewerProp,
     parameters: {
         docs: {
             description: {
@@ -77,13 +85,6 @@ const stories: Meta = {
         componentSource: {
             code: ComponentCode,
             language: "javascript",
-        },
-    },
-    argTypes: {
-        ...argTypesWellLogViewerProp,
-        id: {
-            description:
-                "The ID of this component, used to identify dash components in callbacks. The ID needs to be unique across all of the components in an app.",
         },
     },
 };
@@ -186,7 +187,7 @@ const StoryTemplate = (args: WellLogViewerProps) => {
 };
 
 const wellpick: WellPickProps = {
-    wellpick: wellpicks[0],
+    wellpick: wellpicksJson[0],
     name: "HORIZON",
     colorMapFunctions: exampleColorMapFunctions,
     colorMapFunctionName: "Stratigraphy",
@@ -196,8 +197,8 @@ export const Default: StoryObj<typeof StoryTemplate> = {
     args: {
         //id: "Well-Log-Viewer",
         horizontal: false,
-        welllog: require("../../../../example-data/L898MUD.json")[0], // eslint-disable-line
-        template: require("../../../../example-data/welllog_template_1.json"), // eslint-disable-line
+        wellLogSets: wellLogl898MUD,
+        template: template1,
         colorMapFunctions: exampleColorMapFunctions,
         wellpick: wellpick,
         axisTitles: axisTitles,
@@ -219,7 +220,7 @@ export const ColorByFunction: StoryObj<typeof StoryTemplate> = {
     args: {
         //id: "Well-Log-Viewer",
         horizontal: false,
-        welllog: require("../../../../example-data/L898MUD.json")[0], // eslint-disable-line
+        wellLogSets: wellLogl898MUD,
         template: {
             name: "Template 1",
             scale: {
@@ -266,11 +267,9 @@ export const ColorByFunction: StoryObj<typeof StoryTemplate> = {
 
 export const Horizontal: StoryObj<typeof StoryTemplate> = {
     args: {
-        //id: "Well-Log-Viewer-Horizontal",
         horizontal: true,
-        welllog:
-            require("../../../../example-data/WL_RAW_AAC-BHPR-CAL-DEN-GR-MECH-NEU-NMR-REMP_MWD_3.json")[0], // eslint-disable-line
-        template: template,
+        wellLogSets: wellLogMWD3Json,
+        template: template2,
         colorMapFunctions: exampleColorMapFunctions,
         wellpick: wellpick,
         axisTitles: axisTitles,
@@ -289,11 +288,9 @@ export const Horizontal: StoryObj<typeof StoryTemplate> = {
 
 export const OnInfoFilledEvent: StoryObj<typeof StoryTemplate> = {
     args: {
-        //id: "Well-Log-Viewer-OnInfoFilled",
         horizontal: true,
-        welllog:
-            require("../../../../example-data/WL_RAW_AAC-BHPR-CAL-DEN-GR-MECH-NEU-NMR-REMP_MWD_3.json")[0], // eslint-disable-line
-        template: template,
+        wellLogSets: wellLogMWD3Json,
+        template: template2,
         colorMapFunctions: exampleColorMapFunctions,
         wellpick: wellpick,
         axisTitles: axisTitles,
@@ -379,27 +376,12 @@ function CustomInfoPanel(props: { infos: Info[] }): JSX.Element {
     );
 }
 
-const drawing_layer = exampleData[0].layers.find(
-    (item) => item["@@type"] === "DrawingLayer"
-);
-if (drawing_layer) drawing_layer.visible = false;
-
-const wells_layer = exampleData[0].layers.find(
-    (item) => item["@@type"] === "WellsLayer"
-);
-if (wells_layer) {
-    wells_layer.logName = "ZONE_MAIN"; //
-    wells_layer.logColor = "Stratigraphy";
-}
-
 export const Discrete: StoryObj<typeof StoryTemplate> = {
     args: {
-        //id: "Well-Log-Viewer-Discrete",
         horizontal: false,
         wellLogSets: [
             {
                 ...wellLogs[0],
-                // Inject a curve with a "string" valuetype, to showcase that's a thing
                 curves: [
                     ...wellLogs[0].curves,
                     {
@@ -419,13 +401,13 @@ export const Discrete: StoryObj<typeof StoryTemplate> = {
             },
         ],
         template: {
-            ...template,
+            ...template2,
             tracks: [
                 {
                     title: "string discrete",
                     plots: [{ name: "STRING_CURVE", style: "discrete" }],
                 },
-                ...template.tracks,
+                ...template2.tracks,
             ],
         },
         colorMapFunctions: exampleColorMapFunctions,
@@ -598,13 +580,15 @@ const MapAndWellLogViewerStoryComp = (
     );
 };
 
+const exampleMapAndLogProps =
+    exampleDeckglArgsJson[0] as unknown as MapAndWellLogViewerProps;
+
 export const MapAndWellLogViewerStory: StoryObj<
     typeof MapAndWellLogViewerStoryComp
 > = {
     args: {
-        ...exampleData[0],
-        // @ts-expect-error TS2322
-        colorTables: colorTables,
+        ...exampleMapAndLogProps,
+        colorTables: exampleColorTables,
         id: "MapAndWellLog", // redefine id from exampleData[0]
     },
     tags: ["no-test"],

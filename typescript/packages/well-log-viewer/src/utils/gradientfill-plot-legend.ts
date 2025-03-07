@@ -10,11 +10,8 @@ declare type D3Selection = any; //import { D3Selection } from "@equinor/videx-we
 import { renderBasicPlotLegend } from "./legend/common"; //import { renderBasicPlotLegend } from "@equinor/videx-wellog/dist/plots/legend/common';
 /* End of missed from "@equinor/videx-wellog */
 
-import type {
-    ColorMapFunction,
-    ColorTable,
-} from "../components/ColorMapFunction";
-import { isFunction } from "../components/ColorMapFunction";
+import type { ColorMapFunction, ColorTable } from "./color-function";
+import { isFunction } from "./color-function";
 import { getInterpolatedColorString } from "./color-table";
 
 import { color4ToString } from "./color-table";

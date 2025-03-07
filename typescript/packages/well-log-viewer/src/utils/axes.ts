@@ -1,3 +1,10 @@
+export interface AxesInfo {
+    primaryAxis: string;
+    secondaryAxis: string;
+    titles: Record<string, string>; // language dependent strings
+    mnemos: Record<string, string[]>;
+}
+
 export const axisTitles: Record<string, string> = {
     // language dependent
     md: "MD",
@@ -24,3 +31,7 @@ export const axisMnemos: Record<string, string[]> = {
     //  time based logging data
     time: ["TIME"],
 };
+
+export function getAxisTitle(axes: AxesInfo, axisName: string): string {
+    return axes.titles ? axes.titles[axisName] : axisName;
+}
