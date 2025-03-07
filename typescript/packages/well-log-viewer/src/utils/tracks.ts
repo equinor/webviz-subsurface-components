@@ -276,6 +276,8 @@ function makeGraphTrackOptions(
         const plotSetup = plotSetups[index];
         const plotSetup2 = maybeGetSecondaryPlotSetup(plotSetups, index);
 
+        applySetupMinMax(plotSetup, plotSetup2, indexMinMax);
+
         const plotConfig = buildPlotConfig(
             plotSetup,
             plotSetup2,
@@ -288,8 +290,6 @@ function makeGraphTrackOptions(
         trackPlots.push(plotConfig);
         curvesUsed.push(plotSetup.curve);
         trackData.push(plotSetup.plotData.data);
-
-        applySetupMinMax(plotSetup, plotSetup2, indexMinMax);
 
         if (plotSetup2) {
             // The "next" setup is already consumed, increment an extra step
