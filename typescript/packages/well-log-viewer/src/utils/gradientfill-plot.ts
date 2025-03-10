@@ -1,15 +1,14 @@
 import { area } from "d3";
 import type { Scale } from "@equinor/videx-wellog/dist/common/interfaces";
 import { Plot } from "@equinor/videx-wellog";
-
-import type { DefinedFunction } from "@equinor/videx-wellog/dist/plots/interfaces";
+import type {
+    DefinedFunction,
+    AreaPlotOptions,
+} from "@equinor/videx-wellog/dist/plots/interfaces";
 
 import renderGradientFillPlotLegend from "./gradientfill-plot-legend";
 import { getInterpolatedColorString } from "./color-table";
-
-import type { ColorMapFunction } from "../components/ColorMapFunction";
-
-import type { AreaPlotOptions } from "@equinor/videx-wellog/dist/plots/interfaces";
+import type { ColorMapFunction } from "./color-function";
 
 export interface GradientFillPlotOptions extends AreaPlotOptions {
     colorMapFunction?: ColorMapFunction;
@@ -82,7 +81,7 @@ export default class GradientFillPlot extends Plot {
         super(id, options);
         // subclass render function.
         // eslint-disable-next-line
-        (this.options as any).renderLegend = renderGradientFillPlotLegend; // see updateLegendRows() in videx-wellog\src\tracks\graph\graph-legend.ts 
+        (this.options as any).renderLegend = renderGradientFillPlotLegend; // see updateLegendRows() in videx-wellog\src\tracks\graph\graph-legend.ts
     }
 
     /**
@@ -92,7 +91,7 @@ export default class GradientFillPlot extends Plot {
      */
     plot(ctx: CanvasRenderingContext2D, scale: Scale): void {
         const { scale: xscale, data: plotdata } = this;
-        if (!xscale) return;
+        if (!xscale || plotdata.length < 2) return;
 
         const options = this.options as GradientFillPlotOptions;
         if (options.hidden) return;
