@@ -1,10 +1,188 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`test 'layers' button snapshot test 1`] = `
+.c5 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  -webkit-align-items: flex-end;
+  -webkit-box-align: flex-end;
+  -ms-flex-align: flex-end;
+  align-items: flex-end;
+  position: relative;
+  margin: 0;
+  color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+  font-family: Equinor;
+  font-size: 0.750rem;
+  font-weight: 500;
+  line-height: 1.333em;
+  text-align: left;
+  margin-left: 8px;
+  margin-right: 8px;
+  color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+}
+
+.c6 {
+  margin: 0;
+}
+
 .c0 {
   -webkit-transform: none;
   -ms-transform: none;
   transform: none;
+}
+
+.c2 {
+  background: var(--eds_ui_background__default,rgba(255,255,255,1));
+  box-shadow: 0 1px 5px rgba(0,0,0,0.2),0 3px 4px rgba(0,0,0,0.12),0 2px 4px rgba(0,0,0,0.14);
+}
+
+.c4 {
+  position: relative;
+  list-style: none;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  margin: 0;
+  padding-left: 0px;
+  padding-top: 8px;
+  padding-right: 0px;
+  padding-bottom: 8px;
+}
+
+.c4 li:first-child {
+  z-index: 3;
+}
+
+.c3 {
+  width: 100%;
+  min-width: -webkit-fit-content;
+  min-width: -moz-fit-content;
+  min-width: fit-content;
+  border-radius: 4px;
+}
+
+.c1 {
+  inset: unset;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  overflow: visible;
+  background-color: transparent;
+}
+
+.c1::backdrop {
+  background-color: transparent;
+}
+
+.c10 {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  position: relative;
+  grid-area: input;
+}
+
+.c8 {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 100%;
+  grid-area: input;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+  cursor: pointer;
+}
+
+.c8:focus {
+  outline: none;
+}
+
+.c8[data-focus-visible-added]:focus + span {
+  outline: 2px dashed var(--eds_interactive__focus,rgba(0,112,121,1));
+  outline-offset: 0px;
+}
+
+.c8:focus-visible + span {
+  outline: 2px dashed var(--eds_interactive__focus,rgba(0,112,121,1));
+  outline-offset: 0px;
+}
+
+.c7 {
+  display: inline-grid;
+  vertical-align: middle;
+  grid: [input] 1fr / [input] 1fr;
+  place-items: center;
+  isolation: isolate;
+}
+
+.c9 {
+  width: 48px;
+  aspect-ratio: 1/1;
+}
+
+.c9:checked + span > span {
+  background-color: var(--eds_interactive_primary__selected_highlight,rgba(230,250,236,1));
+}
+
+.c9:checked + span > span:last-child {
+  -webkit-transform: translate(105%,-50%);
+  -ms-transform: translate(105%,-50%);
+  transform: translate(105%,-50%);
+  background-color: var(--eds_interactive_primary__resting,rgba(0,112,121,1));
+}
+
+.c9:hover + span {
+  background-color: var(--eds_interactive_primary__hover_alt,rgba(222,237,238,1));
+}
+
+.c9:hover + span > span:last-child {
+  background-color: var(--eds_interactive_primary__hover,rgba(0,79,85,1));
+}
+
+.c11 {
+  border-radius: 4px;
+  border: none;
+  width: 32px;
+  height: 8px;
+  background-color: var(--eds_ui_background__medium,rgba(220,220,220,1));
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate(-50%,-50%);
+  -ms-transform: translate(-50%,-50%);
+  transform: translate(-50%,-50%);
+  -webkit-transition: background 0.36s;
+  transition: background 0.36s;
+}
+
+.c12 {
+  background-color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+  box-shadow: 0 1px 5px rgba(0,0,0,0.2),0 3px 4px rgba(0,0,0,0.12),0 2px 4px rgba(0,0,0,0.14);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: inline-block;
+  position: absolute;
+  top: 50%;
+  -webkit-transform: translate(0,-50%);
+  -ms-transform: translate(0,-50%);
+  transform: translate(0,-50%);
+  left: 4px;
+  -webkit-transition: -webkit-transform 0.36s cubic-bezier(0.78,0.14,0.15,0.86);
+  -webkit-transition: transform 0.36s cubic-bezier(0.78,0.14,0.15,0.86);
+  transition: transform 0.36s cubic-bezier(0.78,0.14,0.15,0.86);
 }
 
 <div
@@ -38,14 +216,443 @@ exports[`test 'layers' button snapshot test 1`] = `
       class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
     />
   </button>
+  <div
+    class="c1"
+    data-floating-ui-focusable=""
+    popover="manual"
+    style="position: absolute; top: 0px; left: 0px;"
+    tabindex="-1"
+  >
+    <div
+      class="c2 c3 LayersButton-root"
+    >
+      <div
+        aria-labelledby="layers-selector-button"
+        class="c4"
+        id="layers-selector"
+        role="menu"
+      >
+        <div
+          style="display: flex; justify-content: space-between;"
+        >
+          <label
+            class="c5"
+            id="undefined-switch-label"
+            style="padding-top: 15px; font-size: 15px;"
+          >
+            <span
+              class="c6"
+            />
+          </label>
+          <span
+            class="c7"
+            style="padding-right: 10px; width: 3rem;"
+          >
+            <input
+              class="c8 c9"
+              id="undefined-switch"
+              type="checkbox"
+            />
+            <span
+              class="c10"
+            >
+              <span
+                class="c11"
+              />
+              <span
+                class="c12"
+              />
+            </span>
+          </span>
+        </div>
+        <div
+          style="display: flex; justify-content: space-between;"
+        >
+          <label
+            class="c5"
+            id="undefined-switch-label"
+            style="padding-top: 15px; font-size: 15px;"
+          >
+            <span
+              class="c6"
+            />
+          </label>
+          <span
+            class="c7"
+            style="padding-right: 10px; width: 3rem;"
+          >
+            <input
+              checked=""
+              class="c8 c9"
+              id="undefined-switch"
+              type="checkbox"
+            />
+            <span
+              class="c10"
+            >
+              <span
+                class="c11"
+              />
+              <span
+                class="c12"
+              />
+            </span>
+          </span>
+        </div>
+        <div
+          style="display: flex; justify-content: space-between;"
+        >
+          <label
+            class="c5"
+            id="undefined-switch-label"
+            style="padding-top: 15px; font-size: 15px;"
+          >
+            <span
+              class="c6"
+            />
+          </label>
+          <span
+            class="c7"
+            style="padding-right: 10px; width: 3rem;"
+          >
+            <input
+              class="c8 c9"
+              id="undefined-switch"
+              type="checkbox"
+            />
+            <span
+              class="c10"
+            >
+              <span
+                class="c11"
+              />
+              <span
+                class="c12"
+              />
+            </span>
+          </span>
+        </div>
+        <div
+          style="display: flex; justify-content: space-between;"
+        >
+          <label
+            class="c5"
+            id="undefined-switch-label"
+            style="padding-top: 15px; font-size: 15px;"
+          >
+            <span
+              class="c6"
+            />
+          </label>
+          <span
+            class="c7"
+            style="padding-right: 10px; width: 3rem;"
+          >
+            <input
+              class="c8 c9"
+              id="undefined-switch"
+              type="checkbox"
+            />
+            <span
+              class="c10"
+            >
+              <span
+                class="c11"
+              />
+              <span
+                class="c12"
+              />
+            </span>
+          </span>
+        </div>
+        <div
+          style="display: flex; justify-content: space-between;"
+        >
+          <label
+            class="c5"
+            id="undefined-switch-label"
+            style="padding-top: 15px; font-size: 15px;"
+          >
+            <span
+              class="c6"
+            />
+          </label>
+          <span
+            class="c7"
+            style="padding-right: 10px; width: 3rem;"
+          >
+            <input
+              class="c8 c9"
+              id="undefined-switch"
+              type="checkbox"
+            />
+            <span
+              class="c10"
+            >
+              <span
+                class="c11"
+              />
+              <span
+                class="c12"
+              />
+            </span>
+          </span>
+        </div>
+        <div
+          style="display: flex; justify-content: space-between;"
+        >
+          <label
+            class="c5"
+            id="undefined-switch-label"
+            style="padding-top: 15px; font-size: 15px;"
+          >
+            <span
+              class="c6"
+            />
+          </label>
+          <span
+            class="c7"
+            style="padding-right: 10px; width: 3rem;"
+          >
+            <input
+              class="c8 c9"
+              id="undefined-switch"
+              type="checkbox"
+            />
+            <span
+              class="c10"
+            >
+              <span
+                class="c11"
+              />
+              <span
+                class="c12"
+              />
+            </span>
+          </span>
+        </div>
+        <div
+          style="display: flex; justify-content: space-between;"
+        >
+          <label
+            class="c5"
+            id="undefined-switch-label"
+            style="padding-top: 15px; font-size: 15px;"
+          >
+            <span
+              class="c6"
+            />
+          </label>
+          <span
+            class="c7"
+            style="padding-right: 10px; width: 3rem;"
+          >
+            <input
+              class="c8 c9"
+              id="undefined-switch"
+              type="checkbox"
+            />
+            <span
+              class="c10"
+            >
+              <span
+                class="c11"
+              />
+              <span
+                class="c12"
+              />
+            </span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 `;
 
 exports[`test 'layers' button test empty MapState/specbase 1`] = `
+.c5 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  -webkit-align-items: flex-end;
+  -webkit-box-align: flex-end;
+  -ms-flex-align: flex-end;
+  align-items: flex-end;
+  position: relative;
+  margin: 0;
+  color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+  font-family: Equinor;
+  font-size: 0.750rem;
+  font-weight: 500;
+  line-height: 1.333em;
+  text-align: left;
+  margin-left: 8px;
+  margin-right: 8px;
+  color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+}
+
+.c6 {
+  margin: 0;
+}
+
 .c0 {
   -webkit-transform: none;
   -ms-transform: none;
   transform: none;
+}
+
+.c2 {
+  background: var(--eds_ui_background__default,rgba(255,255,255,1));
+  box-shadow: 0 1px 5px rgba(0,0,0,0.2),0 3px 4px rgba(0,0,0,0.12),0 2px 4px rgba(0,0,0,0.14);
+}
+
+.c4 {
+  position: relative;
+  list-style: none;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  margin: 0;
+  padding-left: 0px;
+  padding-top: 8px;
+  padding-right: 0px;
+  padding-bottom: 8px;
+}
+
+.c4 li:first-child {
+  z-index: 3;
+}
+
+.c3 {
+  width: 100%;
+  min-width: -webkit-fit-content;
+  min-width: -moz-fit-content;
+  min-width: fit-content;
+  border-radius: 4px;
+}
+
+.c1 {
+  inset: unset;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  overflow: visible;
+  background-color: transparent;
+}
+
+.c1::backdrop {
+  background-color: transparent;
+}
+
+.c10 {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  position: relative;
+  grid-area: input;
+}
+
+.c8 {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 100%;
+  grid-area: input;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+  cursor: pointer;
+}
+
+.c8:focus {
+  outline: none;
+}
+
+.c8[data-focus-visible-added]:focus + span {
+  outline: 2px dashed var(--eds_interactive__focus,rgba(0,112,121,1));
+  outline-offset: 0px;
+}
+
+.c8:focus-visible + span {
+  outline: 2px dashed var(--eds_interactive__focus,rgba(0,112,121,1));
+  outline-offset: 0px;
+}
+
+.c7 {
+  display: inline-grid;
+  vertical-align: middle;
+  grid: [input] 1fr / [input] 1fr;
+  place-items: center;
+  isolation: isolate;
+}
+
+.c9 {
+  width: 48px;
+  aspect-ratio: 1/1;
+}
+
+.c9:checked + span > span {
+  background-color: var(--eds_interactive_primary__selected_highlight,rgba(230,250,236,1));
+}
+
+.c9:checked + span > span:last-child {
+  -webkit-transform: translate(105%,-50%);
+  -ms-transform: translate(105%,-50%);
+  transform: translate(105%,-50%);
+  background-color: var(--eds_interactive_primary__resting,rgba(0,112,121,1));
+}
+
+.c9:hover + span {
+  background-color: var(--eds_interactive_primary__hover_alt,rgba(222,237,238,1));
+}
+
+.c9:hover + span > span:last-child {
+  background-color: var(--eds_interactive_primary__hover,rgba(0,79,85,1));
+}
+
+.c11 {
+  border-radius: 4px;
+  border: none;
+  width: 32px;
+  height: 8px;
+  background-color: var(--eds_ui_background__medium,rgba(220,220,220,1));
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate(-50%,-50%);
+  -ms-transform: translate(-50%,-50%);
+  transform: translate(-50%,-50%);
+  -webkit-transition: background 0.36s;
+  transition: background 0.36s;
+}
+
+.c12 {
+  background-color: var(--eds_text__static_icons__tertiary,rgba(111,111,111,1));
+  box-shadow: 0 1px 5px rgba(0,0,0,0.2),0 3px 4px rgba(0,0,0,0.12),0 2px 4px rgba(0,0,0,0.14);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: inline-block;
+  position: absolute;
+  top: 50%;
+  -webkit-transform: translate(0,-50%);
+  -ms-transform: translate(0,-50%);
+  transform: translate(0,-50%);
+  left: 4px;
+  -webkit-transition: -webkit-transform 0.36s cubic-bezier(0.78,0.14,0.15,0.86);
+  -webkit-transition: transform 0.36s cubic-bezier(0.78,0.14,0.15,0.86);
+  transition: transform 0.36s cubic-bezier(0.78,0.14,0.15,0.86);
 }
 
 <div
@@ -79,6 +686,257 @@ exports[`test 'layers' button test empty MapState/specbase 1`] = `
       class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
     />
   </button>
+  <div
+    class="c1"
+    data-floating-ui-focusable=""
+    popover="manual"
+    style="position: absolute; top: 0px; left: 0px;"
+    tabindex="-1"
+  >
+    <div
+      class="c2 c3 LayersButton-root"
+    >
+      <div
+        aria-labelledby="layers-selector-button"
+        class="c4"
+        id="layers-selector"
+        role="menu"
+      >
+        <div
+          style="display: flex; justify-content: space-between;"
+        >
+          <label
+            class="c5"
+            id="undefined-switch-label"
+            style="padding-top: 15px; font-size: 15px;"
+          >
+            <span
+              class="c6"
+            />
+          </label>
+          <span
+            class="c7"
+            style="padding-right: 10px; width: 3rem;"
+          >
+            <input
+              class="c8 c9"
+              id="undefined-switch"
+              type="checkbox"
+            />
+            <span
+              class="c10"
+            >
+              <span
+                class="c11"
+              />
+              <span
+                class="c12"
+              />
+            </span>
+          </span>
+        </div>
+        <div
+          style="display: flex; justify-content: space-between;"
+        >
+          <label
+            class="c5"
+            id="undefined-switch-label"
+            style="padding-top: 15px; font-size: 15px;"
+          >
+            <span
+              class="c6"
+            />
+          </label>
+          <span
+            class="c7"
+            style="padding-right: 10px; width: 3rem;"
+          >
+            <input
+              checked=""
+              class="c8 c9"
+              id="undefined-switch"
+              type="checkbox"
+            />
+            <span
+              class="c10"
+            >
+              <span
+                class="c11"
+              />
+              <span
+                class="c12"
+              />
+            </span>
+          </span>
+        </div>
+        <div
+          style="display: flex; justify-content: space-between;"
+        >
+          <label
+            class="c5"
+            id="undefined-switch-label"
+            style="padding-top: 15px; font-size: 15px;"
+          >
+            <span
+              class="c6"
+            />
+          </label>
+          <span
+            class="c7"
+            style="padding-right: 10px; width: 3rem;"
+          >
+            <input
+              class="c8 c9"
+              id="undefined-switch"
+              type="checkbox"
+            />
+            <span
+              class="c10"
+            >
+              <span
+                class="c11"
+              />
+              <span
+                class="c12"
+              />
+            </span>
+          </span>
+        </div>
+        <div
+          style="display: flex; justify-content: space-between;"
+        >
+          <label
+            class="c5"
+            id="undefined-switch-label"
+            style="padding-top: 15px; font-size: 15px;"
+          >
+            <span
+              class="c6"
+            />
+          </label>
+          <span
+            class="c7"
+            style="padding-right: 10px; width: 3rem;"
+          >
+            <input
+              class="c8 c9"
+              id="undefined-switch"
+              type="checkbox"
+            />
+            <span
+              class="c10"
+            >
+              <span
+                class="c11"
+              />
+              <span
+                class="c12"
+              />
+            </span>
+          </span>
+        </div>
+        <div
+          style="display: flex; justify-content: space-between;"
+        >
+          <label
+            class="c5"
+            id="undefined-switch-label"
+            style="padding-top: 15px; font-size: 15px;"
+          >
+            <span
+              class="c6"
+            />
+          </label>
+          <span
+            class="c7"
+            style="padding-right: 10px; width: 3rem;"
+          >
+            <input
+              class="c8 c9"
+              id="undefined-switch"
+              type="checkbox"
+            />
+            <span
+              class="c10"
+            >
+              <span
+                class="c11"
+              />
+              <span
+                class="c12"
+              />
+            </span>
+          </span>
+        </div>
+        <div
+          style="display: flex; justify-content: space-between;"
+        >
+          <label
+            class="c5"
+            id="undefined-switch-label"
+            style="padding-top: 15px; font-size: 15px;"
+          >
+            <span
+              class="c6"
+            />
+          </label>
+          <span
+            class="c7"
+            style="padding-right: 10px; width: 3rem;"
+          >
+            <input
+              class="c8 c9"
+              id="undefined-switch"
+              type="checkbox"
+            />
+            <span
+              class="c10"
+            >
+              <span
+                class="c11"
+              />
+              <span
+                class="c12"
+              />
+            </span>
+          </span>
+        </div>
+        <div
+          style="display: flex; justify-content: space-between;"
+        >
+          <label
+            class="c5"
+            id="undefined-switch-label"
+            style="padding-top: 15px; font-size: 15px;"
+          >
+            <span
+              class="c6"
+            />
+          </label>
+          <span
+            class="c7"
+            style="padding-right: 10px; width: 3rem;"
+          >
+            <input
+              class="c8 c9"
+              id="undefined-switch"
+              type="checkbox"
+            />
+            <span
+              class="c10"
+            >
+              <span
+                class="c11"
+              />
+              <span
+                class="c12"
+              />
+            </span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 `;
 
