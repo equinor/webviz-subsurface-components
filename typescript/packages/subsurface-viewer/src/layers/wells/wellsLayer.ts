@@ -296,14 +296,14 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
         const coarseData = coarsenWells(data);
 
-        const doRefine =
-            typeof refine === "number" ? refine > 1 : (refine as boolean);
+        const isDataTransformSet = this.props.dataTransform !== null;
+        if (!isDataTransformSet) {
+            const doRefine =
+                typeof refine === "number" ? refine > 1 : (refine as boolean);
+            const stepCount = typeof refine === "number" ? refine : 5;
 
-        const stepCount = typeof refine === "number" ? refine : 5;
-
-        data = doRefine
-            ? splineRefine(data, stepCount) // smooth well paths.
-            : data;
+            data = doRefine ? splineRefine(data, stepCount) : coarseData;
+        }
 
         this.setState({
             ...this.state,
@@ -582,6 +582,11 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             extensions,
             getDashArray: getDashFactor(this.props.lineStyle?.dash),
             visible: this.props.outline && !fastDrawing,
+            parameters: {
+                ...parameters,
+                [GL.POLYGON_OFFSET_FACTOR]: 1,
+                [GL.POLYGON_OFFSET_UNITS]: 1,
+            },
         });
 
         const highlightLayerProps = this.getSubLayerProps({
