@@ -1,8 +1,10 @@
 import { area } from "d3";
 import type { Scale } from "@equinor/videx-wellog/dist/common/interfaces";
 import { Plot } from "@equinor/videx-wellog";
-import type { DefinedFunction } from "@equinor/videx-wellog/dist/plots/interfaces";
-import type { AreaPlotOptions } from "@equinor/videx-wellog/dist/plots/interfaces";
+import type {
+    DefinedFunction,
+    AreaPlotOptions,
+} from "@equinor/videx-wellog/dist/plots/interfaces";
 
 import renderGradientFillPlotLegend from "./gradientfill-plot-legend";
 import { getInterpolatedColorString } from "./color-table";
