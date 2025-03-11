@@ -788,7 +788,7 @@ const CoarseWellFactorComponent: React.FC<CoarseWellFactorProps> = (
 
     const handleChange = React.useCallback(
         (_event: Event | SyntheticEvent, value: number | number[]) => {
-            setN(n => n + 1);
+            setN((n) => n + 1);
             setCoarseWellsToleranceFactor(value as number);
         },
         []
@@ -865,7 +865,6 @@ const CoarseWellFactorComponent: React.FC<CoarseWellFactorProps> = (
         },
     };
 
-
     return (
         <Root>
             <div className={classes.main}>
@@ -891,7 +890,6 @@ const CoarseWellFactorComponent: React.FC<CoarseWellFactorProps> = (
                 valueLabelDisplay={"auto"}
             />
         </Root>
-
     );
 };
 
