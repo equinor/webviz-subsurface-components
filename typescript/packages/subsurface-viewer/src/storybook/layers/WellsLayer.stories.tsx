@@ -776,12 +776,7 @@ export const ReducedWellNameClutter2D: StoryObj<
     render: (args) => <ReducedWellNameClutterComponent2D {...args} />,
 };
 
-type CoarseWellFactorProps = object;
-
-const CoarseWellFactorComponent: React.FC<CoarseWellFactorProps> = (
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    props: CoarseWellFactorProps = {}
-) => {
+const CoarseWellFactorComponent: React.FC = () => {
     const [coarseWellsToleranceFactor, setCoarseWellsToleranceFactor] =
         useState<number>(0.01);
     const [n, setN] = useState<number>(1);
