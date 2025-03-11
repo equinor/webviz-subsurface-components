@@ -1,3 +1,7 @@
+// (c) 2013, Vladimir Agafonkin
+// https://github.com/mourner/simplify-js/blob/3d/simplify.js
+// Modified version of above libary. Port to Typescript. Use subset. Take into account md values.
+
 import type { Position3D } from "../utils/layerTools";
 
 // square distance from a point to a segment
@@ -91,7 +95,6 @@ function simplifyDouglasPeucker(
     return [newPoints, newMds];
 }
 
-// See: https://github.com/mourner/simplify-js/blob/3d/simplify.js
 export function simplify(
     points: Position3D[],
     mds: number[],
