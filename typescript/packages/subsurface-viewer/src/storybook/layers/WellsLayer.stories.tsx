@@ -776,22 +776,23 @@ export const ReducedWellNameClutter2D: StoryObj<
     render: (args) => <ReducedWellNameClutterComponent2D {...args} />,
 };
 
-type CoarseWellFactorProps = {
-    coarseWellsToleranceFactor: number;
-};
+type CoarseWellFactorProps = object;
 
 const CoarseWellFactorComponent: React.FC<CoarseWellFactorProps> = (
-    props: CoarseWellFactorProps = {
-        coarseWellsToleranceFactor: 0.01,
-    }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    props: CoarseWellFactorProps = {}
 ) => {
     const [coarseWellsToleranceFactor, setCoarseWellsToleranceFactor] =
         useState<number>(0.01);
     const [n, setN] = useState<number>(1);
-    if (props.coarseWellsToleranceFactor != coarseWellsToleranceFactor) {
-        setCoarseWellsToleranceFactor(props.coarseWellsToleranceFactor);
-        setN(n + 1);
-    }
+
+    const handleChange = React.useCallback(
+        (_event: Event | SyntheticEvent, value: number | number[]) => {
+            setN(n => n + 1);
+            setCoarseWellsToleranceFactor(value as number);
+        },
+        []
+    );
 
     const propsWithLayers = {
         id: "clutter",
@@ -836,7 +837,7 @@ const CoarseWellFactorComponent: React.FC<CoarseWellFactorProps> = (
                             const [newPoints, newMds] = simplify(
                                 lineString.coordinates as Position3D[],
                                 mds,
-                                props.coarseWellsToleranceFactor
+                                coarseWellsToleranceFactor
                             );
                             lineString.coordinates = newPoints as Position3D[];
 
@@ -864,19 +865,33 @@ const CoarseWellFactorComponent: React.FC<CoarseWellFactorProps> = (
         },
     };
 
+
     return (
-        <SubsurfaceViewer {...propsWithLayers}>
-            {
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                /* @ts-expect-error */
-                <View id="view_1">
-                    <ViewFooter>
-                        Coarsen wells using &quot;dataTransform&quot; property.
-                        Adjustable factor typical range: [0.001, 1000]
-                    </ViewFooter>
-                </View>
-            }
-        </SubsurfaceViewer>
+        <Root>
+            <div className={classes.main}>
+                <SubsurfaceViewer {...propsWithLayers}>
+                    {
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                        /* @ts-expect-error */
+                        <View id="view_1">
+                            <ViewFooter>
+                                Coarsen wells using &quot;dataTransform&quot;
+                                property.
+                            </ViewFooter>
+                        </View>
+                    }
+                </SubsurfaceViewer>
+            </div>
+            <Slider
+                min={0.1}
+                max={70}
+                defaultValue={0.1}
+                step={0.1}
+                onChange={handleChange}
+                valueLabelDisplay={"auto"}
+            />
+        </Root>
+
     );
 };
 
