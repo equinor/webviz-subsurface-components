@@ -41,8 +41,6 @@ import {
 } from "../sharedSettings";
 import { simplify } from "../../layers/utils/simplify";
 import type { Position3D } from "../../layers/utils/layerTools";
-import { ViewFooter } from "../../components/ViewFooter";
-import { View } from "@deck.gl/core";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -776,20 +774,19 @@ export const ReducedWellNameClutter2D: StoryObj<
     render: (args) => <ReducedWellNameClutterComponent2D {...args} />,
 };
 
-const CoarseWellFactorComponent: React.FC = () => {
+const CoarseWellFactorComponent: React.FC<{
+    coarseWellsToleranceFactor: number;
+}> = (args) => {
     const [coarseWellsToleranceFactor, setCoarseWellsToleranceFactor] =
         useState<number>(0.01);
     const [n, setN] = useState<number>(1);
 
-    const handleChange = React.useCallback(
-        (_event: Event | SyntheticEvent, value: number | number[]) => {
-            setN((n) => n + 1);
-            setCoarseWellsToleranceFactor(value as number);
-        },
-        []
-    );
+    if (coarseWellsToleranceFactor != args.coarseWellsToleranceFactor) {
+        setN((n) => n + 1);
+        setCoarseWellsToleranceFactor(args.coarseWellsToleranceFactor);
+    }
 
-    const propsWithLayers = {
+    const subsurfaceViewerArgs = {
         id: "clutter",
         cameraPosition: {
             rotationOrbit: 45,
@@ -859,38 +856,25 @@ const CoarseWellFactorComponent: React.FC = () => {
             ],
         },
     };
-
-    return (
-        <Root>
-            <div className={classes.main}>
-                <SubsurfaceViewer {...propsWithLayers}>
-                    {
-                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                        /* @ts-expect-error */
-                        <View id="view_1">
-                            <ViewFooter>
-                                Coarsen wells using &quot;dataTransform&quot;
-                                property.
-                            </ViewFooter>
-                        </View>
-                    }
-                </SubsurfaceViewer>
-            </div>
-            <Slider
-                min={0.1}
-                max={70}
-                defaultValue={0.1}
-                step={0.1}
-                onChange={handleChange}
-                valueLabelDisplay={"auto"}
-            />
-        </Root>
-    );
+    return <SubsurfaceViewer {...subsurfaceViewerArgs} />;
 };
 
 export const CoarseWellFactor: StoryObj<typeof CoarseWellFactorComponent> = {
     args: {
         coarseWellsToleranceFactor: 0.01,
+    },
+    argTypes: {
+        coarseWellsToleranceFactor: {
+            control: { type: "range", min: 0.01, max: 75, step: 0.1 },
+        },
+    },
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: "Coarsen wells using &quot;dataTransform&quot;property",
+            },
+        },
     },
     render: (args) => <CoarseWellFactorComponent {...args} />,
 };
