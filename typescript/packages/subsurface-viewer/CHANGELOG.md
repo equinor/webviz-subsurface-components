@@ -1,3 +1,10 @@
+## [1.8.6](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.8.5...subsurface-viewer@1.8.6) (2025-03-12)
+
+
+### Bug Fixes
+
+* "74736: PPA: well trajectory artifacts" ([#2463](https://github.com/equinor/webviz-subsurface-components/issues/2463)) ([778b546](https://github.com/equinor/webviz-subsurface-components/commit/778b54697ae5e8cccb49559f4ab5fcc457503c10))
+
 ## [1.8.5](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.8.4...subsurface-viewer@1.8.5) (2025-03-12)
 
 
