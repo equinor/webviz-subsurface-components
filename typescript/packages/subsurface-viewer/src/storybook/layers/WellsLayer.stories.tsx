@@ -23,14 +23,16 @@ import { NativeSelect } from "@equinor/eds-core-react";
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import type {
+    BoundingBox2D,
     MapMouseEvent,
     Point3D,
-    BoundingBox2D,
 } from "../../components/Map";
 import AxesLayer from "../../layers/axes/axesLayer";
 import WellsLayer from "../../layers/wells/wellsLayer";
 
 import { Axes2DLayer } from "../../layers";
+import type { Position3D } from "../../layers/utils/layerTools";
+import { simplify } from "../../layers/utils/simplify";
 import {
     default2DViews,
     default3DViews,
@@ -39,8 +41,6 @@ import {
     volveWellsFromResourcesLayer,
     volveWellsResources,
 } from "../sharedSettings";
-import { simplify } from "../../layers/utils/simplify";
-import type { Position3D } from "../../layers/utils/layerTools";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -704,15 +704,7 @@ const ReducedWellNameClutterComponent: React.FC<ClutterProps> = (
                 -3500 / 2,
             ] as Point3D,
         },
-        views: {
-            layout: [1, 1] as [number, number],
-            viewports: [
-                {
-                    id: "view_1",
-                    show3D: true,
-                },
-            ],
-        },
+        views: default3DViews,
     };
 
     return <SubsurfaceViewer {...propsWithLayers} />;
@@ -750,15 +742,6 @@ const ReducedWellNameClutterComponent2D: React.FC<ClutterProps> = (
             }),
         ],
         bounds: [450000, 6781000, 464000, 6791000] as BoundingBox2D,
-        views: {
-            layout: [1, 1] as [number, number],
-            viewports: [
-                {
-                    id: "view_1",
-                    show3D: false,
-                },
-            ],
-        },
     };
 
     return <SubsurfaceViewer {...propsWithLayers} />;
@@ -787,29 +770,20 @@ const CoarseWellFactorComponent: React.FC<{
     }
 
     const subsurfaceViewerArgs = {
-        id: "clutter",
-        cameraPosition: {
-            rotationOrbit: 45,
-            rotationX: 15,
-            zoom: -4,
-            target: undefined,
-        },
+        id: "simplify-wells",
         layers: [
             new WellsLayer({
                 data: n % 2 ? "./gullfaks.json" : "./gullfaks.json ", // Note: trick needed to force dataTransform to recalculate.
                 wellNameVisible: true,
                 wellNameSize: 9,
-                wellNameAtTop: true,
                 wellHeadStyle: { size: 4 },
-                hideOverlappingWellNames: true,
-                outline: true,
                 ZIncreasingDownwards: false,
                 // eslint-disable-next-line
                 // @ts-ignore
-                dataTransform: (data_in) => {
+                dataTransform: (dataIn) => {
                     // Simplify well paths by reducing number of segments/nodes.
                     const data =
-                        data_in as FeatureCollection<GeometryCollection>;
+                        dataIn as FeatureCollection<GeometryCollection>;
 
                     const no_wells = data.features.length;
                     for (let well_no = 0; well_no < no_wells; well_no++) {
@@ -845,16 +819,7 @@ const CoarseWellFactorComponent: React.FC<{
                 bounds: [450000, 6781000, 0, 464000, 6791000, 3500],
             }),
         ],
-        bounds: [450000, 6781000, 464000, 6791000] as BoundingBox2D,
-        views: {
-            layout: [1, 1] as [number, number],
-            viewports: [
-                {
-                    id: "view_1",
-                    show3D: true,
-                },
-            ],
-        },
+        views: default3DViews,
     };
     return <SubsurfaceViewer {...subsurfaceViewerArgs} />;
 };
