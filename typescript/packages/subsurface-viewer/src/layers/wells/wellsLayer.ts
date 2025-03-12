@@ -7,9 +7,9 @@ import type {
     Position,
     UpdateParameters,
 } from "@deck.gl/core";
+import { CompositeLayer, OrbitViewport } from "@deck.gl/core";
 import { Vector2 } from "@math.gl/core";
 import { CollisionModifierExtension } from "../../extensions/collision-modifier-extension";
-import { CompositeLayer, OrbitViewport } from "@deck.gl/core";
 import type {
     ExtendedLayerProps,
     LayerPickInfo,
@@ -36,7 +36,7 @@ import { distance, dot, subtract } from "mathjs";
 
 import { GL } from "@luma.gl/constants";
 import { interpolateNumberArray } from "d3";
-import { isEmpty, isEqual } from "lodash";
+import { clamp, isEmpty, isEqual } from "lodash";
 import type {
     ContinuousLegendDataType,
     DiscreteLegendDataType,
@@ -54,7 +54,6 @@ import {
     invertPath,
     splineRefine,
 } from "./utils/spline";
-import { clamp } from "lodash";
 
 type StyleAccessorFunction = (
     object: Feature,
@@ -166,6 +165,7 @@ const defaultProps = {
     ZIncreasingDownwards: true,
     simplifiedRendering: false,
     section: false,
+    dataTransform: coarsenWells,
 };
 
 export interface LogCurveDataType {
@@ -294,21 +294,15 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
         checkWells(data);
 
-        const coarseData = coarsenWells(data);
-
+        // Conditionally apply spline interpolation to refine the well path.
         const doRefine =
             typeof refine === "number" ? refine > 1 : (refine as boolean);
-
         const stepCount = typeof refine === "number" ? refine : 5;
-
-        data = doRefine
-            ? splineRefine(data, stepCount) // smooth well paths.
-            : data;
+        data = doRefine ? splineRefine(data, stepCount) : data;
 
         this.setState({
             ...this.state,
             data,
-            coarseData,
             camChange: 0,
         });
     }
@@ -512,7 +506,6 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         }
 
         const data = this.state["data"] as FeatureCollection;
-        const coarseData = this.state["coarseData"] as FeatureCollection;
 
         const is3d = this.context.viewport.constructor === OrbitViewport;
         const positionFormat = "XYZ";
@@ -568,7 +561,6 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         const fastLayerProps = this.getSubLayerProps({
             ...defaultLayerProps,
             id: "simple",
-            data: coarseData,
             positionFormat,
             getLineColor: getColor(this.props.lineStyle?.color),
             getFillColor: getColor(this.props.wellHeadStyle?.color),
@@ -582,6 +574,11 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             extensions,
             getDashArray: getDashFactor(this.props.lineStyle?.dash),
             visible: this.props.outline && !fastDrawing,
+            parameters: {
+                ...parameters,
+                [GL.POLYGON_OFFSET_FACTOR]: 1,
+                [GL.POLYGON_OFFSET_UNITS]: 1,
+            },
         });
 
         const highlightLayerProps = this.getSubLayerProps({

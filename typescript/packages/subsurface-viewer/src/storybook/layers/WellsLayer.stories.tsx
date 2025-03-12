@@ -6,7 +6,7 @@ import React, { useState } from "react";
 
 import { Slider } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import type { FeatureCollection } from "geojson";
+import type { FeatureCollection, GeometryCollection } from "geojson";
 
 import {
     ColorLegend,
@@ -18,9 +18,9 @@ import { NativeSelect } from "@equinor/eds-core-react";
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import type {
+    BoundingBox2D,
     MapMouseEvent,
     Point3D,
-    BoundingBox2D,
 } from "../../components/Map";
 import AxesLayer from "../../layers/axes/axesLayer";
 import WellsLayer from "../../layers/wells/wellsLayer";
@@ -34,6 +34,11 @@ import {
     volveWellsFromResourcesLayer,
     volveWellsResources,
 } from "../sharedSettings";
+
+import {
+    coarsenWells,
+    DEFAULT_TOLERANCE,
+} from "../../layers/wells/utils/spline";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -679,7 +684,6 @@ const ReducedWellNameClutterComponent: React.FC<ClutterProps> = (
                 wellHeadStyle: { size: 4 },
                 wellNameSize: 9,
                 hideOverlappingWellNames: props.hideOverlappingWellNames,
-                refine: true,
                 outline: true,
                 ZIncreasingDownwards: false,
             }),
@@ -698,15 +702,7 @@ const ReducedWellNameClutterComponent: React.FC<ClutterProps> = (
                 -3500 / 2,
             ] as Point3D,
         },
-        views: {
-            layout: [1, 1] as [number, number],
-            viewports: [
-                {
-                    id: "view_1",
-                    show3D: true,
-                },
-            ],
-        },
+        views: default3DViews,
     };
 
     return <SubsurfaceViewer {...propsWithLayers} />;
@@ -735,7 +731,6 @@ const ReducedWellNameClutterComponent2D: React.FC<ClutterProps> = (
                 wellNameAtTop: props.wellNamePositionPercentage,
                 wellHeadStyle: { size: 4 },
                 hideOverlappingWellNames: props.hideOverlappingWellNames,
-                refine: true,
                 outline: true,
                 ZIncreasingDownwards: false,
             }),
@@ -745,15 +740,6 @@ const ReducedWellNameClutterComponent2D: React.FC<ClutterProps> = (
             }),
         ],
         bounds: [450000, 6781000, 464000, 6791000] as BoundingBox2D,
-        views: {
-            layout: [1, 1] as [number, number],
-            viewports: [
-                {
-                    id: "view_1",
-                    show3D: false,
-                },
-            ],
-        },
     };
 
     return <SubsurfaceViewer {...propsWithLayers} />;
@@ -767,6 +753,102 @@ export const ReducedWellNameClutter2D: StoryObj<
         wellNamePositionPercentage: 0,
     },
     render: (args) => <ReducedWellNameClutterComponent2D {...args} />,
+};
+
+const CoarseWellFactorComponent: React.FC<{
+    coarseWellsToleranceFactor: number;
+    show3D: boolean;
+}> = ({ show3D, ...args }) => {
+    const [coarseWellsToleranceFactor, setCoarseWellsToleranceFactor] =
+        useState<number>(DEFAULT_TOLERANCE);
+    const [n, setN] = useState<number>(1);
+
+    if (coarseWellsToleranceFactor != args.coarseWellsToleranceFactor) {
+        setN((n) => n + 1);
+        setCoarseWellsToleranceFactor(args.coarseWellsToleranceFactor);
+    }
+
+    const referenceWellProps = {
+        id: "reference-wells",
+        data: "./gullfaks.json",
+        wellNameVisible: true,
+        wellNameSize: 9,
+        wellHeadStyle: { size: 4 },
+        ZIncreasingDownwards: false,
+        dataTransform: undefined,
+    };
+
+    const referenceWells = new WellsLayer({
+        ...referenceWellProps,
+    });
+
+    const simplifiedWells = new WellsLayer({
+        ...referenceWellProps,
+        id: "simplified-wells",
+        data: n % 2 ? "./gullfaks.json" : "./gullfaks.json ", // Note: trick needed to force dataTransform to recalculate.
+        // eslint-disable-next-line
+        // @ts-ignore
+        dataTransform: (dataIn) => {
+            // Simplify well paths by reducing number of segments/nodes.
+            const data = dataIn as FeatureCollection<GeometryCollection>;
+
+            return coarsenWells(data, coarseWellsToleranceFactor);
+        },
+    });
+
+    const axes = new AxesLayer({
+        id: "axes-layer",
+        bounds: [450000, 6781000, 0, 464000, 6791000, 3500],
+    });
+
+    const views = React.useMemo(
+        () => ({
+            layout: [1, 2] as [number, number],
+            viewports: [
+                {
+                    id: "viewport1",
+                    layerIds: ["reference-wells", "axes-layer"],
+                    show3D,
+                    isSync: true,
+                },
+                {
+                    id: "viewport2",
+                    layerIds: ["simplified-wells", "axes-layer"],
+                    show3D,
+                    isSync: true,
+                },
+            ],
+        }),
+        [show3D]
+    );
+
+    const subsurfaceViewerArgs = {
+        id: "simplify-wells",
+        layers: [referenceWells, simplifiedWells, axes],
+        views,
+    };
+    return <SubsurfaceViewer {...subsurfaceViewerArgs} />;
+};
+
+export const CoarseWellFactor: StoryObj<typeof CoarseWellFactorComponent> = {
+    args: {
+        coarseWellsToleranceFactor: DEFAULT_TOLERANCE,
+        show3D: true,
+    },
+    argTypes: {
+        coarseWellsToleranceFactor: {
+            control: { type: "range", min: 0.01, max: 20, step: 0.01 },
+        },
+    },
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: "Coarsen wells using &quot;dataTransform&quot;property",
+            },
+        },
+    },
+    render: (args) => <CoarseWellFactorComponent {...args} />,
 };
 
 export const Wells3dDashed: StoryObj<typeof SubsurfaceViewer> = {
