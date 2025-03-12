@@ -1,3 +1,10 @@
+## [1.8.5](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.8.4...subsurface-viewer@1.8.5) (2025-03-12)
+
+
+### Bug Fixes
+
+* Overlapping tick labels in 3D. ([#2471](https://github.com/equinor/webviz-subsurface-components/issues/2471)) ([cb83a5d](https://github.com/equinor/webviz-subsurface-components/commit/cb83a5db093c845defa9021a73931c495b9d6398))
+
 ## [1.8.4](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.8.3...subsurface-viewer@1.8.4) (2025-03-12)
 
 
