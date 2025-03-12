@@ -46,6 +46,10 @@ function simplifyDouglasPeucker(
     mds: number[],
     sqTolerance: number
 ) {
+    if (points.length <= 2 || 0 === sqTolerance) {
+        return [points, mds];
+    }
+
     const len = points.length,
         MarkerArray = typeof Uint8Array !== "undefined" ? Uint8Array : Array,
         markers = new MarkerArray(len),
@@ -95,12 +99,19 @@ function simplifyDouglasPeucker(
     return [newPoints, newMds];
 }
 
+/**
+ * Simplify points based on the given tolerance
+ * @param points Points to simplify
+ * @param mds MD values
+ * @param tolerance Tolerance to simplify the points
+ * @returns Simplified points and mds
+ */
 export function simplify(
     points: Position3D[],
     mds: number[],
     tolerance: number | undefined
 ) {
-    const sqTolerance = tolerance !== undefined ? tolerance * tolerance : 1;
+    const sqTolerance = tolerance !== undefined ? tolerance * tolerance : 0;
     const [newPoints, newMds] = simplifyDouglasPeucker(
         points,
         mds,

@@ -10,6 +10,8 @@ import { simplify } from "../../utils/simplify";
 
 import type { Position3D } from "../../utils/layerTools";
 
+const DEFAULT_TOLERANCE = 0.01;
+
 export function removeConsecutiveDuplicates(
     coords: Position3D[],
     mds: number[]
@@ -340,7 +342,7 @@ export function coarsenWells(
             const [newPoints, newMds] = simplify(
                 lineString.coordinates as Position3D[],
                 mds,
-                0.01
+                DEFAULT_TOLERANCE
             );
             lineString.coordinates = newPoints as Position3D[];
             properties["md"][0] = newMds;
