@@ -10,7 +10,7 @@ import { simplify } from "../../utils/simplify";
 
 import type { Position3D } from "../../utils/layerTools";
 
-const DEFAULT_TOLERANCE = 0.01;
+export const DEFAULT_TOLERANCE = 0.01;
 
 export function removeConsecutiveDuplicates(
     coords: Position3D[],
@@ -321,13 +321,14 @@ export function splineRefine(
  * Will reduce/coarse the wellpaths.
  */
 export function coarsenWells(
-    data_in: FeatureCollection<GeometryCollection>
+    dataIn: FeatureCollection<GeometryCollection>,
+    tolerance = DEFAULT_TOLERANCE
 ): FeatureCollection<GeometryCollection> {
-    const data = cloneDeep(data_in);
+    const data = cloneDeep(dataIn);
 
-    const no_wells = data.features.length;
-    for (let well_no = 0; well_no < no_wells; well_no++) {
-        const geometryCollection = data.features[well_no]
+    const wellCount = data.features.length;
+    for (let wellIndex = 0; wellIndex < wellCount; wellIndex++) {
+        const geometryCollection = data.features[wellIndex]
             .geometry as GeometryCollection;
         const lineString = geometryCollection?.geometries[1] as LineString;
 
@@ -335,14 +336,14 @@ export function coarsenWells(
             continue;
         }
 
-        const properties = data.features[well_no]
+        const properties = data.features[wellIndex]
             .properties as GeoJsonProperties;
         if (properties) {
             const mds = properties["md"][0];
             const [newPoints, newMds] = simplify(
                 lineString.coordinates as Position3D[],
                 mds,
-                DEFAULT_TOLERANCE
+                tolerance
             );
             lineString.coordinates = newPoints as Position3D[];
             properties["md"][0] = newMds;

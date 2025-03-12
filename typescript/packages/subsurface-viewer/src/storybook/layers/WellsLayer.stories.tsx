@@ -42,6 +42,11 @@ import {
     volveWellsResources,
 } from "../sharedSettings";
 
+import {
+    coarsenWells,
+    DEFAULT_TOLERANCE,
+} from "../../layers/wells/utils/spline";
+
 const stories: Meta = {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer / Wells Layer",
@@ -761,7 +766,7 @@ const CoarseWellFactorComponent: React.FC<{
     coarseWellsToleranceFactor: number;
 }> = (args) => {
     const [coarseWellsToleranceFactor, setCoarseWellsToleranceFactor] =
-        useState<number>(0.01);
+        useState<number>(DEFAULT_TOLERANCE);
     const [n, setN] = useState<number>(1);
 
     if (coarseWellsToleranceFactor != args.coarseWellsToleranceFactor) {
@@ -785,33 +790,7 @@ const CoarseWellFactorComponent: React.FC<{
                     const data =
                         dataIn as FeatureCollection<GeometryCollection>;
 
-                    const no_wells = data.features.length;
-                    for (let well_no = 0; well_no < no_wells; well_no++) {
-                        const geometryCollection = data.features[well_no]
-                            .geometry as GeometryCollection;
-                        const lineString = geometryCollection
-                            ?.geometries[1] as LineString;
-
-                        if (lineString.coordinates?.length === undefined) {
-                            continue;
-                        }
-
-                        const properties = data.features[well_no]
-                            .properties as GeoJsonProperties;
-                        if (properties) {
-                            const mds = properties["md"][0];
-                            const [newPoints, newMds] = simplify(
-                                lineString.coordinates as Position3D[],
-                                mds,
-                                coarseWellsToleranceFactor
-                            );
-                            lineString.coordinates = newPoints as Position3D[];
-
-                            properties["md"][0] = newMds;
-                        }
-                    }
-
-                    return data;
+                    return coarsenWells(data, coarseWellsToleranceFactor);
                 },
             }),
             new AxesLayer({
