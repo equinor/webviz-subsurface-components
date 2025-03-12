@@ -1,3 +1,10 @@
+## [1.1.3](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@1.1.2...wsc-common@1.1.3) (2025-03-12)
+
+
+### Bug Fixes
+
+* bump the npm_and_yarn group in /typescript with 4 updates ([#2468](https://github.com/equinor/webviz-subsurface-components/issues/2468)) ([29b70b3](https://github.com/equinor/webviz-subsurface-components/commit/29b70b372b2d02bf3a009648abee4801a1cf49e7)), closes [sass/node-sass#3355](https://github.com/sass/node-sass/issues/3355) [sass/node-sass#3313](https://github.com/sass/node-sass/issues/3313) [sass/node-sass#3314](https://github.com/sass/node-sass/issues/3314) [sass/node-sass#3257](https://github.com/sass/node-sass/issues/3257) [#3149](https://github.com/equinor/webviz-subsurface-components/issues/3149) [#3193](https://github.com/equinor/webviz-subsurface-components/issues/3193) [#3313](https://github.com/equinor/webviz-subsurface-components/issues/3313) [#3355](https://github.com/equinor/webviz-subsurface-components/issues/3355) [#3350](https://github.com/equinor/webviz-subsurface-components/issues/3350) [#3257](https://github.com/equinor/webviz-subsurface-components/issues/3257) [#3314](https://github.com/equinor/webviz-subsurface-components/issues/3314) [#3313](https://github.com/equinor/webviz-subsurface-components/issues/3313) [#101](https://github.com/equinor/webviz-subsurface-components/issues/101) [#98](https://github.com/equinor/webviz-subsurface-components/issues/98) [#97](https://github.com/equinor/webviz-subsurface-components/issues/97) [#94](https://github.com/equinor/webviz-subsurface-components/issues/94) [#88](https://github.com/equinor/webviz-subsurface-components/issues/88)
+
 ## [1.1.2](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@1.1.1...wsc-common@1.1.2) (2025-02-25)
 
 
