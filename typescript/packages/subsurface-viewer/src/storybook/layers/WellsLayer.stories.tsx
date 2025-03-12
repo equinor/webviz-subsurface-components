@@ -764,7 +764,8 @@ export const ReducedWellNameClutter2D: StoryObj<
 
 const CoarseWellFactorComponent: React.FC<{
     coarseWellsToleranceFactor: number;
-}> = (args) => {
+    show3D: boolean;
+}> = ({ show3D, ...args }) => {
     const [coarseWellsToleranceFactor, setCoarseWellsToleranceFactor] =
         useState<number>(DEFAULT_TOLERANCE);
     const [n, setN] = useState<number>(1);
@@ -774,42 +775,76 @@ const CoarseWellFactorComponent: React.FC<{
         setCoarseWellsToleranceFactor(args.coarseWellsToleranceFactor);
     }
 
+    const referenceWellProps = {
+        id: "reference-wells",
+        data: "./gullfaks.json",
+        wellNameVisible: true,
+        wellNameSize: 9,
+        wellHeadStyle: { size: 4 },
+        ZIncreasingDownwards: false,
+        dataTransform: undefined,
+    };
+
+    const referenceWells = new WellsLayer({
+        ...referenceWellProps,
+    });
+
+    const simplifiedWells = new WellsLayer({
+        ...referenceWellProps,
+        id: "simplified-wells",
+        data: n % 2 ? "./gullfaks.json" : "./gullfaks.json ", // Note: trick needed to force dataTransform to recalculate.
+        // eslint-disable-next-line
+        // @ts-ignore
+        dataTransform: (dataIn) => {
+            // Simplify well paths by reducing number of segments/nodes.
+            const data = dataIn as FeatureCollection<GeometryCollection>;
+
+            return coarsenWells(data, coarseWellsToleranceFactor);
+        },
+    });
+
+    const axes = new AxesLayer({
+        id: "axes-layer",
+        bounds: [450000, 6781000, 0, 464000, 6791000, 3500],
+    });
+
+    const views = React.useMemo(
+        () => ({
+            layout: [1, 2] as [number, number],
+            viewports: [
+                {
+                    id: "viewport1",
+                    layerIds: ["reference-wells", "axes-layer"],
+                    show3D,
+                    isSync: true,
+                },
+                {
+                    id: "viewport2",
+                    layerIds: ["simplified-wells", "axes-layer"],
+                    show3D,
+                    isSync: true,
+                },
+            ],
+        }),
+        [show3D]
+    );
+
     const subsurfaceViewerArgs = {
         id: "simplify-wells",
-        layers: [
-            new WellsLayer({
-                data: n % 2 ? "./gullfaks.json" : "./gullfaks.json ", // Note: trick needed to force dataTransform to recalculate.
-                wellNameVisible: true,
-                wellNameSize: 9,
-                wellHeadStyle: { size: 4 },
-                ZIncreasingDownwards: false,
-                // eslint-disable-next-line
-                // @ts-ignore
-                dataTransform: (dataIn) => {
-                    // Simplify well paths by reducing number of segments/nodes.
-                    const data =
-                        dataIn as FeatureCollection<GeometryCollection>;
-
-                    return coarsenWells(data, coarseWellsToleranceFactor);
-                },
-            }),
-            new AxesLayer({
-                id: "axes-layer",
-                bounds: [450000, 6781000, 0, 464000, 6791000, 3500],
-            }),
-        ],
-        views: default3DViews,
+        layers: [referenceWells, simplifiedWells, axes],
+        views,
     };
     return <SubsurfaceViewer {...subsurfaceViewerArgs} />;
 };
 
 export const CoarseWellFactor: StoryObj<typeof CoarseWellFactorComponent> = {
     args: {
-        coarseWellsToleranceFactor: 0.01,
+        coarseWellsToleranceFactor: DEFAULT_TOLERANCE,
+        show3D: true,
     },
     argTypes: {
         coarseWellsToleranceFactor: {
-            control: { type: "range", min: 0.01, max: 75, step: 0.1 },
+            control: { type: "range", min: 0.01, max: 20, step: 0.01 },
         },
     },
     parameters: {
