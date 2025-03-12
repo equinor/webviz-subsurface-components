@@ -6,12 +6,7 @@ import React, { useState } from "react";
 
 import { Slider } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import type {
-    FeatureCollection,
-    GeoJsonProperties,
-    GeometryCollection,
-    LineString,
-} from "geojson";
+import type { FeatureCollection, GeometryCollection } from "geojson";
 
 import {
     ColorLegend,
@@ -31,8 +26,6 @@ import AxesLayer from "../../layers/axes/axesLayer";
 import WellsLayer from "../../layers/wells/wellsLayer";
 
 import { Axes2DLayer } from "../../layers";
-import type { Position3D } from "../../layers/utils/layerTools";
-import { simplify } from "../../layers/utils/simplify";
 import {
     default2DViews,
     default3DViews,
