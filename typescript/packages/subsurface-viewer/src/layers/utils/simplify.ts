@@ -103,13 +103,13 @@ function simplifyDouglasPeucker(
  * Simplify points based on the given tolerance
  * @param points Points to simplify
  * @param mds MD values
- * @param tolerance Tolerance to simplify the points
+ * @param tolerance The tolerance value to determine the level of simplification. A higher tolerance results in fewer points. If undefined or zero, then no simplification is applied.
  * @returns Simplified points and mds
  */
 export function simplify(
     points: Position3D[],
     mds: number[],
-    tolerance: number | undefined
+    tolerance?: number
 ) {
     const sqTolerance = tolerance !== undefined ? tolerance * tolerance : 0;
     const [newPoints, newMds] = simplifyDouglasPeucker(
