@@ -566,7 +566,7 @@ const Map: React.FC<MapProps> = ({
         ): PickingInfo[] => {
             if (coords?.multiPicking && pickInfo.layer?.context.deck) {
                 const pickInfos =
-                    pickInfo.layer.context.deck.pickMultipleObjects({  // XXX
+                    pickInfo.layer.context.deck.pickMultipleObjects({
                         x: event.offsetCenter.x,
                         y: event.offsetCenter.y,
                         depth: coords.pickDepth ?? undefined,

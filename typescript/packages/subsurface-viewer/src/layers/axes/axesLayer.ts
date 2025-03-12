@@ -365,7 +365,7 @@ function GetTickLines(
     is_orthographic: boolean,
     bounds: BoundingBox3D,
     viewport: Viewport,
-    zScale: number,
+    zScale: number
 ): [number[], string[]] {
     const ndecimals = 0;
     const n_minor_ticks = 3;
