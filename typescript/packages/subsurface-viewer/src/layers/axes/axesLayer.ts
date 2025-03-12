@@ -82,12 +82,14 @@ export default class AxesLayer extends CompositeLayer<AxesLayerProps> {
 
         const is_orthographic =
             this.context.viewport.constructor === OrthographicViewport;
+        const zScale = this.props.modelMatrix ? this.props.modelMatrix[10] : 1;
 
         const [tick_lines, tick_labels] = GetTickLines(
             this.props.ZIncreasingDownwards,
             is_orthographic,
             bounds,
-            this.context.viewport
+            this.context.viewport,
+            zScale
         );
 
         const textlayerData = maketextLayerData(
@@ -140,8 +142,13 @@ export default class AxesLayer extends CompositeLayer<AxesLayerProps> {
             return "middle";
         }
 
-        const screen_from = this.context.viewport.project(d.from);
-        const screen_to = this.context.viewport.project(d.to);
+        const zScale = this.props.modelMatrix ? this.props.modelMatrix[10] : 1;
+
+        const p0: Position3D = [d.from[0], d.from[1], d.from[2] * zScale];
+        const p1: Position3D = [d.to[0], d.to[1], d.to[2] * zScale];
+
+        const screen_from = this.context.viewport.project(p0);
+        const screen_to = this.context.viewport.project(p1);
         const is_labels = d.label !== "X" && d.label !== "Y" && d.label !== "Z"; // labels on axis or XYZ annotations
         if (is_labels) {
             if (screen_from[0] < screen_to[0]) {
@@ -357,7 +364,8 @@ function GetTickLines(
     isZIncreasingDownwards: boolean,
     is_orthographic: boolean,
     bounds: BoundingBox3D,
-    viewport: Viewport
+    viewport: Viewport,
+    zScale: number
 ): [number[], string[]] {
     const ndecimals = 0;
     const n_minor_ticks = 3;
@@ -386,8 +394,8 @@ function GetTickLines(
     const delta = ((dx + dy + dz) / 3.0) * 0.025;
 
     const Lz = LineLengthInPixels(
-        [x_min, y_min, z_min],
-        [x_min, y_min, z_max],
+        [x_min, y_min, z_min * zScale],
+        [x_min, y_min, z_max * zScale],
         viewport
     );
 
@@ -455,10 +463,11 @@ function GetTickLines(
 
     // X axis labels.
     const Lx = LineLengthInPixels(
-        [x_min, y_min, z_min],
-        [x_max, y_min, z_min],
+        [x_min, y_min, z_min * zScale],
+        [x_max, y_min, z_min * zScale],
         viewport
     );
+
     const x_ticks = GetTicks(x_min, x_max, Lx);
     y_tick = y_min;
     z_tick = z_min;
@@ -517,10 +526,11 @@ function GetTickLines(
 
     // Y axis labels.
     const Ly = LineLengthInPixels(
-        [x_min, y_min, z_min],
-        [x_min, y_max, z_min],
+        [x_min, y_min, z_min * zScale],
+        [x_min, y_max, z_min * zScale],
         viewport
     );
+
     const y_ticks = GetTicks(y_min, y_max, Ly);
     for (let i = 0; i < y_ticks.length; i++) {
         const tick = y_ticks[i];
