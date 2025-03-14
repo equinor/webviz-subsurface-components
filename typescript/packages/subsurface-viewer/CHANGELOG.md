@@ -1,3 +1,10 @@
+## [1.8.7](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.8.6...subsurface-viewer@1.8.7) (2025-03-14)
+
+
+### Bug Fixes
+
+* [NGRM]: Grid3DLayer reports wrong x,y,z and dept values in readout for undefined property values. [#2474](https://github.com/equinor/webviz-subsurface-components/issues/2474) ([#2476](https://github.com/equinor/webviz-subsurface-components/issues/2476)) ([e853836](https://github.com/equinor/webviz-subsurface-components/commit/e85383690727fa3a3d5aa4889ac6670ef79379e4))
+
 ## [1.8.6](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.8.5...subsurface-viewer@1.8.6) (2025-03-12)
 
 
