@@ -117,6 +117,10 @@ export interface WellsLayerProps extends ExtendedLayerProps {
      *  If given as a number between 0 and 100,  will place name at this percentage of trajectory from top.
      */
     wellNameAtTop: boolean | number;
+    /** It true label position will be auto calculated if possible to be inside view volume at all times.
+     *  default false.
+     */
+    wellNameAutoPosition: boolean;
     wellNameSize: number;
     wellNameColor: Color;
     /**  If true will prevent well name cluttering by not displaying overlapping names.
@@ -157,6 +161,7 @@ const defaultProps = {
     visible: true,
     wellNameVisible: false,
     wellNameAtTop: true,
+    wellNameAutoPosition: false,
     wellNameSize: 14,
     wellNameColor: [0, 0, 0, 255],
     hideOverlappingWellNames: false,
@@ -407,57 +412,34 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         if (data) this.setLegend(data);
     }
 
-    getWellNamePositionAlongTrajectory(wellNameAtTop: boolean | number) {
-        if (typeof wellNameAtTop === "number") {
-            return clamp(Number(wellNameAtTop), 0, 100);
-        }
-        return wellNameAtTop ? 0 : 100;
-    }
-
     // return position for well name and icon
     getAnnotationPosition(
         well_data: Feature,
-        percentage: number,
-        view_is_3d: boolean,
-        color_accessor: ColorAccessor
+        annotation_position: boolean | number,
+        view_is_3d: boolean
     ): Position | null {
-        if (percentage > 0 && percentage < 100) {
-            // Return a pos "name_at_top" percent down the trajectory
-            const pos = this.getTrajMidPoint(
-                percentage,
-                well_data,
-                (this.props.data as unknown as FeatureCollection).features
-            )[1];
+        let percentage = Number(annotation_position);
+        if (typeof annotation_position === "boolean") {
+            percentage = annotation_position ? 0 : 100;
+        }
+        clamp(percentage, 0, 100);
 
-            // using z=0 for orthographic view to keep label above other other layers
-            if (pos) return view_is_3d ? pos : [pos[0], pos[1], 0];
-        } else if (percentage == 0) {
-            // Read top position from Point geometry, if not present, read it from LineString geometry
-            let top;
-            // Read top position from Point geometry, if not present, read it from LineString geometry
-            const well_head = getWellHeadPosition(well_data);
-            if (well_head) top = well_head;
-            else {
-                const trajectory = getTrajectory(well_data, color_accessor);
-                top = trajectory?.at(0);
-            }
+        // Return a pos "annotation_position" percent down the trajectory
+        const pos = this.getTrajPointAtPercentage(
+            percentage,
+            well_data,
+            (this.props.data as unknown as FeatureCollection).features
+        )[1];
 
-            // using z=0 for orthographic view to keep label above other other layers
-            if (top) return view_is_3d ? top : [top[0], top[1], 0];
-        } else {
-            let bot;
-            // if trajectory is not present, return top position from Point geometry
-            const trajectory = getTrajectory(well_data, color_accessor);
-            if (trajectory) bot = trajectory?.at(-1);
-            else bot = getWellHeadPosition(well_data);
-
-            // using z=0 for orthographic view to keep label above other other layers
-            if (bot) return view_is_3d ? bot : [bot[0], bot[1], 0];
+        // using z=0 for orthographic view to keep label above other other layers
+        if (pos) {
+            return view_is_3d ? pos : [pos[0], pos[1], 0];
         }
         return null;
     }
 
-    getTrajMidPoint(
+    // Return angle and position a given percentage down the trajectory.
+    getTrajPointAtPercentage(
         percent: number,
         well_data: Feature,
         features: Feature<Geometry, GeoJsonProperties>[]
@@ -469,33 +451,51 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         }
 
         const well_xyz = getTrajectory(well_object, undefined);
+
+        const w = this.context.viewport.width;
+        const h = this.context.viewport.height;
+
+        const percentages = [50, 25, 75, 12.5, 87.5, 37.5, 62.5];
+
         const n = well_xyz?.length ?? 2;
         if (well_xyz && n >= 2) {
-            const i = Math.min(Math.floor((percent / 100) * n), n - 2);
-            const pi1 = well_xyz[i];
-            const pi2 = well_xyz[i + 1];
-            const p1 = new Vector2(this.project(pi1 as number[]));
-            const p2 = new Vector2(this.project(pi2 as number[]));
-            const pMid: Position3D = [
-                pi1[0] + (pi2[0] - pi1[0]) / 2,
-                pi1[1] + (pi2[1] - pi1[1]) / 2,
-                pi1?.[2] ?? 0 + (pi2?.[2] ?? 0 - (pi1?.[2] ?? 0)) / 2,
-            ];
-            const v = new Vector2(p2[0] - p1[0], -(p2[1] - p1[1]));
-            v.normalize();
-            const rad = Math.atan2(v[1], v[0]) as number;
-            const deg = rad * (180 / 3.14159);
-            let a = deg;
-            if (deg > 90) {
-                a = deg - 180;
-            } else if (deg < -90) {
-                a = deg + 180;
+            while (percentages.length != 0) {
+                const i = Math.min(Math.floor((percent / 100) * n), n - 2);
+                const pi1 = well_xyz[i];
+                const pi2 = well_xyz[i + 1];
+                const p1 = new Vector2(this.project(pi1 as number[]));
+                const p2 = new Vector2(this.project(pi2 as number[]));
+                const p: Position3D = [
+                    pi1[0] + (pi2[0] - pi1[0]) / 2,
+                    pi1[1] + (pi2[1] - pi1[1]) / 2,
+                    pi1?.[2] ?? 0 + (pi2?.[2] ?? 0 - (pi1?.[2] ?? 0)) / 2,
+                ];
+
+                if (this.props.wellNameAutoPosition) {
+                    const ps = this.project(p);
+                    if (ps[0] < 0 || ps[0] > w || ps[1] < 0 || ps[1] > h) {
+                        // If the label is outside view/camera, reposition it
+                        percent = percentages.shift() as number;
+                        continue;
+                    }
+                }
+
+                const v = new Vector2(p2[0] - p1[0], -(p2[1] - p1[1]));
+                v.normalize();
+                const rad = Math.atan2(v[1], v[0]) as number;
+                const deg = rad * (180 / 3.14159);
+                let a = deg;
+                if (deg > 90) {
+                    a = deg - 180;
+                } else if (deg < -90) {
+                    a = deg + 180;
+                }
+                if (percent == 0 || percent == 100) {
+                    // At top or bottom well names should be horizontal.
+                    a = 0;
+                }
+                return [a, p];
             }
-            if (typeof percent == "boolean" || percent == 0 || percent == 100) {
-                // At top or bottom well names should be horizontal.
-                a = 0;
-            }
-            return [a, pMid];
         }
         return [0, [0, 0, 0]];
     }
@@ -739,11 +739,8 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                     // In 2D prioritize according z height.
                     const labelPosition = this.getAnnotationPosition(
                         d,
-                        this.getWellNamePositionAlongTrajectory(
-                            this.props.wellNameAtTop
-                        ),
-                        true,
-                        this.props.lineStyle?.color
+                        this.props.wellNameAtTop,
+                        true
                     );
 
                     const priority = labelPosition
@@ -766,18 +763,21 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 getPosition: (d: Feature) =>
                     this.getAnnotationPosition(
                         d,
-                        this.getWellNamePositionAlongTrajectory(
-                            this.props.wellNameAtTop
-                        ),
-                        is3d,
-                        this.props.lineStyle?.color
+                        this.props.wellNameAtTop,
+                        is3d
                     ),
                 getAngle: (f: Feature) => {
-                    const percentage = this.getWellNamePositionAlongTrajectory(
-                        this.props.wellNameAtTop
-                    );
+                    const percentage =
+                        Number(this.props.wellNameAtTop) *
+                        (typeof this.props.wellNameAtTop === "boolean"
+                            ? 100
+                            : 1);
+                    clamp(percentage, 0, 100);
+                    if (percentage == 0 || percentage == 100) {
+                        return 0;
+                    }
 
-                    const a = this.getTrajMidPoint(
+                    const a = this.getTrajPointAtPercentage(
                         percentage,
                         f,
                         (this.props.data as unknown as FeatureCollection)
@@ -798,6 +798,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                         this.props.wellNameAtTop,
                         is3d,
                         this.props.lineStyle?.color,
+                        this.state["camChange"],
                     ],
                 },
                 parameters,
