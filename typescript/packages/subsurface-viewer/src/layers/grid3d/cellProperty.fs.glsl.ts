@@ -79,8 +79,6 @@ vec4 getContinuousPropertyColor (float propertyValue) {
    return color;
 }
 
-
-
 void main(void) {
 
    if (picking.isActive > 0.5 && !(picking.isAttribute > 0.5)) {
@@ -90,7 +88,8 @@ void main(void) {
 
    if (isnan(property)) {
       vec3 lightColor = getPhongLightColor(undefinedPropertyColor.rgb, cameraPosition, position_commonspace.xyz, normal);
-      fragColor = vec4(lightColor, 1.0);      
+      fragColor = vec4(lightColor, 1.0);
+      DECKGL_FILTER_COLOR(fragColor, geometry);
       return;
    } 
 
