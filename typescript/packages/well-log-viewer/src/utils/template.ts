@@ -67,12 +67,12 @@ function applyTemplateStyle(
     if (styledTemplate.type === "area") {
         if (!styledTemplate.fill) {
             //styledTemplate.fill = generateColor();
-            styledTemplate.fillOpacity = 0;
+            styledTemplate.fillOpacity = 0.25;
         }
     } else if (styledTemplate.type === "gradientfill") {
         if (!styledTemplate.colorMapFunctionName) {
             //styledTemplate.fill = generateColor();
-            styledTemplate.fillOpacity = 0;
+            styledTemplate.fillOpacity = 0.25;
         }
     } else if (styledTemplate.type === "differential") {
         // "differential" plot
