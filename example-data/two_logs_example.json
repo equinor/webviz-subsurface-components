@@ -25608,7 +25608,6 @@
                             "name":"ALL_MODIFIED.GK",
                             "type":"area",
                             "color":"red",
-                            "fill":"red",
                             "showLines":false,
                             "showLabels":false
                         }

@@ -1,3 +1,10 @@
+## [2.3.6](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@2.3.5...well-log-viewer@2.3.6) (2025-03-20)
+
+
+### Bug Fixes
+
+* Fixed wrong default fill-opacity value ([#2482](https://github.com/equinor/webviz-subsurface-components/issues/2482)) ([574fdb8](https://github.com/equinor/webviz-subsurface-components/commit/574fdb860d787835dd6789b8fd46fbc32fcaeed1))
+
 ## [2.3.5](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@2.3.4...well-log-viewer@2.3.5) (2025-03-12)
 
 
