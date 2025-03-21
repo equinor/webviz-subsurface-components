@@ -8,18 +8,16 @@ import type {
     UpdateParameters,
 } from "@deck.gl/core";
 import { CompositeLayer } from "@deck.gl/core";
-import { Vector2 } from "@math.gl/core";
 import type {
     ExtendedLayerProps,
     LayerPickInfo,
-    Position3D,
     PropertyDataType,
 } from "../utils/layerTools";
 
 import { createPropertyData, isDrawingEnabled } from "../utils/layerTools";
 
 import { PathStyleExtension } from "@deck.gl/extensions";
-import { GeoJsonLayer, PathLayer, TextLayer } from "@deck.gl/layers";
+import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
 import type { colorTablesArray } from "@emerson-eps/color-tables/";
 import { getColors, rgbValues } from "@emerson-eps/color-tables/";
 import type {
@@ -34,9 +32,8 @@ import type {
 import { distance, dot, subtract } from "mathjs";
 
 import { GL } from "@luma.gl/constants";
-import { Vector3 } from "@math.gl/core";
 import { interpolateNumberArray } from "d3";
-import { clamp, isEmpty, isEqual } from "lodash";
+import { isEmpty, isEqual } from "lodash";
 import type {
     ContinuousLegendDataType,
     DiscreteLegendDataType,
@@ -327,18 +324,10 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         this.setState({
             ...this.state,
             data,
-            camChange: 0,
         });
     }
 
     shouldUpdateState({ changeFlags }: UpdateParameters<this>): boolean {
-        if (changeFlags.viewportChanged) {
-            this.setState({
-                ...this.state,
-                camChange: (this.state["camChange"] as number) + 1,
-            });
-        }
-
         return (
             changeFlags.viewportChanged ||
             changeFlags.propsOrDataChanged ||
@@ -429,131 +418,6 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
     setupLegend(): void {
         const data = this.getLogCurveData();
         if (data) this.setLegend(data);
-    }
-
-    // return position for well name and icon
-    getAnnotationPosition(
-        well_data: Feature,
-        annotation_position: boolean | number,
-        view_is_3d: boolean
-    ): Position | null {
-        let percentage = Number(annotation_position);
-        if (typeof annotation_position === "boolean") {
-            percentage = annotation_position ? 0 : 100;
-        }
-        clamp(percentage, 0, 100);
-
-        // Return a pos "annotation_position" percent down the trajectory
-        let pos = this.getTrajPointAtPercentage(
-            percentage,
-            well_data,
-            (this.props.data as unknown as FeatureCollection).features
-        )[1];
-
-        // Perturb position towards camera to avoid z-buffer fighting between labels.
-        // Distance dependent on unique properties of label so that no two labels are offset equally.
-        const label = well_data.properties?.["name"] ?? "a";
-        const labelSize = label.length;
-
-        const view_from = new Vector3(this.context.viewport.cameraPosition);
-        const dir = new Vector3([
-            view_from[0] - pos[0],
-            view_from[1] - pos[1],
-            view_from[2] - pos[2],
-        ]);
-        const camDist = dir.magnitude();
-        dir.normalize();
-
-        let meanCharVal = 0;
-        for (let i = 0; i < labelSize; i++) {
-            const a = label.charCodeAt(i) - 32; // 32: ascii value for first relevant symbol.
-            meanCharVal += a;
-        }
-        meanCharVal = meanCharVal / labelSize; // unique text id for each label
-
-        const x = Math.floor(pos[0]) % 9;
-        const y = Math.floor(pos[1]) % 9;
-        const pId = x + y; // unique position id for each label
-
-        const offset = labelSize + meanCharVal + pId;
-
-        if (view_is_3d) {
-            pos = [
-                pos[0] + dir[0] * offset,
-                pos[1] + dir[1] * offset,
-                pos[2] + dir[2] * offset,
-            ];
-        } else {
-            pos = [
-                pos[0],
-                pos[1],
-                pos[2] + 0.1 * camDist * (labelSize + meanCharVal + pId),
-            ];
-        }
-
-        return pos ?? null;
-    }
-
-    // Return angle and position a given percentage down the trajectory.
-    getTrajPointAtPercentage(
-        percent: number,
-        well_data: Feature,
-        features: Feature<Geometry, GeoJsonProperties>[]
-    ): [number, Position3D] {
-        const wellName = well_data.properties?.["name"];
-        const well_object = getWellObjectByName(features, wellName);
-        if (!well_object) {
-            return [0, [0, 0, 0]];
-        }
-
-        const well_xyz = getTrajectory(well_object, undefined);
-
-        const w = this.context.viewport.width;
-        const h = this.context.viewport.height;
-
-        const percentages = [50, 25, 75, 12.5, 87.5, 37.5, 62.5];
-
-        const n = well_xyz?.length ?? 2;
-        if (well_xyz && n >= 2) {
-            while (percentages.length != 0) {
-                const i = Math.min(Math.floor((percent / 100) * n), n - 2);
-                const pi1 = well_xyz[i];
-                const pi2 = well_xyz[i + 1];
-                const p1 = new Vector2(this.project(pi1 as number[]));
-                const p2 = new Vector2(this.project(pi2 as number[]));
-                const p: Position3D = [
-                    pi1[0] + (pi2[0] - pi1[0]) / 2,
-                    pi1[1] + (pi2[1] - pi1[1]) / 2,
-                    pi1?.[2] ?? 0 + (pi2?.[2] ?? 0 - (pi1?.[2] ?? 0)) / 2,
-                ];
-
-                if (this.props.wellNameAutoPosition) {
-                    const ps = this.project(p);
-                    if (ps[0] < 0 || ps[0] > w || ps[1] < 0 || ps[1] > h) {
-                        // If the label is outside view/camera, reposition it
-                        percent = percentages.shift() as number;
-                        continue;
-                    }
-                }
-
-                const v = new Vector2(p2[0] - p1[0], -(p2[1] - p1[1]));
-                v.normalize();
-                const rad = Math.atan2(v[1], v[0]) as number;
-                const deg = rad * (180 / 3.14159);
-                let a = deg;
-                if (deg > 90) {
-                    a = deg - 180;
-                } else if (deg < -90) {
-                    a = deg + 180;
-                }
-                if (percent == 0 || percent == 100) {
-                    // At top or bottom well names should be horizontal.
-                    a = 0;
-                }
-                return [a, p];
-            }
-        }
-        return [0, [0, 0, 0]];
     }
 
     private getWellLabelPosition() {

@@ -27,11 +27,16 @@ type StyleAccessorFunction = (
 type WellLabelLayerData = Feature<Geometry, GeoJsonProperties>;
 type ColorAccessor = Color | StyleAccessorFunction | undefined;
 
+export enum LabelOrientation {
+    HORIZONTAL = "horizontal",
+    TANGENT = "tangent",
+};
+
 export type WellLabelLayerProps = TextLayerProps<WellLabelLayerData> & {
     autoPosition?: boolean;
     getPositionAlongPath?: number | ((d: Feature) => number);
     zIncreasingDownwards?: boolean;
-    orientation?: "horizontal" | "tangent";
+    orientation?: LabelOrientation;
 };
 
 const DEFAULT_PROPS: DefaultProps<WellLabelLayerProps> = {
@@ -46,7 +51,8 @@ const DEFAULT_PROPS: DefaultProps<WellLabelLayerProps> = {
     getSize: 10,
     getColor: [0, 0, 0, 255],
     zIncreasingDownwards: true,
-    orientation: "horizontal",
+    orientation: LabelOrientation.HORIZONTAL,
+    backgroundPadding: [5, 1, 5, 1],
 };
 
 function getLineStringGeometry(well_object: Feature): LineString {

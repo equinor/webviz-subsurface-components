@@ -3,13 +3,48 @@ import type { Feature, FeatureCollection } from "geojson";
 import { all, create } from "mathjs";
 import React from "react";
 import { AxesLayer, WellsLayer } from "../../layers";
-import { WellLabelLayer } from "../../layers/wells/layers/wellLabelLayer";
+import type { WellLabelLayerProps } from "../../layers/wells/layers/wellLabelLayer";
+import {
+    LabelOrientation,
+    WellLabelLayer,
+} from "../../layers/wells/layers/wellLabelLayer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import { default3DViews } from "../sharedSettings";
+import { getRgba } from "../util/color";
+
+type WellCount = { wellCount: number };
 
 const stories: Meta = {
-    component: SubsurfaceViewer,
     title: "SubsurfaceViewer / Well Label Layer",
+    parameters: {
+        docs: {
+            description: {
+                component: "Layer for displaying well labels",
+            },
+        },
+    },
+    argTypes: {
+        wellCount: {
+            control: {
+                type: "range",
+                min: 1,
+                max: 1000,
+                step: 1,
+            },
+        },
+        getPositionAlongPath: {
+            control: {
+                type: "range",
+                min: 0,
+                max: 100,
+                step: 1,
+            },
+        },
+    },
+    args: {
+        wellCount: 10,
+        getPositionAlongPath: 50,
+    },
 };
 
 const math = create(all, { randomSeed: "1984" });
@@ -32,15 +67,15 @@ const getRandomColor = () => {
     return [r, g, b, 255];
 };
 
-const createSyntheticWell = (seed: number): Feature => {
+const createSyntheticWell = (index: number): Feature => {
     // Create a random well name
-    const name = `Well ${seed}`;
+    const name = `Well ${index}`;
 
     const sampleCount = 10;
 
-    const dx = randomFunc() * 4000 - 2000;
-    const dy = randomFunc() * 4000 - 2000;
-    const headPosition = [458000 + dx, 6785000 + dy, 0];
+    const dx = randomFunc() * 10000 - 2000;
+    const dy = randomFunc() * 8000 - 2000;
+    const headPosition = [456000 + dx, 6785000 + dy, 0];
 
     const dSegmentLength = 300;
 
@@ -101,36 +136,43 @@ const createSyntheticWellCollection = (count: number): FeatureCollection => {
     };
 };
 
-const SYNTHETIC_WELLS = createSyntheticWellCollection(10);
-
-const SYNTHETIC_WELLS_LAYER = new WellsLayer({
-    data: SYNTHETIC_WELLS,
-    wellNameVisible: false,
-});
+const SYNTHETIC_WELLS = createSyntheticWellCollection(1000);
 
 const AXES_LAYER = new AxesLayer({
     id: "axes-layer",
     bounds: [450000, 6781000, 0, 464000, 6791000, 3500],
 });
 
-const DEFAULT_LAYERS = [SYNTHETIC_WELLS_LAYER, AXES_LAYER];
-
 const DEFAULT_LABEL_PROPS = {
     id: "well-labels",
     data: SYNTHETIC_WELLS.features,
 };
 
-export const Default: StoryObj = {
-    render: () => {
+const getSyntheticWells = (wellCount: number): FeatureCollection => {
+    const wells = SYNTHETIC_WELLS.features.slice(0, wellCount);
+    return {
+        type: "FeatureCollection",
+        features: wells,
+    };
+};
+
+export const Default: StoryObj<WellCount> = {
+    render: ({ wellCount }) => {
+        const data = getSyntheticWells(wellCount);
+
+        const wellLayer = new WellsLayer({
+            data,
+            wellNameVisible: false,
+        });
+
+        const labelLayer = new WellLabelLayer({
+            ...DEFAULT_LABEL_PROPS,
+            data: data.features,
+        });
+
         const propsWithLayers = {
             id: "default",
-            layers: [
-                ...DEFAULT_LAYERS,
-                new WellLabelLayer({
-                    ...DEFAULT_LABEL_PROPS,
-                    id: "default",
-                }),
-            ],
+            layers: [AXES_LAYER, wellLayer, labelLayer],
             views: default3DViews,
         };
 
@@ -138,18 +180,24 @@ export const Default: StoryObj = {
     },
 };
 
-export const LabelPosition: StoryObj = {
-    render: () => {
+export const LabelPosition: StoryObj<WellCount & WellLabelLayerProps> = {
+    render: ({ wellCount, getPositionAlongPath }) => {
+        const data = getSyntheticWells(wellCount);
+
+        const wellLayer = new WellsLayer({
+            data,
+            wellNameVisible: false,
+        });
+
+        const labelLayer = new WellLabelLayer({
+            ...DEFAULT_LABEL_PROPS,
+            getPositionAlongPath,
+            data: data.features,
+        });
+
         const propsWithLayers = {
             id: "position",
-            layers: [
-                ...DEFAULT_LAYERS,
-                new WellLabelLayer({
-                    ...DEFAULT_LABEL_PROPS,
-                    getPositionAlongPath: 50,
-                    id: "position",
-                }),
-            ],
+            layers: [AXES_LAYER, wellLayer, labelLayer],
             views: default3DViews,
         };
 
@@ -157,17 +205,26 @@ export const LabelPosition: StoryObj = {
     },
 };
 
-export const LabelAutoPosition: StoryObj = {
-    render: () => {
+export const LabelAutoPosition: StoryObj<WellCount> = {
+    render: ({ wellCount }) => {
+        const data = getSyntheticWells(wellCount);
+
+        const wellLayer = new WellsLayer({
+            data,
+            wellNameVisible: false,
+        });
+
+        const labelLayer = new WellLabelLayer({
+            ...DEFAULT_LABEL_PROPS,
+            autoPosition: true,
+            data: data.features,
+        });
+
+        const layers = [AXES_LAYER, wellLayer, labelLayer];
+
         const propsWithLayers = {
             id: "position",
-            layers: [
-                ...DEFAULT_LAYERS,
-                new WellLabelLayer({
-                    ...DEFAULT_LABEL_PROPS,
-                    autoPosition: true,
-                }),
-            ],
+            layers,
             views: default3DViews,
         };
 
@@ -175,19 +232,27 @@ export const LabelAutoPosition: StoryObj = {
     },
 };
 
-export const LabelOrientation: StoryObj = {
-    render: () => {
+export const TangentOrientation: StoryObj<WellCount & WellLabelLayerProps> = {
+    render: ({ wellCount, getPositionAlongPath }) => {
+        const data = getSyntheticWells(wellCount);
+
+        const wellLayer = new WellsLayer({
+            data,
+            wellNameVisible: false,
+        });
+
+        const labelLayer = new WellLabelLayer({
+            ...DEFAULT_LABEL_PROPS,
+            orientation: LabelOrientation.TANGENT,
+            data: data.features,
+            getPositionAlongPath,
+        });
+
+        const layers = [AXES_LAYER, wellLayer, labelLayer];
+
         const propsWithLayers = {
             id: "orientation",
-            layers: [
-                ...DEFAULT_LAYERS,
-                new WellLabelLayer({
-                    ...DEFAULT_LABEL_PROPS,
-                    getPositionAlongPath: 50,
-                    orientation: "tangent",
-                    id: "orientation",
-                }),
-            ],
+            layers,
             views: default3DViews,
         };
 
@@ -195,27 +260,77 @@ export const LabelOrientation: StoryObj = {
     },
 };
 
-export const LabelStyle: StoryObj = {
-    render: () => {
+export const LabelStyle: StoryObj<
+    WellCount &
+        WellLabelLayerProps & {
+            color: string;
+            borderColor: string;
+            bgColor: string;
+        }
+> = {
+    render: ({
+        wellCount,
+        getPositionAlongPath,
+        getSize,
+        orientation,
+        background,
+        getBorderWidth,
+        ...props
+    }) => {
+        const data = getSyntheticWells(wellCount);
+
+        const wellLayer = new WellsLayer({
+            data,
+            wellNameVisible: false,
+        });
+
+        const labelLayer = new WellLabelLayer({
+            ...DEFAULT_LABEL_PROPS,
+            getPositionAlongPath,
+            data: data.features,
+            getSize,
+            getColor: getRgba(props.color),
+            background,
+            getBorderColor: getRgba(props.borderColor),
+            getBorderWidth,
+            getBackgroundColor: getRgba(props.bgColor),
+            orientation,
+        });
+
+        const layers = [AXES_LAYER, wellLayer, labelLayer];
+
         const propsWithLayers = {
-            id: "orientation",
-            layers: [
-                ...DEFAULT_LAYERS,
-                new WellLabelLayer({
-                    ...DEFAULT_LABEL_PROPS,
-                    getSize: 15,
-                    getColor: [255, 255, 0, 255],
-                    background: true,
-                    getBorderColor: [0, 50, 0, 150],
-                    getBorderWidth: 2,
-                    backgroundPadding: [5, 1, 5, 1],
-                    getBackgroundColor: [0, 0, 0, 100],
-                }),
-            ],
+            id: "style",
+            layers,
             views: default3DViews,
         };
 
         return <SubsurfaceViewer {...propsWithLayers} />;
+    },
+    args: {
+        getSize: 15,
+        orientation: LabelOrientation.HORIZONTAL,
+        color: "yellow",
+        background: true,
+        borderColor: "black",
+        getBorderWidth: 2,
+        bgColor: "grey",
+    },
+    argTypes: {
+        getSize: {
+            control: {
+                type: "range",
+                min: 0,
+                max: 50,
+                step: 1,
+            },
+        },
+        orientation: {
+            options: ["horizontal", "tangent"],
+            control: {
+                type: "select",
+            },
+        },
     },
 };
 
