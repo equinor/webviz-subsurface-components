@@ -339,14 +339,16 @@ export function coarsenWells(
         const properties = data.features[wellIndex]
             .properties as GeoJsonProperties;
         if (properties) {
-            const mds = properties["md"][0];
+            const mds = properties["md"]?.[0];
             const [newPoints, newMds] = simplify(
                 lineString.coordinates as Position3D[],
-                mds,
+                mds ?? [],
                 tolerance
             );
             lineString.coordinates = newPoints as Position3D[];
-            properties["md"][0] = newMds;
+            if (properties["md"]) {
+                properties["md"][0] = newMds;
+            }
         }
     }
 

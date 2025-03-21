@@ -7,7 +7,7 @@ import type {
     Position,
     UpdateParameters,
 } from "@deck.gl/core";
-import { CompositeLayer, OrbitViewport } from "@deck.gl/core";
+import { CompositeLayer } from "@deck.gl/core";
 import { Vector2 } from "@math.gl/core";
 import type {
     ExtendedLayerProps,
@@ -34,6 +34,7 @@ import type {
 import { distance, dot, subtract } from "mathjs";
 
 import { GL } from "@luma.gl/constants";
+import { Vector3 } from "@math.gl/core";
 import { interpolateNumberArray } from "d3";
 import { clamp, isEmpty, isEqual } from "lodash";
 import type {
@@ -45,6 +46,8 @@ import type {
     ReportBoundingBoxAction,
 } from "../../components/Map";
 import { getLayersById } from "../../layers/utils/layerTools";
+import type { WellLabelLayerProps } from "./layers/wellLabelLayer";
+import { WellLabelLayer } from "./layers/wellLabelLayer";
 import { abscissaTransform } from "./utils/abscissaTransform";
 import {
     GetBoundingBox,
@@ -53,7 +56,6 @@ import {
     invertPath,
     splineRefine,
 } from "./utils/spline";
-import { Vector3 } from "@math.gl/core";
 
 type StyleAccessorFunction = (
     object: Feature,
@@ -112,27 +114,42 @@ export interface WellsLayerProps extends ExtendedLayerProps {
     wellHeadStyle: WellHeadStyleAccessor;
     colorMappingFunction: (x: number) => [number, number, number];
     lineStyle: LineStyleAccessor;
+
+    /**
+     * @deprecated use wellLabel instead
+     */
     wellNameVisible: boolean;
-    /** It true place name at top, if false at bottom.
-     *  If given as a number between 0 and 100,  will place name at this percentage of trajectory from top.
+
+    /**
+     * @deprecated use wellLabel instead
+     * It true place name at top, if false at bottom.
+     * If given as a number between 0 and 100,  will place name at this percentage of trajectory from top.
      */
     wellNameAtTop: boolean | number;
-    /** It true label position will be auto calculated if possible to be inside view volume at all times.
-     *  default false.
+
+    /**
+     * @deprecated use wellLabel instead
      */
-    wellNameAutoPosition: boolean;
     wellNameSize: number;
+
+    /**
+     * @deprecated use wellLabel instead
+     */
     wellNameColor: Color;
-    /**  If true will prevent well name cluttering by not displaying overlapping names.
+    /**
+     * If true will prevent well name cluttering by not displaying overlapping names.
      * default false.
+     * @deprecated use wellLabel instead
      */
     hideOverlappingWellNames: boolean;
+
     isLog: boolean;
     depthTest: boolean;
     /**  If true means that input z values are interpreted as depths.
      * For example depth of z = 1000 corresponds to -1000 on the z axis. Default true.
      */
     ZIncreasingDownwards: boolean;
+
     /**  If true means that a simplified representation of the wells will be drawn.
      *   Useful for example during panning and rotation to gain speed.
      */
@@ -143,6 +160,8 @@ export interface WellsLayerProps extends ExtendedLayerProps {
 
     // Non public properties:
     reportBoundingBox?: React.Dispatch<ReportBoundingBoxAction>;
+
+    wellLabel?: WellLabelLayerProps;
 }
 
 const defaultProps = {
@@ -537,6 +556,18 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         return [0, [0, 0, 0]];
     }
 
+    private getWellLabelPosition() {
+        if (this.props.wellLabel?.getPositionAlongPath) {
+            return this.props.wellLabel.getPositionAlongPath;
+        } else if (this.props.wellNameAtTop) {
+            if (typeof this.props.wellNameAtTop === "boolean") {
+                return 0;
+            }
+            return this.props.wellNameAtTop;
+        }
+        return 0;
+    }
+
     renderLayers(): LayersList {
         if (!(this.props.data as unknown as FeatureCollection).features) {
             return [];
@@ -544,7 +575,6 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
         const data = this.state["data"] as FeatureCollection;
 
-        const is3d = this.context.viewport.constructor === OrbitViewport;
         const positionFormat = "XYZ";
         const isDashed = !!this.props.lineStyle?.dash;
 
@@ -763,65 +793,39 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             })
         );
 
-        const namesLayer = new TextLayer<Feature>(
-            this.getSubLayerProps({
-                id: "names",
-                data: data.features,
-                getPosition: (d: Feature) =>
-                    this.getAnnotationPosition(
-                        d,
-                        this.props.wellNameAtTop,
-                        is3d
-                    ),
-                getAngle: (f: Feature) => {
-                    const percentage =
-                        Number(this.props.wellNameAtTop) *
-                        (typeof this.props.wellNameAtTop === "boolean"
-                            ? 100
-                            : 1);
-                    clamp(percentage, 0, 100);
-                    if (percentage == 0 || percentage == 100) {
-                        return 0;
-                    }
+        const namesLayer =
+            (this.props.wellLabel || this.props.wellNameVisible) &&
+            new WellLabelLayer(
+                this.getSubLayerProps({
+                    ...this.props.wellLabel,
+                    data: data.features,
+                    zIncreasingDownwards: this.props.ZIncreasingDownwards,
+                    getPositionAlongPath: this.getWellLabelPosition(),
+                    getColor:
+                        this.props.wellLabel?.getColor ??
+                        this.props.wellNameColor,
+                    getAnchor: "start",
+                    getSize:
+                        this.props.wellLabel?.getSize ??
+                        this.props.wellNameSize,
+                    parameters,
+                    visible:
+                        (this.props.wellLabel?.visible ||
+                            this.props.wellNameVisible) &&
+                        !fastDrawing,
 
-                    const a = this.getTrajPointAtPercentage(
-                        percentage,
-                        f,
-                        (this.props.data as unknown as FeatureCollection)
-                            .features
-                    );
-                    const text_angle = a[0];
-                    return text_angle;
-                },
-
-                getText: (d: Feature) => d.properties?.["name"],
-                getColor: this.props.wellNameColor,
-                getAnchor: "start",
-                getAlignmentBaseline: "bottom",
-                getSize: this.props.wellNameSize,
-                updateTriggers: {
-                    getAngle: [this.state["camChange"]],
-                    getPosition: [
-                        this.props.wellNameAtTop,
-                        is3d,
-                        this.props.lineStyle?.color,
-                        this.state["camChange"],
-                    ],
-                },
-                parameters,
-                visible: this.props.wellNameVisible && !fastDrawing,
-                // If "hideOverlappingWellNames" make a background for the label.
-                ...(this.props.hideOverlappingWellNames
-                    ? {
-                          background: this.props.hideOverlappingWellNames,
-                          getBackgroundColor: [255, 255, 255, 255],
-                          getBorderColor: [155, 155, 155, 255],
-                          getBorderWidth: 1,
-                          backgroundPadding: [5, 1, 5, 1],
-                      }
-                    : {}),
-            })
-        );
+                    // If "hideOverlappingWellNames" make a background for the label.
+                    ...(this.props.hideOverlappingWellNames
+                        ? {
+                              background: this.props.hideOverlappingWellNames,
+                              getBackgroundColor: [255, 255, 255, 255],
+                              getBorderColor: [155, 155, 155, 255],
+                              getBorderWidth: 1,
+                              backgroundPadding: [5, 1, 5, 1],
+                          }
+                        : {}),
+                })
+            );
 
         const layers = [
             outlineLayer,
