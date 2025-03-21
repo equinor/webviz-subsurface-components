@@ -11,14 +11,41 @@ import { getTrajectory } from "../utils/trajectory";
 type WellLabelLayerData = Feature<Geometry, GeoJsonProperties>;
 
 export enum LabelOrientation {
+    /**
+     * Horizontal orientation.
+     */
     HORIZONTAL = "horizontal",
-    TANGENT = "tangent",
-};
 
+    /**
+     * Tangent to well trajectory orientation.
+     */
+    TANGENT = "tangent",
+}
+
+/**
+ * Properties for the WellLabelLayer component.
+ * @typedef WellLabelLayerProps
+ * @type {TextLayerProps<WellLabelLayerData>}
+ */
 export type WellLabelLayerProps = TextLayerProps<WellLabelLayerData> & {
+    /**
+     * Automatically reposition the label if it is outside the view.
+     */
     autoPosition?: boolean;
+
+    /**
+     * Accessor function or value for getting the fractional position along the path, [0, 1].
+     */
     getPositionAlongPath?: number | ((d: Feature) => number);
+
+    /**
+     * If true, then z values are depth. Otherwise, z values are elevation.
+     */
     zIncreasingDownwards?: boolean;
+
+    /**
+     * Orientation of the label.
+     */
     orientation?: LabelOrientation;
 };
 
@@ -38,6 +65,14 @@ const DEFAULT_PROPS: DefaultProps<WellLabelLayerProps> = {
     backgroundPadding: [5, 1, 5, 1],
 };
 
+/**
+ * The `WellLabelLayer` class extends the `TextLayer` to provide functionality for rendering well labels
+ * in a subsurface viewer. It includes methods for calculating label positions and angles based on well
+ * trajectory data and the current viewport.
+ *
+ * @template WellLabelLayerData - The data type for the well label layer.
+ * @template WellLabelLayerProps - The properties type for the well label layer.
+ */
 export class WellLabelLayer extends TextLayer<
     WellLabelLayerData,
     WellLabelLayerProps
