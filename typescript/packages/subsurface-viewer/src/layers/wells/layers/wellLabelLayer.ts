@@ -1,4 +1,8 @@
-import type { DefaultProps, Position, UpdateParameters } from "@deck.gl/core";
+import {
+    type DefaultProps,
+    type Position,
+    type UpdateParameters,
+} from "@deck.gl/core";
 import type { TextLayerProps } from "@deck.gl/layers";
 import { TextLayer } from "@deck.gl/layers";
 import type { Feature, GeoJsonProperties, Geometry } from "geojson";
@@ -141,7 +145,6 @@ export class WellLabelLayer extends TextLayer<
         well_data: Feature,
         annotationPosition: WellLabelLayerProps["getPositionAlongPath"]
     ): Position {
-        const view_is_3d = this.context.viewport.constructor === OrbitViewport;
         let percentage = Number(annotationPosition);
         if (typeof annotationPosition === "function") {
             percentage = annotationPosition(well_data);
@@ -162,7 +165,6 @@ export class WellLabelLayer extends TextLayer<
             view_from[1] - pos[1],
             view_from[2] - pos[2],
         ]);
-        const camDist = dir.magnitude();
         dir.normalize();
 
         let meanCharVal = 0;
@@ -178,19 +180,11 @@ export class WellLabelLayer extends TextLayer<
 
         const offset = labelSize + meanCharVal + pId;
 
-        if (view_is_3d) {
-            pos = [
-                pos[0] + dir[0] * offset,
-                pos[1] + dir[1] * offset,
-                pos[2] + dir[2] * offset,
-            ];
-        } else {
-            pos = [
-                pos[0],
-                pos[1],
-                pos[2] + 0.1 * camDist * (labelSize + meanCharVal + pId),
-            ];
-        }
+        pos = [
+            pos[0] + dir[0] * offset,
+            pos[1] + dir[1] * offset,
+            pos[2] + dir[2] * offset,
+        ];
 
         return pos ?? [0, 0, 0];
     }
