@@ -1590,7 +1590,7 @@ function newView(
     height: number | string
 ): View {
     const far = 9999;
-    const near = viewport.show3D ? 0.1 : -9999;
+    const near = viewport.show3D ? 0.1 : -1000;
 
     const [ViewType, Controller] = getViewType(viewport);
     return new ViewType({
@@ -1623,8 +1623,8 @@ function buildDeckGlViews(views: ViewsType | undefined, size: Size): View[] {
                 width: "100%",
                 height: "100%",
                 flipY: false,
-                far: +99999,
-                near: -99999,
+                far: +9999,
+                near: -1000,
             }),
         ];
     }
