@@ -572,10 +572,11 @@ export const Wells3d: StoryObj<typeof SubsurfaceViewer> = {
         layers: [
             {
                 ...volveWellsFromResourcesLayer,
-                hideOverlappingWellNames: true, // XXX
-                wellNameVisible: true,
                 wellHeadStyle: { size: 4 },
-                wellNameSize: 9,
+                wellLabel: {
+                    getSize: 9,
+                    background: true,
+                },
             },
         ],
         views: default3DViews,
