@@ -90,7 +90,7 @@ const WELL_LAYER_PROPS = {
  * @returns deviation in radians
  */
 const getRandomDeviation = (magnitude = 10, mean = 5) => {
-    return (randomFunc() * (mean + magnitude * 0.5) * Math.PI) / 180;
+    return (randomFunc() * (mean * 2 - magnitude * 0.5) * Math.PI) / 180;
 };
 
 const getRandomColor = () => {
@@ -111,8 +111,9 @@ const createSyntheticWell = (
 
     const dSegmentLength = 150;
 
-    const avgDipDeviation = randomFunc() * 20;
-    const maxDip = Math.PI * 0.5;
+    const avgDipDeviation = randomFunc() * 10;
+    const avgAzimuthDeviation = randomFunc() * 5 - 2.5;
+    const maxDip = Math.PI * 0.5 + 0.05;
 
     // Create a random well geometry
     const coordinates = [headPosition];
@@ -131,9 +132,10 @@ const createSyntheticWell = (
 
     for (let i = 0; i < sampleCount - leadCount; i++) {
         const prevSample = coordinates[coordinates.length - 1];
-        const azimuth = previousAzimuth + getRandomDeviation(5, 2.5);
+        const azimuth =
+            previousAzimuth + getRandomDeviation(5, avgAzimuthDeviation);
         const dip = Math.min(
-            previousDip + getRandomDeviation(10, avgDipDeviation),
+            previousDip + getRandomDeviation(11, avgDipDeviation),
             maxDip
         );
         const x =
