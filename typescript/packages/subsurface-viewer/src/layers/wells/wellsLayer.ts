@@ -152,7 +152,7 @@ export interface WellsLayerProps extends ExtendedLayerProps {
     // Non public properties:
     reportBoundingBox?: React.Dispatch<ReportBoundingBoxAction>;
 
-    wellLabel?: WellLabelLayerProps;
+    wellLabel?: Partial<WellLabelLayerProps>;
 }
 
 const defaultProps = {
@@ -407,6 +407,37 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         return 0;
     }
 
+    protected createWellLabelLayer(data: Feature[]): WellLabelLayer | null {
+        if (!this.props.wellLabel && !this.props.wellNameVisible) {
+            return null;
+        }
+
+        const parameters = {
+            [GL.DEPTH_TEST]: this.props.depthTest,
+            [GL.POLYGON_OFFSET_FILL]: true,
+        };
+
+        const fastDrawing = this.props.simplifiedRendering;
+
+        const wellLabelProps = this.getSubLayerProps({
+            ...this.props.wellLabel,
+            data,
+            zIncreasingDownwards: this.props.ZIncreasingDownwards,
+            getPositionAlongPath: this.getWellLabelPosition(),
+            getColor:
+                this.props.wellLabel?.getColor ?? this.props.wellNameColor,
+            getAnchor: "start",
+            getSize: this.props.wellLabel?.getSize ?? this.props.wellNameSize,
+            parameters,
+            visible: !fastDrawing,
+            background:
+                this.props.wellLabel?.background ||
+                this.props.hideOverlappingWellNames,
+        });
+
+        return new WellLabelLayer(wellLabelProps);
+    }
+
     renderLayers(): LayersList {
         if (!(this.props.data as unknown as FeatureCollection).features) {
             return [];
@@ -632,39 +663,8 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             })
         );
 
-        const namesLayer =
-            (this.props.wellLabel || this.props.wellNameVisible) &&
-            new WellLabelLayer(
-                this.getSubLayerProps({
-                    ...this.props.wellLabel,
-                    data: data.features,
-                    zIncreasingDownwards: this.props.ZIncreasingDownwards,
-                    getPositionAlongPath: this.getWellLabelPosition(),
-                    getColor:
-                        this.props.wellLabel?.getColor ??
-                        this.props.wellNameColor,
-                    getAnchor: "start",
-                    getSize:
-                        this.props.wellLabel?.getSize ??
-                        this.props.wellNameSize,
-                    parameters,
-                    visible:
-                        (this.props.wellLabel?.visible ||
-                            this.props.wellNameVisible) &&
-                        !fastDrawing,
 
-                    // If "hideOverlappingWellNames" make a background for the label.
-                    ...(this.props.hideOverlappingWellNames
-                        ? {
-                              background: this.props.hideOverlappingWellNames,
-                              getBackgroundColor: [255, 255, 255, 255],
-                              getBorderColor: [155, 155, 155, 255],
-                              getBorderWidth: 1,
-                              backgroundPadding: [5, 1, 5, 1],
-                          }
-                        : {}),
-                })
-            );
+        const namesLayer = this.createWellLabelLayer(data.features);
 
         const layers = [
             outlineLayer,
