@@ -1,3 +1,10 @@
+## [1.8.8](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.8.7...subsurface-viewer@1.8.8) (2025-03-21)
+
+
+### Bug Fixes
+
+* replace tick generating algorithm with d3 version ([#2481](https://github.com/equinor/webviz-subsurface-components/issues/2481)) ([6060c12](https://github.com/equinor/webviz-subsurface-components/commit/6060c127aade55c5c707bf811e946d26421f44bd))
+
 ## [1.8.7](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.8.6...subsurface-viewer@1.8.7) (2025-03-14)
 
 
