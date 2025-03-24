@@ -663,7 +663,6 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             })
         );
 
-
         const namesLayer = this.createWellLabelLayer(data.features);
 
         const layers = [
