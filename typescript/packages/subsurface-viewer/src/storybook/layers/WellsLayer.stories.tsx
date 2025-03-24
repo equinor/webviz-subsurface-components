@@ -687,7 +687,6 @@ const ReducedWellNameClutterComponent: React.FC<ClutterProps> = (
                 wellNameVisible: true,
                 // Note: Folloing three varibles to be replaced by separate object.
                 wellNameAtTop: props.wellNamePositionPercentage,
-                wellNameAutoPosition: props.wellNameAutoPosition,
                 hideOverlappingWellNames: props.hideOverlappingWellNames,
                 wellHeadStyle: { size: 4 },
                 wellNameSize: 9,
@@ -737,7 +736,6 @@ const ReducedWellNameClutterComponent2D: React.FC<ClutterProps> = (
                 wellNameVisible: true,
                 wellNameSize: 9,
                 wellNameAtTop: props.wellNamePositionPercentage,
-                wellNameAutoPosition: props.wellNameAutoPosition,
                 wellHeadStyle: { size: 4 },
                 hideOverlappingWellNames: props.hideOverlappingWellNames,
                 outline: true,

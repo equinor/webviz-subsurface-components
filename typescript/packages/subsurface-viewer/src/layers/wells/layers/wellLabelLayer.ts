@@ -1,5 +1,4 @@
 import type { DefaultProps, Position, UpdateParameters } from "@deck.gl/core";
-import { OrbitViewport } from "@deck.gl/core";
 import type { TextLayerProps } from "@deck.gl/layers";
 import { TextLayer } from "@deck.gl/layers";
 import type { Feature, GeoJsonProperties, Geometry } from "geojson";
@@ -24,8 +23,6 @@ export enum LabelOrientation {
 
 /**
  * Properties for the WellLabelLayer component.
- * @typedef WellLabelLayerProps
- * @type {TextLayerProps<WellLabelLayerData>}
  */
 export type WellLabelLayerProps = TextLayerProps<WellLabelLayerData> & {
     /**
