@@ -47,7 +47,7 @@ export interface TemplatePlot extends TemplatePlotProps {
 
 export type TemplateTrack = {
     title?: string; // if it is missed then a name or description of the first plot is used (see makeTrackHeader())
-    tooltip?: string; // tooltip for mouse hover over title
+    titleTooltip?: string; // tooltip for mouse hover over title
     required?: boolean;
     /**
      * Relative track width when used in a LogController, i.e. a track with width set to

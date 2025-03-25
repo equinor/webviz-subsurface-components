@@ -1816,7 +1816,7 @@
       "tracks": [
         {
           "title": "4_EFAC",
-          "tooltip": "custom tooltip on categorical log",
+          "titleTooltip": "custom tooltip on categorical log",
           "plots": [
             {
               "name": "4_EFAC",

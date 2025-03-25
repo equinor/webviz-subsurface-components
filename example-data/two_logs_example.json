@@ -25602,7 +25602,7 @@
             [
                 {
                     "title":"ALL_MODIFIED.GK",
-                    "tooltip":"custom tooltip on continuous log",
+                    "titleTooltip":"custom tooltip on continuous log",
                     "plots":
                     [
                         {
