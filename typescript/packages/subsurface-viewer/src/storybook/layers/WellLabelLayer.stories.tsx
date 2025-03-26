@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import type { Feature, FeatureCollection } from "geojson";
 import { all, create } from "mathjs";
 import React from "react";
-import { Axes2DLayer, AxesLayer, WellsLayer } from "../../layers";
+import { AxesLayer, WellsLayer } from "../../layers";
 import type { Position3D } from "../../layers/utils/layerTools";
 import type { WellLabelLayerProps } from "../../layers/wells/layers/wellLabelLayer";
 import {
@@ -56,7 +56,7 @@ const DEFAULT_VIEWS: ViewsType = {
         {
             id: "view_1",
             show3D: false,
-            layerIds: ["well-layer", "axes-layer-2d", "well-labels"],
+            layerIds: ["well-layer", "well-labels"],
         },
         {
             id: "view_2",
@@ -73,7 +73,7 @@ const SPLIT_VIEWS: ViewsType = {
         {
             id: "view_1",
             show3D: false,
-            layerIds: ["well-layer", "axes-layer-2d", "label-2d"],
+            layerIds: ["well-layer", "label-2d"],
         },
         {
             id: "view_2",
@@ -212,9 +212,6 @@ const AXES_LAYERS = [
     new AxesLayer({
         id: "axes-layer-3d",
         bounds: [450000, 6781000, 0, 464000, 6791000, 3500],
-    }),
-    new Axes2DLayer({
-        id: "axes-layer-2d",
     }),
 ];
 
