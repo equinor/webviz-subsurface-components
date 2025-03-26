@@ -704,6 +704,7 @@ function setTrackOptionsFromTemplate(
     templateTrack: TemplateTrack
 ): void {
     options.label = templateTrack.title;
+    options.tooltip = templateTrack.titleTooltip;
     if (templateTrack.width !== undefined) options.width = templateTrack.width;
 
     (options as ExtTrackOptions).__template = templateTrack;
