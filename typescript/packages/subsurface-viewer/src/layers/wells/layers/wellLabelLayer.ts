@@ -108,10 +108,13 @@ export class WellLabelLayer extends TextLayer<
                 getAngle: [
                     ...angleUpdateTriggers,
                     this.context.viewport.cameraPosition,
+                    this.props.orientation,
+                    this.props.getPositionAlongPath,
                 ],
                 getPosition: [
                     ...positionUpdateTriggers,
                     this.context.viewport.cameraPosition,
+                    this.props.getPositionAlongPath,
                 ],
             },
         };
@@ -151,14 +154,14 @@ export class WellLabelLayer extends TextLayer<
         well_data: Feature,
         annotationPosition: WellLabelLayerProps["getPositionAlongPath"]
     ): Position {
-        let percentage = Number(annotationPosition);
+        let fraction = Number(annotationPosition);
         if (typeof annotationPosition === "function") {
-            percentage = annotationPosition(well_data);
+            fraction = annotationPosition(well_data);
         }
-        _.clamp(percentage, 0, 100);
+        _.clamp(fraction, 0, 1);
 
         // Return a pos "annotation_position" percent down the trajectory
-        let pos = this.getVectorAlongTrajectory(percentage, well_data)[1];
+        let pos = this.getVectorAlongTrajectory(fraction, well_data)[1];
 
         const label = well_data.properties?.["name"] ?? "a";
         const labelSize = label.length;

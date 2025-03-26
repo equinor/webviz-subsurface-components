@@ -32,7 +32,7 @@ import { distance, dot, subtract } from "mathjs";
 
 import { GL } from "@luma.gl/constants";
 import { interpolateNumberArray } from "d3";
-import { isEmpty, isEqual } from "lodash";
+import _, { isEmpty, isEqual } from "lodash";
 import type {
     ContinuousLegendDataType,
     DiscreteLegendDataType,
@@ -393,7 +393,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
     protected getWellLabelPosition() {
         if (this.props.wellLabel?.getPositionAlongPath) {
             return this.props.wellLabel.getPositionAlongPath;
-        } else if (this.props.wellNameAtTop) {
+        } else if (!_.isUndefined(this.props.wellNameAtTop)) {
             // Backwards compatibility for `wellNameAtTop` prop.
             if (typeof this.props.wellNameAtTop === "boolean") {
                 if (this.props.wellNameAtTop) {
