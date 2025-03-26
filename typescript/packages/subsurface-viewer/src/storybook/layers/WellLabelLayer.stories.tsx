@@ -280,7 +280,7 @@ export const LabelPosition: StoryObj<WellCount & WellLabelLayerProps> = {
     },
     argTypes: LABEL_POSITION_ARGTYPES,
     args: {
-        getPositionAlongPath: 50,
+        getPositionAlongPath: 0.5,
     },
 };
 
@@ -357,7 +357,7 @@ export const TangentOrientation: StoryObj<WellCount & WellLabelLayerProps> = {
     },
     argTypes: LABEL_POSITION_ARGTYPES,
     args: {
-        getPositionAlongPath: 50,
+        getPositionAlongPath: 0.5,
     },
 };
 
@@ -425,7 +425,7 @@ export const LabelStyle: StoryObj<
         borderColor: "black",
         getBorderWidth: 2,
         bgColor: "grey",
-        getPositionAlongPath: 50,
+        getPositionAlongPath: 0.5,
     },
     argTypes: {
         ...LABEL_POSITION_ARGTYPES,

@@ -193,7 +193,7 @@ export class WellLabelLayer extends TextLayer<
 
         // Increase perturbation for labels at the top of the trajectory, where the
         // cluttering is likely most prominent.
-        const zOffset = fraction > 0 ? offset : offset * labelSize * 2;
+        const zOffset = fraction > 0 ? offset : offset * 5;
 
         pos = [
             pos[0] + dir[0] * offset,

@@ -176,6 +176,10 @@ const defaultProps = {
     simplifiedRendering: false,
     section: false,
     dataTransform: coarsenWells,
+
+    // Deprecated props
+    wellNameColor: [0, 0, 0, 255],
+    wellNameSize: 10,
 };
 
 export interface LogCurveDataType {
@@ -762,7 +766,6 @@ WellsLayer.defaultProps = {
             layer: Layer;
         }
     ): void => onDataLoad(data, context),
-    //dataTransform,
 };
 
 //================= Local help functions. ==================
