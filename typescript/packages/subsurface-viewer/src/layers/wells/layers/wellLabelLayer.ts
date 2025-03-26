@@ -190,7 +190,7 @@ export class WellLabelLayer extends TextLayer<
         pos = [
             pos[0] + dir[0] * offset,
             pos[1] + dir[1] * offset,
-            pos[2] + dir[2] * (offset * 1.5),
+            pos[2] + dir[2] * (offset * 1.7),
         ];
 
         return pos ?? [0, 0, 0];

@@ -1,8 +1,9 @@
-import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react";
 import type { Feature, FeatureCollection } from "geojson";
 import { all, create } from "mathjs";
 import React from "react";
 import { Axes2DLayer, AxesLayer, WellsLayer } from "../../layers";
+import type { Position3D } from "../../layers/utils/layerTools";
 import type { WellLabelLayerProps } from "../../layers/wells/layers/wellLabelLayer";
 import {
     LabelOrientation,
@@ -10,8 +11,12 @@ import {
 } from "../../layers/wells/layers/wellLabelLayer";
 import type { ViewsType } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
+import {
+    LABEL_ORIENTATION_ARGTYPES,
+    LABEL_POSITION_ARGTYPES,
+    LABEL_SIZE_ARGTYPES,
+} from "../constant/argTypes";
 import { getRgba } from "../util/color";
-import type { Position3D } from "../../layers/utils/layerTools";
 
 type WellCount = { wellCount: number };
 
@@ -216,17 +221,6 @@ const AXES_LAYERS = [
 const DEFAULT_LABEL_PROPS = {
     id: "well-labels",
     data: SYNTHETIC_WELLS.features,
-};
-
-const LABEL_POSITION_ARGTYPES: Partial<ArgTypes<WellLabelLayerProps>> = {
-    getPositionAlongPath: {
-        control: {
-            type: "range",
-            min: 0,
-            max: 100,
-            step: 1,
-        },
-    },
 };
 
 const getSyntheticWells = (wellCount: number): FeatureCollection => {
@@ -435,20 +429,8 @@ export const LabelStyle: StoryObj<
     },
     argTypes: {
         ...LABEL_POSITION_ARGTYPES,
-        getSize: {
-            control: {
-                type: "range",
-                min: 0,
-                max: 50,
-                step: 1,
-            },
-        },
-        orientation: {
-            options: ["horizontal", "tangent"],
-            control: {
-                type: "select",
-            },
-        },
+        ...LABEL_SIZE_ARGTYPES,
+        ...LABEL_ORIENTATION_ARGTYPES,
     },
 };
 

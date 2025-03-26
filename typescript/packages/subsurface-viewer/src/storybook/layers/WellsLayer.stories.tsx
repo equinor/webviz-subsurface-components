@@ -32,12 +32,17 @@ import {
     volveWellsResources,
 } from "../sharedSettings";
 
+import type { WellLabelLayerProps } from "../../layers/wells/layers/wellLabelLayer";
+import { LabelOrientation } from "../../layers/wells/layers/wellLabelLayer";
 import {
     coarsenWells,
     DEFAULT_TOLERANCE,
 } from "../../layers/wells/utils/spline";
-import type { WellLabelLayerProps } from "../../layers/wells/layers/wellLabelLayer";
-import { LabelOrientation } from "../../layers/wells/layers/wellLabelLayer";
+import {
+    LABEL_ORIENTATION_ARGTYPES,
+    LABEL_POSITION_ARGTYPES,
+    LABEL_SIZE_ARGTYPES,
+} from "../constant/argTypes";
 import { getRgba } from "../util/color";
 
 const stories: Meta = {
@@ -752,6 +757,12 @@ export const WellLabelStyle: StoryObj<
                 views={views}
             />
         );
+    },
+
+    argTypes: {
+        ...LABEL_POSITION_ARGTYPES,
+        ...LABEL_SIZE_ARGTYPES,
+        ...LABEL_ORIENTATION_ARGTYPES,
     },
 };
 
