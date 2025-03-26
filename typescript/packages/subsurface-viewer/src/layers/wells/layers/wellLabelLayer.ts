@@ -158,7 +158,8 @@ export class WellLabelLayer extends TextLayer<
         if (typeof annotationPosition === "function") {
             fraction = annotationPosition(well_data);
         }
-        _.clamp(fraction, 0, 1);
+
+        fraction = _.clamp(fraction, 0, 1);
 
         // Return a pos "annotation_position" percent down the trajectory
         let pos = this.getVectorAlongTrajectory(fraction, well_data)[1];
@@ -188,12 +189,16 @@ export class WellLabelLayer extends TextLayer<
         // Perturb position towards camera to avoid z-buffer fighting between labels.
         // Distance dependent on unique properties of label so that no two labels
         // are offset equally.
-        const offset = labelSize * labelSize + meanCharVal + pId;
+        const offset = labelSize + meanCharVal + pId;
+
+        // Increase perturbation for labels at the top of the trajectory, where the
+        // cluttering is likely most prominent.
+        const zOffset = fraction > 0 ? offset : offset * labelSize * 2;
 
         pos = [
             pos[0] + dir[0] * offset,
             pos[1] + dir[1] * offset,
-            pos[2] + dir[2] * (offset * 1.7),
+            pos[2] + dir[2] * zOffset,
         ];
 
         return pos ?? [0, 0, 0];
