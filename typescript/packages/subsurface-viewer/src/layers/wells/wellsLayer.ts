@@ -42,6 +42,7 @@ import type {
     ReportBoundingBoxAction,
 } from "../../components/Map";
 import { getLayersById } from "../../layers/utils/layerTools";
+import type { NumberPair, StyleAccessorFunction } from "../types";
 import type { WellLabelLayerProps } from "./layers/wellLabelLayer";
 import { WellLabelLayer } from "./layers/wellLabelLayer";
 import { abscissaTransform } from "./utils/abscissaTransform";
@@ -52,7 +53,6 @@ import {
     invertPath,
     splineRefine,
 } from "./utils/spline";
-import type { NumberPair, StyleAccessorFunction } from "../types";
 import { getColor, getTrajectory } from "./utils/trajectory";
 
 type DashAccessor = boolean | NumberPair | StyleAccessorFunction | undefined;
@@ -109,33 +109,34 @@ export interface WellsLayerProps extends ExtendedLayerProps {
     /**
      * @deprecated use wellLabel instead
      */
-    wellNameVisible: boolean;
+    wellNameVisible?: boolean;
 
     /**
      * @deprecated use wellLabel instead
      * It true place name at top, if false at bottom.
      * If given as a number between 0 and 100,  will place name at this percentage of trajectory from top.
      */
-    wellNameAtTop: boolean | number;
+    wellNameAtTop?: boolean | number;
 
     /**
      * @deprecated use wellLabel instead
      */
-    wellNameSize: number;
+    wellNameSize?: number;
 
     /**
      * @deprecated use wellLabel instead
      */
-    wellNameColor: Color;
+    wellNameColor?: Color;
     /**
      * If true will prevent well name cluttering by not displaying overlapping names.
      * default false.
      * @deprecated use wellLabel instead
      */
-    hideOverlappingWellNames: boolean;
+    hideOverlappingWellNames?: boolean;
 
     isLog: boolean;
     depthTest: boolean;
+
     /**  If true means that input z values are interpreted as depths.
      * For example depth of z = 1000 corresponds to -1000 on the z axis. Default true.
      */
@@ -169,12 +170,6 @@ const defaultProps = {
     logCurves: true,
     refine: false,
     visible: true,
-    wellNameVisible: false,
-    wellNameAtTop: true,
-    wellNameAutoPosition: false,
-    wellNameSize: 14,
-    wellNameColor: [0, 0, 0, 255],
-    hideOverlappingWellNames: false,
     selectedWell: "@@#editedData.selectedWells", // used to get data from deckgl layer
     depthTest: true,
     ZIncreasingDownwards: true,
@@ -395,14 +390,23 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         if (data) this.setLegend(data);
     }
 
-    private getWellLabelPosition() {
+    protected getWellLabelPosition() {
         if (this.props.wellLabel?.getPositionAlongPath) {
             return this.props.wellLabel.getPositionAlongPath;
         } else if (this.props.wellNameAtTop) {
+            // Backwards compatibility for `wellNameAtTop` prop.
             if (typeof this.props.wellNameAtTop === "boolean") {
-                return 0;
+                if (this.props.wellNameAtTop) {
+                    return 0;
+                }
+
+                // if wellNameAtTop is false, then place name at bottom.
+                return 1;
             }
-            return this.props.wellNameAtTop;
+
+            // `wellNameAtTop` can also be a number [0, 100] indicating the
+            // percentage along the trajectory from the top.
+            return this.props.wellNameAtTop / 100;
         }
         return 0;
     }

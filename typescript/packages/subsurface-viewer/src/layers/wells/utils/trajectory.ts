@@ -29,8 +29,10 @@ export function getColor(accessor: ColorAccessor) {
     };
 }
 
-// return trajectory visibility based on alpha of trajectory color
-function isTrajectoryVisible(
+/**
+ * Get trajectory transparency based on alpha of trajectory color
+ */
+function isTrajectoryTransparent(
     well_object: Feature,
     color_accessor: ColorAccessor
 ): boolean {
@@ -41,15 +43,18 @@ function isTrajectoryVisible(
     } else {
         alpha = (accessor as Color)?.[3];
     }
-    return alpha !== 0;
+    return alpha === 0;
 }
 
-// Return Trajectory data from LineString Geometry if it's visible (checking trajectory visiblity based on line color)
+/**
+ * Get trajectory data from LineString Geometry if it's visible (checking
+ * trajectory visiblity based on line color)
+ */
 export function getTrajectory(
     well_object: Feature,
     color_accessor: ColorAccessor
 ): Position[] | undefined {
-    if (isTrajectoryVisible(well_object, color_accessor))
+    if (!isTrajectoryTransparent(well_object, color_accessor))
         return getLineStringGeometry(well_object)?.coordinates as Position[];
     else return undefined;
 }

@@ -13,6 +13,9 @@ import { getTrajectory } from "../utils/trajectory";
 
 type WellLabelLayerData = Feature<Geometry, GeoJsonProperties>;
 
+/**
+ * Enum representing the orientation of well labels.
+ */
 export enum LabelOrientation {
     /**
      * Horizontal orientation.
@@ -35,19 +38,20 @@ export type WellLabelLayerProps = TextLayerProps<WellLabelLayerData> & {
     autoPosition?: boolean;
 
     /**
-     * Accessor function or value for getting the fractional position along the path, [0, 1].
+     * Accessor function or value for getting the fractional position
+     * along the path, [0, 1].
      */
     getPositionAlongPath?: number | ((d: Feature) => number);
-
-    /**
-     * If true, then z values are depth. Otherwise, z values are elevation.
-     */
-    zIncreasingDownwards?: boolean;
 
     /**
      * Orientation of the label.
      */
     orientation?: LabelOrientation;
+
+    /**
+     * If true, then z values are depth. Otherwise, z values are elevation.
+     */
+    zIncreasingDownwards?: boolean;
 };
 
 const DEFAULT_PROPS: DefaultProps<WellLabelLayerProps> = {
@@ -131,9 +135,9 @@ export class WellLabelLayer extends TextLayer<
             return 0;
         }
 
-        const percentage = Number(this.props.getPositionAlongPath);
-        _.clamp(percentage, 0, 100);
-        const a = this.getTrajPointAtPercentage(percentage, well);
+        const position = Number(this.props.getPositionAlongPath);
+        _.clamp(position, 0, 1);
+        const a = this.getVectorAlongTrajectory(position, well);
         return a[0];
     }
 
@@ -154,10 +158,8 @@ export class WellLabelLayer extends TextLayer<
         _.clamp(percentage, 0, 100);
 
         // Return a pos "annotation_position" percent down the trajectory
-        let pos = this.getTrajPointAtPercentage(percentage, well_data)[1];
+        let pos = this.getVectorAlongTrajectory(percentage, well_data)[1];
 
-        // Perturb position towards camera to avoid z-buffer fighting between labels.
-        // Distance dependent on unique properties of label so that no two labels are offset equally.
         const label = well_data.properties?.["name"] ?? "a";
         const labelSize = label.length;
 
@@ -180,22 +182,27 @@ export class WellLabelLayer extends TextLayer<
         const y = Math.floor(pos[1]) % 9;
         const pId = x + y; // unique position id for each label
 
+        // Perturb position towards camera to avoid z-buffer fighting between labels.
+        // Distance dependent on unique properties of label so that no two labels
+        // are offset equally.
         const offset = labelSize * labelSize + meanCharVal + pId;
 
         pos = [
             pos[0] + dir[0] * offset,
             pos[1] + dir[1] * offset,
-            pos[2] + dir[2] * (offset * 2),
+            pos[2] + dir[2] * (offset * 1.5),
         ];
 
         return pos ?? [0, 0, 0];
     }
 
     /**
-     * Return angle and position a given percentage down the trajectory.
+     * Get angle and position at a given fraction down the trajectory.
+     * @param fraction Fraction down the trajectory [0, 1]
+     * @param wellData Well trajectory
      */
-    protected getTrajPointAtPercentage(
-        percent: number,
+    protected getVectorAlongTrajectory(
+        fraction: number,
         wellData: Feature
     ): [number, Position3D] {
         if (!wellData) {
@@ -207,12 +214,12 @@ export class WellLabelLayer extends TextLayer<
         const w = this.context.viewport.width;
         const h = this.context.viewport.height;
 
-        const percentages = [50, 25, 75, 12.5, 87.5, 37.5, 62.5];
+        const candidateFractions = [0.5, 0.25, 0.75, 0.125, 0.87, 0.37, 0.62];
 
         const n = well_xyz?.length ?? 2;
         if (well_xyz && n >= 2) {
-            while (percentages.length != 0) {
-                const i = Math.min(Math.floor((percent / 100) * n), n - 2);
+            while (candidateFractions.length != 0) {
+                const i = Math.min(Math.floor(fraction * n), n - 2);
                 const pi1 = [...well_xyz[i]];
                 const pi2 = [...well_xyz[i + 1]];
 
@@ -233,7 +240,7 @@ export class WellLabelLayer extends TextLayer<
                     const ps = this.project(p);
                     if (ps[0] < 0 || ps[0] > w || ps[1] < 0 || ps[1] > h) {
                         // If the label is outside view/camera, reposition it
-                        percent = percentages.shift() as number;
+                        fraction = candidateFractions.shift() as number;
                         continue;
                     }
                 }
