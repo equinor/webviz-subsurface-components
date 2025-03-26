@@ -34,6 +34,10 @@ function hasSingleProperty(obj: any): obj is { propertyValue: number } {
     );
 }
 
+function getUniqueInfoPickId(pick: PickingInfo): string {
+    return `${pick.index}::${pick.layer?.id}`;
+}
+
 export type MultiViewPickingInfoAssemblerOptions = {
     multiPicking: boolean;
     pickDepth: number;
@@ -114,14 +118,37 @@ export class MultiViewPickingInfoAssembler {
         });
     }
 
+    private pickAtCoordinate(x: number, y: number): PickingInfo[] {
+        const deck = this._deckGl?.deck;
+        if (!deck) return [];
+
+        if (this._options.multiPicking) {
+            // ! For some reason, multi-pick pads the array up to pick-depth length, repeating the last element
+            const multPickResult = deck.pickMultipleObjects({
+                depth: this._options.pickDepth,
+                unproject3D: true,
+                x,
+                y,
+            });
+
+            return multPickResult;
+        } else {
+            const obj = deck.pickObject({
+                unproject3D: true,
+                x,
+                y,
+            });
+            return obj ? [obj] : [];
+        }
+    }
+
     private async assembleMultiViewPickingInfo(
         eventScreenCoordinate: [number, number],
         activeViewportId: string,
         viewports: Viewport[]
     ): Promise<PickingInfoPerView> {
         return new Promise((resolve, reject) => {
-            const deck = this._deckGl?.deck;
-            if (!deck) {
+            if (!this._deckGl?.deck) {
                 reject("DeckGL not initialized");
                 return;
             }
@@ -143,69 +170,45 @@ export class MultiViewPickingInfoAssembler {
             );
 
             const collectedPickingInfo: PickingInfoPerView = {};
+
             for (const viewport of viewports) {
                 const [relativeScreenX, relativeScreenY] =
                     viewport.project(worldCoordinate);
 
-                let pickingInfo: PickingInfo[] = [];
-                if (this._options.multiPicking) {
-                    pickingInfo = deck.pickMultipleObjects({
-                        x: relativeScreenX + viewport.x,
-                        y: relativeScreenY + viewport.y,
-                        depth: this._options.pickDepth,
-                        unproject3D: true,
-                    });
-                } else {
-                    const obj = deck.pickObject({
-                        x: relativeScreenX + viewport.x,
-                        y: relativeScreenY + viewport.y,
-                        unproject3D: true,
-                    });
-                    pickingInfo = obj ? [obj] : [];
-                }
+                const pickingInfo = this.pickAtCoordinate(
+                    relativeScreenX + viewport.x,
+                    relativeScreenY + viewport.y
+                );
 
                 if (pickingInfo) {
-                    const collectedLayerPickingInfo: LayerPickingInfo[] = [];
+                    const layerInfoDict: Record<string, LayerPickingInfo> = {};
+                    const processedPickIds: string[] = [];
+
                     for (const info of pickingInfo) {
+                        const uniquePickId = getUniqueInfoPickId(info);
                         const hasMultipleProperties = hasPropertiesArray(info);
                         const hasOneProperty = hasSingleProperty(info);
 
-                        if (!hasMultipleProperties && !hasOneProperty) {
-                            continue;
-                        }
+                        // General guard clauses
+                        if (!info.layer) continue;
+                        if (processedPickIds.includes(uniquePickId)) continue;
+                        if (!hasMultipleProperties && !hasOneProperty) continue;
 
-                        if (!info.layer) {
-                            continue;
-                        }
-
-                        if (
-                            collectedLayerPickingInfo.find(
-                                (el) => el.layerId === info.layer?.id
-                            )
-                        ) {
-                            continue;
-                        }
+                        processedPickIds.push(uniquePickId);
 
                         const layerId = info.layer.id;
-                        const layerName = (
-                            info.layer.props as unknown as ExtendedLayerProps
-                        ).name;
+                        const layerProps = info.layer
+                            .props as unknown as ExtendedLayerProps;
+                        const layerName = layerProps.name;
 
-                        let layerPickingInfo = collectedLayerPickingInfo.find(
-                            (el) => el.layerId === layerId
-                        );
-
-                        if (!layerPickingInfo) {
-                            collectedLayerPickingInfo.push({
+                        if (!layerInfoDict[layerId]) {
+                            layerInfoDict[layerId] = {
                                 layerId,
                                 layerName,
                                 properties: [],
-                            });
-                            layerPickingInfo =
-                                collectedLayerPickingInfo[
-                                    collectedLayerPickingInfo.length - 1
-                                ];
+                            };
                         }
+                        const layerPickingInfo = layerInfoDict[layerId];
 
                         if (hasOneProperty) {
                             layerPickingInfo.properties.push({
@@ -213,10 +216,7 @@ export class MultiViewPickingInfoAssembler {
                                 value: info.propertyValue,
                                 color: undefined,
                             });
-                            continue;
-                        }
-
-                        if (hasMultipleProperties) {
+                        } else if (hasMultipleProperties) {
                             const properties = info.properties;
 
                             for (const property of properties) {
@@ -231,11 +231,11 @@ export class MultiViewPickingInfoAssembler {
 
                     collectedPickingInfo[viewport.id] = {
                         coordinates: worldCoordinate,
-                        layerPickingInfo: collectedLayerPickingInfo,
+                        layerPickingInfo: Object.values(layerInfoDict),
                     };
                 } else {
                     collectedPickingInfo[viewport.id] = {
-                        coordinates: null,
+                        coordinates: worldCoordinate,
                         layerPickingInfo: [],
                     };
                 }
