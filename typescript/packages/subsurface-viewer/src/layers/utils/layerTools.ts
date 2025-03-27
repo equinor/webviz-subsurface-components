@@ -1,6 +1,9 @@
 import type { PickingInfo } from "@deck.gl/core";
 import type { Color } from "@deck.gl/core";
-import type { colorTablesArray } from "@emerson-eps/color-tables/";
+import type {
+    colorTablesArray,
+    createColorMapFunction,
+} from "@emerson-eps/color-tables/";
 import { rgbValues } from "@emerson-eps/color-tables/";
 import { createDefaultContinuousColorScale } from "@emerson-eps/color-tables/dist/component/Utils/legendCommonFunction";
 
@@ -20,7 +23,7 @@ import type DrawingLayer from "../drawing/drawingLayer";
 export type Position3D = [number, number, number];
 
 /** Type of functions returning a color from a value in the [0,1] range. */
-export type ColorMapFunctionType = (x: number) => [number, number, number];
+export type ColorMapFunctionType = ReturnType<typeof createColorMapFunction>;
 /** @deprecated Use ColorMapFunctionType instead. */
 export type colorMapFunctionType = ColorMapFunctionType;
 

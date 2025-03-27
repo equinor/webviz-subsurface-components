@@ -6,12 +6,8 @@ import { Slider } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import type { FeatureCollection, GeometryCollection } from "geojson";
 
-import {
-    ColorLegend,
-    colorTables,
-    createColorMapFunction,
-} from "@emerson-eps/color-tables";
 import { NativeSelect } from "@equinor/eds-core-react";
+import { colorTables, createColorMapFunction } from "@emerson-eps/color-tables";
 
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
@@ -20,6 +16,7 @@ import type {
     MapMouseEvent,
     Point3D,
 } from "../../components/Map";
+import ColorLegend from "../../components/ColorLegend";
 import AxesLayer from "../../layers/axes/axesLayer";
 import type { WellFeatureCollection } from "../../layers/wells/wellsLayer";
 import WellsLayer from "../../layers/wells/wellsLayer";

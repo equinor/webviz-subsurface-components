@@ -11,6 +11,7 @@ import type { BinaryFeatureCollection } from "@loaders.gl/schema";
 import { Vector2 } from "@math.gl/core";
 import { CollisionModifierExtension } from "../../extensions/collision-modifier-extension";
 import type {
+    ColorMapFunctionType,
     ExtendedLayerProps,
     LayerPickInfo,
     Position3D,
@@ -133,7 +134,7 @@ export interface WellsLayerProps extends ExtendedLayerProps {
      */
     refine: boolean | number;
     wellHeadStyle: WellHeadStyleAccessor;
-    colorMappingFunction: (x: number) => [number, number, number];
+    colorMappingFunction: ColorMapFunctionType;
     lineStyle: LineStyleAccessor;
     wellNameVisible: boolean;
     /** It true place name at top, if false at bottom.
@@ -1116,8 +1117,7 @@ function getLogColor(
     log_name: string,
     logColor: string,
     colorTables: colorTablesArray,
-    // eslint-disable-next-line
-    colorMappingFunction: any,
+    colorMappingFunction: WellsLayerProps["colorMappingFunction"],
     isLog: boolean
 ): Color[] {
     const log_data = getLogValues(d, logrun_name, log_name);
@@ -1129,17 +1129,14 @@ function getLogColor(
         const max = Math.max(...log_data);
         const max_delta = max - min;
         log_data.forEach((value) => {
+            const adjustedVal = (value - min) / max_delta;
+
             const rgb = colorMappingFunction
-                ? colorMappingFunction((value - min) / max_delta)
-                : rgbValues((value - min) / max_delta, logColor, colorTables);
-            rgbValues(value - min / max_delta, logColor, colorTables, isLog);
+                ? colorMappingFunction(adjustedVal)
+                : rgbValues(adjustedVal, logColor, colorTables, isLog);
 
             if (rgb) {
-                if (Array.isArray(rgb)) {
                     log_color.push([rgb[0], rgb[1], rgb[2]]);
-                } else {
-                    log_color.push([rgb?.r, rgb?.g, rgb?.b]);
-                }
             } else {
                 log_color.push([0, 0, 0, 0]); // push transparent for null/undefined log values
             }
@@ -1149,62 +1146,55 @@ function getLogColor(
         const log_attributes = getDiscreteLogMetadata(d, log_name)?.objects;
         const logLength = Object.keys(log_attributes).length;
 
-        // eslint-disable-next-line
-        const attributesObject: { [key: string]: any } = {};
-        const categorial = true;
+        const attributesObject: { [key: string]: [Color, number] } = {};
+        const categorical = true;
 
         Object.keys(log_attributes).forEach((key) => {
             // get the point from log_attributes
             const point = log_attributes[key][1];
-            const categorialMin = 0;
-            const categorialMax = logLength - 1;
+            const categoricalMin = 0;
+            const categoricalMax = logLength - 1;
 
             let rgb;
             if (colorMappingFunction) {
                 rgb = colorMappingFunction(
                     point,
-                    categorial,
-                    categorialMin,
-                    categorialMax
+                    categorical,
+                    categoricalMin,
+                    categoricalMax
                 );
             } else {
                 // if colormap function is not defined
-                const arrayOfColors: [number, number, number, number][] =
-                    getColors(logColor, colorTables, point);
+                const arrayOfColors: number[] = getColors(
+                    logColor,
+                    colorTables,
+                    point
+                );
+
                 if (!arrayOfColors.length)
-                    console.error(
-                        "Empty or missed '" + logColor + "' color table"
-                    );
+                    console.error(`Empty or missed '${logColor}' color table`);
+                else {
                 rgb = arrayOfColors;
+                }
             }
 
             if (rgb) {
-                if (Array.isArray(rgb)) {
                     if (rgb.length === 3) {
-                        attributesObject[key] = [
-                            [rgb[0], rgb[1], rgb[2]],
-                            point,
-                        ];
+                    attributesObject[key] = [[rgb[0], rgb[1], rgb[2]], point];
                     } else {
-                        attributesObject[key] = [
-                            [rgb[1], rgb[2], rgb[3]],
-                            point,
-                        ];
-                    }
-                } else {
-                    attributesObject[key] = [[rgb.r, rgb.g, rgb.b], point];
+                    // ? What is the point of this? Why do we offset the index in this case, isn't the fourth value the opacity?
+                    // (@anders2303)
+                    attributesObject[key] = [[rgb[1], rgb[2], rgb[3]], point];
                 }
             }
         });
         log_data.forEach((log_value) => {
             const dl_attrs = Object.entries(attributesObject).find(
-                ([, value]) => value[1] == log_value
+                ([, value]) => (value as [Color, number])[1] == log_value
             )?.[1];
-            // TODO: Fix this the next time the file is edited.
-            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-            dl_attrs
-                ? log_color.push(dl_attrs[0])
-                : log_color.push([0, 0, 0, 0]); // use transparent for undefined/null log values
+
+            if (dl_attrs) log_color.push(dl_attrs[0]);
+            else log_color.push([0, 0, 0, 0]); // use transparent for undefined/null log values
         });
     }
     return log_color;
