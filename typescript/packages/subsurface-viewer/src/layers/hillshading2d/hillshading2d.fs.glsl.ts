@@ -1,5 +1,5 @@
 const fsHillshading = `#version 300 es
-#define SHADER_NAME hillshading2d-shader
+#define SHADER_NAME hillshading2d-fragment-shader
 
 precision highp float;
 

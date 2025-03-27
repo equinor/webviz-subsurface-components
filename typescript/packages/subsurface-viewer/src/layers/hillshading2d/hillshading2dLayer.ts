@@ -100,7 +100,7 @@ export default class Hillshading2DLayer extends BitmapLayer<Hillshading2DProps> 
                     this.props.bounds[3] as number
                 ),
             };
-            super.setModuleParameters(mergedModuleParams);
+            super.setShaderModuleProps(mergedModuleParams);
 
             const valueRangeMin = this.props.valueRange[0] ?? 0.0;
             const valueRangeMax = this.props.valueRange[1] ?? 1.0;
