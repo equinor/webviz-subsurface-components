@@ -863,43 +863,55 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             coordinate[2] /= Math.max(0.001, zScale);
         }
 
-        let md_property = getMdProperty(
-            coordinate,
-            info.object as WellFeature,
-            this.props.lineStyle?.color,
-            (info as WellsPickInfo).featureType
-        );
-        if (!md_property) {
+        let md_property: PropertyDataType | null = null;
+        let tvd_property: PropertyDataType | null = null;
+        let log_property: PropertyDataType | null = null;
+
+        // ! This needs to be updated if we ever change the sub-layer id!
+        if (info.sourceLayer?.id === `${this.props.id}-log_curve`) {
+            // The use is hovering a well log entry
+            const logPick = info as PickingInfo<LogCurveDataType>;
+
             md_property = getLogProperty(
                 coordinate,
                 features,
-                info.object,
+                logPick.object!,
                 this.props.logrunName,
                 "MD"
             );
-        }
-        let tvd_property = getTvdProperty(
-            coordinate,
-            info.object as WellFeature,
-            this.props.lineStyle?.color,
-            (info as WellsPickInfo).featureType
-        );
-        if (!tvd_property) {
+
             tvd_property = getLogProperty(
+                coordinate,
+                features,
+                logPick.object!,
+                this.props.logrunName,
+                "TVD"
+            );
+
+            log_property = getLogProperty(
                 coordinate,
                 features,
                 info.object,
                 this.props.logrunName,
-                "TVD"
+                this.props.logName
+            );
+        } else {
+            // User is hovering a wellbore path
+            const wellpickInfo = info as PickingInfo<WellFeature>;
+
+            md_property = getMdProperty(
+                coordinate,
+                wellpickInfo.object!,
+                this.props.lineStyle?.color,
+                (info as WellsPickInfo).featureType
+            );
+            tvd_property = getTvdProperty(
+                coordinate,
+                info.object,
+                this.props.lineStyle?.color,
+                (info as WellsPickInfo).featureType
             );
         }
-        const log_property = getLogProperty(
-            coordinate,
-            features,
-            info.object,
-            this.props.logrunName,
-            this.props.logName
-        );
 
         // Patch for inverting tvd readout to fix issue #830,
         // should make proper fix when handling z increase direction - issue #842
@@ -1136,7 +1148,7 @@ function getLogColor(
                 : rgbValues(adjustedVal, logColor, colorTables, isLog);
 
             if (rgb) {
-                    log_color.push([rgb[0], rgb[1], rgb[2]]);
+                log_color.push([rgb[0], rgb[1], rgb[2]]);
             } else {
                 log_color.push([0, 0, 0, 0]); // push transparent for null/undefined log values
             }
@@ -1174,14 +1186,14 @@ function getLogColor(
                 if (!arrayOfColors.length)
                     console.error(`Empty or missed '${logColor}' color table`);
                 else {
-                rgb = arrayOfColors;
+                    rgb = arrayOfColors;
                 }
             }
 
             if (rgb) {
-                    if (rgb.length === 3) {
+                if (rgb.length === 3) {
                     attributesObject[key] = [[rgb[0], rgb[1], rgb[2]], point];
-                    } else {
+                } else {
                     // ? What is the point of this? Why do we offset the index in this case, isn't the fourth value the opacity?
                     // (@anders2303)
                     attributesObject[key] = [[rgb[1], rgb[2], rgb[3]], point];
