@@ -184,7 +184,7 @@ const defaultProps = {
     wellNameSize: 14,
     wellNameColor: [0, 0, 0, 255],
     hideOverlappingWellNames: false,
-    selectedWell: "@@#editedData.selectedWells", // used to get data from deckgl layer
+    selectedWell: "@@#editedData.selectedWells", // used to get data from deck.gl layer
     depthTest: true,
     ZIncreasingDownwards: true,
     simplifiedRendering: false,
@@ -869,7 +869,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
         // ! This needs to be updated if we ever change the sub-layer id!
         if (info.sourceLayer?.id === `${this.props.id}-log_curve`) {
-            // The use is hovering a well log entry
+            // The user is hovering a well log entry
             const logPick = info as PickingInfo<LogCurveDataType>;
 
             md_property = getLogProperty(
@@ -1051,7 +1051,7 @@ function isTrajectoryVisible(
     return alpha !== 0;
 }
 
-// Return Trajectory data from LineString Geometry if it's visible (checking trajectory visiblity based on line color)
+// Return Trajectory data from LineString Geometry if it's visible (checking trajectory visibility based on line color)
 function getTrajectory(
     well_object: WellFeature,
     color_accessor: ColorAccessor
@@ -1176,7 +1176,7 @@ function getLogColor(
                     categoricalMax
                 );
             } else {
-                // if colormap function is not defined
+                // if color-map function is not defined
                 const arrayOfColors: number[] = getColors(
                     logColor,
                     colorTables,
@@ -1418,7 +1418,7 @@ function getMd(
 
     let trajectory;
     // In 2D view coord is of type Position2D and in 3D view it's Position3D,
-    // so use apropriate trajectory for interpolation
+    // so use appropriate trajectory for interpolation
     if (coord.length == 2) {
         const trajectory2D = trajectory3D.map((v) => {
             return v.slice(0, 2);
@@ -1570,7 +1570,7 @@ function getLogProperty(
     } else return null;
 }
 
-// Return data required to build welllayer legend
+// Return data required to build well layer legend
 function getLegendData(
     logs: LogCurveDataType[],
     wellName: string,
