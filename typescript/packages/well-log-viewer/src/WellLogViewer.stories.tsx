@@ -1,4 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { userEvent, within, expect } from "@storybook/test";
+
 import React from "react";
 
 import WellLogViewer, {
@@ -261,6 +263,108 @@ export const ColorByFunction: StoryObj<typeof StoryTemplate> = {
             hideCurrentPosition: false,
             hideSelectionInterval: false,
         },
+    },
+    render: (args) => <StoryTemplate {...args} />,
+};
+
+export const TrackTitleTooltip: StoryObj<typeof StoryTemplate> = {
+    args: {
+        horizontal: false,
+        wellLogSets: [
+            {
+                header: {
+                    name: "continuous and discrete logs",
+                },
+                curves: [
+                    {
+                        name: "MD",
+                        description: "continuous",
+                        quantity: "m",
+                        unit: "m",
+                        valueType: "float",
+                        dimensions: 1,
+                    },
+                    {
+                        name: "continuous",
+                        description: "A continuous curve",
+                    },
+                    {
+                        name: "discrete",
+                        description: "A discrete curve",
+                    },
+                ],
+                data: [
+                    [0, 0, 1],
+                    [1, 1, 1],
+                    [2, 2, 1],
+                    [3, 3, 2],
+                    [4, 2, 2],
+                    [5, 1, 2],
+                    [6, 0, 3],
+                    [7, 1, 3],
+                    [8, 2, 3],
+                    [9, 3, null],
+                    [10, 2, null],
+                ],
+            },
+        ],
+        template: {
+            name: "template",
+            scale: {
+                primary: "MD",
+            },
+            tracks: [
+                {
+                    title: "discrete log",
+                    titleTooltip: "example discrete log track",
+                    plots: [{ name: "discrete", style: "discrete" }],
+                },
+                {
+                    title: "continuous log",
+                    titleTooltip: "example continuous log track",
+                    plots: [{ name: "continuous", type: "line", color: "red" }],
+                },
+            ],
+            styles: [
+                {
+                    name: "discrete",
+                    type: "stacked",
+                    colorMapFunctionName: "Stratigraphy",
+                },
+            ],
+        },
+        colorMapFunctions: exampleColorMapFunctions,
+        axisTitles: axisTitles,
+        axisMnemos: axisMnemos,
+        viewTitle: true, // show default well log view title (a wellname from the well log)
+    },
+    parameters: {
+        docs: {
+            description: {
+                story: "An example showing the tracks with continuous and discrete logs with title tooltip.",
+            },
+        },
+    },
+    play: async ({ canvasElement }) => {
+        // Assigns canvas to the component root element
+        const canvas = within(canvasElement);
+        await expect(canvas).toBeDefined();
+
+        let titleDiv = canvas.getByText("discrete log");
+        await expect(titleDiv).toBeDefined();
+        await expect(titleDiv.title).toContain("example discrete");
+
+        titleDiv = await canvas.findByText("continuous log");
+        await expect(titleDiv).toBeDefined();
+        await expect(titleDiv.title).toContain("example continuous");
+
+        if (titleDiv) {
+            await userEvent.pointer({
+                target: titleDiv,
+                node: titleDiv,
+                offset: 2,
+            });
+        }
     },
     render: (args) => <StoryTemplate {...args} />,
 };

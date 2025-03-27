@@ -1,3 +1,10 @@
+# [2.4.0](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@2.3.6...well-log-viewer@2.4.0) (2025-03-26)
+
+
+### Features
+
+* Add tooltip optional prop to track template ([#2488](https://github.com/equinor/webviz-subsurface-components/issues/2488)) ([a3e8cf9](https://github.com/equinor/webviz-subsurface-components/commit/a3e8cf96690655d66ae4d7fe18db17c3b39f09cd))
+
 ## [2.3.6](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@2.3.5...well-log-viewer@2.3.6) (2025-03-20)
 
 

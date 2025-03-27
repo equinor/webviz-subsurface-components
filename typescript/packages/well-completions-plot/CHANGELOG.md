@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/equinor/webviz-subsurface-components/compare/well-completions-plot@1.6.4...well-completions-plot@1.7.0) (2025-03-26)
+
+
+### Features
+
+* Add tooltip optional prop to track template ([#2488](https://github.com/equinor/webviz-subsurface-components/issues/2488)) ([a3e8cf9](https://github.com/equinor/webviz-subsurface-components/commit/a3e8cf96690655d66ae4d7fe18db17c3b39f09cd))
+
 ## [1.6.4](https://github.com/equinor/webviz-subsurface-components/compare/well-completions-plot@1.6.3...well-completions-plot@1.6.4) (2025-03-12)
 
 
