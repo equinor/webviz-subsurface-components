@@ -1,3 +1,10 @@
+# [1.10.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.9.0...subsurface-viewer@1.10.0) (2025-03-27)
+
+
+### Features
+
+* enhanced well label styling ([#2487](https://github.com/equinor/webviz-subsurface-components/issues/2487)) ([a4569fe](https://github.com/equinor/webviz-subsurface-components/commit/a4569fe9c958c68ab3c8619d3dc6110a31aeb55d)), closes [#2433](https://github.com/equinor/webviz-subsurface-components/issues/2433) [#767](https://github.com/equinor/webviz-subsurface-components/issues/767) [#947](https://github.com/equinor/webviz-subsurface-components/issues/947)
+
 # [1.9.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.8.8...subsurface-viewer@1.9.0) (2025-03-26)
 
 
