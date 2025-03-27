@@ -32,7 +32,7 @@ import { distance, dot, subtract } from "mathjs";
 
 import { GL } from "@luma.gl/constants";
 import { interpolateNumberArray } from "d3";
-import _, { isEqual } from "lodash";
+import _, { isEmpty, isEqual } from "lodash";
 import type {
     ContinuousLegendDataType,
     DiscreteLegendDataType,
@@ -289,37 +289,50 @@ export function getSize(
     return 0;
 }
 
+function dataIsReady(
+    layerData: WellsLayerProps["data"]
+): layerData is WellFeatureCollection {
+    // As far as I understand, Deck.gl is making prop.data `[]` while external data is being loaded
+    return !!layerData && !isEmpty(layerData);
+}
+
 export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
+    state!: {
+        data: WellFeatureCollection | undefined;
+        well: string;
+        selectedMultiWells: string[];
+        selection: [number, number];
+    };
+
     initializeState(): void {
-        let data = this.getWellDataProp();
+        const data = this.props.data;
         const refine = this.props.refine;
         const doRefine = typeof refine === "number" ? refine > 1 : refine;
         const stepCount = typeof refine === "number" ? refine : 5;
 
-        if (!data) {
+        if (!dataIsReady(data)) {
             return;
         }
 
+        let transformedData = data;
+
         if (this.props.ZIncreasingDownwards) {
-            data = invertPath(data);
+            transformedData = invertPath(transformedData);
         }
 
         if (this.props.section) {
-            data = abscissaTransform(data);
+            transformedData = abscissaTransform(transformedData);
         }
 
         // Mutate data to remove duplicates
-        checkWells(data);
+        checkWells(transformedData);
 
         // Conditionally apply spline interpolation to refine the well path.
         if (doRefine) {
-            data = splineRefine(data, stepCount);
+            transformedData = splineRefine(transformedData, stepCount);
         }
 
-        this.setState({
-            ...this.state,
-            data,
-        });
+        this.setState({ data: transformedData });
     }
 
     shouldUpdateState({ changeFlags }: UpdateParameters<this>): boolean {
@@ -339,6 +352,8 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             ) ||
             !isEqual(props.refine, oldProps.refine);
         if (needs_reload) {
+            // ? Why are we looping back to initializeState here? Deck.gl life-cycle intends for
+            // ? this to only be called *once*, so this is a confusing choice. (@anders2303)
             this.initializeState();
         }
     }
@@ -375,15 +390,8 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         }
     }
 
-    // ? Somewhat unsure why we go back and forth between taking data from props or state (@anders2303)
-    getWellDataProp(): WellFeatureCollection | undefined {
-        if (!this.isLoaded) return undefined;
-        return this.props.data as WellFeatureCollection;
-    }
-
     getWellDataState(): WellFeatureCollection | undefined {
-        if (!this.isLoaded) return undefined;
-        return this.state["data"] as WellFeatureCollection;
+        return this.state.data;
     }
 
     getLegendData(
@@ -571,7 +579,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             id: "highlight2",
             data: getWellObjectsByName(
                 data.features,
-                this.state["selectedMultiWells"] as string[]
+                this.state.selectedMultiWells
             ),
             getPointRadius: getSize(POINT, this.props.wellHeadStyle?.size, 2),
             getFillColor: [255, 140, 0],
@@ -658,8 +666,8 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                     getLogPath1(
                         data.features,
                         d,
-                        this.state["well"] as string,
-                        this.state["selection"] as [number, number],
+                        this.state.well,
+                        this.state.selection,
                         this.props.logrunName,
                         this.props.lineStyle?.color
                     ),
@@ -667,8 +675,8 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                     getLogColor1(
                         data.features,
                         d,
-                        this.state["well"] as string,
-                        this.state["selection"] as [number, number],
+                        this.state.well,
+                        this.state.selection,
                         this.props.logrunName
                     ),
                 getWidth: (d: LogCurveDataType): number | number[] =>
@@ -677,8 +685,8 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 updateTriggers: {
                     getColor: [
                         this.props.logrunName,
-                        this.state["well"],
-                        this.state["selection"],
+                        this.state.well,
+                        this.state.selection,
                     ],
                     getWidth: [
                         this.props.logrunName,
@@ -688,8 +696,8 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                     getPath: [
                         positionFormat,
                         this.props.logrunName,
-                        this.state["well"],
-                        this.state["selection"],
+                        this.state.well,
+                        this.state.selection,
                     ],
                 },
                 onDataLoad: (value: LogCurveDataType[]) => {
@@ -720,8 +728,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
     getPickingInfo({ info }: { info: PickingInfo }): WellsPickInfo {
         if (!info.object) return { ...info, properties: [], logName: "" };
 
-        // ? Why do we get data from props here? (@anders2303)
-        const features = this.getWellDataProp()?.features ?? [];
+        const features = this.getWellDataState()?.features ?? [];
         const coordinate: Position = info.coordinate || [0, 0, 0];
 
         const zScale = this.props.modelMatrix ? this.props.modelMatrix[10] : 1;
