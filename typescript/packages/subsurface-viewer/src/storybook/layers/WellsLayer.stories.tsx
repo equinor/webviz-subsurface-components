@@ -17,12 +17,9 @@ import { NativeSelect } from "@equinor/eds-core-react";
 
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
-import type {
-    BoundingBox2D,
-    MapMouseEvent,
-    Point3D,
-} from "../../components/Map";
+import type { MapMouseEvent } from "../../components/Map";
 import AxesLayer from "../../layers/axes/axesLayer";
+import type { WellsLayerProps } from "../../layers/wells/wellsLayer";
 import WellsLayer from "../../layers/wells/wellsLayer";
 
 import { Axes2DLayer } from "../../layers";
@@ -35,10 +32,18 @@ import {
     volveWellsResources,
 } from "../sharedSettings";
 
+import type { WellLabelLayerProps } from "../../layers/wells/layers/wellLabelLayer";
+import { LabelOrientation } from "../../layers/wells/layers/wellLabelLayer";
 import {
     coarsenWells,
     DEFAULT_TOLERANCE,
 } from "../../layers/wells/utils/spline";
+import {
+    LABEL_ORIENTATION_ARGTYPES,
+    LABEL_POSITION_ARGTYPES,
+    LABEL_SIZE_ARGTYPES,
+} from "../constant/argTypes";
+import { getRgba } from "../util/color";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -572,6 +577,11 @@ export const Wells3d: StoryObj<typeof SubsurfaceViewer> = {
         layers: [
             {
                 ...volveWellsFromResourcesLayer,
+                wellHeadStyle: { size: 4 },
+                wellLabel: {
+                    getSize: 9,
+                    background: true,
+                },
             },
         ],
         views: default3DViews,
@@ -666,93 +676,94 @@ export const SimplifiedRendering: StoryObj<typeof SubsurfaceViewer> = {
     render: (args) => <SimplifiedRenderingComponent {...args} />,
 };
 
-type ClutterProps = {
-    hideOverlappingWellNames: boolean;
-    wellNamePositionPercentage: boolean | number;
-};
-
-const ReducedWellNameClutterComponent: React.FC<ClutterProps> = (
-    props: ClutterProps
-) => {
-    const propsWithLayers = {
-        id: "clutter",
-        layers: [
-            new WellsLayer({
-                data: "./gullfaks.json",
-                wellNameVisible: true,
-                wellNameAtTop: props.wellNamePositionPercentage,
-                wellHeadStyle: { size: 4 },
-                wellNameSize: 9,
-                hideOverlappingWellNames: props.hideOverlappingWellNames,
-                outline: true,
-                ZIncreasingDownwards: false,
-            }),
-            new AxesLayer({
-                id: "axes-layer",
-                bounds: [450000, 6781000, 0, 464000, 6791000, 3500],
-            }),
-        ],
-        cameraPosition: {
-            rotationOrbit: 45,
-            rotationX: 45,
-            zoom: -4,
-            target: [
-                (450000 + 464000) / 2,
-                (6781000 + 6791000) / 2,
-                -3500 / 2,
-            ] as Point3D,
-        },
-        views: default3DViews,
-    };
-
-    return <SubsurfaceViewer {...propsWithLayers} />;
-};
-
-export const ReducedWellNameClutter3D: StoryObj<
-    typeof ReducedWellNameClutterComponent
+/**
+ * A story that demonstrates styling of well labels.
+ */
+export const WellLabelStyle: StoryObj<
+    WellLabelLayerProps & {
+        color: string;
+        borderColor: string;
+        bgColor: string;
+    }
 > = {
     args: {
-        hideOverlappingWellNames: true,
-        wellNamePositionPercentage: 0,
+        getSize: 10,
+        orientation: LabelOrientation.HORIZONTAL,
+        color: "black",
+        background: true,
+        borderColor: "black",
+        getBorderWidth: 1,
+        bgColor: "white",
+        getPositionAlongPath: 0,
     },
-    render: (args) => <ReducedWellNameClutterComponent {...args} />,
-};
 
-const ReducedWellNameClutterComponent2D: React.FC<ClutterProps> = (
-    props: ClutterProps
-) => {
-    const propsWithLayers = {
-        id: "clutter",
-        layers: [
-            new WellsLayer({
-                data: "./gullfaks.json",
-                wellNameVisible: true,
-                wellNameSize: 9,
-                wellNameAtTop: props.wellNamePositionPercentage,
-                wellHeadStyle: { size: 4 },
-                hideOverlappingWellNames: props.hideOverlappingWellNames,
-                outline: true,
-                ZIncreasingDownwards: false,
+    render: (args) => {
+        const wellLabelProps: WellsLayerProps["wellLabel"] = {
+            getPositionAlongPath: args.getPositionAlongPath,
+            getSize: args.getSize,
+            getColor: getRgba(args.color),
+            getBorderColor: getRgba(args.borderColor),
+            getBackgroundColor: getRgba(args.bgColor),
+            getBorderWidth: args.getBorderWidth,
+            orientation: args.orientation,
+            background: args.background,
+            visible: true,
+        };
+
+        const wellLayer = new WellsLayer({
+            data: "./gullfaks.json",
+            wellHeadStyle: { size: 5 },
+            ZIncreasingDownwards: false,
+            wellLabel: wellLabelProps,
+            id: "wells",
+        });
+
+        const axes2d = new Axes2DLayer({
+            id: "axes-2d",
+        });
+
+        const axes3d = new AxesLayer({
+            id: "axes-3d",
+            bounds: [450000, 6781000, 0, 464000, 6791000, 3500],
+        });
+
+        const layers = [wellLayer, axes3d, axes2d];
+
+        // Viewport is reset if identity of `views` object changes, so we need to memoize it.
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const views = React.useMemo(
+            () => ({
+                layout: [1, 2] as [number, number],
+                viewports: [
+                    {
+                        id: "viewport1",
+                        layerIds: ["wells", "axes-3d"],
+                        show3D: true,
+                    },
+                    {
+                        id: "viewport2",
+                        layerIds: ["wells", "axes-2d"],
+                        show3D: false,
+                    },
+                ],
             }),
-            new AxesLayer({
-                id: "axes-layer",
-                bounds: [450000, 6781000, 0, 464000, 6791000, 3500],
-            }),
-        ],
-        bounds: [450000, 6781000, 464000, 6791000] as BoundingBox2D,
-    };
+            []
+        );
 
-    return <SubsurfaceViewer {...propsWithLayers} />;
-};
-
-export const ReducedWellNameClutter2D: StoryObj<
-    typeof ReducedWellNameClutterComponent
-> = {
-    args: {
-        hideOverlappingWellNames: true,
-        wellNamePositionPercentage: 0,
+        return (
+            <SubsurfaceViewer
+                id="well-label-style"
+                layers={layers}
+                views={views}
+            />
+        );
     },
-    render: (args) => <ReducedWellNameClutterComponent2D {...args} />,
+
+    argTypes: {
+        ...LABEL_POSITION_ARGTYPES,
+        ...LABEL_SIZE_ARGTYPES,
+        ...LABEL_ORIENTATION_ARGTYPES,
+    },
 };
 
 const CoarseWellFactorComponent: React.FC<{
