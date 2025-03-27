@@ -135,6 +135,7 @@ export function CatmullRom1D(
  *
  * See https://qroph.github.io/2018/07/30/smooth-paths-using-catmull-rom-splines.html
  */
+// prettier-ignore
 export function CatmullRom(
     P0: Position3D,
     P1: Position3D,
@@ -191,10 +192,9 @@ export function CatmullRom(
  * in smoother curves with more points.
  * Assumes 3D data.
  */
-export function splineRefine(
-    data_in: FeatureCollection<GeometryCollection>,
-    stepCount = 5
-): FeatureCollection<GeometryCollection> {
+export function splineRefine<
+    TFeatureCollection extends FeatureCollection<GeometryCollection>,
+>(data_in: TFeatureCollection, stepCount = 5): TFeatureCollection {
     if (stepCount < 1) {
         return data_in;
     }
@@ -382,9 +382,9 @@ export function flattenPath(data_in: FeatureCollection): FeatureCollection {
     return data;
 }
 
-export function invertPath(
-    data_in: FeatureCollection<GeometryCollection>
-): FeatureCollection<GeometryCollection> {
+export function invertPath<
+    TFeatureCollection extends FeatureCollection<GeometryCollection>,
+>(data_in: TFeatureCollection): TFeatureCollection {
     const data = cloneDeep(data_in);
 
     const no_wells = data.features.length;

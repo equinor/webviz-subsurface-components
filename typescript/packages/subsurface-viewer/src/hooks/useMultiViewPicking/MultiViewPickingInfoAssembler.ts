@@ -1,5 +1,6 @@
 import type { PickingInfo, Viewport } from "@deck.gl/core";
 import type { DeckGLRef } from "@deck.gl/react";
+
 import type {
     ExtendedLayerProps,
     MapMouseEvent,
@@ -12,13 +13,11 @@ export type LayerPickingInfo = {
     properties: PropertyDataType[];
 };
 
-export type PickingInfoPerView = Record<
-    string,
-    {
-        coordinates: number[] | null;
-        layerPickingInfo: LayerPickingInfo[];
-    }
->;
+export type ViewportPickInfo = {
+    coordinates: number[] | null;
+    layerPickingInfo: LayerPickingInfo[];
+};
+export type PickingInfoPerView = Record<string, ViewportPickInfo>;
 
 function hasPropertiesArray(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

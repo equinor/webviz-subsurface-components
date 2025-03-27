@@ -1,5 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
-
 import type { Meta, StoryObj } from "@storybook/react";
 import type { SyntheticEvent } from "react";
 import React, { useState } from "react";
@@ -23,6 +21,7 @@ import type {
     Point3D,
 } from "../../components/Map";
 import AxesLayer from "../../layers/axes/axesLayer";
+import type { WellFeatureCollection } from "../../layers/wells/wellsLayer";
 import WellsLayer from "../../layers/wells/wellsLayer";
 
 import { Axes2DLayer } from "../../layers";
@@ -52,7 +51,7 @@ export default stories;
 
 const PREFIX = "VolveWells";
 
-const testWellWithDuplicates = {
+const testWellWithDuplicates: WellFeatureCollection = {
     type: "FeatureCollection",
     features: [
         {
@@ -81,6 +80,7 @@ const testWellWithDuplicates = {
                     },
                 ],
             },
+            // WellFeatureCollection type means the properties here are typed!
             properties: {
                 name: "wl6",
                 color: [255, 255, 0, 255],

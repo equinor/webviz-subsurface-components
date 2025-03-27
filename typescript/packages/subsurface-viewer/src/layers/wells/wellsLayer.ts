@@ -4,10 +4,10 @@ import type {
     LayerData,
     LayersList,
     PickingInfo,
-    Position,
     UpdateParameters,
 } from "@deck.gl/core";
 import { CompositeLayer, OrbitViewport } from "@deck.gl/core";
+import type { BinaryFeatureCollection } from "@loaders.gl/schema";
 import { Vector2 } from "@math.gl/core";
 import { CollisionModifierExtension } from "../../extensions/collision-modifier-extension";
 import type {
@@ -26,17 +26,16 @@ import { getColors, rgbValues } from "@emerson-eps/color-tables/";
 import type {
     Feature,
     FeatureCollection,
-    GeoJsonProperties,
-    Geometry,
     GeometryCollection,
     LineString,
     Point,
+    Position,
 } from "geojson";
 import { distance, dot, subtract } from "mathjs";
 
 import { GL } from "@luma.gl/constants";
 import { interpolateNumberArray } from "d3";
-import { clamp, isEmpty, isEqual } from "lodash";
+import { clamp, isEqual } from "lodash";
 import type {
     ContinuousLegendDataType,
     DiscreteLegendDataType,
@@ -91,7 +90,31 @@ function onDataLoad(
     }
 }
 
+export type GeoJsonWellProperties = {
+    name: string;
+    md: number[][];
+    color?: Color;
+};
+export type WellFeature = Feature<GeometryCollection, GeoJsonWellProperties>;
+export type WellFeatureCollection = FeatureCollection<
+    GeometryCollection,
+    GeoJsonWellProperties
+>;
+
+export interface WellsPickInfo extends LayerPickInfo<WellFeature> {
+    featureType?: string;
+    logName: string;
+}
+
 export interface WellsLayerProps extends ExtendedLayerProps {
+    // String, binary and promise is handled internally in Deck.gl to load external data.
+    // It's expected that a correctly structured GeoJSON is loaded
+    data:
+        | string
+        | WellFeatureCollection
+        | BinaryFeatureCollection
+        | Promise<WellFeatureCollection | BinaryFeatureCollection>;
+
     pointRadiusScale: number;
     lineWidthScale: number;
     outline: boolean;
@@ -187,11 +210,6 @@ export interface LogCurveDataType {
     >;
 }
 
-export interface WellsPickInfo extends LayerPickInfo {
-    featureType?: string;
-    logName: string;
-}
-
 function multiply(pair: [number, number], factor: number): [number, number] {
     return [pair[0] * factor, pair[1] * factor];
 }
@@ -277,10 +295,12 @@ export function getSize(
 
 export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
     initializeState(): void {
-        let data = this.props.data as FeatureCollection<GeometryCollection>;
+        let data = this.getWellDataProp();
         const refine = this.props.refine;
+        const doRefine = typeof refine === "number" ? refine > 1 : refine;
+        const stepCount = typeof refine === "number" ? refine : 5;
 
-        if (!data || isEmpty(data)) {
+        if (!data) {
             return;
         }
 
@@ -292,13 +312,13 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             data = abscissaTransform(data);
         }
 
+        // Mutate data to remove duplicates
         checkWells(data);
 
         // Conditionally apply spline interpolation to refine the well path.
-        const doRefine =
-            typeof refine === "number" ? refine > 1 : (refine as boolean);
-        const stepCount = typeof refine === "number" ? refine : 5;
-        data = doRefine ? splineRefine(data, stepCount) : data;
+        if (doRefine) {
+            data = splineRefine(data, stepCount);
+        }
 
         this.setState({
             ...this.state,
@@ -335,14 +355,13 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         }
     }
 
-    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any
     onClick(info: WellsPickInfo): boolean {
         // Make selection only when drawing is disabled
         if (isDrawingEnabled(this.context.layerManager)) {
             return false;
         } else {
             this.context.userData.setEditedData({
-                selectedWell: (info.object as Feature).properties?.["name"],
+                selectedWell: info.object?.properties.name,
             });
             return false; // do not return true to allow DeckGL props.onClick to be called
         }
@@ -366,6 +385,17 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 selectedMultiWells: wells,
             });
         }
+    }
+
+    // ? Somewhat unsure why we go back and forth between taking data from props or state (@anders2303)
+    getWellDataProp(): WellFeatureCollection | undefined {
+        if (!this.isLoaded) return undefined;
+        return this.props.data as WellFeatureCollection;
+    }
+
+    getWellDataState(): WellFeatureCollection | undefined {
+        if (!this.isLoaded) return undefined;
+        return this.state["data"] as WellFeatureCollection;
     }
 
     getLegendData(
@@ -416,17 +446,20 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
     // return position for well name and icon
     getAnnotationPosition(
-        well_data: Feature,
+        well_data: WellFeature,
         percentage: number,
         view_is_3d: boolean,
         color_accessor: ColorAccessor
     ): Position | null {
         if (percentage > 0 && percentage < 100) {
+            // ? Why do we get it from props here? (@anders2303)
+            const features = this.getWellDataProp()?.features ?? [];
+
             // Return a pos "name_at_top" percent down the trajectory
             const pos = this.getTrajMidPoint(
                 percentage,
                 well_data,
-                (this.props.data as unknown as FeatureCollection).features
+                features
             )[1];
 
             // using z=0 for orthographic view to keep label above other other layers
@@ -459,8 +492,8 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
     getTrajMidPoint(
         percent: number,
-        well_data: Feature,
-        features: Feature<Geometry, GeoJsonProperties>[]
+        well_data: WellFeature,
+        features: WellFeature[]
     ): [number, Position3D] {
         const wellName = well_data.properties?.["name"];
         const well_object = getWellObjectByName(features, wellName);
@@ -499,17 +532,15 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         }
         return [0, [0, 0, 0]];
     }
-
     renderLayers(): LayersList {
-        if (!(this.props.data as unknown as FeatureCollection).features) {
-            return [];
-        }
-
-        const data = this.state["data"] as FeatureCollection;
-
+        const data = this.getWellDataState();
         const is3d = this.context.viewport.constructor === OrbitViewport;
         const positionFormat = "XYZ";
         const isDashed = !!this.props.lineStyle?.dash;
+
+        if (!data || !data?.features.length) {
+            return [];
+        }
 
         const extensions = [
             new PathStyleExtension({
@@ -730,8 +761,8 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         const clutterProps = {
             background: true,
             collisionEnabled: true,
-            getCollisionPriority: (d: Feature<Geometry, GeoJsonProperties>) => {
-                const labelSize = d.properties?.["name"].length ?? 1;
+            getCollisionPriority: (d: WellFeature) => {
+                const labelSize = d.properties.name.length ?? 1;
                 if (is3d) {
                     // In 3D prioritize according to label size.
                     return labelSize;
@@ -763,7 +794,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             this.getSubLayerProps({
                 id: "names",
                 data: data.features,
-                getPosition: (d: Feature) =>
+                getPosition: (d: WellFeature) =>
                     this.getAnnotationPosition(
                         d,
                         this.getWellNamePositionAlongTrajectory(
@@ -772,22 +803,19 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                         is3d,
                         this.props.lineStyle?.color
                     ),
-                getAngle: (f: Feature) => {
+                getAngle: (d: WellFeature) => {
+                    // ? Why do we get data from props here? (@anders2303)
+                    const features = this.getWellDataProp()?.features ?? [];
                     const percentage = this.getWellNamePositionAlongTrajectory(
                         this.props.wellNameAtTop
                     );
 
-                    const a = this.getTrajMidPoint(
-                        percentage,
-                        f,
-                        (this.props.data as unknown as FeatureCollection)
-                            .features
-                    );
+                    const a = this.getTrajMidPoint(percentage, d, features);
                     const text_angle = a[0];
                     return text_angle;
                 },
 
-                getText: (d: Feature) => d.properties?.["name"],
+                getText: (d: WellFeature) => d.properties.name,
                 getColor: this.props.wellNameColor,
                 getAnchor: "start",
                 getAlignmentBaseline: "bottom",
@@ -825,7 +853,9 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
     getPickingInfo({ info }: { info: PickingInfo }): WellsPickInfo {
         if (!info.object) return { ...info, properties: [], logName: "" };
 
-        const coordinate = (info.coordinate || [0, 0, 0]) as Position;
+        // ? Why do we get data from props here? (@anders2303)
+        const features = this.getWellDataProp()?.features ?? [];
+        const coordinate: Position = info.coordinate || [0, 0, 0];
 
         const zScale = this.props.modelMatrix ? this.props.modelMatrix[10] : 1;
         if (typeof coordinate[2] !== "undefined") {
@@ -834,14 +864,14 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
         let md_property = getMdProperty(
             coordinate,
-            info.object as Feature,
+            info.object as WellFeature,
             this.props.lineStyle?.color,
             (info as WellsPickInfo).featureType
         );
         if (!md_property) {
             md_property = getLogProperty(
                 coordinate,
-                (this.props.data as FeatureCollection).features,
+                features,
                 info.object,
                 this.props.logrunName,
                 "MD"
@@ -849,14 +879,14 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         }
         let tvd_property = getTvdProperty(
             coordinate,
-            info.object as Feature,
+            info.object as WellFeature,
             this.props.lineStyle?.color,
             (info as WellsPickInfo).featureType
         );
         if (!tvd_property) {
             tvd_property = getLogProperty(
                 coordinate,
-                (this.props.data as FeatureCollection).features,
+                features,
                 info.object,
                 this.props.logrunName,
                 "TVD"
@@ -864,7 +894,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         }
         const log_property = getLogProperty(
             coordinate,
-            (this.props.data as FeatureCollection).features,
+            features,
             info.object,
             this.props.logrunName,
             this.props.logName
@@ -894,7 +924,7 @@ WellsLayer.layerName = "WellsLayer";
 WellsLayer.defaultProps = {
     ...defaultProps,
     onDataLoad: (
-        data: LayerData<FeatureCollection<Geometry, GeoJsonProperties>>,
+        data: LayerData<WellFeatureCollection>,
         context: {
             propName: string;
             layer: Layer;
@@ -952,53 +982,50 @@ function isSelectedLogRun(d: LogCurveDataType, logrun_name: string): boolean {
 }
 
 function getWellObjectByName(
-    wells_data: Feature[],
+    wells_data: WellFeature[],
     name: string
-): Feature | undefined {
+): WellFeature | undefined {
     return wells_data?.find(
-        (item) =>
-            item.properties?.["name"]?.toLowerCase() === name?.toLowerCase()
+        (item) => item.properties?.name?.toLowerCase() === name?.toLowerCase()
     );
 }
 
 function getWellObjectsByName(
-    wells_data: Feature[],
+    wells_data: WellFeature[],
     name: string[]
-): Feature[] | undefined {
-    const res: Feature[] = [];
+): WellFeature[] | undefined {
+    const res: WellFeature[] = [];
     for (let i = 0; i < name?.length; i++) {
         wells_data?.find((item) => {
-            if (
-                item.properties?.["name"]?.toLowerCase() ===
-                name[i]?.toLowerCase()
-            ) {
+            if (item.properties?.name?.toLowerCase() === name[i]?.toLowerCase())
                 res.push(item);
-            }
         });
     }
     return res;
 }
 
-function getPointGeometry(well_object: Feature): Point {
-    return (well_object.geometry as GeometryCollection)?.geometries.find(
-        (item: { type: string }) => item.type == "Point"
-    ) as Point;
+function getPointGeometry(well_object: WellFeature): Point | undefined {
+    const geometries = well_object.geometry.geometries;
+    return geometries.find((item): item is Point => item.type === "Point");
 }
 
-function getLineStringGeometry(well_object: Feature): LineString {
-    return (well_object.geometry as GeometryCollection)?.geometries.find(
-        (item: { type: string }) => item.type == "LineString"
-    ) as LineString;
+function getLineStringGeometry(
+    well_object: WellFeature
+): LineString | undefined {
+    const geometries = well_object.geometry.geometries;
+    return geometries.find(
+        (item): item is LineString => item.type === "LineString"
+    );
 }
 
 // Return well head position from Point Geometry
-function getWellHeadPosition(well_object: Feature): Position {
-    return getPointGeometry(well_object)?.coordinates as Position;
+function getWellHeadPosition(well_object: WellFeature): Position {
+    return getPointGeometry(well_object)?.coordinates ?? [-1, -1, -1];
 }
 
 // return trajectory visibility based on alpha of trajectory color
 function isTrajectoryVisible(
-    well_object: Feature,
+    well_object: WellFeature,
     color_accessor: ColorAccessor
 ): boolean {
     let alpha;
@@ -1013,16 +1040,16 @@ function isTrajectoryVisible(
 
 // Return Trajectory data from LineString Geometry if it's visible (checking trajectory visiblity based on line color)
 function getTrajectory(
-    well_object: Feature,
+    well_object: WellFeature,
     color_accessor: ColorAccessor
 ): Position[] | undefined {
     if (isTrajectoryVisible(well_object, color_accessor))
-        return getLineStringGeometry(well_object)?.coordinates as Position[];
+        return getLineStringGeometry(well_object)?.coordinates;
     else return undefined;
 }
 
-function getWellMds(well_object: Feature): number[] {
-    return well_object.properties?.["md"][0];
+function getWellMds(well_object: WellFeature): number[] {
+    return well_object.properties.md[0];
 }
 
 function getNeighboringMdIndices(mds: number[], md: number): number[] {
@@ -1041,7 +1068,7 @@ function getPositionByMD(well_xyz: Position[], well_mds: number[], md: number) {
 }
 
 function getLogPath(
-    wells_data: Feature[],
+    wells_data: WellFeature[],
     d: LogCurveDataType,
     logrun_name: string,
     trajectory_line_color?: ColorAccessor
@@ -1184,7 +1211,7 @@ function getLogColor(
 }
 
 function getLogPath1(
-    wells_data: Feature[],
+    wells_data: WellFeature[],
     d: LogCurveDataType,
     selectedWell: string | undefined,
     selection: [number | undefined, number | undefined] | undefined,
@@ -1255,7 +1282,7 @@ function getLogPath1(
 }
 
 function getLogColor1(
-    wells_data: Feature[],
+    wells_data: WellFeature[],
     d: LogCurveDataType,
     selectedWell: string | undefined,
     selection: [number | undefined, number | undefined] | undefined,
@@ -1377,12 +1404,12 @@ function interpolateDataOnTrajectory(
 
 function getMd(
     coord: Position,
-    feature: Feature,
+    feature: WellFeature,
     accessor: ColorAccessor
 ): number | null {
     if (!feature.properties?.["md"]?.[0] || !feature.geometry) return null;
 
-    const measured_depths = feature.properties["md"][0] as number[];
+    const measured_depths = feature.properties.md[0] as number[];
     const trajectory3D = getTrajectory(feature, accessor);
 
     if (trajectory3D == undefined) return null;
@@ -1404,7 +1431,7 @@ function getMd(
 
 function getMdProperty(
     coord: Position,
-    feature: Feature,
+    feature: WellFeature,
     accessor: ColorAccessor,
     featureType: string | undefined
 ): PropertyDataType | null {
@@ -1421,7 +1448,7 @@ function getMdProperty(
 
 function getTvd(
     coord: Position,
-    feature: Feature,
+    feature: WellFeature,
     accessor: ColorAccessor
 ): number | null {
     const trajectory3D = getTrajectory(feature, accessor);
@@ -1451,7 +1478,7 @@ function getTvd(
 
 function getTvdProperty(
     coord: Position,
-    feature: Feature,
+    feature: WellFeature,
     accessor: ColorAccessor,
     featureType: string | undefined
 ): PropertyDataType | null {
@@ -1487,7 +1514,7 @@ function getSegmentIndex(coord: Position, path: Position[]): number {
 // Returns segment index of discrete logs
 function getLogSegmentIndex(
     coord: Position,
-    wells_data: Feature[],
+    wells_data: WellFeature[],
     log_data: LogCurveDataType,
     logrun_name: string
 ): number {
@@ -1497,7 +1524,7 @@ function getLogSegmentIndex(
 
 function getLogProperty(
     coord: Position,
-    wells_data: Feature[],
+    wells_data: WellFeature[],
     log_data: LogCurveDataType,
     logrun_name: string,
     log_name: string

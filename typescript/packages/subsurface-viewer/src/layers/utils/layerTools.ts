@@ -44,7 +44,8 @@ export interface PropertyDataType {
 }
 
 // Layer pick info can have multiple properties
-export interface LayerPickInfo extends PickingInfo {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- We use "any" to match picking-info default
+export interface LayerPickInfo<T = any> extends PickingInfo<T> {
     propertyValue?: number; // for single property
     properties?: PropertyDataType[]; // for multiple properties
 }
