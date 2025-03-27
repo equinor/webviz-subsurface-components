@@ -1,3 +1,24 @@
+# [1.10.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.9.0...subsurface-viewer@1.10.0) (2025-03-27)
+
+
+### Features
+
+* enhanced well label styling ([#2487](https://github.com/equinor/webviz-subsurface-components/issues/2487)) ([a4569fe](https://github.com/equinor/webviz-subsurface-components/commit/a4569fe9c958c68ab3c8619d3dc6110a31aeb55d)), closes [#2433](https://github.com/equinor/webviz-subsurface-components/issues/2433) [#767](https://github.com/equinor/webviz-subsurface-components/issues/767) [#947](https://github.com/equinor/webviz-subsurface-components/issues/947)
+
+# [1.9.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.8.8...subsurface-viewer@1.9.0) (2025-03-26)
+
+
+### Features
+
+* Add tooltip optional prop to track template ([#2488](https://github.com/equinor/webviz-subsurface-components/issues/2488)) ([a3e8cf9](https://github.com/equinor/webviz-subsurface-components/commit/a3e8cf96690655d66ae4d7fe18db17c3b39f09cd))
+
+## [1.8.8](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.8.7...subsurface-viewer@1.8.8) (2025-03-21)
+
+
+### Bug Fixes
+
+* replace tick generating algorithm with d3 version ([#2481](https://github.com/equinor/webviz-subsurface-components/issues/2481)) ([6060c12](https://github.com/equinor/webviz-subsurface-components/commit/6060c127aade55c5c707bf811e946d26421f44bd))
+
 ## [1.8.7](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.8.6...subsurface-viewer@1.8.7) (2025-03-14)
 
 

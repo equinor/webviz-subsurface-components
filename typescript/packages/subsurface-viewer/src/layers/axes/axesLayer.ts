@@ -17,6 +17,7 @@ import type {
 } from "../../components/Map";
 import type { ExtendedLayerProps, Position3D } from "../utils/layerTools";
 import BoxLayer from "./boxLayer";
+import { ticks } from "d3-array";
 
 export interface AxesLayerProps extends ExtendedLayerProps {
     /**
@@ -326,38 +327,8 @@ function GetTicks(
     max: number,
     axis_pixel_length: number
 ): number[] {
-    let step = Math.min(Math.round(axis_pixel_length / 100) + 1, 20);
-    const range = max - min;
-
-    const delta = Math.abs(range) / step;
-    let decade = 1;
-    if (delta >= 10) {
-        const logde = Math.log10(delta);
-        const pot = Math.floor(logde);
-        decade = Math.pow(10.0, pot);
-    }
-    let scaled_delta = Math.round(delta / decade);
-    if (scaled_delta == 3) scaled_delta = 2;
-    else if (scaled_delta == 4 || scaled_delta == 6 || scaled_delta == 7)
-        scaled_delta = 5;
-    else if (scaled_delta > 7) scaled_delta = 10;
-    else if (scaled_delta < 1) scaled_delta = 1;
-
-    const incr = scaled_delta * decade;
-    const start = Math.ceil(min / incr) * incr;
-    const stop = Math.floor(max / incr) * incr;
-    const calc_step = Math.floor(Math.abs(stop - start) / incr);
-    step = calc_step > 0 ? calc_step : 0;
-
-    const ticks: number[] = [];
-
-    //ticks.push(min);
-    for (let i = 0; i <= step; i++) {
-        const x = start + i * incr;
-        ticks.push(x);
-    }
-
-    return ticks;
+    const nTicks = Math.min(Math.round(axis_pixel_length / 100) + 1, 20);
+    return ticks(min, max, nTicks);
 }
 
 function GetTickLines(

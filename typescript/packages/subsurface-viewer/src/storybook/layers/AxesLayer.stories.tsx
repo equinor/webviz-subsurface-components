@@ -1,13 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 
-import { rgb } from "d3-color";
-
-import type { Color } from "@deck.gl/core";
 import { OrthographicView } from "@deck.gl/core";
 import DeckGL from "@deck.gl/react";
 
 import AxesLayer from "../../layers/axes/axesLayer";
+import { getRgba } from "../util/color";
 
 const stories: Meta = {
     component: DeckGL,
@@ -26,11 +24,6 @@ const layerProps = {
         number,
     ],
 };
-
-function getRgba(color: string) {
-    const c = rgb(color);
-    return [c.r, c.g, c.b, c.opacity * 255];
-}
 
 export const LightMode: StoryObj<typeof DeckGL> = {
     render: () => (
@@ -52,8 +45,8 @@ const ColoredLabelsComponent: React.FC<ColoredLabelsComponentProps> = (
     const layers = [
         new AxesLayer({
             ...layerProps,
-            labelColor: getRgba(props.labelColor) as Color,
-            axisColor: getRgba(props.axisColor) as Color,
+            labelColor: getRgba(props.labelColor),
+            axisColor: getRgba(props.axisColor),
         }),
     ];
     const views = [new OrthographicView({})];
@@ -83,7 +76,7 @@ const CustomLabelsComponent: React.FC<CustomLabelsComponentProps> = (
     const layers = [
         new AxesLayer({
             ...layerProps,
-            labelColor: getRgba(props.labelColor) as Color,
+            labelColor: getRgba(props.labelColor),
             labelFontSize: props.labelFontSize,
             fontFamily: props.fontFamily,
         }),
