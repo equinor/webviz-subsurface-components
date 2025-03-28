@@ -10,7 +10,7 @@ import _ from "lodash";
 import { Vector2, Vector3 } from "math.gl";
 import type { Position3D } from "../../utils/layerTools";
 import { getTrajectory } from "../utils/trajectory";
-import type { WellFeature } from "../wellsLayer";
+import type { WellFeature } from "../types";
 
 type WellLabelLayerData = WellFeature;
 /**

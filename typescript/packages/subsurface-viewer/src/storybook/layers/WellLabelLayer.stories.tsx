@@ -20,7 +20,7 @@ import { getRgba } from "../util/color";
 import type {
     WellFeature,
     WellFeatureCollection,
-} from "../../layers/wells/wellsLayer";
+} from "../../layers/wells/types";
 
 type WellCount = { wellCount: number };
 

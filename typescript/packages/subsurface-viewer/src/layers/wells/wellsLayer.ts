@@ -11,7 +11,6 @@ import type { BinaryFeatureCollection } from "@loaders.gl/schema";
 import type {
     ColorMapFunctionType,
     ExtendedLayerProps,
-    LayerPickInfo,
     PropertyDataType,
 } from "../utils/layerTools";
 
@@ -21,13 +20,7 @@ import { PathStyleExtension } from "@deck.gl/extensions";
 import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
 import type { colorTablesArray } from "@emerson-eps/color-tables/";
 import { getColors, rgbValues } from "@emerson-eps/color-tables/";
-import type {
-    Feature,
-    FeatureCollection,
-    GeometryCollection,
-    Point,
-    Position,
-} from "geojson";
+import type { Feature, FeatureCollection, Point, Position } from "geojson";
 import { distance, dot, subtract } from "mathjs";
 
 import { GL } from "@luma.gl/constants";
@@ -54,21 +47,17 @@ import {
     splineRefine,
 } from "./utils/spline";
 import { getColor, getTrajectory } from "./utils/trajectory";
-
-type DashAccessor = boolean | NumberPair | StyleAccessorFunction | undefined;
-type ColorAccessor = Color | StyleAccessorFunction | undefined;
-type SizeAccessor = number | StyleAccessorFunction | undefined;
-
-type LineStyleAccessor = {
-    color?: ColorAccessor;
-    dash?: DashAccessor;
-    width?: SizeAccessor;
-};
-
-type WellHeadStyleAccessor = {
-    color?: ColorAccessor;
-    size?: SizeAccessor;
-};
+import type {
+    WellFeatureCollection,
+    WellsPickInfo,
+    WellFeature,
+    WellHeadStyleAccessor,
+    LineStyleAccessor,
+    DashAccessor,
+    SizeAccessor,
+    ColorAccessor,
+    LogCurveDataType,
+} from "./types";
 
 function onDataLoad(
     data: LayerData<FeatureCollection>,
@@ -82,22 +71,6 @@ function onDataLoad(
     if (typeof context.layer.props.reportBoundingBox !== "undefined") {
         context.layer.props.reportBoundingBox({ layerBoundingBox: bbox });
     }
-}
-
-export type GeoJsonWellProperties = {
-    name: string;
-    md: number[][];
-    color?: Color;
-};
-export type WellFeature = Feature<GeometryCollection, GeoJsonWellProperties>;
-export type WellFeatureCollection = FeatureCollection<
-    GeometryCollection,
-    GeoJsonWellProperties
->;
-
-export interface WellsPickInfo extends LayerPickInfo<WellFeature> {
-    featureType?: string;
-    logName: string;
 }
 
 export interface WellsLayerProps extends ExtendedLayerProps {
@@ -205,25 +178,6 @@ const defaultProps = {
     wellNameColor: [0, 0, 0, 255],
     wellNameSize: 10,
 };
-
-export interface LogCurveDataType {
-    header: {
-        name: string;
-        well: string;
-    };
-    curves: {
-        name: string;
-        description: string;
-    }[];
-    data: number[][];
-    metadata_discrete: Record<
-        string,
-        {
-            attributes: unknown;
-            objects: Record<string, [Color, number]>;
-        }
-    >;
-}
 
 function multiply(pair: [number, number], factor: number): [number, number] {
     return [pair[0] * factor, pair[1] * factor];

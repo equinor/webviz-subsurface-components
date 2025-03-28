@@ -20,7 +20,7 @@ import type { MapMouseEvent } from "../../components/Map";
 import AxesLayer from "../../layers/axes/axesLayer";
 import type { WellsLayerProps } from "../../layers/wells/wellsLayer";
 import WellsLayer from "../../layers/wells/wellsLayer";
-import type { WellFeatureCollection } from "../../layers/wells/wellsLayer";
+import type { WellFeatureCollection } from "../../layers/wells/types";
 
 import { Axes2DLayer } from "../../layers";
 import {

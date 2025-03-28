@@ -1,7 +1,7 @@
 import type { Color } from "@deck.gl/core";
 import type { LineString, Position } from "geojson";
 import type { StyleAccessorFunction } from "../../types";
-import type { WellFeature } from "../wellsLayer";
+import type { WellFeature } from "../types";
 
 type ColorAccessor = Color | StyleAccessorFunction | undefined;
 
