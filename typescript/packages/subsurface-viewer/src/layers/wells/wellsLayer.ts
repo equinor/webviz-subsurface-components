@@ -60,10 +60,17 @@ import type {
 } from "./types";
 
 export interface WellsLayerProps extends ExtendedLayerProps {
+    /**
+     * Well data to render; described as a single GeoJSON feature collection, which each individual well as a distinct feature.
+     *
+     * Accepted data formats:
+     * * A javascript object.
+     * * A binary/flat GeoJSON object
+     * * A url string pointing to external GeoJSON data.
+     * * A promise returning GeoJSON data.
+     */
     // String, binary and promise is handled internally in Deck.gl to load external data.
-    // It's expected that a correctly structured GeoJSON is loaded
-    // The typing here is intended to match the data typing for GeoJsonLayers, but we limit
-    // the feature type to a single feature collection
+    // The typing here matches the type used in GeoJsonLayer (but with a more strict feature definition)
     data:
         | string
         | WellFeatureCollection

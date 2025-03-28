@@ -1,6 +1,8 @@
 import type { PickingInfo, Viewport } from "@deck.gl/core";
 import type { DeckGLRef } from "@deck.gl/react";
 
+import _ from "lodash";
+
 import type {
     ExtendedLayerProps,
     MapMouseEvent,
@@ -130,7 +132,8 @@ export class MultiViewPickingInfoAssembler {
                 y,
             });
 
-            return multPickResult;
+            // Ensure the top-most element is processed first by sorting on z-coordinate
+            return _.sortBy(multPickResult, (pick) => pick.coordinate?.[2]);
         } else {
             const obj = deck.pickObject({
                 unproject3D: true,
