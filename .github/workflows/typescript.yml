@@ -48,6 +48,7 @@ jobs:
           grep -q '"lockfileVersion": 3,' ./package-lock.json
 
           npm ci CYPRESS_INSTALL_BINARY=0 --ignore-scripts
+
       - name: ⏭️ Modifications when prerelease
         if: github.event.release.prerelease
         run: echo "NPM_PUBLISH_TAG=next" >> $GITHUB_ENV
@@ -118,15 +119,27 @@ jobs:
             "npx wait-on http://$HOST:$PORT/ && npm run storybook:test -- --ci --url http://$HOST:$PORT/"
 
   storybook:
+    # Always validate Storybook build. Deploy it only on pushes to master.
     if: github.event_name != 'push' || github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     name: "📚 Build and conditionally deploy Storybook"
-    needs: typescript
     steps:
+      - name: 📖 Checkout commit locally
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: 📦 Install build dependencies
+        run: |
+          npm ci CYPRESS_INSTALL_BINARY=0 --ignore-scripts
+
       - name: 📚 Build Storybook
         run: npm run build-storybook
 
-      - name: 📚 Update Storybook
+      - name: 📚 Update deployed Storybook
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         run: |
           rm -rf ../../storybook-static
@@ -151,11 +164,24 @@ jobs:
           fi
 
   release_dry_run:
+    # Dry-run semantic release on PR and pushes to master
     if: github.event_name != 'push' || github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     name: "🔼 Dry-run semantic release"
-    needs: typescript
+
     steps:
+      - name: 📖 Checkout commit locally
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: 📦 Install build dependencies
+        run: |
+          npm ci CYPRESS_INSTALL_BINARY=0 --ignore-scripts
+
       - name: 🔼 Dry-run semantic release
         working-directory: ./typescript
         run: npx nx run-many --target="semantic-release:dry-run" --parallel=false
