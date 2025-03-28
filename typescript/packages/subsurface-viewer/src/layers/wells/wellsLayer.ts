@@ -76,6 +76,8 @@ function onDataLoad(
 export interface WellsLayerProps extends ExtendedLayerProps {
     // String, binary and promise is handled internally in Deck.gl to load external data.
     // It's expected that a correctly structured GeoJSON is loaded
+    // The typing here is intended to match the data typing for GeoJsonLayers, but we limit
+    // the feature type to a single feature collection
     data:
         | string
         | WellFeatureCollection
@@ -246,7 +248,7 @@ export function getSize(
 function dataIsReady(
     layerData: WellsLayerProps["data"]
 ): layerData is WellFeatureCollection {
-    // As far as I understand, Deck.gl is making prop.data `[]` while external data is being loaded
+    // Deck.gl always shows prop.data as `[]` while external data is being loaded
     return !!layerData && !isEmpty(layerData);
 }
 
