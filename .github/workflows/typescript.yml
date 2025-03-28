@@ -182,13 +182,13 @@ jobs:
         with:
           node-version: 18
 
-      - name: 🏗️ Build packages
-        run: |
-          npx nx run-many -t build
-
       - name: 📦 Install build dependencies
         run: |
           npm ci CYPRESS_INSTALL_BINARY=0 --ignore-scripts
+
+      - name: 🏗️ Build packages
+        run: |
+          npx nx run-many -t build
 
       - name: 🔼 Dry-run semantic release
         working-directory: ./typescript
