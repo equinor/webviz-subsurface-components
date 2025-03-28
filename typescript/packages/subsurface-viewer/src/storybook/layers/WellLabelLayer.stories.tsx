@@ -281,13 +281,16 @@ export const LabelPosition: StoryObj<WellCount & WellLabelLayerProps> = {
     },
 };
 
-export const LabelAutoPosition: StoryObj<WellCount> = {
-    render: ({ wellCount }) => {
+export const LabelAutoPosition: StoryObj<WellCount & WellLabelLayerProps> = {
+    render: ({ wellCount, getPositionAlongPath, orientation, background }) => {
         const data = getSyntheticWells(wellCount);
 
         const labelProps = {
             autoPosition: true,
             data: data.features,
+            getPositionAlongPath,
+            orientation,
+            background,
         };
 
         const wellLayer = new WellsLayer({
@@ -314,6 +317,22 @@ export const LabelAutoPosition: StoryObj<WellCount> = {
         };
 
         return <SubsurfaceViewer {...propsWithLayers} />;
+    },
+    argTypes: {
+        ...LABEL_POSITION_ARGTYPES,
+        ...LABEL_ORIENTATION_ARGTYPES,
+    },
+    args: {
+        getPositionAlongPath: 0,
+        orientation: LabelOrientation.HORIZONTAL,
+        background: true,
+    },
+    parameters: {
+        docs: {
+            description: {
+                story: "Auto position label along the well trajectory. The label will be repositioned if it falls outside the view.",
+            },
+        },
     },
 };
 
