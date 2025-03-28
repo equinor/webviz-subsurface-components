@@ -202,7 +202,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         selection: [number, number];
     };
 
-    initializeState(): void {
+    private recomputeDataState() {
         const data = this.props.data;
         const refine = this.props.refine;
         const doRefine = typeof refine === "number" ? refine > 1 : refine;
@@ -250,9 +250,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             ) ||
             !isEqual(props.refine, oldProps.refine);
         if (needs_reload) {
-            // ? Why are we looping back to initializeState here? Deck.gl life-cycle intends for
-            // ? this to only be called *once*, so this is a confusing choice. (@anders2303)
-            this.initializeState();
+            this.recomputeDataState();
         }
     }
 
