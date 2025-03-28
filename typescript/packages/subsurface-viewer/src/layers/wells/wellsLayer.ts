@@ -59,6 +59,17 @@ import type {
     LogCurveDataType,
 } from "./types";
 
+export enum SubLayerId {
+    COLORS = "colors",
+    SIMPLE = "simple",
+    OUTLINE = "outline",
+    HIGHLIGHT = "highlight",
+    HIGHLIGHT_2 = "highlight2",
+    LOG_CURVE = "log_curve",
+    SELECTION = "selection",
+    LABELS = "labels",
+}
+
 export interface WellsLayerProps extends ExtendedLayerProps {
     /**
      * Well data to render; described as a single GeoJSON feature collection, which each individual well as a distinct feature.
@@ -371,6 +382,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
         const wellLabelProps = this.getSubLayerProps({
             ...this.props.wellLabel,
+            id: SubLayerId.LABELS,
             data,
             zIncreasingDownwards: this.props.ZIncreasingDownwards,
             getPositionAlongPath: this.getWellLabelPosition(),
@@ -430,7 +442,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
         const colorsLayerProps = this.getSubLayerProps({
             ...defaultLayerProps,
-            id: "colors",
+            id: SubLayerId.COLORS,
             pickable: true,
             extensions,
             getDashArray: getDashFactor(
@@ -445,7 +457,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
         const fastLayerProps = this.getSubLayerProps({
             ...defaultLayerProps,
-            id: "simple",
+            id: SubLayerId.SIMPLE,
             positionFormat,
             getLineColor: getColor(this.props.lineStyle?.color),
             getFillColor: getColor(this.props.wellHeadStyle?.color),
@@ -453,7 +465,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
         const outlineLayerProps = this.getSubLayerProps({
             ...defaultLayerProps,
-            id: "outline",
+            id: SubLayerId.OUTLINE,
             getLineWidth: getSize(LINE, this.props.lineStyle?.width),
             getPointRadius: getSize(POINT, this.props.wellHeadStyle?.size),
             extensions,
@@ -468,7 +480,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
         const highlightLayerProps = this.getSubLayerProps({
             ...defaultLayerProps,
-            id: "highlight",
+            id: SubLayerId.HIGHLIGHT,
             data: getWellObjectByName(data.features, this.props.selectedWell),
             getLineWidth: getSize(LINE, this.props.lineStyle?.width, 2),
             getPointRadius: getSize(POINT, this.props.wellHeadStyle?.size, 2),
@@ -479,7 +491,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
         const highlightMultiWellsLayerProps = this.getSubLayerProps({
             ...defaultLayerProps,
-            id: "highlight2",
+            id: SubLayerId.HIGHLIGHT_2,
             data: getWellObjectsByName(
                 data.features,
                 this.state.selectedMultiWells
@@ -504,7 +516,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
         const logLayer = new PathLayer<LogCurveDataType>(
             this.getSubLayerProps({
-                id: "log_curve",
+                id: SubLayerId.LOG_CURVE,
                 data: this.props.logData,
                 positionFormat,
                 pickable: true,
@@ -558,7 +570,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
         const selectionLayer = new PathLayer<LogCurveDataType>(
             this.getSubLayerProps({
-                id: "selection",
+                id: SubLayerId.SELECTION,
                 data: this.props.logData,
                 positionFormat,
                 pickable: false,
@@ -644,7 +656,9 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         let log_property: PropertyDataType | null = null;
 
         // ! This needs to be updated if we ever change the sub-layer id!
-        if (info.sourceLayer?.id === `${this.props.id}-log_curve`) {
+        if (
+            info.sourceLayer?.id === `${this.props.id}-${SubLayerId.LOG_CURVE}`
+        ) {
             // The user is hovering a well log entry
             const logPick = info as PickingInfo<LogCurveDataType>;
 
