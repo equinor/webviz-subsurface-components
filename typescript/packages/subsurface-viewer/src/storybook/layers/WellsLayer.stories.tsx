@@ -1,5 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
-
 import type { Meta, StoryObj } from "@storybook/react";
 import type { SyntheticEvent } from "react";
 import React, { useState } from "react";
@@ -8,19 +6,21 @@ import { Slider } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import type { FeatureCollection, GeometryCollection } from "geojson";
 
+import { NativeSelect } from "@equinor/eds-core-react";
 import {
     ColorLegend,
     colorTables,
     createColorMapFunction,
 } from "@emerson-eps/color-tables";
-import { NativeSelect } from "@equinor/eds-core-react";
 
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import type { MapMouseEvent } from "../../components/Map";
+
 import AxesLayer from "../../layers/axes/axesLayer";
 import type { WellsLayerProps } from "../../layers/wells/wellsLayer";
 import WellsLayer from "../../layers/wells/wellsLayer";
+import type { WellFeatureCollection } from "../../layers/wells/types";
 
 import { Axes2DLayer } from "../../layers";
 import {
@@ -57,7 +57,7 @@ export default stories;
 
 const PREFIX = "VolveWells";
 
-const testWellWithDuplicates = {
+const testWellWithDuplicates: WellFeatureCollection = {
     type: "FeatureCollection",
     features: [
         {
@@ -86,6 +86,7 @@ const testWellWithDuplicates = {
                     },
                 ],
             },
+            // WellFeatureCollection type means the properties here are typed!
             properties: {
                 name: "wl6",
                 color: [255, 255, 0, 255],

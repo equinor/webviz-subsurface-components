@@ -51,7 +51,7 @@ import {
     getModelMatrixScale,
     getWellLayerByTypeAndSelectedWells,
 } from "../layers/utils/layerTools";
-import type { WellsPickInfo } from "../layers/wells/wellsLayer";
+import type { WellsPickInfo } from "../layers/wells/types";
 import type { BoundingBox2D, Point2D } from "../utils/BoundingBox2D";
 import { isEmpty as isEmptyBox2D } from "../utils/BoundingBox2D";
 import type { BoundingBox3D, Point3D } from "../utils/BoundingBox3D";

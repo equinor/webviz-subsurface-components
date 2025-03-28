@@ -33,6 +33,7 @@ import {
     hugin2DBounds,
     redAxes2DLayer,
     subsufaceProps,
+    volveWellsLayer,
 } from "../sharedSettings";
 import type { DeckGLRef } from "@deck.gl/react";
 
@@ -151,7 +152,7 @@ function MultiViewPickingExample(
         useMultiViewPicking({
             deckGlRef,
             multiPicking: true,
-            pickDepth: 2,
+            pickDepth: 6,
         });
 
     function handleMouseEvent(event: MapMouseEvent) {
@@ -289,6 +290,34 @@ export const MultiViewPicking: StoryObj<typeof SubsurfaceViewer> = {
             delay,
         });
     },
+};
+
+export const MultiViewPickingWithWells: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "multi_view_picking",
+        layers: [
+            hugin25mKhNetmapMapLayer,
+            hugin25mDepthMapLayer,
+            volveWellsLayer,
+        ],
+        views: {
+            layout: [1, 2],
+            showLabel: true,
+            viewports: [
+                {
+                    id: "view_1",
+                    layerIds: [hugin25mDepthMapLayer.id, volveWellsLayer.id],
+                    isSync: true,
+                },
+                {
+                    id: "view_2",
+                    layerIds: [hugin25mKhNetmapMapLayer.id],
+                    isSync: true,
+                },
+            ],
+        },
+    },
+    render: (args) => <MultiViewPickingExample {...args} />,
 };
 
 export const MultiViewsWithEmptyViews: StoryObj<typeof SubsurfaceViewer> = {
@@ -455,8 +484,7 @@ type ViewerTabsProps = SubsurfaceViewerProps & { renderHiddenTabs: boolean };
 const ViewerTabs: React.FC<ViewerTabsProps> = (props: ViewerTabsProps) => {
     const [value, setValue] = React.useState(0);
 
-    // @ts-expect-error TS6133
-    const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
     };
 

@@ -5,14 +5,14 @@ import {
 } from "@deck.gl/core";
 import type { TextLayerProps } from "@deck.gl/layers";
 import { TextLayer } from "@deck.gl/layers";
-import type { Feature, GeoJsonProperties, Geometry } from "geojson";
+import type { Feature } from "geojson";
 import _ from "lodash";
 import { Vector2, Vector3 } from "math.gl";
 import type { Position3D } from "../../utils/layerTools";
 import { getTrajectory } from "../utils/trajectory";
+import type { WellFeature } from "../types";
 
-type WellLabelLayerData = Feature<Geometry, GeoJsonProperties>;
-
+type WellLabelLayerData = WellFeature;
 /**
  * Enum representing the orientation of well labels.
  */
@@ -58,8 +58,8 @@ const DEFAULT_PROPS: DefaultProps<WellLabelLayerProps> = {
     id: "well-label-layer",
     autoPosition: false,
     getPositionAlongPath: 0,
-    getText: (d: Feature) => {
-        const name = d.properties?.["name"];
+    getText: (d: WellFeature) => {
+        const name = d.properties.name;
         return name;
     },
     getAlignmentBaseline: "bottom",
@@ -104,13 +104,13 @@ export class WellLabelLayer extends TextLayer<
 
         const newProps = {
             ...sublayerProps,
-            getPosition: (d: Feature) => {
+            getPosition: (d: WellFeature) => {
                 return this.getAnnotationPosition(
                     d,
                     this.props.getPositionAlongPath
                 );
             },
-            getAngle: (d: Feature) => this.getLabelAngle(d),
+            getAngle: (d: WellFeature) => this.getLabelAngle(d),
             updateTriggers: {
                 ...sublayerProps?.updateTriggers,
                 getAngle: [
@@ -141,7 +141,7 @@ export class WellLabelLayer extends TextLayer<
         return super.shouldUpdateState(params);
     }
 
-    protected getLabelAngle(well: Feature) {
+    protected getLabelAngle(well: WellFeature) {
         if (this.props.orientation === "horizontal") {
             return 0;
         }
@@ -159,7 +159,7 @@ export class WellLabelLayer extends TextLayer<
      * @returns world position of the annotation
      */
     protected getAnnotationPosition(
-        well_data: Feature,
+        well_data: WellFeature,
         annotationPosition: WellLabelLayerProps["getPositionAlongPath"]
     ): Position {
         let fraction = Number(annotationPosition);
@@ -217,7 +217,7 @@ export class WellLabelLayer extends TextLayer<
      */
     protected getVectorAlongTrajectory(
         fraction: number,
-        wellData: Feature
+        wellData: WellFeature
     ): [number, Position3D] {
         if (!wellData) {
             return [0, [0, 0, 0]];
