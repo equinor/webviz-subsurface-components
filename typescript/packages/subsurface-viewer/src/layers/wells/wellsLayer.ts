@@ -59,20 +59,6 @@ import type {
     LogCurveDataType,
 } from "./types";
 
-function onDataLoad(
-    data: LayerData<FeatureCollection>,
-    context: {
-        propName: string;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        layer: Layer<any>;
-    }
-): void {
-    const bbox = GetBoundingBox(data as unknown as FeatureCollection);
-    if (typeof context.layer.props.reportBoundingBox !== "undefined") {
-        context.layer.props.reportBoundingBox({ layerBoundingBox: bbox });
-    }
-}
-
 export interface WellsLayerProps extends ExtendedLayerProps {
     // String, binary and promise is handled internally in Deck.gl to load external data.
     // It's expected that a correctly structured GeoJSON is loaded
@@ -181,48 +167,11 @@ const defaultProps = {
     wellNameSize: 10,
 };
 
-function multiply(pair: [number, number], factor: number): [number, number] {
-    return [pair[0] * factor, pair[1] * factor];
-}
-
 const LINE = "line";
 const POINT = "point";
 const DEFAULT_POINT_SIZE = 8;
 const DEFAULT_LINE_WIDTH = 5;
 const DEFAULT_DASH = [5, 5] as NumberPair;
-
-function getDashFactor(
-    accessor: DashAccessor,
-    width_accessor?: number | ((object: Feature) => number),
-    offset = 0
-) {
-    return (
-        object: Feature,
-        objectInfo: Record<string, unknown>
-    ): NumberPair => {
-        let width = DEFAULT_LINE_WIDTH;
-        if (typeof width_accessor == "function") {
-            width = (width_accessor as StyleAccessorFunction)(object) as number;
-        } else if (width_accessor as number) {
-            width = width_accessor as number;
-        }
-        const factor = width / (width + offset);
-
-        let dash: NumberPair = [0, 0];
-        if (typeof accessor == "function") {
-            dash = (accessor as StyleAccessorFunction)(
-                object,
-                objectInfo
-            ) as NumberPair;
-        } else if (accessor as NumberPair) dash = accessor as NumberPair;
-        else if (accessor) dash = DEFAULT_DASH;
-        if (dash.length == 2) {
-            return multiply(dash, factor);
-        } else {
-            return multiply(DEFAULT_DASH, factor);
-        }
-    };
-}
 
 export function getSize(
     type: string,
@@ -243,13 +192,6 @@ export function getSize(
     if (type == LINE) return DEFAULT_LINE_WIDTH + offset;
     if (type == POINT) return DEFAULT_POINT_SIZE + offset;
     return 0;
-}
-
-function dataIsReady(
-    layerData: WellsLayerProps["data"]
-): layerData is WellFeatureCollection {
-    // Deck.gl always shows prop.data as `[]` while external data is being loaded
-    return !!layerData && !isEmpty(layerData);
 }
 
 export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
@@ -775,6 +717,63 @@ WellsLayer.defaultProps = {
 };
 
 //================= Local help functions. ==================
+function onDataLoad(
+    data: LayerData<FeatureCollection>,
+    context: {
+        propName: string;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        layer: Layer<any>;
+    }
+): void {
+    const bbox = GetBoundingBox(data as unknown as FeatureCollection);
+    if (typeof context.layer.props.reportBoundingBox !== "undefined") {
+        context.layer.props.reportBoundingBox({ layerBoundingBox: bbox });
+    }
+}
+
+function multiply(pair: [number, number], factor: number): [number, number] {
+    return [pair[0] * factor, pair[1] * factor];
+}
+
+function getDashFactor(
+    accessor: DashAccessor,
+    width_accessor?: number | ((object: Feature) => number),
+    offset = 0
+) {
+    return (
+        object: Feature,
+        objectInfo: Record<string, unknown>
+    ): NumberPair => {
+        let width = DEFAULT_LINE_WIDTH;
+        if (typeof width_accessor == "function") {
+            width = (width_accessor as StyleAccessorFunction)(object) as number;
+        } else if (width_accessor as number) {
+            width = width_accessor as number;
+        }
+        const factor = width / (width + offset);
+
+        let dash: NumberPair = [0, 0];
+        if (typeof accessor == "function") {
+            dash = (accessor as StyleAccessorFunction)(
+                object,
+                objectInfo
+            ) as NumberPair;
+        } else if (accessor as NumberPair) dash = accessor as NumberPair;
+        else if (accessor) dash = DEFAULT_DASH;
+        if (dash.length == 2) {
+            return multiply(dash, factor);
+        } else {
+            return multiply(DEFAULT_DASH, factor);
+        }
+    };
+}
+
+function dataIsReady(
+    layerData: WellsLayerProps["data"]
+): layerData is WellFeatureCollection {
+    // Deck.gl always shows prop.data as `[]` while external data is being loaded
+    return !!layerData && !isEmpty(layerData);
+}
 
 function getColumn<D>(data: D[][], col: number): D[] {
     const column: D[] = [];
