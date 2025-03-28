@@ -136,6 +136,10 @@ jobs:
         run: |
           npm ci CYPRESS_INSTALL_BINARY=0 --ignore-scripts
 
+      - name: 🏗️ Build packages
+        run: |
+          npx nx run-many -t build
+
       - name: 📚 Build Storybook
         run: npm run build-storybook
 
@@ -177,6 +181,10 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
+
+      - name: 🏗️ Build packages
+        run: |
+          npx nx run-many -t build
 
       - name: 📦 Install build dependencies
         run: |
