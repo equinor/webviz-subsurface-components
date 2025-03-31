@@ -8,6 +8,7 @@ import type {
     MapMouseEvent,
     PropertyDataType,
 } from "../../";
+import { distance } from "mathjs";
 
 export type LayerPickingInfo = {
     layerId: string;
@@ -132,8 +133,13 @@ export class MultiViewPickingInfoAssembler {
                 y,
             });
 
-            // Ensure the top-most element is processed first by sorting on z-coordinate
-            return _.sortBy(multPickResult, (pick) => pick.coordinate?.[2]);
+            // Ensure the top-most element is processed first by sorting based on distance to camera
+            return _.sortBy(multPickResult, (pick) => {
+                if (!pick.viewport?.cameraPosition) return -1;
+                if (!pick.coordinate) return -1;
+
+                return distance(pick.coordinate, pick.viewport.cameraPosition);
+            });
         } else {
             const obj = deck.pickObject({
                 unproject3D: true,
