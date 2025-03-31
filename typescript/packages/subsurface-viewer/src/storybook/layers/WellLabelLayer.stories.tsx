@@ -19,6 +19,15 @@ import {
 import { getRgba } from "../util/color";
 
 type WellCount = { wellCount: number };
+type TrajectorySimulationProps = {
+    sampleCount?: number;
+    segmentLength?: number;
+
+    /**
+     * How much can the well deviate from the path, in degrees.
+     */
+    dipDeviationMagnitude?: number;
+};
 
 const stories: Meta = {
     title: "SubsurfaceViewer / Well Label Layer",
@@ -107,16 +116,15 @@ const getRandomColor = () => {
 
 const createSyntheticWell = (
     index: number,
-    headPosition: Position3D
+    headPosition: Position3D,
+    sampleCount = 20,
+    segmentLength = 150,
+    dipDeviationMagnitude = 10
 ): Feature => {
     // Create a random well name
     const name = `Well ${index}`;
 
-    const sampleCount = 20;
-
-    const dSegmentLength = 150;
-
-    const avgDipDeviation = randomFunc() * 10;
+    const avgDipDeviation = randomFunc() * dipDeviationMagnitude;
     const avgAzimuthDeviation = randomFunc() * 5 - 2.5;
     const maxDip = Math.PI * 0.5 + 0.05;
 
@@ -128,7 +136,7 @@ const createSyntheticWell = (
     for (let i = 0; i < leadCount; i++) {
         const x = coordinates[coordinates.length - 1][0];
         const y = coordinates[coordinates.length - 1][1];
-        const z = coordinates[coordinates.length - 1][2] + dSegmentLength;
+        const z = coordinates[coordinates.length - 1][2] + segmentLength;
         coordinates.push([x, y, z]);
     }
 
@@ -140,14 +148,15 @@ const createSyntheticWell = (
         const azimuth =
             previousAzimuth + getRandomDeviation(5, avgAzimuthDeviation);
         const dip = Math.min(
-            previousDip + getRandomDeviation(11, avgDipDeviation),
+            previousDip +
+                getRandomDeviation(dipDeviationMagnitude, avgDipDeviation),
             maxDip
         );
         const x =
-            prevSample[0] + dSegmentLength * Math.cos(azimuth) * Math.sin(dip);
+            prevSample[0] + segmentLength * Math.cos(azimuth) * Math.sin(dip);
         const y =
-            prevSample[1] + dSegmentLength * Math.sin(azimuth) * Math.sin(dip);
-        const z = prevSample[2] + dSegmentLength * Math.cos(dip);
+            prevSample[1] + segmentLength * Math.sin(azimuth) * Math.sin(dip);
+        const z = prevSample[2] + segmentLength * Math.cos(dip);
 
         coordinates.push([x, y, z]);
         previousAzimuth = azimuth;
@@ -176,27 +185,56 @@ const createSyntheticWell = (
     };
 };
 
-const createSyntheticWellCollection = (
-    wellCount = 1000,
-    wellHeadCount = 100
-): FeatureCollection => {
-    // Create random well heads
+/**
+ * Create random well heads
+ */
+const createSyntheticWellHeads = (count = 100): Position3D[] => {
     const wellHeads: Position3D[] = [];
-    for (let i = 0; i < wellHeadCount; i++) {
+    for (let i = 0; i < count; i++) {
         const dx = randomFunc() * 10000 - 2000;
         const dy = randomFunc() * 8000 - 2000;
         const headPosition: Position3D = [456000 + dx, 6785000 + dy, 0];
         wellHeads.push(headPosition);
     }
+    return wellHeads;
+};
+
+// A pool of random well heads; fewer than trajectories in order to create clusters
+const SYNTHETIC_WELL_HEADS = createSyntheticWellHeads();
+
+const createSyntheticWellCollection = (
+    wellCount = 1000,
+    wellHeadCount = 100,
+    {
+        sampleCount,
+        segmentLength,
+        dipDeviationMagnitude,
+    }: TrajectorySimulationProps = {
+        sampleCount: 20,
+        segmentLength: 150,
+        dipDeviationMagnitude: 10,
+    }
+): FeatureCollection => {
+    const wellHeads = SYNTHETIC_WELL_HEADS.slice(
+        0,
+        wellHeadCount
+    ) as Position3D[];
 
     const wells: Feature[] = [];
 
     for (let i = 0; i < wellCount; i++) {
         // Draw from collection of heads in order to create clusters
-        const headIndex = Math.trunc(randomFunc() * wellHeads.length);
+        const wellPerClusterCount = Math.trunc(wellCount / wellHeadCount) + 1;
+        const headIndex = Math.trunc(i / wellPerClusterCount);
         const headPosition = wellHeads[headIndex];
 
-        const syntheticWell = createSyntheticWell(i, headPosition);
+        const syntheticWell = createSyntheticWell(
+            i,
+            headPosition,
+            sampleCount,
+            segmentLength,
+            dipDeviationMagnitude
+        );
         wells.push(syntheticWell);
     }
 
@@ -207,6 +245,27 @@ const createSyntheticWellCollection = (
 };
 
 const SYNTHETIC_WELLS = createSyntheticWellCollection(1000);
+
+/*
+const useSytheticWellCollection = (
+    wellCount: number,
+    wellHeadCount: number,
+    { sampleCount, segmentLength }: TrajectorySimulationProps = {
+        sampleCount: 20,
+        segmentLength: 150,
+    }
+): FeatureCollection => {
+    const wells = React.useMemo(
+        () =>
+            createSyntheticWellCollection(wellCount, wellHeadCount, {
+                sampleCount,
+                segmentLength,
+            }),
+        [wellCount, wellHeadCount, sampleCount, segmentLength]
+    );
+    return wells;
+};
+*/
 
 const AXES_LAYERS = [
     new AxesLayer({
@@ -252,9 +311,28 @@ export const Default: StoryObj<WellCount> = {
     },
 };
 
-export const LabelPosition: StoryObj<WellCount & WellLabelLayerProps> = {
-    render: ({ wellCount, getPositionAlongPath }) => {
-        const data = getSyntheticWells(wellCount);
+export const LabelPosition: StoryObj<
+    WellCount & WellLabelLayerProps & TrajectorySimulationProps
+> = {
+    render: ({
+        wellCount,
+        getPositionAlongPath,
+        sampleCount,
+        segmentLength,
+        dipDeviationMagnitude,
+    }) => {
+        //const data = getSyntheticWells(wellCount);
+        const data = createSyntheticWellCollection(wellCount, 100, {
+            sampleCount,
+            segmentLength,
+            dipDeviationMagnitude,
+        });
+        /*
+        const data = useSytheticWellCollection(wellCount, 100, {
+            sampleCount,
+            segmentLength,
+        });
+        */
 
         const wellLayer = new WellsLayer({
             ...WELL_LAYER_PROPS,
@@ -278,6 +356,9 @@ export const LabelPosition: StoryObj<WellCount & WellLabelLayerProps> = {
     argTypes: LABEL_POSITION_ARGTYPES,
     args: {
         getPositionAlongPath: 0.5,
+        sampleCount: 20,
+        segmentLength: 150,
+        dipDeviationMagnitude: 10,
     },
 };
 
