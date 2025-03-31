@@ -1238,7 +1238,8 @@ class WellLogView
     extends Component<WellLogViewProps, State>
     implements WellLogController
 {
-    public static propTypes: Record<string, unknown>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    public static propTypes: Record<string, any>;
 
     wellLogSets: WellLogSet[];
     container?: HTMLElement;
