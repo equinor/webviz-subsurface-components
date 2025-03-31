@@ -205,7 +205,7 @@ const createSyntheticWellCollection = (
     }: TrajectorySimulationProps = {
         sampleCount: 20,
         segmentLength: 150,
-        dipDeviationMagnitude: 10,
+        dipDeviationMagnitude: 20,
     }
 ): FeatureCollection => {
     const wellHeads = SYNTHETIC_WELL_HEADS.slice(
@@ -389,10 +389,30 @@ export const LabelAutoPosition: StoryObj<WellCount & WellLabelLayerProps> = {
 
         const layers = [...AXES_LAYERS, wellLayer, labelLayer2d, labelLayer3d];
 
+        // Viewport is reset on views object identity change, so it needs to be memoized
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const views: ViewsType = React.useMemo(
+            () => ({
+                ...SPLIT_VIEWS,
+                viewports: [
+                    {
+                        ...SPLIT_VIEWS.viewports[0],
+
+                        // Zoom in in order to trigger auto-positioning.
+                        zoom: -2,
+                    },
+                    {
+                        ...SPLIT_VIEWS.viewports[1],
+                    },
+                ],
+            }),
+            []
+        );
+
         const propsWithLayers = {
             id: "position",
             layers,
-            views: SPLIT_VIEWS,
+            views,
         };
 
         return <SubsurfaceViewer {...propsWithLayers} />;
