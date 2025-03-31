@@ -82,7 +82,7 @@ export interface SyncLogViewerProps {
     colorMapFunctions: ColorMapFunction[];
 
     /**
-     * Set to true for default titles or to array of individial well log titles
+     * Set to true for default titles or to array of individual well log titles
      */
     viewTitles?: boolean | (boolean | string | JSX.Element)[];
 
@@ -270,7 +270,7 @@ export const argTypesSyncLogViewerProp = {
     },
     viewTitles: {
         description:
-            "Set to true for default titles or to array of individial well log titles",
+            "Set to true for default titles or to array of individual well log titles",
     },
     layout: {
         description:
@@ -1184,7 +1184,7 @@ SyncLogViewer.propTypes = {
     ]),
 
     /**
-     * Distanses between wells to show on the spacers
+     * Distances between wells to show on the spacers
      */
     wellDistances: WellDistancesType,
 
@@ -1206,7 +1206,7 @@ SyncLogViewer.propTypes = {
     /**
      * Names for axes
      */
-    axisMnemos: PropTypes.object /*Of<Record<string, string>>*/,
+    axisMnemos: PropTypes.object /*Of<Record<string, string[]>>*/,
 
     /**
      * The maximum zoom value
@@ -1224,7 +1224,7 @@ SyncLogViewer.propTypes = {
     selection: PropTypes.arrayOf(PropTypes.number),
 
     /**
-     * Set to true for default titles or to array of individial well log titles
+     * Set to true for default titles or to array of individual well log titles
      */
     viewTitles: PropTypes.oneOfType([
         PropTypes.bool,
