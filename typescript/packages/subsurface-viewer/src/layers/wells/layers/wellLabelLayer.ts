@@ -90,84 +90,14 @@ const getCumulativeDistance = (well_xyz: Position[]): number[] => {
             continue;
         }
 
-        const distance = Math.sqrt(
-            (p2[0] - p1[0]) ** 2 +
-                (p2[1] - p1[1]) ** 2 +
-                ((p2[2] ?? 0) - (p1[2] ?? 0)) ** 2
-        );
+        const v0 = new Vector3(p1);
+        const v1 = new Vector3(p2);
+        const distance = v0.distance(v1);
 
         cumulativeDistance.push(cumulativeDistance[i - 1] + distance);
     }
     return cumulativeDistance;
 };
-
-/*
-const getPositionAlongPath = (d: Feature, fraction: number) => {
-    const well_xyz = getTrajectory(d, undefined);
-
-    if (_.isUndefined(well_xyz)) {
-        return null;
-    }
-
-    // Calculate the cumulative distance to each point along the trajectory
-    const cumulativeDistance = [0];
-    for (let i = 1; i < well_xyz.length; i++) {
-        const p1 = well_xyz[i - 1];
-        const p2 = well_xyz[i];
-
-        if (!p1 || !p2) {
-            continue;
-        }
-
-        const distance = Math.sqrt(
-            (p2[0] - p1[0]) ** 2 +
-                (p2[1] - p1[1]) ** 2 +
-                ((p2[2] ?? 0) - (p1[2] ?? 0)) ** 2
-        );
-
-        cumulativeDistance.push(cumulativeDistance[i - 1] + distance);
-    }
-
-    // Estimate the total length of the trajectory
-    const trajectoryTotalMdEstimate =
-        cumulativeDistance[cumulativeDistance.length - 1];
-
-    // Get the fractional distance along the trajectory
-    const trajectoryMd = trajectoryTotalMdEstimate * fraction;
-
-    for (let i = 0; i < well_xyz.length; i++) {
-        const p1 = well_xyz[i];
-        const p2 = well_xyz[i + 1];
-
-        if (!p1 || !p2) {
-            continue;
-        }
-
-        const distanceAlongTrajectory1 = cumulativeDistance[i];
-        const distanceAlongTrajectory2 = cumulativeDistance[i + 1];
-
-        if (
-            trajectoryMd < distanceAlongTrajectory1 ||
-            trajectoryMd > distanceAlongTrajectory2
-        ) {
-            continue;
-        }
-
-        const lineDistance =
-            distanceAlongTrajectory2 - distanceAlongTrajectory1;
-        const fractionOnLine =
-            (trajectoryMd - distanceAlongTrajectory1) / lineDistance;
-
-        return [
-            p1[0] + (p2[0] - p1[0]) * fractionOnLine,
-            p1[1] + (p2[1] - p1[1]) * fractionOnLine,
-            (p1[2] ?? 0) + ((p2[2] ?? 0) - (p1[2] ?? 0)) * fractionOnLine,
-        ];
-    }
-
-    return null;
-};
-*/
 
 /**
  * The `WellLabelLayer` class extends the `TextLayer` to provide functionality for rendering well labels
@@ -312,9 +242,9 @@ export class WellLabelLayer extends TextLayer<
             return [0, [0, 0, 0]];
         }
 
-        const well_xyz = getTrajectory(wellData, undefined);
+        const trajectory = getTrajectory(wellData, undefined);
 
-        if (_.isUndefined(well_xyz) || well_xyz.length < 2) {
+        if (_.isUndefined(trajectory) || trajectory.length < 2) {
             return [0, [0, 0, 0]];
         }
 
@@ -323,22 +253,23 @@ export class WellLabelLayer extends TextLayer<
 
         const candidateFractions = [0.5, 0.25, 0.75, 0.125, 0.87, 0.37, 0.62];
 
-        const cumulativeDistance = getCumulativeDistance(well_xyz);
+        const cumulativeDistance = getCumulativeDistance(trajectory);
         const targetDistance =
             cumulativeDistance[cumulativeDistance.length - 1] * fraction;
 
         // Find the index of the segment that contains the target distance
         let targetIndex = 0;
-        for (let i = 0; i < cumulativeDistance.length; i++) {
-            if (cumulativeDistance[i] >= targetDistance) {
-                targetIndex = i;
-                break;
+        for (let i = 0; i < cumulativeDistance.length - 1; i++) {
+            if (cumulativeDistance[i + 1] < targetDistance) {
+                continue;
             }
+            targetIndex = i;
+            break;
         }
 
         while (candidateFractions.length != 0) {
-            const pi1 = [...well_xyz[targetIndex]];
-            const pi2 = [...well_xyz[targetIndex + 1]];
+            const pi1 = [...trajectory[targetIndex]];
+            const pi2 = [...trajectory[targetIndex + 1]];
 
             if (this.props.zIncreasingDownwards) {
                 pi1[2] = -pi1[2];
@@ -354,24 +285,26 @@ export class WellLabelLayer extends TextLayer<
             const fractionOnLine =
                 (targetDistance - distanceAlongTrajectory1) / lineDistance;
 
-            const p1 = new Vector2(this.project(pi1 as number[]));
-            const p2 = new Vector2(this.project(pi2 as number[]));
-
             const p: Position3D = [
                 pi1[0] + (pi2[0] - pi1[0]) * fractionOnLine,
                 pi1[1] + (pi2[1] - pi1[1]) * fractionOnLine,
-                pi1?.[2] ??
-                    0 + (pi2?.[2] ?? 0 - (pi1?.[2] ?? 0)) * fractionOnLine,
+                (pi1?.[2] ?? 0) +
+                    ((pi2?.[2] ?? 0) - (pi1?.[2] ?? 0)) * fractionOnLine,
             ];
 
+            // If autoPosition is enabled, check if the label is outside the viewport
+            // and if so, try the next candidate fraction
             if (this.props.autoPosition) {
                 const ps = this.project(p);
                 if (ps[0] < 0 || ps[0] > width || ps[1] < 0 || ps[1] > height) {
                     // If the label is outside view/camera, reposition it
-                    fraction = candidateFractions.shift() as number;
+                    fraction = candidateFractions.shift() ?? 0;
                     continue;
                 }
             }
+
+            const p1 = new Vector2(this.project(pi1 as number[]));
+            const p2 = new Vector2(this.project(pi2 as number[]));
 
             const v = new Vector2(p2[0] - p1[0], -(p2[1] - p1[1]));
             v.normalize();
@@ -389,7 +322,7 @@ export class WellLabelLayer extends TextLayer<
         }
 
         // Default to well head of no valid position is found in viewport
-        return [0, well_xyz[0] as Position3D];
+        return [0, trajectory[0] as Position3D];
     }
 }
 

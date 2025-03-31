@@ -15,19 +15,12 @@ import {
     LABEL_ORIENTATION_ARGTYPES,
     LABEL_POSITION_ARGTYPES,
     LABEL_SIZE_ARGTYPES,
+    TRAJECTORY_SIMULATION_ARGTYPES,
 } from "../constant/argTypes";
 import { getRgba } from "../util/color";
+import type { TrajectorySimulationProps } from "../types/trajectory";
 
 type WellCount = { wellCount: number };
-type TrajectorySimulationProps = {
-    sampleCount?: number;
-    segmentLength?: number;
-
-    /**
-     * How much can the well deviate from the path, in degrees.
-     */
-    dipDeviationMagnitude?: number;
-};
 
 const stories: Meta = {
     title: "SubsurfaceViewer / Well Label Layer",
@@ -244,28 +237,36 @@ const createSyntheticWellCollection = (
     };
 };
 
-const SYNTHETIC_WELLS = createSyntheticWellCollection(1000);
-
-/*
-const useSytheticWellCollection = (
-    wellCount: number,
-    wellHeadCount: number,
-    { sampleCount, segmentLength }: TrajectorySimulationProps = {
+const useSyntheticWellCollection = (
+    wellCount = 1000,
+    wellHeadCount = 100,
+    {
+        sampleCount,
+        segmentLength,
+        dipDeviationMagnitude,
+    }: TrajectorySimulationProps = {
         sampleCount: 20,
         segmentLength: 150,
+        dipDeviationMagnitude: 10,
     }
-): FeatureCollection => {
-    const wells = React.useMemo(
+): FeatureCollection =>
+    React.useMemo(
         () =>
             createSyntheticWellCollection(wellCount, wellHeadCount, {
                 sampleCount,
                 segmentLength,
+                dipDeviationMagnitude,
             }),
-        [wellCount, wellHeadCount, sampleCount, segmentLength]
+        [
+            wellCount,
+            wellHeadCount,
+            sampleCount,
+            segmentLength,
+            dipDeviationMagnitude,
+        ]
     );
-    return wells;
-};
-*/
+
+const SYNTHETIC_WELLS = createSyntheticWellCollection(1000);
 
 const AXES_LAYERS = [
     new AxesLayer({
@@ -321,18 +322,12 @@ export const LabelPosition: StoryObj<
         segmentLength,
         dipDeviationMagnitude,
     }) => {
-        //const data = getSyntheticWells(wellCount);
-        const data = createSyntheticWellCollection(wellCount, 100, {
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const data = useSyntheticWellCollection(wellCount, 100, {
             sampleCount,
             segmentLength,
             dipDeviationMagnitude,
         });
-        /*
-        const data = useSytheticWellCollection(wellCount, 100, {
-            sampleCount,
-            segmentLength,
-        });
-        */
 
         const wellLayer = new WellsLayer({
             ...WELL_LAYER_PROPS,
@@ -353,7 +348,10 @@ export const LabelPosition: StoryObj<
 
         return <SubsurfaceViewer {...propsWithLayers} />;
     },
-    argTypes: LABEL_POSITION_ARGTYPES,
+    argTypes: {
+        ...LABEL_POSITION_ARGTYPES,
+        ...TRAJECTORY_SIMULATION_ARGTYPES,
+    },
     args: {
         getPositionAlongPath: 0.5,
         sampleCount: 20,
@@ -528,6 +526,61 @@ export const LabelStyle: StoryObj<
         ...LABEL_POSITION_ARGTYPES,
         ...LABEL_SIZE_ARGTYPES,
         ...LABEL_ORIENTATION_ARGTYPES,
+    },
+};
+
+export const SparseLabelPosition: StoryObj<
+    WellCount & WellLabelLayerProps & TrajectorySimulationProps
+> = {
+    render: ({
+        wellCount,
+        getPositionAlongPath,
+        sampleCount,
+        segmentLength,
+        dipDeviationMagnitude,
+    }) => {
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const data = useSyntheticWellCollection(wellCount, 100, {
+            sampleCount,
+            segmentLength,
+            dipDeviationMagnitude,
+        });
+
+        const wellLayer = new WellsLayer({
+            ...WELL_LAYER_PROPS,
+            data,
+        });
+
+        const labelLayer = new WellLabelLayer({
+            ...DEFAULT_LABEL_PROPS,
+            getPositionAlongPath,
+            data: data.features,
+        });
+
+        const propsWithLayers = {
+            id: "position",
+            layers: [...AXES_LAYERS, wellLayer, labelLayer],
+            views: DEFAULT_VIEWS,
+        };
+
+        return <SubsurfaceViewer {...propsWithLayers} />;
+    },
+    argTypes: {
+        ...LABEL_POSITION_ARGTYPES,
+        ...TRAJECTORY_SIMULATION_ARGTYPES,
+    },
+    args: {
+        getPositionAlongPath: 0.5,
+        sampleCount: 5,
+        segmentLength: 600,
+        dipDeviationMagnitude: 80,
+    },
+    parameters: {
+        docs: {
+            description: {
+                story: "Label position along a sparsely sampled well trajectory.",
+            },
+        },
     },
 };
 
