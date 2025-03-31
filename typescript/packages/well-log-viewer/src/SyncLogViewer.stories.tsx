@@ -67,7 +67,7 @@ const ComponentCode =
     "    colorMapFunctions={colorMapFunctions} \r\n" +
     "/>";
 
-const stories: Meta<SyncLogViewerProps> = {
+const stories: Meta = {
     component: SyncLogViewer,
     title: "WellLogViewer/Demo/SyncLogViewer",
     argTypes: argTypesSyncLogViewerProp,

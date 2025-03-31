@@ -80,7 +80,8 @@ export default class WellLogViewer extends Component<
     WellLogViewerProps,
     State
 > {
-    public static propTypes: Record<string, unknown>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    public static propTypes: Record<string, any>;
 
     callbackManager: CallbackManager;
     collapsedTrackIds: (string | number)[];

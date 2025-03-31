@@ -13,7 +13,8 @@ export type WellLogViewWithScrollerProps = WellLogViewProps;
 export const argTypesWellLogViewScrollerProp = argTypesWellLogViewProp;
 
 class WellLogViewWithScroller extends Component<WellLogViewWithScrollerProps> {
-    public static propTypes: Record<string, unknown>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    public static propTypes: Record<string, any>;
 
     controller: WellLogController | null;
     scroller: Scroller | null;
