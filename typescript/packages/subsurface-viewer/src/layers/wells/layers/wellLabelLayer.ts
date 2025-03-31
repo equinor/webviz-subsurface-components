@@ -254,20 +254,21 @@ export class WellLabelLayer extends TextLayer<
         const candidateFractions = [0.5, 0.25, 0.75, 0.125, 0.87, 0.37, 0.62];
 
         const cumulativeDistance = getCumulativeDistance(trajectory);
-        const targetDistance =
-            cumulativeDistance[cumulativeDistance.length - 1] * fraction;
-
-        // Find the index of the segment that contains the target distance
-        let targetIndex = 0;
-        for (let i = 0; i < cumulativeDistance.length - 1; i++) {
-            if (cumulativeDistance[i + 1] < targetDistance) {
-                continue;
-            }
-            targetIndex = i;
-            break;
-        }
 
         while (candidateFractions.length != 0) {
+            const targetDistance =
+                cumulativeDistance[cumulativeDistance.length - 1] * fraction;
+
+            // Find the index of the segment that contains the target distance
+            let targetIndex = 0;
+            for (let i = 0; i < cumulativeDistance.length - 1; i++) {
+                if (cumulativeDistance[i + 1] < targetDistance) {
+                    continue;
+                }
+                targetIndex = i;
+                break;
+            }
+
             const pi1 = [...trajectory[targetIndex]];
             const pi2 = [...trajectory[targetIndex + 1]];
 
