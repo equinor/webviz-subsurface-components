@@ -70,6 +70,14 @@ const DEFAULT_PROPS: DefaultProps<WellLabelLayerProps> = {
     backgroundPadding: [5, 1, 5, 1],
     getBorderColor: [0, 0, 0, 255],
     getBorderWidth: 1,
+
+    // Animate label position transitions in order to help tracking when labels are moving
+    transitions: {
+        getPosition: {
+            duration: 100,
+            type: "spring",
+        },
+    },
 };
 
 /**
@@ -162,9 +170,9 @@ export class WellLabelLayer extends TextLayer<
         fraction = _.clamp(fraction, 0, 1);
 
         // Return a pos "annotation_position" percent down the trajectory
-        let pos = this.getVectorAlongTrajectory(fraction, well_data)[1];
+        const pos = this.getVectorAlongTrajectory(fraction, well_data)[1];
 
-        const label = well_data.properties?.["name"] ?? "a";
+        const label = well_data.properties?.["name"] ?? "";
         const labelSize = label.length;
 
         const view_from = new Vector3(this.context.viewport.cameraPosition);
@@ -195,13 +203,11 @@ export class WellLabelLayer extends TextLayer<
         // cluttering is likely most prominent.
         const zOffset = fraction > 0 ? offset : offset * 5;
 
-        pos = [
+        return [
             pos[0] + dir[0] * offset,
             pos[1] + dir[1] * offset,
             pos[2] + dir[2] * zOffset,
         ];
-
-        return pos ?? [0, 0, 0];
     }
 
     /**
@@ -268,6 +274,12 @@ export class WellLabelLayer extends TextLayer<
                 return [a, p];
             }
         }
+
+        // Default to well head of no valid position is found in viewport
+        if (!_.isUndefined(well_xyz)) {
+            return [0, well_xyz[0] as Position3D];
+        }
+
         return [0, [0, 0, 0]];
     }
 }

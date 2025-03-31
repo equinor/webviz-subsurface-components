@@ -1,3 +1,10 @@
+## [1.10.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.10.0...subsurface-viewer@1.10.1) (2025-03-28)
+
+
+### Bug Fixes
+
+* animate label position transitions ([#2494](https://github.com/equinor/webviz-subsurface-components/issues/2494)) ([2b249e0](https://github.com/equinor/webviz-subsurface-components/commit/2b249e078d15d61703cb7fd5300100a11e7e67c4))
+
 # [1.10.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.9.0...subsurface-viewer@1.10.0) (2025-03-27)
 
 
