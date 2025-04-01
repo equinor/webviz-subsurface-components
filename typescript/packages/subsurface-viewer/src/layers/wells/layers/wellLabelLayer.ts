@@ -80,6 +80,25 @@ const DEFAULT_PROPS: DefaultProps<WellLabelLayerProps> = {
     },
 };
 
+const getCumulativeDistance = (well_xyz: Position[]): number[] => {
+    const cumulativeDistance = [0];
+    for (let i = 1; i < well_xyz.length; i++) {
+        const p1 = well_xyz[i - 1];
+        const p2 = well_xyz[i];
+
+        if (!p1 || !p2) {
+            continue;
+        }
+
+        const v0 = new Vector3(p1);
+        const v1 = new Vector3(p2);
+        const distance = v0.distance(v1);
+
+        cumulativeDistance.push(cumulativeDistance[i - 1] + distance);
+    }
+    return cumulativeDistance;
+};
+
 /**
  * The `WellLabelLayer` class extends the `TextLayer` to provide functionality for rendering well labels
  * in a subsurface viewer. It includes methods for calculating label positions and angles based on well
@@ -223,64 +242,90 @@ export class WellLabelLayer extends TextLayer<
             return [0, [0, 0, 0]];
         }
 
-        const well_xyz = getTrajectory(wellData, undefined);
+        const trajectory = getTrajectory(wellData, undefined);
 
-        const w = this.context.viewport.width;
-        const h = this.context.viewport.height;
+        if (_.isUndefined(trajectory) || trajectory.length < 2) {
+            return [0, [0, 0, 0]];
+        }
+
+        const width = this.context.viewport.width;
+        const height = this.context.viewport.height;
 
         const candidateFractions = [0.5, 0.25, 0.75, 0.125, 0.87, 0.37, 0.62];
 
-        const n = well_xyz?.length ?? 2;
-        if (well_xyz && n >= 2) {
-            while (candidateFractions.length != 0) {
-                const i = Math.min(Math.floor(fraction * n), n - 2);
-                const pi1 = [...well_xyz[i]];
-                const pi2 = [...well_xyz[i + 1]];
+        const cumulativeDistance = getCumulativeDistance(trajectory);
 
-                if (this.props.zIncreasingDownwards) {
-                    pi1[2] = -pi1[2];
-                    pi2[2] = -pi2[2];
+        const zSign = this.props.zIncreasingDownwards
+            ? new Vector3(1, 1, -1)
+            : new Vector3(1, 1, 1);
+
+        while (candidateFractions.length != 0) {
+            const targetDistance =
+                cumulativeDistance[cumulativeDistance.length - 1] * fraction;
+
+            // Find the index of the segment that contains the target distance
+            let targetIndex = 0;
+            for (let i = 0; i < cumulativeDistance.length - 1; i++) {
+                if (cumulativeDistance[i + 1] < targetDistance) {
+                    continue;
                 }
-
-                const p1 = new Vector2(this.project(pi1 as number[]));
-                const p2 = new Vector2(this.project(pi2 as number[]));
-                const p: Position3D = [
-                    pi1[0] + (pi2[0] - pi1[0]) / 2,
-                    pi1[1] + (pi2[1] - pi1[1]) / 2,
-                    pi1?.[2] ?? 0 + (pi2?.[2] ?? 0 - (pi1?.[2] ?? 0)) / 2,
-                ];
-
-                if (this.props.autoPosition) {
-                    const ps = this.project(p);
-                    if (ps[0] < 0 || ps[0] > w || ps[1] < 0 || ps[1] > h) {
-                        // If the label is outside view/camera, reposition it
-                        fraction = candidateFractions.shift() as number;
-                        continue;
-                    }
-                }
-
-                const v = new Vector2(p2[0] - p1[0], -(p2[1] - p1[1]));
-                v.normalize();
-                const rad = Math.atan2(v[1], v[0]) as number;
-                const deg = rad * (180 / Math.PI);
-                let a = deg;
-
-                if (deg > 90) {
-                    a = deg - 180;
-                } else if (deg < -90) {
-                    a = deg + 180;
-                }
-
-                return [a, p];
+                targetIndex = i;
+                break;
             }
+
+            const segmentBegin = new Vector3([...trajectory[targetIndex]]);
+            const segmentEnd = new Vector3([...trajectory[targetIndex + 1]]);
+
+            // Invert z if z is increasing downwards
+            segmentBegin.multiply(zSign);
+            segmentEnd.multiply(zSign);
+
+            const distanceAlongTrajectory1 = cumulativeDistance[targetIndex];
+            const distanceAlongTrajectory2 =
+                cumulativeDistance[targetIndex + 1];
+
+            const lineDistance =
+                distanceAlongTrajectory2 - distanceAlongTrajectory1;
+            const fractionOnLine =
+                (targetDistance - distanceAlongTrajectory1) / lineDistance;
+
+            // Linear interpolation between segmentBegin and segmentEnd
+            const labelPosition = new Vector3(segmentBegin).lerp(
+                segmentEnd,
+                fractionOnLine
+            );
+
+            // If autoPosition is enabled, check if the label is outside the viewport
+            // and if so, try the next candidate fraction
+            if (this.props.autoPosition) {
+                const ps = this.project(labelPosition);
+                if (ps[0] < 0 || ps[0] > width || ps[1] < 0 || ps[1] > height) {
+                    // If the label is outside view/camera, reposition it
+                    fraction = candidateFractions.shift() ?? 0;
+                    continue;
+                }
+            }
+
+            const p1 = this.project(segmentBegin);
+            const p2 = this.project(segmentEnd);
+
+            const v = new Vector2(p2[0] - p1[0], -(p2[1] - p1[1]));
+            v.normalize();
+            const rad = Math.atan2(v[1], v[0]) as number;
+            const deg = rad * (180 / Math.PI);
+            let a = deg;
+
+            if (deg > 90) {
+                a = deg - 180;
+            } else if (deg < -90) {
+                a = deg + 180;
+            }
+
+            return [a, labelPosition.toArray() as Position3D];
         }
 
         // Default to well head of no valid position is found in viewport
-        if (!_.isUndefined(well_xyz)) {
-            return [0, well_xyz[0] as Position3D];
-        }
-
-        return [0, [0, 0, 0]];
+        return [0, trajectory[0] as Position3D];
     }
 }
 
