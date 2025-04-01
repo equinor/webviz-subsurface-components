@@ -1,3 +1,10 @@
+## [1.10.2](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.10.1...subsurface-viewer@1.10.2) (2025-04-01)
+
+
+### Bug Fixes
+
+* Well label interpolation on sparse trajectories ([#2495](https://github.com/equinor/webviz-subsurface-components/issues/2495)) ([c79e68f](https://github.com/equinor/webviz-subsurface-components/commit/c79e68fb6f3f37279e9efe6091ab55b7dc646ceb)), closes [#2498](https://github.com/equinor/webviz-subsurface-components/issues/2498)
+
 ## [1.10.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.10.0...subsurface-viewer@1.10.1) (2025-03-28)
 
 
