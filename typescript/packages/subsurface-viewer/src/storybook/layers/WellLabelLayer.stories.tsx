@@ -15,8 +15,10 @@ import {
     LABEL_ORIENTATION_ARGTYPES,
     LABEL_POSITION_ARGTYPES,
     LABEL_SIZE_ARGTYPES,
+    TRAJECTORY_SIMULATION_ARGTYPES,
 } from "../constant/argTypes";
 import { getRgba } from "../util/color";
+import type { TrajectorySimulationProps } from "../types/trajectory";
 
 type WellCount = { wellCount: number };
 
@@ -107,16 +109,15 @@ const getRandomColor = () => {
 
 const createSyntheticWell = (
     index: number,
-    headPosition: Position3D
+    headPosition: Position3D,
+    sampleCount = 20,
+    segmentLength = 150,
+    dipDeviationMagnitude = 10
 ): Feature => {
     // Create a random well name
     const name = `Well ${index}`;
 
-    const sampleCount = 20;
-
-    const dSegmentLength = 150;
-
-    const avgDipDeviation = randomFunc() * 10;
+    const avgDipDeviation = randomFunc() * dipDeviationMagnitude;
     const avgAzimuthDeviation = randomFunc() * 5 - 2.5;
     const maxDip = Math.PI * 0.5 + 0.05;
 
@@ -128,7 +129,7 @@ const createSyntheticWell = (
     for (let i = 0; i < leadCount; i++) {
         const x = coordinates[coordinates.length - 1][0];
         const y = coordinates[coordinates.length - 1][1];
-        const z = coordinates[coordinates.length - 1][2] + dSegmentLength;
+        const z = coordinates[coordinates.length - 1][2] + segmentLength;
         coordinates.push([x, y, z]);
     }
 
@@ -140,14 +141,15 @@ const createSyntheticWell = (
         const azimuth =
             previousAzimuth + getRandomDeviation(5, avgAzimuthDeviation);
         const dip = Math.min(
-            previousDip + getRandomDeviation(11, avgDipDeviation),
+            previousDip +
+                getRandomDeviation(dipDeviationMagnitude, avgDipDeviation),
             maxDip
         );
         const x =
-            prevSample[0] + dSegmentLength * Math.cos(azimuth) * Math.sin(dip);
+            prevSample[0] + segmentLength * Math.cos(azimuth) * Math.sin(dip);
         const y =
-            prevSample[1] + dSegmentLength * Math.sin(azimuth) * Math.sin(dip);
-        const z = prevSample[2] + dSegmentLength * Math.cos(dip);
+            prevSample[1] + segmentLength * Math.sin(azimuth) * Math.sin(dip);
+        const z = prevSample[2] + segmentLength * Math.cos(dip);
 
         coordinates.push([x, y, z]);
         previousAzimuth = azimuth;
@@ -176,27 +178,56 @@ const createSyntheticWell = (
     };
 };
 
-const createSyntheticWellCollection = (
-    wellCount = 1000,
-    wellHeadCount = 100
-): FeatureCollection => {
-    // Create random well heads
+/**
+ * Create random well heads
+ */
+const createSyntheticWellHeads = (count = 100): Position3D[] => {
     const wellHeads: Position3D[] = [];
-    for (let i = 0; i < wellHeadCount; i++) {
+    for (let i = 0; i < count; i++) {
         const dx = randomFunc() * 10000 - 2000;
         const dy = randomFunc() * 8000 - 2000;
         const headPosition: Position3D = [456000 + dx, 6785000 + dy, 0];
         wellHeads.push(headPosition);
     }
+    return wellHeads;
+};
+
+// A pool of random well heads; fewer than trajectories in order to create clusters
+const SYNTHETIC_WELL_HEADS = createSyntheticWellHeads();
+
+const createSyntheticWellCollection = (
+    wellCount = 1000,
+    wellHeadCount = 100,
+    {
+        sampleCount,
+        segmentLength,
+        dipDeviationMagnitude,
+    }: TrajectorySimulationProps = {
+        sampleCount: 20,
+        segmentLength: 150,
+        dipDeviationMagnitude: 20,
+    }
+): FeatureCollection => {
+    const wellHeads = SYNTHETIC_WELL_HEADS.slice(
+        0,
+        wellHeadCount
+    ) as Position3D[];
 
     const wells: Feature[] = [];
 
     for (let i = 0; i < wellCount; i++) {
         // Draw from collection of heads in order to create clusters
-        const headIndex = Math.trunc(randomFunc() * wellHeads.length);
+        const wellPerClusterCount = Math.trunc(wellCount / wellHeadCount) + 1;
+        const headIndex = Math.trunc(i / wellPerClusterCount);
         const headPosition = wellHeads[headIndex];
 
-        const syntheticWell = createSyntheticWell(i, headPosition);
+        const syntheticWell = createSyntheticWell(
+            i,
+            headPosition,
+            sampleCount,
+            segmentLength,
+            dipDeviationMagnitude
+        );
         wells.push(syntheticWell);
     }
 
@@ -205,6 +236,35 @@ const createSyntheticWellCollection = (
         features: wells,
     };
 };
+
+const useSyntheticWellCollection = (
+    wellCount = 1000,
+    wellHeadCount = 100,
+    {
+        sampleCount,
+        segmentLength,
+        dipDeviationMagnitude,
+    }: TrajectorySimulationProps = {
+        sampleCount: 20,
+        segmentLength: 150,
+        dipDeviationMagnitude: 10,
+    }
+): FeatureCollection =>
+    React.useMemo(
+        () =>
+            createSyntheticWellCollection(wellCount, wellHeadCount, {
+                sampleCount,
+                segmentLength,
+                dipDeviationMagnitude,
+            }),
+        [
+            wellCount,
+            wellHeadCount,
+            sampleCount,
+            segmentLength,
+            dipDeviationMagnitude,
+        ]
+    );
 
 const SYNTHETIC_WELLS = createSyntheticWellCollection(1000);
 
@@ -252,9 +312,22 @@ export const Default: StoryObj<WellCount> = {
     },
 };
 
-export const LabelPosition: StoryObj<WellCount & WellLabelLayerProps> = {
-    render: ({ wellCount, getPositionAlongPath }) => {
-        const data = getSyntheticWells(wellCount);
+export const LabelPosition: StoryObj<
+    WellCount & WellLabelLayerProps & TrajectorySimulationProps
+> = {
+    render: ({
+        wellCount,
+        getPositionAlongPath,
+        sampleCount,
+        segmentLength,
+        dipDeviationMagnitude,
+    }) => {
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const data = useSyntheticWellCollection(wellCount, 100, {
+            sampleCount,
+            segmentLength,
+            dipDeviationMagnitude,
+        });
 
         const wellLayer = new WellsLayer({
             ...WELL_LAYER_PROPS,
@@ -275,9 +348,15 @@ export const LabelPosition: StoryObj<WellCount & WellLabelLayerProps> = {
 
         return <SubsurfaceViewer {...propsWithLayers} />;
     },
-    argTypes: LABEL_POSITION_ARGTYPES,
+    argTypes: {
+        ...LABEL_POSITION_ARGTYPES,
+        ...TRAJECTORY_SIMULATION_ARGTYPES,
+    },
     args: {
         getPositionAlongPath: 0.5,
+        sampleCount: 20,
+        segmentLength: 150,
+        dipDeviationMagnitude: 10,
     },
 };
 
@@ -310,10 +389,30 @@ export const LabelAutoPosition: StoryObj<WellCount & WellLabelLayerProps> = {
 
         const layers = [...AXES_LAYERS, wellLayer, labelLayer2d, labelLayer3d];
 
+        // Viewport is reset on views object identity change, so it needs to be memoized
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const views: ViewsType = React.useMemo(
+            () => ({
+                ...SPLIT_VIEWS,
+                viewports: [
+                    {
+                        ...SPLIT_VIEWS.viewports[0],
+
+                        // Zoom in in order to trigger auto-positioning.
+                        zoom: -2,
+                    },
+                    {
+                        ...SPLIT_VIEWS.viewports[1],
+                    },
+                ],
+            }),
+            []
+        );
+
         const propsWithLayers = {
             id: "position",
             layers,
-            views: SPLIT_VIEWS,
+            views,
         };
 
         return <SubsurfaceViewer {...propsWithLayers} />;
@@ -447,6 +546,61 @@ export const LabelStyle: StoryObj<
         ...LABEL_POSITION_ARGTYPES,
         ...LABEL_SIZE_ARGTYPES,
         ...LABEL_ORIENTATION_ARGTYPES,
+    },
+};
+
+export const SparseLabelPosition: StoryObj<
+    WellCount & WellLabelLayerProps & TrajectorySimulationProps
+> = {
+    render: ({
+        wellCount,
+        getPositionAlongPath,
+        sampleCount,
+        segmentLength,
+        dipDeviationMagnitude,
+    }) => {
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const data = useSyntheticWellCollection(wellCount, 100, {
+            sampleCount,
+            segmentLength,
+            dipDeviationMagnitude,
+        });
+
+        const wellLayer = new WellsLayer({
+            ...WELL_LAYER_PROPS,
+            data,
+        });
+
+        const labelLayer = new WellLabelLayer({
+            ...DEFAULT_LABEL_PROPS,
+            getPositionAlongPath,
+            data: data.features,
+        });
+
+        const propsWithLayers = {
+            id: "position",
+            layers: [...AXES_LAYERS, wellLayer, labelLayer],
+            views: DEFAULT_VIEWS,
+        };
+
+        return <SubsurfaceViewer {...propsWithLayers} />;
+    },
+    argTypes: {
+        ...LABEL_POSITION_ARGTYPES,
+        ...TRAJECTORY_SIMULATION_ARGTYPES,
+    },
+    args: {
+        getPositionAlongPath: 0.5,
+        sampleCount: 5,
+        segmentLength: 600,
+        dipDeviationMagnitude: 80,
+    },
+    parameters: {
+        docs: {
+            description: {
+                story: "Label position along a sparsely sampled well trajectory.",
+            },
+        },
     },
 };
 
