@@ -430,7 +430,10 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         const wellLabelProps = this.getSubLayerProps({
             ...this.props.wellLabel,
             data,
-            zIncreasingDownwards: this.props.ZIncreasingDownwards,
+
+            // Z is always increasing upwards at this stage
+            zIncreasingDownwards: false,
+
             getPositionAlongPath: this.getWellLabelPosition(),
             getColor:
                 this.props.wellLabel?.getColor ?? this.props.wellNameColor,
