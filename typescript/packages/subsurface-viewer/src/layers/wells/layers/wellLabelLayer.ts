@@ -255,6 +255,10 @@ export class WellLabelLayer extends TextLayer<
 
         const cumulativeDistance = getCumulativeDistance(trajectory);
 
+        const zSign = this.props.zIncreasingDownwards
+            ? new Vector3(1, 1, -1)
+            : new Vector3(1, 1, 1);
+
         while (candidateFractions.length != 0) {
             const targetDistance =
                 cumulativeDistance[cumulativeDistance.length - 1] * fraction;
@@ -269,13 +273,12 @@ export class WellLabelLayer extends TextLayer<
                 break;
             }
 
-            const pi1 = [...trajectory[targetIndex]];
-            const pi2 = [...trajectory[targetIndex + 1]];
+            const segmentBegin = new Vector3([...trajectory[targetIndex]]);
+            const segmentEnd = new Vector3([...trajectory[targetIndex + 1]]);
 
-            if (this.props.zIncreasingDownwards) {
-                pi1[2] = -pi1[2];
-                pi2[2] = -pi2[2];
-            }
+            // Invert z if z is increasing downwards
+            segmentBegin.multiply(zSign);
+            segmentEnd.multiply(zSign);
 
             const distanceAlongTrajectory1 = cumulativeDistance[targetIndex];
             const distanceAlongTrajectory2 =
@@ -286,17 +289,16 @@ export class WellLabelLayer extends TextLayer<
             const fractionOnLine =
                 (targetDistance - distanceAlongTrajectory1) / lineDistance;
 
-            const p: Position3D = [
-                pi1[0] + (pi2[0] - pi1[0]) * fractionOnLine,
-                pi1[1] + (pi2[1] - pi1[1]) * fractionOnLine,
-                (pi1?.[2] ?? 0) +
-                    ((pi2?.[2] ?? 0) - (pi1?.[2] ?? 0)) * fractionOnLine,
-            ];
+            // Linear interpolation between segmentBegin and segmentEnd
+            const labelPosition = new Vector3(segmentBegin).lerp(
+                segmentEnd,
+                fractionOnLine
+            );
 
             // If autoPosition is enabled, check if the label is outside the viewport
             // and if so, try the next candidate fraction
             if (this.props.autoPosition) {
-                const ps = this.project(p);
+                const ps = this.project(labelPosition);
                 if (ps[0] < 0 || ps[0] > width || ps[1] < 0 || ps[1] > height) {
                     // If the label is outside view/camera, reposition it
                     fraction = candidateFractions.shift() ?? 0;
@@ -304,8 +306,8 @@ export class WellLabelLayer extends TextLayer<
                 }
             }
 
-            const p1 = new Vector2(this.project(pi1 as number[]));
-            const p2 = new Vector2(this.project(pi2 as number[]));
+            const p1 = this.project(segmentBegin);
+            const p2 = this.project(segmentEnd);
 
             const v = new Vector2(p2[0] - p1[0], -(p2[1] - p1[1]));
             v.normalize();
@@ -319,7 +321,7 @@ export class WellLabelLayer extends TextLayer<
                 a = deg + 180;
             }
 
-            return [a, p];
+            return [a, labelPosition.toArray() as Position3D];
         }
 
         // Default to well head of no valid position is found in viewport
