@@ -200,7 +200,7 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
                 indices: { value: this.props.lineIndices, size: 1 },
             }),
             bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
-            modules: [project32],
+            modules: [project32, picking],
             isInstanced: false,
         });
 
