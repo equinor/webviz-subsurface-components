@@ -1,3 +1,10 @@
+## [1.10.5](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.10.4...subsurface-viewer@1.10.5) (2025-04-02)
+
+
+### Bug Fixes
+
+* [NGRM] Line layer picking is inconsistent with Map/Grid3D ([#2501](https://github.com/equinor/webviz-subsurface-components/issues/2501)) ([92b1855](https://github.com/equinor/webviz-subsurface-components/commit/92b185528eb4d643ed4ba2527271066d1cc5329b))
+
 ## [1.10.4](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.10.3...subsurface-viewer@1.10.4) (2025-04-02)
 
 
