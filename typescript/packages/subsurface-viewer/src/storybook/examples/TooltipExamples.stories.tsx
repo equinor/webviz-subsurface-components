@@ -16,7 +16,7 @@ import type {
     LayerPickInfo,
     PropertyDataType,
 } from "../../layers/utils/layerTools";
-import type { WellsPickInfo } from "../../layers/wells/wellsLayer";
+import type { WellsPickInfo } from "../../layers/wells/types";
 
 import {
     defaultStoryParameters,

@@ -1,3 +1,10 @@
+## [1.10.4](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.10.3...subsurface-viewer@1.10.4) (2025-04-02)
+
+
+### Bug Fixes
+
+* Subsurface viewer - Assorted fixes to wells layer and multi pick hook ([#2491](https://github.com/equinor/webviz-subsurface-components/issues/2491)) ([b4673a1](https://github.com/equinor/webviz-subsurface-components/commit/b4673a13680d0bfefdb151c337cab7b7f1148b5b))
+
 ## [1.10.3](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.10.2...subsurface-viewer@1.10.3) (2025-04-02)
 
 
