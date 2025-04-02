@@ -1,11 +1,7 @@
-import {
-    type DefaultProps,
-    type Position,
-    type UpdateParameters,
-} from "@deck.gl/core";
+import { type DefaultProps, type UpdateParameters } from "@deck.gl/core";
 import type { TextLayerProps } from "@deck.gl/layers";
 import { TextLayer } from "@deck.gl/layers";
-import type { Feature } from "geojson";
+import type { Feature, Position } from "geojson";
 import _ from "lodash";
 import { Vector2, Vector3 } from "math.gl";
 import type { Position3D } from "../../utils/layerTools";
