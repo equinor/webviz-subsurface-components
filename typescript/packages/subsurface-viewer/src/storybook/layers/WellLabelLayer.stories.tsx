@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import type { Feature, FeatureCollection } from "geojson";
+import type { Color } from "@deck.gl/core";
 import { all, create } from "mathjs";
 import React from "react";
 import { AxesLayer, WellsLayer } from "../../layers";
@@ -18,6 +18,10 @@ import {
     TRAJECTORY_SIMULATION_ARGTYPES,
 } from "../constant/argTypes";
 import { getRgba } from "../util/color";
+import type {
+    WellFeature,
+    WellFeatureCollection,
+} from "../../layers/wells/types";
 import type { TrajectorySimulationProps } from "../types/trajectory";
 
 type WellCount = { wellCount: number };
@@ -100,7 +104,7 @@ const getRandomDeviation = (magnitude = 10, mean = 5) => {
     return (randomFunc() * (mean * 2 - magnitude * 0.5) * Math.PI) / 180;
 };
 
-const getRandomColor = () => {
+const getRandomColor = (): Color => {
     const r = 100 + Math.floor(randomFunc() * 155);
     const g = 100 + Math.floor(randomFunc() * 155);
     const b = 100 + Math.floor(randomFunc() * 155);
@@ -113,7 +117,7 @@ const createSyntheticWell = (
     sampleCount = 20,
     segmentLength = 150,
     dipDeviationMagnitude = 10
-): Feature => {
+): WellFeature => {
     // Create a random well name
     const name = `Well ${index}`;
 
@@ -160,6 +164,7 @@ const createSyntheticWell = (
         type: "Feature",
         properties: {
             name,
+            md: [],
             color: getRandomColor(),
         },
         geometry: {
@@ -207,13 +212,13 @@ const createSyntheticWellCollection = (
         segmentLength: 150,
         dipDeviationMagnitude: 20,
     }
-): FeatureCollection => {
+): WellFeatureCollection => {
     const wellHeads = SYNTHETIC_WELL_HEADS.slice(
         0,
         wellHeadCount
     ) as Position3D[];
 
-    const wells: Feature[] = [];
+    const wells: WellFeature[] = [];
 
     for (let i = 0; i < wellCount; i++) {
         // Draw from collection of heads in order to create clusters
@@ -249,7 +254,7 @@ const useSyntheticWellCollection = (
         segmentLength: 150,
         dipDeviationMagnitude: 10,
     }
-): FeatureCollection =>
+): WellFeatureCollection =>
     React.useMemo(
         () =>
             createSyntheticWellCollection(wellCount, wellHeadCount, {
@@ -280,7 +285,7 @@ const DEFAULT_LABEL_PROPS = {
     data: SYNTHETIC_WELLS.features,
 };
 
-const getSyntheticWells = (wellCount: number): FeatureCollection => {
+const getSyntheticWells = (wellCount: number): WellFeatureCollection => {
     const wells = SYNTHETIC_WELLS.features.slice(0, wellCount);
     return {
         type: "FeatureCollection",
