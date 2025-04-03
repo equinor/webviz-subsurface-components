@@ -1,10 +1,8 @@
-//import { GL } from "@luma.gl/constants";
 import { Geometry, Model } from "@luma.gl/engine";
 import type {
     Accessor,
     Color,
     DefaultProps,
-    LayerContext,
     Position,
     PickingInfo,
     UpdateParameters,
@@ -12,8 +10,8 @@ import type {
     Unit,
 } from "@deck.gl/core";
 import { Layer, project, picking, UNIT } from "@deck.gl/core";
-import type { UniformValue } from "@luma.gl/core";
 import type { GeometryProps } from "@luma.gl/engine";
+import type { ShaderModule } from "@luma.gl/shadertools";
 
 import type {
     ExtendedLayerProps,
@@ -26,7 +24,7 @@ import { utilities } from "../shader_modules";
 import { vsShader } from "./vertex.glsl";
 import { fsShader } from "./fragment.glsl";
 
-export type WellMarkersLayerProps = _WellMarkersLayerProps & LayerProps;
+export type WellMarkersLayerProps = _WellMarkersLayerProps;
 
 /**
  * Input data of the layer.
@@ -58,6 +56,7 @@ export type WellMarkerDataT = {
      */
     outlineColor: Color;
 };
+
 export interface _WellMarkersLayerProps extends ExtendedLayerProps {
     /**
      * Shape of the markers.
@@ -129,7 +128,7 @@ const defaultProps: DefaultProps<WellMarkersLayerProps> = {
     name: "Well Markers",
     id: "well-markers",
     shape: "circle",
-    sizeUnits: "meters",
+    sizeUnits: "meters" as Unit,
     visible: true,
     ZIncreasingDownwards: true,
     getPosition: {
@@ -263,31 +262,42 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
         return [];
     }
 
-    draw(args: {
-        moduleParameters?: unknown;
-        uniforms: Record<string, UniformValue>;
-        context: LayerContext;
-    }): void {
+    // DrawOptions is not exported by deck.gl :/
+    // DrawOptions = {
+    //     renderPass: RenderPass;
+    //     shaderModuleProps: any;
+    //     uniforms: any;
+    //     parameters: any;
+    //     context: LayerContext;
+    //   }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    draw(args: any): void {
         if (!this.state["shapeModel"]) {
             return;
         }
 
-        const { uniforms } = args;
         const models = this.getModels();
         if (models.length && models.length < 2) {
             return;
         }
-        models[0].setUniforms({
-            ...uniforms,
-            sizeUnits: UNIT[this.props.sizeUnits],
-            ZIncreasingDownwards: this.props.ZIncreasingDownwards,
+
+        models[0].shaderInputs.setProps({
+            ...args.uniforms,
+            wellMarkers: {
+                useOutlineColor: false,
+                sizeUnits: UNIT[this.props.sizeUnits],
+                ZIncreasingDownwards: this.props.ZIncreasingDownwards,
+            },
         });
         models[0].draw(args.context.renderPass);
 
-        models[1].setUniforms({
-            ...uniforms,
-            ZIncreasingDownwards: this.props.ZIncreasingDownwards,
-            sizeUnits: UNIT[this.props.sizeUnits],
+        models[1].shaderInputs.setProps({
+            ...args.uniforms,
+            wellMarkers: {
+                useOutlineColor: true,
+                sizeUnits: UNIT[this.props.sizeUnits],
+                ZIncreasingDownwards: this.props.ZIncreasingDownwards,
+            },
         });
         models[1].draw(args.context.renderPass);
     }
@@ -329,7 +339,7 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
         return super.getShaders({
             vs: vsShader,
             fs: fsShader,
-            modules: [project, picking, utilities],
+            modules: [project, picking, utilities, wellMarkersUniforms],
         });
     }
 
@@ -337,8 +347,12 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
         const triangle_positions = [
             -1.0, -1.0, 0.0, 1.0, -1.0, 0.0, 0.0, 1.0, 0.0,
         ];
+        const triangle_outline = [
+            -1.0, -1.0, 0.0, 1.0, -1.0, 0.0, 0.0, 1.0, 0.0, -1.0, -1.0, 0.0,
+        ];
 
-        const circle_positions: number[] = [0.0, 0.0, 0.0];
+        const circle_positions: number[] = [];
+        const circle_outline: number[] = [];
         const N = 32;
         const R = 1.0;
         for (let i = 0; i <= N; ++i) {
@@ -346,6 +360,14 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
             circle_positions.push(R * Math.cos(angle));
             circle_positions.push(R * Math.sin(angle));
             circle_positions.push(0.0);
+            // push center again to represent a circle with a triangle strip
+            circle_positions.push(0.0);
+            circle_positions.push(0.0);
+            circle_positions.push(0.0);
+
+            circle_outline.push(R * Math.cos(angle));
+            circle_outline.push(R * Math.sin(angle));
+            circle_outline.push(0.0);
         }
 
         const square_positions = [
@@ -354,18 +376,19 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
 
         const square_outline = [
             -1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, -1.0, 0.0, -1.0, -1.0, 0.0,
+            -1.0, 1.0, 0.0,
         ];
 
         this.shapes.set("triangle", {
             drawMode: "triangle-list",
             positions: new Float32Array(triangle_positions),
-            outline: new Float32Array(triangle_positions),
+            outline: new Float32Array(triangle_outline),
         });
 
         this.shapes.set("circle", {
-            drawMode: "triangle-fan-webgl",
+            drawMode: "triangle-strip",
             positions: new Float32Array(circle_positions),
-            outline: new Float32Array(circle_positions.slice(3)),
+            outline: new Float32Array(circle_outline),
         });
 
         this.shapes.set("square", {
@@ -395,9 +418,6 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
                     positions: { size: 3, value: shape.positions },
                 },
             }),
-            uniforms: {
-                useOutlineColor: false,
-            },
             isInstanced: true,
             instanceCount: this.getNumInstances(),
         });
@@ -407,14 +427,11 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
             ...shaders,
             bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
             geometry: new Geometry({
-                topology: "line-loop-webgl",
+                topology: "line-strip",
                 attributes: {
                     positions: { size: 3, value: shape.outline },
                 },
             }),
-            uniforms: {
-                useOutlineColor: true,
-            },
             isInstanced: true,
             instanceCount: this.getNumInstances(),
         });
@@ -441,6 +458,32 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
         ];
     }
 }
+
+const wellMarkersUniformsBlock = /*glsl*/ `\
+uniform wellMarkersUniforms {
+   int sizeUnits;
+   bool useOutlineColor;
+   bool ZIncreasingDownwards;
+} wellMarkers;
+`;
+
+type WellMarkersUniformsType = {
+    sizeUnits: number;
+    useOutlineColor: boolean;
+    ZIncreasingDownwards: boolean;
+};
+
+// NOTE: this must exactly the same name than in the uniform block
+const wellMarkersUniforms = {
+    name: "wellMarkers",
+    vs: wellMarkersUniformsBlock,
+    fs: undefined,
+    uniformTypes: {
+        sizeUnits: "f32",
+        useOutlineColor: "u32",
+        ZIncreasingDownwards: "u32",
+    },
+} as const satisfies ShaderModule<LayerProps, WellMarkersUniformsType>;
 
 WellMarkersLayer.layerName = "WellMarkersLayer";
 WellMarkersLayer.defaultProps = defaultProps;

@@ -1,6 +1,6 @@
 import type {
     Color,
-    LayerContext,
+    LayerProps,
     UpdateParameters,
     Viewport,
 } from "@deck.gl/core";
@@ -14,7 +14,10 @@ import { load } from "@loaders.gl/core";
 import { ImageLoader } from "@loaders.gl/images";
 import type { UniformValue } from "@luma.gl/core";
 import { Geometry, Model } from "@luma.gl/engine";
+import type { ShaderModule } from "@luma.gl/shadertools";
+
 import { vec4 } from "gl-matrix";
+
 import type { ExtendedLayerProps, Position3D } from "../utils/layerTools";
 import fontAtlasPng from "./font-atlas.png";
 import labelFragmentShader from "./label-fragment.glsl";
@@ -153,7 +156,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         oldProps,
         context,
         changeFlags,
-    }: UpdateParameters<this>): boolean {
+    }: UpdateParameters<Layer<Axes2DLayerProps>>): boolean {
         return (
             super.shouldUpdateState({
                 props,
@@ -514,13 +517,8 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         return labels;
     }
 
-    draw({
-        context,
-    }: {
-        moduleParameters: unknown;
-        uniforms: unknown;
-        context: LayerContext;
-    }): void {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    draw(opts: any): void {
         const is_orthographic =
             this.context.viewport.constructor === OrthographicViewport;
         if (
@@ -539,14 +537,14 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         }
 
         // background
-        models[n - 1].draw(context.renderPass);
+        models[n - 1].draw(opts.context.renderPass);
 
         // lines
-        models[n - 2].draw(context.renderPass);
+        models[n - 2].draw(opts.context.renderPass);
 
         // labels
         for (let i = 0; i < n - 2; i++) {
-            models[i].draw(context.renderPass);
+            models[i].draw(opts.context.renderPass);
         }
 
         return;
@@ -863,7 +861,11 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
             labelModels.push(model);
         }
 
-        return { labelModels: labelModels, lineModel: lineModel, backgroundModel: backgroundModel };
+        return {
+            labelModels: labelModels,
+            lineModel: lineModel,
+            backgroundModel: backgroundModel,
+        };
     }
 }
 
@@ -955,3 +957,49 @@ function GetPixelsScale(labelFontSizePt: number): number {
     const px = Math.max(0, (8 / 9) * labelFontSizePt);
     return px;
 }
+
+const axesLinesUniformsBlock = /*glsl*/ `\
+uniform axesLinesUniforms {
+   vec4 color;
+   float clipZ;
+} axesLines;
+`;
+
+type AxesLinesUniformsType = {
+    color: [number, number, number, number];
+    clipZ: number;
+};
+
+// NOTE: this must exactly the same name than in the uniform block
+const axesLinesUniforms = {
+    name: "axesLines",
+    vs: axesLinesUniformsBlock,
+    fs: axesLinesUniformsBlock,
+    uniformTypes: {
+        color: "vec4<f32>",
+        clipZ: "f32",
+    },
+} as const satisfies ShaderModule<LayerProps, AxesLinesUniformsType>;
+
+const axesLabelsUniformsBlock = /*glsl*/ `\
+uniform axesLabelsUniforms {
+   vec4 color;
+   float clipZ;
+} axesLabels;
+`;
+
+type AxesLabelsUniformsType = {
+    color: [number, number, number, number];
+    clipZ: number;
+};
+
+// NOTE: this must exactly the same name than in the uniform block
+const axesLabelsUniforms = {
+    name: "axesLabels",
+    vs: axesLinesUniformsBlock,
+    fs: axesLinesUniformsBlock,
+    uniformTypes: {
+        color: "vec4<f32>",
+        clipZ: "f32",
+    },
+} as const satisfies ShaderModule<LayerProps, AxesLinesUniformsType>;
