@@ -3,7 +3,7 @@ import type {
     PickingInfo,
     UpdateParameters,
     LayerContext,
-    LayerProps
+    LayerProps,
 } from "@deck.gl/core";
 import { COORDINATE_SYSTEM, Layer, picking, project32 } from "@deck.gl/core";
 import type {
@@ -81,7 +81,7 @@ const defaultProps = {
     ZIncreasingDownwards: true,
 };
 
-interface ICommonUniforms {
+interface IUniforms {
     ZIncreasingDownwards: boolean;
     valueRangeMin: number;
     valueRangeMax: number;
@@ -89,11 +89,7 @@ interface ICommonUniforms {
     colorMapRangeMax: number;
     colorMapClampColor: number[];
     isClampColor: boolean;
-}
-interface IGeometryUniforms extends ICommonUniforms {
     coloringMode: TGrid3DColoringMode;
-}
-interface IPropertyUniforms extends ICommonUniforms {
     undefinedPropertyColor: [number, number, number];
     isColoringDiscrete: boolean;
     colorMapSize: number;
@@ -141,7 +137,7 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
     //eslint-disable-next-line
     _getModels(context: DeckGLLayerContext) {
         const geometricShading = isGeometricProperty(this.props.coloringMode);
-        const propertyUniforms = this.getPropertyUniforms();
+        const uniforms = this.getUniforms();
         const colormap = this.getColormapTexture(context);
         const mesh_model = new Model(context.device, {
             id: `${this.props.id}-mesh`,
@@ -161,9 +157,6 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
                 vertexCount: this.props.mesh.vertexCount,
             }),
             bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
-            // uniforms: {
-            //     ...propertyUniforms,
-            // },
             bindings: {
                 colormap,
             },
@@ -178,7 +171,7 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
         });
         mesh_model.shaderInputs.setProps({
             grid: {
-                ...propertyUniforms,
+                ...uniforms,
             },
         });
 
@@ -188,15 +181,12 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             fs: fsLineShader,
             geometry: new Geometry(this.props.meshLines),
             bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
-            // uniforms: {
-            //     ZIncreasingDownwards: this.props.ZIncreasingDownwards,
-            // },
-            modules: [project32, picking],
+            modules: [project32, picking, gridUniforms],
             isInstanced: false,
         });
         mesh_lines_model.shaderInputs.setProps({
             grid: {
-                ...propertyUniforms,
+                ...uniforms,
             },
         });
 
@@ -337,7 +327,7 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
         };
     }
 
-    private getPropertyUniforms(): IGeometryUniforms | IPropertyUniforms {
+    private getUniforms(): IUniforms {
         const valueRangeMin = this.props.propertyValueRange?.[0] ?? 0.0;
         const valueRangeMax = this.props.propertyValueRange?.[1] ?? 1.0;
 
@@ -399,32 +389,6 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             isColoringDiscrete: coloringHints.discreteData,
             colorMapSize: coloringHints.colormapSize,
         };
-
-        // if (isGeometricProperty(this.props.coloringMode)) {
-        //     return {
-        //         ZIncreasingDownwards: this.props.ZIncreasingDownwards,
-        //         valueRangeMin,
-        //         valueRangeMax,
-        //         colorMapRangeMin,
-        //         colorMapRangeMax,
-        //         colorMapClampColor: Array.from(colorMapClampColorUniform),
-        //         isClampColor,
-        //         coloringMode: this.props.coloringMode,
-        //     };
-        // }
-
-        // return {
-        //     ZIncreasingDownwards: this.props.ZIncreasingDownwards,
-        //     valueRangeMin,
-        //     valueRangeMax,
-        //     colorMapRangeMin,
-        //     colorMapRangeMax,
-        //     colorMapClampColor: Array.from(colorMapClampColorUniform),
-        //     isClampColor,
-        //     undefinedPropertyColor: undefinedPropertyColorUniform,
-        //     isColoringDiscrete: coloringHints.discreteData,
-        //     colorMapSize: coloringHints.colormapSize,
-        // };
     }
     private getColormapTexture(context: DeckGLLayerContext): Texture {
         const textureProps: TextureProps = {
@@ -495,7 +459,7 @@ uniform gridUniforms {
     float colorMapRangeMax;
     vec4 colorMapClampColor;
     bool isClampColor;
-    int coloringMode;
+    //int coloringMode;
     vec3 undefinedPropertyColor;
     bool isColoringDiscrete;
     float colorMapSize;
@@ -510,10 +474,10 @@ type GridUniformsType = {
     colorMapRangeMax: number;
     colorMapClampColor: [number, number, number, number];
     isClampColor: boolean;
-    coloringMode: TGrid3DColoringMode;  // noe lowp greier...
+    coloringMode: number; // XXX TGrid3DColoringMode;
     undefinedPropertyColor: [number, number, number];
     isColoringDiscrete: boolean;
-    colorMapSize: number;  // XXX float merkelig nok
+    colorMapSize: number;
 };
 
 const gridUniforms = {
@@ -528,7 +492,7 @@ const gridUniforms = {
         colorMapRangeMax: "f32",
         colorMapClampColor: "vec4<f32>",
         isClampColor: "u32",
-        coloringMode: "i32",
+        coloringMode: "i32", // XXX "i32",
         undefinedPropertyColor: "vec3<f32>",
         isColoringDiscrete: "u32",
         colorMapSize: "f32",

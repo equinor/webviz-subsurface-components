@@ -13,14 +13,6 @@ out vec4 fragColor;
 
 uniform sampler2D colormap;
 
-// uniform float valueRangeMin;
-// uniform float valueRangeMax;
-// uniform float colorMapRangeMin;
-// uniform float colorMapRangeMax;
-
-// uniform vec4 colorMapClampColor;
-// uniform bool isClampColor;
-
 vec4 getPropertyColor (float propertyValue) {
    vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
    float normalizedValue = (propertyValue - grid.colorMapRangeMin) / (grid.colorMapRangeMax - grid.colorMapRangeMin);

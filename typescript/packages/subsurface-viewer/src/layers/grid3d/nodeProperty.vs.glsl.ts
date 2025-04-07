@@ -13,8 +13,6 @@ out float property;
 flat out vec3 normal;
 flat out int vertexIndex;
 
-// uniform lowp int coloringMode;
-// uniform bool ZIncreasingDownwards;
 
 const vec3 pickingColor = vec3(1.0, 1.0, 0.0);
 

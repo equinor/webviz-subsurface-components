@@ -13,19 +13,6 @@ out vec4 fragColor;
 
 uniform sampler2D colormap;
 
-// uniform float valueRangeMin;
-// uniform float valueRangeMax;
-// uniform float colorMapRangeMin;
-// uniform float colorMapRangeMax;
-
-// uniform bool isColoringDiscrete;
-// uniform float colorMapSize;
-
-// uniform vec4 colorMapClampColor;
-// uniform bool isClampColor;
-// uniform vec3 undefinedPropertyColor;
-
-
 // Calculate color from propertyValue using discrete colormap.
 vec4 getDiscretePropertyColor (float propertyValue) {
    vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
