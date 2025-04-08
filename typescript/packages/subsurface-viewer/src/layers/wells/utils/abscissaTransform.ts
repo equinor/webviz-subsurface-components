@@ -19,9 +19,9 @@ function computeUnfoldedPath(worldCoordinates: Position[]): Position[] {
 }
 
 /** Projects well trajectories unfolded onto an XY plane.  */
-export function abscissaTransform(
-    featureCollection: FeatureCollection<GeometryCollection>
-) {
+export function abscissaTransform<
+    TFeatureCollection extends FeatureCollection<GeometryCollection>,
+>(featureCollection: TFeatureCollection): TFeatureCollection {
     const featureCollectionCopy = cloneDeep(featureCollection);
     for (const feature of featureCollectionCopy.features) {
         const geometryCollection = feature.geometry;

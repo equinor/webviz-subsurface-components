@@ -1,3 +1,31 @@
+## [1.10.5](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.10.4...subsurface-viewer@1.10.5) (2025-04-02)
+
+
+### Bug Fixes
+
+* [NGRM] Line layer picking is inconsistent with Map/Grid3D ([#2501](https://github.com/equinor/webviz-subsurface-components/issues/2501)) ([92b1855](https://github.com/equinor/webviz-subsurface-components/commit/92b185528eb4d643ed4ba2527271066d1cc5329b))
+
+## [1.10.4](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.10.3...subsurface-viewer@1.10.4) (2025-04-02)
+
+
+### Bug Fixes
+
+* Subsurface viewer - Assorted fixes to wells layer and multi pick hook ([#2491](https://github.com/equinor/webviz-subsurface-components/issues/2491)) ([b4673a1](https://github.com/equinor/webviz-subsurface-components/commit/b4673a13680d0bfefdb151c337cab7b7f1148b5b))
+
+## [1.10.3](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.10.2...subsurface-viewer@1.10.3) (2025-04-02)
+
+
+### Bug Fixes
+
+* prevent flipping well label z coordinates ([#2499](https://github.com/equinor/webviz-subsurface-components/issues/2499)) ([a1d93e4](https://github.com/equinor/webviz-subsurface-components/commit/a1d93e4d76cc6b66822950c1252505bf303738c2))
+
+## [1.10.2](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.10.1...subsurface-viewer@1.10.2) (2025-04-01)
+
+
+### Bug Fixes
+
+* Well label interpolation on sparse trajectories ([#2495](https://github.com/equinor/webviz-subsurface-components/issues/2495)) ([c79e68f](https://github.com/equinor/webviz-subsurface-components/commit/c79e68fb6f3f37279e9efe6091ab55b7dc646ceb)), closes [#2498](https://github.com/equinor/webviz-subsurface-components/issues/2498)
+
 ## [1.10.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.10.0...subsurface-viewer@1.10.1) (2025-03-28)
 
 
