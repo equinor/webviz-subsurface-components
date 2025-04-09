@@ -679,7 +679,6 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
             id: `${this.props.id}-lines`,
             vs: lineVertexShader,
             fs: lineFragmentShader,
-            uniforms: { uColor: lineColor, uClipZ: -1 },
             geometry: new Geometry({
                 topology: "line-list",
                 attributes: {
@@ -688,8 +687,14 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                 vertexCount: tick_and_axes_lines.length / 3,
             }),
 
-            modules: [project32],
+            modules: [project32, linesUniforms],
             isInstanced: false,
+        });
+        lineModel.shaderInputs.setProps({
+            lines: {
+                uColor: lineColor,
+                uClipZ: -1,
+            },
         });
 
         //-- Background model --
@@ -707,7 +712,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
             id: `${this.props.id}-background`,
             vs: lineVertexShader,
             fs: lineFragmentShader,
-            uniforms: { uColor: bColor, uClipZ: -0.9 },
+            //uniforms: { uColor: bColor, uClipZ: -0.9 },
             geometry: new Geometry({
                 topology: "triangle-list",
                 attributes: {
@@ -716,8 +721,14 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                 vertexCount: background_lines.length / 3,
             }),
 
-            modules: [project32],
+            modules: [project32, linesUniforms],
             isInstanced: false,
+        });
+        backgroundModel.shaderInputs.setProps({
+            lines: {
+                uColor: bColor,
+                uClipZ: -0.9,
+            },
         });
 
         //-- Labels model--
@@ -834,10 +845,10 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                 id: `${this.props.id}-${label}`,
                 vs: labelVertexShader,
                 fs: labelFragmentShader,
-                uniforms: {
-                    uAxisColor: lineColor,
-                    uBackGroundColor: bColor,
-                },
+                // uniforms: {
+                //     uAxisColor: lineColor,
+                //     uBackGroundColor: bColor,
+                // },
                 bindings: {
                     // @ts-ignore
                     fontTexture,
@@ -854,8 +865,14 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                     vertexCount: positions.length / 3,
                 }),
                 bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
-                modules: [project32],
+                modules: [project32, axesUniforms],
                 isInstanced: false,
+            });
+            model.shaderInputs.setProps({
+                axes: {
+                    uAxisColor: lineColor,
+                    uBackGroundColor: bColor,
+                },
             });
 
             labelModels.push(model);
@@ -958,48 +975,51 @@ function GetPixelsScale(labelFontSizePt: number): number {
     return px;
 }
 
-const axesLinesUniformsBlock = /*glsl*/ `\
-uniform axesLinesUniforms {
-   vec4 color;
-   float clipZ;
-} axesLines;
+const linesUniformsBlock = /*glsl*/ `\
+uniform linesUniforms {
+   vec4 uColor;
+   float uClipZ;
+} lines;
 `;
 
-type AxesLinesUniformsType = {
-    color: [number, number, number, number];
-    clipZ: number;
+type LinesUniformsType = {
+    uColor: [number, number, number, number];
+    uClipZ: number;
 };
 
 // NOTE: this must exactly the same name than in the uniform block
-const axesLinesUniforms = {
-    name: "axesLines",
-    vs: axesLinesUniformsBlock,
-    fs: axesLinesUniformsBlock,
+const linesUniforms = {
+    name: "lines",
+    vs: linesUniformsBlock,
+    fs: linesUniformsBlock,
     uniformTypes: {
-        color: "vec4<f32>",
-        clipZ: "f32",
+        uColor: "vec4<f32>",
+        uClipZ: "f32",
     },
-} as const satisfies ShaderModule<LayerProps, AxesLinesUniformsType>;
+} as const satisfies ShaderModule<LayerProps, LinesUniformsType>;
 
-const axesLabelsUniformsBlock = /*glsl*/ `\
-uniform axesLabelsUniforms {
-   vec4 color;
-   float clipZ;
-} axesLabels;
+
+
+const axesUniformsBlock = /*glsl*/ `\
+uniform axesUniforms {
+   vec4 uAxisColor;
+   vec4 uBackGroundColor;
+} axes;
 `;
 
-type AxesLabelsUniformsType = {
-    color: [number, number, number, number];
-    clipZ: number;
+type AxesUniformsType = {
+    uAxisColor: [number, number, number, number],
+    uBackGroundColor: [number, number, number, number],
 };
 
 // NOTE: this must exactly the same name than in the uniform block
-const axesLabelsUniforms = {
-    name: "axesLabels",
-    vs: axesLinesUniformsBlock,
-    fs: axesLinesUniformsBlock,
+const axesUniforms = {
+    name: "axes",
+    vs: axesUniformsBlock,
+    fs: axesUniformsBlock,
     uniformTypes: {
-        color: "vec4<f32>",
-        clipZ: "f32",
+        uAxisColor: "vec4<f32>",
+        uBackGroundColor: "vec4<f32>",
     },
-} as const satisfies ShaderModule<LayerProps, AxesLinesUniformsType>;
+} as const satisfies ShaderModule<LayerProps, AxesUniformsType>;
+
