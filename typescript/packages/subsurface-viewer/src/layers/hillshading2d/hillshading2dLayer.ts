@@ -146,7 +146,7 @@ export default class Hillshading2DLayer extends BitmapLayer<Hillshading2DProps> 
         // use object.assign to make sure we don't overwrite existing fields like `vs`, `modules`...
         return Object.assign({}, parentShaders, {
             fs: fsHillshading,
-            modules: [...parentShaders.modules, project32, mapUniforms],
+            modules: [...parentShaders.modules, project32, map2DUniforms],
         });
     }
 
@@ -181,8 +181,7 @@ Hillshading2DLayer.layerName = "Hillshading2DLayer";
 Hillshading2DLayer.defaultProps = defaultProps;
 
 // local shader module for the uniforms
-const mapUniformsBlock = /*glsl*/ `\
-
+const map2DUniformsBlock = /*glsl*/ `\
 uniform mapUniforms {
     float valueRangeMin;
     float valueRangeMax;
@@ -220,7 +219,7 @@ float decode_rgb2float(vec3 rgb) {
 }
 `;
 
-type MapUniformsType = {
+type Map2DUniformsType = {
     valueRangeMin: number;
     valueRangeMax: number;
     colorMapRangeMin: number;
@@ -239,10 +238,10 @@ type MapUniformsType = {
 };
 
 // NOTE: this must exactly the same name as in the uniform block
-const mapUniforms = {
+const map2DUniforms = {
     name: "map",
-    vs: mapUniformsBlock,
-    fs: mapUniformsBlock,
+    vs: map2DUniformsBlock,
+    fs: map2DUniformsBlock,
     uniformTypes: {
         valueRangeMin: "f32",
         valueRangeMax: "f32",
@@ -260,4 +259,4 @@ const mapUniforms = {
         offset: "f32",
         step: "f32",
     },
-} as const satisfies ShaderModule<LayerProps, MapUniformsType>;
+} as const satisfies ShaderModule<LayerProps, Map2DUniformsType>;
