@@ -459,7 +459,7 @@ uniform gridUniforms {
     float colorMapRangeMax;
     vec4 colorMapClampColor;
     bool isClampColor;
-    //int coloringMode;
+    float coloringMode;
     vec3 undefinedPropertyColor;
     bool isColoringDiscrete;
     float colorMapSize;
@@ -474,7 +474,7 @@ type GridUniformsType = {
     colorMapRangeMax: number;
     colorMapClampColor: [number, number, number, number];
     isClampColor: boolean;
-    coloringMode: number; // XXX TGrid3DColoringMode;
+    coloringMode: TGrid3DColoringMode;
     undefinedPropertyColor: [number, number, number];
     isColoringDiscrete: boolean;
     colorMapSize: number;
@@ -492,7 +492,7 @@ const gridUniforms = {
         colorMapRangeMax: "f32",
         colorMapClampColor: "vec4<f32>",
         isClampColor: "u32",
-        coloringMode: "i32", // XXX "i32",
+        coloringMode: "f32",
         undefinedPropertyColor: "vec3<f32>",
         isColoringDiscrete: "u32",
         colorMapSize: "f32",
