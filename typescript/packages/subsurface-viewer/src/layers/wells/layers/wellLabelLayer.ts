@@ -1,14 +1,25 @@
-import { type DefaultProps, type UpdateParameters } from "@deck.gl/core";
+import { createIterable, type DefaultProps, type UpdateParameters } from "@deck.gl/core";
 import type { TextLayerProps } from "@deck.gl/layers";
 import { TextLayer } from "@deck.gl/layers";
 import type { Feature, Position } from "geojson";
-import _ from "lodash";
+import _, { bind } from "lodash";
 import { Vector2, Vector3 } from "math.gl";
 import type { Position3D } from "../../utils/layerTools";
-import { getTrajectory } from "../utils/trajectory";
 import type { WellFeature } from "../types";
+import { getTrajectory } from "../utils/trajectory";
 
 type WellLabelLayerData = WellFeature;
+
+/*
+const test = (d: WellFeature, other: any) => {
+    const text = d.properties.name + " 123456789";
+    console.log("test() called");
+    //console.log("text ", text);
+    //console.log("other ", other);
+    return text;
+};
+*/
+
 /**
  * Enum representing the orientation of well labels.
  */
@@ -48,19 +59,30 @@ export type WellLabelLayerProps = TextLayerProps<WellLabelLayerData> & {
      * If true, then z values are depth. Otherwise, z values are elevation.
      */
     zIncreasingDownwards?: boolean;
+
+    /**
+     * Merge well names that are close to each other.
+     */
+    mergeLabels?: boolean;
 };
 
 const DEFAULT_PROPS: DefaultProps<WellLabelLayerProps> = {
     id: "well-label-layer",
     autoPosition: false,
     getPositionAlongPath: 0,
+    getText: (d: WellFeature) => d.properties.name,
+    //getText: test,
+    /*
     getText: (d: WellFeature) => {
-        const name = d.properties.name;
-        return name;
+        console.log("getText() called");
+        return d.properties.name;
     },
+    */
     getAlignmentBaseline: "bottom",
     getSize: 10,
     getColor: [0, 0, 0, 255],
+    getBackgroundColor: { type: "accessor", value: [100, 255, 255, 255] },
+    //getBackgroundColor: (d: WellFeature) => [100, 255, 255, 255],
     zIncreasingDownwards: true,
     orientation: LabelOrientation.HORIZONTAL,
     backgroundPadding: [5, 1, 5, 1],
@@ -74,6 +96,9 @@ const DEFAULT_PROPS: DefaultProps<WellLabelLayerProps> = {
             type: "spring",
         },
     },
+
+    mergeLabels: true,
+    maxWidth: 100,
 };
 
 const getCumulativeDistance = (well_xyz: Position[]): number[] => {
@@ -107,6 +132,13 @@ export class WellLabelLayer extends TextLayer<
     WellLabelLayerData,
     WellLabelLayerProps
 > {
+    state!: {
+        /**
+         * Collection of well head clusters.
+         */
+        headClusters: Map<Position3D, string[]>;
+    } & TextLayer<WellLabelLayerData, WellLabelLayerProps>["state"];
+
     protected override getSubLayerProps(sublayerProps?: {
         id?: string;
         updateTriggers?: Record<string, unknown[]>;
@@ -116,6 +148,8 @@ export class WellLabelLayer extends TextLayer<
             sublayerProps?.updateTriggers?.["getAngle"] ?? [];
         const positionUpdateTriggers =
             sublayerProps?.updateTriggers?.["getPosition"] ?? [];
+        const textUpdateTriggers =
+            sublayerProps?.updateTriggers?.["getText"] ?? [];
 
         const newProps = {
             ...sublayerProps,
@@ -126,6 +160,12 @@ export class WellLabelLayer extends TextLayer<
                 );
             },
             getAngle: (d: WellFeature) => this.getLabelAngle(d),
+            getText: (d: WellFeature) => {
+                console.log("this.getText(d) called");
+                return this.getText(d);
+            },
+            getColor: (d: WellFeature) => this.getColor(d),
+            getBackgroundColor: (d: WellFeature) => this.getBackgroundColor(d),
             updateTriggers: {
                 ...sublayerProps?.updateTriggers,
                 getAngle: [
@@ -139,10 +179,20 @@ export class WellLabelLayer extends TextLayer<
                     this.context.viewport.cameraPosition,
                     this.props.getPositionAlongPath,
                 ],
+                getText: [
+                    ...textUpdateTriggers,
+                    this.state.headClusters,
+                    this.props.mergeLabels,
+                    this.state.getText,
+                ],
+                //getBackgroundColor: [this.state.headClusters],
+                //all: [...textUpdateTriggers, this.state.getText],
             },
         };
 
-        return super.getSubLayerProps(newProps);
+        const tmpProps = super.getSubLayerProps(newProps);
+
+        return tmpProps;
     }
 
     public override shouldUpdateState(params: UpdateParameters<this>): boolean {
@@ -153,7 +203,113 @@ export class WellLabelLayer extends TextLayer<
         ) {
             return true;
         }
+
+        if (params.changeFlags.dataChanged) {
+            return true;
+        }
+
         return super.shouldUpdateState(params);
+    }
+
+    protected updateInstanceState() {
+        const { data } = this.props;
+        let numInstances = 0;
+        const startIndices = [0];
+
+        const { iterable } = createIterable(data);
+
+        for (const object of iterable) {
+            const text = Array.from(this.getText(object));
+            numInstances += text.length;
+            startIndices.push(numInstances);
+        }
+
+        this.setState({
+            numInstances,
+            startIndices,
+        });
+    }
+
+    public override updateState(params: UpdateParameters<this>): void {
+        super.updateState(params);
+        if (params.changeFlags.dataChanged) {
+            const headClusters = this.mergeWellNames(
+                this.props.data as WellFeature[]
+            );
+
+            this.setState({
+                //...this.state,
+                headClusters,
+                getText: bind(this.getText, this),
+            });
+
+            this.updateInstanceState();
+        }
+    }
+
+    protected getText(d: WellFeature): string {
+        const wellName = d.properties?.["name"] ?? "";
+
+        if (!this.props.mergeLabels) {
+            return wellName;
+        }
+
+        const trajectory = getTrajectory(d, undefined);
+        if (!trajectory) {
+            return wellName;
+        }
+
+        // Get the well head position
+        const wellHeadPosition = trajectory[0] as Position3D;
+
+        const wellHeadCluster = this.state.headClusters.get(wellHeadPosition);
+
+        if (wellHeadCluster && wellHeadCluster[0] === wellName) {
+            return wellName + " ...";
+        }
+
+        return wellName;
+    }
+
+    protected getColor(d: WellFeature): number[] {
+        const wellName = d.properties?.["name"] ?? "";
+        const wellHeadPosition = getTrajectory(d, undefined)?.[0] as Position3D;
+        const wellHeadCluster = this.state.headClusters.get(wellHeadPosition);
+        if (wellHeadCluster && wellHeadCluster[0] === wellName) {
+            return [0, 0, 0, 255];
+        }
+        return [255, 0, 0, 255];
+    }
+
+    protected getBackgroundColor(d: WellFeature): number[] {
+        const wellName = d.properties?.["name"] ?? "";
+        const wellHeadPosition = getTrajectory(d, undefined)?.[0] as Position3D;
+        const wellHeadCluster = this.state.headClusters.get(wellHeadPosition);
+        if (wellHeadCluster && wellHeadCluster[0] === wellName) {
+            return [0, 0, 0, 255];
+        }
+        return [255, 0, 0, 255];
+    }
+
+    protected mergeWellNames(wells: WellFeature[]): Map<Position3D, string[]> {
+        const wellNames = new Map<Position3D, string[]>();
+        for (const well of wells) {
+            const trajectory = getTrajectory(well, undefined);
+            if (!trajectory) {
+                continue;
+            }
+            const head = trajectory[0] as Position3D;
+            const name = well.properties?.["name"] ?? "";
+            if (wellNames.has(head)) {
+                const names = wellNames.get(head);
+                if (names) {
+                    names.push(name);
+                }
+            } else {
+                wellNames.set(head, [name]);
+            }
+        }
+        return wellNames;
     }
 
     protected getLabelAngle(well: WellFeature) {
