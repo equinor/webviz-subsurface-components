@@ -1,6 +1,6 @@
 const fragmentShader = `\
 #version 300 es
-#define SHADER_NAME graph-layer-fragment-shader
+#define SHADER_NAME grid3d-cell-lines-fragment-shader
 
 precision highp float;
 

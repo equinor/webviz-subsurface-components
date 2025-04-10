@@ -1,10 +1,15 @@
-import type { Layer } from "@deck.gl/core";
+import {
+    AmbientLight,
+    DirectionalLight,
+    PointLight,
+    type Layer,
+} from "@deck.gl/core";
 import { all, create } from "mathjs";
 import React from "react";
 
 import type { Meta, StoryObj } from "@storybook/react";
 
-import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
+import type { SubsurfaceViewerProps, LightsType } from "../../SubsurfaceViewer";
 import SubsurfaceViewer, { TGrid3DColoringMode } from "../../SubsurfaceViewer";
 import Grid3DLayer from "../../layers/grid3d/grid3dLayer";
 
@@ -97,12 +102,36 @@ const material = {
     specularColor: [255, 255, 255],
 };
 
+const ambientLight = new AmbientLight({
+    color: [128, 128, 0],
+    intensity: 0.1,
+});
+
+const pointLight = new PointLight({
+    color: [255, 255, 255],
+    intensity: 1.0,
+    position: [20000, 20000, 20000],
+});
+
+const directionalLights = new DirectionalLight({
+    color: [255, 255, 255],
+    intensity: 1.0,
+    direction: [0, 0, -1],
+});
+
+const lights: LightsType = {
+    ambientLight,
+    directionalLights: [directionalLights],
+    pointLights: [pointLight],
+};
+
 export const MapMaterial: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "material",
         layers: [{ ...hugin25mKhNetmapMapLayerPng, material }],
         bounds: hugin2DBounds,
         views: default3DViews,
+        lights,
     },
     parameters: {
         docs: {

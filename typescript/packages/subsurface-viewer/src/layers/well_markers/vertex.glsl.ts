@@ -11,22 +11,18 @@ in vec4 instanceColors;
 in vec4 instanceOutlineColors;
 in vec3 instancePickingColors;
 
-uniform int sizeUnits;
-uniform bool ZIncreasingDownwards;
-uniform bool useOutlineColor;
-
 out vec4 color;
 
 void main(void) {
    vec3 position = instancePositions;
-   position.z *= (ZIncreasingDownwards? -1.0 : 1.0);
+   position.z *= (wellMarkers.ZIncreasingDownwards? -1.0 : 1.0);
 
    geometry.worldPosition = position;
    geometry.pickingColor  = instancePickingColors;
 
-   color = useOutlineColor ? instanceOutlineColors : instanceColors;
+   color = wellMarkers.useOutlineColor ? instanceOutlineColors : instanceColors;
 
-   float sizeInPixels = project_size_to_pixel(instanceSizes, sizeUnits);
+   float sizeInPixels = project_size_to_pixel(instanceSizes, wellMarkers.sizeUnits);
    float projectedSize = project_pixel_size(sizeInPixels);
 
    float sinA = sin (PI / 180.0 * instanceAzimuths);

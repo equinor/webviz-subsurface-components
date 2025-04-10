@@ -1,5 +1,5 @@
 const fragmentShader = `#version 300 es
-#define SHADER_NAME graph-layer-fragment-shader
+#define SHADER_NAME axes-fragment-shader
 
 precision highp float;
 

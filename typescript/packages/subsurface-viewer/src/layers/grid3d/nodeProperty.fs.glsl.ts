@@ -13,21 +13,13 @@ out vec4 fragColor;
 
 uniform sampler2D colormap;
 
-uniform float valueRangeMin;
-uniform float valueRangeMax;
-uniform float colorMapRangeMin;
-uniform float colorMapRangeMax;
-
-uniform vec4 colorMapClampColor;
-uniform bool isClampColor;
-
 vec4 getPropertyColor (float propertyValue) {
    vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
-   float normalizedValue = (propertyValue - colorMapRangeMin) / (colorMapRangeMax - colorMapRangeMin);
+   float normalizedValue = (propertyValue - grid.colorMapRangeMin) / (grid.colorMapRangeMax - grid.colorMapRangeMin);
    if (normalizedValue < 0.0 || normalizedValue > 1.0) {
       // Out of range. Use clampcolor.
-      if (isClampColor) {
-         color = colorMapClampColor;
+      if (grid.isClampColor) {
+         color = grid.colorMapClampColor;
          if( color[3] == 0.0 ) {
             discard;
          }
@@ -52,12 +44,12 @@ void main(void) {
    }
        
    // This may happen due to GPU interpolation precision causing color artifacts.
-   float propertyValue = clamp(property, valueRangeMin, valueRangeMax);
+   float propertyValue = clamp(property, grid.valueRangeMin, grid.valueRangeMax);
 
    vec4 color = getPropertyColor(propertyValue);
 
    // Use two sided phong lighting. This has no effect if "material" property is not set.
-   vec3 lightColor = getPhongLightColor(color.rgb, cameraPosition, position_commonspace.xyz, normal);
+   vec3 lightColor = getPhongLightColorLocal(color.rgb, cameraPosition, position_commonspace.xyz, normal);
    fragColor = vec4(lightColor, 1.0);
    DECKGL_FILTER_COLOR(fragColor, geometry);
 }
