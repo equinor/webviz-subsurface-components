@@ -1,9 +1,11 @@
 import { createIterable, type DefaultProps, type UpdateParameters } from "@deck.gl/core";
 import type { TextLayerProps } from "@deck.gl/layers";
 import { TextLayer } from "@deck.gl/layers";
+import { label } from "@equinor/eds-icons";
 import type { Feature, Position } from "geojson";
 import _, { bind } from "lodash";
 import { Vector2, Vector3 } from "math.gl";
+import createKdTree from "static-kdtree";
 import type { Position3D } from "../../utils/layerTools";
 import type { WellFeature } from "../types";
 import { getTrajectory } from "../utils/trajectory";
@@ -64,6 +66,8 @@ export type WellLabelLayerProps = TextLayerProps<WellLabelLayerData> & {
      * Merge well names that are close to each other.
      */
     mergeLabels?: boolean;
+
+    mergeRadius?: number;
 };
 
 const DEFAULT_PROPS: DefaultProps<WellLabelLayerProps> = {
@@ -71,18 +75,10 @@ const DEFAULT_PROPS: DefaultProps<WellLabelLayerProps> = {
     autoPosition: false,
     getPositionAlongPath: 0,
     getText: (d: WellFeature) => d.properties.name,
-    //getText: test,
-    /*
-    getText: (d: WellFeature) => {
-        console.log("getText() called");
-        return d.properties.name;
-    },
-    */
     getAlignmentBaseline: "bottom",
     getSize: 10,
     getColor: [0, 0, 0, 255],
-    getBackgroundColor: { type: "accessor", value: [100, 255, 255, 255] },
-    //getBackgroundColor: (d: WellFeature) => [100, 255, 255, 255],
+    //getBackgroundColor: { type: "accessor", value: [100, 255, 255, 255] },
     zIncreasingDownwards: true,
     orientation: LabelOrientation.HORIZONTAL,
     backgroundPadding: [5, 1, 5, 1],
@@ -99,6 +95,7 @@ const DEFAULT_PROPS: DefaultProps<WellLabelLayerProps> = {
 
     mergeLabels: true,
     maxWidth: 100,
+    mergeRadius: 1,
 };
 
 const getCumulativeDistance = (well_xyz: Position[]): number[] => {
@@ -137,6 +134,8 @@ export class WellLabelLayer extends TextLayer<
          * Collection of well head clusters.
          */
         headClusters: Map<Position3D, string[]>;
+        labelPositions: Map<string, Position3D>;
+        labelClusters: any;
     } & TextLayer<WellLabelLayerData, WellLabelLayerProps>["state"];
 
     protected override getSubLayerProps(sublayerProps?: {
@@ -165,7 +164,9 @@ export class WellLabelLayer extends TextLayer<
                 return this.getText(d);
             },
             getColor: (d: WellFeature) => this.getColor(d),
-            getBackgroundColor: (d: WellFeature) => this.getBackgroundColor(d),
+            //getBackgroundColor: (d: WellFeature) => this.getBackgroundColor(d),
+            getFillColor: (d: WellFeature) => this.getBackgroundColor(d),
+            getLineColor: (d: WellFeature) => this.getColor(d),
             updateTriggers: {
                 ...sublayerProps?.updateTriggers,
                 getAngle: [
@@ -230,9 +231,30 @@ export class WellLabelLayer extends TextLayer<
         });
     }
 
+    protected updateLabelPositions() {
+        const { data } = this.props;
+        const labelPositions = new Map<string, Position3D>();
+        const { iterable } = createIterable(data);
+        for (const object of iterable) {
+            const wellName = object.properties?.["name"] ?? "";
+            const position = this.getAnnotationPosition(
+                object,
+                this.props.getPositionAlongPath
+            );
+            labelPositions.set(wellName, position as Position3D);
+        }
+        this.setState({
+            labelPositions,
+        });
+    }
+
     public override updateState(params: UpdateParameters<this>): void {
         super.updateState(params);
         if (params.changeFlags.dataChanged) {
+            this.updateLabelPositions();
+
+            this.updateLabelClusters();
+
             const headClusters = this.mergeWellNames(
                 this.props.data as WellFeature[]
             );
@@ -271,14 +293,14 @@ export class WellLabelLayer extends TextLayer<
         return wellName;
     }
 
-    protected getColor(d: WellFeature): number[] {
-        const wellName = d.properties?.["name"] ?? "";
-        const wellHeadPosition = getTrajectory(d, undefined)?.[0] as Position3D;
+    protected getColor(well: WellFeature): number[] {
+        const wellName = well.properties?.["name"] ?? "";
+        const wellHeadPosition = this.state.labelPositions.get(wellName);
         const wellHeadCluster = this.state.headClusters.get(wellHeadPosition);
         if (wellHeadCluster && wellHeadCluster[0] === wellName) {
             return [0, 0, 0, 255];
         }
-        return [255, 0, 0, 255];
+        return [0, 0, 0, 0];
     }
 
     protected getBackgroundColor(d: WellFeature): number[] {
@@ -286,19 +308,28 @@ export class WellLabelLayer extends TextLayer<
         const wellHeadPosition = getTrajectory(d, undefined)?.[0] as Position3D;
         const wellHeadCluster = this.state.headClusters.get(wellHeadPosition);
         if (wellHeadCluster && wellHeadCluster[0] === wellName) {
-            return [0, 0, 0, 255];
+            return [255, 255, 255, 255];
         }
-        return [255, 0, 0, 255];
+        return [0, 0, 0, 0];
+    }
+
+    protected updateLabelClusters() {
+        const positions: Position3D[] = [...this.state.labelPositions.values()];
+
+        const labelClusters = createKdTree<3>(positions);
+        this.setState({
+            labelClusters,
+        });
     }
 
     protected mergeWellNames(wells: WellFeature[]): Map<Position3D, string[]> {
         const wellNames = new Map<Position3D, string[]>();
         for (const well of wells) {
-            const trajectory = getTrajectory(well, undefined);
-            if (!trajectory) {
-                continue;
-            }
-            const head = trajectory[0] as Position3D;
+            const wellName = well.properties?.["name"] ?? "";
+            const labelPosition = this.state.labelPositions.get(wellName);
+
+            const head = labelPosition;
+
             const name = well.properties?.["name"] ?? "";
             if (wellNames.has(head)) {
                 const names = wellNames.get(head);
@@ -309,6 +340,7 @@ export class WellLabelLayer extends TextLayer<
                 wellNames.set(head, [name]);
             }
         }
+        console.log(wellNames);
         return wellNames;
     }
 

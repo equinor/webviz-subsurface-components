@@ -58,6 +58,7 @@
         "math.gl": "^4.0.1",
         "mathjs": "^13.2.0",
         "merge-refs": "^1.2.2",
+        "static-kdtree": "^1.0.2",
         "workerpool": "^9.2.0"
     },
     "peerDependencies": {
@@ -78,6 +79,7 @@
     },
     "devDependencies": {
         "@reduxjs/toolkit": "^2.3.0",
+        "@types/static-kdtree": "^1.0.3",
         "react-redux": "^9.1.2"
     },
     "volta": {
