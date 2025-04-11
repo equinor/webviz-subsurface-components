@@ -73,8 +73,6 @@ const DEFAULT_PROPS: DefaultProps<WellLabelLayerProps> = {
             type: "spring",
         },
     },
-
-    //maxWidth: 100,
 };
 
 const getCumulativeDistance = (well_xyz: Position[]): number[] => {
@@ -188,9 +186,6 @@ export class WellLabelLayer extends MergedTextLayer<
         // Return a pos "annotation_position" percent down the trajectory
         const pos = this.getVectorAlongTrajectory(fraction, well_data)[1];
 
-        const label = well_data.properties?.["name"] ?? "";
-        const labelSize = label.length;
-
         const view_from = new Vector3(this.context.viewport.cameraPosition);
         const dir = new Vector3([
             view_from[0] - pos[0],
@@ -199,31 +194,7 @@ export class WellLabelLayer extends MergedTextLayer<
         ]);
         dir.normalize();
 
-        let meanCharVal = 0;
-        for (let i = 0; i < labelSize; i++) {
-            const a = label.charCodeAt(i) - 32; // 32: ascii value for first relevant symbol.
-            meanCharVal += a;
-        }
-        meanCharVal = meanCharVal / labelSize; // unique text id for each label
-
-        const x = Math.floor(pos[0]) % 9;
-        const y = Math.floor(pos[1]) % 9;
-        const pId = x + y; // unique position id for each label
-
-        // Perturb position towards camera to avoid z-buffer fighting between labels.
-        // Distance dependent on unique properties of label so that no two labels
-        // are offset equally.
-        const offset = labelSize + meanCharVal + pId;
-
-        // Increase perturbation for labels at the top of the trajectory, where the
-        // cluttering is likely most prominent.
-        const zOffset = fraction > 0 ? offset : offset * 5;
-
-        return [
-            pos[0] + dir[0] * offset,
-            pos[1] + dir[1] * offset,
-            pos[2] + dir[2] * zOffset,
-        ];
+        return [pos[0] + dir[0], pos[1] + dir[1], pos[2] + dir[2]];
     }
 
     /**

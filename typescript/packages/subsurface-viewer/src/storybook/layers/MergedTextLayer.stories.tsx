@@ -1,8 +1,10 @@
 import React from "react";
-import { Meta, Story, StoryObj } from "@storybook/react";
-import { MergedTextLayer, MergedTextLayerProps } from "../../layers/wells/layers/mergedTextLayer";
+import type { Meta, StoryObj } from "@storybook/react";
+import type { MergedTextLayerProps } from "../../layers/wells/layers/mergedTextLayer";
+import { MergedTextLayer } from "../../layers/wells/layers/mergedTextLayer";
 import { AxesLayer } from "../../layers";
-import SubsurfaceViewer, { ViewsType } from "../../SubsurfaceViewer";
+import type { ViewsType } from "../../SubsurfaceViewer";
+import SubsurfaceViewer from "../../SubsurfaceViewer";
 
 const stories: Meta = {
     title: "SubsurfaceViewer / MergedTextLayer",
