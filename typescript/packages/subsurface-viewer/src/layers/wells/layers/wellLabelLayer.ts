@@ -95,9 +95,9 @@ const getCumulativeDistance = (well_xyz: Position[]): number[] => {
 };
 
 /**
- * The `WellLabelLayer` class extends the `TextLayer` to provide functionality for rendering well labels
- * in a subsurface viewer. It includes methods for calculating label positions and angles based on well
- * trajectory data and the current viewport.
+ * The `WellLabelLayer` class extends the `MergedTextLayer` to provide functionality for rendering well
+ * labels in a subsurface viewer. It includes methods for calculating label positions and angles based
+ * on well trajectory data and the current viewport.
  *
  * @template WellLabelLayerData - The data type for the well label layer.
  * @template WellLabelLayerProps - The properties type for the well label layer.

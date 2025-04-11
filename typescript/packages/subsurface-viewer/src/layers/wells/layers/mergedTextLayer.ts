@@ -31,6 +31,10 @@ const DEFAULT_PROPS: DefaultProps<MergedTextLayerProps> = {
     mergeLabels: true,
 };
 
+/**
+ * MergedTextLayer is a subclass of TextLayer that merges text labels
+ * that are near each other.
+ */
 export class MergedTextLayer<
     DataT,
     PropsT extends MergedTextLayerProps<DataT>,
@@ -46,9 +50,6 @@ export class MergedTextLayer<
 
     public override shouldUpdateState(params: UpdateParameters<this>): boolean {
         if (params.changeFlags.propsOrDataChanged) {
-            return true;
-        }
-        if (params.changeFlags.updateTriggersChanged) {
             return true;
         }
         return super.shouldUpdateState(params);
@@ -79,7 +80,7 @@ export class MergedTextLayer<
             ...sublayerProps,
             getColor: _.bind(this.getColor, this),
             getFillColor: _.bind(this.getBackgroundColor, this),
-            getLineColor: _.bind(this.getColor, this),
+            getLineColor: _.bind(this.getBorderColor, this),
             updateTriggers: {
                 ...sublayerProps?.updateTriggers,
                 all: [this.props.mergeRadius, this.props.mergeLabels],
@@ -92,7 +93,10 @@ export class MergedTextLayer<
     protected updateLabelPositions() {
         const { data, getText } = this.props;
 
-        const { getPosition } = this.getSubLayerProps();
+        let { getPosition } = this.getSubLayerProps({ ...this.props });
+        if (_.isUndefined(getPosition)) {
+            getPosition = this.props.getPosition;
+        }
 
         const labelPositions = new Map<string, Position>();
         const positionToText = new Map<Position, string[]>();
@@ -123,6 +127,10 @@ export class MergedTextLayer<
         });
     }
 
+    /**
+     * `TextLayer` ignores `getText` from derived layers, so we need
+     * to override the state here
+     */
     protected updateInstanceState() {
         const { data } = this.props;
         let numInstances = 0;
@@ -208,24 +216,31 @@ export class MergedTextLayer<
             return text;
         }
 
-        if (text === cluster[0] && cluster.length > 1) {
-            return text + " ...";
+        if (text === cluster[0]) {
+            // Elide the text if there are multiple labels in the cluster
+            if (cluster.length > 1) {
+                return text + " ...";
+            }
+
+            // If this is the only label in the cluster, return the text
+            return text;
         }
 
-        return text;
+        // Hide the text if it is not the first label in the cluster
+        return "";
     }
 
-    protected getColor(
+    protected getBorderColor(
         object: DataT,
         objectInfo: AccessorContext<DataT>
     ): Color {
-        const { getText, getColor, mergeLabels } = this.props;
+        const { getText, getBorderColor, mergeLabels } = this.props;
         const text = getText(object, objectInfo);
 
         if (!mergeLabels) {
-            return typeof getColor === "function"
-                ? getColor(object, objectInfo)
-                : getColor;
+            return typeof getBorderColor === "function"
+                ? getBorderColor(object, objectInfo)
+                : getBorderColor;
         }
 
         const position = this.state.labelPositions.get(text);
@@ -240,11 +255,47 @@ export class MergedTextLayer<
         }
 
         if (cluster[0] === text) {
-            return typeof getColor === "function"
-                ? getColor(object, objectInfo)
-                : getColor;
+            return typeof getBorderColor === "function"
+                ? getBorderColor(object, objectInfo)
+                : getBorderColor;
         }
 
+        return [0, 0, 0, 0];
+    }
+
+    protected getColor(
+        object: DataT,
+        objectInfo: AccessorContext<DataT>
+    ): Color {
+        const { getText, getColor, mergeLabels } = this.props;
+        const text = getText(object, objectInfo);
+
+        const color =
+            typeof getColor === "function"
+                ? getColor(object, objectInfo)
+                : getColor;
+
+        if (!mergeLabels) {
+            return color;
+        }
+
+        const position = this.state.labelPositions.get(text);
+
+        if (_.isUndefined(position)) {
+            return [255, 100, 100, 255];
+        }
+
+        const cluster = this.state.clusters.get(position);
+        if (_.isUndefined(cluster)) {
+            return [255, 100, 100, 255];
+        }
+
+        if (cluster[0] === text) {
+            return color;
+        }
+
+        // Hide the text if it is not the first label in the cluster, in which case it will be
+        // elided
         return [0, 0, 0, 0];
     }
 
@@ -255,16 +306,19 @@ export class MergedTextLayer<
         const { getText, getBackgroundColor, mergeLabels } = this.props;
         const text = getText(object, objectInfo);
 
-        if (!mergeLabels) {
-            return typeof getBackgroundColor === "function"
+        const backgroundColor =
+            typeof getBackgroundColor === "function"
                 ? getBackgroundColor(object, objectInfo)
                 : getBackgroundColor;
+
+        if (!mergeLabels) {
+            return backgroundColor;
         }
 
         const position = this.state.labelPositions.get(text);
 
         if (_.isUndefined(position)) {
-            return [255, 255, 255, 255];
+            return [255, 100, 100, 255];
         }
 
         const cluster = this.state.clusters.get(position);
@@ -273,9 +327,7 @@ export class MergedTextLayer<
         }
 
         if (cluster[0] === text) {
-            return typeof getBackgroundColor === "function"
-                ? getBackgroundColor(object, objectInfo)
-                : getBackgroundColor;
+            return backgroundColor;
         }
 
         return [0, 0, 0, 0];
