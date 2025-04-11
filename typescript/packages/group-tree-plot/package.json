@@ -1,6 +1,6 @@
 {
     "name": "@webviz/group-tree-plot",
-    "version": "1.5.0",
+    "version": "1.5.1",
     "description": "",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -11,7 +11,8 @@
         "transpile": "tsc --project ./tsconfig.json",
         "copy-files": "copyfiles --up 1 \"src/**/*.css\" dist/",
         "build": "git clean -xdff dist && npm run transpile && npm run copy-files",
-        "doc": "git clean -xdff docs && typedoc src"
+        "doc": "git clean -xdff docs && typedoc src",
+        "semantic-release:dry-run": "semantic-release --dry-run"
     },
     "author": "Equinor <opensource@equinor.com>",
     "license": "MPL-2.0",
