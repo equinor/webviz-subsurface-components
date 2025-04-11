@@ -18,6 +18,7 @@ import type {
 import type { ExtendedLayerProps, Position3D } from "../utils/layerTools";
 import BoxLayer from "./boxLayer";
 import { ticks } from "d3-array";
+import { FixedSizeExtension } from "../../extensions/fixed-size-extension";
 
 export interface AxesLayerProps extends ExtendedLayerProps {
     /**
@@ -222,6 +223,7 @@ export default class AxesLayer extends CompositeLayer<AxesLayerProps> {
                     this.getBaseLine(d, is_orthographic),
                 coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
                 getColor: this.props.labelColor || [0, 0, 0, 255],
+                extensions: [new FixedSizeExtension()],
             })
         );
 
@@ -315,7 +317,7 @@ function maketextLayerData(
             label: label,
             from: from,
             to: to,
-            size: labelFontSize ?? 11,
+            size: labelFontSize ?? 16,
         });
     }
 
