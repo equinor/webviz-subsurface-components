@@ -1,6 +1,6 @@
 {
     "name": "@webviz/subsurface-viewer",
-    "version": "1.10.5",
+    "version": "1.10.6",
     "description": "3D visualization component for subsurface reservoir data",
     "keywords": [
         "subsurface",
@@ -27,7 +27,8 @@
         "test:update": "npm test -- --u",
         "test:watch": "npm test -- --watch",
         "test:debug": "node --inspect-brk ../../node_modules/jest/bin/jest.js --coverage=false --runInBand",
-        "doc": "git clean -xdff docs && typedoc src"
+        "doc": "git clean -xdff docs && typedoc src",
+        "semantic-release:dry-run": "semantic-release --dry-run"
     },
     "author": "Equinor <opensource@equinor.com>",
     "license": "MPL-2.0",
@@ -41,7 +42,7 @@
         "@deck.gl/layers": "9.0.40",
         "@deck.gl/mesh-layers": "9.0.40",
         "@deck.gl/react": "9.0.40",
-        "@emerson-eps/color-tables": "^0.4.85",
+        "@emerson-eps/color-tables": "^0.4.92",
         "@equinor/eds-core-react": "^0.36.0",
         "@equinor/eds-icons": "^0.21.0",
         "@turf/simplify": "^7.1.0",
