@@ -1,3 +1,10 @@
+## [1.7.1](https://github.com/equinor/webviz-subsurface-components/compare/well-completions-plot@1.7.0...well-completions-plot@1.7.1) (2025-04-11)
+
+
+### Bug Fixes
+
+* bump @emerson-eps/color-tables from 0.4.85 to 0.4.92 in /typescript ([#2509](https://github.com/equinor/webviz-subsurface-components/issues/2509)) ([54ea5e4](https://github.com/equinor/webviz-subsurface-components/commit/54ea5e4e0cc887f183c85c9e85c05d438844eebb)), closes [#915](https://github.com/equinor/webviz-subsurface-components/issues/915) [#911](https://github.com/equinor/webviz-subsurface-components/issues/911) [#909](https://github.com/equinor/webviz-subsurface-components/issues/909) [#905](https://github.com/equinor/webviz-subsurface-components/issues/905) [#890](https://github.com/equinor/webviz-subsurface-components/issues/890)
+
 # [1.7.0](https://github.com/equinor/webviz-subsurface-components/compare/well-completions-plot@1.6.4...well-completions-plot@1.7.0) (2025-03-26)
 
 
