@@ -12,30 +12,43 @@ import createKdTree from "static-kdtree";
 import type { Position3D } from "../../utils/layerTools";
 import _ from "lodash";
 
-export type MergedTextLayerProps = TextLayerProps & {
+export type MergedTextLayerProps<DataT = unknown> = TextLayerProps<DataT> & {
+    /**
+     * Merge well names that are near each other.
+     * @default true
+     */
+    mergeLabels?: boolean;
+
+    /**
+     * The radius in measurement units to merge well names.
+     * @default 20
+     */
     mergeRadius?: number;
 };
 
 const DEFAULT_PROPS: DefaultProps<MergedTextLayerProps> = {
-    mergeRadius: 10,
+    mergeRadius: 100,
+    mergeLabels: true,
 };
 
-export class MergedTextLayer<DataT> extends TextLayer<
+export class MergedTextLayer<
     DataT,
-    MergedTextLayerProps
-> {
+    PropsT extends MergedTextLayerProps<DataT>,
+> extends TextLayer<DataT, PropsT> {
     static defaultProps = DEFAULT_PROPS;
     static layerName = "MergedTextLayer";
 
     state!: {
         clusters: Map<Position, string[]>;
         labelPositions: Map<string, Position>;
-        //positionTree: ReturnType<typeof createKdTree<3>>;
         positionToText: Map<Position, string[]>;
     } & TextLayer<DataT, MergedTextLayerProps>["state"];
 
     public override shouldUpdateState(params: UpdateParameters<this>): boolean {
-        if (params.changeFlags.dataChanged) {
+        if (params.changeFlags.propsOrDataChanged) {
+            return true;
+        }
+        if (params.changeFlags.updateTriggersChanged) {
             return true;
         }
         return super.shouldUpdateState(params);
@@ -62,18 +75,6 @@ export class MergedTextLayer<DataT> extends TextLayer<
         updateTriggers?: Record<string, unknown[]>;
         [propName: string]: unknown;
     }) {
-        const textUpdateTriggers =
-            sublayerProps?.updateTriggers?.["getText"] ?? [];
-
-        const colorUpdateTriggers =
-            sublayerProps?.updateTriggers?.["getColor"] ?? [];
-
-        const fillUpdateTriggers =
-            sublayerProps?.updateTriggers?.["getFillColor"] ?? [];
-
-        const iconUpdateTriggers =
-            sublayerProps?.updateTriggers?.["getIcon"] ?? [];
-
         const newProps = {
             ...sublayerProps,
             getColor: _.bind(this.getColor, this),
@@ -81,45 +82,18 @@ export class MergedTextLayer<DataT> extends TextLayer<
             getLineColor: _.bind(this.getColor, this),
             updateTriggers: {
                 ...sublayerProps?.updateTriggers,
-                getIconOffsets: [
-                    ...iconUpdateTriggers,
-                    this.props.mergeRadius,
-                    this.state.numInstances,
-                    this.state.startIndices,
-                ],
-                getIcon: [
-                    ...iconUpdateTriggers,
-                    this.props.mergeRadius,
-                    this.state.numInstances,
-                    this.state.startIndices,
-                ],
-                getColor: [
-                    ...colorUpdateTriggers,
-                    this.state.clusters,
-                    this.props.mergeRadius,
-                ],
-                getFillColor: [
-                    ...fillUpdateTriggers,
-                    this.state.clusters,
-                    this.props.mergeRadius,
-                ],
-                getLineColor: [this.state.clusters, this.props.mergeRadius],
-                all: [
-                    this.state.clusters,
-                    this.props.mergeRadius,
-                    this.props.numInstances,
-                    this.props.startIndices,
-                ],
+                all: [this.props.mergeRadius, this.props.mergeLabels],
             },
         };
 
-        const tmpProps = super.getSubLayerProps(newProps);
-
-        return tmpProps;
+        return super.getSubLayerProps(newProps);
     }
 
     protected updateLabelPositions() {
-        const { data, getText, getPosition } = this.props;
+        const { data, getText } = this.props;
+
+        const { getPosition } = this.getSubLayerProps();
+
         const labelPositions = new Map<string, Position>();
         const positionToText = new Map<Position, string[]>();
         const { iterable, objectInfo } = createIterable(data);
@@ -130,6 +104,11 @@ export class MergedTextLayer<DataT> extends TextLayer<
                 typeof getPosition === "function"
                     ? getPosition(object, objectInfo)
                     : getPosition;
+
+            if (_.isUndefined(position)) {
+                continue;
+            }
+
             labelPositions.set(text, position);
 
             if (positionToText.has(position)) {
@@ -156,8 +135,6 @@ export class MergedTextLayer<DataT> extends TextLayer<
             numInstances += text.length;
             startIndices.push(numInstances);
         }
-        console.log("startIndices", startIndices);
-        console.log("numInstances", numInstances);
 
         this.setState({
             numInstances,
@@ -167,6 +144,10 @@ export class MergedTextLayer<DataT> extends TextLayer<
 
     protected updateLabelClusters() {
         const positions: Position[] = [...this.state.labelPositions.values()];
+
+        if (positions.length === 0) {
+            return;
+        }
 
         const positionTree = createKdTree<3>(positions as Position3D[]);
         const clusters = new Map<Position, string[]>();
@@ -203,43 +184,50 @@ export class MergedTextLayer<DataT> extends TextLayer<
             }
         }
 
-        console.log("clusters", clusters);
-
         this.setState({
-            //positionTree,
             clusters,
         });
     }
 
-    protected getText(object: unknown, objectInfo: AccessorContext<unknown>) {
-        const { getText } = this.props;
+    protected getText(object: DataT, objectInfo: AccessorContext<DataT>) {
+        const { getText, mergeLabels } = this.props;
         const text = getText(object, objectInfo);
+
+        if (!mergeLabels) {
+            return text;
+        }
+
         const position = this.state.labelPositions.get(text);
 
         if (_.isUndefined(position)) {
-            return "undef";
+            return text;
         }
 
         const cluster = this.state.clusters.get(position);
         if (_.isUndefined(cluster)) {
-            return "undef";
+            return text;
         }
 
         if (text === cluster[0] && cluster.length > 1) {
-            console.log("text", text + " ...");
             return text + " ...";
         }
 
-        console.log("text", text);
         return text;
     }
 
     protected getColor(
-        object: unknown,
-        objectInfo: AccessorContext<unknown>
-    ): number[] {
-        const { getText } = this.props;
+        object: DataT,
+        objectInfo: AccessorContext<DataT>
+    ): Color {
+        const { getText, getColor, mergeLabels } = this.props;
         const text = getText(object, objectInfo);
+
+        if (!mergeLabels) {
+            return typeof getColor === "function"
+                ? getColor(object, objectInfo)
+                : getColor;
+        }
+
         const position = this.state.labelPositions.get(text);
 
         if (_.isUndefined(position)) {
@@ -252,7 +240,9 @@ export class MergedTextLayer<DataT> extends TextLayer<
         }
 
         if (cluster[0] === text) {
-            return [0, 0, 0, 255];
+            return typeof getColor === "function"
+                ? getColor(object, objectInfo)
+                : getColor;
         }
 
         return [0, 0, 0, 0];
@@ -262,8 +252,15 @@ export class MergedTextLayer<DataT> extends TextLayer<
         object: DataT,
         objectInfo: AccessorContext<DataT>
     ): Color {
-        const { getText, getBackgroundColor } = this.props;
+        const { getText, getBackgroundColor, mergeLabels } = this.props;
         const text = getText(object, objectInfo);
+
+        if (!mergeLabels) {
+            return typeof getBackgroundColor === "function"
+                ? getBackgroundColor(object, objectInfo)
+                : getBackgroundColor;
+        }
+
         const position = this.state.labelPositions.get(text);
 
         if (_.isUndefined(position)) {

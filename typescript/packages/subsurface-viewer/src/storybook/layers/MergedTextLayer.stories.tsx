@@ -42,9 +42,10 @@ const DEFAULT_VIEWS: ViewsType = {
 };
 
 const LABEL_DATA = [
-    { id: "1", text: "a", position: [460000, 6785000, 0] },
-    { id: "2", text: "b", position: [460000, 6785000, -1000] },
-    { id: "3", text: "c", position: [460000, 6785000, -1100] },
+    { text: "Well A", position: [461000, 6786000, 0] },
+    { text: "Well B", position: [460000, 6785000, -1000] },
+    { text: "Well C", position: [460000, 6785000, -1009] },
+    { text: "Well D", position: [460000, 6785000, -1009] },
 ];
 
 export const Default: StoryObj = {
@@ -70,12 +71,6 @@ export const MergeRadius: StoryObj<MergedTextLayerProps> = {
             ...args,
             id: "merged-labels",
             data: LABEL_DATA,
-            /*
-            mergeRadius,
-            background,
-            getBackgroundColor,
-            getBorderColor,
-            */
         });
 
         const propsWithLayers = {
@@ -93,13 +88,15 @@ export const MergeRadius: StoryObj<MergedTextLayerProps> = {
         getBorderColor: [0, 0, 0, 255],
         getSize: 20,
         getBorderWidth: 2,
+        mergeLabels: true,
+        getColor: [100, 0, 0, 255],
     },
     argTypes: {
         mergeRadius: {
             control: {
                 type: "range",
                 min: 1,
-                max: 10000,
+                max: 2000,
                 step: 1,
             },
         },
