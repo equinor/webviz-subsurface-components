@@ -668,11 +668,17 @@ const Map: React.FC<MapProps> = ({
             layers.push(dummy_layer);
         }
 
-        const m = getModelMatrixScale(zScale);
-
         return layers.map((item) => {
             if (item?.constructor.name === NorthArrow3DLayer.name) {
                 return item;
+            }
+
+            let m: Matrix4;
+            if ((item as Layer).props.modelMatrix) {
+                m = (item as Layer).props.modelMatrix as Matrix4;
+                m[10] *= zScale;  // Z scaling element of matrix.
+            } else {
+                m = getModelMatrixScale(zScale);
             }
 
             return (item as Layer).clone({
@@ -680,7 +686,8 @@ const Map: React.FC<MapProps> = ({
                 // eslint-disable-next-line
                 // @ts-ignore
                 reportBoundingBox: dispatchBoundingBox,
-                // Set "modelLayer" matrix to reflect correct z scaling.
+
+                // Modify "modelMatrix" to reflect correct z scaling.
                 modelMatrix: m,
             });
         });
