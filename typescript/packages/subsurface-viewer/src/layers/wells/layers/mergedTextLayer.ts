@@ -241,11 +241,13 @@ export class MergedTextLayer<
     ): Color {
         const { getText, getBorderColor, mergeLabels } = this.props;
         const text = getText(object, objectInfo);
-
-        if (!mergeLabels) {
-            return typeof getBorderColor === "function"
+        const borderColor =
+            typeof getBorderColor === "function"
                 ? getBorderColor(object, objectInfo)
                 : getBorderColor;
+
+        if (!mergeLabels) {
+            return borderColor;
         }
 
         const position = this.state.labelPositions.get(text);
@@ -260,12 +262,10 @@ export class MergedTextLayer<
         }
 
         if (cluster[0] === text) {
-            return typeof getBorderColor === "function"
-                ? getBorderColor(object, objectInfo)
-                : getBorderColor;
+            return borderColor;
         }
 
-        return [0, 0, 0, 0];
+        return [borderColor[0], borderColor[1], borderColor[2], 0];
     }
 
     protected getColor(
@@ -335,6 +335,6 @@ export class MergedTextLayer<
             return backgroundColor;
         }
 
-        return [0, 0, 0, 0];
+        return [backgroundColor[0], backgroundColor[1], backgroundColor[2], 0];
     }
 }

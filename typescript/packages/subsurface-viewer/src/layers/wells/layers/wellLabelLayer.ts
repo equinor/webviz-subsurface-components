@@ -1,3 +1,4 @@
+import type { Color } from "@deck.gl/core";
 import { type DefaultProps, type UpdateParameters } from "@deck.gl/core";
 import type { TextLayerProps } from "@deck.gl/layers";
 import type { Feature, Position } from "geojson";
@@ -66,11 +67,34 @@ const DEFAULT_PROPS: DefaultProps<WellLabelLayerProps> = {
     getBorderColor: [0, 0, 0, 255],
     getBorderWidth: 1,
 
-    // Animate label position transitions in order to help tracking when labels are moving
     transitions: {
+        // Animate label position transitions in order to help tracking when labels are moving
         getPosition: {
-            duration: 100,
+            duration: 1,
             type: "spring",
+            damping: 1,
+            stiffness: 0.5,
+        },
+
+        // Prevent changed label texts from appearing before the label background
+        // has moved into place
+        getColor: {
+            duration: 50,
+            type: "interpolation",
+            enter: ([r, g, b]: Color) => [r, g, b, 0],
+            easing: (t: number) => _.floor(t),
+        },
+
+        // Cosmetic effects
+        getBackgroundColor: {
+            duration: 1,
+            type: "spring",
+            enter: ([r, g, b]: Color) => [r, g, b, 0],
+        },
+        getBorderColor: {
+            duration: 1,
+            type: "spring",
+            enter: ([r, g, b]: Color) => [r, g, b, 0],
         },
     },
 };
