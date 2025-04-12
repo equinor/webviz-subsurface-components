@@ -58,11 +58,8 @@ export class MergedTextLayer<
     public override updateState(params: UpdateParameters<this>) {
         super.updateState(params);
 
-        if (params.changeFlags.dataChanged) {
-            this.updateLabelPositions();
-        }
-
         if (params.changeFlags.propsOrDataChanged) {
+            this.updateLabelPositions();
             this.updateLabelClusters();
             this.updateInstanceState();
             this.setState({
@@ -88,6 +85,7 @@ export class MergedTextLayer<
                     ...allUpdateTriggers,
                     this.props.mergeRadius,
                     this.props.mergeLabels,
+                    this.props.getPosition,
                 ],
             },
         };

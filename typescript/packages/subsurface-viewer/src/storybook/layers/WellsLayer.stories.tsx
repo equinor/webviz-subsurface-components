@@ -39,6 +39,7 @@ import {
     DEFAULT_TOLERANCE,
 } from "../../layers/wells/utils/spline";
 import {
+    LABEL_MERGE_RADIUS_ARGTYPES,
     LABEL_ORIENTATION_ARGTYPES,
     LABEL_POSITION_ARGTYPES,
     LABEL_SIZE_ARGTYPES,
@@ -696,6 +697,9 @@ export const WellLabelStyle: StoryObj<
         getBorderWidth: 1,
         bgColor: "white",
         getPositionAlongPath: 0,
+        mergeLabels: true,
+        mergeRadius: 100,
+        autoPosition: true,
     },
 
     render: (args) => {
@@ -709,14 +713,28 @@ export const WellLabelStyle: StoryObj<
             orientation: args.orientation,
             background: args.background,
             visible: true,
+            autoPosition: args.autoPosition,
+
+            // MergedTextLayer options
+            mergeLabels: args.mergeLabels,
+            mergeRadius: args.mergeRadius,
         };
 
-        const wellLayer = new WellsLayer({
+        const wellLayerProps = {
             data: "./gullfaks.json",
             wellHeadStyle: { size: 5 },
             ZIncreasingDownwards: false,
             wellLabel: wellLabelProps,
-            id: "wells",
+        };
+
+        const wellLayer2d = new WellsLayer({
+            ...wellLayerProps,
+            id: "wells-2d",
+        });
+
+        const wellLayer3d = new WellsLayer({
+            ...wellLayerProps,
+            id: "wells-3d",
         });
 
         const axes2d = new Axes2DLayer({
@@ -728,7 +746,7 @@ export const WellLabelStyle: StoryObj<
             bounds: [450000, 6781000, 0, 464000, 6791000, 3500],
         });
 
-        const layers = [wellLayer, axes3d, axes2d];
+        const layers = [wellLayer2d, wellLayer3d, axes3d, axes2d];
 
         // Viewport is reset if identity of `views` object changes, so we need to memoize it.
         // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -738,12 +756,12 @@ export const WellLabelStyle: StoryObj<
                 viewports: [
                     {
                         id: "viewport1",
-                        layerIds: ["wells", "axes-3d"],
+                        layerIds: ["wells-3d", "axes-3d"],
                         show3D: true,
                     },
                     {
                         id: "viewport2",
-                        layerIds: ["wells", "axes-2d"],
+                        layerIds: ["wells-2d", "axes-2d"],
                         show3D: false,
                     },
                 ],
@@ -764,6 +782,7 @@ export const WellLabelStyle: StoryObj<
         ...LABEL_POSITION_ARGTYPES,
         ...LABEL_SIZE_ARGTYPES,
         ...LABEL_ORIENTATION_ARGTYPES,
+        ...LABEL_MERGE_RADIUS_ARGTYPES,
     },
 };
 

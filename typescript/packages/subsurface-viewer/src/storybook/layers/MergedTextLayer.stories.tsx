@@ -5,6 +5,7 @@ import { MergedTextLayer } from "../../layers/wells/layers/mergedTextLayer";
 import { AxesLayer } from "../../layers";
 import type { ViewsType } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
+import { LABEL_MERGE_RADIUS_ARGTYPES } from "../constant/argTypes";
 
 const stories: Meta = {
     title: "SubsurfaceViewer / MergedTextLayer",
@@ -94,14 +95,7 @@ export const MergeRadius: StoryObj<MergedTextLayerProps> = {
         getColor: [100, 0, 0, 255],
     },
     argTypes: {
-        mergeRadius: {
-            control: {
-                type: "range",
-                min: 1,
-                max: 2000,
-                step: 1,
-            },
-        },
+        ...LABEL_MERGE_RADIUS_ARGTYPES,
     },
 };
 

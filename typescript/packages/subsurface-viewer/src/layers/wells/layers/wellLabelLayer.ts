@@ -85,7 +85,7 @@ const DEFAULT_PROPS: DefaultProps<WellLabelLayerProps> = {
             easing: (t: number) => _.floor(t),
         },
 
-        // Cosmetic effects
+        // Cosmetic effects for fading in the label background
         getBackgroundColor: {
             duration: 1,
             type: "spring",
@@ -162,7 +162,10 @@ export class WellLabelLayer extends MergedTextLayer<
                     this.context.viewport.cameraPosition,
                     this.props.getPositionAlongPath,
                 ],
-                all: [this.context.viewport.cameraPosition],
+                all: [
+                    this.context.viewport.cameraPosition,
+                    this.props.getPositionAlongPath,
+                ],
             },
         };
 
