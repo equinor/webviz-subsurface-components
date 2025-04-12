@@ -138,6 +138,7 @@ export class WellLabelLayer extends MergedTextLayer<
                     this.context.viewport.cameraPosition,
                     this.props.getPositionAlongPath,
                 ],
+                all: [this.context.viewport.cameraPosition],
             },
         };
 
@@ -146,13 +147,21 @@ export class WellLabelLayer extends MergedTextLayer<
 
     public override shouldUpdateState(params: UpdateParameters<this>): boolean {
         if (
-            params.changeFlags.viewportChanged === true &&
+            params.changeFlags.viewportChanged &&
             (params.props.autoPosition ||
                 "tangent" === params.props.orientation)
         ) {
             return true;
         }
         return super.shouldUpdateState(params);
+    }
+
+    public override updateState(params: UpdateParameters<this>): void {
+        if (params.props.autoPosition && params.changeFlags.viewportChanged) {
+            // Trigger dataChanged if labels move due to auto-positioning
+            params.changeFlags.dataChanged = "autoPosition";
+        }
+        super.updateState(params);
     }
 
     protected getLabelAngle(well: WellFeature) {

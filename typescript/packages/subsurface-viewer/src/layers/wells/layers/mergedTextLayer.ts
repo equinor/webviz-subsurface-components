@@ -76,6 +76,7 @@ export class MergedTextLayer<
         updateTriggers?: Record<string, unknown[]>;
         [propName: string]: unknown;
     }) {
+        const allUpdateTriggers = sublayerProps?.updateTriggers?.["all"] ?? [];
         const newProps = {
             ...sublayerProps,
             getColor: _.bind(this.getColor, this),
@@ -83,7 +84,11 @@ export class MergedTextLayer<
             getLineColor: _.bind(this.getBorderColor, this),
             updateTriggers: {
                 ...sublayerProps?.updateTriggers,
-                all: [this.props.mergeRadius, this.props.mergeLabels],
+                all: [
+                    ...allUpdateTriggers,
+                    this.props.mergeRadius,
+                    this.props.mergeLabels,
+                ],
             },
         };
 
