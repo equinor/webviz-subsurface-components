@@ -21,14 +21,27 @@ export type MergedTextLayerProps<DataT = unknown> = TextLayerProps<DataT> & {
 
     /**
      * The radius in measurement units to merge well names.
-     * @default 20
+     * @default 100
      */
     mergeRadius?: number;
+
+    /**
+     * Format the text for the list of labels in the cluster.
+     * @default (texts) => texts[0] + " (+N)"
+     */
+    getClusterText: (texts: string[]) => string;
 };
 
 const DEFAULT_PROPS: DefaultProps<MergedTextLayerProps> = {
     mergeRadius: 100,
     mergeLabels: true,
+    getClusterText: (texts: string[]) => {
+        if (texts.length > 1) {
+            // Elide the text if there are multiple labels in the cluster
+            return `${texts[0]} (+${texts.length - 1})`;
+        }
+        return texts[0];
+    },
 };
 
 /**
@@ -201,7 +214,7 @@ export class MergedTextLayer<
     }
 
     protected getText(object: DataT, objectInfo: AccessorContext<DataT>) {
-        const { getText, mergeLabels } = this.props;
+        const { getText, mergeLabels, getClusterText } = this.props;
         const text = getText(object, objectInfo);
 
         if (!mergeLabels) {
@@ -220,13 +233,7 @@ export class MergedTextLayer<
         }
 
         if (text === cluster[0]) {
-            // Elide the text if there are multiple labels in the cluster
-            if (cluster.length > 1) {
-                return text + " ...";
-            }
-
-            // If this is the only label in the cluster, return the text
-            return text;
+            return getClusterText(cluster);
         }
 
         // Hide the text if it is not the first label in the cluster

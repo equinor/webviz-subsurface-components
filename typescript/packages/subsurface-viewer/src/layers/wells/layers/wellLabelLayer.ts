@@ -63,7 +63,7 @@ const DEFAULT_PROPS: DefaultProps<WellLabelLayerProps> = {
     getColor: [0, 0, 0, 255],
     zIncreasingDownwards: true,
     orientation: LabelOrientation.HORIZONTAL,
-    backgroundPadding: [5, 1, 5, 1],
+    backgroundPadding: [3, 1, 3, 1],
     getBorderColor: [0, 0, 0, 255],
     getBorderWidth: 1,
 
