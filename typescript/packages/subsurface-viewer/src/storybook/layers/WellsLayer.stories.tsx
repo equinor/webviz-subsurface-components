@@ -737,16 +737,7 @@ export const WellLabelStyle: StoryObj<
             id: "wells-3d",
         });
 
-        const axes2d = new Axes2DLayer({
-            id: "axes-2d",
-        });
-
-        const axes3d = new AxesLayer({
-            id: "axes-3d",
-            bounds: [450000, 6781000, 0, 464000, 6791000, 3500],
-        });
-
-        const layers = [wellLayer2d, wellLayer3d, axes3d, axes2d];
+        const layers = [wellLayer2d, wellLayer3d];
 
         // Viewport is reset if identity of `views` object changes, so we need to memoize it.
         // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -756,12 +747,12 @@ export const WellLabelStyle: StoryObj<
                 viewports: [
                     {
                         id: "viewport1",
-                        layerIds: ["wells-3d", "axes-3d"],
+                        layerIds: ["wells-3d"],
                         show3D: true,
                     },
                     {
                         id: "viewport2",
-                        layerIds: ["wells-2d", "axes-2d"],
+                        layerIds: ["wells-2d"],
                         show3D: false,
                     },
                 ],

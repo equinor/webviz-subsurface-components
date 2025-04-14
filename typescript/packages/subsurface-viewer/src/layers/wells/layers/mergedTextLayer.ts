@@ -211,6 +211,8 @@ export class MergedTextLayer<
         this.setState({
             clusters,
         });
+
+        positionTree.dispose();
     }
 
     protected getText(object: DataT, objectInfo: AccessorContext<DataT>) {

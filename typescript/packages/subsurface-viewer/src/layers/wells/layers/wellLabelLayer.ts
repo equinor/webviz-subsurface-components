@@ -219,18 +219,8 @@ export class WellLabelLayer extends MergedTextLayer<
 
         fraction = _.clamp(fraction, 0, 1);
 
-        // Return a pos "annotation_position" percent down the trajectory
-        const pos = this.getVectorAlongTrajectory(fraction, well_data)[1];
-
-        const view_from = new Vector3(this.context.viewport.cameraPosition);
-        const dir = new Vector3([
-            view_from[0] - pos[0],
-            view_from[1] - pos[1],
-            view_from[2] - pos[2],
-        ]);
-        dir.normalize();
-
-        return [pos[0] + dir[0], pos[1] + dir[1], pos[2] + dir[2]];
+        // Return a position as a fraction down the trajectory
+        return this.getVectorAlongTrajectory(fraction, well_data)[1];
     }
 
     /**
