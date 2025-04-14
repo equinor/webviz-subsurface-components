@@ -6,7 +6,7 @@ export class FixedSizeExtension extends LayerExtension {
     getShaders() {
         return {
             inject: {
-                "vs:DECKGL_FILTER_SIZE": "size *= 0.7 * gl_Position.w;",
+                "vs:DECKGL_FILTER_SIZE": "size *= gl_Position.w;",
             },
         };
     }
