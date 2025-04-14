@@ -718,6 +718,9 @@ export const WellLabelStyle: StoryObj<
             // MergedTextLayer options
             mergeLabels: args.mergeLabels,
             mergeRadius: args.mergeRadius,
+
+            // Disable transitions as they are too slow for this story, on the test runner
+            transitions: {},
         };
 
         const wellLayerProps = {
