@@ -1,3 +1,10 @@
+## [2.4.2](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@2.4.1...well-log-viewer@2.4.2) (2025-04-15)
+
+
+### Bug Fixes
+
+* **subsurface-viewer:** merge overlapping well labels ([#2515](https://github.com/equinor/webviz-subsurface-components/issues/2515)) ([a17c241](https://github.com/equinor/webviz-subsurface-components/commit/a17c241034581138024714302a8a3cabfcdaec56))
+
 ## [2.4.1](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@2.4.0...well-log-viewer@2.4.1) (2025-04-11)
 
 
