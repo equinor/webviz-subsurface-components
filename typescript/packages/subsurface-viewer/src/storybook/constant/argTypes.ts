@@ -1,6 +1,7 @@
 import type { ArgTypes } from "@storybook/react";
 import type { WellLabelLayerProps } from "../../layers/wells/layers/wellLabelLayer";
 import type { TrajectorySimulationProps } from "../types/trajectory";
+import type { MergedTextLayerProps } from "../../layers/wells/layers/mergedTextLayer";
 
 export const LABEL_POSITION_ARGTYPES: Partial<ArgTypes<WellLabelLayerProps>> = {
     getPositionAlongPath: {
@@ -59,6 +60,19 @@ export const TRAJECTORY_SIMULATION_ARGTYPES: Partial<
             type: "range",
             min: 0,
             max: 90,
+            step: 1,
+        },
+    },
+};
+
+export const LABEL_MERGE_RADIUS_ARGTYPES: Partial<
+    ArgTypes<MergedTextLayerProps>
+> = {
+    mergeRadius: {
+        control: {
+            type: "range",
+            min: 0,
+            max: 2000,
             step: 1,
         },
     },

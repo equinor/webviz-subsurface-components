@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/react";
 import type { Color } from "@deck.gl/core";
+import type { Meta, StoryObj } from "@storybook/react";
 import { all, create } from "mathjs";
 import React from "react";
 import { AxesLayer, WellsLayer } from "../../layers";
@@ -9,6 +9,10 @@ import {
     LabelOrientation,
     WellLabelLayer,
 } from "../../layers/wells/layers/wellLabelLayer";
+import type {
+    WellFeature,
+    WellFeatureCollection,
+} from "../../layers/wells/types";
 import type { ViewsType } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import {
@@ -17,12 +21,8 @@ import {
     LABEL_SIZE_ARGTYPES,
     TRAJECTORY_SIMULATION_ARGTYPES,
 } from "../constant/argTypes";
-import { getRgba } from "../util/color";
-import type {
-    WellFeature,
-    WellFeatureCollection,
-} from "../../layers/wells/types";
 import type { TrajectorySimulationProps } from "../types/trajectory";
+import { getRgba } from "../util/color";
 
 type WellCount = { wellCount: number };
 
