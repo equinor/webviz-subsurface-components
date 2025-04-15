@@ -676,7 +676,7 @@ const Map: React.FC<MapProps> = ({
             let m: Matrix4;
             if ((item as Layer).props.modelMatrix) {
                 m = (item as Layer).props.modelMatrix as Matrix4;
-                m[10] *= zScale; // Z scaling element of matrix.
+                m[10] *= zScale;
             } else {
                 m = getModelMatrixScale(zScale);
             }
