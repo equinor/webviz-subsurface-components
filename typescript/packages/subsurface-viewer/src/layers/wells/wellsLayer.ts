@@ -404,6 +404,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
         return new WellLabelLayer(wellLabelProps);
     }
+
     renderLayers(): LayersList {
         const data = this.getWellDataState();
         const positionFormat = "XYZ";
