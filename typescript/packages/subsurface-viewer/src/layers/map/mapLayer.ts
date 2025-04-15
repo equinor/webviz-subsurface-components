@@ -19,7 +19,8 @@ import type {
     ExtendedLayerProps,
     ColorMapFunctionType,
 } from "../utils/layerTools";
-import type { Material } from "./privateMapLayer";
+//import type { Material } from "./privateMapLayer";
+import type { Material } from "@deck.gl/core";
 import PrivateMapLayer from "./privateMapLayer";
 
 import { getModelMatrix } from "../utils/layerTools";

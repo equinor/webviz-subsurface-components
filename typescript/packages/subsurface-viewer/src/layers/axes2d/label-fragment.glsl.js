@@ -1,6 +1,6 @@
 export default `\
 #version 300 es
-#define SHADER_NAME axes2d-layer-fragment-shader
+#define SHADER_NAME axes2d-label-fragment-shader
 
 precision highp float;
 
@@ -8,8 +8,8 @@ out vec4 fragColor;
 
 uniform sampler2D fontTexture;
 
-uniform vec4 uAxisColor;
-uniform vec4 uBackGroundColor;
+// uniform vec4 uAxisColor;
+// uniform vec4 uBackGroundColor;
 
 in vec2 _vTexCoord;
 
@@ -19,13 +19,13 @@ void main(void) {
   float x = 1.0 - (color.r + color.g + color.b) / 3.0;  // intensity of text color
   x = smoothstep(0.0, 0.2, x);  
 
-  float text_r = uAxisColor.r;
-  float text_g = uAxisColor.g;
-  float text_b = uAxisColor.b;
+  float text_r = axes.uAxisColor.r;
+  float text_g = axes.uAxisColor.g;
+  float text_b = axes.uAxisColor.b;
 
-  float bg_r = uBackGroundColor.r;
-  float bg_g = uBackGroundColor.g;
-  float bg_b = uBackGroundColor.b;
+  float bg_r = axes.uBackGroundColor.r;
+  float bg_g = axes.uBackGroundColor.g;
+  float bg_b = axes.uBackGroundColor.b;
   
   float r = x * text_r + (1.0 - x) * bg_r;
   float g = x * text_g + (1.0 - x) * bg_g;

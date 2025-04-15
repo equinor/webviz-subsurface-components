@@ -135,5 +135,8 @@
     },
     "workspaces": [
         "packages/*"
-    ]
+    ],
+    "dependencies": {
+        "@deck.gl-community/editable-layers": "^9.1.0-beta.4"
+    }
 }
