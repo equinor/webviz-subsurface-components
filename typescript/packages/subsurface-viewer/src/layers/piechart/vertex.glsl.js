@@ -1,6 +1,6 @@
 export default `\
 #version 300 es
-#define SHADER_NAME graph-layer-axis-vertex-shader
+#define SHADER_NAME piechart-vertex-shader
 
 precision highp float;
 

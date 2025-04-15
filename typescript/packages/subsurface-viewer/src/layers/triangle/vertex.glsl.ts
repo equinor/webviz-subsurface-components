@@ -1,6 +1,6 @@
 const vsShader = `\
 #version 300 es
-#define SHADER_NAME vertex-shader
+#define SHADER_NAME triangle-vertex-shader
 
 precision highp float;
 
@@ -16,17 +16,15 @@ out vec4 position_commonspace;
 out vec3 worldPos;
 out float property;
 
-uniform bool ZIncreasingDownwards;
-
 const vec3 pickingColor = vec3(1.0, 1.0, 0.0);
 
 void main(void) {
    geometry.pickingColor = pickingColor;
 
-   cameraPosition = project_uCameraPosition;
+   cameraPosition = project.cameraPosition;
 
    vec3 position = positions;
-   position[2] *= ZIncreasingDownwards ? -1.0 : 1.0;
+   position[2] *= triangles.ZIncreasingDownwards ? -1.0 : 1.0;
 
    worldPos = position;
 

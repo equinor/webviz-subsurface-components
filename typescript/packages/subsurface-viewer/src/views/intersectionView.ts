@@ -1,4 +1,8 @@
-import type { OrthographicViewState } from "@deck.gl/core";
+import type {
+    OrthographicViewState,
+    Viewport,
+    _ConstructorOf,
+} from "@deck.gl/core";
 import { View } from "@deck.gl/core";
 import type { CommonViewProps } from "@deck.gl/core/dist/views/view";
 import IntersectionViewport from "../viewports/intersectionViewport";
@@ -30,7 +34,13 @@ export default class IntersectionView extends View<
         });
     }
 
-    get ViewportType(): typeof IntersectionViewport {
+    getViewportType(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        _viewState: OrthographicViewState
+    ): _ConstructorOf<Viewport> {
+        return IntersectionViewport;
+    }
+    get ViewportType(): _ConstructorOf<Viewport> {
         return IntersectionViewport;
     }
 

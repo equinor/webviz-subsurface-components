@@ -14,20 +14,18 @@ flat out vec3 normal;
 flat out int vertexIndex;
 flat out float property;
 
-uniform bool ZIncreasingDownwards;
-
 const vec3 pickingColor = vec3(1.0, 1.0, 0.0);
 
 void main(void) { 
    
    vertexIndex = gl_VertexID;
-   cameraPosition = project_uCameraPosition;   
+   cameraPosition = project.cameraPosition;   
    geometry.pickingColor = pickingColor;
 
    normal = normals;
    vec3 position = positions;
 
-   float zSign = ZIncreasingDownwards ? -1.0 : 1.0;
+   float zSign = grid.ZIncreasingDownwards ? -1.0 : 1.0;
 
    position.z *= zSign;
    normal.z   *= zSign;

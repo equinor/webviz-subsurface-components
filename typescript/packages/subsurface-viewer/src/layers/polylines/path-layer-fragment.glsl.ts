@@ -20,11 +20,9 @@
 
 export default `\
 #version 300 es
-#define SHADER_NAME path-layer-fragment-shader
+#define SHADER_NAME polylines-fragment-shader
 
 precision highp float;
-
-uniform float miterLimit;
 
 in vec4 vColor;
 in vec2 vCornerOffset;
@@ -49,7 +47,7 @@ void main(void) {
       discard;
     }
     // trim miter
-    if (vJointType < 0.5 && vMiterLength > miterLimit + 1.0) {
+    if (vJointType < 0.5 && vMiterLength > path.miterLimit + 1.0) {
       discard;
     }
   }

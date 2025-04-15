@@ -1,6 +1,6 @@
 export default `\
 #version 300 es
-#define SHADER_NAME graph-layer-fragment-shader
+#define SHADER_NAME piechart-fragment-shader
 
 precision highp float;
 

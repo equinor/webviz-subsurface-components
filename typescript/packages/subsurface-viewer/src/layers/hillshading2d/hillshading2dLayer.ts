@@ -1,15 +1,14 @@
-import type { PickingInfo } from "@deck.gl/core";
+import { project32, type LayerProps, type PickingInfo } from "@deck.gl/core";
+import { BitmapLayer } from "@deck.gl/layers";
+import { getModelMatrix } from "../utils/layerTools";
 import type { Texture } from "@luma.gl/core";
 import type { BitmapLayerPickingInfo, BitmapLayerProps } from "@deck.gl/layers";
-import { BitmapLayer } from "@deck.gl/layers";
-
+import type { Model } from "@luma.gl/engine";
+import type { ShaderModule } from "@luma.gl/shadertools";
 import type { ReportBoundingBoxAction } from "../../components/Map";
 import type { LayerPickInfo } from "../../layers/utils/layerTools";
-import { decoder } from "../shader_modules";
-import { getModelMatrix } from "../utils/layerTools";
 import type { ValueDecoder } from "../utils/propertyMapTools";
 import { decodeRGB } from "../utils/propertyMapTools";
-
 import fsHillshading from "./hillshading2d.fs.glsl";
 
 // Most props are inherited from DeckGL's BitmapLayer. For a full list, see:
@@ -67,9 +66,9 @@ export default class Hillshading2DLayer extends BitmapLayer<Hillshading2DProps> 
         super.initializeState();
     }
 
-    // Signature from the base class, eslint doesn't like the any type.
-    // eslint-disable-next-line
-    draw({ moduleParameters, uniforms }: any): void {
+    setShaderModuleProps(
+        ...props: Parameters<Model["shaderInputs"]["setProps"]>
+    ): void {
         if (!this.isLoaded) {
             if (typeof this.props.reportBoundingBox !== "undefined") {
                 const xMin = this.props.bounds[0] as number;
@@ -85,62 +84,70 @@ export default class Hillshading2DLayer extends BitmapLayer<Hillshading2DProps> 
             }
         }
 
-        if (this.props.image) {
-            const mergedModuleParams = {
-                ...moduleParameters,
-                valueDecoder: {
-                    // The prop objects are not merged with the defaultProps by default.
-                    // See https://github.com/facebook/react/issues/2568
-                    ...defaultProps.valueDecoder,
-                    ...moduleParameters.valueDecoder,
-                },
-                modelMatrix: getModelMatrix(
-                    this.props.rotDeg,
-                    this.props.bounds[0] as number, // Rotate around upper left corner of bounds
-                    this.props.bounds[3] as number
-                ),
-            };
-            super.setModuleParameters(mergedModuleParams);
+        // Set property for modelMatrix.
+        const m = getModelMatrix(
+            this.props.rotDeg,
+            this.props.bounds[0] as number, // Rotate around upper left corner of bounds
+            this.props.bounds[3] as number
+        );
+        for (const model of this.getModels()) {
+            const isDefined =
+                (props[0] as { project?: { modelMatrix?: unknown } })?.project
+                    ?.modelMatrix !== undefined;
+            if (isDefined) {
+                (props[0]["project"] as { modelMatrix?: unknown }).modelMatrix =
+                    m;
+            }
 
-            const valueRangeMin = this.props.valueRange[0] ?? 0.0;
-            const valueRangeMax = this.props.valueRange[1] ?? 1.0;
-            const colorMapRangeMin =
-                this.props.colorMapRange?.[0] ?? valueRangeMin;
-            const colorMapRangeMax =
-                this.props.colorMapRange?.[1] ?? valueRangeMax;
-
-            const [minVal, maxVal] = this.props.valueRange;
-            super.draw({
-                uniforms: {
-                    ...uniforms,
-                    // Send extra uniforms to the shader.
-                    bitmapResolution: [
-                        (this.props.image as Texture).width,
-                        (this.props.image as Texture).height,
-                    ],
-                    valueRangeSize: maxVal - minVal,
-                    lightDirection: this.props.lightDirection,
-                    ambientLightIntensity: this.props.ambientLightIntensity,
-                    diffuseLightIntensity: this.props.diffuseLightIntensity,
-                    valueRangeMin,
-                    valueRangeMax,
-                    colorMapRangeMin,
-                    colorMapRangeMax,
-                },
-                moduleParameters: mergedModuleParams,
-            });
+            model.shaderInputs.setProps(...props);
         }
+
+        const valueRangeMin = this.props.valueRange[0] ?? 0.0;
+        const valueRangeMax = this.props.valueRange[1] ?? 1.0;
+        const colorMapRangeMin = this.props.colorMapRange?.[0] ?? valueRangeMin;
+        const colorMapRangeMax = this.props.colorMapRange?.[1] ?? valueRangeMax;
+
+        const [minVal, maxVal] = this.props.valueRange;
+
+        const bitmapResolution = this.props.image
+            ? [
+                  (this.props.image as Texture).width,
+                  (this.props.image as Texture).height,
+              ]
+            : [1, 1];
+        const valueRangeSize = maxVal - minVal;
+        const lightDirection = this.props.lightDirection;
+        const ambientLightIntensity = this.props.ambientLightIntensity;
+        const diffuseLightIntensity = this.props.diffuseLightIntensity;
+
+        super.setShaderModuleProps({
+            map: {
+                valueRangeMin,
+                valueRangeMax,
+                colorMapRangeMin,
+                colorMapRangeMax,
+
+                bitmapResolution,
+                valueRangeSize,
+                lightDirection,
+                ambientLightIntensity,
+                diffuseLightIntensity,
+
+                rgbScaler: this.props.valueDecoder.rgbScaler,
+                floatScaler: this.props.valueDecoder.floatScaler,
+                offset: this.props.valueDecoder.offset,
+                step: this.props.valueDecoder.step,
+            },
+        });
     }
 
-    // Signature from the base class, eslint doesn't like the any type.
-    // eslint-disable-next-line
-    getShaders(): any {
+    getShaders() {
         const parentShaders = super.getShaders();
-        // Overwrite the BitmapLayer's default fragment shader with ours, that does hillshading.
-        parentShaders.fs = fsHillshading;
-        // Add the decoder shader module to our colormap shader, so we can use the decoder function from our shader.
-        parentShaders.modules.push(decoder);
-        return parentShaders;
+        // use object.assign to make sure we don't overwrite existing fields like `vs`, `modules`...
+        return Object.assign({}, parentShaders, {
+            fs: fsHillshading,
+            modules: [...parentShaders.modules, project32, map2DUniforms],
+        });
     }
 
     getPickingInfo({
@@ -172,3 +179,84 @@ export default class Hillshading2DLayer extends BitmapLayer<Hillshading2DProps> 
 
 Hillshading2DLayer.layerName = "Hillshading2DLayer";
 Hillshading2DLayer.defaultProps = defaultProps;
+
+// local shader module for the uniforms
+const map2DUniformsBlock = /*glsl*/ `\
+uniform mapUniforms {
+    float valueRangeMin;
+    float valueRangeMax;
+    float colorMapRangeMin;
+    float colorMapRangeMax;
+
+    vec2 bitmapResolution;
+    float valueRangeSize;
+    vec3 lightDirection;
+    float ambientLightIntensity;
+    float diffuseLightIntensity;
+
+    vec3 rgbScaler;    // r, g and b multipliers
+    float floatScaler; // value multiplier
+    float offset;      // translation of the r, g, b sum
+    float step;        // discretize the value in a number of
+} map;
+
+float decode_rgb2float(vec3 rgb) {
+  rgb *= map.rgbScaler * vec3(16711680.0, 65280.0, 255.0); //255*256*256, 255*256, 255
+  float value = (rgb.r + rgb.g + rgb.b + map.offset) * map.floatScaler;
+
+  // Value must be in [0, 1] and step in (0, 1]
+  if (map.step > 0.0) {
+    value = floor(value / map.step + 0.5) * map.step;
+  }
+
+  // If colorMapRangeMin/Max specified, color map will span this interval.
+  float x  = value * (map.valueRangeMax - map.valueRangeMin) + map.valueRangeMin;
+  x = (x - map.colorMapRangeMin) / (map.colorMapRangeMax - map.colorMapRangeMin);
+  x = max(0.0, x);
+  x = min(1.0, x);
+
+  return x;
+}
+`;
+
+type Map2DUniformsType = {
+    valueRangeMin: number;
+    valueRangeMax: number;
+    colorMapRangeMin: number;
+    colorMapRangeMax: number;
+
+    bitmapResolution: [number, number];
+    valueRangeSize: number;
+    lightDirection: [number, number, number];
+    ambientLightIntensity: number;
+    diffuseLightIntensity: number;
+
+    rgbScaler: [number, number, number];
+    floatScaler: number;
+    offset: number;
+    step: number;
+};
+
+// NOTE: this must exactly the same name as in the uniform block
+const map2DUniforms = {
+    name: "map",
+    vs: map2DUniformsBlock,
+    fs: map2DUniformsBlock,
+    uniformTypes: {
+        valueRangeMin: "f32",
+        valueRangeMax: "f32",
+        colorMapRangeMin: "f32",
+        colorMapRangeMax: "f32",
+
+        bitmapResolution: "vec2<f32>",
+        valueRangeSize: "f32",
+        lightDirection: "vec3<f32>",
+        ambientLightIntensity: "f32",
+        diffuseLightIntensity: "f32",
+
+        rgbScaler: "vec3<f32>",
+        floatScaler: "f32",
+        offset: "f32",
+        step: "f32",
+    },
+} as const satisfies ShaderModule<LayerProps, Map2DUniformsType>;
