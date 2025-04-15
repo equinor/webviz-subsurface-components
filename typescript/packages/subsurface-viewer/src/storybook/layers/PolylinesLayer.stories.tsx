@@ -1,13 +1,14 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import React from "react";
 
-import { create, all } from "mathjs";
+import type { Meta, StoryObj } from "@storybook/react";
 
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 
-import { default as PolylinesLayer } from "../../layers/polylines/polylinesLayer";
-import { default as AxesLayer } from "../../layers/axes/axesLayer";
-
 import { default3DViews, defaultStoryParameters } from "../sharedSettings";
+import {
+    createMathWithSeed,
+    replaceNonJsonArgs,
+} from "../sharedHelperFunctions";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -19,14 +20,32 @@ const stories: Meta = {
 };
 export default stories;
 
+const sideSize = 10000;
+const pointsCount = 100000;
+
+const math = createMathWithSeed("123456789");
+
+const hugePoints = new Array(pointsCount * 3)
+    .fill(0)
+    .map(() => math.random(sideSize));
+
+// ---------In-place array data handling (storybook fails to rebuild non JSon data)--------------- //
+const hugePolylinesTypedDataLayerId = "huge_polylines_typed_data_layer";
+
+const nonJsonLayerArgs = {
+    [hugePolylinesTypedDataLayerId]: {
+        polylinePoints: new Float32Array(hugePoints),
+        startIndices: new Uint32Array([0, pointsCount]),
+    },
+};
+
 // Small example using polylinesLayer.
-const smallPolylinesLayer = new PolylinesLayer({
+const smallPolylinesLayer = {
+    "@@type": "PolylinesLayer",
     id: "small_polylines_layer",
     /* eslint-disable */
     polylinePoints: [
-        0, 0, 0, 10, 0, 0, 10, 0, 10,
-
-        -5, -5, 4, 0, -8, 6, 5, 10, 8,
+        0, 0, 0, 10, 0, 0, 10, 0, 10, -5, -5, 4, 0, -8, 6, 5, 10, 8,
     ],
     /* eslint-enable */
     startIndices: [0, 3],
@@ -36,16 +55,17 @@ const smallPolylinesLayer = new PolylinesLayer({
     widthUnits: "pixels",
     linesWidth: 10,
     ZIncreasingDownwards: true,
-});
+};
 
-const smallAxesLayer = new AxesLayer({
+const smallAxesLayer = {
+    "@@type": "AxesLayer",
     id: "small_axes_layer",
-    bounds: [-10, -10, 0, 20, 10, 10],
-});
+    bounds: [-10, -10, 0, 20, 15, 10],
+};
 
 export const SmallPolylinesLayer: StoryObj<typeof SubsurfaceViewer> = {
     args: {
-        id: "map",
+        id: "small-polylines",
         layers: [smallAxesLayer, smallPolylinesLayer],
         bounds: [-10, -10, 17, 10],
         views: default3DViews,
@@ -60,27 +80,9 @@ export const SmallPolylinesLayer: StoryObj<typeof SubsurfaceViewer> = {
     },
 };
 
-const sideSize = 10000;
-const pointsCount = 100000;
-
-const math = create(all, { randomSeed: "1234" });
-
-type TRandomNumberFunc = () => number;
-
-const randomFunc = ((): TRandomNumberFunc => {
-    if (math.random) {
-        return () => {
-            return math.random(sideSize);
-        };
-    }
-    return () => Math.random() * sideSize;
-})();
-
-const hugePoints = new Array(pointsCount * 3).fill(0).map(() => randomFunc());
-
-const hugePolylinesLayer = new PolylinesLayer({
-    id: "huge_polylines-layer",
-
+const hugePolylinesLayer = {
+    "@@type": "PolylinesLayer",
+    id: "huge_polylines_layer",
     polylinePoints: hugePoints,
     startIndices: [0],
     color: [0, 100, 100, 40],
@@ -89,12 +91,13 @@ const hugePolylinesLayer = new PolylinesLayer({
     linesWidth: 1,
 
     ZIncreasingDownwards: true,
-});
+};
 
-const hugeAxesLayer = new AxesLayer({
+const hugeAxesLayer = {
+    "@@type": "AxesLayer",
     id: "huge_axes_layer",
     bounds: [0, 0, 0, sideSize, sideSize, sideSize],
-});
+};
 
 export const HugePolylinesLayer: StoryObj<typeof SubsurfaceViewer> = {
     args: {
@@ -111,6 +114,9 @@ export const HugePolylinesLayer: StoryObj<typeof SubsurfaceViewer> = {
             },
         },
     },
+    render: (args) => (
+        <SubsurfaceViewer {...replaceNonJsonArgs(args, nonJsonLayerArgs)} />
+    ),
     tags: ["no-test"],
 };
 
@@ -121,11 +127,15 @@ export const HugeLayerTypedArrayInput: StoryObj<typeof SubsurfaceViewer> = {
             hugeAxesLayer,
             {
                 "@@type": "PolylinesLayer",
+                id: hugePolylinesTypedDataLayerId,
                 "@@typedArraySupport": true,
-                id: "huge_polylines-layer-typedarrays",
 
-                polylinePoints: new Float32Array(hugePoints),
-                startIndices: new Uint32Array([0, pointsCount]),
+                polylinePoints:
+                    nonJsonLayerArgs[hugePolylinesTypedDataLayerId]
+                        .polylinePoints,
+                startIndices:
+                    nonJsonLayerArgs[hugePolylinesTypedDataLayerId]
+                        .startIndices,
                 color: [0, 100, 200, 40],
 
                 widthUnits: "pixels",
@@ -145,5 +155,8 @@ export const HugeLayerTypedArrayInput: StoryObj<typeof SubsurfaceViewer> = {
             },
         },
     },
+    render: (args) => (
+        <SubsurfaceViewer {...replaceNonJsonArgs(args, nonJsonLayerArgs)} />
+    ),
     tags: ["no-test"],
 };

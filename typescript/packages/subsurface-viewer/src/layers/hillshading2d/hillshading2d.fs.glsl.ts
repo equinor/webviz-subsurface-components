@@ -1,5 +1,5 @@
 const fsHillshading = `#version 300 es
-#define SHADER_NAME hillshading2d-shader
+#define SHADER_NAME hillshading2d-fragment-shader
 
 precision highp float;
 
@@ -8,22 +8,15 @@ in vec2 vTexCoord;
 out vec4 fragColor;
 
 uniform sampler2D bitmapTexture; // Property map
-uniform vec2 bitmapResolution;
 
-uniform float valueRangeSize;
-
-uniform vec3 lightDirection;
-uniform float ambientLightIntensity;
-uniform float diffuseLightIntensity;
-uniform float opacity;
 
 // Compute the normal value for every pixel, based on the current value and two values aroud it.
 vec3 normal(float val) {
-  vec2 dr = 1.0 / bitmapResolution;
-  float p0 = valueRangeSize * val;
+  vec2 dr = 1.0 / map.bitmapResolution;
+  float p0 = map.valueRangeSize * val;
 
-  float px = valueRangeSize * decode_rgb2float(texture(bitmapTexture, vTexCoord + vec2(1.0, 0.0) / bitmapResolution).rgb);
-  float py = valueRangeSize * decode_rgb2float(texture(bitmapTexture, vTexCoord + vec2(0.0, 1.0) / bitmapResolution).rgb);
+  float px = map.valueRangeSize * decode_rgb2float(texture(bitmapTexture, vTexCoord + vec2(1.0, 0.0) / map.bitmapResolution).rgb);
+  float py = map.valueRangeSize * decode_rgb2float(texture(bitmapTexture, vTexCoord + vec2(0.0, 1.0) / map.bitmapResolution).rgb);
   vec3 dx = vec3(1.0, 0.0, px - p0);
   vec3 dy = vec3(0.0, 1.0, py - p0);
 
@@ -32,8 +25,8 @@ vec3 normal(float val) {
 
 // Compute how much a pixel is in the shadow based on its normal and where the light comes from.
 float shadow(vec3 normal) {
-  float diffuse = diffuseLightIntensity * dot(normal, normalize(lightDirection));
-  return clamp(ambientLightIntensity + diffuse, 0.0, 1.0);
+  float diffuse = map.diffuseLightIntensity * dot(normal, normalize(map.lightDirection));
+  return clamp(map.ambientLightIntensity + diffuse, 0.0, 1.0);
 }
 
 void main(void) {
@@ -54,7 +47,7 @@ void main(void) {
   // opacity 0 if pixel is completely in the light, opacity 1 if pixel is completely in the shadow.
   // The property map opacity (some portions of the property map can be transparent) and
   // the user provided image-wide opacity value are also taken into account.
-  fragColor = vec4(vec3(0.0), (1.0-shadow) * bitmapColor.a * opacity);
+  fragColor = vec4(vec3(0.0), (1.0-shadow) * bitmapColor.a * layer.opacity);
 
   geometry.uv = vTexCoord;
   DECKGL_FILTER_COLOR(fragColor, geometry);
