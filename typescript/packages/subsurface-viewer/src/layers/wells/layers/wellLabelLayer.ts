@@ -1,14 +1,17 @@
+import type { Color } from "@deck.gl/core";
 import { type DefaultProps, type UpdateParameters } from "@deck.gl/core";
 import type { TextLayerProps } from "@deck.gl/layers";
-import { TextLayer } from "@deck.gl/layers";
 import type { Feature, Position } from "geojson";
 import _ from "lodash";
 import { Vector2, Vector3 } from "math.gl";
 import type { Position3D } from "../../utils/layerTools";
-import { getTrajectory } from "../utils/trajectory";
 import type { WellFeature } from "../types";
+import { getTrajectory } from "../utils/trajectory";
+import type { MergedTextLayerProps } from "./mergedTextLayer";
+import { MergedTextLayer } from "./mergedTextLayer";
 
 type WellLabelLayerData = WellFeature;
+
 /**
  * Enum representing the orientation of well labels.
  */
@@ -27,7 +30,7 @@ export enum LabelOrientation {
 /**
  * Properties for the WellLabelLayer component.
  */
-export type WellLabelLayerProps = TextLayerProps<WellLabelLayerData> & {
+export type WellLabelLayerProps = MergedTextLayerProps<WellLabelLayerData> & {
     /**
      * Automatically reposition the label if it is outside the view.
      */
@@ -54,24 +57,44 @@ const DEFAULT_PROPS: DefaultProps<WellLabelLayerProps> = {
     id: "well-label-layer",
     autoPosition: false,
     getPositionAlongPath: 0,
-    getText: (d: WellFeature) => {
-        const name = d.properties.name;
-        return name;
-    },
+    getText: (d: WellFeature) => d.properties.name,
     getAlignmentBaseline: "bottom",
     getSize: 10,
     getColor: [0, 0, 0, 255],
     zIncreasingDownwards: true,
     orientation: LabelOrientation.HORIZONTAL,
-    backgroundPadding: [5, 1, 5, 1],
+    backgroundPadding: [3, 1, 3, 1],
     getBorderColor: [0, 0, 0, 255],
     getBorderWidth: 1,
 
-    // Animate label position transitions in order to help tracking when labels are moving
     transitions: {
+        // Animate label position transitions in order to help tracking when labels are moving
         getPosition: {
-            duration: 100,
+            duration: 1,
             type: "spring",
+            damping: 1,
+            stiffness: 0.5,
+        },
+
+        // Prevent changed label texts from appearing before the label background
+        // has moved into place
+        getColor: {
+            duration: 50,
+            type: "interpolation",
+            enter: ([r, g, b]: Color) => [r, g, b, 0],
+            easing: (t: number) => _.floor(t),
+        },
+
+        // Cosmetic effects for fading in the label background
+        getBackgroundColor: {
+            duration: 1,
+            type: "spring",
+            enter: ([r, g, b]: Color) => [r, g, b, 0],
+        },
+        getBorderColor: {
+            duration: 1,
+            type: "spring",
+            enter: ([r, g, b]: Color) => [r, g, b, 0],
         },
     },
 };
@@ -96,14 +119,14 @@ const getCumulativeDistance = (well_xyz: Position[]): number[] => {
 };
 
 /**
- * The `WellLabelLayer` class extends the `TextLayer` to provide functionality for rendering well labels
- * in a subsurface viewer. It includes methods for calculating label positions and angles based on well
- * trajectory data and the current viewport.
+ * The `WellLabelLayer` class extends the `MergedTextLayer` to provide functionality for rendering well
+ * labels in a subsurface viewer. It includes methods for calculating label positions and angles based
+ * on well trajectory data and the current viewport.
  *
  * @template WellLabelLayerData - The data type for the well label layer.
  * @template WellLabelLayerProps - The properties type for the well label layer.
  */
-export class WellLabelLayer extends TextLayer<
+export class WellLabelLayer extends MergedTextLayer<
     WellLabelLayerData,
     WellLabelLayerProps
 > {
@@ -139,6 +162,10 @@ export class WellLabelLayer extends TextLayer<
                     this.context.viewport.cameraPosition,
                     this.props.getPositionAlongPath,
                 ],
+                all: [
+                    this.context.viewport.cameraPosition,
+                    this.props.getPositionAlongPath,
+                ],
             },
         };
 
@@ -147,13 +174,21 @@ export class WellLabelLayer extends TextLayer<
 
     public override shouldUpdateState(params: UpdateParameters<this>): boolean {
         if (
-            params.changeFlags.viewportChanged === true &&
+            params.changeFlags.viewportChanged &&
             (params.props.autoPosition ||
                 "tangent" === params.props.orientation)
         ) {
             return true;
         }
         return super.shouldUpdateState(params);
+    }
+
+    public override updateState(params: UpdateParameters<this>): void {
+        if (params.props.autoPosition && params.changeFlags.viewportChanged) {
+            // Trigger dataChanged if labels move due to auto-positioning
+            params.changeFlags.dataChanged = "autoPosition";
+        }
+        super.updateState(params);
     }
 
     protected getLabelAngle(well: WellFeature) {
@@ -184,45 +219,8 @@ export class WellLabelLayer extends TextLayer<
 
         fraction = _.clamp(fraction, 0, 1);
 
-        // Return a pos "annotation_position" percent down the trajectory
-        const pos = this.getVectorAlongTrajectory(fraction, well_data)[1];
-
-        const label = well_data.properties?.["name"] ?? "";
-        const labelSize = label.length;
-
-        const view_from = new Vector3(this.context.viewport.cameraPosition);
-        const dir = new Vector3([
-            view_from[0] - pos[0],
-            view_from[1] - pos[1],
-            view_from[2] - pos[2],
-        ]);
-        dir.normalize();
-
-        let meanCharVal = 0;
-        for (let i = 0; i < labelSize; i++) {
-            const a = label.charCodeAt(i) - 32; // 32: ascii value for first relevant symbol.
-            meanCharVal += a;
-        }
-        meanCharVal = meanCharVal / labelSize; // unique text id for each label
-
-        const x = Math.floor(pos[0]) % 9;
-        const y = Math.floor(pos[1]) % 9;
-        const pId = x + y; // unique position id for each label
-
-        // Perturb position towards camera to avoid z-buffer fighting between labels.
-        // Distance dependent on unique properties of label so that no two labels
-        // are offset equally.
-        const offset = labelSize + meanCharVal + pId;
-
-        // Increase perturbation for labels at the top of the trajectory, where the
-        // cluttering is likely most prominent.
-        const zOffset = fraction > 0 ? offset : offset * 5;
-
-        return [
-            pos[0] + dir[0] * offset,
-            pos[1] + dir[1] * offset,
-            pos[2] + dir[2] * zOffset,
-        ];
+        // Return a position as a fraction down the trajectory
+        return this.getVectorAlongTrajectory(fraction, well_data)[1];
     }
 
     /**
