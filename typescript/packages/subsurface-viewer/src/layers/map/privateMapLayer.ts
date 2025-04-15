@@ -7,9 +7,7 @@ import type {
 } from "@deck.gl/core";
 import { COORDINATE_SYSTEM } from "@deck.gl/core";
 import type { Device, Texture, UniformValue } from "@luma.gl/core";
-import { utilities } from "../shader_modules";
-import { lighting } from "@luma.gl/shadertools";
-import { phongMaterial } from "../shader_modules/phong-material/phong-material";
+import { localPhongLighting, utilities } from "../shader_modules";
 import type {
     ExtendedLayerProps,
     LayerPickInfo,
@@ -18,13 +16,14 @@ import type {
 } from "../utils/layerTools";
 import { createPropertyData, getImageData } from "../utils/layerTools";
 import type { DeckGLLayerContext } from "../../components/Map";
-import fs from "./fragment.glsl";
+import fs from "./fragment.fs.glsl";
 import vs from "./vertex.glsl";
 import fsLineShader from "./fragment_lines.glsl";
 import vsLineShader from "./vertex_lines.glsl";
 import type { ShaderModule } from "@luma.gl/shadertools";
 import { Layer, project32, picking } from "@deck.gl/core";
 import { Model, Geometry } from "@luma.gl/engine";
+import { phongMaterial } from "@luma.gl/shadertools";
 
 export interface PrivateMapLayerProps extends ExtendedLayerProps {
     positions: Float32Array;
@@ -44,7 +43,6 @@ export interface PrivateMapLayerProps extends ExtendedLayerProps {
     smoothShading: boolean;
     depthTest: boolean;
     ZIncreasingDownwards: boolean;
-    enableLighting: boolean;
 }
 
 const defaultProps = {
@@ -58,27 +56,12 @@ const defaultProps = {
     meshValueRange: [0.0, 1.0],
     depthTest: true,
     ZIncreasingDownwards: true,
-    enableLighting: true,
 };
 
 // This is a private layer used only by the composite MapLayer
 export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
     get isLoaded(): boolean {
         return (this.state["isLoaded"] as boolean) ?? false;
-    }
-
-    setShaderModuleProps(
-        args: Partial<{
-            [x: string]: Partial<Record<string, unknown> | undefined>;
-        }>
-    ): void {
-        super.setShaderModuleProps({
-            ...args,
-            lighting: {
-                ...args["lighting"],
-                enabled: this.props.enableLighting,
-            },
-        });
     }
 
     initializeState(context: DeckGLLayerContext): void {
@@ -181,8 +164,8 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
                 project32,
                 picking,
                 utilities,
-                lighting,
                 phongMaterial,
+                localPhongLighting,
                 mapUniforms,
             ],
             bindings: {
@@ -190,7 +173,6 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
             },
             isInstanced: false,
         });
-
         mesh_model.shaderInputs.setProps({
             map: {
                 contourReferencePoint,
@@ -329,8 +311,8 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
                 project32,
                 picking,
                 utilities,
-                lighting,
                 phongMaterial,
+                localPhongLighting,
                 mapUniforms,
             ],
         });

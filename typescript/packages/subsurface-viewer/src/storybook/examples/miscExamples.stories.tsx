@@ -1,9 +1,15 @@
+import {
+    AmbientLight,
+    DirectionalLight,
+    PointLight,
+    type Layer,
+} from "@deck.gl/core";
 import { all, create } from "mathjs";
 import React from "react";
 
 import type { Meta, StoryObj } from "@storybook/react";
 
-import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
+import type { SubsurfaceViewerProps, LightsType } from "../../SubsurfaceViewer";
 import SubsurfaceViewer, { TGrid3DColoringMode } from "../../SubsurfaceViewer";
 import Grid3DLayer from "../../layers/grid3d/grid3dLayer";
 
@@ -35,7 +41,6 @@ import {
     Points as ToroidPoints,
     VertexCount as ToroidVertexCount,
 } from "../../layers/grid3d/test_data/PentagonalToroid";
-import type { Layer } from "@deck.gl/core";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -97,12 +102,36 @@ const material = {
     specularColor: [255, 255, 255],
 };
 
+const ambientLight = new AmbientLight({
+    color: [128, 128, 0],
+    intensity: 0.1,
+});
+
+const pointLight = new PointLight({
+    color: [255, 255, 255],
+    intensity: 1.0,
+    position: [20000, 20000, 20000],
+});
+
+const directionalLights = new DirectionalLight({
+    color: [255, 255, 255],
+    intensity: 1.0,
+    direction: [0, 0, -1],
+});
+
+const lights: LightsType = {
+    ambientLight,
+    directionalLights: [directionalLights],
+    pointLights: [pointLight],
+};
+
 export const MapMaterial: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "material",
         layers: [{ ...hugin25mKhNetmapMapLayerPng, material }],
         bounds: hugin2DBounds,
         views: default3DViews,
+        lights,
     },
     parameters: {
         docs: {
@@ -151,7 +180,8 @@ export const MapClampColor: StoryObj<typeof SubsurfaceViewer> = {
 const layer = {
     ...hugin25mKhNetmapMapLayerPng,
     isContoursDepth: true,
-    colorMapFunction: (x: number) => [255 - x * 100, 255 - x * 100, 255 * x], // If defined this function will override the colormap.
+    // @ts-expect-error TS7006
+    colorMapFunction: (x) => [255 - x * 100, 255 - x * 100, 255 * x], // If defined this function will override the colormap.
 };
 export const colorMapFunction: StoryObj<typeof SubsurfaceViewer> = {
     args: {
@@ -163,7 +193,8 @@ export const colorMapFunction: StoryObj<typeof SubsurfaceViewer> = {
             {
                 ...colormapLayer,
                 image: "propertyMap.png",
-                colorMapFunction: (x: number) => [
+                // @ts-expect-error TS7006
+                colorMapFunction: (x) => [
                     255 - x * 100,
                     255 - x * 100,
                     255 * x,
@@ -207,7 +238,8 @@ const SelectableFeatureComponent: React.FC<SubsurfaceViewerProps> = (args) => {
                 editedData={editedData}
                 setProps={(updatedProps) => {
                     setEditedData(
-                        updatedProps["editedData"] as Record<string, unknown>
+                        // @ts-expect-error TS4111
+                        updatedProps.editedData as Record<string, unknown>
                     );
                 }}
             />
