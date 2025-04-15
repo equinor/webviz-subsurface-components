@@ -198,6 +198,28 @@ export function createWellLogTracks(
         }
     }
 
+    // If no bounds have been defined (for example, if no tracks were added),
+    // we default to using the axis curve's min/max as bounds
+    if (!isFinite(info.minmaxPrimaryAxis[0])) {
+        const curves = wellLog[0].curves;
+        const data = wellLog[0].data;
+        const { primary } = getAxisIndices(curves, axes);
+
+        const firstAxisValue = data[0][primary];
+        if (typeof firstAxisValue === "number")
+            info.minmaxPrimaryAxis[0] = firstAxisValue;
+    }
+
+    if (!isFinite(info.minmaxPrimaryAxis[1])) {
+        const curves = wellLog[0].curves;
+        const data = wellLog[0].data;
+        const { primary } = getAxisIndices(curves, axes);
+
+        const lastAxisValue = data[data.length - 1][primary];
+        if (typeof lastAxisValue === "number")
+            info.minmaxPrimaryAxis[1] = lastAxisValue;
+    }
+
     return info;
 }
 
