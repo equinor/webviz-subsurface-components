@@ -58,7 +58,6 @@ import type {
     ColorAccessor,
     LogCurveDataType,
 } from "./types";
-import { FixedSizeExtension } from "../../extensions/fixed-size-extension";
 
 export enum SubLayerId {
     COLORS = "colors",
@@ -399,7 +398,6 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             background:
                 this.props.wellLabel?.background ||
                 this.props.hideOverlappingWellNames,
-            extensions: [new FixedSizeExtension()],
         });
 
         return new WellLabelLayer(wellLabelProps);

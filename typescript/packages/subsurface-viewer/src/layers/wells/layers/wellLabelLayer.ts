@@ -9,6 +9,7 @@ import type { WellFeature } from "../types";
 import { getTrajectory } from "../utils/trajectory";
 import type { MergedTextLayerProps } from "./mergedTextLayer";
 import { MergedTextLayer } from "./mergedTextLayer";
+import { FixedSizeExtension } from "../../../extensions/fixed-size-extension";
 
 type WellLabelLayerData = WellFeature;
 
@@ -97,6 +98,9 @@ const DEFAULT_PROPS: DefaultProps<WellLabelLayerProps> = {
             enter: ([r, g, b]: Color) => [r, g, b, 0],
         },
     },
+
+    // Ensure labels honor pixel size in screen space
+    extensions: [new FixedSizeExtension()],
 };
 
 const getCumulativeDistance = (well_xyz: Position[]): number[] => {
