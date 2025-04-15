@@ -205,7 +205,7 @@ export function createWellLogTracks(
         const data = wellLog[0].data;
         const { primary } = getAxisIndices(curves, axes);
 
-        const firstAxisValue = data[0][primary];
+        const firstAxisValue = data[0]?.[primary];
         if (typeof firstAxisValue === "number")
             info.minmaxPrimaryAxis[0] = firstAxisValue;
     }
@@ -215,7 +215,7 @@ export function createWellLogTracks(
         const data = wellLog[0].data;
         const { primary } = getAxisIndices(curves, axes);
 
-        const lastAxisValue = data[data.length - 1][primary];
+        const lastAxisValue = data[data.length - 1]?.[primary];
         if (typeof lastAxisValue === "number")
             info.minmaxPrimaryAxis[1] = lastAxisValue;
     }
