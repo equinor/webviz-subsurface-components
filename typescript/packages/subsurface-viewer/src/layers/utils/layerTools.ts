@@ -218,7 +218,7 @@ export function getImageData(
     colorMapFunction: ColorMapFunctionType | undefined,
     colormapSize: number = 256,
     discreteColormapFunction: boolean = false
-) {
+): Uint8Array {
     type funcType = (x: number) => Color;
 
     const isColorMapFunctionDefined = typeof colorMapFunction !== "undefined";
@@ -252,5 +252,5 @@ export function getImageData(
         }
     }
 
-    return data ? data : [0, 0, 0];
+    return data ? data : new Uint8Array([0, 0, 0]);
 }
