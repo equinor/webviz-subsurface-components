@@ -1,3 +1,10 @@
+## [2.4.3](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@2.4.2...well-log-viewer@2.4.3) (2025-04-15)
+
+
+### Bug Fixes
+
+* Made Well Log Viewer set correct bounds even if no tracks are present ([#2520](https://github.com/equinor/webviz-subsurface-components/issues/2520)) ([11a3592](https://github.com/equinor/webviz-subsurface-components/commit/11a35927ff36b5a147a78ab6472b86a699fffeb2))
+
 ## [2.4.2](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@2.4.1...well-log-viewer@2.4.2) (2025-04-15)
 
 
