@@ -1,3 +1,10 @@
+## [1.10.8](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.10.7...subsurface-viewer@1.10.8) (2025-04-16)
+
+
+### Bug Fixes
+
+* [NGRM] When zoomed in text labels on 3D axes shrinks. [#2510](https://github.com/equinor/webviz-subsurface-components/issues/2510) ([#2511](https://github.com/equinor/webviz-subsurface-components/issues/2511)) ([94281fc](https://github.com/equinor/webviz-subsurface-components/commit/94281fca4a2d219ee414494b1db22f9ef3ed8a70))
+
 ## [1.10.7](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.10.6...subsurface-viewer@1.10.7) (2025-04-15)
 
 

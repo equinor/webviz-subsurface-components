@@ -18,6 +18,7 @@ import type {
 import type { ExtendedLayerProps, Position3D } from "../utils/layerTools";
 import BoxLayer from "./boxLayer";
 import { ticks } from "d3-array";
+import { FixedSizeExtension } from "../../extensions/fixed-size-extension";
 
 export interface AxesLayerProps extends ExtendedLayerProps {
     /**
@@ -27,7 +28,11 @@ export interface AxesLayerProps extends ExtendedLayerProps {
      */
     bounds: BoundingBox3D;
     labelColor?: Color;
-    labelFontSize?: number;
+    /**
+     * Font size for tick labels, specified in pixels. Axis labels are +7 pixels relative to this size.
+     * @default 12
+     */
+    labelFontSize: number;
     fontFamily?: string;
     axisColor?: Color;
     /** If true means that input z values are interpreted as depths.
@@ -46,6 +51,7 @@ const defaultProps = {
     id: "axes-layer",
     visible: true,
     ZIncreasingDownwards: true,
+    labelFontSize: 12,
 };
 
 type TextLayerData = {
@@ -222,6 +228,7 @@ export default class AxesLayer extends CompositeLayer<AxesLayerProps> {
                     this.getBaseLine(d, is_orthographic),
                 coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
                 getColor: this.props.labelColor || [0, 0, 0, 255],
+                extensions: [new FixedSizeExtension()],
             })
         );
 
@@ -256,7 +263,7 @@ function maketextLayerData(
     tick_lines: number[],
     tick_labels: string[],
     bounds: BoundingBox3D,
-    labelFontSize?: number
+    labelFontSize: number
 ): [TextLayerData] {
     const x_min = bounds[0];
     const x_max = bounds[3];
@@ -273,29 +280,28 @@ function maketextLayerData(
 
     const offset = ((dx + dy + dz) / 3.0) * 0.1;
 
+    const axisAnnotationData = {
+        label: "X",
+        from: [0.0, 0.0, 0.0],
+        to: [x_max + offset, y_min, z_min],
+        size: labelFontSize + 7,
+    };
+
     const data = [
+        axisAnnotationData,
         {
-            label: "X",
-            from: [0.0, 0.0, 0.0],
-            to: [x_max + offset, y_min, z_min],
-            size: labelFontSize ?? 26,
-        },
-        {
+            ...axisAnnotationData,
             label: "Y",
-            from: [0.0, 0.0, 0.0],
             to: [x_min, y_max + offset, z_min],
-            size: labelFontSize ?? 26,
         },
     ];
 
     if (!is_orthographic) {
-        const z_axis_annotaion = {
+        data.push({
+            ...axisAnnotationData,
             label: "Z",
-            from: [0.0, 0.0, 0.0],
             to: [x_min, y_min, z_max + offset],
-            size: labelFontSize ?? 26,
-        };
-        data.push(z_axis_annotaion);
+        });
     }
 
     for (let i = 0; i < tick_lines.length / 6; i++) {
@@ -315,7 +321,7 @@ function maketextLayerData(
             label: label,
             from: from,
             to: to,
-            size: labelFontSize ?? 11,
+            size: labelFontSize,
         });
     }
 
