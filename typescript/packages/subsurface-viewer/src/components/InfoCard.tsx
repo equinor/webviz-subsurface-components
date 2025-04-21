@@ -17,6 +17,7 @@ import type {
     PropertyDataType,
 } from "../layers/utils/layerTools";
 import { rgb } from "d3-color";
+import { WellLabelLayer } from "../layers/wells/layers/wellLabelLayer";
 
 Icon.add({ arrow_drop_up, arrow_drop_down });
 
@@ -161,6 +162,27 @@ const InfoCard: React.FC<InfoCardProps> = (props: InfoCardProps) => {
             setInfoCardData(null);
             return;
         }
+
+        if (props.pickInfos[0].sourceLayer?.constructor === WellLabelLayer && props.pickInfos[0].object?.wellLabels) {
+            // Cluster of well labels.
+            const info_card_data: InfoCardDataType[] = [];
+            const xy_properties: PropertyDataType[] = [];
+            props.pickInfos[0].object.wellLabels.forEach((label) => {
+                xy_properties.push({
+                    name: label,
+                    value: "",
+                });
+            })
+
+            info_card_data.push({
+                layerName: "Well(s)",
+                properties: xy_properties,
+            });
+
+            setInfoCardData(info_card_data);
+            return;
+        }
+
         const topObject = props.pickInfos[0];
         if (
             topObject.coordinate === undefined ||

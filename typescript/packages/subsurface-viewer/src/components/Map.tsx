@@ -77,6 +77,7 @@ import type { ViewportType } from "../views/viewport";
 import { useVerticalScale } from "../views/viewport";
 
 import mergeRefs from "merge-refs";
+import { WellLabelLayer } from "../layers/wells/layers/wellLabelLayer";
 
 export type { BoundingBox2D, BoundingBox3D, Point2D, Point3D };
 /**
@@ -401,7 +402,10 @@ export interface MapProps {
 }
 
 function defaultTooltip(info: PickingInfo) {
-    if ((info as WellsPickInfo)?.logName) {
+    if (info.sourceLayer?.constructor === WellLabelLayer && info.object?.wellLabels) {
+        return info.object.wellLabels?.join("\n");
+    }
+    else if ((info as WellsPickInfo)?.logName) {
         return (info as WellsPickInfo)?.logName;
     } else if (info.layer?.id === "drawing-layer") {
         return (info as LayerPickInfo).propertyValue?.toFixed(2);
@@ -640,7 +644,7 @@ const Map: React.FC<MapProps> = ({
     const onHover = useCallback(
         (pickInfo: PickingInfo, event: MjolnirEvent) => {
             const infos = getPickingInfos(pickInfo, event);
-            setHoverInfo(infos); //  for InfoCard pickInfos
+            setHoverInfo(infos);
             callOnMouseEvent?.("hover", infos, event);
         },
         [callOnMouseEvent, getPickingInfos]

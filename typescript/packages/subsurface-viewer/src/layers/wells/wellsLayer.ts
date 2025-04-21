@@ -384,7 +384,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             ...this.props.wellLabel,
             id: SubLayerId.LABELS,
             data,
-
+            pickable: true, 
             // Z is always increasing upwards at this stage
             zIncreasingDownwards: false,
 
@@ -646,6 +646,10 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
     getPickingInfo({ info }: { info: PickingInfo }): WellsPickInfo {
         if (!info.object) return { ...info, properties: [], logName: "" };
+
+        if (info.sourceLayer?.constructor === WellLabelLayer) {
+            return { ...info, properties: [], logName: "" };
+        }
 
         const features = this.getWellDataState()?.features ?? [];
         const coordinate: Position = info.coordinate || [0, 0, 0];
