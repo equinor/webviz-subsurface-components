@@ -16,7 +16,7 @@ import type {
 } from "../utils/layerTools";
 import { createPropertyData, getImageData } from "../utils/layerTools";
 import type { DeckGLLayerContext } from "../../components/Map";
-import fs from "./fragment.fs.glsl";
+import fs from "./fragment.glsl";
 import vs from "./vertex.glsl";
 import fsLineShader from "./fragment_lines.glsl";
 import vsLineShader from "./vertex_lines.glsl";
