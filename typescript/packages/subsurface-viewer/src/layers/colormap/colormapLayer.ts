@@ -122,11 +122,9 @@ export default class ColormapLayer extends BitmapLayer<ColormapLayerProps> {
         super.initializeState();
     }
 
-    draw(args: {
-        moduleParameters?: unknown;
-        uniforms: UniformValue;
-        context: LayerContext;
-    }): void {
+    setShaderModuleProps(
+        ...props: Parameters<Model["shaderInputs"]["setProps"]>
+    ): void {
         if (!this.isLoaded) {
             if (typeof this.props.reportBoundingBox !== "undefined") {
                 const xMin = this.props.bounds[0] as number;
@@ -141,12 +139,7 @@ export default class ColormapLayer extends BitmapLayer<ColormapLayerProps> {
                 });
             }
         }
-        super.draw(args);
-    }
-
-    setShaderModuleProps(
-        ...props: Parameters<Model["shaderInputs"]["setProps"]>
-    ): void {
+ 
         // Set property for modelMatrix.
         const m = getModelMatrix(
             this.props.rotDeg,
