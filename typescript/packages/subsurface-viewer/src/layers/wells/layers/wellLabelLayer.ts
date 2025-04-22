@@ -1,4 +1,4 @@
-import type { Color } from "@deck.gl/core";
+import type { Color, PickingInfo } from "@deck.gl/core";
 import { type DefaultProps, type UpdateParameters } from "@deck.gl/core";
 import type { TextLayerProps } from "@deck.gl/layers";
 import type { Feature, Position } from "geojson";
@@ -327,12 +327,12 @@ export class WellLabelLayer extends MergedTextLayer<
         return [0, trajectory[0] as Position3D];
     }
 
-    getPickingInfo({ info }) { 
+    getPickingInfo({ info }: { info: PickingInfo }) {
         const name = info.object?.properties?.name ?? "";
         const pos = this.state.labelPositions.get(name)!;
         const names = this.state.clusters.get(pos);
 
-        info.object = {...info.object, wellLabels: names}
+        info.object = { ...info.object, wellLabels: names };
         return info;
     }
 }

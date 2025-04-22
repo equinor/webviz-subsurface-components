@@ -163,16 +163,19 @@ const InfoCard: React.FC<InfoCardProps> = (props: InfoCardProps) => {
             return;
         }
 
-        if (props.pickInfos[0].sourceLayer?.constructor === WellLabelLayer && props.pickInfos[0].object?.wellLabels) {
+        if (
+            props.pickInfos[0].sourceLayer?.constructor === WellLabelLayer &&
+            props.pickInfos[0].object?.wellLabels
+        ) {
             // Cluster of well labels.
             const info_card_data: InfoCardDataType[] = [];
             const xy_properties: PropertyDataType[] = [];
-            props.pickInfos[0].object.wellLabels.forEach((label) => {
+            props.pickInfos[0].object.wellLabels.forEach((label: string) => {
                 xy_properties.push({
                     name: label,
                     value: "",
                 });
-            })
+            });
 
             info_card_data.push({
                 layerName: "Well(s)",
