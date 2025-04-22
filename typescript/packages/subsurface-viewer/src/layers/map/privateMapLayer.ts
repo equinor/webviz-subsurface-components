@@ -7,7 +7,8 @@ import type {
 } from "@deck.gl/core";
 import { COORDINATE_SYSTEM } from "@deck.gl/core";
 import type { Device, Texture, UniformValue } from "@luma.gl/core";
-import { localPhongLighting, utilities } from "../shader_modules";
+import { utilities } from "../shader_modules";
+import { phongMaterial } from "../shader_modules/phong-material/phong-material";
 import type {
     ExtendedLayerProps,
     LayerPickInfo,
@@ -23,7 +24,6 @@ import vsLineShader from "./vertex_lines.glsl";
 import type { ShaderModule } from "@luma.gl/shadertools";
 import { Layer, project32, picking } from "@deck.gl/core";
 import { Model, Geometry } from "@luma.gl/engine";
-import { phongMaterial } from "@luma.gl/shadertools";
 
 export interface PrivateMapLayerProps extends ExtendedLayerProps {
     positions: Float32Array;
@@ -165,7 +165,6 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
                 picking,
                 utilities,
                 phongMaterial,
-                localPhongLighting,
                 mapUniforms,
             ],
             bindings: {
@@ -312,7 +311,6 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
                 picking,
                 utilities,
                 phongMaterial,
-                localPhongLighting,
                 mapUniforms,
             ],
         });

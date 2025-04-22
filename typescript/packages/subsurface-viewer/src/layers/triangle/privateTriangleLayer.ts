@@ -8,7 +8,7 @@ import type { Device } from "@luma.gl/core";
 import type { ShaderModule } from "@luma.gl/shadertools";
 
 import type { DeckGLLayerContext } from "../../components/Map";
-import { localPhongLighting } from "../shader_modules";
+import { phongMaterial } from "../shader_modules/phong-material/phong-material";
 import type {
     ExtendedLayerProps,
     LayerPickInfo,
@@ -112,12 +112,7 @@ export default class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProp
             fs: fsShader,
             bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
             geometry: new Geometry(this.props.geometryTriangles),
-            modules: [
-                project32,
-                picking,
-                localPhongLighting,
-                trianglesUniforms,
-            ],
+            modules: [project32, picking, phongMaterial, trianglesUniforms],
             isInstanced: false, // This only works when set to false.
         });
 
