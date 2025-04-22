@@ -1,3 +1,10 @@
+## [1.10.9](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.10.8...subsurface-viewer@1.10.9) (2025-04-20)
+
+
+### Bug Fixes
+
+* Fix model matrix ([#2513](https://github.com/equinor/webviz-subsurface-components/issues/2513)) ([04bb780](https://github.com/equinor/webviz-subsurface-components/commit/04bb78022a2d430120805858ff24e61a5b45d46d))
+
 ## [1.10.8](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.10.7...subsurface-viewer@1.10.8) (2025-04-16)
 
 
