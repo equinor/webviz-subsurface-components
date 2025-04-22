@@ -4,8 +4,6 @@ export default `\
 
 precision highp float;
 
-// uniform float uClipZ;
-
 in vec3 positions;
 
 void main(void) {
