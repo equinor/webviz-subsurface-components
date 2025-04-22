@@ -1,6 +1,6 @@
 import type { BitmapLayerPickingInfo, BitmapLayerProps } from "@deck.gl/layers";
 import { BitmapLayer } from "@deck.gl/layers";
-import type { LayerProps, PickingInfo } from "@deck.gl/core";
+import type { LayerContext, LayerProps, PickingInfo } from "@deck.gl/core";
 
 import type {
     LayerPickInfo,
@@ -20,6 +20,7 @@ import type { ContinuousLegendDataType } from "../../components/ColorLegend";
 import type { ShaderModule } from "@luma.gl/shadertools";
 import type { Model } from "@luma.gl/engine";
 import { project32 } from "@deck.gl/core";
+import { UniformValue } from "@luma.gl/core";
 
 function getImageData(
     colorMapName: string,
@@ -121,9 +122,11 @@ export default class ColormapLayer extends BitmapLayer<ColormapLayerProps> {
         super.initializeState();
     }
 
-    setShaderModuleProps(
-        ...props: Parameters<Model["shaderInputs"]["setProps"]>
-    ): void {
+    draw(args: {
+        moduleParameters?: unknown;
+        uniforms: UniformValue;
+        context: LayerContext;
+    }): void {
         if (!this.isLoaded) {
             if (typeof this.props.reportBoundingBox !== "undefined") {
                 const xMin = this.props.bounds[0] as number;
@@ -138,7 +141,12 @@ export default class ColormapLayer extends BitmapLayer<ColormapLayerProps> {
                 });
             }
         }
+        super.draw(args);
+    }
 
+    setShaderModuleProps(
+        ...props: Parameters<Model["shaderInputs"]["setProps"]>
+    ): void {
         // Set property for modelMatrix.
         const m = getModelMatrix(
             this.props.rotDeg,
