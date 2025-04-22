@@ -14,7 +14,8 @@ import type {
 } from "@luma.gl/core";
 import { Geometry, Model } from "@luma.gl/engine";
 import type { DeckGLLayerContext } from "../../components/Map";
-import { localPhongLighting, utilities } from "../shader_modules";
+import { utilities } from "../shader_modules";
+import { phongMaterial } from "../shader_modules/phong-material/phong-material";
 import type {
     ExtendedLayerProps,
     LayerPickInfo,
@@ -163,7 +164,7 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             modules: [
                 project32,
                 picking,
-                localPhongLighting,
+                phongMaterial,
                 utilities,
                 gridUniforms,
             ],
