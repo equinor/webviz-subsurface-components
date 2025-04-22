@@ -384,7 +384,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             ...this.props.wellLabel,
             id: SubLayerId.LABELS,
             data,
-            pickable: true, 
+            pickable: true,
             // Z is always increasing upwards at this stage
             zIncreasingDownwards: false,
 

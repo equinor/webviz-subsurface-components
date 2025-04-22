@@ -402,10 +402,12 @@ export interface MapProps {
 }
 
 function defaultTooltip(info: PickingInfo) {
-    if (info.sourceLayer?.constructor === WellLabelLayer && info.object?.wellLabels) {
+    if (
+        info.sourceLayer?.constructor === WellLabelLayer &&
+        info.object?.wellLabels
+    ) {
         return info.object.wellLabels?.join("\n");
-    }
-    else if ((info as WellsPickInfo)?.logName) {
+    } else if ((info as WellsPickInfo)?.logName) {
         return (info as WellsPickInfo)?.logName;
     } else if (info.layer?.id === "drawing-layer") {
         return (info as LayerPickInfo).propertyValue?.toFixed(2);
