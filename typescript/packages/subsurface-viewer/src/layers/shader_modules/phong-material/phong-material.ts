@@ -2,13 +2,10 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) vis.gl contributors
 
-// Note: Copied this module from luma.gl version 9.1.0
-// Modified function "lighting_getLightColor" in file "phong-shaders-glsl.ts" to get two sided phong lighting.
-
 import type { NumberArray3 } from "@math.gl/types";
 
 import type { ShaderModule } from "@luma.gl/shadertools";
-import { lighting } from "@luma.gl/shadertools";
+import { lighting } from "../lights/lighting";
 
 import { PHONG_WGSL } from "./phong-shaders-wgsl";
 import { PHONG_VS, PHONG_FS } from "./phong-shaders-glsl";
@@ -30,8 +27,6 @@ export const phongMaterial: ShaderModule<PhongMaterialProps> = {
     vs: PHONG_VS,
     fs: PHONG_FS,
     defines: {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
         LIGHTING_FRAGMENT: true,
     },
     uniformTypes: {

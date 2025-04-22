@@ -3,7 +3,7 @@ import React from "react";
 
 import type { Meta, StoryObj } from "@storybook/react";
 
-import type { SubsurfaceViewerProps, LightsType } from "../../SubsurfaceViewer";
+import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer, { TGrid3DColoringMode } from "../../SubsurfaceViewer";
 import Grid3DLayer from "../../layers/grid3d/grid3dLayer";
 
