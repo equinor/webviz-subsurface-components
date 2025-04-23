@@ -35,6 +35,7 @@ import {
     Points as ToroidPoints,
     VertexCount as ToroidVertexCount,
 } from "../../layers/grid3d/test_data/PentagonalToroid";
+import { Layer } from "@deck.gl/core";
 
 const stories: Meta = {
     component: SubsurfaceViewer,

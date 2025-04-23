@@ -142,6 +142,7 @@ export const lighting = {
     fs: lightingUniformsGLSL,
 
     getUniforms,
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 } as const satisfies ShaderModule<LightingProps, LightingUniforms, {}>;
 
 function getUniforms(
