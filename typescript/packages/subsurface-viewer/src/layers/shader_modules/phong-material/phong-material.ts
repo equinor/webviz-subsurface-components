@@ -8,7 +8,7 @@
 import type { NumberArray3 } from "@math.gl/types";
 
 import type { ShaderModule } from "@luma.gl/shadertools";
-import { lighting } from "../lights/lighting";
+import { lighting } from "@luma.gl/shadertools";
 
 import { PHONG_WGSL } from "./phong-shaders-wgsl";
 import { PHONG_VS, PHONG_FS } from "./phong-shaders-glsl";
