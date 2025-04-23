@@ -135,8 +135,5 @@
     },
     "workspaces": [
         "packages/*"
-    ],
-    "dependencies": {
-        "math.gl": "^4.1.0"
-    }
+    ]
 }
