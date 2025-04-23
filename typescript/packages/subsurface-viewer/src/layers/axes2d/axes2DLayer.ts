@@ -12,7 +12,7 @@ import {
 } from "@deck.gl/core";
 import { load } from "@loaders.gl/core";
 import { ImageLoader } from "@loaders.gl/images";
-import type { UniformValue } from "@luma.gl/core";
+import type { RenderPass, UniformValue } from "@luma.gl/core";
 import { Geometry, Model } from "@luma.gl/engine";
 import type { ShaderModule } from "@luma.gl/shadertools";
 
@@ -517,8 +517,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         return labels;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    draw(opts: any): void {
+    draw(opts: { context: { renderPass: RenderPass } }): void {
         const is_orthographic =
             this.context.viewport.constructor === OrthographicViewport;
         if (
