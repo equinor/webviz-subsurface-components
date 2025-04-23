@@ -8,6 +8,7 @@ import type { Device } from "@luma.gl/core";
 import type { ShaderModule } from "@luma.gl/shadertools";
 
 import type { DeckGLLayerContext } from "../../components/Map";
+import { lighting } from "@luma.gl/shadertools";
 import { phongMaterial } from "../shader_modules/phong-material/phong-material";
 import type {
     ExtendedLayerProps,
@@ -41,14 +42,6 @@ export type GeometryLines = {
     vertexCount: number;
 };
 
-export type Material =
-    | {
-          ambient: number;
-          diffuse: number;
-          shininess: number;
-          specularColor: [number, number, number];
-      }
-    | boolean;
 
 export interface PrivateTriangleLayerProps extends ExtendedLayerProps {
     geometryTriangles: GeometryTriangles;
@@ -59,6 +52,7 @@ export interface PrivateTriangleLayerProps extends ExtendedLayerProps {
     smoothShading: boolean;
     depthTest: boolean;
     ZIncreasingDownwards: boolean;
+    enableLighting: boolean;
 }
 
 const defaultProps = {
@@ -71,12 +65,23 @@ const defaultProps = {
     depthTest: true,
     smoothShading: true,
     ZIncreasingDownwards: true,
+    enableLighting: true,
 };
 
 // This is a private layer used only by the composite TriangleLayer
 export default class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProps> {
     get isLoaded(): boolean {
         return (this.state["isLoaded"] as boolean) ?? false;
+    }
+
+    setShaderModuleProps( args: Partial<{ [x: string]: Partial<Record<string, unknown> | undefined>; }> ): void {
+        super.setShaderModuleProps({
+                ...args,
+                lighting: {
+                    ...args["lighting"],
+                    enabled: this.props.enableLighting,
+                },
+            })
     }
 
     initializeState(context: DeckGLLayerContext): void {
@@ -112,7 +117,7 @@ export default class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProp
             fs: fsShader,
             bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
             geometry: new Geometry(this.props.geometryTriangles),
-            modules: [project32, picking, phongMaterial, trianglesUniforms],
+            modules: [project32, picking, lighting, phongMaterial, trianglesUniforms],
             isInstanced: false, // This only works when set to false.
         });
 

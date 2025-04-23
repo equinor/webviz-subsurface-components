@@ -408,6 +408,7 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
         const undefinedColor = this.getUndefinedPropertyColor();
         const undefinedValue = this.getUndefinedPropertyValue();
 
+        const enableLighting: boolean = !(this.props.material === false);
         const layer = new PrivateLayer(
             this.getSubLayerProps({
                 mesh: this.state["mesh"],
@@ -427,6 +428,7 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
                 material: this.props.material,
                 depthTest: this.props.depthTest,
                 ZIncreasingDownwards: this.props.ZIncreasingDownwards,
+                enableLighting,
             })
         );
         return [layer];
