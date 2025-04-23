@@ -15,6 +15,7 @@ import type {
 import { Geometry, Model } from "@luma.gl/engine";
 import type { DeckGLLayerContext } from "../../components/Map";
 import { utilities } from "../shader_modules";
+import { lighting } from "@luma.gl/shadertools";
 import { phongMaterial } from "../shader_modules/phong-material/phong-material";
 import type {
     ExtendedLayerProps,
@@ -70,6 +71,7 @@ export interface PrivateLayerProps extends ExtendedLayerProps {
     discretePropertyValueNames?: IDiscretePropertyValueName[];
     depthTest: boolean;
     ZIncreasingDownwards: boolean;
+    enableLighting: boolean;
 }
 
 const defaultProps = {
@@ -80,6 +82,7 @@ const defaultProps = {
     propertyValueRange: [0.0, 1.0],
     depthTest: true,
     ZIncreasingDownwards: true,
+    enableLighting: true,
 };
 
 interface IUniforms {
@@ -105,6 +108,16 @@ interface IColormapTextureHints {
 export default class PrivateLayer extends Layer<PrivateLayerProps> {
     get isLoaded(): boolean {
         return (this.state["isLoaded"] as boolean) ?? false;
+    }
+
+    setShaderModuleProps( args: Partial<{ [x: string]: Partial<Record<string, unknown> | undefined>; }> ): void {
+        super.setShaderModuleProps({
+                ...args,
+                lighting: {
+                    ...args["lighting"],
+                    enabled: this.props.enableLighting,
+                },
+            })
     }
 
     initializeState(context: DeckGLLayerContext): void {
@@ -164,6 +177,7 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             modules: [
                 project32,
                 picking,
+                lighting,
                 phongMaterial,
                 utilities,
                 gridUniforms,
