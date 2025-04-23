@@ -71,16 +71,22 @@ const DEFAULT_PROPS: DefaultProps<WellLabelLayerProps> = {
     transitions: {
         // Animate label position transitions in order to help tracking when labels are moving
         getPosition: {
-            duration: 1,
-            type: "spring",
-            damping: 1,
-            stiffness: 0.5,
+            duration: 100,
+            type: "interpolation",
         },
 
         // Prevent changed label texts from appearing before the label background
         // has moved into place
         getColor: {
-            duration: 50,
+            duration: 100,
+            type: "interpolation",
+            enter: ([r, g, b]: Color) => [r, g, b, 0],
+            easing: (t: number) => _.floor(t),
+        },
+
+        // Prevent changed background border from appearing before the label text
+        getBorderColor: {
+            duration: 1,
             type: "interpolation",
             enter: ([r, g, b]: Color) => [r, g, b, 0],
             easing: (t: number) => _.floor(t),
@@ -88,11 +94,6 @@ const DEFAULT_PROPS: DefaultProps<WellLabelLayerProps> = {
 
         // Cosmetic effects for fading in the label background
         getBackgroundColor: {
-            duration: 1,
-            type: "spring",
-            enter: ([r, g, b]: Color) => [r, g, b, 0],
-        },
-        getBorderColor: {
             duration: 1,
             type: "spring",
             enter: ([r, g, b]: Color) => [r, g, b, 0],
@@ -246,8 +247,7 @@ export class WellLabelLayer extends MergedTextLayer<
             return [0, [0, 0, 0]];
         }
 
-        const width = this.context.viewport.width;
-        const height = this.context.viewport.height;
+        const { width, height } = this.context.viewport;
 
         const candidateFractions = [0.5, 0.25, 0.75, 0.125, 0.87, 0.37, 0.62];
 
