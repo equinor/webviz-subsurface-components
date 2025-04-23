@@ -110,14 +110,18 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
         return (this.state["isLoaded"] as boolean) ?? false;
     }
 
-    setShaderModuleProps( args: Partial<{ [x: string]: Partial<Record<string, unknown> | undefined>; }> ): void {
+    setShaderModuleProps(
+        args: Partial<{
+            [x: string]: Partial<Record<string, unknown> | undefined>;
+        }>
+    ): void {
         super.setShaderModuleProps({
-                ...args,
-                lighting: {
-                    ...args["lighting"],
-                    enabled: this.props.enableLighting,
-                },
-            })
+            ...args,
+            lighting: {
+                ...args["lighting"],
+                enabled: this.props.enableLighting,
+            },
+        });
     }
 
     initializeState(context: DeckGLLayerContext): void {
