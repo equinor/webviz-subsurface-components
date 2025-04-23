@@ -1,6 +1,6 @@
 import type { BitmapLayerPickingInfo, BitmapLayerProps } from "@deck.gl/layers";
 import { BitmapLayer } from "@deck.gl/layers";
-import type { LayerContext, LayerProps, PickingInfo } from "@deck.gl/core";
+import type { LayerProps, PickingInfo } from "@deck.gl/core";
 
 import type {
     LayerPickInfo,
@@ -20,7 +20,6 @@ import type { ContinuousLegendDataType } from "../../components/ColorLegend";
 import type { ShaderModule } from "@luma.gl/shadertools";
 import type { Model } from "@luma.gl/engine";
 import { project32 } from "@deck.gl/core";
-import { UniformValue } from "@luma.gl/core";
 
 function getImageData(
     colorMapName: string,
@@ -139,7 +138,7 @@ export default class ColormapLayer extends BitmapLayer<ColormapLayerProps> {
                 });
             }
         }
- 
+
         // Set property for modelMatrix.
         const m = getModelMatrix(
             this.props.rotDeg,
