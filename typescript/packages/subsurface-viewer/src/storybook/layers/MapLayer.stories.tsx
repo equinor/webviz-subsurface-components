@@ -783,14 +783,15 @@ const ExtensionsComponent: React.FC<
         // @ts-expect-error TS7053
         args.bounds?.[3],
     ];
+    //console.log(leftClipBounds)
     // Can not use Record<string, unknown> because extensions will not be supported
     const leftMap = new MapLayer({
         ...hugin25mKhNetmapMapLayer,
         id: "left",
-        material: false,
+        material: true,
         extensions: [new ClipExtension()],
-        clipBounds: leftClipBounds,
-        clipByInstance: true,
+        // //clipBounds: leftClipBounds,
+        // clipByInstance: false,
     });
 
     const rightMap = new MapLayer({
@@ -800,13 +801,13 @@ const ExtensionsComponent: React.FC<
         material: false,
         extensions: [new ClipExtension()],
         clipBounds: rightClipBounds,
-        clipByInstance: true,
+        //clipByInstance: true,
     });
 
     const layers = [
         new AxesLayer({ ...huginAxes3DLayer }),
         leftMap,
-        rightMap,
+        //rightMap,
         new NorthArrow3DLayer(),
     ];
 
