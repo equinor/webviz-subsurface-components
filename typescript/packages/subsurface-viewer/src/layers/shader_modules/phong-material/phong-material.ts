@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) vis.gl contributors
 
-// Note: Copied this module from luma.gl version 9.1.0
+// Note: Copied this module from luma.gl.
+// https://github.com/visgl/luma.gl branch 9.1-release
 // Modified function "lighting_getLightColor" in file "phong-shaders-glsl.ts" to get two sided phong lighting.
 
 import type { NumberArray3 } from "@math.gl/types";

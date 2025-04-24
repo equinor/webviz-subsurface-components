@@ -4,7 +4,7 @@ const fsShader = `#version 300 es
 precision highp float;
 
 in vec2 vTexCoord;
-in vec3 cameraPosition_;
+in vec3 cameraPosition;
 in vec3 normals_commonspace;
 in vec4 position_commonspace;
 in vec4 vColor;
@@ -77,7 +77,7 @@ void main(void) {
    }
 
    // Use two sided phong lighting. This has no effect if "material" property is not set.
-   vec3 lightColor = lighting_getLightColor(color.rgb, cameraPosition_, position_commonspace.xyz, normal);
+   vec3 lightColor = lighting_getLightColor(color.rgb, cameraPosition, position_commonspace.xyz, normal);
 
    fragColor = vec4(lightColor, 1.0);
 
