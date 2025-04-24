@@ -177,14 +177,6 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
                 indices: { value: this.props.triangleIndices, size: 1 },
             }),
             bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
-            modules: [
-                project32,
-                picking,
-                utilities,
-                lighting,
-                phongMaterial,
-                mapUniforms,
-            ],
             bindings: {
                 colormap: colormap,
             },
