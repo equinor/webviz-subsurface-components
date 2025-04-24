@@ -12,7 +12,7 @@ in vec3 colors;
 
 // Outputs to fragment shader
 out vec2 vTexCoord;
-out vec3 cameraPosition_;
+out vec3 cameraPosition;
 out vec3 normals_commonspace;
 out vec4 position_commonspace;
 out vec4 vColor;
@@ -27,7 +27,7 @@ void main(void) {
    vec3 position = positions;
    position[2] *= map.ZIncreasingDownwards ? -1.0 : 1.0;
 
-   cameraPosition_ = project.cameraPosition;
+   cameraPosition = project.cameraPosition;
 
    worldPos = position;
    geometry.worldPosition = position;
