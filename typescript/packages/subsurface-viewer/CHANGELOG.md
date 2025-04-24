@@ -1,3 +1,10 @@
+## [1.10.10](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.10.9...subsurface-viewer@1.10.10) (2025-04-23)
+
+
+### Bug Fixes
+
+* **subsurface-viewer:** prevent disappearing well label texts ([#2526](https://github.com/equinor/webviz-subsurface-components/issues/2526)) ([d6e9c9d](https://github.com/equinor/webviz-subsurface-components/commit/d6e9c9d5927e23410cb24b20861ba02c7fc48bab)), closes [#2524](https://github.com/equinor/webviz-subsurface-components/issues/2524)
+
 ## [1.10.9](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.10.8...subsurface-viewer@1.10.9) (2025-04-20)
 
 
