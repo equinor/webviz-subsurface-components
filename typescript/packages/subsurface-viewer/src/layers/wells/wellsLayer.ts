@@ -645,10 +645,15 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
     }
 
     getPickingInfo({ info }: { info: PickingInfo }): WellsPickInfo {
-        if (!info.object) return { ...info, properties: [], logName: "" };
+        const noLog = {
+            properties: [],
+            logName: "",
+        };
+
+        if (!info.object) return { ...info, ...noLog };
 
         if (info.sourceLayer?.constructor === WellLabelLayer) {
-            return { ...info, properties: [], logName: "" };
+            return { ...info, ...noLog };
         }
 
         const features = this.getWellDataState()?.features ?? [];
