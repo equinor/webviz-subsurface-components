@@ -164,9 +164,7 @@ const InfoCard: React.FC<InfoCardProps> = (props: InfoCardProps) => {
         }
 
         if (
-            (props.pickInfos[0].layer?.constructor === WellLabelLayer ||
-                props.pickInfos[0].sourceLayer?.constructor ===
-                    WellLabelLayer) &&
+            props.pickInfos[0].sourceLayer?.constructor === WellLabelLayer &&
             props.pickInfos[0].object?.wellLabels
         ) {
             // Cluster of well labels.

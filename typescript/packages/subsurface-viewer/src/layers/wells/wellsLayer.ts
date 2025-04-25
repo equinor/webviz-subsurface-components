@@ -656,6 +656,10 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             return { ...info, ...noLog };
         }
 
+        if (info.sourceLayer?.constructor === WellLabelLayer) {
+            return { ...info, properties: [], logName: "" };
+        }
+
         const features = this.getWellDataState()?.features ?? [];
         const coordinate: Position = info.coordinate || [0, 0, 0];
 

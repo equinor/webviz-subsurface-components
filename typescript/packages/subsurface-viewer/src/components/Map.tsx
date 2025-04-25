@@ -403,8 +403,7 @@ export interface MapProps {
 
 function defaultTooltip(info: PickingInfo) {
     if (
-        (info.layer?.constructor === WellLabelLayer ||
-            info.sourceLayer?.constructor === WellLabelLayer) &&
+        info.sourceLayer?.constructor === WellLabelLayer &&
         info.object?.wellLabels
     ) {
         return info.object.wellLabels?.join("\n");
