@@ -9,7 +9,7 @@ import type { ShaderModule } from "@luma.gl/shadertools";
 
 import type { DeckGLLayerContext } from "../../components/Map";
 import { lighting } from "@luma.gl/shadertools";
-import { phongMaterial } from "../shader_modules/phong-material/phong-material";
+import { phongMaterial } from "../shader_modules/phong-lighting/phong-material";
 import type {
     ExtendedLayerProps,
     LayerPickInfo,

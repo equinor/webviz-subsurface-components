@@ -9,7 +9,7 @@ import { COORDINATE_SYSTEM } from "@deck.gl/core";
 import type { Device, Texture, UniformValue } from "@luma.gl/core";
 import { utilities } from "../shader_modules";
 import { lighting } from "@luma.gl/shadertools";
-import { phongMaterial } from "../shader_modules/phong-material/phong-material";
+import { phongMaterial } from "../shader_modules/phong-lighting/phong-material";
 import type {
     ExtendedLayerProps,
     LayerPickInfo,

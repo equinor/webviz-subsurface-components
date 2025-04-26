@@ -16,7 +16,7 @@ import { Geometry, Model } from "@luma.gl/engine";
 import type { DeckGLLayerContext } from "../../components/Map";
 import { utilities } from "../shader_modules";
 import { lighting } from "@luma.gl/shadertools";
-import { phongMaterial } from "../shader_modules/phong-material/phong-material";
+import { phongMaterial } from "../shader_modules/phong-lighting/phong-material";
 import type {
     ExtendedLayerProps,
     LayerPickInfo,
