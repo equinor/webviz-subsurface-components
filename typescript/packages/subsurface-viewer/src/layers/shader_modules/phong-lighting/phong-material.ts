@@ -11,7 +11,6 @@ import type { NumberArray3 } from "@math.gl/types";
 import type { ShaderModule } from "@luma.gl/shadertools";
 import { lighting } from "@luma.gl/shadertools";
 
-import { PHONG_WGSL } from "./phong-shaders-wgsl";
 import { PHONG_VS, PHONG_FS } from "./phong-shaders-glsl";
 
 export type PhongMaterialProps = {
@@ -27,7 +26,6 @@ export const phongMaterial: ShaderModule<PhongMaterialProps> = {
     name: "phongMaterial",
     dependencies: [lighting],
     // Note these are switched between phong and gouraud
-    source: PHONG_WGSL,
     vs: PHONG_VS,
     fs: PHONG_FS,
     defines: {

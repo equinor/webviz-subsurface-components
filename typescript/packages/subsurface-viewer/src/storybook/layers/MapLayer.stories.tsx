@@ -788,10 +788,10 @@ const ExtensionsComponent: React.FC<
     const leftMap = new MapLayer({
         ...hugin25mKhNetmapMapLayer,
         id: "left",
-        material: true,
+        material: false,
         extensions: [new ClipExtension()],
         clipBounds: leftClipBounds,
-        clipByInstance: false,
+        clipByInstance: true,
     });
 
     const rightMap = new MapLayer({
