@@ -13,7 +13,7 @@ import type {
     WellFeature,
     WellFeatureCollection,
 } from "../../layers/wells/types";
-import type { ViewsType } from "../../SubsurfaceViewer";
+import type { ViewStateType, ViewsType } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import {
     LABEL_ORIENTATION_ARGTYPES,
@@ -23,6 +23,7 @@ import {
 } from "../constant/argTypes";
 import type { TrajectorySimulationProps } from "../types/trajectory";
 import { getRgba } from "../util/color";
+import { fireEvent, userEvent } from "@storybook/test";
 
 type WellCount = { wellCount: number };
 
@@ -314,6 +315,79 @@ export const Default: StoryObj<WellCount> = {
         };
 
         return <SubsurfaceViewer {...propsWithLayers} />;
+    },
+};
+
+export const WellLabelPicking: StoryObj<typeof SubsurfaceViewer> = {
+    render: () => {
+        const camera: ViewStateType = {
+            target: [458305, 6785369, 0],
+            zoom: 0,
+            rotationX: 0,
+            rotationOrbit: 40,
+        };
+
+        const data = getSyntheticWells(10);
+
+        const wellLayer = new WellsLayer({
+            ...WELL_LAYER_PROPS,
+            data,
+        });
+
+        const labelLayer = new WellLabelLayer({
+            ...DEFAULT_LABEL_PROPS,
+            data: data.features,
+            background: true,
+            getSize: 100,
+        });
+
+        const propsWithLayers = {
+            id: "default",
+            cameraPosition: camera,
+            layers: [...AXES_LAYERS, wellLayer, labelLayer],
+            views: {
+                layout: [1, 1],
+                viewports: [
+                    {
+                        id: "view_1",
+                        show3D: false,
+                        layerIds: [
+                            "well-layer",
+                            "axes-layer-3d",
+                            "well-labels",
+                        ],
+                    },
+                ],
+            } as ViewsType,
+        };
+
+        return <SubsurfaceViewer {...propsWithLayers} />;
+    },
+    play: async () => {
+        const delay = 500;
+        const canvas = document.querySelector("canvas");
+
+        if (canvas) {
+            await userEvent.click(canvas, { delay });
+        }
+
+        if (!canvas) {
+            return;
+        }
+
+        const leftViewCenterPosition = {
+            x: canvas.clientLeft + canvas.clientWidth / 2,
+            y: canvas.clientTop + canvas.clientHeight / 2,
+        };
+
+        await userEvent.hover(canvas, { delay });
+
+        await fireEvent.mouseMove(canvas, { clientX: 0, clientY: 0, delay });
+        await fireEvent.mouseMove(canvas, {
+            clientX: leftViewCenterPosition.x,
+            clientY: leftViewCenterPosition.y,
+            delay,
+        });
     },
 };
 

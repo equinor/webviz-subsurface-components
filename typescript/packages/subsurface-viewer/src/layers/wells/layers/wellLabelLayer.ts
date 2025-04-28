@@ -1,4 +1,4 @@
-import type { Color } from "@deck.gl/core";
+import type { Color, PickingInfo } from "@deck.gl/core";
 import { type DefaultProps, type UpdateParameters } from "@deck.gl/core";
 import type { TextLayerProps } from "@deck.gl/layers";
 import type { Feature, Position } from "geojson";
@@ -67,6 +67,7 @@ const DEFAULT_PROPS: DefaultProps<WellLabelLayerProps> = {
     backgroundPadding: [3, 1, 3, 1],
     getBorderColor: [0, 0, 0, 255],
     getBorderWidth: 1,
+    pickable: true,
 
     transitions: {
         // Animate label position transitions in order to help tracking when labels are moving
@@ -324,6 +325,15 @@ export class WellLabelLayer extends MergedTextLayer<
 
         // Default to well head of no valid position is found in viewport
         return [0, trajectory[0] as Position3D];
+    }
+
+    getPickingInfo({ info }: { info: PickingInfo }) {
+        const name = info.object?.properties?.name ?? "";
+        const pos = this.state.labelPositions.get(name)!;
+        const names = this.state.clusters.get(pos);
+
+        info.object = { ...info.object, wellLabels: names };
+        return info;
     }
 }
 
