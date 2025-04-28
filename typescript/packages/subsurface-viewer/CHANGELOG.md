@@ -1,3 +1,10 @@
+# [1.11.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.10.10...subsurface-viewer@1.11.0) (2025-04-28)
+
+
+### Features
+
+* Well labels tool tip ([#2523](https://github.com/equinor/webviz-subsurface-components/issues/2523)) ([d27bcc1](https://github.com/equinor/webviz-subsurface-components/commit/d27bcc16fa5b4f2bd0a5e851bed8463544bf493d))
+
 ## [1.10.10](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.10.9...subsurface-viewer@1.10.10) (2025-04-23)
 
 
