@@ -318,7 +318,7 @@ export const Default: StoryObj<WellCount> = {
     },
 };
 
-export const Default2: StoryObj<typeof SubsurfaceViewer> = {
+export const WellLabelPicking: StoryObj<typeof SubsurfaceViewer> = {
     render: () => {
         const camera: ViewStateType = {
             target: [458305, 6785369, 0],

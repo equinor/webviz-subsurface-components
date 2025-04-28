@@ -650,14 +650,8 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             logName: "",
         };
 
-        if (!info.object) return { ...info, ...noLog };
-
-        if (info.sourceLayer?.constructor === WellLabelLayer) {
+        if (!info.object || info.sourceLayer?.constructor === WellLabelLayer) {
             return { ...info, ...noLog };
-        }
-
-        if (info.sourceLayer?.constructor === WellLabelLayer) {
-            return { ...info, properties: [], logName: "" };
         }
 
         const features = this.getWellDataState()?.features ?? [];
