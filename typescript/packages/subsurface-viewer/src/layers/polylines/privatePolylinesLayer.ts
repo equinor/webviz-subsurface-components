@@ -30,14 +30,6 @@ export class PrivatePolylinesLayer extends PathLayer<
         });
     }
 
-    // DrawOptions is not exported by deck.gl :/
-    // DrawOptions = {
-    //     renderPass: RenderPass;
-    //     shaderModuleProps: any;
-    //     uniforms: any;
-    //     parameters: any;
-    //     context: LayerContext;
-    //   }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     draw(args: any): void {
         //conf g = context.device.getDefaultCanvasContext();

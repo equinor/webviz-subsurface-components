@@ -262,14 +262,6 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
         return [];
     }
 
-    // DrawOptions is not exported by deck.gl :/
-    // DrawOptions = {
-    //     renderPass: RenderPass;
-    //     shaderModuleProps: any;
-    //     uniforms: any;
-    //     parameters: any;
-    //     context: LayerContext;
-    //   }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     draw(args: any): void {
         if (!this.state["shapeModel"]) {
