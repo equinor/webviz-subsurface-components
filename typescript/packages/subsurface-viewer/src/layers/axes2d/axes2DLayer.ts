@@ -711,7 +711,6 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
             id: `${this.props.id}-background`,
             vs: lineVertexShader,
             fs: lineFragmentShader,
-            //uniforms: { uColor: bColor, uClipZ: -0.9 },
             geometry: new Geometry({
                 topology: "triangle-list",
                 attributes: {
@@ -844,10 +843,6 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                 id: `${this.props.id}-${label}`,
                 vs: labelVertexShader,
                 fs: labelFragmentShader,
-                // uniforms: {
-                //     uAxisColor: lineColor,
-                //     uBackGroundColor: bColor,
-                // },
                 bindings: {
                     // @ts-ignore
                     fontTexture,

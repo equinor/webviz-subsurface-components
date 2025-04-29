@@ -8,9 +8,6 @@ out vec4 fragColor;
 
 uniform sampler2D fontTexture;
 
-// uniform vec4 uAxisColor;
-// uniform vec4 uBackGroundColor;
-
 in vec2 _vTexCoord;
 
 void main(void) {
