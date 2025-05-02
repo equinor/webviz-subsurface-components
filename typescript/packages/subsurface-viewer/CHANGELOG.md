@@ -1,3 +1,10 @@
+## [1.11.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.11.0...subsurface-viewer@1.11.1) (2025-05-02)
+
+
+### Bug Fixes
+
+* Deck gl update ([#2508](https://github.com/equinor/webviz-subsurface-components/issues/2508)) ([d0e5b4c](https://github.com/equinor/webviz-subsurface-components/commit/d0e5b4c144890697739723e07ec8cb0f9d33b66e))
+
 # [1.11.0](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.10.10...subsurface-viewer@1.11.0) (2025-04-28)
 
 
