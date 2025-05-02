@@ -1,3 +1,10 @@
+## [1.5.3](https://github.com/equinor/webviz-subsurface-components/compare/group-tree-plot@1.5.2...group-tree-plot@1.5.3) (2025-05-02)
+
+
+### Bug Fixes
+
+* Deck gl update ([#2508](https://github.com/equinor/webviz-subsurface-components/issues/2508)) ([d0e5b4c](https://github.com/equinor/webviz-subsurface-components/commit/d0e5b4c144890697739723e07ec8cb0f9d33b66e))
+
 ## [1.5.2](https://github.com/equinor/webviz-subsurface-components/compare/group-tree-plot@1.5.1...group-tree-plot@1.5.2) (2025-04-15)
 
 
