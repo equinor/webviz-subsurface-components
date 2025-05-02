@@ -8,7 +8,7 @@ import workerpool from "workerpool";
 
 import type { ReportBoundingBoxAction } from "../../components/Map";
 import type { ExtendedLayerProps } from "../utils/layerTools";
-import type { Material } from "./privateTriangleLayer";
+import type { Material } from "@deck.gl/core";
 import PrivateTriangleLayer from "./privateTriangleLayer";
 import { makeFullMesh } from "./webworker";
 
@@ -289,6 +289,7 @@ export default class TriangleLayer extends CompositeLayer<TriangleLayerProps> {
             return [];
         }
 
+        const enableLighting: boolean = !(this.props.material === false);
         const layer = new PrivateTriangleLayer(
             this.getSubLayerProps({
                 geometryTriangles: this.state["geometryTriangles"],
@@ -301,6 +302,7 @@ export default class TriangleLayer extends CompositeLayer<TriangleLayerProps> {
                 smoothShading: this.props.smoothShading,
                 depthTest: this.props.depthTest,
                 ZIncreasingDownwards: this.props.ZIncreasingDownwards,
+                enableLighting,
             })
         );
         return [layer];

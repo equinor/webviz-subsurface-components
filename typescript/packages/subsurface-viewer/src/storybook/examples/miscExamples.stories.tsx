@@ -1,4 +1,3 @@
-import type { Layer } from "@deck.gl/core";
 import { all, create } from "mathjs";
 import React from "react";
 
@@ -36,6 +35,7 @@ import {
     Points as ToroidPoints,
     VertexCount as ToroidVertexCount,
 } from "../../layers/grid3d/test_data/PentagonalToroid";
+import type { Layer } from "@deck.gl/core";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -151,8 +151,7 @@ export const MapClampColor: StoryObj<typeof SubsurfaceViewer> = {
 const layer = {
     ...hugin25mKhNetmapMapLayerPng,
     isContoursDepth: true,
-    // @ts-expect-error TS7006
-    colorMapFunction: (x) => [255 - x * 100, 255 - x * 100, 255 * x], // If defined this function will override the colormap.
+    colorMapFunction: (x: number) => [255 - x * 100, 255 - x * 100, 255 * x], // If defined this function will override the colormap.
 };
 export const colorMapFunction: StoryObj<typeof SubsurfaceViewer> = {
     args: {
@@ -164,8 +163,7 @@ export const colorMapFunction: StoryObj<typeof SubsurfaceViewer> = {
             {
                 ...colormapLayer,
                 image: "propertyMap.png",
-                // @ts-expect-error TS7006
-                colorMapFunction: (x) => [
+                colorMapFunction: (x: number) => [
                     255 - x * 100,
                     255 - x * 100,
                     255 * x,
@@ -209,8 +207,7 @@ const SelectableFeatureComponent: React.FC<SubsurfaceViewerProps> = (args) => {
                 editedData={editedData}
                 setProps={(updatedProps) => {
                     setEditedData(
-                        // @ts-expect-error TS4111
-                        updatedProps.editedData as Record<string, unknown>
+                        updatedProps["editedData"] as Record<string, unknown>
                     );
                 }}
             />

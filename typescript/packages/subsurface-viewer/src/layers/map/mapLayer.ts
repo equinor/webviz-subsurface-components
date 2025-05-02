@@ -1,6 +1,5 @@
 import { isEqual } from "lodash";
 import type React from "react";
-
 import type {
     Color,
     CompositeLayerProps,
@@ -8,24 +7,19 @@ import type {
     UpdateParameters,
 } from "@deck.gl/core";
 import { CompositeLayer } from "@deck.gl/core";
-
 import * as png from "@vivaxy/png";
 import type { Matrix4 } from "math.gl";
-
 import workerpool from "workerpool";
-
 import type { ReportBoundingBoxAction } from "../../components/Map";
 import type {
     ExtendedLayerProps,
     ColorMapFunctionType,
 } from "../utils/layerTools";
-import type { Material } from "./privateMapLayer";
+import type { Material } from "@deck.gl/core";
 import PrivateMapLayer from "./privateMapLayer";
-
 import { getModelMatrix } from "../utils/layerTools";
 import { rotate } from "./utils";
 import { makeFullMesh } from "./webworker";
-
 import config from "../../SubsurfaceConfig.json";
 import { findConfig } from "../../utils/configTools";
 
@@ -473,6 +467,7 @@ export default class MapLayer<
             );
         }
 
+        const enableLighting: boolean = !(this.props.material === false);
         const layer = new PrivateMapLayer(
             this.getSubLayerProps({
                 positions: this.state["positions"],
@@ -494,6 +489,7 @@ export default class MapLayer<
                 smoothShading: this.props.smoothShading,
                 depthTest: this.props.depthTest,
                 ZIncreasingDownwards: this.props.ZIncreasingDownwards,
+                enableLighting,
             })
         );
         return [layer];

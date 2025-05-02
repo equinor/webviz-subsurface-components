@@ -783,6 +783,7 @@ const ExtensionsComponent: React.FC<
         // @ts-expect-error TS7053
         args.bounds?.[3],
     ];
+
     // Can not use Record<string, unknown> because extensions will not be supported
     const leftMap = new MapLayer({
         ...hugin25mKhNetmapMapLayer,

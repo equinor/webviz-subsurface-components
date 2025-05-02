@@ -2,12 +2,6 @@ import React from "react";
 
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { create, all } from "mathjs";
-
-import type {
-    SubsurfaceViewerProps,
-    TLayerDefinition,
-} from "../../SubsurfaceViewer";
 import SubsurfaceViewer, { TGrid3DColoringMode } from "../../SubsurfaceViewer";
 
 import {
@@ -27,6 +21,10 @@ import * as gridPolys from "../../layers/grid3d/test_data/DiscreteProperty/Polys
 import * as gridProps from "../../layers/grid3d/test_data/DiscreteProperty/Props.json";
 
 import { default3DViews, defaultStoryParameters } from "../sharedSettings";
+import {
+    createMathWithSeed,
+    replaceNonJsonArgs,
+} from "../sharedHelperFunctions";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -186,7 +184,7 @@ const discretePropsLayerId = "discrete_props";
 const discretePropsColorfuncLayerId = "discrete_props_colorfunc";
 const zPaintingLayerId = "z_painting";
 
-const layerNonJson = {
+const nonJsonLayerArgs = {
     [simpleContinuousLayerId]: {
         pointsData: new Float32Array(SIMPLE_GEOMETRY.points.flat()),
         polysData: new Uint32Array(SIMPLE_GEOMETRY.polygons),
@@ -221,51 +219,20 @@ const layerNonJson = {
     },
 };
 
-function replaceNonJson(
-    args: SubsurfaceViewerProps,
-    keys: string[] | undefined = undefined
-) {
-    args.layers?.forEach((layer: TLayerDefinition) => {
-        replaceLayerNonJson(layer, keys);
-    });
-    return args;
-}
-
-function replaceLayerNonJson(
-    layer: TLayerDefinition,
-    keys: string[] | undefined = undefined
-) {
-    const localLayer = layer as Record<string, unknown>;
-    const layerId = localLayer["id"] as string | undefined;
-    if (layer && layerId && layerId) {
-        for (const nonJsonKey in layerNonJson) {
-            if (nonJsonKey === layerId) {
-                if (!keys) {
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    keys = Object.keys((layerNonJson as any)[nonJsonKey]);
-                }
-                for (const key of keys) {
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    localLayer[key] = (layerNonJson as any)[nonJsonKey][key];
-                }
-            }
-        }
-    }
-}
-
 const SIMPLE_GEOMETRY_LAYER = {
     ...grid3dLayer,
     "@@typedArraySupport": true,
-    pointsData: layerNonJson[simpleContinuousLayerId].pointsData,
-    polysData: layerNonJson[simpleContinuousLayerId].polysData,
+    pointsData: nonJsonLayerArgs[simpleContinuousLayerId].pointsData,
+    polysData: nonJsonLayerArgs[simpleContinuousLayerId].polysData,
     gridLines: SIMPLE_GEOMETRY.points.length < 1000,
 };
 
 const SIMPLE_CONTINUOUS_LAYER = {
     ...SIMPLE_GEOMETRY_LAYER,
     id: simpleContinuousLayerId,
-    propertiesData: layerNonJson[simpleContinuousLayerId].propertiesData,
-    colorMapFunction: layerNonJson[simpleContinuousLayerId].colorMapFunction,
+    propertiesData: nonJsonLayerArgs[simpleContinuousLayerId].propertiesData,
+    colorMapFunction:
+        nonJsonLayerArgs[simpleContinuousLayerId].colorMapFunction,
     colorMapClampColor: true,
     colorMapRange: [-2, 2],
 };
@@ -274,9 +241,9 @@ const SIMPLE_DISCRETE_LAYER = {
     ...SIMPLE_GEOMETRY_LAYER,
     id: simpleDiscreteLayerId,
     coloringMode: TGrid3DColoringMode.DiscreteProperty,
-    propertiesData: layerNonJson[simpleDiscreteLayerId].propertiesData,
+    propertiesData: nonJsonLayerArgs[simpleDiscreteLayerId].propertiesData,
     discretePropertyValueNames: propertyValueNames,
-    colorMapFunction: layerNonJson[simpleDiscreteLayerId].colorMapFunction,
+    colorMapFunction: nonJsonLayerArgs[simpleDiscreteLayerId].colorMapFunction,
     colorMapClampColor: true,
     colorMapRange: [0, 12],
 };
@@ -380,20 +347,19 @@ export const Simgrid8xIJonly: StoryObj<typeof SubsurfaceViewer> = {
     parameters: parameters,
 };
 
-const math = create(all, { randomSeed: "1984" });
-const randomFunc = math?.random ? math.random : Math.random;
+const math = createMathWithSeed("1984");
 
 const snubCubePoints = SnubCubePoints.map((v) => 10 * v);
 const snubCubeProperties = Array(SnubCubeVertexCount)
     .fill(0)
-    .map(() => 100 + randomFunc() * 50);
+    .map(() => 100 + math.random() * 50);
 
 const toroidPoints = ToroidPoints.map((v) => 10 * v).map((v, index) =>
     index % 3 === 0 ? v + 30 : v
 );
 const toroidProperties = Array(ToroidVertexCount)
     .fill(0)
-    .map(() => randomFunc() * 10);
+    .map(() => math.random() * 10);
 
 export const PolyhedralCells: StoryObj<typeof SubsurfaceViewer> = {
     args: {
@@ -448,7 +414,9 @@ export const ContinuousProperty: StoryObj<typeof SubsurfaceViewer> = {
         ],
     },
     parameters: parameters,
-    render: (args) => <SubsurfaceViewer {...replaceNonJson(args)} />,
+    render: (args) => (
+        <SubsurfaceViewer {...replaceNonJsonArgs(args, nonJsonLayerArgs)} />
+    ),
 };
 
 export const DiscreteProperty: StoryObj<typeof SubsurfaceViewer> = {
@@ -463,7 +431,9 @@ export const DiscreteProperty: StoryObj<typeof SubsurfaceViewer> = {
         ],
     },
     parameters: parameters,
-    render: (args) => <SubsurfaceViewer {...replaceNonJson(args)} />,
+    render: (args) => (
+        <SubsurfaceViewer {...replaceNonJsonArgs(args, nonJsonLayerArgs)} />
+    ),
 };
 
 export const DiscretePropertyWithClamping: StoryObj<typeof SubsurfaceViewer> = {
@@ -490,14 +460,14 @@ export const DiscretePropertyWithClamping: StoryObj<typeof SubsurfaceViewer> = {
                 "@@typedArraySupport": true,
                 id: discretePropsLayerId,
                 coloringMode: TGrid3DColoringMode.DiscreteProperty,
-                pointsData: layerNonJson[discretePropsLayerId].pointsData,
-                polysData: layerNonJson[discretePropsLayerId].polysData,
+                pointsData: nonJsonLayerArgs[discretePropsLayerId].pointsData,
+                polysData: nonJsonLayerArgs[discretePropsLayerId].polysData,
                 propertiesData:
-                    layerNonJson[discretePropsLayerId].propertiesData,
+                    nonJsonLayerArgs[discretePropsLayerId].propertiesData,
                 discretePropertyValueNames: propertyValueNames,
                 colorMapName: "Seismic",
                 colorMapFunction:
-                    layerNonJson[discretePropsLayerId].colorMapFunction,
+                    nonJsonLayerArgs[discretePropsLayerId].colorMapFunction,
                 material: {
                     ambient: 0.5,
                     diffuse: 0.5,
@@ -510,7 +480,9 @@ export const DiscretePropertyWithClamping: StoryObj<typeof SubsurfaceViewer> = {
         ],
     },
     parameters: parameters,
-    render: (args) => <SubsurfaceViewer {...replaceNonJson(args)} />,
+    render: (args) => (
+        <SubsurfaceViewer {...replaceNonJsonArgs(args, nonJsonLayerArgs)} />
+    ),
 };
 
 export const DiscretePropertyWithColorFuncAndClamping: StoryObj<
@@ -540,13 +512,14 @@ export const DiscretePropertyWithColorFuncAndClamping: StoryObj<
                 id: discretePropsColorfuncLayerId,
                 coloringMode: TGrid3DColoringMode.DiscreteProperty,
                 pointsData:
-                    layerNonJson[discretePropsColorfuncLayerId].pointsData,
+                    nonJsonLayerArgs[discretePropsColorfuncLayerId].pointsData,
                 polysData:
-                    layerNonJson[discretePropsColorfuncLayerId].polysData,
+                    nonJsonLayerArgs[discretePropsColorfuncLayerId].polysData,
                 propertiesData:
-                    layerNonJson[discretePropsColorfuncLayerId].propertiesData,
+                    nonJsonLayerArgs[discretePropsColorfuncLayerId]
+                        .propertiesData,
                 colorMapFunction:
-                    layerNonJson[discretePropsColorfuncLayerId]
+                    nonJsonLayerArgs[discretePropsColorfuncLayerId]
                         .colorMapFunction,
                 material: false,
                 colorMapRange: [3, 10],
@@ -555,7 +528,9 @@ export const DiscretePropertyWithColorFuncAndClamping: StoryObj<
         ],
     },
     parameters: parameters,
-    render: (args) => <SubsurfaceViewer {...replaceNonJson(args)} />,
+    render: (args) => (
+        <SubsurfaceViewer {...replaceNonJsonArgs(args, nonJsonLayerArgs)} />
+    ),
 };
 
 export const DiscretePropertyWithUndefinedValues: StoryObj<
@@ -585,12 +560,12 @@ export const DiscretePropertyWithUndefinedValues: StoryObj<
                 id: discretePropsLayerId,
                 coloringMode: TGrid3DColoringMode.DiscreteProperty,
                 colorMapFunction:
-                    layerNonJson[discretePropsLayerId].colorMapFunction,
+                    nonJsonLayerArgs[discretePropsLayerId].colorMapFunction,
                 discretePropertyValueNames: propertyValueNames,
-                pointsData: layerNonJson[discretePropsLayerId].pointsData,
-                polysData: layerNonJson[discretePropsLayerId].polysData,
+                pointsData: nonJsonLayerArgs[discretePropsLayerId].pointsData,
+                polysData: nonJsonLayerArgs[discretePropsLayerId].polysData,
                 propertiesData:
-                    layerNonJson[discretePropsLayerId].propertiesData,
+                    nonJsonLayerArgs[discretePropsLayerId].propertiesData,
                 material: {
                     ambient: 0.5,
                     diffuse: 0.5,
@@ -603,7 +578,9 @@ export const DiscretePropertyWithUndefinedValues: StoryObj<
         ],
     },
     parameters: parameters,
-    render: (args) => <SubsurfaceViewer {...replaceNonJson(args)} />,
+    render: (args) => (
+        <SubsurfaceViewer {...replaceNonJsonArgs(args, nonJsonLayerArgs)} />
+    ),
 };
 
 export const ZPainting: StoryObj<typeof SubsurfaceViewer> = {
@@ -629,8 +606,8 @@ export const ZPainting: StoryObj<typeof SubsurfaceViewer> = {
                 ...grid3dLayer,
                 "@@typedArraySupport": true,
                 id: zPaintingLayerId,
-                pointsData: layerNonJson[zPaintingLayerId].pointsData,
-                polysData: layerNonJson[zPaintingLayerId].polysData,
+                pointsData: nonJsonLayerArgs[zPaintingLayerId].pointsData,
+                polysData: nonJsonLayerArgs[zPaintingLayerId].polysData,
                 colorMapName: "Seismic",
                 coloringMode: TGrid3DColoringMode.Z,
                 //colorMapFunction: "rainbow",
@@ -646,5 +623,7 @@ export const ZPainting: StoryObj<typeof SubsurfaceViewer> = {
         ],
     },
     parameters: parameters,
-    render: (args) => <SubsurfaceViewer {...replaceNonJson(args)} />,
+    render: (args) => (
+        <SubsurfaceViewer {...replaceNonJsonArgs(args, nonJsonLayerArgs)} />
+    ),
 };
