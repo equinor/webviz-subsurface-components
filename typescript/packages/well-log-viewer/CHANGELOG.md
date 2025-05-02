@@ -1,3 +1,10 @@
+## [2.4.4](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@2.4.3...well-log-viewer@2.4.4) (2025-05-02)
+
+
+### Bug Fixes
+
+* Deck gl update ([#2508](https://github.com/equinor/webviz-subsurface-components/issues/2508)) ([d0e5b4c](https://github.com/equinor/webviz-subsurface-components/commit/d0e5b4c144890697739723e07ec8cb0f9d33b66e))
+
 ## [2.4.3](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@2.4.2...well-log-viewer@2.4.3) (2025-04-15)
 
 
