@@ -22,10 +22,9 @@ export const Metrics = forwardRef((_props, ref) => {
     for (const key in metrics) {
         if (Object.prototype.hasOwnProperty.call(metrics, key)) {
             const typedKey = key as keyof DeckMetrics;
-
             tableRows.push(
-                <tr>
-                    <td> {typedKey + ":"} </td>{" "}
+                <tr key={typedKey}>
+                    <td> {typedKey} </td>
                     <td> {metrics[typedKey]?.toFixed(1)} </td>
                 </tr>
             );
@@ -46,10 +45,12 @@ export const Metrics = forwardRef((_props, ref) => {
             }}
         >
             <table>
-                <tr>
-                    <th align="left"> {"Metrics"} </th>
-                </tr>
-                {tableRows}
+                <tbody>
+                    <tr>
+                        <th align="left"> {"Metrics"} </th>
+                    </tr>
+                    {tableRows}
+                </tbody>
             </table>
         </div>
     );
