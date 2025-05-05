@@ -7,9 +7,12 @@ import { ClipExtension } from "@deck.gl/extensions";
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import InfoCard from "../../components/InfoCard";
+import Metrics from "../../components/Metrics";
+import type { DeckMetrics } from "../../SubsurfaceViewer";
 import type {
     BoundingBox2D,
     BoundingBox3D,
+    BoundsAccessor,
     ViewsType,
 } from "../../components/Map";
 import { useHoverInfo } from "../../components/Map";
@@ -315,9 +318,47 @@ export const BigMap: StoryObj<typeof SubsurfaceViewer> = {
     },
 };
 
-export const BigMap3d: StoryObj<typeof SubsurfaceViewer> = {
+interface BigMapComponentProps {
+    showMetrics: boolean;
+    layers: Array<Record<string, unknown>>; // Array of layer objects
+    bounds: BoundingBox2D | BoundsAccessor | undefined; // Can be 2D or 3D bounding box
+    views: ViewsType; // Type for views
+}
+
+const BigMapComponent: React.FC<BigMapComponentProps> = (
+    props: BigMapComponentProps
+) => {
+    const metricsComponentRef = React.useRef<{
+        updateMetrics?: (m: DeckMetrics) => void;
+    } | null>(null);
+    const updateMetrics = (m: DeckMetrics) => {
+        if (!metricsComponentRef.current) {
+            return;
+        }
+        if ("updateMetrics" in metricsComponentRef.current) {
+            metricsComponentRef.current.updateMetrics?.(m);
+        }
+    };
+
+    const onMetrics = (m: DeckMetrics) => {
+        updateMetrics(m);
+    };
+
+    return (
+        <div>
+            <SubsurfaceViewer
+                id={"test"}
+                onMetrics={onMetrics}
+                {...props}
+            ></SubsurfaceViewer>
+            {props.showMetrics ? <Metrics ref={metricsComponentRef} /> : null}
+        </div>
+    );
+};
+
+export const BigMap3d: StoryObj<typeof BigMapComponent> = {
     args: {
-        id: "map",
+        showMetrics: false,
         layers: [huginAxes3DLayer, hugin5mKhNetmapMapLayer, northArrowLayer],
         bounds: hugin2DBounds,
         views: default3DViews,
@@ -330,6 +371,7 @@ export const BigMap3d: StoryObj<typeof SubsurfaceViewer> = {
             },
         },
     },
+    render: (args) => <BigMapComponent {...args} />,
 };
 
 const axes_small = {

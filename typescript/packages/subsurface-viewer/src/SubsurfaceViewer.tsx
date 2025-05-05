@@ -18,6 +18,25 @@ import { TGrid3DColoringMode } from "./layers/grid3d/grid3dLayer";
 
 import Map, { createLayers } from "./components/Map";
 
+export type DeckMetrics = {
+    /* eslint-disable*/
+    fps: number;                  // fps - average number of frames rendered per second
+    setPropsTime: number;         // updateAttributesTime - time spent updating layer attributes
+    updateAttributesTime: number; // setPropsTime - time spent setting deck properties
+    framesRedrawn: number;        // framesRedrawn - number of times the scene was rendered
+    pickTime: number;             // pickTime - total time spent on picking operations
+    pickCount: number;            // pickCount - number of times a pick operation was performed
+    gpuTime: number;              // gpuTime - total time spent on GPU processing
+    gpuTimePerFrame: number;      // gpuTimePerFrame - average time spent on GPU processing per frame
+    cpuTime: number;              // cpuTime - total time spent on CPU processing
+    cpuTimePerFrame: number;      // cpuTimePerFrame - average time spent on CPU processing per frame
+    bufferMemory: number;         // bufferMemory - total GPU memory allocated for buffers
+    textureMemory: number;        // textureMemory - total GPU memory allocated for textures
+    renderbufferMemory: number;   // renderbufferMemory - total GPU memory allocated for renderbuffers
+    gpuMemory: number;            // gpuMemory - total allocated GPU memory
+    /* eslint-enable*/
+};
+
 export type {
     BoundsAccessor,
     colorTablesArray,
@@ -80,6 +99,11 @@ export interface SubsurfaceViewerProps
      * instead.
      */
     setProps?: (data: Record<string, unknown>) => void;
+
+    /**
+     * Callback called from deck.gl whith metrics data.
+     */
+    onMetrics?: (m: DeckMetrics) => void;
 }
 
 const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
@@ -108,6 +132,7 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
     lights,
     children,
     verticalScale,
+    onMetrics = () => {},
     ...args
 }: SubsurfaceViewerProps) => {
     // Contains layers data received from map layers by user interaction
@@ -188,6 +213,7 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
             triggerResetMultipleWells={triggerResetMultipleWells}
             lights={lights}
             verticalScale={verticalScale}
+            onMetrics={onMetrics}
             {...args}
         >
             {children}
