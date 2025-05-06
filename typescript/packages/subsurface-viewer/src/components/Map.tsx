@@ -570,7 +570,9 @@ const Map: React.FC<MapProps> = ({
             pickInfo: PickingInfo,
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             event: any
-        ): PickingInfo[] => {
+        ): (PickingInfo & {
+            scaledCoordinate?: Point2D | Point3D | undefined;
+        })[] => {
             if (coords?.multiPicking && pickInfo.layer?.context.deck) {
                 const pickInfos =
                     pickInfo.layer.context.deck.pickMultipleObjects({
@@ -578,8 +580,20 @@ const Map: React.FC<MapProps> = ({
                         y: event.offsetCenter.y,
                         depth: coords.pickDepth ?? undefined,
                         unproject3D: true,
-                    }) as LayerPickInfo[];
+                    }) as (LayerPickInfo & {
+                        scaledCoordinate?: Point2D | Point3D | undefined;
+                    })[];
                 pickInfos.forEach((item) => {
+                    // Z value should not take into account the Z scale factor.
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    item.scaledCoordinate = item.coordinate
+                        ? ([...item.coordinate] as Point2D | Point3D)
+                        : undefined;
+                    viewController.unscaledTarget(
+                        item.coordinate as Point2D | Point3D
+                    );
+
+                    // handle properties
                     if (item.properties) {
                         let unit = (
                             item.sourceLayer?.props
@@ -607,7 +621,7 @@ const Map: React.FC<MapProps> = ({
             }
             return [pickInfo];
         },
-        [coords?.multiPicking, coords?.pickDepth]
+        [coords?.multiPicking, coords?.pickDepth, viewController]
     );
 
     /**
@@ -616,7 +630,9 @@ const Map: React.FC<MapProps> = ({
     const callOnMouseEvent = useCallback(
         (
             type: "click" | "hover",
-            infos: PickingInfo[],
+            infos: (PickingInfo & {
+                scaledCoordinate?: Point2D | Point3D | undefined;
+            })[],
             event: MjolnirEvent
         ): void => {
             if (
@@ -629,7 +645,7 @@ const Map: React.FC<MapProps> = ({
                 if (infos.length >= 1) {
                     if (infos[0].coordinate) {
                         viewController.setScaledTarget(
-                            infos[0].coordinate as Point3D
+                            infos[0].scaledCoordinate
                         );
                     }
                 }
@@ -1130,9 +1146,9 @@ class ViewController {
 
     /**
      * Sets the target from picks, which comes from the displayed scaled data.
-     * @param target scaled 3D point.
+     * @param scaledTarget scaled 3D point.
      */
-    public readonly setScaledTarget = (target: Point3D) => {
+    public setScaledTarget(scaledTarget: Point2D | Point3D | undefined): void {
         const vsKey = Object.keys(this.result_.deckglViewStates).at(0);
         if (vsKey) {
             // deep clone to notify change (memo checks object address)
@@ -1141,18 +1157,22 @@ class ViewController {
             );
 
             // update target of deckglViewStates with the scaled event target
-            this.result_.deckglViewStates[vsKey].target = target;
+            this.result_.deckglViewStates[vsKey].target = scaledTarget;
             this.result_.deckglViewStates[vsKey].transitionDuration = 1000;
             // update target of deckglViewStates with the scaled event target
             this.result_.viewStates[vsKey].target = inversedZScaled(
-                target,
+                scaledTarget,
                 this.state_.zScale,
                 this.result_.viewStates[vsKey].target
             );
 
             this.rerender_();
         }
-    };
+    }
+
+    public unscaledTarget(target: Point3D | Point2D | undefined): void {
+        applyInverseZScale(target, this.state_.zScale);
+    }
 
     /**
      * Retrieves the views and their corresponding view states to be sent to DeckGL.
@@ -1160,10 +1180,10 @@ class ViewController {
      * @param state - The current state.
      * @returns The new views and their corresponding view states.
      */
-    public readonly getViews = (
+    public getViews(
         views: ViewsType | undefined,
         state: ViewControllerState
-    ): [View[], Record<string, ViewStateType>] => {
+    ): [View[], Record<string, ViewStateType>] {
         const fullState = this.consolidateState(state);
         const newDeckglViews = this.getDeckGlViews(views, fullState);
         const [newDeckglViewState, newViewStates] =
@@ -1178,18 +1198,18 @@ class ViewController {
         this.result_.deckglViewStates = newDeckglViewState;
         this.result_.viewStates = newViewStates;
         return [newDeckglViews, newDeckglViewState];
-    };
+    }
 
     /**
      * Consolidates the controlled state (ie. set by parent) with the uncontrolled state.
      * @param state - The current state.
      * @returns The consolidated state.
      */
-    private readonly consolidateState = (
+    private consolidateState(
         state: ViewControllerState
-    ): ViewControllerFullState => {
+    ): ViewControllerFullState {
         return { ...state, ...this.derivedState_ };
-    };
+    }
 
     /**
      * Returns the DeckGL views (ie. view position and viewport) based on the input views and current state.
@@ -1197,17 +1217,17 @@ class ViewController {
      * @param state - The current state.
      * @returns The DeckGL views.
      */
-    private readonly getDeckGlViews = (
+    private getDeckGlViews(
         views: ViewsType | undefined,
         state: ViewControllerFullState
-    ) => {
+    ) {
         const needUpdate =
             views != this.views_ || state.deckSize != this.state_.deckSize;
         if (!needUpdate) {
             return this.result_.views;
         }
         return buildDeckGlViews(views, state.deckSize);
-    };
+    }
 
     /**
      * Returns the scaled DeckGL view state(s) (ie. camera settings applied to individual views)
@@ -1217,10 +1237,10 @@ class ViewController {
      * @param state current state.
      * @returns The DeckGL view states and the corresponding view states in user space.
      */
-    private readonly getDeckGlAndUserViewStates = (
+    private getDeckGlAndUserViewStates(
         views: ViewsType | undefined,
         state: ViewControllerFullState
-    ): [Record<string, ViewStateType>, Record<string, ViewStateType>] => {
+    ): [Record<string, ViewStateType>, Record<string, ViewStateType>] {
         const viewsChanged = views != this.views_;
         const triggerHome = state.triggerHome !== this.state_.triggerHome;
         const updateZScale =
@@ -1291,7 +1311,7 @@ class ViewController {
             }
         }
         return [deckglViewStates, viewStates];
-    };
+    }
 
     /**
      * Handles changes to the view state.
@@ -1299,11 +1319,11 @@ class ViewController {
      * @param viewState - The new view state.
      * @param getCameraPosition - A function to get the camera position.
      */
-    public readonly onViewStateChange = (
+    public onViewStateChange(
         viewId: string,
         viewState: ViewStateType,
         getCameraPosition: ((input: ViewStateType) => void) | undefined
-    ): void => {
+    ): void {
         if (!this.derivedState_.readyForInteraction) {
             // disable interaction if the camera is not defined
             return;
@@ -1365,7 +1385,7 @@ class ViewController {
         }
         this.derivedState_.viewStateChanged = true;
         this.rerender_();
-    };
+    }
 }
 
 /**
@@ -1798,6 +1818,23 @@ function zScaledTarget(
     }
 
     return [target[0], target[1], target[2] * zScale];
+}
+
+/**
+ * Applies the inverse of the zScale to the target point.
+ * This is needed, as the camera target is specified in world coordinates, while the Z scale
+ * is applied to the transformation matrix of the object coordinates. The target must be applied
+ * the same scale to be consistent with the display.
+ * @param target point that must be converted to user values (ie. without scale).
+ * @param zScale Z scale.
+ */
+function applyInverseZScale(
+    target: Point2D | Point3D | undefined,
+    zScale: number
+): void {
+    if (target?.[2] != undefined && zScale != 0) {
+        target[2] = target[2] / zScale;
+    }
 }
 
 /**
