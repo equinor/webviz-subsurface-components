@@ -18,11 +18,12 @@ import { TGrid3DColoringMode } from "./layers/grid3d/grid3dLayer";
 
 import Map, { createLayers } from "./components/Map";
 
+// Type extracted from Deck.gl.
 export type DeckMetrics = {
     /* eslint-disable*/
     fps: number;                  // fps - average number of frames rendered per second
-    setPropsTime: number;         // updateAttributesTime - time spent updating layer attributes
-    updateAttributesTime: number; // setPropsTime - time spent setting deck properties
+    setPropsTime: number;         // setPropsTime - time spent setting deck properties
+    updateAttributesTime: number; // updateAttributesTime - time spent updating layer attributes
     framesRedrawn: number;        // framesRedrawn - number of times the scene was rendered
     pickTime: number;             // pickTime - total time spent on picking operations
     pickCount: number;            // pickCount - number of times a pick operation was performed
@@ -103,7 +104,7 @@ export interface SubsurfaceViewerProps
     /**
      * Callback called from deck.gl whith metrics data.
      */
-    onMetrics?: (m: DeckMetrics) => void;
+    onMetrics?: ((m: DeckMetrics) => void) | null;
 }
 
 const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
@@ -132,7 +133,7 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
     lights,
     children,
     verticalScale,
-    onMetrics = () => {},
+    onMetrics,
     ...args
 }: SubsurfaceViewerProps) => {
     // Contains layers data received from map layers by user interaction
@@ -213,7 +214,7 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = ({
             triggerResetMultipleWells={triggerResetMultipleWells}
             lights={lights}
             verticalScale={verticalScale}
-            onMetrics={onMetrics}
+            onMetrics={onMetrics ?? undefined}
             {...args}
         >
             {children}

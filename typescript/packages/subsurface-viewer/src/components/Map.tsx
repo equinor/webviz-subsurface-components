@@ -455,7 +455,7 @@ const Map: React.FC<MapProps> = ({
     innerRef,
     pickingRadius,
     deckGlRef,
-    onMetrics = () => {},
+    onMetrics,
 }: MapProps) => {
     // From react doc, ref should not be read nor modified during rendering.
     const deckRef = React.useRef<DeckGLRef>(null);
