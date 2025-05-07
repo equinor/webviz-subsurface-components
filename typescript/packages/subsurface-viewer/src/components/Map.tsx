@@ -407,7 +407,7 @@ export interface MapProps {
     /**
      * Callback called from deck.gl whith metrics data.
      */
-    onMetrics?: (m: DeckMetrics) => void;
+    onMetrics?: ((m: DeckMetrics) => void) | null;
 }
 
 function defaultTooltip(info: PickingInfo) {
