@@ -69,7 +69,11 @@ import StatusIndicator from "./StatusIndicator";
 import type { Unit } from "convert-units";
 import IntersectionView from "../views/intersectionView";
 
-import type { LightsType, TLayerDefinition } from "../SubsurfaceViewer";
+import type {
+    LightsType,
+    TLayerDefinition,
+    DeckMetrics,
+} from "../SubsurfaceViewer";
 import { getZoom, useLateralZoom } from "../utils/camera";
 import { useScaleFactor, useShiftHeld } from "../utils/event";
 
@@ -399,6 +403,11 @@ export interface MapProps {
      * The reference to the deck.gl instance.
      */
     deckGlRef?: React.ForwardedRef<DeckGLRef>;
+
+    /**
+     * Callback called from deck.gl whith metrics data.
+     */
+    onMetrics?: ((m: DeckMetrics) => void) | null;
 }
 
 function defaultTooltip(info: PickingInfo) {
@@ -446,6 +455,7 @@ const Map: React.FC<MapProps> = ({
     innerRef,
     pickingRadius,
     deckGlRef,
+    onMetrics,
 }: MapProps) => {
     // From react doc, ref should not be read nor modified during rendering.
     const deckRef = React.useRef<DeckGLRef>(null);
@@ -884,6 +894,7 @@ const Map: React.FC<MapProps> = ({
                 onDrag={onDrag}
                 onResize={onResize}
                 pickingRadius={pickingRadius}
+                _onMetrics={onMetrics}
             >
                 {children}
             </DeckGL>
