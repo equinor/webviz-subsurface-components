@@ -1,3 +1,10 @@
+## [1.11.2](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.11.1...subsurface-viewer@1.11.2) (2025-05-12)
+
+
+### Bug Fixes
+
+* add support for double click ([#2541](https://github.com/equinor/webviz-subsurface-components/issues/2541)) ([cfcf089](https://github.com/equinor/webviz-subsurface-components/commit/cfcf08940b3ff1605a8c33f22b3176043ffc1cbd)), closes [#2538](https://github.com/equinor/webviz-subsurface-components/issues/2538)
+
 ## [1.11.1](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.11.0...subsurface-viewer@1.11.1) (2025-05-02)
 
 
