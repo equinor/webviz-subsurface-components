@@ -884,6 +884,7 @@ const Map: React.FC<MapProps> = ({
                 onDrag={onDrag}
                 onResize={onResize}
                 pickingRadius={pickingRadius}
+                eventRecognizerOptions={{ dblclick: { taps: 3 } }} // Add double click recognizer
             >
                 {children}
             </DeckGL>
