@@ -61,7 +61,7 @@ import {
     isEmpty as isEmptyBox3D,
 } from "../utils/BoundingBox3D";
 import JSON_CONVERTER_CONFIG from "../utils/configuration";
-import fitBounds from "../utils/fit-bounds";
+import { fitBounds } from "../utils/fitBounds";
 import { DistanceScale } from "./DistanceScale";
 import InfoCard from "./InfoCard";
 import StatusIndicator from "./StatusIndicator";
