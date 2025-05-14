@@ -1,3 +1,4 @@
+import type { HierarchyPointNode, HierarchyPointLink } from "d3";
 import PropTypes from "prop-types";
 
 // Node key and values map - one value per date in DatedTree
@@ -83,3 +84,7 @@ export const DatedTreePropTypes = PropTypes.shape({
     dates: PropTypes.arrayOf(PropTypes.string).isRequired,
     tree: RecursiveTreeNodePropTypes,
 });
+
+// Simple shorthand for the type passed among the tree plot components
+export type D3TreeNode = HierarchyPointNode<RecursiveTreeNode>;
+export type D3TreeEdge = HierarchyPointLink<RecursiveTreeNode>;

@@ -1,7 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { fireEvent, userEvent } from "@storybook/test";
 import React from "react";
 
 import { View } from "@deck.gl/core";
+import { useMultiViewPicking } from "../../hooks/useMultiViewPicking";
+import { useMultiViewCursorTracking } from "../../hooks/useMultiViewCursorTracking";
+import type { PickingInfoPerView } from "../../hooks/useMultiViewPicking";
+
 import { ContinuousLegend } from "@emerson-eps/color-tables";
 
 import Box from "@mui/material/Box";
@@ -10,7 +15,8 @@ import Tabs from "@mui/material/Tabs";
 
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
-import type { ViewsType } from "../../components/Map";
+import type { ViewStateType } from "../../SubsurfaceViewer";
+import type { MapMouseEvent, ViewsType } from "../../components/Map";
 import { ViewFooter } from "../../components/ViewFooter";
 
 import {
@@ -27,7 +33,9 @@ import {
     hugin2DBounds,
     redAxes2DLayer,
     subsufaceProps,
+    volveWellsLayer,
 } from "../sharedSettings";
+import type { DeckGLRef } from "@deck.gl/react";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -78,6 +86,238 @@ export const MultiViewAnnotation: StoryObj<typeof SubsurfaceViewer> = {
             }
         </SubsurfaceViewer>
     ),
+};
+
+function ExampleReadoutComponent(props: {
+    viewId: string;
+    pickingInfoPerView: PickingInfoPerView;
+}): React.ReactNode {
+    return (
+        <div
+            style={{
+                position: "absolute",
+                bottom: 8,
+                left: 8,
+                background: "#fff",
+                padding: 8,
+                borderRadius: 4,
+                display: "grid",
+                gridTemplateColumns: "8rem auto",
+                border: "1px solid #ccc",
+            }}
+        >
+            <div>X:</div>
+            <div>
+                {props.pickingInfoPerView[props.viewId]?.coordinates
+                    ?.at(0)
+                    ?.toFixed(3) ?? "-"}
+            </div>
+            <div>Y:</div>
+            <div>
+                {props.pickingInfoPerView[props.viewId]?.coordinates
+                    ?.at(1)
+                    ?.toFixed(3) ?? "-"}
+            </div>
+            {props.pickingInfoPerView[props.viewId]?.layerPickingInfo.map(
+                (el) => (
+                    <React.Fragment key={`${el.layerId}`}>
+                        <div style={{ fontWeight: "bold" }}>{el.layerName}</div>
+                        {el.properties.map((prop, i) => (
+                            <React.Fragment key={`${el.layerId}-${i}}`}>
+                                <div style={{ gridColumn: 1 }}>{prop.name}</div>
+                                <div>
+                                    {typeof prop.value === "string"
+                                        ? prop.value
+                                        : prop.value.toFixed(3)}
+                                </div>
+                            </React.Fragment>
+                        ))}
+                    </React.Fragment>
+                )
+            ) ?? ""}
+        </div>
+    );
+}
+
+function MultiViewPickingExample(
+    props: SubsurfaceViewerProps
+): React.ReactNode {
+    const deckGlRef = React.useRef<DeckGLRef>(null);
+    const [mouseHover, setMouseHover] = React.useState<boolean>(false);
+    const [cameraPosition, setCameraPosition] = React.useState<
+        ViewStateType | undefined
+    >(undefined);
+
+    const { getPickingInfo, activeViewportId, pickingInfoPerView } =
+        useMultiViewPicking({
+            deckGlRef,
+            multiPicking: true,
+            pickDepth: 6,
+        });
+
+    function handleMouseEvent(event: MapMouseEvent) {
+        if (event.type === "hover") {
+            getPickingInfo(event);
+        }
+    }
+
+    const viewports = props.views?.viewports ?? [];
+    const layers = props.layers ?? [];
+
+    const { viewports: adjustedViewports, layers: adjustedLayers } =
+        useMultiViewCursorTracking({
+            activeViewportId,
+            worldCoordinates:
+                pickingInfoPerView[activeViewportId]?.coordinates ?? null,
+            viewports,
+            layers,
+            crosshairProps: {
+                color: [255, 255, 255, 255],
+                sizePx: 32,
+                visible: mouseHover,
+            },
+        });
+
+    return (
+        <div
+            style={{ width: "100%", height: "90vh", position: "relative" }}
+            onMouseEnter={() => setMouseHover(true)}
+            onMouseLeave={() => setMouseHover(false)}
+            onBlur={() => setMouseHover(false)}
+            onFocus={() => setMouseHover(true)}
+        >
+            <SubsurfaceViewer
+                {...props}
+                getCameraPosition={(position) => setCameraPosition(position)}
+                layers={adjustedLayers}
+                views={{
+                    ...props.views,
+
+                    viewports: adjustedViewports,
+                    layout: props.views?.layout ?? [1, 2],
+                }}
+                deckGlRef={deckGlRef}
+                cameraPosition={cameraPosition}
+                onMouseEvent={handleMouseEvent}
+                coords={{
+                    visible: false,
+                    multiPicking: true,
+                }}
+                scale={{
+                    visible: true,
+                    cssStyle: {
+                        right: 10,
+                        top: 10,
+                    },
+                }}
+            >
+                {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    /* @ts-expect-error */
+                    <View id="view_1">
+                        <ContinuousLegend min={-3071} max={41048} />
+                        <ViewFooter>kH netmap</ViewFooter>
+                        <ExampleReadoutComponent
+                            viewId="view_1"
+                            pickingInfoPerView={pickingInfoPerView}
+                        />
+                    </View>
+                }
+                {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    /* @ts-expect-error */
+                    <View id="view_2">
+                        <ContinuousLegend min={2725} max={3396} />
+                        <ViewFooter>Hugin</ViewFooter>
+                        <ExampleReadoutComponent
+                            viewId="view_2"
+                            pickingInfoPerView={pickingInfoPerView}
+                        />
+                    </View>
+                }
+            </SubsurfaceViewer>
+        </div>
+    );
+}
+
+export const MultiViewPicking: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "multi_view_picking",
+        layers: [hugin25mKhNetmapMapLayer, hugin25mDepthMapLayer],
+        views: {
+            layout: [1, 2],
+            showLabel: true,
+            viewports: [
+                {
+                    id: "view_1",
+                    layerIds: [hugin25mDepthMapLayer.id],
+                    isSync: true,
+                },
+                {
+                    id: "view_2",
+                    layerIds: [hugin25mKhNetmapMapLayer.id],
+                    isSync: true,
+                },
+            ],
+        },
+    },
+    render: (args) => <MultiViewPickingExample {...args} />,
+    play: async (args) => {
+        const delay = 500;
+        const canvas = document.querySelector("canvas");
+
+        if (canvas) {
+            await userEvent.click(canvas, { delay });
+        }
+
+        const layout = args.args.views?.layout;
+
+        if (!canvas || !layout) {
+            return;
+        }
+
+        const leftViewCenterPosition = {
+            x: canvas.clientLeft + canvas.clientWidth / layout[1] / 2,
+            y: canvas.clientTop + canvas.clientHeight / layout[0] / 2,
+        };
+
+        await userEvent.hover(canvas, { delay });
+
+        await fireEvent.mouseMove(canvas, { clientX: 0, clientY: 0, delay });
+        await fireEvent.mouseMove(canvas, {
+            clientX: leftViewCenterPosition.x,
+            clientY: leftViewCenterPosition.y,
+            delay,
+        });
+    },
+};
+
+export const MultiViewPickingWithWells: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "multi_view_picking",
+        layers: [
+            hugin25mKhNetmapMapLayer,
+            hugin25mDepthMapLayer,
+            volveWellsLayer,
+        ],
+        views: {
+            layout: [1, 2],
+            showLabel: true,
+            viewports: [
+                {
+                    id: "view_1",
+                    layerIds: [hugin25mDepthMapLayer.id, volveWellsLayer.id],
+                    isSync: true,
+                },
+                {
+                    id: "view_2",
+                    layerIds: [hugin25mKhNetmapMapLayer.id],
+                    isSync: true,
+                },
+            ],
+        },
+    },
+    render: (args) => <MultiViewPickingExample {...args} />,
 };
 
 export const MultiViewsWithEmptyViews: StoryObj<typeof SubsurfaceViewer> = {
@@ -244,8 +484,7 @@ type ViewerTabsProps = SubsurfaceViewerProps & { renderHiddenTabs: boolean };
 const ViewerTabs: React.FC<ViewerTabsProps> = (props: ViewerTabsProps) => {
     const [value, setValue] = React.useState(0);
 
-    // @ts-expect-error TS6133
-    const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
     };
 

@@ -4,38 +4,28 @@ import type {
     LayerData,
     LayersList,
     PickingInfo,
-    Position,
     UpdateParameters,
 } from "@deck.gl/core";
-
-import { CompositeLayer, OrbitViewport } from "@deck.gl/core";
-
+import { CompositeLayer } from "@deck.gl/core";
+import type { BinaryFeatureCollection } from "@loaders.gl/schema";
 import type {
+    ColorMapFunctionType,
     ExtendedLayerProps,
-    LayerPickInfo,
     PropertyDataType,
 } from "../utils/layerTools";
 
 import { createPropertyData, isDrawingEnabled } from "../utils/layerTools";
 
 import { PathStyleExtension } from "@deck.gl/extensions";
-import { GeoJsonLayer, PathLayer, TextLayer } from "@deck.gl/layers";
+import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
 import type { colorTablesArray } from "@emerson-eps/color-tables/";
 import { getColors, rgbValues } from "@emerson-eps/color-tables/";
-import type {
-    Feature,
-    FeatureCollection,
-    GeoJsonProperties,
-    Geometry,
-    GeometryCollection,
-    LineString,
-    Point,
-} from "geojson";
+import type { Feature, FeatureCollection, Point, Position } from "geojson";
 import { distance, dot, subtract } from "mathjs";
 
 import { GL } from "@luma.gl/constants";
 import { interpolateNumberArray } from "d3";
-import { isEmpty, isEqual } from "lodash";
+import _, { isEmpty, isEqual } from "lodash";
 import type {
     ContinuousLegendDataType,
     DiscreteLegendDataType,
@@ -45,6 +35,9 @@ import type {
     ReportBoundingBoxAction,
 } from "../../components/Map";
 import { getLayersById } from "../../layers/utils/layerTools";
+import type { NumberPair, StyleAccessorFunction } from "../types";
+import type { WellLabelLayerProps } from "./layers/wellLabelLayer";
+import { WellLabelLayer } from "./layers/wellLabelLayer";
 import { abscissaTransform } from "./utils/abscissaTransform";
 import {
     GetBoundingBox,
@@ -53,44 +46,48 @@ import {
     invertPath,
     splineRefine,
 } from "./utils/spline";
+import { getColor, getTrajectory } from "./utils/trajectory";
+import type {
+    WellFeatureCollection,
+    WellsPickInfo,
+    WellFeature,
+    WellHeadStyleAccessor,
+    LineStyleAccessor,
+    DashAccessor,
+    SizeAccessor,
+    ColorAccessor,
+    LogCurveDataType,
+} from "./types";
 
-type StyleAccessorFunction = (
-    object: Feature,
-    objectInfo?: Record<string, unknown>
-) => StyleData;
-
-type NumberPair = [number, number];
-type DashAccessor = boolean | NumberPair | StyleAccessorFunction | undefined;
-type ColorAccessor = Color | StyleAccessorFunction | undefined;
-type SizeAccessor = number | StyleAccessorFunction | undefined;
-type StyleData = NumberPair | Color | number;
-
-type LineStyleAccessor = {
-    color?: ColorAccessor;
-    dash?: DashAccessor;
-    width?: SizeAccessor;
-};
-
-type WellHeadStyleAccessor = {
-    color?: ColorAccessor;
-    size?: SizeAccessor;
-};
-
-function onDataLoad(
-    data: LayerData<FeatureCollection>,
-    context: {
-        propName: string;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        layer: Layer<any>;
-    }
-): void {
-    const bbox = GetBoundingBox(data as unknown as FeatureCollection);
-    if (typeof context.layer.props.reportBoundingBox !== "undefined") {
-        context.layer.props.reportBoundingBox({ layerBoundingBox: bbox });
-    }
+export enum SubLayerId {
+    COLORS = "colors",
+    SIMPLE = "simple",
+    OUTLINE = "outline",
+    HIGHLIGHT = "highlight",
+    HIGHLIGHT_2 = "highlight2",
+    LOG_CURVE = "log_curve",
+    SELECTION = "selection",
+    LABELS = "labels",
 }
 
 export interface WellsLayerProps extends ExtendedLayerProps {
+    /**
+     * Well data to render; described as a single GeoJSON feature collection, which each individual well as a distinct feature.
+     *
+     * Accepted data formats:
+     * * A javascript object.
+     * * A binary/flat GeoJSON object
+     * * A url string pointing to external GeoJSON data.
+     * * A promise returning GeoJSON data.
+     */
+    // String, binary and promise is handled internally in Deck.gl to load external data.
+    // The typing here matches the type used in GeoJsonLayer (but with a more strict feature definition)
+    data:
+        | string
+        | WellFeatureCollection
+        | BinaryFeatureCollection
+        | Promise<WellFeatureCollection | BinaryFeatureCollection>;
+
     pointRadiusScale: number;
     lineWidthScale: number;
     outline: boolean;
@@ -109,18 +106,45 @@ export interface WellsLayerProps extends ExtendedLayerProps {
      */
     refine: boolean | number;
     wellHeadStyle: WellHeadStyleAccessor;
-    colorMappingFunction: (x: number) => [number, number, number];
+    colorMappingFunction: ColorMapFunctionType;
     lineStyle: LineStyleAccessor;
-    wellNameVisible: boolean;
-    wellNameAtTop: boolean;
-    wellNameSize: number;
-    wellNameColor: Color;
+
+    /**
+     * @deprecated use wellLabel instead
+     */
+    wellNameVisible?: boolean;
+
+    /**
+     * @deprecated use wellLabel instead
+     * It true place name at top, if false at bottom.
+     * If given as a number between 0 and 100,  will place name at this percentage of trajectory from top.
+     */
+    wellNameAtTop?: boolean | number;
+
+    /**
+     * @deprecated use wellLabel instead
+     */
+    wellNameSize?: number;
+
+    /**
+     * @deprecated use wellLabel instead
+     */
+    wellNameColor?: Color;
+    /**
+     * If true will prevent well name cluttering by not displaying overlapping names.
+     * default false.
+     * @deprecated use wellLabel instead
+     */
+    hideOverlappingWellNames?: boolean;
+
     isLog: boolean;
     depthTest: boolean;
+
     /**  If true means that input z values are interpreted as depths.
      * For example depth of z = 1000 corresponds to -1000 on the z axis. Default true.
      */
     ZIncreasingDownwards: boolean;
+
     /**  If true means that a simplified representation of the wells will be drawn.
      *   Useful for example during panning and rotation to gain speed.
      */
@@ -131,6 +155,8 @@ export interface WellsLayerProps extends ExtendedLayerProps {
 
     // Non public properties:
     reportBoundingBox?: React.Dispatch<ReportBoundingBoxAction>;
+
+    wellLabel?: Partial<WellLabelLayerProps>;
 }
 
 const defaultProps = {
@@ -147,102 +173,23 @@ const defaultProps = {
     logCurves: true,
     refine: false,
     visible: true,
-    wellNameVisible: false,
-    wellNameAtTop: false,
-    wellNameSize: 14,
-    wellNameColor: [0, 0, 0, 255],
     selectedWell: "@@#editedData.selectedWells", // used to get data from deckgl layer
     depthTest: true,
     ZIncreasingDownwards: true,
     simplifiedRendering: false,
     section: false,
+    dataTransform: coarsenWells,
+
+    // Deprecated props
+    wellNameColor: [0, 0, 0, 255],
+    wellNameSize: 10,
 };
-
-export interface LogCurveDataType {
-    header: {
-        name: string;
-        well: string;
-    };
-    curves: {
-        name: string;
-        description: string;
-    }[];
-    data: number[][];
-    metadata_discrete: Record<
-        string,
-        {
-            attributes: unknown;
-            objects: Record<string, [Color, number]>;
-        }
-    >;
-}
-
-export interface WellsPickInfo extends LayerPickInfo {
-    featureType?: string;
-    logName: string;
-}
-
-function multiply(pair: [number, number], factor: number): [number, number] {
-    return [pair[0] * factor, pair[1] * factor];
-}
 
 const LINE = "line";
 const POINT = "point";
 const DEFAULT_POINT_SIZE = 8;
 const DEFAULT_LINE_WIDTH = 5;
 const DEFAULT_DASH = [5, 5] as NumberPair;
-
-function getDashFactor(
-    accessor: DashAccessor,
-    width_accessor?: number | ((object: Feature) => number),
-    offset = 0
-) {
-    return (
-        object: Feature,
-        objectInfo: Record<string, unknown>
-    ): NumberPair => {
-        let width = DEFAULT_LINE_WIDTH;
-        if (typeof width_accessor == "function") {
-            width = (width_accessor as StyleAccessorFunction)(object) as number;
-        } else if (width_accessor as number) {
-            width = width_accessor as number;
-        }
-        const factor = width / (width + offset);
-
-        let dash: NumberPair = [0, 0];
-        if (typeof accessor == "function") {
-            dash = (accessor as StyleAccessorFunction)(
-                object,
-                objectInfo
-            ) as NumberPair;
-        } else if (accessor as NumberPair) dash = accessor as NumberPair;
-        else if (accessor) dash = DEFAULT_DASH;
-        if (dash.length == 2) {
-            return multiply(dash, factor);
-        } else {
-            return multiply(DEFAULT_DASH, factor);
-        }
-    };
-}
-
-function getColor(accessor: ColorAccessor) {
-    if (accessor as Color) {
-        return accessor as Color;
-    }
-
-    return (object: Feature, objectInfo?: Record<string, unknown>): Color => {
-        if (typeof accessor === "function") {
-            const color = (accessor as StyleAccessorFunction)(
-                object,
-                objectInfo
-            ) as Color;
-            if (color) {
-                return color;
-            }
-        }
-        return object.properties?.["color"] as Color;
-    };
-}
 
 export function getSize(
     type: string,
@@ -266,40 +213,50 @@ export function getSize(
 }
 
 export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
-    initializeState(): void {
-        let data = this.props.data as FeatureCollection<GeometryCollection>;
-        const refine = this.props.refine;
+    state!: {
+        data: WellFeatureCollection | undefined;
+        well: string;
+        selectedMultiWells: string[];
+        selection: [number, number];
+    };
 
-        if (!data || isEmpty(data)) {
+    private recomputeDataState() {
+        const data = this.props.data;
+        const refine = this.props.refine;
+        const doRefine = typeof refine === "number" ? refine > 1 : refine;
+        const stepCount = typeof refine === "number" ? refine : 5;
+
+        if (!dataIsReady(data)) {
             return;
         }
 
+        let transformedData = data;
+
         if (this.props.ZIncreasingDownwards) {
-            data = invertPath(data);
+            transformedData = invertPath(transformedData);
         }
 
         if (this.props.section) {
-            data = abscissaTransform(data);
+            transformedData = abscissaTransform(transformedData);
         }
 
-        checkWells(data);
+        // Mutate data to remove duplicates
+        checkWells(transformedData);
 
-        const coarseData = coarsenWells(data);
+        // Conditionally apply spline interpolation to refine the well path.
+        if (doRefine) {
+            transformedData = splineRefine(transformedData, stepCount);
+        }
 
-        const doRefine =
-            typeof refine === "number" ? refine > 1 : (refine as boolean);
+        this.setState({ data: transformedData });
+    }
 
-        const stepCount = typeof refine === "number" ? refine : 5;
-
-        data = doRefine
-            ? splineRefine(data, stepCount) // smooth well paths.
-            : data;
-
-        this.setState({
-            ...this.state,
-            data,
-            coarseData,
-        });
+    shouldUpdateState({ changeFlags }: UpdateParameters<this>): boolean {
+        return (
+            changeFlags.viewportChanged ||
+            changeFlags.propsOrDataChanged ||
+            typeof changeFlags.updateTriggersChanged === "object"
+        );
     }
 
     updateState({ props, oldProps }: UpdateParameters<WellsLayer>): void {
@@ -311,18 +268,17 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             ) ||
             !isEqual(props.refine, oldProps.refine);
         if (needs_reload) {
-            this.initializeState();
+            this.recomputeDataState();
         }
     }
 
-    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any
     onClick(info: WellsPickInfo): boolean {
         // Make selection only when drawing is disabled
         if (isDrawingEnabled(this.context.layerManager)) {
             return false;
         } else {
             this.context.userData.setEditedData({
-                selectedWell: (info.object as Feature).properties?.["name"],
+                selectedWell: info.object?.properties.name,
             });
             return false; // do not return true to allow DeckGL props.onClick to be called
         }
@@ -348,12 +304,8 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         }
     }
 
-    shouldUpdateState({ changeFlags }: UpdateParameters<this>): boolean {
-        return (
-            changeFlags.viewportChanged ||
-            changeFlags.propsOrDataChanged ||
-            typeof changeFlags.updateTriggersChanged === "object"
-        );
+    getWellDataState(): WellFeatureCollection | undefined {
+        return this.state.data;
     }
 
     getLegendData(
@@ -395,17 +347,70 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         if (data) this.setLegend(data);
     }
 
-    renderLayers(): LayersList {
-        if (!(this.props.data as unknown as FeatureCollection).features) {
-            return [];
+    protected getWellLabelPosition() {
+        if (this.props.wellLabel?.getPositionAlongPath) {
+            return this.props.wellLabel.getPositionAlongPath;
+        } else if (!_.isUndefined(this.props.wellNameAtTop)) {
+            // Backwards compatibility for `wellNameAtTop` prop.
+            if (typeof this.props.wellNameAtTop === "boolean") {
+                if (this.props.wellNameAtTop) {
+                    return 0;
+                }
+
+                // if wellNameAtTop is false, then place name at bottom.
+                return 1;
+            }
+
+            // `wellNameAtTop` can also be a number [0, 100] indicating the
+            // percentage along the trajectory from the top.
+            return this.props.wellNameAtTop / 100;
+        }
+        return 0;
+    }
+
+    protected createWellLabelLayer(data: WellFeature[]): WellLabelLayer | null {
+        if (!this.props.wellLabel && !this.props.wellNameVisible) {
+            return null;
         }
 
-        const data = this.state["data"] as FeatureCollection;
-        const coarseData = this.state["coarseData"] as FeatureCollection;
+        const parameters = {
+            [GL.DEPTH_TEST]: this.props.depthTest,
+            [GL.POLYGON_OFFSET_FILL]: true,
+        };
 
-        const is3d = this.context.viewport.constructor === OrbitViewport;
+        const fastDrawing = this.props.simplifiedRendering;
+
+        const wellLabelProps = this.getSubLayerProps({
+            ...this.props.wellLabel,
+            id: SubLayerId.LABELS,
+            data,
+            pickable: true,
+            // Z is always increasing upwards at this stage
+            zIncreasingDownwards: false,
+
+            getPositionAlongPath: this.getWellLabelPosition(),
+            getColor:
+                this.props.wellLabel?.getColor ?? this.props.wellNameColor,
+            getAnchor: "start",
+            getSize: this.props.wellLabel?.getSize ?? this.props.wellNameSize,
+            parameters,
+            visible: !fastDrawing,
+            background:
+                this.props.wellLabel?.background ||
+                this.props.hideOverlappingWellNames,
+        });
+
+        return new WellLabelLayer(wellLabelProps);
+    }
+
+    renderLayers(): LayersList {
+        const data = this.getWellDataState();
         const positionFormat = "XYZ";
         const isDashed = !!this.props.lineStyle?.dash;
+
+        if (!data || !data?.features.length) {
+            return [];
+        }
 
         const extensions = [
             new PathStyleExtension({
@@ -441,7 +446,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
         const colorsLayerProps = this.getSubLayerProps({
             ...defaultLayerProps,
-            id: "colors",
+            id: SubLayerId.COLORS,
             pickable: true,
             extensions,
             getDashArray: getDashFactor(
@@ -456,8 +461,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
         const fastLayerProps = this.getSubLayerProps({
             ...defaultLayerProps,
-            id: "simple",
-            data: coarseData,
+            id: SubLayerId.SIMPLE,
             positionFormat,
             getLineColor: getColor(this.props.lineStyle?.color),
             getFillColor: getColor(this.props.wellHeadStyle?.color),
@@ -465,17 +469,22 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
         const outlineLayerProps = this.getSubLayerProps({
             ...defaultLayerProps,
-            id: "outline",
+            id: SubLayerId.OUTLINE,
             getLineWidth: getSize(LINE, this.props.lineStyle?.width),
             getPointRadius: getSize(POINT, this.props.wellHeadStyle?.size),
             extensions,
             getDashArray: getDashFactor(this.props.lineStyle?.dash),
             visible: this.props.outline && !fastDrawing,
+            parameters: {
+                ...parameters,
+                [GL.POLYGON_OFFSET_FACTOR]: 1,
+                [GL.POLYGON_OFFSET_UNITS]: 1,
+            },
         });
 
         const highlightLayerProps = this.getSubLayerProps({
             ...defaultLayerProps,
-            id: "highlight",
+            id: SubLayerId.HIGHLIGHT,
             data: getWellObjectByName(data.features, this.props.selectedWell),
             getLineWidth: getSize(LINE, this.props.lineStyle?.width, 2),
             getPointRadius: getSize(POINT, this.props.wellHeadStyle?.size, 2),
@@ -486,10 +495,10 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
         const highlightMultiWellsLayerProps = this.getSubLayerProps({
             ...defaultLayerProps,
-            id: "highlight2",
+            id: SubLayerId.HIGHLIGHT_2,
             data: getWellObjectsByName(
                 data.features,
-                this.state["selectedMultiWells"] as string[]
+                this.state.selectedMultiWells
             ),
             getPointRadius: getSize(POINT, this.props.wellHeadStyle?.size, 2),
             getFillColor: [255, 140, 0],
@@ -511,7 +520,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
         const logLayer = new PathLayer<LogCurveDataType>(
             this.getSubLayerProps({
-                id: "log_curve",
+                id: SubLayerId.LOG_CURVE,
                 data: this.props.logData,
                 positionFormat,
                 pickable: true,
@@ -565,7 +574,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
         const selectionLayer = new PathLayer<LogCurveDataType>(
             this.getSubLayerProps({
-                id: "selection",
+                id: SubLayerId.SELECTION,
                 data: this.props.logData,
                 positionFormat,
                 pickable: false,
@@ -576,8 +585,8 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                     getLogPath1(
                         data.features,
                         d,
-                        this.state["well"] as string,
-                        this.state["selection"] as [number, number],
+                        this.state.well,
+                        this.state.selection,
                         this.props.logrunName,
                         this.props.lineStyle?.color
                     ),
@@ -585,8 +594,8 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                     getLogColor1(
                         data.features,
                         d,
-                        this.state["well"] as string,
-                        this.state["selection"] as [number, number],
+                        this.state.well,
+                        this.state.selection,
                         this.props.logrunName
                     ),
                 getWidth: (d: LogCurveDataType): number | number[] =>
@@ -595,8 +604,8 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 updateTriggers: {
                     getColor: [
                         this.props.logrunName,
-                        this.state["well"],
-                        this.state["selection"],
+                        this.state.well,
+                        this.state.selection,
                     ],
                     getWidth: [
                         this.props.logrunName,
@@ -606,8 +615,8 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                     getPath: [
                         positionFormat,
                         this.props.logrunName,
-                        this.state["well"],
-                        this.state["selection"],
+                        this.state.well,
+                        this.state.selection,
                     ],
                 },
                 onDataLoad: (value: LogCurveDataType[]) => {
@@ -618,34 +627,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             })
         );
 
-        // well name
-        const namesLayer = new TextLayer<Feature>(
-            this.getSubLayerProps({
-                id: "names",
-                data: data.features,
-                getPosition: (d: Feature) =>
-                    getAnnotationPosition(
-                        d,
-                        this.props.wellNameAtTop,
-                        is3d,
-                        this.props.lineStyle?.color
-                    ),
-                getText: (d: Feature) => d.properties?.["name"],
-                getColor: this.props.wellNameColor,
-                getAnchor: "start",
-                getAlignmentBaseline: "bottom",
-                getSize: this.props.wellNameSize,
-                updateTriggers: {
-                    getPosition: [
-                        this.props.wellNameAtTop,
-                        is3d,
-                        this.props.lineStyle?.color,
-                    ],
-                },
-                parameters,
-                visible: this.props.wellNameVisible && !fastDrawing,
-            })
-        );
+        const namesLayer = this.createWellLabelLayer(data.features);
 
         const layers = [
             outlineLayer,
@@ -663,52 +645,74 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
     }
 
     getPickingInfo({ info }: { info: PickingInfo }): WellsPickInfo {
-        if (!info.object) return { ...info, properties: [], logName: "" };
+        const noLog = {
+            properties: [],
+            logName: "",
+        };
 
-        const coordinate = (info.coordinate || [0, 0, 0]) as Position;
+        if (!info.object || info.sourceLayer?.constructor === WellLabelLayer) {
+            return { ...info, ...noLog };
+        }
+
+        const features = this.getWellDataState()?.features ?? [];
+        const coordinate: Position = info.coordinate || [0, 0, 0];
 
         const zScale = this.props.modelMatrix ? this.props.modelMatrix[10] : 1;
         if (typeof coordinate[2] !== "undefined") {
             coordinate[2] /= Math.max(0.001, zScale);
         }
 
-        let md_property = getMdProperty(
-            coordinate,
-            info.object as Feature,
-            this.props.lineStyle?.color,
-            (info as WellsPickInfo).featureType
-        );
-        if (!md_property) {
+        let md_property: PropertyDataType | null = null;
+        let tvd_property: PropertyDataType | null = null;
+        let log_property: PropertyDataType | null = null;
+
+        // ! This needs to be updated if we ever change the sub-layer id!
+        if (
+            info.sourceLayer?.id === `${this.props.id}-${SubLayerId.LOG_CURVE}`
+        ) {
+            // The user is hovering a well log entry
+            const logPick = info as PickingInfo<LogCurveDataType>;
+
             md_property = getLogProperty(
                 coordinate,
-                (this.props.data as FeatureCollection).features,
-                info.object,
+                features,
+                logPick.object!,
                 this.props.logrunName,
                 "MD"
             );
-        }
-        let tvd_property = getTvdProperty(
-            coordinate,
-            info.object as Feature,
-            this.props.lineStyle?.color,
-            (info as WellsPickInfo).featureType
-        );
-        if (!tvd_property) {
+
             tvd_property = getLogProperty(
                 coordinate,
-                (this.props.data as FeatureCollection).features,
-                info.object,
+                features,
+                logPick.object!,
                 this.props.logrunName,
                 "TVD"
             );
+
+            log_property = getLogProperty(
+                coordinate,
+                features,
+                info.object,
+                this.props.logrunName,
+                this.props.logName
+            );
+        } else {
+            // User is hovering a wellbore path
+            const wellpickInfo = info as PickingInfo<WellFeature>;
+
+            md_property = getMdProperty(
+                coordinate,
+                wellpickInfo.object!,
+                this.props.lineStyle?.color,
+                (info as WellsPickInfo).featureType
+            );
+            tvd_property = getTvdProperty(
+                coordinate,
+                info.object,
+                this.props.lineStyle?.color,
+                (info as WellsPickInfo).featureType
+            );
         }
-        const log_property = getLogProperty(
-            coordinate,
-            (this.props.data as FeatureCollection).features,
-            info.object,
-            this.props.logrunName,
-            this.props.logName
-        );
 
         // Patch for inverting tvd readout to fix issue #830,
         // should make proper fix when handling z increase direction - issue #842
@@ -734,16 +738,72 @@ WellsLayer.layerName = "WellsLayer";
 WellsLayer.defaultProps = {
     ...defaultProps,
     onDataLoad: (
-        data: LayerData<FeatureCollection<Geometry, GeoJsonProperties>>,
+        data: LayerData<WellFeatureCollection>,
         context: {
             propName: string;
             layer: Layer;
         }
     ): void => onDataLoad(data, context),
-    //dataTransform,
 };
 
 //================= Local help functions. ==================
+function onDataLoad(
+    data: LayerData<FeatureCollection>,
+    context: {
+        propName: string;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        layer: Layer<any>;
+    }
+): void {
+    const bbox = GetBoundingBox(data as unknown as FeatureCollection);
+    if (typeof context.layer.props.reportBoundingBox !== "undefined") {
+        context.layer.props.reportBoundingBox({ layerBoundingBox: bbox });
+    }
+}
+
+function multiply(pair: [number, number], factor: number): [number, number] {
+    return [pair[0] * factor, pair[1] * factor];
+}
+
+function getDashFactor(
+    accessor: DashAccessor,
+    width_accessor?: number | ((object: Feature) => number),
+    offset = 0
+) {
+    return (
+        object: Feature,
+        objectInfo: Record<string, unknown>
+    ): NumberPair => {
+        let width = DEFAULT_LINE_WIDTH;
+        if (typeof width_accessor == "function") {
+            width = (width_accessor as StyleAccessorFunction)(object) as number;
+        } else if (width_accessor as number) {
+            width = width_accessor as number;
+        }
+        const factor = width / (width + offset);
+
+        let dash: NumberPair = [0, 0];
+        if (typeof accessor == "function") {
+            dash = (accessor as StyleAccessorFunction)(
+                object,
+                objectInfo
+            ) as NumberPair;
+        } else if (accessor as NumberPair) dash = accessor as NumberPair;
+        else if (accessor) dash = DEFAULT_DASH;
+        if (dash.length == 2) {
+            return multiply(dash, factor);
+        } else {
+            return multiply(DEFAULT_DASH, factor);
+        }
+    };
+}
+
+function dataIsReady(
+    layerData: WellsLayerProps["data"]
+): layerData is WellFeatureCollection {
+    // Deck.gl always shows prop.data as `[]` while external data is being loaded
+    return !!layerData && !isEmpty(layerData);
+}
 
 function getColumn<D>(data: D[][], col: number): D[] {
     const column: D[] = [];
@@ -791,111 +851,41 @@ function isSelectedLogRun(d: LogCurveDataType, logrun_name: string): boolean {
     return d.header.name.toLowerCase() === logrun_name.toLowerCase();
 }
 
-// return position for well name and icon
-function getAnnotationPosition(
-    well_data: Feature,
-    name_at_top: boolean,
-    view_is_3d: boolean,
-    color_accessor: ColorAccessor
-): Position | null {
-    if (name_at_top) {
-        let top;
-
-        // Read top position from Point geometry, if not present, read it from LineString geometry
-        const well_head = getWellHeadPosition(well_data);
-        if (well_data) top = well_head;
-        else {
-            const trajectory = getTrajectory(well_data, color_accessor);
-            top = trajectory?.at(0);
-        }
-
-        // using z=0 for orthographic view to keep label above other other layers
-        if (top) return view_is_3d ? top : [top[0], top[1], 0];
-    } else {
-        let bot;
-        // if trajectory is not present, return top position from Point geometry
-        const trajectory = getTrajectory(well_data, color_accessor);
-        if (trajectory) bot = trajectory?.at(-1);
-        else bot = getWellHeadPosition(well_data);
-
-        // using z=0 for orthographic view to keep label above other other layers
-        if (bot) return view_is_3d ? bot : [bot[0], bot[1], 0];
-    }
-    return null;
-}
-
 function getWellObjectByName(
-    wells_data: Feature[],
+    wells_data: WellFeature[],
     name: string
-): Feature | undefined {
+): WellFeature | undefined {
     return wells_data?.find(
-        (item) =>
-            item.properties?.["name"]?.toLowerCase() === name?.toLowerCase()
+        (item) => item.properties?.name?.toLowerCase() === name?.toLowerCase()
     );
 }
 
 function getWellObjectsByName(
-    wells_data: Feature[],
+    wells_data: WellFeature[],
     name: string[]
-): Feature[] | undefined {
-    const res: Feature[] = [];
+): WellFeature[] | undefined {
+    const res: WellFeature[] = [];
     for (let i = 0; i < name?.length; i++) {
         wells_data?.find((item) => {
-            if (
-                item.properties?.["name"]?.toLowerCase() ===
-                name[i]?.toLowerCase()
-            ) {
+            if (item.properties?.name?.toLowerCase() === name[i]?.toLowerCase())
                 res.push(item);
-            }
         });
     }
     return res;
 }
 
-function getPointGeometry(well_object: Feature): Point {
-    return (well_object.geometry as GeometryCollection)?.geometries.find(
-        (item: { type: string }) => item.type == "Point"
-    ) as Point;
-}
-
-function getLineStringGeometry(well_object: Feature): LineString {
-    return (well_object.geometry as GeometryCollection)?.geometries.find(
-        (item: { type: string }) => item.type == "LineString"
-    ) as LineString;
+function getPointGeometry(well_object: WellFeature): Point | undefined {
+    const geometries = well_object.geometry.geometries;
+    return geometries.find((item): item is Point => item.type === "Point");
 }
 
 // Return well head position from Point Geometry
-function getWellHeadPosition(well_object: Feature): Position {
-    return getPointGeometry(well_object)?.coordinates as Position;
+function getWellHeadPosition(well_object: WellFeature): Position {
+    return getPointGeometry(well_object)?.coordinates ?? [-1, -1, -1];
 }
 
-// return trajectory visibility based on alpha of trajectory color
-function isTrajectoryVisible(
-    well_object: Feature,
-    color_accessor: ColorAccessor
-): boolean {
-    let alpha;
-    const accessor = getColor(color_accessor);
-    if (typeof accessor === "function") {
-        alpha = accessor(well_object)?.[3];
-    } else {
-        alpha = (accessor as Color)?.[3];
-    }
-    return alpha !== 0;
-}
-
-// Return Trajectory data from LineString Geometry if it's visible (checking trajectory visiblity based on line color)
-function getTrajectory(
-    well_object: Feature,
-    color_accessor: ColorAccessor
-): Position[] | undefined {
-    if (isTrajectoryVisible(well_object, color_accessor))
-        return getLineStringGeometry(well_object)?.coordinates as Position[];
-    else return undefined;
-}
-
-function getWellMds(well_object: Feature): number[] {
-    return well_object.properties?.["md"][0];
+function getWellMds(well_object: WellFeature): number[] {
+    return well_object.properties.md[0];
 }
 
 function getNeighboringMdIndices(mds: number[], md: number): number[] {
@@ -914,7 +904,7 @@ function getPositionByMD(well_xyz: Position[], well_mds: number[], md: number) {
 }
 
 function getLogPath(
-    wells_data: Feature[],
+    wells_data: WellFeature[],
     d: LogCurveDataType,
     logrun_name: string,
     trajectory_line_color?: ColorAccessor
@@ -962,8 +952,7 @@ function getLogColor(
     log_name: string,
     logColor: string,
     colorTables: colorTablesArray,
-    // eslint-disable-next-line
-    colorMappingFunction: any,
+    colorMappingFunction: WellsLayerProps["colorMappingFunction"],
     isLog: boolean
 ): Color[] {
     const log_data = getLogValues(d, logrun_name, log_name);
@@ -975,17 +964,14 @@ function getLogColor(
         const max = Math.max(...log_data);
         const max_delta = max - min;
         log_data.forEach((value) => {
+            const adjustedVal = (value - min) / max_delta;
+
             const rgb = colorMappingFunction
-                ? colorMappingFunction((value - min) / max_delta)
-                : rgbValues((value - min) / max_delta, logColor, colorTables);
-            rgbValues(value - min / max_delta, logColor, colorTables, isLog);
+                ? colorMappingFunction(adjustedVal)
+                : rgbValues(adjustedVal, logColor, colorTables, isLog);
 
             if (rgb) {
-                if (Array.isArray(rgb)) {
-                    log_color.push([rgb[0], rgb[1], rgb[2]]);
-                } else {
-                    log_color.push([rgb?.r, rgb?.g, rgb?.b]);
-                }
+                log_color.push([rgb[0], rgb[1], rgb[2]]);
             } else {
                 log_color.push([0, 0, 0, 0]); // push transparent for null/undefined log values
             }
@@ -995,69 +981,62 @@ function getLogColor(
         const log_attributes = getDiscreteLogMetadata(d, log_name)?.objects;
         const logLength = Object.keys(log_attributes).length;
 
-        // eslint-disable-next-line
-        const attributesObject: { [key: string]: any } = {};
-        const categorial = true;
+        const attributesObject: { [key: string]: [Color, number] } = {};
+        const categorical = true;
 
         Object.keys(log_attributes).forEach((key) => {
             // get the point from log_attributes
             const point = log_attributes[key][1];
-            const categorialMin = 0;
-            const categorialMax = logLength - 1;
+            const categoricalMin = 0;
+            const categoricalMax = logLength - 1;
 
             let rgb;
             if (colorMappingFunction) {
                 rgb = colorMappingFunction(
                     point,
-                    categorial,
-                    categorialMin,
-                    categorialMax
+                    categorical,
+                    categoricalMin,
+                    categoricalMax
                 );
             } else {
-                // if colormap function is not defined
-                const arrayOfColors: [number, number, number, number][] =
-                    getColors(logColor, colorTables, point);
+                // if color-map function is not defined
+                const arrayOfColors: number[] = getColors(
+                    logColor,
+                    colorTables,
+                    point
+                );
+
                 if (!arrayOfColors.length)
-                    console.error(
-                        "Empty or missed '" + logColor + "' color table"
-                    );
-                rgb = arrayOfColors;
+                    console.error(`Empty or missed '${logColor}' color table`);
+                else {
+                    rgb = arrayOfColors;
+                }
             }
 
             if (rgb) {
-                if (Array.isArray(rgb)) {
-                    if (rgb.length === 3) {
-                        attributesObject[key] = [
-                            [rgb[0], rgb[1], rgb[2]],
-                            point,
-                        ];
-                    } else {
-                        attributesObject[key] = [
-                            [rgb[1], rgb[2], rgb[3]],
-                            point,
-                        ];
-                    }
+                if (rgb.length === 3) {
+                    attributesObject[key] = [[rgb[0], rgb[1], rgb[2]], point];
                 } else {
-                    attributesObject[key] = [[rgb.r, rgb.g, rgb.b], point];
+                    // ? What is the point of this? Why do we offset the index in this case, isn't the fourth value the opacity?
+                    // (@anders2303)
+                    attributesObject[key] = [[rgb[1], rgb[2], rgb[3]], point];
                 }
             }
         });
         log_data.forEach((log_value) => {
             const dl_attrs = Object.entries(attributesObject).find(
-                ([, value]) => value[1] == log_value
+                ([, value]) => (value as [Color, number])[1] == log_value
             )?.[1];
-            // TODO: Fix this the next time the file is edited.
-            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-            dl_attrs
-                ? log_color.push(dl_attrs[0])
-                : log_color.push([0, 0, 0, 0]); // use transparent for undefined/null log values
+
+            if (dl_attrs) log_color.push(dl_attrs[0]);
+            else log_color.push([0, 0, 0, 0]); // use transparent for undefined/null log values
         });
     }
     return log_color;
 }
 
 function getLogPath1(
-    wells_data: Feature[],
+    wells_data: WellFeature[],
     d: LogCurveDataType,
     selectedWell: string | undefined,
     selection: [number | undefined, number | undefined] | undefined,
@@ -1128,7 +1107,7 @@ function getLogPath1(
 }
 
 function getLogColor1(
-    wells_data: Feature[],
+    wells_data: WellFeature[],
     d: LogCurveDataType,
     selectedWell: string | undefined,
     selection: [number | undefined, number | undefined] | undefined,
@@ -1250,19 +1229,19 @@ function interpolateDataOnTrajectory(
 
 function getMd(
     coord: Position,
-    feature: Feature,
+    feature: WellFeature,
     accessor: ColorAccessor
 ): number | null {
     if (!feature.properties?.["md"]?.[0] || !feature.geometry) return null;
 
-    const measured_depths = feature.properties["md"][0] as number[];
+    const measured_depths = feature.properties.md[0] as number[];
     const trajectory3D = getTrajectory(feature, accessor);
 
     if (trajectory3D == undefined) return null;
 
     let trajectory;
     // In 2D view coord is of type Position2D and in 3D view it's Position3D,
-    // so use apropriate trajectory for interpolation
+    // so use appropriate trajectory for interpolation
     if (coord.length == 2) {
         const trajectory2D = trajectory3D.map((v) => {
             return v.slice(0, 2);
@@ -1277,7 +1256,7 @@ function getMd(
 
 function getMdProperty(
     coord: Position,
-    feature: Feature,
+    feature: WellFeature,
     accessor: ColorAccessor,
     featureType: string | undefined
 ): PropertyDataType | null {
@@ -1294,7 +1273,7 @@ function getMdProperty(
 
 function getTvd(
     coord: Position,
-    feature: Feature,
+    feature: WellFeature,
     accessor: ColorAccessor
 ): number | null {
     const trajectory3D = getTrajectory(feature, accessor);
@@ -1324,7 +1303,7 @@ function getTvd(
 
 function getTvdProperty(
     coord: Position,
-    feature: Feature,
+    feature: WellFeature,
     accessor: ColorAccessor,
     featureType: string | undefined
 ): PropertyDataType | null {
@@ -1360,7 +1339,7 @@ function getSegmentIndex(coord: Position, path: Position[]): number {
 // Returns segment index of discrete logs
 function getLogSegmentIndex(
     coord: Position,
-    wells_data: Feature[],
+    wells_data: WellFeature[],
     log_data: LogCurveDataType,
     logrun_name: string
 ): number {
@@ -1370,7 +1349,7 @@ function getLogSegmentIndex(
 
 function getLogProperty(
     coord: Position,
-    wells_data: Feature[],
+    wells_data: WellFeature[],
     log_data: LogCurveDataType,
     logrun_name: string,
     log_name: string
@@ -1414,7 +1393,7 @@ function getLogProperty(
     } else return null;
 }
 
-// Return data required to build welllayer legend
+// Return data required to build well layer legend
 function getLegendData(
     logs: LogCurveDataType[],
     wellName: string,

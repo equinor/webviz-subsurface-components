@@ -1,14 +1,12 @@
+import type { LayerProps } from "@deck.gl/core";
 import type { ScatterplotLayerProps } from "@deck.gl/layers";
 import { ScatterplotLayer } from "@deck.gl/layers";
 
 import { GL } from "@luma.gl/constants";
-import type { NumericArray } from "@math.gl/types";
 
-import type { LayerContext } from "@deck.gl/core";
+import type { ShaderModule } from "@luma.gl/shadertools";
 
 import vs from "./vertex.glsl";
-
-type UniformValue = number | boolean | Readonly<NumericArray>;
 
 export interface ExtendedScatterplotLayerProps {
     depthTest: boolean;
@@ -24,19 +22,16 @@ export class PrivatePointsLayer extends ScatterplotLayer<
     }
 
     getShaders() {
-        const defaultShaders = super.getShaders();
-
-        // Inject custom vertex shader.
-        return { ...defaultShaders, vs };
+        const superShaders = super.getShaders();
+        // use object.assign to make sure we don't overwrite existing fields like `vs`, `modules`...
+        return Object.assign({}, superShaders, {
+            vs: vs,
+            modules: [...superShaders.modules, pointsUniforms],
+        });
     }
 
-    draw(args: {
-        moduleParameters?: unknown;
-        uniforms: Record<string, UniformValue>;
-        context: LayerContext;
-    }): void {
-        args.uniforms["ZIncreasingDownwards"] = this.props.ZIncreasingDownwards;
-
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    draw(args: any): void {
         let restoreDepthTest = false;
         if (
             typeof this.props.depthTest === "boolean" &&
@@ -45,7 +40,14 @@ export class PrivatePointsLayer extends ScatterplotLayer<
             restoreDepthTest = true;
             this.context.gl.disable(GL.DEPTH_TEST);
         }
-        super.draw({ uniforms: args.uniforms });
+        // inject the local uniforms into the shader
+        this.state.model?.shaderInputs.setProps({
+            points: {
+                opacity: this.props.opacity,
+                ZIncreasingDownwards: this.props.ZIncreasingDownwards,
+            },
+        });
+        super.draw(args.uniforms);
         if (restoreDepthTest) {
             this.context.gl.enable(GL.DEPTH_TEST);
         }
@@ -53,3 +55,26 @@ export class PrivatePointsLayer extends ScatterplotLayer<
 }
 
 PrivatePointsLayer.layerName = "PrivatePointsLayer";
+
+const pointsUniformsBlock = /*glsl*/ `\
+uniform pointsUniforms {
+   float opacity;
+   bool ZIncreasingDownwards;
+} points;
+`;
+
+type PointsUniformsType = {
+    opacity: number;
+    ZIncreasingDownwards: boolean;
+};
+
+// NOTE: this must exactly the same name than in the uniform block
+const pointsUniforms = {
+    name: "points",
+    vs: pointsUniformsBlock,
+    fs: undefined,
+    uniformTypes: {
+        opacity: "f32",
+        ZIncreasingDownwards: "u32",
+    },
+} as const satisfies ShaderModule<LayerProps, PointsUniformsType>;

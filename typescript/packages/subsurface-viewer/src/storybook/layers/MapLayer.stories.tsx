@@ -18,7 +18,7 @@ import { ViewFooter } from "../../components/ViewFooter";
 import AxesLayer from "../../layers/axes/axesLayer";
 import MapLayer from "../../layers/map/mapLayer";
 import NorthArrow3DLayer from "../../layers/northarrow/northArrow3DLayer";
-import type { colorMapFunctionType } from "../../layers/utils/layerTools";
+import type { ColorMapFunctionType } from "../../layers/utils/layerTools";
 
 import {
     default2DViews,
@@ -504,7 +504,7 @@ const TypedArrayInputComponent: React.FC<{
                 material: true,
                 ZIncreasingDownwards: false,
                 contours: [0, 5],
-                colorMapFunction: nearestColorMap as colorMapFunctionType,
+                colorMapFunction: nearestColorMap as ColorMapFunctionType,
             },
             {
                 "@@type": "AxesLayer",
@@ -783,6 +783,7 @@ const ExtensionsComponent: React.FC<
         // @ts-expect-error TS7053
         args.bounds?.[3],
     ];
+
     // Can not use Record<string, unknown> because extensions will not be supported
     const leftMap = new MapLayer({
         ...hugin25mKhNetmapMapLayer,

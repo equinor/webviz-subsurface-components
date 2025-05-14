@@ -48,6 +48,7 @@ jobs:
           grep -q '"lockfileVersion": 3,' ./package-lock.json
 
           npm ci CYPRESS_INSTALL_BINARY=0 --ignore-scripts
+
       - name: ⏭️ Modifications when prerelease
         if: github.event.release.prerelease
         run: echo "NPM_PUBLISH_TAG=next" >> $GITHUB_ENV
@@ -80,33 +81,6 @@ jobs:
           npm version --allow-same-version --no-git-tag-version ${VERSION}
           # Use 'latest' tag if $NPM_PUBLISH_TAG is not set:
           npm publish --access public --tag ${NPM_PUBLISH_TAG:-latest}
-
-      - name: 📚 Build Storybook
-        run: npm run build-storybook
-
-      - name: 📚 Update Storybook
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-        run: |
-          rm -rf ../../storybook-static
-          mv ./storybook-static ../..
-
-          git config --local user.email "webviz-github-action"
-          git config --local user.name "webviz-github-action"
-          git fetch origin gh-pages
-          git checkout --track origin/gh-pages
-          git clean -f -f -d -x
-          git rm -r --ignore-unmatch ../*
-
-          mv ../../storybook-static ..
-
-          git add ../storybook-static
-
-          if git diff-index --quiet HEAD; then
-            echo "No changes in documentation. Skip documentation deploy."
-          else
-            git commit -m "Update Github Pages"
-            git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" gh-pages
-          fi
 
   smoke_tests:
     # Run on all events defined above, except pushes which are not to master
@@ -143,3 +117,87 @@ jobs:
           npx concurrently -k -s first -n "SB,TEST" -c "magenta,blue" \
             "npx http-server storybook-static --port $PORT -a $HOST" \
             "npx wait-on http://$HOST:$PORT/ && npm run storybook:test -- --ci --url http://$HOST:$PORT/"
+
+  storybook:
+    # Always validate Storybook build. Deploy it only on pushes to master.
+    if: github.event_name != 'push' || github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    name: "📚 Build and conditionally deploy Storybook"
+    steps:
+      - name: 📖 Checkout commit locally
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: 📦 Install build dependencies
+        run: |
+          npm ci CYPRESS_INSTALL_BINARY=0 --ignore-scripts
+
+      - name: 🏗️ Build packages
+        run: |
+          npx nx run-many -t build
+
+      - name: 📚 Build Storybook
+        run: npm run build-storybook
+
+      - name: 📚 Update deployed Storybook
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        run: |
+          rm -rf ../../storybook-static
+          mv ./storybook-static ../..
+
+          git config --local user.email "webviz-github-action"
+          git config --local user.name "webviz-github-action"
+          git fetch origin gh-pages
+          git checkout --track origin/gh-pages
+          git clean -f -f -d -x
+          git rm -r --ignore-unmatch ../*
+
+          mv ../../storybook-static ..
+
+          git add ../storybook-static
+
+          if git diff-index --quiet HEAD; then
+            echo "No changes in documentation. Skip documentation deploy."
+          else
+            git commit -m "Update Github Pages"
+            git push "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" gh-pages
+          fi
+
+  release_dry_run:
+    # Dry-run semantic release on PR and pushes to master
+    if: github.event_name != 'push' || github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    name: "🔼 Dry-run semantic release"
+
+    steps:
+      - name: 📖 Checkout commit locally
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: 📦 Install build dependencies
+        run: |
+          npm ci CYPRESS_INSTALL_BINARY=0 --ignore-scripts
+
+      - name: 🏗️ Build packages
+        run: |
+          npx nx run-many -t build
+
+      - name: 🔼 Dry-run semantic release
+        working-directory: ./typescript
+        run: npx nx run-many --target="semantic-release:dry-run" --parallel=false
+        env:
+          GITHUB_TOKEN: ${{ secrets.SEMANTIC_RELEASE_GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.SEMANTIC_RELEASE_GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+
+

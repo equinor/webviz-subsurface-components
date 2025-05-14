@@ -8,13 +8,13 @@ import {
 import type { ExtendedLayer } from "../layers/utils/layerTools";
 import type { Color } from "@deck.gl/core";
 import type { colorTablesArray } from "@emerson-eps/color-tables/";
-import type { colorMapFunctionType } from "../layers/utils/layerTools";
+import type { ColorMapFunctionType } from "../layers/utils/layerTools";
 
 interface LegendBaseData {
     title: string;
     colorName: string;
     discrete: boolean;
-    colorMapFunction?: colorMapFunctionType;
+    colorMapFunction?: ColorMapFunctionType;
 }
 export interface DiscreteLegendDataType extends LegendBaseData {
     metadata: Record<string, [Color, number]>;

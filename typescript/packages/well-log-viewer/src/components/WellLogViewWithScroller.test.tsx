@@ -1,19 +1,16 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 import { colorTables } from "@emerson-eps/color-tables";
 import { render } from "@testing-library/react";
 import "jest-styled-components";
 import React from "react";
+
+import type { Template } from "./WellLogTemplateTypes";
 import WellLogViewWithScroller from "./WellLogViewWithScroller";
+import type { ColorMapFunction } from "../utils/color-function";
 
-import type { ColorMapFunction } from "./ColorMapFunction";
+import wellLogJson from "../../../../../example-data/L898MUD.json";
+import templateJson from "../../../../../example-data/welllog_template_1.json";
+
 const exampleColorMapFunctions = colorTables as ColorMapFunction[];
-
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const wellLog = require("../../../../../example-data/L898MUD.json")[0];
-// TODO: Fix this the next time the file is edited.
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const template = require("../../../../../example-data/welllog_template_1.json");
 
 window.ResizeObserver =
     window.ResizeObserver ||
@@ -27,8 +24,8 @@ describe("Test Well Log View Component with Scroller", () => {
     it("snapshot test", () => {
         const { container } = render(
             <WellLogViewWithScroller
-                wellLogSets={[wellLog]}
-                template={template}
+                wellLogSets={wellLogJson}
+                template={templateJson as Template}
                 colorMapFunctions={exampleColorMapFunctions}
                 primaryAxis={"md"}
                 axisTitles={{

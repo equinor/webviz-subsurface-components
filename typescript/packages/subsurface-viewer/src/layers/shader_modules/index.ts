@@ -1,3 +1,3 @@
 export { decoder } from "./decoder";
-export { localPhongLighting } from "./localPhongLighting";
 export { utilities } from "./utilities";
+export { phongMaterial } from "./phong-lighting/phong-material";

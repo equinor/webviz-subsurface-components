@@ -1,12 +1,16 @@
 import type {
     FeatureCollection,
+    GeoJsonProperties,
     GeometryCollection,
     LineString,
     Point,
 } from "geojson";
 import { cloneDeep } from "lodash";
+import { simplify } from "../../utils/simplify";
+
 import type { Position3D } from "../../utils/layerTools";
-import simplify from "@turf/simplify";
+
+export const DEFAULT_TOLERANCE = 0.01;
 
 export function removeConsecutiveDuplicates(
     coords: Position3D[],
@@ -131,6 +135,7 @@ export function CatmullRom1D(
  *
  * See https://qroph.github.io/2018/07/30/smooth-paths-using-catmull-rom-splines.html
  */
+// prettier-ignore
 export function CatmullRom(
     P0: Position3D,
     P1: Position3D,
@@ -187,10 +192,9 @@ export function CatmullRom(
  * in smoother curves with more points.
  * Assumes 3D data.
  */
-export function splineRefine(
-    data_in: FeatureCollection<GeometryCollection>,
-    stepCount = 5
-): FeatureCollection<GeometryCollection> {
+export function splineRefine<
+    TFeatureCollection extends FeatureCollection<GeometryCollection>,
+>(data_in: TFeatureCollection, stepCount = 5): TFeatureCollection {
     if (stepCount < 1) {
         return data_in;
     }
@@ -316,12 +320,15 @@ export function splineRefine(
 /**
  * Will reduce/coarse the wellpaths.
  */
-export function coarsenWells(data_in: FeatureCollection): FeatureCollection {
-    const data = cloneDeep(data_in);
+export function coarsenWells(
+    dataIn: FeatureCollection<GeometryCollection>,
+    tolerance = DEFAULT_TOLERANCE
+): FeatureCollection<GeometryCollection> {
+    const data = cloneDeep(dataIn);
 
-    const no_wells = data.features.length;
-    for (let well_no = 0; well_no < no_wells; well_no++) {
-        const geometryCollection = data.features[well_no]
+    const wellCount = data.features.length;
+    for (let wellIndex = 0; wellIndex < wellCount; wellIndex++) {
+        const geometryCollection = data.features[wellIndex]
             .geometry as GeometryCollection;
         const lineString = geometryCollection?.geometries[1] as LineString;
 
@@ -329,30 +336,19 @@ export function coarsenWells(data_in: FeatureCollection): FeatureCollection {
             continue;
         }
 
-        const isVerticalWell = lineString.coordinates.every(
-            (e) =>
-                e[0] === lineString.coordinates[0][0] &&
-                e[1] === lineString.coordinates[0][1]
-        );
-
-        if (isVerticalWell) {
-            // The simplify algorithm below did not work on vertical wells hence in this case we only use first and last point.
-            const n = lineString.coordinates.length;
-            const coordsSimplified = [
-                lineString.coordinates[0],
-                lineString.coordinates[n - 1],
-            ];
-            lineString.coordinates = coordsSimplified;
-        } else {
-            const options = {
-                tolerance: 0.01,
-                highQuality: false,
-                mutate: false,
-            };
-
-            const coordsSimplified = simplify(lineString, options);
-            lineString.coordinates =
-                coordsSimplified.coordinates as Position3D[];
+        const properties = data.features[wellIndex]
+            .properties as GeoJsonProperties;
+        if (properties) {
+            const mds = properties["md"]?.[0];
+            const [newPoints, newMds] = simplify(
+                lineString.coordinates as Position3D[],
+                mds ?? [],
+                tolerance
+            );
+            lineString.coordinates = newPoints as Position3D[];
+            if (properties["md"]) {
+                properties["md"][0] = newMds;
+            }
         }
     }
 
@@ -388,9 +384,9 @@ export function flattenPath(data_in: FeatureCollection): FeatureCollection {
     return data;
 }
 
-export function invertPath(
-    data_in: FeatureCollection<GeometryCollection>
-): FeatureCollection<GeometryCollection> {
+export function invertPath<
+    TFeatureCollection extends FeatureCollection<GeometryCollection>,
+>(data_in: TFeatureCollection): TFeatureCollection {
     const data = cloneDeep(data_in);
 
     const no_wells = data.features.length;

@@ -1,6 +1,9 @@
 import type { PickingInfo } from "@deck.gl/core";
 import type { Color } from "@deck.gl/core";
-import type { colorTablesArray } from "@emerson-eps/color-tables/";
+import type {
+    colorTablesArray,
+    createColorMapFunction,
+} from "@emerson-eps/color-tables/";
 import { rgbValues } from "@emerson-eps/color-tables/";
 import { createDefaultContinuousColorScale } from "@emerson-eps/color-tables/dist/component/Utils/legendCommonFunction";
 
@@ -19,8 +22,10 @@ import type DrawingLayer from "../drawing/drawingLayer";
 
 export type Position3D = [number, number, number];
 
-// Return a color given a number in the [0,1] range.
-export type colorMapFunctionType = (x: number) => [number, number, number];
+/** Type of functions returning a color from a value in the [0,1] range. */
+export type ColorMapFunctionType = ReturnType<typeof createColorMapFunction>;
+/** @deprecated Use ColorMapFunctionType instead. */
+export type colorMapFunctionType = ColorMapFunctionType;
 
 export interface TypeAndNameLayerProps {
     "@@type"?: string;
@@ -42,7 +47,8 @@ export interface PropertyDataType {
 }
 
 // Layer pick info can have multiple properties
-export interface LayerPickInfo extends PickingInfo {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- We use "any" to match picking-info default
+export interface LayerPickInfo<T = any> extends PickingInfo<T> {
     propertyValue?: number; // for single property
     properties?: PropertyDataType[]; // for multiple properties
 }
@@ -196,19 +202,23 @@ export function defineBoundingBox(
 }
 
 /**
- * Creates an array of 256 colors as RGB triplets in range [0, 1] using the color map or color map function.
+ * Creates an array of colors as RGB triplets in range [0, 1] using the color map or color map function.
  * ColorMapFunction has priority.
  * @param colorMapName Name of the color map in color tables.
  * @param colorTables Color tables.
  * @param colorMapFunction Either a function which returns a color
  * or an array representing a constant color.
- * @returns Array of 256 colors.
+ * @param colormapSize Number of colors in the color map.
+ * @param discreteColormapFunction If true, the color map function is targeting indices ranging from 0 to colormapSize.
+ * @returns Array of colors.
  */
 export function getImageData(
     colorMapName: string,
     colorTables: colorTablesArray,
-    colorMapFunction: colorMapFunctionType | undefined
-) {
+    colorMapFunction: ColorMapFunctionType | undefined,
+    colormapSize: number = 256,
+    discreteColormapFunction: boolean = false
+): Uint8Array {
     type funcType = (x: number) => Color;
 
     const isColorMapFunctionDefined = typeof colorMapFunction !== "undefined";
@@ -223,15 +233,18 @@ export function getImageData(
                 ? (colorMapFunction as funcType)
                 : ((() => colorMapFunction) as unknown as funcType);
     } else if (isColorMapNameDefined) {
+        discreteColormapFunction = false;
         colorMap = (value: number) =>
             rgbValues(value, colorMapName, colorTables);
     }
 
-    const data = new Uint8Array(256 * 3);
+    const data = new Uint8Array(colormapSize * 3);
 
-    for (let i = 0; i < 256; i++) {
-        const value = i / 255.0;
-        const color = colorMap ? colorMap(value) : [0, 0, 0];
+    const scaling = discreteColormapFunction
+        ? 1
+        : 1 / Math.max(colormapSize - 1, 1);
+    for (let i = 0; i < colormapSize; i++) {
+        const color = colorMap ? colorMap(scaling * i) : [1, 0, 0];
         if (color) {
             data[3 * i + 0] = color[0];
             data[3 * i + 1] = color[1];
@@ -239,5 +252,5 @@ export function getImageData(
         }
     }
 
-    return data ? data : [0, 0, 0];
+    return data ? data : new Uint8Array([0, 0, 0]);
 }

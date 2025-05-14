@@ -1,25 +1,26 @@
-/* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
-
 import type { Meta, StoryObj } from "@storybook/react";
 import type { SyntheticEvent } from "react";
 import React, { useState } from "react";
 
 import { Slider } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import type { FeatureCollection } from "geojson";
+import type { FeatureCollection, GeometryCollection } from "geojson";
 
+import { NativeSelect } from "@equinor/eds-core-react";
 import {
     ColorLegend,
     colorTables,
     createColorMapFunction,
 } from "@emerson-eps/color-tables";
-import { NativeSelect } from "@equinor/eds-core-react";
 
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import type { MapMouseEvent } from "../../components/Map";
+
 import AxesLayer from "../../layers/axes/axesLayer";
+import type { WellsLayerProps } from "../../layers/wells/wellsLayer";
 import WellsLayer from "../../layers/wells/wellsLayer";
+import type { WellFeatureCollection } from "../../layers/wells/types";
 
 import { Axes2DLayer } from "../../layers";
 import {
@@ -30,6 +31,20 @@ import {
     volveWellsFromResourcesLayer,
     volveWellsResources,
 } from "../sharedSettings";
+
+import type { WellLabelLayerProps } from "../../layers/wells/layers/wellLabelLayer";
+import { LabelOrientation } from "../../layers/wells/layers/wellLabelLayer";
+import {
+    coarsenWells,
+    DEFAULT_TOLERANCE,
+} from "../../layers/wells/utils/spline";
+import {
+    LABEL_MERGE_RADIUS_ARGTYPES,
+    LABEL_ORIENTATION_ARGTYPES,
+    LABEL_POSITION_ARGTYPES,
+    LABEL_SIZE_ARGTYPES,
+} from "../constant/argTypes";
+import { getRgba } from "../util/color";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -43,7 +58,7 @@ export default stories;
 
 const PREFIX = "VolveWells";
 
-const testWellWithDuplicates = {
+const testWellWithDuplicates: WellFeatureCollection = {
     type: "FeatureCollection",
     features: [
         {
@@ -72,6 +87,7 @@ const testWellWithDuplicates = {
                     },
                 ],
             },
+            // WellFeatureCollection type means the properties here are typed!
             properties: {
                 name: "wl6",
                 color: [255, 255, 0, 255],
@@ -560,7 +576,16 @@ export const WellsRefine: StoryObj<typeof WellsRefineComponent> = {
 export const Wells3d: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         ...defaultProps,
-        layers: [volveWellsFromResourcesLayer],
+        layers: [
+            {
+                ...volveWellsFromResourcesLayer,
+                wellHeadStyle: { size: 4 },
+                wellLabel: {
+                    getSize: 9,
+                    background: true,
+                },
+            },
+        ],
         views: default3DViews,
     },
     parameters: {
@@ -614,6 +639,7 @@ const SimplifiedRenderingComponent: React.FC<SubsurfaceViewerProps> = (
         layers: [
             new WellsLayer({
                 data: "./gullfaks.json",
+                wellNameAtTop: true,
                 wellHeadStyle: { size: 4 },
                 refine: true,
                 outline: true,
@@ -650,6 +676,204 @@ export const SimplifiedRendering: StoryObj<typeof SubsurfaceViewer> = {
         },
     },
     render: (args) => <SimplifiedRenderingComponent {...args} />,
+};
+
+/**
+ * A story that demonstrates styling of well labels.
+ */
+export const WellLabelStyle: StoryObj<
+    WellLabelLayerProps & {
+        color: string;
+        borderColor: string;
+        bgColor: string;
+    }
+> = {
+    args: {
+        getSize: 10,
+        orientation: LabelOrientation.HORIZONTAL,
+        color: "black",
+        background: true,
+        borderColor: "black",
+        getBorderWidth: 1,
+        bgColor: "white",
+        getPositionAlongPath: 0,
+        mergeLabels: true,
+        mergeRadius: 100,
+        autoPosition: true,
+    },
+
+    render: (args) => {
+        const wellLabelProps: WellsLayerProps["wellLabel"] = {
+            getPositionAlongPath: args.getPositionAlongPath,
+            getSize: args.getSize,
+            getColor: getRgba(args.color),
+            getBorderColor: getRgba(args.borderColor),
+            getBackgroundColor: getRgba(args.bgColor),
+            getBorderWidth: args.getBorderWidth,
+            orientation: args.orientation,
+            background: args.background,
+            visible: true,
+            autoPosition: args.autoPosition,
+
+            // MergedTextLayer options
+            mergeLabels: args.mergeLabels,
+            mergeRadius: args.mergeRadius,
+
+            // Disable transitions as they are too slow for this story, on the test runner
+            transitions: {},
+        };
+
+        const wellLayerProps = {
+            data: "./gullfaks.json",
+            wellHeadStyle: { size: 5 },
+            ZIncreasingDownwards: false,
+            wellLabel: wellLabelProps,
+        };
+
+        const wellLayer2d = new WellsLayer({
+            ...wellLayerProps,
+            id: "wells-2d",
+        });
+
+        const wellLayer3d = new WellsLayer({
+            ...wellLayerProps,
+            id: "wells-3d",
+        });
+
+        const layers = [wellLayer2d, wellLayer3d];
+
+        // Viewport is reset if identity of `views` object changes, so we need to memoize it.
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const views = React.useMemo(
+            () => ({
+                layout: [1, 2] as [number, number],
+                viewports: [
+                    {
+                        id: "viewport1",
+                        layerIds: ["wells-3d"],
+                        show3D: true,
+                    },
+                    {
+                        id: "viewport2",
+                        layerIds: ["wells-2d"],
+                        show3D: false,
+                    },
+                ],
+            }),
+            []
+        );
+
+        return (
+            <SubsurfaceViewer
+                id="well-label-style"
+                layers={layers}
+                views={views}
+            />
+        );
+    },
+
+    argTypes: {
+        ...LABEL_POSITION_ARGTYPES,
+        ...LABEL_SIZE_ARGTYPES,
+        ...LABEL_ORIENTATION_ARGTYPES,
+        ...LABEL_MERGE_RADIUS_ARGTYPES,
+    },
+};
+
+const CoarseWellFactorComponent: React.FC<{
+    coarseWellsToleranceFactor: number;
+    show3D: boolean;
+}> = ({ show3D, ...args }) => {
+    const [coarseWellsToleranceFactor, setCoarseWellsToleranceFactor] =
+        useState<number>(DEFAULT_TOLERANCE);
+    const [n, setN] = useState<number>(1);
+
+    if (coarseWellsToleranceFactor != args.coarseWellsToleranceFactor) {
+        setN((n) => n + 1);
+        setCoarseWellsToleranceFactor(args.coarseWellsToleranceFactor);
+    }
+
+    const referenceWellProps = {
+        id: "reference-wells",
+        data: "./gullfaks.json",
+        wellNameVisible: true,
+        wellNameSize: 9,
+        wellHeadStyle: { size: 4 },
+        ZIncreasingDownwards: false,
+        dataTransform: undefined,
+    };
+
+    const referenceWells = new WellsLayer({
+        ...referenceWellProps,
+    });
+
+    const simplifiedWells = new WellsLayer({
+        ...referenceWellProps,
+        id: "simplified-wells",
+        data: n % 2 ? "./gullfaks.json" : "./gullfaks.json ", // Note: trick needed to force dataTransform to recalculate.
+        // eslint-disable-next-line
+        // @ts-ignore
+        dataTransform: (dataIn) => {
+            // Simplify well paths by reducing number of segments/nodes.
+            const data = dataIn as FeatureCollection<GeometryCollection>;
+
+            return coarsenWells(data, coarseWellsToleranceFactor);
+        },
+    });
+
+    const axes = new AxesLayer({
+        id: "axes-layer",
+        bounds: [450000, 6781000, 0, 464000, 6791000, 3500],
+    });
+
+    const views = React.useMemo(
+        () => ({
+            layout: [1, 2] as [number, number],
+            viewports: [
+                {
+                    id: "viewport1",
+                    layerIds: ["reference-wells", "axes-layer"],
+                    show3D,
+                    isSync: true,
+                },
+                {
+                    id: "viewport2",
+                    layerIds: ["simplified-wells", "axes-layer"],
+                    show3D,
+                    isSync: true,
+                },
+            ],
+        }),
+        [show3D]
+    );
+
+    const subsurfaceViewerArgs = {
+        id: "simplify-wells",
+        layers: [referenceWells, simplifiedWells, axes],
+        views,
+    };
+    return <SubsurfaceViewer {...subsurfaceViewerArgs} />;
+};
+
+export const CoarseWellFactor: StoryObj<typeof CoarseWellFactorComponent> = {
+    args: {
+        coarseWellsToleranceFactor: DEFAULT_TOLERANCE,
+        show3D: true,
+    },
+    argTypes: {
+        coarseWellsToleranceFactor: {
+            control: { type: "range", min: 0.01, max: 20, step: 0.01 },
+        },
+    },
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: "Coarsen wells using &quot;dataTransform&quot;property",
+            },
+        },
+    },
+    render: (args) => <CoarseWellFactorComponent {...args} />,
 };
 
 export const Wells3dDashed: StoryObj<typeof SubsurfaceViewer> = {

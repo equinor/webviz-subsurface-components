@@ -14,7 +14,7 @@ import defaultLayout from "./components/DefaultSyncLogViewerLayout";
 
 import type { WellLogSet } from "./components/WellLogTypes";
 import type { Template } from "./components/WellLogTemplateTypes";
-import type { ColorMapFunction } from "./components/ColorMapFunction";
+import type { ColorMapFunction } from "./utils/color-function";
 import { ColorFunctionType } from "./components/CommonPropTypes";
 import type { PatternsTable, Pattern } from "./utils/pattern";
 import { PatternsTableType, PatternsType } from "./components/CommonPropTypes";
@@ -32,7 +32,8 @@ import type {
 import type { WellLogSpacerOptions } from "./components/WellLogSpacer";
 import { getWellPicks } from "./components/WellLogView";
 
-import { getAvailableAxes, toggleId } from "./utils/tracks";
+import { toggleId } from "./utils/arrays";
+import { getAvailableAxes } from "./utils/well-log";
 
 import { checkMinMax } from "./utils/minmax";
 
@@ -40,27 +41,11 @@ import { onTrackMouseEventDefault } from "./utils/edit-track";
 
 import type { Info, InfoOptions } from "./components/InfoTypes";
 
-import { isEqualRanges, isEqDomains } from "./utils/log-viewer";
+import { isEqDomains } from "./utils/arrays";
+import { isEqualRanges } from "./utils/arrays";
 import type { LogViewer } from "@equinor/videx-wellog";
 import { fillInfos } from "./utils/fill-info";
-
-export function isEqualArrays(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    d1: undefined | any[],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    d2: undefined | any[]
-): boolean {
-    if (!d1) return !d2;
-    if (!d2) return !d1;
-
-    const n = d1.length;
-    if (n !== d2.length) return false;
-
-    for (let i = 0; i < n; i++) {
-        if (d1[i] !== d2[i]) return false;
-    }
-    return true;
-}
+import { isEqualArrays } from "./utils/arrays";
 
 export type WellDistances = {
     units: string;
@@ -97,7 +82,7 @@ export interface SyncLogViewerProps {
     colorMapFunctions: ColorMapFunction[];
 
     /**
-     * Set to true for default titles or to array of individial well log titles
+     * Set to true for default titles or to array of individual well log titles
      */
     viewTitles?: boolean | (boolean | string | JSX.Element)[];
 
@@ -195,6 +180,7 @@ export interface SyncLogViewerProps {
     onTemplateChanged?: (iWellLog: number) => void;
 
     onTrackMouseEvent?: (wellLogView: WellLogView, ev: TrackMouseEvent) => void;
+    onTrackMouseLeaveEvent?: () => void;
 
     onCreateController?: (
         iWellLog: number,
@@ -207,10 +193,6 @@ export interface SyncLogViewerProps {
 }
 
 export const argTypesSyncLogViewerProp = {
-    id: {
-        description:
-            "The ID of this component, used to identify dash components in callbacks. The ID needs to be unique across all of the components in an app.",
-    },
     welllogs: {
         description:
             "Array of JSON objects describing well log data.\n<i>Depreacted — Use <b>wellLogCollections</b> instead.</i>",
@@ -267,6 +249,9 @@ export const argTypesSyncLogViewerProp = {
             "hideTrackTitle: Hide titles on the tracks<br/>" +
             "hideLegend: Hide legends on the tracks.",
     },
+    spacerOptions: {
+        description: "Options for well log spacer",
+    },
     readoutOptions: {
         description:
             "Options for readout panel.<br/>" +
@@ -285,7 +270,7 @@ export const argTypesSyncLogViewerProp = {
     },
     viewTitles: {
         description:
-            "Set to true for default titles or to array of individial well log titles",
+            "Set to true for default titles or to array of individual well log titles",
     },
     layout: {
         description:
@@ -299,7 +284,8 @@ interface State {
 }
 
 class SyncLogViewer extends Component<SyncLogViewerProps, State> {
-    public static propTypes: Record<string, unknown>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    public static propTypes: Record<string, any>;
 
     spacers: (WellLogSpacer | null)[];
 
@@ -467,13 +453,9 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
 
         // const onInfoFilled = this.onInfoFilled.bind(this, iView);
         const onInfoFilled = (infos: Info[]) => {
-            // TODO: Fix this the next time the file is edited.
-            // eslint-disable-next-line react/prop-types
             this.props.onInfoFilled?.(iView, infos);
         };
 
-        // TODO: Fix this the next time the file is edited.
-        // eslint-disable-next-line react/prop-types
         if (this.props.onInfoFilled) {
             callbackManager.registerCallback("onInfoFilled", onInfoFilled);
         }
@@ -553,8 +535,6 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         iTo: number
     ): void {
         this.callbackManagers[iWellLog].onInfo(x, logController, iFrom, iTo);
-        // TODO: Fix this the next time the file is edited.
-        // eslint-disable-next-line react/prop-types
         this.props.onInfo?.(iWellLog, x, logController, iFrom, iTo);
 
         this.fillInfo(iWellLog, x, logController, iFrom, iTo);
@@ -587,8 +567,6 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
     onCreateController(iWellLog: number, controller: WellLogController): void {
         this.callbackManagers[iWellLog]?.onCreateController(controller);
         // set callback to component's caller
-        // TODO: Fix this the next time the file is edited.
-        // eslint-disable-next-line react/prop-types
         this.props.onCreateController?.(iWellLog, controller);
 
         this.setControllersZoom();
@@ -599,8 +577,6 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         this.controllers[iWellLog] = controller;
     }
     onDeleteController(iWellLog: number, controller: WellLogController): void {
-        // TODO: Fix this the next time the file is edited.
-        // eslint-disable-next-line react/prop-types
         this.props.onDeleteController?.(iWellLog, controller);
     }
     // callback function from WellLogView
@@ -619,8 +595,6 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         this.syncContentScrollPos(iWellLog);
         this.syncContentSelection(iWellLog);
 
-        // TODO: Fix this the next time the file is edited.
-        // eslint-disable-next-line react/prop-types
         this.props.onContentRescale?.(iWellLog);
     }
     // callback function from WellLogView
@@ -628,8 +602,6 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         this.callbackManagers[iWellLog]?.onContentSelection();
 
         this.syncContentSelection(iWellLog);
-        // TODO: Fix this the next time the file is edited.
-        // eslint-disable-next-line react/prop-types
         this.props.onContentSelection?.(iWellLog);
     }
     // callback function from WellLogView
@@ -638,8 +610,6 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
 
         this.syncTemplate(iWellLog);
 
-        // TODO: Fix this the next time the file is edited.
-        // eslint-disable-next-line react/prop-types
         this.props.onTemplateChanged?.(iWellLog);
     }
     // callback function from Axis selector
@@ -940,11 +910,14 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
     syncTemplate(iWellLog: number): void {
         const controller = this.callbackManagers[iWellLog]?.controller;
         if (!controller) return;
+        if (!this.props.syncTemplate) return;
+
         const template = controller.getTemplate();
         for (const callbackManager of this.callbackManagers) {
             const _controller = callbackManager?.controller;
             if (!_controller || _controller === controller) continue;
-            if (this.props.syncTemplate) _controller.setTemplate(template);
+
+            _controller.setTemplate(template, true);
         }
     }
 
@@ -1008,10 +981,9 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                 onInfo={callbacks.onInfoBind}
                 onCreateController={callbacks.onCreateControllerBind}
                 onTrackMouseEvent={
-                    // TODO: Fix this the next time the file is edited.
-                    // eslint-disable-next-line react/prop-types
                     this.props.onTrackMouseEvent || onTrackMouseEventDefault
                 }
+                onTrackMouseLeaveEvent={this.props.onTrackMouseLeaveEvent}
                 onTrackScroll={callbacks.onTrackScrollBind}
                 onTrackSelection={callbacks.onTrackSelectionBind}
                 onContentRescale={callbacks.onContentRescaleBind}
@@ -1068,8 +1040,6 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                     width={width}
                     patternsTable={this.props.patternsTable}
                     patterns={this.props.patterns}
-                    // TODO: Fix this the next time the file is edited.
-                    // eslint-disable-next-line react/prop-types
                     options={this.props.spacerOptions}
                     horizontal={this.props.horizontal}
                     onCreateSpacer={(spacer: WellLogSpacer): void => {
@@ -1104,8 +1074,6 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                         )}
                     </div>
                 }
-                // TODO: Fix this the next time the file is edited.
-                // eslint-disable-next-line react/prop-types
                 layout={this.props.layout || defaultLayout}
             />
         );
@@ -1168,13 +1136,6 @@ export const InfoOptionsTypes = PropTypes.shape({
  */
 SyncLogViewer.propTypes = {
     /**
-     * The ID of this component, used to identify dash components
-     * in callbacks. The ID needs to be unique across all of the
-     * components in an app.
-     */
-    id: PropTypes.string.isRequired,
-
-    /**
      * An array of JSON well log objects. A synced well log is created per entry.
      * @deprecated use wellLogCollections instead
      */
@@ -1224,7 +1185,7 @@ SyncLogViewer.propTypes = {
     ]),
 
     /**
-     * Distanses between wells to show on the spacers
+     * Distances between wells to show on the spacers
      */
     wellDistances: WellDistancesType,
 
@@ -1246,7 +1207,7 @@ SyncLogViewer.propTypes = {
     /**
      * Names for axes
      */
-    axisMnemos: PropTypes.object /*Of<Record<string, string>>*/,
+    axisMnemos: PropTypes.object /*Of<Record<string, string[]>>*/,
 
     /**
      * The maximum zoom value
@@ -1264,7 +1225,7 @@ SyncLogViewer.propTypes = {
     selection: PropTypes.arrayOf(PropTypes.number),
 
     /**
-     * Set to true for default titles or to array of individial well log titles
+     * Set to true for default titles or to array of individual well log titles
      */
     viewTitles: PropTypes.oneOfType([
         PropTypes.bool,

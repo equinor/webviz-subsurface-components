@@ -1,8 +1,15 @@
 import React from "react";
+import _ from "lodash";
 
-import GroupTreeAssembler from "./GroupTreeAssembler/groupTreeAssembler";
+import "./group_tree.css";
+
 import type { DatedTree, EdgeMetadata, NodeMetadata } from "./types";
-import { isEqual } from "lodash";
+import { TreePlotRenderer } from "./components/TreePlotRenderer";
+import { PlotErrorOverlay } from "./components/PlotErrorOverlay";
+import {
+    useDataAssembler,
+    useUpdateAssemblerDate,
+} from "./utils/DataAssembler";
 
 export interface GroupTreePlotProps {
     id: string;
@@ -12,76 +19,80 @@ export interface GroupTreePlotProps {
     selectedEdgeKey: string;
     selectedNodeKey: string;
     selectedDateTime: string;
+
+    initialVisibleDepth?: number;
 }
 
-export const GroupTreePlot: React.FC<GroupTreePlotProps> = (
-    props: GroupTreePlotProps
-) => {
-    const divRef = React.useRef<HTMLDivElement>(null);
-    const groupTreeAssemblerRef = React.useRef<GroupTreeAssembler>();
+export function GroupTreePlot(props: GroupTreePlotProps): React.ReactNode {
+    // References to handle resizing
+    const svgRootRef = React.useRef<SVGSVGElement | null>(null);
+    const [svgHeight, setSvgHeight] = React.useState<number>(0);
+    const [svgWidth, setSvgWidth] = React.useState<number>(0);
 
-    // State to ensure divRef is defined before creating GroupTree
-    const [isMounted, setIsMounted] = React.useState<boolean>(false);
+    const [dataAssembler, initError] = useDataAssembler(
+        props.datedTrees,
+        props.edgeMetadataList,
+        props.nodeMetadataList
+    );
 
-    // Remove when typescript version is implemented using ref
-    const [prevId, setPrevId] = React.useState<string | null>(null);
+    const dateUpdateError = useUpdateAssemblerDate(
+        dataAssembler,
+        props.selectedDateTime
+    );
 
-    const [prevDatedTrees, setPrevDatedTrees] = React.useState<
-        DatedTree[] | null
-    >(null);
+    const errorToPrint = initError ?? dateUpdateError;
 
-    const [prevSelectedEdgeKey, setPrevSelectedEdgeKey] =
-        React.useState<string>(props.selectedEdgeKey);
-    const [prevSelectedNodeKey, setPrevSelectedNodeKey] =
-        React.useState<string>(props.selectedNodeKey);
-    const [prevSelectedDateTime, setPrevSelectedDateTime] =
-        React.useState<string>(props.selectedDateTime);
+    // Mount hook
+    React.useEffect(function setupResizeObserver() {
+        if (!svgRootRef.current) throw new Error("Expected root ref to be set");
 
-    React.useEffect(function initialRender() {
-        setIsMounted(true);
+        const svgElement = svgRootRef.current;
+
+        // Debounce to avoid excessive re-renders
+        const debouncedResizeObserverCheck = _.debounce<ResizeObserverCallback>(
+            function debouncedResizeObserverCheck(entries) {
+                if (!Array.isArray(entries)) return;
+                if (!entries.length) return;
+
+                const entry = entries[0];
+
+                setSvgWidth(entry.contentRect.width);
+                setSvgHeight(entry.contentRect.height);
+            },
+            100
+        );
+
+        // Since the debounce will delay calling the setters, we call them early now
+        setSvgHeight(svgElement.getBoundingClientRect().height);
+        setSvgWidth(svgElement.getBoundingClientRect().width);
+
+        // Set up a resize-observer to check for svg size changes
+        const resizeObserver = new ResizeObserver(debouncedResizeObserverCheck);
+        resizeObserver.observe(svgElement);
+
+        // Cleanup on unmount
+        return () => {
+            debouncedResizeObserverCheck.cancel();
+            resizeObserver.disconnect();
+        };
     }, []);
 
-    if (
-        isMounted &&
-        divRef.current &&
-        (!isEqual(prevDatedTrees, props.datedTrees) ||
-            prevId !== divRef.current.id)
-    ) {
-        setPrevDatedTrees(props.datedTrees);
-        setPrevId(divRef.current.id);
-        groupTreeAssemblerRef.current = new GroupTreeAssembler(
-            divRef.current.id,
-            props.datedTrees,
-            props.selectedEdgeKey,
-            props.selectedNodeKey,
-            props.selectedDateTime,
-            props.edgeMetadataList,
-            props.nodeMetadataList
-        );
-    }
+    return (
+        <svg ref={svgRootRef} height="100%" width="100%">
+            {dataAssembler && svgHeight && svgWidth && (
+                <TreePlotRenderer
+                    dataAssembler={dataAssembler}
+                    primaryEdgeProperty={props.selectedEdgeKey}
+                    primaryNodeProperty={props.selectedNodeKey}
+                    width={svgWidth}
+                    height={svgHeight}
+                    initialVisibleDepth={props.initialVisibleDepth}
+                />
+            )}
 
-    if (prevSelectedEdgeKey !== props.selectedEdgeKey) {
-        setPrevSelectedEdgeKey(props.selectedEdgeKey);
-        if (groupTreeAssemblerRef.current) {
-            groupTreeAssemblerRef.current.flowrate = props.selectedEdgeKey;
-        }
-    }
-
-    if (prevSelectedNodeKey !== props.selectedNodeKey) {
-        setPrevSelectedNodeKey(props.selectedNodeKey);
-        if (groupTreeAssemblerRef.current) {
-            groupTreeAssemblerRef.current.nodeinfo = props.selectedNodeKey;
-        }
-    }
-
-    if (prevSelectedDateTime !== props.selectedDateTime) {
-        setPrevSelectedDateTime(props.selectedDateTime);
-        if (groupTreeAssemblerRef.current) {
-            groupTreeAssemblerRef.current.update(props.selectedDateTime);
-        }
-    }
-
-    return <div id={props.id} ref={divRef} />;
-};
+            {errorToPrint && <PlotErrorOverlay message={errorToPrint} />}
+        </svg>
+    );
+}
 
 GroupTreePlot.displayName = "GroupTreePlot";

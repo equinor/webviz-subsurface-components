@@ -2,12 +2,6 @@ import React from "react";
 
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { create, all } from "mathjs";
-
-import type {
-    SubsurfaceViewerProps,
-    TLayerDefinition,
-} from "../../SubsurfaceViewer";
 import SubsurfaceViewer, { TGrid3DColoringMode } from "../../SubsurfaceViewer";
 
 import {
@@ -27,9 +21,10 @@ import * as gridPolys from "../../layers/grid3d/test_data/DiscreteProperty/Polys
 import * as gridProps from "../../layers/grid3d/test_data/DiscreteProperty/Props.json";
 
 import { default3DViews, defaultStoryParameters } from "../sharedSettings";
-import type { Grid3DLayerProps } from "../../layers";
-import { AxesLayer, Grid3DLayer } from "../../layers";
-import type { CompositeLayer } from "@deck.gl/core";
+import {
+    createMathWithSeed,
+    replaceNonJsonArgs,
+} from "../sharedHelperFunctions";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -55,7 +50,8 @@ const grid3dLayer = {
     gridLines: true,
     material: true,
     colorMapName: "Rainbow",
-    ZIncreasingDownwards: false,
+    ZIncreasingDownwards: true,
+    pickable: true,
 };
 
 const axes = {
@@ -73,29 +69,183 @@ const parameters = {
     },
 };
 
-const SIMPLE_GEOMETRY = {
-    points: [
-        [0, 0, 0],
-        [100, 0, 0],
-        [100, 100, 0],
-        [0, 100, 0],
-        [200, 100, 0],
-        [200, 0, 0],
-    ],
-    polygons: [4, 0, 1, 2, 3, 4, 1, 2, 4, 5],
-};
+// ---------In-place data generation--------------- //
+function simpleGeometry(
+    cellCountU: number,
+    cellCountV: number,
+    size?: [number, number]
+) {
+    const points: number[][] = [];
+    const polygons: number[] = [];
+    if (cellCountU <= 0 || cellCountV <= 0) {
+        return { points, polygons, size: [0, 0] };
+    }
+    // convert to number of points
+    const nu = cellCountU + 1;
+    const nv = cellCountV + 1;
+    const [xmin, xmax] = [-(size?.[0] ?? 100) / 2, (size?.[0] ?? 100) / 2];
+    const dx = (xmax - xmin) / cellCountU;
+    const [ymin, ymax] = [
+        -(size?.[1] ?? cellCountV * dx) / 2,
+        (size?.[1] ?? cellCountV * dx) / 2,
+    ];
+    const dy = (ymax - ymin) / cellCountV;
+    let index = 0;
+    for (let j = 0; j < nv; j++) {
+        for (let i = 0; i < nu; i++) {
+            points.push([xmin + i * dx, ymin + j * dy, 0]);
+            if (i < nu - 1 && j < nv - 1) {
+                polygons.push(4, index, index + 1, index + nu + 1, index + nu);
+            }
+            index++;
+        }
+    }
+    return { points, polygons, size: [cellCountU, cellCountV] };
+}
 
-const SIMPLE_GEOMETRY_LAYER = {
-    ...grid3dLayer,
-    pickable: true,
-    pointsData: new Float32Array(SIMPLE_GEOMETRY.points.flat()),
-    polysData: new Uint32Array(SIMPLE_GEOMETRY.polygons),
-};
+function continuousProperty(cellCountU: number, cellCountV: number) {
+    const values: number[] = [];
+    for (let i = 0; i < cellCountU; i++) {
+        for (let j = 0; j < cellCountV; j++) {
+            const value =
+                Math.sin((i / cellCountU) * Math.PI * 2) +
+                Math.cos((j / cellCountV) * Math.PI * 2);
+            values.push(value);
+        }
+    }
+    return values;
+}
+
+/** Discrete properties are expected to be continuous integers starting from 0. */
+function discreteProperty(cellCountU: number, cellCountV: number) {
+    const max = propertyValueNames.length - 1;
+    const values = continuousProperty(cellCountU, cellCountV);
+    for (let i = 0; i < values.length; i++) {
+        // continuous properties are between -2 and 2, thus they must be divided by 2
+        values[i] = Math.round(Math.abs(values[i] / 2) * max);
+    }
+    return values;
+}
+
+/* eslint-disable prettier/prettier */
+const CATEGORICAL_COLOR_TABLE: [number, number, number][] = [
+    [0, 0, 255], // 0
+    [0, 255, 0], // 1
+    [0, 255, 255], // 2
+    [255, 0, 0], // 3
+    [255, 0, 255], // 4
+    [255, 255, 0], // 5
+    [0, 0, 100], // 6
+    [0, 100, 0], // 7
+    [0, 100, 100], // 8
+    [100, 0, 0], // 9
+    [100, 0, 100], // 10
+    [100, 100, 0], // 11
+    [100, 100, 255], // 12
+];
+
+const propertyValueNames = [
+    { value: 1, name: "blue" }, // 0
+    { value: 2, name: "green" }, // 1
+    { value: 5, name: "cyan" }, // 2
+    { value: 6, name: "red" }, // 3
+    { value: -8, name: "magenta" }, // 4
+    { value: 9, name: "yellow" }, // 5
+    { value: 20, name: "dark blue" }, // 6
+    { value: 30, name: "dark green" }, // 7
+    { value: 15, name: "dark cyan" }, // 8
+    { value: 10, name: "dark red" }, // 9
+    { value: 3, name: "dark magenta" }, // 10
+    { value: -10, name: "dark yellow" }, // 11
+    { value: -10, name: "Lite blue" }, // 12
+];
+/* eslint-enable prettier/prettier */
 
 const CATEGORICAL_COLOR_MAP = (value: number) => CATEGORICAL_COLOR_TABLE[value];
 
 const BLUE_RED_HEAT_MAP = (value: number): [number, number, number] => {
     return [value * 255, 0, (1 - value) * 255];
+};
+
+const SIMPLE_GEOMETRY = simpleGeometry(20, 10);
+const SIMPLE_CONTINUOUS_PROP = continuousProperty(
+    SIMPLE_GEOMETRY.size[0],
+    SIMPLE_GEOMETRY.size[1]
+);
+const SIMPLE_DISCRETE_PROP = discreteProperty(
+    SIMPLE_GEOMETRY.size[0],
+    SIMPLE_GEOMETRY.size[1]
+);
+
+// ---------In-place array data handling (storybook fails to rebuild non JSon data)--------------- //
+const simpleContinuousLayerId = "simple_continuous_props";
+const simpleDiscreteLayerId = "simple_discrete_props";
+const discretePropsLayerId = "discrete_props";
+const discretePropsColorfuncLayerId = "discrete_props_colorfunc";
+const zPaintingLayerId = "z_painting";
+
+const nonJsonLayerArgs = {
+    [simpleContinuousLayerId]: {
+        pointsData: new Float32Array(SIMPLE_GEOMETRY.points.flat()),
+        polysData: new Uint32Array(SIMPLE_GEOMETRY.polygons),
+        propertiesData: new Float32Array(SIMPLE_CONTINUOUS_PROP),
+        colorMapFunction: BLUE_RED_HEAT_MAP,
+    },
+    [simpleDiscreteLayerId]: {
+        pointsData: new Float32Array(SIMPLE_GEOMETRY.points.flat()),
+        polysData: new Uint32Array(SIMPLE_GEOMETRY.polygons),
+        propertiesData: new Float32Array(SIMPLE_DISCRETE_PROP),
+        colorMapFunction: CATEGORICAL_COLOR_MAP,
+    },
+    [discretePropsLayerId]: {
+        pointsData: new Float32Array(gridPoints),
+        polysData: new Uint32Array(gridPolys),
+        propertiesData: new Uint16Array(gridProps),
+        colorMapFunction: new Uint8Array(CATEGORICAL_COLOR_TABLE.flat()),
+    },
+    [discretePropsColorfuncLayerId]: {
+        pointsData: new Float32Array(gridPoints),
+        polysData: new Uint32Array(gridPolys),
+        propertiesData: new Uint16Array(gridProps),
+        // The function should convert color indices to RGB values.
+        // The property values are ranging from 0 to 12.
+        colorMapFunction: (v: number) => {
+            return [24 * v, 0, 24 * (12 - v)];
+        },
+    },
+    [zPaintingLayerId]: {
+        pointsData: new Float32Array(gridPoints),
+        polysData: new Uint32Array(gridPolys),
+    },
+};
+
+const SIMPLE_GEOMETRY_LAYER = {
+    ...grid3dLayer,
+    "@@typedArraySupport": true,
+    pointsData: nonJsonLayerArgs[simpleContinuousLayerId].pointsData,
+    polysData: nonJsonLayerArgs[simpleContinuousLayerId].polysData,
+    gridLines: SIMPLE_GEOMETRY.points.length < 1000,
+};
+
+const SIMPLE_CONTINUOUS_LAYER = {
+    ...SIMPLE_GEOMETRY_LAYER,
+    id: simpleContinuousLayerId,
+    propertiesData: nonJsonLayerArgs[simpleContinuousLayerId].propertiesData,
+    colorMapFunction:
+        nonJsonLayerArgs[simpleContinuousLayerId].colorMapFunction,
+    colorMapClampColor: true,
+    colorMapRange: [-2, 2],
+};
+
+const SIMPLE_DISCRETE_LAYER = {
+    ...SIMPLE_GEOMETRY_LAYER,
+    id: simpleDiscreteLayerId,
+    coloringMode: TGrid3DColoringMode.DiscreteProperty,
+    propertiesData: nonJsonLayerArgs[simpleDiscreteLayerId].propertiesData,
+    discretePropertyValueNames: propertyValueNames,
+    colorMapFunction: nonJsonLayerArgs[simpleDiscreteLayerId].colorMapFunction,
+    colorMapClampColor: true,
+    colorMapRange: [0, 12],
 };
 
 export const Simgrid: StoryObj<typeof SubsurfaceViewer> = {
@@ -106,6 +256,7 @@ export const Simgrid: StoryObj<typeof SubsurfaceViewer> = {
             axes,
             {
                 ...grid3dLayer,
+                ZIncreasingDownwards: false,
                 pointsData: "vtk-grid/Simgrid_points.json",
                 polysData: "vtk-grid/Simgrid_polys.json",
                 propertiesData: "vtk-grid/Simgrid_scalar.json",
@@ -125,6 +276,7 @@ export const SimgridArrayInput: StoryObj<typeof SubsurfaceViewer> = {
             axes,
             {
                 ...grid3dLayer,
+                ZIncreasingDownwards: false,
                 pointsData: [
                     456063, 5935991, -1729, 456063, 5935991, -1731, 456138,
                     5935861.518843642, -1727.820068359375, 456138.5, 5935861.5,
@@ -135,7 +287,6 @@ export const SimgridArrayInput: StoryObj<typeof SubsurfaceViewer> = {
                 ],
                 polysData: [4, 0, 1, 2, 3, 4, 0, 4, 5, 1, 4, 0, 3, 6, 4],
                 propertiesData: [0.2, 0.6, 0.8],
-                pickable: true,
             },
         ],
     },
@@ -150,10 +301,10 @@ export const Simgrid2x: StoryObj<typeof SubsurfaceViewer> = {
             axes,
             {
                 ...grid3dLayer,
+                ZIncreasingDownwards: false,
                 pointsData: "vtk-grid/Simgrid2x_points.json",
                 polysData: "vtk-grid/Simgrid2x_polys.json",
                 propertiesData: "vtk-grid/Simgrid2x_scalar.json",
-                pickable: true,
             },
         ],
     },
@@ -172,7 +323,6 @@ export const Simgrid4x: StoryObj<typeof SubsurfaceViewer> = {
                 pointsData: "vtk-grid/Simgrid4x_points.json",
                 polysData: "vtk-grid/Simgrid4x_polys.json",
                 propertiesData: "vtk-grid/Simgrid4x_scalar.json",
-                pickable: true,
             },
         ],
     },
@@ -187,62 +337,29 @@ export const Simgrid8xIJonly: StoryObj<typeof SubsurfaceViewer> = {
             axes,
             {
                 ...grid3dLayer,
+                ZIncreasingDownwards: false,
                 pointsData: "vtk-grid/Simgrid8xIJonly_points.json",
                 polysData: "vtk-grid/Simgrid8xIJonly_polys.json",
                 propertiesData: "vtk-grid/Simgrid8xIJonly_scalar.json",
-                pickable: true,
             },
         ],
     },
     parameters: parameters,
 };
 
-const math = create(all, { randomSeed: "1984" });
-const randomFunc = math?.random ? math.random : Math.random;
+const math = createMathWithSeed("1984");
 
 const snubCubePoints = SnubCubePoints.map((v) => 10 * v);
 const snubCubeProperties = Array(SnubCubeVertexCount)
     .fill(0)
-    .map(() => 100 + randomFunc() * 50);
+    .map(() => 100 + math.random() * 50);
 
 const toroidPoints = ToroidPoints.map((v) => 10 * v).map((v, index) =>
     index % 3 === 0 ? v + 30 : v
 );
 const toroidProperties = Array(ToroidVertexCount)
     .fill(0)
-    .map(() => randomFunc() * 10);
-
-/* eslint-disable prettier/prettier */
-const CATEGORICAL_COLOR_TABLE: [number, number, number][] = [
-    [0, 0, 255],     // 0
-    [0, 255, 0],     // 1 
-    [0, 255, 255],   // 2 
-    [255, 0, 0],     // 3 
-    [255, 0, 255],   // 4 
-    [255, 255, 0],   // 5 
-    [0, 0, 100],     // 6 
-    [0, 100, 0],     // 7 
-    [0, 100, 100],   // 8
-    [100, 0, 0],     // 9 
-    [100, 0, 100],   // 10
-    [100, 100, 0],   // 11
-];
-
-const propertyValueNames = [
-    { value: 1, name: "blue"},         // 0
-    { value: 2, name:"green"},         // 1
-    { value: 5, name: "cyan"},         // 2
-    { value: 6, name: "red"},          // 3
-    { value: -8, name: "magenta"},     // 4
-    { value: 9, name: "yellow"},       // 5
-    { value: 20, name: "dark blue"},   // 6
-    { value: 30, name: "dark green"},  // 7
-    { value: 15, name: "dark cyan"},   // 8
-    { value: 10, name: "dark red"},    // 9
-    { value: 3, name: "dark magenta"}, // 10
-    { value: -10, name: "dark yellow"},// 11
-];
-/* eslint-enable prettier/prettier */
+    .map(() => math.random() * 10);
 
 export const PolyhedralCells: StoryObj<typeof SubsurfaceViewer> = {
     args: {
@@ -267,7 +384,6 @@ export const PolyhedralCells: StoryObj<typeof SubsurfaceViewer> = {
                 ...grid3dLayer,
                 id: "polyhedral1",
                 coloringMode: TGrid3DColoringMode.Y,
-                pickable: true,
                 pointsData: snubCubePoints,
                 polysData: SnubCubeFaces,
                 propertiesData: snubCubeProperties,
@@ -276,7 +392,6 @@ export const PolyhedralCells: StoryObj<typeof SubsurfaceViewer> = {
             {
                 ...grid3dLayer,
                 id: "polyhedral2",
-                pickable: true,
                 pointsData: toroidPoints,
                 polysData: ToroidFaces,
                 propertiesData: toroidProperties,
@@ -287,88 +402,38 @@ export const PolyhedralCells: StoryObj<typeof SubsurfaceViewer> = {
     parameters: parameters,
 };
 
-// ---------In-place array data handling (storybook fails to rebuild non JSon data)--------------- //
-const discretePropsLayerId = "discrete_props";
-
-const layerArrays = {
-    [discretePropsLayerId]: {
-        pointsData: new Float32Array(gridPoints),
-        polysData: new Uint32Array(gridPolys),
-        propertiesData: new Uint16Array(gridProps),
-        colorMapFunction: new Uint8Array(CATEGORICAL_COLOR_TABLE.flat()),
-    },
-};
-
-function replaceAllArrays(args: SubsurfaceViewerProps) {
-    args.layers?.forEach((layer: TLayerDefinition) => {
-        replaceLayerArrays(layer);
-    });
-    return args;
-}
-
-function replaceArrays(args: SubsurfaceViewerProps, keys: string[]) {
-    args.layers?.forEach((layer: TLayerDefinition) => {
-        replaceLayerArrays(layer, keys);
-    });
-    return args;
-}
-
-function replaceLayerArrays(
-    layer: TLayerDefinition,
-    keys: string[] | undefined = undefined
-) {
-    // @ts-expect-error TS7053
-    const layerId = layer?.["id"] as string | undefined;
-    // @ts-expect-error TS7053
-    if (layer && layerId && layerArrays[layerId]) {
-        if (!keys) {
-            // @ts-expect-error TS7053
-            keys = Object.keys(layerArrays[layerId]) as string[];
-        }
-        for (const key of keys) {
-            // @ts-expect-error TS7053
-            layer[key] = layerArrays[layerId][key];
-        }
-    }
-}
-
 export const ContinuousProperty: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "grid-property",
         layers: [
-            new AxesLayer({
+            {
                 ...axes,
-                bounds: [-300, -300, -2200, 300, 300, -1000],
-            }),
-            new Grid3DLayer({
-                ...SIMPLE_GEOMETRY_LAYER,
-                propertiesData: new Float32Array([-1, 100.5]),
-                colorMapFunction: BLUE_RED_HEAT_MAP,
-            }) as CompositeLayer<Grid3DLayerProps>,
+                bounds: [-100, -100, -100, 100, 100, 100],
+            },
+            SIMPLE_CONTINUOUS_LAYER,
         ],
     },
     parameters: parameters,
-    render: (args) => <SubsurfaceViewer {...args} />,
+    render: (args) => (
+        <SubsurfaceViewer {...replaceNonJsonArgs(args, nonJsonLayerArgs)} />
+    ),
 };
 
 export const DiscreteProperty: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "grid-property",
         layers: [
-            new AxesLayer({
+            {
                 ...axes,
-                bounds: [-300, -300, -2200, 300, 300, -1000],
-            }),
-            new Grid3DLayer({
-                ...SIMPLE_GEOMETRY_LAYER,
-                propertiesData: new Uint16Array([0, 1]),
-                discretePropertyValueNames: propertyValueNames,
-                colorMapFunction: CATEGORICAL_COLOR_MAP,
-            }) as CompositeLayer<Grid3DLayerProps>,
+                bounds: [-100, -100, -100, 100, 100, 100],
+            },
+            SIMPLE_DISCRETE_LAYER,
         ],
     },
     parameters: parameters,
-    render: (args) => <SubsurfaceViewer {...args} />,
+    render: (args) => (
+        <SubsurfaceViewer {...replaceNonJsonArgs(args, nonJsonLayerArgs)} />
+    ),
 };
 
 export const DiscretePropertyWithClamping: StoryObj<typeof SubsurfaceViewer> = {
@@ -394,17 +459,15 @@ export const DiscretePropertyWithClamping: StoryObj<typeof SubsurfaceViewer> = {
                 ...grid3dLayer,
                 "@@typedArraySupport": true,
                 id: discretePropsLayerId,
-                coloringMode: TGrid3DColoringMode.Property,
-                pickable: true,
-                pointsData: layerArrays[discretePropsLayerId].pointsData,
-                polysData: layerArrays[discretePropsLayerId].polysData,
+                coloringMode: TGrid3DColoringMode.DiscreteProperty,
+                pointsData: nonJsonLayerArgs[discretePropsLayerId].pointsData,
+                polysData: nonJsonLayerArgs[discretePropsLayerId].polysData,
                 propertiesData:
-                    layerArrays[discretePropsLayerId].propertiesData,
+                    nonJsonLayerArgs[discretePropsLayerId].propertiesData,
                 discretePropertyValueNames: propertyValueNames,
                 colorMapName: "Seismic",
-                ZIncreasingDownwards: true,
                 colorMapFunction:
-                    layerArrays[discretePropsLayerId].colorMapFunction,
+                    nonJsonLayerArgs[discretePropsLayerId].colorMapFunction,
                 material: {
                     ambient: 0.5,
                     diffuse: 0.5,
@@ -417,10 +480,14 @@ export const DiscretePropertyWithClamping: StoryObj<typeof SubsurfaceViewer> = {
         ],
     },
     parameters: parameters,
-    render: (args) => <SubsurfaceViewer {...replaceAllArrays(args)} />,
+    render: (args) => (
+        <SubsurfaceViewer {...replaceNonJsonArgs(args, nonJsonLayerArgs)} />
+    ),
 };
 
-export const CustomColorFuncWithClamping: StoryObj<typeof SubsurfaceViewer> = {
+export const DiscretePropertyWithColorFuncAndClamping: StoryObj<
+    typeof SubsurfaceViewer
+> = {
     args: {
         bounds: [-2500, -2500, 2500, 2500] as NumberQuad,
         views: {
@@ -442,19 +509,18 @@ export const CustomColorFuncWithClamping: StoryObj<typeof SubsurfaceViewer> = {
             {
                 ...grid3dLayer,
                 "@@typedArraySupport": true,
-                id: discretePropsLayerId,
-                coloringMode: TGrid3DColoringMode.Property,
-                pickable: true,
-                pointsData: layerArrays[discretePropsLayerId].pointsData,
-                polysData: layerArrays[discretePropsLayerId].polysData,
+                id: discretePropsColorfuncLayerId,
+                coloringMode: TGrid3DColoringMode.DiscreteProperty,
+                pointsData:
+                    nonJsonLayerArgs[discretePropsColorfuncLayerId].pointsData,
+                polysData:
+                    nonJsonLayerArgs[discretePropsColorfuncLayerId].polysData,
                 propertiesData:
-                    layerArrays[discretePropsLayerId].propertiesData,
-                colorMapName: "Seismic",
-                ZIncreasingDownwards: true,
-                // @ts-expect-error TS7006
-                colorMapFunction: function (v) {
-                    return [255 * v, 0, 255 * (1 - v)];
-                },
+                    nonJsonLayerArgs[discretePropsColorfuncLayerId]
+                        .propertiesData,
+                colorMapFunction:
+                    nonJsonLayerArgs[discretePropsColorfuncLayerId]
+                        .colorMapFunction,
                 material: false,
                 colorMapRange: [3, 10],
                 colorMapClampColor: [100, 100, 100],
@@ -463,13 +529,7 @@ export const CustomColorFuncWithClamping: StoryObj<typeof SubsurfaceViewer> = {
     },
     parameters: parameters,
     render: (args) => (
-        <SubsurfaceViewer
-            {...replaceArrays(args, [
-                "pointsData",
-                "polysData",
-                "propertiesData",
-            ])}
-        />
+        <SubsurfaceViewer {...replaceNonJsonArgs(args, nonJsonLayerArgs)} />
     ),
 };
 
@@ -498,30 +558,72 @@ export const DiscretePropertyWithUndefinedValues: StoryObj<
                 ...grid3dLayer,
                 "@@typedArraySupport": true,
                 id: discretePropsLayerId,
-                coloringMode: TGrid3DColoringMode.Property,
+                coloringMode: TGrid3DColoringMode.DiscreteProperty,
                 colorMapFunction:
-                    layerArrays[discretePropsLayerId].colorMapFunction,
+                    nonJsonLayerArgs[discretePropsLayerId].colorMapFunction,
                 discretePropertyValueNames: propertyValueNames,
-                pickable: true,
-                pointsData: layerArrays[discretePropsLayerId].pointsData,
-                polysData: layerArrays[discretePropsLayerId].polysData,
+                pointsData: nonJsonLayerArgs[discretePropsLayerId].pointsData,
+                polysData: nonJsonLayerArgs[discretePropsLayerId].polysData,
                 propertiesData:
-                    layerArrays[discretePropsLayerId].propertiesData,
-                colorMapName: "Rainbow",
-                ZIncreasingDownwards: true,
-                material: false,
+                    nonJsonLayerArgs[discretePropsLayerId].propertiesData,
+                material: {
+                    ambient: 0.5,
+                    diffuse: 0.5,
+                    shininess: 32,
+                    specularColor: [255, 255, 255],
+                },
                 undefinedPropertyValue: 4,
+                undefinedPropertyColor: [204, 204, 204],
             },
         ],
     },
     parameters: parameters,
     render: (args) => (
-        <SubsurfaceViewer
-            {...replaceArrays(args, [
-                "pointsData",
-                "polysData",
-                "propertiesData",
-            ])}
-        />
+        <SubsurfaceViewer {...replaceNonJsonArgs(args, nonJsonLayerArgs)} />
+    ),
+};
+
+export const ZPainting: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        bounds: [-2500, -2500, 2500, 2500] as NumberQuad,
+        views: {
+            layout: [1, 1] as [number, number],
+            viewports: [
+                {
+                    id: "view_1",
+                    show3D: true,
+                },
+            ],
+        },
+        id: "grid-3d-Z_props",
+        layers: [
+            {
+                ...axes,
+                id: "discrete_props-axes",
+                bounds: [-2000, -2200, -2200, 2200, 2000, -1000],
+            },
+            {
+                ...grid3dLayer,
+                "@@typedArraySupport": true,
+                id: zPaintingLayerId,
+                pointsData: nonJsonLayerArgs[zPaintingLayerId].pointsData,
+                polysData: nonJsonLayerArgs[zPaintingLayerId].polysData,
+                colorMapName: "Seismic",
+                coloringMode: TGrid3DColoringMode.Z,
+                //colorMapFunction: "rainbow",
+                material: {
+                    ambient: 0.5,
+                    diffuse: 0.5,
+                    shininess: 32,
+                    specularColor: [255, 255, 255],
+                },
+                colorMapRange: [-1850, -1700],
+                colorMapClampColor: [0, 250, 0],
+            },
+        ],
+    },
+    parameters: parameters,
+    render: (args) => (
+        <SubsurfaceViewer {...replaceNonJsonArgs(args, nonJsonLayerArgs)} />
     ),
 };

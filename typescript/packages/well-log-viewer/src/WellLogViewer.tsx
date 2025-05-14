@@ -21,7 +21,8 @@ import type {
 } from "./components/WellLogView";
 import type WellLogView from "./components/WellLogView";
 
-import { getAvailableAxes, toggleId } from "./utils/tracks";
+import { toggleId } from "./utils/arrays";
+import { getAvailableAxes } from "./utils/well-log";
 
 import { onTrackMouseEventDefault } from "./utils/edit-track";
 
@@ -45,6 +46,7 @@ export interface WellLogViewerProps extends WellLogViewWithScrollerProps {
 
     onInfoFilled?: (computedInfo: Info[]) => void;
     onTrackMouseEvent?: (wellLogView: WellLogView, ev: TrackMouseEvent) => void;
+    onTrackMouseLeaveEvent?: () => void;
 
     onCreateController?: (controller: WellLogController) => void;
 }
@@ -78,7 +80,8 @@ export default class WellLogViewer extends Component<
     WellLogViewerProps,
     State
 > {
-    public static propTypes: Record<string, unknown>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    public static propTypes: Record<string, any>;
 
     callbackManager: CallbackManager;
     collapsedTrackIds: (string | number)[];
@@ -304,6 +307,9 @@ export default class WellLogViewer extends Component<
                         onTrackMouseEvent={
                             this.props.onTrackMouseEvent ||
                             onTrackMouseEventDefault
+                        }
+                        onTrackMouseLeaveEvent={
+                            this.props.onTrackMouseLeaveEvent
                         }
                         onContentRescale={this.onContentRescale}
                         onContentSelection={this.onContentSelection}

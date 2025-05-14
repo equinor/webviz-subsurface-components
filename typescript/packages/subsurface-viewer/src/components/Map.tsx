@@ -20,7 +20,7 @@ import type {
     View,
     Viewport,
 } from "@deck.gl/core";
-import type { DeckGLRef } from "@deck.gl/react";
+import type { DeckGLProps, DeckGLRef } from "@deck.gl/react";
 import DeckGL from "@deck.gl/react";
 
 import {
@@ -51,7 +51,7 @@ import {
     getModelMatrixScale,
     getWellLayerByTypeAndSelectedWells,
 } from "../layers/utils/layerTools";
-import type { WellsPickInfo } from "../layers/wells/wellsLayer";
+import type { WellsPickInfo } from "../layers/wells/types";
 import type { BoundingBox2D, Point2D } from "../utils/BoundingBox2D";
 import { isEmpty as isEmptyBox2D } from "../utils/BoundingBox2D";
 import type { BoundingBox3D, Point3D } from "../utils/BoundingBox3D";
@@ -77,6 +77,7 @@ import type { ViewportType } from "../views/viewport";
 import { useVerticalScale } from "../views/viewport";
 
 import mergeRefs from "merge-refs";
+import { WellLabelLayer } from "../layers/wells/layers/wellLabelLayer";
 
 export type { BoundingBox2D, BoundingBox3D, Point2D, Point3D };
 /**
@@ -350,6 +351,16 @@ export interface MapProps {
 
     onDragStart?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
     onDragEnd?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
+    onDrag?: (info: PickingInfo, event: MjolnirGestureEvent) => void;
+
+    /**
+     * Override default cursor with a callback.
+     * @param cursorState
+     * @returns cursor string
+     * @default "grabbing" when dragging, "default" otherwise
+     * @see https://developer.mozilla.org/en-US/docs/Web/CSS/cursor
+     */
+    getCursor?: DeckGLProps["getCursor"];
 
     triggerResetMultipleWells?: number;
 
@@ -383,10 +394,21 @@ export interface MapProps {
      * Extra pixels around the pointer to include while picking.
      */
     pickingRadius?: number;
+
+    /**
+     * The reference to the deck.gl instance.
+     */
+    deckGlRef?: React.ForwardedRef<DeckGLRef>;
 }
 
 function defaultTooltip(info: PickingInfo) {
-    if ((info as WellsPickInfo)?.logName) {
+    if (
+        (info.layer?.constructor === WellLabelLayer ||
+            info.sourceLayer?.constructor === WellLabelLayer) &&
+        info.object?.wellLabels
+    ) {
+        return info.object.wellLabels?.join("\n");
+    } else if ((info as WellsPickInfo)?.logName) {
         return (info as WellsPickInfo)?.logName;
     } else if (info.layer?.id === "drawing-layer") {
         return (info as LayerPickInfo).propertyValue?.toFixed(2);
@@ -402,7 +424,7 @@ const Map: React.FC<MapProps> = ({
     cameraPosition,
     triggerHome,
     views = DEFAULT_VIEWS,
-    coords = { visible: true, multiPicking: true, pickDepth: 10 },
+    coords = { visible: true, multiPicking: true, pickDepth: 2 },
     scale = { visible: true, cssStyle: { top: 10, left: 10 } },
     coordinateUnit = "m",
     colorTables = defaultColorTables,
@@ -416,14 +438,22 @@ const Map: React.FC<MapProps> = ({
     onRenderingProgress,
     onDragStart,
     onDragEnd,
+    onDrag,
+    getCursor,
     lights,
     triggerResetMultipleWells,
     verticalScale,
     innerRef,
     pickingRadius,
+    deckGlRef,
 }: MapProps) => {
     // From react doc, ref should not be read nor modified during rendering.
     const deckRef = React.useRef<DeckGLRef>(null);
+
+    React.useImperativeHandle<DeckGLRef | null, DeckGLRef | null>(
+        deckGlRef,
+        () => deckRef.current
+    );
 
     const [applyViewController, forceUpdate] = React.useReducer(
         (x) => x + 1,
@@ -490,11 +520,13 @@ const Map: React.FC<MapProps> = ({
         }) as unknown as Axes2DLayer;
 
         const axes2DProps = axes2DLayer?.props;
+        const marginV = axes2DProps?.minimalMarginV ?? axes2DProps?.marginV;
+        const marginH = axes2DProps?.minimalMarginH ?? axes2DProps?.marginH;
         return {
-            left: axes2DProps?.isLeftRuler ? axes2DProps.marginH : 0,
-            right: axes2DProps?.isRightRuler ? axes2DProps.marginH : 0,
-            top: axes2DProps?.isTopRuler ? axes2DProps.marginV : 0,
-            bottom: axes2DProps?.isBottomRuler ? axes2DProps.marginV : 0,
+            left: axes2DProps?.isLeftRuler ? marginH : 0,
+            right: axes2DProps?.isRightRuler ? marginH : 0,
+            top: axes2DProps?.isTopRuler ? marginV : 0,
+            bottom: axes2DProps?.isBottomRuler ? marginV : 0,
         };
     }, [layers]);
 
@@ -544,7 +576,7 @@ const Map: React.FC<MapProps> = ({
                     pickInfo.layer.context.deck.pickMultipleObjects({
                         x: event.offsetCenter.x,
                         y: event.offsetCenter.y,
-                        depth: coords.pickDepth ? coords.pickDepth : undefined,
+                        depth: coords.pickDepth ?? undefined,
                         unproject3D: true,
                     }) as LayerPickInfo[];
                 pickInfos.forEach((item) => {
@@ -615,7 +647,7 @@ const Map: React.FC<MapProps> = ({
     const onHover = useCallback(
         (pickInfo: PickingInfo, event: MjolnirEvent) => {
             const infos = getPickingInfos(pickInfo, event);
-            setHoverInfo(infos); //  for InfoCard pickInfos
+            setHoverInfo(infos);
             callOnMouseEvent?.("hover", infos, event);
         },
         [callOnMouseEvent, getPickingInfos]
@@ -643,11 +675,17 @@ const Map: React.FC<MapProps> = ({
             layers.push(dummy_layer);
         }
 
-        const m = getModelMatrixScale(zScale);
-
         return layers.map((item) => {
             if (item?.constructor.name === NorthArrow3DLayer.name) {
                 return item;
+            }
+
+            let m: Matrix4;
+            if ((item as Layer).props.modelMatrix) {
+                m = (item as Layer).props.modelMatrix as Matrix4;
+                m[10] *= zScale; // Z scaling element of matrix.
+            } else {
+                m = getModelMatrixScale(zScale);
             }
 
             return (item as Layer).clone({
@@ -655,7 +693,8 @@ const Map: React.FC<MapProps> = ({
                 // eslint-disable-next-line
                 // @ts-ignore
                 reportBoundingBox: dispatchBoundingBox,
-                // Set "modelLayer" matrix to reflect correct z scaling.
+
+                // Modify "modelMatrix" to reflect correct z scaling.
                 modelMatrix: m,
             });
         });
@@ -745,6 +784,20 @@ const Map: React.FC<MapProps> = ({
         [getCameraPosition, viewController]
     );
 
+    const getCursorFunc = useCallback(
+        function getCursorFunc(
+            cursorState: Parameters<
+                Exclude<DeckGLProps["getCursor"], undefined>
+            >[0]
+        ): string {
+            if (getCursor) {
+                return getCursor(cursorState);
+            }
+            return cursorState.isDragging ? "grabbing" : "default";
+        },
+        [getCursor]
+    );
+
     const effects = parseLights(lights) ?? [];
 
     const [deckGlViews, deckGlViewState] = useMemo(() => {
@@ -818,9 +871,7 @@ const Map: React.FC<MapProps> = ({
                     },
                     colorTables: colorTables,
                 }}
-                getCursor={({ isDragging }): string =>
-                    isDragging ? "grabbing" : "default"
-                }
+                getCursor={getCursorFunc}
                 getTooltip={getTooltip}
                 ref={deckRef}
                 onViewStateChange={onViewStateChange}
@@ -830,8 +881,10 @@ const Map: React.FC<MapProps> = ({
                 effects={effects}
                 onDragStart={onDragStart}
                 onDragEnd={onDragEnd}
+                onDrag={onDrag}
                 onResize={onResize}
                 pickingRadius={pickingRadius}
+                eventRecognizerOptions={{ dblclick: { taps: 3 } }} // Add double click recognizer
             >
                 {children}
             </DeckGL>
@@ -1552,7 +1605,7 @@ function newView(
     height: number | string
 ): View {
     const far = 9999;
-    const near = viewport.show3D ? 0.1 : -9999;
+    const near = viewport.show3D ? 0.1 : -1000;
 
     const [ViewType, Controller] = getViewType(viewport);
     return new ViewType({
@@ -1585,8 +1638,8 @@ function buildDeckGlViews(views: ViewsType | undefined, size: Size): View[] {
                 width: "100%",
                 height: "100%",
                 flipY: false,
-                far: +99999,
-                near: -99999,
+                far: +9999,
+                near: -1000,
             }),
         ];
     }

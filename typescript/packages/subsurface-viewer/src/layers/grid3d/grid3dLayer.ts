@@ -15,7 +15,7 @@ import type {
 } from "../../components/Map";
 import type {
     ExtendedLayerProps,
-    colorMapFunctionType,
+    ColorMapFunctionType,
 } from "../utils/layerTools";
 import { makeFullMesh } from "./webworker";
 
@@ -47,7 +47,7 @@ function onTerminateWorker() {
 export type WebWorkerParams = {
     points: Float32Array;
     polys: Uint32Array;
-    properties: Float32Array | Uint16Array;
+    properties: Float32Array | Uint16Array | undefined;
     undefinedValue: number;
 };
 
@@ -115,15 +115,18 @@ async function loadPropertiesData(
 async function load_data(
     pointsData: string | number[] | Float32Array,
     polysData: string | number[] | Uint32Array,
-    propertiesData: string | number[] | Float32Array | Uint16Array,
+    propertiesData: string | number[] | Float32Array | Uint16Array | undefined,
     loadProperties: boolean
-): Promise<[Float32Array, Uint32Array, Float32Array | Uint16Array]> {
+): Promise<
+    [Float32Array, Uint32Array, Float32Array | Uint16Array | undefined]
+> {
     const points = await loadData(pointsData, Float32Array);
     const polys = await loadData(polysData, Uint32Array);
 
-    const properties = loadProperties
-        ? await loadPropertiesData(propertiesData)
-        : new Float32Array();
+    const properties =
+        loadProperties && propertiesData
+            ? await loadPropertiesData(propertiesData)
+            : undefined;
     return Promise.all([points, polys, properties]);
 }
 
@@ -131,10 +134,42 @@ async function load_data(
  * Enumerates possible coloring modes of Grid3D Layer.
  */
 export enum TGrid3DColoringMode {
+    /** A continuous property is provided to colorize the cells. */
     Property,
+    /** A discrete property is provided to colorize the cells. */
+    DiscreteProperty,
+    /** Coloring using the X value of the cell nodes. */
     X,
+    /** Coloring using the Y value of the cell nodes. */
     Y,
+    /** Coloring using the Z value of the cell nodes. */
     Z,
+}
+
+/**
+ * Returns true if the coloring mode is geometric, that is based on the X, Y or Z coordinates
+ * of the cell nodes. In that case no explicit property data is required.
+ * @param coloringMode coloring mode.
+ * @returns true if the coloring mode is geometric.
+ */
+export function isGeometricProperty(
+    coloringMode: TGrid3DColoringMode
+): boolean {
+    return (
+        coloringMode === TGrid3DColoringMode.X ||
+        coloringMode === TGrid3DColoringMode.Y ||
+        coloringMode === TGrid3DColoringMode.Z
+    );
+}
+
+/**
+ * Returns true if the coloring mode is discrete. In that case an explicit property data is required,
+ * with integer values ranging from 0 to N, where N is the number of discrete property values.
+ * @param coloringMode coloring mode
+ * @returns true if the property values are discrete.
+ */
+export function isDiscreteProperty(coloringMode: TGrid3DColoringMode): boolean {
+    return coloringMode === TGrid3DColoringMode.DiscreteProperty;
 }
 
 export interface IDiscretePropertyValueName {
@@ -161,7 +196,7 @@ export interface Grid3DLayerProps extends ExtendedLayerProps {
      * If propertiesData is provided as Uint16Array it is assumed that all the values are in range [0, N].
      * If colorMapFunction is Uint8Array the property values are used as color indices.
      */
-    propertiesData: string | number[] | Float32Array | Uint16Array;
+    propertiesData: string | number[] | Float32Array | Uint16Array | undefined;
 
     /**
      * Discrete propety value-name pairs to be displayed in cursor readouts.
@@ -198,7 +233,7 @@ export interface Grid3DLayerProps extends ExtendedLayerProps {
      * E.g. [255, 0, 0] for constant red cells.
      * Can be defined as Uint8Array containing [R, G, B] triplets in [0, 255] range each.
      */
-    colorMapFunction?: colorMapFunctionType | Uint8Array;
+    colorMapFunction?: ColorMapFunctionType | Uint8Array;
 
     /**
      * Value in propertiesData indicating that the property is undefined.
@@ -279,7 +314,9 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
             this.props.pointsData,
             this.props.polysData,
             this.props.propertiesData,
-            this.props.coloringMode === TGrid3DColoringMode.Property
+            !isGeometricProperty(
+                this.props.coloringMode ?? TGrid3DColoringMode.Property
+            )
         );
 
         p.then(([points, polys, properties]) => {
@@ -371,6 +408,7 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
         const undefinedColor = this.getUndefinedPropertyColor();
         const undefinedValue = this.getUndefinedPropertyValue();
 
+        const enableLighting: boolean = !(this.props.material === false);
         const layer = new PrivateLayer(
             this.getSubLayerProps({
                 mesh: this.state["mesh"],
@@ -390,6 +428,7 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
                 material: this.props.material,
                 depthTest: this.props.depthTest,
                 ZIncreasingDownwards: this.props.ZIncreasingDownwards,
+                enableLighting,
             })
         );
         return [layer];
@@ -397,14 +436,15 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
 
     private getPropertyValueRange(): [number, number] {
         const bbox = this.state["bbox"] as BoundingBox3D;
-        const zSign = this.props.ZIncreasingDownwards ? -1.0 : 1.0;
         switch (this.props.coloringMode) {
             case TGrid3DColoringMode.X:
                 return [bbox[0], bbox[3]];
             case TGrid3DColoringMode.Y:
                 return [bbox[1], bbox[4]];
             case TGrid3DColoringMode.Z:
-                return [zSign * bbox[2], zSign * bbox[5]];
+                return this.props.ZIncreasingDownwards
+                    ? [-bbox[5], -bbox[2]]
+                    : [bbox[2], bbox[5]];
             default:
                 return this.state["propertyValueRange"] as [number, number];
         }
@@ -425,7 +465,7 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
     private getUndefinedPropertyColor(): [number, number, number] {
         const colorFunc = this.props.colorMapFunction;
         if (
-            this.props.propertiesData.length === 0 &&
+            this.props.propertiesData?.length === 0 &&
             this.isColorMapFunctionConstantColor(colorFunc)
         ) {
             return [colorFunc[0], colorFunc[1], colorFunc[2]];
@@ -434,7 +474,7 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
     }
 
     private isColorMapFunctionConstantColor(
-        colorFunc: Uint8Array | colorMapFunctionType | undefined
+        colorFunc: Uint8Array | ColorMapFunctionType | undefined
     ): colorFunc is Uint8Array {
         return (
             (Array.isArray(colorFunc) || colorFunc instanceof Uint8Array) &&

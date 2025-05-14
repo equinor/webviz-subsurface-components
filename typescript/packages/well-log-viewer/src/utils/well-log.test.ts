@@ -9,7 +9,7 @@ import {
     getWellLogSetsFromProps,
 } from "./well-log";
 import type { WellLogSet } from "../components/WellLogTypes";
-import type { AxesInfo } from "./tracks";
+import type { AxesInfo } from "./axes";
 import type { WellLogViewProps } from "../components/WellLogView";
 
 // @ts-expect-error TS2741 Mock object kept simple for testing purposes

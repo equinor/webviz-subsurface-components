@@ -139,7 +139,6 @@ export const hugin25mDepthMapLayer = {
     gridLines: false,
     smoothShading: true,
     material: true,
-    //ZIncreasingDownwards: true,
 };
 
 export const hugin25mKhNetmapMapLayer = {

@@ -14,6 +14,7 @@ describe("createGetWellPlotDataCompareValueFunction", () => {
         completions: [
             { open: 0, zoneIndex: 10, khMean: 0, khMin: 0, khMax: 0, shut: 0 },
             { open: 1, zoneIndex: 20, khMean: 0, khMin: 0, khMax: 0, shut: 0 },
+            { open: 1, zoneIndex: 15, khMean: 0, khMin: 0, khMax: 0, shut: 0 },
         ],
         earliestCompDateIndex: 5,
         attributes: {},
@@ -30,7 +31,7 @@ describe("createGetWellPlotDataCompareValueFunction", () => {
         const getCompareValue = createGetWellPlotDataCompareValueFunction(
             SortWellsBy.STRATIGRAPHY_DEPTH
         );
-        expect(getCompareValue(mockWellPlotData)).toBe(20);
+        expect(getCompareValue(mockWellPlotData)).toEqual([15, 20]);
     });
 
     it("should return the earliest completion date index when sortWellsBy is EARLIEST_COMPLETION_DATE", () => {
@@ -53,6 +54,7 @@ describe("compareWellPlotDataValues", () => {
         name: "Well A",
         completions: [
             { open: 0, zoneIndex: 10, khMean: 0, khMin: 0, khMax: 0, shut: 0 },
+            { open: 1, zoneIndex: 15, khMean: 0, khMin: 0, khMax: 0, shut: 0 },
             { open: 1, zoneIndex: 20, khMean: 0, khMin: 0, khMax: 0, shut: 0 },
         ],
         earliestCompDateIndex: 5,
@@ -62,6 +64,7 @@ describe("compareWellPlotDataValues", () => {
     const mockWellPlotDataB: WellPlotData = {
         name: "Well B",
         completions: [
+            { open: 1, zoneIndex: 10, khMean: 0, khMin: 0, khMax: 0, shut: 0 },
             { open: 0, zoneIndex: 15, khMean: 0, khMin: 0, khMax: 0, shut: 0 },
             { open: 1, zoneIndex: 25, khMean: 0, khMin: 0, khMax: 0, shut: 0 },
         ],
@@ -148,6 +151,70 @@ describe("compareWellPlotDataValues", () => {
         );
         expect(result).toBe(0);
     });
+
+    it("should handle array comparison correctly for ascending sort", () => {
+        const getCompareValue = createGetWellPlotDataCompareValueFunction(
+            SortWellsBy.STRATIGRAPHY_DEPTH
+        );
+        const result = compareWellPlotDataValues(
+            mockWellPlotDataA,
+            mockWellPlotDataB,
+            getCompareValue,
+            SortDirection.ASCENDING
+        );
+        expect(result).toBe(1);
+    });
+
+    it("should handle array comparison correctly for descending sort", () => {
+        const getCompareValue = createGetWellPlotDataCompareValueFunction(
+            SortWellsBy.STRATIGRAPHY_DEPTH
+        );
+        const result = compareWellPlotDataValues(
+            mockWellPlotDataA,
+            mockWellPlotDataB,
+            getCompareValue,
+            SortDirection.DESCENDING
+        );
+        expect(result).toBe(-1);
+    });
+
+    it("should handle empty arrays correctly", () => {
+        const mockWellPlotDataEmptyA: WellPlotData = {
+            ...mockWellPlotDataA,
+            completions: [],
+        };
+        const mockWellPlotDataEmptyB: WellPlotData = {
+            ...mockWellPlotDataB,
+            completions: [],
+        };
+        const getCompareValue = createGetWellPlotDataCompareValueFunction(
+            SortWellsBy.STRATIGRAPHY_DEPTH
+        );
+        const result = compareWellPlotDataValues(
+            mockWellPlotDataEmptyA,
+            mockWellPlotDataEmptyB,
+            getCompareValue,
+            SortDirection.ASCENDING
+        );
+        expect(result).toBe(0);
+    });
+
+    it("should handle mixed empty and non-empty arrays correctly", () => {
+        const mockWellPlotDataEmpty: WellPlotData = {
+            ...mockWellPlotDataA,
+            completions: [],
+        };
+        const getCompareValue = createGetWellPlotDataCompareValueFunction(
+            SortWellsBy.STRATIGRAPHY_DEPTH
+        );
+        const result = compareWellPlotDataValues(
+            mockWellPlotDataEmpty,
+            mockWellPlotDataB,
+            getCompareValue,
+            SortDirection.ASCENDING
+        );
+        expect(result).toBe(1);
+    });
 });
 
 describe("compareWellsBySortByAndDirection", () => {
@@ -155,6 +222,7 @@ describe("compareWellsBySortByAndDirection", () => {
         name: "Well A",
         completions: [
             { open: 0, zoneIndex: 10, khMean: 0, khMin: 0, khMax: 0, shut: 0 },
+            { open: 1, zoneIndex: 15, khMean: 0, khMin: 0, khMax: 0, shut: 0 },
             { open: 1, zoneIndex: 20, khMean: 0, khMin: 0, khMax: 0, shut: 0 },
         ],
         earliestCompDateIndex: 5,
@@ -164,6 +232,7 @@ describe("compareWellsBySortByAndDirection", () => {
     const mockWellPlotDataB: WellPlotData = {
         name: "Well B",
         completions: [
+            { open: 1, zoneIndex: 10, khMean: 0, khMin: 0, khMax: 0, shut: 0 },
             { open: 0, zoneIndex: 15, khMean: 0, khMin: 0, khMax: 0, shut: 0 },
             { open: 1, zoneIndex: 25, khMean: 0, khMin: 0, khMax: 0, shut: 0 },
         ],
@@ -229,6 +298,58 @@ describe("compareWellsBySortByAndDirection", () => {
             SortDirection.ASCENDING
         );
         expect(result).toBe(0);
+    });
+
+    it("should handle array comparison correctly for ascending sort", () => {
+        const result = compareWellsBySortByAndDirection(
+            mockWellPlotDataA,
+            mockWellPlotDataB,
+            SortWellsBy.STRATIGRAPHY_DEPTH,
+            SortDirection.ASCENDING
+        );
+        expect(result).toBe(1);
+    });
+
+    it("should handle array comparison correctly for descending sort", () => {
+        const result = compareWellsBySortByAndDirection(
+            mockWellPlotDataA,
+            mockWellPlotDataB,
+            SortWellsBy.STRATIGRAPHY_DEPTH,
+            SortDirection.DESCENDING
+        );
+        expect(result).toBe(-1);
+    });
+
+    it("should handle empty arrays correctly", () => {
+        const mockWellPlotDataEmptyA: WellPlotData = {
+            ...mockWellPlotDataA,
+            completions: [],
+        };
+        const mockWellPlotDataEmptyB: WellPlotData = {
+            ...mockWellPlotDataB,
+            completions: [],
+        };
+        const result = compareWellsBySortByAndDirection(
+            mockWellPlotDataEmptyA,
+            mockWellPlotDataEmptyB,
+            SortWellsBy.STRATIGRAPHY_DEPTH,
+            SortDirection.ASCENDING
+        );
+        expect(result).toBe(0);
+    });
+
+    it("should handle mixed empty and non-empty arrays correctly", () => {
+        const mockWellPlotDataEmpty: WellPlotData = {
+            ...mockWellPlotDataA,
+            completions: [],
+        };
+        const result = compareWellsBySortByAndDirection(
+            mockWellPlotDataEmpty,
+            mockWellPlotDataB,
+            SortWellsBy.STRATIGRAPHY_DEPTH,
+            SortDirection.ASCENDING
+        );
+        expect(result).toBe(1);
     });
 });
 

@@ -58,7 +58,6 @@ const TestComponentArea: React.FC<React.PropsWithChildren> = ({ children }) => {
     //---------------------------------------------------------------------------------
     // The Page rendering
     //---------------------------------------------------------------------------------
-
     const direction: GridDirection = "column";
 
     const ref = React.useRef(null);
@@ -72,7 +71,7 @@ const TestComponentArea: React.FC<React.PropsWithChildren> = ({ children }) => {
     const testComponent = renderTestComponent(renderer, ref, tab);
 
     return (
-        <div>
+        <div style={{ overflow: "auto" }}>
             <Grid container direction={direction} justifyContent="flex-start">
                 <div>tab title</div>
                 {testComponent}

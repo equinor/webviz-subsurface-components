@@ -17,6 +17,8 @@ import type {
 } from "../../components/Map";
 import type { ExtendedLayerProps, Position3D } from "../utils/layerTools";
 import BoxLayer from "./boxLayer";
+import { ticks } from "d3-array";
+import { FixedSizeExtension } from "../../extensions/fixed-size-extension";
 
 export interface AxesLayerProps extends ExtendedLayerProps {
     /**
@@ -26,7 +28,11 @@ export interface AxesLayerProps extends ExtendedLayerProps {
      */
     bounds: BoundingBox3D;
     labelColor?: Color;
-    labelFontSize?: number;
+    /**
+     * Font size for tick labels, specified in pixels. Axis labels are +7 pixels relative to this size.
+     * @default 12
+     */
+    labelFontSize: number;
     fontFamily?: string;
     axisColor?: Color;
     /** If true means that input z values are interpreted as depths.
@@ -45,6 +51,7 @@ const defaultProps = {
     id: "axes-layer",
     visible: true,
     ZIncreasingDownwards: true,
+    labelFontSize: 12,
 };
 
 type TextLayerData = {
@@ -82,12 +89,14 @@ export default class AxesLayer extends CompositeLayer<AxesLayerProps> {
 
         const is_orthographic =
             this.context.viewport.constructor === OrthographicViewport;
+        const zScale = this.props.modelMatrix ? this.props.modelMatrix[10] : 1;
 
         const [tick_lines, tick_labels] = GetTickLines(
             this.props.ZIncreasingDownwards,
             is_orthographic,
             bounds,
-            this.context.viewport
+            this.context.viewport,
+            zScale
         );
 
         const textlayerData = maketextLayerData(
@@ -140,8 +149,13 @@ export default class AxesLayer extends CompositeLayer<AxesLayerProps> {
             return "middle";
         }
 
-        const screen_from = this.context.viewport.project(d.from);
-        const screen_to = this.context.viewport.project(d.to);
+        const zScale = this.props.modelMatrix ? this.props.modelMatrix[10] : 1;
+
+        const p0: Position3D = [d.from[0], d.from[1], d.from[2] * zScale];
+        const p1: Position3D = [d.to[0], d.to[1], d.to[2] * zScale];
+
+        const screen_from = this.context.viewport.project(p0);
+        const screen_to = this.context.viewport.project(p1);
         const is_labels = d.label !== "X" && d.label !== "Y" && d.label !== "Z"; // labels on axis or XYZ annotations
         if (is_labels) {
             if (screen_from[0] < screen_to[0]) {
@@ -214,6 +228,7 @@ export default class AxesLayer extends CompositeLayer<AxesLayerProps> {
                     this.getBaseLine(d, is_orthographic),
                 coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
                 getColor: this.props.labelColor || [0, 0, 0, 255],
+                extensions: [new FixedSizeExtension()],
             })
         );
 
@@ -248,7 +263,7 @@ function maketextLayerData(
     tick_lines: number[],
     tick_labels: string[],
     bounds: BoundingBox3D,
-    labelFontSize?: number
+    labelFontSize: number
 ): [TextLayerData] {
     const x_min = bounds[0];
     const x_max = bounds[3];
@@ -265,29 +280,28 @@ function maketextLayerData(
 
     const offset = ((dx + dy + dz) / 3.0) * 0.1;
 
+    const axisAnnotationData = {
+        label: "X",
+        from: [0.0, 0.0, 0.0],
+        to: [x_max + offset, y_min, z_min],
+        size: labelFontSize + 7,
+    };
+
     const data = [
+        axisAnnotationData,
         {
-            label: "X",
-            from: [0.0, 0.0, 0.0],
-            to: [x_max + offset, y_min, z_min],
-            size: labelFontSize ?? 26,
-        },
-        {
+            ...axisAnnotationData,
             label: "Y",
-            from: [0.0, 0.0, 0.0],
             to: [x_min, y_max + offset, z_min],
-            size: labelFontSize ?? 26,
         },
     ];
 
     if (!is_orthographic) {
-        const z_axis_annotaion = {
+        data.push({
+            ...axisAnnotationData,
             label: "Z",
-            from: [0.0, 0.0, 0.0],
             to: [x_min, y_min, z_max + offset],
-            size: labelFontSize ?? 26,
-        };
-        data.push(z_axis_annotaion);
+        });
     }
 
     for (let i = 0; i < tick_lines.length / 6; i++) {
@@ -307,7 +321,7 @@ function maketextLayerData(
             label: label,
             from: from,
             to: to,
-            size: labelFontSize ?? 11,
+            size: labelFontSize,
         });
     }
 
@@ -319,45 +333,16 @@ function GetTicks(
     max: number,
     axis_pixel_length: number
 ): number[] {
-    let step = Math.min(Math.round(axis_pixel_length / 100) + 1, 20);
-    const range = max - min;
-
-    const delta = Math.abs(range) / step;
-    let decade = 1;
-    if (delta >= 10) {
-        const logde = Math.log10(delta);
-        const pot = Math.floor(logde);
-        decade = Math.pow(10.0, pot);
-    }
-    let scaled_delta = Math.round(delta / decade);
-    if (scaled_delta == 3) scaled_delta = 2;
-    else if (scaled_delta == 4 || scaled_delta == 6 || scaled_delta == 7)
-        scaled_delta = 5;
-    else if (scaled_delta > 7) scaled_delta = 10;
-    else if (scaled_delta < 1) scaled_delta = 1;
-
-    const incr = scaled_delta * decade;
-    const start = Math.ceil(min / incr) * incr;
-    const stop = Math.floor(max / incr) * incr;
-    const calc_step = Math.floor(Math.abs(stop - start) / incr);
-    step = calc_step > 0 ? calc_step : 0;
-
-    const ticks: number[] = [];
-
-    //ticks.push(min);
-    for (let i = 0; i <= step; i++) {
-        const x = start + i * incr;
-        ticks.push(x);
-    }
-
-    return ticks;
+    const nTicks = Math.min(Math.round(axis_pixel_length / 100) + 1, 20);
+    return ticks(min, max, nTicks);
 }
 
 function GetTickLines(
     isZIncreasingDownwards: boolean,
     is_orthographic: boolean,
     bounds: BoundingBox3D,
-    viewport: Viewport
+    viewport: Viewport,
+    zScale: number
 ): [number[], string[]] {
     const ndecimals = 0;
     const n_minor_ticks = 3;
@@ -386,8 +371,8 @@ function GetTickLines(
     const delta = ((dx + dy + dz) / 3.0) * 0.025;
 
     const Lz = LineLengthInPixels(
-        [x_min, y_min, z_min],
-        [x_min, y_min, z_max],
+        [x_min, y_min, z_min * zScale],
+        [x_min, y_min, z_max * zScale],
         viewport
     );
 
@@ -455,10 +440,11 @@ function GetTickLines(
 
     // X axis labels.
     const Lx = LineLengthInPixels(
-        [x_min, y_min, z_min],
-        [x_max, y_min, z_min],
+        [x_min, y_min, z_min * zScale],
+        [x_max, y_min, z_min * zScale],
         viewport
     );
+
     const x_ticks = GetTicks(x_min, x_max, Lx);
     y_tick = y_min;
     z_tick = z_min;
@@ -517,10 +503,11 @@ function GetTickLines(
 
     // Y axis labels.
     const Ly = LineLengthInPixels(
-        [x_min, y_min, z_min],
-        [x_min, y_max, z_min],
+        [x_min, y_min, z_min * zScale],
+        [x_min, y_max, z_min * zScale],
         viewport
     );
+
     const y_ticks = GetTicks(y_min, y_max, Ly);
     for (let i = 0; i < y_ticks.length; i++) {
         const tick = y_ticks[i];

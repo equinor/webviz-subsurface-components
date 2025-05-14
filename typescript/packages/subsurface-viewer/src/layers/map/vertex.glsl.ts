@@ -1,6 +1,6 @@
 const vsShader = `\
 #version 300 es
-#define SHADER_NAME vertex-shader
+#define SHADER_NAME map-vertex-shader
 
 precision highp float;
 
@@ -20,16 +20,14 @@ out vec3 worldPos;
 out float property;
 flat out int vertexIndex;
 
-uniform bool ZIncreasingDownwards;
-
 void main(void) {
    geometry.pickingColor = vec3(1.0, 1.0, 0.0);
    vertexIndex = gl_VertexID;
 
    vec3 position = positions;
-   position[2] *= ZIncreasingDownwards ? -1.0 : 1.0;
+   position[2] *= map.ZIncreasingDownwards ? -1.0 : 1.0;
 
-   cameraPosition = project_uCameraPosition;
+   cameraPosition = project.cameraPosition;
 
    worldPos = position;
    geometry.worldPosition = position;

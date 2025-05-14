@@ -3,6 +3,7 @@ import type {
     PickingInfo,
     UpdateParameters,
     LayerContext,
+    LayerProps,
 } from "@deck.gl/core";
 import { COORDINATE_SYSTEM, Layer, picking, project32 } from "@deck.gl/core";
 import type {
@@ -10,28 +11,35 @@ import type {
     SamplerProps,
     Texture,
     TextureProps,
-    TextureData,
 } from "@luma.gl/core";
 import { Geometry, Model } from "@luma.gl/engine";
 import type { DeckGLLayerContext } from "../../components/Map";
-import { localPhongLighting, utilities } from "../shader_modules";
+import { utilities } from "../shader_modules";
+import { lighting } from "@luma.gl/shadertools";
+import { phongMaterial } from "../shader_modules/phong-lighting/phong-material";
 import type {
     ExtendedLayerProps,
     LayerPickInfo,
     PropertyDataType,
-    colorMapFunctionType,
+    ColorMapFunctionType,
 } from "../utils/layerTools";
 import { createPropertyData, getImageData } from "../utils/layerTools";
-import fsShader from "./fragment.fs.glsl";
+import linearFragmentShader from "./nodeProperty.fs.glsl";
+import linearVertexShader from "./nodeProperty.vs.glsl";
+import flatFragmentShader from "./cellProperty.fs.glsl";
+import flatVertexShader from "./cellProperty.vs.glsl";
 import fsLineShader from "./fragment_lines.glsl";
+import type { ShaderModule } from "@luma.gl/shadertools";
 
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import {
     TGrid3DColoringMode,
     type IDiscretePropertyValueName,
+    isDiscreteProperty,
+    isGeometricProperty,
 } from "./grid3dLayer";
 
 import type { MeshType, MeshTypeLines } from "./typeDefs";
-import vsShader from "./vertex.glsl";
 import vsLineShader from "./vertex_lines.glsl";
 
 const DEFAULT_TEXTURE_PARAMETERS: SamplerProps = {
@@ -56,13 +64,14 @@ export interface PrivateLayerProps extends ExtendedLayerProps {
     colorMapClampColor: Color | undefined | boolean;
     undefinedPropertyValue: number;
     undefinedPropertyColor: [number, number, number];
-    colorMapFunction?: colorMapFunctionType;
+    colorMapFunction?: ColorMapFunctionType;
     coloringMode: TGrid3DColoringMode.Property;
     gridLines: boolean;
     propertyValueRange: [number, number];
     discretePropertyValueNames?: IDiscretePropertyValueName[];
     depthTest: boolean;
     ZIncreasingDownwards: boolean;
+    enableLighting: boolean;
 }
 
 const defaultProps = {
@@ -73,34 +82,46 @@ const defaultProps = {
     propertyValueRange: [0.0, 1.0],
     depthTest: true,
     ZIncreasingDownwards: true,
+    enableLighting: true,
 };
 
-interface IPropertyUniforms {
+interface IUniforms {
+    ZIncreasingDownwards: boolean;
     valueRangeMin: number;
     valueRangeMax: number;
     colorMapRangeMin: number;
     colorMapRangeMax: number;
     colorMapClampColor: number[];
-    undefinedPropertyColor: [number, number, number];
-    isColorMapClampColorTransparent: boolean;
     isClampColor: boolean;
+    coloringMode: TGrid3DColoringMode;
+    undefinedPropertyColor: [number, number, number];
     isColoringDiscrete: boolean;
     colorMapSize: number;
 }
 
-interface IImageData {
-    data: number[] | Uint8Array;
-    count: number;
-    parameters:
-        | typeof DEFAULT_TEXTURE_PARAMETERS
-        | typeof DISCRETE_TEXTURE_PARAMETERS;
-    isColoringDiscrete: boolean;
+interface IColormapTextureHints {
+    discreteData: boolean;
+    colormapSize: number;
 }
 
 // This is a private layer used only by the composite Grid3DLayer
 export default class PrivateLayer extends Layer<PrivateLayerProps> {
     get isLoaded(): boolean {
         return (this.state["isLoaded"] as boolean) ?? false;
+    }
+
+    setShaderModuleProps(
+        args: Partial<{
+            [x: string]: Partial<Record<string, unknown> | undefined>;
+        }>
+    ): void {
+        super.setShaderModuleProps({
+            ...args,
+            lighting: {
+                ...args["lighting"],
+                enabled: this.props.enableLighting,
+            },
+        });
     }
 
     initializeState(context: DeckGLLayerContext): void {
@@ -116,7 +137,7 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
         oldProps,
         context,
         changeFlags,
-    }: UpdateParameters<this>): boolean {
+    }: UpdateParameters<Layer<PrivateLayerProps>>): boolean {
         return (
             super.shouldUpdateState({
                 props,
@@ -127,38 +148,50 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
         );
     }
 
-    updateState({ context }: UpdateParameters<this>): void {
+    updateState({ context }: UpdateParameters<Layer<PrivateLayerProps>>): void {
         this.initializeState(context as DeckGLLayerContext);
     }
 
     //eslint-disable-next-line
     _getModels(context: DeckGLLayerContext) {
-        const propertyUniforms = this.getPropertyUniforms();
-        const colormap = this.getTexture(context);
+        const geometricShading = isGeometricProperty(this.props.coloringMode);
+        const uniforms = this.getUniforms();
+        const colormap = this.getColormapTexture(context);
         const mesh_model = new Model(context.device, {
             id: `${this.props.id}-mesh`,
-            vs: vsShader,
-            fs: fsShader,
+            vs: geometricShading ? linearVertexShader : flatVertexShader,
+            fs: geometricShading ? linearFragmentShader : flatFragmentShader,
             geometry: new Geometry({
                 topology: this.props.mesh.drawMode ?? "triangle-list",
                 attributes: {
                     positions: this.props.mesh.attributes.positions,
-                    properties: this.props.mesh.attributes.properties,
                     normals: this.props.mesh.attributes.normals,
+                    ...(geometricShading
+                        ? {}
+                        : {
+                              properties: this.props.mesh.attributes.properties,
+                          }),
                 },
                 vertexCount: this.props.mesh.vertexCount,
             }),
             bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
-            uniforms: {
-                ...propertyUniforms,
-                coloringMode: this.props.coloringMode,
-                ZIncreasingDownwards: this.props.ZIncreasingDownwards,
-            },
             bindings: {
                 colormap,
             },
-            modules: [project32, picking, localPhongLighting, utilities],
+            modules: [
+                project32,
+                picking,
+                lighting,
+                phongMaterial,
+                utilities,
+                gridUniforms,
+            ],
             isInstanced: false,
+        });
+        mesh_model.shaderInputs.setProps({
+            grid: {
+                ...uniforms,
+            },
         });
 
         const mesh_lines_model = new Model(context.device, {
@@ -167,14 +200,16 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             fs: fsLineShader,
             geometry: new Geometry(this.props.meshLines),
             bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
-            uniforms: {
-                ZIncreasingDownwards: this.props.ZIncreasingDownwards,
-            },
-            modules: [project32, picking],
+            modules: [project32, picking, gridUniforms],
             isInstanced: false,
         });
+        mesh_lines_model.shaderInputs.setProps({
+            grid: {
+                ...uniforms,
+            },
+        });
 
-        return [mesh_model, mesh_lines_model];
+        return [mesh_model, mesh_lines_model, gridUniforms];
     }
 
     draw(args: {
@@ -218,8 +253,8 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
         return this.nullPickingColor() as unknown as number;
     }
 
-    encodePickingColor(): number[] {
-        return this.nullPickingColor();
+    encodePickingColor(): [number, number, number] {
+        return this.nullPickingColor() as [number, number, number];
     }
 
     getPickingInfo({ info }: { info: PickingInfo }): LayerPickInfo {
@@ -246,9 +281,9 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             layer_properties.push(createPropertyData("Depth", depth));
         }
 
-        const properties = this.props.mesh.attributes.properties.value;
-        const propertyIndex = properties[vertexIndex];
-        if (Number.isFinite(propertyIndex)) {
+        const properties = this.props.mesh.attributes.properties?.value;
+        const propertyIndex = properties?.[vertexIndex];
+        if (propertyIndex != undefined && Number.isFinite(propertyIndex)) {
             const propertyText = this.getPropertyText(propertyIndex);
             if (propertyText) {
                 layer_properties.push(
@@ -289,49 +324,29 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
         };
     }
 
-    private getDefaultImageData(): IImageData {
-        return {
-            data: new Uint8Array([0, 0, 0]),
-            count: 1,
-            parameters: DISCRETE_TEXTURE_PARAMETERS,
-            isColoringDiscrete: true,
-        };
-    }
-
-    private getImageData(): IImageData {
+    private getColoringHints(): IColormapTextureHints {
         if (this.props.colorMapFunction instanceof Uint8Array) {
-            const count = this.props.colorMapFunction.length / 3;
-            if (count === 0) {
-                return this.getDefaultImageData();
-            }
-
-            const parameters =
-                this.props.coloringMode === TGrid3DColoringMode.Property
-                    ? DISCRETE_TEXTURE_PARAMETERS
-                    : DEFAULT_TEXTURE_PARAMETERS;
-            const isColoringDiscrete =
-                this.props.coloringMode === TGrid3DColoringMode.Property;
             return {
-                data: this.props.colorMapFunction,
-                count,
-                parameters,
-                isColoringDiscrete,
+                discreteData: true,
+                colormapSize: this.props.colorMapFunction.length / 3,
             };
         }
-        const data = getImageData(
-            this.props.colorMapName,
-            (this.context as DeckGLLayerContext).userData.colorTables,
-            this.props.colorMapFunction
-        );
+        if (isDiscreteProperty(this.props.coloringMode)) {
+            // It is expected that the property values are integers ranging from 0 to N.
+            // Thus this.props.propertyValueRange?.[0] should be 0
+            // and this.props.propertyValueRange?.[1] should be N
+            return {
+                discreteData: true,
+                colormapSize: (this.props.propertyValueRange?.[1] ?? 0.0) + 1,
+            };
+        }
         return {
-            data,
-            count: 256,
-            parameters: DEFAULT_TEXTURE_PARAMETERS,
-            isColoringDiscrete: false,
+            discreteData: false,
+            colormapSize: 256,
         };
     }
 
-    private getPropertyUniforms(): IPropertyUniforms {
+    private getUniforms(): IUniforms {
         const valueRangeMin = this.props.propertyValueRange?.[0] ?? 0.0;
         const valueRangeMax = this.props.propertyValueRange?.[1] ?? 1.0;
 
@@ -340,18 +355,36 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
         const colorMapRangeMin = this.props.colorMapRange?.[0] ?? valueRangeMin;
         const colorMapRangeMax = this.props.colorMapRange?.[1] ?? valueRangeMax;
 
-        const isClampColor: boolean =
+        const isColorMapClampColorTransparent: boolean =
+            (this.props.colorMapClampColor as boolean) === false;
+        const hasClampColor: boolean =
             this.props.colorMapClampColor !== undefined &&
             this.props.colorMapClampColor !== true &&
             this.props.colorMapClampColor !== false;
-        const colorMapClampColor = (
-            isClampColor ? this.props.colorMapClampColor : [0, 0, 0]
+        let colorMapClampColor = (
+            hasClampColor ? this.props.colorMapClampColor : [0, 0, 0, 255]
         ) as Color;
+        if (isColorMapClampColorTransparent) {
+            colorMapClampColor = [0, 0, 0, 0];
+        }
+
+        if (colorMapClampColor.length === 3) {
+            colorMapClampColor = [...colorMapClampColor, 255] as [
+                number,
+                number,
+                number,
+                number,
+            ];
+        }
+        const isClampColor = hasClampColor || isColorMapClampColorTransparent;
 
         // Normalize to [0,1] range.
         const colorMapClampColorUniform = colorMapClampColor.map(
             (x) => (x ?? 0) / 255
         );
+        if (isColorMapClampColorTransparent) {
+            colorMapClampColor[3] = 0;
+        }
 
         const undefinedPropertyColorUniform =
             this.props.undefinedPropertyColor.map((x) => (x ?? 0) / 255) as [
@@ -360,25 +393,23 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
                 number,
             ];
 
-        const isColorMapClampColorTransparent: boolean =
-            (this.props.colorMapClampColor as boolean) === false;
-
-        const imageData = this.getImageData();
+        const coloringHints = this.getColoringHints();
 
         return {
+            ZIncreasingDownwards: this.props.ZIncreasingDownwards,
             valueRangeMin,
             valueRangeMax,
             colorMapRangeMin,
             colorMapRangeMax,
-            undefinedPropertyColor: undefinedPropertyColorUniform,
             colorMapClampColor: Array.from(colorMapClampColorUniform),
-            isColorMapClampColorTransparent,
             isClampColor,
-            isColoringDiscrete: imageData.isColoringDiscrete,
-            colorMapSize: imageData.count,
+            coloringMode: this.props.coloringMode,
+            undefinedPropertyColor: undefinedPropertyColorUniform,
+            isColoringDiscrete: coloringHints.discreteData,
+            colorMapSize: coloringHints.colormapSize,
         };
     }
-    private getTexture(context: DeckGLLayerContext): Texture<TextureProps> {
+    private getColormapTexture(context: DeckGLLayerContext): Texture {
         const textureProps: TextureProps = {
             sampler: DEFAULT_TEXTURE_PARAMETERS,
             width: 256,
@@ -386,29 +417,35 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             format: "rgb8unorm-webgl",
         };
 
-        if (this.props.colorMapFunction instanceof Uint8Array) {
-            const imageData = this.getImageData();
-            const count = this.props.colorMapFunction.length / 3;
-            if (count === 0) {
+        const colormapHints = this.getColoringHints();
+        if (colormapHints.discreteData) {
+            if (colormapHints.colormapSize === 0) {
                 const colormap = context.device.createTexture({
                     ...textureProps,
-                    width: imageData.count,
-                    data: new Uint8Array([0, 0, 0, 0, 0, 0]),
                     sampler: DISCRETE_TEXTURE_PARAMETERS,
+                    width: colormapHints.colormapSize,
+                    data: new Uint8Array([0, 0, 0, 0, 0, 0]),
                 });
                 return colormap;
             }
 
-            const sampler =
-                this.props.coloringMode === TGrid3DColoringMode.Property
-                    ? DISCRETE_TEXTURE_PARAMETERS
-                    : DEFAULT_TEXTURE_PARAMETERS;
+            const colormapData =
+                this.props.colorMapFunction instanceof Uint8Array
+                    ? this.props.colorMapFunction
+                    : getImageData(
+                          this.props.colorMapName,
+                          (this.context as DeckGLLayerContext).userData
+                              .colorTables,
+                          this.props.colorMapFunction,
+                          colormapHints.colormapSize,
+                          colormapHints.discreteData
+                      );
 
             const colormap = context.device.createTexture({
                 ...textureProps,
-                width: imageData.count,
-                data: imageData.data as TextureData,
-                sampler,
+                sampler: DISCRETE_TEXTURE_PARAMETERS,
+                width: colormapHints.colormapSize,
+                data: colormapData,
             });
 
             return colormap;
@@ -422,8 +459,7 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
 
         const colormap = context.device.createTexture({
             ...textureProps,
-            height: 1,
-            data: data as TextureData,
+            data: data,
         });
         return colormap;
     }
@@ -431,3 +467,53 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
 
 PrivateLayer.layerName = "PrivateLayer";
 PrivateLayer.defaultProps = defaultProps;
+
+// local shader module for the uniforms
+const gridUniformsBlock = /*glsl*/ `\
+uniform gridUniforms {
+    bool ZIncreasingDownwards;
+    float valueRangeMin;
+    float valueRangeMax;
+    float colorMapRangeMin;
+    float colorMapRangeMax;
+    vec4 colorMapClampColor;
+    bool isClampColor;
+    float coloringMode;
+    vec3 undefinedPropertyColor;
+    bool isColoringDiscrete;
+    float colorMapSize;
+} grid;
+`;
+
+type GridUniformsType = {
+    ZIncreasingDownwards: boolean;
+    valueRangeMin: number;
+    valueRangeMax: number;
+    colorMapRangeMin: number;
+    colorMapRangeMax: number;
+    colorMapClampColor: [number, number, number, number];
+    isClampColor: boolean;
+    coloringMode: TGrid3DColoringMode;
+    undefinedPropertyColor: [number, number, number];
+    isColoringDiscrete: boolean;
+    colorMapSize: number;
+};
+
+const gridUniforms = {
+    name: "grid",
+    vs: gridUniformsBlock,
+    fs: gridUniformsBlock,
+    uniformTypes: {
+        ZIncreasingDownwards: "u32",
+        valueRangeMin: "f32",
+        valueRangeMax: "f32",
+        colorMapRangeMin: "f32",
+        colorMapRangeMax: "f32",
+        colorMapClampColor: "vec4<f32>",
+        isClampColor: "u32",
+        coloringMode: "f32",
+        undefinedPropertyColor: "vec3<f32>",
+        isColoringDiscrete: "u32",
+        colorMapSize: "f32",
+    },
+} as const satisfies ShaderModule<LayerProps, GridUniformsType>;

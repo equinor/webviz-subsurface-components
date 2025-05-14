@@ -1,36 +1,31 @@
 import type {
     Color,
-    LayerContext,
+    LayerProps,
     PickingInfo,
     UpdateParameters,
+    LayerContext,
 } from "@deck.gl/core";
-import { COORDINATE_SYSTEM, Layer, picking, project32 } from "@deck.gl/core";
-
-//import GL from "@luma.gl/constants";
-import type { Device, UniformValue, TextureData, Texture } from "@luma.gl/core";
-import { Geometry, Model } from "@luma.gl/engine";
-import { localPhongLighting, utilities } from "../shader_modules";
+import { COORDINATE_SYSTEM } from "@deck.gl/core";
+import type { Device, Texture, UniformValue } from "@luma.gl/core";
+import { utilities } from "../shader_modules";
+import { lighting } from "@luma.gl/shadertools";
+import { phongMaterial } from "../shader_modules/phong-lighting/phong-material";
 import type {
     ExtendedLayerProps,
     LayerPickInfo,
     PropertyDataType,
-    colorMapFunctionType,
+    ColorMapFunctionType,
 } from "../utils/layerTools";
 import { createPropertyData, getImageData } from "../utils/layerTools";
 import type { DeckGLLayerContext } from "../../components/Map";
-import fs from "./fragment.fs.glsl";
-import fsLineShader from "./fragment_lines.glsl";
+import fs from "./fragment.glsl";
 import vs from "./vertex.glsl";
+import fsLineShader from "./fragment_lines.glsl";
 import vsLineShader from "./vertex_lines.glsl";
+import type { ShaderModule } from "@luma.gl/shadertools";
+import { Layer, project32, picking } from "@deck.gl/core";
+import { Model, Geometry } from "@luma.gl/engine";
 
-export type Material =
-    | {
-          ambient: number;
-          diffuse: number;
-          shininess: number;
-          specularColor: [number, number, number];
-      }
-    | boolean;
 export interface PrivateMapLayerProps extends ExtendedLayerProps {
     positions: Float32Array;
     normals: Float32Array;
@@ -44,11 +39,12 @@ export interface PrivateMapLayerProps extends ExtendedLayerProps {
     colorMapName: string;
     colorMapRange: [number, number];
     colorMapClampColor: Color | undefined | boolean;
-    colorMapFunction?: colorMapFunctionType;
+    colorMapFunction?: ColorMapFunctionType;
     propertyValueRange: [number, number];
     smoothShading: boolean;
     depthTest: boolean;
     ZIncreasingDownwards: boolean;
+    enableLighting: boolean;
 }
 
 const defaultProps = {
@@ -62,12 +58,27 @@ const defaultProps = {
     meshValueRange: [0.0, 1.0],
     depthTest: true,
     ZIncreasingDownwards: true,
+    enableLighting: true,
 };
 
 // This is a private layer used only by the composite MapLayer
 export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
     get isLoaded(): boolean {
         return (this.state["isLoaded"] as boolean) ?? false;
+    }
+
+    setShaderModuleProps(
+        args: Partial<{
+            [x: string]: Partial<Record<string, unknown> | undefined>;
+        }>
+    ): void {
+        super.setShaderModuleProps({
+            ...args,
+            lighting: {
+                ...args["lighting"],
+                enabled: this.props.enableLighting,
+            },
+        });
     }
 
     initializeState(context: DeckGLLayerContext): void {
@@ -114,7 +125,7 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
                 this.props.colorMapName,
                 (this.context as DeckGLLayerContext).userData.colorTables,
                 this.props.colorMapFunction
-            ) as TextureData,
+            ),
         });
 
         // MESH MODEL
@@ -150,8 +161,7 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
 
         const smoothShading =
             this.props.normals.length == 0 ? false : this.props.smoothShading;
-
-        const mesh_model = new Model(device, {
+        const mesh_model = new Model(this.context.device, {
             id: `${this.props.id}-mesh`,
             ...this.getShaders(),
             geometry: new Geometry({
@@ -167,7 +177,14 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
                 indices: { value: this.props.triangleIndices, size: 1 },
             }),
             bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
-            uniforms: {
+            bindings: {
+                colormap: colormap,
+            },
+            isInstanced: false,
+        });
+
+        mesh_model.shaderInputs.setProps({
+            map: {
                 contourReferencePoint,
                 contourInterval,
                 isContoursDepth,
@@ -181,10 +198,6 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
                 smoothShading,
                 ZIncreasingDownwards: this.props.ZIncreasingDownwards,
             },
-            bindings: {
-                colormap: colormap,
-            },
-            isInstanced: false,
         });
 
         // MESH LINES
@@ -200,8 +213,24 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
                 indices: { value: this.props.lineIndices, size: 1 },
             }),
             bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
-            modules: [project32],
+            modules: [project32, picking, mapUniforms],
             isInstanced: false,
+        });
+        mesh_lines_model.shaderInputs.setProps({
+            map: {
+                contourReferencePoint,
+                contourInterval,
+                isContoursDepth,
+                valueRangeMin,
+                valueRangeMax,
+                colorMapRangeMin,
+                colorMapRangeMax,
+                colorMapClampColor,
+                isColorMapClampColorTransparent,
+                isClampColor,
+                smoothShading,
+                ZIncreasingDownwards: this.props.ZIncreasingDownwards,
+            },
         });
 
         return [mesh_model, mesh_lines_model];
@@ -216,7 +245,7 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
             return;
         }
 
-        const { uniforms, context } = args;
+        const { context } = args;
         const { gl } = context;
 
         const [mesh_model, mesh_lines_model] = this.state["models"] as Model[];
@@ -235,10 +264,6 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
         }
 
         if (this.props.gridLines) {
-            mesh_lines_model.setUniforms({
-                uniforms,
-                ZIncreasingDownwards: this.props.ZIncreasingDownwards,
-            });
             mesh_lines_model.draw(context.renderPass);
         }
 
@@ -292,10 +317,73 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
         return super.getShaders({
             vs,
             fs,
-            modules: [project32, picking, localPhongLighting, utilities],
+            modules: [
+                project32,
+                picking,
+                utilities,
+                lighting,
+                phongMaterial,
+                mapUniforms,
+            ],
         });
     }
 }
 
 PrivateMapLayer.layerName = "privateMapLayer";
 PrivateMapLayer.defaultProps = defaultProps;
+
+// local shader module for the uniforms
+const mapUniformsBlock = /*glsl*/ `\
+uniform mapUniforms {
+    bool isContoursDepth;
+    float contourReferencePoint;
+    float contourInterval;
+
+    float valueRangeMin;
+    float valueRangeMax;
+    float colorMapRangeMin;
+    float colorMapRangeMax;
+
+    vec3 colorMapClampColor;
+    bool isClampColor;
+    bool isColorMapClampColorTransparent;
+    bool smoothShading;
+    bool ZIncreasingDownwards;
+} map;
+`;
+
+type MapUniformsType = {
+    isContoursDepth: boolean;
+    contourReferencePoint: number;
+    contourInterval: number;
+    valueRangeMin: number;
+    valueRangeMax: number;
+    colorMapRangeMin: number;
+    colorMapRangeMax: number;
+    colorMapClampColor: [number, number, number];
+    isClampColor: boolean;
+    isColorMapClampColorTransparent: boolean;
+    smoothShading: boolean;
+    ZIncreasingDownwards: boolean;
+};
+
+// NOTE: this must exactly the same name as in the uniform block
+const mapUniforms = {
+    name: "map",
+    vs: mapUniformsBlock,
+    fs: mapUniformsBlock,
+    uniformTypes: {
+        isContoursDepth: "u32",
+        contourReferencePoint: "f32",
+        contourInterval: "f32",
+        valueRangeMin: "f32",
+        valueRangeMax: "f32",
+        colorMapRangeMin: "f32",
+        colorMapRangeMax: "f32",
+        colorMapClampColor: "vec3<f32>",
+        isClampColor: "u32",
+        isColorMapClampColorTransparent: "u32",
+        smoothShading: "u32",
+        ZIncreasingDownwards: "u32",
+    },
+} as const satisfies ShaderModule<LayerProps, MapUniformsType>;

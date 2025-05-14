@@ -41,10 +41,10 @@ export default class NorthArrow3DLayer extends Layer<NorthArrow3DLayerProps> {
 
     // Signature from the base class, eslint doesn't like the any type.
     // eslint-disable-next-line
-    draw({ moduleParameters, uniforms, context }: any): void {
-        const { gl } = context;
+    draw(drawOptions: any): void {
+        const { gl } = drawOptions.context;
         gl.disable(gl.DEPTH_TEST);
-        super.draw({ moduleParameters, uniforms, context });
+        super.draw(drawOptions);
         gl.enable(gl.DEPTH_TEST);
     }
 

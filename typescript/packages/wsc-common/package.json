@@ -1,6 +1,6 @@
 {
     "name": "@webviz/wsc-common",
-    "version": "1.0.6",
+    "version": "1.2.3",
     "description": "Shared functionality for WebViz Subsurface Components",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -15,12 +15,13 @@
         "test": "jest --coverage",
         "test:update": "npm test -- --u",
         "test:watch": "npm test -- --watch",
-        "doc": "git clean -xdff docs && typedoc src"
+        "doc": "git clean -xdff docs && typedoc src",
+        "semantic-release:dry-run": "semantic-release --dry-run"
     },
     "author": "Equinor <opensource@equinor.com>",
     "license": "MPL-2.0",
     "dependencies": {
-        "@deck.gl/core": "^9.0.33",
+        "@deck.gl/core": "^9.1.11",
         "ajv": "^8.12.0"
     },
     "volta": {

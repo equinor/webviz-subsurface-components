@@ -13,7 +13,8 @@ export type WellLogViewWithScrollerProps = WellLogViewProps;
 export const argTypesWellLogViewScrollerProp = argTypesWellLogViewProp;
 
 class WellLogViewWithScroller extends Component<WellLogViewWithScrollerProps> {
-    public static propTypes: Record<string, unknown>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    public static propTypes: Record<string, any>;
 
     controller: WellLogController | null;
     scroller: Scroller | null;
@@ -50,34 +51,25 @@ class WellLogViewWithScroller extends Component<WellLogViewWithScrollerProps> {
     // callback function from WellLogView
     onCreateController(controller: WellLogController): void {
         this.controller = controller;
-        // TODO: Fix this the next time the file is edited.
-        // eslint-disable-next-line react/prop-types
         this.props.onCreateController?.(controller);
     }
     // callback function from WellLogView
     onTrackScroll(): void {
         this.setScrollerPosAndZoom();
-        // TODO: Fix this the next time the file is edited.
-        // eslint-disable-next-line react/prop-types
         this.props.onTrackScroll?.();
     }
     // callback function from WellLogView
     onTrackSelection(): void {
-        // TODO: Fix this the next time the file is edited.
-        // eslint-disable-next-line react/prop-types
         this.props.onTrackSelection?.();
     }
     // callback function from WellLogView
     onContentRescale(): void {
         this.setScrollerPosAndZoom();
-        // TODO: Fix this the next time the file is edited.
-        // eslint-disable-next-line react/prop-types
+
         this.props.onContentRescale?.();
     }
     // callback function from WellLogView
     onContentSelection(): void {
-        // TODO: Fix this the next time the file is edited.
-        // eslint-disable-next-line react/prop-types
         this.props.onContentSelection?.();
     }
 
@@ -92,12 +84,10 @@ class WellLogViewWithScroller extends Component<WellLogViewWithScrollerProps> {
 
         const controller = this.controller;
         if (!controller) return;
-        // TODO: Fix this the next time the file is edited.
-        // eslint-disable-next-line react/prop-types
+
         const fContent = this.props.horizontal ? x : y; // fraction
         controller.scrollContentTo(fContent);
-        // TODO: Fix this the next time the file is edited.
-        // eslint-disable-next-line react/prop-types
+
         const posTrack = this.calcPosTrack(this.props.horizontal ? y : x);
         controller.scrollTrackTo(posTrack);
     }
