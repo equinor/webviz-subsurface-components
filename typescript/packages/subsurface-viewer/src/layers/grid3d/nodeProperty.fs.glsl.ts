@@ -1,4 +1,4 @@
-const fsShader = `\
+export default `\
 #version 300 es
 #define SHADER_NAME grid3d-node-fragment-shader
 
@@ -54,5 +54,3 @@ void main(void) {
    DECKGL_FILTER_COLOR(fragColor, geometry);
 }
 `;
-
-export default fsShader;

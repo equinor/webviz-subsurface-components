@@ -20,10 +20,10 @@ import { vec4 } from "gl-matrix";
 
 import type { ExtendedLayerProps, Position3D } from "../utils/layerTools";
 import fontAtlasPng from "./font-atlas.png";
-import labelFragmentShader from "./label-fragment.glsl";
-import labelVertexShader from "./label-vertex.glsl";
-import lineFragmentShader from "./line-fragment.glsl";
-import lineVertexShader from "./line-vertex.glsl";
+import labelFragmentShader from "./label.fs.glsl";
+import labelVertexShader from "./label.vs.glsl";
+import lineFragmentShader from "./line.fs.glsl";
+import lineVertexShader from "./line.vs.glsl";
 
 enum TEXT_ANCHOR {
     start = 0,
@@ -433,8 +433,12 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
 
         /*eslint-disable */
         const background_lines: number[] = [
-            ...p1, ...p2, ...p4,  // triangle 1
-            ...p2, ...p4, ...p3,  // triangle 2 
+            ...p1,
+            ...p2,
+            ...p4, // triangle 1
+            ...p2,
+            ...p4,
+            ...p3, // triangle 2
         ];
         /*eslint-enable */
 
@@ -460,8 +464,12 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
 
         /*eslint-disable */
         const background_lines: number[] = [
-            ...p1, ...p2, ...p4,  // triangle 1
-            ...p2, ...p4, ...p3,  // triangle 2 
+            ...p1,
+            ...p2,
+            ...p4, // triangle 1
+            ...p2,
+            ...p4,
+            ...p3, // triangle 2
         ];
         /*eslint-enable */
 
@@ -792,39 +800,57 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                     // 6 vertices per letter
                     // t1
                     /*eslint-disable */
-                    positions[offset + 0] = pos_w[0] + x1 * pixelScale * pixel2worldHor; // Add a distance in view coords and convert to world
-                    positions[offset + 1] = pos_w[1] + (0 * pixelScale - y_alignment_offset) * pixel2worldVer;
+                    positions[offset + 0] =
+                        pos_w[0] + x1 * pixelScale * pixel2worldHor; // Add a distance in view coords and convert to world
+                    positions[offset + 1] =
+                        pos_w[1] +
+                        (0 * pixelScale - y_alignment_offset) * pixel2worldVer;
                     positions[offset + 2] = pos_w[2];
                     texcoords[offsetTexture + 0] = u1;
                     texcoords[offsetTexture + 1] = v1;
 
-                    positions[offset + 3] = pos_w[0] + x2 * pixelScale * pixel2worldHor;
-                    positions[offset + 4] = pos_w[1] + (0 * pixelScale - y_alignment_offset) * pixel2worldVer;
+                    positions[offset + 3] =
+                        pos_w[0] + x2 * pixelScale * pixel2worldHor;
+                    positions[offset + 4] =
+                        pos_w[1] +
+                        (0 * pixelScale - y_alignment_offset) * pixel2worldVer;
                     positions[offset + 5] = pos_w[2];
                     texcoords[offsetTexture + 2] = u2;
                     texcoords[offsetTexture + 3] = v1;
 
-                    positions[offset + 6] = pos_w[0] + x1 * pixelScale * pixel2worldHor;
-                    positions[offset + 7] = pos_w[1] + (h * pixelScale - y_alignment_offset) * pixel2worldVer;
+                    positions[offset + 6] =
+                        pos_w[0] + x1 * pixelScale * pixel2worldHor;
+                    positions[offset + 7] =
+                        pos_w[1] +
+                        (h * pixelScale - y_alignment_offset) * pixel2worldVer;
                     positions[offset + 8] = pos_w[2];
                     texcoords[offsetTexture + 4] = u1;
                     texcoords[offsetTexture + 5] = v2;
 
                     // t2
-                    positions[offset + 9] = pos_w[0] + x1 * pixelScale * pixel2worldHor;
-                    positions[offset + 10] = pos_w[1] + (h * pixelScale - y_alignment_offset) * pixel2worldVer;
+                    positions[offset + 9] =
+                        pos_w[0] + x1 * pixelScale * pixel2worldHor;
+                    positions[offset + 10] =
+                        pos_w[1] +
+                        (h * pixelScale - y_alignment_offset) * pixel2worldVer;
                     positions[offset + 11] = pos_w[2];
                     texcoords[offsetTexture + 6] = u1;
                     texcoords[offsetTexture + 7] = v2;
 
-                    positions[offset + 12] = pos_w[0] + x2 * pixelScale * pixel2worldHor;
-                    positions[offset + 13] = pos_w[1] + (0 * pixelScale - y_alignment_offset) * pixel2worldVer;
+                    positions[offset + 12] =
+                        pos_w[0] + x2 * pixelScale * pixel2worldHor;
+                    positions[offset + 13] =
+                        pos_w[1] +
+                        (0 * pixelScale - y_alignment_offset) * pixel2worldVer;
                     positions[offset + 14] = pos_w[2];
                     texcoords[offsetTexture + 8] = u2;
                     texcoords[offsetTexture + 9] = v1;
 
-                    positions[offset + 15] = pos_w[0] + x2 * pixelScale * pixel2worldHor;
-                    positions[offset + 16] = pos_w[1] + (h * pixelScale - y_alignment_offset) * pixel2worldVer;
+                    positions[offset + 15] =
+                        pos_w[0] + x2 * pixelScale * pixel2worldHor;
+                    positions[offset + 16] =
+                        pos_w[1] +
+                        (h * pixelScale - y_alignment_offset) * pixel2worldVer;
                     positions[offset + 17] = pos_w[2];
                     texcoords[offsetTexture + 10] = u2;
                     texcoords[offsetTexture + 11] = v2;
@@ -992,8 +1018,6 @@ const linesUniforms = {
     },
 } as const satisfies ShaderModule<LayerProps, LinesUniformsType>;
 
-
-
 const axesUniformsBlock = /*glsl*/ `\
 uniform axesUniforms {
    vec4 uAxisColor;
@@ -1002,8 +1026,8 @@ uniform axesUniforms {
 `;
 
 type AxesUniformsType = {
-    uAxisColor: [number, number, number, number],
-    uBackGroundColor: [number, number, number, number],
+    uAxisColor: [number, number, number, number];
+    uBackGroundColor: [number, number, number, number];
 };
 
 // NOTE: this must exactly the same name than in the uniform block
@@ -1016,4 +1040,3 @@ const axesUniforms = {
         uBackGroundColor: "vec4<f32>",
     },
 } as const satisfies ShaderModule<LayerProps, AxesUniformsType>;
-

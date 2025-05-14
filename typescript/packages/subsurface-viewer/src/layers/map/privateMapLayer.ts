@@ -18,10 +18,10 @@ import type {
 } from "../utils/layerTools";
 import { createPropertyData, getImageData } from "../utils/layerTools";
 import type { DeckGLLayerContext } from "../../components/Map";
-import fs from "./fragment.glsl";
-import vs from "./vertex.glsl";
-import fsLineShader from "./fragment_lines.glsl";
-import vsLineShader from "./vertex_lines.glsl";
+import fs from "./map.fs.glsl";
+import vs from "./map.vs.glsl";
+import fsLineShader from "./line.fs.glsl";
+import vsLineShader from "./line.vs.glsl";
 import type { ShaderModule } from "@luma.gl/shadertools";
 import { Layer, project32, picking } from "@deck.gl/core";
 import { Model, Geometry } from "@luma.gl/engine";
