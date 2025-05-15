@@ -57,6 +57,9 @@ class CrosshairLayer extends CompositeLayer<CrosshairLayerProps> {
                     sizeUnits: "pixels",
                     getColor: () => this.props.color || [0, 0, 0, 255],
                     pickable: false,
+                    parameters: {
+                        depthTest: false,
+                    },
                 })
             ),
         ];
