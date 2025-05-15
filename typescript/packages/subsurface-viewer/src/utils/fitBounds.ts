@@ -2,14 +2,17 @@
 // that will contain the provided corners within the provided width.
 // Only supports non-perspective mode.
 
-function ieLog2(x) {
+function ieLog2(x: number): number {
     return Math.log(x) * Math.LOG2E;
 }
 
 // Handle missing log2 in IE 11
 export const log2 = Math.log2 || ieLog2;
 
-export default function fitBounds({
+type Bounds = [number, number, number, number];
+type Padding = { top: number; bottom: number; left: number; right: number };
+
+export function fitBounds({
     width,
     height,
     bounds,
@@ -18,8 +21,17 @@ export default function fitBounds({
     // options
     padding = 0,
     offset = [0, 0],
-}) {
-    if (Number.isFinite(padding)) {
+}: {
+    width: number;
+    height: number;
+    bounds: Bounds;
+    minExtent?: number;
+    maxZoom?: number;
+    padding?: number | Padding;
+    offset?: [number, number];
+}): { x: number; y: number; zoom: number } {
+    if (typeof padding === "number") {
+        // convert to Padding
         const p = padding;
         padding = {
             top: p,
@@ -27,15 +39,15 @@ export default function fitBounds({
             left: p,
             right: p,
         };
-    } else {
-        // Make sure all the required properties are set
-        console.assert(
-            Number.isFinite(padding.top) &&
-                Number.isFinite(padding.bottom) &&
-                Number.isFinite(padding.left) &&
-                Number.isFinite(padding.right)
-        );
     }
+
+    // Make sure all the required properties are set
+    console.assert(
+        Number.isFinite(padding.top) &&
+            Number.isFinite(padding.bottom) &&
+            Number.isFinite(padding.left) &&
+            Number.isFinite(padding.right)
+    );
 
     const [west, south] = [bounds[0], bounds[1]];
     const [east, north] = [bounds[2], bounds[3]];

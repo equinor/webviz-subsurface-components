@@ -1,4 +1,4 @@
-export const vsShader = `#version 300 es
+export default `#version 300 es
 #define SHADER_NAME well-markers-vertex-shader
 precision highp float;
 

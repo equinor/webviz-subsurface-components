@@ -1,4 +1,4 @@
-export const fsShader = `#version 300 es
+export default `#version 300 es
 #define SHADER_NAME well-markers-fragment-shader
 
 precision highp float;

@@ -28,7 +28,8 @@ import linearFragmentShader from "./nodeProperty.fs.glsl";
 import linearVertexShader from "./nodeProperty.vs.glsl";
 import flatFragmentShader from "./cellProperty.fs.glsl";
 import flatVertexShader from "./cellProperty.vs.glsl";
-import fsLineShader from "./fragment_lines.glsl";
+import fsLineShader from "./line.fs.glsl";
+import vsLineShader from "./line.vs.glsl";
 import type { ShaderModule } from "@luma.gl/shadertools";
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
@@ -40,7 +41,6 @@ import {
 } from "./grid3dLayer";
 
 import type { MeshType, MeshTypeLines } from "./typeDefs";
-import vsLineShader from "./vertex_lines.glsl";
 
 const DEFAULT_TEXTURE_PARAMETERS: SamplerProps = {
     addressModeU: "clamp-to-edge",

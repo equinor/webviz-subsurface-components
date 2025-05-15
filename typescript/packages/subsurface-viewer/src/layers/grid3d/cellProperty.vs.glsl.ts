@@ -1,4 +1,4 @@
-const vsShader = `\
+export default `\
 #version 300 es
 #define SHADER_NAME grid3d-cell-vertex-shader
 
@@ -41,5 +41,3 @@ void main(void) {
    DECKGL_FILTER_COLOR(color, geometry);
 }
 `;
-
-export default vsShader;

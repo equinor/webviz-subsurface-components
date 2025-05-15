@@ -17,10 +17,10 @@ import type {
 } from "../utils/layerTools";
 import { createPropertyData } from "../utils/layerTools";
 
-import fsShader from "./fragment.fs.glsl";
-import fsLineShader from "./fragment_lines.glsl";
-import vsShader from "./vertex.glsl";
-import vsLineShader from "./vertex_lines.glsl";
+import fsShader from "./triangle.fs.glsl";
+import vsShader from "./triangle.vs.glsl";
+import fsLineShader from "./line.fs.glsl";
+import vsLineShader from "./line.vs.glsl";
 
 export type GeometryTriangles = {
     topology: GeometryProps["topology"];
