@@ -1,4 +1,4 @@
-const fragmentShader = `#version 300 es
+export default `#version 300 es
 #define SHADER_NAME axes-fragment-shader
 
 precision highp float;
@@ -11,5 +11,3 @@ void main(void) {
   fragColor = uColor;
 }
 `;
-
-export default fragmentShader;

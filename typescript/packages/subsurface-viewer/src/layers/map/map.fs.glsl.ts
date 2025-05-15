@@ -1,4 +1,4 @@
-const fsShader = `#version 300 es
+export default `#version 300 es
 #define SHADER_NAME map-fragment-shader
 
 precision highp float;
@@ -84,5 +84,3 @@ void main(void) {
    DECKGL_FILTER_COLOR(fragColor, geometry);
 }
 `;
-
-export default fsShader;

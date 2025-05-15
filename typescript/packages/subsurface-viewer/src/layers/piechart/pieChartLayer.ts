@@ -13,8 +13,8 @@ import type {
     PropertyDataType,
 } from "../utils/layerTools";
 import { createPropertyData } from "../utils/layerTools";
-import fragmentShader from "./fragment.glsl";
-import vertexShader from "./vertex.glsl";
+import fragmentShader from "./piechart.fs.glsl";
+import vertexShader from "./piechart.vs.glsl";
 
 type PieProperties = [{ color: Color; label: string }];
 

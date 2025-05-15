@@ -6,8 +6,8 @@ import { Geometry, Model } from "@luma.gl/engine";
 
 import type { DeckGLLayerContext } from "../../components/Map";
 import type { ExtendedLayerProps } from "../utils/layerTools";
-import fragmentShader from "./axes-fragment.glsl";
-import gridVertex from "./grid-vertex.glsl";
+import fragmentShader from "./box.fs.glsl";
+import vertexShader from "./box.vs.glsl";
 
 export interface BoxLayerProps extends ExtendedLayerProps {
     lines: [number]; // from pt , to pt.
@@ -39,7 +39,7 @@ export default class BoxLayer extends Layer<BoxLayerProps> {
         const color = this.props.color.map((x) => (x ?? 0) / 255);
         const grids = new Model(device, {
             id: `${this.props.id}-grids`,
-            vs: gridVertex,
+            vs: vertexShader,
             fs: fragmentShader,
             uniforms: { uColor: Array.from(color) },
             geometry: new Geometry({

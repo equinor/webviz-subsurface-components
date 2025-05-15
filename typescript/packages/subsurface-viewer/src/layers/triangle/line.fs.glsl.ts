@@ -1,4 +1,4 @@
-const fragmentShader = `\
+export default `\
 #version 300 es
 #define SHADER_NAME triangle-lines-fragment-shader
 
@@ -17,5 +17,3 @@ void main(void) {
   fragColor = vec4(0.0, 0.0, 0.0, 1.0);
 }
 `;
-
-export default fragmentShader;
