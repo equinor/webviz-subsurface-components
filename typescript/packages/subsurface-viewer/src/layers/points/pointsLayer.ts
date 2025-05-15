@@ -2,13 +2,13 @@ import type { PickingInfo, UpdateParameters } from "@deck.gl/core";
 import { CompositeLayer } from "@deck.gl/core";
 import { isEqual } from "lodash";
 
-import type { ReportBoundingBoxAction } from "../../components/Map";
 import type {
     ExtendedLayerProps,
     LayerPickInfo,
     PropertyDataType,
+    ReportBoundingBoxAction,
 } from "../utils/layerTools";
-import { createPropertyData, defineBoundingBox } from "../utils/layerTools";
+import { createPropertyData, computeBoundingBox } from "../utils/layerTools";
 
 import { PrivatePointsLayer } from "./privatePointsLayer";
 
@@ -172,8 +172,9 @@ export default class PointsLayer extends CompositeLayer<PointsLayerProps> {
             typeof this.props.reportBoundingBox === "function" &&
             reportBoundingBox
         ) {
-            const boundingBox = defineBoundingBox(
+            const boundingBox = computeBoundingBox(
                 this.state["dataAttributes"] as Float32Array,
+                // why not for polylines ?
                 this.props.ZIncreasingDownwards
             );
             this.props.reportBoundingBox({ layerBoundingBox: boundingBox });

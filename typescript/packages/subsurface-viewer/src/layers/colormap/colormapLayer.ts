@@ -1,25 +1,25 @@
+import type { LayerProps, PickingInfo } from "@deck.gl/core";
+import { project32 } from "@deck.gl/core";
 import type { BitmapLayerPickingInfo, BitmapLayerProps } from "@deck.gl/layers";
 import { BitmapLayer } from "@deck.gl/layers";
-import type { LayerProps, PickingInfo } from "@deck.gl/core";
 
-import type {
-    LayerPickInfo,
-    TypeAndNameLayerProps,
-} from "../../layers/utils/layerTools";
-import { decodeRGB, type ValueDecoder } from "../utils/propertyMapTools";
-import type { ColorMapFunctionType } from "../utils/layerTools";
-import { getModelMatrix } from "../utils/layerTools";
-import fsColormap from "./colormap.fs.glsl";
-import type {
-    DeckGLLayerContext,
-    ReportBoundingBoxAction,
-} from "../../components/Map";
-import type { colorTablesArray } from "@emerson-eps/color-tables/";
-import { getRgbData } from "@emerson-eps/color-tables";
-import type { ContinuousLegendDataType } from "../../components/ColorLegend";
 import type { ShaderModule } from "@luma.gl/shadertools";
 import type { Model } from "@luma.gl/engine";
-import { project32 } from "@deck.gl/core";
+
+import type { colorTablesArray } from "@emerson-eps/color-tables/";
+import { getRgbData } from "@emerson-eps/color-tables";
+
+import type {
+    ColorMapFunctionType,
+    LayerPickInfo,
+    ReportBoundingBoxAction,
+    TypeAndNameLayerProps,
+} from "../utils/layerTools";
+import { getModelMatrix } from "../utils/layerTools";
+import { decodeRGB, type ValueDecoder } from "../utils/propertyMapTools";
+import fsColormap from "./colormap.fs.glsl";
+import type { DeckGLLayerContext } from "../../components/Map";
+import type { ContinuousLegendDataType } from "../../components/ColorLegend";
 
 function getImageData(
     colorMapName: string,

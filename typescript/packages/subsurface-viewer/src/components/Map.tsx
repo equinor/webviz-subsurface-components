@@ -45,16 +45,18 @@ import type { colorTablesArray } from "@emerson-eps/color-tables/";
 
 import { validateColorTables, validateLayers } from "@webviz/wsc-common";
 import { Axes2DLayer, NorthArrow3DLayer, WellsLayer } from "../layers";
-import type { LayerPickInfo } from "../layers/utils/layerTools";
+import type {
+    LayerPickInfo,
+    ReportBoundingBoxAction,
+} from "../layers/utils/layerTools";
 import {
     getLayersByType,
     getModelMatrixScale,
     getWellLayerByTypeAndSelectedWells,
 } from "../layers/utils/layerTools";
 import type { WellsPickInfo } from "../layers/wells/types";
-import type { BoundingBox2D, Point2D } from "../utils/BoundingBox2D";
+import type { BoundingBox2D, BoundingBox3D, Point2D, Point3D } from "../utils";
 import { isEmpty as isEmptyBox2D } from "../utils/BoundingBox2D";
-import type { BoundingBox3D, Point3D } from "../utils/BoundingBox3D";
 import {
     boxCenter,
     boxUnion,
@@ -79,7 +81,6 @@ import { useVerticalScale } from "../views/viewport";
 import mergeRefs from "merge-refs";
 import { WellLabelLayer } from "../layers/wells/layers/wellLabelLayer";
 
-export type { BoundingBox2D, BoundingBox3D, Point2D, Point3D };
 /**
  * Type of the function returning coordinate boundary for the view defined as [left, bottom, right, top].
  */
@@ -147,7 +148,6 @@ function parseLights(lights?: LightsType): LightingEffect[] | undefined {
     return effects;
 }
 
-export type ReportBoundingBoxAction = { layerBoundingBox: BoundingBox3D };
 function mapBoundingBoxReducer(
     mapBoundingBox: BoundingBox3D | undefined,
     action: ReportBoundingBoxAction

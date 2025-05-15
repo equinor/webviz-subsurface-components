@@ -1,3 +1,7 @@
+import _, { isEmpty, isEqual } from "lodash";
+import { distance, dot, subtract } from "mathjs";
+import { interpolateNumberArray } from "d3";
+
 import type {
     Color,
     Layer,
@@ -7,34 +11,33 @@ import type {
     UpdateParameters,
 } from "@deck.gl/core";
 import { CompositeLayer } from "@deck.gl/core";
+import { PathStyleExtension } from "@deck.gl/extensions";
+import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
+import { GL } from "@luma.gl/constants";
 import type { BinaryFeatureCollection } from "@loaders.gl/schema";
+
+import type { colorTablesArray } from "@emerson-eps/color-tables/";
+import { getColors, rgbValues } from "@emerson-eps/color-tables/";
+
+import type { Feature, FeatureCollection, Point, Position } from "geojson";
+
 import type {
+    ReportBoundingBoxAction,
     ColorMapFunctionType,
     ExtendedLayerProps,
     PropertyDataType,
 } from "../utils/layerTools";
+import {
+    createPropertyData,
+    getLayersById,
+    isDrawingEnabled,
+} from "../utils/layerTools";
 
-import { createPropertyData, isDrawingEnabled } from "../utils/layerTools";
-
-import { PathStyleExtension } from "@deck.gl/extensions";
-import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
-import type { colorTablesArray } from "@emerson-eps/color-tables/";
-import { getColors, rgbValues } from "@emerson-eps/color-tables/";
-import type { Feature, FeatureCollection, Point, Position } from "geojson";
-import { distance, dot, subtract } from "mathjs";
-
-import { GL } from "@luma.gl/constants";
-import { interpolateNumberArray } from "d3";
-import _, { isEmpty, isEqual } from "lodash";
 import type {
     ContinuousLegendDataType,
     DiscreteLegendDataType,
 } from "../../components/ColorLegend";
-import type {
-    DeckGLLayerContext,
-    ReportBoundingBoxAction,
-} from "../../components/Map";
-import { getLayersById } from "../../layers/utils/layerTools";
+import type { DeckGLLayerContext } from "../../components/Map";
 import type { NumberPair, StyleAccessorFunction } from "../types";
 import type { WellLabelLayerProps } from "./layers/wellLabelLayer";
 import { WellLabelLayer } from "./layers/wellLabelLayer";
@@ -1240,7 +1243,7 @@ function getMd(
     if (trajectory3D == undefined) return null;
 
     let trajectory;
-    // In 2D view coord is of type Position2D and in 3D view it's Position3D,
+    // In 2D view coord is of type Point2D and in 3D view it is Point3D,
     // so use appropriate trajectory for interpolation
     if (coord.length == 2) {
         const trajectory2D = trajectory3D.map((v) => {
@@ -1284,7 +1287,7 @@ function getTvd(
         return wellhead_xyz?.[2] ?? null;
     }
     let trajectory;
-    // For 2D view coord is Position2D and for 3D view it's Position3D
+    // For 2D view coord is Point2D and for 3D view it is Point3D
     if (coord.length == 2) {
         const trajectory2D = trajectory3D?.map((v) => {
             return v.slice(0, 2);

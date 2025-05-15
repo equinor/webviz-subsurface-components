@@ -12,18 +12,19 @@ import {
 import { TextLayer } from "@deck.gl/layers";
 import { ticks } from "d3-array";
 import { cloneDeep } from "lodash";
+
+import type { BoundingBox3D, Point3D } from "../../utils";
 import type {
-    BoundingBox3D,
+    ExtendedLayerProps,
     ReportBoundingBoxAction,
-} from "../../components/Map";
+} from "../utils/layerTools";
 import { FixedSizeExtension } from "../../extensions/fixed-size-extension";
-import type { ExtendedLayerProps, Position3D } from "../utils/layerTools";
 import BoxLayer from "./boxLayer";
 
 export interface AxesLayerProps extends ExtendedLayerProps {
     /**
      *  [xmin, ymin, zmin, xmax, ymax, zmax]
-     *  Note that z values are default interptreted as going downwards. See property "ZIncreasingDownwards".
+     *  Note that z values are default interpreted as going downwards. See property "ZIncreasingDownwards".
      *  So by default zmax is expected to be bigger than zmin.
      */
     bounds: BoundingBox3D;
@@ -59,8 +60,8 @@ const defaultProps = {
 
 type TextLayerData = {
     label: string;
-    from: Position3D; // tick line start
-    to: Position3D; // tick line end
+    from: Point3D; // tick line start
+    to: Point3D; // tick line end
     size: number; // font size
 };
 
@@ -154,8 +155,8 @@ export default class AxesLayer extends CompositeLayer<AxesLayerProps> {
 
         const zScale = this.props.modelMatrix ? this.props.modelMatrix[10] : 1;
 
-        const p0: Position3D = [d.from[0], d.from[1], d.from[2] * zScale];
-        const p1: Position3D = [d.to[0], d.to[1], d.to[2] * zScale];
+        const p0: Point3D = [d.from[0], d.from[1], d.from[2] * zScale];
+        const p1: Point3D = [d.to[0], d.to[1], d.to[2] * zScale];
 
         const screen_from = this.context.viewport.project(p0);
         const screen_to = this.context.viewport.project(p1);
@@ -169,7 +170,7 @@ export default class AxesLayer extends CompositeLayer<AxesLayerProps> {
         return "end";
     }
 
-    getLabelPosition(d: TextLayerData): Position3D {
+    getLabelPosition(d: TextLayerData): Point3D {
         const is_labels = d.label !== "X" && d.label !== "Y" && d.label !== "Z"; // labels on axis or XYZ annotations
         if (is_labels) {
             const tick_vec = [d.to[0] - d.from[0], d.to[1] - d.from[1]];
@@ -245,8 +246,8 @@ AxesLayer.defaultProps = defaultProps;
 //-- Local functions. -------------------------------------------------
 
 function lineLengthInPixels(
-    p0: Position3D,
-    p1: Position3D,
+    p0: Point3D,
+    p1: Point3D,
     viewport: Viewport
 ): number {
     const screen_from = viewport.project(p0);

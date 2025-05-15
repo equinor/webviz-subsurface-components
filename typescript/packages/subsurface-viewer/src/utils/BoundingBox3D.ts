@@ -1,3 +1,5 @@
+import type { Point3D } from "./Point3D";
+
 /**
  * 3D bounding box defined as [xmin, ymin, zmin, xmax, ymax, zmax].
  */
@@ -31,11 +33,6 @@ export const boxUnion = (
     const zmax = Math.max(box1[5], box2[5]);
     return [xmin, ymin, zmin, xmax, ymax, zmax];
 };
-
-/**
- * 3D point defined as [x, y, z].
- */
-export type Point3D = [number, number, number];
 
 /**
  * Returns the center of the bounding box.
@@ -77,3 +74,33 @@ export const isEmpty = (box: BoundingBox3D | undefined): boolean => {
     // the box can be bottom-up in some cases, thus the zmax != zmin
     return !(xmax > xmin && ymax > ymin && zmax != zmin);
 };
+
+/**
+ * Calculates the axis-aligned bounding box for a set of 3D points.
+ *
+ * @param dataArray - A flat `Float32Array` containing 3D coordinates in the order [x0, y0, z0, x1, y1, z1, ...].
+ * @returns The BoundingBox representing the minimum and maximum coordinates along each axis.
+ */
+export function computeBoundingBox(dataArray: Float32Array): BoundingBox3D {
+    const length = dataArray.length;
+    let minX = Number.POSITIVE_INFINITY;
+    let minY = Number.POSITIVE_INFINITY;
+    let minZ = Number.POSITIVE_INFINITY;
+    let maxX = Number.NEGATIVE_INFINITY;
+    let maxY = Number.NEGATIVE_INFINITY;
+    let maxZ = Number.NEGATIVE_INFINITY;
+
+    for (let i = 0; i < length; i += 3) {
+        const x = dataArray[i];
+        const y = dataArray[i + 1];
+        const z = dataArray[i + 2];
+        minX = x < minX ? x : minX;
+        minY = y < minY ? y : minY;
+        minZ = z < minZ ? z : minZ;
+
+        maxX = x > maxX ? x : maxX;
+        maxY = y > maxY ? y : maxY;
+        maxZ = z > maxZ ? z : maxZ;
+    }
+    return [minX, minY, minZ, maxX, maxY, maxZ];
+}

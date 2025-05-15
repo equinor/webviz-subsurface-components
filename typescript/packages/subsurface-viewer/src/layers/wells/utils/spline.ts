@@ -1,3 +1,5 @@
+import { cloneDeep } from "lodash";
+
 import type {
     FeatureCollection,
     GeoJsonProperties,
@@ -5,17 +7,17 @@ import type {
     LineString,
     Point,
 } from "geojson";
-import { cloneDeep } from "lodash";
+
 import { simplify } from "../../utils/simplify";
 
-import type { Position3D } from "../../utils/layerTools";
+import type { Point3D } from "../../../utils";
 
 export const DEFAULT_TOLERANCE = 0.01;
 
 export function removeConsecutiveDuplicates(
-    coords: Position3D[],
+    coords: Point3D[],
     mds: number[]
-): [Position3D[], number[]] {
+): [Point3D[], number[]] {
     // Filter out consecutive duplicate vertices.
     const keep = coords.map((e, index, arr) => {
         if (index < arr.length - 1) {
@@ -50,7 +52,7 @@ export function checkWells(data: FeatureCollection): void {
             continue;
         }
 
-        let coords = lineString.coordinates as Position3D[];
+        let coords = lineString.coordinates as Point3D[];
 
         // If not defined set wellhead z value to top of well string.
         const wellHead = geometryCollection?.geometries[0] as Point;
@@ -137,12 +139,12 @@ export function CatmullRom1D(
  */
 // prettier-ignore
 export function CatmullRom(
-    P0: Position3D,
-    P1: Position3D,
-    P2: Position3D,
-    P3: Position3D,
+    P0: Point3D,
+    P1: Point3D,
+    P2: Point3D,
+    P3: Point3D,
     t: number
-): Position3D {
+): Point3D {
     const alpha = 0.5;
     const tt = t * t;
     const ttt = t * t * t;
@@ -184,7 +186,7 @@ export function CatmullRom(
     const y = a_y * ttt + b_y * tt + c_y * t + d_y;
     const z = a_z * ttt + b_z * tt + c_z * t + d_z;
 
-    return [x, y, z] as Position3D;
+    return [x, y, z] as Point3D;
 }
 
 /**
@@ -221,7 +223,7 @@ export function splineRefine<
             continue;
         }
 
-        const coords = lineString.coordinates as Position3D[];
+        const coords = lineString.coordinates as Point3D[];
 
         const n = coords.length;
         if (n <= 1) {
@@ -234,7 +236,7 @@ export function splineRefine<
         const x0 = coords[0][0] - coords[1][0] + coords[0][0];
         const y0 = coords[0][1] - coords[1][1] + coords[0][1];
         const z0 = coords[0][2] - coords[1][2] + coords[0][2];
-        const P_first: Position3D = [x0, y0, z0];
+        const P_first: Point3D = [x0, y0, z0];
 
         const md_first = mds[0][0] - mds[0][1] + mds[0][0];
 
@@ -242,16 +244,16 @@ export function splineRefine<
         const xn = coords[n - 1][0] - coords[n - 2][0] + coords[n - 1][0];
         const yn = coords[n - 1][1] - coords[n - 2][1] + coords[n - 1][1];
         const zn = coords[n - 1][2] - coords[n - 2][2] + coords[n - 1][2];
-        const P_n: Position3D = [xn, yn, zn];
+        const P_n: Point3D = [xn, yn, zn];
 
         const md_n = mds[0][n - 1] - mds[0][n - 2] + mds[0][n - 1];
 
-        const newCoordinates: Position3D[] = [];
+        const newCoordinates: Point3D[] = [];
         const newMds: number[][] = [];
         newMds.push([]);
 
         for (let i = 0; i < n - 1; i += 1) {
-            let P0: Position3D, P1: Position3D, P2: Position3D, P3: Position3D;
+            let P0: Point3D, P1: Point3D, P2: Point3D, P3: Point3D;
             let md0: number, md1: number, md2: number, md3: number;
 
             if (i === 0) {
@@ -296,7 +298,7 @@ export function splineRefine<
                     const [x, y, z] = CatmullRom(P0, P1, P2, P3, t);
                     const md = CatmullRom1D(md0, md1, md2, md3, t);
 
-                    newCoordinates.push([x, y, z] as Position3D);
+                    newCoordinates.push([x, y, z] as Point3D);
                     newMds[0].push(md);
                 }
             }
@@ -341,11 +343,11 @@ export function coarsenWells(
         if (properties) {
             const mds = properties["md"]?.[0];
             const [newPoints, newMds] = simplify(
-                lineString.coordinates as Position3D[],
+                lineString.coordinates as Point3D[],
                 mds ?? [],
                 tolerance
             );
-            lineString.coordinates = newPoints as Position3D[];
+            lineString.coordinates = newPoints as Point3D[];
             if (properties["md"]) {
                 properties["md"][0] = newMds;
             }
@@ -368,10 +370,10 @@ export function flattenPath(data_in: FeatureCollection): FeatureCollection {
             continue;
         }
 
-        const coords = lineString.coordinates as Position3D[];
+        const coords = lineString.coordinates as Point3D[];
 
         // flatten by setting z value constant.
-        const coords_flat: Position3D[] = coords.map((e: Position3D) => {
+        const coords_flat: Point3D[] = coords.map((e: Point3D) => {
             return [e[0], e[1], 0.0];
         });
 
@@ -404,10 +406,10 @@ export function invertPath<
             continue;
         }
 
-        const coords = lineString.coordinates as Position3D[];
+        const coords = lineString.coordinates as Point3D[];
 
         // Invert path by multiplying depth with -1.
-        const coords_inverted: Position3D[] = coords.map((e: Position3D) => {
+        const coords_inverted: Point3D[] = coords.map((e: Point3D) => {
             return [e[0], e[1], -e[2]];
         });
 
@@ -442,7 +444,7 @@ export function GetBoundingBox(
             continue;
         }
 
-        const coords = lineString.coordinates as Position3D[];
+        const coords = lineString.coordinates as Point3D[];
         const n = coords.length;
         for (let i = 0; i < n; i++) {
             const xyz = coords[i];

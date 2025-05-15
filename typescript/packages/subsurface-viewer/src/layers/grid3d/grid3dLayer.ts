@@ -9,18 +9,17 @@ import workerpool from "workerpool";
 
 import type { Material } from "./typeDefs";
 import PrivateLayer from "./privateGrid3dLayer";
-import type {
-    BoundingBox3D,
-    ReportBoundingBoxAction,
-} from "../../components/Map";
+import { makeFullMesh } from "./webworker";
+
 import type {
     ExtendedLayerProps,
     ColorMapFunctionType,
+    ReportBoundingBoxAction,
 } from "../utils/layerTools";
-import { makeFullMesh } from "./webworker";
 
 import config from "../../SubsurfaceConfig.json";
 import { findConfig } from "../../utils/configTools";
+import type { BoundingBox3D } from "../../utils";
 
 // init workerpool
 const workerPoolConfig = findConfig(

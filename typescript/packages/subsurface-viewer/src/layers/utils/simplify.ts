@@ -2,14 +2,10 @@
 // https://github.com/mourner/simplify-js/blob/3d/simplify.js
 // Modified version of above libary. Port to Typescript. Use subset. Take into account md values.
 
-import type { Position3D } from "../utils/layerTools";
+import type { Point3D } from "../../utils";
 
 // square distance from a point to a segment
-function getSquareSegmentDistance(
-    p: Position3D,
-    p1: Position3D,
-    p2: Position3D
-) {
+function getSquareSegmentDistance(p: Point3D, p1: Point3D, p2: Point3D) {
     let x = p1[0],
         y = p1[1],
         z = p1[2],
@@ -42,7 +38,7 @@ function getSquareSegmentDistance(
 
 // simplification using optimized Douglas-Peucker algorithm with recursion elimination
 function simplifyDouglasPeucker(
-    points: Position3D[],
+    points: Point3D[],
     mds: number[],
     sqTolerance: number
 ) {
@@ -106,11 +102,7 @@ function simplifyDouglasPeucker(
  * @param tolerance The tolerance value to determine the level of simplification. A higher tolerance results in fewer points. If undefined or zero, then no simplification is applied.
  * @returns Simplified points and mds
  */
-export function simplify(
-    points: Position3D[],
-    mds: number[],
-    tolerance?: number
-) {
+export function simplify(points: Point3D[], mds: number[], tolerance?: number) {
     const sqTolerance = tolerance !== undefined ? tolerance * tolerance : 0;
     const [newPoints, newMds] = simplifyDouglasPeucker(
         points,

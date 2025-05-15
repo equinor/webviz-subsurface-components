@@ -2,13 +2,13 @@ import type { PickingInfo, UpdateParameters } from "@deck.gl/core";
 import { CompositeLayer } from "@deck.gl/core";
 import { isEqual } from "lodash";
 
-import type { ReportBoundingBoxAction } from "../../components/Map";
 import type {
     ExtendedLayerProps,
     LayerPickInfo,
     PropertyDataType,
+    ReportBoundingBoxAction,
 } from "../utils/layerTools";
-import { createPropertyData, defineBoundingBox } from "../utils/layerTools";
+import { createPropertyData, computeBoundingBox } from "../utils/layerTools";
 
 import { PrivatePolylinesLayer } from "./privatePolylinesLayer";
 
@@ -36,6 +36,7 @@ export interface PolylinesLayerProps extends ExtendedLayerProps {
      *  The polylines are considered to be open if not set.
      */
     polylinesClosed?: boolean | boolean[];
+
     /**
      * Line color defined as RGB or RGBA array. Each component is in 0-255 range.
      */
@@ -144,7 +145,7 @@ export default class PolylinesLayer extends CompositeLayer<PolylinesLayerProps> 
             typeof this.props.reportBoundingBox === "function" &&
             reportBoundingBox
         ) {
-            const boundingBox = defineBoundingBox(dataArrays.positions);
+            const boundingBox = computeBoundingBox(dataArrays.positions);
             this.props.reportBoundingBox({ layerBoundingBox: boundingBox });
         }
 

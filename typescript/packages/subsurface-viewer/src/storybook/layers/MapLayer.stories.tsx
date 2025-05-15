@@ -7,12 +7,9 @@ import { ClipExtension } from "@deck.gl/extensions";
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import InfoCard from "../../components/InfoCard";
-import type {
-    BoundingBox2D,
-    BoundingBox3D,
-    ViewsType,
-} from "../../components/Map";
+import type { ViewsType } from "../../components/Map";
 import { useHoverInfo } from "../../components/Map";
+import type { BoundingBox2D, BoundingBox3D } from "../../utils";
 
 import { ViewFooter } from "../../components/ViewFooter";
 import AxesLayer from "../../layers/axes/axesLayer";
@@ -445,9 +442,7 @@ export const NodeCenteredPropMapWithArrayInput: StoryObj<
     tags: ["no-test"],
 };
 
-// @ts-expect-error TS7006
 function makeGaussian(amplitude, x0, y0, stdX, stdY) {
-    // @ts-expect-error TS7006
     return function (amplitude, x0, y0, stdX, stdY, x, y) {
         const exponent = -(
             Math.pow(x - x0, 2) / (2 * Math.pow(stdX, 2)) +
@@ -464,7 +459,6 @@ function makeData(n: number, amplitude: number): Float32Array {
     const stdY = 50;
     const f = makeGaussian(amplitude, X0, Y0, stdX, stdY);
 
-    // @ts-expect-error TS6133
     const data = new Float32Array(n * n).map((val, index) => {
         const x = (index % n) - n / 2;
         const y = Math.floor(index / n) - n / 2;
@@ -764,23 +758,15 @@ const ExtensionsComponent: React.FC<
     SubsurfaceViewerProps & { clipX: number }
 > = (args) => {
     const rightClipBounds = [
-        // @ts-expect-error TS7053
         args.bounds?.[0] + args.clipX,
-        // @ts-expect-error TS7053
         args.bounds?.[1],
-        // @ts-expect-error TS7053
         args.bounds?.[2],
-        // @ts-expect-error TS7053
         args.bounds?.[3],
     ];
     const leftClipBounds = [
-        // @ts-expect-error TS7053
         args.bounds?.[0],
-        // @ts-expect-error TS7053
         args.bounds?.[1],
-        // @ts-expect-error TS7053
         args.bounds?.[0] + args.clipX,
-        // @ts-expect-error TS7053
         args.bounds?.[3],
     ];
 

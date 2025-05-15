@@ -1,9 +1,9 @@
-import type { Position3D } from "../utils/layerTools";
+import type { Point3D } from "../../utils";
 import { simplify } from "./simplify";
 
 describe("simplify", () => {
     it("should return the same points and mds if tolerance is undefined", () => {
-        const points: Position3D[] = [
+        const points: Point3D[] = [
             [0, 0, 0],
             [1, 1, 1],
             [2, 2, 2],
@@ -18,7 +18,7 @@ describe("simplify", () => {
     });
 
     it("should simplify points based on the given tolerance", () => {
-        const points: Position3D[] = [
+        const points: Point3D[] = [
             [0, 0, 0],
             [0.5, 0.5, 0.5],
             [1, 1, 1],
@@ -38,7 +38,7 @@ describe("simplify", () => {
     });
 
     it("should handle an empty array of points", () => {
-        const points: Position3D[] = [];
+        const points: Point3D[] = [];
         const mds: number[] = [];
         const tolerance = 1;
 
@@ -49,7 +49,7 @@ describe("simplify", () => {
     });
 
     it("should handle a single point", () => {
-        const points: Position3D[] = [[0, 0, 0]];
+        const points: Point3D[] = [[0, 0, 0]];
         const mds: number[] = [0];
         const tolerance = 1;
 
