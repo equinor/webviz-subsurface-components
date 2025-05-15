@@ -1,3 +1,10 @@
+## [1.11.3](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.11.2...subsurface-viewer@1.11.3) (2025-05-15)
+
+
+### Bug Fixes
+
+* Disable depth test for cross-hair layer to always keep it at top ([#2544](https://github.com/equinor/webviz-subsurface-components/issues/2544)) ([a65383d](https://github.com/equinor/webviz-subsurface-components/commit/a65383db55f7cd048897508e8c9e6dce28ab309b))
+
 ## [1.11.2](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.11.1...subsurface-viewer@1.11.2) (2025-05-12)
 
 
