@@ -1,8 +1,0 @@
-{
-    "name": "subsurface-viewer",
-    "targets": {
-        "semantic-release": {
-            "executor": "@theunderscorer/nx-semantic-release:semantic-release"
-        }
-    }
-}
