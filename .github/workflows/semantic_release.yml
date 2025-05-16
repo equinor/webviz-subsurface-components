@@ -9,18 +9,26 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: 📖 Checkout commit locally
+        uses: actions/checkout@v3
         with:
           persist-credentials: false
           fetch-depth: 0
 
-      - name: configure git
+      - name: Configure git
         run: |
           git config user.name "hkfb"
           git config user.email "hkfb@users.noreply.github.com"
 
-      - run: npm ci
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+
+      - run: npm CYPRESS_INSTALL_BINARY=0 ci
         working-directory: ./typescript
+
+      - name: 🏗️ Build packages
+        run: |
+          npx nx run-many -t build
 
       - name: 🔼 Run Nx release
         working-directory: ./typescript

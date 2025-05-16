@@ -176,17 +176,19 @@ jobs:
     steps:
       - name: 📖 Checkout commit locally
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Fetch full history including tags (needed for nx release)
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
-        with:
-          node-version: 18
 
       - name: 📦 Install build dependencies
+        working-directory: ./typescript
         run: |
           npm ci CYPRESS_INSTALL_BINARY=0 --ignore-scripts
 
       - name: 🏗️ Build packages
+        working-directory: ./typescript
         run: |
           npx nx run-many -t build
 
