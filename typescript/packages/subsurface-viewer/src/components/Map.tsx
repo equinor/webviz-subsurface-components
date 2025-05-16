@@ -585,7 +585,6 @@ const Map: React.FC<MapProps> = ({
                     })[];
                 pickInfos.forEach((item) => {
                     // Z value should not take into account the Z scale factor.
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     item.scaledCoordinate = item.coordinate
                         ? ([...item.coordinate] as Point2D | Point3D)
                         : undefined;
