@@ -190,14 +190,11 @@ jobs:
         run: |
           npx nx run-many -t build
 
-      - name: 🔼 Dry-run semantic release
+      - name: 🔼 Dry-run Nx release
         working-directory: ./typescript
-        run: npx nx run-many --target="semantic-release:dry-run" --parallel=false
+        run: npx nx release --dry-run --yes
         env:
           GITHUB_TOKEN: ${{ secrets.SEMANTIC_RELEASE_GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.SEMANTIC_RELEASE_GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-
-
