@@ -63,7 +63,6 @@
         "@testing-library/jest-dom": "^6.6.3",
         "@testing-library/react": "^16.3.0",
         "@testing-library/user-event": "^14.6.1",
-        "@theunderscorer/nx-semantic-release": "^2.12.0",
         "@types/convert-units": "^2.3.11",
         "@types/d3": "^7.4.3",
         "@types/d3-color": "^3.1.3",

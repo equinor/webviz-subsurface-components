@@ -27,8 +27,7 @@
         "test:update": "npm test -- --u",
         "test:watch": "npm test -- --watch",
         "test:debug": "node --inspect-brk ../../node_modules/jest/bin/jest.js --coverage=false --runInBand",
-        "doc": "git clean -xdff docs && typedoc src",
-        "semantic-release:dry-run": "semantic-release --dry-run"
+        "doc": "git clean -xdff docs && typedoc src"
     },
     "author": "Equinor <opensource@equinor.com>",
     "license": "MPL-2.0",

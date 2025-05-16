@@ -11,8 +11,7 @@
         "transpile": "tsc --project ./tsconfig.json",
         "copy-files": "copyfiles --up 1 \"src/**/*.css\" dist/",
         "build": "git clean -xdff dist && npm run transpile && npm run copy-files",
-        "doc": "git clean -xdff docs && typedoc src",
-        "semantic-release:dry-run": "semantic-release --dry-run"
+        "doc": "git clean -xdff docs && typedoc src"
     },
     "author": "Equinor <opensource@equinor.com>",
     "license": "MPL-2.0",
