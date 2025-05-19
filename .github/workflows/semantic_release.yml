@@ -27,7 +27,9 @@ jobs:
         working-directory: ./typescript
         run: |
           npm ci CYPRESS_INSTALL_BINARY=0 --ignore-scripts
+
       - name: 🏗️ Build packages
+        working-directory: ./typescript
         run: |
           npx nx run-many -t build
 
