@@ -9,16 +9,17 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
+      # Inspired by https://medium.com/@michadrabikowski/automated-releases-with-nx-and-github-actions-07f574041293
       - name: 📖 Checkout commit locally
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
-          persist-credentials: false
           fetch-depth: 0
+          token: ${{ secrets.SEMANTIC_RELEASE_GITHUB_TOKEN }} 
 
       - name: Configure git
         run: |
-          git config user.name "hkfb"
-          git config user.email "hkfb@users.noreply.github.com"
+          git config --global user.name "hkfb"
+          git config --global user.email "hkfb@users.noreply.github.com"
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
