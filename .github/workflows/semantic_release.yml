@@ -23,9 +23,10 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
 
-      - run: npm CYPRESS_INSTALL_BINARY=0 ci
+      - name: 📦 Install build dependencies
         working-directory: ./typescript
-
+        run: |
+          npm ci CYPRESS_INSTALL_BINARY=0 --ignore-scripts
       - name: 🏗️ Build packages
         run: |
           npx nx run-many -t build
