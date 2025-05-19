@@ -16,8 +16,7 @@
         "test": "jest --coverage",
         "test:update": "npm test -- --u",
         "test:watch": "npm test -- --watch",
-        "doc": "git clean -xdff docs && typedoc src",
-        "semantic-release:dry-run": "semantic-release --dry-run"
+        "doc": "git clean -xdff docs && typedoc src"
     },
     "author": "Equinor <opensource@equinor.com>",
     "license": "MPL-2.0",
