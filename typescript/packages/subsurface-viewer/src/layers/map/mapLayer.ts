@@ -123,7 +123,7 @@ export interface MapLayerProps extends ExtendedLayerProps {
 
     /**  Url to the properties (ex, poro or perm values).
      * If the number of property values equals the number of depth values
-     * the property values will be placed at the nodes and the cell (4 neigboring nodes)
+     * the property values will be placed at the nodes and the cell (4 neighboring nodes)
      * color will be linearly interpolated over the cell.
      * If the number of property values equals one less than the depth values in
      * each direction then the property values will be pr cell and the cell will be constant
@@ -132,23 +132,23 @@ export interface MapLayerProps extends ExtendedLayerProps {
     propertiesUrl: string; // Deprecated
     propertiesData: string | number[] | Float32Array;
 
-    /**  Contourlines reference point and interval.
+    /**  Contour lines reference point and interval.
      * A value of [-1.0, -1.0] will disable contour lines.
      * Contour lines will also not be activated if cells are constant colored
-     * and "isContoursDepth" is set to false. I.e. constant properties within cells and contourlines
+     * and "isContoursDepth" is set to false. I.e. constant properties within cells and contour lines
      * to be calculated for properties and not depths.
      * default value: [-1.0, -1.0]
      */
     contours: [number, number];
 
-    /**  Contourlines may be calculated either on depth/z-value or on property value
+    /**  Contour lines may be calculated either on depth/z-value or on property value
      * If this is set to false, lines will follow properties instead of depth.
      * In 2D mode this is always the case regardless.
      * default: true
      */
     isContoursDepth: boolean;
 
-    /**  Enable gridlines.
+    /**  Enable grid lines.
      * default: false.
      */
     gridLines: boolean;
