@@ -23,6 +23,12 @@ export type Material =
       }
     | boolean;
 
+export type Texture2D = {
+    values: Float32Array;
+    width?: number | undefined;
+    height?: number | undefined;
+};
+
 // type checking. Make sure local Material type is equivalent to DeckGlMaterial
 // https://github.com/microsoft/TypeScript/issues/27024#issuecomment-421529650
 type Equals<X, Y> =

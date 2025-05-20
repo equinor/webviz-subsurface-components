@@ -31,27 +31,66 @@ export interface IColormapHints {
  */
 export interface ColorTableProps {
     colormapName: string;
+    colorTables?: colorTablesArray;
 }
 
 /**
- * Colormap definition used for mapping data values to colors.
+ * Represents the possible types of colormap inputs that can be used in the subsurface viewer.
  *
- * @property colorTables - An array or collection of color tables from which to select the colormap.
+ * - `ColormapFunctionType`: A function that returns a color from a property value.
+ * - `Uint8Array`: A raw array of color values, typically representing RGBA or RGB data.
+ * - `ColorTableProps`: An object describing a color table with additional properties.
+ *
+ * This union type allows flexibility in specifying how colormaps are provided to components or utilities.
  */
-export interface ColorTableDef extends ColorTableProps {
-    colorTables: colorTablesArray;
-}
-
 export type ColormapProps = ColormapFunctionType | Uint8Array | ColorTableProps;
 
 /**
- * Represents the possible types that can be used as colormap properties.
- *
- * - `ColormapFunctionType`: A function converting a value to a color.
- * - `Uint8Array`: A typed array containing color data.
- * - `ColorTableDef`: An object representing a color table.
+ * Configuration options for setting up a colormap.
  */
-export type TColormapDef = ColormapFunctionType | Uint8Array | ColorTableDef;
+export interface ColormapSetup {
+    /** Minimum and maximum value range. Used to map values to the the colormap colors. */
+    valueRange?: [number, number];
+    /** Range specifying the minimum and maximum values to clamp the data.
+     * If not provided, the colormap range will be used.
+     */
+    clampRange?: [number, number];
+    /** Color or pair of colors used for clamped values.
+     * If a single color is provided, it is used for both ends of the range.
+     * If it is not provided, the  first and last colors of the colormap will be used.
+     */
+    clampColor?: Color | [Color, Color];
+    /** Specification of the value used to represent undefined data. */
+    undefinedValue?: number;
+    /** Color used for undefined value. */
+    undefinedColor?: Color;
+    /** Control used to apply or not smoothing to the display of the property.  */
+    smooth?: boolean;
+}
+
+/**
+ * Converts a color represented as an array of numbers (either RGB or RGBA) with 8-bit channel values (0-255)
+ * into a normalized RGBA tuple with values in the range [0, 1].
+ *
+ * @param color - The input color as an array of numbers. It can be either:
+ *   - [r, g, b]: An RGB color, where each channel is a number between 0 and 255.
+ *   - [r, g, b, a]: An RGBA color, where each channel is a number between 0 and 255.
+ * @returns A tuple [r, g, b, a] where each value is normalized to the range [0, 1].
+ */
+export function toNormalizedColor(
+    color: Color | undefined
+): [number, number, number, number] | undefined {
+    return color
+        ? [
+              color[0] / 255,
+              color[1] / 255,
+              color[2] / 255,
+              color.length === 3
+                  ? 1
+                  : (color as [number, number, number, number])[3] / 255,
+          ]
+        : undefined;
+}
 
 /**
  * Creates an array of colors as RGB triplets in range [0, 1] using the colormap definition.
@@ -61,7 +100,7 @@ export type TColormapDef = ColormapFunctionType | Uint8Array | ColorTableDef;
  * @returns Array of colors.
  */
 export function getImageData(
-    colormapDef: TColormapDef,
+    colormapDef: ColormapProps,
     colormapSize: number = 256,
     discreteColormapFunction: boolean = false
 ): Uint8Array {
@@ -127,7 +166,7 @@ const DISCRETE_TEXTURE_PARAMETERS: SamplerProps = {
     addressModeV: "clamp-to-edge",
 };
 export function createColormapTexture(
-    colormap: TColormapDef,
+    colormap: ColormapProps,
     context: DeckGLLayerContext,
     colormapHints: IColormapHints
 ): Texture {
