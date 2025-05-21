@@ -7,7 +7,7 @@ import { JSONLoader, load } from "@loaders.gl/core";
 
 import workerpool from "workerpool";
 
-import type { Material } from "./typeDefs";
+import type { Material } from "../gpglLayers/typeDefs";
 import PrivateLayer from "./privateGrid3dLayer";
 import { makeFullMesh } from "./webworker";
 
@@ -198,7 +198,7 @@ export interface Grid3DLayerProps extends ExtendedLayerProps {
     propertiesData: string | number[] | Float32Array | Uint16Array | undefined;
 
     /**
-     * Discrete propety value-name pairs to be displayed in cursor readouts.
+     * Discrete property value-name pairs to be displayed in cursor readouts.
      * The property values are used as the array indices.
      */
     discretePropertyValueNames?: IDiscretePropertyValueName[];

@@ -21,15 +21,6 @@ export type MeshTypeLines = {
     vertexCount: number;
 };
 
-export type Material =
-    | {
-          ambient: number;
-          diffuse: number;
-          shininess: number;
-          specularColor: [number, number, number];
-      }
-    | boolean;
-
 export type WebWorkerParams = {
     points: Float32Array;
     polys: Uint32Array;
