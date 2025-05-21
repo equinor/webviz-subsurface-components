@@ -22,7 +22,13 @@ jobs:
           git config --global user.email "hkfb@users.noreply.github.com"
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
+        with:
+          # Needed for registry authentication in the publish step (https://github.com/actions/setup-node?tab=readme-ov-file#usage)
+          registry-url: https://registry.npmjs.org/
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
 
       - name: 📦 Install build dependencies
         working-directory: ./typescript
