@@ -4,6 +4,6 @@ module.exports = {
     overrides: [
         // `nx release version` overwrites package.json with 2
         // spaces indentation
-        { files: "package.json", options: { tabWidth: 2 } },
+        { files: "typescript/**/package.json", options: { tabWidth: 2 } },
     ],
 };
