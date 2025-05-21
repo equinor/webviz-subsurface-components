@@ -175,29 +175,28 @@ jobs:
 
     steps:
       - name: 📖 Checkout commit locally
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch full history including tags (needed for nx release)
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
-        with:
-          node-version: 18
 
       - name: 📦 Install build dependencies
+        working-directory: ./typescript
         run: |
           npm ci CYPRESS_INSTALL_BINARY=0 --ignore-scripts
 
       - name: 🏗️ Build packages
+        working-directory: ./typescript
         run: |
           npx nx run-many -t build
 
-      - name: 🔼 Dry-run semantic release
+      - name: 🔼 Dry-run Nx release
         working-directory: ./typescript
-        run: npx nx run-many --target="semantic-release:dry-run" --parallel=false
+        run: npx nx release --dry-run --yes
         env:
           GITHUB_TOKEN: ${{ secrets.SEMANTIC_RELEASE_GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.SEMANTIC_RELEASE_GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-
-

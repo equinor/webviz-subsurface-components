@@ -9,8 +9,8 @@ import { Geometry, Model } from "@luma.gl/engine";
 import type { Device } from "@luma.gl/core";
 import { Vector3 } from "@math.gl/core";
 import type { ExtendedLayerProps } from "../utils/layerTools";
-import fragmentShader from "./northarrow-fragment.glsl";
-import vertexShader from "./northarrow-vertex.glsl";
+import fragmentShader from "./northarrow.fs.glsl";
+import vertexShader from "./northarrow.vs.glsl";
 
 export interface NorthArrow3DLayerProps extends ExtendedLayerProps {
     color: Color;

@@ -1,3 +1,20 @@
+## 1.11.5 (2025-05-20)
+
+### 🩹 Fixes
+
+- test package publishing using nx release ([#2556](https://github.com/equinor/webviz-subsurface-components/pull/2556))
+
+### ❤️ Thank You
+
+- Håvard Bjerke
+
+## [1.11.4](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.11.3...subsurface-viewer@1.11.4) (2025-05-16)
+
+
+### Bug Fixes
+
+* wrong Z readout when a Z scale has been applied. ([#2542](https://github.com/equinor/webviz-subsurface-components/issues/2542)) ([f603cdb](https://github.com/equinor/webviz-subsurface-components/commit/f603cdbe8b97275bd4177da9edd9d2072f11f1b0)), closes [#2537](https://github.com/equinor/webviz-subsurface-components/issues/2537)
+
 ## [1.11.3](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.11.2...subsurface-viewer@1.11.3) (2025-05-15)
 
 

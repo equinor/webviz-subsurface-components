@@ -6,7 +6,7 @@ import { GL } from "@luma.gl/constants";
 
 import type { ShaderModule } from "@luma.gl/shadertools";
 
-import vs from "./vertex.glsl";
+import vs from "./point.vs.glsl";
 
 export interface ExtendedScatterplotLayerProps {
     depthTest: boolean;

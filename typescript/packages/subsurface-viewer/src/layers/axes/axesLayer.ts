@@ -10,15 +10,15 @@ import {
     OrthographicViewport,
 } from "@deck.gl/core";
 import { TextLayer } from "@deck.gl/layers";
+import { ticks } from "d3-array";
 import { cloneDeep } from "lodash";
 import type {
     BoundingBox3D,
     ReportBoundingBoxAction,
 } from "../../components/Map";
+import { FixedSizeExtension } from "../../extensions/fixed-size-extension";
 import type { ExtendedLayerProps, Position3D } from "../utils/layerTools";
 import BoxLayer from "./boxLayer";
-import { ticks } from "d3-array";
-import { FixedSizeExtension } from "../../extensions/fixed-size-extension";
 
 export interface AxesLayerProps extends ExtendedLayerProps {
     /**
@@ -28,16 +28,19 @@ export interface AxesLayerProps extends ExtendedLayerProps {
      */
     bounds: BoundingBox3D;
     labelColor?: Color;
+
     /**
      * Font size for tick labels, specified in pixels. Axis labels are +7 pixels relative to this size.
      * @default 12
      */
     labelFontSize: number;
+
     fontFamily?: string;
     axisColor?: Color;
+
     /** If true means that input z values are interpreted as depths.
      * For example a depth of 2000 will be further down than a depth value of 1000.
-     * Default true.
+     * @default true
      */
     ZIncreasingDownwards: boolean;
 
@@ -241,7 +244,7 @@ AxesLayer.defaultProps = defaultProps;
 
 //-- Local functions. -------------------------------------------------
 
-function LineLengthInPixels(
+function lineLengthInPixels(
     p0: Position3D,
     p1: Position3D,
     viewport: Viewport
@@ -370,7 +373,7 @@ function GetTickLines(
 
     const delta = ((dx + dy + dz) / 3.0) * 0.025;
 
-    const Lz = LineLengthInPixels(
+    const Lz = lineLengthInPixels(
         [x_min, y_min, z_min * zScale],
         [x_min, y_min, z_max * zScale],
         viewport
@@ -439,7 +442,7 @@ function GetTickLines(
     }
 
     // X axis labels.
-    const Lx = LineLengthInPixels(
+    const Lx = lineLengthInPixels(
         [x_min, y_min, z_min * zScale],
         [x_max, y_min, z_min * zScale],
         viewport
@@ -502,7 +505,7 @@ function GetTickLines(
     }
 
     // Y axis labels.
-    const Ly = LineLengthInPixels(
+    const Ly = lineLengthInPixels(
         [x_min, y_min, z_min * zScale],
         [x_min, y_max, z_min * zScale],
         viewport
