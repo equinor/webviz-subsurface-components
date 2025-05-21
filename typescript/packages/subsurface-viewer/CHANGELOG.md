@@ -1,3 +1,13 @@
+## 1.11.5 (2025-05-20)
+
+### 🩹 Fixes
+
+- test package publishing using nx release ([#2556](https://github.com/equinor/webviz-subsurface-components/pull/2556))
+
+### ❤️ Thank You
+
+- Håvard Bjerke
+
 ## [1.11.4](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.11.3...subsurface-viewer@1.11.4) (2025-05-16)
 
 
