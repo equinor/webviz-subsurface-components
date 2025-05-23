@@ -1,5 +1,14 @@
+import { Matrix4 } from "math.gl";
+
 import type { PickingInfo } from "@deck.gl/core";
 import type { Color } from "@deck.gl/core";
+import type {
+    Layer,
+    LayersList,
+    LayerManager,
+    CompositeLayerProps,
+} from "@deck.gl/core";
+
 import type {
     colorTablesArray,
     createColorMapFunction,
@@ -8,19 +17,13 @@ import { rgbValues } from "@emerson-eps/color-tables/";
 import { createDefaultContinuousColorScale } from "@emerson-eps/color-tables/dist/component/Utils/legendCommonFunction";
 
 import type {
-    Layer,
-    LayersList,
-    LayerManager,
-    CompositeLayerProps,
-} from "@deck.gl/core";
-import { Matrix4 } from "math.gl";
-import type {
     ContinuousLegendDataType,
     DiscreteLegendDataType,
 } from "../../components/ColorLegend";
 import type DrawingLayer from "../drawing/drawingLayer";
 
-export type Position3D = [number, number, number];
+import type { BoundingBox3D } from "../../utils";
+import { computeBoundingBox as buidBoundingBox } from "../../utils/BoundingBox3D";
 
 /** Type of functions returning a color from a value in the [0,1] range. */
 export type ColorMapFunctionType = ReturnType<typeof createColorMapFunction>;
@@ -171,35 +174,27 @@ export function invertZCoordinate(dataArray: Float32Array): void {
     }
 }
 
-export function defineBoundingBox(
+/**
+ * Calculates the axis-aligned bounding box for a set of 3D points.
+ *
+ * @param dataArray - A flat `Float32Array` containing 3D coordinates in the order [x0, y0, z0, x1, y1, z1, ...].
+ * @param zIncreasingDownwards - Optional. If `true`, inverts the Z-axis direction to account for coordinate systems where Z increases downwards. Defaults to `false`.
+ * @returns A tuple of six numbers: [minX, minY, minZ, maxX, maxY, maxZ], representing the minimum and maximum coordinates along each axis.
+ */
+export function computeBoundingBox(
     dataArray: Float32Array,
     zIncreasingDownwards: boolean = false
-): [number, number, number, number, number, number] {
-    const length = dataArray.length;
-    let minX = Number.POSITIVE_INFINITY;
-    let minY = Number.POSITIVE_INFINITY;
-    let minZ = Number.POSITIVE_INFINITY;
-    let maxX = Number.NEGATIVE_INFINITY;
-    let maxY = Number.NEGATIVE_INFINITY;
-    let maxZ = Number.NEGATIVE_INFINITY;
-
-    for (let i = 0; i < length; i += 3) {
-        const x = dataArray[i];
-        const y = dataArray[i + 1];
-        const z = dataArray[i + 2];
-        minX = x < minX ? x : minX;
-        minY = y < minY ? y : minY;
-        minZ = z < minZ ? z : minZ;
-
-        maxX = x > maxX ? x : maxX;
-        maxY = y > maxY ? y : maxY;
-        maxZ = z > maxZ ? z : maxZ;
-    }
+): BoundingBox3D {
+    const bbox = buidBoundingBox(dataArray);
     if (zIncreasingDownwards) {
-        [maxZ, minZ] = [-minZ, -maxZ];
+        // invert Z coordinates
+        bbox[2] = -bbox[2];
+        bbox[5] = -bbox[5];
     }
-    return [minX, minY, minZ, maxX, maxY, maxZ];
+    return bbox;
 }
+
+export type ReportBoundingBoxAction = { layerBoundingBox: BoundingBox3D };
 
 /**
  * Creates an array of colors as RGB triplets in range [0, 1] using the color map or color map function.

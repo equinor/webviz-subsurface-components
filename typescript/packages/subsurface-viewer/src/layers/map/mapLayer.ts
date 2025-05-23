@@ -1,27 +1,30 @@
 import { isEqual } from "lodash";
 import type React from "react";
+
 import type {
     Color,
     CompositeLayerProps,
     Layer,
+    Material,
     UpdateParameters,
 } from "@deck.gl/core";
 import { CompositeLayer } from "@deck.gl/core";
-import * as png from "@vivaxy/png";
 import type { Matrix4 } from "math.gl";
-import workerpool from "workerpool";
-import type { ReportBoundingBoxAction } from "../../components/Map";
+import * as png from "@vivaxy/png";
+
 import type {
+    ReportBoundingBoxAction,
     ExtendedLayerProps,
     ColorMapFunctionType,
 } from "../utils/layerTools";
-import type { Material } from "@deck.gl/core";
-import PrivateMapLayer from "./privateMapLayer";
 import { getModelMatrix } from "../utils/layerTools";
-import { rotate } from "./utils";
-import { makeFullMesh } from "./webworker";
 import config from "../../SubsurfaceConfig.json";
 import { findConfig } from "../../utils/configTools";
+import PrivateMapLayer from "./privateMapLayer";
+import { rotate } from "./utils";
+import { makeFullMesh } from "./webworker";
+
+import workerpool from "workerpool";
 
 // init workerpool
 const workerPoolConfig = findConfig(
@@ -365,10 +368,34 @@ export default class MapLayer<
                         const rotRad = (rotDeg * (2.0 * Math.PI)) / 360.0;
 
                         // Rotate x,y around "center" "rad" radians
-                        const [x0, y0] = rotate(xMin, yMin, center[0], center[1], rotRad); // eslint-disable-line
-                        const [x1, y1] = rotate(xMax, yMin, center[0], center[1], rotRad); // eslint-disable-line
-                        const [x2, y2] = rotate(xMax, yMax, center[0], center[1], rotRad); // eslint-disable-line
-                        const [x3, y3] = rotate(xMin, yMax, center[0], center[1], rotRad); // eslint-disable-line
+                        const [x0, y0] = rotate(
+                            xMin,
+                            yMin,
+                            center[0],
+                            center[1],
+                            rotRad
+                        ); // eslint-disable-line
+                        const [x1, y1] = rotate(
+                            xMax,
+                            yMin,
+                            center[0],
+                            center[1],
+                            rotRad
+                        ); // eslint-disable-line
+                        const [x2, y2] = rotate(
+                            xMax,
+                            yMax,
+                            center[0],
+                            center[1],
+                            rotRad
+                        ); // eslint-disable-line
+                        const [x3, y3] = rotate(
+                            xMin,
+                            yMax,
+                            center[0],
+                            center[1],
+                            rotRad
+                        ); // eslint-disable-line
 
                         // Rotated bounds in x/y plane.
                         const x_min = Math.min(x0, x1, x2, x3);

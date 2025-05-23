@@ -18,7 +18,8 @@ import type { ShaderModule } from "@luma.gl/shadertools";
 
 import { vec4 } from "gl-matrix";
 
-import type { ExtendedLayerProps, Position3D } from "../utils/layerTools";
+import type { Point3D } from "../../utils";
+import type { ExtendedLayerProps } from "../utils/layerTools";
 import fontAtlasPng from "./font-atlas.png";
 import labelFragmentShader from "./label.fs.glsl";
 import labelVertexShader from "./label.vs.glsl";
@@ -39,7 +40,7 @@ enum ALIGNMENT_BASELINE {
 
 type LabelData = {
     label: string;
-    pos: Position3D; // tick line start
+    pos: Point3D; // tick line start
     anchor?: TEXT_ANCHOR;
     alignment?: ALIGNMENT_BASELINE;
     //font_size: number; KEEP.
@@ -498,7 +499,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                 to[2] - from[2],
             ];
             const s = 0.5;
-            const pos: Position3D = [
+            const pos: Point3D = [
                 to[0] + s * tick_vec[0],
                 to[1] + s * tick_vec[1],
                 to[2] + s * tick_vec[2],
@@ -933,8 +934,8 @@ Axes2DLayer.defaultProps = defaultProps;
 // }
 
 function LineLengthInPixels(
-    p0: Position3D,
-    p1: Position3D,
+    p0: Point3D,
+    p1: Point3D,
     viewport: Viewport
 ): number {
     const screen_from = viewport.project(p0);

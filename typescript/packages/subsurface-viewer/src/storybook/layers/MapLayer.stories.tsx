@@ -7,12 +7,9 @@ import { ClipExtension } from "@deck.gl/extensions";
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import InfoCard from "../../components/InfoCard";
-import type {
-    BoundingBox2D,
-    BoundingBox3D,
-    ViewsType,
-} from "../../components/Map";
+import type { ViewsType } from "../../components/Map";
 import { useHoverInfo } from "../../components/Map";
+import type { BoundingBox2D, BoundingBox3D } from "../../utils";
 
 import { ViewFooter } from "../../components/ViewFooter";
 import AxesLayer from "../../layers/axes/axesLayer";
@@ -764,23 +761,23 @@ const ExtensionsComponent: React.FC<
     SubsurfaceViewerProps & { clipX: number }
 > = (args) => {
     const rightClipBounds = [
-        // @ts-expect-error TS7053
+        // @ts-expect-error TS6133
         args.bounds?.[0] + args.clipX,
-        // @ts-expect-error TS7053
+        // @ts-expect-error TS6133
         args.bounds?.[1],
-        // @ts-expect-error TS7053
+        // @ts-expect-error TS6133
         args.bounds?.[2],
-        // @ts-expect-error TS7053
+        // @ts-expect-error TS6133
         args.bounds?.[3],
     ];
     const leftClipBounds = [
-        // @ts-expect-error TS7053
+        // @ts-expect-error TS6133
         args.bounds?.[0],
-        // @ts-expect-error TS7053
+        // @ts-expect-error TS6133
         args.bounds?.[1],
-        // @ts-expect-error TS7053
+        // @ts-expect-error TS6133
         args.bounds?.[0] + args.clipX,
-        // @ts-expect-error TS7053
+        // @ts-expect-error TS6133
         args.bounds?.[3],
     ];
 

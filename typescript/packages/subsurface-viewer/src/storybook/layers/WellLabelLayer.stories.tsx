@@ -1,9 +1,12 @@
-import type { Color } from "@deck.gl/core";
-import type { Meta, StoryObj } from "@storybook/react";
 import { all, create } from "mathjs";
+
 import React from "react";
+import type { Meta, StoryObj } from "@storybook/react";
+
+import type { Color } from "@deck.gl/core";
+
+import type { Point3D } from "../../utils";
 import { AxesLayer, WellsLayer } from "../../layers";
-import type { Position3D } from "../../layers/utils/layerTools";
 import type { WellLabelLayerProps } from "../../layers/wells/layers/wellLabelLayer";
 import {
     LabelOrientation,
@@ -114,7 +117,7 @@ const getRandomColor = (): Color => {
 
 const createSyntheticWell = (
     index: number,
-    headPosition: Position3D,
+    headPosition: Point3D,
     sampleCount = 20,
     segmentLength = 150,
     dipDeviationMagnitude = 10
@@ -187,12 +190,12 @@ const createSyntheticWell = (
 /**
  * Create random well heads
  */
-const createSyntheticWellHeads = (count = 100): Position3D[] => {
-    const wellHeads: Position3D[] = [];
+const createSyntheticWellHeads = (count = 100): Point3D[] => {
+    const wellHeads: Point3D[] = [];
     for (let i = 0; i < count; i++) {
         const dx = randomFunc() * 10000 - 2000;
         const dy = randomFunc() * 8000 - 2000;
-        const headPosition: Position3D = [456000 + dx, 6785000 + dy, 0];
+        const headPosition: Point3D = [456000 + dx, 6785000 + dy, 0];
         wellHeads.push(headPosition);
     }
     return wellHeads;
@@ -214,10 +217,7 @@ const createSyntheticWellCollection = (
         dipDeviationMagnitude: 20,
     }
 ): WellFeatureCollection => {
-    const wellHeads = SYNTHETIC_WELL_HEADS.slice(
-        0,
-        wellHeadCount
-    ) as Position3D[];
+    const wellHeads = SYNTHETIC_WELL_HEADS.slice(0, wellHeadCount) as Point3D[];
 
     const wells: WellFeature[] = [];
 

@@ -1,3 +1,5 @@
+import _ from "lodash";
+
 import type {
     AccessorContext,
     Color,
@@ -8,9 +10,10 @@ import type {
 import { createIterable } from "@deck.gl/core";
 import type { TextLayerProps } from "@deck.gl/layers";
 import { TextLayer } from "@deck.gl/layers";
+
 import createKdTree from "static-kdtree";
-import type { Position3D } from "../../utils/layerTools";
-import _ from "lodash";
+
+import type { Point3D } from "../../../utils";
 
 export type MergedTextLayerProps<DataT = unknown> = TextLayerProps<DataT> & {
     /**
@@ -173,7 +176,7 @@ export class MergedTextLayer<
             return;
         }
 
-        const positionTree = createKdTree<3>(positions as Position3D[]);
+        const positionTree = createKdTree<3>(positions as Point3D[]);
         const clusters = new Map<Position, string[]>();
 
         for (const position of positions) {
@@ -184,7 +187,7 @@ export class MergedTextLayer<
             };
 
             positionTree.rnn(
-                position as Position3D,
+                position as Point3D,
                 this.props.mergeRadius ?? 10,
                 visitor
             );

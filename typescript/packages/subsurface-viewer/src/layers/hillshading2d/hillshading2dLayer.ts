@@ -1,12 +1,16 @@
-import { project32, type LayerProps, type PickingInfo } from "@deck.gl/core";
-import { BitmapLayer } from "@deck.gl/layers";
-import { getModelMatrix } from "../utils/layerTools";
 import type { Texture } from "@luma.gl/core";
+import { project32, type LayerProps, type PickingInfo } from "@deck.gl/core";
 import type { BitmapLayerPickingInfo, BitmapLayerProps } from "@deck.gl/layers";
+import { BitmapLayer } from "@deck.gl/layers";
+
 import type { Model } from "@luma.gl/engine";
 import type { ShaderModule } from "@luma.gl/shadertools";
-import type { ReportBoundingBoxAction } from "../../components/Map";
-import type { LayerPickInfo } from "../../layers/utils/layerTools";
+
+import type {
+    LayerPickInfo,
+    ReportBoundingBoxAction,
+} from "../utils/layerTools";
+import { getModelMatrix } from "../utils/layerTools";
 import type { ValueDecoder } from "../utils/propertyMapTools";
 import { decodeRGB } from "../utils/propertyMapTools";
 import fsHillshading from "./hillshading2d.fs.glsl";
