@@ -4,6 +4,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { userEvent } from "@storybook/test";
 import React from "react";
 
+import { GeoJsonLayer } from "@deck.gl/layers";
 import { SimpleMeshLayer } from "@deck.gl/mesh-layers";
 import { SphereGeometry } from "@luma.gl/engine";
 
@@ -13,14 +14,10 @@ import { styled } from "@mui/material/styles";
 
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
-import type {
-    BoundingBox3D,
-    Point3D,
-    ViewStateType,
-} from "../../components/Map";
+import type { ViewStateType } from "../../components/Map";
+import type { BoundingBox3D, Point3D } from "../../utils";
 import { Axes2DLayer, AxesLayer } from "../../layers";
 
-import { GeoJsonLayer } from "@deck.gl/layers";
 import {
     customLayerWithPolygonDataProps,
     default2DViews,
