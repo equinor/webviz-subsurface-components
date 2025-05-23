@@ -112,9 +112,11 @@ export function replaceNonJsonArgs(
         if (layer && layer.id !== undefined) {
             const layerNonJsonProps = nonJsonLayerProps[layer.id as string];
             if (layerNonJsonProps && layer) {
-                if (layer["@@typedArraySupport"] !== true) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                if ((layer as any)["@@typedArraySupport"] !== true) {
                     console.error(
-                        `Storybook story handles ${layer["@@type"] ?? "layer"} "${layer.id}" as using non-json properties; the layer is missing "@@typedArraySupport" set to true.`
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        `Storybook story handles ${(layer as any)["@@type"] ?? "layer"} "${layer.id}" as using non-json properties; the layer is missing "@@typedArraySupport" set to true.`
                     );
                 }
                 lodash.mergeWith(layer, layerNonJsonProps, customizer);
@@ -124,7 +126,8 @@ export function replaceNonJsonArgs(
     return args;
 }
 
-function customizer(objValue, srcValue) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function customizer(objValue: any, srcValue: any): any {
     if (lodash.isUndefined(objValue) || lodash.isNull(srcValue)) {
         return objValue;
     }
