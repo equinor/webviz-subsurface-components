@@ -13,6 +13,7 @@ import {
     defaultStoryParameters,
     northArrowLayer,
 } from "../sharedSettings";
+import { replaceNonJsonArgs } from "../sharedHelperFunctions";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -191,14 +192,24 @@ export const TwoSideLighting: StoryObj<typeof SubsurfaceViewer> = {
     },
 };
 
+// ---------In-place array data handling (storybook fails to rebuild non JSon data)--------------- //
+const typedDataSurfaceLayerId = "typedData_surface_layer";
+
+const nonJsonLayerArgs = {
+    [typedDataSurfaceLayerId]: {
+        pointsData: new Float32Array(SurfacePoints.default),
+        triangleData: new Uint32Array(SurfaceTriangles.default),
+    },
+};
+
 const typedDataSurfaceLayer = {
     "@@type": "TriangleLayer",
     id: "typedData_surface_layer",
     "@@typedArraySupport": true,
 
     /*eslint-disable */
-    pointsData: new Float32Array(SurfacePoints.default),
-    triangleData: new Uint32Array(SurfaceTriangles.default),
+    pointsData: nonJsonLayerArgs[typedDataSurfaceLayerId].pointsData,
+    triangleData: nonJsonLayerArgs[typedDataSurfaceLayerId].triangleData,
 
     color: [100, 100, 255], // Surface color.
     gridLines: true, // If true will draw lines around triangles.
@@ -228,6 +239,9 @@ export const TypedArrayInput: StoryObj<typeof SubsurfaceViewer> = {
             },
         },
     },
+    render: (args) => (
+        <SubsurfaceViewer {...replaceNonJsonArgs(args, nonJsonLayerArgs)} />
+    ),
 };
 
 const math = create(all, { randomSeed: "12345" });
