@@ -273,7 +273,7 @@ const ColorMapLayerComponent: React.FC<{
             {
                 "@@type": "ColormapLayer",
                 image: "propertyMap.png",
-                propertiesUrl: "propertyMap.png",
+                heightMapUrl: "propertyMap.png",
                 rotDeg: args.rotDeg,
                 bounds: [432205, 6475078, 437720, 6481113],
 

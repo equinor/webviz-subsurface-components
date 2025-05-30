@@ -8,7 +8,8 @@ in vec2 vTexCoord;
 out vec4 fragColor;
 
 uniform sampler2D bitmapTexture; // Property map
-uniform sampler2D colormap;
+uniform sampler2D colormapTexture;
+uniform sampler2D heightMapTexture; // Height map texture, if defined.
 
 // Compute the normal value for every pixel, based on the current value and two values aroud it.
 vec3 normal(float val) {
@@ -17,8 +18,17 @@ vec3 normal(float val) {
   float valueRangeSize = map.valueRangeMax - map.valueRangeMin;
   float p0 = valueRangeSize * val;
 
-  float px = valueRangeSize * decode_rgb2float(texture(bitmapTexture, vTexCoord + vec2(1.0, 0.0) / map.bitmapResolution).rgb);
-  float py = valueRangeSize * decode_rgb2float(texture(bitmapTexture, vTexCoord + vec2(0.0, 1.0) / map.bitmapResolution).rgb);
+  float px = valueRangeSize;
+  float py = valueRangeSize;
+  if (map.isHeightMapTextureDefined) {
+    px *= decode_rgb2float(texture(heightMapTexture, vTexCoord + vec2(1.0, 0.0) / map.bitmapResolution).rgb);
+    py *= decode_rgb2float(texture(heightMapTexture, vTexCoord + vec2(0.0, 1.0) / map.bitmapResolution).rgb);
+  }
+  else {
+    px *= decode_rgb2float(texture(bitmapTexture, vTexCoord + vec2(1.0, 0.0) / map.bitmapResolution).rgb);
+    py *= decode_rgb2float(texture(bitmapTexture, vTexCoord + vec2(0.0, 1.0) / map.bitmapResolution).rgb);
+  }
+
   vec3 dx = vec3(1.0, 0.0, px - p0);
   vec3 dy = vec3(0.0, 1.0, py - p0);
 
@@ -64,11 +74,11 @@ void main(void) {
          x = max(0.0, x);
          x = min(1.0, x);
 
-         color = texture(colormap, vec2(x, 0.5));
+         color = texture(colormapTexture, vec2(x, 0.5));
       }
    }
    else {
-      color = texture(colormap, vec2(x, 0.5));
+      color = texture(colormapTexture, vec2(x, 0.5));
    }
    fragColor = vec4(color.rgb, color.a * bitmapColor.a * layer.opacity);
 
@@ -83,6 +93,16 @@ void main(void) {
 
   // Contour lines.
   if (map.contours) {
+      vec4 texture_val; 
+      if (map.isHeightMapTextureDefined) {
+        texture_val = texture(heightMapTexture, vTexCoord);
+      }
+      else {
+        texture_val = texture(bitmapTexture, vTexCoord);
+      }
+      float val =  decode_rgb2float(texture_val.rgb);
+      float property = val * (map.valueRangeMax - map.valueRangeMin) + map.valueRangeMin;
+
       float x = (property - map.contourReferencePoint) / map.contourInterval;  
       float f  = fract(x);
       float df = fwidth(x);

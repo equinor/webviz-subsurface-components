@@ -1,7 +1,7 @@
-import type { LayerProps, PickingInfo } from "@deck.gl/core";
-import { project32 } from "@deck.gl/core";
 import type { BitmapLayerPickingInfo, BitmapLayerProps } from "@deck.gl/layers";
 import { BitmapLayer } from "@deck.gl/layers";
+import type { colorTablesArray } from "@emerson-eps/color-tables/";
+import { getRgbData } from "@emerson-eps/color-tables";
 import type { Color, LayerProps, PickingInfo } from "@deck.gl/core";
 import { project32 } from "@deck.gl/core";
 import type {
@@ -18,6 +18,7 @@ import type { ContinuousLegendDataType } from "../../components/ColorLegend";
 import type { ShaderModule } from "@luma.gl/shadertools";
 import type { Model } from "@luma.gl/engine";
 import type { Texture } from "@luma.gl/core";
+import * as png from "@vivaxy/png";
 
 function getImageData(
     colorMapName: string,
@@ -108,6 +109,10 @@ export interface ColormapLayerProps
      */
     colorMapClampColor: Color | undefined | boolean;
 
+    // If set will calculate contour lines and hillshading based on this map instead.
+    // Default undefined.
+    heightMapUrl: string;
+
     // Non public properties:
     reportBoundingBox?: React.Dispatch<ReportBoundingBoxAction>;
 }
@@ -133,9 +138,69 @@ const defaultProps = {
     hillshading: false,
     contourReferencePoint: 0,
     contourInterval: 50, // 50 meter by default
+
+    propertiesUrl: "",
 };
 
 export default class ColormapLayer extends BitmapLayer<ColormapLayerProps> {
+    initializeState(): void {
+        super.initializeState();
+
+        const createPropertyTexture = async () => {
+            const response = await fetch(this.props.heightMapUrl);
+            if (!response.ok) {
+                console.error("Could not load ", this.props.heightMapUrl);
+            } else {
+                const blob = await response.blob();
+                const contentType = response.headers.get("content-type");
+                const isPng = contentType === "image/png";
+                if (isPng) {
+                    const heightMapTexture = await new Promise((resolve) => {
+                        const fileReader = new FileReader();
+                        fileReader.readAsArrayBuffer(blob);
+                        fileReader.onload = () => {
+                            const arrayBuffer = fileReader.result;
+                            const imgData = png.decode(
+                                arrayBuffer as ArrayBuffer
+                            );
+                            const w = imgData.width;
+                            const h = imgData.height;
+
+                            const data = imgData.data; // array of int's
+                            const n = data.length;
+                            const buffer = new ArrayBuffer(n);
+                            const view = new DataView(buffer);
+                            for (let i = 0; i < n; i++) {
+                                view.setUint8(i, data[i]);
+                            }
+
+                            const array = new Uint8Array(buffer);
+                            const propertyTexture =
+                                this.context.device.createTexture({
+                                    sampler: {
+                                        addressModeU: "clamp-to-edge",
+                                        addressModeV: "clamp-to-edge",
+                                        minFilter: "linear",
+                                        magFilter: "linear",
+                                    },
+                                    width: w,
+                                    height: h,
+                                    format: "rgba8unorm",
+                                    data: array as Uint8Array,
+                                });
+                            resolve(propertyTexture);
+                        };
+                    });
+                    this.setState({
+                        ...this.state,
+                        heightMapTexture,
+                    });
+                }
+            }
+        };
+        createPropertyTexture();
+    }
+
     setShaderModuleProps(
         ...props: Parameters<Model["shaderInputs"]["setProps"]>
     ): void {
@@ -181,7 +246,7 @@ export default class ColormapLayer extends BitmapLayer<ColormapLayerProps> {
         const colorMapRangeMin = this.props.colorMapRange?.[0] ?? valueRangeMin;
         const colorMapRangeMax = this.props.colorMapRange?.[1] ?? valueRangeMax;
 
-        const colormap = this.context.device.createTexture({
+        const colormapTexture = this.context.device.createTexture({
             width: 256,
             height: 1,
             format: "rgb8unorm-webgl",
@@ -192,7 +257,29 @@ export default class ColormapLayer extends BitmapLayer<ColormapLayerProps> {
             ),
         });
 
-        this.state.model?.setBindings({ colormap });
+        // eslint-disable-next-line
+        // @ts-ignore
+        let heightMapTexture = this.state.heightMapTexture;
+        const isHeightMapTextureDefined =
+            typeof heightMapTexture !== "undefined";
+
+        if (!isHeightMapTextureDefined) {
+            // Create a dummy texture
+            heightMapTexture = this.context.device.createTexture({
+                sampler: {
+                    addressModeU: "clamp-to-edge",
+                    addressModeV: "clamp-to-edge",
+                    minFilter: "linear",
+                    magFilter: "linear",
+                },
+                width: 1,
+                height: 1,
+                format: "rgba8unorm",
+                data: new Uint8Array([1, 1, 1, 1]),
+            });
+        }
+
+        this.state.model?.setBindings({ colormapTexture, heightMapTexture });
 
         const bitmapResolution = this.props.image
             ? [
@@ -236,6 +323,7 @@ export default class ColormapLayer extends BitmapLayer<ColormapLayerProps> {
                 isClampColor,
                 colorMapClampColor,
                 isColorMapClampColorTransparent,
+                isHeightMapTextureDefined,
                 rgbScaler: this.props.valueDecoder.rgbScaler,
                 floatScaler: this.props.valueDecoder.floatScaler,
                 offset: this.props.valueDecoder.offset,
@@ -320,6 +408,7 @@ uniform mapUniforms {
     bool isClampColor;
     vec3 colorMapClampColor;
     bool isColorMapClampColorTransparent;
+    bool isHeightMapTextureDefined;
     vec3 rgbScaler;    // r, g and b multipliers
     float floatScaler; // value multiplier
     float offset;      // translation of the r, g, b sum
@@ -352,6 +441,7 @@ type Map2DUniformsType = {
     isClampColor: boolean;
     colorMapClampColor: [number, number, number];
     isColorMapClampColorTransparent: boolean;
+    isHeightMapTextureDefined: boolean;
     rgbScaler: [number, number, number];
     floatScaler: number;
     offset: number;
@@ -376,6 +466,7 @@ const map2DUniforms = {
         isClampColor: "u32",
         colorMapClampColor: "vec3<f32>",
         isColorMapClampColorTransparent: "u32",
+        isHeightMapTextureDefined: "u32",
         rgbScaler: "vec3<f32>",
         floatScaler: "f32",
         offset: "f32",
