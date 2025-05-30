@@ -255,6 +255,82 @@ export const MapLayer2d: StoryObj<typeof SubsurfaceViewer> = {
     },
 };
 
+const ColorMapLayerComponent: React.FC<{
+    triggerHome: number;
+    contours: boolean;
+    hillshading: boolean;
+    contourReferencePoint: number;
+    contourInterval: number;
+    colorMapRange: number;
+    useClampColor: boolean;
+    rotDeg: number;
+}> = (args) => {
+    const delta = (3513 - 2782) * (1 - args.colorMapRange / 100);
+
+    const subsurfaceViewerArgs = {
+        id: "colormap",
+        layers: [
+            {
+                "@@type": "ColormapLayer",
+                image: "propertyMap.png",
+                propertiesUrl: "propertyMap.png",
+                rotDeg: args.rotDeg,
+                bounds: [432205, 6475078, 437720, 6481113],
+
+                colorMapName: "Rainbow",
+                valueRange: [2782, 3513],
+                colorMapRange: [2782 + delta, 3513],
+                colorMapClampColor: args.useClampColor
+                    ? [55, 55, 55]
+                    : undefined,
+
+                contours: args.contours,
+                hillshading: args.hillshading,
+
+                contourReferencePoint: args.contourReferencePoint,
+                contourInterval: args.contourInterval,
+            },
+            axesLayer2D,
+        ],
+
+        views: default2DViews,
+        triggerHome: args.triggerHome,
+    };
+    return <SubsurfaceViewer {...subsurfaceViewerArgs} />;
+};
+
+export const ColorMapLayer: StoryObj<typeof ColorMapLayerComponent> = {
+    args: {
+        hillshading: false,
+        contours: false,
+        contourReferencePoint: 2782,
+        contourInterval: 50,
+        colorMapRange: 100,
+        useClampColor: false,
+        rotDeg: 0,
+    },
+    argTypes: {
+        contourInterval: {
+            control: { type: "range", min: 20, max: 100, step: 1 },
+        },
+        colorMapRange: {
+            control: { type: "range", min: 0, max: 100, step: 1 },
+        },
+        rotDeg: {
+            control: { type: "range", min: -90, max: 90, step: 1 },
+        },
+    },
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: "ColorMapLayer example.",
+            },
+        },
+    },
+    render: (args) => <ColorMapLayerComponent {...args} />,
+};
+
 const white = [255, 255, 255, 255];
 
 export const MapLayer2dDarkMode: StoryObj<typeof SubsurfaceViewer> = {
