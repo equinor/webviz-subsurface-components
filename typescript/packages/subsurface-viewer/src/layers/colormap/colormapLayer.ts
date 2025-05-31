@@ -419,8 +419,8 @@ uniform mapUniforms {
     vec3 colorMapClampColor;
     bool isColorMapClampColorTransparent;
     bool isHeightMapTextureDefined;
-    float heightValueRangeMin,
-    float heightValueRangeMax,
+    float heightValueRangeMin;
+    float heightValueRangeMax;
     vec3 rgbScaler;    // r, g and b multipliers
     float floatScaler; // value multiplier
     float offset;      // translation of the r, g, b sum
