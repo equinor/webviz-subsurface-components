@@ -101,7 +101,7 @@ void main(void) {
         texture_val = texture(bitmapTexture, vTexCoord);
       }
       float val =  decode_rgb2float(texture_val.rgb);
-      float property = val * (map.valueRangeMax - map.valueRangeMin) + map.valueRangeMin;
+      float property = val * (map.heightValueRangeMax - map.heightValueRangeMin) + map.heightValueRangeMin;
 
       float x = (property - map.contourReferencePoint) / map.contourInterval;  
       float f  = fract(x);

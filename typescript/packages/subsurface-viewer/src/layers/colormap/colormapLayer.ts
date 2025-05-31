@@ -109,9 +109,12 @@ export interface ColormapLayerProps
      */
     colorMapClampColor: Color | undefined | boolean;
 
-    // If set will calculate contour lines and hillshading based on this map instead.
-    // Default undefined.
+    // Optional height map. If set hillshading and contourlines will be based on this map.
     heightMapUrl: string;
+
+    // Min and max values of optional height map.
+    // Defaults to "valueRange".
+    heightValueRange: [number, number];
 
     // Non public properties:
     reportBoundingBox?: React.Dispatch<ReportBoundingBoxAction>;
@@ -279,6 +282,11 @@ export default class ColormapLayer extends BitmapLayer<ColormapLayerProps> {
             });
         }
 
+        const heightValueRangeMin =
+            this.props.heightValueRange?.[0] ?? valueRangeMin;
+        const heightValueRangeMax =
+            this.props.heightValueRange?.[1] ?? valueRangeMax;
+
         this.state.model?.setBindings({ colormapTexture, heightMapTexture });
 
         const bitmapResolution = this.props.image
@@ -324,6 +332,8 @@ export default class ColormapLayer extends BitmapLayer<ColormapLayerProps> {
                 colorMapClampColor,
                 isColorMapClampColorTransparent,
                 isHeightMapTextureDefined,
+                heightValueRangeMin,
+                heightValueRangeMax,
                 rgbScaler: this.props.valueDecoder.rgbScaler,
                 floatScaler: this.props.valueDecoder.floatScaler,
                 offset: this.props.valueDecoder.offset,
@@ -409,6 +419,8 @@ uniform mapUniforms {
     vec3 colorMapClampColor;
     bool isColorMapClampColorTransparent;
     bool isHeightMapTextureDefined;
+    float heightValueRangeMin,
+    float heightValueRangeMax,
     vec3 rgbScaler;    // r, g and b multipliers
     float floatScaler; // value multiplier
     float offset;      // translation of the r, g, b sum
@@ -442,6 +454,8 @@ type Map2DUniformsType = {
     colorMapClampColor: [number, number, number];
     isColorMapClampColorTransparent: boolean;
     isHeightMapTextureDefined: boolean;
+    heightValueRangeMin: number;
+    heightValueRangeMax: number;
     rgbScaler: [number, number, number];
     floatScaler: number;
     offset: number;
@@ -467,6 +481,8 @@ const map2DUniforms = {
         colorMapClampColor: "vec3<f32>",
         isColorMapClampColorTransparent: "u32",
         isHeightMapTextureDefined: "u32",
+        heightValueRangeMin: "f32",
+        heightValueRangeMax: "f32",
         rgbScaler: "vec3<f32>",
         floatScaler: "f32",
         offset: "f32",
