@@ -39,6 +39,7 @@
           437720,
           6481113
         ],
+        "hillshading": true,
         "colorMapName": "Rainbow",
         "valueRange": [
           2782,
@@ -48,21 +49,6 @@
           2782,
           3513
         ]
-      },
-      {
-        "@@type": "Hillshading2DLayer",
-        "bounds": [
-          432205,
-          6475078,
-          437720,
-          6481113
-        ],
-        "valueRange": [
-          2782,
-          3513
-        ],
-        "rotDeg": 0,
-        "image": "@@#resources.depthMap"
       },
       {
         "@@type": "WellsLayer",
