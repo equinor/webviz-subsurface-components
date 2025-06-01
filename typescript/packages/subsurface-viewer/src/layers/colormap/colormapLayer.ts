@@ -141,8 +141,7 @@ const defaultProps = {
     hillshading: false,
     contourReferencePoint: 0,
     contourInterval: 50, // 50 meter by default
-
-    propertiesUrl: "",
+    heightMapUrl: "",
 };
 
 export default class ColormapLayer extends BitmapLayer<ColormapLayerProps> {

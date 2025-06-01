@@ -55,6 +55,39 @@ export const KhMapFlat: StoryObj<typeof SubsurfaceViewer> = {
     },
 };
 
+// Volve kh netmap using only ColorMapLAyer
+export const KhMapFlatOnlyColorMapLayer: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "kh-map-flat",
+        resources: {
+            propertyMap: "./volve_property_normalized.png",
+            depthMap: "./volve_hugin_depth_normalized.png",
+        },
+        bounds: volveWellsBounds,
+        layers: [
+            {
+                "@@type": "ColormapLayer",
+                id: "property_map",
+                valueRange: [-3071, 41048],
+                bounds: volveWellsBounds,
+                image: "@@#resources.propertyMap",
+                hillshading: true,
+                contours: true,
+                heightMapUrl: "@@#resources.depthMap",
+                heightValueRange: [2725, 3397],
+            },
+        ],
+    },
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: "An example showing a kh property layer and a depth map hillshading layer using only ColorMapLayer.",
+            },
+        },
+    },
+};
+
 const axesLayer2D = {
     "@@type": "Axes2DLayer",
     id: "axesLayer2D",
