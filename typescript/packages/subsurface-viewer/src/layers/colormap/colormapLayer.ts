@@ -1,14 +1,9 @@
-import type { LayerProps, PickingInfo } from "@deck.gl/core";
-import { project32 } from "@deck.gl/core";
 import type { BitmapLayerPickingInfo, BitmapLayerProps } from "@deck.gl/layers";
 import { BitmapLayer } from "@deck.gl/layers";
-
-import type { ShaderModule } from "@luma.gl/shadertools";
-import type { Model } from "@luma.gl/engine";
-
 import type { colorTablesArray } from "@emerson-eps/color-tables/";
 import { getRgbData } from "@emerson-eps/color-tables";
-
+import type { Color, LayerProps, PickingInfo } from "@deck.gl/core";
+import { project32 } from "@deck.gl/core";
 import type {
     ColorMapFunctionType,
     LayerPickInfo,
@@ -20,6 +15,10 @@ import { decodeRGB, type ValueDecoder } from "../utils/propertyMapTools";
 import fsColormap from "./colormap.fs.glsl";
 import type { DeckGLLayerContext } from "../../components/Map";
 import type { ContinuousLegendDataType } from "../../components/ColorLegend";
+import type { ShaderModule } from "@luma.gl/shadertools";
+import type { Model } from "@luma.gl/engine";
+import type { Texture } from "@luma.gl/core";
+import * as png from "@vivaxy/png";
 
 function getImageData(
     colorMapName: string,
@@ -27,9 +26,7 @@ function getImageData(
     colorMapFunction?: ColorMapFunctionType
 ) {
     const isColorMapFunctionDefined = typeof colorMapFunction !== "undefined";
-
     const data = new Uint8Array(256 * 3);
-
     for (let i = 0; i < 256; i++) {
         const value = i / 255.0;
         const rgb = isColorMapFunctionDefined
@@ -93,6 +90,32 @@ export interface ColormapLayerProps
     // Rotates image around bounds upper left corner counterclockwise in degrees.
     rotDeg: number;
 
+    // If true, draw contour lines.  Default false.
+    contours: boolean;
+
+    // If true, apply hillshading. Default false.
+    hillshading: boolean;
+
+    // Contour reference height. Default 0.
+    contourReferencePoint: number;
+
+    // Height between contour lines. Default 50.
+    contourInterval: number;
+
+    /**  Clamp colormap to this color at ends.
+     * Given as array of three values (r,g,b) e.g: [255, 0, 0]
+     * If not set or set to true, it will clamp to color map min and max values.
+     * If set to false the clamp color will be completely transparent.
+     */
+    colorMapClampColor: Color | undefined | boolean;
+
+    // Optional height map. If set hillshading and contourlines will be based on this map.
+    heightMapUrl: string;
+
+    // Min and max values of optional height map.
+    // Defaults to "valueRange".
+    heightValueRange: [number, number];
+
     // Non public properties:
     reportBoundingBox?: React.Dispatch<ReportBoundingBoxAction>;
 }
@@ -114,11 +137,70 @@ const defaultProps = {
     },
     rotDeg: 0,
     colorMapName: "Rainbow",
+    contours: false,
+    hillshading: false,
+    contourReferencePoint: 0,
+    contourInterval: 50, // 50 meter by default
+    heightMapUrl: "",
 };
 
 export default class ColormapLayer extends BitmapLayer<ColormapLayerProps> {
     initializeState(): void {
         super.initializeState();
+
+        const createPropertyTexture = async () => {
+            const response = await fetch(this.props.heightMapUrl);
+            if (!response.ok) {
+                console.error("Could not load ", this.props.heightMapUrl);
+            } else {
+                const blob = await response.blob();
+                const contentType = response.headers.get("content-type");
+                const isPng = contentType === "image/png";
+                if (isPng) {
+                    const heightMapTexture = await new Promise((resolve) => {
+                        const fileReader = new FileReader();
+                        fileReader.readAsArrayBuffer(blob);
+                        fileReader.onload = () => {
+                            const arrayBuffer = fileReader.result;
+                            const imgData = png.decode(
+                                arrayBuffer as ArrayBuffer
+                            );
+                            const w = imgData.width;
+                            const h = imgData.height;
+
+                            const data = imgData.data; // array of int's
+                            const n = data.length;
+                            const buffer = new ArrayBuffer(n);
+                            const view = new DataView(buffer);
+                            for (let i = 0; i < n; i++) {
+                                view.setUint8(i, data[i]);
+                            }
+
+                            const array = new Uint8Array(buffer);
+                            const propertyTexture =
+                                this.context.device.createTexture({
+                                    sampler: {
+                                        addressModeU: "clamp-to-edge",
+                                        addressModeV: "clamp-to-edge",
+                                        minFilter: "linear",
+                                        magFilter: "linear",
+                                    },
+                                    width: w,
+                                    height: h,
+                                    format: "rgba8unorm",
+                                    data: array as Uint8Array,
+                                });
+                            resolve(propertyTexture);
+                        };
+                    });
+                    this.setState({
+                        ...this.state,
+                        heightMapTexture,
+                    });
+                }
+            }
+        };
+        createPropertyTexture();
     }
 
     setShaderModuleProps(
@@ -161,12 +243,12 @@ export default class ColormapLayer extends BitmapLayer<ColormapLayerProps> {
         const valueRangeMin = this.props.valueRange[0] ?? 0.0;
         const valueRangeMax = this.props.valueRange[1] ?? 1.0;
 
-        // If specified color map will extend from colorMapRangeMin to colorMapRangeMax.
+        // If specified, color map will extend from colorMapRangeMin to colorMapRangeMax.
         // Otherwise it will extend from valueRangeMin to valueRangeMax.
         const colorMapRangeMin = this.props.colorMapRange?.[0] ?? valueRangeMin;
         const colorMapRangeMax = this.props.colorMapRange?.[1] ?? valueRangeMax;
 
-        const colormap = this.context.device.createTexture({
+        const colormapTexture = this.context.device.createTexture({
             width: 256,
             height: 1,
             format: "rgb8unorm-webgl",
@@ -177,7 +259,62 @@ export default class ColormapLayer extends BitmapLayer<ColormapLayerProps> {
             ),
         });
 
-        this.state.model?.setBindings({ colormap });
+        // eslint-disable-next-line
+        // @ts-ignore
+        let heightMapTexture = this.state.heightMapTexture;
+        const isHeightMapTextureDefined =
+            typeof heightMapTexture !== "undefined";
+
+        if (!isHeightMapTextureDefined) {
+            // Create a dummy texture
+            heightMapTexture = this.context.device.createTexture({
+                sampler: {
+                    addressModeU: "clamp-to-edge",
+                    addressModeV: "clamp-to-edge",
+                    minFilter: "linear",
+                    magFilter: "linear",
+                },
+                width: 1,
+                height: 1,
+                format: "rgba8unorm",
+                data: new Uint8Array([1, 1, 1, 1]),
+            });
+        }
+
+        const heightValueRangeMin =
+            this.props.heightValueRange?.[0] ?? valueRangeMin;
+        const heightValueRangeMax =
+            this.props.heightValueRange?.[1] ?? valueRangeMax;
+
+        this.state.model?.setBindings({ colormapTexture, heightMapTexture });
+
+        const bitmapResolution = this.props.image
+            ? [
+                  (this.props.image as Texture).width,
+                  (this.props.image as Texture).height,
+              ]
+            : [1, 1];
+
+        const contours = this.props.contours;
+        const hillshading = this.props.hillshading;
+
+        const contourReferencePoint = this.props.contourReferencePoint;
+        const contourInterval = this.props.contourInterval;
+
+        const isClampColor: boolean =
+            this.props.colorMapClampColor !== undefined &&
+            this.props.colorMapClampColor !== true &&
+            this.props.colorMapClampColor !== false;
+        let colorMapClampColor = isClampColor
+            ? this.props.colorMapClampColor
+            : [0, 0, 0];
+
+        colorMapClampColor = (colorMapClampColor as Color).map(
+            (x) => (x ?? 0) / 255
+        );
+
+        const isColorMapClampColorTransparent: boolean =
+            (this.props.colorMapClampColor as boolean) === false;
 
         super.setShaderModuleProps({
             map: {
@@ -185,7 +322,17 @@ export default class ColormapLayer extends BitmapLayer<ColormapLayerProps> {
                 valueRangeMax,
                 colorMapRangeMin,
                 colorMapRangeMax,
-
+                contours,
+                hillshading,
+                bitmapResolution,
+                contourReferencePoint,
+                contourInterval,
+                isClampColor,
+                colorMapClampColor,
+                isColorMapClampColorTransparent,
+                isHeightMapTextureDefined,
+                heightValueRangeMin,
+                heightValueRangeMax,
                 rgbScaler: this.props.valueDecoder.rgbScaler,
                 floatScaler: this.props.valueDecoder.floatScaler,
                 offset: this.props.valueDecoder.offset,
@@ -219,6 +366,10 @@ export default class ColormapLayer extends BitmapLayer<ColormapLayerProps> {
         // The picked color is the one in raw image, not the one after colormapping.
         // We just need to decode that RGB color into a property float value.
         const val = decodeRGB(info.color, mergedDecoder, this.props.valueRange);
+
+        if (info.coordinate) {
+            info.coordinate[2] = NaN; // disable z value in 2D map;
+        }
 
         return {
             ...info,
@@ -258,7 +409,17 @@ uniform mapUniforms {
     float valueRangeMax;
     float colorMapRangeMin;
     float colorMapRangeMax;
-
+    vec2 bitmapResolution;
+    bool contours;
+    bool hillshading;
+    float contourReferencePoint;
+    float contourInterval;
+    bool isClampColor;
+    vec3 colorMapClampColor;
+    bool isColorMapClampColorTransparent;
+    bool isHeightMapTextureDefined;
+    float heightValueRangeMin;
+    float heightValueRangeMax;
     vec3 rgbScaler;    // r, g and b multipliers
     float floatScaler; // value multiplier
     float offset;      // translation of the r, g, b sum
@@ -274,13 +435,7 @@ float decode_rgb2float(vec3 rgb) {
     value = floor(value / map.step + 0.5) * map.step;
   }
 
-  // If colorMapRangeMin/Max specified, color map will span this interval.
-  float x  = value * (map.valueRangeMax - map.valueRangeMin) + map.valueRangeMin;
-  x = (x - map.colorMapRangeMin) / (map.colorMapRangeMax - map.colorMapRangeMin);
-  x = max(0.0, x);
-  x = min(1.0, x);
-
-  return x;
+  return value;
 }
 `;
 
@@ -289,7 +444,17 @@ type Map2DUniformsType = {
     valueRangeMax: number;
     colorMapRangeMin: number;
     colorMapRangeMax: number;
-
+    bitmapResolution: [number, number];
+    contours: boolean;
+    hillshading: boolean;
+    contourReferencePoint: number;
+    contourInterval: number;
+    isClampColor: boolean;
+    colorMapClampColor: [number, number, number];
+    isColorMapClampColorTransparent: boolean;
+    isHeightMapTextureDefined: boolean;
+    heightValueRangeMin: number;
+    heightValueRangeMax: number;
     rgbScaler: [number, number, number];
     floatScaler: number;
     offset: number;
@@ -306,7 +471,17 @@ const map2DUniforms = {
         valueRangeMax: "f32",
         colorMapRangeMin: "f32",
         colorMapRangeMax: "f32",
-
+        bitmapResolution: "vec2<f32>",
+        contours: "u32",
+        hillshading: "u32",
+        contourReferencePoint: "f32",
+        contourInterval: "f32",
+        isClampColor: "u32",
+        colorMapClampColor: "vec3<f32>",
+        isColorMapClampColorTransparent: "u32",
+        isHeightMapTextureDefined: "u32",
+        heightValueRangeMin: "f32",
+        heightValueRangeMax: "f32",
         rgbScaler: "vec3<f32>",
         floatScaler: "f32",
         offset: "f32",
