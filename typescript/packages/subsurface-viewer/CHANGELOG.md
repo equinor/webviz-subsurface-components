@@ -1,3 +1,13 @@
+## 1.11.7 (2025-06-04)
+
+### 🩹 Fixes
+
+- "SubsurfaceViewer: colorAbove/colorBelow/colorNaN possibly not working? #2479" ([#2569](https://github.com/equinor/webviz-subsurface-components/pull/2569), [#2479](https://github.com/equinor/webviz-subsurface-components/issues/2479))
+
+### ❤️ Thank You
+
+- nilscb
+
 ## 1.11.6 (2025-05-23)
 
 ### 🩹 Fixes
