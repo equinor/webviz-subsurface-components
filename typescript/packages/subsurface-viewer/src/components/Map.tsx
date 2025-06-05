@@ -567,7 +567,9 @@ const Map: React.FC<MapProps> = ({
 
     const getPickingInfos = useCallback(
         (
-            pickInfo: PickingInfo,
+            pickInfo: PickingInfo & {
+                scaledCoordinate?: Point2D | Point3D | undefined;
+            },
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             event: any
         ): (PickingInfo & {
@@ -618,6 +620,13 @@ const Map: React.FC<MapProps> = ({
                 });
                 return pickInfos;
             }
+            // Z value should not take into account the Z scale factor.
+            pickInfo.scaledCoordinate = pickInfo.coordinate
+                ? ([...pickInfo.coordinate] as Point2D | Point3D)
+                : undefined;
+            viewController.unscaledTarget(
+                pickInfo.coordinate as Point2D | Point3D
+            );
             return [pickInfo];
         },
         [coords?.multiPicking, coords?.pickDepth, viewController]
