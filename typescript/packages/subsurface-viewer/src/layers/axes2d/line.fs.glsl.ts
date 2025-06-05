@@ -7,6 +7,6 @@ precision highp float;
 out vec4 fragColor;
 
 void main(void) {
-  fragColor = lines.uColor;
+  fragColor = vec4(lines.uColor.rgb, lines.uColor.a * layer.opacity);
 }
 `;

@@ -14,6 +14,6 @@ void main(void) {
     return;
   }
 
-  fragColor = vec4(0.0, 0.0, 0.0, 1.0);
+  fragColor = vec4(0.0, 0.0, 0.0, layer.opacity);
 }
 `;

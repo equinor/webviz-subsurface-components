@@ -7,7 +7,7 @@ precision highp float;
 out vec4 fragColor;
 
 void main(void) {
-  fragColor = vec4(0.0, 0.0, 0.0, 1.0);
+  fragColor = vec4(0.0, 0.0, 0.0, layer.opacity);
   DECKGL_FILTER_COLOR(fragColor, geometry);
 }
 `;

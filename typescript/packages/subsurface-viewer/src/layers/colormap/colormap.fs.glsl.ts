@@ -104,7 +104,7 @@ void main(void) {
       float f  = fract(x);
       float df = fwidth(x);
       float c = smoothstep(df * 1.0, df * 2.0, f); // smootstep from/to no of pixels distance from contour line.  // keep: 
-      fragColor = fragColor * vec4(c, c, c, 1.0);
+      fragColor = fragColor * vec4(c, c, c, layer.opacity);
   }
 
   geometry.uv = vTexCoord;

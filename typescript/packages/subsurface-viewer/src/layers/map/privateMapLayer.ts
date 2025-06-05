@@ -203,8 +203,11 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
         // MESH LINES
         const mesh_lines_model = new Model(device, {
             id: `${this.props.id}-lines`,
-            vs: vsLineShader,
-            fs: fsLineShader,
+            ...super.getShaders({
+                vs: vsLineShader,
+                fs: fsLineShader,
+                modules: [project32, picking, mapUniforms],
+            }),
             geometry: new Geometry({
                 topology: "line-list",
                 attributes: {
@@ -213,7 +216,6 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
                 indices: { value: this.props.lineIndices, size: 1 },
             }),
             bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
-            modules: [project32, picking, mapUniforms],
             isInstanced: false,
         });
         mesh_lines_model.shaderInputs.setProps({
