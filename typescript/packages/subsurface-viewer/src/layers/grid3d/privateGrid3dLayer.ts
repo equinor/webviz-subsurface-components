@@ -159,8 +159,20 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
         const colormap = this.getColormapTexture(context);
         const mesh_model = new Model(context.device, {
             id: `${this.props.id}-mesh`,
-            vs: geometricShading ? linearVertexShader : flatVertexShader,
-            fs: geometricShading ? linearFragmentShader : flatFragmentShader,
+            ...super.getShaders({
+                vs: geometricShading ? linearVertexShader : flatVertexShader,
+                fs: geometricShading
+                    ? linearFragmentShader
+                    : flatFragmentShader,
+                modules: [
+                    project32,
+                    picking,
+                    lighting,
+                    phongMaterial,
+                    utilities,
+                    gridUniforms,
+                ],
+            }),
             geometry: new Geometry({
                 topology: this.props.mesh.drawMode ?? "triangle-list",
                 attributes: {
@@ -178,14 +190,6 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             bindings: {
                 colormap,
             },
-            modules: [
-                project32,
-                picking,
-                lighting,
-                phongMaterial,
-                utilities,
-                gridUniforms,
-            ],
             isInstanced: false,
         });
         mesh_model.shaderInputs.setProps({
@@ -209,7 +213,7 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             },
         });
 
-        return [mesh_model, mesh_lines_model, gridUniforms];
+        return [mesh_model, mesh_lines_model];
     }
 
     draw(args: {
