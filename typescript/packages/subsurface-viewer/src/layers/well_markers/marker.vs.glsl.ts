@@ -39,7 +39,7 @@ void main(void) {
    vec4 position_commonspace = vec4(project_position(rotatedPos + position), 0.0);
    gl_Position = project_common_position_to_clipspace(position_commonspace);
 
-   vec4 dummyColor = vec4(0.0);
+   vec4 dummyColor = vec4(0.0, 0.0, 0.0, layer.opacity);
 
    DECKGL_FILTER_GL_POSITION(gl_Position, geometry);
    DECKGL_FILTER_COLOR(dummyColor, geometry);

@@ -43,7 +43,7 @@ void main(void) {
 
    DECKGL_FILTER_GL_POSITION(gl_Position, geometry);
 
-   vec4 color = vec4(0.0);
+   vec4 color = vec4(0.0, 0.0, 0.0, layer.opacity);
    DECKGL_FILTER_COLOR(color, geometry);
 }
 `;

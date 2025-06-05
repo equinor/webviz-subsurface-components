@@ -200,11 +200,13 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
 
         const mesh_lines_model = new Model(context.device, {
             id: `${this.props.id}-lines`,
-            vs: vsLineShader,
-            fs: fsLineShader,
+            ...super.getShaders({
+                vs: vsLineShader,
+                fs: fsLineShader,
+                modules: [project32, picking, gridUniforms],
+            }),
             geometry: new Geometry(this.props.meshLines),
             bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
-            modules: [project32, picking, gridUniforms],
             isInstanced: false,
         });
         mesh_lines_model.shaderInputs.setProps({
