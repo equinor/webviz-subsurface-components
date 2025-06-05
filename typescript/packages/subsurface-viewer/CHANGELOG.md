@@ -1,3 +1,13 @@
+## 1.11.8 (2025-06-05)
+
+### 🩹 Fixes
+
+- event handling has undefined behavior when double clicking on viewer background ([#2571](https://github.com/equinor/webviz-subsurface-components/pull/2571), [#2570](https://github.com/equinor/webviz-subsurface-components/issues/2570))
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
 ## 1.11.7 (2025-06-04)
 
 ### 🩹 Fixes
