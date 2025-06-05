@@ -697,8 +697,6 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                 },
                 vertexCount: tick_and_axes_lines.length / 3,
             }),
-
-            modules: [project32, linesUniforms],
             isInstanced: false,
         });
         lineModel.shaderInputs.setProps({

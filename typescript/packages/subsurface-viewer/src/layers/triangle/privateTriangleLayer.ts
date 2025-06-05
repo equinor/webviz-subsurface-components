@@ -134,11 +134,13 @@ export default class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProp
 
         const lineModel = new Model(device, {
             id: `${this.props.id}-lines`,
-            vs: vsLineShader,
-            fs: fsLineShader,
+            ...super.getShaders({
+                vs: vsLineShader,
+                fs: fsLineShader,
+                modules: [project32, picking, triangleMeshUniforms],
+            }),
             bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
             geometry: new Geometry(this.props.geometryLines),
-            modules: [project32, picking, triangleMeshUniforms],
             isInstanced: false,
         });
 

@@ -36,7 +36,7 @@ void main(void) {
 
    // Use two sided phong lighting. This has no effect if "material" property is not set.
    vec3 lightColor = lighting_getLightColor(color.rgb, cameraPosition, position_commonspace.xyz, normal);
-   fragColor = vec4(lightColor, 1.0);
+   fragColor = vec4(lightColor, layer.opacity);
    DECKGL_FILTER_COLOR(fragColor, geometry);
 }
 `;

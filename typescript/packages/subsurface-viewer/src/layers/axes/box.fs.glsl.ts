@@ -8,6 +8,6 @@ out vec4 fragColor;
 uniform vec4 uColor;
 
 void main(void) {
-  fragColor = uColor;
+  fragColor = vec4(uColor.rgb, uColor.a * layer.opacity);
 }
 `;
