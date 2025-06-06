@@ -76,7 +76,7 @@ void main(void) {
 
    if (isnan(property)) {
       vec3 lightColor = lighting_getLightColor(grid.undefinedPropertyColor.rgb, cameraPosition, position_commonspace.xyz, normal);
-      fragColor = vec4(lightColor, layer.opacity);
+      fragColor = vec4(lightColor, vColor.a);
       DECKGL_FILTER_COLOR(fragColor, geometry);
       return;
    }
