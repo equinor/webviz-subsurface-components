@@ -1,6 +1,5 @@
-import React from "react";
-
 import type { Meta, StoryObj } from "@storybook/react";
+import React from "react";
 
 import SubsurfaceViewer, { TGrid3DColoringMode } from "../../SubsurfaceViewer";
 
@@ -52,6 +51,7 @@ const grid3dLayer = {
     colorMapName: "Rainbow",
     ZIncreasingDownwards: true,
     pickable: true,
+    opacity: 1.0,
 };
 
 const axes = {

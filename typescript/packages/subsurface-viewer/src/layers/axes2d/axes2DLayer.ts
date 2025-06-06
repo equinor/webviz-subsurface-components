@@ -685,8 +685,11 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
 
         const lineModel = new Model(device, {
             id: `${this.props.id}-lines`,
-            vs: lineVertexShader,
-            fs: lineFragmentShader,
+            ...super.getShaders({
+                vs: lineVertexShader,
+                fs: lineFragmentShader,
+                modules: [project32, linesUniforms],
+            }),
             geometry: new Geometry({
                 topology: "line-list",
                 attributes: {
@@ -694,8 +697,6 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                 },
                 vertexCount: tick_and_axes_lines.length / 3,
             }),
-
-            modules: [project32, linesUniforms],
             isInstanced: false,
         });
         lineModel.shaderInputs.setProps({
@@ -718,8 +719,11 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
 
         const backgroundModel = new Model(device, {
             id: `${this.props.id}-background`,
-            vs: lineVertexShader,
-            fs: lineFragmentShader,
+            ...super.getShaders({
+                vs: lineVertexShader,
+                fs: lineFragmentShader,
+                modules: [project32, linesUniforms],
+            }),
             geometry: new Geometry({
                 topology: "triangle-list",
                 attributes: {
@@ -728,7 +732,6 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                 vertexCount: background_lines.length / 3,
             }),
 
-            modules: [project32, linesUniforms],
             isInstanced: false,
         });
         backgroundModel.shaderInputs.setProps({
@@ -868,8 +871,11 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
 
             const model = new Model(device, {
                 id: `${this.props.id}-${label}`,
-                vs: labelVertexShader,
-                fs: labelFragmentShader,
+                ...super.getShaders({
+                    vs: labelVertexShader,
+                    fs: labelFragmentShader,
+                    modules: [project32, axesUniforms],
+                }),
                 bindings: {
                     // @ts-ignore
                     fontTexture,
@@ -886,7 +892,6 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                     vertexCount: positions.length / 3,
                 }),
                 bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
-                modules: [project32, axesUniforms],
                 isInstanced: false,
             });
             model.shaderInputs.setProps({

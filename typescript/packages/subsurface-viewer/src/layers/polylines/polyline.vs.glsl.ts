@@ -164,7 +164,7 @@ void clipLine(inout vec4 position, vec4 refPosition) {
 void main() {
   geometry.pickingColor = instancePickingColors;
 
-  vColor = vec4(instanceColors.rgb, instanceColors.a * polylines.opacity);
+  vColor = vec4(instanceColors.rgb, instanceColors.a * polylines.opacity * layer.opacity);
   vec3 leftPosition  = instanceLeftPositions;
   vec3 startPosition = instanceStartPositions;
   vec3 leftPos64Low  = instanceLeftPositions64Low;

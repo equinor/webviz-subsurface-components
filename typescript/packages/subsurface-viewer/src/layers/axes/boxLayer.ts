@@ -39,8 +39,11 @@ export default class BoxLayer extends Layer<BoxLayerProps> {
         const color = this.props.color.map((x) => (x ?? 0) / 255);
         const grids = new Model(device, {
             id: `${this.props.id}-grids`,
-            vs: vertexShader,
-            fs: fragmentShader,
+            ...super.getShaders({
+                vs: vertexShader,
+                fs: fragmentShader,
+                modules: [project32],
+            }),
             uniforms: { uColor: Array.from(color) },
             geometry: new Geometry({
                 topology: "line-list",
@@ -49,7 +52,6 @@ export default class BoxLayer extends Layer<BoxLayerProps> {
                 },
                 vertexCount: this.props.lines.length / 3,
             }),
-            modules: [project32],
             isInstanced: false, // This only works when set to false.
         });
 

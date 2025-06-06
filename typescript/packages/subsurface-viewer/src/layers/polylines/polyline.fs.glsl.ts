@@ -51,7 +51,7 @@ void main(void) {
       discard;
     }
   }
-  fragColor = vColor;
+  fragColor = vec4(vColor.rgb, vColor.a * layer.opacity);
 
   DECKGL_FILTER_COLOR(fragColor, geometry);
 }

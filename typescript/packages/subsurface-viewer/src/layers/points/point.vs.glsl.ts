@@ -88,9 +88,9 @@ void main(void) {
   }
 
   // Apply opacity to instance color, or return instance picking color
-  vFillColor = vec4(instanceFillColors.rgb, instanceFillColors.a * points.opacity);
+  vFillColor = vec4(instanceFillColors.rgb, instanceFillColors.a * points.opacity * layer.opacity);
   DECKGL_FILTER_COLOR(vFillColor, geometry);
-  vLineColor = vec4(instanceLineColors.rgb, instanceLineColors.a * points.opacity);
+  vLineColor = vec4(instanceLineColors.rgb, instanceLineColors.a * points.opacity * layer.opacity);
   DECKGL_FILTER_COLOR(vLineColor, geometry);
 }
 `;

@@ -33,7 +33,7 @@ void main(void) {
  
      b = float(idx);
  
-     fragColor = vec4(r / 255.0, g / 255.0, b / 255.0,  1.0);
+     fragColor = vec4(r / 255.0, g / 255.0, b / 255.0,  layer.opacity);
      return;
   }
 
