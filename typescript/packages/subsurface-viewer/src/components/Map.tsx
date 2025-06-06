@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from "react";
 
 import type { Feature, FeatureCollection } from "geojson";
 import { cloneDeep, isEmpty, isEqual } from "lodash";
@@ -148,12 +154,43 @@ function parseLights(lights?: LightsType): LightingEffect[] | undefined {
     return effects;
 }
 
+type BoundingBoxMap = Record<string, BoundingBox3D>;
+
+enum BoundingBoxActionType {
+    UPDATE = "update",
+    REMOVE = "remove",
+}
+
+type BoundingBoxAction =
+    | ({
+          type: BoundingBoxActionType.UPDATE;
+          layerId: string;
+      } & ReportBoundingBoxAction)
+    | {
+          type: BoundingBoxActionType.REMOVE;
+          layerIds: string[];
+      };
+
 function mapBoundingBoxReducer(
-    mapBoundingBox: BoundingBox3D | undefined,
-    action: ReportBoundingBoxAction
-): BoundingBox3D | undefined {
-    const union = boxUnion(mapBoundingBox, action.layerBoundingBox);
-    return isEqual(union, mapBoundingBox) ? mapBoundingBox : union;
+    state: BoundingBoxMap,
+    action: BoundingBoxAction
+): BoundingBoxMap {
+    if (action.type === BoundingBoxActionType.UPDATE) {
+        const { layerId, layerBoundingBox } = action;
+        const current = state[layerId];
+        if (isEqual(current, layerBoundingBox)) return state;
+        return {
+            ...state,
+            [layerId]: layerBoundingBox,
+        };
+    } else if (action.type === BoundingBoxActionType.REMOVE) {
+        const newState = { ...state };
+        for (const id of action.layerIds) {
+            delete newState[id];
+        }
+        return newState;
+    }
+    return state;
 }
 
 export type TooltipCallback = (
@@ -478,11 +515,20 @@ const Map: React.FC<MapProps> = ({
         }
     }, []);
 
-    // 3d bounding box computed from the layers
-    const [dataBoundingBox3d, dispatchBoundingBox] = React.useReducer(
+    // 3d bounding boxes stored by layer.
+    const [boundingBoxesByLayer, dispatchBoundingBox] = React.useReducer(
         mapBoundingBoxReducer,
-        undefined
+        {}
     );
+
+    // 3d bounding box computed from the layers
+    const dataBoundingBox3d = useMemo(() => {
+        const allBoxes = Object.values(boundingBoxesByLayer);
+        return allBoxes.reduce(
+            (acc, box) => boxUnion(acc, box),
+            undefined as BoundingBox3D | undefined
+        );
+    }, [boundingBoxesByLayer]);
 
     // Get vertical scaling factor defined in viewports.
     const viewportVerticalScale = useVerticalScale(views?.viewports);
@@ -716,13 +762,44 @@ const Map: React.FC<MapProps> = ({
                 // Inject "dispatchBoundingBox" function into layer for it to report back its respective bounding box.
                 // eslint-disable-next-line
                 // @ts-ignore
-                reportBoundingBox: dispatchBoundingBox,
+                reportBoundingBox: (action) => {
+                    dispatchBoundingBox({
+                        type: BoundingBoxActionType.UPDATE,
+                        layerId: (item as Layer).id,
+                        layerBoundingBox: action.layerBoundingBox,
+                    });
+                },
 
                 // Modify "modelMatrix" to reflect correct z scaling.
                 modelMatrix: m,
             });
         });
     }, [layers, zScale]);
+
+    const removeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    useEffect(() => {
+        if (!layers) return;
+
+        if (removeTimeoutRef.current) {
+            clearTimeout(removeTimeoutRef.current);
+        }
+
+        removeTimeoutRef.current = setTimeout(() => {
+            const currentIds = new Set(layers?.map((l) => (l as Layer).id));
+            const existingIds = new Set(Object.keys(boundingBoxesByLayer));
+
+            const removedIds = [...existingIds].filter(
+                (id) => !currentIds.has(id)
+            );
+            if (removedIds.length > 0) {
+                dispatchBoundingBox({
+                    type: BoundingBoxActionType.REMOVE,
+                    layerIds: removedIds,
+                });
+            }
+        }, 200);
+    }, [layers, boundingBoxesByLayer]);
 
     const [loadingProgress, setLoadingProgress] = useState<number>(0);
     const onAfterRender = useCallback(() => {
