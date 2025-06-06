@@ -9,6 +9,7 @@ in vec3 normals;
 out vec3 cameraPosition;
 out vec4 position_commonspace;
 out float property;
+out vec4 vColor;
 
 flat out vec3 normal;
 flat out int vertexIndex;
@@ -49,7 +50,11 @@ void main(void) {
 
    DECKGL_FILTER_GL_POSITION(gl_Position, geometry);
 
-   vec4 color = vec4(0.0, 0.0, 0.0, layer.opacity);
-   DECKGL_FILTER_COLOR(color, geometry);
+   // This may happen due to GPU interpolation precision causing color artifacts.
+   float propertyValue = clamp(property, grid.valueRangeMin, grid.valueRangeMax);
+
+   vColor = getPropertyColor(propertyValue);
+   vColor = vec4(vColor.rgb, vColor.a * layer.opacity);
+   DECKGL_FILTER_COLOR(vColor, geometry);
 }
 `;

@@ -3,12 +3,11 @@ export default `#version 300 es
 
 precision highp float;
 
-in vec2 vTexCoord;
 in vec3 cameraPosition;
 in vec3 normals_commonspace;
 in vec4 position_commonspace;
 in vec3 worldPos;
-in float property;
+in vec4 vColor;
 
 out vec4 fragColor;
 
@@ -17,9 +16,10 @@ void main(void) {
 
    if (!triangles.smoothShading) {
       normal = normalize(cross(dFdx(position_commonspace.xyz), dFdy(position_commonspace.xyz)));
-   } 
+   }
 
-   vec4 color = triangles.uColor;
+   vec4 color = vColor;
+      
    bool is_contours = triangles.contourReferencePoint != -1.0 && triangles.contourInterval != -1.0;
    if (is_contours) {
       // Contours are made of either depths or properties.
@@ -36,7 +36,7 @@ void main(void) {
 
    // Use two sided phong lighting. This has no effect if "material" property is not set.
    vec3 lightColor = lighting_getLightColor(color.rgb, cameraPosition, position_commonspace.xyz, normal);
-   fragColor = vec4(lightColor, layer.opacity);
+   fragColor = vec4(lightColor, vColor.a);
    DECKGL_FILTER_COLOR(fragColor, geometry);
 }
 `;

@@ -4,6 +4,8 @@ export default `\
 
 precision highp float;
 
+in vec4 vColor;
+
 out vec4 fragColor;
 
 void main(void) {
@@ -14,6 +16,7 @@ void main(void) {
     return;
   }
 
-  fragColor = vec4(0.0, 0.0, 0.0, layer.opacity);
+  fragColor = vColor;
+  DECKGL_FILTER_COLOR(fragColor, geometry);
 }
 `;

@@ -17,7 +17,7 @@ out vec3 normals_commonspace;
 out vec4 position_commonspace;
 out vec4 vColor;
 out vec3 worldPos;
-out float property;
+out float propertyValue;
 flat out int vertexIndex;
 
 void main(void) {
@@ -36,14 +36,18 @@ void main(void) {
 
    vColor = vec4(colors.rgb, 1.0);
 
-   property = properties;
-
    position_commonspace = vec4(project_position(position), 0.0);
    gl_Position = project_common_position_to_clipspace(position_commonspace);
 
    DECKGL_FILTER_GL_POSITION(gl_Position, geometry);
 
-   vec4 color = vec4(0.0, 0.0, 0.0, layer.opacity);
-   DECKGL_FILTER_COLOR(color, geometry);
+   vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
+   float propertyValue = properties;
+
+   // This may happen due to GPU interpolation precision causing color artifacts.
+   propertyValue = clamp(propertyValue, map.valueRangeMin, map.valueRangeMax);
+
+   vColor = vec4(color.rgb, color.a * layer.opacity);
+   DECKGL_FILTER_COLOR(vColor, geometry);
 }
 `;

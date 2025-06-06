@@ -9,6 +9,7 @@ in float properties;
 // Outputs to fragment shader
 out vec3 cameraPosition;
 out vec4 position_commonspace;
+out vec4 vColor;
 
 flat out vec3 normal;
 flat out int vertexIndex;
@@ -37,7 +38,7 @@ void main(void) {
 
    DECKGL_FILTER_GL_POSITION(gl_Position, geometry);
 
-   vec4 color = vec4(0.0, 0.0, 0.0, layer.opacity);
-   DECKGL_FILTER_COLOR(color, geometry);
+   vColor = vec4(1.0, 1.0, 1.0, layer.opacity);
+   DECKGL_FILTER_COLOR(vColor, geometry);
 }
 `;

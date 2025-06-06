@@ -28,6 +28,6 @@ void main(void) {
   float g = x * text_g + (1.0 - x) * bg_g;
   float b = x * text_b + (1.0 - x) * bg_b;
 
-  fragColor = vec4(r, g, b, layer.opacity);
+  fragColor = vec4(r, g, b, 1.0);
 }
 `;
