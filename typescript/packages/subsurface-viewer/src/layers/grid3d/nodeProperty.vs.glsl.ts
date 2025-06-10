@@ -50,7 +50,7 @@ void main(void) {
 
    DECKGL_FILTER_GL_POSITION(gl_Position, geometry);
 
-   vColor = vec4(1.0, 1.0, 1.0, layer.opacity);
+   vColor = vec4(0.0, 0.0, 0.0, layer.opacity);
    DECKGL_FILTER_COLOR(vColor, geometry);
 }
 `;

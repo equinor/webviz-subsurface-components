@@ -8,14 +8,12 @@ in vec3 cameraPosition;
 in vec3 normals_commonspace;
 in vec4 position_commonspace;
 in vec4 vColor;
-in float propertyValue;
+in vec3 worldPos;
+in float property;
+flat in int vertexIndex;
 
 // Uniforms
 uniform sampler2D colormap;
-
-flat in int vertexIndex;
-
-in vec3 worldPos;
 
 out vec4 fragColor;
 
@@ -35,7 +33,11 @@ void main(void) {
       return;
    }
 
-   vec4 color = vColor;
+   vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
+   float propertyValue = property;
+
+   // This may happen due to GPU interpolation precision causing color artifacts.
+   propertyValue = clamp(propertyValue, map.valueRangeMin, map.valueRangeMax);
 
    float x = (propertyValue - map.colorMapRangeMin) / (map.colorMapRangeMax - map.colorMapRangeMin);
    if (x < 0.0 || x > 1.0) {
