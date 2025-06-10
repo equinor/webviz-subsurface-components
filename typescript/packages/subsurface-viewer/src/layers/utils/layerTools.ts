@@ -1,7 +1,7 @@
 import { Matrix4 } from "math.gl";
 
 import type { PickingInfo } from "@deck.gl/core";
-import type { Color } from "@deck.gl/core";
+import type { Color, LayerContext } from "@deck.gl/core";
 import type {
     Layer,
     LayersList,
@@ -9,12 +9,7 @@ import type {
     CompositeLayerProps,
 } from "@deck.gl/core";
 
-import type {
-    colorTablesArray,
-    createColorMapFunction,
-} from "@emerson-eps/color-tables/";
-import { rgbValues } from "@emerson-eps/color-tables/";
-import { createDefaultContinuousColorScale } from "@emerson-eps/color-tables/dist/component/Utils/legendCommonFunction";
+import type { colorTablesArray } from "@emerson-eps/color-tables/";
 
 import type {
     ContinuousLegendDataType,
@@ -25,11 +20,6 @@ import type DrawingLayer from "../drawing/drawingLayer";
 import type { BoundingBox3D } from "../../utils";
 import { computeBoundingBox as buidBoundingBox } from "../../utils/BoundingBox3D";
 
-/** Type of functions returning a color from a value in the [0,1] range. */
-export type ColorMapFunctionType = ReturnType<typeof createColorMapFunction>;
-/** @deprecated Use ColorMapFunctionType instead. */
-export type colorMapFunctionType = ColorMapFunctionType;
-
 export interface TypeAndNameLayerProps {
     "@@type"?: string;
     name: string;
@@ -39,8 +29,15 @@ export interface ExtendedLayerProps
     extends CompositeLayerProps,
         TypeAndNameLayerProps {}
 
-export interface ExtendedLayer extends Layer {
+export interface ExtendedLegendLayer extends Layer {
     getLegendData?: () => DiscreteLegendDataType | ContinuousLegendDataType;
+}
+
+export interface DeckGLLayerContext extends LayerContext {
+    userData: {
+        setEditedData: (data: Record<string, unknown>) => void;
+        colorTables: colorTablesArray;
+    };
 }
 
 export interface PropertyDataType {
@@ -195,57 +192,3 @@ export function computeBoundingBox(
 }
 
 export type ReportBoundingBoxAction = { layerBoundingBox: BoundingBox3D };
-
-/**
- * Creates an array of colors as RGB triplets in range [0, 1] using the color map or color map function.
- * ColorMapFunction has priority.
- * @param colorMapName Name of the color map in color tables.
- * @param colorTables Color tables.
- * @param colorMapFunction Either a function which returns a color
- * or an array representing a constant color.
- * @param colormapSize Number of colors in the color map.
- * @param discreteColormapFunction If true, the color map function is targeting indices ranging from 0 to colormapSize.
- * @returns Array of colors.
- */
-export function getImageData(
-    colorMapName: string,
-    colorTables: colorTablesArray,
-    colorMapFunction: ColorMapFunctionType | undefined,
-    colormapSize: number = 256,
-    discreteColormapFunction: boolean = false
-): Uint8Array {
-    type funcType = (x: number) => Color;
-
-    const isColorMapFunctionDefined = typeof colorMapFunction !== "undefined";
-    const isColorMapNameDefined = !!colorMapName;
-
-    const defaultColorMap = createDefaultContinuousColorScale;
-    let colorMap = defaultColorMap() as unknown as funcType;
-
-    if (isColorMapFunctionDefined) {
-        colorMap =
-            typeof colorMapFunction === "function"
-                ? (colorMapFunction as funcType)
-                : ((() => colorMapFunction) as unknown as funcType);
-    } else if (isColorMapNameDefined) {
-        discreteColormapFunction = false;
-        colorMap = (value: number) =>
-            rgbValues(value, colorMapName, colorTables);
-    }
-
-    const data = new Uint8Array(colormapSize * 3);
-
-    const scaling = discreteColormapFunction
-        ? 1
-        : 1 / Math.max(colormapSize - 1, 1);
-    for (let i = 0; i < colormapSize; i++) {
-        const color = colorMap ? colorMap(scaling * i) : [1, 0, 0];
-        if (color) {
-            data[3 * i + 0] = color[0];
-            data[3 * i + 1] = color[1];
-            data[3 * i + 2] = color[2];
-        }
-    }
-
-    return data ? data : new Uint8Array([0, 0, 0]);
-}

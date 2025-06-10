@@ -1,5 +1,5 @@
 import React from "react";
-import type { ExtendedLayer } from "../layers/utils/layerTools";
+import type { ExtendedLegendLayer } from "../layers/utils/layerTools";
 import ColorLegend from "./ColorLegend";
 import type { colorTablesArray } from "@emerson-eps/color-tables/";
 
@@ -7,7 +7,7 @@ interface ColorLegendsProps {
     // Pass additional css style to the parent color legend container
     cssStyle?: Record<string, unknown> | null;
     horizontal?: boolean | null;
-    layers: ExtendedLayer[];
+    layers: ExtendedLegendLayer[];
     colorTables: colorTablesArray | string | undefined;
     reverseRange?: boolean;
 }

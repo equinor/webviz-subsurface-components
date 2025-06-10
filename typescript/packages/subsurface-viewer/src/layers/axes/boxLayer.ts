@@ -4,8 +4,10 @@ import { COORDINATE_SYSTEM, Layer, project32 } from "@deck.gl/core";
 import type { Device } from "@luma.gl/core";
 import { Geometry, Model } from "@luma.gl/engine";
 
-import type { DeckGLLayerContext } from "../../components/Map";
-import type { ExtendedLayerProps } from "../utils/layerTools";
+import type {
+    DeckGLLayerContext,
+    ExtendedLayerProps,
+} from "../utils/layerTools";
 import fragmentShader from "./box.fs.glsl";
 import vertexShader from "./box.vs.glsl";
 

@@ -1,53 +1,26 @@
-import type { BitmapLayerPickingInfo, BitmapLayerProps } from "@deck.gl/layers";
-import { BitmapLayer } from "@deck.gl/layers";
-import type { colorTablesArray } from "@emerson-eps/color-tables/";
-import { getRgbData } from "@emerson-eps/color-tables";
 import type { Color, LayerProps, PickingInfo } from "@deck.gl/core";
 import { project32 } from "@deck.gl/core";
-import type {
-    ColorMapFunctionType,
-    LayerPickInfo,
-    ReportBoundingBoxAction,
-    TypeAndNameLayerProps,
-} from "../utils/layerTools";
-import { getModelMatrix } from "../utils/layerTools";
-import { decodeRGB, type ValueDecoder } from "../utils/propertyMapTools";
-import fsColormap from "./colormap.fs.glsl";
-import type { DeckGLLayerContext } from "../../components/Map";
-import type { ContinuousLegendDataType } from "../../components/ColorLegend";
+import type { BitmapLayerPickingInfo, BitmapLayerProps } from "@deck.gl/layers";
+import { BitmapLayer } from "@deck.gl/layers";
+
 import type { ShaderModule } from "@luma.gl/shadertools";
 import type { Model } from "@luma.gl/engine";
 import type { Texture } from "@luma.gl/core";
 import * as png from "@vivaxy/png";
 
-function getImageData(
-    colorMapName: string,
-    colorTables: colorTablesArray,
-    colorMapFunction?: ColorMapFunctionType
-) {
-    const isColorMapFunctionDefined = typeof colorMapFunction !== "undefined";
-    const data = new Uint8Array(256 * 3);
-    for (let i = 0; i < 256; i++) {
-        const value = i / 255.0;
-        const rgb = isColorMapFunctionDefined
-            ? (colorMapFunction as ColorMapFunctionType)(i / 255)
-            : getRgbData(value, colorMapName, colorTables);
-        let color: number[] = [];
-        if (rgb != undefined) {
-            if (Array.isArray(rgb)) {
-                color = rgb;
-            } else {
-                color = [rgb.r, rgb.g, rgb.b];
-            }
-        }
-
-        data[3 * i + 0] = color[0];
-        data[3 * i + 1] = color[1];
-        data[3 * i + 2] = color[2];
-    }
-
-    return data;
-}
+import type {
+    LayerPickInfo,
+    ReportBoundingBoxAction,
+    TypeAndNameLayerProps,
+} from "../utils/layerTools";
+import { type DeckGLLayerContext, getModelMatrix } from "../utils/layerTools";
+import {
+    type ColorMapFunctionType,
+    getImageData,
+} from "../utils/colormapTools";
+import { decodeRGB, type ValueDecoder } from "../utils/propertyMapTools";
+import type { ContinuousLegendDataType } from "../../components/ColorLegend";
+import fsColormap from "./colormap.fs.glsl";
 
 // Most props are inherited from DeckGL's BitmapLayer. For a full list, see
 // https://deck.gl/docs/api-reference/layers/bitmap-layer
@@ -253,9 +226,11 @@ export default class ColormapLayer extends BitmapLayer<ColormapLayerProps> {
             height: 1,
             format: "rgb8unorm-webgl",
             data: getImageData(
-                this.props.colorMapName,
-                (this.context as DeckGLLayerContext).userData.colorTables,
-                this.props.colorMapFunction
+                this.props.colorMapFunction ?? {
+                    colormapName: this.props.colorMapName,
+                    colorTables: (this.context as DeckGLLayerContext).userData
+                        .colorTables,
+                }
             ),
         });
 

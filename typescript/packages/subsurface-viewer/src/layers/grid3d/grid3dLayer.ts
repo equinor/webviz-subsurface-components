@@ -13,9 +13,9 @@ import { makeFullMesh } from "./webworker";
 
 import type {
     ExtendedLayerProps,
-    ColorMapFunctionType,
     ReportBoundingBoxAction,
 } from "../utils/layerTools";
+import type { ColorMapFunctionType } from "../utils/colormapTools";
 
 import config from "../../SubsurfaceConfig.json";
 import { findConfig } from "../../utils/configTools";

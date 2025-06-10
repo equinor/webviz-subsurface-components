@@ -6,31 +6,32 @@ import type {
     LayerProps,
 } from "@deck.gl/core";
 import { COORDINATE_SYSTEM, Layer, picking, project32 } from "@deck.gl/core";
-import type {
-    UniformValue,
-    SamplerProps,
-    Texture,
-    TextureProps,
-} from "@luma.gl/core";
+import type { UniformValue } from "@luma.gl/core";
+
 import { Geometry, Model } from "@luma.gl/engine";
-import type { DeckGLLayerContext } from "../../components/Map";
-import { utilities } from "../shader_modules";
+
+import type { ShaderModule } from "@luma.gl/shadertools";
 import { lighting } from "@luma.gl/shadertools";
+
+import { utilities } from "../shader_modules";
 import { phongMaterial } from "../shader_modules/phong-lighting/phong-material";
 import type {
+    DeckGLLayerContext,
     ExtendedLayerProps,
     LayerPickInfo,
     PropertyDataType,
-    ColorMapFunctionType,
 } from "../utils/layerTools";
-import { createPropertyData, getImageData } from "../utils/layerTools";
+import { createPropertyData } from "../utils/layerTools";
+import {
+    type ColorMapFunctionType,
+    createColormapTexture,
+} from "../utils/colormapTools";
 import linearFragmentShader from "./nodeProperty.fs.glsl";
 import linearVertexShader from "./nodeProperty.vs.glsl";
 import flatFragmentShader from "./cellProperty.fs.glsl";
 import flatVertexShader from "./cellProperty.vs.glsl";
 import fsLineShader from "./line.fs.glsl";
 import vsLineShader from "./line.vs.glsl";
-import type { ShaderModule } from "@luma.gl/shadertools";
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import {
@@ -41,20 +42,6 @@ import {
 } from "./grid3dLayer";
 
 import type { MeshType, MeshTypeLines } from "./typeDefs";
-
-const DEFAULT_TEXTURE_PARAMETERS: SamplerProps = {
-    addressModeU: "clamp-to-edge",
-    addressModeV: "clamp-to-edge",
-    minFilter: "linear",
-    magFilter: "linear",
-};
-
-const DISCRETE_TEXTURE_PARAMETERS: SamplerProps = {
-    minFilter: "nearest",
-    magFilter: "nearest",
-    addressModeU: "clamp-to-edge",
-    addressModeV: "clamp-to-edge",
-};
 
 export interface PrivateLayerProps extends ExtendedLayerProps {
     mesh: MeshType;
@@ -156,7 +143,15 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
     _getModels(context: DeckGLLayerContext) {
         const geometricShading = isGeometricProperty(this.props.coloringMode);
         const uniforms = this.getUniforms();
-        const colormap = this.getColormapTexture(context);
+        const colormap = createColormapTexture(
+            this.props.colorMapFunction ?? {
+                colormapName: this.props.colorMapName,
+                colorTables: (this.context as DeckGLLayerContext).userData
+                    .colorTables,
+            },
+            context,
+            this.getColoringHints()
+        );
         const mesh_model = new Model(context.device, {
             id: `${this.props.id}-mesh`,
             ...super.getShaders({
@@ -414,60 +409,6 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             isColoringDiscrete: coloringHints.discreteData,
             colorMapSize: coloringHints.colormapSize,
         };
-    }
-    private getColormapTexture(context: DeckGLLayerContext): Texture {
-        const textureProps: TextureProps = {
-            sampler: DEFAULT_TEXTURE_PARAMETERS,
-            width: 256,
-            height: 1,
-            format: "rgb8unorm-webgl",
-        };
-
-        const colormapHints = this.getColoringHints();
-        if (colormapHints.discreteData) {
-            if (colormapHints.colormapSize === 0) {
-                const colormap = context.device.createTexture({
-                    ...textureProps,
-                    sampler: DISCRETE_TEXTURE_PARAMETERS,
-                    width: colormapHints.colormapSize,
-                    data: new Uint8Array([0, 0, 0, 0, 0, 0]),
-                });
-                return colormap;
-            }
-
-            const colormapData =
-                this.props.colorMapFunction instanceof Uint8Array
-                    ? this.props.colorMapFunction
-                    : getImageData(
-                          this.props.colorMapName,
-                          (this.context as DeckGLLayerContext).userData
-                              .colorTables,
-                          this.props.colorMapFunction,
-                          colormapHints.colormapSize,
-                          colormapHints.discreteData
-                      );
-
-            const colormap = context.device.createTexture({
-                ...textureProps,
-                sampler: DISCRETE_TEXTURE_PARAMETERS,
-                width: colormapHints.colormapSize,
-                data: colormapData,
-            });
-
-            return colormap;
-        }
-
-        const data = getImageData(
-            this.props.colorMapName,
-            (this.context as DeckGLLayerContext).userData.colorTables,
-            this.props.colorMapFunction
-        );
-
-        const colormap = context.device.createTexture({
-            ...textureProps,
-            data: data,
-        });
-        return colormap;
     }
 }
 

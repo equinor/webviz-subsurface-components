@@ -22,8 +22,8 @@ import { getColors, rgbValues } from "@emerson-eps/color-tables/";
 import type { Feature, FeatureCollection, Point, Position } from "geojson";
 
 import type {
+    DeckGLLayerContext,
     ReportBoundingBoxAction,
-    ColorMapFunctionType,
     ExtendedLayerProps,
     PropertyDataType,
 } from "../utils/layerTools";
@@ -32,12 +32,13 @@ import {
     getLayersById,
     isDrawingEnabled,
 } from "../utils/layerTools";
+import type { ColorMapFunctionType } from "../utils/colormapTools";
 
 import type {
     ContinuousLegendDataType,
     DiscreteLegendDataType,
 } from "../../components/ColorLegend";
-import type { DeckGLLayerContext } from "../../components/Map";
+
 import type { NumberPair, StyleAccessorFunction } from "../types";
 import type { WellLabelLayerProps } from "./layers/wellLabelLayer";
 import { WellLabelLayer } from "./layers/wellLabelLayer";

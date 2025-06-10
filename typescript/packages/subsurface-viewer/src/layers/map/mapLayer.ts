@@ -14,9 +14,9 @@ import type { Matrix4 } from "math.gl";
 import type {
     ReportBoundingBoxAction,
     ExtendedLayerProps,
-    ColorMapFunctionType,
 } from "../utils/layerTools";
 import { getModelMatrix } from "../utils/layerTools";
+import type { ColorMapFunctionType } from "../utils/colormapTools";
 import config from "../../SubsurfaceConfig.json";
 import { findConfig } from "../../utils/configTools";
 import { loadFloat32Data } from "../../utils/serialize";
