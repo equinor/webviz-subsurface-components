@@ -50,11 +50,7 @@ void main(void) {
 
    DECKGL_FILTER_GL_POSITION(gl_Position, geometry);
 
-   // This may happen due to GPU interpolation precision causing color artifacts.
-   float propertyValue = clamp(property, grid.valueRangeMin, grid.valueRangeMax);
-
-   vColor = getPropertyColor(propertyValue);
-   vColor = vec4(vColor.rgb, vColor.a * layer.opacity);
+   vColor = vec4(1.0, 1.0, 1.0, layer.opacity);
    DECKGL_FILTER_COLOR(vColor, geometry);
 }
 `;
