@@ -1,3 +1,13 @@
+## 1.11.9 (2025-06-12)
+
+### 🩹 Fixes
+
+- Multiple layers not including default `shaderModules` and `layer.opacity` not used in fragment shader ([#2572](https://github.com/equinor/webviz-subsurface-components/pull/2572))
+
+### ❤️ Thank You
+
+- Ruben Thoms @rubenthoms
+
 ## 1.11.8 (2025-06-05)
 
 ### 🩹 Fixes
