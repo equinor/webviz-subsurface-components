@@ -4,10 +4,12 @@ export default `\
 
 precision highp float;
 
+in vec4 vColor;
+
 out vec4 fragColor;
 
 void main(void) {
-  fragColor = vec4(0.0, 0.0, 0.0, 1.0);
+  fragColor = vColor;
   DECKGL_FILTER_COLOR(fragColor, geometry);
 }
 `;

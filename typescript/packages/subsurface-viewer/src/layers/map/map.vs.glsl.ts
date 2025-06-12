@@ -34,8 +34,6 @@ void main(void) {
 
    normals_commonspace = normals;
 
-   vColor = vec4(colors.rgb, 1.0);
-
    property = properties;
 
    position_commonspace = vec4(project_position(position), 0.0);
@@ -43,7 +41,7 @@ void main(void) {
 
    DECKGL_FILTER_GL_POSITION(gl_Position, geometry);
 
-   vec4 color = vec4(0.0);
-   DECKGL_FILTER_COLOR(color, geometry);
+   vColor = vec4(colors.rgb, layer.opacity);
+   DECKGL_FILTER_COLOR(vColor, geometry);
 }
 `;

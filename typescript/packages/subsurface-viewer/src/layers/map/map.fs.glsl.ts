@@ -8,15 +8,14 @@ in vec3 cameraPosition;
 in vec3 normals_commonspace;
 in vec4 position_commonspace;
 in vec4 vColor;
-
-flat in int vertexIndex;
-
 in vec3 worldPos;
 in float property;
+flat in int vertexIndex;
+
+// Uniforms
+uniform sampler2D colormap;
 
 out vec4 fragColor;
-
-uniform sampler2D colormap;
 
 
 void main(void) { 
@@ -34,7 +33,7 @@ void main(void) {
       return;
    }
 
-   vec4 color = vec4(1.0, 1.0, 1.0,  1.0);
+   vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
    float propertyValue = property;
 
    // This may happen due to GPU interpolation precision causing color artifacts.
@@ -79,8 +78,7 @@ void main(void) {
    // Use two sided phong lighting. This has no effect if "material" property is not set.
    vec3 lightColor = lighting_getLightColor(color.rgb, cameraPosition, position_commonspace.xyz, normal);
 
-   fragColor = vec4(lightColor, 1.0);
-
+   fragColor = vec4(lightColor, vColor.a);
    DECKGL_FILTER_COLOR(fragColor, geometry);
 }
 `;

@@ -13,8 +13,8 @@ in vec3 normals;
 out vec3 cameraPosition;
 out vec3 normals_commonspace;
 out vec4 position_commonspace;
+out vec4 vColor;
 out vec3 worldPos;
-out float property;
 
 const vec3 pickingColor = vec3(1.0, 1.0, 0.0);
 
@@ -30,14 +30,12 @@ void main(void) {
 
    normals_commonspace = normals;
 
-   property = properties;
-
    position_commonspace = vec4(project_position(position), 0.0);
    gl_Position = project_common_position_to_clipspace(position_commonspace);
 
    DECKGL_FILTER_GL_POSITION(gl_Position, geometry);
 
-   vec4 color = vec4(0.0);
-   DECKGL_FILTER_COLOR(color, geometry);
+   vColor = vec4(triangles.uColor.rgb, triangles.uColor.a * layer.opacity);
+   DECKGL_FILTER_COLOR(vColor, geometry);
 }
 `;

@@ -152,8 +152,11 @@ export default class PieChartLayer extends Layer<PieChartLayerProps<PiesData>> {
 
         const model = new Model(device, {
             id: `${this.props.id}-pie`,
-            vs: vertexShader,
-            fs: fragmentShader,
+            ...super.getShaders({
+                vs: vertexShader,
+                fs: fragmentShader,
+                modules: [project32, picking],
+            }),
             geometry: new Geometry({
                 topology: "triangle-list",
                 attributes: {
@@ -166,8 +169,6 @@ export default class PieChartLayer extends Layer<PieChartLayerProps<PiesData>> {
                 },
                 vertexCount: vertexs.length / 3,
             }),
-
-            modules: [project32, picking],
             isInstanced: false, // This only works when set to false.
         });
 

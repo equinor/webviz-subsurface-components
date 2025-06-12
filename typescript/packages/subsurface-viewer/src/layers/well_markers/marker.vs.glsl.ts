@@ -11,7 +11,7 @@ in vec4 instanceColors;
 in vec4 instanceOutlineColors;
 in vec3 instancePickingColors;
 
-out vec4 color;
+out vec4 vColor;
 
 void main(void) {
    vec3 position = instancePositions;
@@ -20,7 +20,7 @@ void main(void) {
    geometry.worldPosition = position;
    geometry.pickingColor  = instancePickingColors;
 
-   color = wellMarkers.useOutlineColor ? instanceOutlineColors : instanceColors;
+   vColor = wellMarkers.useOutlineColor ? instanceOutlineColors : instanceColors;
 
    float sizeInPixels = project_size_to_pixel(instanceSizes, wellMarkers.sizeUnits);
    float projectedSize = project_pixel_size(sizeInPixels);
@@ -39,9 +39,7 @@ void main(void) {
    vec4 position_commonspace = vec4(project_position(rotatedPos + position), 0.0);
    gl_Position = project_common_position_to_clipspace(position_commonspace);
 
-   vec4 dummyColor = vec4(0.0);
-
    DECKGL_FILTER_GL_POSITION(gl_Position, geometry);
-   DECKGL_FILTER_COLOR(dummyColor, geometry);
+   DECKGL_FILTER_COLOR(vColor, geometry);
 }
 `;

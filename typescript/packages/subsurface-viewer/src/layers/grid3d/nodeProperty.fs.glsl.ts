@@ -5,6 +5,7 @@ export default `\
 in vec3 cameraPosition;
 in vec4 position_commonspace;
 in float property;
+in vec4 vColor;
 
 flat in vec3 normal;
 flat in int vertexIndex;
@@ -42,7 +43,7 @@ void main(void) {
       fragColor = encodeVertexIndexToRGB(vertexIndex);      
       return;
    }
-       
+
    // This may happen due to GPU interpolation precision causing color artifacts.
    float propertyValue = clamp(property, grid.valueRangeMin, grid.valueRangeMax);
 
@@ -50,7 +51,7 @@ void main(void) {
 
    // Use two sided phong lighting. This has no effect if "material" property is not set.
    vec3 lightColor = lighting_getLightColor(color.rgb, cameraPosition, position_commonspace.xyz, normal);
-   fragColor = vec4(lightColor, 1.0);
+   fragColor = vec4(lightColor, vColor.a);
    DECKGL_FILTER_COLOR(fragColor, geometry);
 }
 `;

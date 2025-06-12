@@ -116,27 +116,31 @@ export default class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProp
     _getModels(device: Device): [Model, Model] {
         const triangleModel = new Model(device, {
             id: `${this.props.id}-mesh`,
-            vs: vsShader,
-            fs: fsShader,
+            ...super.getShaders({
+                vs: vsShader,
+                fs: fsShader,
+                modules: [
+                    project32,
+                    picking,
+                    lighting,
+                    phongMaterial,
+                    trianglesUniforms,
+                ],
+            }),
             bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
             geometry: new Geometry(this.props.geometryTriangles),
-            modules: [
-                project32,
-                picking,
-                lighting,
-                phongMaterial,
-                trianglesUniforms,
-            ],
             isInstanced: false, // This only works when set to false.
         });
 
         const lineModel = new Model(device, {
             id: `${this.props.id}-lines`,
-            vs: vsLineShader,
-            fs: fsLineShader,
+            ...super.getShaders({
+                vs: vsLineShader,
+                fs: fsLineShader,
+                modules: [project32, picking, triangleMeshUniforms],
+            }),
             bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
             geometry: new Geometry(this.props.geometryLines),
-            modules: [project32, picking, triangleMeshUniforms],
             isInstanced: false,
         });
 
