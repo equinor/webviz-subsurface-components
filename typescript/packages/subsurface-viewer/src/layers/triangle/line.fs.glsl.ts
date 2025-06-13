@@ -1,6 +1,6 @@
 export default `\
 #version 300 es
-#define SHADER_NAME triangle-lines-fragment-shader
+#define SHADER_NAME triangle-line-fragment-shader
 
 precision highp float;
 
