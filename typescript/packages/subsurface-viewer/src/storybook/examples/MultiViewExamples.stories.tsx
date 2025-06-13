@@ -572,3 +572,60 @@ export const ViewTabs: StoryObj<typeof ViewerTabs> = {
         </Root>
     ),
 };
+
+const grid3dLayer = {
+    "@@type": "Grid3DLayer",
+    id: "Grid3DLayer",
+    gridLines: true,
+    material: true,
+    colorMapName: "Rainbow",
+    ZIncreasingDownwards: false,
+    pickable: true,
+    opacity: 1.0,
+    pointsData: "vtk-grid/Simgrid_points.json",
+    polysData: "vtk-grid/Simgrid_polys.json",
+    propertiesData: "vtk-grid/Simgrid_scalar.json",
+};
+
+export const MultiViewPickingCrash: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "multi_view_picking",
+        layers: [grid3dLayer],
+        views: {
+            layout: [1, 2],
+            showLabel: true,
+            viewports: [
+                {
+                    id: "view_1",
+                    layerIds: [grid3dLayer.id],
+                    isSync: true,
+                    show3D: true,
+                },
+                {
+                    id: "view_2",
+                    layerIds: [grid3dLayer.id],
+                    isSync: false,
+                    show3D: true,
+                },
+            ],
+        },
+        verticalScale: 1.025,
+    },
+    render: (args) => <MultiViewWithCameraError {...args} />,
+};
+
+function MultiViewWithCameraError(
+    props: SubsurfaceViewerProps
+): React.ReactNode {
+    const [cameraPosition, setCameraPosition] = React.useState<
+        ViewStateType | undefined
+    >(undefined);
+
+    return (
+        <SubsurfaceViewer
+            {...props}
+            getCameraPosition={setCameraPosition}
+            cameraPosition={cameraPosition}
+        ></SubsurfaceViewer>
+    );
+}
