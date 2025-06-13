@@ -216,10 +216,10 @@ export default class ColormapLayer extends BitmapLayer<ColormapLayerProps> {
         const valueRangeMin = this.props.valueRange[0] ?? 0.0;
         const valueRangeMax = this.props.valueRange[1] ?? 1.0;
 
-        // If specified, color map will extend from colorMapRangeMin to colorMapRangeMax.
+        // If specified, color map will extend from colormapRangeMin to colormapRangeMax.
         // Otherwise it will extend from valueRangeMin to valueRangeMax.
-        const colorMapRangeMin = this.props.colorMapRange?.[0] ?? valueRangeMin;
-        const colorMapRangeMax = this.props.colorMapRange?.[1] ?? valueRangeMax;
+        const colormapRangeMin = this.props.colorMapRange?.[0] ?? valueRangeMin;
+        const colormapRangeMax = this.props.colorMapRange?.[1] ?? valueRangeMax;
 
         const colormapTexture = this.context.device.createTexture({
             width: 256,
@@ -280,31 +280,31 @@ export default class ColormapLayer extends BitmapLayer<ColormapLayerProps> {
             this.props.colorMapClampColor !== undefined &&
             this.props.colorMapClampColor !== true &&
             this.props.colorMapClampColor !== false;
-        let colorMapClampColor = isClampColor
+        let colormapClampColor = isClampColor
             ? this.props.colorMapClampColor
             : [0, 0, 0];
 
-        colorMapClampColor = (colorMapClampColor as Color).map(
+        colormapClampColor = (colormapClampColor as Color).map(
             (x) => (x ?? 0) / 255
         );
 
-        const isColorMapClampColorTransparent: boolean =
+        const isColormapClampColorTransparent: boolean =
             (this.props.colorMapClampColor as boolean) === false;
 
         super.setShaderModuleProps({
             map: {
                 valueRangeMin,
                 valueRangeMax,
-                colorMapRangeMin,
-                colorMapRangeMax,
+                colormapRangeMin,
+                colormapRangeMax,
                 contours,
                 hillshading,
                 bitmapResolution,
                 contourReferencePoint,
                 contourInterval,
                 isClampColor,
-                colorMapClampColor,
-                isColorMapClampColorTransparent,
+                colormapClampColor,
+                isColormapClampColorTransparent,
                 isHeightMapTextureDefined,
                 heightValueRangeMin,
                 heightValueRangeMax,
@@ -359,7 +359,7 @@ export default class ColormapLayer extends BitmapLayer<ColormapLayerProps> {
         const valueRangeMin = this.props.valueRange[0] ?? 0.0;
         const valueRangeMax = this.props.valueRange[1] ?? 1.0;
 
-        // If specified color map will extend from colorMapRangeMin to colorMapRangeMax.
+        // If specified color map will extend from colormapRangeMin to colormapRangeMax.
         // Otherwise it will extend from valueRangeMin to valueRangeMax.
         const min = this.props.colorMapRange?.[0] ?? valueRangeMin;
         const max = this.props.colorMapRange?.[1] ?? valueRangeMax;
@@ -382,16 +382,16 @@ const map2DUniformsBlock = /*glsl*/ `\
 uniform mapUniforms {
     float valueRangeMin;
     float valueRangeMax;
-    float colorMapRangeMin;
-    float colorMapRangeMax;
+    float colormapRangeMin;
+    float colormapRangeMax;
     vec2 bitmapResolution;
     bool contours;
     bool hillshading;
     float contourReferencePoint;
     float contourInterval;
     bool isClampColor;
-    vec3 colorMapClampColor;
-    bool isColorMapClampColorTransparent;
+    vec3 colormapClampColor;
+    bool isColormapClampColorTransparent;
     bool isHeightMapTextureDefined;
     float heightValueRangeMin;
     float heightValueRangeMax;
@@ -417,16 +417,16 @@ float decode_rgb2float(vec3 rgb) {
 type Map2DUniformsType = {
     valueRangeMin: number;
     valueRangeMax: number;
-    colorMapRangeMin: number;
-    colorMapRangeMax: number;
+    colormapRangeMin: number;
+    colormapRangeMax: number;
     bitmapResolution: [number, number];
     contours: boolean;
     hillshading: boolean;
     contourReferencePoint: number;
     contourInterval: number;
     isClampColor: boolean;
-    colorMapClampColor: [number, number, number];
-    isColorMapClampColorTransparent: boolean;
+    colormapClampColor: [number, number, number];
+    isColormapClampColorTransparent: boolean;
     isHeightMapTextureDefined: boolean;
     heightValueRangeMin: number;
     heightValueRangeMax: number;
@@ -444,16 +444,16 @@ const map2DUniforms = {
     uniformTypes: {
         valueRangeMin: "f32",
         valueRangeMax: "f32",
-        colorMapRangeMin: "f32",
-        colorMapRangeMax: "f32",
+        colormapRangeMin: "f32",
+        colormapRangeMax: "f32",
         bitmapResolution: "vec2<f32>",
         contours: "u32",
         hillshading: "u32",
         contourReferencePoint: "f32",
         contourInterval: "f32",
         isClampColor: "u32",
-        colorMapClampColor: "vec3<f32>",
-        isColorMapClampColorTransparent: "u32",
+        colormapClampColor: "vec3<f32>",
+        isColormapClampColorTransparent: "u32",
         isHeightMapTextureDefined: "u32",
         heightValueRangeMin: "f32",
         heightValueRangeMax: "f32",

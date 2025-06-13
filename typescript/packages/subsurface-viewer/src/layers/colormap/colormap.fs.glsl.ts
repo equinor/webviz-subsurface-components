@@ -59,13 +59,13 @@ void main(void) {
 
   // Compute the color from the colormap.
   vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
-  float x = (property - map.colorMapRangeMin) / (map.colorMapRangeMax - map.colorMapRangeMin);
+  float x = (property - map.colormapRangeMin) / (map.colormapRangeMax - map.colormapRangeMin);
   if (x < 0.0 || x > 1.0) {
       // Out of range. Use clampcolor.
       if (map.isClampColor) {
-         color = vec4(map.colorMapClampColor.rgb, 1.0);
+         color = vec4(map.colormapClampColor.rgb, 1.0);
       }
-      else if (map.isColorMapClampColorTransparent) {
+      else if (map.isColormapClampColorTransparent) {
          discard;
          return;
       }

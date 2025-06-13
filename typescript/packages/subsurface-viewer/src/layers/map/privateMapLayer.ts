@@ -43,10 +43,10 @@ export interface PrivateMapLayerProps extends ExtendedLayerProps {
     contours: [number, number];
     gridLines: boolean;
     isContoursDepth: boolean;
-    colorMapName: string;
-    colorMapRange: [number, number];
-    colorMapClampColor: Color | undefined | boolean;
-    colorMapFunction?: ColorMapFunctionType;
+    colormapName: string;
+    colormapRange: [number, number];
+    colormapClampColor: Color | undefined | boolean;
+    colormapFunction?: ColorMapFunctionType;
     propertyValueRange: [number, number];
     smoothShading: boolean;
     depthTest: boolean;
@@ -129,8 +129,8 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
             height: 1,
             format: "rgb8unorm-webgl",
             data: getImageData(
-                this.props.colorMapFunction ?? {
-                    colormapName: this.props.colorMapName,
+                this.props.colormapFunction ?? {
+                    colormapName: this.props.colormapName,
                     colorTables: (this.context as DeckGLLayerContext).userData
                         .colorTables,
                 }
@@ -145,28 +145,28 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
         const valueRangeMin = this.props.propertyValueRange[0] ?? 0.0;
         const valueRangeMax = this.props.propertyValueRange[1] ?? 1.0;
 
-        // If specified color map will extend from colorMapRangeMin to colorMapRangeMax.
+        // If specified color map will extend from colormapRangeMin to colormapRangeMax.
         // Otherwise it will extend from valueRangeMin to valueRangeMax.
-        const colorMapRangeMin = this.props.colorMapRange?.[0] ?? valueRangeMin;
-        const colorMapRangeMax = this.props.colorMapRange?.[1] ?? valueRangeMax;
+        const colormapRangeMin = this.props.colormapRange?.[0] ?? valueRangeMin;
+        const colormapRangeMax = this.props.colormapRange?.[1] ?? valueRangeMax;
 
         const isClampColor: boolean =
-            this.props.colorMapClampColor !== undefined &&
-            this.props.colorMapClampColor !== true &&
-            this.props.colorMapClampColor !== false;
-        let colorMapClampColor = isClampColor
-            ? this.props.colorMapClampColor
+            this.props.colormapClampColor !== undefined &&
+            this.props.colormapClampColor !== true &&
+            this.props.colormapClampColor !== false;
+        let colormapClampColor = isClampColor
+            ? this.props.colormapClampColor
             : [0, 0, 0];
 
         // Normalize to [0,1] range.
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        colorMapClampColor = (colorMapClampColor as Color).map(
+        colormapClampColor = (colormapClampColor as Color).map(
             (x) => (x ?? 0) / 255
         );
 
-        const isColorMapClampColorTransparent: boolean =
-            (this.props.colorMapClampColor as boolean) === false;
+        const isColormapClampColorTransparent: boolean =
+            (this.props.colormapClampColor as boolean) === false;
 
         const smoothShading =
             this.props.normals.length == 0 ? false : this.props.smoothShading;
@@ -199,10 +199,10 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
                 isContoursDepth,
                 valueRangeMin,
                 valueRangeMax,
-                colorMapRangeMin,
-                colorMapRangeMax,
-                colorMapClampColor,
-                isColorMapClampColorTransparent,
+                colormapRangeMin,
+                colormapRangeMax,
+                colormapClampColor,
+                isColormapClampColorTransparent,
                 isClampColor,
                 smoothShading,
                 ZIncreasingDownwards: this.props.ZIncreasingDownwards,
@@ -234,10 +234,10 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
                 isContoursDepth,
                 valueRangeMin,
                 valueRangeMax,
-                colorMapRangeMin,
-                colorMapRangeMax,
-                colorMapClampColor,
-                isColorMapClampColorTransparent,
+                colormapRangeMin,
+                colormapRangeMax,
+                colormapClampColor,
+                isColormapClampColorTransparent,
                 isClampColor,
                 smoothShading,
                 ZIncreasingDownwards: this.props.ZIncreasingDownwards,
@@ -352,12 +352,12 @@ uniform mapUniforms {
 
     float valueRangeMin;
     float valueRangeMax;
-    float colorMapRangeMin;
-    float colorMapRangeMax;
+    float colormapRangeMin;
+    float colormapRangeMax;
 
-    vec3 colorMapClampColor;
+    vec3 colormapClampColor;
     bool isClampColor;
-    bool isColorMapClampColorTransparent;
+    bool isColormapClampColorTransparent;
     bool smoothShading;
     bool ZIncreasingDownwards;
 } map;
@@ -369,11 +369,11 @@ type MapUniformsType = {
     contourInterval: number;
     valueRangeMin: number;
     valueRangeMax: number;
-    colorMapRangeMin: number;
-    colorMapRangeMax: number;
-    colorMapClampColor: [number, number, number];
+    colormapRangeMin: number;
+    colormapRangeMax: number;
+    colormapClampColor: [number, number, number];
     isClampColor: boolean;
-    isColorMapClampColorTransparent: boolean;
+    isColormapClampColorTransparent: boolean;
     smoothShading: boolean;
     ZIncreasingDownwards: boolean;
 };
@@ -389,11 +389,11 @@ const mapUniforms = {
         contourInterval: "f32",
         valueRangeMin: "f32",
         valueRangeMax: "f32",
-        colorMapRangeMin: "f32",
-        colorMapRangeMax: "f32",
-        colorMapClampColor: "vec3<f32>",
+        colormapRangeMin: "f32",
+        colormapRangeMax: "f32",
+        colormapClampColor: "vec3<f32>",
         isClampColor: "u32",
-        isColorMapClampColorTransparent: "u32",
+        isColormapClampColorTransparent: "u32",
         smoothShading: "u32",
         ZIncreasingDownwards: "u32",
     },
