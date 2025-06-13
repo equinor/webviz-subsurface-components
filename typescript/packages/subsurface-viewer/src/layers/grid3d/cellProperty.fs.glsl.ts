@@ -19,25 +19,25 @@ vec4 getDiscretePropertyColor (float propertyValue) {
    vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
    // On some machines (like in docker container), float comparison and texture lookup may fail due to precision.
    // Use this tolerance for comparison and to shift the lookup position.
-   float tolerance = (1.0 / grid.colorMapSize) * 0.5;
+   float tolerance = (1.0 / grid.colormapSize) * 0.5;
 
-   if (propertyValue < grid.colorMapRangeMin - tolerance || propertyValue > grid.colorMapRangeMax + tolerance) {
+   if (propertyValue < grid.colormapRangeMin - tolerance || propertyValue > grid.colormapRangeMax + tolerance) {
       // Out of range. Use clampcolor.
       if (grid.isClampColor) {
-         color = grid.colorMapClampColor;
+         color = grid.colormapClampColor;
          if( color[3] == 0.0 ) {
             discard;
          }
       }
       else {
          // Use min/max color to clamp.
-         float p = clamp (propertyValue, grid.colorMapRangeMin, grid.colorMapRangeMax);
-         float x = p / grid.colorMapSize;
+         float p = clamp (propertyValue, grid.colormapRangeMin, grid.colormapRangeMax);
+         float x = p / grid.colormapSize;
          color = texture(colormap, vec2(x + tolerance, 0.5));
       }
    }
    else {
-      float x = propertyValue / grid.colorMapSize;
+      float x = propertyValue / grid.colormapSize;
       color = texture(colormap, vec2(x + tolerance, 0.5));
    }
       
@@ -46,11 +46,11 @@ vec4 getDiscretePropertyColor (float propertyValue) {
 
 vec4 getContinuousPropertyColor (float propertyValue) {
    vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
-   float normalizedValue = (propertyValue - grid.colorMapRangeMin) / (grid.colorMapRangeMax - grid.colorMapRangeMin);
+   float normalizedValue = (propertyValue - grid.colormapRangeMin) / (grid.colormapRangeMax - grid.colormapRangeMin);
    if (normalizedValue < 0.0 || normalizedValue > 1.0) {
       // Out of range. Use clampcolor.
       if (grid.isClampColor) {
-         color = grid.colorMapClampColor;
+         color = grid.colormapClampColor;
          if( color[3] == 0.0 ) {
             discard;
          }

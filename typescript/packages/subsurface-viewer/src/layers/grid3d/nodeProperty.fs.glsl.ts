@@ -16,11 +16,11 @@ uniform sampler2D colormap;
 
 vec4 getPropertyColor (float propertyValue) {
    vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
-   float normalizedValue = (propertyValue - grid.colorMapRangeMin) / (grid.colorMapRangeMax - grid.colorMapRangeMin);
+   float normalizedValue = (propertyValue - grid.colormapRangeMin) / (grid.colormapRangeMax - grid.colormapRangeMin);
    if (normalizedValue < 0.0 || normalizedValue > 1.0) {
       // Out of range. Use clampcolor.
       if (grid.isClampColor) {
-         color = grid.colorMapClampColor;
+         color = grid.colormapClampColor;
          if( color[3] == 0.0 ) {
             discard;
          }
