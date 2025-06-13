@@ -12,8 +12,8 @@ uniform Decoder decoder;
 
 uniform float valueRangeMin;
 uniform float valueRangeMax;
-uniform float colorMapRangeMin;
-uniform float colorMapRangeMax;
+uniform float colormapRangeMin;
+uniform float colormapRangeMax;
 
 // Decode the RGB value using the decoder parameter.
 float decode_rgb2float(vec3 rgb, Decoder dec) {
@@ -23,9 +23,9 @@ float decode_rgb2float(vec3 rgb, Decoder dec) {
   // Value must be in [0, 1] and step in (0, 1]
   value = floor(value / dec.step + 0.5) * dec.step;
 
-  // If colorMapRangeMin/Max specified, color map will span this interval.
+  // If colormapRangeMin/Max specified, color map will span this interval.
   float x  = value * (valueRangeMax - valueRangeMin) + valueRangeMin;
-  x = (x - colorMapRangeMin) / (colorMapRangeMax - colorMapRangeMin);
+  x = (x - colormapRangeMin) / (colormapRangeMax - colormapRangeMin);
   x = max(0.0, x);
   x = min(1.0, x);
 
