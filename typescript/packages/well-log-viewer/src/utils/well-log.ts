@@ -233,7 +233,7 @@ export function getDiscreteMeta(
 
 export function getDiscreteColorAndName(
     value: number | string | null,
-    colorMapFunction: ColorMapFunction | undefined,
+    colormapFunction: ColorMapFunction | undefined,
     meta?: DiscreteMeta | null
 ): { color: number[]; name: string } {
     let color: number[];
@@ -261,10 +261,10 @@ export function getDiscreteColorAndName(
             }
         }
         /*if(object)*/ {
-            if (colorMapFunction) {
+            if (colormapFunction) {
                 // get color from the table
                 color = getInterpolatedColor(
-                    colorMapFunction,
+                    colormapFunction,
                     !object
                         ? Number.NaN
                         : // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -277,7 +277,7 @@ export function getDiscreteColorAndName(
         }
     } else {
         name = value.toString();
-        if (colorMapFunction) {
+        if (colormapFunction) {
             // get color from the table
             if (typeof value === "string") {
                 let v: number;
@@ -288,10 +288,10 @@ export function getDiscreteColorAndName(
                     v = iStringToNum;
                     iStringToNum++;
                 }
-                color = getInterpolatedColor(colorMapFunction, v);
+                color = getInterpolatedColor(colormapFunction, v);
             } else {
                 color = getInterpolatedColor(
-                    colorMapFunction,
+                    colormapFunction,
                     parseInt(value.toString())
                 );
             }

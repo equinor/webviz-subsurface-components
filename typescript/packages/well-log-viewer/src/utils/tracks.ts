@@ -21,7 +21,7 @@ import {
     StackedTrack,
 } from "@equinor/videx-wellog";
 
-import { getColorMapFunction, type ColorMapFunction } from "./color-function";
+import { getColormapFunction, type ColorMapFunction } from "./color-function";
 import type {
     TemplateTrack,
     TemplatePlot,
@@ -149,7 +149,7 @@ function updateStackedTrackScale(track: StackedTrack): void {
     //}
 
     //if (!track.options.domain) {
-    //    // could be on reguired track with missed data
+    //    // could be on required track with missed data
     //    console.log("Empty track.options.domain!");
     //    track.options.domain =
     //        track.options.scale === "log" ? [1, 100] : [0, 100];
@@ -166,14 +166,14 @@ function updateStackedTrackScale(track: StackedTrack): void {
  * @param axes The axes to match data to
  * @param templateTracks Templates describing individual tracks
  * @param templateStyles Global styles/options for track plots
- * @param colorMapFunctions Overview of methods used to color rendered plots
+ * @param colormapFunctions Overview of methods used to color rendered plots
  * @returns An object containing videx tracks and related meta-info
  */
 export function createWellLogTracks(
     wellLog: WellLogSet[],
     axes: AxesInfo,
     templateTracks: TemplateTrack[], // Part of JSON
-    colorMapFunctions: ColorMapFunction[] // JS code or JSON color table
+    colormapFunctions: ColorMapFunction[] // JS code or JSON color table
 ): TracksInfo {
     if (!wellLog?.length) return new TracksInfo();
 
@@ -187,7 +187,7 @@ export function createWellLogTracks(
             wellLog,
             axes,
             templateTrack,
-            colorMapFunctions
+            colormapFunctions
         );
 
         if (!track) {
@@ -278,7 +278,7 @@ function maybeGetSecondaryPlotSetup(
 function makeGraphTrackOptions(
     plotSetups: PlotSetup[],
     templateTrack: TemplateTrack,
-    colorMapFunctions?: ColorMapFunction[],
+    colormapFunctions?: ColorMapFunction[],
     existingOptions: Partial<ExtTrackOptions> = {}
 ): GraphTrackOptions & ExtTrackOptions {
     // Only returns a non-required tracks if there's any plot-setups available
@@ -304,7 +304,7 @@ function makeGraphTrackOptions(
             plotSetup,
             plotSetup2,
             templateTrack,
-            colorMapFunctions,
+            colormapFunctions,
             trackData.length,
             trackData.length + 1
         );
@@ -333,7 +333,7 @@ function makeGraphTrackOptions(
 function makeStackedTrackOptions(
     plotSetups: PlotSetup[],
     templateTrack: TemplateTrack,
-    colorMapFunctions?: ColorMapFunction[],
+    colormapFunctions?: ColorMapFunction[],
     existingOptions: Partial<ExtTrackOptions> = {}
 ): StackedTrackOptions & ExtTrackOptions {
     // ? Why do we not care about "required" here? (@anders2303)
@@ -341,9 +341,9 @@ function makeStackedTrackOptions(
 
     const { curve, plotData, sourceLogSet, templatePlot } = plotSetups[0];
     const meta = getDiscreteMeta(sourceLogSet, curve.name);
-    const colorFunc = getColorMapFunction(
+    const colorFunc = getColormapFunction(
         templatePlot.colorMapFunctionName ?? "",
-        colorMapFunctions
+        colormapFunctions
     );
     const trackHeader = makeTrackHeader([curve], templateTrack);
 
@@ -376,14 +376,14 @@ function makeStackedTrackOptions(
  * @param wellLog Well log data set
  * @param axesInfo Information about data axes to use
  * @param templateTrack Track setup template
- * @param colorMapFunctions Optional - Functions for coloring the plot
+ * @param colormapFunctions Optional - Functions for coloring the plot
  * @returns A videx well-log track, if the template was valid. Otherwise null
  */
 export function createTrack(
     wellLog: WellLogSet[],
     axesInfo: AxesInfo,
     templateTrack: TemplateTrack,
-    colorMapFunctions?: ColorMapFunction[]
+    colormapFunctions?: ColorMapFunction[]
 ): Track | null {
     const plotSetups = setupTrackPlots(wellLog, templateTrack, axesInfo);
 
@@ -392,7 +392,7 @@ export function createTrack(
         const stackedOptions = makeStackedTrackOptions(
             plotSetups,
             templateTrack,
-            colorMapFunctions
+            colormapFunctions
         );
 
         const track = newStackedTrack(stackedOptions);
@@ -403,7 +403,7 @@ export function createTrack(
         const graphOptions = makeGraphTrackOptions(
             plotSetups,
             templateTrack,
-            colorMapFunctions
+            colormapFunctions
         );
 
         const track = newGraphTrack(graphOptions);
@@ -421,7 +421,7 @@ export function createTrack(
  * @param newTemplateTrack The new template to apply
  * @param wellLogSets JSON Well-log containing curve data
  * @param axisInfo Description of the axes to plot data against
- * @param colorMapFunctions Methods used when coloring the plot
+ * @param colormapFunctions Methods used when coloring the plot
  * @returns The edited track
  */
 export function editTrack(
@@ -429,7 +429,7 @@ export function editTrack(
     newTemplateTrack: TemplateTrack,
     wellLogSets: WellLogSet[],
     axisInfo: AxesInfo,
-    colorMapFunctions: ColorMapFunction[]
+    colormapFunctions: ColorMapFunction[]
 ): Track {
     const newPlotSetups = setupTrackPlots(
         wellLogSets,
@@ -444,7 +444,7 @@ export function editTrack(
         const newTrackOptions = makeStackedTrackOptions(
             newPlotSetups,
             newTemplateTrack,
-            colorMapFunctions,
+            colormapFunctions,
             existingTrack.options
         );
 
@@ -457,7 +457,7 @@ export function editTrack(
         const newOptions = makeGraphTrackOptions(
             newPlotSetups,
             newTemplateTrack,
-            colorMapFunctions,
+            colormapFunctions,
             existingTrack.options
         );
         existingTrack.options = newOptions;
@@ -477,14 +477,14 @@ export function editTrack(
  * @param templatePlot Template object for the new plot,
  * @param wellLogSets JSON Well-log sets to source data from
  * @param axesInfo
- * @param colorMapFunctions
+ * @param colormapFunctions
  */
 export function addPlotToTrack(
     track: Track,
     templatePlot: TemplatePlot,
     wellLogSets: WellLogSet[],
     axesInfo: AxesInfo,
-    colorMapFunctions: ColorMapFunction[]
+    colormapFunctions: ColorMapFunction[]
 ) {
     // ! Currently only supporting graph tracks, but keeping the function ambiguous for now
     if (!(track instanceof GraphTrack))
@@ -512,7 +512,7 @@ export function addPlotToTrack(
         setup1,
         setup2,
         existingTemplate,
-        colorMapFunctions,
+        colormapFunctions,
         trackDataPoints.length,
         trackDataPoints.length + 1
     );
@@ -537,7 +537,7 @@ export function addPlotToTrack(
  * @param templatePlot The new template to apply
  * @param wellLogSets JSON Well-log sets to source data from
  * @param axesInfo Description of the axes to plot data against
- * @param colorMapFunctions Methods used when coloring the plot
+ * @param colormapFunctions Methods used when coloring the plot
  */
 export function editTrackPlot(
     track: Track,
@@ -545,7 +545,7 @@ export function editTrackPlot(
     templatePlot: TemplatePlot,
     wellLogSets: WellLogSet[],
     axesInfo: AxesInfo,
-    colorMapFunctions: ColorMapFunction[]
+    colormapFunctions: ColorMapFunction[]
 ) {
     if (!(track instanceof GraphTrack))
         throw Error("Can only add tracks to GraphTracks");
@@ -578,7 +578,7 @@ export function editTrackPlot(
         setup1,
         setup2,
         existingTemplate,
-        colorMapFunctions,
+        colormapFunctions,
         trackDataPoints.length,
         trackDataPoints.length + 1
     );

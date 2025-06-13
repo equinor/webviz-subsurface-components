@@ -10,7 +10,7 @@ import { NativeSelect } from "@equinor/eds-core-react";
 import {
     ColorLegend,
     colorTables,
-    createColorMapFunction,
+    createColorMapFunction as createColormapFunction,
 } from "@emerson-eps/color-tables";
 
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
@@ -953,7 +953,7 @@ const wellLayers = [
         logrunName: "BLOCKING",
         logName: "ZONELOG",
         logColor: "Stratigraphy",
-        colorMappingFunction: createColorMapFunction(
+        colorMappingFunction: createColormapFunction(
             "Stratigraphy",
             true,
             true,
@@ -1011,7 +1011,7 @@ const WellLayerTemplate: React.FC = (args: any) => {
     const layers = [
         {
             ...args.wellLayers[0],
-            colorMappingFunction: createColorMapFunction(
+            colorMappingFunction: createColormapFunction(
                 colorName,
                 true,
                 true,

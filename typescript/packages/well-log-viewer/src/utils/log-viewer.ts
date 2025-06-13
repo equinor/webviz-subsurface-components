@@ -395,7 +395,7 @@ function addTrackAtIndex(
  * @param position The new track's position in the log viewer
  * @param axesInfo Information about the axis curves in the log
  * @param wellLogSets A well-log JSON data set to source curve data from
- * @param colorMapFunctions An array of color map functions to apply to the track
+ * @param colormapFunctions An array of color map functions to apply to the track
  * @returns The new track if successful, otherwise `null`
  */
 export function createNewViewTrack(
@@ -404,13 +404,13 @@ export function createNewViewTrack(
     position: number,
     axesInfo: AxesInfo,
     wellLogSets: WellLogSet[],
-    colorMapFunctions: ColorMapFunction[] = []
+    colormapFunctions: ColorMapFunction[] = []
 ): Track<TrackOptions> | null {
     const newTrack = createTrack(
         wellLogSets,
         axesInfo,
         template,
-        colorMapFunctions
+        colormapFunctions
     );
     if (!newTrack) return null;
 
@@ -430,7 +430,7 @@ export function createNewViewTrack(
  * @param template A modified template config to apply to the track
  * @param axesInfo Information about the axis curves in the log
  * @param wellLogSets A well-log JSON data set to source curve data from
- * @param colorMapFunctions An array of color map functions to apply to the track
+ * @param colormapFunctions An array of color map functions to apply to the track
  * @returns The modified track
  */
 export function editViewTrack(
@@ -439,9 +439,9 @@ export function editViewTrack(
     newTemplate: TemplateTrack,
     axesInfo: AxesInfo,
     wellLogSets: WellLogSet[],
-    colorMapFunctions: ColorMapFunction[] = []
+    colormapFunctions: ColorMapFunction[] = []
 ): Track {
-    editTrack(track, newTemplate, wellLogSets, axesInfo, colorMapFunctions);
+    editTrack(track, newTemplate, wellLogSets, axesInfo, colormapFunctions);
     adjustControllerToModifiedTrack(logViewer, track);
 
     return track;

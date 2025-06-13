@@ -12,7 +12,7 @@ import type { ColorLegendProps } from "@emerson-eps/color-tables";
 import {
     ColorLegend,
     ContinuousLegend,
-    createColorMapFunction,
+    createColorMapFunction as ColormapFunctionType,
 } from "@emerson-eps/color-tables";
 
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
@@ -359,7 +359,7 @@ const MapLayerColorSelectorTemplate: React.FC<SubsurfaceViewerProps> = (
 
     // color map function
     const colorMapFunc = React.useCallback(() => {
-        return createColorMapFunction(colorName, isLog, isNearest, breakPoints);
+        return ColormapFunctionType(colorName, isLog, isNearest, breakPoints);
     }, [colorName, isLog, isNearest, breakPoints]);
 
     const min = 100;

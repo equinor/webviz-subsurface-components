@@ -10,23 +10,23 @@ export type ColorFunction = {
 export type ColorMapFunction = colorTablesObj | ColorFunction;
 
 export function isFunction(
-    colorMapFunction: ColorMapFunction | undefined
+    colormapFunction: ColorMapFunction | undefined
 ): boolean {
-    if (!colorMapFunction) return false;
-    return !!(colorMapFunction as ColorFunction).func;
+    if (!colormapFunction) return false;
+    return !!(colormapFunction as ColorFunction).func;
 }
 
-export function getColorMapFunction(
+export function getColormapFunction(
     functionName?: string,
-    colorMapFunctions?: ColorMapFunction[]
+    colormapFunctions?: ColorMapFunction[]
 ): ColorMapFunction | undefined {
     if (!functionName) return undefined;
-    if (!colorMapFunctions) {
+    if (!colormapFunctions) {
         console.error("No color functions provided for graph!");
-        colorMapFunctions = [];
+        colormapFunctions = [];
     }
 
-    const colorFunction = elementByName(colorMapFunctions, functionName);
+    const colorFunction = elementByName(colormapFunctions, functionName);
 
     if (!colorFunction) {
         console.error(`Color function '${functionName}' not found`);

@@ -77,8 +77,8 @@ function getTemplatePlotColorFunctionName(
     template: Template,
     templatePlot: TemplatePlot
 ): string | undefined {
-    let colorMapFunctionName = templatePlot.colorMapFunctionName;
-    if (!colorMapFunctionName && templatePlot.style) {
+    let colormapFunctionName = templatePlot.colorMapFunctionName;
+    if (!colormapFunctionName && templatePlot.style) {
         const templateStyles = template.styles;
         if (templateStyles) {
             const iStyle = indexOfElementByName(
@@ -87,11 +87,11 @@ function getTemplatePlotColorFunctionName(
             );
             if (iStyle >= 0) {
                 const style = templateStyles[iStyle];
-                colorMapFunctionName = style.colorMapFunctionName;
+                colormapFunctionName = style.colorMapFunctionName;
             }
         }
     }
-    return colorMapFunctionName;
+    return colormapFunctionName;
 }
 
 interface State {
