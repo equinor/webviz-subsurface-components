@@ -471,7 +471,7 @@ function makeData(n: number, amplitude: number): Float32Array {
     return data;
 }
 
-function nearestColorMap(x: number) {
+function nearestColormap(x: number) {
     if (x > 0.5) return [100, 255, 255];
     else if (x > 0.1) return [255, 100, 255];
     return [255, 255, 100];
@@ -501,7 +501,7 @@ const TypedArrayInputComponent: React.FC<{
                 material: true,
                 ZIncreasingDownwards: false,
                 contours: [0, 5],
-                colorMapFunction: nearestColorMap as ColorMapFunctionType,
+                colorMapFunction: nearestColormap as ColorMapFunctionType,
             },
             {
                 "@@type": "AxesLayer",

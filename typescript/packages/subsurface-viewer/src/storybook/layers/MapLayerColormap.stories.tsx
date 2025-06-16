@@ -12,7 +12,7 @@ import type { ColorLegendProps } from "@emerson-eps/color-tables";
 import {
     ColorLegend,
     ContinuousLegend,
-    createColorMapFunction as ColormapFunctionType,
+    createColorMapFunction as createColormapFunction,
 } from "@emerson-eps/color-tables";
 
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
@@ -61,23 +61,23 @@ const Root = styled("div")({
 
 const valueRange = [-3071, 41048];
 
-function gradientColorMap(x: number) {
+function gradientColormap(x: number) {
     return [255 - x * 255, 255 - x * 100, 255 * x];
 }
 
-function nearestColorMap(x: number) {
+function nearestColormap(x: number) {
     if (x > 0.5) return [100, 255, 255];
     else if (x > 0.1) return [255, 100, 255];
     return [255, 255, 100];
 }
 
-function breakpointColorMap(x: number, breakpoint: number) {
+function breakpointColormap(x: number, breakpoint: number) {
     if (x > breakpoint) return [0, 50, 200];
     return [255, 255, 0];
 }
 
-function createColorMap(breakpoint: number) {
-    return (value: number) => breakpointColorMap(value, breakpoint);
+function createColormap(breakpoint: number) {
+    return (value: number) => breakpointColormap(value, breakpoint);
 }
 
 export const ConstantColor: StoryObj<typeof SubsurfaceViewer> = {
@@ -105,7 +105,7 @@ export const ConstantColor: StoryObj<typeof SubsurfaceViewer> = {
     },
 };
 
-export const GradientFunctionColorMap: StoryObj<typeof SubsurfaceViewer> = {
+export const GradientFunctionColormap: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "gradient-color-map",
         bounds: hugin2DBounds,
@@ -113,7 +113,7 @@ export const GradientFunctionColorMap: StoryObj<typeof SubsurfaceViewer> = {
             {
                 ...hugin25mKhNetmapMapLayer,
                 material: false,
-                colorMapFunction: gradientColorMap,
+                colorMapFunction: gradientColormap,
             },
         ],
     },
@@ -127,7 +127,7 @@ export const GradientFunctionColorMap: StoryObj<typeof SubsurfaceViewer> = {
     },
 };
 
-export const StepFunctionColorMap: StoryObj<typeof SubsurfaceViewer> = {
+export const StepFunctionColormap: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "nearest-color-map",
         bounds: hugin2DBounds,
@@ -135,7 +135,7 @@ export const StepFunctionColorMap: StoryObj<typeof SubsurfaceViewer> = {
             {
                 ...hugin25mKhNetmapMapLayer,
                 material: true,
-                colorMapFunction: nearestColorMap,
+                colorMapFunction: nearestColormap,
             },
         ],
     },
@@ -165,22 +165,22 @@ export const DefaultColorScale: StoryObj<typeof SubsurfaceViewer> = {
     },
 };
 
-const BreakpointColorMapComponent: React.FC<
+const BreakpointColormapComponent: React.FC<
     // @ts-expect-error TS2709
     SubsurfaceViewerProps & ColorLegendProps
 > = (props) => {
     const [breakpoint, setBreakpoint] = React.useState<number>(0.5);
 
-    const colorMap = React.useCallback(
+    const colormap = React.useCallback(
         (value: number) => {
-            return createColorMap(breakpoint)(value);
+            return createColormap(breakpoint)(value);
         },
         [breakpoint]
     );
 
     const layer = {
         ...props?.layers?.[0],
-        colorMapFunction: colorMap,
+        colorMapFunction: colormap,
     };
 
     const propsWithLayers = {
@@ -203,7 +203,7 @@ const BreakpointColorMapComponent: React.FC<
                     <ContinuousLegend
                         min={valueRange[0]}
                         max={valueRange[1]}
-                        colorMapFunction={colorMap}
+                        colorMapFunction={colormap}
                     />
                 </div>
             </div>
@@ -218,7 +218,7 @@ const BreakpointColorMapComponent: React.FC<
     );
 };
 
-export const BreakpointColorMap: StoryObj<typeof BreakpointColorMapComponent> =
+export const BreakpointColormap: StoryObj<typeof BreakpointColormapComponent> =
     {
         args: {
             id: "breakpoint-color-map",
@@ -239,15 +239,15 @@ export const BreakpointColorMap: StoryObj<typeof BreakpointColorMapComponent> =
                 },
             },
         },
-        render: (args) => <BreakpointColorMapComponent {...args} />,
+        render: (args) => <BreakpointColormapComponent {...args} />,
     };
 
-const ColorMapRangeComponent: React.FC<SubsurfaceViewerProps> = (props) => {
-    const [colorMapUpper, setColorMapUpper] = React.useState<number>(41048);
+const ColormapRangeComponent: React.FC<SubsurfaceViewerProps> = (props) => {
+    const [colormapUpper, setColormapUpper] = React.useState<number>(41048);
 
     const layer = {
         ...props?.layers?.[0],
-        colorMapRange: [-3071, colorMapUpper],
+        colorMapRange: [-3071, colormapUpper],
     };
 
     const propsWithLayers = {
@@ -257,7 +257,7 @@ const ColorMapRangeComponent: React.FC<SubsurfaceViewerProps> = (props) => {
 
     const handleChange = React.useCallback(
         (_event: unknown, value: number | number[]) => {
-            setColorMapUpper(value as number);
+            setColormapUpper(value as number);
         },
         []
     );
@@ -278,7 +278,7 @@ const ColorMapRangeComponent: React.FC<SubsurfaceViewerProps> = (props) => {
     );
 };
 
-export const ColorMapRange: StoryObj<typeof ColorMapRangeComponent> = {
+export const ColormapRange: StoryObj<typeof ColormapRangeComponent> = {
     args: {
         id: "breakpoint-color-map",
         bounds: hugin2DBounds,
@@ -296,11 +296,11 @@ export const ColorMapRange: StoryObj<typeof ColorMapRangeComponent> = {
         docs: {
             ...defaultStoryParameters.docs,
             description: {
-                story: 'Example changing the "ColorMapRange" property using a slider.',
+                story: 'Example changing the "ColormapRange" property using a slider.',
             },
         },
     },
-    render: (args) => <ColorMapRangeComponent {...args} />,
+    render: (args) => <ColormapRangeComponent {...args} />,
 };
 
 // Map layer with color colorselector
@@ -358,8 +358,8 @@ const MapLayerColorSelectorTemplate: React.FC<SubsurfaceViewerProps> = (
     );
 
     // color map function
-    const colorMapFunc = React.useCallback(() => {
-        return ColormapFunctionType(colorName, isLog, isNearest, breakPoints);
+    const colormapFunc = React.useCallback(() => {
+        return createColormapFunction(colorName, isLog, isNearest, breakPoints);
     }, [colorName, isLog, isNearest, breakPoints]);
 
     const min = 100;
@@ -371,7 +371,7 @@ const MapLayerColorSelectorTemplate: React.FC<SubsurfaceViewerProps> = (
             colorMapName: colorName,
             colorMapRange:
                 colorRange && isAuto == false ? colorRange : [min, max],
-            colorMapFunction: colorMapFunc(),
+            colorMapFunction: colormapFunc(),
         },
     ];
     return (

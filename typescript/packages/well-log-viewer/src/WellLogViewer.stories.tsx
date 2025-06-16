@@ -40,7 +40,7 @@ const wellLogl898MUD = wellLogl898MUDJson as WellLogSet[];
 const template1 = templateJson1 as unknown as Template;
 const template2 = templateJson2 as unknown as Template;
 
-const exampleColorMapFunctions: ColorMapFunction[] = [
+const exampleColormapFunctions: ColorMapFunction[] = [
     // copy color tables and add some color functions
     ...exampleColorFunctions,
     {
@@ -191,7 +191,7 @@ const StoryTemplate = (args: WellLogViewerProps) => {
 const wellpick: WellPickProps = {
     wellpick: wellpicksJson[0],
     name: "HORIZON",
-    colorMapFunctions: exampleColorMapFunctions,
+    colorMapFunctions: exampleColormapFunctions,
     colorMapFunctionName: "Stratigraphy",
 };
 
@@ -201,7 +201,7 @@ export const Default: StoryObj<typeof StoryTemplate> = {
         horizontal: false,
         wellLogSets: wellLogl898MUD,
         template: template1,
-        colorMapFunctions: exampleColorMapFunctions,
+        colorMapFunctions: exampleColormapFunctions,
         wellpick: wellpick,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
@@ -250,7 +250,7 @@ export const ColorByFunction: StoryObj<typeof StoryTemplate> = {
                 },
             ],
         },
-        colorMapFunctions: exampleColorMapFunctions,
+        colorMapFunctions: exampleColormapFunctions,
         wellpick: wellpick,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
@@ -333,7 +333,7 @@ export const TrackTitleTooltip: StoryObj<typeof StoryTemplate> = {
                 },
             ],
         },
-        colorMapFunctions: exampleColorMapFunctions,
+        colorMapFunctions: exampleColormapFunctions,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
         viewTitle: true, // show default well log view title (a wellname from the well log)
@@ -374,7 +374,7 @@ export const Horizontal: StoryObj<typeof StoryTemplate> = {
         horizontal: true,
         wellLogSets: wellLogMWD3Json,
         template: template2,
-        colorMapFunctions: exampleColorMapFunctions,
+        colorMapFunctions: exampleColormapFunctions,
         wellpick: wellpick,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
@@ -395,7 +395,7 @@ export const OnInfoFilledEvent: StoryObj<typeof StoryTemplate> = {
         horizontal: true,
         wellLogSets: wellLogMWD3Json,
         template: template2,
-        colorMapFunctions: exampleColorMapFunctions,
+        colorMapFunctions: exampleColormapFunctions,
         wellpick: wellpick,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
@@ -514,7 +514,7 @@ export const Discrete: StoryObj<typeof StoryTemplate> = {
                 ...template2.tracks,
             ],
         },
-        colorMapFunctions: exampleColorMapFunctions,
+        colorMapFunctions: exampleColormapFunctions,
         wellpick: wellpick,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,

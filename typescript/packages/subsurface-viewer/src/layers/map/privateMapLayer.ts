@@ -59,7 +59,7 @@ const defaultProps = {
     contours: [-1, -1],
     isContoursDepth: true,
     gridLines: false,
-    colorMapName: "",
+    colormapName: "",
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
     propertyValueRange: [0.0, 1.0],
     meshValueRange: [0.0, 1.0],

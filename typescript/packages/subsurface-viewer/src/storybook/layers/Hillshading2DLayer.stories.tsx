@@ -55,7 +55,7 @@ export const KhMapFlat: StoryObj<typeof SubsurfaceViewer> = {
     },
 };
 
-// Volve kh netmap using only ColorMapLAyer
+// Volve kh netmap using only ColorMapLayer
 export const KhMapFlatOnlyColorMapLayer: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "kh-map-flat",

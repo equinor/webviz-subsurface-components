@@ -41,7 +41,7 @@ import { getDiscreteMeta } from "../../utils/well-log";
 const wellLogs = wellLogsJson as unknown as WellLogSet[];
 const template = templateJson as unknown as Template;
 
-const exampleColorMapFunctions: ColorMapFunction[] = [
+const exampleColormapFunctions: ColorMapFunction[] = [
     // copy color tables and add some color functions
     ...(colorTables as ColorMapFunction[]),
     {
@@ -69,7 +69,7 @@ const exampleColorMapFunctions: ColorMapFunction[] = [
 const wellpick = {
     wellpick: wellPicks[0],
     name: "HORIZON",
-    colorMapFunctions: exampleColorMapFunctions,
+    colorMapFunctions: exampleColormapFunctions,
     color: "Stratigraphy",
 };
 
@@ -410,7 +410,7 @@ export class MapAndWellLogViewer extends React.Component<
                                     : undefined
                             }
                             template={template}
-                            colorMapFunctions={exampleColorMapFunctions}
+                            colorMapFunctions={exampleColormapFunctions}
                             // @aspentech: This issue needs to get sorted out, there seems to be a compatibility issue with the JSON file and the prop type
                             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                             // @ts-ignore

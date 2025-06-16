@@ -337,20 +337,20 @@ export class PlotPropertiesDialog extends Component<Props, State> {
                 ),
             ];
         } else if (type === "gradientfill") {
-            const colorMapFunctions =
+            const colormapFunctions =
                 this.props.wellLogView.props.colorMapFunctions;
             return [
                 this.createSelectControl(
                     "colorMapFunctionName",
                     "Fill Color function/table",
-                    createColorFunctionItems(colorMapFunctions)
+                    createColorFunctionItems(colormapFunctions)
                 ),
                 <FormControl fullWidth key="211" />,
                 <FormControl fullWidth key="212" />,
                 this.createSelectControl(
                     "inverseColorMapFunctionName",
                     "Inverse Color function/table",
-                    createColorFunctionItems(colorMapFunctions),
+                    createColorFunctionItems(colormapFunctions),
                     true
                 ),
             ];

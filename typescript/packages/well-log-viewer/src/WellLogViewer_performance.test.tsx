@@ -18,7 +18,7 @@ const exampleWellLog = {
     curves: [],
     data: [],
 };
-const exampleColorMapFunctions = colorTables as ColorMapFunction[];
+const exampleColormapFunctions = colorTables as ColorMapFunction[];
 
 window.ResizeObserver =
     window.ResizeObserver ||
@@ -43,7 +43,7 @@ describe("Well Log Viewer perfomance", () => {
                     axisTitles={axisTitles}
                     axisMnemos={axisMnemos}
                     template={exampleTemplate}
-                    colorMapFunctions={exampleColorMapFunctions}
+                    colorMapFunctions={exampleColormapFunctions}
                     onContentRescale={function (): void {
                         // todo: fix the test
                         // commented to make test pass

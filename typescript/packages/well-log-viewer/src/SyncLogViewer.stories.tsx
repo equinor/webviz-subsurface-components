@@ -37,8 +37,8 @@ import L916MUDJson from "../../../../example-data/L916MUD.json";
 import List1Json from "../../../../example-data/Lis1.json";
 import facies3WellsJson from "../../../../example-data/facies3wells.json";
 
-const exampleColorMapFunctions = colorTables as ColorMapFunction[];
-const wellpickColorMapFunctions = wellpickColorTablesJson as ColorMapFunction[];
+const exampleColormapFunctions = colorTables as ColorMapFunction[];
+const wellpickColormapFunctions = wellpickColorTablesJson as ColorMapFunction[];
 const horizonPatterns = horizonPatternsJson as Pattern[];
 
 const syncTemplate = syncTemplateJson as TemplateType;
@@ -205,19 +205,19 @@ const exampleWellPicks: WellPickProps[] = [
     {
         wellpick: wellpicks[0],
         name: "HORIZON",
-        colorMapFunctions: wellpickColorMapFunctions,
+        colorMapFunctions: wellpickColormapFunctions,
         colorMapFunctionName: "Stratigraphy",
     },
     {
         wellpick: wellpicks[1],
         name: "HORIZON",
-        colorMapFunctions: wellpickColorMapFunctions,
+        colorMapFunctions: wellpickColormapFunctions,
         colorMapFunctionName: "Stratigraphy",
     },
     {
         wellpick: wellpicks[0],
         name: "HORIZON",
-        colorMapFunctions: wellpickColorMapFunctions,
+        colorMapFunctions: wellpickColormapFunctions,
         colorMapFunctionName: "Stratigraphy",
     },
 ];
@@ -232,7 +232,7 @@ export const Default: StoryObj<typeof Template> = {
 
         welllogs: [L898MUD[0], L916MUD[0], List1[0]],
         templates: [syncTemplate, syncTemplate],
-        colorMapFunctions: exampleColorMapFunctions,
+        colorMapFunctions: exampleColormapFunctions,
         wellpicks: exampleWellPicks,
         patternsTable: {
             patternSize: 24,
@@ -422,7 +422,7 @@ export const LogsWithDifferentSets: StoryObj<typeof Template> = {
             units: "m",
             distances: [2048.3, 512.7],
         },
-        colorMapFunctions: exampleColorMapFunctions,
+        colorMapFunctions: exampleColormapFunctions,
         templates: [verySimpleTemplate, verySimpleTemplate],
         wellLogCollections: [
             [
