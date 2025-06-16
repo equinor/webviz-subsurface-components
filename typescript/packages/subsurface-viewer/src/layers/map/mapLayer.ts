@@ -10,16 +10,16 @@ import type {
 } from "@deck.gl/core";
 import { CompositeLayer } from "@deck.gl/core";
 import type { Matrix4 } from "math.gl";
-import * as png from "@vivaxy/png";
 
 import type {
     ReportBoundingBoxAction,
     ExtendedLayerProps,
-    ColorMapFunctionType,
 } from "../utils/layerTools";
 import { getModelMatrix } from "../utils/layerTools";
+import type { ColorMapFunctionType } from "../utils/colormapTools";
 import config from "../../SubsurfaceConfig.json";
 import { findConfig } from "../../utils/configTools";
+import { loadFloat32Data } from "../../utils/serialize";
 import PrivateMapLayer from "./privateMapLayer";
 import { rotate } from "./utils";
 import { makeFullMesh } from "./webworker";
@@ -79,62 +79,6 @@ export type Params = [
     smoothShading: boolean,
     gridLines: boolean,
 ];
-
-async function loadURLData(url: string): Promise<Float32Array | null> {
-    let res: Float32Array | null = null;
-    const response = await fetch(url);
-    if (!response.ok) {
-        console.error("Could not load ", url);
-    }
-    const blob = await response.blob();
-    const contentType = response.headers.get("content-type");
-    const isPng = contentType === "image/png";
-    if (isPng) {
-        // Load as Png  with abolute float values.
-        res = await new Promise((resolve) => {
-            const fileReader = new FileReader();
-            fileReader.readAsArrayBuffer(blob);
-            fileReader.onload = () => {
-                const arrayBuffer = fileReader.result;
-                const imgData = png.decode(arrayBuffer as ArrayBuffer);
-                const data = imgData.data; // array of int's
-
-                const n = data.length;
-                const buffer = new ArrayBuffer(n);
-                const view = new DataView(buffer);
-                for (let i = 0; i < n; i++) {
-                    view.setUint8(i, data[i]);
-                }
-
-                const floatArray = new Float32Array(buffer);
-                resolve(floatArray);
-            };
-        });
-    } else {
-        // Load as binary array of floats.
-        const buffer = await blob.arrayBuffer();
-        res = new Float32Array(buffer);
-    }
-    return res;
-}
-
-async function loadFloat32Data(
-    data: string | number[] | Float32Array
-): Promise<Float32Array | null> {
-    if (!data) {
-        return null;
-    }
-    if (ArrayBuffer.isView(data)) {
-        // Input data is typed array.
-        return data;
-    } else if (Array.isArray(data)) {
-        // Input data is native javascript array.
-        return new Float32Array(data);
-    } else {
-        // Input data is an URL.
-        return await loadURLData(data);
-    }
-}
 
 /**
  * Will load data for the mesh and the properties. Both of which may be given as arrays (javascript or typed)

@@ -4,7 +4,7 @@ import "jest-styled-components";
 import "@testing-library/jest-dom";
 import React from "react";
 import ColorLegend from "./ColorLegend";
-import type { ExtendedLayer } from "../layers/utils/layerTools";
+import type { ExtendedLegendLayer } from "../layers/utils/layerTools";
 import { colorTables } from "@emerson-eps/color-tables";
 
 describe("Test Color Legend component", () => {
@@ -20,7 +20,7 @@ describe("Test Color Legend component", () => {
                         colorMapName: "Rainbow",
                         valueRange: [2782, 3513],
                         colorMapRange: [2782, 3513],
-                    } as unknown as ExtendedLayer
+                    } as unknown as ExtendedLegendLayer
                 }
                 colorTables={colorTables}
                 horizontal={false}

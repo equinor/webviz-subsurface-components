@@ -2,15 +2,15 @@ import type { LayerProps, PickingInfo, UpdateParameters } from "@deck.gl/core";
 import { COORDINATE_SYSTEM, Layer, picking, project32 } from "@deck.gl/core";
 
 import { GL } from "@luma.gl/constants";
+import type { Device } from "@luma.gl/core";
 import type { GeometryProps } from "@luma.gl/engine";
 import { Geometry, Model } from "@luma.gl/engine";
-import type { Device } from "@luma.gl/core";
 import type { ShaderModule } from "@luma.gl/shadertools";
-
-import type { DeckGLLayerContext } from "../../components/Map";
 import { lighting } from "@luma.gl/shadertools";
+
 import { phongMaterial } from "../shader_modules/phong-lighting/phong-material";
 import type {
+    DeckGLLayerContext,
     ExtendedLayerProps,
     LayerPickInfo,
     PropertyDataType,

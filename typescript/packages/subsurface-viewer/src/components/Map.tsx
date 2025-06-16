@@ -13,7 +13,6 @@ import { JSONConfiguration, JSONConverter } from "@deck.gl/json";
 
 import type {
     Color,
-    LayerContext,
     LayerProps,
     LayersList,
     PickingInfo,
@@ -204,13 +203,6 @@ interface MarginsType {
     right: number;
     top: number;
     bottom: number;
-}
-
-export interface DeckGLLayerContext extends LayerContext {
-    userData: {
-        setEditedData: (data: Record<string, unknown>) => void;
-        colorTables: colorTablesArray;
-    };
 }
 
 export interface MapMouseEvent {

@@ -22,9 +22,13 @@ import type {
     PickingInfo,
 } from "@deck.gl/core";
 import { COORDINATE_SYSTEM, CompositeLayer } from "@deck.gl/core";
-import type { DeckGLLayerContext } from "../../components/Map";
+
 import { area, length } from "../../utils/measurement";
-import type { ExtendedLayerProps, LayerPickInfo } from "../utils/layerTools";
+import type {
+    DeckGLLayerContext,
+    ExtendedLayerProps,
+    LayerPickInfo,
+} from "../utils/layerTools";
 
 // Custom drawing mode that deletes the selected GeoJson feature when releasing the Delete key.
 class CustomModifyMode extends ModifyMode {

@@ -6,25 +6,32 @@ import type {
     LayerContext,
 } from "@deck.gl/core";
 import { COORDINATE_SYSTEM } from "@deck.gl/core";
+import { Layer, project32, picking } from "@deck.gl/core";
+
 import type { Device, Texture, UniformValue } from "@luma.gl/core";
-import { utilities } from "../shader_modules";
+import type { ShaderModule } from "@luma.gl/shadertools";
 import { lighting } from "@luma.gl/shadertools";
+import { Model, Geometry } from "@luma.gl/engine";
+
 import { phongMaterial } from "../shader_modules/phong-lighting/phong-material";
+import { utilities } from "../shader_modules";
+
 import type {
+    DeckGLLayerContext,
     ExtendedLayerProps,
     LayerPickInfo,
     PropertyDataType,
-    ColorMapFunctionType,
 } from "../utils/layerTools";
-import { createPropertyData, getImageData } from "../utils/layerTools";
-import type { DeckGLLayerContext } from "../../components/Map";
+import { createPropertyData } from "../utils/layerTools";
+import {
+    type ColorMapFunctionType,
+    getImageData,
+} from "../utils/colormapTools";
+
 import fs from "./map.fs.glsl";
 import vs from "./map.vs.glsl";
 import fsLineShader from "./line.fs.glsl";
 import vsLineShader from "./line.vs.glsl";
-import type { ShaderModule } from "@luma.gl/shadertools";
-import { Layer, project32, picking } from "@deck.gl/core";
-import { Model, Geometry } from "@luma.gl/engine";
 
 export interface PrivateMapLayerProps extends ExtendedLayerProps {
     positions: Float32Array;
@@ -122,9 +129,11 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
             height: 1,
             format: "rgb8unorm-webgl",
             data: getImageData(
-                this.props.colorMapName,
-                (this.context as DeckGLLayerContext).userData.colorTables,
-                this.props.colorMapFunction
+                this.props.colorMapFunction ?? {
+                    colormapName: this.props.colorMapName,
+                    colorTables: (this.context as DeckGLLayerContext).userData
+                        .colorTables,
+                }
             ),
         });
 

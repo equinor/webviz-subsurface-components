@@ -1,11 +1,12 @@
 import { isEqual } from "lodash";
 import type React from "react";
 
-import type { Material, UpdateParameters } from "@deck.gl/core";
+import type { UpdateParameters } from "@deck.gl/core";
 import { CompositeLayer } from "@deck.gl/core";
 
 import workerpool from "workerpool";
 
+import type { Material } from "../gpglLayers/typeDefs";
 import type {
     ExtendedLayerProps,
     ReportBoundingBoxAction,

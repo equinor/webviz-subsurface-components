@@ -191,7 +191,7 @@ export default class PolylinesLayer extends CompositeLayer<PolylinesLayerProps> 
         pathType: PathType;
     } {
         // The input arrays can be used as deck.gl binary inputs.
-        // Explicit pathType prevents deck.gl from addtional computations.
+        // Explicit pathType prevents deck.gl from additional computations.
         if (
             this.props.polylinePoints instanceof Float32Array &&
             this.props.startIndices instanceof Uint32Array &&
