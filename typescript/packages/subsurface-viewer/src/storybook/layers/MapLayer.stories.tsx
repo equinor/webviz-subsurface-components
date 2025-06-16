@@ -15,7 +15,7 @@ import { ViewFooter } from "../../components/ViewFooter";
 import AxesLayer from "../../layers/axes/axesLayer";
 import MapLayer from "../../layers/map/mapLayer";
 import NorthArrow3DLayer from "../../layers/northarrow/northArrow3DLayer";
-import type { ColorMapFunctionType } from "../../layers/utils/layerTools";
+import type { ColorMapFunctionType } from "../../layers/utils/colormapTools";
 
 import {
     default2DViews,

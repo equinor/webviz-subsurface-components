@@ -1,6 +1,5 @@
 import "jest";
 
-import type { TypedArray, TypedFloatArray, TypedIntArray } from "./typedArray";
 import { isNumberArray, isTypedArray, toTypedArray } from "./typedArray";
 
 describe("Test isNumberArray", () => {

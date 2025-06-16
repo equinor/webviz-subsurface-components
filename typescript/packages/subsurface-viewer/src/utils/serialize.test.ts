@@ -9,21 +9,21 @@ const smallPropertyFile =
     "../../../../../example-data/small_properties.float32";
 
 // Helper to fetch and read the binary file as reference
-async function getReferenceFloat32Array(): Promise<Float32Array> {
-    // Read the binary file using fs and assign it to Float32Array
-    const filePath = path.resolve(__dirname, smallPropertyFile);
-    const buffer = fs.readFileSync(filePath);
-    return new Float32Array(
-        buffer.buffer,
-        buffer.byteOffset,
-        buffer.byteLength / Float32Array.BYTES_PER_ELEMENT
-    );
+// async function getReferenceFloat32Array(): Promise<Float32Array> {
+//     // Read the binary file using fs and assign it to Float32Array
+//     const filePath = path.resolve(__dirname, smallPropertyFile);
+//     const buffer = fs.readFileSync(filePath);
+//     return new Float32Array(
+//         buffer.buffer,
+//         buffer.byteOffset,
+//         buffer.byteLength / Float32Array.BYTES_PER_ELEMENT
+//     );
 
-    //return new Float32Array(smallPropertyBufferRef);
-    // const response = await fetch(smallPropertyFile);
-    // const buffer = await response.arrayBuffer();
-    // return new Float32Array(buffer);
-}
+//     //return new Float32Array(smallPropertyBufferRef);
+//     // const response = await fetch(smallPropertyFile);
+//     // const buffer = await response.arrayBuffer();
+//     // return new Float32Array(buffer);
+// }
 
 describe("loadFloat32Data", () => {
     it("returns null for null input", async () => {
