@@ -281,7 +281,7 @@ function buildPlotOptions(
         fillOpacity, // for 'area' and 'gradientfill'!
         useMinAsBase: true, // for 'area' and 'gradientfill'!
 
-		// keep colorMap in returned structure: it is an external API
+        // keep colorMap in returned structure: it is an external API
         colorMapFunction: colormapFunction,
         inverseColorMapFunction: inverseColormapFunction,
         colorScale: templatePlot.colorScale,
