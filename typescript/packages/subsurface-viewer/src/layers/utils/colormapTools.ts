@@ -74,14 +74,19 @@ export function getImageData(
     const isColorTableDef =
         "colormapName" in colormapDef &&
         "colorTables" in colormapDef &&
-        !!colormapDef.colormapName;
+        !!colormapDef.colorTables;
 
     let colormap = createDefaultContinuousColorScale() as unknown as funcType;
 
     if (isColorTableDef) {
-        discreteColormapFunction = false;
-        colormap = (value: number) =>
-            rgbValues(value, colormapDef.colormapName, colormapDef.colorTables);
+        if (colormapDef.colormapName) {
+            colormap = (value: number) =>
+                rgbValues(
+                    value,
+                    colormapDef.colormapName,
+                    colormapDef.colorTables
+                );
+        }
     } else if (isFunctionDefined) {
         colormap =
             typeof colormapDef === "function"
