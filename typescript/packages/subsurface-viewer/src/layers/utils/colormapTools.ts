@@ -70,11 +70,12 @@ export function getImageData(
         return colormapDef;
     }
 
+    const isFunction = typeof colormapDef === "function";
     const isColorTableDef =
+        !isFunction &&
         "colormapName" in colormapDef &&
         "colorTables" in colormapDef &&
-        colormapDef.colormapName &&
-        colormapDef.colorTables;
+        !!colormapDef.colormapName;
 
     const defaultColorMap = createDefaultContinuousColorScale;
     let colorMap = defaultColorMap() as unknown as funcType;
@@ -83,7 +84,7 @@ export function getImageData(
         discreteColormapFunction = false;
         colorMap = (value: number) =>
             rgbValues(value, colormapDef.colormapName, colormapDef.colorTables);
-    } else {
+    } else if (isFunction) {
         colorMap =
             typeof colormapDef === "function"
                 ? (colormapDef as funcType)
