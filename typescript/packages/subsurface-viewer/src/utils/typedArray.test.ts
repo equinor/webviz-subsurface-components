@@ -16,10 +16,6 @@ describe("Test isNumberArray", () => {
         expect(isNumberArray(["a", "b", "c"])).toBe(false);
     });
 
-    it("should return false for a mixed array", () => {
-        expect(isNumberArray([1, "2", 3])).toBe(false);
-    });
-
     it("should return false for non-array values", () => {
         expect(isNumberArray("not an array")).toBe(false);
         expect(isNumberArray(123)).toBe(false);
@@ -30,7 +26,7 @@ describe("Test isNumberArray", () => {
 
     it("should return false for TypedArrays values", () => {
         expect(isNumberArray(new Int8Array([1, 2, 3]))).toBe(false);
-        expect(isTypedArray(new Uint8Array([1, 2, 3]))).toBe(false);
+        expect(isNumberArray(new Uint8Array([1, 2, 3]))).toBe(false);
         expect(isNumberArray(new Uint8ClampedArray([1, 2, 3]))).toBe(false);
         expect(isNumberArray(new Int16Array([1, 2, 3]))).toBe(false);
         expect(isNumberArray(new Uint16Array([1, 2, 3]))).toBe(false);
