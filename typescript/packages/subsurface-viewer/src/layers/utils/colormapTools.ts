@@ -42,7 +42,7 @@ export interface ColorTableDef extends ColorTableProps {
     colorTables: colorTablesArray;
 }
 
-export type ColormapProps = ColorMapFunctionType | Uint8Array | ColorTableProps;
+export type ColormapProps = ColormapFunctionType | Uint8Array | ColorTableProps;
 
 /**
  * Represents the possible types that can be used as colormap properties.
@@ -68,7 +68,7 @@ export function getImageData(
     type funcType = (x: number) => Color;
 
     if (colormapDef instanceof Uint8Array) {
-        // If colorMapProps is a Uint8Array, return it directly
+        // If colormapProps is a Uint8Array, return it directly
         return colormapDef;
     }
 
