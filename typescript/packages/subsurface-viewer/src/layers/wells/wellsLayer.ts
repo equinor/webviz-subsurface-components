@@ -32,7 +32,7 @@ import {
     getLayersById,
     isDrawingEnabled,
 } from "../utils/layerTools";
-import type { ColorMapFunctionType } from "../utils/colormapTools";
+import type { ColormapFunctionType } from "../utils/colormapTools";
 
 import type {
     ContinuousLegendDataType,
@@ -110,7 +110,7 @@ export interface WellsLayerProps extends ExtendedLayerProps {
      */
     refine: boolean | number;
     wellHeadStyle: WellHeadStyleAccessor;
-    colorMappingFunction: ColorMapFunctionType;
+    colorMappingFunction: ColormapFunctionType;
     lineStyle: LineStyleAccessor;
 
     /**

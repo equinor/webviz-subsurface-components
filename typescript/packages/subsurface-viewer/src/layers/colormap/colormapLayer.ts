@@ -15,7 +15,7 @@ import type {
 } from "../utils/layerTools";
 import { type DeckGLLayerContext, getModelMatrix } from "../utils/layerTools";
 import {
-    type ColorMapFunctionType,
+    type ColormapFunctionType,
     getImageData,
 } from "../utils/colormapTools";
 import { decodeRGB, type ValueDecoder } from "../utils/propertyMapTools";
@@ -49,7 +49,7 @@ export interface ColormapLayerProps
     // Optional function property.
     // If defined this function will override the color map.
     // Takes a value in the range [0,1] and returns a color.
-    colorMapFunction?: ColorMapFunctionType;
+    colorMapFunction?: ColormapFunctionType;
 
     // Min and max property values.
     valueRange: [number, number];

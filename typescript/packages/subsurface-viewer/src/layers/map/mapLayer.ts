@@ -16,7 +16,7 @@ import type {
     ExtendedLayerProps,
 } from "../utils/layerTools";
 import { getModelMatrix } from "../utils/layerTools";
-import type { ColorMapFunctionType } from "../utils/colormapTools";
+import type { ColormapFunctionType } from "../utils/colormapTools";
 import config from "../../SubsurfaceConfig.json";
 import { findConfig } from "../../utils/configTools";
 import { loadFloat32Data } from "../../utils/serialize";
@@ -175,7 +175,7 @@ export interface MapLayerProps extends ExtendedLayerProps {
      * May also be set as constant color:
      * E.g. [255, 0, 0] for constant red surface.
      */
-    colorMapFunction?: ColorMapFunctionType;
+    colorMapFunction?: ColormapFunctionType;
 
     /**  Surface material properties.
      * material: true  = default material, coloring depends on surface orientation and lighting.
