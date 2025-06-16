@@ -10,7 +10,7 @@ import type {
     WellLogSet,
 } from "../components/WellLogTypes";
 import type { WellLogViewProps } from "../components/WellLogView";
-import type { ColorMapFunction } from "./color-function";
+import type { ColormapFunction } from "./color-function";
 import type { AxesInfo } from "./axes";
 import { indexOfElementByNames } from "./arrays";
 import { getInterpolatedColor } from "./color-table";
@@ -233,7 +233,7 @@ export function getDiscreteMeta(
 
 export function getDiscreteColorAndName(
     value: number | string | null,
-    colormapFunction: ColorMapFunction | undefined,
+    colormapFunction: ColormapFunction | undefined,
     meta?: DiscreteMeta | null
 ): { color: number[]; name: string } {
     let color: number[];

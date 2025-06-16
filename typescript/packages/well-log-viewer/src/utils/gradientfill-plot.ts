@@ -8,11 +8,11 @@ import type {
 
 import renderGradientFillPlotLegend from "./gradientfill-plot-legend";
 import { getInterpolatedColorString } from "./color-table";
-import type { ColorMapFunction } from "./color-function";
+import type { ColormapFunction } from "./color-function";
 
 export interface GradientFillPlotOptions extends AreaPlotOptions {
-    colorMapFunction?: ColorMapFunction;
-    inverseColorMapFunction?: ColorMapFunction;
+    colorMapFunction?: ColormapFunction;
+    inverseColorMapFunction?: ColormapFunction;
     colorScale?: "linear" | "log";
     inverseColorScale?: "linear" | "log";
 }
@@ -26,7 +26,7 @@ function createGradient(
     horizontal: boolean | undefined,
     plotdata: number[][],
     xscale: Scale,
-    colormapFunction: ColorMapFunction,
+    colormapFunction: ColormapFunction,
     scale: undefined | string // "linear" | "log"
 ): CanvasGradient {
     const dataFrom = plotdata[0];

@@ -19,7 +19,7 @@ import type { DifferentialPlotLegendInfo } from "@equinor/videx-wellog/dist/plot
 import { validateSchema } from "@webviz/wsc-common";
 
 import type { AxesInfo } from "../utils/axes";
-import type { ColorMapFunction } from "../utils/color-function";
+import type { ColormapFunction } from "../utils/color-function";
 import { deepCopy } from "../utils/deepcopy";
 import {
     createNewViewTrack,
@@ -326,7 +326,7 @@ export interface WellPickProps {
     /**
      * Prop containing color tables or color functions array for well picks
      */
-    colorMapFunctions: ColorMapFunction[];
+    colorMapFunctions: ColormapFunction[];
     colorMapFunctionName: string; // "Stratigraphy" ..., "Step func", ...
 }
 
@@ -690,7 +690,7 @@ function setTracksToController(
     axes: AxesInfo,
     wellLogSets: WellLogSet[], // JSON Log Format
     templateTracks: TemplateTrack[], // JSON
-    colorMapFunctions: ColorMapFunction[] // JS code array or JSON file for pure color tables array without color functions elements
+    colorMapFunctions: ColormapFunction[] // JS code array or JSON file for pure color tables array without color functions elements
 ): ScaleInterpolator {
     const { tracks, minmaxPrimaryAxis: minmaxPrimaryAxis } =
         createWellLogTracks(
@@ -1013,7 +1013,7 @@ export interface WellLogViewProps {
     /**
       Prop containing color table or color functions array for discrete well logs
      */
-    colorMapFunctions: ColorMapFunction[];
+    colorMapFunctions: ColormapFunction[];
 
     /**
      * Well Picks data

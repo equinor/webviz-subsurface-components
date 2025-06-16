@@ -7,10 +7,12 @@ export type ColorFunction = {
     func: (v: number) => [number, number, number]; // input number is between 0.0 and 1.0; returned numbers are between 0 and 255
 };
 
-export type ColorMapFunction = colorTablesObj | ColorFunction;
+export type ColormapFunction = colorTablesObj | ColorFunction;
+/** @deprecated Use ColormapFunction instead. */
+export type ColorMapFunction = ColormapFunction;
 
 export function isFunction(
-    colormapFunction: ColorMapFunction | undefined
+    colormapFunction: ColormapFunction | undefined
 ): boolean {
     if (!colormapFunction) return false;
     return !!(colormapFunction as ColorFunction).func;
@@ -18,8 +20,8 @@ export function isFunction(
 
 export function getColormapFunction(
     functionName?: string,
-    colormapFunctions?: ColorMapFunction[]
-): ColorMapFunction | undefined {
+    colormapFunctions?: ColormapFunction[]
+): ColormapFunction | undefined {
     if (!functionName) return undefined;
     if (!colormapFunctions) {
         console.error("No color functions provided for graph!");

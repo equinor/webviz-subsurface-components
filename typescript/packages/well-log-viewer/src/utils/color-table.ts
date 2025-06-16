@@ -1,5 +1,5 @@
 import {
-    type ColorMapFunction,
+    type ColormapFunction,
     type ColorFunction,
     type ColorTable,
     isFunction,
@@ -78,7 +78,7 @@ export function getExactColor(
   get HTML string with interpolated color value in #xxxxxx format
 */
 export function getInterpolatedColor(
-    colormapFunction: ColorMapFunction,
+    colormapFunction: ColormapFunction,
     v: number
 ): [number, number, number] {
     if (isFunction(colormapFunction)) {
@@ -125,7 +125,7 @@ export function getInterpolatedColor(
   get HTML string with interpolated color value in #xxxxxx format
 */
 export function getInterpolatedColorString(
-    colormapFunction: ColorMapFunction,
+    colormapFunction: ColormapFunction,
     v: number
 ): string {
     if (isFunction(colormapFunction)) {
