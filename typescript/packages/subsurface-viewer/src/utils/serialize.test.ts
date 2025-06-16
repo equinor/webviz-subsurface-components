@@ -9,21 +9,21 @@ const smallPropertyFile =
     "../../../../../example-data/small_properties.float32";
 
 // Helper to fetch and read the binary file as reference
-// async function getReferenceFloat32Array(): Promise<Float32Array> {
-//     // Read the binary file using fs and assign it to Float32Array
-//     const filePath = path.resolve(__dirname, smallPropertyFile);
-//     const buffer = fs.readFileSync(filePath);
-//     return new Float32Array(
-//         buffer.buffer,
-//         buffer.byteOffset,
-//         buffer.byteLength / Float32Array.BYTES_PER_ELEMENT
-//     );
+async function getReferenceFloat32Array(): Promise<Float32Array> {
+    // Read the binary file using fs and assign it to Float32Array
+    const filePath = path.resolve(__dirname, smallPropertyFile);
+    const buffer = fs.readFileSync(filePath);
+    return new Float32Array(
+        buffer.buffer,
+        buffer.byteOffset,
+        buffer.byteLength / Float32Array.BYTES_PER_ELEMENT
+    );
 
-//     //return new Float32Array(smallPropertyBufferRef);
-//     // const response = await fetch(smallPropertyFile);
-//     // const buffer = await response.arrayBuffer();
-//     // return new Float32Array(buffer);
-// }
+    //return new Float32Array(smallPropertyBufferRef);
+    // const response = await fetch(smallPropertyFile);
+    // const buffer = await response.arrayBuffer();
+    // return new Float32Array(buffer);
+}
 
 describe("loadFloat32Data", () => {
     it("returns null for null input", async () => {
@@ -45,14 +45,14 @@ describe("loadFloat32Data", () => {
     });
 
     // Needs elaborated mocking of fetch
-    // it("loads Float32Array from a binary file URL", async () => {
-    //     const expected = await getReferenceFloat32Array();
-    //     const result = await loadFloat32Data(smallPropertyFile);
-    //     expect(result).toBeInstanceOf(Float32Array);
-    //     expect(result!.length).toBe(expected.length);
-    //     // Compare values with precision
-    //     for (let i = 0; i < expected.length; i++) {
-    //         expect(result![i]).toBeCloseTo(expected[i]);
-    //     }
-    // });
+    it.skip("loads Float32Array from a binary file URL", async () => {
+        const expected = await getReferenceFloat32Array();
+        const result = await loadFloat32Data(smallPropertyFile);
+        expect(result).toBeInstanceOf(Float32Array);
+        expect(result!.length).toBe(expected.length);
+        // Compare values with precision
+        for (let i = 0; i < expected.length; i++) {
+            expect(result![i]).toBeCloseTo(expected[i]);
+        }
+    });
 });
