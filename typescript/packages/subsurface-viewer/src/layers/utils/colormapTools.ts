@@ -70,22 +70,20 @@ export function getImageData(
         return colormapDef;
     }
 
-    const isFunction = typeof colormapDef === "function";
+    const isFunctionDefined = colormapDef !== undefined;
     const isColorTableDef =
-        !isFunction &&
         "colormapName" in colormapDef &&
         "colorTables" in colormapDef &&
         !!colormapDef.colormapName;
 
-    const defaultColorMap = createDefaultContinuousColorScale;
-    let colorMap = defaultColorMap() as unknown as funcType;
+    let colormap = createDefaultContinuousColorScale() as unknown as funcType;
 
     if (isColorTableDef) {
         discreteColormapFunction = false;
-        colorMap = (value: number) =>
+        colormap = (value: number) =>
             rgbValues(value, colormapDef.colormapName, colormapDef.colorTables);
-    } else if (isFunction) {
-        colorMap =
+    } else if (isFunctionDefined) {
+        colormap =
             typeof colormapDef === "function"
                 ? (colormapDef as funcType)
                 : ((() => colormapDef) as unknown as funcType);
@@ -97,7 +95,7 @@ export function getImageData(
         ? 1
         : 1 / Math.max(colormapSize - 1, 1);
     for (let i = 0; i < colormapSize; i++) {
-        const color = colorMap ? colorMap(scaling * i) : [1, 0, 0];
+        const color = colormap ? colormap(scaling * i) : [1, 0, 0];
         if (color) {
             data[3 * i + 0] = color[0];
             data[3 * i + 1] = color[1];
