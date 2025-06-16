@@ -15,7 +15,7 @@ import { ViewFooter } from "../../components/ViewFooter";
 import AxesLayer from "../../layers/axes/axesLayer";
 import MapLayer from "../../layers/map/mapLayer";
 import NorthArrow3DLayer from "../../layers/northarrow/northArrow3DLayer";
-import type { ColorMapFunctionType } from "../../layers/utils/colormapTools";
+import type { ColormapFunctionType } from "../../layers/utils/colormapTools";
 
 import {
     default2DViews,
@@ -501,7 +501,7 @@ const TypedArrayInputComponent: React.FC<{
                 material: true,
                 ZIncreasingDownwards: false,
                 contours: [0, 5],
-                colorMapFunction: nearestColormap as ColorMapFunctionType,
+                colorMapFunction: nearestColormap as ColormapFunctionType,
             },
             {
                 "@@type": "AxesLayer",
