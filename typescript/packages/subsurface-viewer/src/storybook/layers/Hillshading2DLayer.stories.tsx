@@ -55,8 +55,8 @@ export const KhMapFlat: StoryObj<typeof SubsurfaceViewer> = {
     },
 };
 
-// Volve kh netmap using only ColorMapLayer
-export const KhMapFlatOnlyColorMapLayer: StoryObj<typeof SubsurfaceViewer> = {
+// Volve kh netmap using only ColormapLayer
+export const KhMapFlatOnlyColormapLayer: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "kh-map-flat",
         resources: {
@@ -82,7 +82,7 @@ export const KhMapFlatOnlyColorMapLayer: StoryObj<typeof SubsurfaceViewer> = {
         docs: {
             ...defaultStoryParameters.docs,
             description: {
-                story: "An example showing a kh property layer and a depth map hillshading layer using only ColorMapLayer.",
+                story: "An example showing a kh property layer and a depth map hillshading layer using only ColormapLayer.",
             },
         },
     },
@@ -94,7 +94,7 @@ const axesLayer2D = {
     backgroundColor: [0, 255, 255],
 };
 
-const ColorMapLayerComponent: React.FC<{
+const ColormapLayerComponent: React.FC<{
     triggerHome: number;
     contours: boolean;
     hillshading: boolean;
@@ -138,7 +138,7 @@ const ColorMapLayerComponent: React.FC<{
     return <SubsurfaceViewer {...subsurfaceViewerArgs} />;
 };
 
-export const ColorMapLayer: StoryObj<typeof ColorMapLayerComponent> = {
+export const ColormapLayer: StoryObj<typeof ColormapLayerComponent> = {
     args: {
         hillshading: false,
         contours: false,
@@ -163,9 +163,9 @@ export const ColorMapLayer: StoryObj<typeof ColorMapLayerComponent> = {
         docs: {
             ...defaultStoryParameters.docs,
             description: {
-                story: "ColorMapLayer example.",
+                story: "ColormapLayer example.",
             },
         },
     },
-    render: (args) => <ColorMapLayerComponent {...args} />,
+    render: (args) => <ColormapLayerComponent {...args} />,
 };
