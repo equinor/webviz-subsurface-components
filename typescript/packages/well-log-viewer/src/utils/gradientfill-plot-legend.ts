@@ -19,7 +19,7 @@ import { color4ToString } from "./color-table";
 let __idGradient = 0;
 function createGradient(
     g: D3Selection,
-    colorMapFunction: ColorMapFunction,
+    colormapFunction: ColorMapFunction,
     rLogarithmic?: number
 ): string {
     const id = "grad" + ++__idGradient; // generate unique id
@@ -39,18 +39,18 @@ function createGradient(
             const fraction = i / nIntervals;
             const y = 1 + fraction * d;
             const v = Math.log(y) / yDelta;
-            const c = getInterpolatedColorString(colorMapFunction, v);
+            const c = getInterpolatedColorString(colormapFunction, v);
             lg.append("stop")
                 .attr("offset", fraction * 100.0 + "%")
                 .style("stop-color", c);
         }
     } else {
-        if (isFunction(colorMapFunction)) {
+        if (isFunction(colormapFunction)) {
             const nIntervals = 25; // set some not very big value to smooth filling
             for (let i = 0; i <= nIntervals; i++) {
                 const fraction = i / nIntervals;
                 const c = getInterpolatedColorString(
-                    colorMapFunction,
+                    colormapFunction,
                     fraction
                 );
                 lg.append("stop")
@@ -58,7 +58,7 @@ function createGradient(
                     .style("stop-color", c);
             }
         } else {
-            const table = colorMapFunction as ColorTable;
+            const table = colormapFunction as ColorTable;
             const colors = table.colors;
             for (let i = 0; i < colors.length; i++) {
                 const color = colors[i];
@@ -107,28 +107,28 @@ export default function renderGradientFillPlotLegend(
                 : plot.options.color;
 
         /* Start GradientFill code */
-        let colorMapFunction: ColorMapFunction | undefined =
+        let colormapFunction: ColorMapFunction | undefined =
             useMinAsBase && minIsLeft
                 ? options.colorMapFunction
                 : options.inverseColorMapFunction;
-        if (colorMapFunction) {
+        if (colormapFunction) {
             const id = createGradient(
                 g,
-                colorMapFunction,
+                colormapFunction,
                 options.scale === "linear" && options.colorScale === "log"
                     ? max / min
                     : undefined
             );
             fillNrm = "url(#" + id + ")";
         }
-        colorMapFunction =
+        colormapFunction =
             useMinAsBase && minIsLeft
                 ? options.inverseColorMapFunction
                 : options.colorMapFunction;
-        if (colorMapFunction) {
+        if (colormapFunction) {
             const id = createGradient(
                 g,
-                colorMapFunction,
+                colormapFunction,
                 options.scale === "linear" &&
                     (options.inverseColorScale || options.colorScale) === "log"
                     ? max / min
@@ -158,12 +158,12 @@ export default function renderGradientFillPlotLegend(
     } else {
         let fillNrm = plot.options.color; // see area-plot-legend.ts! should be? plot.options.fill || plot.options.color;
         /* Start GradientFill code */
-        const colorMapFunction = options.colorMapFunction;
-        if (colorMapFunction) {
+        const colormapFunction = options.colorMapFunction;
+        if (colormapFunction) {
             const [min, max] = plot.scale.domain();
             const id = createGradient(
                 g,
-                colorMapFunction,
+                colormapFunction,
                 options.scale === "linear" && options.colorScale === "log"
                     ? max / min
                     : undefined

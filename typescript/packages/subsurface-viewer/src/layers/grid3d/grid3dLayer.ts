@@ -338,7 +338,7 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
                     valueRange: this.props.colorMapRange ?? propertyValueRange,
                     colorName: this.props.colorMapName,
                     title: "MapLayer",
-                    colorMapFunction: this.props.colorMapFunction,
+                    colormapFunction: this.props.colorMapFunction,
                 };
 
                 this.setState({
@@ -413,12 +413,12 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
                 mesh: this.state["mesh"],
                 meshLines: this.state["mesh_lines"],
                 pickable: this.props.pickable,
-                colorMapName: this.props.colorMapName,
-                colorMapRange: this.props.colorMapRange,
-                colorMapClampColor: this.props.colorMapClampColor,
+                colormapName: this.props.colorMapName,
+                colormapRange: this.props.colorMapRange,
+                colormapClampColor: this.props.colorMapClampColor,
                 undefinedPropertyValue: undefinedValue,
                 undefinedPropertyColor: undefinedColor,
-                colorMapFunction: this.props.colorMapFunction,
+                colormapFunction: this.props.colorMapFunction,
                 coloringMode: this.props.coloringMode,
                 gridLines: this.props.gridLines,
                 propertyValueRange: this.getPropertyValueRange(),
@@ -465,14 +465,14 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
         const colorFunc = this.props.colorMapFunction;
         if (
             this.props.propertiesData?.length === 0 &&
-            this.isColorMapFunctionConstantColor(colorFunc)
+            this.isColormapFunctionConstantColor(colorFunc)
         ) {
             return [colorFunc[0], colorFunc[1], colorFunc[2]];
         }
         return this.props.undefinedPropertyColor ?? [204, 204, 204];
     }
 
-    private isColorMapFunctionConstantColor(
+    private isColormapFunctionConstantColor(
         colorFunc: Uint8Array | ColorMapFunctionType | undefined
     ): colorFunc is Uint8Array {
         return (

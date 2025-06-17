@@ -20,14 +20,14 @@ export default class Map2D extends Component {
         layers,
         height = 800,
         width = undefined,
-        colorMap = "viridis",
+        colormap = "viridis",
         valUnit = "",
         layerNames = [],
     }) {
         super();
         this.elementSelector = elementSelector;
         this._calcMinMax(layers);
-        this.colorMap = colorMap;
+        this.colormap = colormap;
         this.valUnit = valUnit;
         this.layerNames = layerNames;
         this.layers = layers;
@@ -112,7 +112,7 @@ export default class Map2D extends Component {
 
     initColorScale() {
         let colorScale;
-        switch (this.colorMap) {
+        switch (this.colormap) {
             case "viridis":
                 colorScale = d3.interpolateViridis;
                 break;

@@ -27,7 +27,7 @@ import type {
 
 import { type AxesInfo } from "./axes";
 import type { ColorMapFunction } from "./color-function";
-import { getColorMapFunction } from "./color-function";
+import { getColormapFunction } from "./color-function";
 
 import GradientFillPlot, {
     type GradientFillPlotOptions,
@@ -205,7 +205,7 @@ function makeDataAccessorFunc(
  * @param plotSetup - The setup information for the primary plot.
  * @param plotSetup2 - The setup information for the secondary plot, if any.
  * @param trackTemplate - The template for the track.
- * @param colorMapFunctions - An array of color map functions, for coloring the plot.
+ * @param colormapFunctions - An array of color map functions, for coloring the plot.
  * @param iData - The index of the parent track's data array that corresponds to the primary plot.
  * @param iData2 - The index for the secondary curve, if any.
  * @returns The configuration for the plot.
@@ -214,7 +214,7 @@ export function buildPlotConfig(
     plotSetup: PlotSetup,
     plotSetup2: PlotSetup | null,
     trackTemplate: TemplateTrack,
-    colorMapFunctions: ColorMapFunction[] | undefined,
+    colormapFunctions: ColorMapFunction[] | undefined,
     iData: number,
     iData2: number
 ): PlotConfig {
@@ -227,7 +227,7 @@ export function buildPlotConfig(
             plotSetup,
             plotSetup2,
             trackTemplate,
-            colorMapFunctions,
+            colormapFunctions,
             iData,
             iData2
         ),
@@ -238,7 +238,7 @@ function buildPlotOptions(
     plotSetup: PlotSetup,
     plotSetup2: PlotSetup | null,
     trackTemplate: TemplateTrack,
-    colorMapFunctions: ColorMapFunction[] | undefined,
+    colormapFunctions: ColorMapFunction[] | undefined,
     iData: number,
     iData2: number
 ): ExtPlotOptions {
@@ -247,13 +247,13 @@ function buildPlotOptions(
 
     const domain = getScaledDomain(templatePlot, scale, minmax);
 
-    const colorMapFunction = getColorMapFunction(
+    const colormapFunction = getColormapFunction(
         templatePlot.colorMapFunctionName,
-        colorMapFunctions
+        colormapFunctions
     );
-    const inverseColorMapFunction = getColorMapFunction(
+    const inverseColormapFunction = getColormapFunction(
         templatePlot.inverseColorMapFunctionName,
-        colorMapFunctions
+        colormapFunctions
     );
 
     const dataAccessorFunc = makeDataAccessorFunc(
@@ -281,8 +281,9 @@ function buildPlotOptions(
         fillOpacity, // for 'area' and 'gradientfill'!
         useMinAsBase: true, // for 'area' and 'gradientfill'!
 
-        colorMapFunction,
-        inverseColorMapFunction,
+        // keep colorMap in returned structure: it is an external API
+        colorMapFunction: colormapFunction,
+        inverseColorMapFunction: inverseColormapFunction,
         colorScale: templatePlot.colorScale,
         inverseColorScale: templatePlot.inverseColorScale,
 
@@ -307,12 +308,12 @@ function createAreaData(
     from: number,
     to: number,
     value: number | string,
-    colorMapFunction: ColorMapFunction | undefined,
+    colormapFunction: ColorMapFunction | undefined,
     meta?: DiscreteMeta | null
 ): AreaData | null {
     const { color, name } = getDiscreteColorAndName(
         value,
-        colorMapFunction,
+        colormapFunction,
         meta
     );
     return {
@@ -332,14 +333,14 @@ function createAreaData(
  * Creates an array of `AreaData` objects that together form a discrete stacked graph.
  *
  * @param data - An array of key-value tuple rows.
- * @param colorMapFunction - A function that maps values to colors. Can be undefined.
+ * @param colormapFunction - A function that maps values to colors. Can be undefined.
  * @param meta - Metadata defining how a value is represented (i.e label and color).
  *
  * @returns A promise that resolves to an array of `AreaData` objects.
  */
 export async function createStackData(
     data: [number | null, number | string | null][],
-    colorMapFunction: ColorMapFunction | undefined,
+    colormapFunction: ColorMapFunction | undefined,
     meta: DiscreteMeta | undefined | null
 ): Promise<AreaData[]> {
     const arr: AreaData[] = new Array<AreaData>();
@@ -386,7 +387,7 @@ export async function createStackData(
                 boundary,
                 p[0],
                 value,
-                colorMapFunction,
+                colormapFunction,
                 meta
             );
         }

@@ -78,15 +78,15 @@ export function getExactColor(
   get HTML string with interpolated color value in #xxxxxx format
 */
 export function getInterpolatedColor(
-    colorMapFunction: ColorMapFunction,
+    colormapFunction: ColorMapFunction,
     v: number
 ): [number, number, number] {
-    if (isFunction(colorMapFunction)) {
-        const func = colorMapFunction as ColorFunction;
+    if (isFunction(colormapFunction)) {
+        const func = colormapFunction as ColorFunction;
         return func.func(v);
     }
 
-    const table = colorMapFunction as ColorTable;
+    const table = colormapFunction as ColorTable;
     // TODO: Do not compute these 3 constants (cNaN, cBelow, cAbove) every time!
     const cNaN: [number, number, number] = table.colorNaN
         ? table.colorNaN
@@ -125,15 +125,15 @@ export function getInterpolatedColor(
   get HTML string with interpolated color value in #xxxxxx format
 */
 export function getInterpolatedColorString(
-    colorMapFunction: ColorMapFunction,
+    colormapFunction: ColorMapFunction,
     v: number
 ): string {
-    if (isFunction(colorMapFunction)) {
-        const func = colorMapFunction as ColorFunction;
+    if (isFunction(colormapFunction)) {
+        const func = colormapFunction as ColorFunction;
         return colorToString(func.func(v), "#ffffff");
     }
 
-    const colorTable = colorMapFunction as ColorTable;
+    const colorTable = colormapFunction as ColorTable;
     // TODO: Do not compute these 3 constants (cNaN, cBelow, cAbove) every time!
     const cNaN = colorToString(colorTable.colorNaN, "#ffffff"); // "white"
 

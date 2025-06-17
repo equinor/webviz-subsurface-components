@@ -153,9 +153,9 @@ const layer = {
     isContoursDepth: true,
     colorMapFunction: (x: number) => [255 - x * 100, 255 - x * 100, 255 * x], // If defined this function will override the colormap.
 };
-export const colorMapFunction: StoryObj<typeof SubsurfaceViewer> = {
+export const ColormapFunction: StoryObj<typeof SubsurfaceViewer> = {
     args: {
-        id: "colorMapFunction",
+        id: "ColormapFunction",
         layers: [
             // map layer
             layer,

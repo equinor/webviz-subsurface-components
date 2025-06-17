@@ -39,13 +39,13 @@ void main(void) {
    // This may happen due to GPU interpolation precision causing color artifacts.
    propertyValue = clamp(propertyValue, map.valueRangeMin, map.valueRangeMax);
 
-   float x = (propertyValue - map.colorMapRangeMin) / (map.colorMapRangeMax - map.colorMapRangeMin);
+   float x = (propertyValue - map.colormapRangeMin) / (map.colormapRangeMax - map.colormapRangeMin);
    if (x < 0.0 || x > 1.0) {
       // Out of range. Use clampcolor.
       if (map.isClampColor) {
-         color = vec4(map.colorMapClampColor.rgb, 1.0);
+         color = vec4(map.colormapClampColor.rgb, 1.0);
       }
-      else if (map.isColorMapClampColorTransparent) {
+      else if (map.isColormapClampColorTransparent) {
          discard;
          return;
       }

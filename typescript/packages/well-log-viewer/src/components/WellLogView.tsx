@@ -454,15 +454,15 @@ export function getWellPicks(wellLogView: WellLogView): WellPick[] {
             const vSecondary =
                 primaryAxis === "md" ? scaleInterpolator?.reverse(vMD) : vMD;
 
-            const colorMapFunction = wellpick.colorMapFunctions.find(
-                (colorMapFunction) =>
-                    colorMapFunction.name === wellpick.colorMapFunctionName
+            const colormapFunction = wellpick.colorMapFunctions.find(
+                (colormapFunction) =>
+                    colormapFunction.name === wellpick.colorMapFunctionName
             );
 
             const meta = getDiscreteMeta(wellpick.wellpick, wellpick.name);
             const { color } = getDiscreteColorAndName(
                 d[c],
-                colorMapFunction,
+                colormapFunction,
                 meta
             );
 

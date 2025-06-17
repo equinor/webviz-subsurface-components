@@ -20,13 +20,13 @@ const ColorBar = (props) => {
 
     // State
     const [control, setControl] = useState(null);
-    const [colorMap, setColorMap] = useState(null);
+    const [colormap, setColormap] = useState(null);
     const [minMaxValue, setMinMaxValue] = useState([0, 0]);
     const [unit, setUnit] = useState(null);
 
     useEffect(() => {
         addControl();
-        createNewColorMap();
+        createNewColormap();
         updateUnit();
     }, []);
 
@@ -45,7 +45,7 @@ const ColorBar = (props) => {
     };
 
     useEffect(() => {
-        createNewColorMap();
+        createNewColormap();
         updateUnit();
     }, focusedDependencyArray());
 
@@ -58,7 +58,7 @@ const ColorBar = (props) => {
         setUnit(unit);
     };
 
-    const createNewColorMap = () => {
+    const createNewColormap = () => {
         if (!focusedImageLayer) {
             return;
         }
@@ -66,13 +66,13 @@ const ColorBar = (props) => {
         const options = focusedImageLayer.options || {};
         const colorScale = options.colorScale;
         if (colorScale) {
-            setColorMap(buildColormap(colorScale));
+            setColormap(buildColormap(colorScale));
             setMinMaxValue([options.minvalue, options.maxvalue]);
         } else if (!colorScale && options.url) {
-            setColorMap(buildColormap(["#FFFFFF"]));
+            setColormap(buildColormap(["#FFFFFF"]));
             setMinMaxValue([options.minvalue, options.maxvalue]);
         } else {
-            setColorMap(null);
+            setColormap(null);
         }
     };
 
@@ -94,17 +94,17 @@ const ColorBar = (props) => {
         setControl(newColorBarCtrl);
     };
 
-    if (!colorMap || minMaxValue.length !== 2 || !control) {
+    if (!colormap || minMaxValue.length !== 2 || !control) {
         return null;
     }
 
     return ReactDOM.createPortal(
         <div className="leaflet-colorbar">
             <div className="leaflet-colorbar-image">
-                {colorMap && (
+                {colormap && (
                     <img
-                        key={colorMap}
-                        src={colorMap}
+                        key={colormap}
+                        src={colormap}
                         style={{ width: "100%", height: "10px" }}
                     />
                 )}

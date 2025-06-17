@@ -46,12 +46,12 @@ import type { MeshType, MeshTypeLines } from "./typeDefs";
 export interface PrivateLayerProps extends ExtendedLayerProps {
     mesh: MeshType;
     meshLines: MeshTypeLines;
-    colorMapName: string;
-    colorMapRange: [number, number];
-    colorMapClampColor: Color | undefined | boolean;
+    colormapName: string;
+    colormapRange: [number, number];
+    colormapClampColor: Color | undefined | boolean;
     undefinedPropertyValue: number;
     undefinedPropertyColor: [number, number, number];
-    colorMapFunction?: ColorMapFunctionType;
+    colormapFunction?: ColorMapFunctionType;
     coloringMode: TGrid3DColoringMode.Property;
     gridLines: boolean;
     propertyValueRange: [number, number];
@@ -62,8 +62,8 @@ export interface PrivateLayerProps extends ExtendedLayerProps {
 }
 
 const defaultProps = {
-    colorMapName: "",
-    colorMapClampColor: [200, 200, 200],
+    colormapName: "",
+    colormapClampColor: [200, 200, 200],
     coloringMode: 0,
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
     propertyValueRange: [0.0, 1.0],
@@ -76,14 +76,14 @@ interface IUniforms {
     ZIncreasingDownwards: boolean;
     valueRangeMin: number;
     valueRangeMax: number;
-    colorMapRangeMin: number;
-    colorMapRangeMax: number;
-    colorMapClampColor: number[];
+    colormapRangeMin: number;
+    colormapRangeMax: number;
+    colormapClampColor: number[];
     isClampColor: boolean;
     coloringMode: TGrid3DColoringMode;
     undefinedPropertyColor: [number, number, number];
     isColoringDiscrete: boolean;
-    colorMapSize: number;
+    colormapSize: number;
 }
 
 interface IColormapTextureHints {
@@ -144,8 +144,8 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
         const geometricShading = isGeometricProperty(this.props.coloringMode);
         const uniforms = this.getUniforms();
         const colormap = createColormapTexture(
-            this.props.colorMapFunction ?? {
-                colormapName: this.props.colorMapName,
+            this.props.colormapFunction ?? {
+                colormapName: this.props.colormapName,
                 colorTables: (this.context as DeckGLLayerContext).userData
                     .colorTables,
             },
@@ -326,10 +326,10 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
     }
 
     private getColoringHints(): IColormapTextureHints {
-        if (this.props.colorMapFunction instanceof Uint8Array) {
+        if (this.props.colormapFunction instanceof Uint8Array) {
             return {
                 discreteData: true,
-                colormapSize: this.props.colorMapFunction.length / 3,
+                colormapSize: this.props.colormapFunction.length / 3,
             };
         }
         if (isDiscreteProperty(this.props.coloringMode)) {
@@ -351,40 +351,40 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
         const valueRangeMin = this.props.propertyValueRange?.[0] ?? 0.0;
         const valueRangeMax = this.props.propertyValueRange?.[1] ?? 1.0;
 
-        // If specified color map will extend from colorMapRangeMin to colorMapRangeMax.
+        // If specified color map will extend from colormapRangeMin to colormapRangeMax.
         // Otherwise it will extend from valueRangeMin to valueRangeMax.
-        const colorMapRangeMin = this.props.colorMapRange?.[0] ?? valueRangeMin;
-        const colorMapRangeMax = this.props.colorMapRange?.[1] ?? valueRangeMax;
+        const colormapRangeMin = this.props.colormapRange?.[0] ?? valueRangeMin;
+        const colormapRangeMax = this.props.colormapRange?.[1] ?? valueRangeMax;
 
-        const isColorMapClampColorTransparent: boolean =
-            (this.props.colorMapClampColor as boolean) === false;
+        const isColormapClampColorTransparent: boolean =
+            (this.props.colormapClampColor as boolean) === false;
         const hasClampColor: boolean =
-            this.props.colorMapClampColor !== undefined &&
-            this.props.colorMapClampColor !== true &&
-            this.props.colorMapClampColor !== false;
-        let colorMapClampColor = (
-            hasClampColor ? this.props.colorMapClampColor : [0, 0, 0, 255]
+            this.props.colormapClampColor !== undefined &&
+            this.props.colormapClampColor !== true &&
+            this.props.colormapClampColor !== false;
+        let colormapClampColor = (
+            hasClampColor ? this.props.colormapClampColor : [0, 0, 0, 255]
         ) as Color;
-        if (isColorMapClampColorTransparent) {
-            colorMapClampColor = [0, 0, 0, 0];
+        if (isColormapClampColorTransparent) {
+            colormapClampColor = [0, 0, 0, 0];
         }
 
-        if (colorMapClampColor.length === 3) {
-            colorMapClampColor = [...colorMapClampColor, 255] as [
+        if (colormapClampColor.length === 3) {
+            colormapClampColor = [...colormapClampColor, 255] as [
                 number,
                 number,
                 number,
                 number,
             ];
         }
-        const isClampColor = hasClampColor || isColorMapClampColorTransparent;
+        const isClampColor = hasClampColor || isColormapClampColorTransparent;
 
         // Normalize to [0,1] range.
-        const colorMapClampColorUniform = colorMapClampColor.map(
+        const colormapClampColorUniform = colormapClampColor.map(
             (x) => (x ?? 0) / 255
         );
-        if (isColorMapClampColorTransparent) {
-            colorMapClampColor[3] = 0;
+        if (isColormapClampColorTransparent) {
+            colormapClampColor[3] = 0;
         }
 
         const undefinedPropertyColorUniform =
@@ -400,14 +400,14 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             ZIncreasingDownwards: this.props.ZIncreasingDownwards,
             valueRangeMin,
             valueRangeMax,
-            colorMapRangeMin,
-            colorMapRangeMax,
-            colorMapClampColor: Array.from(colorMapClampColorUniform),
+            colormapRangeMin: colormapRangeMin,
+            colormapRangeMax: colormapRangeMax,
+            colormapClampColor: Array.from(colormapClampColorUniform),
             isClampColor,
             coloringMode: this.props.coloringMode,
             undefinedPropertyColor: undefinedPropertyColorUniform,
             isColoringDiscrete: coloringHints.discreteData,
-            colorMapSize: coloringHints.colormapSize,
+            colormapSize: coloringHints.colormapSize,
         };
     }
 }
@@ -421,14 +421,14 @@ uniform gridUniforms {
     bool ZIncreasingDownwards;
     float valueRangeMin;
     float valueRangeMax;
-    float colorMapRangeMin;
-    float colorMapRangeMax;
-    vec4 colorMapClampColor;
+    float colormapRangeMin;
+    float colormapRangeMax;
+    vec4 colormapClampColor;
     bool isClampColor;
     float coloringMode;
     vec3 undefinedPropertyColor;
     bool isColoringDiscrete;
-    float colorMapSize;
+    float colormapSize;
 } grid;
 `;
 
@@ -436,14 +436,14 @@ type GridUniformsType = {
     ZIncreasingDownwards: boolean;
     valueRangeMin: number;
     valueRangeMax: number;
-    colorMapRangeMin: number;
-    colorMapRangeMax: number;
-    colorMapClampColor: [number, number, number, number];
+    colormapRangeMin: number;
+    colormapRangeMax: number;
+    colormapClampColor: [number, number, number, number];
     isClampColor: boolean;
     coloringMode: TGrid3DColoringMode;
     undefinedPropertyColor: [number, number, number];
     isColoringDiscrete: boolean;
-    colorMapSize: number;
+    colormapSize: number;
 };
 
 const gridUniforms = {
@@ -454,13 +454,13 @@ const gridUniforms = {
         ZIncreasingDownwards: "u32",
         valueRangeMin: "f32",
         valueRangeMax: "f32",
-        colorMapRangeMin: "f32",
-        colorMapRangeMax: "f32",
-        colorMapClampColor: "vec4<f32>",
+        colormapRangeMin: "f32",
+        colormapRangeMax: "f32",
+        colormapClampColor: "vec4<f32>",
         isClampColor: "u32",
         coloringMode: "f32",
         undefinedPropertyColor: "vec3<f32>",
         isColoringDiscrete: "u32",
-        colorMapSize: "f32",
+        colormapSize: "f32",
     },
 } as const satisfies ShaderModule<LayerProps, GridUniformsType>;

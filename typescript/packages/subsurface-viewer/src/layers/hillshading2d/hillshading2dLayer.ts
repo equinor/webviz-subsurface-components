@@ -108,8 +108,8 @@ export default class Hillshading2DLayer extends BitmapLayer<Hillshading2DProps> 
 
         const valueRangeMin = this.props.valueRange[0] ?? 0.0;
         const valueRangeMax = this.props.valueRange[1] ?? 1.0;
-        const colorMapRangeMin = this.props.colorMapRange?.[0] ?? valueRangeMin;
-        const colorMapRangeMax = this.props.colorMapRange?.[1] ?? valueRangeMax;
+        const colormapRangeMin = this.props.colorMapRange?.[0] ?? valueRangeMin;
+        const colormapRangeMax = this.props.colorMapRange?.[1] ?? valueRangeMax;
 
         const [minVal, maxVal] = this.props.valueRange;
 
@@ -128,8 +128,8 @@ export default class Hillshading2DLayer extends BitmapLayer<Hillshading2DProps> 
             map: {
                 valueRangeMin,
                 valueRangeMax,
-                colorMapRangeMin,
-                colorMapRangeMax,
+                colormapRangeMin,
+                colormapRangeMax,
 
                 bitmapResolution,
                 valueRangeSize,
@@ -189,8 +189,8 @@ const map2DUniformsBlock = /*glsl*/ `\
 uniform mapUniforms {
     float valueRangeMin;
     float valueRangeMax;
-    float colorMapRangeMin;
-    float colorMapRangeMax;
+    float colormapRangeMin;
+    float colormapRangeMax;
 
     vec2 bitmapResolution;
     float valueRangeSize;
@@ -213,9 +213,9 @@ float decode_rgb2float(vec3 rgb) {
     value = floor(value / map.step + 0.5) * map.step;
   }
 
-  // If colorMapRangeMin/Max specified, color map will span this interval.
+  // If colormapRangeMin/Max specified, color map will span this interval.
   float x  = value * (map.valueRangeMax - map.valueRangeMin) + map.valueRangeMin;
-  x = (x - map.colorMapRangeMin) / (map.colorMapRangeMax - map.colorMapRangeMin);
+  x = (x - map.colormapRangeMin) / (map.colormapRangeMax - map.colormapRangeMin);
   x = max(0.0, x);
   x = min(1.0, x);
 
@@ -226,8 +226,8 @@ float decode_rgb2float(vec3 rgb) {
 type Map2DUniformsType = {
     valueRangeMin: number;
     valueRangeMax: number;
-    colorMapRangeMin: number;
-    colorMapRangeMax: number;
+    colormapRangeMin: number;
+    colormapRangeMax: number;
 
     bitmapResolution: [number, number];
     valueRangeSize: number;
@@ -249,8 +249,8 @@ const map2DUniforms = {
     uniformTypes: {
         valueRangeMin: "f32",
         valueRangeMax: "f32",
-        colorMapRangeMin: "f32",
-        colorMapRangeMax: "f32",
+        colormapRangeMin: "f32",
+        colormapRangeMax: "f32",
 
         bitmapResolution: "vec2<f32>",
         valueRangeSize: "f32",

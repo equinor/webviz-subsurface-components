@@ -90,19 +90,19 @@ export function createBooleanItems(): ReactNode[] {
 }
 
 function createColorFunctionItems(
-    colorMapFunctions: ColorMapFunction[]
+    colormapFunctions: ColorMapFunction[]
 ): ReactNode[] {
     const nodes: ReactNode[] = [];
-    if (!colorMapFunctions || !colorMapFunctions.length) {
+    if (!colormapFunctions || !colormapFunctions.length) {
         console.error(
-            "colorMapFunctions are missed or empty in createColorFunctionItems()"
+            "colormapFunctions are missed or empty in createColorFunctionItems()"
         );
     } else {
-        for (const colorMapFunction of colorMapFunctions) {
-            const name = colorMapFunction.name;
+        for (const colormapFunction of colormapFunctions) {
+            const name = colormapFunction.name;
             if (!name) {
                 console.error(
-                    "colorMapFunction.name is empty in createColorFunctionItems()"
+                    "colormapFunction.name is empty in createColorFunctionItems()"
                 );
             }
             nodes.push(<option key={name}>{name}</option>);
@@ -337,20 +337,20 @@ export class PlotPropertiesDialog extends Component<Props, State> {
                 ),
             ];
         } else if (type === "gradientfill") {
-            const colorMapFunctions =
+            const colormapFunctions =
                 this.props.wellLogView.props.colorMapFunctions;
             return [
                 this.createSelectControl(
                     "colorMapFunctionName",
                     "Fill Color function/table",
-                    createColorFunctionItems(colorMapFunctions)
+                    createColorFunctionItems(colormapFunctions)
                 ),
                 <FormControl fullWidth key="211" />,
                 <FormControl fullWidth key="212" />,
                 this.createSelectControl(
                     "inverseColorMapFunctionName",
                     "Inverse Color function/table",
-                    createColorFunctionItems(colorMapFunctions),
+                    createColorFunctionItems(colormapFunctions),
                     true
                 ),
             ];

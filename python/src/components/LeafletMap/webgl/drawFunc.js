@@ -17,7 +17,7 @@ export default async (gl, canvas, image, colormap = null, config = {}) => {
         imagesToLoad.push(Utils.loadImage(colormap, config));
     }
 
-    let [loadedImage, loadedColorMap = null] = await Promise.all(
+    let [loadedImage, loadedColormap = null] = await Promise.all(
         imagesToLoad
     ).catch(console.error);
 
@@ -30,7 +30,7 @@ export default async (gl, canvas, image, colormap = null, config = {}) => {
             maxValue: config.maxvalue,
         };
 
-        drawWithTerrainRGB(gl, canvas, loadedImage, loadedColorMap, {
+        drawWithTerrainRGB(gl, canvas, loadedImage, loadedColormap, {
             ...minmaxValues,
             ...colorScale,
             ...shader,

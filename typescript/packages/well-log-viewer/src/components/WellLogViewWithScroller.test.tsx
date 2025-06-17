@@ -10,7 +10,7 @@ import type { ColorMapFunction } from "../utils/color-function";
 import wellLogJson from "../../../../../example-data/L898MUD.json";
 import templateJson from "../../../../../example-data/welllog_template_1.json";
 
-const exampleColorMapFunctions = colorTables as ColorMapFunction[];
+const exampleColormapFunctions = colorTables as ColorMapFunction[];
 
 window.ResizeObserver =
     window.ResizeObserver ||
@@ -26,7 +26,7 @@ describe("Test Well Log View Component with Scroller", () => {
             <WellLogViewWithScroller
                 wellLogSets={wellLogJson}
                 template={templateJson as Template}
-                colorMapFunctions={exampleColorMapFunctions}
+                colorMapFunctions={exampleColormapFunctions}
                 primaryAxis={"md"}
                 axisTitles={{
                     md: "MD",
