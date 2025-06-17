@@ -1,3 +1,13 @@
+## 1.11.10 (2025-06-17)
+
+### 🩹 Fixes
+
+- unify non exposed naming to colormap ([#2583](https://github.com/equinor/webviz-subsurface-components/pull/2583), [#2580](https://github.com/equinor/webviz-subsurface-components/issues/2580))
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
 ## 1.11.9 (2025-06-12)
 
 ### 🩹 Fixes
