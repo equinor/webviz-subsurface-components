@@ -5,14 +5,14 @@ import "jest-styled-components";
 import React from "react";
 import SyncLogViewer from "./SyncLogViewer";
 import { axisMnemos, axisTitles } from "./utils/axes";
-import type { ColorMapFunction } from "./utils/color-function";
+import type { ColormapFunction } from "./utils/color-function";
 import type { WellLogSet } from "./components/WellLogTypes";
 import type { Template } from "./components/WellLogTemplateTypes";
 
 import exampleWellLogJson from "../../../../example-data/L898MUD.json";
 import exampleTemplateJson from "../../../../example-data/welllog_template_1.json";
 
-const exampleColorFunction = colorTables as ColorMapFunction[];
+const exampleColorFunction = colorTables as ColormapFunction[];
 const exampleWellLog = exampleWellLogJson as WellLogSet[];
 const exampleTemplate = exampleTemplateJson as Template;
 

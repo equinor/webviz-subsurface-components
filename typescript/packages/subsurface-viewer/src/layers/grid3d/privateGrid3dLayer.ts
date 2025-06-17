@@ -23,7 +23,7 @@ import type {
 } from "../utils/layerTools";
 import { createPropertyData } from "../utils/layerTools";
 import {
-    type ColorMapFunctionType,
+    type ColormapFunctionType,
     createColormapTexture,
 } from "../utils/colormapTools";
 import linearFragmentShader from "./nodeProperty.fs.glsl";
@@ -51,7 +51,7 @@ export interface PrivateLayerProps extends ExtendedLayerProps {
     colormapClampColor: Color | undefined | boolean;
     undefinedPropertyValue: number;
     undefinedPropertyColor: [number, number, number];
-    colormapFunction?: ColorMapFunctionType;
+    colormapFunction?: ColormapFunctionType;
     coloringMode: TGrid3DColoringMode.Property;
     gridLines: boolean;
     propertyValueRange: [number, number];

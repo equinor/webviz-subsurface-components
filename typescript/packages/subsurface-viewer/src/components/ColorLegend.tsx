@@ -10,13 +10,13 @@ import {
 } from "@emerson-eps/color-tables";
 
 import type { ExtendedLegendLayer } from "../layers/utils/layerTools";
-import type { ColorMapFunctionType } from "../layers/utils/colormapTools";
+import type { ColormapFunctionType } from "../layers/utils/colormapTools";
 
 interface LegendBaseData {
     title: string;
     colorName: string;
     discrete: boolean;
-    colorMapFunction?: ColorMapFunctionType;
+    colorMapFunction?: ColormapFunctionType;
 }
 export interface DiscreteLegendDataType extends LegendBaseData {
     metadata: Record<string, [Color, number]>;

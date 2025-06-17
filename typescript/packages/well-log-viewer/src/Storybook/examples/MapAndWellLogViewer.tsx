@@ -34,16 +34,16 @@ import wellLogsJson from "../../../../../../example-data/volve_logs.json";
 import templateJson from "../../../../../../example-data/welllog_template_2.json";
 import colorTables from "../../../../../../example-data/wellpick_colors.json";
 import wellPicks from "../../../../../../example-data/wellpicks.json";
-import type { ColorMapFunction } from "../../utils/color-function";
+import type { ColormapFunction } from "../../utils/color-function";
 import { indexOfElementByName, isEqualRanges } from "../../utils/arrays";
 import { getDiscreteMeta } from "../../utils/well-log";
 
 const wellLogs = wellLogsJson as unknown as WellLogSet[];
 const template = templateJson as unknown as Template;
 
-const exampleColormapFunctions: ColorMapFunction[] = [
+const exampleColormapFunctions: ColormapFunction[] = [
     // copy color tables and add some color functions
-    ...(colorTables as ColorMapFunction[]),
+    ...(colorTables as ColormapFunction[]),
     {
         name: "Grey scale",
         func: (v: number) => [v * 255, v * 255, v * 255],

@@ -26,7 +26,7 @@ import type {
 } from "../components/WellLogTypes";
 
 import { type AxesInfo } from "./axes";
-import type { ColorMapFunction } from "./color-function";
+import type { ColormapFunction } from "./color-function";
 import { getColormapFunction } from "./color-function";
 
 import GradientFillPlot, {
@@ -214,7 +214,7 @@ export function buildPlotConfig(
     plotSetup: PlotSetup,
     plotSetup2: PlotSetup | null,
     trackTemplate: TemplateTrack,
-    colormapFunctions: ColorMapFunction[] | undefined,
+    colormapFunctions: ColormapFunction[] | undefined,
     iData: number,
     iData2: number
 ): PlotConfig {
@@ -238,7 +238,7 @@ function buildPlotOptions(
     plotSetup: PlotSetup,
     plotSetup2: PlotSetup | null,
     trackTemplate: TemplateTrack,
-    colormapFunctions: ColorMapFunction[] | undefined,
+    colormapFunctions: ColormapFunction[] | undefined,
     iData: number,
     iData2: number
 ): ExtPlotOptions {
@@ -308,7 +308,7 @@ function createAreaData(
     from: number,
     to: number,
     value: number | string,
-    colormapFunction: ColorMapFunction | undefined,
+    colormapFunction: ColormapFunction | undefined,
     meta?: DiscreteMeta | null
 ): AreaData | null {
     const { color, name } = getDiscreteColorAndName(
@@ -340,7 +340,7 @@ function createAreaData(
  */
 export async function createStackData(
     data: [number | null, number | string | null][],
-    colormapFunction: ColorMapFunction | undefined,
+    colormapFunction: ColormapFunction | undefined,
     meta: DiscreteMeta | undefined | null
 ): Promise<AreaData[]> {
     const arr: AreaData[] = new Array<AreaData>();

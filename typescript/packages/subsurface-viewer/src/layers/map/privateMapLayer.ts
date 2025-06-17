@@ -24,7 +24,7 @@ import type {
 } from "../utils/layerTools";
 import { createPropertyData } from "../utils/layerTools";
 import {
-    type ColorMapFunctionType,
+    type ColormapFunctionType,
     getImageData,
 } from "../utils/colormapTools";
 
@@ -46,7 +46,7 @@ export interface PrivateMapLayerProps extends ExtendedLayerProps {
     colormapName: string;
     colormapRange: [number, number];
     colormapClampColor: Color | undefined | boolean;
-    colormapFunction?: ColorMapFunctionType;
+    colormapFunction?: ColormapFunctionType;
     propertyValueRange: [number, number];
     smoothShading: boolean;
     depthTest: boolean;

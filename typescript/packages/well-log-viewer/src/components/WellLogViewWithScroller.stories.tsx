@@ -8,12 +8,12 @@ import WellLogViewWithScroller from "./WellLogViewWithScroller";
 import type { WellLogViewWithScrollerProps } from "./WellLogViewWithScroller";
 import { argTypesWellLogViewScrollerProp } from "./WellLogViewWithScroller";
 import { axisTitles, axisMnemos } from "../utils/axes";
-import type { ColorMapFunction } from "../utils/color-function";
+import type { ColormapFunction } from "../utils/color-function";
 
 import wellLog898MudJson from "../../../../../example-data/L898MUD.json";
 import templateJson1 from "../../../../../example-data/welllog_template_1.json";
 
-const exampleColormapFunctions = colorTables as ColorMapFunction[];
+const exampleColormapFunctions = colorTables as ColormapFunction[];
 
 const ComponentCode =
     '<WellLogViewWithScroller id="WellLogViewWithScroller" \r\n' +

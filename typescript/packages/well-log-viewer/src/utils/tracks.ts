@@ -21,7 +21,7 @@ import {
     StackedTrack,
 } from "@equinor/videx-wellog";
 
-import { getColormapFunction, type ColorMapFunction } from "./color-function";
+import { getColormapFunction, type ColormapFunction } from "./color-function";
 import type {
     TemplateTrack,
     TemplatePlot,
@@ -173,7 +173,7 @@ export function createWellLogTracks(
     wellLog: WellLogSet[],
     axes: AxesInfo,
     templateTracks: TemplateTrack[], // Part of JSON
-    colormapFunctions: ColorMapFunction[] // JS code or JSON color table
+    colormapFunctions: ColormapFunction[] // JS code or JSON color table
 ): TracksInfo {
     if (!wellLog?.length) return new TracksInfo();
 
@@ -278,7 +278,7 @@ function maybeGetSecondaryPlotSetup(
 function makeGraphTrackOptions(
     plotSetups: PlotSetup[],
     templateTrack: TemplateTrack,
-    colormapFunctions?: ColorMapFunction[],
+    colormapFunctions?: ColormapFunction[],
     existingOptions: Partial<ExtTrackOptions> = {}
 ): GraphTrackOptions & ExtTrackOptions {
     // Only returns a non-required tracks if there's any plot-setups available
@@ -333,7 +333,7 @@ function makeGraphTrackOptions(
 function makeStackedTrackOptions(
     plotSetups: PlotSetup[],
     templateTrack: TemplateTrack,
-    colormapFunctions?: ColorMapFunction[],
+    colormapFunctions?: ColormapFunction[],
     existingOptions: Partial<ExtTrackOptions> = {}
 ): StackedTrackOptions & ExtTrackOptions {
     // ? Why do we not care about "required" here? (@anders2303)
@@ -383,7 +383,7 @@ export function createTrack(
     wellLog: WellLogSet[],
     axesInfo: AxesInfo,
     templateTrack: TemplateTrack,
-    colormapFunctions?: ColorMapFunction[]
+    colormapFunctions?: ColormapFunction[]
 ): Track | null {
     const plotSetups = setupTrackPlots(wellLog, templateTrack, axesInfo);
 
@@ -429,7 +429,7 @@ export function editTrack(
     newTemplateTrack: TemplateTrack,
     wellLogSets: WellLogSet[],
     axisInfo: AxesInfo,
-    colormapFunctions: ColorMapFunction[]
+    colormapFunctions: ColormapFunction[]
 ): Track {
     const newPlotSetups = setupTrackPlots(
         wellLogSets,
@@ -484,7 +484,7 @@ export function addPlotToTrack(
     templatePlot: TemplatePlot,
     wellLogSets: WellLogSet[],
     axesInfo: AxesInfo,
-    colormapFunctions: ColorMapFunction[]
+    colormapFunctions: ColormapFunction[]
 ) {
     // ! Currently only supporting graph tracks, but keeping the function ambiguous for now
     if (!(track instanceof GraphTrack))
@@ -545,7 +545,7 @@ export function editTrackPlot(
     templatePlot: TemplatePlot,
     wellLogSets: WellLogSet[],
     axesInfo: AxesInfo,
-    colormapFunctions: ColorMapFunction[]
+    colormapFunctions: ColormapFunction[]
 ) {
     if (!(track instanceof GraphTrack))
         throw Error("Can only add tracks to GraphTracks");

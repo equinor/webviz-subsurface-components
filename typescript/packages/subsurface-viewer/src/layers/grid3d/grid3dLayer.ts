@@ -15,7 +15,7 @@ import type {
     ExtendedLayerProps,
     ReportBoundingBoxAction,
 } from "../utils/layerTools";
-import type { ColorMapFunctionType } from "../utils/colormapTools";
+import type { ColormapFunctionType } from "../utils/colormapTools";
 
 import config from "../../SubsurfaceConfig.json";
 import { findConfig } from "../../utils/configTools";
@@ -232,7 +232,7 @@ export interface Grid3DLayerProps extends ExtendedLayerProps {
      * E.g. [255, 0, 0] for constant red cells.
      * Can be defined as Uint8Array containing [R, G, B] triplets in [0, 255] range each.
      */
-    colorMapFunction?: ColorMapFunctionType | Uint8Array;
+    colorMapFunction?: ColormapFunctionType | Uint8Array;
 
     /**
      * Value in propertiesData indicating that the property is undefined.
@@ -473,7 +473,7 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
     }
 
     private isColormapFunctionConstantColor(
-        colorFunc: Uint8Array | ColorMapFunctionType | undefined
+        colorFunc: Uint8Array | ColormapFunctionType | undefined
     ): colorFunc is Uint8Array {
         return (
             (Array.isArray(colorFunc) || colorFunc instanceof Uint8Array) &&

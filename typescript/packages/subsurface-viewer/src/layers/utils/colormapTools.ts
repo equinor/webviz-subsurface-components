@@ -12,9 +12,11 @@ import { createDefaultContinuousColorScale } from "@emerson-eps/color-tables/dis
 import type { DeckGLLayerContext } from "./layerTools";
 
 /** Type of functions returning a color from a value in the [0,1] range. */
-export type ColorMapFunctionType = ReturnType<typeof createColormapFunction>;
-/** @deprecated Use ColorMapFunctionType instead. */
-export type colorMapFunctionType = ColorMapFunctionType;
+export type ColormapFunctionType = ReturnType<typeof createColormapFunction>;
+/** @deprecated Use ColormapFunctionType instead. */
+export type colorMapFunctionType = ColormapFunctionType;
+/** @deprecated Use ColormapFunctionType instead. */
+export type ColorMapFunctionType = ColormapFunctionType;
 
 export interface IColormapHints {
     discreteData: boolean;
@@ -40,16 +42,16 @@ export interface ColorTableDef extends ColorTableProps {
     colorTables: colorTablesArray;
 }
 
-export type ColormapProps = ColorMapFunctionType | Uint8Array | ColorTableProps;
+export type ColormapProps = ColormapFunctionType | Uint8Array | ColorTableProps;
 
 /**
  * Represents the possible types that can be used as colormap properties.
  *
- * - `ColorMapFunctionType`: A function converting a value to a color.
+ * - `ColormapFunctionType`: A function converting a value to a color.
  * - `Uint8Array`: A typed array containing color data.
  * - `ColorTableDef`: An object representing a color table.
  */
-export type TColormapDef = ColorMapFunctionType | Uint8Array | ColorTableDef;
+export type TColormapDef = ColormapFunctionType | Uint8Array | ColorTableDef;
 
 /**
  * Creates an array of colors as RGB triplets in range [0, 1] using the colormap definition.
@@ -66,7 +68,7 @@ export function getImageData(
     type funcType = (x: number) => Color;
 
     if (colormapDef instanceof Uint8Array) {
-        // If colorMapProps is a Uint8Array, return it directly
+        // If colormapProps is a Uint8Array, return it directly
         return colormapDef;
     }
 

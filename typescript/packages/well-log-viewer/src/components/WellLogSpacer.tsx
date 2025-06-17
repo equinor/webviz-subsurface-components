@@ -5,7 +5,7 @@ import type { WellLogController, WellPickProps } from "./WellLogView";
 import { getWellPicks } from "./WellLogView";
 import type WellLogView from "./WellLogView";
 
-import type { ColorMapFunction } from "../utils/color-function";
+import type { ColormapFunction } from "../utils/color-function";
 import type { PatternsTable, Pattern } from "../utils/pattern";
 import { createDefs, patternId } from "../utils/pattern";
 
@@ -28,7 +28,7 @@ export interface WellLogSpacerProps {
     /**
      * Prop containing color function/table data.
      */
-    colorMapFunctions: ColorMapFunction[];
+    colorMapFunctions: ColormapFunction[];
     /**
      * Well Picks data
      */

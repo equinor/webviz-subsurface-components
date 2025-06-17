@@ -13,7 +13,7 @@ import {
 import SyncLogViewer, { argTypesSyncLogViewerProp } from "./SyncLogViewer";
 import type { SyncLogViewerProps } from "./SyncLogViewer";
 
-import type { ColorMapFunction } from "./utils/color-function";
+import type { ColormapFunction } from "./utils/color-function";
 import type { Pattern } from "./utils/pattern";
 
 import type {
@@ -37,8 +37,8 @@ import L916MUDJson from "../../../../example-data/L916MUD.json";
 import List1Json from "../../../../example-data/Lis1.json";
 import facies3WellsJson from "../../../../example-data/facies3wells.json";
 
-const exampleColormapFunctions = colorTables as ColorMapFunction[];
-const wellpickColormapFunctions = wellpickColorTablesJson as ColorMapFunction[];
+const exampleColormapFunctions = colorTables as ColormapFunction[];
+const wellpickColormapFunctions = wellpickColorTablesJson as ColormapFunction[];
 const horizonPatterns = horizonPatternsJson as Pattern[];
 
 const syncTemplate = syncTemplateJson as TemplateType;

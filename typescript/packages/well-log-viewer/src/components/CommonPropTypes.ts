@@ -9,7 +9,7 @@ export const PatternsTableType = PropTypes.shape({
     patternNames: PropTypes.arrayOf(PropTypes.string),
 });
 
-// see ./ColorMapFunction.ts
+// see color-function.ts
 export const ColorFunctionType = PropTypes.oneOfType([
     PropTypes.func,
     PropTypes.object,

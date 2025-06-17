@@ -10,7 +10,7 @@ declare type D3Selection = any; //import { D3Selection } from "@equinor/videx-we
 import { renderBasicPlotLegend } from "./legend/common"; //import { renderBasicPlotLegend } from "@equinor/videx-wellog/dist/plots/legend/common';
 /* End of missed from "@equinor/videx-wellog */
 
-import type { ColorMapFunction, ColorTable } from "./color-function";
+import type { ColormapFunction, ColorTable } from "./color-function";
 import { isFunction } from "./color-function";
 import { getInterpolatedColorString } from "./color-table";
 
@@ -19,7 +19,7 @@ import { color4ToString } from "./color-table";
 let __idGradient = 0;
 function createGradient(
     g: D3Selection,
-    colormapFunction: ColorMapFunction,
+    colormapFunction: ColormapFunction,
     rLogarithmic?: number
 ): string {
     const id = "grad" + ++__idGradient; // generate unique id
@@ -107,7 +107,7 @@ export default function renderGradientFillPlotLegend(
                 : plot.options.color;
 
         /* Start GradientFill code */
-        let colormapFunction: ColorMapFunction | undefined =
+        let colormapFunction: ColormapFunction | undefined =
             useMinAsBase && minIsLeft
                 ? options.colorMapFunction
                 : options.inverseColorMapFunction;

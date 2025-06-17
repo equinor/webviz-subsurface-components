@@ -21,7 +21,7 @@ import type {
 import type { MapAndWellLogViewerProps } from "./Storybook/examples/MapAndWellLogViewer";
 import { MapAndWellLogViewer } from "./Storybook/examples/MapAndWellLogViewer";
 import { axisMnemos, axisTitles } from "./utils/axes";
-import type { ColorMapFunction, ColorTable } from "./utils/color-function";
+import type { ColormapFunction, ColorTable } from "./utils/color-function";
 
 import exampleDeckglArgsJson from "../../../../example-data/deckgl-map.json";
 import wellLogsJson from "../../../../example-data/volve_logs.json";
@@ -32,7 +32,7 @@ import templateJson2 from "../../../../example-data/welllog_template_2.json";
 import wellpicksJson from "../../../../example-data/wellpicks.json";
 import colorTablesJson from "../../../../example-data/wellpick_colors.json";
 
-const exampleColorFunctions = colorTablesJson as ColorMapFunction[];
+const exampleColorFunctions = colorTablesJson as ColormapFunction[];
 const exampleColorTables = colorTablesJson as ColorTable[];
 
 const wellLogs = wellLogsJson as unknown as WellLogSet[];
@@ -40,7 +40,7 @@ const wellLogl898MUD = wellLogl898MUDJson as WellLogSet[];
 const template1 = templateJson1 as unknown as Template;
 const template2 = templateJson2 as unknown as Template;
 
-const exampleColormapFunctions: ColorMapFunction[] = [
+const exampleColormapFunctions: ColormapFunction[] = [
     // copy color tables and add some color functions
     ...exampleColorFunctions,
     {

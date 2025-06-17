@@ -11,7 +11,7 @@ import { InterpolatedScaleHandler } from "@equinor/videx-wellog";
 import type { TrackOptions } from "@equinor/videx-wellog/dist/tracks/interfaces";
 
 import type { AxesInfo } from "./axes";
-import type { ColorMapFunction } from "./color-function";
+import type { ColormapFunction } from "./color-function";
 import { getAxisIndices } from "./well-log";
 import { checkMinMax } from "./minmax";
 import { createTrack, isScaleTrack, editTrack } from "../utils/tracks";
@@ -404,7 +404,7 @@ export function createNewViewTrack(
     position: number,
     axesInfo: AxesInfo,
     wellLogSets: WellLogSet[],
-    colormapFunctions: ColorMapFunction[] = []
+    colormapFunctions: ColormapFunction[] = []
 ): Track<TrackOptions> | null {
     const newTrack = createTrack(
         wellLogSets,
@@ -439,7 +439,7 @@ export function editViewTrack(
     newTemplate: TemplateTrack,
     axesInfo: AxesInfo,
     wellLogSets: WellLogSet[],
-    colormapFunctions: ColorMapFunction[] = []
+    colormapFunctions: ColormapFunction[] = []
 ): Track {
     editTrack(track, newTemplate, wellLogSets, axesInfo, colormapFunctions);
     adjustControllerToModifiedTrack(logViewer, track);

@@ -6,7 +6,7 @@ import React from "react";
 import WellLogViewer from "./WellLogViewer";
 import type { WellLogController } from "./components/WellLogView";
 import { axisMnemos, axisTitles } from "./utils/axes";
-import type { ColorMapFunction } from "./utils/color-function";
+import type { ColormapFunction } from "./utils/color-function";
 
 // TODO: Fix this the next time the file is edited.
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -14,7 +14,7 @@ const exampleTemplate = require("../../../../example-data/welllog_template_1.jso
 // TODO: Fix this the next time the file is edited.
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const exampleWellLog = require("../../../../example-data/L898MUD.json")[0];
-const exampleColormapFunctions = colorTables as ColorMapFunction[];
+const exampleColormapFunctions = colorTables as ColormapFunction[];
 
 window.ResizeObserver =
     window.ResizeObserver ||
