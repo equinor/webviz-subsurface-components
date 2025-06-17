@@ -1,3 +1,13 @@
+## 1.12.0 (2025-06-17)
+
+### 🚀 Features
+
+- unify exposed types naming to colormap ([#2584](https://github.com/equinor/webviz-subsurface-components/pull/2584), [#2581](https://github.com/equinor/webviz-subsurface-components/issues/2581))
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
 ## 1.11.10 (2025-06-17)
 
 ### 🩹 Fixes
