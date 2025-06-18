@@ -3,7 +3,6 @@ import type React from "react";
 
 import type { Color } from "@deck.gl/core";
 import { CompositeLayer } from "@deck.gl/core";
-import { JSONLoader, load } from "@loaders.gl/core";
 
 import workerpool from "workerpool";
 
@@ -18,8 +17,8 @@ import type {
 import type { ColormapFunctionType } from "../utils/colormapTools";
 
 import config from "../../SubsurfaceConfig.json";
-import { findConfig } from "../../utils/configTools";
 import type { BoundingBox3D } from "../../utils";
+import { findConfig, loadDataArray } from "../../utils";
 
 // init workerpool
 const workerPoolConfig = findConfig(
@@ -78,26 +77,9 @@ async function loadData<T extends TTypedArray>(
     data: string | number[] | TTypedArray,
     type: { new (data: unknown): T }
 ): Promise<T> {
-    if (data instanceof type) {
-        return data;
-    }
-    if (Array.isArray(data)) {
-        return new type(data);
-    }
-    if (typeof data === "string") {
-        const extension = data.split(".").pop()?.toLowerCase();
-        // Data is a file name with .json extension
-        if (extension === "json") {
-            const stringData = await load(data, JSONLoader);
-            return new type(stringData);
-        }
-        // It is assumed that the data is a file containing raw array of bytes.
-        const response = await fetch(data);
-        if (response.ok) {
-            const blob = await response.blob();
-            const buffer = await blob.arrayBuffer();
-            return new type(buffer);
-        }
+    const result = await loadDataArray(data, type);
+    if (result !== null) {
+        return result;
     }
     return Promise.reject("Grid3DLayer: Unsupported type of input data");
 }
@@ -106,9 +88,13 @@ async function loadPropertiesData(
     propertiesData: string | number[] | Float32Array | Uint16Array
 ): Promise<Float32Array | Uint16Array> {
     const isPropertiesDiscrete = propertiesData instanceof Uint16Array;
-    return isPropertiesDiscrete
-        ? await loadData(propertiesData, Uint16Array)
-        : await loadData(propertiesData, Float32Array);
+    const result = isPropertiesDiscrete
+        ? await loadDataArray(propertiesData, Uint16Array)
+        : await loadDataArray(propertiesData, Float32Array);
+    if (result !== null) {
+        return result;
+    }
+    return Promise.reject("Grid3DLayer: Unsupported type of input data");
 }
 
 async function load_data(

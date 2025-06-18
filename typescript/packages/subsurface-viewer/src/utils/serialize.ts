@@ -1,5 +1,19 @@
 import * as png from "@vivaxy/png";
 
+import { JSONLoader, load } from "@loaders.gl/core";
+
+import type { TConstructor, TypedArray } from "./typedArray";
+import { toTypedArray } from "./typedArray";
+
+async function safeFetch(url: string): Promise<Response> {
+    try {
+        return await fetch(url);
+    } catch (error) {
+        console.error(`Failed to fetch ${url}:`, error);
+        return new Response(null, { status: 404 });
+    }
+}
+
 /**
  * Loads data from a URL as a Float32Array. Supports both PNG images (with absolute float values)
  * and binary float32 files. If the content type is 'image/png', the PNG is decoded and its pixel
@@ -8,11 +22,14 @@ import * as png from "@vivaxy/png";
  * @param url - The URL to load data from
  * @returns A Promise resolving to a Float32Array with the data, or null if loading fails
  */
-export async function loadURLData(url: string): Promise<Float32Array | null> {
-    let res: Float32Array | null = null;
-    const response = await fetch(url);
+export async function loadURLData<T extends TypedArray>(
+    url: string,
+    type: TConstructor<T>
+): Promise<T | null> {
+    let res: T | null = null;
+    const response = await safeFetch(url);
     if (!response.ok) {
-        console.error("Could not load ", url);
+        return null;
     }
     const blob = await response.blob();
     const contentType = response.headers.get("content-type");
@@ -34,41 +51,51 @@ export async function loadURLData(url: string): Promise<Float32Array | null> {
                     view.setUint8(i, data[i]);
                 }
 
-                const floatArray = new Float32Array(buffer);
+                const floatArray = new type(buffer);
                 resolve(floatArray);
             };
         });
     } else {
         // Load as binary array of floats.
         const buffer = await blob.arrayBuffer();
-        res = new Float32Array(buffer);
+        res = new type(buffer);
     }
     return res;
 }
 
 /**
- * Loads data as a Float32Array from a string (URL), number array, or Float32Array.
+ * Loads data as a typed array from a string (URL), number array, or any typed array.
  * If the input is a URL, it loads the data from the URL. If it's an array, it converts it.
  *
- * @param data - The data to load (string URL, number[], or Float32Array)
- * @returns A Promise resolving to a Float32Array or null if input is invalid
+ * @param data - The data to load (string URL, base 64 encoded string, number[], or any typed array like Float32Array)
+ * @param type - The targeted TypedArray type (e.g., any typed array like Float32Array)
+ * @returns A Promise resolving to the targeted TypedArray or null if input is invalid
  */
-export async function loadFloat32Data(
-    data: string | number[] | Float32Array
-): Promise<Float32Array | null> {
+export async function loadDataArray<T extends TypedArray>(
+    data: string | number[] | TypedArray,
+    type: TConstructor<T>
+): Promise<T | null> {
     if (!data) {
         return null;
     }
-    if (ArrayBuffer.isView(data)) {
-        // Input data is typed array.
-        return data;
-    } else if (Array.isArray(data)) {
-        // Input data is native javascript array.
-        return new Float32Array(data);
+    if (typeof data === "string") {
+        const extension = data.split(".").pop()?.toLowerCase();
+        // Data is a file name with .json extension
+        if (extension === "json") {
+            const stringData = await load(data, JSONLoader);
+            return new type(stringData);
+        }
+        // It is assumed that the data is a file containing raw array of bytes.
+        const response = await safeFetch(data);
+        if (response.ok) {
+            const blob = await response.blob();
+            const buffer = await blob.arrayBuffer();
+            return new type(buffer);
+        }
     } else {
-        // Input data is an URL.
-        return await loadURLData(data);
+        return toTypedArray(data, type);
     }
+    return Promise.reject("loadDataArray: unsupported type of input data");
 }
 
 /**
