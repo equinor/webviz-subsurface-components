@@ -10,62 +10,59 @@ async function safeFetch(url: string): Promise<Response> {
         return await fetch(url);
     } catch (error) {
         console.error(`Failed to fetch ${url}:`, error);
-        return new Response(null, { status: 404 });
+        return new Response(null, { status: 500 });
     }
 }
 
 /**
- * Loads data from a URL as a Float32Array. Supports both PNG images (with absolute float values)
- * and binary float32 files. If the content type is 'image/png', the PNG is decoded and its pixel
- * data is returned as a Float32Array. Otherwise, the file is loaded as a binary array of floats.
+ * Loads PNG image data (with absolute float values) from a Response object
+ * and decodes it into a typed array of the specified type.
  *
- * @param url - The URL to load data from
- * @returns A Promise resolving to a Float32Array with the data, or null if loading fails
+ * This function reads the response as a Blob, decodes the PNG image data, and converts the pixel data
+ * into a typed array (e.g., Float32Array, Uint8Array) using the provided constructor.
+ *
+ * @template T - The type of TypedArray to return (e.g., Float32Array, Uint8Array).
+ * @param response - The Response object containing the PNG image data.
+ * @param type - The constructor for the desired TypedArray type.
+ * @returns A promise that resolves to a typed array containing the decoded image data, or null if decoding fails.
  */
-export async function loadURLData<T extends TypedArray>(
-    url: string,
+async function loadPngData<T extends TypedArray>(
+    response: Response,
     type: TConstructor<T>
 ): Promise<T | null> {
-    let res: T | null = null;
-    const response = await safeFetch(url);
-    if (!response.ok) {
-        return null;
-    }
+    // Load as PNG with absolute float values.
     const blob = await response.blob();
-    const contentType = response.headers.get("content-type");
-    const isPng = contentType === "image/png";
-    if (isPng) {
-        // Load as PNG with absolute float values.
-        res = await new Promise((resolve) => {
-            const fileReader = new FileReader();
-            fileReader.readAsArrayBuffer(blob);
-            fileReader.onload = () => {
-                const arrayBuffer = fileReader.result;
-                const imgData = png.decode(arrayBuffer as ArrayBuffer);
-                const data = imgData.data; // array of ints (pixel data)
+    const result: T | null = await new Promise((resolve) => {
+        const fileReader = new FileReader();
+        fileReader.readAsArrayBuffer(blob);
+        fileReader.onload = () => {
+            const arrayBuffer = fileReader.result;
+            const imgData = png.decode(arrayBuffer as ArrayBuffer);
+            const data = imgData.data; // array of ints (pixel data)
 
-                const n = data.length;
-                const buffer = new ArrayBuffer(n);
-                const view = new DataView(buffer);
-                for (let i = 0; i < n; i++) {
-                    view.setUint8(i, data[i]);
-                }
+            const n = data.length;
+            const buffer = new ArrayBuffer(n);
+            const view = new DataView(buffer);
+            for (let i = 0; i < n; i++) {
+                view.setUint8(i, data[i]);
+            }
 
-                const floatArray = new type(buffer);
-                resolve(floatArray);
-            };
-        });
-    } else {
-        // Load as binary array of floats.
-        const buffer = await blob.arrayBuffer();
-        res = new type(buffer);
-    }
-    return res;
+            const floatArray = new type(buffer);
+            resolve(floatArray);
+        };
+    });
+    return result;
+}
+
+function isPngData(headers: Headers): boolean {
+    const contentType = headers.get("content-type");
+    return contentType === "image/png";
 }
 
 /**
  * Loads data as a typed array from a string (URL), number array, or any typed array.
- * If the input is a URL, it loads the data from the URL. If it's an array, it converts it.
+ * If the input is a URL, it loads the data from the URL. Supports binary float32 files,
+ * PNG images (with absolute float values) and json files storing number arrays.
  *
  * @param data - The data to load (string URL, base 64 encoded string, number[], or any typed array like Float32Array)
  * @param type - The targeted TypedArray type (e.g., any typed array like Float32Array)
@@ -87,6 +84,13 @@ export async function loadDataArray<T extends TypedArray>(
         }
         // It is assumed that the data is a file containing raw array of bytes.
         const response = await safeFetch(data);
+        if (!response.ok) {
+            return null;
+        }
+        if (isPngData(response.headers)) {
+            return await loadPngData(response, type);
+        }
+
         if (response.ok) {
             const blob = await response.blob();
             const buffer = await blob.arrayBuffer();
