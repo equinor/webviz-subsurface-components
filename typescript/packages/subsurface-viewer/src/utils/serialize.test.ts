@@ -23,6 +23,7 @@ globalThis.fetch = jest.fn(async (url: string | URL | RequestInfo) => {
                     },
                 };
             },
+            headers: new Headers(),
             ok: true,
             status: 200,
         } as Response;

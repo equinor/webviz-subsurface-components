@@ -91,11 +91,9 @@ export async function loadDataArray<T extends TypedArray>(
             return await loadPngData(response, type);
         }
 
-        if (response.ok) {
-            const blob = await response.blob();
-            const buffer = await blob.arrayBuffer();
-            return new type(buffer);
-        }
+        const blob = await response.blob();
+        const buffer = await blob.arrayBuffer();
+        return new type(buffer);
     } else {
         return toTypedArray(data, type);
     }
