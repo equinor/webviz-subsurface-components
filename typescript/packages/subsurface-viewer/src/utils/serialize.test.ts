@@ -8,22 +8,28 @@ import { loadDataArray } from "./serialize";
 const exampleDataDir = "../../../../../example-data";
 const smallPropertyFile = "small_properties.float32";
 
-globalThis.fetch = jest.fn(async (url: string) => {
-    const filePath = path.resolve(__dirname, exampleDataDir, url);
-    const buffer = fs.readFileSync(filePath);
+globalThis.fetch = jest.fn(async (url: string | URL | RequestInfo) => {
+    if (typeof url === "string") {
+        const filePath = path.resolve(__dirname, exampleDataDir, url);
+        const buffer = fs.readFileSync(filePath);
+        return {
+            async blob() {
+                return {
+                    async arrayBuffer() {
+                        return buffer.buffer.slice(
+                            buffer.byteOffset,
+                            buffer.byteOffset + buffer.byteLength
+                        );
+                    },
+                };
+            },
+            ok: true,
+            status: 200,
+        } as Response;
+    }
     return {
-        async blob() {
-            return {
-                async arrayBuffer() {
-                    return buffer.buffer.slice(
-                        buffer.byteOffset,
-                        buffer.byteOffset + buffer.byteLength
-                    );
-                },
-            };
-        },
-        ok: true,
-        status: 200,
+        ok: false,
+        status: 500,
     } as Response;
 });
 
