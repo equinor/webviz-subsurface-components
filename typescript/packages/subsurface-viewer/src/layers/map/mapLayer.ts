@@ -19,7 +19,7 @@ import { getModelMatrix } from "../utils/layerTools";
 import type { ColormapFunctionType } from "../utils/colormapTools";
 import config from "../../SubsurfaceConfig.json";
 import { findConfig } from "../../utils/configTools";
-import { loadFloat32Data } from "../../utils/serialize";
+import { loadDataArray } from "../../utils/serialize";
 import PrivateMapLayer from "./privateMapLayer";
 import { rotate } from "./utils";
 import { makeFullMesh } from "./webworker";
@@ -92,8 +92,8 @@ async function loadMeshAndProperties(
     // Keep
     //const t0 = performance.now();
 
-    const mesh = await loadFloat32Data(meshData);
-    const properties = await loadFloat32Data(propertiesData);
+    const mesh = await loadDataArray(meshData, Float32Array);
+    const properties = await loadDataArray(propertiesData, Float32Array);
 
     // if (!isMesh && !isProperties) {
     //     console.error("Error. One or both of texture and mesh must be given!");

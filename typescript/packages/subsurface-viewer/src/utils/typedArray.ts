@@ -59,19 +59,16 @@ export type TConstructor<T> = new (...args: any) => T;
  * Converts a number[] or TypedArray to a specific TypedArray type.
  * If the input is already of the correct type, it is returned as-is.
  *
- * @param constructor - The TypedArray constructor (e.g., Float32Array)
  * @param data - The input data (number[] or TypedArray)
+ * @param type - The targeted TypedArray (e.g., Float32Array)
  * @returns The data as the specified TypedArray type
  */
 export function toTypedArray<T extends TypedArray>(
-    constructor: TConstructor<T>,
-    data: TypedArray | number[]
+    data: TypedArray | number[],
+    type: TConstructor<T>
 ): T {
-    if (ArrayBuffer.isView(data) && data instanceof constructor) {
-        return data;
-    }
-    if (data instanceof constructor) {
+    if (data instanceof type) {
         return data as T;
     }
-    return new constructor(data);
+    return new type(data);
 }

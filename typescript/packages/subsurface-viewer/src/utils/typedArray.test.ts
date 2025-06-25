@@ -71,34 +71,34 @@ describe("Test isTypedArray", () => {
 describe("Test toTypedArray", () => {
     it("should convert a number[] to the specified TypedArray", () => {
         const arr = [1, 2, 3];
-        const result = toTypedArray(Float64Array, arr);
+        const result = toTypedArray(arr, Float64Array);
         expect(result).toBeInstanceOf(Float64Array);
         expect(Array.from(result)).toEqual(arr);
     });
 
     it("should return the same TypedArray if input is already a TypedArray", () => {
         const arr = new Int16Array([4, 5, 6]);
-        const result = toTypedArray(Int16Array, arr);
+        const result = toTypedArray(arr, Int16Array);
         expect(result).toBe(arr);
     });
 
     it("should convert a Float32Array to Int8Array", () => {
         const arr = new Float32Array([1.7, -2.2, 3.9]);
-        const result = toTypedArray(Int8Array, arr);
+        const result = toTypedArray(arr, Int8Array);
         expect(result).toBeInstanceOf(Int8Array);
         expect(Array.from(result)).toEqual([1, -2, 3]);
     });
 
     it("should convert a Uint8Array to Float32Array", () => {
         const arr = new Uint8Array([10, 20, 30]);
-        const result = toTypedArray(Float32Array, arr);
+        const result = toTypedArray(arr, Float32Array);
         expect(result).toBeInstanceOf(Float32Array);
         expect(Array.from(result)).toEqual([10, 20, 30]);
     });
 
     it("should handle empty arrays", () => {
         const arr: number[] = [];
-        const result = toTypedArray(Uint16Array, arr);
+        const result = toTypedArray(arr, Uint16Array);
         expect(result).toBeInstanceOf(Uint16Array);
         expect(result.length).toBe(0);
     });

@@ -1,3 +1,13 @@
+## 1.12.1 (2025-06-23)
+
+### 🩹 Fixes
+
+- loadURLData throws if the url can not be resolved ([#2586](https://github.com/equinor/webviz-subsurface-components/pull/2586))
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
 ## 1.12.0 (2025-06-17)
 
 ### 🚀 Features
