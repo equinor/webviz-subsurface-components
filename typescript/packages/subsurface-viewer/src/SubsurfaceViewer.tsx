@@ -322,12 +322,7 @@ SubsurfaceViewer.propTypes = {
     pickingRadius: PropTypes.number,
 
     /** Prop containing the lighting settings. */
-    lights: PropTypes.shape({
-        headLight: PropTypes.any,
-        ambientLight: PropTypes.any,
-        pointLights: PropTypes.any,
-        directionalLights: PropTypes.any,
-    }),
+    lights: PropTypes.any,
 };
 
 export default SubsurfaceViewer;
