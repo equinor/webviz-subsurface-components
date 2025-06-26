@@ -7,7 +7,8 @@ import type { Unit } from "convert-units";
 import convert from "convert-units";
 import PropTypes from "prop-types";
 
-import type { Point3D, RGBColor } from "./utils";
+// cannot use these type, they break python build
+// import type { Point3D, RGBColor } from "./utils";
 
 import type {
     BoundsAccessor,
@@ -35,25 +36,25 @@ export { TGrid3DColoringMode };
 export type LightsType = {
     headLight?: {
         intensity: number;
-        color?: RGBColor;
+        color?: [number, number, number]; // RGBColor;
     };
     ambientLight?: {
         intensity: number;
-        color?: RGBColor;
+        color?: [number, number, number]; // RGBColor;
     };
     pointLights?: [
         {
             intensity: number;
-            position: Point3D;
-            color?: RGBColor;
+            position: [number, number, number]; // Point3D;
+            color?: [number, number, number]; // RGBColor;
         },
     ];
 
     directionalLights?: [
         {
             intensity: number;
-            direction: Point3D;
-            color?: RGBColor;
+            direction: [number, number, number]; // Point3D;
+            color?: [number, number, number]; // RGBColor;
         },
     ];
 };
