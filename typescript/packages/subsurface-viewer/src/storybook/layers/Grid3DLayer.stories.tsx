@@ -3,8 +3,6 @@ import React from "react";
 
 import SubsurfaceViewer, { TGrid3DColoringMode } from "../../SubsurfaceViewer";
 
-import type { RGBColor } from "../../utils";
-
 import {
     Points as SnubCubePoints,
     Faces as SnubCubeFaces,
@@ -130,7 +128,7 @@ function discreteProperty(cellCountU: number, cellCountV: number) {
 }
 
 /* eslint-disable prettier/prettier */
-const CATEGORICAL_COLOR_TABLE: RGBColor[] = [
+const CATEGORICAL_COLOR_TABLE: [number, number, number][] = [
     [0, 0, 255], // 0
     [0, 255, 0], // 1
     [0, 255, 255], // 2
@@ -165,7 +163,7 @@ const propertyValueNames = [
 
 const CATEGORICAL_COLOR_MAP = (value: number) => CATEGORICAL_COLOR_TABLE[value];
 
-const BLUE_RED_HEAT_MAP = (value: number): RGBColor => {
+const BLUE_RED_HEAT_MAP = (value: number): [number, number, number] => {
     return [value * 255, 0, (1 - value) * 255];
 };
 

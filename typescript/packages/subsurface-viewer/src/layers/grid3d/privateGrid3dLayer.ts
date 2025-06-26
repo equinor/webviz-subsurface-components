@@ -1,4 +1,5 @@
 import type {
+    Color,
     PickingInfo,
     UpdateParameters,
     LayerContext,
@@ -25,9 +26,6 @@ import {
     type ColormapFunctionType,
     createColormapTexture,
 } from "../utils/colormapTools";
-
-import type { Color, RGBAColor, RGBColor } from "../../utils/Color";
-
 import linearFragmentShader from "./nodeProperty.fs.glsl";
 import linearVertexShader from "./nodeProperty.vs.glsl";
 import flatFragmentShader from "./cellProperty.fs.glsl";
@@ -52,7 +50,7 @@ export interface PrivateLayerProps extends ExtendedLayerProps {
     colormapRange: [number, number];
     colormapClampColor: Color | undefined | boolean;
     undefinedPropertyValue: number;
-    undefinedPropertyColor: RGBColor;
+    undefinedPropertyColor: [number, number, number];
     colormapFunction?: ColormapFunctionType;
     coloringMode: TGrid3DColoringMode.Property;
     gridLines: boolean;
@@ -83,7 +81,7 @@ interface IUniforms {
     colormapClampColor: number[];
     isClampColor: boolean;
     coloringMode: TGrid3DColoringMode;
-    undefinedPropertyColor: RGBColor;
+    undefinedPropertyColor: [number, number, number];
     isColoringDiscrete: boolean;
     colormapSize: number;
 }
@@ -256,8 +254,8 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
         return this.nullPickingColor() as unknown as number;
     }
 
-    encodePickingColor(): RGBColor {
-        return this.nullPickingColor() as RGBColor;
+    encodePickingColor(): [number, number, number] {
+        return this.nullPickingColor() as [number, number, number];
     }
 
     getPickingInfo({ info }: { info: PickingInfo }): LayerPickInfo {
@@ -440,10 +438,10 @@ type GridUniformsType = {
     valueRangeMax: number;
     colormapRangeMin: number;
     colormapRangeMax: number;
-    colormapClampColor: RGBAColor;
+    colormapClampColor: [number, number, number, number];
     isClampColor: boolean;
     coloringMode: TGrid3DColoringMode;
-    undefinedPropertyColor: RGBColor;
+    undefinedPropertyColor: [number, number, number];
     isColoringDiscrete: boolean;
     colormapSize: number;
 };

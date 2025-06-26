@@ -20,8 +20,6 @@ import {
     VertexCount as SnubCubeVertexCount,
 } from "../../layers/grid3d/test_data/TruncatedSnubCube";
 
-import type { RGBColor } from "../../utils";
-
 import {
     mainStyle,
     default3DViews,
@@ -177,18 +175,21 @@ interface ICoordinates {
     z: number;
 }
 
+type IColor = [number, number, number];
+
 interface ILight {
     active: boolean;
     label: string;
     intensity: number;
-    color: RGBColor;
+    color: IColor;
     coordinates?: ICoordinates;
 }
 
 interface CoordInputProps {
     label: string;
     value: number;
-    setValue: (val: number) => void;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setValue: any;
 }
 
 function CoordField({ label, value, setValue: setCoord }: CoordInputProps) {
@@ -234,23 +235,20 @@ function CoordinatesEditor({
             <CoordField
                 label="X"
                 value={coordinates.x}
-                setValue={(val: number) =>
-                    setCoordinates({ ...coordinates, x: val })
-                }
+                // @ts-expect-error TS7006
+                setValue={(val) => setCoordinates({ ...coordinates, x: val })}
             />
             <CoordField
                 label="Y"
                 value={coordinates.y}
-                setValue={(val: number) =>
-                    setCoordinates({ ...coordinates, y: val })
-                }
+                // @ts-expect-error TS7006
+                setValue={(val) => setCoordinates({ ...coordinates, y: val })}
             />
             <CoordField
                 label="Z"
                 value={coordinates.z}
-                setValue={(val: number) =>
-                    setCoordinates({ ...coordinates, z: val })
-                }
+                // @ts-expect-error TS7006
+                setValue={(val) => setCoordinates({ ...coordinates, z: val })}
             />
         </>
     );

@@ -6,7 +6,7 @@ import {
 } from "./color-function";
 
 /*
-  Binary search in array of elements [number, ...]
+  Binary serach in array of elements [number, ...]
   */
 function binarySearch(array: number[][], v: number) {
     let lo = -1,
@@ -19,7 +19,7 @@ function binarySearch(array: number[][], v: number) {
             lo = mi;
         }
     }
-    // v should be in the semi-open interval [array[lo][0], array[hi][0])
+    // v should be in the semiopen interval [array[lo][0], array[hi][0])
     // i.e. array[lo][0] <= v < array[hi][0]
     return hi;
 }

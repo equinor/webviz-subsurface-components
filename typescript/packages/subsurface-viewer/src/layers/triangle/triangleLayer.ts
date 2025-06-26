@@ -11,9 +11,6 @@ import type {
     ExtendedLayerProps,
     ReportBoundingBoxAction,
 } from "../utils/layerTools";
-
-import type { RGBColor } from "../../utils";
-
 import PrivateTriangleLayer from "./privateTriangleLayer";
 import { makeFullMesh } from "./webworker";
 
@@ -113,7 +110,7 @@ export interface TriangleLayerProps extends ExtendedLayerProps {
 
     triangleData: string | number[] | Uint32Array;
 
-    color: RGBColor;
+    color: [number, number, number];
 
     /**  Contourlines reference point and interval.
      */

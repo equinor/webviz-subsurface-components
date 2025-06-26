@@ -10,8 +10,6 @@ import type {
 } from "../utils/layerTools";
 import { createPropertyData, computeBoundingBox } from "../utils/layerTools";
 
-import type { RGBAColor, RGBColor } from "../../utils";
-
 import { PrivatePolylinesLayer } from "./privatePolylinesLayer";
 
 type IsPolylineClosedFunc = (index: number) => boolean;
@@ -42,7 +40,7 @@ export interface PolylinesLayerProps extends ExtendedLayerProps {
     /**
      * Line color defined as RGB or RGBA array. Each component is in 0-255 range.
      */
-    color: RGBColor | RGBAColor;
+    color: [number, number, number] | [number, number, number, number];
 
     /**
      * The units of the line width, one of `'meters'`, `'common'`, and `'pixels'`.

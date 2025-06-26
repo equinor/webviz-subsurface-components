@@ -3,9 +3,7 @@ import { IconLayer } from "@deck.gl/layers";
 
 import type { DefaultProps } from "@deck.gl/core";
 
-import type { RGBAColor } from "../../utils";
-
-function makeCrossHairSvg(color: RGBAColor): string {
+function makeCrossHairSvg(color: [number, number, number, number]): string {
     return `<?xml version="1.0" encoding="utf-8"?>
 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="150px" height="150px"
 	 viewBox="0 0 150 150" xml:space="preserve">
@@ -20,7 +18,7 @@ function makeCrossHairSvg(color: RGBAColor): string {
 export type CrosshairLayerProps = {
     id: string;
     worldCoordinates: [number, number, number] | null;
-    color?: RGBAColor;
+    color?: [number, number, number, number];
     sizePx?: number;
     visible?: boolean;
 };
