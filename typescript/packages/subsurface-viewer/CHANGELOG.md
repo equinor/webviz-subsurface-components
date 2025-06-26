@@ -1,3 +1,13 @@
+## 1.12.2 (2025-06-26)
+
+### 🩹 Fixes
+
+- make triangle line shader consistent with triangle shader ([#2587](https://github.com/equinor/webviz-subsurface-components/pull/2587))
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
 ## 1.12.1 (2025-06-23)
 
 ### 🩹 Fixes
