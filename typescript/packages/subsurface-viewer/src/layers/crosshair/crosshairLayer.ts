@@ -32,8 +32,8 @@ const defaultProps: DefaultProps<CrosshairLayerProps> = {
 };
 
 class CrosshairLayer extends CompositeLayer<CrosshairLayerProps> {
-    static readonly layerName: string = "CrosshairLayer";
-    static readonly defaultProps = defaultProps;
+    static layerName: string = "CrosshairLayer";
+    static defaultProps = defaultProps;
 
     renderLayers() {
         if (!this.props.worldCoordinates || !this.props.visible) {

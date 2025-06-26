@@ -16,8 +16,8 @@ import type {
 import type { ColormapFunctionType } from "../utils/colormapTools";
 
 import config from "../../SubsurfaceConfig.json";
-import type { BoundingBox3D } from "../../utils";
-import type { Color, RGBColor } from "../../utils";
+
+import type { BoundingBox3D, Color, RGBColor } from "../../utils";
 import { findConfig, loadDataArray } from "../../utils";
 
 // init workerpool
