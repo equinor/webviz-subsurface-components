@@ -322,7 +322,7 @@ SubsurfaceViewer.propTypes = {
     pickingRadius: PropTypes.number,
 
     /** Prop containing the lighting settings. */
-    lights: PropTypes.any,
+    lights: PropTypes.objectOf(PropTypes.any),
 };
 
 export default SubsurfaceViewer;
