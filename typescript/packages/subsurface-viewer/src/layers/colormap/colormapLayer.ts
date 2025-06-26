@@ -9,17 +9,19 @@ import type { Texture } from "@luma.gl/core";
 import * as png from "@vivaxy/png";
 
 import type {
+    DeckGLLayerContext,
     LayerPickInfo,
     ReportBoundingBoxAction,
     TypeAndNameLayerProps,
 } from "../utils/layerTools";
-import { type DeckGLLayerContext, getModelMatrix } from "../utils/layerTools";
+import { getModelMatrix } from "../utils/layerTools";
 import {
     type ColormapFunctionType,
     getImageData,
 } from "../utils/colormapTools";
 import { decodeRGB, type ValueDecoder } from "../utils/propertyMapTools";
 import type { ContinuousLegendDataType } from "../../components/ColorLegend";
+import type { RGBColor } from "../../utils";
 import fsColormap from "./colormap.fs.glsl";
 
 // Most props are inherited from DeckGL's BitmapLayer. For a full list, see
@@ -425,12 +427,12 @@ type Map2DUniformsType = {
     contourReferencePoint: number;
     contourInterval: number;
     isClampColor: boolean;
-    colormapClampColor: [number, number, number];
+    colormapClampColor: RGBColor;
     isColormapClampColorTransparent: boolean;
     isHeightMapTextureDefined: boolean;
     heightValueRangeMin: number;
     heightValueRangeMax: number;
-    rgbScaler: [number, number, number];
+    rgbScaler: RGBColor; // r, g and b multipliers
     floatScaler: number;
     offset: number;
     step: number;
