@@ -1,4 +1,5 @@
 import type { colorTablesObj } from "@emerson-eps/color-tables/dist/component/colorTableTypes";
+
 import { elementByName } from "./arrays";
 
 export type ColorTable = colorTablesObj;
