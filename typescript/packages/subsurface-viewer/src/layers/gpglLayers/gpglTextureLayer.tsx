@@ -1,5 +1,4 @@
 import type {
-    Color,
     DefaultProps,
     LayerProps,
     PickingInfo,
@@ -27,11 +26,23 @@ import {
     type ColormapProps,
     type ColormapSetup,
     getImageData,
-    toNormalizedColor,
 } from "../utils/colormapTools";
 
-import type { TypedFloatArray, TypedIntArray } from "../../utils";
-import { isTypedArray, loadDataArray, toTypedArray } from "../../utils";
+import type {} from "../../utils/Color";
+
+import type {
+    Color,
+    RGBAColor,
+    RGBColor,
+    TypedFloatArray,
+    TypedIntArray,
+} from "../../utils";
+import {
+    isTypedArray,
+    loadDataArray,
+    toNormalizedColor,
+    toTypedArray,
+} from "../../utils";
 
 import type { Texture2D } from "./typeDefs";
 
@@ -74,7 +85,7 @@ export interface GpglTextureLayerProps extends ExtendedLayerProps {
 
     colormapSetup?: ColormapSetup;
 
-    color: [number, number, number];
+    color: RGBColor;
     smoothShading: boolean;
     enableLighting: boolean;
     depthTest: boolean;
@@ -585,7 +596,7 @@ uniform trianglesUniforms {
 `;
 
 type TriangleUniformsType = {
-    uColor: [number, number, number, number];
+    uColor: RGBAColor;
     smoothShading: boolean;
     ZIncreasingDownwards: boolean;
 };
@@ -620,10 +631,10 @@ type TexTriangleUniformsType = {
     colormapRange: [number, number];
     clampRange: [number, number];
     useClampColors: boolean;
-    lowClampColor: [number, number, number, number];
-    highClampColor: [number, number, number, number];
+    lowClampColor: RGBAColor;
+    highClampColor: RGBAColor;
     undefinedValue: number;
-    undefinedColor: [number, number, number, number];
+    undefinedColor: RGBAColor;
     smoothShading: boolean;
     ZIncreasingDownwards: boolean;
 };
