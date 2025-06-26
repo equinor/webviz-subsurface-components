@@ -10,6 +10,8 @@ import type {
 } from "../utils/layerTools";
 import { createPropertyData, computeBoundingBox } from "../utils/layerTools";
 
+import type { RGBAColor, RGBColor } from "../../utils";
+
 import { PrivatePointsLayer } from "./privatePointsLayer";
 
 export interface PointsLayerProps extends ExtendedLayerProps {
@@ -21,7 +23,7 @@ export interface PointsLayerProps extends ExtendedLayerProps {
     /**
      * Point color defined as RGB or RGBA array. Each component is in 0-255 range.
      */
-    color: [number, number, number] | [number, number, number, number];
+    color: RGBColor | RGBAColor;
 
     /**
      * The units of the point radius, one of `'meters'`, `'common'`, and `'pixels'`.

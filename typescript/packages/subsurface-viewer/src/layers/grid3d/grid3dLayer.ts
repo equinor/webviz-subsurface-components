@@ -1,7 +1,6 @@
 import { isEqual } from "lodash";
 import type React from "react";
 
-import type { Color } from "@deck.gl/core";
 import { CompositeLayer } from "@deck.gl/core";
 
 import workerpool from "workerpool";
@@ -17,7 +16,8 @@ import type {
 import type { ColormapFunctionType } from "../utils/colormapTools";
 
 import config from "../../SubsurfaceConfig.json";
-import type { BoundingBox3D } from "../../utils";
+
+import type { BoundingBox3D, Color, RGBColor } from "../../utils";
 import { findConfig, loadDataArray } from "../../utils";
 
 // init workerpool
@@ -234,7 +234,7 @@ export interface Grid3DLayerProps extends ExtendedLayerProps {
      * Is not overridden by and used prior to colorMapFunction.
      * By default, Light gray if not provided.
      */
-    undefinedPropertyColor?: [number, number, number];
+    undefinedPropertyColor?: RGBColor;
 
     /** Enable lines around cell faces.
      *  default: true.
@@ -447,7 +447,7 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
         return Number.NaN;
     }
 
-    private getUndefinedPropertyColor(): [number, number, number] {
+    private getUndefinedPropertyColor(): RGBColor {
         const colorFunc = this.props.colorMapFunction;
         if (
             this.props.propertiesData?.length === 0 &&
