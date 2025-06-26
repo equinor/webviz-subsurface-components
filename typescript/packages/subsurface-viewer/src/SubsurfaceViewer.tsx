@@ -1,9 +1,13 @@
+import React from "react";
+
 import type { Layer, LayersList } from "@deck.gl/core";
 import type { colorTablesArray } from "@emerson-eps/color-tables/";
+
 import type { Unit } from "convert-units";
 import convert from "convert-units";
 import PropTypes from "prop-types";
-import React from "react";
+
+import type { RGBColor } from "./utils";
 
 import type {
     BoundsAccessor,
@@ -13,10 +17,9 @@ import type {
     ViewStateType,
     ViewsType,
 } from "./components/Map";
+import Map, { createLayers } from "./components/Map";
 
 import { TGrid3DColoringMode } from "./layers/grid3d/grid3dLayer";
-
-import Map, { createLayers } from "./components/Map";
 
 export type {
     BoundsAccessor,
@@ -32,17 +35,17 @@ export { TGrid3DColoringMode };
 export type LightsType = {
     headLight?: {
         intensity: number;
-        color?: [number, number, number];
+        color?: RGBColor;
     };
     ambientLight?: {
         intensity: number;
-        color?: [number, number, number];
+        color?: RGBColor;
     };
     pointLights?: [
         {
             intensity: number;
             position: [number, number, number];
-            color?: [number, number, number];
+            color?: RGBColor;
         },
     ];
 
@@ -50,7 +53,7 @@ export type LightsType = {
         {
             intensity: number;
             direction: [number, number, number];
-            color?: [number, number, number];
+            color?: RGBColor;
         },
     ];
 };
