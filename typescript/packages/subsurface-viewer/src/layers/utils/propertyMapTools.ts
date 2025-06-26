@@ -1,9 +1,9 @@
-import type { Color } from "@deck.gl/core";
+import type { Color, RGBColor } from "../../utils";
 
 // Parameters used to decode a float value from RGB pixels.
 export interface ValueDecoder {
     // r, g and b multipliers
-    rgbScaler: [number, number, number];
+    rgbScaler: RGBColor;
     // value multiplier
     floatScaler: number;
     // translation of the r, g, b sum

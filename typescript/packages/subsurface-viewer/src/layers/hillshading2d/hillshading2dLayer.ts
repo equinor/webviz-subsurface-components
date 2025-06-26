@@ -13,6 +13,9 @@ import type {
 import { getModelMatrix } from "../utils/layerTools";
 import type { ValueDecoder } from "../utils/propertyMapTools";
 import { decodeRGB } from "../utils/propertyMapTools";
+
+import type { RGBColor } from "../../utils";
+
 import fsHillshading from "./hillshading2d.fs.glsl";
 
 // Most props are inherited from DeckGL's BitmapLayer. For a full list, see:
@@ -235,7 +238,7 @@ type Map2DUniformsType = {
     ambientLightIntensity: number;
     diffuseLightIntensity: number;
 
-    rgbScaler: [number, number, number];
+    rgbScaler: RGBColor;
     floatScaler: number;
     offset: number;
     step: number;
