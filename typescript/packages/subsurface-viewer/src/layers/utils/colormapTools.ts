@@ -1,5 +1,3 @@
-import type { Color } from "@deck.gl/core";
-
 import type { SamplerProps, Texture, TextureProps } from "@luma.gl/core";
 
 import type {
@@ -10,6 +8,8 @@ import { rgbValues } from "@emerson-eps/color-tables/";
 import { createDefaultContinuousColorScale } from "@emerson-eps/color-tables/dist/component/Utils/legendCommonFunction";
 
 import type { DeckGLLayerContext } from "./layerTools";
+
+import type { Color } from "../../utils/Color";
 
 /** Type of functions returning a color from a value in the [0,1] range. */
 export type ColormapFunctionType = ReturnType<typeof createColormapFunction>;
@@ -69,30 +69,6 @@ export interface ColormapSetup {
 }
 
 /**
- * Converts a color represented as an array of numbers (either RGB or RGBA) with 8-bit channel values (0-255)
- * into a normalized RGBA tuple with values in the range [0, 1].
- *
- * @param color - The input color as an array of numbers. It can be either:
- *   - [r, g, b]: An RGB color, where each channel is a number between 0 and 255.
- *   - [r, g, b, a]: An RGBA color, where each channel is a number between 0 and 255.
- * @returns A tuple [r, g, b, a] where each value is normalized to the range [0, 1].
- */
-export function toNormalizedColor(
-    color: Color | undefined
-): [number, number, number, number] | undefined {
-    return color
-        ? [
-              color[0] / 255,
-              color[1] / 255,
-              color[2] / 255,
-              color.length === 3
-                  ? 1
-                  : (color as [number, number, number, number])[3] / 255,
-          ]
-        : undefined;
-}
-
-/**
  * Creates an array of colors as RGB triplets in range [0, 1] using the colormap definition.
  * @param colormapDef Definition of the colormap.
  * @param colormapSize Number of colors in the color map.
@@ -149,7 +125,7 @@ export function getImageData(
         }
     }
 
-    return data ? data : new Uint8Array([0, 0, 0]);
+    return data;
 }
 
 const DEFAULT_TEXTURE_PARAMETERS: SamplerProps = {
