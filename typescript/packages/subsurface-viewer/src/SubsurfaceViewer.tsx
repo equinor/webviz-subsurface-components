@@ -7,7 +7,7 @@ import type { Unit } from "convert-units";
 import convert from "convert-units";
 import PropTypes from "prop-types";
 
-import type { RGBColor } from "./utils";
+import type { Point3D, RGBColor } from "./utils";
 
 import type {
     BoundsAccessor,
@@ -44,7 +44,7 @@ export type LightsType = {
     pointLights?: [
         {
             intensity: number;
-            position: [number, number, number];
+            position: Point3D;
             color?: RGBColor;
         },
     ];
@@ -52,7 +52,7 @@ export type LightsType = {
     directionalLights?: [
         {
             intensity: number;
-            direction: [number, number, number];
+            direction: Point3D;
             color?: RGBColor;
         },
     ];
@@ -320,6 +320,14 @@ SubsurfaceViewer.propTypes = {
      * Extra pixels around the pointer to include while picking.
      */
     pickingRadius: PropTypes.number,
+
+    /** Prop containing the lighting settings. */
+    lights: PropTypes.shape({
+        headLight: PropTypes.any,
+        ambientLight: PropTypes.any,
+        pointLights: PropTypes.any,
+        directionalLights: PropTypes.any,
+    }),
 };
 
 export default SubsurfaceViewer;
