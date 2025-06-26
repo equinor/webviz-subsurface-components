@@ -18,7 +18,7 @@ import type { ShaderModule } from "@luma.gl/shadertools";
 
 import { vec4 } from "gl-matrix";
 
-import type { Point3D } from "../../utils";
+import type { Point3D, RGBAColor } from "../../utils";
 import type { ExtendedLayerProps } from "../utils/layerTools";
 import fontAtlasPng from "./font-atlas.png";
 import labelFragmentShader from "./label.fs.glsl";
@@ -1009,7 +1009,7 @@ uniform linesUniforms {
 `;
 
 type LinesUniformsType = {
-    uColor: [number, number, number, number];
+    uColor: RGBAColor;
     uClipZ: number;
 };
 
@@ -1032,8 +1032,8 @@ uniform axesUniforms {
 `;
 
 type AxesUniformsType = {
-    uAxisColor: [number, number, number, number];
-    uBackGroundColor: [number, number, number, number];
+    uAxisColor: RGBAColor;
+    uBackGroundColor: RGBAColor;
 };
 
 // NOTE: this must exactly the same name than in the uniform block

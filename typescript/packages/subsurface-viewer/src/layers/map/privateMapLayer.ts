@@ -5,8 +5,7 @@ import type {
     UpdateParameters,
     LayerContext,
 } from "@deck.gl/core";
-import { COORDINATE_SYSTEM } from "@deck.gl/core";
-import { Layer, project32, picking } from "@deck.gl/core";
+import { COORDINATE_SYSTEM, Layer, project32, picking } from "@deck.gl/core";
 
 import type { Device, Texture, UniformValue } from "@luma.gl/core";
 import type { ShaderModule } from "@luma.gl/shadertools";
@@ -27,6 +26,8 @@ import {
     type ColormapFunctionType,
     getImageData,
 } from "../utils/colormapTools";
+
+import type { RGBColor } from "../../utils";
 
 import fs from "./map.fs.glsl";
 import vs from "./map.vs.glsl";
@@ -371,7 +372,7 @@ type MapUniformsType = {
     valueRangeMax: number;
     colormapRangeMin: number;
     colormapRangeMax: number;
-    colormapClampColor: [number, number, number];
+    colormapClampColor: RGBColor;
     isClampColor: boolean;
     isColormapClampColorTransparent: boolean;
     smoothShading: boolean;

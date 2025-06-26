@@ -17,6 +17,8 @@ import type {
 } from "../utils/layerTools";
 import { createPropertyData } from "../utils/layerTools";
 
+import type { RGBAColor, RGBColor } from "../../utils";
+
 import fsShader from "./triangle.fs.glsl";
 import vsShader from "./triangle.vs.glsl";
 import fsLineShader from "./line.fs.glsl";
@@ -47,7 +49,7 @@ export interface PrivateTriangleLayerProps extends ExtendedLayerProps {
     geometryLines: GeometryLines;
     contours: [number, number];
     gridLines: boolean;
-    color: [number, number, number];
+    color: RGBColor;
     smoothShading: boolean;
     depthTest: boolean;
     ZIncreasingDownwards: boolean;
@@ -176,7 +178,7 @@ export default class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProp
                         (x: number) => (x ?? 0) / 255
                     ),
                     1 /* alpha channel */,
-                ] as [number, number, number, number],
+                ] as RGBAColor,
                 smoothShading:
                     this.props.smoothShading ?? defaultProps.smoothShading,
                 ZIncreasingDownwards:
@@ -272,7 +274,7 @@ type TriangleUniformsType = {
     isContoursDepth: boolean;
     contourReferencePoint: number;
     contourInterval: number;
-    uColor: [number, number, number, number];
+    uColor: RGBAColor;
     smoothShading: boolean;
     ZIncreasingDownwards: boolean;
 };
