@@ -1,3 +1,9 @@
+## 2.5.1 (2025-07-09)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.2.5
+
 ## 2.5.0 (2025-06-17)
 
 ### 🚀 Features
