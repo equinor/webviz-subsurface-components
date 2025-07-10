@@ -68,7 +68,7 @@ export function toTypedArray<T extends TypedArray>(
     type: TConstructor<T>
 ): T {
     if (data instanceof type) {
-        return data as T;
+        return data;
     }
     return new type(data);
 }

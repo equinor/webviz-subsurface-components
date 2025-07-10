@@ -72,10 +72,10 @@ const nonJsonLayerArgs = {
 };
 
 const ComplexDataLayer = {
-    "@@type": "GpglTextureLayer",
+    "@@type": "GpglValueMappedSurfaceLayer",
     "@@typedArraySupport": true,
     id: njTextureLayerId,
-    texturedTriangles: [
+    valueMappedTriangles: [
         {
             topology: "triangle-strip",
             vertices: new Float32Array(sectionZ0Vertices),

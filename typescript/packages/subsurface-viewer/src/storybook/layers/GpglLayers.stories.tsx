@@ -17,22 +17,32 @@ const stories: Meta = {
 };
 export default stories;
 
+/*
+ Vertices of a section in the seismic data.
+ ^  P01  P11
+ |
+ Y
+ |  P00  P10   
+ +---X--->
+
+ sectionZ0Vertices= [ P00, P10, P01, P11 ]
+ */
 const sectionZ0Vertices = [
     -2808.4, -6505.9, 1071.3, 3426.2, -6358.0, 1071.3, -3083.9, 5103.5, 1071.3,
     3150.7, 5251.4, 1071.3,
 ];
-const sectionZ0TexCoords = [0, 1, 1, 1, 0, 0, 1, 0];
-const sectionZ0Indices = [2, 0, 3, 1];
+const sectionZ0TexCoords = [0, 0, 1, 0, 0, 1, 1, 1];
+const sectionZ0Indices = [0, 1, 2, 3];
 
 const section0Props = {
     topology: "triangle-strip",
     vertices: sectionZ0Vertices,
-    vertexIndices: { value: sectionZ0Indices },
+    vertexIndices: { value: sectionZ0Indices, size: 4 },
 };
 const section0TexProps = {
     ...section0Props,
     texCoords: sectionZ0TexCoords,
-    propertiesData: {
+    valueMap: {
         width: 115,
         height: 103,
         values: "seismic_Z0_115_103.float32",
@@ -51,7 +61,7 @@ const njTextureLayerId = "nj_texture_layer";
 
 const nonJsonLayerArgs = {
     [njTextureLayerId]: {
-        texturedTriangles: [
+        valueMappedTriangles: [
             {
                 vertices: new Float32Array(sectionZ0Vertices),
                 texCoords: new Float32Array(sectionZ0TexCoords),
@@ -67,7 +77,7 @@ const njSection0TexProps = {
     topology: "triangle-strip",
     vertices: new Float32Array(sectionZ0Vertices),
     texCoords: new Float32Array(sectionZ0TexCoords),
-    propertiesData: {
+    valueMap: {
         width: 115,
         height: 103,
         values: "seismic_Z0_115_103.float32",
@@ -79,9 +89,9 @@ const njSection0TexProps = {
 
 // Small example using polylinesLayer.
 const noTextureLayer = {
-    "@@type": "GpglTextureLayer",
+    "@@type": "GpglValueMappedSurfaceLayer",
     id: "no_texture_layer",
-    texturedTriangles: [section0Props],
+    valueMappedTriangles: [section0Props],
     color: [100, 100, 255],
     showMesh: true,
     ZIncreasingDownwards: true,
@@ -96,9 +106,9 @@ const colormapSetup = {
 };
 
 const textureLayer = {
-    "@@type": "GpglTextureLayer",
+    "@@type": "GpglValueMappedSurfaceLayer",
     id: "texture_layer",
-    texturedTriangles: [section0TexProps],
+    valueMappedTriangles: [section0TexProps],
     colormap: { colormapName: "seismic" },
     colormapSetup: colormapSetup,
     showMesh: false,
@@ -113,10 +123,10 @@ const textureWithMeshLayer = {
 };
 
 const njTextureLayer = {
-    "@@type": "GpglTextureLayer",
+    "@@type": "GpglValueMappedSurfaceLayer",
     "@@typedArraySupport": true,
     id: njTextureLayerId,
-    texturedTriangles: [njSection0TexProps],
+    valueMappedTriangles: [njSection0TexProps],
     colormap: { colormapName: "seismic" },
     colormapSetup: colormapSetup,
     showMesh: true,

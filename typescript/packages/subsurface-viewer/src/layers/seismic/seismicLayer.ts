@@ -7,9 +7,9 @@ import { CompositeLayer } from "@deck.gl/core";
 import type { Material } from "../gpglLayers/typeDefs";
 import { PrivatePolylinesLayer } from "../polylines/privatePolylinesLayer";
 import {
-    GpglTextureLayer,
-    type TexturedTriangleProps,
-} from "../gpglLayers/gpglTextureLayer";
+    GpglValueMappedSurfaceLayer,
+    type ValueMappedTriangleProps,
+} from "../gpglLayers/gpglValueMappedSurfaceLayer";
 
 import { createPropertyData, computeBoundingBox } from "../utils/layerTools";
 import type {
@@ -69,7 +69,7 @@ export interface CageProps {
     visible: boolean;
 }
 
-export type SeismicFenceProps = TexturedTriangleProps;
+export type SeismicFenceProps = ValueMappedTriangleProps;
 
 export interface SeismicLayerProps extends ExtendedLayerProps {
     /**
@@ -275,7 +275,7 @@ export default class SeismicLayer extends CompositeLayer<SeismicLayerProps> {
         };
     }
 
-    private rebuildFencesAttributes(): TexturedTriangleProps[] {
+    private rebuildFencesAttributes(): ValueMappedTriangleProps[] {
         return this.props.seismicFences;
     }
 
@@ -301,7 +301,7 @@ export default class SeismicLayer extends CompositeLayer<SeismicLayerProps> {
         };
     }
 
-    renderLayers(): [PrivatePolylinesLayer?, GpglTextureLayer?] {
+    renderLayers(): [PrivatePolylinesLayer?, GpglValueMappedSurfaceLayer?] {
         const cage = this.state["cageAttributes"] as ICageDataAttributes;
         const cageLayer = new PrivatePolylinesLayer(
             this.getSubLayerProps({
@@ -327,11 +327,11 @@ export default class SeismicLayer extends CompositeLayer<SeismicLayerProps> {
 
         const seismicFences = this.state[
             "seismicFences"
-        ] as TexturedTriangleProps[];
-        const seismicLayer = new GpglTextureLayer(
+        ] as ValueMappedTriangleProps[];
+        const seismicLayer = new GpglValueMappedSurfaceLayer(
             this.getSubLayerProps({
                 id: `seismic-fence-layer`,
-                texturedTriangles: seismicFences,
+                valueMappedTriangles: seismicFences,
                 showMesh: this.props.showMesh,
                 colormap: this.props.colormap,
                 colormapSetup: this.props.colormapSetup,

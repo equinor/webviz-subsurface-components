@@ -44,7 +44,7 @@ import {
     toTypedArray,
 } from "../../utils";
 
-import type { Texture2D } from "./typeDefs";
+import type { ValueArray2D } from "./typeDefs";
 
 import fsShader from "./triangle.fs.glsl";
 import vsShader from "./triangle.vs.glsl";
@@ -53,42 +53,74 @@ import vsTexShader from "./texTriangle.vs.glsl";
 import fsLineShader from "./triangleLine.fs.glsl";
 import vsLineShader from "./triangleLine.vs.glsl";
 
-export type TexturedTriangleProps = {
+/**
+ * Props for defining a triangle surfaces with optional value mapping and texture coordinates.
+ * If a value map, ie. a 2D array of values, is provided, it will be used to generate a 2D texture
+ * of values which will be mapped on the surface and converted to colors using the colormap
+ *
+ * @property topology The type of triangle topology to use: either `triangle-list` or `triangle-strip`.
+ * @property vertices The array of vertex positions, as either a typed float array or a number array.
+ * @property normals (Optional) The array of vertex normals, as either a typed float array or a number array.
+ * @property texCoords (Optional) The array of texture coordinates, as either a typed float array or a number array.
+ * @property valueMap (Optional) A 2D array of values used to generate a value texture.
+ * @property vertexIndices An object containing the indices of vertices and the size of each index group.
+ * @property vertexIndices.value The array of vertex indices, as either a typed int array or a number array.
+ * @property vertexIndices.size The number of indices per group (e.g., 3 for triangles).
+ */
+export type ValueMappedTriangleProps = {
     topology: "triangle-list" | "triangle-strip";
     vertices: TypedFloatArray | number[];
     normals?: TypedFloatArray | number[];
     texCoords?: TypedFloatArray | number[];
-    propertiesData?: Texture2D;
+    valueMap?: ValueArray2D;
     vertexIndices: { value: TypedIntArray | number[]; size: number };
 };
 
+/**
+ * Props for defining a triangle mesh geometry.
+ *
+ * @property topology Specifies the type of mesh topology. Can be either `line-list` or `line-strip`.
+ * @property vertices Optional array of vertex positions. Accepts either a typed float array or a regular number array.
+ *                      If not provided, the vertices of the ValueMappedTriangleProps will be used.
+ * @property vertexIndices Object containing the indices for the vertices and the size of each index group.
+ * @property vertexIndices.value The indices referencing vertices, as a typed integer array or a number array.
+ * @property vertexIndices.size The number of indices per primitive (e.g., 1 for vertex indices).
+ */
 export type TriangleMeshProps = {
     topology: "line-list" | "line-strip";
     vertices?: TypedFloatArray | number[];
     vertexIndices: { value: TypedIntArray | number[]; size: number };
 };
 
-export interface GpglTextureLayerProps extends ExtendedLayerProps {
-    texturedTriangles: TexturedTriangleProps[];
+/**
+ * Props for the GpglValueMappedSurfaceLayer component, which renders surfaces with value-mapped textures.
+ *
+ * @remarks
+ * This interface extends `ExtendedLayerProps` and provides configuration for rendering surfaces
+ * with value-mapped textures, optional triangle meshes, and various rendering options such as
+ * shading, lighting, and depth testing.
+ */
+export interface GpglValueMappedSurfaceLayerProps extends ExtendedLayerProps {
+    /** Surfaces with a value map used as texture. */
+    valueMappedTriangles: ValueMappedTriangleProps[];
+    /** Optional triangle meshes. Inferred from `valueMappedTriangles` if not specified. */
     triangleMeshes: TriangleMeshProps[];
+    /** Whether to display the mesh overlay. */
     showMesh: boolean;
 
-    /**  Optional function property.
-     * If defined this function will override the color map.
-     * Takes a value in the range [0,1] and returns a color.
-     * E.g. (x) => [x * 255, x * 255, x * 255]
-     * May also be set as constant color:
-     * E.g. [255, 0, 0] for constant red cells.
-     * Can be defined as Uint8Array containing [R, G, B] triplets in [0, 255] range each.
-     */
+    /** Definition of the colormap to use for mapping values to colors. */
     colormap?: ColormapProps;
-
+    /** Setup of the colormap. */
     colormapSetup?: ColormapSetup;
-
+    /** Plain color if no value map is provided. */
     color: RGBColor;
+    /** Enables smooth shading for the surface. */
     smoothShading: boolean;
+    /** Enables lighting for the surface. */
     enableLighting: boolean;
+    /** Enables depth testing for rendering. */
     depthTest: boolean;
+    /** Indicates if the Z axis increases downwards. */
     ZIncreasingDownwards: boolean;
 }
 
@@ -101,10 +133,10 @@ const defaultColormapSetup: ColormapSetup = {
     smooth: true,
 };
 
-const defaultProps: DefaultProps<GpglTextureLayerProps> = {
-    "@@type": "GpglTextureLayer",
-    name: "Textured Triangles",
-    id: "textured-triangles",
+const defaultProps: DefaultProps<GpglValueMappedSurfaceLayerProps> = {
+    "@@type": "GpglValueMappedSurfaceLayer",
+    name: "Value Mapped Surface Layer",
+    id: "value-mapped-surface",
     data: ["dummy"],
     showMesh: false,
     colormap: {
@@ -123,12 +155,13 @@ const defaultProps: DefaultProps<GpglTextureLayerProps> = {
 };
 
 /**
- * GpglTextureLayer is a layer handling textured surfaces.
+ * GpglValueMappedSurfaceLayer is a layer handling surfaces textured by a value map.
+ * These values are converted to color using a colormap and associated setup.
  *
  * A primary use case is to display seismic data.
  * The surfaces are expected to be small compared to the ones handled by the triangles layer.
  */
-export class GpglTextureLayer extends Layer<GpglTextureLayerProps> {
+export class GpglValueMappedSurfaceLayer extends Layer<GpglValueMappedSurfaceLayerProps> {
     setShaderModuleProps(
         args: Partial<{
             [x: string]: Partial<Record<string, unknown> | undefined>;
@@ -169,7 +202,9 @@ export class GpglTextureLayer extends Layer<GpglTextureLayerProps> {
         );
     }
 
-    updateState(params: UpdateParameters<Layer<GpglTextureLayerProps>>): void {
+    updateState(
+        params: UpdateParameters<Layer<GpglValueMappedSurfaceLayerProps>>
+    ): void {
         super.updateState(params);
         this.initializeState(params.context as DeckGLLayerContext);
     }
@@ -216,15 +251,15 @@ export class GpglTextureLayer extends Layer<GpglTextureLayerProps> {
 
     private async _createValuesTexture(
         device: Device,
-        texture: Texture2D | undefined
+        valueMap: ValueArray2D | undefined
     ): Promise<Texture | undefined> {
-        if (texture === undefined || texture.values === undefined) {
+        if (valueMap?.values === undefined) {
             return undefined;
         }
 
         // fetch data
         const propertiesData = await loadDataArray(
-            texture.values,
+            valueMap.values,
             Float32Array
         );
         if (!propertiesData) {
@@ -240,14 +275,14 @@ export class GpglTextureLayer extends Layer<GpglTextureLayerProps> {
                 minFilter: smooth ? "linear" : "nearest",
                 magFilter: smooth ? "linear" : "nearest",
             },
-            width: texture.width,
-            height: texture.height,
+            width: valueMap.width,
+            height: valueMap.height,
             format: "r32float",
         };
         return device.createTexture({
             ...textureProps,
-            width: texture.width,
-            height: texture.height,
+            width: valueMap.width,
+            height: valueMap.height,
             data: propertiesData,
         });
     }
@@ -256,9 +291,9 @@ export class GpglTextureLayer extends Layer<GpglTextureLayerProps> {
         const models: Model[] = [];
         const meshModels: Model[] = [];
 
-        // Collect promises for all texturedTriangles
+        // Collect promises for all valueMappedTriangles
         const triangleModelPromises =
-            this.props.texturedTriangles?.map(async (texturedTrgs, i) => {
+            this.props.valueMappedTriangles?.map(async (texturedTrgs, i) => {
                 const trglGeometry: GeometryProps = {
                     topology: texturedTrgs.topology,
                     attributes: {
@@ -293,13 +328,13 @@ export class GpglTextureLayer extends Layer<GpglTextureLayerProps> {
                         size: 1,
                     },
                 };
-                const colormap = texturedTrgs.propertiesData
+                const colormap = texturedTrgs.valueMap
                     ? this._createColormapTexture(device, this.props.colormap)
                     : undefined;
-                const floatValues = texturedTrgs.propertiesData
+                const floatValues = texturedTrgs.valueMap
                     ? await this._createValuesTexture(
                           device,
-                          texturedTrgs.propertiesData
+                          texturedTrgs.valueMap
                       )
                     : undefined;
                 const bindings =
@@ -392,7 +427,7 @@ export class GpglTextureLayer extends Layer<GpglTextureLayerProps> {
                     positions: {
                         value: toTypedArray(
                             mesh.vertices ??
-                                this.props.texturedTriangles[i]?.vertices,
+                                this.props.valueMappedTriangles[i]?.vertices,
                             Float32Array
                         ),
                         size: 3,
@@ -566,8 +601,8 @@ export class GpglTextureLayer extends Layer<GpglTextureLayerProps> {
     }
 }
 
-GpglTextureLayer.layerName = "GpglTextureLayer";
-GpglTextureLayer.defaultProps = defaultProps;
+GpglValueMappedSurfaceLayer.layerName = "GpglValueMappedSurfaceLayer";
+GpglValueMappedSurfaceLayer.defaultProps = defaultProps;
 
 const triangleMeshUniformsBlock = `\
 uniform triangleMeshUniforms {
@@ -659,7 +694,7 @@ const texTrianglesUniforms = {
 
 // Helper functions
 function meshTopology(
-    topology: TexturedTriangleProps["topology"]
+    topology: ValueMappedTriangleProps["topology"]
 ): "line-list" | "line-strip" {
     switch (topology) {
         case "triangle-list":
@@ -673,7 +708,7 @@ function meshTopology(
 
 function computeMeshIndices(
     trglIndices: TypedIntArray | number[],
-    topology: TexturedTriangleProps["topology"]
+    topology: ValueMappedTriangleProps["topology"]
 ): TypedIntArray | number[] {
     if (topology === "triangle-list") {
         // non optimal, and some edges might be missing
