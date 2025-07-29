@@ -147,7 +147,7 @@ export const SeismicSections: StoryObj<typeof SubsurfaceViewer> = {
             },
         },
     },
-    render: (args) => (
+    render: (args: SubsurfaceViewerProps) => (
         <SubsurfaceViewer {...preprocessProps(args, nonJsonLayerArgs)} />
     ),
 };
@@ -161,7 +161,7 @@ const seismicSectionsWithMaterialLayer = {
         shininess: 32,
         specularColor: [38, 38, 38],
     },
-    render: (args) => (
+    render: (args: SubsurfaceViewerProps) => (
         <SubsurfaceViewer {...preprocessProps(args, nonJsonLayerArgs)} />
     ),
 };
@@ -180,7 +180,7 @@ export const SeismicSectionsWithMaterial: StoryObj<typeof SubsurfaceViewer> = {
             },
         },
     },
-    render: (args) => (
+    render: (args: SubsurfaceViewerProps) => (
         <SubsurfaceViewer {...preprocessProps(args, nonJsonLayerArgs)} />
     ),
 };
