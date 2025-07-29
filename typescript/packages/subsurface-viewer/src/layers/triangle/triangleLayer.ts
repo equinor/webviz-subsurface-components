@@ -132,7 +132,7 @@ export interface TriangleLayerProps extends ExtendedLayerProps {
      *           ambient: 0.35,
      *           diffuse: 0.6,
      *           shininess: 32,
-     *           specularColor: [255, 255, 255],
+     *           specularColor: [38, 38, 38],
      *       }
      * Default value: true.
      */
@@ -312,7 +312,7 @@ export default class TriangleLayer extends CompositeLayer<TriangleLayerProps> {
             return [];
         }
 
-        const enableLighting: boolean = !(this.props.material === false);
+        const enableLighting: boolean = this.props.material !== false;
         const layer = new PrivateTriangleLayer(
             this.getSubLayerProps({
                 geometryTriangles: this.state["geometryTriangles"],

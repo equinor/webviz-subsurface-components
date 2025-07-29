@@ -185,7 +185,7 @@ export interface MapLayerProps extends ExtendedLayerProps {
      *           ambient: 0.35,
      *           diffuse: 0.6,
      *           shininess: 32,
-     *           specularColor: [255, 255, 255],
+     *           specularColor: [38, 38, 38],
      *       }
      */
     material: Material;
@@ -438,7 +438,7 @@ export default class MapLayer<
             );
         }
 
-        const enableLighting: boolean = !(this.props.material === false);
+        const enableLighting: boolean = this.props.material !== false;
         const layer = new PrivateMapLayer(
             this.getSubLayerProps({
                 positions: this.state["positions"],

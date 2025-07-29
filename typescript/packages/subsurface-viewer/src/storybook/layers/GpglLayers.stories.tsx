@@ -2,10 +2,12 @@ import React from "react";
 
 import type { Meta, StoryObj } from "@storybook/react";
 
-import SubsurfaceViewer from "../../SubsurfaceViewer";
+import SubsurfaceViewer, {
+    type SubsurfaceViewerProps,
+} from "../../SubsurfaceViewer";
 
 import { default3DViews, defaultStoryParameters } from "../sharedSettings";
-import { replaceNonJsonArgs } from "../sharedHelperFunctions";
+import { replaceNonJsonArgs, convertUndefNull } from "../sharedHelperFunctions";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -16,6 +18,15 @@ const stories: Meta = {
     },
 };
 export default stories;
+
+function preprocessProps(
+    props: SubsurfaceViewerProps,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    nonJsonLayerProps: Record<string, any>
+): SubsurfaceViewerProps {
+    convertUndefNull(props.layers as unknown as Record<string, unknown>);
+    return replaceNonJsonArgs(props, nonJsonLayerProps);
+}
 
 /*
  Vertices of a section in the seismic data.
@@ -99,8 +110,8 @@ const noTextureLayer = {
 
 const colormapSetup = {
     valueRange: [-1, 1],
-    clampRange: [-1, 1],
-    clampColor: [0, 255, 0, 200],
+    clampRange: undefined,
+    clampColor: undefined,
     undefinedColor: [255, 0, 0, 200],
     smooth: true,
 };
@@ -156,11 +167,11 @@ export const GpglWithoutTexture: StoryObj<typeof SubsurfaceViewer> = {
         },
     },
     render: (args) => (
-        <SubsurfaceViewer {...replaceNonJsonArgs(args, nonJsonLayerArgs)} />
+        <SubsurfaceViewer {...preprocessProps(args, nonJsonLayerArgs)} />
     ),
 };
 
-export const GpglTexture: StoryObj<typeof SubsurfaceViewer> = {
+export const GpglValueMap: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "gpgl_texture",
         layers: [smallAxesLayer, textureLayer],
@@ -175,7 +186,7 @@ export const GpglTexture: StoryObj<typeof SubsurfaceViewer> = {
         },
     },
     render: (args) => (
-        <SubsurfaceViewer {...replaceNonJsonArgs(args, nonJsonLayerArgs)} />
+        <SubsurfaceViewer {...preprocessProps(args, nonJsonLayerArgs)} />
     ),
 };
 
@@ -194,7 +205,37 @@ export const GpglTextureWithExplicitMesh: StoryObj<typeof SubsurfaceViewer> = {
         },
     },
     render: (args) => (
-        <SubsurfaceViewer {...replaceNonJsonArgs(args, nonJsonLayerArgs)} />
+        <SubsurfaceViewer {...preprocessProps(args, nonJsonLayerArgs)} />
+    ),
+};
+
+const textureWithMaterialLayer = {
+    ...textureLayer,
+    id: "texture_with_material_layer",
+    material: {
+        ambient: 0.35,
+        diffuse: 0.9,
+        shininess: 32,
+        specularColor: [38, 38, 38],
+    },
+};
+
+export const GpglValueMapWithMaterial: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "gpgl_texture",
+        layers: [smallAxesLayer, textureWithMaterialLayer],
+        views: default3DViews,
+    },
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: "Display the cage of seismic.",
+            },
+        },
+    },
+    render: (args) => (
+        <SubsurfaceViewer {...preprocessProps(args, nonJsonLayerArgs)} />
     ),
 };
 
@@ -213,6 +254,6 @@ export const TypedArrayGpglTexture: StoryObj<typeof SubsurfaceViewer> = {
         },
     },
     render: (args) => (
-        <SubsurfaceViewer {...replaceNonJsonArgs(args, nonJsonLayerArgs)} />
+        <SubsurfaceViewer {...preprocessProps(args, nonJsonLayerArgs)} />
     ),
 };

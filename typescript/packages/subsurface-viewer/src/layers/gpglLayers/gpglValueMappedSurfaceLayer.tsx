@@ -15,6 +15,8 @@ import { lighting } from "@luma.gl/shadertools";
 
 import { phongMaterial } from "../shader_modules/phong-lighting/phong-material";
 
+import type { Material } from "../gpglLayers/typeDefs";
+
 import type {
     DeckGLLayerContext,
     ExtendedLayerProps,
@@ -114,20 +116,42 @@ export interface GpglValueMappedSurfaceLayerProps extends ExtendedLayerProps {
     colormapSetup?: ColormapSetup;
     /** Plain color if no value map is provided. */
     color: RGBColor;
-    /** Enables smooth shading for the surface. */
+    /**  Surface material properties.
+     * material: true  = default material, coloring depends on surface orientation and lighting.
+     *           false = no material,  coloring is independent on surface orientation and lighting.
+     *           or full spec:
+     *      material: {
+     *           ambient: 0.35,
+     *           diffuse: 0.9,
+     *           shininess: 32,
+     *           specularColor: [38, 38, 38],
+     *       }
+     * Default value: true.
+     */
+    material: Material;
+    /** Enables smooth shading for the surface.
+     * If true, the per-vertex normals will be interpolated across triangles and used for shading.
+     * Otherwise, a constant normal will be computed and used across each triangle.
+     */
     smoothShading: boolean;
-    /** Enables lighting for the surface. */
-    enableLighting: boolean;
+
     /** Enables depth testing for rendering. */
     depthTest: boolean;
     /** Indicates if the Z axis increases downwards. */
     ZIncreasingDownwards: boolean;
 }
 
+const defaultMaterial: Material = {
+    ambient: 0.35,
+    diffuse: 0.9,
+    shininess: 32,
+    specularColor: [38, 38, 38],
+};
+
 const defaultColormapSetup: ColormapSetup = {
     valueRange: [0, 1],
     clampRange: undefined,
-    clampColor: undefined,
+    clampColor: [0, 255, 0, 200], // green color for clamped values
     undefinedValue: Number.NaN,
     undefinedColor: [255, 0, 0, 200], // red color for undefined values
     smooth: true,
@@ -145,10 +169,10 @@ const defaultProps: DefaultProps<GpglValueMappedSurfaceLayerProps> = {
     colormapSetup: defaultColormapSetup,
     color: [100, 100, 255],
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-    depthTest: true,
+    material: true, // default material
     smoothShading: false,
+    depthTest: true,
     ZIncreasingDownwards: true,
-    enableLighting: false,
     // deck.gl default props
     visible: true,
     pickable: true,
@@ -167,11 +191,20 @@ export class GpglValueMappedSurfaceLayer extends Layer<GpglValueMappedSurfaceLay
             [x: string]: Partial<Record<string, unknown> | undefined>;
         }>
     ): void {
+        // If material is a boolean, convert it to the default material
+        // We need to set a different default material than in the shader module
+        if (
+            typeof args["phongMaterial"] === "boolean" &&
+            args["phongMaterial"] === true
+        ) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (args as any)["phongMaterial"] = defaultMaterial;
+        }
         super.setShaderModuleProps({
             ...args,
             lighting: {
                 ...args["lighting"],
-                enabled: this.props.enableLighting,
+                enabled: this.props.material !== false,
             },
         });
     }
@@ -186,27 +219,19 @@ export class GpglValueMappedSurfaceLayer extends Layer<GpglValueMappedSurfaceLay
         });
     }
 
-    shouldUpdateState({
-        props,
-        oldProps,
-        context,
-        changeFlags,
-    }: UpdateParameters<this>): boolean {
-        return (
-            super.shouldUpdateState({
-                props,
-                oldProps,
-                context,
-                changeFlags,
-            }) || changeFlags.propsOrDataChanged
-        );
-    }
-
     updateState(
         params: UpdateParameters<Layer<GpglValueMappedSurfaceLayerProps>>
     ): void {
+        const rebuild =
+            params.props.valueMappedTriangles !==
+                params.oldProps.valueMappedTriangles ||
+            params.props.triangleMeshes !== params.oldProps.triangleMeshes ||
+            params.props.showMesh !== params.oldProps.showMesh ||
+            params.props.colormap !== params.oldProps.colormap;
         super.updateState(params);
-        this.initializeState(params.context as DeckGLLayerContext);
+        if (rebuild) {
+            this.initializeState(params.context as DeckGLLayerContext);
+        }
     }
 
     private _consolidateColormap(
@@ -298,21 +323,21 @@ export class GpglValueMappedSurfaceLayer extends Layer<GpglValueMappedSurfaceLay
                     topology: texturedTrgs.topology,
                     attributes: {
                         positions: {
-                            value: toTypedArray(
+                            value: await loadDataArray(
                                 texturedTrgs.vertices,
                                 Float32Array
                             ),
                             size: 3,
                         },
                         normals: {
-                            value: toTypedArray(
+                            value: await loadDataArray(
                                 texturedTrgs.normals ?? [],
                                 Float32Array
                             ),
                             size: 3,
                         },
                         texCoords: {
-                            value: toTypedArray(
+                            value: await loadDataArray(
                                 texturedTrgs.texCoords ?? [],
                                 Float32Array
                             ),
@@ -321,7 +346,7 @@ export class GpglValueMappedSurfaceLayer extends Layer<GpglValueMappedSurfaceLay
                     },
                     vertexCount: texturedTrgs.vertexIndices.size,
                     indices: {
-                        value: toTypedArray(
+                        value: await loadDataArray(
                             texturedTrgs.vertexIndices.value,
                             Uint32Array
                         ),
@@ -523,11 +548,14 @@ export class GpglValueMappedSurfaceLayer extends Layer<GpglValueMappedSurfaceLay
                         this.props.colormapSetup?.valueRange ??
                         defaultColormapSetup.valueRange,
                     clampRange:
-                        this.props.colormapSetup?.clampRange ??
-                        this.props.colormapSetup?.valueRange ??
-                        defaultColormapSetup.valueRange,
+                        this.props.colormapSetup?.clampRange === null
+                            ? null
+                            : (this.props.colormapSetup?.clampRange ??
+                              this.props.colormapSetup?.valueRange ??
+                              defaultColormapSetup.valueRange),
                     useClampColors:
-                        this.props.colormapSetup?.clampColor !== undefined,
+                        this.props.colormapSetup?.clampColor !== null &&
+                        this.props.colormapSetup?.clampRange !== null,
                     lowClampColor: lowClampColors,
                     highClampColor: highClampColor,
                     undefinedValue:

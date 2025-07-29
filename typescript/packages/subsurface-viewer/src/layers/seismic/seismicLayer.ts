@@ -96,15 +96,14 @@ export interface SeismicLayerProps extends ExtendedLayerProps {
      *           or full spec:
      *      material: {
      *           ambient: 0.35,
-     *           diffuse: 0.6,
+     *           diffuse: 0.9,
      *           shininess: 32,
-     *           specularColor: [255, 255, 255],
+     *           specularColor: [38, 38, 38],
      *       }
      */
     material: Material;
 
     smoothShading: boolean;
-    enableLighting: boolean;
 
     /**
      * Layer visibility. Default true.
@@ -139,7 +138,13 @@ const defaultProps = {
     id: "seismic-layer",
     cage: defaultCageProps,
     seismicFences: [],
-    material: false,
+    material: {
+        ambient: 0.35,
+        diffuse: 0.9,
+        shininess: 32,
+        specularColor: [38, 38, 38],
+    },
+    smoothShading: false,
     pickable: true,
     visible: true,
     depthTest: true,
@@ -184,7 +189,7 @@ export default class SeismicLayer extends CompositeLayer<SeismicLayerProps> {
         const needs_reload_fences =
             !isEqual(
                 props.seismicFences.length,
-                oldProps.seismicFences?.lastIndexOf
+                oldProps.seismicFences?.length
             ) ||
             props.seismicFences.some((fence, index) => {
                 const oldFence = oldProps.seismicFences?.[index];
@@ -319,6 +324,7 @@ export default class SeismicLayer extends CompositeLayer<SeismicLayerProps> {
                     getColor: [this.props.cage.color],
                     getWidth: [this.props.cage.lineWidth],
                 },
+                visible: this.props.cage.visible ?? defaultCageProps.visible,
                 pickable: this.props.pickable,
                 depthTest: this.props.depthTest,
                 ZIncreasingDownwards: this.props.ZIncreasingDownwards,
@@ -335,6 +341,12 @@ export default class SeismicLayer extends CompositeLayer<SeismicLayerProps> {
                 showMesh: this.props.showMesh,
                 colormap: this.props.colormap,
                 colormapSetup: this.props.colormapSetup,
+                material:
+                    this.props.material === true
+                        ? defaultProps.material
+                        : this.props.material,
+                smoothShading:
+                    this.props.smoothShading ?? defaultProps.smoothShading,
                 pickable: this.props.pickable,
                 depthTest: this.props.depthTest,
                 ZIncreasingDownwards: this.props.ZIncreasingDownwards,

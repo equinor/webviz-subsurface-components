@@ -49,20 +49,28 @@ export type ColormapProps = ColormapFunctionType | Uint8Array | ColorTableProps;
  * Configuration options for setting up a colormap.
  */
 export interface ColormapSetup {
-    /** Minimum and maximum value range. Used to map values to the the colormap colors. */
+    /**
+     * Minimum and maximum value range, used to map values to the the colormap colors.
+     * Values outside of this range will be displayed with either the clamp color if activated,
+     * or with the color of the corresponding colormap end color.
+     */
     valueRange?: [number, number];
-    /** Range specifying the minimum and maximum values to clamp the data.
-     * If not provided, the colormap range will be used.
+    /**
+     * Range specifying the minimum and maximum values to clamp the data.
+     * If it is undefined or not provided, the colormap range will be used.
+     * If it is null, no clamping will be applied.
      */
-    clampRange?: [number, number];
-    /** Color or pair of colors used for clamped values.
+    clampRange?: [number, number] | null;
+    /**
+     * Color or pair of colors used for clamped values.
      * If a single color is provided, it is used for both ends of the range.
-     * If it is not provided, the  first and last colors of the colormap will be used.
+     * If it is undefined or not provided, the default clamp color will be used.
+     * If it is null, no clamping will be applied.
      */
-    clampColor?: Color | [Color, Color];
-    /** Specification of the value used to represent undefined data. */
+    clampColor?: Color | [Color, Color] | null;
+    /** Value used to represent undefined data. */
     undefinedValue?: number;
-    /** Color used for undefined value. */
+    /** Color used for undefined data. */
     undefinedColor?: Color;
     /** Control used to apply or not smoothing to the display of the property.  */
     smooth?: boolean;

@@ -29,10 +29,10 @@ async function safeFetch(url: string): Promise<Response> {
 async function loadPngData<T extends TypedArray>(
     response: Response,
     type: TConstructor<T>
-): Promise<T | null> {
+): Promise<T> {
     // Load as PNG with absolute float values.
     const blob = await response.blob();
-    const result: T | null = await new Promise((resolve) => {
+    const result: T = await new Promise((resolve) => {
         const fileReader = new FileReader();
         fileReader.readAsArrayBuffer(blob);
         fileReader.onload = () => {
@@ -71,9 +71,9 @@ function isPngData(headers: Headers): boolean {
 export async function loadDataArray<T extends TypedArray>(
     data: string | number[] | TypedArray,
     type: TConstructor<T>
-): Promise<T | null> {
+): Promise<T> {
     if (!data) {
-        return null;
+        return new type(0);
     }
     if (typeof data === "string") {
         const extension = data.split(".").pop()?.toLowerCase();
@@ -85,7 +85,7 @@ export async function loadDataArray<T extends TypedArray>(
         // It is assumed that the data is a file containing raw array of bytes.
         const response = await safeFetch(data);
         if (!response.ok) {
-            return null;
+            return new type(0);
         }
         if (isPngData(response.headers)) {
             return await loadPngData(response, type);

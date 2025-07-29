@@ -1,11 +1,13 @@
-//import React from "react";
+import React from "react";
 
 import type { Meta, StoryObj } from "@storybook/react";
 
-import SubsurfaceViewer from "../../SubsurfaceViewer";
+import SubsurfaceViewer, {
+    type SubsurfaceViewerProps,
+} from "../../SubsurfaceViewer";
 
 import { default3DViews, defaultStoryParameters } from "../sharedSettings";
-// import { replaceNonJsonArgs } from "../sharedHelperFunctions";
+import { replaceNonJsonArgs, convertUndefNull } from "../sharedHelperFunctions";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -16,6 +18,15 @@ const stories: Meta = {
     },
 };
 export default stories;
+
+function preprocessProps(
+    props: SubsurfaceViewerProps,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    nonJsonLayerProps: Record<string, any>
+): SubsurfaceViewerProps {
+    convertUndefNull(props.layers as unknown as Record<string, unknown>);
+    return replaceNonJsonArgs(props, nonJsonLayerProps);
+}
 
 const cage = {
     origin: [-2808.4, -6505.9, 1071.3],
@@ -62,12 +73,12 @@ const seismicBounds = [-3083.9, -6505.9, -1071.3, 3426.2, 5251.4, -2374.3];
 const seismicCageLayerId = "seismic_cage_layer";
 const seismicSectionsLayerId = "seismic_section_layer";
 
-// const nonJsonLayerArgs = {
-//     [seismicCageLayerId]: {
-//         polylinePoints: new Float32Array(cagePoints),
-//         startIndices: new Uint32Array(cageStartIndices),
-//     },
-// };
+const nonJsonLayerArgs = {
+    //     [seismicCageLayerId]: {
+    //         polylinePoints: new Float32Array(cagePoints),
+    //         startIndices: new Uint32Array(cageStartIndices),
+    //     },
+};
 
 // Small example using polylinesLayer.
 const seismicCageLayer = {
@@ -136,4 +147,40 @@ export const SeismicSections: StoryObj<typeof SubsurfaceViewer> = {
             },
         },
     },
+    render: (args) => (
+        <SubsurfaceViewer {...preprocessProps(args, nonJsonLayerArgs)} />
+    ),
+};
+
+const seismicSectionsWithMaterialLayer = {
+    ...seismicSectionsLayer,
+    id: "seismic_sections_with_material",
+    material: {
+        ambient: 0.35,
+        diffuse: 0.9,
+        shininess: 32,
+        specularColor: [38, 38, 38],
+    },
+    render: (args) => (
+        <SubsurfaceViewer {...preprocessProps(args, nonJsonLayerArgs)} />
+    ),
+};
+
+export const SeismicSectionsWithMaterial: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "seismic_sections",
+        layers: [smallAxesLayer, seismicSectionsWithMaterialLayer],
+        views: default3DViews,
+    },
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: "Display the cage of seismic.",
+            },
+        },
+    },
+    render: (args) => (
+        <SubsurfaceViewer {...preprocessProps(args, nonJsonLayerArgs)} />
+    ),
 };
