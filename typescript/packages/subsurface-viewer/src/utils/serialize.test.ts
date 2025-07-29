@@ -52,12 +52,13 @@ async function getReferenceFloat32Array(): Promise<Float32Array> {
 }
 
 describe("loadDataArray for Float32Array", () => {
-    it("returns null for null input", async () => {
+    it("returns empty Float32Array for null input", async () => {
         const result = await loadDataArray(
             null as unknown as string,
             Float32Array
         );
-        expect(result).toBeNull();
+        expect(result instanceof Float32Array).toBe(true);
+        expect(result.length).toBe(0);
     });
 
     it("returns the same Float32Array if input is already Float32Array", async () => {
