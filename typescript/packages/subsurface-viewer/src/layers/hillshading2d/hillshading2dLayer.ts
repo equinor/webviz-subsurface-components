@@ -16,7 +16,7 @@ import { decodeRGB } from "../utils/propertyMapTools";
 
 import type { RGBColor } from "../../utils";
 
-import { testPrecision } from "../shader_modules/test-precision/test-precision";
+import { precisionForTests } from "../shader_modules/test-precision/precisionForTests";
 
 import fsHillshading from "./hillshading2d.fs.glsl";
 
@@ -159,7 +159,7 @@ export default class Hillshading2DLayer extends BitmapLayer<Hillshading2DProps> 
                 ...parentShaders.modules,
                 project32,
                 map2DUniforms,
-                testPrecision,
+                precisionForTests,
             ],
         });
     }

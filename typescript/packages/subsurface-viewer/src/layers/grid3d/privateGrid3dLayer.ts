@@ -14,7 +14,7 @@ import { lighting } from "@luma.gl/shadertools";
 
 import { utilities } from "../shader_modules";
 import { phongMaterial } from "../shader_modules/phong-lighting/phong-material";
-import { testPrecision } from "../shader_modules/test-precision/test-precision";
+import { precisionForTests } from "../shader_modules/test-precision/precisionForTests";
 import type {
     DeckGLLayerContext,
     ExtendedLayerProps,
@@ -169,7 +169,7 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
                     phongMaterial,
                     utilities,
                     gridUniforms,
-                    testPrecision,
+                    precisionForTests,
                 ],
             }),
             geometry: new Geometry({
@@ -202,7 +202,7 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             ...super.getShaders({
                 vs: vsLineShader,
                 fs: fsLineShader,
-                modules: [project32, picking, gridUniforms, testPrecision],
+                modules: [project32, picking, gridUniforms, precisionForTests],
             }),
             geometry: new Geometry(this.props.meshLines),
             bufferLayout: this.getAttributeManager()!.getBufferLayouts(),

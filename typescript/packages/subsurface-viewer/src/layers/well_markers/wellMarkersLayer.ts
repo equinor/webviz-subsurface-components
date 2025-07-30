@@ -21,7 +21,7 @@ import type {
 import { createPropertyData } from "../utils/layerTools";
 import { utilities } from "../shader_modules";
 
-import { testPrecision } from "../shader_modules/test-precision/test-precision";
+import { precisionForTests } from "../shader_modules/test-precision/precisionForTests";
 
 import fsShader from "./marker.fs.glsl";
 import vsShader from "./marker.vs.glsl";
@@ -338,7 +338,7 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
                 picking,
                 utilities,
                 wellMarkersUniforms,
-                testPrecision,
+                precisionForTests,
             ],
         });
     }

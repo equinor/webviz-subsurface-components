@@ -13,7 +13,7 @@ import { lighting } from "@luma.gl/shadertools";
 import { Model, Geometry } from "@luma.gl/engine";
 
 import { phongMaterial } from "../shader_modules/phong-lighting/phong-material";
-import { testPrecision } from "../shader_modules/test-precision/test-precision";
+import { precisionForTests } from "../shader_modules/test-precision/precisionForTests";
 import { utilities } from "../shader_modules";
 
 import type {
@@ -217,7 +217,7 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
             ...super.getShaders({
                 vs: vsLineShader,
                 fs: fsLineShader,
-                modules: [project32, picking, mapUniforms, testPrecision],
+                modules: [project32, picking, mapUniforms, precisionForTests],
             }),
             geometry: new Geometry({
                 topology: "line-list",
@@ -337,7 +337,7 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
                 lighting,
                 phongMaterial,
                 mapUniforms,
-                testPrecision,
+                precisionForTests,
             ],
         });
     }
