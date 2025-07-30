@@ -2,7 +2,6 @@
 import { toMatchImageSnapshot } from "jest-image-snapshot";
 
 import { getStoryContext, type TestRunnerConfig } from "@storybook/test-runner";
-import { fail } from "assert";
 
 // https://github.com/mapbox/pixelmatch#pixelmatchimg1-img2-output-width-height-options
 const customDiffConfig = {};
