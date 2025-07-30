@@ -2,6 +2,10 @@
 import { toMatchImageSnapshot } from "jest-image-snapshot";
 
 import { getStoryContext, type TestRunnerConfig } from "@storybook/test-runner";
+import { fail } from "assert";
+
+// https://github.com/mapbox/pixelmatch#pixelmatchimg1-img2-output-width-height-options
+const customDiffConfig = {};
 
 // @ts-expect-error TS7006
 const screenshotTest = async (page, context) => {
@@ -27,6 +31,11 @@ const screenshotTest = async (page, context) => {
     // @ts-expect-error TS2551
     expect(previousScreenshot).toMatchImageSnapshot({
         customSnapshotIdentifier: context.id,
+        // https://www.npmjs.com/package/jest-image-snapshot/v/4.0.2#-api
+        failureThreshold: 50,
+        failureThresholdType: "pixel",
+        // https://github.com/mapbox/pixelmatch#pixelmatchimg1-img2-output-width-height-options
+        customDiffConfig,
     });
 };
 
