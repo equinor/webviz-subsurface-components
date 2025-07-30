@@ -2,8 +2,6 @@ export default `\
 #version 300 es
 #define SHADER_NAME triangle-vertex-shader
 
-precision highp float;
-
 // Primitive attributes
 in vec3 positions;
 in float properties;

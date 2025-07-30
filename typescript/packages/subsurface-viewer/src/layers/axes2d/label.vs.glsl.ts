@@ -2,8 +2,6 @@ export default `\
 #version 300 es
 #define SHADER_NAME axes2d-label-vertex-shader
 
-precision highp float;
-
 in vec3 positions;
 
 in vec2 vTexCoord;

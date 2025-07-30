@@ -1,8 +1,6 @@
 export default `#version 300 es
 #define SHADER_NAME axes-grid-vertex-shader
 
-precision highp float;
-
 in  vec3 positions;
 out vec4 vColor;
 uniform vec4 uColor;

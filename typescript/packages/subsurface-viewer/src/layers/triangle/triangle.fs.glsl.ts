@@ -1,8 +1,6 @@
 export default `#version 300 es
 #define SHADER_NAME triangle-fragment-shader
 
-precision highp float;
-
 in vec3 cameraPosition;
 in vec3 normals_commonspace;
 in vec4 position_commonspace;

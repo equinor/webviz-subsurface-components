@@ -1,8 +1,6 @@
 export default `#version 300 es
 #define SHADER_NAME axes-fragment-shader
 
-precision highp float;
-
 in vec4 vColor;
 out vec4 fragColor;
 

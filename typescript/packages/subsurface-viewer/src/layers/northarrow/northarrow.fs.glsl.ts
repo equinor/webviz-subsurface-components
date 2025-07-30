@@ -2,8 +2,6 @@ export default `\
 #version 300 es
 #define SHADER_NAME northarrow-fragment-shader
 
-precision highp float;
-
 out vec4 fragColor;
 
 uniform vec4 uColor;

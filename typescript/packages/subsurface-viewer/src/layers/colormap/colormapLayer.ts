@@ -24,6 +24,8 @@ import type { ContinuousLegendDataType } from "../../components/ColorLegend";
 import type { RGBColor } from "../../utils";
 import fsColormap from "./colormap.fs.glsl";
 
+import { testPrecision } from "../shader_modules/test-precision/test-precision";
+
 // Most props are inherited from DeckGL's BitmapLayer. For a full list, see
 // https://deck.gl/docs/api-reference/layers/bitmap-layer
 //
@@ -323,7 +325,12 @@ export default class ColormapLayer extends BitmapLayer<ColormapLayerProps> {
         // use object.assign to make sure we don't overwrite existing fields like `vs`, `modules`...
         return Object.assign({}, parentShaders, {
             fs: fsColormap,
-            modules: [...parentShaders.modules, project32, map2DUniforms],
+            modules: [
+                ...parentShaders.modules,
+                project32,
+                map2DUniforms,
+                testPrecision,
+            ],
         });
     }
 

@@ -4,6 +4,8 @@ import { PathLayer } from "@deck.gl/layers";
 import type { LayerProps } from "@deck.gl/core";
 import type { ShaderModule } from "@luma.gl/shadertools";
 
+import { testPrecision } from "../shader_modules/test-precision/test-precision";
+
 import fs from "./polyline.fs.glsl";
 import vs from "./polyline.vs.glsl";
 
@@ -26,7 +28,11 @@ export class PrivatePolylinesLayer extends PathLayer<
         return Object.assign({}, superShaders, {
             vs: vs,
             fs: fs,
-            modules: [...superShaders.modules, polylinesUniforms],
+            modules: [
+                ...superShaders.modules,
+                polylinesUniforms,
+                testPrecision,
+            ],
         });
     }
 

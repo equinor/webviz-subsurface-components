@@ -16,6 +16,8 @@ import { decodeRGB } from "../utils/propertyMapTools";
 
 import type { RGBColor } from "../../utils";
 
+import { testPrecision } from "../shader_modules/test-precision/test-precision";
+
 import fsHillshading from "./hillshading2d.fs.glsl";
 
 // Most props are inherited from DeckGL's BitmapLayer. For a full list, see:
@@ -153,7 +155,12 @@ export default class Hillshading2DLayer extends BitmapLayer<Hillshading2DProps> 
         // use object.assign to make sure we don't overwrite existing fields like `vs`, `modules`...
         return Object.assign({}, parentShaders, {
             fs: fsHillshading,
-            modules: [...parentShaders.modules, project32, map2DUniforms],
+            modules: [
+                ...parentShaders.modules,
+                project32,
+                map2DUniforms,
+                testPrecision,
+            ],
         });
     }
 

@@ -9,6 +9,8 @@ import type { ShaderModule } from "@luma.gl/shadertools";
 import { lighting } from "@luma.gl/shadertools";
 
 import { phongMaterial } from "../shader_modules/phong-lighting/phong-material";
+import { testPrecision } from "../shader_modules/test-precision/test-precision";
+
 import type {
     DeckGLLayerContext,
     ExtendedLayerProps,
@@ -127,6 +129,7 @@ export default class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProp
                     lighting,
                     phongMaterial,
                     trianglesUniforms,
+                    testPrecision,
                 ],
             }),
             bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
@@ -139,7 +142,12 @@ export default class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProp
             ...super.getShaders({
                 vs: vsLineShader,
                 fs: fsLineShader,
-                modules: [project32, picking, triangleMeshUniforms],
+                modules: [
+                    project32,
+                    picking,
+                    triangleMeshUniforms,
+                    testPrecision,
+                ],
             }),
             bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
             geometry: new Geometry(this.props.geometryLines),

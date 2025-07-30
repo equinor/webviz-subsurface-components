@@ -2,8 +2,6 @@ export default `\
 #version 300 es
 #define SHADER_NAME piechart-fragment-shader
 
-precision highp float;
-
 flat in int pie_index_;
 
 out vec4 fragColor;
