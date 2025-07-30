@@ -481,6 +481,7 @@ function nearestColormap(x: number) {
 const TypedArrayInputComponent: React.FC<{
     triggerHome: number;
     dimension: number;
+    noProperty: boolean;
 }> = (args) => {
     const subsurfaceViewerArgs = {
         id: "map",
@@ -496,12 +497,17 @@ const TypedArrayInputComponent: React.FC<{
                     rotDeg: 0,
                 },
                 meshData: makeData(args.dimension, 99),
-                propertiesData: makeData(args.dimension, 1),
+                propertiesData: makeData(
+                    args.noProperty ? 0 : args.dimension,
+                    1
+                ),
                 gridLines: false,
                 material: true,
                 ZIncreasingDownwards: false,
                 contours: [0, 5],
-                colorMapFunction: nearestColormap as ColormapFunctionType,
+                colorMapFunction: args.noProperty
+                    ? [200, 200, 0]
+                    : (nearestColormap as ColormapFunctionType),
             },
             {
                 "@@type": "AxesLayer",
@@ -547,6 +553,30 @@ export const TypedArrayInput: StoryObj<typeof TypedArrayInputComponent> = {
         },
     },
     render: (args) => <TypedArrayInputComponent {...args} />,
+};
+
+export const TypedArrayWithoutPropertyInput: StoryObj<
+    typeof TypedArrayInputComponent
+> = {
+    args: {
+        dimension: 300,
+    },
+    argTypes: {
+        dimension: {
+            control: { type: "range", min: 150, max: 300, step: 1 },
+        },
+    },
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: "Both mesh and property data given as typed arrays arrays (as opposed to URL).",
+            },
+        },
+    },
+    render: (args) => (
+        <TypedArrayInputComponent {...{ ...args, noProperty: true }} />
+    ),
 };
 
 const ReadoutComponent: React.FC = () => {

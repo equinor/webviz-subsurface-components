@@ -146,7 +146,9 @@ export function makeFullMesh(e: { data: Params }) {
     }
 
     const meshData = inputMeshData as Float32Array;
-    const propertiesData = inputPropertiesData ?? meshData;
+    const propertiesData = inputPropertiesData?.length
+        ? inputPropertiesData
+        : meshData;
 
     // non mesh grids use z = 0 (see below)
     const meshZValueRange = isMesh ? getFloat32ArrayMinMax(meshData) : [0, 0];
