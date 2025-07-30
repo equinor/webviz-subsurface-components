@@ -21,6 +21,7 @@ import { vec4 } from "gl-matrix";
 import type { Point3D, RGBAColor } from "../../utils";
 import type { ExtendedLayerProps } from "../utils/layerTools";
 import fontAtlasPng from "./font-atlas.png";
+import { precisionForTests } from "../shader_modules/test-precision/precisionForTests";
 import labelFragmentShader from "./label.fs.glsl";
 import labelVertexShader from "./label.vs.glsl";
 import lineFragmentShader from "./line.fs.glsl";
@@ -688,7 +689,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
             ...super.getShaders({
                 vs: lineVertexShader,
                 fs: lineFragmentShader,
-                modules: [project32, linesUniforms],
+                modules: [project32, linesUniforms, precisionForTests],
             }),
             geometry: new Geometry({
                 topology: "line-list",
@@ -722,7 +723,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
             ...super.getShaders({
                 vs: lineVertexShader,
                 fs: lineFragmentShader,
-                modules: [project32, linesUniforms],
+                modules: [project32, linesUniforms, precisionForTests],
             }),
             geometry: new Geometry({
                 topology: "triangle-list",
@@ -874,7 +875,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                 ...super.getShaders({
                     vs: labelVertexShader,
                     fs: labelFragmentShader,
-                    modules: [project32, axesUniforms],
+                    modules: [project32, axesUniforms, precisionForTests],
                 }),
                 bindings: {
                     // @ts-ignore

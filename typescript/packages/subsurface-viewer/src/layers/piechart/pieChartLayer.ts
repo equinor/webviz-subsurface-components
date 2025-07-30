@@ -13,6 +13,9 @@ import type {
     PropertyDataType,
 } from "../utils/layerTools";
 import { createPropertyData } from "../utils/layerTools";
+
+import { precisionForTests } from "../shader_modules/test-precision/precisionForTests";
+
 import fragmentShader from "./piechart.fs.glsl";
 import vertexShader from "./piechart.vs.glsl";
 
@@ -155,7 +158,7 @@ export default class PieChartLayer extends Layer<PieChartLayerProps<PiesData>> {
             ...super.getShaders({
                 vs: vertexShader,
                 fs: fragmentShader,
-                modules: [project32, picking],
+                modules: [project32, picking, precisionForTests],
             }),
             geometry: new Geometry({
                 topology: "triangle-list",

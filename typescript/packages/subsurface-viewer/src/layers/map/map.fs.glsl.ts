@@ -1,8 +1,6 @@
 export default `#version 300 es
 #define SHADER_NAME map-fragment-shader
 
-precision highp float;
-
 in vec2 vTexCoord;
 in vec3 cameraPosition;
 in vec3 normals_commonspace;

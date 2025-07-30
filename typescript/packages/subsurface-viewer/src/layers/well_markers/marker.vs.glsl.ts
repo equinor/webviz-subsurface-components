@@ -1,6 +1,5 @@
 export default `#version 300 es
 #define SHADER_NAME well-markers-vertex-shader
-precision highp float;
 
 in vec3 positions;
 in vec3 instancePositions;

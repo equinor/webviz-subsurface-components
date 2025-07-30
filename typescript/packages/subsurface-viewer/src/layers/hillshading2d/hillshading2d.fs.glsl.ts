@@ -1,8 +1,6 @@
 export default `#version 300 es
 #define SHADER_NAME hillshading2d-fragment-shader
 
-precision highp float;
-
 in vec2 vTexCoord;
 
 out vec4 fragColor;

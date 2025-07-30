@@ -2,8 +2,6 @@ export default `\
 #version 300 es
 #define SHADER_NAME grid3d-lines-vertex-shader
 
-precision highp float;
-
 in vec3 positions;
 
 out vec4 position_commonspace;

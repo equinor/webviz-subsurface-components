@@ -8,6 +8,9 @@ import type {
     DeckGLLayerContext,
     ExtendedLayerProps,
 } from "../utils/layerTools";
+
+import { precisionForTests } from "../shader_modules/test-precision/precisionForTests";
+
 import fragmentShader from "./box.fs.glsl";
 import vertexShader from "./box.vs.glsl";
 
@@ -44,7 +47,7 @@ export default class BoxLayer extends Layer<BoxLayerProps> {
             ...super.getShaders({
                 vs: vertexShader,
                 fs: fragmentShader,
-                modules: [project32],
+                modules: [project32, precisionForTests],
             }),
             uniforms: { uColor: Array.from(color) },
             geometry: new Geometry({

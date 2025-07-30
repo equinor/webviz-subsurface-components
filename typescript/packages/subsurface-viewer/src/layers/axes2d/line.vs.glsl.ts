@@ -2,8 +2,6 @@ export default `\
 #version 300 es
 #define SHADER_NAME axes2d-line-vertex-shader
 
-precision highp float;
-
 in vec3 positions;
 
 void main(void) {

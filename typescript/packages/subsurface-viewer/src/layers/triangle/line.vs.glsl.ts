@@ -2,8 +2,6 @@ export default `\
 #version 300 es
 #define SHADER_NAME triangle-line-vertex-shader
 
-precision highp float;
-
 in vec3 positions;
 
 out vec4 vColor;

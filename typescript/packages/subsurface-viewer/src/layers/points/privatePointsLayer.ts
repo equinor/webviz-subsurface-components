@@ -6,6 +6,8 @@ import { GL } from "@luma.gl/constants";
 
 import type { ShaderModule } from "@luma.gl/shadertools";
 
+import { precisionForTests } from "../shader_modules/test-precision/precisionForTests";
+
 import vs from "./point.vs.glsl";
 
 export interface ExtendedScatterplotLayerProps {
@@ -26,7 +28,11 @@ export class PrivatePointsLayer extends ScatterplotLayer<
         // use object.assign to make sure we don't overwrite existing fields like `vs`, `modules`...
         return Object.assign({}, superShaders, {
             vs: vs,
-            modules: [...superShaders.modules, pointsUniforms],
+            modules: [
+                ...superShaders.modules,
+                pointsUniforms,
+                precisionForTests,
+            ],
         });
     }
 
