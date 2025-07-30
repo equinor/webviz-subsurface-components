@@ -8,6 +8,6 @@ const PROD_PRECISION = /* glsl */ `\
 `;
 
 const PRECISION =
-    process.env["NODE_ENV"] !== "production" ? PROD_PRECISION : TEST_PRECISION;
+    process.env["NODE_ENV"] !== "production" ? TEST_PRECISION : PROD_PRECISION;
 
 export { PRECISION };

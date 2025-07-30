@@ -72,10 +72,10 @@ const nonJsonLayerArgs = {
 };
 
 const ComplexDataLayer = {
-    "@@type": "GpglTextureLayer",
+    "@@type": "GpglValueMappedSurfaceLayer",
     "@@typedArraySupport": true,
     id: njTextureLayerId,
-    texturedTriangles: [
+    valueMappedTriangles: [
         {
             topology: "triangle-strip",
             vertices: new Float32Array(sectionZ0Vertices),
@@ -109,9 +109,9 @@ export function replaceNonJsonArgs(
     nonJsonLayerProps: Record<string, any>
 ) {
     args.layers?.forEach((layer: TLayerDefinition) => {
-        if (layer && layer.id !== undefined) {
+        if (layer && layer?.id !== undefined) {
             const layerNonJsonProps = nonJsonLayerProps[layer.id as string];
-            if (layerNonJsonProps && layer) {
+            if (layerNonJsonProps) {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 if ((layer as any)["@@typedArraySupport"] !== true) {
                     console.error(
@@ -124,6 +124,38 @@ export function replaceNonJsonArgs(
         }
     });
     return args;
+}
+
+/**
+ * Recursively traverses the properties of the given object and converts any string values
+ * equal to `"undefined"` to `undefined`, and any string values equal to `"null"` to `null`.
+ *
+ * This function mutates the input object in place. Nested objects are also processed,
+ * but arrays are not traversed.
+ *
+ * @note This function is useful to handle storybook controls which are doing a JSON roundtrip.
+ * It allows to convert string representations of `undefined` and `null` back to their actual types.
+ *
+ * @param layers - The object whose properties will be checked and converted.
+ */
+export function convertUndefNull(layers: Record<string, unknown>) {
+    for (const key in layers) {
+        const value = layers[key];
+        if (
+            typeof value === "object" &&
+            value !== null &&
+            !Array.isArray(value)
+        ) {
+            convertUndefNull(value as Record<string, unknown>);
+        } else {
+            if (value === "undefined") {
+                layers[key] = undefined;
+            }
+            if (value === "null") {
+                layers[key] = null;
+            }
+        }
+    }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

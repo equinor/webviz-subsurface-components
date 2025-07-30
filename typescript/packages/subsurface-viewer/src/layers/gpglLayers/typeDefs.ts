@@ -1,5 +1,7 @@
 import type { Material as DeckGlMaterial } from "@deck.gl/core";
 
+import type { RGBColor } from "../../utils/Color";
+
 /**
  * Material properties for a graphical surface, used for lighting and shading.
  *
@@ -19,9 +21,15 @@ export type Material =
           ambient?: number | undefined;
           diffuse?: number | undefined;
           shininess?: number | undefined;
-          specularColor?: [number, number, number] | undefined;
+          specularColor?: RGBColor | undefined;
       }
     | boolean;
+
+export interface ValueArray2D {
+    values: Float32Array;
+    width: number;
+    height: number;
+}
 
 // type checking. Make sure local Material type is equivalent to DeckGlMaterial
 // https://github.com/microsoft/TypeScript/issues/27024#issuecomment-421529650
