@@ -1,3 +1,13 @@
+## 1.12.5 (2025-07-30)
+
+### 🩹 Fixes
+
+- centralize shader precision for tests ([#2601](https://github.com/equinor/webviz-subsurface-components/pull/2601))
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
 ## 1.12.4 (2025-07-22)
 
 ### 🧱 Updated Dependencies
