@@ -1,8 +1,6 @@
 export default `#version 300 es
 #define SHADER_NAME texture-fragment-shader
 
-precision highp float;
-
 uniform sampler2D valueTexture;
 uniform sampler2D colormap;
 

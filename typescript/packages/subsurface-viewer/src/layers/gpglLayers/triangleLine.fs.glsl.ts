@@ -2,8 +2,6 @@ export default `\
 #version 300 es
 #define SHADER_NAME texture-line-fragment-shader
 
-precision highp float;
-
 in vec4 vColor;
 
 out vec4 fragColor;

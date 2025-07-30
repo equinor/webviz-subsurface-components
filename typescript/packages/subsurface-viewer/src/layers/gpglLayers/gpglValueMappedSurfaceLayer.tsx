@@ -14,6 +14,7 @@ import type { ShaderModule } from "@luma.gl/shadertools";
 import { lighting } from "@luma.gl/shadertools";
 
 import { phongMaterial } from "../shader_modules/phong-lighting/phong-material";
+import { precisionForTests } from "../shader_modules/test-precision/precisionForTests";
 
 import type { Material } from "../gpglLayers/typeDefs";
 
@@ -385,6 +386,7 @@ export class GpglValueMappedSurfaceLayer extends Layer<GpglValueMappedSurfaceLay
                             lighting,
                             phongMaterial,
                             uniforms,
+                            precisionForTests,
                         ],
                     }),
                     bufferLayout:
@@ -424,7 +426,12 @@ export class GpglValueMappedSurfaceLayer extends Layer<GpglValueMappedSurfaceLay
                         ...super.getShaders({
                             vs: vsLineShader,
                             fs: fsLineShader,
-                            modules: [project32, picking, triangleMeshUniforms],
+                            modules: [
+                                project32,
+                                picking,
+                                triangleMeshUniforms,
+                                precisionForTests,
+                            ],
                         }),
                         bufferLayout:
                             this.getAttributeManager()!.getBufferLayouts(),
@@ -470,7 +477,12 @@ export class GpglValueMappedSurfaceLayer extends Layer<GpglValueMappedSurfaceLay
                     ...super.getShaders({
                         vs: vsLineShader,
                         fs: fsLineShader,
-                        modules: [project32, picking, triangleMeshUniforms],
+                        modules: [
+                            project32,
+                            picking,
+                            triangleMeshUniforms,
+                            precisionForTests,
+                        ],
                     }),
                     bufferLayout:
                         this.getAttributeManager()!.getBufferLayouts(),

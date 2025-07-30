@@ -1,8 +1,6 @@
 export default `#version 300 es
 #define SHADER_NAME texture-fragment-shader
 
-precision highp float;
-
 in vec3 cameraPosition;
 
 in vec4 vPosition;
