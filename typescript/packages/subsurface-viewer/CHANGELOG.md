@@ -1,3 +1,17 @@
+## 1.13.0 (2025-07-30)
+
+### 🚀 Features
+
+- add seismic layer ([#2589](https://github.com/equinor/webviz-subsurface-components/pull/2589), [#2588](https://github.com/equinor/webviz-subsurface-components/issues/2588))
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.0
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
 ## 1.12.5 (2025-07-30)
 
 ### 🩹 Fixes
