@@ -1,3 +1,13 @@
+## 1.13.1 (2025-07-31)
+
+### 🩹 Fixes
+
+- map without property ([#2602](https://github.com/equinor/webviz-subsurface-components/pull/2602), [#2589](https://github.com/equinor/webviz-subsurface-components/issues/2589))
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
 ## 1.13.0 (2025-07-30)
 
 ### 🚀 Features
