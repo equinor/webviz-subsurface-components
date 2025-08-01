@@ -7,8 +7,6 @@ import { styled } from "@mui/material/styles";
 
 import { View } from "@deck.gl/core";
 
-// @ts-expect-error TS6133
-import type { ColorLegendProps } from "@emerson-eps/color-tables";
 import {
     ColorLegend,
     ContinuousLegend,
@@ -165,10 +163,9 @@ export const DefaultColorScale: StoryObj<typeof SubsurfaceViewer> = {
     },
 };
 
-const BreakpointColormapComponent: React.FC<
-    // @ts-expect-error TS2709
-    SubsurfaceViewerProps & ColorLegendProps
-> = (props) => {
+const BreakpointColormapComponent: React.FC<SubsurfaceViewerProps> = (
+    props
+) => {
     const [breakpoint, setBreakpoint] = React.useState<number>(0.5);
 
     const colormap = React.useCallback(
@@ -239,7 +236,9 @@ export const BreakpointColormap: StoryObj<typeof BreakpointColormapComponent> =
                 },
             },
         },
-        render: (args) => <BreakpointColormapComponent {...args} />,
+        render: (args: SubsurfaceViewerProps) => (
+            <BreakpointColormapComponent {...args} />
+        ),
     };
 
 const ColormapRangeComponent: React.FC<SubsurfaceViewerProps> = (props) => {
