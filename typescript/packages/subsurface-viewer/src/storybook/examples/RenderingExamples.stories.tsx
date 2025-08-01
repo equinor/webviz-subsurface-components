@@ -335,8 +335,8 @@ function LightEditor({ lightName, light, setLight }: LightEditorProps) {
                     />
                     {light[i].coordinates && (
                         <CoordinatesEditor
-                            // @ts-expect-error TS2322
-                            coordinates={light[i].coordinates}
+                            label={``}
+                            coordinates={light[i].coordinates as ICoordinates}
                             setCoordinates={(coords: ICoordinates) => {
                                 setLight(
                                     light.map((l, li) =>

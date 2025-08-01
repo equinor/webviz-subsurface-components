@@ -156,5 +156,7 @@ export const ContinuousLegendForSubsurfaceViewer: StoryObj<
             ],
         },
     },
-    render: (args) => <SubsurfaceViewerWithLegend {...args} />,
+    render: (args: SubsurfaceViewerWithLegendProps) => (
+        <SubsurfaceViewerWithLegend {...args} />
+    ),
 };
