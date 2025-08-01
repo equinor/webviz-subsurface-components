@@ -1,3 +1,17 @@
+## 1.13.3 (2025-08-01)
+
+### 🩹 Fixes
+
+- bump @deck.gl-community/editable-layers ([#2605](https://github.com/equinor/webviz-subsurface-components/pull/2605))
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.2
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
 ## 1.13.2 (2025-08-01)
 
 ### 🩹 Fixes
