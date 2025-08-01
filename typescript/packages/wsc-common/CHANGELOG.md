@@ -1,3 +1,9 @@
+## 1.3.1 (2025-08-01)
+
+### 🩹 Fixes
+
+- bump the deckgl group in /typescript with 8 updates ([#2604](https://github.com/equinor/webviz-subsurface-components/pull/2604), [#9705](https://github.com/equinor/webviz-subsurface-components/issues/9705))
+
 ## 1.3.0 (2025-07-30)
 
 This was a version bump only for wsc-common to align it with other projects, there were no code changes.
