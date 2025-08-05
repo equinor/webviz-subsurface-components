@@ -32,7 +32,7 @@ const NumericInput: React.FC<Props> = React.memo(
                 }}
             >
                 <Label
-                    label={label}
+                    label={`${label} - mode: storybook: "${process.env["STORYBOOK_NODE_ENV"]}", node: "${process.env["NODE_ENV"]}"`}
                     id={`${label}-input-label`}
                     style={{
                         paddingTop: 5,
