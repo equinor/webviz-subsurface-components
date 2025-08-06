@@ -112,6 +112,7 @@ jobs:
         env:
           PORT: 8080
           HOST: 127.0.0.1
+          STORYBOOK_NODE_ENV: test
 
         run: |
           npx concurrently -k -s first -n "SB,TEST" -c "magenta,blue" \

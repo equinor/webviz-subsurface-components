@@ -7,7 +7,11 @@ precision highp float;
 const PROD_PRECISION = /* glsl */ `\
 `;
 
-const PRECISION =
-    process.env["NODE_ENV"] !== "production" ? TEST_PRECISION : PROD_PRECISION;
+const mode =
+    process.env["STORYBOOK_NODE_ENV"] ??
+    process.env["CYPRESS_NODE_ENV"] ??
+    process.env["NODE_ENV"];
+
+const PRECISION = mode !== "production" ? TEST_PRECISION : PROD_PRECISION;
 
 export { PRECISION };
