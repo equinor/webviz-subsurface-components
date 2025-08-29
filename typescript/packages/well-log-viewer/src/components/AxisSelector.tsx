@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import React, { Component } from "react";
+import React from "react";
 
 interface Props {
     header?: string | JSX.Element; // language dependent string
@@ -13,41 +13,36 @@ interface Props {
     autoHide?: boolean;
 }
 
-class AxisSelector extends Component<Props> {
-    createItem(label: string, value: string): ReactNode {
-        return (
-            <div key={value}>
-                <input
-                    type="radio"
-                    value={value}
-                    checked={this.props.value === value}
-                    onChange={(ev) => {
-                        this.props.onChange(ev.target.value);
-                    }}
-                />
-                {label}
-            </div>
-        );
-    }
+export const AxisSelector: React.FC<Props> = ({
+    header,
+    axes,
+    axisTitles,
+    value,
+    onChange,
+    autoHide,
+}) => {
+    if (autoHide && axes.length <= 1) return <></>; // do not need to render anything
 
-    render(): JSX.Element {
-        if (this.props.autoHide && this.props.axes.length <= 1) return <></>; // do not need to render anything
-        return (
-            <div className="axis-selector">
-                <fieldset>
-                    <legend>{this.props.header}</legend>
-                    {this.props.axes.map((axis) => {
-                        return this.createItem(
-                            this.props.axisTitles
-                                ? this.props.axisTitles[axis]
-                                : axis,
-                            axis
-                        );
-                    })}
-                </fieldset>
-            </div>
-        );
-    }
-}
+    const createItem = (label: string, axisValue: string): ReactNode => (
+        <div key={axisValue}>
+            <input
+                type="radio"
+                value={axisValue}
+                checked={value === axisValue}
+                onChange={(ev) => onChange(ev.target.value)}
+            />
+            {label}
+        </div>
+    );
 
-export default AxisSelector;
+    return (
+        <div className="axis-selector">
+            <fieldset>
+                <legend>{header}</legend>
+                {axes.map((axis) =>
+                    createItem(axisTitles ? axisTitles[axis] : axis, axis)
+                )}
+            </fieldset>
+        </div>
+    );
+};
