@@ -961,7 +961,6 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         };
         return (
             <WellLogViewWithScroller
-                iWellLogView={index}
                 key={index}
                 welllog={wellLog}
                 viewTitle={viewTitle}

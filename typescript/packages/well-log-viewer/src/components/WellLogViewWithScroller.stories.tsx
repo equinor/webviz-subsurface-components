@@ -57,10 +57,7 @@ const Template = (args: WellLogViewWithScrollerProps) => {
             style={{ height: "92vh", display: "flex", flexDirection: "column" }}
         >
             <div style={{ width: "100%", height: "100%" }}>
-                <WellLogViewWithScroller
-                    id="WellLogViewWithScroller"
-                    {...args}
-                />
+                <WellLogViewWithScroller {...args} />
             </div>
         </div>
     );

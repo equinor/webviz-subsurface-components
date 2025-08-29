@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import React, { Component } from "react";
+import React from "react";
 
 import type { Info } from "./InfoTypes";
 
@@ -40,27 +40,18 @@ function formatValue(value: number): string {
 const bigCircle = "\u2B24";
 const nbsp = "\xA0";
 const ellipsis = "\u2026"; //"…";
-class InfoPanel extends Component<Props> {
-    constructor(props: Props) {
-        super(props);
-        this.createRow = this.createRow.bind(this);
-    }
 
-    onRowClick(
-        info: Info /*,
-        ev: React.MouseEvent<HTMLTableRowElement>*/
-    ): void {
-        // TODO: Fix this the next time the file is edited.
-        // eslint-disable-next-line react/prop-types
-        this.props.onGroupClick?.(info);
-    }
+const InfoPanel: React.FC<Props> = ({ header, infos, onGroupClick }) => {
+    const onRowClick = (info: Info): void => {
+        onGroupClick?.(info);
+    };
 
-    createGroupRow(info: Info): ReactNode {
+    const createGroupRow = (info: Info): ReactNode => {
         return (
             <tr
                 className="group-row"
                 key={"_group_" + info.trackId + "." + info.name}
-                onClick={() => this.onRowClick(info)}
+                onClick={() => onRowClick(info)}
             >
                 <td style={{ color: info.color }}>
                     {
@@ -74,15 +65,15 @@ class InfoPanel extends Component<Props> {
                 </td>
             </tr>
         );
-    }
+    };
 
-    createRow(info: Info): ReactNode {
+    const createRow = (info: Info): ReactNode => {
         const autoDescreaseFontSize = false;
         if (info.type === "separator")
             // special case
             return createSeparator(info);
 
-        if (info.groupStart !== undefined) return this.createGroupRow(info);
+        if (info.groupStart !== undefined) return createGroupRow(info);
 
         let name = info.name || "?";
         const tooltip = name;
@@ -122,27 +113,18 @@ class InfoPanel extends Component<Props> {
                 )}
             </tr>
         );
-    }
+    };
 
-    render(): JSX.Element {
-        // TODO: Fix this the next time the file is edited.
-        // eslint-disable-next-line react/prop-types
-        const header = this.props.header;
-        return (
-            <div className="readout">
-                <fieldset>
-                    {header && <legend>{header}</legend>}
-                    <table>
-                        <tbody>
-                            {/* TODO: Fix this the next time the file is edited. */}
-                            {/* eslint-disable-next-line react/prop-types */}
-                            {this.props.infos?.map(this.createRow.bind(this))}
-                        </tbody>
-                    </table>
-                </fieldset>
-            </div>
-        );
-    }
-}
+    return (
+        <div className="readout">
+            <fieldset>
+                {header && <legend>{header}</legend>}
+                <table>
+                    <tbody>{infos?.map(createRow)}</tbody>
+                </table>
+            </fieldset>
+        </div>
+    );
+};
 
 export default InfoPanel;
