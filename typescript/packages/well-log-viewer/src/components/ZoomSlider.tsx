@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import Slider from "@mui/material/Slider";
 
@@ -39,21 +39,21 @@ const ZoomSlider: React.FC<ZoomSliderProps> = ({
     }, [value, level]);
 
     // callback function from Zoom slider
-    const handleChange = (
-        _event: Event,
-        newLevel: number | number[] // zoom level
-    ): void => {
-        if (typeof newLevel !== "number") return;
+    const handleChange = React.useCallback(
+        (_event: Event, newLevel: number | number[]) => {
+            if (typeof newLevel !== "number") return;
 
-        if (level !== newLevel) {
-            setLevel(newLevel);
-            if (onChange) {
-                onChange(convertLevelToValue(newLevel));
-            } else {
-                console.error("ZoomSlider props.onChange not set");
+            if (level !== newLevel) {
+                setLevel(newLevel);
+                if (onChange) {
+                    onChange(convertLevelToValue(newLevel));
+                } else {
+                    console.error("ZoomSlider props.onChange not set");
+                }
             }
-        }
-    };
+        },
+        [level, onChange]
+    );
 
     return (
         <Slider
