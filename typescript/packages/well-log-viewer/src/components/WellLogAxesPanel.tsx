@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-import AxisSelector from "./AxisSelector";
+import { AxisSelector } from "./AxisSelector";
 
 import { getAvailableAxes } from "../utils/well-log";
 

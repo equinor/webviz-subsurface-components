@@ -7,6 +7,7 @@ import { _propTypesWellLogView } from "./WellLogView";
 
 import type { WellLogController } from "./WellLogView";
 
+import type { ScrollerRef } from "./Scroller";
 import Scroller from "./Scroller";
 
 export type WellLogViewWithScrollerProps = WellLogViewProps;
@@ -17,13 +18,13 @@ class WellLogViewWithScroller extends Component<WellLogViewWithScrollerProps> {
     public static propTypes: Record<string, any>;
 
     controller: WellLogController | null;
-    scroller: Scroller | null;
+    scroller: React.RefObject<ScrollerRef>;
 
     constructor(props: WellLogViewWithScrollerProps) {
         super(props);
 
         this.controller = null;
-        this.scroller = null;
+        this.scroller = React.createRef<ScrollerRef>();
 
         this.onCreateController = this.onCreateController.bind(this);
 
@@ -119,7 +120,7 @@ class WellLogViewWithScroller extends Component<WellLogViewWithScrollerProps> {
     setScrollerPosAndZoom(): void {
         let x: number, y: number;
         let xZoom: number, yZoom: number;
-        const scroller = this.scroller;
+        const scroller = this.scroller?.current;
         if (!scroller) return;
         const controller = this.controller;
         if (!controller) {
@@ -186,10 +187,7 @@ class WellLogViewWithScroller extends Component<WellLogViewWithScrollerProps> {
 
     render(): JSX.Element {
         return (
-            <Scroller
-                ref={(el) => (this.scroller = el as Scroller)}
-                onScroll={this.onScrollerScroll}
-            >
+            <Scroller ref={this.scroller} onScroll={this.onScrollerScroll}>
                 <WellLogView
                     // copy all props
                     {...this.props}

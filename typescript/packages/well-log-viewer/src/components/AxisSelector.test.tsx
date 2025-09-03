@@ -3,7 +3,7 @@ import "jest-styled-components";
 import "@testing-library/jest-dom";
 import React from "react";
 import userEvent from "@testing-library/user-event";
-import AxisSelector from "./AxisSelector";
+import { AxisSelector } from "./AxisSelector";
 
 describe("Test Axis Selector", () => {
     it("snapshot test", () => {
