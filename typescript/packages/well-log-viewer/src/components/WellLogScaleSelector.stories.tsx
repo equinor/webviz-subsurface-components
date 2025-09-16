@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { expect, userEvent, within } from "@storybook/test";
 import React, { useState } from "react";
 
 import type { CallbackManager } from "./CallbackManager";
@@ -159,6 +160,27 @@ export const Default: StoryObj<typeof Template> = {
         round: true,
     },
     render: (args) => <Template {...args} />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+
+        // Wait for component to render
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
+        // Test external scale change button
+        const externalButton = canvas.getByText(
+            "Simulate External Scale Change"
+        );
+        await userEvent.click(externalButton);
+
+        // Check that the info display updated
+        await expect(
+            canvas.getByText(/Current scale: 0\.5/)
+        ).toBeInTheDocument();
+
+        // Click again to cycle to next value
+        await userEvent.click(externalButton);
+        await expect(canvas.getByText(/Current scale: 2/)).toBeInTheDocument();
+    },
 };
 
 export const WithJSXLabel: StoryObj<typeof Template> = {
@@ -167,6 +189,21 @@ export const WithJSXLabel: StoryObj<typeof Template> = {
         round: true,
     },
     render: (args) => <Template {...args} />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+
+        // Verify the custom JSX label is rendered
+        await expect(canvas.getByText("Custom Scale:")).toBeInTheDocument();
+
+        // Test interaction
+        const externalButton = canvas.getByText(
+            "Simulate External Scale Change"
+        );
+        await userEvent.click(externalButton);
+        await expect(
+            canvas.getByText(/Current scale: 0\.5/)
+        ).toBeInTheDocument();
+    },
 };
 
 export const WithCustomValues: StoryObj<typeof Template> = {
@@ -176,6 +213,30 @@ export const WithCustomValues: StoryObj<typeof Template> = {
         round: false,
     },
     render: (args) => <Template {...args} />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+
+        // Test cycling through custom values
+        const externalButton = canvas.getByText(
+            "Simulate External Scale Change"
+        );
+
+        // Start at scale 1, click to go to next value (2)
+        await userEvent.click(externalButton);
+        await expect(canvas.getByText(/Current scale: 2/)).toBeInTheDocument();
+
+        // Click again to go to next value (4)
+        await userEvent.click(externalButton);
+        await expect(canvas.getByText(/Current scale: 4/)).toBeInTheDocument();
+
+        // Click multiple times to test cycling back to beginning
+        for (let i = 0; i < 5; i++) {
+            await userEvent.click(externalButton);
+        }
+        await expect(
+            canvas.getByText(/Current scale: 0\.5/)
+        ).toBeInTheDocument();
+    },
 };
 
 export const WithoutLabel: StoryObj<typeof Template> = {
@@ -183,6 +244,18 @@ export const WithoutLabel: StoryObj<typeof Template> = {
         round: true,
     },
     render: (args) => <Template {...args} />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+
+        // Test that the component works without a label
+        const externalButton = canvas.getByText(
+            "Simulate External Scale Change"
+        );
+        await userEvent.click(externalButton);
+        await expect(
+            canvas.getByText(/Current scale: 0\.5/)
+        ).toBeInTheDocument();
+    },
 };
 
 export const WithRoundingStep: StoryObj<typeof Template> = {
@@ -192,4 +265,28 @@ export const WithRoundingStep: StoryObj<typeof Template> = {
         values: [0.01, 0.11, 0.12, 100.01],
     },
     render: (args) => <Template {...args} />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+
+        // Test rounding behavior with custom values
+        const externalButton = canvas.getByText(
+            "Simulate External Scale Change"
+        );
+
+        // Click to cycle through values and verify they appear
+        await userEvent.click(externalButton);
+        await expect(
+            canvas.getByText(/Current scale: 0\.11/)
+        ).toBeInTheDocument();
+
+        await userEvent.click(externalButton);
+        await expect(
+            canvas.getByText(/Current scale: 0\.12/)
+        ).toBeInTheDocument();
+
+        await userEvent.click(externalButton);
+        await expect(
+            canvas.getByText(/Current scale: 100\.01/)
+        ).toBeInTheDocument();
+    },
 };
