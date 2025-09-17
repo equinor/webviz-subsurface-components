@@ -50,7 +50,7 @@
     "@mui/material": "^5.15.15",
     "@mui/system": "^5.15.14",
     "@nx/jest": "^21.5.1",
-    "@playwright/test": "^1.55.0",
+    "@playwright/test": "1.39",
     "@storybook/addon-essentials": "^8.6.14",
     "@storybook/addon-interactions": "^8.6.14",
     "@storybook/addon-links": "^8.6.14",
