@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`SubsurfaceViewer/Components/Settings NumericInputStory smoke-test: subsurfaceviewer-components-settings--numeric-input-story.dom.html 1`] = `
+exports[`SubsurfaceViewer/Components/Settings NumericInputStory smoke-test 2`] = `
 <div style="display: flex; justify-content: space-between;">
   <label id="test-input-label"
          class="Label__LabelBase-sc-1gi2bcn-0 fdTexl"

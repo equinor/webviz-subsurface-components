@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`WellLogViewer/Demo/ClassificationLayout RTCTabsLayout smoke-test: welllogviewer-demo-classificationlayout--rtc-tabs-layout.dom.html 1`] = `
+exports[`WellLogViewer/Demo/ClassificationLayout RTCTabsLayout smoke-test 2`] = `
 <div class="MuiBox-root css-0"
      style="width: 100%;"
 >
@@ -120,7 +120,7 @@ exports[`WellLogViewer/Demo/ClassificationLayout RTCTabsLayout smoke-test: welll
 </div>
 `;
 
-exports[`WellLogViewer/Demo/ClassificationLayout RTCTabsLayoutWithScrollbar smoke-test: welllogviewer-demo-classificationlayout--rtc-tabs-layout-with-scrollbar.dom.html 1`] = `
+exports[`WellLogViewer/Demo/ClassificationLayout RTCTabsLayoutWithScrollbar smoke-test 2`] = `
 <div class="MuiBox-root css-0"
      style="width: 100%;"
 >

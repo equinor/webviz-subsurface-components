@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`SubsurfaceViewer/Components/InfoCard MutipleProperties smoke-test: subsurfaceviewer-components-infocard--mutiple-properties.dom.html 1`] = `
+exports[`SubsurfaceViewer/Components/InfoCard MutipleProperties smoke-test 1`] = `
 <div class="MuiTableContainer-root css-rorn0c-MuiTableContainer-root">
   <table class="MuiTable-root css-t8ttc-MuiTable-root"
          aria-label="info-card"
@@ -87,7 +87,7 @@ exports[`SubsurfaceViewer/Components/InfoCard MutipleProperties smoke-test: subs
 </div>
 `;
 
-exports[`SubsurfaceViewer/Components/InfoCard SingleProperty smoke-test: subsurfaceviewer-components-infocard--single-property.dom.html 1`] = `
+exports[`SubsurfaceViewer/Components/InfoCard SingleProperty smoke-test 1`] = `
 <div class="MuiTableContainer-root css-rorn0c-MuiTableContainer-root">
   <table class="MuiTable-root css-t8ttc-MuiTable-root"
          aria-label="info-card"

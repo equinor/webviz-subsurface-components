@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`WellCompletionsPlot/Demo WellCompletionsPlotStory smoke-test: wellcompletionsplot-demo--well-completions-plot-story.dom.html 1`] = `
+exports[`WellCompletionsPlot/Demo WellCompletionsPlotStory smoke-test 2`] = `
 <button type="button">
   First plot data
 </button>

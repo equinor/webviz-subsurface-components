@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`WellLogViewer/Components/WellLogScaleSelector Default play-test: welllogviewer-components-welllogscaleselector--default.dom.html 1`] = `
+exports[`WellLogViewer/Components/WellLogScaleSelector Default play-test 1`] = `
 <div style="padding: 20px; font-family: Arial, sans-serif;">
   <div style="margin-bottom: 10px;">
     <div class="scale">
@@ -54,7 +54,7 @@ exports[`WellLogViewer/Components/WellLogScaleSelector Default play-test: welllo
 </div>
 `;
 
-exports[`WellLogViewer/Components/WellLogScaleSelector WithCustomValues play-test: welllogviewer-components-welllogscaleselector--with-custom-values.dom.html 1`] = `
+exports[`WellLogViewer/Components/WellLogScaleSelector WithCustomValues play-test 1`] = `
 <div style="padding: 20px; font-family: Arial, sans-serif;">
   <div style="margin-bottom: 10px;">
     <div class="scale">
@@ -99,7 +99,7 @@ exports[`WellLogViewer/Components/WellLogScaleSelector WithCustomValues play-tes
 </div>
 `;
 
-exports[`WellLogViewer/Components/WellLogScaleSelector WithJSXLabel play-test: welllogviewer-components-welllogscaleselector--with-jsx-label.dom.html 1`] = `
+exports[`WellLogViewer/Components/WellLogScaleSelector WithJSXLabel play-test 1`] = `
 <div style="padding: 20px; font-family: Arial, sans-serif;">
   <div style="margin-bottom: 10px;">
     <div class="scale">
@@ -155,7 +155,7 @@ exports[`WellLogViewer/Components/WellLogScaleSelector WithJSXLabel play-test: w
 </div>
 `;
 
-exports[`WellLogViewer/Components/WellLogScaleSelector WithRoundingStep play-test: welllogviewer-components-welllogscaleselector--with-rounding-step.dom.html 1`] = `
+exports[`WellLogViewer/Components/WellLogScaleSelector WithRoundingStep play-test 1`] = `
 <div style="padding: 20px; font-family: Arial, sans-serif;">
   <div style="margin-bottom: 10px;">
     <div class="scale">
@@ -194,7 +194,7 @@ exports[`WellLogViewer/Components/WellLogScaleSelector WithRoundingStep play-tes
 </div>
 `;
 
-exports[`WellLogViewer/Components/WellLogScaleSelector WithoutLabel play-test: welllogviewer-components-welllogscaleselector--without-label.dom.html 1`] = `
+exports[`WellLogViewer/Components/WellLogScaleSelector WithoutLabel play-test 1`] = `
 <div style="padding: 20px; font-family: Arial, sans-serif;">
   <div style="margin-bottom: 10px;">
     <div class="scale">

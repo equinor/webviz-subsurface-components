@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`WellLogViewer/Components/ZoomSlider Default smoke-test: welllogviewer-components-zoomslider--default.dom.html 1`] = `
+exports[`WellLogViewer/Components/ZoomSlider Default smoke-test 2`] = `
 <div>
   <div style="width: 97%; height: 100%; flex: 1 1 0%;">
     Zoom:

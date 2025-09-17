@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`WellLogViewer/Demo/ExampleData TwoLogs smoke-test: welllogviewer-demo-exampledata--two-logs.dom.html 1`] = `
+exports[`WellLogViewer/Demo/ExampleData TwoLogs smoke-test 2`] = `
 <div style="height: 92vh; display: flex; flex-direction: column;">
   <div style="width: 100%; height: 100%; flex: 1 1 0%;">
     <div class="welllog-layout">

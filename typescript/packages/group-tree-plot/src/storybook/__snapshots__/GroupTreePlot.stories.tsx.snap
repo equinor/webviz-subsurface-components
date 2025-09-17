@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`GroupTreePlot/Demo Default smoke-test: grouptreeplot-demo--default.dom.html 1`] = `
+exports[`GroupTreePlot/Demo Default smoke-test 2`] = `
 <div style="width: 938px; height: 700px;">
   <svg height="100%"
        width="100%"
@@ -174,7 +174,7 @@ Bottom Hole Pressure: 11 N/m2
 </div>
 `;
 
-exports[`GroupTreePlot/Demo Resizable smoke-test: grouptreeplot-demo--resizable.dom.html 1`] = `
+exports[`GroupTreePlot/Demo Resizable smoke-test 2`] = `
 <div style="height: 700px; width: 700px;">
   <button>
     Randomize size

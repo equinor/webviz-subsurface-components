@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`WellLogViewer/Demo/WellLogViewer ColorByFunction smoke-test: welllogviewer-demo-welllogviewer--color-by-function.dom.html 1`] = `
+exports[`WellLogViewer/Demo/WellLogViewer ColorByFunction smoke-test 2`] = `
 <div>
   <div style="height: 92vh; width: 100%;">
     <div class="welllog-layout">
@@ -1354,7 +1354,7 @@ exports[`WellLogViewer/Demo/WellLogViewer ColorByFunction smoke-test: welllogvie
 </div>
 `;
 
-exports[`WellLogViewer/Demo/WellLogViewer Default smoke-test: welllogviewer-demo-welllogviewer--default.dom.html 1`] = `
+exports[`WellLogViewer/Demo/WellLogViewer Default smoke-test 2`] = `
 <div>
   <div style="height: 92vh; width: 100%;">
     <div class="welllog-layout">
@@ -4112,7 +4112,7 @@ exports[`WellLogViewer/Demo/WellLogViewer Default smoke-test: welllogviewer-demo
 </div>
 `;
 
-exports[`WellLogViewer/Demo/WellLogViewer Discrete smoke-test: welllogviewer-demo-welllogviewer--discrete.dom.html 1`] = `
+exports[`WellLogViewer/Demo/WellLogViewer Discrete smoke-test 2`] = `
 <div>
   <div style="height: 92vh; width: 100%;">
     <div class="welllog-layout">
@@ -8117,7 +8117,7 @@ exports[`WellLogViewer/Demo/WellLogViewer Discrete smoke-test: welllogviewer-dem
 </div>
 `;
 
-exports[`WellLogViewer/Demo/WellLogViewer Horizontal smoke-test: welllogviewer-demo-welllogviewer--horizontal.dom.html 1`] = `
+exports[`WellLogViewer/Demo/WellLogViewer Horizontal smoke-test 2`] = `
 <div>
   <div style="height: 92vh; width: 100%;">
     <div class="welllog-layout">
@@ -9536,7 +9536,7 @@ exports[`WellLogViewer/Demo/WellLogViewer Horizontal smoke-test: welllogviewer-d
 </div>
 `;
 
-exports[`WellLogViewer/Demo/WellLogViewer LogWithDifferentSets smoke-test: welllogviewer-demo-welllogviewer--log-with-different-sets.dom.html 1`] = `
+exports[`WellLogViewer/Demo/WellLogViewer LogWithDifferentSets smoke-test 2`] = `
 <div>
   <div style="height: 92vh; width: 100%;">
     <div class="welllog-layout">
@@ -10438,7 +10438,7 @@ exports[`WellLogViewer/Demo/WellLogViewer LogWithDifferentSets smoke-test: welll
 </div>
 `;
 
-exports[`WellLogViewer/Demo/WellLogViewer OnInfoFilledEvent smoke-test: welllogviewer-demo-welllogviewer--on-info-filled-event.dom.html 1`] = `
+exports[`WellLogViewer/Demo/WellLogViewer OnInfoFilledEvent smoke-test 2`] = `
 <div>
   <div>
     <div style="height: 92vh; width: 100%;">
@@ -11694,7 +11694,7 @@ exports[`WellLogViewer/Demo/WellLogViewer OnInfoFilledEvent smoke-test: welllogv
 </div>
 `;
 
-exports[`WellLogViewer/Demo/WellLogViewer TrackTitleTooltip play-test: welllogviewer-demo-welllogviewer--track-title-tooltip.dom.html 1`] = `
+exports[`WellLogViewer/Demo/WellLogViewer TrackTitleTooltip play-test 2`] = `
 <div>
   <div style="height: 92vh; width: 100%;">
     <div class="welllog-layout">

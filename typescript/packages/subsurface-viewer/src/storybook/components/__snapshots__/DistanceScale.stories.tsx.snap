@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`SubsurfaceViewer / Components / DistanceScale DarkMode smoke-test: subsurfaceviewer-components-distancescale--dark-mode.dom.html 1`] = `
+exports[`SubsurfaceViewer / Components / DistanceScale DarkMode smoke-test 1`] = `
 <div style="position: absolute; color: white;">
   <label style="color: white;">
     800m
@@ -10,7 +10,7 @@ exports[`SubsurfaceViewer / Components / DistanceScale DarkMode smoke-test: subs
 </div>
 `;
 
-exports[`SubsurfaceViewer / Components / DistanceScale LightMode smoke-test: subsurfaceviewer-components-distancescale--light-mode.dom.html 1`] = `
+exports[`SubsurfaceViewer / Components / DistanceScale LightMode smoke-test 1`] = `
 <div style="position: absolute;">
   <label>
     800m

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`SubsurfaceViewer/Components/Settings ToggleButtonStory smoke-test: subsurfaceviewer-components-settings--toggle-button-story.dom.html 1`] = `
+exports[`SubsurfaceViewer/Components/Settings ToggleButtonStory smoke-test 2`] = `
 <div style="display: flex; justify-content: space-between;">
   <label id="test-switch-label"
          class="Label__LabelBase-sc-1gi2bcn-0 fdTexl"

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test: welllogviewer-components-welllogviewwithscroller--default.dom.html 1`] = `
+exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`] = `
 <div style="height: 92vh; display: flex; flex-direction: column;">
   <div style="width: 100%; height: 100%;">
     <div style="overflow: scroll; width: 100%; height: 100%;">

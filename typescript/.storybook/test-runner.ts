@@ -40,28 +40,10 @@ const screenshotTest = async (page: Page, context: TestContext) => {
     });
 };
 
-const domSnapshotTest = async (page: Page, context: TestContext) => {
-    try {
-        // Try to wait for network idle, but with a shorter timeout
-        await page.waitForLoadState("networkidle", { timeout: 10000 });
-    } catch {
-        // If networkidle times out, wait for domcontentloaded instead
-        await page.waitForLoadState("domcontentloaded");
-        // Add a small delay to allow for initial rendering
-        await page.waitForTimeout(2000);
-    }
-
-    // Wait for the story to be rendered
-    await page.waitForSelector("#storybook-root", { timeout: 10000 });
-
-    // Get the DOM content of the story container
-    const domContent = await page.evaluate(() => {
-        const storyElement = document.querySelector("#storybook-root");
-        return storyElement ? storyElement.innerHTML : "";
-    });
-
-    // Create a snapshot of the DOM
-    expect(domContent).toMatchSnapshot(`${context.id}.dom.html`);
+const domSnapshotTest = async (page: Page) => {
+    const elementHandler = await page.$("#storybook-root");
+    const innerHTML = elementHandler ? await elementHandler.innerHTML() : "";
+    expect(innerHTML).toMatchSnapshot();
 };
 
 const config: TestRunnerConfig = {
@@ -84,7 +66,7 @@ const config: TestRunnerConfig = {
 
         // Run DOM snapshot test unless no-dom-test is specified
         if (!storyContext.tags.includes("no-dom-test")) {
-            await domSnapshotTest(page, context);
+            await domSnapshotTest(page);
         }
     },
 };

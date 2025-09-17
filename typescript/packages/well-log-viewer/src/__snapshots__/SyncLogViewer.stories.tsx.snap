@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`WellLogViewer/Demo/SyncLogViewer Default smoke-test: welllogviewer-demo-synclogviewer--default.dom.html 1`] = `
+exports[`WellLogViewer/Demo/SyncLogViewer Default smoke-test 1`] = `
 <div style="height: 92vh; display: flex; flex-direction: column;">
   <div style="width: 100%; height: 100%; flex: 1 1 0%;">
     <div class="welllog-layout">
@@ -7190,7 +7190,7 @@ exports[`WellLogViewer/Demo/SyncLogViewer Default smoke-test: welllogviewer-demo
 </div>
 `;
 
-exports[`WellLogViewer/Demo/SyncLogViewer DiscreteLogs smoke-test: welllogviewer-demo-synclogviewer--discrete-logs.dom.html 1`] = `
+exports[`WellLogViewer/Demo/SyncLogViewer DiscreteLogs smoke-test 1`] = `
 <div style="height: 92vh; display: flex; flex-direction: column;">
   <div style="flex-direction: row;">
     <button class="MuiButtonBase-root MuiToggleButton-root Mui-selected MuiToggleButton-sizeMedium MuiToggleButton-standard css-ueukts-MuiButtonBase-root-MuiToggleButton-root"
@@ -14889,7 +14889,7 @@ exports[`WellLogViewer/Demo/SyncLogViewer DiscreteLogs smoke-test: welllogviewer
 </div>
 `;
 
-exports[`WellLogViewer/Demo/SyncLogViewer LogsWithDifferentSets smoke-test: welllogviewer-demo-synclogviewer--logs-with-different-sets.dom.html 1`] = `
+exports[`WellLogViewer/Demo/SyncLogViewer LogsWithDifferentSets smoke-test 1`] = `
 <div style="height: 92vh; display: flex; flex-direction: column;">
   <div style="width: 100%; height: 100%; flex: 1 1 0%;">
     <div class="welllog-layout">

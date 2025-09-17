@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`WellLogViewer/Components/WellLogView Default smoke-test: welllogviewer-components-welllogview--default.dom.html 1`] = `
+exports[`WellLogViewer/Components/WellLogView Default smoke-test 2`] = `
 <div style="height: 92vh;">
   <div class="welllogview"
        style="flex-direction: column;"
@@ -1651,7 +1651,7 @@ exports[`WellLogViewer/Components/WellLogView Default smoke-test: welllogviewer-
 </div>
 `;
 
-exports[`WellLogViewer/Components/WellLogView Discrete smoke-test: welllogviewer-components-welllogview--discrete.dom.html 1`] = `
+exports[`WellLogViewer/Components/WellLogView Discrete smoke-test 2`] = `
 <div style="height: 92vh;">
   <div class="welllogview"
        style="flex-direction: column;"
