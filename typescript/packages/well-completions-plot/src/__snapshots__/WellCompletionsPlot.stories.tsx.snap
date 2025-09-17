@@ -1,0 +1,1033 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`WellCompletionsPlot/Demo WellCompletionsPlotStory smoke-test 2`] = `
+<button type="button">
+  First plot data
+</button>
+<button type="button">
+  Second plot data
+</button>
+<button type="button">
+  Third plot data
+</button>
+<div style="min-width: 500px; min-height: 300px; height: 100vh;">
+  <div id="test"
+       class="WellCompletionsPlot"
+       data-tooltip-id="plot-tooltip"
+       data-tooltip-float="true"
+  >
+    <svg id="test-svg-context"
+         width="1232"
+         height="576"
+         style="position: relative;"
+    >
+      <g>
+        <g transform="translate(0,70)">
+          <rect transform="translate(80, 0)"
+                width="1102"
+                height="32.57142857142857"
+                fill="#808080"
+          >
+          </rect>
+          <title>
+            zone1.1
+          </title>
+          <text text-anchor="end"
+                x="76"
+                y="16.285714285714285"
+                dy=".35em"
+                font-family="sans-serif"
+                style="font-size: 11px;"
+          >
+            zone1.1
+          </text>
+        </g>
+        <g transform="translate(0,102.57142857142857)">
+          <rect transform="translate(80, 0)"
+                width="1102"
+                height="32.57142857142857"
+                fill="#FF0000"
+          >
+          </rect>
+          <title>
+            zone1.2
+          </title>
+          <text text-anchor="end"
+                x="76"
+                y="16.285714285714285"
+                dy=".35em"
+                font-family="sans-serif"
+                style="font-size: 11px;"
+          >
+            zone1.2
+          </text>
+        </g>
+        <g transform="translate(0,135.14285714285714)">
+          <rect transform="translate(80, 0)"
+                width="1102"
+                height="32.57142857142857"
+                fill="#800000"
+          >
+          </rect>
+          <title>
+            zone1.3
+          </title>
+          <text text-anchor="end"
+                x="76"
+                y="16.285714285714285"
+                dy=".35em"
+                font-family="sans-serif"
+                style="font-size: 11px;"
+          >
+            zone1.3
+          </text>
+        </g>
+        <g transform="translate(0,167.71428571428572)">
+          <rect transform="translate(80, 0)"
+                width="1102"
+                height="32.57142857142857"
+                fill="#FFFF00"
+          >
+          </rect>
+          <title>
+            zone2.1
+          </title>
+          <text text-anchor="end"
+                x="76"
+                y="16.285714285714285"
+                dy=".35em"
+                font-family="sans-serif"
+                style="font-size: 11px;"
+          >
+            zone2.1
+          </text>
+        </g>
+        <g transform="translate(0,200.28571428571428)">
+          <rect transform="translate(80, 0)"
+                width="1102"
+                height="32.57142857142857"
+                fill="#808000"
+          >
+          </rect>
+          <title>
+            zone2.2
+          </title>
+          <text text-anchor="end"
+                x="76"
+                y="16.285714285714285"
+                dy=".35em"
+                font-family="sans-serif"
+                style="font-size: 11px;"
+          >
+            zone2.2
+          </text>
+        </g>
+        <g transform="translate(0,232.85714285714283)">
+          <rect transform="translate(80, 0)"
+                width="1102"
+                height="32.57142857142857"
+                fill="#00FF00"
+          >
+          </rect>
+          <title>
+            zone2.3
+          </title>
+          <text text-anchor="end"
+                x="76"
+                y="16.285714285714285"
+                dy=".35em"
+                font-family="sans-serif"
+                style="font-size: 11px;"
+          >
+            zone2.3
+          </text>
+        </g>
+        <g transform="translate(0,265.42857142857144)">
+          <rect transform="translate(80, 0)"
+                width="1102"
+                height="32.57142857142857"
+                fill="#008000"
+          >
+          </rect>
+          <title>
+            zone3.1
+          </title>
+          <text text-anchor="end"
+                x="76"
+                y="16.285714285714285"
+                dy=".35em"
+                font-family="sans-serif"
+                style="font-size: 11px;"
+          >
+            zone3.1
+          </text>
+        </g>
+        <g transform="translate(0,298)">
+          <rect transform="translate(80, 0)"
+                width="1102"
+                height="32.57142857142857"
+                fill="#00FFFF"
+          >
+          </rect>
+          <title>
+            zone3.2
+          </title>
+          <text text-anchor="end"
+                x="76"
+                y="16.285714285714285"
+                dy=".35em"
+                font-family="sans-serif"
+                style="font-size: 11px;"
+          >
+            zone3.2
+          </text>
+        </g>
+        <g transform="translate(0,330.57142857142856)">
+          <rect transform="translate(80, 0)"
+                width="1102"
+                height="32.57142857142857"
+                fill="#008080"
+          >
+          </rect>
+          <title>
+            zone3.3
+          </title>
+          <text text-anchor="end"
+                x="76"
+                y="16.285714285714285"
+                dy=".35em"
+                font-family="sans-serif"
+                style="font-size: 11px;"
+          >
+            zone3.3
+          </text>
+        </g>
+        <g transform="translate(0,363.1428571428571)">
+          <rect transform="translate(80, 0)"
+                width="1102"
+                height="32.57142857142857"
+                fill="#0000FF"
+          >
+          </rect>
+          <title>
+            zone4.1
+          </title>
+          <text text-anchor="end"
+                x="76"
+                y="16.285714285714285"
+                dy=".35em"
+                font-family="sans-serif"
+                style="font-size: 11px;"
+          >
+            zone4.1
+          </text>
+        </g>
+        <g transform="translate(0,395.71428571428567)">
+          <rect transform="translate(80, 0)"
+                width="1102"
+                height="32.57142857142857"
+                fill="#000080"
+          >
+          </rect>
+          <title>
+            zone4.2
+          </title>
+          <text text-anchor="end"
+                x="76"
+                y="16.285714285714285"
+                dy=".35em"
+                font-family="sans-serif"
+                style="font-size: 11px;"
+          >
+            zone4.2
+          </text>
+        </g>
+        <g transform="translate(0,428.2857142857143)">
+          <rect transform="translate(80, 0)"
+                width="1102"
+                height="32.57142857142857"
+                fill="#FF00FF"
+          >
+          </rect>
+          <title>
+            zone4.3
+          </title>
+          <text text-anchor="end"
+                x="76"
+                y="16.285714285714285"
+                dy=".35em"
+                font-family="sans-serif"
+                style="font-size: 11px;"
+          >
+            zone4.3
+          </text>
+        </g>
+        <g transform="translate(0,460.85714285714283)">
+          <rect transform="translate(80, 0)"
+                width="1102"
+                height="32.57142857142857"
+                fill="#800080"
+          >
+          </rect>
+          <title>
+            zone4.4
+          </title>
+          <text text-anchor="end"
+                x="76"
+                y="16.285714285714285"
+                dy=".35em"
+                font-family="sans-serif"
+                style="font-size: 11px;"
+          >
+            zone4.4
+          </text>
+        </g>
+        <g transform="translate(0,493.4285714285714)">
+          <rect transform="translate(80, 0)"
+                width="1102"
+                height="32.57142857142857"
+                fill="#C0C0C0"
+          >
+          </rect>
+          <title>
+            zone4.5
+          </title>
+          <text text-anchor="end"
+                x="76"
+                y="16.285714285714285"
+                dy=".35em"
+                font-family="sans-serif"
+                style="font-size: 11px;"
+          >
+            zone4.5
+          </text>
+        </g>
+      </g>
+      <g>
+        <g transform="translate(171.83333333333331,0)">
+          <text text-anchor="start"
+                transform="translate(0,60) rotate(-60)"
+                x="0"
+                y="0"
+                dy=".35em"
+                font-family="sans-serif"
+                style="font-size: 9px;"
+          >
+            PP_1
+          </text>
+          <rect transform="translate(0,66)"
+                width="0.5"
+                height="329.71428571428567"
+                fill="#111"
+          >
+          </rect>
+        </g>
+        <g transform="translate(355.5,0)">
+          <text text-anchor="start"
+                transform="translate(0,60) rotate(-60)"
+                x="0"
+                y="0"
+                dy=".35em"
+                font-family="sans-serif"
+                style="font-size: 9px;"
+          >
+            OP_2
+          </text>
+          <rect transform="translate(0,66)"
+                width="0.5"
+                height="362.2857142857143"
+                fill="#111"
+          >
+          </rect>
+        </g>
+        <g transform="translate(539.1666666666666,0)">
+          <text text-anchor="start"
+                transform="translate(0,60) rotate(-60)"
+                x="0"
+                y="0"
+                dy=".35em"
+                font-family="sans-serif"
+                style="font-size: 9px;"
+          >
+            OP_3
+          </text>
+          <rect transform="translate(0,66)"
+                width="0.5"
+                height="460"
+                fill="#111"
+          >
+          </rect>
+        </g>
+        <g transform="translate(722.8333333333333,0)">
+          <text text-anchor="start"
+                transform="translate(0,60) rotate(-60)"
+                x="0"
+                y="0"
+                dy=".35em"
+                font-family="sans-serif"
+                style="font-size: 9px;"
+          >
+            RWI_2
+          </text>
+          <rect transform="translate(0,66)"
+                width="0.5"
+                height="4"
+                fill="#111"
+          >
+          </rect>
+        </g>
+        <g transform="translate(906.5,0)">
+          <text text-anchor="start"
+                transform="translate(0,60) rotate(-60)"
+                x="0"
+                y="0"
+                dy=".35em"
+                font-family="sans-serif"
+                style="font-size: 9px;"
+          >
+            WI_1
+          </text>
+          <rect transform="translate(0,66)"
+                width="0.5"
+                height="166.85714285714283"
+                fill="#111"
+          >
+          </rect>
+        </g>
+        <g transform="translate(1090.1666666666665,0)">
+          <text text-anchor="start"
+                transform="translate(0,60) rotate(-60)"
+                x="0"
+                y="0"
+                dy=".35em"
+                font-family="sans-serif"
+                style="font-size: 9px;"
+          >
+            WI_2
+          </text>
+          <rect transform="translate(0,66)"
+                width="0.5"
+                height="4"
+                fill="#111"
+          >
+          </rect>
+        </g>
+      </g>
+      <g>
+        <g transform="translate(171.83333333333331, 0)">
+          <g>
+            <rect transform="translate(0, 70)"
+                  width="0"
+                  height="130.28571428571428"
+                  fill="#f00"
+            >
+            </rect>
+            <rect transform="translate(0, 70)"
+                  width="0"
+                  height="130.28571428571428"
+                  fill="#111"
+            >
+            </rect>
+            <rect transform="translate(0, 70)"
+                  width="0"
+                  height="130.28571428571428"
+                  fill="#f00"
+            >
+            </rect>
+          </g>
+          <g>
+            <rect transform="translate(-45.916666666666664, 200.28571428571428)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+            <rect transform="translate(-45.916666666666664, 200.28571428571428)"
+                  width="91.83333333333333"
+                  height="32.57142857142857"
+                  fill="#111"
+            >
+            </rect>
+            <rect transform="translate(45.916666666666664, 200.28571428571428)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+          </g>
+          <g>
+            <rect transform="translate(-45.916666666666664, 232.85714285714283)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+            <rect transform="translate(-45.916666666666664, 232.85714285714283)"
+                  width="91.83333333333333"
+                  height="32.57142857142857"
+                  fill="#111"
+            >
+            </rect>
+            <rect transform="translate(45.916666666666664, 232.85714285714283)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+          </g>
+          <g>
+            <rect transform="translate(-45.916666666666664, 265.42857142857144)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+            <rect transform="translate(-45.916666666666664, 265.42857142857144)"
+                  width="91.83333333333333"
+                  height="32.57142857142857"
+                  fill="#111"
+            >
+            </rect>
+            <rect transform="translate(45.916666666666664, 265.42857142857144)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+          </g>
+          <g>
+            <rect transform="translate(-45.916666666666664, 298)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+            <rect transform="translate(-45.916666666666664, 298)"
+                  width="91.83333333333333"
+                  height="32.57142857142857"
+                  fill="#111"
+            >
+            </rect>
+            <rect transform="translate(45.916666666666664, 298)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+          </g>
+          <g>
+            <rect transform="translate(-45.916666666666664, 330.57142857142856)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+            <rect transform="translate(-45.916666666666664, 330.57142857142856)"
+                  width="91.83333333333333"
+                  height="32.57142857142857"
+                  fill="#111"
+            >
+            </rect>
+            <rect transform="translate(45.916666666666664, 330.57142857142856)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+          </g>
+          <g>
+            <rect transform="translate(-45.916666666666664, 363.1428571428571)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+            <rect transform="translate(-45.916666666666664, 363.1428571428571)"
+                  width="91.83333333333333"
+                  height="32.57142857142857"
+                  fill="#111"
+            >
+            </rect>
+            <rect transform="translate(45.916666666666664, 363.1428571428571)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+          </g>
+          <g>
+            <rect transform="translate(0, 395.71428571428567)"
+                  width="0"
+                  height="130.28571428571428"
+                  fill="#f00"
+            >
+            </rect>
+            <rect transform="translate(0, 395.71428571428567)"
+                  width="0"
+                  height="130.28571428571428"
+                  fill="#111"
+            >
+            </rect>
+            <rect transform="translate(0, 395.71428571428567)"
+                  width="0"
+                  height="130.28571428571428"
+                  fill="#f00"
+            >
+            </rect>
+          </g>
+        </g>
+        <g transform="translate(355.5, 0)">
+          <g>
+            <rect transform="translate(0, 70)"
+                  width="0"
+                  height="195.42857142857142"
+                  fill="#f00"
+            >
+            </rect>
+            <rect transform="translate(0, 70)"
+                  width="0"
+                  height="195.42857142857142"
+                  fill="#111"
+            >
+            </rect>
+            <rect transform="translate(0, 70)"
+                  width="0"
+                  height="195.42857142857142"
+                  fill="#f00"
+            >
+            </rect>
+          </g>
+          <g>
+            <rect transform="translate(-45.916666666666664, 265.42857142857144)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+            <rect transform="translate(-45.916666666666664, 265.42857142857144)"
+                  width="91.83333333333333"
+                  height="32.57142857142857"
+                  fill="#111"
+            >
+            </rect>
+            <rect transform="translate(45.916666666666664, 265.42857142857144)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+          </g>
+          <g>
+            <rect transform="translate(-45.916666666666664, 298)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+            <rect transform="translate(-45.916666666666664, 298)"
+                  width="91.83333333333333"
+                  height="32.57142857142857"
+                  fill="#111"
+            >
+            </rect>
+            <rect transform="translate(45.916666666666664, 298)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+          </g>
+          <g>
+            <rect transform="translate(-45.916666666666664, 330.57142857142856)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+            <rect transform="translate(-45.916666666666664, 330.57142857142856)"
+                  width="91.83333333333333"
+                  height="32.57142857142857"
+                  fill="#111"
+            >
+            </rect>
+            <rect transform="translate(45.916666666666664, 330.57142857142856)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+          </g>
+          <g>
+            <rect transform="translate(-45.916666666666664, 363.1428571428571)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+            <rect transform="translate(-45.916666666666664, 363.1428571428571)"
+                  width="91.83333333333333"
+                  height="32.57142857142857"
+                  fill="#111"
+            >
+            </rect>
+            <rect transform="translate(45.916666666666664, 363.1428571428571)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+          </g>
+          <g>
+            <rect transform="translate(-45.916666666666664, 395.71428571428567)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+            <rect transform="translate(-45.916666666666664, 395.71428571428567)"
+                  width="91.83333333333333"
+                  height="32.57142857142857"
+                  fill="#111"
+            >
+            </rect>
+            <rect transform="translate(45.916666666666664, 395.71428571428567)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+          </g>
+          <g>
+            <rect transform="translate(0, 428.2857142857143)"
+                  width="0"
+                  height="97.71428571428571"
+                  fill="#f00"
+            >
+            </rect>
+            <rect transform="translate(0, 428.2857142857143)"
+                  width="0"
+                  height="97.71428571428571"
+                  fill="#111"
+            >
+            </rect>
+            <rect transform="translate(0, 428.2857142857143)"
+                  width="0"
+                  height="97.71428571428571"
+                  fill="#f00"
+            >
+            </rect>
+          </g>
+        </g>
+        <g transform="translate(539.1666666666666, 0)">
+          <g>
+            <rect transform="translate(0, 70)"
+                  width="0"
+                  height="260.57142857142856"
+                  fill="#f00"
+            >
+            </rect>
+            <rect transform="translate(0, 70)"
+                  width="0"
+                  height="260.57142857142856"
+                  fill="#111"
+            >
+            </rect>
+            <rect transform="translate(0, 70)"
+                  width="0"
+                  height="260.57142857142856"
+                  fill="#f00"
+            >
+            </rect>
+          </g>
+          <g>
+            <rect transform="translate(-45.916666666666664, 330.57142857142856)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+            <rect transform="translate(-45.916666666666664, 330.57142857142856)"
+                  width="91.83333333333333"
+                  height="32.57142857142857"
+                  fill="#111"
+            >
+            </rect>
+            <rect transform="translate(45.916666666666664, 330.57142857142856)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+          </g>
+          <g>
+            <rect transform="translate(-45.916666666666664, 363.1428571428571)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+            <rect transform="translate(-45.916666666666664, 363.1428571428571)"
+                  width="91.83333333333333"
+                  height="32.57142857142857"
+                  fill="#111"
+            >
+            </rect>
+            <rect transform="translate(45.916666666666664, 363.1428571428571)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+          </g>
+          <g>
+            <rect transform="translate(-45.916666666666664, 395.71428571428567)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+            <rect transform="translate(-45.916666666666664, 395.71428571428567)"
+                  width="91.83333333333333"
+                  height="32.57142857142857"
+                  fill="#111"
+            >
+            </rect>
+            <rect transform="translate(45.916666666666664, 395.71428571428567)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+          </g>
+          <g>
+            <rect transform="translate(-45.916666666666664, 428.2857142857143)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+            <rect transform="translate(-45.916666666666664, 428.2857142857143)"
+                  width="91.83333333333333"
+                  height="32.57142857142857"
+                  fill="#111"
+            >
+            </rect>
+            <rect transform="translate(45.916666666666664, 428.2857142857143)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+          </g>
+          <g>
+            <rect transform="translate(-45.916666666666664, 460.85714285714283)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+            <rect transform="translate(-45.916666666666664, 460.85714285714283)"
+                  width="91.83333333333333"
+                  height="32.57142857142857"
+                  fill="#111"
+            >
+            </rect>
+            <rect transform="translate(45.916666666666664, 460.85714285714283)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+          </g>
+          <g>
+            <rect transform="translate(-45.916666666666664, 493.4285714285714)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+            <rect transform="translate(-45.916666666666664, 493.4285714285714)"
+                  width="91.83333333333333"
+                  height="32.57142857142857"
+                  fill="#111"
+            >
+            </rect>
+            <rect transform="translate(45.916666666666664, 493.4285714285714)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+          </g>
+        </g>
+        <g transform="translate(722.8333333333333, 0)">
+          <g>
+            <rect transform="translate(0, 70)"
+                  width="0"
+                  height="456"
+                  fill="#f00"
+            >
+            </rect>
+            <rect transform="translate(0, 70)"
+                  width="0"
+                  height="456"
+                  fill="#111"
+            >
+            </rect>
+            <rect transform="translate(0, 70)"
+                  width="0"
+                  height="456"
+                  fill="#f00"
+            >
+            </rect>
+          </g>
+        </g>
+        <g transform="translate(906.5, 0)">
+          <g>
+            <rect transform="translate(0, 70)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+            <rect transform="translate(0, 70)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#111"
+            >
+            </rect>
+            <rect transform="translate(0, 70)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+          </g>
+          <g>
+            <rect transform="translate(-45.916666666666664, 102.57142857142857)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+            <rect transform="translate(-45.916666666666664, 102.57142857142857)"
+                  width="91.83333333333333"
+                  height="32.57142857142857"
+                  fill="#111"
+            >
+            </rect>
+            <rect transform="translate(45.916666666666664, 102.57142857142857)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+          </g>
+          <g>
+            <rect transform="translate(-45.916666666666664, 135.14285714285714)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+            <rect transform="translate(-45.916666666666664, 135.14285714285714)"
+                  width="91.83333333333333"
+                  height="32.57142857142857"
+                  fill="#111"
+            >
+            </rect>
+            <rect transform="translate(45.916666666666664, 135.14285714285714)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+          </g>
+          <g>
+            <rect transform="translate(-45.916666666666664, 167.71428571428572)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+            <rect transform="translate(-45.916666666666664, 167.71428571428572)"
+                  width="91.83333333333333"
+                  height="32.57142857142857"
+                  fill="#111"
+            >
+            </rect>
+            <rect transform="translate(45.916666666666664, 167.71428571428572)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+          </g>
+          <g>
+            <rect transform="translate(-45.916666666666664, 200.28571428571428)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+            <rect transform="translate(-45.916666666666664, 200.28571428571428)"
+                  width="91.83333333333333"
+                  height="32.57142857142857"
+                  fill="#111"
+            >
+            </rect>
+            <rect transform="translate(45.916666666666664, 200.28571428571428)"
+                  width="0"
+                  height="32.57142857142857"
+                  fill="#f00"
+            >
+            </rect>
+          </g>
+          <g>
+            <rect transform="translate(0, 232.85714285714283)"
+                  width="0"
+                  height="293.1428571428571"
+                  fill="#f00"
+            >
+            </rect>
+            <rect transform="translate(0, 232.85714285714283)"
+                  width="0"
+                  height="293.1428571428571"
+                  fill="#111"
+            >
+            </rect>
+            <rect transform="translate(0, 232.85714285714283)"
+                  width="0"
+                  height="293.1428571428571"
+                  fill="#f00"
+            >
+            </rect>
+          </g>
+        </g>
+        <g transform="translate(1090.1666666666665, 0)">
+          <g>
+            <rect transform="translate(0, 70)"
+                  width="0"
+                  height="456"
+                  fill="#f00"
+            >
+            </rect>
+            <rect transform="translate(0, 70)"
+                  width="0"
+                  height="456"
+                  fill="#111"
+            >
+            </rect>
+            <rect transform="translate(0, 70)"
+                  width="0"
+                  height="456"
+                  fill="#f00"
+            >
+            </rect>
+          </g>
+        </g>
+      </g>
+    </svg>
+  </div>
+</div>
+`;

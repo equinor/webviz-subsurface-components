@@ -8,6 +8,7 @@ import { ContinuousLegend, colorTables } from "@emerson-eps/color-tables";
 const stories: Meta = {
     component: ContinuousLegend,
     title: "SubsurfaceViewer/Components/ColorLegends",
+    tags: ["no-dom-test"],
 };
 export default stories;
 

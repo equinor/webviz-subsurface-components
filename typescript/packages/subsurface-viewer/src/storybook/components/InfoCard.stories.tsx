@@ -7,6 +7,7 @@ import { type LayerPickInfo } from "../../layers/utils/layerTools";
 const stories: Meta = {
     component: InfoCard,
     title: "SubsurfaceViewer/Components/InfoCard",
+    tags: ["no-screenshot-test"],
 };
 export default stories;
 

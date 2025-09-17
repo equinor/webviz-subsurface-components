@@ -13,6 +13,7 @@ import exampleData from "../../../../../../example-data/deckgl-map.json";
 export default {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer/SchemaValidation",
+    tags: ["no-dom-test"],
 };
 
 // Template for when edited data needs to be captured.

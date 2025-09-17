@@ -41,6 +41,7 @@ import { useScaleFactor } from "../../utils/event";
 const stories: Meta = {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer/Examples/Camera",
+    tags: ["no-dom-test"],
     args: {
         // Add some common controls for all the stories.
         triggerHome: 0,

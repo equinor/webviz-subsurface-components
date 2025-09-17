@@ -9,6 +9,7 @@ import { LABEL_MERGE_RADIUS_ARGTYPES } from "../constant/argTypes";
 
 const stories: Meta = {
     title: "SubsurfaceViewer / MergedTextLayer",
+    tags: ["no-dom-test"],
     parameters: {
         docs: {
             description: {

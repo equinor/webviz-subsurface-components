@@ -10,6 +10,7 @@ import { getRgba } from "../util/color";
 const stories: Meta = {
     component: DeckGL,
     title: "SubsurfaceViewer / AxesLayer",
+    tags: ["no-dom-test"],
 };
 export default stories;
 
