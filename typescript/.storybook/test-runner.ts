@@ -1,13 +1,12 @@
-// @ts-expect-error TS7016
 import { toMatchImageSnapshot } from "jest-image-snapshot";
 
-import { getStoryContext, type TestRunnerConfig } from "@storybook/test-runner";
+import type { Page } from "@playwright/test";
+import { getStoryContext, type TestContext, type TestRunnerConfig } from "@storybook/test-runner";
 
 // https://github.com/mapbox/pixelmatch#pixelmatchimg1-img2-output-width-height-options
 const customDiffConfig = {};
 
-// @ts-expect-error TS7006
-const screenshotTest = async (page, context) => {
+const screenshotTest = async (page: Page, context: TestContext) => {
     let previousScreenshot: Buffer = Buffer.from("");
 
     let stable = false;
@@ -38,7 +37,7 @@ const screenshotTest = async (page, context) => {
     });
 };
 
-const domSnapshotTest = async (page, context) => {
+const domSnapshotTest = async (page: Page, context: TestContext) => {
     try {
         // Try to wait for network idle, but with a shorter timeout
         await page.waitForLoadState('networkidle', { timeout: 10000 });
@@ -49,19 +48,8 @@ const domSnapshotTest = async (page, context) => {
         await page.waitForTimeout(2000);
     }
     
-    // Wait for the story to be rendered - check for element existence, not visibility
-    try {
-        await page.waitForSelector('#storybook-root', { 
-            timeout: 10000,
-            state: 'attached' // Wait for element to exist in DOM, not necessarily visible
-        });
-    } catch (error) {
-        // Fallback: wait for any story content to be present
-        await page.waitForFunction(() => {
-            const storyElement = document.querySelector('#storybook-root');
-            return storyElement && storyElement.innerHTML.trim().length > 0;
-        }, { timeout: 15000 });
-    }
+    // Wait for the story to be rendered
+    await page.waitForSelector('#storybook-root', { timeout: 10000 });
     
     // Get the DOM content of the story container
     const domContent = await page.evaluate(() => {
