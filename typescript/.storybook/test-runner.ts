@@ -1,7 +1,11 @@
 import { toMatchImageSnapshot } from "jest-image-snapshot";
 
 import type { Page } from "@playwright/test";
-import { getStoryContext, type TestContext, type TestRunnerConfig } from "@storybook/test-runner";
+import {
+    getStoryContext,
+    type TestContext,
+    type TestRunnerConfig,
+} from "@storybook/test-runner";
 
 // https://github.com/mapbox/pixelmatch#pixelmatchimg1-img2-output-width-height-options
 const customDiffConfig = {};
@@ -40,21 +44,21 @@ const screenshotTest = async (page: Page, context: TestContext) => {
 const domSnapshotTest = async (page: Page, context: TestContext) => {
     try {
         // Try to wait for network idle, but with a shorter timeout
-        await page.waitForLoadState('networkidle', { timeout: 10000 });
-    } catch (error) {
+        await page.waitForLoadState("networkidle", { timeout: 10000 });
+    } catch {
         // If networkidle times out, wait for domcontentloaded instead
-        await page.waitForLoadState('domcontentloaded');
+        await page.waitForLoadState("domcontentloaded");
         // Add a small delay to allow for initial rendering
         await page.waitForTimeout(2000);
     }
-    
+
     // Wait for the story to be rendered
-    await page.waitForSelector('#storybook-root', { timeout: 10000 });
-    
+    await page.waitForSelector("#storybook-root", { timeout: 10000 });
+
     // Get the DOM content of the story container
     const domContent = await page.evaluate(() => {
-        const storyElement = document.querySelector('#storybook-root');
-        return storyElement ? storyElement.innerHTML : '';
+        const storyElement = document.querySelector("#storybook-root");
+        return storyElement ? storyElement.innerHTML : "";
     });
 
     // Create a snapshot of the DOM
