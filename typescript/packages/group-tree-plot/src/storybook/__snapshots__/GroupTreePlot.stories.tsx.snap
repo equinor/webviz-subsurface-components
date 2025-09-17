@@ -1,0 +1,354 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`GroupTreePlot/Demo Default smoke-test: grouptreeplot-demo--default.dom.html 1`] = `
+<div style="width: 938px; height: 700px;">
+  <svg height="100%"
+       width="100%"
+  >
+    <g transform="translate(70,10)">
+      <g>
+        <path id=":r1:"
+              class="link grouptree_link grouptree_link__waterrate"
+              stroke-dasharray="none"
+              stroke-opacity="1"
+              stroke-width="57.99999999999999"
+              d="
+        M 0 340         C             374 340,             374 170,             748 170
+        "
+        >
+          <title>
+            Water Rate: 20 m3/s
+Oil Rate: 30 m3/s
+Gas Rate: 40 m3/s
+Water Injection Rate: 50 m3/s
+Gas Injection Rate: 60 m3/s
+          </title>
+        </path>
+        <text dominant-baseline="central"
+              text-anchor="middle"
+              fill-opacity="1"
+        >
+          <textPath class="edge_info_text"
+                    startoffset="50%"
+                    href="#:r1:"
+          >
+            VFP11
+          </textPath>
+        </text>
+      </g>
+      <g>
+        <path id=":r3:"
+              class="link grouptree_link grouptree_link__waterrate"
+              stroke-dasharray="none"
+              stroke-opacity="1"
+              stroke-width="72"
+              d="
+        M 0 340         C             374 340,             374 510,             748 510
+        "
+        >
+          <title>
+            Water Rate: 25 m3/s
+Oil Rate: 35 m3/s
+Gas Rate: 45 m3/s
+Water Injection Rate: 55 m3/s
+Gas Injection Rate: 65 m3/s
+          </title>
+        </path>
+        <text dominant-baseline="central"
+              text-anchor="middle"
+              fill-opacity="1"
+        >
+          <textPath class="edge_info_text"
+                    startoffset="50%"
+                    href="#:r3:"
+          >
+            VFP12
+          </textPath>
+        </text>
+      </g>
+      <g class="node"
+         cursor="pointer"
+         opacity="1"
+         transform-origin="-18.5625px 0px"
+         style="transform: translateY(340px); transform-origin: -18.5625px 0px;"
+      >
+        <circle class="grouptree__node  grouptree__node--withchildren"
+                r="15"
+        >
+        </circle>
+        <text class="grouptree__nodelabel"
+              dominant-baseline="middle"
+              x="-21"
+              text-anchor="end"
+        >
+          TRE_1
+        </text>
+        <text class="grouptree__pressurelabel"
+              text-anchor="middle"
+              y="-.05em"
+        >
+          5
+        </text>
+        <text class="grouptree__pressureunit"
+              y=".04em"
+              dominant-baseline="text-before-edge"
+              text-anchor="middle"
+        >
+          Bar
+        </text>
+        <title>
+          Pressure: 5 Bar
+        </title>
+      </g>
+      <g class="node"
+         opacity="1"
+         transform-origin="24.34228515625px 0px"
+         style="transform: translateX(748px) translateY(170px); transform-origin: 24.3423px 0px;"
+      >
+        <circle class="grouptree__node"
+                r="15"
+        >
+        </circle>
+        <text class="grouptree__nodelabel"
+              dominant-baseline="middle"
+              x="21"
+              text-anchor="start"
+        >
+          TRE_1_1
+        </text>
+        <text class="grouptree__pressurelabel"
+              text-anchor="middle"
+              y="-.05em"
+        >
+          20
+        </text>
+        <text class="grouptree__pressureunit"
+              y=".04em"
+              dominant-baseline="text-before-edge"
+              text-anchor="middle"
+        >
+          Bar
+        </text>
+        <title>
+          Pressure: 20 Bar
+Bottom Hole Pressure: 11 N/m2
+: 12 ?
+        </title>
+      </g>
+      <g class="node"
+         opacity="1"
+         transform-origin="24.34228515625px 0px"
+         style="transform: translateX(748px) translateY(510px); transform-origin: 24.3423px 0px;"
+      >
+        <circle class="grouptree__node"
+                r="15"
+        >
+        </circle>
+        <text class="grouptree__nodelabel"
+              dominant-baseline="middle"
+              x="21"
+              text-anchor="start"
+        >
+          TRE_1_2
+        </text>
+        <text class="grouptree__pressurelabel"
+              text-anchor="middle"
+              y="-.05em"
+        >
+          22
+        </text>
+        <text class="grouptree__pressureunit"
+              y=".04em"
+              dominant-baseline="text-before-edge"
+              text-anchor="middle"
+        >
+          Bar
+        </text>
+        <title>
+          Pressure: 22 Bar
+: 10 ?
+        </title>
+      </g>
+    </g>
+  </svg>
+</div>
+`;
+
+exports[`GroupTreePlot/Demo Resizable smoke-test: grouptreeplot-demo--resizable.dom.html 1`] = `
+<div style="height: 700px; width: 700px;">
+  <button>
+    Randomize size
+  </button>
+  <div style="margin-top: 0.25rem; background: rgba(0, 0, 255, 0.2); height: 400px; width: 400px; transition: height 200ms ease 0s, width ease 0s;">
+    <svg height="100%"
+         width="100%"
+    >
+      <g transform="translate(70,10)">
+        <g>
+          <path id=":r8:"
+                class="link grouptree_link grouptree_link__waterrate"
+                stroke-dasharray="none"
+                stroke-opacity="1"
+                stroke-width="57.99999999999999"
+                d="
+        M 0 190         C             105 190,             105 95,             210 95
+        "
+          >
+            <title>
+              Water Rate: 20 m3/s
+Oil Rate: 30 m3/s
+Gas Rate: 40 m3/s
+Water Injection Rate: 50 m3/s
+Gas Injection Rate: 60 m3/s
+            </title>
+          </path>
+          <text dominant-baseline="central"
+                text-anchor="middle"
+                fill-opacity="1"
+          >
+            <textPath class="edge_info_text"
+                      startoffset="50%"
+                      href="#:r8:"
+            >
+              VFP11
+            </textPath>
+          </text>
+        </g>
+        <g>
+          <path id=":ra:"
+                class="link grouptree_link grouptree_link__waterrate"
+                stroke-dasharray="none"
+                stroke-opacity="1"
+                stroke-width="72"
+                d="
+        M 0 190         C             105 190,             105 285,             210 285
+        "
+          >
+            <title>
+              Water Rate: 25 m3/s
+Oil Rate: 35 m3/s
+Gas Rate: 45 m3/s
+Water Injection Rate: 55 m3/s
+Gas Injection Rate: 65 m3/s
+            </title>
+          </path>
+          <text dominant-baseline="central"
+                text-anchor="middle"
+                fill-opacity="1"
+          >
+            <textPath class="edge_info_text"
+                      startoffset="50%"
+                      href="#:ra:"
+            >
+              VFP12
+            </textPath>
+          </text>
+        </g>
+        <g class="node"
+           cursor="pointer"
+           opacity="1"
+           transform-origin="-18.5625px 0px"
+           style="transform: translateY(190px); transform-origin: -18.5625px 0px;"
+        >
+          <circle class="grouptree__node  grouptree__node--withchildren"
+                  r="15"
+          >
+          </circle>
+          <text class="grouptree__nodelabel"
+                dominant-baseline="middle"
+                x="-21"
+                text-anchor="end"
+          >
+            TRE_1
+          </text>
+          <text class="grouptree__pressurelabel"
+                text-anchor="middle"
+                y="-.05em"
+          >
+            5
+          </text>
+          <text class="grouptree__pressureunit"
+                y=".04em"
+                dominant-baseline="text-before-edge"
+                text-anchor="middle"
+          >
+            Bar
+          </text>
+          <title>
+            Pressure: 5 Bar
+          </title>
+        </g>
+        <g class="node"
+           opacity="1"
+           transform-origin="24.34228515625px 0px"
+           style="transform: translateX(210px) translateY(95px); transform-origin: 24.3423px 0px;"
+        >
+          <circle class="grouptree__node"
+                  r="15"
+          >
+          </circle>
+          <text class="grouptree__nodelabel"
+                dominant-baseline="middle"
+                x="21"
+                text-anchor="start"
+          >
+            TRE_1_1
+          </text>
+          <text class="grouptree__pressurelabel"
+                text-anchor="middle"
+                y="-.05em"
+          >
+            20
+          </text>
+          <text class="grouptree__pressureunit"
+                y=".04em"
+                dominant-baseline="text-before-edge"
+                text-anchor="middle"
+          >
+            Bar
+          </text>
+          <title>
+            Pressure: 20 Bar
+Bottom Hole Pressure: 11 N/m2
+: 12 ?
+          </title>
+        </g>
+        <g class="node"
+           opacity="1"
+           transform-origin="24.34228515625px 0px"
+           style="transform: translateX(210px) translateY(285px); transform-origin: 24.3423px 0px;"
+        >
+          <circle class="grouptree__node"
+                  r="15"
+          >
+          </circle>
+          <text class="grouptree__nodelabel"
+                dominant-baseline="middle"
+                x="21"
+                text-anchor="start"
+          >
+            TRE_1_2
+          </text>
+          <text class="grouptree__pressurelabel"
+                text-anchor="middle"
+                y="-.05em"
+          >
+            22
+          </text>
+          <text class="grouptree__pressureunit"
+                y=".04em"
+                dominant-baseline="text-before-edge"
+                text-anchor="middle"
+          >
+            Bar
+          </text>
+          <title>
+            Pressure: 22 Bar
+: 10 ?
+          </title>
+        </g>
+      </g>
+    </svg>
+  </div>
+</div>
+`;

@@ -1,0 +1,29 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SubsurfaceViewer/Components/Settings ToggleButtonStory smoke-test: subsurfaceviewer-components-settings--toggle-button-story.dom.html 1`] = `
+<div style="display: flex; justify-content: space-between;">
+  <label id="test-switch-label"
+         class="Label__LabelBase-sc-1gi2bcn-0 fdTexl"
+         style="padding-top: 15px; font-size: 15px;"
+  >
+    <span class="Label__Text-sc-1gi2bcn-1 hkGcWj">
+      test
+    </span>
+  </label>
+  <span class="Switchstyles__GridWrapper-sc-x39lde-2 gUdGex"
+        style="padding-right: 10px; width: 3rem;"
+  >
+    <input id="test-switch"
+           aria-label="test"
+           type="checkbox"
+           class="Switchstyles__BaseInput-sc-x39lde-1 SwitchDefault__Input-sc-16ym5pn-0 kNKTpL ewbgpJ"
+    >
+    <span class="Switchstyles__BaseInputWrapper-sc-x39lde-0 fSSKMh">
+      <span class="SwitchDefault__Track-sc-16ym5pn-1 kPsJrV">
+      </span>
+      <span class="SwitchDefault__Handle-sc-16ym5pn-2 jdwCBx">
+      </span>
+    </span>
+  </span>
+</div>
+`;

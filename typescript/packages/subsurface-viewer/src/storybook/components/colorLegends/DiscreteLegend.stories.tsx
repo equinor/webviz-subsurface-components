@@ -11,6 +11,7 @@ import { DiscreteColorLegend, colorTables } from "@emerson-eps/color-tables";
 const stories: Meta = {
     component: DiscreteColorLegend,
     title: "SubsurfaceViewer/Components/ColorLegends",
+    tags: ["no-dom-test"],
 };
 export default stories;
 

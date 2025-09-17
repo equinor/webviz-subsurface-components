@@ -1,0 +1,4908 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`WellLogViewer/Components/WellLogView Default smoke-test: welllogviewer-components-welllogview--default.dom.html 1`] = `
+<div style="height: 92vh;">
+  <div class="welllogview"
+       style="flex-direction: column;"
+  >
+    <div class="title">
+      <div>
+        <i>
+          Well
+        </i>
+        <b>
+          15/9-19A
+        </b>
+      </div>
+    </div>
+    <div class="view">
+      <div class="container log-controller">
+        <div class="overlay"
+             style="width: 1248px; height: 578.391px; left: 0px; top: 69px; overflow: hidden;"
+        >
+          <div class="depth"
+               style="position: absolute; pointer-events: none; visibility: visible;"
+          >
+            Zoom: x1.0
+          </div>
+          <div class="rubber-band"
+               style="position: relative; pointer-events: none; height: 9px; width: 100%; visibility: hidden;"
+          >
+            <div style="height: 1px; width: 100%; top: 4.5px; position: relative;">
+            </div>
+          </div>
+          <div class="pinned"
+               style="position: absolute; pointer-events: none; height: 9px; width: 100%; left: 0px; visibility: hidden;"
+          >
+            <div style="height: 1px; width: 100%; top: 4.5px; position: absolute;">
+            </div>
+          </div>
+        </div>
+        <div class="track"
+             style="flex: 6 1 0%; display: flex;"
+        >
+          <div class="track-title"
+               title="Multiple"
+               style="height: 18px; font-size: 12.6px;"
+          >
+            Multiple
+          </div>
+          <div class="track-legend"
+               style="height: 50px;"
+          >
+            <svg width="100%"
+                 height="100%"
+                 style="flex: 1 1 auto;"
+            >
+              <g class="svg-legend">
+                <g class="legend-row"
+                   transform="translate(0,0)"
+                   style="cursor: pointer;"
+                >
+                  <title>
+                    Toggle plot on/off
+                  </title>
+                  <rect width="410.328125"
+                        height="21"
+                        x="2"
+                        y="2"
+                        visibility="hidden"
+                  >
+                  </rect>
+                  <line x1="2"
+                        x2="412.328125"
+                        y1="12.5"
+                        y2="12.5"
+                        style="stroke-width: 2.5; stroke: red; fill: red;"
+                  >
+                  </line>
+                  <text class="legend-label"
+                        font-size="8.75px"
+                        transform="translate(207.1640625,8.75)"
+                        style="text-anchor: middle; fill: red;"
+                  >
+                    MDIA
+                  </text>
+                  <text class="legend-unit"
+                        font-size="7.4375px"
+                        transform="translate(207.1640625,19.9375)"
+                        style="text-anchor: middle; fill: red;"
+                  >
+                    KG/L
+                  </text>
+                  <rect x="0"
+                        y="5.0625"
+                        width="17.359375"
+                        height="15"
+                        style="fill: white;"
+                  >
+                  </rect>
+                  <rect x="396.96875"
+                        y="5.0625"
+                        width="17.359375"
+                        height="15"
+                        style="fill: white;"
+                  >
+                  </rect>
+                  <text class="legend-domain"
+                        font-size="9.625px"
+                        x="2"
+                        y="16.0625"
+                        style="text-anchor: start; fill: red;"
+                  >
+                    1.5
+                  </text>
+                  <text class="legend-domain"
+                        font-size="9.625px"
+                        x="412.328125"
+                        y="16.0625"
+                        style="text-anchor: end; fill: red;"
+                  >
+                    1.6
+                  </text>
+                </g>
+                <g class="legend-row"
+                   transform="translate(0,25)"
+                   style="cursor: pointer;"
+                >
+                  <title>
+                    Toggle plot on/off
+                  </title>
+                  <defs>
+                    <linearGradient id="grad37"
+                                    x1="0%"
+                                    x2="100%"
+                                    y1="0%"
+                                    y2="0%"
+                    >
+                      <stop offset="0%"
+                            style="stop-color: rgb(255, 0, 0);"
+                      >
+                      </stop>
+                      <stop offset="25%"
+                            style="stop-color: rgb(255, 255, 0);"
+                      >
+                      </stop>
+                      <stop offset="50%"
+                            style="stop-color: rgb(0, 255, 0);"
+                      >
+                      </stop>
+                      <stop offset="75%"
+                            style="stop-color: rgb(0, 255, 255);"
+                      >
+                      </stop>
+                      <stop offset="100%"
+                            style="stop-color: rgb(0, 0, 255);"
+                      >
+                      </stop>
+                    </linearGradient>
+                  </defs>
+                  <rect x="2"
+                        y="0"
+                        width="410.328125"
+                        height="12.5"
+                        fill="url(#grad37)"
+                        fill-opacity="0.5"
+                  >
+                  </rect>
+                  <line x1="2"
+                        x2="412.328125"
+                        y1="12.5"
+                        y2="12.5"
+                        style="stroke-width: 2.5; stroke: green; fill: green;"
+                  >
+                  </line>
+                  <rect class="label-bg"
+                        fill="white"
+                        x="194.734375"
+                        y="1"
+                        width="25.021484375"
+                        height="10.5"
+                  >
+                  </rect>
+                  <text class="legend-label"
+                        font-size="8.75px"
+                        transform="translate(207.1640625,8.75)"
+                        style="text-anchor: middle; fill: green;"
+                  >
+                    HKLA
+                  </text>
+                  <text class="legend-unit"
+                        font-size="7.4375px"
+                        transform="translate(207.1640625,19.9375)"
+                        style="text-anchor: middle; fill: green;"
+                  >
+                    T
+                  </text>
+                  <text class="legend-domain"
+                        font-size="7.4375px"
+                        x="2"
+                        y="19.9375"
+                        style="text-anchor: start; fill: green;"
+                  >
+                    0
+                  </text>
+                  <text class="legend-domain"
+                        font-size="7.4375px"
+                        x="412.328125"
+                        y="19.9375"
+                        style="text-anchor: end; fill: green;"
+                  >
+                    200
+                  </text>
+                </g>
+              </g>
+            </svg>
+          </div>
+          <div class="track-container">
+            <canvas width="414.328125"
+                    height="576"
+                    style="position: absolute; width: 414.328px; height: 576px;"
+            >
+            </canvas>
+          </div>
+        </div>
+        <div class="track"
+             style="flex: 3 1 0%; display: flex;"
+        >
+          <div class="track-title"
+               title="Area"
+               style="height: 18px; font-size: 12.6px;"
+          >
+            Area
+          </div>
+          <div class="track-legend"
+               style="height: 50px;"
+          >
+            <svg width="100%"
+                 height="100%"
+                 style="flex: 1 1 auto;"
+            >
+              <g class="svg-legend">
+                <g class="legend-row"
+                   transform="translate(0,25)"
+                   style="cursor: pointer;"
+                >
+                  <title>
+                    Toggle plot on/off
+                  </title>
+                  <rect x="2"
+                        y="0"
+                        width="102.5859375"
+                        height="12.5"
+                        fill="blue"
+                        fill-opacity="0.5"
+                  >
+                  </rect>
+                  <rect x="103.5859375"
+                        y="0"
+                        width="102.5859375"
+                        height="12.5"
+                        fill="#00ff00"
+                        fill-opacity="0.5"
+                  >
+                  </rect>
+                  <rect width="203.171875"
+                        height="21"
+                        x="2"
+                        y="2"
+                        visibility="hidden"
+                  >
+                  </rect>
+                  <line x1="2"
+                        x2="205.171875"
+                        y1="12.5"
+                        y2="12.5"
+                        style="stroke-width: 2.5; stroke: blue; fill: blue;"
+                  >
+                  </line>
+                  <rect class="label-bg"
+                        fill="white"
+                        x="91.15625"
+                        y="1"
+                        width="25.021484375"
+                        height="10.5"
+                  >
+                  </rect>
+                  <text class="legend-label"
+                        font-size="8.75px"
+                        transform="translate(103.5859375,8.75)"
+                        style="text-anchor: middle; fill: blue;"
+                  >
+                    HKLA
+                  </text>
+                  <text class="legend-unit"
+                        font-size="7.4375px"
+                        transform="translate(103.5859375,19.9375)"
+                        style="text-anchor: middle; fill: blue;"
+                  >
+                    T
+                  </text>
+                  <text class="legend-domain"
+                        font-size="7.4375px"
+                        x="2"
+                        y="19.9375"
+                        style="text-anchor: start; fill: blue;"
+                  >
+                    0.1
+                  </text>
+                  <text class="legend-domain"
+                        font-size="7.4375px"
+                        x="205.171875"
+                        y="19.9375"
+                        style="text-anchor: end; fill: blue;"
+                  >
+                    200
+                  </text>
+                </g>
+              </g>
+            </svg>
+          </div>
+          <div class="track-container">
+            <canvas width="207.171875"
+                    height="576"
+                    style="position: absolute; width: 207.172px; height: 576px;"
+            >
+            </canvas>
+          </div>
+        </div>
+        <div class="track"
+             style="flex: 3 1 0%; display: flex;"
+        >
+          <div class="track-title"
+               title="Differential"
+               style="height: 18px; font-size: 12.6px;"
+          >
+            Differential
+          </div>
+          <div class="track-legend"
+               style="height: 50px;"
+          >
+            <svg width="100%"
+                 height="100%"
+                 style="flex: 1 1 auto;"
+            >
+              <g class="svg-legend">
+                <g class="legend-row"
+                   transform="translate(0,0)"
+                   style="cursor: pointer;"
+                >
+                  <title>
+                    Toggle plot on/off
+                  </title>
+                  <rect x="2"
+                        y="0"
+                        width="101.5859375"
+                        height="12.5"
+                        fill="green"
+                        fill-opacity="0.5"
+                  >
+                  </rect>
+                  <rect x="103.5859375"
+                        y="0"
+                        width="101.5859375"
+                        height="12.5"
+                        fill="red"
+                        fill-opacity="0.5"
+                  >
+                  </rect>
+                  <rect width="203.171875"
+                        height="21"
+                        x="2"
+                        y="2"
+                        visibility="hidden"
+                  >
+                  </rect>
+                  <line x1="2"
+                        x2="205.171875"
+                        y1="12.5"
+                        y2="12.5"
+                        style="stroke-width: 2.5; stroke: blue; fill: blue;"
+                  >
+                  </line>
+                  <rect class="label-bg"
+                        fill="white"
+                        x="91.15625"
+                        y="1"
+                        width="25.021484375"
+                        height="10.5"
+                  >
+                  </rect>
+                  <text class="legend-label"
+                        font-size="8.75px"
+                        transform="translate(103.5859375,8.75)"
+                        style="text-anchor: middle; fill: blue;"
+                  >
+                    HKLX
+                  </text>
+                  <text class="legend-unit"
+                        font-size="7.4375px"
+                        transform="translate(103.5859375,19.9375)"
+                        style="text-anchor: middle; fill: blue;"
+                  >
+                    T
+                  </text>
+                  <text class="legend-domain"
+                        font-size="7.4375px"
+                        x="2"
+                        y="19.9375"
+                        style="text-anchor: start; fill: blue;"
+                  >
+                    0
+                  </text>
+                  <text class="legend-domain"
+                        font-size="7.4375px"
+                        x="205.171875"
+                        y="19.9375"
+                        style="text-anchor: end; fill: blue;"
+                  >
+                    200
+                  </text>
+                  <rect width="203.171875"
+                        height="21"
+                        x="2"
+                        y="2"
+                        visibility="hidden"
+                  >
+                  </rect>
+                  <line x1="2"
+                        x2="205.171875"
+                        y1="37.5"
+                        y2="37.5"
+                        style="stroke-width: 2.5; stroke: orange; fill: orange;"
+                  >
+                  </line>
+                  <text class="legend-label"
+                        font-size="8.75px"
+                        transform="translate(103.5859375,33.75)"
+                        style="text-anchor: middle; fill: orange;"
+                  >
+                    HKLA
+                  </text>
+                  <text class="legend-unit"
+                        font-size="7.4375px"
+                        transform="translate(103.5859375,44.9375)"
+                        style="text-anchor: middle; fill: orange;"
+                  >
+                    T
+                  </text>
+                  <rect x="0"
+                        y="30.0625"
+                        width="9.359375"
+                        height="15"
+                        style="fill: white;"
+                  >
+                  </rect>
+                  <rect x="187.125"
+                        y="30.0625"
+                        width="20.046875"
+                        height="15"
+                        style="fill: white;"
+                  >
+                  </rect>
+                  <text class="legend-domain"
+                        font-size="9.625px"
+                        x="2"
+                        y="41.0625"
+                        style="text-anchor: start; fill: orange;"
+                  >
+                    0
+                  </text>
+                  <text class="legend-domain"
+                        font-size="9.625px"
+                        x="205.171875"
+                        y="41.0625"
+                        style="text-anchor: end; fill: orange;"
+                  >
+                    200
+                  </text>
+                </g>
+              </g>
+            </svg>
+          </div>
+          <div class="track-container">
+            <canvas width="207.171875"
+                    height="576"
+                    style="position: absolute; width: 207.172px; height: 576px;"
+            >
+            </canvas>
+          </div>
+        </div>
+        <div class="track"
+             style="flex: 3 1 0%; display: flex;"
+        >
+          <div class="track-title"
+               title="Gradient Fill &amp; inverse"
+               style="height: 18px; font-size: 12.6px;"
+          >
+            Gradient Fill &amp; inverse
+          </div>
+          <div class="track-legend"
+               style="height: 50px;"
+          >
+            <svg width="100%"
+                 height="100%"
+                 style="flex: 1 1 auto;"
+            >
+              <g class="svg-legend">
+                <g class="legend-row"
+                   transform="translate(0,25)"
+                   style="cursor: pointer;"
+                >
+                  <title>
+                    Toggle plot on/off
+                  </title>
+                  <defs>
+                    <linearGradient id="grad38"
+                                    x1="0%"
+                                    x2="100%"
+                                    y1="0%"
+                                    y2="0%"
+                    >
+                      <stop offset="0%"
+                            style="stop-color: rgb(255, 0, 0);"
+                      >
+                      </stop>
+                      <stop offset="25%"
+                            style="stop-color: rgb(255, 255, 0);"
+                      >
+                      </stop>
+                      <stop offset="50%"
+                            style="stop-color: rgb(0, 255, 0);"
+                      >
+                      </stop>
+                      <stop offset="75%"
+                            style="stop-color: rgb(0, 255, 255);"
+                      >
+                      </stop>
+                      <stop offset="100%"
+                            style="stop-color: rgb(0, 0, 255);"
+                      >
+                      </stop>
+                    </linearGradient>
+                  </defs>
+                  <defs>
+                    <linearGradient id="grad39"
+                                    x1="0%"
+                                    x2="100%"
+                                    y1="0%"
+                                    y2="0%"
+                    >
+                      <stop offset="0%"
+                            style="stop-color: rgb(255, 0, 0);"
+                      >
+                      </stop>
+                      <stop offset="25%"
+                            style="stop-color: rgb(255, 255, 0);"
+                      >
+                      </stop>
+                      <stop offset="50%"
+                            style="stop-color: rgb(0, 255, 0);"
+                      >
+                      </stop>
+                      <stop offset="75%"
+                            style="stop-color: rgb(0, 255, 255);"
+                      >
+                      </stop>
+                      <stop offset="100%"
+                            style="stop-color: rgb(0, 0, 255);"
+                      >
+                      </stop>
+                    </linearGradient>
+                  </defs>
+                  <rect x="2"
+                        y="0"
+                        width="102.5859375"
+                        height="12.5"
+                        fill="url(#grad38)"
+                        fill-opacity="0.5"
+                  >
+                  </rect>
+                  <rect x="103.5859375"
+                        y="0"
+                        width="102.5859375"
+                        height="12.5"
+                        fill="url(#grad39)"
+                        fill-opacity="0.5"
+                  >
+                  </rect>
+                  <line x1="2"
+                        x2="205.171875"
+                        y1="12.5"
+                        y2="12.5"
+                        style="stroke-width: 2.5; stroke: blue; fill: blue;"
+                  >
+                  </line>
+                  <rect class="label-bg"
+                        fill="white"
+                        x="91.15625"
+                        y="1"
+                        width="25.021484375"
+                        height="10.5"
+                  >
+                  </rect>
+                  <text class="legend-label"
+                        font-size="8.75px"
+                        transform="translate(103.5859375,8.75)"
+                        style="text-anchor: middle; fill: blue;"
+                  >
+                    HKLA
+                  </text>
+                  <text class="legend-unit"
+                        font-size="7.4375px"
+                        transform="translate(103.5859375,19.9375)"
+                        style="text-anchor: middle; fill: blue;"
+                  >
+                    T
+                  </text>
+                  <text class="legend-domain"
+                        font-size="7.4375px"
+                        x="2"
+                        y="19.9375"
+                        style="text-anchor: start; fill: blue;"
+                  >
+                    0
+                  </text>
+                  <text class="legend-domain"
+                        font-size="7.4375px"
+                        x="205.171875"
+                        y="19.9375"
+                        style="text-anchor: end; fill: blue;"
+                  >
+                    200
+                  </text>
+                </g>
+              </g>
+            </svg>
+          </div>
+          <div class="track-container">
+            <canvas width="207.171875"
+                    height="576"
+                    style="position: absolute; width: 207.172px; height: 576px;"
+            >
+            </canvas>
+          </div>
+        </div>
+        <div class="track"
+             style="flex: 3 1 0%; display: flex;"
+        >
+          <div class="track-title"
+               title="MFOA"
+               style="height: 18px; font-size: 12.6px;"
+          >
+            MFOA
+          </div>
+          <div class="track-legend"
+               style="height: 50px;"
+          >
+            <svg width="100%"
+                 height="100%"
+                 style="flex: 1 1 auto;"
+            >
+              <g class="svg-legend">
+                <g class="legend-row"
+                   transform="translate(0,25)"
+                   style="cursor: pointer;"
+                >
+                  <title>
+                    Toggle plot on/off
+                  </title>
+                  <rect width="203.171875"
+                        height="21"
+                        x="2"
+                        y="2"
+                        visibility="hidden"
+                  >
+                  </rect>
+                  <line x1="2"
+                        x2="205.171875"
+                        y1="12.5"
+                        y2="12.5"
+                        style="stroke-width: 2.5; stroke: blue; fill: blue;"
+                  >
+                  </line>
+                  <text class="legend-label"
+                        font-size="8.75px"
+                        transform="translate(103.5859375,8.75)"
+                        style="text-anchor: middle; fill: blue;"
+                  >
+                    MFOA
+                  </text>
+                  <text class="legend-unit"
+                        font-size="7.4375px"
+                        transform="translate(103.5859375,19.9375)"
+                        style="text-anchor: middle; fill: blue;"
+                  >
+                    %
+                  </text>
+                  <rect x="0"
+                        y="5.0625"
+                        width="17.890625"
+                        height="15"
+                        style="fill: white;"
+                  >
+                  </rect>
+                  <rect x="187.125"
+                        y="5.0625"
+                        width="20.046875"
+                        height="15"
+                        style="fill: white;"
+                  >
+                  </rect>
+                  <text class="legend-domain"
+                        font-size="9.625px"
+                        x="2"
+                        y="16.0625"
+                        style="text-anchor: start; fill: blue;"
+                  >
+                    -40
+                  </text>
+                  <text class="legend-domain"
+                        font-size="9.625px"
+                        x="205.171875"
+                        y="16.0625"
+                        style="text-anchor: end; fill: blue;"
+                  >
+                    180
+                  </text>
+                </g>
+              </g>
+            </svg>
+          </div>
+          <div class="track-container">
+            <canvas width="207.171875"
+                    height="576"
+                    style="position: absolute; width: 207.172px; height: 576px;"
+            >
+            </canvas>
+          </div>
+        </div>
+        <div class="track"
+             style="flex: 3 1 0%; display: none;"
+        >
+          <div class="track-title"
+               title="TQA"
+               style="height: 18px; font-size: 12.6px;"
+          >
+            TQA
+          </div>
+          <div class="track-legend"
+               style="height: 50px;"
+          >
+            <svg width="100%"
+                 height="100%"
+                 style="flex: 1 1 auto;"
+            >
+              <g class="svg-legend">
+                <g class="legend-row"
+                   transform="translate(0,25)"
+                   style="cursor: pointer;"
+                >
+                  <title>
+                    Toggle plot on/off
+                  </title>
+                  <circle cx="4"
+                          cy="2"
+                          r="0"
+                          style="fill: red;"
+                  >
+                  </circle>
+                  <circle cx="4"
+                          cy="2"
+                          r="0"
+                          style="fill: red;"
+                  >
+                  </circle>
+                  <text class="legend-label"
+                        font-size="8.75px"
+                        transform="translate(0,8.75)"
+                        style="text-anchor: middle; fill: red;"
+                  >
+                    TQA
+                  </text>
+                  <text class="legend-unit"
+                        font-size="7.4375px"
+                        transform="translate(0,19.9375)"
+                        style="text-anchor: middle; fill: red;"
+                  >
+                    AMPS
+                  </text>
+                  <text class="legend-domain"
+                        font-size="7.4375px"
+                        x="2"
+                        y="19.9375"
+                        style="text-anchor: start; fill: red;"
+                  >
+                    0
+                  </text>
+                  <text class="legend-domain"
+                        font-size="7.4375px"
+                        x="-2"
+                        y="19.9375"
+                        style="text-anchor: end; fill: red;"
+                  >
+                    1200
+                  </text>
+                </g>
+              </g>
+            </svg>
+          </div>
+          <div class="track-container">
+            <canvas width="0"
+                    height="0"
+                    style="position: absolute; width: 0px; height: 0px;"
+            >
+            </canvas>
+          </div>
+        </div>
+        <div class="track"
+             style="flex: 3 1 0%; display: none;"
+        >
+          <div class="track-title"
+               title="MFIA"
+               style="height: 18px; font-size: 12.6px;"
+          >
+            MFIA
+          </div>
+          <div class="track-legend"
+               style="height: 50px;"
+          >
+            <svg width="100%"
+                 height="100%"
+                 style="flex: 1 1 auto;"
+            >
+              <g class="svg-legend">
+                <g class="legend-row"
+                   transform="translate(0,25)"
+                   style="cursor: pointer;"
+                >
+                  <title>
+                    Toggle plot on/off
+                  </title>
+                  <circle cx="4"
+                          cy="2"
+                          r="0"
+                          style="fill: blue;"
+                  >
+                  </circle>
+                  <circle cx="4"
+                          cy="2"
+                          r="0"
+                          style="fill: blue;"
+                  >
+                  </circle>
+                  <text class="legend-label"
+                        font-size="8.75px"
+                        transform="translate(0,8.75)"
+                        style="text-anchor: middle; fill: blue;"
+                  >
+                    MFIA
+                  </text>
+                  <text class="legend-unit"
+                        font-size="7.4375px"
+                        transform="translate(0,19.9375)"
+                        style="text-anchor: middle; fill: blue;"
+                  >
+                    L/MN
+                  </text>
+                  <text class="legend-domain"
+                        font-size="7.4375px"
+                        x="2"
+                        y="19.9375"
+                        style="text-anchor: start; fill: blue;"
+                  >
+                    800
+                  </text>
+                  <text class="legend-domain"
+                        font-size="7.4375px"
+                        x="-2"
+                        y="19.9375"
+                        style="text-anchor: end; fill: blue;"
+                  >
+                    2600
+                  </text>
+                </g>
+              </g>
+            </svg>
+          </div>
+          <div class="track-container">
+            <canvas width="0"
+                    height="0"
+                    style="position: absolute; width: 0px; height: 0px;"
+            >
+            </canvas>
+          </div>
+        </div>
+        <div class="track"
+             style="flex: 3 1 0%; display: none;"
+        >
+          <div class="track-title"
+               title="MDOA"
+               style="height: 18px; font-size: 12.6px;"
+          >
+            MDOA
+          </div>
+          <div class="track-legend"
+               style="height: 50px;"
+          >
+            <svg width="100%"
+                 height="100%"
+                 style="flex: 1 1 auto;"
+            >
+              <g class="svg-legend">
+                <g class="legend-row"
+                   transform="translate(0,25)"
+                   style="cursor: pointer;"
+                >
+                  <title>
+                    Toggle plot on/off
+                  </title>
+                  <rect x="2"
+                        y="0"
+                        width="0"
+                        height="12.5"
+                        fill="blue"
+                        fill-opacity="0.5"
+                  >
+                  </rect>
+                  <rect width="0"
+                        height="21"
+                        x="2"
+                        y="2"
+                        visibility="hidden"
+                  >
+                  </rect>
+                  <line x1="2"
+                        x2="2"
+                        y1="12.5"
+                        y2="12.5"
+                        style="stroke-width: 2.5; stroke: blue; fill: blue;"
+                  >
+                  </line>
+                  <rect class="label-bg"
+                        fill="white"
+                        x="-1"
+                        y="1"
+                        width="2"
+                        height="10.5"
+                  >
+                  </rect>
+                  <text class="legend-label"
+                        font-size="8.75px"
+                        transform="translate(0,8.75)"
+                        style="text-anchor: middle; fill: blue;"
+                  >
+                    MDOA
+                  </text>
+                  <text class="legend-unit"
+                        font-size="7.4375px"
+                        transform="translate(0,19.9375)"
+                        style="text-anchor: middle; fill: blue;"
+                  >
+                    KG/L
+                  </text>
+                  <text class="legend-domain"
+                        font-size="7.4375px"
+                        x="2"
+                        y="19.9375"
+                        style="text-anchor: start; fill: blue;"
+                  >
+                    1.42
+                  </text>
+                  <text class="legend-domain"
+                        font-size="7.4375px"
+                        x="-2"
+                        y="19.9375"
+                        style="text-anchor: end; fill: blue;"
+                  >
+                    1.6
+                  </text>
+                </g>
+              </g>
+            </svg>
+          </div>
+          <div class="track-container">
+            <canvas width="0"
+                    height="0"
+                    style="position: absolute; width: 0px; height: 0px;"
+            >
+            </canvas>
+          </div>
+        </div>
+        <div class="track"
+             style="flex: 3 1 0%; display: none;"
+        >
+          <div class="track-title"
+               title="MDIA"
+               style="height: 18px; font-size: 12.6px;"
+          >
+            MDIA
+          </div>
+          <div class="track-legend"
+               style="height: 50px;"
+          >
+            <svg width="100%"
+                 height="100%"
+                 style="flex: 1 1 auto;"
+            >
+              <g class="svg-legend">
+                <g class="legend-row"
+                   transform="translate(0,25)"
+                   style="cursor: pointer;"
+                >
+                  <title>
+                    Toggle plot on/off
+                  </title>
+                  <rect x="2"
+                        y="0"
+                        width="0"
+                        height="12.5"
+                        fill="blue"
+                        fill-opacity="0.5"
+                  >
+                  </rect>
+                  <rect width="0"
+                        height="21"
+                        x="2"
+                        y="2"
+                        visibility="hidden"
+                  >
+                  </rect>
+                  <line x1="2"
+                        x2="2"
+                        y1="12.5"
+                        y2="12.5"
+                        style="stroke-width: 2.5; stroke: blue; fill: blue;"
+                  >
+                  </line>
+                  <rect class="label-bg"
+                        fill="white"
+                        x="-1"
+                        y="1"
+                        width="2"
+                        height="10.5"
+                  >
+                  </rect>
+                  <text class="legend-label"
+                        font-size="8.75px"
+                        transform="translate(0,8.75)"
+                        style="text-anchor: middle; fill: blue;"
+                  >
+                    MDIA
+                  </text>
+                  <text class="legend-unit"
+                        font-size="7.4375px"
+                        transform="translate(0,19.9375)"
+                        style="text-anchor: middle; fill: blue;"
+                  >
+                    KG/L
+                  </text>
+                  <text class="legend-domain"
+                        font-size="7.4375px"
+                        x="2"
+                        y="19.9375"
+                        style="text-anchor: start; fill: blue;"
+                  >
+                    1.5
+                  </text>
+                  <text class="legend-domain"
+                        font-size="7.4375px"
+                        x="-2"
+                        y="19.9375"
+                        style="text-anchor: end; fill: blue;"
+                  >
+                    1.6
+                  </text>
+                </g>
+              </g>
+            </svg>
+          </div>
+          <div class="track-container">
+            <canvas width="0"
+                    height="0"
+                    style="position: absolute; width: 0px; height: 0px;"
+            >
+            </canvas>
+          </div>
+        </div>
+        <div class="track"
+             style="flex: 3 1 0%; display: none;"
+        >
+          <div class="track-title"
+               title="MTOA"
+               style="height: 18px; font-size: 12.6px;"
+          >
+            MTOA
+          </div>
+          <div class="track-legend"
+               style="height: 50px;"
+          >
+            <svg width="100%"
+                 height="100%"
+                 style="flex: 1 1 auto;"
+            >
+              <g class="svg-legend">
+                <g class="legend-row"
+                   transform="translate(0,25)"
+                   style="cursor: pointer;"
+                >
+                  <title>
+                    Toggle plot on/off
+                  </title>
+                  <rect width="0"
+                        height="21"
+                        x="2"
+                        y="2"
+                        visibility="hidden"
+                  >
+                  </rect>
+                  <line x1="2"
+                        x2="2"
+                        y1="12.5"
+                        y2="12.5"
+                        style="stroke-width: 2.5; stroke: orange; fill: orange;"
+                  >
+                  </line>
+                  <text class="legend-label"
+                        font-size="8.75px"
+                        transform="translate(0,8.75)"
+                        style="text-anchor: middle; fill: orange;"
+                  >
+                    MTOA
+                  </text>
+                  <text class="legend-unit"
+                        font-size="7.4375px"
+                        transform="translate(0,19.9375)"
+                        style="text-anchor: middle; fill: orange;"
+                  >
+                    DEGC
+                  </text>
+                  <text class="legend-domain"
+                        font-size="7.4375px"
+                        x="2"
+                        y="19.9375"
+                        style="text-anchor: start; fill: orange;"
+                  >
+                    25
+                  </text>
+                  <text class="legend-domain"
+                        font-size="7.4375px"
+                        x="-2"
+                        y="19.9375"
+                        style="text-anchor: end; fill: orange;"
+                  >
+                    80
+                  </text>
+                </g>
+              </g>
+            </svg>
+          </div>
+          <div class="track-container">
+            <canvas width="0"
+                    height="0"
+                    style="position: absolute; width: 0px; height: 0px;"
+            >
+            </canvas>
+          </div>
+        </div>
+        <div class="track"
+             style="flex: 3 1 0%; display: none;"
+        >
+          <div class="track-title"
+               title="MTIA"
+               style="height: 18px; font-size: 12.6px;"
+          >
+            MTIA
+          </div>
+          <div class="track-legend"
+               style="height: 50px;"
+          >
+            <svg width="100%"
+                 height="100%"
+                 style="flex: 1 1 auto;"
+            >
+              <g class="svg-legend">
+                <g class="legend-row"
+                   transform="translate(0,25)"
+                   style="cursor: pointer;"
+                >
+                  <title>
+                    Toggle plot on/off
+                  </title>
+                  <rect width="0"
+                        height="21"
+                        x="2"
+                        y="2"
+                        visibility="hidden"
+                  >
+                  </rect>
+                  <line x1="2"
+                        x2="2"
+                        y1="12.5"
+                        y2="12.5"
+                        style="stroke-width: 2.5; stroke: green; fill: green;"
+                  >
+                  </line>
+                  <text class="legend-label"
+                        font-size="8.75px"
+                        transform="translate(0,8.75)"
+                        style="text-anchor: middle; fill: green;"
+                  >
+                    MTIA
+                  </text>
+                  <text class="legend-unit"
+                        font-size="7.4375px"
+                        transform="translate(0,19.9375)"
+                        style="text-anchor: middle; fill: green;"
+                  >
+                    DEGC
+                  </text>
+                  <text class="legend-domain"
+                        font-size="7.4375px"
+                        x="2"
+                        y="19.9375"
+                        style="text-anchor: start; fill: green;"
+                  >
+                    30
+                  </text>
+                  <text class="legend-domain"
+                        font-size="7.4375px"
+                        x="-2"
+                        y="19.9375"
+                        style="text-anchor: end; fill: green;"
+                  >
+                    58
+                  </text>
+                </g>
+              </g>
+            </svg>
+          </div>
+          <div class="track-container">
+            <canvas width="0"
+                    height="0"
+                    style="position: absolute; width: 0px; height: 0px;"
+            >
+            </canvas>
+          </div>
+        </div>
+        <div class="track"
+             style="flex: 3 1 0%; display: none;"
+        >
+          <div class="track-title"
+               title="ECDT"
+               style="height: 18px; font-size: 12.6px;"
+          >
+            ECDT
+          </div>
+          <div class="track-legend"
+               style="height: 50px;"
+          >
+            <svg width="100%"
+                 height="100%"
+                 style="flex: 1 1 auto;"
+            >
+              <g class="svg-legend">
+                <g class="legend-row"
+                   transform="translate(0,25)"
+                   style="cursor: pointer;"
+                >
+                  <title>
+                    Toggle plot on/off
+                  </title>
+                  <rect width="0"
+                        height="21"
+                        x="2"
+                        y="2"
+                        visibility="hidden"
+                  >
+                  </rect>
+                  <line x1="2"
+                        x2="2"
+                        y1="12.5"
+                        y2="12.5"
+                        style="stroke-width: 2.5; stroke: red; fill: red;"
+                  >
+                  </line>
+                  <text class="legend-label"
+                        font-size="8.75px"
+                        transform="translate(0,8.75)"
+                        style="text-anchor: middle; fill: red;"
+                  >
+                    ECDT
+                  </text>
+                  <text class="legend-unit"
+                        font-size="7.4375px"
+                        transform="translate(0,19.9375)"
+                        style="text-anchor: middle; fill: red;"
+                  >
+                    KG/L
+                  </text>
+                  <text class="legend-domain"
+                        font-size="7.4375px"
+                        x="2"
+                        y="19.9375"
+                        style="text-anchor: start; fill: red;"
+                  >
+                    1.5
+                  </text>
+                  <text class="legend-domain"
+                        font-size="7.4375px"
+                        x="-2"
+                        y="19.9375"
+                        style="text-anchor: end; fill: red;"
+                  >
+                    1.7
+                  </text>
+                </g>
+              </g>
+            </svg>
+          </div>
+          <div class="track-container">
+            <canvas width="0"
+                    height="0"
+                    style="position: absolute; width: 0px; height: 0px;"
+            >
+            </canvas>
+          </div>
+        </div>
+        <div class="track"
+             style="flex: 3 1 0%; display: none;"
+        >
+          <div class="track-title"
+               title="BDTI"
+               style="height: 18px; font-size: 12.6px;"
+          >
+            BDTI
+          </div>
+          <div class="track-legend"
+               style="height: 50px;"
+          >
+            <svg width="100%"
+                 height="100%"
+                 style="flex: 1 1 auto;"
+            >
+              <g class="svg-legend">
+                <g class="legend-row"
+                   transform="translate(0,25)"
+                   style="cursor: pointer;"
+                >
+                  <title>
+                    Toggle plot on/off
+                  </title>
+                  <rect width="0"
+                        height="21"
+                        x="2"
+                        y="2"
+                        visibility="hidden"
+                  >
+                  </rect>
+                  <line x1="2"
+                        x2="2"
+                        y1="12.5"
+                        y2="12.5"
+                        style="stroke-width: 2.5; stroke: magenta; fill: magenta;"
+                  >
+                  </line>
+                  <text class="legend-label"
+                        font-size="8.75px"
+                        transform="translate(0,8.75)"
+                        style="text-anchor: middle; fill: magenta;"
+                  >
+                    BDTI
+                  </text>
+                  <text class="legend-unit"
+                        font-size="7.4375px"
+                        transform="translate(0,19.9375)"
+                        style="text-anchor: middle; fill: magenta;"
+                  >
+                    H
+                  </text>
+                  <text class="legend-domain"
+                        font-size="7.4375px"
+                        x="2"
+                        y="19.9375"
+                        style="text-anchor: start; fill: magenta;"
+                  >
+                    0
+                  </text>
+                  <text class="legend-domain"
+                        font-size="7.4375px"
+                        x="-2"
+                        y="19.9375"
+                        style="text-anchor: end; fill: magenta;"
+                  >
+                    45
+                  </text>
+                </g>
+              </g>
+            </svg>
+          </div>
+          <div class="track-container">
+            <canvas width="0"
+                    height="0"
+                    style="position: absolute; width: 0px; height: 0px;"
+            >
+            </canvas>
+          </div>
+        </div>
+        <div class="track"
+             style="flex: 3 1 0%; display: none;"
+        >
+          <div class="track-title"
+               title="BDDI"
+               style="height: 18px; font-size: 12.6px;"
+          >
+            BDDI
+          </div>
+          <div class="track-legend"
+               style="height: 50px;"
+          >
+            <svg width="100%"
+                 height="100%"
+                 style="flex: 1 1 auto;"
+            >
+              <g class="svg-legend">
+                <g class="legend-row"
+                   transform="translate(0,25)"
+                   style="cursor: pointer;"
+                >
+                  <title>
+                    Toggle plot on/off
+                  </title>
+                  <rect width="0"
+                        height="21"
+                        x="2"
+                        y="2"
+                        visibility="hidden"
+                  >
+                  </rect>
+                  <line x1="2"
+                        x2="2"
+                        y1="12.5"
+                        y2="12.5"
+                        style="stroke-width: 2.5; stroke: gray; fill: gray;"
+                  >
+                  </line>
+                  <text class="legend-label"
+                        font-size="8.75px"
+                        transform="translate(0,8.75)"
+                        style="text-anchor: middle; fill: gray;"
+                  >
+                    BDDI
+                  </text>
+                  <text class="legend-unit"
+                        font-size="7.4375px"
+                        transform="translate(0,19.9375)"
+                        style="text-anchor: middle; fill: gray;"
+                  >
+                    M
+                  </text>
+                  <text class="legend-domain"
+                        font-size="7.4375px"
+                        x="2"
+                        y="19.9375"
+                        style="text-anchor: start; fill: gray;"
+                  >
+                    0
+                  </text>
+                  <text class="legend-domain"
+                        font-size="7.4375px"
+                        x="-2"
+                        y="19.9375"
+                        style="text-anchor: end; fill: gray;"
+                  >
+                    600
+                  </text>
+                </g>
+              </g>
+            </svg>
+          </div>
+          <div class="track-container">
+            <canvas width="0"
+                    height="0"
+                    style="position: absolute; width: 0px; height: 0px;"
+            >
+            </canvas>
+          </div>
+        </div>
+        <div class="track"
+             style="flex: 3 1 0%; display: none;"
+        >
+          <div class="track-title"
+               title="BRVC"
+               style="height: 18px; font-size: 12.6px;"
+          >
+            BRVC
+          </div>
+          <div class="track-legend"
+               style="height: 50px;"
+          >
+            <svg width="100%"
+                 height="100%"
+                 style="flex: 1 1 auto;"
+            >
+              <g class="svg-legend">
+                <g class="legend-row"
+                   transform="translate(0,25)"
+                   style="cursor: pointer;"
+                >
+                  <title>
+                    Toggle plot on/off
+                  </title>
+                  <rect width="0"
+                        height="21"
+                        x="2"
+                        y="2"
+                        visibility="hidden"
+                  >
+                  </rect>
+                  <line x1="2"
+                        x2="2"
+                        y1="12.5"
+                        y2="12.5"
+                        style="stroke-width: 2.5; stroke: brown; fill: brown;"
+                  >
+                  </line>
+                  <text class="legend-label"
+                        font-size="8.75px"
+                        transform="translate(0,8.75)"
+                        style="text-anchor: middle; fill: brown;"
+                  >
+                    BRVC
+                  </text>
+                  <text class="legend-unit"
+                        font-size="7.4375px"
+                        transform="translate(0,19.9375)"
+                        style="text-anchor: middle; fill: brown;"
+                  >
+                    KREV
+                  </text>
+                  <text class="legend-domain"
+                        font-size="7.4375px"
+                        x="2"
+                        y="19.9375"
+                        style="text-anchor: start; fill: brown;"
+                  >
+                    0
+                  </text>
+                  <text class="legend-domain"
+                        font-size="7.4375px"
+                        x="-2"
+                        y="19.9375"
+                        style="text-anchor: end; fill: brown;"
+                  >
+                    600
+                  </text>
+                </g>
+              </g>
+            </svg>
+          </div>
+          <div class="track-container">
+            <canvas width="0"
+                    height="0"
+                    style="position: absolute; width: 0px; height: 0px;"
+            >
+            </canvas>
+          </div>
+        </div>
+        <div class="track"
+             style="flex: 3 1 0%; display: none;"
+        >
+          <div class="track-title"
+               title="TCTI"
+               style="height: 18px; font-size: 12.6px;"
+          >
+            TCTI
+          </div>
+          <div class="track-legend"
+               style="height: 50px;"
+          >
+            <svg width="100%"
+                 height="100%"
+                 style="flex: 1 1 auto;"
+            >
+              <g class="svg-legend">
+                <g class="legend-row"
+                   transform="translate(0,25)"
+                   style="cursor: pointer;"
+                >
+                  <title>
+                    Toggle plot on/off
+                  </title>
+                  <rect width="0"
+                        height="21"
+                        x="2"
+                        y="2"
+                        visibility="hidden"
+                  >
+                  </rect>
+                  <line x1="2"
+                        x2="2"
+                        y1="12.5"
+                        y2="12.5"
+                        style="stroke-width: 2.5; stroke: red; fill: red;"
+                  >
+                  </line>
+                  <text class="legend-label"
+                        font-size="8.75px"
+                        transform="translate(0,8.75)"
+                        style="text-anchor: middle; fill: red;"
+                  >
+                    TCTI
+                  </text>
+                  <text class="legend-unit"
+                        font-size="7.4375px"
+                        transform="translate(0,19.9375)"
+                        style="text-anchor: middle; fill: red;"
+                  >
+                    H
+                  </text>
+                  <text class="legend-domain"
+                        font-size="7.4375px"
+                        x="2"
+                        y="19.9375"
+                        style="text-anchor: start; fill: red;"
+                  >
+                    0
+                  </text>
+                  <text class="legend-domain"
+                        font-size="7.4375px"
+                        x="-2"
+                        y="19.9375"
+                        style="text-anchor: end; fill: red;"
+                  >
+                    60
+                  </text>
+                </g>
+              </g>
+            </svg>
+          </div>
+          <div class="track-container">
+            <canvas width="0"
+                    height="0"
+                    style="position: absolute; width: 0px; height: 0px;"
+            >
+            </canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`WellLogViewer/Components/WellLogView Discrete smoke-test: welllogviewer-components-welllogview--discrete.dom.html 1`] = `
+<div style="height: 92vh;">
+  <div class="welllogview"
+       style="flex-direction: column;"
+  >
+    <div class="title">
+      Well '15/9-19 A'
+    </div>
+    <div class="view">
+      <div class="container log-controller">
+        <div class="overlay"
+             style="width: 1248px; height: 553.391px; left: 0px; top: 94px; overflow: hidden;"
+        >
+          <div class="depth"
+               style="position: absolute; pointer-events: none; visibility: visible;"
+          >
+            Zoom: x1.0
+          </div>
+          <div class="rubber-band"
+               style="position: relative; pointer-events: none; height: 9px; width: 100%; visibility: hidden;"
+          >
+            <div style="height: 1px; width: 100%; top: 4.5px; position: relative;">
+            </div>
+          </div>
+          <div class="pinned"
+               style="position: absolute; pointer-events: none; height: 9px; width: 100%; left: 0px; visibility: hidden;"
+          >
+            <div style="height: 1px; width: 100%; top: 4.5px; position: absolute;">
+            </div>
+          </div>
+        </div>
+        <div class="track"
+             style="flex: 3 1 0%; display: flex;"
+        >
+          <div class="track-title"
+               title="discrete"
+               style="height: 18px; font-size: 12.6px;"
+          >
+            discrete
+          </div>
+          <div class="track-legend"
+               style="height: 75px;"
+          >
+            <svg width="100%"
+                 height="100%"
+                 style="flex: 1 1 auto;"
+            >
+              <g class="legend">
+                <text class="scale-title"
+                      transform="translate(124.296875,41.5)"
+                      font-size="12px"
+                      fill="#555"
+                      style="text-anchor: middle;"
+                >
+                  ZONELOG
+                </text>
+              </g>
+            </svg>
+          </div>
+          <div class="track-container">
+            <svg style="position: absolute; height: 551px; width: 248.594px;">
+              <g class="area"
+                 transform="translate(0, 96.25174110814145)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="12.28745631167763"
+                      fill="rgb(255,155,76)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="12.28745631167763"
+                      x2="186.75"
+                      y2="12.28745631167763"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="12.28745631167763"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 108.53919741981908)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="3.868273283305925"
+                      fill="rgb(255,223,161)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="3.868273283305925"
+                      x2="186.75"
+                      y2="3.868273283305925"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="3.868273283305925"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 112.407470703125)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="4.778455232319075"
+                      fill="rgb(226,44,118)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="4.778455232319075"
+                      x2="186.75"
+                      y2="4.778455232319075"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="4.778455232319075"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 117.18592593544408)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="9.101819490131575"
+                      fill="rgb(255,243,53)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="9.101819490131575"
+                      x2="186.75"
+                      y2="9.101819490131575"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="9.101819490131575"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 126.28774542557565)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="20.02400287828948"
+                      fill="rgb(255,212,179)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="20.02400287828948"
+                      x2="186.75"
+                      y2="20.02400287828948"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="20.02400287828948"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+                <g class="label"
+                   transform="translate(124.5,10.01200143914474)rotate(90)"
+                >
+                  <rect x="-6.1171875"
+                        y="-5.890625"
+                        width="12.77734375"
+                        height="11"
+                        fill="rgb(255,212,179)"
+                  >
+                  </rect>
+                  <text class="label"
+                        fill="black"
+                        stroke="black"
+                        text-anchor="middle"
+                        font-size="8px"
+                        style="dominant-baseline: middle; text-anchor: middle; text-rendering: optimizespeed; stroke-width: 0.5;"
+                  >
+                    H8
+                  </text>
+                </g>
+              </g>
+              <g class="area"
+                 transform="translate(0, 146.31174830386513)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="30.03600431743422"
+                      fill="rgb(255,155,23)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="30.03600431743422"
+                      x2="186.75"
+                      y2="30.03600431743422"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="30.03600431743422"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+                <g class="label"
+                   transform="translate(124.5,15.01800215871711)rotate(90)"
+                >
+                  <rect x="-6.1171875"
+                        y="-5.890625"
+                        width="12.77734375"
+                        height="11"
+                        fill="rgb(255,155,23)"
+                  >
+                  </rect>
+                  <text class="label"
+                        fill="black"
+                        stroke="black"
+                        text-anchor="middle"
+                        font-size="8px"
+                        style="dominant-baseline: middle; text-anchor: middle; text-rendering: optimizespeed; stroke-width: 0.5;"
+                  >
+                    H7
+                  </text>
+                </g>
+              </g>
+              <g class="area"
+                 transform="translate(0, 176.34775262129935)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="10.69463790090461"
+                      fill="rgb(255,246,117)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="10.69463790090461"
+                      x2="186.75"
+                      y2="10.69463790090461"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="10.69463790090461"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 187.04239052220396)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="2.0479093852795813"
+                      fill="rgb(255,241,0)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="2.0479093852795813"
+                      x2="186.75"
+                      y2="2.0479093852795813"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="2.0479093852795813"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 189.09029990748354)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="10.69463790090461"
+                      fill="rgb(255,211,178)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="10.69463790090461"
+                      x2="186.75"
+                      y2="10.69463790090461"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="10.69463790090461"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 199.78493780838815)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="10.01200143914474"
+                      fill="rgb(255,173,128)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="10.01200143914474"
+                      x2="186.75"
+                      y2="10.01200143914474"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="10.01200143914474"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 209.7969392475329)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="14.56291118421052"
+                      fill="rgb(248,152,0)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="14.56291118421052"
+                      x2="186.75"
+                      y2="14.56291118421052"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="14.56291118421052"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+                <g class="label"
+                   transform="translate(124.5,7.28145559210526)rotate(90)"
+                >
+                  <rect x="-6.1171875"
+                        y="-5.890625"
+                        width="12.77734375"
+                        height="11"
+                        fill="rgb(248,152,0)"
+                  >
+                  </rect>
+                  <text class="label"
+                        fill="black"
+                        stroke="black"
+                        text-anchor="middle"
+                        font-size="8px"
+                        style="dominant-baseline: middle; text-anchor: middle; text-rendering: optimizespeed; stroke-width: 0.5;"
+                  >
+                    H2
+                  </text>
+                </g>
+              </g>
+              <g class="area"
+                 transform="translate(0, 224.3598504317434)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="17.52100251850328"
+                      fill="rgb(154,89,24)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="17.52100251850328"
+                      x2="186.75"
+                      y2="17.52100251850328"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="17.52100251850328"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+                <g class="label"
+                   transform="translate(124.5,8.76050125925164)rotate(90)"
+                >
+                  <rect x="-6.1171875"
+                        y="-5.890625"
+                        width="12.77734375"
+                        height="11"
+                        fill="rgb(154,89,24)"
+                  >
+                  </rect>
+                  <text class="label"
+                        fill="white"
+                        stroke="white"
+                        text-anchor="middle"
+                        font-size="8px"
+                        style="dominant-baseline: middle; text-anchor: middle; text-rendering: optimizespeed; stroke-width: 0.5;"
+                  >
+                    H1
+                  </text>
+                </g>
+              </g>
+              <g class="area"
+                 transform="translate(0, 241.8808529502467)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="311.2822265625"
+                      fill="rgb(0,138,185)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="311.2822265625"
+                      x2="186.75"
+                      y2="311.2822265625"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="311.2822265625"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+                <g class="label"
+                   transform="translate(124.5,155.64111328125)rotate(90)"
+                >
+                  <rect x="-33.5078125"
+                        y="-12.25"
+                        width="67.0234375"
+                        height="22"
+                        fill="rgb(0,138,185)"
+                  >
+                  </rect>
+                  <text class="label"
+                        fill="white"
+                        stroke="white"
+                        text-anchor="middle"
+                        font-size="18px"
+                        style="dominant-baseline: middle; text-anchor: middle; text-rendering: optimizespeed; stroke-width: 0.5;"
+                  >
+                    BELOW
+                  </text>
+                </g>
+              </g>
+            </svg>
+          </div>
+        </div>
+        <div class="track"
+             style="flex: 3 1 0%; display: flex;"
+        >
+          <div class="track-title"
+               title="continuous"
+               style="height: 18px; font-size: 12.6px;"
+          >
+            continuous
+          </div>
+          <div class="track-legend"
+               style="height: 75px;"
+          >
+            <svg width="100%"
+                 height="100%"
+                 style="flex: 1 1 auto;"
+            >
+              <g class="svg-legend">
+                <g class="legend-row"
+                   transform="translate(0,0)"
+                   style="cursor: pointer;"
+                >
+                  <title>
+                    Toggle plot on/off
+                  </title>
+                  <rect width="244.59375"
+                        height="21"
+                        x="2"
+                        y="2"
+                        visibility="hidden"
+                  >
+                  </rect>
+                  <line x1="2"
+                        x2="246.59375"
+                        y1="12.5"
+                        y2="12.5"
+                        style="stroke-width: 2.5; stroke: blue; fill: blue;"
+                  >
+                  </line>
+                  <text class="legend-label"
+                        font-size="8.75px"
+                        transform="translate(124.296875,8.75)"
+                        style="text-anchor: middle; fill: blue;"
+                  >
+                    PORO
+                  </text>
+                  <rect x="0"
+                        y="5.0625"
+                        width="9.359375"
+                        height="15"
+                        style="fill: white;"
+                  >
+                  </rect>
+                  <rect x="225.890625"
+                        y="5.0625"
+                        width="22.703125"
+                        height="15"
+                        style="fill: white;"
+                  >
+                  </rect>
+                  <text class="legend-domain"
+                        font-size="9.625px"
+                        x="2"
+                        y="16.0625"
+                        style="text-anchor: start; fill: blue;"
+                  >
+                    0
+                  </text>
+                  <text class="legend-domain"
+                        font-size="9.625px"
+                        x="246.59375"
+                        y="16.0625"
+                        style="text-anchor: end; fill: blue;"
+                  >
+                    0.28
+                  </text>
+                </g>
+                <g class="legend-row"
+                   transform="translate(0,25)"
+                   style="cursor: pointer;"
+                >
+                  <title>
+                    Toggle plot on/off
+                  </title>
+                  <rect width="244.59375"
+                        height="21"
+                        x="2"
+                        y="2"
+                        visibility="hidden"
+                  >
+                  </rect>
+                  <line x1="2"
+                        x2="246.59375"
+                        y1="12.5"
+                        y2="12.5"
+                        style="stroke-width: 2.5; stroke: orange; fill: orange;"
+                  >
+                  </line>
+                  <text class="legend-label"
+                        font-size="8.75px"
+                        transform="translate(124.296875,8.75)"
+                        style="text-anchor: middle; fill: orange;"
+                  >
+                    NTG
+                  </text>
+                  <rect x="0"
+                        y="5.0625"
+                        width="9.359375"
+                        height="15"
+                        style="fill: white;"
+                  >
+                  </rect>
+                  <rect x="239.234375"
+                        y="5.0625"
+                        width="9.359375"
+                        height="15"
+                        style="fill: white;"
+                  >
+                  </rect>
+                  <text class="legend-domain"
+                        font-size="9.625px"
+                        x="2"
+                        y="16.0625"
+                        style="text-anchor: start; fill: orange;"
+                  >
+                    0
+                  </text>
+                  <text class="legend-domain"
+                        font-size="9.625px"
+                        x="246.59375"
+                        y="16.0625"
+                        style="text-anchor: end; fill: orange;"
+                  >
+                    1
+                  </text>
+                </g>
+                <g class="legend-row"
+                   transform="translate(0,50)"
+                   style="cursor: pointer;"
+                >
+                  <title>
+                    Toggle plot on/off
+                  </title>
+                  <rect width="244.59375"
+                        height="21"
+                        x="2"
+                        y="2"
+                        visibility="hidden"
+                  >
+                  </rect>
+                  <line x1="2"
+                        x2="246.59375"
+                        y1="12.5"
+                        y2="12.5"
+                        style="stroke-width: 2.5; stroke: green; fill: green;"
+                  >
+                  </line>
+                  <text class="legend-label"
+                        font-size="8.75px"
+                        transform="translate(124.296875,8.75)"
+                        style="text-anchor: middle; fill: green;"
+                  >
+                    SW
+                  </text>
+                  <rect x="0"
+                        y="5.0625"
+                        width="22.703125"
+                        height="15"
+                        style="fill: white;"
+                  >
+                  </rect>
+                  <rect x="239.234375"
+                        y="5.0625"
+                        width="9.359375"
+                        height="15"
+                        style="fill: white;"
+                  >
+                  </rect>
+                  <text class="legend-domain"
+                        font-size="9.625px"
+                        x="2"
+                        y="16.0625"
+                        style="text-anchor: start; fill: green;"
+                  >
+                    0.05
+                  </text>
+                  <text class="legend-domain"
+                        font-size="9.625px"
+                        x="246.59375"
+                        y="16.0625"
+                        style="text-anchor: end; fill: green;"
+                  >
+                    1
+                  </text>
+                </g>
+              </g>
+            </svg>
+          </div>
+          <div class="track-container">
+            <canvas width="248.59375"
+                    height="551"
+                    style="position: absolute; width: 248.594px; height: 551px;"
+            >
+            </canvas>
+          </div>
+        </div>
+        <div class="track"
+             style="flex: 3 1 0%; display: flex;"
+        >
+          <div class="track-title"
+               title="discrete"
+               style="height: 18px; font-size: 12.6px;"
+          >
+            discrete
+          </div>
+          <div class="track-legend"
+               style="height: 75px;"
+          >
+            <svg width="100%"
+                 height="100%"
+                 style="flex: 1 1 auto;"
+            >
+              <g class="legend">
+                <text class="scale-title"
+                      transform="translate(124.296875,41.5)"
+                      font-size="12px"
+                      fill="#555"
+                      style="text-anchor: middle;"
+                >
+                  FAULT_PROXIMITY_FLAG
+                </text>
+              </g>
+            </svg>
+          </div>
+          <div class="track-container">
+            <svg style="position: absolute; height: 551px; width: 248.594px;">
+              <g class="area"
+                 transform="translate(0, 0)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="180.21602590460526"
+                      fill="rgb(255,193,0)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <g class="label"
+                   transform="translate(124.5,90.10801295230263)rotate(90)"
+                >
+                  <rect x="-15.0078125"
+                        y="-12.25"
+                        width="30.015625"
+                        height="22"
+                        fill="rgb(255,193,0)"
+                  >
+                  </rect>
+                  <text class="label"
+                        fill="black"
+                        stroke="black"
+                        text-anchor="middle"
+                        font-size="18px"
+                        style="dominant-baseline: middle; text-anchor: middle; text-rendering: optimizespeed; stroke-width: 0.5;"
+                  >
+                    yes
+                  </text>
+                </g>
+              </g>
+              <g class="area"
+                 transform="translate(0, 180.21602590460526)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="372.9470536081414"
+                      fill="rgb(255,120,61)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <g class="label"
+                   transform="translate(124.5,186.4735268040707)rotate(90)"
+                >
+                  <rect x="-11.015625"
+                        y="-12.25"
+                        width="22.03125"
+                        height="22"
+                        fill="rgb(255,120,61)"
+                  >
+                  </rect>
+                  <text class="label"
+                        fill="black"
+                        stroke="black"
+                        text-anchor="middle"
+                        font-size="18px"
+                        style="dominant-baseline: middle; text-anchor: middle; text-rendering: optimizespeed; stroke-width: 0.5;"
+                  >
+                    no
+                  </text>
+                </g>
+              </g>
+            </svg>
+          </div>
+        </div>
+        <div class="track"
+             style="flex: 3 1 0%; display: flex;"
+        >
+          <div class="track-title"
+               title="discrete"
+               style="height: 18px; font-size: 12.6px;"
+          >
+            discrete
+          </div>
+          <div class="track-legend"
+               style="height: 75px;"
+          >
+            <svg width="100%"
+                 height="100%"
+                 style="flex: 1 1 auto;"
+            >
+              <g class="legend">
+                <text class="scale-title"
+                      transform="translate(124.296875,41.5)"
+                      font-size="12px"
+                      fill="#555"
+                      style="text-anchor: middle;"
+                >
+                  RDE_ORIG
+                </text>
+              </g>
+            </svg>
+          </div>
+          <div class="track-container">
+            <svg style="position: absolute; height: 551px; width: 248.594px;">
+              <g class="area"
+                 transform="translate(0, 96.25174110814145)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="12.28745631167763"
+                      fill="rgb(248,152,0)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="12.28745631167763"
+                      x2="186.75"
+                      y2="12.28745631167763"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="12.28745631167763"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 108.53919741981908)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="3.868273283305925"
+                      fill="rgb(0,138,185)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="3.868273283305925"
+                      x2="186.75"
+                      y2="3.868273283305925"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="3.868273283305925"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 112.407470703125)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="4.778455232319075"
+                      fill="rgb(248,152,0)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="4.778455232319075"
+                      x2="186.75"
+                      y2="4.778455232319075"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="4.778455232319075"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 117.18592593544408)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="1.8203638980263293"
+                      fill="rgb(255,211,178)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="1.8203638980263293"
+                      x2="186.75"
+                      y2="1.8203638980263293"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="1.8203638980263293"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 119.0062898334704)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="7.281455592105246"
+                      fill="rgb(248,152,0)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="7.281455592105246"
+                      x2="186.75"
+                      y2="7.281455592105246"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="7.281455592105246"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 126.28774542557565)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="20.02400287828948"
+                      fill="rgb(0,138,185)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="20.02400287828948"
+                      x2="186.75"
+                      y2="20.02400287828948"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="20.02400287828948"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 146.31174830386513)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="30.03600431743422"
+                      fill="rgb(248,152,0)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="30.03600431743422"
+                      x2="186.75"
+                      y2="30.03600431743422"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="30.03600431743422"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 176.34775262129935)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="10.69463790090461"
+                      fill="rgb(82,161,40)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="10.69463790090461"
+                      x2="186.75"
+                      y2="10.69463790090461"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="10.69463790090461"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 187.04239052220396)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="2.0479093852795813"
+                      fill="rgb(154,89,24)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="2.0479093852795813"
+                      x2="186.75"
+                      y2="2.0479093852795813"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="2.0479093852795813"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 189.09029990748354)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="10.69463790090461"
+                      fill="rgb(0,138,185)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="10.69463790090461"
+                      x2="186.75"
+                      y2="10.69463790090461"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="10.69463790090461"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 199.78493780838815)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="10.01200143914474"
+                      fill="rgb(248,152,0)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="10.01200143914474"
+                      x2="186.75"
+                      y2="10.01200143914474"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="10.01200143914474"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 209.7969392475329)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="14.56291118421052"
+                      fill="rgb(0,138,185)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="14.56291118421052"
+                      x2="186.75"
+                      y2="14.56291118421052"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="14.56291118421052"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 224.3598504317434)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="17.52100251850328"
+                      fill="rgb(248,152,0)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="17.52100251850328"
+                      x2="186.75"
+                      y2="17.52100251850328"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="17.52100251850328"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+            </svg>
+          </div>
+        </div>
+        <div class="track"
+             style="flex: 3 1 0%; display: flex;"
+        >
+          <div class="track-title"
+               title="discrete"
+               style="height: 18px; font-size: 12.6px;"
+          >
+            discrete
+          </div>
+          <div class="track-legend"
+               style="height: 75px;"
+          >
+            <svg width="100%"
+                 height="100%"
+                 style="flex: 1 1 auto;"
+            >
+              <g class="legend">
+                <text class="scale-title"
+                      transform="translate(124.296875,41.5)"
+                      font-size="12px"
+                      fill="#555"
+                      style="text-anchor: middle;"
+                >
+                  FACIES
+                </text>
+              </g>
+            </svg>
+          </div>
+          <div class="track-container">
+            <svg style="position: absolute; height: 551px; width: 248.594px;">
+              <g class="area"
+                 transform="translate(0, 96.25174110814145)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="0.4550909745065752"
+                      fill="rgb(226,44,118)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="0.4550909745065752"
+                      x2="186.75"
+                      y2="0.4550909745065752"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="0.4550909745065752"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 96.70683208264802)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="1.1377274362664593"
+                      fill="rgb(255,241,0)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="1.1377274362664593"
+                      x2="186.75"
+                      y2="1.1377274362664593"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="1.1377274362664593"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 97.84455951891448)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="10.694637900904596"
+                      fill="rgb(226,44,118)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="10.694637900904596"
+                      x2="186.75"
+                      y2="10.694637900904596"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="10.694637900904596"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 108.53919741981908)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="0.9101819490131504"
+                      fill="rgb(255,241,0)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="0.9101819490131504"
+                      x2="186.75"
+                      y2="0.9101819490131504"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="0.9101819490131504"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 109.44937936883223)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="2.9580913342927744"
+                      fill="rgb(255,155,76)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="2.9580913342927744"
+                      x2="186.75"
+                      y2="2.9580913342927744"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="2.9580913342927744"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 112.407470703125)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="4.778455232319075"
+                      fill="rgb(226,44,118)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="4.778455232319075"
+                      x2="186.75"
+                      y2="4.778455232319075"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="4.778455232319075"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 117.18592593544408)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="0.2275454872532947"
+                      fill="rgb(255,120,61)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="0.2275454872532947"
+                      x2="186.75"
+                      y2="0.2275454872532947"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="0.2275454872532947"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 117.41347142269737)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="0.9101819490131504"
+                      fill="rgb(255,241,0)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="0.9101819490131504"
+                      x2="186.75"
+                      y2="0.9101819490131504"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="0.9101819490131504"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 118.32365337171052)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="0.6826364617598841"
+                      fill="rgb(255,120,61)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="0.6826364617598841"
+                      x2="186.75"
+                      y2="0.6826364617598841"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="0.6826364617598841"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 119.0062898334704)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="2.7305458470394655"
+                      fill="rgb(255,243,53)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="2.7305458470394655"
+                      x2="186.75"
+                      y2="2.7305458470394655"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="2.7305458470394655"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 121.73683568050987)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="0.6826364617598557"
+                      fill="rgb(255,241,0)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="0.6826364617598557"
+                      x2="186.75"
+                      y2="0.6826364617598557"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="0.6826364617598557"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 122.41947214226973)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="3.868273283305925"
+                      fill="rgb(255,243,53)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="3.868273283305925"
+                      x2="186.75"
+                      y2="3.868273283305925"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="3.868273283305925"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 126.28774542557565)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="2.2754548725328902"
+                      fill="rgb(255,223,161)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="2.2754548725328902"
+                      x2="186.75"
+                      y2="2.2754548725328902"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="2.2754548725328902"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 128.56320029810854)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="0.6826364617598699"
+                      fill="rgb(255,241,0)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="0.6826364617598699"
+                      x2="186.75"
+                      y2="0.6826364617598699"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="0.6826364617598699"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 129.2458367598684)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="5.233546206825679"
+                      fill="rgb(255,223,161)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="5.233546206825679"
+                      x2="186.75"
+                      y2="5.233546206825679"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="5.233546206825679"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 134.4793829666941)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="1.5928184107730203"
+                      fill="rgb(255,241,0)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="1.5928184107730203"
+                      x2="186.75"
+                      y2="1.5928184107730203"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="1.5928184107730203"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 136.0722013774671)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="2.2754548725328902"
+                      fill="rgb(255,223,161)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="2.2754548725328902"
+                      x2="186.75"
+                      y2="2.2754548725328902"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="2.2754548725328902"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 138.34765625)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="0.4550909745065894"
+                      fill="rgb(255,241,0)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="0.4550909745065894"
+                      x2="186.75"
+                      y2="0.4550909745065894"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="0.4550909745065894"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 138.8027472245066)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="5.00600071957237"
+                      fill="rgb(255,223,161)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="5.00600071957237"
+                      x2="186.75"
+                      y2="5.00600071957237"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="5.00600071957237"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 143.80874794407896)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="1.8203638980263008"
+                      fill="rgb(255,241,0)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="1.8203638980263008"
+                      x2="186.75"
+                      y2="1.8203638980263008"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="1.8203638980263008"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 145.62911184210526)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="0.6826364617598699"
+                      fill="rgb(255,223,161)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="0.6826364617598699"
+                      x2="186.75"
+                      y2="0.6826364617598699"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="0.6826364617598699"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 146.31174830386513)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="0.2275454872532805"
+                      fill="rgb(226,44,118)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="0.2275454872532805"
+                      x2="186.75"
+                      y2="0.2275454872532805"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="0.2275454872532805"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 146.5392937911184)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="1.1377274362664593"
+                      fill="rgb(255,241,0)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="1.1377274362664593"
+                      x2="186.75"
+                      y2="1.1377274362664593"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="1.1377274362664593"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 147.67702122738487)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="5.00600071957237"
+                      fill="rgb(226,44,118)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="5.00600071957237"
+                      x2="186.75"
+                      y2="5.00600071957237"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="5.00600071957237"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 152.68302194695724)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="23.66473067434211"
+                      fill="rgb(255,243,53)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="23.66473067434211"
+                      x2="186.75"
+                      y2="23.66473067434211"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="23.66473067434211"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+                <g class="label"
+                   transform="translate(124.5,11.832365337171055)rotate(90)"
+                >
+                  <rect x="-6.3359375"
+                        y="-5.890625"
+                        width="12.88671875"
+                        height="11"
+                        fill="rgb(255,243,53)"
+                  >
+                  </rect>
+                  <text class="label"
+                        fill="black"
+                        stroke="black"
+                        text-anchor="middle"
+                        font-size="8px"
+                        style="dominant-baseline: middle; text-anchor: middle; text-rendering: optimizespeed; stroke-width: 0.5;"
+                  >
+                    TC
+                  </text>
+                </g>
+              </g>
+              <g class="area"
+                 transform="translate(0, 176.34775262129935)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="0.2275454872532805"
+                      fill="rgb(255,193,0)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="0.2275454872532805"
+                      x2="186.75"
+                      y2="0.2275454872532805"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="0.2275454872532805"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 176.57529810855263)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="1.5928184107730203"
+                      fill="rgb(255,241,0)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="1.5928184107730203"
+                      x2="186.75"
+                      y2="1.5928184107730203"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="1.5928184107730203"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 178.16811651932565)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="3.6407277960526585"
+                      fill="rgb(255,193,0)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="3.6407277960526585"
+                      x2="186.75"
+                      y2="3.6407277960526585"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="3.6407277960526585"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 181.8088443153783)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="0.6826364617598415"
+                      fill="rgb(255,241,0)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="0.6826364617598415"
+                      x2="186.75"
+                      y2="0.6826364617598415"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="0.6826364617598415"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 182.49148077713815)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="4.550909745065809"
+                      fill="rgb(255,193,0)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="4.550909745065809"
+                      x2="186.75"
+                      y2="4.550909745065809"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="4.550909745065809"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 187.04239052220396)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="2.0479093852795813"
+                      fill="rgb(255,246,117)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="2.0479093852795813"
+                      x2="186.75"
+                      y2="2.0479093852795813"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="2.0479093852795813"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 189.09029990748354)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="0.6826364617598699"
+                      fill="rgb(255,241,0)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="0.6826364617598699"
+                      x2="186.75"
+                      y2="0.6826364617598699"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="0.6826364617598699"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 189.7729363692434)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="10.01200143914474"
+                      fill="rgb(255,223,161)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="10.01200143914474"
+                      x2="186.75"
+                      y2="10.01200143914474"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="10.01200143914474"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 199.78493780838815)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="0.4550909745065894"
+                      fill="rgb(255,241,0)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="0.4550909745065894"
+                      x2="186.75"
+                      y2="0.4550909745065894"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="0.4550909745065894"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 200.24002878289474)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="3.4131823087993496"
+                      fill="rgb(226,44,118)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="3.4131823087993496"
+                      x2="186.75"
+                      y2="3.4131823087993496"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="3.4131823087993496"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 203.6532110916941)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="0.455090974506561"
+                      fill="rgb(255,241,0)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="0.455090974506561"
+                      x2="186.75"
+                      y2="0.455090974506561"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="0.455090974506561"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 204.10830206620065)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="5.68863718133224"
+                      fill="rgb(226,44,118)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="5.68863718133224"
+                      x2="186.75"
+                      y2="5.68863718133224"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="5.68863718133224"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 209.7969392475329)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="14.56291118421052"
+                      fill="rgb(255,223,161)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="14.56291118421052"
+                      x2="186.75"
+                      y2="14.56291118421052"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="14.56291118421052"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+                <g class="label"
+                   transform="translate(124.5,7.28145559210526)rotate(90)"
+                >
+                  <rect x="-7"
+                        y="-5.890625"
+                        width="14"
+                        height="11"
+                        fill="rgb(255,223,161)"
+                  >
+                  </rect>
+                  <text class="label"
+                        fill="black"
+                        stroke="black"
+                        text-anchor="middle"
+                        font-size="8px"
+                        style="dominant-baseline: middle; text-anchor: middle; text-rendering: optimizespeed; stroke-width: 0.5;"
+                  >
+                    MB
+                  </text>
+                </g>
+              </g>
+              <g class="area"
+                 transform="translate(0, 224.3598504317434)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="0.6826364617598983"
+                      fill="rgb(255,241,0)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="0.6826364617598983"
+                      x2="186.75"
+                      y2="0.6826364617598983"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="0.6826364617598983"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 225.0424868935033)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="249"
+                      height="16.838366056743382"
+                      fill="rgb(226,44,118)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="62.25"
+                      y1="0"
+                      x2="186.75"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="62.25"
+                      y1="16.838366056743382"
+                      x2="186.75"
+                      y2="16.838366056743382"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="124.5"
+                      y1="0"
+                      x2="124.5"
+                      y2="16.838366056743382"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+                <g class="label"
+                   transform="translate(124.5,8.419183028371691)rotate(90)"
+                >
+                  <rect x="-6.1171875"
+                        y="-5.890625"
+                        width="12.234375"
+                        height="11"
+                        fill="rgb(226,44,118)"
+                  >
+                  </rect>
+                  <text class="label"
+                        fill="white"
+                        stroke="white"
+                        text-anchor="middle"
+                        font-size="8px"
+                        style="dominant-baseline: middle; text-anchor: middle; text-rendering: optimizespeed; stroke-width: 0.5;"
+                  >
+                    TB
+                  </text>
+                </g>
+              </g>
+            </svg>
+          </div>
+        </div>
+        <div class="track"
+             style="flex: 3 1 0%; display: none;"
+        >
+          <div class="track-title"
+               title="discrete"
+               style="height: 18px; font-size: 12.6px;"
+          >
+            discrete
+          </div>
+          <div class="track-legend"
+               style="height: 75px;"
+          >
+            <svg width="100%"
+                 height="100%"
+                 style="flex: 1 1 auto;"
+            >
+              <g class="legend">
+                <text class="scale-title"
+                      transform="translate(0,41.5)"
+                      font-size="6px"
+                      fill="#555"
+                      style="text-anchor: middle;"
+                >
+                  ZONE_MAIN
+                </text>
+              </g>
+            </svg>
+          </div>
+          <div class="track-container">
+            <svg style="position: absolute; height: 0px; width: 0px;">
+              <g class="area"
+                 transform="translate(0, 1.8203638980263157)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="0"
+                      height="94.43137721011513"
+                      fill="rgb(255,120,61)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="0"
+                      y1="94.43137721011513"
+                      x2="0"
+                      y2="94.43137721011513"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="94.43137721011513"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 96.25174110814145)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="0"
+                      height="20.93418482730263"
+                      fill="rgb(255,193,0)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="0"
+                      y1="20.93418482730263"
+                      x2="0"
+                      y2="20.93418482730263"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="20.93418482730263"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 117.18592593544408)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="0"
+                      height="69.85646458675988"
+                      fill="rgb(255,155,76)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="0"
+                      y1="69.85646458675988"
+                      x2="0"
+                      y2="69.85646458675988"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="69.85646458675988"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 187.04239052220396)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="0"
+                      height="54.83846242804273"
+                      fill="rgb(255,223,161)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="0"
+                      y1="54.83846242804273"
+                      x2="0"
+                      y2="54.83846242804273"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="54.83846242804273"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+              <g class="area"
+                 transform="translate(0, 241.8808529502467)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="0"
+                      height="246.8868536698191"
+                      fill="rgb(226,44,118)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="0"
+                      y1="246.8868536698191"
+                      x2="0"
+                      y2="246.8868536698191"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="246.8868536698191"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+            </svg>
+          </div>
+        </div>
+        <div class="track"
+             style="flex: 3 1 0%; display: none;"
+        >
+          <div class="track-title"
+               title="discrete"
+               style="height: 18px; font-size: 12.6px;"
+          >
+            discrete
+          </div>
+          <div class="track-legend"
+               style="height: 75px;"
+          >
+            <svg width="100%"
+                 height="100%"
+                 style="flex: 1 1 auto;"
+            >
+              <g class="legend">
+                <text class="scale-title"
+                      transform="translate(0,41.5)"
+                      font-size="6px"
+                      fill="#555"
+                      style="text-anchor: middle;"
+                >
+                  FaultDistance_HUM
+                </text>
+              </g>
+            </svg>
+          </div>
+          <div class="track-container">
+            <svg style="position: absolute; height: 0px; width: 0px;">
+              <g class="area"
+                 transform="translate(0, 0)"
+              >
+                <rect x="0"
+                      y="0"
+                      width="0"
+                      height="553.1630795127467"
+                      fill="rgb(255,120,61)"
+                      fill-opacity="1"
+                >
+                </rect>
+                <line x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="0"
+                      class="line-top"
+                      stroke="black"
+                >
+                </line>
+                <line x1="0"
+                      y1="553.1630795127467"
+                      x2="0"
+                      y2="553.1630795127467"
+                      class="line-bottom"
+                      stroke="black"
+                >
+                </line>
+                <line x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="553.1630795127467"
+                      class="line-middle"
+                      stroke="black"
+                >
+                </line>
+              </g>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

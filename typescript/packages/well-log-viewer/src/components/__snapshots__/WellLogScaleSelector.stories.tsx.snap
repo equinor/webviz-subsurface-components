@@ -1,0 +1,246 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`WellLogViewer/Components/WellLogScaleSelector Default play-test: welllogviewer-components-welllogscaleselector--default.dom.html 1`] = `
+<div style="padding: 20px; font-family: Arial, sans-serif;">
+  <div style="margin-bottom: 10px;">
+    <div class="scale">
+      <span class="scale-label">
+        Zoom Level:
+      </span>
+      <span class="scale-value">
+        <select>
+          <option value="1">
+            1:1
+          </option>
+          <option value="100">
+            1:100
+          </option>
+          <option value="200">
+            1:200
+          </option>
+          <option value="500">
+            1:500
+          </option>
+          <option value="1000">
+            1:1000
+          </option>
+          <option value="2000">
+            1:2000
+          </option>
+          <option value="5000">
+            1:5000
+          </option>
+          <option value="10000">
+            1:10000
+          </option>
+          <option value="20000">
+            1:20000
+          </option>
+          <option value="50000">
+            1:50000
+          </option>
+        </select>
+      </span>
+    </div>
+  </div>
+  <div style="padding: 10px; background-color: rgb(245, 245, 245); border-radius: 4px; font-size: 14px; color: rgb(102, 102, 102);">
+    Current scale: 1
+  </div>
+  <div style="margin-top: 20px;">
+    <button style="padding: 8px 16px; background-color: rgb(0, 122, 204); color: white; border: none; border-radius: 4px; cursor: pointer;">
+      Simulate External Scale Change
+    </button>
+  </div>
+</div>
+`;
+
+exports[`WellLogViewer/Components/WellLogScaleSelector WithCustomValues play-test: welllogviewer-components-welllogscaleselector--with-custom-values.dom.html 1`] = `
+<div style="padding: 20px; font-family: Arial, sans-serif;">
+  <div style="margin-bottom: 10px;">
+    <div class="scale">
+      <span class="scale-label">
+        Scale:
+      </span>
+      <span class="scale-value">
+        <select>
+          <option value="0.5">
+            1:0.5
+          </option>
+          <option value="1">
+            1:1
+          </option>
+          <option value="2">
+            1:2
+          </option>
+          <option value="4">
+            1:4
+          </option>
+          <option value="8">
+            1:8
+          </option>
+          <option value="16">
+            1:16
+          </option>
+          <option value="32">
+            1:32
+          </option>
+        </select>
+      </span>
+    </div>
+  </div>
+  <div style="padding: 10px; background-color: rgb(245, 245, 245); border-radius: 4px; font-size: 14px; color: rgb(102, 102, 102);">
+    Current scale: 1
+  </div>
+  <div style="margin-top: 20px;">
+    <button style="padding: 8px 16px; background-color: rgb(0, 122, 204); color: white; border: none; border-radius: 4px; cursor: pointer;">
+      Simulate External Scale Change
+    </button>
+  </div>
+</div>
+`;
+
+exports[`WellLogViewer/Components/WellLogScaleSelector WithJSXLabel play-test: welllogviewer-components-welllogscaleselector--with-jsx-label.dom.html 1`] = `
+<div style="padding: 20px; font-family: Arial, sans-serif;">
+  <div style="margin-bottom: 10px;">
+    <div class="scale">
+      <span class="scale-label">
+        <strong style="color: rgb(0, 122, 204);">
+          Custom Scale:
+        </strong>
+      </span>
+      <span class="scale-value">
+        <select>
+          <option value="1">
+            1:1
+          </option>
+          <option value="100">
+            1:100
+          </option>
+          <option value="200">
+            1:200
+          </option>
+          <option value="500">
+            1:500
+          </option>
+          <option value="1000">
+            1:1000
+          </option>
+          <option value="2000">
+            1:2000
+          </option>
+          <option value="5000">
+            1:5000
+          </option>
+          <option value="10000">
+            1:10000
+          </option>
+          <option value="20000">
+            1:20000
+          </option>
+          <option value="50000">
+            1:50000
+          </option>
+        </select>
+      </span>
+    </div>
+  </div>
+  <div style="padding: 10px; background-color: rgb(245, 245, 245); border-radius: 4px; font-size: 14px; color: rgb(102, 102, 102);">
+    Current scale: 1
+  </div>
+  <div style="margin-top: 20px;">
+    <button style="padding: 8px 16px; background-color: rgb(0, 122, 204); color: white; border: none; border-radius: 4px; cursor: pointer;">
+      Simulate External Scale Change
+    </button>
+  </div>
+</div>
+`;
+
+exports[`WellLogViewer/Components/WellLogScaleSelector WithRoundingStep play-test: welllogviewer-components-welllogscaleselector--with-rounding-step.dom.html 1`] = `
+<div style="padding: 20px; font-family: Arial, sans-serif;">
+  <div style="margin-bottom: 10px;">
+    <div class="scale">
+      <span class="scale-label">
+        Scale:
+      </span>
+      <span class="scale-value">
+        <select>
+          <option value="100">
+            1:100
+          </option>
+          <option value="0.01">
+            1:0.01
+          </option>
+          <option value="0.11">
+            1:0.11
+          </option>
+          <option value="0.12">
+            1:0.12
+          </option>
+          <option value="100.01">
+            1:100.01
+          </option>
+        </select>
+      </span>
+    </div>
+  </div>
+  <div style="padding: 10px; background-color: rgb(245, 245, 245); border-radius: 4px; font-size: 14px; color: rgb(102, 102, 102);">
+    Current scale: 100.01
+  </div>
+  <div style="margin-top: 20px;">
+    <button style="padding: 8px 16px; background-color: rgb(0, 122, 204); color: white; border: none; border-radius: 4px; cursor: pointer;">
+      Simulate External Scale Change
+    </button>
+  </div>
+</div>
+`;
+
+exports[`WellLogViewer/Components/WellLogScaleSelector WithoutLabel play-test: welllogviewer-components-welllogscaleselector--without-label.dom.html 1`] = `
+<div style="padding: 20px; font-family: Arial, sans-serif;">
+  <div style="margin-bottom: 10px;">
+    <div class="scale">
+      <span class="scale-value">
+        <select>
+          <option value="1">
+            1:1
+          </option>
+          <option value="100">
+            1:100
+          </option>
+          <option value="200">
+            1:200
+          </option>
+          <option value="500">
+            1:500
+          </option>
+          <option value="1000">
+            1:1000
+          </option>
+          <option value="2000">
+            1:2000
+          </option>
+          <option value="5000">
+            1:5000
+          </option>
+          <option value="10000">
+            1:10000
+          </option>
+          <option value="20000">
+            1:20000
+          </option>
+          <option value="50000">
+            1:50000
+          </option>
+        </select>
+      </span>
+    </div>
+  </div>
+  <div style="padding: 10px; background-color: rgb(245, 245, 245); border-radius: 4px; font-size: 14px; color: rgb(102, 102, 102);">
+    Current scale: 1
+  </div>
+  <div style="margin-top: 20px;">
+    <button style="padding: 8px 16px; background-color: rgb(0, 122, 204); color: white; border: none; border-radius: 4px; cursor: pointer;">
+      Simulate External Scale Change
+    </button>
+  </div>
+</div>
+`;

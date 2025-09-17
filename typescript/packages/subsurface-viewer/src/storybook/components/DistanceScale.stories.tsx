@@ -5,6 +5,7 @@ import { DistanceScale } from "../../components/DistanceScale";
 const stories: Meta = {
     component: DistanceScale,
     title: "SubsurfaceViewer / Components / DistanceScale",
+    tags: ["no-screenshot-test"],
 };
 export default stories;
 

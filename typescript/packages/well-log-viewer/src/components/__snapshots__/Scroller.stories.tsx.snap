@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`WellLogViewer/Components/Scroller Default smoke-test: welllogviewer-components-scroller--default.dom.html 1`] = `
+<div style="height: 92vh;">
+  <div style="overflow: scroll; width: 100%; height: 100%;">
+    <div style="width: 12480px; height: 6620px;">
+      <div style="position: absolute; width: 1248px; height: 662px;">
+        <div>
+          Scroll position X=0.20, Y=0.20
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

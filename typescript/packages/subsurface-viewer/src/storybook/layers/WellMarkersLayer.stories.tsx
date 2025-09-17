@@ -10,6 +10,7 @@ import { defaultStoryParameters } from "../sharedSettings";
 const stories: Meta = {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer/Well Markers Layer",
+    tags: ["no-dom-test"],
     args: {
         // Add some common controls for all the stories.
         triggerHome: 0,

@@ -38,6 +38,41 @@ const screenshotTest = async (page, context) => {
     });
 };
 
+const domSnapshotTest = async (page, context) => {
+    try {
+        // Try to wait for network idle, but with a shorter timeout
+        await page.waitForLoadState('networkidle', { timeout: 10000 });
+    } catch (error) {
+        // If networkidle times out, wait for domcontentloaded instead
+        await page.waitForLoadState('domcontentloaded');
+        // Add a small delay to allow for initial rendering
+        await page.waitForTimeout(2000);
+    }
+    
+    // Wait for the story to be rendered - check for element existence, not visibility
+    try {
+        await page.waitForSelector('#storybook-root', { 
+            timeout: 10000,
+            state: 'attached' // Wait for element to exist in DOM, not necessarily visible
+        });
+    } catch (error) {
+        // Fallback: wait for any story content to be present
+        await page.waitForFunction(() => {
+            const storyElement = document.querySelector('#storybook-root');
+            return storyElement && storyElement.innerHTML.trim().length > 0;
+        }, { timeout: 15000 });
+    }
+    
+    // Get the DOM content of the story container
+    const domContent = await page.evaluate(() => {
+        const storyElement = document.querySelector('#storybook-root');
+        return storyElement ? storyElement.innerHTML : '';
+    });
+
+    // Create a snapshot of the DOM
+    expect(domContent).toMatchSnapshot(`${context.id}.dom.html`);
+};
+
 const config: TestRunnerConfig = {
     setup() {
         jest.retryTimes(2);
@@ -54,6 +89,11 @@ const config: TestRunnerConfig = {
 
         if (!storyContext.tags.includes("no-screenshot-test")) {
             await screenshotTest(page, context);
+        }
+
+        // Run DOM snapshot test unless no-dom-test is specified
+        if (!storyContext.tags.includes("no-dom-test")) {
+            await domSnapshotTest(page, context);
         }
     },
 };
