@@ -27,6 +27,8 @@
     "docker:storybook:test": "cross-env-shell PWD=$PWD npm run docker:storybook:test:docker:core -- -it --rm --mount type=bind,source=${PWD}/packages,target=/test/packages --network=host wsc_story_test",
     "docker:storybook:test:update": "npm run docker:storybook:test -- npm run storybook:test -- --url http://host.docker.internal:6006/ --no-index-json --updateSnapshot",
     "docker:storybook:test:docker:core": "docker run",
+    "compose:storybook:test": "docker-compose run --build test-storybook",
+    "compose:storybook:test:update": "docker-compose run --build test-storybook --updateSnapshot",
     "cy:run": "npx cypress run -b chrome --component --headed",
     "postpack": "npm run tidy-up",
     "git:hooks:enable": "cd .. && husky install",
