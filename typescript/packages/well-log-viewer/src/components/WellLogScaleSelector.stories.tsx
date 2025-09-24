@@ -45,7 +45,6 @@ class MockCallbackManager {
 const stories: Meta = {
     component: WellLogScaleSelector,
     title: "WellLogViewer/Components/WellLogScaleSelector",
-    tags: ["no-screenshot-test"],
     parameters: {
         docs: {
             description: {
