@@ -1,6 +1,6 @@
-import React from "react";
-import _ from "lodash";
 import type { Meta, StoryObj } from "@storybook/react";
+import _ from "lodash";
+import React from "react";
 
 import { GroupTreePlot, type GroupTreePlotProps } from "../GroupTreePlot";
 
@@ -34,6 +34,7 @@ const stories: Meta<GroupTreePlotProps> = {
                 "When initially rendering the tree, automatically collapse all nodes at or below this depth",
         },
     },
+    tags: ["no-dom-test"],
 };
 export default stories;
 

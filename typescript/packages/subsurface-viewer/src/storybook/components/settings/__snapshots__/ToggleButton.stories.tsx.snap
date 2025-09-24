@@ -1,16 +1,16 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`SubsurfaceViewer/Components/Settings ToggleButtonStory smoke-test 2`] = `
+exports[`SubsurfaceViewer/Components/Settings ToggleButtonStory smoke-test 1`] = `
 <div style="display: flex; justify-content: space-between;">
   <label id="test-switch-label"
-         class="Label__LabelBase-sc-1gi2bcn-0 fdTexl"
+         class="Label__LabelBase-sc-1gi2bcn-0 jGGvso"
          style="padding-top: 15px; font-size: 15px;"
   >
-    <span class="Label__Text-sc-1gi2bcn-1 hkGcWj">
+    <span class="Label__Text-sc-1gi2bcn-1 bjgoJD">
       test
     </span>
   </label>
-  <span class="Switchstyles__GridWrapper-sc-x39lde-2 gUdGex"
+  <span class="Switchstyles__GridWrapper-sc-x39lde-2 gdDWLt"
         style="padding-right: 10px; width: 3rem;"
   >
     <input id="test-switch"

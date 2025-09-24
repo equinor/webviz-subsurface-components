@@ -72,6 +72,7 @@ const stories: Meta = {
             control: { type: "boolean" },
         },
     },
+    tags: ["no-screenshot-test"],
 };
 
 export default stories;

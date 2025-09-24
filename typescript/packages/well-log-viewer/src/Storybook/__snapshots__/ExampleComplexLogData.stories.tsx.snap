@@ -672,15 +672,15 @@ exports[`WellLogViewer/Demo/ExampleData TwoLogs smoke-test 2`] = `
                 Zoom:
               </span>
               <span class="zoom-value">
-                <span class="MuiSlider-root MuiSlider-colorPrimary MuiSlider-sizeMedium css-188mx6n-MuiSlider-root">
-                  <span class="MuiSlider-rail css-7o8aqz-MuiSlider-rail">
+                <span class="MuiSlider-root MuiSlider-colorPrimary MuiSlider-sizeMedium css-1228x3t">
+                  <span class="MuiSlider-rail css-3ndvyc">
                   </span>
-                  <span class="MuiSlider-track css-ttgsjq-MuiSlider-track"
+                  <span class="MuiSlider-track css-10opxo5"
                         style="left: 0%; width: 0%;"
                   >
                   </span>
                   <span data-index="0"
-                        class="MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary css-1as9v07-MuiSlider-thumb"
+                        class="MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary css-1qyrwba"
                         style="left: 0%;"
                   >
                     <input data-index="0"
@@ -697,7 +697,7 @@ exports[`WellLogViewer/Demo/ExampleData TwoLogs smoke-test 2`] = `
                            value="0"
                            style="border: 0px; clip: rect(0px, 0px, 0px, 0px); height: 100%; margin: -1px; overflow: hidden; padding: 0px; position: absolute; white-space: nowrap; width: 100%; direction: ltr;"
                     >
-                    <span class="MuiSlider-valueLabel css-14gyywz-MuiSlider-valueLabel"
+                    <span class="MuiSlider-valueLabel css-1ym2qpd"
                           aria-hidden="true"
                     >
                       <span class="MuiSlider-valueLabelCircle">

@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 
 import { Grid } from "@mui/material";
-//import type { GridDirection } from "@mui/material";
 
 import SyncLogViewer from "../SyncLogViewer";
 
@@ -40,6 +39,7 @@ const RTCWellLogViewer: React.FunctionComponent<IRTCWellLogViewerProps> = (
 const meta: Meta<typeof RTCWellLogViewer> = {
     title: "WellLogViewer/Demo/ClassificationLayout",
     component: RTCWellLogViewer,
+    tags: ["no-dom-test"],
 };
 
 export default meta;

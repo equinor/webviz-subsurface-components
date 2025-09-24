@@ -2,9 +2,7 @@ services:
   storybook:
     build:
       context: ..
-      dockerfile: typescript/Dockerfile.storybook
-      #cache_from:
-        #- node:18-alpine
+      dockerfile: typescript/config/docker/storybook/Dockerfile
     ports:
       - "6006:6006"
     healthcheck:
@@ -13,11 +11,12 @@ services:
   test-storybook:
     build:
       context: .
-      dockerfile: Dockerfile.test
+      dockerfile: config/docker/test_runner/Dockerfile
     depends_on:
       storybook:
         condition: service_healthy
     volumes:
-      - ./.storybook:/test/.storybook:ro
-      - ./packages:/test/packages
-    command: ["npm", "run", "storybook:test", "--", "--url", "http://storybook:6006/"]
+      - ./.storybook:/home/pwuser/test/.storybook:ro
+      - ./packages:/home/pwuser/test/packages
+    environment:
+      TARGET_URL: "http://storybook:6006/"

@@ -1,12 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`SubsurfaceViewer/Components/Settings NumericInputStory smoke-test 2`] = `
+exports[`SubsurfaceViewer/Components/Settings NumericInputStory smoke-test 1`] = `
 <div style="display: flex; justify-content: space-between;">
   <label id="test-input-label"
-         class="Label__LabelBase-sc-1gi2bcn-0 fdTexl"
+         class="Label__LabelBase-sc-1gi2bcn-0 jGGvso"
          style="padding-top: 5px; padding-bottom: 5px; font-size: 15px;"
   >
-    <span class="Label__Text-sc-1gi2bcn-1 hkGcWj">
+    <span class="Label__Text-sc-1gi2bcn-1 bjgoJD">
       test
     </span>
   </label>
