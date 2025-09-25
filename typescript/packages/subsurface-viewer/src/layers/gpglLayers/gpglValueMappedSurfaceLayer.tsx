@@ -32,6 +32,7 @@ import {
 } from "../utils/colormapTools";
 
 import type {} from "../../utils/Color";
+import { utilities } from "../shader_modules";
 
 import type {
     Color,
@@ -150,7 +151,6 @@ const defaultMaterial: Material = {
 };
 
 const defaultColormapSetup: ColormapSetup = {
-    valueRange: [0, 1],
     clampRange: undefined,
     clampColor: [0, 255, 0, 200], // green color for clamped values
     undefinedValue: Number.NaN,
@@ -167,7 +167,6 @@ const defaultProps: DefaultProps<GpglValueMappedSurfaceLayerProps> = {
     colormap: {
         colormapName: "seismic",
     },
-    colormapSetup: defaultColormapSetup,
     color: [100, 100, 255],
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
     material: true, // default material
@@ -292,6 +291,10 @@ export class GpglValueMappedSurfaceLayer extends Layer<GpglValueMappedSurfaceLay
             return undefined;
         }
 
+        const min = Math.min(...propertiesData);
+        const max = Math.max(...propertiesData);
+        this.setState({ ...this.state, valueRange: [min, max] });
+
         const smooth =
             this.props.colormapSetup?.smooth ?? defaultColormapSetup.smooth;
         const textureProps: TextureProps = {
@@ -387,6 +390,7 @@ export class GpglValueMappedSurfaceLayer extends Layer<GpglValueMappedSurfaceLay
                             phongMaterial,
                             uniforms,
                             precisionForTests,
+                            utilities,
                         ],
                     }),
                     bufferLayout:
@@ -551,20 +555,23 @@ export class GpglValueMappedSurfaceLayer extends Layer<GpglValueMappedSurfaceLay
                 (defaultColormapSetup.clampColor as Color)
         );
 
+        const colormapRange =
+            this.props.colormapSetup?.valueRange ??
+            (this.state["valueRange"] as [number, number]) ??
+            defaultColormapSetup.valueRange;
+
+        const clampRange =
+            this.props.colormapSetup?.clampRange ??
+            (this.state["valueRange"] as [number, number]) ??
+            defaultColormapSetup.valueRange;
+
         // render all the triangle surfaces
         triangleModels?.forEach((model) => {
             model.shaderInputs.setProps({
                 ...args.uniforms,
                 triangles: {
-                    colormapRange:
-                        this.props.colormapSetup?.valueRange ??
-                        defaultColormapSetup.valueRange,
-                    clampRange:
-                        this.props.colormapSetup?.clampRange === null
-                            ? null
-                            : (this.props.colormapSetup?.clampRange ??
-                              this.props.colormapSetup?.valueRange ??
-                              defaultColormapSetup.valueRange),
+                    colormapRange,
+                    clampRange,
                     useClampColors:
                         this.props.colormapSetup?.clampColor !== null &&
                         this.props.colormapSetup?.clampRange !== null,
@@ -623,16 +630,22 @@ export class GpglValueMappedSurfaceLayer extends Layer<GpglValueMappedSurfaceLay
         if (!info.color) {
             return info;
         }
-
         const layer_properties: PropertyDataType[] = [];
-        const zScale = this.props.modelMatrix ? this.props.modelMatrix[10] : 1;
-        if (typeof info.coordinate?.[2] !== "undefined") {
-            const depth =
-                (this.props.ZIncreasingDownwards
-                    ? -info.coordinate[2]
-                    : info.coordinate[2]) / Math.max(0.001, zScale);
-            layer_properties.push(createPropertyData("Depth", depth));
-        }
+
+        // Note these colors are in the  0-255 range.
+        const r = info.color[0];
+        const g = info.color[1];
+        const b = info.color[2];
+
+        const n = 256 * 256 * r + 256 * g + b;
+        const valueRange =
+            this.props.colormapSetup?.valueRange ??
+            (this.state["valueRange"] as [number, number]) ??
+            defaultColormapSetup.valueRange;
+        const normalizedValue = n / (255 * 255 * 255 - 1);
+        const value =
+            valueRange[0] + normalizedValue * (valueRange[1] - valueRange[0]);
+        layer_properties.push(createPropertyData("Value", value));
 
         return {
             ...info,
