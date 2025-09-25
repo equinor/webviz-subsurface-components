@@ -1255,7 +1255,13 @@ function getMd(
         trajectory = trajectory3D;
     }
 
-    return interpolateDataOnTrajectory(coord, measured_depths, trajectory);
+    const interpolatedMd = interpolateDataOnTrajectory(
+        coord,
+        measured_depths,
+        trajectory
+    );
+
+    return Math.min(interpolatedMd, measured_depths.at(-1)!);
 }
 
 function getMdProperty(
@@ -1302,7 +1308,10 @@ function getTvd(
         return v[2];
     }) as number[];
 
-    return interpolateDataOnTrajectory(coord, tvds, trajectory);
+    const interpolatedMd = interpolateDataOnTrajectory(coord, tvds, trajectory);
+
+    // TVD goes downards, so it's reversed
+    return Math.max(interpolatedMd, tvds.at(-1)!);
 }
 
 function getTvdProperty(
