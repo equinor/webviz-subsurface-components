@@ -1190,6 +1190,19 @@ function distToSegmentSquared(v: Position, w: Position, p: Position): number {
     ]);
 }
 
+function isPointAwayFromLineEnd(
+    point: Position,
+    line: [lineStart: Position, lineEnd: Position]
+): boolean {
+    const ab = subtract(line[1] as number[], line[0] as number[]);
+    const cb = subtract(line[1] as number[], point as number[]);
+
+    const dotProduct = dot(ab as number[], cb as number[]);
+
+    // If the dot product is negative, the point has moved past the end of the line
+    return dotProduct < 0;
+}
+
 // Interpolates point closest to the coords on trajectory
 function interpolateDataOnTrajectory(
     coord: Position,
@@ -1213,6 +1226,14 @@ function interpolateDataOnTrajectory(
     // Get the nearest survey points.
     const survey0 = trajectory[index0];
     const survey1 = trajectory[index1];
+
+    // To avoid interpolating longer than the actual wellbore path we ignore the coordinate if it's moved beyond the last line
+    if (
+        index1 === trajectory.length - 1 &&
+        isPointAwayFromLineEnd(coord, [survey0, survey1])
+    ) {
+        coord = survey1;
+    }
 
     const dv = distance(survey0, survey1) as number;
     if (dv === 0) {
@@ -1302,6 +1323,7 @@ function getTvd(
         return v[2];
     }) as number[];
 
+    // TVD goes downwards, so it's reversed
     return interpolateDataOnTrajectory(coord, tvds, trajectory);
 }
 

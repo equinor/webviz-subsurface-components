@@ -13,7 +13,10 @@ export type WellFeature = Feature<GeometryCollection, GeoJsonWellProperties>;
 export type WellFeatureCollection = FeatureCollection<
     GeometryCollection,
     GeoJsonWellProperties
->;
+> & {
+    // ? This is used in the example volve-well feature-collection, but is not part of the standard. Should we include it?
+    unit?: string;
+};
 
 export interface WellsPickInfo extends LayerPickInfo<WellFeature> {
     featureType?: string;
