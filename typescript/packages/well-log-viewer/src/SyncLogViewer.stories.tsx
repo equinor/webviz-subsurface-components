@@ -10,32 +10,32 @@ import {
     patternImages,
     patternNamesEnglish,
 } from "./Storybook/helpers/patternImages";
-import SyncLogViewer, { argTypesSyncLogViewerProp } from "./SyncLogViewer";
 import type { SyncLogViewerProps } from "./SyncLogViewer";
+import SyncLogViewer, { argTypesSyncLogViewerProp } from "./SyncLogViewer";
 
 import type { ColormapFunction } from "./utils/color-function";
 import type { Pattern } from "./utils/pattern";
 
 import type {
-    WellLogController,
     TrackMouseEvent,
+    WellLogController,
     WellPickProps,
 } from "./components/WellLogView";
 
-import { axisMnemos, axisTitles } from "./utils/axes";
-import type WellLogView from "./components/WellLogView";
 import type { Template as TemplateType } from "./components/WellLogTemplateTypes";
 import type { WellLogSet } from "./components/WellLogTypes";
+import type WellLogView from "./components/WellLogView";
+import { axisMnemos, axisTitles } from "./utils/axes";
 
 // Example data and templates
-import horizonPatternsJson from "../../../../example-data/horizon_patterns.json";
-import wellpicksJson from "../../../../example-data/wellpicks.json";
-import wellpickColorTablesJson from "../../../../example-data/wellpick_colors.json";
-import syncTemplateJson from "../../../../example-data/synclog_template.json";
 import L898MUDJson from "../../../../example-data/L898MUD.json";
 import L916MUDJson from "../../../../example-data/L916MUD.json";
 import List1Json from "../../../../example-data/Lis1.json";
 import facies3WellsJson from "../../../../example-data/facies3wells.json";
+import horizonPatternsJson from "../../../../example-data/horizon_patterns.json";
+import syncTemplateJson from "../../../../example-data/synclog_template.json";
+import wellpickColorTablesJson from "../../../../example-data/wellpick_colors.json";
+import wellpicksJson from "../../../../example-data/wellpicks.json";
 
 const exampleColormapFunctions = colorTables as ColormapFunction[];
 const wellpickColormapFunctions = wellpickColorTablesJson as ColormapFunction[];
@@ -71,7 +71,7 @@ const stories: Meta = {
     component: SyncLogViewer,
     title: "WellLogViewer/Demo/SyncLogViewer",
     argTypes: argTypesSyncLogViewerProp,
-    tags: ["no-screenshot-test"],
+    tags: ["no-dom-test"],
     parameters: {
         docs: {
             description: {

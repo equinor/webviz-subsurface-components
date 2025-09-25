@@ -14,6 +14,7 @@ import { volveWellsBounds } from "../sharedSettings";
 const stories: Meta = {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer / Box Selection Layer",
+    tags: ["no-dom-test"],
     args: {
         // Add some common controls for all the stories.
         triggerHome: 0,

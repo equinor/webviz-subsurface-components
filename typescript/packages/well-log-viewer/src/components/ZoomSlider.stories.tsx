@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 
-import ZoomSlider from "./ZoomSlider";
 import type { ZoomSliderProps } from "./ZoomSlider";
+import ZoomSlider from "./ZoomSlider";
 
 const ComponentCode = "<ZoomSlider value={1} max={128}/>";
 
@@ -35,6 +35,7 @@ const stories: Meta = {
             description: "zoom level step (default 0.5)",
         },
     },
+    tags: ["no-screenshot-test"],
 };
 export default stories;
 

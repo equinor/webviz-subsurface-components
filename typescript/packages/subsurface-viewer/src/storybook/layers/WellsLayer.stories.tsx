@@ -6,21 +6,21 @@ import { Slider } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import type { FeatureCollection, GeometryCollection } from "geojson";
 
-import { NativeSelect } from "@equinor/eds-core-react";
 import {
     ColorLegend,
     colorTables,
     createColorMapFunction as createColormapFunction,
 } from "@emerson-eps/color-tables";
+import { NativeSelect } from "@equinor/eds-core-react";
 
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import type { MapMouseEvent } from "../../components/Map";
 
 import AxesLayer from "../../layers/axes/axesLayer";
+import type { WellFeatureCollection } from "../../layers/wells/types";
 import type { WellsLayerProps } from "../../layers/wells/wellsLayer";
 import WellsLayer from "../../layers/wells/wellsLayer";
-import type { WellFeatureCollection } from "../../layers/wells/types";
 
 import { Axes2DLayer } from "../../layers";
 import {
@@ -49,6 +49,7 @@ import { getRgba } from "../util/color";
 const stories: Meta = {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer / Wells Layer",
+    tags: ["no-dom-test"],
     args: {
         // Add some common controls for all the stories.
         triggerHome: 0,

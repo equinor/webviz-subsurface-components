@@ -5,6 +5,7 @@ import NumericInput from "../../../components/settings/NumericInput";
 const stories: Meta = {
     component: NumericInput,
     title: "SubsurfaceViewer/Components/Settings",
+    tags: ["no-screenshot-test"],
 };
 export default stories;
 

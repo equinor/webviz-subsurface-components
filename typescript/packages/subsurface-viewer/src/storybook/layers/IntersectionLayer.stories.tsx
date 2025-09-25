@@ -7,6 +7,7 @@ import SubsurfaceViewer from "../../SubsurfaceViewer";
 const stories: Meta = {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer / Experimental Intersection View",
+    tags: ["no-dom-test"],
 };
 export default stories;
 

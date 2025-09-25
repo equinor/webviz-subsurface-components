@@ -1,0 +1,22 @@
+services:
+  storybook:
+    build:
+      context: ..
+      dockerfile: typescript/config/docker/storybook/Dockerfile
+    ports:
+      - "6006:6006"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6006"]
+
+  test-storybook:
+    build:
+      context: .
+      dockerfile: config/docker/test_runner/Dockerfile
+    depends_on:
+      storybook:
+        condition: service_healthy
+    volumes:
+      - ./.storybook:/home/pwuser/test/.storybook:ro
+      - ./packages:/home/pwuser/test/packages
+    environment:
+      TARGET_URL: "http://storybook:6006/"

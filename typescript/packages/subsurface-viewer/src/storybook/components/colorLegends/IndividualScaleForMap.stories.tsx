@@ -16,6 +16,7 @@ import {
 const stories: Meta = {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer/Components/ColorLegends",
+    tags: ["no-dom-test"],
 };
 export default stories;
 

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { userEvent, within, expect } from "@storybook/test";
+import { expect, userEvent, within } from "@storybook/test";
 
 import React from "react";
 
@@ -23,14 +23,14 @@ import { MapAndWellLogViewer } from "./Storybook/examples/MapAndWellLogViewer";
 import { axisMnemos, axisTitles } from "./utils/axes";
 import type { ColormapFunction, ColorTable } from "./utils/color-function";
 
-import exampleDeckglArgsJson from "../../../../example-data/deckgl-map.json";
-import wellLogsJson from "../../../../example-data/volve_logs.json";
 import wellLogl898MUDJson from "../../../../example-data/L898MUD.json";
 import wellLogMWD3Json from "../../../../example-data/WL_RAW_AAC-BHPR-CAL-DEN-GR-MECH-NEU-NMR-REMP_MWD_3.json";
+import exampleDeckglArgsJson from "../../../../example-data/deckgl-map.json";
+import wellLogsJson from "../../../../example-data/volve_logs.json";
 import templateJson1 from "../../../../example-data/welllog_template_1.json";
 import templateJson2 from "../../../../example-data/welllog_template_2.json";
-import wellpicksJson from "../../../../example-data/wellpicks.json";
 import colorTablesJson from "../../../../example-data/wellpick_colors.json";
+import wellpicksJson from "../../../../example-data/wellpicks.json";
 
 const exampleColorFunctions = colorTablesJson as ColormapFunction[];
 const exampleColorTables = colorTablesJson as ColorTable[];
@@ -89,6 +89,7 @@ const stories: Meta<WellLogViewerProps> = {
             language: "javascript",
         },
     },
+    tags: ["no-dom-test"],
 };
 export default stories;
 

@@ -1,0 +1,26 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SubsurfaceViewer/Components/Settings NumericInputStory smoke-test 1`] = `
+<div style="display: flex; justify-content: space-between;">
+  <label id="test-input-label"
+         class="Label__LabelBase-sc-1gi2bcn-0 jGGvso"
+         style="padding-top: 5px; padding-bottom: 5px; font-size: 15px;"
+  >
+    <span class="Label__Text-sc-1gi2bcn-1 bjgoJD">
+      test
+    </span>
+  </label>
+  <div class="Input__Container-sc-1ykv024-0 efGlqQ"
+       style="font-size: 15px; text-align: right; width: 3rem;"
+  >
+    <input type="number"
+           id="test-input"
+           min="0"
+           step="1"
+           class="Input__StyledInput-sc-1ykv024-1 jtVHwP"
+           value="5"
+           style="resize: none;"
+    >
+  </div>
+</div>
+`;

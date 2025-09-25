@@ -30,6 +30,7 @@ import {
 const stories: Meta = {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer/Grid3D Layer",
+    tags: ["no-dom-test"],
     args: {
         // Add some common controls for all the stories.
         triggerHome: 0,

@@ -1,0 +1,719 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`WellLogViewer/Demo/ExampleData TwoLogs smoke-test 2`] = `
+<div style="height: 92vh; display: flex; flex-direction: column;">
+  <div style="width: 100%; height: 100%; flex: 1 1 0%;">
+    <div class="welllog-layout">
+      <div class="interior">
+        <div class="middle">
+          <div style="height: 0%; flex: 1 1 0%; display: flex; flex-direction: row;">
+            <div style="overflow: scroll; width: 100%; height: 100%;">
+              <div style="width: 662px; height: 662px;">
+                <div style="position: absolute; width: 993px; height: 662px;">
+                  <div class="welllogview"
+                       style="flex-direction: column;"
+                  >
+                    <div class="title">
+                      505
+                    </div>
+                    <div class="view">
+                      <div class="container log-controller">
+                        <div class="overlay"
+                             style="width: 993px; left: 0px; top: 69px; overflow: hidden; height: 578px;"
+                        >
+                          <div class="depth"
+                               style="position: absolute; pointer-events: none; visibility: visible;"
+                          >
+                            Zoom: x1.0
+                          </div>
+                          <div class="rubber-band"
+                               style="position: relative; pointer-events: none; height: 9px; width: 100%; visibility: hidden;"
+                          >
+                            <div style="height: 1px; width: 100%; top: 4.5px; position: relative;">
+                            </div>
+                          </div>
+                          <div class="pinned"
+                               style="position: absolute; pointer-events: none; height: 9px; width: 100%; left: 0px; visibility: hidden;"
+                          >
+                            <div style="height: 1px; width: 100%; top: 4.5px; position: absolute;">
+                            </div>
+                          </div>
+                        </div>
+                        <div class="track"
+                             style="flex: 2 1 0%; max-width: 50px;"
+                        >
+                          <div class="track-title"
+                               title="MD"
+                               style="height: 18px; font-size: 12.6px;"
+                          >
+                            MD
+                          </div>
+                          <div class="track-legend"
+                               style="height: 50px;"
+                          >
+                            <svg width="100%"
+                                 height="100%"
+                                 style="flex: 1 1 auto;"
+                            >
+                              <g class="legend">
+                                <text class="scale-title"
+                                      font-weight="600"
+                                      style="text-anchor: middle;"
+                                      transform="translate(25,15.799999999999997)"
+                                      font-size="12px"
+                                      fill="#555"
+                                >
+                                  DEPTH
+                                </text>
+                                <text class="scale-range"
+                                      transform="translate(25,28.999999999999996)"
+                                      font-size="12px"
+                                      style="text-anchor: middle;"
+                                >
+                                  2555
+                                </text>
+                                <text class="scale-units"
+                                      transform="translate(25,39.8)"
+                                      font-size="10px"
+                                      style="text-anchor: middle;"
+                                >
+                                  m
+                                </text>
+                              </g>
+                            </svg>
+                          </div>
+                          <div class="track-container">
+                            <svg class="scale-track master-scale"
+                                 style="position: absolute; height: 576px; width: 50px;"
+                            >
+                              <g class="major-tick"
+                                 transform="translate(0,45.01663339986689)"
+                              >
+                                <line x1="0"
+                                      x2="50"
+                                      class="major-tick-line"
+                                >
+                                </line>
+                                <rect x="10"
+                                      y="-6"
+                                      class="label-bg"
+                                      width="30"
+                                      height="12"
+                                >
+                                </rect>
+                                <text class="label"
+                                      font-size="12px"
+                                      stroke-width="0.5"
+                                      font-family="Verdana Tahoma Arial"
+                                      transform="translate(25,4)"
+                                      style="text-anchor: middle;"
+                                >
+                                  200
+                                </text>
+                              </g>
+                              <g class="major-tick"
+                                 transform="translate(0,90.25948103792408)"
+                              >
+                                <line x1="0"
+                                      x2="50"
+                                      class="major-tick-line"
+                                >
+                                </line>
+                                <rect x="10"
+                                      y="-6"
+                                      class="label-bg"
+                                      width="30"
+                                      height="12"
+                                >
+                                </rect>
+                                <text class="label"
+                                      font-size="12px"
+                                      stroke-width="0.5"
+                                      font-family="Verdana Tahoma Arial"
+                                      transform="translate(25,4)"
+                                      style="text-anchor: middle;"
+                                >
+                                  400
+                                </text>
+                              </g>
+                              <g class="major-tick"
+                                 transform="translate(0,135.50232867598126)"
+                              >
+                                <line x1="0"
+                                      x2="50"
+                                      class="major-tick-line"
+                                >
+                                </line>
+                                <rect x="10"
+                                      y="-6"
+                                      class="label-bg"
+                                      width="30"
+                                      height="12"
+                                >
+                                </rect>
+                                <text class="label"
+                                      font-size="12px"
+                                      stroke-width="0.5"
+                                      font-family="Verdana Tahoma Arial"
+                                      transform="translate(25,4)"
+                                      style="text-anchor: middle;"
+                                >
+                                  600
+                                </text>
+                              </g>
+                              <g class="major-tick"
+                                 transform="translate(0,180.74517631403842)"
+                              >
+                                <line x1="0"
+                                      x2="50"
+                                      class="major-tick-line"
+                                >
+                                </line>
+                                <rect x="10"
+                                      y="-6"
+                                      class="label-bg"
+                                      width="30"
+                                      height="12"
+                                >
+                                </rect>
+                                <text class="label"
+                                      font-size="12px"
+                                      stroke-width="0.5"
+                                      font-family="Verdana Tahoma Arial"
+                                      transform="translate(25,4)"
+                                      style="text-anchor: middle;"
+                                >
+                                  800
+                                </text>
+                              </g>
+                              <g class="major-tick"
+                                 transform="translate(0,225.98802395209563)"
+                              >
+                                <line x1="0"
+                                      x2="50"
+                                      class="major-tick-line"
+                                >
+                                </line>
+                                <rect x="10"
+                                      y="-6"
+                                      class="label-bg"
+                                      width="30"
+                                      height="12"
+                                >
+                                </rect>
+                                <text class="label"
+                                      font-size="12px"
+                                      stroke-width="0.5"
+                                      font-family="Verdana Tahoma Arial"
+                                      transform="translate(25,4)"
+                                      style="text-anchor: middle;"
+                                >
+                                  1000
+                                </text>
+                              </g>
+                              <g class="major-tick"
+                                 transform="translate(0,271.2308715901528)"
+                              >
+                                <line x1="0"
+                                      x2="50"
+                                      class="major-tick-line"
+                                >
+                                </line>
+                                <rect x="10"
+                                      y="-6"
+                                      class="label-bg"
+                                      width="30"
+                                      height="12"
+                                >
+                                </rect>
+                                <text class="label"
+                                      font-size="12px"
+                                      stroke-width="0.5"
+                                      font-family="Verdana Tahoma Arial"
+                                      transform="translate(25,4)"
+                                      style="text-anchor: middle;"
+                                >
+                                  1200
+                                </text>
+                              </g>
+                              <g class="major-tick"
+                                 transform="translate(0,316.47371922821)"
+                              >
+                                <line x1="0"
+                                      x2="50"
+                                      class="major-tick-line"
+                                >
+                                </line>
+                                <rect x="10"
+                                      y="-6"
+                                      class="label-bg"
+                                      width="30"
+                                      height="12"
+                                >
+                                </rect>
+                                <text class="label"
+                                      font-size="12px"
+                                      stroke-width="0.5"
+                                      font-family="Verdana Tahoma Arial"
+                                      transform="translate(25,4)"
+                                      style="text-anchor: middle;"
+                                >
+                                  1400
+                                </text>
+                              </g>
+                              <g class="major-tick"
+                                 transform="translate(0,361.71656686626716)"
+                              >
+                                <line x1="0"
+                                      x2="50"
+                                      class="major-tick-line"
+                                >
+                                </line>
+                                <rect x="10"
+                                      y="-6"
+                                      class="label-bg"
+                                      width="30"
+                                      height="12"
+                                >
+                                </rect>
+                                <text class="label"
+                                      font-size="12px"
+                                      stroke-width="0.5"
+                                      font-family="Verdana Tahoma Arial"
+                                      transform="translate(25,4)"
+                                      style="text-anchor: middle;"
+                                >
+                                  1600
+                                </text>
+                              </g>
+                              <g class="major-tick"
+                                 transform="translate(0,406.95941450432434)"
+                              >
+                                <line x1="0"
+                                      x2="50"
+                                      class="major-tick-line"
+                                >
+                                </line>
+                                <rect x="10"
+                                      y="-6"
+                                      class="label-bg"
+                                      width="30"
+                                      height="12"
+                                >
+                                </rect>
+                                <text class="label"
+                                      font-size="12px"
+                                      stroke-width="0.5"
+                                      font-family="Verdana Tahoma Arial"
+                                      transform="translate(25,4)"
+                                      style="text-anchor: middle;"
+                                >
+                                  1800
+                                </text>
+                              </g>
+                              <g class="major-tick"
+                                 transform="translate(0,452.2022621423815)"
+                              >
+                                <line x1="0"
+                                      x2="50"
+                                      class="major-tick-line"
+                                >
+                                </line>
+                                <rect x="10"
+                                      y="-6"
+                                      class="label-bg"
+                                      width="30"
+                                      height="12"
+                                >
+                                </rect>
+                                <text class="label"
+                                      font-size="12px"
+                                      stroke-width="0.5"
+                                      font-family="Verdana Tahoma Arial"
+                                      transform="translate(25,4)"
+                                      style="text-anchor: middle;"
+                                >
+                                  2000
+                                </text>
+                              </g>
+                              <g class="major-tick"
+                                 transform="translate(0,497.44510978043866)"
+                              >
+                                <line x1="0"
+                                      x2="50"
+                                      class="major-tick-line"
+                                >
+                                </line>
+                                <rect x="10"
+                                      y="-6"
+                                      class="label-bg"
+                                      width="30"
+                                      height="12"
+                                >
+                                </rect>
+                                <text class="label"
+                                      font-size="12px"
+                                      stroke-width="0.5"
+                                      font-family="Verdana Tahoma Arial"
+                                      transform="translate(25,4)"
+                                      style="text-anchor: middle;"
+                                >
+                                  2200
+                                </text>
+                              </g>
+                              <g class="major-tick"
+                                 transform="translate(0,542.6879574184959)"
+                              >
+                                <line x1="0"
+                                      x2="50"
+                                      class="major-tick-line"
+                                >
+                                </line>
+                                <rect x="10"
+                                      y="-6"
+                                      class="label-bg"
+                                      width="30"
+                                      height="12"
+                                >
+                                </rect>
+                                <text class="label"
+                                      font-size="12px"
+                                      stroke-width="0.5"
+                                      font-family="Verdana Tahoma Arial"
+                                      transform="translate(25,4)"
+                                      style="text-anchor: middle;"
+                                >
+                                  2400
+                                </text>
+                              </g>
+                            </svg>
+                          </div>
+                        </div>
+                        <div class="track"
+                             style="flex: 3 1 0%; display: flex;"
+                        >
+                          <div class="track-title"
+                               title="custom tooltip on continuous log"
+                               style="height: 18px; font-size: 12.6px;"
+                          >
+                            ALL_MODIFIED.GK
+                          </div>
+                          <div class="track-legend"
+                               style="height: 50px;"
+                          >
+                            <svg width="100%"
+                                 height="100%"
+                                 style="flex: 1 1 auto;"
+                            >
+                              <g class="svg-legend">
+                                <g class="legend-row"
+                                   transform="translate(0,25)"
+                                   style="cursor: pointer;"
+                                >
+                                  <title>
+                                    Toggle plot on/off
+                                  </title>
+                                  <rect x="2"
+                                        y="0"
+                                        width="466.5"
+                                        height="12.5"
+                                        fill="red"
+                                        fill-opacity="0.5"
+                                  >
+                                  </rect>
+                                  <rect width="466.5"
+                                        height="21"
+                                        x="2"
+                                        y="2"
+                                        visibility="hidden"
+                                  >
+                                  </rect>
+                                  <line x1="2"
+                                        x2="468.5"
+                                        y1="12.5"
+                                        y2="12.5"
+                                        style="stroke-width: 2.5; stroke: red; fill: red;"
+                                  >
+                                  </line>
+                                  <rect class="label-bg"
+                                        fill="white"
+                                        x="195.1015625"
+                                        y="1"
+                                        width="80.4481201171875"
+                                        height="10.5"
+                                  >
+                                  </rect>
+                                  <text class="legend-label"
+                                        font-size="8.75px"
+                                        transform="translate(235.25,8.75)"
+                                        style="text-anchor: middle; fill: red;"
+                                  >
+                                    ALL_MODIFIED.GK
+                                  </text>
+                                  <text class="legend-domain"
+                                        font-size="7.4375px"
+                                        x="2"
+                                        y="19.9375"
+                                        style="text-anchor: start; fill: red;"
+                                  >
+                                    0
+                                  </text>
+                                  <text class="legend-domain"
+                                        font-size="7.4375px"
+                                        x="468.5"
+                                        y="19.9375"
+                                        style="text-anchor: end; fill: red;"
+                                  >
+                                    12k
+                                  </text>
+                                </g>
+                              </g>
+                            </svg>
+                          </div>
+                          <div class="track-container">
+                            <canvas width="470.5"
+                                    height="576"
+                                    style="position: absolute; width: 470.5px; height: 576px;"
+                            >
+                            </canvas>
+                          </div>
+                        </div>
+                        <div class="track"
+                             style="flex: 3 1 0%; display: flex;"
+                        >
+                          <div class="track-title"
+                               title="ALL_MODIFIED.NGK"
+                               style="height: 18px; font-size: 12.6px;"
+                          >
+                            ALL_MODIFIED.NGK
+                          </div>
+                          <div class="track-legend"
+                               style="height: 50px;"
+                          >
+                            <svg width="100%"
+                                 height="100%"
+                                 style="flex: 1 1 auto;"
+                            >
+                              <g class="svg-legend">
+                                <g class="legend-row"
+                                   transform="translate(0,25)"
+                                   style="cursor: pointer;"
+                                >
+                                  <title>
+                                    Toggle plot on/off
+                                  </title>
+                                  <rect width="466.5"
+                                        height="21"
+                                        x="2"
+                                        y="2"
+                                        visibility="hidden"
+                                  >
+                                  </rect>
+                                  <line x1="2"
+                                        x2="468.5"
+                                        y1="12.5"
+                                        y2="12.5"
+                                        style="stroke-width: 2.5; stroke: green; fill: green;"
+                                  >
+                                  </line>
+                                  <text class="legend-label"
+                                        font-size="8.75px"
+                                        transform="translate(235.25,8.75)"
+                                        style="text-anchor: middle; fill: green;"
+                                  >
+                                    ALL_MODIFIED.NGK
+                                  </text>
+                                  <rect x="0"
+                                        y="5.0625"
+                                        width="18.014083862304688"
+                                        height="15"
+                                        style="fill: white;"
+                                  >
+                                  </rect>
+                                  <rect x="453.140625"
+                                        y="5.0625"
+                                        width="18.01409912109375"
+                                        height="15"
+                                        style="fill: white;"
+                                  >
+                                  </rect>
+                                  <text class="legend-domain"
+                                        font-size="9.625px"
+                                        x="2"
+                                        y="16.0625"
+                                        style="text-anchor: start; fill: green;"
+                                  >
+                                    0.4
+                                  </text>
+                                  <text class="legend-domain"
+                                        font-size="9.625px"
+                                        x="468.5"
+                                        y="16.0625"
+                                        style="text-anchor: end; fill: green;"
+                                  >
+                                    3.4
+                                  </text>
+                                </g>
+                              </g>
+                            </svg>
+                          </div>
+                          <div class="track-container">
+                            <canvas width="470.5"
+                                    height="576"
+                                    style="position: absolute; width: 470.5px; height: 576px;"
+                            >
+                            </canvas>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="left-right">
+          <div class="side-panel">
+            <div class="axes-selector">
+              <div class="axis-selector">
+                <fieldset>
+                  <legend>
+                    Primary scale
+                  </legend>
+                  <div>
+                    <input type="radio"
+                           value="md"
+                           checked
+                    >
+                    MD
+                  </div>
+                </fieldset>
+              </div>
+            </div>
+            <div class="readout">
+              <fieldset>
+                <legend>
+                  Readout 505
+                </legend>
+                <table>
+                  <tbody>
+                    <tr>
+                      <td class="row-info"
+                          style="color: black;"
+                      >
+                        ⬤
+                      </td>
+                      <td class="row-name"
+                          title="DEPTH"
+                      >
+                      </td>
+                      <td class="row-value"
+                          colspan="1"
+                          title="&nbsp;"
+                      >
+                      </td>
+                      <td class="row-units"
+                          title="m"
+                      >
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colspan="4">
+                        <hr>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="row-info"
+                          style="color: red;"
+                      >
+                        ⬤
+                      </td>
+                      <td class="row-name"
+                          title="ALL_MODIFIED.GK"
+                      >
+                      </td>
+                      <td class="row-value"
+                          colspan="1"
+                          title="&nbsp;"
+                      >
+                      </td>
+                      <td class="row-units"
+                          title
+                      >
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="row-info"
+                          style="color: green;"
+                      >
+                        ⬤
+                      </td>
+                      <td class="row-name"
+                          title="ALL_MODIFIED.NGK"
+                      >
+                      </td>
+                      <td class="row-value"
+                          colspan="1"
+                          title="&nbsp;"
+                      >
+                      </td>
+                      <td class="row-units"
+                          title
+                      >
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </fieldset>
+            </div>
+            <div class="zoom">
+              <span class="zoom-label">
+                Zoom:
+              </span>
+              <span class="zoom-value">
+                <span class="MuiSlider-root MuiSlider-colorPrimary MuiSlider-sizeMedium css-1228x3t">
+                  <span class="MuiSlider-rail css-3ndvyc">
+                  </span>
+                  <span class="MuiSlider-track css-10opxo5"
+                        style="left: 0%; width: 0%;"
+                  >
+                  </span>
+                  <span data-index="0"
+                        class="MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary css-1qyrwba"
+                        style="left: 0%;"
+                  >
+                    <input data-index="0"
+                           aria-valuenow="1"
+                           aria-labelledby="non-linear-slider"
+                           aria-valuetext="1"
+                           aria-orientation="horizontal"
+                           aria-valuemax="256"
+                           aria-valuemin="1"
+                           type="range"
+                           min="0"
+                           max="8"
+                           step="0.5"
+                           value="0"
+                           style="border: 0px; clip: rect(0px, 0px, 0px, 0px); height: 100%; margin: -1px; overflow: hidden; padding: 0px; position: absolute; white-space: nowrap; width: 100%; direction: ltr;"
+                    >
+                    <span class="MuiSlider-valueLabel css-1ym2qpd"
+                          aria-hidden="true"
+                    >
+                      <span class="MuiSlider-valueLabelCircle">
+                        <span class="MuiSlider-valueLabelLabel">
+                          1
+                        </span>
+                      </span>
+                    </span>
+                  </span>
+                </span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
