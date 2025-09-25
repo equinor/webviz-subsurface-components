@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
-import type { Feature, FeatureCollection } from "geojson";
+import type { Feature } from "geojson";
 import { cloneDeep, isEmpty, isEqual } from "lodash";
 
 import type {
@@ -64,6 +64,7 @@ import {
 import JSON_CONVERTER_CONFIG from "../utils/configuration";
 import { fitBounds } from "../utils/fitBounds";
 import { DistanceScale } from "./DistanceScale";
+import type { InfoCardProps } from "./InfoCard";
 import InfoCard from "./InfoCard";
 import StatusIndicator from "./StatusIndicator";
 
@@ -88,6 +89,10 @@ export type BoundsAccessor = () => BoundingBox2D;
 type Size = {
     width: number;
     height: number;
+};
+
+export type PickingInfoExt = PickingInfo & {
+    scaledCoordinate?: Point2D | Point3D | undefined;
 };
 
 const minZoom3D = -12;
@@ -278,12 +283,26 @@ export interface MapProps {
 
     /**
      * Parameters for the InfoCard component
+     * @deprecated - Use pickingDepth, multiPicking, and showReadout instead
      */
     coords?: {
         visible?: boolean | null;
         multiPicking?: boolean | null;
         pickDepth?: number | null;
-    };
+    } | null;
+
+    /**
+     * The amount of items that gets picked. Depth is only relevant if multi-picking is enabled
+     */
+    pickingDepth?: number;
+    /**
+     * Enable multi-picking.
+     */
+    multiPicking?: boolean;
+    /**
+     * If true, the built-in readout box will be shown
+     */
+    showReadout?: boolean | ((props: InfoCardProps) => React.ReactNode);
 
     /**
      * Parameters for the Distance Scale component
@@ -293,7 +312,7 @@ export interface MapProps {
         incrementValue?: number | null;
         widthPerUnit?: number | null;
         cssStyle?: Record<string, unknown> | null;
-    };
+    } | null;
 
     coordinateUnit?: Unit;
 
@@ -416,8 +435,11 @@ const Map: React.FC<MapProps> = ({
     cameraPosition,
     triggerHome,
     views = DEFAULT_VIEWS,
-    coords = { visible: true, multiPicking: true, pickDepth: 2 },
     scale = { visible: true, cssStyle: { top: 10, left: 10 } },
+    coords,
+    showReadout = coords?.visible ?? true,
+    pickingDepth = coords?.pickDepth ?? 2,
+    multiPicking = coords?.multiPicking ?? true,
     coordinateUnit = "m",
     colorTables = defaultColorTables,
     setEditedData,
@@ -559,69 +581,72 @@ const Map: React.FC<MapProps> = ({
 
     const getPickingInfos = useCallback(
         (
-            pickInfo: PickingInfo & {
-                scaledCoordinate?: Point2D | Point3D | undefined;
-            },
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            event: any
-        ): (PickingInfo & {
-            scaledCoordinate?: Point2D | Point3D | undefined;
-        })[] => {
-            if (coords?.multiPicking && pickInfo.layer?.context.deck) {
+            pickInfo: PickingInfo,
+            event: MjolnirPointerEvent | MjolnirGestureEvent
+        ): PickingInfoExt[] => {
+            function makeExtendedPickingInfo(
+                info: PickingInfo
+            ): PickingInfoExt {
+                const scaledCoordinate = info.coordinate
+                    ? ([...info.coordinate] as Point2D | Point3D)
+                    : undefined;
+
+                const extendedPickInfo: PickingInfoExt = {
+                    ...info,
+                    scaledCoordinate,
+                };
+
+                return extendedPickInfo;
+            }
+
+            if (multiPicking && pickInfo.layer?.context.deck) {
                 const pickInfos =
                     pickInfo.layer.context.deck.pickMultipleObjects({
                         x: event.offsetCenter.x,
                         y: event.offsetCenter.y,
-                        depth: coords.pickDepth ?? undefined,
+                        depth: pickingDepth,
                         unproject3D: true,
-                    }) as (LayerPickInfo & {
-                        scaledCoordinate?: Point2D | Point3D | undefined;
-                    })[];
-                pickInfos.forEach((item) => {
+                    });
+
+                pickInfos.forEach((itemPick) => {
+                    const extItemPick = makeExtendedPickingInfo(itemPick);
                     // Z value should not take into account the Z scale factor.
-                    item.scaledCoordinate = item.coordinate
-                        ? ([...item.coordinate] as Point2D | Point3D)
-                        : undefined;
                     viewController.unscaledTarget(
-                        item.coordinate as Point2D | Point3D
+                        extItemPick.coordinate as Point2D | Point3D
                     );
 
-                    // handle properties
-                    if (item.properties) {
-                        let unit = (
-                            item.sourceLayer?.props
-                                .data as unknown as FeatureCollection & {
-                                unit: string;
-                            }
-                        )?.unit;
-                        if (unit == undefined) unit = " ";
-                        item.properties.forEach((element) => {
+                    if (extItemPick.layer instanceof WellsLayer) {
+                        const wellsPickInfo = extItemPick as WellsPickInfo;
+                        const unit = extItemPick.layer?.state.data?.unit ?? " ";
+
+                        wellsPickInfo.properties?.forEach((property) => {
                             if (
-                                element.name.includes("MD") ||
-                                element.name.includes("TVD")
+                                property.name.includes("MD") ||
+                                property.name.includes("TVD")
                             ) {
-                                element.value =
-                                    Number(element.value)
-                                        .toFixed(2)
-                                        .toString() +
-                                    " " +
-                                    unit;
+                                const fixedNumber = Number(
+                                    property.value
+                                ).toFixed(2);
+
+                                property.value = `${fixedNumber} ${unit}`;
                             }
                         });
                     }
                 });
                 return pickInfos;
             }
+
+            // When not multi-picking, we can use the info already picked by deckGl
+            const extendedPickInfo = makeExtendedPickingInfo(pickInfo);
+
             // Z value should not take into account the Z scale factor.
-            pickInfo.scaledCoordinate = pickInfo.coordinate
-                ? ([...pickInfo.coordinate] as Point2D | Point3D)
-                : undefined;
             viewController.unscaledTarget(
                 pickInfo.coordinate as Point2D | Point3D
             );
-            return [pickInfo];
+
+            return [extendedPickInfo];
         },
-        [coords?.multiPicking, coords?.pickDepth, viewController]
+        [multiPicking, pickingDepth, pickingRadius, viewController]
     );
 
     /**
@@ -661,7 +686,7 @@ const Map: React.FC<MapProps> = ({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [hoverInfo, setHoverInfo] = useState<any>([]);
     const onHover = useCallback(
-        (pickInfo: PickingInfo, event: MjolnirEvent) => {
+        (pickInfo: PickingInfo, event: MjolnirPointerEvent) => {
             const infos = getPickingInfos(pickInfo, event);
             setHoverInfo(infos);
             callOnMouseEvent?.("hover", infos, event);
@@ -670,7 +695,7 @@ const Map: React.FC<MapProps> = ({
     );
 
     const onClick = useCallback(
-        (pickInfo: PickingInfo, event: MjolnirEvent) => {
+        (pickInfo: PickingInfo, event: MjolnirGestureEvent) => {
             const infos = getPickingInfos(pickInfo, event);
             callOnMouseEvent?.("click", infos, event);
         },
@@ -931,7 +956,7 @@ const Map: React.FC<MapProps> = ({
                     />
                 </div>
             )}
-            {coords?.visible && <InfoCard pickInfos={hoverInfo} />}
+            {showReadout && <InfoCard pickInfos={hoverInfo} />}
             {errorText && (
                 <pre
                     style={{
