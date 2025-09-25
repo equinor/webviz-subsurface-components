@@ -606,6 +606,7 @@ const Map: React.FC<MapProps> = ({
                         y: event.offsetCenter.y,
                         depth: pickingDepth,
                         unproject3D: true,
+                        radius: pickingRadius,
                     });
 
                 pickInfos.forEach((itemPick) => {
