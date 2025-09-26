@@ -151,6 +151,7 @@ const defaultMaterial: Material = {
 };
 
 const defaultColormapSetup: ColormapSetup = {
+    valueRange: [0, 1],
     clampRange: undefined,
     clampColor: [0, 255, 0, 200], // green color for clamped values
     undefinedValue: Number.NaN,
@@ -291,9 +292,15 @@ export class GpglValueMappedSurfaceLayer extends Layer<GpglValueMappedSurfaceLay
             return undefined;
         }
 
-        const min = Math.min(...propertiesData);
-        const max = Math.max(...propertiesData);
-        this.setState({ ...this.state, valueRange: [min, max] });
+        if (!this.props.colormapSetup?.valueRange) {
+            let min = Infinity;
+            let max = -Infinity;
+            for (const x of propertiesData) {
+                min = x < min ? x : min;
+                max = x > max ? x : max;
+            }
+            this.setState({ ...this.state, valueRange: [min, max] });
+        }
 
         const smooth =
             this.props.colormapSetup?.smooth ?? defaultColormapSetup.smooth;
@@ -561,9 +568,12 @@ export class GpglValueMappedSurfaceLayer extends Layer<GpglValueMappedSurfaceLay
             defaultColormapSetup.valueRange;
 
         const clampRange =
-            this.props.colormapSetup?.clampRange ??
-            (this.state["valueRange"] as [number, number]) ??
-            defaultColormapSetup.valueRange;
+            this.props.colormapSetup?.clampRange === null
+                ? null
+                : (this.props.colormapSetup?.clampRange ??
+                  this.props.colormapSetup?.valueRange ??
+                  (this.state["valueRange"] as [number, number]) ??
+                  defaultColormapSetup.valueRange);
 
         // render all the triangle surfaces
         triangleModels?.forEach((model) => {
