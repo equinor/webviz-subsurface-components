@@ -300,9 +300,12 @@ export default class SeismicLayer extends CompositeLayer<SeismicLayerProps> {
             layer_properties.push(createPropertyData("Depth", depth));
         }
 
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const properties = [...layer_properties, ...(info.properties ?? [])];
         return {
             ...info,
-            properties: layer_properties,
+            properties,
         };
     }
 

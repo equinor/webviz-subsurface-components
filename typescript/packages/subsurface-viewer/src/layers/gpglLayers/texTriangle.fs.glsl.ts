@@ -35,6 +35,15 @@ vec4 valueColor(float value) {
 }
 
 void main(void) {
+
+   //Picking pass.
+   if (picking.isActive > 0.5 && !(picking.isAttribute > 0.5)) {
+      float value = texture(valueTexture, vTexCoords).r; 
+      float normalizedValue = normalizeValue(value);
+      fragColor = encodeVertexIndexToRGB(int(normalizedValue * (255.0 * 255.0 * 255.0 - 1.0)));
+      return;
+   }
+
    vec3 normal = vNormal;
 
    if (!triangles.smoothShading) {
