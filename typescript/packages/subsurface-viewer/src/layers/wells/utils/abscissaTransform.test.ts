@@ -1,10 +1,16 @@
+import { describe, expect, it } from "@jest/globals";
 import type {
     FeatureCollection,
     GeometryCollection,
     LineString,
     Point,
 } from "geojson";
-import { abscissaTransform } from "./abscissaTransform";
+import {
+    abscissaTransform,
+    calculateTrajectoryGap,
+    getEndPoint,
+    getStartPoint,
+} from "./abscissaTransform";
 
 const MOCK_WELL: FeatureCollection<GeometryCollection> = {
     type: "FeatureCollection",
@@ -29,13 +35,131 @@ const MOCK_WELL: FeatureCollection<GeometryCollection> = {
                 ],
             },
             properties: {
-                name: "wl6",
-                color: [255, 255, 0, 255],
-                md: [[0, 1, 2, 3, 4, 5, 8, 9]],
+                name: "WellA",
+            },
+        },
+        {
+            type: "Feature",
+            geometry: {
+                type: "GeometryCollection",
+                geometries: [
+                    {
+                        type: "Point",
+                        coordinates: [2570.71, 2070.71, 0],
+                    },
+                    {
+                        type: "LineString",
+                        coordinates: [
+                            [2570.71, 2070.71, 0], // 100 units lateral distance from [2500, 2000, -2000]
+                            [2570.71, 2070.71, -500],
+                            [3070.71, 2570.71, -1000],
+                            [3570.71, 3070.71, -1500],
+                        ],
+                    },
+                ],
+            },
+            properties: {
+                name: "WellB",
             },
         },
     ],
 };
+
+describe("calculateTrajectoryGap", () => {
+    it("should calculate correct lateral distance between trajectory endpoints", () => {
+        const gap = calculateTrajectoryGap(
+            MOCK_WELL.features[0],
+            MOCK_WELL.features[1]
+        );
+        expect(gap).toBeCloseTo(100, 2); // Should be approximately 100 units
+    });
+
+    it("should return default gap when feature1 has no LineString", () => {
+        const feature1 = {
+            geometry: {
+                type: "GeometryCollection" as const,
+                geometries: [
+                    {
+                        type: "Point" as const,
+                        coordinates: [0, 0, 0],
+                    },
+                ],
+            },
+        };
+
+        const gap = calculateTrajectoryGap(feature1, MOCK_WELL.features[1]);
+        expect(gap).toBe(0); // Default gap
+    });
+
+    it("should return default gap when feature2 has no LineString", () => {
+        const feature2 = {
+            geometry: {
+                type: "GeometryCollection" as const,
+                geometries: [
+                    {
+                        type: "Point" as const,
+                        coordinates: [200, 0, 0],
+                    },
+                ],
+            },
+        };
+
+        const gap = calculateTrajectoryGap(MOCK_WELL.features[0], feature2);
+        expect(gap).toBe(0); // Default gap
+    });
+
+    it("should return default gap when LineString has no coordinates", () => {
+        const feature1 = {
+            geometry: {
+                type: "GeometryCollection" as const,
+                geometries: [
+                    {
+                        type: "LineString" as const,
+                        coordinates: [], // Empty coordinates
+                    },
+                ],
+            },
+        };
+
+        const gap = calculateTrajectoryGap(feature1, MOCK_WELL.features[1]);
+        expect(gap).toBe(0); // Default gap
+    });
+
+    it("should handle zero distance between trajectories", () => {
+        const feature1 = {
+            geometry: {
+                type: "GeometryCollection" as const,
+                geometries: [
+                    {
+                        type: "LineString" as const,
+                        coordinates: [
+                            [0, 0, 0],
+                            [100, 100, -100],
+                        ],
+                    },
+                ],
+            },
+        };
+
+        const feature2 = {
+            geometry: {
+                type: "GeometryCollection" as const,
+                geometries: [
+                    {
+                        type: "LineString" as const,
+                        coordinates: [
+                            [100, 100, -200], // Same X,Y as end of feature1, different Z
+                            [200, 200, -300],
+                        ],
+                    },
+                ],
+            },
+        };
+
+        const gap = calculateTrajectoryGap(feature1, feature2);
+        expect(gap).toBe(0); // Zero lateral distance
+    });
+});
 
 describe("Transform well trajectory", () => {
     it("Empty well", () => {
@@ -57,10 +181,177 @@ describe("Transform well trajectory", () => {
         // Check well head projection
         expect(wellHead.coordinates).toEqual([0, 0, 0]);
 
-        // Checke unfolded trajectory
+        // Check unfolded trajectory
         expect(trajectory.coordinates[0]).toStrictEqual([0, 0, 0]);
         expect(trajectory.coordinates[1][0]).toBeCloseTo(1414.2135);
         expect(trajectory.coordinates[1][1]).toStrictEqual(-1000);
         expect(trajectory.coordinates[2][0]).toBeCloseTo(2828.4271);
+    });
+});
+
+describe("getEndPoint", () => {
+    it("should return the last coordinate of the first LineString found", () => {
+        const endPoint = getEndPoint(MOCK_WELL.features[0]);
+        expect(endPoint).toEqual([2500, 2000, -2000]);
+    });
+
+    it("should return null when no LineString geometry exists", () => {
+        const feature = {
+            geometry: {
+                type: "GeometryCollection" as const,
+                geometries: [
+                    {
+                        type: "Point" as const,
+                        coordinates: [0, 0, 0],
+                    },
+                ],
+            },
+        };
+
+        const endPoint = getEndPoint(feature);
+        expect(endPoint).toBeNull();
+    });
+
+    it("should return null when LineString has empty coordinates", () => {
+        const feature = {
+            geometry: {
+                type: "GeometryCollection" as const,
+                geometries: [
+                    {
+                        type: "LineString" as const,
+                        coordinates: [],
+                    },
+                ],
+            },
+        };
+
+        const endPoint = getEndPoint(feature);
+        expect(endPoint).toBeNull();
+    });
+
+    it("should return null when geometry collection is empty", () => {
+        const feature = {
+            geometry: {
+                type: "GeometryCollection" as const,
+                geometries: [],
+            },
+        };
+
+        const endPoint = getEndPoint(feature);
+        expect(endPoint).toBeNull();
+    });
+});
+
+describe("getStartPoint", () => {
+    it("should return the first coordinate of the first LineString found", () => {
+        const startPoint = getStartPoint(MOCK_WELL.features[0]);
+        expect(startPoint).toEqual([500, 0, 0]);
+    });
+
+    it("should return null when no LineString geometry exists", () => {
+        const feature = {
+            geometry: {
+                type: "GeometryCollection" as const,
+                geometries: [
+                    {
+                        type: "Point" as const,
+                        coordinates: [0, 0, 0],
+                    },
+                ],
+            },
+        };
+
+        const startPoint = getStartPoint(feature);
+        expect(startPoint).toBeNull();
+    });
+
+    it("should return null when LineString has empty coordinates", () => {
+        const feature = {
+            geometry: {
+                type: "GeometryCollection" as const,
+                geometries: [
+                    {
+                        type: "LineString" as const,
+                        coordinates: [],
+                    },
+                ],
+            },
+        };
+
+        const startPoint = getStartPoint(feature);
+        expect(startPoint).toBeNull();
+    });
+
+    it("should return null when geometry collection is empty", () => {
+        const feature = {
+            geometry: {
+                type: "GeometryCollection" as const,
+                geometries: [],
+            },
+        };
+
+        const startPoint = getStartPoint(feature);
+        expect(startPoint).toBeNull();
+    });
+
+    it("should return null when no LineString geometry exists", () => {
+        const feature = {
+            geometry: {
+                type: "GeometryCollection" as const,
+                geometries: [
+                    {
+                        type: "Point" as const,
+                        coordinates: [0, 0, 0],
+                    },
+                ],
+            },
+        };
+
+        const startPoint = getStartPoint(feature);
+        expect(startPoint).toBeNull();
+    });
+
+    it("should return null when LineString has empty coordinates", () => {
+        const feature = {
+            geometry: {
+                type: "GeometryCollection" as const,
+                geometries: [
+                    {
+                        type: "LineString" as const,
+                        coordinates: [],
+                    },
+                ],
+            },
+        };
+
+        const startPoint = getStartPoint(feature);
+        expect(startPoint).toBeNull();
+    });
+
+    it("should return start point from first valid LineString when multiple exist", () => {
+        const feature = {
+            geometry: {
+                type: "GeometryCollection" as const,
+                geometries: [
+                    {
+                        type: "LineString" as const,
+                        coordinates: [
+                            [100, 200, -100],
+                            [200, 300, -200],
+                        ],
+                    },
+                    {
+                        type: "LineString" as const,
+                        coordinates: [
+                            [300, 400, -300],
+                            [400, 500, -400],
+                        ],
+                    },
+                ],
+            },
+        };
+
+        const startPoint = getStartPoint(feature);
+        expect(startPoint).toEqual([100, 200, -100]); // First LineString's start
     });
 });
