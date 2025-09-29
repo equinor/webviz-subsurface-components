@@ -562,15 +562,15 @@ export class GpglValueMappedSurfaceLayer extends Layer<GpglValueMappedSurfaceLay
                 (defaultColormapSetup.clampColor as Color)
         );
 
-        const colormapRange = this.props.colormapSetup?.valueRange ??
-            (this.state["valueRange"] as [number, number]) ?? [0, 1];
+        const colormapRange =
+            this.props.colormapSetup?.valueRange ??
+            (this.state["valueRange"] as [number, number]) ??
+            defaultColormapSetup.valueRange;
 
         const clampRange =
             this.props.colormapSetup?.clampRange === null
                 ? null
-                : (this.props.colormapSetup?.clampRange ??
-                  this.props.colormapSetup?.valueRange ??
-                  (this.state["valueRange"] as [number, number]) ?? [0, 1]);
+                : (this.props.colormapSetup?.clampRange ?? colormapRange);
 
         // render all the triangle surfaces
         triangleModels?.forEach((model) => {

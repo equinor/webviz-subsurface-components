@@ -94,8 +94,8 @@ const seismicCageLayer = {
 };
 
 const colormapSetup = {
-    valueRange: [-3.031, 3.051],
-    clampRange: [-3.031, 3.051],
+    valueRange: [-1, 1],
+    clampRange: [-1, 1],
     clampColor: [0, 255, 0, 200],
     undefinedColor: [255, 0, 0, 200],
     smooth: false,
