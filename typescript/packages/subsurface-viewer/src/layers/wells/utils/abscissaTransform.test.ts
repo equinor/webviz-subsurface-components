@@ -171,21 +171,45 @@ describe("Transform well trajectory", () => {
         expect(transformedWell).toStrictEqual(emptyWell);
     });
 
-    it("Unfold trajectory", () => {
+    it("Unfold well trajectories", () => {
         const transformedWell = abscissaTransform(MOCK_WELL);
-        const wellHead = transformedWell.features[0].geometry
+
+        // Check number of trajectories transformed
+        expect(transformedWell.features).toHaveLength(2);
+
+        const wellHead0 = transformedWell.features[0].geometry
             .geometries[0] as Point;
-        const trajectory = transformedWell.features[0].geometry
+        const trajectory0 = transformedWell.features[0].geometry
             .geometries[1] as LineString;
 
         // Check well head projection
-        expect(wellHead.coordinates).toEqual([0, 0, 0]);
+        expect(wellHead0.coordinates).toEqual([0, 0, 0]);
 
-        // Check unfolded trajectory
-        expect(trajectory.coordinates[0]).toStrictEqual([0, 0, 0]);
-        expect(trajectory.coordinates[1][0]).toBeCloseTo(1414.2135);
-        expect(trajectory.coordinates[1][1]).toStrictEqual(-1000);
-        expect(trajectory.coordinates[2][0]).toBeCloseTo(2828.4271);
+        // Check first unfolded trajectory
+        expect(trajectory0.coordinates[0]).toStrictEqual([0, 0, 0]);
+        expect(trajectory0.coordinates[1][0]).toBeCloseTo(1414.2135);
+        expect(trajectory0.coordinates[1][1]).toStrictEqual(-1000);
+        expect(trajectory0.coordinates[2][0]).toBeCloseTo(2828.4271);
+
+        // Check second unfolded trajectory
+        const wellHead1 = transformedWell.features[1].geometry
+            .geometries[0] as Point;
+        const trajectory1 = transformedWell.features[1].geometry
+            .geometries[1] as LineString;
+
+        const previousEnd = trajectory0.coordinates.at(-1) || [0, 0, 0];
+
+        // Well head should be offset by gap (100) from end of the the lateral distance
+        // of the previous trajectory
+        expect(wellHead1.coordinates[0]).toBeCloseTo(previousEnd[0] + 100);
+
+        // Trajectory start should match well head
+        expect(trajectory1.coordinates[0][0]).toBeCloseTo(
+            wellHead1.coordinates[0]
+        );
+        expect(trajectory1.coordinates[0][1]).toBeCloseTo(
+            wellHead1.coordinates[1]
+        );
     });
 });
 

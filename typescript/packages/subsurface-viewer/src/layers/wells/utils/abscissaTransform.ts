@@ -76,42 +76,40 @@ export function abscissaTransform<
     const featureCollectionCopy = cloneDeep(featureCollection);
 
     // Calculate the maximum trajectory length and gaps needed
-    let currentOffset = 0;
+    let maxAbscissa = 0;
 
     // First pass: calculate trajectory lengths and offsets
     for (let i = 0; i < featureCollectionCopy.features.length; i++) {
         const feature = featureCollectionCopy.features[i];
         const geometryCollection = feature.geometry;
-        let maxTrajectoryLength = 0;
 
         // Find the maximum length of LineString geometries in this feature
         for (const geometry of geometryCollection.geometries) {
-            if ("LineString" === geometry.type) {
-                const { vAbscissa, maxAbscissa } = computeUnfoldedPath(
-                    geometry.coordinates
-                );
+            if ("Point" === geometry.type) {
+                const coordinates = geometry.coordinates;
+                geometry.coordinates = [maxAbscissa, coordinates[2], 0];
+            } else if ("LineString" === geometry.type) {
+                const projection = computeUnfoldedPath(geometry.coordinates);
 
-                maxTrajectoryLength = Math.max(
-                    maxTrajectoryLength,
-                    maxAbscissa
-                );
-
-                geometry.coordinates = vAbscissa.map((coord) => [
-                    coord[0] + currentOffset,
+                geometry.coordinates = projection.vAbscissa.map((coord) => [
+                    coord[0] + maxAbscissa,
                     coord[1],
                     coord[2],
                 ]);
-            } else if ("Point" === geometry.type) {
-                const coordinates = geometry.coordinates;
-                geometry.coordinates = [currentOffset, coordinates[2], 0];
+
+                maxAbscissa += projection.maxAbscissa;
             }
         }
 
         // Add gap equal to lateral euclidean distance between trajectory start points
-        if (i < featureCollectionCopy.features.length - 1) {
-            const nextFeature = featureCollectionCopy.features[i + 1];
-            const gap = calculateTrajectoryGap(feature, nextFeature);
-            currentOffset += maxTrajectoryLength + gap;
+        if (i < featureCollection.features.length - 1) {
+            const currentTrajectory = featureCollection.features[i];
+            const nextTrajectory = featureCollection.features[i + 1];
+            const gap = calculateTrajectoryGap(
+                currentTrajectory,
+                nextTrajectory
+            );
+            maxAbscissa += gap;
         }
     }
 
