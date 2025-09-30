@@ -582,14 +582,13 @@ export const TypedArrayWithoutPropertyInput: StoryObj<
 const ReadoutComponent: React.FC = () => {
     const [hoverInfo, hoverCallback] = useHoverInfo();
 
-    const args = React.useMemo(() => {
+    const args = React.useMemo<SubsurfaceViewerProps>(() => {
         return {
             id: "readout",
             bounds: hugin2DBounds,
             layers: [{ ...hugin25mKhNetmapMapLayer, material: false }],
-            coords: {
-                visible: false,
-            },
+            showReadout: false,
+            pickingDepth: 1,
             onMouseEvent: hoverCallback,
         };
     }, [hoverCallback]);
@@ -617,7 +616,7 @@ export const Readout: StoryObj<typeof ReadoutComponent> = {
 const BigMapWithHoleComponent: React.FC = () => {
     const [hoverInfo, hoverCallback] = useHoverInfo();
 
-    const args = React.useMemo(() => {
+    const args = React.useMemo<SubsurfaceViewerProps>(() => {
         return {
             id: "readout",
             bounds: hugin2DBounds,
@@ -629,9 +628,7 @@ const BigMapWithHoleComponent: React.FC = () => {
                     material: false,
                 },
             ],
-            coords: {
-                visible: false,
-            },
+            showReadout: false,
             onMouseEvent: hoverCallback,
         };
     }, [hoverCallback]);

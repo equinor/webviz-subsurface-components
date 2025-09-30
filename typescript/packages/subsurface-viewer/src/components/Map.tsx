@@ -598,10 +598,12 @@ const Map: React.FC<MapProps> = ({
                 ? pickingDepth(type)
                 : pickingDepth;
 
-            if (depth < 1)
+            if (depth < 0)
                 throw new Error(
-                    `Expected a picking depth to be higher than 0. Received ${depth}`
+                    `Expected a picking depth to be positive. Received ${depth}`
                 );
+
+            if (depth === 0) return [];
 
             if (depth > 1 && pickInfo.layer?.context.deck) {
                 const pickInfos =

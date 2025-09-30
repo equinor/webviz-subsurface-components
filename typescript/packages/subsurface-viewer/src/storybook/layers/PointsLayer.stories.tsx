@@ -22,14 +22,30 @@ export default stories;
 
 /*eslint-disable */
 const smallPointsData = [
-    0,  0,  5,  // Vertex 1, x, y, z
-    10, 0,  5,  // Vertex 2, x, y, z
-    10, 10, 5,  // Vertex 3, x, y, z
-    0,  10, 0,  // Vertex 4, x, y, z
-    5,  -5, 10, // Vertex 5, x, y, z
-    11, -4, 6,  // Vertex 6, x, y, z
-    11, 0,  7,  // Vertex 7, x, y, z
-    17, 0,  8,  // Vertex 8, x, y, z
+    0,
+    0,
+    5, // Vertex 1, x, y, z
+    10,
+    0,
+    5, // Vertex 2, x, y, z
+    10,
+    10,
+    5, // Vertex 3, x, y, z
+    0,
+    10,
+    0, // Vertex 4, x, y, z
+    5,
+    -5,
+    10, // Vertex 5, x, y, z
+    11,
+    -4,
+    6, // Vertex 6, x, y, z
+    11,
+    0,
+    7, // Vertex 7, x, y, z
+    17,
+    0,
+    8, // Vertex 8, x, y, z
 ];
 /*eslint-enable */
 
@@ -148,9 +164,8 @@ export const HugePointsLayer: StoryObj<typeof SubsurfaceViewer> = {
         id: "huge-points-map",
         layers: [hugeAxesLayer, hugePointsLayer],
         bounds: [0, 0, sideSize, sideSize],
-        coords: {
-            visible: false,
-        },
+        showReadout: false,
+        pickingDepth: 0,
         views: default3DViews,
     },
     parameters: {
