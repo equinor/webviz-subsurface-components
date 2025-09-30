@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { Feature } from "geojson";
-import { cloneDeep, isEmpty, isEqual } from "lodash";
+import { cloneDeep, isEmpty, isEqual, isFunction } from "lodash";
 
 import type {
     MjolnirEvent,
@@ -292,13 +292,15 @@ export interface MapProps {
     } | null;
 
     /**
-     * The amount of items that gets picked. Depth is only relevant if multi-picking is enabled
+     * The amount of items that gets picked.Should be a positive integer, minimum of 1. Can alternatively provide a function to give a dynamic value.
      */
-    pickingDepth?: number;
+    pickingDepth?: number | ((type: "click" | "hover") => number);
+
     /**
-     * Enable multi-picking.
+     * Extra pixels around the pointer to include while picking.
      */
-    multiPicking?: boolean;
+    pickingRadius?: number;
+
     /**
      * If true, the built-in readout box will be shown
      */
@@ -402,11 +404,6 @@ export interface MapProps {
     innerRef?: React.Ref<HTMLElement>;
 
     /**
-     * Extra pixels around the pointer to include while picking.
-     */
-    pickingRadius?: number;
-
-    /**
      * The reference to the deck.gl instance.
      */
     deckGlRef?: React.ForwardedRef<DeckGLRef>;
@@ -428,6 +425,19 @@ function defaultTooltip(info: PickingInfo) {
     return feat?.properties?.["name"];
 }
 
+function makeExtendedPickingInfo(info: PickingInfo): PickingInfoExt {
+    const scaledCoordinate = info.coordinate
+        ? ([...info.coordinate] as Point2D | Point3D)
+        : undefined;
+
+    const extendedPickInfo: PickingInfoExt = {
+        ...info,
+        scaledCoordinate,
+    };
+
+    return extendedPickInfo;
+}
+
 const Map: React.FC<MapProps> = ({
     id,
     layers,
@@ -439,7 +449,6 @@ const Map: React.FC<MapProps> = ({
     coords,
     showReadout = coords?.visible ?? true,
     pickingDepth = coords?.pickDepth ?? 2,
-    multiPicking = coords?.multiPicking ?? true,
     coordinateUnit = "m",
     colorTables = defaultColorTables,
     setEditedData,
@@ -581,30 +590,25 @@ const Map: React.FC<MapProps> = ({
 
     const getPickingInfos = useCallback(
         (
+            type: "hover" | "click",
             pickInfo: PickingInfo,
             event: MjolnirPointerEvent | MjolnirGestureEvent
         ): PickingInfoExt[] => {
-            function makeExtendedPickingInfo(
-                info: PickingInfo
-            ): PickingInfoExt {
-                const scaledCoordinate = info.coordinate
-                    ? ([...info.coordinate] as Point2D | Point3D)
-                    : undefined;
+            const depth = isFunction(pickingDepth)
+                ? pickingDepth(type)
+                : pickingDepth;
 
-                const extendedPickInfo: PickingInfoExt = {
-                    ...info,
-                    scaledCoordinate,
-                };
+            if (depth < 1)
+                throw new Error(
+                    `Expected a picking depth to be higher than 0. Received ${depth}`
+                );
 
-                return extendedPickInfo;
-            }
-
-            if (multiPicking && pickInfo.layer?.context.deck) {
+            if (depth > 1 && pickInfo.layer?.context.deck) {
                 const pickInfos =
                     pickInfo.layer.context.deck.pickMultipleObjects({
                         x: event.offsetCenter.x,
                         y: event.offsetCenter.y,
-                        depth: pickingDepth,
+                        depth,
                         unproject3D: true,
                         radius: pickingRadius,
                     });
@@ -647,7 +651,7 @@ const Map: React.FC<MapProps> = ({
 
             return [extendedPickInfo];
         },
-        [multiPicking, pickingDepth, pickingRadius, viewController]
+        [pickingDepth, pickingRadius, viewController]
     );
 
     /**
@@ -688,7 +692,7 @@ const Map: React.FC<MapProps> = ({
     const [hoverInfo, setHoverInfo] = useState<any>([]);
     const onHover = useCallback(
         (pickInfo: PickingInfo, event: MjolnirPointerEvent) => {
-            const infos = getPickingInfos(pickInfo, event);
+            const infos = getPickingInfos("hover", pickInfo, event);
             setHoverInfo(infos);
             callOnMouseEvent?.("hover", infos, event);
         },
@@ -697,7 +701,7 @@ const Map: React.FC<MapProps> = ({
 
     const onClick = useCallback(
         (pickInfo: PickingInfo, event: MjolnirGestureEvent) => {
-            const infos = getPickingInfos(pickInfo, event);
+            const infos = getPickingInfos("click", pickInfo, event);
             callOnMouseEvent?.("click", infos, event);
         },
         [callOnMouseEvent, getPickingInfos]
