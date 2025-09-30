@@ -15,14 +15,14 @@ function computeUnfoldedPath(worldCoordinates: Position[]): {
     const a: number[] = [];
     let maxAbscissa = 0;
 
-    delta.forEach((d) => {
+    for (const d of delta) {
         const prev = a.at(-1) || 0;
         const newA = (d as number) + prev;
         a.push(newA);
         maxAbscissa = Math.max(maxAbscissa, newA);
-    });
+    }
 
-    const vAbscissa = zip(a, z, [...a].fill(0));
+    const vAbscissa = zip(a, z, new Array(a.length).fill(0));
     return { vAbscissa: vAbscissa as Position[], maxAbscissa };
 }
 
@@ -101,7 +101,8 @@ export function abscissaTransform<
             }
         }
 
-        // Add gap equal to lateral euclidean distance between trajectory start points
+        // Add gap equal to lateral euclidean distance between trajectory start points in
+        // original world coordinates
         if (i < featureCollection.features.length - 1) {
             const currentTrajectory = featureCollection.features[i];
             const nextTrajectory = featureCollection.features[i + 1];
