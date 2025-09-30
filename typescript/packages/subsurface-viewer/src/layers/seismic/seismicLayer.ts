@@ -1,4 +1,4 @@
-import { isEqual } from "lodash";
+import { isEqual, uniqWith } from "lodash";
 import type React from "react";
 
 import type { Color, PickingInfo, UpdateParameters } from "@deck.gl/core";
@@ -300,9 +300,17 @@ export default class SeismicLayer extends CompositeLayer<SeismicLayerProps> {
             layer_properties.push(createPropertyData("Depth", depth));
         }
 
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const merged_props = [...layer_properties, ...(info.properties ?? [])];
+        const properties = uniqWith(
+            merged_props,
+            (e1, e2) => e1.name === e2.name
+        );
+
         return {
             ...info,
-            properties: layer_properties,
+            properties,
         };
     }
 

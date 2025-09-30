@@ -1,3 +1,13 @@
+## 1.13.6 (2025-09-30)
+
+### 🩹 Fixes
+
+- [NGRM] Cursor readout for Seismic layer #2617 ([#2620](https://github.com/equinor/webviz-subsurface-components/pull/2620), [#2617](https://github.com/equinor/webviz-subsurface-components/issues/2617))
+
+### ❤️ Thank You
+
+- nilscb @nilscb
+
 ## 1.13.5 (2025-08-07)
 
 ### 🧱 Updated Dependencies
