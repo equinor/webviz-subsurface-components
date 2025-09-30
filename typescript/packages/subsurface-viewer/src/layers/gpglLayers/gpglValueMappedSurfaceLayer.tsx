@@ -32,6 +32,7 @@ import {
 } from "../utils/colormapTools";
 
 import type {} from "../../utils/Color";
+import { utilities } from "../shader_modules";
 
 import type {
     Color,
@@ -292,6 +293,16 @@ export class GpglValueMappedSurfaceLayer extends Layer<GpglValueMappedSurfaceLay
             return undefined;
         }
 
+        if (!this.props.colormapSetup?.valueRange) {
+            let min = Infinity;
+            let max = -Infinity;
+            for (const x of propertiesData) {
+                min = x < min ? x : min;
+                max = x > max ? x : max;
+            }
+            this.setState({ ...this.state, valueRange: [min, max] });
+        }
+
         const smooth =
             this.props.colormapSetup?.smooth ?? defaultColormapSetup.smooth;
         const textureProps: TextureProps = {
@@ -387,6 +398,7 @@ export class GpglValueMappedSurfaceLayer extends Layer<GpglValueMappedSurfaceLay
                             phongMaterial,
                             uniforms,
                             precisionForTests,
+                            utilities,
                         ],
                     }),
                     bufferLayout:
@@ -551,20 +563,23 @@ export class GpglValueMappedSurfaceLayer extends Layer<GpglValueMappedSurfaceLay
                 (defaultColormapSetup.clampColor as Color)
         );
 
+        const colormapRange =
+            this.props.colormapSetup?.valueRange ??
+            (this.state["valueRange"] as [number, number]) ??
+            defaultColormapSetup.valueRange;
+
+        const clampRange =
+            this.props.colormapSetup?.clampRange === null
+                ? null
+                : (this.props.colormapSetup?.clampRange ?? colormapRange);
+
         // render all the triangle surfaces
         triangleModels?.forEach((model) => {
             model.shaderInputs.setProps({
                 ...args.uniforms,
                 triangles: {
-                    colormapRange:
-                        this.props.colormapSetup?.valueRange ??
-                        defaultColormapSetup.valueRange,
-                    clampRange:
-                        this.props.colormapSetup?.clampRange === null
-                            ? null
-                            : (this.props.colormapSetup?.clampRange ??
-                              this.props.colormapSetup?.valueRange ??
-                              defaultColormapSetup.valueRange),
+                    colormapRange,
+                    clampRange,
                     useClampColors:
                         this.props.colormapSetup?.clampColor !== null &&
                         this.props.colormapSetup?.clampRange !== null,
@@ -623,7 +638,6 @@ export class GpglValueMappedSurfaceLayer extends Layer<GpglValueMappedSurfaceLay
         if (!info.color) {
             return info;
         }
-
         const layer_properties: PropertyDataType[] = [];
         const zScale = this.props.modelMatrix ? this.props.modelMatrix[10] : 1;
         if (typeof info.coordinate?.[2] !== "undefined") {
@@ -633,6 +647,21 @@ export class GpglValueMappedSurfaceLayer extends Layer<GpglValueMappedSurfaceLay
                     : info.coordinate[2]) / Math.max(0.001, zScale);
             layer_properties.push(createPropertyData("Depth", depth));
         }
+
+        // Note these colors are in the  0-255 range.
+        const r = info.color[0];
+        const g = info.color[1];
+        const b = info.color[2];
+
+        const n = 256 * 256 * r + 256 * g + b;
+        const valueRange =
+            this.props.colormapSetup?.valueRange ??
+            (this.state["valueRange"] as [number, number]) ??
+            defaultColormapSetup.valueRange;
+        const normalizedValue = n / (255 * 255 * 255 - 1);
+        const value =
+            valueRange[0] + normalizedValue * (valueRange[1] - valueRange[0]);
+        layer_properties.push(createPropertyData("Value", value));
 
         return {
             ...info,
