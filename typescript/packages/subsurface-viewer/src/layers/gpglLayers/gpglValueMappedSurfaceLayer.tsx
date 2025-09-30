@@ -638,6 +638,14 @@ export class GpglValueMappedSurfaceLayer extends Layer<GpglValueMappedSurfaceLay
             return info;
         }
         const layer_properties: PropertyDataType[] = [];
+        const zScale = this.props.modelMatrix ? this.props.modelMatrix[10] : 1;
+        if (typeof info.coordinate?.[2] !== "undefined") {
+            const depth =
+                (this.props.ZIncreasingDownwards
+                    ? -info.coordinate[2]
+                    : info.coordinate[2]) / Math.max(0.001, zScale);
+            layer_properties.push(createPropertyData("Depth", depth));
+        }
 
         // Note these colors are in the  0-255 range.
         const r = info.color[0];
