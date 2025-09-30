@@ -168,6 +168,7 @@ const defaultProps: DefaultProps<GpglValueMappedSurfaceLayerProps> = {
     colormap: {
         colormapName: "seismic",
     },
+    colormapSetup: defaultColormapSetup,
     color: [100, 100, 255],
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
     material: true, // default material
