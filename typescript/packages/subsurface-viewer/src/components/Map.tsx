@@ -605,53 +605,51 @@ const Map: React.FC<MapProps> = ({
 
             if (depth === 0) return [];
 
-            if (depth > 1 && pickInfo.layer?.context.deck) {
-                const pickInfos =
-                    pickInfo.layer.context.deck.pickMultipleObjects({
-                        x: event.offsetCenter.x,
-                        y: event.offsetCenter.y,
-                        depth,
-                        unproject3D: true,
-                        radius: pickingRadius,
-                    });
+            if (!pickInfo.layer?.context.deck) {
+                const extendedPickInfo = makeExtendedPickingInfo(pickInfo);
 
-                pickInfos.forEach((itemPick) => {
-                    const extItemPick = makeExtendedPickingInfo(itemPick);
-                    // Z value should not take into account the Z scale factor.
-                    viewController.unscaledTarget(
-                        extItemPick.coordinate as Point2D | Point3D
-                    );
+                // Z value should not take into account the Z scale factor.
+                viewController.unscaledTarget(
+                    pickInfo.coordinate as Point2D | Point3D
+                );
 
-                    if (extItemPick.layer instanceof WellsLayer) {
-                        const wellsPickInfo = extItemPick as WellsPickInfo;
-                        const unit = extItemPick.layer?.state.data?.unit ?? " ";
-
-                        wellsPickInfo.properties?.forEach((property) => {
-                            if (
-                                property.name.includes("MD") ||
-                                property.name.includes("TVD")
-                            ) {
-                                const fixedNumber = Number(
-                                    property.value
-                                ).toFixed(2);
-
-                                property.value = `${fixedNumber} ${unit}`;
-                            }
-                        });
-                    }
-                });
-                return pickInfos;
+                return [extendedPickInfo];
             }
 
-            // When not multi-picking, we can use the info already picked by deckGl
-            const extendedPickInfo = makeExtendedPickingInfo(pickInfo);
+            const pickInfos = pickInfo.layer.context.deck.pickMultipleObjects({
+                x: event.offsetCenter.x,
+                y: event.offsetCenter.y,
+                depth,
+                unproject3D: true,
+                radius: pickingRadius,
+            });
 
-            // Z value should not take into account the Z scale factor.
-            viewController.unscaledTarget(
-                pickInfo.coordinate as Point2D | Point3D
-            );
+            pickInfos.forEach((itemPick) => {
+                const extItemPick = makeExtendedPickingInfo(itemPick);
+                // Z value should not take into account the Z scale factor.
+                viewController.unscaledTarget(
+                    extItemPick.coordinate as Point2D | Point3D
+                );
 
-            return [extendedPickInfo];
+                if (extItemPick.layer instanceof WellsLayer) {
+                    const wellsPickInfo = extItemPick as WellsPickInfo;
+                    const unit = extItemPick.layer?.state.data?.unit ?? " ";
+
+                    wellsPickInfo.properties?.forEach((property) => {
+                        if (
+                            property.name.includes("MD") ||
+                            property.name.includes("TVD")
+                        ) {
+                            const fixedNumber = Number(property.value).toFixed(
+                                2
+                            );
+
+                            property.value = `${fixedNumber} ${unit}`;
+                        }
+                    });
+                }
+            });
+            return pickInfos;
         },
         [pickingDepth, pickingRadius, viewController]
     );
