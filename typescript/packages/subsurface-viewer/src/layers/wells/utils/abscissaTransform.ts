@@ -26,7 +26,13 @@ function computeUnfoldedPath(worldCoordinates: Position[]): {
     return { vAbscissa: vAbscissa as Position[], maxAbscissa };
 }
 
-// Find the ending point of the last LineString in feature1
+/**
+ * Returns the final (last) coordinate of the first LineString with at least one coordinate
+ * found inside the supplied GeometryCollection.
+ *
+ * @param feature Geometry collection feature containing well geometries (Points / LineStrings).
+ * @returns The last coordinate (xyz) of the first qualifying LineString, or null if none exist.
+ */
 export const getEndPoint = (feature: {
     geometry: GeometryCollection;
 }): Position | null => {
@@ -38,7 +44,13 @@ export const getEndPoint = (feature: {
     return null;
 };
 
-// Find the starting point of the first LineString in feature1
+/**
+ * Returns the starting (first) coordinate of the first LineString with at least one coordinate
+ * found inside the supplied GeometryCollection.
+ *
+ * @param feature Geometry collection feature containing well geometries (Points / LineStrings).
+ * @returns The first coordinate (xyz) of the first qualifying LineString, or null if none exist.
+ */
 export const getStartPoint = (feature: {
     geometry: GeometryCollection;
 }): Position | null => {
@@ -50,6 +62,15 @@ export const getStartPoint = (feature: {
     return null;
 };
 
+/**
+ * Computes the lateral (XY plane) Euclidean distance between the end of the first available
+ * trajectory (LineString) in the first feature and the start of the first available trajectory
+ * in the second feature. Z values are ignored in the distance calculation.
+ *
+ * @param feature1 Feature containing a GeometryCollection (source / previous well trajectory).
+ * @param feature2 Feature containing a GeometryCollection (target / next well trajectory).
+ * @returns Lateral distance in the same units as the input coordinates, or 0 if either trajectory endpoint is missing.
+ */
 export function calculateTrajectoryGap(
     feature1: { geometry: GeometryCollection },
     feature2: { geometry: GeometryCollection }
