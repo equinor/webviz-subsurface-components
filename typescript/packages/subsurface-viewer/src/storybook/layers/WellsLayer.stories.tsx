@@ -44,6 +44,7 @@ import {
     LABEL_SIZE_ARGTYPES,
 } from "../constant/argTypes";
 import { getRgba } from "../util/color";
+import { View } from "@deck.gl/core";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -1107,7 +1108,7 @@ export const UnfoldedProjection: StoryObj<typeof SubsurfaceViewer> = {
                 {
                     id: "viewport1",
                     target: [2000, -1500],
-                    zoom: -2.5,
+                    zoom: -3,
                     layerIds: ["unfolded", "axes"],
                 },
                 {
@@ -1116,6 +1117,7 @@ export const UnfoldedProjection: StoryObj<typeof SubsurfaceViewer> = {
                 },
             ],
         },
+        scale: { visible: false },
     },
     parameters: {
         docs: {
@@ -1125,4 +1127,26 @@ export const UnfoldedProjection: StoryObj<typeof SubsurfaceViewer> = {
             },
         },
     },
+    render: (args) => (
+        <SubsurfaceViewer {...args}>
+            {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                /* @ts-expect-error */
+                <View id="viewport1">
+                    <h2 style={{ marginLeft: "100px" }}>
+                        Unfolded projection [abscissa, z]
+                    </h2>
+                </View>
+            }
+            {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                /* @ts-expect-error */
+                <View id="viewport2">
+                    <h2 style={{ marginLeft: "100px" }}>
+                        Folded projection [x, y]
+                    </h2>
+                </View>
+            }
+        </SubsurfaceViewer>
+    ),
 };
