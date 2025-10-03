@@ -21,31 +21,16 @@ const stories: Meta = {
 export default stories;
 
 /*eslint-disable */
+/* prettier-ignore */
 const smallPointsData = [
-    0,
-    0,
-    5, // Vertex 1, x, y, z
-    10,
-    0,
-    5, // Vertex 2, x, y, z
-    10,
-    10,
-    5, // Vertex 3, x, y, z
-    0,
-    10,
-    0, // Vertex 4, x, y, z
-    5,
-    -5,
-    10, // Vertex 5, x, y, z
-    11,
-    -4,
-    6, // Vertex 6, x, y, z
-    11,
-    0,
-    7, // Vertex 7, x, y, z
-    17,
-    0,
-    8, // Vertex 8, x, y, z
+    0,  0,  5,  // Vertex 1, x, y, z
+    10, 0,  5,  // Vertex 2, x, y, z
+    10, 10, 5,  // Vertex 3, x, y, z
+    0,  10, 0,  // Vertex 4, x, y, z
+    5,  -5, 10, // Vertex 5, x, y, z
+    11, -4, 6,  // Vertex 6, x, y, z
+    11, 0,  7,  // Vertex 7, x, y, z
+    17, 0,  8,  // Vertex 8, x, y, z
 ];
 /*eslint-enable */
 

@@ -292,7 +292,7 @@ export interface MapProps {
     } | null;
 
     /**
-     * The amount of items that gets picked.Should be a positive integer, minimum of 1. Can alternatively provide a function to give a dynamic value.
+     * The amount of items that gets picked. Should be a positive integer. With depth 0, no picking info will be returned. Can alternatively provide a function to give a dynamic value.
      */
     pickingDepth?: number | ((type: "click" | "hover") => number);
 
@@ -314,7 +314,7 @@ export interface MapProps {
         incrementValue?: number | null;
         widthPerUnit?: number | null;
         cssStyle?: Record<string, unknown> | null;
-    } | null;
+    };
 
     coordinateUnit?: Unit;
 
