@@ -53,8 +53,13 @@ export interface LayerPickInfo<T = any> extends PickingInfo<T> {
     properties?: PropertyDataType[]; // for multiple properties
 }
 
-// Creates property object which will be used to display layer property
-// in the info card.
+/**
+ * Creates property object which will be displayed in the info card.
+ *   createPropertyData("Property", value) is used to store the value,
+ *      which is either a number of the category text (for categorical properties)
+ *   createPropertyData("Value", categoryIndex) is used to store the category index in case of categorical property.
+ *   createPropertyData("Depth", categoryIndex) is used to store depth coordinate (Z in 3d viewer, md in well log viewer)
+ */
 export function createPropertyData(
     name: string,
     value: string | number,

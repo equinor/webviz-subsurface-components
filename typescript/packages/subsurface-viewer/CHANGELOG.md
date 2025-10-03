@@ -1,3 +1,13 @@
+## 1.13.7 (2025-10-01)
+
+### 🩹 Fixes
+
+- Fix seismic readout doc and display text. ([#2624](https://github.com/equinor/webviz-subsurface-components/pull/2624))
+
+### ❤️ Thank You
+
+- nilscb @nilscb
+
 ## 1.13.6 (2025-09-30)
 
 ### 🩹 Fixes
