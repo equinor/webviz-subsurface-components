@@ -661,7 +661,7 @@ export class GpglValueMappedSurfaceLayer extends Layer<GpglValueMappedSurfaceLay
         const normalizedValue = n / (255 * 255 * 255 - 1);
         const value =
             valueRange[0] + normalizedValue * (valueRange[1] - valueRange[0]);
-        layer_properties.push(createPropertyData("Value", value));
+        layer_properties.push(createPropertyData("Property", value));
 
         return {
             ...info,
