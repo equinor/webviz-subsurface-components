@@ -154,10 +154,13 @@ TFeatureCollection {
         return features;
     }
 
+    const featuresCopy = cloneDeep(features);
+
     // Start with the first feature at abscissa 0
     let currentAbscissa = 0;
     const visited = new Set<number>();
     visited.add(0);
+    let lastVisitedIndex = 0;
 
     const transformedFeatures: typeof features.features = [];
     transformedFeatures.push(cloneDeep(features.features[0]));
@@ -182,7 +185,7 @@ TFeatureCollection {
         let nearestIndex = -1;
         let nearestDistance = Infinity;
 
-        const lastFeature = transformedFeatures[transformedFeatures.length - 1];
+        const lastFeature = features.features[lastVisitedIndex];
 
         for (let i = 0; i < features.features.length; i++) {
             if (visited.has(i)) continue;
@@ -204,6 +207,10 @@ TFeatureCollection {
         const nextFeature = cloneDeep(features.features[nearestIndex]);
         transformedFeatures.push(nextFeature);
 
+        lastVisitedIndex = nearestIndex;
+
+        currentAbscissa += nearestDistance;
+
         // Transform the next feature
         for (const geometry of nextFeature.geometry.geometries) {
             if ("Point" === geometry.type) {
@@ -221,7 +228,7 @@ TFeatureCollection {
         }
     }
 
-    features.features = transformedFeatures;
+    featuresCopy.features = transformedFeatures;
 
-    return features;
+    return featuresCopy;
 }

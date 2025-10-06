@@ -1082,9 +1082,9 @@ const VOLVE_WELLS_PROPS = {
     },
 };
 
-const WELLS_UNFOLDED = new WellsLayer({
+const WELLS_UNFOLDED_DEFAULT = new WellsLayer({
     ...VOLVE_WELLS_PROPS,
-    id: "unfolded",
+    id: "unfolded_default",
     section: true,
 });
 
@@ -1110,7 +1110,7 @@ export const UnfoldedProjection: StoryObj<typeof SubsurfaceViewer> = {
         id: "some-id",
         layers: [
             WELLS_FOLDED,
-            WELLS_UNFOLDED,
+            WELLS_UNFOLDED_DEFAULT,
             WELLS_UNFOLDED_CUSTOM,
             new Axes2DLayer({ id: "axes" }),
         ],
@@ -1119,19 +1119,19 @@ export const UnfoldedProjection: StoryObj<typeof SubsurfaceViewer> = {
             viewports: [
                 {
                     id: "viewport1",
-                    target: [2000, -1500],
-                    zoom: -3,
-                    layerIds: ["unfolded", "axes"],
+                    target: [3000, -1500],
+                    zoom: -4,
+                    layerIds: [WELLS_UNFOLDED_DEFAULT.id, "axes"],
                 },
                 {
                     id: "viewport2",
-                    target: [2000, -1500],
-                    zoom: -3,
-                    layerIds: ["unfolded_custom", "axes"],
+                    target: [3000, -1500],
+                    zoom: -4,
+                    layerIds: [WELLS_UNFOLDED_CUSTOM.id, "axes"],
                 },
                 {
                     id: "viewport3",
-                    layerIds: ["folded", "axes"],
+                    layerIds: [WELLS_FOLDED.id, "axes"],
                 },
             ],
         },
@@ -1152,7 +1152,7 @@ export const UnfoldedProjection: StoryObj<typeof SubsurfaceViewer> = {
                 /* @ts-expect-error */
                 <View id="viewport1">
                     <h2 style={{ marginLeft: "100px" }}>
-                        Unfolded projection [abscissa, z]
+                        Default unfolded projection [abscissa, z]
                     </h2>
                 </View>
             }
@@ -1160,6 +1160,15 @@ export const UnfoldedProjection: StoryObj<typeof SubsurfaceViewer> = {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 /* @ts-expect-error */
                 <View id="viewport2">
+                    <h2 style={{ marginLeft: "100px" }}>
+                        Custom unfolded projection [abscissa, z]
+                    </h2>
+                </View>
+            }
+            {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                /* @ts-expect-error */
+                <View id="viewport3">
                     <h2 style={{ marginLeft: "100px" }}>
                         Folded projection [x, y]
                     </h2>
