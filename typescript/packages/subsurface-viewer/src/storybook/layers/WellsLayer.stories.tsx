@@ -24,7 +24,6 @@ import type { WellFeatureCollection } from "../../layers/wells/types";
 
 import { Axes2DLayer } from "../../layers";
 import {
-    default2DViews,
     default3DViews,
     defaultStoryParameters,
     volveWellsBounds,
@@ -45,6 +44,7 @@ import {
     LABEL_SIZE_ARGTYPES,
 } from "../constant/argTypes";
 import { getRgba } from "../util/color";
+import { View } from "@deck.gl/core";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -1075,29 +1075,49 @@ const VOLVE_WELLS_PROPS = {
     id: "volve",
     data: "./volve_wells.json",
     ZIncreasingDownwards: false,
+    wellLabel: {
+        getSize: 12,
+        background: true,
+    },
 };
+
 const WELLS_UNFOLDED = new WellsLayer({
     ...VOLVE_WELLS_PROPS,
     id: "unfolded",
     section: true,
 });
 
+const WELLS_FOLDED = new WellsLayer({
+    ...VOLVE_WELLS_PROPS,
+    id: "folded",
+    wellLabel: {
+        ...VOLVE_WELLS_PROPS.wellLabel,
+        orientation: LabelOrientation.TANGENT,
+        getPositionAlongPath: 0.9,
+    },
+});
+
 /** Example well with unfolded projection */
 export const UnfoldedProjection: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "some-id",
-        layers: [WELLS_UNFOLDED, new Axes2DLayer()],
+        layers: [WELLS_FOLDED, WELLS_UNFOLDED, new Axes2DLayer({ id: "axes" })],
         views: {
-            ...default2DViews,
+            layout: [1, 2] as [number, number],
             viewports: [
                 {
                     id: "viewport1",
                     target: [2000, -1500],
-                    zoom: -2.5,
+                    zoom: -3,
+                    layerIds: ["unfolded", "axes"],
+                },
+                {
+                    id: "viewport2",
+                    layerIds: ["folded", "axes"],
                 },
             ],
         },
-        bounds: [0, -1000, 4000, 0],
+        scale: { visible: false },
     },
     parameters: {
         docs: {
@@ -1107,4 +1127,26 @@ export const UnfoldedProjection: StoryObj<typeof SubsurfaceViewer> = {
             },
         },
     },
+    render: (args) => (
+        <SubsurfaceViewer {...args}>
+            {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                /* @ts-expect-error */
+                <View id="viewport1">
+                    <h2 style={{ marginLeft: "100px" }}>
+                        Unfolded projection [abscissa, z]
+                    </h2>
+                </View>
+            }
+            {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                /* @ts-expect-error */
+                <View id="viewport2">
+                    <h2 style={{ marginLeft: "100px" }}>
+                        Folded projection [x, y]
+                    </h2>
+                </View>
+            }
+        </SubsurfaceViewer>
+    ),
 };
