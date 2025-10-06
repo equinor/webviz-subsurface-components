@@ -6,21 +6,21 @@ import { Slider } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import type { FeatureCollection, GeometryCollection } from "geojson";
 
-import { NativeSelect } from "@equinor/eds-core-react";
 import {
     ColorLegend,
     colorTables,
     createColorMapFunction as createColormapFunction,
 } from "@emerson-eps/color-tables";
+import { NativeSelect } from "@equinor/eds-core-react";
 
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import type { MapMouseEvent } from "../../components/Map";
 
 import AxesLayer from "../../layers/axes/axesLayer";
+import type { WellFeatureCollection } from "../../layers/wells/types";
 import type { WellsLayerProps } from "../../layers/wells/wellsLayer";
 import WellsLayer from "../../layers/wells/wellsLayer";
-import type { WellFeatureCollection } from "../../layers/wells/types";
 
 import { Axes2DLayer } from "../../layers";
 import {
@@ -31,8 +31,10 @@ import {
     volveWellsResources,
 } from "../sharedSettings";
 
+import { View } from "@deck.gl/core";
 import type { WellLabelLayerProps } from "../../layers/wells/layers/wellLabelLayer";
 import { LabelOrientation } from "../../layers/wells/layers/wellLabelLayer";
+import { nearestNeighborAbscissaTransform } from "../../layers/wells/utils/abscissaTransform";
 import {
     coarsenWells,
     DEFAULT_TOLERANCE,
@@ -44,7 +46,6 @@ import {
     LABEL_SIZE_ARGTYPES,
 } from "../constant/argTypes";
 import { getRgba } from "../util/color";
-import { View } from "@deck.gl/core";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -1087,6 +1088,12 @@ const WELLS_UNFOLDED = new WellsLayer({
     section: true,
 });
 
+const WELLS_UNFOLDED_CUSTOM = new WellsLayer({
+    ...VOLVE_WELLS_PROPS,
+    id: "unfolded_custom",
+    section: nearestNeighborAbscissaTransform,
+});
+
 const WELLS_FOLDED = new WellsLayer({
     ...VOLVE_WELLS_PROPS,
     id: "folded",
@@ -1101,9 +1108,14 @@ const WELLS_FOLDED = new WellsLayer({
 export const UnfoldedProjection: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "some-id",
-        layers: [WELLS_FOLDED, WELLS_UNFOLDED, new Axes2DLayer({ id: "axes" })],
+        layers: [
+            WELLS_FOLDED,
+            WELLS_UNFOLDED,
+            WELLS_UNFOLDED_CUSTOM,
+            new Axes2DLayer({ id: "axes" }),
+        ],
         views: {
-            layout: [1, 2] as [number, number],
+            layout: [1, 3] as [number, number],
             viewports: [
                 {
                     id: "viewport1",
@@ -1113,6 +1125,12 @@ export const UnfoldedProjection: StoryObj<typeof SubsurfaceViewer> = {
                 },
                 {
                     id: "viewport2",
+                    target: [2000, -1500],
+                    zoom: -3,
+                    layerIds: ["unfolded_custom", "axes"],
+                },
+                {
+                    id: "viewport3",
                     layerIds: ["folded", "axes"],
                 },
             ],

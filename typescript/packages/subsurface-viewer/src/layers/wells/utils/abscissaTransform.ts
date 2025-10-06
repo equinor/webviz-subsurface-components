@@ -2,6 +2,10 @@ import type { FeatureCollection, GeometryCollection, Position } from "geojson";
 import { cloneDeep, zip } from "lodash";
 import { distance } from "mathjs";
 
+export type AbscissaTransform = <TFeatureCollection extends FeatureCollection<GeometryCollection>>(
+    featureCollection: TFeatureCollection
+) => TFeatureCollection;
+
 function computeUnfoldedPath(worldCoordinates: Position[]): {
     vAbscissa: Position[];
     maxAbscissa: number;
@@ -136,4 +140,88 @@ export function abscissaTransform<
     }
 
     return featureCollectionCopy;
+}
+
+/**
+ * Projects well trajectories onto an abscissa, z plane using a nearest neighbor approach.
+ * @param features 
+ * @returns 
+ */
+export function nearestNeighborAbscissaTransform<TFeatureCollection extends FeatureCollection<GeometryCollection>>  (
+    features: TFeatureCollection):
+TFeatureCollection {
+    if (features.features.length === 0) {
+        return features;
+    }
+
+    // Start with the first feature at abscissa 0
+    let currentAbscissa = 0;
+    const visited = new Set<number>();
+    visited.add(0);
+
+    const transformedFeatures: typeof features.features = [];
+    transformedFeatures.push(cloneDeep(features.features[0]));
+
+    // Transform the first feature
+    for (const geometry of transformedFeatures[0].geometry.geometries) {
+        if ("Point" === geometry.type) {
+            const coordinates = geometry.coordinates;
+            geometry.coordinates = [currentAbscissa, coordinates[2], 0];
+        } else if ("LineString" === geometry.type) {
+            const projection = computeUnfoldedPath(geometry.coordinates);
+            geometry.coordinates = projection.vAbscissa.map((coord) => [
+                coord[0] + currentAbscissa,
+                coord[1],
+                coord[2],
+            ]);
+            currentAbscissa += projection.maxAbscissa;
+        }
+    }
+
+    while (visited.size < features.features.length) {
+        let nearestIndex = -1;
+        let nearestDistance = Infinity;
+
+        const lastFeature = transformedFeatures[transformedFeatures.length - 1];
+
+        for (let i = 0; i < features.features.length; i++) {
+            if (visited.has(i)) continue;
+
+            const distance = calculateTrajectoryGap(
+                lastFeature,
+                features.features[i]
+            );
+
+            if (distance < nearestDistance) {
+                nearestDistance = distance;
+                nearestIndex = i;
+            }
+        }
+
+        if (nearestIndex === -1) break; // No more unvisited features
+
+        visited.add(nearestIndex);
+        const nextFeature = cloneDeep(features.features[nearestIndex]);
+        transformedFeatures.push(nextFeature);
+
+        // Transform the next feature
+        for (const geometry of nextFeature.geometry.geometries) {
+            if ("Point" === geometry.type) {
+                const coordinates = geometry.coordinates;
+                geometry.coordinates = [currentAbscissa, coordinates[2], 0];
+            } else if ("LineString" === geometry.type) {
+                const projection = computeUnfoldedPath(geometry.coordinates);
+                geometry.coordinates = projection.vAbscissa.map((coord) => [
+                    coord[0] + currentAbscissa,
+                    coord[1],
+                    coord[2],
+                ]);
+                currentAbscissa += projection.maxAbscissa;
+            }
+        }
+    }
+
+    features.features = transformedFeatures;
+
+    return features;
 }

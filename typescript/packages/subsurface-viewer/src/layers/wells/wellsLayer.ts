@@ -1,6 +1,6 @@
+import { interpolateNumberArray } from "d3";
 import _, { isEmpty, isEqual } from "lodash";
 import { distance, dot, subtract } from "mathjs";
-import { interpolateNumberArray } from "d3";
 
 import type {
     Color,
@@ -13,26 +13,26 @@ import type {
 import { CompositeLayer } from "@deck.gl/core";
 import { PathStyleExtension } from "@deck.gl/extensions";
 import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
-import { GL } from "@luma.gl/constants";
 import type { BinaryFeatureCollection } from "@loaders.gl/schema";
+import { GL } from "@luma.gl/constants";
 
 import type { colorTablesArray } from "@emerson-eps/color-tables/";
 import { getColors, rgbValues } from "@emerson-eps/color-tables/";
 
 import type { Feature, FeatureCollection, Point, Position } from "geojson";
 
+import type { ColormapFunctionType } from "../utils/colormapTools";
 import type {
     DeckGLLayerContext,
-    ReportBoundingBoxAction,
     ExtendedLayerProps,
     PropertyDataType,
+    ReportBoundingBoxAction,
 } from "../utils/layerTools";
 import {
     createPropertyData,
     getLayersById,
     isDrawingEnabled,
 } from "../utils/layerTools";
-import type { ColormapFunctionType } from "../utils/colormapTools";
 
 import type {
     ContinuousLegendDataType,
@@ -42,6 +42,18 @@ import type {
 import type { NumberPair, StyleAccessorFunction } from "../types";
 import type { WellLabelLayerProps } from "./layers/wellLabelLayer";
 import { WellLabelLayer } from "./layers/wellLabelLayer";
+import type {
+    ColorAccessor,
+    DashAccessor,
+    LineStyleAccessor,
+    LogCurveDataType,
+    SizeAccessor,
+    WellFeature,
+    WellFeatureCollection,
+    WellHeadStyleAccessor,
+    WellsPickInfo,
+} from "./types";
+import type { AbscissaTransform } from "./utils/abscissaTransform";
 import { abscissaTransform } from "./utils/abscissaTransform";
 import {
     GetBoundingBox,
@@ -51,17 +63,6 @@ import {
     splineRefine,
 } from "./utils/spline";
 import { getColor, getTrajectory } from "./utils/trajectory";
-import type {
-    WellFeatureCollection,
-    WellsPickInfo,
-    WellFeature,
-    WellHeadStyleAccessor,
-    LineStyleAccessor,
-    DashAccessor,
-    SizeAccessor,
-    ColorAccessor,
-    LogCurveDataType,
-} from "./types";
 
 export enum SubLayerId {
     COLORS = "colors",
@@ -155,7 +156,7 @@ export interface WellsLayerProps extends ExtendedLayerProps {
     simplifiedRendering: boolean;
 
     /** Sectional projection of data */
-    section?: boolean;
+    section?: boolean | AbscissaTransform;
 
     // Non public properties:
     reportBoundingBox?: React.Dispatch<ReportBoundingBoxAction>;
@@ -240,8 +241,13 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             transformedData = invertPath(transformedData);
         }
 
+        // Apply sectional projection if requested
         if (this.props.section) {
-            transformedData = abscissaTransform(transformedData);
+            if (typeof this.props.section === "function") {
+                transformedData = this.props.section(transformedData);
+            } else if (this.props.section === true) {
+                transformedData = abscissaTransform(transformedData);
+            }
         }
 
         // Mutate data to remove duplicates
