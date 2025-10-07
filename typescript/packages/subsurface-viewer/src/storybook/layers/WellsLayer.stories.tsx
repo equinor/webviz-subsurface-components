@@ -13,7 +13,10 @@ import {
 } from "@emerson-eps/color-tables";
 import { NativeSelect } from "@equinor/eds-core-react";
 
-import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
+import type {
+    SubsurfaceViewerProps,
+    TLayerDefinition,
+} from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import type { MapMouseEvent } from "../../components/Map";
 
@@ -34,7 +37,6 @@ import {
 import { View } from "@deck.gl/core";
 import type { WellLabelLayerProps } from "../../layers/wells/layers/wellLabelLayer";
 import { LabelOrientation } from "../../layers/wells/layers/wellLabelLayer";
-import { nearestNeighborAbscissaTransform } from "../../layers/wells/utils/abscissaTransform";
 import {
     coarsenWells,
     DEFAULT_TOLERANCE,
@@ -46,6 +48,8 @@ import {
     LABEL_SIZE_ARGTYPES,
 } from "../constant/argTypes";
 import { getRgba } from "../util/color";
+import { useAbscissaTransform } from "../../layers/wells/hooks/useAbscissaTransform";
+import { PathLayer } from "@deck.gl/layers";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -1077,7 +1081,7 @@ const VOLVE_WELLS_PROPS = {
     data: "./volve_wells.json",
     ZIncreasingDownwards: false,
     wellLabel: {
-        getSize: 12,
+        getSize: 10,
         background: true,
     },
 };
@@ -1086,12 +1090,6 @@ const WELLS_UNFOLDED_DEFAULT = new WellsLayer({
     ...VOLVE_WELLS_PROPS,
     id: "unfolded_default",
     section: true,
-});
-
-const WELLS_UNFOLDED_CUSTOM = new WellsLayer({
-    ...VOLVE_WELLS_PROPS,
-    id: "unfolded_custom",
-    section: nearestNeighborAbscissaTransform,
 });
 
 const WELLS_FOLDED = new WellsLayer({
@@ -1111,7 +1109,6 @@ export const UnfoldedProjection: StoryObj<typeof SubsurfaceViewer> = {
         layers: [
             WELLS_FOLDED,
             WELLS_UNFOLDED_DEFAULT,
-            WELLS_UNFOLDED_CUSTOM,
             new Axes2DLayer({ id: "axes" }),
         ],
         views: {
@@ -1127,11 +1124,11 @@ export const UnfoldedProjection: StoryObj<typeof SubsurfaceViewer> = {
                     id: "viewport2",
                     target: [3000, -1500],
                     zoom: -4,
-                    layerIds: [WELLS_UNFOLDED_CUSTOM.id, "axes"],
+                    layerIds: ["unfolded_custom", "axes"],
                 },
                 {
                     id: "viewport3",
-                    layerIds: [WELLS_FOLDED.id, "axes"],
+                    layerIds: [WELLS_FOLDED.id, "axes", "section-path"],
                 },
             ],
         },
@@ -1145,35 +1142,65 @@ export const UnfoldedProjection: StoryObj<typeof SubsurfaceViewer> = {
             },
         },
     },
-    render: (args) => (
-        <SubsurfaceViewer {...args}>
-            {
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                /* @ts-expect-error */
-                <View id="viewport1">
-                    <h2 style={{ marginLeft: "100px" }}>
-                        Default unfolded projection [abscissa, z]
-                    </h2>
-                </View>
-            }
-            {
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                /* @ts-expect-error */
-                <View id="viewport2">
-                    <h2 style={{ marginLeft: "100px" }}>
-                        Custom unfolded projection [abscissa, z]
-                    </h2>
-                </View>
-            }
-            {
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                /* @ts-expect-error */
-                <View id="viewport3">
-                    <h2 style={{ marginLeft: "100px" }}>
-                        Folded projection [x, y]
-                    </h2>
-                </View>
-            }
-        </SubsurfaceViewer>
-    ),
+    render: (args) => {
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const { transform, path } = useAbscissaTransform();
+
+        // Use custom section transform (nearest neighbor)
+        const wellsUnfoldedCustom = new WellsLayer({
+            ...VOLVE_WELLS_PROPS,
+            id: "unfolded_custom",
+            section: transform,
+            wellLabel: {
+                ...VOLVE_WELLS_PROPS.wellLabel,
+                orientation: LabelOrientation.TANGENT,
+                getPositionAlongPath: 0.5,
+            },
+        });
+
+        // Project the section path in the map view
+        const sectionPathLayer = new PathLayer({
+            id: "section-path",
+            data: [{ path }],
+            widthMinPixels: 1,
+        });
+
+        const layers = [
+            ...(args.layers as TLayerDefinition[]),
+            wellsUnfoldedCustom,
+            sectionPathLayer,
+        ];
+
+        return (
+            <SubsurfaceViewer {...args} layers={layers}>
+                {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    /* @ts-expect-error */
+                    <View id="viewport1">
+                        <h2 style={{ marginLeft: "100px" }}>
+                            Default unfolded projection [abscissa, z]
+                        </h2>
+                    </View>
+                }
+                {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    /* @ts-expect-error */
+                    <View id="viewport2">
+                        <h2 style={{ marginLeft: "100px" }}>
+                            Custom unfolded projection [abscissa, z]
+                        </h2>
+                    </View>
+                }
+                {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    /* @ts-expect-error */
+                    <View id="viewport3">
+                        <h2 style={{ marginLeft: "100px" }}>
+                            Folded projection [x, y]
+                        </h2>
+                    </View>
+                }
+            </SubsurfaceViewer>
+        );
+    },
 };

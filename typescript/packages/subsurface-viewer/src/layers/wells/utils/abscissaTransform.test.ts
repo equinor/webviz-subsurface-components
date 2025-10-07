@@ -244,7 +244,8 @@ describe("Transform well trajectory", () => {
     });
 
     it("Nearest neighbor abscissa transform", () => {
-        const transformedWell = nearestNeighborAbscissaTransform(MOCK_WELL);
+        const { features: transformedWell } =
+            nearestNeighborAbscissaTransform(MOCK_WELL);
 
         // Check number of trajectories transformed
         expect(transformedWell.features).toHaveLength(3);
@@ -300,7 +301,7 @@ describe("Transform well trajectory", () => {
         mockWellboreGeometry.coordinates[1] = [1500, 1000, -1000];
         mockWellboreGeometry.coordinates[2] = [500, 0, -2000];
 
-        const transformedWell = nearestNeighborAbscissaTransform(
+        const { features: transformedWell } = nearestNeighborAbscissaTransform(
             reversedFirstMockWell
         );
 

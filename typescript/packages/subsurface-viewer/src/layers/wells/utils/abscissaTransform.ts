@@ -328,12 +328,16 @@ function unfoldWell(
  */
 export function nearestNeighborAbscissaTransform<
     TFeatureCollection extends FeatureCollection<GeometryCollection>,
->(features: TFeatureCollection): TFeatureCollection {
+>(
+    features: TFeatureCollection
+): { features: TFeatureCollection; path: Position[] } {
     if (features.features.length === 0) {
-        return features;
+        return { features, path: [] };
     }
 
     const featuresCopy = cloneDeep(features);
+
+    const path = [];
 
     // Start with the first feature at abscissa 0
     let currentAbscissa = 0;
@@ -351,6 +355,13 @@ export function nearestNeighborAbscissaTransform<
     // Check if reversing the first wellbore gives a shorter gap to the
     // next well
     const reverseFirstWellbore = shouldReverseFirstWellbore(features);
+
+    // Record the path of the section in world coordinates
+    path.push(
+        ...(reverseFirstWellbore
+            ? [...wellboreGeometry.coordinates].reverse()
+            : wellboreGeometry.coordinates)
+    );
 
     // Transform the first wellbore
     const wellboreProjection = computeUnfoldedPath(
@@ -404,6 +415,13 @@ export function nearestNeighborAbscissaTransform<
         const nextFeature = cloneDeep(features.features[nearestIndex]);
         transformedFeatures.push(nextFeature);
 
+        // Record the path of the section
+        path.push(
+            ...(nearestReverse
+                ? [...getWellboreGeometry(nextFeature).coordinates].reverse()
+                : getWellboreGeometry(nextFeature).coordinates)
+        );
+
         lastVisitedIndex = nearestIndex;
 
         currentAbscissa += nearestDistance;
@@ -418,5 +436,5 @@ export function nearestNeighborAbscissaTransform<
 
     featuresCopy.features = transformedFeatures;
 
-    return featuresCopy;
+    return { features: featuresCopy, path };
 }
