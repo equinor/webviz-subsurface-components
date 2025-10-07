@@ -1,8 +1,19 @@
-import type { FeatureCollection, GeometryCollection, Position } from "geojson";
+import type {
+    Feature,
+    FeatureCollection,
+    GeoJsonProperties,
+    Geometry,
+    GeometryCollection,
+    LineString,
+    Point,
+    Position,
+} from "geojson";
 import { cloneDeep, zip } from "lodash";
 import { distance } from "mathjs";
 
-export type AbscissaTransform = <TFeatureCollection extends FeatureCollection<GeometryCollection>>(
+export type AbscissaTransform = <
+    TFeatureCollection extends FeatureCollection<GeometryCollection>,
+>(
     featureCollection: TFeatureCollection
 ) => TFeatureCollection;
 
@@ -28,6 +39,28 @@ function computeUnfoldedPath(worldCoordinates: Position[]): {
 
     const vAbscissa = zip(a, z, new Array(a.length).fill(0));
     return { vAbscissa: vAbscissa as Position[], maxAbscissa };
+}
+
+/**
+ * Get the first geometry of a given type
+ */
+function getGeometry(
+    feature: Feature<GeometryCollection<Geometry>, GeoJsonProperties>,
+    type: string
+) {
+    return feature.geometry.geometries.find((value) => value.type === type);
+}
+
+function getWellboreGeometry(
+    feature: Feature<GeometryCollection<Geometry>, GeoJsonProperties>
+) {
+    return getGeometry(feature, "LineString") as LineString;
+}
+
+function getWellHeadGeometry(
+    feature: Feature<GeometryCollection<Geometry>, GeoJsonProperties>
+) {
+    return getGeometry(feature, "Point") as Point;
 }
 
 /**
@@ -91,6 +124,32 @@ export function calculateTrajectoryGap(
 }
 
 /**
+ * Omni directional version of calculateTrajectoryGap.
+ * @param featureCollection
+ * @returns
+ */
+export function calculateTrajectoryOmniGap(
+    feature1: { geometry: GeometryCollection },
+    feature2: { geometry: GeometryCollection }
+): { gap: number; reverse: boolean } {
+    const end1 = getEndPoint(feature1);
+    const start2 = getStartPoint(feature2);
+    const end2 = getEndPoint(feature2);
+
+    if (!end1 || !start2 || !end2) {
+        return { gap: 0, reverse: false }; // Default gap if we can't find end/start points
+    }
+
+    // Calculate euclidean distance between end of previous and start of next
+    const distStart = distance(
+        [end1[0], end1[1]],
+        [start2[0], start2[1]]
+    ) as number;
+    const distEnd = distance([end1[0], end1[1]], [end2[0], end2[1]]) as number;
+    return { gap: Math.min(distStart, distEnd), reverse: distEnd < distStart };
+}
+
+/**
  * Projects well trajectories unfolded onto an abscissa, z plane with lateral separation.
  * The distance between trajectories is equal to the lateral component of the euclidean
  * distance between the end of the previous trajectory and the start of the next one.
@@ -144,12 +203,12 @@ export function abscissaTransform<
 
 /**
  * Projects well trajectories onto an abscissa, z plane using a nearest neighbor approach.
- * @param features 
- * @returns 
+ * @param features
+ * @returns
  */
-export function nearestNeighborAbscissaTransform<TFeatureCollection extends FeatureCollection<GeometryCollection>>  (
-    features: TFeatureCollection):
-TFeatureCollection {
+export function nearestNeighborAbscissaTransform<
+    TFeatureCollection extends FeatureCollection<GeometryCollection>,
+>(features: TFeatureCollection): TFeatureCollection {
     if (features.features.length === 0) {
         return features;
     }
@@ -165,39 +224,50 @@ TFeatureCollection {
     const transformedFeatures: typeof features.features = [];
     transformedFeatures.push(cloneDeep(features.features[0]));
 
-    // Transform the first feature
-    for (const geometry of transformedFeatures[0].geometry.geometries) {
-        if ("Point" === geometry.type) {
-            const coordinates = geometry.coordinates;
-            geometry.coordinates = [currentAbscissa, coordinates[2], 0];
-        } else if ("LineString" === geometry.type) {
-            const projection = computeUnfoldedPath(geometry.coordinates);
-            geometry.coordinates = projection.vAbscissa.map((coord) => [
-                coord[0] + currentAbscissa,
-                coord[1],
-                coord[2],
-            ]);
-            currentAbscissa += projection.maxAbscissa;
-        }
-    }
+    // Get well geometry
+    const wellHeadGeometry = getWellHeadGeometry(transformedFeatures[0]);
+    const wellboreGeometry = getWellboreGeometry(transformedFeatures[0]);
+
+    // Transform the first well head
+    wellHeadGeometry.coordinates = [
+        currentAbscissa,
+        wellHeadGeometry.coordinates[2],
+        0,
+    ];
+
+    // Transform the first wellbore
+    const wellboreProjection = computeUnfoldedPath(
+        wellboreGeometry.coordinates
+    );
+    wellboreGeometry.coordinates = wellboreProjection.vAbscissa.map((coord) => [
+        coord[0] + currentAbscissa,
+        coord[1],
+        coord[2],
+    ]);
+
+    currentAbscissa += wellboreProjection.maxAbscissa;
 
     while (visited.size < features.features.length) {
         let nearestIndex = -1;
         let nearestDistance = Infinity;
 
+        let nearestReverse = false;
+
         const lastFeature = features.features[lastVisitedIndex];
 
+        // Find the nearest unvisited feature
         for (let i = 0; i < features.features.length; i++) {
             if (visited.has(i)) continue;
 
-            const distance = calculateTrajectoryGap(
+            const { gap, reverse } = calculateTrajectoryOmniGap(
                 lastFeature,
                 features.features[i]
             );
 
-            if (distance < nearestDistance) {
-                nearestDistance = distance;
+            if (gap < nearestDistance) {
+                nearestDistance = gap;
                 nearestIndex = i;
+                nearestReverse = reverse;
             }
         }
 
@@ -211,21 +281,52 @@ TFeatureCollection {
 
         currentAbscissa += nearestDistance;
 
-        // Transform the next feature
-        for (const geometry of nextFeature.geometry.geometries) {
-            if ("Point" === geometry.type) {
-                const coordinates = geometry.coordinates;
-                geometry.coordinates = [currentAbscissa, coordinates[2], 0];
-            } else if ("LineString" === geometry.type) {
-                const projection = computeUnfoldedPath(geometry.coordinates);
-                geometry.coordinates = projection.vAbscissa.map((coord) => [
-                    coord[0] + currentAbscissa,
-                    coord[1],
-                    coord[2],
-                ]);
-                currentAbscissa += projection.maxAbscissa;
-            }
+        // Get well geometry
+        const wellboreGeometry = getWellboreGeometry(nextFeature);
+        const wellHeadGeometry = getWellHeadGeometry(nextFeature);
+
+        if (!wellboreGeometry) {
+            continue;
         }
+
+        const wellboreProjection = computeUnfoldedPath(
+            wellboreGeometry.coordinates
+        );
+
+        const projectedCoordinates = new Array<Position>(
+            wellboreGeometry.coordinates.length
+        );
+
+        for (let i = 0; i < projectedCoordinates.length; i++) {
+            const projectionCoordinates = wellboreProjection.vAbscissa[i];
+
+            // Translate abscissae next to previous well
+            const translatedAbscissa = nearestReverse
+                ? currentAbscissa +
+                  wellboreProjection.maxAbscissa -
+                  projectionCoordinates[0]
+                : projectionCoordinates[0] + currentAbscissa;
+
+            const translatedCoordinates = [
+                translatedAbscissa,
+                projectionCoordinates[1],
+                projectionCoordinates[2],
+            ];
+
+            projectedCoordinates[i] = translatedCoordinates;
+        }
+
+        wellboreGeometry.coordinates = projectedCoordinates;
+
+        wellHeadGeometry.coordinates = [
+            nearestReverse
+                ? currentAbscissa + wellboreProjection.maxAbscissa
+                : currentAbscissa,
+            wellHeadGeometry.coordinates[2],
+            0,
+        ];
+
+        currentAbscissa += wellboreProjection.maxAbscissa;
     }
 
     featuresCopy.features = transformedFeatures;

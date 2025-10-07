@@ -51,7 +51,8 @@ const MOCK_WELL: FeatureCollection<GeometryCollection> = {
                     {
                         type: "LineString",
                         coordinates: [
-                            [2570.71, 2070.71, 0], // 100 units lateral distance from [2500, 2000, -2000]
+                            [2570.71, 2070.71, 0], // 100 units lateral distance from
+                            // [2500, 2000, -2000] (WellA end)
                             [2570.71, 2070.71, -500],
                             [3070.71, 2570.71, -1000],
                             [3570.71, 3070.71, -1500],
@@ -61,6 +62,32 @@ const MOCK_WELL: FeatureCollection<GeometryCollection> = {
             },
             properties: {
                 name: "WellB",
+            },
+        },
+        {
+            type: "Feature",
+            geometry: {
+                type: "GeometryCollection",
+                geometries: [
+                    {
+                        type: "Point",
+                        coordinates: [3000, 2500, 0],
+                    },
+                    {
+                        type: "LineString",
+                        coordinates: [
+                            [3000, 2500, 0],    // ~707 units lateral distance from
+                                                // [2500, 2000, -2000] (WellA end)
+                            [2800, 2300, -500],
+                            [2600, 2100, -1000],
+                            [2550, 2050, -1500],    // ~71 units lateral distance from
+                                                    // [2500, 2000, -2000] (WellA end)
+                        ],
+                    },
+                ],
+            },
+            properties: {
+                name: "WellC",
             },
         },
     ],
@@ -176,7 +203,7 @@ describe("Transform well trajectory", () => {
         const transformedWell = abscissaTransform(MOCK_WELL);
 
         // Check number of trajectories transformed
-        expect(transformedWell.features).toHaveLength(2);
+        expect(transformedWell.features).toHaveLength(3);
 
         const wellHead0 = transformedWell.features[0].geometry
             .geometries[0] as Point;
@@ -217,7 +244,7 @@ describe("Transform well trajectory", () => {
         const transformedWell = nearestNeighborAbscissaTransform(MOCK_WELL);
 
         // Check number of trajectories transformed
-        expect(transformedWell.features).toHaveLength(2);
+        expect(transformedWell.features).toHaveLength(3);
 
         const wellHead0 = transformedWell.features[0].geometry
             .geometries[0] as Point;
@@ -239,11 +266,12 @@ describe("Transform well trajectory", () => {
         const trajectory1 = transformedWell.features[1].geometry
             .geometries[1] as LineString;
 
-        const previousEnd = trajectory0.coordinates.at(-1) || [0, 0, 0];
+        const end0 = trajectory0.coordinates.at(-1) || [0, 0, 0];
+        const end1 = trajectory1.coordinates.at(-1) || [0, 0, 0];
 
-        // Well head should be offset by gap (100) from end of the the lateral distance
+        // Wellbore end should be offset by gap (71) from end of the the lateral distance
         // of the previous trajectory
-        expect(wellHead1.coordinates[0]).toBeCloseTo(previousEnd[0] + 100);
+        expect(end1[0]).toBeCloseTo(end0[0] + 70.7, 1);
 
         // Trajectory start should match well head
         expect(trajectory1.coordinates[0][0]).toBeCloseTo(
