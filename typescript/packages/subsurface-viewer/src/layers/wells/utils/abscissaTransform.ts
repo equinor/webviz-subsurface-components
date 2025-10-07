@@ -17,7 +17,10 @@ export type AbscissaTransform = <
     featureCollection: TFeatureCollection
 ) => TFeatureCollection;
 
-function computeUnfoldedPath(worldCoordinates: Position[]): {
+function computeUnfoldedPath(
+    worldCoordinates: Position[],
+    reverse = false
+): {
     vAbscissa: Position[];
     maxAbscissa: number;
 } {
@@ -37,8 +40,69 @@ function computeUnfoldedPath(worldCoordinates: Position[]): {
         maxAbscissa = Math.max(maxAbscissa, newA);
     }
 
+    if (reverse) {
+        a.forEach((v, i) => {
+            a[i] = maxAbscissa - v;
+        });
+    }
+
     const vAbscissa = zip(a, z, new Array(a.length).fill(0));
     return { vAbscissa: vAbscissa as Position[], maxAbscissa };
+}
+
+function shouldReverseFirstWellbore(
+    wellbores: FeatureCollection<GeometryCollection<Geometry>>
+): boolean {
+    const firstWellbore = wellbores.features[0];
+    if (!firstWellbore) {
+        return false;
+    }
+
+    let nearestForwardDistance = Infinity;
+    let nearestReverseDistance = Infinity;
+
+    // Find the distance to the nearest wellbore
+    for (let i = 1; i < wellbores.features.length; i++) {
+        const { gap } = calculateTrajectoryOmniGap(
+            firstWellbore,
+            wellbores.features[i]
+        );
+
+        if (gap < nearestForwardDistance) {
+            nearestForwardDistance = gap;
+        }
+    }
+
+    const firstWellboreReversed: Feature<GeometryCollection<Geometry>> = {
+        ...firstWellbore,
+        geometry: {
+            type: "GeometryCollection",
+            geometries: firstWellbore.geometry.geometries.map((geometry) => {
+                if (geometry.type === "LineString") {
+                    return {
+                        ...geometry,
+                        coordinates: [...geometry.coordinates].reverse(),
+                    };
+                }
+                return geometry;
+            }),
+        },
+    };
+
+    for (let i = 1; i < wellbores.features.length; i++) {
+        const { gap } = calculateTrajectoryOmniGap(
+            firstWellboreReversed,
+            wellbores.features[i]
+        );
+
+        if (gap < nearestReverseDistance) {
+            nearestReverseDistance = gap;
+        }
+    }
+
+    // Placeholder for logic to determine if the first wellbore should be reversed.
+    // This could be based on metadata or other criteria.
+    return nearestReverseDistance < nearestForwardDistance;
 }
 
 /**
@@ -51,13 +115,13 @@ function getGeometry(
     return feature.geometry.geometries.find((value) => value.type === type);
 }
 
-function getWellboreGeometry(
+export function getWellboreGeometry(
     feature: Feature<GeometryCollection<Geometry>, GeoJsonProperties>
 ) {
     return getGeometry(feature, "LineString") as LineString;
 }
 
-function getWellHeadGeometry(
+export function getWellHeadGeometry(
     feature: Feature<GeometryCollection<Geometry>, GeoJsonProperties>
 ) {
     return getGeometry(feature, "Point") as Point;
@@ -125,27 +189,38 @@ export function calculateTrajectoryGap(
 
 /**
  * Omni directional version of calculateTrajectoryGap.
- * @param featureCollection
- * @returns
+ * @param feature1 The first wellbore feature
+ * @param feature2 The second wellbore feature
+ * @param reverse Whether to consider the first wellbore as reversed
+ * @returns The lateral gap and whether reversing the second wellbore gives the shortest
+ * gap.
  */
 export function calculateTrajectoryOmniGap(
     feature1: { geometry: GeometryCollection },
-    feature2: { geometry: GeometryCollection }
+    feature2: { geometry: GeometryCollection },
+    reverse = false
 ): { gap: number; reverse: boolean } {
+    const start1 = getStartPoint(feature1);
     const end1 = getEndPoint(feature1);
     const start2 = getStartPoint(feature2);
     const end2 = getEndPoint(feature2);
 
-    if (!end1 || !start2 || !end2) {
+    if (!end1 || !start2 || !end2 || !start1) {
         return { gap: 0, reverse: false }; // Default gap if we can't find end/start points
     }
 
+    const startPoint1 = reverse ? start1 : end1;
+
     // Calculate euclidean distance between end of previous and start of next
     const distStart = distance(
-        [end1[0], end1[1]],
+        [startPoint1[0], startPoint1[1]],
         [start2[0], start2[1]]
     ) as number;
-    const distEnd = distance([end1[0], end1[1]], [end2[0], end2[1]]) as number;
+    const distEnd = distance(
+        [startPoint1[0], startPoint1[1]],
+        [end2[0], end2[1]]
+    ) as number;
+
     return { gap: Math.min(distStart, distEnd), reverse: distEnd < distStart };
 }
 
@@ -228,29 +303,33 @@ export function nearestNeighborAbscissaTransform<
     const wellHeadGeometry = getWellHeadGeometry(transformedFeatures[0]);
     const wellboreGeometry = getWellboreGeometry(transformedFeatures[0]);
 
+    // Check if reversing the first wellbore gives a shorter gap to the
+    // next well
+    const reverseFirstWellbore = shouldReverseFirstWellbore(features);
+
+    // Transform the first wellbore
+    const wellboreProjection = computeUnfoldedPath(
+        wellboreGeometry.coordinates,
+        reverseFirstWellbore
+    );
+    wellboreGeometry.coordinates = [...wellboreProjection.vAbscissa];
+
     // Transform the first well head
     wellHeadGeometry.coordinates = [
-        currentAbscissa,
+        reverseFirstWellbore
+            ? currentAbscissa + wellboreProjection.maxAbscissa
+            : currentAbscissa,
         wellHeadGeometry.coordinates[2],
         0,
     ];
 
-    // Transform the first wellbore
-    const wellboreProjection = computeUnfoldedPath(
-        wellboreGeometry.coordinates
-    );
-    wellboreGeometry.coordinates = wellboreProjection.vAbscissa.map((coord) => [
-        coord[0] + currentAbscissa,
-        coord[1],
-        coord[2],
-    ]);
-
     currentAbscissa += wellboreProjection.maxAbscissa;
+
+    let previousReverse = reverseFirstWellbore;
 
     while (visited.size < features.features.length) {
         let nearestIndex = -1;
         let nearestDistance = Infinity;
-
         let nearestReverse = false;
 
         const lastFeature = features.features[lastVisitedIndex];
@@ -261,7 +340,8 @@ export function nearestNeighborAbscissaTransform<
 
             const { gap, reverse } = calculateTrajectoryOmniGap(
                 lastFeature,
-                features.features[i]
+                features.features[i],
+                previousReverse
             );
 
             if (gap < nearestDistance) {
@@ -270,6 +350,8 @@ export function nearestNeighborAbscissaTransform<
                 nearestReverse = reverse;
             }
         }
+
+        previousReverse = nearestReverse;
 
         if (nearestIndex === -1) break; // No more unvisited features
 
@@ -290,30 +372,22 @@ export function nearestNeighborAbscissaTransform<
         }
 
         const wellboreProjection = computeUnfoldedPath(
-            wellboreGeometry.coordinates
+            wellboreGeometry.coordinates,
+            nearestReverse
         );
 
         const projectedCoordinates = new Array<Position>(
             wellboreGeometry.coordinates.length
         );
 
+        // Translate abscissae next to previous well
         for (let i = 0; i < projectedCoordinates.length; i++) {
             const projectionCoordinates = wellboreProjection.vAbscissa[i];
-
-            // Translate abscissae next to previous well
-            const translatedAbscissa = nearestReverse
-                ? currentAbscissa +
-                  wellboreProjection.maxAbscissa -
-                  projectionCoordinates[0]
-                : projectionCoordinates[0] + currentAbscissa;
-
-            const translatedCoordinates = [
-                translatedAbscissa,
+            projectedCoordinates[i] = [
+                projectionCoordinates[0] + currentAbscissa,
                 projectionCoordinates[1],
                 projectionCoordinates[2],
             ];
-
-            projectedCoordinates[i] = translatedCoordinates;
         }
 
         wellboreGeometry.coordinates = projectedCoordinates;

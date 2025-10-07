@@ -10,8 +10,11 @@ import {
     calculateTrajectoryGap,
     getEndPoint,
     getStartPoint,
+    getWellHeadGeometry,
+    getWellboreGeometry,
     nearestNeighborAbscissaTransform,
 } from "./abscissaTransform";
+import _ from "lodash";
 
 const MOCK_WELL: FeatureCollection<GeometryCollection> = {
     type: "FeatureCollection",
@@ -76,12 +79,12 @@ const MOCK_WELL: FeatureCollection<GeometryCollection> = {
                     {
                         type: "LineString",
                         coordinates: [
-                            [3000, 2500, 0],    // ~707 units lateral distance from
-                                                // [2500, 2000, -2000] (WellA end)
+                            [3000, 2500, 0], // ~707 units lateral distance from
+                            // [2500, 2000, -2000] (WellA end)
                             [2800, 2300, -500],
                             [2600, 2100, -1000],
-                            [2550, 2050, -1500],    // ~71 units lateral distance from
-                                                    // [2500, 2000, -2000] (WellA end)
+                            [2550, 2050, -1500], // ~71 units lateral distance from
+                            // [2500, 2000, -2000] (WellA end)
                         ],
                     },
                 ],
@@ -272,6 +275,66 @@ describe("Transform well trajectory", () => {
         // Wellbore end should be offset by gap (71) from end of the the lateral distance
         // of the previous trajectory
         expect(end1[0]).toBeCloseTo(end0[0] + 70.7, 1);
+
+        // Trajectory start should match well head
+        expect(trajectory1.coordinates[0][0]).toBeCloseTo(
+            wellHead1.coordinates[0]
+        );
+        expect(trajectory1.coordinates[0][1]).toBeCloseTo(
+            wellHead1.coordinates[1]
+        );
+    });
+
+    it("Nearest neighbor abscissa transform - reverse first wellbore", () => {
+        const reversedFirstMockWell = _.cloneDeep(MOCK_WELL);
+
+        // Craft a scenario where reversing the first wellbore yields a shorter gap
+        const mockWellHeadGeometry = getWellHeadGeometry(
+            reversedFirstMockWell.features[0]
+        );
+        mockWellHeadGeometry.coordinates = [2500, 2000, 0];
+        const mockWellboreGeometry = getWellboreGeometry(
+            reversedFirstMockWell.features[0]
+        );
+        mockWellboreGeometry.coordinates[0] = [2500, 2000, 0];
+        mockWellboreGeometry.coordinates[1] = [1500, 1000, -1000];
+        mockWellboreGeometry.coordinates[2] = [500, 0, -2000];
+
+        const transformedWell = nearestNeighborAbscissaTransform(
+            reversedFirstMockWell
+        );
+
+        // Check number of trajectories transformed
+        expect(transformedWell.features).toHaveLength(3);
+
+        const wellHead0 = transformedWell.features[0].geometry
+            .geometries[0] as Point;
+        const trajectory0 = transformedWell.features[0].geometry
+            .geometries[1] as LineString;
+
+        // Check well head projection - first well head is reversed
+        expect(wellHead0.coordinates[0]).toBeCloseTo(2828.427);
+        expect(wellHead0.coordinates[1]).toStrictEqual(0);
+        expect(wellHead0.coordinates[2]).toStrictEqual(0);
+
+        // Check first unfolded trajectory
+        expect(trajectory0.coordinates[0][0]).toBeCloseTo(2828.4271);
+        expect(trajectory0.coordinates[1][0]).toBeCloseTo(1414.2135);
+        expect(trajectory0.coordinates[1][1]).toStrictEqual(-1000);
+        expect(trajectory0.coordinates[2]).toStrictEqual([0, -2000, 0]);
+
+        // Check second unfolded trajectory
+        const wellHead1 = transformedWell.features[1].geometry
+            .geometries[0] as Point;
+        const trajectory1 = transformedWell.features[1].geometry
+            .geometries[1] as LineString;
+
+        const begin0 = trajectory0.coordinates[0] || [0, 0, 0];
+        const end1 = trajectory1.coordinates.at(-1) || [0, 0, 0];
+
+        // Wellbore end should be offset by gap (71) from end of the the lateral distance
+        // of the previous trajectory
+        expect(end1[0]).toBeCloseTo(begin0[0] + 70.7, 1);
 
         // Trajectory start should match well head
         expect(trajectory1.coordinates[0][0]).toBeCloseTo(
