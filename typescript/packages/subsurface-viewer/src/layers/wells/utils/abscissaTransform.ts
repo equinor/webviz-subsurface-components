@@ -276,6 +276,51 @@ export function abscissaTransform<
     return featureCollectionCopy;
 }
 
+function unfoldWell(
+    well: Feature<GeometryCollection<Geometry>>,
+    reverse: boolean,
+    abscissaOffset: number
+): number {
+    // Get well geometry
+    const wellboreGeometry = getWellboreGeometry(well);
+    const wellHeadGeometry = getWellHeadGeometry(well);
+
+    if (!wellboreGeometry) {
+        return 0;
+    }
+
+    const wellboreProjection = computeUnfoldedPath(
+        wellboreGeometry.coordinates,
+        reverse
+    );
+
+    const projectedCoordinates = new Array<Position>(
+        wellboreGeometry.coordinates.length
+    );
+
+    // Translate abscissae next to previous well
+    for (let i = 0; i < projectedCoordinates.length; i++) {
+        const projectionCoordinates = wellboreProjection.vAbscissa[i];
+        projectedCoordinates[i] = [
+            projectionCoordinates[0] + abscissaOffset,
+            projectionCoordinates[1],
+            projectionCoordinates[2],
+        ];
+    }
+
+    wellboreGeometry.coordinates = projectedCoordinates;
+
+    wellHeadGeometry.coordinates = [
+        reverse
+            ? abscissaOffset + wellboreProjection.maxAbscissa
+            : abscissaOffset,
+        wellHeadGeometry.coordinates[2],
+        0,
+    ];
+
+    return wellboreProjection.maxAbscissa;
+}
+
 /**
  * Projects well trajectories onto an abscissa, z plane using a nearest neighbor approach.
  * @param features
@@ -363,44 +408,12 @@ export function nearestNeighborAbscissaTransform<
 
         currentAbscissa += nearestDistance;
 
-        // Get well geometry
-        const wellboreGeometry = getWellboreGeometry(nextFeature);
-        const wellHeadGeometry = getWellHeadGeometry(nextFeature);
-
-        if (!wellboreGeometry) {
-            continue;
-        }
-
-        const wellboreProjection = computeUnfoldedPath(
-            wellboreGeometry.coordinates,
-            nearestReverse
+        // Unfold well geometry
+        currentAbscissa += unfoldWell(
+            nextFeature,
+            nearestReverse,
+            currentAbscissa
         );
-
-        const projectedCoordinates = new Array<Position>(
-            wellboreGeometry.coordinates.length
-        );
-
-        // Translate abscissae next to previous well
-        for (let i = 0; i < projectedCoordinates.length; i++) {
-            const projectionCoordinates = wellboreProjection.vAbscissa[i];
-            projectedCoordinates[i] = [
-                projectionCoordinates[0] + currentAbscissa,
-                projectionCoordinates[1],
-                projectionCoordinates[2],
-            ];
-        }
-
-        wellboreGeometry.coordinates = projectedCoordinates;
-
-        wellHeadGeometry.coordinates = [
-            nearestReverse
-                ? currentAbscissa + wellboreProjection.maxAbscissa
-                : currentAbscissa,
-            wellHeadGeometry.coordinates[2],
-            0,
-        ];
-
-        currentAbscissa += wellboreProjection.maxAbscissa;
     }
 
     featuresCopy.features = transformedFeatures;
