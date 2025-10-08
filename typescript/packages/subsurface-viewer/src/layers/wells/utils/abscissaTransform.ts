@@ -27,9 +27,11 @@ function computeUnfoldedPath(
     }
 
     if (reverse) {
-        a.forEach((v, i) => {
-            a[i] = maxAbscissa - v;
-        });
+        // Mirror the abscissa values around the maximum abscissa (ie. the shortest
+        // path goes bottom-up the wellbore)
+        for (let i = 0; i < a.length; i++) {
+            a[i] = maxAbscissa - a[i];
+        }
     }
 
     const vAbscissa = zip(a, z, new Array(a.length).fill(0));
@@ -65,7 +67,7 @@ function shouldReverseFirstWellbore(wellbores: WellFeatureCollection): boolean {
                 if (geometry.type === "LineString") {
                     return {
                         ...geometry,
-                        coordinates: [...geometry.coordinates].reverse(),
+                        coordinates: geometry.coordinates.slice().reverse(),
                     };
                 }
                 return geometry;
@@ -84,8 +86,6 @@ function shouldReverseFirstWellbore(wellbores: WellFeatureCollection): boolean {
         }
     }
 
-    // Placeholder for logic to determine if the first wellbore should be reversed.
-    // This could be based on metadata or other criteria.
     return nearestReverseDistance < nearestForwardDistance;
 }
 
@@ -217,25 +217,8 @@ export function abscissaTransform(
     // First pass: calculate trajectory lengths and offsets
     for (let i = 0; i < featureCollectionCopy.features.length; i++) {
         const feature = featureCollectionCopy.features[i];
-        const geometryCollection = feature.geometry;
 
-        // Find the maximum length of LineString geometries in this feature
-        for (const geometry of geometryCollection.geometries) {
-            if ("Point" === geometry.type) {
-                const coordinates = geometry.coordinates;
-                geometry.coordinates = [maxAbscissa, coordinates[2], 0];
-            } else if ("LineString" === geometry.type) {
-                const projection = computeUnfoldedPath(geometry.coordinates);
-
-                geometry.coordinates = projection.vAbscissa.map((coord) => [
-                    coord[0] + maxAbscissa,
-                    coord[1],
-                    coord[2],
-                ]);
-
-                maxAbscissa += projection.maxAbscissa;
-            }
-        }
+        maxAbscissa += unfoldWell(feature, false, maxAbscissa);
 
         // Add gap equal to lateral euclidean distance between trajectory start points in
         // original world coordinates
