@@ -3,7 +3,7 @@ import type {
     CommonViewProps,
     CommonViewState,
 } from "@deck.gl/core/dist/views/view";
-import SectionViewport from "../viewports/sectionViewport";
+import { SectionViewport } from "../viewports/sectionViewport";
 
 export type SectionViewState = {
     /** The world position at the center of the viewport. Default `[0, 0, 0]`. */
@@ -26,10 +26,7 @@ export type SectionViewProps = {
     flipY?: boolean;
 } & CommonViewProps<SectionViewState>;
 
-export default class SectionView extends View<
-    SectionViewState,
-    SectionViewProps
-> {
+export class SectionView extends View<SectionViewState, SectionViewProps> {
     static displayName = "SectionView";
 
     constructor(props: SectionViewProps = {}) {

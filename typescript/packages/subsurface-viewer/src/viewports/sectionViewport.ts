@@ -81,7 +81,7 @@ export type SectionViewportOptions = {
     flipY?: boolean;
 };
 
-export default class SectionViewport extends Viewport {
+export class SectionViewport extends Viewport {
     constructor(props: SectionViewportOptions) {
         const {
             width,

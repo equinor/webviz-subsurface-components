@@ -26,7 +26,7 @@ import labelFragmentShader from "./label.fs.glsl";
 import labelVertexShader from "./label.vs.glsl";
 import lineFragmentShader from "./line.fs.glsl";
 import lineVertexShader from "./line.vs.glsl";
-import SectionViewport from "../../viewports/sectionViewport";
+import { SectionViewport } from "../../viewports/sectionViewport";
 
 enum TEXT_ANCHOR {
     start = 0,
