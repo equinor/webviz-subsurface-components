@@ -18,6 +18,7 @@ import type {
 } from "../layers/utils/layerTools";
 import { rgb } from "d3-color";
 import { WellLabelLayer } from "../layers/wells/layers/wellLabelLayer";
+import SectionViewport from "../viewports/sectionViewport";
 
 Icon.add({ arrow_drop_up, arrow_drop_down });
 
@@ -196,25 +197,30 @@ const InfoCard: React.FC<InfoCardProps> = (props: InfoCardProps) => {
             return;
         }
 
+        const isSectionViewport =
+            props.pickInfos[0].viewport instanceof SectionViewport;
+
         const xy_properties: PropertyDataType[] = [];
         xy_properties.push({
-            name: "x",
+            name: isSectionViewport ? "distance" : "x",
             value: Number(topObject.coordinate[0]).toFixed(2).toString() + " m",
         });
         xy_properties.push({
-            name: "y",
+            name: isSectionViewport ? "z" : "y",
             value: Number(topObject.coordinate[1]).toFixed(2).toString() + " m",
         });
         if (
             topObject.coordinate[2] != undefined &&
             !Number.isNaN(topObject.coordinate[2])
         ) {
-            xy_properties.push({
-                name: "z",
-                value:
-                    Number(topObject.coordinate[2]).toFixed(2).toString() +
-                    " m",
-            });
+            if (!isSectionViewport) {
+                xy_properties.push({
+                    name: "z",
+                    value:
+                        Number(topObject.coordinate[2]).toFixed(2).toString() +
+                        " m",
+                });
+            }
         }
 
         const info_card_data: InfoCardDataType[] = [];
