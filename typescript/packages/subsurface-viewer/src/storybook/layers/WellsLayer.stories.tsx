@@ -109,6 +109,7 @@ const testWellWithDuplicates: WellFeatureCollection = {
 
 const classes = {
     main: `${PREFIX}-main`,
+    annotation: `${PREFIX}-annotation`,
 };
 
 const Root = styled("div")({
@@ -116,6 +117,9 @@ const Root = styled("div")({
         height: 500,
         border: "1px solid black",
         position: "relative",
+    },
+    [`& .${classes.annotation}`]: {
+        marginLeft: "100px",
     },
 });
 
@@ -1170,7 +1174,7 @@ export const UnfoldedProjection: StoryObj<
                     {
                         id: "viewport3",
                         layerIds: [WELLS_FOLDED.id, "axes", "section-path"],
-                        target: [458500, 6784400],
+                        target: [458500, 6785000],
                         zoom: -3.5,
                     },
                 ],
@@ -1220,35 +1224,41 @@ export const UnfoldedProjection: StoryObj<
         ];
 
         return (
-            <SubsurfaceViewer {...viewerArgs} layers={layers}>
-                {
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    /* @ts-expect-error */
-                    <View id="viewport1">
-                        <h2 style={{ marginLeft: "100px" }}>
-                            Default unfolded projection [abscissa, z]
-                        </h2>
-                    </View>
-                }
-                {
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    /* @ts-expect-error */
-                    <View id="viewport2">
-                        <h2 style={{ marginLeft: "100px" }}>
-                            Custom unfolded projection [abscissa, z]
-                        </h2>
-                    </View>
-                }
-                {
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    /* @ts-expect-error */
-                    <View id="viewport3">
-                        <h2 style={{ marginLeft: "100px" }}>
-                            Folded projection [x, y]
-                        </h2>
-                    </View>
-                }
-            </SubsurfaceViewer>
+            <Root>
+                <SubsurfaceViewer {...viewerArgs} layers={layers}>
+                    {
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                        /* @ts-expect-error */
+                        <View id="viewport1">
+                            <h2 className={classes.annotation}>
+                                Default unfolded projection [abscissa, z]
+                            </h2>
+                        </View>
+                    }
+                    {
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                        /* @ts-expect-error */
+                        <View id="viewport2">
+                            <h2 className={classes.annotation}>
+                                Custom unfolded projection [abscissa, z]
+                            </h2>
+                        </View>
+                    }
+                    {
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                        /* @ts-expect-error */
+                        <View id="viewport3">
+                            <h2 className={classes.annotation}>
+                                Folded projection [x, y]
+                            </h2>
+                            <p className={classes.annotation}>
+                                The dashed polyline shows the custom section
+                                path.
+                            </p>
+                        </View>
+                    }
+                </SubsurfaceViewer>
+            </Root>
         );
     },
 };
