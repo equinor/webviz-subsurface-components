@@ -1,6 +1,6 @@
-import React from "react";
 import type { Position } from "geojson";
-import type { AbscissaTransform } from "../utils/abscissaTransform";
+import React from "react";
+import type { AbscissaTransform } from "../types";
 import { nearestNeighborAbscissaTransform } from "../utils/abscissaTransform";
 
 /**

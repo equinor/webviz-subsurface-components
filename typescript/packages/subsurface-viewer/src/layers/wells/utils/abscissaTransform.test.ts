@@ -1,12 +1,7 @@
 import { describe, expect, it } from "@jest/globals";
-import type {
-    FeatureCollection,
-    GeometryCollection,
-    LineString,
-    Point,
-} from "geojson";
+import type { LineString, Point } from "geojson";
 import _ from "lodash";
-import { WellFeature, WellFeatureCollection } from "../types";
+import type { WellFeature, WellFeatureCollection } from "../types";
 import {
     abscissaTransform,
     calculateTrajectoryGap,
