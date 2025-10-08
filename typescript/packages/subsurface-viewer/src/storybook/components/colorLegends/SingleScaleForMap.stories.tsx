@@ -3,9 +3,6 @@ import { styled } from "@mui/material/styles";
 
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { omit } from "lodash";
-
-// @ts-expect-error TS6192
 import type {
     colorTablesArray,
     ContinuousLegendProps,
@@ -50,7 +47,9 @@ const Root = styled("div")({
 
 // Remove the left and top keys from the default legend style
 // The Legends from @emerson-eps/color-tables do overwrite the style to {"position": absolute} and cssLegendStyles prop :(
-const legendStyle = omit(defaultLegendStyle, ["left", "top"]);
+// Remove left and top from defaultLegendStyle using destructuring
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const { left, top, ...legendStyle } = defaultLegendStyle;
 
 const defaultProps = {
     id: "SubsurfaceViewer",
@@ -68,11 +67,9 @@ const max = 0.35;
 const dataObjectName = "Legend";
 const horizontal = true;
 const reverseRange = false;
-// @ts-expect-error TS2709
 const colorTablesData = colorTables as colorTablesArray;
 
 type SubsurfaceViewerWithLegendProps = SubsurfaceViewerProps &
-    // @ts-expect-error TS2709
     ContinuousLegendProps;
 
 // 4 maps with same color scale for all maps

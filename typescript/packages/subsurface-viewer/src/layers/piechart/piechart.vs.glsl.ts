@@ -11,8 +11,6 @@ in int pie_index;
 
 flat out int pie_index_;
 
-uniform float scale;
-
 out vec4 vColor;
 
 void main(void) {
@@ -23,8 +21,8 @@ void main(void) {
       // Triangle vertex' are (mx,my) and two more. The
       // latter two will be scaled so that the triangle (or the pie piece its part of) will
       // have constant size depending on zoom.
-      float x = scale * (positions.x - mx);
-      float y = scale * (positions.y - my);
+      float x = piechart.scale * (positions.x - mx);
+      float y = piechart.scale * (positions.y - my);
 
       v = vec3(x + mx, y + my, 0.0);
    }
