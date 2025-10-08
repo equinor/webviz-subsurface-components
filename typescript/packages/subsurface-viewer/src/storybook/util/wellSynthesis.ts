@@ -1,12 +1,12 @@
-import { all, create } from "mathjs";
-import type { Point3D } from "../../utils";
 import type { Color } from "@deck.gl/core";
+import { all, create } from "mathjs";
+import React from "react";
 import type {
     WellFeature,
     WellFeatureCollection,
 } from "../../layers/wells/types";
-import type { TrajectorySimulationProps } from "../types/trajectory";
-import React from "react";
+import type { Point3D } from "../../utils";
+import type { TrajectorySimulationProps } from "../types/well";
 
 const math = create(all, { randomSeed: "1984" });
 const randomFunc = math?.random ? math.random : Math.random;
@@ -102,7 +102,7 @@ const createSyntheticWell = (
 /**
  * Create random well heads
  */
-const createSyntheticWellHeads = (count = 100): Point3D[] => {
+export const createSyntheticWellHeads = (count = 100): Point3D[] => {
     const wellHeads: Point3D[] = [];
     for (let i = 0; i < count; i++) {
         const dx = randomFunc() * 10000 - 2000;
@@ -116,7 +116,7 @@ const createSyntheticWellHeads = (count = 100): Point3D[] => {
 // A pool of random well heads; fewer than trajectories in order to create clusters
 const SYNTHETIC_WELL_HEADS = createSyntheticWellHeads();
 
-const createSyntheticWellCollection = (
+export const createSyntheticWellCollection = (
     wellCount = 1000,
     wellHeadCount = 100,
     {
