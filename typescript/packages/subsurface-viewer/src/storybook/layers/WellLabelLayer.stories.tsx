@@ -40,7 +40,7 @@ const stories: Meta = {
         },
     },
     argTypes: {
-        WELL_COUNT_ARGTYPES,
+        ...WELL_COUNT_ARGTYPES,
     },
     args: {
         wellCount: 10,
