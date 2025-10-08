@@ -18,7 +18,7 @@ import type {
 } from "../layers/utils/layerTools";
 import { rgb } from "d3-color";
 import { WellLabelLayer } from "../layers/wells/layers/wellLabelLayer";
-import SectionViewport from "../viewports/sectionViewport";
+import { SectionViewport } from "../viewports/sectionViewport";
 
 Icon.add({ arrow_drop_up, arrow_drop_down });
 

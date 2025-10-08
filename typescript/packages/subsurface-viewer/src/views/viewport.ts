@@ -16,13 +16,13 @@ export interface ViewportType {
     name?: string;
 
     /**
-     * If true, displays map in 3D view, default is 2D view (false)
+     * @deprecated If true, displays map in 3D view, default is 2D view (false)
      * Deprecated. Use "viewType" instead.
      */
     show3D?: boolean;
 
     /**
-     * Type of view port.
+     * Type of viewport.
      * Use "OrbitView" for 3D
      * Use "OrthographicView" for 2D (default)
      * Use "SectionView" for unfolded 2D

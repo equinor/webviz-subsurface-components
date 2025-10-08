@@ -80,7 +80,7 @@ import { useVerticalScale } from "../views/viewport";
 
 import mergeRefs from "merge-refs";
 import { WellLabelLayer } from "../layers/wells/layers/wellLabelLayer";
-import SectionView from "../views/sectionView";
+import { SectionView } from "../views/sectionView";
 
 /**
  * Type of the function returning coordinate boundary for the view defined as [left, bottom, right, top].
