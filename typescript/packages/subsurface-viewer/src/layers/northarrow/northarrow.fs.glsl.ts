@@ -4,9 +4,7 @@ export default `\
 
 out vec4 fragColor;
 
-uniform vec4 uColor;
-
 void main(void) {
-  fragColor = vec4(uColor.rgb, uColor.a * layer.opacity);
+  fragColor = vec4(northArrow3D.uColor.rgb, northArrow3D.uColor.a * layer.opacity);
 }
 `;
