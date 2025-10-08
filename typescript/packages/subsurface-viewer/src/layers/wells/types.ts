@@ -1,7 +1,7 @@
 import type { Color } from "@deck.gl/core";
-import type { Feature, GeometryCollection, FeatureCollection } from "geojson";
-import type { LayerPickInfo } from "../utils/layerTools";
+import type { Feature, FeatureCollection, GeometryCollection } from "geojson";
 import type { NumberPair, StyleAccessorFunction } from "../types";
+import type { LayerPickInfo } from "../utils/layerTools";
 
 export type GeoJsonWellProperties = {
     name: string;
@@ -56,3 +56,7 @@ export type WellHeadStyleAccessor = {
     color?: ColorAccessor;
     size?: SizeAccessor;
 };
+
+export type AbscissaTransform = (
+    featureCollection: WellFeatureCollection
+) => WellFeatureCollection;

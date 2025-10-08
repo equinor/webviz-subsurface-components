@@ -43,6 +43,7 @@ import type { NumberPair, StyleAccessorFunction } from "../types";
 import type { WellLabelLayerProps } from "./layers/wellLabelLayer";
 import { WellLabelLayer } from "./layers/wellLabelLayer";
 import type {
+    AbscissaTransform,
     ColorAccessor,
     DashAccessor,
     LineStyleAccessor,
@@ -53,7 +54,6 @@ import type {
     WellHeadStyleAccessor,
     WellsPickInfo,
 } from "./types";
-import type { AbscissaTransform } from "./utils/abscissaTransform";
 import { abscissaTransform } from "./utils/abscissaTransform";
 import {
     GetBoundingBox,

@@ -1,21 +1,7 @@
-import type {
-    Feature,
-    FeatureCollection,
-    GeoJsonProperties,
-    Geometry,
-    GeometryCollection,
-    LineString,
-    Point,
-    Position,
-} from "geojson";
+import type { GeometryCollection, LineString, Point, Position } from "geojson";
 import { cloneDeep, zip } from "lodash";
 import { distance } from "mathjs";
-
-export type AbscissaTransform = <
-    TFeatureCollection extends FeatureCollection<GeometryCollection>,
->(
-    featureCollection: TFeatureCollection
-) => TFeatureCollection;
+import type { WellFeature, WellFeatureCollection } from "../types";
 
 function computeUnfoldedPath(
     worldCoordinates: Position[],
@@ -50,9 +36,7 @@ function computeUnfoldedPath(
     return { vAbscissa: vAbscissa as Position[], maxAbscissa };
 }
 
-function shouldReverseFirstWellbore(
-    wellbores: FeatureCollection<GeometryCollection<Geometry>>
-): boolean {
+function shouldReverseFirstWellbore(wellbores: WellFeatureCollection): boolean {
     const firstWellbore = wellbores.features[0];
     if (!firstWellbore) {
         return false;
@@ -73,7 +57,7 @@ function shouldReverseFirstWellbore(
         }
     }
 
-    const firstWellboreReversed: Feature<GeometryCollection<Geometry>> = {
+    const firstWellboreReversed: WellFeature = {
         ...firstWellbore,
         geometry: {
             type: "GeometryCollection",
@@ -108,22 +92,15 @@ function shouldReverseFirstWellbore(
 /**
  * Get the first geometry of a given type
  */
-function getGeometry(
-    feature: Feature<GeometryCollection<Geometry>, GeoJsonProperties>,
-    type: string
-) {
+function getGeometry(feature: WellFeature, type: string) {
     return feature.geometry.geometries.find((value) => value.type === type);
 }
 
-export function getWellboreGeometry(
-    feature: Feature<GeometryCollection<Geometry>, GeoJsonProperties>
-) {
+export function getWellboreGeometry(feature: WellFeature) {
     return getGeometry(feature, "LineString") as LineString;
 }
 
-export function getWellHeadGeometry(
-    feature: Feature<GeometryCollection<Geometry>, GeoJsonProperties>
-) {
+export function getWellHeadGeometry(feature: WellFeature) {
     return getGeometry(feature, "Point") as Point;
 }
 
@@ -173,8 +150,8 @@ export const getStartPoint = (feature: {
  * @returns Lateral distance in the same units as the input coordinates, or 0 if either trajectory endpoint is missing.
  */
 export function calculateTrajectoryGap(
-    feature1: { geometry: GeometryCollection },
-    feature2: { geometry: GeometryCollection }
+    feature1: WellFeature,
+    feature2: WellFeature
 ): number {
     const end1 = getEndPoint(feature1);
     const start2 = getStartPoint(feature2);
@@ -196,8 +173,8 @@ export function calculateTrajectoryGap(
  * gap.
  */
 export function calculateTrajectoryOmniGap(
-    feature1: { geometry: GeometryCollection },
-    feature2: { geometry: GeometryCollection },
+    feature1: WellFeature,
+    feature2: WellFeature,
     reverse = false
 ): { gap: number; reverse: boolean } {
     const start1 = getStartPoint(feature1);
@@ -229,9 +206,9 @@ export function calculateTrajectoryOmniGap(
  * The distance between trajectories is equal to the lateral component of the euclidean
  * distance between the end of the previous trajectory and the start of the next one.
  */
-export function abscissaTransform<
-    TFeatureCollection extends FeatureCollection<GeometryCollection>,
->(featureCollection: TFeatureCollection): TFeatureCollection {
+export function abscissaTransform(
+    featureCollection: WellFeatureCollection
+): WellFeatureCollection {
     const featureCollectionCopy = cloneDeep(featureCollection);
 
     // Calculate the maximum trajectory length and gaps needed
@@ -277,7 +254,7 @@ export function abscissaTransform<
 }
 
 function unfoldWell(
-    well: Feature<GeometryCollection<Geometry>>,
+    well: WellFeature,
     reverse: boolean,
     abscissaOffset: number
 ): number {
@@ -326,11 +303,9 @@ function unfoldWell(
  * @param features
  * @returns
  */
-export function nearestNeighborAbscissaTransform<
-    TFeatureCollection extends FeatureCollection<GeometryCollection>,
->(
-    features: TFeatureCollection
-): { features: TFeatureCollection; path: Position[] } {
+export function nearestNeighborAbscissaTransform(
+    features: WellFeatureCollection
+): { features: WellFeatureCollection; path: Position[] } {
     if (features.features.length === 0) {
         return { features, path: [] };
     }

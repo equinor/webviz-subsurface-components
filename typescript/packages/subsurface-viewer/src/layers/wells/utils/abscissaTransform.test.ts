@@ -5,6 +5,8 @@ import type {
     LineString,
     Point,
 } from "geojson";
+import _ from "lodash";
+import { WellFeature, WellFeatureCollection } from "../types";
 import {
     abscissaTransform,
     calculateTrajectoryGap,
@@ -14,9 +16,8 @@ import {
     getWellboreGeometry,
     nearestNeighborAbscissaTransform,
 } from "./abscissaTransform";
-import _ from "lodash";
 
-const MOCK_WELL: FeatureCollection<GeometryCollection> = {
+const MOCK_WELL: WellFeatureCollection = {
     type: "FeatureCollection",
     features: [
         {
@@ -40,6 +41,7 @@ const MOCK_WELL: FeatureCollection<GeometryCollection> = {
             },
             properties: {
                 name: "WellA",
+                md: [],
             },
         },
         {
@@ -65,6 +67,7 @@ const MOCK_WELL: FeatureCollection<GeometryCollection> = {
             },
             properties: {
                 name: "WellB",
+                md: [],
             },
         },
         {
@@ -91,6 +94,7 @@ const MOCK_WELL: FeatureCollection<GeometryCollection> = {
             },
             properties: {
                 name: "WellC",
+                md: [],
             },
         },
     ],
@@ -106,7 +110,8 @@ describe("calculateTrajectoryGap", () => {
     });
 
     it("should return default gap when feature1 has no LineString", () => {
-        const feature1 = {
+        const feature1: WellFeature = {
+            type: "Feature",
             geometry: {
                 type: "GeometryCollection" as const,
                 geometries: [
@@ -116,6 +121,7 @@ describe("calculateTrajectoryGap", () => {
                     },
                 ],
             },
+            properties: { name: "MockWell", md: [] },
         };
 
         const gap = calculateTrajectoryGap(feature1, MOCK_WELL.features[1]);
@@ -123,7 +129,8 @@ describe("calculateTrajectoryGap", () => {
     });
 
     it("should return default gap when feature2 has no LineString", () => {
-        const feature2 = {
+        const feature2: WellFeature = {
+            type: "Feature",
             geometry: {
                 type: "GeometryCollection" as const,
                 geometries: [
@@ -133,6 +140,7 @@ describe("calculateTrajectoryGap", () => {
                     },
                 ],
             },
+            properties: { name: "MockWell", md: [] },
         };
 
         const gap = calculateTrajectoryGap(MOCK_WELL.features[0], feature2);
@@ -140,7 +148,8 @@ describe("calculateTrajectoryGap", () => {
     });
 
     it("should return default gap when LineString has no coordinates", () => {
-        const feature1 = {
+        const feature1: WellFeature = {
+            type: "Feature",
             geometry: {
                 type: "GeometryCollection" as const,
                 geometries: [
@@ -150,6 +159,7 @@ describe("calculateTrajectoryGap", () => {
                     },
                 ],
             },
+            properties: { name: "MockWell", md: [] },
         };
 
         const gap = calculateTrajectoryGap(feature1, MOCK_WELL.features[1]);
@@ -157,7 +167,8 @@ describe("calculateTrajectoryGap", () => {
     });
 
     it("should handle zero distance between trajectories", () => {
-        const feature1 = {
+        const feature1: WellFeature = {
+            type: "Feature",
             geometry: {
                 type: "GeometryCollection" as const,
                 geometries: [
@@ -170,9 +181,11 @@ describe("calculateTrajectoryGap", () => {
                     },
                 ],
             },
+            properties: { name: "MockWell", md: [] },
         };
 
-        const feature2 = {
+        const feature2: WellFeature = {
+            type: "Feature",
             geometry: {
                 type: "GeometryCollection" as const,
                 geometries: [
@@ -185,6 +198,7 @@ describe("calculateTrajectoryGap", () => {
                     },
                 ],
             },
+            properties: { name: "MockWell", md: [] },
         };
 
         const gap = calculateTrajectoryGap(feature1, feature2);
@@ -194,7 +208,7 @@ describe("calculateTrajectoryGap", () => {
 
 describe("Transform well trajectory", () => {
     it("Empty well", () => {
-        const emptyWell: FeatureCollection<GeometryCollection> = {
+        const emptyWell: WellFeatureCollection = {
             type: "FeatureCollection",
             features: [],
         };
