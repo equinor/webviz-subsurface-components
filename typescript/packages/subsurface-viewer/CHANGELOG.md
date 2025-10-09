@@ -1,3 +1,13 @@
+## 1.13.9 (2025-10-06)
+
+### 🩹 Fixes
+
+- draw unfolded well trajectories adjacent ([#2623](https://github.com/equinor/webviz-subsurface-components/pull/2623), [#2019](https://github.com/equinor/webviz-subsurface-components/issues/2019))
+
+### ❤️ Thank You
+
+- Håvard Bjerke
+
 ## 1.13.8 (2025-10-03)
 
 ### 🩹 Fixes
