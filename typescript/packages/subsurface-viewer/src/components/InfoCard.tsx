@@ -211,16 +211,15 @@ const InfoCard: React.FC<InfoCardProps> = (props: InfoCardProps) => {
         });
         if (
             topObject.coordinate[2] != undefined &&
-            !Number.isNaN(topObject.coordinate[2])
+            !Number.isNaN(topObject.coordinate[2]) &&
+            !isSectionViewport
         ) {
-            if (!isSectionViewport) {
-                xy_properties.push({
-                    name: "z",
-                    value:
-                        Number(topObject.coordinate[2]).toFixed(2).toString() +
-                        " m",
-                });
-            }
+            xy_properties.push({
+                name: "z",
+                value:
+                    Number(topObject.coordinate[2]).toFixed(2).toString() +
+                    " m",
+            });
         }
 
         const info_card_data: InfoCardDataType[] = [];
