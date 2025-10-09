@@ -1,3 +1,13 @@
+## 1.6.6 (2025-10-09)
+
+### 🩹 Fixes
+
+- prepare for deck.gl 9.2 ([#2635](https://github.com/equinor/webviz-subsurface-components/pull/2635))
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
 ## 1.6.5 (2025-10-03)
 
 This was a version bump only for group-tree-plot to align it with other projects, there were no code changes.
