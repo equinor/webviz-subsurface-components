@@ -3,6 +3,7 @@ import { styled } from "@mui/material/styles";
 
 import type { Meta, StoryObj } from "@storybook/react";
 
+// @ts-expect-error TS6192
 import type {
     colorTablesArray,
     ContinuousLegendProps,
@@ -67,9 +68,11 @@ const max = 0.35;
 const dataObjectName = "Legend";
 const horizontal = true;
 const reverseRange = false;
+// @ts-expect-error TS2709
 const colorTablesData = colorTables as colorTablesArray;
 
 type SubsurfaceViewerWithLegendProps = SubsurfaceViewerProps &
+    // @ts-expect-error TS2709
     ContinuousLegendProps;
 
 // 4 maps with same color scale for all maps
