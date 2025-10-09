@@ -6,21 +6,21 @@ import { Slider } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import type { FeatureCollection, GeometryCollection } from "geojson";
 
-import { NativeSelect } from "@equinor/eds-core-react";
 import {
     ColorLegend,
     colorTables,
     createColorMapFunction as createColormapFunction,
 } from "@emerson-eps/color-tables";
+import { NativeSelect } from "@equinor/eds-core-react";
 
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import type { MapMouseEvent } from "../../components/Map";
 
 import AxesLayer from "../../layers/axes/axesLayer";
+import type { WellFeatureCollection } from "../../layers/wells/types";
 import type { WellsLayerProps } from "../../layers/wells/wellsLayer";
 import WellsLayer from "../../layers/wells/wellsLayer";
-import type { WellFeatureCollection } from "../../layers/wells/types";
 
 import { Axes2DLayer } from "../../layers";
 import {
@@ -31,6 +31,10 @@ import {
     volveWellsResources,
 } from "../sharedSettings";
 
+import { View } from "@deck.gl/core";
+import { PathStyleExtension } from "@deck.gl/extensions";
+import { PathLayer } from "@deck.gl/layers";
+import { useAbscissaTransform } from "../../layers/wells/hooks/useAbscissaTransform";
 import type { WellLabelLayerProps } from "../../layers/wells/layers/wellLabelLayer";
 import { LabelOrientation } from "../../layers/wells/layers/wellLabelLayer";
 import {
@@ -42,9 +46,15 @@ import {
     LABEL_ORIENTATION_ARGTYPES,
     LABEL_POSITION_ARGTYPES,
     LABEL_SIZE_ARGTYPES,
+    TRAJECTORY_SIMULATION_ARGTYPES,
+    WELL_COUNT_ARGTYPES,
 } from "../constant/argTypes";
+import type { TrajectorySimulationProps, WellCount } from "../types/well";
 import { getRgba } from "../util/color";
-import { View } from "@deck.gl/core";
+import {
+    getSyntheticWells,
+    useSyntheticWellCollection,
+} from "../util/wellSynthesis";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -99,6 +109,7 @@ const testWellWithDuplicates: WellFeatureCollection = {
 
 const classes = {
     main: `${PREFIX}-main`,
+    annotation: `${PREFIX}-annotation`,
 };
 
 const Root = styled("div")({
@@ -106,6 +117,9 @@ const Root = styled("div")({
         height: 500,
         border: "1px solid black",
         position: "relative",
+    },
+    [`& .${classes.annotation}`]: {
+        marginLeft: "100px",
     },
 });
 
@@ -1071,53 +1085,56 @@ export const LegendWithColorSelector: StoryObj<typeof WellLayerTemplate> = {
     render: (args) => <WellLayerTemplate {...args} />,
 };
 
-const VOLVE_WELLS_PROPS = {
-    id: "volve",
-    data: "./volve_wells.json",
-    ZIncreasingDownwards: false,
+const SYNTHETIC_WELLS_PROPS = {
+    id: "wells",
+    data: getSyntheticWells(10),
     wellLabel: {
-        getSize: 12,
+        getSize: 10,
         background: true,
     },
 };
 
-const WELLS_UNFOLDED = new WellsLayer({
-    ...VOLVE_WELLS_PROPS,
-    id: "unfolded",
+const WELLS_UNFOLDED_DEFAULT_PROPS = {
+    ...SYNTHETIC_WELLS_PROPS,
+    id: "unfolded_default",
+    section: true,
+};
+
+const WELLS_UNFOLDED_DEFAULT = new WellsLayer({
+    ...SYNTHETIC_WELLS_PROPS,
+    id: "unfolded_default",
     section: true,
 });
 
-const WELLS_FOLDED = new WellsLayer({
-    ...VOLVE_WELLS_PROPS,
+const WELLS_FOLDED_PROPS = {
+    ...SYNTHETIC_WELLS_PROPS,
     id: "folded",
     wellLabel: {
-        ...VOLVE_WELLS_PROPS.wellLabel,
+        ...SYNTHETIC_WELLS_PROPS.wellLabel,
+        orientation: LabelOrientation.TANGENT,
+        getPositionAlongPath: 0.9,
+    },
+};
+
+const WELLS_FOLDED = new WellsLayer({
+    ...SYNTHETIC_WELLS_PROPS,
+    id: "folded",
+    wellLabel: {
+        ...SYNTHETIC_WELLS_PROPS.wellLabel,
         orientation: LabelOrientation.TANGENT,
         getPositionAlongPath: 0.9,
     },
 });
 
 /** Example well with unfolded projection */
-export const UnfoldedProjection: StoryObj<typeof SubsurfaceViewer> = {
+export const UnfoldedProjection: StoryObj<
+    WellCount & TrajectorySimulationProps
+> = {
     args: {
-        id: "some-id",
-        layers: [WELLS_FOLDED, WELLS_UNFOLDED, new Axes2DLayer({ id: "axes" })],
-        views: {
-            layout: [1, 2] as [number, number],
-            viewports: [
-                {
-                    id: "viewport1",
-                    target: [2000, -1500],
-                    zoom: -3,
-                    layerIds: ["unfolded", "axes"],
-                },
-                {
-                    id: "viewport2",
-                    layerIds: ["folded", "axes"],
-                },
-            ],
-        },
-        scale: { visible: false },
+        wellCount: 10,
+        sampleCount: 20,
+        segmentLength: 150,
+        dipDeviationMagnitude: 10,
     },
     parameters: {
         docs: {
@@ -1127,26 +1144,134 @@ export const UnfoldedProjection: StoryObj<typeof SubsurfaceViewer> = {
             },
         },
     },
-    render: (args) => (
-        <SubsurfaceViewer {...args}>
-            {
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                /* @ts-expect-error */
-                <View id="viewport1">
-                    <h2 style={{ marginLeft: "100px" }}>
-                        Unfolded projection [abscissa, z]
-                    </h2>
-                </View>
-            }
-            {
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                /* @ts-expect-error */
-                <View id="viewport2">
-                    <h2 style={{ marginLeft: "100px" }}>
-                        Folded projection [x, y]
-                    </h2>
-                </View>
-            }
-        </SubsurfaceViewer>
-    ),
+    argTypes: {
+        ...WELL_COUNT_ARGTYPES,
+        ...TRAJECTORY_SIMULATION_ARGTYPES,
+    },
+    render: ({
+        wellCount,
+        sampleCount,
+        segmentLength,
+        dipDeviationMagnitude,
+    }) => {
+        const viewerArgs: SubsurfaceViewerProps = {
+            id: "some-id",
+            views: {
+                layout: [1, 3] as [number, number],
+                viewports: [
+                    {
+                        id: "viewport1",
+                        target: [3000, -1500],
+                        zoom: -4.5,
+                        layerIds: [WELLS_UNFOLDED_DEFAULT.id, "axes"],
+                    },
+                    {
+                        id: "viewport2",
+                        target: [3000, -1500],
+                        zoom: -4.5,
+                        layerIds: ["unfolded_custom", "axes"],
+                    },
+                    {
+                        id: "viewport3",
+                        layerIds: [WELLS_FOLDED.id, "axes", "section-path"],
+                        target: [458500, 6785000],
+                        zoom: -3.5,
+                    },
+                ],
+            },
+            scale: { visible: false },
+            bounds: [450000, 6781000, 464000, 6791000],
+        };
+
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const data = useSyntheticWellCollection(wellCount, 10, {
+            sampleCount,
+            segmentLength,
+            dipDeviationMagnitude,
+        });
+
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const { transform, path } = useAbscissaTransform();
+
+        // Use custom section transform (nearest neighbor)
+        const wellsUnfoldedCustom = new WellsLayer({
+            ...SYNTHETIC_WELLS_PROPS,
+            id: "unfolded_custom",
+            section: transform,
+            wellLabel: {
+                ...SYNTHETIC_WELLS_PROPS.wellLabel,
+                orientation: LabelOrientation.TANGENT,
+                getPositionAlongPath: 0.7,
+            },
+            data,
+        });
+
+        // Project the section path in the map view with a dashed polyline
+        const sectionPathLayer = new PathLayer({
+            id: "section-path",
+            data: [{ path }],
+            widthMinPixels: 1,
+            extensions: [new PathStyleExtension({ dash: true })],
+            getDashArray: [10, 5],
+        });
+
+        const layers = [
+            new WellsLayer({ ...WELLS_FOLDED_PROPS, data }),
+            new WellsLayer({ ...WELLS_UNFOLDED_DEFAULT_PROPS, data }),
+            new Axes2DLayer({ id: "axes" }),
+            wellsUnfoldedCustom,
+            sectionPathLayer,
+        ];
+
+        return (
+            <Root>
+                <SubsurfaceViewer {...viewerArgs} layers={layers}>
+                    {
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                        /* @ts-expect-error */
+                        <View id="viewport1">
+                            <h2 className={classes.annotation}>
+                                Default unfolded projection [abscissa, z]
+                            </h2>
+                            <p className={classes.annotation}>
+                                The wells are projected onto a section defined
+                                by the wellbores themselves, ie. a [abscissa, z]
+                                plane defined by <i>unfolding</i> the well
+                                trajectories.
+                            </p>
+                        </View>
+                    }
+                    {
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                        /* @ts-expect-error */
+                        <View id="viewport2">
+                            <h2 className={classes.annotation}>
+                                Custom unfolded projection [abscissa, z]
+                            </h2>
+                            <p className={classes.annotation}>
+                                Demonstrates using a custom method of unfolding
+                                the wells, by specifying a custom section
+                                transform. This section is defined by a nearest
+                                neighbor search through the wells starting with
+                                the first given well.
+                            </p>
+                        </View>
+                    }
+                    {
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                        /* @ts-expect-error */
+                        <View id="viewport3">
+                            <h2 className={classes.annotation}>
+                                Folded projection [x, y]
+                            </h2>
+                            <p className={classes.annotation}>
+                                The dashed polyline shows the custom section
+                                path.
+                            </p>
+                        </View>
+                    }
+                </SubsurfaceViewer>
+            </Root>
+        );
+    },
 };

@@ -7,3 +7,5 @@ export type TrajectorySimulationProps = {
      */
     dipDeviationMagnitude?: number;
 };
+
+export type WellCount = { wellCount: number };

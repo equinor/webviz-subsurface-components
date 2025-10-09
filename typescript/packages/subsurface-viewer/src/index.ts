@@ -4,6 +4,7 @@ export { default } from "./SubsurfaceViewer";
 export { TGrid3DColoringMode } from "./SubsurfaceViewer";
 export type {
     BoundsAccessor,
+    colorTablesArray,
     LightsType,
     MapMouseEvent,
     SubsurfaceViewerProps,
@@ -11,7 +12,6 @@ export type {
     TooltipCallback,
     ViewStateType,
     ViewsType,
-    colorTablesArray,
 } from "./SubsurfaceViewer";
 
 export * from "./utils";
@@ -23,3 +23,11 @@ export type {
 } from "./layers/utils/layerTools";
 
 export type { ViewportType } from "./views/viewport";
+
+export { useAbscissaTransform } from "./layers/wells/hooks/useAbscissaTransform";
+
+export type {
+    AbscissaTransform,
+    WellFeature,
+    WellFeatureCollection,
+} from "./layers/wells/types";
