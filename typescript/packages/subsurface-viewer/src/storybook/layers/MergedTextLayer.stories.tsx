@@ -1,5 +1,6 @@
 import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+import { OrbitView, OrthographicView } from "@deck.gl/core";
 import type { MergedTextLayerProps } from "../../layers/wells/layers/mergedTextLayer";
 import { MergedTextLayer } from "../../layers/wells/layers/mergedTextLayer";
 import { AxesLayer } from "../../layers";
@@ -33,12 +34,12 @@ const DEFAULT_VIEWS: ViewsType = {
     viewports: [
         {
             id: "view_1",
-            show3D: false,
+            viewType: new OrthographicView(),
             layerIds: ["merged-labels"],
         },
         {
             id: "view_2",
-            show3D: true,
+            viewType: new OrbitView(),
             layerIds: ["axes-layer-3d", "merged-labels"],
         },
     ],

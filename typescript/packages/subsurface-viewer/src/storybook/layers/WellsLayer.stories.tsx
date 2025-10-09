@@ -31,7 +31,7 @@ import {
     volveWellsResources,
 } from "../sharedSettings";
 
-import { View } from "@deck.gl/core";
+import { View, OrbitView, OrthographicView } from "@deck.gl/core";
 import { PathStyleExtension } from "@deck.gl/extensions";
 import { PathLayer } from "@deck.gl/layers";
 import { useAbscissaTransform } from "../../layers/wells/hooks/useAbscissaTransform";
@@ -766,12 +766,12 @@ export const WellLabelStyle: StoryObj<
                     {
                         id: "viewport1",
                         layerIds: ["wells-3d"],
-                        show3D: true,
+                        viewType: OrbitView,
                     },
                     {
                         id: "viewport2",
                         layerIds: ["wells-2d"],
-                        show3D: false,
+                        viewType: OrthographicView,
                     },
                 ],
             }),
@@ -797,8 +797,8 @@ export const WellLabelStyle: StoryObj<
 
 const CoarseWellFactorComponent: React.FC<{
     coarseWellsToleranceFactor: number;
-    show3D: boolean;
-}> = ({ show3D, ...args }) => {
+    is3D: boolean;
+}> = ({ is3D, ...args }) => {
     const [coarseWellsToleranceFactor, setCoarseWellsToleranceFactor] =
         useState<number>(DEFAULT_TOLERANCE);
     const [n, setN] = useState<number>(1);
@@ -848,18 +848,18 @@ const CoarseWellFactorComponent: React.FC<{
                 {
                     id: "viewport1",
                     layerIds: ["reference-wells", "axes-layer"],
-                    show3D,
+                    viewType: is3D ? OrbitView : OrthographicView,
                     isSync: true,
                 },
                 {
                     id: "viewport2",
                     layerIds: ["simplified-wells", "axes-layer"],
-                    show3D,
+                    viewType: is3D ? OrbitView : OrthographicView,
                     isSync: true,
                 },
             ],
         }),
-        [show3D]
+        [is3D]
     );
 
     const subsurfaceViewerArgs = {
@@ -873,7 +873,7 @@ const CoarseWellFactorComponent: React.FC<{
 export const CoarseWellFactor: StoryObj<typeof CoarseWellFactorComponent> = {
     args: {
         coarseWellsToleranceFactor: DEFAULT_TOLERANCE,
-        show3D: true,
+        is3D: true,
     },
     argTypes: {
         coarseWellsToleranceFactor: {

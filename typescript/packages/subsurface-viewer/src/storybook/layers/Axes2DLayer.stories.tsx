@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 
-import { View } from "@deck.gl/core";
+import { View, OrthographicView } from "@deck.gl/core";
 
 import * as d3 from "d3";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
@@ -140,25 +140,25 @@ const MatrixStory = () => {
         viewports: [
             {
                 id: "view_1",
-                show3D: false,
+                viewType: OrthographicView,
                 layerIds: [],
                 isSync: false,
             },
             {
                 id: "view_2",
-                show3D: false,
+                viewType: OrthographicView,
                 layerIds: [],
                 isSync: false,
             },
             {
                 id: "view_3",
-                show3D: false,
+                viewType: OrthographicView,
                 layerIds: [],
                 isSync: false,
             },
             {
                 id: "view_4",
-                show3D: false,
+                viewType: OrthographicView,
                 layerIds: [],
                 isSync: false,
             },
