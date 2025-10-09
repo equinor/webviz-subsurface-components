@@ -55,6 +55,7 @@ import {
     getSyntheticWells,
     useSyntheticWellCollection,
 } from "../util/wellSynthesis";
+import { SectionView } from "../../views/sectionView";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -1162,12 +1163,14 @@ export const UnfoldedProjection: StoryObj<
                     {
                         id: "viewport1",
                         target: [3000, -1500],
+                        viewType: SectionView,
                         zoom: -4.5,
                         layerIds: [WELLS_UNFOLDED_DEFAULT.id, "axes"],
                     },
                     {
                         id: "viewport2",
                         target: [3000, -1500],
+                        viewType: SectionView,
                         zoom: -4.5,
                         layerIds: ["unfolded_custom", "axes"],
                     },
@@ -1231,7 +1234,7 @@ export const UnfoldedProjection: StoryObj<
                         /* @ts-expect-error */
                         <View id="viewport1">
                             <h2 className={classes.annotation}>
-                                Default unfolded projection [abscissa, z]
+                                Default unfolded projection [distance, z]
                             </h2>
                             <p className={classes.annotation}>
                                 The wells are projected onto a section defined
@@ -1246,7 +1249,7 @@ export const UnfoldedProjection: StoryObj<
                         /* @ts-expect-error */
                         <View id="viewport2">
                             <h2 className={classes.annotation}>
-                                Custom unfolded projection [abscissa, z]
+                                Custom unfolded projection [distance, z]
                             </h2>
                             <p className={classes.annotation}>
                                 Demonstrates using a custom method of unfolding
