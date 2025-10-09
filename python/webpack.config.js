@@ -48,15 +48,9 @@ module.exports = function (env, argv) {
                 worker_threads: false,
             },
         },
-        //devtool: "source-map",
+        devtool: "source-map",
         module: {
             rules: [
-                {
-                    test: /node_modules/,
-                    resolve: {
-                        fullySpecified: false,
-                    },
-                },
                 {
                     test: /\.m?js/,
                     resolve: {
@@ -65,9 +59,6 @@ module.exports = function (env, argv) {
                 },
                 {
                     test: /\.(t|j)sx?$/,
-                    resolve: {
-                        fullySpecified: false,
-                    },
                     use: [
                         {
                             loader: "ts-loader",
