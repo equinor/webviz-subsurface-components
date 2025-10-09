@@ -236,6 +236,17 @@ export function abscissaTransform(
     return featureCollectionCopy;
 }
 
+/**
+ * Unfolds a single wellbore, in place (ie. without copying), onto an abscissa, z plane and
+ * translates it
+ * @param well The well to unfold
+ * @param reverse Whether to mirror the wellbore around the maximum abscissa (typically used when
+ * the shortest path is bottom-up the wellbore)
+ * @param abscissaOffset The abscissa offset to apply to the wellbore, typically used to place the
+ * well next to the previous one
+ * @returns The maximum abscissa of the unfolded wellbore (typically used to position the next
+ * wellbore)
+ */
 function unfoldWell(
     well: WellFeature,
     reverse: boolean,
@@ -255,7 +266,7 @@ function unfoldWell(
     );
 
     const projectedCoordinates = new Array<Position>(
-        wellboreGeometry.coordinates.length
+        wellboreProjection.vAbscissa.length
     );
 
     // Translate abscissae next to previous well
@@ -283,17 +294,15 @@ function unfoldWell(
 
 /**
  * Projects well trajectories onto an abscissa, z plane using a nearest neighbor approach.
- * @param features
- * @returns
+ * @param wellCollection The well collection to project
+ * @returns The projected well collection and the path used for the section projected upon
  */
 export function nearestNeighborAbscissaTransform(
-    features: WellFeatureCollection
+    wellCollection: WellFeatureCollection
 ): { features: WellFeatureCollection; path: Position[] } {
-    if (features.features.length === 0) {
-        return { features, path: [] };
+    if (wellCollection.features.length === 0) {
+        return { features: wellCollection, path: [] };
     }
-
-    const featuresCopy = cloneDeep(features);
 
     const path = [];
 
@@ -303,8 +312,8 @@ export function nearestNeighborAbscissaTransform(
     visited.add(0);
     let lastVisitedIndex = 0;
 
-    const transformedFeatures: typeof features.features = [];
-    transformedFeatures.push(cloneDeep(features.features[0]));
+    const transformedFeatures: typeof wellCollection.features = [];
+    transformedFeatures.push(cloneDeep(wellCollection.features[0]));
 
     // Get well geometry
     const wellHeadGeometry = getWellHeadGeometry(transformedFeatures[0]);
@@ -312,7 +321,7 @@ export function nearestNeighborAbscissaTransform(
 
     // Check if reversing the first wellbore gives a shorter gap to the
     // next well
-    const reverseFirstWellbore = shouldReverseFirstWellbore(features);
+    const reverseFirstWellbore = shouldReverseFirstWellbore(wellCollection);
 
     // Record the path of the section in world coordinates
     path.push(
@@ -341,20 +350,20 @@ export function nearestNeighborAbscissaTransform(
 
     let previousReverse = reverseFirstWellbore;
 
-    while (visited.size < features.features.length) {
+    while (visited.size < wellCollection.features.length) {
         let nearestIndex = -1;
         let nearestDistance = Infinity;
         let nearestReverse = false;
 
-        const lastFeature = features.features[lastVisitedIndex];
+        const lastFeature = wellCollection.features[lastVisitedIndex];
 
         // Find the nearest unvisited feature
-        for (let i = 0; i < features.features.length; i++) {
+        for (let i = 0; i < wellCollection.features.length; i++) {
             if (visited.has(i)) continue;
 
             const { gap, reverse } = calculateTrajectoryOmniGap(
                 lastFeature,
-                features.features[i],
+                wellCollection.features[i],
                 previousReverse
             );
 
@@ -370,7 +379,7 @@ export function nearestNeighborAbscissaTransform(
         if (nearestIndex === -1) break; // No more unvisited features
 
         visited.add(nearestIndex);
-        const nextFeature = cloneDeep(features.features[nearestIndex]);
+        const nextFeature = cloneDeep(wellCollection.features[nearestIndex]);
         transformedFeatures.push(nextFeature);
 
         // Record the path of the section
@@ -392,7 +401,9 @@ export function nearestNeighborAbscissaTransform(
         );
     }
 
-    featuresCopy.features = transformedFeatures;
-
-    return { features: featuresCopy, path };
+    // Return a new collection of well features using the transformed features
+    return {
+        features: { ...wellCollection, features: transformedFeatures },
+        path,
+    };
 }
