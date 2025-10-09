@@ -29,8 +29,6 @@ export const phongMaterial: ShaderModule<PhongMaterialProps> = {
     vs: PHONG_VS,
     fs: PHONG_FS,
     defines: {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
         LIGHTING_FRAGMENT: true,
     },
     uniformTypes: {

@@ -1,8 +1,14 @@
-import type { Color, PickingInfo, UpdateParameters } from "@deck.gl/core";
+import type {
+    Color,
+    PickingInfo,
+    LayerProps,
+    UpdateParameters,
+} from "@deck.gl/core";
 import { Layer, picking, project32 } from "@deck.gl/core";
 
 import type { Device } from "@luma.gl/core";
 import { GL } from "@luma.gl/constants";
+import type { ShaderModule } from "@luma.gl/shadertools";
 import { Geometry, Model } from "@luma.gl/engine";
 
 import { Vector2 } from "@math.gl/core";
@@ -158,7 +164,12 @@ export default class PieChartLayer extends Layer<PieChartLayerProps<PiesData>> {
             ...super.getShaders({
                 vs: vertexShader,
                 fs: fragmentShader,
-                modules: [project32, picking, precisionForTests],
+                modules: [
+                    project32,
+                    picking,
+                    precisionForTests,
+                    piechartUniforms,
+                ],
             }),
             geometry: new Geometry({
                 topology: "triangle-list",
@@ -209,7 +220,7 @@ export default class PieChartLayer extends Layer<PieChartLayerProps<PiesData>> {
             gl.disable(GL.DEPTH_TEST);
         }
 
-        model.setUniforms({ scale });
+        model.shaderInputs.setProps({ ...args.uniforms, piechart: { scale } });
         model.draw(context.renderPass);
 
         if (!this.props.depthTest) {
@@ -246,3 +257,21 @@ export default class PieChartLayer extends Layer<PieChartLayerProps<PiesData>> {
 
 PieChartLayer.layerName = "PieChartLayer";
 PieChartLayer.defaultProps = defaultProps;
+
+const piechartUniformsBlock = `\
+uniform piechartUniforms {
+    uniform float scale;
+} piechart;
+`;
+
+type PieChartUniformsType = { scale: number };
+
+// NOTE: this must exactly the same name than in the uniform block
+const piechartUniforms = {
+    name: "piechart",
+    vs: piechartUniformsBlock,
+    fs: undefined,
+    uniformTypes: {
+        scale: "f32",
+    },
+} as const satisfies ShaderModule<LayerProps, PieChartUniformsType>;

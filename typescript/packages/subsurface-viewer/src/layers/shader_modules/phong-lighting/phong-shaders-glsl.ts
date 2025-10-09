@@ -12,6 +12,7 @@ uniform phongMaterialUniforms {
 `;
 
 export const PHONG_FS = /* glsl */ `\
+#define MAX_LIGHTS 3
 
 uniform phongMaterialUniforms {
   uniform float ambient;
@@ -20,7 +21,7 @@ uniform phongMaterialUniforms {
   uniform vec3  specularColor;
 } material;
 
-// Note modified for two sided lighing.
+// Note modified for two sided lighting.
 vec3 lighting_getLightColor(vec3 surfaceColor, vec3 light_direction, vec3 view_direction, vec3 normal_worldspace, vec3 color) {
   vec3 halfway_direction = normalize(light_direction + view_direction); 
 
