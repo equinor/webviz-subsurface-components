@@ -13,13 +13,16 @@ in vec4 vColor;
 
 out vec4 fragColor;
 
-   // Normalize the value to the range [0, 1]
+// Normalize the value to the range [0, 1]
 float normalizeValue(float value) {
+   if(isNanValue(value)) {
+      return value;
+   }
    return (value - triangles.colormapRange[0]) / (triangles.colormapRange[1] - triangles.colormapRange[0]);
 }
-
+   
 vec4 valueColor(float value) {
-   if(value == triangles.undefinedValue) {
+   if(isNanValue(value) || value == triangles.undefinedValue) {
       return triangles.undefinedColor;
    }
    if(triangles.useClampColors) {
@@ -38,9 +41,9 @@ void main(void) {
 
    //Picking pass.
    if (picking.isActive > 0.5 && !(picking.isAttribute > 0.5)) {
-      float value = texture(valueTexture, vTexCoords).r; 
+      float value = texture(valueTexture, vTexCoords).r;
       float normalizedValue = normalizeValue(value);
-      fragColor = encodeVertexIndexToRGB(int(normalizedValue * (255.0 * 255.0 * 255.0 - 1.0)));
+      fragColor = encodeNormalizedValueWithNaNToRGB(normalizedValue);
       return;
    }
 

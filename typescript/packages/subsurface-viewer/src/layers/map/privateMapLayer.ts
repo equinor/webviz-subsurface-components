@@ -14,7 +14,7 @@ import { Model, Geometry } from "@luma.gl/engine";
 
 import { phongMaterial } from "../shader_modules/phong-lighting/phong-material";
 import { precisionForTests } from "../shader_modules/test-precision/precisionForTests";
-import { utilities } from "../shader_modules";
+import { decodeIndexFromRGB, utilities } from "../shader_modules";
 
 import type {
     DeckGLLayerContext,
@@ -297,11 +297,9 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
         const layer_properties: PropertyDataType[] = [];
 
         // Note these colors are in the  0-255 range.
-        const r = info.color[0];
-        const g = info.color[1];
-        const b = info.color[2];
 
-        const vertexIndex = 256 * 256 * r + 256 * g + b;
+        const [r, g, b] = info.color;
+        const vertexIndex = decodeIndexFromRGB([r, g, b]);
 
         if (typeof info.coordinate?.[2] !== "undefined") {
             const zScale = this.props.modelMatrix
