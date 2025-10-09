@@ -25895,7 +25895,7 @@
         },
         {
             "name":"Colors_set_1",
-            "discrete":"true",
+            "discrete":true,
             "colors":
             [
                 [0,255,13,186],
@@ -25917,7 +25917,7 @@
         },
         {
             "name":"Colors_set_3",
-            "discrete":"true",
+            "discrete":true,
             "colors":
             [
                 [0,120,181,255],
