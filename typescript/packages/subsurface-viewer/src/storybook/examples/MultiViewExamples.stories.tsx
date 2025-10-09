@@ -199,10 +199,7 @@ function MultiViewPickingExample(
                 deckGlRef={deckGlRef}
                 cameraPosition={cameraPosition}
                 onMouseEvent={handleMouseEvent}
-                coords={{
-                    visible: false,
-                    multiPicking: true,
-                }}
+                showReadout={false}
                 scale={{
                     visible: true,
                     cssStyle: {

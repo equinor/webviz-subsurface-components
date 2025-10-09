@@ -695,7 +695,8 @@ const ScaleFactorHookComponent = (
         ...props,
         verticalScale: scaleFactor,
         innerRef: elementRef,
-        coords: { visible: false },
+        showReadout: false,
+        pickingDepth: 0,
     };
     return <SubsurfaceViewer {...viewerProps} />;
 };

@@ -21,6 +21,7 @@ const stories: Meta = {
 export default stories;
 
 /*eslint-disable */
+/* prettier-ignore */
 const smallPointsData = [
     0,  0,  5,  // Vertex 1, x, y, z
     10, 0,  5,  // Vertex 2, x, y, z
@@ -148,9 +149,8 @@ export const HugePointsLayer: StoryObj<typeof SubsurfaceViewer> = {
         id: "huge-points-map",
         layers: [hugeAxesLayer, hugePointsLayer],
         bounds: [0, 0, sideSize, sideSize],
-        coords: {
-            visible: false,
-        },
+        showReadout: false,
+        pickingDepth: 0,
         views: default3DViews,
     },
     parameters: {

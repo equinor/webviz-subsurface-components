@@ -1,3 +1,13 @@
+## 1.13.10 (2025-10-09)
+
+### 🩹 Fixes
+
+- [Subsurface Viewer] Fix picking radius for multi-picking and clamp interpolation ([#2621](https://github.com/equinor/webviz-subsurface-components/pull/2621))
+
+### ❤️ Thank You
+
+- Anders Rantala Hunderi
+
 ## 1.13.9 (2025-10-06)
 
 ### 🩹 Fixes
