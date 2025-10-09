@@ -1,3 +1,13 @@
+## 1.14.0 (2025-10-09)
+
+### 🚀 Features
+
+- custom section well projection ([#2630](https://github.com/equinor/webviz-subsurface-components/pull/2630))
+
+### ❤️ Thank You
+
+- Håvard Bjerke
+
 ## 1.13.10 (2025-10-09)
 
 ### 🩹 Fixes
