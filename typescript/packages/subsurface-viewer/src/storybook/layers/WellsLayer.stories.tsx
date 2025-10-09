@@ -1233,6 +1233,12 @@ export const UnfoldedProjection: StoryObj<
                             <h2 className={classes.annotation}>
                                 Default unfolded projection [abscissa, z]
                             </h2>
+                            <p className={classes.annotation}>
+                                The wells are projected onto a section defined
+                                by the wellbores themselves, ie. a [abscissa, z]
+                                plane defined by <i>unfolding</i> the well
+                                trajectories.
+                            </p>
                         </View>
                     }
                     {
@@ -1242,6 +1248,13 @@ export const UnfoldedProjection: StoryObj<
                             <h2 className={classes.annotation}>
                                 Custom unfolded projection [abscissa, z]
                             </h2>
+                            <p className={classes.annotation}>
+                                Demonstrates using a custom method of unfolding
+                                the wells, by specifying a custom section
+                                transform. This section is defined by a nearest
+                                neighbor search through the wells starting with
+                                the first given well.
+                            </p>
                         </View>
                     }
                     {
