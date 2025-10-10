@@ -12,7 +12,7 @@ import { Geometry, Model } from "@luma.gl/engine";
 import type { ShaderModule } from "@luma.gl/shadertools";
 import { lighting } from "@luma.gl/shadertools";
 
-import { utilities } from "../shader_modules";
+import { decodeIndexFromRGB, utilities } from "../shader_modules";
 import { phongMaterial } from "../shader_modules/phong-lighting/phong-material";
 import { precisionForTests } from "../shader_modules/test-precision/precisionForTests";
 import type {
@@ -270,11 +270,8 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
         const layer_properties: PropertyDataType[] = [];
 
         // Note these colors are in the 0-255 range.
-        const r = info.color[0];
-        const g = info.color[1];
-        const b = info.color[2];
-
-        const vertexIndex = 256 * 256 * r + 256 * g + b;
+        const [r, g, b] = info.color;
+        const vertexIndex = decodeIndexFromRGB([r, g, b]);
 
         const zScale = this.props.modelMatrix ? this.props.modelMatrix[10] : 1;
 

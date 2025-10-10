@@ -32,7 +32,10 @@ import {
 } from "../utils/colormapTools";
 
 import type {} from "../../utils/Color";
-import { utilities } from "../shader_modules";
+import {
+    decodeNormalizedValueWithNaNFromRGB,
+    utilities,
+} from "../shader_modules";
 
 import type {
     Color,
@@ -649,16 +652,13 @@ export class GpglValueMappedSurfaceLayer extends Layer<GpglValueMappedSurfaceLay
         }
 
         // Note these colors are in the  0-255 range.
-        const r = info.color[0];
-        const g = info.color[1];
-        const b = info.color[2];
+        const [r, g, b] = info.color;
+        const normalizedValue = decodeNormalizedValueWithNaNFromRGB([r, g, b]);
 
-        const n = 256 * 256 * r + 256 * g + b;
         const valueRange =
             this.props.colormapSetup?.valueRange ??
             (this.state["valueRange"] as [number, number]) ??
             defaultColormapSetup.valueRange;
-        const normalizedValue = n / (255 * 255 * 255 - 1);
         const value =
             valueRange[0] + normalizedValue * (valueRange[1] - valueRange[0]);
         layer_properties.push(createPropertyData("Property", value));

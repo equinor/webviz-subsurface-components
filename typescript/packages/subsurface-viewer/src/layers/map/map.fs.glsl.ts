@@ -27,7 +27,7 @@ void main(void) {
 
    //Picking pass.
    if (picking.isActive > 0.5 && !(picking.isAttribute > 0.5)) {
-      fragColor = encodeVertexIndexToRGB(vertexIndex);
+      fragColor = encodeIndexToRGB(vertexIndex);
       return;
    }
 

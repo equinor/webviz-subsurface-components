@@ -59,6 +59,16 @@ const section0TexProps = {
         values: "seismic_Z0_115_103.float32",
     },
 };
+const section0NaNTexProps = {
+    ...section0Props,
+    texCoords: sectionZ0TexCoords,
+    valueMap: {
+        width: 115,
+        height: 103,
+        values: "seismicNaN_Z0_115_103.float32",
+    },
+};
+
 const section0MeshProps = {
     topology: "line-strip",
     vertices: sectionZ0Vertices,
@@ -69,9 +79,21 @@ const bounds = [-3083.9, -6505.9, -1071.3, 3426.2, 5251.4, -2374.3];
 
 // ---------In-place array data handling (storybook fails to rebuild non JSon data)--------------- //
 const njTextureLayerId = "nj_texture_layer";
+const njTextureNaNLayerId = "nj_texture_nan_layer";
 
 const nonJsonLayerArgs = {
     [njTextureLayerId]: {
+        valueMappedTriangles: [
+            {
+                vertices: new Float32Array(sectionZ0Vertices),
+                texCoords: new Float32Array(sectionZ0TexCoords),
+                vertexIndices: {
+                    value: new Uint32Array(sectionZ0Indices),
+                },
+            },
+        ],
+    },
+    [njTextureNaNLayerId]: {
         valueMappedTriangles: [
             {
                 vertices: new Float32Array(sectionZ0Vertices),
@@ -243,6 +265,35 @@ export const TypedArrayGpglTexture: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "njTextureLayerId",
         layers: [smallAxesLayer, njTextureLayer],
+        views: default3DViews,
+    },
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: "Display the cage of seismic.",
+            },
+        },
+    },
+    render: (args) => (
+        <SubsurfaceViewer {...preprocessProps(args, nonJsonLayerArgs)} />
+    ),
+};
+
+const nanTextureLayer = {
+    "@@type": "GpglValueMappedSurfaceLayer",
+    id: "texture_layer",
+    valueMappedTriangles: [section0NaNTexProps],
+    colormap: { colormapName: "seismic" },
+    colormapSetup: colormapSetup,
+    showMesh: false,
+    ZIncreasingDownwards: true,
+};
+
+export const GpglValueMapWithNan: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "gpgl_texture",
+        layers: [smallAxesLayer, nanTextureLayer],
         views: default3DViews,
     },
     parameters: {
