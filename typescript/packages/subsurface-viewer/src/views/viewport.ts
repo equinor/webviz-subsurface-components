@@ -16,8 +16,8 @@ export interface ViewportType {
     name?: string;
 
     /**
-     * @deprecated If true, displays map in 3D view, default is 2D view (false)
-     * Deprecated. Use "viewType" instead.
+     * If true, displays map in 3D view, default is 2D view (false)
+     * @deprecated Use "viewType" instead.
      */
     show3D?: boolean;
 
