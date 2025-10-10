@@ -663,8 +663,6 @@ export class GpglValueMappedSurfaceLayer extends Layer<GpglValueMappedSurfaceLay
             valueRange[0] + normalizedValue * (valueRange[1] - valueRange[0]);
         layer_properties.push(createPropertyData("Property", value));
 
-        console.log(`Picked value: ${value} from color: [${r}, ${g}, ${b}]`);
-
         return {
             ...info,
             properties: layer_properties,
