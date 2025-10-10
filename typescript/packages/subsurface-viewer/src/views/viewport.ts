@@ -1,4 +1,5 @@
 import React from "react";
+import type { ViewTypeType } from "../components/Map";
 
 /**
  * Viewport type.
@@ -16,8 +17,17 @@ export interface ViewportType {
 
     /**
      * If true, displays map in 3D view, default is 2D view (false)
+     * @deprecated Use "viewType" instead.
      */
     show3D?: boolean;
+
+    /**
+     * Type of viewport.
+     * Use "OrbitView" for 3D
+     * Use "OrthographicView" for 2D (default)
+     * Use "SectionView" for unfolded 2D
+     */
+    viewType?: ViewTypeType;
 
     /**
      * Layers to be displayed on viewport

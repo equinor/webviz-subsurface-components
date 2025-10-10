@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
+import { OrbitView, OrthographicView } from "@deck.gl/core";
 import type { Feature } from "geojson";
 
 import SubsurfaceViewer from "../../SubsurfaceViewer";
@@ -19,13 +20,13 @@ const defaultProps = {
             {
                 id: "orbit_view",
                 name: "3d view",
-                show3D: true,
+                viewType: OrbitView,
                 isSync: false,
             },
             {
                 id: "intersection_view",
                 name: "Intersection view",
-                show3D: false,
+                viewType: OrthographicView,
                 layerIds: ["enhanced-path-layer", "wells-layer"],
                 isSync: false,
             },

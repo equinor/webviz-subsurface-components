@@ -26,6 +26,7 @@ import labelFragmentShader from "./label.fs.glsl";
 import labelVertexShader from "./label.vs.glsl";
 import lineFragmentShader from "./line.fs.glsl";
 import lineVertexShader from "./line.vs.glsl";
+import { SectionViewport } from "../../viewports/sectionViewport";
 
 enum TEXT_ANCHOR {
     start = 0,
@@ -529,7 +530,8 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
 
     draw(opts: { context: { renderPass: RenderPass } }): void {
         const is_orthographic =
-            this.context.viewport.constructor === OrthographicViewport;
+            this.context.viewport.constructor === OrthographicViewport ||
+            this.context.viewport.constructor === SectionViewport;
         if (
             typeof this.state["fontTexture"] === "undefined" ||
             !is_orthographic
