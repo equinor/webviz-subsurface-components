@@ -34,12 +34,12 @@ const DEFAULT_VIEWS: ViewsType = {
     viewports: [
         {
             id: "view_1",
-            viewType: new OrthographicView(),
+            viewType: OrthographicView,
             layerIds: ["merged-labels"],
         },
         {
             id: "view_2",
-            viewType: new OrbitView(),
+            viewType: OrbitView,
             layerIds: ["axes-layer-3d", "merged-labels"],
         },
     ],
