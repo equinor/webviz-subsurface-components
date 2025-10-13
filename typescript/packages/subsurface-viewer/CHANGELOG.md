@@ -1,3 +1,17 @@
+## 1.14.2 (2025-10-13)
+
+### 🩹 Fixes
+
+- support seismic values with NaN ([#2637](https://github.com/equinor/webviz-subsurface-components/pull/2637))
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.7
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
 ## 1.14.1 (2025-10-09)
 
 ### 🩹 Fixes
