@@ -105,16 +105,23 @@ export async function loadDataArray<T extends TypedArray>(
  *
  * @param data - The Float32Array to dump
  */
-export function debug_dumpToBinaryFile(data: Float32Array) {
+export function debug_dumpToBinaryFile(
+    data: Float32Array,
+    size: number | [number, number]
+): void {
     // Write propertiesData to a binary file for debugging
     if (data instanceof Float32Array) {
+        const sizeTag = Array.isArray(size)
+            ? `-${size[0]}x${size[1]}`
+            : `-${size}`;
+
         const blob = new Blob([data.buffer], {
             type: "application/octet-stream",
         });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = "propertiesData.bin";
+        a.download = `propertiesData${sizeTag}.bin`;
         a.style.display = "none";
         document.body.appendChild(a);
         a.click();
