@@ -1,0 +1,37 @@
+Metadata-Version: 2.1
+Name: webviz_subsurface_components
+Version: 1.0.4
+Summary: Custom Dash components for use in Webviz.
+Home-page: https://github.com/equinor/webviz-subsurface-components
+Author: Equinor <opensource@equinor.com>
+License: MPL
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Classifier: Natural Language :: English
+Classifier: Environment :: Web Environment
+Classifier: Framework :: Dash
+Classifier: Framework :: Flask
+Classifier: Topic :: Multimedia :: Graphics
+Classifier: Topic :: Scientific/Engineering
+Classifier: Topic :: Scientific/Engineering :: Visualization
+Classifier: License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)
+Requires-Dist: dash>=2.0
+Requires-Dist: numpy>=1.14
+Requires-Dist: pandas>=1.0
+Provides-Extra: tests
+Requires-Dist: bandit; extra == "tests"
+Requires-Dist: black==23.1.0; extra == "tests"
+Requires-Dist: dash[testing]; extra == "tests"
+Requires-Dist: geojson>=2.5.0; extra == "tests"
+Requires-Dist: jsonpatch>=1.32; extra == "tests"
+Requires-Dist: jsonpointer>=2.1; extra == "tests"
+Requires-Dist: matplotlib>=3.0; extra == "tests"
+Requires-Dist: orjson>=3.8.2; extra == "tests"
+Requires-Dist: Pillow>=6.0; extra == "tests"
+Requires-Dist: pylint>=2.4; extra == "tests"
+Requires-Dist: scipy>=1.2; extra == "tests"
+Requires-Dist: selenium>=3.141; extra == "tests"
+Requires-Dist: vtk>=9.2.2; extra == "tests"
+Requires-Dist: webviz-core-components>=0.6.0; extra == "tests"
+Requires-Dist: xtgeo>=2.20.3; extra == "tests"
+
