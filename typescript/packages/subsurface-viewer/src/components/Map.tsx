@@ -69,7 +69,6 @@ import InfoCard from "./InfoCard";
 import StatusIndicator from "./StatusIndicator";
 
 import type { Unit } from "convert-units";
-import IntersectionView from "../views/intersectionView";
 
 import type { LightsType, TLayerDefinition } from "../SubsurfaceViewer";
 import { getZoom, useLateralZoom } from "../utils/camera";
@@ -412,7 +411,6 @@ export interface MapProps {
 
 export type ViewTypeType =
     | typeof OrbitView
-    | typeof IntersectionView
     | typeof OrthographicView
     | typeof SectionView;
 
@@ -1660,12 +1658,7 @@ function getViewType(
     }
 
     // Default 2D behavior based on viewport ID
-    const viewType =
-        viewport.id === "intersection_view"
-            ? IntersectionView
-            : OrthographicView;
-
-    return [viewType, OrthographicController];
+    return [OrthographicView, OrthographicController];
 }
 
 function areViewsValid(views: ViewsType | undefined, size: Size): boolean {
