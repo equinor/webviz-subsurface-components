@@ -1,10 +1,10 @@
 import React from "react";
 import type { SubsurfaceViewerProps, ViewsType } from "./SubsurfaceViewer";
 import SubsurfaceViewer from "./SubsurfaceViewer";
-import { OrbitView, OrthographicView, View } from "@deck.gl/core";
+import { View } from "@deck.gl/core";
 import { ViewAnnotation } from "./components/ViewAnnotation";
-import { ViewportType } from "./views/viewport";
-import { ViewTypeType } from "./components/Map";
+import type { ViewportType } from "./views/viewport";
+import type { ViewTypeType } from "./components/Map";
 
 function mapAnnotation(annotationContainers: React.ReactNode) {
     return React.Children.map(annotationContainers, (annotationContainer) => {
@@ -31,7 +31,7 @@ function mapAnnotation(annotationContainers: React.ReactNode) {
     });
 }
 
-interface DashViewTypeType extends Omit<ViewTypeType, "SectionView"> {}
+type DashViewTypeType = Omit<ViewTypeType, "SectionView">;
 
 interface DashViewportType extends Omit<ViewportType, "viewType"> {
     viewType?: DashViewTypeType;
