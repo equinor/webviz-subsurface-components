@@ -50,7 +50,7 @@ export interface DashSubsurfaceViewerProps
     views?: DashViewsType;
 }
 
-const DashSubsurfaceViewer: React.FC<SubsurfaceViewerProps> = (props) => {
+const DashSubsurfaceViewer: React.FC<DashSubsurfaceViewerProps> = (props) => {
     const { children, ...rest } = props;
     return (
         <SubsurfaceViewer {...rest}>{mapAnnotation(children)}</SubsurfaceViewer>
