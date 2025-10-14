@@ -32,4 +32,4 @@ export type {
     WellFeatureCollection,
 } from "./layers/wells/types";
 
-export { type SectionView } from "./views/sectionView";
+export { SectionView } from "./views/sectionView";
