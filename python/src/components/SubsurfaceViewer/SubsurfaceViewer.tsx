@@ -1,13 +1,22 @@
-import React from "react";
+import { DeckGLRef } from "@deck.gl/react";
 import {
+    SubsurfaceViewerProps as LibSubsurfaceViewerProps,
     MapMouseEvent,
-    SubsurfaceViewerProps,
     ViewStateType,
 } from "@webviz/subsurface-viewer";
-import { DeckGLRef } from "@deck.gl/react";
-import { useMultiViewPicking } from "@webviz/subsurface-viewer/src/hooks/useMultiViewPicking";
 import { useMultiViewCursorTracking } from "@webviz/subsurface-viewer/src/hooks/useMultiViewCursorTracking";
+import { useMultiViewPicking } from "@webviz/subsurface-viewer/src/hooks/useMultiViewPicking";
 import { isEqual } from "lodash";
+import React from "react";
+
+type LibViews = NonNullable<LibSubsurfaceViewerProps["views"]>;
+
+type SubsurfaceViewerProps = Omit<LibSubsurfaceViewerProps, "views"> & {
+    views?: {
+        layout: LibViews["layout"];
+        viewports: Omit<LibViews["viewports"], "viewType">;
+    };
+};
 
 const SubsurfaceViewerComponent = React.lazy(() =>
     import(
