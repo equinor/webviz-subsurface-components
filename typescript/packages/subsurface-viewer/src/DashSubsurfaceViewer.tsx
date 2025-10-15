@@ -51,39 +51,9 @@ export interface DashSubsurfaceViewerProps
 }
 
 const DashSubsurfaceViewer: React.FC<DashSubsurfaceViewerProps> = (props) => {
-    const { children, views, ...rest } = props;
-
-    // Helper to convert DashViewTypeType to ViewTypeType
-    function convertViewType(
-        viewType?: DashViewTypeType
-    ): ViewTypeType | undefined {
-        // If viewType is already a valid ViewTypeType, return as is
-        // Otherwise, handle conversion logic here if needed
-        return viewType as unknown as ViewTypeType;
-    }
-
-    // Convert DashViewsType to ViewsType if views is provided
-    const convertedViews = views
-        ? {
-              ...views,
-              viewports: Array.isArray(views.viewports)
-                  ? views.viewports.map((vp) => ({
-                        ...vp,
-                        viewType: convertViewType(vp.viewType),
-                    }))
-                  : [
-                        {
-                            ...views.viewports,
-                            viewType: convertViewType(views.viewports.viewType),
-                        },
-                    ],
-          }
-        : undefined;
-
+    const { children, ...rest } = props;
     return (
-        <SubsurfaceViewer {...rest} views={convertedViews}>
-            {mapAnnotation(children)}
-        </SubsurfaceViewer>
+        <SubsurfaceViewer {...rest}>{mapAnnotation(children)}</SubsurfaceViewer>
     );
 };
 
