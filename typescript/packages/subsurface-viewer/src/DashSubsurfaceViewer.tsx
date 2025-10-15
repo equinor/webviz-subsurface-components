@@ -5,13 +5,12 @@ import type { SubsurfaceViewerProps } from "./SubsurfaceViewer";
 import SubsurfaceViewer from "./SubsurfaceViewer";
 
 type ViewsType = Omit<SubsurfaceViewerProps["views"], "viewports"> & {
+    // Dash does not support complex nested types
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     viewports: any;
 };
 
-export type DashSubsurfaceViewerProps = Omit<
-    SubsurfaceViewerProps,
-    "views"
-> & {
+export type DashSubsurfaceViewerProps = Omit<SubsurfaceViewerProps, "views"> & {
     /**
      * An array of view definitions. If not provided, a single view is rendered.
      */

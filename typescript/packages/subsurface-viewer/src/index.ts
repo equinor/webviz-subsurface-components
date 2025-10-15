@@ -11,7 +11,7 @@ export type {
     TLayerDefinition,
     TooltipCallback,
     ViewStateType,
-    ViewsType
+    ViewsType,
 } from "./SubsurfaceViewer";
 
 export * from "./utils";
@@ -19,7 +19,7 @@ export * from "./utils";
 export type {
     ExtendedLayerProps,
     LayerPickInfo,
-    PropertyDataType
+    PropertyDataType,
 } from "./layers/utils/layerTools";
 
 export type { ViewportType } from "./views/viewport";
@@ -29,7 +29,7 @@ export { useAbscissaTransform } from "./layers/wells/hooks/useAbscissaTransform"
 export type {
     AbscissaTransform,
     WellFeature,
-    WellFeatureCollection
+    WellFeatureCollection,
 } from "./layers/wells/types";
 
 export { SectionView } from "./views/sectionView";
