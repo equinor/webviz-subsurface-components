@@ -29,7 +29,16 @@ function mapAnnotation(annotationContainers: React.ReactNode) {
     });
 }
 
-const DashSubsurfaceViewer: React.FC<SubsurfaceViewerProps> = (props) => {
+export interface DashSubsurfaceViewerProps
+    extends Omit<SubsurfaceViewerProps, "views"> {
+    /**
+     * Views configuration for map. If not specified, all the layers will be
+     * displayed in a single 2D viewport
+     */
+    views?: any;
+}
+
+const DashSubsurfaceViewer: React.FC<DashSubsurfaceViewerProps> = (props) => {
     const { children, ...rest } = props;
     return (
         <SubsurfaceViewer {...rest}>{mapAnnotation(children)}</SubsurfaceViewer>
