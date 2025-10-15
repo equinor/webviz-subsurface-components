@@ -31,3 +31,7 @@ export type {
     WellFeature,
     WellFeatureCollection,
 } from "./layers/wells/types";
+
+export { SectionView } from "./views/sectionView";
+
+export type { DashSubsurfaceViewerProps } from "./DashSubsurfaceViewer";

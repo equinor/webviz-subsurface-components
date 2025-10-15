@@ -69,7 +69,6 @@ import InfoCard from "./InfoCard";
 import StatusIndicator from "./StatusIndicator";
 
 import type { Unit } from "convert-units";
-import IntersectionView from "../views/intersectionView";
 
 import type { LightsType, TLayerDefinition } from "../SubsurfaceViewer";
 import { getZoom, useLateralZoom } from "../utils/camera";
@@ -80,6 +79,7 @@ import { useVerticalScale } from "../views/viewport";
 
 import mergeRefs from "merge-refs";
 import { WellLabelLayer } from "../layers/wells/layers/wellLabelLayer";
+import { SectionView } from "../views/sectionView";
 
 /**
  * Type of the function returning coordinate boundary for the view defined as [left, bottom, right, top].
@@ -104,7 +104,7 @@ const DEFAULT_VIEWS: ViewsType = {
     layout: [1, 1],
     showLabel: false,
     marginPixels: 0,
-    viewports: [{ id: "main-view", show3D: false, layerIds: [] }],
+    viewports: [{ id: "main-view", viewType: OrthographicView, layerIds: [] }],
 };
 
 function parseLights(lights?: LightsType): LightingEffect[] | undefined {
@@ -407,6 +407,21 @@ export interface MapProps {
      * The reference to the deck.gl instance.
      */
     deckGlRef?: React.ForwardedRef<DeckGLRef>;
+}
+
+export type ViewTypeType =
+    | typeof OrbitView
+    | typeof OrthographicView
+    | typeof SectionView;
+
+// Helper function to handle deprecated "show3D" property of ViewportType
+function show3D(viewPort: ViewportType): boolean {
+    if (typeof viewPort.show3D === "boolean") {
+        console.warn("show3D is deprecated. Use viewType");
+        return viewPort.show3D;
+    }
+
+    return viewPort.viewType === OrbitView;
 }
 
 function defaultTooltip(info: PickingInfo) {
@@ -873,8 +888,10 @@ const Map: React.FC<MapProps> = ({
 
     const lateralZoom = useLateralZoom(deckGlViewState);
 
-    if (!deckGlViews || isEmpty(deckGlViews) || isEmpty(deckGLLayers))
+    if (!deckGlViews || isEmpty(deckGlViews) || isEmpty(deckGLLayers)) {
         return null;
+    }
+
     return (
         <div ref={divRef} onContextMenu={(event) => event.preventDefault()}>
             <DeckGL
@@ -1604,18 +1621,14 @@ function getViewStateFromBounds(
         zoom: getZoom(viewPort, fb_zoom),
         rotationX: 90, // look down z -axis
         rotationOrbit: 0,
-        minZoom: viewPort.show3D ? minZoom3D : minZoom2D,
-        maxZoom: viewPort.show3D ? maxZoom3D : max2DZoom,
+        minZoom: show3D(viewPort) ? minZoom3D : minZoom2D,
+        maxZoom: show3D(viewPort) ? maxZoom3D : max2DZoom,
     };
     return view_state;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 // build views
-type ViewTypeType =
-    | typeof OrbitView
-    | typeof IntersectionView
-    | typeof OrthographicView;
 
 function getViewType(
     viewport: ViewportType
@@ -1623,15 +1636,25 @@ function getViewType(
     ViewType: ViewTypeType,
     Controller: typeof OrbitController | typeof OrthographicController,
 ] {
-    if (viewport.show3D) {
+    // 3D views always use OrbitView with OrbitController
+    if (show3D(viewport)) {
         return [OrbitView, OrbitController];
     }
-    return [
-        viewport.id === "intersection_view"
-            ? IntersectionView
-            : OrthographicView,
-        OrthographicController,
-    ];
+
+    // Handle specific viewType cases
+    if (viewport.viewType) {
+        switch (viewport.viewType) {
+            case SectionView:
+                return [SectionView, OrthographicController];
+            case OrthographicView:
+                return [OrthographicView, OrthographicController];
+            default:
+                return [OrbitView, OrbitController];
+        }
+    }
+
+    // Default 2D behavior based on viewport ID
+    return [OrthographicView, OrthographicController];
 }
 
 function areViewsValid(views: ViewsType | undefined, size: Size): boolean {
@@ -1654,7 +1677,7 @@ function newView(
     height: number | string
 ): View {
     const far = 9999;
-    const near = viewport.show3D ? 0.1 : -1000;
+    const near = show3D(viewport) ? 0.1 : -1000;
 
     const [ViewType, Controller] = getViewType(viewport);
     return new ViewType({
@@ -1970,7 +1993,7 @@ function computeViewState(
         boundingBox = [-1, -1, -1, 1, 1, 1];
     }
 
-    if (viewPort.show3D ?? false) {
+    if (show3D(viewPort)) {
         // If the camera is defined, use it
         if (isCameraPositionDefined) {
             return updateViewState(scaledCamera, boundingBox, size);

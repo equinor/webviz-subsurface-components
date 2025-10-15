@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 
+import { OrbitView, OrthographicView } from "@deck.gl/core";
 import { fireEvent, userEvent } from "@storybook/test";
 import { AxesLayer, WellsLayer } from "../../layers";
 import type { WellLabelLayerProps } from "../../layers/wells/layers/wellLabelLayer";
@@ -52,12 +53,12 @@ const DEFAULT_VIEWS: ViewsType = {
     viewports: [
         {
             id: "view_1",
-            show3D: false,
+            viewType: OrthographicView,
             layerIds: ["well-layer", "well-labels"],
         },
         {
             id: "view_2",
-            show3D: true,
+            viewType: OrbitView,
             layerIds: ["well-layer", "axes-layer-3d", "well-labels"],
         },
     ],
@@ -69,12 +70,12 @@ const SPLIT_VIEWS: ViewsType = {
     viewports: [
         {
             id: "view_1",
-            show3D: false,
+            viewType: OrthographicView,
             layerIds: ["well-layer", "label-2d"],
         },
         {
             id: "view_2",
-            show3D: true,
+            viewType: OrbitView,
             layerIds: ["well-layer", "axes-layer-3d", "label-3d"],
         },
     ],
@@ -156,7 +157,7 @@ export const WellLabelPicking: StoryObj<typeof SubsurfaceViewer> = {
                 viewports: [
                     {
                         id: "view_1",
-                        show3D: false,
+                        viewType: OrthographicView,
                         layerIds: [
                             "well-layer",
                             "axes-layer-3d",

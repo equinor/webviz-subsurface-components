@@ -16,7 +16,6 @@ export { default as PolylinesLayer } from "./polylines/polylinesLayer";
 export { default as SeismicLayer } from "./seismic/seismicLayer";
 export { default as SelectableGeoJsonLayer } from "./selectable_geojson/selectableGeoJsonLayer";
 export { default as TriangleLayer } from "./triangle/triangleLayer";
-export { default as UnfoldedGeoJsonLayer } from "./intersection/unfoldedGeoJsonLayer";
 export { default as WellMarkersLayer } from "./well_markers/wellMarkersLayer";
 export { default as WellsLayer } from "./wells/wellsLayer";
 
