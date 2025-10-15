@@ -421,11 +421,7 @@ function show3D(viewPort: ViewportType): boolean {
         return viewPort.show3D;
     }
 
-    if (viewPort.viewType !== undefined) {
-        return viewPort.viewType === OrbitView;
-    }
-
-    return false;
+    return viewPort.viewType === OrbitView;
 }
 
 function defaultTooltip(info: PickingInfo) {
