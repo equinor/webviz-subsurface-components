@@ -2125,7 +2125,6 @@ function buildScaledViewStates(
     for (const key in result) {
         const viewState = result[key];
         if (viewState) {
-            // TODO: VERIFY REF HERE
             applyZScale(viewState.target, zScale);
         }
     }
