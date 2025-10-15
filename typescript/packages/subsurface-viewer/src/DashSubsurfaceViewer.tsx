@@ -1,8 +1,10 @@
+import { View } from "@deck.gl/core";
 import React from "react";
+import { ViewAnnotation } from "./components/ViewAnnotation";
 import type { SubsurfaceViewerProps } from "./SubsurfaceViewer";
 import SubsurfaceViewer from "./SubsurfaceViewer";
-import { View } from "@deck.gl/core";
-import { ViewAnnotation } from "./components/ViewAnnotation";
+
+export type DashSubsurfaceViewerProps = SubsurfaceViewerProps;
 
 function mapAnnotation(annotationContainers: React.ReactNode) {
     return React.Children.map(annotationContainers, (annotationContainer) => {

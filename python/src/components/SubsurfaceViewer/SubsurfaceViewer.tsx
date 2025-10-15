@@ -1,6 +1,6 @@
 import { DeckGLRef } from "@deck.gl/react";
 import {
-    SubsurfaceViewerProps as LibSubsurfaceViewerProps,
+    DashSubsurfaceViewerProps,
     MapMouseEvent,
 } from "@webviz/subsurface-viewer";
 import { useMultiViewCursorTracking } from "@webviz/subsurface-viewer/src/hooks/useMultiViewCursorTracking";
@@ -8,29 +8,18 @@ import { useMultiViewPicking } from "@webviz/subsurface-viewer/src/hooks/useMult
 import { isEqual } from "lodash";
 import React from "react";
 
-type LibViews = NonNullable<LibSubsurfaceViewerProps["views"]>;
-
-type SubsurfaceViewerProps = Omit<LibSubsurfaceViewerProps, "views"> & {
-    views?: {
-        //layout: LibViews["layout"];
-        //viewports: Omit<LibViews["viewports"], "viewType">;
-        layout: any;
-        viewports: any;
-    };
-};
-
-type ViewStateType = any;
+type ViewStateType = DashSubsurfaceViewerProps["cameraPosition"];
 
 const SubsurfaceViewerComponent = React.lazy(() =>
     import(
         /* webpackChunkName: "webviz-subsurface-viewer" */ "@webviz/subsurface-viewer"
     ).then((module) => ({
         default:
-            module.DashSubsurfaceViewer as unknown as React.ComponentType<SubsurfaceViewerProps>,
+            module.DashSubsurfaceViewer as unknown as React.ComponentType<DashSubsurfaceViewerProps>,
     }))
 );
 
-const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = (props) => {
+const SubsurfaceViewer: React.FC<DashSubsurfaceViewerProps> = (props) => {
     const { views, children, ...rest } = props;
 
     if (!views) {
@@ -53,8 +42,8 @@ const SubsurfaceViewer: React.FC<SubsurfaceViewerProps> = (props) => {
 };
 
 function MultiViewSubsurfaceViewer(
-    props: SubsurfaceViewerProps &
-        Required<Pick<SubsurfaceViewerProps, "views">>
+    props: DashSubsurfaceViewerProps &
+        Required<Pick<DashSubsurfaceViewerProps, "views">>
 ) {
     const { onMouseEvent, getCameraPosition } = props;
 
