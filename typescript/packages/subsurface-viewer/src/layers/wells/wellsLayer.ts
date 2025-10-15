@@ -10,7 +10,7 @@ import type {
     PickingInfo,
     UpdateParameters,
 } from "@deck.gl/core";
-import { CompositeLayer, OrbitViewport } from "@deck.gl/core";
+import { CompositeLayer } from "@deck.gl/core";
 import { PathStyleExtension } from "@deck.gl/extensions";
 import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
 import type { BinaryFeatureCollection } from "@loaders.gl/schema";
@@ -39,6 +39,7 @@ import type {
     DiscreteLegendDataType,
 } from "../../components/ColorLegend";
 
+import { SectionViewport } from "../../viewports";
 import type { NumberPair, StyleAccessorFunction } from "../types";
 import type { WellLabelLayerProps } from "./layers/wellLabelLayer";
 import { WellLabelLayer } from "./layers/wellLabelLayer";
@@ -326,14 +327,11 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
     getWellDataState(): WellFeatureCollection | undefined {
         const { data, sectionData } = this.state;
 
-        if (this.context.viewport.constructor === OrbitViewport) {
-            return data;
+        if (this.context.viewport.constructor === SectionViewport) {
+            return sectionData;
         }
 
-        // Once a Section View type is added we should return sectionData only if the current
-        // view is a Section View. For now we assume that any non-OrbitView is a Section View
-        // as long as a section transform is provided.
-        return sectionData;
+        return data;
     }
 
     getLegendData(
