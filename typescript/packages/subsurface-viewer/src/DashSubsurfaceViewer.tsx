@@ -4,6 +4,10 @@ import { ViewAnnotation } from "./components/ViewAnnotation";
 import type { SubsurfaceViewerProps } from "./SubsurfaceViewer";
 import SubsurfaceViewer from "./SubsurfaceViewer";
 
+type ViewsType = Omit<SubsurfaceViewerProps["views"], "viewports"> & {
+    viewports: any;
+};
+
 export type DashSubsurfaceViewerProps = Omit<
     SubsurfaceViewerProps,
     "views"
@@ -11,7 +15,7 @@ export type DashSubsurfaceViewerProps = Omit<
     /**
      * An array of view definitions. If not provided, a single view is rendered.
      */
-    views?: any;
+    views?: ViewsType;
 };
 
 function mapAnnotation(annotationContainers: React.ReactNode) {
