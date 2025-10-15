@@ -2,7 +2,6 @@ import { DeckGLRef } from "@deck.gl/react";
 import {
     SubsurfaceViewerProps as LibSubsurfaceViewerProps,
     MapMouseEvent,
-    ViewStateType,
 } from "@webviz/subsurface-viewer";
 import { useMultiViewCursorTracking } from "@webviz/subsurface-viewer/src/hooks/useMultiViewCursorTracking";
 import { useMultiViewPicking } from "@webviz/subsurface-viewer/src/hooks/useMultiViewPicking";
@@ -13,10 +12,14 @@ type LibViews = NonNullable<LibSubsurfaceViewerProps["views"]>;
 
 type SubsurfaceViewerProps = Omit<LibSubsurfaceViewerProps, "views"> & {
     views?: {
-        layout: LibViews["layout"];
-        viewports: Omit<LibViews["viewports"], "viewType">;
+        //layout: LibViews["layout"];
+        //viewports: Omit<LibViews["viewports"], "viewType">;
+        layout: any;
+        viewports: any;
     };
 };
+
+type ViewStateType = any;
 
 const SubsurfaceViewerComponent = React.lazy(() =>
     import(
