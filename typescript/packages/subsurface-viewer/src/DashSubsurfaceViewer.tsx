@@ -4,7 +4,15 @@ import { ViewAnnotation } from "./components/ViewAnnotation";
 import type { SubsurfaceViewerProps } from "./SubsurfaceViewer";
 import SubsurfaceViewer from "./SubsurfaceViewer";
 
-export type DashSubsurfaceViewerProps = SubsurfaceViewerProps;
+export type DashSubsurfaceViewerProps = Omit<
+    SubsurfaceViewerProps,
+    "views"
+> & {
+    /**
+     * An array of view definitions. If not provided, a single view is rendered.
+     */
+    views?: any;
+};
 
 function mapAnnotation(annotationContainers: React.ReactNode) {
     return React.Children.map(annotationContainers, (annotationContainer) => {
