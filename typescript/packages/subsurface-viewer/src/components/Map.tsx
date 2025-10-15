@@ -2100,7 +2100,8 @@ function buildViewStates(
             if (currentViewState) {
                 result = {
                     ...result,
-                    [currentViewport.id]: currentViewState,
+                    // Each viewport should have distinct state objects, so we clone to avoid any shared object references
+                    [currentViewport.id]: cloneDeep(currentViewState),
                 };
             }
         }
@@ -2124,6 +2125,7 @@ function buildScaledViewStates(
     for (const key in result) {
         const viewState = result[key];
         if (viewState) {
+            // TODO: VERIFY REF HERE
             applyZScale(viewState.target, zScale);
         }
     }
