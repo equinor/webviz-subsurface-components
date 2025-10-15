@@ -1,10 +1,8 @@
 import React from "react";
-import type { SubsurfaceViewerProps, ViewsType } from "./SubsurfaceViewer";
+import type { SubsurfaceViewerProps } from "./SubsurfaceViewer";
 import SubsurfaceViewer from "./SubsurfaceViewer";
-import { OrbitView, OrthographicView, View } from "@deck.gl/core";
+import { View } from "@deck.gl/core";
 import { ViewAnnotation } from "./components/ViewAnnotation";
-import { ViewportType } from "./views/viewport";
-import { ViewTypeType } from "./components/Map";
 
 function mapAnnotation(annotationContainers: React.ReactNode) {
     return React.Children.map(annotationContainers, (annotationContainer) => {
@@ -29,25 +27,6 @@ function mapAnnotation(annotationContainers: React.ReactNode) {
             </View>
         );
     });
-}
-
-interface DashViewTypeType extends Omit<ViewTypeType, "SectionView"> {}
-
-interface DashViewportType extends Omit<ViewportType, "viewType"> {
-    viewType?: DashViewTypeType;
-}
-
-interface DashViewsType extends Omit<ViewsType, "viewports"> {
-    viewports: DashViewportType;
-}
-
-export interface DashSubsurfaceViewerProps
-    extends Omit<SubsurfaceViewerProps, "views"> {
-    /**
-     * Views configuration for map. If not specified, all the layers will be
-     * displayed in a single 2D viewport
-     */
-    views?: DashViewsType;
 }
 
 const DashSubsurfaceViewer: React.FC<SubsurfaceViewerProps> = (props) => {
