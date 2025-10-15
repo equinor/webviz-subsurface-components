@@ -4,8 +4,6 @@ import { ViewAnnotation } from "./components/ViewAnnotation";
 import type { SubsurfaceViewerProps } from "./SubsurfaceViewer";
 import SubsurfaceViewer from "./SubsurfaceViewer";
 
-export type DashSubsurfaceViewerProps = SubsurfaceViewerProps;
-
 function mapAnnotation(annotationContainers: React.ReactNode) {
     return React.Children.map(annotationContainers, (annotationContainer) => {
         let viewId = (annotationContainer as React.ReactElement).props.id;
