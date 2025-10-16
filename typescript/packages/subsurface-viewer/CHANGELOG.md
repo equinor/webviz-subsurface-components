@@ -1,3 +1,13 @@
+## 1.14.4 (2025-10-16)
+
+### 🩹 Fixes
+
+- ZScale get re-applied to controlled views ([#2641](https://github.com/equinor/webviz-subsurface-components/pull/2641), [#2577](https://github.com/equinor/webviz-subsurface-components/issues/2577))
+
+### ❤️ Thank You
+
+- Anders Rantala Hunderi
+
 ## 1.14.3 (2025-10-15)
 
 ### 🩹 Fixes

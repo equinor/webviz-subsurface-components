@@ -2123,7 +2123,8 @@ function buildViewStates(
             if (currentViewState) {
                 result = {
                     ...result,
-                    [currentViewport.id]: currentViewState,
+                    // Each viewport should have distinct state objects, so we clone to avoid any shared object references
+                    [currentViewport.id]: cloneDeep(currentViewState),
                 };
             }
         }
