@@ -1,1 +1,1 @@
-export { default as IntersectionView } from "./intersectionView";
+export { SectionView } from "./sectionView";

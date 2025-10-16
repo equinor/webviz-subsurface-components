@@ -1,3 +1,13 @@
+## 1.14.3 (2025-10-15)
+
+### 🩹 Fixes
+
+- readout for section view ([#2639](https://github.com/equinor/webviz-subsurface-components/pull/2639))
+
+### ❤️ Thank You
+
+- Håvard Bjerke
+
 ## 1.14.2 (2025-10-13)
 
 ### 🩹 Fixes

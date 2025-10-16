@@ -31,7 +31,7 @@ import {
     volveWellsResources,
 } from "../sharedSettings";
 
-import { View } from "@deck.gl/core";
+import { View, OrbitView, OrthographicView } from "@deck.gl/core";
 import { PathStyleExtension } from "@deck.gl/extensions";
 import { PathLayer } from "@deck.gl/layers";
 import { useAbscissaTransform } from "../../layers/wells/hooks/useAbscissaTransform";
@@ -55,6 +55,7 @@ import {
     getSyntheticWells,
     useSyntheticWellCollection,
 } from "../util/wellSynthesis";
+import { SectionView } from "../../views/sectionView";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -765,12 +766,12 @@ export const WellLabelStyle: StoryObj<
                     {
                         id: "viewport1",
                         layerIds: ["wells-3d"],
-                        show3D: true,
+                        viewType: OrbitView,
                     },
                     {
                         id: "viewport2",
                         layerIds: ["wells-2d"],
-                        show3D: false,
+                        viewType: OrthographicView,
                     },
                 ],
             }),
@@ -796,8 +797,8 @@ export const WellLabelStyle: StoryObj<
 
 const CoarseWellFactorComponent: React.FC<{
     coarseWellsToleranceFactor: number;
-    show3D: boolean;
-}> = ({ show3D, ...args }) => {
+    is3D: boolean;
+}> = ({ is3D, ...args }) => {
     const [coarseWellsToleranceFactor, setCoarseWellsToleranceFactor] =
         useState<number>(DEFAULT_TOLERANCE);
     const [n, setN] = useState<number>(1);
@@ -847,18 +848,18 @@ const CoarseWellFactorComponent: React.FC<{
                 {
                     id: "viewport1",
                     layerIds: ["reference-wells", "axes-layer"],
-                    show3D,
+                    viewType: is3D ? OrbitView : OrthographicView,
                     isSync: true,
                 },
                 {
                     id: "viewport2",
                     layerIds: ["simplified-wells", "axes-layer"],
-                    show3D,
+                    viewType: is3D ? OrbitView : OrthographicView,
                     isSync: true,
                 },
             ],
         }),
-        [show3D]
+        [is3D]
     );
 
     const subsurfaceViewerArgs = {
@@ -872,7 +873,7 @@ const CoarseWellFactorComponent: React.FC<{
 export const CoarseWellFactor: StoryObj<typeof CoarseWellFactorComponent> = {
     args: {
         coarseWellsToleranceFactor: DEFAULT_TOLERANCE,
-        show3D: true,
+        is3D: true,
     },
     argTypes: {
         coarseWellsToleranceFactor: {
@@ -1162,12 +1163,14 @@ export const UnfoldedProjection: StoryObj<
                     {
                         id: "viewport1",
                         target: [3000, -1500],
+                        viewType: SectionView,
                         zoom: -4.5,
                         layerIds: [WELLS_UNFOLDED_DEFAULT.id, "axes"],
                     },
                     {
                         id: "viewport2",
                         target: [3000, -1500],
+                        viewType: SectionView,
                         zoom: -4.5,
                         layerIds: ["unfolded_custom", "axes"],
                     },
@@ -1231,7 +1234,7 @@ export const UnfoldedProjection: StoryObj<
                         /* @ts-expect-error */
                         <View id="viewport1">
                             <h2 className={classes.annotation}>
-                                Default unfolded projection [abscissa, z]
+                                Default unfolded projection [distance, z]
                             </h2>
                             <p className={classes.annotation}>
                                 The wells are projected onto a section defined
@@ -1246,7 +1249,7 @@ export const UnfoldedProjection: StoryObj<
                         /* @ts-expect-error */
                         <View id="viewport2">
                             <h2 className={classes.annotation}>
-                                Custom unfolded projection [abscissa, z]
+                                Custom unfolded projection [distance, z]
                             </h2>
                             <p className={classes.annotation}>
                                 Demonstrates using a custom method of unfolding
