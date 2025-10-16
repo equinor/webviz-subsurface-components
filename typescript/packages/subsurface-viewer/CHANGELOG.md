@@ -1,3 +1,13 @@
+## 1.14.6 (2025-10-16)
+
+### 🩹 Fixes
+
+- improve 2D axes rendering performance ([#2644](https://github.com/equinor/webviz-subsurface-components/pull/2644))
+
+### ❤️ Thank You
+
+- Håvard Bjerke
+
 ## 1.14.5 (2025-10-16)
 
 ### 🩹 Fixes
