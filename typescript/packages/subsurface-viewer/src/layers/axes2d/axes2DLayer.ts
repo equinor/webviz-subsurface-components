@@ -19,14 +19,14 @@ import type { ShaderModule } from "@luma.gl/shadertools";
 import { vec4 } from "gl-matrix";
 
 import type { Point3D, RGBAColor } from "../../utils";
+import { SectionViewport } from "../../viewports/sectionViewport";
+import { precisionForTests } from "../shader_modules/test-precision/precisionForTests";
 import type { ExtendedLayerProps } from "../utils/layerTools";
 import fontAtlasPng from "./font-atlas.png";
-import { precisionForTests } from "../shader_modules/test-precision/precisionForTests";
 import labelFragmentShader from "./label.fs.glsl";
 import labelVertexShader from "./label.vs.glsl";
 import lineFragmentShader from "./line.fs.glsl";
 import lineVertexShader from "./line.vs.glsl";
-import { SectionViewport } from "../../viewports/sectionViewport";
 
 enum TEXT_ANCHOR {
     start = 0,
@@ -581,9 +581,9 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         const yBoundsMin = viewport_bounds_w[1];
         const yBoundsMax = viewport_bounds_w[3];
 
-        let tick_and_axes_lines: number[] = [];
-        let background_lines: number[] = [];
-        let labelData: LabelData[] = [];
+        const tick_and_axes_lines: number[] = [];
+        const background_lines: number[] = [];
+        const labelData: LabelData[] = [];
 
         const isB = this.props.isBottomRuler;
         const isT = this.props.isTopRuler;
@@ -611,9 +611,9 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                     false
                 );
 
-            tick_and_axes_lines = [...tick_and_axes_lines, ...axes, ...ticks];
-            background_lines = [...background_lines, ...back_lines];
-            labelData = [...labelData, ...labels];
+            tick_and_axes_lines.push(...axes, ...ticks);
+            background_lines.push(...back_lines);
+            labelData.push(...labels);
         }
 
         //- TOP RULER ----------------------------------------
@@ -631,9 +631,9 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                 true // isTop
             );
 
-            tick_and_axes_lines = [...tick_and_axes_lines, ...axes, ...ticks];
-            background_lines = [...background_lines, ...back_lines];
-            labelData = [...labelData, ...labels];
+            tick_and_axes_lines.push(...axes, ...ticks);
+            background_lines.push(...back_lines);
+            labelData.push(...labels);
         }
 
         //- LEFT RULER ----------------------------------------
@@ -650,9 +650,9 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                 true
             );
 
-            tick_and_axes_lines = [...tick_and_axes_lines, ...axes, ...ticks];
-            background_lines = [...background_lines, ...back_lines];
-            labelData = [...labelData, ...labels];
+            tick_and_axes_lines.push(...axes, ...ticks);
+            background_lines.push(...back_lines);
+            labelData.push(...labels);
         }
 
         //- RIGHT RULER ----------------------------------------
@@ -670,9 +670,9 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                 false
             );
 
-            tick_and_axes_lines = [...tick_and_axes_lines, ...axes, ...ticks];
-            background_lines = [...background_lines, ...back_lines];
-            labelData = [...labelData, ...labels];
+            tick_and_axes_lines.push(...axes, ...ticks);
+            background_lines.push(...back_lines);
+            labelData.push(...labels);
         }
 
         // Line models. (axis line and tick lines)
