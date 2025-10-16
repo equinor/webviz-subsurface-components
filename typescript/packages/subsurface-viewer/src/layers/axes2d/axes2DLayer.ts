@@ -879,11 +879,11 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                 bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
                 isInstanced: false,
             });
-            
+
             batchedLabelModel.setBindings({
                 fontTexture: fontTexture as unknown as Texture,
             });
-            
+
             batchedLabelModel.shaderInputs.setProps({
                 axes: {
                     uAxisColor: lineColor,
