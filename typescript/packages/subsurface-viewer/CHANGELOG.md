@@ -1,3 +1,13 @@
+## 1.14.5 (2025-10-16)
+
+### 🩹 Fixes
+
+- only show section data in SectionViews ([#2640](https://github.com/equinor/webviz-subsurface-components/pull/2640))
+
+### ❤️ Thank You
+
+- Håvard Bjerke
+
 ## 1.14.4 (2025-10-16)
 
 ### 🩹 Fixes
