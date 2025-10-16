@@ -39,6 +39,7 @@ import type {
     DiscreteLegendDataType,
 } from "../../components/ColorLegend";
 
+import { SectionViewport } from "../../viewports";
 import type { NumberPair, StyleAccessorFunction } from "../types";
 import type { WellLabelLayerProps } from "./layers/wellLabelLayer";
 import { WellLabelLayer } from "./layers/wellLabelLayer";
@@ -223,11 +224,12 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         well: string;
         selectedMultiWells: string[];
         selection: [number, number];
+        sectionData?: WellFeatureCollection;
     };
 
     private recomputeDataState() {
-        const data = this.props.data;
-        const refine = this.props.refine;
+        const { data, refine, ZIncreasingDownwards, section } = this.props;
+
         const doRefine = typeof refine === "number" ? refine > 1 : refine;
         const stepCount = typeof refine === "number" ? refine : 5;
 
@@ -237,28 +239,36 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
         let transformedData = data;
 
-        if (this.props.ZIncreasingDownwards) {
+        if (ZIncreasingDownwards) {
             transformedData = invertPath(transformedData);
         }
 
-        // Apply sectional projection if requested
-        if (this.props.section) {
-            if (typeof this.props.section === "function") {
-                transformedData = this.props.section(transformedData);
-            } else if (this.props.section === true) {
-                transformedData = abscissaTransform(transformedData);
-            }
-        }
+        // Create a state for the section projection of the data, which by default is
+        // identical to the original transformed data.
+        let sectionData = transformedData;
 
         // Mutate data to remove duplicates
         checkWells(transformedData);
 
+        // Apply sectional projection if requested
+        if (section) {
+            if (typeof section === "function") {
+                sectionData = section(transformedData);
+            } else if (section === true) {
+                sectionData = abscissaTransform(transformedData);
+            }
+        }
+
+        // Mutate data to remove duplicates
+        checkWells(sectionData);
+
         // Conditionally apply spline interpolation to refine the well path.
         if (doRefine) {
             transformedData = splineRefine(transformedData, stepCount);
+            sectionData = splineRefine(sectionData, stepCount);
         }
 
-        this.setState({ data: transformedData });
+        this.setState({ data: transformedData, sectionData });
     }
 
     shouldUpdateState({ changeFlags }: UpdateParameters<this>): boolean {
@@ -315,7 +325,13 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
     }
 
     getWellDataState(): WellFeatureCollection | undefined {
-        return this.state.data;
+        const { data, sectionData } = this.state;
+
+        if (this.context.viewport.constructor === SectionViewport) {
+            return sectionData;
+        }
+
+        return data;
     }
 
     getLegendData(
