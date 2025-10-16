@@ -12,7 +12,7 @@ import {
 } from "@deck.gl/core";
 import { load } from "@loaders.gl/core";
 import { ImageLoader } from "@loaders.gl/images";
-import type { RenderPass, UniformValue } from "@luma.gl/core";
+import type { RenderPass, Texture, UniformValue } from "@luma.gl/core";
 import { Geometry, Model } from "@luma.gl/engine";
 import type { ShaderModule } from "@luma.gl/shadertools";
 
@@ -745,11 +745,15 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         });
 
         //-- Labels model--
-        const labelModels: Model[] = [];
-
         const pixelScale = GetPixelsScale(
             this.props.labelFontSizePt ?? defaultProps.labelFontSizePt
         );
+
+        // Batch all labels into a single model for better performance
+        const allPositions: number[] = [];
+        const allTexcoords: number[] = [];
+        const maxX = fontInfo.textureWidth;
+        const maxY = fontInfo.textureHeight;
 
         for (const item of labelData) {
             const x = item.pos[0];
@@ -767,14 +771,6 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
             const pos_w = vec4.fromValues(x, y, z, 1); // pos world
 
             const len = label.length;
-            const numVertices = len * 6;
-            const positions = new Float32Array(numVertices * 3);
-            const texcoords = new Float32Array(numVertices * 2);
-            const maxX = fontInfo.textureWidth;
-            const maxY = fontInfo.textureHeight;
-            let offset = 0;
-            let offsetTexture = 0;
-
             let x1 = 0;
             if (anchor === TEXT_ANCHOR.end) {
                 x1 = -len;
@@ -804,107 +800,98 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
 
                     const h = 1;
 
-                    // 6 vertices per letter
+                    // 6 vertices per letter - add to batch arrays
                     // t1
                     /*eslint-disable */
-                    positions[offset + 0] =
-                        pos_w[0] + x1 * pixelScale * pixel2worldHor; // Add a distance in view coords and convert to world
-                    positions[offset + 1] =
-                        pos_w[1] +
-                        (0 * pixelScale - y_alignment_offset) * pixel2worldVer;
-                    positions[offset + 2] = pos_w[2];
-                    texcoords[offsetTexture + 0] = u1;
-                    texcoords[offsetTexture + 1] = v1;
+                    allPositions.push(
+                        pos_w[0] + x1 * pixelScale * pixel2worldHor,
+                        pos_w[1] + (0 * pixelScale - y_alignment_offset) * pixel2worldVer,
+                        pos_w[2]
+                    );
+                    allTexcoords.push(u1, v1);
 
-                    positions[offset + 3] =
-                        pos_w[0] + x2 * pixelScale * pixel2worldHor;
-                    positions[offset + 4] =
-                        pos_w[1] +
-                        (0 * pixelScale - y_alignment_offset) * pixel2worldVer;
-                    positions[offset + 5] = pos_w[2];
-                    texcoords[offsetTexture + 2] = u2;
-                    texcoords[offsetTexture + 3] = v1;
+                    allPositions.push(
+                        pos_w[0] + x2 * pixelScale * pixel2worldHor,
+                        pos_w[1] + (0 * pixelScale - y_alignment_offset) * pixel2worldVer,
+                        pos_w[2]
+                    );
+                    allTexcoords.push(u2, v1);
 
-                    positions[offset + 6] =
-                        pos_w[0] + x1 * pixelScale * pixel2worldHor;
-                    positions[offset + 7] =
-                        pos_w[1] +
-                        (h * pixelScale - y_alignment_offset) * pixel2worldVer;
-                    positions[offset + 8] = pos_w[2];
-                    texcoords[offsetTexture + 4] = u1;
-                    texcoords[offsetTexture + 5] = v2;
+                    allPositions.push(
+                        pos_w[0] + x1 * pixelScale * pixel2worldHor,
+                        pos_w[1] + (h * pixelScale - y_alignment_offset) * pixel2worldVer,
+                        pos_w[2]
+                    );
+                    allTexcoords.push(u1, v2);
 
                     // t2
-                    positions[offset + 9] =
-                        pos_w[0] + x1 * pixelScale * pixel2worldHor;
-                    positions[offset + 10] =
-                        pos_w[1] +
-                        (h * pixelScale - y_alignment_offset) * pixel2worldVer;
-                    positions[offset + 11] = pos_w[2];
-                    texcoords[offsetTexture + 6] = u1;
-                    texcoords[offsetTexture + 7] = v2;
+                    allPositions.push(
+                        pos_w[0] + x1 * pixelScale * pixel2worldHor,
+                        pos_w[1] + (h * pixelScale - y_alignment_offset) * pixel2worldVer,
+                        pos_w[2]
+                    );
+                    allTexcoords.push(u1, v2);
 
-                    positions[offset + 12] =
-                        pos_w[0] + x2 * pixelScale * pixel2worldHor;
-                    positions[offset + 13] =
-                        pos_w[1] +
-                        (0 * pixelScale - y_alignment_offset) * pixel2worldVer;
-                    positions[offset + 14] = pos_w[2];
-                    texcoords[offsetTexture + 8] = u2;
-                    texcoords[offsetTexture + 9] = v1;
+                    allPositions.push(
+                        pos_w[0] + x2 * pixelScale * pixel2worldHor,
+                        pos_w[1] + (0 * pixelScale - y_alignment_offset) * pixel2worldVer,
+                        pos_w[2]
+                    );
+                    allTexcoords.push(u2, v1);
 
-                    positions[offset + 15] =
-                        pos_w[0] + x2 * pixelScale * pixel2worldHor;
-                    positions[offset + 16] =
-                        pos_w[1] +
-                        (h * pixelScale - y_alignment_offset) * pixel2worldVer;
-                    positions[offset + 17] = pos_w[2];
-                    texcoords[offsetTexture + 10] = u2;
-                    texcoords[offsetTexture + 11] = v2;
-                    /*eslint-ensable */
+                    allPositions.push(
+                        pos_w[0] + x2 * pixelScale * pixel2worldHor,
+                        pos_w[1] + (h * pixelScale - y_alignment_offset) * pixel2worldVer,
+                        pos_w[2]
+                    );
+                    allTexcoords.push(u2, v2);
+                    /*eslint-enable */
 
                     x1 += 1;
-                    offset += 18;
-                    offsetTexture += 12;
                 } else {
                     // we don't have this character so just advance
                     x1 += 1;
                 }
             }
+        }
 
-            const model = new Model(device, {
-                id: `${this.props.id}-${label}`,
+        // Create single batched model for all labels
+        const labelModels: Model[] = [];
+        if (allPositions.length > 0) {
+            const batchedLabelModel = new Model(device, {
+                id: `${this.props.id}-labels-batched`,
                 ...super.getShaders({
                     vs: labelVertexShader,
                     fs: labelFragmentShader,
                     modules: [project32, axesUniforms, precisionForTests],
                 }),
-                bindings: {
-                    // @ts-ignore
-                    fontTexture,
-                },
                 geometry: new Geometry({
                     topology: "triangle-list",
                     attributes: {
-                        positions,
+                        positions: new Float32Array(allPositions),
                         vTexCoord: {
-                            value: texcoords,
+                            value: new Float32Array(allTexcoords),
                             size: 2,
                         },
                     },
-                    vertexCount: positions.length / 3,
+                    vertexCount: allPositions.length / 3,
                 }),
                 bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
                 isInstanced: false,
             });
-            model.shaderInputs.setProps({
+            
+            batchedLabelModel.setBindings({
+                fontTexture: fontTexture as unknown as Texture,
+            });
+            
+            batchedLabelModel.shaderInputs.setProps({
                 axes: {
                     uAxisColor: lineColor,
                     uBackGroundColor: bColor,
                 },
             });
 
-            labelModels.push(model);
+            labelModels.push(batchedLabelModel);
         }
 
         return {
