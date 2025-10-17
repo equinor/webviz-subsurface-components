@@ -1,3 +1,13 @@
+## 2.6.8 (2025-10-17)
+
+### 🩹 Fixes
+
+- partial revert of "refactor: refactor some React class component… ([#2645](https://github.com/equinor/webviz-subsurface-components/pull/2645), [#2611](https://github.com/equinor/webviz-subsurface-components/issues/2611))
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
 ## 2.6.7 (2025-10-13)
 
 ### 🧱 Updated Dependencies
