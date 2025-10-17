@@ -1,11 +1,5 @@
 import type { ReactNode } from "react";
-import React, {
-    useRef,
-    useEffect,
-    useCallback,
-    useImperativeHandle,
-    forwardRef,
-} from "react";
+import React, { Component } from "react";
 
 function getScrollbarSizes(): { vertical: number; horizontal: number } {
     // Creating invisible container
@@ -33,179 +27,153 @@ export interface ScrollerProps {
     children?: ReactNode;
 }
 
-export interface ScrollerRef {
-    getScrollX(): number;
-    getScrollY(): number;
-    getScrollPos(vertical: boolean | undefined): number;
-    scrollTo(x: number, y: number): boolean;
-    zoom(xZoom: number, yZoom: number): boolean;
-}
+class Scroller extends Component<ScrollerProps> {
+    scroller: HTMLDivElement | null; // Outer
+    scrollable: HTMLDivElement | null; // Inner
+    content: HTMLDivElement | null; // Content over inner
+    resizeObserver: ResizeObserver;
 
-const Scroller = forwardRef<ScrollerRef, ScrollerProps>(
-    ({ onScroll, children }, ref) => {
-        const scrollerRef = useRef<HTMLDivElement>(null);
-        const scrollableRef = useRef<HTMLDivElement>(null);
-        const contentRef = useRef<HTMLDivElement>(null);
-        const resizeObserverRef = useRef<ResizeObserver | null>(null);
+    constructor(props: ScrollerProps) {
+        super(props);
+        this.scroller = null;
+        this.scrollable = null;
+        this.content = null;
 
-        useEffect(() => {
-            if (!resizeObserverRef.current) {
-                resizeObserverRef.current = new ResizeObserver(
-                    (entries: ResizeObserverEntry[]): void => {
-                        const entry = entries[0];
-                        if (entry && entry.target) {
-                            const Width = (entry.target as HTMLElement)
-                                .offsetWidth;
-                            const Height = (entry.target as HTMLElement)
-                                .offsetHeight;
+        this.resizeObserver = new ResizeObserver(
+            (entries: ResizeObserverEntry[]): void => {
+                const entry = entries[0];
+                if (entry && entry.target) {
+                    const Width = (entry.target as HTMLElement).offsetWidth;
+                    const Height = (entry.target as HTMLElement).offsetHeight;
 
-                            if (contentRef.current) {
-                                const { vertical, horizontal } =
-                                    getScrollbarSizes();
+                    if (this.content) {
+                        const { vertical, horizontal } = getScrollbarSizes();
 
-                                contentRef.current.style.width =
-                                    Width - vertical + "px";
-                                contentRef.current.style.height =
-                                    Height - horizontal + "px";
-                            }
-                        }
+                        this.content.style.width = Width - vertical + "px";
+                        this.content.style.height = Height - horizontal + "px";
                     }
-                );
-            }
-
-            const scrollerElem = scrollerRef.current;
-
-            if (scrollerElem && resizeObserverRef.current) {
-                resizeObserverRef.current.observe(scrollerElem);
-            }
-
-            return () => {
-                if (scrollerElem && resizeObserverRef.current) {
-                    resizeObserverRef.current.unobserve(scrollerElem);
                 }
-            };
-        }, []);
-
-        /* current position access functions */
-        const getScrollX = useCallback((): number => {
-            const elOuter = scrollerRef.current;
-            if (!elOuter) return 0;
-            const scrollWidth = elOuter.scrollWidth - elOuter.clientWidth;
-            return scrollWidth ? elOuter.scrollLeft / scrollWidth : 0;
-        }, []);
-
-        const getScrollY = useCallback((): number => {
-            const elOuter = scrollerRef.current;
-            if (!elOuter) return 0;
-            const scrollHeight = elOuter.scrollHeight - elOuter.clientHeight;
-            return scrollHeight ? elOuter.scrollTop / scrollHeight : 0;
-        }, []);
-
-        const getScrollPos = useCallback(
-            (vertical: boolean | undefined): number => {
-                return vertical ? getScrollY() : getScrollX();
-            },
-            [getScrollX, getScrollY]
+            }
         );
 
-        /**
-         * callback from HTML element
-         */
-        const handleScroll = useCallback((): void => {
-            const elOuter = scrollerRef.current;
-            if (!elOuter) return;
-            // notify parent
-            onScroll?.(getScrollX(), getScrollY());
-        }, [onScroll, getScrollX, getScrollY]);
+        this.onScroll = this.onScroll.bind(this);
+    }
 
-        /* functions to externally set zoom and scroll position */
+    componentDidMount(): void {
+        if (this.scroller) this.resizeObserver.observe(this.scroller);
+    }
+    componentWillUnmount(): void {
+        if (this.scroller) this.resizeObserver.unobserve(this.scroller);
+    }
 
-        /**
-         * @param x value to set the horizontal beginning of visible part of content (fraction)
-         * @param y value to set the vertical beginning of visible part of content (fraction)
-         * @returns true if visible part is changed
-         */
-        const scrollTo = useCallback((x: number, y: number): boolean => {
-            if (x < 0.0) x = 0.0;
-            else if (x > 1.0) x = 1.0;
-            if (y < 0.0) y = 0.0;
-            else if (y > 1.0) y = 1.0;
+    /* current position access functions */
+    getScrollX(): number {
+        const elOuter = this.scroller;
+        if (!elOuter) return 0;
+        const scrollWidth = elOuter.scrollWidth - elOuter.clientWidth;
+        return scrollWidth ? elOuter.scrollLeft / scrollWidth : 0;
+    }
+    getScrollY(): number {
+        const elOuter = this.scroller;
+        if (!elOuter) return 0;
+        const scrollHeight = elOuter.scrollHeight - elOuter.clientHeight;
+        return scrollHeight ? elOuter.scrollTop / scrollHeight : 0;
+    }
+    getScrollPos(vertical: boolean | undefined): number {
+        return vertical ? this.getScrollY() : this.getScrollX();
+    }
 
-            const elOuter = scrollerRef.current;
-            if (!elOuter) return false;
+    /**
+     * callback from HTML element
+     */
+    onScroll(): void {
+        const elOuter = this.scroller;
+        if (!elOuter) return;
+        // notify parent
+        // TODO: Fix this the next time the file is edited.
+        // eslint-disable-next-line react/prop-types
+        this.props.onScroll?.(this.getScrollX(), this.getScrollY());
+    }
 
-            const scrollLeft = Math.round(
-                x * (elOuter.scrollWidth - elOuter.clientWidth)
-            );
-            const scrollTop = Math.round(
-                y * (elOuter.scrollHeight - elOuter.clientHeight)
-            );
+    /* functions to externally set zoom and scroll position */
 
-            if (
-                elOuter.scrollLeft !== scrollLeft ||
-                elOuter.scrollTop !== scrollTop
-            ) {
-                elOuter.scrollTo(scrollLeft, scrollTop);
-                return true;
-            }
-            return false;
-        }, []);
+    /**
+     * @param x value to set the horizontal beginning of visible part of content (fraction)
+     * @param y value to set the vertical beginning of visible part of content (fraction)
+     * @returns true if visible part is changed
+     */
+    scrollTo(x: number, y: number): boolean {
+        if (x < 0.0) x = 0.0;
+        else if (x > 1.0) x = 1.0;
+        if (y < 0.0) y = 0.0;
+        else if (y > 1.0) y = 1.0;
 
-        /**
-         * @param xZoom set X zoom factor of visible part of content
-         * @param yZoom set Y zoom factor of visible part of content
-         * @returns true if visible part is changed
-         */
-        const zoom = useCallback((xZoom: number, yZoom: number): boolean => {
-            const elOuter = scrollerRef.current;
-            if (!elOuter) return false;
+        const elOuter = this.scroller;
+        if (!elOuter) return false;
 
-            const elInner = scrollableRef.current;
-            if (!elInner) return false;
-
-            const widthInner = Math.round(elOuter.clientWidth * xZoom) + "px";
-            const heightInner = Math.round(elOuter.clientHeight * yZoom) + "px";
-
-            if (
-                elInner.style.width !== widthInner ||
-                elInner.style.height !== heightInner
-            ) {
-                elInner.style.width = widthInner;
-                elInner.style.height = heightInner;
-
-                return true;
-            }
-            return false;
-        }, []);
-
-        useImperativeHandle(
-            ref,
-            () => ({
-                getScrollX,
-                getScrollY,
-                getScrollPos,
-                scrollTo,
-                zoom,
-            }),
-            [getScrollX, getScrollY, getScrollPos, scrollTo, zoom]
+        const scrollLeft = Math.round(
+            x * (elOuter.scrollWidth - elOuter.clientWidth)
+        );
+        const scrollTop = Math.round(
+            y * (elOuter.scrollHeight - elOuter.clientHeight)
         );
 
+        if (
+            elOuter.scrollLeft !== scrollLeft ||
+            elOuter.scrollTop !== scrollTop
+        ) {
+            elOuter.scrollTo(scrollLeft, scrollTop);
+            return true;
+        }
+        return false;
+    }
+    /**
+     * @param xZoom set X zoom factor of visible part of content
+     * @param yZoom set Y zoom factor of visible part of content
+     * @returns true if visible part is changed
+     */
+    zoom(xZoom: number, yZoom: number): boolean {
+        const elOuter = this.scroller;
+        if (!elOuter) return false;
+
+        const elInner = this.scrollable;
+        if (!elInner) return false;
+
+        const widthInner = Math.round(elOuter.clientWidth * xZoom) + "px";
+        const heightInner = Math.round(elOuter.clientHeight * yZoom) + "px";
+
+        if (
+            elInner.style.width !== widthInner ||
+            elInner.style.height !== heightInner
+        ) {
+            elInner.style.width = widthInner;
+            elInner.style.height = heightInner;
+
+            return true;
+        }
+        return false;
+    }
+
+    render(): JSX.Element {
         return (
             <div
-                ref={scrollerRef}
+                ref={(el) => (this.scroller = el as HTMLDivElement)}
                 style={{ overflow: "scroll", width: "100%", height: "100%" }}
-                onScroll={handleScroll}
+                onScroll={this.onScroll}
             >
-                <div ref={scrollableRef}>
-                    <div ref={contentRef} style={{ position: "absolute" }}>
-                        {children}
+                <div ref={(el) => (this.scrollable = el as HTMLDivElement)}>
+                    <div
+                        ref={(el) => (this.content = el as HTMLDivElement)}
+                        style={{ position: "absolute" }}
+                    >
+                        {/* TODO: Fix this the next time the file is edited. */}
+                        {/* eslint-disable-next-line react/prop-types */}
+                        {this.props.children}
                     </div>
                 </div>
             </div>
         );
     }
-);
-
-Scroller.displayName = "Scroller";
+}
 
 export default Scroller;
