@@ -173,20 +173,23 @@ export class MultiViewPickingInfoAssembler {
                 eventScreenCoordinate[1] - activeViewport.y,
             ];
 
-            const worldCoordinate = activeViewport.unproject(
-                activeViewportRelativeScreenCoordinates
+            const activePickingInfo = this.pickAtCoordinate(
+                eventScreenCoordinate[0],
+                eventScreenCoordinate[1]
             );
+
+            const worldCoordinate =
+                activePickingInfo[0]?.coordinate ||
+                activeViewport.unproject(
+                    activeViewportRelativeScreenCoordinates
+                );
 
             const collectedPickingInfo: PickingInfoPerView = {};
 
             for (const viewport of viewports) {
-                const [relativeScreenX, relativeScreenY] =
-                    viewport.project(worldCoordinate);
+                const [screenX, screenY] = viewport.project(worldCoordinate);
 
-                const pickingInfo = this.pickAtCoordinate(
-                    relativeScreenX + viewport.x,
-                    relativeScreenY + viewport.y
-                );
+                const pickingInfo = this.pickAtCoordinate(screenX, screenY);
 
                 if (pickingInfo) {
                     const layerInfoDict: Record<string, LayerPickingInfo> = {};
