@@ -639,7 +639,7 @@ const Map: React.FC<MapProps> = ({
                 radius: pickingRadius,
             });
 
-            pickInfos.forEach((itemPick) => {
+            const extendedPickInfos = pickInfos.map((itemPick) => {
                 const extItemPick = makeExtendedPickingInfo(itemPick);
                 // Z value should not take into account the Z scale factor.
                 viewController.unscaledTarget(
@@ -663,8 +663,10 @@ const Map: React.FC<MapProps> = ({
                         }
                     });
                 }
+
+                return extItemPick;
             });
-            return pickInfos;
+            return extendedPickInfos;
         },
         [pickingDepth, pickingRadius, viewController]
     );
@@ -687,12 +689,10 @@ const Map: React.FC<MapProps> = ({
                 event.tapCount == 2 // Note. Detect double click.
             ) {
                 // Left button click identifies new camera rotation anchor.
-                if (infos.length >= 1) {
-                    if (infos[0].coordinate) {
-                        viewController.setScaledTarget(
-                            infos[0].scaledCoordinate
-                        );
-                    }
+                if (infos.length >= 1 && infos[0].coordinate) {
+                    // if (!infos) {
+                    viewController.setScaledTarget(infos[0].scaledCoordinate);
+                    // }
                 }
             }
 
@@ -1195,6 +1195,10 @@ class ViewController {
      * @param scaledTarget scaled 3D point.
      */
     public setScaledTarget(scaledTarget: Point2D | Point3D | undefined): void {
+        if (!scaledTarget) {
+            return console.warn("Undefined scale-target! Skipping...");
+        }
+
         const vsKey = Object.keys(this.result_.deckglViewStates).at(0);
         if (vsKey) {
             // deep clone to notify change (memo checks object address)
