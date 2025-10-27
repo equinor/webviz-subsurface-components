@@ -179,7 +179,7 @@ export class MultiViewPickingInfoAssembler {
             );
 
             const worldCoordinate =
-                activePickingInfo[0]?.coordinate ||
+                activePickingInfo[0]?.coordinate ??
                 activeViewport.unproject(
                     activeViewportRelativeScreenCoordinates
                 );
