@@ -690,9 +690,7 @@ const Map: React.FC<MapProps> = ({
             ) {
                 // Left button click identifies new camera rotation anchor.
                 if (infos.length >= 1 && infos[0].coordinate) {
-                    // if (!infos) {
                     viewController.setScaledTarget(infos[0].scaledCoordinate);
-                    // }
                 }
             }
 
