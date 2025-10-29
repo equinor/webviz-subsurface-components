@@ -189,12 +189,19 @@ export class MultiViewPickingInfoAssembler {
             for (const viewport of viewports) {
                 const [screenX, screenY] = viewport.project(worldCoordinate);
 
-                const pickingInfo = this.pickAtCoordinate(screenX, screenY);
+                const pickingInfo = this.pickAtCoordinate(
+                    screenX + viewport.x,
+                    screenY + viewport.y
+                );
 
                 if (pickingInfo) {
                     const layerInfoDict: Record<string, LayerPickingInfo> = {};
                     const processedPickIds: string[] = [];
-
+                    console.log(
+                        "Picking info for viewport ",
+                        viewport.id,
+                        pickingInfo
+                    );
                     for (const info of pickingInfo) {
                         const uniquePickId = getUniqueInfoPickId(info);
                         const hasMultipleProperties = hasPropertiesArray(info);
