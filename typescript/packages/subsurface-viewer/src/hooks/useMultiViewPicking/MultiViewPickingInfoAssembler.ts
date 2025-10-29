@@ -173,9 +173,16 @@ export class MultiViewPickingInfoAssembler {
                 eventScreenCoordinate[1] - activeViewport.y,
             ];
 
-            const worldCoordinate = activeViewport.unproject(
-                activeViewportRelativeScreenCoordinates
+            const activePickingInfo = this.pickAtCoordinate(
+                eventScreenCoordinate[0],
+                eventScreenCoordinate[1]
             );
+
+            const worldCoordinate =
+                activePickingInfo[0]?.coordinate ??
+                activeViewport.unproject(
+                    activeViewportRelativeScreenCoordinates
+                );
 
             const collectedPickingInfo: PickingInfoPerView = {};
 
