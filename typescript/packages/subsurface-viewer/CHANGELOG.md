@@ -1,3 +1,13 @@
+## 1.14.10 (2025-11-03)
+
+### 🩹 Fixes
+
+- use picked coordinate instead of unprojecting screen coordinates when multipicking ([#2649](https://github.com/equinor/webviz-subsurface-components/pull/2649), [#1229](https://github.com/equinor/webviz-subsurface-components/issues/1229))
+
+### ❤️ Thank You
+
+- Hans Kallekleiv @HansKallekleiv
+
 ## 1.14.9 (2025-10-28)
 
 ### 🧱 Updated Dependencies
