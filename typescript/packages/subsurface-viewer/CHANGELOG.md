@@ -1,3 +1,9 @@
+## 1.14.11 (2025-11-03)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.10
+
 ## 1.14.10 (2025-11-03)
 
 ### 🩹 Fixes
