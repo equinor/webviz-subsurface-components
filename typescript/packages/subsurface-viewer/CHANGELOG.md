@@ -1,3 +1,25 @@
+## 1.14.9 (2025-10-28)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.9
+
+## 1.14.8 (2025-10-28)
+
+### 🩹 Fixes
+
+- map moves to origin when double-clicking ([#2651](https://github.com/equinor/webviz-subsurface-components/pull/2651), [#2642](https://github.com/equinor/webviz-subsurface-components/issues/2642), [#2621](https://github.com/equinor/webviz-subsurface-components/issues/2621))
+
+### ❤️ Thank You
+
+- Anders Rantala Hunderi
+
+## 1.14.7 (2025-10-27)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.8
+
 ## 1.14.6 (2025-10-16)
 
 ### 🩹 Fixes
