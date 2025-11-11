@@ -88,6 +88,47 @@ export const MultiViewAnnotation: StoryObj<typeof SubsurfaceViewer> = {
     ),
 };
 
+export const MultiViewAnnotationWithEmptyLayer: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "multi_view_annotation",
+        layers: [hugin25mKhNetmapMapLayer, hugin25mDepthMapLayer],
+        views: {
+            layout: [1, 2],
+            showLabel: true,
+            viewports: [
+                {
+                    id: "view_1",
+                    layerIds: [hugin25mDepthMapLayer.id],
+                },
+                {
+                    id: "view_2",
+                    layerIds: [],
+                },
+            ],
+        },
+    },
+    render: (args) => (
+        <SubsurfaceViewer {...args}>
+            {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                /* @ts-expect-error */
+                <View id="view_1">
+                    <ContinuousLegend min={-3071} max={41048} />
+                    <ViewFooter>kH netmap</ViewFooter>
+                </View>
+            }
+            {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                /* @ts-expect-error */
+                <View id="view_2">
+                    <ContinuousLegend min={2725} max={3396} />
+                    <ViewFooter>Hugin</ViewFooter>
+                </View>
+            }
+        </SubsurfaceViewer>
+    ),
+};
+
 function ExampleReadoutComponent(props: {
     viewId: string;
     pickingInfoPerView: PickingInfoPerView;
@@ -360,7 +401,13 @@ export const SyncedMultiView: StoryObj<typeof SubsurfaceViewer> = {
                     id: "view_3",
                     name: "All layers",
                     show3D: false,
-                    layerIds: [],
+                    layerIds: [
+                        colormapLayer.id,
+                        hillshadingLayer.id,
+                        customLayerWithPolylineData.id,
+                        customLayerWithPolygonData.id,
+                        customLayerWithTextData.id,
+                    ],
                     zoom: -5,
                     isSync: false,
                 },

@@ -104,7 +104,7 @@ const DEFAULT_VIEWS: ViewsType = {
     layout: [1, 1],
     showLabel: false,
     marginPixels: 0,
-    viewports: [{ id: "main-view", viewType: OrthographicView, layerIds: [] }],
+    viewports: [{ id: "main-view", viewType: OrthographicView, layerIds: undefined }],
 };
 
 function parseLights(lights?: LightsType): LightingEffect[] | undefined {
@@ -769,9 +769,14 @@ const Map: React.FC<MapProps> = ({
                 (deckGLLayers[0] as LineLayer).id ===
                     "webviz_internal_dummy_layer";
             if (!emptyLayers) {
+                // get all the layers ids used in the views, to consider only visible layers
+                const layersIdsPresentInViews = views.viewports.map((viewport) => viewport.layerIds).flat();
                 // compute #done layers / #visible layers percentage
                 const visibleLayers = deckGLLayers.filter(
-                    (layer) => (layer as Layer).props.visible
+                    (layer) => {
+                        const layerWithType = layer as Layer;
+                        return layerWithType.props.visible && layersIdsPresentInViews.includes(layerWithType.id);
+                    }
                 );
                 const loaded = visibleLayers?.filter(
                     (layer) => (layer as Layer)?.isLoaded
@@ -819,6 +824,11 @@ const Map: React.FC<MapProps> = ({
             const cur_view = views.viewports.find(
                 ({ id }) => args.viewport.id && id === args.viewport.id
             );
+
+            if (cur_view?.layerIds === undefined) {
+                return true;
+            };
+
             if (cur_view?.layerIds && cur_view.layerIds.length > 0) {
                 const layer_ids = cur_view.layerIds;
                 return layer_ids.some((layer_id) => {
@@ -826,7 +836,7 @@ const Map: React.FC<MapProps> = ({
                     return t;
                 });
             } else {
-                return true;
+                return false;
             }
         },
         [views]

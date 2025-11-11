@@ -23,6 +23,7 @@ import {
     default2DViews,
     default3DViews,
     defaultStoryParameters,
+    emptyVolveWellsViewViewport,
     hugin25mDepthMapLayer,
     hugin25mKhNetmapMapLayer,
     hugin25mKhNetmapMapLayerPng,
@@ -147,6 +148,17 @@ export const DisplayCameraState: StoryObj<typeof SubsurfaceViewer> = {
         bounds: volveWellsBounds,
         layers: [volveWellsLayer],
         cameraPosition: CAMERA_POSITION,
+    },
+    render: (args) => <DisplayCameraPositionComponent {...args} />,
+};
+
+export const DisplayEmptyView: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "volve-wells",
+        bounds: volveWellsBounds,
+        layers: [volveWellsLayer],
+        cameraPosition: CAMERA_POSITION,
+        views: emptyVolveWellsViewViewport,
     },
     render: (args) => <DisplayCameraPositionComponent {...args} />,
 };
