@@ -775,8 +775,8 @@ const Map: React.FC<MapProps> = ({
                 // compute #done layers / #visible layers percentage
                 const visibleLayers = deckGLLayers.filter(
                     (layer) => {
-                        const filterByLayersInViews = !someViewportHasUndefinedLayerIds ? layersIdsPresentInViews?.includes((layer as Layer).id) : true;
                         const layerWithType = layer as Layer;
+                        const filterByLayersInViews = !someViewportHasUndefinedLayerIds ? layersIdsPresentInViews?.includes(layerWithType.id) : true;
                         return layerWithType?.props?.visible && filterByLayersInViews;
                     }
                 );
