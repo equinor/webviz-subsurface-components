@@ -30,7 +30,7 @@ export interface ViewportType {
     viewType?: ViewTypeType;
 
     /**
-     * Layers to be displayed on viewport
+     * Layers to be displayed on the viewport. if left undefined, all layers are displayed. if it's an empty array, no layers are displayed.
      */
     layerIds?: string[];
 

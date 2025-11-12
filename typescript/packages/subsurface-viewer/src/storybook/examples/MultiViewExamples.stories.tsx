@@ -88,7 +88,7 @@ export const MultiViewAnnotation: StoryObj<typeof SubsurfaceViewer> = {
     ),
 };
 
-export const MultiViewAnnotationWithEmptyLayer: StoryObj<typeof SubsurfaceViewer> = {
+export const MultiViewWithEmptyViewport: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "multi_view_annotation",
         layers: [hugin25mKhNetmapMapLayer, hugin25mDepthMapLayer],
@@ -401,13 +401,6 @@ export const SyncedMultiView: StoryObj<typeof SubsurfaceViewer> = {
                     id: "view_3",
                     name: "All layers",
                     show3D: false,
-                    layerIds: [
-                        colormapLayer.id,
-                        hillshadingLayer.id,
-                        customLayerWithPolylineData.id,
-                        customLayerWithPolygonData.id,
-                        customLayerWithTextData.id,
-                    ],
                     zoom: -5,
                     isSync: false,
                 },

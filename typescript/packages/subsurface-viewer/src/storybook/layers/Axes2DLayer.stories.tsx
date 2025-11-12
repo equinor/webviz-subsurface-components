@@ -141,37 +141,21 @@ const MatrixStory = () => {
             {
                 id: "view_1",
                 viewType: OrthographicView,
-                layerIds: [
-                    hugin25mKhNetmapMapLayerPng.id,
-                    axes2DLayer.id,
-                ],
                 isSync: false,
             },
             {
                 id: "view_2",
                 viewType: OrthographicView,
-                layerIds: [
-                    hugin25mKhNetmapMapLayerPng.id,
-                    axes2DLayer.id,
-                ],
                 isSync: false,
             },
             {
                 id: "view_3",
                 viewType: OrthographicView,
-                layerIds: [
-                    hugin25mKhNetmapMapLayerPng.id,
-                    axes2DLayer.id,
-                ],
                 isSync: false,
             },
             {
                 id: "view_4",
                 viewType: OrthographicView,
-                layerIds: [
-                    hugin25mKhNetmapMapLayerPng.id,
-                    axes2DLayer.id,
-                ],
                 isSync: false,
             },
         ],

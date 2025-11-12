@@ -107,7 +107,7 @@ export const volveWellsBounds: BoundingBox2D = [
     432150, 6475800, 439400, 6481500,
 ];
 
-export const emptyVolveWellsViewViewport: ViewsType  = {
+export const emptyVolveWellsViewViewport: ViewsType = {
     layout: [1, 1],
     viewports: [
         {
