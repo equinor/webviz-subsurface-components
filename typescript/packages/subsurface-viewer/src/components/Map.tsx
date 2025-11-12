@@ -770,12 +770,14 @@ const Map: React.FC<MapProps> = ({
                     "webviz_internal_dummy_layer";
             if (!emptyLayers) {
                 // get all the layers ids used in the views, to consider only visible layers
-                const layersIdsPresentInViews = views.viewports.map((viewport) => viewport.layerIds).flat();
+                const layersIdsPresentInViews = views?.viewports?.map((viewport) => viewport?.layerIds)?.flat();
+                const someViewportHasUndefinedLayerIds = layersIdsPresentInViews?.includes(undefined);
                 // compute #done layers / #visible layers percentage
                 const visibleLayers = deckGLLayers.filter(
                     (layer) => {
+                        const filterByLayersInViews = !someViewportHasUndefinedLayerIds ? layersIdsPresentInViews?.includes((layer as Layer).id) : true;
                         const layerWithType = layer as Layer;
-                        return layerWithType.props.visible && layersIdsPresentInViews.includes(layerWithType.id);
+                        return layerWithType?.props?.visible && filterByLayersInViews;
                     }
                 );
                 const loaded = visibleLayers?.filter(
