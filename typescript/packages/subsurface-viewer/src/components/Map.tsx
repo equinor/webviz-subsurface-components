@@ -764,14 +764,16 @@ const Map: React.FC<MapProps> = ({
         if (deckGLLayers) {
             let progress = 100;
 
+            // get all the layers ids used in the views, to consider only visible layers
+            const layersIdsPresentInViews = views?.viewports?.map((viewport) => viewport?.layerIds)?.flat();
+            const someViewportHasUndefinedLayerIds = layersIdsPresentInViews?.includes(undefined);
+            const allViewportsHaveAnEmptyListOfLayerIds = !someViewportHasUndefinedLayerIds && layersIdsPresentInViews?.length === 0;
+
             const emptyLayers = // There will always be a dummy layer. Deck.gl does not like empty array of layers.
-                deckGLLayers.length == 1 &&
+                deckGLLayers.length === 1 &&
                 (deckGLLayers[0] as LineLayer).id ===
                     "webviz_internal_dummy_layer";
-            if (!emptyLayers) {
-                // get all the layers ids used in the views, to consider only visible layers
-                const layersIdsPresentInViews = views?.viewports?.map((viewport) => viewport?.layerIds)?.flat();
-                const someViewportHasUndefinedLayerIds = layersIdsPresentInViews?.includes(undefined);
+            if (!emptyLayers && !allViewportsHaveAnEmptyListOfLayerIds) {
                 // compute #done layers / #visible layers percentage
                 const visibleLayers = deckGLLayers.filter(
                     (layer) => {
