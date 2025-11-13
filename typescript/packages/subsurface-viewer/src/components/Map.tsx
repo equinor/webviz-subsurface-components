@@ -104,9 +104,7 @@ const DEFAULT_VIEWS: ViewsType = {
     layout: [1, 1],
     showLabel: false,
     marginPixels: 0,
-    viewports: [
-        { id: "main-view", viewType: OrthographicView },
-    ],
+    viewports: [{ id: "main-view", viewType: OrthographicView }],
 };
 
 function parseLights(lights?: LightsType): LightingEffect[] | undefined {
@@ -806,7 +804,7 @@ const Map: React.FC<MapProps> = ({
                 onRenderingProgress(progress);
             }
         }
-    }, [deckGLLayers, onRenderingProgress]);
+    }, [deckGLLayers, onRenderingProgress, views?.viewports]);
 
     // validate layers data
     const [errorText, setErrorText] = useState<string>();
