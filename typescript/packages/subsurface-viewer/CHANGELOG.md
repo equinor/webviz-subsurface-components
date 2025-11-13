@@ -1,3 +1,13 @@
+## 1.14.13 (2025-11-13)
+
+### 🩹 Fixes
+
+- subsurface viewer, viewport with empty layer ids list should sho… ([#2655](https://github.com/equinor/webviz-subsurface-components/pull/2655))
+
+### ❤️ Thank You
+
+- danielsantiago1002 (Open to work)
+
 ## 1.14.12 (2025-11-13)
 
 ### 🧱 Updated Dependencies
