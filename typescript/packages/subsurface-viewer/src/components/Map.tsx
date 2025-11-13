@@ -104,7 +104,9 @@ const DEFAULT_VIEWS: ViewsType = {
     layout: [1, 1],
     showLabel: false,
     marginPixels: 0,
-    viewports: [{ id: "main-view", viewType: OrthographicView, layerIds: undefined }],
+    viewports: [
+        { id: "main-view", viewType: OrthographicView, layerIds: undefined },
+    ],
 };
 
 function parseLights(lights?: LightsType): LightingEffect[] | undefined {
@@ -765,9 +767,14 @@ const Map: React.FC<MapProps> = ({
             let progress = 100;
 
             // get all the layers ids used in the views, to consider only visible layers
-            const layersIdsPresentInViews = views?.viewports?.map((viewport) => viewport?.layerIds)?.flat();
-            const someViewportHasUndefinedLayerIds = layersIdsPresentInViews?.includes(undefined);
-            const allViewportsHaveAnEmptyListOfLayerIds = !someViewportHasUndefinedLayerIds && layersIdsPresentInViews?.length === 0;
+            const layersIdsPresentInViews = views?.viewports
+                ?.map((viewport) => viewport?.layerIds)
+                ?.flat();
+            const someViewportHasUndefinedLayerIds =
+                layersIdsPresentInViews?.includes(undefined);
+            const allViewportsHaveAnEmptyListOfLayerIds =
+                !someViewportHasUndefinedLayerIds &&
+                layersIdsPresentInViews?.length === 0;
 
             const emptyLayers = // There will always be a dummy layer. Deck.gl does not like empty array of layers.
                 deckGLLayers.length === 1 &&
@@ -775,13 +782,18 @@ const Map: React.FC<MapProps> = ({
                     "webviz_internal_dummy_layer";
             if (!emptyLayers && !allViewportsHaveAnEmptyListOfLayerIds) {
                 // compute #done layers / #visible layers percentage
-                const visibleLayers = deckGLLayers.filter(
-                    (layer) => {
-                        const layerWithType = layer as Layer;
-                        const filterByLayersInViews = !someViewportHasUndefinedLayerIds ? layersIdsPresentInViews?.includes(layerWithType.id) : true;
-                        return layerWithType?.props?.visible && filterByLayersInViews;
-                    }
-                );
+                const visibleLayers = deckGLLayers.filter((layer) => {
+                    const layerWithType = layer as Layer;
+                    const filterByLayersInViews =
+                        !someViewportHasUndefinedLayerIds
+                            ? layersIdsPresentInViews?.includes(
+                                  layerWithType.id
+                              )
+                            : true;
+                    return (
+                        layerWithType?.props?.visible && filterByLayersInViews
+                    );
+                });
                 const loaded = visibleLayers?.filter(
                     (layer) => (layer as Layer)?.isLoaded
                 ).length;
@@ -831,7 +843,7 @@ const Map: React.FC<MapProps> = ({
 
             if (cur_view?.layerIds === undefined) {
                 return true;
-            };
+            }
 
             if (cur_view?.layerIds && cur_view.layerIds.length > 0) {
                 const layer_ids = cur_view.layerIds;
