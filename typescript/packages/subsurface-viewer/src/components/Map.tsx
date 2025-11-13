@@ -105,7 +105,7 @@ const DEFAULT_VIEWS: ViewsType = {
     showLabel: false,
     marginPixels: 0,
     viewports: [
-        { id: "main-view", viewType: OrthographicView, layerIds: undefined },
+        { id: "main-view", viewType: OrthographicView },
     ],
 };
 
