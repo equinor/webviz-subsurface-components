@@ -141,25 +141,21 @@ const MatrixStory = () => {
             {
                 id: "view_1",
                 viewType: OrthographicView,
-                layerIds: [],
                 isSync: false,
             },
             {
                 id: "view_2",
                 viewType: OrthographicView,
-                layerIds: [],
                 isSync: false,
             },
             {
                 id: "view_3",
                 viewType: OrthographicView,
-                layerIds: [],
                 isSync: false,
             },
             {
                 id: "view_4",
                 viewType: OrthographicView,
-                layerIds: [],
                 isSync: false,
             },
         ],
