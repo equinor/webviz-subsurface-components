@@ -9,14 +9,14 @@ type ControllerOps = Exclude<
     ConstructorOf<Controller<any>>
 >;
 
-export const DEFAULT_CONTROLLER_OPTIONS = {
+export const DEFAULT_CONTROLLER_OPTIONS: ControllerOptions = {
     doubleClickZoom: false,
     inertia: 300,
     scrollZoom: {
         speed: 0.008,
         smooth: true,
     },
-} as ControllerOptions;
+};
 
 /**
  * Viewport type.
