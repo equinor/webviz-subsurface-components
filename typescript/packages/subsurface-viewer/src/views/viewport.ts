@@ -1,5 +1,22 @@
 import React from "react";
 import type { ViewTypeType } from "../components/Map";
+import { Controller, View } from "@deck.gl/core";
+import { ConstructorOf } from "@deck.gl/core/dist/types/types";
+import { ControllerOptions } from "@deck.gl/core/dist/controllers/controller";
+
+type ControllerProps = Exclude<
+    View["props"]["controller"],
+    ConstructorOf<Controller<any>>
+>;
+
+export const DEFAULT_CONTROLLER_OPTIONS = {
+    doubleClickZoom: false,
+    inertia: 300,
+    scrollZoom: {
+        speed: 0.008,
+        smooth: true,
+    },
+} as ControllerOptions;
 
 /**
  * Viewport type.
@@ -44,6 +61,11 @@ export interface ViewportType {
     verticalScale?: number;
 
     isSync?: boolean;
+
+    /**
+     * Options for viewport interactivity.
+     */
+    controller?: ControllerProps;
 }
 
 export const useVerticalScale = (viewports: ViewportType[] | undefined) => {
@@ -53,4 +75,26 @@ export const useVerticalScale = (viewports: ViewportType[] | undefined) => {
         }
         return viewports.find((item) => !!item.verticalScale)?.verticalScale;
     }, [viewports]);
+};
+
+export const defineController = (
+    controllerClass: ConstructorOf<Controller<any>>,
+    controllerProps?: ControllerProps
+) => {
+    const controllerPropsIsNullOrFalse =
+        controllerProps === null || controllerProps === false;
+    if (controllerPropsIsNullOrFalse) {
+        return controllerProps;
+    }
+    if (controllerProps === undefined || controllerProps === true) {
+        return {
+            type: controllerClass,
+            ...DEFAULT_CONTROLLER_OPTIONS,
+        };
+    }
+    return {
+        type: controllerClass,
+        ...DEFAULT_CONTROLLER_OPTIONS,
+        ...controllerProps,
+    };
 };
