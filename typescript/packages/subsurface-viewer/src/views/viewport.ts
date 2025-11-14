@@ -4,7 +4,7 @@ import { Controller, View } from "@deck.gl/core";
 import { ConstructorOf } from "@deck.gl/core/dist/types/types";
 import { ControllerOptions } from "@deck.gl/core/dist/controllers/controller";
 
-type ControllerProps = Exclude<
+type ControllerOps = Exclude<
     View["props"]["controller"],
     ConstructorOf<Controller<any>>
 >;
@@ -65,7 +65,7 @@ export interface ViewportType {
     /**
      * Options for viewport interactivity.
      */
-    controller?: ControllerProps;
+    controller?: ControllerOps;
 }
 
 export const useVerticalScale = (viewports: ViewportType[] | undefined) => {
@@ -79,7 +79,7 @@ export const useVerticalScale = (viewports: ViewportType[] | undefined) => {
 
 export const defineController = (
     controllerClass: ConstructorOf<Controller<any>>,
-    controllerProps?: ControllerProps
+    controllerProps?: ControllerOps
 ) => {
     if (controllerProps === null || controllerProps === false) {
         return controllerProps;
