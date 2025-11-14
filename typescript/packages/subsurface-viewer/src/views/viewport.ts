@@ -1,13 +1,10 @@
 import React from "react";
 import type { ViewTypeType } from "../components/Map";
-import { Controller, View } from "@deck.gl/core";
+import { Controller } from "@deck.gl/core";
 import { ConstructorOf } from "@deck.gl/core/dist/types/types";
 import { ControllerOptions } from "@deck.gl/core/dist/controllers/controller";
 
-type ControllerOps = Exclude<
-    View["props"]["controller"],
-    ConstructorOf<Controller<any>>
->;
+type ControllerOps = boolean | null | ControllerOptions;
 
 export const DEFAULT_CONTROLLER_OPTIONS: ControllerOptions = {
     doubleClickZoom: false,
