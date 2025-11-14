@@ -81,9 +81,7 @@ export const defineController = (
     controllerClass: ConstructorOf<Controller<any>>,
     controllerProps?: ControllerProps
 ) => {
-    const controllerPropsIsNullOrFalse =
-        controllerProps === null || controllerProps === false;
-    if (controllerPropsIsNullOrFalse) {
+    if (controllerProps === null || controllerProps === false) {
         return controllerProps;
     }
     if (controllerProps === undefined || controllerProps === true) {
