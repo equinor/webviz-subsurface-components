@@ -61,9 +61,12 @@ export interface ViewportType {
 
     /**
      * Options for viewport interactivity.
-     * If true or undefined, enables interactivity with default options.
-     * If false or null, disables interactivity.
-     * If it is a ControllerOptions object, enables interactivity with the specified options (default options are merged with the specified options).
+     * 
+     * If `true` or `undefined`, enables interactivity with default options.
+     * 
+     * If `false` or `null`, disables interactivity.
+     * 
+     * If it is a ControllerOptions `object`, enables interactivity with the specified options (default options are merged with the specified options).
      */
     controller?: ControllerOps;
 }
