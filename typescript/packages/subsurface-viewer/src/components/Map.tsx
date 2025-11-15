@@ -75,7 +75,7 @@ import { getZoom, useLateralZoom } from "../utils/camera";
 import { useScaleFactor, useShiftHeld } from "../utils/event";
 
 import type { ViewportType } from "../views/viewport";
-import { useVerticalScale } from "../views/viewport";
+import { defineController, useVerticalScale } from "../views/viewport";
 
 import mergeRefs from "merge-refs";
 import { WellLabelLayer } from "../layers/wells/layers/wellLabelLayer";
@@ -1708,16 +1708,11 @@ function newView(
     const [ViewType, Controller] = getViewType(viewport);
     return new ViewType({
         id: viewport.id,
-        controller: {
-            type: Controller,
-            doubleClickZoom: false,
-        },
-
+        controller: defineController(Controller, viewport?.controller),
         x,
         y,
         width,
         height,
-
         flipY: false,
         far,
         near,
