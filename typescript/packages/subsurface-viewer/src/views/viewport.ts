@@ -5,14 +5,14 @@ import type { ConstructorOf } from "@deck.gl/core/dist/types/types";
 import type { ControllerOptions } from "@deck.gl/core/dist/controllers/controller";
 import type { IViewState } from "@deck.gl/core/dist/controllers/view-state";
 
-type ControllerOpts = boolean | null | ControllerOptions;
+export type ControllerOpts = boolean | null | ControllerOptions;
 
 export const DEFAULT_CONTROLLER_OPTIONS: ControllerOptions = {
     doubleClickZoom: false,
     inertia: 300,
     scrollZoom: {
         speed: 0.008,
-        smooth: true,
+        smooth: false,
     },
 };
 
