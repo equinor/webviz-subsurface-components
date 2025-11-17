@@ -1,10 +1,11 @@
 import React from "react";
 import type { ViewTypeType } from "../components/Map";
-import { Controller } from "@deck.gl/core";
-import { ConstructorOf } from "@deck.gl/core/dist/types/types";
-import { ControllerOptions } from "@deck.gl/core/dist/controllers/controller";
+import type { Controller } from "@deck.gl/core";
+import type { ConstructorOf } from "@deck.gl/core/dist/types/types";
+import type { ControllerOptions } from "@deck.gl/core/dist/controllers/controller";
+import type { IViewState } from "@deck.gl/core/dist/controllers/view-state";
 
-type ControllerOps = boolean | null | ControllerOptions;
+type ControllerOpts = boolean | null | ControllerOptions;
 
 export const DEFAULT_CONTROLLER_OPTIONS: ControllerOptions = {
     doubleClickZoom: false,
@@ -61,14 +62,14 @@ export interface ViewportType {
 
     /**
      * Options for viewport interactivity.
-     * 
+     *
      * If `true` or `undefined`, enables interactivity with default options.
-     * 
+     *
      * If `false` or `null`, disables interactivity.
-     * 
+     *
      * If it is a ControllerOptions `object`, enables interactivity with the specified options (default options are merged with the specified options).
      */
-    controller?: ControllerOps;
+    controller?: ControllerOpts;
 }
 
 export const useVerticalScale = (viewports: ViewportType[] | undefined) => {
@@ -80,9 +81,11 @@ export const useVerticalScale = (viewports: ViewportType[] | undefined) => {
     }, [viewports]);
 };
 
-export const defineController = (
-    controllerClass: ConstructorOf<Controller<any>>,
-    controllerProps?: ControllerOps
+export const defineController = <
+    ControllerState extends IViewState<ControllerState>,
+>(
+    controllerClass: ConstructorOf<Controller<ControllerState>>,
+    controllerProps?: ControllerOpts
 ) => {
     if (controllerProps === null || controllerProps === false) {
         return controllerProps;
