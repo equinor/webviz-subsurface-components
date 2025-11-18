@@ -1,7 +1,7 @@
 import { cloneDeep } from "lodash";
 
 import type { Meta, StoryObj } from "@storybook/react";
-import { userEvent } from "@storybook/test";
+import { userEvent, waitFor, within } from "@storybook/test";
 import React from "react";
 
 import { GeoJsonLayer } from "@deck.gl/layers";
@@ -36,7 +36,7 @@ import {
     volveWellsWithLogsLayer,
 } from "../sharedSettings";
 
-import { scaleZoom } from "../..";
+import { scaleZoom, ViewportType } from "../..";
 import { useScaleFactor } from "../../utils/event";
 
 const stories: Meta = {
@@ -740,5 +740,109 @@ export const ScaleFactorHook: StoryObj<typeof ScaleFactorHookComponent> = {
         await userEvent.keyboard("[ArrowUp]", { delay });
         await userEvent.keyboard("[ArrowDown]", { delay });
         await userEvent.keyboard("[ArrowUp]", { delay });
+    },
+};
+
+const OverrideControllerSettingsComponent = (args: {
+    viewport: ViewportType
+}) => {
+    const subsurfaceViewerArgs: SubsurfaceViewerProps = {
+        id: "OverrideControllerSettings",
+        layers: [
+            hugin25mDepthMapLayer,
+        ],
+        views: {
+            layout: [1, 1],
+            viewports: [args.viewport],
+        },
+    };
+    return (
+        <div data-testid="OverrideControllerSettingsStory">
+            <SubsurfaceViewer {...subsurfaceViewerArgs} />
+        </div>
+    );
+};
+
+export const OverrideControllerSettings: StoryObj<typeof OverrideControllerSettingsComponent> = {
+    args: {
+        viewport: {
+            id: "view_1",
+            layerIds: [hugin25mDepthMapLayer.id],
+            controller: {
+                doubleClickZoom: true,
+                inertia: false,
+                scrollZoom: {
+                    speed: 0.1
+                }
+            }
+        },
+    },
+    argTypes: {
+        viewport: {
+            control: "object",
+        },
+    },
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: "Override controller settings via props.",
+            },
+        },
+    },
+    render: (args) => <OverrideControllerSettingsComponent {...args} />,
+    play: async ({ canvasElement }) => {
+        const delay = 500;
+        const delayTimeout = () => new Promise((r) => setTimeout(r, delay));
+        const user = userEvent.setup({ delay });
+
+        const canvas = within(canvasElement);
+        const wrapper = await canvas.findByTestId("OverrideControllerSettingsStory");
+        const deckGlCanvas = wrapper.querySelector("canvas") as HTMLCanvasElement | null;
+
+        if (!deckGlCanvas) {
+            throw new Error("Canvas not found");
+        }
+
+        await user.pointer([
+            { target: deckGlCanvas, keys: "[WheelEvent]" }
+        ]);
+
+        const baseWheelEventProps = {
+            clientX: deckGlCanvas.clientWidth / 2,
+            clientY: deckGlCanvas.clientHeight / 2,
+            bubbles: true,
+            cancelable: true,
+        };
+
+        const wheelNegativeEvent = new WheelEvent("wheel", {
+            deltaY: -20,
+            ...baseWheelEventProps,
+        });
+
+        deckGlCanvas.dispatchEvent(wheelNegativeEvent);
+
+        await delayTimeout();
+
+        await user.pointer([
+            { target: deckGlCanvas, keys: "[WheelEvent]" }
+        ]);
+
+        deckGlCanvas.dispatchEvent(wheelNegativeEvent);
+
+        await delayTimeout();
+
+        await user.pointer([
+            { target: deckGlCanvas, keys: "[WheelEvent]" }
+        ]);
+
+        const wheelPositiveEvent = new WheelEvent("wheel", {
+            deltaY: 20,
+            ...baseWheelEventProps,
+        });
+
+        deckGlCanvas.dispatchEvent(wheelPositiveEvent);
+
+        await delayTimeout();
     },
 };
