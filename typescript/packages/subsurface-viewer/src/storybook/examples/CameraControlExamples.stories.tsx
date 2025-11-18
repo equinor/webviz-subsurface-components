@@ -807,7 +807,6 @@ export const OverrideControllerSettings: StoryObj<
 
         if (!deckGlCanvas) {
             throw new Error("Canvas not found");
-            return;
         }
 
         await user.pointer([{ target: deckGlCanvas, keys: "[WheelEvent]" }]);
