@@ -5,7 +5,7 @@ import type { ConstructorOf } from "@deck.gl/core/dist/types/types";
 import type { ControllerOptions } from "@deck.gl/core/dist/controllers/controller";
 import type { IViewState } from "@deck.gl/core/dist/controllers/view-state";
 
-export type ControllerOpts = boolean | null | ControllerOptions;
+export type ControllerOpts = boolean | ControllerOptions;
 
 export const DEFAULT_CONTROLLER_OPTIONS: ControllerOptions = {
     doubleClickZoom: false,
@@ -87,7 +87,7 @@ export const defineController = <
     controllerClass: ConstructorOf<Controller<ControllerState>>,
     controllerProps?: ControllerOpts
 ) => {
-    if (controllerProps === null || controllerProps === false) {
+    if (controllerProps === false) {
         return controllerProps;
     }
     if (controllerProps === undefined || controllerProps === true) {
