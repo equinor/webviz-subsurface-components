@@ -298,7 +298,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             return false;
         } else {
             this.context.userData.setEditedData({
-                selectedWell: info.object?.properties.name,
+                selectedWell: info.wellName,
             });
             return false; // do not return true to allow DeckGL props.onClick to be called
         }
@@ -688,6 +688,8 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             coordinate[2] /= Math.max(0.001, zScale);
         }
 
+        let wellName: string | undefined = undefined;
+
         let md_property: PropertyDataType | null = null;
         let tvd_property: PropertyDataType | null = null;
         let log_property: PropertyDataType | null = null;
@@ -698,6 +700,8 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         ) {
             // The user is hovering a well log entry
             const logPick = info as PickingInfo<LogCurveDataType>;
+
+            wellName = logPick.object?.header?.well;
 
             md_property = getLogProperty(
                 coordinate,
@@ -725,6 +729,8 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         } else {
             // User is hovering a wellbore path
             const wellpickInfo = info as PickingInfo<WellFeature>;
+
+            wellName = wellpickInfo.object?.properties?.name;
 
             md_property = getMdProperty(
                 coordinate,
@@ -755,7 +761,8 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         return {
             ...info,
             properties: layer_properties,
-            logName: log_property?.name || "",
+            logName: log_property?.name,
+            wellName: wellName,
         };
     }
 }

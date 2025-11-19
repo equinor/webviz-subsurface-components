@@ -20,7 +20,8 @@ export type WellFeatureCollection = FeatureCollection<
 
 export interface WellsPickInfo extends LayerPickInfo<WellFeature> {
     featureType?: string;
-    logName: string;
+    logName?: string;
+    wellName?: string;
 }
 
 export interface LogCurveDataType {

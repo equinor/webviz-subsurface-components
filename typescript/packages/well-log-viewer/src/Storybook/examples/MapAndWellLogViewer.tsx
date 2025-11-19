@@ -20,9 +20,10 @@ import type {
     TLayerDefinition,
 } from "@webviz/subsurface-viewer";
 
-import type { WellsLayer } from "@webviz/subsurface-viewer/dist/layers";
+import { WellsLayer } from "@webviz/subsurface-viewer/dist/layers";
 
 import type { MapMouseEvent } from "@webviz/subsurface-viewer/dist/components/Map";
+import type { WellsPickInfo } from "@webviz/subsurface-viewer/dist/layers/wells/types";
 
 import { axisMnemos, axisTitles } from "../../utils/axes";
 import { deepCopy } from "../../utils/deepcopy";
@@ -256,12 +257,17 @@ export class MapAndWellLogViewer extends React.Component<
     }
 
     onMapMouseEvent(event: MapMouseEvent): void {
-        console.warn("! onMapMouseEvent event is not working...");
+        if (event.type !== "click") return;
 
-        // TODO: This event is broken within MapViewer, and MapMouseEvent is never given with a wellname. Might need to be fixed in a PR there
-        if (event.wellname !== undefined) {
+        const wellInfo = event.infos.find(
+            (i) => i.layer instanceof WellsLayer
+        ) as WellsPickInfo;
+
+        const wellName = wellInfo?.wellName;
+
+        if (wellName !== undefined) {
             if (event.type === "click") {
-                const iWell = findWellLogIndex(wellLogs, event.wellname);
+                const iWell = findWellLogIndex(wellLogs, wellName);
                 this.setState((state: Readonly<State>) => {
                     let selection:
                         | [number | undefined, number | undefined]
@@ -288,7 +294,7 @@ export class MapAndWellLogViewer extends React.Component<
 
                     return {
                         wellIndex: iWell,
-                        wellName: event.wellname,
+                        wellName: wellName,
                         wellColor: event.wellcolor,
                         selection: selection,
                         selPersistent: selPersistent,
