@@ -678,7 +678,9 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
 function initOverlays(instance: LogViewer, parent: WellLogView) {
     instance.overlay.elm.style("overflow", "hidden"); // to clip content selection
 
-    addReadoutOverlay(instance, parent);
+    if (!parent.props.options?.hideReadoutOverlay) {
+        addReadoutOverlay(instance, parent);
+    }
     addRubberbandOverlay(instance, parent);
     addPinnedValueOverlay(instance, parent);
 
@@ -990,6 +992,10 @@ export interface WellLogViewOptions {
      * Hide selection interval. Default is false
      */
     hideSelectionInterval?: boolean;
+    /**
+     * Hide readout overlay.
+     */
+    hideReadoutOverlay?: boolean;
 }
 
 export interface WellLogViewProps {
