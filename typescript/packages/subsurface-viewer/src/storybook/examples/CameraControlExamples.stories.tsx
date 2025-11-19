@@ -775,6 +775,10 @@ export const OverrideControllerSettings: StoryObj<
                 scrollZoom: {
                     speed: 0.1,
                 },
+                keyboard: {
+                    zoomSpeed: 1.2,
+                    moveSpeed: 300,
+                }
             },
         },
     },
@@ -794,7 +798,6 @@ export const OverrideControllerSettings: StoryObj<
     render: (args) => <OverrideControllerSettingsComponent {...args} />,
     play: async ({ canvasElement }) => {
         const delay = 500;
-        const delayTimeout = () => new Promise((r) => setTimeout(r, delay));
         const user = userEvent.setup({ delay });
 
         const canvas = within(canvasElement);
@@ -809,36 +812,10 @@ export const OverrideControllerSettings: StoryObj<
             throw new Error("Canvas not found");
         }
 
-        await user.pointer([{ target: deckGlCanvas, keys: "[WheelEvent]" }]);
-
-        const baseWheelEventProps = {
-            clientX: deckGlCanvas.clientWidth / 2,
-            clientY: deckGlCanvas.clientHeight / 2,
-            bubbles: true,
-            cancelable: true,
-        };
-
-        const wheelNegativeEvent = new WheelEvent("wheel", {
-            deltaY: -20,
-            ...baseWheelEventProps,
-        });
-
-        deckGlCanvas.dispatchEvent(wheelNegativeEvent);
-        await delayTimeout();
-
-        await user.pointer([{ target: deckGlCanvas, keys: "[WheelEvent]" }]);
-
-        deckGlCanvas.dispatchEvent(wheelNegativeEvent);
-        await delayTimeout();
-
-        await user.pointer([{ target: deckGlCanvas, keys: "[WheelEvent]" }]);
-
-        const wheelPositiveEvent = new WheelEvent("wheel", {
-            deltaY: 20,
-            ...baseWheelEventProps,
-        });
-
-        deckGlCanvas.dispatchEvent(wheelPositiveEvent);
-        await delayTimeout();
+        await user.click(deckGlCanvas)
+        await user.keyboard("[Equal]");
+        await user.keyboard("[Equal]");
+        await user.keyboard("[Minus]");
+        await user.keyboard("[ArrowLeft]");
     },
 };
