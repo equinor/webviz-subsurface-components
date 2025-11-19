@@ -778,7 +778,7 @@ export const OverrideControllerSettings: StoryObj<
                 keyboard: {
                     zoomSpeed: 1.2,
                     moveSpeed: 300,
-                }
+                },
             },
         },
     },
@@ -812,7 +812,7 @@ export const OverrideControllerSettings: StoryObj<
             throw new Error("Canvas not found");
         }
 
-        await user.click(deckGlCanvas)
+        await user.click(deckGlCanvas);
         await user.keyboard("[Equal]");
         await user.keyboard("[Equal]");
         await user.keyboard("[Minus]");
