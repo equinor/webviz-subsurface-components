@@ -10,9 +10,9 @@ const preview: Preview = {
         },
         docs: {
             story: {
-                height: "500px"
+                height: "500px",
             },
-        }
+        },
     },
 };
 
