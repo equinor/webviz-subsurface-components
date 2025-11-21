@@ -1,3 +1,14 @@
+## 1.15.0 (2025-11-21)
+
+### 🚀 Features
+
+- Subsurface Viewer, Improve default camera controls ([#2657](https://github.com/equinor/webviz-subsurface-components/pull/2657))
+
+### ❤️ Thank You
+
+- Daniel Avila (Open to work) @danielsantiago1002
+- Håvard Bjerke
+
 ## 1.14.15 (2025-11-19)
 
 ### 🧱 Updated Dependencies
