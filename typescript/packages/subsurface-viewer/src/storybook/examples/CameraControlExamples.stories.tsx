@@ -816,6 +816,5 @@ export const OverrideControllerSettings: StoryObj<
         await user.keyboard("[Equal]");
         await user.keyboard("[Equal]");
         await user.keyboard("[Minus]");
-        await user.keyboard("[ArrowLeft]");
     },
 };
