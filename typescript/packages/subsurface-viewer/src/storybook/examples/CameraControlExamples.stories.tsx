@@ -1,7 +1,7 @@
 import { cloneDeep } from "lodash";
 
 import type { Meta, StoryObj } from "@storybook/react";
-import { userEvent } from "@storybook/test";
+import { userEvent, within } from "@storybook/test";
 import React from "react";
 
 import { GeoJsonLayer } from "@deck.gl/layers";
@@ -36,6 +36,7 @@ import {
     volveWellsWithLogsLayer,
 } from "../sharedSettings";
 
+import type { ViewportType } from "../..";
 import { scaleZoom } from "../..";
 import { useScaleFactor } from "../../utils/event";
 
@@ -740,5 +741,81 @@ export const ScaleFactorHook: StoryObj<typeof ScaleFactorHookComponent> = {
         await userEvent.keyboard("[ArrowUp]", { delay });
         await userEvent.keyboard("[ArrowDown]", { delay });
         await userEvent.keyboard("[ArrowUp]", { delay });
+    },
+};
+
+const OverrideControllerSettingsComponent = (args: {
+    viewport: ViewportType;
+}) => {
+    const subsurfaceViewerArgs: SubsurfaceViewerProps = {
+        id: "OverrideControllerSettings",
+        layers: [hugin25mDepthMapLayer],
+        views: {
+            layout: [1, 1],
+            viewports: [args.viewport],
+        },
+    };
+    return (
+        <div data-testid="OverrideControllerSettingsStory">
+            <SubsurfaceViewer {...subsurfaceViewerArgs} />
+        </div>
+    );
+};
+
+export const OverrideControllerSettings: StoryObj<
+    typeof OverrideControllerSettingsComponent
+> = {
+    args: {
+        viewport: {
+            id: "view_1",
+            layerIds: [hugin25mDepthMapLayer.id],
+            controller: {
+                doubleClickZoom: true,
+                inertia: false,
+                scrollZoom: {
+                    speed: 0.1,
+                },
+                keyboard: {
+                    zoomSpeed: 1.2,
+                    moveSpeed: 300,
+                },
+            },
+        },
+    },
+    argTypes: {
+        viewport: {
+            control: "object",
+        },
+    },
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: "Override controller settings via props.",
+            },
+        },
+    },
+    render: (args) => <OverrideControllerSettingsComponent {...args} />,
+    play: async ({ canvasElement }) => {
+        const delay = 500;
+        const user = userEvent.setup({ delay });
+
+        const canvas = within(canvasElement);
+        const wrapper = await canvas.findByTestId(
+            "OverrideControllerSettingsStory"
+        );
+        const deckGlCanvas = wrapper.querySelector(
+            "canvas"
+        ) as HTMLCanvasElement | null;
+
+        if (!deckGlCanvas) {
+            throw new Error("Canvas not found");
+        }
+
+        await user.click(deckGlCanvas);
+        await user.keyboard("[Equal]");
+        await user.keyboard("[Equal]");
+        await user.keyboard("[Minus]");
+        await user.keyboard("[ArrowLeft]");
     },
 };
