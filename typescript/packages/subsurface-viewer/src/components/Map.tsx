@@ -201,6 +201,10 @@ export interface ViewStateType {
     minZoom?: number;
     maxZoom?: number;
     transitionDuration?: number;
+    width?: number;
+    height?: number;
+    minRotationX?: number;
+    maxRotationX?: number;
 }
 
 interface MarginsType {
