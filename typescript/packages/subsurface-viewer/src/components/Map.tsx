@@ -194,16 +194,50 @@ export interface ViewsType {
  * Camera view state.
  */
 export interface ViewStateType {
+    /**
+     * Camera target position.
+     */
     target: Point2D | Point3D | undefined;
+    /**
+     * Zoom level or bounding box to fit in the view.
+     * If a bounding box is provided, the camera position is computed to fit the box.
+     */
     zoom: number | Point2D | BoundingBox3D | undefined;
+    /**
+     * Rotation around the X axis in degrees. Only for 3D view.
+     */
     rotationX: number;
+    /**
+     * Rotation around the orbit in degrees. Only for 3D view.
+     */
     rotationOrbit: number;
+    /**
+     * Minimum zoom level.
+     */
     minZoom?: number;
+    /**
+     * Maximum zoom level.
+     */
     maxZoom?: number;
+    /**
+     *  Animation transition duration in milliseconds.
+     */
     transitionDuration?: number;
+    /**
+     * Viewport width in pixels.
+     */
     width?: number;
+    /**
+     * Viewport height in pixels.
+     */
     height?: number;
+    /**
+     * Minimum rotation around the X axis in degrees. Only for 3D view.
+     */
     minRotationX?: number;
+    /**
+     * Maximum rotation around the X axis in degrees. Only for 3D view.
+     */
     maxRotationX?: number;
 }
 
