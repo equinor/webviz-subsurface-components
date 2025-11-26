@@ -200,7 +200,9 @@ export interface ViewStateType {
     target: Point2D | Point3D | undefined;
     /**
      * Zoom level or bounding box to fit in the view.
-     * If a bounding box is provided, the camera position is computed to fit the box.
+     * - When a number: Sets the zoom level of the camera.
+     * - When a Point2D [x, y]: Sets the camera target (zoom in) to [x, y] coordinates.
+     * - When a BoundingBox3D: The camera position is computed to fit the entire box in view.
      */
     zoom: number | Point2D | BoundingBox3D | undefined;
     /**
@@ -213,10 +215,12 @@ export interface ViewStateType {
     rotationOrbit: number;
     /**
      * Minimum zoom level.
+     * Constrains how far out the user can zoom. Lower values allow viewing a larger area.
      */
     minZoom?: number;
     /**
      * Maximum zoom level.
+     * Constrains how far in the user can zoom. Higher values allow closer inspection.
      */
     maxZoom?: number;
     /**
@@ -233,10 +237,12 @@ export interface ViewStateType {
     height?: number;
     /**
      * Minimum rotation around the X axis in degrees. Only for 3D view.
+     * Constrains the minimum tilt angle of the camera (e.g., 0° = horizontal view).
      */
     minRotationX?: number;
     /**
      * Maximum rotation around the X axis in degrees. Only for 3D view.
+     * Constrains the maximum tilt angle of the camera (e.g., 90° = top-down view).
      */
     maxRotationX?: number;
 }
