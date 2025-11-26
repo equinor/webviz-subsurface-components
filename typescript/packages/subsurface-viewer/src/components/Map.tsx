@@ -200,9 +200,9 @@ export interface ViewStateType {
     target: Point2D | Point3D | undefined;
     /**
      * Zoom level or bounding box to fit in the view.
-     * - When a number: Sets the zoom level of the camera.
-     * - When a Point2D [x, y]: Sets the camera target (zoom in) to [x, y] coordinates.
-     * - When a BoundingBox3D: The camera position is computed to fit the entire box in view.
+     * - When a number: Represents the zoom level of the camera.
+     * - When a Point2D [x, y]: Represents the camera target (zoom in) in [x, y] coordinates.
+     * - When a BoundingBox3D: Represents the camera position computed to fit (zoom in) the entire box.
      */
     zoom: number | Point2D | BoundingBox3D | undefined;
     /**
