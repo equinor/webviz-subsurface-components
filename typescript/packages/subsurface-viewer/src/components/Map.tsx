@@ -201,10 +201,10 @@ export interface ViewStateType {
     /**
      * Zoom level or bounding box to fit in the view.
      * - When a number: Represents the zoom level of the camera.
-     * - When a Point2D [x, y]: Represents independent zoom levels along the X and Y axes.
+     * - When a tuple [number, number]: Represents independent zoom levels along the horizontal and vertical axes.
      * - When a BoundingBox3D: Represents the camera position computed to fit (zoom in) the entire box.
      */
-    zoom: number | Point2D | BoundingBox3D | undefined;
+    zoom: number | [number, number] | BoundingBox3D | undefined;
     /**
      * Rotation around the X axis in degrees. Only for 3D view.
      */
