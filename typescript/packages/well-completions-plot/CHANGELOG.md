@@ -1,3 +1,7 @@
+## 1.8.15 (2025-11-27)
+
+This was a version bump only for well-completions-plot to align it with other projects, there were no code changes.
+
 ## 1.8.14 (2025-11-22)
 
 This was a version bump only for well-completions-plot to align it with other projects, there were no code changes.

@@ -1,3 +1,7 @@
+## 1.3.15 (2025-11-27)
+
+This was a version bump only for wsc-common to align it with other projects, there were no code changes.
+
 ## 1.3.14 (2025-11-22)
 
 This was a version bump only for wsc-common to align it with other projects, there were no code changes.
