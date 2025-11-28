@@ -1,6 +1,11 @@
-import type { Color } from "@deck.gl/core";
-import type { Feature, FeatureCollection, GeometryCollection } from "geojson";
-import type { NumberPair, StyleAccessorFunction } from "../types";
+import type { Accessor, Color } from "@deck.gl/core";
+import type {
+    Feature,
+    FeatureCollection,
+    GeometryCollection,
+    Position,
+} from "geojson";
+import type { NumberPair } from "../types";
 import type { LayerPickInfo } from "../utils/layerTools";
 
 export type GeoJsonWellProperties = {
@@ -42,14 +47,12 @@ export interface LogCurveDataType {
         }
     >;
 }
+export type ColorAccessor = Accessor<Feature, Color | undefined>;
+export type SizeAccessor = Accessor<Feature, number | undefined>;
+export type DashAccessor = Accessor<Feature, NumberPair | boolean | undefined>;
 
-export type ColorAccessor = Color | StyleAccessorFunction | undefined;
-export type SizeAccessor = number | StyleAccessorFunction | undefined;
-export type DashAccessor =
-    | boolean
-    | NumberPair
-    | StyleAccessorFunction
-    | undefined;
+export type WellTrajectoryAccessor = Accessor<WellFeature, Position[]>;
+export type WellMdAccessor = Accessor<WellFeature, number[]>;
 
 export type LineStyleAccessor = {
     color?: ColorAccessor;
