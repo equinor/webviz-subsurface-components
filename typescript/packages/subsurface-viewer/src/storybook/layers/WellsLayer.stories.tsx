@@ -6,6 +6,7 @@ import { Slider } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import type { FeatureCollection, GeometryCollection } from "geojson";
 
+import type { ScaleHandler } from "@emerson-eps/color-tables";
 import {
     ColorLegend,
     colorTables,
@@ -1008,12 +1009,9 @@ const WellLayerTemplate: React.FC = (args: any) => {
 
     const [isLog, setIsLog] = React.useState(false);
 
-    const wellLayerData = React.useCallback(
-        (data: React.SetStateAction<string>) => {
-            setColorName(data);
-        },
-        []
-    );
+    const onGetColorRange = React.useCallback<ScaleHandler>((data) => {
+        setColorName(data.name);
+    }, []);
 
     // interpolation method
     const getInterpolateMethod = React.useCallback(
@@ -1040,19 +1038,25 @@ const WellLayerTemplate: React.FC = (args: any) => {
         <div>
             <div
                 style={{
-                    float: "right",
                     zIndex: 999,
                     opacity: 1,
-                    position: "relative",
                 }}
             >
                 <ColorLegend
                     {...args}
-                    getColorName={wellLayerData}
+                    colorTables={colorTables}
+                    getScale={onGetColorRange}
                     getInterpolateMethod={getInterpolateMethod}
                 />
             </div>
-            <SubsurfaceViewer {...args} layers={layers} />
+            <SubsurfaceViewer
+                {...args}
+                layers={layers}
+                scale={{
+                    visible: true,
+                    cssStyle: { top: 10, right: 10 },
+                }}
+            />
         </div>
     );
 };
