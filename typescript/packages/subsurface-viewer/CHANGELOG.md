@@ -1,3 +1,26 @@
+## 1.15.5 (2025-12-01)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.17
+
+## 1.15.4 (2025-12-01)
+
+### 🩹 Fixes
+
+- SubsurfaceViewer, ViewStateType missing properties ([#2667](https://github.com/equinor/webviz-subsurface-components/pull/2667))
+
+### ❤️ Thank You
+
+- Daniel Avila (Open to work) @danielsantiago1002
+- Håvard Bjerke
+
+## 1.15.3 (2025-11-28)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.16
+
 ## 1.15.2 (2025-11-27)
 
 ### 🧱 Updated Dependencies
