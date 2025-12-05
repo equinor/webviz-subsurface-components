@@ -7,6 +7,7 @@ in vec3 positions;
 in float properties;
 in vec3 normals;
 in vec3 colors;
+in vec3 pickingColors;
 
 // Outputs to fragment shader
 out vec2 vTexCoord;
@@ -19,7 +20,7 @@ out float property;
 flat out int vertexIndex;
 
 void main(void) {
-   geometry.pickingColor = vec3(1.0, 1.0, 0.0);
+   geometry.pickingColor = pickingColors;
    vertexIndex = gl_VertexID;
 
    vec3 position = positions;
