@@ -36,6 +36,7 @@ import {
     VertexCount as ToroidVertexCount,
 } from "../../layers/grid3d/test_data/PentagonalToroid";
 import type { Layer } from "@deck.gl/core";
+import { fireEvent, userEvent } from "@storybook/test";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -172,6 +173,54 @@ export const ColormapFunction: StoryObj<typeof SubsurfaceViewer> = {
         ],
         bounds: hugin2DBounds,
         views: default3DViews,
+    },
+};
+
+export const MultiPicking: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "MultiPicking",
+        pickingRadius: 30,
+        pickingDepth: 3,
+        layers: [
+            // map layer
+            hugin25mKhNetmapMapLayerPng,
+            {
+                "@@type": "WellsLayer",
+                id: "volve-wells",
+                data: "./volve_wells.json",
+                ZIncreasingDownwards: false,
+            },
+        ],
+        bounds: hugin2DBounds,
+        views: default3DViews,
+    },
+    play: async (args) => {
+        const delay = 500;
+        const canvas = document.querySelector("canvas");
+
+        if (canvas) {
+            await userEvent.click(canvas, { delay });
+        }
+
+        const layout = args.args.views?.layout;
+
+        if (!canvas || !layout) {
+            return;
+        }
+
+        const pos = {
+            x: canvas.clientLeft + canvas.clientWidth * 0.5,
+            y: canvas.clientTop + canvas.clientHeight * 0.5,
+        };
+
+        await userEvent.hover(canvas, { delay });
+
+        await fireEvent.mouseMove(canvas, { clientX: 0, clientY: 0, delay });
+        await fireEvent.mouseMove(canvas, {
+            clientX: pos.x,
+            clientY: pos.y,
+            delay,
+        });
     },
 };
 

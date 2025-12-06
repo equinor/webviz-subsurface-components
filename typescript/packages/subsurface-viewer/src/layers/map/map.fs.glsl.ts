@@ -15,7 +15,6 @@ uniform sampler2D colormap;
 
 out vec4 fragColor;
 
-
 void main(void) { 
    geometry.uv = vTexCoord;
 
@@ -23,12 +22,6 @@ void main(void) {
 
    if(!map.smoothShading || (normal[0] == 0.0 && normal[1] == 0.0 && normal[2] == 0.0)) {
       normal = normalize(cross(dFdx(position_commonspace.xyz), dFdy(position_commonspace.xyz)));
-   }
-
-   //Picking pass.
-   if (picking.isActive > 0.5 && !(picking.isAttribute > 0.5)) {
-      fragColor = encodeIndexToRGB(vertexIndex);
-      return;
    }
 
    vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
@@ -78,5 +71,17 @@ void main(void) {
 
    fragColor = vec4(lightColor, vColor.a);
    DECKGL_FILTER_COLOR(fragColor, geometry);
+
+   // Below code is modified version of "picking_filterPickingColor" function.
+   // Original function is in deckgl's shader modules/picking.glsl.ts
+   // "GetPickingInfo" retrieves this color as "pickingColor" on the JS side.
+   // Encodes vertexIndex and is used to retrieve picked info from input data.
+   if ( bool(picking.isActive) && !bool(picking.isAttribute) ) {
+      if (picking_vRGBcolor_Avalid.a == 0.0) {
+          discard;
+      }
+      vec4 encodedIndexColor = encodeIndexToRGB(vertexIndex);
+      fragColor = vec4(encodedIndexColor.rgb, picking_vRGBcolor_Avalid.a);
+   }
 }
 `;

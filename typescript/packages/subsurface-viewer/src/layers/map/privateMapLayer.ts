@@ -4,18 +4,17 @@ import type {
     PickingInfo,
     UpdateParameters,
     LayerContext,
+    Attribute,
 } from "@deck.gl/core";
 import { COORDINATE_SYSTEM, Layer, project32, picking } from "@deck.gl/core";
-
 import type { Device, Texture, UniformValue } from "@luma.gl/core";
 import type { ShaderModule } from "@luma.gl/shadertools";
 import { lighting } from "@luma.gl/shadertools";
 import { Model, Geometry } from "@luma.gl/engine";
-
 import { phongMaterial } from "../shader_modules/phong-lighting/phong-material";
 import { precisionForTests } from "../shader_modules/test-precision/precisionForTests";
 import { decodeIndexFromRGB, utilities } from "../shader_modules";
-
+import { encodeIndexToRGB } from "../shader_modules/utilities";
 import type {
     DeckGLLayerContext,
     ExtendedLayerProps,
@@ -27,9 +26,7 @@ import {
     type ColormapFunctionType,
     getImageData,
 } from "../utils/colormapTools";
-
 import type { RGBColor } from "../../utils";
-
 import fs from "./map.fs.glsl";
 import vs from "./map.vs.glsl";
 import fsLineShader from "./line.fs.glsl";
@@ -57,7 +54,6 @@ export interface PrivateMapLayerProps extends ExtendedLayerProps {
 }
 
 const defaultProps = {
-    data: ["dummy"],
     contours: [-1, -1],
     isContoursDepth: true,
     gridLines: false,
@@ -90,12 +86,36 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
         });
     }
 
+    calculatePickingColors(attribute: Attribute) {
+        const n = this.props.positions.length / 3;
+        const arr = new Uint8Array(n * 3);
+
+        for (let i = 0; i < arr.length / 3; i++) {
+            const pickingColor = encodeIndexToRGB(i);
+            arr[i * 3 + 0] = pickingColor[0];
+            arr[i * 3 + 1] = pickingColor[1];
+            arr[i * 3 + 2] = pickingColor[2];
+        }
+        attribute.value = arr;
+        return;
+    }
+
     initializeState(context: DeckGLLayerContext): void {
         const gl = context.device;
         const [mesh_model, mesh_lines_model] = this._getModels(gl);
         this.setState({
             models: [mesh_model, mesh_lines_model],
             isLoaded: false,
+        });
+
+        this.getAttributeManager()!.remove(["instancePickingColors"]);
+
+        this.getAttributeManager()!.add({
+            pickingColors: {
+                size: 3,
+                type: "uint8",
+                update: this.calculatePickingColors,
+            },
         });
     }
 
@@ -285,8 +305,33 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
         }
     }
 
-    decodePickingColor(): number {
+    // Maps all colors to index 0 as this layer does not use multiple indexes.
+    decodePickingColor(/*color: Uint8Array*/): number {
         return 0;
+    }
+
+    // Disable picking by setting all picking colors to null color.
+    // Used in multipicking to prevent recurring picks of the same layer.
+    _disablePickingIndex(/*objectIndex: number*/) {
+        const { pickingColors, instancePickingColors } =
+            this.getAttributeManager()!.attributes;
+        const colors = pickingColors || instancePickingColors;
+        if (!colors) {
+            return;
+        }
+
+        const pickingColor = this.nullPickingColor();
+
+        const n = this.props.positions.length / 3;
+        const arr = new Uint8Array(n * 3);
+
+        for (let i = 0; i < arr.length / 3; i++) {
+            arr[i * 3 + 0] = pickingColor[0];
+            arr[i * 3 + 1] = pickingColor[1];
+            arr[i * 3 + 2] = pickingColor[2];
+        }
+
+        colors.buffer.write(arr, 0);
     }
 
     getPickingInfo({ info }: { info: PickingInfo }): LayerPickInfo {
@@ -297,7 +342,6 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
         const layer_properties: PropertyDataType[] = [];
 
         // Note these colors are in the  0-255 range.
-
         const [r, g, b] = info.color;
         const vertexIndex = decodeIndexFromRGB([r, g, b]);
 
@@ -316,8 +360,8 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
 
         const properties = this.props.vertexProperties;
         const property = properties[vertexIndex];
-        layer_properties.push(createPropertyData("Property", property));
 
+        layer_properties.push(createPropertyData("Property", property));
         return {
             ...info,
             properties: layer_properties,

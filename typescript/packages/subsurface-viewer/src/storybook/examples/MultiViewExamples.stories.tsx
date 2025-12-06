@@ -72,7 +72,7 @@ export const MultiViewAnnotation: StoryObj<typeof SubsurfaceViewer> = {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 /* @ts-expect-error */
                 <View id="view_1">
-                    <ContinuousLegend min={-3071} max={41048} />
+                    <ContinuousLegend min={2724} max={3396} />
                     <ViewFooter>kH netmap</ViewFooter>
                 </View>
             }
@@ -80,7 +80,7 @@ export const MultiViewAnnotation: StoryObj<typeof SubsurfaceViewer> = {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 /* @ts-expect-error */
                 <View id="view_2">
-                    <ContinuousLegend min={2725} max={3396} />
+                    <ContinuousLegend min={-1863} max={40798} />
                     <ViewFooter>Hugin</ViewFooter>
                 </View>
             }
@@ -253,8 +253,8 @@ function MultiViewPickingExample(
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     /* @ts-expect-error */
                     <View id="view_1">
-                        <ContinuousLegend min={-3071} max={41048} />
-                        <ViewFooter>kH netmap</ViewFooter>
+                        <ContinuousLegend min={2724} max={3396} />
+                        <ViewFooter>Hugin</ViewFooter>
                         <ExampleReadoutComponent
                             viewId="view_1"
                             pickingInfoPerView={pickingInfoPerView}
@@ -265,8 +265,8 @@ function MultiViewPickingExample(
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     /* @ts-expect-error */
                     <View id="view_2">
-                        <ContinuousLegend min={2725} max={3396} />
-                        <ViewFooter>Hugin</ViewFooter>
+                        <ContinuousLegend min={-1863} max={40798} />
+                        <ViewFooter>kH netmap</ViewFooter>
                         <ExampleReadoutComponent
                             viewId="view_2"
                             pickingInfoPerView={pickingInfoPerView}
