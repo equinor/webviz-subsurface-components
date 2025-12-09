@@ -1,3 +1,13 @@
+## 1.15.6 (2025-12-09)
+
+### 🩹 Fixes
+
+- "SubsurfaceViewer: pickingRadius not working with overlapping layers #2320" ([#2669](https://github.com/equinor/webviz-subsurface-components/pull/2669), [#2320](https://github.com/equinor/webviz-subsurface-components/issues/2320))
+
+### ❤️ Thank You
+
+- nilscb @nilscb
+
 ## 1.15.5 (2025-12-01)
 
 ### 🧱 Updated Dependencies
