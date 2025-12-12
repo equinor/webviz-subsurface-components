@@ -6,7 +6,7 @@ import { Slider } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import type { FeatureCollection, GeometryCollection } from "geojson";
 
-import type { ScaleHandler } from "@emerson-eps/color-tables";
+import type { ScaleHandler } from "@emerson-eps/color-tables/";
 import {
     ColorLegend,
     colorTables,
