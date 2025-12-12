@@ -1,3 +1,71 @@
+## 1.15.7 (2025-12-09)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.18
+
+## 1.15.6 (2025-12-09)
+
+### 🩹 Fixes
+
+- "SubsurfaceViewer: pickingRadius not working with overlapping layers #2320" ([#2669](https://github.com/equinor/webviz-subsurface-components/pull/2669), [#2320](https://github.com/equinor/webviz-subsurface-components/issues/2320))
+
+### ❤️ Thank You
+
+- nilscb @nilscb
+
+## 1.15.5 (2025-12-01)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.17
+
+## 1.15.4 (2025-12-01)
+
+### 🩹 Fixes
+
+- SubsurfaceViewer, ViewStateType missing properties ([#2667](https://github.com/equinor/webviz-subsurface-components/pull/2667))
+
+### ❤️ Thank You
+
+- Daniel Avila (Open to work) @danielsantiago1002
+- Håvard Bjerke
+
+## 1.15.3 (2025-11-28)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.16
+
+## 1.15.2 (2025-11-27)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.15
+
+## 1.15.1 (2025-11-22)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.14
+
+## 1.15.0 (2025-11-21)
+
+### 🚀 Features
+
+- Subsurface Viewer, Improve default camera controls ([#2657](https://github.com/equinor/webviz-subsurface-components/pull/2657))
+
+### ❤️ Thank You
+
+- Daniel Avila (Open to work) @danielsantiago1002
+- Håvard Bjerke
+
+## 1.14.15 (2025-11-19)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.13
+
 ## 1.14.14 (2025-11-13)
 
 ### 🧱 Updated Dependencies
