@@ -575,11 +575,11 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
         const layers = [
             outlineLayer,
-            logLayer,
             colorsLayer,
             highlightLayer,
             highlightMultiWellsLayer,
             namesLayer,
+            logLayer,
         ];
         if (fastDrawing) {
             layers.push(fastLayer);

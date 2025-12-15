@@ -260,7 +260,7 @@ export class LogCurveLayer extends CompositeLayer<LogCurveLayerProps> {
                 }),
 
                 // Using polygon offset to avoid z-fighting between the two layers. No actual clue how these numbers work, but this seemed to work
-                getPolygonOffset: ({ layerIndex }) => [2, layerIndex * 2000],
+                getPolygonOffset: ({ layerIndex }) => [2, layerIndex],
                 getPath: (d, ctx) => {
                     if (!this._logCurveIsVisible(d, ctx)) return [];
                     return getLogPath(
