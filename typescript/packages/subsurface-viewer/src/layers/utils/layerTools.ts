@@ -212,6 +212,8 @@ export function getFromAccessor<In, Out>(
 ): Out {
     if (typeof accessor !== "function") return accessor;
 
+    // `Out` can *theoretically* still be a function, so Typescript won't narrow this to be an AccessorFunction. Deck.gl does however
+    // ensure that Out is never a function, so we'll just expect the error here (the same approach is used internally in Deck.gl)
     // @ts-expect-error -- Out is always a function here
     return accessor(data, objectInfo);
 }
