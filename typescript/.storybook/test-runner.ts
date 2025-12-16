@@ -1,3 +1,4 @@
+// @ts-expect-error TS7016
 import { toMatchImageSnapshot } from "jest-image-snapshot";
 
 import { getStoryContext, type TestRunnerConfig } from "@storybook/test-runner";
@@ -5,6 +6,7 @@ import { getStoryContext, type TestRunnerConfig } from "@storybook/test-runner";
 // https://github.com/mapbox/pixelmatch#pixelmatchimg1-img2-output-width-height-options
 const customDiffConfig = {};
 
+// @ts-expect-error TS7006
 const screenshotTest = async (page, context) => {
     let previousScreenshot: Buffer = Buffer.from("");
 
