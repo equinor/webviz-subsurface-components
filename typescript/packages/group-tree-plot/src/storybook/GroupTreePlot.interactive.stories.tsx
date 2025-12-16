@@ -10,17 +10,15 @@ import {
     allTestDates,
 } from "../../example-data/interactive-test-data";
 
-const meta: Meta = {
+const stories: Meta = {
     component: GroupTreePlot,
     title: "GroupTreePlot/Interactive Demo",
     tags: ["autodocs"],
 };
-
-export default meta;
-type Story = StoryObj;
+export default stories;
 
 /**
- * Interactive storybook example with time slider and tree type dropdown.
+ * Storybook test for the group tree plot component with interactive controls.
  *
  * This story demonstrates the bug fix for switching between tree types:
  * - "Single Tree Definition": One tree valid for all dates (static structure with changing data)
@@ -31,30 +29,22 @@ type Story = StoryObj;
  * 2. Switch tree types
  * 3. Verify the tree shows the correct date (not the first date)
  */
-export const InteractiveWithTreeTypeSwitch: Story = {
-    render: () => {
-        const [treeTypeIndex, setTreeTypeIndex] = React.useState(0);
-        const [dateIndex, setDateIndex] = React.useState(0);
-        const [selectedEdgeKey, setSelectedEdgeKey] = React.useState(
-            edgeMetadataList[0]?.key || ""
-        );
-        const [selectedNodeKey, setSelectedNodeKey] = React.useState(
-            nodeMetadataList[0]?.key || ""
-        );
 
-        const currentTreeType = treeTypes[treeTypeIndex];
-        const currentDate = allTestDates[dateIndex] || "";
+const Template = () => {
+    const [treeTypeIndex, setTreeTypeIndex] = React.useState(0);
+    const [dateIndex, setDateIndex] = React.useState(0);
+    const [selectedEdgeKey, setSelectedEdgeKey] = React.useState(
+        edgeMetadataList[0]?.key || ""
+    );
+    const [selectedNodeKey, setSelectedNodeKey] = React.useState(
+        nodeMetadataList[0]?.key || ""
+    );
 
-        // Update date index when tree type changes to maintain same date
-        React.useEffect(() => {
-            // Try to maintain the same date when switching tree types
-            const currentDateString = allTestDates[dateIndex];
+    const currentTreeType = treeTypes[treeTypeIndex];
+    const currentDate = allTestDates[dateIndex] || "";
 
-            // Since both tree types use the same dates, we can keep the same index
-            // This maintains the selected date across tree type switches
-        }, [treeTypeIndex]);
-
-        return (
+    return (
+        <>
             <div style={{ padding: "20px" }}>
                 <div
                     style={{
@@ -230,6 +220,11 @@ export const InteractiveWithTreeTypeSwitch: Story = {
                     />
                 </div>
             </div>
-        );
-    },
+        </>
+    );
+};
+
+export const InteractiveWithTreeTypeSwitch: StoryObj = {
+    args: {},
+    render: () => <Template />,
 };
