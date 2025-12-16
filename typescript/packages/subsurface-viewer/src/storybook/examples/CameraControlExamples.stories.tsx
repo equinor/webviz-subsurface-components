@@ -1,9 +1,10 @@
 import { cloneDeep } from "lodash";
 
 import type { Meta, StoryObj } from "@storybook/react";
-import { userEvent } from "@storybook/test";
+import { userEvent, within } from "@storybook/test";
 import React from "react";
 
+import { GeoJsonLayer } from "@deck.gl/layers";
 import { SimpleMeshLayer } from "@deck.gl/mesh-layers";
 import { SphereGeometry } from "@luma.gl/engine";
 
@@ -13,19 +14,16 @@ import { styled } from "@mui/material/styles";
 
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
-import type {
-    BoundingBox3D,
-    Point3D,
-    ViewStateType,
-} from "../../components/Map";
+import type { ViewStateType } from "../../components/Map";
+import type { BoundingBox3D, Point3D } from "../../utils";
 import { Axes2DLayer, AxesLayer } from "../../layers";
 
-import { GeoJsonLayer } from "@deck.gl/layers";
 import {
     customLayerWithPolygonDataProps,
     default2DViews,
     default3DViews,
     defaultStoryParameters,
+    emptyVolveWellsViewViewport,
     hugin25mDepthMapLayer,
     hugin25mKhNetmapMapLayer,
     hugin25mKhNetmapMapLayerPng,
@@ -38,6 +36,7 @@ import {
     volveWellsWithLogsLayer,
 } from "../sharedSettings";
 
+import type { ViewportType } from "../..";
 import { scaleZoom } from "../..";
 import { useScaleFactor } from "../../utils/event";
 
@@ -150,6 +149,17 @@ export const DisplayCameraState: StoryObj<typeof SubsurfaceViewer> = {
         bounds: volveWellsBounds,
         layers: [volveWellsLayer],
         cameraPosition: CAMERA_POSITION,
+    },
+    render: (args) => <DisplayCameraPositionComponent {...args} />,
+};
+
+export const DisplayEmptyView: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "volve-wells",
+        bounds: volveWellsBounds,
+        layers: [volveWellsLayer],
+        cameraPosition: CAMERA_POSITION,
+        views: emptyVolveWellsViewViewport,
     },
     render: (args) => <DisplayCameraPositionComponent {...args} />,
 };
@@ -698,7 +708,8 @@ const ScaleFactorHookComponent = (
         ...props,
         verticalScale: scaleFactor,
         innerRef: elementRef,
-        coords: { visible: false },
+        showReadout: false,
+        pickingDepth: 0,
     };
     return <SubsurfaceViewer {...viewerProps} />;
 };
@@ -730,5 +741,80 @@ export const ScaleFactorHook: StoryObj<typeof ScaleFactorHookComponent> = {
         await userEvent.keyboard("[ArrowUp]", { delay });
         await userEvent.keyboard("[ArrowDown]", { delay });
         await userEvent.keyboard("[ArrowUp]", { delay });
+    },
+};
+
+const OverrideControllerSettingsComponent = (args: {
+    viewport: ViewportType;
+}) => {
+    const subsurfaceViewerArgs: SubsurfaceViewerProps = {
+        id: "OverrideControllerSettings",
+        layers: [hugin25mDepthMapLayer],
+        views: {
+            layout: [1, 1],
+            viewports: [args.viewport],
+        },
+    };
+    return (
+        <div data-testid="OverrideControllerSettingsStory">
+            <SubsurfaceViewer {...subsurfaceViewerArgs} />
+        </div>
+    );
+};
+
+export const OverrideControllerSettings: StoryObj<
+    typeof OverrideControllerSettingsComponent
+> = {
+    args: {
+        viewport: {
+            id: "view_1",
+            layerIds: [hugin25mDepthMapLayer.id],
+            controller: {
+                doubleClickZoom: true,
+                inertia: false,
+                scrollZoom: {
+                    speed: 0.1,
+                },
+                keyboard: {
+                    zoomSpeed: 1.2,
+                    moveSpeed: 300,
+                },
+            },
+        },
+    },
+    argTypes: {
+        viewport: {
+            control: "object",
+        },
+    },
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: "Override controller settings via props.",
+            },
+        },
+    },
+    render: (args) => <OverrideControllerSettingsComponent {...args} />,
+    play: async ({ canvasElement }) => {
+        const delay = 500;
+        const user = userEvent.setup({ delay });
+
+        const canvas = within(canvasElement);
+        const wrapper = await canvas.findByTestId(
+            "OverrideControllerSettingsStory"
+        );
+        const deckGlCanvas = wrapper.querySelector(
+            "canvas"
+        ) as HTMLCanvasElement | null;
+
+        if (!deckGlCanvas) {
+            throw new Error("Canvas not found");
+        }
+
+        await user.click(deckGlCanvas);
+        await user.keyboard("[Equal]");
+        await user.keyboard("[Equal]");
+        await user.keyboard("[Minus]");
     },
 };

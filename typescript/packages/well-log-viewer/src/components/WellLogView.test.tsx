@@ -4,12 +4,12 @@ import { render } from "@testing-library/react";
 import "jest-styled-components";
 import WellLogView from "./WellLogView";
 import type { Template } from "./WellLogTemplateTypes";
-import type { ColorMapFunction } from "../utils/color-function";
+import type { ColormapFunction } from "../utils/color-function";
 
 import viewerTemplateJson from "../../../../../example-data/welllog_template_1.json";
 
 const viewerTemplate = viewerTemplateJson as Template;
-const exampleColorMapFunctions = colorTables as ColorMapFunction[];
+const exampleColormapFunctions = colorTables as ColormapFunction[];
 const exampleWellLog = {
     header: {},
     curves: [],
@@ -35,7 +35,7 @@ describe("Test Well Log View Component", () => {
                     hideTrackTitle: true,
                 }}
                 template={viewerTemplate}
-                colorMapFunctions={exampleColorMapFunctions}
+                colorMapFunctions={exampleColormapFunctions}
                 primaryAxis={"md"}
                 axisTitles={{
                     md: "MD",

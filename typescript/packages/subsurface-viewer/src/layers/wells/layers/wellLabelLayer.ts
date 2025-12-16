@@ -1,10 +1,14 @@
+import _ from "lodash";
+
+import { Vector2, Vector3 } from "math.gl";
+
 import type { Color, PickingInfo } from "@deck.gl/core";
 import { type DefaultProps, type UpdateParameters } from "@deck.gl/core";
 import type { TextLayerProps } from "@deck.gl/layers";
+
 import type { Feature, Position } from "geojson";
-import _ from "lodash";
-import { Vector2, Vector3 } from "math.gl";
-import type { Position3D } from "../../utils/layerTools";
+
+import type { Point3D } from "../../../utils";
 import type { WellFeature } from "../types";
 import { getTrajectory } from "../utils/trajectory";
 import type { MergedTextLayerProps } from "./mergedTextLayer";
@@ -237,7 +241,7 @@ export class WellLabelLayer extends MergedTextLayer<
     protected getVectorAlongTrajectory(
         fraction: number,
         wellData: WellFeature
-    ): [number, Position3D] {
+    ): [number, Point3D] {
         if (!wellData) {
             return [0, [0, 0, 0]];
         }
@@ -320,11 +324,11 @@ export class WellLabelLayer extends MergedTextLayer<
                 a = deg + 180;
             }
 
-            return [a, labelPosition.toArray() as Position3D];
+            return [a, labelPosition.toArray() as Point3D];
         }
 
         // Default to well head of no valid position is found in viewport
-        return [0, trajectory[0] as Position3D];
+        return [0, trajectory[0] as Point3D];
     }
 
     getPickingInfo({ info }: { info: PickingInfo }) {

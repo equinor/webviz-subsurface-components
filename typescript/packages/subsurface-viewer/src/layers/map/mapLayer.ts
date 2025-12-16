@@ -1,27 +1,30 @@
 import { isEqual } from "lodash";
 import type React from "react";
+
 import type {
     Color,
     CompositeLayerProps,
     Layer,
+    Material,
     UpdateParameters,
 } from "@deck.gl/core";
 import { CompositeLayer } from "@deck.gl/core";
-import * as png from "@vivaxy/png";
 import type { Matrix4 } from "math.gl";
-import workerpool from "workerpool";
-import type { ReportBoundingBoxAction } from "../../components/Map";
+
 import type {
+    ReportBoundingBoxAction,
     ExtendedLayerProps,
-    ColorMapFunctionType,
 } from "../utils/layerTools";
-import type { Material } from "@deck.gl/core";
-import PrivateMapLayer from "./privateMapLayer";
 import { getModelMatrix } from "../utils/layerTools";
-import { rotate } from "./utils";
-import { makeFullMesh } from "./webworker";
+import type { ColormapFunctionType } from "../utils/colormapTools";
 import config from "../../SubsurfaceConfig.json";
 import { findConfig } from "../../utils/configTools";
+import { loadDataArray } from "../../utils/serialize";
+import PrivateMapLayer from "./privateMapLayer";
+import { rotate } from "./utils";
+import { makeFullMesh } from "./webworker";
+
+import workerpool from "workerpool";
 
 // init workerpool
 const workerPoolConfig = findConfig(
@@ -77,62 +80,6 @@ export type Params = [
     gridLines: boolean,
 ];
 
-async function loadURLData(url: string): Promise<Float32Array | null> {
-    let res: Float32Array | null = null;
-    const response = await fetch(url);
-    if (!response.ok) {
-        console.error("Could not load ", url);
-    }
-    const blob = await response.blob();
-    const contentType = response.headers.get("content-type");
-    const isPng = contentType === "image/png";
-    if (isPng) {
-        // Load as Png  with abolute float values.
-        res = await new Promise((resolve) => {
-            const fileReader = new FileReader();
-            fileReader.readAsArrayBuffer(blob);
-            fileReader.onload = () => {
-                const arrayBuffer = fileReader.result;
-                const imgData = png.decode(arrayBuffer as ArrayBuffer);
-                const data = imgData.data; // array of int's
-
-                const n = data.length;
-                const buffer = new ArrayBuffer(n);
-                const view = new DataView(buffer);
-                for (let i = 0; i < n; i++) {
-                    view.setUint8(i, data[i]);
-                }
-
-                const floatArray = new Float32Array(buffer);
-                resolve(floatArray);
-            };
-        });
-    } else {
-        // Load as binary array of floats.
-        const buffer = await blob.arrayBuffer();
-        res = new Float32Array(buffer);
-    }
-    return res;
-}
-
-async function loadFloat32Data(
-    data: string | number[] | Float32Array
-): Promise<Float32Array | null> {
-    if (!data) {
-        return null;
-    }
-    if (ArrayBuffer.isView(data)) {
-        // Input data is typed array.
-        return data;
-    } else if (Array.isArray(data)) {
-        // Input data is native javascript array.
-        return new Float32Array(data);
-    } else {
-        // Input data is an URL.
-        return await loadURLData(data);
-    }
-}
-
 /**
  * Will load data for the mesh and the properties. Both of which may be given as arrays (javascript or typed)
  * or as a URL to the data in binary format.
@@ -145,8 +92,8 @@ async function loadMeshAndProperties(
     // Keep
     //const t0 = performance.now();
 
-    const mesh = await loadFloat32Data(meshData);
-    const properties = await loadFloat32Data(propertiesData);
+    const mesh = await loadDataArray(meshData, Float32Array);
+    const properties = await loadDataArray(propertiesData, Float32Array);
 
     // if (!isMesh && !isProperties) {
     //     console.error("Error. One or both of texture and mesh must be given!");
@@ -176,7 +123,7 @@ export interface MapLayerProps extends ExtendedLayerProps {
 
     /**  Url to the properties (ex, poro or perm values).
      * If the number of property values equals the number of depth values
-     * the property values will be placed at the nodes and the cell (4 neigboring nodes)
+     * the property values will be placed at the nodes and the cell (4 neighboring nodes)
      * color will be linearly interpolated over the cell.
      * If the number of property values equals one less than the depth values in
      * each direction then the property values will be pr cell and the cell will be constant
@@ -185,23 +132,23 @@ export interface MapLayerProps extends ExtendedLayerProps {
     propertiesUrl: string; // Deprecated
     propertiesData: string | number[] | Float32Array;
 
-    /**  Contourlines reference point and interval.
+    /**  Contour lines reference point and interval.
      * A value of [-1.0, -1.0] will disable contour lines.
      * Contour lines will also not be activated if cells are constant colored
-     * and "isContoursDepth" is set to false. I.e. constant properties within cells and contourlines
+     * and "isContoursDepth" is set to false. I.e. constant properties within cells and contour lines
      * to be calculated for properties and not depths.
      * default value: [-1.0, -1.0]
      */
     contours: [number, number];
 
-    /**  Contourlines may be calculated either on depth/z-value or on property value
+    /**  Contour lines may be calculated either on depth/z-value or on property value
      * If this is set to false, lines will follow properties instead of depth.
      * In 2D mode this is always the case regardless.
      * default: true
      */
     isContoursDepth: boolean;
 
-    /**  Enable gridlines.
+    /**  Enable grid lines.
      * default: false.
      */
     gridLines: boolean;
@@ -228,7 +175,7 @@ export interface MapLayerProps extends ExtendedLayerProps {
      * May also be set as constant color:
      * E.g. [255, 0, 0] for constant red surface.
      */
-    colorMapFunction?: ColorMapFunctionType;
+    colorMapFunction?: ColormapFunctionType;
 
     /**  Surface material properties.
      * material: true  = default material, coloring depends on surface orientation and lighting.
@@ -238,7 +185,7 @@ export interface MapLayerProps extends ExtendedLayerProps {
      *           ambient: 0.35,
      *           diffuse: 0.6,
      *           shininess: 32,
-     *           specularColor: [255, 255, 255],
+     *           specularColor: [38, 38, 38],
      *       }
      */
     material: Material;
@@ -365,10 +312,34 @@ export default class MapLayer<
                         const rotRad = (rotDeg * (2.0 * Math.PI)) / 360.0;
 
                         // Rotate x,y around "center" "rad" radians
-                        const [x0, y0] = rotate(xMin, yMin, center[0], center[1], rotRad); // eslint-disable-line
-                        const [x1, y1] = rotate(xMax, yMin, center[0], center[1], rotRad); // eslint-disable-line
-                        const [x2, y2] = rotate(xMax, yMax, center[0], center[1], rotRad); // eslint-disable-line
-                        const [x3, y3] = rotate(xMin, yMax, center[0], center[1], rotRad); // eslint-disable-line
+                        const [x0, y0] = rotate(
+                            xMin,
+                            yMin,
+                            center[0],
+                            center[1],
+                            rotRad
+                        ); // eslint-disable-line
+                        const [x1, y1] = rotate(
+                            xMax,
+                            yMin,
+                            center[0],
+                            center[1],
+                            rotRad
+                        ); // eslint-disable-line
+                        const [x2, y2] = rotate(
+                            xMax,
+                            yMax,
+                            center[0],
+                            center[1],
+                            rotRad
+                        ); // eslint-disable-line
+                        const [x3, y3] = rotate(
+                            xMin,
+                            yMax,
+                            center[0],
+                            center[1],
+                            rotRad
+                        ); // eslint-disable-line
 
                         // Rotated bounds in x/y plane.
                         const x_min = Math.min(x0, x1, x2, x3);
@@ -467,7 +438,7 @@ export default class MapLayer<
             );
         }
 
-        const enableLighting: boolean = !(this.props.material === false);
+        const enableLighting: boolean = this.props.material !== false;
         const layer = new PrivateMapLayer(
             this.getSubLayerProps({
                 positions: this.state["positions"],
@@ -480,10 +451,10 @@ export default class MapLayer<
                 contours: this.props.contours,
                 gridLines: this.props.gridLines,
                 isContoursDepth: !isMesh ? false : this.props.isContoursDepth,
-                colorMapName: this.props.colorMapName,
-                colorMapRange: this.props.colorMapRange,
-                colorMapClampColor: this.props.colorMapClampColor,
-                colorMapFunction: this.props.colorMapFunction,
+                colormapName: this.props.colorMapName,
+                colormapRange: this.props.colorMapRange,
+                colormapClampColor: this.props.colorMapClampColor,
+                colormapFunction: this.props.colorMapFunction,
                 propertyValueRange: this.state["propertyValueRange"],
                 material: this.props.material,
                 smoothShading: this.props.smoothShading,

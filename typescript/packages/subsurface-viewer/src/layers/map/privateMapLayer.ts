@@ -4,27 +4,33 @@ import type {
     PickingInfo,
     UpdateParameters,
     LayerContext,
+    Attribute,
 } from "@deck.gl/core";
-import { COORDINATE_SYSTEM } from "@deck.gl/core";
+import { COORDINATE_SYSTEM, Layer, project32, picking } from "@deck.gl/core";
 import type { Device, Texture, UniformValue } from "@luma.gl/core";
-import { utilities } from "../shader_modules";
+import type { ShaderModule } from "@luma.gl/shadertools";
 import { lighting } from "@luma.gl/shadertools";
+import { Model, Geometry } from "@luma.gl/engine";
 import { phongMaterial } from "../shader_modules/phong-lighting/phong-material";
+import { precisionForTests } from "../shader_modules/test-precision/precisionForTests";
+import { decodeIndexFromRGB, utilities } from "../shader_modules";
+import { encodeIndexToRGB } from "../shader_modules/utilities";
 import type {
+    DeckGLLayerContext,
     ExtendedLayerProps,
     LayerPickInfo,
     PropertyDataType,
-    ColorMapFunctionType,
 } from "../utils/layerTools";
-import { createPropertyData, getImageData } from "../utils/layerTools";
-import type { DeckGLLayerContext } from "../../components/Map";
-import fs from "./fragment.glsl";
-import vs from "./vertex.glsl";
-import fsLineShader from "./fragment_lines.glsl";
-import vsLineShader from "./vertex_lines.glsl";
-import type { ShaderModule } from "@luma.gl/shadertools";
-import { Layer, project32, picking } from "@deck.gl/core";
-import { Model, Geometry } from "@luma.gl/engine";
+import { createPropertyData } from "../utils/layerTools";
+import {
+    type ColormapFunctionType,
+    getImageData,
+} from "../utils/colormapTools";
+import type { RGBColor } from "../../utils";
+import fs from "./map.fs.glsl";
+import vs from "./map.vs.glsl";
+import fsLineShader from "./line.fs.glsl";
+import vsLineShader from "./line.vs.glsl";
 
 export interface PrivateMapLayerProps extends ExtendedLayerProps {
     positions: Float32Array;
@@ -36,10 +42,10 @@ export interface PrivateMapLayerProps extends ExtendedLayerProps {
     contours: [number, number];
     gridLines: boolean;
     isContoursDepth: boolean;
-    colorMapName: string;
-    colorMapRange: [number, number];
-    colorMapClampColor: Color | undefined | boolean;
-    colorMapFunction?: ColorMapFunctionType;
+    colormapName: string;
+    colormapRange: [number, number];
+    colormapClampColor: Color | undefined | boolean;
+    colormapFunction?: ColormapFunctionType;
     propertyValueRange: [number, number];
     smoothShading: boolean;
     depthTest: boolean;
@@ -48,11 +54,10 @@ export interface PrivateMapLayerProps extends ExtendedLayerProps {
 }
 
 const defaultProps = {
-    data: ["dummy"],
     contours: [-1, -1],
     isContoursDepth: true,
     gridLines: false,
-    colorMapName: "",
+    colormapName: "",
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
     propertyValueRange: [0.0, 1.0],
     meshValueRange: [0.0, 1.0],
@@ -81,12 +86,36 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
         });
     }
 
+    calculatePickingColors(attribute: Attribute) {
+        const n = this.props.positions.length / 3;
+        const arr = new Uint8Array(n * 3);
+
+        for (let i = 0; i < arr.length / 3; i++) {
+            const pickingColor = encodeIndexToRGB(i);
+            arr[i * 3 + 0] = pickingColor[0];
+            arr[i * 3 + 1] = pickingColor[1];
+            arr[i * 3 + 2] = pickingColor[2];
+        }
+        attribute.value = arr;
+        return;
+    }
+
     initializeState(context: DeckGLLayerContext): void {
         const gl = context.device;
         const [mesh_model, mesh_lines_model] = this._getModels(gl);
         this.setState({
             models: [mesh_model, mesh_lines_model],
             isLoaded: false,
+        });
+
+        this.getAttributeManager()!.remove(["instancePickingColors"]);
+
+        this.getAttributeManager()!.add({
+            pickingColors: {
+                size: 3,
+                type: "uint8",
+                update: this.calculatePickingColors,
+            },
         });
     }
 
@@ -122,9 +151,11 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
             height: 1,
             format: "rgb8unorm-webgl",
             data: getImageData(
-                this.props.colorMapName,
-                (this.context as DeckGLLayerContext).userData.colorTables,
-                this.props.colorMapFunction
+                this.props.colormapFunction ?? {
+                    colormapName: this.props.colormapName,
+                    colorTables: (this.context as DeckGLLayerContext).userData
+                        .colorTables,
+                }
             ),
         });
 
@@ -136,28 +167,28 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
         const valueRangeMin = this.props.propertyValueRange[0] ?? 0.0;
         const valueRangeMax = this.props.propertyValueRange[1] ?? 1.0;
 
-        // If specified color map will extend from colorMapRangeMin to colorMapRangeMax.
+        // If specified color map will extend from colormapRangeMin to colormapRangeMax.
         // Otherwise it will extend from valueRangeMin to valueRangeMax.
-        const colorMapRangeMin = this.props.colorMapRange?.[0] ?? valueRangeMin;
-        const colorMapRangeMax = this.props.colorMapRange?.[1] ?? valueRangeMax;
+        const colormapRangeMin = this.props.colormapRange?.[0] ?? valueRangeMin;
+        const colormapRangeMax = this.props.colormapRange?.[1] ?? valueRangeMax;
 
         const isClampColor: boolean =
-            this.props.colorMapClampColor !== undefined &&
-            this.props.colorMapClampColor !== true &&
-            this.props.colorMapClampColor !== false;
-        let colorMapClampColor = isClampColor
-            ? this.props.colorMapClampColor
+            this.props.colormapClampColor !== undefined &&
+            this.props.colormapClampColor !== true &&
+            this.props.colormapClampColor !== false;
+        let colormapClampColor = isClampColor
+            ? this.props.colormapClampColor
             : [0, 0, 0];
 
         // Normalize to [0,1] range.
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        colorMapClampColor = (colorMapClampColor as Color).map(
+        colormapClampColor = (colormapClampColor as Color).map(
             (x) => (x ?? 0) / 255
         );
 
-        const isColorMapClampColorTransparent: boolean =
-            (this.props.colorMapClampColor as boolean) === false;
+        const isColormapClampColorTransparent: boolean =
+            (this.props.colormapClampColor as boolean) === false;
 
         const smoothShading =
             this.props.normals.length == 0 ? false : this.props.smoothShading;
@@ -190,10 +221,10 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
                 isContoursDepth,
                 valueRangeMin,
                 valueRangeMax,
-                colorMapRangeMin,
-                colorMapRangeMax,
-                colorMapClampColor,
-                isColorMapClampColorTransparent,
+                colormapRangeMin,
+                colormapRangeMax,
+                colormapClampColor,
+                isColormapClampColorTransparent,
                 isClampColor,
                 smoothShading,
                 ZIncreasingDownwards: this.props.ZIncreasingDownwards,
@@ -203,8 +234,11 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
         // MESH LINES
         const mesh_lines_model = new Model(device, {
             id: `${this.props.id}-lines`,
-            vs: vsLineShader,
-            fs: fsLineShader,
+            ...super.getShaders({
+                vs: vsLineShader,
+                fs: fsLineShader,
+                modules: [project32, picking, mapUniforms, precisionForTests],
+            }),
             geometry: new Geometry({
                 topology: "line-list",
                 attributes: {
@@ -213,7 +247,6 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
                 indices: { value: this.props.lineIndices, size: 1 },
             }),
             bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
-            modules: [project32, picking, mapUniforms],
             isInstanced: false,
         });
         mesh_lines_model.shaderInputs.setProps({
@@ -223,10 +256,10 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
                 isContoursDepth,
                 valueRangeMin,
                 valueRangeMax,
-                colorMapRangeMin,
-                colorMapRangeMax,
-                colorMapClampColor,
-                isColorMapClampColorTransparent,
+                colormapRangeMin,
+                colormapRangeMax,
+                colormapClampColor,
+                isColormapClampColorTransparent,
                 isClampColor,
                 smoothShading,
                 ZIncreasingDownwards: this.props.ZIncreasingDownwards,
@@ -272,8 +305,33 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
         }
     }
 
-    decodePickingColor(): number {
+    // Maps all colors to index 0 as this layer does not use multiple indexes.
+    decodePickingColor(/*color: Uint8Array*/): number {
         return 0;
+    }
+
+    // Disable picking by setting all picking colors to null color.
+    // Used in multipicking to prevent recurring picks of the same layer.
+    _disablePickingIndex(/*objectIndex: number*/) {
+        const { pickingColors, instancePickingColors } =
+            this.getAttributeManager()!.attributes;
+        const colors = pickingColors || instancePickingColors;
+        if (!colors) {
+            return;
+        }
+
+        const pickingColor = this.nullPickingColor();
+
+        const n = this.props.positions.length / 3;
+        const arr = new Uint8Array(n * 3);
+
+        for (let i = 0; i < arr.length / 3; i++) {
+            arr[i * 3 + 0] = pickingColor[0];
+            arr[i * 3 + 1] = pickingColor[1];
+            arr[i * 3 + 2] = pickingColor[2];
+        }
+
+        colors.buffer.write(arr, 0);
     }
 
     getPickingInfo({ info }: { info: PickingInfo }): LayerPickInfo {
@@ -284,11 +342,8 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
         const layer_properties: PropertyDataType[] = [];
 
         // Note these colors are in the  0-255 range.
-        const r = info.color[0];
-        const g = info.color[1];
-        const b = info.color[2];
-
-        const vertexIndex = 256 * 256 * r + 256 * g + b;
+        const [r, g, b] = info.color;
+        const vertexIndex = decodeIndexFromRGB([r, g, b]);
 
         if (typeof info.coordinate?.[2] !== "undefined") {
             const zScale = this.props.modelMatrix
@@ -305,8 +360,8 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
 
         const properties = this.props.vertexProperties;
         const property = properties[vertexIndex];
-        layer_properties.push(createPropertyData("Property", property));
 
+        layer_properties.push(createPropertyData("Property", property));
         return {
             ...info,
             properties: layer_properties,
@@ -324,6 +379,7 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
                 lighting,
                 phongMaterial,
                 mapUniforms,
+                precisionForTests,
             ],
         });
     }
@@ -341,12 +397,12 @@ uniform mapUniforms {
 
     float valueRangeMin;
     float valueRangeMax;
-    float colorMapRangeMin;
-    float colorMapRangeMax;
+    float colormapRangeMin;
+    float colormapRangeMax;
 
-    vec3 colorMapClampColor;
+    vec3 colormapClampColor;
     bool isClampColor;
-    bool isColorMapClampColorTransparent;
+    bool isColormapClampColorTransparent;
     bool smoothShading;
     bool ZIncreasingDownwards;
 } map;
@@ -358,11 +414,11 @@ type MapUniformsType = {
     contourInterval: number;
     valueRangeMin: number;
     valueRangeMax: number;
-    colorMapRangeMin: number;
-    colorMapRangeMax: number;
-    colorMapClampColor: [number, number, number];
+    colormapRangeMin: number;
+    colormapRangeMax: number;
+    colormapClampColor: RGBColor;
     isClampColor: boolean;
-    isColorMapClampColorTransparent: boolean;
+    isColormapClampColorTransparent: boolean;
     smoothShading: boolean;
     ZIncreasingDownwards: boolean;
 };
@@ -378,11 +434,11 @@ const mapUniforms = {
         contourInterval: "f32",
         valueRangeMin: "f32",
         valueRangeMax: "f32",
-        colorMapRangeMin: "f32",
-        colorMapRangeMax: "f32",
-        colorMapClampColor: "vec3<f32>",
+        colormapRangeMin: "f32",
+        colormapRangeMax: "f32",
+        colormapClampColor: "vec3<f32>",
         isClampColor: "u32",
-        isColorMapClampColorTransparent: "u32",
+        isColormapClampColorTransparent: "u32",
         smoothShading: "u32",
         ZIncreasingDownwards: "u32",
     },

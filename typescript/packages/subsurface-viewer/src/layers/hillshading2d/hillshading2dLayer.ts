@@ -1,14 +1,23 @@
-import { project32, type LayerProps, type PickingInfo } from "@deck.gl/core";
-import { BitmapLayer } from "@deck.gl/layers";
-import { getModelMatrix } from "../utils/layerTools";
 import type { Texture } from "@luma.gl/core";
+import { project32, type LayerProps, type PickingInfo } from "@deck.gl/core";
 import type { BitmapLayerPickingInfo, BitmapLayerProps } from "@deck.gl/layers";
+import { BitmapLayer } from "@deck.gl/layers";
+
 import type { Model } from "@luma.gl/engine";
 import type { ShaderModule } from "@luma.gl/shadertools";
-import type { ReportBoundingBoxAction } from "../../components/Map";
-import type { LayerPickInfo } from "../../layers/utils/layerTools";
+
+import type {
+    LayerPickInfo,
+    ReportBoundingBoxAction,
+} from "../utils/layerTools";
+import { getModelMatrix } from "../utils/layerTools";
 import type { ValueDecoder } from "../utils/propertyMapTools";
 import { decodeRGB } from "../utils/propertyMapTools";
+
+import type { RGBColor } from "../../utils";
+
+import { precisionForTests } from "../shader_modules/test-precision/precisionForTests";
+
 import fsHillshading from "./hillshading2d.fs.glsl";
 
 // Most props are inherited from DeckGL's BitmapLayer. For a full list, see:
@@ -104,8 +113,8 @@ export default class Hillshading2DLayer extends BitmapLayer<Hillshading2DProps> 
 
         const valueRangeMin = this.props.valueRange[0] ?? 0.0;
         const valueRangeMax = this.props.valueRange[1] ?? 1.0;
-        const colorMapRangeMin = this.props.colorMapRange?.[0] ?? valueRangeMin;
-        const colorMapRangeMax = this.props.colorMapRange?.[1] ?? valueRangeMax;
+        const colormapRangeMin = this.props.colorMapRange?.[0] ?? valueRangeMin;
+        const colormapRangeMax = this.props.colorMapRange?.[1] ?? valueRangeMax;
 
         const [minVal, maxVal] = this.props.valueRange;
 
@@ -124,8 +133,8 @@ export default class Hillshading2DLayer extends BitmapLayer<Hillshading2DProps> 
             map: {
                 valueRangeMin,
                 valueRangeMax,
-                colorMapRangeMin,
-                colorMapRangeMax,
+                colormapRangeMin,
+                colormapRangeMax,
 
                 bitmapResolution,
                 valueRangeSize,
@@ -146,7 +155,12 @@ export default class Hillshading2DLayer extends BitmapLayer<Hillshading2DProps> 
         // use object.assign to make sure we don't overwrite existing fields like `vs`, `modules`...
         return Object.assign({}, parentShaders, {
             fs: fsHillshading,
-            modules: [...parentShaders.modules, project32, map2DUniforms],
+            modules: [
+                ...parentShaders.modules,
+                project32,
+                map2DUniforms,
+                precisionForTests,
+            ],
         });
     }
 
@@ -185,8 +199,8 @@ const map2DUniformsBlock = /*glsl*/ `\
 uniform mapUniforms {
     float valueRangeMin;
     float valueRangeMax;
-    float colorMapRangeMin;
-    float colorMapRangeMax;
+    float colormapRangeMin;
+    float colormapRangeMax;
 
     vec2 bitmapResolution;
     float valueRangeSize;
@@ -209,9 +223,9 @@ float decode_rgb2float(vec3 rgb) {
     value = floor(value / map.step + 0.5) * map.step;
   }
 
-  // If colorMapRangeMin/Max specified, color map will span this interval.
+  // If colormapRangeMin/Max specified, color map will span this interval.
   float x  = value * (map.valueRangeMax - map.valueRangeMin) + map.valueRangeMin;
-  x = (x - map.colorMapRangeMin) / (map.colorMapRangeMax - map.colorMapRangeMin);
+  x = (x - map.colormapRangeMin) / (map.colormapRangeMax - map.colormapRangeMin);
   x = max(0.0, x);
   x = min(1.0, x);
 
@@ -222,8 +236,8 @@ float decode_rgb2float(vec3 rgb) {
 type Map2DUniformsType = {
     valueRangeMin: number;
     valueRangeMax: number;
-    colorMapRangeMin: number;
-    colorMapRangeMax: number;
+    colormapRangeMin: number;
+    colormapRangeMax: number;
 
     bitmapResolution: [number, number];
     valueRangeSize: number;
@@ -231,7 +245,7 @@ type Map2DUniformsType = {
     ambientLightIntensity: number;
     diffuseLightIntensity: number;
 
-    rgbScaler: [number, number, number];
+    rgbScaler: RGBColor;
     floatScaler: number;
     offset: number;
     step: number;
@@ -245,8 +259,8 @@ const map2DUniforms = {
     uniformTypes: {
         valueRangeMin: "f32",
         valueRangeMax: "f32",
-        colorMapRangeMin: "f32",
-        colorMapRangeMax: "f32",
+        colormapRangeMin: "f32",
+        colormapRangeMax: "f32",
 
         bitmapResolution: "vec2<f32>",
         valueRangeSize: "f32",

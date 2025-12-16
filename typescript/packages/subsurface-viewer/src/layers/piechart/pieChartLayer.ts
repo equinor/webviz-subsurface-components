@@ -1,8 +1,14 @@
-import type { Color, PickingInfo, UpdateParameters } from "@deck.gl/core";
+import type {
+    Color,
+    PickingInfo,
+    LayerProps,
+    UpdateParameters,
+} from "@deck.gl/core";
 import { Layer, picking, project32 } from "@deck.gl/core";
 
 import type { Device } from "@luma.gl/core";
 import { GL } from "@luma.gl/constants";
+import type { ShaderModule } from "@luma.gl/shadertools";
 import { Geometry, Model } from "@luma.gl/engine";
 
 import { Vector2 } from "@math.gl/core";
@@ -13,8 +19,11 @@ import type {
     PropertyDataType,
 } from "../utils/layerTools";
 import { createPropertyData } from "../utils/layerTools";
-import fragmentShader from "./fragment.glsl";
-import vertexShader from "./vertex.glsl";
+
+import { precisionForTests } from "../shader_modules/test-precision/precisionForTests";
+
+import fragmentShader from "./piechart.fs.glsl";
+import vertexShader from "./piechart.vs.glsl";
 
 type PieProperties = [{ color: Color; label: string }];
 
@@ -152,8 +161,16 @@ export default class PieChartLayer extends Layer<PieChartLayerProps<PiesData>> {
 
         const model = new Model(device, {
             id: `${this.props.id}-pie`,
-            vs: vertexShader,
-            fs: fragmentShader,
+            ...super.getShaders({
+                vs: vertexShader,
+                fs: fragmentShader,
+                modules: [
+                    project32,
+                    picking,
+                    precisionForTests,
+                    piechartUniforms,
+                ],
+            }),
             geometry: new Geometry({
                 topology: "triangle-list",
                 attributes: {
@@ -166,8 +183,6 @@ export default class PieChartLayer extends Layer<PieChartLayerProps<PiesData>> {
                 },
                 vertexCount: vertexs.length / 3,
             }),
-
-            modules: [project32, picking],
             isInstanced: false, // This only works when set to false.
         });
 
@@ -205,7 +220,7 @@ export default class PieChartLayer extends Layer<PieChartLayerProps<PiesData>> {
             gl.disable(GL.DEPTH_TEST);
         }
 
-        model.setUniforms({ scale });
+        model.shaderInputs.setProps({ ...args.uniforms, piechart: { scale } });
         model.draw(context.renderPass);
 
         if (!this.props.depthTest) {
@@ -242,3 +257,21 @@ export default class PieChartLayer extends Layer<PieChartLayerProps<PiesData>> {
 
 PieChartLayer.layerName = "PieChartLayer";
 PieChartLayer.defaultProps = defaultProps;
+
+const piechartUniformsBlock = `\
+uniform piechartUniforms {
+    uniform float scale;
+} piechart;
+`;
+
+type PieChartUniformsType = { scale: number };
+
+// NOTE: this must exactly the same name than in the uniform block
+const piechartUniforms = {
+    name: "piechart",
+    vs: piechartUniformsBlock,
+    fs: undefined,
+    uniformTypes: {
+        scale: "f32",
+    },
+} as const satisfies ShaderModule<LayerProps, PieChartUniformsType>;

@@ -1,3 +1,99 @@
+## 1.6.18 (2025-12-09)
+
+This was a version bump only for group-tree-plot to align it with other projects, there were no code changes.
+
+## 1.6.17 (2025-12-01)
+
+This was a version bump only for group-tree-plot to align it with other projects, there were no code changes.
+
+## 1.6.16 (2025-11-28)
+
+This was a version bump only for group-tree-plot to align it with other projects, there were no code changes.
+
+## 1.6.15 (2025-11-27)
+
+This was a version bump only for group-tree-plot to align it with other projects, there were no code changes.
+
+## 1.6.14 (2025-11-22)
+
+This was a version bump only for group-tree-plot to align it with other projects, there were no code changes.
+
+## 1.6.13 (2025-11-19)
+
+This was a version bump only for group-tree-plot to align it with other projects, there were no code changes.
+
+## 1.6.12 (2025-11-13)
+
+This was a version bump only for group-tree-plot to align it with other projects, there were no code changes.
+
+## 1.6.11 (2025-11-13)
+
+This was a version bump only for group-tree-plot to align it with other projects, there were no code changes.
+
+## 1.6.10 (2025-11-03)
+
+This was a version bump only for group-tree-plot to align it with other projects, there were no code changes.
+
+## 1.6.9 (2025-10-28)
+
+This was a version bump only for group-tree-plot to align it with other projects, there were no code changes.
+
+## 1.6.8 (2025-10-27)
+
+This was a version bump only for group-tree-plot to align it with other projects, there were no code changes.
+
+## 1.6.7 (2025-10-13)
+
+This was a version bump only for group-tree-plot to align it with other projects, there were no code changes.
+
+## 1.6.6 (2025-10-09)
+
+### 🩹 Fixes
+
+- prepare for deck.gl 9.2 ([#2635](https://github.com/equinor/webviz-subsurface-components/pull/2635))
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
+## 1.6.5 (2025-10-03)
+
+This was a version bump only for group-tree-plot to align it with other projects, there were no code changes.
+
+## 1.6.4 (2025-08-07)
+
+This was a version bump only for group-tree-plot to align it with other projects, there were no code changes.
+
+## 1.6.3 (2025-08-06)
+
+This was a version bump only for group-tree-plot to align it with other projects, there were no code changes.
+
+## 1.6.2 (2025-08-01)
+
+This was a version bump only for group-tree-plot to align it with other projects, there were no code changes.
+
+## 1.6.1 (2025-08-01)
+
+This was a version bump only for group-tree-plot to align it with other projects, there were no code changes.
+
+## 1.6.0 (2025-07-30)
+
+This was a version bump only for group-tree-plot to align it with other projects, there were no code changes.
+
+## 1.5.6 (2025-07-22)
+
+This was a version bump only for group-tree-plot to align it with other projects, there were no code changes.
+
+## 1.5.5 (2025-07-09)
+
+This was a version bump only for group-tree-plot to align it with other projects, there were no code changes.
+
+## 1.5.4 (2025-05-23)
+
+### 🩹 Fixes
+
+- bump the deckgl group in /typescript with 8 updates ([#2563](https://github.com/equinor/webviz-subsurface-components/pull/2563), [#9630](https://github.com/equinor/webviz-subsurface-components/issues/9630), [#9550](https://github.com/equinor/webviz-subsurface-components/issues/9550), [#9621](https://github.com/equinor/webviz-subsurface-components/issues/9621), [#9427](https://github.com/equinor/webviz-subsurface-components/issues/9427), [#9598](https://github.com/equinor/webviz-subsurface-components/issues/9598))
+
 ## [1.5.3](https://github.com/equinor/webviz-subsurface-components/compare/group-tree-plot@1.5.2...group-tree-plot@1.5.3) (2025-05-02)
 
 

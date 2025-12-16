@@ -1,5 +1,5 @@
 import { removeConsecutiveDuplicates, splineRefine } from "./spline";
-import type { Position3D } from "../../utils/layerTools";
+import type { Point3D } from "../../../utils";
 import type {
     FeatureCollection,
     GeometryCollection,
@@ -44,13 +44,13 @@ const testWell: FeatureCollection<GeometryCollection> = {
 };
 
 describe("remove duplicates", () => {
-    const coords: Position3D[] = [
+    const coords: Point3D[] = [
         [1, 2, 3],
         [1, 2, 3],
         [4, 5, 6],
     ];
 
-    const coordsRes: Position3D[] = [
+    const coordsRes: Point3D[] = [
         [1, 2, 3],
         [4, 5, 6],
     ];
@@ -58,7 +58,7 @@ describe("remove duplicates", () => {
     const mds = [0, 1, 2];
     const mdsRes = [1, 2];
 
-    const coordsEmpty: Position3D[] = [];
+    const coordsEmpty: Point3D[] = [];
     const mdsEmpty: number[] = [];
 
     it("should remove duplicate", () => {

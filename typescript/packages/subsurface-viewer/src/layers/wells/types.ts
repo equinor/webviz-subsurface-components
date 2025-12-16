@@ -1,7 +1,7 @@
 import type { Color } from "@deck.gl/core";
-import type { Feature, GeometryCollection, FeatureCollection } from "geojson";
-import type { LayerPickInfo } from "../utils/layerTools";
+import type { Feature, FeatureCollection, GeometryCollection } from "geojson";
 import type { NumberPair, StyleAccessorFunction } from "../types";
+import type { LayerPickInfo } from "../utils/layerTools";
 
 export type GeoJsonWellProperties = {
     name: string;
@@ -13,7 +13,10 @@ export type WellFeature = Feature<GeometryCollection, GeoJsonWellProperties>;
 export type WellFeatureCollection = FeatureCollection<
     GeometryCollection,
     GeoJsonWellProperties
->;
+> & {
+    // ? This is used in the example volve-well feature-collection, but is not part of the standard. Should we include it?
+    unit?: string;
+};
 
 export interface WellsPickInfo extends LayerPickInfo<WellFeature> {
     featureType?: string;
@@ -56,3 +59,7 @@ export type WellHeadStyleAccessor = {
     color?: ColorAccessor;
     size?: SizeAccessor;
 };
+
+export type AbscissaTransform = (
+    featureCollection: WellFeatureCollection
+) => WellFeatureCollection;

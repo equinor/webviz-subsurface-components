@@ -7,18 +7,15 @@ import { ClipExtension } from "@deck.gl/extensions";
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import InfoCard from "../../components/InfoCard";
-import type {
-    BoundingBox2D,
-    BoundingBox3D,
-    ViewsType,
-} from "../../components/Map";
+import type { ViewsType } from "../../components/Map";
 import { useHoverInfo } from "../../components/Map";
+import type { BoundingBox2D, BoundingBox3D } from "../../utils";
 
 import { ViewFooter } from "../../components/ViewFooter";
 import AxesLayer from "../../layers/axes/axesLayer";
 import MapLayer from "../../layers/map/mapLayer";
 import NorthArrow3DLayer from "../../layers/northarrow/northArrow3DLayer";
-import type { ColorMapFunctionType } from "../../layers/utils/layerTools";
+import type { ColormapFunctionType } from "../../layers/utils/colormapTools";
 
 import {
     default2DViews,
@@ -474,7 +471,7 @@ function makeData(n: number, amplitude: number): Float32Array {
     return data;
 }
 
-function nearestColorMap(x: number) {
+function nearestColormap(x: number) {
     if (x > 0.5) return [100, 255, 255];
     else if (x > 0.1) return [255, 100, 255];
     return [255, 255, 100];
@@ -484,6 +481,7 @@ function nearestColorMap(x: number) {
 const TypedArrayInputComponent: React.FC<{
     triggerHome: number;
     dimension: number;
+    noProperty: boolean;
 }> = (args) => {
     const subsurfaceViewerArgs = {
         id: "map",
@@ -499,12 +497,17 @@ const TypedArrayInputComponent: React.FC<{
                     rotDeg: 0,
                 },
                 meshData: makeData(args.dimension, 99),
-                propertiesData: makeData(args.dimension, 1),
+                propertiesData: makeData(
+                    args.noProperty ? 0 : args.dimension,
+                    1
+                ),
                 gridLines: false,
                 material: true,
                 ZIncreasingDownwards: false,
                 contours: [0, 5],
-                colorMapFunction: nearestColorMap as ColorMapFunctionType,
+                colorMapFunction: args.noProperty
+                    ? [200, 200, 0]
+                    : (nearestColormap as ColormapFunctionType),
             },
             {
                 "@@type": "AxesLayer",
@@ -552,17 +555,40 @@ export const TypedArrayInput: StoryObj<typeof TypedArrayInputComponent> = {
     render: (args) => <TypedArrayInputComponent {...args} />,
 };
 
+export const TypedArrayWithoutPropertyInput: StoryObj<
+    typeof TypedArrayInputComponent
+> = {
+    args: {
+        dimension: 300,
+    },
+    argTypes: {
+        dimension: {
+            control: { type: "range", min: 150, max: 300, step: 1 },
+        },
+    },
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: "Both mesh and property data given as typed arrays arrays (as opposed to URL).",
+            },
+        },
+    },
+    render: (args) => (
+        <TypedArrayInputComponent {...{ ...args, noProperty: true }} />
+    ),
+};
+
 const ReadoutComponent: React.FC = () => {
     const [hoverInfo, hoverCallback] = useHoverInfo();
 
-    const args = React.useMemo(() => {
+    const args = React.useMemo<SubsurfaceViewerProps>(() => {
         return {
             id: "readout",
             bounds: hugin2DBounds,
             layers: [{ ...hugin25mKhNetmapMapLayer, material: false }],
-            coords: {
-                visible: false,
-            },
+            showReadout: false,
+            pickingDepth: 1,
             onMouseEvent: hoverCallback,
         };
     }, [hoverCallback]);
@@ -590,7 +616,7 @@ export const Readout: StoryObj<typeof ReadoutComponent> = {
 const BigMapWithHoleComponent: React.FC = () => {
     const [hoverInfo, hoverCallback] = useHoverInfo();
 
-    const args = React.useMemo(() => {
+    const args = React.useMemo<SubsurfaceViewerProps>(() => {
         return {
             id: "readout",
             bounds: hugin2DBounds,
@@ -602,9 +628,7 @@ const BigMapWithHoleComponent: React.FC = () => {
                     material: false,
                 },
             ],
-            coords: {
-                visible: false,
-            },
+            showReadout: false,
             onMouseEvent: hoverCallback,
         };
     }, [hoverCallback]);
@@ -764,23 +788,23 @@ const ExtensionsComponent: React.FC<
     SubsurfaceViewerProps & { clipX: number }
 > = (args) => {
     const rightClipBounds = [
-        // @ts-expect-error TS7053
+        // @ts-expect-error TS6133
         args.bounds?.[0] + args.clipX,
-        // @ts-expect-error TS7053
+        // @ts-expect-error TS6133
         args.bounds?.[1],
-        // @ts-expect-error TS7053
+        // @ts-expect-error TS6133
         args.bounds?.[2],
-        // @ts-expect-error TS7053
+        // @ts-expect-error TS6133
         args.bounds?.[3],
     ];
     const leftClipBounds = [
-        // @ts-expect-error TS7053
+        // @ts-expect-error TS6133
         args.bounds?.[0],
-        // @ts-expect-error TS7053
+        // @ts-expect-error TS6133
         args.bounds?.[1],
-        // @ts-expect-error TS7053
+        // @ts-expect-error TS6133
         args.bounds?.[0] + args.clipX,
-        // @ts-expect-error TS7053
+        // @ts-expect-error TS6133
         args.bounds?.[3],
     ];
 

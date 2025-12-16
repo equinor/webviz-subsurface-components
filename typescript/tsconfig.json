@@ -25,10 +25,11 @@
         "__mocks__",
         "cypress",
         "coverage",
+        "**/*.test.ts",
         "**/*.test.tsx",
+        "**/test/*.ts",
         "**/test/*.tsx",
-        "**/*.stories.tsx",
-        "**/*.test.ts"
+        "**/*.stories.tsx"
     ],
     "typedocOptions": {
         "entryPoints": ["./src/index.ts"],

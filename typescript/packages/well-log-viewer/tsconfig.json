@@ -9,6 +9,7 @@
         "src/demo",
         "src/test/",
         "src/Storybook/",
+        "./**/*.test.ts",
         "./**/*.test.tsx",
         "./**/*.stories.tsx",
         "./**/*.stories.mdx"

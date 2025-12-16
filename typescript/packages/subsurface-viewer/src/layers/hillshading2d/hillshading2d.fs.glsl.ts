@@ -1,7 +1,5 @@
-const fsHillshading = `#version 300 es
+export default `#version 300 es
 #define SHADER_NAME hillshading2d-fragment-shader
-
-precision highp float;
 
 in vec2 vTexCoord;
 
@@ -53,5 +51,3 @@ void main(void) {
   DECKGL_FILTER_COLOR(fragColor, geometry);
 }
 `;
-
-export default fsHillshading;

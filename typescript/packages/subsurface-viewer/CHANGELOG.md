@@ -1,3 +1,449 @@
+## 1.15.7 (2025-12-09)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.18
+
+## 1.15.6 (2025-12-09)
+
+### 🩹 Fixes
+
+- "SubsurfaceViewer: pickingRadius not working with overlapping layers #2320" ([#2669](https://github.com/equinor/webviz-subsurface-components/pull/2669), [#2320](https://github.com/equinor/webviz-subsurface-components/issues/2320))
+
+### ❤️ Thank You
+
+- nilscb @nilscb
+
+## 1.15.5 (2025-12-01)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.17
+
+## 1.15.4 (2025-12-01)
+
+### 🩹 Fixes
+
+- SubsurfaceViewer, ViewStateType missing properties ([#2667](https://github.com/equinor/webviz-subsurface-components/pull/2667))
+
+### ❤️ Thank You
+
+- Daniel Avila (Open to work) @danielsantiago1002
+- Håvard Bjerke
+
+## 1.15.3 (2025-11-28)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.16
+
+## 1.15.2 (2025-11-27)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.15
+
+## 1.15.1 (2025-11-22)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.14
+
+## 1.15.0 (2025-11-21)
+
+### 🚀 Features
+
+- Subsurface Viewer, Improve default camera controls ([#2657](https://github.com/equinor/webviz-subsurface-components/pull/2657))
+
+### ❤️ Thank You
+
+- Daniel Avila (Open to work) @danielsantiago1002
+- Håvard Bjerke
+
+## 1.14.15 (2025-11-19)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.13
+
+## 1.14.14 (2025-11-13)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.12
+
+## 1.14.13 (2025-11-13)
+
+### 🩹 Fixes
+
+- subsurface viewer, viewport with empty layer ids list should sho… ([#2655](https://github.com/equinor/webviz-subsurface-components/pull/2655))
+
+### ❤️ Thank You
+
+- danielsantiago1002 (Open to work)
+
+## 1.14.12 (2025-11-13)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.11
+
+## 1.14.11 (2025-11-03)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.10
+
+## 1.14.10 (2025-11-03)
+
+### 🩹 Fixes
+
+- use picked coordinate instead of unprojecting screen coordinates when multipicking ([#2649](https://github.com/equinor/webviz-subsurface-components/pull/2649), [#1229](https://github.com/equinor/webviz-subsurface-components/issues/1229))
+
+### ❤️ Thank You
+
+- Hans Kallekleiv @HansKallekleiv
+
+## 1.14.9 (2025-10-28)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.9
+
+## 1.14.8 (2025-10-28)
+
+### 🩹 Fixes
+
+- map moves to origin when double-clicking ([#2651](https://github.com/equinor/webviz-subsurface-components/pull/2651), [#2642](https://github.com/equinor/webviz-subsurface-components/issues/2642), [#2621](https://github.com/equinor/webviz-subsurface-components/issues/2621))
+
+### ❤️ Thank You
+
+- Anders Rantala Hunderi
+
+## 1.14.7 (2025-10-27)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.8
+
+## 1.14.6 (2025-10-16)
+
+### 🩹 Fixes
+
+- improve 2D axes rendering performance ([#2644](https://github.com/equinor/webviz-subsurface-components/pull/2644))
+
+### ❤️ Thank You
+
+- Håvard Bjerke
+
+## 1.14.5 (2025-10-16)
+
+### 🩹 Fixes
+
+- only show section data in SectionViews ([#2640](https://github.com/equinor/webviz-subsurface-components/pull/2640))
+
+### ❤️ Thank You
+
+- Håvard Bjerke
+
+## 1.14.4 (2025-10-16)
+
+### 🩹 Fixes
+
+- ZScale get re-applied to controlled views ([#2641](https://github.com/equinor/webviz-subsurface-components/pull/2641), [#2577](https://github.com/equinor/webviz-subsurface-components/issues/2577))
+
+### ❤️ Thank You
+
+- Anders Rantala Hunderi
+
+## 1.14.3 (2025-10-15)
+
+### 🩹 Fixes
+
+- readout for section view ([#2639](https://github.com/equinor/webviz-subsurface-components/pull/2639))
+
+### ❤️ Thank You
+
+- Håvard Bjerke
+
+## 1.14.2 (2025-10-13)
+
+### 🩹 Fixes
+
+- support seismic values with NaN ([#2637](https://github.com/equinor/webviz-subsurface-components/pull/2637))
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.7
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
+## 1.14.1 (2025-10-09)
+
+### 🩹 Fixes
+
+- prepare for deck.gl 9.2 ([#2635](https://github.com/equinor/webviz-subsurface-components/pull/2635))
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.6
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
+## 1.14.0 (2025-10-09)
+
+### 🚀 Features
+
+- custom section well projection ([#2630](https://github.com/equinor/webviz-subsurface-components/pull/2630))
+
+### ❤️ Thank You
+
+- Håvard Bjerke
+
+## 1.13.10 (2025-10-09)
+
+### 🩹 Fixes
+
+- [Subsurface Viewer] Fix picking radius for multi-picking and clamp interpolation ([#2621](https://github.com/equinor/webviz-subsurface-components/pull/2621))
+
+### ❤️ Thank You
+
+- Anders Rantala Hunderi
+
+## 1.13.9 (2025-10-06)
+
+### 🩹 Fixes
+
+- draw unfolded well trajectories adjacent ([#2623](https://github.com/equinor/webviz-subsurface-components/pull/2623), [#2019](https://github.com/equinor/webviz-subsurface-components/issues/2019))
+
+### ❤️ Thank You
+
+- Håvard Bjerke
+
+## 1.13.8 (2025-10-03)
+
+### 🩹 Fixes
+
+- bump the deckgl group in /typescript with 8 updates ([#2626](https://github.com/equinor/webviz-subsurface-components/pull/2626), [#9769](https://github.com/equinor/webviz-subsurface-components/issues/9769), [#9799](https://github.com/equinor/webviz-subsurface-components/issues/9799), [#9780](https://github.com/equinor/webviz-subsurface-components/issues/9780), [#9775](https://github.com/equinor/webviz-subsurface-components/issues/9775), [#9771](https://github.com/equinor/webviz-subsurface-components/issues/9771), [#9759](https://github.com/equinor/webviz-subsurface-components/issues/9759))
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.5
+
+## 1.13.7 (2025-10-01)
+
+### 🩹 Fixes
+
+- Fix seismic readout doc and display text. ([#2624](https://github.com/equinor/webviz-subsurface-components/pull/2624))
+
+### ❤️ Thank You
+
+- nilscb @nilscb
+
+## 1.13.6 (2025-09-30)
+
+### 🩹 Fixes
+
+- [NGRM] Cursor readout for Seismic layer #2617 ([#2620](https://github.com/equinor/webviz-subsurface-components/pull/2620), [#2617](https://github.com/equinor/webviz-subsurface-components/issues/2617))
+
+### ❤️ Thank You
+
+- nilscb @nilscb
+
+## 1.13.5 (2025-08-07)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.4
+
+## 1.13.4 (2025-08-06)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.3
+
+## 1.13.3 (2025-08-01)
+
+### 🩹 Fixes
+
+- bump @deck.gl-community/editable-layers ([#2605](https://github.com/equinor/webviz-subsurface-components/pull/2605))
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.2
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
+## 1.13.2 (2025-08-01)
+
+### 🩹 Fixes
+
+- bump the deckgl group in /typescript with 8 updates ([#2604](https://github.com/equinor/webviz-subsurface-components/pull/2604), [#9705](https://github.com/equinor/webviz-subsurface-components/issues/9705))
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.1
+
+## 1.13.1 (2025-07-31)
+
+### 🩹 Fixes
+
+- map without property ([#2602](https://github.com/equinor/webviz-subsurface-components/pull/2602), [#2589](https://github.com/equinor/webviz-subsurface-components/issues/2589))
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
+## 1.13.0 (2025-07-30)
+
+### 🚀 Features
+
+- add seismic layer ([#2589](https://github.com/equinor/webviz-subsurface-components/pull/2589), [#2588](https://github.com/equinor/webviz-subsurface-components/issues/2588))
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.0
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
+## 1.12.5 (2025-07-30)
+
+### 🩹 Fixes
+
+- centralize shader precision for tests ([#2601](https://github.com/equinor/webviz-subsurface-components/pull/2601))
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
+## 1.12.4 (2025-07-22)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.2.6
+
+## 1.12.3 (2025-07-09)
+
+### 🩹 Fixes
+
+- bump the deckgl group in /typescript with 8 updates ([#2592](https://github.com/equinor/webviz-subsurface-components/pull/2592), [#9695](https://github.com/equinor/webviz-subsurface-components/issues/9695), [#9693](https://github.com/equinor/webviz-subsurface-components/issues/9693), [#9629](https://github.com/equinor/webviz-subsurface-components/issues/9629), [#9668](https://github.com/equinor/webviz-subsurface-components/issues/9668), [#9603](https://github.com/equinor/webviz-subsurface-components/issues/9603))
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.2.5
+
+## 1.12.2 (2025-06-26)
+
+### 🩹 Fixes
+
+- make triangle line shader consistent with triangle shader ([#2587](https://github.com/equinor/webviz-subsurface-components/pull/2587))
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
+## 1.12.1 (2025-06-23)
+
+### 🩹 Fixes
+
+- loadURLData throws if the url can not be resolved ([#2586](https://github.com/equinor/webviz-subsurface-components/pull/2586))
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
+## 1.12.0 (2025-06-17)
+
+### 🚀 Features
+
+- unify exposed types naming to colormap ([#2584](https://github.com/equinor/webviz-subsurface-components/pull/2584), [#2581](https://github.com/equinor/webviz-subsurface-components/issues/2581))
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
+## 1.11.10 (2025-06-17)
+
+### 🩹 Fixes
+
+- unify non exposed naming to colormap ([#2583](https://github.com/equinor/webviz-subsurface-components/pull/2583), [#2580](https://github.com/equinor/webviz-subsurface-components/issues/2580))
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
+## 1.11.9 (2025-06-12)
+
+### 🩹 Fixes
+
+- Multiple layers not including default `shaderModules` and `layer.opacity` not used in fragment shader ([#2572](https://github.com/equinor/webviz-subsurface-components/pull/2572))
+
+### ❤️ Thank You
+
+- Ruben Thoms @rubenthoms
+
+## 1.11.8 (2025-06-05)
+
+### 🩹 Fixes
+
+- event handling has undefined behavior when double clicking on viewer background ([#2571](https://github.com/equinor/webviz-subsurface-components/pull/2571), [#2570](https://github.com/equinor/webviz-subsurface-components/issues/2570))
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
+## 1.11.7 (2025-06-04)
+
+### 🩹 Fixes
+
+- "SubsurfaceViewer: colorAbove/colorBelow/colorNaN possibly not working? #2479" ([#2569](https://github.com/equinor/webviz-subsurface-components/pull/2569), [#2479](https://github.com/equinor/webviz-subsurface-components/issues/2479))
+
+### ❤️ Thank You
+
+- nilscb
+
+## 1.11.6 (2025-05-23)
+
+### 🩹 Fixes
+
+- bump the deckgl group in /typescript with 8 updates ([#2563](https://github.com/equinor/webviz-subsurface-components/pull/2563), [#9630](https://github.com/equinor/webviz-subsurface-components/issues/9630), [#9550](https://github.com/equinor/webviz-subsurface-components/issues/9550), [#9621](https://github.com/equinor/webviz-subsurface-components/issues/9621), [#9427](https://github.com/equinor/webviz-subsurface-components/issues/9427), [#9598](https://github.com/equinor/webviz-subsurface-components/issues/9598))
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.2.4
+
+## 1.11.5 (2025-05-20)
+
+### 🩹 Fixes
+
+- test package publishing using nx release ([#2556](https://github.com/equinor/webviz-subsurface-components/pull/2556))
+
+### ❤️ Thank You
+
+- Håvard Bjerke
+
+## [1.11.4](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.11.3...subsurface-viewer@1.11.4) (2025-05-16)
+
+
+### Bug Fixes
+
+* wrong Z readout when a Z scale has been applied. ([#2542](https://github.com/equinor/webviz-subsurface-components/issues/2542)) ([f603cdb](https://github.com/equinor/webviz-subsurface-components/commit/f603cdbe8b97275bd4177da9edd9d2072f11f1b0)), closes [#2537](https://github.com/equinor/webviz-subsurface-components/issues/2537)
+
+## [1.11.3](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.11.2...subsurface-viewer@1.11.3) (2025-05-15)
+
+
+### Bug Fixes
+
+* Disable depth test for cross-hair layer to always keep it at top ([#2544](https://github.com/equinor/webviz-subsurface-components/issues/2544)) ([a65383d](https://github.com/equinor/webviz-subsurface-components/commit/a65383db55f7cd048897508e8c9e6dce28ab309b))
+
 ## [1.11.2](https://github.com/equinor/webviz-subsurface-components/compare/subsurface-viewer@1.11.1...subsurface-viewer@1.11.2) (2025-05-12)
 
 

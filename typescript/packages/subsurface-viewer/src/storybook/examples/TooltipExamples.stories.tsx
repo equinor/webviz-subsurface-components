@@ -7,6 +7,7 @@ import type { Feature } from "geojson";
 import type { PickingInfo } from "@deck.gl/core";
 import { View } from "@deck.gl/core";
 
+import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import InfoCard from "../../components/InfoCard";
 import type { MapMouseEvent, TooltipCallback } from "../../components/Map";
@@ -171,7 +172,7 @@ const MouseEventComponent: React.FC<MouseEvenComponentProps> = (
     );
 
     const subsurfaceProps = React.useMemo<Record<string, unknown>>(() => {
-        const props = {
+        const props: Partial<SubsurfaceViewerProps> = {
             layers: [volveWellsWithLogsLayer, hugin25mKhNetmapMapLayer],
             bounds: volveWellsBounds,
             onMouseEvent: handleEvent,
@@ -179,7 +180,8 @@ const MouseEventComponent: React.FC<MouseEvenComponentProps> = (
                 layout: [1, 1] as [number, number],
                 viewports: [{ id: "test", show3D: args.show3d }],
             },
-            coords: { visible: false },
+            showReadout: false,
+            pickingDepth: 1,
         };
         return props;
     }, [handleEvent, args.show3d]);

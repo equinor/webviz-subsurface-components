@@ -1,18 +1,14 @@
-import type { Color } from "@deck.gl/core";
 import type { Meta, StoryObj } from "@storybook/react";
-import { all, create } from "mathjs";
 import React from "react";
+
+import { OrbitView, OrthographicView } from "@deck.gl/core";
+import { fireEvent, userEvent } from "@storybook/test";
 import { AxesLayer, WellsLayer } from "../../layers";
-import type { Position3D } from "../../layers/utils/layerTools";
 import type { WellLabelLayerProps } from "../../layers/wells/layers/wellLabelLayer";
 import {
     LabelOrientation,
     WellLabelLayer,
 } from "../../layers/wells/layers/wellLabelLayer";
-import type {
-    WellFeature,
-    WellFeatureCollection,
-} from "../../layers/wells/types";
 import type { ViewStateType, ViewsType } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import {
@@ -20,10 +16,15 @@ import {
     LABEL_POSITION_ARGTYPES,
     LABEL_SIZE_ARGTYPES,
     TRAJECTORY_SIMULATION_ARGTYPES,
+    WELL_COUNT_ARGTYPES,
 } from "../constant/argTypes";
-import type { TrajectorySimulationProps } from "../types/trajectory";
+import type { TrajectorySimulationProps } from "../types/well";
 import { getRgba } from "../util/color";
-import { fireEvent, userEvent } from "@storybook/test";
+import {
+    createSyntheticWellCollection,
+    getSyntheticWells,
+    useSyntheticWellCollection,
+} from "../util/wellSynthesis";
 
 type WellCount = { wellCount: number };
 
@@ -40,34 +41,24 @@ const stories: Meta = {
         },
     },
     argTypes: {
-        wellCount: {
-            control: {
-                type: "range",
-                min: 1,
-                max: 1000,
-                step: 1,
-            },
-        },
+        ...WELL_COUNT_ARGTYPES,
     },
     args: {
         wellCount: 10,
     },
 };
 
-const math = create(all, { randomSeed: "1984" });
-const randomFunc = math?.random ? math.random : Math.random;
-
 const DEFAULT_VIEWS: ViewsType = {
     layout: [1, 2],
     viewports: [
         {
             id: "view_1",
-            show3D: false,
+            viewType: OrthographicView,
             layerIds: ["well-layer", "well-labels"],
         },
         {
             id: "view_2",
-            show3D: true,
+            viewType: OrbitView,
             layerIds: ["well-layer", "axes-layer-3d", "well-labels"],
         },
     ],
@@ -79,12 +70,12 @@ const SPLIT_VIEWS: ViewsType = {
     viewports: [
         {
             id: "view_1",
-            show3D: false,
+            viewType: OrthographicView,
             layerIds: ["well-layer", "label-2d"],
         },
         {
             id: "view_2",
-            show3D: true,
+            viewType: OrbitView,
             layerIds: ["well-layer", "axes-layer-3d", "label-3d"],
         },
     ],
@@ -95,182 +86,6 @@ const WELL_LAYER_PROPS = {
     wellNameVisible: false,
     wellHeadStyle: { size: 6 },
 };
-
-/**
- * Generate a random deviation
- * @param magnitude maximum deviation in degrees
- * @returns deviation in radians
- */
-const getRandomDeviation = (magnitude = 10, mean = 5) => {
-    return (randomFunc() * (mean * 2 - magnitude * 0.5) * Math.PI) / 180;
-};
-
-const getRandomColor = (): Color => {
-    const r = 100 + Math.floor(randomFunc() * 155);
-    const g = 100 + Math.floor(randomFunc() * 155);
-    const b = 100 + Math.floor(randomFunc() * 155);
-    return [r, g, b, 255];
-};
-
-const createSyntheticWell = (
-    index: number,
-    headPosition: Position3D,
-    sampleCount = 20,
-    segmentLength = 150,
-    dipDeviationMagnitude = 10
-): WellFeature => {
-    // Create a random well name
-    const name = `Well ${index}`;
-
-    const avgDipDeviation = randomFunc() * dipDeviationMagnitude;
-    const avgAzimuthDeviation = randomFunc() * 5 - 2.5;
-    const maxDip = Math.PI * 0.5 + 0.05;
-
-    // Create a random well geometry
-    const coordinates = [headPosition];
-
-    // Lead with at least three vertical segments
-    const leadCount = Math.trunc(randomFunc() * (sampleCount - 3)) + 3;
-    for (let i = 0; i < leadCount; i++) {
-        const x = coordinates[coordinates.length - 1][0];
-        const y = coordinates[coordinates.length - 1][1];
-        const z = coordinates[coordinates.length - 1][2] + segmentLength;
-        coordinates.push([x, y, z]);
-    }
-
-    let previousAzimuth = randomFunc() * Math.PI * 2;
-    let previousDip = 0;
-
-    for (let i = 0; i < sampleCount - leadCount; i++) {
-        const prevSample = coordinates[coordinates.length - 1];
-        const azimuth =
-            previousAzimuth + getRandomDeviation(5, avgAzimuthDeviation);
-        const dip = Math.min(
-            previousDip +
-                getRandomDeviation(dipDeviationMagnitude, avgDipDeviation),
-            maxDip
-        );
-        const x =
-            prevSample[0] + segmentLength * Math.cos(azimuth) * Math.sin(dip);
-        const y =
-            prevSample[1] + segmentLength * Math.sin(azimuth) * Math.sin(dip);
-        const z = prevSample[2] + segmentLength * Math.cos(dip);
-
-        coordinates.push([x, y, z]);
-        previousAzimuth = azimuth;
-        previousDip = dip;
-    }
-
-    return {
-        type: "Feature",
-        properties: {
-            name,
-            md: [],
-            color: getRandomColor(),
-        },
-        geometry: {
-            type: "GeometryCollection",
-            geometries: [
-                {
-                    type: "Point",
-                    coordinates: headPosition,
-                },
-                {
-                    type: "LineString",
-                    coordinates,
-                },
-            ],
-        },
-    };
-};
-
-/**
- * Create random well heads
- */
-const createSyntheticWellHeads = (count = 100): Position3D[] => {
-    const wellHeads: Position3D[] = [];
-    for (let i = 0; i < count; i++) {
-        const dx = randomFunc() * 10000 - 2000;
-        const dy = randomFunc() * 8000 - 2000;
-        const headPosition: Position3D = [456000 + dx, 6785000 + dy, 0];
-        wellHeads.push(headPosition);
-    }
-    return wellHeads;
-};
-
-// A pool of random well heads; fewer than trajectories in order to create clusters
-const SYNTHETIC_WELL_HEADS = createSyntheticWellHeads();
-
-const createSyntheticWellCollection = (
-    wellCount = 1000,
-    wellHeadCount = 100,
-    {
-        sampleCount,
-        segmentLength,
-        dipDeviationMagnitude,
-    }: TrajectorySimulationProps = {
-        sampleCount: 20,
-        segmentLength: 150,
-        dipDeviationMagnitude: 20,
-    }
-): WellFeatureCollection => {
-    const wellHeads = SYNTHETIC_WELL_HEADS.slice(
-        0,
-        wellHeadCount
-    ) as Position3D[];
-
-    const wells: WellFeature[] = [];
-
-    for (let i = 0; i < wellCount; i++) {
-        // Draw from collection of heads in order to create clusters
-        const wellPerClusterCount = Math.trunc(wellCount / wellHeadCount) + 1;
-        const headIndex = Math.trunc(i / wellPerClusterCount);
-        const headPosition = wellHeads[headIndex];
-
-        const syntheticWell = createSyntheticWell(
-            i,
-            headPosition,
-            sampleCount,
-            segmentLength,
-            dipDeviationMagnitude
-        );
-        wells.push(syntheticWell);
-    }
-
-    return {
-        type: "FeatureCollection",
-        features: wells,
-    };
-};
-
-const useSyntheticWellCollection = (
-    wellCount = 1000,
-    wellHeadCount = 100,
-    {
-        sampleCount,
-        segmentLength,
-        dipDeviationMagnitude,
-    }: TrajectorySimulationProps = {
-        sampleCount: 20,
-        segmentLength: 150,
-        dipDeviationMagnitude: 10,
-    }
-): WellFeatureCollection =>
-    React.useMemo(
-        () =>
-            createSyntheticWellCollection(wellCount, wellHeadCount, {
-                sampleCount,
-                segmentLength,
-                dipDeviationMagnitude,
-            }),
-        [
-            wellCount,
-            wellHeadCount,
-            sampleCount,
-            segmentLength,
-            dipDeviationMagnitude,
-        ]
-    );
 
 const SYNTHETIC_WELLS = createSyntheticWellCollection(1000);
 
@@ -284,14 +99,6 @@ const AXES_LAYERS = [
 const DEFAULT_LABEL_PROPS = {
     id: "well-labels",
     data: SYNTHETIC_WELLS.features,
-};
-
-const getSyntheticWells = (wellCount: number): WellFeatureCollection => {
-    const wells = SYNTHETIC_WELLS.features.slice(0, wellCount);
-    return {
-        type: "FeatureCollection",
-        features: wells,
-    };
 };
 
 export const Default: StoryObj<WellCount> = {
@@ -350,7 +157,7 @@ export const WellLabelPicking: StoryObj<typeof SubsurfaceViewer> = {
                 viewports: [
                     {
                         id: "view_1",
-                        show3D: false,
+                        viewType: OrthographicView,
                         layerIds: [
                             "well-layer",
                             "axes-layer-3d",

@@ -1,10 +1,11 @@
-const fsShader = `\
+export default `\
 #version 300 es
 #define SHADER_NAME grid3d-node-fragment-shader
 
 in vec3 cameraPosition;
 in vec4 position_commonspace;
 in float property;
+in vec4 vColor;
 
 flat in vec3 normal;
 flat in int vertexIndex;
@@ -15,11 +16,11 @@ uniform sampler2D colormap;
 
 vec4 getPropertyColor (float propertyValue) {
    vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
-   float normalizedValue = (propertyValue - grid.colorMapRangeMin) / (grid.colorMapRangeMax - grid.colorMapRangeMin);
+   float normalizedValue = (propertyValue - grid.colormapRangeMin) / (grid.colormapRangeMax - grid.colormapRangeMin);
    if (normalizedValue < 0.0 || normalizedValue > 1.0) {
       // Out of range. Use clampcolor.
       if (grid.isClampColor) {
-         color = grid.colorMapClampColor;
+         color = grid.colormapClampColor;
          if( color[3] == 0.0 ) {
             discard;
          }
@@ -39,10 +40,10 @@ vec4 getPropertyColor (float propertyValue) {
 
 void main(void) {
    if (picking.isActive > 0.5 && !(picking.isAttribute > 0.5)) {
-      fragColor = encodeVertexIndexToRGB(vertexIndex);      
+      fragColor = encodeIndexToRGB(vertexIndex);      
       return;
    }
-       
+
    // This may happen due to GPU interpolation precision causing color artifacts.
    float propertyValue = clamp(property, grid.valueRangeMin, grid.valueRangeMax);
 
@@ -50,9 +51,7 @@ void main(void) {
 
    // Use two sided phong lighting. This has no effect if "material" property is not set.
    vec3 lightColor = lighting_getLightColor(color.rgb, cameraPosition, position_commonspace.xyz, normal);
-   fragColor = vec4(lightColor, 1.0);
+   fragColor = vec4(lightColor, vColor.a);
    DECKGL_FILTER_COLOR(fragColor, geometry);
 }
 `;
-
-export default fsShader;

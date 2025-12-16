@@ -1,3 +1,169 @@
+## 2.6.19 (2025-12-09)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.18
+
+## 2.6.18 (2025-12-01)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.17
+
+## 2.6.17 (2025-11-28)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.16
+
+## 2.6.16 (2025-11-27)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.15
+
+## 2.6.15 (2025-11-22)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.14
+
+## 2.6.14 (2025-11-19)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.13
+
+## 2.6.13 (2025-11-13)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.12
+
+## 2.6.12 (2025-11-13)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.11
+
+## 2.6.11 (2025-11-03)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.10
+
+## 2.6.10 (2025-10-28)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.9
+
+## 2.6.9 (2025-10-27)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.8
+
+## 2.6.8 (2025-10-17)
+
+### 🩹 Fixes
+
+- partial revert of "refactor: refactor some React class component… ([#2645](https://github.com/equinor/webviz-subsurface-components/pull/2645), [#2611](https://github.com/equinor/webviz-subsurface-components/issues/2611))
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
+## 2.6.7 (2025-10-13)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.7
+
+## 2.6.6 (2025-10-09)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.6
+
+## 2.6.5 (2025-10-03)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.5
+
+## 2.6.4 (2025-08-07)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.4
+
+## 2.6.3 (2025-08-06)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.3
+
+## 2.6.2 (2025-08-01)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.2
+
+## 2.6.1 (2025-08-01)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.1
+
+## 2.6.0 (2025-07-30)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.0
+
+## 2.5.2 (2025-07-22)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.2.6
+
+## 2.5.1 (2025-07-09)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.2.5
+
+## 2.5.0 (2025-06-17)
+
+### 🚀 Features
+
+- unify exposed types naming to colormap ([#2584](https://github.com/equinor/webviz-subsurface-components/pull/2584), [#2581](https://github.com/equinor/webviz-subsurface-components/issues/2581))
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
+## 2.4.6 (2025-06-17)
+
+### 🩹 Fixes
+
+- unify non exposed naming to colormap ([#2583](https://github.com/equinor/webviz-subsurface-components/pull/2583), [#2580](https://github.com/equinor/webviz-subsurface-components/issues/2580))
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
+## 2.4.5 (2025-05-23)
+
+### 🩹 Fixes
+
+- bump the deckgl group in /typescript with 8 updates ([#2563](https://github.com/equinor/webviz-subsurface-components/pull/2563), [#9630](https://github.com/equinor/webviz-subsurface-components/issues/9630), [#9550](https://github.com/equinor/webviz-subsurface-components/issues/9550), [#9621](https://github.com/equinor/webviz-subsurface-components/issues/9621), [#9427](https://github.com/equinor/webviz-subsurface-components/issues/9427), [#9598](https://github.com/equinor/webviz-subsurface-components/issues/9598))
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.2.4
+
 ## [2.4.4](https://github.com/equinor/webviz-subsurface-components/compare/well-log-viewer@2.4.3...well-log-viewer@2.4.4) (2025-05-02)
 
 

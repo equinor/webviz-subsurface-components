@@ -1,3 +1,99 @@
+## 1.3.18 (2025-12-09)
+
+This was a version bump only for wsc-common to align it with other projects, there were no code changes.
+
+## 1.3.17 (2025-12-01)
+
+This was a version bump only for wsc-common to align it with other projects, there were no code changes.
+
+## 1.3.16 (2025-11-28)
+
+This was a version bump only for wsc-common to align it with other projects, there were no code changes.
+
+## 1.3.15 (2025-11-27)
+
+This was a version bump only for wsc-common to align it with other projects, there were no code changes.
+
+## 1.3.14 (2025-11-22)
+
+This was a version bump only for wsc-common to align it with other projects, there were no code changes.
+
+## 1.3.13 (2025-11-19)
+
+This was a version bump only for wsc-common to align it with other projects, there were no code changes.
+
+## 1.3.12 (2025-11-13)
+
+This was a version bump only for wsc-common to align it with other projects, there were no code changes.
+
+## 1.3.11 (2025-11-13)
+
+This was a version bump only for wsc-common to align it with other projects, there were no code changes.
+
+## 1.3.10 (2025-11-03)
+
+This was a version bump only for wsc-common to align it with other projects, there were no code changes.
+
+## 1.3.9 (2025-10-28)
+
+This was a version bump only for wsc-common to align it with other projects, there were no code changes.
+
+## 1.3.8 (2025-10-27)
+
+This was a version bump only for wsc-common to align it with other projects, there were no code changes.
+
+## 1.3.7 (2025-10-13)
+
+This was a version bump only for wsc-common to align it with other projects, there were no code changes.
+
+## 1.3.6 (2025-10-09)
+
+This was a version bump only for wsc-common to align it with other projects, there were no code changes.
+
+## 1.3.5 (2025-10-03)
+
+### 🩹 Fixes
+
+- bump the deckgl group in /typescript with 8 updates ([#2626](https://github.com/equinor/webviz-subsurface-components/pull/2626), [#9769](https://github.com/equinor/webviz-subsurface-components/issues/9769), [#9799](https://github.com/equinor/webviz-subsurface-components/issues/9799), [#9780](https://github.com/equinor/webviz-subsurface-components/issues/9780), [#9775](https://github.com/equinor/webviz-subsurface-components/issues/9775), [#9771](https://github.com/equinor/webviz-subsurface-components/issues/9771), [#9759](https://github.com/equinor/webviz-subsurface-components/issues/9759))
+
+## 1.3.4 (2025-08-07)
+
+This was a version bump only for wsc-common to align it with other projects, there were no code changes.
+
+## 1.3.3 (2025-08-06)
+
+This was a version bump only for wsc-common to align it with other projects, there were no code changes.
+
+## 1.3.2 (2025-08-01)
+
+This was a version bump only for wsc-common to align it with other projects, there were no code changes.
+
+## 1.3.1 (2025-08-01)
+
+### 🩹 Fixes
+
+- bump the deckgl group in /typescript with 8 updates ([#2604](https://github.com/equinor/webviz-subsurface-components/pull/2604), [#9705](https://github.com/equinor/webviz-subsurface-components/issues/9705))
+
+## 1.3.0 (2025-07-30)
+
+This was a version bump only for wsc-common to align it with other projects, there were no code changes.
+
+## 1.2.6 (2025-07-22)
+
+This was a version bump only for wsc-common to align it with other projects, there were no code changes.
+
+## 1.2.5 (2025-07-09)
+
+### 🩹 Fixes
+
+- bump the deckgl group in /typescript with 8 updates ([#2592](https://github.com/equinor/webviz-subsurface-components/pull/2592), [#9695](https://github.com/equinor/webviz-subsurface-components/issues/9695), [#9693](https://github.com/equinor/webviz-subsurface-components/issues/9693), [#9629](https://github.com/equinor/webviz-subsurface-components/issues/9629), [#9668](https://github.com/equinor/webviz-subsurface-components/issues/9668), [#9603](https://github.com/equinor/webviz-subsurface-components/issues/9603))
+
+## 1.2.4 (2025-05-23)
+
+### 🩹 Fixes
+
+- bump the deckgl group in /typescript with 8 updates ([#2563](https://github.com/equinor/webviz-subsurface-components/pull/2563), [#9630](https://github.com/equinor/webviz-subsurface-components/issues/9630), [#9550](https://github.com/equinor/webviz-subsurface-components/issues/9550), [#9621](https://github.com/equinor/webviz-subsurface-components/issues/9621), [#9427](https://github.com/equinor/webviz-subsurface-components/issues/9427), [#9598](https://github.com/equinor/webviz-subsurface-components/issues/9598))
+
 ## [1.2.3](https://github.com/equinor/webviz-subsurface-components/compare/wsc-common@1.2.2...wsc-common@1.2.3) (2025-05-02)
 
 

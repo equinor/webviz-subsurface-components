@@ -82,7 +82,6 @@ describe("Test Map component", () => {
                                 {
                                     id: "view_1",
                                     show3D: false,
-                                    layerIds: [],
                                 },
                             ],
                         }}
@@ -112,7 +111,6 @@ describe("Test Map component", () => {
                                 {
                                     id: "view_1",
                                     show3D: false,
-                                    layerIds: [],
                                 },
                             ],
                         }}

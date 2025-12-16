@@ -8,11 +8,11 @@ import type {
 
 import renderGradientFillPlotLegend from "./gradientfill-plot-legend";
 import { getInterpolatedColorString } from "./color-table";
-import type { ColorMapFunction } from "./color-function";
+import type { ColormapFunction } from "./color-function";
 
 export interface GradientFillPlotOptions extends AreaPlotOptions {
-    colorMapFunction?: ColorMapFunction;
-    inverseColorMapFunction?: ColorMapFunction;
+    colorMapFunction?: ColormapFunction;
+    inverseColorMapFunction?: ColormapFunction;
     colorScale?: "linear" | "log";
     inverseColorScale?: "linear" | "log";
 }
@@ -26,7 +26,7 @@ function createGradient(
     horizontal: boolean | undefined,
     plotdata: number[][],
     xscale: Scale,
-    colorMapFunction: ColorMapFunction,
+    colormapFunction: ColormapFunction,
     scale: undefined | string // "linear" | "log"
 ): CanvasGradient {
     const dataFrom = plotdata[0];
@@ -48,7 +48,7 @@ function createGradient(
             const stop = (data[0] - xFrom) / xDelta;
             if (0 <= stop && stop <= 1.0) {
                 const v = (Math.log(data[1]) - yFrom) / yDelta;
-                const c = getInterpolatedColorString(colorMapFunction, v);
+                const c = getInterpolatedColorString(colormapFunction, v);
                 gradient.addColorStop(stop, c);
             }
         }
@@ -64,7 +64,7 @@ function createGradient(
             const stop = (data[0] - xFrom) / xDelta;
             if (0 <= stop && stop <= 1.0) {
                 const v = (data[1] - yFrom) / yDelta;
-                const c = getInterpolatedColorString(colorMapFunction, v);
+                const c = getInterpolatedColorString(colormapFunction, v);
                 gradient.addColorStop(stop, c);
             }
         }
@@ -154,15 +154,15 @@ export default class GradientFillPlot extends Plot {
             inverseAreaFunction(plotdata);
             ctx.fillStyle = options.inverseColor || "";
             /* Start GradientFill code */
-            const colorMapFunction = options.inverseColorMapFunction;
-            if (colorMapFunction)
+            const colormapFunction = options.inverseColorMapFunction;
+            if (colormapFunction)
                 ctx.fillStyle = createGradient(
                     ctx,
                     scale,
                     options.horizontal,
                     plotdata,
                     xscale,
-                    colorMapFunction,
+                    colormapFunction,
                     options.inverseColorScale ||
                         options.colorScale ||
                         options.scale
@@ -178,15 +178,15 @@ export default class GradientFillPlot extends Plot {
 
         ctx.fillStyle = options.fill || options.color || "";
         /* Start GradientFill code */
-        const colorMapFunction = options.colorMapFunction;
-        if (colorMapFunction)
+        const colormapFunction = options.colorMapFunction;
+        if (colormapFunction)
             ctx.fillStyle = createGradient(
                 ctx,
                 scale,
                 options.horizontal,
                 plotdata,
                 xscale,
-                colorMapFunction,
+                colormapFunction,
                 options.colorScale || options.scale
             );
         /* End GradientFill code */

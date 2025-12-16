@@ -1,8 +1,21 @@
+import { View } from "@deck.gl/core";
 import React from "react";
+import { ViewAnnotation } from "./components/ViewAnnotation";
 import type { SubsurfaceViewerProps } from "./SubsurfaceViewer";
 import SubsurfaceViewer from "./SubsurfaceViewer";
-import { View } from "@deck.gl/core";
-import { ViewAnnotation } from "./components/ViewAnnotation";
+
+type ViewsType = Omit<SubsurfaceViewerProps["views"], "viewports"> & {
+    // Dash does not support complex nested types
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    viewports: any;
+};
+
+export type DashSubsurfaceViewerProps = Omit<SubsurfaceViewerProps, "views"> & {
+    /**
+     * An array of view definitions. If not provided, a single view is rendered.
+     */
+    views?: ViewsType;
+};
 
 function mapAnnotation(annotationContainers: React.ReactNode) {
     return React.Children.map(annotationContainers, (annotationContainer) => {

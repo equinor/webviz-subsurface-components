@@ -2,13 +2,15 @@ import type { PickingInfo, UpdateParameters } from "@deck.gl/core";
 import { CompositeLayer } from "@deck.gl/core";
 import { isEqual } from "lodash";
 
-import type { ReportBoundingBoxAction } from "../../components/Map";
 import type {
     ExtendedLayerProps,
     LayerPickInfo,
     PropertyDataType,
+    ReportBoundingBoxAction,
 } from "../utils/layerTools";
-import { createPropertyData, defineBoundingBox } from "../utils/layerTools";
+import { createPropertyData, computeBoundingBox } from "../utils/layerTools";
+
+import type { RGBAColor, RGBColor } from "../../utils";
 
 import { PrivatePointsLayer } from "./privatePointsLayer";
 
@@ -21,7 +23,7 @@ export interface PointsLayerProps extends ExtendedLayerProps {
     /**
      * Point color defined as RGB or RGBA array. Each component is in 0-255 range.
      */
-    color: [number, number, number] | [number, number, number, number];
+    color: RGBColor | RGBAColor;
 
     /**
      * The units of the point radius, one of `'meters'`, `'common'`, and `'pixels'`.
@@ -172,8 +174,9 @@ export default class PointsLayer extends CompositeLayer<PointsLayerProps> {
             typeof this.props.reportBoundingBox === "function" &&
             reportBoundingBox
         ) {
-            const boundingBox = defineBoundingBox(
+            const boundingBox = computeBoundingBox(
                 this.state["dataAttributes"] as Float32Array,
+                // why not for polylines ?
                 this.props.ZIncreasingDownwards
             );
             this.props.reportBoundingBox({ layerBoundingBox: boundingBox });

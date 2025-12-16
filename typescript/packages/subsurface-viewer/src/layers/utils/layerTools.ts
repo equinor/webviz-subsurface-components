@@ -1,31 +1,24 @@
-import type { PickingInfo } from "@deck.gl/core";
-import type { Color } from "@deck.gl/core";
-import type {
-    colorTablesArray,
-    createColorMapFunction,
-} from "@emerson-eps/color-tables/";
-import { rgbValues } from "@emerson-eps/color-tables/";
-import { createDefaultContinuousColorScale } from "@emerson-eps/color-tables/dist/component/Utils/legendCommonFunction";
+import { Matrix4 } from "math.gl";
 
+import type { PickingInfo } from "@deck.gl/core";
+import type { Color, LayerContext } from "@deck.gl/core";
 import type {
     Layer,
     LayersList,
     LayerManager,
     CompositeLayerProps,
 } from "@deck.gl/core";
-import { Matrix4 } from "math.gl";
+
+import type { colorTablesArray } from "@emerson-eps/color-tables/";
+
 import type {
     ContinuousLegendDataType,
     DiscreteLegendDataType,
 } from "../../components/ColorLegend";
 import type DrawingLayer from "../drawing/drawingLayer";
 
-export type Position3D = [number, number, number];
-
-/** Type of functions returning a color from a value in the [0,1] range. */
-export type ColorMapFunctionType = ReturnType<typeof createColorMapFunction>;
-/** @deprecated Use ColorMapFunctionType instead. */
-export type colorMapFunctionType = ColorMapFunctionType;
+import type { BoundingBox3D } from "../../utils";
+import { computeBoundingBox as buidBoundingBox } from "../../utils/BoundingBox3D";
 
 export interface TypeAndNameLayerProps {
     "@@type"?: string;
@@ -36,8 +29,15 @@ export interface ExtendedLayerProps
     extends CompositeLayerProps,
         TypeAndNameLayerProps {}
 
-export interface ExtendedLayer extends Layer {
+export interface ExtendedLegendLayer extends Layer {
     getLegendData?: () => DiscreteLegendDataType | ContinuousLegendDataType;
+}
+
+export interface DeckGLLayerContext extends LayerContext {
+    userData: {
+        setEditedData: (data: Record<string, unknown>) => void;
+        colorTables: colorTablesArray;
+    };
 }
 
 export interface PropertyDataType {
@@ -53,8 +53,13 @@ export interface LayerPickInfo<T = any> extends PickingInfo<T> {
     properties?: PropertyDataType[]; // for multiple properties
 }
 
-// Creates property object which will be used to display layer property
-// in the info card.
+/**
+ * Creates property object which will be displayed in the info card.
+ *   createPropertyData("Property", value) is used to store the value,
+ *      which is either a number of the category text (for categorical properties)
+ *   createPropertyData("Value", categoryIndex) is used to store the category index in case of categorical property.
+ *   createPropertyData("Depth", categoryIndex) is used to store depth coordinate (Z in 3d viewer, md in well log viewer)
+ */
 export function createPropertyData(
     name: string,
     value: string | number,
@@ -171,86 +176,24 @@ export function invertZCoordinate(dataArray: Float32Array): void {
     }
 }
 
-export function defineBoundingBox(
+/**
+ * Calculates the axis-aligned bounding box for a set of 3D points.
+ *
+ * @param dataArray - A flat `Float32Array` containing 3D coordinates in the order [x0, y0, z0, x1, y1, z1, ...].
+ * @param zIncreasingDownwards - Optional. If `true`, inverts the Z-axis direction to account for coordinate systems where Z increases downwards. Defaults to `false`.
+ * @returns A tuple of six numbers: [minX, minY, minZ, maxX, maxY, maxZ], representing the minimum and maximum coordinates along each axis.
+ */
+export function computeBoundingBox(
     dataArray: Float32Array,
     zIncreasingDownwards: boolean = false
-): [number, number, number, number, number, number] {
-    const length = dataArray.length;
-    let minX = Number.POSITIVE_INFINITY;
-    let minY = Number.POSITIVE_INFINITY;
-    let minZ = Number.POSITIVE_INFINITY;
-    let maxX = Number.NEGATIVE_INFINITY;
-    let maxY = Number.NEGATIVE_INFINITY;
-    let maxZ = Number.NEGATIVE_INFINITY;
-
-    for (let i = 0; i < length; i += 3) {
-        const x = dataArray[i];
-        const y = dataArray[i + 1];
-        const z = dataArray[i + 2];
-        minX = x < minX ? x : minX;
-        minY = y < minY ? y : minY;
-        minZ = z < minZ ? z : minZ;
-
-        maxX = x > maxX ? x : maxX;
-        maxY = y > maxY ? y : maxY;
-        maxZ = z > maxZ ? z : maxZ;
-    }
+): BoundingBox3D {
+    const bbox = buidBoundingBox(dataArray);
     if (zIncreasingDownwards) {
-        [maxZ, minZ] = [-minZ, -maxZ];
+        // invert Z coordinates
+        bbox[2] = -bbox[2];
+        bbox[5] = -bbox[5];
     }
-    return [minX, minY, minZ, maxX, maxY, maxZ];
+    return bbox;
 }
 
-/**
- * Creates an array of colors as RGB triplets in range [0, 1] using the color map or color map function.
- * ColorMapFunction has priority.
- * @param colorMapName Name of the color map in color tables.
- * @param colorTables Color tables.
- * @param colorMapFunction Either a function which returns a color
- * or an array representing a constant color.
- * @param colormapSize Number of colors in the color map.
- * @param discreteColormapFunction If true, the color map function is targeting indices ranging from 0 to colormapSize.
- * @returns Array of colors.
- */
-export function getImageData(
-    colorMapName: string,
-    colorTables: colorTablesArray,
-    colorMapFunction: ColorMapFunctionType | undefined,
-    colormapSize: number = 256,
-    discreteColormapFunction: boolean = false
-): Uint8Array {
-    type funcType = (x: number) => Color;
-
-    const isColorMapFunctionDefined = typeof colorMapFunction !== "undefined";
-    const isColorMapNameDefined = !!colorMapName;
-
-    const defaultColorMap = createDefaultContinuousColorScale;
-    let colorMap = defaultColorMap() as unknown as funcType;
-
-    if (isColorMapFunctionDefined) {
-        colorMap =
-            typeof colorMapFunction === "function"
-                ? (colorMapFunction as funcType)
-                : ((() => colorMapFunction) as unknown as funcType);
-    } else if (isColorMapNameDefined) {
-        discreteColormapFunction = false;
-        colorMap = (value: number) =>
-            rgbValues(value, colorMapName, colorTables);
-    }
-
-    const data = new Uint8Array(colormapSize * 3);
-
-    const scaling = discreteColormapFunction
-        ? 1
-        : 1 / Math.max(colormapSize - 1, 1);
-    for (let i = 0; i < colormapSize; i++) {
-        const color = colorMap ? colorMap(scaling * i) : [1, 0, 0];
-        if (color) {
-            data[3 * i + 0] = color[0];
-            data[3 * i + 1] = color[1];
-            data[3 * i + 2] = color[2];
-        }
-    }
-
-    return data ? data : new Uint8Array([0, 0, 0]);
-}
+export type ReportBoundingBoxAction = { layerBoundingBox: BoundingBox3D };

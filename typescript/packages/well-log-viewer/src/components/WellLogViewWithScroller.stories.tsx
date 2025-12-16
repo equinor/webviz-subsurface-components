@@ -8,19 +8,19 @@ import WellLogViewWithScroller from "./WellLogViewWithScroller";
 import type { WellLogViewWithScrollerProps } from "./WellLogViewWithScroller";
 import { argTypesWellLogViewScrollerProp } from "./WellLogViewWithScroller";
 import { axisTitles, axisMnemos } from "../utils/axes";
-import type { ColorMapFunction } from "../utils/color-function";
+import type { ColormapFunction } from "../utils/color-function";
 
 import wellLog898MudJson from "../../../../../example-data/L898MUD.json";
 import templateJson1 from "../../../../../example-data/welllog_template_1.json";
 
-const exampleColorMapFunctions = colorTables as ColorMapFunction[];
+const exampleColormapFunctions = colorTables as ColormapFunction[];
 
 const ComponentCode =
     '<WellLogViewWithScroller id="WellLogViewWithScroller" \r\n' +
     "    horizontal=false \r\n" +
     '    welllog={require("../../../../../example-data/L898MUD.json")[0]} \r\n' +
     '    template={require("../../../../../example-data/welllog_template_1.json")} \r\n' +
-    "    colorMapFunctions={exampleColorMapFunctions} \r\n" +
+    "    colorMapFunctions={exampleColormapFunctions} \r\n" +
     "/>";
 
 const stories: Meta<WellLogViewWithScrollerProps> = {
@@ -72,7 +72,7 @@ export const Default: StoryObj<typeof Template> = {
         wellLogSets: wellLog898MudJson,
         template: templateJson1 as TemplateType,
         viewTitle: "Well '" + wellLog898MudJson[0].header.well + "'",
-        colorMapFunctions: exampleColorMapFunctions,
+        colorMapFunctions: exampleColormapFunctions,
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
         options: {

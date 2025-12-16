@@ -1,7 +1,12 @@
 import "jest";
 
 import type { BoundingBox3D } from "./BoundingBox3D";
-import { boxCenter, boxUnion, isEmpty } from "./BoundingBox3D";
+import {
+    boxCenter,
+    boxUnion,
+    computeBoundingBox,
+    isEmpty,
+} from "./BoundingBox3D";
 
 describe("Test BoundingBox3D", () => {
     it("boxUnion default box", () => {
@@ -53,5 +58,28 @@ describe("Test BoundingBox3D", () => {
 
         const box4: BoundingBox3D = [1, 2, 3, 4, 5, 6];
         expect(isEmpty(box4)).toBe(false);
+    });
+
+    it("computeBoundingBox returns correct bounding box for points", () => {
+        // Points: (1,2,3), (4,5,6), (-1,-2,-3)
+        const arr = new Float32Array([1, 2, 3, 4, 5, 6, -1, -2, -3]);
+        expect(computeBoundingBox(arr)).toEqual([-1, -2, -3, 4, 5, 6]);
+    });
+
+    it("computeBoundingBox returns correct bounding box for single point", () => {
+        const arr = new Float32Array([7, 8, 9]);
+        expect(computeBoundingBox(arr)).toEqual([7, 8, 9, 7, 8, 9]);
+    });
+
+    it("computeBoundingBox returns infinities for empty array", () => {
+        const arr = new Float32Array([]);
+        expect(computeBoundingBox(arr)).toEqual([
+            Number.POSITIVE_INFINITY,
+            Number.POSITIVE_INFINITY,
+            Number.POSITIVE_INFINITY,
+            Number.NEGATIVE_INFINITY,
+            Number.NEGATIVE_INFINITY,
+            Number.NEGATIVE_INFINITY,
+        ]);
     });
 });

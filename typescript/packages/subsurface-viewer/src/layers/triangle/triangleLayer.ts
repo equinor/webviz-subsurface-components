@@ -6,9 +6,14 @@ import { CompositeLayer } from "@deck.gl/core";
 
 import workerpool from "workerpool";
 
-import type { ReportBoundingBoxAction } from "../../components/Map";
-import type { ExtendedLayerProps } from "../utils/layerTools";
-import type { Material } from "@deck.gl/core";
+import type { Material } from "../gpglLayers/typeDefs";
+import type {
+    ExtendedLayerProps,
+    ReportBoundingBoxAction,
+} from "../utils/layerTools";
+
+import type { RGBColor } from "../../utils";
+
 import PrivateTriangleLayer from "./privateTriangleLayer";
 import { makeFullMesh } from "./webworker";
 
@@ -108,7 +113,7 @@ export interface TriangleLayerProps extends ExtendedLayerProps {
 
     triangleData: string | number[] | Uint32Array;
 
-    color: [number, number, number];
+    color: RGBColor;
 
     /**  Contourlines reference point and interval.
      */
@@ -127,7 +132,7 @@ export interface TriangleLayerProps extends ExtendedLayerProps {
      *           ambient: 0.35,
      *           diffuse: 0.6,
      *           shininess: 32,
-     *           specularColor: [255, 255, 255],
+     *           specularColor: [38, 38, 38],
      *       }
      * Default value: true.
      */
@@ -225,14 +230,32 @@ export default class TriangleLayer extends CompositeLayer<TriangleLayerProps> {
                     let zmin = 99999999;
 
                     for (let i = 0; i < vertexArray.length / 3; i++) {
-                        xmax = vertexArray[3 * i + 0] > xmax ? vertexArray[3 * i + 0] : xmax; //eslint-disable-line
-                        xmin = vertexArray[3 * i + 0] < xmin ? vertexArray[3 * i + 0] : xmin; //eslint-disable-line
+                        xmax =
+                            vertexArray[3 * i + 0] > xmax
+                                ? vertexArray[3 * i + 0]
+                                : xmax; //eslint-disable-line
+                        xmin =
+                            vertexArray[3 * i + 0] < xmin
+                                ? vertexArray[3 * i + 0]
+                                : xmin; //eslint-disable-line
 
-                        ymax = vertexArray[3 * i + 1] > ymax ? vertexArray[3 * i + 1] : ymax; //eslint-disable-line
-                        ymin = vertexArray[3 * i + 1] < ymin ? vertexArray[3 * i + 1] : ymin; //eslint-disable-line
+                        ymax =
+                            vertexArray[3 * i + 1] > ymax
+                                ? vertexArray[3 * i + 1]
+                                : ymax; //eslint-disable-line
+                        ymin =
+                            vertexArray[3 * i + 1] < ymin
+                                ? vertexArray[3 * i + 1]
+                                : ymin; //eslint-disable-line
 
-                        zmax = vertexArray[3 * i + 2] > zmax ? vertexArray[3 * i + 2] : zmax; //eslint-disable-line
-                        zmin = vertexArray[3 * i + 2] < zmin ? vertexArray[3 * i + 2] : zmin; //eslint-disable-line
+                        zmax =
+                            vertexArray[3 * i + 2] > zmax
+                                ? vertexArray[3 * i + 2]
+                                : zmax; //eslint-disable-line
+                        zmin =
+                            vertexArray[3 * i + 2] < zmin
+                                ? vertexArray[3 * i + 2]
+                                : zmin; //eslint-disable-line
                     }
 
                     if (this.props.ZIncreasingDownwards) {
@@ -289,7 +312,7 @@ export default class TriangleLayer extends CompositeLayer<TriangleLayerProps> {
             return [];
         }
 
-        const enableLighting: boolean = !(this.props.material === false);
+        const enableLighting: boolean = this.props.material !== false;
         const layer = new PrivateTriangleLayer(
             this.getSubLayerProps({
                 geometryTriangles: this.state["geometryTriangles"],

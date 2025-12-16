@@ -1,20 +1,22 @@
 /* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
 
 import React from "react";
+import type { Color } from "@deck.gl/core";
+
+import type { colorTablesArray } from "@emerson-eps/color-tables/";
 import {
     DiscreteColorLegend,
     ContinuousLegend,
 } from "@emerson-eps/color-tables";
-import type { ExtendedLayer } from "../layers/utils/layerTools";
-import type { Color } from "@deck.gl/core";
-import type { colorTablesArray } from "@emerson-eps/color-tables/";
-import type { ColorMapFunctionType } from "../layers/utils/layerTools";
+
+import type { ExtendedLegendLayer } from "../layers/utils/layerTools";
+import type { ColormapFunctionType } from "../layers/utils/colormapTools";
 
 interface LegendBaseData {
     title: string;
     colorName: string;
     discrete: boolean;
-    colorMapFunction?: ColorMapFunctionType;
+    colorMapFunction?: ColormapFunctionType;
 }
 export interface DiscreteLegendDataType extends LegendBaseData {
     metadata: Record<string, [Color, number]>;
@@ -26,7 +28,7 @@ export interface ContinuousLegendDataType extends LegendBaseData {
 
 interface ColorLegendProps {
     horizontal?: boolean | null;
-    layer: ExtendedLayer;
+    layer: ExtendedLegendLayer;
     colorTables: colorTablesArray | string | undefined;
     reverseRange?: boolean;
 }

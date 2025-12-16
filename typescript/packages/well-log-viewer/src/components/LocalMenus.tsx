@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import React, { Component } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { createRoot } from "react-dom/client";
 
 import type { Track, GraphTrack } from "@equinor/videx-wellog";
@@ -50,250 +50,233 @@ function getPlotTitle(plot: Plot, wellLogSets: WellLogSet[]): string {
     return title;
 }
 
-export class SimpleMenu extends Component<Props, State> {
-    addTrack: () => void;
-    editTrack: () => void;
-    removeTrack: () => void;
+export const SimpleMenu: React.FC<Props> = ({
+    anchorEl: initialAnchorEl,
+    wellLogView,
+    track,
+    type,
+}) => {
+    const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(
+        initialAnchorEl
+    );
 
-    addPlot: () => void;
-    editPlots: () => void;
-    removePlots: () => void;
+    useEffect(() => {
+        setAnchorEl(initialAnchorEl);
+    }, [initialAnchorEl]);
 
-    constructor(props: Props) {
-        super(props);
-        this.state = { anchorEl: this.props.anchorEl };
+    const addTrack = useCallback(() => {
+        wellLogView.addTrack(anchorEl, track);
+    }, [wellLogView, anchorEl, track]);
 
-        const wellLogView = this.props.wellLogView;
-        this.addTrack = wellLogView.addTrack.bind(
-            wellLogView,
-            this.state.anchorEl,
-            this.props.track
-        );
-        this.editTrack = wellLogView.editTrack.bind(
-            wellLogView,
-            this.state.anchorEl,
-            this.props.track
-        );
-        this.removeTrack = wellLogView.removeTrack.bind(
-            wellLogView,
-            this.props.track
-        );
+    const editTrack = useCallback(() => {
+        wellLogView.editTrack(anchorEl, track);
+    }, [wellLogView, anchorEl, track]);
 
-        this.addPlot = wellLogView.addPlot.bind(
-            wellLogView,
-            this.state.anchorEl,
-            this.props.track
-        );
-        this.editPlots = editPlots.bind(
-            null,
-            this.state.anchorEl,
-            wellLogView,
-            this.props.track
-        );
-        this.removePlots = removePlots.bind(
-            null,
-            this.state.anchorEl,
-            wellLogView,
-            this.props.track
-        );
-    }
-    componentDidUpdate(prevProps: Props): void {
-        if (this.props.anchorEl !== prevProps.anchorEl) {
-            this.setState((_state, props) => {
-                return { anchorEl: props.anchorEl };
-            });
-        }
-    }
+    const removeTrack = useCallback(() => {
+        wellLogView.removeTrack(track);
+    }, [wellLogView, track]);
 
-    closeMenu(): void {
-        this.setState({ anchorEl: null });
-    }
+    const addPlot = useCallback(() => {
+        wellLogView.addPlot(anchorEl, track);
+    }, [wellLogView, anchorEl, track]);
 
-    handleContextMenu(ev: React.MouseEvent<HTMLElement>): void {
-        ev.preventDefault();
-        this.closeMenu();
-    }
-    handleCloseMenu(/*ev: React.MouseEvent<HTMLElement>*/): void {
-        this.closeMenu();
-    }
-    handleClickItem(action?: () => void): void {
-        if (action) action();
-        this.closeMenu();
-    }
+    const editPlots = useCallback(() => {
+        editPlotsFunctionHelper(anchorEl, wellLogView, track);
+    }, [anchorEl, wellLogView, track]);
 
-    createRemovePlotMenuItem(title: string, plot: Plot): ReactNode {
-        return (
-            <MenuItem
-                key={plot.id}
-                onClick={() =>
-                    this.handleClickItem(
-                        this.props.wellLogView.removeTrackPlot.bind(
-                            this.props.wellLogView,
-                            this.props.track as GraphTrack,
-                            plot
+    const removePlots = useCallback(() => {
+        removePlotsFunctionHelper(anchorEl, wellLogView, track);
+    }, [anchorEl, wellLogView, track]);
+
+    const closeMenu = useCallback(() => {
+        setAnchorEl(null);
+    }, []);
+
+    const handleContextMenu = useCallback(
+        (ev: React.MouseEvent<HTMLElement>) => {
+            ev.preventDefault();
+            closeMenu();
+        },
+        [closeMenu]
+    );
+
+    const handleCloseMenu = useCallback(() => {
+        closeMenu();
+    }, [closeMenu]);
+
+    const handleClickItem = useCallback(
+        (action?: () => void) => {
+            if (action) action();
+            closeMenu();
+        },
+        [closeMenu]
+    );
+
+    const createRemovePlotMenuItem = useCallback(
+        (title: string, plot: Plot): ReactNode => {
+            return (
+                <MenuItem
+                    key={plot.id}
+                    onClick={() =>
+                        handleClickItem(() =>
+                            wellLogView.removeTrackPlot(
+                                track as GraphTrack,
+                                plot
+                            )
                         )
-                    )
-                }
-            >
-                &nbsp;&nbsp;&nbsp;&nbsp;{title}
-            </MenuItem>
-        );
-    }
+                    }
+                >
+                    &nbsp;&nbsp;&nbsp;&nbsp;{title}
+                </MenuItem>
+            );
+        },
+        [handleClickItem, wellLogView, track]
+    );
 
-    menuRemovePlotItems(): ReactNode[] {
+    const menuRemovePlotItems = useCallback((): ReactNode[] => {
         const nodes: ReactNode[] = [];
-        const wellLogSets = this.props.wellLogView.wellLogSets;
+        const wellLogSets = wellLogView.wellLogSets;
 
         if (!wellLogSets.length) return nodes;
 
-        const track = this.props.track;
         const plots = (track as GraphTrack).plots;
 
         for (const plot of plots) {
             const title = getPlotTitle(plot, wellLogSets);
-            nodes.push(this.createRemovePlotMenuItem(title, plot));
+            nodes.push(createRemovePlotMenuItem(title, plot));
         }
         return nodes;
-    }
+    }, [wellLogView.wellLogSets, track, createRemovePlotMenuItem]);
 
-    createEditPlotMenuItem(title: string, plot: Plot): ReactNode {
-        return (
-            <MenuItem
-                key={plot.id}
-                onClick={() =>
-                    this.handleClickItem(
-                        this.props.wellLogView.editPlot.bind(
-                            this.props.wellLogView,
-                            this.state.anchorEl,
-                            this.props.track,
-                            plot
+    const createEditPlotMenuItem = useCallback(
+        (title: string, plot: Plot): ReactNode => {
+            return (
+                <MenuItem
+                    key={plot.id}
+                    onClick={() =>
+                        handleClickItem(() =>
+                            wellLogView.editPlot(anchorEl, track, plot)
                         )
-                    )
-                }
-            >
-                &nbsp;&nbsp;&nbsp;&nbsp;{title}
-            </MenuItem>
-        );
-    }
+                    }
+                >
+                    &nbsp;&nbsp;&nbsp;&nbsp;{title}
+                </MenuItem>
+            );
+        },
+        [handleClickItem, wellLogView, anchorEl, track]
+    );
 
-    menuEditPlotItems(): ReactNode[] {
+    const menuEditPlotItems = useCallback((): ReactNode[] => {
         const nodes: ReactNode[] = [];
-        const wellLogSets = this.props.wellLogView.wellLogSets;
+        const wellLogSets = wellLogView.wellLogSets;
 
         if (!wellLogSets.length) return nodes;
 
-        const track = this.props.track;
         const plots = (track as GraphTrack).plots;
         for (const plot of plots) {
             const title = getPlotTitle(plot, wellLogSets);
-            nodes.push(this.createEditPlotMenuItem(title, plot));
+            nodes.push(createEditPlotMenuItem(title, plot));
         }
 
         return nodes;
-    }
+    }, [wellLogView.wellLogSets, track, createEditPlotMenuItem]);
 
-    createMenuItem(title: string, action?: () => void): ReactNode {
-        return (
-            <MenuItem key={title} onClick={() => this.handleClickItem(action)}>
-                &nbsp;&nbsp;&nbsp;&nbsp;{title}
-            </MenuItem>
-        );
-    }
-
-    render(): JSX.Element {
-        if (this.props.type === "removePlots") {
+    const createMenuItem = useCallback(
+        (title: string, action?: () => void): ReactNode => {
             return (
-                <div className="local-menu">
-                    <Menu
-                        id="simple-menu"
-                        anchorEl={this.state.anchorEl}
-                        keepMounted
-                        open={Boolean(this.state.anchorEl)}
-                        onClose={this.handleCloseMenu.bind(this)}
-                        onContextMenu={this.handleContextMenu.bind(this)}
-                    >
-                        {this.menuRemovePlotItems()}
-                    </Menu>
-                </div>
+                <MenuItem key={title} onClick={() => handleClickItem(action)}>
+                    &nbsp;&nbsp;&nbsp;&nbsp;{title}
+                </MenuItem>
             );
-        }
-        if (this.props.type === "editPlots") {
-            return (
-                <div className="local-menu">
-                    <Menu
-                        id="simple-menu"
-                        anchorEl={this.state.anchorEl}
-                        keepMounted
-                        open={Boolean(this.state.anchorEl)}
-                        onClose={this.handleCloseMenu.bind(this)}
-                        onContextMenu={this.handleContextMenu.bind(this)}
-                    >
-                        {this.menuEditPlotItems()}
-                    </Menu>
-                </div>
-            );
-        }
-        if (this.props.type === "title") {
-            return (
-                <div className="local-menu">
-                    <Menu
-                        id="simple-menu"
-                        anchorEl={this.state.anchorEl}
-                        open={Boolean(this.state.anchorEl)}
-                        onClose={this.handleCloseMenu.bind(this)}
-                        onContextMenu={this.handleContextMenu.bind(this)}
-                    >
-                        {this.createMenuItem("Add track", this.addTrack)}
-                        {this.createMenuItem("Edit track", this.editTrack)}
-                        {this.createMenuItem("Remove track", this.removeTrack)}
-                    </Menu>
-                </div>
-            );
-        }
+        },
+        [handleClickItem]
+    );
 
-        // For this.props.type === "legends" or this.props.type === "container"
-
-        const track = this.props.track;
-        const plots = (track as GraphTrack).plots;
-
-        const createMenuItem = (track: GraphTrack): React.ReactNode => {
-            if ((track as GraphTrack).options.plotFactory) {
-                return [this.createMenuItem("Add plot", this.addPlot)];
-            } else if (!isScaleTrack(track)) {
-                return [this.createMenuItem("Edit track", this.editTrack)];
-            }
-            return [];
-        };
-
+    if (type === "removePlots") {
         return (
             <div className="local-menu">
                 <Menu
                     id="simple-menu"
-                    anchorEl={this.state.anchorEl}
+                    anchorEl={anchorEl}
                     keepMounted
-                    open={Boolean(this.state.anchorEl)}
-                    onClose={this.handleCloseMenu.bind(this)}
-                    onContextMenu={this.handleContextMenu.bind(this)}
+                    open={Boolean(anchorEl)}
+                    onClose={handleCloseMenu}
+                    onContextMenu={handleContextMenu}
                 >
-                    {createMenuItem(track as GraphTrack)}
-                    {/* TODO: Fix this the next time the file is edited. */}
-                    {/* eslint-disable-next-line react/prop-types */}
-                    {plots && plots.length
-                        ? [
-                              this.createMenuItem("Edit plot", this.editPlots),
-                              this.createMenuItem(
-                                  "Remove plot",
-                                  this.removePlots
-                              ),
-                          ]
-                        : []}
+                    {menuRemovePlotItems()}
                 </Menu>
             </div>
         );
     }
-}
+    if (type === "editPlots") {
+        return (
+            <div className="local-menu">
+                <Menu
+                    id="simple-menu"
+                    anchorEl={anchorEl}
+                    keepMounted
+                    open={Boolean(anchorEl)}
+                    onClose={handleCloseMenu}
+                    onContextMenu={handleContextMenu}
+                >
+                    {menuEditPlotItems()}
+                </Menu>
+            </div>
+        );
+    }
+    if (type === "title") {
+        return (
+            <div className="local-menu">
+                <Menu
+                    id="simple-menu"
+                    anchorEl={anchorEl}
+                    open={Boolean(anchorEl)}
+                    onClose={handleCloseMenu}
+                    onContextMenu={handleContextMenu}
+                >
+                    {createMenuItem("Add track", addTrack)}
+                    {createMenuItem("Edit track", editTrack)}
+                    {createMenuItem("Remove track", removeTrack)}
+                </Menu>
+            </div>
+        );
+    }
 
-export function editPlots(
+    // For type === "legends" or type === "container"
+    const plots = (track as GraphTrack).plots;
+
+    const createMenuItemForTrack = (track: GraphTrack): React.ReactNode => {
+        if ((track as GraphTrack).options.plotFactory) {
+            return [createMenuItem("Add plot", addPlot)];
+        } else if (!isScaleTrack(track)) {
+            return [createMenuItem("Edit track", editTrack)];
+        }
+        return [];
+    };
+
+    return (
+        <div className="local-menu">
+            <Menu
+                id="simple-menu"
+                anchorEl={anchorEl}
+                keepMounted
+                open={Boolean(anchorEl)}
+                onClose={handleCloseMenu}
+                onContextMenu={handleContextMenu}
+            >
+                {createMenuItemForTrack(track as GraphTrack)}
+                {plots && plots.length
+                    ? [
+                          createMenuItem("Edit plot", editPlots),
+                          createMenuItem("Remove plot", removePlots),
+                      ]
+                    : []}
+            </Menu>
+        </div>
+    );
+};
+
+export function editPlotsFunctionHelper(
     parent: HTMLElement | null,
     wellLogView: WellLogView,
     track: Track
@@ -318,7 +301,7 @@ export function editPlots(
     );
 }
 
-export function removePlots(
+export function removePlotsFunctionHelper(
     parent: HTMLElement | null,
     wellLogView: WellLogView,
     track: Track
@@ -342,3 +325,7 @@ export function removePlots(
         />
     );
 }
+
+// Legacy function names for backward compatibility
+export const editPlots = editPlotsFunctionHelper;
+export const removePlots = removePlotsFunctionHelper;

@@ -1,4 +1,5 @@
 import type { colorTablesObj } from "@emerson-eps/color-tables/dist/component/colorTableTypes";
+
 import { elementByName } from "./arrays";
 
 export type ColorTable = colorTablesObj;
@@ -7,26 +8,28 @@ export type ColorFunction = {
     func: (v: number) => [number, number, number]; // input number is between 0.0 and 1.0; returned numbers are between 0 and 255
 };
 
-export type ColorMapFunction = colorTablesObj | ColorFunction;
+export type ColormapFunction = colorTablesObj | ColorFunction;
+/** @deprecated Use ColormapFunction instead. */
+export type ColorMapFunction = ColormapFunction;
 
 export function isFunction(
-    colorMapFunction: ColorMapFunction | undefined
+    colormapFunction: ColormapFunction | undefined
 ): boolean {
-    if (!colorMapFunction) return false;
-    return !!(colorMapFunction as ColorFunction).func;
+    if (!colormapFunction) return false;
+    return !!(colormapFunction as ColorFunction).func;
 }
 
-export function getColorMapFunction(
+export function getColormapFunction(
     functionName?: string,
-    colorMapFunctions?: ColorMapFunction[]
-): ColorMapFunction | undefined {
+    colormapFunctions?: ColormapFunction[]
+): ColormapFunction | undefined {
     if (!functionName) return undefined;
-    if (!colorMapFunctions) {
+    if (!colormapFunctions) {
         console.error("No color functions provided for graph!");
-        colorMapFunctions = [];
+        colormapFunctions = [];
     }
 
-    const colorFunction = elementByName(colorMapFunctions, functionName);
+    const colorFunction = elementByName(colormapFunctions, functionName);
 
     if (!colorFunction) {
         console.error(`Color function '${functionName}' not found`);

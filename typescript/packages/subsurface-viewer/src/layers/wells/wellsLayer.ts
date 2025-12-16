@@ -1,3 +1,7 @@
+import { interpolateNumberArray } from "d3";
+import _, { isEmpty, isEqual } from "lodash";
+import { distance, dot, subtract } from "mathjs";
+
 import type {
     Color,
     Layer,
@@ -7,37 +11,50 @@ import type {
     UpdateParameters,
 } from "@deck.gl/core";
 import { CompositeLayer } from "@deck.gl/core";
-import type { BinaryFeatureCollection } from "@loaders.gl/schema";
-import type {
-    ColorMapFunctionType,
-    ExtendedLayerProps,
-    PropertyDataType,
-} from "../utils/layerTools";
-
-import { createPropertyData, isDrawingEnabled } from "../utils/layerTools";
-
 import { PathStyleExtension } from "@deck.gl/extensions";
 import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
+import type { BinaryFeatureCollection } from "@loaders.gl/schema";
+import { GL } from "@luma.gl/constants";
+
 import type { colorTablesArray } from "@emerson-eps/color-tables/";
 import { getColors, rgbValues } from "@emerson-eps/color-tables/";
-import type { Feature, FeatureCollection, Point, Position } from "geojson";
-import { distance, dot, subtract } from "mathjs";
 
-import { GL } from "@luma.gl/constants";
-import { interpolateNumberArray } from "d3";
-import _, { isEmpty, isEqual } from "lodash";
+import type { Feature, FeatureCollection, Point, Position } from "geojson";
+
+import type { ColormapFunctionType } from "../utils/colormapTools";
+import type {
+    DeckGLLayerContext,
+    ExtendedLayerProps,
+    PropertyDataType,
+    ReportBoundingBoxAction,
+} from "../utils/layerTools";
+import {
+    createPropertyData,
+    getLayersById,
+    isDrawingEnabled,
+} from "../utils/layerTools";
+
 import type {
     ContinuousLegendDataType,
     DiscreteLegendDataType,
 } from "../../components/ColorLegend";
-import type {
-    DeckGLLayerContext,
-    ReportBoundingBoxAction,
-} from "../../components/Map";
-import { getLayersById } from "../../layers/utils/layerTools";
+
+import { SectionViewport } from "../../viewports";
 import type { NumberPair, StyleAccessorFunction } from "../types";
 import type { WellLabelLayerProps } from "./layers/wellLabelLayer";
 import { WellLabelLayer } from "./layers/wellLabelLayer";
+import type {
+    AbscissaTransform,
+    ColorAccessor,
+    DashAccessor,
+    LineStyleAccessor,
+    LogCurveDataType,
+    SizeAccessor,
+    WellFeature,
+    WellFeatureCollection,
+    WellHeadStyleAccessor,
+    WellsPickInfo,
+} from "./types";
 import { abscissaTransform } from "./utils/abscissaTransform";
 import {
     GetBoundingBox,
@@ -47,17 +64,6 @@ import {
     splineRefine,
 } from "./utils/spline";
 import { getColor, getTrajectory } from "./utils/trajectory";
-import type {
-    WellFeatureCollection,
-    WellsPickInfo,
-    WellFeature,
-    WellHeadStyleAccessor,
-    LineStyleAccessor,
-    DashAccessor,
-    SizeAccessor,
-    ColorAccessor,
-    LogCurveDataType,
-} from "./types";
 
 export enum SubLayerId {
     COLORS = "colors",
@@ -106,7 +112,7 @@ export interface WellsLayerProps extends ExtendedLayerProps {
      */
     refine: boolean | number;
     wellHeadStyle: WellHeadStyleAccessor;
-    colorMappingFunction: ColorMapFunctionType;
+    colorMappingFunction: ColormapFunctionType;
     lineStyle: LineStyleAccessor;
 
     /**
@@ -151,7 +157,7 @@ export interface WellsLayerProps extends ExtendedLayerProps {
     simplifiedRendering: boolean;
 
     /** Sectional projection of data */
-    section?: boolean;
+    section?: boolean | AbscissaTransform;
 
     // Non public properties:
     reportBoundingBox?: React.Dispatch<ReportBoundingBoxAction>;
@@ -218,11 +224,12 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         well: string;
         selectedMultiWells: string[];
         selection: [number, number];
+        sectionData?: WellFeatureCollection;
     };
 
     private recomputeDataState() {
-        const data = this.props.data;
-        const refine = this.props.refine;
+        const { data, refine, ZIncreasingDownwards, section } = this.props;
+
         const doRefine = typeof refine === "number" ? refine > 1 : refine;
         const stepCount = typeof refine === "number" ? refine : 5;
 
@@ -232,23 +239,36 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
         let transformedData = data;
 
-        if (this.props.ZIncreasingDownwards) {
+        if (ZIncreasingDownwards) {
             transformedData = invertPath(transformedData);
         }
 
-        if (this.props.section) {
-            transformedData = abscissaTransform(transformedData);
-        }
+        // Create a state for the section projection of the data, which by default is
+        // identical to the original transformed data.
+        let sectionData = transformedData;
 
         // Mutate data to remove duplicates
         checkWells(transformedData);
 
+        // Apply sectional projection if requested
+        if (section) {
+            if (typeof section === "function") {
+                sectionData = section(transformedData);
+            } else if (section === true) {
+                sectionData = abscissaTransform(transformedData);
+            }
+        }
+
+        // Mutate data to remove duplicates
+        checkWells(sectionData);
+
         // Conditionally apply spline interpolation to refine the well path.
         if (doRefine) {
             transformedData = splineRefine(transformedData, stepCount);
+            sectionData = splineRefine(sectionData, stepCount);
         }
 
-        this.setState({ data: transformedData });
+        this.setState({ data: transformedData, sectionData });
     }
 
     shouldUpdateState({ changeFlags }: UpdateParameters<this>): boolean {
@@ -305,7 +325,13 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
     }
 
     getWellDataState(): WellFeatureCollection | undefined {
-        return this.state.data;
+        const { data, sectionData } = this.state;
+
+        if (this.context.viewport.constructor === SectionViewport) {
+            return sectionData;
+        }
+
+        return data;
     }
 
     getLegendData(
@@ -1186,6 +1212,19 @@ function distToSegmentSquared(v: Position, w: Position, p: Position): number {
     ]);
 }
 
+function isPointAwayFromLineEnd(
+    point: Position,
+    line: [lineStart: Position, lineEnd: Position]
+): boolean {
+    const ab = subtract(line[1] as number[], line[0] as number[]);
+    const cb = subtract(line[1] as number[], point as number[]);
+
+    const dotProduct = dot(ab as number[], cb as number[]);
+
+    // If the dot product is negative, the point has moved past the end of the line
+    return dotProduct < 0;
+}
+
 // Interpolates point closest to the coords on trajectory
 function interpolateDataOnTrajectory(
     coord: Position,
@@ -1209,6 +1248,14 @@ function interpolateDataOnTrajectory(
     // Get the nearest survey points.
     const survey0 = trajectory[index0];
     const survey1 = trajectory[index1];
+
+    // To avoid interpolating longer than the actual wellbore path we ignore the coordinate if it's moved beyond the last line
+    if (
+        index1 === trajectory.length - 1 &&
+        isPointAwayFromLineEnd(coord, [survey0, survey1])
+    ) {
+        coord = survey1;
+    }
 
     const dv = distance(survey0, survey1) as number;
     if (dv === 0) {
@@ -1240,7 +1287,7 @@ function getMd(
     if (trajectory3D == undefined) return null;
 
     let trajectory;
-    // In 2D view coord is of type Position2D and in 3D view it's Position3D,
+    // In 2D view coord is of type Point2D and in 3D view it is Point3D,
     // so use appropriate trajectory for interpolation
     if (coord.length == 2) {
         const trajectory2D = trajectory3D.map((v) => {
@@ -1284,7 +1331,7 @@ function getTvd(
         return wellhead_xyz?.[2] ?? null;
     }
     let trajectory;
-    // For 2D view coord is Position2D and for 3D view it's Position3D
+    // For 2D view coord is Point2D and for 3D view it is Point3D
     if (coord.length == 2) {
         const trajectory2D = trajectory3D?.map((v) => {
             return v.slice(0, 2);
@@ -1298,6 +1345,7 @@ function getTvd(
         return v[2];
     }) as number[];
 
+    // TVD goes downwards, so it's reversed
     return interpolateDataOnTrajectory(coord, tvds, trajectory);
 }
 

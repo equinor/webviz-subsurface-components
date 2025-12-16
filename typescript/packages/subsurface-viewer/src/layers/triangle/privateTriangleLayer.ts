@@ -2,25 +2,29 @@ import type { LayerProps, PickingInfo, UpdateParameters } from "@deck.gl/core";
 import { COORDINATE_SYSTEM, Layer, picking, project32 } from "@deck.gl/core";
 
 import { GL } from "@luma.gl/constants";
+import type { Device } from "@luma.gl/core";
 import type { GeometryProps } from "@luma.gl/engine";
 import { Geometry, Model } from "@luma.gl/engine";
-import type { Device } from "@luma.gl/core";
 import type { ShaderModule } from "@luma.gl/shadertools";
-
-import type { DeckGLLayerContext } from "../../components/Map";
 import { lighting } from "@luma.gl/shadertools";
+
 import { phongMaterial } from "../shader_modules/phong-lighting/phong-material";
+import { precisionForTests } from "../shader_modules/test-precision/precisionForTests";
+
 import type {
+    DeckGLLayerContext,
     ExtendedLayerProps,
     LayerPickInfo,
     PropertyDataType,
 } from "../utils/layerTools";
 import { createPropertyData } from "../utils/layerTools";
 
-import fsShader from "./fragment.fs.glsl";
-import fsLineShader from "./fragment_lines.glsl";
-import vsShader from "./vertex.glsl";
-import vsLineShader from "./vertex_lines.glsl";
+import type { RGBAColor, RGBColor } from "../../utils";
+
+import fsShader from "./triangle.fs.glsl";
+import vsShader from "./triangle.vs.glsl";
+import fsLineShader from "./line.fs.glsl";
+import vsLineShader from "./line.vs.glsl";
 
 export type GeometryTriangles = {
     topology: GeometryProps["topology"];
@@ -47,7 +51,7 @@ export interface PrivateTriangleLayerProps extends ExtendedLayerProps {
     geometryLines: GeometryLines;
     contours: [number, number];
     gridLines: boolean;
-    color: [number, number, number];
+    color: RGBColor;
     smoothShading: boolean;
     depthTest: boolean;
     ZIncreasingDownwards: boolean;
@@ -116,27 +120,37 @@ export default class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProp
     _getModels(device: Device): [Model, Model] {
         const triangleModel = new Model(device, {
             id: `${this.props.id}-mesh`,
-            vs: vsShader,
-            fs: fsShader,
+            ...super.getShaders({
+                vs: vsShader,
+                fs: fsShader,
+                modules: [
+                    project32,
+                    picking,
+                    lighting,
+                    phongMaterial,
+                    trianglesUniforms,
+                    precisionForTests,
+                ],
+            }),
             bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
             geometry: new Geometry(this.props.geometryTriangles),
-            modules: [
-                project32,
-                picking,
-                lighting,
-                phongMaterial,
-                trianglesUniforms,
-            ],
             isInstanced: false, // This only works when set to false.
         });
 
         const lineModel = new Model(device, {
             id: `${this.props.id}-lines`,
-            vs: vsLineShader,
-            fs: fsLineShader,
+            ...super.getShaders({
+                vs: vsLineShader,
+                fs: fsLineShader,
+                modules: [
+                    project32,
+                    picking,
+                    triangleMeshUniforms,
+                    precisionForTests,
+                ],
+            }),
             bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
             geometry: new Geometry(this.props.geometryLines),
-            modules: [project32, picking, triangleMeshUniforms],
             isInstanced: false,
         });
 
@@ -172,7 +186,7 @@ export default class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProp
                         (x: number) => (x ?? 0) / 255
                     ),
                     1 /* alpha channel */,
-                ] as [number, number, number, number],
+                ] as RGBAColor,
                 smoothShading:
                     this.props.smoothShading ?? defaultProps.smoothShading,
                 ZIncreasingDownwards:
@@ -268,7 +282,7 @@ type TriangleUniformsType = {
     isContoursDepth: boolean;
     contourReferencePoint: number;
     contourInterval: number;
-    uColor: [number, number, number, number];
+    uColor: RGBAColor;
     smoothShading: boolean;
     ZIncreasingDownwards: boolean;
 };

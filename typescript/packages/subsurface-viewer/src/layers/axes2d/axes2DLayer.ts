@@ -12,18 +12,21 @@ import {
 } from "@deck.gl/core";
 import { load } from "@loaders.gl/core";
 import { ImageLoader } from "@loaders.gl/images";
-import type { RenderPass, UniformValue } from "@luma.gl/core";
+import type { RenderPass, Texture, UniformValue } from "@luma.gl/core";
 import { Geometry, Model } from "@luma.gl/engine";
 import type { ShaderModule } from "@luma.gl/shadertools";
 
 import { vec4 } from "gl-matrix";
 
-import type { ExtendedLayerProps, Position3D } from "../utils/layerTools";
+import type { Point3D, RGBAColor } from "../../utils";
+import { SectionViewport } from "../../viewports/sectionViewport";
+import { precisionForTests } from "../shader_modules/test-precision/precisionForTests";
+import type { ExtendedLayerProps } from "../utils/layerTools";
 import fontAtlasPng from "./font-atlas.png";
-import labelFragmentShader from "./label-fragment.glsl";
-import labelVertexShader from "./label-vertex.glsl";
-import lineFragmentShader from "./line-fragment.glsl";
-import lineVertexShader from "./line-vertex.glsl";
+import labelFragmentShader from "./label.fs.glsl";
+import labelVertexShader from "./label.vs.glsl";
+import lineFragmentShader from "./line.fs.glsl";
+import lineVertexShader from "./line.vs.glsl";
 
 enum TEXT_ANCHOR {
     start = 0,
@@ -39,7 +42,7 @@ enum ALIGNMENT_BASELINE {
 
 type LabelData = {
     label: string;
-    pos: Position3D; // tick line start
+    pos: Point3D; // tick line start
     anchor?: TEXT_ANCHOR;
     alignment?: ALIGNMENT_BASELINE;
     //font_size: number; KEEP.
@@ -433,8 +436,12 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
 
         /*eslint-disable */
         const background_lines: number[] = [
-            ...p1, ...p2, ...p4,  // triangle 1
-            ...p2, ...p4, ...p3,  // triangle 2 
+            ...p1,
+            ...p2,
+            ...p4, // triangle 1
+            ...p2,
+            ...p4,
+            ...p3, // triangle 2
         ];
         /*eslint-enable */
 
@@ -460,8 +467,12 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
 
         /*eslint-disable */
         const background_lines: number[] = [
-            ...p1, ...p2, ...p4,  // triangle 1
-            ...p2, ...p4, ...p3,  // triangle 2 
+            ...p1,
+            ...p2,
+            ...p4, // triangle 1
+            ...p2,
+            ...p4,
+            ...p3, // triangle 2
         ];
         /*eslint-enable */
 
@@ -490,7 +501,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                 to[2] - from[2],
             ];
             const s = 0.5;
-            const pos: Position3D = [
+            const pos: Point3D = [
                 to[0] + s * tick_vec[0],
                 to[1] + s * tick_vec[1],
                 to[2] + s * tick_vec[2],
@@ -519,7 +530,8 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
 
     draw(opts: { context: { renderPass: RenderPass } }): void {
         const is_orthographic =
-            this.context.viewport.constructor === OrthographicViewport;
+            this.context.viewport.constructor === OrthographicViewport ||
+            this.context.viewport.constructor === SectionViewport;
         if (
             typeof this.state["fontTexture"] === "undefined" ||
             !is_orthographic
@@ -569,9 +581,9 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         const yBoundsMin = viewport_bounds_w[1];
         const yBoundsMax = viewport_bounds_w[3];
 
-        let tick_and_axes_lines: number[] = [];
-        let background_lines: number[] = [];
-        let labelData: LabelData[] = [];
+        const tick_and_axes_lines: number[] = [];
+        const background_lines: number[] = [];
+        const labelData: LabelData[] = [];
 
         const isB = this.props.isBottomRuler;
         const isT = this.props.isTopRuler;
@@ -599,9 +611,9 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                     false
                 );
 
-            tick_and_axes_lines = [...tick_and_axes_lines, ...axes, ...ticks];
-            background_lines = [...background_lines, ...back_lines];
-            labelData = [...labelData, ...labels];
+            tick_and_axes_lines.push(...axes, ...ticks);
+            background_lines.push(...back_lines);
+            labelData.push(...labels);
         }
 
         //- TOP RULER ----------------------------------------
@@ -619,9 +631,9 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                 true // isTop
             );
 
-            tick_and_axes_lines = [...tick_and_axes_lines, ...axes, ...ticks];
-            background_lines = [...background_lines, ...back_lines];
-            labelData = [...labelData, ...labels];
+            tick_and_axes_lines.push(...axes, ...ticks);
+            background_lines.push(...back_lines);
+            labelData.push(...labels);
         }
 
         //- LEFT RULER ----------------------------------------
@@ -638,9 +650,9 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                 true
             );
 
-            tick_and_axes_lines = [...tick_and_axes_lines, ...axes, ...ticks];
-            background_lines = [...background_lines, ...back_lines];
-            labelData = [...labelData, ...labels];
+            tick_and_axes_lines.push(...axes, ...ticks);
+            background_lines.push(...back_lines);
+            labelData.push(...labels);
         }
 
         //- RIGHT RULER ----------------------------------------
@@ -658,9 +670,9 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                 false
             );
 
-            tick_and_axes_lines = [...tick_and_axes_lines, ...axes, ...ticks];
-            background_lines = [...background_lines, ...back_lines];
-            labelData = [...labelData, ...labels];
+            tick_and_axes_lines.push(...axes, ...ticks);
+            background_lines.push(...back_lines);
+            labelData.push(...labels);
         }
 
         // Line models. (axis line and tick lines)
@@ -676,8 +688,11 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
 
         const lineModel = new Model(device, {
             id: `${this.props.id}-lines`,
-            vs: lineVertexShader,
-            fs: lineFragmentShader,
+            ...super.getShaders({
+                vs: lineVertexShader,
+                fs: lineFragmentShader,
+                modules: [project32, linesUniforms, precisionForTests],
+            }),
             geometry: new Geometry({
                 topology: "line-list",
                 attributes: {
@@ -685,8 +700,6 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                 },
                 vertexCount: tick_and_axes_lines.length / 3,
             }),
-
-            modules: [project32, linesUniforms],
             isInstanced: false,
         });
         lineModel.shaderInputs.setProps({
@@ -709,8 +722,11 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
 
         const backgroundModel = new Model(device, {
             id: `${this.props.id}-background`,
-            vs: lineVertexShader,
-            fs: lineFragmentShader,
+            ...super.getShaders({
+                vs: lineVertexShader,
+                fs: lineFragmentShader,
+                modules: [project32, linesUniforms, precisionForTests],
+            }),
             geometry: new Geometry({
                 topology: "triangle-list",
                 attributes: {
@@ -719,7 +735,6 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                 vertexCount: background_lines.length / 3,
             }),
 
-            modules: [project32, linesUniforms],
             isInstanced: false,
         });
         backgroundModel.shaderInputs.setProps({
@@ -730,11 +745,15 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         });
 
         //-- Labels model--
-        const labelModels: Model[] = [];
-
         const pixelScale = GetPixelsScale(
             this.props.labelFontSizePt ?? defaultProps.labelFontSizePt
         );
+
+        // Batch all labels into a single model for better performance
+        const allPositions: number[] = [];
+        const allTexcoords: number[] = [];
+        const maxX = fontInfo.textureWidth;
+        const maxY = fontInfo.textureHeight;
 
         for (const item of labelData) {
             const x = item.pos[0];
@@ -752,14 +771,6 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
             const pos_w = vec4.fromValues(x, y, z, 1); // pos world
 
             const len = label.length;
-            const numVertices = len * 6;
-            const positions = new Float32Array(numVertices * 3);
-            const texcoords = new Float32Array(numVertices * 2);
-            const maxX = fontInfo.textureWidth;
-            const maxY = fontInfo.textureHeight;
-            let offset = 0;
-            let offsetTexture = 0;
-
             let x1 = 0;
             if (anchor === TEXT_ANCHOR.end) {
                 x1 = -len;
@@ -789,87 +800,98 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
 
                     const h = 1;
 
-                    // 6 vertices per letter
+                    // 6 vertices per letter - add to batch arrays
                     // t1
                     /*eslint-disable */
-                    positions[offset + 0] = pos_w[0] + x1 * pixelScale * pixel2worldHor; // Add a distance in view coords and convert to world
-                    positions[offset + 1] = pos_w[1] + (0 * pixelScale - y_alignment_offset) * pixel2worldVer;
-                    positions[offset + 2] = pos_w[2];
-                    texcoords[offsetTexture + 0] = u1;
-                    texcoords[offsetTexture + 1] = v1;
+                    allPositions.push(
+                        pos_w[0] + x1 * pixelScale * pixel2worldHor,
+                        pos_w[1] + (0 * pixelScale - y_alignment_offset) * pixel2worldVer,
+                        pos_w[2]
+                    );
+                    allTexcoords.push(u1, v1);
 
-                    positions[offset + 3] = pos_w[0] + x2 * pixelScale * pixel2worldHor;
-                    positions[offset + 4] = pos_w[1] + (0 * pixelScale - y_alignment_offset) * pixel2worldVer;
-                    positions[offset + 5] = pos_w[2];
-                    texcoords[offsetTexture + 2] = u2;
-                    texcoords[offsetTexture + 3] = v1;
+                    allPositions.push(
+                        pos_w[0] + x2 * pixelScale * pixel2worldHor,
+                        pos_w[1] + (0 * pixelScale - y_alignment_offset) * pixel2worldVer,
+                        pos_w[2]
+                    );
+                    allTexcoords.push(u2, v1);
 
-                    positions[offset + 6] = pos_w[0] + x1 * pixelScale * pixel2worldHor;
-                    positions[offset + 7] = pos_w[1] + (h * pixelScale - y_alignment_offset) * pixel2worldVer;
-                    positions[offset + 8] = pos_w[2];
-                    texcoords[offsetTexture + 4] = u1;
-                    texcoords[offsetTexture + 5] = v2;
+                    allPositions.push(
+                        pos_w[0] + x1 * pixelScale * pixel2worldHor,
+                        pos_w[1] + (h * pixelScale - y_alignment_offset) * pixel2worldVer,
+                        pos_w[2]
+                    );
+                    allTexcoords.push(u1, v2);
 
                     // t2
-                    positions[offset + 9] = pos_w[0] + x1 * pixelScale * pixel2worldHor;
-                    positions[offset + 10] = pos_w[1] + (h * pixelScale - y_alignment_offset) * pixel2worldVer;
-                    positions[offset + 11] = pos_w[2];
-                    texcoords[offsetTexture + 6] = u1;
-                    texcoords[offsetTexture + 7] = v2;
+                    allPositions.push(
+                        pos_w[0] + x1 * pixelScale * pixel2worldHor,
+                        pos_w[1] + (h * pixelScale - y_alignment_offset) * pixel2worldVer,
+                        pos_w[2]
+                    );
+                    allTexcoords.push(u1, v2);
 
-                    positions[offset + 12] = pos_w[0] + x2 * pixelScale * pixel2worldHor;
-                    positions[offset + 13] = pos_w[1] + (0 * pixelScale - y_alignment_offset) * pixel2worldVer;
-                    positions[offset + 14] = pos_w[2];
-                    texcoords[offsetTexture + 8] = u2;
-                    texcoords[offsetTexture + 9] = v1;
+                    allPositions.push(
+                        pos_w[0] + x2 * pixelScale * pixel2worldHor,
+                        pos_w[1] + (0 * pixelScale - y_alignment_offset) * pixel2worldVer,
+                        pos_w[2]
+                    );
+                    allTexcoords.push(u2, v1);
 
-                    positions[offset + 15] = pos_w[0] + x2 * pixelScale * pixel2worldHor;
-                    positions[offset + 16] = pos_w[1] + (h * pixelScale - y_alignment_offset) * pixel2worldVer;
-                    positions[offset + 17] = pos_w[2];
-                    texcoords[offsetTexture + 10] = u2;
-                    texcoords[offsetTexture + 11] = v2;
-                    /*eslint-ensable */
+                    allPositions.push(
+                        pos_w[0] + x2 * pixelScale * pixel2worldHor,
+                        pos_w[1] + (h * pixelScale - y_alignment_offset) * pixel2worldVer,
+                        pos_w[2]
+                    );
+                    allTexcoords.push(u2, v2);
+                    /*eslint-enable */
 
                     x1 += 1;
-                    offset += 18;
-                    offsetTexture += 12;
                 } else {
                     // we don't have this character so just advance
                     x1 += 1;
                 }
             }
+        }
 
-            const model = new Model(device, {
-                id: `${this.props.id}-${label}`,
-                vs: labelVertexShader,
-                fs: labelFragmentShader,
-                bindings: {
-                    // @ts-ignore
-                    fontTexture,
-                },
+        // Create single batched model for all labels
+        const labelModels: Model[] = [];
+        if (allPositions.length > 0) {
+            const batchedLabelModel = new Model(device, {
+                id: `${this.props.id}-labels-batched`,
+                ...super.getShaders({
+                    vs: labelVertexShader,
+                    fs: labelFragmentShader,
+                    modules: [project32, axesUniforms, precisionForTests],
+                }),
                 geometry: new Geometry({
                     topology: "triangle-list",
                     attributes: {
-                        positions,
+                        positions: new Float32Array(allPositions),
                         vTexCoord: {
-                            value: texcoords,
+                            value: new Float32Array(allTexcoords),
                             size: 2,
                         },
                     },
-                    vertexCount: positions.length / 3,
+                    vertexCount: allPositions.length / 3,
                 }),
                 bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
-                modules: [project32, axesUniforms],
                 isInstanced: false,
             });
-            model.shaderInputs.setProps({
+
+            batchedLabelModel.setBindings({
+                fontTexture: fontTexture as unknown as Texture,
+            });
+
+            batchedLabelModel.shaderInputs.setProps({
                 axes: {
                     uAxisColor: lineColor,
                     uBackGroundColor: bColor,
                 },
             });
 
-            labelModels.push(model);
+            labelModels.push(batchedLabelModel);
         }
 
         return {
@@ -907,8 +929,8 @@ Axes2DLayer.defaultProps = defaultProps;
 // }
 
 function LineLengthInPixels(
-    p0: Position3D,
-    p1: Position3D,
+    p0: Point3D,
+    p1: Point3D,
     viewport: Viewport
 ): number {
     const screen_from = viewport.project(p0);
@@ -977,7 +999,7 @@ uniform linesUniforms {
 `;
 
 type LinesUniformsType = {
-    uColor: [number, number, number, number];
+    uColor: RGBAColor;
     uClipZ: number;
 };
 
@@ -992,8 +1014,6 @@ const linesUniforms = {
     },
 } as const satisfies ShaderModule<LayerProps, LinesUniformsType>;
 
-
-
 const axesUniformsBlock = /*glsl*/ `\
 uniform axesUniforms {
    vec4 uAxisColor;
@@ -1002,8 +1022,8 @@ uniform axesUniforms {
 `;
 
 type AxesUniformsType = {
-    uAxisColor: [number, number, number, number],
-    uBackGroundColor: [number, number, number, number],
+    uAxisColor: RGBAColor;
+    uBackGroundColor: RGBAColor;
 };
 
 // NOTE: this must exactly the same name than in the uniform block
@@ -1016,4 +1036,3 @@ const axesUniforms = {
         uBackGroundColor: "vec4<f32>",
     },
 } as const satisfies ShaderModule<LayerProps, AxesUniformsType>;
-

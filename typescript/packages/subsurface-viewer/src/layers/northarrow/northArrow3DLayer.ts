@@ -1,16 +1,26 @@
 import type {
     Color,
     LayerContext,
+    LayerProps,
     UpdateParameters,
     Viewport,
 } from "@deck.gl/core";
 import { Layer, OrthographicViewport, project32 } from "@deck.gl/core";
-import { Geometry, Model } from "@luma.gl/engine";
+
 import type { Device } from "@luma.gl/core";
+import { Geometry, Model } from "@luma.gl/engine";
+import type { ShaderModule } from "@luma.gl/shadertools";
+
 import { Vector3 } from "@math.gl/core";
+
 import type { ExtendedLayerProps } from "../utils/layerTools";
-import fragmentShader from "./northarrow-fragment.glsl";
-import vertexShader from "./northarrow-vertex.glsl";
+
+import { precisionForTests } from "../shader_modules/test-precision/precisionForTests";
+
+import type { RGBAColor } from "../../utils";
+
+import fragmentShader from "./northarrow.fs.glsl";
+import vertexShader from "./northarrow.vs.glsl";
 
 export interface NorthArrow3DLayerProps extends ExtendedLayerProps {
     color: Color;
@@ -39,12 +49,28 @@ export default class NorthArrow3DLayer extends Layer<NorthArrow3DLayerProps> {
         }
     }
 
+    setShaderModuleProps(
+        args: Partial<{
+            [x: string]: Partial<Record<string, unknown> | undefined>;
+        }>
+    ): void {
+        const color = (this.props.color ?? defaultProps.color).map((x, i) =>
+            i < 3 ? (x ?? 0) / 255 : 1
+        ) as RGBAColor;
+        super.setShaderModuleProps({
+            ...args,
+            northArrow3D: {
+                uColor: color,
+            },
+        });
+    }
+
     // Signature from the base class, eslint doesn't like the any type.
     // eslint-disable-next-line
-    draw(drawOptions: any): void {
-        const { gl } = drawOptions.context;
+    draw(args: any): void {
+        const { gl } = args.context;
         gl.disable(gl.DEPTH_TEST);
-        super.draw(drawOptions);
+        super.draw(args);
         gl.enable(gl.DEPTH_TEST);
     }
 
@@ -92,14 +118,13 @@ export default class NorthArrow3DLayer extends Layer<NorthArrow3DLayerProps> {
             lines.push(x, y, z);
         }
 
-        const color = this.props.color.map((x?: number) => (x ?? 0) / 255);
-        color[3] = 1;
-
         const grids = new Model(device, {
             id: `${this.props.id}-grids`,
-            vs: vertexShader,
-            fs: fragmentShader,
-            uniforms: { uColor: Array.from(color) },
+            ...super.getShaders({
+                vs: vertexShader,
+                fs: fragmentShader,
+                modules: [project32, precisionForTests, northArrow3DUniforms],
+            }),
             geometry: new Geometry({
                 topology: "line-list",
                 attributes: {
@@ -107,8 +132,6 @@ export default class NorthArrow3DLayer extends Layer<NorthArrow3DLayerProps> {
                 },
                 vertexCount: lines.length / 3,
             }),
-
-            modules: [project32],
             isInstanced: false, // This only works when set to false.
         });
 
@@ -122,6 +145,24 @@ export default class NorthArrow3DLayer extends Layer<NorthArrow3DLayerProps> {
 
 NorthArrow3DLayer.layerName = "NorthArrow3DLayer";
 NorthArrow3DLayer.defaultProps = defaultProps;
+
+const northArrow3DUniformsBlock = `\
+uniform northArrow3DUniforms {
+    uniform vec4 uColor;
+} northArrow3D;
+`;
+
+type NorthArrow3DUniformsType = { uColor: RGBAColor };
+
+// NOTE: this must exactly the same name than in the uniform block
+const northArrow3DUniforms = {
+    name: "northArrow3D",
+    vs: undefined,
+    fs: northArrow3DUniformsBlock,
+    uniformTypes: {
+        uColor: "vec4<f32>",
+    },
+} as const satisfies ShaderModule<LayerProps, NorthArrow3DUniformsType>;
 
 //-- Local functions. --------------------------------------
 

@@ -34,16 +34,16 @@ import wellLogsJson from "../../../../../../example-data/volve_logs.json";
 import templateJson from "../../../../../../example-data/welllog_template_2.json";
 import colorTables from "../../../../../../example-data/wellpick_colors.json";
 import wellPicks from "../../../../../../example-data/wellpicks.json";
-import type { ColorMapFunction } from "../../utils/color-function";
+import type { ColormapFunction } from "../../utils/color-function";
 import { indexOfElementByName, isEqualRanges } from "../../utils/arrays";
 import { getDiscreteMeta } from "../../utils/well-log";
 
 const wellLogs = wellLogsJson as unknown as WellLogSet[];
 const template = templateJson as unknown as Template;
 
-const exampleColorMapFunctions: ColorMapFunction[] = [
+const exampleColormapFunctions: ColormapFunction[] = [
     // copy color tables and add some color functions
-    ...(colorTables as ColorMapFunction[]),
+    ...(colorTables as ColormapFunction[]),
     {
         name: "Grey scale",
         func: (v: number) => [v * 255, v * 255, v * 255],
@@ -69,7 +69,7 @@ const exampleColorMapFunctions: ColorMapFunction[] = [
 const wellpick = {
     wellpick: wellPicks[0],
     name: "HORIZON",
-    colorMapFunctions: exampleColorMapFunctions,
+    colorMapFunctions: exampleColormapFunctions,
     color: "Stratigraphy",
 };
 
@@ -77,8 +77,8 @@ function getTemplatePlotColorFunctionName(
     template: Template,
     templatePlot: TemplatePlot
 ): string | undefined {
-    let colorMapFunctionName = templatePlot.colorMapFunctionName;
-    if (!colorMapFunctionName && templatePlot.style) {
+    let colormapFunctionName = templatePlot.colorMapFunctionName;
+    if (!colormapFunctionName && templatePlot.style) {
         const templateStyles = template.styles;
         if (templateStyles) {
             const iStyle = indexOfElementByName(
@@ -87,11 +87,11 @@ function getTemplatePlotColorFunctionName(
             );
             if (iStyle >= 0) {
                 const style = templateStyles[iStyle];
-                colorMapFunctionName = style.colorMapFunctionName;
+                colormapFunctionName = style.colorMapFunctionName;
             }
         }
     }
-    return colorMapFunctionName;
+    return colormapFunctionName;
 }
 
 interface State {
@@ -410,7 +410,7 @@ export class MapAndWellLogViewer extends React.Component<
                                     : undefined
                             }
                             template={template}
-                            colorMapFunctions={exampleColorMapFunctions}
+                            colorMapFunctions={exampleColormapFunctions}
                             // @aspentech: This issue needs to get sorted out, there seems to be a compatibility issue with the JSON file and the prop type
                             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                             // @ts-ignore

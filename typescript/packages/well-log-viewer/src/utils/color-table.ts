@@ -1,12 +1,12 @@
 import {
-    type ColorMapFunction,
+    type ColormapFunction,
     type ColorFunction,
     type ColorTable,
     isFunction,
 } from "./color-function";
 
 /*
-  Binary serach in array of elements [number, ...]
+  Binary search in array of elements [number, ...]
   */
 function binarySearch(array: number[][], v: number) {
     let lo = -1,
@@ -19,7 +19,7 @@ function binarySearch(array: number[][], v: number) {
             lo = mi;
         }
     }
-    // v should be in the semiopen interval [array[lo][0], array[hi][0])
+    // v should be in the semi-open interval [array[lo][0], array[hi][0])
     // i.e. array[lo][0] <= v < array[hi][0]
     return hi;
 }
@@ -78,15 +78,15 @@ export function getExactColor(
   get HTML string with interpolated color value in #xxxxxx format
 */
 export function getInterpolatedColor(
-    colorMapFunction: ColorMapFunction,
+    colormapFunction: ColormapFunction,
     v: number
 ): [number, number, number] {
-    if (isFunction(colorMapFunction)) {
-        const func = colorMapFunction as ColorFunction;
+    if (isFunction(colormapFunction)) {
+        const func = colormapFunction as ColorFunction;
         return func.func(v);
     }
 
-    const table = colorMapFunction as ColorTable;
+    const table = colormapFunction as ColorTable;
     // TODO: Do not compute these 3 constants (cNaN, cBelow, cAbove) every time!
     const cNaN: [number, number, number] = table.colorNaN
         ? table.colorNaN
@@ -125,15 +125,15 @@ export function getInterpolatedColor(
   get HTML string with interpolated color value in #xxxxxx format
 */
 export function getInterpolatedColorString(
-    colorMapFunction: ColorMapFunction,
+    colormapFunction: ColormapFunction,
     v: number
 ): string {
-    if (isFunction(colorMapFunction)) {
-        const func = colorMapFunction as ColorFunction;
+    if (isFunction(colormapFunction)) {
+        const func = colormapFunction as ColorFunction;
         return colorToString(func.func(v), "#ffffff");
     }
 
-    const colorTable = colorMapFunction as ColorTable;
+    const colorTable = colormapFunction as ColorTable;
     // TODO: Do not compute these 3 constants (cNaN, cBelow, cAbove) every time!
     const cNaN = colorToString(colorTable.colorNaN, "#ffffff"); // "white"
 

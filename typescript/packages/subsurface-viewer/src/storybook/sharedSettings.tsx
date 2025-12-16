@@ -2,10 +2,10 @@ import React from "react";
 
 import { styled } from "@mui/material/styles";
 
-import type { SubsurfaceViewerProps } from "../SubsurfaceViewer";
+import type { SubsurfaceViewerProps, ViewsType } from "../SubsurfaceViewer";
 import SubsurfaceViewer from "../SubsurfaceViewer";
-import type { BoundingBox2D } from "../utils/BoundingBox2D";
-import type { BoundingBox3D } from "../utils/BoundingBox3D";
+
+import type { BoundingBox2D, BoundingBox3D, Point3D } from "../utils";
 
 import type { GeoJsonLayerProps } from "@deck.gl/layers";
 import exampleData from "../../../../../example-data/deckgl-map.json";
@@ -106,6 +106,16 @@ export const volveWellsLayer = {
 export const volveWellsBounds: BoundingBox2D = [
     432150, 6475800, 439400, 6481500,
 ];
+
+export const emptyVolveWellsViewViewport: ViewsType = {
+    layout: [1, 1],
+    viewports: [
+        {
+            id: "viewport_1",
+            layerIds: [],
+        },
+    ],
+};
 
 export const volveWellsWithLogsLayer = {
     "@@type": "WellsLayer",
@@ -259,8 +269,7 @@ export const customLayerWithTextData = {
         },
     ],
     pickable: true,
-    getPosition: (d: { coordinates: [number, number, number] }) =>
-        d.coordinates,
+    getPosition: (d: { coordinates: Point3D }) => d.coordinates,
     getText: (d: { name: string }) => d.name,
     getColor: [255, 0, 0],
     getSize: 16,

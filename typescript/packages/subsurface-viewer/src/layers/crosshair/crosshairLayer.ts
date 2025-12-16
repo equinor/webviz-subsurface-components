@@ -3,7 +3,9 @@ import { IconLayer } from "@deck.gl/layers";
 
 import type { DefaultProps } from "@deck.gl/core";
 
-function makeCrossHairSvg(color: [number, number, number, number]): string {
+import type { RGBAColor } from "../../utils";
+
+function makeCrossHairSvg(color: RGBAColor): string {
     return `<?xml version="1.0" encoding="utf-8"?>
 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="150px" height="150px"
 	 viewBox="0 0 150 150" xml:space="preserve">
@@ -18,7 +20,7 @@ function makeCrossHairSvg(color: [number, number, number, number]): string {
 export type CrosshairLayerProps = {
     id: string;
     worldCoordinates: [number, number, number] | null;
-    color?: [number, number, number, number];
+    color?: RGBAColor;
     sizePx?: number;
     visible?: boolean;
 };
@@ -57,6 +59,9 @@ class CrosshairLayer extends CompositeLayer<CrosshairLayerProps> {
                     sizeUnits: "pixels",
                     getColor: () => this.props.color || [0, 0, 0, 255],
                     pickable: false,
+                    parameters: {
+                        depthTest: false,
+                    },
                 })
             ),
         ];

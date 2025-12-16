@@ -9,33 +9,43 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      # Inspired by https://medium.com/@michadrabikowski/automated-releases-with-nx-and-github-actions-07f574041293
+      - name: 📖 Checkout commit locally
+        uses: actions/checkout@v4
         with:
-          persist-credentials: false
           fetch-depth: 0
+          token: ${{ secrets.SEMANTIC_RELEASE_GITHUB_TOKEN }} 
 
-      - name: configure git
+      - name: Configure git
         run: |
-          git config user.name "hkfb"
-          git config user.email "hkfb@users.noreply.github.com"
+          git config --global user.name "hkfb"
+          git config --global user.email "hkfb@users.noreply.github.com"
 
-      - run: npm ci
-        working-directory: ./typescript
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          # Needed for registry authentication in the publish step (https://github.com/actions/setup-node?tab=readme-ov-file#usage)
+          registry-url: https://registry.npmjs.org/
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Dry-run Nx release
+
+      - name: 📦 Install build dependencies
         working-directory: ./typescript
-        run: npx nx release --dry-run
+        run: |
+          npm ci CYPRESS_INSTALL_BINARY=0 --ignore-scripts
+
+      - name: 🏗️ Build packages
+        working-directory: ./typescript
+        run: |
+          npx nx run-many -t build
+
+      - name: 🔼 Run Nx release
+        working-directory: ./typescript
+        run: npx nx release --yes
         env:
           GITHUB_TOKEN: ${{ secrets.SEMANTIC_RELEASE_GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.SEMANTIC_RELEASE_GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Run semantic release
-        working-directory: ./typescript
-        run: npx nx run-many --target=semantic-release --parallel=false
-        env:
-          GITHUB_TOKEN: ${{ secrets.SEMANTIC_RELEASE_GITHUB_TOKEN }}
-          GH_TOKEN: ${{ secrets.SEMANTIC_RELEASE_GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          npm_config_legacy_peer_deps: false  # `nx release version` corrupts package-lock.json. See https://github.com/nrwl/nx/issues/22066#issuecomment-2576366862

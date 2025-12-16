@@ -14,7 +14,7 @@ import defaultLayout from "./components/DefaultSyncLogViewerLayout";
 
 import type { WellLogSet } from "./components/WellLogTypes";
 import type { Template } from "./components/WellLogTemplateTypes";
-import type { ColorMapFunction } from "./utils/color-function";
+import type { ColormapFunction } from "./utils/color-function";
 import { ColorFunctionType } from "./components/CommonPropTypes";
 import type { PatternsTable, Pattern } from "./utils/pattern";
 import { PatternsTableType, PatternsType } from "./components/CommonPropTypes";
@@ -79,7 +79,7 @@ export interface SyncLogViewerProps {
     /**
      * Prop containing color function/table array.
      */
-    colorMapFunctions: ColorMapFunction[];
+    colorMapFunctions: ColormapFunction[];
 
     /**
      * Set to true for default titles or to array of individual well log titles
@@ -961,7 +961,6 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         };
         return (
             <WellLogViewWithScroller
-                iWellLogView={index}
                 key={index}
                 welllog={wellLog}
                 viewTitle={viewTitle}

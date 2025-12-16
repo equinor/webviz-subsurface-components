@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
-import type { Feature, FeatureCollection } from "geojson";
-import { cloneDeep, isEmpty, isEqual } from "lodash";
+import type { Feature } from "geojson";
+import { cloneDeep, isEmpty, isEqual, isFunction } from "lodash";
 
 import type {
     MjolnirEvent,
@@ -13,7 +13,6 @@ import { JSONConfiguration, JSONConverter } from "@deck.gl/json";
 
 import type {
     Color,
-    LayerContext,
     LayerProps,
     LayersList,
     PickingInfo,
@@ -45,41 +44,43 @@ import type { colorTablesArray } from "@emerson-eps/color-tables/";
 
 import { validateColorTables, validateLayers } from "@webviz/wsc-common";
 import { Axes2DLayer, NorthArrow3DLayer, WellsLayer } from "../layers";
-import type { LayerPickInfo } from "../layers/utils/layerTools";
+import type {
+    LayerPickInfo,
+    ReportBoundingBoxAction,
+} from "../layers/utils/layerTools";
 import {
     getLayersByType,
     getModelMatrixScale,
     getWellLayerByTypeAndSelectedWells,
 } from "../layers/utils/layerTools";
 import type { WellsPickInfo } from "../layers/wells/types";
-import type { BoundingBox2D, Point2D } from "../utils/BoundingBox2D";
+import type { BoundingBox2D, BoundingBox3D, Point2D, Point3D } from "../utils";
 import { isEmpty as isEmptyBox2D } from "../utils/BoundingBox2D";
-import type { BoundingBox3D, Point3D } from "../utils/BoundingBox3D";
 import {
     boxCenter,
     boxUnion,
     isEmpty as isEmptyBox3D,
 } from "../utils/BoundingBox3D";
 import JSON_CONVERTER_CONFIG from "../utils/configuration";
-import fitBounds from "../utils/fit-bounds";
+import { fitBounds } from "../utils/fitBounds";
 import { DistanceScale } from "./DistanceScale";
+import type { InfoCardProps } from "./InfoCard";
 import InfoCard from "./InfoCard";
 import StatusIndicator from "./StatusIndicator";
 
 import type { Unit } from "convert-units";
-import IntersectionView from "../views/intersectionView";
 
 import type { LightsType, TLayerDefinition } from "../SubsurfaceViewer";
 import { getZoom, useLateralZoom } from "../utils/camera";
 import { useScaleFactor, useShiftHeld } from "../utils/event";
 
 import type { ViewportType } from "../views/viewport";
-import { useVerticalScale } from "../views/viewport";
+import { defineController, useVerticalScale } from "../views/viewport";
 
 import mergeRefs from "merge-refs";
 import { WellLabelLayer } from "../layers/wells/layers/wellLabelLayer";
+import { SectionView } from "../views/sectionView";
 
-export type { BoundingBox2D, BoundingBox3D, Point2D, Point3D };
 /**
  * Type of the function returning coordinate boundary for the view defined as [left, bottom, right, top].
  */
@@ -88,6 +89,10 @@ export type BoundsAccessor = () => BoundingBox2D;
 type Size = {
     width: number;
     height: number;
+};
+
+export type PickingInfoExt = PickingInfo & {
+    scaledCoordinate?: Point2D | Point3D | undefined;
 };
 
 const minZoom3D = -12;
@@ -99,7 +104,7 @@ const DEFAULT_VIEWS: ViewsType = {
     layout: [1, 1],
     showLabel: false,
     marginPixels: 0,
-    viewports: [{ id: "main-view", show3D: false, layerIds: [] }],
+    viewports: [{ id: "main-view", viewType: OrthographicView }],
 };
 
 function parseLights(lights?: LightsType): LightingEffect[] | undefined {
@@ -147,7 +152,6 @@ function parseLights(lights?: LightsType): LightingEffect[] | undefined {
     return effects;
 }
 
-export type ReportBoundingBoxAction = { layerBoundingBox: BoundingBox3D };
 function mapBoundingBoxReducer(
     mapBoundingBox: BoundingBox3D | undefined,
     action: ReportBoundingBoxAction
@@ -190,13 +194,57 @@ export interface ViewsType {
  * Camera view state.
  */
 export interface ViewStateType {
+    /**
+     * Camera target position.
+     */
     target: Point2D | Point3D | undefined;
-    zoom: number | Point2D | BoundingBox3D | undefined;
+    /**
+     * Zoom level or bounding box to fit in the view.
+     * - When a number: Represents the zoom level of the camera.
+     * - When a tuple [number, number]: Represents independent zoom levels along the horizontal and vertical axes.
+     * - When a BoundingBox3D: Represents the camera position computed to fit (zoom in) the entire box.
+     */
+    zoom: number | [number, number] | BoundingBox3D | undefined;
+    /**
+     * Rotation around the X axis in degrees. Only for 3D view.
+     */
     rotationX: number;
+    /**
+     * Rotation around the orbit in degrees. Only for 3D view.
+     */
     rotationOrbit: number;
+    /**
+     * Minimum zoom level.
+     * Constrains how far out the user can zoom. Lower values allow viewing a larger area.
+     */
     minZoom?: number;
+    /**
+     * Maximum zoom level.
+     * Constrains how far in the user can zoom. Higher values allow closer inspection.
+     */
     maxZoom?: number;
+    /**
+     *  Animation transition duration in milliseconds.
+     */
     transitionDuration?: number;
+    /**
+     * Viewport width in pixels.
+     */
+    width?: number;
+    /**
+     * Viewport height in pixels.
+     */
+    height?: number;
+    /**
+     * Minimum rotation around the X axis in degrees. Only for 3D view.
+     * Constrains the minimum tilt angle of the camera (e.g., 0° = horizontal view).
+     */
+    minRotationX?: number;
+    /**
+     * Maximum rotation around the X axis in degrees. Only for 3D view.
+     * Constrains the maximum tilt angle of the camera (e.g., 90° = top-down view).
+     */
+    maxRotationX?: number;
 }
 
 interface MarginsType {
@@ -204,13 +252,6 @@ interface MarginsType {
     right: number;
     top: number;
     bottom: number;
-}
-
-export interface DeckGLLayerContext extends LayerContext {
-    userData: {
-        setEditedData: (data: Record<string, unknown>) => void;
-        colorTables: colorTablesArray;
-    };
 }
 
 export interface MapMouseEvent {
@@ -286,12 +327,28 @@ export interface MapProps {
 
     /**
      * Parameters for the InfoCard component
+     * @deprecated - Use pickingDepth, multiPicking, and showReadout instead
      */
     coords?: {
         visible?: boolean | null;
         multiPicking?: boolean | null;
         pickDepth?: number | null;
-    };
+    } | null;
+
+    /**
+     * The amount of items that gets picked. Should be a positive integer. With depth 0, no picking info will be returned. Can alternatively provide a function to give a dynamic value.
+     */
+    pickingDepth?: number | ((type: "click" | "hover") => number);
+
+    /**
+     * Extra pixels around the pointer to include while picking.
+     */
+    pickingRadius?: number;
+
+    /**
+     * If true, the built-in readout box will be shown
+     */
+    showReadout?: boolean | ((props: InfoCardProps) => React.ReactNode);
 
     /**
      * Parameters for the Distance Scale component
@@ -391,14 +448,24 @@ export interface MapProps {
     innerRef?: React.Ref<HTMLElement>;
 
     /**
-     * Extra pixels around the pointer to include while picking.
-     */
-    pickingRadius?: number;
-
-    /**
      * The reference to the deck.gl instance.
      */
     deckGlRef?: React.ForwardedRef<DeckGLRef>;
+}
+
+export type ViewTypeType =
+    | typeof OrbitView
+    | typeof OrthographicView
+    | typeof SectionView;
+
+// Helper function to handle deprecated "show3D" property of ViewportType
+function show3D(viewPort: ViewportType): boolean {
+    if (typeof viewPort.show3D === "boolean") {
+        console.warn("show3D is deprecated. Use viewType");
+        return viewPort.show3D;
+    }
+
+    return viewPort.viewType === OrbitView;
 }
 
 function defaultTooltip(info: PickingInfo) {
@@ -417,6 +484,19 @@ function defaultTooltip(info: PickingInfo) {
     return feat?.properties?.["name"];
 }
 
+function makeExtendedPickingInfo(info: PickingInfo): PickingInfoExt {
+    const scaledCoordinate = info.coordinate
+        ? ([...info.coordinate] as Point2D | Point3D)
+        : undefined;
+
+    const extendedPickInfo: PickingInfoExt = {
+        ...info,
+        scaledCoordinate,
+    };
+
+    return extendedPickInfo;
+}
+
 const Map: React.FC<MapProps> = ({
     id,
     layers,
@@ -424,8 +504,10 @@ const Map: React.FC<MapProps> = ({
     cameraPosition,
     triggerHome,
     views = DEFAULT_VIEWS,
-    coords = { visible: true, multiPicking: true, pickDepth: 2 },
     scale = { visible: true, cssStyle: { top: 10, left: 10 } },
+    coords,
+    showReadout = coords?.visible ?? true,
+    pickingDepth = coords?.pickDepth ?? 2,
     coordinateUnit = "m",
     colorTables = defaultColorTables,
     setEditedData,
@@ -567,47 +649,70 @@ const Map: React.FC<MapProps> = ({
 
     const getPickingInfos = useCallback(
         (
+            type: "hover" | "click",
             pickInfo: PickingInfo,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            event: any
-        ): PickingInfo[] => {
-            if (coords?.multiPicking && pickInfo.layer?.context.deck) {
-                const pickInfos =
-                    pickInfo.layer.context.deck.pickMultipleObjects({
-                        x: event.offsetCenter.x,
-                        y: event.offsetCenter.y,
-                        depth: coords.pickDepth ?? undefined,
-                        unproject3D: true,
-                    }) as LayerPickInfo[];
-                pickInfos.forEach((item) => {
-                    if (item.properties) {
-                        let unit = (
-                            item.sourceLayer?.props
-                                .data as unknown as FeatureCollection & {
-                                unit: string;
-                            }
-                        )?.unit;
-                        if (unit == undefined) unit = " ";
-                        item.properties.forEach((element) => {
-                            if (
-                                element.name.includes("MD") ||
-                                element.name.includes("TVD")
-                            ) {
-                                element.value =
-                                    Number(element.value)
-                                        .toFixed(2)
-                                        .toString() +
-                                    " " +
-                                    unit;
-                            }
-                        });
-                    }
-                });
-                return pickInfos;
+            event: MjolnirPointerEvent | MjolnirGestureEvent
+        ): PickingInfoExt[] => {
+            const depth = isFunction(pickingDepth)
+                ? pickingDepth(type)
+                : pickingDepth;
+
+            if (depth < 0)
+                throw new Error(
+                    `Expected a picking depth to be positive. Received ${depth}`
+                );
+
+            if (depth === 0) return [];
+
+            if (!pickInfo.layer?.context.deck) {
+                const extendedPickInfo = makeExtendedPickingInfo(pickInfo);
+
+                // Z value should not take into account the Z scale factor.
+                viewController.unscaledTarget(
+                    pickInfo.coordinate as Point2D | Point3D
+                );
+
+                return [extendedPickInfo];
             }
-            return [pickInfo];
+
+            const pickInfos = pickInfo.layer.context.deck.pickMultipleObjects({
+                x: event.offsetCenter.x,
+                y: event.offsetCenter.y,
+                depth,
+                unproject3D: true,
+                radius: pickingRadius,
+            });
+
+            const extendedPickInfos = pickInfos.map((itemPick) => {
+                const extItemPick = makeExtendedPickingInfo(itemPick);
+                // Z value should not take into account the Z scale factor.
+                viewController.unscaledTarget(
+                    extItemPick.coordinate as Point2D | Point3D
+                );
+
+                if (extItemPick.layer instanceof WellsLayer) {
+                    const wellsPickInfo = extItemPick as WellsPickInfo;
+                    const unit = extItemPick.layer?.state.data?.unit ?? " ";
+
+                    wellsPickInfo.properties?.forEach((property) => {
+                        if (
+                            property.name.includes("MD") ||
+                            property.name.includes("TVD")
+                        ) {
+                            const fixedNumber = Number(property.value).toFixed(
+                                2
+                            );
+
+                            property.value = `${fixedNumber} ${unit}`;
+                        }
+                    });
+                }
+
+                return extItemPick;
+            });
+            return extendedPickInfos;
         },
-        [coords?.multiPicking, coords?.pickDepth]
+        [pickingDepth, pickingRadius, viewController]
     );
 
     /**
@@ -616,7 +721,9 @@ const Map: React.FC<MapProps> = ({
     const callOnMouseEvent = useCallback(
         (
             type: "click" | "hover",
-            infos: PickingInfo[],
+            infos: (PickingInfo & {
+                scaledCoordinate?: Point2D | Point3D | undefined;
+            })[],
             event: MjolnirEvent
         ): void => {
             if (
@@ -626,12 +733,8 @@ const Map: React.FC<MapProps> = ({
                 event.tapCount == 2 // Note. Detect double click.
             ) {
                 // Left button click identifies new camera rotation anchor.
-                if (infos.length >= 1) {
-                    if (infos[0].coordinate) {
-                        viewController.setScaledTarget(
-                            infos[0].coordinate as Point3D
-                        );
-                    }
+                if (infos.length >= 1 && infos[0].coordinate) {
+                    viewController.setScaledTarget(infos[0].scaledCoordinate);
                 }
             }
 
@@ -645,8 +748,8 @@ const Map: React.FC<MapProps> = ({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [hoverInfo, setHoverInfo] = useState<any>([]);
     const onHover = useCallback(
-        (pickInfo: PickingInfo, event: MjolnirEvent) => {
-            const infos = getPickingInfos(pickInfo, event);
+        (pickInfo: PickingInfo, event: MjolnirPointerEvent) => {
+            const infos = getPickingInfos("hover", pickInfo, event);
             setHoverInfo(infos);
             callOnMouseEvent?.("hover", infos, event);
         },
@@ -654,8 +757,8 @@ const Map: React.FC<MapProps> = ({
     );
 
     const onClick = useCallback(
-        (pickInfo: PickingInfo, event: MjolnirEvent) => {
-            const infos = getPickingInfos(pickInfo, event);
+        (pickInfo: PickingInfo, event: MjolnirGestureEvent) => {
+            const infos = getPickingInfos("click", pickInfo, event);
             callOnMouseEvent?.("click", infos, event);
         },
         [callOnMouseEvent, getPickingInfos]
@@ -705,15 +808,34 @@ const Map: React.FC<MapProps> = ({
         if (deckGLLayers) {
             let progress = 100;
 
+            // get all the layers ids used in the views, to consider only visible layers
+            const layersIdsPresentInViews = views?.viewports
+                ?.map((viewport) => viewport?.layerIds)
+                ?.flat();
+            const someViewportHasUndefinedLayerIds =
+                layersIdsPresentInViews?.includes(undefined);
+            const allViewportsHaveAnEmptyListOfLayerIds =
+                !someViewportHasUndefinedLayerIds &&
+                layersIdsPresentInViews?.length === 0;
+
             const emptyLayers = // There will always be a dummy layer. Deck.gl does not like empty array of layers.
-                deckGLLayers.length == 1 &&
+                deckGLLayers.length === 1 &&
                 (deckGLLayers[0] as LineLayer).id ===
                     "webviz_internal_dummy_layer";
-            if (!emptyLayers) {
+            if (!emptyLayers && !allViewportsHaveAnEmptyListOfLayerIds) {
                 // compute #done layers / #visible layers percentage
-                const visibleLayers = deckGLLayers.filter(
-                    (layer) => (layer as Layer).props.visible
-                );
+                const visibleLayers = deckGLLayers.filter((layer) => {
+                    const layerWithType = layer as Layer;
+                    const filterByLayersInViews =
+                        !someViewportHasUndefinedLayerIds
+                            ? layersIdsPresentInViews?.includes(
+                                  layerWithType.id
+                              )
+                            : true;
+                    return (
+                        layerWithType?.props?.visible && filterByLayersInViews
+                    );
+                });
                 const loaded = visibleLayers?.filter(
                     (layer) => (layer as Layer)?.isLoaded
                 ).length;
@@ -726,7 +848,7 @@ const Map: React.FC<MapProps> = ({
                 onRenderingProgress(progress);
             }
         }
-    }, [deckGLLayers, onRenderingProgress]);
+    }, [deckGLLayers, onRenderingProgress, views?.viewports]);
 
     // validate layers data
     const [errorText, setErrorText] = useState<string>();
@@ -760,6 +882,11 @@ const Map: React.FC<MapProps> = ({
             const cur_view = views.viewports.find(
                 ({ id }) => args.viewport.id && id === args.viewport.id
             );
+
+            if (cur_view?.layerIds === undefined) {
+                return true;
+            }
+
             if (cur_view?.layerIds && cur_view.layerIds.length > 0) {
                 const layer_ids = cur_view.layerIds;
                 return layer_ids.some((layer_id) => {
@@ -767,7 +894,7 @@ const Map: React.FC<MapProps> = ({
                     return t;
                 });
             } else {
-                return true;
+                return false;
             }
         },
         [views]
@@ -827,8 +954,10 @@ const Map: React.FC<MapProps> = ({
 
     const lateralZoom = useLateralZoom(deckGlViewState);
 
-    if (!deckGlViews || isEmpty(deckGlViews) || isEmpty(deckGLLayers))
+    if (!deckGlViews || isEmpty(deckGlViews) || isEmpty(deckGLLayers)) {
         return null;
+    }
+
     return (
         <div ref={divRef} onContextMenu={(event) => event.preventDefault()}>
             <DeckGL
@@ -884,7 +1013,6 @@ const Map: React.FC<MapProps> = ({
                 onDrag={onDrag}
                 onResize={onResize}
                 pickingRadius={pickingRadius}
-                eventRecognizerOptions={{ dblclick: { taps: 3 } }} // Add double click recognizer
             >
                 {children}
             </DeckGL>
@@ -916,7 +1044,7 @@ const Map: React.FC<MapProps> = ({
                     />
                 </div>
             )}
-            {coords?.visible && <InfoCard pickInfos={hoverInfo} />}
+            {showReadout && <InfoCard pickInfos={hoverInfo} />}
             {errorText && (
                 <pre
                     style={{
@@ -1130,9 +1258,13 @@ class ViewController {
 
     /**
      * Sets the target from picks, which comes from the displayed scaled data.
-     * @param target scaled 3D point.
+     * @param scaledTarget scaled 3D point.
      */
-    public readonly setScaledTarget = (target: Point3D) => {
+    public setScaledTarget(scaledTarget: Point2D | Point3D | undefined): void {
+        if (!scaledTarget) {
+            return console.warn("Undefined scale-target! Skipping...");
+        }
+
         const vsKey = Object.keys(this.result_.deckglViewStates).at(0);
         if (vsKey) {
             // deep clone to notify change (memo checks object address)
@@ -1141,18 +1273,22 @@ class ViewController {
             );
 
             // update target of deckglViewStates with the scaled event target
-            this.result_.deckglViewStates[vsKey].target = target;
+            this.result_.deckglViewStates[vsKey].target = scaledTarget;
             this.result_.deckglViewStates[vsKey].transitionDuration = 1000;
             // update target of deckglViewStates with the scaled event target
             this.result_.viewStates[vsKey].target = inversedZScaled(
-                target,
+                scaledTarget,
                 this.state_.zScale,
                 this.result_.viewStates[vsKey].target
             );
 
             this.rerender_();
         }
-    };
+    }
+
+    public unscaledTarget(target: Point3D | Point2D | undefined): void {
+        applyInverseZScale(target, this.state_.zScale);
+    }
 
     /**
      * Retrieves the views and their corresponding view states to be sent to DeckGL.
@@ -1160,10 +1296,10 @@ class ViewController {
      * @param state - The current state.
      * @returns The new views and their corresponding view states.
      */
-    public readonly getViews = (
+    public getViews(
         views: ViewsType | undefined,
         state: ViewControllerState
-    ): [View[], Record<string, ViewStateType>] => {
+    ): [View[], Record<string, ViewStateType>] {
         const fullState = this.consolidateState(state);
         const newDeckglViews = this.getDeckGlViews(views, fullState);
         const [newDeckglViewState, newViewStates] =
@@ -1178,18 +1314,18 @@ class ViewController {
         this.result_.deckglViewStates = newDeckglViewState;
         this.result_.viewStates = newViewStates;
         return [newDeckglViews, newDeckglViewState];
-    };
+    }
 
     /**
      * Consolidates the controlled state (ie. set by parent) with the uncontrolled state.
      * @param state - The current state.
      * @returns The consolidated state.
      */
-    private readonly consolidateState = (
+    private consolidateState(
         state: ViewControllerState
-    ): ViewControllerFullState => {
+    ): ViewControllerFullState {
         return { ...state, ...this.derivedState_ };
-    };
+    }
 
     /**
      * Returns the DeckGL views (ie. view position and viewport) based on the input views and current state.
@@ -1197,17 +1333,17 @@ class ViewController {
      * @param state - The current state.
      * @returns The DeckGL views.
      */
-    private readonly getDeckGlViews = (
+    private getDeckGlViews(
         views: ViewsType | undefined,
         state: ViewControllerFullState
-    ) => {
+    ) {
         const needUpdate =
             views != this.views_ || state.deckSize != this.state_.deckSize;
         if (!needUpdate) {
             return this.result_.views;
         }
         return buildDeckGlViews(views, state.deckSize);
-    };
+    }
 
     /**
      * Returns the scaled DeckGL view state(s) (ie. camera settings applied to individual views)
@@ -1217,10 +1353,10 @@ class ViewController {
      * @param state current state.
      * @returns The DeckGL view states and the corresponding view states in user space.
      */
-    private readonly getDeckGlAndUserViewStates = (
+    private getDeckGlAndUserViewStates(
         views: ViewsType | undefined,
         state: ViewControllerFullState
-    ): [Record<string, ViewStateType>, Record<string, ViewStateType>] => {
+    ): [Record<string, ViewStateType>, Record<string, ViewStateType>] {
         const viewsChanged = views != this.views_;
         const triggerHome = state.triggerHome !== this.state_.triggerHome;
         const updateZScale =
@@ -1291,7 +1427,7 @@ class ViewController {
             }
         }
         return [deckglViewStates, viewStates];
-    };
+    }
 
     /**
      * Handles changes to the view state.
@@ -1299,11 +1435,11 @@ class ViewController {
      * @param viewState - The new view state.
      * @param getCameraPosition - A function to get the camera position.
      */
-    public readonly onViewStateChange = (
+    public onViewStateChange(
         viewId: string,
         viewState: ViewStateType,
         getCameraPosition: ((input: ViewStateType) => void) | undefined
-    ): void => {
+    ): void {
         if (!this.derivedState_.readyForInteraction) {
             // disable interaction if the camera is not defined
             return;
@@ -1365,7 +1501,7 @@ class ViewController {
         }
         this.derivedState_.viewStateChanged = true;
         this.rerender_();
-    };
+    }
 }
 
 /**
@@ -1555,18 +1691,14 @@ function getViewStateFromBounds(
         zoom: getZoom(viewPort, fb_zoom),
         rotationX: 90, // look down z -axis
         rotationOrbit: 0,
-        minZoom: viewPort.show3D ? minZoom3D : minZoom2D,
-        maxZoom: viewPort.show3D ? maxZoom3D : max2DZoom,
+        minZoom: show3D(viewPort) ? minZoom3D : minZoom2D,
+        maxZoom: show3D(viewPort) ? maxZoom3D : max2DZoom,
     };
     return view_state;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 // build views
-type ViewTypeType =
-    | typeof OrbitView
-    | typeof IntersectionView
-    | typeof OrthographicView;
 
 function getViewType(
     viewport: ViewportType
@@ -1574,15 +1706,25 @@ function getViewType(
     ViewType: ViewTypeType,
     Controller: typeof OrbitController | typeof OrthographicController,
 ] {
-    if (viewport.show3D) {
+    // 3D views always use OrbitView with OrbitController
+    if (show3D(viewport)) {
         return [OrbitView, OrbitController];
     }
-    return [
-        viewport.id === "intersection_view"
-            ? IntersectionView
-            : OrthographicView,
-        OrthographicController,
-    ];
+
+    // Handle specific viewType cases
+    if (viewport.viewType) {
+        switch (viewport.viewType) {
+            case SectionView:
+                return [SectionView, OrthographicController];
+            case OrthographicView:
+                return [OrthographicView, OrthographicController];
+            default:
+                return [OrbitView, OrbitController];
+        }
+    }
+
+    // Default 2D behavior based on viewport ID
+    return [OrthographicView, OrthographicController];
 }
 
 function areViewsValid(views: ViewsType | undefined, size: Size): boolean {
@@ -1605,21 +1747,16 @@ function newView(
     height: number | string
 ): View {
     const far = 9999;
-    const near = viewport.show3D ? 0.1 : -1000;
+    const near = show3D(viewport) ? 0.1 : -1000;
 
     const [ViewType, Controller] = getViewType(viewport);
     return new ViewType({
         id: viewport.id,
-        controller: {
-            type: Controller,
-            doubleClickZoom: false,
-        },
-
+        controller: defineController(Controller, viewport?.controller),
         x,
         y,
         width,
         height,
-
         flipY: false,
         far,
         near,
@@ -1801,6 +1938,23 @@ function zScaledTarget(
 }
 
 /**
+ * Applies the inverse of the zScale to the target point.
+ * This is needed, as the camera target is specified in world coordinates, while the Z scale
+ * is applied to the transformation matrix of the object coordinates. The target must be applied
+ * the same scale to be consistent with the display.
+ * @param target point that must be converted to user values (ie. without scale).
+ * @param zScale Z scale.
+ */
+function applyInverseZScale(
+    target: Point2D | Point3D | undefined,
+    zScale: number
+): void {
+    if (target?.[2] != undefined && zScale != 0) {
+        target[2] = target[2] / zScale;
+    }
+}
+
+/**
  * Returns an inverted z-scaled target.
  * This is needed, as the camera target is specified in world coordinates, while the Z scale
  * is applied to the transformation matrix of the object coordinates. The target must be applied
@@ -1904,7 +2058,7 @@ function computeViewState(
         boundingBox = [-1, -1, -1, 1, 1, 1];
     }
 
-    if (viewPort.show3D ?? false) {
+    if (show3D(viewPort)) {
         // If the camera is defined, use it
         if (isCameraPositionDefined) {
             return updateViewState(scaledCamera, boundingBox, size);
@@ -2034,7 +2188,8 @@ function buildViewStates(
             if (currentViewState) {
                 result = {
                     ...result,
-                    [currentViewport.id]: currentViewState,
+                    // Each viewport should have distinct state objects, so we clone to avoid any shared object references
+                    [currentViewport.id]: cloneDeep(currentViewState),
                 };
             }
         }
