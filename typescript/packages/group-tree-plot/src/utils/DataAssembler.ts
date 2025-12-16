@@ -196,6 +196,13 @@ export function useUpdateAssemblerDate(
     targetDate: string
 ): string | void {
     const [prevDate, setPrevDate] = React.useState<string | null>(null);
+    const prevAssemblerRef = React.useRef<DataAssembler | null>(null);
+
+    // Reset previous date if assembler instance changed
+    if (dataAssembler !== prevAssemblerRef.current) {
+        prevAssemblerRef.current = dataAssembler;
+        setPrevDate(null);
+    }
 
     if (!dataAssembler || targetDate === prevDate) return;
 
