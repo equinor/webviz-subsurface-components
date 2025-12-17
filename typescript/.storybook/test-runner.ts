@@ -31,8 +31,8 @@ const screenshotTest = async (page, context) => {
     expect(previousScreenshot).toMatchImageSnapshot({
         customSnapshotIdentifier: context.id,
         // https://www.npmjs.com/package/jest-image-snapshot/v/4.0.2#-api
-        failureThreshold: 50,
-        failureThresholdType: "pixel",
+        failureThreshold: 0.01,
+        failureThresholdType: "percent",
         // https://github.com/mapbox/pixelmatch#pixelmatchimg1-img2-output-width-height-options
         customDiffConfig,
     });
