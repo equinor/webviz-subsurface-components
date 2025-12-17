@@ -8,6 +8,11 @@ const preview: Preview = {
                 date: /Date$/,
             },
         },
+        docs: {
+            story: {
+                height: "500px",
+            },
+        },
     },
 };
 

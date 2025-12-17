@@ -75,7 +75,7 @@ import { getZoom, useLateralZoom } from "../utils/camera";
 import { useScaleFactor, useShiftHeld } from "../utils/event";
 
 import type { ViewportType } from "../views/viewport";
-import { useVerticalScale } from "../views/viewport";
+import { defineController, useVerticalScale } from "../views/viewport";
 
 import mergeRefs from "merge-refs";
 import { WellLabelLayer } from "../layers/wells/layers/wellLabelLayer";
@@ -104,7 +104,7 @@ const DEFAULT_VIEWS: ViewsType = {
     layout: [1, 1],
     showLabel: false,
     marginPixels: 0,
-    viewports: [{ id: "main-view", viewType: OrthographicView, layerIds: [] }],
+    viewports: [{ id: "main-view", viewType: OrthographicView }],
 };
 
 function parseLights(lights?: LightsType): LightingEffect[] | undefined {
@@ -194,13 +194,57 @@ export interface ViewsType {
  * Camera view state.
  */
 export interface ViewStateType {
+    /**
+     * Camera target position.
+     */
     target: Point2D | Point3D | undefined;
-    zoom: number | Point2D | BoundingBox3D | undefined;
+    /**
+     * Zoom level or bounding box to fit in the view.
+     * - When a number: Represents the zoom level of the camera.
+     * - When a tuple [number, number]: Represents independent zoom levels along the horizontal and vertical axes.
+     * - When a BoundingBox3D: Represents the camera position computed to fit (zoom in) the entire box.
+     */
+    zoom: number | [number, number] | BoundingBox3D | undefined;
+    /**
+     * Rotation around the X axis in degrees. Only for 3D view.
+     */
     rotationX: number;
+    /**
+     * Rotation around the orbit in degrees. Only for 3D view.
+     */
     rotationOrbit: number;
+    /**
+     * Minimum zoom level.
+     * Constrains how far out the user can zoom. Lower values allow viewing a larger area.
+     */
     minZoom?: number;
+    /**
+     * Maximum zoom level.
+     * Constrains how far in the user can zoom. Higher values allow closer inspection.
+     */
     maxZoom?: number;
+    /**
+     *  Animation transition duration in milliseconds.
+     */
     transitionDuration?: number;
+    /**
+     * Viewport width in pixels.
+     */
+    width?: number;
+    /**
+     * Viewport height in pixels.
+     */
+    height?: number;
+    /**
+     * Minimum rotation around the X axis in degrees. Only for 3D view.
+     * Constrains the minimum tilt angle of the camera (e.g., 0° = horizontal view).
+     */
+    minRotationX?: number;
+    /**
+     * Maximum rotation around the X axis in degrees. Only for 3D view.
+     * Constrains the maximum tilt angle of the camera (e.g., 90° = top-down view).
+     */
+    maxRotationX?: number;
 }
 
 interface MarginsType {
@@ -764,15 +808,34 @@ const Map: React.FC<MapProps> = ({
         if (deckGLLayers) {
             let progress = 100;
 
+            // get all the layers ids used in the views, to consider only visible layers
+            const layersIdsPresentInViews = views?.viewports
+                ?.map((viewport) => viewport?.layerIds)
+                ?.flat();
+            const someViewportHasUndefinedLayerIds =
+                layersIdsPresentInViews?.includes(undefined);
+            const allViewportsHaveAnEmptyListOfLayerIds =
+                !someViewportHasUndefinedLayerIds &&
+                layersIdsPresentInViews?.length === 0;
+
             const emptyLayers = // There will always be a dummy layer. Deck.gl does not like empty array of layers.
-                deckGLLayers.length == 1 &&
+                deckGLLayers.length === 1 &&
                 (deckGLLayers[0] as LineLayer).id ===
                     "webviz_internal_dummy_layer";
-            if (!emptyLayers) {
+            if (!emptyLayers && !allViewportsHaveAnEmptyListOfLayerIds) {
                 // compute #done layers / #visible layers percentage
-                const visibleLayers = deckGLLayers.filter(
-                    (layer) => (layer as Layer).props.visible
-                );
+                const visibleLayers = deckGLLayers.filter((layer) => {
+                    const layerWithType = layer as Layer;
+                    const filterByLayersInViews =
+                        !someViewportHasUndefinedLayerIds
+                            ? layersIdsPresentInViews?.includes(
+                                  layerWithType.id
+                              )
+                            : true;
+                    return (
+                        layerWithType?.props?.visible && filterByLayersInViews
+                    );
+                });
                 const loaded = visibleLayers?.filter(
                     (layer) => (layer as Layer)?.isLoaded
                 ).length;
@@ -785,7 +848,7 @@ const Map: React.FC<MapProps> = ({
                 onRenderingProgress(progress);
             }
         }
-    }, [deckGLLayers, onRenderingProgress]);
+    }, [deckGLLayers, onRenderingProgress, views?.viewports]);
 
     // validate layers data
     const [errorText, setErrorText] = useState<string>();
@@ -819,6 +882,11 @@ const Map: React.FC<MapProps> = ({
             const cur_view = views.viewports.find(
                 ({ id }) => args.viewport.id && id === args.viewport.id
             );
+
+            if (cur_view?.layerIds === undefined) {
+                return true;
+            }
+
             if (cur_view?.layerIds && cur_view.layerIds.length > 0) {
                 const layer_ids = cur_view.layerIds;
                 return layer_ids.some((layer_id) => {
@@ -826,7 +894,7 @@ const Map: React.FC<MapProps> = ({
                     return t;
                 });
             } else {
-                return true;
+                return false;
             }
         },
         [views]
@@ -1684,16 +1752,11 @@ function newView(
     const [ViewType, Controller] = getViewType(viewport);
     return new ViewType({
         id: viewport.id,
-        controller: {
-            type: Controller,
-            doubleClickZoom: false,
-        },
-
+        controller: defineController(Controller, viewport?.controller),
         x,
         y,
         width,
         height,
-
         flipY: false,
         far,
         near,
