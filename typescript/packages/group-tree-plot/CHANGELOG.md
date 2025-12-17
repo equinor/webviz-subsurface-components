@@ -1,3 +1,13 @@
+## 1.6.20 (2025-12-17)
+
+### 🩹 Fixes
+
+- GroupTreePlot incorrect initial selectedDateTime value ([#2678](https://github.com/equinor/webviz-subsurface-components/pull/2678), [#2677](https://github.com/equinor/webviz-subsurface-components/issues/2677))
+
+### ❤️ Thank You
+
+- Jørgen Herje @jorgenherje
+
 ## 1.6.19 (2025-12-17)
 
 This was a version bump only for group-tree-plot to align it with other projects, there were no code changes.
