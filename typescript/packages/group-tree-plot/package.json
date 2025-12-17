@@ -1,6 +1,6 @@
 {
   "name": "@webviz/group-tree-plot",
-  "version": "1.6.26",
+  "version": "1.6.27",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
