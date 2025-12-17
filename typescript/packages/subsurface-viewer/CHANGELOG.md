@@ -1,3 +1,9 @@
+## 1.15.33 (2025-12-17)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.44
+
 ## 1.15.32 (2025-12-17)
 
 ### 🧱 Updated Dependencies
