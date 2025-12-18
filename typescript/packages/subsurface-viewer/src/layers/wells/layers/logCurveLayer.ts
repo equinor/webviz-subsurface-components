@@ -259,8 +259,8 @@ export class LogCurveLayer extends CompositeLayer<LogCurveLayerProps> {
                     },
                 }),
 
-                // Using polygon offset to avoid z-fighting between the two layers. No actual clue how these numbers work, but this seemed to work
-                getPolygonOffset: ({ layerIndex }) => [2, layerIndex],
+                // The log curve layer is (usually) used alongside the trajectory curve layer. We want the log line to appear right *behind* the trajectory, from all angles. A positive layer-index will push it away from the camera
+                getPolygonOffset: ({ layerIndex }) => [2, layerIndex * 1000],
                 getPath: (d, ctx) => {
                     if (!this._logCurveIsVisible(d, ctx)) return [];
                     return getLogPath(
@@ -321,8 +321,8 @@ export class LogCurveLayer extends CompositeLayer<LogCurveLayerProps> {
                         ],
                     },
                 }),
-                // Using polygon offset to avoid z-fighting between the two layers. No actual clue how these numbers work, but this seemed to work
-                getPolygonOffset: ({ layerIndex }) => [1, layerIndex * 1000],
+                // Similar to the curve layer, we want the selection to be rendered *over* the curve and trajectory layer. A negative offset pulls it towards the camera
+                getPolygonOffset: ({ layerIndex }) => [2, layerIndex * -1000],
                 getPath: (d, ctx) => {
                     if (!this._logCurveIsVisible(d, ctx)) return [];
                     return getSelectionPath(
