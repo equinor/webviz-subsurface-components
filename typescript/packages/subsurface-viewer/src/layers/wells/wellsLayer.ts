@@ -287,17 +287,17 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
     setSelection(
         well: string | undefined,
-        _selection?: [number | undefined, number | undefined]
+        selection?: [number | undefined, number | undefined]
     ): void {
         if (!this.internalState) return;
 
-        if (!well || !_selection) {
+        if (!well || !selection) {
             this.setState({
                 logDomainSelection: undefined,
             });
         } else {
             this.setState({
-                logDomainSelection: { well: well, selection: _selection },
+                logDomainSelection: { well, selection },
             });
         }
     }
@@ -340,8 +340,8 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
     getLogLayer(): Layer | undefined {
         const sub_layers = this.internalState?.subLayers as Layer[];
-        const log_layer = getLayersById(sub_layers, "wells-layer-log_curve");
-        return (log_layer as LogCurveLayer[])?.[0]?.getCurveLayer();
+        const log_layers = getLayersById(sub_layers, "wells-layer-log_curve");
+        return (log_layers as LogCurveLayer[])?.[0]?.getCurveLayer();
     }
 
     getSelectionLayer(): Layer | undefined {

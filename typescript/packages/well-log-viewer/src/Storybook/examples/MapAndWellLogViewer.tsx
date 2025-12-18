@@ -20,10 +20,9 @@ import type {
     TLayerDefinition,
 } from "@webviz/subsurface-viewer";
 
-import { WellsLayer } from "@webviz/subsurface-viewer/dist/layers";
+import type { WellsLayer } from "@webviz/subsurface-viewer/dist/layers";
 
 import type { MapMouseEvent } from "@webviz/subsurface-viewer/dist/components/Map";
-import type { WellsPickInfo } from "@webviz/subsurface-viewer/dist/layers/wells/types";
 
 import { axisMnemos, axisTitles } from "../../utils/axes";
 import { deepCopy } from "../../utils/deepcopy";
@@ -257,17 +256,9 @@ export class MapAndWellLogViewer extends React.Component<
     }
 
     onMapMouseEvent(event: MapMouseEvent): void {
-        if (event.type !== "click") return;
-
-        const wellInfo = event.infos.find(
-            (i) => i.layer instanceof WellsLayer
-        ) as WellsPickInfo;
-
-        const wellName = wellInfo?.wellName;
-
-        if (wellName !== undefined) {
+        if (event.wellname !== undefined) {
             if (event.type === "click") {
-                const iWell = findWellLogIndex(wellLogs, wellName);
+                const iWell = findWellLogIndex(wellLogs, event.wellname);
                 this.setState((state: Readonly<State>) => {
                     let selection:
                         | [number | undefined, number | undefined]
@@ -294,7 +285,7 @@ export class MapAndWellLogViewer extends React.Component<
 
                     return {
                         wellIndex: iWell,
-                        wellName: wellName,
+                        wellName: event.wellname,
                         wellColor: event.wellcolor,
                         selection: selection,
                         selPersistent: selPersistent,
@@ -308,7 +299,10 @@ export class MapAndWellLogViewer extends React.Component<
                         const template = controller.getTemplate();
                         const logName = wellsLayer.props?.logName;
                         let iTrack = findLog(template, logName);
-                        if (iTrack < 0) {
+                        if (
+                            iTrack < 0 &&
+                            controller.getTrackScrollPos() !== iTrack
+                        ) {
                             //const wellLog = info.object is Feature or WellLog;
                             const wellLog = wellLogs[iWell];
                             const templateNew = addTemplateTrack(
