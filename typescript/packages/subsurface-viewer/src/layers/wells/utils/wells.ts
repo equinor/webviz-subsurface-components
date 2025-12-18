@@ -13,7 +13,7 @@ export function getWellObjectByName(
     wells_data: WellFeature[],
     name: string
 ): WellFeature | undefined {
-    return wells_data?.find(
+    return wells_data.find(
         (item) => item.properties?.name?.toLowerCase() === name?.toLowerCase()
     );
 }
@@ -30,7 +30,7 @@ export function getWellObjectsByName(
 ): WellFeature[] {
     const res: WellFeature[] = [];
     for (let i = 0; i < name?.length; i++) {
-        wells_data?.find((item) => {
+        wells_data.find((item) => {
             if (item.properties?.name?.toLowerCase() === name[i]?.toLowerCase())
                 res.push(item);
         });

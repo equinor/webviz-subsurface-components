@@ -20,7 +20,7 @@ function getLineStringGeometry(
 }
 
 export function getColor(accessor: ColorAccessor) {
-    if (accessor as Color) {
+    if (Array.isArray(accessor)) {
         return accessor as Color;
     }
 
@@ -34,6 +34,7 @@ export function getColor(accessor: ColorAccessor) {
             // info object is arguably required, but there's too many spots that don't pass it along atm
             // @ts-expect-error -- @ander2303
             const color = colorFunc(object, objectInfo) as Color;
+
             if (color) {
                 return color;
             }
@@ -102,10 +103,10 @@ export function interpolateDataOnTrajectory(
     coord: Position,
     data: number[],
     trajectory: Position[]
-): number {
+): number | null {
     // if number of data points in less than 1 or
     // length of data and trajectory are different we cannot interpolate.
-    if (data.length <= 1 || data.length != trajectory.length) return -1;
+    if (data.length <= 1 || data.length != trajectory.length) return null;
 
     // Identify closest well path leg to coord.
     const segment_index = getSegmentIndex(coord, trajectory);
@@ -131,7 +132,7 @@ export function interpolateDataOnTrajectory(
 
     const dv = distance(survey0, survey1) as number;
     if (dv === 0) {
-        return -1;
+        return null;
     }
 
     // Calculate the scalar projection onto segment.
@@ -145,6 +146,7 @@ export function interpolateDataOnTrajectory(
     // Interpolate data.
     return data0 * (1.0 - scalar_projection) + data1 * scalar_projection;
 }
+
 export function getMd(
     coord: Position,
     feature: WellFeature,

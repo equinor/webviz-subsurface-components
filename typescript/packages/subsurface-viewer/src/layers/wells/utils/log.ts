@@ -39,6 +39,32 @@ export function getLogForWellbore(
     return undefined;
 }
 
+export function getLogIndexByName(
+    d: LogCurveDataType,
+    log_name: string
+): number {
+    const name = log_name.toLowerCase();
+    return d.curves.findIndex((item) => item.name.toLowerCase() === name);
+}
+
+export function getLogIndexByNames(
+    d: LogCurveDataType,
+    names: string[]
+): number {
+    for (const name of names) {
+        const index = getLogIndexByName(d, name);
+        if (index >= 0) return index;
+    }
+    return -1;
+}
+
+export function isSelectedLogRun(
+    d: LogCurveDataType,
+    logrun_name: string
+): boolean {
+    return d.header.name.toLowerCase() === logrun_name.toLowerCase();
+}
+
 export function getLogValues(
     d: LogCurveDataType,
     logrun_name: string,
@@ -60,31 +86,35 @@ export function getLogInfo(
     const log_id = getLogIndexByName(d, log_name);
     return d.curves[log_id];
 }
+
 export function getDiscreteLogMetadata(d: LogCurveDataType, log_name: string) {
     return d?.metadata_discrete[log_name];
 }
-export function isSelectedLogRun(
-    d: LogCurveDataType,
-    logrun_name: string
-): boolean {
-    return d.header.name.toLowerCase() === logrun_name.toLowerCase();
-}
-export function getLogIndexByName(
-    d: LogCurveDataType,
-    log_name: string
-): number {
-    const name = log_name.toLowerCase();
-    return d.curves.findIndex((item) => item.name.toLowerCase() === name);
-}
 
-export function getLogIndexByNames(
-    d: LogCurveDataType,
-    names: string[]
+export function getLogSegmentIndexForMd(
+    log: LogCurveDataType,
+    md: number
 ): number {
-    for (const name of names) {
-        const index = getLogIndexByName(d, name);
-        if (index >= 0) return index;
+    const mdCurveIndex = getLogIndexByNames(log, MD_CURVE_NAMES);
+
+    if (md < log.data[0][mdCurveIndex]) return -1;
+    if (md > log.data.at(-1)![mdCurveIndex]) return -1;
+
+    // Special case to include the last md within the last segment
+    if (md === log.data.at(-1)![mdCurveIndex]) return log.data.length - 2;
+
+    for (
+        let segmentIndex = 0;
+        segmentIndex < log.data.length - 1;
+        segmentIndex++
+    ) {
+        const segmentStart = log.data[segmentIndex][mdCurveIndex];
+        const segmentEnd = log.data[segmentIndex + 1][mdCurveIndex];
+
+        if (md < segmentStart) continue;
+        if (md >= segmentStart && md < segmentEnd) return segmentIndex;
     }
+
     return -1;
 }
 
@@ -98,6 +128,7 @@ function getLogSegmentIndex(
     const trajectory = getLogPath(wells_data, log_data, logrun_name);
     return getSegmentIndex(coord, trajectory);
 }
+
 export function getLogProperty(
     coord: Position,
     wells_data: WellFeature[],
@@ -143,6 +174,7 @@ export function getLogProperty(
         );
     } else return null;
 }
+
 export function getLogWidth(
     d: LogCurveDataType,
     logrun_name: string,
@@ -150,6 +182,7 @@ export function getLogWidth(
 ): number[] {
     return getLogValues(d, logrun_name, log_name);
 }
+
 // Return data required to build well layer legend
 export function getLegendData(
     logs: LogCurveDataType[],
@@ -196,23 +229,6 @@ export function getLogMd(d: LogCurveDataType, logrun_name: string): number[] {
 
     const log_id = getLogIndexByNames(d, MD_CURVE_NAMES);
     return log_id >= 0 ? getColumn(d.data, log_id) : [];
-}
-
-// export function getLogColorForMd(
-//     d: LogCurveDataType,
-//     md: number,
-//     logrun_name: string,
-//     log_name: string,
-//     logColor: string,
-//     colorTables: colorTablesArray,
-//     colorMappingFunction: WellsLayerProps["colorMappingFunction"],
-//     isLog: boolean
-// ) {
-// }
-
-export function getLogSegmentIndex2(log: LogCurveDataType, md: number): number {
-    const mdCurveIndex = getLogIndexByNames(log, MD_CURVE_NAMES);
-    return log.data.findIndex((row) => row[mdCurveIndex] > md);
 }
 
 export function getCurveValueAtRow(
@@ -411,6 +427,7 @@ export function getLogColor(
 
     return log_color;
 }
+
 export function getLogPath(
     wells_data: WellFeature[],
     d: LogCurveDataType,

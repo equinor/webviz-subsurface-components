@@ -6,7 +6,7 @@ import { getFromAccessor } from "../../utils/layerTools";
 
 export const LINE = "line";
 export const POINT = "point";
-const DEFAULT_POINT_SIZE = 8;
+export const DEFAULT_POINT_SIZE = 8;
 export const DEFAULT_LINE_WIDTH = 5;
 
 export function getSize(
@@ -35,6 +35,8 @@ function getPointGeometry(well_object: WellFeature): Point | undefined {
 }
 
 // Return well head position from Point Geometry
-export function getWellHeadPosition(well_object: WellFeature): Position {
-    return getPointGeometry(well_object)?.coordinates ?? [-1, -1, -1];
+export function getWellHeadPosition(
+    well_object: WellFeature
+): Position | undefined {
+    return getPointGeometry(well_object)?.coordinates;
 }

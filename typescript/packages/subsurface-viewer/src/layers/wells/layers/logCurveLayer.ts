@@ -32,7 +32,7 @@ import {
     getLegendData,
     getLogColor,
     getLogMd,
-    getLogSegmentIndex2,
+    getLogSegmentIndexForMd,
     getLogWidth,
     injectMdRows,
 } from "../utils/log";
@@ -396,27 +396,29 @@ function getSelectionMds(
 
     if (!sanitizedRange.length) return [];
 
-    let [mdStart, mdEnd] = sanitizedRange;
+    let [mdStart, mdEnd] = sanitizedRange as [number, number | undefined];
 
     // Add caps; i.e. colored lines at start and end
-    // ? Should be handled as a marker instead?
-    const capWidth = 4;
+    const capWidth = mdEnd === undefined ? 2 : 4;
 
-    // Clamp start/end cap sections to avoid going beyond trajectory
     if (mdStart - capWidth <= logMds[0]) {
         mdStart = logMds[0] + capWidth;
     }
-
-    if (mdEnd !== undefined && mdEnd + capWidth >= logMds.at(-1)!) {
-        mdEnd = logMds.at(-1)! - capWidth;
+    if (mdStart + capWidth >= logMds.at(-1)!) {
+        mdStart = logMds.at(-1)! - capWidth;
     }
 
-    // @ts-expect-error -- Allowed undefined
-    if (mdEnd < mdStart) mdEnd = undefined;
-
     if (mdEnd === undefined) {
-        return [mdStart - capWidth / 2, mdStart + capWidth / 2];
+        return [mdStart - capWidth, mdStart + capWidth];
     } else {
+        if (mdEnd + capWidth >= logMds.at(-1)!) {
+            mdEnd = logMds.at(-1)! - capWidth;
+        }
+
+        if (mdEnd < mdStart) {
+            mdEnd = mdStart;
+        }
+
         return [
             mdStart - capWidth,
             ...getMdsInRange(logMds, mdStart, mdEnd),
@@ -491,7 +493,7 @@ function getSelectionWidth(
 
     // We'll only need to interpolate the values for the ends of the array, each other point will be in the log
     // The "caps" of the selection is currently a two-point line segment
-    const logRowOffset = getLogSegmentIndex2(d, selectionMds[1]) - 2;
+    const logRowOffset = getLogSegmentIndexForMd(d, selectionMds[1]) - 1;
 
     return selectionMds.map((md, idx) => {
         let width = 0;
@@ -505,6 +507,7 @@ function getSelectionWidth(
         return Math.max(width, SELECTION_MIN_WIDTH);
     });
 }
+
 export function sanitizeSelectionRange(
     mdArray: number[],
     range: number[] | undefined
