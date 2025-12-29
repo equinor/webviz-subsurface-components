@@ -1,10 +1,19 @@
 import React from "react";
 
-import type { Layer } from "@deck.gl/core";
-import { type Position } from "@deck.gl/core";
+import type {
+    AccessorContext,
+    Position as GlPosition,
+    Layer,
+} from "@deck.gl/core";
+import { PathLayer } from "@deck.gl/layers";
 import type { Meta, StoryObj } from "@storybook/react";
-import { chunk } from "lodash";
+import type { Position } from "geojson";
+import { chunk, clamp } from "lodash";
+
 import { DashedSectionsPathLayer } from "../../layers/wells/layers/dashedSectionsPathLayer";
+import type { TrajectoryMarker } from "../../layers/wells/layers/trajectoryMarkerLayer";
+import { TrajectoryMarkersLayer } from "../../layers/wells/layers/trajectoryMarkerLayer";
+
 import type {
     WellFeature,
     WellFeatureCollection,
@@ -84,7 +93,7 @@ export const DashedSections: Story = {
             {...args}
             makeLayers={(wellData) => [
                 new DashedSectionsPathLayer<WellFeature>({
-                    id: "dashed-sections-path-layer",
+                    id: "wells-sublayer-dashed-sections",
                     data: wellData.features,
                     positionFormat: "XY",
                     billboard: true,
@@ -119,8 +128,7 @@ export const DashedSections: Story = {
 
 // Utility to split a trajectory's path into segment-chunks. Each chunk connects to the next segment (aka chunk1[-1] === chunk2[0]).
 function getChunkedTrajectoryPath(d: WellFeature, chunkSize: number) {
-    const fullPath = d.geometry.geometries.find((f) => f.type === "LineString")
-        ?.coordinates as Position[];
+    const fullPath = getTrajectoryCoordinates(d);
 
     if (chunkSize < 1) return [fullPath];
 
@@ -131,4 +139,89 @@ function getChunkedTrajectoryPath(d: WellFeature, chunkSize: number) {
         if (!nextChunk) return chunk;
         return [...chunk, nextChunk[0]];
     });
+}
+
+export const TrajectoryMarkers: Story = {
+    args: {
+        markerPosition: 0.9,
+    },
+
+    argTypes: {
+        markerPosition: {
+            control: { type: "range", min: 0, max: 1, step: 0.01 },
+        },
+    },
+    render: (args) => (
+        // @ts-expect-error -- Don't know how to get args typed so that it stops complaining
+        <SubsurfaceViewerWithSyntheticWells
+            {...args}
+            id="wells-sublayer-markers"
+            makeLayers={(wellData) => [
+                new PathLayer({
+                    id: "well-paths",
+                    data: wellData.features,
+                    positionFormat: "XY",
+                    billboard: true,
+                    widthMinPixels: 1,
+                    getWidth: 2,
+                    getColor: [115, 115, 115],
+                    getPath: (d) => getTrajectoryCoordinates(d) as GlPosition[],
+                }),
+                new TrajectoryMarkersLayer({
+                    id: "well-markers",
+                    data: wellData.features,
+                    positionFormat: "XY",
+                    getLineWidth: 1,
+                    lineWidthMinPixels: 2,
+                    getMarkerColor: [255, 0, 0],
+                    getTrajectoryPath: getTrajectoryCoordinates,
+                    getMarkers(d, i) {
+                        return getTrajectoryMarkers(
+                            d,
+                            i,
+                            args["markerPosition"]
+                        );
+                    },
+
+                    updateTriggers: {
+                        getMarkers: [args["markerPosition"]],
+                    },
+                }),
+            ]}
+        />
+    ),
+};
+
+function getTrajectoryCoordinates(d: WellFeature): Position[] {
+    return (d.geometry.geometries.find((f) => f.type === "LineString")
+        ?.coordinates ?? []) as Position[];
+}
+
+function getTrajectoryMarkers(
+    d: WellFeature,
+    itemInfo: AccessorContext<WellFeature>,
+    markerPosition: number
+): TrajectoryMarker[] {
+    if (itemInfo.index % 4 === 0)
+        return [
+            {
+                type: "perforation",
+                positionAlongPath: markerPosition,
+            },
+        ];
+
+    if (itemInfo.index % 5 === 0) {
+        return [
+            {
+                type: "screen-start",
+                positionAlongPath: clamp(markerPosition - 0.05, 0, 1),
+            },
+            {
+                type: "screen-end",
+                positionAlongPath: clamp(markerPosition + 0.05, 0, 1),
+            },
+        ];
+    }
+
+    return [];
 }

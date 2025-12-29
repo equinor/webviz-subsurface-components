@@ -1,7 +1,10 @@
-import { distance, subtract, dot } from "mathjs";
 import type { AccessorContext, Color } from "@deck.gl/core";
 import type { LineString, Position } from "geojson";
+import { distance, dot, subtract } from "mathjs";
+import { zipWith } from "lodash";
+import { Vector2 } from "math.gl";
 
+import type { Point2D, Point3D } from "../../../utils";
 import {
     distToSegmentSquared,
     isPointAwayFromLineEnd,
@@ -216,4 +219,107 @@ export function getSegmentIndex(coord: Position, path: Position[]): number {
         min_d = d;
     }
     return segment_index;
+}
+
+/**
+ * Get position and angle (in radians) along a trajectory path
+ * @param fraction 0-1 fraction along trajectory
+ * @param trajectory Trajectory as a list of positions
+ * @param projectionFunc Callback function to project 3D coordinates over to 2D
+ * @param is3d Whether to use compute with (and return) 2-dimensional positions
+ * @returns A tuple containing an angle and a interpolated point on the trajectory
+ */
+export function getPositionAndAngleAlongTrajectoryPath(
+    fraction: number,
+    trajectory: Position[],
+    projectionFunc: (xyz: number[]) => number[],
+    is3d?: boolean
+): [angle: number, position: Point2D | Point3D] {
+    if (typeof is3d === "undefined") is3d = trajectory[0]?.length === 3;
+    if (!trajectory.length && is3d) return [0, [0, 0, 0]];
+    if (!trajectory.length && !is3d) return [0, [0, 0]];
+    if (is3d && trajectory[0].length < 3)
+        throw Error(
+            `Expected trajectory positions to be 3D, instead got ${trajectory[0].length} dimensions`
+        );
+
+    let angle: number;
+    let position: Position;
+
+    const maxSegmentIndex = trajectory.length - 1;
+
+    // The point is somewhere between these two points
+    const lowerSegmentIndex = Math.floor(maxSegmentIndex * fraction);
+    const upperSegmentIndex = Math.ceil(maxSegmentIndex * fraction);
+
+    const [lowerPosition, upperPosition] = getSegmentPositions(
+        trajectory,
+        lowerSegmentIndex,
+        upperSegmentIndex
+    );
+
+    if (lowerSegmentIndex === upperSegmentIndex) {
+        position = trajectory[lowerSegmentIndex];
+    } else {
+        // The positional fraction on this specific segment
+        const segmentFraction = maxSegmentIndex * fraction - lowerSegmentIndex;
+
+        position = zipWith(lowerPosition, upperPosition, (pl, pu) => {
+            return pl + segmentFraction * (pu - pl);
+        });
+    }
+
+    let lowerProjectedPosition = lowerPosition;
+    let upperProjectedPosition = upperPosition;
+
+    // We only need to project when we deal with 3 positions
+    if (is3d) {
+        lowerProjectedPosition = projectionFunc(lowerPosition);
+        upperProjectedPosition = projectionFunc(upperPosition);
+
+        // ? I don't understand why we need to apply this whenever we project from 3d, but the angle gets wrong if I don't
+        lowerProjectedPosition[1] *= -1;
+        upperProjectedPosition[1] *= -1;
+    }
+
+    const segmentVec = new Vector2(
+        upperProjectedPosition[0] - lowerProjectedPosition[0],
+        upperProjectedPosition[1] - lowerProjectedPosition[1]
+    );
+
+    // The projected vector has no length, so we cannot define an angle. This is most likely because the two points are stacked on top of each other
+    if (segmentVec.len() === 0) {
+        angle = 0;
+    }
+
+    segmentVec.normalize();
+    const rad = Math.atan2(segmentVec[1], segmentVec[0]);
+
+    angle = rad;
+
+    if (is3d) return [angle, position as Point3D];
+    else return [angle, [position[0], position[1]]];
+}
+
+// Helper to get a segment without reaching index overflow
+function getSegmentPositions(
+    trajectory: Position[],
+    lowerIndex: number,
+    upperIndex: number
+): [Position, Position] {
+    if (trajectory.length < 2) {
+        console.warn("Trajectory is too short to have any segments");
+        return [trajectory[lowerIndex], trajectory[upperIndex]];
+    }
+
+    // If the upper and lower index are the same (for instance)
+    if (lowerIndex === upperIndex && upperIndex === trajectory.length - 1) {
+        return [trajectory[upperIndex - 1], trajectory[upperIndex]];
+    }
+
+    if (lowerIndex === upperIndex) {
+        return [trajectory[lowerIndex], trajectory[lowerIndex + 1]];
+    }
+
+    return [trajectory[lowerIndex], trajectory[upperIndex]];
 }
