@@ -1,3 +1,27 @@
+## 1.6.87 (2026-01-05)
+
+This was a version bump only for group-tree-plot to align it with other projects, there were no code changes.
+
+## 1.6.86 (2026-01-05)
+
+This was a version bump only for group-tree-plot to align it with other projects, there were no code changes.
+
+## 1.6.85 (2026-01-05)
+
+This was a version bump only for group-tree-plot to align it with other projects, there were no code changes.
+
+## 1.6.84 (2026-01-05)
+
+This was a version bump only for group-tree-plot to align it with other projects, there were no code changes.
+
+## 1.6.83 (2026-01-05)
+
+This was a version bump only for group-tree-plot to align it with other projects, there were no code changes.
+
+## 1.6.82 (2026-01-05)
+
+This was a version bump only for group-tree-plot to align it with other projects, there were no code changes.
+
 ## 1.6.81 (2026-01-05)
 
 This was a version bump only for group-tree-plot to align it with other projects, there were no code changes.
