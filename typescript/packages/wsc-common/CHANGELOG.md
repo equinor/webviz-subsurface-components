@@ -1,3 +1,43 @@
+## 1.3.80 (2026-01-05)
+
+This was a version bump only for wsc-common to align it with other projects, there were no code changes.
+
+## 1.3.79 (2026-01-05)
+
+This was a version bump only for wsc-common to align it with other projects, there were no code changes.
+
+## 1.3.78 (2026-01-05)
+
+This was a version bump only for wsc-common to align it with other projects, there were no code changes.
+
+## 1.3.77 (2026-01-05)
+
+This was a version bump only for wsc-common to align it with other projects, there were no code changes.
+
+## 1.3.76 (2026-01-05)
+
+This was a version bump only for wsc-common to align it with other projects, there were no code changes.
+
+## 1.3.75 (2026-01-05)
+
+This was a version bump only for wsc-common to align it with other projects, there were no code changes.
+
+## 1.3.74 (2026-01-05)
+
+This was a version bump only for wsc-common to align it with other projects, there were no code changes.
+
+## 1.3.73 (2026-01-05)
+
+This was a version bump only for wsc-common to align it with other projects, there were no code changes.
+
+## 1.3.72 (2026-01-05)
+
+This was a version bump only for wsc-common to align it with other projects, there were no code changes.
+
+## 1.3.71 (2026-01-05)
+
+This was a version bump only for wsc-common to align it with other projects, there were no code changes.
+
 ## 1.3.70 (2026-01-05)
 
 This was a version bump only for wsc-common to align it with other projects, there were no code changes.
