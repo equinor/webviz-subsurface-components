@@ -1,3 +1,7 @@
+## 1.6.67 (2026-01-05)
+
+This was a version bump only for group-tree-plot to align it with other projects, there were no code changes.
+
 ## 1.6.66 (2025-12-19)
 
 This was a version bump only for group-tree-plot to align it with other projects, there were no code changes.
