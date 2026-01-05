@@ -15,7 +15,11 @@
         }
     },
     "release": {
-        "version": { "conventionalCommits": true },
+        "version": {
+            "conventionalCommits": true,
+            "updateDependents": "auto"
+
+        },
         "projectsRelationship": "independent",
         "changelog": {
             "projectChangelogs": {
