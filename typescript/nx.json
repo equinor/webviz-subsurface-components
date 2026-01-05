@@ -18,7 +18,6 @@
         "version": {
             "conventionalCommits": true,
             "updateDependents": "auto"
-
         },
         "projectsRelationship": "independent",
         "changelog": {
