@@ -1,6 +1,6 @@
 {
   "name": "@webviz/well-completions-plot",
-  "version": "1.8.91",
+  "version": "1.8.92",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
