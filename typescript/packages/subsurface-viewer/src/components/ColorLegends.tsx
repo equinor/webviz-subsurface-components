@@ -1,7 +1,7 @@
 import React from "react";
 import type { ExtendedLegendLayer } from "../layers/utils/layerTools";
 import ColorLegend from "./ColorLegend";
-import type { colorTablesArray } from "@emerson-eps/color-tables/";
+import type { colorTablesArray } from "@emerson-eps/color-tables";
 
 interface ColorLegendsProps {
     // Pass additional css style to the parent color legend container

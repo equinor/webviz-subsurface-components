@@ -1,6 +1,6 @@
 import type { LayersList } from "@deck.gl/core";
 import { colorTables } from "@emerson-eps/color-tables";
-import type { colorTablesArray } from "@emerson-eps/color-tables/";
+import type { colorTablesArray } from "@emerson-eps/color-tables";
 import "@testing-library/jest-dom";
 import { render } from "@testing-library/react";
 import "jest-styled-components";

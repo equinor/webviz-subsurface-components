@@ -3,7 +3,7 @@ import {
     type colorTablesArray,
     rgbValues,
     getColors,
-} from "@emerson-eps/color-tables/";
+} from "@emerson-eps/color-tables";
 import type { Position } from "geojson";
 
 import {

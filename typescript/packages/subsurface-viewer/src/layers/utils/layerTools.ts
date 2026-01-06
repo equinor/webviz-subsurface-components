@@ -1,4 +1,4 @@
-import type { colorTablesArray } from "@emerson-eps/color-tables/";
+import type { colorTablesArray } from "@emerson-eps/color-tables";
 import { Matrix4 } from "math.gl";
 
 import type {

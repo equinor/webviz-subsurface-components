@@ -9,7 +9,7 @@ import {
     colorTables,
     createColorMapFunction as createColormapFunction,
 } from "@emerson-eps/color-tables";
-import type { ScaleHandler } from "@emerson-eps/color-tables/";
+import type { ScaleHandler } from "@emerson-eps/color-tables";
 import { NativeSelect } from "@equinor/eds-core-react";
 import { Slider } from "@mui/material";
 import { styled } from "@mui/material/styles";

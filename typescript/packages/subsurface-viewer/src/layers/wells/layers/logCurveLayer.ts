@@ -1,5 +1,5 @@
 import { clamp, isEqual } from "lodash";
-import { type colorTablesArray } from "@emerson-eps/color-tables/";
+import { type colorTablesArray } from "@emerson-eps/color-tables";
 
 import type {
     Accessor,

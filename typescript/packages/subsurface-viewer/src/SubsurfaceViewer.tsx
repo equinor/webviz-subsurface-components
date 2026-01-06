@@ -1,7 +1,7 @@
 import React from "react";
 
 import type { Layer, LayersList } from "@deck.gl/core";
-import type { colorTablesArray } from "@emerson-eps/color-tables/";
+import type { colorTablesArray } from "@emerson-eps/color-tables";
 
 import type { Unit } from "convert-units";
 import convert from "convert-units";
