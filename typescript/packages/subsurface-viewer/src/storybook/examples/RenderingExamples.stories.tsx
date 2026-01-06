@@ -447,7 +447,6 @@ const LightsStoryComponent: React.FC<SubsurfaceViewerProps> = (
     if (pointLights) {
         lights = {
             ...lights,
-            // @ts-expect-error TS2322
             pointLights: pointLights
                 .filter((l) => l.active)
                 .map((l) => {
@@ -467,7 +466,6 @@ const LightsStoryComponent: React.FC<SubsurfaceViewerProps> = (
     if (directionalLights) {
         lights = {
             ...lights,
-            // @ts-expect-error TS2322
             directionalLights: directionalLights
                 .filter((l) => l.active)
                 .map((l) => {
