@@ -39,6 +39,7 @@ export type colorTablesArray = ColorTableArray;
 export { TGrid3DColoringMode };
 
 export type LightsType = {
+
     headLight?: {
         intensity: number;
         color?: [number, number, number]; // RGBColor;
