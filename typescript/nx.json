@@ -24,6 +24,9 @@
             "projectChangelogs": {
                 "createRelease": "github"
             }
+        },
+        "git": {
+            "commitMessage": "chore(release): updated version [no ci]"
         }
     }
 }
