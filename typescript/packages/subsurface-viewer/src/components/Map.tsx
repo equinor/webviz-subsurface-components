@@ -2236,7 +2236,8 @@ function handleMouseEvent(
             ev.x = info.coordinate[0];
             ev.y = info.coordinate[1];
         }
-        if (info.layer && info.layer.id === "wells-layer") {
+
+        if (info.layer && info.layer instanceof WellsLayer) {
             // info.object is Feature or WellLog;
             {
                 // try to use Object info (see DeckGL getToolTip callback)
