@@ -24,6 +24,7 @@ import {
     TRAJECTORY_SIMULATION_ARGTYPES,
     WELL_COUNT_ARGTYPES,
 } from "../constant/argTypes";
+import { default3DViews } from "../sharedSettings";
 import type { TrajectorySimulationProps, WellCount } from "../types/well";
 import { useSyntheticWellCollection } from "../util/wellSynthesis";
 
@@ -37,6 +38,7 @@ const meta: Meta<typeof SubsurfaceViewerWithSyntheticWells> = {
         dipDeviationMagnitude: 10,
         getWidth: 5,
         widthMinPixels: 3,
+        use3dView: false,
     },
     argTypes: {
         ...WELL_COUNT_ARGTYPES,
@@ -58,14 +60,25 @@ function SubsurfaceViewerWithSyntheticWells<
         WellCount &
         ExtraArgs
 ) {
-    const { wellCount, sampleCount, segmentLength, dipDeviationMagnitude } =
-        props;
+    const {
+        wellCount,
+        sampleCount,
+        segmentLength,
+        dipDeviationMagnitude,
+        use3dView,
+    } = props;
 
     const wellData = useSyntheticWellCollection(wellCount, 10, {
         sampleCount,
         segmentLength,
         dipDeviationMagnitude,
+        zIncreasingDownwards: true,
     });
+
+    const views = React.useMemo(() => {
+        if (use3dView) return default3DViews;
+        return undefined;
+    }, [use3dView]);
 
     if (!wellData.features) return null;
 
@@ -74,6 +87,7 @@ function SubsurfaceViewerWithSyntheticWells<
             id={props.id}
             bounds={[455000, 6785000, 464000, 6790000]}
             pickingRadius={12}
+            views={views}
             layers={props.makeLayers(wellData)}
         />
     );
@@ -95,13 +109,13 @@ export const DashedSections: Story = {
                 new DashedSectionsPathLayer<WellFeature>({
                     id: "wells-sublayer-dashed-sections",
                     data: wellData.features,
-                    positionFormat: "XY",
+                    positionFormat: args.use3dView ? "XYZ" : "XY",
                     billboard: true,
                     getDashArray: args["dashArray"],
                     getColor: [255, 0, 0],
                     getWidth: args["getWidth"],
                     widthMinPixels: args["widthMinPixels"],
-
+                    opacity: 0.1,
                     pickable: true,
                     autoHighlight: true,
 
@@ -117,8 +131,14 @@ export const DashedSections: Story = {
                         ).filter((c, i) => i % 2 !== 0),
 
                     updateTriggers: {
-                        getDashedPathSection: [args["dashSegmentSize"]],
-                        getNormalPathSection: [args["dashSegmentSize"]],
+                        getDashedPathSection: [
+                            args["dashSegmentSize"],
+                            args["use3dView"],
+                        ],
+                        getNormalPathSection: [
+                            args["dashSegmentSize"],
+                            args["use3dView"],
+                        ],
                     },
                 }),
             ]}
@@ -160,31 +180,37 @@ export const TrajectoryMarkers: Story = {
                 new PathLayer({
                     id: "well-paths",
                     data: wellData.features,
-                    positionFormat: "XY",
+                    positionFormat: args.use3dView ? "XYZ" : "XY",
                     billboard: true,
                     widthMinPixels: 1,
+                    lineWidthUnits: "pixels",
                     getWidth: 2,
                     getColor: [115, 115, 115],
                     getPath: (d) => getTrajectoryCoordinates(d) as GlPosition[],
+                    updateTriggers: { getPath: [args.use3dView] },
                 }),
                 new TrajectoryMarkersLayer({
                     id: "well-markers",
                     data: wellData.features,
-                    positionFormat: "XY",
-                    getLineWidth: 1,
-                    lineWidthMinPixels: 2,
+                    positionFormat: args.use3dView ? "XYZ" : "XY",
+                    getLineWidth: 2,
+                    lineWidthMinPixels: 1,
                     getMarkerColor: [255, 0, 0],
+
+                    lineWidthScale: 1,
+                    lineWidthUnits: "pixels",
+                    lineBillboard: true,
+
+                    pickable: true,
+                    autoHighlight: true,
                     getTrajectoryPath: getTrajectoryCoordinates,
                     getMarkers(d, i) {
-                        return getTrajectoryMarkers(
-                            d,
-                            i,
-                            args["markerPosition"]
-                        );
+                        return getTrajectoryMarkers(d, i, args.markerPosition);
                     },
 
                     updateTriggers: {
-                        getMarkers: [args["markerPosition"]],
+                        getMarkers: [args.markerPosition],
+                        getTrajectoryPath: [args.use3dView],
                     },
                 }),
             ]}

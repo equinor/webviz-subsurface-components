@@ -9,13 +9,13 @@ import type {
 } from "@deck.gl/core";
 import { CompositeLayer } from "@deck.gl/core";
 import type { GeoJsonLayerProps } from "@deck.gl/layers";
-import { GeoJsonLayer } from "@deck.gl/layers";
+import { PathLayer } from "@deck.gl/layers";
 import type { Feature, Geometry, Position } from "geojson";
 import { clamp } from "lodash";
 
 import { getFromAccessor } from "../../utils/layerTools";
 import type { MarkerType } from "../utils/markers";
-import { buildMarkerGeometry } from "../utils/markers";
+import { buildMarkerPath } from "../utils/markers";
 import { getPositionAndAngleAlongTrajectoryPath } from "../utils/trajectory";
 
 /** A marker that exists somewhere along a trajectory path */
@@ -23,9 +23,15 @@ export type TrajectoryMarker = {
     type: MarkerType;
     /* The marker's position along the path, as a float between 0-1 */
     positionAlongPath: number;
-};
+} & Record<string, unknown>;
 
 export type TrajectoryMarkerFeature = Feature<Geometry, TrajectoryMarker>;
+
+type MarkerData = {
+    type: MarkerType;
+    position: Position;
+    angle: number;
+};
 
 export type TrajectoryMarkerLayerProps<TData> = {
     data: LayerDataSource<TData>;
@@ -34,6 +40,7 @@ export type TrajectoryMarkerLayerProps<TData> = {
     getMarkerColor: Accessor<TrajectoryMarker, Color>;
 };
 
+// Although this layer only renders a path layer, we inherit props from GeoJson to make it easier to use within the WellsLayer. Future updates might include other types of markers (polygons, icons, etc) so the other properties might be relevant down the line.
 type InheritedGeoJsonProps = Omit<
     GeoJsonLayerProps,
     "data" | "getLineColor" | "getFillColor"
@@ -53,7 +60,7 @@ export class TrajectoryMarkersLayer<TData = unknown> extends CompositeLayer<
     };
 
     state!: {
-        markerFeatures2D: TrajectoryMarkerFeature[];
+        subLayerData: MarkerData[];
     };
 
     updateState({ changeFlags }: UpdateParameters<this>): void {
@@ -64,12 +71,13 @@ export class TrajectoryMarkersLayer<TData = unknown> extends CompositeLayer<
 
         if (!this.isLoaded) return;
         if (!changeFlags.dataChanged && !markersUpdate) return;
+        if (!this.props.getTrajectoryPath) return;
         if (!Array.isArray(data))
             throw Error(
                 `Expected data to be a list, instead got ${typeof data}`
             );
 
-        const markerFeatures2D: TrajectoryMarkerFeature[] = [];
+        const subLayerData: MarkerData[] = [];
 
         for (let index = 0; index < data.length; index++) {
             const itemContext = { data, index, target: [] };
@@ -91,8 +99,13 @@ export class TrajectoryMarkersLayer<TData = unknown> extends CompositeLayer<
                 markerIndex < trajectoryMarkers.length;
                 markerIndex++
             ) {
-                const marker = trajectoryMarkers[markerIndex];
-                const posFragment = clamp(marker.positionAlongPath, 0, 1);
+                const {
+                    type: markerType,
+                    positionAlongPath: pathPosition,
+                    ...otherData
+                } = trajectoryMarkers[markerIndex];
+
+                const posFragment = clamp(pathPosition, 0, 1);
                 const [angle, worldPosition] =
                     getPositionAndAngleAlongTrajectoryPath(
                         posFragment,
@@ -102,39 +115,57 @@ export class TrajectoryMarkersLayer<TData = unknown> extends CompositeLayer<
                         this.props.positionFormat === "XYZ"
                     );
 
-                const featureGeometry = buildMarkerGeometry(
-                    marker.type,
-                    worldPosition,
-                    angle
+                const markerData = {
+                    type: markerType,
+                    position: worldPosition,
+                    angle: angle,
+                    ...otherData,
+                } as MarkerData;
+
+                subLayerData.push(
+                    this.getSubLayerRow(markerData, datum, index)
                 );
 
-                markerFeatures2D.push({
-                    type: "Feature",
-                    properties: marker,
-                    geometry: featureGeometry,
-                });
+                // ! We want to show perforations as a spike on both sides of the line. Since they will rendered as disconnected lines, we need to inject a second, rotated row for it
+                if (markerType === "perforation") {
+                    const markerDatum2 = {
+                        ...markerData,
+                        angle: angle + Math.PI,
+                    };
+                    subLayerData.push(
+                        this.getSubLayerRow(markerDatum2, datum, index)
+                    );
+                }
             }
         }
 
-        this.setState({ markerFeatures2D });
+        this.setState({ subLayerData });
     }
 
     renderLayers(): Layer | null | LayersList {
         // TODO: Distinct layers based on 2D or 3D views, as they should render completely differently based on context
-        return new GeoJsonLayer({
+        // TODO: Better scaling for markers. For instance, a screen marker should always be the same amount bigger than it's parent line
+
+        return new PathLayer({
             ...this.getSubLayerProps({
                 ...this.props,
                 id: "-2d",
+                updateTriggers: {
+                    getPath: this.props.updateTriggers?.["getTrajectoryPath"],
+                },
             }),
 
-            data: this.state.markerFeatures2D,
-            positionFormat: "XY",
+            data: this.state.subLayerData,
 
-            lineBillboard: true,
-            filled: false,
+            getPath: (d: MarkerData) =>
+                buildMarkerPath(d.type, d.position, d.angle),
 
-            getLineColor: this.props.getMarkerColor,
-            getFillColor: [0, 0, 0, 0],
+            getColor: this.getSubLayerAccessor(this.props.getMarkerColor),
+            billboard: this.props.lineBillboard,
+
+            getWidth: this.getSubLayerAccessor(this.props.getLineWidth),
+            widthScale: this.props.lineWidthScale,
+            widthUnits: this.props.lineWidthUnits,
         });
     }
 }

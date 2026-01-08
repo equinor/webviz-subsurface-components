@@ -298,7 +298,7 @@ export function getPositionAndAngleAlongTrajectoryPath(
     angle = rad;
 
     if (is3d) return [angle, position as Point3D];
-    else return [angle, [position[0], position[1]]];
+    return [angle, position as Point2D];
 }
 
 // Helper to get a segment without reaching index overflow

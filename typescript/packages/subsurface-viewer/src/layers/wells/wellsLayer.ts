@@ -70,6 +70,8 @@ import type {
 } from "../../components/ColorLegend";
 import { getSize, LINE, POINT, DEFAULT_LINE_WIDTH } from "./utils/features";
 import { scaleArray } from "../../utils/arrays";
+import type { TrajectoryMarker } from "./layers/trajectoryMarkerLayer";
+import { TrajectoryMarkersLayer } from "./layers/trajectoryMarkerLayer";
 
 const DEFAULT_DASH = [5, 5] as NumberPair;
 
@@ -82,6 +84,7 @@ export enum SubLayerId {
     LOG_CURVE = "log_curve",
     SELECTION = "selection",
     LABELS = "labels",
+    MARKERS = "markers",
 }
 
 export interface WellsLayerProps extends ExtendedLayerProps {
@@ -417,7 +420,6 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
     renderLayers(): LayersList {
         const data = this.getWellDataState();
-        const positionFormat = "XYZ";
         const isDashed = !!this.props.lineStyle?.dash;
 
         if (!data || !data?.features.length) {
@@ -443,7 +445,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             data,
             pickable: false,
             stroked: false,
-            positionFormat,
+            positionFormat: this.props.positionFormat ?? "XYZ",
             pointRadiusUnits: "pixels",
             lineWidthUnits: "pixels",
             pointRadiusScale: this.props.pointRadiusScale,
@@ -474,7 +476,6 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         const fastLayerProps = this.getSubLayerProps({
             ...defaultLayerProps,
             id: SubLayerId.SIMPLE,
-            positionFormat,
             getLineColor: getColor(this.props.lineStyle?.color),
             getFillColor: getColor(this.props.wellHeadStyle?.color),
         });
@@ -537,8 +538,8 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 visible: this.props.logCurves && !fastDrawing,
                 pickable: true,
                 parameters,
-                positionFormat,
 
+                positionFormat: this.props.positionFormat,
                 data: this.props.logData,
                 trajectoryData: data,
                 domainSelection: this.state.logDomainSelection,
@@ -571,6 +572,41 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             } as Partial<LogCurveLayerProps>),
         });
 
+        const markerLayer = new TrajectoryMarkersLayer({
+            ...defaultLayerProps,
+            ...this.getSubLayerProps({
+                id: SubLayerId.MARKERS,
+                data: data.features,
+                getMarkerColor: getColor(this.props.lineStyle?.color),
+
+                getTrajectoryPath: (d: WellFeature) =>
+                    getTrajectory(d, this.props.lineStyle?.color),
+                getMarkers: (d: WellFeature) => {
+                    const maxMd = d.properties.md[0]?.at(-1);
+                    const { perforations = [], screens = [] } = d.properties;
+
+                    if (maxMd === undefined || maxMd === 0) return [];
+
+                    return [
+                        ...perforations.map<TrajectoryMarker>((p) => ({
+                            type: "perforation",
+                            positionAlongPath: p.md / maxMd,
+                        })),
+                        ...screens.flatMap<TrajectoryMarker>((s) => [
+                            {
+                                type: "screen-start",
+                                positionAlongPath: s.mdStart / maxMd,
+                            },
+                            {
+                                type: "screen-end",
+                                positionAlongPath: s.mdEnd / maxMd,
+                            },
+                        ]),
+                    ];
+                },
+            }),
+        });
+
         const namesLayer = this.createWellLabelLayer(data.features);
 
         const layers = [
@@ -580,6 +616,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             highlightMultiWellsLayer,
             namesLayer,
             logLayer,
+            markerLayer,
         ];
         if (fastDrawing) {
             layers.push(fastLayer);

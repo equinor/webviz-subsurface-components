@@ -12,6 +12,8 @@ export type GeoJsonWellProperties = {
     name: string;
     md: number[][];
     color?: Color;
+    perforations?: PerforationProperties[];
+    screens?: ScreenProperties[];
 };
 
 export type WellFeature = Feature<GeometryCollection, GeoJsonWellProperties>;
@@ -21,6 +23,21 @@ export type WellFeatureCollection = FeatureCollection<
 > & {
     // ? This is used in the example volve-well feature-collection, but is not part of the standard. Should we include it?
     unit?: string;
+};
+
+// TODO: Un-decided which properties are important, so many of these are subject to change
+export type PerforationProperties = {
+    md: number;
+    status: string;
+    mode?: string;
+    dateShot?: string;
+    dateClosed?: string;
+};
+
+export type ScreenProperties = {
+    mdStart: number;
+    mdEnd: number;
+    description?: string;
 };
 
 export interface WellsPickInfo extends LayerPickInfo<WellFeature> {
