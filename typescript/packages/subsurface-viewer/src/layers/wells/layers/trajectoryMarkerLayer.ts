@@ -1,6 +1,7 @@
 import type {
     Accessor,
     Color,
+    GetPickingInfoParams,
     Layer,
     LayerData,
     LayerDataSource,
@@ -10,9 +11,10 @@ import type {
 import { CompositeLayer } from "@deck.gl/core";
 import type { GeoJsonLayerProps } from "@deck.gl/layers";
 import { PathLayer } from "@deck.gl/layers";
-import type { Feature, Geometry, Position } from "geojson";
+import type { Position } from "geojson";
 import { clamp } from "lodash";
 
+import type { LayerPickInfo } from "../../utils/layerTools";
 import { getFromAccessor } from "../../utils/layerTools";
 import type { MarkerType } from "../utils/markers";
 import { buildMarkerPath } from "../utils/markers";
@@ -23,14 +25,14 @@ export type TrajectoryMarker = {
     type: MarkerType;
     /* The marker's position along the path, as a float between 0-1 */
     positionAlongPath: number;
-} & Record<string, unknown>;
-
-export type TrajectoryMarkerFeature = Feature<Geometry, TrajectoryMarker>;
+    properties?: Record<string, unknown>;
+};
 
 type MarkerData = {
     type: MarkerType;
     position: Position;
     angle: number;
+    properties?: Record<string, unknown>;
 };
 
 export type TrajectoryMarkerLayerProps<TData> = {
@@ -99,13 +101,10 @@ export class TrajectoryMarkersLayer<TData = unknown> extends CompositeLayer<
                 markerIndex < trajectoryMarkers.length;
                 markerIndex++
             ) {
-                const {
-                    type: markerType,
-                    positionAlongPath: pathPosition,
-                    ...otherData
-                } = trajectoryMarkers[markerIndex];
+                const { type, positionAlongPath, properties } =
+                    trajectoryMarkers[markerIndex];
 
-                const posFragment = clamp(pathPosition, 0, 1);
+                const posFragment = clamp(positionAlongPath, 0, 1);
                 const [angle, worldPosition] =
                     getPositionAndAngleAlongTrajectoryPath(
                         posFragment,
@@ -115,19 +114,19 @@ export class TrajectoryMarkersLayer<TData = unknown> extends CompositeLayer<
                         this.props.positionFormat === "XYZ"
                     );
 
-                const markerData = {
-                    type: markerType,
+                const markerData: MarkerData = {
+                    type: type,
                     position: worldPosition,
                     angle: angle,
-                    ...otherData,
-                } as MarkerData;
+                    properties: properties,
+                };
 
                 subLayerData.push(
                     this.getSubLayerRow(markerData, datum, index)
                 );
 
                 // ! We want to show perforations as a spike on both sides of the line. Since they will rendered as disconnected lines, we need to inject a second, rotated row for it
-                if (markerType === "perforation") {
+                if (type === "perforation") {
                     const markerDatum2 = {
                         ...markerData,
                         angle: angle + Math.PI,
@@ -140,6 +139,29 @@ export class TrajectoryMarkersLayer<TData = unknown> extends CompositeLayer<
         }
 
         this.setState({ subLayerData });
+    }
+
+    getPickingInfo({ info }: GetPickingInfoParams): LayerPickInfo<TData> {
+        if (!info.picked || !info.object || !info.coordinate) return info;
+
+        const object = info.object as MarkerData;
+
+        info.coordinate[2] = object.position[2];
+
+        const markerData = info.object as MarkerData;
+        if (info.index === -1 || !markerData?.properties) return info;
+
+        if (markerData.type !== "perforation") return info;
+
+        return {
+            ...info,
+            properties: [
+                {
+                    name: String(markerData.properties["name"]),
+                    value: String(markerData.properties["status"]),
+                },
+            ],
+        };
     }
 
     renderLayers(): Layer | null | LayersList {

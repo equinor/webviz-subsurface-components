@@ -190,6 +190,8 @@ export const TrajectoryMarkers: Story = {
                     updateTriggers: { getPath: [args.use3dView] },
                 }),
                 new TrajectoryMarkersLayer({
+                    // @ts-expect-error -- Forcing name so readout works in story
+                    name: "Trajectory Marker Layer",
                     id: "well-markers",
                     data: wellData.features,
                     positionFormat: args.use3dView ? "XYZ" : "XY",
@@ -233,6 +235,10 @@ function getTrajectoryMarkers(
             {
                 type: "perforation",
                 positionAlongPath: markerPosition,
+                properties: {
+                    status: "open",
+                    name: `Perforation ${d.properties.name} XX-yy `,
+                },
             },
         ];
 
