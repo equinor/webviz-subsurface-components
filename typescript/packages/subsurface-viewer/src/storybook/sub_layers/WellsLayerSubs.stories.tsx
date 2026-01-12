@@ -8,12 +8,11 @@ import type {
 import { PathLayer } from "@deck.gl/layers";
 import type { Meta, StoryObj } from "@storybook/react";
 import type { Position } from "geojson";
-import { chunk, clamp } from "lodash";
+import { clamp, round } from "lodash";
 
 import { DashedSectionsPathLayer } from "../../layers/wells/layers/dashedSectionsPathLayer";
 import type { TrajectoryMarker } from "../../layers/wells/layers/trajectoryMarkerLayer";
 import { TrajectoryMarkersLayer } from "../../layers/wells/layers/trajectoryMarkerLayer";
-
 import type {
     WellFeature,
     WellFeatureCollection,
@@ -86,7 +85,7 @@ function SubsurfaceViewerWithSyntheticWells<
         <SubsurfaceViewer
             id={props.id}
             bounds={[455000, 6785000, 464000, 6790000]}
-            pickingRadius={12}
+            pickingRadius={24}
             views={views}
             layers={props.makeLayers(wellData)}
         />
@@ -98,8 +97,18 @@ export const DashedSections: Story = {
         id: "trajectory-markers-layer",
         getWidth: 5,
         widthMinPixels: 3,
-        dashSegmentSize: 4,
+        dashSegmentSize: 0.3,
         dashArray: [3, 3],
+    },
+    argTypes: {
+        dashSegmentSize: {
+            control: {
+                type: "range",
+                min: 0,
+                max: 1,
+                step: 0.01,
+            },
+        },
     },
     render: (args) => (
         // @ts-expect-error -- Don't know how to get args typed so that it stops complaining
@@ -107,6 +116,8 @@ export const DashedSections: Story = {
             {...args}
             makeLayers={(wellData) => [
                 new DashedSectionsPathLayer<WellFeature>({
+                    // @ts-expect-error -- Forcing name so readout works in story
+                    name: "Dashed Paths",
                     id: "wells-sublayer-dashed-sections",
                     data: wellData.features,
                     positionFormat: args.use3dView ? "XYZ" : "XY",
@@ -119,23 +130,17 @@ export const DashedSections: Story = {
                     pickable: true,
                     autoHighlight: true,
 
-                    getDashedPathSection: (d) =>
-                        getChunkedTrajectoryPath(
-                            d,
-                            args["dashSegmentSize"]
-                        ).filter((c, i) => i % 2 === 0),
-                    getNormalPathSection: (d) =>
-                        getChunkedTrajectoryPath(
-                            d,
-                            args["dashSegmentSize"]
-                        ).filter((c, i) => i % 2 !== 0),
+                    getPath: getTrajectoryCoordinates,
+                    getPathFractions: (d) =>
+                        d.properties.md[0].map((md) => {
+                            return round(md / d.properties.md[0].at(-1)!, 2);
+                        }),
+
+                    getDashedSectionsAlongPath: (d) =>
+                        getDashedSectionsAlongPath(d, args["dashSegmentSize"]),
 
                     updateTriggers: {
-                        getDashedPathSection: [
-                            args["dashSegmentSize"],
-                            args["use3dView"],
-                        ],
-                        getNormalPathSection: [
+                        getDashedSectionsAlongPath: [
                             args["dashSegmentSize"],
                             args["use3dView"],
                         ],
@@ -146,19 +151,14 @@ export const DashedSections: Story = {
     ),
 };
 
-// Utility to split a trajectory's path into segment-chunks. Each chunk connects to the next segment (aka chunk1[-1] === chunk2[0]).
-function getChunkedTrajectoryPath(d: WellFeature, chunkSize: number) {
-    const fullPath = getTrajectoryCoordinates(d);
+function getDashedSectionsAlongPath(d: WellFeature, dashSegmentSize: number) {
+    if (!dashSegmentSize) return [];
 
-    if (chunkSize < 1) return [fullPath];
+    // Computing in hundreds to avoid floating point errors
+    const segSize = dashSegmentSize * 50;
+    const anchor = 80; // Placing it more towards the end so it's more visible in 2D
 
-    const chunkedPath = chunk(fullPath, chunkSize);
-
-    return chunkedPath.map((chunk, i) => {
-        const nextChunk = chunkedPath[i + 1];
-        if (!nextChunk) return chunk;
-        return [...chunk, nextChunk[0]];
-    });
+    return [(anchor - segSize) / 100, (anchor + segSize) / 100];
 }
 
 export const TrajectoryMarkers: Story = {

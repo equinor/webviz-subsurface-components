@@ -1,8 +1,8 @@
 import type { AccessorContext, Color } from "@deck.gl/core";
 import type { LineString, Position } from "geojson";
-import { distance, dot, subtract } from "mathjs";
-import { zipWith } from "lodash";
+import { clamp, sortedIndex, zipWith } from "lodash";
 import { Vector2 } from "math.gl";
+import { distance, dot, subtract } from "mathjs";
 
 import type { Point2D, Point3D } from "../../../utils";
 import {
@@ -12,6 +12,7 @@ import {
 import type { StyleAccessorFunction } from "../../types";
 import type { ColorAccessor, WellFeature } from "../types";
 import { getWellHeadPosition } from "./features";
+import { getPositionByMD } from "./wells";
 
 function getLineStringGeometry(
     well_object: WellFeature
@@ -99,6 +100,51 @@ export function getMdsInRange(
     mdSection.push(mdEnd);
 
     return mdSection;
+}
+
+/**
+ * Calculates a sub-trajectory between two fractional positions along a trajectory
+ * @param trajectoryPositions The position array that describes the trajectory
+ * @param trajectoryMds The measured depths for each trajectory position
+ * @param startFraction The fractional (0-1) position along the path the sub-trajectory starts at
+ * @param endFraction The fractional (0-1) position along the path the sub-trajectory ends at
+ * @returns A sub-section of the trajectory positions between the start and end fractions. Start and end will be interpolated if they do not fall exactly on existing trajectory positions
+ */
+export function getPositionsAlongTrajectory(
+    trajectoryPositions: Position[],
+    trajectoryMds: number[],
+    startFraction: number,
+    endFraction: number
+): Position[] {
+    if (trajectoryPositions.length !== trajectoryPositions.length)
+        throw Error(
+            "Expected trajectory and measurements arrays to be of equal lenght"
+        );
+
+    startFraction = clamp(startFraction, 0, 1);
+    endFraction = clamp(startFraction, 0, 1);
+
+    if (startFraction >= endFraction) return [];
+    if (startFraction === 0 && endFraction === 1)
+        return [...trajectoryPositions];
+
+    const startMd = startFraction * trajectoryMds[trajectoryMds.length - 1];
+    const endMd = endFraction * trajectoryMds[trajectoryMds.length - 1];
+
+    const startIndex = sortedIndex(trajectoryMds, startMd);
+    const endIndex = sortedIndex(trajectoryMds, endMd);
+
+    const mdSegment = trajectoryMds.slice(startIndex, endIndex);
+
+    if (mdSegment.at(0)! > startMd) mdSegment.splice(0, 0, startMd);
+    if (mdSegment.at(-1)! > endMd)
+        mdSegment.splice(mdSegment.length - 1, 0, endMd);
+
+    console.log(mdSegment);
+
+    return mdSegment.map((md) =>
+        getPositionByMD(trajectoryPositions, trajectoryMds, md)
+    );
 }
 
 // Interpolates point closest to the coords on trajectory
