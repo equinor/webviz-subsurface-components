@@ -168,7 +168,7 @@ export const TrajectoryMarkers: Story = {
 
     argTypes: {
         markerPosition: {
-            control: { type: "range", min: 0, max: 1, step: 0.01 },
+            control: { type: "range", min: 0.3, max: 1, step: 0.01 },
         },
     },
     render: (args) => (
@@ -197,7 +197,14 @@ export const TrajectoryMarkers: Story = {
                     positionFormat: args.use3dView ? "XYZ" : "XY",
                     getLineWidth: 2,
                     lineWidthMinPixels: 1,
-                    getMarkerColor: [255, 0, 0],
+                    getMarkerColor: (d) => {
+                        if (d.properties?.status === "closed")
+                            return [255, 0, 0];
+                        if (d.properties?.status === "open")
+                            return [0, 155, 115];
+
+                        return [115, 115, 115];
+                    },
 
                     lineWidthScale: 1,
                     lineWidthUnits: "pixels",
@@ -238,6 +245,15 @@ function getTrajectoryMarkers(
                 properties: {
                     status: "open",
                     name: `Perforation ${d.properties.name} XX-yy `,
+                },
+            },
+
+            {
+                type: "perforation",
+                positionAlongPath: 1.3 - markerPosition,
+                properties: {
+                    status: "closed",
+                    name: `Perforation ${d.properties.name} AA-bb `,
                 },
             },
         ];

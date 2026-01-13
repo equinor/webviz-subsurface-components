@@ -15,7 +15,10 @@ import type { Position } from "geojson";
 import { clamp } from "lodash";
 
 import type { LayerPickInfo } from "../../utils/layerTools";
-import { getFromAccessor } from "../../utils/layerTools";
+import {
+    getFromAccessor,
+    hasUpdateTriggerChanged,
+} from "../../utils/layerTools";
 import type { MarkerType } from "../utils/markers";
 import { buildMarkerPath } from "../utils/markers";
 import { getPositionAndAngleAlongTrajectoryPath } from "../utils/trajectory";
@@ -32,7 +35,13 @@ type MarkerData = {
     type: MarkerType;
     position: Position;
     angle: number;
+    positionAlongPath: number;
     properties?: Record<string, unknown>;
+};
+
+type GroupedMarkerData = {
+    properties?: Record<string, unknown>;
+    markers: MarkerData[];
 };
 
 export type TrajectoryMarkerLayerProps<TData> = {
@@ -62,24 +71,36 @@ export class TrajectoryMarkersLayer<TData = unknown> extends CompositeLayer<
     };
 
     state!: {
-        subLayerData: MarkerData[];
+        // Since some markers (for instance perforation) are visibly disconnected shapes, we need to add an intermediate data list to group related path data objects; this also lets us make auto-highlighting work per "grouped marker" (such as both perforation spikes being colored when you hover one of them)
+        flattenedMarkerData: MarkerData[];
+        groupedMarkerData: GroupedMarkerData[];
     };
 
     updateState({ changeFlags }: UpdateParameters<this>): void {
-        const data = this.props.data as LayerData<TData>;
-        const markersUpdate =
-            changeFlags.updateTriggersChanged &&
-            !!changeFlags.updateTriggersChanged["getMarkers"];
-
         if (!this.isLoaded) return;
-        if (!changeFlags.dataChanged && !markersUpdate) return;
+
+        const data = this.props.data as LayerData<TData>;
+
+        const markersUpdate = hasUpdateTriggerChanged(
+            changeFlags,
+            "getMarkers"
+        );
+
+        const trajectoryUpdate = hasUpdateTriggerChanged(
+            changeFlags,
+            "getTrajectoryPath"
+        );
+
+        if (!changeFlags.dataChanged && !markersUpdate && !trajectoryUpdate)
+            return;
         if (!this.props.getTrajectoryPath) return;
         if (!Array.isArray(data))
             throw Error(
                 `Expected data to be a list, instead got ${typeof data}`
             );
 
-        const subLayerData: MarkerData[] = [];
+        const flattenedMarkerData: MarkerData[] = [];
+        const groupedMarkerData: GroupedMarkerData[] = [];
 
         for (let index = 0; index < data.length; index++) {
             const itemContext = { data, index, target: [] };
@@ -114,31 +135,48 @@ export class TrajectoryMarkersLayer<TData = unknown> extends CompositeLayer<
                         this.props.positionFormat === "XYZ"
                     );
 
-                const markerData: MarkerData = {
-                    type: type,
-                    position: worldPosition,
-                    angle: angle,
-                    properties: properties,
+                const markerGroup: GroupedMarkerData = {
+                    properties,
+                    markers: [],
                 };
 
-                subLayerData.push(
-                    this.getSubLayerRow(markerData, datum, index)
+                const markerData: MarkerData = this.getSubLayerRow(
+                    {
+                        type: type,
+                        position: worldPosition,
+                        angle: angle,
+                        positionAlongPath: posFragment,
+                        properties: properties,
+                    },
+                    markerGroup,
+                    groupedMarkerData.length - 1
                 );
+
+                markerGroup.markers.push(markerData);
+                flattenedMarkerData.push(markerData);
 
                 // ! We want to show perforations as a spike on both sides of the line. Since they will rendered as disconnected lines, we need to inject a second, rotated row for it
                 if (type === "perforation") {
-                    const markerDatum2 = {
-                        ...markerData,
-                        angle: angle + Math.PI,
-                    };
-                    subLayerData.push(
-                        this.getSubLayerRow(markerDatum2, datum, index)
+                    const markerData2 = this.getSubLayerRow(
+                        {
+                            ...markerData,
+                            angle: angle + Math.PI,
+                        },
+                        markerGroup,
+                        groupedMarkerData.length - 1
                     );
+
+                    markerGroup.markers.push(markerData2);
+                    flattenedMarkerData.push(markerData2);
                 }
+
+                groupedMarkerData.push(
+                    this.getSubLayerRow(markerGroup, datum, index)
+                );
             }
         }
 
-        this.setState({ subLayerData });
+        this.setState({ flattenedMarkerData });
     }
 
     getPickingInfo({ info }: GetPickingInfoParams): LayerPickInfo<TData> {
@@ -167,7 +205,6 @@ export class TrajectoryMarkersLayer<TData = unknown> extends CompositeLayer<
     renderLayers(): Layer | null | LayersList {
         // TODO: Distinct layers based on 2D or 3D views, as they should render completely differently based on context
         // TODO: Better scaling for markers. For instance, a screen marker should always be the same amount bigger than it's parent line
-
         return new PathLayer({
             ...this.getSubLayerProps({
                 ...this.props,
@@ -176,8 +213,7 @@ export class TrajectoryMarkersLayer<TData = unknown> extends CompositeLayer<
                     getPath: this.props.updateTriggers?.["getTrajectoryPath"],
                 },
             }),
-
-            data: this.state.subLayerData,
+            data: this.state.flattenedMarkerData,
 
             getPath: (d: MarkerData) =>
                 buildMarkerPath(d.type, d.position, d.angle),
