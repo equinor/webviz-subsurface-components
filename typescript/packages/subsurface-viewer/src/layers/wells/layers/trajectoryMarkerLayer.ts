@@ -12,7 +12,7 @@ import { CompositeLayer } from "@deck.gl/core";
 import type { GeoJsonLayerProps } from "@deck.gl/layers";
 import { PathLayer } from "@deck.gl/layers";
 import type { Position } from "geojson";
-import { clamp } from "lodash";
+import _ from "lodash";
 
 import type { LayerPickInfo } from "../../utils/layerTools";
 import {
@@ -21,7 +21,10 @@ import {
 } from "../../utils/layerTools";
 import type { MarkerType } from "../utils/markers";
 import { buildMarkerPath } from "../utils/markers";
-import { getPositionAndAngleAlongTrajectoryPath } from "../utils/trajectory";
+import {
+    getCumulativeDistance,
+    getPositionAndAngleOnTrajectoryPath,
+} from "../utils/trajectory";
 
 /** A marker that exists somewhere along a trajectory path */
 export type TrajectoryMarker = {
@@ -47,15 +50,13 @@ type GroupedMarkerData = {
 export type TrajectoryMarkerLayerProps<TData> = {
     data: LayerDataSource<TData>;
     getTrajectoryPath: Accessor<TData, Position[]>;
+    getCumulativePathDistance: Accessor<TData, number[]>;
     getMarkers: Accessor<TData, TrajectoryMarker[]>;
     getMarkerColor: Accessor<TrajectoryMarker, Color>;
 };
 
 // Although this layer only renders a path layer, we inherit props from GeoJson to make it easier to use within the WellsLayer. Future updates might include other types of markers (polygons, icons, etc) so the other properties might be relevant down the line.
-type InheritedGeoJsonProps = Omit<
-    GeoJsonLayerProps,
-    "data" | "getLineColor" | "getFillColor"
->;
+type InheritedGeoJsonProps = Omit<GeoJsonLayerProps, "data" | "getFillColor">;
 
 /**
  * Wells sub-layer for displaying different markers along a well trajectories
@@ -68,6 +69,7 @@ export class TrajectoryMarkersLayer<TData = unknown> extends CompositeLayer<
     static defaultProps = {
         getMarkers: { type: "accessor", value: [] },
         getMarkerColor: { type: "accessor", value: [0, 0, 0] },
+        getCumulativePathDistance: { type: "accessor", value: undefined },
     };
 
     state!: {
@@ -91,7 +93,17 @@ export class TrajectoryMarkersLayer<TData = unknown> extends CompositeLayer<
             "getTrajectoryPath"
         );
 
-        if (!changeFlags.dataChanged && !markersUpdate && !trajectoryUpdate)
+        const cumulativeDistanceUpdate = hasUpdateTriggerChanged(
+            changeFlags,
+            "getCumulativePathDistance"
+        );
+
+        if (
+            !changeFlags.dataChanged &&
+            !markersUpdate &&
+            !trajectoryUpdate &&
+            !cumulativeDistanceUpdate
+        )
             return;
         if (!this.props.getTrajectoryPath) return;
         if (!Array.isArray(data))
@@ -111,6 +123,14 @@ export class TrajectoryMarkersLayer<TData = unknown> extends CompositeLayer<
                 datum,
                 itemContext
             );
+
+            const cumulativePathDistance =
+                getFromAccessor(
+                    this.props.getCumulativePathDistance,
+                    datum,
+                    itemContext
+                ) ?? getCumulativeDistance(trajectoryPath);
+
             const trajectoryMarkers = getFromAccessor(
                 this.props.getMarkers,
                 datum,
@@ -125,11 +145,12 @@ export class TrajectoryMarkersLayer<TData = unknown> extends CompositeLayer<
                 const { type, positionAlongPath, properties } =
                     trajectoryMarkers[markerIndex];
 
-                const posFragment = clamp(positionAlongPath, 0, 1);
+                const posFragment = _.clamp(positionAlongPath, 0, 1);
                 const [angle, worldPosition] =
-                    getPositionAndAngleAlongTrajectoryPath(
+                    getPositionAndAngleOnTrajectoryPath(
                         posFragment,
                         trajectoryPath,
+                        cumulativePathDistance,
                         // Arrow func to preserve "this"
                         (xyz) => this.project(xyz),
                         this.props.positionFormat === "XYZ"
@@ -202,9 +223,17 @@ export class TrajectoryMarkersLayer<TData = unknown> extends CompositeLayer<
         };
     }
 
+    // This one does look a bit weird, but since we have the intermediate layer that wraps grouped elements, we need to apply the accessor helper twice every time to get the source feature
+    getNestedSubLayerAccessor<In, Out>(
+        accessor: Accessor<In, Out>
+    ): Accessor<In, Out> {
+        return this.getSubLayerAccessor(this.getSubLayerAccessor(accessor));
+    }
+
     renderLayers(): Layer | null | LayersList {
         // TODO: Distinct layers based on 2D or 3D views, as they should render completely differently based on context
         // TODO: Better scaling for markers. For instance, a screen marker should always be the same amount bigger than it's parent line
+
         return new PathLayer({
             ...this.getSubLayerProps({
                 ...this.props,
@@ -218,10 +247,12 @@ export class TrajectoryMarkersLayer<TData = unknown> extends CompositeLayer<
             getPath: (d: MarkerData) =>
                 buildMarkerPath(d.type, d.position, d.angle),
 
-            getColor: this.getSubLayerAccessor(this.props.getMarkerColor),
+            getColor: this.props.getLineColor
+                ? this.getNestedSubLayerAccessor(this.props.getLineColor)
+                : this.props.getMarkerColor,
             billboard: this.props.lineBillboard,
 
-            getWidth: this.getSubLayerAccessor(this.props.getLineWidth),
+            getWidth: this.getNestedSubLayerAccessor(this.props.getLineWidth),
             widthScale: this.props.lineWidthScale,
             widthUnits: this.props.lineWidthUnits,
         });

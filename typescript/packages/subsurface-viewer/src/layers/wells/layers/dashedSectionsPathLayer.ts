@@ -13,12 +13,17 @@ import { PathLayer } from "@deck.gl/layers";
 import type { PathGeometry } from "@deck.gl/layers/dist/path-layer/path";
 import type { Position } from "geojson";
 import _ from "lodash";
+import { isClose } from "../../../utils/measurement";
 import type { LayerPickInfo } from "../../utils/layerTools";
 import {
     getFromAccessor,
     hasUpdateTriggerChanged,
 } from "../../utils/layerTools";
-import { interpolateDataOnTrajectory } from "../utils/trajectory";
+import {
+    getCumulativeDistance,
+    getFractionPositionSegmentIndices,
+    interpolateDataOnTrajectory,
+} from "../utils/trajectory";
 
 export enum SubLayerId {
     DASHED_PATH = "dashed-paths",
@@ -33,10 +38,10 @@ type ComputedPathSection = {
 };
 
 type _DashedSectionsPathLayerProps<TData = unknown> = {
-    getDashArray: Accessor<TData, [number, number]>;
+    getScreenDashArray: Accessor<TData, [number, number]>;
     getPath: Accessor<TData, Position[]>;
     getDashedSectionsAlongPath: Accessor<TData, number[] | number[][]>;
-    getPathFractions: Accessor<TData, number[]>;
+    getCumulativePathDistance: Accessor<TData, number[]>;
 };
 
 export type DashedSectionsPathLayerProps<TData = unknown> = Omit<
@@ -51,17 +56,17 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
     static layerName = "DashedSectionsPathLayer";
     static defaultProps = {
         ...PathLayer.defaultProps,
-        getDashArray: PathStyleExtension.defaultProps.getDashArray,
+        getScreenDashArray: PathStyleExtension.defaultProps.getDashArray,
         getDashedSectionsAlongPath: {
             type: "accessor",
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             value: (object: any) => object.dashSectionsAlongPath,
         },
 
-        getPathFractions: {
+        getCumulativePathDistance: {
             type: "accessor",
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            value: (object: any) => object.md,
+            // If not provided, we manually compute it from the path
+            value: undefined,
         },
     };
 
@@ -72,7 +77,7 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
         // Caches for computed values, mapped by source data row index
         sectionsCache: Map<number, number[][]>;
         pathCache: Map<number, Position[]>;
-        pathFractionsCache: Map<number, number[]>;
+        cumulativePathDistanceCache: Map<number, number[]>;
     };
 
     updateState({ changeFlags }: UpdateParameters<this>): void {
@@ -80,8 +85,8 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
 
         const data = this.props.data as LayerData<TData>;
         const {
-            getDashedSectionsAlongPath: getSectionsAlongPath,
-            getPathFractions,
+            getDashedSectionsAlongPath,
+            getCumulativePathDistance,
             getPath,
         } = this.props;
 
@@ -92,9 +97,9 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
 
         const dataChanged = changeFlags.dataChanged;
         const pathChanged = hasUpdateTriggerChanged(changeFlags, "getPath");
-        const pathFractionsChanged = hasUpdateTriggerChanged(
+        const cumulativePathDistanceChanged = hasUpdateTriggerChanged(
             changeFlags,
-            "getPathFractions"
+            "getCumulativePathDistance"
         );
         const sectionsChanged = hasUpdateTriggerChanged(
             changeFlags,
@@ -104,7 +109,7 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
         if (
             dataChanged ||
             pathChanged ||
-            pathFractionsChanged ||
+            cumulativePathDistanceChanged ||
             sectionsChanged
         ) {
             // Each path will need to be split into two data sets based on whether the section is dashed or not.
@@ -112,8 +117,8 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
             const normalPathSubLayerData: ComputedPathSection[] = [];
 
             const pathCache = this.state.pathCache ?? new Map();
-            const pathFractionsCache =
-                this.state.pathFractionsCache ?? new Map();
+            const cumulativePathDistanceCache =
+                this.state.cumulativePathDistanceCache ?? new Map();
             const sectionsCache = this.state.sectionsCache ?? new Map();
 
             for (let index = 0; index < data.length; index++) {
@@ -128,19 +133,29 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
                     );
                 }
 
-                if (pathFractionsChanged || dataChanged) {
-                    pathFractionsCache.set(
-                        index,
-                        getFromAccessor(getPathFractions, datum, itemContext)
-                    );
-                }
-
-                if (sectionsChanged || dataChanged) {
-                    const sections = getFromAccessor(
-                        getSectionsAlongPath,
+                if (cumulativePathDistanceChanged || dataChanged) {
+                    let cumulativeDistance = getFromAccessor(
+                        getCumulativePathDistance,
                         datum,
                         itemContext
                     );
+
+                    if (!cumulativeDistance) {
+                        cumulativeDistance = getCumulativeDistance(
+                            pathCache.get(index)!
+                        );
+                    }
+
+                    cumulativePathDistanceCache.set(index, cumulativeDistance);
+                }
+
+                if (sectionsChanged || dataChanged) {
+                    const sections =
+                        getFromAccessor(
+                            getDashedSectionsAlongPath,
+                            datum,
+                            itemContext
+                        ) ?? [];
 
                     const chunkedSections: number[][] =
                         typeof sections[0] === "number"
@@ -151,8 +166,9 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
                 }
 
                 const path = pathCache.get(index)!;
-                const pathFractions = pathFractionsCache.get(index)!;
                 const sections = sectionsCache.get(index)!;
+                const cumulativePathDistance =
+                    cumulativePathDistanceCache.get(index)!;
 
                 let prevSectionEnd = 0;
 
@@ -169,7 +185,7 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
                             properties: {},
                             path: getSectionPathPositions(
                                 path,
-                                pathFractions,
+                                cumulativePathDistance,
                                 prevSectionEnd,
                                 dashedSectionStart
                             ),
@@ -186,7 +202,7 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
                         properties: {},
                         path: getSectionPathPositions(
                             path,
-                            pathFractions,
+                            cumulativePathDistance,
                             dashedSectionStart,
                             dashedSectionEnd
                         ),
@@ -206,7 +222,7 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
                         properties: {},
                         path: getSectionPathPositions(
                             path,
-                            pathFractions,
+                            cumulativePathDistance,
                             prevSectionEnd,
                             1
                         ),
@@ -222,8 +238,8 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
                 dashedPathSubLayerData,
                 normalPathSubLayerData,
                 pathCache,
-                pathFractionsCache,
                 sectionsCache,
+                cumulativePathDistanceCache,
             });
         }
     }
@@ -247,7 +263,7 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
 
         let path = this.state.pathCache.get(sourceInfo.index);
         const sections = this.state.sectionsCache.get(sourceInfo.index);
-        const pathFractions = this.state.pathFractionsCache.get(
+        const pathFractions = this.state.cumulativePathDistanceCache.get(
             sourceInfo.index
         );
 
@@ -294,96 +310,89 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
                 ...this.getSubLayerProps({
                     ...otherProps,
                     id: SubLayerId.DASHED_PATH,
-                }),
-                data: this.state.dashedPathSubLayerData,
-
-                extensions: [
-                    new PathStyleExtension({
-                        dash: true,
-                        highPrecisionDash: true,
-                    }),
-                ],
-                getDashArray: this.props.getDashArray,
-                dashGapPickable: true,
+                    data: this.state.dashedPathSubLayerData,
+                    dashGapPickable: true,
+                    getColor: this.getSubLayerAccessor(this.props.getColor),
+                    extensions: [
+                        new PathStyleExtension({
+                            dash: true,
+                            highPrecisionDash: true,
+                        }),
+                    ],
+                } as Partial<PathLayerProps>),
+                // ! This one gets override if included inside getSubLayerProps
+                getDashArray: this.props.getScreenDashArray,
             }),
 
-            new PathLayer({
-                ...this.getSubLayerProps({
+            new PathLayer(
+                this.getSubLayerProps({
                     ...otherProps,
                     id: SubLayerId.SOLID_PATH,
-                }),
-                data: this.state.normalPathSubLayerData,
-            }),
+                    data: this.state.normalPathSubLayerData,
+                    getColor: this.getSubLayerAccessor(this.props.getColor),
+                    parameters: this.props.parameters,
+                } as Partial<PathLayerProps>)
+            ),
         ];
     }
 }
 
 function getSectionPathPositions(
     path: Position[],
-    pathFractions: number[],
+    cumulativePathDistance: number[],
     startFraction: number,
     endFraction: number
 ): Position[] {
+    if (startFraction === 0 && endFraction === 1) return [...path];
     if (path.length === 0) return [];
-    if (pathFractions.length !== path.length)
+    if (cumulativePathDistance.length !== path.length) {
         throw Error(
             "Expected path measurements array to be same length as path array"
         );
+    }
 
-    startFraction = _.clamp(startFraction, 0, 1);
-    endFraction = _.clamp(endFraction, 0, 1);
+    const [lowerIndexStart, upperIndexStart, sectionFractionStart] =
+        getFractionPositionSegmentIndices(
+            startFraction,
+            path,
+            cumulativePathDistance
+        );
 
-    let startIndex = _.sortedIndex(pathFractions, startFraction);
-    const endIndex = _.sortedIndex(pathFractions, endFraction);
+    const [lowerIndexEnd, upperIndexEnd, sectionFractionEnd] =
+        getFractionPositionSegmentIndices(
+            endFraction,
+            path,
+            cumulativePathDistance
+        );
+
+    const startPosition = _.zipWith(
+        path[lowerIndexStart],
+        path[upperIndexStart],
+        (pl, pu) => {
+            return pl + sectionFractionStart * (pu - pl);
+        }
+    );
+
+    const endPosition = _.zipWith(
+        path[lowerIndexEnd],
+        path[upperIndexEnd],
+        (pl, pu) => {
+            return pl + sectionFractionEnd * (pu - pl);
+        }
+    );
+
+    const sliceStartOffset = isClose(sectionFractionStart, 1) ? 1 : 0;
+    const sliceEndOffset = isClose(sectionFractionEnd, 0) ? 2 : 1;
 
     // Build a segment of positions
-    const segment: Position[] = [];
-
-    if (isClose(pathFractions[startIndex], startFraction)) {
-        segment.push(path[startIndex]);
-        startIndex++;
-    } else {
-        // Interpolate the starting position
-        const prevIdx = startIndex - 1;
-        const prevFraction = pathFractions[prevIdx];
-        const nextFraction = pathFractions[startIndex];
-        const t =
-            (startFraction - prevFraction) / (nextFraction - prevFraction);
-
-        const prevPos = path[prevIdx];
-        const nextPos = path[startIndex];
-        const interpolated = prevPos.map(
-            (coord, i) => coord + (nextPos[i] - coord) * t
-        ) as Position;
-        segment.push(interpolated);
-    }
-
-    segment.push(...path.slice(startIndex, endIndex));
-
-    if (isClose(pathFractions[endIndex], endFraction)) {
-        segment.push(path[endIndex]);
-    } else {
-        // Interpolate the end position of the segment
-        const prevIdx = endIndex - 1;
-        const prevFraction = pathFractions[prevIdx];
-        const nextFraction = pathFractions[endIndex];
-        const t = (endFraction - prevFraction) / (nextFraction - prevFraction);
-
-        const prevPos = path[prevIdx];
-        const nextPos = path[endIndex];
-        const interpolated = prevPos.map(
-            (coord, i) => coord + (nextPos[i] - coord) * t
-        ) as Position;
-        segment.push(interpolated);
-    }
+    const segment: Position[] = [
+        startPosition,
+        ...path.slice(
+            upperIndexStart + sliceStartOffset,
+            lowerIndexEnd + sliceEndOffset
+        ),
+        endPosition,
+    ];
 
     return segment;
-}
-
-function isClose(
-    number: number,
-    otherNumber: number,
-    threshold: number = 0.001
-) {
-    return Math.abs(number - otherNumber) < threshold;
 }

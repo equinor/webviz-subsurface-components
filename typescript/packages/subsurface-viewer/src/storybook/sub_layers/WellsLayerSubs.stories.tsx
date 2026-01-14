@@ -122,7 +122,7 @@ export const DashedSections: Story = {
                     data: wellData.features,
                     positionFormat: args.use3dView ? "XYZ" : "XY",
                     billboard: true,
-                    getDashArray: args["dashArray"],
+                    getScreenDashArray: args["dashArray"],
                     getColor: [255, 0, 0],
                     getWidth: args["getWidth"],
                     widthMinPixels: args["widthMinPixels"],
@@ -135,7 +135,7 @@ export const DashedSections: Story = {
                         d.properties.md[0].map((md) => {
                             return round(md / d.properties.md[0].at(-1)!, 2);
                         }),
-
+                    getCumulativePathDistance: (d) => d.properties.md[0],
                     getDashedSectionsAlongPath: (d) =>
                         getDashedSectionsAlongPath(d, args["dashSegmentSize"]),
 
@@ -213,6 +213,7 @@ export const TrajectoryMarkers: Story = {
                     pickable: true,
                     autoHighlight: true,
                     getTrajectoryPath: getTrajectoryCoordinates,
+                    getCumulativePathDistance: (d) => d.properties.md[0],
                     getMarkers(d, i) {
                         return getTrajectoryMarkers(d, i, args.markerPosition);
                     },

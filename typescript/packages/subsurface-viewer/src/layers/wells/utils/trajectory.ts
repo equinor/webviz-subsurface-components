@@ -1,7 +1,7 @@
 import type { AccessorContext, Color } from "@deck.gl/core";
 import type { LineString, Position } from "geojson";
-import { clamp, sortedIndex, zipWith } from "lodash";
-import { Vector2 } from "math.gl";
+import _ from "lodash";
+import { Vector2, Vector3 } from "math.gl";
 import { distance, dot, subtract } from "mathjs";
 
 import type { Point2D, Point3D } from "../../../utils";
@@ -13,8 +13,14 @@ import type { StyleAccessorFunction } from "../../types";
 import type { ColorAccessor, WellFeature } from "../types";
 import { getWellHeadPosition } from "./features";
 import { getPositionByMD } from "./wells";
+import { isClose } from "../../../utils/measurement";
 
-function getLineStringGeometry(
+/**
+ * Finds the nested geometry object that describes a well's trajectory
+ * @param well_object A GeoJSON Well Feature
+ * @returns A "LineString" object that describes the well's path
+ */
+export function getLineStringGeometry(
     well_object: WellFeature
 ): LineString | undefined {
     const geometries = well_object.geometry.geometries;
@@ -121,8 +127,8 @@ export function getPositionsAlongTrajectory(
             "Expected trajectory and measurements arrays to be of equal lenght"
         );
 
-    startFraction = clamp(startFraction, 0, 1);
-    endFraction = clamp(startFraction, 0, 1);
+    startFraction = _.clamp(startFraction, 0, 1);
+    endFraction = _.clamp(startFraction, 0, 1);
 
     if (startFraction >= endFraction) return [];
     if (startFraction === 0 && endFraction === 1)
@@ -131,8 +137,8 @@ export function getPositionsAlongTrajectory(
     const startMd = startFraction * trajectoryMds[trajectoryMds.length - 1];
     const endMd = endFraction * trajectoryMds[trajectoryMds.length - 1];
 
-    const startIndex = sortedIndex(trajectoryMds, startMd);
-    const endIndex = sortedIndex(trajectoryMds, endMd);
+    const startIndex = _.sortedIndex(trajectoryMds, startMd);
+    const endIndex = _.sortedIndex(trajectoryMds, endMd);
 
     const mdSegment = trajectoryMds.slice(startIndex, endIndex);
 
@@ -268,16 +274,71 @@ export function getSegmentIndex(coord: Position, path: Position[]): number {
 }
 
 /**
+ * Gets the lower and upper path-indices for the path-segment that contains a specific fractional point along the path. fraction-positions that are very close to either end (by 0.001 units) will be rounded of.
+ * @param fractionPosition A fractional position along the track (0-1);
+ * @param trajectory A list of positions that describes the trajectory
+ * @param cumulativeTrajectoryDistance A list of pre-computed distance measurements for each trajectory point (i.e. a wells measured depth array). The measurements must cumulative values.
+ * @returns a tuple containing the lower and upper segment indices, as well as the fractional position along the segment (0-1, with 0 being the beginning of the segment)
+ */
+export function getFractionPositionSegmentIndices(
+    fractionPosition: number,
+    trajectory: Position[],
+    cumulativeTrajectoryDistance: number[]
+): [lowerIndex: number, upperIndex: number, segmentFraction: number] {
+    if (trajectory.length < 2) {
+        throw Error("Expected trajectory to have at least 2 points");
+    }
+    if (cumulativeTrajectoryDistance.length !== trajectory.length) {
+        throw Error(
+            "Expected path measurements array to be same length as path array"
+        );
+    }
+
+    const pointDistance = _.clamp(
+        fractionPosition * cumulativeTrajectoryDistance.at(-1)!,
+        cumulativeTrajectoryDistance.at(0)!,
+        cumulativeTrajectoryDistance.at(-1)!
+    );
+
+    const sortedIndex = _.sortedIndex(
+        cumulativeTrajectoryDistance,
+        pointDistance
+    );
+
+    if (sortedIndex >= cumulativeTrajectoryDistance.length) {
+        throw Error("Position is outside of trajectory");
+    }
+
+    if (isClose(cumulativeTrajectoryDistance[0], pointDistance)) {
+        return [sortedIndex, sortedIndex + 1, 0];
+    }
+
+    if (isClose(cumulativeTrajectoryDistance[sortedIndex], pointDistance)) {
+        return [sortedIndex - 1, sortedIndex, 1];
+    }
+
+    const lowerDistance = cumulativeTrajectoryDistance[sortedIndex - 1];
+    const upperDistance = cumulativeTrajectoryDistance[sortedIndex];
+
+    return [
+        sortedIndex - 1,
+        sortedIndex,
+        (pointDistance - lowerDistance) / (upperDistance - lowerDistance),
+    ];
+}
+
+/**
  * Get position and angle (in radians) along a trajectory path
- * @param fraction 0-1 fraction along trajectory
+ * @param positionAlongPath 0-1 fraction along trajectory
  * @param trajectory Trajectory as a list of positions
  * @param projectionFunc Callback function to project 3D coordinates over to 2D
  * @param is3d Whether to use compute with (and return) 2-dimensional positions
  * @returns A tuple containing an angle and a interpolated point on the trajectory
  */
-export function getPositionAndAngleAlongTrajectoryPath(
-    fraction: number,
+export function getPositionAndAngleOnTrajectoryPath(
+    positionAlongPath: number,
     trajectory: Position[],
+    cumulativeTrajectoryDistance: number[],
     projectionFunc: (xyz: number[]) => number[],
     is3d?: boolean
 ): [angle: number, position: Point2D | Point3D] {
@@ -290,38 +351,30 @@ export function getPositionAndAngleAlongTrajectoryPath(
         );
 
     let angle: number;
-    let position: Position;
 
-    const maxSegmentIndex = trajectory.length - 1;
+    const [lowerSegmentIndex, upperSegmentIndex, segmentFraction] =
+        getFractionPositionSegmentIndices(
+            positionAlongPath,
+            trajectory,
+            cumulativeTrajectoryDistance
+        );
 
-    // The point is somewhere between these two points
-    const lowerSegmentIndex = Math.floor(maxSegmentIndex * fraction);
-    const upperSegmentIndex = Math.ceil(maxSegmentIndex * fraction);
-
-    const [lowerPosition, upperPosition] = getSegmentPositions(
-        trajectory,
-        lowerSegmentIndex,
-        upperSegmentIndex
+    const position = _.zipWith(
+        trajectory[lowerSegmentIndex],
+        trajectory[upperSegmentIndex],
+        (pl, pu) => {
+            return pl + segmentFraction * (pu - pl);
+        }
     );
 
-    if (lowerSegmentIndex === upperSegmentIndex) {
-        position = trajectory[lowerSegmentIndex];
-    } else {
-        // The positional fraction on this specific segment
-        const segmentFraction = maxSegmentIndex * fraction - lowerSegmentIndex;
-
-        position = zipWith(lowerPosition, upperPosition, (pl, pu) => {
-            return pl + segmentFraction * (pu - pl);
-        });
-    }
-
-    let lowerProjectedPosition = lowerPosition;
-    let upperProjectedPosition = upperPosition;
+    // Compute angle projected to camera
+    let lowerProjectedPosition = trajectory[lowerSegmentIndex];
+    let upperProjectedPosition = trajectory[upperSegmentIndex];
 
     // We only need to project when we deal with 3 positions
     if (is3d) {
-        lowerProjectedPosition = projectionFunc(lowerPosition);
-        upperProjectedPosition = projectionFunc(upperPosition);
+        lowerProjectedPosition = projectionFunc(trajectory[lowerSegmentIndex]);
+        upperProjectedPosition = projectionFunc(trajectory[upperSegmentIndex]);
 
         // ? I don't understand why we need to apply this whenever we project from 3d, but the angle gets wrong if I don't
         lowerProjectedPosition[1] *= -1;
@@ -347,25 +400,21 @@ export function getPositionAndAngleAlongTrajectoryPath(
     return [angle, position as Point2D];
 }
 
-// Helper to get a segment without reaching index overflow
-function getSegmentPositions(
-    trajectory: Position[],
-    lowerIndex: number,
-    upperIndex: number
-): [Position, Position] {
-    if (trajectory.length < 2) {
-        console.warn("Trajectory is too short to have any segments");
-        return [trajectory[lowerIndex], trajectory[upperIndex]];
-    }
+export function getCumulativeDistance(well_xyz: Position[]): number[] {
+    const cumulativeDistance = [0];
+    for (let i = 1; i < well_xyz.length; i++) {
+        const p1 = well_xyz[i - 1];
+        const p2 = well_xyz[i];
 
-    // If the upper and lower index are the same (for instance)
-    if (lowerIndex === upperIndex && upperIndex === trajectory.length - 1) {
-        return [trajectory[upperIndex - 1], trajectory[upperIndex]];
-    }
+        if (!p1 || !p2) {
+            continue;
+        }
 
-    if (lowerIndex === upperIndex) {
-        return [trajectory[lowerIndex], trajectory[lowerIndex + 1]];
-    }
+        const v0 = new Vector3(p1);
+        const v1 = new Vector3(p2);
+        const distance = v0.distance(v1);
 
-    return [trajectory[lowerIndex], trajectory[upperIndex]];
+        cumulativeDistance.push(cumulativeDistance[i - 1] + distance);
+    }
+    return cumulativeDistance;
 }
