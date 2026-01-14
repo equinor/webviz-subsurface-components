@@ -27,13 +27,26 @@ import type {
 } from "../utils/layerTools";
 import {
     createPropertyData,
+    forwardProps,
     getFromAccessor,
     getLayersById,
     isDrawingEnabled,
+    LINE_LAYER_PROP_MAP,
 } from "../utils/layerTools";
 
+import type {
+    ContinuousLegendDataType,
+    DiscreteLegendDataType,
+} from "../../components/ColorLegend";
+import { scaleArray } from "../../utils/arrays";
 import { SectionViewport } from "../../viewports";
 import type { NumberPair } from "../types";
+import type { DashedSectionsPathLayerProps } from "./layers/dashedSectionsPathLayer";
+import { DashedSectionsPathLayer } from "./layers/dashedSectionsPathLayer";
+import type { LogCurveLayerProps } from "./layers/logCurveLayer";
+import { LogCurveLayer } from "./layers/logCurveLayer";
+import type { TrajectoryMarker } from "./layers/trajectoryMarkerLayer";
+import { TrajectoryMarkersLayer } from "./layers/trajectoryMarkerLayer";
 import type { WellLabelLayerProps } from "./layers/wellLabelLayer";
 import { WellLabelLayer } from "./layers/wellLabelLayer";
 import type {
@@ -48,30 +61,27 @@ import type {
     WellsPickInfo,
 } from "./types";
 import { abscissaTransform } from "./utils/abscissaTransform";
+import { DEFAULT_LINE_WIDTH, getSize, LINE, POINT } from "./utils/features";
+import { getLegendData, getLogProperty } from "./utils/log";
 import {
-    GetBoundingBox,
     checkWells,
     coarsenWells,
+    GetBoundingBox,
     invertPath,
     splineRefine,
 } from "./utils/spline";
-import { getColor, getMd, getTrajectory, getTvd } from "./utils/trajectory";
-import type { LogCurveLayerProps } from "./layers/logCurveLayer";
-import { LogCurveLayer } from "./layers/logCurveLayer";
+import {
+    getColor,
+    getLineStringGeometry,
+    getMd,
+    getTrajectory,
+    getTvd,
+} from "./utils/trajectory";
 import {
     getWellMds,
     getWellObjectByName,
     getWellObjectsByName,
 } from "./utils/wells";
-import { getLegendData, getLogProperty } from "./utils/log";
-import type {
-    ContinuousLegendDataType,
-    DiscreteLegendDataType,
-} from "../../components/ColorLegend";
-import { getSize, LINE, POINT, DEFAULT_LINE_WIDTH } from "./utils/features";
-import { scaleArray } from "../../utils/arrays";
-import type { TrajectoryMarker } from "./layers/trajectoryMarkerLayer";
-import { TrajectoryMarkersLayer } from "./layers/trajectoryMarkerLayer";
 
 const DEFAULT_DASH = [5, 5] as NumberPair;
 
@@ -85,6 +95,8 @@ export enum SubLayerId {
     SELECTION = "selection",
     LABELS = "labels",
     MARKERS = "markers",
+    SCREEN_TRAJECTORY = "screen_trajectory",
+    SCREEN_TRAJECTORY_OUTLINE = "screen_trajectory_outline",
 }
 
 export interface WellsLayerProps extends ExtendedLayerProps {
@@ -174,6 +186,13 @@ export interface WellsLayerProps extends ExtendedLayerProps {
     reportBoundingBox?: React.Dispatch<ReportBoundingBoxAction>;
 
     wellLabel?: Partial<WellLabelLayerProps>;
+
+    // Screens and perforations
+    showScreenTrajectory: boolean;
+    getScreenDashFactor: DashAccessor;
+
+    showScreenMarkers: boolean;
+    showPerforationsMarkers: boolean;
 }
 
 const defaultProps = {
@@ -196,6 +215,8 @@ const defaultProps = {
     simplifiedRendering: false,
     section: false,
     dataTransform: coarsenWells,
+
+    getScreenDashFactor: { type: "accessor", value: [5, 5] },
 
     // Deprecated props
     wellNameColor: [0, 0, 0, 255],
@@ -458,6 +479,12 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             visible: fastDrawing,
         } as Partial<GeoJsonLayerProps>;
 
+        // Map GeoJsonLayer properties to match PathLayerProps
+        const forwardedDefaultLayerProps = forwardProps(
+            defaultLayerProps,
+            LINE_LAYER_PROP_MAP
+        );
+
         const colorsLayerProps = this.getSubLayerProps({
             ...defaultLayerProps,
             id: SubLayerId.COLORS,
@@ -468,7 +495,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 getSize(LINE, this.props.lineStyle?.width),
                 -1
             ),
-            visible: !fastDrawing,
+            visible: !fastDrawing && !this.props.showScreenTrajectory,
             getLineColor: getColor(this.props.lineStyle?.color),
             getFillColor: getColor(this.props.wellHeadStyle?.color),
         });
@@ -487,13 +514,78 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             getPointRadius: getSize(POINT, this.props.wellHeadStyle?.size),
             extensions,
             getDashArray: getDashFactor(this.props.lineStyle?.dash),
-            visible: this.props.outline && !fastDrawing,
+            visible:
+                this.props.outline &&
+                !fastDrawing &&
+                !this.props.showScreenTrajectory,
             parameters: {
                 ...parameters,
                 [GL.POLYGON_OFFSET_FACTOR]: 1,
                 [GL.POLYGON_OFFSET_UNITS]: 1,
             },
         });
+
+        const screenTrajectoryLayerProps = this.getSubLayerProps({
+            ...forwardedDefaultLayerProps,
+            id: SubLayerId.SCREEN_TRAJECTORY,
+            data: data.features,
+            pickable: true,
+            visible: !fastDrawing && this.props.showScreenTrajectory,
+
+            extensions,
+            getDashArray: getDashFactor(
+                this.props.lineStyle?.dash,
+                getSize(LINE, this.props.lineStyle?.width),
+                -1
+            ),
+
+            getColor: getColor(this.props.lineStyle?.color),
+            getScreenDashArray: getDashFactor(
+                this.props.getScreenDashFactor,
+                getSize(LINE, this.props.lineStyle?.width),
+                -1
+            ),
+            getPath: (d) => getLineStringGeometry(d)?.coordinates,
+            getCumulativePathDistance: (d) => d.properties.md[0],
+            getDashedSectionsAlongPath: (d) => {
+                const maxMd = d.properties.md[0]?.at(-1);
+                if (maxMd === undefined) return undefined;
+
+                return d.properties.screens?.map((screen) => [
+                    screen.mdStart / maxMd,
+                    screen.mdEnd / maxMd,
+                ]);
+            },
+        } as Partial<DashedSectionsPathLayerProps<WellFeature>>);
+
+        const screenTrajectoryOutlineLayerProps = this.getSubLayerProps({
+            ...screenTrajectoryLayerProps,
+            id: SubLayerId.SCREEN_TRAJECTORY_OUTLINE,
+            getColor: [0, 0, 0],
+            getWidth: getSize(LINE, this.props.lineStyle?.width),
+            getScreenDashArray: getDashFactor(
+                this.props.getScreenDashFactor,
+                getSize(LINE, this.props.lineStyle?.width)
+            ),
+
+            visible:
+                this.props.outline &&
+                !fastDrawing &&
+                this.props.showScreenTrajectory,
+            parameters: {
+                ...parameters,
+                [GL.POLYGON_OFFSET_FACTOR]: 1,
+                [GL.POLYGON_OFFSET_UNITS]: 1,
+            },
+        } as Partial<DashedSectionsPathLayerProps<WellFeature>>);
+
+        const trajectoryScreenLayer = new DashedSectionsPathLayer(
+            screenTrajectoryLayerProps
+        );
+
+        const trajectoryScreenOutlineLayer = new DashedSectionsPathLayer(
+            screenTrajectoryOutlineLayerProps
+        );
 
         const highlightLayerProps = this.getSubLayerProps({
             ...defaultLayerProps,
@@ -572,13 +664,23 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             } as Partial<LogCurveLayerProps>),
         });
 
-        const markerLayer = new TrajectoryMarkersLayer({
-            ...defaultLayerProps,
-            ...this.getSubLayerProps({
+        const markerLayer = new TrajectoryMarkersLayer(
+            this.getSubLayerProps({
+                ...defaultLayerProps,
+                visible: !fastDrawing,
                 id: SubLayerId.MARKERS,
                 data: data.features,
-                getMarkerColor: getColor(this.props.lineStyle?.color),
-
+                getLineColor: getColor(this.props.lineStyle?.color),
+                // We can also specify the color per marker
+                // getMarkerColor: (marker: TrajectoryMarker) => ...
+                updateTriggers: {
+                    getMarkers: [
+                        this.props.showScreenMarkers,
+                        this.props.showPerforationsMarkers,
+                    ],
+                },
+                getCumulativePathDistance: (d: WellFeature) =>
+                    d.properties.md[0],
                 getTrajectoryPath: (d: WellFeature) =>
                     getTrajectory(d, this.props.lineStyle?.color),
                 getMarkers: (d: WellFeature) => {
@@ -587,30 +689,43 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
                     if (maxMd === undefined || maxMd === 0) return [];
 
-                    return [
-                        ...perforations.map<TrajectoryMarker>((p) => ({
-                            type: "perforation",
-                            positionAlongPath: p.md / maxMd,
-                        })),
-                        ...screens.flatMap<TrajectoryMarker>((s) => [
-                            {
-                                type: "screen-start",
-                                positionAlongPath: s.mdStart / maxMd,
-                            },
-                            {
-                                type: "screen-end",
-                                positionAlongPath: s.mdEnd / maxMd,
-                            },
-                        ]),
-                    ];
+                    const markers: TrajectoryMarker[] = [];
+
+                    if (this.props.showScreenMarkers) {
+                        markers.push(
+                            ...screens.flatMap<TrajectoryMarker>((s) => [
+                                {
+                                    type: "screen-start",
+                                    positionAlongPath: s.mdStart / maxMd,
+                                },
+                                {
+                                    type: "screen-end",
+                                    positionAlongPath: s.mdEnd / maxMd,
+                                },
+                            ])
+                        );
+                    }
+
+                    if (this.props.showPerforationsMarkers) {
+                        markers.push(
+                            ...perforations.map<TrajectoryMarker>((p) => ({
+                                type: "perforation",
+                                positionAlongPath: p.md / maxMd,
+                            }))
+                        );
+                    }
+
+                    return markers;
                 },
-            }),
-        });
+            })
+        );
 
         const namesLayer = this.createWellLabelLayer(data.features);
 
         const layers = [
+            trajectoryScreenOutlineLayer,
             outlineLayer,
+            trajectoryScreenLayer,
             colorsLayer,
             highlightLayer,
             highlightMultiWellsLayer,
@@ -680,7 +795,10 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 this.props.logrunName,
                 this.props.logName
             );
-        } else {
+        } else if (
+            info.sourceLayer?.id ===
+            this.getSubLayerProps({ id: SubLayerId.COLORS }).id
+        ) {
             // User is hovering a wellbore path
             const wellpickInfo = info as PickingInfo<WellFeature>;
 

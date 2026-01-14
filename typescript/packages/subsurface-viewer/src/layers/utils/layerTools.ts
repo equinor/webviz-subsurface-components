@@ -1,20 +1,19 @@
+import type { colorTablesArray } from "@emerson-eps/color-tables/";
 import { Matrix4 } from "math.gl";
 
 import type {
     Accessor,
     AccessorContext,
     ChangeFlags,
+    Color,
+    CompositeLayerProps,
+    Layer,
+    LayerContext,
+    LayerManager,
+    LayersList,
     PickingInfo,
 } from "@deck.gl/core";
-import type { Color, LayerContext } from "@deck.gl/core";
-import type {
-    Layer,
-    LayersList,
-    LayerManager,
-    CompositeLayerProps,
-} from "@deck.gl/core";
-
-import type { colorTablesArray } from "@emerson-eps/color-tables/";
+import type { GeoJsonLayerProps, PathLayerProps } from "@deck.gl/layers";
 
 import type {
     ContinuousLegendDataType,
@@ -234,4 +233,61 @@ export function hasUpdateTriggerChanged(
 ): boolean {
     if (!changeFlags.updateTriggersChanged) return false;
     return !!changeFlags.updateTriggersChanged[updateTriggerName];
+}
+
+export const LINE_LAYER_PROP_MAP = {
+    lineWidthUnits: "widthUnits",
+    lineWidthScale: "widthScale",
+    lineWidthMinPixels: "widthMinPixels",
+    lineWidthMaxPixels: "widthMaxPixels",
+    lineJointRounded: "jointRounded",
+    lineCapRounded: "capRounded",
+    lineMiterLimit: "miterLimit",
+    lineBillboard: "billboard",
+
+    getLineColor: "getColor",
+    getLineWidth: "getWidth",
+};
+
+/**
+ * Translates GeoJson layer props to Path layer props. Update triggers will also be merged accordingly.
+ * @param props properties for a GeoJson layer
+ * @param propsMap string-to-string map defining how to forward each geo-json property
+ * @returns all properties from `props`, but with properties renamed according to the map
+ */
+export function forwardProps(
+    props: Partial<GeoJsonLayerProps>,
+    propsMap: typeof LINE_LAYER_PROP_MAP
+): PathLayerProps;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- any is needed to translate easily
+export function forwardProps<T extends Record<string, any>>(
+    props: Partial<GeoJsonLayerProps>,
+    propsMap: Record<string, string>
+): T {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const newProps: Record<string, any> = {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        updateTriggers: {} as Record<string, any>,
+    };
+
+    Object.entries(props).forEach(([k, v]) => {
+        if (k === "updateTriggers") {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const triggers = props[k] as Record<string, any>;
+            Object.entries(triggers).forEach(([kt, vt]) => {
+                if (propsMap[kt] !== undefined) {
+                    newProps["updateTriggers"][propsMap[kt]] = vt;
+                } else {
+                    newProps["updateTriggers"][kt] = vt;
+                }
+            });
+        } else if (propsMap[k] !== undefined) {
+            newProps[propsMap[k]] = v;
+        } else {
+            newProps[k] = v;
+        }
+    });
+
+    return newProps as T;
 }

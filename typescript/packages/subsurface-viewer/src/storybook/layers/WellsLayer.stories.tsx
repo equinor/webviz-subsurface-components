@@ -19,7 +19,12 @@ import SubsurfaceViewer from "../../SubsurfaceViewer";
 import type { MapMouseEvent } from "../../components/Map";
 
 import AxesLayer from "../../layers/axes/axesLayer";
-import type { WellFeatureCollection } from "../../layers/wells/types";
+import type {
+    GeoJsonWellProperties,
+    PerforationProperties,
+    ScreenProperties,
+    WellFeatureCollection,
+} from "../../layers/wells/types";
 import type { WellsLayerProps } from "../../layers/wells/wellsLayer";
 import WellsLayer from "../../layers/wells/wellsLayer";
 
@@ -1281,4 +1286,177 @@ export const UnfoldedProjection: StoryObj<
             </Root>
         );
     },
+};
+
+type PerforationAndScreenArgs = {
+    use3dView: boolean;
+    showPerforations: boolean;
+    showScreens: boolean;
+    perforations: (PerforationProperties & { wellIndex: number })[];
+    screens: (ScreenProperties & { wellIndex: number })[];
+};
+
+function PerforationsAndScreensComponent(
+    props: SubsurfaceViewerProps & PerforationAndScreenArgs
+) {
+    const { perforations, screens, showPerforations, showScreens, use3dView } =
+        props;
+
+    const views = React.useMemo(() => {
+        if (use3dView) return default3DViews;
+        return undefined;
+    }, [use3dView]);
+
+    // Inject perforation and screens added in args
+    const perforationAndScreensByWellIndex = React.useMemo(() => {
+        const dict = new Map<
+            number,
+            Pick<GeoJsonWellProperties, "perforations" | "screens">
+        >();
+
+        perforations.forEach(({ wellIndex, ...rest }) => {
+            if (!dict.has(wellIndex))
+                dict.set(wellIndex, { perforations: [], screens: [] });
+            dict.get(wellIndex)?.perforations?.push({ ...rest });
+        });
+
+        screens.forEach(({ wellIndex, ...rest }) => {
+            if (!dict.has(wellIndex))
+                dict.set(wellIndex, { perforations: [], screens: [] });
+            dict.get(wellIndex)?.screens?.push({ ...rest });
+        });
+
+        return dict;
+    }, [perforations, screens]);
+
+    console.log(volveWellsFromResourcesLayer.data);
+
+    const wellsLayerWithPerforations: Partial<WellsLayerProps> = {
+        ...volveWellsFromResourcesLayer,
+
+        refine: false,
+        ZIncreasingDownwards: false,
+        pickable: true,
+        autoHighlight: true,
+        outline: false,
+
+        showPerforationsMarkers: showPerforations,
+        showScreenTrajectory: showScreens,
+        showScreenMarkers: showScreens,
+
+        updateTriggers: {
+            dataTransform: [perforationAndScreensByWellIndex],
+        },
+
+        // @ts-expect-error -- Can't get the typing to work
+        dataTransform: (data) => {
+            console.log("transform");
+
+            if (
+                !data ||
+                typeof data !== "object" ||
+                !("type" in data) ||
+                data.type !== "FeatureCollection"
+            ) {
+                console.error("Invalid data: expected WellFeatureCollection");
+                return data;
+            }
+
+            const knownData = data as WellFeatureCollection;
+
+            return {
+                ...knownData,
+                features: knownData.features.map((f, i) => ({
+                    ...f,
+                    properties: {
+                        ...f.properties,
+                        ...perforationAndScreensByWellIndex.get(i),
+                    },
+                })),
+            };
+        },
+    };
+
+    const propsWithLayers: Partial<SubsurfaceViewerProps> = {
+        ...props,
+        views: views,
+        pickingRadius: 6,
+        bounds: volveWellsBounds,
+        layers: [wellsLayerWithPerforations],
+        // This position is zoomed to showcase the example screen and perforations
+        cameraPosition: {
+            height: 777,
+            maxRotationX: 90,
+            maxZoom: 3,
+            minRotationX: -90,
+            minZoom: -12,
+            rotationOrbit: -30.428047289033827,
+            rotationX: 90,
+            target: [435903.9447562302, 6478365.7145422315, 0],
+            width: 1338,
+            zoom: -0.5089082423922854,
+        },
+    };
+
+    return (
+        <SubsurfaceViewer id="perforations_and_screens" {...propsWithLayers} />
+    );
+}
+
+export const PerforationsAndScreens: StoryObj<PerforationAndScreenArgs> = {
+    args: {
+        use3dView: false,
+        showScreens: true,
+        showPerforations: true,
+        perforations: [
+            {
+                wellIndex: 0,
+                md: 4000,
+                status: "open",
+            },
+            {
+                wellIndex: 0,
+                md: 4005,
+                status: "open",
+            },
+            {
+                wellIndex: 0,
+                md: 4010,
+                status: "open",
+            },
+            {
+                wellIndex: 0,
+                md: 4015,
+                status: "open",
+            },
+            {
+                wellIndex: 0,
+                md: 4020,
+                status: "closed",
+            },
+            {
+                wellIndex: 0,
+                md: 4025,
+                status: "closed",
+            },
+        ],
+        screens: [
+            {
+                wellIndex: 8,
+                mdStart: 2000,
+                mdEnd: 3000,
+            },
+        ],
+    },
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: "An example of wells with screens (dashed sections) and perforations (spikes)",
+            },
+        },
+    },
+    render: (args) => (
+        <PerforationsAndScreensComponent {...defaultProps} {...args} />
+    ),
 };
