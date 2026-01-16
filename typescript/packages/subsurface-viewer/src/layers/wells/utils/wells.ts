@@ -71,6 +71,6 @@ export function getPositionByMD(
 function getNeighboringMdIndices(mds: number[], md: number): number[] {
     const idx = mds.findIndex((x) => x >= md);
 
-    if (idx === -1) throw Error(`md ${md} is outside of md range`);
+    if (idx === -1) return [];
     return idx === 0 ? [idx, idx + 1] : [idx - 1, idx];
 }

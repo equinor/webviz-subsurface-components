@@ -38,7 +38,10 @@ export function getSize(
 
     if (type == LINE) return DEFAULT_LINE_WIDTH + offset;
     else if (type == POINT) return DEFAULT_POINT_SIZE + offset;
-    else throw `Unrecognized feature type: ${type}`;
+    else {
+        console.warn(`Unrecognized feature type: ${type}`);
+        return 0;
+    }
 }
 
 function getPointGeometry(well_object: WellFeature): Point | undefined {
