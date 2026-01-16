@@ -42,10 +42,14 @@ import { scaleArray } from "../../utils/arrays";
 import { SectionViewport } from "../../viewports";
 import type { NumberPair } from "../types";
 import type { DashedSectionsPathLayerProps } from "./layers/dashedSectionsPathLayer";
+import type { DashedSectionsLayerPickInfo } from "./types";
 import { DashedSectionsPathLayer } from "./layers/dashedSectionsPathLayer";
 import type { LogCurveLayerProps } from "./layers/logCurveLayer";
 import { LogCurveLayer } from "./layers/logCurveLayer";
-import type { TrajectoryMarker } from "./layers/trajectoryMarkerLayer";
+import type {
+    MarkerData,
+    TrajectoryMarker,
+} from "./layers/trajectoryMarkerLayer";
 import { TrajectoryMarkersLayer } from "./layers/trajectoryMarkerLayer";
 import type { WellLabelLayerProps } from "./layers/wellLabelLayer";
 import { WellLabelLayer } from "./layers/wellLabelLayer";
@@ -55,6 +59,7 @@ import type {
     DashAccessor,
     LineStyleAccessor,
     LogCurveDataType,
+    PerforationProperties,
     WellFeature,
     WellFeatureCollection,
     WellHeadStyleAccessor,
@@ -63,6 +68,7 @@ import type {
 import { abscissaTransform } from "./utils/abscissaTransform";
 import { DEFAULT_LINE_WIDTH, getSize, LINE, POINT } from "./utils/features";
 import { getLegendData, getLogProperty } from "./utils/log";
+import { createPerforationReadout, createScreenReadout } from "./utils/markers";
 import {
     checkWells,
     coarsenWells,
@@ -668,6 +674,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             this.getSubLayerProps({
                 ...defaultLayerProps,
                 visible: !fastDrawing,
+                pickable: true,
                 id: SubLayerId.MARKERS,
                 data: data.features,
                 getLineColor: getColor(this.props.lineStyle?.color),
@@ -711,6 +718,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                             ...perforations.map<TrajectoryMarker>((p) => ({
                                 type: "perforation",
                                 positionAlongPath: p.md / maxMd,
+                                properties: p,
                             }))
                         );
                     }
@@ -739,6 +747,14 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         return layers;
     }
 
+    private getSubLayerId(id: SubLayerId): string {
+        return this.getSubLayerProps({ id }).id;
+    }
+
+    private getSubLayerById(id: SubLayerId) {
+        return this.getSubLayers().find((l) => l.id === this.getSubLayerId(id));
+    }
+
     getPickingInfo({ info }: { info: PickingInfo }): WellsPickInfo {
         const noLog = {
             properties: [],
@@ -750,7 +766,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         }
 
         const features = this.getWellDataState()?.features ?? [];
-        const coordinate: Position = info.coordinate || [0, 0, 0];
+        let coordinate: Position = info.coordinate || [0, 0, 0];
 
         const zScale = this.props.modelMatrix ? this.props.modelMatrix[10] : 1;
         if (typeof coordinate[2] !== "undefined") {
@@ -762,6 +778,66 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         let md_property: PropertyDataType | null = null;
         let tvd_property: PropertyDataType | null = null;
         let log_property: PropertyDataType | null = null;
+        let screen_property: PropertyDataType | null = null;
+        let perforation_property: PropertyDataType | null = null;
+
+        if (
+            info.sourceLayer?.id ===
+            this.getSubLayerId(SubLayerId.SCREEN_TRAJECTORY)
+        ) {
+            const screenIndex = (info as DashedSectionsLayerPickInfo)
+                .dashedSectionIndex;
+            const data = info.object as WellFeature;
+
+            if (screenIndex !== undefined && screenIndex !== -1) {
+                const hoveredScreen = data.properties?.screens?.at(screenIndex);
+                screen_property = createScreenReadout(hoveredScreen, data);
+            }
+        }
+
+        if (info.sourceLayer?.id === this.getSubLayerId(SubLayerId.MARKERS)) {
+            const markerData = info.object as MarkerData<WellFeature>;
+            const wellData = info.object?.sourceObject as WellFeature;
+            const sourceIndex = markerData.sourceIndex;
+
+            // Re-compute index and color to make autohighlight apply to the *trajectory*, instead of the individual marker
+            info.index = sourceIndex;
+            info.color = new Uint8Array(
+                this.getSubLayerById(
+                    SubLayerId.SCREEN_TRAJECTORY
+                )!.encodePickingColor(markerData.sourceIndex)
+            );
+
+            if (markerData.type === "perforation") {
+                const properties =
+                    markerData.properties as PerforationProperties;
+
+                wellName = wellData.properties?.name;
+                perforation_property = createPerforationReadout(
+                    properties,
+                    wellData
+                );
+
+                // We also include the MD readout here, based on the marker position
+                coordinate = markerData.position;
+                if (typeof coordinate[2] !== "undefined") {
+                    coordinate[2] /= Math.max(0.001, zScale);
+                }
+
+                md_property = getMdProperty(
+                    coordinate,
+                    wellData,
+                    this.props.lineStyle?.color,
+                    "lines"
+                );
+                tvd_property = getTvdProperty(
+                    coordinate,
+                    wellData,
+                    this.props.lineStyle?.color,
+                    "lines"
+                );
+            }
+        }
 
         // ! This needs to be updated if we ever change the sub-layer id!
         if (
@@ -797,7 +873,9 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             );
         } else if (
             info.sourceLayer?.id ===
-            this.getSubLayerProps({ id: SubLayerId.COLORS }).id
+                this.getSubLayerProps({ id: SubLayerId.COLORS }).id ||
+            info.sourceLayer?.id ===
+                this.getSubLayerProps({ id: SubLayerId.SCREEN_TRAJECTORY }).id
         ) {
             // User is hovering a wellbore path
             const wellpickInfo = info as PickingInfo<WellFeature>;
@@ -829,6 +907,8 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         if (md_property) layer_properties.push(md_property);
         if (inverted_tvd_property) layer_properties.push(inverted_tvd_property);
         if (log_property) layer_properties.push(log_property);
+        if (screen_property) layer_properties.push(screen_property);
+        if (perforation_property) layer_properties.push(perforation_property);
 
         return {
             ...info,

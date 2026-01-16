@@ -14,11 +14,11 @@ import type { PathGeometry } from "@deck.gl/layers/dist/path-layer/path";
 import type { Position } from "geojson";
 import _ from "lodash";
 import { isClose } from "../../../utils/measurement";
-import type { LayerPickInfo } from "../../utils/layerTools";
 import {
     getFromAccessor,
     hasUpdateTriggerChanged,
 } from "../../utils/layerTools";
+import type { DashedSectionsLayerPickInfo } from "../types";
 import {
     getCumulativeDistance,
     getFractionPositionSegmentIndices,
@@ -248,7 +248,7 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
         return this.getSubLayerProps({ id: sublayerId }).id;
     }
 
-    getPickingInfo(params: GetPickingInfoParams): LayerPickInfo {
+    getPickingInfo(params: GetPickingInfoParams): DashedSectionsLayerPickInfo {
         const sourceInfo = super.getPickingInfo(params);
 
         if (!sourceInfo.coordinate || !sourceInfo.object) return sourceInfo;
@@ -261,13 +261,19 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
             sourceInfo.coordinate = sourceInfo.coordinate.slice(0, 2);
         }
 
+        const coordinate = sourceInfo.coordinate;
+
+        const zScale = this.props.modelMatrix ? this.props.modelMatrix[10] : 1;
+        if (typeof coordinate[2] !== "undefined") {
+            coordinate[2] /= Math.max(0.001, zScale);
+        }
+
         let path = this.state.pathCache.get(sourceInfo.index);
         const sections = this.state.sectionsCache.get(sourceInfo.index);
-        const pathFractions = this.state.cumulativePathDistanceCache.get(
-            sourceInfo.index
-        );
+        const cumulativePathDistance =
+            this.state.cumulativePathDistanceCache.get(sourceInfo.index);
 
-        if (!path || !pathFractions || !sections) {
+        if (!path || !cumulativePathDistance || !sections) {
             throw Error("Expected cached accessor values for hovered object");
         }
 
@@ -275,30 +281,28 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
             path = path.map((v) => v.slice(0, 2));
         }
 
-        const hoveredFraction = interpolateDataOnTrajectory(
+        const hoveredDistance = interpolateDataOnTrajectory(
             sourceInfo.coordinate,
-            pathFractions,
+            cumulativePathDistance,
             path
         );
 
+        if (hoveredDistance == null) return sourceInfo;
+
+        const hoveredPositionAlong =
+            hoveredDistance / cumulativePathDistance.at(-1)!;
+
         // ? Possibly allow more nuanced info here?
 
-        if (hoveredFraction == null) return sourceInfo;
-
         const hoveredSectionIndex = sections.findIndex(
-            ([from, to]) => from <= hoveredFraction && to >= hoveredFraction
+            ([from, to]) =>
+                from <= hoveredPositionAlong && to >= hoveredPositionAlong
         );
 
         return {
             ...sourceInfo,
-            properties: [
-                { name: "posAlong", value: hoveredFraction ?? "?" },
-                {
-                    name: "isInDashSection",
-                    value: String(hoveredSectionIndex !== -1),
-                },
-                { name: "segmentIndex", value: hoveredSectionIndex },
-            ],
+            dashedSectionIndex: hoveredSectionIndex,
+            positionAlong: hoveredDistance,
         };
     }
 
@@ -311,7 +315,6 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
                     ...otherProps,
                     id: SubLayerId.DASHED_PATH,
                     data: this.state.dashedPathSubLayerData,
-                    dashGapPickable: true,
                     getColor: this.getSubLayerAccessor(this.props.getColor),
                     extensions: [
                         new PathStyleExtension({
@@ -320,8 +323,9 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
                         }),
                     ],
                 } as Partial<PathLayerProps>),
-                // ! This one gets override if included inside getSubLayerProps
+                // ! These props gets overriden if included inside getSubLayerProps
                 getDashArray: this.props.getScreenDashArray,
+                dashGapPickable: true,
             }),
 
             new PathLayer(

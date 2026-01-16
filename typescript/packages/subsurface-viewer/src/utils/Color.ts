@@ -38,3 +38,28 @@ export function toNormalizedColor(
           ]
         : undefined;
 }
+
+/**
+ * Blends to color arrays together, following deckk.gl's color blending approach.
+ * @param color1 The first color to blend
+ * @param color2 The second color to blend
+ * @param mixRatio The ratio of color2 in the blend. 0 = only color1, 1 = only color2
+ * @returns The blended color as an RGBA array
+ */
+export function blendColors(
+    color1: Color,
+    color2: Color,
+    mixRatio: number = 0.5 // 0.5 seems to give the same color as Deck.gl
+) {
+    const alpha1 = (color1[3] ?? 255) / 255;
+    const alpha2 = (color2[3] ?? 255) / 255;
+
+    return [
+        color1[0] * (1 - mixRatio) + color2[0] * mixRatio,
+        color1[1] * (1 - mixRatio) + color2[1] * mixRatio,
+        color1[2] * (1 - mixRatio) + color2[2] * mixRatio,
+
+        // Blend alpha
+        Math.min(255, (alpha1 + alpha2 * (1 - alpha1) * mixRatio) * 255),
+    ];
+}

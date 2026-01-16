@@ -1,19 +1,24 @@
 import type {
     Accessor,
+    AccessorContext,
     Color,
+    FilterContext,
     GetPickingInfoParams,
     Layer,
     LayerData,
     LayerDataSource,
     LayersList,
+    PickingInfo,
     UpdateParameters,
 } from "@deck.gl/core";
 import { CompositeLayer } from "@deck.gl/core";
+import { DataFilterExtension } from "@deck.gl/extensions";
 import type { GeoJsonLayerProps } from "@deck.gl/layers";
-import { PathLayer } from "@deck.gl/layers";
+import { PathLayer, PolygonLayer } from "@deck.gl/layers";
 import type { Position } from "geojson";
 import _ from "lodash";
 
+import { blendColors } from "../../../utils/Color";
 import type { LayerPickInfo } from "../../utils/layerTools";
 import {
     getFromAccessor,
@@ -26,6 +31,11 @@ import {
     getPositionAndAngleOnTrajectoryPath,
 } from "../utils/trajectory";
 
+export enum SubLayerId {
+    MARKERS_2D = "markers-2d",
+    MARKERS_2D_PICKING = "markers-2d--picking",
+}
+
 /** A marker that exists somewhere along a trajectory path */
 export type TrajectoryMarker = {
     type: MarkerType;
@@ -34,17 +44,17 @@ export type TrajectoryMarker = {
     properties?: Record<string, unknown>;
 };
 
-type MarkerData = {
+export type MarkerData<TData = unknown> = {
     type: MarkerType;
     position: Position;
     angle: number;
     positionAlongPath: number;
     properties?: Record<string, unknown>;
-};
 
-type GroupedMarkerData = {
-    properties?: Record<string, unknown>;
-    markers: MarkerData[];
+    // Internals
+    sourceObject: TData;
+    sourceIndex: number;
+    markerIndex: number;
 };
 
 export type TrajectoryMarkerLayerProps<TData> = {
@@ -73,15 +83,35 @@ export class TrajectoryMarkersLayer<TData = unknown> extends CompositeLayer<
     };
 
     state!: {
-        // Since some markers (for instance perforation) are visibly disconnected shapes, we need to add an intermediate data list to group related path data objects; this also lets us make auto-highlighting work per "grouped marker" (such as both perforation spikes being colored when you hover one of them)
-        flattenedMarkerData: MarkerData[];
-        groupedMarkerData: GroupedMarkerData[];
+        markers: MarkerData<TData>[];
+
+        // We want to allow picking specific markers, so we cant use normal auto-highlight
+        // since we'll be dealing with different indices.
+        highlightedSourceIndex: number;
+        hoveredMarkerIndex: number;
     };
 
-    updateState({ changeFlags }: UpdateParameters<this>): void {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    constructor(...args: any[]) {
+        super(...args);
+
+        this.getMarkerColor = this.getMarkerColor.bind(this);
+    }
+
+    updateState({
+        changeFlags,
+        props,
+        oldProps,
+    }: UpdateParameters<this>): void {
         if (!this.isLoaded) return;
 
         const data = this.props.data as LayerData<TData>;
+
+        if (props.highlightedObjectIndex !== oldProps.highlightedObjectIndex) {
+            this.setState({
+                highlightedSourceIndex: props.highlightedObjectIndex,
+            });
+        }
 
         const markersUpdate = hasUpdateTriggerChanged(
             changeFlags,
@@ -111,8 +141,9 @@ export class TrajectoryMarkersLayer<TData = unknown> extends CompositeLayer<
                 `Expected data to be a list, instead got ${typeof data}`
             );
 
-        const flattenedMarkerData: MarkerData[] = [];
-        const groupedMarkerData: GroupedMarkerData[] = [];
+        const markers: MarkerData<TData>[] = [];
+
+        let markerDataOffset: number = 0;
 
         for (let index = 0; index < data.length; index++) {
             const itemContext = { data, index, target: [] };
@@ -156,105 +187,201 @@ export class TrajectoryMarkersLayer<TData = unknown> extends CompositeLayer<
                         this.props.positionFormat === "XYZ"
                     );
 
-                const markerGroup: GroupedMarkerData = {
-                    properties,
-                    markers: [],
+                const markerData: MarkerData<TData> = {
+                    type: type,
+                    position: worldPosition,
+                    angle: angle,
+                    positionAlongPath: posFragment,
+                    properties: properties,
+                    // Link source data
+                    sourceObject: datum,
+                    sourceIndex: index,
+                    markerIndex: markerIndex + markerDataOffset,
                 };
 
-                const markerData: MarkerData = this.getSubLayerRow(
-                    {
-                        type: type,
-                        position: worldPosition,
-                        angle: angle,
-                        positionAlongPath: posFragment,
-                        properties: properties,
-                    },
-                    markerGroup,
-                    groupedMarkerData.length - 1
-                );
-
-                markerGroup.markers.push(markerData);
-                flattenedMarkerData.push(markerData);
+                markers.push(markerData);
 
                 // ! We want to show perforations as a spike on both sides of the line. Since they will rendered as disconnected lines, we need to inject a second, rotated row for it
                 if (type === "perforation") {
-                    const markerData2 = this.getSubLayerRow(
-                        {
-                            ...markerData,
-                            angle: angle + Math.PI,
-                        },
-                        markerGroup,
-                        groupedMarkerData.length - 1
-                    );
+                    const markerData2 = {
+                        ...markerData,
+                        angle: angle + Math.PI,
+                    };
 
-                    markerGroup.markers.push(markerData2);
-                    flattenedMarkerData.push(markerData2);
+                    markers.push(markerData2);
                 }
-
-                groupedMarkerData.push(
-                    this.getSubLayerRow(markerGroup, datum, index)
-                );
             }
+
+            markerDataOffset += trajectoryMarkers.length;
         }
 
-        this.setState({ flattenedMarkerData });
+        this.setState({ markers });
+    }
+
+    filterSubLayer(context: FilterContext): boolean {
+        if (
+            context.layer.id ===
+            this.getSubLayerProps({ id: SubLayerId.MARKERS_2D_PICKING }).id
+        ) {
+            return context.isPicking;
+        }
+
+        return true;
     }
 
     getPickingInfo({ info }: GetPickingInfoParams): LayerPickInfo<TData> {
-        if (!info.picked || !info.object || !info.coordinate) return info;
+        const hoveredIndex = info.object?.markerIndex ?? -1;
 
-        const object = info.object as MarkerData;
+        this.setState({ hoveredMarkerIndex: hoveredIndex });
 
-        info.coordinate[2] = object.position[2];
-
-        const markerData = info.object as MarkerData;
-        if (info.index === -1 || !markerData?.properties) return info;
-
-        if (markerData.type !== "perforation") return info;
-
-        return {
-            ...info,
-            properties: [
-                {
-                    name: String(markerData.properties["name"]),
-                    value: String(markerData.properties["status"]),
-                },
-            ],
-        };
+        return info;
     }
 
-    // This one does look a bit weird, but since we have the intermediate layer that wraps grouped elements, we need to apply the accessor helper twice every time to get the source feature
-    getNestedSubLayerAccessor<In, Out>(
+    updateAutoHighlight(info: PickingInfo): void {
+        if (info.sourceLayer !== this && this.props.autoHighlight) {
+            // Assume this is from the source
+            this.setState({ highlightedSourceIndex: info.index });
+        }
+    }
+
+    // @ts-expect-error (TS2416) -- The base typing is technically wrong
+    protected getSubLayerAccessor<In, Out>(
         accessor: Accessor<In, Out>
-    ): Accessor<In, Out> {
-        return this.getSubLayerAccessor(this.getSubLayerAccessor(accessor));
+    ): Accessor<MarkerData<TData>, Out> {
+        if (typeof accessor === "function") {
+            const objectInfo: AccessorContext<In> = {
+                index: -1,
+                // @ts-expect-error (TS2322) -- Accessing resolved data
+                data: this.props.data,
+                target: [],
+            };
+            return (x: MarkerData<TData>) => {
+                objectInfo.index = x.sourceIndex;
+                // @ts-expect-error (TS2349) -- Out is never a function
+                return accessor(x.sourceObject as In, objectInfo);
+            };
+        }
+
+        return accessor;
+    }
+
+    private getMarkerColor(
+        d: MarkerData<TData>,
+        ctx: AccessorContext<MarkerData>
+    ) {
+        const markerIndex = d.markerIndex;
+
+        // Check if this marker or any related marker is being hovered
+        const isHighlighted =
+            this.props.autoHighlight &&
+            (markerIndex === this.state.hoveredMarkerIndex ||
+                d.sourceIndex === this.state.highlightedSourceIndex);
+
+        // Get base color
+        let baseColor: Color;
+
+        if (this.props.getLineColor) {
+            baseColor = getFromAccessor(
+                this.props.getLineColor,
+                // @ts-expect-error -- accessors are hard :O
+                d.sourceObject,
+                ctx
+            ) as Color;
+        } else {
+            baseColor = getFromAccessor(
+                this.props.getMarkerColor,
+                d,
+                ctx
+            ) as Color;
+        }
+
+        if (!isHighlighted) {
+            return baseColor;
+        }
+
+        // Mimic auto-highlight behaviour
+        let highlightColor: Color;
+
+        if (typeof this.props.highlightColor === "function") {
+            console.warn(
+                "highlightColor from function is not supported in TrajectoryMarkersLayer"
+            );
+            highlightColor = [0, 0, 128, 128];
+        } else {
+            highlightColor = this.props.highlightColor as Color;
+        }
+
+        return blendColors(baseColor, highlightColor);
     }
 
     renderLayers(): Layer | null | LayersList {
         // TODO: Distinct layers based on 2D or 3D views, as they should render completely differently based on context
         // TODO: Better scaling for markers. For instance, a screen marker should always be the same amount bigger than it's parent line
+        return [
+            new PathLayer({
+                ...this.getSubLayerProps({
+                    ...this.props,
+                    id: SubLayerId.MARKERS_2D,
+                    updateTriggers: {
+                        getPath:
+                            this.props.updateTriggers?.["getTrajectoryPath"],
+                        getColor: [
+                            this.state.hoveredMarkerIndex,
+                            this.state.highlightedSourceIndex,
+                            this.props.getLineColor,
+                            this.props.getMarkerColor,
+                        ],
+                    },
+                }),
+                data: this.state.markers,
 
-        return new PathLayer({
-            ...this.getSubLayerProps({
-                ...this.props,
-                id: "-2d",
-                updateTriggers: {
-                    getPath: this.props.updateTriggers?.["getTrajectoryPath"],
-                },
+                getPath: (d: MarkerData) =>
+                    buildMarkerPath(d.type, d.position, d.angle),
+
+                getColor: this.getMarkerColor,
+
+                billboard: this.props.lineBillboard,
+                getWidth: this.getSubLayerAccessor(this.props.getLineWidth),
+                widthScale: this.props.lineWidthScale,
+                widthUnits: this.props.lineWidthUnits,
+
+                // Disable this layer for picking, instead using MARKERS_2D_PICKING
+                pickable: false,
+                autoHighlight: false,
+                highlightedObjectIndex: -1,
             }),
-            data: this.state.flattenedMarkerData,
 
-            getPath: (d: MarkerData) =>
-                buildMarkerPath(d.type, d.position, d.angle),
+            // To make markers easier to pick, we render them as filled polygons whilst picking
+            new PolygonLayer({
+                ...this.getSubLayerProps({
+                    ...this.props,
+                    id: SubLayerId.MARKERS_2D_PICKING,
+                    updateTriggers: {
+                        getPolygon:
+                            this.props.updateTriggers?.["getTrajectoryPath"],
+                    },
+                }),
+                data: this.state.markers,
+                visible: this.props.pickable,
+                filled: true,
+                stroked: true,
 
-            getColor: this.props.getLineColor
-                ? this.getNestedSubLayerAccessor(this.props.getLineColor)
-                : this.props.getMarkerColor,
-            billboard: this.props.lineBillboard,
+                extensions: [new DataFilterExtension({ categorySize: 1 })],
+                getFilterCategory: (d: MarkerData) =>
+                    Number(d.type !== "perforation"),
 
-            getWidth: this.getNestedSubLayerAccessor(this.props.getLineWidth),
-            widthScale: this.props.lineWidthScale,
-            widthUnits: this.props.lineWidthUnits,
-        });
+                getPolygon: (d: MarkerData) =>
+                    buildMarkerPath(d.type, d.position, d.angle),
+
+                getLineColor: [255, 0, 0],
+                getFillColor: [255, 0, 0],
+                billboard: this.props.lineBillboard,
+
+                getLineWidth: this.getSubLayerAccessor(this.props.getLineWidth),
+                lineWidthScale: this.props.lineWidthScale,
+                lineWidthUnits: this.props.lineWidthUnits,
+                autoHighlight: false,
+            }),
+        ];
     }
 }
