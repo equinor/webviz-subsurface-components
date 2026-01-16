@@ -256,9 +256,6 @@ export class MapAndWellLogViewer extends React.Component<
     }
 
     onMapMouseEvent(event: MapMouseEvent): void {
-        console.warn("! onMapMouseEvent event is not working...");
-
-        // TODO: This event is broken within MapViewer, and MapMouseEvent is never given with a wellname. Might need to be fixed in a PR there
         if (event.wellname !== undefined) {
             if (event.type === "click") {
                 const iWell = findWellLogIndex(wellLogs, event.wellname);
@@ -302,7 +299,10 @@ export class MapAndWellLogViewer extends React.Component<
                         const template = controller.getTemplate();
                         const logName = wellsLayer.props?.logName;
                         let iTrack = findLog(template, logName);
-                        if (iTrack < 0) {
+                        if (
+                            iTrack < 0 &&
+                            controller.getTrackScrollPos() !== iTrack
+                        ) {
                             //const wellLog = info.object is Feature or WellLog;
                             const wellLog = wellLogs[iWell];
                             const templateNew = addTemplateTrack(

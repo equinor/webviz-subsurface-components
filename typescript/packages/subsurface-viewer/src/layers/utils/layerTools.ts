@@ -1,6 +1,6 @@
 import { Matrix4 } from "math.gl";
 
-import type { PickingInfo } from "@deck.gl/core";
+import type { Accessor, AccessorContext, PickingInfo } from "@deck.gl/core";
 import type { Color, LayerContext } from "@deck.gl/core";
 import type {
     Layer,
@@ -197,3 +197,23 @@ export function computeBoundingBox(
 }
 
 export type ReportBoundingBoxAction = { layerBoundingBox: BoundingBox3D };
+
+/**
+ * Gets a value from a deck.gl accessor (aka, calls it if its a function, or returns the static value)
+ * @param accessor A deck.gl Accessor
+ * @param data The data object passed to the accessor
+ * @param objectInfo Info about the data object. Passed to the accessor
+ * @returns
+ */
+export function getFromAccessor<In, Out>(
+    accessor: Accessor<In, Out>,
+    data: In,
+    objectInfo: AccessorContext<In>
+): Out {
+    if (typeof accessor !== "function") return accessor;
+
+    // `Out` can *theoretically* still be a function, so Typescript won't narrow this to be an AccessorFunction. Deck.gl does however
+    // ensure that Out is never a function, so we'll just expect the error here (the same approach is used internally in Deck.gl)
+    // @ts-expect-error -- Out is always a function here
+    return accessor(data, objectInfo);
+}

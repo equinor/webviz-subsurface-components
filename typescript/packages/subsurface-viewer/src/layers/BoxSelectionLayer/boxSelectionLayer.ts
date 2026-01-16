@@ -1,11 +1,12 @@
 import { SelectionLayer } from "@deck.gl-community/editable-layers";
-import type { Color, LayersList, PickingInfo } from "@deck.gl/core";
+import type { LayersList, PickingInfo } from "@deck.gl/core";
 import { CompositeLayer } from "@deck.gl/core";
 import type { GeoJsonLayerProps } from "@deck.gl/layers";
 import { GeoJsonLayer } from "@deck.gl/layers";
-import type { Feature } from "geojson";
+
 import type { ExtendedLayerProps } from "../utils/layerTools";
-import { getSize } from "../wells/wellsLayer";
+import { getSize } from "../wells/utils/features";
+import type { LineStyleAccessor, WellHeadStyleAccessor } from "../wells/types";
 
 export interface BoxSelectionLayerProps extends ExtendedLayerProps {
     mode: string; // One of modes in MODE_MAP
@@ -34,29 +35,7 @@ const defaultProps = {
     },
 };
 
-type StyleAccessorFunction = (
-    object: Feature,
-    objectInfo?: Record<string, unknown>
-) => StyleData;
-
-type NumberPair = [number, number];
-type DashAccessor = boolean | NumberPair | StyleAccessorFunction | undefined;
-type ColorAccessor = Color | StyleAccessorFunction | undefined;
-type SizeAccessor = number | StyleAccessorFunction | undefined;
-type StyleData = NumberPair | Color | number;
-
-type LineStyleAccessor = {
-    color?: ColorAccessor;
-    dash?: DashAccessor;
-    width?: SizeAccessor;
-};
-
-type WellHeadStyleAccessor = {
-    color?: ColorAccessor;
-    size?: SizeAccessor;
-};
-
-// Composite layer that contains an Selection Lyaer from nebula.gl
+// Composite layer that contains an Selection Layer from nebula.gl
 // See https://nebula.gl/docs/api-reference/layers/selection-layer
 export default class BoxSelectionLayer extends CompositeLayer<BoxSelectionLayerProps> {
     setMultiSelection(pickingInfos: PickingInfo[]): void {
