@@ -15,12 +15,18 @@
         }
     },
     "release": {
-        "version": { "conventionalCommits": true },
+        "version": {
+            "conventionalCommits": true,
+            "updateDependents": "auto"
+        },
         "projectsRelationship": "independent",
         "changelog": {
             "projectChangelogs": {
                 "createRelease": "github"
             }
+        },
+        "git": {
+            "commitMessage": "chore(release): updated version [no ci]"
         }
     }
 }

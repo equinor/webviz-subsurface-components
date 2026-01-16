@@ -1,3 +1,135 @@
+## 1.8.97 (2026-01-05)
+
+This was a version bump only for well-completions-plot to align it with other projects, there were no code changes.
+
+## 1.8.96 (2026-01-05)
+
+This was a version bump only for well-completions-plot to align it with other projects, there were no code changes.
+
+## 1.8.95 (2026-01-05)
+
+This was a version bump only for well-completions-plot to align it with other projects, there were no code changes.
+
+## 1.8.94 (2026-01-05)
+
+This was a version bump only for well-completions-plot to align it with other projects, there were no code changes.
+
+## 1.8.93 (2026-01-05)
+
+This was a version bump only for well-completions-plot to align it with other projects, there were no code changes.
+
+## 1.8.92 (2026-01-05)
+
+This was a version bump only for well-completions-plot to align it with other projects, there were no code changes.
+
+## 1.8.91 (2026-01-05)
+
+This was a version bump only for well-completions-plot to align it with other projects, there were no code changes.
+
+## 1.8.90 (2026-01-05)
+
+This was a version bump only for well-completions-plot to align it with other projects, there were no code changes.
+
+## 1.8.89 (2026-01-05)
+
+This was a version bump only for well-completions-plot to align it with other projects, there were no code changes.
+
+## 1.8.88 (2026-01-05)
+
+This was a version bump only for well-completions-plot to align it with other projects, there were no code changes.
+
+## 1.8.87 (2026-01-05)
+
+This was a version bump only for well-completions-plot to align it with other projects, there were no code changes.
+
+## 1.8.86 (2026-01-05)
+
+This was a version bump only for well-completions-plot to align it with other projects, there were no code changes.
+
+## 1.8.85 (2026-01-05)
+
+This was a version bump only for well-completions-plot to align it with other projects, there were no code changes.
+
+## 1.8.84 (2026-01-05)
+
+This was a version bump only for well-completions-plot to align it with other projects, there were no code changes.
+
+## 1.8.83 (2026-01-05)
+
+This was a version bump only for well-completions-plot to align it with other projects, there were no code changes.
+
+## 1.8.82 (2026-01-05)
+
+This was a version bump only for well-completions-plot to align it with other projects, there were no code changes.
+
+## 1.8.81 (2026-01-05)
+
+This was a version bump only for well-completions-plot to align it with other projects, there were no code changes.
+
+## 1.8.80 (2026-01-05)
+
+This was a version bump only for well-completions-plot to align it with other projects, there were no code changes.
+
+## 1.8.79 (2026-01-05)
+
+This was a version bump only for well-completions-plot to align it with other projects, there were no code changes.
+
+## 1.8.78 (2026-01-05)
+
+This was a version bump only for well-completions-plot to align it with other projects, there were no code changes.
+
+## 1.8.77 (2026-01-05)
+
+This was a version bump only for well-completions-plot to align it with other projects, there were no code changes.
+
+## 1.8.76 (2026-01-05)
+
+This was a version bump only for well-completions-plot to align it with other projects, there were no code changes.
+
+## 1.8.75 (2026-01-05)
+
+This was a version bump only for well-completions-plot to align it with other projects, there were no code changes.
+
+## 1.8.74 (2026-01-05)
+
+This was a version bump only for well-completions-plot to align it with other projects, there were no code changes.
+
+## 1.8.73 (2026-01-05)
+
+This was a version bump only for well-completions-plot to align it with other projects, there were no code changes.
+
+## 1.8.72 (2026-01-05)
+
+This was a version bump only for well-completions-plot to align it with other projects, there were no code changes.
+
+## 1.8.71 (2026-01-05)
+
+This was a version bump only for well-completions-plot to align it with other projects, there were no code changes.
+
+## 1.8.70 (2026-01-05)
+
+This was a version bump only for well-completions-plot to align it with other projects, there were no code changes.
+
+## 1.8.69 (2026-01-05)
+
+This was a version bump only for well-completions-plot to align it with other projects, there were no code changes.
+
+## 1.8.68 (2026-01-05)
+
+This was a version bump only for well-completions-plot to align it with other projects, there were no code changes.
+
+## 1.8.67 (2026-01-05)
+
+This was a version bump only for well-completions-plot to align it with other projects, there were no code changes.
+
+## 1.8.66 (2026-01-05)
+
+This was a version bump only for well-completions-plot to align it with other projects, there were no code changes.
+
+## 1.8.65 (2025-12-19)
+
+This was a version bump only for well-completions-plot to align it with other projects, there were no code changes.
+
 ## 1.8.64 (2025-12-18)
 
 This was a version bump only for well-completions-plot to align it with other projects, there were no code changes.
