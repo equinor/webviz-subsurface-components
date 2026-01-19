@@ -1,53 +1,44 @@
-import type { Meta, StoryObj } from "@storybook/react";
 import type { SyntheticEvent } from "react";
 import React, { useState } from "react";
 
-import { Slider } from "@mui/material";
-import { styled } from "@mui/material/styles";
-import type { FeatureCollection, GeometryCollection } from "geojson";
-
-import type { ScaleHandler } from "@emerson-eps/color-tables/";
+import { OrbitView, OrthographicView, View } from "@deck.gl/core";
+import { PathStyleExtension } from "@deck.gl/extensions";
+import { PathLayer } from "@deck.gl/layers";
 import {
     ColorLegend,
     colorTables,
     createColorMapFunction as createColormapFunction,
 } from "@emerson-eps/color-tables";
+import type { ScaleHandler } from "@emerson-eps/color-tables/";
 import { NativeSelect } from "@equinor/eds-core-react";
+import { Slider } from "@mui/material";
+import { styled } from "@mui/material/styles";
+import type { Meta, StoryObj } from "@storybook/react";
+import type { FeatureCollection, GeometryCollection } from "geojson";
+
 import volveWellsJson from "../../../../../../example-data/volve_wells.json";
 
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import type { MapMouseEvent } from "../../components/Map";
-
+import { Axes2DLayer } from "../../layers";
 import AxesLayer from "../../layers/axes/axesLayer";
+import { useAbscissaTransform } from "../../layers/wells/hooks/useAbscissaTransform";
+import type { WellLabelLayerProps } from "../../layers/wells/layers/wellLabelLayer";
+import { LabelOrientation } from "../../layers/wells/layers/wellLabelLayer";
 import type {
     GeoJsonWellProperties,
     PerforationProperties,
     ScreenProperties,
     WellFeatureCollection,
 } from "../../layers/wells/types";
-import type { WellsLayerProps } from "../../layers/wells/wellsLayer";
-import WellsLayer from "../../layers/wells/wellsLayer";
-
-import { Axes2DLayer } from "../../layers";
-import {
-    default3DViews,
-    defaultStoryParameters,
-    volveWellsBounds,
-    volveWellsFromResourcesLayer,
-    volveWellsResources,
-} from "../sharedSettings";
-
-import { View, OrbitView, OrthographicView } from "@deck.gl/core";
-import { PathStyleExtension } from "@deck.gl/extensions";
-import { PathLayer } from "@deck.gl/layers";
-import { useAbscissaTransform } from "../../layers/wells/hooks/useAbscissaTransform";
-import type { WellLabelLayerProps } from "../../layers/wells/layers/wellLabelLayer";
-import { LabelOrientation } from "../../layers/wells/layers/wellLabelLayer";
 import {
     coarsenWells,
     DEFAULT_TOLERANCE,
 } from "../../layers/wells/utils/spline";
+import type { WellsLayerProps } from "../../layers/wells/wellsLayer";
+import WellsLayer from "../../layers/wells/wellsLayer";
+import { SectionView } from "../../views/sectionView";
 import {
     LABEL_MERGE_RADIUS_ARGTYPES,
     LABEL_ORIENTATION_ARGTYPES,
@@ -56,13 +47,19 @@ import {
     TRAJECTORY_SIMULATION_ARGTYPES,
     WELL_COUNT_ARGTYPES,
 } from "../constant/argTypes";
+import {
+    default3DViews,
+    defaultStoryParameters,
+    volveWellsBounds,
+    volveWellsFromResourcesLayer,
+    volveWellsResources,
+} from "../sharedSettings";
 import type { TrajectorySimulationProps, WellCount } from "../types/well";
 import { getRgba } from "../util/color";
 import {
     getSyntheticWells,
     useSyntheticWellCollection,
 } from "../util/wellSynthesis";
-import { SectionView } from "../../views/sectionView";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
