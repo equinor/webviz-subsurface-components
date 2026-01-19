@@ -677,6 +677,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 pickable: true,
                 id: SubLayerId.MARKERS,
                 data: data.features,
+                outline: this.props.outline,
                 getLineColor: getColor(this.props.lineStyle?.color),
                 // We can also specify the color per marker
                 // getMarkerColor: (marker: TrajectoryMarker) => ...

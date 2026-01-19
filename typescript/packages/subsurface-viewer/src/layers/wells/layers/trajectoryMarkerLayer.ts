@@ -15,6 +15,7 @@ import { CompositeLayer } from "@deck.gl/core";
 import { DataFilterExtension } from "@deck.gl/extensions";
 import type { GeoJsonLayerProps } from "@deck.gl/layers";
 import { PathLayer, PolygonLayer } from "@deck.gl/layers";
+import { GL } from "@luma.gl/constants";
 import type { Position } from "geojson";
 import _ from "lodash";
 
@@ -24,6 +25,7 @@ import {
     getFromAccessor,
     hasUpdateTriggerChanged,
 } from "../../utils/layerTools";
+import { getSize, LINE } from "../utils/features";
 import type { MarkerType } from "../utils/markers";
 import { buildMarkerPath } from "../utils/markers";
 import {
@@ -33,6 +35,7 @@ import {
 
 export enum SubLayerId {
     MARKERS_2D = "markers-2d",
+    MARKERS_2D_OUTLINE = "markers-2d--outline",
     MARKERS_2D_PICKING = "markers-2d--picking",
 }
 
@@ -59,6 +62,7 @@ export type MarkerData<TData = unknown> = {
 
 export type TrajectoryMarkerLayerProps<TData> = {
     data: LayerDataSource<TData>;
+    outline: boolean;
     getTrajectoryPath: Accessor<TData, Position[]>;
     getCumulativePathDistance: Accessor<TData, number[]>;
     getMarkers: Accessor<TData, TrajectoryMarker[]>;
@@ -244,10 +248,10 @@ export class TrajectoryMarkersLayer<TData = unknown> extends CompositeLayer<
         }
     }
 
-    // @ts-expect-error (TS2416) -- The base typing is technically wrong
-    protected getSubLayerAccessor<In, Out>(
-        accessor: Accessor<In, Out>
-    ): Accessor<MarkerData<TData>, Out> {
+    // We've done our own style of binding, so we override the base one to reflect that.
+    protected getSubLayerAccessor<In, Out, TAccessor = Accessor<In, Out>>(
+        accessor: TAccessor
+    ): TAccessor {
         if (typeof accessor === "function") {
             const objectInfo: AccessorContext<In> = {
                 index: -1,
@@ -255,6 +259,7 @@ export class TrajectoryMarkersLayer<TData = unknown> extends CompositeLayer<
                 data: this.props.data,
                 target: [],
             };
+            // @ts-expect-error (TS2416) -- deck.gl types these with In as the source data, which is technically wrong, so we ignore this error
             return (x: MarkerData<TData>) => {
                 objectInfo.index = x.sourceIndex;
                 // @ts-expect-error (TS2349) -- Out is never a function
@@ -315,12 +320,60 @@ export class TrajectoryMarkersLayer<TData = unknown> extends CompositeLayer<
     }
 
     renderLayers(): Layer | null | LayersList {
+        const lineWidthAccessor = this.getSubLayerAccessor(
+            this.props.getLineWidth
+        );
+
+        const sharedSubLayerProps = {
+            ...this.props,
+
+            data: this.state.markers,
+            billboard: this.props.lineBillboard,
+            widthScale: this.props.lineWidthScale,
+            widthUnits: this.props.lineWidthUnits,
+
+            getWidth: lineWidthAccessor,
+
+            getPath: (d: MarkerData) =>
+                buildMarkerPath(d.type, d.position, d.angle),
+
+            updateTriggers: {
+                getPath: this.props.updateTriggers?.["getTrajectoryPath"],
+                getColor: [
+                    this.state.hoveredMarkerIndex,
+                    this.state.highlightedSourceIndex,
+                    this.props.getLineColor,
+                    this.props.getMarkerColor,
+                ],
+            },
+        };
+
         // TODO: Distinct layers based on 2D or 3D views, as they should render completely differently based on context
         // TODO: Better scaling for markers. For instance, a screen marker should always be the same amount bigger than it's parent line
+
         return [
             new PathLayer({
                 ...this.getSubLayerProps({
-                    ...this.props,
+                    ...sharedSubLayerProps,
+                    id: SubLayerId.MARKERS_2D_OUTLINE,
+                    parameters: {
+                        [GL.POLYGON_OFFSET_FACTOR]: 1,
+                        [GL.POLYGON_OFFSET_UNITS]: 1,
+                    },
+                }),
+
+                visible: this.props.outline,
+                getColor: [0, 0, 0],
+                getWidth: getSize(LINE, lineWidthAccessor, 1),
+
+                // Disable this layer for picking, instead using MARKERS_2D_PICKING
+                pickable: false,
+                autoHighlight: false,
+                highlightedObjectIndex: -1,
+            }),
+            new PathLayer({
+                ...this.getSubLayerProps({
+                    ...sharedSubLayerProps,
                     id: SubLayerId.MARKERS_2D,
                     updateTriggers: {
                         getPath:
@@ -333,17 +386,7 @@ export class TrajectoryMarkersLayer<TData = unknown> extends CompositeLayer<
                         ],
                     },
                 }),
-                data: this.state.markers,
-
-                getPath: (d: MarkerData) =>
-                    buildMarkerPath(d.type, d.position, d.angle),
-
                 getColor: this.getMarkerColor,
-
-                billboard: this.props.lineBillboard,
-                getWidth: this.getSubLayerAccessor(this.props.getLineWidth),
-                widthScale: this.props.lineWidthScale,
-                widthUnits: this.props.lineWidthUnits,
 
                 // Disable this layer for picking, instead using MARKERS_2D_PICKING
                 pickable: false,
@@ -354,18 +397,18 @@ export class TrajectoryMarkersLayer<TData = unknown> extends CompositeLayer<
             // To make markers easier to pick, we render them as filled polygons whilst picking
             new PolygonLayer({
                 ...this.getSubLayerProps({
-                    ...this.props,
+                    ...sharedSubLayerProps,
                     id: SubLayerId.MARKERS_2D_PICKING,
                     updateTriggers: {
                         getPolygon:
                             this.props.updateTriggers?.["getTrajectoryPath"],
                     },
                 }),
-                data: this.state.markers,
                 visible: this.props.pickable,
                 filled: true,
                 stroked: true,
 
+                // Only render pick-able markers
                 extensions: [new DataFilterExtension({ categorySize: 1 })],
                 getFilterCategory: (d: MarkerData) =>
                     Number(d.type !== "perforation"),
@@ -373,14 +416,13 @@ export class TrajectoryMarkersLayer<TData = unknown> extends CompositeLayer<
                 getPolygon: (d: MarkerData) =>
                     buildMarkerPath(d.type, d.position, d.angle),
 
-                getLineColor: [255, 0, 0],
-                getFillColor: [255, 0, 0],
-                billboard: this.props.lineBillboard,
-
-                getLineWidth: this.getSubLayerAccessor(this.props.getLineWidth),
+                getLineWidth: lineWidthAccessor,
                 lineWidthScale: this.props.lineWidthScale,
                 lineWidthUnits: this.props.lineWidthUnits,
+
+                // Disable auto-highlight, since we've implemented it manually
                 autoHighlight: false,
+                highlightedObjectIndex: -1,
             }),
         ];
     }

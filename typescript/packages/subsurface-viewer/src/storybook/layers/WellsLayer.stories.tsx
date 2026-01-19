@@ -1287,6 +1287,7 @@ export const UnfoldedProjection: StoryObj<
 };
 
 type PerforationAndScreenArgs = {
+    outline: boolean;
     use3dView: boolean;
     showPerforations: boolean;
     showScreens: boolean;
@@ -1349,7 +1350,7 @@ function PerforationsAndScreensComponent(
         ZIncreasingDownwards: false,
         pickable: true,
         autoHighlight: true,
-        outline: false,
+        outline: props.outline,
 
         showPerforationsMarkers: showPerforations,
         showScreenTrajectory: showScreens,
@@ -1388,6 +1389,7 @@ function PerforationsAndScreensComponent(
 
 export const PerforationsAndScreens: StoryObj<PerforationAndScreenArgs> = {
     args: {
+        outline: true,
         use3dView: false,
         showScreens: true,
         showPerforations: true,
