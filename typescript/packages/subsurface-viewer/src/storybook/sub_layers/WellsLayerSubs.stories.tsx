@@ -190,7 +190,6 @@ export const TrajectoryMarkers: Story = {
                     updateTriggers: { getPath: [args.use3dView] },
                 }),
                 new TrajectoryMarkersLayer({
-                    // @ts-expect-error -- Forcing name so readout works in story
                     name: "Trajectory Marker Layer",
                     id: "well-markers",
                     data: wellData.features,

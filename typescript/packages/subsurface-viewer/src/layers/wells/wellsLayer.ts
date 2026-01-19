@@ -12,7 +12,7 @@ import type {
 import { CompositeLayer } from "@deck.gl/core";
 import { PathStyleExtension } from "@deck.gl/extensions";
 import type { GeoJsonLayerProps } from "@deck.gl/layers";
-import { GeoJsonLayer } from "@deck.gl/layers";
+import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
 import type { BinaryFeatureCollection } from "@loaders.gl/schema";
 import { GL } from "@luma.gl/constants";
 
@@ -27,11 +27,9 @@ import type {
 } from "../utils/layerTools";
 import {
     createPropertyData,
-    forwardProps,
     getFromAccessor,
     getLayersById,
     isDrawingEnabled,
-    LINE_LAYER_PROP_MAP,
 } from "../utils/layerTools";
 
 import type {
@@ -41,7 +39,6 @@ import type {
 import { scaleArray } from "../../utils/arrays";
 import { SectionViewport } from "../../viewports";
 import type { NumberPair } from "../types";
-import type { DashedSectionsPathLayerProps } from "./layers/dashedSectionsPathLayer";
 import type { DashedSectionsLayerPickInfo } from "./types";
 import { DashedSectionsPathLayer } from "./layers/dashedSectionsPathLayer";
 import type { LogCurveLayerProps } from "./layers/logCurveLayer";
@@ -76,13 +73,7 @@ import {
     invertPath,
     splineRefine,
 } from "./utils/spline";
-import {
-    getColor,
-    getLineStringGeometry,
-    getMd,
-    getTrajectory,
-    getTvd,
-} from "./utils/trajectory";
+import { getColor, getMd, getTrajectory, getTvd } from "./utils/trajectory";
 import {
     getWellMds,
     getWellObjectByName,
@@ -90,6 +81,13 @@ import {
 } from "./utils/wells";
 
 const DEFAULT_DASH = [5, 5] as NumberPair;
+
+interface SourcedSubLayerData {
+    __source: {
+        object: WellFeature;
+        index: number;
+    };
+}
 
 export enum SubLayerId {
     COLORS = "colors",
@@ -101,6 +99,7 @@ export enum SubLayerId {
     SELECTION = "selection",
     LABELS = "labels",
     MARKERS = "markers",
+    WELL_HEADS = "well_head",
     SCREEN_TRAJECTORY = "screen_trajectory",
     SCREEN_TRAJECTORY_OUTLINE = "screen_trajectory_outline",
 }
@@ -193,11 +192,25 @@ export interface WellsLayerProps extends ExtendedLayerProps {
 
     wellLabel?: Partial<WellLabelLayerProps>;
 
-    // Screens and perforations
+    /* --- Screens and perforations --- --- --- --- ---*/
+    /**
+     * Renders screen sections of the trajectory as dashed segments.
+     *
+     * **Note: If enabled, the COLORS sub-layer will be replaced by the SCREEN_TRAJECTORY sub-layer**
+     */
     showScreenTrajectory: boolean;
+    /** Specifies the dash factor for screen sections. */
     getScreenDashFactor: DashAccessor;
 
+    /** Enables simple line markers at the start and end of screen sections.
+     *
+     * **Note:** These markers are currently is only designed for 2D, so they are not guaranteed to look nice in 3D
+     */
     showScreenMarkers: boolean;
+    /** Enables visualization of trajectory perforations.
+     *
+     * **Note:** These markers are currently is only designed for 2D, so they are not guaranteed to look nice in 3D
+     */
     showPerforationsMarkers: boolean;
 }
 
@@ -486,14 +499,13 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         } as Partial<GeoJsonLayerProps>;
 
         // Map GeoJsonLayer properties to match PathLayerProps
-        const forwardedDefaultLayerProps = forwardProps(
-            defaultLayerProps,
-            LINE_LAYER_PROP_MAP
-        );
-
         const colorsLayerProps = this.getSubLayerProps({
             ...defaultLayerProps,
-            id: SubLayerId.COLORS,
+            // Whenever _subLayerProps.linestrings.type changes, we need to ensure an entirely new
+            // layer instance is created to avoid state errors, which is why we modify the ID.
+            id: this.props.showScreenTrajectory
+                ? SubLayerId.SCREEN_TRAJECTORY
+                : SubLayerId.COLORS,
             pickable: true,
             extensions,
             getDashArray: getDashFactor(
@@ -501,10 +513,36 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 getSize(LINE, this.props.lineStyle?.width),
                 -1
             ),
-            visible: !fastDrawing && !this.props.showScreenTrajectory,
+            visible: !fastDrawing,
             getLineColor: getColor(this.props.lineStyle?.color),
             getFillColor: getColor(this.props.wellHeadStyle?.color),
-        });
+            // Override path layer to use opt-in screen dashes
+            _subLayerProps: {
+                linestrings: {
+                    type: this.props.showScreenTrajectory
+                        ? DashedSectionsPathLayer
+                        : PathLayer,
+                    getScreenDashArray: getDashFactor(
+                        this.props.getScreenDashFactor,
+                        getSize(LINE, this.props.lineStyle?.width),
+                        -1
+                    ),
+                    getCumulativePathDistance: (d: SourcedSubLayerData) =>
+                        d.__source.object.properties.md[0],
+                    getDashedSectionsAlongPath: (d: SourcedSubLayerData) => {
+                        const feature = d.__source.object as WellFeature;
+
+                        const maxMd = feature.properties.md[0]?.at(-1);
+                        if (maxMd === undefined) return undefined;
+
+                        return feature.properties.screens?.map((screen) => [
+                            screen.mdStart / maxMd,
+                            screen.mdEnd / maxMd,
+                        ]);
+                    },
+                },
+            },
+        } as Partial<GeoJsonLayerProps<WellFeature>>);
 
         const fastLayerProps = this.getSubLayerProps({
             ...defaultLayerProps,
@@ -515,83 +553,49 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
         const outlineLayerProps = this.getSubLayerProps({
             ...defaultLayerProps,
-            id: SubLayerId.OUTLINE,
+            // Whenever _subLayerProps.linestrings.type changes, we need to ensure an entirely new
+            // layer instance is created to avoid state errors, which is why we modify the ID.
+            id: this.props.showScreenTrajectory
+                ? SubLayerId.SCREEN_TRAJECTORY_OUTLINE
+                : SubLayerId.OUTLINE,
             getLineWidth: getSize(LINE, this.props.lineStyle?.width),
             getPointRadius: getSize(POINT, this.props.wellHeadStyle?.size),
             extensions,
             getDashArray: getDashFactor(this.props.lineStyle?.dash),
-            visible:
-                this.props.outline &&
-                !fastDrawing &&
-                !this.props.showScreenTrajectory,
+            visible: this.props.outline && !fastDrawing,
             parameters: {
                 ...parameters,
                 [GL.POLYGON_OFFSET_FACTOR]: 1,
                 [GL.POLYGON_OFFSET_UNITS]: 1,
+            },
+
+            // Override path layer to use opt-in screen dashes
+            _subLayerProps: {
+                linestrings: {
+                    type: this.props.showScreenTrajectory
+                        ? DashedSectionsPathLayer
+                        : PathLayer,
+                    // Props for DashedSectionsPathLayer
+                    getScreenDashArray: getDashFactor(
+                        this.props.getScreenDashFactor,
+                        getSize(LINE, this.props.lineStyle?.width)
+                    ),
+                    getCumulativePathDistance: (d: SourcedSubLayerData) =>
+                        d.__source.object.properties.md[0],
+                    getDashedSectionsAlongPath: (d: SourcedSubLayerData) => {
+                        const feature = d.__source.object as WellFeature;
+
+                        const maxMd = feature.properties.md[0]?.at(-1);
+                        if (maxMd === undefined) return undefined;
+
+                        return feature.properties.screens?.map((screen) => [
+                            screen.mdStart / maxMd,
+                            screen.mdEnd / maxMd,
+                        ]);
+                    },
+                },
             },
         });
-
-        const screenTrajectoryLayerProps = this.getSubLayerProps({
-            ...forwardedDefaultLayerProps,
-            id: SubLayerId.SCREEN_TRAJECTORY,
-            data: data.features,
-            pickable: true,
-            visible: !fastDrawing && this.props.showScreenTrajectory,
-
-            extensions,
-            getDashArray: getDashFactor(
-                this.props.lineStyle?.dash,
-                getSize(LINE, this.props.lineStyle?.width),
-                -1
-            ),
-
-            getColor: getColor(this.props.lineStyle?.color),
-            getScreenDashArray: getDashFactor(
-                this.props.getScreenDashFactor,
-                getSize(LINE, this.props.lineStyle?.width),
-                -1
-            ),
-            getPath: (d) => getLineStringGeometry(d)?.coordinates,
-            getCumulativePathDistance: (d) => d.properties.md[0],
-            getDashedSectionsAlongPath: (d) => {
-                const maxMd = d.properties.md[0]?.at(-1);
-                if (maxMd === undefined) return undefined;
-
-                return d.properties.screens?.map((screen) => [
-                    screen.mdStart / maxMd,
-                    screen.mdEnd / maxMd,
-                ]);
-            },
-        } as Partial<DashedSectionsPathLayerProps<WellFeature>>);
-
-        const screenTrajectoryOutlineLayerProps = this.getSubLayerProps({
-            ...screenTrajectoryLayerProps,
-            id: SubLayerId.SCREEN_TRAJECTORY_OUTLINE,
-            getColor: [0, 0, 0],
-            getWidth: getSize(LINE, this.props.lineStyle?.width),
-            getScreenDashArray: getDashFactor(
-                this.props.getScreenDashFactor,
-                getSize(LINE, this.props.lineStyle?.width)
-            ),
-
-            visible:
-                this.props.outline &&
-                !fastDrawing &&
-                this.props.showScreenTrajectory,
-            parameters: {
-                ...parameters,
-                [GL.POLYGON_OFFSET_FACTOR]: 1,
-                [GL.POLYGON_OFFSET_UNITS]: 1,
-            },
-        } as Partial<DashedSectionsPathLayerProps<WellFeature>>);
-
-        const trajectoryScreenLayer = new DashedSectionsPathLayer(
-            screenTrajectoryLayerProps
-        );
-
-        const trajectoryScreenOutlineLayer = new DashedSectionsPathLayer(
-            screenTrajectoryOutlineLayerProps
-        );
 
         const highlightLayerProps = this.getSubLayerProps({
             ...defaultLayerProps,
@@ -732,9 +736,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         const namesLayer = this.createWellLabelLayer(data.features);
 
         const layers = [
-            trajectoryScreenOutlineLayer,
             outlineLayer,
-            trajectoryScreenLayer,
             colorsLayer,
             highlightLayer,
             highlightMultiWellsLayer,
