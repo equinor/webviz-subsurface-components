@@ -13,6 +13,7 @@ import {
     createColorMapFunction as createColormapFunction,
 } from "@emerson-eps/color-tables";
 import { NativeSelect } from "@equinor/eds-core-react";
+import volveWellsJson from "../../../../../../example-data/volve_wells.json";
 
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
@@ -1329,10 +1330,23 @@ function PerforationsAndScreensComponent(
         return dict;
     }, [perforations, screens]);
 
-    console.log(volveWellsFromResourcesLayer.data);
+    const volveWellsWithMarkers = React.useMemo(() => {
+        return {
+            ...volveWellsJson,
+            features: volveWellsJson.features.map((f, i) => ({
+                ...f,
+                properties: {
+                    ...f.properties,
+                    ...perforationAndScreensByWellIndex.get(i),
+                },
+            })),
+        } as WellFeatureCollection;
+    }, [perforationAndScreensByWellIndex]);
 
     const wellsLayerWithPerforations: Partial<WellsLayerProps> = {
         ...volveWellsFromResourcesLayer,
+
+        data: volveWellsWithMarkers,
 
         refine: false,
         ZIncreasingDownwards: false,
@@ -1346,34 +1360,6 @@ function PerforationsAndScreensComponent(
 
         updateTriggers: {
             dataTransform: [perforationAndScreensByWellIndex],
-        },
-
-        // @ts-expect-error -- Can't get the typing to work
-        dataTransform: (data) => {
-            console.log("transform");
-
-            if (
-                !data ||
-                typeof data !== "object" ||
-                !("type" in data) ||
-                data.type !== "FeatureCollection"
-            ) {
-                console.error("Invalid data: expected WellFeatureCollection");
-                return data;
-            }
-
-            const knownData = data as WellFeatureCollection;
-
-            return {
-                ...knownData,
-                features: knownData.features.map((f, i) => ({
-                    ...f,
-                    properties: {
-                        ...f.properties,
-                        ...perforationAndScreensByWellIndex.get(i),
-                    },
-                })),
-            };
         },
     };
 
