@@ -176,6 +176,7 @@ export class WellLabelLayer extends MergedTextLayer<
                 ],
                 getPosition: [
                     ...positionUpdateTriggers,
+                    this.context.viewport.cameraPosition,
                     this.props.getPositionAlongPath,
                 ],
             },
