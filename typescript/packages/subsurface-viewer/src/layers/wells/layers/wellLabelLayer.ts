@@ -153,10 +153,10 @@ export class WellLabelLayer extends MergedTextLayer<
             sublayerProps?.updateTriggers?.["getAngle"] ?? [];
         const positionUpdateTriggers =
             sublayerProps?.updateTriggers?.["getPosition"] ?? [];
-        const angleTrigger = this.context.viewport.constructor === OrbitViewport
-                        ? (this.context.viewport as OrbitViewport)
-                              .cameraPosition
-                        : null; // No need for angle update trigger for OrthographicViewport and change in camera.
+        const angleTrigger =
+            this.context.viewport.constructor === OrbitViewport
+                ? (this.context.viewport as OrbitViewport).cameraPosition
+                : null; // No need for angle update trigger for OrthographicViewport and change in camera.
         const newProps = {
             ...sublayerProps,
             getPosition: (d: WellFeature) => {
@@ -180,10 +180,7 @@ export class WellLabelLayer extends MergedTextLayer<
                     this.props.getPositionAlongPath,
                 ],
 
-                all: [
-                    angleTrigger,
-                    this.props.getPositionAlongPath,
-                ],
+                all: [angleTrigger, this.props.getPositionAlongPath],
             },
         };
 
