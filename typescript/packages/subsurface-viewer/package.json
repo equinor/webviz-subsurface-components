@@ -53,7 +53,7 @@
     "d3-color": "^3.1.0",
     "d3-format": "^3.1.0",
     "gl-matrix": "^3.4.3",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "math.gl": "^4.1.0",
     "mathjs": "^13.2.0",
     "merge-refs": "^1.2.2",
