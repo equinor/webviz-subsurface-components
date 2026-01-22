@@ -273,6 +273,7 @@ const defaultProps = {
     mdFilterRange: [],
     formationFilter: [],
     wellNameFilter: [],
+    enableFilters: false,
 
     // Deprecated props
     wellNameColor: [0, 0, 0, 255],
