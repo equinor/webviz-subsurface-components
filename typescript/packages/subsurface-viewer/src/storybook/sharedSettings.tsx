@@ -1,14 +1,14 @@
 import React from "react";
 
+import { OrbitView } from "@deck.gl/core";
+import type { GeoJsonLayerProps } from "@deck.gl/layers";
 import { styled } from "@mui/material/styles";
+
+import exampleData from "../../../../../example-data/deckgl-map.json";
 
 import type { SubsurfaceViewerProps, ViewsType } from "../SubsurfaceViewer";
 import SubsurfaceViewer from "../SubsurfaceViewer";
-
 import type { BoundingBox2D, BoundingBox3D, Point3D } from "../utils";
-
-import type { GeoJsonLayerProps } from "@deck.gl/layers";
-import exampleData from "../../../../../example-data/deckgl-map.json";
 
 export const defaultStoryParameters = {
     docs: {
@@ -190,12 +190,12 @@ export const default2DViews = {
         },
     ],
 };
-export const default3DViews = {
+export const default3DViews: ViewsType = {
     layout: [1, 1] as [number, number],
     viewports: [
         {
             id: "view_1",
-            show3D: true,
+            viewType: OrbitView,
         },
     ],
 };
