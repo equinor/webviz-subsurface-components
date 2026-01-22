@@ -3,7 +3,11 @@ import _ from "lodash";
 import { Vector2, Vector3 } from "math.gl";
 
 import type { Color, PickingInfo } from "@deck.gl/core";
-import { type DefaultProps, type UpdateParameters } from "@deck.gl/core";
+import {
+    OrbitViewport,
+    type DefaultProps,
+    type UpdateParameters,
+} from "@deck.gl/core";
 import type { TextLayerProps } from "@deck.gl/layers";
 
 import type { Feature, Position } from "geojson";
@@ -163,16 +167,15 @@ export class WellLabelLayer extends MergedTextLayer<
                 ...sublayerProps?.updateTriggers,
                 getAngle: [
                     ...angleUpdateTriggers,
-                    this.context.viewport.cameraPosition,
+                    this.context.viewport.constructor === OrbitViewport
+                        ? (this.context.viewport as OrbitViewport)
+                              .cameraPosition
+                        : null, // No need for angle update trigger for OrthographicViewport and change in camera.
                     this.props.orientation,
                     this.props.getPositionAlongPath,
                 ],
                 getPosition: [
                     ...positionUpdateTriggers,
-                    this.context.viewport.cameraPosition,
-                    this.props.getPositionAlongPath,
-                ],
-                all: [
                     this.context.viewport.cameraPosition,
                     this.props.getPositionAlongPath,
                 ],

@@ -220,6 +220,7 @@ export function getFromAccessor<In, Out>(
     // @ts-expect-error -- Out is always a function here
     return accessor(data, objectInfo);
 }
+
 /**
  * Checks if a specified updateTrigger is flagged as changed
  * @param changeFlags The deck.gl change-flag object
