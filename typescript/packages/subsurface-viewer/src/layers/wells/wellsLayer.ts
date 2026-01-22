@@ -10,12 +10,12 @@ import type {
     UpdateParameters,
 } from "@deck.gl/core";
 import { CompositeLayer } from "@deck.gl/core";
-import { PathStyleExtension } from "@deck.gl/extensions";
+import type { DataFilterExtensionProps } from "@deck.gl/extensions";
+import { DataFilterExtension, PathStyleExtension } from "@deck.gl/extensions";
 import type { GeoJsonLayerProps } from "@deck.gl/layers";
 import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
 import type { BinaryFeatureCollection } from "@loaders.gl/schema";
 import { GL } from "@luma.gl/constants";
-
 import type { Feature, FeatureCollection, Position } from "geojson";
 
 import type { ColormapFunctionType } from "../utils/colormapTools";
@@ -37,9 +37,9 @@ import type {
     DiscreteLegendDataType,
 } from "../../components/ColorLegend";
 import { scaleArray } from "../../utils/arrays";
+import { isClose } from "../../utils/measurement";
 import { SectionViewport } from "../../viewports";
 import type { NumberPair } from "../types";
-import type { DashedSectionsLayerPickInfo } from "./types";
 import { DashedSectionsPathLayer } from "./layers/dashedSectionsPathLayer";
 import type { LogCurveLayerProps } from "./layers/logCurveLayer";
 import { LogCurveLayer } from "./layers/logCurveLayer";
@@ -54,6 +54,7 @@ import type {
     AbscissaTransform,
     ColorAccessor,
     DashAccessor,
+    DashedSectionsLayerPickInfo,
     LineStyleAccessor,
     LogCurveDataType,
     PerforationProperties,
@@ -73,7 +74,13 @@ import {
     invertPath,
     splineRefine,
 } from "./utils/spline";
-import { getColor, getMd, getTrajectory, getTvd } from "./utils/trajectory";
+import {
+    getColor,
+    getMd,
+    getTrajectory,
+    getTvd,
+    injectMdPoints,
+} from "./utils/trajectory";
 import {
     getWellMds,
     getWellObjectByName,
@@ -102,6 +109,7 @@ export enum SubLayerId {
     WELL_HEADS = "well_head",
     SCREEN_TRAJECTORY = "screen_trajectory",
     SCREEN_TRAJECTORY_OUTLINE = "screen_trajectory_outline",
+    TRAJECTORY_FILTER_GHOST = "trajectory_filter_ghost",
 }
 
 export interface WellsLayerProps extends ExtendedLayerProps {
@@ -212,6 +220,32 @@ export interface WellsLayerProps extends ExtendedLayerProps {
      * **Note:** These markers are currently is only designed for 2D, so they are not guaranteed to look nice in 3D
      */
     showPerforationsMarkers: boolean;
+
+    /* --- Filtering -- --- --- --- --- --- --- --- --- */
+    /** Enables well filtering  */
+    enableFilters: boolean;
+    /** Filter wells by measured depth (MD).
+     * - Return [min, max] to show only the portion of the well between these MD values
+     * - Return [max, min] (inverted) to show everything OUTSIDE this range
+     * - Return undefined or [-1, -1] to show the entire well
+     * Multiple ranges are additive
+     *
+     * **Note:** To make sure trajectories paths disappear at the correct point, each
+     * range value will inject a point into the path array; meaning layers will recompute
+     * each time this is changed
+     */
+    mdFilterRange: [number, number] | [number, number][];
+
+    /** Filters wells based on name */
+    wellNameFilter: string[];
+
+    /**
+     * Filters trajectory paths to formation sections
+     */
+    formationFilter: string[];
+
+    /** Shows a simple trajectory in place of filtered sections. If color is not specified, a light gray will be used */
+    showFilterTrajectoryGhost: boolean | Color;
 }
 
 const defaultProps = {
@@ -236,6 +270,9 @@ const defaultProps = {
     dataTransform: coarsenWells,
 
     getScreenDashFactor: { type: "accessor", value: [5, 5] },
+    mdFilterRange: [],
+    formationFilter: [],
+    wellNameFilter: [],
 
     // Deprecated props
     wellNameColor: [0, 0, 0, 255],
@@ -265,6 +302,13 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
         if (ZIncreasingDownwards) {
             transformedData = invertPath(transformedData);
+        }
+
+        if (this.props.enableFilters) {
+            transformedData = injectFilterData(
+                transformedData,
+                this.props.mdFilterRange
+            );
         }
 
         // Create a state for the section projection of the data, which by default is
@@ -466,6 +510,10 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             return [];
         }
 
+        const sanitizedFilterBands = makeSanitizedFilterBands(
+            this.props.mdFilterRange
+        );
+
         const extensions = [
             new PathStyleExtension({
                 dash: isDashed,
@@ -496,6 +544,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             pointBillboard: true,
             parameters,
             visible: fastDrawing,
+            filterEnabled: false,
         } as Partial<GeoJsonLayerProps>;
 
         // Map GeoJsonLayer properties to match PathLayerProps
@@ -507,7 +556,13 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 ? SubLayerId.SCREEN_TRAJECTORY
                 : SubLayerId.COLORS,
             pickable: true,
-            extensions,
+
+            extensions: [
+                ...extensions,
+                new DataFilterExtension({
+                    filterSize: 1,
+                }),
+            ],
             getDashArray: getDashFactor(
                 this.props.lineStyle?.dash,
                 getSize(LINE, this.props.lineStyle?.width),
@@ -516,6 +571,19 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             visible: !fastDrawing,
             getLineColor: getColor(this.props.lineStyle?.color),
             getFillColor: getColor(this.props.wellHeadStyle?.color),
+
+            filterEnabled: this.props.enableFilters,
+
+            // ? I should be able to use filterCategories: [1] and `getFilterCategory`, but it's not working for path section filtering
+            filterRange: [1, 1],
+            getFilterValue: (d) =>
+                getTrajectoryFilterCategory(
+                    d,
+                    sanitizedFilterBands,
+                    this.props.formationFilter,
+                    this.props.wellNameFilter
+                ),
+
             // Override path layer to use opt-in screen dashes
             _subLayerProps: {
                 linestrings: {
@@ -542,7 +610,8 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                     },
                 },
             },
-        } as Partial<GeoJsonLayerProps<WellFeature>>);
+        } as Partial<GeoJsonLayerProps<WellFeature>> &
+            Partial<DataFilterExtensionProps<WellFeature>>);
 
         const fastLayerProps = this.getSubLayerProps({
             ...defaultLayerProps,
@@ -550,6 +619,52 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             getLineColor: getColor(this.props.lineStyle?.color),
             getFillColor: getColor(this.props.wellHeadStyle?.color),
         });
+
+        const filterGhostLayerProps = this.getSubLayerProps({
+            ...defaultLayerProps,
+            extensions: [
+                new DataFilterExtension({
+                    filterSize: 1,
+                }),
+            ],
+
+            id: SubLayerId.TRAJECTORY_FILTER_GHOST,
+
+            filterEnabled: this.props.enableFilters,
+
+            getFillColor: Array.isArray(this.props.showFilterTrajectoryGhost)
+                ? this.props.showFilterTrajectoryGhost
+                : [225, 225, 225],
+            getLineColor: Array.isArray(this.props.showFilterTrajectoryGhost)
+                ? this.props.showFilterTrajectoryGhost
+                : [225, 225, 225],
+
+            // ? I should be able to use filterCategories: [1] and `getFilterCategory`, but it's not working for path section filtering
+            filterRange: [1, 1],
+            getFilterValue: (d: WellFeature) => {
+                const includeFilter = getTrajectoryFilterCategory(
+                    d,
+                    sanitizedFilterBands,
+                    this.props.formationFilter,
+                    this.props.wellNameFilter
+                );
+
+                if (!Array.isArray(includeFilter)) return 1 - includeFilter;
+
+                return includeFilter.map((n) => 1 - n);
+            },
+            getDashArray: getDashFactor(this.props.lineStyle?.dash),
+            visible:
+                !fastDrawing &&
+                this.props.enableFilters &&
+                this.props.showFilterTrajectoryGhost,
+
+            parameters: {
+                ...parameters,
+                [GL.POLYGON_OFFSET_FACTOR]: 1,
+                [GL.POLYGON_OFFSET_UNITS]: 1,
+            },
+        } as GeoJsonLayerProps);
 
         const outlineLayerProps = this.getSubLayerProps({
             ...defaultLayerProps,
@@ -560,7 +675,22 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 : SubLayerId.OUTLINE,
             getLineWidth: getSize(LINE, this.props.lineStyle?.width),
             getPointRadius: getSize(POINT, this.props.wellHeadStyle?.size),
-            extensions,
+            extensions: [
+                ...extensions,
+                new DataFilterExtension({
+                    filterSize: 1,
+                }),
+            ],
+            filterEnabled: this.props.enableFilters,
+            // ? I should be able to use filterCategories: [1] and `getFilterCategory`, but it's not working for path section filtering
+            filterRange: [1, 1],
+            getFilterValue: (d: WellFeature) =>
+                getTrajectoryFilterCategory(
+                    d,
+                    sanitizedFilterBands,
+                    this.props.formationFilter,
+                    this.props.wellNameFilter
+                ),
             getDashArray: getDashFactor(this.props.lineStyle?.dash),
             visible: this.props.outline && !fastDrawing,
             parameters: {
@@ -624,6 +754,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         const fastLayer = new GeoJsonLayer(fastLayerProps);
         const outlineLayer = new GeoJsonLayer(outlineLayerProps);
         const colorsLayer = new GeoJsonLayer(colorsLayerProps);
+        const filterGhostLayer = new GeoJsonLayer(filterGhostLayerProps);
 
         // Highlight the selected well.
         const highlightLayer = new GeoJsonLayer(highlightLayerProps);
@@ -691,6 +822,18 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                         this.props.showPerforationsMarkers,
                     ],
                 },
+
+                extensions: [new DataFilterExtension({ filterSize: 1 })],
+                filterEnabled: this.props.enableFilters,
+                filterRange: [1, 1],
+
+                getFilterValue: (d: WellFeature) =>
+                    getTrajectoryFilterCategory(
+                        d,
+                        sanitizedFilterBands,
+                        this.props.formationFilter,
+                        this.props.wellNameFilter
+                    ),
                 getCumulativePathDistance: (d: WellFeature) =>
                     d.properties.md[0],
                 getTrajectoryPath: (d: WellFeature) =>
@@ -743,6 +886,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             namesLayer,
             logLayer,
             markerLayer,
+            filterGhostLayer,
         ];
         if (fastDrawing) {
             layers.push(fastLayer);
@@ -1017,4 +1161,114 @@ function getTvdProperty(
         );
     }
     return null;
+}
+
+// Injects MD points that will be required for cutting trajectories at the correct points
+function injectFilterData(
+    data: WellFeatureCollection,
+    mdFilterRange: WellsLayerProps["mdFilterRange"]
+): WellFeatureCollection {
+    const globalRequiredMds = mdFilterRange.flat().filter((i) => i !== -1);
+
+    return {
+        ...data,
+        features: data.features.map((feature) => {
+            const { formations } = feature.properties;
+
+            const formationMds =
+                formations?.flatMap((f) => [f.mdEnter, f.mdExit]) ?? [];
+
+            const allRequiredMds = _.chain([
+                ...formationMds,
+                ...globalRequiredMds,
+            ])
+                .sort((a, b) => a - b)
+                .uniq()
+                .value();
+
+            const newFeature = injectMdPoints(feature, ...allRequiredMds);
+
+            return newFeature;
+        }),
+    };
+}
+
+function getTrajectoryFilterCategory(
+    feature: WellFeature,
+    sanitizedMdFilterBands: [number, number][],
+    formationFilter: string[],
+    wellNameFilter: string[]
+): number | number[] {
+    if (
+        !formationFilter.length &&
+        !wellNameFilter.length &&
+        !sanitizedMdFilterBands.length
+    )
+        return 1;
+    const {
+        formations,
+        md: [mdArr],
+    } = feature.properties;
+
+    const nameIsValid =
+        !wellNameFilter.length ||
+        wellNameFilter.includes(feature.properties.name);
+
+    if (!nameIsValid) return 0;
+
+    // No per vertex filters
+    if (!formationFilter.length && !sanitizedMdFilterBands.length) return 1;
+
+    return mdArr.map((md) => {
+        const mdIsValid =
+            !sanitizedMdFilterBands.length ||
+            sanitizedMdFilterBands.some((band) => {
+                if (isClose(md, band[0])) return true;
+                if (isClose(md, band[1])) return false;
+                return md >= band[0] && md < band[1];
+            });
+
+        const formation = formations?.find(
+            (seg) => seg.mdEnter <= md && seg.mdExit > md
+        );
+
+        const formationIsValid =
+            !formationFilter?.length ||
+            formationFilter.includes(formation?.name ?? "");
+
+        return Number(mdIsValid && formationIsValid);
+    });
+}
+
+function makeSanitizedFilterBands(
+    mdFilter: WellsLayerProps["mdFilterRange"]
+): [number, number][] {
+    if (!mdFilter) return [];
+
+    if (!(mdFilter.every(Number.isFinite) || mdFilter.every(Array.isArray))) {
+        throw Error(
+            "MD filter should either only be numbers, or lists of numbers"
+        );
+    }
+
+    if (Array.isArray(mdFilter[0])) {
+        return (mdFilter as [number, number][]).flatMap(
+            makeSanitizedFilterBands
+        );
+    }
+
+    let [rangeStart, rangeEnd] = mdFilter as [number, number];
+
+    if (rangeStart === -1 && rangeEnd === -1) return [];
+    if (rangeStart === -1) rangeStart = Number.NEGATIVE_INFINITY;
+    if (rangeEnd === -1) rangeEnd = Number.POSITIVE_INFINITY;
+
+    if (rangeStart > rangeEnd) {
+        return [
+            [Number.NEGATIVE_INFINITY, rangeEnd],
+            [rangeStart, Number.POSITIVE_INFINITY],
+        ];
+    }
+
+    return [[rangeStart, rangeEnd]];
 }

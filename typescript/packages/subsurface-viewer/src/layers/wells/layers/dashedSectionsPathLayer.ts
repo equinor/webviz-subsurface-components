@@ -7,12 +7,14 @@ import type {
     UpdateParameters,
 } from "@deck.gl/core";
 import { CompositeLayer } from "@deck.gl/core";
-import { PathStyleExtension } from "@deck.gl/extensions";
+import type { DataFilterExtensionProps } from "@deck.gl/extensions";
+import { DataFilterExtension, PathStyleExtension } from "@deck.gl/extensions";
 import type { PathLayerProps } from "@deck.gl/layers";
 import { PathLayer } from "@deck.gl/layers";
 import type { PathGeometry } from "@deck.gl/layers/dist/path-layer/path";
 import type { Position } from "geojson";
 import _ from "lodash";
+
 import { isClose } from "../../../utils/measurement";
 import {
     getFromAccessor,
@@ -24,6 +26,7 @@ import {
     getFractionPositionSegmentIndices,
     interpolateDataOnTrajectory,
 } from "../utils/trajectory";
+import type { MarkerData } from "./trajectoryMarkerLayer";
 
 export enum SubLayerId {
     DASHED_PATH = "dashed-paths",
@@ -172,6 +175,22 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
 
                 let prevSectionEnd = 0;
 
+                // If a data-filter extension is present, we might need to split the filter value array along the path.
+                let filterValue: undefined | number | number[];
+                const { filterEnabled, getFilterValue } = this
+                    .props as DataFilterExtensionProps;
+                const hasFilterExtension = this.props.extensions?.some(
+                    (e) => e instanceof DataFilterExtension
+                );
+
+                if (hasFilterExtension && filterEnabled && getFilterValue) {
+                    filterValue = getFromAccessor(
+                        getFilterValue,
+                        datum,
+                        itemContext
+                    );
+                }
+
                 // ! We assume sections are sorted
                 for (const section of sections) {
                     const dashedSectionStart = section[0];
@@ -182,7 +201,14 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
                         const normalSection: ComputedPathSection = {
                             id: `path-${index}-normal-section-${normalPathSubLayerData.length}`,
                             pathType: "normal",
-                            properties: {},
+                            properties: {
+                                filterValue: getSectionFilterValue(
+                                    filterValue,
+                                    cumulativePathDistance,
+                                    prevSectionEnd,
+                                    dashedSectionStart
+                                ),
+                            },
                             path: getSectionPathPositions(
                                 path,
                                 cumulativePathDistance,
@@ -199,7 +225,14 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
                     const dashedSection: ComputedPathSection = {
                         id: `path-${index}-dashed-section-${normalPathSubLayerData.length}`,
                         pathType: "dashed",
-                        properties: {},
+                        properties: {
+                            filterValue: getSectionFilterValue(
+                                filterValue,
+                                cumulativePathDistance,
+                                dashedSectionStart,
+                                dashedSectionEnd
+                            ),
+                        },
                         path: getSectionPathPositions(
                             path,
                             cumulativePathDistance,
@@ -219,7 +252,14 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
                     const normalSection: ComputedPathSection = {
                         id: `path-${index}-normal-section-${normalPathSubLayerData.length}`,
                         pathType: "normal",
-                        properties: {},
+                        properties: {
+                            filterValue: getSectionFilterValue(
+                                filterValue,
+                                cumulativePathDistance,
+                                prevSectionEnd,
+                                1
+                            ),
+                        },
                         path: getSectionPathPositions(
                             path,
                             cumulativePathDistance,
@@ -317,6 +357,9 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
                     data: this.state.dashedPathSubLayerData,
                     getColor: this.getSubLayerAccessor(this.props.getColor),
                     extensions: [
+                        ...this.props.extensions.filter(
+                            (f) => !(f instanceof PathStyleExtension)
+                        ),
                         new PathStyleExtension({
                             dash: true,
                             highPrecisionDash: true,
@@ -326,19 +369,64 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
                 // ! These props gets overriden if included inside getSubLayerProps
                 getDashArray: this.props.getScreenDashArray,
                 dashGapPickable: true,
+                getFilterValue: (d: MarkerData) =>
+                    d.properties?.["filterValue"],
             }),
 
-            new PathLayer(
-                this.getSubLayerProps({
+            new PathLayer({
+                ...this.getSubLayerProps({
                     ...otherProps,
                     id: SubLayerId.SOLID_PATH,
                     data: this.state.normalPathSubLayerData,
                     getColor: this.getSubLayerAccessor(this.props.getColor),
                     parameters: this.props.parameters,
-                } as Partial<PathLayerProps>)
-            ),
+                } as Partial<PathLayerProps>),
+                getFilterValue: (d: MarkerData) =>
+                    d.properties?.["filterValue"],
+            }),
         ];
     }
+}
+
+function getSectionFilterValue(
+    filterValue: undefined | number | number[],
+    cumulativePathDistance: number[],
+    startFraction: number,
+    endFraction: number
+): undefined | number | number[] {
+    if (!Array.isArray(filterValue)) return filterValue;
+    if (filterValue.length !== cumulativePathDistance.length) {
+        throw Error(
+            "Expected filter value array to be same length as path computation array"
+        );
+    }
+
+    if (startFraction === 0 && endFraction === 1) return filterValue;
+
+    const [lowerIndexStart, upperIndexStart] =
+        getFractionPositionSegmentIndices(
+            startFraction,
+            filterValue,
+            cumulativePathDistance
+        );
+
+    const [lowerIndexEnd, upperIndexEnd] = getFractionPositionSegmentIndices(
+        endFraction,
+        filterValue,
+        cumulativePathDistance
+    );
+
+    const startFilterValue = filterValue[lowerIndexStart];
+    const endFilterValue = filterValue[upperIndexEnd];
+
+    // Build a segment of positions
+    const segment = [
+        startFilterValue,
+        ...filterValue.slice(upperIndexStart, lowerIndexEnd + 1),
+        endFilterValue,
+    ];
+
+    return segment;
 }
 
 function getSectionPathPositions(

@@ -14,6 +14,7 @@ export type GeoJsonWellProperties = {
     color?: Color;
     perforations?: PerforationProperties[];
     screens?: ScreenProperties[];
+    formations?: FormationProperties[];
 };
 
 export type WellFeature = Feature<GeometryCollection, GeoJsonWellProperties>;
@@ -40,6 +41,12 @@ export type ScreenProperties = {
     mdStart: number;
     mdEnd: number;
     description?: string;
+};
+
+export type FormationProperties = {
+    name: string;
+    mdEnter: number;
+    mdExit: number;
 };
 
 export interface WellsPickInfo extends LayerPickInfo<WellFeature> {

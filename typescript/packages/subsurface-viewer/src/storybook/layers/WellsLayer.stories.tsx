@@ -16,11 +16,12 @@ import { styled } from "@mui/material/styles";
 import type { Meta, StoryObj } from "@storybook/react";
 import type { FeatureCollection, GeometryCollection } from "geojson";
 
+import volveBlockingZoneLogJson from "../../../../../../example-data/volve_blocking_zonelog_logs.json";
 import volveWellsJson from "../../../../../../example-data/volve_wells.json";
 
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
-import type { MapMouseEvent } from "../../components/Map";
+import type { MapMouseEvent, ViewStateType } from "../../components/Map";
 import { Axes2DLayer } from "../../layers";
 import AxesLayer from "../../layers/axes/axesLayer";
 import { useAbscissaTransform } from "../../layers/wells/hooks/useAbscissaTransform";
@@ -48,6 +49,7 @@ import {
     WELL_COUNT_ARGTYPES,
 } from "../constant/argTypes";
 import {
+    default2DViews,
     default3DViews,
     defaultStoryParameters,
     volveWellsBounds,
@@ -1452,3 +1454,185 @@ export const PerforationsAndScreens: StoryObj<PerforationAndScreenArgs> = {
         <PerforationsAndScreensComponent {...defaultProps} {...args} />
     ),
 };
+
+type TrajectoryFilterArgs = {
+    use3dView: boolean;
+    mdFilterRangeStart: number;
+    mdFilterRangeEnd: number;
+
+    showGhostTrajectory: boolean;
+
+    formationFilter: string[];
+    wellNameFilter: string[];
+};
+
+const ZONES = Object.keys(
+    volveBlockingZoneLogJson[0].metadata_discrete.ZONELOG.objects
+);
+
+const WELL_NAMES = volveWellsJson.features.map((f) => f.properties.name);
+
+export const TrajectoryFilter: StoryObj<TrajectoryFilterArgs> = {
+    args: {
+        use3dView: true,
+        mdFilterRangeStart: 2200,
+        mdFilterRangeEnd: 3500,
+
+        showGhostTrajectory: false,
+
+        formationFilter: [],
+
+        wellNameFilter: [],
+    },
+
+    argTypes: {
+        mdFilterRangeStart: {
+            control: {
+                type: "range",
+                min: -1,
+                max: 5000,
+                step: 1,
+            },
+        },
+        mdFilterRangeEnd: {
+            control: {
+                type: "range",
+                min: -1,
+                max: 5000,
+                step: 1,
+            },
+        },
+        formationFilter: {
+            options: ZONES,
+            control: "multi-select",
+        },
+
+        wellNameFilter: {
+            options: WELL_NAMES,
+            control: "multi-select",
+        },
+    },
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: "An example of wells with screens (dashed sections) and perforations (spikes)",
+            },
+        },
+    },
+    render: (args) => (
+        <TrajectoryFilterComponent
+            {...defaultProps}
+            {...args}
+            id="trajectory_filters"
+        />
+    ),
+};
+
+function TrajectoryFilterComponent(
+    props: SubsurfaceViewerProps & TrajectoryFilterArgs
+) {
+    const view = React.useMemo(
+        () => (props.use3dView ? default3DViews : default2DViews),
+        [props.use3dView]
+    );
+
+    // Inject perforation and screens added in args
+    const formationsByWellIndex = React.useMemo(() => {
+        const dict = new Map<string, GeoJsonWellProperties["formations"]>();
+
+        volveBlockingZoneLogJson.forEach((log) => {
+            const { data, header, metadata_discrete } = log;
+
+            if (!dict.has(header.well)) dict.set(header.well, []);
+
+            for (let index = 0; index < data.length - 1; index++) {
+                const [mdEnter, rowCode] = data[index];
+                const [mdExit] = data[index + 1];
+
+                const name = Object.entries(
+                    metadata_discrete.ZONELOG.objects
+                ).find(([, [, code]]) => code === rowCode)?.[0];
+
+                if (mdEnter != null && mdExit != null && name != null)
+                    dict.get(header.well)!.push({
+                        mdEnter,
+                        mdExit,
+                        name,
+                    });
+            }
+        });
+        return dict;
+    }, []);
+
+    const volveWellsWithFormations = React.useMemo(() => {
+        return {
+            ...volveWellsJson,
+            features: volveWellsJson.features.map((f, i) => ({
+                ...f,
+                properties: {
+                    ...f.properties,
+                    formations: formationsByWellIndex.get(f.properties.name),
+                    screens:
+                        i % 2 === 0
+                            ? [
+                                  {
+                                      name: 'SuperScreen 25x35"',
+                                      mdStart: 2000,
+                                      mdEnd: 3000,
+                                  },
+                              ]
+                            : undefined,
+                },
+            })),
+        } as WellFeatureCollection;
+    }, [formationsByWellIndex]);
+
+    const wellsLayerWithPerforations: Partial<WellsLayerProps> = {
+        ...volveWellsFromResourcesLayer,
+
+        data: volveWellsWithFormations,
+
+        enableFilters: true,
+        showScreenMarkers: true,
+        showScreenTrajectory: true,
+
+        mdFilterRange: [props.mdFilterRangeStart, props.mdFilterRangeEnd],
+
+        showFilterTrajectoryGhost: props.showGhostTrajectory,
+        formationFilter: props.formationFilter,
+        wellNameFilter: props.wellNameFilter,
+
+        refine: false,
+        ZIncreasingDownwards: false,
+        pickable: true,
+        autoHighlight: true,
+        outline: true,
+    };
+
+    // This camera state gives a decent angle for the smoke test screenshot
+    const initialCameraPosition: ViewStateType = {
+        height: 735,
+        width: 1701,
+        zoom: -2.395835621116446,
+        minZoom: -12,
+        maxZoom: 3,
+        rotationOrbit: -10.654253260221996,
+        rotationX: 27.467130964273807,
+        maxRotationX: 90,
+        minRotationX: -90,
+        target: [436626.50202926976, 6477484.086298338, -1531.1769336680954],
+    };
+
+    const propsWithLayers: Partial<SubsurfaceViewerProps> = {
+        ...props,
+        views: view,
+        pickingRadius: 6,
+        layers: [wellsLayerWithPerforations],
+        cameraPosition: initialCameraPosition,
+    };
+
+    return (
+        <SubsurfaceViewer {...propsWithLayers} id="perforations_and_screens" />
+    );
+}

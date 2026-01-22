@@ -12,6 +12,7 @@ import type {
     UpdateParameters,
 } from "@deck.gl/core";
 import { CompositeLayer } from "@deck.gl/core";
+import type { DataFilterExtensionProps } from "@deck.gl/extensions";
 import { DataFilterExtension } from "@deck.gl/extensions";
 import type { GeoJsonLayerProps } from "@deck.gl/layers";
 import { PathLayer, PolygonLayer } from "@deck.gl/layers";
@@ -30,6 +31,7 @@ import type { MarkerType } from "../utils/markers";
 import { buildMarkerPath } from "../utils/markers";
 import {
     getCumulativeDistance,
+    getFractionPositionSegmentIndices,
     getPositionAndAngleOnTrajectoryPath,
 } from "../utils/trajectory";
 
@@ -93,6 +95,8 @@ export class TrajectoryMarkersLayer<TData = unknown> extends CompositeLayer<
         // since we'll be dealing with different indices.
         highlightedSourceIndex: number;
         hoveredMarkerIndex: number;
+
+        cumulativePathDistanceCache: Map<number, number[]>;
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -145,6 +149,9 @@ export class TrajectoryMarkersLayer<TData = unknown> extends CompositeLayer<
                 `Expected data to be a list, instead got ${typeof data}`
             );
 
+        const cumulativePathDistanceCache =
+            this.state.cumulativePathDistanceCache ?? new Map();
+
         const markers: MarkerData<TData>[] = [];
 
         let markerDataOffset: number = 0;
@@ -159,12 +166,19 @@ export class TrajectoryMarkersLayer<TData = unknown> extends CompositeLayer<
                 itemContext
             );
 
+            if (cumulativeDistanceUpdate || changeFlags.dataChanged) {
+                const cumulativeDistance =
+                    getFromAccessor(
+                        props.getCumulativePathDistance,
+                        datum,
+                        itemContext
+                    ) ?? getCumulativeDistance(trajectoryPath)!;
+
+                cumulativePathDistanceCache.set(index, cumulativeDistance);
+            }
+
             const cumulativePathDistance =
-                getFromAccessor(
-                    this.props.getCumulativePathDistance,
-                    datum,
-                    itemContext
-                ) ?? getCumulativeDistance(trajectoryPath);
+                cumulativePathDistanceCache.get(index)!;
 
             const trajectoryMarkers = getFromAccessor(
                 this.props.getMarkers,
@@ -219,7 +233,7 @@ export class TrajectoryMarkersLayer<TData = unknown> extends CompositeLayer<
             markerDataOffset += trajectoryMarkers.length;
         }
 
-        this.setState({ markers });
+        this.setState({ markers, cumulativePathDistanceCache });
     }
 
     filterSubLayer(context: FilterContext): boolean {
@@ -320,9 +334,35 @@ export class TrajectoryMarkersLayer<TData = unknown> extends CompositeLayer<
     }
 
     renderLayers(): Layer | null | LayersList {
+        const { cumulativePathDistanceCache } = this.state;
+
         const lineWidthAccessor = this.getSubLayerAccessor(
             this.props.getLineWidth
         );
+
+        const sourceFilterAccessor = this.getSubLayerAccessor(
+            (this.props as DataFilterExtensionProps).getFilterValue
+        );
+
+        const markerFilterAccessor = (
+            d: MarkerData,
+            ctx: AccessorContext<MarkerData>
+        ) => {
+            const sourcePathDistance = cumulativePathDistanceCache.get(
+                d.sourceIndex
+            )!;
+            const sourceFilterValue = getFromAccessor(
+                sourceFilterAccessor,
+                d,
+                ctx
+            );
+
+            return getMarkerFilterValue(
+                d,
+                sourceFilterValue,
+                sourcePathDistance
+            );
+        };
 
         const sharedSubLayerProps = {
             ...this.props,
@@ -370,6 +410,8 @@ export class TrajectoryMarkersLayer<TData = unknown> extends CompositeLayer<
                 pickable: false,
                 autoHighlight: false,
                 highlightedObjectIndex: -1,
+
+                getFilterValue: markerFilterAccessor,
             }),
             new PathLayer({
                 ...this.getSubLayerProps({
@@ -387,6 +429,8 @@ export class TrajectoryMarkersLayer<TData = unknown> extends CompositeLayer<
                     },
                 }),
                 getColor: this.getMarkerColor,
+
+                getFilterValue: markerFilterAccessor,
 
                 // Disable this layer for picking, instead using MARKERS_2D_PICKING
                 pickable: false,
@@ -409,7 +453,11 @@ export class TrajectoryMarkersLayer<TData = unknown> extends CompositeLayer<
                 stroked: true,
 
                 // Only render pick-able markers
-                extensions: [new DataFilterExtension({ categorySize: 1 })],
+                extensions: [
+                    ...this.props.extensions,
+                    new DataFilterExtension({ categorySize: 1 }),
+                ],
+                getFilterValue: markerFilterAccessor,
                 getFilterCategory: (d: MarkerData) =>
                     Number(d.type !== "perforation"),
 
@@ -426,4 +474,20 @@ export class TrajectoryMarkersLayer<TData = unknown> extends CompositeLayer<
             }),
         ];
     }
+}
+
+function getMarkerFilterValue(
+    markerData: MarkerData,
+    sourceFilterValue: undefined | number | number[],
+    cumulativePathDistance: number[]
+) {
+    if (!Array.isArray(sourceFilterValue)) return sourceFilterValue ?? 1;
+
+    const [lowerIndex] = getFractionPositionSegmentIndices(
+        markerData.positionAlongPath,
+        sourceFilterValue,
+        cumulativePathDistance
+    );
+
+    return sourceFilterValue[lowerIndex];
 }

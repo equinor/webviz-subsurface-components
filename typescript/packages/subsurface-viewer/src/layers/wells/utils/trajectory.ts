@@ -282,7 +282,7 @@ export function getSegmentIndex(coord: Position, path: Position[]): number {
  */
 export function getFractionPositionSegmentIndices(
     fractionPosition: number,
-    trajectory: Position[],
+    trajectory: unknown[],
     cumulativeTrajectoryDistance: number[]
 ): [lowerIndex: number, upperIndex: number, segmentFraction: number] {
     if (trajectory.length < 2) {
@@ -294,8 +294,11 @@ export function getFractionPositionSegmentIndices(
         );
     }
 
+    // Some trajectories dont have the md-array starting at 1
+    const offset = cumulativeTrajectoryDistance.at(0)!;
+
     const pointDistance = _.clamp(
-        fractionPosition * cumulativeTrajectoryDistance.at(-1)!,
+        fractionPosition * cumulativeTrajectoryDistance.at(-1)! + offset,
         cumulativeTrajectoryDistance.at(0)!,
         cumulativeTrajectoryDistance.at(-1)!
     );
@@ -417,4 +420,81 @@ export function getCumulativeDistance(well_xyz: Position[]): number[] {
         cumulativeDistance.push(cumulativeDistance[i - 1] + distance);
     }
     return cumulativeDistance;
+}
+
+/**
+ * Adds interpolated entries to trajectory data (MD and position) at a given MD. If an MD value is close (0.001 units) the point will *not* be added.
+ * @param well A well feature to add entries to
+ * @param mdValuesToInject one or more MD values to inject
+ * @returns A copy of the well object with the new MD values injected
+ */
+export function injectMdPoints(
+    well: WellFeature,
+    ...mdValuesToInject: number[]
+): WellFeature {
+    const path = getLineStringGeometry(well)?.coordinates ?? [];
+    const md = well.properties.md[0] ?? [];
+
+    const newPath = [...path];
+    const newMd = [...md];
+
+    let currentDataRowIdx = 0;
+    let spliceCount = 0;
+
+    for (let i = 0; i < mdValuesToInject.length; i++) {
+        const nextMdToInject = mdValuesToInject[i];
+        if (nextMdToInject < md[0]) continue;
+        if (nextMdToInject > md[md.length - 1]) break;
+
+        // Increase until we go over or find the value
+        while (
+            md[currentDataRowIdx] < nextMdToInject &&
+            currentDataRowIdx < md.length
+        ) {
+            currentDataRowIdx++;
+        }
+
+        if (currentDataRowIdx >= md.length) break;
+
+        // Data already in array, so we can skip it
+        const mdBelow = md[currentDataRowIdx - 1];
+        const mdAbove = md[currentDataRowIdx];
+
+        if (isClose(mdBelow, nextMdToInject)) continue;
+        if (isClose(mdAbove, nextMdToInject)) continue;
+
+        const interpolatedT = (nextMdToInject - mdBelow) / (mdAbove - mdBelow);
+
+        const interpolatedPosition = _.zipWith(
+            path[currentDataRowIdx - 1],
+            path[currentDataRowIdx],
+            (pl, pu) => {
+                return pl + interpolatedT * (pu - pl);
+            }
+        );
+
+        const spliceIndex = currentDataRowIdx + spliceCount;
+        newPath.splice(spliceIndex, 0, interpolatedPosition);
+        newMd.splice(spliceIndex, 0, nextMdToInject);
+
+        spliceCount++;
+    }
+
+    return {
+        ...well,
+        properties: {
+            ...well.properties,
+            md: [newMd],
+        },
+        geometry: {
+            ...well.geometry,
+            geometries: well.geometry.geometries.map((g) => {
+                if (g.type !== "LineString") return g;
+                return {
+                    ...g,
+                    coordinates: newPath,
+                };
+            }),
+        },
+    };
 }
