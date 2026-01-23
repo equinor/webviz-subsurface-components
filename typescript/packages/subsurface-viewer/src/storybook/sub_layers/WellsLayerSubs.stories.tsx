@@ -120,7 +120,7 @@ export const DashedSections: Story = {
                     name: "Dashed Paths",
                     id: "wells-sublayer-dashed-sections",
                     data: wellData.features,
-                    positionFormat: args.use3dView ? "XYZ" : "XY",
+                    positionFormat: args["use3dView"] ? "XYZ" : "XY",
                     billboard: true,
                     getScreenDashArray: args["dashArray"],
                     getColor: [255, 0, 0],
@@ -131,7 +131,7 @@ export const DashedSections: Story = {
                     autoHighlight: true,
 
                     getPath: getTrajectoryCoordinates,
-                    getPathFractions: (d) =>
+                    getPathFractions: (d: WellFeature) =>
                         d.properties.md[0].map((md) => {
                             return round(md / d.properties.md[0].at(-1)!, 2);
                         }),
@@ -151,7 +151,7 @@ export const DashedSections: Story = {
     ),
 };
 
-function getDashedSectionsAlongPath(d: WellFeature, dashSegmentSize: number) {
+function getDashedSectionsAlongPath(_d: WellFeature, dashSegmentSize: number) {
     if (!dashSegmentSize) return [];
 
     // Computing in hundreds to avoid floating point errors
@@ -180,26 +180,26 @@ export const TrajectoryMarkers: Story = {
                 new PathLayer({
                     id: "well-paths",
                     data: wellData.features,
-                    positionFormat: args.use3dView ? "XYZ" : "XY",
+                    positionFormat: args["use3dView"] ? "XYZ" : "XY",
                     billboard: true,
                     widthMinPixels: 1,
                     lineWidthUnits: "pixels",
                     getWidth: 2,
                     getColor: [115, 115, 115],
                     getPath: (d) => getTrajectoryCoordinates(d) as GlPosition[],
-                    updateTriggers: { getPath: [args.use3dView] },
+                    updateTriggers: { getPath: [args["use3dView"]] },
                 }),
                 new TrajectoryMarkersLayer({
                     name: "Trajectory Marker Layer",
                     id: "well-markers",
                     data: wellData.features,
-                    positionFormat: args.use3dView ? "XYZ" : "XY",
+                    positionFormat: args["use3dView"] ? "XYZ" : "XY",
                     getLineWidth: 2,
                     lineWidthMinPixels: 1,
-                    getMarkerColor: (d) => {
-                        if (d.properties?.status === "closed")
+                    getMarkerColor: (d: TrajectoryMarker) => {
+                        if (d.properties?.["status"] === "closed")
                             return [255, 0, 0];
-                        if (d.properties?.status === "open")
+                        if (d.properties?.["status"] === "open")
                             return [0, 155, 115];
 
                         return [115, 115, 115];
@@ -212,14 +212,22 @@ export const TrajectoryMarkers: Story = {
                     pickable: true,
                     autoHighlight: true,
                     getTrajectoryPath: getTrajectoryCoordinates,
-                    getCumulativePathDistance: (d) => d.properties.md[0],
-                    getMarkers(d, i) {
-                        return getTrajectoryMarkers(d, i, args.markerPosition);
+                    getCumulativePathDistance: (d: WellFeature) =>
+                        d.properties.md[0],
+                    getMarkers: (
+                        d: WellFeature,
+                        itemInfo: AccessorContext<WellFeature>
+                    ) => {
+                        return getTrajectoryMarkers(
+                            d,
+                            itemInfo,
+                            args["markerPosition"]
+                        );
                     },
 
                     updateTriggers: {
-                        getMarkers: [args.markerPosition],
-                        getTrajectoryPath: [args.use3dView],
+                        getMarkers: [args["markerPosition"]],
+                        getTrajectoryPath: [args["use3dView"]],
                     },
                 }),
             ]}
