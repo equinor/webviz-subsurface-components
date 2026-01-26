@@ -66,7 +66,7 @@ import type {
 import { abscissaTransform } from "./utils/abscissaTransform";
 import { DEFAULT_LINE_WIDTH, getSize, LINE, POINT } from "./utils/features";
 import { getLegendData, getLogProperty } from "./utils/log";
-import { createPerforationReadout, createScreenReadout } from "./utils/markers";
+import { createPerforationReadout, createScreenReadout } from "./utils/readout";
 import {
     checkWells,
     coarsenWells,

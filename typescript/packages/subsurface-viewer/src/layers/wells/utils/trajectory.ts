@@ -7,13 +7,12 @@ import { distance, dot, subtract } from "mathjs";
 import type { Point2D, Point3D } from "../../../utils";
 import {
     distToSegmentSquared,
+    isClose,
     isPointAwayFromLineEnd,
 } from "../../../utils/measurement";
 import type { StyleAccessorFunction } from "../../types";
 import type { ColorAccessor, WellFeature } from "../types";
 import { getWellHeadPosition } from "./features";
-import { getPositionByMD } from "./wells";
-import { isClose } from "../../../utils/measurement";
 
 /**
  * Finds the nested geometry object that describes a well's trajectory
@@ -108,51 +107,6 @@ export function getMdsInRange(
     return mdSection;
 }
 
-/**
- * Calculates a sub-trajectory between two fractional positions along a trajectory
- * @param trajectoryPositions The position array that describes the trajectory
- * @param trajectoryMds The measured depths for each trajectory position
- * @param startFraction The fractional (0-1) position along the path the sub-trajectory starts at
- * @param endFraction The fractional (0-1) position along the path the sub-trajectory ends at
- * @returns A sub-section of the trajectory positions between the start and end fractions. Start and end will be interpolated if they do not fall exactly on existing trajectory positions
- */
-export function getPositionsAlongTrajectory(
-    trajectoryPositions: Position[],
-    trajectoryMds: number[],
-    startFraction: number,
-    endFraction: number
-): Position[] {
-    if (trajectoryPositions.length !== trajectoryPositions.length)
-        throw Error(
-            "Expected trajectory and measurements arrays to be of equal lenght"
-        );
-
-    startFraction = _.clamp(startFraction, 0, 1);
-    endFraction = _.clamp(startFraction, 0, 1);
-
-    if (startFraction >= endFraction) return [];
-    if (startFraction === 0 && endFraction === 1)
-        return [...trajectoryPositions];
-
-    const startMd = startFraction * trajectoryMds[trajectoryMds.length - 1];
-    const endMd = endFraction * trajectoryMds[trajectoryMds.length - 1];
-
-    const startIndex = _.sortedIndex(trajectoryMds, startMd);
-    const endIndex = _.sortedIndex(trajectoryMds, endMd);
-
-    const mdSegment = trajectoryMds.slice(startIndex, endIndex);
-
-    if (mdSegment.at(0)! > startMd) mdSegment.splice(0, 0, startMd);
-    if (mdSegment.at(-1)! > endMd)
-        mdSegment.splice(mdSegment.length - 1, 0, endMd);
-
-    console.log(mdSegment);
-
-    return mdSegment.map((md) =>
-        getPositionByMD(trajectoryPositions, trajectoryMds, md)
-    );
-}
-
 // Interpolates point closest to the coords on trajectory
 export function interpolateDataOnTrajectory(
     coord: Position,
@@ -183,6 +137,10 @@ export function interpolateDataOnTrajectory(
         isPointAwayFromLineEnd(coord, [survey0, survey1])
     ) {
         coord = survey1;
+    }
+
+    if (index0 === 0 && isPointAwayFromLineEnd(coord, [survey1, survey0])) {
+        coord = survey0;
     }
 
     const dv = distance(survey0, survey1) as number;
@@ -298,7 +256,7 @@ export function getFractionPositionSegmentIndices(
     const offset = cumulativeTrajectoryDistance.at(0)!;
 
     const pointDistance = _.clamp(
-        fractionPosition * cumulativeTrajectoryDistance.at(-1)! + offset,
+        fractionPosition * (cumulativeTrajectoryDistance.at(-1)! + offset),
         cumulativeTrajectoryDistance.at(0)!,
         cumulativeTrajectoryDistance.at(-1)!
     );
@@ -308,26 +266,26 @@ export function getFractionPositionSegmentIndices(
         pointDistance
     );
 
+    if (sortedIndex === 0) {
+        return [0, 1, 0];
+    }
+
+    // Since we clamp it, this shouldn't be possible, but Im leaving it just in case
+    /* istanbul ignore next @preserve */
     if (sortedIndex >= cumulativeTrajectoryDistance.length) {
         throw Error("Position is outside of trajectory");
-    }
-
-    if (isClose(cumulativeTrajectoryDistance[0], pointDistance)) {
-        return [sortedIndex, sortedIndex + 1, 0];
-    }
-
-    if (isClose(cumulativeTrajectoryDistance[sortedIndex], pointDistance)) {
-        return [sortedIndex - 1, sortedIndex, 1];
     }
 
     const lowerDistance = cumulativeTrajectoryDistance[sortedIndex - 1];
     const upperDistance = cumulativeTrajectoryDistance[sortedIndex];
 
-    return [
-        sortedIndex - 1,
-        sortedIndex,
-        (pointDistance - lowerDistance) / (upperDistance - lowerDistance),
-    ];
+    let segmentPos =
+        (pointDistance - lowerDistance) / (upperDistance - lowerDistance);
+
+    if (isClose(segmentPos, 0)) segmentPos = 0;
+    if (isClose(segmentPos, 1)) segmentPos = 1;
+
+    return [sortedIndex - 1, sortedIndex, segmentPos];
 }
 
 /**
@@ -342,7 +300,7 @@ export function getPositionAndAngleOnTrajectoryPath(
     positionAlongPath: number,
     trajectory: Position[],
     cumulativeTrajectoryDistance: number[],
-    projectionFunc: (xyz: number[]) => number[],
+    projectionFunc?: (xyz: number[]) => number[],
     is3d?: boolean
 ): [angle: number, position: Point2D | Point3D] {
     if (typeof is3d === "undefined") is3d = trajectory[0]?.length === 3;
@@ -352,6 +310,8 @@ export function getPositionAndAngleOnTrajectoryPath(
         throw Error(
             `Expected trajectory positions to be 3D, instead got ${trajectory[0].length} dimensions`
         );
+    if (is3d && typeof projectionFunc === "undefined")
+        throw Error("2D projection function required for 3d trajectories");
 
     let angle: number;
 
@@ -376,8 +336,8 @@ export function getPositionAndAngleOnTrajectoryPath(
 
     // We only need to project when we deal with 3 positions
     if (is3d) {
-        lowerProjectedPosition = projectionFunc(trajectory[lowerSegmentIndex]);
-        upperProjectedPosition = projectionFunc(trajectory[upperSegmentIndex]);
+        lowerProjectedPosition = projectionFunc!(trajectory[lowerSegmentIndex]);
+        upperProjectedPosition = projectionFunc!(trajectory[upperSegmentIndex]);
 
         // ? I don't understand why we need to apply this whenever we project from 3d, but the angle gets wrong if I don't
         lowerProjectedPosition[1] *= -1;
@@ -395,23 +355,26 @@ export function getPositionAndAngleOnTrajectoryPath(
     }
 
     segmentVec.normalize();
-    const rad = Math.atan2(segmentVec[1], segmentVec[0]);
-
-    angle = rad;
+    angle = Math.atan2(segmentVec[1], segmentVec[0]);
 
     if (is3d) return [angle, position as Point3D];
     return [angle, position as Point2D];
 }
 
+/**
+ * Computes an array of cumulative distances for a well's trajectory path.
+ *
+ * **Note:** This is usually equivalent to the MD-array, so you probably don't need this.
+ * @param well_xyz A list of positions that describe the wells trajectory
+ * @returns a list of cumulative distances
+ */
 export function getCumulativeDistance(well_xyz: Position[]): number[] {
+    if (!well_xyz.length) return [];
+
     const cumulativeDistance = [0];
     for (let i = 1; i < well_xyz.length; i++) {
         const p1 = well_xyz[i - 1];
         const p2 = well_xyz[i];
-
-        if (!p1 || !p2) {
-            continue;
-        }
 
         const v0 = new Vector3(p1);
         const v1 = new Vector3(p2);
@@ -433,7 +396,13 @@ export function injectMdPoints(
     ...mdValuesToInject: number[]
 ): WellFeature {
     const path = getLineStringGeometry(well)?.coordinates ?? [];
-    const md = well.properties.md[0] ?? [];
+    const md = well.properties.md[0] ?? getCumulativeDistance(path);
+
+    if (path.length !== md.length) {
+        throw new Error(
+            "Cannot inject MD points, md and path are of different length"
+        );
+    }
 
     const newPath = [...path];
     const newMd = [...md];

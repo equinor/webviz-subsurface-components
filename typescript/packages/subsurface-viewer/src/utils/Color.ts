@@ -40,26 +40,24 @@ export function toNormalizedColor(
 }
 
 /**
- * Blends to color arrays together, following deckk.gl's color blending approach.
- * @param color1 The first color to blend
- * @param color2 The second color to blend
- * @param mixRatio The ratio of color2 in the blend. 0 = only color1, 1 = only color2
+ * Blends to color arrays together, following an additive blending pattern.
+ * @param baseColor The underlying color.
+ * @param addedColor The color to add on top. If this color has no opacity, the base color is fully overwritten
  * @returns The blended color as an RGBA array
  */
-export function blendColors(
-    color1: Color,
-    color2: Color,
-    mixRatio: number = 0.5 // 0.5 seems to give the same color as Deck.gl
-) {
-    const alpha1 = (color1[3] ?? 255) / 255;
-    const alpha2 = (color2[3] ?? 255) / 255;
+export function blendColors(baseColor: Color, addedColor: Color) {
+    const alpha1 = (baseColor[3] ?? 255) / 255;
+    const alpha2 = (addedColor[3] ?? 255) / 255;
 
-    return [
-        color1[0] * (1 - mixRatio) + color2[0] * mixRatio,
-        color1[1] * (1 - mixRatio) + color2[1] * mixRatio,
-        color1[2] * (1 - mixRatio) + color2[2] * mixRatio,
+    const mixedAlpha = 1 - (1 - alpha2) * (1 - alpha1);
 
-        // Blend alpha
-        Math.min(255, (alpha1 + alpha2 * (1 - alpha1) * mixRatio) * 255),
-    ];
+    const mixChannel = (channel: number) => {
+        const channel1Res =
+            addedColor[channel] * alpha2 +
+            baseColor[channel] * alpha1 * (1 - alpha2);
+
+        return Math.round(channel1Res / mixedAlpha);
+    };
+
+    return [mixChannel(0), mixChannel(1), mixChannel(2), mixedAlpha * 255];
 }
