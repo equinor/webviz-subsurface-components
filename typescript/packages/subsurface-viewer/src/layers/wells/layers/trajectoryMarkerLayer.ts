@@ -200,9 +200,10 @@ export class TrajectoryMarkersLayer<TData = unknown> extends CompositeLayer<
                         posFragment,
                         trajectoryPath,
                         cumulativePathDistance,
-                        // Arrow func to preserve "this"
-                        (xyz) => this.project(xyz),
-                        this.props.positionFormat === "XYZ"
+
+                        // We'll disregard 3D positioning here; the markers look nicer when they're "flat"
+                        undefined,
+                        false
                     );
 
                 const markerData: MarkerData<TData> = {
