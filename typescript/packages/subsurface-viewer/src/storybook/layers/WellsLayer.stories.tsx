@@ -1479,7 +1479,6 @@ export const PerforationsAndScreens: StoryObj<PerforationAndScreenArgs> = {
 };
 
 type TrajectoryFilterArgs = {
-    use3dView: boolean;
     mdFilterRangeStart: number;
     mdFilterRangeEnd: number;
 
@@ -1495,7 +1494,6 @@ const WELL_NAMES = volveWellsJson.features.map((f) => f.properties.name);
 
 export const TrajectoryFilter: StoryObj<TrajectoryFilterArgs> = {
     args: {
-        use3dView: true,
         mdFilterRangeStart: 2200,
         mdFilterRangeEnd: 3500,
 
@@ -1558,13 +1556,13 @@ function TrajectoryFilterComponent(
                 {
                     id: "viewport1",
                     layerIds: ["wells-layer-filtered"],
-                    viewType: props.use3dView ? OrbitView : OrthographicView,
+                    viewType: OrbitView,
                     zoom: -1.5,
                 },
                 {
                     id: "viewport2",
                     layerIds: ["wells-layer-filtered-ghost"],
-                    viewType: props.use3dView ? OrbitView : OrthographicView,
+                    viewType: OrthographicView,
                     zoom: -1.5,
                 },
                 {
@@ -1576,7 +1574,7 @@ function TrajectoryFilterComponent(
                 },
             ],
         }),
-        [props.use3dView]
+        []
     );
 
     // Inject perforation and screens added in args
