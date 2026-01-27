@@ -395,34 +395,28 @@ function getSectionFilterValue(
     endFraction: number
 ): undefined | number | number[] {
     if (!Array.isArray(filterValue)) return filterValue;
+    if (startFraction === 0 && endFraction === 1) return [...filterValue];
     if (filterValue.length !== cumulativePathDistance.length) {
         throw Error(
             "Expected filter value array to be same length as path computation array"
         );
     }
 
-    if (startFraction === 0 && endFraction === 1) return filterValue;
-
-    const [lowerIndexStart, upperIndexStart] =
-        getFractionPositionSegmentIndices(
-            startFraction,
+    const { sliceStart, sliceEnd, startSegment, endSegment } =
+        computeSliceIndices(
             filterValue,
-            cumulativePathDistance
+            cumulativePathDistance,
+            startFraction,
+            endFraction
         );
 
-    const [lowerIndexEnd, upperIndexEnd] = getFractionPositionSegmentIndices(
-        endFraction,
-        filterValue,
-        cumulativePathDistance
-    );
-
-    const startFilterValue = filterValue[lowerIndexStart];
-    const endFilterValue = filterValue[upperIndexEnd];
+    const startFilterValue = startSegment[0];
+    const endFilterValue = endSegment[1];
 
     // Build a segment of positions
     const segment = [
         startFilterValue,
-        ...filterValue.slice(upperIndexStart, lowerIndexEnd + 1),
+        ...filterValue.slice(sliceStart, sliceEnd),
         endFilterValue,
     ];
 
@@ -443,48 +437,83 @@ function getSectionPathPositions(
         );
     }
 
+    const { sliceStart, sliceEnd, startSegment, endSegment } =
+        computeSliceIndices(
+            path,
+            cumulativePathDistance,
+            startFraction,
+            endFraction
+        );
+
+    const startPosition = _.zipWith(
+        startSegment[0],
+        startSegment[1],
+        (pl, pu) => {
+            return pl + startSegment[2] * (pu - pl);
+        }
+    );
+
+    const endPosition = _.zipWith(endSegment[0], endSegment[1], (pl, pu) => {
+        return pl + endSegment[2] * (pu - pl);
+    });
+
+    // Build a segment of positions
+    const segment: Position[] = [
+        startPosition,
+        ...path.slice(sliceStart, sliceEnd),
+        endPosition,
+    ];
+
+    return segment;
+}
+
+function computeSliceIndices<T>(
+    dataArr: T[],
+    cumulativePathDistance: number[],
+    startFraction: number,
+    endFraction: number
+): {
+    startSegment: [T, T, number];
+    endSegment: [T, T, number];
+    sliceStart: number;
+    sliceEnd: number;
+} {
+    if (cumulativePathDistance.length !== dataArr.length) {
+        throw Error(
+            "Expected distance and data array to be same length as path array"
+        );
+    }
+
     const [lowerIndexStart, upperIndexStart, sectionFractionStart] =
         getFractionPositionSegmentIndices(
             startFraction,
-            path,
+            dataArr,
             cumulativePathDistance
         );
 
     const [lowerIndexEnd, upperIndexEnd, sectionFractionEnd] =
         getFractionPositionSegmentIndices(
             endFraction,
-            path,
+            dataArr,
             cumulativePathDistance
         );
-
-    const startPosition = _.zipWith(
-        path[lowerIndexStart],
-        path[upperIndexStart],
-        (pl, pu) => {
-            return pl + sectionFractionStart * (pu - pl);
-        }
-    );
-
-    const endPosition = _.zipWith(
-        path[lowerIndexEnd],
-        path[upperIndexEnd],
-        (pl, pu) => {
-            return pl + sectionFractionEnd * (pu - pl);
-        }
-    );
 
     const sliceStartOffset = isClose(sectionFractionStart, 1) ? 1 : 0;
     const sliceEndOffset = isClose(sectionFractionEnd, 0) ? 2 : 1;
 
-    // Build a segment of positions
-    const segment: Position[] = [
-        startPosition,
-        ...path.slice(
-            upperIndexStart + sliceStartOffset,
-            lowerIndexEnd + sliceEndOffset
-        ),
-        endPosition,
-    ];
+    return {
+        startSegment: [
+            dataArr[lowerIndexStart],
+            dataArr[upperIndexStart],
+            sectionFractionStart,
+        ],
+        endSegment: [
+            dataArr[lowerIndexEnd],
+            dataArr[upperIndexEnd],
+            sectionFractionEnd,
+        ],
 
-    return segment;
+        sliceStart: upperIndexStart + sliceStartOffset,
+        sliceEnd: lowerIndexEnd + sliceEndOffset,
+    };
 }
