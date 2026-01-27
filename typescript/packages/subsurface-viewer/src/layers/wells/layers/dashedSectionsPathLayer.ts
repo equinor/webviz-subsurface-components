@@ -99,6 +99,7 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
             );
 
         const dataChanged = changeFlags.dataChanged;
+
         const pathChanged = hasUpdateTriggerChanged(changeFlags, "getPath");
         const cumulativePathDistanceChanged = hasUpdateTriggerChanged(
             changeFlags,
@@ -109,10 +110,16 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
             "getDashedSectionsAlongPath"
         );
 
+        const filterValueChanged = hasUpdateTriggerChanged(
+            changeFlags,
+            "getFilterValue"
+        );
+
         if (
             dataChanged ||
             pathChanged ||
             cumulativePathDistanceChanged ||
+            filterValueChanged ||
             sectionsChanged
         ) {
             // Each path will need to be split into two data sets based on whether the section is dashed or not.
@@ -365,6 +372,11 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
                             highPrecisionDash: true,
                         }),
                     ],
+
+                    updateTriggers: {
+                        getFilterValue:
+                            this.props.updateTriggers["getFilterValue"],
+                    },
                 } as Partial<PathLayerProps>),
                 // ! These props gets overriden if included inside getSubLayerProps
                 getDashArray: this.props.getScreenDashArray,
@@ -380,6 +392,11 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
                     data: this.state.normalPathSubLayerData,
                     getColor: this.getSubLayerAccessor(this.props.getColor),
                     parameters: this.props.parameters,
+
+                    updateTriggers: {
+                        getFilterValue:
+                            this.props.updateTriggers["getFilterValue"],
+                    },
                 } as Partial<PathLayerProps>),
                 getFilterValue: (d: MarkerData) =>
                     d.properties?.["filterValue"],

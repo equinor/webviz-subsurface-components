@@ -355,7 +355,11 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 props.ZIncreasingDownwards,
                 oldProps.ZIncreasingDownwards
             ) ||
-            !isEqual(props.refine, oldProps.refine);
+            !isEqual(props.refine, oldProps.refine) ||
+            !isEqual(props.enableFilters, oldProps.enableFilters) ||
+            !isEqual(props.mdFilterRange, oldProps.mdFilterRange) ||
+            !isEqual(props.formationFilter, oldProps.formationFilter);
+
         if (needs_reload) {
             this.recomputeDataState();
         }
@@ -584,6 +588,13 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                     this.props.formationFilter,
                     this.props.wellNameFilter
                 ),
+            updateTriggers: {
+                getFilterValue: [
+                    this.props.formationFilter,
+                    this.props.wellNameFilter,
+                    ...sanitizedFilterBands,
+                ],
+            },
 
             // Override path layer to use opt-in screen dashes
             _subLayerProps: {
@@ -665,6 +676,13 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 [GL.POLYGON_OFFSET_FACTOR]: 1,
                 [GL.POLYGON_OFFSET_UNITS]: 1,
             },
+            updateTriggers: {
+                getFilterValue: [
+                    this.props.formationFilter,
+                    this.props.wellNameFilter,
+                    ...sanitizedFilterBands,
+                ],
+            },
         } as GeoJsonLayerProps);
 
         const outlineLayerProps = this.getSubLayerProps({
@@ -698,6 +716,14 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 ...parameters,
                 [GL.POLYGON_OFFSET_FACTOR]: 1,
                 [GL.POLYGON_OFFSET_UNITS]: 1,
+            },
+
+            updateTriggers: {
+                getFilterValue: [
+                    this.props.formationFilter,
+                    this.props.wellNameFilter,
+                    ...sanitizedFilterBands,
+                ],
             },
 
             // Override path layer to use opt-in screen dashes
@@ -821,6 +847,11 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                     getMarkers: [
                         this.props.showScreenMarkers,
                         this.props.showPerforationsMarkers,
+                    ],
+                    getFilterValue: [
+                        this.props.formationFilter,
+                        this.props.wellNameFilter,
+                        ...sanitizedFilterBands,
                     ],
                 },
 
@@ -1258,7 +1289,7 @@ function makeSanitizedFilterBands(
         );
     }
 
-    let [rangeStart, rangeEnd] = mdFilter as [number, number];
+    let [rangeStart = -1, rangeEnd = -1] = mdFilter as [number, number];
 
     if (rangeStart === -1 && rangeEnd === -1) return [];
     if (rangeStart === -1) rangeStart = Number.NEGATIVE_INFINITY;
