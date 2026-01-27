@@ -70,5 +70,13 @@ describe("Color utilities", () => {
             expect(result1).toEqual([0, 0, 255, 255]);
             expect(result2).toEqual([255, 0, 0, 255]);
         });
+
+        it("should return transparent black when both colors are fully transparent", () => {
+            const color1: RGBAColor = [255, 0, 0, 0];
+            const color2: RGBAColor = [0, 0, 255, 0];
+
+            const result = blendColors(color1, color2);
+            expect(result).toEqual([0, 0, 0, 0]);
+        });
     });
 });
