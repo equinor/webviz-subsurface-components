@@ -21,11 +21,7 @@ import volveWellsJson from "../../../../../../example-data/volve_wells.json";
 
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
-import type {
-    MapMouseEvent,
-    ViewStateType,
-    ViewsType,
-} from "../../components/Map";
+import type { MapMouseEvent, ViewsType } from "../../components/Map";
 import { Axes2DLayer } from "../../layers";
 import AxesLayer from "../../layers/axes/axesLayer";
 import { useAbscissaTransform } from "../../layers/wells/hooks/useAbscissaTransform";
@@ -1339,7 +1335,7 @@ function PerforationsAndScreensComponent(
         } as WellFeatureCollection;
     }, [perforationAndScreensByWellIndex]);
 
-    const wellsLayerWithPerforations: Partial<WellsLayerProps> = {
+    const wellsLayerWithPerforations = new WellsLayer({
         ...volveWellsFromResourcesLayer,
 
         data: volveWellsWithMarkers,
@@ -1353,11 +1349,11 @@ function PerforationsAndScreensComponent(
         showPerforationsMarkers: showPerforations,
         showScreenTrajectory: showScreens,
         showScreenMarkers: showScreens,
-    };
+    });
 
     const { transform } = useAbscissaTransform();
 
-    const unfoldedWells: Partial<WellsLayerProps> = new WellsLayer({
+    const unfoldedWells = new WellsLayer({
         id: "unfolded-wells",
         data: volveWellsWithMarkers,
         section: transform,
@@ -1557,7 +1553,7 @@ function TrajectoryFilterComponent(
 ) {
     const views = React.useMemo<ViewsType>(
         () => ({
-            layout: [1, 2] as [number, number],
+            layout: [2, 2] as [number, number],
             viewports: [
                 {
                     id: "viewport1",
@@ -1570,6 +1566,13 @@ function TrajectoryFilterComponent(
                     layerIds: ["wells-layer-filtered-ghost"],
                     viewType: props.use3dView ? OrbitView : OrthographicView,
                     zoom: -1.5,
+                },
+                {
+                    id: "viewport3",
+                    target: [3000, -1500],
+                    viewType: SectionView,
+                    zoom: -4.5,
+                    layerIds: ["unfolded-wells"],
                 },
             ],
         }),
@@ -1627,7 +1630,7 @@ function TrajectoryFilterComponent(
         } as WellFeatureCollection;
     }, [formationsByWellIndex]);
 
-    const wellsLayerWithPerforations: Partial<WellsLayerProps> = {
+    const wellsLayerWithPerforations = new WellsLayer({
         ...volveWellsFromResourcesLayer,
         id: "wells-layer-filtered",
         data: volveWellsWithFormations,
@@ -1647,9 +1650,9 @@ function TrajectoryFilterComponent(
         pickable: true,
         autoHighlight: true,
         outline: true,
-    };
+    });
 
-    const wellsLayerWithPerforationsWithGhost: Partial<WellsLayerProps> = {
+    const wellsLayerWithPerforationsWithGhost = new WellsLayer({
         ...volveWellsFromResourcesLayer,
         id: "wells-layer-filtered-ghost",
         data: volveWellsWithFormations,
@@ -1669,21 +1672,22 @@ function TrajectoryFilterComponent(
         pickable: true,
         autoHighlight: true,
         outline: true,
-    };
+    });
 
-    // This camera state gives a decent angle for the smoke test screenshot
-    const initialCameraPosition: ViewStateType = {
-        height: 735,
-        width: 1701,
-        zoom: -2.395835621116446,
-        minZoom: -12,
-        maxZoom: 3,
-        rotationOrbit: -10.654253260221996,
-        rotationX: 27.467130964273807,
-        maxRotationX: 90,
-        minRotationX: -90,
-        target: [436626.50202926976, 6477484.086298338, -1531.1769336680954],
-    };
+    const unfoldedWells = new WellsLayer({
+        id: "unfolded-wells",
+        data: volveWellsWithFormations,
+        section: true,
+        ZIncreasingDownwards: false,
+        outline: true,
+
+        enableFilters: true,
+
+        showFilterTrajectoryGhost: true,
+        mdFilterRange: [props.mdFilterRangeStart, props.mdFilterRangeEnd],
+        formationFilter: props.formationFilter,
+        wellNameFilter: props.wellNameFilter,
+    });
 
     const propsWithLayers: Partial<SubsurfaceViewerProps> = {
         ...props,
@@ -1692,8 +1696,8 @@ function TrajectoryFilterComponent(
         layers: [
             wellsLayerWithPerforations,
             wellsLayerWithPerforationsWithGhost,
+            unfoldedWells,
         ],
-        cameraPosition: initialCameraPosition,
     };
 
     return (
