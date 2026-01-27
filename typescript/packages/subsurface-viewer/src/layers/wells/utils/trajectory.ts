@@ -303,14 +303,14 @@ export function getPositionAndAngleOnTrajectoryPath(
     projectionFunc?: (xyz: number[]) => number[],
     is3d?: boolean
 ): [angle: number, position: Point2D | Point3D] {
-    if (typeof is3d === "undefined") is3d = trajectory[0]?.length === 3;
+    if (is3d === undefined) is3d = trajectory[0]?.length === 3;
     if (!trajectory.length && is3d) return [0, [0, 0, 0]];
     if (!trajectory.length && !is3d) return [0, [0, 0]];
     if (is3d && trajectory[0].length < 3)
         throw Error(
             `Expected trajectory positions to be 3D, instead got ${trajectory[0].length} dimensions`
         );
-    if (is3d && typeof projectionFunc === "undefined")
+    if (is3d && projectionFunc === undefined)
         throw Error("2D projection function required for 3d trajectories");
 
     let angle: number;

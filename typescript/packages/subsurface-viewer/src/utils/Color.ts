@@ -51,6 +51,8 @@ export function blendColors(baseColor: Color, addedColor: Color) {
 
     const mixedAlpha = 1 - (1 - alpha2) * (1 - alpha1);
 
+    if (mixedAlpha === 0) return [0, 0, 0, 0];
+
     const mixChannel = (channel: number) => {
         const channel1Res =
             addedColor[channel] * alpha2 +

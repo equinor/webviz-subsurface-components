@@ -212,12 +212,12 @@ export interface WellsLayerProps extends ExtendedLayerProps {
 
     /** Enables simple line markers at the start and end of screen sections.
      *
-     * **Note:** These markers are currently is only designed for 2D, so they are not guaranteed to look nice in 3D
+     * **Note:** These markers are currently only designed for 2D, so they are not guaranteed to look nice in 3D
      */
     showScreenMarkers: boolean;
     /** Enables visualization of trajectory perforations.
      *
-     * **Note:** These markers are currently is only designed for 2D, so they are not guaranteed to look nice in 3D
+     * **Note:** These markers are currently only designed for 2D, so they are not guaranteed to look nice in 3D
      */
     showPerforationsMarkers: boolean;
 
@@ -306,7 +306,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         }
 
         if (this.props.enableFilters) {
-            transformedData = injectFilterData(
+            transformedData = injectMdPointsForFilter(
                 transformedData,
                 this.props.mdFilterRange
             );
@@ -1196,7 +1196,7 @@ function getTvdProperty(
 }
 
 // Injects MD points that will be required for cutting trajectories at the correct points
-function injectFilterData(
+function injectMdPointsForFilter(
     data: WellFeatureCollection,
     mdFilterRange: WellsLayerProps["mdFilterRange"]
 ): WellFeatureCollection {
