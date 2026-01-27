@@ -21,7 +21,11 @@ import volveWellsJson from "../../../../../../example-data/volve_wells.json";
 
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
-import type { MapMouseEvent, ViewStateType } from "../../components/Map";
+import type {
+    MapMouseEvent,
+    ViewStateType,
+    ViewsType,
+} from "../../components/Map";
 import { Axes2DLayer } from "../../layers";
 import AxesLayer from "../../layers/axes/axesLayer";
 import { useAbscissaTransform } from "../../layers/wells/hooks/useAbscissaTransform";
@@ -49,7 +53,6 @@ import {
     WELL_COUNT_ARGTYPES,
 } from "../constant/argTypes";
 import {
-    default2DViews,
     default3DViews,
     defaultStoryParameters,
     volveWellsBounds,
@@ -1290,7 +1293,6 @@ export const UnfoldedProjection: StoryObj<
 
 type PerforationAndScreenArgs = {
     outline: boolean;
-    use3dView: boolean;
     showPerforations: boolean;
     showScreens: boolean;
     perforations: (PerforationProperties & { wellIndex: number })[];
@@ -1300,13 +1302,7 @@ type PerforationAndScreenArgs = {
 function PerforationsAndScreensComponent(
     props: SubsurfaceViewerProps & PerforationAndScreenArgs
 ) {
-    const { perforations, screens, showPerforations, showScreens, use3dView } =
-        props;
-
-    const views = React.useMemo(() => {
-        if (use3dView) return default3DViews;
-        return undefined;
-    }, [use3dView]);
+    const { perforations, screens, showPerforations, showScreens } = props;
 
     // Inject perforation and screens added in args
     const perforationAndScreensByWellIndex = React.useMemo(() => {
@@ -1357,31 +1353,57 @@ function PerforationsAndScreensComponent(
         showPerforationsMarkers: showPerforations,
         showScreenTrajectory: showScreens,
         showScreenMarkers: showScreens,
-
-        updateTriggers: {
-            dataTransform: [perforationAndScreensByWellIndex],
-        },
     };
+
+    const { transform } = useAbscissaTransform();
+
+    const unfoldedWells: Partial<WellsLayerProps> = new WellsLayer({
+        id: "unfolded-wells",
+        data: volveWellsWithMarkers,
+        section: transform,
+        ZIncreasingDownwards: false,
+        outline: props.outline,
+
+        showPerforationsMarkers: showPerforations,
+        showScreenMarkers: showScreens,
+        showScreenTrajectory: showScreens,
+    });
+
+    const views = React.useMemo<ViewsType>(
+        () => ({
+            layout: [2, 2] as [number, number],
+            viewports: [
+                {
+                    id: "viewport1",
+                    layerIds: ["volve-wells"],
+                    viewType: OrbitView,
+
+                    zoom: -1.5,
+                },
+                {
+                    id: "viewport2",
+                    layerIds: ["volve-wells"],
+                    viewType: OrthographicView,
+                    zoom: -1.5,
+                },
+                {
+                    id: "viewport3",
+                    target: [3000, -1500],
+                    viewType: SectionView,
+                    zoom: -4.5,
+                    layerIds: ["unfolded-wells"],
+                },
+            ],
+        }),
+        []
+    );
 
     const propsWithLayers: Partial<SubsurfaceViewerProps> = {
         ...props,
         views: views,
         pickingRadius: 6,
         bounds: volveWellsBounds,
-        layers: [wellsLayerWithPerforations],
-        // This position is zoomed to showcase the example screen and perforations
-        cameraPosition: {
-            height: 777,
-            maxRotationX: 90,
-            maxZoom: 3,
-            minRotationX: -90,
-            minZoom: -12,
-            rotationOrbit: -30.428047289033827,
-            rotationX: 90,
-            target: [435903.9447562302, 6478365.7145422315, 0],
-            width: 1338,
-            zoom: -0.5089082423922854,
-        },
+        layers: [wellsLayerWithPerforations, unfoldedWells],
     };
 
     return (
@@ -1392,7 +1414,6 @@ function PerforationsAndScreensComponent(
 export const PerforationsAndScreens: StoryObj<PerforationAndScreenArgs> = {
     args: {
         outline: true,
-        use3dView: false,
         showScreens: true,
         showPerforations: true,
         perforations: [
@@ -1440,6 +1461,12 @@ export const PerforationsAndScreens: StoryObj<PerforationAndScreenArgs> = {
                 mdStart: 2000,
                 mdEnd: 3000,
             },
+            {
+                wellIndex: 1,
+                name: 'SuperScreen 25x35"',
+                mdStart: 3000,
+                mdEnd: 4000,
+            },
         ],
     },
     parameters: {
@@ -1460,8 +1487,6 @@ type TrajectoryFilterArgs = {
     mdFilterRangeStart: number;
     mdFilterRangeEnd: number;
 
-    showGhostTrajectory: boolean;
-
     formationFilter: string[];
     wellNameFilter: string[];
 };
@@ -1477,8 +1502,6 @@ export const TrajectoryFilter: StoryObj<TrajectoryFilterArgs> = {
         use3dView: true,
         mdFilterRangeStart: 2200,
         mdFilterRangeEnd: 3500,
-
-        showGhostTrajectory: false,
 
         formationFilter: [],
 
@@ -1532,8 +1555,24 @@ export const TrajectoryFilter: StoryObj<TrajectoryFilterArgs> = {
 function TrajectoryFilterComponent(
     props: SubsurfaceViewerProps & TrajectoryFilterArgs
 ) {
-    const view = React.useMemo(
-        () => (props.use3dView ? default3DViews : default2DViews),
+    const views = React.useMemo<ViewsType>(
+        () => ({
+            layout: [1, 2] as [number, number],
+            viewports: [
+                {
+                    id: "viewport1",
+                    layerIds: ["wells-layer-filtered"],
+                    viewType: props.use3dView ? OrbitView : OrthographicView,
+                    zoom: -1.5,
+                },
+                {
+                    id: "viewport2",
+                    layerIds: ["wells-layer-filtered-ghost"],
+                    viewType: props.use3dView ? OrbitView : OrthographicView,
+                    zoom: -1.5,
+                },
+            ],
+        }),
         [props.use3dView]
     );
 
@@ -1590,7 +1629,7 @@ function TrajectoryFilterComponent(
 
     const wellsLayerWithPerforations: Partial<WellsLayerProps> = {
         ...volveWellsFromResourcesLayer,
-
+        id: "wells-layer-filtered",
         data: volveWellsWithFormations,
 
         enableFilters: true,
@@ -1599,7 +1638,29 @@ function TrajectoryFilterComponent(
 
         mdFilterRange: [props.mdFilterRangeStart, props.mdFilterRangeEnd],
 
-        showFilterTrajectoryGhost: props.showGhostTrajectory,
+        showFilterTrajectoryGhost: false,
+        formationFilter: props.formationFilter,
+        wellNameFilter: props.wellNameFilter,
+
+        refine: false,
+        ZIncreasingDownwards: false,
+        pickable: true,
+        autoHighlight: true,
+        outline: true,
+    };
+
+    const wellsLayerWithPerforationsWithGhost: Partial<WellsLayerProps> = {
+        ...volveWellsFromResourcesLayer,
+        id: "wells-layer-filtered-ghost",
+        data: volveWellsWithFormations,
+
+        enableFilters: true,
+        showScreenMarkers: true,
+        showScreenTrajectory: true,
+
+        mdFilterRange: [props.mdFilterRangeStart, props.mdFilterRangeEnd],
+
+        showFilterTrajectoryGhost: true,
         formationFilter: props.formationFilter,
         wellNameFilter: props.wellNameFilter,
 
@@ -1626,9 +1687,12 @@ function TrajectoryFilterComponent(
 
     const propsWithLayers: Partial<SubsurfaceViewerProps> = {
         ...props,
-        views: view,
+        views: views,
         pickingRadius: 6,
-        layers: [wellsLayerWithPerforations],
+        layers: [
+            wellsLayerWithPerforations,
+            wellsLayerWithPerforationsWithGhost,
+        ],
         cameraPosition: initialCameraPosition,
     };
 
