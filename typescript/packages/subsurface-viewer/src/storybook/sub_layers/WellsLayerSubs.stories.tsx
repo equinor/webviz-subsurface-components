@@ -11,8 +11,8 @@ import type { Position } from "geojson";
 import { clamp, round } from "lodash";
 
 import { DashedSectionsPathLayer } from "../../layers/wells/layers/dashedSectionsPathLayer";
-import type { TrajectoryMarker } from "../../layers/wells/layers/trajectoryMarkerLayer";
-import { TrajectoryMarkersLayer } from "../../layers/wells/layers/trajectoryMarkerLayer";
+import type { WellMarker } from "../../layers/wells/layers/flatWellMarkersLayer";
+import { FlatWellMarkersLayer } from "../../layers/wells/layers/flatWellMarkersLayer";
 import type {
     WellFeature,
     WellFeatureCollection,
@@ -189,14 +189,14 @@ export const TrajectoryMarkers: Story = {
                     getPath: (d) => getTrajectoryCoordinates(d) as GlPosition[],
                     updateTriggers: { getPath: [args["use3dView"]] },
                 }),
-                new TrajectoryMarkersLayer({
+                new FlatWellMarkersLayer({
                     name: "Trajectory Marker Layer",
                     id: "well-markers",
                     data: wellData.features,
                     positionFormat: args["use3dView"] ? "XYZ" : "XY",
                     getLineWidth: 2,
                     lineWidthMinPixels: 1,
-                    getMarkerColor: (d: TrajectoryMarker) => {
+                    getMarkerColor: (d: WellMarker) => {
                         if (d.properties?.["status"] === "closed")
                             return [255, 0, 0];
                         if (d.properties?.["status"] === "open")
@@ -244,7 +244,7 @@ function getTrajectoryMarkers(
     d: WellFeature,
     itemInfo: AccessorContext<WellFeature>,
     markerPosition: number
-): TrajectoryMarker[] {
+): WellMarker[] {
     if (itemInfo.index % 4 === 0)
         return [
             {

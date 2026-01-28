@@ -26,7 +26,7 @@ import {
     getFractionPositionSegmentIndices,
     interpolateDataOnTrajectory,
 } from "../utils/trajectory";
-import type { MarkerData } from "./trajectoryMarkerLayer";
+import type { MarkerData } from "./flatWellMarkersLayer";
 
 export enum SubLayerId {
     DASHED_PATH = "dashed-paths",

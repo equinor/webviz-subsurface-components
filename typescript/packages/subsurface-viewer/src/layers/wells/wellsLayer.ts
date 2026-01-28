@@ -44,11 +44,8 @@ import type { NumberPair } from "../types";
 import { DashedSectionsPathLayer } from "./layers/dashedSectionsPathLayer";
 import type { LogCurveLayerProps } from "./layers/logCurveLayer";
 import { LogCurveLayer } from "./layers/logCurveLayer";
-import type {
-    MarkerData,
-    TrajectoryMarker,
-} from "./layers/trajectoryMarkerLayer";
-import { TrajectoryMarkersLayer } from "./layers/trajectoryMarkerLayer";
+import type { MarkerData, WellMarker } from "./layers/flatWellMarkersLayer";
+import { FlatWellMarkersLayer } from "./layers/flatWellMarkersLayer";
 import type { WellLabelLayerProps } from "./layers/wellLabelLayer";
 import { WellLabelLayer } from "./layers/wellLabelLayer";
 import type {
@@ -838,7 +835,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             } as Partial<LogCurveLayerProps>),
         });
 
-        const markerLayer = new TrajectoryMarkersLayer(
+        const markerLayer = new FlatWellMarkersLayer(
             this.getSubLayerProps({
                 ...defaultLayerProps,
                 visible: !fastDrawing,
@@ -886,11 +883,11 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
                     if (maxMd === undefined || maxMd === 0) return [];
 
-                    const markers: TrajectoryMarker[] = [];
+                    const markers: WellMarker[] = [];
 
                     if (this.props.showScreenMarkers) {
                         markers.push(
-                            ...screens.flatMap<TrajectoryMarker>((s) => [
+                            ...screens.flatMap<WellMarker>((s) => [
                                 {
                                     type: "screen-start",
                                     positionAlongPath: s.mdStart / maxMd,
@@ -905,7 +902,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
                     if (this.props.showPerforationsMarkers) {
                         markers.push(
-                            ...perforations.map<TrajectoryMarker>((p) => ({
+                            ...perforations.map<WellMarker>((p) => ({
                                 type: "perforation",
                                 positionAlongPath: p.md / maxMd,
                                 properties: p,

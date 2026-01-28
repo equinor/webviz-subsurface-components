@@ -42,7 +42,7 @@ export enum SubLayerId {
 }
 
 /** A marker that exists somewhere along a trajectory path */
-export type TrajectoryMarker = {
+export type WellMarker = {
     type: MarkerType;
     /* The marker's position along the path, as a float between 0-1 */
     positionAlongPath: number;
@@ -62,26 +62,28 @@ export type MarkerData<TData = unknown> = {
     markerIndex: number;
 };
 
-export type TrajectoryMarkerLayerProps<TData> = {
+export type FlatWellMarkersLayerProps<TData> = {
     data: LayerDataSource<TData>;
     outline: boolean;
     getTrajectoryPath: Accessor<TData, Position[]>;
     getCumulativePathDistance: Accessor<TData, number[]>;
-    getMarkers: Accessor<TData, TrajectoryMarker[]>;
-    getMarkerColor: Accessor<TrajectoryMarker, Color>;
+    getMarkers: Accessor<TData, WellMarker[]>;
+    getMarkerColor: Accessor<WellMarker, Color>;
 };
 
 // Although this layer only renders a path layer, we inherit props from GeoJson to make it easier to use within the WellsLayer. Future updates might include other types of markers (polygons, icons, etc) so the other properties might be relevant down the line.
 type InheritedGeoJsonProps = Omit<GeoJsonLayerProps, "data" | "getFillColor">;
 
 /**
- * Wells sub-layer for displaying different markers along a well trajectories
- * *Note:* Currently only supports markers in 2D
+ * Wells sub-layer for displaying assorted markers along the trajectory of a well. The layer
+ * is * primarily designed to be used in 2D views, so the markers are built by simple flat
+ * lines, and are aligned along the XY path of the trajectories. For 3D markers, see the
+ * `WellMarkersLayer` class
  */
-export class TrajectoryMarkersLayer<TData = unknown> extends CompositeLayer<
-    TrajectoryMarkerLayerProps<TData> & InheritedGeoJsonProps
+export class FlatWellMarkersLayer<TData = unknown> extends CompositeLayer<
+    FlatWellMarkersLayerProps<TData> & InheritedGeoJsonProps
 > {
-    static layerName = "TrajectoryMarkersLayer";
+    static layerName = "FlatWellMarkersLayer";
     static defaultProps = {
         getMarkers: { type: "accessor", value: [] },
         getMarkerColor: { type: "accessor", value: [0, 0, 0] },
@@ -319,12 +321,12 @@ export class TrajectoryMarkersLayer<TData = unknown> extends CompositeLayer<
             return baseColor;
         }
 
-        // Mimic auto-highlight behaviour
+        // Mimic auto-highlight behavior
         let highlightColor: Color;
 
         if (typeof this.props.highlightColor === "function") {
             console.warn(
-                "highlightColor from function is not supported in TrajectoryMarkersLayer"
+                "highlightColor from function is not supported in FlatWellMarkersLayer"
             );
             highlightColor = [0, 0, 128, 128];
         } else {
