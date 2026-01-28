@@ -2,6 +2,7 @@ import _, { isEmpty, isEqual } from "lodash";
 
 import type {
     Accessor,
+    AccessorContext,
     Color,
     Layer,
     LayerData,
@@ -234,15 +235,15 @@ export interface WellsLayerProps extends ExtendedLayerProps {
      * range value will inject a point into the path array; meaning layers will recompute
      * each time this is changed
      */
-    mdFilterRange: [number, number] | [number, number][];
+    mdFilterRange: Accessor<WellFeature, [number, number] | [number, number][]>;
+
+    /**
+     * Filters trajectory paths to formation sections.
+     */
+    formationFilter: Accessor<WellFeature, string[]>;
 
     /** Filters wells based on name */
     wellNameFilter: string[];
-
-    /**
-     * Filters trajectory paths to formation sections
-     */
-    formationFilter: string[];
 
     /** Shows a simple trajectory in place of filtered sections. If color is not specified, a light gray will be used */
     showFilterTrajectoryGhost: boolean | Color;
@@ -515,10 +516,6 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             return [];
         }
 
-        const sanitizedFilterBands = makeSanitizedFilterBands(
-            this.props.mdFilterRange
-        );
-
         const extensions = [
             new PathStyleExtension({
                 dash: isDashed,
@@ -581,18 +578,19 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
             // ? I should be able to use filterCategories: [1] and `getFilterCategory`, but it's not working for path section filtering
             filterRange: [1, 1],
-            getFilterValue: (d) =>
+            getFilterValue: (d, ctx) =>
                 getTrajectoryFilterCategory(
                     d,
-                    sanitizedFilterBands,
+                    this.props.mdFilterRange,
                     this.props.formationFilter,
-                    this.props.wellNameFilter
+                    this.props.wellNameFilter,
+                    ctx
                 ),
             updateTriggers: {
                 getFilterValue: [
-                    this.props.formationFilter,
                     this.props.wellNameFilter,
-                    ...sanitizedFilterBands,
+                    ...(this.props.updateTriggers["mdFilterRange"] ?? []),
+                    ...(this.props.updateTriggers["formationFilter"] ?? []),
                 ],
             },
 
@@ -653,12 +651,16 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
             // ? I should be able to use filterCategories: [1] and `getFilterCategory`, but it's not working for path section filtering
             filterRange: [1, 1],
-            getFilterValue: (d: WellFeature) => {
+            getFilterValue: (
+                d: WellFeature,
+                ctx: AccessorContext<WellFeature>
+            ) => {
                 const includeFilter = getTrajectoryFilterCategory(
                     d,
-                    sanitizedFilterBands,
+                    this.props.mdFilterRange,
                     this.props.formationFilter,
-                    this.props.wellNameFilter
+                    this.props.wellNameFilter,
+                    ctx
                 );
 
                 if (!Array.isArray(includeFilter)) return 1 - includeFilter;
@@ -678,9 +680,9 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             },
             updateTriggers: {
                 getFilterValue: [
-                    this.props.formationFilter,
                     this.props.wellNameFilter,
-                    ...sanitizedFilterBands,
+                    ...(this.props.updateTriggers["mdFilterRange"] ?? []),
+                    ...(this.props.updateTriggers["formationFilter"] ?? []),
                 ],
             },
         } as GeoJsonLayerProps);
@@ -703,12 +705,16 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             filterEnabled: this.props.enableFilters,
             // ? I should be able to use filterCategories: [1] and `getFilterCategory`, but it's not working for path section filtering
             filterRange: [1, 1],
-            getFilterValue: (d: WellFeature) =>
+            getFilterValue: (
+                d: WellFeature,
+                ctx: AccessorContext<WellFeature>
+            ) =>
                 getTrajectoryFilterCategory(
                     d,
-                    sanitizedFilterBands,
+                    this.props.mdFilterRange,
                     this.props.formationFilter,
-                    this.props.wellNameFilter
+                    this.props.wellNameFilter,
+                    ctx
                 ),
             getDashArray: getDashFactor(this.props.lineStyle?.dash),
             visible: this.props.outline && !fastDrawing,
@@ -720,9 +726,9 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
             updateTriggers: {
                 getFilterValue: [
-                    this.props.formationFilter,
                     this.props.wellNameFilter,
-                    ...sanitizedFilterBands,
+                    ...(this.props.updateTriggers["mdFilterRange"] ?? []),
+                    ...(this.props.updateTriggers["formationFilter"] ?? []),
                 ],
             },
 
@@ -849,9 +855,9 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                         this.props.showPerforationsMarkers,
                     ],
                     getFilterValue: [
-                        this.props.formationFilter,
                         this.props.wellNameFilter,
-                        ...sanitizedFilterBands,
+                        ...(this.props.updateTriggers["mdFilterRange"] ?? []),
+                        ...(this.props.updateTriggers["formationFilter"] ?? []),
                     ],
                 },
 
@@ -859,12 +865,16 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 filterEnabled: this.props.enableFilters,
                 filterRange: [1, 1],
 
-                getFilterValue: (d: WellFeature) =>
+                getFilterValue: (
+                    d: WellFeature,
+                    ctx: AccessorContext<WellFeature>
+                ) =>
                     getTrajectoryFilterCategory(
                         d,
-                        sanitizedFilterBands,
+                        this.props.mdFilterRange,
                         this.props.formationFilter,
-                        this.props.wellNameFilter
+                        this.props.wellNameFilter,
+                        ctx
                     ),
                 getCumulativePathDistance: (d: WellFeature) =>
                     d.properties.md[0],
@@ -1200,20 +1210,24 @@ function injectMdPointsForFilter(
     data: WellFeatureCollection,
     mdFilterRange: WellsLayerProps["mdFilterRange"]
 ): WellFeatureCollection {
-    const globalRequiredMds = mdFilterRange.flat().filter((i) => i !== -1);
-
     return {
         ...data,
-        features: data.features.map((feature) => {
+        features: data.features.map((feature, index) => {
             const { formations } = feature.properties;
+            const itemInfo: AccessorContext<WellFeature> = {
+                data: data.features,
+                target: [],
+                index,
+            };
+
+            const rangeMds = getFromAccessor(mdFilterRange, feature, itemInfo)
+                .flat()
+                .filter((i) => i !== -1);
 
             const formationMds =
                 formations?.flatMap((f) => [f.mdEnter, f.mdExit]) ?? [];
 
-            const allRequiredMds = _.chain([
-                ...formationMds,
-                ...globalRequiredMds,
-            ])
+            const allRequiredMds = _.chain([...formationMds, ...rangeMds])
                 .sort((a, b) => a - b)
                 .uniq()
                 .value();
@@ -1227,10 +1241,24 @@ function injectMdPointsForFilter(
 
 function getTrajectoryFilterCategory(
     feature: WellFeature,
-    sanitizedMdFilterBands: [number, number][],
-    formationFilter: string[],
-    wellNameFilter: string[]
+    mdFilterRangeAccessor: WellsLayerProps["mdFilterRange"],
+    formationFilterAccessor: WellsLayerProps["formationFilter"],
+    wellNameFilter: WellsLayerProps["wellNameFilter"],
+    itemInfo: AccessorContext<WellFeature>
 ): number | number[] {
+    const mdFilterRange = getFromAccessor(
+        mdFilterRangeAccessor,
+        feature,
+        itemInfo
+    );
+    const formationFilter = getFromAccessor(
+        formationFilterAccessor,
+        feature,
+        itemInfo
+    );
+
+    const sanitizedMdFilterBands = makeSanitizedFilterBands(mdFilterRange);
+
     if (
         !formationFilter.length &&
         !wellNameFilter.length &&
@@ -1273,7 +1301,7 @@ function getTrajectoryFilterCategory(
 }
 
 function makeSanitizedFilterBands(
-    mdFilter: WellsLayerProps["mdFilterRange"]
+    mdFilter: [number, number] | [number, number][]
 ): [number, number][] {
     if (!mdFilter) return [];
 
