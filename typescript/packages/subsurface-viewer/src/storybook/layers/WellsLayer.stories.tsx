@@ -1,47 +1,45 @@
-import type { Meta, StoryObj } from "@storybook/react";
 import type { SyntheticEvent } from "react";
 import React, { useState } from "react";
 
-import { Slider } from "@mui/material";
-import { styled } from "@mui/material/styles";
-import type { FeatureCollection, GeometryCollection } from "geojson";
-
-import type { ScaleHandler } from "@emerson-eps/color-tables/";
+import { OrbitView, OrthographicView, View } from "@deck.gl/core";
+import { PathStyleExtension } from "@deck.gl/extensions";
+import { PathLayer } from "@deck.gl/layers";
 import {
     ColorLegend,
     colorTables,
     createColorMapFunction as createColormapFunction,
 } from "@emerson-eps/color-tables";
+import type { ScaleHandler } from "@emerson-eps/color-tables/";
 import { NativeSelect } from "@equinor/eds-core-react";
+import { Slider } from "@mui/material";
+import { styled } from "@mui/material/styles";
+import type { Meta, StoryObj } from "@storybook/react";
+import type { FeatureCollection, GeometryCollection } from "geojson";
+
+import volveBlockingZoneLogJson from "../../../../../../example-data/volve_blocking_zonelog_logs.json";
+import volveWellsJson from "../../../../../../example-data/volve_wells.json";
 
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
-import type { MapMouseEvent } from "../../components/Map";
-
-import AxesLayer from "../../layers/axes/axesLayer";
-import type { WellFeatureCollection } from "../../layers/wells/types";
-import type { WellsLayerProps } from "../../layers/wells/wellsLayer";
-import WellsLayer from "../../layers/wells/wellsLayer";
-
+import type { MapMouseEvent, ViewsType } from "../../components/Map";
 import { Axes2DLayer } from "../../layers";
-import {
-    default3DViews,
-    defaultStoryParameters,
-    volveWellsBounds,
-    volveWellsFromResourcesLayer,
-    volveWellsResources,
-} from "../sharedSettings";
-
-import { View, OrbitView, OrthographicView } from "@deck.gl/core";
-import { PathStyleExtension } from "@deck.gl/extensions";
-import { PathLayer } from "@deck.gl/layers";
+import AxesLayer from "../../layers/axes/axesLayer";
 import { useAbscissaTransform } from "../../layers/wells/hooks/useAbscissaTransform";
 import type { WellLabelLayerProps } from "../../layers/wells/layers/wellLabelLayer";
 import { LabelOrientation } from "../../layers/wells/layers/wellLabelLayer";
+import type {
+    GeoJsonWellProperties,
+    PerforationProperties,
+    ScreenProperties,
+    WellFeatureCollection,
+} from "../../layers/wells/types";
 import {
     coarsenWells,
     DEFAULT_TOLERANCE,
 } from "../../layers/wells/utils/spline";
+import type { WellsLayerProps } from "../../layers/wells/wellsLayer";
+import WellsLayer from "../../layers/wells/wellsLayer";
+import { SectionView } from "../../views/sectionView";
 import {
     LABEL_MERGE_RADIUS_ARGTYPES,
     LABEL_ORIENTATION_ARGTYPES,
@@ -50,13 +48,19 @@ import {
     TRAJECTORY_SIMULATION_ARGTYPES,
     WELL_COUNT_ARGTYPES,
 } from "../constant/argTypes";
+import {
+    default3DViews,
+    defaultStoryParameters,
+    volveWellsBounds,
+    volveWellsFromResourcesLayer,
+    volveWellsResources,
+} from "../sharedSettings";
 import type { TrajectorySimulationProps, WellCount } from "../types/well";
 import { getRgba } from "../util/color";
 import {
     getSyntheticWells,
     useSyntheticWellCollection,
 } from "../util/wellSynthesis";
-import { SectionView } from "../../views/sectionView";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -1282,3 +1286,419 @@ export const UnfoldedProjection: StoryObj<
         );
     },
 };
+
+type PerforationAndScreenArgs = {
+    outline: boolean;
+    showPerforations: boolean;
+    showScreens: boolean;
+    perforations: (PerforationProperties & { wellIndex: number })[];
+    screens: (ScreenProperties & { wellIndex: number })[];
+};
+
+function PerforationsAndScreensComponent(
+    props: SubsurfaceViewerProps & PerforationAndScreenArgs
+) {
+    const { perforations, screens, showPerforations, showScreens } = props;
+
+    // Inject perforation and screens added in args
+    const perforationAndScreensByWellIndex = React.useMemo(() => {
+        const dict = new Map<
+            number,
+            Pick<GeoJsonWellProperties, "perforations" | "screens">
+        >();
+
+        perforations.forEach(({ wellIndex, ...rest }) => {
+            if (!dict.has(wellIndex))
+                dict.set(wellIndex, { perforations: [], screens: [] });
+            dict.get(wellIndex)?.perforations?.push({ ...rest });
+        });
+
+        screens.forEach(({ wellIndex, ...rest }) => {
+            if (!dict.has(wellIndex))
+                dict.set(wellIndex, { perforations: [], screens: [] });
+            dict.get(wellIndex)?.screens?.push({ ...rest });
+        });
+
+        return dict;
+    }, [perforations, screens]);
+
+    const volveWellsWithMarkers = React.useMemo(() => {
+        return {
+            ...volveWellsJson,
+            features: volveWellsJson.features.map((f, i) => ({
+                ...f,
+                properties: {
+                    ...f.properties,
+                    ...perforationAndScreensByWellIndex.get(i),
+                },
+            })),
+        } as WellFeatureCollection;
+    }, [perforationAndScreensByWellIndex]);
+
+    const wellsLayerWithPerforations = new WellsLayer({
+        ...volveWellsFromResourcesLayer,
+
+        data: volveWellsWithMarkers,
+
+        refine: false,
+        ZIncreasingDownwards: false,
+        pickable: true,
+        autoHighlight: true,
+        outline: props.outline,
+
+        showPerforationsMarkers: showPerforations,
+        showScreenTrajectory: showScreens,
+        showScreenMarkers: showScreens,
+    });
+
+    const { transform } = useAbscissaTransform();
+
+    const unfoldedWells = new WellsLayer({
+        id: "unfolded-wells",
+        data: volveWellsWithMarkers,
+        section: transform,
+        ZIncreasingDownwards: false,
+        outline: props.outline,
+
+        showPerforationsMarkers: showPerforations,
+        showScreenMarkers: showScreens,
+        showScreenTrajectory: showScreens,
+    });
+
+    const views = React.useMemo<ViewsType>(
+        () => ({
+            layout: [2, 2] as [number, number],
+            viewports: [
+                {
+                    id: "viewport1",
+                    layerIds: ["volve-wells"],
+                    viewType: OrbitView,
+
+                    zoom: -1.5,
+                },
+                {
+                    id: "viewport2",
+                    layerIds: ["volve-wells"],
+                    viewType: OrthographicView,
+                    zoom: -1.5,
+                },
+                {
+                    id: "viewport3",
+                    target: [3000, -1500],
+                    viewType: SectionView,
+                    zoom: -4.5,
+                    layerIds: ["unfolded-wells"],
+                },
+            ],
+        }),
+        []
+    );
+
+    const propsWithLayers: Partial<SubsurfaceViewerProps> = {
+        ...props,
+        views: views,
+        pickingRadius: 6,
+        bounds: volveWellsBounds,
+        layers: [wellsLayerWithPerforations, unfoldedWells],
+    };
+
+    return (
+        <SubsurfaceViewer id="perforations_and_screens" {...propsWithLayers} />
+    );
+}
+
+export const PerforationsAndScreens: StoryObj<PerforationAndScreenArgs> = {
+    args: {
+        outline: true,
+        showScreens: true,
+        showPerforations: true,
+        perforations: [
+            {
+                wellIndex: 0,
+                md: 4000,
+                status: "open",
+                name: "Perforation 00-aa",
+            },
+            {
+                wellIndex: 0,
+                md: 4005,
+                status: "open",
+                name: "Perforation 00-bb",
+            },
+            {
+                wellIndex: 0,
+                md: 4010,
+                status: "open",
+                name: "Perforation 00-cc",
+            },
+            {
+                wellIndex: 0,
+                md: 4030,
+                status: "open",
+                name: "Perforation 00-dd",
+            },
+            {
+                wellIndex: 0,
+                md: 4040,
+                status: "closed",
+                name: "Perforation 00-ee",
+            },
+            {
+                wellIndex: 0,
+                md: 4050,
+                status: "closed",
+                name: "Perforation 00-ff",
+            },
+        ],
+        screens: [
+            {
+                wellIndex: 8,
+                name: 'SuperScreen 25x35"',
+                mdStart: 2000,
+                mdEnd: 3000,
+            },
+            {
+                wellIndex: 1,
+                name: 'SuperScreen 25x35"',
+                mdStart: 3000,
+                mdEnd: 4000,
+            },
+        ],
+    },
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: "An example of wells with screens (dashed sections) and perforations (spikes)",
+            },
+        },
+    },
+    render: (args) => (
+        <PerforationsAndScreensComponent {...defaultProps} {...args} />
+    ),
+};
+
+type TrajectoryFilterArgs = {
+    mdFilterRangeStart: number;
+    mdFilterRangeEnd: number;
+
+    formationFilter: string[];
+    wellNameFilter: string[];
+};
+
+const ZONES = Object.keys(
+    volveBlockingZoneLogJson[0].metadata_discrete.ZONELOG.objects
+);
+
+const WELL_NAMES = volveWellsJson.features.map((f) => f.properties.name);
+
+export const TrajectoryFilter: StoryObj<TrajectoryFilterArgs> = {
+    args: {
+        mdFilterRangeStart: 2200,
+        mdFilterRangeEnd: 3500,
+
+        formationFilter: [],
+
+        wellNameFilter: [],
+    },
+
+    argTypes: {
+        mdFilterRangeStart: {
+            control: {
+                type: "range",
+                min: -1,
+                max: 5000,
+                step: 1,
+            },
+        },
+        mdFilterRangeEnd: {
+            control: {
+                type: "range",
+                min: -1,
+                max: 5000,
+                step: 1,
+            },
+        },
+        formationFilter: {
+            options: ZONES,
+            control: "multi-select",
+        },
+
+        wellNameFilter: {
+            options: WELL_NAMES,
+            control: "multi-select",
+        },
+    },
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: "An example of wells with screens (dashed sections) and perforations (spikes)",
+            },
+        },
+    },
+    render: (args) => (
+        <TrajectoryFilterComponent
+            {...defaultProps}
+            {...args}
+            id="trajectory_filters"
+        />
+    ),
+};
+
+function TrajectoryFilterComponent(
+    props: SubsurfaceViewerProps & TrajectoryFilterArgs
+) {
+    const views = React.useMemo<ViewsType>(
+        () => ({
+            layout: [2, 2] as [number, number],
+            viewports: [
+                {
+                    id: "viewport1",
+                    layerIds: ["wells-layer-filtered"],
+                    viewType: OrbitView,
+                    zoom: -1.5,
+                },
+                {
+                    id: "viewport2",
+                    layerIds: ["wells-layer-filtered-ghost"],
+                    viewType: OrthographicView,
+                    zoom: -1.5,
+                },
+                {
+                    id: "viewport3",
+                    target: [3000, -1500],
+                    viewType: SectionView,
+                    zoom: -4.5,
+                    layerIds: ["unfolded-wells"],
+                },
+            ],
+        }),
+        []
+    );
+
+    // Inject perforation and screens added in args
+    const formationsByWellIndex = React.useMemo(() => {
+        const dict = new Map<string, GeoJsonWellProperties["formations"]>();
+
+        volveBlockingZoneLogJson.forEach((log) => {
+            const { data, header, metadata_discrete } = log;
+
+            if (!dict.has(header.well)) dict.set(header.well, []);
+
+            for (let index = 0; index < data.length - 1; index++) {
+                const [mdEnter, rowCode] = data[index];
+                const [mdExit] = data[index + 1];
+
+                const name = Object.entries(
+                    metadata_discrete.ZONELOG.objects
+                ).find(([, [, code]]) => code === rowCode)?.[0];
+
+                if (mdEnter != null && mdExit != null && name != null)
+                    dict.get(header.well)!.push({
+                        mdEnter,
+                        mdExit,
+                        name,
+                    });
+            }
+        });
+        return dict;
+    }, []);
+
+    const volveWellsWithFormations = React.useMemo(() => {
+        return {
+            ...volveWellsJson,
+            features: volveWellsJson.features.map((f, i) => ({
+                ...f,
+                properties: {
+                    ...f.properties,
+                    formations: formationsByWellIndex.get(f.properties.name),
+                    screens:
+                        i % 2 === 0
+                            ? [
+                                  {
+                                      name: 'SuperScreen 25x35"',
+                                      mdStart: 2000,
+                                      mdEnd: 3000,
+                                  },
+                              ]
+                            : undefined,
+                },
+            })),
+        } as WellFeatureCollection;
+    }, [formationsByWellIndex]);
+
+    const wellsLayerWithPerforations = new WellsLayer({
+        ...volveWellsFromResourcesLayer,
+        id: "wells-layer-filtered",
+        data: volveWellsWithFormations,
+
+        enableFilters: true,
+        showScreenMarkers: true,
+        showScreenTrajectory: true,
+
+        mdFilterRange: [props.mdFilterRangeStart, props.mdFilterRangeEnd],
+
+        showFilterTrajectoryGhost: false,
+        formationFilter: props.formationFilter,
+        wellNameFilter: props.wellNameFilter,
+
+        refine: false,
+        ZIncreasingDownwards: false,
+        pickable: true,
+        autoHighlight: true,
+        outline: true,
+    });
+
+    const wellsLayerWithPerforationsWithGhost = new WellsLayer({
+        ...volveWellsFromResourcesLayer,
+        id: "wells-layer-filtered-ghost",
+        data: volveWellsWithFormations,
+
+        enableFilters: true,
+        showScreenMarkers: true,
+        showScreenTrajectory: true,
+
+        mdFilterRange: [props.mdFilterRangeStart, props.mdFilterRangeEnd],
+
+        showFilterTrajectoryGhost: true,
+        formationFilter: props.formationFilter,
+        wellNameFilter: props.wellNameFilter,
+
+        refine: false,
+        ZIncreasingDownwards: false,
+        pickable: true,
+        autoHighlight: true,
+        outline: true,
+    });
+
+    const unfoldedWells = new WellsLayer({
+        id: "unfolded-wells",
+        data: volveWellsWithFormations,
+        section: true,
+        ZIncreasingDownwards: false,
+        outline: true,
+
+        enableFilters: true,
+
+        showFilterTrajectoryGhost: true,
+        mdFilterRange: [props.mdFilterRangeStart, props.mdFilterRangeEnd],
+        formationFilter: props.formationFilter,
+        wellNameFilter: props.wellNameFilter,
+    });
+
+    const propsWithLayers: Partial<SubsurfaceViewerProps> = {
+        ...props,
+        views: views,
+        pickingRadius: 6,
+        layers: [
+            wellsLayerWithPerforations,
+            wellsLayerWithPerforationsWithGhost,
+            unfoldedWells,
+        ],
+    };
+
+    return (
+        <SubsurfaceViewer {...propsWithLayers} id="perforations_and_screens" />
+    );
+}

@@ -1,6 +1,10 @@
 import "jest";
 
-import { distToSegmentSquared, isPointAwayFromLineEnd } from "./measurement";
+import {
+    distToSegmentSquared,
+    isClose,
+    isPointAwayFromLineEnd,
+} from "./measurement";
 import type { Position } from "geojson";
 
 describe("measurement utils", () => {
@@ -118,6 +122,41 @@ describe("measurement utils", () => {
             const result = isPointAwayFromLineEnd(point, [lineStart, lineEnd]);
 
             expect(result).toBe(false);
+        });
+    });
+
+    describe("isClose", () => {
+        it("should return true for close values", () => {
+            const a = 1.0;
+            const b = 1.0005;
+
+            const result = isClose(a, b);
+            expect(result).toBe(true);
+        });
+
+        it("should handle negative values", () => {
+            const a = -1.0;
+            const b = -1.0005;
+
+            const result = isClose(a, b);
+            expect(result).toBe(true);
+        });
+
+        it("should return false for distant values", () => {
+            const a = 1.0;
+            const b = 1.1;
+
+            const result = isClose(a, b);
+            expect(result).toBe(false);
+        });
+
+        it("should handle custom threshold", () => {
+            const a = 1.0;
+            const b = 1.01;
+            const threshold = 0.02;
+
+            const result = isClose(a, b, threshold);
+            expect(result).toBe(true);
         });
     });
 });

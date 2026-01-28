@@ -38,3 +38,28 @@ export function toNormalizedColor(
           ]
         : undefined;
 }
+
+/**
+ * Blends to color arrays together, following an additive blending pattern.
+ * @param baseColor The underlying color.
+ * @param addedColor The color to add on top. If this color has no opacity, the base color is fully overwritten
+ * @returns The blended color as an RGBA array
+ */
+export function blendColors(baseColor: Color, addedColor: Color) {
+    const alpha1 = (baseColor[3] ?? 255) / 255;
+    const alpha2 = (addedColor[3] ?? 255) / 255;
+
+    const mixedAlpha = 1 - (1 - alpha2) * (1 - alpha1);
+
+    if (mixedAlpha === 0) return [0, 0, 0, 0];
+
+    const mixChannel = (channel: number) => {
+        const channel1Res =
+            addedColor[channel] * alpha2 +
+            baseColor[channel] * alpha1 * (1 - alpha2);
+
+        return Math.round(channel1Res / mixedAlpha);
+    };
+
+    return [mixChannel(0), mixChannel(1), mixChannel(2), mixedAlpha * 255];
+}

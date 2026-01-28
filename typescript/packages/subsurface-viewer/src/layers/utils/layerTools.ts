@@ -1,15 +1,18 @@
+import type { colorTablesArray } from "@emerson-eps/color-tables/";
 import { Matrix4 } from "math.gl";
 
-import type { Accessor, AccessorContext, PickingInfo } from "@deck.gl/core";
-import type { Color, LayerContext } from "@deck.gl/core";
 import type {
-    Layer,
-    LayersList,
-    LayerManager,
+    Accessor,
+    AccessorContext,
+    ChangeFlags,
+    Color,
     CompositeLayerProps,
+    Layer,
+    LayerContext,
+    LayerManager,
+    LayersList,
+    PickingInfo,
 } from "@deck.gl/core";
-
-import type { colorTablesArray } from "@emerson-eps/color-tables/";
 
 import type {
     ContinuousLegendDataType,
@@ -216,4 +219,18 @@ export function getFromAccessor<In, Out>(
     // ensure that Out is never a function, so we'll just expect the error here (the same approach is used internally in Deck.gl)
     // @ts-expect-error -- Out is always a function here
     return accessor(data, objectInfo);
+}
+
+/**
+ * Checks if a specified updateTrigger is flagged as changed
+ * @param changeFlags The deck.gl change-flag object
+ * @param updateTriggerName The name of the trigger to check
+ * @returns true if the update trigger has changed
+ */
+export function hasUpdateTriggerChanged(
+    changeFlags: ChangeFlags,
+    updateTriggerName: string
+): boolean {
+    if (!changeFlags.updateTriggersChanged) return false;
+    return !!changeFlags.updateTriggersChanged[updateTriggerName];
 }

@@ -32,7 +32,8 @@ const createSyntheticWell = (
     headPosition: Point3D,
     sampleCount = 20,
     segmentLength = 150,
-    dipDeviationMagnitude = 10
+    dipDeviationMagnitude = 10,
+    zIncreasingDownwards = false
 ): WellFeature => {
     // Create a random well name
     const name = `Well ${index}`;
@@ -43,6 +44,7 @@ const createSyntheticWell = (
 
     // Create a random well geometry
     const coordinates = [headPosition];
+    const mdArray = [0];
 
     // Lead with at least three vertical segments
     const leadCount = Math.trunc(randomFunc() * (sampleCount - 2)) + 2;
@@ -51,6 +53,7 @@ const createSyntheticWell = (
         const y = coordinates[coordinates.length - 1][1];
         const z = coordinates[coordinates.length - 1][2] + segmentLength;
         coordinates.push([x, y, z]);
+        mdArray.push(mdArray.length * segmentLength);
     }
 
     let previousAzimuth = randomFunc() * Math.PI * 2;
@@ -72,15 +75,20 @@ const createSyntheticWell = (
         const z = prevSample[2] + segmentLength * Math.cos(dip);
 
         coordinates.push([x, y, z]);
+        mdArray.push(mdArray.length * segmentLength);
         previousAzimuth = azimuth;
         previousDip = dip;
+    }
+
+    if (zIncreasingDownwards) {
+        coordinates.forEach((c) => (c[2] *= -1));
     }
 
     return {
         type: "Feature",
         properties: {
             name,
-            md: [],
+            md: [mdArray],
             color: getRandomColor(),
         },
         geometry: {
@@ -123,10 +131,12 @@ export const createSyntheticWellCollection = (
         sampleCount,
         segmentLength,
         dipDeviationMagnitude,
+        zIncreasingDownwards,
     }: TrajectorySimulationProps = {
         sampleCount: 20,
         segmentLength: 150,
         dipDeviationMagnitude: 20,
+        zIncreasingDownwards: false,
     }
 ): WellFeatureCollection => {
     const wellHeads = SYNTHETIC_WELL_HEADS.slice(0, wellHeadCount);
@@ -144,7 +154,8 @@ export const createSyntheticWellCollection = (
             headPosition,
             sampleCount,
             segmentLength,
-            dipDeviationMagnitude
+            dipDeviationMagnitude,
+            zIncreasingDownwards
         );
         wells.push(syntheticWell);
     }
@@ -162,10 +173,12 @@ export const useSyntheticWellCollection = (
         sampleCount,
         segmentLength,
         dipDeviationMagnitude,
+        zIncreasingDownwards,
     }: TrajectorySimulationProps = {
         sampleCount: 20,
         segmentLength: 150,
         dipDeviationMagnitude: 10,
+        zIncreasingDownwards: false,
     }
 ): WellFeatureCollection =>
     React.useMemo(
@@ -174,6 +187,7 @@ export const useSyntheticWellCollection = (
                 sampleCount,
                 segmentLength,
                 dipDeviationMagnitude,
+                zIncreasingDownwards,
             }),
         [
             wellCount,
@@ -181,6 +195,7 @@ export const useSyntheticWellCollection = (
             sampleCount,
             segmentLength,
             dipDeviationMagnitude,
+            zIncreasingDownwards,
         ]
     );
 

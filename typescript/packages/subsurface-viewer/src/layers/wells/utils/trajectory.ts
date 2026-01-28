@@ -1,16 +1,25 @@
-import { distance, subtract, dot } from "mathjs";
 import type { AccessorContext, Color } from "@deck.gl/core";
 import type { LineString, Position } from "geojson";
+import _ from "lodash";
+import { Vector2, Vector3 } from "math.gl";
+import { distance, dot, subtract } from "mathjs";
 
+import type { Point2D, Point3D } from "../../../utils";
 import {
     distToSegmentSquared,
+    isClose,
     isPointAwayFromLineEnd,
 } from "../../../utils/measurement";
 import type { StyleAccessorFunction } from "../../types";
 import type { ColorAccessor, WellFeature } from "../types";
 import { getWellHeadPosition } from "./features";
 
-function getLineStringGeometry(
+/**
+ * Finds the nested geometry object that describes a well's trajectory
+ * @param well_object A GeoJSON Well Feature
+ * @returns A "LineString" object that describes the well's path
+ */
+export function getLineStringGeometry(
     well_object: WellFeature
 ): LineString | undefined {
     const geometries = well_object.geometry.geometries;
@@ -130,6 +139,10 @@ export function interpolateDataOnTrajectory(
         coord = survey1;
     }
 
+    if (index0 === 0 && isPointAwayFromLineEnd(coord, [survey1, survey0])) {
+        coord = survey0;
+    }
+
     const dv = distance(survey0, survey1) as number;
     if (dv === 0) {
         return null;
@@ -216,4 +229,241 @@ export function getSegmentIndex(coord: Position, path: Position[]): number {
         min_d = d;
     }
     return segment_index;
+}
+
+/**
+ * Gets the lower and upper path-indices for the path-segment that contains a specific fractional point along the path. fraction-positions that are very close to either end (by 0.001 units) will be rounded of.
+ * @param fractionPosition A fractional position along the track (0-1);
+ * @param trajectory A list of positions that describes the trajectory
+ * @param cumulativeTrajectoryDistance A list of pre-computed distance measurements for each trajectory point (i.e. a wells measured depth array). The measurements must cumulative values.
+ * @returns a tuple containing the lower and upper segment indices, as well as the fractional position along the segment (0-1, with 0 being the beginning of the segment)
+ */
+export function getFractionPositionSegmentIndices(
+    fractionPosition: number,
+    trajectory: unknown[],
+    cumulativeTrajectoryDistance: number[]
+): [lowerIndex: number, upperIndex: number, segmentFraction: number] {
+    if (trajectory.length < 2) {
+        throw Error("Expected trajectory to have at least 2 points");
+    }
+    if (cumulativeTrajectoryDistance.length !== trajectory.length) {
+        throw Error(
+            "Expected path measurements array to be same length as path array"
+        );
+    }
+
+    // Some trajectories dont have the md-array starting at 1
+    const offset = cumulativeTrajectoryDistance.at(0)!;
+
+    const pointDistance = _.clamp(
+        fractionPosition * (cumulativeTrajectoryDistance.at(-1)! + offset),
+        cumulativeTrajectoryDistance.at(0)!,
+        cumulativeTrajectoryDistance.at(-1)!
+    );
+
+    const sortedIndex = _.sortedIndex(
+        cumulativeTrajectoryDistance,
+        pointDistance
+    );
+
+    if (sortedIndex === 0) {
+        return [0, 1, 0];
+    }
+
+    // Since we clamp it, this shouldn't be possible, but Im leaving it just in case
+    /* istanbul ignore next @preserve */
+    if (sortedIndex >= cumulativeTrajectoryDistance.length) {
+        throw Error("Position is outside of trajectory");
+    }
+
+    const lowerDistance = cumulativeTrajectoryDistance[sortedIndex - 1];
+    const upperDistance = cumulativeTrajectoryDistance[sortedIndex];
+
+    let segmentPos =
+        (pointDistance - lowerDistance) / (upperDistance - lowerDistance);
+
+    if (isClose(segmentPos, 0)) segmentPos = 0;
+    if (isClose(segmentPos, 1)) segmentPos = 1;
+
+    return [sortedIndex - 1, sortedIndex, segmentPos];
+}
+
+/**
+ * Get position and angle (in radians) along a trajectory path
+ * @param positionAlongPath 0-1 fraction along trajectory
+ * @param trajectory Trajectory as a list of positions
+ * @param projectionFunc Callback function to project 3D coordinates over to 2D
+ * @param is3d Whether to use compute with (and return) 2-dimensional positions
+ * @returns A tuple containing an angle and a interpolated point on the trajectory
+ */
+export function getPositionAndAngleOnTrajectoryPath(
+    positionAlongPath: number,
+    trajectory: Position[],
+    cumulativeTrajectoryDistance: number[],
+    projectionFunc?: (xyz: number[]) => number[],
+    is3d?: boolean
+): [angle: number, position: Point2D | Point3D] {
+    if (is3d === undefined) is3d = trajectory[0]?.length === 3;
+    if (!trajectory.length && is3d) return [0, [0, 0, 0]];
+    if (!trajectory.length && !is3d) return [0, [0, 0]];
+    if (is3d && trajectory[0].length < 3)
+        throw Error(
+            `Expected trajectory positions to be 3D, instead got ${trajectory[0].length} dimensions`
+        );
+    if (is3d && projectionFunc === undefined)
+        throw Error("2D projection function required for 3d trajectories");
+
+    let angle: number;
+
+    const [lowerSegmentIndex, upperSegmentIndex, segmentFraction] =
+        getFractionPositionSegmentIndices(
+            positionAlongPath,
+            trajectory,
+            cumulativeTrajectoryDistance
+        );
+
+    const position = _.zipWith(
+        trajectory[lowerSegmentIndex],
+        trajectory[upperSegmentIndex],
+        (pl, pu) => {
+            return pl + segmentFraction * (pu - pl);
+        }
+    );
+
+    // Compute angle projected to camera
+    let lowerProjectedPosition = trajectory[lowerSegmentIndex];
+    let upperProjectedPosition = trajectory[upperSegmentIndex];
+
+    // We only need to project when we deal with 3 positions
+    if (is3d) {
+        lowerProjectedPosition = projectionFunc!(trajectory[lowerSegmentIndex]);
+        upperProjectedPosition = projectionFunc!(trajectory[upperSegmentIndex]);
+
+        // ? I don't understand why we need to apply this whenever we project from 3d, but the angle gets wrong if I don't
+        lowerProjectedPosition[1] *= -1;
+        upperProjectedPosition[1] *= -1;
+    }
+
+    const segmentVec = new Vector2(
+        upperProjectedPosition[0] - lowerProjectedPosition[0],
+        upperProjectedPosition[1] - lowerProjectedPosition[1]
+    );
+
+    // The projected vector has no length, so we cannot define an angle. This is most likely because the two points are stacked on top of each other
+    if (segmentVec.len() === 0) {
+        angle = 0;
+    }
+
+    segmentVec.normalize();
+    angle = Math.atan2(segmentVec[1], segmentVec[0]);
+
+    if (is3d) return [angle, position as Point3D];
+    return [angle, position as Point2D];
+}
+
+/**
+ * Computes an array of cumulative distances for a well's trajectory path.
+ *
+ * **Note:** This is usually equivalent to the MD-array, so you probably don't need this.
+ * @param well_xyz A list of positions that describe the wells trajectory
+ * @returns a list of cumulative distances
+ */
+export function getCumulativeDistance(well_xyz: Position[]): number[] {
+    if (!well_xyz.length) return [];
+
+    const cumulativeDistance = [0];
+    for (let i = 1; i < well_xyz.length; i++) {
+        const p1 = well_xyz[i - 1];
+        const p2 = well_xyz[i];
+
+        const v0 = new Vector3(p1);
+        const v1 = new Vector3(p2);
+        const distance = v0.distance(v1);
+
+        cumulativeDistance.push(cumulativeDistance[i - 1] + distance);
+    }
+    return cumulativeDistance;
+}
+
+/**
+ * Adds interpolated entries to trajectory data (MD and position) at a given MD. If an MD value is close (0.001 units) the point will *not* be added.
+ * @param well A well feature to add entries to
+ * @param mdValuesToInject one or more MD values to inject
+ * @returns A copy of the well object with the new MD values injected
+ */
+export function injectMdPoints(
+    well: WellFeature,
+    ...mdValuesToInject: number[]
+): WellFeature {
+    const path = getLineStringGeometry(well)?.coordinates ?? [];
+    const md = well.properties.md[0] ?? getCumulativeDistance(path);
+
+    if (path.length !== md.length) {
+        throw new Error(
+            "Cannot inject MD points, md and path are of different length"
+        );
+    }
+
+    const newPath = [...path];
+    const newMd = [...md];
+
+    let currentDataRowIdx = 0;
+    let spliceCount = 0;
+
+    for (let i = 0; i < mdValuesToInject.length; i++) {
+        const nextMdToInject = mdValuesToInject[i];
+        if (nextMdToInject < md[0]) continue;
+        if (nextMdToInject > md[md.length - 1]) break;
+
+        // Increase until we go over or find the value
+        while (
+            md[currentDataRowIdx] < nextMdToInject &&
+            currentDataRowIdx < md.length
+        ) {
+            currentDataRowIdx++;
+        }
+
+        if (currentDataRowIdx >= md.length) break;
+
+        // Data already in array, so we can skip it
+        const mdBelow = md[currentDataRowIdx - 1];
+        const mdAbove = md[currentDataRowIdx];
+
+        if (isClose(mdBelow, nextMdToInject)) continue;
+        if (isClose(mdAbove, nextMdToInject)) continue;
+
+        const interpolatedT = (nextMdToInject - mdBelow) / (mdAbove - mdBelow);
+
+        const interpolatedPosition = _.zipWith(
+            path[currentDataRowIdx - 1],
+            path[currentDataRowIdx],
+            (pl, pu) => {
+                return pl + interpolatedT * (pu - pl);
+            }
+        );
+
+        const spliceIndex = currentDataRowIdx + spliceCount;
+        newPath.splice(spliceIndex, 0, interpolatedPosition);
+        newMd.splice(spliceIndex, 0, nextMdToInject);
+
+        spliceCount++;
+    }
+
+    return {
+        ...well,
+        properties: {
+            ...well.properties,
+            md: [newMd],
+        },
+        geometry: {
+            ...well.geometry,
+            geometries: well.geometry.geometries.map((g) => {
+                if (g.type !== "LineString") return g;
+                return {
+                    ...g,
+                    coordinates: newPath,
+                };
+            }),
+        },
+    };
 }

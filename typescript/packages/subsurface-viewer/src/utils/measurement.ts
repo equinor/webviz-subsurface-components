@@ -112,3 +112,18 @@ export function isPointAwayFromLineEnd(
     // If the dot product is negative, the point has moved past the end of the line
     return dotProduct < 0;
 }
+
+/**
+ * Check if a number is close (or equal) to another number
+ * @param number A number
+ * @param otherNumber Another number
+ * @param threshold The threshold within which the two numbers are considered "close". Defaults to `0.001`
+ * @returns true if the numbers are close, false otherwise
+ */
+export function isClose(
+    number: number,
+    otherNumber: number,
+    threshold: number = 0.001
+) {
+    return Math.abs(number - otherNumber) < threshold;
+}

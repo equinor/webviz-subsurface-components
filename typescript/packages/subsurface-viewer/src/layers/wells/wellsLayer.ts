@@ -2,6 +2,7 @@ import _, { isEmpty, isEqual } from "lodash";
 
 import type {
     Accessor,
+    AccessorContext,
     Color,
     Layer,
     LayerData,
@@ -10,12 +11,12 @@ import type {
     UpdateParameters,
 } from "@deck.gl/core";
 import { CompositeLayer } from "@deck.gl/core";
-import { PathStyleExtension } from "@deck.gl/extensions";
+import type { DataFilterExtensionProps } from "@deck.gl/extensions";
+import { DataFilterExtension, PathStyleExtension } from "@deck.gl/extensions";
 import type { GeoJsonLayerProps } from "@deck.gl/layers";
-import { GeoJsonLayer } from "@deck.gl/layers";
+import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
 import type { BinaryFeatureCollection } from "@loaders.gl/schema";
 import { GL } from "@luma.gl/constants";
-
 import type { Feature, FeatureCollection, Position } from "geojson";
 
 import type { ColormapFunctionType } from "../utils/colormapTools";
@@ -32,46 +33,66 @@ import {
     isDrawingEnabled,
 } from "../utils/layerTools";
 
+import type {
+    ContinuousLegendDataType,
+    DiscreteLegendDataType,
+} from "../../components/ColorLegend";
+import { scaleArray } from "../../utils/arrays";
+import { isClose } from "../../utils/measurement";
 import { SectionViewport } from "../../viewports";
 import type { NumberPair } from "../types";
+import { DashedSectionsPathLayer } from "./layers/dashedSectionsPathLayer";
+import type { LogCurveLayerProps } from "./layers/logCurveLayer";
+import { LogCurveLayer } from "./layers/logCurveLayer";
+import type { MarkerData, WellMarker } from "./layers/flatWellMarkersLayer";
+import { FlatWellMarkersLayer } from "./layers/flatWellMarkersLayer";
 import type { WellLabelLayerProps } from "./layers/wellLabelLayer";
 import { WellLabelLayer } from "./layers/wellLabelLayer";
 import type {
     AbscissaTransform,
     ColorAccessor,
     DashAccessor,
+    DashedSectionsLayerPickInfo,
     LineStyleAccessor,
     LogCurveDataType,
+    PerforationProperties,
     WellFeature,
     WellFeatureCollection,
     WellHeadStyleAccessor,
     WellsPickInfo,
 } from "./types";
 import { abscissaTransform } from "./utils/abscissaTransform";
+import { DEFAULT_LINE_WIDTH, getSize, LINE, POINT } from "./utils/features";
+import { getLegendData, getLogProperty } from "./utils/log";
+import { createPerforationReadout, createScreenReadout } from "./utils/readout";
 import {
-    GetBoundingBox,
     checkWells,
     coarsenWells,
+    GetBoundingBox,
     invertPath,
     splineRefine,
 } from "./utils/spline";
-import { getColor, getMd, getTrajectory, getTvd } from "./utils/trajectory";
-import type { LogCurveLayerProps } from "./layers/logCurveLayer";
-import { LogCurveLayer } from "./layers/logCurveLayer";
+import {
+    getColor,
+    getMd,
+    getTrajectory,
+    getTvd,
+    injectMdPoints,
+} from "./utils/trajectory";
 import {
     getWellMds,
     getWellObjectByName,
     getWellObjectsByName,
 } from "./utils/wells";
-import { getLegendData, getLogProperty } from "./utils/log";
-import type {
-    ContinuousLegendDataType,
-    DiscreteLegendDataType,
-} from "../../components/ColorLegend";
-import { getSize, LINE, POINT, DEFAULT_LINE_WIDTH } from "./utils/features";
-import { scaleArray } from "../../utils/arrays";
 
 const DEFAULT_DASH = [5, 5] as NumberPair;
+
+interface SourcedSubLayerData {
+    __source: {
+        object: WellFeature;
+        index: number;
+    };
+}
 
 export enum SubLayerId {
     COLORS = "colors",
@@ -82,6 +103,11 @@ export enum SubLayerId {
     LOG_CURVE = "log_curve",
     SELECTION = "selection",
     LABELS = "labels",
+    MARKERS = "markers",
+    WELL_HEADS = "well_head",
+    SCREEN_TRAJECTORY = "screen_trajectory",
+    SCREEN_TRAJECTORY_OUTLINE = "screen_trajectory_outline",
+    TRAJECTORY_FILTER_GHOST = "trajectory_filter_ghost",
 }
 
 export interface WellsLayerProps extends ExtendedLayerProps {
@@ -171,6 +197,53 @@ export interface WellsLayerProps extends ExtendedLayerProps {
     reportBoundingBox?: React.Dispatch<ReportBoundingBoxAction>;
 
     wellLabel?: Partial<WellLabelLayerProps>;
+
+    /* --- Screens and perforations --- --- --- --- ---*/
+    /**
+     * Renders screen sections of the trajectory as dashed segments.
+     *
+     * **Note: If enabled, the COLORS sub-layer will be replaced by the SCREEN_TRAJECTORY sub-layer**
+     */
+    showScreenTrajectory: boolean;
+    /** Specifies the dash factor for screen sections. */
+    getScreenDashFactor: DashAccessor;
+
+    /** Enables simple line markers at the start and end of screen sections.
+     *
+     * **Note:** These markers are currently only designed for 2D, so they are not guaranteed to look nice in 3D
+     */
+    showScreenMarkers: boolean;
+    /** Enables visualization of trajectory perforations.
+     *
+     * **Note:** These markers are currently only designed for 2D, so they are not guaranteed to look nice in 3D
+     */
+    showPerforationsMarkers: boolean;
+
+    /* --- Filtering -- --- --- --- --- --- --- --- --- */
+    /** Enables well filtering  */
+    enableFilters: boolean;
+    /** Filter wells by measured depth (MD).
+     * - Return [min, max] to show only the portion of the well between these MD values
+     * - Return [max, min] (inverted) to show everything OUTSIDE this range
+     * - Return undefined or [-1, -1] to show the entire well
+     * Multiple ranges are additive
+     *
+     * **Note:** To make sure trajectories paths disappear at the correct point, each
+     * range value will inject a point into the path array; meaning layers will recompute
+     * each time this is changed
+     */
+    mdFilterRange: Accessor<WellFeature, [number, number] | [number, number][]>;
+
+    /**
+     * Filters trajectory paths to formation sections.
+     */
+    formationFilter: Accessor<WellFeature, string[]>;
+
+    /** Filters wells based on name */
+    wellNameFilter: string[];
+
+    /** Shows a simple trajectory in place of filtered sections. If color is not specified, a light gray will be used */
+    showFilterTrajectoryGhost: boolean | Color;
 }
 
 const defaultProps = {
@@ -193,6 +266,12 @@ const defaultProps = {
     simplifiedRendering: false,
     section: false,
     dataTransform: coarsenWells,
+
+    getScreenDashFactor: { type: "accessor", value: [5, 5] },
+    mdFilterRange: [],
+    formationFilter: [],
+    wellNameFilter: [],
+    enableFilters: false,
 
     // Deprecated props
     wellNameColor: [0, 0, 0, 255],
@@ -222,6 +301,13 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
         if (ZIncreasingDownwards) {
             transformedData = invertPath(transformedData);
+        }
+
+        if (this.props.enableFilters) {
+            transformedData = injectMdPointsForFilter(
+                transformedData,
+                this.props.mdFilterRange
+            );
         }
 
         // Create a state for the section projection of the data, which by default is
@@ -267,7 +353,11 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 props.ZIncreasingDownwards,
                 oldProps.ZIncreasingDownwards
             ) ||
-            !isEqual(props.refine, oldProps.refine);
+            !isEqual(props.refine, oldProps.refine) ||
+            !isEqual(props.enableFilters, oldProps.enableFilters) ||
+            !isEqual(props.mdFilterRange, oldProps.mdFilterRange) ||
+            !isEqual(props.formationFilter, oldProps.formationFilter);
+
         if (needs_reload) {
             this.recomputeDataState();
         }
@@ -417,7 +507,6 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
     renderLayers(): LayersList {
         const data = this.getWellDataState();
-        const positionFormat = "XYZ";
         const isDashed = !!this.props.lineStyle?.dash;
 
         if (!data || !data?.features.length) {
@@ -443,7 +532,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             data,
             pickable: false,
             stroked: false,
-            positionFormat,
+            positionFormat: this.props.positionFormat ?? "XYZ",
             pointRadiusUnits: "pixels",
             lineWidthUnits: "pixels",
             pointRadiusScale: this.props.pointRadiusScale,
@@ -454,13 +543,25 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             pointBillboard: true,
             parameters,
             visible: fastDrawing,
+            filterEnabled: false,
         } as Partial<GeoJsonLayerProps>;
 
+        // Map GeoJsonLayer properties to match PathLayerProps
         const colorsLayerProps = this.getSubLayerProps({
             ...defaultLayerProps,
-            id: SubLayerId.COLORS,
+            // Whenever _subLayerProps.linestrings.type changes, we need to ensure an entirely new
+            // layer instance is created to avoid state errors, which is why we modify the ID.
+            id: this.props.showScreenTrajectory
+                ? SubLayerId.SCREEN_TRAJECTORY
+                : SubLayerId.COLORS,
             pickable: true,
-            extensions,
+
+            extensions: [
+                ...extensions,
+                new DataFilterExtension({
+                    filterSize: 1,
+                }),
+            ],
             getDashArray: getDashFactor(
                 this.props.lineStyle?.dash,
                 getSize(LINE, this.props.lineStyle?.width),
@@ -469,28 +570,190 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             visible: !fastDrawing,
             getLineColor: getColor(this.props.lineStyle?.color),
             getFillColor: getColor(this.props.wellHeadStyle?.color),
-        });
+
+            filterEnabled: this.props.enableFilters,
+
+            // ? I should be able to use filterCategories: [1] and `getFilterCategory`, but it's not working for path section filtering
+            filterRange: [1, 1],
+            getFilterValue: (d, ctx) =>
+                getTrajectoryFilterCategory(
+                    d,
+                    this.props.mdFilterRange,
+                    this.props.formationFilter,
+                    this.props.wellNameFilter,
+                    ctx
+                ),
+            updateTriggers: {
+                getFilterValue: [
+                    this.props.wellNameFilter,
+                    ...(this.props.updateTriggers["mdFilterRange"] ?? []),
+                    ...(this.props.updateTriggers["formationFilter"] ?? []),
+                ],
+            },
+
+            // Override path layer to use opt-in screen dashes
+            _subLayerProps: {
+                linestrings: {
+                    type: this.props.showScreenTrajectory
+                        ? DashedSectionsPathLayer
+                        : PathLayer,
+                    getScreenDashArray: getDashFactor(
+                        this.props.getScreenDashFactor,
+                        getSize(LINE, this.props.lineStyle?.width),
+                        -1
+                    ),
+                    getCumulativePathDistance: (d: SourcedSubLayerData) =>
+                        d.__source.object.properties.md[0],
+                    getDashedSectionsAlongPath: (d: SourcedSubLayerData) => {
+                        const feature = d.__source.object as WellFeature;
+
+                        const maxMd = feature.properties.md[0]?.at(-1);
+                        if (maxMd === undefined) return undefined;
+
+                        return feature.properties.screens?.map((screen) => [
+                            screen.mdStart / maxMd,
+                            screen.mdEnd / maxMd,
+                        ]);
+                    },
+                },
+            },
+        } as Partial<GeoJsonLayerProps<WellFeature>> &
+            Partial<DataFilterExtensionProps<WellFeature>>);
 
         const fastLayerProps = this.getSubLayerProps({
             ...defaultLayerProps,
             id: SubLayerId.SIMPLE,
-            positionFormat,
             getLineColor: getColor(this.props.lineStyle?.color),
             getFillColor: getColor(this.props.wellHeadStyle?.color),
         });
 
+        const filterGhostLayerProps = this.getSubLayerProps({
+            ...defaultLayerProps,
+            extensions: [
+                new DataFilterExtension({
+                    filterSize: 1,
+                }),
+            ],
+
+            id: SubLayerId.TRAJECTORY_FILTER_GHOST,
+
+            filterEnabled: this.props.enableFilters,
+
+            getFillColor: Array.isArray(this.props.showFilterTrajectoryGhost)
+                ? this.props.showFilterTrajectoryGhost
+                : [225, 225, 225],
+            getLineColor: Array.isArray(this.props.showFilterTrajectoryGhost)
+                ? this.props.showFilterTrajectoryGhost
+                : [225, 225, 225],
+
+            // ? I should be able to use filterCategories: [1] and `getFilterCategory`, but it's not working for path section filtering
+            filterRange: [1, 1],
+            getFilterValue: (
+                d: WellFeature,
+                ctx: AccessorContext<WellFeature>
+            ) => {
+                const includeFilter = getTrajectoryFilterCategory(
+                    d,
+                    this.props.mdFilterRange,
+                    this.props.formationFilter,
+                    this.props.wellNameFilter,
+                    ctx
+                );
+
+                if (!Array.isArray(includeFilter)) return 1 - includeFilter;
+
+                return includeFilter.map((n) => 1 - n);
+            },
+            getDashArray: getDashFactor(this.props.lineStyle?.dash),
+            visible:
+                !fastDrawing &&
+                this.props.enableFilters &&
+                this.props.showFilterTrajectoryGhost,
+
+            parameters: {
+                ...parameters,
+                [GL.POLYGON_OFFSET_FACTOR]: 1,
+                [GL.POLYGON_OFFSET_UNITS]: 1,
+            },
+            updateTriggers: {
+                getFilterValue: [
+                    this.props.wellNameFilter,
+                    ...(this.props.updateTriggers["mdFilterRange"] ?? []),
+                    ...(this.props.updateTriggers["formationFilter"] ?? []),
+                ],
+            },
+        } as GeoJsonLayerProps);
+
         const outlineLayerProps = this.getSubLayerProps({
             ...defaultLayerProps,
-            id: SubLayerId.OUTLINE,
+            // Whenever _subLayerProps.linestrings.type changes, we need to ensure an entirely new
+            // layer instance is created to avoid state errors, which is why we modify the ID.
+            id: this.props.showScreenTrajectory
+                ? SubLayerId.SCREEN_TRAJECTORY_OUTLINE
+                : SubLayerId.OUTLINE,
             getLineWidth: getSize(LINE, this.props.lineStyle?.width),
             getPointRadius: getSize(POINT, this.props.wellHeadStyle?.size),
-            extensions,
+            extensions: [
+                ...extensions,
+                new DataFilterExtension({
+                    filterSize: 1,
+                }),
+            ],
+            filterEnabled: this.props.enableFilters,
+            // ? I should be able to use filterCategories: [1] and `getFilterCategory`, but it's not working for path section filtering
+            filterRange: [1, 1],
+            getFilterValue: (
+                d: WellFeature,
+                ctx: AccessorContext<WellFeature>
+            ) =>
+                getTrajectoryFilterCategory(
+                    d,
+                    this.props.mdFilterRange,
+                    this.props.formationFilter,
+                    this.props.wellNameFilter,
+                    ctx
+                ),
             getDashArray: getDashFactor(this.props.lineStyle?.dash),
             visible: this.props.outline && !fastDrawing,
             parameters: {
                 ...parameters,
                 [GL.POLYGON_OFFSET_FACTOR]: 1,
                 [GL.POLYGON_OFFSET_UNITS]: 1,
+            },
+
+            updateTriggers: {
+                getFilterValue: [
+                    this.props.wellNameFilter,
+                    ...(this.props.updateTriggers["mdFilterRange"] ?? []),
+                    ...(this.props.updateTriggers["formationFilter"] ?? []),
+                ],
+            },
+
+            // Override path layer to use opt-in screen dashes
+            _subLayerProps: {
+                linestrings: {
+                    type: this.props.showScreenTrajectory
+                        ? DashedSectionsPathLayer
+                        : PathLayer,
+                    // Props for DashedSectionsPathLayer
+                    getScreenDashArray: getDashFactor(
+                        this.props.getScreenDashFactor,
+                        getSize(LINE, this.props.lineStyle?.width)
+                    ),
+                    getCumulativePathDistance: (d: SourcedSubLayerData) =>
+                        d.__source.object.properties.md[0],
+                    getDashedSectionsAlongPath: (d: SourcedSubLayerData) => {
+                        const feature = d.__source.object as WellFeature;
+
+                        const maxMd = feature.properties.md[0]?.at(-1);
+                        if (maxMd === undefined) return undefined;
+
+                        return feature.properties.screens?.map((screen) => [
+                            screen.mdStart / maxMd,
+                            screen.mdEnd / maxMd,
+                        ]);
+                    },
+                },
             },
         });
 
@@ -521,6 +784,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         const fastLayer = new GeoJsonLayer(fastLayerProps);
         const outlineLayer = new GeoJsonLayer(outlineLayerProps);
         const colorsLayer = new GeoJsonLayer(colorsLayerProps);
+        const filterGhostLayer = new GeoJsonLayer(filterGhostLayerProps);
 
         // Highlight the selected well.
         const highlightLayer = new GeoJsonLayer(highlightLayerProps);
@@ -537,8 +801,8 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 visible: this.props.logCurves && !fastDrawing,
                 pickable: true,
                 parameters,
-                positionFormat,
 
+                positionFormat: this.props.positionFormat,
                 data: this.props.logData,
                 trajectoryData: data,
                 domainSelection: this.state.logDomainSelection,
@@ -571,6 +835,86 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             } as Partial<LogCurveLayerProps>),
         });
 
+        const markerLayer = new FlatWellMarkersLayer(
+            this.getSubLayerProps({
+                ...defaultLayerProps,
+                visible: !fastDrawing,
+                pickable: true,
+                id: SubLayerId.MARKERS,
+                data: data.features,
+                outline: this.props.outline,
+                getLineColor: getColor(this.props.lineStyle?.color),
+                // We can also specify the color per marker
+                // getMarkerColor: (marker: TrajectoryMarker) => ...
+                updateTriggers: {
+                    getMarkers: [
+                        this.props.showScreenMarkers,
+                        this.props.showPerforationsMarkers,
+                    ],
+                    getFilterValue: [
+                        this.props.wellNameFilter,
+                        ...(this.props.updateTriggers["mdFilterRange"] ?? []),
+                        ...(this.props.updateTriggers["formationFilter"] ?? []),
+                    ],
+                },
+
+                extensions: [new DataFilterExtension({ filterSize: 1 })],
+                filterEnabled: this.props.enableFilters,
+                filterRange: [1, 1],
+
+                getFilterValue: (
+                    d: WellFeature,
+                    ctx: AccessorContext<WellFeature>
+                ) =>
+                    getTrajectoryFilterCategory(
+                        d,
+                        this.props.mdFilterRange,
+                        this.props.formationFilter,
+                        this.props.wellNameFilter,
+                        ctx
+                    ),
+                getCumulativePathDistance: (d: WellFeature) =>
+                    d.properties.md[0],
+                getTrajectoryPath: (d: WellFeature) =>
+                    getTrajectory(d, this.props.lineStyle?.color),
+                getMarkers: (d: WellFeature) => {
+                    const maxMd = d.properties.md[0]?.at(-1);
+                    const { perforations = [], screens = [] } = d.properties;
+
+                    if (maxMd === undefined || maxMd === 0) return [];
+
+                    const markers: WellMarker[] = [];
+
+                    if (this.props.showScreenMarkers) {
+                        markers.push(
+                            ...screens.flatMap<WellMarker>((s) => [
+                                {
+                                    type: "screen-start",
+                                    positionAlongPath: s.mdStart / maxMd,
+                                },
+                                {
+                                    type: "screen-end",
+                                    positionAlongPath: s.mdEnd / maxMd,
+                                },
+                            ])
+                        );
+                    }
+
+                    if (this.props.showPerforationsMarkers) {
+                        markers.push(
+                            ...perforations.map<WellMarker>((p) => ({
+                                type: "perforation",
+                                positionAlongPath: p.md / maxMd,
+                                properties: p,
+                            }))
+                        );
+                    }
+
+                    return markers;
+                },
+            })
+        );
+
         const namesLayer = this.createWellLabelLayer(data.features);
 
         const layers = [
@@ -580,11 +924,21 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             highlightMultiWellsLayer,
             namesLayer,
             logLayer,
+            markerLayer,
+            filterGhostLayer,
         ];
         if (fastDrawing) {
             layers.push(fastLayer);
         }
         return layers;
+    }
+
+    private getSubLayerId(id: SubLayerId): string {
+        return this.getSubLayerProps({ id }).id;
+    }
+
+    private getSubLayerById(id: SubLayerId) {
+        return this.getSubLayers().find((l) => l.id === this.getSubLayerId(id));
     }
 
     getPickingInfo({ info }: { info: PickingInfo }): WellsPickInfo {
@@ -598,7 +952,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         }
 
         const features = this.getWellDataState()?.features ?? [];
-        const coordinate: Position = info.coordinate || [0, 0, 0];
+        let coordinate: Position = info.coordinate || [0, 0, 0];
 
         const zScale = this.props.modelMatrix ? this.props.modelMatrix[10] : 1;
         if (typeof coordinate[2] !== "undefined") {
@@ -610,6 +964,66 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         let md_property: PropertyDataType | null = null;
         let tvd_property: PropertyDataType | null = null;
         let log_property: PropertyDataType | null = null;
+        let screen_property: PropertyDataType | null = null;
+        let perforation_property: PropertyDataType | null = null;
+
+        if (
+            info.sourceLayer?.id ===
+            this.getSubLayerId(SubLayerId.SCREEN_TRAJECTORY)
+        ) {
+            const screenIndex = (info as DashedSectionsLayerPickInfo)
+                .dashedSectionIndex;
+            const data = info.object as WellFeature;
+
+            if (screenIndex !== undefined && screenIndex !== -1) {
+                const hoveredScreen = data.properties?.screens?.at(screenIndex);
+                screen_property = createScreenReadout(hoveredScreen, data);
+            }
+        }
+
+        if (info.sourceLayer?.id === this.getSubLayerId(SubLayerId.MARKERS)) {
+            const markerData = info.object as MarkerData<WellFeature>;
+            const wellData = info.object?.sourceObject as WellFeature;
+            const sourceIndex = markerData.sourceIndex;
+
+            // Re-compute index and color to make autohighlight apply to the *trajectory*, instead of the individual marker
+            info.index = sourceIndex;
+            info.color = new Uint8Array(
+                this.getSubLayerById(
+                    SubLayerId.SCREEN_TRAJECTORY
+                )!.encodePickingColor(markerData.sourceIndex)
+            );
+
+            if (markerData.type === "perforation") {
+                const properties =
+                    markerData.properties as PerforationProperties;
+
+                wellName = wellData.properties?.name;
+                perforation_property = createPerforationReadout(
+                    properties,
+                    wellData
+                );
+
+                // We also include the MD readout here, based on the marker position
+                coordinate = markerData.position;
+                if (typeof coordinate[2] !== "undefined") {
+                    coordinate[2] /= Math.max(0.001, zScale);
+                }
+
+                md_property = getMdProperty(
+                    coordinate,
+                    wellData,
+                    this.props.lineStyle?.color,
+                    "lines"
+                );
+                tvd_property = getTvdProperty(
+                    coordinate,
+                    wellData,
+                    this.props.lineStyle?.color,
+                    "lines"
+                );
+            }
+        }
 
         // ! This needs to be updated if we ever change the sub-layer id!
         if (
@@ -643,7 +1057,12 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 this.props.logrunName,
                 this.props.logName
             );
-        } else {
+        } else if (
+            info.sourceLayer?.id ===
+                this.getSubLayerProps({ id: SubLayerId.COLORS }).id ||
+            info.sourceLayer?.id ===
+                this.getSubLayerProps({ id: SubLayerId.SCREEN_TRAJECTORY }).id
+        ) {
             // User is hovering a wellbore path
             const wellpickInfo = info as PickingInfo<WellFeature>;
 
@@ -674,6 +1093,8 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         if (md_property) layer_properties.push(md_property);
         if (inverted_tvd_property) layer_properties.push(inverted_tvd_property);
         if (log_property) layer_properties.push(log_property);
+        if (screen_property) layer_properties.push(screen_property);
+        if (perforation_property) layer_properties.push(perforation_property);
 
         return {
             ...info,
@@ -779,4 +1200,132 @@ function getTvdProperty(
         );
     }
     return null;
+}
+
+// Injects MD points that will be required for cutting trajectories at the correct points
+function injectMdPointsForFilter(
+    data: WellFeatureCollection,
+    mdFilterRange: WellsLayerProps["mdFilterRange"]
+): WellFeatureCollection {
+    return {
+        ...data,
+        features: data.features.map((feature, index) => {
+            const { formations } = feature.properties;
+            const itemInfo: AccessorContext<WellFeature> = {
+                data: data.features,
+                target: [],
+                index,
+            };
+
+            const rangeMds = getFromAccessor(mdFilterRange, feature, itemInfo)
+                .flat()
+                .filter((i) => i !== -1);
+
+            const formationMds =
+                formations?.flatMap((f) => [f.mdEnter, f.mdExit]) ?? [];
+
+            const allRequiredMds = _.chain([...formationMds, ...rangeMds])
+                .sort((a, b) => a - b)
+                .uniq()
+                .value();
+
+            const newFeature = injectMdPoints(feature, ...allRequiredMds);
+
+            return newFeature;
+        }),
+    };
+}
+
+function getTrajectoryFilterCategory(
+    feature: WellFeature,
+    mdFilterRangeAccessor: WellsLayerProps["mdFilterRange"],
+    formationFilterAccessor: WellsLayerProps["formationFilter"],
+    wellNameFilter: WellsLayerProps["wellNameFilter"],
+    itemInfo: AccessorContext<WellFeature>
+): number | number[] {
+    const mdFilterRange = getFromAccessor(
+        mdFilterRangeAccessor,
+        feature,
+        itemInfo
+    );
+    const formationFilter = getFromAccessor(
+        formationFilterAccessor,
+        feature,
+        itemInfo
+    );
+
+    const sanitizedMdFilterBands = makeSanitizedFilterBands(mdFilterRange);
+
+    if (
+        !formationFilter.length &&
+        !wellNameFilter.length &&
+        !sanitizedMdFilterBands.length
+    )
+        return 1;
+    const {
+        formations,
+        md: [mdArr],
+    } = feature.properties;
+
+    const nameIsValid =
+        !wellNameFilter.length ||
+        wellNameFilter.includes(feature.properties.name);
+
+    if (!nameIsValid) return 0;
+
+    // No per vertex filters
+    if (!formationFilter.length && !sanitizedMdFilterBands.length) return 1;
+
+    return mdArr.map((md) => {
+        const mdIsValid =
+            !sanitizedMdFilterBands.length ||
+            sanitizedMdFilterBands.some((band) => {
+                if (isClose(md, band[0])) return true;
+                if (isClose(md, band[1])) return false;
+                return md >= band[0] && md < band[1];
+            });
+
+        const formation = formations?.find(
+            (seg) => seg.mdEnter <= md && seg.mdExit > md
+        );
+
+        const formationIsValid =
+            !formationFilter?.length ||
+            formationFilter.includes(formation?.name ?? "");
+
+        return Number(mdIsValid && formationIsValid);
+    });
+}
+
+function makeSanitizedFilterBands(
+    mdFilter: [number, number] | [number, number][]
+): [number, number][] {
+    if (!mdFilter) return [];
+
+    if (!(mdFilter.every(Number.isFinite) || mdFilter.every(Array.isArray))) {
+        throw Error(
+            "MD filter should either only be numbers, or lists of numbers"
+        );
+    }
+
+    if (Array.isArray(mdFilter[0])) {
+        return (mdFilter as [number, number][]).flatMap(
+            makeSanitizedFilterBands
+        );
+    }
+
+    let [rangeStart = -1, rangeEnd = -1] = mdFilter as [number, number];
+
+    if (rangeStart === -1 && rangeEnd === -1) return [];
+    if (rangeStart === -1) rangeStart = Number.NEGATIVE_INFINITY;
+    if (rangeEnd === -1) rangeEnd = Number.POSITIVE_INFINITY;
+
+    if (rangeStart > rangeEnd) {
+        return [
+            [Number.NEGATIVE_INFINITY, rangeEnd],
+            [rangeStart, Number.POSITIVE_INFINITY],
+        ];
+    }
+
+    return [[rangeStart, rangeEnd]];
 }
