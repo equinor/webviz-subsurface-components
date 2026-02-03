@@ -28,7 +28,7 @@ import {
 } from "../../utils/layerTools";
 import { getSize, LINE } from "../utils/features";
 import type { MarkerType } from "../utils/markers";
-import { buildMarkerPath } from "../utils/markers";
+import { buildMarkerPath2D } from "../utils/markers";
 import {
     getCumulativeDistance,
     getFractionPositionSegmentIndices,
@@ -83,8 +83,8 @@ type InheritedGeoJsonProps = Omit<GeoJsonLayerProps, "data" | "getFillColor">;
 export class FlatWellMarkersLayer<TData = unknown> extends CompositeLayer<
     FlatWellMarkersLayerProps<TData> & InheritedGeoJsonProps
 > {
-    static layerName = "FlatWellMarkersLayer";
-    static defaultProps = {
+    static readonly layerName = "FlatWellMarkersLayer";
+    static readonly defaultProps = {
         getMarkers: { type: "accessor", value: [] },
         getMarkerColor: { type: "accessor", value: [0, 0, 0] },
         getCumulativePathDistance: { type: "accessor", value: undefined },
@@ -147,7 +147,7 @@ export class FlatWellMarkersLayer<TData = unknown> extends CompositeLayer<
             return;
         if (!this.props.getTrajectoryPath) return;
         if (!Array.isArray(data))
-            throw Error(
+            throw new Error(
                 `Expected data to be a list, instead got ${typeof data}`
             );
 
@@ -174,6 +174,8 @@ export class FlatWellMarkersLayer<TData = unknown> extends CompositeLayer<
                         props.getCumulativePathDistance,
                         datum,
                         itemContext
+                        // The typing is a little misleading here; the *default* accessor could
+                        // potentially return undefined, so we need to include a fallback here
                     ) ?? getCumulativeDistance(trajectoryPath)!;
 
                 cumulativePathDistanceCache.set(index, cumulativeDistance);
@@ -378,7 +380,7 @@ export class FlatWellMarkersLayer<TData = unknown> extends CompositeLayer<
             getWidth: lineWidthAccessor,
 
             getPath: (d: MarkerData) =>
-                buildMarkerPath(d.type, d.position, d.angle),
+                buildMarkerPath2D(d.type, d.position, d.angle),
 
             updateTriggers: {
                 getPath: this.props.updateTriggers?.["getTrajectoryPath"],
@@ -465,7 +467,7 @@ export class FlatWellMarkersLayer<TData = unknown> extends CompositeLayer<
                     Number(d.type !== "perforation"),
 
                 getPolygon: (d: MarkerData) =>
-                    buildMarkerPath(d.type, d.position, d.angle),
+                    buildMarkerPath2D(d.type, d.position, d.angle),
 
                 getLineWidth: lineWidthAccessor,
                 lineWidthScale: this.props.lineWidthScale,

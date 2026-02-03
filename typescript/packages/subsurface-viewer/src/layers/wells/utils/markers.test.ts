@@ -1,4 +1,4 @@
-import { buildMarkerPath } from "./markers";
+import { buildMarkerPath2D } from "./markers";
 import type { Position } from "geojson";
 
 describe("Marker utilities", () => {
@@ -8,7 +8,7 @@ describe("Marker utilities", () => {
 
     describe("buildMarkerPath", () => {
         it("should build perforation marker coordinates correctly", () => {
-            const coords = buildMarkerPath("perforation", anchorPoint, 0);
+            const coords = buildMarkerPath2D("perforation", anchorPoint, 0);
 
             expect(coords).toHaveLength(4);
             // The spike should be right above the anchor point
@@ -16,7 +16,7 @@ describe("Marker utilities", () => {
         });
 
         it("should rotate perforation marker correctly", () => {
-            const coords = buildMarkerPath(
+            const coords = buildMarkerPath2D(
                 "perforation",
                 anchorPoint,
                 angle180
@@ -28,8 +28,12 @@ describe("Marker utilities", () => {
         });
 
         it("should build screen markers correctly", () => {
-            const startCoords = buildMarkerPath("screen-start", anchorPoint, 0);
-            const endCoords = buildMarkerPath("screen-end", anchorPoint, 0);
+            const startCoords = buildMarkerPath2D(
+                "screen-start",
+                anchorPoint,
+                0
+            );
+            const endCoords = buildMarkerPath2D("screen-end", anchorPoint, 0);
 
             expect(startCoords).toHaveLength(3);
             expect(endCoords).toHaveLength(3);
@@ -41,12 +45,12 @@ describe("Marker utilities", () => {
         });
 
         it("should rotate screen markers correctly", () => {
-            const startCoords = buildMarkerPath(
+            const startCoords = buildMarkerPath2D(
                 "screen-start",
                 anchorPoint,
                 angle90
             );
-            const endCoords = buildMarkerPath(
+            const endCoords = buildMarkerPath2D(
                 "screen-end",
                 anchorPoint,
                 angle90
@@ -64,7 +68,7 @@ describe("Marker utilities", () => {
         it("should throw error for unknown marker type", () => {
             expect(() =>
                 // @ts-expect-error -- testing unknown type
-                buildMarkerPath("unknown-marker", anchorPoint, 0)
+                buildMarkerPath2D("unknown-marker", anchorPoint, 0)
             ).toThrow("Unknown marker type: unknown-marker");
         });
     });

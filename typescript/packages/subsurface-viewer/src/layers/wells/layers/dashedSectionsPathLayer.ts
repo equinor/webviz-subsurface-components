@@ -56,8 +56,8 @@ export type DashedSectionsPathLayerProps<TData = unknown> = Omit<
 export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
     DashedSectionsPathLayerProps<TData>
 > {
-    static layerName = "DashedSectionsPathLayer";
-    static defaultProps = {
+    static readonly layerName = "DashedSectionsPathLayer";
+    static readonly defaultProps = {
         ...PathLayer.defaultProps,
         getScreenDashArray: PathStyleExtension.defaultProps.getDashArray,
         getDashedSectionsAlongPath: {
@@ -94,7 +94,7 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
         } = this.props;
 
         if (!Array.isArray(data))
-            throw Error(
+            throw new Error(
                 `Expected loaded data to be a list, instead got ${typeof data}`
             );
 
@@ -311,7 +311,7 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
         const coordinate = sourceInfo.coordinate;
 
         const zScale = this.props.modelMatrix ? this.props.modelMatrix[10] : 1;
-        if (typeof coordinate[2] !== "undefined") {
+        if (coordinate[2] !== undefined) {
             coordinate[2] /= Math.max(0.001, zScale);
         }
 
@@ -321,7 +321,9 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
             this.state.cumulativePathDistanceCache.get(sourceInfo.index);
 
         if (!path || !cumulativePathDistance || !sections) {
-            throw Error("Expected cached accessor values for hovered object");
+            throw new Error(
+                "Expected cached accessor values for hovered object"
+            );
         }
 
         if (sourceInfo.coordinate.length === 2) {
@@ -414,7 +416,7 @@ function getSectionFilterValue(
     if (!Array.isArray(filterValue)) return filterValue;
     if (startFraction === 0 && endFraction === 1) return [...filterValue];
     if (filterValue.length !== cumulativePathDistance.length) {
-        throw Error(
+        throw new Error(
             "Expected filter value array to be same length as path computation array"
         );
     }
@@ -449,7 +451,7 @@ function getSectionPathPositions(
     if (startFraction === 0 && endFraction === 1) return [...path];
     if (path.length === 0) return [];
     if (cumulativePathDistance.length !== path.length) {
-        throw Error(
+        throw new Error(
             "Expected path measurements array to be same length as path array"
         );
     }
@@ -496,7 +498,7 @@ function computeSliceIndices<T>(
     sliceEnd: number;
 } {
     if (cumulativePathDistance.length !== dataArr.length) {
-        throw Error(
+        throw new Error(
             "Expected distance and data array to be same length as path array"
         );
     }

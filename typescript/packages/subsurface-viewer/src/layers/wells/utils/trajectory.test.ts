@@ -577,5 +577,23 @@ describe("trajectory utils", () => {
                 "Cannot inject MD points, md and path are of different length"
             );
         });
+
+        it("should throw if md and path lengths differ", () => {
+            const featureWithMismatchedMd: WellFeature = set(
+                cloneDeep(mockFeature),
+                "properties.md",
+                [[0, 50, 50, 100]] // the mock has 4 points
+            );
+
+            const result = injectMdPoints(
+                featureWithMismatchedMd,
+                49,
+                50,
+                51,
+                110
+            );
+
+            expect(result.properties.md[0]).toEqual([0, 49, 50, 50, 51, 100]);
+        });
     });
 });

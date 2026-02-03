@@ -71,7 +71,7 @@ function isTrajectoryTransparent(
 
 /**
  * Get trajectory data from LineString Geometry if it's visible (checking
- * trajectory visiblity based on line color)
+ * trajectory visibility based on line color)
  */
 export function getTrajectory(
     well_object: WellFeature,
@@ -244,10 +244,10 @@ export function getFractionPositionSegmentIndices(
     cumulativeTrajectoryDistance: number[]
 ): [lowerIndex: number, upperIndex: number, segmentFraction: number] {
     if (trajectory.length < 2) {
-        throw Error("Expected trajectory to have at least 2 points");
+        throw new Error("Expected trajectory to have at least 2 points");
     }
     if (cumulativeTrajectoryDistance.length !== trajectory.length) {
-        throw Error(
+        throw new Error(
             "Expected path measurements array to be same length as path array"
         );
     }
@@ -273,11 +273,17 @@ export function getFractionPositionSegmentIndices(
     // Since we clamp it, this shouldn't be possible, but Im leaving it just in case
     /* istanbul ignore next @preserve */
     if (sortedIndex >= cumulativeTrajectoryDistance.length) {
-        throw Error("Position is outside of trajectory");
+        throw new Error("Position is outside of trajectory");
     }
 
     const lowerDistance = cumulativeTrajectoryDistance[sortedIndex - 1];
     const upperDistance = cumulativeTrajectoryDistance[sortedIndex];
+
+    // Distance arrays are expected to be increasing, so this implies invalid data
+    if (upperDistance - lowerDistance === 0) {
+        console.warn(`segment length is 0 at index ${sortedIndex - 1}`);
+        return [sortedIndex - 1, sortedIndex, 0];
+    }
 
     let segmentPos =
         (pointDistance - lowerDistance) / (upperDistance - lowerDistance);
@@ -307,13 +313,11 @@ export function getPositionAndAngleOnTrajectoryPath(
     if (!trajectory.length && is3d) return [0, [0, 0, 0]];
     if (!trajectory.length && !is3d) return [0, [0, 0]];
     if (is3d && trajectory[0].length < 3)
-        throw Error(
+        throw new Error(
             `Expected trajectory positions to be 3D, instead got ${trajectory[0].length} dimensions`
         );
     if (is3d && projectionFunc === undefined)
-        throw Error("2D projection function required for 3d trajectories");
-
-    let angle: number;
+        throw new Error("2D projection function required for 3d trajectories");
 
     const [lowerSegmentIndex, upperSegmentIndex, segmentFraction] =
         getFractionPositionSegmentIndices(
@@ -349,13 +353,13 @@ export function getPositionAndAngleOnTrajectoryPath(
         upperProjectedPosition[1] - lowerProjectedPosition[1]
     );
 
-    // The projected vector has no length, so we cannot define an angle. This is most likely because the two points are stacked on top of each other
-    if (segmentVec.len() === 0) {
-        angle = 0;
-    }
+    let angle = 0;
 
-    segmentVec.normalize();
-    angle = Math.atan2(segmentVec[1], segmentVec[0]);
+    // The projected vector has no length, so we cannot define an angle. This is most likely because the two points are stacked on top of each other
+    if (segmentVec.len() !== 0) {
+        segmentVec.normalize();
+        angle = Math.atan2(segmentVec[1], segmentVec[0]);
+    }
 
     if (is3d) return [angle, position as Point3D];
     return [angle, position as Point2D];
@@ -410,15 +414,14 @@ export function injectMdPoints(
     let currentDataRowIdx = 0;
     let spliceCount = 0;
 
-    for (let i = 0; i < mdValuesToInject.length; i++) {
-        const nextMdToInject = mdValuesToInject[i];
+    for (const nextMdToInject of mdValuesToInject) {
         if (nextMdToInject < md[0]) continue;
-        if (nextMdToInject > md[md.length - 1]) break;
+        if (nextMdToInject > md.at(-1)!) break;
 
         // Increase until we go over or find the value
         while (
-            md[currentDataRowIdx] < nextMdToInject &&
-            currentDataRowIdx < md.length
+            currentDataRowIdx < md.length &&
+            md[currentDataRowIdx] < nextMdToInject
         ) {
             currentDataRowIdx++;
         }
@@ -432,6 +435,7 @@ export function injectMdPoints(
         if (isClose(mdBelow, nextMdToInject)) continue;
         if (isClose(mdAbove, nextMdToInject)) continue;
 
+        // above/below values are guaranteed to be different here, so we don't need to worry about 0 division
         const interpolatedT = (nextMdToInject - mdBelow) / (mdAbove - mdBelow);
 
         const interpolatedPosition = _.zipWith(

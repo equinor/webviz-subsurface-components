@@ -11,13 +11,16 @@ const SCREEN_HEIGHT = 10;
 const SCREEN_INDENT = 3;
 
 /**
- * Returns geometry positions for different types of trajectory markers
+ * Returns two-dimensional geometry positions for different types of trajectory markers.
+ *
+ * **Note:** If a 3D anchor point is provided, the returned geometry will include the anchor's Z position for *each
+ * point*. The resulting geometry is a object in 3D space that lays flat on the XY-plane
  * @param markerType The marker type to build
  * @param anchorPoint The world position to place the anchor at
  * @param angle The angle of the marker
  * @returns A GeoJson geometry object
  */
-export function buildMarkerPath(
+export function buildMarkerPath2D(
     markerType: MarkerType,
     anchorPoint: Position,
     angle: number
@@ -29,19 +32,23 @@ export function buildMarkerPath(
                 angle
             );
         case "screen-start":
-            return buildScreenMarkerLineCoordinates(
+            return buildScreenMarkerLineCoordinates2D(
                 anchorPoint,
                 angle,
                 "start"
             );
         case "screen-end":
-            return buildScreenMarkerLineCoordinates(anchorPoint, angle, "end");
+            return buildScreenMarkerLineCoordinates2D(
+                anchorPoint,
+                angle,
+                "end"
+            );
         default:
             throw new Error(`Unknown marker type: ${markerType}`);
     }
 }
 
-function getRotatedPoint(
+function getRotatedPoint2D(
     point: Position,
     pivotPoint: Position,
     rotation: number
@@ -66,9 +73,9 @@ function buildPerforationTrianglePolygonCoordinates(
         anchorPoint[1] + PERFORATION_OFFSET,
     ];
 
-    const rotatedPoint1 = getRotatedPoint(point1, anchorPoint, rotation);
-    const rotatedPoint2 = getRotatedPoint(point2, anchorPoint, rotation);
-    const rotatedPoint3 = getRotatedPoint(point3, anchorPoint, rotation);
+    const rotatedPoint1 = getRotatedPoint2D(point1, anchorPoint, rotation);
+    const rotatedPoint2 = getRotatedPoint2D(point2, anchorPoint, rotation);
+    const rotatedPoint3 = getRotatedPoint2D(point3, anchorPoint, rotation);
 
     // Keep the z coordinate the same so the marker still follows the path if this happens to be used in 3d (the marker will look "flat")
     rotatedPoint1.push(anchorPoint[2]);
@@ -78,7 +85,7 @@ function buildPerforationTrianglePolygonCoordinates(
     return [rotatedPoint1, rotatedPoint2, rotatedPoint3, rotatedPoint1];
 }
 
-function buildScreenMarkerLineCoordinates(
+function buildScreenMarkerLineCoordinates2D(
     anchorPoint: Position,
     rotation: number,
     type: "start" | "end"
@@ -97,12 +104,12 @@ function buildScreenMarkerLineCoordinates(
         anchorPoint[1] - SCREEN_HEIGHT,
     ];
 
-    const rotatedPointAbove = getRotatedPoint(
+    const rotatedPointAbove = getRotatedPoint2D(
         pointAbove,
         anchorPoint,
         rotation
     );
-    const rotatedPointBelow = getRotatedPoint(
+    const rotatedPointBelow = getRotatedPoint2D(
         pointBelow,
         anchorPoint,
         rotation

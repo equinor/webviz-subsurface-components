@@ -605,7 +605,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                     getCumulativePathDistance: (d: SourcedSubLayerData) =>
                         d.__source.object.properties.md[0],
                     getDashedSectionsAlongPath: (d: SourcedSubLayerData) => {
-                        const feature = d.__source.object as WellFeature;
+                        const feature = d.__source.object;
 
                         const maxMd = feature.properties.md[0]?.at(-1);
                         if (maxMd === undefined) return undefined;
@@ -743,7 +743,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                     getCumulativePathDistance: (d: SourcedSubLayerData) =>
                         d.__source.object.properties.md[0],
                     getDashedSectionsAlongPath: (d: SourcedSubLayerData) => {
-                        const feature = d.__source.object as WellFeature;
+                        const feature = d.__source.object;
 
                         const maxMd = feature.properties.md[0]?.at(-1);
                         if (maxMd === undefined) return undefined;
@@ -955,7 +955,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         let coordinate: Position = info.coordinate || [0, 0, 0];
 
         const zScale = this.props.modelMatrix ? this.props.modelMatrix[10] : 1;
-        if (typeof coordinate[2] !== "undefined") {
+        if (coordinate[2] !== undefined) {
             coordinate[2] /= Math.max(0.001, zScale);
         }
 
@@ -1006,7 +1006,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
                 // We also include the MD readout here, based on the marker position
                 coordinate = markerData.position;
-                if (typeof coordinate[2] !== "undefined") {
+                if (coordinate[2] !== undefined) {
                     coordinate[2] /= Math.max(0.001, zScale);
                 }
 
@@ -1127,7 +1127,7 @@ function onDataLoad(
     }
 ): void {
     const bbox = GetBoundingBox(data as unknown as FeatureCollection);
-    if (typeof context.layer.props.reportBoundingBox !== "undefined") {
+    if (context.layer.props.reportBoundingBox !== undefined) {
         context.layer.props.reportBoundingBox({ layerBoundingBox: bbox });
     }
 }
@@ -1303,7 +1303,7 @@ function makeSanitizedFilterBands(
     if (!mdFilter) return [];
 
     if (!(mdFilter.every(Number.isFinite) || mdFilter.every(Array.isArray))) {
-        throw Error(
+        throw new Error(
             "MD filter should either only be numbers, or lists of numbers"
         );
     }
