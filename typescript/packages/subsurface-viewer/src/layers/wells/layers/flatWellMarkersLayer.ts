@@ -66,9 +66,9 @@ export type FlatWellMarkersLayerProps<TData> = {
     data: LayerDataSource<TData>;
     outline: boolean;
     getTrajectoryPath: Accessor<TData, Position[]>;
-    getCumulativePathDistance: Accessor<TData, number[]>;
+    getCumulativePathDistance?: Accessor<TData, number[]>;
     getMarkers: Accessor<TData, WellMarker[]>;
-    getMarkerColor: Accessor<WellMarker, Color>;
+    getMarkerColor?: Accessor<MarkerData<TData>, Color>;
 };
 
 // Although this layer only renders a path layer, we inherit props from GeoJson to make it easier to use within the WellsLayer. Future updates might include other types of markers (polygons, icons, etc) so the other properties might be relevant down the line.
@@ -86,8 +86,9 @@ export class FlatWellMarkersLayer<TData = unknown> extends CompositeLayer<
     static readonly layerName = "FlatWellMarkersLayer";
     static readonly defaultProps = {
         getMarkers: { type: "accessor", value: [] },
-        getMarkerColor: { type: "accessor", value: [0, 0, 0] },
-        getCumulativePathDistance: { type: "accessor", value: undefined },
+        // Default to undefined so we can fall back to trajectory color
+        getMarkerColor: undefined,
+        getCumulativePathDistance: undefined,
     };
 
     state!: {
@@ -291,7 +292,7 @@ export class FlatWellMarkersLayer<TData = unknown> extends CompositeLayer<
 
     private getMarkerColor(
         d: MarkerData<TData>,
-        ctx: AccessorContext<MarkerData>
+        ctx: AccessorContext<MarkerData<TData>>
     ) {
         const markerIndex = d.markerIndex;
 
@@ -304,7 +305,13 @@ export class FlatWellMarkersLayer<TData = unknown> extends CompositeLayer<
         // Get base color
         let baseColor: Color;
 
-        if (this.props.getLineColor) {
+        if (this.props.getMarkerColor) {
+            baseColor = getFromAccessor(
+                this.props.getMarkerColor,
+                d,
+                ctx
+            ) as Color;
+        } else if (this.props.getLineColor) {
             baseColor = getFromAccessor(
                 this.props.getLineColor,
                 // @ts-expect-error -- accessors are hard :O
@@ -312,11 +319,7 @@ export class FlatWellMarkersLayer<TData = unknown> extends CompositeLayer<
                 ctx
             ) as Color;
         } else {
-            baseColor = getFromAccessor(
-                this.props.getMarkerColor,
-                d,
-                ctx
-            ) as Color;
+            baseColor = [0, 0, 0, 255];
         }
 
         if (!isHighlighted) {
