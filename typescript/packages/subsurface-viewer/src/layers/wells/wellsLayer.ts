@@ -44,7 +44,11 @@ import type { NumberPair } from "../types";
 import { DashedSectionsPathLayer } from "./layers/dashedSectionsPathLayer";
 import type { LogCurveLayerProps } from "./layers/logCurveLayer";
 import { LogCurveLayer } from "./layers/logCurveLayer";
-import type { MarkerData, WellMarker } from "./layers/flatWellMarkersLayer";
+import type {
+    FlatWellMarkersLayerProps,
+    MarkerData,
+    WellMarker,
+} from "./layers/flatWellMarkersLayer";
 import { FlatWellMarkersLayer } from "./layers/flatWellMarkersLayer";
 import type { WellLabelLayerProps } from "./layers/wellLabelLayer";
 import { WellLabelLayer } from "./layers/wellLabelLayer";
@@ -86,6 +90,7 @@ import {
 } from "./utils/wells";
 
 const DEFAULT_DASH = [5, 5] as NumberPair;
+const DEFAULT_SCREEN_DASH = [5, 5] as NumberPair;
 
 interface SourcedSubLayerData {
     __source: {
@@ -199,25 +204,31 @@ export interface WellsLayerProps extends ExtendedLayerProps {
     wellLabel?: Partial<WellLabelLayerProps>;
 
     /* --- Screens and perforations --- --- --- --- ---*/
-    /**
-     * Renders screen sections of the trajectory as dashed segments.
-     *
-     * **Note: If enabled, the COLORS sub-layer will be replaced by the SCREEN_TRAJECTORY sub-layer**
-     */
-    showScreenTrajectory: boolean;
-    /** Specifies the dash factor for screen sections. */
-    getScreenDashFactor: DashAccessor;
+    markers?: {
+        /** Enables simple line markers at the start and end of screen sections.
+         *
+         * @remark These markers are currently only designed for 2D, so they are not guaranteed to look nice in 3D
+         */
+        showScreens?: boolean;
+        /**
+         * Renders screen sections of the trajectory as dashed segments.
+         *
+         * @remark If enabled, the COLORS sub-layer will be replaced by the SCREEN_TRAJECTORY sub-layer!
+         */
+        showScreenTrajectoryAsDash?: boolean;
 
-    /** Enables simple line markers at the start and end of screen sections.
-     *
-     * **Note:** These markers are currently only designed for 2D, so they are not guaranteed to look nice in 3D
-     */
-    showScreenMarkers: boolean;
-    /** Enables visualization of trajectory perforations.
-     *
-     * **Note:** These markers are currently only designed for 2D, so they are not guaranteed to look nice in 3D
-     */
-    showPerforationsMarkers: boolean;
+        /** Enables visualization of trajectory perforations.
+         *
+         * @remark These markers are currently only designed for 2D, so they are not guaranteed to look nice in 3D
+         */
+        showPerforations?: boolean;
+
+        /** Specifies colors of markers at a per-marker basis */
+        getMarkerColor?: FlatWellMarkersLayerProps<WellFeature>["getMarkerColor"];
+
+        /** Specifies the dash factor for screen sections. */
+        getScreenDashArray?: DashAccessor;
+    };
 
     /* --- Filtering -- --- --- --- --- --- --- --- --- */
     /** Enables well filtering  */
@@ -228,7 +239,7 @@ export interface WellsLayerProps extends ExtendedLayerProps {
      * - Return undefined or [-1, -1] to show the entire well
      * Multiple ranges are additive
      *
-     * **Note:** To make sure trajectories paths disappear at the correct point, each
+     * @remark To make sure trajectories paths disappear at the correct point, each
      * range value will inject a point into the path array; meaning layers will recompute
      * each time this is changed
      */
@@ -267,7 +278,6 @@ const defaultProps = {
     section: false,
     dataTransform: coarsenWells,
 
-    getScreenDashFactor: { type: "accessor", value: [5, 5] },
     mdFilterRange: [],
     formationFilter: [],
     wellNameFilter: [],
@@ -508,6 +518,9 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
     renderLayers(): LayersList {
         const data = this.getWellDataState();
         const isDashed = !!this.props.lineStyle?.dash;
+        // To support outlines for the dashed section, we will manage it's default dash size here
+        const screenDashAccessor =
+            this.props.markers?.getScreenDashArray ?? DEFAULT_SCREEN_DASH;
 
         if (!data || !data?.features.length) {
             return [];
@@ -551,7 +564,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             ...defaultLayerProps,
             // Whenever _subLayerProps.linestrings.type changes, we need to ensure an entirely new
             // layer instance is created to avoid state errors, which is why we modify the ID.
-            id: this.props.showScreenTrajectory
+            id: this.props.markers?.showScreenTrajectoryAsDash
                 ? SubLayerId.SCREEN_TRAJECTORY
                 : SubLayerId.COLORS,
             pickable: true,
@@ -594,11 +607,12 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             // Override path layer to use opt-in screen dashes
             _subLayerProps: {
                 linestrings: {
-                    type: this.props.showScreenTrajectory
+                    type: this.props.markers?.showScreenTrajectoryAsDash
                         ? DashedSectionsPathLayer
                         : PathLayer,
-                    getScreenDashArray: getDashFactor(
-                        this.props.getScreenDashFactor,
+
+                    getSectionDashArray: getDashFactor(
+                        screenDashAccessor,
                         getSize(LINE, this.props.lineStyle?.width),
                         -1
                     ),
@@ -688,7 +702,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             ...defaultLayerProps,
             // Whenever _subLayerProps.linestrings.type changes, we need to ensure an entirely new
             // layer instance is created to avoid state errors, which is why we modify the ID.
-            id: this.props.showScreenTrajectory
+            id: this.props.markers?.showScreenTrajectoryAsDash
                 ? SubLayerId.SCREEN_TRAJECTORY_OUTLINE
                 : SubLayerId.OUTLINE,
             getLineWidth: getSize(LINE, this.props.lineStyle?.width),
@@ -732,12 +746,12 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             // Override path layer to use opt-in screen dashes
             _subLayerProps: {
                 linestrings: {
-                    type: this.props.showScreenTrajectory
+                    type: this.props.markers?.showScreenTrajectoryAsDash
                         ? DashedSectionsPathLayer
                         : PathLayer,
                     // Props for DashedSectionsPathLayer
-                    getScreenDashArray: getDashFactor(
-                        this.props.getScreenDashFactor,
+                    getSectionDashArray: getDashFactor(
+                        screenDashAccessor,
                         getSize(LINE, this.props.lineStyle?.width)
                     ),
                     getCumulativePathDistance: (d: SourcedSubLayerData) =>
@@ -848,8 +862,8 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 // getMarkerColor: (marker: TrajectoryMarker) => ...
                 updateTriggers: {
                     getMarkers: [
-                        this.props.showScreenMarkers,
-                        this.props.showPerforationsMarkers,
+                        this.props.markers?.showScreens,
+                        this.props.markers?.showPerforations,
                     ],
                     getFilterValue: [
                         this.props.wellNameFilter,
@@ -885,7 +899,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
                     const markers: WellMarker[] = [];
 
-                    if (this.props.showScreenMarkers) {
+                    if (this.props.markers?.showScreens) {
                         markers.push(
                             ...screens.flatMap<WellMarker>((s) => [
                                 {
@@ -900,7 +914,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                         );
                     }
 
-                    if (this.props.showPerforationsMarkers) {
+                    if (this.props.markers?.showPerforations) {
                         markers.push(
                             ...perforations.map<WellMarker>((p) => ({
                                 type: "perforation",

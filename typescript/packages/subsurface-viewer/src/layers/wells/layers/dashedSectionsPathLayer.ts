@@ -41,7 +41,7 @@ type ComputedPathSection = {
 };
 
 type _DashedSectionsPathLayerProps<TData = unknown> = {
-    getScreenDashArray: Accessor<TData, [number, number]>;
+    getSectionDashArray: Accessor<TData, [number, number]>;
     getPath: Accessor<TData, Position[]>;
     getDashedSectionsAlongPath: Accessor<TData, number[] | number[][]>;
     getCumulativePathDistance: Accessor<TData, number[]>;
@@ -59,7 +59,7 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
     static readonly layerName = "DashedSectionsPathLayer";
     static readonly defaultProps = {
         ...PathLayer.defaultProps,
-        getScreenDashArray: PathStyleExtension.defaultProps.getDashArray,
+        getSectionDashArray: { type: "accessor", value: [5, 5] },
         getDashedSectionsAlongPath: {
             type: "accessor",
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -381,7 +381,7 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
                     },
                 } as Partial<PathLayerProps>),
                 // ! These props gets overriden if included inside getSubLayerProps
-                getDashArray: this.props.getScreenDashArray,
+                getDashArray: this.props.getSectionDashArray,
                 dashGapPickable: true,
                 getFilterValue: (d: MarkerData) =>
                     d.properties?.["filterValue"],

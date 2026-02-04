@@ -1343,9 +1343,7 @@ function PerforationsAndScreensComponent(
         } as WellFeatureCollection;
     }, [perforationAndScreensByWellIndex]);
 
-    const wellsLayerWithPerforations = new WellsLayer({
-        ...volveWellsFromResourcesLayer,
-
+    const sharedLayerProps: Partial<WellsLayerProps> = {
         data: volveWellsWithMarkers,
 
         refine: false,
@@ -1354,23 +1352,30 @@ function PerforationsAndScreensComponent(
         autoHighlight: true,
         outline: props.outline,
 
-        showPerforationsMarkers: showPerforations,
-        showScreenTrajectory: showScreens,
-        showScreenMarkers: showScreens,
+        markers: {
+            showPerforations: showPerforations,
+            showScreens: showScreens,
+            showScreenTrajectoryAsDash: showScreens,
+        },
+    };
+
+    const wellsLayerWithPerforations = new WellsLayer({
+        ...sharedLayerProps,
+        id: "volve-wells",
+    });
+
+    const wellsLayerWithPerforations2d = new WellsLayer({
+        ...sharedLayerProps,
+        id: "volve-wells-2d",
+        positionFormat: "XY",
     });
 
     const { transform } = useAbscissaTransform();
 
     const unfoldedWells = new WellsLayer({
+        ...sharedLayerProps,
         id: "unfolded-wells",
-        data: volveWellsWithMarkers,
         section: transform,
-        ZIncreasingDownwards: false,
-        outline: props.outline,
-
-        showPerforationsMarkers: showPerforations,
-        showScreenMarkers: showScreens,
-        showScreenTrajectory: showScreens,
     });
 
     const views = React.useMemo<ViewsType>(
@@ -1381,12 +1386,11 @@ function PerforationsAndScreensComponent(
                     id: "viewport1",
                     layerIds: ["volve-wells"],
                     viewType: OrbitView,
-
                     zoom: -1.5,
                 },
                 {
                     id: "viewport2",
-                    layerIds: ["volve-wells"],
+                    layerIds: ["volve-wells-2d"],
                     viewType: OrthographicView,
                     zoom: -1.5,
                 },
@@ -1407,7 +1411,11 @@ function PerforationsAndScreensComponent(
         views: views,
         pickingRadius: 6,
         bounds: volveWellsBounds,
-        layers: [wellsLayerWithPerforations, unfoldedWells],
+        layers: [
+            wellsLayerWithPerforations,
+            wellsLayerWithPerforations2d,
+            unfoldedWells,
+        ],
     };
 
     return (
@@ -1630,8 +1638,10 @@ function TrajectoryFilterComponent(
         ...volveWellsFromResourcesLayer,
         data: VOLVE_WELLS_WITH_FORMATIONS,
 
-        showScreenMarkers: true,
-        showScreenTrajectory: true,
+        markers: {
+            showScreens: true,
+            showScreenTrajectoryAsDash: true,
+        },
 
         enableFilters: true,
         mdFilterRange: [props.mdFilterRangeStart, props.mdFilterRangeEnd],
