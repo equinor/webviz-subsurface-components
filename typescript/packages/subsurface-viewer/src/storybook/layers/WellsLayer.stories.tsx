@@ -14,10 +14,18 @@ import { NativeSelect } from "@equinor/eds-core-react";
 import { Slider } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import type { Meta, StoryObj } from "@storybook/react";
+import { WellLogViewWithScroller } from "@webviz/well-log-viewer";
+import type { WellLogSet } from "@webviz/well-log-viewer/dist/components/WellLogTypes";
+import {
+    axisMnemos,
+    axisTitles,
+} from "@webviz/well-log-viewer/dist/utils/axes";
+import type { ColormapFunction } from "@webviz/well-log-viewer/dist/utils/color-function";
 import type { FeatureCollection, GeometryCollection } from "geojson";
 
 import volveBlockingZoneLogJson from "../../../../../../example-data/volve_blocking_zonelog_logs.json";
 import volveWellsJson from "../../../../../../example-data/volve_wells.json";
+import colorTablesJson from "../../../../../../example-data/wellpick_colors.json";
 
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
@@ -1484,13 +1492,61 @@ type TrajectoryFilterArgs = {
 
     formationFilter: string[];
     wellNameFilter: string[];
+    showFormationLogForWell: string;
 };
 
+const WELL_NAMES = volveWellsJson.features.map((f) => f.properties.name);
 const ZONES = Object.keys(
     volveBlockingZoneLogJson[0].metadata_discrete.ZONELOG.objects
 );
 
-const WELL_NAMES = volveWellsJson.features.map((f) => f.properties.name);
+const FORMATIONS_BY_WELL_NAME = volveBlockingZoneLogJson.reduce<
+    Map<string, GeoJsonWellProperties["formations"]>
+>((acc, log) => {
+    const { data, header, metadata_discrete } = log;
+
+    if (!acc.has(header.well)) acc.set(header.well, []);
+
+    for (let index = 0; index < data.length - 1; index++) {
+        const [mdEnter, rowCode] = data[index];
+        const [mdExit] = data[index + 1];
+
+        const name = Object.entries(metadata_discrete.ZONELOG.objects).find(
+            ([, [, code]]) => code === rowCode
+        )?.[0];
+
+        if (mdEnter != null && mdExit != null && name != null)
+            acc.get(header.well)!.push({
+                mdEnter,
+                mdExit,
+                name,
+            });
+    }
+
+    return acc;
+}, new Map());
+
+const VOLVE_WELLS_WITH_FORMATIONS = {
+    ...volveWellsJson,
+    features: volveWellsJson.features.map((f, i) => ({
+        ...f,
+        properties: {
+            ...f.properties,
+            formations: FORMATIONS_BY_WELL_NAME.get(f.properties.name),
+            // Adding some screens to verify that filtering works for dashed path layers too
+            screens:
+                i % 2 === 0
+                    ? [
+                          {
+                              name: 'SuperScreen 25x35"',
+                              mdStart: 2000,
+                              mdEnd: 3000,
+                          },
+                      ]
+                    : undefined,
+        },
+    })),
+} as WellFeatureCollection;
 
 export const TrajectoryFilter: StoryObj<TrajectoryFilterArgs> = {
     args: {
@@ -1500,33 +1556,22 @@ export const TrajectoryFilter: StoryObj<TrajectoryFilterArgs> = {
         formationFilter: [],
 
         wellNameFilter: [],
+
+        showFormationLogForWell: "None",
     },
 
     argTypes: {
         mdFilterRangeStart: {
-            control: {
-                type: "range",
-                min: -1,
-                max: 5000,
-                step: 1,
-            },
+            control: { type: "range", min: -1, max: 5000, step: 1 },
         },
         mdFilterRangeEnd: {
-            control: {
-                type: "range",
-                min: -1,
-                max: 5000,
-                step: 1,
-            },
+            control: { type: "range", min: -1, max: 5000, step: 1 },
         },
-        formationFilter: {
-            options: ZONES,
-            control: "multi-select",
-        },
-
-        wellNameFilter: {
-            options: WELL_NAMES,
-            control: "multi-select",
+        formationFilter: { control: "multi-select", options: ZONES },
+        wellNameFilter: { control: "multi-select", options: WELL_NAMES },
+        showFormationLogForWell: {
+            control: "select",
+            options: ["None", ...WELL_NAMES],
         },
     },
     parameters: {
@@ -1549,6 +1594,10 @@ export const TrajectoryFilter: StoryObj<TrajectoryFilterArgs> = {
 function TrajectoryFilterComponent(
     props: SubsurfaceViewerProps & TrajectoryFilterArgs
 ) {
+    const activeLog = volveBlockingZoneLogJson.find(
+        (l) => l.header.well === props.showFormationLogForWell
+    ) as unknown as WellLogSet | undefined;
+
     const views = React.useMemo<ViewsType>(
         () => ({
             layout: [2, 2] as [number, number],
@@ -1577,69 +1626,17 @@ function TrajectoryFilterComponent(
         []
     );
 
-    // Inject perforation and screens added in args
-    const formationsByWellIndex = React.useMemo(() => {
-        const dict = new Map<string, GeoJsonWellProperties["formations"]>();
-
-        volveBlockingZoneLogJson.forEach((log) => {
-            const { data, header, metadata_discrete } = log;
-
-            if (!dict.has(header.well)) dict.set(header.well, []);
-
-            for (let index = 0; index < data.length - 1; index++) {
-                const [mdEnter, rowCode] = data[index];
-                const [mdExit] = data[index + 1];
-
-                const name = Object.entries(
-                    metadata_discrete.ZONELOG.objects
-                ).find(([, [, code]]) => code === rowCode)?.[0];
-
-                if (mdEnter != null && mdExit != null && name != null)
-                    dict.get(header.well)!.push({
-                        mdEnter,
-                        mdExit,
-                        name,
-                    });
-            }
-        });
-        return dict;
-    }, []);
-
-    const volveWellsWithFormations = React.useMemo(() => {
-        return {
-            ...volveWellsJson,
-            features: volveWellsJson.features.map((f, i) => ({
-                ...f,
-                properties: {
-                    ...f.properties,
-                    formations: formationsByWellIndex.get(f.properties.name),
-                    screens:
-                        i % 2 === 0
-                            ? [
-                                  {
-                                      name: 'SuperScreen 25x35"',
-                                      mdStart: 2000,
-                                      mdEnd: 3000,
-                                  },
-                              ]
-                            : undefined,
-                },
-            })),
-        } as WellFeatureCollection;
-    }, [formationsByWellIndex]);
-
-    const wellsLayerWithPerforations = new WellsLayer({
+    const sharedLayerProps: Partial<WellsLayerProps> = {
         ...volveWellsFromResourcesLayer,
-        id: "wells-layer-filtered",
-        data: volveWellsWithFormations,
+        data: VOLVE_WELLS_WITH_FORMATIONS,
 
-        enableFilters: true,
         showScreenMarkers: true,
         showScreenTrajectory: true,
 
+        enableFilters: true,
         mdFilterRange: [props.mdFilterRangeStart, props.mdFilterRangeEnd],
 
-        showFilterTrajectoryGhost: false,
+        showFilterTrajectoryGhost: true,
         formationFilter: props.formationFilter,
         wellNameFilter: props.wellNameFilter,
 
@@ -1648,43 +1645,24 @@ function TrajectoryFilterComponent(
         pickable: true,
         autoHighlight: true,
         outline: true,
+    };
+
+    const wellsLayerWithPerforations = new WellsLayer({
+        ...sharedLayerProps,
+        id: "wells-layer-filtered",
+        showFilterTrajectoryGhost: false,
     });
 
     const wellsLayerWithPerforationsWithGhost = new WellsLayer({
-        ...volveWellsFromResourcesLayer,
+        ...sharedLayerProps,
         id: "wells-layer-filtered-ghost",
-        data: volveWellsWithFormations,
-
-        enableFilters: true,
-        showScreenMarkers: true,
-        showScreenTrajectory: true,
-
-        mdFilterRange: [props.mdFilterRangeStart, props.mdFilterRangeEnd],
-
-        showFilterTrajectoryGhost: true,
-        formationFilter: props.formationFilter,
-        wellNameFilter: props.wellNameFilter,
-
-        refine: false,
-        ZIncreasingDownwards: false,
-        pickable: true,
-        autoHighlight: true,
-        outline: true,
+        positionFormat: "XY",
     });
 
     const unfoldedWells = new WellsLayer({
+        ...sharedLayerProps,
         id: "unfolded-wells",
-        data: volveWellsWithFormations,
         section: true,
-        ZIncreasingDownwards: false,
-        outline: true,
-
-        enableFilters: true,
-
-        showFilterTrajectoryGhost: true,
-        mdFilterRange: [props.mdFilterRangeStart, props.mdFilterRangeEnd],
-        formationFilter: props.formationFilter,
-        wellNameFilter: props.wellNameFilter,
     });
 
     const propsWithLayers: Partial<SubsurfaceViewerProps> = {
@@ -1699,6 +1677,61 @@ function TrajectoryFilterComponent(
     };
 
     return (
-        <SubsurfaceViewer {...propsWithLayers} id="perforations_and_screens" />
+        <div style={{ height: "94vh", width: "100%", display: "flex" }}>
+            <div
+                style={{
+                    width: activeLog ? "90%" : "100%",
+                    position: "relative",
+                }}
+            >
+                <SubsurfaceViewer
+                    {...propsWithLayers}
+                    id="perforations_and_screens"
+                />
+            </div>
+
+            {activeLog && (
+                <div
+                    style={{
+                        width: "10%",
+                        display: "flex",
+                        flexDirection: "column",
+                    }}
+                >
+                    <WellLogViewWithScroller
+                        wellLogSets={[activeLog]}
+                        axisTitles={axisTitles}
+                        axisMnemos={axisMnemos}
+                        primaryAxis="md"
+                        template={{
+                            name: `Zone log - ${activeLog.header.well}`,
+                            scale: { primary: "md" },
+                            tracks: [
+                                {
+                                    title: `${activeLog.header.well}`,
+                                    plots: [
+                                        {
+                                            name: "ZONELOG",
+                                            style: "discrete",
+                                        },
+                                    ],
+                                },
+                            ],
+                            styles: [
+                                {
+                                    name: "discrete",
+                                    type: "stacked",
+                                    colorMapFunctionName: "Stratigraphy",
+                                },
+                            ],
+                        }}
+                        options={{ maxVisibleTrackNum: 1 }}
+                        colorMapFunctions={
+                            colorTablesJson as ColormapFunction[]
+                        }
+                    />
+                </div>
+            )}
+        </div>
     );
 }
