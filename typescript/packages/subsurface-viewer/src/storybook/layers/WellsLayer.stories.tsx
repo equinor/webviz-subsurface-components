@@ -14,18 +14,10 @@ import { NativeSelect } from "@equinor/eds-core-react";
 import { Slider } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import type { Meta, StoryObj } from "@storybook/react";
-import { WellLogViewWithScroller } from "@webviz/well-log-viewer";
-import type { WellLogSet } from "@webviz/well-log-viewer/dist/components/WellLogTypes";
-import {
-    axisMnemos,
-    axisTitles,
-} from "@webviz/well-log-viewer/dist/utils/axes";
-import type { ColormapFunction } from "@webviz/well-log-viewer/dist/utils/color-function";
 import type { FeatureCollection, GeometryCollection } from "geojson";
 
 import volveBlockingZoneLogJson from "../../../../../../example-data/volve_blocking_zonelog_logs.json";
 import volveWellsJson from "../../../../../../example-data/volve_wells.json";
-import colorTablesJson from "../../../../../../example-data/wellpick_colors.json";
 
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
@@ -37,6 +29,7 @@ import type { WellLabelLayerProps } from "../../layers/wells/layers/wellLabelLay
 import { LabelOrientation } from "../../layers/wells/layers/wellLabelLayer";
 import type {
     GeoJsonWellProperties,
+    LogCurveDataType,
     PerforationProperties,
     ScreenProperties,
     WellFeatureCollection,
@@ -1500,7 +1493,7 @@ type TrajectoryFilterArgs = {
 
     formationFilter: string[];
     wellNameFilter: string[];
-    showFormationLogForWell: string;
+    showFormationLogForWells: boolean;
 };
 
 const WELL_NAMES = volveWellsJson.features.map((f) => f.properties.name);
@@ -1565,7 +1558,7 @@ export const TrajectoryFilter: StoryObj<TrajectoryFilterArgs> = {
 
         wellNameFilter: [],
 
-        showFormationLogForWell: "None",
+        showFormationLogForWells: false,
     },
 
     argTypes: {
@@ -1577,10 +1570,6 @@ export const TrajectoryFilter: StoryObj<TrajectoryFilterArgs> = {
         },
         formationFilter: { control: "multi-select", options: ZONES },
         wellNameFilter: { control: "multi-select", options: WELL_NAMES },
-        showFormationLogForWell: {
-            control: "select",
-            options: ["None", ...WELL_NAMES],
-        },
     },
     parameters: {
         docs: {
@@ -1602,10 +1591,6 @@ export const TrajectoryFilter: StoryObj<TrajectoryFilterArgs> = {
 function TrajectoryFilterComponent(
     props: SubsurfaceViewerProps & TrajectoryFilterArgs
 ) {
-    const activeLog = volveBlockingZoneLogJson.find(
-        (l) => l.header.well === props.showFormationLogForWell
-    ) as unknown as WellLogSet | undefined;
-
     const views = React.useMemo<ViewsType>(
         () => ({
             layout: [2, 2] as [number, number],
@@ -1655,6 +1640,13 @@ function TrajectoryFilterComponent(
         pickable: true,
         autoHighlight: true,
         outline: true,
+
+        ...(props.showFormationLogForWells && {
+            logData: volveBlockingZoneLogJson as unknown as LogCurveDataType[],
+            logrunName: "BLOCKING",
+            logName: "ZONELOG",
+            logColor: "Stratigraphy",
+        }),
     };
 
     const wellsLayerWithPerforations = new WellsLayer({
@@ -1688,60 +1680,10 @@ function TrajectoryFilterComponent(
 
     return (
         <div style={{ height: "94vh", width: "100%", display: "flex" }}>
-            <div
-                style={{
-                    width: activeLog ? "90%" : "100%",
-                    position: "relative",
-                }}
-            >
-                <SubsurfaceViewer
-                    {...propsWithLayers}
-                    id="perforations_and_screens"
-                />
-            </div>
-
-            {activeLog && (
-                <div
-                    style={{
-                        width: "10%",
-                        display: "flex",
-                        flexDirection: "column",
-                    }}
-                >
-                    <WellLogViewWithScroller
-                        wellLogSets={[activeLog]}
-                        axisTitles={axisTitles}
-                        axisMnemos={axisMnemos}
-                        primaryAxis="md"
-                        template={{
-                            name: `Zone log - ${activeLog.header.well}`,
-                            scale: { primary: "md" },
-                            tracks: [
-                                {
-                                    title: `${activeLog.header.well}`,
-                                    plots: [
-                                        {
-                                            name: "ZONELOG",
-                                            style: "discrete",
-                                        },
-                                    ],
-                                },
-                            ],
-                            styles: [
-                                {
-                                    name: "discrete",
-                                    type: "stacked",
-                                    colorMapFunctionName: "Stratigraphy",
-                                },
-                            ],
-                        }}
-                        options={{ maxVisibleTrackNum: 1 }}
-                        colorMapFunctions={
-                            colorTablesJson as ColormapFunction[]
-                        }
-                    />
-                </div>
-            )}
+            <SubsurfaceViewer
+                {...propsWithLayers}
+                id="perforations_and_screens"
+            />
         </div>
     );
 }
