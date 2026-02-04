@@ -858,6 +858,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                 data: data.features,
                 outline: this.props.outline,
                 getLineColor: getColor(this.props.lineStyle?.color),
+
                 // We can also specify the color per marker
                 // getMarkerColor: (marker: TrajectoryMarker) => ...
                 updateTriggers: {
@@ -891,6 +892,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                     d.properties.md[0],
                 getTrajectoryPath: (d: WellFeature) =>
                     getTrajectory(d, this.props.lineStyle?.color),
+                getMarkerColor: this.props.markers?.getMarkerColor,
                 getMarkers: (d: WellFeature) => {
                     const maxMd = d.properties.md[0]?.at(-1);
                     const { perforations = [], screens = [] } = d.properties;
@@ -905,10 +907,12 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
                                 {
                                     type: "screen-start",
                                     positionAlongPath: s.mdStart / maxMd,
+                                    properties: s,
                                 },
                                 {
                                     type: "screen-end",
                                     positionAlongPath: s.mdEnd / maxMd,
+                                    properties: s,
                                 },
                             ])
                         );

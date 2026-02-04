@@ -390,8 +390,8 @@ export class FlatWellMarkersLayer<TData = unknown> extends CompositeLayer<
                 getColor: [
                     this.state.hoveredMarkerIndex,
                     this.state.highlightedSourceIndex,
-                    this.props.getLineColor,
-                    this.props.getMarkerColor,
+                    ...(this.props.updateTriggers?.["getLineColor"] || []),
+                    ...(this.props.updateTriggers?.["getMarkerColor"] || []),
                 ],
             },
         };
@@ -425,19 +425,8 @@ export class FlatWellMarkersLayer<TData = unknown> extends CompositeLayer<
                 ...this.getSubLayerProps({
                     ...sharedSubLayerProps,
                     id: SubLayerId.MARKERS_2D,
-                    updateTriggers: {
-                        getPath:
-                            this.props.updateTriggers?.["getTrajectoryPath"],
-                        getColor: [
-                            this.state.hoveredMarkerIndex,
-                            this.state.highlightedSourceIndex,
-                            this.props.getLineColor,
-                            this.props.getMarkerColor,
-                        ],
-                    },
                 }),
                 getColor: this.getMarkerColor,
-
                 getFilterValue: markerFilterAccessor,
 
                 // Disable this layer for picking, instead using MARKERS_2D_PICKING
