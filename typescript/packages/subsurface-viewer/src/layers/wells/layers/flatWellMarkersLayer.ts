@@ -390,8 +390,8 @@ export class FlatWellMarkersLayer<TData = unknown> extends CompositeLayer<
                 getColor: [
                     this.state.hoveredMarkerIndex,
                     this.state.highlightedSourceIndex,
-                    ...(this.props.updateTriggers?.["getLineColor"] || []),
-                    ...(this.props.updateTriggers?.["getMarkerColor"] || []),
+                    ...(this.props.updateTriggers?.["getLineColor"] ?? []),
+                    ...(this.props.updateTriggers?.["getMarkerColor"] ?? []),
                 ],
             },
         };
