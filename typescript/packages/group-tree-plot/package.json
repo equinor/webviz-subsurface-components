@@ -8,6 +8,7 @@
     "/dist"
   ],
   "scripts": {
+    "typecheck": "tsc --noEmit --project ./tsconfig.eslint.json",
     "transpile": "tsc --project ./tsconfig.json",
     "copy-files": "copyfiles --up 1 \"src/**/*.css\" dist/",
     "build": "git clean -xdff dist && npm run transpile && npm run copy-files",

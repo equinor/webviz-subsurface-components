@@ -1,0 +1,10 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "outDir": "./dist",
+        "rootDir": "."
+    },
+    "include": ["*.json", "*.js", "*.ts"],
+    // exclude is overwritten, replicate in .eslintignore,
+    "exclude": ["coverage", "dist", "docs", "node_modules"]
+}
