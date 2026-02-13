@@ -1,3 +1,5 @@
+import { expect } from "@jest/globals";
+
 // @ts-expect-error TS7016
 import { toMatchImageSnapshot } from "jest-image-snapshot";
 
