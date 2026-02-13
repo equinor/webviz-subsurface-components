@@ -11,7 +11,7 @@ exports[`test layers settings button snapshot test 1`] = `
   class="css-mk8rzy"
 >
   <button
-    class="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeMedium MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeMedium MuiFab-default LayerSettingsButton-root css-1fwudth-MuiButtonBase-root-MuiFab-root"
+    class="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeMedium MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeMedium MuiFab-default LayerSettingsButton-root css-ya8w6e-MuiButtonBase-root-MuiFab-root"
     id="drawing-layer-button"
     tabindex="0"
     type="button"
@@ -33,9 +33,6 @@ exports[`test layers settings button snapshot test 1`] = `
         fill-rule="evenodd"
       />
     </svg>
-    <span
-      class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-    />
   </button>
 </div>
 `;
