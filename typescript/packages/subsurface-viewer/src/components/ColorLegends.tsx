@@ -1,14 +1,14 @@
 import React from "react";
 import type { ExtendedLegendLayer } from "../layers/utils/layerTools";
 import ColorLegend from "./ColorLegend";
-import type { colorTablesArray } from "@emerson-eps/color-tables";
+import type { ColorTableArray } from "@emerson-eps/color-tables";
 
 interface ColorLegendsProps {
     // Pass additional css style to the parent color legend container
     cssStyle?: Record<string, unknown> | null;
     horizontal?: boolean | null;
     layers: ExtendedLegendLayer[];
-    colorTables: colorTablesArray | string | undefined;
+    colorTables: ColorTableArray | string | undefined;
     reverseRange?: boolean;
 }
 

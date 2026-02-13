@@ -1,7 +1,7 @@
 import React from "react";
 
 import type { Layer, LayersList } from "@deck.gl/core";
-import type { colorTablesArray } from "@emerson-eps/color-tables";
+import type { ColorTableArray } from "@emerson-eps/color-tables";
 
 import type { Unit } from "convert-units";
 import convert from "convert-units";
@@ -24,12 +24,17 @@ import { TGrid3DColoringMode } from "./layers/grid3d/grid3dLayer";
 
 export type {
     BoundsAccessor,
-    colorTablesArray,
+    ColorTableArray,
     MapMouseEvent,
     TooltipCallback,
     ViewStateType,
     ViewsType,
 };
+
+/**
+ * @deprecated Use ColorTableArray instead.
+ */
+export type colorTablesArray = ColorTableArray;
 
 export { TGrid3DColoringMode };
 

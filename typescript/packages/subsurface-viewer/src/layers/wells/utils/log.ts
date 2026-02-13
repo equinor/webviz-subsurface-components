@@ -1,6 +1,6 @@
 import type { Color } from "@deck.gl/core";
 import {
-    type colorTablesArray,
+    type ColorTableArray,
     rgbValues,
     getColors,
 } from "@emerson-eps/color-tables";
@@ -342,7 +342,7 @@ export function getLogColor(
     logrun_name: string,
     log_name: string,
     logColor: string,
-    colorTables: colorTablesArray,
+    colorTables: ColorTableArray,
     colorMappingFunction: WellsLayerProps["colorMappingFunction"],
     isLog: boolean
 ): Color[] {

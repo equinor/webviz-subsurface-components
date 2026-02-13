@@ -3,9 +3,8 @@
 import React from "react";
 import type { Color } from "@deck.gl/core";
 
-import type { colorTablesArray } from "@emerson-eps/color-tables";
+import type { ColorTableArray, DiscreteCodes } from "@emerson-eps/color-tables";
 import {
-    DiscreteCodes,
     DiscreteColorLegend,
     ContinuousLegend,
 } from "@emerson-eps/color-tables";
@@ -30,7 +29,7 @@ export interface ContinuousLegendDataType extends LegendBaseData {
 /**
  * Type guard function that determines if the legend data is discrete or continuous.
  * Narrows the type of the data parameter to DiscreteLegendDataType when it returns true.
- * 
+ *
  * @param data - The legend data to check, can be either discrete or continuous type
  * @returns True if the data is of discrete type, false otherwise
  */
@@ -47,7 +46,7 @@ function toDiscreteCodes(data: DiscreteLegendDataType): DiscreteCodes {
 interface ColorLegendProps {
     horizontal?: boolean | null;
     layer: ExtendedLegendLayer;
-    colorTables: colorTablesArray | string | undefined;
+    colorTables: ColorTableArray | string | undefined;
     reverseRange?: boolean;
 }
 

@@ -1,8 +1,8 @@
 import { validateSchema } from "./validator";
 import type { Layer } from "@deck.gl/core";
-import type { colorTablesArray } from "@emerson-eps/color-tables";
+import type { ColorTableArray } from "@emerson-eps/color-tables";
 
-export function validateColorTables(colorTables: colorTablesArray): void {
+export function validateColorTables(colorTables: ColorTableArray): void {
     validateSchema(colorTables, "ColorTables");
 }
 

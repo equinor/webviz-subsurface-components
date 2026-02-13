@@ -1,4 +1,4 @@
-import type { colorTablesArray } from "@emerson-eps/color-tables";
+import type { ColorTableArray } from "@emerson-eps/color-tables";
 import { Matrix4 } from "math.gl";
 
 import type {
@@ -39,7 +39,7 @@ export interface ExtendedLegendLayer extends Layer {
 export interface DeckGLLayerContext extends LayerContext {
     userData: {
         setEditedData: (data: Record<string, unknown>) => void;
-        colorTables: colorTablesArray;
+        colorTables: ColorTableArray;
     };
 }
 

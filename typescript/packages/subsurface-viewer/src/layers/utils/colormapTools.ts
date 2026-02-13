@@ -1,7 +1,7 @@
 import type { SamplerProps, Texture, TextureProps } from "@luma.gl/core";
 
 import type {
-    colorTablesArray,
+    ColorTableArray,
     createColorMapFunction as createColormapFunction,
 } from "@emerson-eps/color-tables";
 import { rgbValues } from "@emerson-eps/color-tables";
@@ -31,7 +31,7 @@ export interface IColormapHints {
  */
 export interface ColorTableProps {
     colormapName: string;
-    colorTables?: colorTablesArray;
+    colorTables?: ColorTableArray;
 }
 
 /**
