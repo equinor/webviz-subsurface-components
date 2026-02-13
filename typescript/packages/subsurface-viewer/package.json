@@ -18,6 +18,7 @@
     "dist"
   ],
   "scripts": {
+    "typecheck": "tsc --noEmit --project ./tsconfig.typecheck.json",
     "transpile": "tsc --project ./tsconfig.json",
     "copy-files": "copyfiles --up 1 \"src/{layers,assets}/**/*.png\" dist/",
     "build": "git clean -xdff dist && npm run transpile && npm run copy-files",

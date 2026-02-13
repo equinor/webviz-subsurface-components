@@ -8,6 +8,7 @@
     "dist"
   ],
   "scripts": {
+    "typecheck": "tsc --noEmit --project ./tsconfig.typecheck.json",
     "transpile": "tsc --project ./tsconfig.json",
     "build": "git clean -xdff dist && npm run transpile",
     "test_perf": "jest _performance",
