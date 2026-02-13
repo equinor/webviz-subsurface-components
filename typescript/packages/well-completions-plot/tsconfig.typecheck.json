@@ -4,7 +4,7 @@
         "outDir": "./dist",
         "rootDir": "."
     },
-    "include": ["*.json", "*.js", "*.ts"],
+    "include": ["*.json", "*.js", "src/"],
     // exclude is overwritten, replicate in .eslintignore,
     "exclude": ["coverage", "dist", "docs", "node_modules"]
 }
