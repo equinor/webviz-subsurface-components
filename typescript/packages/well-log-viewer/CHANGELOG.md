@@ -1,3 +1,17 @@
+## 2.7.0 (2026-02-16)
+
+### 🚀 Features
+
+- add support for @mui 7 ([#2709](https://github.com/equinor/webviz-subsurface-components/pull/2709))
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.4.0
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
 ## 2.6.98 (2026-01-05)
 
 ### 🧱 Updated Dependencies
