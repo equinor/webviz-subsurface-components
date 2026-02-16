@@ -40,7 +40,7 @@ import { Matrix4 } from "@math.gl/core";
 import { fovyToAltitude } from "@math.gl/web-mercator";
 
 import { colorTables as defaultColorTables } from "@emerson-eps/color-tables";
-import type { colorTablesArray } from "@emerson-eps/color-tables/";
+import type { ColorTableArray } from "@emerson-eps/color-tables";
 
 import { validateColorTables, validateLayers } from "@webviz/wsc-common";
 import { Axes2DLayer, NorthArrow3DLayer, WellsLayer } from "../layers";
@@ -372,7 +372,7 @@ export interface MapProps {
     /**
      * Prop containing color table data
      */
-    colorTables?: colorTablesArray;
+    colorTables?: ColorTableArray;
 
     /**
      * @deprecated Used by layers to propagate state to component, eg. selected

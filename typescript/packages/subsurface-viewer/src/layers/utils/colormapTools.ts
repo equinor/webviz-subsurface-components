@@ -1,10 +1,10 @@
 import type { SamplerProps, Texture, TextureProps } from "@luma.gl/core";
 
 import type {
-    colorTablesArray,
+    ColorTableArray,
     createColorMapFunction as createColormapFunction,
-} from "@emerson-eps/color-tables/";
-import { rgbValues } from "@emerson-eps/color-tables/";
+} from "@emerson-eps/color-tables";
+import { rgbValues } from "@emerson-eps/color-tables";
 import { createDefaultContinuousColorScale } from "@emerson-eps/color-tables/dist/component/Utils/legendCommonFunction";
 
 import type { DeckGLLayerContext } from "./layerTools";
@@ -31,7 +31,7 @@ export interface IColormapHints {
  */
 export interface ColorTableProps {
     colormapName: string;
-    colorTables?: colorTablesArray;
+    colorTables?: ColorTableArray;
 }
 
 /**

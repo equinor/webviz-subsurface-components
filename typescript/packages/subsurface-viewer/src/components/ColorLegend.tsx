@@ -3,7 +3,7 @@
 import React from "react";
 import type { Color } from "@deck.gl/core";
 
-import type { colorTablesArray } from "@emerson-eps/color-tables/";
+import type { ColorTableArray, DiscreteCodes } from "@emerson-eps/color-tables";
 import {
     DiscreteColorLegend,
     ContinuousLegend,
@@ -26,10 +26,27 @@ export interface ContinuousLegendDataType extends LegendBaseData {
     valueRange: [number, number];
 }
 
+/**
+ * Type guard function that determines if the legend data is discrete or continuous.
+ * Narrows the type of the data parameter to DiscreteLegendDataType when it returns true.
+ *
+ * @param data - The legend data to check, can be either discrete or continuous type
+ * @returns True if the data is of discrete type, false otherwise
+ */
+function isDiscrete(
+    data: DiscreteLegendDataType | ContinuousLegendDataType
+): data is DiscreteLegendDataType {
+    return data.discrete;
+}
+
+function toDiscreteCodes(data: DiscreteLegendDataType): DiscreteCodes {
+    return data.metadata as DiscreteCodes;
+}
+
 interface ColorLegendProps {
     horizontal?: boolean | null;
     layer: ExtendedLegendLayer;
-    colorTables: colorTablesArray | string | undefined;
+    colorTables: ColorTableArray | string | undefined;
     reverseRange?: boolean;
 }
 
@@ -55,21 +72,19 @@ const ColorLegend: React.FC<ColorLegendProps> = ({
 
     return (
         <div style={{ marginTop: 30 }}>
-            {legendData.discrete && (
+            {isDiscrete(legendData) && (
                 <DiscreteColorLegend
-                    discreteData={
-                        (legendData as DiscreteLegendDataType).metadata
-                    }
+                    discreteData={toDiscreteCodes(legendData)}
                     dataObjectName={legendData.title}
                     colorName={legendData.colorName}
                     horizontal={horizontal}
                     colorTables={colorTables}
                 />
             )}
-            {!legendData.discrete && (
+            {!isDiscrete(legendData) && (
                 <ContinuousLegend
-                    min={(legendData as ContinuousLegendDataType).valueRange[0]}
-                    max={(legendData as ContinuousLegendDataType).valueRange[1]}
+                    min={legendData.valueRange[0]}
+                    max={legendData.valueRange[1]}
                     dataObjectName={legendData.title}
                     colorName={legendData.colorName}
                     horizontal={horizontal}

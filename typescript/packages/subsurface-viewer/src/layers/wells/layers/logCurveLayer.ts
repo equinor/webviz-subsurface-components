@@ -1,5 +1,5 @@
 import { clamp, isEqual } from "lodash";
-import { type colorTablesArray } from "@emerson-eps/color-tables/";
+import { type ColorTableArray } from "@emerson-eps/color-tables";
 
 import type {
     Accessor,
@@ -64,7 +64,7 @@ export type LogCurveLayerProps = Omit<
     colorScale: {
         name: string;
         isLogarithmic: boolean;
-        colorTables: colorTablesArray;
+        colorTables: ColorTableArray;
         mappingFunction: ColormapFunctionType;
     };
 

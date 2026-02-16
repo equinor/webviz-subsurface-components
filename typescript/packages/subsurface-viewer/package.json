@@ -42,7 +42,7 @@
     "@deck.gl/layers": "~9.2.7",
     "@deck.gl/mesh-layers": "~9.2.7",
     "@deck.gl/react": "~9.2.7",
-    "@emerson-eps/color-tables": "^0.4.92",
+    "@emerson-eps/color-tables": "^1.0.2",
     "@equinor/eds-core-react": "^0.36.0",
     "@equinor/eds-icons": "^0.21.0",
     "@turf/simplify": "^7.1.0",
@@ -62,8 +62,9 @@
     "workerpool": "^9.2.0"
   },
   "peerDependencies": {
-    "@mui/material": "^5.11",
-    "@mui/system": "^5.11",
+    "@mui/icons-material": "^5.11 || ^6 || ^7.3",
+    "@mui/material": "^5.11 || ^6 || ^7.3",
+    "@mui/system": "^5.11 || ^6 || ^7.3",
     "@reduxjs/toolkit": "^1.7.2 || ^2",
     "react": "^17 || ^18",
     "react-dom": "^17 || ^18",

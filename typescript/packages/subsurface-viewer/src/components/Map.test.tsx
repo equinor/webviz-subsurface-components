@@ -1,6 +1,5 @@
 import type { LayersList } from "@deck.gl/core";
 import { colorTables } from "@emerson-eps/color-tables";
-import type { colorTablesArray } from "@emerson-eps/color-tables/";
 import "@testing-library/jest-dom";
 import { render } from "@testing-library/react";
 import "jest-styled-components";
@@ -19,7 +18,7 @@ import Map from "./Map";
 
 import type { Unit } from "convert-units";
 import mapData from "../../../../../example-data/deckgl-map.json";
-const colorTablesData = colorTables as colorTablesArray;
+const colorTablesData = colorTables;
 const testBounds = [432205, 6475078, 437720, 6481113] as [
     number,
     number,

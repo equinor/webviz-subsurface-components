@@ -3,11 +3,7 @@ import { styled } from "@mui/material/styles";
 
 import type { Meta, StoryObj } from "@storybook/react";
 
-// @ts-expect-error TS6192
-import type {
-    colorTablesArray,
-    ContinuousLegendProps,
-} from "@emerson-eps/color-tables";
+import type { ContinuousLegendProps } from "@emerson-eps/color-tables";
 import { ContinuousLegend, colorTables } from "@emerson-eps/color-tables";
 import { DEFAULT_STYLE as defaultLegendStyle } from "@emerson-eps/color-tables/dist/component/Legend/constants";
 
@@ -68,11 +64,9 @@ const max = 0.35;
 const dataObjectName = "Legend";
 const horizontal = true;
 const reverseRange = false;
-// @ts-expect-error TS2709
-const colorTablesData = colorTables as colorTablesArray;
+const colorTablesData = colorTables;
 
 type SubsurfaceViewerWithLegendProps = SubsurfaceViewerProps &
-    // @ts-expect-error TS2709
     ContinuousLegendProps;
 
 // 4 maps with same color scale for all maps

@@ -4,7 +4,7 @@ export { default } from "./SubsurfaceViewer";
 export { TGrid3DColoringMode } from "./SubsurfaceViewer";
 export type {
     BoundsAccessor,
-    colorTablesArray,
+    ColorTableArray,
     LightsType,
     MapMouseEvent,
     SubsurfaceViewerProps,
@@ -12,6 +12,7 @@ export type {
     TooltipCallback,
     ViewStateType,
     ViewsType,
+    colorTablesArray,
 } from "./SubsurfaceViewer";
 
 export * from "./utils";
