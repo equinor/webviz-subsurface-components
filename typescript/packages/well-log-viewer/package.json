@@ -1,6 +1,6 @@
 {
   "name": "@webviz/well-log-viewer",
-  "version": "2.7.0",
+  "version": "2.7.1",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -24,7 +24,7 @@
   "dependencies": {
     "@emerson-eps/color-tables": "^1.0.2",
     "@equinor/videx-wellog": "^0.11.3",
-    "@webviz/wsc-common": "1.4.0",
+    "@webviz/wsc-common": "1.4.1",
     "convert-units": "^2.3.4",
     "d3": "^7.8.2"
   },

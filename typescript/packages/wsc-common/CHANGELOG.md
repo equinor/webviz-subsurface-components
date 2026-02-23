@@ -1,3 +1,13 @@
+## 1.4.1 (2026-02-23)
+
+### 🩹 Fixes
+
+- bump ajv to latest ([#2713](https://github.com/equinor/webviz-subsurface-components/pull/2713))
+
+### ❤️ Thank You
+
+- Håvard Bjerke
+
 ## 1.4.0 (2026-02-16)
 
 ### 🚀 Features
