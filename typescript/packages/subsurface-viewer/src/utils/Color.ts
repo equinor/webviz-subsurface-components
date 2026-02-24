@@ -5,7 +5,7 @@
  */
 import type { Color } from "@deck.gl/core";
 
-export type { Color };
+export type { Color } from "@deck.gl/core";
 
 /**
  * RGB color represented as a tuple of three numbers: [red, green, blue].
@@ -24,11 +24,10 @@ export type RGBAColor = [number, number, number, number];
  * @param color - The input color as an array of numbers. It can be either:
  *   - [r, g, b]: An RGB color, where each channel is a number between 0 and 255.
  *   - [r, g, b, a]: An RGBA color, where each channel is a number between 0 and 255.
- * @returns A tuple [r, g, b, a] where each value is normalized to the range [0, 1].
+ *   - undefined
+ * @returns A tuple [r, g, b, a] where each value is normalized to the range [0, 1] or undefined.
  */
-export function toNormalizedColor(
-    color: Color | undefined
-): RGBAColor | undefined {
+export function toNormalizedColor(color?: Color): RGBAColor | undefined {
     return color
         ? [
               color[0] / 255,
@@ -40,7 +39,38 @@ export function toNormalizedColor(
 }
 
 /**
- * Blends to color arrays together, following an additive blending pattern.
+ * Converts a color represented as an array of numbers (either RGB or RGBA) with 8-bit channel values (0-255)
+ * into a normalized RGBA tuple with values in the range [0, 1].
+ *
+ * @param color - The input color as an array of numbers. It can be either:
+ *   - [r, g, b]: An RGB color, where each channel is a number between 0 and 255.
+ *   - [r, g, b, a]: An RGBA color, where each channel is a number between 0 and 255.
+ * @returns A tuple [r, g, b, a] where each value is normalized to the range [0, 1].
+ */
+export function toNormalizedRGBAColor(color: Color): RGBAColor {
+    return [
+        color[0] / 255,
+        color[1] / 255,
+        color[2] / 255,
+        color.length === 3 ? 1 : (color as RGBAColor)[3] / 255,
+    ];
+}
+
+/**
+ * Converts a color represented as an array of numbers (either RGB or RGBA) with 8-bit channel values (0-255)
+ * into a normalized RGB tuple with values in the range [0, 1].
+ *
+ * @param color - The input color as an array of numbers. It can be either:
+ *   - [r, g, b]: An RGB color, where each channel is a number between 0 and 255.
+ *   - [r, g, b, a]: An RGBA color, where each channel is a number between 0 and 255.
+ * @returns A tuple [r, g, b] where each value is normalized to the range [0, 1].
+ */
+export function toNormalizedRGBColor(color: Color): RGBColor {
+    return [color[0] / 255, color[1] / 255, color[2] / 255];
+}
+
+/**
+ * Blends two color arrays together, following an additive blending pattern.
  * @param baseColor The underlying color.
  * @param addedColor The color to add on top. If this color has no opacity, the base color is fully overwritten
  * @returns The blended color as an RGBA array
@@ -62,4 +92,14 @@ export function blendColors(baseColor: Color, addedColor: Color) {
     };
 
     return [mixChannel(0), mixChannel(1), mixChannel(2), mixedAlpha * 255];
+}
+
+/**
+ * Converts a `Color` object to an array representation.
+ *
+ * @param color - The color value to convert, expected to be an iterable (e.g., TypedArray or array-like) representing a color.
+ * @returns The color as an array of numbers, typed as either `RGBColor` or `RGBAColor`.
+ */
+export function toArrayColor(color: Color): RGBColor | RGBAColor {
+    return Array.from(color) as RGBColor | RGBAColor;
 }

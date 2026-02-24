@@ -28,6 +28,7 @@ import {
 } from "../utils/colormapTools";
 
 import type { Color, RGBAColor, RGBColor } from "../../utils/Color";
+import { toNormalizedRGBAColor, toNormalizedRGBColor } from "../../utils/Color";
 
 import linearFragmentShader from "./nodeProperty.fs.glsl";
 import linearVertexShader from "./nodeProperty.vs.glsl";
@@ -339,7 +340,7 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             // and this.props.propertyValueRange?.[1] should be N
             return {
                 discreteData: true,
-                colormapSize: (this.props.propertyValueRange?.[1] ?? 0.0) + 1,
+                colormapSize: (this.props.propertyValueRange?.[1] ?? 0) + 1,
             };
         }
         return {
@@ -349,8 +350,8 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
     }
 
     private getUniforms(): IUniforms {
-        const valueRangeMin = this.props.propertyValueRange?.[0] ?? 0.0;
-        const valueRangeMax = this.props.propertyValueRange?.[1] ?? 1.0;
+        const valueRangeMin = this.props.propertyValueRange?.[0] ?? 0;
+        const valueRangeMax = this.props.propertyValueRange?.[1] ?? 1;
 
         // If specified color map will extend from colormapRangeMin to colormapRangeMax.
         // Otherwise it will extend from valueRangeMin to valueRangeMax.
@@ -363,37 +364,20 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             this.props.colormapClampColor !== undefined &&
             this.props.colormapClampColor !== true &&
             this.props.colormapClampColor !== false;
-        let colormapClampColor = (
-            hasClampColor ? this.props.colormapClampColor : [0, 0, 0, 255]
-        ) as Color;
-        if (isColormapClampColorTransparent) {
-            colormapClampColor = [0, 0, 0, 0];
-        }
-
-        if (colormapClampColor.length === 3) {
-            colormapClampColor = [...colormapClampColor, 255] as [
-                number,
-                number,
-                number,
-                number,
-            ];
-        }
-        const isClampColor = hasClampColor || isColormapClampColorTransparent;
 
         // Normalize to [0,1] range.
-        const colormapClampColorUniform = colormapClampColor.map(
-            (x) => (x ?? 0) / 255
-        );
+        const colormapClampColorUniform: RGBAColor = hasClampColor
+            ? toNormalizedRGBAColor(this.props.colormapClampColor as Color)
+            : [0, 0, 0, 1];
         if (isColormapClampColorTransparent) {
-            colormapClampColor[3] = 0;
+            colormapClampColorUniform[3] = 0;
         }
 
-        const undefinedPropertyColorUniform =
-            this.props.undefinedPropertyColor.map((x) => (x ?? 0) / 255) as [
-                number,
-                number,
-                number,
-            ];
+        const isClampColor = hasClampColor || isColormapClampColorTransparent;
+
+        const undefinedPropertyColorUniform = toNormalizedRGBColor(
+            this.props.undefinedPropertyColor
+        ) as [number, number, number];
 
         const coloringHints = this.getColoringHints();
 
@@ -403,7 +387,7 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             valueRangeMax,
             colormapRangeMin: colormapRangeMin,
             colormapRangeMax: colormapRangeMax,
-            colormapClampColor: Array.from(colormapClampColorUniform),
+            colormapClampColor: colormapClampColorUniform,
             isClampColor,
             coloringMode: this.props.coloringMode,
             undefinedPropertyColor: undefinedPropertyColorUniform,

@@ -1,4 +1,7 @@
 import React from "react";
+
+import { rgb } from "d3-color";
+
 import {
     Collapse,
     Table,
@@ -7,16 +10,17 @@ import {
     TableContainer,
     TableRow,
 } from "@mui/material";
+import { styled } from "@mui/system";
+
 import { Button, Icon } from "@equinor/eds-core-react";
 import { arrow_drop_up, arrow_drop_down } from "@equinor/eds-icons";
-import { styled } from "@mui/system";
 
 import type {
     ExtendedLayerProps,
     LayerPickInfo,
     PropertyDataType,
 } from "../layers/utils/layerTools";
-import { rgb } from "d3-color";
+import { toNormalizedRGBAColor } from "../utils/Color";
 import { WellLabelLayer } from "../layers/wells/layers/wellLabelLayer";
 import { SectionViewport } from "../viewports/sectionViewport";
 
@@ -115,12 +119,9 @@ function Row(props: { layer_data: InfoCardDataType }) {
                                                 <span
                                                     style={{
                                                         color: rgb(
-                                                            ...(propertyRow.color as [
-                                                                number,
-                                                                number,
-                                                                number,
-                                                                number?,
-                                                            ])
+                                                            ...toNormalizedRGBAColor(
+                                                                propertyRow.color
+                                                            )
                                                         ).toString(),
                                                     }}
                                                 >

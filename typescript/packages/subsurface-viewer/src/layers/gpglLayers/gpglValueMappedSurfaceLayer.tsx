@@ -593,11 +593,11 @@ export class GpglValueMappedSurfaceLayer extends Layer<GpglValueMappedSurfaceLay
                         defaultColormapSetup.undefinedValue,
                     undefinedColor: toNormalizedColor(
                         this.props.colormapSetup?.undefinedColor ??
-                            defaultColormapSetup.undefinedColor
+                            (defaultColormapSetup.undefinedColor as Color)
                     ),
                     // Normalize color to [0,1] range.
                     uColor: toNormalizedColor(
-                        this.props.color ?? defaultProps.color
+                        this.props.color ?? (defaultProps.color as Color)
                     ),
                     smoothShading:
                         this.props.smoothShading ?? defaultProps.smoothShading,
