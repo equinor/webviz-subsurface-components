@@ -1,8 +1,10 @@
+import type { GeoJsonProperties, Geometry } from "geojson";
+
 import type {
     EditAction,
     Feature,
     FeatureCollection,
-    GeoJsonEditMode,
+    SimpleFeatureCollection,
     ModeProps,
 } from "@deck.gl-community/editable-layers";
 import {
@@ -30,13 +32,24 @@ import type {
     LayerPickInfo,
 } from "../utils/layerTools";
 
+type SimpleFeatureCollectionWrapper = FeatureCollection<
+    Geometry,
+    GeoJsonProperties
+>;
+
 // Custom drawing mode that deletes the selected GeoJson feature when releasing the Delete key.
 class CustomModifyMode extends ModifyMode {
-    handleKeyUp(event: KeyboardEvent, props: ModeProps<FeatureCollection>) {
+    handleKeyUp(
+        event: KeyboardEvent,
+        props: ModeProps<SimpleFeatureCollectionWrapper>
+    ) {
         super.handleKeyUp(event, props);
 
         if (event.key === "Delete") {
-            const updatedData = new ImmutableFeatureCollection(props.data)
+            // Cast props.data to SimpleFeatureCollection for compatibility with ImmutableFeatureCollection
+            const updatedData = new ImmutableFeatureCollection(
+                props.data as SimpleFeatureCollection
+            )
                 .deleteFeatures(props.selectedIndexes)
                 .getObject();
 
@@ -54,9 +67,12 @@ class CustomModifyMode extends ModifyMode {
 }
 
 function deleteEscapeKeyHandler(
-    drawMode: GeoJsonEditMode,
+    drawMode: {
+        getClickSequence: () => unknown[];
+        resetClickSequence: () => void;
+    },
     event: KeyboardEvent,
-    props: ModeProps<FeatureCollection>
+    props: ModeProps<SimpleFeatureCollection>
 ) {
     if (event.key === "Escape") drawMode.getClickSequence().pop();
     else if (event.key === "Delete") drawMode.resetClickSequence();
@@ -76,14 +92,20 @@ function deleteEscapeKeyHandler(
 }
 
 class CustomDrawLineStringMode extends DrawLineStringMode {
-    handleKeyUp(event: KeyboardEvent, props: ModeProps<FeatureCollection>) {
+    handleKeyUp(
+        event: KeyboardEvent,
+        props: ModeProps<SimpleFeatureCollection>
+    ) {
         super.handleKeyUp(event, props);
         deleteEscapeKeyHandler(this, event, props);
     }
 }
 
 class CustomDrawPolygonMode extends DrawPolygonMode {
-    handleKeyUp(event: KeyboardEvent, props: ModeProps<FeatureCollection>) {
+    handleKeyUp(
+        event: KeyboardEvent,
+        props: ModeProps<SimpleFeatureCollection>
+    ) {
         super.handleKeyUp(event, props);
         deleteEscapeKeyHandler(this, event, props);
     }
@@ -171,7 +193,7 @@ export default class DrawingLayer extends CompositeLayer<DrawingLayerProps> {
 
     // Callback for various editing events. Most events will update this component
     // through patches sent to the map parent. See patchLayerPropsin layerTools.ts.
-    _onEdit(editAction: EditAction<FeatureCollection>): void {
+    _onEdit(editAction: EditAction<SimpleFeatureCollection>): void {
         switch (editAction.editType) {
             case "addFeature":
                 this.setState({
@@ -219,7 +241,7 @@ export default class DrawingLayer extends CompositeLayer<DrawingLayerProps> {
         const selectedFeatureIndexes = this.state[
             "selectedFeatureIndexes"
         ] as number[];
-        const data = this.state["data"] as FeatureCollection;
+        const data = this.state["data"] as SimpleFeatureCollection;
         const is_feature_selected = selectedFeatureIndexes.some(
             (i: number) => (data.features[i] as unknown as Feature) === feature
         );
@@ -242,7 +264,7 @@ export default class DrawingLayer extends CompositeLayer<DrawingLayerProps> {
             },
             selectedFeatureIndexes: this.state["selectedFeatureIndexes"],
             coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
-            onEdit: (editAction: EditAction<FeatureCollection>) =>
+            onEdit: (editAction: EditAction<SimpleFeatureCollection>) =>
                 this._onEdit(editAction),
             _subLayerProps: {
                 geojson: {

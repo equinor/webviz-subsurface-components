@@ -7,21 +7,20 @@ import type {
     ChangeFlags,
     Color,
     CompositeLayerProps,
-    Layer,
     LayerContext,
-    LayerManager,
     LayersList,
     PickingInfo,
 } from "@deck.gl/core";
+import { Layer, LayerManager } from "@deck.gl/core";
 
 import type {
     ContinuousLegendDataType,
     DiscreteLegendDataType,
 } from "../../components/ColorLegend";
-import type DrawingLayer from "../drawing/drawingLayer";
+import DrawingLayer from "../drawing/drawingLayer";
 
 import type { BoundingBox3D } from "../../utils";
-import { computeBoundingBox as buidBoundingBox } from "../../utils/BoundingBox3D";
+import { computeBoundingBox as buildBoundingBox } from "../../utils/BoundingBox3D";
 
 export interface TypeAndNameLayerProps {
     "@@type"?: string;
@@ -190,7 +189,7 @@ export function computeBoundingBox(
     dataArray: Float32Array,
     zIncreasingDownwards: boolean = false
 ): BoundingBox3D {
-    const bbox = buidBoundingBox(dataArray);
+    const bbox = buildBoundingBox(dataArray);
     if (zIncreasingDownwards) {
         // invert Z coordinates
         bbox[2] = -bbox[2];
