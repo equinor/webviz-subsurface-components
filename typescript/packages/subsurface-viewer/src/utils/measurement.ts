@@ -2,7 +2,7 @@
 
 import { subtract, dot } from "mathjs";
 import type {
-    FeatureOf,
+    Feature,
     LineString,
     Polygon,
 } from "@deck.gl-community/editable-layers";
@@ -10,14 +10,14 @@ import type { Position } from "geojson";
 
 import { geomReduce, segmentReduce } from "@turf/meta";
 
-export function length(geojson: FeatureOf<LineString>): number {
+export function length(geojson: Feature<LineString>): number {
     // Calculate distance from 2-vertex line segments
     return segmentReduce(
         // @ts-ignore
         geojson,
-        function (previousValue?: number, segment?: FeatureOf<LineString>) {
+        function (previousValue?: number, segment?: Feature<LineString>) {
             if (segment === undefined || previousValue === undefined) return 0;
-            const coords = segment.geometry.coordinates as Position[];
+            const coords = segment.geometry.coordinates;
             return previousValue + distance(coords[0], coords[1]);
         },
         0
@@ -27,7 +27,7 @@ export function length(geojson: FeatureOf<LineString>): number {
 /**
  * Takes one or more features and returns their area in square meters.
  */
-export function area(geojson: FeatureOf<Polygon>): number {
+export function area(geojson: Feature<Polygon>): number {
     return geomReduce(
         // @ts-ignore
         geojson,
@@ -107,7 +107,7 @@ export function isPointAwayFromLineEnd(
     const ab = subtract(line[1] as number[], line[0] as number[]);
     const cb = subtract(line[1] as number[], point as number[]);
 
-    const dotProduct = dot(ab as number[], cb as number[]);
+    const dotProduct = dot(ab, cb);
 
     // If the dot product is negative, the point has moved past the end of the line
     return dotProduct < 0;
