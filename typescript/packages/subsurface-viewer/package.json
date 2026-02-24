@@ -33,7 +33,7 @@
   "author": "Equinor <opensource@equinor.com>",
   "license": "MPL-2.0",
   "dependencies": {
-    "@deck.gl-community/editable-layers": "~9.1.1",
+    "@deck.gl-community/editable-layers": "^9.2.5",
     "@deck.gl/aggregation-layers": "~9.2.9",
     "@deck.gl/core": "~9.2.9",
     "@deck.gl/extensions": "~9.2.9",
