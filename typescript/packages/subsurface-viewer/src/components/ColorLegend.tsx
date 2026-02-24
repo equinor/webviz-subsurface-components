@@ -40,7 +40,7 @@ function isDiscrete(
 }
 
 function toDiscreteCodes(data: DiscreteLegendDataType): DiscreteCodes {
-    return data.metadata as DiscreteCodes;
+    return data.metadata as unknown as DiscreteCodes;
 }
 
 interface ColorLegendProps {
