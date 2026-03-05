@@ -21,7 +21,7 @@
   "author": "Equinor <opensource@equinor.com>",
   "license": "MPL-2.0",
   "dependencies": {
-    "@deck.gl/core": "~9.2.7",
+    "@deck.gl/core": "~9.2.9",
     "@emerson-eps/color-tables": "^1.0.2",
     "ajv": "^8.18.0"
   },

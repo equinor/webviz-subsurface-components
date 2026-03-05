@@ -1,7 +1,13 @@
 import "jest";
 
 import type { RGBAColor, RGBColor } from "../utils/Color";
-import { blendColors, toNormalizedColor } from "./Color";
+import {
+    blendColors,
+    toArrayColor,
+    toNormalizedColor,
+    toNormalizedRGBAColor,
+    toNormalizedRGBColor,
+} from "./Color";
 
 describe("Color utilities", () => {
     describe("toNormalizedColor", () => {
@@ -41,6 +47,70 @@ describe("Color utilities", () => {
         });
     });
 
+    describe("toNormalizedRGBAColor", () => {
+        it("should normalize an RGB color array", () => {
+            const input: RGBColor = [255, 128, 0];
+            const result = toNormalizedRGBAColor(input);
+            expect(result).toEqual([1, 128 / 255, 0, 1]);
+        });
+
+        it("should normalize an RGBA color array", () => {
+            const input: RGBAColor = [64, 128, 192, 128];
+            const result = toNormalizedRGBAColor(input);
+            expect(result).toEqual([64 / 255, 128 / 255, 192 / 255, 128 / 255]);
+        });
+
+        it("should handle black RGB color", () => {
+            const input: RGBColor = [0, 0, 0];
+            const result = toNormalizedRGBAColor(input);
+            expect(result).toEqual([0, 0, 0, 1]);
+        });
+
+        it("should handle white RGBA color", () => {
+            const input: RGBAColor = [255, 255, 255, 255];
+            const result = toNormalizedRGBAColor(input);
+            expect(result).toEqual([1, 1, 1, 1]);
+        });
+
+        it("should handle alpha channel of 0 in RGBA", () => {
+            const input: RGBAColor = [10, 20, 30, 0];
+            const result = toNormalizedRGBAColor(input);
+            expect(result).toEqual([10 / 255, 20 / 255, 30 / 255, 0]);
+        });
+    });
+
+    describe("toNormalizedRGBColor", () => {
+        it("should normalize an RGB color array", () => {
+            const input: RGBColor = [255, 128, 0];
+            const result = toNormalizedRGBColor(input);
+            expect(result).toEqual([1, 128 / 255, 0]);
+        });
+
+        it("should normalize an RGBA color array", () => {
+            const input: RGBAColor = [64, 128, 192, 128];
+            const result = toNormalizedRGBColor(input);
+            expect(result).toEqual([64 / 255, 128 / 255, 192 / 255]);
+        });
+
+        it("should handle black RGB color", () => {
+            const input: RGBColor = [0, 0, 0];
+            const result = toNormalizedRGBColor(input);
+            expect(result).toEqual([0, 0, 0]);
+        });
+
+        it("should handle white RGBA color", () => {
+            const input: RGBAColor = [255, 255, 255, 255];
+            const result = toNormalizedRGBColor(input);
+            expect(result).toEqual([1, 1, 1]);
+        });
+
+        it("should handle alpha channel of 0 in RGBA", () => {
+            const input: RGBAColor = [10, 20, 30, 0];
+            const result = toNormalizedRGBColor(input);
+            expect(result).toEqual([10 / 255, 20 / 255, 30 / 255]);
+        });
+    });
+
     describe("blendColors", () => {
         it("should blend two colors equally", () => {
             const color1: RGBAColor = [255, 0, 0, 255];
@@ -77,6 +147,35 @@ describe("Color utilities", () => {
 
             const result = blendColors(color1, color2);
             expect(result).toEqual([0, 0, 0, 0]);
+        });
+    });
+
+    describe("toArrayColor", () => {
+        it("should convert an RGBColor to an array", () => {
+            const input: RGBColor = [10, 20, 30];
+            const result = toArrayColor(input);
+            expect(Array.isArray(result)).toBe(true);
+            expect(result).toEqual(input);
+        });
+
+        it("should convert an RGBAColor to an array", () => {
+            const input: RGBAColor = [100, 150, 200, 50];
+            const result = toArrayColor(input);
+            expect(Array.isArray(result)).toBe(true);
+            expect(result).toEqual(input);
+        });
+
+        it("should handle a TypedArray input", () => {
+            const inputArray = [1, 2, 3, 4];
+            const input = new Uint8Array(inputArray);
+            const result = toArrayColor(input as unknown as RGBAColor);
+            expect(result).toEqual(inputArray);
+        });
+
+        it("should handle an array-like object", () => {
+            const input = { 0: 5, 1: 10, 2: 15, 3: 20, length: 4 };
+            const result = toArrayColor(input as unknown as RGBAColor);
+            expect(result).toEqual([5, 10, 15, 20]);
         });
     });
 });

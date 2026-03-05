@@ -20,6 +20,7 @@ import { GL } from "@luma.gl/constants";
 import type { Position } from "geojson";
 import _ from "lodash";
 
+import type { RGBAColor, RGBColor } from "../../../utils/Color";
 import { blendColors } from "../../../utils/Color";
 import type { LayerPickInfo } from "../../utils/layerTools";
 import {
@@ -177,7 +178,7 @@ export class FlatWellMarkersLayer<TData = unknown> extends CompositeLayer<
                         itemContext
                         // The typing is a little misleading here; the *default* accessor could
                         // potentially return undefined, so we need to include a fallback here
-                    ) ?? getCumulativeDistance(trajectoryPath)!;
+                    ) ?? getCumulativeDistance(trajectoryPath);
 
                 cumulativePathDistanceCache.set(index, cumulativeDistance);
             }
@@ -306,18 +307,14 @@ export class FlatWellMarkersLayer<TData = unknown> extends CompositeLayer<
         let baseColor: Color;
 
         if (this.props.getMarkerColor) {
-            baseColor = getFromAccessor(
-                this.props.getMarkerColor,
-                d,
-                ctx
-            ) as Color;
+            baseColor = getFromAccessor(this.props.getMarkerColor, d, ctx);
         } else if (this.props.getLineColor) {
             baseColor = getFromAccessor(
                 this.props.getLineColor,
                 // @ts-expect-error -- accessors are hard :O
                 d.sourceObject,
                 ctx
-            ) as Color;
+            );
         } else {
             baseColor = [0, 0, 0, 255];
         }
@@ -327,7 +324,7 @@ export class FlatWellMarkersLayer<TData = unknown> extends CompositeLayer<
         }
 
         // Mimic auto-highlight behavior
-        let highlightColor: Color;
+        let highlightColor: RGBAColor | RGBColor;
 
         if (typeof this.props.highlightColor === "function") {
             console.warn(
@@ -335,7 +332,7 @@ export class FlatWellMarkersLayer<TData = unknown> extends CompositeLayer<
             );
             highlightColor = [0, 0, 128, 128];
         } else {
-            highlightColor = this.props.highlightColor as Color;
+            highlightColor = this.props.highlightColor as RGBAColor | RGBColor;
         }
 
         return blendColors(baseColor, highlightColor);
