@@ -10,19 +10,18 @@ import json
 import os as _os
 import sys as _sys
 import warnings
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version as _get_version
 
 import dash as _dash
-from importlib.metadata import PackageNotFoundError, version as _get_version
 
 from ._imports_ import *
 from ._imports_ import __all__
 from .py_expression_eval import Parser
-from .VectorCalculatorWrapper import (
-    ExpressionInfo,
-    ExternalParseData,
-    VariableVectorMapInfo,
-)
-from .VectorCalculatorWrapper import VectorCalculatorWrapper as VectorCalculator
+from .VectorCalculatorWrapper import (ExpressionInfo, ExternalParseData,
+                                      VariableVectorMapInfo)
+from .VectorCalculatorWrapper import \
+    VectorCalculatorWrapper as VectorCalculator
 from .VectorDefinitions import VectorDefinition, VectorDefinitions
 
 try:
