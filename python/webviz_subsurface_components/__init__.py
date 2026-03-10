@@ -12,7 +12,7 @@ import sys as _sys
 import warnings
 
 import dash as _dash
-from pkg_resources import DistributionNotFound, get_distribution
+from importlib.metadata import PackageNotFoundError, version as _get_version
 
 from ._imports_ import *
 from ._imports_ import __all__
@@ -26,8 +26,8 @@ from .VectorCalculatorWrapper import VectorCalculatorWrapper as VectorCalculator
 from .VectorDefinitions import VectorDefinition, VectorDefinitions
 
 try:
-    __version__ = get_distribution(__name__).version
-except DistributionNotFound:
+    __version__ = _get_version(__name__)
+except PackageNotFoundError:
     # package is not installed
     pass
 
