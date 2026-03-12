@@ -4,7 +4,11 @@ export type { Point3D } from "./Point3D";
 export { add as addPoints3D } from "./Point3D";
 
 export type { Color, RGBColor, RGBAColor } from "./Color";
-export { toNormalizedColor } from "./Color";
+export {
+    toArrayColor,
+    toNormalizedColor,
+    toNormalizedRGBAColor,
+} from "./Color";
 
 export type { TypedArray, TypedFloatArray, TypedIntArray } from "./typedArray";
 export { isNumberArray, isTypedArray, toTypedArray } from "./typedArray";

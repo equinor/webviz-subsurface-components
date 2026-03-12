@@ -19,6 +19,7 @@ import type { ShaderModule } from "@luma.gl/shadertools";
 import { vec4 } from "gl-matrix";
 
 import type { Point3D, RGBAColor } from "../../utils";
+import { toNormalizedColor } from "../../utils";
 import { SectionViewport } from "../../viewports/sectionViewport";
 import { precisionForTests } from "../shader_modules/test-precision/precisionForTests";
 import type { ExtendedLayerProps } from "../utils/layerTools";
@@ -237,11 +238,9 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         });
 
         const fontTexture = this.state["fontTexture"];
-        const {
-            labelModels,
-            lineModel: lineModel,
-            backgroundModel: backgroundModel,
-        } = this._getModels(fontTexture as UniformValue);
+        const { labelModels, lineModel, backgroundModel } = this._getModels(
+            fontTexture as UniformValue
+        );
 
         this.setState({
             ...this.state,
@@ -288,7 +287,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
     makeLabel(n: number, ndecimals: number): string {
         let label = n.toFixed(ndecimals);
         if (this.props.formatLabelFunc) {
-            label = this.props.formatLabelFunc(n) as string;
+            label = this.props.formatLabelFunc(n);
             label = label.replace("e", "E"); // this font atlas does not have "e"
             label = label.replace("\u2212", "-"); // use standard minus sign
         }
@@ -356,9 +355,7 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                 ? -delta
                 : delta;
 
-        for (let i = 0; i < ticks.length; i++) {
-            const tick = ticks[i];
-
+        for (const tick of ticks) {
             const label = this.makeLabel(tick, ndecimals);
             tick_labels.push(label);
 
@@ -557,8 +554,6 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
         for (let i = 0; i < n - 2; i++) {
             models[i].draw(opts.context.renderPass);
         }
-
-        return;
     }
 
     // Make models for background, lines (tick marks and axis) and labels.
@@ -677,14 +672,9 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
 
         // Line models. (axis line and tick lines)
         // Color on axes and text.
-        let lineColor = [0.0, 0.0, 0.0, 1.0];
-        if (typeof this.props.axisColor !== "undefined") {
-            lineColor = this.props.axisColor as number[];
-            if (lineColor.length === 3) {
-                lineColor.push(255);
-            }
-            lineColor = lineColor.map((x) => (x ?? 0) / 255);
-        }
+        const lineColor = toNormalizedColor(this.props.axisColor) ?? [
+            0.0, 0.0, 0.0, 1.0,
+        ];
 
         const lineModel = new Model(device, {
             id: `${this.props.id}-lines`,
@@ -711,14 +701,9 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
 
         //-- Background model --
         // Color on axes background.
-        let bColor = [0.5, 0.5, 0.5, 1];
-        if (typeof this.props.backgroundColor !== "undefined") {
-            bColor = this.props.backgroundColor as number[];
-            if (bColor.length === 3) {
-                bColor.push(255);
-            }
-            bColor = bColor.map((x) => (x ?? 0) / 255);
-        }
+        const bColor = toNormalizedColor(this.props.backgroundColor) ?? [
+            0.5, 0.5, 0.5, 1,
+        ];
 
         const backgroundModel = new Model(device, {
             id: `${this.props.id}-background`,
@@ -924,7 +909,6 @@ Axes2DLayer.defaultProps = defaultProps;
 //             >)
 //         )
 //     );
-
 //     return pos_v.slice(0, 3) as [number, number, number];
 // }
 

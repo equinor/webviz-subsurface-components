@@ -19,6 +19,7 @@ import type {
     PropertyDataType,
 } from "../utils/layerTools";
 import { createPropertyData } from "../utils/layerTools";
+import { toNormalizedColor } from "../../utils";
 
 import { precisionForTests } from "../shader_modules/test-precision/precisionForTests";
 
@@ -108,12 +109,9 @@ export default class PieChartLayer extends Layer<PieChartLayerProps<PiesData>> {
                 const end_a = start_a + frac * 360.0;
 
                 const prop = pieData.properties[pie.fractions[i].idx];
-                let col: number[] = (prop?.color as number[]) ?? [
-                    255, 0, 255, 255,
+                const col: number[] = toNormalizedColor(prop?.color) ?? [
+                    1, 0, 1, 1,
                 ]; // magenta
-                col = col.map(
-                    (x) => (x ?? 0) / 255 // Normalize to [0,1] range.
-                );
 
                 const name = prop?.label ?? "no label";
                 const frac_string = (frac * 100).toFixed(1) + "%";
