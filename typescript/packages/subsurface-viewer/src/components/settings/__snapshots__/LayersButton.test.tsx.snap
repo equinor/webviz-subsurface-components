@@ -12,7 +12,7 @@ exports[`test 'layers' button snapshot test 1`] = `
   id="layers-button-view_1"
 >
   <button
-    class="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeLarge MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeLarge MuiFab-default css-mm42gz-MuiButtonBase-root-MuiFab-root"
+    class="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeLarge MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeLarge MuiFab-default css-djw9hb-MuiButtonBase-root-MuiFab-root"
     id="layers-selector-button"
     tabindex="0"
     type="button"
@@ -34,9 +34,6 @@ exports[`test 'layers' button snapshot test 1`] = `
         fill-rule="evenodd"
       />
     </svg>
-    <span
-      class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-    />
   </button>
 </div>
 `;
@@ -53,7 +50,7 @@ exports[`test 'layers' button test empty MapState/specbase 1`] = `
   id="layers-button-view_1"
 >
   <button
-    class="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeLarge MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeLarge MuiFab-default css-mm42gz-MuiButtonBase-root-MuiFab-root"
+    class="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeLarge MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeLarge MuiFab-default css-djw9hb-MuiButtonBase-root-MuiFab-root"
     id="layers-selector-button"
     tabindex="0"
     type="button"
@@ -75,9 +72,6 @@ exports[`test 'layers' button test empty MapState/specbase 1`] = `
         fill-rule="evenodd"
       />
     </svg>
-    <span
-      class="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-    />
   </button>
 </div>
 `;

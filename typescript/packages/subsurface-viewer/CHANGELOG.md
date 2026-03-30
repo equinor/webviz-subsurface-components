@@ -1,3 +1,41 @@
+## 1.17.1 (2026-02-23)
+
+### 🩹 Fixes
+
+- bump ajv to latest ([#2713](https://github.com/equinor/webviz-subsurface-components/pull/2713))
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.4.1
+
+### ❤️ Thank You
+
+- Håvard Bjerke
+
+## 1.17.0 (2026-02-16)
+
+### 🚀 Features
+
+- add support for @mui 7 ([#2709](https://github.com/equinor/webviz-subsurface-components/pull/2709))
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.4.0
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
+## 1.16.1 (2026-02-13)
+
+### 🩹 Fixes
+
+- bump the deckgl group in /typescript with 8 updates ([#2710](https://github.com/equinor/webviz-subsurface-components/pull/2710), [#9993](https://github.com/equinor/webviz-subsurface-components/issues/9993), [#9988](https://github.com/equinor/webviz-subsurface-components/issues/9988), [#9971](https://github.com/equinor/webviz-subsurface-components/issues/9971), [#9984](https://github.com/equinor/webviz-subsurface-components/issues/9984), [#9948](https://github.com/equinor/webviz-subsurface-components/issues/9948), [#9937](https://github.com/equinor/webviz-subsurface-components/issues/9937), [#9956](https://github.com/equinor/webviz-subsurface-components/issues/9956), [#9965](https://github.com/equinor/webviz-subsurface-components/issues/9965), [#9955](https://github.com/equinor/webviz-subsurface-components/issues/9955), [#9944](https://github.com/equinor/webviz-subsurface-components/issues/9944), [#9](https://github.com/equinor/webviz-subsurface-components/issues/9), [#9990](https://github.com/equinor/webviz-subsurface-components/issues/9990), [#9970](https://github.com/equinor/webviz-subsurface-components/issues/9970))
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.3.23
+
 ## 1.16.0 (2026-02-06)
 
 ### 🚀 Features

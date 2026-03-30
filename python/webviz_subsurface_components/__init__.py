@@ -10,9 +10,10 @@ import json
 import os as _os
 import sys as _sys
 import warnings
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version as _get_version
 
 import dash as _dash
-from pkg_resources import DistributionNotFound, get_distribution
 
 from ._imports_ import *
 from ._imports_ import __all__
@@ -26,8 +27,8 @@ from .VectorCalculatorWrapper import VectorCalculatorWrapper as VectorCalculator
 from .VectorDefinitions import VectorDefinition, VectorDefinitions
 
 try:
-    __version__ = get_distribution(__name__).version
-except DistributionNotFound:
+    __version__ = _get_version(__name__)
+except PackageNotFoundError:
     # package is not installed
     pass
 

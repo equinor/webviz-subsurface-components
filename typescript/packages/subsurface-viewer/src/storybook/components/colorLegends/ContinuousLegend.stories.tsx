@@ -1,8 +1,6 @@
 import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 
-// @ts-expect-error TS6133
-import type { colorTablesArray } from "@emerson-eps/color-tables";
 import { ContinuousLegend, colorTables } from "@emerson-eps/color-tables";
 
 const stories: Meta = {
@@ -27,8 +25,7 @@ export const ContinuousLegendStory: StoryObj<typeof ContinuousLegend> = {
         dataObjectName,
         id: name,
         colorName,
-        // @ts-expect-error TS2709
-        colorTables: colorTables as colorTablesArray,
+        colorTables: colorTables,
         horizontal,
         reverseRange,
     },
