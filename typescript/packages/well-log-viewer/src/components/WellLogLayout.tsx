@@ -11,7 +11,7 @@ export interface ViewerLayout<Parent> {
     footer?: ((parent: Parent) => JSX.Element) | JSX.Element | string;
 }
 
-interface Props<Parent> {
+export interface WellLogLayoutProps<Parent> {
     parent: Parent;
 
     center?: ((parent: Parent) => JSX.Element) | JSX.Element | string;
@@ -19,8 +19,10 @@ interface Props<Parent> {
     layout?: ViewerLayout<Parent>;
 }
 
-export class WellLogLayout<Parent> extends Component<Props<Parent>> {
-    constructor(props: Props<Parent>) {
+export class WellLogLayout<Parent> extends Component<
+    WellLogLayoutProps<Parent>
+> {
+    constructor(props: WellLogLayoutProps<Parent>) {
         super(props);
     }
 

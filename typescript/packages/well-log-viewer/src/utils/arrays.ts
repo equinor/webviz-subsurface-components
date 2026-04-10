@@ -18,7 +18,7 @@ export function indexOfElementByName(array: Named[], name: string): number {
         const nameUpper = name.toUpperCase();
         let i = 0;
         for (const element of array) {
-            if (element.name && element.name.toUpperCase() === nameUpper) {
+            if (element.name?.toUpperCase() === nameUpper) {
                 return i;
             }
             i++;
@@ -38,7 +38,7 @@ export function indexOfElementByNames(array: Named[], names: string[]): number {
         /* names should be already in upper case */
         let i = 0;
         for (const element of array) {
-            if (element.name && names.indexOf(element.name.toUpperCase()) >= 0)
+            if (element.name && names.includes(element.name.toUpperCase()))
                 return i;
             i++;
         }

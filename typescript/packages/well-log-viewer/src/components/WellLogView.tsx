@@ -429,7 +429,7 @@ export function getWellPicks(wellLogView: WellLogView): WellPick[] {
     }
 
     const curves = wellpick.wellpick.curves;
-    const mnemo = wellpick.md ? wellpick.md : "MD";
+    const mnemo = wellpick.md ?? "MD";
     const md = _getLogIndexByNames(curves, [mnemo]);
     if (md < 0) {
         console.error("Depth log '" + mnemo + "' is not found for wellpicks");
@@ -445,8 +445,9 @@ export function getWellPicks(wellLogView: WellLogView): WellPick[] {
         const data = wellpick.wellpick.data;
         for (const d of data) {
             if (d[md] === null) continue; // no MD!
-            const horizon = d[c] as string | null;
-            if (horizon === null) continue;
+            // undefined can happen if d has less items than curves
+            const horizon = d[c] as string | null | undefined;
+            if (horizon === null || horizon === undefined) continue;
 
             const vMD = d[md] as number;
             const vPrimary =

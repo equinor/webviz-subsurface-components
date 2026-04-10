@@ -88,9 +88,7 @@ export function getInterpolatedColor(
 
     const table = colormapFunction as ColorTable;
     // TODO: Do not compute these 3 constants (cNaN, cBelow, cAbove) every time!
-    const cNaN: [number, number, number] = table.colorNaN
-        ? table.colorNaN
-        : [255, 255, 255]; // "white"
+    const cNaN: [number, number, number] = table.colorNaN ?? [255, 255, 255]; // "white"
     if (Number.isNaN(v)) {
         return cNaN;
     }
@@ -98,12 +96,12 @@ export function getInterpolatedColor(
     const colors = table.colors;
     const j = binarySearch(colors, v);
 
-    const cBelow = table.colorBelow ? table.colorBelow : cNaN;
+    const cBelow = table.colorBelow ?? cNaN;
     if (j <= 0) {
         return cBelow;
     }
 
-    const cAbove = table.colorAbove ? table.colorAbove : cBelow;
+    const cAbove = table.colorAbove ?? cBelow;
     if (j >= colors.length) {
         return cAbove;
     }
