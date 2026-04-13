@@ -17,9 +17,10 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Configure git
+        # must have push access to the repository
         run: |
           git config --global user.name "Semantic Release"
-          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+          git config --global user.email "hkfb@users.noreply.github.com"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
