@@ -56,7 +56,7 @@
     "gl-matrix": "^3.4.3",
     "lodash": "^4.18.1",
     "math.gl": "^4.1.0",
-    "mathjs": "^13.2.0",
+    "mathjs": "^15.2.0",
     "merge-refs": "^1.2.2",
     "static-kdtree": "^1.0.2",
     "workerpool": "^9.2.0"
