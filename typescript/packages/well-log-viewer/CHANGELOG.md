@@ -1,3 +1,17 @@
+## 2.7.2 (2026-04-14)
+
+### 🩹 Fixes
+
+- clean WLV API ([#2735](https://github.com/equinor/webviz-subsurface-components/pull/2735))
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.4.2
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
 ## 2.7.1 (2026-02-23)
 
 ### 🧱 Updated Dependencies

@@ -1,3 +1,9 @@
+## 1.7.2 (2026-04-14)
+
+### 🩹 Fixes
+
+- bump lodash from 4.17.23 to 4.18.1 in /typescript ([#2734](https://github.com/equinor/webviz-subsurface-components/pull/2734), [#6167](https://github.com/equinor/webviz-subsurface-components/issues/6167), [#6099](https://github.com/equinor/webviz-subsurface-components/issues/6099), [#6115](https://github.com/equinor/webviz-subsurface-components/issues/6115), [#6090](https://github.com/equinor/webviz-subsurface-components/issues/6090), [#6177](https://github.com/equinor/webviz-subsurface-components/issues/6177), [#6170](https://github.com/equinor/webviz-subsurface-components/issues/6170), [#6165](https://github.com/equinor/webviz-subsurface-components/issues/6165), [#6161](https://github.com/equinor/webviz-subsurface-components/issues/6161), [#6153](https://github.com/equinor/webviz-subsurface-components/issues/6153), [#6137](https://github.com/equinor/webviz-subsurface-components/issues/6137))
+
 ## 1.7.1 (2026-02-23)
 
 This was a version bump only for group-tree-plot to align it with other projects, there were no code changes.
