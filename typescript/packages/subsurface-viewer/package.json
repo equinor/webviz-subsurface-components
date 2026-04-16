@@ -55,20 +55,15 @@
     "static-kdtree": "^1.0.2",
     "workerpool": "^9.2.0"
   },
-  "peerDependencies comments": {
-    "@deck.gl-community/layers": "@deck.gl-community/editable-layers peer deps is ^9.x until 9.3.2 where this peer dep can be removed"
-  },
   "peerDependencies": {
-    "@deck.gl-community/editable-layers": "~9.2.8",
-    "@deck.gl-community/layers": "~9.2.8",
-    "@deck.gl/aggregation-layers": "~9.2.11",
-    "@deck.gl/core": "~9.2.11",
-    "@deck.gl/extensions": "~9.2.11",
-    "@deck.gl/geo-layers": "~9.2.11",
-    "@deck.gl/json": "~9.2.11",
-    "@deck.gl/layers": "~9.2.11",
-    "@deck.gl/mesh-layers": "~9.2.11",
-    "@deck.gl/react": "~9.2.11",
+    "@deck.gl-community/editable-layers": "~9.3.2",
+    "@deck.gl/aggregation-layers": "~9.3.2",
+    "@deck.gl/core": "~9.3.2",
+    "@deck.gl/geo-layers": "~9.3.2",
+    "@deck.gl/json": "~9.3.2",
+    "@deck.gl/layers": "~9.3.2",
+    "@deck.gl/mesh-layers": "~9.3.2",
+    "@deck.gl/react": "~9.3.2",
     "@mui/icons-material": "^5.11 || ^6 || ^7.3",
     "@mui/material": "^5.11 || ^6 || ^7.3",
     "@mui/system": "^5.11 || ^6 || ^7.3",

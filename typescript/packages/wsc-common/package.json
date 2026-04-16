@@ -24,11 +24,11 @@
   "author": "Equinor <opensource@equinor.com>",
   "license": "MPL-2.0",
   "dependencies": {
-    "@deck.gl/core": "~9.2.11",
     "@emerson-eps/color-tables": "^1.0.2",
     "ajv": "^8.18.0"
   },
   "peerDependencies": {
+    "@deck.gl/core": "~9.3.2",
     "@mui/icons-material": "^5.11 || ^6 || ^7.3",
     "react": "^17 || ^18",
     "react-dom": "^17 || ^18"
