@@ -1,10 +1,11 @@
 import "jest";
+import { describe, expect, it, jest } from "@jest/globals";
 
 import type { Color } from "@deck.gl/core";
 import type { Position } from "geojson";
 import { cloneDeep, reverse, set } from "lodash";
 
-import type { WellFeature } from "../types";
+import type { ColorAccessor, WellFeature } from "../types";
 import {
     getColor,
     getCumulativeDistance,
@@ -32,6 +33,7 @@ describe("trajectory utils", () => {
     };
 
     const mockFeature: WellFeature = {
+        type: "Feature",
         geometry: {
             type: "GeometryCollection",
             geometries: [
@@ -40,6 +42,7 @@ describe("trajectory utils", () => {
             ],
         },
         properties: {
+            name: "Depth",
             md: [[0, 100, 200, 300]],
             color: [100, 100, 100, 255],
         },
@@ -55,7 +58,7 @@ describe("trajectory utils", () => {
         it("Should return a wrapped accessor function if accessor is a function", () => {
             const mockAccessor = jest.fn().mockReturnValue([0, 255, 0, 255]);
 
-            const colorFunc = getColor(mockAccessor);
+            const colorFunc = getColor(mockAccessor as ColorAccessor);
             const result =
                 typeof colorFunc === "function"
                     ? colorFunc(mockFeature)
@@ -67,7 +70,7 @@ describe("trajectory utils", () => {
         it("should return the feature's color property if accessor function returns a falsy value", () => {
             const mockAccessor = jest.fn().mockReturnValue(undefined);
 
-            const colorFunc = getColor(mockAccessor);
+            const colorFunc = getColor(mockAccessor as ColorAccessor);
             const result =
                 typeof colorFunc === "function"
                     ? colorFunc(mockFeature)

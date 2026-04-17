@@ -186,7 +186,8 @@ export const TrajectoryMarkers: Story = {
                     lineWidthUnits: "pixels",
                     getWidth: 2,
                     getColor: [115, 115, 115],
-                    getPath: (d) => getTrajectoryCoordinates(d) as GlPosition[],
+                    getPath: (d) =>
+                        getTrajectoryCoordinates(d) as unknown as GlPosition[],
                     updateTriggers: { getPath: [args["use3dView"]] },
                 }),
                 new FlatWellMarkersLayer({

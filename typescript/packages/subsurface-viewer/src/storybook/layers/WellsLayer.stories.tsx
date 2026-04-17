@@ -1333,7 +1333,7 @@ function PerforationsAndScreensComponent(
                     ...perforationAndScreensByWellIndex.get(i),
                 },
             })),
-        } as WellFeatureCollection;
+        } as unknown as WellFeatureCollection;
     }, [perforationAndScreensByWellIndex]);
 
     const sharedLayerProps: Partial<WellsLayerProps> = {
@@ -1547,7 +1547,7 @@ const VOLVE_WELLS_WITH_FORMATIONS = {
                     : undefined,
         },
     })),
-} as WellFeatureCollection;
+} as unknown as WellFeatureCollection;
 
 export const TrajectoryFilter: StoryObj<TrajectoryFilterArgs> = {
     args: {
