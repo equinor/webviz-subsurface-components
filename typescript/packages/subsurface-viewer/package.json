@@ -33,15 +33,15 @@
   "author": "Equinor <opensource@equinor.com>",
   "license": "MPL-2.0",
   "dependencies": {
-    "@deck.gl-community/editable-layers": "~9.1.1",
-    "@deck.gl/aggregation-layers": "~9.2.7",
-    "@deck.gl/core": "~9.2.7",
-    "@deck.gl/extensions": "~9.2.7",
-    "@deck.gl/geo-layers": "~9.2.7",
-    "@deck.gl/json": "~9.2.7",
-    "@deck.gl/layers": "~9.2.7",
-    "@deck.gl/mesh-layers": "~9.2.7",
-    "@deck.gl/react": "~9.2.7",
+    "@deck.gl-community/editable-layers": "~9.2.8",
+    "@deck.gl/aggregation-layers": "~9.2.11",
+    "@deck.gl/core": "~9.2.11",
+    "@deck.gl/extensions": "~9.2.11",
+    "@deck.gl/geo-layers": "~9.2.11",
+    "@deck.gl/json": "~9.2.11",
+    "@deck.gl/layers": "~9.2.11",
+    "@deck.gl/mesh-layers": "~9.2.11",
+    "@deck.gl/react": "~9.2.11",
     "@emerson-eps/color-tables": "^1.0.2",
     "@equinor/eds-core-react": "^0.36.0",
     "@equinor/eds-icons": "^0.21.0",
@@ -61,7 +61,11 @@
     "static-kdtree": "^1.0.2",
     "workerpool": "^9.2.0"
   },
+  "peerDependencies comments": {
+    "@deck.gl-community/layers": "@deck.gl-community/editable-layers peer deps is ^9.x until 9.3.2 where this peer dep can be removed"
+  },
   "peerDependencies": {
+    "@deck.gl-community/layers": "~9.2.8",
     "@mui/icons-material": "^5.11 || ^6 || ^7.3",
     "@mui/material": "^5.11 || ^6 || ^7.3",
     "@mui/system": "^5.11 || ^6 || ^7.3",
