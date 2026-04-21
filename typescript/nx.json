@@ -17,7 +17,9 @@
     },
     "targetDefaults": {
         "build": {
-            "dependsOn": ["^build"]
+            "dependsOn": [
+                "^build"
+            ]
         }
     },
     "release": {
@@ -34,5 +36,6 @@
         "git": {
             "commitMessage": "chore(release): updated version [no ci]"
         }
-    }
+    },
+    "analytics": false
 }
