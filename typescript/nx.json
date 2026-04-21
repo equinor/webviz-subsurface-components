@@ -17,9 +17,7 @@
     },
     "targetDefaults": {
         "build": {
-            "dependsOn": [
-                "^build"
-            ]
+            "dependsOn": ["^build"]
         }
     },
     "release": {
