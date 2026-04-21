@@ -11,13 +11,13 @@ import type {
     LayersList,
     PickingInfo,
 } from "@deck.gl/core";
-import { Layer, LayerManager } from "@deck.gl/core";
+import type { Layer, LayerManager } from "@deck.gl/core";
 
 import type {
     ContinuousLegendDataType,
     DiscreteLegendDataType,
 } from "../../components/ColorLegend";
-import DrawingLayer from "../drawing/drawingLayer";
+import type DrawingLayer from "../drawing/drawingLayer";
 
 import type { BoundingBox3D } from "../../utils";
 import { computeBoundingBox as buildBoundingBox } from "../../utils/BoundingBox3D";
