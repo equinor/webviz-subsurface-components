@@ -1,3 +1,13 @@
+## 2.8.0 (2026-04-23)
+
+### 🚀 Features
+
+- add support of an array of domains and selections for the Well Log Viewer ([#2752](https://github.com/equinor/webviz-subsurface-components/pull/2752))
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
 ## 2.7.5 (2026-04-21)
 
 ### 🩹 Fixes
