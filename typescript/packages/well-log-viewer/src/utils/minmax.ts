@@ -1,7 +1,6 @@
-export function checkMinMaxValue(
-    minmax: [number, number],
-    value: number
-): void {
+import type { Range } from "./arrayTypes";
+
+export function checkMinMaxValue(minmax: Range, value: number): void {
     if (value !== null) {
         if (minmax[0] === Number.POSITIVE_INFINITY)
             minmax[0] = minmax[1] = value;
@@ -10,10 +9,7 @@ export function checkMinMaxValue(
     }
 }
 
-export function checkMinMax(
-    minmax: [number, number],
-    minmaxSrc: [number, number]
-): void {
+export function checkMinMax(minmax: Range, minmaxSrc: Range): void {
     if (minmax[0] === Number.POSITIVE_INFINITY) {
         minmax[0] = minmaxSrc[0];
         minmax[1] = minmaxSrc[1];
@@ -23,7 +19,7 @@ export function checkMinMax(
     }
 }
 
-export function roundMinMax(minmax: [number, number]): [number, number] {
+export function roundMinMax(minmax: Range): Range {
     const kmin = 6; // a minimal number of intervals
     const kmax = 9; // a maximal number of intervals
 
@@ -108,7 +104,7 @@ export function roundMinMax(minmax: [number, number]): [number, number] {
     return [parseFloat(a.toPrecision(5)), parseFloat(b.toPrecision(5))];
 }
 
-export function roundLogMinMax(minmax: [number, number]): [number, number] {
+export function roundLogMinMax(minmax: Range): Range {
     const r = roundMinMax(minmax);
     /* TODO: make Log version
       const ret = roundMinMax([Math.log10(minmax[0]), Math.log10(minmax[1])]);

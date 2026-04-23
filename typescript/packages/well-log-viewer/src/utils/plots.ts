@@ -25,6 +25,7 @@ import type {
     WellLogSet,
 } from "../components/WellLogTypes";
 
+import type { Range } from "./arrayTypes";
 import { type AxesInfo } from "./axes";
 import type { ColormapFunction } from "./color-function";
 import { getColormapFunction } from "./color-function";
@@ -60,7 +61,7 @@ export type PlotSetup = {
     sourceLogSet: WellLogSet;
     curve: WellLogCurve;
     plotData: PlotData;
-    minmax: [number, number];
+    minmax: Range;
     templatePlot: TemplatePlot;
     isSecondary: boolean;
 };
@@ -69,8 +70,8 @@ export type PlotSetup = {
  * Data-class used when translating JSON well-log data to videx-data
  */
 export class PlotData {
-    minmax: [number, number];
-    minmaxPrimaryAxis: [number, number];
+    minmax: Range;
+    minmaxPrimaryAxis: Range;
     data: [number | null, number | string | null][];
 
     constructor() {
@@ -134,8 +135,8 @@ export function getPlotType(plot: Plot): TemplatePlotType {
 function getScaledDomain(
     templatePlot: TemplatePlot,
     scale: string,
-    minmax: [number, number]
-): [number, number] {
+    minmax: Range
+): Range {
     if (templatePlot.domain) return templatePlot.domain;
     if (scale === "log") return roundLogMinMax(minmax);
     if (
@@ -433,7 +434,7 @@ export function setupPlot(
 
     const axisIndices = getAxisIndices(sourceLogSet.curves, axesInfo);
     const plotData = preparePlotData(data, iCurve, axisIndices.primary);
-    const minmax: [number, number] = [plotData.minmax[0], plotData.minmax[1]];
+    const minmax: Range = [plotData.minmax[0], plotData.minmax[1]];
 
     return {
         iCurve,

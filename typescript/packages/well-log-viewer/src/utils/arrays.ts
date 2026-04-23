@@ -1,5 +1,7 @@
 import type { Domain } from "@equinor/videx-wellog/dist/common/interfaces";
 
+import type { OpenRange, Range } from "./arrayTypes";
+
 /**
  * Utility type for various well-log things that are "named", such as tracks, plots and curves, and so on.
  */
@@ -84,8 +86,8 @@ export function toggleId(
  * @returns True if the ranges are equal, false otherwise.
  */
 export function isEqualRanges(
-    d1: undefined | [number | undefined, number | undefined],
-    d2: undefined | [number | undefined, number | undefined]
+    d1: undefined | OpenRange,
+    d2: undefined | OpenRange
 ): boolean {
     if (!d1) return !d2;
     if (!d2) return !d1;
@@ -102,10 +104,7 @@ export function isEqualRanges(
  * @returns `true` if the domains are equivalent, `false` otherwise.
  */
 // ? Conceptually very similar to isEqualRanges, should they be combined? (@anders2303)
-export function isEqDomains(
-    d1: Domain | [number, number],
-    d2: Domain | [number, number]
-): boolean {
+export function isEqDomains(d1: Domain | Range, d2: Domain | Range): boolean {
     // ! We consider all invalid domains as equivalent
     if (d1.some(Number.isNaN) && d2.some(Number.isNaN)) return true;
 

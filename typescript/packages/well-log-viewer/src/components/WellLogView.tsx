@@ -42,6 +42,7 @@ import {
     editViewTrack,
     removeViewTrack,
 } from "../utils/log-viewer";
+import type { OpenRange, Range } from "../utils/arrayTypes";
 import { isEqualRanges } from "../utils/arrays";
 import type { Pattern, PatternsTable } from "../utils/pattern";
 import type { ExtPlotOptions } from "../utils/plots";
@@ -888,15 +889,15 @@ export interface TrackMouseEvent {
 }
 
 export interface WellLogController {
-    zoomContentTo(domain: [number, number]): boolean;
+    zoomContentTo(domain: Range): boolean;
     scrollContentTo(f: number): boolean; // fraction of content
     zoomContent(zoom: number): void;
-    selectContent(selection: [number | undefined, number | undefined]): void;
-    setContentBaseDomain(domain: [number, number]): boolean;
-    getContentBaseDomain(): [number, number]; // full scale range
-    getContentDomain(): [number, number]; // visible range
+    selectContent(selection: OpenRange): void;
+    setContentBaseDomain(domain: Range): boolean;
+    getContentBaseDomain(): Range; // full scale range
+    getContentDomain(): Range; // visible range
     getContentZoom(): number;
-    getContentSelection(): [number | undefined, number | undefined]; // [current, pinned]
+    getContentSelection(): OpenRange; // [current, pinned]
     setContentScale(value: number): void;
     getContentScale(): number;
     setControllerDefaultZoom(): void;
@@ -1059,12 +1060,12 @@ export interface WellLogViewProps {
     /**
      * Initial visible range
      */
-    domain?: [number, number];
+    domain?: Range;
 
     /**
      * Initial selected range
      */
-    selection?: [number | undefined, number | undefined];
+    selection?: OpenRange;
 
     /**
      * Additional options
@@ -1348,8 +1349,7 @@ class WellLogView
         }
 
         let selectedTrackIndices: number[] = []; // Indices to restore
-        let selection: [number | undefined, number | undefined] | undefined =
-            undefined; // content selection to restore
+        let selection: OpenRange | undefined = undefined; // content selection to restore
         let shouldSetTracks = false;
         let checkSchema = false;
         if (
@@ -1605,7 +1605,7 @@ class WellLogView
     }
 
     // content
-    zoomContentTo(domain: [number, number]): boolean {
+    zoomContentTo(domain: Range): boolean {
         if (!this.logController) return false;
         return zoomContentTo(this.logController, domain);
     }
@@ -1679,7 +1679,7 @@ class WellLogView
             posWellPickTitles(this.logController, this);
         }
     }
-    selectContent(selection: [number | undefined, number | undefined]): void {
+    selectContent(selection: OpenRange): void {
         const selPinned = selection[1];
         if (this.selCurrent === selection[0] && this.selPinned === selPinned)
             return;
@@ -1691,15 +1691,15 @@ class WellLogView
         this.updateInfo(); // reflect new value in this.selCurrent
     }
 
-    setContentBaseDomain(domain: [number, number]): boolean {
+    setContentBaseDomain(domain: Range): boolean {
         if (!this.logController) return false;
         return setContentBaseDomain(this.logController, domain);
     }
-    getContentBaseDomain(): [number, number] {
+    getContentBaseDomain(): Range {
         if (!this.logController) return [0.0, 0.0];
         return getContentBaseDomain(this.logController);
     }
-    getContentDomain(): [number, number] {
+    getContentDomain(): Range {
         if (!this.logController) return [0.0, 0.0];
         return getContentDomain(this.logController);
     }
@@ -1707,7 +1707,7 @@ class WellLogView
         if (!this.logController) return 1.0;
         return getContentZoom(this.logController);
     }
-    getContentSelection(): [number | undefined, number | undefined] {
+    getContentSelection(): OpenRange {
         if (!this.logController) return [undefined, undefined];
         return [this.selCurrent, this.selPinned];
     }

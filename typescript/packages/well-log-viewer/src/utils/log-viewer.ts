@@ -10,13 +10,15 @@ import type {
 import { InterpolatedScaleHandler } from "@equinor/videx-wellog";
 import type { TrackOptions } from "@equinor/videx-wellog/dist/tracks/interfaces";
 
+import type { TemplateTrack } from "../components/WellLogTemplateTypes";
+import type { WellLogSet } from "../components/WellLogTypes";
+
 import type { AxesInfo } from "./axes";
 import type { ColormapFunction } from "./color-function";
 import { getAxisIndices } from "./well-log";
 import { checkMinMax } from "./minmax";
 import { createTrack, isScaleTrack, editTrack } from "../utils/tracks";
-import type { TemplateTrack } from "../components/WellLogTemplateTypes";
-import type { WellLogSet } from "../components/WellLogTypes";
+import type { Range } from "../utils/arrayTypes";
 import { isEqDomains } from "./arrays";
 
 /**
@@ -27,7 +29,7 @@ import { isEqDomains } from "./arrays";
  */
 export function setContentBaseDomain(
     logViewer: VidexLogViewer,
-    domain: [number, number]
+    domain: Range
 ): boolean {
     const [b1, b2] = logViewer.scaleHandler.baseDomain();
     if (b1 !== domain[0] || b2 !== domain[1]) {
@@ -47,10 +49,10 @@ export function setContentBaseDomain(
  */
 export function expandDomainToFitRange(
     logViewer: VidexLogViewer,
-    range: [number, number]
+    range: Range
 ) {
     const baseDomain = logViewer.scaleHandler.baseDomain();
-    checkMinMax(baseDomain as [number, number], range);
+    checkMinMax(baseDomain as Range, range);
 
     logViewer.rescale();
 }
@@ -188,7 +190,7 @@ export function zoomContent(logViewer: VidexLogViewer, zoom: number): boolean {
         // check if new domain is in the base domain
         if (c + d > b2) c = b2 - d;
         if (c - d < b1) c = b1 + d;
-        const domain: [number, number] = [c - d, c + d];
+        const domain: Range = [c - d, c + d];
         return zoomContentTo(logViewer, domain);
     }
     return false;
@@ -210,7 +212,7 @@ export function scrollContentTo(
     const w = b2 - b1 - d; // width of not visible part of content
 
     const c = b1 + fraction * w;
-    const domain: [number, number] = [c, c + d];
+    const domain: Range = [c, c + d];
     return zoomContentTo(logViewer, domain);
 }
 
@@ -222,7 +224,7 @@ export function scrollContentTo(
  */
 export function zoomContentTo(
     logViewer: VidexLogViewer,
-    domain: [number, number]
+    domain: Range
 ): boolean {
     // ? Why do we need to retry multiple times here? (@anders2303)
     if (!isEqDomains(logViewer.domain, domain)) {
@@ -254,9 +256,7 @@ export function zoomContentTo(
  * @param logViewer A videx log view controller
  * @returns The base domain as a two-element tuple.
  */
-export function getContentBaseDomain(
-    logViewer: VidexLogViewer
-): [number, number] {
+export function getContentBaseDomain(logViewer: VidexLogViewer): Range {
     const [b1, b2] = logViewer.scaleHandler.baseDomain();
     return [b1, b2];
 }
@@ -266,7 +266,7 @@ export function getContentBaseDomain(
  * @param logViewer A videx log view controller
  * @returns The domain as a two-element tuple.
  */
-export function getContentDomain(logViewer: VidexLogViewer): [number, number] {
+export function getContentDomain(logViewer: VidexLogViewer): Range {
     const [d1, d2] = logViewer.domain; // same as logViewer.scale.domain()
     return [d1, d2];
 }

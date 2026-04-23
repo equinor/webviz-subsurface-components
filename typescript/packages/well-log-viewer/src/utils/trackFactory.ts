@@ -29,7 +29,7 @@ import { scaleLegendConfig } from "./stack/scale-legend";
 export function newGraphTrack(
     /* should contain:
         title: string,
-        data: [number, number][][],
+        data: Range[][],
         plots: PlotConfig[]
     */
     // ? Should we enforce this with an extended type? (@anders2303)

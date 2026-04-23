@@ -366,6 +366,28 @@ export const DiscreteLogs: StoryObj<typeof TemplateWithSelection> = {
     render: (args) => <TemplateWithSelection {...args} />,
 };
 
+export const DiscreteLogsWithIndividualDomains: StoryObj<
+    typeof TemplateWithSelection
+> = {
+    args: {
+        ...facies3Wells,
+        domain: [
+            [3000, 5500],
+            [2500, 4000],
+            [1000, 4000],
+        ],
+        selection: [
+            [3500, 3600],
+            [2700, 2900],
+            [3300, 3400],
+        ],
+        syncContentDomain: false,
+        syncContentSelection: false,
+        syncTrackPos: false,
+    },
+    render: (args) => <TemplateWithSelection {...args} />,
+};
+
 const verySimpleTemplate: TemplateType = {
     name: "Something simple",
     scale: syncTemplateJson.scale,

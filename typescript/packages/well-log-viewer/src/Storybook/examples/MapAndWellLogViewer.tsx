@@ -24,6 +24,7 @@ import type { WellsLayer } from "@webviz/subsurface-viewer/dist/layers";
 
 import type { MapMouseEvent } from "@webviz/subsurface-viewer/dist/components/Map";
 
+import type { OpenRange } from "../../utils/arrayTypes";
 import { axisMnemos, axisTitles } from "../../utils/axes";
 import { deepCopy } from "../../utils/deepcopy";
 
@@ -101,7 +102,7 @@ interface State {
     layers?: TLayerDefinition[];
 
     wellName?: string;
-    selection?: [number | undefined, number | undefined];
+    selection?: OpenRange;
     selPersistent?: boolean;
     wellColor?: Color; // well color
 }
@@ -260,9 +261,7 @@ export class MapAndWellLogViewer extends React.Component<
             if (event.type === "click") {
                 const iWell = findWellLogIndex(wellLogs, event.wellname);
                 this.setState((state: Readonly<State>) => {
-                    let selection:
-                        | [number | undefined, number | undefined]
-                        | undefined = undefined;
+                    let selection: OpenRange | undefined = undefined;
                     let selPersistent: boolean | undefined = undefined;
                     if (
                         state.wellIndex !== iWell ||

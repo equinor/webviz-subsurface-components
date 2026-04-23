@@ -1,11 +1,10 @@
-export { default as WellLogView } from "./WellLogView";
+export { default as WellLogView, WellPickPropsType } from "./WellLogView";
 export type {
     TrackMouseEvent,
     WellLogController,
     WellLogViewOptions,
     WellLogViewProps,
     WellPickProps,
-    WellPickPropsType,
 } from "./WellLogView";
 
 export { default as WellLogViewWithScroller } from "./WellLogViewWithScroller";

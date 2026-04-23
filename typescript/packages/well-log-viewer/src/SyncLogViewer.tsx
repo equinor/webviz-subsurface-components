@@ -3,7 +3,10 @@ import React, { Component } from "react";
 
 import PropTypes from "prop-types";
 
+import type { LogViewer } from "@equinor/videx-wellog";
+
 import WellLogSpacer from "./components/WellLogSpacer";
+import type { WellLogSpacerOptions } from "./components/WellLogSpacer";
 import WellLogViewWithScroller from "./components/WellLogViewWithScroller";
 
 import { CallbackManager } from "./components/CallbackManager";
@@ -14,38 +17,39 @@ import defaultLayout from "./components/DefaultSyncLogViewerLayout";
 
 import type { WellLogSet } from "./components/WellLogTypes";
 import type { Template } from "./components/WellLogTemplateTypes";
-import type { ColormapFunction } from "./utils/color-function";
-import { ColorFunctionType } from "./components/CommonPropTypes";
-import type { PatternsTable, Pattern } from "./utils/pattern";
-import { PatternsTableType, PatternsType } from "./components/CommonPropTypes";
-import type {
-    WellLogController,
-    WellPickProps,
-} from "./components/WellLogView";
-import { WellPickPropsType } from "./components/WellLogView";
+import {
+    ColorFunctionType,
+    PatternsTableType,
+    PatternsType,
+} from "./components/CommonPropTypes";
 
 import type WellLogView from "./components/WellLogView";
 import type {
+    WellLogController,
+    WellPickProps,
     WellLogViewOptions,
     TrackMouseEvent,
 } from "./components/WellLogView";
-import type { WellLogSpacerOptions } from "./components/WellLogSpacer";
-import { getWellPicks } from "./components/WellLogView";
+import { WellPickPropsType, getWellPicks } from "./components/WellLogView";
 
-import { toggleId } from "./utils/arrays";
+import type { ColormapFunction } from "./utils/color-function";
+import type { PatternsTable, Pattern } from "./utils/pattern";
 import { getAvailableAxes } from "./utils/well-log";
 
 import { checkMinMax } from "./utils/minmax";
 
 import { onTrackMouseEventDefault } from "./utils/edit-track";
 
+import { fillInfos } from "./utils/fill-info";
 import type { Info, InfoOptions } from "./components/InfoTypes";
 
-import { isEqDomains } from "./utils/arrays";
-import { isEqualRanges } from "./utils/arrays";
-import type { LogViewer } from "@equinor/videx-wellog";
-import { fillInfos } from "./utils/fill-info";
-import { isEqualArrays } from "./utils/arrays";
+import type { OpenRange, Range } from "./utils/arrayTypes";
+import {
+    isEqDomains,
+    isEqualArrays,
+    isEqualRanges,
+    toggleId,
+} from "./utils/arrays";
 
 export type WellDistances = {
     units: string;
@@ -110,7 +114,7 @@ export interface SyncLogViewerProps {
      */
     spacers?: boolean | number | number[];
     /**
-     * Distanses between wells to show on the spacers
+     * Distances between wells to show on the spacers
      */
     wellDistances?: WellDistances;
 
@@ -119,7 +123,13 @@ export interface SyncLogViewerProps {
      */
     horizontal?: boolean;
     syncTrackPos?: boolean;
+    /**
+     * Synchronize visible content domain (pan and zoom) across all the tracks in the views.
+     */
     syncContentDomain?: boolean;
+    /**
+     * Synchronize selected content across all the tracks in the views.
+     */
     syncContentSelection?: boolean;
     syncTemplate?: boolean;
 
@@ -139,14 +149,16 @@ export interface SyncLogViewerProps {
     axisMnemos: Record<string, string[]>;
 
     /**
-     * Initial visible range
+     * Initial visible range. A single domain applies to all the tracks,
+     * an array of domains applies to the tracks in corresponding views.
      */
-    domain?: [number, number];
+    domain?: Range | Range[];
 
     /**
-     * Initial selected range
+     * Initial selected range. A single selection applies to all the tracks,
+     * an array of selections applies to the tracks in corresponding views.
      */
-    selection?: [number | undefined, number | undefined];
+    selection?: OpenRange | OpenRange[];
 
     /**
      * Options for well log views
@@ -195,7 +207,7 @@ export interface SyncLogViewerProps {
 export const argTypesSyncLogViewerProp = {
     welllogs: {
         description:
-            "Array of JSON objects describing well log data.\n<i>Depreacted — Use <b>wellLogCollections</b> instead.</i>",
+            "Array of JSON objects describing well log data.\n<i>Deprecated — Use <b>wellLogCollections</b> instead.</i>",
     },
     wellLogCollections: {
         description:
@@ -222,7 +234,7 @@ export const argTypesSyncLogViewerProp = {
             "Set to true or to spacers width or to array of spacer widths if WellLogSpacers should be used",
     },
     wellDistances: {
-        description: "Distanses between wells to show on the spacers",
+        description: "Distances between wells to show on the spacers",
     },
 
     horizontal: {
@@ -309,7 +321,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
     }[];
 
     collapsedTrackIds: (string | number)[][];
-    controllers: WellLogController[]; // for onDeletecontroller implementation
+    controllers: WellLogController[]; // for onDeleteController implementation
 
     _isMounted: boolean;
     _inInfoGroupClick: number;
@@ -402,7 +414,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
 
         if (
             this.props.syncContentDomain !== prevProps.syncContentDomain ||
-            !isEqualRanges(this.props.domain, prevProps.domain)
+            !isEqualDomains(this.props.domain, prevProps.domain)
         ) {
             this.setControllersZoom();
         }
@@ -420,7 +432,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                 this.syncContentScrollPos(0); // force to redraw visible domain
         }
 
-        if (!isEqualRanges(this.props.selection, prevProps.selection)) {
+        if (!isEqualSelections(this.props.selection, prevProps.selection)) {
             this.setControllersSelection();
         }
 
@@ -477,7 +489,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         this.callbackManagers.length = nViews;
 
         for (let iView = nViews; iView < this.controllers.length; iView++) {
-            console.assert(this.controllers[iView]);
+            console.assert(!!this.controllers[iView]);
             this.onDeleteController(iView, this.controllers[iView]);
         }
         this.controllers.length = nViews;
@@ -642,8 +654,8 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         }
     }
 
-    getCommonContentBaseDomain(): [number, number] {
-        const commonBaseDomain: [number, number] = [
+    getCommonContentBaseDomain(): Range {
+        const commonBaseDomain: Range = [
             Number.POSITIVE_INFINITY,
             Number.NEGATIVE_INFINITY,
         ];
@@ -661,8 +673,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
             !(this.props.wellpickFlatting && this.props.wellpicks) &&
             this.props.syncContentDomain
         ) {
-            const commonBaseDomain: [number, number] =
-                this.getCommonContentBaseDomain();
+            const commonBaseDomain: Range = this.getCommonContentBaseDomain();
             for (const callbackManager of this.callbackManagers) {
                 const controller = callbackManager?.controller;
                 if (!controller) continue;
@@ -679,7 +690,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
     makeFlattingCoeffs(): {
         A: number[][];
         B: number[][];
-        newBaseDomain: [number, number][]; // not used
+        newBaseDomain: Range[]; // not used
     } {
         const wellpickFlatting = this.props.wellpickFlatting;
         if (!wellpickFlatting) return { A: [], B: [], newBaseDomain: [] };
@@ -688,7 +699,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         const flattingB: number[][] = [];
 
         const nView = this.callbackManagers.length;
-        const newBaseDomain: [number, number][] = [];
+        const newBaseDomain: Range[] = [];
         for (let i = 0; i < nView; i++) {
             newBaseDomain.push([
                 Number.POSITIVE_INFINITY,
@@ -764,7 +775,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                     _flattingB.push(b);
 
                     const baseDomain = controller.getContentBaseDomain();
-                    const baseDomainNew: [number, number] = [
+                    const baseDomainNew: Range = [
                         a * baseDomain[0] + b,
                         a * baseDomain[1] + b,
                     ];
@@ -799,7 +810,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         let coeff: {
             A: number[][];
             B: number[][];
-            newBaseDomain: [number, number][];
+            newBaseDomain: Range[];
         } | null = null;
         if (this.props.wellpicks && wellpickFlatting)
             coeff = this.makeFlattingCoeffs();
@@ -824,7 +835,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                     const a = coeff.A[iWellLog][j];
                     const b = coeff.B[iWellLog][j];
 
-                    const domainNew: [number, number] = [
+                    const domainNew: Range = [
                         a * domain[0] + b,
                         a * domain[1] + b,
                     ];
@@ -843,7 +854,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                         // sync scroll bar: not work yet
                         const baseDomain = _controller.getContentBaseDomain();
                         //const newBaseDomain = coeff.newBaseDomain[j];
-                        const newBaseDomain: [number, number] = [
+                        const newBaseDomain: Range = [
                             domainNew[0],
                             domainNew[1],
                         ];
@@ -922,22 +933,32 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
     }
 
     setControllersZoom(): void {
-        for (const callbackManager of this.callbackManagers) {
+        for (const [
+            index,
+            callbackManager,
+        ] of this.callbackManagers.entries()) {
             const controller = callbackManager?.controller;
             if (!controller) continue;
-            if (this.props.domain) {
-                controller.zoomContentTo(this.props.domain);
+            const domain = getDomain(this.props.domain, index);
+            if (domain) {
+                controller.zoomContentTo(domain);
                 //this.forceUpdate();
-                if (this.props.syncContentDomain) break; // Set the domain only to the first controllers. Another controllers should be set by syncContentDomain or wellpickFlatting options
+                if (this.props.syncContentDomain) break; // Set the domain only to the first controllers. Other controllers should be set by syncContentDomain or wellpickFlatting options
             }
         }
     }
     setControllersSelection(): void {
         if (!this.props.selection) return;
-        for (const callbackManager of this.callbackManagers) {
+        for (const [
+            index,
+            callbackManager,
+        ] of this.callbackManagers.entries()) {
             const controller = callbackManager?.controller;
             if (!controller) continue;
-            controller.selectContent(this.props.selection);
+            const selection = getSelection(this.props.selection, index);
+            if (selection) {
+                controller.selectContent(selection);
+            }
         }
         for (const spacer of this.spacers) {
             if (!spacer) continue;
@@ -972,8 +993,8 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                 horizontal={this.props.horizontal}
                 axisTitles={this.props.axisTitles}
                 axisMnemos={this.props.axisMnemos}
-                domain={this.props.domain}
-                selection={this.props.selection}
+                domain={getDomain(this.props.domain, index)}
+                selection={getSelection(this.props.selection, index)}
                 primaryAxis={this.state.primaryAxis}
                 options={options}
                 // callbacks
@@ -1086,6 +1107,103 @@ function getWellLogCollectionsFromProps(props: SyncLogViewerProps) {
         if (Array.isArray(setOrCollection)) return setOrCollection;
         else return [setOrCollection];
     });
+}
+
+/**
+ * Retrieves the domain range for a specific index from the provided domain configuration.
+ *
+ * @param domain - The domain configuration, which can be either a single [min, max] tuple
+ *                 applicable to all indices, or an array of [min, max] tuples, one for each index.
+ * @param index - The index to retrieve the domain for. Only used if domain is an array of tuples.
+ * @returns A [min, max] tuple representing the domain range, or undefined if the domain
+ *          configuration is invalid or the index is out of bounds.
+ */
+function getDomain(
+    domain: SyncLogViewerProps["domain"],
+    index: number
+): Range | undefined {
+    if (Array.isArray(domain)) {
+        if (Array.isArray(domain[0])) {
+            return domain[index] as Range | undefined;
+        } else {
+            return domain as Range;
+        }
+    }
+    return undefined;
+}
+
+/**
+ * Compares two domain props for structural and value equality.
+ *
+ * Supports both accepted domain shapes:
+ * - A single [min, max] tuple used by all views.
+ * - An array of [min, max] tuples used per view.
+ *
+ * @param domain1 - First domain value to compare.
+ * @param domain2 - Second domain value to compare.
+ * @returns True when both domains represent the same ranges, otherwise false.
+ */
+function isEqualDomains(
+    domain1: SyncLogViewerProps["domain"],
+    domain2: SyncLogViewerProps["domain"]
+): boolean {
+    if (domain1 === domain2) return true;
+    if (!domain1 || !domain2) return false;
+    if (typeof domain1 !== typeof domain2) return false;
+    if (typeof domain1[0] === "number") {
+        return isEqualRanges(domain1 as Range, domain2 as Range);
+    }
+    return domain1.every((range, index) =>
+        isEqualRanges(range as Range, domain2[index] as Range)
+    );
+}
+
+/**
+ * Retrieves the selection range for a specific index from the provided selection configuration.
+ *
+ * @param selection - The selection configuration, either a single [from, to] tuple
+ *                    for all indices or an array of [from, to] tuples per index.
+ * @param index - The index to retrieve the selection for when selection is per-index.
+ * @returns A [from, to] tuple for the requested index, or undefined when unavailable.
+ */
+function getSelection(
+    selection: SyncLogViewerProps["selection"],
+    index: number
+): OpenRange | undefined {
+    if (Array.isArray(selection)) {
+        if (Array.isArray(selection[0])) {
+            return selection[index] as OpenRange | undefined;
+        } else {
+            return selection as OpenRange;
+        }
+    }
+    return undefined;
+}
+
+/**
+ * Compares two selection props for structural and value equality.
+ *
+ * Supports both accepted selection shapes:
+ * - A single [from, to] tuple used by all indices.
+ * - An array of [from, to] tuples used per index.
+ *
+ * @param selection1 - First selection value to compare.
+ * @param selection2 - Second selection value to compare.
+ * @returns True when both selections represent the same ranges, otherwise false.
+ */
+function isEqualSelections(
+    selection1: SyncLogViewerProps["selection"],
+    selection2: SyncLogViewerProps["selection"]
+): boolean {
+    if (selection1 === selection2) return true;
+    if (!selection1 || !selection2) return false;
+    if (typeof selection1 !== typeof selection2) return false;
+    if (typeof selection1[0] === "number" || selection1[0] === undefined) {
+        return isEqualRanges(selection1 as OpenRange, selection2 as OpenRange);
+    }
+    return selection1.every((range, index) =>
+        isEqualRanges(range as OpenRange, selection2[index] as OpenRange)
+    );
 }
 
 ///
@@ -1216,12 +1334,18 @@ SyncLogViewer.propTypes = {
     /**
      * Initial visible interval of the log data
      */
-    domain: PropTypes.arrayOf(PropTypes.number),
+    domain: PropTypes.oneOfType([
+        PropTypes.arrayOf(PropTypes.number),
+        PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
+    ]),
 
     /**
      * Initial selected interval of the log data
      */
-    selection: PropTypes.arrayOf(PropTypes.number),
+    selection: PropTypes.oneOfType([
+        PropTypes.arrayOf(PropTypes.number),
+        PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
+    ]),
 
     /**
      * Set to true for default titles or to array of individual well log titles

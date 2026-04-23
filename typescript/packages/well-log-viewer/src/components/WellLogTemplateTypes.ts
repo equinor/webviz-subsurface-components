@@ -1,3 +1,5 @@
+import type { Range } from "../utils/arrayTypes";
+
 export type TemplatePlotScale = "linear" | "log";
 
 export type TemplatePlotType =
@@ -17,7 +19,7 @@ export type CSSColor = string;
 export type TemplatePlotProps = {
     type?: TemplatePlotType; // should be given or got from a style!
     scale?: TemplatePlotScale; // 'linear' or 'log', default 'linear'
-    domain?: [number, number]; // min, max values
+    domain?: Range; // min, max values
 
     color?: CSSColor; // color or colorMapFunction should be given or got from a style!
     inverseColor?: CSSColor;
@@ -58,7 +60,7 @@ export type TemplateTrack = {
     width?: number;
     plots: TemplatePlot[];
     scale?: TemplatePlotScale; // 'linear' or 'log', default first plot scale
-    domain?: [number, number]; // min, max values, default all plots domain
+    domain?: Range; // min, max values, default all plots domain
 }; // Part of JSON
 
 export interface TemplateStyle extends TemplatePlotProps {

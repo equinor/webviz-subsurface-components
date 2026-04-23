@@ -32,6 +32,7 @@ import { createScale } from "./graph/factory";
 import { stackLegendConfig } from "./stack/stack-legend";
 import { type AxesInfo, getAxisTitle } from "./axes";
 
+import type { Range } from "./arrayTypes";
 import { checkMinMax } from "./minmax";
 import { getAxisIndices, getDiscreteMeta } from "./well-log";
 import {
@@ -49,24 +50,23 @@ import {
     newDualScaleTrack,
     newScaleTrack,
 } from "./trackFactory";
-import { isStackedTrackTemplate } from "./template";
-import { makeTrackHeader } from "./template";
+import { isStackedTrackTemplate, makeTrackHeader } from "./template";
 
 // Extended track options interface that includes template and index range properties. Used interally in other
 interface ExtTrackOptions extends TrackOptions {
-    __indexMinMax: [number, number];
+    __indexMinMax: Range;
     __template: TemplateTrack;
 }
 
 // Data class utility for createTracks return object
 class TracksInfo {
     tracks: Track[] = [];
-    minmaxPrimaryAxis: [number, number] = [
+    minmaxPrimaryAxis: Range = [
         Number.POSITIVE_INFINITY,
         Number.NEGATIVE_INFINITY,
     ];
     // ? Doesn't seem to be used anywhere? (@anders2303)
-    minmaxSecondaryAxis: [number, number] = [
+    minmaxSecondaryAxis: Range = [
         Number.POSITIVE_INFINITY,
         Number.NEGATIVE_INFINITY,
     ];
@@ -247,7 +247,7 @@ function setupTrackPlots(
 function applySetupMinMax(
     setup1: PlotSetup,
     setup2: PlotSetup | null,
-    primaryAxisMinMax: [number, number]
+    primaryAxisMinMax: Range
 ) {
     checkMinMax(primaryAxisMinMax, setup1.plotData.minmaxPrimaryAxis);
 
@@ -289,7 +289,7 @@ function makeGraphTrackOptions(
     const curvesUsed: WellLogCurve[] = [];
 
     // Store tracks index range
-    const indexMinMax: [number, number] = [
+    const indexMinMax: Range = [
         Number.POSITIVE_INFINITY,
         Number.NEGATIVE_INFINITY,
     ];
@@ -630,7 +630,7 @@ export function removeTrackPlot(track: Track, plot: Plot) {
  * @param track A videx track
  * @returns A number tuple, with the lower and upper axis values
  */
-export function getTrackIndexRange(track: Track): [number, number] {
+export function getTrackIndexRange(track: Track): Range {
     const options = track.options as ExtTrackOptions;
     if (options.__indexMinMax) {
         return options.__indexMinMax;

@@ -1,6 +1,9 @@
 export type { AxesInfo } from "./axes";
 export { axisTitles, axisMnemos, getAxisTitle } from "./axes";
 
+export type { Range, OpenRange } from "./arrayTypes";
+export { isEqDomains, isEqualArrays, isEqualRanges } from "./arrays";
+
 export type {
     ColorFunction,
     ColorTable,
