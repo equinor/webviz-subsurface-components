@@ -45,12 +45,23 @@ const smallPolylinesLayer = {
     id: "small_polylines_layer",
     /* eslint-disable */
     polylinePoints: [
-        0, 0, 0, 10, 0, 0, 10, 0, 10, -5, -5, 4, 0, -8, 6, 5, 10, 8,
+        0, 0, 0, 
+        10, 0, 0, 
+        10, 0, 10, 
+        -5, -5, 4, 
+        0, -8, 6, 
+        5, 10, 8,
+        3, 1, 2, 
+        15, 8, 10,
     ],
     /* eslint-enable */
-    startIndices: [0, 3],
+    startIndices: [0, 3, 6],
     polylinesClosed: [true, false],
-    color: [0, 200, 100],
+    color: [
+        [255, 0, 0],
+        [0, 255, 0],
+        [0, 0, 255],
+    ],
 
     widthUnits: "pixels",
     linesWidth: 10,
