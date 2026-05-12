@@ -6,7 +6,7 @@ import type {
 } from "@deck.gl/core";
 import { CompositeLayer } from "@deck.gl/core";
 import { PathLayer } from "@deck.gl/layers";
-import { DataFilterExtension } from "@deck.gl/extensions";
+import { DataFilterExtension, PathStyleExtension } from "@deck.gl/extensions";
 import { isEqual } from "lodash";
 
 import type {
@@ -29,6 +29,7 @@ export type Polyline = {
     path: Position[];
     color?: Color;
     width?: number;
+    dashArray?: [number, number];
 };
 
 /**
@@ -48,6 +49,7 @@ export type PolylineGroup = {
     name?: string;
     color?: Color;
     width?: number;
+    dashArray?: [number, number];
     polylines: Polyline[] | BinaryPolylines;
 };
 
@@ -128,6 +130,23 @@ export interface PolylineGroupLayerProps extends ExtendedLayerProps {
      */
     hiddenPolylines?: Set<string | number>;
 
+    // -- Dash style ----------------------------------------------------------
+
+    getGroupDashArray?: (
+        group: PolylineGroup
+    ) => [number, number] | null | undefined;
+    getPolylineDashArray?: (
+        polyline: Polyline,
+        group: PolylineGroup
+    ) => [number, number] | null | undefined;
+    /** Default dash pattern `[dashLength, gapLength]` applied when no group or polyline override is set. */
+    defaultGroupDashArray?: [number, number];
+    /**
+     * Use high-precision dash rendering (avoids dash-length variation at segment
+     * joins). Slightly more expensive. Default: false.
+     */
+    highPrecisionDash?: boolean;
+
     /**
      * Path of the cross-section fence as 2-D world-space XY coordinates `[x, y]`.
      * When provided, each polyline path point is interpreted as
@@ -150,6 +169,7 @@ type FlatEntry = {
     path: Position[];
     color: Color;
     width: number;
+    dashArray: [number, number];
     /** Undefined when the polyline originates from BinaryPolylines. */
     _polyline: Polyline | undefined;
     _group: PolylineGroup;
@@ -247,6 +267,31 @@ function resolveGroupWidth(
     );
 }
 
+function resolveGroupDashArray(
+    group: PolylineGroup,
+    props: PolylineGroupLayerProps
+): [number, number] {
+    return (
+        props.getGroupDashArray?.(group) ??
+        group.dashArray ??
+        props.defaultGroupDashArray ?? [0, 0]
+    );
+}
+
+function resolveDashArray(
+    polyline: Polyline,
+    group: PolylineGroup,
+    props: PolylineGroupLayerProps
+): [number, number] {
+    const fromPolylineAccessor = props.getPolylineDashArray?.(polyline, group);
+    if (fromPolylineAccessor != null) return fromPolylineAccessor;
+    if (polyline.dashArray != null) return polyline.dashArray;
+    const fromGroupAccessor = props.getGroupDashArray?.(group);
+    if (fromGroupAccessor != null) return fromGroupAccessor;
+    if (group.dashArray != null) return group.dashArray;
+    return props.defaultGroupDashArray ?? [0, 0];
+}
+
 function flattenGroupData(
     data: PolylineGroup[],
     props: PolylineGroupLayerProps
@@ -264,6 +309,7 @@ function flattenGroupData(
             const { positions, startIndices } = polylines;
             const color = resolveGroupColor(group, props);
             const width = resolveGroupWidth(group, props);
+            const dashArray = resolveGroupDashArray(group, props);
             for (let i = 0; i < startIndices.length; i++) {
                 const start = startIndices[i];
                 const end =
@@ -282,6 +328,7 @@ function flattenGroupData(
                     path,
                     color,
                     width,
+                    dashArray,
                     _polyline: undefined,
                     _group: group,
                 });
@@ -292,6 +339,7 @@ function flattenGroupData(
                     path: getPath(polyline, group),
                     color: resolveColor(polyline, group, props),
                     width: resolveWidth(polyline, group, props),
+                    dashArray: resolveDashArray(polyline, group, props),
                     _polyline: polyline,
                     _group: group,
                 });
@@ -407,7 +455,16 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
             ZIncreasingDownwards,
             hiddenGroups,
             hiddenPolylines,
+            defaultGroupDashArray,
+            getGroupDashArray,
+            getPolylineDashArray,
+            highPrecisionDash,
         } = this.props;
+
+        const hasDash =
+            defaultGroupDashArray != null ||
+            getGroupDashArray != null ||
+            getPolylineDashArray != null;
 
         // Shared sub-layer props for everything except getPath / updateTriggers.getPath
         const sharedProps = {
@@ -422,7 +479,17 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
             capRounded,
             miterLimit,
             parameters: { depthTest },
-            extensions: [new DataFilterExtension({ filterSize: 1 })],
+            extensions: [
+                new DataFilterExtension({ filterSize: 1 }),
+                ...(hasDash
+                    ? [
+                          new PathStyleExtension({
+                              dash: true,
+                              highPrecisionDash: highPrecisionDash ?? false,
+                          }),
+                      ]
+                    : []),
+            ],
             getFilterValue: (d: FlatEntry) => {
                 if (d._group.id != null && hiddenGroups?.has(d._group.id))
                     return 0;
@@ -436,12 +503,14 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
             filterRange: [1, 1] as [number, number],
             getColor: (d: FlatEntry) => d.color,
             getWidth: (d: FlatEntry) => d.width,
+            getDashArray: (d: FlatEntry) => d.dashArray,
         };
 
         const updateTriggers = {
             getFilterValue: [hiddenGroups, hiddenPolylines],
             getColor: [flatData],
             getWidth: [flatData],
+            getDashArray: [flatData],
             getPath: [ZIncreasingDownwards],
         };
 

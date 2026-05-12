@@ -805,3 +805,218 @@ export const SectionViewRendering: StoryObj<typeof SubsurfaceViewer> = {
         },
     },
 };
+
+// ---------------------------------------------------------------------------
+// Story 7: Group-level styling — color, width and dash pattern
+// ---------------------------------------------------------------------------
+//
+// Three groups — Horizons, Faults, Markers — each with independent color,
+// line width and dash pattern. Both OrbitView (left) and OrthographicView
+// (right) are shown simultaneously using DUAL_VIEWS.
+//
+// Dash patterns are stored as `dashArray: [dashLength, gapLength]` directly
+// on each PolylineGroup object. The `getGroupDashArray` layer prop reads them
+// back, which also enables PathStyleExtension internally. Setting dashLength
+// to 0 leaves a group's lines solid.
+//
+// Group A occupies x ∈ [0, 10], y ∈ [0, 6] (left half of the scene).
+// Group B occupies x ∈ [0, 10], y ∈ [10, 16] (right half — separated by a gap).
+
+const GROUP_A_PATHS: Position[][] = [
+    [
+        [0, 0, 2],
+        [4, 0, 3],
+        [8, 0, 4],
+        [10, 0, 5],
+    ],
+    [
+        [0, 3, 4],
+        [4, 3, 5],
+        [8, 3, 6],
+        [10, 3, 7],
+    ],
+    [
+        [0, 6, 6],
+        [4, 6, 7],
+        [8, 6, 8],
+        [10, 6, 9],
+    ],
+];
+
+const GROUP_B_PATHS: Position[][] = [
+    [
+        [0, 10, 2],
+        [4, 10, 3],
+        [8, 10, 4],
+        [10, 10, 5],
+    ],
+    [
+        [0, 13, 4],
+        [4, 13, 5],
+        [8, 13, 6],
+        [10, 13, 7],
+    ],
+    [
+        [0, 16, 6],
+        [4, 16, 7],
+        [8, 16, 8],
+        [10, 16, 9],
+    ],
+];
+
+const GROUP_STYLING_BOUNDS = [-1, -1, 12, 18] as [
+    number,
+    number,
+    number,
+    number,
+];
+
+const groupStylingAxesLayer = new AxesLayer({
+    id: "axes-group-styling",
+    name: "Axes",
+    bounds: [-1, -1, 0, 12, 18, 10],
+});
+
+type GroupStylingArgs = {
+    groupAColor: string;
+    groupAWidth: number;
+    groupADashLength: number;
+    groupAGapLength: number;
+    groupBColor: string;
+    groupBWidth: number;
+    groupBDashLength: number;
+    groupBGapLength: number;
+    highPrecisionDash: boolean;
+};
+
+const GroupStylingWrapper = ({
+    groupAColor = "#e05050",
+    groupAWidth = 3,
+    groupADashLength = 0,
+    groupAGapLength = 4,
+    groupBColor = "#50c050",
+    groupBWidth = 4,
+    groupBDashLength = 0,
+    groupBGapLength = 4,
+    highPrecisionDash = false,
+}: GroupStylingArgs) => {
+    const data: PolylineGroup[] = [
+        {
+            id: "group-a",
+            name: "Group A",
+            color: getRgba(groupAColor),
+            width: groupAWidth,
+            dashArray:
+                groupADashLength > 0
+                    ? [groupADashLength, groupAGapLength]
+                    : undefined,
+            polylines: GROUP_A_PATHS.map((path) => ({ path })),
+        },
+        {
+            id: "group-b",
+            name: "Group B",
+            color: getRgba(groupBColor),
+            width: groupBWidth,
+            dashArray:
+                groupBDashLength > 0
+                    ? [groupBDashLength, groupBGapLength]
+                    : undefined,
+            polylines: GROUP_B_PATHS.map((path) => ({ path })),
+        },
+    ];
+
+    return (
+        <SubsurfaceViewer
+            id="polyline-group-styling"
+            layers={[
+                groupStylingAxesLayer,
+                new PolylineGroupLayer({
+                    id: "group-styling-layer",
+                    name: "Group Styling",
+                    data,
+                    widthUnits: "pixels",
+                    ZIncreasingDownwards: true,
+                    // Reading dashArray from the group object and returning it
+                    // here enables PathStyleExtension inside the layer.
+                    getGroupDashArray: (g: PolylineGroup) =>
+                        g.dashArray ?? null,
+                    highPrecisionDash,
+                }),
+            ]}
+            bounds={GROUP_STYLING_BOUNDS}
+            views={DUAL_VIEWS}
+        />
+    );
+};
+
+export const GroupLevelStyling: StoryObj<typeof GroupStylingWrapper> = {
+    args: {
+        groupAColor: "#e05050",
+        groupAWidth: 3,
+        groupADashLength: 0,
+        groupAGapLength: 4,
+        groupBColor: "#50c050",
+        groupBWidth: 4,
+        groupBDashLength: 0,
+        groupBGapLength: 4,
+        highPrecisionDash: false,
+    },
+    argTypes: {
+        groupAColor: {
+            name: "Group A — color",
+            control: { type: "color" },
+        },
+        groupAWidth: {
+            name: "Group A — width (px)",
+            control: { type: "range", min: 1, max: 20, step: 1 },
+        },
+        groupADashLength: {
+            name: "Group A — dash length (0 = solid)",
+            control: { type: "range", min: 0, max: 40, step: 1 },
+        },
+        groupAGapLength: {
+            name: "Group A — gap length",
+            control: { type: "range", min: 1, max: 40, step: 1 },
+        },
+        groupBColor: {
+            name: "Group B — color",
+            control: { type: "color" },
+        },
+        groupBWidth: {
+            name: "Group B — width (px)",
+            control: { type: "range", min: 1, max: 20, step: 1 },
+        },
+        groupBDashLength: {
+            name: "Group B — dash length (0 = solid)",
+            control: { type: "range", min: 0, max: 40, step: 1 },
+        },
+        groupBGapLength: {
+            name: "Group B — gap length",
+            control: { type: "range", min: 1, max: 40, step: 1 },
+        },
+        highPrecisionDash: {
+            name: "High-precision dash",
+            control: { type: "boolean" },
+        },
+    },
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: [
+                    "Two groups of three polylines — **Group A** (lower half) and **Group B** (upper half) —",
+                    "separated by a gap in world space.",
+                    "Both the **OrbitView** (left) and **OrthographicView** (right) are shown.",
+                    "",
+                    "Each group has independently controlled **color**, **width** and **dash pattern**.",
+                    "Set *dash length* > 0 to enable dashing for that group; *gap length* controls",
+                    "the space between dashes. A *dash length* of 0 keeps the lines solid.",
+                    "",
+                    "Enable **high-precision dash** for sharper dash edges at segment joins",
+                    "(slightly higher GPU cost).",
+                ].join(" "),
+            },
+        },
+    },
+    render: (args) => <GroupStylingWrapper {...args} />,
+};
