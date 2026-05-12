@@ -438,10 +438,21 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
             getWidth: (d: FlatEntry) => d.width,
         };
 
+        const updateTriggers = {
+            getFilterValue: [hiddenGroups, hiddenPolylines],
+            getColor: [flatData],
+            getWidth: [flatData],
+            getPath: [ZIncreasingDownwards],
+        };
+
         if (sectionIndex) {
             // Two separate sub-layers — one per coordinate system — so each has
             // its own GPU attribute buffer. filterSubLayer() routes each to the
             // appropriate viewport type (SectionViewport vs. 3D).
+            const sectionUpdateTriggers = {
+                ...updateTriggers,
+                getPath: [...updateTriggers.getPath, sectionIndex],
+            };
             return [
                 new PathLayer(
                     this.getSubLayerProps({
@@ -452,12 +463,7 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
                                 const z = ZIncreasingDownwards ? -pt[1] : pt[1];
                                 return [pt[0], z, 0] as Position;
                             }),
-                        updateTriggers: {
-                            getFilterValue: [hiddenGroups, hiddenPolylines],
-                            getPath: [ZIncreasingDownwards, sectionIndex],
-                            getColor: [flatData],
-                            getWidth: [flatData],
-                        },
+                        updateTriggers: sectionUpdateTriggers,
                     })
                 ),
                 new PathLayer(
@@ -473,12 +479,7 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
                                 );
                                 return [wx, wy, z] as Position;
                             }),
-                        updateTriggers: {
-                            getFilterValue: [hiddenGroups, hiddenPolylines],
-                            getPath: [ZIncreasingDownwards, sectionIndex],
-                            getColor: [flatData],
-                            getWidth: [flatData],
-                        },
+                        updateTriggers: sectionUpdateTriggers,
                     })
                 ),
             ];
@@ -495,12 +496,7 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
                             ([x, y, z]) => [x, y, -z] as Position
                         );
                     },
-                    updateTriggers: {
-                        getFilterValue: [hiddenGroups, hiddenPolylines],
-                        getPath: [ZIncreasingDownwards],
-                        getColor: [flatData],
-                        getWidth: [flatData],
-                    },
+                    updateTriggers,
                 })
             ),
         ];
