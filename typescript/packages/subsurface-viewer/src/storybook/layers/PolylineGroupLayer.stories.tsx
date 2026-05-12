@@ -1020,3 +1020,227 @@ export const GroupLevelStyling: StoryObj<typeof GroupStylingWrapper> = {
     },
     render: (args) => <GroupStylingWrapper {...args} />,
 };
+
+// ---------------------------------------------------------------------------
+// Story 8: Per-polyline style overrides — color, width and dash pattern
+// ---------------------------------------------------------------------------
+//
+// Same two-group, three-polyline layout as GroupLevelStyling. Each group has
+// a group-level color, width and dash pattern that all three of its polylines
+// inherit. The **middle polyline** in each group (A2 / B2) can be overridden
+// individually, demonstrating the resolution cascade:
+//   polyline.color > group.color > defaultGroupColor
+
+type PolylineOverrideArgs = {
+    groupAColor: string;
+    groupAWidth: number;
+    groupADashLength: number;
+    groupAGapLength: number;
+    a2Color: string;
+    a2Width: number;
+    a2DashLength: number;
+    a2GapLength: number;
+    groupBColor: string;
+    groupBWidth: number;
+    groupBDashLength: number;
+    groupBGapLength: number;
+    b2Color: string;
+    b2Width: number;
+    b2DashLength: number;
+    b2GapLength: number;
+    highPrecisionDash: boolean;
+};
+
+const PolylineOverrideWrapper = ({
+    groupAColor = "#e05050",
+    groupAWidth = 3,
+    groupADashLength = 0,
+    groupAGapLength = 4,
+    a2Color = "#e0c030",
+    a2Width = 7,
+    a2DashLength = 12,
+    a2GapLength = 4,
+    groupBColor = "#50c050",
+    groupBWidth = 3,
+    groupBDashLength = 0,
+    groupBGapLength = 4,
+    b2Color = "#3090d0",
+    b2Width = 7,
+    b2DashLength = 6,
+    b2GapLength = 6,
+    highPrecisionDash = false,
+}: PolylineOverrideArgs) => {
+    const mkDash = (len: number, gap: number): [number, number] | undefined =>
+        len > 0 ? [len, gap] : undefined;
+
+    const data: PolylineGroup[] = [
+        {
+            id: "group-a",
+            name: "Group A",
+            color: getRgba(groupAColor),
+            width: groupAWidth,
+            dashArray: mkDash(groupADashLength, groupAGapLength),
+            polylines: [
+                { id: "a1", path: GROUP_A_PATHS[0] },
+                {
+                    id: "a2",
+                    path: GROUP_A_PATHS[1],
+                    color: getRgba(a2Color),
+                    width: a2Width,
+                    dashArray: mkDash(a2DashLength, a2GapLength),
+                },
+                { id: "a3", path: GROUP_A_PATHS[2] },
+            ],
+        },
+        {
+            id: "group-b",
+            name: "Group B",
+            color: getRgba(groupBColor),
+            width: groupBWidth,
+            dashArray: mkDash(groupBDashLength, groupBGapLength),
+            polylines: [
+                { id: "b1", path: GROUP_B_PATHS[0] },
+                {
+                    id: "b2",
+                    path: GROUP_B_PATHS[1],
+                    color: getRgba(b2Color),
+                    width: b2Width,
+                    dashArray: mkDash(b2DashLength, b2GapLength),
+                },
+                { id: "b3", path: GROUP_B_PATHS[2] },
+            ],
+        },
+    ];
+
+    return (
+        <SubsurfaceViewer
+            id="polyline-override-styling"
+            layers={[
+                groupStylingAxesLayer,
+                new PolylineGroupLayer({
+                    id: "polyline-override-layer",
+                    name: "Polyline Overrides",
+                    data,
+                    widthUnits: "pixels",
+                    ZIncreasingDownwards: true,
+                    getGroupDashArray: (g) => g.dashArray ?? null,
+                    getPolylineDashArray: (p) => p.dashArray ?? null,
+                    highPrecisionDash,
+                }),
+            ]}
+            bounds={GROUP_STYLING_BOUNDS}
+            views={DUAL_VIEWS}
+        />
+    );
+};
+
+export const PolylineLevelStyling: StoryObj<typeof PolylineOverrideWrapper> = {
+    args: {
+        groupAColor: "#e05050",
+        groupAWidth: 3,
+        groupADashLength: 0,
+        groupAGapLength: 4,
+        a2Color: "#e0c030",
+        a2Width: 7,
+        a2DashLength: 12,
+        a2GapLength: 4,
+        groupBColor: "#50c050",
+        groupBWidth: 3,
+        groupBDashLength: 0,
+        groupBGapLength: 4,
+        b2Color: "#3090d0",
+        b2Width: 7,
+        b2DashLength: 6,
+        b2GapLength: 6,
+        highPrecisionDash: false,
+    },
+    argTypes: {
+        groupAColor: {
+            name: "Group A — color",
+            control: { type: "color" },
+        },
+        groupAWidth: {
+            name: "Group A — width (px)",
+            control: { type: "range", min: 1, max: 20, step: 1 },
+        },
+        groupADashLength: {
+            name: "Group A — dash length (0 = solid)",
+            control: { type: "range", min: 0, max: 40, step: 1 },
+        },
+        groupAGapLength: {
+            name: "Group A — gap length",
+            control: { type: "range", min: 1, max: 40, step: 1 },
+        },
+        a2Color: {
+            name: "A2 override — color",
+            control: { type: "color" },
+        },
+        a2Width: {
+            name: "A2 override — width (px)",
+            control: { type: "range", min: 1, max: 20, step: 1 },
+        },
+        a2DashLength: {
+            name: "A2 override — dash length (0 = solid)",
+            control: { type: "range", min: 0, max: 40, step: 1 },
+        },
+        a2GapLength: {
+            name: "A2 override — gap length",
+            control: { type: "range", min: 1, max: 40, step: 1 },
+        },
+        groupBColor: {
+            name: "Group B — color",
+            control: { type: "color" },
+        },
+        groupBWidth: {
+            name: "Group B — width (px)",
+            control: { type: "range", min: 1, max: 20, step: 1 },
+        },
+        groupBDashLength: {
+            name: "Group B — dash length (0 = solid)",
+            control: { type: "range", min: 0, max: 40, step: 1 },
+        },
+        groupBGapLength: {
+            name: "Group B — gap length",
+            control: { type: "range", min: 1, max: 40, step: 1 },
+        },
+        b2Color: {
+            name: "B2 override — color",
+            control: { type: "color" },
+        },
+        b2Width: {
+            name: "B2 override — width (px)",
+            control: { type: "range", min: 1, max: 20, step: 1 },
+        },
+        b2DashLength: {
+            name: "B2 override — dash length (0 = solid)",
+            control: { type: "range", min: 0, max: 40, step: 1 },
+        },
+        b2GapLength: {
+            name: "B2 override — gap length",
+            control: { type: "range", min: 1, max: 40, step: 1 },
+        },
+        highPrecisionDash: {
+            name: "High-precision dash",
+            control: { type: "boolean" },
+        },
+    },
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: [
+                    "Same two-group, three-polyline layout as *Group Level Styling*.",
+                    "Each group has group-level **color**, **width** and **dash pattern** that",
+                    "all three of its polylines inherit by default.",
+                    "",
+                    "The **middle polyline** in each group (A2 / B2) carries individual",
+                    "`Polyline.color`, `.width` and `.dashArray` overrides, demonstrating the",
+                    "resolution cascade: polyline property → group property → layer default.",
+                    "",
+                    "Both the **OrbitView** (left) and **OrthographicView** (right) are shown.",
+                ].join(" "),
+            },
+        },
+    },
+    render: (args) => <PolylineOverrideWrapper {...args} />,
+};
