@@ -79,6 +79,8 @@ export interface PolylineGroupLayerProps extends ExtendedLayerProps {
     jointRounded?: boolean;
     capRounded?: boolean;
     miterLimit?: number;
+    /** If true, the path always faces the camera. Default: true. */
+    billboard?: boolean;
 
     // -- Depth ---------------------------------------------------------------
 
@@ -125,6 +127,7 @@ const defaultProps: Partial<PolylineGroupLayerProps> = {
     jointRounded: false,
     capRounded: false,
     miterLimit: 4,
+    billboard: true,
     getGroupPolylines: (g: PolylineGroup) => g.polylines,
     getPolylinePath: (p: Polyline) => p.path,
 };
@@ -230,6 +233,7 @@ export default class PolylineGroupLayer extends CompositeLayer<PolylineGroupLaye
             jointRounded,
             capRounded,
             miterLimit,
+            billboard,
             pickable,
             depthTest,
             ZIncreasingDownwards,
@@ -240,6 +244,7 @@ export default class PolylineGroupLayer extends CompositeLayer<PolylineGroupLaye
                 id: "paths",
                 data: flatData,
                 pickable,
+                billboard,
                 widthUnits,
                 widthScale,
                 widthMinPixels,
