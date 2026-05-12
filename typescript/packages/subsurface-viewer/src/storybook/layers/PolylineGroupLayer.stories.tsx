@@ -8,6 +8,7 @@ import SubsurfaceViewer from "../../SubsurfaceViewer";
 import type { ViewsType } from "../../SubsurfaceViewer";
 import { defaultStoryParameters } from "../sharedSettings";
 import AxesLayer from "../../layers/axes/axesLayer";
+import { Axes2DLayer } from "../../layers";
 import { PolylineGroupLayer } from "../../layers/polyline_group/polylineGroupLayer";
 import type {
     BinaryPolylines,
@@ -90,8 +91,16 @@ const DUAL_VIEWS: ViewsType = {
 const SECTION_VIEWS: ViewsType = {
     layout: [1, 2] as [number, number],
     viewports: [
-        { id: "view_3d", viewType: OrbitView },
-        { id: "view_section", viewType: SectionView },
+        {
+            id: "view_3d",
+            viewType: OrbitView,
+            layerIds: ["axes-3d-section", "section-layer"],
+        },
+        {
+            id: "view_section",
+            viewType: SectionView,
+            layerIds: ["axes-2d-section", "section-layer"],
+        },
     ],
 };
 
@@ -758,6 +767,15 @@ export const SectionViewRendering: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "polyline-group-section",
         layers: [
+            new AxesLayer({
+                id: "axes-3d-section",
+                name: "Axes 3D",
+                bounds: [0, 0, 0, 12, 12, 10],
+            }),
+            new Axes2DLayer({
+                id: "axes-2d-section",
+                name: "Axes 2D",
+            }),
             new PolylineGroupLayer({
                 id: "section-layer",
                 name: "Section Horizons",

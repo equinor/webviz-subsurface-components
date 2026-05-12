@@ -1,4 +1,9 @@
-import type { Color, PickingInfo, UpdateParameters } from "@deck.gl/core";
+import type {
+    Color,
+    FilterContext,
+    PickingInfo,
+    UpdateParameters,
+} from "@deck.gl/core";
 import { CompositeLayer } from "@deck.gl/core";
 import { PathLayer } from "@deck.gl/layers";
 import { DataFilterExtension } from "@deck.gl/extensions";
@@ -378,11 +383,16 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
         }
     }
 
+    filterSubLayer({ layer, viewport }: FilterContext): boolean {
+        const isSV = viewport.constructor === SectionViewport;
+        if (layer.id.endsWith("-paths-section")) return isSV;
+        if (layer.id.endsWith("-paths-3d")) return !isSV;
+        return true;
+    }
+
     renderLayers(): PathLayer[] {
         const flatData = this.state["flatData"] as FlatEntry[];
         const sectionIndex = this.state["sectionIndex"] as SectionIndex | null;
-        const isSectionViewport =
-            this.context.viewport.constructor === SectionViewport;
         const {
             widthUnits,
             widthScale,
@@ -399,68 +409,101 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
             hiddenPolylines,
         } = this.props;
 
-        const layer = new PathLayer(
-            this.getSubLayerProps({
-                id: "paths",
-                data: flatData,
-                pickable,
-                billboard,
-                widthUnits,
-                widthScale,
-                widthMinPixels,
-                widthMaxPixels,
-                jointRounded,
-                capRounded,
-                miterLimit,
-                parameters: { depthTest },
-                extensions: [new DataFilterExtension({ filterSize: 1 })],
-                getFilterValue: (d: FlatEntry) => {
-                    if (d._group.id != null && hiddenGroups?.has(d._group.id))
-                        return 0;
-                    if (
-                        d._polyline?.id != null &&
-                        hiddenPolylines?.has(d._polyline.id)
-                    )
-                        return 0;
-                    return 1;
-                },
-                filterRange: [1, 1] as [number, number],
-                getPath: (d: FlatEntry) => {
-                    if (sectionIndex) {
-                        return d.path.map((pt) => {
-                            const a = pt[0];
-                            const dep = pt[1];
-                            const z = ZIncreasingDownwards ? -dep : dep;
-                            if (isSectionViewport) {
-                                return [a, z, 0] as Position;
-                            } else {
+        // Shared sub-layer props for everything except getPath / updateTriggers.getPath
+        const sharedProps = {
+            data: flatData,
+            pickable,
+            billboard,
+            widthUnits,
+            widthScale,
+            widthMinPixels,
+            widthMaxPixels,
+            jointRounded,
+            capRounded,
+            miterLimit,
+            parameters: { depthTest },
+            extensions: [new DataFilterExtension({ filterSize: 1 })],
+            getFilterValue: (d: FlatEntry) => {
+                if (d._group.id != null && hiddenGroups?.has(d._group.id))
+                    return 0;
+                if (
+                    d._polyline?.id != null &&
+                    hiddenPolylines?.has(d._polyline.id)
+                )
+                    return 0;
+                return 1;
+            },
+            filterRange: [1, 1] as [number, number],
+            getColor: (d: FlatEntry) => d.color,
+            getWidth: (d: FlatEntry) => d.width,
+        };
+
+        if (sectionIndex) {
+            // Two separate sub-layers — one per coordinate system — so each has
+            // its own GPU attribute buffer. filterSubLayer() routes each to the
+            // appropriate viewport type (SectionViewport vs. 3D).
+            return [
+                new PathLayer(
+                    this.getSubLayerProps({
+                        ...sharedProps,
+                        id: "paths-section",
+                        getPath: (d: FlatEntry) =>
+                            d.path.map((pt) => {
+                                const z = ZIncreasingDownwards ? -pt[1] : pt[1];
+                                return [pt[0], z, 0] as Position;
+                            }),
+                        updateTriggers: {
+                            getFilterValue: [hiddenGroups, hiddenPolylines],
+                            getPath: [ZIncreasingDownwards, sectionIndex],
+                            getColor: [flatData],
+                            getWidth: [flatData],
+                        },
+                    })
+                ),
+                new PathLayer(
+                    this.getSubLayerProps({
+                        ...sharedProps,
+                        id: "paths-3d",
+                        getPath: (d: FlatEntry) =>
+                            d.path.map((pt) => {
+                                const z = ZIncreasingDownwards ? -pt[1] : pt[1];
                                 const [wx, wy] = projectAbscissa(
-                                    a,
+                                    pt[0],
                                     sectionIndex
                                 );
                                 return [wx, wy, z] as Position;
-                            }
-                        });
-                    }
-                    if (!ZIncreasingDownwards) return d.path;
-                    return d.path.map(([x, y, z]) => [x, y, -z] as Position);
-                },
-                getColor: (d: FlatEntry) => d.color,
-                getWidth: (d: FlatEntry) => d.width,
-                updateTriggers: {
-                    getFilterValue: [hiddenGroups, hiddenPolylines],
-                    getPath: [
-                        ZIncreasingDownwards,
-                        sectionIndex,
-                        isSectionViewport,
-                    ],
-                    getColor: [flatData],
-                    getWidth: [flatData],
-                },
-            })
-        );
+                            }),
+                        updateTriggers: {
+                            getFilterValue: [hiddenGroups, hiddenPolylines],
+                            getPath: [ZIncreasingDownwards, sectionIndex],
+                            getColor: [flatData],
+                            getWidth: [flatData],
+                        },
+                    })
+                ),
+            ];
+        }
 
-        return [layer];
+        return [
+            new PathLayer(
+                this.getSubLayerProps({
+                    ...sharedProps,
+                    id: "paths",
+                    getPath: (d: FlatEntry) => {
+                        if (!ZIncreasingDownwards) return d.path;
+                        return d.path.map(
+                            ([x, y, z]) => [x, y, -z] as Position
+                        );
+                    },
+                    updateTriggers: {
+                        getFilterValue: [hiddenGroups, hiddenPolylines],
+                        getPath: [ZIncreasingDownwards],
+                        getColor: [flatData],
+                        getWidth: [flatData],
+                    },
+                })
+            ),
+        ];
     }
 
     getPickingInfo({ info }: { info: PickingInfo }): LayerPickInfo {
