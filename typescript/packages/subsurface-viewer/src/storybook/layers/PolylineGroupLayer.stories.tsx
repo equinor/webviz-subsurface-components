@@ -1,6 +1,8 @@
 import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+import type { Position } from "@deck.gl/core";
 import { OrbitView, OrthographicView } from "@deck.gl/core";
+import { SectionView } from "../../views/sectionView";
 
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import type { ViewsType } from "../../SubsurfaceViewer";
@@ -10,7 +12,7 @@ import { PolylineGroupLayer } from "../../layers/polyline_group/polylineGroupLay
 import type {
     BinaryPolylines,
     PolylineGroup,
-    Position,
+    Position2D,
 } from "../../layers/polyline_group/polylineGroupLayer";
 import { getRgba } from "../util/color";
 
@@ -80,6 +82,16 @@ const DUAL_VIEWS: ViewsType = {
     viewports: [
         { id: "view_3d", viewType: OrbitView },
         { id: "view_2d", viewType: OrthographicView },
+    ],
+};
+
+// Two viewports for the section-path story: 3D OrbitView on the left,
+// SectionView on the right.
+const SECTION_VIEWS: ViewsType = {
+    layout: [1, 2] as [number, number],
+    viewports: [
+        { id: "view_3d", viewType: OrbitView },
+        { id: "view_section", viewType: SectionView },
     ],
 };
 
@@ -652,4 +664,126 @@ export const VisibilityFiltering: StoryObj<typeof VisibilityWrapper> = {
     },
     render: (args) => <VisibilityWrapper {...args} />,
     tags: ["no-test"],
+};
+
+// ---------------------------------------------------------------------------
+// Story 6: Section-path rendering (abscissa / depth space)
+// ---------------------------------------------------------------------------
+//
+// When `sectionPath` is provided the polyline coordinates are interpreted as
+// [abscissa, depth] pairs:
+//   - abscissa : cumulative distance along the fence
+//   - depth    : positive = down when ZIncreasingDownwards is true
+//
+// Left viewport (OrbitView)  – abscissa values are projected back onto the
+//                              fence, giving a 3D "fence diagram".
+// Right viewport (SectionView) – paths are rendered flat in abscissa/depth
+//                                 space, identical to a classic well section.
+//
+// The fence below is an L-shape: 12 m east then 12 m north, total length 24 m.
+
+// L-shaped fence:  (0,0) → (12,0) → (12,12)
+const SECTION_PATH: Position2D[] = [
+    [0, 0],
+    [12, 0],
+    [12, 12],
+];
+
+// Stable bounds in abscissa/depth space: x = [0, 24], y = [0, 10]
+const SECTION_BOUNDS = [-1, -1, 25, 11] as [number, number, number, number];
+
+const sectionGroups: PolylineGroup[] = [
+    {
+        id: "horizon-a",
+        name: "Horizon A",
+        color: [220, 60, 60, 255],
+        width: 3,
+        // abscissa ranges roughly 0–12 (first leg of the fence)
+        polylines: [
+            {
+                id: "ha-1",
+                path: [
+                    [0, 2, 0],
+                    [4, 3, 0],
+                    [8, 2.5, 0],
+                    [12, 3, 0],
+                ] as Position[],
+            },
+        ],
+    },
+    {
+        id: "horizon-b",
+        name: "Horizon B",
+        color: [60, 180, 60, 255],
+        width: 3,
+        // abscissa ranges roughly 12–24 (second leg of the fence)
+        polylines: [
+            {
+                id: "hb-1",
+                path: [
+                    [12, 5, 0],
+                    [16, 5.5, 0],
+                    [20, 6, 0],
+                    [24, 6.5, 0],
+                ] as Position[],
+            },
+        ],
+    },
+    {
+        id: "fault-1",
+        name: "Fault 1",
+        color: [80, 80, 220, 255],
+        width: 2,
+        // spans both legs
+        polylines: [
+            {
+                id: "f1-1",
+                path: [
+                    [6, 1, 0],
+                    [6, 9, 0],
+                ] as Position[],
+            },
+            {
+                id: "f1-2",
+                path: [
+                    [18, 3, 0],
+                    [18, 9, 0],
+                ] as Position[],
+            },
+        ],
+    },
+];
+
+export const SectionViewRendering: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "polyline-group-section",
+        layers: [
+            new PolylineGroupLayer({
+                id: "section-layer",
+                name: "Section Horizons",
+                data: sectionGroups,
+                sectionPath: SECTION_PATH,
+                pickable: true,
+                widthUnits: "pixels",
+                ZIncreasingDownwards: true,
+            }),
+        ],
+        bounds: SECTION_BOUNDS,
+        views: SECTION_VIEWS,
+    },
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: [
+                    "Demonstrates the `sectionPath` prop. Each path point is `[abscissa, depth]`",
+                    "where `abscissa` is the cumulative distance along the fence.",
+                    "The **left** viewport (OrbitView) projects the abscissa back onto the",
+                    "L-shaped world-space fence, producing a 3-D fence diagram.",
+                    "The **right** viewport (SectionView) renders the paths flat in",
+                    "abscissa/depth space, giving a classic cross-section view.",
+                ].join(" "),
+            },
+        },
+    },
 };

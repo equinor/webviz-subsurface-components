@@ -10,12 +10,14 @@ import type {
     PropertyDataType,
 } from "../utils/layerTools";
 import { createPropertyData } from "../utils/layerTools";
+import { SectionViewport } from "../../viewports";
+import type { Position } from "@deck.gl/core";
 
 // ---------------------------------------------------------------------------
 // Public data types
 // ---------------------------------------------------------------------------
 
-export type Position = [number, number, number];
+export type Position2D = [number, number];
 
 export type Polyline = {
     id?: string | number;
@@ -120,6 +122,19 @@ export interface PolylineGroupLayerProps extends ExtendedLayerProps {
      * Uses GPU-side filtering — no re-flatten required when changed.
      */
     hiddenPolylines?: Set<string | number>;
+
+    /**
+     * Path of the cross-section fence as 2-D world-space XY coordinates `[x, y]`.
+     * When provided, each polyline path point is interpreted as
+     * `[abscissa, depth]` where `abscissa` is the cumulative distance along this fence.
+     *
+     * - In a `SectionView` viewport the paths are rendered in abscissa/depth space.
+     * - In a 3D viewport the abscissa values are projected back onto the fence.
+     *
+     * @remarks Pass a stable reference (module-level or memoized constant) to avoid
+     * unnecessary re-computation of the section index.
+     */
+    sectionPath?: Position2D[];
 }
 
 // ---------------------------------------------------------------------------
@@ -282,13 +297,56 @@ function flattenGroupData(
 }
 
 // ---------------------------------------------------------------------------
+// Section-path utilities
+// ---------------------------------------------------------------------------
+
+/** Precomputed data for projecting abscissa values onto the fence. */
+type SectionIndex = { cumDist: number[]; path: Position2D[] };
+
+function buildSectionIndex(path: Position2D[]): SectionIndex {
+    const cumDist: number[] = [0];
+    for (let i = 1; i < path.length; i++) {
+        const dx = path[i][0] - path[i - 1][0];
+        const dy = path[i][1] - path[i - 1][1];
+        cumDist.push(cumDist[i - 1] + Math.sqrt(dx * dx + dy * dy));
+    }
+    return { cumDist, path };
+}
+
+/** Return the (x, y) world position on the fence at the given cumulative distance. */
+function projectAbscissa(
+    abscissa: number,
+    idx: SectionIndex
+): [number, number] {
+    const { cumDist, path } = idx;
+    if (path.length === 0) return [0, 0];
+    if (abscissa <= cumDist[0]) return [path[0][0], path[0][1]];
+    const last = cumDist.length - 1;
+    if (abscissa >= cumDist[last]) return [path[last][0], path[last][1]];
+    let lo = 0,
+        hi = last;
+    while (hi - lo > 1) {
+        const mid = (lo + hi) >> 1;
+        if (cumDist[mid] <= abscissa) lo = mid;
+        else hi = mid;
+    }
+    const t = (abscissa - cumDist[lo]) / (cumDist[hi] - cumDist[lo]);
+    return [
+        path[lo][0] + t * (path[hi][0] - path[lo][0]),
+        path[lo][1] + t * (path[hi][1] - path[lo][1]),
+    ];
+}
+
+// ---------------------------------------------------------------------------
 // Layer class
 // ---------------------------------------------------------------------------
 
 export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> {
     initializeState(): void {
+        const { data, sectionPath } = this.props;
         this.setState({
-            flatData: flattenGroupData(this.props.data, this.props),
+            flatData: flattenGroupData(data, this.props),
+            sectionIndex: sectionPath ? buildSectionIndex(sectionPath) : null,
         });
     }
 
@@ -311,10 +369,20 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
         if (needsRebuild) {
             this.setState({ flatData: flattenGroupData(props.data, props) });
         }
+        if (props.sectionPath !== oldProps.sectionPath) {
+            this.setState({
+                sectionIndex: props.sectionPath
+                    ? buildSectionIndex(props.sectionPath)
+                    : null,
+            });
+        }
     }
 
     renderLayers(): PathLayer[] {
         const flatData = this.state["flatData"] as FlatEntry[];
+        const sectionIndex = this.state["sectionIndex"] as SectionIndex | null;
+        const isSectionViewport =
+            this.context.viewport.constructor === SectionViewport;
         const {
             widthUnits,
             widthScale,
@@ -358,6 +426,22 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
                 },
                 filterRange: [1, 1] as [number, number],
                 getPath: (d: FlatEntry) => {
+                    if (sectionIndex) {
+                        return d.path.map((pt) => {
+                            const a = pt[0];
+                            const dep = pt[1];
+                            const z = ZIncreasingDownwards ? -dep : dep;
+                            if (isSectionViewport) {
+                                return [a, z, 0] as Position;
+                            } else {
+                                const [wx, wy] = projectAbscissa(
+                                    a,
+                                    sectionIndex
+                                );
+                                return [wx, wy, z] as Position;
+                            }
+                        });
+                    }
                     if (!ZIncreasingDownwards) return d.path;
                     return d.path.map(([x, y, z]) => [x, y, -z] as Position);
                 },
@@ -365,7 +449,11 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
                 getWidth: (d: FlatEntry) => d.width,
                 updateTriggers: {
                     getFilterValue: [hiddenGroups, hiddenPolylines],
-                    getPath: [ZIncreasingDownwards],
+                    getPath: [
+                        ZIncreasingDownwards,
+                        sectionIndex,
+                        isSectionViewport,
+                    ],
                     getColor: [flatData],
                     getWidth: [flatData],
                 },
