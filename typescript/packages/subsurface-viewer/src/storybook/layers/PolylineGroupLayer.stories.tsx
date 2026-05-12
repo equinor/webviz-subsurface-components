@@ -1,8 +1,10 @@
 import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+import { OrbitView, OrthographicView } from "@deck.gl/core";
 
 import SubsurfaceViewer from "../../SubsurfaceViewer";
-import { default3DViews, defaultStoryParameters } from "../sharedSettings";
+import type { ViewsType } from "../../SubsurfaceViewer";
+import { defaultStoryParameters } from "../sharedSettings";
 import AxesLayer from "../../layers/axes/axesLayer";
 import { PolylineGroupLayer } from "../../layers/polyline_group/polylineGroupLayer";
 import type {
@@ -71,6 +73,16 @@ const groupCPaths: Position[][] = [
 const BOUNDS_WIDE = [-2, -2, 16, 18] as [number, number, number, number];
 const BOUNDS_NARROW = [-2, -2, 12, 12] as [number, number, number, number];
 
+// Two viewports side by side: 3D OrbitView on the left, 2D OrthographicView
+// on the right. Defined at module level so its identity is stable.
+const DUAL_VIEWS: ViewsType = {
+    layout: [1, 2] as [number, number],
+    viewports: [
+        { id: "view_3d", viewType: OrbitView },
+        { id: "view_2d", viewType: OrthographicView },
+    ],
+};
+
 // ---------------------------------------------------------------------------
 // Story 1: Basic grouped colors and widths
 // ---------------------------------------------------------------------------
@@ -130,7 +142,7 @@ const BasicGroupedColorsWrapper = ({
                 }),
             ]}
             bounds={BOUNDS_WIDE}
-            views={default3DViews}
+            views={DUAL_VIEWS}
         />
     );
 };
@@ -250,7 +262,7 @@ const PerPolylineColorOverrideWrapper = ({
                 }),
             ]}
             bounds={BOUNDS_NARROW}
-            views={default3DViews}
+            views={DUAL_VIEWS}
         />
     );
 };
@@ -371,7 +383,7 @@ export const PickablePolylines: StoryObj<typeof SubsurfaceViewer> = {
             pickableLayer,
         ],
         bounds: [-2, -2, 18, 16],
-        views: default3DViews,
+        views: DUAL_VIEWS,
     },
     parameters: {
         docs: {
@@ -488,7 +500,7 @@ export const BinaryPolylinesFormat: StoryObj<typeof SubsurfaceViewer> = {
             }),
         ],
         bounds: [-2, -2, 18, 16],
-        views: default3DViews,
+        views: DUAL_VIEWS,
     },
     parameters: {
         docs: {
@@ -586,7 +598,7 @@ const VisibilityWrapper = ({
             id="polyline-group-visibility"
             layers={[axesLayer, layer]}
             bounds={BOUNDS_WIDE}
-            views={default3DViews}
+            views={DUAL_VIEWS}
         />
     );
 };
