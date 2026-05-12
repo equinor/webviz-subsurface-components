@@ -8,6 +8,7 @@ import PolylineGroupLayer from "../../layers/polyline_group/polylineGroupLayer";
 import type {
     BinaryPolylines,
     PolylineGroup,
+    Position,
 } from "../../layers/polyline_group/polylineGroupLayer";
 import { getRgba } from "../util/color";
 
@@ -27,8 +28,43 @@ export default stories;
 const axesLayer = new AxesLayer({
     id: "axes-layer",
     name: "Axes",
-    bounds: [-5, -5, 0, 25, 15, 12],
+    bounds: [-2, -2, 0, 16, 18, 10],
 });
+
+// Shared polyline path geometry reused across stories that demonstrate
+// multi-group behaviour. The exact coordinates are not semantically
+// significant — any set of distinct paths would serve the same purpose.
+const groupAPaths: Position[][] = [
+    [
+        [0, 0, 0],
+        [6, 0, 3],
+        [12, 0, 6],
+    ],
+    [
+        [0, 3, 0],
+        [6, 3, 4],
+        [12, 3, 7],
+    ],
+];
+const groupBPaths: Position[][] = [
+    [
+        [0, 7, 0],
+        [6, 7, 5],
+        [12, 7, 8],
+    ],
+    [
+        [0, 10, 0],
+        [6, 10, 3],
+        [12, 10, 6],
+    ],
+];
+const groupCPaths: Position[][] = [
+    [
+        [0, 14, 0],
+        [6, 14, 2],
+        [12, 14, 5],
+    ],
+];
 
 // ---------------------------------------------------------------------------
 // Story 1: Basic grouped colors and widths
@@ -57,57 +93,21 @@ const BasicGroupedColorsWrapper = ({
             name: "Group A",
             color: getRgba(groupAColor),
             width: groupAWidth,
-            polylines: [
-                {
-                    path: [
-                        [0, 0, 0],
-                        [5, 0, 0],
-                        [5, 5, 4],
-                    ],
-                },
-                {
-                    path: [
-                        [0, 2, 0],
-                        [8, 2, 2],
-                    ],
-                },
-            ],
+            polylines: groupAPaths.map((path) => ({ path })),
         },
         {
             id: "group-b",
             name: "Group B",
             color: getRgba(groupBColor),
             width: groupBWidth,
-            polylines: [
-                {
-                    path: [
-                        [10, 0, 0],
-                        [15, 0, 6],
-                        [15, 8, 10],
-                    ],
-                },
-                {
-                    path: [
-                        [10, 4, 0],
-                        [20, 4, 8],
-                    ],
-                },
-            ],
+            polylines: groupBPaths.map((path) => ({ path })),
         },
         {
             id: "group-c",
             name: "Group C",
             color: getRgba(groupCColor),
             width: groupCWidth,
-            polylines: [
-                {
-                    path: [
-                        [0, 10, 0],
-                        [10, 10, 5],
-                        [20, 10, 10],
-                    ],
-                },
-            ],
+            polylines: groupCPaths.map((path) => ({ path })),
         },
     ];
 
@@ -124,7 +124,7 @@ const BasicGroupedColorsWrapper = ({
                     ZIncreasingDownwards: true,
                 }),
             ]}
-            bounds={[-5, -5, 25, 15]}
+            bounds={[-2, -2, 16, 18]}
             views={default3DViews}
         />
     );
@@ -519,22 +519,8 @@ const visibilityData: PolylineGroup[] = [
         color: [220, 60, 60, 255],
         width: 4,
         polylines: [
-            {
-                id: "a1",
-                path: [
-                    [0, 0, 0],
-                    [6, 0, 3],
-                    [12, 0, 6],
-                ],
-            },
-            {
-                id: "a2",
-                path: [
-                    [0, 3, 0],
-                    [6, 3, 4],
-                    [12, 3, 7],
-                ],
-            },
+            { id: "a1", path: groupAPaths[0] },
+            { id: "a2", path: groupAPaths[1] },
         ],
     },
     {
@@ -543,22 +529,8 @@ const visibilityData: PolylineGroup[] = [
         color: [60, 180, 60, 255],
         width: 4,
         polylines: [
-            {
-                id: "b1",
-                path: [
-                    [0, 7, 0],
-                    [6, 7, 5],
-                    [12, 7, 8],
-                ],
-            },
-            {
-                id: "b2",
-                path: [
-                    [0, 10, 0],
-                    [6, 10, 3],
-                    [12, 10, 6],
-                ],
-            },
+            { id: "b1", path: groupBPaths[0] },
+            { id: "b2", path: groupBPaths[1] },
         ],
     },
     {
@@ -566,24 +538,9 @@ const visibilityData: PolylineGroup[] = [
         name: "Gamma",
         color: [60, 60, 220, 255],
         width: 4,
-        polylines: [
-            {
-                id: "g1",
-                path: [
-                    [0, 14, 0],
-                    [6, 14, 2],
-                    [12, 14, 5],
-                ],
-            },
-        ],
+        polylines: [{ id: "g1", path: groupCPaths[0] }],
     },
 ];
-
-const visibilityAxes = new AxesLayer({
-    id: "axes-layer-visibility",
-    name: "Axes",
-    bounds: [-2, -2, 0, 16, 18, 10],
-});
 
 type VisibilityArgs = {
     hiddenGroupIds: string[];
@@ -622,7 +579,7 @@ const VisibilityWrapper = ({
     return (
         <SubsurfaceViewer
             id="polyline-group-visibility"
-            layers={[visibilityAxes, layer]}
+            layers={[axesLayer, layer]}
             bounds={[-2, -2, 16, 18]}
             views={default3DViews}
         />
