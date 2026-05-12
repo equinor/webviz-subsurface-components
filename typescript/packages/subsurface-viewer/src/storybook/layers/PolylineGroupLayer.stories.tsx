@@ -36,21 +36,27 @@ const axesLayer = new AxesLayer({
 
 type BasicGroupedColorsArgs = {
     groupAColor: string;
+    groupAWidth: number;
     groupBColor: string;
+    groupBWidth: number;
     groupCColor: string;
+    groupCWidth: number;
 };
 
 const BasicGroupedColorsWrapper = ({
     groupAColor = "#dc3232",
+    groupAWidth = 3,
     groupBColor = "#32b432",
+    groupBWidth = 5,
     groupCColor = "#3232dc",
+    groupCWidth = 2,
 }: BasicGroupedColorsArgs) => {
     const data: PolylineGroup[] = [
         {
             id: "group-a",
             name: "Group A",
             color: getRgba(groupAColor),
-            width: 3,
+            width: groupAWidth,
             polylines: [
                 {
                     path: [
@@ -71,7 +77,7 @@ const BasicGroupedColorsWrapper = ({
             id: "group-b",
             name: "Group B",
             color: getRgba(groupBColor),
-            width: 5,
+            width: groupBWidth,
             polylines: [
                 {
                     path: [
@@ -92,7 +98,7 @@ const BasicGroupedColorsWrapper = ({
             id: "group-c",
             name: "Group C",
             color: getRgba(groupCColor),
-            width: 2,
+            width: groupCWidth,
             polylines: [
                 {
                     path: [
@@ -127,13 +133,28 @@ const BasicGroupedColorsWrapper = ({
 export const BasicGroupedColors: StoryObj<typeof BasicGroupedColorsWrapper> = {
     args: {
         groupAColor: "#dc3232",
+        groupAWidth: 3,
         groupBColor: "#32b432",
+        groupBWidth: 5,
         groupCColor: "#3232dc",
+        groupCWidth: 2,
     },
     argTypes: {
         groupAColor: { name: "Group A color", control: { type: "color" } },
+        groupAWidth: {
+            name: "Group A width",
+            control: { type: "range", min: 1, max: 20, step: 1 },
+        },
         groupBColor: { name: "Group B color", control: { type: "color" } },
+        groupBWidth: {
+            name: "Group B width",
+            control: { type: "range", min: 1, max: 20, step: 1 },
+        },
         groupCColor: { name: "Group C color", control: { type: "color" } },
+        groupCWidth: {
+            name: "Group C width",
+            control: { type: "range", min: 1, max: 20, step: 1 },
+        },
     },
     parameters: {
         docs: {
@@ -152,21 +173,27 @@ export const BasicGroupedColors: StoryObj<typeof BasicGroupedColorsWrapper> = {
 
 type PerPolylineColorOverrideArgs = {
     groupColor: string;
+    groupWidth: number;
     line2Color: string;
+    line2Width: number;
     line3Color: string;
+    line3Width: number;
 };
 
 const PerPolylineColorOverrideWrapper = ({
     groupColor = "#b4b400",
+    groupWidth = 3,
     line2Color = "#ff0000",
+    line2Width = 3,
     line3Color = "#00dcdc",
+    line3Width = 3,
 }: PerPolylineColorOverrideArgs) => {
     const data: PolylineGroup[] = [
         {
             id: "group-x",
             name: "Mixed Group",
             color: getRgba(groupColor),
-            width: 3,
+            width: groupWidth,
             polylines: [
                 // Inherits group color
                 {
@@ -184,6 +211,7 @@ const PerPolylineColorOverrideWrapper = ({
                         [8, 4, 6],
                     ],
                     color: getRgba(line2Color),
+                    width: line2Width,
                 },
                 // Per-polyline color override
                 {
@@ -193,6 +221,7 @@ const PerPolylineColorOverrideWrapper = ({
                         [8, 8, 9],
                     ],
                     color: getRgba(line3Color),
+                    width: line3Width,
                 },
             ],
         },
@@ -226,21 +255,36 @@ export const PerPolylineColorOverride: StoryObj<
 > = {
     args: {
         groupColor: "#b4b400",
+        groupWidth: 3,
         line2Color: "#ff0000",
+        line2Width: 3,
         line3Color: "#00dcdc",
+        line3Width: 3,
     },
     argTypes: {
         groupColor: {
             name: "Group color (line-1 inherits)",
             control: { type: "color" },
         },
+        groupWidth: {
+            name: "Group width (line-1 inherits)",
+            control: { type: "range", min: 1, max: 20, step: 1 },
+        },
         line2Color: {
             name: "Line-2 color (override)",
             control: { type: "color" },
         },
+        line2Width: {
+            name: "Line-2 width (override)",
+            control: { type: "range", min: 1, max: 20, step: 1 },
+        },
         line3Color: {
             name: "Line-3 color (override)",
             control: { type: "color" },
+        },
+        line3Width: {
+            name: "Line-3 width (override)",
+            control: { type: "range", min: 1, max: 20, step: 1 },
         },
     },
     parameters: {
