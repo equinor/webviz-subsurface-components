@@ -66,6 +66,11 @@ const groupCPaths: Position[][] = [
     ],
 ];
 
+// Stable bounds constants — inline array literals would create a new object on
+// every render, causing SubsurfaceViewer to reset the camera.
+const BOUNDS_WIDE = [-2, -2, 16, 18] as [number, number, number, number];
+const BOUNDS_NARROW = [-2, -2, 12, 12] as [number, number, number, number];
+
 // ---------------------------------------------------------------------------
 // Story 1: Basic grouped colors and widths
 // ---------------------------------------------------------------------------
@@ -124,7 +129,7 @@ const BasicGroupedColorsWrapper = ({
                     ZIncreasingDownwards: true,
                 }),
             ]}
-            bounds={[-2, -2, 16, 18]}
+            bounds={BOUNDS_WIDE}
             views={default3DViews}
         />
     );
@@ -244,7 +249,7 @@ const PerPolylineColorOverrideWrapper = ({
                     ZIncreasingDownwards: true,
                 }),
             ]}
-            bounds={[-2, -2, 12, 12]}
+            bounds={BOUNDS_NARROW}
             views={default3DViews}
         />
     );
@@ -580,7 +585,7 @@ const VisibilityWrapper = ({
         <SubsurfaceViewer
             id="polyline-group-visibility"
             layers={[axesLayer, layer]}
-            bounds={[-2, -2, 16, 18]}
+            bounds={BOUNDS_WIDE}
             views={default3DViews}
         />
     );
