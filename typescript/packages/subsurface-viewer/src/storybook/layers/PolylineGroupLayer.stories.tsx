@@ -4,7 +4,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import { default3DViews, defaultStoryParameters } from "../sharedSettings";
 import AxesLayer from "../../layers/axes/axesLayer";
-import PolylineGroupLayer from "../../layers/polyline_group/polylineGroupLayer";
+import { PolylineGroupLayer } from "../../layers/polyline_group/polylineGroupLayer";
 import type {
     BinaryPolylines,
     PolylineGroup,

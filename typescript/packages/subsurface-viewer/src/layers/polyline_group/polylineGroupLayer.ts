@@ -285,7 +285,7 @@ function flattenGroupData(
 // Layer class
 // ---------------------------------------------------------------------------
 
-export default class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> {
+export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> {
     initializeState(): void {
         this.setState({
             flatData: flattenGroupData(this.props.data, this.props),

@@ -13,7 +13,7 @@ export { default as NorthArrow3DLayer } from "./northarrow/northArrow3DLayer";
 export { default as PieChartLayer } from "./piechart/pieChartLayer";
 export { default as PointsLayer } from "./points/pointsLayer";
 export { default as PolylinesLayer } from "./polylines/polylinesLayer";
-export { default as PolylineGroupLayer } from "./polyline_group/polylineGroupLayer";
+export { PolylineGroupLayer } from "./polyline_group/polylineGroupLayer";
 export { default as SeismicLayer } from "./seismic/seismicLayer";
 export { default as SelectableGeoJsonLayer } from "./selectable_geojson/selectableGeoJsonLayer";
 export { default as TriangleLayer } from "./triangle/triangleLayer";

@@ -14,7 +14,7 @@ import type { RGBAColor, RGBColor } from "../../utils";
 
 import { PrivatePolylinesLayer } from "./privatePolylinesLayer";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars -- used in @link JSDoc
-import type PolylineGroupLayer from "../polyline_group/polylineGroupLayer";
+import type { PolylineGroupLayer } from "../polyline_group/polylineGroupLayer";
 
 type IsPolylineClosedFunc = (index: number) => boolean;
 
