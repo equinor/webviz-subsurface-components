@@ -1,6 +1,7 @@
 import type { Color, PickingInfo, UpdateParameters } from "@deck.gl/core";
 import { CompositeLayer } from "@deck.gl/core";
 import { PathLayer } from "@deck.gl/layers";
+import { DataFilterExtension } from "@deck.gl/extensions";
 import { isEqual } from "lodash";
 
 import type {
@@ -104,6 +105,21 @@ export interface PolylineGroupLayerProps extends ExtendedLayerProps {
 
     /** Enable/disable depth testing when rendering layer. Default: true. */
     depthTest?: boolean;
+
+    // -- Visibility ----------------------------------------------------------
+
+    /**
+     * Set of group ids to hide. Groups not in the set remain visible.
+     * Uses GPU-side filtering — no re-flatten required when changed.
+     */
+    hiddenGroups?: Set<string | number>;
+
+    /**
+     * Set of polyline ids to hide. Only applies to polylines defined via
+     * the `Polyline[]` format (ids are unavailable in BinaryPolylines).
+     * Uses GPU-side filtering — no re-flatten required when changed.
+     */
+    hiddenPolylines?: Set<string | number>;
 }
 
 // ---------------------------------------------------------------------------
@@ -311,6 +327,8 @@ export default class PolylineGroupLayer extends CompositeLayer<PolylineGroupLaye
             pickable,
             depthTest,
             ZIncreasingDownwards,
+            hiddenGroups,
+            hiddenPolylines,
         } = this.props;
 
         const layer = new PathLayer(
@@ -327,6 +345,18 @@ export default class PolylineGroupLayer extends CompositeLayer<PolylineGroupLaye
                 capRounded,
                 miterLimit,
                 parameters: { depthTest },
+                extensions: [new DataFilterExtension({ filterSize: 1 })],
+                getFilterValue: (d: FlatEntry) => {
+                    if (d._group.id != null && hiddenGroups?.has(d._group.id))
+                        return 0;
+                    if (
+                        d._polyline?.id != null &&
+                        hiddenPolylines?.has(d._polyline.id)
+                    )
+                        return 0;
+                    return 1;
+                },
+                filterRange: [1, 1] as [number, number],
                 getPath: (d: FlatEntry) => {
                     if (!ZIncreasingDownwards) return d.path;
                     return d.path.map(([x, y, z]) => [x, y, -z] as Position);
@@ -334,6 +364,7 @@ export default class PolylineGroupLayer extends CompositeLayer<PolylineGroupLaye
                 getColor: (d: FlatEntry) => d.color,
                 getWidth: (d: FlatEntry) => d.width,
                 updateTriggers: {
+                    getFilterValue: [hiddenGroups, hiddenPolylines],
                     getPath: [ZIncreasingDownwards],
                     getColor: [flatData],
                     getWidth: [flatData],
