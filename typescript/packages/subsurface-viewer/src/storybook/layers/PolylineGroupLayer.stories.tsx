@@ -4,6 +4,7 @@ import SubsurfaceViewer from "../../SubsurfaceViewer";
 import { default3DViews, defaultStoryParameters } from "../sharedSettings";
 import AxesLayer from "../../layers/axes/axesLayer";
 import PolylineGroupLayer from "../../layers/polyline_group/polylineGroupLayer";
+import type { PolylineGroup } from "../../layers/polyline_group/polylineGroupLayer";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -28,7 +29,7 @@ const axesLayer = new AxesLayer({
 // Story 1: Basic grouped colors and widths
 // ---------------------------------------------------------------------------
 
-const groupedData = [
+const groupedData: PolylineGroup[] = [
     {
         id: "group-a",
         name: "Group A",
@@ -117,7 +118,7 @@ export const BasicGroupedColors: StoryObj<typeof SubsurfaceViewer> = {
 // Story 2: Per-polyline color override
 // ---------------------------------------------------------------------------
 
-const overrideData = [
+const overrideData: PolylineGroup[] = [
     {
         id: "group-x",
         name: "Mixed Group",
@@ -166,7 +167,11 @@ export const PerPolylineColorOverride: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "polyline-group-override",
         layers: [
-            new AxesLayer({ id: "axes-layer-override", name: "Axes", bounds: [-2, -2, 0, 12, 12, 10] }),
+            new AxesLayer({
+                id: "axes-layer-override",
+                name: "Axes",
+                bounds: [-2, -2, 0, 12, 12, 10],
+            }),
             overrideLayer,
         ],
         bounds: [-2, -2, 12, 12],
@@ -186,7 +191,7 @@ export const PerPolylineColorOverride: StoryObj<typeof SubsurfaceViewer> = {
 // Story 3: Pickable with group/polyline info in tooltip
 // ---------------------------------------------------------------------------
 
-const pickableData = [
+const pickableData: PolylineGroup[] = [
     {
         id: "fault-a",
         name: "Fault A",
@@ -242,7 +247,11 @@ export const PickablePolylines: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "polyline-group-pickable",
         layers: [
-            new AxesLayer({ id: "axes-layer-pickable", name: "Axes", bounds: [-2, -2, 0, 18, 16, 12] }),
+            new AxesLayer({
+                id: "axes-layer-pickable",
+                name: "Axes",
+                bounds: [-2, -2, 0, 18, 16, 12],
+            }),
             pickableLayer,
         ],
         bounds: [-2, -2, 18, 16],
