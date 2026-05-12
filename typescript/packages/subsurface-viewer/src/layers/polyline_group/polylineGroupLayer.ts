@@ -23,12 +23,24 @@ export type Polyline = {
     width?: number;
 };
 
+/**
+ * Binary format for high-performance rendering of large polyline sets.
+ * `positions` is a flat interleaved Float32Array: [x,y,z, x,y,z, ...].
+ * `startIndices` contains the vertex index where each polyline begins;
+ * the last polyline ends at the end of the positions array.
+ * Per-polyline color/width overrides are not supported — use group-level values.
+ */
+export type BinaryPolylines = {
+    positions: Float32Array;
+    startIndices: Uint32Array;
+};
+
 export type PolylineGroup = {
     id?: string | number;
     name?: string;
     color?: Color;
     width?: number;
-    polylines: Polyline[];
+    polylines: Polyline[] | BinaryPolylines;
 };
 
 // ---------------------------------------------------------------------------
@@ -60,8 +72,8 @@ export interface PolylineGroupLayerProps extends ExtendedLayerProps {
 
     // -- Geometry accessors --------------------------------------------------
 
-    /** Extract the polyline list from a group object. Defaults to `g.polylines`. */
-    getGroupPolylines?: (group: PolylineGroup) => Polyline[];
+    /** Extract the polylines from a group object. Defaults to `g.polylines`. */
+    getGroupPolylines?: (group: PolylineGroup) => Polyline[] | BinaryPolylines;
     /** Extract the path positions from a polyline object. Defaults to `p.path`. */
     getPolylinePath?: (polyline: Polyline, group: PolylineGroup) => Position[];
 
@@ -102,7 +114,8 @@ type FlatEntry = {
     path: Position[];
     color: Color;
     width: number;
-    _polyline: Polyline;
+    /** Undefined when the polyline originates from BinaryPolylines. */
+    _polyline: Polyline | undefined;
     _group: PolylineGroup;
 };
 
@@ -128,7 +141,8 @@ const defaultProps: Partial<PolylineGroupLayerProps> = {
     capRounded: false,
     miterLimit: 4,
     billboard: true,
-    getGroupPolylines: (g: PolylineGroup) => g.polylines,
+    getGroupPolylines: (g: PolylineGroup): Polyline[] | BinaryPolylines =>
+        g.polylines,
     getPolylinePath: (p: Polyline) => p.path,
 };
 
@@ -168,24 +182,84 @@ function resolveWidth(
 // Flatten
 // ---------------------------------------------------------------------------
 
+function isBinaryPolylines(
+    p: Polyline[] | BinaryPolylines
+): p is BinaryPolylines {
+    return !Array.isArray(p) && "positions" in p;
+}
+
+function resolveGroupColor(
+    group: PolylineGroup,
+    props: PolylineGroupLayerProps
+): Color {
+    return (
+        props.getGroupColor?.(group) ??
+        group.color ??
+        props.defaultGroupColor ?? [0, 128, 255, 255]
+    );
+}
+
+function resolveGroupWidth(
+    group: PolylineGroup,
+    props: PolylineGroupLayerProps
+): number {
+    return (
+        props.getGroupWidth?.(group) ??
+        group.width ??
+        props.defaultGroupWidth ??
+        2
+    );
+}
+
 function flattenGroupData(
     data: PolylineGroup[],
     props: PolylineGroupLayerProps
 ): FlatEntry[] {
-    const getPolylines = props.getGroupPolylines ?? ((g) => g.polylines);
-    const getPath = props.getPolylinePath ?? ((p) => p.path);
+    const getPolylines =
+        props.getGroupPolylines ??
+        ((g: PolylineGroup): Polyline[] | BinaryPolylines => g.polylines);
+    const getPath = props.getPolylinePath ?? ((p: Polyline) => p.path);
     const result: FlatEntry[] = [];
 
     for (const group of data) {
         const polylines = getPolylines(group);
-        for (const polyline of polylines) {
-            result.push({
-                path: getPath(polyline, group),
-                color: resolveColor(polyline, group, props),
-                width: resolveWidth(polyline, group, props),
-                _polyline: polyline,
-                _group: group,
-            });
+
+        if (isBinaryPolylines(polylines)) {
+            const { positions, startIndices } = polylines;
+            const color = resolveGroupColor(group, props);
+            const width = resolveGroupWidth(group, props);
+            for (let i = 0; i < startIndices.length; i++) {
+                const start = startIndices[i];
+                const end =
+                    i + 1 < startIndices.length
+                        ? startIndices[i + 1]
+                        : positions.length / 3;
+                const path: Position[] = [];
+                for (let v = start; v < end; v++) {
+                    path.push([
+                        positions[v * 3],
+                        positions[v * 3 + 1],
+                        positions[v * 3 + 2],
+                    ]);
+                }
+                result.push({
+                    path,
+                    color,
+                    width,
+                    _polyline: undefined,
+                    _group: group,
+                });
+            }
+        } else {
+            for (const polyline of polylines) {
+                result.push({
+                    path: getPath(polyline, group),
+                    color: resolveColor(polyline, group, props),
+                    width: resolveWidth(polyline, group, props),
+                    _polyline: polyline,
+                    _group: group,
+                });
+            }
         }
     }
     return result;
