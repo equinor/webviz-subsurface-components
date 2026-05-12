@@ -9,6 +9,7 @@ import type {
     BinaryPolylines,
     PolylineGroup,
 } from "../../layers/polyline_group/polylineGroupLayer";
+import { getRgba } from "../util/color";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -33,80 +34,106 @@ const axesLayer = new AxesLayer({
 // Story 1: Basic grouped colors and widths
 // ---------------------------------------------------------------------------
 
-const groupedData: PolylineGroup[] = [
-    {
-        id: "group-a",
-        name: "Group A",
-        color: [220, 50, 50, 255],
-        width: 3,
-        polylines: [
-            {
-                path: [
-                    [0, 0, 0],
-                    [5, 0, 0],
-                    [5, 5, 4],
-                ],
-            },
-            {
-                path: [
-                    [0, 2, 0],
-                    [8, 2, 2],
-                ],
-            },
-        ],
-    },
-    {
-        id: "group-b",
-        name: "Group B",
-        color: [50, 180, 50, 255],
-        width: 5,
-        polylines: [
-            {
-                path: [
-                    [10, 0, 0],
-                    [15, 0, 6],
-                    [15, 8, 10],
-                ],
-            },
-            {
-                path: [
-                    [10, 4, 0],
-                    [20, 4, 8],
-                ],
-            },
-        ],
-    },
-    {
-        id: "group-c",
-        name: "Group C",
-        color: [50, 50, 220, 255],
-        width: 2,
-        polylines: [
-            {
-                path: [
-                    [0, 10, 0],
-                    [10, 10, 5],
-                    [20, 10, 10],
-                ],
-            },
-        ],
-    },
-];
+type BasicGroupedColorsArgs = {
+    groupAColor: string;
+    groupBColor: string;
+    groupCColor: string;
+};
 
-const basicGroupedLayer = new PolylineGroupLayer({
-    id: "basic-grouped-layer",
-    name: "Basic Groups",
-    data: groupedData,
-    widthUnits: "pixels",
-    ZIncreasingDownwards: true,
-});
+const BasicGroupedColorsWrapper = ({
+    groupAColor = "#dc3232",
+    groupBColor = "#32b432",
+    groupCColor = "#3232dc",
+}: BasicGroupedColorsArgs) => {
+    const data: PolylineGroup[] = [
+        {
+            id: "group-a",
+            name: "Group A",
+            color: getRgba(groupAColor),
+            width: 3,
+            polylines: [
+                {
+                    path: [
+                        [0, 0, 0],
+                        [5, 0, 0],
+                        [5, 5, 4],
+                    ],
+                },
+                {
+                    path: [
+                        [0, 2, 0],
+                        [8, 2, 2],
+                    ],
+                },
+            ],
+        },
+        {
+            id: "group-b",
+            name: "Group B",
+            color: getRgba(groupBColor),
+            width: 5,
+            polylines: [
+                {
+                    path: [
+                        [10, 0, 0],
+                        [15, 0, 6],
+                        [15, 8, 10],
+                    ],
+                },
+                {
+                    path: [
+                        [10, 4, 0],
+                        [20, 4, 8],
+                    ],
+                },
+            ],
+        },
+        {
+            id: "group-c",
+            name: "Group C",
+            color: getRgba(groupCColor),
+            width: 2,
+            polylines: [
+                {
+                    path: [
+                        [0, 10, 0],
+                        [10, 10, 5],
+                        [20, 10, 10],
+                    ],
+                },
+            ],
+        },
+    ];
 
-export const BasicGroupedColors: StoryObj<typeof SubsurfaceViewer> = {
+    return (
+        <SubsurfaceViewer
+            id="polyline-group-basic"
+            layers={[
+                axesLayer,
+                new PolylineGroupLayer({
+                    id: "basic-grouped-layer",
+                    name: "Basic Groups",
+                    data,
+                    widthUnits: "pixels",
+                    ZIncreasingDownwards: true,
+                }),
+            ]}
+            bounds={[-5, -5, 25, 15]}
+            views={default3DViews}
+        />
+    );
+};
+
+export const BasicGroupedColors: StoryObj<typeof BasicGroupedColorsWrapper> = {
     args: {
-        id: "polyline-group-basic",
-        layers: [axesLayer, basicGroupedLayer],
-        bounds: [-5, -5, 25, 15],
-        views: default3DViews,
+        groupAColor: "#dc3232",
+        groupBColor: "#32b432",
+        groupCColor: "#3232dc",
+    },
+    argTypes: {
+        groupAColor: { name: "Group A color", control: { type: "color" } },
+        groupBColor: { name: "Group B color", control: { type: "color" } },
+        groupCColor: { name: "Group C color", control: { type: "color" } },
     },
     parameters: {
         docs: {
@@ -116,70 +143,105 @@ export const BasicGroupedColors: StoryObj<typeof SubsurfaceViewer> = {
             },
         },
     },
+    render: (args) => <BasicGroupedColorsWrapper {...args} />,
 };
 
 // ---------------------------------------------------------------------------
 // Story 2: Per-polyline color override
 // ---------------------------------------------------------------------------
 
-const overrideData: PolylineGroup[] = [
-    {
-        id: "group-x",
-        name: "Mixed Group",
-        color: [180, 180, 0, 255],
-        width: 3,
-        polylines: [
-            // Uses group color
-            {
-                id: "line-1",
-                path: [
-                    [0, 0, 0],
-                    [8, 0, 3],
-                ],
-            },
-            // Per-polyline color override (red)
-            {
-                id: "line-2",
-                path: [
-                    [0, 4, 0],
-                    [8, 4, 6],
-                ],
-                color: [255, 0, 0, 255],
-            },
-            // Per-polyline color override (cyan)
-            {
-                id: "line-3",
-                path: [
-                    [0, 8, 0],
-                    [8, 8, 9],
-                ],
-                color: [0, 220, 220, 255],
-            },
-        ],
-    },
-];
+type PerPolylineColorOverrideArgs = {
+    groupColor: string;
+    line2Color: string;
+    line3Color: string;
+};
 
-const overrideLayer = new PolylineGroupLayer({
-    id: "override-layer",
-    name: "Color Overrides",
-    data: overrideData,
-    widthUnits: "pixels",
-    ZIncreasingDownwards: true,
-});
+const PerPolylineColorOverrideWrapper = ({
+    groupColor = "#b4b400",
+    line2Color = "#ff0000",
+    line3Color = "#00dcdc",
+}: PerPolylineColorOverrideArgs) => {
+    const data: PolylineGroup[] = [
+        {
+            id: "group-x",
+            name: "Mixed Group",
+            color: getRgba(groupColor),
+            width: 3,
+            polylines: [
+                // Inherits group color
+                {
+                    id: "line-1",
+                    path: [
+                        [0, 0, 0],
+                        [8, 0, 3],
+                    ],
+                },
+                // Per-polyline color override
+                {
+                    id: "line-2",
+                    path: [
+                        [0, 4, 0],
+                        [8, 4, 6],
+                    ],
+                    color: getRgba(line2Color),
+                },
+                // Per-polyline color override
+                {
+                    id: "line-3",
+                    path: [
+                        [0, 8, 0],
+                        [8, 8, 9],
+                    ],
+                    color: getRgba(line3Color),
+                },
+            ],
+        },
+    ];
 
-export const PerPolylineColorOverride: StoryObj<typeof SubsurfaceViewer> = {
+    return (
+        <SubsurfaceViewer
+            id="polyline-group-override"
+            layers={[
+                new AxesLayer({
+                    id: "axes-layer-override",
+                    name: "Axes",
+                    bounds: [-2, -2, 0, 12, 12, 10],
+                }),
+                new PolylineGroupLayer({
+                    id: "override-layer",
+                    name: "Color Overrides",
+                    data,
+                    widthUnits: "pixels",
+                    ZIncreasingDownwards: true,
+                }),
+            ]}
+            bounds={[-2, -2, 12, 12]}
+            views={default3DViews}
+        />
+    );
+};
+
+export const PerPolylineColorOverride: StoryObj<
+    typeof PerPolylineColorOverrideWrapper
+> = {
     args: {
-        id: "polyline-group-override",
-        layers: [
-            new AxesLayer({
-                id: "axes-layer-override",
-                name: "Axes",
-                bounds: [-2, -2, 0, 12, 12, 10],
-            }),
-            overrideLayer,
-        ],
-        bounds: [-2, -2, 12, 12],
-        views: default3DViews,
+        groupColor: "#b4b400",
+        line2Color: "#ff0000",
+        line3Color: "#00dcdc",
+    },
+    argTypes: {
+        groupColor: {
+            name: "Group color (line-1 inherits)",
+            control: { type: "color" },
+        },
+        line2Color: {
+            name: "Line-2 color (override)",
+            control: { type: "color" },
+        },
+        line3Color: {
+            name: "Line-3 color (override)",
+            control: { type: "color" },
+        },
     },
     parameters: {
         docs: {
@@ -189,6 +251,7 @@ export const PerPolylineColorOverride: StoryObj<typeof SubsurfaceViewer> = {
             },
         },
     },
+    render: (args) => <PerPolylineColorOverrideWrapper {...args} />,
 };
 
 // ---------------------------------------------------------------------------
@@ -481,16 +544,31 @@ const visibilityAxes = new AxesLayer({
 type VisibilityArgs = {
     hiddenGroupIds: string[];
     hiddenPolylineIds: string[];
+    alphaColor: string;
+    betaColor: string;
+    gammaColor: string;
 };
 
 const VisibilityWrapper = ({
     hiddenGroupIds = [],
     hiddenPolylineIds = [],
+    alphaColor = "#dc3c3c",
+    betaColor = "#3cb43c",
+    gammaColor = "#3c3cdc",
 }: VisibilityArgs) => {
+    const groupColors: Record<string, string> = {
+        alpha: alphaColor,
+        beta: betaColor,
+        gamma: gammaColor,
+    };
+    const data: PolylineGroup[] = visibilityData.map((g) => {
+        const hex = g.id != null ? groupColors[String(g.id)] : undefined;
+        return hex != null ? { ...g, color: getRgba(hex) } : g;
+    });
     const layer = new PolylineGroupLayer({
         id: "visibility-layer",
         name: "Visibility Demo",
-        data: visibilityData,
+        data,
         widthUnits: "pixels",
         ZIncreasingDownwards: true,
         hiddenGroups: new Set<string | number>(hiddenGroupIds),
@@ -511,8 +589,23 @@ export const VisibilityFiltering: StoryObj<typeof VisibilityWrapper> = {
     args: {
         hiddenGroupIds: [],
         hiddenPolylineIds: [],
+        alphaColor: "#dc3c3c",
+        betaColor: "#3cb43c",
+        gammaColor: "#3c3cdc",
     },
     argTypes: {
+        alphaColor: {
+            name: "Alpha color",
+            control: { type: "color" },
+        },
+        betaColor: {
+            name: "Beta color",
+            control: { type: "color" },
+        },
+        gammaColor: {
+            name: "Gamma color",
+            control: { type: "color" },
+        },
         hiddenGroupIds: {
             name: "Hidden groups",
             control: { type: "check" },
