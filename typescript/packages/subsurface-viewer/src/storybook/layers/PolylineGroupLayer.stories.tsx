@@ -2,6 +2,8 @@ import type { Meta, StoryObj } from "@storybook/react";
 
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import { default3DViews, defaultStoryParameters } from "../sharedSettings";
+import AxesLayer from "../../layers/axes/axesLayer";
+import PolylineGroupLayer from "../../layers/polyline_group/polylineGroupLayer";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -16,11 +18,11 @@ export default stories;
 // Shared axes layer
 // ---------------------------------------------------------------------------
 
-const axesLayer = {
-    "@@type": "AxesLayer",
+const axesLayer = new AxesLayer({
     id: "axes-layer",
+    name: "Axes",
     bounds: [-5, -5, 0, 25, 15, 12],
-};
+});
 
 // ---------------------------------------------------------------------------
 // Story 1: Basic grouped colors and widths
@@ -86,13 +88,13 @@ const groupedData = [
     },
 ];
 
-const basicGroupedLayer = {
-    "@@type": "PolylineGroupLayer",
+const basicGroupedLayer = new PolylineGroupLayer({
     id: "basic-grouped-layer",
+    name: "Basic Groups",
     data: groupedData,
     widthUnits: "pixels",
     ZIncreasingDownwards: true,
-};
+});
 
 export const BasicGroupedColors: StoryObj<typeof SubsurfaceViewer> = {
     args: {
@@ -152,19 +154,19 @@ const overrideData = [
     },
 ];
 
-const overrideLayer = {
-    "@@type": "PolylineGroupLayer",
+const overrideLayer = new PolylineGroupLayer({
     id: "override-layer",
+    name: "Color Overrides",
     data: overrideData,
     widthUnits: "pixels",
     ZIncreasingDownwards: true,
-};
+});
 
 export const PerPolylineColorOverride: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "polyline-group-override",
         layers: [
-            { ...axesLayer, bounds: [-2, -2, 0, 12, 12, 10] },
+            new AxesLayer({ id: "axes-layer-override", name: "Axes", bounds: [-2, -2, 0, 12, 12, 10] }),
             overrideLayer,
         ],
         bounds: [-2, -2, 12, 12],
@@ -227,20 +229,20 @@ const pickableData = [
     },
 ];
 
-const pickableLayer = {
-    "@@type": "PolylineGroupLayer",
+const pickableLayer = new PolylineGroupLayer({
     id: "pickable-layer",
+    name: "Pickable Faults",
     data: pickableData,
     pickable: true,
     widthUnits: "pixels",
     ZIncreasingDownwards: true,
-};
+});
 
 export const PickablePolylines: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "polyline-group-pickable",
         layers: [
-            { ...axesLayer, bounds: [-2, -2, 0, 18, 16, 12] },
+            new AxesLayer({ id: "axes-layer-pickable", name: "Axes", bounds: [-2, -2, 0, 18, 16, 12] }),
             pickableLayer,
         ],
         bounds: [-2, -2, 18, 16],
