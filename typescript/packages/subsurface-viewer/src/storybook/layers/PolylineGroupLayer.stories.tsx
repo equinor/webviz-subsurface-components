@@ -23,20 +23,17 @@ import { defaultStoryParameters } from "../sharedSettings";
 import { getRgba } from "../util/color";
 import { useSyntheticWellCollection } from "../util/wellSynthesis";
 
-const stories: Meta = {
+const STORIES: Meta = {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer / Polyline Group Layer",
-    args: {
-        triggerHome: 0,
-    },
 };
-export default stories;
+export default STORIES;
 
 // ---------------------------------------------------------------------------
 // Shared axes layer
 // ---------------------------------------------------------------------------
 
-const axesLayer = new AxesLayer({
+const AXES_LAYER = new AxesLayer({
     id: "axes-layer",
     name: "Axes",
     bounds: [-2, -2, 0, 16, 18, 10],
@@ -45,7 +42,7 @@ const axesLayer = new AxesLayer({
 // Shared polyline path geometry reused across stories that demonstrate
 // multi-group behaviour. The exact coordinates are not semantically
 // significant — any set of distinct paths would serve the same purpose.
-const groupAPaths: Position[][] = [
+const VIS_GROUP_A_PATHS: Position[][] = [
     [
         [0, 0, 0],
         [6, 0, 3],
@@ -57,7 +54,7 @@ const groupAPaths: Position[][] = [
         [12, 3, 7],
     ],
 ];
-const groupBPaths: Position[][] = [
+const VIS_GROUP_B_PATHS: Position[][] = [
     [
         [0, 7, 0],
         [6, 7, 5],
@@ -69,7 +66,7 @@ const groupBPaths: Position[][] = [
         [12, 10, 6],
     ],
 ];
-const groupCPaths: Position[][] = [
+const VIS_GROUP_C_PATHS: Position[][] = [
     [
         [0, 14, 0],
         [6, 14, 2],
@@ -113,7 +110,7 @@ const SECTION_VIEWS: ViewsType = {
 // Story 1: Pickable with group/polyline info in tooltip
 // ---------------------------------------------------------------------------
 
-const pickableData: PolylineGroup[] = [
+const PICKABLE_DATA: PolylineGroup[] = [
     {
         id: "fault-a",
         name: "Fault A",
@@ -156,10 +153,10 @@ const pickableData: PolylineGroup[] = [
     },
 ];
 
-const pickableLayer = new PolylineGroupLayer({
+const PICKABLE_LAYER = new PolylineGroupLayer({
     id: "pickable-layer",
     name: "Pickable Faults",
-    data: pickableData,
+    data: PICKABLE_DATA,
     pickable: true,
     widthUnits: "pixels",
     ZIncreasingDownwards: true,
@@ -175,7 +172,7 @@ export const PickablePolylines: StoryObj<typeof SubsurfaceViewer> = {
                 name: "Axes",
                 bounds: [-2, -2, 0, 18, 16, 12],
             }),
-            pickableLayer,
+            PICKABLE_LAYER,
         ],
         bounds: [-2, -2, 18, 16],
         views: DUAL_VIEWS,
@@ -217,7 +214,7 @@ const makeBinary = (
     };
 };
 
-const binaryGroups: PolylineGroup[] = [
+const BINARY_GROUPS: PolylineGroup[] = [
     {
         id: "contour-100",
         name: "Contour 100 m",
@@ -289,7 +286,7 @@ export const BinaryPolylinesFormat: StoryObj<typeof SubsurfaceViewer> = {
             new PolylineGroupLayer({
                 id: "binary-polylines-layer",
                 name: "Contours (binary)",
-                data: binaryGroups,
+                data: BINARY_GROUPS,
                 widthUnits: "pixels",
                 ZIncreasingDownwards: true,
             }),
@@ -324,15 +321,15 @@ export const BinaryPolylinesFormat: StoryObj<typeof SubsurfaceViewer> = {
 // Changing either Set triggers only a GPU attribute update (no re-flatten),
 // making visibility toggling very cheap even for large datasets.
 
-const visibilityData: PolylineGroup[] = [
+const VISIBILITY_DATA: PolylineGroup[] = [
     {
         id: "alpha",
         name: "Alpha",
         color: [220, 60, 60, 255],
         width: 4,
         polylines: [
-            { id: "a1", path: groupAPaths[0] },
-            { id: "a2", path: groupAPaths[1] },
+            { id: "a1", path: VIS_GROUP_A_PATHS[0] },
+            { id: "a2", path: VIS_GROUP_A_PATHS[1] },
         ],
     },
     {
@@ -341,8 +338,8 @@ const visibilityData: PolylineGroup[] = [
         color: [60, 180, 60, 255],
         width: 4,
         polylines: [
-            { id: "b1", path: groupBPaths[0] },
-            { id: "b2", path: groupBPaths[1] },
+            { id: "b1", path: VIS_GROUP_B_PATHS[0] },
+            { id: "b2", path: VIS_GROUP_B_PATHS[1] },
         ],
     },
     {
@@ -350,7 +347,7 @@ const visibilityData: PolylineGroup[] = [
         name: "Gamma",
         color: [60, 60, 220, 255],
         width: 4,
-        polylines: [{ id: "g1", path: groupCPaths[0] }],
+        polylines: [{ id: "g1", path: VIS_GROUP_C_PATHS[0] }],
     },
 ];
 
@@ -374,7 +371,7 @@ const VisibilityWrapper = ({
         beta: betaColor,
         gamma: gammaColor,
     };
-    const data: PolylineGroup[] = visibilityData.map((g) => {
+    const data: PolylineGroup[] = VISIBILITY_DATA.map((g) => {
         const hex = g.id != null ? groupColors[String(g.id)] : undefined;
         return hex != null ? { ...g, color: getRgba(hex) } : g;
     });
@@ -391,7 +388,7 @@ const VisibilityWrapper = ({
     return (
         <SubsurfaceViewer
             id="polyline-group-visibility"
-            layers={[axesLayer, layer]}
+            layers={[AXES_LAYER, layer]}
             bounds={BOUNDS_WIDE}
             views={DUAL_VIEWS}
         />
@@ -437,7 +434,6 @@ export const VisibilityFiltering: StoryObj<typeof VisibilityWrapper> = {
         },
     },
     render: (args) => <VisibilityWrapper {...args} />,
-    tags: ["no-test"],
 };
 
 // ---------------------------------------------------------------------------
@@ -466,7 +462,7 @@ const SECTION_PATH: Position2D[] = [
 // Stable bounds in abscissa/depth space: x = [0, 24], y = [0, 10]
 const SECTION_BOUNDS = [-1, -1, 25, 11] as [number, number, number, number];
 
-const sectionGroups: PolylineGroup[] = [
+const SECTION_GROUPS: PolylineGroup[] = [
     {
         id: "horizon-a",
         name: "Horizon A",
@@ -544,7 +540,7 @@ export const SectionViewRendering: StoryObj<typeof SubsurfaceViewer> = {
             new PolylineGroupLayer({
                 id: "section-layer",
                 name: "Section Horizons",
-                data: sectionGroups,
+                data: SECTION_GROUPS,
                 sectionPath: SECTION_PATH,
                 pickable: true,
                 widthUnits: "pixels",
@@ -636,7 +632,7 @@ const GROUP_STYLING_BOUNDS = [-1, -1, 12, 18] as [
     number,
 ];
 
-const groupStylingAxesLayer = new AxesLayer({
+const GROUP_STYLING_AXES_LAYER = new AxesLayer({
     id: "axes-group-styling",
     name: "Axes",
     bounds: [-1, -1, 0, 12, 18, 10],
@@ -694,7 +690,7 @@ const GroupStylingWrapper = ({
         <SubsurfaceViewer
             id="polyline-group-styling"
             layers={[
-                groupStylingAxesLayer,
+                GROUP_STYLING_AXES_LAYER,
                 new PolylineGroupLayer({
                     id: "group-styling-layer",
                     name: "Group Styling",
@@ -875,7 +871,7 @@ const PolylineOverrideWrapper = ({
         <SubsurfaceViewer
             id="polyline-override-styling"
             layers={[
-                groupStylingAxesLayer,
+                GROUP_STYLING_AXES_LAYER,
                 new PolylineGroupLayer({
                     id: "polyline-override-layer",
                     name: "Polyline Overrides",
@@ -1015,7 +1011,7 @@ export const PolylineLevelStyling: StoryObj<typeof PolylineOverrideWrapper> = {
 
 const DISC_BOUNDS = [-1, -1, 14, 7] as [number, number, number, number];
 
-const discAxesLayer = new AxesLayer({
+const DISC_AXES_LAYER = new AxesLayer({
     id: "axes-disc",
     name: "Axes",
     bounds: [-1, -1, 0, 14, 7, 8],
@@ -1038,7 +1034,7 @@ const Z_THROW_F2 = 1.0; // downward depth-throw at fault 2
 const RED_Y = 1; // Y position of the red horizon
 const GREEN_Y = 5; // Y position of the green horizon
 
-const discGroups: PolylineGroup[] = [
+const DISC_GROUPS: PolylineGroup[] = [
     {
         id: "horizons",
         name: "Horizons",
@@ -1165,22 +1161,22 @@ const DiscontinuousWrapper = ({
 }: DiscontinuousArgs) => {
     const data: PolylineGroup[] = [
         {
-            ...discGroups[0],
+            ...DISC_GROUPS[0],
             polylines: [
                 {
-                    ...(discGroups[0].polylines as Polyline[])[0],
+                    ...(DISC_GROUPS[0].polylines as Polyline[])[0],
                     color: getRgba(redColor),
                     width: redWidth,
                 },
                 {
-                    ...(discGroups[0].polylines as Polyline[])[1],
+                    ...(DISC_GROUPS[0].polylines as Polyline[])[1],
                     color: getRgba(greenColor),
                     width: greenWidth,
                 },
             ],
         },
         {
-            ...discGroups[1],
+            ...DISC_GROUPS[1],
             color: getRgba(faultColor),
         },
     ];
@@ -1210,7 +1206,7 @@ const DiscontinuousWrapper = ({
     return (
         <SubsurfaceViewer
             id="polyline-group-disc"
-            layers={[discAxesLayer, layer]}
+            layers={[DISC_AXES_LAYER, layer]}
             bounds={DISC_BOUNDS}
             cameraPosition={cameraPosition}
             views={DUAL_VIEWS}
@@ -1611,6 +1607,5 @@ export const HorizonsOnWellSectionPath: StoryObj<
             },
         },
     },
-    tags: ["no-test"],
     render: () => <WellSectionHorizonWrapper />,
 };
