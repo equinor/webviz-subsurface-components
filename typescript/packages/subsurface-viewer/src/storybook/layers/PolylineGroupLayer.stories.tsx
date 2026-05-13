@@ -42,11 +42,17 @@ const Root = styled("div")({
     },
 });
 
-// Factory function (NOT a React component) that creates a View element with
-// annotation children. Must be invoked as a plain function call inside `{}`,
-// never as JSX `<AnnotatedView>`, so that React never attempts to render the
-// View class constructor directly. SubsurfaceViewer consumes the returned
-// element from its children prop without passing it to React's reconciler.
+/**
+ * Creates a deck.gl {@link View} element with annotation children.
+ *
+ * Must be called as a plain function inside `{}`, never as JSX, so that React
+ * never attempts to invoke the `View` class constructor as a function component.
+ * `SubsurfaceViewer` consumes the returned element from its `children` prop
+ * directly, bypassing React's reconciler.
+ *
+ * @param id - The viewport id that this View should match.
+ * @param children - Annotation content rendered inside the View overlay.
+ */
 function annotateView(
     id: string,
     children: React.ReactNode
