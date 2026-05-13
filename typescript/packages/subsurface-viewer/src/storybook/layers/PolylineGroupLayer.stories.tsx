@@ -1556,6 +1556,38 @@ const WELL_HORIZON_3D_BOUNDS: [number, number, number, number] = [
     450000, 6781000, 464000, 6791000,
 ];
 
+/**
+ * Resample a polyline expressed in [abscissa, depth, 0] space by inserting
+ * intermediate points at every sectionPath breakpoint abscissa that falls
+ * strictly within each segment's abscissa range.
+ *
+ * Without this, the 3-D projection renders a straight world-space line between
+ * the projected endpoints of each segment, cutting through space instead of
+ * following the fence bends. With it, every kink in the fence gets a sample
+ * point and the 3-D path drapes correctly onto the fence curtain.
+ */
+function resampleAlongFence(pts: Position[], cumDist: number[]): Position[] {
+    if (pts.length < 2) return pts;
+    const result: Position[] = [pts[0]];
+    for (let i = 0; i < pts.length - 1; i++) {
+        const a0 = pts[i][0];
+        const d0 = pts[i][1];
+        const a1 = pts[i + 1][0];
+        const d1 = pts[i + 1][1];
+        const span = a1 - a0;
+        if (span !== 0) {
+            for (const ab of cumDist) {
+                if (ab > a0 && ab < a1) {
+                    const t = (ab - a0) / span;
+                    result.push([ab, d0 + t * (d1 - d0), 0] as Position);
+                }
+            }
+        }
+        result.push(pts[i + 1]);
+    }
+    return result;
+}
+
 const WellSectionHorizonWrapper: React.FC = () => {
     // 6 wells drawn from 6 distinct head positions so the section path is clear.
     const wellData = useSyntheticWellCollection(6, 6, {
@@ -1624,6 +1656,17 @@ const WellSectionHorizonWrapper: React.FC = () => {
     const horizonData = React.useMemo<PolylineGroup[]>(() => {
         if (abscissaMax === 0) return [];
 
+        // Build cumulative-distance breakpoints matching sectionPath nodes.
+        // resampleAlongFence inserts a sample point at each breakpoint that
+        // falls inside a segment, so the 3-D projection follows every kink in
+        // the fence instead of drawing a straight line between endpoints.
+        const cumDist: number[] = [0];
+        for (let i = 1; i < sectionPath.length; i++) {
+            const dx = sectionPath[i][0] - sectionPath[i - 1][0];
+            const dy = sectionPath[i][1] - sectionPath[i - 1][1];
+            cumDist.push(cumDist[i - 1] + Math.sqrt(dx * dx + dy * dy));
+        }
+
         const L = abscissaMax;
         const faultAbs = L * 0.45; // fault cut at 45 % along section
         const zThrow = 300; // depth throw (m) on hanging-wall
@@ -1642,23 +1685,35 @@ const WellSectionHorizonWrapper: React.FC = () => {
                             polylines: [
                                 {
                                     // Footwall segment (left of fault)
-                                    path: [
-                                        [0, 1500, 0],
-                                        [faultAbs, 1500 + faultAbs * 0.015, 0],
-                                    ] as Position[],
+                                    path: resampleAlongFence(
+                                        [
+                                            [0, 1500, 0],
+                                            [
+                                                faultAbs,
+                                                1500 + faultAbs * 0.015,
+                                                0,
+                                            ],
+                                        ] as Position[],
+                                        cumDist
+                                    ),
                                 },
                                 {
                                     // Hanging-wall segment (right of fault),
                                     // thrown down by zThrow, highlighted yellow.
                                     color: [220, 200, 30, 255],
-                                    path: [
+                                    path: resampleAlongFence(
                                         [
-                                            faultAbs,
-                                            1500 + faultAbs * 0.015 + zThrow,
-                                            0,
-                                        ],
-                                        [L, 1500 + L * 0.015 + zThrow, 0],
-                                    ] as Position[],
+                                            [
+                                                faultAbs,
+                                                1500 +
+                                                    faultAbs * 0.015 +
+                                                    zThrow,
+                                                0,
+                                            ],
+                                            [L, 1500 + L * 0.015 + zThrow, 0],
+                                        ] as Position[],
+                                        cumDist
+                                    ),
                                 },
                             ],
                         },
@@ -1668,17 +1723,20 @@ const WellSectionHorizonWrapper: React.FC = () => {
                         id: "horizon-deep",
                         color: [60, 180, 60, 255],
                         width: 3,
-                        path: [
-                            [0, 2600, 0],
-                            [L * 0.33, 2600 + L * 0.33 * 0.012, 0],
-                            [L * 0.67, 2600 + L * 0.67 * 0.012, 0],
-                            [L, 2600 + L * 0.012, 0],
-                        ] as Position[],
+                        path: resampleAlongFence(
+                            [
+                                [0, 2600, 0],
+                                [L * 0.33, 2600 + L * 0.33 * 0.012, 0],
+                                [L * 0.67, 2600 + L * 0.67 * 0.012, 0],
+                                [L, 2600 + L * 0.012, 0],
+                            ] as Position[],
+                            cumDist
+                        ),
                     },
                 ],
             },
         ];
-    }, [abscissaMax]);
+    }, [abscissaMax, sectionPath]);
 
     const views = React.useMemo<ViewsType>(
         () => ({
