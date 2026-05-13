@@ -1,6 +1,7 @@
 import type { Position } from "@deck.gl/core";
-import { OrbitView, OrthographicView } from "@deck.gl/core";
+import { OrbitView, OrthographicView, View } from "@deck.gl/core";
 import { PolygonLayer } from "@deck.gl/layers";
+import { styled } from "@mui/material/styles";
 import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 import { SectionView } from "../../views/sectionView";
@@ -28,6 +29,18 @@ const STORIES: Meta = {
     title: "SubsurfaceViewer / Polyline Group Layer",
 };
 export default STORIES;
+
+const PREFIX = "PolylineGroup";
+
+const classes = {
+    annotation: `${PREFIX}-annotation`,
+};
+
+const Root = styled("div")({
+    [`& .${classes.annotation}`]: {
+        marginLeft: "100px",
+    },
+});
 
 // ---------------------------------------------------------------------------
 // Shared axes layer
@@ -185,6 +198,34 @@ export const PickablePolylines: StoryObj<typeof SubsurfaceViewer> = {
             },
         },
     },
+    render: (args) => (
+        <Root>
+            <SubsurfaceViewer {...args}>
+                {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    /* @ts-expect-error */
+                    <View id="view_3d">
+                        <h2 className={classes.annotation}>
+                            3D view [x, y, z]
+                        </h2>
+                        <p className={classes.annotation}>
+                            Hover over a line to see its group name and polyline
+                            id in the info card.
+                        </p>
+                    </View>
+                }
+                {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    /* @ts-expect-error */
+                    <View id="view_2d">
+                        <h2 className={classes.annotation}>
+                            2D top view [x, y]
+                        </h2>
+                    </View>
+                }
+            </SubsurfaceViewer>
+        </Root>
+    ),
 };
 
 // ---------------------------------------------------------------------------
@@ -309,6 +350,30 @@ export const BinaryPolylinesFormat: StoryObj<typeof SubsurfaceViewer> = {
             },
         },
     },
+    render: (args) => (
+        <Root>
+            <SubsurfaceViewer {...args}>
+                {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    /* @ts-expect-error */
+                    <View id="view_3d">
+                        <h2 className={classes.annotation}>
+                            3D view [x, y, z]
+                        </h2>
+                    </View>
+                }
+                {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    /* @ts-expect-error */
+                    <View id="view_2d">
+                        <h2 className={classes.annotation}>
+                            2D top view [x, y]
+                        </h2>
+                    </View>
+                }
+            </SubsurfaceViewer>
+        </Root>
+    ),
 };
 
 // ---------------------------------------------------------------------------
@@ -386,12 +451,33 @@ const VisibilityWrapper = ({
     });
 
     return (
-        <SubsurfaceViewer
-            id="polyline-group-visibility"
-            layers={[AXES_LAYER, layer]}
-            bounds={BOUNDS_WIDE}
-            views={DUAL_VIEWS}
-        />
+        <Root>
+            <SubsurfaceViewer
+                id="polyline-group-visibility"
+                layers={[AXES_LAYER, layer]}
+                bounds={BOUNDS_WIDE}
+                views={DUAL_VIEWS}
+            >
+                {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    /* @ts-expect-error */
+                    <View id="view_3d">
+                        <h2 className={classes.annotation}>
+                            3D view [x, y, z]
+                        </h2>
+                    </View>
+                }
+                {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    /* @ts-expect-error */
+                    <View id="view_2d">
+                        <h2 className={classes.annotation}>
+                            2D top view [x, y]
+                        </h2>
+                    </View>
+                }
+            </SubsurfaceViewer>
+        </Root>
     );
 };
 
@@ -565,6 +651,37 @@ export const SectionViewRendering: StoryObj<typeof SubsurfaceViewer> = {
             },
         },
     },
+    render: (args) => (
+        <Root>
+            <SubsurfaceViewer {...args}>
+                {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    /* @ts-expect-error */
+                    <View id="view_3d">
+                        <h2 className={classes.annotation}>
+                            3D fence diagram [x, y, z]
+                        </h2>
+                        <p className={classes.annotation}>
+                            Abscissa values are projected back onto the L-shaped
+                            world-space fence.
+                        </p>
+                    </View>
+                }
+                {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    /* @ts-expect-error */
+                    <View id="view_section">
+                        <h2 className={classes.annotation}>
+                            Section view [abscissa, depth]
+                        </h2>
+                        <p className={classes.annotation}>
+                            Paths rendered flat in abscissa/depth space.
+                        </p>
+                    </View>
+                }
+            </SubsurfaceViewer>
+        </Root>
+    ),
 };
 
 // ---------------------------------------------------------------------------
@@ -687,26 +804,47 @@ const GroupStylingWrapper = ({
     ];
 
     return (
-        <SubsurfaceViewer
-            id="polyline-group-styling"
-            layers={[
-                GROUP_STYLING_AXES_LAYER,
-                new PolylineGroupLayer({
-                    id: "group-styling-layer",
-                    name: "Group Styling",
-                    data,
-                    widthUnits: "pixels",
-                    ZIncreasingDownwards: true,
-                    // Reading dashArray from the group object and returning it
-                    // here enables PathStyleExtension inside the layer.
-                    getGroupDashArray: (g: PolylineGroup) =>
-                        g.dashArray ?? null,
-                    highPrecisionDash,
-                }),
-            ]}
-            bounds={GROUP_STYLING_BOUNDS}
-            views={DUAL_VIEWS}
-        />
+        <Root>
+            <SubsurfaceViewer
+                id="polyline-group-styling"
+                layers={[
+                    GROUP_STYLING_AXES_LAYER,
+                    new PolylineGroupLayer({
+                        id: "group-styling-layer",
+                        name: "Group Styling",
+                        data,
+                        widthUnits: "pixels",
+                        ZIncreasingDownwards: true,
+                        // Reading dashArray from the group object and returning it
+                        // here enables PathStyleExtension inside the layer.
+                        getGroupDashArray: (g: PolylineGroup) =>
+                            g.dashArray ?? null,
+                        highPrecisionDash,
+                    }),
+                ]}
+                bounds={GROUP_STYLING_BOUNDS}
+                views={DUAL_VIEWS}
+            >
+                {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    /* @ts-expect-error */
+                    <View id="view_3d">
+                        <h2 className={classes.annotation}>
+                            3D view [x, y, z]
+                        </h2>
+                    </View>
+                }
+                {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    /* @ts-expect-error */
+                    <View id="view_2d">
+                        <h2 className={classes.annotation}>
+                            2D top view [x, y]
+                        </h2>
+                    </View>
+                }
+            </SubsurfaceViewer>
+        </Root>
     );
 };
 
@@ -868,24 +1006,45 @@ const PolylineOverrideWrapper = ({
     ];
 
     return (
-        <SubsurfaceViewer
-            id="polyline-override-styling"
-            layers={[
-                GROUP_STYLING_AXES_LAYER,
-                new PolylineGroupLayer({
-                    id: "polyline-override-layer",
-                    name: "Polyline Overrides",
-                    data,
-                    widthUnits: "pixels",
-                    ZIncreasingDownwards: true,
-                    getGroupDashArray: (g) => g.dashArray ?? null,
-                    getPolylineDashArray: (p) => p.dashArray ?? null,
-                    highPrecisionDash,
-                }),
-            ]}
-            bounds={GROUP_STYLING_BOUNDS}
-            views={DUAL_VIEWS}
-        />
+        <Root>
+            <SubsurfaceViewer
+                id="polyline-override-styling"
+                layers={[
+                    GROUP_STYLING_AXES_LAYER,
+                    new PolylineGroupLayer({
+                        id: "polyline-override-layer",
+                        name: "Polyline Overrides",
+                        data,
+                        widthUnits: "pixels",
+                        ZIncreasingDownwards: true,
+                        getGroupDashArray: (g) => g.dashArray ?? null,
+                        getPolylineDashArray: (p) => p.dashArray ?? null,
+                        highPrecisionDash,
+                    }),
+                ]}
+                bounds={GROUP_STYLING_BOUNDS}
+                views={DUAL_VIEWS}
+            >
+                {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    /* @ts-expect-error */
+                    <View id="view_3d">
+                        <h2 className={classes.annotation}>
+                            3D view [x, y, z]
+                        </h2>
+                    </View>
+                }
+                {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    /* @ts-expect-error */
+                    <View id="view_2d">
+                        <h2 className={classes.annotation}>
+                            2D top view [x, y]
+                        </h2>
+                    </View>
+                }
+            </SubsurfaceViewer>
+        </Root>
     );
 };
 
@@ -1204,13 +1363,38 @@ const DiscontinuousWrapper = ({
     );
 
     return (
-        <SubsurfaceViewer
-            id="polyline-group-disc"
-            layers={[DISC_AXES_LAYER, layer]}
-            bounds={DISC_BOUNDS}
-            cameraPosition={cameraPosition}
-            views={DUAL_VIEWS}
-        />
+        <Root>
+            <SubsurfaceViewer
+                id="polyline-group-disc"
+                layers={[DISC_AXES_LAYER, layer]}
+                bounds={DISC_BOUNDS}
+                cameraPosition={cameraPosition}
+                views={DUAL_VIEWS}
+            >
+                {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    /* @ts-expect-error */
+                    <View id="view_3d">
+                        <h2 className={classes.annotation}>
+                            3D view [x, y, z]
+                        </h2>
+                        <p className={classes.annotation}>
+                            Side view along fault strike — Z-throw depth offset
+                            is visible as vertical steps.
+                        </p>
+                    </View>
+                }
+                {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    /* @ts-expect-error */
+                    <View id="view_2d">
+                        <h2 className={classes.annotation}>
+                            2D top view [x, y]
+                        </h2>
+                    </View>
+                }
+            </SubsurfaceViewer>
+        </Root>
     );
 };
 
@@ -1513,65 +1697,94 @@ const WellSectionHorizonWrapper: React.FC = () => {
     );
 
     return (
-        <SubsurfaceViewer
-            id="well-section-horizons"
-            bounds={WELL_HORIZON_3D_BOUNDS}
-            views={views}
-            layers={[
-                // 3-D well trajectories in world space (no section transform).
-                new WellsLayer({
-                    id: "wells-3d",
-                    data: wellData,
-                    wellHeadStyle: { size: 3 },
-                    ZIncreasingDownwards: true,
-                }),
-                // Wells unfolded to [abscissa, depth] section space.
-                new WellsLayer({
-                    id: "wells-section",
-                    data: wellData,
-                    section: transform,
-                    ZIncreasingDownwards: true,
-                }),
-                // Horizon polylines projected via sectionPath.
-                // filterSubLayer routes paths-3d → OrbitView, paths-section → SectionView.
-                new PolylineGroupLayer({
-                    id: "horizon-layer",
-                    name: "Section Horizons",
-                    data: horizonData,
-                    sectionPath,
-                    pickable: true,
-                    widthUnits: "pixels",
-                    ZIncreasingDownwards: true,
-                }),
-                new AxesLayer({
-                    id: "axes-3d-wh",
-                    // Data-space bounds (z positive = depth downward);
-                    // AxesLayer with ZIncreasingDownwards:true (default) negates
-                    // z internally, matching the wells rendered at deck.gl z ≤ 0.
-                    bounds: [450000, 6781000, 0, 464000, 6791000, 3000],
-                }),
-                new Axes2DLayer({ id: "axes-2d-wh" }),
-                // Vertical fence curtain — 3-D only (OrbitView).
-                // PolygonLayer is a composite; its fill sub-layer id is 'fill'.
-                // Passing _full3d:true via _subLayerProps makes earcut compare
-                // XY/XZ/YZ projected areas and pick the largest, so each
-                // vertical quad (zero XY area) tessellates correctly in XZ/YZ.
-                new PolygonLayer<Position[]>({
-                    id: "fence-layer",
-                    data: fenceQuads,
-                    getPolygon: (d) => d,
-                    filled: true,
-                    getFillColor: [100, 160, 220, 90],
-                    stroked: true,
-                    getLineColor: [80, 130, 200, 200],
-                    lineWidthMinPixels: 1,
-                    // Propagate _full3d to the SolidPolygonLayer fill sub-layer.
-                    _subLayerProps: {
-                        fill: { _full3d: true },
-                    },
-                }),
-            ]}
-        />
+        <Root>
+            <SubsurfaceViewer
+                id="well-section-horizons"
+                bounds={WELL_HORIZON_3D_BOUNDS}
+                views={views}
+                layers={[
+                    // 3-D well trajectories in world space (no section transform).
+                    new WellsLayer({
+                        id: "wells-3d",
+                        data: wellData,
+                        wellHeadStyle: { size: 3 },
+                        ZIncreasingDownwards: true,
+                    }),
+                    // Wells unfolded to [abscissa, depth] section space.
+                    new WellsLayer({
+                        id: "wells-section",
+                        data: wellData,
+                        section: transform,
+                        ZIncreasingDownwards: true,
+                    }),
+                    // Horizon polylines projected via sectionPath.
+                    // filterSubLayer routes paths-3d → OrbitView, paths-section → SectionView.
+                    new PolylineGroupLayer({
+                        id: "horizon-layer",
+                        name: "Section Horizons",
+                        data: horizonData,
+                        sectionPath,
+                        pickable: true,
+                        widthUnits: "pixels",
+                        ZIncreasingDownwards: true,
+                    }),
+                    new AxesLayer({
+                        id: "axes-3d-wh",
+                        // Data-space bounds (z positive = depth downward);
+                        // AxesLayer with ZIncreasingDownwards:true (default) negates
+                        // z internally, matching the wells rendered at deck.gl z ≤ 0.
+                        bounds: [450000, 6781000, 0, 464000, 6791000, 3000],
+                    }),
+                    new Axes2DLayer({ id: "axes-2d-wh" }),
+                    // Vertical fence curtain — 3-D only (OrbitView).
+                    // PolygonLayer is a composite; its fill sub-layer id is 'fill'.
+                    // Passing _full3d:true via _subLayerProps makes earcut compare
+                    // XY/XZ/YZ projected areas and pick the largest, so each
+                    // vertical quad (zero XY area) tessellates correctly in XZ/YZ.
+                    new PolygonLayer<Position[]>({
+                        id: "fence-layer",
+                        data: fenceQuads,
+                        getPolygon: (d) => d,
+                        filled: true,
+                        getFillColor: [100, 160, 220, 90],
+                        stroked: true,
+                        getLineColor: [80, 130, 200, 200],
+                        lineWidthMinPixels: 1,
+                        // Propagate _full3d to the SolidPolygonLayer fill sub-layer.
+                        _subLayerProps: {
+                            fill: { _full3d: true },
+                        },
+                    }),
+                ]}
+            >
+                {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    /* @ts-expect-error */
+                    <View id="view-3d">
+                        <h2 className={classes.annotation}>
+                            3D fence diagram [x, y, z]
+                        </h2>
+                        <p className={classes.annotation}>
+                            Well trajectories and horizon polylines projected
+                            onto the world-space fence curtain.
+                        </p>
+                    </View>
+                }
+                {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    /* @ts-expect-error */
+                    <View id="view-section">
+                        <h2 className={classes.annotation}>
+                            Section view [abscissa, depth]
+                        </h2>
+                        <p className={classes.annotation}>
+                            Horizon paths rendered flat in abscissa/depth space,
+                            aligned to the well order.
+                        </p>
+                    </View>
+                }
+            </SubsurfaceViewer>
+        </Root>
     );
 };
 
