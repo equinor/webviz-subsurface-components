@@ -42,6 +42,20 @@ const Root = styled("div")({
     },
 });
 
+// Factory function (NOT a React component) that creates a View element with
+// annotation children. Must be invoked as a plain function call inside `{}`,
+// never as JSX `<AnnotatedView>`, so that React never attempts to render the
+// View class constructor directly. SubsurfaceViewer consumes the returned
+// element from its children prop without passing it to React's reconciler.
+function annotateView(
+    id: string,
+    children: React.ReactNode
+): React.ReactElement {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error -- View accepts children at runtime but lacks the type
+    return <View id={id}>{children}</View>;
+}
+
 // ---------------------------------------------------------------------------
 // Shared axes layer
 // ---------------------------------------------------------------------------
@@ -201,10 +215,9 @@ export const PickablePolylines: StoryObj<typeof SubsurfaceViewer> = {
     render: (args) => (
         <Root>
             <SubsurfaceViewer {...args}>
-                {
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    /* @ts-expect-error */
-                    <View id="view_3d">
+                {annotateView(
+                    "view_3d",
+                    <>
                         <h2 className={classes.annotation}>
                             3D view [x, y, z]
                         </h2>
@@ -212,17 +225,12 @@ export const PickablePolylines: StoryObj<typeof SubsurfaceViewer> = {
                             Hover over a line to see its group name and polyline
                             id in the info card.
                         </p>
-                    </View>
-                }
-                {
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    /* @ts-expect-error */
-                    <View id="view_2d">
-                        <h2 className={classes.annotation}>
-                            2D top view [x, y]
-                        </h2>
-                    </View>
-                }
+                    </>
+                )}
+                {annotateView(
+                    "view_2d",
+                    <h2 className={classes.annotation}>2D top view [x, y]</h2>
+                )}
             </SubsurfaceViewer>
         </Root>
     ),
@@ -353,24 +361,14 @@ export const BinaryPolylinesFormat: StoryObj<typeof SubsurfaceViewer> = {
     render: (args) => (
         <Root>
             <SubsurfaceViewer {...args}>
-                {
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    /* @ts-expect-error */
-                    <View id="view_3d">
-                        <h2 className={classes.annotation}>
-                            3D view [x, y, z]
-                        </h2>
-                    </View>
-                }
-                {
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    /* @ts-expect-error */
-                    <View id="view_2d">
-                        <h2 className={classes.annotation}>
-                            2D top view [x, y]
-                        </h2>
-                    </View>
-                }
+                {annotateView(
+                    "view_3d",
+                    <h2 className={classes.annotation}>3D view [x, y, z]</h2>
+                )}
+                {annotateView(
+                    "view_2d",
+                    <h2 className={classes.annotation}>2D top view [x, y]</h2>
+                )}
             </SubsurfaceViewer>
         </Root>
     ),
@@ -458,24 +456,14 @@ const VisibilityWrapper = ({
                 bounds={BOUNDS_WIDE}
                 views={DUAL_VIEWS}
             >
-                {
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    /* @ts-expect-error */
-                    <View id="view_3d">
-                        <h2 className={classes.annotation}>
-                            3D view [x, y, z]
-                        </h2>
-                    </View>
-                }
-                {
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    /* @ts-expect-error */
-                    <View id="view_2d">
-                        <h2 className={classes.annotation}>
-                            2D top view [x, y]
-                        </h2>
-                    </View>
-                }
+                {annotateView(
+                    "view_3d",
+                    <h2 className={classes.annotation}>3D view [x, y, z]</h2>
+                )}
+                {annotateView(
+                    "view_2d",
+                    <h2 className={classes.annotation}>2D top view [x, y]</h2>
+                )}
             </SubsurfaceViewer>
         </Root>
     );
@@ -654,10 +642,9 @@ export const SectionViewRendering: StoryObj<typeof SubsurfaceViewer> = {
     render: (args) => (
         <Root>
             <SubsurfaceViewer {...args}>
-                {
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    /* @ts-expect-error */
-                    <View id="view_3d">
+                {annotateView(
+                    "view_3d",
+                    <>
                         <h2 className={classes.annotation}>
                             3D fence diagram [x, y, z]
                         </h2>
@@ -665,20 +652,19 @@ export const SectionViewRendering: StoryObj<typeof SubsurfaceViewer> = {
                             Abscissa values are projected back onto the L-shaped
                             world-space fence.
                         </p>
-                    </View>
-                }
-                {
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    /* @ts-expect-error */
-                    <View id="view_section">
+                    </>
+                )}
+                {annotateView(
+                    "view_section",
+                    <>
                         <h2 className={classes.annotation}>
                             Section view [abscissa, depth]
                         </h2>
                         <p className={classes.annotation}>
                             Paths rendered flat in abscissa/depth space.
                         </p>
-                    </View>
-                }
+                    </>
+                )}
             </SubsurfaceViewer>
         </Root>
     ),
@@ -825,24 +811,14 @@ const GroupStylingWrapper = ({
                 bounds={GROUP_STYLING_BOUNDS}
                 views={DUAL_VIEWS}
             >
-                {
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    /* @ts-expect-error */
-                    <View id="view_3d">
-                        <h2 className={classes.annotation}>
-                            3D view [x, y, z]
-                        </h2>
-                    </View>
-                }
-                {
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    /* @ts-expect-error */
-                    <View id="view_2d">
-                        <h2 className={classes.annotation}>
-                            2D top view [x, y]
-                        </h2>
-                    </View>
-                }
+                {annotateView(
+                    "view_3d",
+                    <h2 className={classes.annotation}>3D view [x, y, z]</h2>
+                )}
+                {annotateView(
+                    "view_2d",
+                    <h2 className={classes.annotation}>2D top view [x, y]</h2>
+                )}
             </SubsurfaceViewer>
         </Root>
     );
@@ -1025,24 +1001,14 @@ const PolylineOverrideWrapper = ({
                 bounds={GROUP_STYLING_BOUNDS}
                 views={DUAL_VIEWS}
             >
-                {
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    /* @ts-expect-error */
-                    <View id="view_3d">
-                        <h2 className={classes.annotation}>
-                            3D view [x, y, z]
-                        </h2>
-                    </View>
-                }
-                {
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    /* @ts-expect-error */
-                    <View id="view_2d">
-                        <h2 className={classes.annotation}>
-                            2D top view [x, y]
-                        </h2>
-                    </View>
-                }
+                {annotateView(
+                    "view_3d",
+                    <h2 className={classes.annotation}>3D view [x, y, z]</h2>
+                )}
+                {annotateView(
+                    "view_2d",
+                    <h2 className={classes.annotation}>2D top view [x, y]</h2>
+                )}
             </SubsurfaceViewer>
         </Root>
     );
@@ -1371,10 +1337,9 @@ const DiscontinuousWrapper = ({
                 cameraPosition={cameraPosition}
                 views={DUAL_VIEWS}
             >
-                {
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    /* @ts-expect-error */
-                    <View id="view_3d">
+                {annotateView(
+                    "view_3d",
+                    <>
                         <h2 className={classes.annotation}>
                             3D view [x, y, z]
                         </h2>
@@ -1382,17 +1347,12 @@ const DiscontinuousWrapper = ({
                             Side view along fault strike — Z-throw depth offset
                             is visible as vertical steps.
                         </p>
-                    </View>
-                }
-                {
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    /* @ts-expect-error */
-                    <View id="view_2d">
-                        <h2 className={classes.annotation}>
-                            2D top view [x, y]
-                        </h2>
-                    </View>
-                }
+                    </>
+                )}
+                {annotateView(
+                    "view_2d",
+                    <h2 className={classes.annotation}>2D top view [x, y]</h2>
+                )}
             </SubsurfaceViewer>
         </Root>
     );
@@ -1757,10 +1717,9 @@ const WellSectionHorizonWrapper: React.FC = () => {
                     }),
                 ]}
             >
-                {
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    /* @ts-expect-error */
-                    <View id="view-3d">
+                {annotateView(
+                    "view-3d",
+                    <>
                         <h2 className={classes.annotation}>
                             3D fence diagram [x, y, z]
                         </h2>
@@ -1768,12 +1727,11 @@ const WellSectionHorizonWrapper: React.FC = () => {
                             Well trajectories and horizon polylines projected
                             onto the world-space fence curtain.
                         </p>
-                    </View>
-                }
-                {
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    /* @ts-expect-error */
-                    <View id="view-section">
+                    </>
+                )}
+                {annotateView(
+                    "view-section",
+                    <>
                         <h2 className={classes.annotation}>
                             Section view [abscissa, depth]
                         </h2>
@@ -1781,8 +1739,8 @@ const WellSectionHorizonWrapper: React.FC = () => {
                             Horizon paths rendered flat in abscissa/depth space,
                             aligned to the well order.
                         </p>
-                    </View>
-                }
+                    </>
+                )}
             </SubsurfaceViewer>
         </Root>
     );
