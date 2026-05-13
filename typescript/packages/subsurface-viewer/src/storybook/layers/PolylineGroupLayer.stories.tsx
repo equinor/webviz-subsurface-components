@@ -168,6 +168,7 @@ const pickableLayer = new PolylineGroupLayer({
 export const PickablePolylines: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "polyline-group-pickable",
+        pickingRadius: 8,
         layers: [
             new AxesLayer({
                 id: "axes-layer-pickable",
