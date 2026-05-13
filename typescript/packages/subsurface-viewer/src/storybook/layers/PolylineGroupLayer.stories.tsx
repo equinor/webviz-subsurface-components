@@ -1267,19 +1267,30 @@ export const PolylineLevelStyling: StoryObj<typeof PolylineOverrideWrapper> = {
 // hiddenPolylineIds: toggling a horizon id hides ALL its segments at once,
 // because each FlatEntry carries `_polyline = parentPolyline` (root id).
 
-const DISC_BOUNDS = [-1, -1, 14, 12] as [number, number, number, number];
+const DISC_BOUNDS = [-1, -1, 14, 7] as [number, number, number, number];
 
 const discAxesLayer = new AxesLayer({
     id: "axes-disc",
     name: "Axes",
-    bounds: [-1, -1, 0, 14, 12, 10],
+    bounds: [-1, -1, 0, 14, 7, 8],
 });
 
-// Fault planes at x = 4 and x = 9 (world-space vertical cuts).
-// The horizon segments are separated by a small gap around each fault.
+// Two normal (dip-slip) faults at x = 4 and x = 9.
+// The throw is a depth (Z) offset: the hanging-wall block (right of each fault)
+// is displaced *downward* by Z_THROW_F1 / Z_THROW_F2.
+// Each horizon lies at a constant Y throughout — there is no horizontal
+// (Y-direction) displacement — so the faults are truly vertical: they extend
+// in the Z direction and appear as vertical sticks in the 3D view.
+//
+// Each fault is represented by two vertical sticks, one at each horizon's Y,
+// so the stick visually pierces the horizon at the fault plane.
 const FAULT_X1 = 4;
 const FAULT_X2 = 9;
-const GAP = 0.3; // gap half-width around each fault cut
+const Z_THROW_F1 = 1.5; // downward depth-throw at fault 1
+const Z_THROW_F2 = 1.0; // downward depth-throw at fault 2
+
+const RED_Y = 1; // Y position of the red horizon
+const GREEN_Y = 5; // Y position of the green horizon
 
 const discGroups: PolylineGroup[] = [
     {
@@ -1293,26 +1304,27 @@ const discGroups: PolylineGroup[] = [
                 width: 3,
                 path: {
                     polylines: [
-                        // Segment 1: left of fault 1
+                        // Segment 1: footwall (left of fault 1)
                         {
                             path: [
-                                [0, 2, 1],
-                                [FAULT_X1 - GAP, 2.5, 2],
+                                [0, RED_Y, 1.0],
+                                [FAULT_X1, RED_Y, 1.5],
                             ] as Position[],
                         },
-                        // Segment 2 (middle): between the two faults — highlighted yellow
+                        // Segment 2 (middle, highlighted yellow):
+                        // thrown down by Z_THROW_F1 at fault 1.
                         {
                             color: [220, 200, 30, 255],
                             path: [
-                                [FAULT_X1 + GAP, 2.5, 2],
-                                [FAULT_X2 - GAP, 3, 3],
+                                [FAULT_X1, RED_Y, 1.5 + Z_THROW_F1],
+                                [FAULT_X2, RED_Y, 3.2],
                             ] as Position[],
                         },
-                        // Segment 3: right of fault 2
+                        // Segment 3: thrown down again by Z_THROW_F2 at fault 2.
                         {
                             path: [
-                                [FAULT_X2 + GAP, 3, 3],
-                                [13, 3.5, 4],
+                                [FAULT_X2, RED_Y, 3.2 + Z_THROW_F2],
+                                [13, RED_Y, 4.7],
                             ] as Position[],
                         },
                     ],
@@ -1326,20 +1338,20 @@ const discGroups: PolylineGroup[] = [
                     polylines: [
                         {
                             path: [
-                                [0, 6, 3],
-                                [FAULT_X1 - GAP, 6.5, 4],
+                                [0, GREEN_Y, 3.5],
+                                [FAULT_X1, GREEN_Y, 4.0],
                             ] as Position[],
                         },
                         {
                             path: [
-                                [FAULT_X1 + GAP, 6, 4],
-                                [FAULT_X2 - GAP, 6.5, 5],
+                                [FAULT_X1, GREEN_Y, 4.0 + Z_THROW_F1],
+                                [FAULT_X2, GREEN_Y, 5.7],
                             ] as Position[],
                         },
                         {
                             path: [
-                                [FAULT_X2 + GAP, 6, 5],
-                                [13, 6.5, 6],
+                                [FAULT_X2, GREEN_Y, 5.7 + Z_THROW_F2],
+                                [13, GREEN_Y, 7.2],
                             ] as Position[],
                         },
                     ],
@@ -1353,18 +1365,35 @@ const discGroups: PolylineGroup[] = [
         color: [80, 80, 220, 255],
         width: 2,
         polylines: [
+            // Each fault is represented by two vertical sticks — one at each
+            // horizon's Y — spanning from above the footwall cut to below the
+            // hanging-wall cut.  The sticks are vertical (varying Z only).
             {
-                id: "fault-1",
+                id: "fault-1-red",
                 path: [
-                    [FAULT_X1, 0, 0],
-                    [FAULT_X1, 10, 0],
+                    [FAULT_X1, RED_Y, 0.5],
+                    [FAULT_X1, RED_Y, 3.8],
                 ] as Position[],
             },
             {
-                id: "fault-2",
+                id: "fault-1-green",
                 path: [
-                    [FAULT_X2, 0, 0],
-                    [FAULT_X2, 10, 0],
+                    [FAULT_X1, GREEN_Y, 3.0],
+                    [FAULT_X1, GREEN_Y, 6.2],
+                ] as Position[],
+            },
+            {
+                id: "fault-2-red",
+                path: [
+                    [FAULT_X2, RED_Y, 2.2],
+                    [FAULT_X2, RED_Y, 4.8],
+                ] as Position[],
+            },
+            {
+                id: "fault-2-green",
+                path: [
+                    [FAULT_X2, GREEN_Y, 4.7],
+                    [FAULT_X2, GREEN_Y, 7.5],
                 ] as Position[],
             },
         ],
@@ -1414,6 +1443,7 @@ const DiscontinuousWrapper = ({
         id: "disc-layer",
         name: "Discontinuous Horizons",
         data,
+        pickable: true,
         widthUnits: "pixels",
         ZIncreasingDownwards: true,
         hiddenPolylines: new Set<string | number>(hiddenPolylineIds),
@@ -1474,14 +1504,19 @@ export const DiscontinuousPolylines: StoryObj<typeof DiscontinuousWrapper> = {
                     "whose `path` is a `PolylineGroup` of disjoint segments.",
                     "",
                     "Two horizons (**red** and **green**) are each cut into three segments",
-                    "by two vertical fault planes. The middle segment of the red horizon",
-                    "carries a **yellow** per-segment color override, demonstrating that",
-                    "individual segments can be independently styled (e.g. for highlighting).",
+                    "by two normal faults. The throw is a **depth (Z) offset** on the",
+                    "hanging-wall block, so the faults are truly vertical in 3D.",
+                    "The middle segment of the red horizon carries a **yellow**",
+                    "per-segment color override, demonstrating that individual segments",
+                    "can be independently styled (e.g. for highlighting).",
                     "",
-                    "The **blue** fault-trace polylines use a normal `path: Position[]`.",
+                    "Each fault is shown as two **vertical blue sticks** — one per horizon",
+                    "Y position — piercing the horizon at its throw point.",
                     "",
                     "Toggling a horizon in *Hidden horizons* hides **all its segments**",
                     "simultaneously, because all segments share the same root `Polyline` id.",
+                    "**Hover** over any segment to see the root horizon name and depth in the",
+                    "info card — picking always returns the root `Polyline`, not the segment.",
                 ].join(" "),
             },
         },
