@@ -1,13 +1,12 @@
 import type { Position } from "@deck.gl/core";
 import { OrbitView, OrthographicView } from "@deck.gl/core";
+import { PolygonLayer } from "@deck.gl/layers";
 import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 import { SectionView } from "../../views/sectionView";
 
 import { Axes2DLayer } from "../../layers";
 import AxesLayer from "../../layers/axes/axesLayer";
-import { useAbscissaTransform } from "../../layers/wells/hooks/useAbscissaTransform";
-import WellsLayer from "../../layers/wells/wellsLayer";
 import type {
     BinaryPolylines,
     Polyline,
@@ -15,6 +14,8 @@ import type {
     Position2D,
 } from "../../layers/polyline_group/polylineGroupLayer";
 import { PolylineGroupLayer } from "../../layers/polyline_group/polylineGroupLayer";
+import { useAbscissaTransform } from "../../layers/wells/hooks/useAbscissaTransform";
+import WellsLayer from "../../layers/wells/wellsLayer";
 import type { ViewsType } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import { defaultStoryParameters } from "../sharedSettings";
@@ -1587,6 +1588,34 @@ const WellSectionHorizonWrapper: React.FC = () => {
         return sum;
     }, [sectionPath]);
 
+    // One planar vertical quad per path segment forms the fence curtain.
+    // Each quad is [topLeft, topRight, bottomRight, bottomLeft] in world XYZ.
+    // deck.gl's earcut triangualtion uses dim=3 and picks the XZ or YZ
+    // projection plane (never XY, which degenerates to a line for a vertical
+    // quad), so each quad tessellates into exactly 2 triangles correctly.
+    //
+    // path z values are already inverted (ZIncreasingDownwards causes
+    // WellsLayer to negate z before calling the abscissa transform):
+    //   surface ≈ z = 0; deepest point ≈ z = −3000.
+    const fenceQuads = React.useMemo<Position[][]>(() => {
+        if (path.length < 2) return [];
+        const zValues = path.map((p) => p[2] ?? 0);
+        const zTop = Math.max(...zValues) + 100; // 100 m above shallowest
+        const zBottom = Math.min(...zValues) - 100; // 100 m below deepest
+        const quads: Position[][] = [];
+        for (let i = 0; i < path.length - 1; i++) {
+            const p1 = path[i];
+            const p2 = path[i + 1];
+            quads.push([
+                [p1[0], p1[1], zTop],
+                [p2[0], p2[1], zTop],
+                [p2[0], p2[1], zBottom],
+                [p1[0], p1[1], zBottom],
+            ]);
+        }
+        return quads;
+    }, [path]);
+
     // Horizon geometry in [abscissa, depth, 0] space.
     // Depths are positive-downward; ZIncreasingDownwards:true on the layer
     // negates them so they appear below the surface in section/3D views.
@@ -1658,7 +1687,12 @@ const WellSectionHorizonWrapper: React.FC = () => {
                 {
                     id: "view-3d",
                     viewType: OrbitView,
-                    layerIds: ["wells-3d", "axes-3d-wh", "horizon-layer"],
+                    layerIds: [
+                        "wells-3d",
+                        "axes-3d-wh",
+                        "horizon-layer",
+                        "fence-layer",
+                    ],
                 },
                 {
                     id: "view-section",
@@ -1717,6 +1751,25 @@ const WellSectionHorizonWrapper: React.FC = () => {
                     bounds: [450000, 6781000, 0, 464000, 6791000, 3000],
                 }),
                 new Axes2DLayer({ id: "axes-2d-wh" }),
+                // Vertical fence curtain — 3-D only (OrbitView).
+                // PolygonLayer is a composite; its fill sub-layer id is 'fill'.
+                // Passing _full3d:true via _subLayerProps makes earcut compare
+                // XY/XZ/YZ projected areas and pick the largest, so each
+                // vertical quad (zero XY area) tessellates correctly in XZ/YZ.
+                new PolygonLayer<Position[]>({
+                    id: "fence-layer",
+                    data: fenceQuads,
+                    getPolygon: (d) => d,
+                    filled: true,
+                    getFillColor: [100, 160, 220, 90],
+                    stroked: true,
+                    getLineColor: [80, 130, 200, 200],
+                    lineWidthMinPixels: 1,
+                    // Propagate _full3d to the SolidPolygonLayer fill sub-layer.
+                    _subLayerProps: {
+                        fill: { _full3d: true },
+                    },
+                }),
             ]}
         />
     );
