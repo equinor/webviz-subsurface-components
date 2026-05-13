@@ -1,7 +1,6 @@
 import type { Position } from "@deck.gl/core";
 import { OrbitView, OrthographicView, View } from "@deck.gl/core";
 import { PolygonLayer } from "@deck.gl/layers";
-import { styled } from "@mui/material/styles";
 import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 import { SectionView } from "../../views/sectionView";
@@ -20,7 +19,11 @@ import { useAbscissaTransform } from "../../layers/wells/hooks/useAbscissaTransf
 import WellsLayer from "../../layers/wells/wellsLayer";
 import type { ViewsType } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
-import { defaultStoryParameters } from "../sharedSettings";
+import {
+    annotationClasses,
+    AnnotationRoot,
+    defaultStoryParameters,
+} from "../sharedSettings";
 import { getRgba } from "../util/color";
 import { useSyntheticWellCollection } from "../util/wellSynthesis";
 
@@ -29,18 +32,6 @@ const STORIES: Meta = {
     title: "SubsurfaceViewer / Polyline Group Layer",
 };
 export default STORIES;
-
-const PREFIX = "PolylineGroup";
-
-const classes = {
-    annotation: `${PREFIX}-annotation`,
-};
-
-const Root = styled("div")({
-    [`& .${classes.annotation}`]: {
-        marginLeft: "100px",
-    },
-});
 
 /**
  * Creates a deck.gl {@link View} element with annotation children.
@@ -219,15 +210,15 @@ export const PickablePolylines: StoryObj<typeof SubsurfaceViewer> = {
         },
     },
     render: (args) => (
-        <Root>
+        <AnnotationRoot>
             <SubsurfaceViewer {...args}>
                 {annotateView(
                     "view_3d",
                     <>
-                        <h2 className={classes.annotation}>
+                        <h2 className={annotationClasses.annotation}>
                             3D view [x, y, z]
                         </h2>
-                        <p className={classes.annotation}>
+                        <p className={annotationClasses.annotation}>
                             Hover over a line to see its group name and polyline
                             id in the info card.
                         </p>
@@ -235,10 +226,12 @@ export const PickablePolylines: StoryObj<typeof SubsurfaceViewer> = {
                 )}
                 {annotateView(
                     "view_2d",
-                    <h2 className={classes.annotation}>2D top view [x, y]</h2>
+                    <h2 className={annotationClasses.annotation}>
+                        2D top view [x, y]
+                    </h2>
                 )}
             </SubsurfaceViewer>
-        </Root>
+        </AnnotationRoot>
     ),
 };
 
@@ -365,18 +358,22 @@ export const BinaryPolylinesFormat: StoryObj<typeof SubsurfaceViewer> = {
         },
     },
     render: (args) => (
-        <Root>
+        <AnnotationRoot>
             <SubsurfaceViewer {...args}>
                 {annotateView(
                     "view_3d",
-                    <h2 className={classes.annotation}>3D view [x, y, z]</h2>
+                    <h2 className={annotationClasses.annotation}>
+                        3D view [x, y, z]
+                    </h2>
                 )}
                 {annotateView(
                     "view_2d",
-                    <h2 className={classes.annotation}>2D top view [x, y]</h2>
+                    <h2 className={annotationClasses.annotation}>
+                        2D top view [x, y]
+                    </h2>
                 )}
             </SubsurfaceViewer>
-        </Root>
+        </AnnotationRoot>
     ),
 };
 
@@ -455,7 +452,7 @@ const VisibilityWrapper = ({
     });
 
     return (
-        <Root>
+        <AnnotationRoot>
             <SubsurfaceViewer
                 id="polyline-group-visibility"
                 layers={[AXES_LAYER, layer]}
@@ -464,14 +461,18 @@ const VisibilityWrapper = ({
             >
                 {annotateView(
                     "view_3d",
-                    <h2 className={classes.annotation}>3D view [x, y, z]</h2>
+                    <h2 className={annotationClasses.annotation}>
+                        3D view [x, y, z]
+                    </h2>
                 )}
                 {annotateView(
                     "view_2d",
-                    <h2 className={classes.annotation}>2D top view [x, y]</h2>
+                    <h2 className={annotationClasses.annotation}>
+                        2D top view [x, y]
+                    </h2>
                 )}
             </SubsurfaceViewer>
-        </Root>
+        </AnnotationRoot>
     );
 };
 
@@ -646,15 +647,15 @@ export const SectionViewRendering: StoryObj<typeof SubsurfaceViewer> = {
         },
     },
     render: (args) => (
-        <Root>
+        <AnnotationRoot>
             <SubsurfaceViewer {...args}>
                 {annotateView(
                     "view_3d",
                     <>
-                        <h2 className={classes.annotation}>
+                        <h2 className={annotationClasses.annotation}>
                             3D fence diagram [x, y, z]
                         </h2>
-                        <p className={classes.annotation}>
+                        <p className={annotationClasses.annotation}>
                             Abscissa values are projected back onto the L-shaped
                             world-space fence.
                         </p>
@@ -663,16 +664,16 @@ export const SectionViewRendering: StoryObj<typeof SubsurfaceViewer> = {
                 {annotateView(
                     "view_section",
                     <>
-                        <h2 className={classes.annotation}>
+                        <h2 className={annotationClasses.annotation}>
                             Section view [abscissa, depth]
                         </h2>
-                        <p className={classes.annotation}>
+                        <p className={annotationClasses.annotation}>
                             Paths rendered flat in abscissa/depth space.
                         </p>
                     </>
                 )}
             </SubsurfaceViewer>
-        </Root>
+        </AnnotationRoot>
     ),
 };
 
@@ -796,7 +797,7 @@ const GroupStylingWrapper = ({
     ];
 
     return (
-        <Root>
+        <AnnotationRoot>
             <SubsurfaceViewer
                 id="polyline-group-styling"
                 layers={[
@@ -819,14 +820,18 @@ const GroupStylingWrapper = ({
             >
                 {annotateView(
                     "view_3d",
-                    <h2 className={classes.annotation}>3D view [x, y, z]</h2>
+                    <h2 className={annotationClasses.annotation}>
+                        3D view [x, y, z]
+                    </h2>
                 )}
                 {annotateView(
                     "view_2d",
-                    <h2 className={classes.annotation}>2D top view [x, y]</h2>
+                    <h2 className={annotationClasses.annotation}>
+                        2D top view [x, y]
+                    </h2>
                 )}
             </SubsurfaceViewer>
-        </Root>
+        </AnnotationRoot>
     );
 };
 
@@ -988,7 +993,7 @@ const PolylineOverrideWrapper = ({
     ];
 
     return (
-        <Root>
+        <AnnotationRoot>
             <SubsurfaceViewer
                 id="polyline-override-styling"
                 layers={[
@@ -1009,14 +1014,18 @@ const PolylineOverrideWrapper = ({
             >
                 {annotateView(
                     "view_3d",
-                    <h2 className={classes.annotation}>3D view [x, y, z]</h2>
+                    <h2 className={annotationClasses.annotation}>
+                        3D view [x, y, z]
+                    </h2>
                 )}
                 {annotateView(
                     "view_2d",
-                    <h2 className={classes.annotation}>2D top view [x, y]</h2>
+                    <h2 className={annotationClasses.annotation}>
+                        2D top view [x, y]
+                    </h2>
                 )}
             </SubsurfaceViewer>
-        </Root>
+        </AnnotationRoot>
     );
 };
 
@@ -1335,7 +1344,7 @@ const DiscontinuousWrapper = ({
     );
 
     return (
-        <Root>
+        <AnnotationRoot>
             <SubsurfaceViewer
                 id="polyline-group-disc"
                 layers={[DISC_AXES_LAYER, layer]}
@@ -1346,10 +1355,10 @@ const DiscontinuousWrapper = ({
                 {annotateView(
                     "view_3d",
                     <>
-                        <h2 className={classes.annotation}>
+                        <h2 className={annotationClasses.annotation}>
                             3D view [x, y, z]
                         </h2>
-                        <p className={classes.annotation}>
+                        <p className={annotationClasses.annotation}>
                             Side view along fault strike — Z-throw depth offset
                             is visible as vertical steps.
                         </p>
@@ -1357,10 +1366,12 @@ const DiscontinuousWrapper = ({
                 )}
                 {annotateView(
                     "view_2d",
-                    <h2 className={classes.annotation}>2D top view [x, y]</h2>
+                    <h2 className={annotationClasses.annotation}>
+                        2D top view [x, y]
+                    </h2>
                 )}
             </SubsurfaceViewer>
-        </Root>
+        </AnnotationRoot>
     );
 };
 
@@ -1663,7 +1674,7 @@ const WellSectionHorizonWrapper: React.FC = () => {
     );
 
     return (
-        <Root>
+        <AnnotationRoot>
             <SubsurfaceViewer
                 id="well-section-horizons"
                 bounds={WELL_HORIZON_3D_BOUNDS}
@@ -1726,10 +1737,10 @@ const WellSectionHorizonWrapper: React.FC = () => {
                 {annotateView(
                     "view-3d",
                     <>
-                        <h2 className={classes.annotation}>
+                        <h2 className={annotationClasses.annotation}>
                             3D fence diagram [x, y, z]
                         </h2>
-                        <p className={classes.annotation}>
+                        <p className={annotationClasses.annotation}>
                             Well trajectories and horizon polylines projected
                             onto the world-space fence curtain.
                         </p>
@@ -1738,17 +1749,17 @@ const WellSectionHorizonWrapper: React.FC = () => {
                 {annotateView(
                     "view-section",
                     <>
-                        <h2 className={classes.annotation}>
+                        <h2 className={annotationClasses.annotation}>
                             Section view [abscissa, depth]
                         </h2>
-                        <p className={classes.annotation}>
+                        <p className={annotationClasses.annotation}>
                             Horizon paths rendered flat in abscissa/depth space,
                             aligned to the well order.
                         </p>
                     </>
                 )}
             </SubsurfaceViewer>
-        </Root>
+        </AnnotationRoot>
     );
 };
 

@@ -36,6 +36,39 @@ export const mainStyle = {
 
 export const Root = styled("div")(mainStyle);
 
+/** Class names used by {@link AnnotationRoot}. */
+export const annotationClasses = {
+    /** Applied to `<h2>` / `<p>` annotation elements inside a View overlay. */
+    annotation: "storyAnnotation",
+    /** Optional container for a fixed-height viewer pane. */
+    main: "storyMain",
+};
+
+/**
+ * Styled root `<div>` that styles View overlay annotations and an optional
+ * fixed-height viewer pane. Import this in story files instead of defining
+ * a local `styled("div")`.
+ *
+ * Usage:
+ * ```tsx
+ * <AnnotationRoot>
+ *   <SubsurfaceViewer ...>
+ *     {annotateView("viewport1", <h2 className={annotationClasses.annotation}>…</h2>)}
+ *   </SubsurfaceViewer>
+ * </AnnotationRoot>
+ * ```
+ */
+export const AnnotationRoot = styled("div")({
+    [`& .${annotationClasses.annotation}`]: {
+        marginLeft: "100px",
+    },
+    [`& .${annotationClasses.main}`]: {
+        height: 500,
+        border: "1px solid black",
+        position: "relative",
+    },
+});
+
 // Full deckgl-map.json
 export const subsufaceProps: SubsurfaceViewerProps =
     exampleData[0] as unknown as SubsurfaceViewerProps;
