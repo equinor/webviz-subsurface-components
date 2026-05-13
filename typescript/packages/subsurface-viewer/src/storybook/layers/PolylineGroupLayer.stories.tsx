@@ -6,6 +6,8 @@ import { SectionView } from "../../views/sectionView";
 
 import { Axes2DLayer } from "../../layers";
 import AxesLayer from "../../layers/axes/axesLayer";
+import { useAbscissaTransform } from "../../layers/wells/hooks/useAbscissaTransform";
+import WellsLayer from "../../layers/wells/wellsLayer";
 import type {
     BinaryPolylines,
     Polyline,
@@ -17,6 +19,7 @@ import type { ViewsType } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import { defaultStoryParameters } from "../sharedSettings";
 import { getRgba } from "../util/color";
+import { useSyntheticWellCollection } from "../util/wellSynthesis";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -1522,4 +1525,235 @@ export const DiscontinuousPolylines: StoryObj<typeof DiscontinuousWrapper> = {
         },
     },
     render: (args) => <DiscontinuousWrapper {...args} />,
+};
+
+// ---------------------------------------------------------------------------
+// Story 10: Horizons on a well-derived section path
+// ---------------------------------------------------------------------------
+//
+// Demonstrates using `sectionPath` with a fence computed dynamically from
+// real well trajectories rather than a hard-coded geometry.
+//
+// A small synthetic well field (6 wells) is ordered by the nearest-neighbour
+// abscissa transform (`useAbscissaTransform`).  The resulting world-space path
+// is passed to `PolylineGroupLayer.sectionPath` as a 2-D XY fence.
+// Horizon polylines are expressed in [abscissa, depth] space; the layer
+// automatically:
+//   • projects abscissa back to world XY in the OrbitView (3-D fence diagram)
+//   • renders abscissa/depth as-is in the SectionView (classic cross-section)
+//
+// The deeper horizon (green) is a simple dipping polyline.
+// The shallower horizon (red) is discontinuous — cut by a normal fault at
+// 45 % along the section — with the hanging-wall segment highlighted yellow,
+// reusing the `path: PolylineGroup` approach from Story 9.
+//
+// The two WellsLayer instances share the same well data, but only one applies
+// `section: transform`; filterSubLayer on the PolylineGroupLayer ensures each
+// sub-layer renders in the correct viewport.
+
+const WELL_HORIZON_3D_BOUNDS: [number, number, number, number] = [
+    450000, 6781000, 464000, 6791000,
+];
+
+const WellSectionHorizonWrapper: React.FC = () => {
+    // 6 wells drawn from 6 distinct head positions so the section path is clear.
+    const wellData = useSyntheticWellCollection(6, 6, {
+        sampleCount: 20,
+        segmentLength: 150,
+        dipDeviationMagnitude: 10,
+    });
+
+    // useAbscissaTransform provides:
+    //   transform — passed to WellsLayer.section; sets path as a side-effect
+    //   path      — the world-space 3-D trajectory of the ordered well chain
+    const { transform, path } = useAbscissaTransform();
+
+    // sectionPath for PolylineGroupLayer is the 2-D XY projection of the
+    // world-space section path produced by the abscissa transform.
+    const sectionPath = React.useMemo<Position2D[]>(
+        () => path.map((p) => [p[0], p[1]] as Position2D),
+        [path]
+    );
+
+    // Cumulative length of the 2-D fence = max abscissa value.
+    const abscissaMax = React.useMemo(() => {
+        if (sectionPath.length < 2) return 0;
+        let sum = 0;
+        for (let i = 1; i < sectionPath.length; i++) {
+            const dx = sectionPath[i][0] - sectionPath[i - 1][0];
+            const dy = sectionPath[i][1] - sectionPath[i - 1][1];
+            sum += Math.sqrt(dx * dx + dy * dy);
+        }
+        return sum;
+    }, [sectionPath]);
+
+    // Horizon geometry in [abscissa, depth, 0] space.
+    // Depths are positive-downward; ZIncreasingDownwards:true on the layer
+    // negates them so they appear below the surface in section/3D views.
+    // Horizon data is computed once abscissaMax is known (requires one
+    // render cycle after wells are processed by the section transform).
+    const horizonData = React.useMemo<PolylineGroup[]>(() => {
+        if (abscissaMax === 0) return [];
+
+        const L = abscissaMax;
+        const faultAbs = L * 0.45; // fault cut at 45 % along section
+        const zThrow = 300; // depth throw (m) on hanging-wall
+
+        return [
+            {
+                id: "well-horizons",
+                name: "Horizons",
+                polylines: [
+                    {
+                        // Shallower horizon — cut by a fault.
+                        id: "horizon-shallow",
+                        color: [210, 60, 60, 255],
+                        width: 3,
+                        path: {
+                            polylines: [
+                                {
+                                    // Footwall segment (left of fault)
+                                    path: [
+                                        [0, 1500, 0],
+                                        [faultAbs, 1500 + faultAbs * 0.015, 0],
+                                    ] as Position[],
+                                },
+                                {
+                                    // Hanging-wall segment (right of fault),
+                                    // thrown down by zThrow, highlighted yellow.
+                                    color: [220, 200, 30, 255],
+                                    path: [
+                                        [
+                                            faultAbs,
+                                            1500 + faultAbs * 0.015 + zThrow,
+                                            0,
+                                        ],
+                                        [L, 1500 + L * 0.015 + zThrow, 0],
+                                    ] as Position[],
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        // Deeper continuous horizon.
+                        id: "horizon-deep",
+                        color: [60, 180, 60, 255],
+                        width: 3,
+                        path: [
+                            [0, 2600, 0],
+                            [L * 0.33, 2600 + L * 0.33 * 0.012, 0],
+                            [L * 0.67, 2600 + L * 0.67 * 0.012, 0],
+                            [L, 2600 + L * 0.012, 0],
+                        ] as Position[],
+                    },
+                ],
+            },
+        ];
+    }, [abscissaMax]);
+
+    const views = React.useMemo<ViewsType>(
+        () => ({
+            layout: [1, 2] as [number, number],
+            viewports: [
+                {
+                    id: "view-3d",
+                    viewType: OrbitView,
+                    layerIds: ["wells-3d", "axes-3d-wh", "horizon-layer"],
+                },
+                {
+                    id: "view-section",
+                    viewType: SectionView,
+                    // Target the centre of the section content once abscissaMax
+                    // is known.  x = mid-abscissa; y = -(mid-depth) in deck.gl
+                    // space (ZIncreasingDownwards negates depth).
+                    target: [
+                        abscissaMax > 0 ? abscissaMax / 2 : 1500,
+                        -2050,
+                    ] as [number, number],
+                    zoom: -4,
+                    layerIds: ["wells-section", "axes-2d-wh", "horizon-layer"],
+                },
+            ],
+        }),
+        [abscissaMax]
+    );
+
+    return (
+        <SubsurfaceViewer
+            id="well-section-horizons"
+            bounds={WELL_HORIZON_3D_BOUNDS}
+            views={views}
+            layers={[
+                // 3-D well trajectories in world space (no section transform).
+                new WellsLayer({
+                    id: "wells-3d",
+                    data: wellData,
+                    wellHeadStyle: { size: 3 },
+                    ZIncreasingDownwards: true,
+                }),
+                // Wells unfolded to [abscissa, depth] section space.
+                new WellsLayer({
+                    id: "wells-section",
+                    data: wellData,
+                    section: transform,
+                    ZIncreasingDownwards: true,
+                }),
+                // Horizon polylines projected via sectionPath.
+                // filterSubLayer routes paths-3d → OrbitView, paths-section → SectionView.
+                new PolylineGroupLayer({
+                    id: "horizon-layer",
+                    name: "Section Horizons",
+                    data: horizonData,
+                    sectionPath,
+                    pickable: true,
+                    widthUnits: "pixels",
+                    ZIncreasingDownwards: true,
+                }),
+                new AxesLayer({
+                    id: "axes-3d-wh",
+                    // Data-space bounds (z positive = depth downward);
+                    // AxesLayer with ZIncreasingDownwards:true (default) negates
+                    // z internally, matching the wells rendered at deck.gl z ≤ 0.
+                    bounds: [450000, 6781000, 0, 464000, 6791000, 3000],
+                }),
+                new Axes2DLayer({ id: "axes-2d-wh" }),
+            ]}
+        />
+    );
+};
+
+export const HorizonsOnWellSectionPath: StoryObj<
+    typeof WellSectionHorizonWrapper
+> = {
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: [
+                    "Demonstrates `sectionPath` with a **dynamically computed fence** derived",
+                    "from real well trajectories.",
+                    "",
+                    "Six synthetic wells are ordered by the nearest-neighbour abscissa transform",
+                    "(`useAbscissaTransform`). The world-space path of the ordered well chain is",
+                    "passed to `PolylineGroupLayer.sectionPath` as a 2-D XY fence.",
+                    "",
+                    "Horizon polylines are expressed in **`[abscissa, depth]`** space:",
+                    "- The **left viewport** (OrbitView) projects each abscissa value back onto",
+                    "  the world-space fence, producing a 3-D fence diagram that drapes across",
+                    "  the well field.",
+                    "- The **right viewport** (SectionView) renders the paths flat in",
+                    "  abscissa/depth space — a classic cross-section aligned to the well order.",
+                    "",
+                    "The **red (shallow) horizon** is discontinuous, cut by a normal fault at",
+                    "45 % along the section (same `path: PolylineGroup` pattern as Story 9).",
+                    "The hanging-wall segment is highlighted **yellow**.",
+                    "The **green (deep) horizon** is a simple dipping polyline.",
+                    "",
+                    "Hover any horizon segment to see its id and depth in the info card.",
+                ].join(" "),
+            },
+        },
+    },
+    tags: ["no-test"],
+    render: () => <WellSectionHorizonWrapper />,
 };
