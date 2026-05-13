@@ -5,6 +5,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 import { SectionView } from "../../views/sectionView";
 
+import type { ViewStateType } from "../../components/Map";
 import { Axes2DLayer } from "../../layers";
 import AxesLayer from "../../layers/axes/axesLayer";
 import type {
@@ -1220,11 +1221,24 @@ const DiscontinuousWrapper = ({
         hiddenPolylines: new Set<string | number>(hiddenPolylineIds),
     });
 
+    const cameraPosition = React.useMemo<ViewStateType>(
+        () => ({
+            // Look from the side (along the fault strike) with a slight
+            // downward tilt so the Z-throw depth offset is clearly visible.
+            rotationX: 25,
+            rotationOrbit: 80,
+            target: undefined,
+            zoom: undefined,
+        }),
+        []
+    );
+
     return (
         <SubsurfaceViewer
             id="polyline-group-disc"
             layers={[discAxesLayer, layer]}
             bounds={DISC_BOUNDS}
+            cameraPosition={cameraPosition}
             views={DUAL_VIEWS}
         />
     );
