@@ -365,9 +365,9 @@ type VisibilityArgs = {
 const VisibilityWrapper = ({
     hiddenGroupIds = [],
     hiddenPolylineIds = [],
-    alphaColor = "#dc3c3c",
-    betaColor = "#3cb43c",
-    gammaColor = "#3c3cdc",
+    alphaColor = "rgba(220, 60, 60, 1)",
+    betaColor = "rgba(60, 180, 60, 1)",
+    gammaColor = "rgba(60, 60, 220, 1)",
 }: VisibilityArgs) => {
     const groupColors: Record<string, string> = {
         alpha: alphaColor,
@@ -402,23 +402,14 @@ export const VisibilityFiltering: StoryObj<typeof VisibilityWrapper> = {
     args: {
         hiddenGroupIds: [],
         hiddenPolylineIds: [],
-        alphaColor: "#dc3c3c",
-        betaColor: "#3cb43c",
-        gammaColor: "#3c3cdc",
+        alphaColor: "rgba(220, 60, 60, 1)",
+        betaColor: "rgba(60, 180, 60, 1)",
+        gammaColor: "rgba(60, 60, 220, 1)",
     },
     argTypes: {
-        alphaColor: {
-            name: "Alpha color",
-            control: { type: "color" },
-        },
-        betaColor: {
-            name: "Beta color",
-            control: { type: "color" },
-        },
-        gammaColor: {
-            name: "Gamma color",
-            control: { type: "color" },
-        },
+        alphaColor: { name: "Alpha color" },
+        betaColor: { name: "Beta color" },
+        gammaColor: { name: "Gamma color" },
         hiddenGroupIds: {
             name: "Hidden groups",
             control: { type: "check" },
@@ -664,11 +655,11 @@ type GroupStylingArgs = {
 };
 
 const GroupStylingWrapper = ({
-    groupAColor = "#e05050",
+    groupAColor = "rgba(224, 80, 80, 1)",
     groupAWidth = 3,
     groupADashLength = 0,
     groupAGapLength = 4,
-    groupBColor = "#50c050",
+    groupBColor = "rgba(80, 192, 80, 1)",
     groupBWidth = 4,
     groupBDashLength = 0,
     groupBGapLength = 4,
@@ -725,21 +716,18 @@ const GroupStylingWrapper = ({
 
 export const GroupLevelStyling: StoryObj<typeof GroupStylingWrapper> = {
     args: {
-        groupAColor: "#e05050",
+        groupAColor: "rgba(224, 80, 80, 1)",
         groupAWidth: 3,
         groupADashLength: 0,
         groupAGapLength: 4,
-        groupBColor: "#50c050",
+        groupBColor: "rgba(80, 192, 80, 1)",
         groupBWidth: 4,
         groupBDashLength: 0,
         groupBGapLength: 4,
         highPrecisionDash: false,
     },
     argTypes: {
-        groupAColor: {
-            name: "Group A — color",
-            control: { type: "color" },
-        },
+        groupAColor: { name: "Group A — color" },
         groupAWidth: {
             name: "Group A — width (px)",
             control: { type: "range", min: 1, max: 20, step: 1 },
@@ -752,10 +740,7 @@ export const GroupLevelStyling: StoryObj<typeof GroupStylingWrapper> = {
             name: "Group A — gap length",
             control: { type: "range", min: 1, max: 40, step: 1 },
         },
-        groupBColor: {
-            name: "Group B — color",
-            control: { type: "color" },
-        },
+        groupBColor: { name: "Group B — color" },
         groupBWidth: {
             name: "Group B — width (px)",
             control: { type: "range", min: 1, max: 20, step: 1 },
@@ -826,19 +811,19 @@ type PolylineOverrideArgs = {
 };
 
 const PolylineOverrideWrapper = ({
-    groupAColor = "#e05050",
+    groupAColor = "rgba(224, 80, 80, 1)",
     groupAWidth = 3,
     groupADashLength = 0,
     groupAGapLength = 4,
-    a2Color = "#e0c030",
+    a2Color = "rgba(224, 192, 48, 1)",
     a2Width = 7,
     a2DashLength = 12,
     a2GapLength = 4,
-    groupBColor = "#50c050",
+    groupBColor = "rgba(80, 192, 80, 1)",
     groupBWidth = 3,
     groupBDashLength = 0,
     groupBGapLength = 4,
-    b2Color = "#3090d0",
+    b2Color = "rgba(48, 144, 208, 1)",
     b2Width = 7,
     b2DashLength = 6,
     b2GapLength = 6,
@@ -910,29 +895,26 @@ const PolylineOverrideWrapper = ({
 
 export const PolylineLevelStyling: StoryObj<typeof PolylineOverrideWrapper> = {
     args: {
-        groupAColor: "#e05050",
+        groupAColor: "rgba(224, 80, 80, 1)",
         groupAWidth: 3,
         groupADashLength: 0,
         groupAGapLength: 4,
-        a2Color: "#e0c030",
+        a2Color: "rgba(224, 192, 48, 1)",
         a2Width: 7,
         a2DashLength: 12,
         a2GapLength: 4,
-        groupBColor: "#50c050",
+        groupBColor: "rgba(80, 192, 80, 1)",
         groupBWidth: 3,
         groupBDashLength: 0,
         groupBGapLength: 4,
-        b2Color: "#3090d0",
+        b2Color: "rgba(48, 144, 208, 1)",
         b2Width: 7,
         b2DashLength: 6,
         b2GapLength: 6,
         highPrecisionDash: false,
     },
     argTypes: {
-        groupAColor: {
-            name: "Group A — color",
-            control: { type: "color" },
-        },
+        groupAColor: { name: "Group A — color" },
         groupAWidth: {
             name: "Group A — width (px)",
             control: { type: "range", min: 1, max: 20, step: 1 },
@@ -945,10 +927,7 @@ export const PolylineLevelStyling: StoryObj<typeof PolylineOverrideWrapper> = {
             name: "Group A — gap length",
             control: { type: "range", min: 1, max: 40, step: 1 },
         },
-        a2Color: {
-            name: "A2 override — color",
-            control: { type: "color" },
-        },
+        a2Color: { name: "A2 override — color" },
         a2Width: {
             name: "A2 override — width (px)",
             control: { type: "range", min: 1, max: 20, step: 1 },
@@ -961,10 +940,7 @@ export const PolylineLevelStyling: StoryObj<typeof PolylineOverrideWrapper> = {
             name: "A2 override — gap length",
             control: { type: "range", min: 1, max: 40, step: 1 },
         },
-        groupBColor: {
-            name: "Group B — color",
-            control: { type: "color" },
-        },
+        groupBColor: { name: "Group B — color" },
         groupBWidth: {
             name: "Group B — width (px)",
             control: { type: "range", min: 1, max: 20, step: 1 },
@@ -977,10 +953,7 @@ export const PolylineLevelStyling: StoryObj<typeof PolylineOverrideWrapper> = {
             name: "Group B — gap length",
             control: { type: "range", min: 1, max: 40, step: 1 },
         },
-        b2Color: {
-            name: "B2 override — color",
-            control: { type: "color" },
-        },
+        b2Color: { name: "B2 override — color" },
         b2Width: {
             name: "B2 override — width (px)",
             control: { type: "range", min: 1, max: 20, step: 1 },
@@ -1184,11 +1157,11 @@ type DiscontinuousArgs = {
 
 const DiscontinuousWrapper = ({
     hiddenPolylineIds = [],
-    redColor = "#d23c3c",
+    redColor = "rgba(210, 60, 60, 1)",
     redWidth = 3,
-    greenColor = "#3cb43c",
+    greenColor = "rgba(60, 180, 60, 1)",
     greenWidth = 3,
-    faultColor = "#5050dc",
+    faultColor = "rgba(80, 80, 220, 1)",
 }: DiscontinuousArgs) => {
     const data: PolylineGroup[] = [
         {
@@ -1248,11 +1221,11 @@ const DiscontinuousWrapper = ({
 export const DiscontinuousPolylines: StoryObj<typeof DiscontinuousWrapper> = {
     args: {
         hiddenPolylineIds: [],
-        redColor: "#d23c3c",
+        redColor: "rgba(210, 60, 60, 1)",
         redWidth: 3,
-        greenColor: "#3cb43c",
+        greenColor: "rgba(60, 180, 60, 1)",
         greenWidth: 3,
-        faultColor: "#5050dc",
+        faultColor: "rgba(80, 80, 220, 1)",
     },
     argTypes: {
         hiddenPolylineIds: {
@@ -1260,26 +1233,17 @@ export const DiscontinuousPolylines: StoryObj<typeof DiscontinuousWrapper> = {
             control: { type: "check" },
             options: ["horizon-red", "horizon-green"],
         },
-        redColor: {
-            name: "Red horizon — color",
-            control: { type: "color" },
-        },
+        redColor: { name: "Red horizon — color" },
         redWidth: {
             name: "Red horizon — width (px)",
             control: { type: "range", min: 1, max: 20, step: 1 },
         },
-        greenColor: {
-            name: "Green horizon — color",
-            control: { type: "color" },
-        },
+        greenColor: { name: "Green horizon — color" },
         greenWidth: {
             name: "Green horizon — width (px)",
             control: { type: "range", min: 1, max: 20, step: 1 },
         },
-        faultColor: {
-            name: "Fault color",
-            control: { type: "color" },
-        },
+        faultColor: { name: "Fault color" },
     },
     parameters: {
         docs: {
