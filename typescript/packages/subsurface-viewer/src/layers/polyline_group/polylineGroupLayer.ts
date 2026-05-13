@@ -5,18 +5,18 @@ import type {
     UpdateParameters,
 } from "@deck.gl/core";
 import { CompositeLayer } from "@deck.gl/core";
-import { PathLayer } from "@deck.gl/layers";
 import { DataFilterExtension, PathStyleExtension } from "@deck.gl/extensions";
+import { PathLayer } from "@deck.gl/layers";
 import { isEqual } from "lodash";
 
+import type { Position } from "@deck.gl/core";
+import { SectionViewport } from "../../viewports";
 import type {
     ExtendedLayerProps,
     LayerPickInfo,
     PropertyDataType,
 } from "../utils/layerTools";
 import { createPropertyData } from "../utils/layerTools";
-import { SectionViewport } from "../../viewports";
-import type { Position } from "@deck.gl/core";
 
 // ---------------------------------------------------------------------------
 // Public data types
@@ -26,7 +26,22 @@ export type Position2D = [number, number];
 
 export type Polyline = {
     id?: string | number;
-    path: Position[];
+    /**
+     * The geometry of this polyline.
+     *
+     * - `Position[]` — a single connected path (the common case).
+     * - `PolylineGroup` — a set of disjoint segments that share the same logical
+     *   identity (id, picking, visibility). Use this to represent a horizon that
+     *   is cut by faults: each segment in `group.polylines` is a full `Polyline`
+     *   and may carry its own `color`, `width`, and `dashArray` overrides, enabling
+     *   per-segment highlighting. The parent `Polyline` acts as the logical owner.
+     *
+     *   One level only — segment paths must be `Position[]`; nested `PolylineGroup`
+     *   paths inside segments are not supported.
+     *
+     *   `BinaryPolylines` inside the sub-group is not supported; use `Polyline[]`.
+     */
+    path: Position[] | PolylineGroup;
     color?: Color;
     width?: number;
     dashArray?: [number, number];
@@ -84,7 +99,11 @@ export interface PolylineGroupLayerProps extends ExtendedLayerProps {
 
     /** Extract the polylines from a group object. Defaults to `g.polylines`. */
     getGroupPolylines?: (group: PolylineGroup) => Polyline[] | BinaryPolylines;
-    /** Extract the path positions from a polyline object. Defaults to `p.path`. */
+    /**
+     * Extract the path positions from a polyline object. Defaults to `p.path as Position[]`.
+     * Only called on leaf polylines whose `path` is `Position[]` (i.e. not on container
+     * polylines whose `path` is a `PolylineGroup`).
+     */
     getPolylinePath?: (polyline: Polyline, group: PolylineGroup) => Position[];
 
     // -- Fallback defaults ---------------------------------------------------
@@ -199,7 +218,7 @@ const defaultProps: Partial<PolylineGroupLayerProps> = {
     billboard: true,
     getGroupPolylines: (g: PolylineGroup): Polyline[] | BinaryPolylines =>
         g.polylines,
-    getPolylinePath: (p: Polyline) => p.path,
+    getPolylinePath: (p: Polyline) => p.path as Position[],
 };
 
 // ---------------------------------------------------------------------------
@@ -292,6 +311,54 @@ function resolveDashArray(
     return props.defaultGroupDashArray ?? [0, 0];
 }
 
+// ---------------------------------------------------------------------------
+// Segment resolution helpers (used when polyline.path is a PolylineGroup)
+// ---------------------------------------------------------------------------
+// Cascade: accessor(segment) -> segment field -> subGroup field -> parent polyline
+// resolution (which itself cascades through accessor -> field -> outerGroup -> default).
+
+function resolveSegmentColor(
+    segment: Polyline,
+    subGroup: PolylineGroup,
+    parentPolyline: Polyline,
+    outerGroup: PolylineGroup,
+    props: PolylineGroupLayerProps
+): Color {
+    const fromAccessor = props.getPolylineColor?.(segment, outerGroup);
+    if (fromAccessor != null) return fromAccessor;
+    if (segment.color != null) return segment.color;
+    if (subGroup.color != null) return subGroup.color;
+    return resolveColor(parentPolyline, outerGroup, props);
+}
+
+function resolveSegmentWidth(
+    segment: Polyline,
+    subGroup: PolylineGroup,
+    parentPolyline: Polyline,
+    outerGroup: PolylineGroup,
+    props: PolylineGroupLayerProps
+): number {
+    const fromAccessor = props.getPolylineWidth?.(segment, outerGroup);
+    if (fromAccessor != null) return fromAccessor;
+    if (segment.width != null) return segment.width;
+    if (subGroup.width != null) return subGroup.width;
+    return resolveWidth(parentPolyline, outerGroup, props);
+}
+
+function resolveSegmentDashArray(
+    segment: Polyline,
+    subGroup: PolylineGroup,
+    parentPolyline: Polyline,
+    outerGroup: PolylineGroup,
+    props: PolylineGroupLayerProps
+): [number, number] {
+    const fromAccessor = props.getPolylineDashArray?.(segment, outerGroup);
+    if (fromAccessor != null) return fromAccessor;
+    if (segment.dashArray != null) return segment.dashArray;
+    if (subGroup.dashArray != null) return subGroup.dashArray;
+    return resolveDashArray(parentPolyline, outerGroup, props);
+}
+
 function flattenGroupData(
     data: PolylineGroup[],
     props: PolylineGroupLayerProps
@@ -299,7 +366,8 @@ function flattenGroupData(
     const getPolylines =
         props.getGroupPolylines ??
         ((g: PolylineGroup): Polyline[] | BinaryPolylines => g.polylines);
-    const getPath = props.getPolylinePath ?? ((p: Polyline) => p.path);
+    const getPath =
+        props.getPolylinePath ?? ((p: Polyline) => p.path as Position[]);
     const result: FlatEntry[] = [];
 
     for (const group of data) {
@@ -335,14 +403,54 @@ function flattenGroupData(
             }
         } else {
             for (const polyline of polylines) {
-                result.push({
-                    path: getPath(polyline, group),
-                    color: resolveColor(polyline, group, props),
-                    width: resolveWidth(polyline, group, props),
-                    dashArray: resolveDashArray(polyline, group, props),
-                    _polyline: polyline,
-                    _group: group,
-                });
+                if (!Array.isArray(polyline.path)) {
+                    // path is a PolylineGroup — expand into one FlatEntry per segment.
+                    const subGroup = polyline.path;
+                    const segPolylines = subGroup.polylines;
+                    if (isBinaryPolylines(segPolylines)) {
+                        console.warn(
+                            "PolylineGroupLayer: BinaryPolylines inside a sub-group path is not supported. Skipping."
+                        );
+                        continue;
+                    }
+                    for (const segment of segPolylines) {
+                        result.push({
+                            path: getPath(segment, group),
+                            color: resolveSegmentColor(
+                                segment,
+                                subGroup,
+                                polyline,
+                                group,
+                                props
+                            ),
+                            width: resolveSegmentWidth(
+                                segment,
+                                subGroup,
+                                polyline,
+                                group,
+                                props
+                            ),
+                            dashArray: resolveSegmentDashArray(
+                                segment,
+                                subGroup,
+                                polyline,
+                                group,
+                                props
+                            ),
+                            _polyline: polyline, // root polyline — for picking & hiddenPolylines
+                            _group: group,
+                        });
+                    }
+                } else {
+                    result.push({
+                        path: getPath(polyline, group),
+                        color: resolveColor(polyline, group, props),
+                        width: resolveWidth(polyline, group, props),
+                        dashArray: resolveDashArray(polyline, group, props),
+                        _polyline: polyline,
+                        _group: group,
+                    });
+                }
             }
         }
     }

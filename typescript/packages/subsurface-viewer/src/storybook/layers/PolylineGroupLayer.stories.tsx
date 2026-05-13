@@ -1,20 +1,21 @@
-import React from "react";
-import type { Meta, StoryObj } from "@storybook/react";
 import type { Position } from "@deck.gl/core";
 import { OrbitView, OrthographicView } from "@deck.gl/core";
+import type { Meta, StoryObj } from "@storybook/react";
+import React from "react";
 import { SectionView } from "../../views/sectionView";
 
-import SubsurfaceViewer from "../../SubsurfaceViewer";
-import type { ViewsType } from "../../SubsurfaceViewer";
-import { defaultStoryParameters } from "../sharedSettings";
-import AxesLayer from "../../layers/axes/axesLayer";
 import { Axes2DLayer } from "../../layers";
-import { PolylineGroupLayer } from "../../layers/polyline_group/polylineGroupLayer";
+import AxesLayer from "../../layers/axes/axesLayer";
 import type {
     BinaryPolylines,
+    Polyline,
     PolylineGroup,
     Position2D,
 } from "../../layers/polyline_group/polylineGroupLayer";
+import { PolylineGroupLayer } from "../../layers/polyline_group/polylineGroupLayer";
+import type { ViewsType } from "../../SubsurfaceViewer";
+import SubsurfaceViewer from "../../SubsurfaceViewer";
+import { defaultStoryParameters } from "../sharedSettings";
 import { getRgba } from "../util/color";
 
 const stories: Meta = {
@@ -1243,4 +1244,247 @@ export const PolylineLevelStyling: StoryObj<typeof PolylineOverrideWrapper> = {
         },
     },
     render: (args) => <PolylineOverrideWrapper {...args} />,
+};
+
+// ---------------------------------------------------------------------------
+// Story 9: Discontinuous polylines — horizons cut by faults
+// ---------------------------------------------------------------------------
+//
+// A polyline's `path` can be a `PolylineGroup` instead of `Position[]`.
+// In that case the group's `polylines` define disjoint segments that share
+// the same logical identity (id, picking, visibility).
+//
+// Use case: a seismic horizon cut by two faults into three separate segments.
+// Each segment is a full `Polyline` and may carry its own `color`, `width`,
+// and `dashArray` overrides — enabling, for example, highlighting the segment
+// that lies in the footwall of a specific fault.
+//
+// The scene below contains:
+//   • Red horizon ("horizon-red")  — 3 segments; middle segment is yellow.
+//   • Green horizon ("horizon-green") — 3 segments; all at group color.
+//   • Fault group — 2 solid blue vertical fault-trace polylines (normal paths).
+//
+// hiddenPolylineIds: toggling a horizon id hides ALL its segments at once,
+// because each FlatEntry carries `_polyline = parentPolyline` (root id).
+
+const DISC_BOUNDS = [-1, -1, 14, 12] as [number, number, number, number];
+
+const discAxesLayer = new AxesLayer({
+    id: "axes-disc",
+    name: "Axes",
+    bounds: [-1, -1, 0, 14, 12, 10],
+});
+
+// Fault planes at x = 4 and x = 9 (world-space vertical cuts).
+// The horizon segments are separated by a small gap around each fault.
+const FAULT_X1 = 4;
+const FAULT_X2 = 9;
+const GAP = 0.3; // gap half-width around each fault cut
+
+const discGroups: PolylineGroup[] = [
+    {
+        id: "horizons",
+        name: "Horizons",
+        polylines: [
+            {
+                id: "horizon-red",
+                // No top-level path Position[] — path is a PolylineGroup.
+                color: [210, 60, 60, 255],
+                width: 3,
+                path: {
+                    polylines: [
+                        // Segment 1: left of fault 1
+                        {
+                            path: [
+                                [0, 2, 1],
+                                [FAULT_X1 - GAP, 2.5, 2],
+                            ] as Position[],
+                        },
+                        // Segment 2 (middle): between the two faults — highlighted yellow
+                        {
+                            color: [220, 200, 30, 255],
+                            path: [
+                                [FAULT_X1 + GAP, 2.5, 2],
+                                [FAULT_X2 - GAP, 3, 3],
+                            ] as Position[],
+                        },
+                        // Segment 3: right of fault 2
+                        {
+                            path: [
+                                [FAULT_X2 + GAP, 3, 3],
+                                [13, 3.5, 4],
+                            ] as Position[],
+                        },
+                    ],
+                },
+            },
+            {
+                id: "horizon-green",
+                color: [60, 180, 60, 255],
+                width: 3,
+                path: {
+                    polylines: [
+                        {
+                            path: [
+                                [0, 6, 3],
+                                [FAULT_X1 - GAP, 6.5, 4],
+                            ] as Position[],
+                        },
+                        {
+                            path: [
+                                [FAULT_X1 + GAP, 6, 4],
+                                [FAULT_X2 - GAP, 6.5, 5],
+                            ] as Position[],
+                        },
+                        {
+                            path: [
+                                [FAULT_X2 + GAP, 6, 5],
+                                [13, 6.5, 6],
+                            ] as Position[],
+                        },
+                    ],
+                },
+            },
+        ],
+    },
+    {
+        id: "faults",
+        name: "Faults",
+        color: [80, 80, 220, 255],
+        width: 2,
+        polylines: [
+            {
+                id: "fault-1",
+                path: [
+                    [FAULT_X1, 0, 0],
+                    [FAULT_X1, 10, 0],
+                ] as Position[],
+            },
+            {
+                id: "fault-2",
+                path: [
+                    [FAULT_X2, 0, 0],
+                    [FAULT_X2, 10, 0],
+                ] as Position[],
+            },
+        ],
+    },
+];
+
+type DiscontinuousArgs = {
+    hiddenPolylineIds: string[];
+    redColor: string;
+    redWidth: number;
+    greenColor: string;
+    greenWidth: number;
+    faultColor: string;
+};
+
+const DiscontinuousWrapper = ({
+    hiddenPolylineIds = [],
+    redColor = "#d23c3c",
+    redWidth = 3,
+    greenColor = "#3cb43c",
+    greenWidth = 3,
+    faultColor = "#5050dc",
+}: DiscontinuousArgs) => {
+    const data: PolylineGroup[] = [
+        {
+            ...discGroups[0],
+            polylines: [
+                {
+                    ...(discGroups[0].polylines as Polyline[])[0],
+                    color: getRgba(redColor),
+                    width: redWidth,
+                },
+                {
+                    ...(discGroups[0].polylines as Polyline[])[1],
+                    color: getRgba(greenColor),
+                    width: greenWidth,
+                },
+            ],
+        },
+        {
+            ...discGroups[1],
+            color: getRgba(faultColor),
+        },
+    ];
+
+    const layer = new PolylineGroupLayer({
+        id: "disc-layer",
+        name: "Discontinuous Horizons",
+        data,
+        widthUnits: "pixels",
+        ZIncreasingDownwards: true,
+        hiddenPolylines: new Set<string | number>(hiddenPolylineIds),
+    });
+
+    return (
+        <SubsurfaceViewer
+            id="polyline-group-disc"
+            layers={[discAxesLayer, layer]}
+            bounds={DISC_BOUNDS}
+            views={DUAL_VIEWS}
+        />
+    );
+};
+
+export const DiscontinuousPolylines: StoryObj<typeof DiscontinuousWrapper> = {
+    args: {
+        hiddenPolylineIds: [],
+        redColor: "#d23c3c",
+        redWidth: 3,
+        greenColor: "#3cb43c",
+        greenWidth: 3,
+        faultColor: "#5050dc",
+    },
+    argTypes: {
+        hiddenPolylineIds: {
+            name: "Hidden horizons",
+            control: { type: "check" },
+            options: ["horizon-red", "horizon-green"],
+        },
+        redColor: {
+            name: "Red horizon — color",
+            control: { type: "color" },
+        },
+        redWidth: {
+            name: "Red horizon — width (px)",
+            control: { type: "range", min: 1, max: 20, step: 1 },
+        },
+        greenColor: {
+            name: "Green horizon — color",
+            control: { type: "color" },
+        },
+        greenWidth: {
+            name: "Green horizon — width (px)",
+            control: { type: "range", min: 1, max: 20, step: 1 },
+        },
+        faultColor: {
+            name: "Fault color",
+            control: { type: "color" },
+        },
+    },
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: [
+                    "Demonstrates **discontinuous polylines** — a single logical polyline",
+                    "whose `path` is a `PolylineGroup` of disjoint segments.",
+                    "",
+                    "Two horizons (**red** and **green**) are each cut into three segments",
+                    "by two vertical fault planes. The middle segment of the red horizon",
+                    "carries a **yellow** per-segment color override, demonstrating that",
+                    "individual segments can be independently styled (e.g. for highlighting).",
+                    "",
+                    "The **blue** fault-trace polylines use a normal `path: Position[]`.",
+                    "",
+                    "Toggling a horizon in *Hidden horizons* hides **all its segments**",
+                    "simultaneously, because all segments share the same root `Polyline` id.",
+                ].join(" "),
+            },
+        },
+    },
+    render: (args) => <DiscontinuousWrapper {...args} />,
 };
