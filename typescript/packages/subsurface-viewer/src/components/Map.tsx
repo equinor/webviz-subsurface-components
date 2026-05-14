@@ -307,6 +307,12 @@ export interface MapProps {
      * @remarks The camera is reset whenever the identity of this value changes.
      * Pass a stable reference (a module-level or memoized constant) rather than
      * an inline array literal to avoid unintentional resets.
+     *
+     * **Conflict with per-viewport camera settings:** when `bounds` is set,
+     * per-viewport `target` and `zoom` fields in `ViewportType` do not work as
+     * expected. Omit `bounds` and set `target`/`zoom` directly on each viewport
+     * instead, relying on `dataBoundingBox3d` from the layers as the fallback
+     * fit.
      */
     bounds?: BoundingBox2D | BoundsAccessor;
 
