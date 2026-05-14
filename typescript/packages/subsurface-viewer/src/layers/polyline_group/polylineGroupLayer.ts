@@ -406,6 +406,42 @@ function resolveSegmentDashArray(
     return resolveDashArray(parentPolyline, outerGroup, props);
 }
 
+/**
+ * Expands a polyline whose `path` is a {@link PolylineGroup} (i.e. a
+ * discontinuous polyline made of disjoint segments) into one {@link FlatEntry}
+ * per segment. Returns an empty array and emits a warning if the sub-group
+ * contains {@link BinaryPolylines}, which are not supported at the segment level.
+ */
+function flattenSubGroupPolyline(
+    polyline: Polyline,
+    subGroup: PolylineGroup,
+    group: PolylineGroup,
+    getPath: (p: Polyline, g: PolylineGroup) => Position[],
+    props: PolylineGroupLayerProps
+): FlatEntry[] {
+    const segPolylines = subGroup.polylines;
+    if (isBinaryPolylines(segPolylines)) {
+        console.warn(
+            "PolylineGroupLayer: BinaryPolylines inside a sub-group path is not supported. Skipping."
+        );
+        return [];
+    }
+    return segPolylines.map((segment) => ({
+        path: getPath(segment, group),
+        color: resolveSegmentColor(segment, subGroup, polyline, group, props),
+        width: resolveSegmentWidth(segment, subGroup, polyline, group, props),
+        dashArray: resolveSegmentDashArray(
+            segment,
+            subGroup,
+            polyline,
+            group,
+            props
+        ),
+        _polyline: polyline, // root polyline — for picking & hiddenPolylines
+        _group: group,
+    }));
+}
+
 function flattenGroupData(
     data: PolylineGroup[],
     props: PolylineGroupLayerProps
@@ -451,43 +487,15 @@ function flattenGroupData(
         } else {
             for (const polyline of polylines) {
                 if (!Array.isArray(polyline.path)) {
-                    // path is a PolylineGroup — expand into one FlatEntry per segment.
-                    const subGroup = polyline.path;
-                    const segPolylines = subGroup.polylines;
-                    if (isBinaryPolylines(segPolylines)) {
-                        console.warn(
-                            "PolylineGroupLayer: BinaryPolylines inside a sub-group path is not supported. Skipping."
-                        );
-                        continue;
-                    }
-                    for (const segment of segPolylines) {
-                        result.push({
-                            path: getPath(segment, group),
-                            color: resolveSegmentColor(
-                                segment,
-                                subGroup,
-                                polyline,
-                                group,
-                                props
-                            ),
-                            width: resolveSegmentWidth(
-                                segment,
-                                subGroup,
-                                polyline,
-                                group,
-                                props
-                            ),
-                            dashArray: resolveSegmentDashArray(
-                                segment,
-                                subGroup,
-                                polyline,
-                                group,
-                                props
-                            ),
-                            _polyline: polyline, // root polyline — for picking & hiddenPolylines
-                            _group: group,
-                        });
-                    }
+                    result.push(
+                        ...flattenSubGroupPolyline(
+                            polyline,
+                            polyline.path,
+                            group,
+                            getPath,
+                            props
+                        )
+                    );
                 } else {
                     result.push({
                         path: getPath(polyline, group),
