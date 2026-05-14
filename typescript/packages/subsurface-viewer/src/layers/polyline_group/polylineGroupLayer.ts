@@ -18,12 +18,11 @@ import type {
     PropertyDataType,
 } from "../utils/layerTools";
 import { createPropertyData } from "../utils/layerTools";
+import type { Point2D } from "../..";
 
 // ---------------------------------------------------------------------------
 // Public data types
 // ---------------------------------------------------------------------------
-
-export type Position2D = [number, number];
 
 export type Polyline = {
     id?: string | number;
@@ -225,7 +224,7 @@ export interface PolylineGroupLayerProps
      * @remarks Pass a stable reference (module-level or memoized constant) to avoid
      * unnecessary re-computation of the section index.
      */
-    sectionPath?: Position2D[];
+    sectionPath?: Point2D[];
 }
 
 // ---------------------------------------------------------------------------
@@ -510,9 +509,9 @@ function flattenGroupData(
 // ---------------------------------------------------------------------------
 
 /** Precomputed data for projecting abscissa values onto the fence. */
-type SectionIndex = { cumDist: number[]; path: Position2D[] };
+type SectionIndex = { cumDist: number[]; path: Point2D[] };
 
-function buildSectionIndex(path: Position2D[]): SectionIndex {
+function buildSectionIndex(path: Point2D[]): SectionIndex {
     const cumDist: number[] = [0];
     for (let i = 1; i < path.length; i++) {
         const dx = path[i][0] - path[i - 1][0];

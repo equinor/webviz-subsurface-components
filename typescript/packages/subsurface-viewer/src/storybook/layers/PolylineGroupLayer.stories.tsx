@@ -12,7 +12,6 @@ import type {
     BinaryPolylines,
     Polyline,
     PolylineGroup,
-    Position2D,
 } from "../../layers/polyline_group/polylineGroupLayer";
 import { PolylineGroupLayer } from "../../layers/polyline_group/polylineGroupLayer";
 import { useAbscissaTransform } from "../../layers/wells/hooks/useAbscissaTransform";
@@ -26,7 +25,7 @@ import {
 } from "../sharedSettings";
 import { getRgba } from "../util/color";
 import { useSyntheticWellCollection } from "../util/wellSynthesis";
-import type { BoundingBox2D } from "../../utils";
+import type { BoundingBox2D, Point2D } from "../../utils";
 
 const STORIES: Meta = {
     component: SubsurfaceViewer,
@@ -544,7 +543,7 @@ export const VisibilityFiltering: StoryObj<typeof VisibilityWrapper> = {
 // The fence below is an L-shape: 12 m east then 12 m north, total length 24 m.
 
 // L-shaped fence:  (0,0) → (12,0) → (12,12)
-const SECTION_PATH: Position2D[] = [
+const SECTION_PATH: Point2D[] = [
     [0, 0],
     [12, 0],
     [12, 12],
@@ -1487,7 +1486,7 @@ const WellSectionHorizonWrapper: React.FC = () => {
 
     // sectionPath for PolylineGroupLayer is the 2-D XY projection of the
     // world-space section path produced by the abscissa transform.
-    const sectionPath = React.useMemo<Position2D[]>(
+    const sectionPath = React.useMemo<Point2D[]>(
         () => path.map((p) => [p[0], p[1]]),
         [path]
     );
