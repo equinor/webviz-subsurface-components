@@ -136,6 +136,68 @@ const SECTION_VIEWS: ViewsType = {
     ],
 };
 
+// ---------------------------------------------------------------------------
+// Shared scene data — used by PickablePolylines and GroupLevelStyling stories.
+//
+// Group A occupies x ∈ [0, 10], y ∈ [0,  6] (lower half of the scene).
+// Group B occupies x ∈ [0, 10], y ∈ [10, 16] (upper half, separated by a gap).
+// ---------------------------------------------------------------------------
+
+const GROUP_A_PATHS: Position[][] = [
+    [
+        [0, 0, 2],
+        [4, 0, 3],
+        [8, 0, 4],
+        [10, 0, 5],
+    ],
+    [
+        [0, 3, 4],
+        [4, 3, 5],
+        [8, 3, 6],
+        [10, 3, 7],
+    ],
+    [
+        [0, 6, 6],
+        [4, 6, 7],
+        [8, 6, 8],
+        [10, 6, 9],
+    ],
+];
+
+const GROUP_B_PATHS: Position[][] = [
+    [
+        [0, 10, 2],
+        [4, 10, 3],
+        [8, 10, 4],
+        [10, 10, 5],
+    ],
+    [
+        [0, 13, 4],
+        [4, 13, 5],
+        [8, 13, 6],
+        [10, 13, 7],
+    ],
+    [
+        [0, 16, 6],
+        [4, 16, 7],
+        [8, 16, 8],
+        [10, 16, 9],
+    ],
+];
+
+const GROUP_STYLING_BOUNDS = [-1, -1, 12, 18] as [
+    number,
+    number,
+    number,
+    number,
+];
+
+const GROUP_STYLING_AXES_LAYER = new AxesLayer({
+    id: "axes-group-styling",
+    name: "Axes",
+    bounds: [-1, -1, 0, 12, 18, 10],
+});
+
 /**
  * Returns a Storybook `parameters` object with the standard docs config.
  * Avoids repeating `...defaultStoryParameters.docs` in every story.
@@ -164,53 +226,31 @@ function mkDash(
 // Story 1: Pickable with group/polyline info in tooltip
 // ---------------------------------------------------------------------------
 
-const PICKABLE_DATA: PolylineGroup[] = [
-    {
-        id: "fault-a",
-        name: "Fault A",
-        color: [255, 140, 0, 255],
-        width: 4,
-        polylines: [
-            {
-                id: "fa-1",
-                path: [
-                    [0, 0, 0],
-                    [6, 2, 5],
-                    [12, 0, 8],
-                ],
-            },
-            {
-                id: "fa-2",
-                path: [
-                    [0, 5, 0],
-                    [6, 7, 4],
-                    [12, 5, 6],
-                ],
-            },
-        ],
-    },
-    {
-        id: "fault-b",
-        name: "Fault B",
-        color: [160, 32, 240, 255],
-        width: 4,
-        polylines: [
-            {
-                id: "fb-1",
-                path: [
-                    [2, 10, 0],
-                    [8, 12, 6],
-                    [14, 10, 10],
-                ],
-            },
-        ],
-    },
-];
-
 const PICKABLE_LAYER = new PolylineGroupLayer({
     id: "pickable-layer",
-    name: "Pickable Faults",
-    data: PICKABLE_DATA,
+    name: "Pickable Groups",
+    data: [
+        {
+            id: "group-a",
+            name: "Group A",
+            color: [255, 140, 0, 255],
+            width: 4,
+            polylines: GROUP_A_PATHS.map((path, i) => ({
+                id: `a-${i + 1}`,
+                path,
+            })),
+        },
+        {
+            id: "group-b",
+            name: "Group B",
+            color: [160, 32, 240, 255],
+            width: 4,
+            polylines: GROUP_B_PATHS.map((path, i) => ({
+                id: `b-${i + 1}`,
+                path,
+            })),
+        },
+    ],
     pickable: true,
     widthUnits: "pixels",
     ZIncreasingDownwards: true,
@@ -220,15 +260,8 @@ export const PickablePolylines: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "polyline-group-pickable",
         pickingRadius: 8,
-        layers: [
-            new AxesLayer({
-                id: "axes-layer-pickable",
-                name: "Axes",
-                bounds: [-2, -2, 0, 18, 16, 12],
-            }),
-            PICKABLE_LAYER,
-        ],
-        bounds: [-2, -2, 18, 16],
+        layers: [GROUP_STYLING_AXES_LAYER, PICKABLE_LAYER],
+        bounds: GROUP_STYLING_BOUNDS,
         views: DUAL_VIEWS,
     },
     parameters: storyDocs(
@@ -696,64 +729,6 @@ export const SectionViewRendering: StoryObj<typeof SubsurfaceViewer> = {
 // back, which also enables PathStyleExtension internally. Setting dashLength
 // to 0 leaves a group's lines solid.
 //
-// Group A occupies x ∈ [0, 10], y ∈ [0, 6] (left half of the scene).
-// Group B occupies x ∈ [0, 10], y ∈ [10, 16] (right half — separated by a gap).
-
-const GROUP_A_PATHS: Position[][] = [
-    [
-        [0, 0, 2],
-        [4, 0, 3],
-        [8, 0, 4],
-        [10, 0, 5],
-    ],
-    [
-        [0, 3, 4],
-        [4, 3, 5],
-        [8, 3, 6],
-        [10, 3, 7],
-    ],
-    [
-        [0, 6, 6],
-        [4, 6, 7],
-        [8, 6, 8],
-        [10, 6, 9],
-    ],
-];
-
-const GROUP_B_PATHS: Position[][] = [
-    [
-        [0, 10, 2],
-        [4, 10, 3],
-        [8, 10, 4],
-        [10, 10, 5],
-    ],
-    [
-        [0, 13, 4],
-        [4, 13, 5],
-        [8, 13, 6],
-        [10, 13, 7],
-    ],
-    [
-        [0, 16, 6],
-        [4, 16, 7],
-        [8, 16, 8],
-        [10, 16, 9],
-    ],
-];
-
-const GROUP_STYLING_BOUNDS = [-1, -1, 12, 18] as [
-    number,
-    number,
-    number,
-    number,
-];
-
-const GROUP_STYLING_AXES_LAYER = new AxesLayer({
-    id: "axes-group-styling",
-    name: "Axes",
-    bounds: [-1, -1, 0, 12, 18, 10],
-});
-
 type GroupStylingArgs = {
     groupAColor: string;
     groupAWidth: number;
