@@ -5,7 +5,6 @@ import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 import { SectionView } from "../../views/sectionView";
 
-import type { ViewStateType } from "../../components/Map";
 import { Axes2DLayer, MapLayer } from "../../layers";
 import AxesLayer from "../../layers/axes/axesLayer";
 import type {
@@ -1137,8 +1136,6 @@ export const PolylineLevelStyling: StoryObj<typeof PolylineOverrideWrapper> = {
 // hiddenPolylineIds: toggling a horizon id hides ALL its segments at once,
 // because each FlatEntry carries `_polyline = parentPolyline` (root id).
 
-const DISC_BOUNDS: BoundingBox2D = [-1, -1, 14, 7];
-
 const DISC_AXES_LAYER = new AxesLayer({
     id: "axes-disc",
     name: "Axes",
@@ -1279,7 +1276,7 @@ type DiscontinuousArgs = {
     faultColor: string;
 };
 
-const DiscontinuousWrapper = ({
+const DiscontinuousPolylinesView = ({
     hiddenPolylineIds = [],
     redColor = "rgba(210, 60, 60, 1)",
     redWidth = 3,
@@ -1319,25 +1316,11 @@ const DiscontinuousWrapper = ({
         hiddenPolylines: new Set<string | number>(hiddenPolylineIds),
     });
 
-    const cameraPosition = React.useMemo<ViewStateType>(
-        () => ({
-            // Look from the side (along the fault strike) with a slight
-            // downward tilt so the Z-throw depth offset is clearly visible.
-            rotationX: 25,
-            rotationOrbit: 80,
-            target: undefined,
-            zoom: undefined,
-        }),
-        []
-    );
-
     return (
         <AnnotationRoot>
             <SubsurfaceViewer
                 id="polyline-group-disc"
                 layers={[DISC_AXES_LAYER, layer]}
-                bounds={DISC_BOUNDS}
-                cameraPosition={cameraPosition}
                 views={DUAL_VIEWS}
             >
                 {annotateView(
@@ -1347,8 +1330,8 @@ const DiscontinuousWrapper = ({
                             3D view [x, y, z]
                         </h2>
                         <p className={annotationClasses.annotation}>
-                            Side view along fault strike — Z-throw depth offset
-                            is visible as vertical steps.
+                            Angled view — Z-throw depth offset is visible as
+                            vertical steps at the fault planes.
                         </p>
                     </>
                 )}
@@ -1363,7 +1346,9 @@ const DiscontinuousWrapper = ({
     );
 };
 
-export const DiscontinuousPolylines: StoryObj<typeof DiscontinuousWrapper> = {
+export const DiscontinuousPolylines: StoryObj<
+    typeof DiscontinuousPolylinesView
+> = {
     args: {
         hiddenPolylineIds: [],
         redColor: "rgba(210, 60, 60, 1)",
@@ -1411,7 +1396,7 @@ export const DiscontinuousPolylines: StoryObj<typeof DiscontinuousWrapper> = {
             "info card — picking always returns the root `Polyline`, not the segment.",
         ].join(" ")
     ),
-    render: (args) => <DiscontinuousWrapper {...args} />,
+    render: (args) => <DiscontinuousPolylinesView {...args} />,
 };
 
 // ---------------------------------------------------------------------------
