@@ -26,6 +26,7 @@ import {
 } from "../sharedSettings";
 import { getRgba } from "../util/color";
 import { useSyntheticWellCollection } from "../util/wellSynthesis";
+import type { BoundingBox2D } from "../../utils";
 
 const STORIES: Meta = {
     component: SubsurfaceViewer,
@@ -1134,7 +1135,7 @@ export const PolylineLevelStyling: StoryObj<typeof PolylineOverrideWrapper> = {
 // hiddenPolylineIds: toggling a horizon id hides ALL its segments at once,
 // because each FlatEntry carries `_polyline = parentPolyline` (root id).
 
-const DISC_BOUNDS = [-1, -1, 14, 7] as [number, number, number, number];
+const DISC_BOUNDS: BoundingBox2D = [-1, -1, 14, 7];
 
 const DISC_AXES_LAYER = new AxesLayer({
     id: "axes-disc",
@@ -1176,7 +1177,7 @@ const DISC_GROUPS: PolylineGroup[] = [
                             path: [
                                 [0, RED_Y, 1.0],
                                 [FAULT_X1, RED_Y, 1.5],
-                            ] as Position[],
+                            ],
                         },
                         // Segment 2 (middle, highlighted yellow):
                         // thrown down by Z_THROW_F1 at fault 1.
@@ -1185,14 +1186,14 @@ const DISC_GROUPS: PolylineGroup[] = [
                             path: [
                                 [FAULT_X1, RED_Y, 1.5 + Z_THROW_F1],
                                 [FAULT_X2, RED_Y, 3.2],
-                            ] as Position[],
+                            ],
                         },
                         // Segment 3: thrown down again by Z_THROW_F2 at fault 2.
                         {
                             path: [
                                 [FAULT_X2, RED_Y, 3.2 + Z_THROW_F2],
                                 [13, RED_Y, 4.7],
-                            ] as Position[],
+                            ],
                         },
                     ],
                 },
@@ -1207,19 +1208,19 @@ const DISC_GROUPS: PolylineGroup[] = [
                             path: [
                                 [0, GREEN_Y, 3.5],
                                 [FAULT_X1, GREEN_Y, 4.0],
-                            ] as Position[],
+                            ],
                         },
                         {
                             path: [
                                 [FAULT_X1, GREEN_Y, 4.0 + Z_THROW_F1],
                                 [FAULT_X2, GREEN_Y, 5.7],
-                            ] as Position[],
+                            ],
                         },
                         {
                             path: [
                                 [FAULT_X2, GREEN_Y, 5.7 + Z_THROW_F2],
                                 [13, GREEN_Y, 7.2],
-                            ] as Position[],
+                            ],
                         },
                     ],
                 },
@@ -1240,28 +1241,28 @@ const DISC_GROUPS: PolylineGroup[] = [
                 path: [
                     [FAULT_X1, RED_Y, 0.5],
                     [FAULT_X1, RED_Y, 3.8],
-                ] as Position[],
+                ],
             },
             {
                 id: "fault-1-green",
                 path: [
                     [FAULT_X1, GREEN_Y, 3.0],
                     [FAULT_X1, GREEN_Y, 6.2],
-                ] as Position[],
+                ],
             },
             {
                 id: "fault-2-red",
                 path: [
                     [FAULT_X2, RED_Y, 2.2],
                     [FAULT_X2, RED_Y, 4.8],
-                ] as Position[],
+                ],
             },
             {
                 id: "fault-2-green",
                 path: [
                     [FAULT_X2, GREEN_Y, 4.7],
                     [FAULT_X2, GREEN_Y, 7.5],
-                ] as Position[],
+                ],
             },
         ],
     },
@@ -1462,7 +1463,7 @@ function resampleAlongFence(pts: Position[], cumDist: number[]): Position[] {
             for (const ab of cumDist) {
                 if (ab > a0 && ab < a1) {
                     const t = (ab - a0) / span;
-                    result.push([ab, d0 + t * (d1 - d0), 0] as Position);
+                    result.push([ab, d0 + t * (d1 - d0), 0]);
                 }
             }
         }
@@ -1487,7 +1488,7 @@ const WellSectionHorizonWrapper: React.FC = () => {
     // sectionPath for PolylineGroupLayer is the 2-D XY projection of the
     // world-space section path produced by the abscissa transform.
     const sectionPath = React.useMemo<Position2D[]>(
-        () => path.map((p) => [p[0], p[1]] as Position2D),
+        () => path.map((p) => [p[0], p[1]]),
         [path]
     );
 
@@ -1576,7 +1577,7 @@ const WellSectionHorizonWrapper: React.FC = () => {
                                                 1500 + faultAbs * 0.015,
                                                 0,
                                             ],
-                                        ] as Position[],
+                                        ],
                                         cumDist
                                     ),
                                 },
@@ -1594,7 +1595,7 @@ const WellSectionHorizonWrapper: React.FC = () => {
                                                 0,
                                             ],
                                             [L, 1500 + L * 0.015 + zThrow, 0],
-                                        ] as Position[],
+                                        ],
                                         cumDist
                                     ),
                                 },
@@ -1612,7 +1613,7 @@ const WellSectionHorizonWrapper: React.FC = () => {
                                 [L * 0.33, 2600 + L * 0.33 * 0.012, 0],
                                 [L * 0.67, 2600 + L * 0.67 * 0.012, 0],
                                 [L, 2600 + L * 0.012, 0],
-                            ] as Position[],
+                            ],
                             cumDist
                         ),
                     },
@@ -1623,7 +1624,7 @@ const WellSectionHorizonWrapper: React.FC = () => {
 
     const views = React.useMemo<ViewsType>(
         () => ({
-            layout: [1, 2] as [number, number],
+            layout: [1, 2],
             viewports: [
                 {
                     id: "view-3d",
@@ -1641,10 +1642,7 @@ const WellSectionHorizonWrapper: React.FC = () => {
                     // Target the centre of the section content once abscissaMax
                     // is known.  x = mid-abscissa; y = -(mid-depth) in deck.gl
                     // space (ZIncreasingDownwards negates depth).
-                    target: [
-                        abscissaMax > 0 ? abscissaMax / 2 : 1500,
-                        -2050,
-                    ] as [number, number],
+                    target: [abscissaMax > 0 ? abscissaMax / 2 : 1500, -2050],
                     zoom: -4,
                     layerIds: ["wells-section", "axes-2d-wh", "horizon-layer"],
                 },
@@ -1812,7 +1810,7 @@ const ORDERING_DATA_2D: PolylineGroup[] = [
                 path: [
                     [1, 1],
                     [9, 9],
-                ] as Position[],
+                ],
             },
         ],
     },
@@ -1827,7 +1825,7 @@ const ORDERING_DATA_2D: PolylineGroup[] = [
                 path: [
                     [1, 9],
                     [9, 1],
-                ] as Position[],
+                ],
             },
         ],
     },
@@ -1842,7 +1840,7 @@ const ORDERING_DATA_2D: PolylineGroup[] = [
                 path: [
                     [1, 5],
                     [9, 5],
-                ] as Position[],
+                ],
             },
         ],
     },
@@ -1860,7 +1858,7 @@ const ORDERING_DATA_3D: PolylineGroup[] = [
                 path: [
                     [1, 1, 0],
                     [9, 9, 0],
-                ] as Position[],
+                ],
             },
         ],
     },
@@ -1875,7 +1873,7 @@ const ORDERING_DATA_3D: PolylineGroup[] = [
                 path: [
                     [1, 9, 2],
                     [9, 1, 2],
-                ] as Position[],
+                ],
             },
         ],
     },
@@ -1890,21 +1888,16 @@ const ORDERING_DATA_3D: PolylineGroup[] = [
                 path: [
                     [1, 5, 4],
                     [9, 5, 4],
-                ] as Position[],
+                ],
             },
         ],
     },
 ];
 
-const ORDERING_BOUNDS = [-0.5, -0.5, 10.5, 10.5] as [
-    number,
-    number,
-    number,
-    number,
-];
+const ORDERING_BOUNDS: BoundingBox2D = [-0.5, -0.5, 10.5, 10.5];
 
 const ORDERING_VIEWS: ViewsType = {
-    layout: [2, 2] as [number, number],
+    layout: [2, 2],
     viewports: [
         {
             id: "ortho-unordered",
