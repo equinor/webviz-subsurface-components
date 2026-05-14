@@ -2019,3 +2019,191 @@ export const PolylineOrdering: StoryObj<typeof SubsurfaceViewer> = {
         </AnnotationRoot>
     ),
 };
+
+// ---------------------------------------------------------------------------
+// Story 13: Depth test — polyline vs. horizon surface
+//
+// Two side-by-side orthographic views show the same scene: a Gaussian-bump
+// horizon surface and a horizontal yellow polyline running at z = 5.
+//   Left  (depthTest: false) — polyline ignores the depth buffer, always on top
+//   Right (depthTest: true)  — depth test enabled; the polyline is occluded
+//       wherever the surface is shallower than z = 5 (the warm-coloured centre
+//       region), and visible where the surface is deeper (the cool outer ring).
+//
+// The surface uses elevation as its own colour map:
+//   orange-red (v=0, z≈2, shallow)  →  purple (v=0.5, z=5)  →  blue (v=1, z≈8)
+// A single contour ring is drawn at z = 5 (the intersection depth) so the
+// depth-test boundary is clearly visible on the surface itself.
+// ---------------------------------------------------------------------------
+
+// Grid dimensions: 50×50 nodes at 0.2 world-unit spacing → 0..9.8 extent.
+const DT_N = 50;
+const DT_DX = 0.2; // world units per cell
+
+/**
+ * Build the Gaussian-bump height-field.
+ * z ranges from ~2 (centre) to ~8 (boundary).
+ * The polyline runs at z = 5, so it intersects the surface at a circle of
+ * radius ≈ 11.77 index units (≈ 2.35 world units) around the grid centre.
+ */
+function makeDtHorizon(): number[] {
+    const cx = (DT_N - 1) / 2; // 24.5
+    const cy = (DT_N - 1) / 2;
+    const sigma2 = 10 * 10; // σ = 10 index units = 2 world units
+    const result: number[] = [];
+    for (let j = 0; j < DT_N; j++) {
+        for (let i = 0; i < DT_N; i++) {
+            const di = i - cx;
+            const dj = j - cy;
+            result.push(8 - 6 * Math.exp(-(di * di + dj * dj) / (2 * sigma2)));
+        }
+    }
+    return result;
+}
+
+const DT_HORIZON_MESH = makeDtHorizon();
+const DT_WORLD_MAX = (DT_N - 1) * DT_DX; // 9.8
+const DT_MID = DT_WORLD_MAX / 2; // 4.9
+
+// Horizontal polyline through the grid centre at constant depth z = 5.
+const DT_POLYLINE_DATA: PolylineGroup[] = [
+    {
+        id: "dt-line",
+        name: "Polyline at z=5",
+        color: [255, 230, 0, 255],
+        width: 8,
+        polylines: [
+            {
+                id: "dt-h",
+                path: [
+                    [0, DT_MID, 5],
+                    [DT_WORLD_MAX, DT_MID, 5],
+                ] as Position[],
+            },
+        ],
+    },
+];
+
+const DT_BOUNDS: BoundingBox2D = [0, 0, DT_WORLD_MAX, DT_WORLD_MAX];
+
+// MapLayer in JSON format (no import needed; registered in SubsurfaceViewer's
+// layer catalogue via CustomLayers).
+const DT_HORIZON_LAYER = {
+    "@@type": "MapLayer",
+    id: "dt-horizon",
+    frame: {
+        origin: [0, 0],
+        count: [DT_N, DT_N],
+        increment: [DT_DX, DT_DX],
+        rotDeg: 0,
+    },
+    // Using the same array for mesh (geometry) and properties (colour input).
+    meshData: DT_HORIZON_MESH,
+    propertiesData: DT_HORIZON_MESH,
+    // Smooth warm→cool gradient: orange-red at shallow depths, blue at deep.
+    colorMapFunction: (v: number) => [
+        Math.round(240 - 220 * v), // 240 → 20  (red)
+        80, // constant green
+        Math.round(20 + 220 * v), // 20  → 240 (blue)
+    ],
+    colorMapRange: [2, 8],
+    material: false, // pure colormap, no lighting shading
+    ZIncreasingDownwards: true,
+    gridLines: false,
+    // Single contour ring at z = 5 — the exact intersection depth.
+    // The next contour would be at z = 105 (outside data range), so only
+    // one ring appears.
+    contours: [5, 100],
+    isContoursDepth: true,
+};
+
+const DT_VIEWS: ViewsType = {
+    layout: [1, 2],
+    viewports: [
+        {
+            id: "dt-off",
+            viewType: OrthographicView,
+            layerIds: ["dt-horizon", "dt-polyline-off"],
+        },
+        {
+            id: "dt-on",
+            viewType: OrthographicView,
+            layerIds: ["dt-horizon", "dt-polyline-on"],
+        },
+    ],
+};
+
+export const DepthTestVsHorizon: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "depth-test-demo",
+        layers: [
+            DT_HORIZON_LAYER,
+            // depthTest: false — polyline always rendered on top of everything.
+            new PolylineGroupLayer({
+                id: "dt-polyline-off",
+                name: "Polyline (depthTest: false)",
+                data: DT_POLYLINE_DATA,
+                widthUnits: "pixels",
+                ZIncreasingDownwards: true,
+                depthTest: false,
+            }),
+            // depthTest: true (default) — polyline participates in depth test;
+            // hidden where the surface is shallower than z = 5.
+            new PolylineGroupLayer({
+                id: "dt-polyline-on",
+                name: "Polyline (depthTest: true)",
+                data: DT_POLYLINE_DATA,
+                widthUnits: "pixels",
+                ZIncreasingDownwards: true,
+                depthTest: true,
+            }),
+        ],
+        bounds: DT_BOUNDS,
+        views: DT_VIEWS,
+    },
+    parameters: storyDocs(
+        [
+            "Demonstrates the effect of `depthTest` on a polyline rendered over a horizon surface.",
+            "",
+            "The surface is a Gaussian bump: minimum depth ~2 at the centre, ~8 at the boundary.",
+            "The yellow polyline runs horizontally through the grid centre at z = 5.",
+            "A contour ring at z = 5 marks the exact depth-test boundary on the surface.",
+            "",
+            "**Left — `depthTest: false`:** the polyline ignores the depth buffer and is always",
+            "painted on top, crossing the full width of the surface.",
+            "",
+            "**Right — `depthTest: true`:** the depth values written by the MapLayer are",
+            "respected. Where the surface is shallower than z = 5 (roughly the inner 2.4-unit",
+            "radius, shown in warm colours), the surface occludes the polyline.",
+            "Outside that ring the surface is deeper and the polyline is visible.",
+        ].join(" ")
+    ),
+    render: (args) => (
+        <AnnotationRoot>
+            <SubsurfaceViewer {...args}>
+                {annotateView(
+                    "dt-off",
+                    <>
+                        <h2 className={annotationClasses.annotation}>
+                            depthTest: false
+                        </h2>
+                        <p className={annotationClasses.annotation}>
+                            Polyline always on top
+                        </p>
+                    </>
+                )}
+                {annotateView(
+                    "dt-on",
+                    <>
+                        <h2 className={annotationClasses.annotation}>
+                            depthTest: true
+                        </h2>
+                        <p className={annotationClasses.annotation}>
+                            Polyline hidden behind shallow surface
+                        </p>
+                    </>
+                )}
+            </SubsurfaceViewer>
+        </AnnotationRoot>
+    ),
+};
