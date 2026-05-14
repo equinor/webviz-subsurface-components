@@ -130,6 +130,30 @@ const SECTION_VIEWS: ViewsType = {
     ],
 };
 
+/**
+ * Returns a Storybook `parameters` object with the standard docs config.
+ * Avoids repeating `...defaultStoryParameters.docs` in every story.
+ */
+function storyDocs(story: string) {
+    return {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: { story },
+        },
+    };
+}
+
+/**
+ * Returns `[dashLength, gapLength]`, or `undefined` when `dashLength` is 0
+ * (solid line). Extracted to avoid repeating the ternary in every wrapper.
+ */
+function mkDash(
+    dashLength: number,
+    gapLength: number
+): [number, number] | undefined {
+    return dashLength > 0 ? [dashLength, gapLength] : undefined;
+}
+
 // ---------------------------------------------------------------------------
 // Story 1: Pickable with group/polyline info in tooltip
 // ---------------------------------------------------------------------------
@@ -201,14 +225,9 @@ export const PickablePolylines: StoryObj<typeof SubsurfaceViewer> = {
         bounds: [-2, -2, 18, 16],
         views: DUAL_VIEWS,
     },
-    parameters: {
-        docs: {
-            ...defaultStoryParameters.docs,
-            description: {
-                story: "Pickable polylines. Hover over a line to see its group name, polyline id, and depth in the info card.",
-            },
-        },
-    },
+    parameters: storyDocs(
+        "Pickable polylines. Hover over a line to see its group name, polyline id, and depth in the info card."
+    ),
     render: (args) => (
         <AnnotationRoot>
             <SubsurfaceViewer {...args}>
@@ -342,21 +361,16 @@ export const BinaryPolylinesFormat: StoryObj<typeof SubsurfaceViewer> = {
         bounds: [-2, -2, 18, 16],
         views: DUAL_VIEWS,
     },
-    parameters: {
-        docs: {
-            ...defaultStoryParameters.docs,
-            description: {
-                story: [
-                    "Contour lines supplied in the **BinaryPolylines** format.",
-                    "Each group's `polylines` is `{ positions: Float32Array, startIndices: Uint32Array }`",
-                    "instead of a `Polyline[]` array.",
-                    "This avoids per-polyline object allocation and is ideal for large datasets.",
-                    "Group-level `color` and `width` are still applied; per-polyline overrides are not",
-                    "available in binary mode.",
-                ].join(" "),
-            },
-        },
-    },
+    parameters: storyDocs(
+        [
+            "Contour lines supplied in the **BinaryPolylines** format.",
+            "Each group's `polylines` is `{ positions: Float32Array, startIndices: Uint32Array }`",
+            "instead of a `Polyline[]` array.",
+            "This avoids per-polyline object allocation and is ideal for large datasets.",
+            "Group-level `color` and `width` are still applied; per-polyline overrides are not",
+            "available in binary mode.",
+        ].join(" ")
+    ),
     render: (args) => (
         <AnnotationRoot>
             <SubsurfaceViewer {...args}>
@@ -499,21 +513,16 @@ export const VisibilityFiltering: StoryObj<typeof VisibilityWrapper> = {
             options: ["a1", "a2", "b1", "b2", "g1"],
         },
     },
-    parameters: {
-        docs: {
-            ...defaultStoryParameters.docs,
-            description: {
-                story: [
-                    "Toggle group and polyline visibility at runtime using the",
-                    "`hiddenGroups` and `hiddenPolylines` props.",
-                    "Visibility changes are applied **GPU-side** — the flattened data buffer is",
-                    "never rebuilt, making this approach efficient for large datasets.",
-                    "A group hidden via `hiddenGroups` hides all its polylines regardless of",
-                    "`hiddenPolylines`. Per-polyline hiding requires `Polyline[]` format with `id`s set.",
-                ].join(" "),
-            },
-        },
-    },
+    parameters: storyDocs(
+        [
+            "Toggle group and polyline visibility at runtime using the",
+            "`hiddenGroups` and `hiddenPolylines` props.",
+            "Visibility changes are applied **GPU-side** — the flattened data buffer is",
+            "never rebuilt, making this approach efficient for large datasets.",
+            "A group hidden via `hiddenGroups` hides all its polylines regardless of",
+            "`hiddenPolylines`. Per-polyline hiding requires `Polyline[]` format with `id`s set.",
+        ].join(" ")
+    ),
     render: (args) => <VisibilityWrapper {...args} />,
 };
 
@@ -631,21 +640,16 @@ export const SectionViewRendering: StoryObj<typeof SubsurfaceViewer> = {
         bounds: SECTION_BOUNDS,
         views: SECTION_VIEWS,
     },
-    parameters: {
-        docs: {
-            ...defaultStoryParameters.docs,
-            description: {
-                story: [
-                    "Demonstrates the `sectionPath` prop. Each path point is `[abscissa, depth]`",
-                    "where `abscissa` is the cumulative distance along the fence.",
-                    "The **left** viewport (OrbitView) projects the abscissa back onto the",
-                    "L-shaped world-space fence, producing a 3-D fence diagram.",
-                    "The **right** viewport (SectionView) renders the paths flat in",
-                    "abscissa/depth space, giving a classic cross-section view.",
-                ].join(" "),
-            },
-        },
-    },
+    parameters: storyDocs(
+        [
+            "Demonstrates the `sectionPath` prop. Each path point is `[abscissa, depth]`",
+            "where `abscissa` is the cumulative distance along the fence.",
+            "The **left** viewport (OrbitView) projects the abscissa back onto the",
+            "L-shaped world-space fence, producing a 3-D fence diagram.",
+            "The **right** viewport (SectionView) renders the paths flat in",
+            "abscissa/depth space, giving a classic cross-section view.",
+        ].join(" ")
+    ),
     render: (args) => (
         <AnnotationRoot>
             <SubsurfaceViewer {...args}>
@@ -777,10 +781,7 @@ const GroupStylingWrapper = ({
             name: "Group A",
             color: getRgba(groupAColor),
             width: groupAWidth,
-            dashArray:
-                groupADashLength > 0
-                    ? [groupADashLength, groupAGapLength]
-                    : undefined,
+            dashArray: mkDash(groupADashLength, groupAGapLength),
             polylines: GROUP_A_PATHS.map((path) => ({ path })),
         },
         {
@@ -788,10 +789,7 @@ const GroupStylingWrapper = ({
             name: "Group B",
             color: getRgba(groupBColor),
             width: groupBWidth,
-            dashArray:
-                groupBDashLength > 0
-                    ? [groupBDashLength, groupBGapLength]
-                    : undefined,
+            dashArray: mkDash(groupBDashLength, groupBGapLength),
             polylines: GROUP_B_PATHS.map((path) => ({ path })),
         },
     ];
@@ -879,25 +877,20 @@ export const GroupLevelStyling: StoryObj<typeof GroupStylingWrapper> = {
             control: { type: "boolean" },
         },
     },
-    parameters: {
-        docs: {
-            ...defaultStoryParameters.docs,
-            description: {
-                story: [
-                    "Two groups of three polylines — **Group A** (lower half) and **Group B** (upper half) —",
-                    "separated by a gap in world space.",
-                    "Both the **OrbitView** (left) and **OrthographicView** (right) are shown.",
-                    "",
-                    "Each group has independently controlled **color**, **width** and **dash pattern**.",
-                    "Set *dash length* > 0 to enable dashing for that group; *gap length* controls",
-                    "the space between dashes. A *dash length* of 0 keeps the lines solid.",
-                    "",
-                    "Enable **high-precision dash** for sharper dash edges at segment joins",
-                    "(slightly higher GPU cost).",
-                ].join(" "),
-            },
-        },
-    },
+    parameters: storyDocs(
+        [
+            "Two groups of three polylines — **Group A** (lower half) and **Group B** (upper half) —",
+            "separated by a gap in world space.",
+            "Both the **OrbitView** (left) and **OrthographicView** (right) are shown.",
+            "",
+            "Each group has independently controlled **color**, **width** and **dash pattern**.",
+            "Set *dash length* > 0 to enable dashing for that group; *gap length* controls",
+            "the space between dashes. A *dash length* of 0 keeps the lines solid.",
+            "",
+            "Enable **high-precision dash** for sharper dash edges at segment joins",
+            "(slightly higher GPU cost).",
+        ].join(" ")
+    ),
     render: (args) => <GroupStylingWrapper {...args} />,
 };
 
@@ -950,9 +943,6 @@ const PolylineOverrideWrapper = ({
     b2GapLength = 6,
     highPrecisionDash = false,
 }: PolylineOverrideArgs) => {
-    const mkDash = (len: number, gap: number): [number, number] | undefined =>
-        len > 0 ? [len, gap] : undefined;
-
     const data: PolylineGroup[] = [
         {
             id: "group-a",
@@ -1107,24 +1097,19 @@ export const PolylineLevelStyling: StoryObj<typeof PolylineOverrideWrapper> = {
             control: { type: "boolean" },
         },
     },
-    parameters: {
-        docs: {
-            ...defaultStoryParameters.docs,
-            description: {
-                story: [
-                    "Same two-group, three-polyline layout as *Group Level Styling*.",
-                    "Each group has group-level **color**, **width** and **dash pattern** that",
-                    "all three of its polylines inherit by default.",
-                    "",
-                    "The **middle polyline** in each group (A2 / B2) carries individual",
-                    "`Polyline.color`, `.width` and `.dashArray` overrides, demonstrating the",
-                    "resolution cascade: polyline property → group property → layer default.",
-                    "",
-                    "Both the **OrbitView** (left) and **OrthographicView** (right) are shown.",
-                ].join(" "),
-            },
-        },
-    },
+    parameters: storyDocs(
+        [
+            "Same two-group, three-polyline layout as *Group Level Styling*.",
+            "Each group has group-level **color**, **width** and **dash pattern** that",
+            "all three of its polylines inherit by default.",
+            "",
+            "The **middle polyline** in each group (A2 / B2) carries individual",
+            "`Polyline.color`, `.width` and `.dashArray` overrides, demonstrating the",
+            "resolution cascade: polyline property → group property → layer default.",
+            "",
+            "Both the **OrbitView** (left) and **OrthographicView** (right) are shown.",
+        ].join(" ")
+    ),
     render: (args) => <PolylineOverrideWrapper {...args} />,
 };
 
@@ -1402,32 +1387,27 @@ export const DiscontinuousPolylines: StoryObj<typeof DiscontinuousWrapper> = {
         },
         faultColor: { name: "Fault color" },
     },
-    parameters: {
-        docs: {
-            ...defaultStoryParameters.docs,
-            description: {
-                story: [
-                    "Demonstrates **discontinuous polylines** — a single logical polyline",
-                    "whose `path` is a `PolylineGroup` of disjoint segments.",
-                    "",
-                    "Two horizons (**red** and **green**) are each cut into three segments",
-                    "by two normal faults. The throw is a **depth (Z) offset** on the",
-                    "hanging-wall block, so the faults are truly vertical in 3D.",
-                    "The middle segment of the red horizon carries a **yellow**",
-                    "per-segment color override, demonstrating that individual segments",
-                    "can be independently styled (e.g. for highlighting).",
-                    "",
-                    "Each fault is shown as two **vertical blue sticks** — one per horizon",
-                    "Y position — piercing the horizon at its throw point.",
-                    "",
-                    "Toggling a horizon in *Hidden horizons* hides **all its segments**",
-                    "simultaneously, because all segments share the same root `Polyline` id.",
-                    "**Hover** over any segment to see the root horizon name and depth in the",
-                    "info card — picking always returns the root `Polyline`, not the segment.",
-                ].join(" "),
-            },
-        },
-    },
+    parameters: storyDocs(
+        [
+            "Demonstrates **discontinuous polylines** — a single logical polyline",
+            "whose `path` is a `PolylineGroup` of disjoint segments.",
+            "",
+            "Two horizons (**red** and **green**) are each cut into three segments",
+            "by two normal faults. The throw is a **depth (Z) offset** on the",
+            "hanging-wall block, so the faults are truly vertical in 3D.",
+            "The middle segment of the red horizon carries a **yellow**",
+            "per-segment color override, demonstrating that individual segments",
+            "can be independently styled (e.g. for highlighting).",
+            "",
+            "Each fault is shown as two **vertical blue sticks** — one per horizon",
+            "Y position — piercing the horizon at its throw point.",
+            "",
+            "Toggling a horizon in *Hidden horizons* hides **all its segments**",
+            "simultaneously, because all segments share the same root `Polyline` id.",
+            "**Hover** over any segment to see the root horizon name and depth in the",
+            "info card — picking always returns the root `Polyline`, not the segment.",
+        ].join(" ")
+    ),
     render: (args) => <DiscontinuousWrapper {...args} />,
 };
 
@@ -1766,34 +1746,29 @@ const WellSectionHorizonWrapper: React.FC = () => {
 export const HorizonsOnWellSectionPath: StoryObj<
     typeof WellSectionHorizonWrapper
 > = {
-    parameters: {
-        docs: {
-            ...defaultStoryParameters.docs,
-            description: {
-                story: [
-                    "Demonstrates `sectionPath` with a **dynamically computed fence** derived",
-                    "from real well trajectories.",
-                    "",
-                    "Six synthetic wells are ordered by the nearest-neighbour abscissa transform",
-                    "(`useAbscissaTransform`). The world-space path of the ordered well chain is",
-                    "passed to `PolylineGroupLayer.sectionPath` as a 2-D XY fence.",
-                    "",
-                    "Horizon polylines are expressed in **`[abscissa, depth]`** space:",
-                    "- The **left viewport** (OrbitView) projects each abscissa value back onto",
-                    "  the world-space fence, producing a 3-D fence diagram that drapes across",
-                    "  the well field.",
-                    "- The **right viewport** (SectionView) renders the paths flat in",
-                    "  abscissa/depth space — a classic cross-section aligned to the well order.",
-                    "",
-                    "The **red (shallow) horizon** is discontinuous, cut by a normal fault at",
-                    "45 % along the section (same `path: PolylineGroup` pattern as Story 9).",
-                    "The hanging-wall segment is highlighted **yellow**.",
-                    "The **green (deep) horizon** is a simple dipping polyline.",
-                    "",
-                    "Hover any horizon segment to see its id and depth in the info card.",
-                ].join(" "),
-            },
-        },
-    },
+    parameters: storyDocs(
+        [
+            "Demonstrates `sectionPath` with a **dynamically computed fence** derived",
+            "from real well trajectories.",
+            "",
+            "Six synthetic wells are ordered by the nearest-neighbour abscissa transform",
+            "(`useAbscissaTransform`). The world-space path of the ordered well chain is",
+            "passed to `PolylineGroupLayer.sectionPath` as a 2-D XY fence.",
+            "",
+            "Horizon polylines are expressed in **`[abscissa, depth]`** space:",
+            "- The **left viewport** (OrbitView) projects each abscissa value back onto",
+            "  the world-space fence, producing a 3-D fence diagram that drapes across",
+            "  the well field.",
+            "- The **right viewport** (SectionView) renders the paths flat in",
+            "  abscissa/depth space — a classic cross-section aligned to the well order.",
+            "",
+            "The **red (shallow) horizon** is discontinuous, cut by a normal fault at",
+            "45 % along the section (same `path: PolylineGroup` pattern as Story 9).",
+            "The hanging-wall segment is highlighted **yellow**.",
+            "The **green (deep) horizon** is a simple dipping polyline.",
+            "",
+            "Hover any horizon segment to see its id and depth in the info card.",
+        ].join(" ")
+    ),
     render: () => <WellSectionHorizonWrapper />,
 };
