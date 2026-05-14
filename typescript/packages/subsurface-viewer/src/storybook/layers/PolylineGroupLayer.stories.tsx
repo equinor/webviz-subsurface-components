@@ -1772,3 +1772,258 @@ export const HorizonsOnWellSectionPath: StoryObj<
     ),
     render: () => <WellSectionHorizonWrapper />,
 };
+
+// ---------------------------------------------------------------------------
+// Story 11: Front-to-back polyline ordering in orthographic and section views
+// ---------------------------------------------------------------------------
+//
+// Three line groups cross each other at the centre of a [0, 10] × [0, 10]
+// coordinate space:
+//   Red  : diagonal from (1, 1) to (9, 9)
+//   Green: diagonal from (1, 9) to (9, 1)
+//   Blue : horizontal  from (1, 5) to (9, 5)
+// All three lines intersect at (5, 5).
+//
+// LEFT column — 2-D coordinates [x, y], no Z component.
+//   All paths share the same implicit depth (0), so deck.gl draws them in
+//   data order.  Blue (listed last) is painted on top at every intersection,
+//   regardless of intent.
+//
+// RIGHT column — 3-D coordinates [x, y, z].
+//   ZIncreasingDownwards: true maps z = 0 to the front (surface) and larger
+//   z values away from the viewer.  Red is assigned z = 0 (front), Green
+//   z = 2, Blue z = 4 (back).  Red wins every depth-test intersection
+//   independent of data order.
+//
+// TOP row    — OrthographicView (plan / top-down view)
+// BOTTOM row — SectionView (cross-section; y = depth increasing downward)
+//   In the section views the Red line reads as a dipping horizon, Green as
+//   an anti-dip horizon, and Blue as a flat horizon.
+
+const ORDERING_DATA_2D: PolylineGroup[] = [
+    {
+        id: "red",
+        name: "Red (data-order: first → behind)",
+        color: [220, 60, 60, 255],
+        width: 8,
+        polylines: [
+            {
+                id: "r1",
+                path: [
+                    [1, 1],
+                    [9, 9],
+                ] as Position[],
+            },
+        ],
+    },
+    {
+        id: "green",
+        name: "Green (data-order: second)",
+        color: [60, 180, 60, 255],
+        width: 8,
+        polylines: [
+            {
+                id: "g1",
+                path: [
+                    [1, 9],
+                    [9, 1],
+                ] as Position[],
+            },
+        ],
+    },
+    {
+        id: "blue",
+        name: "Blue (data-order: last → on top)",
+        color: [60, 100, 220, 255],
+        width: 8,
+        polylines: [
+            {
+                id: "b1",
+                path: [
+                    [1, 5],
+                    [9, 5],
+                ] as Position[],
+            },
+        ],
+    },
+];
+
+const ORDERING_DATA_3D: PolylineGroup[] = [
+    {
+        id: "red",
+        name: "Red (z=0 — front)",
+        color: [220, 60, 60, 255],
+        width: 8,
+        polylines: [
+            {
+                id: "r1",
+                path: [
+                    [1, 1, 0],
+                    [9, 9, 0],
+                ] as Position[],
+            },
+        ],
+    },
+    {
+        id: "green",
+        name: "Green (z=2)",
+        color: [60, 180, 60, 255],
+        width: 8,
+        polylines: [
+            {
+                id: "g1",
+                path: [
+                    [1, 9, 2],
+                    [9, 1, 2],
+                ] as Position[],
+            },
+        ],
+    },
+    {
+        id: "blue",
+        name: "Blue (z=4 — back)",
+        color: [60, 100, 220, 255],
+        width: 8,
+        polylines: [
+            {
+                id: "b1",
+                path: [
+                    [1, 5, 4],
+                    [9, 5, 4],
+                ] as Position[],
+            },
+        ],
+    },
+];
+
+const ORDERING_BOUNDS = [-0.5, -0.5, 10.5, 10.5] as [
+    number,
+    number,
+    number,
+    number,
+];
+
+const ORDERING_VIEWS: ViewsType = {
+    layout: [2, 2] as [number, number],
+    viewports: [
+        {
+            id: "ortho-unordered",
+            viewType: OrthographicView,
+            layerIds: ["axes-ordering", "ordering-2d-layer"],
+        },
+        {
+            id: "ortho-ordered",
+            viewType: OrthographicView,
+            layerIds: ["axes-ordering", "ordering-3d-layer"],
+        },
+        {
+            id: "section-unordered",
+            viewType: SectionView,
+            layerIds: ["axes-ordering", "ordering-2d-layer"],
+        },
+        {
+            id: "section-ordered",
+            viewType: SectionView,
+            layerIds: ["axes-ordering", "ordering-3d-layer"],
+        },
+    ],
+};
+
+export const PolylineOrdering: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "polyline-ordering",
+        layers: [
+            new Axes2DLayer({ id: "axes-ordering" }),
+            new PolylineGroupLayer({
+                id: "ordering-2d-layer",
+                name: "Unordered polylines (2D coordinates)",
+                data: ORDERING_DATA_2D,
+                pickable: true,
+                widthUnits: "pixels",
+                ZIncreasingDownwards: true,
+            }),
+            new PolylineGroupLayer({
+                id: "ordering-3d-layer",
+                name: "Ordered polylines (3D coordinates)",
+                data: ORDERING_DATA_3D,
+                pickable: true,
+                widthUnits: "pixels",
+                ZIncreasingDownwards: true,
+            }),
+        ],
+        bounds: ORDERING_BOUNDS,
+        views: ORDERING_VIEWS,
+    },
+    parameters: storyDocs(
+        [
+            "Demonstrates front-to-back ordering of overlapping polylines.",
+            "Three line groups — **Red**, **Green**, **Blue** — all cross at (5, 5).",
+            "",
+            "**Left column — unordered:** 2-D coordinates `[x, y]`, no Z component.",
+            "All paths share the same implicit depth (0), so deck.gl uses data order",
+            "to resolve overlaps: **Blue** (listed last) is painted on top at every",
+            "intersection, regardless of intent.",
+            "",
+            "**Right column — ordered:** 3-D coordinates `[x, y, z]`.",
+            "`ZIncreasingDownwards: true` maps z = 0 to the front and larger z away",
+            "from the viewer. Red is z = 0 (front), Green z = 2, Blue z = 4 (back).",
+            "**Red** wins every intersection via the depth test, independent of data order.",
+            "",
+            "**Top row** — OrthographicView (plan / top-down view).",
+            "**Bottom row** — SectionView (cross-section; y = depth increasing downward).",
+            "In the section views Red reads as a dipping horizon, Green as an anti-dip",
+            "horizon, and Blue as a flat horizon at mid-depth.",
+            "The ordering behaviour is identical in both view types.",
+        ].join(" ")
+    ),
+    render: (args) => (
+        <AnnotationRoot>
+            <SubsurfaceViewer {...args}>
+                {annotateView(
+                    "ortho-unordered",
+                    <>
+                        <h2 className={annotationClasses.annotation}>
+                            Orthographic — unordered (2D)
+                        </h2>
+                        <p className={annotationClasses.annotation}>
+                            Blue paints last → appears on top
+                        </p>
+                    </>
+                )}
+                {annotateView(
+                    "ortho-ordered",
+                    <>
+                        <h2 className={annotationClasses.annotation}>
+                            Orthographic — ordered (3D z)
+                        </h2>
+                        <p className={annotationClasses.annotation}>
+                            Red z=0 → wins depth test
+                        </p>
+                    </>
+                )}
+                {annotateView(
+                    "section-unordered",
+                    <>
+                        <h2 className={annotationClasses.annotation}>
+                            Section — unordered (2D)
+                        </h2>
+                        <p className={annotationClasses.annotation}>
+                            Blue paints last → appears on top
+                        </p>
+                    </>
+                )}
+                {annotateView(
+                    "section-ordered",
+                    <>
+                        <h2 className={annotationClasses.annotation}>
+                            Section — ordered (3D z)
+                        </h2>
+                        <p className={annotationClasses.annotation}>
+                            Red z=0 → wins depth test
+                        </p>
+                    </>
+                )}
+            </SubsurfaceViewer>
+        </AnnotationRoot>
+    ),
+};
