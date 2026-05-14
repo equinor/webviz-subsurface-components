@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from "@storybook/react";
 import React from "react";
 
 import { OrbitView, OrthographicView } from "@deck.gl/core";
-import { fireEvent, userEvent } from "@storybook/test";
 import { AxesLayer, WellsLayer } from "../../layers";
 import type { WellLabelLayerProps } from "../../layers/wells/layers/wellLabelLayer";
 import {
@@ -25,6 +24,7 @@ import {
     getSyntheticWells,
     useSyntheticWellCollection,
 } from "../util/wellSynthesis";
+import { Play } from "../util/play";
 
 type WellCount = { wellCount: number };
 
@@ -171,30 +171,18 @@ export const WellLabelPicking: StoryObj<typeof SubsurfaceViewer> = {
         return <SubsurfaceViewer {...propsWithLayers} />;
     },
     play: async () => {
-        const delay = 500;
-        const canvas = document.querySelector("canvas");
-
-        if (canvas) {
-            await userEvent.click(canvas, { delay });
-        }
+        const canvas = await Play.activateCanvas();
 
         if (!canvas) {
             return;
         }
 
         const leftViewCenterPosition = {
-            x: canvas.clientLeft + canvas.clientWidth / 2,
-            y: canvas.clientTop + canvas.clientHeight / 2,
+            clientX: canvas.clientLeft + canvas.clientWidth / 2,
+            clientY: canvas.clientTop + canvas.clientHeight / 2,
         };
 
-        await userEvent.hover(canvas, { delay });
-
-        await fireEvent.mouseMove(canvas, { clientX: 0, clientY: 0, delay });
-        await fireEvent.mouseMove(canvas, {
-            clientX: leftViewCenterPosition.x,
-            clientY: leftViewCenterPosition.y,
-            delay,
-        });
+        await Play.pick(canvas, leftViewCenterPosition);
     },
 };
 

@@ -2,7 +2,6 @@ import type { Position } from "@deck.gl/core";
 import { OrbitView, OrthographicView, View } from "@deck.gl/core";
 import { PolygonLayer } from "@deck.gl/layers";
 import type { Meta, StoryObj } from "@storybook/react";
-import { fireEvent, userEvent } from "@storybook/test";
 import React from "react";
 import { SectionView } from "../../views/sectionView";
 
@@ -26,6 +25,7 @@ import {
 import { getRgba } from "../util/color";
 import { useSyntheticWellCollection } from "../util/wellSynthesis";
 import type { BoundingBox2D, Point2D } from "../../utils";
+import { Play } from "../util/play";
 
 const STORIES: Meta = {
     component: SubsurfaceViewer,
@@ -285,7 +285,8 @@ export const PickablePolylines: StoryObj<typeof SubsurfaceViewer> = {
         "Pickable polylines. Hover over a line to see its group name, polyline id, and depth in the info card."
     ),
     play: async () => {
-        const canvas = document.querySelector("canvas");
+        const canvas = await Play.activateCanvas();
+
         if (!canvas) {
             return;
         }
@@ -295,17 +296,11 @@ export const PickablePolylines: StoryObj<typeof SubsurfaceViewer> = {
         // midpoint of polyline a-2.  Moving to 3/4 of the canvas width places
         // the cursor at the centre of that viewport.
         const pickPosition = {
-            x: canvas.clientLeft + (canvas.clientWidth * 3) / 4,
-            y: canvas.clientTop + canvas.clientHeight / 2,
+            clientX: canvas.clientLeft + (canvas.clientWidth * 3) / 4,
+            clientY: canvas.clientTop + canvas.clientHeight / 2,
         };
 
-        await userEvent.click(canvas, { delay: 200 });
-        await userEvent.hover(canvas, { delay: 200 });
-        await fireEvent.mouseMove(canvas, { clientX: 0, clientY: 0 });
-        await fireEvent.mouseMove(canvas, {
-            clientX: pickPosition.x,
-            clientY: pickPosition.y,
-        });
+        await Play.pick(canvas, pickPosition);
     },
     render: (args) => (
         <AnnotationRoot>
