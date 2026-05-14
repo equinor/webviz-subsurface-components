@@ -2084,8 +2084,6 @@ const DT_POLYLINE_DATA: PolylineGroup[] = [
     },
 ];
 
-const DT_BOUNDS: BoundingBox2D = [0, 0, DT_WORLD_MAX, DT_WORLD_MAX];
-
 // MapLayer in JSON format (no import needed; registered in SubsurfaceViewer's
 // layer catalogue via CustomLayers).
 const DT_HORIZON_LAYER = {
@@ -2118,8 +2116,17 @@ const DT_HORIZON_LAYER = {
 };
 
 const DT_VIEWS: ViewsType = {
-    layout: [1, 2],
+    layout: [1, 3],
     viewports: [
+        // OrbitView MUST be first: buildViewStates processes viewports in order
+        // and mutates the shared scaledCamera object. Putting the 3D view first
+        // ensures target / zoom are computed from the 3D bounding box; the two
+        // OrthographicViews then reuse those values unchanged.
+        {
+            id: "dt-3d",
+            viewType: OrbitView,
+            layerIds: ["dt-horizon", "dt-polyline-on"],
+        },
         {
             id: "dt-off",
             viewType: OrthographicView,
@@ -2158,7 +2165,6 @@ export const DepthTestVsHorizon: StoryObj<typeof SubsurfaceViewer> = {
                 depthTest: true,
             }),
         ],
-        bounds: DT_BOUNDS,
         views: DT_VIEWS,
     },
     parameters: storyDocs(
@@ -2169,7 +2175,10 @@ export const DepthTestVsHorizon: StoryObj<typeof SubsurfaceViewer> = {
             "The yellow polyline runs horizontally through the grid centre at z = 5.",
             "A contour ring at z = 5 marks the exact depth-test boundary on the surface.",
             "",
-            "**Left — `depthTest: false`:** the polyline ignores the depth buffer and is always",
+            "**Left — 3D view (`depthTest: true`):** the same scene in an OrbitView,",
+            "showing the bump geometry and the polyline intersection in three dimensions.",
+            "",
+            "**Centre — `depthTest: false`:** the polyline ignores the depth buffer and is always",
             "painted on top, crossing the full width of the surface.",
             "",
             "**Right — `depthTest: true`:** the depth values written by the MapLayer are",
@@ -2181,6 +2190,17 @@ export const DepthTestVsHorizon: StoryObj<typeof SubsurfaceViewer> = {
     render: (args) => (
         <AnnotationRoot>
             <SubsurfaceViewer {...args}>
+                {annotateView(
+                    "dt-3d",
+                    <>
+                        <h2 className={annotationClasses.annotation}>
+                            3D view (depthTest: true)
+                        </h2>
+                        <p className={annotationClasses.annotation}>
+                            Orbit to see the bump geometry
+                        </p>
+                    </>
+                )}
                 {annotateView(
                     "dt-off",
                     <>
