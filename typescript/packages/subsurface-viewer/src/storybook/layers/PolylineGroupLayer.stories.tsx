@@ -6,7 +6,7 @@ import React from "react";
 import { SectionView } from "../../views/sectionView";
 
 import type { ViewStateType } from "../../components/Map";
-import { Axes2DLayer } from "../../layers";
+import { Axes2DLayer, MapLayer } from "../../layers";
 import AxesLayer from "../../layers/axes/axesLayer";
 import type {
     BinaryPolylines,
@@ -114,6 +114,9 @@ const DUAL_VIEWS: ViewsType = {
 
 // Two viewports for the section-path story: 3D OrbitView on the left,
 // SectionView on the right.
+// No global bounds — the 3D view auto-fits from dataBoundingBox3d with the
+// default rotationX:45 (a natural side-angled view). The section view centres
+// explicitly on the abscissa/depth geometry.
 const SECTION_VIEWS: ViewsType = {
     layout: [1, 2] as [number, number],
     viewports: [
@@ -126,6 +129,10 @@ const SECTION_VIEWS: ViewsType = {
             id: "view_section",
             viewType: SectionView,
             layerIds: ["axes-2d-section", "section-layer"],
+            // Centre on the section content: abscissa mid-point (12) and
+            // depth mid-point (5). Zoom fits the ~26×12 abscissa/depth extent.
+            target: [12, -5] as [number, number],
+            zoom: 4.5,
         },
     ],
 };
@@ -549,9 +556,6 @@ const SECTION_PATH: Point2D[] = [
     [12, 12],
 ];
 
-// Stable bounds in abscissa/depth space: x = [0, 24], y = [0, 10]
-const SECTION_BOUNDS = [-1, -1, 25, 11] as [number, number, number, number];
-
 const SECTION_GROUPS: PolylineGroup[] = [
     {
         id: "horizon-a",
@@ -637,7 +641,6 @@ export const SectionViewRendering: StoryObj<typeof SubsurfaceViewer> = {
                 ZIncreasingDownwards: true,
             }),
         ],
-        bounds: SECTION_BOUNDS,
         views: SECTION_VIEWS,
     },
     parameters: storyDocs(
@@ -2084,10 +2087,7 @@ const DT_POLYLINE_DATA: PolylineGroup[] = [
     },
 ];
 
-// MapLayer in JSON format (no import needed; registered in SubsurfaceViewer's
-// layer catalogue via CustomLayers).
-const DT_HORIZON_LAYER = {
-    "@@type": "MapLayer",
+const DT_HORIZON_LAYER = new MapLayer({
     id: "dt-horizon",
     frame: {
         origin: [0, 0],
@@ -2113,7 +2113,7 @@ const DT_HORIZON_LAYER = {
     // one ring appears.
     contours: [5, 100],
     isContoursDepth: true,
-};
+});
 
 const DT_VIEWS: ViewsType = {
     layout: [1, 3],
