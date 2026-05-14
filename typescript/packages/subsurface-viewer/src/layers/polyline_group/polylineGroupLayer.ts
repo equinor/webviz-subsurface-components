@@ -7,6 +7,7 @@ import type {
 import { CompositeLayer } from "@deck.gl/core";
 import { DataFilterExtension, PathStyleExtension } from "@deck.gl/extensions";
 import { PathLayer } from "@deck.gl/layers";
+import type { PathLayerProps } from "@deck.gl/layers";
 import { isEqual } from "lodash";
 
 import type { Position } from "@deck.gl/core";
@@ -82,7 +83,19 @@ export type PolylineGroup = {
  * 4. `PolylineGroup` field (`color` / `width` / `dashArray`)
  * 5. layer default (`defaultGroupColor` / `defaultGroupWidth` / `defaultGroupDashArray`)
  */
-export interface PolylineGroupLayerProps extends ExtendedLayerProps {
+export interface PolylineGroupLayerProps
+    extends ExtendedLayerProps,
+        Pick<
+            PathLayerProps,
+            | "widthUnits"
+            | "widthScale"
+            | "widthMinPixels"
+            | "widthMaxPixels"
+            | "jointRounded"
+            | "capRounded"
+            | "miterLimit"
+            | "billboard"
+        > {
     /**
      * Array of polyline groups. Each group holds a set of polylines and
      * optional group-level color/width defaults.
@@ -143,24 +156,10 @@ export interface PolylineGroupLayerProps extends ExtendedLayerProps {
     /** Fallback line width used when no group or polyline width is resolved. Default: `2`. */
     defaultGroupWidth?: number;
 
-    // -- Width / rendering controls ------------------------------------------
-
-    /** Unit system for line widths: `"meters"` (world units), `"common"` (deck.gl common space), or `"pixels"`. Default: `"meters"`. */
-    widthUnits?: "meters" | "common" | "pixels";
-    /** Multiplier applied to every resolved line width before rendering. Default: `1`. */
-    widthScale?: number;
-    /** Minimum on-screen line width in pixels, regardless of zoom level. Default: `0`. */
-    widthMinPixels?: number;
-    /** Maximum on-screen line width in pixels, regardless of zoom level. Default: `Number.MAX_SAFE_INTEGER`. */
-    widthMaxPixels?: number;
-    /** Use rounded joints between path segments. Default: `false`. */
-    jointRounded?: boolean;
-    /** Use rounded caps at path endpoints. Default: `false`. */
-    capRounded?: boolean;
-    /** Miter limit for sharp joints; joints exceeding this limit are bevelled. Default: `4`. */
-    miterLimit?: number;
-    /** If `true`, each path segment always faces the camera (billboard mode). Default: `true`. */
-    billboard?: boolean;
+    // -- Width / rendering controls — inherited from PathLayerProps ----------
+    // widthUnits, widthScale, widthMinPixels, widthMaxPixels,
+    // jointRounded, capRounded, miterLimit, billboard
+    // Note: `billboard` defaults to `true` here; PathLayer's own default is `false`.
 
     // -- Depth ---------------------------------------------------------------
 
