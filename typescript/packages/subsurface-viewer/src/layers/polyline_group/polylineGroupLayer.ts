@@ -72,6 +72,16 @@ export type PolylineGroup = {
 // Layer props
 // ---------------------------------------------------------------------------
 
+/**
+ * Props accepted by {@link PolylineGroupLayer}.
+ *
+ * Styling is resolved through a cascade for each rendered path:
+ * 1. polyline-level accessor (`getPolylineColor` / `getPolylineWidth` / `getPolylineDashArray`)
+ * 2. `Polyline` field (`color` / `width` / `dashArray`)
+ * 3. group-level accessor (`getGroupColor` / `getGroupWidth` / `getGroupDashArray`)
+ * 4. `PolylineGroup` field (`color` / `width` / `dashArray`)
+ * 5. layer default (`defaultGroupColor` / `defaultGroupWidth` / `defaultGroupDashArray`)
+ */
 export interface PolylineGroupLayerProps extends ExtendedLayerProps {
     /**
      * Array of polyline groups. Each group holds a set of polylines and
@@ -81,15 +91,35 @@ export interface PolylineGroupLayerProps extends ExtendedLayerProps {
 
     // -- Group-level accessors -----------------------------------------------
 
+    /**
+     * Return an explicit color for all polylines in `group`.
+     * Takes precedence over `PolylineGroup.color`.
+     * Return `null` or `undefined` to fall through to the field value.
+     */
     getGroupColor?: (group: PolylineGroup) => Color | null | undefined;
+    /**
+     * Return an explicit width for all polylines in `group`.
+     * Takes precedence over `PolylineGroup.width`.
+     * Return `null` or `undefined` to fall through to the field value.
+     */
     getGroupWidth?: (group: PolylineGroup) => number | null | undefined;
 
     // -- Polyline-level overrides --------------------------------------------
 
+    /**
+     * Return an explicit color for an individual `polyline`.
+     * Takes precedence over the polyline's own `color` field and the group accessor.
+     * Return `null` or `undefined` to continue down the cascade.
+     */
     getPolylineColor?: (
         polyline: Polyline,
         group: PolylineGroup
     ) => Color | null | undefined;
+    /**
+     * Return an explicit width for an individual `polyline`.
+     * Takes precedence over the polyline's own `width` field and the group accessor.
+     * Return `null` or `undefined` to continue down the cascade.
+     */
     getPolylineWidth?: (
         polyline: Polyline,
         group: PolylineGroup
@@ -108,19 +138,28 @@ export interface PolylineGroupLayerProps extends ExtendedLayerProps {
 
     // -- Fallback defaults ---------------------------------------------------
 
+    /** Fallback color used when no group or polyline color is resolved. Default: `[0, 128, 255, 255]`. */
     defaultGroupColor?: Color;
+    /** Fallback line width used when no group or polyline width is resolved. Default: `2`. */
     defaultGroupWidth?: number;
 
     // -- Width / rendering controls ------------------------------------------
 
+    /** Unit system for line widths: `"meters"` (world units), `"common"` (deck.gl common space), or `"pixels"`. Default: `"meters"`. */
     widthUnits?: "meters" | "common" | "pixels";
+    /** Multiplier applied to every resolved line width before rendering. Default: `1`. */
     widthScale?: number;
+    /** Minimum on-screen line width in pixels, regardless of zoom level. Default: `0`. */
     widthMinPixels?: number;
+    /** Maximum on-screen line width in pixels, regardless of zoom level. Default: `Number.MAX_SAFE_INTEGER`. */
     widthMaxPixels?: number;
+    /** Use rounded joints between path segments. Default: `false`. */
     jointRounded?: boolean;
+    /** Use rounded caps at path endpoints. Default: `false`. */
     capRounded?: boolean;
+    /** Miter limit for sharp joints; joints exceeding this limit are bevelled. Default: `4`. */
     miterLimit?: number;
-    /** If true, the path always faces the camera. Default: true. */
+    /** If `true`, each path segment always faces the camera (billboard mode). Default: `true`. */
     billboard?: boolean;
 
     // -- Depth ---------------------------------------------------------------
@@ -151,9 +190,19 @@ export interface PolylineGroupLayerProps extends ExtendedLayerProps {
 
     // -- Dash style ----------------------------------------------------------
 
+    /**
+     * Return a `[dashLength, gapLength]` dash pattern for all polylines in `group`.
+     * Providing this accessor (even for some groups) activates `PathStyleExtension`
+     * for the entire layer. Return `null` or `undefined` to fall through to the field value.
+     */
     getGroupDashArray?: (
         group: PolylineGroup
     ) => [number, number] | null | undefined;
+    /**
+     * Return a `[dashLength, gapLength]` dash pattern for an individual `polyline`,
+     * overriding the group-level pattern.
+     * Return `null` or `undefined` to continue down the cascade.
+     */
     getPolylineDashArray?: (
         polyline: Polyline,
         group: PolylineGroup
@@ -502,7 +551,47 @@ function projectAbscissa(
 // Layer class
 // ---------------------------------------------------------------------------
 
+/**
+ * A deck.gl {@link CompositeLayer} that renders collections of polylines
+ * organised into named groups.
+ *
+ * **Data formats**
+ *
+ * Each {@link PolylineGroup} holds one or more polylines. Two formats are
+ * supported for `PolylineGroup.polylines`:
+ * - `Polyline[]` — per-object format; supports `id`, and per-polyline `color`,
+ *   `width`, and `dashArray` overrides.
+ * - {@link BinaryPolylines} — flat typed-array format; more efficient for
+ *   large datasets loaded from binary sources. Group-level styling only.
+ *
+ * **Discontinuous polylines**
+ *
+ * A `Polyline.path` may be a nested {@link PolylineGroup}, making one logical
+ * polyline consist of disjoint segments (e.g. a seismic horizon cut by faults).
+ * All segments share the root `Polyline.id` for picking and visibility filtering.
+ *
+ * **Styling cascade**
+ *
+ * Color, width, and dash pattern are resolved per-path in this order:
+ * polyline accessor → `Polyline` field → group accessor → `PolylineGroup` field
+ * → layer default prop.
+ *
+ * **Section-view projection**
+ *
+ * When {@link PolylineGroupLayerProps.sectionPath} is provided, path coordinates
+ * are interpreted as `[abscissa, depth]`. The layer renders two sub-layers:
+ * one in abscissa/depth space for {@link SectionViewport}s, and one with
+ * abscissa values projected back to world XY for 3-D viewports.
+ *
+ * **GPU-side visibility**
+ *
+ * {@link PolylineGroupLayerProps.hiddenGroups} and
+ * {@link PolylineGroupLayerProps.hiddenPolylines} use `DataFilterExtension`.
+ * Changing these sets triggers only a GPU attribute update; the flattened
+ * data buffer is never rebuilt.
+ */
 export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> {
+    /** @override Builds the initial flat data buffer and section index from `props.data`. */
     initializeState(): void {
         const { data, sectionPath } = this.props;
         this.setState({
@@ -511,7 +600,12 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
         });
     }
 
-    updateState({
+    /**
+     * @override
+     * Rebuilds the flat data buffer when `data` or any accessor/default prop changes.
+     * Rebuilds the section index when `sectionPath` changes.
+     */
+    override updateState({
         props,
         oldProps,
     }: UpdateParameters<PolylineGroupLayer>): void {
@@ -539,14 +633,28 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
         }
     }
 
-    filterSubLayer({ layer, viewport }: FilterContext): boolean {
+    /**
+     * @override
+     * Routes the `paths-section` sub-layer to {@link SectionViewport}s and
+     * the `paths-3d` sub-layer to all other viewports.
+     * Only active when `sectionPath` is set; otherwise the single `paths` sub-layer
+     * is always visible.
+     */
+    override filterSubLayer({ layer, viewport }: FilterContext): boolean {
         const isSV = viewport.constructor === SectionViewport;
         if (layer.id.endsWith("-paths-section")) return isSV;
         if (layer.id.endsWith("-paths-3d")) return !isSV;
         return true;
     }
 
-    renderLayers(): PathLayer[] {
+    /**
+     * @override
+     * Returns one or two `PathLayer` sub-layers.
+     * - Without `sectionPath`: a single `paths` sub-layer.
+     * - With `sectionPath`: a `paths-section` sub-layer (abscissa/depth space)
+     *   and a `paths-3d` sub-layer (world XY space), routed by {@link filterSubLayer}.
+     */
+    override renderLayers(): PathLayer[] {
         const flatData = this.state["flatData"] as FlatEntry[];
         const sectionIndex = this.state["sectionIndex"] as SectionIndex | null;
         const {
@@ -679,7 +787,13 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
         ];
     }
 
-    getPickingInfo({ info }: { info: PickingInfo }): LayerPickInfo {
+    /**
+     * @override
+     * Enriches the pick result with the originating {@link PolylineGroup} (`info.group`),
+     * the root {@link Polyline} (`info.object`), and layer properties for display
+     * (group name, polyline id, depth at the picked coordinate).
+     */
+    override getPickingInfo({ info }: { info: PickingInfo }): LayerPickInfo {
         if (!info.object) return info;
 
         const entry = info.object as FlatEntry;
