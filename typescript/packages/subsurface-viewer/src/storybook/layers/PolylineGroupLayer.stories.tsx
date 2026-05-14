@@ -2,6 +2,7 @@ import type { Position } from "@deck.gl/core";
 import { OrbitView, OrthographicView, View } from "@deck.gl/core";
 import { PolygonLayer } from "@deck.gl/layers";
 import type { Meta, StoryObj } from "@storybook/react";
+import { fireEvent, userEvent } from "@storybook/test";
 import React from "react";
 import { SectionView } from "../../views/sectionView";
 
@@ -226,6 +227,23 @@ function mkDash(
 // Story 1: Pickable with group/polyline info in tooltip
 // ---------------------------------------------------------------------------
 
+// Views for the Pickable story. The 2D (right) viewport is centred on
+// polyline a-2 (Group A, y = 3) so that the automated play function can
+// reliably pick the centre of that viewport.
+const PICKABLE_VIEWS: ViewsType = {
+    layout: [1, 2] as [number, number],
+    viewports: [
+        { id: "view_3d", viewType: OrbitView },
+        {
+            id: "view_2d",
+            viewType: OrthographicView,
+            // Centre on the midpoint of polyline a-2: x = 5, y = 3.
+            target: [5, 3] as [number, number],
+            zoom: 5,
+        },
+    ],
+};
+
 const PICKABLE_LAYER = new PolylineGroupLayer({
     id: "pickable-layer",
     name: "Pickable Groups",
@@ -234,7 +252,7 @@ const PICKABLE_LAYER = new PolylineGroupLayer({
             id: "group-a",
             name: "Group A",
             color: [255, 140, 0, 255],
-            width: 4,
+            width: 10,
             polylines: GROUP_A_PATHS.map((path, i) => ({
                 id: `a-${i + 1}`,
                 path,
@@ -244,7 +262,7 @@ const PICKABLE_LAYER = new PolylineGroupLayer({
             id: "group-b",
             name: "Group B",
             color: [160, 32, 240, 255],
-            width: 4,
+            width: 10,
             polylines: GROUP_B_PATHS.map((path, i) => ({
                 id: `b-${i + 1}`,
                 path,
@@ -261,12 +279,34 @@ export const PickablePolylines: StoryObj<typeof SubsurfaceViewer> = {
         id: "polyline-group-pickable",
         pickingRadius: 8,
         layers: [GROUP_STYLING_AXES_LAYER, PICKABLE_LAYER],
-        bounds: GROUP_STYLING_BOUNDS,
-        views: DUAL_VIEWS,
+        views: PICKABLE_VIEWS,
     },
     parameters: storyDocs(
         "Pickable polylines. Hover over a line to see its group name, polyline id, and depth in the info card."
     ),
+    play: async () => {
+        const canvas = document.querySelector("canvas");
+        if (!canvas) {
+            return;
+        }
+
+        // DUAL_VIEWS layout [1, 2]: the 2D OrthographicView occupies the right
+        // half of the story canvas, centred at world position (5, 3) — the
+        // midpoint of polyline a-2.  Moving to 3/4 of the canvas width places
+        // the cursor at the centre of that viewport.
+        const pickPosition = {
+            x: canvas.clientLeft + (canvas.clientWidth * 3) / 4,
+            y: canvas.clientTop + canvas.clientHeight / 2,
+        };
+
+        await userEvent.click(canvas, { delay: 200 });
+        await userEvent.hover(canvas, { delay: 200 });
+        await fireEvent.mouseMove(canvas, { clientX: 0, clientY: 0 });
+        await fireEvent.mouseMove(canvas, {
+            clientX: pickPosition.x,
+            clientY: pickPosition.y,
+        });
+    },
     render: (args) => (
         <AnnotationRoot>
             <SubsurfaceViewer {...args}>
