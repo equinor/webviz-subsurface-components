@@ -9,6 +9,7 @@ import {
     createMathWithSeed,
     replaceNonJsonArgs,
 } from "../sharedHelperFunctions";
+import { OrbitView } from "@deck.gl/core";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
@@ -45,13 +46,46 @@ const smallPolylinesLayer = {
     id: "small_polylines_layer",
     /* eslint-disable */
     polylinePoints: [
-        0, 0, 0, 10, 0, 0, 10, 0, 10, -5, -5, 4, 0, -8, 6, 5, 10, 8,
+        0, 0, 0, 
+        10, 0, 0, 
+        10, 0, 10, 
+        -5, -5, 4, 
+        0, -8, 6, 
+        5, 10, 8,
+        3, 1, 2, 
+        15, 8, 10,
     ],
     /* eslint-enable */
-    startIndices: [0, 3],
+    startIndices: [0, 3, 6],
     polylinesClosed: [true, false],
-    color: [0, 200, 100],
+    color: [
+        [255, 0, 0],
+        [0, 255, 0],
+        [0, 0, 255],
+    ],
 
+    widthUnits: "pixels",
+    linesWidth: 10,
+    ZIncreasingDownwards: true,
+};
+
+const smallPolylinesLayerSingleColor = {
+    "@@type": "PolylinesLayer",
+    id: "small_polylines_layer_single_color",
+    /* eslint-disable */
+    polylinePoints: [
+        0, 0, 0, 
+        10, 0, 0, 
+        10, 0, 10, 
+        -5, -5, 4, 
+        0, -8, 6, 
+        5, 10, 8,
+        3, 1, 2, 
+        15, 8, 10,
+    ],
+    startIndices: [0, 3, 6],
+    polylinesClosed: [true, false],
+    color: [255, 0, 0],
     widthUnits: "pixels",
     linesWidth: 10,
     ZIncreasingDownwards: true,
@@ -66,9 +100,27 @@ const smallAxesLayer = {
 export const SmallPolylinesLayer: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "small-polylines",
-        layers: [smallAxesLayer, smallPolylinesLayer],
+        layers: [smallAxesLayer, smallPolylinesLayer, smallPolylinesLayerSingleColor],
         bounds: [-10, -10, 17, 10],
-        views: default3DViews,
+        views: {
+            layout: [1, 2],
+            showLabel: true,
+            viewports: [
+                {
+                    id: "view_1",
+                    layerIds: [smallAxesLayer.id, smallPolylinesLayer.id],
+                    viewType: OrbitView,
+                },
+                {
+                    id: "view_2",
+                    layerIds: [
+                        smallAxesLayer.id,
+                        smallPolylinesLayerSingleColor.id,
+                    ],
+                    viewType: OrbitView,
+                },
+            ],
+        },
     },
     parameters: {
         docs: {
