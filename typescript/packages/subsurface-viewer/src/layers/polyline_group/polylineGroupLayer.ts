@@ -176,14 +176,21 @@ export interface PolylineGroupLayerProps
     /**
      * Set of group ids to hide. Groups not in the set remain visible.
      * Uses GPU-side filtering — no re-flatten required when changed.
+     *
+     * @remarks Group ids can be defined using string or number. The set can
+     * contain a mix of both, but the type of ids in the set should match the
+     * type of `PolylineGroup.id` for correct filtering.
      */
-    // XXX: handle both string and number ids in the same set, or require a single type?
     hiddenGroups?: Set<string | number>;
 
     /**
      * Set of polyline ids to hide. Only applies to polylines defined via
      * the `Polyline[]` format (ids are unavailable in BinaryPolylines).
      * Uses GPU-side filtering — no re-flatten required when changed.
+     *
+     * @remarks Polyline ids can be defined using string or number. The set can
+     * contain a mix of both, but the type of ids in the set should match the
+     * type of `Polyline.id` for correct filtering.
      */
     hiddenPolylines?: Set<string | number>;
 
