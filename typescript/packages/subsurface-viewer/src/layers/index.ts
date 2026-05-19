@@ -36,7 +36,13 @@ export type { NorthArrow3DLayerProps } from "./northarrow/northArrow3DLayer";
 export type { PieChartLayerProps } from "./piechart/pieChartLayer";
 export type { PointsLayerProps } from "./points/pointsLayer";
 export type { PolylinesLayerProps } from "./polylines/polylinesLayer";
-export type { PolylineGroupLayerProps } from "./polyline_group/polylineGroupLayer";
+export type {
+    PolylineGroupLayerProps,
+    PolylineStyle,
+    Polyline,
+    PolylineGroup,
+    BinaryPolylines,
+} from "./polyline_group/polylineGroupLayer";
 export type { SeismicLayerProps } from "./seismic/seismicLayer";
 export type { TriangleLayerProps } from "./triangle/triangleLayer";
 export type { WellsLayerProps } from "./wells/wellsLayer";

@@ -24,7 +24,13 @@ import type { Point2D } from "../..";
 // Public data types
 // ---------------------------------------------------------------------------
 
-export type Polyline = {
+export type PolylineStyle = {
+    color?: Color;
+    width?: number;
+    dashArray?: [number, number];
+};
+
+export type Polyline = PolylineStyle & {
     id?: string | number;
     /**
      * The geometry of this polyline.
@@ -42,9 +48,6 @@ export type Polyline = {
      *   `BinaryPolylines` inside the sub-group is not supported; use `Polyline[]`.
      */
     path: Position[] | PolylineGroup;
-    color?: Color;
-    width?: number;
-    dashArray?: [number, number];
 };
 
 /**
@@ -59,12 +62,9 @@ export type BinaryPolylines = {
     startIndices: Uint32Array;
 };
 
-export type PolylineGroup = {
+export type PolylineGroup = PolylineStyle & {
     id?: string | number;
     name?: string;
-    color?: Color;
-    width?: number;
-    dashArray?: [number, number];
     polylines: Polyline[] | BinaryPolylines;
 };
 
@@ -177,6 +177,7 @@ export interface PolylineGroupLayerProps
      * Set of group ids to hide. Groups not in the set remain visible.
      * Uses GPU-side filtering — no re-flatten required when changed.
      */
+    // XXX: handle both string and number ids in the same set, or require a single type?
     hiddenGroups?: Set<string | number>;
 
     /**
