@@ -249,6 +249,27 @@ type FlatEntry = {
     _group: PolylineGroup;
 };
 
+/**
+ * Combined binary data for all groups using {@link BinaryPolylines}, rendered
+ * by a single PathLayer via its typed-array data path. Per-vertex attributes
+ * carry the group-level color and width (replicated per vertex). Dash style is
+ * not supported for binary groups.
+ *
+ * `pathGroup` maps each path index (used by picking) to its originating
+ * {@link PolylineGroup}. `vertexGroupIndex` maps each vertex to its group index
+ * within `groups`, used to rebuild the GPU filter buffer when `hiddenGroups`
+ * changes without re-flattening.
+ */
+type BinaryData = {
+    positions: Float32Array; // size 3 per vertex
+    startIndices: Uint32Array; // length = number of paths
+    colors: Uint8Array; // size 4 per vertex
+    widths: Float32Array; // size 1 per vertex
+    pathGroup: PolylineGroup[]; // length = number of paths
+    vertexGroupIndex: Uint32Array; // size 1 per vertex
+    groups: PolylineGroup[];
+};
+
 // ---------------------------------------------------------------------------
 // Default props
 // ---------------------------------------------------------------------------
@@ -338,17 +359,6 @@ function resolveGroupWidth(
         group.width ??
         props.defaultGroupWidth ??
         2
-    );
-}
-
-function resolveGroupDashArray(
-    group: PolylineGroup,
-    props: PolylineGroupLayerProps
-): [number, number] {
-    return (
-        props.getGroupDashArray?.(group) ??
-        group.dashArray ??
-        props.defaultGroupDashArray ?? [0, 0]
     );
 }
 
@@ -453,49 +463,51 @@ function flattenSubGroupPolyline(
 function flattenGroupData(
     data: PolylineGroup[],
     props: PolylineGroupLayerProps
-): FlatEntry[] {
+): { flatData: FlatEntry[]; binaryData: BinaryData | null } {
     const getPolylines =
         props.getGroupPolylines ??
         ((g: PolylineGroup): Polyline[] | BinaryPolylines => g.polylines);
     const getPath =
         props.getPolylinePath ?? ((p: Polyline) => p.path as Position[]);
-    const result: FlatEntry[] = [];
+    const flatData: FlatEntry[] = [];
+
+    const ZIncreasingDownwards = props.ZIncreasingDownwards ?? true;
+
+    // First pass over binary groups: collect groups + sum sizes so we can
+    // allocate combined typed arrays once.
+    const binaryRaw: {
+        group: PolylineGroup;
+        polylines: BinaryPolylines;
+        color: Color;
+        width: number;
+    }[] = [];
+    let totalVerts = 0;
+    let totalPaths = 0;
 
     for (const group of data) {
         const polylines = getPolylines(group);
 
         if (isBinaryPolylines(polylines)) {
-            const { positions, startIndices } = polylines;
-            const color = resolveGroupColor(group, props);
-            const width = resolveGroupWidth(group, props);
-            const dashArray = resolveGroupDashArray(group, props);
-            for (let i = 0; i < startIndices.length; i++) {
-                const start = startIndices[i];
-                const end =
-                    i + 1 < startIndices.length
-                        ? startIndices[i + 1]
-                        : positions.length / 3;
-                const path: Position[] = [];
-                for (let v = start; v < end; v++) {
-                    path.push([
-                        positions[v * 3],
-                        positions[v * 3 + 1],
-                        positions[v * 3 + 2],
-                    ]);
-                }
-                result.push({
-                    path,
-                    color,
-                    width,
-                    dashArray,
-                    _polyline: undefined,
-                    _group: group,
-                });
+            if (
+                group.dashArray != null ||
+                props.getGroupDashArray?.(group) != null
+            ) {
+                console.warn(
+                    "PolylineGroupLayer: dashArray is not supported on BinaryPolylines groups; ignoring."
+                );
             }
+            binaryRaw.push({
+                group,
+                polylines,
+                color: resolveGroupColor(group, props),
+                width: resolveGroupWidth(group, props),
+            });
+            totalVerts += polylines.positions.length / 3;
+            totalPaths += polylines.startIndices.length;
         } else {
             for (const polyline of polylines) {
                 if (!Array.isArray(polyline.path)) {
-                    result.push(
+                    flatData.push(
                         ...flattenSubGroupPolyline(
                             polyline,
                             polyline.path,
@@ -505,7 +517,7 @@ function flattenGroupData(
                         )
                     );
                 } else {
-                    result.push({
+                    flatData.push({
                         path: getPath(polyline, group),
                         color: resolveColor(polyline, group, props),
                         width: resolveWidth(polyline, group, props),
@@ -517,7 +529,80 @@ function flattenGroupData(
             }
         }
     }
-    return result;
+
+    if (binaryRaw.length === 0) {
+        return { flatData, binaryData: null };
+    }
+
+    // Second pass: build combined typed-array buffers. Positions and indices
+    // are concatenated; color/width are replicated per vertex (uniform within a
+    // group) so the GPU can read them directly without any per-vertex JS work.
+    const positions = new Float32Array(totalVerts * 3);
+    const colors = new Uint8Array(totalVerts * 4);
+    const widths = new Float32Array(totalVerts);
+    const vertexGroupIndex = new Uint32Array(totalVerts);
+    const startIndices = new Uint32Array(totalPaths);
+    const pathGroup: PolylineGroup[] = new Array(totalPaths);
+    const groups: PolylineGroup[] = binaryRaw.map((b) => b.group);
+
+    let vOffset = 0; // running vertex offset
+    let pOffset = 0; // running path offset
+
+    for (let gIdx = 0; gIdx < binaryRaw.length; gIdx++) {
+        const { group, polylines, color, width } = binaryRaw[gIdx];
+        const src = polylines.positions;
+        const srcVerts = src.length / 3;
+
+        // Copy positions (optionally flipping Z) and replicate per-vertex
+        // attributes for this group.
+        const base = vOffset * 3;
+        if (ZIncreasingDownwards) {
+            for (let i = 0; i < src.length; i += 3) {
+                positions[base + i] = src[i];
+                positions[base + i + 1] = src[i + 1];
+                positions[base + i + 2] = -src[i + 2];
+            }
+        } else {
+            positions.set(src, base);
+        }
+
+        const r = color[0],
+            g = color[1],
+            b = color[2],
+            a = color[3] ?? 255;
+        for (let v = 0; v < srcVerts; v++) {
+            const vi = vOffset + v;
+            colors[vi * 4] = r;
+            colors[vi * 4 + 1] = g;
+            colors[vi * 4 + 2] = b;
+            colors[vi * 4 + 3] = a;
+            widths[vi] = width;
+            vertexGroupIndex[vi] = gIdx;
+        }
+
+        // Offset and copy startIndices into the combined buffer.
+        const srcIdx = polylines.startIndices;
+        for (let p = 0; p < srcIdx.length; p++) {
+            startIndices[pOffset + p] = srcIdx[p] + vOffset;
+            pathGroup[pOffset + p] = group;
+        }
+
+        vOffset += srcVerts;
+        pOffset += srcIdx.length;
+    }
+
+    return {
+        flatData,
+        binaryData: {
+            positions,
+            startIndices,
+            colors,
+            widths,
+            pathGroup,
+            vertexGroupIndex,
+            groups,
+        },
+    };
 }
 
 // ---------------------------------------------------------------------------
@@ -608,8 +693,10 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
     /** @override Builds the initial flat data buffer and section index from `props.data`. */
     initializeState(): void {
         const { data, sectionPath } = this.props;
+        const { flatData, binaryData } = flattenGroupData(data, this.props);
         this.setState({
-            flatData: flattenGroupData(data, this.props),
+            flatData,
+            binaryData,
             sectionIndex: sectionPath ? buildSectionIndex(sectionPath) : null,
         });
     }
@@ -639,7 +726,11 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
             props.ZIncreasingDownwards !== oldProps.ZIncreasingDownwards;
 
         if (needsRebuild) {
-            this.setState({ flatData: flattenGroupData(props.data, props) });
+            const { flatData, binaryData } = flattenGroupData(
+                props.data,
+                props
+            );
+            this.setState({ flatData, binaryData });
         }
         if (props.sectionPath !== oldProps.sectionPath) {
             this.setState({
@@ -666,13 +757,17 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
 
     /**
      * @override
-     * Returns one or two `PathLayer` sub-layers.
-     * - Without `sectionPath`: a single `paths` sub-layer.
+     * Returns one or more `PathLayer` sub-layers.
+     * - Without `sectionPath`: a single `paths` sub-layer for non-binary groups,
+     *   plus one `paths-binary-{i}` sub-layer per binary group (typed arrays
+     *   passed straight to the GPU).
      * - With `sectionPath`: a `paths-section` sub-layer (abscissa/depth space)
      *   and a `paths-3d` sub-layer (world XY space), routed by {@link filterSubLayer}.
+     *   Binary groups are not supported in section mode and are skipped with a warning.
      */
     override renderLayers(): PathLayer[] {
         const flatData = this.state["flatData"] as FlatEntry[];
+        const binaryData = this.state["binaryData"] as BinaryData | null;
         const sectionIndex = this.state["sectionIndex"] as SectionIndex | null;
         const {
             widthUnits,
@@ -694,12 +789,16 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
             highPrecisionDash,
         } = this.props;
 
+        // Dash style is not applied to binary groups (it is unsupported there);
+        // hasDash therefore reflects only the non-binary `paths` sub-layer.
         const hasDash =
             defaultGroupDashArray != null ||
             getGroupDashArray != null ||
-            getPolylineDashArray != null;
+            getPolylineDashArray != null ||
+            flatData.some((d) => d.dashArray[0] > 0);
 
-        // Shared sub-layer props for everything except getPath / updateTriggers.getPath
+        // Shared sub-layer props for the non-binary `paths` sub-layer (and the
+        // section-mode sub-layers).
         const sharedProps = {
             data: flatData,
             pickable,
@@ -747,7 +846,14 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
             getPath: [ZIncreasingDownwards],
         };
 
+        const layers: PathLayer[] = [];
+
         if (sectionIndex) {
+            if (binaryData) {
+                console.warn(
+                    "PolylineGroupLayer: BinaryPolylines are not supported when sectionPath is set; skipping binary groups."
+                );
+            }
             // Two separate sub-layers — one per coordinate system — so each has
             // its own GPU attribute buffer. filterSubLayer() routes each to the
             // appropriate viewport type (SectionViewport vs. 3D).
@@ -755,7 +861,7 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
                 ...updateTriggers,
                 getPath: [...updateTriggers.getPath, sectionIndex],
             };
-            return [
+            layers.push(
                 new PathLayer(
                     this.getSubLayerProps({
                         ...sharedProps,
@@ -783,25 +889,96 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
                             }),
                         updateTriggers: sectionUpdateTriggers,
                     })
-                ),
-            ];
+                )
+            );
+            return layers;
         }
 
-        return [
-            new PathLayer(
-                this.getSubLayerProps({
-                    ...sharedProps,
-                    id: "paths",
-                    getPath: (d: FlatEntry) => {
-                        if (!ZIncreasingDownwards) return d.path;
-                        return d.path.map(
-                            ([x, y, z]) => [x, y, -z] as Position
-                        );
-                    },
-                    updateTriggers,
-                })
-            ),
-        ];
+        if (flatData.length > 0) {
+            layers.push(
+                new PathLayer(
+                    this.getSubLayerProps({
+                        ...sharedProps,
+                        id: "paths",
+                        getPath: (d: FlatEntry) => {
+                            if (!ZIncreasingDownwards) return d.path;
+                            return d.path.map(
+                                ([x, y, z]) => [x, y, -z] as Position
+                            );
+                        },
+                        updateTriggers,
+                    })
+                )
+            );
+        }
+
+        if (binaryData) {
+            // Build the per-vertex filter buffer. Cheap to rebuild (one float
+            // per vertex) and only runs when `hiddenGroups` actually changes
+            // because of the updateTriggers reference.
+            const filterValues = new Float32Array(
+                binaryData.vertexGroupIndex.length
+            );
+            for (let i = 0; i < filterValues.length; i++) {
+                const g = binaryData.groups[binaryData.vertexGroupIndex[i]];
+                filterValues[i] =
+                    g.id != null && hiddenGroups?.has(g.id) ? 0 : 1;
+            }
+
+            // Single PathLayer for all binary groups, using deck.gl's native
+            // typed-array data path. Per-vertex color/width attributes are
+            // replicated from the group-level resolved values.
+            layers.push(
+                new PathLayer(
+                    this.getSubLayerProps({
+                        id: "paths-binary",
+                        pickable,
+                        billboard,
+                        widthUnits,
+                        widthScale,
+                        widthMinPixels,
+                        widthMaxPixels,
+                        jointRounded,
+                        capRounded,
+                        miterLimit,
+                        parameters: { depthTest },
+                        extensions: [
+                            new DataFilterExtension({ filterSize: 1 }),
+                        ],
+                        data: {
+                            length: binaryData.startIndices.length,
+                            startIndices: binaryData.startIndices,
+                            attributes: {
+                                getPath: {
+                                    value: binaryData.positions,
+                                    size: 3,
+                                },
+                                getColor: {
+                                    value: binaryData.colors,
+                                    size: 4,
+                                    normalized: true,
+                                },
+                                getWidth: {
+                                    value: binaryData.widths,
+                                    size: 1,
+                                },
+                                getFilterValue: {
+                                    value: filterValues,
+                                    size: 1,
+                                },
+                            },
+                        },
+                        _pathType: "open",
+                        filterRange: [1, 1] as [number, number],
+                        updateTriggers: {
+                            getFilterValue: [hiddenGroups],
+                        },
+                    })
+                )
+            );
+        }
+
+        return layers;
     }
 
     /**
@@ -811,19 +988,47 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
      * (group name, polyline id, depth at the picked coordinate).
      */
     override getPickingInfo({ info }: { info: PickingInfo }): LayerPickInfo {
-        if (!info.object) return info;
+        if (info.index < 0) return info;
 
-        const entry = info.object as FlatEntry;
+        // Resolve the source group/polyline. For Polyline[] groups the picked
+        // FlatEntry carries them directly. For BinaryPolylines the sub-layer id
+        // (`paths-binary-{i}`) is used to look up the source group; the polyline
+        // is unavailable.
+        let pickedGroup: PolylineGroup | undefined;
+        let pickedPolyline: Polyline | undefined;
+        let pickedSource: FlatEntry | PolylineGroup | undefined;
+
+        const entry = info.object as FlatEntry | undefined;
+        if (entry && entry._group) {
+            pickedGroup = entry._group;
+            pickedPolyline = entry._polyline;
+            pickedSource = entry;
+        } else {
+            const sourceId = (
+                info as PickingInfo & { sourceLayer?: { id: string } }
+            ).sourceLayer?.id;
+            if (sourceId?.endsWith("paths-binary")) {
+                const binaryData = this.state[
+                    "binaryData"
+                ] as BinaryData | null;
+                const group = binaryData?.pathGroup[info.index];
+                if (group) {
+                    pickedGroup = group;
+                    pickedSource = group;
+                }
+            }
+        }
+
+        if (!pickedSource) return info;
+
         const layerProperties: PropertyDataType[] = [];
 
-        if (entry._group?.name) {
-            layerProperties.push(
-                createPropertyData("Group", entry._group.name)
-            );
+        if (pickedGroup?.name) {
+            layerProperties.push(createPropertyData("Group", pickedGroup.name));
         }
-        if (entry._polyline?.id != null) {
+        if (pickedPolyline?.id != null) {
             layerProperties.push(
-                createPropertyData("Polyline", String(entry._polyline.id))
+                createPropertyData("Polyline", String(pickedPolyline.id))
             );
         }
 
@@ -838,10 +1043,12 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
 
         return {
             ...info,
-            // Expose the original polyline and group for onHover/onClick handlers
-            object: entry._polyline,
+            // Expose the original polyline (when available) and group for
+            // onHover/onClick handlers. For binary groups `object` falls back
+            // to the BinaryGroupEntry so consumers always receive something stable.
+            object: pickedPolyline ?? pickedSource,
             // @ts-expect-error -- deck.gl PickingInfo doesn't type extra fields; consumers can cast
-            group: entry._group,
+            group: pickedGroup,
             properties: layerProperties,
         };
     }
