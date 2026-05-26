@@ -216,6 +216,7 @@ export interface PolylineGroupLayerProps
     getGroupDashArray?: (
         group: PolylineGroup
     ) => [number, number] | null | undefined;
+
     /**
      * Return a `[dashLength, gapLength]` dash pattern for an individual `polyline`,
      * overriding the group-level pattern.
@@ -225,8 +226,10 @@ export interface PolylineGroupLayerProps
         polyline: Polyline,
         group: PolylineGroup
     ) => [number, number] | null | undefined;
+
     /** Default dash pattern `[dashLength, gapLength]` applied when no group or polyline override is set. */
     defaultGroupDashArray?: [number, number];
+
     /**
      * Use high-precision dash rendering (avoids dash-length variation at segment
      * joins). Slightly more expensive. Default: false.
@@ -777,19 +780,8 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
             ZIncreasingDownwards,
             hiddenGroups,
             hiddenPolylines,
-            defaultGroupDashArray,
-            getGroupDashArray,
-            getPolylineDashArray,
             highPrecisionDash,
         } = this.props;
-
-        // Dash style is not applied to binary groups (it is unsupported there);
-        // hasDash therefore reflects only the non-binary `paths` sub-layer.
-        const hasDash =
-            defaultGroupDashArray != null ||
-            getGroupDashArray != null ||
-            getPolylineDashArray != null ||
-            flatData.some((d) => d.dashArray[0] > 0);
 
         // Shared sub-layer props for the non-binary `paths` sub-layer (and the
         // section-mode sub-layers).
@@ -807,14 +799,10 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
             parameters: { depthTest },
             extensions: [
                 new DataFilterExtension({ filterSize: 1 }),
-                ...(hasDash
-                    ? [
-                          new PathStyleExtension({
-                              dash: true,
-                              highPrecisionDash: highPrecisionDash ?? false,
-                          }),
-                      ]
-                    : []),
+                new PathStyleExtension({
+                    dash: true,
+                    highPrecisionDash: highPrecisionDash ?? false,
+                }),
             ],
             getFilterValue: (d: FlatEntry) => {
                 if (d._group.id != null && hiddenGroups?.has(d._group.id))
