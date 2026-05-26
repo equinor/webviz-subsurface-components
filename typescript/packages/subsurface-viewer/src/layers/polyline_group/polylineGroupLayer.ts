@@ -1007,7 +1007,8 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
             const sourceId = (
                 info as PickingInfo & { sourceLayer?: { id: string } }
             ).sourceLayer?.id;
-            if (sourceId?.endsWith("paths-binary")) {
+            // Robust check: deck.gl may prefix/suffix the sub-layer id.
+            if (sourceId && sourceId.indexOf("paths-binary") !== -1) {
                 const binaryData = this.state[
                     "binaryData"
                 ] as BinaryData | null;

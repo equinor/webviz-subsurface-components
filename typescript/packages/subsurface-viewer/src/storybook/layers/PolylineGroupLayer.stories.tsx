@@ -455,12 +455,14 @@ export const BinaryPolylinesFormat: StoryObj<typeof SubsurfaceViewer> = {
                 id: "binary-polylines-layer",
                 name: "Contours (binary)",
                 data: BINARY_GROUPS,
+                pickable: true,
                 widthUnits: "pixels",
                 ZIncreasingDownwards: true,
             }),
         ],
         bounds: [-2, -2, 18, 16],
         views: DUAL_VIEWS,
+        pickingRadius: 8,
     },
     parameters: storyDocs(
         [
