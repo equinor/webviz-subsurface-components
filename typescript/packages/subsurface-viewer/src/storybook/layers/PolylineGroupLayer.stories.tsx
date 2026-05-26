@@ -1,4 +1,4 @@
-import type { Position } from "@deck.gl/core";
+import type { Color, Position } from "@deck.gl/core";
 import { OrbitView, OrthographicView, View } from "@deck.gl/core";
 import { PolygonLayer } from "@deck.gl/layers";
 import type { Meta, StoryObj } from "@storybook/react";
@@ -341,7 +341,9 @@ export const PickablePolylines: StoryObj<typeof SubsurfaceViewer> = {
 // for large datasets loaded from binary blobs or typed-array workers.
 
 const makeBinary = (
-    segments: [number, number, number][][]
+    segments: Position[][],
+    color?: Color,
+    width?: number
 ): BinaryPolylines => {
     const flat: number[] = [];
     const starts: number[] = [];
@@ -349,9 +351,28 @@ const makeBinary = (
         starts.push(flat.length / 3);
         for (const [x, y, z] of seg) flat.push(x, y, z);
     }
+
+    let colors: Uint8Array | undefined;
+    if (color) {
+        // Number of vertices = flat.length / 3
+        const nVerts = flat.length / 3;
+        colors = new Uint8Array(nVerts * 4);
+        for (let i = 0; i < nVerts; ++i) {
+            colors.set(color, i * 4);
+        }
+    }
+    let widths: Float32Array | undefined;
+    if (width !== undefined) {
+        const nVerts = flat.length / 3;
+        widths = new Float32Array(nVerts);
+        widths.fill(width);
+    }
+
     return {
         positions: new Float32Array(flat),
         startIndices: new Uint32Array(starts),
+        colors,
+        widths,
     };
 };
 
@@ -359,59 +380,65 @@ const BINARY_GROUPS: PolylineGroup[] = [
     {
         id: "contour-100",
         name: "Contour 100 m",
-        color: [220, 80, 80, 255],
-        width: 2,
-        polylines: makeBinary([
+        polylines: makeBinary(
             [
-                [0, 0, 2],
-                [4, 0, 2],
-                [8, 2, 2],
-                [12, 2, 2],
+                [
+                    [0, 0, 2],
+                    [4, 0, 2],
+                    [8, 2, 2],
+                    [12, 2, 2],
+                ],
+                [
+                    [0, 6, 2],
+                    [6, 6, 2],
+                    [12, 8, 2],
+                ],
             ],
-            [
-                [0, 6, 2],
-                [6, 6, 2],
-                [12, 8, 2],
-            ],
-        ]),
+            [220, 80, 80, 255],
+            2
+        ),
     },
     {
         id: "contour-200",
         name: "Contour 200 m",
-        color: [80, 180, 80, 255],
-        width: 2,
-        polylines: makeBinary([
+        polylines: makeBinary(
             [
-                [0, 0, 5],
-                [4, 1, 5],
-                [8, 3, 5],
-                [12, 4, 5],
+                [
+                    [0, 0, 5],
+                    [4, 1, 5],
+                    [8, 3, 5],
+                    [12, 4, 5],
+                ],
+                [
+                    [0, 7, 5],
+                    [6, 7, 5],
+                    [12, 9, 5],
+                ],
+                [
+                    [2, 12, 5],
+                    [8, 11, 5],
+                    [14, 12, 5],
+                ],
             ],
-            [
-                [0, 7, 5],
-                [6, 7, 5],
-                [12, 9, 5],
-            ],
-            [
-                [2, 12, 5],
-                [8, 11, 5],
-                [14, 12, 5],
-            ],
-        ]),
+            [80, 180, 80, 255],
+            2
+        ),
     },
     {
         id: "contour-300",
         name: "Contour 300 m",
-        color: [80, 80, 220, 255],
-        width: 2,
-        polylines: makeBinary([
+        polylines: makeBinary(
             [
-                [0, 0, 9],
-                [5, 2, 9],
-                [10, 5, 9],
-                [14, 8, 9],
+                [
+                    [0, 0, 9],
+                    [5, 2, 9],
+                    [10, 5, 9],
+                    [14, 8, 9],
+                ],
             ],
-        ]),
+            [80, 80, 220, 255],
+            2
+        ),
     },
 ];
 
