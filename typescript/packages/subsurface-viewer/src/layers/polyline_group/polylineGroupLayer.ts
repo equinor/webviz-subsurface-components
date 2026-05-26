@@ -938,16 +938,7 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
                 new PathLayer(
                     this.getSubLayerProps({
                         id: "paths-binary",
-                        pickable,
-                        billboard,
-                        widthUnits,
-                        widthScale,
-                        widthMinPixels,
-                        widthMaxPixels,
-                        jointRounded,
-                        capRounded,
-                        miterLimit,
-                        parameters: { depthTest },
+                        ...sharedProps,
                         extensions: [
                             new DataFilterExtension({ filterSize: 1 }),
                         ],
@@ -957,10 +948,11 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
                             attributes,
                         },
                         _pathType: "open",
-                        filterRange: [1, 1] as [number, number],
                         updateTriggers: {
                             getFilterValue: [hiddenGroups],
                         },
+                        getColor: undefined, // color comes from attribute
+                        getWidth: undefined, // width comes from attribute
                     })
                 )
             );
