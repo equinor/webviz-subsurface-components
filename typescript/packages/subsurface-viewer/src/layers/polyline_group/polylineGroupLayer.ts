@@ -57,9 +57,21 @@ export type Polyline = PolylineStyle & {
  * the last polyline ends at the end of the positions array.
  * Per-polyline color/width overrides are not supported — use group-level values.
  */
+/**
+ * Binary format for high-performance rendering of large polyline sets.
+ * `positions` is a flat interleaved Float32Array: [x,y,z, x,y,z, ...].
+ * `startIndices` contains the vertex index where each polyline begins;
+ * the last polyline ends at the end of the positions array.
+ *
+ * Optionally, `colors` (Uint8Array, RGBA, normalized, length = 4 * num vertices)
+ * and `widths` (Float32Array, length = num vertices) can be provided for per-vertex
+ * styling. If omitted, group-level color/width will be used for all vertices.
+ */
 export type BinaryPolylines = {
     positions: Float32Array;
     startIndices: Uint32Array;
+    colors?: Uint8Array;
+    widths?: Float32Array;
 };
 
 export type PolylineGroup = PolylineStyle & {
@@ -339,29 +351,6 @@ function isBinaryPolylines(
     return !Array.isArray(p) && "positions" in p;
 }
 
-function resolveGroupColor(
-    group: PolylineGroup,
-    props: PolylineGroupLayerProps
-): Color {
-    return (
-        props.getGroupColor?.(group) ??
-        group.color ??
-        props.defaultGroupColor ?? [0, 128, 255, 255]
-    );
-}
-
-function resolveGroupWidth(
-    group: PolylineGroup,
-    props: PolylineGroupLayerProps
-): number {
-    return (
-        props.getGroupWidth?.(group) ??
-        group.width ??
-        props.defaultGroupWidth ??
-        2
-    );
-}
-
 function resolveDashArray(
     polyline: Polyline,
     group: PolylineGroup,
@@ -478,8 +467,6 @@ function flattenGroupData(
     const binaryRaw: {
         group: PolylineGroup;
         polylines: BinaryPolylines;
-        color: Color;
-        width: number;
     }[] = [];
     let totalVerts = 0;
     let totalPaths = 0;
@@ -496,13 +483,24 @@ function flattenGroupData(
                     "PolylineGroupLayer: dashArray is not supported on BinaryPolylines groups; ignoring."
                 );
             }
+            const srcVerts = polylines.positions.length / 3;
+            if (polylines.colors && polylines.colors.length !== srcVerts * 4) {
+                console.warn(
+                    `PolylineGroupLayer: BinaryPolylines group (id=${group.id ?? "unknown"}) has a colors buffer with wrong length (expected ${srcVerts * 4}, got ${polylines.colors.length}). Ignoring colors.`
+                );
+                polylines.colors = undefined;
+            }
+            if (polylines.widths && polylines.widths.length !== srcVerts) {
+                console.warn(
+                    `PolylineGroupLayer: BinaryPolylines group (id=${group.id ?? "unknown"}) has a widths buffer with wrong length (expected ${srcVerts}, got ${polylines.widths.length}). Ignoring widths.`
+                );
+                polylines.widths = undefined;
+            }
             binaryRaw.push({
                 group,
                 polylines,
-                color: resolveGroupColor(group, props),
-                width: resolveGroupWidth(group, props),
             });
-            totalVerts += polylines.positions.length / 3;
+            totalVerts += srcVerts;
             totalPaths += polylines.startIndices.length;
         } else {
             for (const polyline of polylines) {
@@ -549,12 +547,11 @@ function flattenGroupData(
     let pOffset = 0; // running path offset
 
     for (let gIdx = 0; gIdx < binaryRaw.length; gIdx++) {
-        const { group, polylines, color, width } = binaryRaw[gIdx];
+        const { group, polylines } = binaryRaw[gIdx];
         const src = polylines.positions;
         const srcVerts = src.length / 3;
 
-        // Copy positions (optionally flipping Z) and replicate per-vertex
-        // attributes for this group.
+        // Copy positions (optionally flipping Z)
         const base = vOffset * 3;
         if (ZIncreasingDownwards) {
             for (let i = 0; i < src.length; i += 3) {
@@ -566,18 +563,15 @@ function flattenGroupData(
             positions.set(src, base);
         }
 
-        const r = color[0],
-            g = color[1],
-            b = color[2],
-            a = color[3] ?? 255;
+        if (polylines.colors) {
+            colors.set(polylines.colors, vOffset * 4);
+        }
+        if (polylines.widths) {
+            widths.set(polylines.widths, vOffset);
+        }
+
         for (let v = 0; v < srcVerts; v++) {
-            const vi = vOffset + v;
-            colors[vi * 4] = r;
-            colors[vi * 4 + 1] = g;
-            colors[vi * 4 + 2] = b;
-            colors[vi * 4 + 3] = a;
-            widths[vi] = width;
-            vertexGroupIndex[vi] = gIdx;
+            vertexGroupIndex[vOffset + v] = gIdx;
         }
 
         // Offset and copy startIndices into the combined buffer.
@@ -925,9 +919,33 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
                     g.id != null && hiddenGroups?.has(g.id) ? 0 : 1;
             }
 
-            // Single PathLayer for all binary groups, using deck.gl's native
-            // typed-array data path. Per-vertex color/width attributes are
-            // replicated from the group-level resolved values.
+            // Build attributes object, omitting color/width if not present
+            const attributes: { [key: string]: unknown } = {
+                getPath: {
+                    value: binaryData.positions,
+                    size: 3,
+                },
+                getFilterValue: {
+                    value: filterValues,
+                    size: 1,
+                },
+            };
+            // Only add getColor if any group provided colors
+            if (binaryData.colors.some((v) => v !== 0)) {
+                attributes["getColor"] = {
+                    value: binaryData.colors,
+                    size: 4,
+                    normalized: true,
+                };
+            }
+            // Only add getWidth if any group provided widths
+            if (binaryData.widths.some((v) => v !== 0)) {
+                attributes["getWidth"] = {
+                    value: binaryData.widths,
+                    size: 1,
+                };
+            }
+
             layers.push(
                 new PathLayer(
                     this.getSubLayerProps({
@@ -948,25 +966,7 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
                         data: {
                             length: binaryData.startIndices.length,
                             startIndices: binaryData.startIndices,
-                            attributes: {
-                                getPath: {
-                                    value: binaryData.positions,
-                                    size: 3,
-                                },
-                                getColor: {
-                                    value: binaryData.colors,
-                                    size: 4,
-                                    normalized: true,
-                                },
-                                getWidth: {
-                                    value: binaryData.widths,
-                                    size: 1,
-                                },
-                                getFilterValue: {
-                                    value: filterValues,
-                                    size: 1,
-                                },
-                            },
+                            attributes,
                         },
                         _pathType: "open",
                         filterRange: [1, 1] as [number, number],
