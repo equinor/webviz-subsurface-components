@@ -444,13 +444,9 @@ const BINARY_GROUPS: PolylineGroup[] = [
 
 type BinaryVisibilityArgs = {
     hiddenGroupIds: string[];
-    hiddenPolylineIds: string[];
 };
 
-const BinaryWrapper = ({
-    hiddenGroupIds = [],
-    hiddenPolylineIds = [],
-}: BinaryVisibilityArgs) => {
+const BinaryWrapper = ({ hiddenGroupIds = [] }: BinaryVisibilityArgs) => {
     const layer = new PolylineGroupLayer({
         id: "binary-polylines-layer",
         name: "Contours (binary)",
@@ -459,7 +455,6 @@ const BinaryWrapper = ({
         widthUnits: "pixels",
         ZIncreasingDownwards: true,
         hiddenGroups: new Set<string | number>(hiddenGroupIds),
-        hiddenPolylines: new Set<string | number>(hiddenPolylineIds),
     });
 
     return (
@@ -498,29 +493,12 @@ const BinaryWrapper = ({
 export const BinaryPolylinesFormat: StoryObj<typeof BinaryWrapper> = {
     args: {
         hiddenGroupIds: [],
-        hiddenPolylineIds: [],
     },
     argTypes: {
         hiddenGroupIds: {
             name: "Hidden groups",
             control: { type: "check" },
             options: ["contour-100", "contour-200", "contour-300"],
-        },
-        hiddenPolylineIds: {
-            name: "Hidden polylines",
-            control: { type: "check" },
-            // Binary format does not provide per-polyline ids; listing
-            // per-group polyline indices for UI convenience. Selecting
-            // these has no effect unless the data contains explicit
-            // polyline ids (Polyline[] format).
-            options: [
-                "contour-100:0",
-                "contour-100:1",
-                "contour-200:0",
-                "contour-200:1",
-                "contour-200:2",
-                "contour-300:0",
-            ],
         },
     },
     parameters: storyDocs(
