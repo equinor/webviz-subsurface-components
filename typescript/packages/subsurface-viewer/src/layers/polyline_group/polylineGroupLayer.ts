@@ -1034,7 +1034,11 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
         }
 
         const zScale = this.props.modelMatrix ? this.props.modelMatrix[10] : 1;
-        if (typeof info.coordinate?.[2] !== "undefined") {
+        // Omit Depth property when the pick originated from a SectionView.
+        const viewport = (info as PickingInfo & { viewport?: unknown })
+            .viewport;
+        const isSectionView = viewport?.constructor === SectionViewport;
+        if (!isSectionView && typeof info.coordinate?.[2] !== "undefined") {
             const depth =
                 (this.props.ZIncreasingDownwards
                     ? -info.coordinate[2]

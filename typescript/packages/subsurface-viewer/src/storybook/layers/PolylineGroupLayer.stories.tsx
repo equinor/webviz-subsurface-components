@@ -738,6 +738,7 @@ export const SectionViewRendering: StoryObj<typeof SubsurfaceViewer> = {
             }),
         ],
         views: SECTION_VIEWS,
+        pickingRadius: 8,
     },
     parameters: storyDocs(
         [
