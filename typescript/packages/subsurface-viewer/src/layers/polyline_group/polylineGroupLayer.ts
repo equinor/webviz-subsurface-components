@@ -627,12 +627,15 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
             !isEqual(props.data, oldProps.data) ||
             props.getGroupColor !== oldProps.getGroupColor ||
             props.getGroupWidth !== oldProps.getGroupWidth ||
+            props.getGroupDashArray !== oldProps.getGroupDashArray ||
             props.getPolylineColor !== oldProps.getPolylineColor ||
             props.getPolylineWidth !== oldProps.getPolylineWidth ||
+            props.getPolylineDashArray !== oldProps.getPolylineDashArray ||
             props.getGroupPolylines !== oldProps.getGroupPolylines ||
             props.getPolylinePath !== oldProps.getPolylinePath ||
             props.defaultGroupColor !== oldProps.defaultGroupColor ||
             props.defaultGroupWidth !== oldProps.defaultGroupWidth ||
+            props.defaultGroupDashArray !== oldProps.defaultGroupDashArray ||
             props.ZIncreasingDownwards !== oldProps.ZIncreasingDownwards;
 
         if (needsRebuild) {
