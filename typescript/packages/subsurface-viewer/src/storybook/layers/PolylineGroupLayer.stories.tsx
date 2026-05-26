@@ -442,41 +442,42 @@ const BINARY_GROUPS: PolylineGroup[] = [
     },
 ];
 
-export const BinaryPolylinesFormat: StoryObj<typeof SubsurfaceViewer> = {
-    args: {
-        id: "polyline-group-binary",
-        layers: [
-            new AxesLayer({
-                id: "axes-layer-binary",
-                name: "Axes",
-                bounds: [-2, -2, 0, 18, 16, 12],
-            }),
-            new PolylineGroupLayer({
-                id: "binary-polylines-layer",
-                name: "Contours (binary)",
-                data: BINARY_GROUPS,
-                pickable: true,
-                widthUnits: "pixels",
-                ZIncreasingDownwards: true,
-            }),
-        ],
-        bounds: [-2, -2, 18, 16],
-        views: DUAL_VIEWS,
-        pickingRadius: 8,
-    },
-    parameters: storyDocs(
-        [
-            "Contour lines supplied in the **BinaryPolylines** format.",
-            "Each group's `polylines` is `{ positions: Float32Array, startIndices: Uint32Array }`",
-            "instead of a `Polyline[]` array.",
-            "This avoids per-polyline object allocation and is ideal for large datasets.",
-            "Group-level `color` and `width` are still applied; per-polyline overrides are not",
-            "available in binary mode.",
-        ].join(" ")
-    ),
-    render: (args) => (
+type BinaryVisibilityArgs = {
+    hiddenGroupIds: string[];
+    hiddenPolylineIds: string[];
+};
+
+const BinaryWrapper = ({
+    hiddenGroupIds = [],
+    hiddenPolylineIds = [],
+}: BinaryVisibilityArgs) => {
+    const layer = new PolylineGroupLayer({
+        id: "binary-polylines-layer",
+        name: "Contours (binary)",
+        data: BINARY_GROUPS,
+        pickable: true,
+        widthUnits: "pixels",
+        ZIncreasingDownwards: true,
+        hiddenGroups: new Set<string | number>(hiddenGroupIds),
+        hiddenPolylines: new Set<string | number>(hiddenPolylineIds),
+    });
+
+    return (
         <AnnotationRoot>
-            <SubsurfaceViewer {...args}>
+            <SubsurfaceViewer
+                id="polyline-group-binary"
+                layers={[
+                    new AxesLayer({
+                        id: "axes-layer-binary",
+                        name: "Axes",
+                        bounds: [-2, -2, 0, 18, 16, 12],
+                    }),
+                    layer,
+                ]}
+                bounds={[-2, -2, 18, 16]}
+                views={DUAL_VIEWS}
+                pickingRadius={8}
+            >
                 {annotateView(
                     "view_3d",
                     <h2 className={annotationClasses.annotation}>
@@ -491,7 +492,48 @@ export const BinaryPolylinesFormat: StoryObj<typeof SubsurfaceViewer> = {
                 )}
             </SubsurfaceViewer>
         </AnnotationRoot>
+    );
+};
+
+export const BinaryPolylinesFormat: StoryObj<typeof BinaryWrapper> = {
+    args: {
+        hiddenGroupIds: [],
+        hiddenPolylineIds: [],
+    },
+    argTypes: {
+        hiddenGroupIds: {
+            name: "Hidden groups",
+            control: { type: "check" },
+            options: ["contour-100", "contour-200", "contour-300"],
+        },
+        hiddenPolylineIds: {
+            name: "Hidden polylines",
+            control: { type: "check" },
+            // Binary format does not provide per-polyline ids; listing
+            // per-group polyline indices for UI convenience. Selecting
+            // these has no effect unless the data contains explicit
+            // polyline ids (Polyline[] format).
+            options: [
+                "contour-100:0",
+                "contour-100:1",
+                "contour-200:0",
+                "contour-200:1",
+                "contour-200:2",
+                "contour-300:0",
+            ],
+        },
+    },
+    parameters: storyDocs(
+        [
+            "Contour lines supplied in the **BinaryPolylines** format.",
+            "Each group's `polylines` is `{ positions: Float32Array, startIndices: Uint32Array }`",
+            "instead of a `Polyline[]` array.",
+            "This avoids per-polyline object allocation and is ideal for large datasets.",
+            "Group-level `color` and `width` are still applied; per-polyline overrides are not",
+            "available in binary mode.",
+        ].join(" ")
     ),
+    render: (args) => <BinaryWrapper {...args} />,
 };
 
 // ---------------------------------------------------------------------------
