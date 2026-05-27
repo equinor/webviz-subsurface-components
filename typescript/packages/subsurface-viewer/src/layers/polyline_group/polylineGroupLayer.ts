@@ -6,11 +6,12 @@ import type {
 } from "@deck.gl/core";
 import { CompositeLayer } from "@deck.gl/core";
 import { DataFilterExtension, PathStyleExtension } from "@deck.gl/extensions";
-import { PathLayer } from "@deck.gl/layers";
 import type { PathLayerProps } from "@deck.gl/layers";
+import { PathLayer } from "@deck.gl/layers";
 import { isEqual } from "lodash";
 
 import type { Position } from "@deck.gl/core";
+import type { Point2D } from "../..";
 import { SectionViewport } from "../../viewports";
 import type {
     ExtendedLayerProps,
@@ -18,7 +19,6 @@ import type {
     PropertyDataType,
 } from "../utils/layerTools";
 import { createPropertyData } from "../utils/layerTools";
-import type { Point2D } from "../..";
 
 // ---------------------------------------------------------------------------
 // Public data types
@@ -56,12 +56,6 @@ export type Polyline = PolylineStyle & {
  * `startIndices` contains the vertex index where each polyline begins;
  * the last polyline ends at the end of the positions array.
  * Per-polyline color/width overrides are not supported — use group-level values.
- */
-/**
- * Binary format for high-performance rendering of large polyline sets.
- * `positions` is a flat interleaved Float32Array: [x,y,z, x,y,z, ...].
- * `startIndices` contains the vertex index where each polyline begins;
- * the last polyline ends at the end of the positions array.
  *
  * Optionally, `colors` (Uint8Array, RGBA, normalized, length = 4 * num vertices)
  * and `widths` (Float32Array, length = num vertices) can be provided for per-vertex
@@ -568,9 +562,33 @@ function flattenGroupData(
 
         if (polylines.colors) {
             colors.set(polylines.colors, vOffset * 4);
+        } else {
+            const [r, g, b, a = 255] = props.getGroupColor?.(group) ??
+                group.color ??
+                props.defaultGroupColor ?? [0, 128, 255, 255];
+            const packed =
+                ((r & 0xff) |
+                    ((g & 0xff) << 8) |
+                    ((b & 0xff) << 16) |
+                    ((a & 0xff) << 24)) >>>
+                0;
+            new Uint32Array(colors.buffer).fill(
+                packed,
+                vOffset,
+                vOffset + srcVerts
+            );
         }
         if (polylines.widths) {
             widths.set(polylines.widths, vOffset);
+        } else {
+            widths.fill(
+                props.getGroupWidth?.(group) ??
+                    group.width ??
+                    props.defaultGroupWidth ??
+                    2,
+                vOffset,
+                vOffset + srcVerts
+            );
         }
 
         for (let v = 0; v < srcVerts; v++) {
@@ -918,21 +936,15 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
                     size: 1,
                 },
             };
-            // Only add getColor if any group provided colors
-            if (binaryData.colors.some((v) => v !== 0)) {
-                attributes["getColor"] = {
-                    value: binaryData.colors,
-                    size: 4,
-                    normalized: true,
-                };
-            }
-            // Only add getWidth if any group provided widths
-            if (binaryData.widths.some((v) => v !== 0)) {
-                attributes["getWidth"] = {
-                    value: binaryData.widths,
-                    size: 1,
-                };
-            }
+            attributes["getColor"] = {
+                value: binaryData.colors,
+                size: 4,
+                normalized: true,
+            };
+            attributes["getWidth"] = {
+                value: binaryData.widths,
+                size: 1,
+            };
 
             layers.push(
                 new PathLayer(
