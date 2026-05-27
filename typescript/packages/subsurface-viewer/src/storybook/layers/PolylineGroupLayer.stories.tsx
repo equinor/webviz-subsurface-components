@@ -1553,7 +1553,7 @@ const WellSectionHorizonWrapper: React.FC = () => {
 
     // One planar vertical quad per path segment forms the fence curtain.
     // Each quad is [topLeft, topRight, bottomRight, bottomLeft] in world XYZ.
-    // deck.gl's earcut triangualtion uses dim=3 and picks the XZ or YZ
+    // deck.gl's earcut triangulation uses dim=3 and picks the XZ or YZ
     // projection plane (never XY, which degenerates to a line for a vertical
     // quad), so each quad tessellates into exactly 2 triangles correctly.
     //
