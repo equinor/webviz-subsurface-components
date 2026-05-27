@@ -568,6 +568,53 @@ function buildBinaryData(
     };
 }
 
+/**
+ * Builds the per-vertex GPU filter buffer for the binary sub-layer.
+ * Each vertex gets 1.0 if its group is visible, 0.0 if it is hidden.
+ * This is a plain typed-array allocation (O(vertices)); separated so it can
+ * be re-run cheaply when only `hiddenGroups` changes, without rebuilding the
+ * full `BinaryData`.
+ */
+function buildFilterValues(
+    binaryData: BinaryData,
+    hiddenGroups: Set<string | number> | undefined
+): Float32Array {
+    const filterValues = new Float32Array(binaryData.vertexGroupIndex.length);
+    for (let i = 0; i < filterValues.length; i++) {
+        const g = binaryData.groups[binaryData.vertexGroupIndex[i]];
+        filterValues[i] = g.id != null && hiddenGroups?.has(g.id) ? 0 : 1;
+    }
+    return filterValues;
+}
+
+/** Shape of the cached binary PathLayer data object stored in layer state. */
+type BinaryLayerData = {
+    length: number;
+    startIndices: Uint32Array;
+    attributes: Record<string, unknown>;
+};
+
+/**
+ * Assembles the `data` object passed to the binary PathLayer sub-layer.
+ * Thin wrapper around the cached typed arrays; cheap to call, but creating a
+ * new object reference signals deck.gl to re-examine attribute buffers.
+ */
+function buildBinaryLayerData(
+    binaryData: BinaryData,
+    filterValues: Float32Array
+): BinaryLayerData {
+    return {
+        length: binaryData.startIndices.length - 1,
+        startIndices: binaryData.startIndices,
+        attributes: {
+            getPath: { value: binaryData.positions, size: 3 },
+            getFilterValue: { value: filterValues, size: 1 },
+            getColor: { value: binaryData.colors, size: 4, normalized: true },
+            getWidth: { value: binaryData.widths, size: 1 },
+        },
+    };
+}
+
 function flattenGroupData(
     data: PolylineGroup[],
     props: PolylineGroupLayerProps
@@ -752,11 +799,18 @@ function projectAbscissa(
 export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> {
     /** @override Builds the initial flat data buffer and section index from `props.data`. */
     initializeState(): void {
-        const { data, sectionPath } = this.props;
+        const { data, sectionPath, hiddenGroups } = this.props;
         const { flatData, binaryData } = flattenGroupData(data, this.props);
+        const binaryLayerData = binaryData
+            ? buildBinaryLayerData(
+                  binaryData,
+                  buildFilterValues(binaryData, hiddenGroups)
+              )
+            : null;
         this.setState({
             flatData,
             binaryData,
+            binaryLayerData,
             sectionIndex: sectionPath ? buildSectionIndex(sectionPath) : null,
         });
     }
@@ -790,7 +844,25 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
                 props.data,
                 props
             );
-            this.setState({ flatData, binaryData });
+            const binaryLayerData = binaryData
+                ? buildBinaryLayerData(
+                      binaryData,
+                      buildFilterValues(binaryData, props.hiddenGroups)
+                  )
+                : null;
+            this.setState({ flatData, binaryData, binaryLayerData });
+        } else if (props.hiddenGroups !== oldProps.hiddenGroups) {
+            // Only the per-vertex filter buffer needs rebuilding; the large
+            // position/color/width buffers are untouched.
+            const binaryData = this.state["binaryData"] as BinaryData | null;
+            if (binaryData) {
+                this.setState({
+                    binaryLayerData: buildBinaryLayerData(
+                        binaryData,
+                        buildFilterValues(binaryData, props.hiddenGroups)
+                    ),
+                });
+            }
         }
         if (props.sectionPath !== oldProps.sectionPath) {
             this.setState({
@@ -955,40 +1027,10 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
             );
         }
 
-        if (binaryData) {
-            // Build the per-vertex filter buffer. Cheap to rebuild (one float
-            // per vertex) and only runs when `hiddenGroups` actually changes
-            // because of the updateTriggers reference.
-            const filterValues = new Float32Array(
-                binaryData.vertexGroupIndex.length
-            );
-            for (let i = 0; i < filterValues.length; i++) {
-                const g = binaryData.groups[binaryData.vertexGroupIndex[i]];
-                filterValues[i] =
-                    g.id != null && hiddenGroups?.has(g.id) ? 0 : 1;
-            }
-
-            // Build attributes object, omitting color/width if not present
-            const attributes: { [key: string]: unknown } = {
-                getPath: {
-                    value: binaryData.positions,
-                    size: 3,
-                },
-                getFilterValue: {
-                    value: filterValues,
-                    size: 1,
-                },
-            };
-            attributes["getColor"] = {
-                value: binaryData.colors,
-                size: 4,
-                normalized: true,
-            };
-            attributes["getWidth"] = {
-                value: binaryData.widths,
-                size: 1,
-            };
-
+        const binaryLayerData = this.state[
+            "binaryLayerData"
+        ] as BinaryLayerData | null;
+        if (binaryLayerData) {
             layers.push(
                 new PathLayer(
                     this.getSubLayerProps({
@@ -997,11 +1039,7 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
                         extensions: [
                             new DataFilterExtension({ filterSize: 1 }),
                         ],
-                        data: {
-                            length: binaryData.startIndices.length - 1, // was: .length
-                            startIndices: binaryData.startIndices,
-                            attributes,
-                        },
+                        data: binaryLayerData,
                         _pathType: "open",
                         updateTriggers: {
                             getFilterValue: [hiddenGroups],
