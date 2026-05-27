@@ -271,7 +271,7 @@ type FlatEntry = {
  */
 type BinaryData = {
     positions: Float32Array; // size 3 per vertex
-    startIndices: Uint32Array; // length = number of paths
+    startIndices: Uint32Array; // length = number of paths + 1 (terminal entry)
     colors: Uint8Array; // size 4 per vertex
     widths: Float32Array; // size 1 per vertex
     pathGroup: PolylineGroup[]; // length = number of paths
@@ -484,7 +484,7 @@ function buildBinaryData(
     const colors = new Uint8Array(totalVerts * 4);
     const widths = new Float32Array(totalVerts);
     const vertexGroupIndex = new Uint32Array(totalVerts);
-    const startIndices = new Uint32Array(totalPaths);
+    const startIndices = new Uint32Array(totalPaths + 1);
     const pathGroup: PolylineGroup[] = new Array(totalPaths);
     const groups: PolylineGroup[] = binaryRaw.map((b) => b.group);
 
@@ -555,6 +555,8 @@ function buildBinaryData(
         vOffset += srcVerts;
         pOffset += srcIdx.length;
     }
+
+    startIndices[totalPaths] = totalVerts; // terminal entry
 
     return {
         positions,
@@ -995,7 +997,7 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
                             new DataFilterExtension({ filterSize: 1 }),
                         ],
                         data: {
-                            length: binaryData.startIndices.length,
+                            length: binaryData.startIndices.length - 1, // was: .length
                             startIndices: binaryData.startIndices,
                             attributes,
                         },
