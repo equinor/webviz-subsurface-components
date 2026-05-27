@@ -17,15 +17,15 @@ import { useAbscissaTransform } from "../../layers/wells/hooks/useAbscissaTransf
 import WellsLayer from "../../layers/wells/wellsLayer";
 import type { ViewsType } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
+import type { BoundingBox2D, Point2D } from "../../utils";
 import {
     annotationClasses,
     AnnotationRoot,
     defaultStoryParameters,
 } from "../sharedSettings";
 import { getRgba } from "../util/color";
-import { useSyntheticWellCollection } from "../util/wellSynthesis";
-import type { BoundingBox2D, Point2D } from "../../utils";
 import { Play } from "../util/play";
+import { useSyntheticWellCollection } from "../util/wellSynthesis";
 
 const STORIES: Meta = {
     component: SubsurfaceViewer,
@@ -380,23 +380,21 @@ const BINARY_GROUPS: PolylineGroup[] = [
     {
         id: "contour-100",
         name: "Contour 100 m",
-        polylines: makeBinary(
+        polylines: makeBinary([
             [
-                [
-                    [0, 0, 2],
-                    [4, 0, 2],
-                    [8, 2, 2],
-                    [12, 2, 2],
-                ],
-                [
-                    [0, 6, 2],
-                    [6, 6, 2],
-                    [12, 8, 2],
-                ],
+                [0, 0, 2],
+                [4, 0, 2],
+                [8, 2, 2],
+                [12, 2, 2],
             ],
-            [220, 80, 80, 255],
-            2
-        ),
+            [
+                [0, 6, 2],
+                [6, 6, 2],
+                [12, 8, 2],
+            ],
+        ]),
+        color: [220, 80, 80, 255],
+        width: 2,
     },
     {
         id: "contour-200",
@@ -507,8 +505,7 @@ export const BinaryPolylinesFormat: StoryObj<typeof BinaryWrapper> = {
             "Each group's `polylines` is `{ positions: Float32Array, startIndices: Uint32Array }`",
             "instead of a `Polyline[]` array.",
             "This avoids per-polyline object allocation and is ideal for large datasets.",
-            "Group-level `color` and `width` are still applied; per-polyline overrides are not",
-            "available in binary mode.",
+            "Group-level `color` and `width` are still applied.",
         ].join(" ")
     ),
     render: (args) => <BinaryWrapper {...args} />,

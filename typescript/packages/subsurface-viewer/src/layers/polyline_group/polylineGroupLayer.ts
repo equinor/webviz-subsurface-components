@@ -563,18 +563,20 @@ function flattenGroupData(
         if (polylines.colors) {
             colors.set(polylines.colors, vOffset * 4);
         } else {
-            const [r, g, b, a = 255] = props.getGroupColor?.(group) ??
+            const color = props.getGroupColor?.(group) ??
                 group.color ??
                 props.defaultGroupColor ?? [0, 128, 255, 255];
-            const packed =
-                ((r & 0xff) |
-                    ((g & 0xff) << 8) |
-                    ((b & 0xff) << 16) |
-                    ((a & 0xff) << 24)) >>>
-                0;
+
+            // Write the first RGBA directly into the combined buffer, then
+            // reinterpret that position as a Uint32 and fill it across all
+            // remaining vertices
+            colors.set(
+                [color[0], color[1], color[2], color[3] ?? 255],
+                vOffset * 4
+            );
             new Uint32Array(colors.buffer).fill(
-                packed,
-                vOffset,
+                new Uint32Array(colors.buffer)[vOffset],
+                vOffset + 1,
                 vOffset + srcVerts
             );
         }
