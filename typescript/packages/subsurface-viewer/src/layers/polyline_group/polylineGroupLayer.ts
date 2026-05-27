@@ -891,8 +891,8 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
      * @override
      * Returns one or more `PathLayer` sub-layers.
      * - Without `sectionPath`: a single `paths` sub-layer for non-binary groups,
-     *   plus one `paths-binary-{i}` sub-layer per binary group (typed arrays
-     *   passed straight to the GPU).
+     *   plus a single `paths-binary` sub-layer that merges all binary groups into
+     *   combined typed-array buffers and passes them straight to the GPU.
      * - With `sectionPath`: a `paths-section` sub-layer (abscissa/depth space)
      *   and a `paths-3d` sub-layer (world XY space), routed by {@link filterSubLayer}.
      *   Binary groups are not supported in section mode and are skipped with a warning.
@@ -1065,7 +1065,7 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
 
         // Resolve the source group/polyline. For Polyline[] groups the picked
         // FlatEntry carries them directly. For BinaryPolylines the sub-layer id
-        // (`paths-binary-{i}`) is used to look up the source group; the polyline
+        // (`paths-binary`) is used to look up the source group; the polyline
         // is unavailable.
         let pickedGroup: PolylineGroup | undefined;
         let pickedPolyline: Polyline | undefined;
