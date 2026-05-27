@@ -430,20 +430,42 @@ function flattenSubGroupPolyline(
         );
         return [];
     }
-    return segPolylines.map((segment) => ({
-        path: getPath(segment, group),
-        color: resolveSegmentColor(segment, subGroup, polyline, group, props),
-        width: resolveSegmentWidth(segment, subGroup, polyline, group, props),
-        dashArray: resolveSegmentDashArray(
-            segment,
-            subGroup,
-            polyline,
-            group,
-            props
-        ),
-        _polyline: polyline, // root polyline — for picking & hiddenPolylines
-        _group: group,
-    }));
+    return segPolylines.flatMap((segment) => {
+        if (!Array.isArray(segment.path)) {
+            console.warn(
+                "PolylineGroupLayer: nested PolylineGroup paths inside segment polylines are not supported. Skipping segment."
+            );
+            return [];
+        }
+        return [
+            {
+                path: getPath(segment, group),
+                color: resolveSegmentColor(
+                    segment,
+                    subGroup,
+                    polyline,
+                    group,
+                    props
+                ),
+                width: resolveSegmentWidth(
+                    segment,
+                    subGroup,
+                    polyline,
+                    group,
+                    props
+                ),
+                dashArray: resolveSegmentDashArray(
+                    segment,
+                    subGroup,
+                    polyline,
+                    group,
+                    props
+                ),
+                _polyline: polyline, // root polyline — for picking & hiddenPolylines
+                _group: group,
+            },
+        ];
+    });
 }
 
 /**
