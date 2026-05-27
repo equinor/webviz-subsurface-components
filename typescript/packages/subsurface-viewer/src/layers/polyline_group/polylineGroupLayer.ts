@@ -889,7 +889,7 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
                         getPath: (d: FlatEntry) =>
                             d.path.map((pt) => {
                                 const z = ZIncreasingDownwards ? -pt[1] : pt[1];
-                                return [pt[0], z, 0] as Position;
+                                return [pt[0], z, 0];
                             }),
                         updateTriggers: sectionUpdateTriggers,
                     })
@@ -905,7 +905,7 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
                                     pt[0],
                                     sectionIndex
                                 );
-                                return [wx, wy, z] as Position;
+                                return [wx, wy, z];
                             }),
                         updateTriggers: sectionUpdateTriggers,
                     })
@@ -922,9 +922,7 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
                         id: "paths",
                         getPath: (d: FlatEntry) => {
                             if (!ZIncreasingDownwards) return d.path;
-                            return d.path.map(
-                                ([x, y, z]) => [x, y, -z] as Position
-                            );
+                            return d.path.map(([x, y, z]) => [x, y, -(z ?? 0)]);
                         },
                         updateTriggers,
                     })
