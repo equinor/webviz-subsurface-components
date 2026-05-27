@@ -19,12 +19,12 @@ import {
 } from "../constant/argTypes";
 import type { TrajectorySimulationProps } from "../types/well";
 import { getRgba } from "../util/color";
+import { Play } from "../util/play";
 import {
     createSyntheticWellCollection,
     getSyntheticWells,
     useSyntheticWellCollection,
 } from "../util/wellSynthesis";
-import { Play } from "../util/play";
 
 type WellCount = { wellCount: number };
 
@@ -178,8 +178,10 @@ export const WellLabelPicking: StoryObj<typeof SubsurfaceViewer> = {
         }
 
         const leftViewCenterPosition = {
-            clientX: canvas.clientLeft + canvas.clientWidth / 2,
-            clientY: canvas.clientTop + canvas.clientHeight / 2,
+            clientX:
+                canvas.getBoundingClientRect().left + canvas.clientWidth / 2,
+            clientY:
+                canvas.getBoundingClientRect().top + canvas.clientHeight / 2,
         };
 
         await Play.pick(canvas, leftViewCenterPosition);

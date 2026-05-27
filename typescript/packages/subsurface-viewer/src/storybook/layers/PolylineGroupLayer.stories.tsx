@@ -296,8 +296,11 @@ export const PickablePolylines: StoryObj<typeof SubsurfaceViewer> = {
         // midpoint of polyline a-2.  Moving to 3/4 of the canvas width places
         // the cursor at the centre of that viewport.
         const pickPosition = {
-            clientX: canvas.clientLeft + (canvas.clientWidth * 3) / 4,
-            clientY: canvas.clientTop + canvas.clientHeight / 2,
+            clientX:
+                canvas.getBoundingClientRect().left +
+                (canvas.clientWidth * 3) / 4,
+            clientY:
+                canvas.getBoundingClientRect().top + canvas.clientHeight / 2,
         };
 
         await Play.pick(canvas, pickPosition);
