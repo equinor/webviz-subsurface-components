@@ -8,7 +8,6 @@ import { CompositeLayer } from "@deck.gl/core";
 import { DataFilterExtension, PathStyleExtension } from "@deck.gl/extensions";
 import type { PathLayerProps } from "@deck.gl/layers";
 import { PathLayer } from "@deck.gl/layers";
-import { isEqual } from "lodash";
 
 import type { Position } from "@deck.gl/core";
 import type { Point2D } from "../..";
@@ -772,7 +771,7 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
         oldProps,
     }: UpdateParameters<PolylineGroupLayer>): void {
         const needsRebuild =
-            !isEqual(props.data, oldProps.data) ||
+            props.data !== oldProps.data ||
             props.getGroupColor !== oldProps.getGroupColor ||
             props.getGroupWidth !== oldProps.getGroupWidth ||
             props.getGroupDashArray !== oldProps.getGroupDashArray ||
