@@ -446,6 +446,105 @@ function flattenSubGroupPolyline(
     }));
 }
 
+/**
+ * Allocates combined typed-array buffers and fills them from all raw binary
+ * groups. Positions and indices are concatenated; color/width are replicated
+ * per vertex so the GPU can read them without per-vertex JS work.
+ */
+function buildBinaryData(
+    binaryRaw: { group: PolylineGroup; polylines: BinaryPolylines }[],
+    totalVerts: number,
+    totalPaths: number,
+    ZIncreasingDownwards: boolean,
+    props: PolylineGroupLayerProps
+): BinaryData {
+    const positions = new Float32Array(totalVerts * 3);
+    const colors = new Uint8Array(totalVerts * 4);
+    const widths = new Float32Array(totalVerts);
+    const vertexGroupIndex = new Uint32Array(totalVerts);
+    const startIndices = new Uint32Array(totalPaths);
+    const pathGroup: PolylineGroup[] = new Array(totalPaths);
+    const groups: PolylineGroup[] = binaryRaw.map((b) => b.group);
+
+    let vOffset = 0;
+    let pOffset = 0;
+
+    for (let gIdx = 0; gIdx < binaryRaw.length; gIdx++) {
+        const { group, polylines } = binaryRaw[gIdx];
+        const src = polylines.positions;
+        const srcVerts = src.length / 3;
+
+        // Copy positions (optionally flipping Z)
+        const base = vOffset * 3;
+        if (ZIncreasingDownwards) {
+            for (let i = 0; i < src.length; i += 3) {
+                positions[base + i] = src[i];
+                positions[base + i + 1] = src[i + 1];
+                positions[base + i + 2] = -src[i + 2];
+            }
+        } else {
+            positions.set(src, base);
+        }
+
+        if (polylines.colors) {
+            colors.set(polylines.colors, vOffset * 4);
+        } else {
+            const color = props.getGroupColor?.(group) ??
+                group.color ??
+                props.defaultGroupColor ?? [0, 128, 255, 255];
+            // Write the first RGBA directly into the combined buffer, then
+            // reinterpret that position as a Uint32 and fill it across all
+            // remaining vertices in one call — no bit-shifting required.
+            colors.set(
+                [color[0], color[1], color[2], color[3] ?? 255],
+                vOffset * 4
+            );
+            new Uint32Array(colors.buffer).fill(
+                new Uint32Array(colors.buffer)[vOffset],
+                vOffset + 1,
+                vOffset + srcVerts
+            );
+        }
+
+        if (polylines.widths) {
+            widths.set(polylines.widths, vOffset);
+        } else {
+            widths.fill(
+                props.getGroupWidth?.(group) ??
+                    group.width ??
+                    props.defaultGroupWidth ??
+                    2,
+                vOffset,
+                vOffset + srcVerts
+            );
+        }
+
+        for (let v = 0; v < srcVerts; v++) {
+            vertexGroupIndex[vOffset + v] = gIdx;
+        }
+
+        // Offset and copy startIndices into the combined buffer.
+        const srcIdx = polylines.startIndices;
+        for (let p = 0; p < srcIdx.length; p++) {
+            startIndices[pOffset + p] = srcIdx[p] + vOffset;
+            pathGroup[pOffset + p] = group;
+        }
+
+        vOffset += srcVerts;
+        pOffset += srcIdx.length;
+    }
+
+    return {
+        positions,
+        startIndices,
+        colors,
+        widths,
+        pathGroup,
+        vertexGroupIndex,
+        groups,
+    };
+}
+
 function flattenGroupData(
     data: PolylineGroup[],
     props: PolylineGroupLayerProps
@@ -529,96 +628,15 @@ function flattenGroupData(
         return { flatData, binaryData: null };
     }
 
-    // Second pass: build combined typed-array buffers. Positions and indices
-    // are concatenated; color/width are replicated per vertex (uniform within a
-    // group) so the GPU can read them directly without any per-vertex JS work.
-    const positions = new Float32Array(totalVerts * 3);
-    const colors = new Uint8Array(totalVerts * 4);
-    const widths = new Float32Array(totalVerts);
-    const vertexGroupIndex = new Uint32Array(totalVerts);
-    const startIndices = new Uint32Array(totalPaths);
-    const pathGroup: PolylineGroup[] = new Array(totalPaths);
-    const groups: PolylineGroup[] = binaryRaw.map((b) => b.group);
-
-    let vOffset = 0; // running vertex offset
-    let pOffset = 0; // running path offset
-
-    for (let gIdx = 0; gIdx < binaryRaw.length; gIdx++) {
-        const { group, polylines } = binaryRaw[gIdx];
-        const src = polylines.positions;
-        const srcVerts = src.length / 3;
-
-        // Copy positions (optionally flipping Z)
-        const base = vOffset * 3;
-        if (ZIncreasingDownwards) {
-            for (let i = 0; i < src.length; i += 3) {
-                positions[base + i] = src[i];
-                positions[base + i + 1] = src[i + 1];
-                positions[base + i + 2] = -src[i + 2];
-            }
-        } else {
-            positions.set(src, base);
-        }
-
-        if (polylines.colors) {
-            colors.set(polylines.colors, vOffset * 4);
-        } else {
-            const color = props.getGroupColor?.(group) ??
-                group.color ??
-                props.defaultGroupColor ?? [0, 128, 255, 255];
-
-            // Write the first RGBA directly into the combined buffer, then
-            // reinterpret that position as a Uint32 and fill it across all
-            // remaining vertices
-            colors.set(
-                [color[0], color[1], color[2], color[3] ?? 255],
-                vOffset * 4
-            );
-            new Uint32Array(colors.buffer).fill(
-                new Uint32Array(colors.buffer)[vOffset],
-                vOffset + 1,
-                vOffset + srcVerts
-            );
-        }
-        if (polylines.widths) {
-            widths.set(polylines.widths, vOffset);
-        } else {
-            widths.fill(
-                props.getGroupWidth?.(group) ??
-                    group.width ??
-                    props.defaultGroupWidth ??
-                    2,
-                vOffset,
-                vOffset + srcVerts
-            );
-        }
-
-        for (let v = 0; v < srcVerts; v++) {
-            vertexGroupIndex[vOffset + v] = gIdx;
-        }
-
-        // Offset and copy startIndices into the combined buffer.
-        const srcIdx = polylines.startIndices;
-        for (let p = 0; p < srcIdx.length; p++) {
-            startIndices[pOffset + p] = srcIdx[p] + vOffset;
-            pathGroup[pOffset + p] = group;
-        }
-
-        vOffset += srcVerts;
-        pOffset += srcIdx.length;
-    }
-
     return {
         flatData,
-        binaryData: {
-            positions,
-            startIndices,
-            colors,
-            widths,
-            pathGroup,
-            vertexGroupIndex,
-            groups,
-        },
+        binaryData: buildBinaryData(
+            binaryRaw,
+            totalVerts,
+            totalPaths,
+            ZIncreasingDownwards,
+            props
+        ),
     };
 }
 
