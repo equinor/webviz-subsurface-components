@@ -604,21 +604,23 @@ function flattenGroupData(
                 );
             }
             const srcVerts = polylines.positions.length / 3;
-            if (polylines.colors && polylines.colors.length !== srcVerts * 4) {
+            let colors = polylines.colors;
+            if (colors && colors.length !== srcVerts * 4) {
                 console.warn(
-                    `PolylineGroupLayer: BinaryPolylines group (id=${group.id ?? "unknown"}) has a colors buffer with wrong length (expected ${srcVerts * 4}, got ${polylines.colors.length}). Ignoring colors.`
+                    `PolylineGroupLayer: BinaryPolylines group (id=${group.id ?? "unknown"}) has a colors buffer with wrong length (expected ${srcVerts * 4}, got ${colors.length}). Ignoring colors.`
                 );
-                polylines.colors = undefined;
+                colors = undefined;
             }
-            if (polylines.widths && polylines.widths.length !== srcVerts) {
+            let widths = polylines.widths;
+            if (widths && widths.length !== srcVerts) {
                 console.warn(
-                    `PolylineGroupLayer: BinaryPolylines group (id=${group.id ?? "unknown"}) has a widths buffer with wrong length (expected ${srcVerts}, got ${polylines.widths.length}). Ignoring widths.`
+                    `PolylineGroupLayer: BinaryPolylines group (id=${group.id ?? "unknown"}) has a widths buffer with wrong length (expected ${srcVerts}, got ${widths.length}). Ignoring widths.`
                 );
-                polylines.widths = undefined;
+                widths = undefined;
             }
             binaryRaw.push({
                 group,
-                polylines,
+                polylines: { ...polylines, colors, widths },
             });
             totalVerts += srcVerts;
             totalPaths += polylines.startIndices.length;
