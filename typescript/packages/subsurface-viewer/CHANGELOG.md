@@ -1,3 +1,14 @@
+## 1.18.0 (2026-06-02)
+
+### 🚀 Features
+
+- polyline group layer ([#2766](https://github.com/equinor/webviz-subsurface-components/pull/2766))
+
+### ❤️ Thank You
+
+- Copilot
+- Håvard Bjerke
+
 ## 1.17.8 (2026-05-12)
 
 ### 🧱 Updated Dependencies
