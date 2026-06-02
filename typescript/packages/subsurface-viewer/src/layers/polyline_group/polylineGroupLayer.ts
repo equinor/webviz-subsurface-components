@@ -494,7 +494,18 @@ function buildBinaryData(
     for (let gIdx = 0; gIdx < binaryRaw.length; gIdx++) {
         const { group, polylines } = binaryRaw[gIdx];
         const src = polylines.positions;
-        const srcVerts = src.length / 3;
+
+        // Ensure positions buffer length is a multiple of 3; if not, ignore
+        // trailing vertices.
+        if (src.length % 3 !== 0) {
+            console.warn(
+                `PolylineGroupLayer: BinaryPolylines group (id=` +
+                    `${group.id ?? "unknown"}) has a positions buffer whose` +
+                    `length (${src.length}) is not a multiple of 3. Trailing ` +
+                    `incomplete vertex will be ignored.`
+            );
+        }
+        const srcVerts = Math.floor(src.length / 3);
 
         // Copy positions (optionally flipping Z)
         const base = vOffset * 3;
