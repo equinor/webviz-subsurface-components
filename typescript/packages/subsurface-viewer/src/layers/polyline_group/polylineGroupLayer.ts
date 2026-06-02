@@ -677,7 +677,12 @@ function flattenGroupData(
                     "PolylineGroupLayer: dashArray is not supported on BinaryPolylines groups; ignoring."
                 );
             }
-            const srcVerts = polylines.positions.length / 3;
+            if (polylines.positions.length % 3 !== 0) {
+                console.warn(
+                    `PolylineGroupLayer: BinaryPolylines group (id=${group.id ?? "unknown"}) has a positions buffer whose length (${polylines.positions.length}) is not a multiple of 3. Trailing incomplete vertex will be ignored.`
+                );
+            }
+            const srcVerts = Math.floor(polylines.positions.length / 3);
             let colors = polylines.colors;
             if (colors && colors.length !== srcVerts * 4) {
                 console.warn(
