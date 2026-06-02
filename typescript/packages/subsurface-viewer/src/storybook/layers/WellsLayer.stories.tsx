@@ -4,15 +4,14 @@ import React, { useState } from "react";
 import { OrbitView, OrthographicView, View } from "@deck.gl/core";
 import { PathStyleExtension } from "@deck.gl/extensions";
 import { PathLayer } from "@deck.gl/layers";
+import type { ScaleHandler } from "@emerson-eps/color-tables";
 import {
     ColorLegend,
     colorTables,
     createColorMapFunction as createColormapFunction,
 } from "@emerson-eps/color-tables";
-import type { ScaleHandler } from "@emerson-eps/color-tables";
 import { NativeSelect } from "@equinor/eds-core-react";
 import { Slider } from "@mui/material";
-import { styled } from "@mui/material/styles";
 import type { Meta, StoryObj } from "@storybook/react";
 import type { FeatureCollection, GeometryCollection } from "geojson";
 
@@ -50,6 +49,8 @@ import {
     WELL_COUNT_ARGTYPES,
 } from "../constant/argTypes";
 import {
+    annotationClasses,
+    AnnotationRoot,
     default3DViews,
     defaultStoryParameters,
     volveWellsBounds,
@@ -72,8 +73,6 @@ const stories: Meta = {
     },
 };
 export default stories;
-
-const PREFIX = "VolveWells";
 
 const testWellWithDuplicates: WellFeatureCollection = {
     type: "FeatureCollection",
@@ -113,22 +112,6 @@ const testWellWithDuplicates: WellFeatureCollection = {
         },
     ],
 };
-
-const classes = {
-    main: `${PREFIX}-main`,
-    annotation: `${PREFIX}-annotation`,
-};
-
-const Root = styled("div")({
-    [`& .${classes.main}`]: {
-        height: 500,
-        border: "1px solid black",
-        position: "relative",
-    },
-    [`& .${classes.annotation}`]: {
-        marginLeft: "100px",
-    },
-});
 
 const defaultProps = {
     id: "some id",
@@ -352,8 +335,8 @@ const WellsWithResetButton: React.FC<SubsurfaceViewerProps> = (props) => {
     }, [props.editedData]);
 
     return (
-        <Root>
-            <div className={classes.main}>
+        <AnnotationRoot>
+            <div className={annotationClasses.main}>
                 <SubsurfaceViewer
                     {...props}
                     editedData={editedData}
@@ -364,7 +347,7 @@ const WellsWithResetButton: React.FC<SubsurfaceViewerProps> = (props) => {
                 />
             </div>
             <button onClick={handleChange1}> Reset Multiple Wells </button>
-        </Root>
+        </AnnotationRoot>
     );
 };
 
@@ -555,8 +538,8 @@ const WellsRefineComponent: React.FC<SubsurfaceViewerProps> = (props) => {
     );
 
     return (
-        <Root>
-            <div className={classes.main}>
+        <AnnotationRoot>
+            <div className={annotationClasses.main}>
                 <SubsurfaceViewer {...propsWithLayers} />
             </div>
             <Slider
@@ -567,7 +550,7 @@ const WellsRefineComponent: React.FC<SubsurfaceViewerProps> = (props) => {
                 onChange={handleChange}
                 valueLabelDisplay={"auto"}
             />
-        </Root>
+        </AnnotationRoot>
     );
 };
 
@@ -1236,16 +1219,16 @@ export const UnfoldedProjection: StoryObj<
         ];
 
         return (
-            <Root>
+            <AnnotationRoot>
                 <SubsurfaceViewer {...viewerArgs} layers={layers}>
                     {
                         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                         /* @ts-expect-error */
                         <View id="viewport1">
-                            <h2 className={classes.annotation}>
+                            <h2 className={annotationClasses.annotation}>
                                 Default unfolded projection [distance, z]
                             </h2>
-                            <p className={classes.annotation}>
+                            <p className={annotationClasses.annotation}>
                                 The wells are projected onto a section defined
                                 by the wellbores themselves, ie. a [abscissa, z]
                                 plane defined by <i>unfolding</i> the well
@@ -1257,10 +1240,10 @@ export const UnfoldedProjection: StoryObj<
                         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                         /* @ts-expect-error */
                         <View id="viewport2">
-                            <h2 className={classes.annotation}>
+                            <h2 className={annotationClasses.annotation}>
                                 Custom unfolded projection [distance, z]
                             </h2>
-                            <p className={classes.annotation}>
+                            <p className={annotationClasses.annotation}>
                                 Demonstrates using a custom method of unfolding
                                 the wells, by specifying a custom section
                                 transform. This section is defined by a nearest
@@ -1273,17 +1256,17 @@ export const UnfoldedProjection: StoryObj<
                         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                         /* @ts-expect-error */
                         <View id="viewport3">
-                            <h2 className={classes.annotation}>
+                            <h2 className={annotationClasses.annotation}>
                                 Folded projection [x, y]
                             </h2>
-                            <p className={classes.annotation}>
+                            <p className={annotationClasses.annotation}>
                                 The dashed polyline shows the custom section
                                 path.
                             </p>
                         </View>
                     }
                 </SubsurfaceViewer>
-            </Root>
+            </AnnotationRoot>
         );
     },
 };

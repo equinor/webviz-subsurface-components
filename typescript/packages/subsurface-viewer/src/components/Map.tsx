@@ -303,6 +303,16 @@ export interface MapProps {
     /**
      * Coordinate boundary for the view defined as [left, bottom, right, top].
      * Should be used for 2D view only.
+     *
+     * @remarks The camera is reset whenever the identity of this value changes.
+     * Pass a stable reference (a module-level or memoized constant) rather than
+     * an inline array literal to avoid unintentional resets.
+     *
+     * **Conflict with per-viewport camera settings:** when `bounds` is set,
+     * per-viewport `target` and `zoom` fields in `ViewportType` do not work as
+     * expected. Omit `bounds` and set `target`/`zoom` directly on each viewport
+     * instead, relying on `dataBoundingBox3d` from the layers as the fallback
+     * fit.
      */
     bounds?: BoundingBox2D | BoundsAccessor;
 
@@ -321,7 +331,11 @@ export interface MapProps {
 
     /**
      * Views configuration for map. If not specified, all the layers will be
-     * displayed in a single 2D viewport
+     * displayed in a single 2D viewport.
+     *
+     * @remarks The camera is reset whenever the identity of this value changes.
+     * Pass a stable reference (a module-level or memoized constant) rather than
+     * an object literal to avoid unintentional resets.
      */
     views?: ViewsType;
 

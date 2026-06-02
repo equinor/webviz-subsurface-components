@@ -13,6 +13,8 @@ import { createPropertyData, computeBoundingBox } from "../utils/layerTools";
 import type { RGBAColor, RGBColor } from "../../utils";
 
 import { PrivatePolylinesLayer } from "./privatePolylinesLayer";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- used in @link JSDoc
+import type { PolylineGroupLayer } from "../polyline_group/polylineGroupLayer";
 
 type IsPolylineClosedFunc = (index: number) => boolean;
 
@@ -93,6 +95,10 @@ interface IDataAttributes {
     pathType: PathType;
 }
 
+/**
+ * @deprecated Use {@link PolylineGroupLayer} instead, which supports grouped polylines
+ * with per-group and per-polyline color/width overrides.
+ */
 export default class PolylinesLayer extends CompositeLayer<PolylinesLayerProps> {
     renderLayers(): [PrivatePolylinesLayer?] {
         const data = this.state["dataAttributes"] as IDataAttributes;
