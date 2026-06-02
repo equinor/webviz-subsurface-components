@@ -277,6 +277,12 @@ type BinaryData = {
     groups: PolylineGroup[];
 };
 
+const DEFAULT_GROUP_STYLE: Required<PolylineStyle> = {
+    color: [0, 128, 255, 255],
+    width: 2,
+    dashArray: [0, 0],
+};
+
 // ---------------------------------------------------------------------------
 // Default props
 // ---------------------------------------------------------------------------
@@ -289,7 +295,7 @@ const defaultProps: Partial<PolylineGroupLayerProps> = {
     visible: true,
     depthTest: true,
     ZIncreasingDownwards: true,
-    defaultGroupStyle: { color: [0, 128, 255, 255], width: 2 },
+    defaultGroupStyle: DEFAULT_GROUP_STYLE,
     widthUnits: "meters",
     widthScale: 1,
     widthMinPixels: 0,
@@ -318,7 +324,7 @@ function resolveColor(
     const fromGroupAccessor = props.getGroupColor?.(group);
     if (fromGroupAccessor != null) return fromGroupAccessor;
     if (group.color != null) return group.color;
-    return props.defaultGroupStyle?.color ?? [0, 128, 255, 255];
+    return props.defaultGroupStyle?.color ?? DEFAULT_GROUP_STYLE.color;
 }
 
 function resolveWidth(
@@ -332,7 +338,7 @@ function resolveWidth(
     const fromGroupAccessor = props.getGroupWidth?.(group);
     if (fromGroupAccessor != null) return fromGroupAccessor;
     if (group.width != null) return group.width;
-    return props.defaultGroupStyle?.width ?? 2;
+    return props.defaultGroupStyle?.width ?? DEFAULT_GROUP_STYLE.width;
 }
 
 // ---------------------------------------------------------------------------
@@ -356,7 +362,7 @@ function resolveDashArray(
     const fromGroupAccessor = props.getGroupDashArray?.(group);
     if (fromGroupAccessor != null) return fromGroupAccessor;
     if (group.dashArray != null) return group.dashArray;
-    return props.defaultGroupStyle?.dashArray ?? [0, 0];
+    return props.defaultGroupStyle?.dashArray ?? DEFAULT_GROUP_STYLE.dashArray;
 }
 
 // ---------------------------------------------------------------------------
