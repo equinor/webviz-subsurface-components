@@ -18,6 +18,7 @@ import type {
     PropertyDataType,
 } from "../utils/layerTools";
 import { createPropertyData } from "../utils/layerTools";
+import _ from "lodash";
 
 // ---------------------------------------------------------------------------
 // Public data types
@@ -85,7 +86,7 @@ export type PolylineGroup = PolylineStyle & {
  * 2. `Polyline` field (`color` / `width` / `dashArray`)
  * 3. group-level accessor (`getGroupColor` / `getGroupWidth` / `getGroupDashArray`)
  * 4. `PolylineGroup` field (`color` / `width` / `dashArray`)
- * 5. layer default (`defaultGroupColor` / `defaultGroupWidth` / `defaultGroupDashArray`)
+ * 5. layer default (`defaultGroupStyle`)
  */
 export interface PolylineGroupLayerProps
     extends ExtendedLayerProps,
@@ -155,10 +156,11 @@ export interface PolylineGroupLayerProps
 
     // -- Fallback defaults ---------------------------------------------------
 
-    /** Fallback color used when no group or polyline color is resolved. Default: `[0, 128, 255, 255]`. */
-    defaultGroupColor?: Color;
-    /** Fallback line width used when no group or polyline width is resolved. Default: `2`. */
-    defaultGroupWidth?: number;
+    /**
+     * Fallback style applied when no group or polyline style is resolved.
+     * Defaults to `{ color: [0, 128, 255, 255], width: 2 }`.
+     */
+    defaultGroupStyle?: PolylineStyle;
 
     // -- Width / rendering controls — inherited from PathLayerProps ----------
     // widthUnits, widthScale, widthMinPixels, widthMaxPixels,
@@ -219,9 +221,6 @@ export interface PolylineGroupLayerProps
         polyline: Polyline,
         group: PolylineGroup
     ) => [number, number] | null | undefined;
-
-    /** Default dash pattern `[dashLength, gapLength]` applied when no group or polyline override is set. */
-    defaultGroupDashArray?: [number, number];
 
     /**
      * Use high-precision dash rendering (avoids dash-length variation at segment
@@ -290,8 +289,7 @@ const defaultProps: Partial<PolylineGroupLayerProps> = {
     visible: true,
     depthTest: true,
     ZIncreasingDownwards: true,
-    defaultGroupColor: [0, 128, 255, 255],
-    defaultGroupWidth: 2,
+    defaultGroupStyle: { color: [0, 128, 255, 255], width: 2 },
     widthUnits: "meters",
     widthScale: 1,
     widthMinPixels: 0,
@@ -320,7 +318,7 @@ function resolveColor(
     const fromGroupAccessor = props.getGroupColor?.(group);
     if (fromGroupAccessor != null) return fromGroupAccessor;
     if (group.color != null) return group.color;
-    return props.defaultGroupColor ?? [0, 128, 255, 255];
+    return props.defaultGroupStyle?.color ?? [0, 128, 255, 255];
 }
 
 function resolveWidth(
@@ -334,7 +332,7 @@ function resolveWidth(
     const fromGroupAccessor = props.getGroupWidth?.(group);
     if (fromGroupAccessor != null) return fromGroupAccessor;
     if (group.width != null) return group.width;
-    return props.defaultGroupWidth ?? 2;
+    return props.defaultGroupStyle?.width ?? 2;
 }
 
 // ---------------------------------------------------------------------------
@@ -358,7 +356,7 @@ function resolveDashArray(
     const fromGroupAccessor = props.getGroupDashArray?.(group);
     if (fromGroupAccessor != null) return fromGroupAccessor;
     if (group.dashArray != null) return group.dashArray;
-    return props.defaultGroupDashArray ?? [0, 0];
+    return props.defaultGroupStyle?.dashArray ?? [0, 0];
 }
 
 // ---------------------------------------------------------------------------
@@ -512,7 +510,7 @@ function buildBinaryData(
         } else {
             const color = props.getGroupColor?.(group) ??
                 group.color ??
-                props.defaultGroupColor ?? [0, 128, 255, 255];
+                props.defaultGroupStyle?.color ?? [0, 128, 255, 255];
             // Write the first RGBA directly into the combined buffer, then
             // reinterpret that position as a Uint32 and fill it across all
             // remaining vertices in one call — no bit-shifting required.
@@ -533,7 +531,7 @@ function buildBinaryData(
             widths.fill(
                 props.getGroupWidth?.(group) ??
                     group.width ??
-                    props.defaultGroupWidth ??
+                    props.defaultGroupStyle?.width ??
                     2,
                 vOffset,
                 vOffset + srcVerts
@@ -834,9 +832,7 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
             props.getPolylineDashArray !== oldProps.getPolylineDashArray ||
             props.getGroupPolylines !== oldProps.getGroupPolylines ||
             props.getPolylinePath !== oldProps.getPolylinePath ||
-            props.defaultGroupColor !== oldProps.defaultGroupColor ||
-            props.defaultGroupWidth !== oldProps.defaultGroupWidth ||
-            props.defaultGroupDashArray !== oldProps.defaultGroupDashArray ||
+            !_.isEqual(props.defaultGroupStyle, oldProps.defaultGroupStyle) ||
             props.ZIncreasingDownwards !== oldProps.ZIncreasingDownwards;
 
         if (needsRebuild) {
