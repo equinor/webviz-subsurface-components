@@ -914,8 +914,7 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
             highPrecisionDash,
         } = this.props;
 
-        // Shared sub-layer props for the non-binary `paths` sub-layer (and the
-        // section-mode sub-layers).
+        // Shared props for all sub-layers
         const sharedProps = {
             data: flatData,
             pickable,
@@ -1036,12 +1035,15 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
                             new DataFilterExtension({ filterSize: 1 }),
                         ],
                         data: binaryLayerData,
+                        // Experimental deck.gl prop: tells PathLayer the paths
+                        // are open (not closed rings), skipping the closure
+                        // check. Safe here since BinaryPolylines are never
+                        // closed. Re-evaluate if deck.gl removes/renames this.
                         _pathType: "open",
-                        updateTriggers: {
-                            getFilterValue: [hiddenGroups],
-                        },
                         getColor: undefined, // color comes from attribute
                         getWidth: undefined, // width comes from attribute
+                        getFilterValue: undefined, // filter value comes from attribute
+                        getDashArray: undefined, // dash array is not supported for binary groups
                     })
                 )
             );
