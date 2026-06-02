@@ -515,14 +515,19 @@ function buildBinaryData(
 
         // Copy positions (optionally flipping Z)
         const base = vOffset * 3;
+        const srcLen = srcVerts * 3;
         if (ZIncreasingDownwards) {
-            for (let i = 0; i < src.length; i += 3) {
+            for (let i = 0; i < srcLen; i += 3) {
                 positions[base + i] = src[i];
                 positions[base + i + 1] = src[i + 1];
                 positions[base + i + 2] = -src[i + 2];
             }
         } else {
-            positions.set(src, base);
+            // Slice to srcLen to exclude any trailing incomplete vertex.
+            positions.set(
+                srcLen < src.length ? src.subarray(0, srcLen) : src,
+                base
+            );
         }
 
         if (polylines.colors) {
