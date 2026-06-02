@@ -469,6 +469,9 @@ function flattenSubGroupPolyline(
  * Allocates combined typed-array buffers and fills them from all raw binary
  * groups. Positions and indices are concatenated; color/width are replicated
  * per vertex so the GPU can read them without per-vertex JS work.
+ *
+ * @remarks * `polylines` is a sanitized copy of group.polylines with invalid
+ * colors/widths buffers stripped out; do not read from group.polylines directly.
  */
 function buildBinaryData(
     binaryRaw: { group: PolylineGroup; polylines: BinaryPolylines }[],
@@ -511,9 +514,14 @@ function buildBinaryData(
             const color = props.getGroupColor?.(group) ??
                 group.color ??
                 props.defaultGroupStyle?.color ?? [0, 128, 255, 255];
-            // Write the first RGBA directly into the combined buffer, then
-            // reinterpret that position as a Uint32 and fill it across all
-            // remaining vertices in one call — no bit-shifting required.
+            // Flood-fill the group color across all vertices efficiently:
+            // 1. Write the first RGBA (4 × Uint8) into the combined Uint8Array
+            //    at byte offset vOffset*4.
+            // 2. Reinterpret the same ArrayBuffer as Uint32 (1 element = 4 bytes
+            //    = one RGBA pixel). Index vOffset in the Uint32 view therefore
+            //    aliases the four bytes we just wrote.
+            // 3. Use TypedArray.fill to copy that single 32-bit value into every
+            //    remaining vertex slot in one call — no per-channel bit-shifting.
             colors.set(
                 [color[0], color[1], color[2], color[3] ?? 255],
                 vOffset * 4
