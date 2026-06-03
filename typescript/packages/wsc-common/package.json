@@ -1,6 +1,9 @@
 {
   "name": "@webviz/wsc-common",
   "version": "1.4.8",
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "Shared functionality for WebViz Subsurface Components",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
