@@ -1,3 +1,17 @@
+## 2.8.4 (2026-06-03)
+
+### 🩹 Fixes
+
+- add publishConfig for public access in multiple packages ([#2770](https://github.com/equinor/webviz-subsurface-components/pull/2770))
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.4.9
+
+### ❤️ Thank You
+
+- Håvard Bjerke
+
 ## 2.8.3 (2026-05-12)
 
 ### 🧱 Updated Dependencies

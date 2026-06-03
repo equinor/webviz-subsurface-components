@@ -1,3 +1,13 @@
+## 1.9.9 (2026-06-03)
+
+### 🩹 Fixes
+
+- add publishConfig for public access in multiple packages ([#2770](https://github.com/equinor/webviz-subsurface-components/pull/2770))
+
+### ❤️ Thank You
+
+- Håvard Bjerke
+
 ## 1.9.8 (2026-05-12)
 
 This was a version bump only for well-completions-plot to align it with other projects, there were no code changes.
