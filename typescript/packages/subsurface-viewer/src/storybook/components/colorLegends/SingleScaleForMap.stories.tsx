@@ -1,7 +1,7 @@
 import React from "react";
 import { styled } from "@mui/material/styles";
 
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-webpack5";
 
 import type { ContinuousLegendProps } from "@emerson-eps/color-tables";
 import { ContinuousLegend, colorTables } from "@emerson-eps/color-tables";

@@ -1,6 +1,6 @@
 import { colorTables } from "@emerson-eps/color-tables";
-import type { Meta, StoryObj } from "@storybook/react";
-import { fn } from "@storybook/test";
+import type { Meta, StoryObj } from "@storybook/react-webpack5";
+import { fn } from "storybook/test";
 import React from "react";
 
 import type { Template as TemplateType } from "./WellLogTemplateTypes";

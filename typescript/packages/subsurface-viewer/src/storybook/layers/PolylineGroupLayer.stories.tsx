@@ -1,7 +1,7 @@
 import type { Color, Position } from "@deck.gl/core";
 import { OrbitView, OrthographicView, View } from "@deck.gl/core";
 import { PolygonLayer } from "@deck.gl/layers";
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-webpack5";
 import React from "react";
 import { SectionView } from "../../views/sectionView";
 

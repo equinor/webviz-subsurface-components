@@ -1,4 +1,4 @@
-import { fireEvent, userEvent } from "@storybook/test";
+import { fireEvent, userEvent } from "storybook/test";
 
 /**
  * Shared utilities for Storybook `play` functions.

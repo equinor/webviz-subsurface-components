@@ -1,5 +1,5 @@
 import React from "react";
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-webpack5";
 import { OrbitView, OrthographicView } from "@deck.gl/core";
 import type { MergedTextLayerProps } from "../../layers/wells/layers/mergedTextLayer";
 import { MergedTextLayer } from "../../layers/wells/layers/mergedTextLayer";

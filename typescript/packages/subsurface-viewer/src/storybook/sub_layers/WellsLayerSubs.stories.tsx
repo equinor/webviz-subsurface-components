@@ -6,7 +6,7 @@ import type {
     Layer,
 } from "@deck.gl/core";
 import { PathLayer } from "@deck.gl/layers";
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-webpack5";
 import type { Position } from "geojson";
 import { clamp, round } from "lodash";
 

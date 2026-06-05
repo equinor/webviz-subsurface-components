@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-webpack5";
 import React from "react";
 
 import { OrthographicView } from "@deck.gl/core";
@@ -58,8 +58,8 @@ export const DarkMode: StoryObj<typeof ColoredLabelsComponent> = {
         labelColor: "white",
         axisColor: "white",
     },
-    parameters: {
-        backgrounds: { default: "dark" },
+    globals: {
+        backgrounds: { value: "dark" },
     },
     render: (args) => <ColoredLabelsComponent {...args} />,
 };

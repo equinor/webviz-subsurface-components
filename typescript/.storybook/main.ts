@@ -1,20 +1,22 @@
+import { createRequire } from "node:module";
 import { dirname, join } from "path";
 
 import type { StorybookConfig } from "@storybook/react-webpack5";
+
+const require = createRequire(import.meta.url);
 
 const config: StorybookConfig = {
     stories: [
         "../packages/*/src/**/*.mdx",
         "../packages/*/src/**/*.stories.@(js|jsx|ts|tsx)",
     ],
+
     addons: [
+        getAbsolutePath("@storybook/addon-docs"),
         getAbsolutePath("@storybook/addon-links"),
-        getAbsolutePath("@storybook/addon-essentials"),
-        getAbsolutePath("@storybook/addon-actions"),
-        getAbsolutePath("@storybook/addon-storysource"),
         getAbsolutePath("@storybook/addon-webpack5-compiler-babel"),
-        getAbsolutePath("@storybook/addon-interactions"),
     ],
+
     webpackFinal: async (config) => {
         return {
             ...config,
@@ -76,13 +78,18 @@ const config: StorybookConfig = {
             },
         };
     },
+
     staticDirs: ["../../example-data"],
+
     framework: {
-        name: "@storybook/react-webpack5",
+        name: getAbsolutePath("@storybook/react-webpack5"),
         options: {},
     },
-    docs: {
-        autodocs: true,
+
+    docs: {},
+
+    typescript: {
+        reactDocgen: "react-docgen-typescript",
     },
 };
 export default config;
