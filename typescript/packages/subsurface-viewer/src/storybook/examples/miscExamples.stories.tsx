@@ -1,7 +1,10 @@
 import { all, create } from "mathjs";
 import React from "react";
 
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-webpack5";
+import { fireEvent, userEvent } from "storybook/test";
+
+import type { Layer } from "@deck.gl/core";
 
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer, { TGrid3DColoringMode } from "../../SubsurfaceViewer";
@@ -35,8 +38,6 @@ import {
     Points as ToroidPoints,
     VertexCount as ToroidVertexCount,
 } from "../../layers/grid3d/test_data/PentagonalToroid";
-import type { Layer } from "@deck.gl/core";
-import { fireEvent, userEvent } from "@storybook/test";
 
 const stories: Meta = {
     component: SubsurfaceViewer,
