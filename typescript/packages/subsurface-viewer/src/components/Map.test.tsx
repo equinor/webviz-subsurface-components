@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import type { LayersList } from "@deck.gl/core";
 import { colorTables } from "@emerson-eps/color-tables";
 import "@testing-library/jest-dom";
