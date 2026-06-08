@@ -49,7 +49,10 @@ const config: StorybookConfig = {
                                     ],
                                     [
                                         "@babel/preset-typescript",
-                                        { allowNamespaces: true },
+                                        {
+                                            allowNamespaces: true,
+                                            allowDeclareFields: true,
+                                        },
                                     ],
                                     "@babel/preset-react",
                                 ],

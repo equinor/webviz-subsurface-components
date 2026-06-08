@@ -92,7 +92,7 @@ export class FlatWellMarkersLayer<TData = unknown> extends CompositeLayer<
         getCumulativePathDistance: undefined,
     };
 
-    state!: {
+    declare state: {
         markers: MarkerData<TData>[];
 
         // We want to allow picking specific markers, so we cant use normal auto-highlight

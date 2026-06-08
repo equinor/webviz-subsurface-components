@@ -73,7 +73,7 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
         },
     };
 
-    state!: {
+    declare state: {
         dashedPathSubLayerData: ComputedPathSection[];
         normalPathSubLayerData: ComputedPathSection[];
 

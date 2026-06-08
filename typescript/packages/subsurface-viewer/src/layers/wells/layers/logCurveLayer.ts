@@ -80,7 +80,7 @@ export type LogCurveLayerProps = Omit<
 export class LogCurveLayer extends CompositeLayer<LogCurveLayerProps> {
     static layerName = "Log Curve Layer";
 
-    state!: {
+    declare state: {
         subLayerData: LogCurveDataType[] | null;
         legend?: string;
 

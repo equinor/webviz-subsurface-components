@@ -463,7 +463,7 @@ function makeData(n: number, amplitude: number): Float32Array {
     const stdY = 50;
     const f = makeGaussian(amplitude, X0, Y0, stdX, stdY);
 
-    const data = new Float32Array(n * n).map((val, index) => {
+    const data = new Float32Array(n * n).map((_val, index) => {
         const x = (index % n) - n / 2;
         const y = Math.floor(index / n) - n / 2;
         return f(x, y); // keep + 0.3 * Math.random();
