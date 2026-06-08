@@ -111,7 +111,6 @@ export const DashedSections: Story = {
         },
     },
     render: (args) => (
-        // @ts-expect-error -- Don't know how to get args typed so that it stops complaining
         <SubsurfaceViewerWithSyntheticWells
             {...args}
             makeLayers={(wellData) => [
@@ -172,7 +171,6 @@ export const TrajectoryMarkers: Story = {
         },
     },
     render: (args) => (
-        // @ts-expect-error -- Don't know how to get args typed so that it stops complaining
         <SubsurfaceViewerWithSyntheticWells
             {...args}
             id="wells-sublayer-markers"

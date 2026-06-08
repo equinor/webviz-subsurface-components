@@ -289,7 +289,7 @@ const defaultProps = {
 };
 
 export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
-    state!: {
+    declare state: {
         data: WellFeatureCollection | undefined;
         logData: LogCurveDataType[] | undefined;
         selectedMultiWells: string[];

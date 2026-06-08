@@ -58,7 +58,7 @@ export class MergedTextLayer<
     static defaultProps = DEFAULT_PROPS;
     static layerName = "MergedTextLayer";
 
-    state!: {
+    declare state: {
         clusters: Map<Position, string[]>;
         labelPositions: Map<string, Position>;
         positionToText: Map<Position, string[]>;
