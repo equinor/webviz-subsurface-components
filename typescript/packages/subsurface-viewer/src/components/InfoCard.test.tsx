@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import type { Layer } from "@deck.gl/core";
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
