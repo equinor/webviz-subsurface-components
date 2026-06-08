@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`Test Well Log View Component snapshot test 1`] = `
 <div
@@ -13,7 +13,7 @@ exports[`Test Well Log View Component snapshot test 1`] = `
     >
       <div
         class="overlay"
-        style="width: 0px; left: 0px; overflow: hidden;"
+        style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); width: 0px; left: 0px; overflow: hidden;"
       >
         <div
           class="depth"
@@ -38,7 +38,7 @@ exports[`Test Well Log View Component snapshot test 1`] = `
       </div>
       <div
         class="track"
-        style="display: flex; flex: 3;"
+        style="display: flex; flex: 3 1 0%;"
       >
         <div
           class="track-container"
