@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`Test Well Log Viewer Component snapshot test 1`] = `
 <div
@@ -31,7 +31,7 @@ exports[`Test Well Log Viewer Component snapshot test 1`] = `
                 >
                   <div
                     class="overlay"
-                    style="height: 0px; top: 0px; overflow: hidden;"
+                    style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); height: 0px; top: 0px; overflow: hidden;"
                   >
                     <div
                       class="depth"
@@ -56,7 +56,7 @@ exports[`Test Well Log Viewer Component snapshot test 1`] = `
                   </div>
                   <div
                     class="track"
-                    style="max-height: 50px; flex: 2;"
+                    style="max-height: 50px; flex: 2 1 0%;"
                   >
                     <div
                       class="track-container"
@@ -68,7 +68,7 @@ exports[`Test Well Log Viewer Component snapshot test 1`] = `
                   </div>
                   <div
                     class="track"
-                    style="max-height: 50px; flex: 2;"
+                    style="max-height: 50px; flex: 2 1 0%;"
                   >
                     <div
                       class="track-container"
@@ -80,7 +80,7 @@ exports[`Test Well Log Viewer Component snapshot test 1`] = `
                   </div>
                   <div
                     class="track"
-                    style="display: flex; flex: 6;"
+                    style="display: flex; flex: 6 1 0%;"
                   >
                     <div
                       class="track-container"
@@ -92,7 +92,7 @@ exports[`Test Well Log Viewer Component snapshot test 1`] = `
                   </div>
                   <div
                     class="track"
-                    style="display: flex; flex: 3;"
+                    style="display: flex; flex: 3 1 0%;"
                   >
                     <div
                       class="track-container"
@@ -104,7 +104,7 @@ exports[`Test Well Log Viewer Component snapshot test 1`] = `
                   </div>
                   <div
                     class="track"
-                    style="display: flex; flex: 3;"
+                    style="display: flex; flex: 3 1 0%;"
                   >
                     <div
                       class="track-container"
@@ -116,7 +116,7 @@ exports[`Test Well Log Viewer Component snapshot test 1`] = `
                   </div>
                   <div
                     class="track"
-                    style="display: none; flex: 3;"
+                    style="display: none; flex: 3 1 0%;"
                   >
                     <div
                       class="track-container"
@@ -128,7 +128,7 @@ exports[`Test Well Log Viewer Component snapshot test 1`] = `
                   </div>
                   <div
                     class="track"
-                    style="display: none; flex: 3;"
+                    style="display: none; flex: 3 1 0%;"
                   >
                     <div
                       class="track-container"
@@ -140,7 +140,7 @@ exports[`Test Well Log Viewer Component snapshot test 1`] = `
                   </div>
                   <div
                     class="track"
-                    style="display: none; flex: 3;"
+                    style="display: none; flex: 3 1 0%;"
                   >
                     <div
                       class="track-container"
@@ -152,7 +152,7 @@ exports[`Test Well Log Viewer Component snapshot test 1`] = `
                   </div>
                   <div
                     class="track"
-                    style="display: none; flex: 3;"
+                    style="display: none; flex: 3 1 0%;"
                   >
                     <div
                       class="track-container"
@@ -164,7 +164,7 @@ exports[`Test Well Log Viewer Component snapshot test 1`] = `
                   </div>
                   <div
                     class="track"
-                    style="display: none; flex: 3;"
+                    style="display: none; flex: 3 1 0%;"
                   >
                     <div
                       class="track-container"
@@ -176,7 +176,7 @@ exports[`Test Well Log Viewer Component snapshot test 1`] = `
                   </div>
                   <div
                     class="track"
-                    style="display: none; flex: 3;"
+                    style="display: none; flex: 3 1 0%;"
                   >
                     <div
                       class="track-container"
@@ -188,7 +188,7 @@ exports[`Test Well Log Viewer Component snapshot test 1`] = `
                   </div>
                   <div
                     class="track"
-                    style="display: none; flex: 3;"
+                    style="display: none; flex: 3 1 0%;"
                   >
                     <div
                       class="track-container"
@@ -200,7 +200,7 @@ exports[`Test Well Log Viewer Component snapshot test 1`] = `
                   </div>
                   <div
                     class="track"
-                    style="display: none; flex: 3;"
+                    style="display: none; flex: 3 1 0%;"
                   >
                     <div
                       class="track-container"
@@ -212,7 +212,7 @@ exports[`Test Well Log Viewer Component snapshot test 1`] = `
                   </div>
                   <div
                     class="track"
-                    style="display: none; flex: 3;"
+                    style="display: none; flex: 3 1 0%;"
                   >
                     <div
                       class="track-container"
@@ -224,7 +224,7 @@ exports[`Test Well Log Viewer Component snapshot test 1`] = `
                   </div>
                   <div
                     class="track"
-                    style="display: none; flex: 3;"
+                    style="display: none; flex: 3 1 0%;"
                   >
                     <div
                       class="track-container"
@@ -236,7 +236,7 @@ exports[`Test Well Log Viewer Component snapshot test 1`] = `
                   </div>
                   <div
                     class="track"
-                    style="display: none; flex: 3;"
+                    style="display: none; flex: 3 1 0%;"
                   >
                     <div
                       class="track-container"
@@ -248,7 +248,7 @@ exports[`Test Well Log Viewer Component snapshot test 1`] = `
                   </div>
                   <div
                     class="track"
-                    style="display: none; flex: 3;"
+                    style="display: none; flex: 3 1 0%;"
                   >
                     <div
                       class="track-container"
@@ -260,7 +260,7 @@ exports[`Test Well Log Viewer Component snapshot test 1`] = `
                   </div>
                   <div
                     class="track"
-                    style="display: none; flex: 3;"
+                    style="display: none; flex: 3 1 0%;"
                   >
                     <div
                       class="track-container"
