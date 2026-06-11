@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 /* eslint-disable @typescript-eslint/no-var-requires */
 import type { Layer } from "@deck.gl/core";
 import "@testing-library/jest-dom";

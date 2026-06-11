@@ -1091,7 +1091,7 @@ export function jsonToObject(
 
     // remove empty data/layer object
     const filtered_data = data.filter((value) => !isEmpty(value));
-    return jsonConverter.convert(filtered_data);
+    return jsonConverter.convert(filtered_data) as LayersList | View[];
 }
 
 /**
@@ -1153,10 +1153,10 @@ function createLayer(
     layerData: Record<string, unknown>,
     configuration: JSONConfiguration
 ): Layer | null {
-    const typeKey = configuration.typeKey;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const classes = configuration.classes as Record<string, any>;
-    if (layerData[typeKey]) {
+    const configProps = configuration.getProps();
+    const typeKey = configProps.typeKey;
+    const classes = configProps.classes;
+    if (typeKey && classes && layerData[typeKey]) {
         const type = layerData[typeKey] as string;
         if (type in classes) {
             const Class = classes[type];
@@ -1164,7 +1164,7 @@ function createLayer(
             // Prepare a props object
             const props = { ...layerData };
             delete props[typeKey];
-            return new Class(props);
+            return new Class(props) as Layer;
         }
     }
     return null;
@@ -1716,10 +1716,10 @@ function getViewStateFromBounds(
 
 function getViewType(
     viewport: ViewportType
-): [
-    ViewType: ViewTypeType,
-    Controller: typeof OrbitController | typeof OrthographicController,
-] {
+):
+    | [typeof SectionView, typeof OrthographicController]
+    | [typeof OrthographicView, typeof OrthographicController]
+    | [typeof OrbitView, typeof OrbitController] {
     // 3D views always use OrbitView with OrbitController
     if (show3D(viewport)) {
         return [OrbitView, OrbitController];
@@ -1764,9 +1764,13 @@ function newView(
     const near = show3D(viewport) ? 0.1 : -1000;
 
     const [ViewType, Controller] = getViewType(viewport);
+    const controllerConfig =
+        Controller === OrbitController
+            ? defineController(OrbitController, viewport?.controller)
+            : defineController(OrthographicController, viewport?.controller);
     return new ViewType({
         id: viewport.id,
-        controller: defineController(Controller, viewport?.controller),
+        controller: controllerConfig,
         x,
         y,
         width,

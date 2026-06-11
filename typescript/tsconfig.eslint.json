@@ -6,6 +6,7 @@
         "*.js",
         "packages/*/*.json",
         "packages/*/*.js",
+        "packages/*/*.ts",
         ".storybook/*",
         "*.ts",
         "__mocks__",
