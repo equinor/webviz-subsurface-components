@@ -1164,7 +1164,7 @@ function createLayer(
             // Prepare a props object
             const props = { ...layerData };
             delete props[typeKey];
-            return new Class(props) as Layer | null;
+            return new Class(props) as Layer;
         }
     }
     return null;
