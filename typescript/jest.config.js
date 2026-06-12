@@ -1,6 +1,6 @@
 /** @type {import('jest').Config} */
 
-const path = require("path");
+const path = require("node:path");
 
 /**
  * The jest tests had an error: SyntaxError: Cannot use import statement outside a module

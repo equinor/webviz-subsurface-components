@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-webpack5";
 
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 
@@ -65,6 +65,8 @@ export const NorthArrow2dDarkMode: StoryObj<typeof SubsurfaceViewer> = {
                 story: "Example using north arrow in 2D Dark Mode.",
             },
         },
-        backgrounds: { default: "dark" },
+    },
+    globals: {
+        backgrounds: { value: "dark" },
     },
 };

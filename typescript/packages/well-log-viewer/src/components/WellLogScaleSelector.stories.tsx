@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/react";
-import { expect, userEvent, within } from "@storybook/test";
+import type { Meta, StoryObj } from "@storybook/react-webpack5";
+import { expect, userEvent, within } from "storybook/test";
 import React, { useState } from "react";
 
 import type { CallbackManager } from "./CallbackManager";
