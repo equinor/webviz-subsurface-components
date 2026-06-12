@@ -8,7 +8,13 @@ module.exports = {
                 },
             },
         ],
+        [
+            "@babel/preset-typescript",
+            {
+                allowNamespaces: true,
+                allowDeclareFields: true,
+            },
+        ],
         "@babel/preset-react",
-        "@babel/preset-typescript",
     ],
 };
