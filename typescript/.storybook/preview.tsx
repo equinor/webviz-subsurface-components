@@ -13,11 +13,11 @@ const preview: Preview = {
                 height: "500px",
             },
 
-            codePanel: true
+            codePanel: true,
         },
     },
 
-    tags: ["autodocs"]
+    tags: ["autodocs"],
 };
 
 export default preview;
