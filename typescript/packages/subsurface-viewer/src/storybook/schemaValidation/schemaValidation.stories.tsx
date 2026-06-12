@@ -29,72 +29,72 @@ export default stories;
 
 export const WellsLayerValidation: StoryObj<typeof SubsurfaceViewer> = {
     args: {
-    ...exampleData[0],
-    layers: [
-        {
+        ...exampleData[0],
+        layers: [
+            {
                 ...exampleData[0]?.layers?.[4],
-            data: sampleWellsData,
-            logData: sampleLogData,
-        },
-        {
+                data: sampleWellsData,
+                logData: sampleLogData,
+            },
+            {
                 ...exampleData[0]?.layers?.[6],
-        },
-    ],
+            },
+        ],
         checkDatafileSchema: true,
     },
 };
 
 export const PieLayerValidation: StoryObj<typeof SubsurfaceViewer> = {
     args: {
-    ...exampleData[0],
-    layers: [
-        {
-            "@@type": "PieChartLayer",
-            data: samplePieData,
-        },
-    ],
-    checkDatafileSchema: true,
+        ...exampleData[0],
+        layers: [
+            {
+                "@@type": "PieChartLayer",
+                data: samplePieData,
+            },
+        ],
+        checkDatafileSchema: true,
     },
 };
 
 export const GridLayerValidation: StoryObj<typeof SubsurfaceViewer> = {
     args: {
-    ...exampleData[0],
-    layers: [
-        {
+        ...exampleData[0],
+        layers: [
+            {
                 ...exampleData[0].layers?.[2],
-            data: sampleGridData,
-            visible: true,
-        },
-    ],
-    checkDatafileSchema: true,
+                data: sampleGridData,
+                visible: true,
+            },
+        ],
+        checkDatafileSchema: true,
     },
 };
 
 export const FaultPolygonsValidation: StoryObj<typeof SubsurfaceViewer> = {
     args: {
-    ...exampleData[0],
-    layers: [
-        {
-            "@@type": "FaultPolygonsLayer",
-            data: sampleFaultPolygonsData,
-        },
-    ],
-    checkDatafileSchema: true,
+        ...exampleData[0],
+        layers: [
+            {
+                "@@type": "FaultPolygonsLayer",
+                data: sampleFaultPolygonsData,
+            },
+        ],
+        checkDatafileSchema: true,
     },
 };
 
 export const ColorTableValidation: StoryObj<typeof SubsurfaceViewer> = {
     args: {
-    ...exampleData[0],
-    layers: [
-        {
+        ...exampleData[0],
+        layers: [
+            {
                 ...exampleData[0].layers?.[4],
-            logColor: "Colors_set_5",
-            logRadius: 15,
-        },
-    ],
+                logColor: "Colors_set_5",
+                logRadius: 15,
+            },
+        ],
         colorTables: sampleColorTable as unknown as ColorTable[],
-    checkDatafileSchema: true,
+        checkDatafileSchema: true,
     },
 };
