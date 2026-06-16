@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-webpack5";
 import React from "react";
 
 import { View } from "@deck.gl/core";
@@ -283,7 +283,9 @@ export const MapLayer2dDarkMode: StoryObj<typeof SubsurfaceViewer> = {
                 story: "Example using png as mesh and properties data.",
             },
         },
-        backgrounds: { default: "dark" },
+    },
+    globals: {
+        backgrounds: { value: "dark" },
     },
 };
 
@@ -461,8 +463,7 @@ function makeData(n: number, amplitude: number): Float32Array {
     const stdY = 50;
     const f = makeGaussian(amplitude, X0, Y0, stdX, stdY);
 
-    // @ts-expect-error TS6133
-    const data = new Float32Array(n * n).map((val, index) => {
+    const data = new Float32Array(n * n).map((_val, index) => {
         const x = (index % n) - n / 2;
         const y = Math.floor(index / n) - n / 2;
         return f(x, y); // keep + 0.3 * Math.random();

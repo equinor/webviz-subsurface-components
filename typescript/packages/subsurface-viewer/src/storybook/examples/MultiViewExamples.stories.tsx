@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/react";
-import { fireEvent, userEvent } from "@storybook/test";
+import type { Meta, StoryObj } from "@storybook/react-webpack5";
+import { fireEvent, userEvent } from "storybook/test";
 import React from "react";
 
 import { View } from "@deck.gl/core";

@@ -12,7 +12,7 @@ import {
 } from "@emerson-eps/color-tables";
 import { NativeSelect } from "@equinor/eds-core-react";
 import { Slider } from "@mui/material";
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-webpack5";
 import type { FeatureCollection, GeometryCollection } from "geojson";
 
 import volveBlockingZoneLogJson from "../../../../../../example-data/volve_blocking_zonelog_logs.json";

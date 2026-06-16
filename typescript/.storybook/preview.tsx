@@ -1,4 +1,4 @@
-import type { Preview } from "@storybook/react";
+import type { Preview } from "@storybook/react-webpack5";
 
 const preview: Preview = {
     parameters: {
@@ -12,8 +12,12 @@ const preview: Preview = {
             story: {
                 height: "500px",
             },
+
+            codePanel: true,
         },
     },
+
+    tags: ["autodocs"],
 };
 
 export default preview;

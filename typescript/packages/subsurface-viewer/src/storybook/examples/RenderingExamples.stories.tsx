@@ -1,5 +1,5 @@
 import React from "react";
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-webpack5";
 
 import type { Layer } from "@deck.gl/core";
 import { SimpleMeshLayer } from "@deck.gl/mesh-layers";

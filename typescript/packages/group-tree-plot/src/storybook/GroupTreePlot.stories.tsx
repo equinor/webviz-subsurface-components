@@ -1,6 +1,6 @@
 import React from "react";
 import _ from "lodash";
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-webpack5";
 
 import { GroupTreePlot, type GroupTreePlotProps } from "../GroupTreePlot";
 

@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-webpack5";
 
 import { DistanceScale } from "../../components/DistanceScale";
 
@@ -18,7 +18,7 @@ export const DarkMode: StoryObj<typeof DistanceScale> = {
     args: {
         style: darkModeStyle,
     },
-    parameters: {
-        backgrounds: { default: "dark" },
+    globals: {
+        backgrounds: { value: "dark" },
     },
 };
