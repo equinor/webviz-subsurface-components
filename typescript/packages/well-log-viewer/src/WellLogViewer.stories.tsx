@@ -458,7 +458,16 @@ export const OnInfoFilledEvent: StoryObj<typeof StoryTemplate> = {
     ),
 };
 
-function StoryTemplateWithCustomPanel(props: WellLogViewerProps): JSX.Element {
+type StoryTemplateWithCustomPanelProps = Omit<
+    WellLogViewerProps,
+    "wellLogSets"
+> & {
+    wellLogSets: string;
+};
+
+function StoryTemplateWithCustomPanel(
+    props: StoryTemplateWithCustomPanelProps
+): JSX.Element {
     const [infos, setInfos] = React.useState<Info[]>([]);
     const [showPanel, setShowPanel] = React.useState<boolean>(false);
 

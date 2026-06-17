@@ -48,8 +48,15 @@ const L898MUD = L898MUDJson as WellLogSet[];
 const L916MUD = L916MUDJson as WellLogSet[];
 const List1 = List1Json as WellLogSet[];
 const facies3Wells = facies3WellsJson as unknown as SyncLogViewerProps;
-const { welllogs: facies3WellsLogs, ...facies3WellsArgs } = facies3Wells;
-const facies3WellsCollections: WellLogSet[][] = [facies3WellsLogs];
+const {
+    welllogs: facies3WellsLogs,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    wellLogCollections: discarded,
+    ...facies3WellsArgs
+} = facies3Wells;
+const facies3WellsCollections: WellLogSet[][] | undefined = facies3WellsLogs
+    ? ([facies3WellsLogs] as WellLogSet[][])
+    : undefined;
 
 const ComponentCode =
     "<SyncLogViewer id='SyncLogViewer' \r\n" +
@@ -124,7 +131,12 @@ function fillInfo(controller: WellLogController | undefined): string {
  * Note: it does not make really sense to pack some huge data structure into a storybook argument; user will never be able to
  * read/edit it.
  */
-function getWellLogCollections(name: string): WellLogSet[][] {
+function getWellLogCollections(
+    name: string | undefined
+): WellLogSet[][] | undefined {
+    if (name === undefined) {
+        return undefined;
+    }
     switch (name) {
         case "Default":
             return defaultLogCollections;
@@ -141,7 +153,7 @@ type SyncLogViewerPropsWrapper = Omit<
     SyncLogViewerProps,
     "wellLogCollections"
 > & {
-    wellLogCollections?: string[];
+    wellLogCollections?: string;
 };
 
 const Template = (args: SyncLogViewerPropsWrapper) => {
@@ -257,9 +269,7 @@ const exampleWellPicks: WellPickProps[] = [
 ];
 
 const defaultLogCollections: WellLogSet[][] = [
-    L898MUD[0],
-    L916MUD[0],
-    List1[0],
+    [L898MUD[0], L916MUD[0], List1[0]],
 ];
 
 export const Default: StoryObj<typeof Template> = {
@@ -320,7 +330,7 @@ type TemplateWithSelectionProps = Omit<
 const TemplateWithSelection = (args: TemplateWithSelectionProps) => {
     const { wellLogCollections: collectionName = "", ...restOfArgs } = args;
     const allCollections: WellLogSet[][] =
-        getWellLogCollections(collectionName);
+        getWellLogCollections(collectionName) ?? [];
 
     const [showWell1, setShowWell1] = React.useState(true);
     const [showWell2, setShowWell2] = React.useState(true);

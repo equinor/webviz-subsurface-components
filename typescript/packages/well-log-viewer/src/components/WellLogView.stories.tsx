@@ -61,7 +61,7 @@ function getWellLogSets(name: string): WellLogSet[] {
 /**
  * Update wellLogSets property by a name to retrieve the well log sets from the getWellLogSets() function.
  */
-type WrappedWellLogProps = Omit<WellLogViewerProps, "wellLogSets"> & {
+type WrappedWellLogProps = Omit<WellLogViewProps, "wellLogSets"> & {
     wellLogSets: string;
 };
 const WrappedWellLogView = (args: WrappedWellLogProps) => {
