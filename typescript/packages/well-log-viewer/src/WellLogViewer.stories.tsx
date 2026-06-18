@@ -126,7 +126,7 @@ function fillInfo(controller: WellLogController | undefined): string {
  * The function getWellLogSets() returns the well log sets based on the name.
  * The storybook args.wellLogSets is a string name, which is used to get the well log sets.
  *
- * Note: it does not make really sense to pack some huge data structure into a storybook argument; user will never be able to
+ * Note: it does not really make sense to pack some huge data structure into a storybook argument; user will never be able to
  * read/edit it.
  */
 function getWellLogSets(name: string): WellLogSet[] {
