@@ -2,11 +2,11 @@ import type { Meta, StoryObj } from "@storybook/react-webpack5";
 import { colorTables } from "@emerson-eps/color-tables";
 import React from "react";
 
-import WellLogView from "./WellLogView";
+import type { WellLogViewProps } from "./WellLogView";
+import WellLogView, { argTypesWellLogViewProp } from "./WellLogView";
+
 import type { WellLogSet } from "./WellLogTypes";
 import type { Template } from "./WellLogTemplateTypes";
-import type { WellLogViewProps } from "./WellLogView";
-import { argTypesWellLogViewProp } from "./WellLogView";
 import { axisTitles, axisMnemos } from "../utils/axes";
 import type { ColormapFunction } from "../utils/color-function";
 
@@ -39,10 +39,38 @@ const stories: Meta<WellLogViewProps> = {
 };
 export default stories;
 
-const WrappedWellLogView = (args: WellLogViewProps) => {
+/**
+ * Storybook 9 is very slow to parse huge JSON args.
+ * Thus the approach to use a string name to select the well log sets to be used in the story.
+ * The function getWellLogSets() returns the well log sets based on the name.
+ * The storybook args.wellLogSets is a string name, which is used to get the well log sets.
+ *
+ * Note: it does not really make sense to pack some huge data structure into a storybook argument; user will never be able to
+ * read/edit it.
+ */
+function getWellLogSets(name: string): WellLogSet[] {
+    switch (name) {
+        case "Default":
+            return [wellLogDefault];
+        case "Discrete":
+            return [wellLogDiscrete];
+    }
+    return [];
+}
+
+/**
+ * Update wellLogSets property by a name to retrieve the well log sets from the getWellLogSets() function.
+ */
+type WrappedWellLogProps = Omit<WellLogViewProps, "wellLogSets"> & {
+    wellLogSets: string;
+};
+const WrappedWellLogView = (args: WrappedWellLogProps) => {
     return (
         <div style={{ height: "92vh" }}>
-            <WellLogView {...args} />
+            <WellLogView
+                {...args}
+                wellLogSets={getWellLogSets(args.wellLogSets)}
+            />
         </div>
     );
 };
@@ -50,7 +78,6 @@ const WrappedWellLogView = (args: WellLogViewProps) => {
 export const Default: StoryObj<typeof WrappedWellLogView> = {
     args: {
         horizontal: false,
-        wellLogSets: [wellLogDefault],
         template: viewerTemplate1,
         viewTitle: (
             <div>
@@ -61,13 +88,13 @@ export const Default: StoryObj<typeof WrappedWellLogView> = {
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
     },
-    render: (args) => <WrappedWellLogView {...args} />,
+    // wellLogSets is used to retrieve the well log sets from the getWellLogSets() function
+    render: (args) => <WrappedWellLogView {...args} wellLogSets="Default" />,
 };
 
 export const Discrete: StoryObj<typeof WrappedWellLogView> = {
     args: {
         horizontal: false,
-        wellLogSets: [wellLogDiscrete] as WellLogSet[],
         template: viewerTemplate2,
         viewTitle: "Well '" + wellLogDiscrete.header.well + "'",
         colorMapFunctions: exampleColormapFunctions,
@@ -77,5 +104,6 @@ export const Discrete: StoryObj<typeof WrappedWellLogView> = {
             checkDatafileSchema: true,
         },
     },
-    render: (args) => <WrappedWellLogView {...args} />,
+    // wellLogSets is used to retrieve the well log sets from the getWellLogSets() function
+    render: (args) => <WrappedWellLogView {...args} wellLogSets="Discrete" />,
 };

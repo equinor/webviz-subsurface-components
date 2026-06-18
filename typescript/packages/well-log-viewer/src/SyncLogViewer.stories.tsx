@@ -48,6 +48,15 @@ const L898MUD = L898MUDJson as WellLogSet[];
 const L916MUD = L916MUDJson as WellLogSet[];
 const List1 = List1Json as WellLogSet[];
 const facies3Wells = facies3WellsJson as unknown as SyncLogViewerProps;
+const {
+    welllogs: facies3WellsLogs,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    wellLogCollections: discarded,
+    ...facies3WellsArgs
+} = facies3Wells;
+const facies3WellsCollections: WellLogSet[][] | undefined = facies3WellsLogs
+    ? ([facies3WellsLogs] as WellLogSet[][])
+    : undefined;
 
 const ComponentCode =
     "<SyncLogViewer id='SyncLogViewer' \r\n" +
@@ -113,7 +122,41 @@ function fillInfo(controller: WellLogController | undefined): string {
     );
 }
 
-const Template = (args: SyncLogViewerProps) => {
+/**
+ * Storybook 9 is very slow to parse huge JSON args.
+ * Thus the approach to use a string name to select the well log collections to be used in the story.
+ * The function getWellLogCollections() returns the well log collections based on the name.
+ * The storybook args.wellLogCollections is a string name, which is used to get the well log collections.
+ *
+ * Note: it does not really make sense to pack some huge data structure into a storybook argument; user will never be able to
+ * read/edit it.
+ */
+function getWellLogCollections(
+    name: string | undefined
+): WellLogSet[][] | undefined {
+    if (name === undefined) {
+        return undefined;
+    }
+    switch (name) {
+        case "Default":
+            return defaultLogCollections;
+        case "DiscreteLogs":
+        case "DiscreteLogsWithIndividualDomains":
+            return facies3WellsCollections;
+        case "LogsWithDifferentSets":
+            return logsWithDifferentSetsCollections;
+    }
+    return [];
+}
+
+type SyncLogViewerPropsWrapper = Omit<
+    SyncLogViewerProps,
+    "wellLogCollections"
+> & {
+    wellLogCollections?: string;
+};
+
+const Template = (args: SyncLogViewerPropsWrapper) => {
     const infoRef = React.useRef<HTMLDivElement | null>(null);
     const setInfo = function (info: string): void {
         if (infoRef.current) infoRef.current.innerHTML = info;
@@ -174,6 +217,9 @@ const Template = (args: SyncLogViewerProps) => {
                 <SyncLogViewer
                     id="SyncLogViewer"
                     {...args}
+                    wellLogCollections={getWellLogCollections(
+                        args.wellLogCollections
+                    )}
                     onCreateController={onCreateController}
                     onDeleteController={onDeleteController}
                     onContentRescale={onContentRescale}
@@ -222,6 +268,10 @@ const exampleWellPicks: WellPickProps[] = [
     },
 ];
 
+const defaultLogCollections: WellLogSet[][] = [
+    [L898MUD[0], L916MUD[0], List1[0]],
+];
+
 export const Default: StoryObj<typeof Template> = {
     args: {
         syncTrackPos: true,
@@ -230,7 +280,6 @@ export const Default: StoryObj<typeof Template> = {
         syncTemplate: true,
         horizontal: false,
 
-        welllogs: [L898MUD[0], L916MUD[0], List1[0]],
         templates: [syncTemplate, syncTemplate],
         colorMapFunctions: exampleColormapFunctions,
         wellpicks: exampleWellPicks,
@@ -265,13 +314,23 @@ export const Default: StoryObj<typeof Template> = {
             wellpickPatternFill: true,
         },
     },
-    render: (args) => <Template {...args} />,
+    // wellLogCollections is used to retrieve the well log sets from the getWellLogCollections() function
+    render: (args) => <Template {...args} wellLogCollections="Default" />,
 };
 
 Default.tags = ["no-screenshot-test"];
 
-const TemplateWithSelection = (args: SyncLogViewerProps) => {
-    const { welllogs = [], ...restOfArgs } = args;
+type TemplateWithSelectionProps = Omit<
+    SyncLogViewerProps,
+    "wellLogCollections"
+> & {
+    wellLogCollections: string;
+};
+
+const TemplateWithSelection = (args: TemplateWithSelectionProps) => {
+    const { wellLogCollections: collectionName = "", ...restOfArgs } = args;
+    const allCollections: WellLogSet[][] =
+        getWellLogCollections(collectionName) ?? [];
 
     const [showWell1, setShowWell1] = React.useState(true);
     const [showWell2, setShowWell2] = React.useState(true);
@@ -294,11 +353,14 @@ const TemplateWithSelection = (args: SyncLogViewerProps) => {
         []
     );
 
-    const filtered: (WellLogSet[] | WellLogSet)[] = [];
+    const wellLogCollections: WellLogSet[][] = [];
 
-    if (showWell1 && welllogs[0]) filtered.push(welllogs[0]);
-    if (showWell2 && welllogs[1]) filtered.push(welllogs[1]);
-    if (showWell3 && welllogs[2]) filtered.push(welllogs[2]);
+    if (showWell1 && allCollections[0])
+        wellLogCollections.push(allCollections[0]);
+    if (showWell2 && allCollections[1])
+        wellLogCollections.push(allCollections[1]);
+    if (showWell3 && allCollections[2])
+        wellLogCollections.push(allCollections[2]);
 
     const handleClick = function (): void {
         for (const ctrl of controllers) {
@@ -308,7 +370,7 @@ const TemplateWithSelection = (args: SyncLogViewerProps) => {
 
     const argsWithSelection: SyncLogViewerProps = {
         ...restOfArgs,
-        welllogs: filtered,
+        wellLogCollections,
     };
 
     return (
@@ -318,9 +380,10 @@ const TemplateWithSelection = (args: SyncLogViewerProps) => {
             <div style={{ flexDirection: "row" }}>
                 <ToggleButton
                     value="check"
-                    selected={showWell1 && !!welllogs[0]}
+                    selected={showWell1 && !!allCollections[0]}
                     onChange={(): void => {
-                        if (!welllogs[1]) alert("No args.welllogs[0]");
+                        if (!allCollections[0])
+                            alert("No args.wellLogCollections[0]");
                         setShowWell1(!showWell1);
                     }}
                 >
@@ -328,9 +391,10 @@ const TemplateWithSelection = (args: SyncLogViewerProps) => {
                 </ToggleButton>
                 <ToggleButton
                     value="check"
-                    selected={showWell2 && !!welllogs[1]}
+                    selected={showWell2 && !!allCollections[1]}
                     onChange={(): void => {
-                        if (!welllogs[1]) alert("No args.welllogs[1]");
+                        if (!allCollections[1])
+                            alert("No args.wellLogCollections[1]");
                         setShowWell2(!showWell2);
                     }}
                 >
@@ -338,9 +402,10 @@ const TemplateWithSelection = (args: SyncLogViewerProps) => {
                 </ToggleButton>
                 <ToggleButton
                     value="check"
-                    selected={showWell3 && !!welllogs[2]}
+                    selected={showWell3 && !!allCollections[2]}
                     onChange={(): void => {
-                        if (!welllogs[2]) alert("No args.welllogs[2]");
+                        if (!allCollections[2])
+                            alert("No args.wellLogCollections[2]");
                         setShowWell3(!showWell3);
                     }}
                 >
@@ -362,15 +427,19 @@ const TemplateWithSelection = (args: SyncLogViewerProps) => {
 };
 
 export const DiscreteLogs: StoryObj<typeof TemplateWithSelection> = {
-    args: facies3Wells,
-    render: (args) => <TemplateWithSelection {...args} />,
+    args: { ...facies3WellsArgs },
+    // wellLogCollections is used to retrieve the well log sets from the getWellLogCollections() function
+    render: (args) => (
+        <TemplateWithSelection {...args} wellLogCollections="DiscreteLogs" />
+    ),
 };
 
 export const DiscreteLogsWithIndividualDomains: StoryObj<
     typeof TemplateWithSelection
 > = {
     args: {
-        ...facies3Wells,
+        ...facies3WellsArgs,
+
         domain: [
             [3000, 5500],
             [2500, 4000],
@@ -385,7 +454,14 @@ export const DiscreteLogsWithIndividualDomains: StoryObj<
         syncContentSelection: false,
         syncTrackPos: false,
     },
-    render: (args) => <TemplateWithSelection {...args} />,
+
+    render: (args) => (
+        <TemplateWithSelection
+            {...args}
+            // wellLogCollections is used to retrieve the well log sets from the getWellLogCollections() function
+            wellLogCollections="DiscreteLogsWithIndividualDomains"
+        />
+    ),
 };
 
 const verySimpleTemplate: TemplateType = {
@@ -421,8 +497,95 @@ const verySimpleTemplate: TemplateType = {
     ],
 };
 
+const logsWithDifferentSetsCollections: WellLogSet[][] = [
+    [
+        ...L916MUD,
+        {
+            header: L916MUD[0].header,
+            curves: [
+                {
+                    name: "DEPT",
+                    description: null,
+                    quantity: null,
+                    unit: "M",
+                    valueType: "float",
+                    dimensions: 1,
+                },
+                {
+                    name: "DVER",
+                    description: "continuous",
+                    quantity: "m",
+                    unit: "m",
+                    valueType: "float",
+                    dimensions: 1,
+                },
+
+                {
+                    name: "FLAG_EXAMPLE",
+                    description: "discrete with different sampling",
+                    quantity: "DISC",
+                    unit: "DISC",
+                    valueType: "integer",
+                    dimensions: 1,
+                },
+            ],
+            data: [
+                [2966, 2254.3, null],
+                [3297, 2533.72, 0],
+                [4123, 3251.07, 1],
+            ],
+            metadata_discrete: {
+                FLAG_EXAMPLE: {
+                    attributes: ["color", "code"],
+                    objects: {
+                        no: [[244, 237, 255, 255], 0],
+                        yes: [[255, 171, 178, 255], 1],
+                    },
+                },
+            },
+        },
+    ],
+    [
+        ...L898MUD,
+        {
+            header: L898MUD[0].header,
+            curves: [
+                {
+                    name: "DEPT",
+                    description: null,
+                    quantity: null,
+                    unit: "M",
+                    valueType: "float",
+                    dimensions: 1,
+                },
+                {
+                    name: "DVER",
+                    description: "continuous",
+                    quantity: "m",
+                    unit: "m",
+                    valueType: "float",
+                    dimensions: 1,
+                },
+
+                {
+                    name: "BAD_CONT",
+                    description: "continuous with different sampling",
+                    quantity: "m",
+                    unit: "m",
+                    valueType: "integer",
+                    dimensions: 1,
+                },
+            ],
+            data: [
+                [2977, 2263.39, 0.1],
+                [3606, 2792.98, 4],
+                [4129, 3256.31, 2],
+            ],
+        },
+    ],
+];
+
 export const LogsWithDifferentSets: StoryObj<typeof Template> = {
-    render: (args) => <Template {...args} />,
     parameters: {
         docs: {
             description: {
@@ -446,92 +609,9 @@ export const LogsWithDifferentSets: StoryObj<typeof Template> = {
         },
         colorMapFunctions: exampleColormapFunctions,
         templates: [verySimpleTemplate, verySimpleTemplate],
-        wellLogCollections: [
-            [
-                ...L916MUDJson,
-                {
-                    header: L916MUDJson[0].header,
-                    curves: [
-                        {
-                            name: "DEPT",
-                            description: null,
-                            quantity: null,
-                            unit: "M",
-                            valueType: "float",
-                            dimensions: 1,
-                        },
-                        {
-                            name: "DVER",
-                            description: "continuous",
-                            quantity: "m",
-                            unit: "m",
-                            valueType: "float",
-                            dimensions: 1,
-                        },
-
-                        {
-                            name: "FLAG_EXAMPLE",
-                            description: "discrete with different sampling",
-                            quantity: "DISC",
-                            unit: "DISC",
-                            valueType: "integer",
-                            dimensions: 1,
-                        },
-                    ],
-                    data: [
-                        [2966, 2254.3, null],
-                        [3297, 2533.72, 0],
-                        [4123, 3251.07, 1],
-                    ],
-                    metadata_discrete: {
-                        FLAG_EXAMPLE: {
-                            attributes: ["color", "code"],
-                            objects: {
-                                no: [[244, 237, 255, 255], 0],
-                                yes: [[255, 171, 178, 255], 1],
-                            },
-                        },
-                    },
-                },
-            ],
-            [
-                ...L898MUDJson,
-                {
-                    header: L898MUDJson[0].header,
-                    curves: [
-                        {
-                            name: "DEPT",
-                            description: null,
-                            quantity: null,
-                            unit: "M",
-                            valueType: "float",
-                            dimensions: 1,
-                        },
-                        {
-                            name: "DVER",
-                            description: "continuous",
-                            quantity: "m",
-                            unit: "m",
-                            valueType: "float",
-                            dimensions: 1,
-                        },
-
-                        {
-                            name: "BAD_CONT",
-                            description: "continuous with different sampling",
-                            quantity: "m",
-                            unit: "m",
-                            valueType: "integer",
-                            dimensions: 1,
-                        },
-                    ],
-                    data: [
-                        [2977, 2263.39, 0.1],
-                        [3606, 2792.98, 4],
-                        [4129, 3256.31, 2],
-                    ],
-                },
-            ],
-        ],
     },
+    // wellLogCollections is used to retrieve the well log sets from the getWellLogCollections() function
+    render: (args) => (
+        <Template {...args} wellLogCollections="LogsWithDifferentSets" />
+    ),
 };

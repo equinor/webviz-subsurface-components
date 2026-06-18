@@ -39,7 +39,7 @@ const stories: Meta<WellLogViewWithScrollerProps> = {
         },
     },
     args: {
-        // must be explicitely set starting storybook V 8
+        // must be explicitly set starting storybook V 8
         onCreateController: fn(),
         onInfo: fn(),
         onTrackScroll: fn(),
@@ -60,6 +60,10 @@ const Template = (args: WellLogViewWithScrollerProps) => {
                 <WellLogViewWithScroller
                     id="WellLogViewWithScroller"
                     {...args}
+                    // Storybook 9 is very slow to parse huge JSON args.
+                    // Move the wellLogSets from the arguments to inline to speed up storybook.
+                    // See SyncLogViewer.stories.tsx as an example to handle multiple stories.
+                    wellLogSets={wellLog898MudJson}
                 />
             </div>
         </div>
@@ -69,7 +73,6 @@ const Template = (args: WellLogViewWithScrollerProps) => {
 export const Default: StoryObj<typeof Template> = {
     args: {
         horizontal: false,
-        wellLogSets: wellLog898MudJson,
         template: templateJson1 as TemplateType,
         viewTitle: "Well '" + wellLog898MudJson[0].header.well + "'",
         colorMapFunctions: exampleColormapFunctions,

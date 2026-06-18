@@ -37,6 +37,7 @@ const exampleColorTables = colorTablesJson as ColorTable[];
 
 const wellLogs = wellLogsJson as unknown as WellLogSet[];
 const wellLogl898MUD = wellLogl898MUDJson as WellLogSet[];
+const wellLogMWD3 = wellLogMWD3Json as WellLogSet[];
 const template1 = templateJson1 as unknown as Template;
 const template2 = templateJson2 as unknown as Template;
 
@@ -119,7 +120,41 @@ function fillInfo(controller: WellLogController | undefined): string {
     );
 }
 
-const StoryTemplate = (args: WellLogViewerProps) => {
+/**
+ * Storybook 9 is very slow to parse huge JSON args.
+ * Thus the approach to use a string name to select the well log sets to be used in the story.
+ * The function getWellLogSets() returns the well log sets based on the name.
+ * The storybook args.wellLogSets is a string name, which is used to get the well log sets.
+ *
+ * Note: it does not really make sense to pack some huge data structure into a storybook argument; user will never be able to
+ * read/edit it.
+ */
+function getWellLogSets(name: string): WellLogSet[] {
+    switch (name) {
+        case "Default":
+        case "ColorByFunction":
+            return wellLogl898MUD;
+        case "TrackTitleTooltip":
+            return trackTitleTooltipLogSets;
+        case "Horizontal":
+        case "OnInfoFilledEvent":
+            return wellLogMWD3;
+        case "Discrete":
+            return discreteLogSet;
+        case "LogsWithDifferentSets":
+            return logsWithDifferentSetsLogSet;
+    }
+    return [];
+}
+
+/**
+ * Update wellLogSets property by a name to retrieve the well log sets from the getWellLogSets() function.
+ */
+type StoryTemplateProps = Omit<WellLogViewerProps, "wellLogSets"> & {
+    wellLogSets: string;
+};
+
+const StoryTemplate = (args: StoryTemplateProps) => {
     const infoRef = React.useRef<HTMLDivElement | null>(null);
     const setInfo = function (info: string): void {
         if (infoRef.current) infoRef.current.innerHTML = info;
@@ -163,6 +198,7 @@ const StoryTemplate = (args: WellLogViewerProps) => {
                 <WellLogViewer
                     id="WellLogViewer"
                     {...args}
+                    wellLogSets={getWellLogSets(args.wellLogSets)}
                     onCreateController={onCreateController}
                     onContentRescale={onContentRescale}
                     onContentSelection={onContentSelection}
@@ -199,7 +235,6 @@ export const Default: StoryObj<typeof StoryTemplate> = {
     args: {
         //id: "Well-Log-Viewer",
         horizontal: false,
-        wellLogSets: wellLogl898MUD,
         template: template1,
         colorMapFunctions: exampleColormapFunctions,
         wellpick: wellpick,
@@ -215,14 +250,14 @@ export const Default: StoryObj<typeof StoryTemplate> = {
             hideSelectionInterval: false,
         },
     },
-    render: (args) => <StoryTemplate {...args} />,
+    // wellLogSets is used to retrieve the well log sets from the getWellLogSets() function
+    render: (args) => <StoryTemplate {...args} wellLogSets="Default" />,
 };
 
 export const ColorByFunction: StoryObj<typeof StoryTemplate> = {
     args: {
         //id: "Well-Log-Viewer",
         horizontal: false,
-        wellLogSets: wellLogl898MUD,
         template: {
             name: "Template 1",
             scale: {
@@ -264,50 +299,52 @@ export const ColorByFunction: StoryObj<typeof StoryTemplate> = {
             hideSelectionInterval: false,
         },
     },
-    render: (args) => <StoryTemplate {...args} />,
+    // wellLogSets is used to retrieve the well log sets from the getWellLogSets() function
+    render: (args) => <StoryTemplate {...args} wellLogSets="ColorByFunction" />,
 };
+
+const trackTitleTooltipLogSets: WellLogSet[] = [
+    {
+        header: {
+            name: "continuous and discrete logs",
+        },
+        curves: [
+            {
+                name: "MD",
+                description: "continuous",
+                quantity: "m",
+                unit: "m",
+                valueType: "float",
+                dimensions: 1,
+            },
+            {
+                name: "continuous",
+                description: "A continuous curve",
+            },
+            {
+                name: "discrete",
+                description: "A discrete curve",
+            },
+        ],
+        data: [
+            [0, 0, 1],
+            [1, 1, 1],
+            [2, 2, 1],
+            [3, 3, 2],
+            [4, 2, 2],
+            [5, 1, 2],
+            [6, 0, 3],
+            [7, 1, 3],
+            [8, 2, 3],
+            [9, 3, null],
+            [10, 2, null],
+        ],
+    },
+];
 
 export const TrackTitleTooltip: StoryObj<typeof StoryTemplate> = {
     args: {
         horizontal: false,
-        wellLogSets: [
-            {
-                header: {
-                    name: "continuous and discrete logs",
-                },
-                curves: [
-                    {
-                        name: "MD",
-                        description: "continuous",
-                        quantity: "m",
-                        unit: "m",
-                        valueType: "float",
-                        dimensions: 1,
-                    },
-                    {
-                        name: "continuous",
-                        description: "A continuous curve",
-                    },
-                    {
-                        name: "discrete",
-                        description: "A discrete curve",
-                    },
-                ],
-                data: [
-                    [0, 0, 1],
-                    [1, 1, 1],
-                    [2, 2, 1],
-                    [3, 3, 2],
-                    [4, 2, 2],
-                    [5, 1, 2],
-                    [6, 0, 3],
-                    [7, 1, 3],
-                    [8, 2, 3],
-                    [9, 3, null],
-                    [10, 2, null],
-                ],
-            },
-        ],
         template: {
             name: "template",
             scale: {
@@ -366,13 +403,15 @@ export const TrackTitleTooltip: StoryObj<typeof StoryTemplate> = {
             });
         }
     },
-    render: (args) => <StoryTemplate {...args} />,
+    render: (args) => (
+        // wellLogSets is used to retrieve the well log sets from the getWellLogSets() function
+        <StoryTemplate {...args} wellLogSets="TrackTitleTooltip" />
+    ),
 };
 
 export const Horizontal: StoryObj<typeof StoryTemplate> = {
     args: {
         horizontal: true,
-        wellLogSets: wellLogMWD3Json,
         template: template2,
         colorMapFunctions: exampleColormapFunctions,
         wellpick: wellpick,
@@ -387,13 +426,14 @@ export const Horizontal: StoryObj<typeof StoryTemplate> = {
             },
         },
     },
-    render: (args) => <StoryTemplate {...args} />,
+    // wellLogSets is used to retrieve the well log sets from the getWellLogSets() function
+    render: (args) => <StoryTemplate {...args} wellLogSets="Horizontal" />,
 };
 
 export const OnInfoFilledEvent: StoryObj<typeof StoryTemplate> = {
     args: {
         horizontal: true,
-        wellLogSets: wellLogMWD3Json,
+
         template: template2,
         colorMapFunctions: exampleColormapFunctions,
         wellpick: wellpick,
@@ -409,10 +449,25 @@ export const OnInfoFilledEvent: StoryObj<typeof StoryTemplate> = {
             },
         },
     },
-    render: (args) => <StoryTemplateWithCustomPanel {...args} />,
+    render: (args) => (
+        <StoryTemplateWithCustomPanel
+            {...args}
+            // wellLogSets is used to retrieve the well log sets from the getWellLogSets() function
+            wellLogSets="OnInfoFilledEvent"
+        />
+    ),
 };
 
-function StoryTemplateWithCustomPanel(props: WellLogViewerProps): JSX.Element {
+type StoryTemplateWithCustomPanelProps = Omit<
+    WellLogViewerProps,
+    "wellLogSets"
+> & {
+    wellLogSets: string;
+};
+
+function StoryTemplateWithCustomPanel(
+    props: StoryTemplateWithCustomPanelProps
+): JSX.Element {
     const [infos, setInfos] = React.useState<Info[]>([]);
     const [showPanel, setShowPanel] = React.useState<boolean>(false);
 
@@ -480,30 +535,31 @@ function CustomInfoPanel(props: { infos: Info[] }): JSX.Element {
     );
 }
 
+const discreteLogSet: WellLogSet[] = [
+    {
+        ...wellLogs[0],
+        curves: [
+            ...wellLogs[0].curves,
+            {
+                name: "STRING_CURVE",
+                description: "A discrete curve with a string value type",
+                quantity: "DISC",
+                unit: "DISC",
+                valueType: "string",
+                dimensions: 1,
+            },
+        ],
+        data: wellLogs[0].data.map((d) => {
+            if ((d[0] as number) <= 3900) return [...d, "FOO"];
+            else return [...d, "BAR"];
+        }),
+    },
+];
+
 export const Discrete: StoryObj<typeof StoryTemplate> = {
     args: {
         horizontal: false,
-        wellLogSets: [
-            {
-                ...wellLogs[0],
-                curves: [
-                    ...wellLogs[0].curves,
-                    {
-                        name: "STRING_CURVE",
-                        description:
-                            "A discrete curve with a string value type",
-                        quantity: "DISC",
-                        unit: "DISC",
-                        valueType: "string",
-                        dimensions: 1,
-                    },
-                ],
-                data: wellLogs[0].data.map((d) => {
-                    if ((d[0] as number) <= 3900) return [...d, "FOO"];
-                    else return [...d, "BAR"];
-                }),
-            },
-        ],
+
         template: {
             ...template2,
             tracks: [
@@ -527,107 +583,109 @@ export const Discrete: StoryObj<typeof StoryTemplate> = {
             },
         },
     },
-    render: (args) => <StoryTemplate {...args} />,
+    // wellLogSets is used to retrieve the well log sets from the getWellLogSets() function
+    render: (args) => <StoryTemplate {...args} wellLogSets="Discrete" />,
 };
+
+const logsWithDifferentSetsLogSet: WellLogSet[] = [
+    {
+        header: wellLogs[0].header,
+        curves: [
+            {
+                name: "MD",
+                description: "continuous",
+                quantity: "m",
+                unit: "m",
+                valueType: "float",
+                dimensions: 1,
+            },
+            {
+                name: "PORO",
+                description: "continuous",
+                quantity: "",
+                unit: "",
+                valueType: "float",
+                dimensions: 1,
+            },
+        ],
+
+        data: [
+            [3700, 45],
+            [3725, 78],
+            [3750, 12],
+            [3775, 34],
+            [3800, 89],
+            [3825, 67],
+            [3850, 90],
+            [3875, 11],
+            [3900, 78],
+            [3925, 34],
+            [3950, 56],
+            [3975, 89],
+            [4000, 67],
+            [4025, 11],
+            [4050, 45],
+            [4075, 78],
+            [4100, 34],
+            [4125, 89],
+        ],
+    },
+
+    {
+        // Sharing the discrete config across all logs for simplicity
+        metadata_discrete: {
+            FLAG_EXAMPLE: {
+                attributes: ["color", "code"],
+                objects: {
+                    no: [[244, 237, 255, 255], 0],
+                    yes: [[255, 171, 178, 255], 1],
+                },
+            },
+        },
+        header: {
+            name: "The second log",
+            well: wellLogs[0].header.well,
+        },
+        curves: [
+            {
+                name: "MD",
+                description: "continuous",
+                quantity: "m",
+                unit: "m",
+                valueType: "float",
+                dimensions: 1,
+            },
+
+            {
+                name: "FLAG_EXAMPLE",
+                description: "discrete with different sampling",
+                quantity: "DISC",
+                unit: "DISC",
+                valueType: "integer",
+                dimensions: 1,
+            },
+
+            {
+                name: "BAD_CONT",
+                description:
+                    "A continuous curve with a really bad sampling rate",
+                quantity: "m",
+                unit: "m",
+                valueType: "integer",
+                dimensions: 1,
+            },
+        ],
+        data: [
+            [3800, null, 2],
+            [3870, 0, 2.4],
+            [4000, 1, 0.4],
+        ],
+    },
+];
 
 export const LogWithDifferentSets: StoryObj<typeof StoryTemplate> = {
     args: {
         colorMapFunctions: [],
-        wellLogSets: [
-            {
-                header: wellLogs[0].header,
-                curves: [
-                    {
-                        name: "MD",
-                        description: "continuous",
-                        quantity: "m",
-                        unit: "m",
-                        valueType: "float",
-                        dimensions: 1,
-                    },
-                    {
-                        name: "PORO",
-                        description: "continuous",
-                        quantity: "",
-                        unit: "",
-                        valueType: "float",
-                        dimensions: 1,
-                    },
-                ],
-
-                data: [
-                    [3700, 45],
-                    [3725, 78],
-                    [3750, 12],
-                    [3775, 34],
-                    [3800, 89],
-                    [3825, 67],
-                    [3850, 90],
-                    [3875, 11],
-                    [3900, 78],
-                    [3925, 34],
-                    [3950, 56],
-                    [3975, 89],
-                    [4000, 67],
-                    [4025, 11],
-                    [4050, 45],
-                    [4075, 78],
-                    [4100, 34],
-                    [4125, 89],
-                ],
-            },
-
-            {
-                // Sharing the discrete config across all logs for simplicity
-                metadata_discrete: {
-                    FLAG_EXAMPLE: {
-                        attributes: ["color", "code"],
-                        objects: {
-                            no: [[244, 237, 255, 255], 0],
-                            yes: [[255, 171, 178, 255], 1],
-                        },
-                    },
-                },
-                header: {
-                    name: "The second log",
-                    well: wellLogs[0].header.well,
-                },
-                curves: [
-                    {
-                        name: "MD",
-                        description: "continuous",
-                        quantity: "m",
-                        unit: "m",
-                        valueType: "float",
-                        dimensions: 1,
-                    },
-
-                    {
-                        name: "FLAG_EXAMPLE",
-                        description: "discrete with different sampling",
-                        quantity: "DISC",
-                        unit: "DISC",
-                        valueType: "integer",
-                        dimensions: 1,
-                    },
-
-                    {
-                        name: "BAD_CONT",
-                        description:
-                            "A continuous curve with a really bad sampling rate",
-                        quantity: "m",
-                        unit: "m",
-                        valueType: "integer",
-                        dimensions: 1,
-                    },
-                ],
-                data: [
-                    [3800, null, 2],
-                    [3870, 0, 2.4],
-                    [4000, 1, 0.4],
-                ],
-            },
-        ],
 
         template: {
             name: "aaa",
@@ -669,7 +727,10 @@ export const LogWithDifferentSets: StoryObj<typeof StoryTemplate> = {
             },
         },
     },
-    render: (args) => <StoryTemplate {...args} />,
+    render: (args) => (
+        // wellLogSets is used to retrieve the well log sets from the getWellLogSets() function
+        <StoryTemplate {...args} wellLogSets="LogsWithDifferentSets" />
+    ),
 };
 
 const MapAndWellLogViewerStoryComp = (
