@@ -43,8 +43,11 @@ export interface PolylinesLayerProps extends ExtendedLayerProps {
 
     /**
      * Line color defined as RGB or RGBA array. Each component is in 0-255 range.
+     * If color is given as an array of colors, each polyline gets its own color.
+     * If given as array the number of colors should be at least equal to the number of polylines.
+     * Otherwise, the first color is applied to all polylines.
      */
-    color: RGBColor | RGBAColor;
+    color: RGBColor | RGBAColor | RGBColor[] | RGBAColor[];
 
     /**
      * The units of the line width, one of `'meters'`, `'common'`, and `'pixels'`.
@@ -91,6 +94,10 @@ interface IDataAttributes {
             value: Float32Array;
             size: number;
         };
+        getColor: {
+            value: Float32Array;
+            size: number;
+        };
     };
     pathType: PathType;
 }
@@ -113,7 +120,6 @@ export default class PolylinesLayer extends CompositeLayer<PolylinesLayerProps> 
                 capRounded: true,
                 data,
                 _pathType,
-                getColor: () => this.props.color,
                 getWidth: () => this.props.linesWidth,
 
                 updateTriggers: {
@@ -157,6 +163,55 @@ export default class PolylinesLayer extends CompositeLayer<PolylinesLayerProps> 
             this.props.reportBoundingBox({ layerBoundingBox: boundingBox });
         }
 
+        const nStartIndicies = dataArrays.startIndices.length;
+        const isRGBArray =
+            this.props.color.length > 0 &&
+            Array.isArray(this.props.color[0]) &&
+            (this.props.color[0] as RGBColor).length === 3;
+        const isRGBAArray =
+            this.props.color.length > 0 &&
+            Array.isArray(this.props.color[0]) &&
+            (this.props.color[0] as RGBAColor).length === 4;
+
+        if (
+            (isRGBArray || isRGBAArray) &&
+            this.props.color.length < nStartIndicies
+        ) {
+            throw new Error(
+                "Color array length should be at least equal to the number of polylines"
+            );
+        }
+
+        // Set color for each vertex. If color is given as a single value, all vertices get
+        // the same color. If color is given as an array of colors, each polyline gets its own color.
+        const npoints = dataArrays.positions.length / 3;
+        const colors = new Float32Array(npoints * 4);
+
+        const { startIndices } = dataArrays;
+        const scale = startIndices.at(-1) === npoints ? 255 : 1;
+
+        for (let i = 0; i < startIndices.length; i++) {
+            const ii = this.props.color.length < nStartIndicies ? 0 : i;
+            const color =
+                isRGBArray || isRGBAArray
+                    ? (this.props.color as RGBColor[] | RGBAColor[])[ii]
+                    : (this.props.color as RGBColor | RGBAColor);
+            const r = color[0] / scale;
+            const g = color[1] / scale;
+            const b = color[2] / scale;
+            const a =
+                color.length > 3 ? (color[3] as number) / scale : 255 / scale;
+            const start = startIndices[i];
+            const end =
+                i < startIndices.length - 1 ? startIndices[i + 1] - 1 : npoints;
+            for (let j = start; j <= end; j++) {
+                colors[j * 4 + 0] = r;
+                colors[j * 4 + 1] = g;
+                colors[j * 4 + 2] = b;
+                colors[j * 4 + 3] = a;
+            }
+        }
+
         return {
             length: dataArrays.linesCount,
             startIndices: dataArrays.startIndices,
@@ -164,6 +219,10 @@ export default class PolylinesLayer extends CompositeLayer<PolylinesLayerProps> 
                 getPath: {
                     value: dataArrays.positions,
                     size: 3,
+                },
+                getColor: {
+                    value: colors,
+                    size: 4,
                 },
             },
             pathType: dataArrays.pathType,
