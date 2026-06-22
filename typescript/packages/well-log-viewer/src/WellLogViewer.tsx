@@ -393,9 +393,14 @@ WellLogViewer.propTypes = {
     horizontal: PropTypes.bool,
 
     /**
-     * Initial visible interval of the log data
+     * Initial base domain of the log data
      */
     domain: PropTypes.arrayOf(PropTypes.number),
+
+    /**
+     * Initial visible interval of the log data
+     */
+    zoomDomain: PropTypes.arrayOf(PropTypes.number),
 
     /**
      * Initial selected interval of the log data

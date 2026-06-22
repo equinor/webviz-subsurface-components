@@ -149,10 +149,18 @@ export interface SyncLogViewerProps {
     axisMnemos: Record<string, string[]>;
 
     /**
-     * Initial visible range. A single domain applies to all the tracks,
-     * an array of domains applies to the tracks in corresponding views.
+     * Initial base domain of the log data.
+     * A single domain applies to all the tracks, an array of domains applies to the tracks in corresponding views.
+     * If not set, the base domain is calculated from the log data as [min, max] of the primary axis values.
      */
     domain?: Range | Range[];
+
+    /**
+     * Initial visible range.
+     * A single domain applies to all the tracks, an array of domains applies to the tracks in corresponding views.
+     * If not set, defaults to the base domain.
+     */
+    zoomDomain?: Range | Range[];
 
     /**
      * Initial selected range. A single selection applies to all the tracks,
@@ -275,6 +283,9 @@ export const argTypesSyncLogViewerProp = {
         //},
     },
     domain: {
+        description: "Initial base domain of the log data.",
+    },
+    zoomDomain: {
         description: "Initial visible interval of the log data.",
     },
     selection: {
@@ -414,7 +425,8 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
 
         if (
             this.props.syncContentDomain !== prevProps.syncContentDomain ||
-            !isEqualDomains(this.props.domain, prevProps.domain)
+            !isEqualDomains(this.props.domain, prevProps.domain) ||
+            !isEqualDomains(this.props.zoomDomain, prevProps.zoomDomain)
         ) {
             this.setControllersZoom();
         }
@@ -939,7 +951,9 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         ] of this.callbackManagers.entries()) {
             const controller = callbackManager?.controller;
             if (!controller) continue;
-            const domain = getDomain(this.props.domain, index);
+            const domain =
+                getDomain(this.props.zoomDomain, index) ??
+                getDomain(this.props.domain, index);
             if (domain) {
                 controller.zoomContentTo(domain);
                 //this.forceUpdate();
@@ -994,6 +1008,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                 axisTitles={this.props.axisTitles}
                 axisMnemos={this.props.axisMnemos}
                 domain={getDomain(this.props.domain, index)}
+                zoomDomain={getDomain(this.props.zoomDomain, index)}
                 selection={getSelection(this.props.selection, index)}
                 primaryAxis={this.state.primaryAxis}
                 options={options}
@@ -1332,9 +1347,17 @@ SyncLogViewer.propTypes = {
     maxContentZoom: PropTypes.number,
 
     /**
-     * Initial visible interval of the log data
+     * Initial base domain of the log data
      */
     domain: PropTypes.oneOfType([
+        PropTypes.arrayOf(PropTypes.number),
+        PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
+    ]),
+
+    /**
+     * Initial visible interval of the log data
+     */
+    zoomDomain: PropTypes.oneOfType([
         PropTypes.arrayOf(PropTypes.number),
         PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
     ]),

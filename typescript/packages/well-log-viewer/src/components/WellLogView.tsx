@@ -692,15 +692,16 @@ function setTracksToController(
     axes: AxesInfo,
     wellLogSets: WellLogSet[], // JSON Log Format
     templateTracks: TemplateTrack[], // JSON
+    domain: Range | undefined,
+    zoomDomain: Range | undefined,
     colorMapFunctions: ColormapFunction[] // JS code array or JSON file for pure color tables array without color functions elements
 ): ScaleInterpolator {
-    const { tracks, minmaxPrimaryAxis: minmaxPrimaryAxis } =
-        createWellLogTracks(
-            wellLogSets,
-            axes,
-            templateTracks,
-            colorMapFunctions
-        );
+    const { tracks, minmaxPrimaryAxis } = createWellLogTracks(
+        wellLogSets,
+        axes,
+        templateTracks,
+        colorMapFunctions
+    );
     logController.reset();
 
     const scaleInterpolator = setUpScaleInterpolator(
@@ -710,7 +711,10 @@ function setTracksToController(
         axes
     );
 
-    setContentBaseDomain(logController, minmaxPrimaryAxis);
+    // respect the provided domain, otherwise use the minmaxPrimaryAxis
+    setContentBaseDomain(logController, domain ?? minmaxPrimaryAxis);
+    // respect the provided zoomDomain, otherwise use the base domain
+    zoomContentTo(logController, zoomDomain ?? domain ?? minmaxPrimaryAxis);
 
     logController.setTracks(tracks);
 
@@ -1058,9 +1062,16 @@ export interface WellLogViewProps {
     viewTitle?: boolean | string | JSX.Element;
 
     /**
-     * Initial visible range
+     * Initial base domain of the log data.
+     * If not set, the base domain is calculated from the log data as [min, max] of the primary axis values.
      */
     domain?: Range;
+
+    /**
+     * Initial visible range.
+     * If not set, defaults to the base domain.
+     */
+    zoomDomain?: Range;
 
     /**
      * Initial selected range
@@ -1144,7 +1155,10 @@ export const argTypesWellLogViewProp = {
     },
 
     domain: {
-        description: "Initial visible range",
+        description: "Initial base domain range",
+    },
+    zoomDomain: {
+        description: "Initial zoom range",
     },
     selection: {
         description: "Initial selected range",
@@ -1192,6 +1206,7 @@ export function shouldUpdateWellLogView(
     if (props.viewTitle !== nextProps.viewTitle) return true;
 
     if (!isEqualRanges(props.domain, nextProps.domain)) return true;
+    if (!isEqualRanges(props.zoomDomain, nextProps.zoomDomain)) return true;
     if (!isEqualRanges(props.selection, nextProps.selection)) return true;
 
     if (props.options?.hideTrackTitle !== nextProps.options?.hideTrackTitle)
@@ -1435,7 +1450,15 @@ class WellLogView
                 this.props.domain[0] !== prevProps.domain[0] ||
                 this.props.domain[1] !== prevProps.domain[1])
         ) {
-            this.setControllerZoom();
+            this.setContentBaseDomain(this.props.domain);
+        }
+        if (
+            this.props.zoomDomain &&
+            (!prevProps.zoomDomain ||
+                this.props.zoomDomain[0] !== prevProps.zoomDomain[0] ||
+                this.props.zoomDomain[1] !== prevProps.zoomDomain[1])
+        ) {
+            this.zoomContentTo(this.props.zoomDomain);
         }
 
         if (
@@ -1524,6 +1547,8 @@ class WellLogView
                 axes,
                 this.wellLogSets,
                 this.getStyledTemplate().tracks,
+                this.props.domain,
+                this.props.zoomDomain,
                 this.props.colorMapFunctions
             );
             addWellPickOverlay(this.logController, this);
@@ -1543,15 +1568,20 @@ class WellLogView
         });
     }
     setControllerZoom(): void {
-        if (this.props.domain) this.zoomContentTo(this.props.domain);
+        if (this.props.zoomDomain) this.zoomContentTo(this.props.zoomDomain);
     }
     setControllerSelection(): void {
         if (this.props.selection) this.selectContent(this.props.selection);
     }
     setControllerDefaultZoom(): void {
-        if (this.props.domain) this.zoomContentTo(this.props.domain);
-        else this.zoomContentTo(this.getContentBaseDomain());
-        this.isDefZoom = true;
+        const zoomDomain =
+            this.props.zoomDomain ??
+            this.props.domain ??
+            this.getContentBaseDomain();
+        if (zoomDomain) {
+            this.zoomContentTo(zoomDomain);
+            this.isDefZoom = true;
+        }
     }
 
     /**
@@ -2195,6 +2225,11 @@ export function _propTypesWellLogView(): Record<string, unknown> {
          * Initial visible interval of the log data
          */
         domain: PropTypes.arrayOf(PropTypes.number),
+
+        /**
+         * Initial visible interval of the log data
+         */
+        zoomDomain: PropTypes.arrayOf(PropTypes.number),
 
         /**
          * Initial selected interval of the log data
