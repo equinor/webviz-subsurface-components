@@ -241,7 +241,7 @@ export const Default: StoryObj<typeof StoryTemplate> = {
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
         viewTitle: true, // show default well log view title (a wellname from the well log)
-        zoomDomain: [2500, 4000],
+        visibleRange: [2500, 4000],
         selection: [3500, 3700],
         options: {
             hideTrackTitle: false,
@@ -290,7 +290,7 @@ export const ColorByFunction: StoryObj<typeof StoryTemplate> = {
         axisTitles: axisTitles,
         axisMnemos: axisMnemos,
         viewTitle: true, // show default well log view title (a wellname from the well log)
-        zoomDomain: [2500, 4000],
+        visibleRange: [2500, 4000],
         selection: [3500, 3700],
         options: {
             hideTrackTitle: false,

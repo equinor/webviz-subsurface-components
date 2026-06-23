@@ -440,7 +440,7 @@ export const DiscreteLogsWithIndividualDomains: StoryObj<
     args: {
         ...facies3WellsArgs,
 
-        zoomDomain: [
+        visibleRange: [
             [3000, 5500],
             [2500, 4000],
             [1000, 4000],

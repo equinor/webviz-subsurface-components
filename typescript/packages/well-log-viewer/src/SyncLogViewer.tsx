@@ -160,7 +160,7 @@ export interface SyncLogViewerProps {
      * A single domain applies to all the tracks, an array of domains applies to the tracks in corresponding views.
      * If not set, defaults to the base domain.
      */
-    zoomDomain?: Range | Range[];
+    visibleRange?: Range | Range[];
 
     /**
      * Initial selected range. A single selection applies to all the tracks,
@@ -285,7 +285,7 @@ export const argTypesSyncLogViewerProp = {
     domain: {
         description: "Initial base domain of the log data.",
     },
-    zoomDomain: {
+    visibleRange: {
         description: "Initial visible interval of the log data.",
     },
     selection: {
@@ -426,7 +426,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         if (
             this.props.syncContentDomain !== prevProps.syncContentDomain ||
             !isEqualDomains(this.props.domain, prevProps.domain) ||
-            !isEqualDomains(this.props.zoomDomain, prevProps.zoomDomain)
+            !isEqualDomains(this.props.visibleRange, prevProps.visibleRange)
         ) {
             this.setControllersZoom();
         }
@@ -952,7 +952,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
             const controller = callbackManager?.controller;
             if (!controller) continue;
             const domain =
-                getDomain(this.props.zoomDomain, index) ??
+                getDomain(this.props.visibleRange, index) ??
                 getDomain(this.props.domain, index);
             if (domain) {
                 controller.zoomContentTo(domain);
@@ -1008,7 +1008,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                 axisTitles={this.props.axisTitles}
                 axisMnemos={this.props.axisMnemos}
                 domain={getDomain(this.props.domain, index)}
-                zoomDomain={getDomain(this.props.zoomDomain, index)}
+                visibleRange={getDomain(this.props.visibleRange, index)}
                 selection={getSelection(this.props.selection, index)}
                 primaryAxis={this.state.primaryAxis}
                 options={options}
@@ -1357,7 +1357,7 @@ SyncLogViewer.propTypes = {
     /**
      * Initial visible interval of the log data
      */
-    zoomDomain: PropTypes.oneOfType([
+    visibleRange: PropTypes.oneOfType([
         PropTypes.arrayOf(PropTypes.number),
         PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
     ]),

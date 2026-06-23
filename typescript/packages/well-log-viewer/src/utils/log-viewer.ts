@@ -284,7 +284,7 @@ export function getContentZoom(logViewer: VidexLogViewer): number /*fraction*/ {
 }
 
 /**
- * Changes the visibliity of a range of tracks in a videx log viewer, so that the given range is visible.
+ * Changes the visibility of a range of tracks in a videx log viewer, so that the given range is visible.
  * Scale tracks are untouched.
  * @param logViewer A videx log view controller
  * @param iFrom The index of the first track that should be visible

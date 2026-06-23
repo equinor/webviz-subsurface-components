@@ -400,7 +400,7 @@ WellLogViewer.propTypes = {
     /**
      * Initial visible interval of the log data
      */
-    zoomDomain: PropTypes.arrayOf(PropTypes.number),
+    visibleRange: PropTypes.arrayOf(PropTypes.number),
 
     /**
      * Initial selected interval of the log data
