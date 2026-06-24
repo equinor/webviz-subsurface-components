@@ -17,7 +17,7 @@ import viewerTemplateJson1 from "../../../../../example-data/welllog_template_1.
 import viewerTemplateJson2 from "../../../../../example-data/welllog_template_2.json";
 
 const wellLogDefault = L898MUD[0];
-const wellLogDiscrete = volve_logs[0] as unknown as WellLogSet;
+const wellLogDiscrete = (volve_logs as unknown as WellLogSet[])[0];
 
 const viewerTemplate1 = viewerTemplateJson1 as Template;
 const viewerTemplate2 = viewerTemplateJson2 as Template;
@@ -85,8 +85,8 @@ export const Default: StoryObj<typeof WrappedWellLogView> = {
             </div>
         ),
         colorMapFunctions: exampleColormapFunctions,
-        axisTitles: axisTitles,
-        axisMnemos: axisMnemos,
+        axisTitles,
+        axisMnemos,
     },
     // wellLogSets is used to retrieve the well log sets from the getWellLogSets() function
     render: (args) => <WrappedWellLogView {...args} wellLogSets="Default" />,
@@ -98,8 +98,8 @@ export const Discrete: StoryObj<typeof WrappedWellLogView> = {
         template: viewerTemplate2,
         viewTitle: "Well '" + wellLogDiscrete.header.well + "'",
         colorMapFunctions: exampleColormapFunctions,
-        axisTitles: axisTitles,
-        axisMnemos: axisMnemos,
+        axisTitles,
+        axisMnemos,
         options: {
             checkDatafileSchema: true,
         },

@@ -143,6 +143,21 @@ function getWellLogSets(name: string): WellLogSet[] {
             return discreteLogSet;
         case "LogsWithDifferentSets":
             return logsWithDifferentSetsLogSet;
+        case "LogsWithUndefined":
+            // logsWithDifferentSetsLogSet has 2 log sets
+            // 0: PORO, continuous log
+            // 1: FLAG_EXAMPLE, discrete log
+            //    BAD_CONT, continuous log
+            return [
+                undefined as unknown as WellLogSet,
+                logsWithDifferentSetsLogSet[1],
+                undefined as unknown as WellLogSet,
+                logsWithDifferentSetsLogSet[0],
+            ];
+        case "Empty":
+            return [];
+        case "Undefined":
+            return [undefined] as unknown as WellLogSet[];
     }
     return [];
 }
@@ -237,12 +252,9 @@ export const Default: StoryObj<typeof StoryTemplate> = {
         horizontal: false,
         template: template1,
         colorMapFunctions: exampleColormapFunctions,
-        wellpick: wellpick,
-        axisTitles: axisTitles,
-        axisMnemos: axisMnemos,
+        axisTitles,
+        axisMnemos,
         viewTitle: true, // show default well log view title (a wellname from the well log)
-        visibleRange: [2500, 4000],
-        selection: [3500, 3700],
         options: {
             hideTrackTitle: false,
             hideTrackLegend: false,
@@ -252,6 +264,28 @@ export const Default: StoryObj<typeof StoryTemplate> = {
     },
     // wellLogSets is used to retrieve the well log sets from the getWellLogSets() function
     render: (args) => <StoryTemplate {...args} wellLogSets="Default" />,
+};
+
+export const Empty: StoryObj<typeof StoryTemplate> = {
+    args: {
+        horizontal: false,
+        axisTitles,
+        axisMnemos,
+        viewTitle: true, // show default well log view title (a wellname from the well log)
+    },
+    // wellLogSets is used to retrieve the well log sets from the getWellLogSets() function
+    render: (args) => <StoryTemplate {...args} wellLogSets="Empty" />,
+};
+
+export const Undefined: StoryObj<typeof StoryTemplate> = {
+    args: {
+        horizontal: false,
+        axisTitles,
+        axisMnemos,
+        viewTitle: true, // show default well log view title (a wellname from the well log)
+    },
+    // wellLogSets is used to retrieve the well log sets from the getWellLogSets() function
+    render: (args) => <StoryTemplate {...args} wellLogSets="Undefined" />,
 };
 
 export const ColorByFunction: StoryObj<typeof StoryTemplate> = {
@@ -286,9 +320,9 @@ export const ColorByFunction: StoryObj<typeof StoryTemplate> = {
             ],
         },
         colorMapFunctions: exampleColormapFunctions,
-        wellpick: wellpick,
-        axisTitles: axisTitles,
-        axisMnemos: axisMnemos,
+        wellpick,
+        axisTitles,
+        axisMnemos,
         viewTitle: true, // show default well log view title (a wellname from the well log)
         visibleRange: [2500, 4000],
         selection: [3500, 3700],
@@ -371,8 +405,8 @@ export const TrackTitleTooltip: StoryObj<typeof StoryTemplate> = {
             ],
         },
         colorMapFunctions: exampleColormapFunctions,
-        axisTitles: axisTitles,
-        axisMnemos: axisMnemos,
+        axisTitles,
+        axisMnemos,
         viewTitle: true, // show default well log view title (a wellname from the well log)
     },
     parameters: {
@@ -414,9 +448,9 @@ export const Horizontal: StoryObj<typeof StoryTemplate> = {
         horizontal: true,
         template: template2,
         colorMapFunctions: exampleColormapFunctions,
-        wellpick: wellpick,
-        axisTitles: axisTitles,
-        axisMnemos: axisMnemos,
+        wellpick,
+        axisTitles,
+        axisMnemos,
         viewTitle: true, // show default well log view title (a wellname from the well log)
     },
     parameters: {
@@ -436,9 +470,9 @@ export const OnInfoFilledEvent: StoryObj<typeof StoryTemplate> = {
 
         template: template2,
         colorMapFunctions: exampleColormapFunctions,
-        wellpick: wellpick,
-        axisTitles: axisTitles,
-        axisMnemos: axisMnemos,
+        wellpick,
+        axisTitles,
+        axisMnemos,
         viewTitle: true, // show default well log view title (a wellname from the well log)
         layout: { right: undefined },
     },
@@ -571,9 +605,9 @@ export const Discrete: StoryObj<typeof StoryTemplate> = {
             ],
         },
         colorMapFunctions: exampleColormapFunctions,
-        wellpick: wellpick,
-        axisTitles: axisTitles,
-        axisMnemos: axisMnemos,
+        wellpick,
+        axisTitles,
+        axisMnemos,
         viewTitle: true, // show default well log view title (a wellname from the well log)
     },
     parameters: {
@@ -716,8 +750,8 @@ export const LogWithDifferentSets: StoryObj<typeof StoryTemplate> = {
                 },
             ],
         },
-        axisTitles: axisTitles,
-        axisMnemos: axisMnemos,
+        axisTitles,
+        axisMnemos,
         viewTitle: true, // show default well log view title (a wellname from the well log)
     },
     parameters: {
@@ -730,6 +764,56 @@ export const LogWithDifferentSets: StoryObj<typeof StoryTemplate> = {
     render: (args) => (
         // wellLogSets is used to retrieve the well log sets from the getWellLogSets() function
         <StoryTemplate {...args} wellLogSets="LogsWithDifferentSets" />
+    ),
+};
+
+export const LogsWithUndefined: StoryObj<typeof StoryTemplate> = {
+    args: {
+        colorMapFunctions: [],
+
+        template: {
+            name: "aaa",
+            scale: { primary: "md" },
+            tracks: [
+                {
+                    title: "Discrete, from set 1",
+                    plots: [
+                        {
+                            name: "FLAG_EXAMPLE",
+                            type: "stacked",
+                            color: "",
+                        },
+                    ],
+                },
+
+                {
+                    title: "Continuous, from both sets",
+                    plots: [
+                        { name: "PORO", type: "line", color: "red" },
+                        { name: "BAD_CONT", type: "line", color: "blue" },
+                    ],
+                },
+
+                {
+                    title: "Continuous, from set 2",
+                    plots: [{ name: "PORO", type: "line", color: "red" }],
+                },
+            ],
+        },
+        axisTitles,
+        axisMnemos,
+        viewTitle: true, // show default well log view title (a wellname from the well log)
+    },
+    parameters: {
+        docs: {
+            description: {
+                story: "An example showing support for multiple logs (For the same well) with different sampling rates",
+            },
+        },
+    },
+    render: (args) => (
+        // wellLogSets is used to retrieve the well log sets from the getWellLogSets() function
+        <StoryTemplate {...args} wellLogSets="LogsWithUndefined" />
     ),
 };
 

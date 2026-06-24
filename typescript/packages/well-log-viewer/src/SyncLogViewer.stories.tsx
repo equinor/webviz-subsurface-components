@@ -15,6 +15,7 @@ import type { SyncLogViewerProps } from "./SyncLogViewer";
 
 import type { ColormapFunction } from "./utils/color-function";
 import type { Pattern } from "./utils/pattern";
+import type { Range } from "./utils/arrayTypes";
 
 import type {
     WellLogController,
@@ -54,9 +55,16 @@ const {
     wellLogCollections: discarded,
     ...facies3WellsArgs
 } = facies3Wells;
-const facies3WellsCollections: WellLogSet[][] | undefined = facies3WellsLogs
-    ? ([facies3WellsLogs] as WellLogSet[][])
-    : undefined;
+const facies3WellsCollections: WellLogSet[][] = (
+    facies3WellsLogs as WellLogSet[]
+).map((wellLog) => [wellLog as WellLogSet]);
+
+const facies3WellsCollectionsWithUndefined: WellLogSet[][] | undefined = [
+    // [undefined] is not correclty supported in first place :/
+    facies3WellsCollections[1],
+    [undefined] as unknown as WellLogSet[],
+    facies3WellsCollections[2],
+];
 
 const ComponentCode =
     "<SyncLogViewer id='SyncLogViewer' \r\n" +
@@ -143,8 +151,12 @@ function getWellLogCollections(
         case "DiscreteLogs":
         case "DiscreteLogsWithIndividualDomains":
             return facies3WellsCollections;
+        case "DiscreteLogsWithUndefined":
+            return facies3WellsCollectionsWithUndefined;
         case "LogsWithDifferentSets":
             return logsWithDifferentSetsCollections;
+        case "Empty":
+            return [[]];
     }
     return [];
 }
@@ -298,8 +310,8 @@ export const Default: StoryObj<typeof Template> = {
             distances: [2048.3, 512.7],
         },
 
-        axisTitles: axisTitles,
-        axisMnemos: axisMnemos,
+        axisTitles,
+        axisMnemos,
 
         viewTitles: true, // show default well log view titles (a wellname from the well log)
 
@@ -316,9 +328,20 @@ export const Default: StoryObj<typeof Template> = {
     },
     // wellLogCollections is used to retrieve the well log sets from the getWellLogCollections() function
     render: (args) => <Template {...args} wellLogCollections="Default" />,
+    tags: ["no-screenshot-test"],
 };
 
-Default.tags = ["no-screenshot-test"];
+export const Empty: StoryObj<typeof Template> = {
+    args: {
+        axisTitles,
+        axisMnemos,
+
+        viewTitles: true, // show default well log view titles (a wellname from the well log)
+    },
+    // wellLogCollections is used to retrieve the well log sets from the getWellLogCollections() function
+    render: (args) => <Template {...args} wellLogCollections="Empty" />,
+    tags: ["no-screenshot-test"],
+};
 
 type TemplateWithSelectionProps = Omit<
     SyncLogViewerProps,
@@ -329,8 +352,10 @@ type TemplateWithSelectionProps = Omit<
 
 const TemplateWithSelection = (args: TemplateWithSelectionProps) => {
     const { wellLogCollections: collectionName = "", ...restOfArgs } = args;
-    const allCollections: WellLogSet[][] =
-        getWellLogCollections(collectionName) ?? [];
+    const allCollections: WellLogSet[][] = React.useMemo(
+        () => getWellLogCollections(collectionName) ?? [],
+        [collectionName]
+    );
 
     const [showWell1, setShowWell1] = React.useState(true);
     const [showWell2, setShowWell2] = React.useState(true);
@@ -353,14 +378,52 @@ const TemplateWithSelection = (args: TemplateWithSelectionProps) => {
         []
     );
 
-    const wellLogCollections: WellLogSet[][] = [];
-
-    if (showWell1 && allCollections[0])
-        wellLogCollections.push(allCollections[0]);
-    if (showWell2 && allCollections[1])
-        wellLogCollections.push(allCollections[1]);
-    if (showWell3 && allCollections[2])
-        wellLogCollections.push(allCollections[2]);
+    const { wellLogCollections, domain, visibleRange } = React.useMemo(() => {
+        const collections: WellLogSet[][] = [];
+        const domain: Range | Range[] = [];
+        const visibleRange: Range | Range[] = [];
+        const isIndividualDomain = Array.isArray(args.domain?.[0]);
+        const isIndividualRange = Array.isArray(args.visibleRange?.[0]);
+        if (showWell1 && allCollections[0]) {
+            collections.push(allCollections[0]);
+            if (isIndividualDomain) {
+                domain.push(args.domain?.[0] as Range);
+            }
+            if (isIndividualRange) {
+                visibleRange.push(args.visibleRange?.[0] as Range);
+            }
+        }
+        if (showWell2 && allCollections[1]) {
+            collections.push(allCollections[1]);
+            if (isIndividualDomain) {
+                domain.push(args.domain?.[1] as Range);
+            }
+            if (isIndividualRange) {
+                visibleRange.push(args.visibleRange?.[1] as Range);
+            }
+        }
+        if (showWell3 && allCollections[2]) {
+            collections.push(allCollections[2]);
+            if (isIndividualDomain) {
+                domain.push(args.domain?.[2] as Range);
+            }
+            if (isIndividualRange) {
+                visibleRange.push(args.visibleRange?.[2] as Range);
+            }
+        }
+        return {
+            wellLogCollections: collections,
+            visibleRange: isIndividualRange ? visibleRange : args.visibleRange,
+            domain: isIndividualDomain ? domain : args.domain,
+        };
+    }, [
+        args.visibleRange,
+        args.domain,
+        showWell1,
+        allCollections,
+        showWell2,
+        showWell3,
+    ]);
 
     const handleClick = function (): void {
         for (const ctrl of controllers) {
@@ -370,6 +433,8 @@ const TemplateWithSelection = (args: TemplateWithSelectionProps) => {
 
     const argsWithSelection: SyncLogViewerProps = {
         ...restOfArgs,
+        domain,
+        visibleRange,
         wellLogCollections,
     };
 
@@ -434,16 +499,63 @@ export const DiscreteLogs: StoryObj<typeof TemplateWithSelection> = {
     ),
 };
 
-export const DiscreteLogsWithIndividualDomains: StoryObj<
+export const DiscreteLogsWithUndefined: StoryObj<typeof TemplateWithSelection> =
+    {
+        args: { ...facies3WellsArgs },
+        // wellLogCollections is used to retrieve the well log sets from the getWellLogCollections() function
+        render: (args) => (
+            <TemplateWithSelection
+                {...args}
+                wellLogCollections="DiscreteLogsWithUndefined"
+            />
+        ),
+    };
+
+export const DiscreteLogsWithIndividualVisibleRange: StoryObj<
     typeof TemplateWithSelection
 > = {
     args: {
         ...facies3WellsArgs,
+        domain: undefined,
 
         visibleRange: [
             [3000, 5500],
             [2500, 4000],
             [1000, 4000],
+        ],
+        selection: [
+            [3500, 3600],
+            [2700, 2900],
+            [3300, 3400],
+        ],
+        syncContentDomain: false,
+        syncContentSelection: false,
+        syncTrackPos: false,
+    },
+
+    render: (args) => (
+        <TemplateWithSelection
+            {...args}
+            // wellLogCollections is used to retrieve the well log sets from the getWellLogCollections() function
+            wellLogCollections="DiscreteLogsWithIndividualDomains"
+        />
+    ),
+};
+
+export const DiscreteLogsWithIndividualDomainAndVisibleRange: StoryObj<
+    typeof TemplateWithSelection
+> = {
+    args: {
+        ...facies3WellsArgs,
+        domain: [
+            [3000, 5500],
+            [2500, 4000],
+            [1000, 4000],
+        ],
+        visibleRange: [
+            [3500, 5200],
+            [2600, 3600],
+            [1200, 3600],
         ],
         selection: [
             [3500, 3600],
@@ -599,7 +711,7 @@ export const LogsWithDifferentSets: StoryObj<typeof Template> = {
             tvd: "TVD",
             time: "TIME",
         },
-        axisMnemos: axisMnemos,
+        axisMnemos,
         syncContentSelection: true,
         viewTitles: true,
         spacers: [80, 66],
