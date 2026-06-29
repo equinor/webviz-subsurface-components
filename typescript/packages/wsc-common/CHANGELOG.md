@@ -1,3 +1,13 @@
+## 1.4.10 (2026-06-29)
+
+### 🩹 Fixes
+
+- bump the deckgl group in /typescript to 9.3 ([#2775](https://github.com/equinor/webviz-subsurface-components/pull/2775))
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
 ## 1.4.9 (2026-06-03)
 
 ### 🩹 Fixes
