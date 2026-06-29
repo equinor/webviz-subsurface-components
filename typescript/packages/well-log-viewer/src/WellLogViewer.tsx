@@ -8,7 +8,7 @@ import defaultLayout from "./components/DefaultWellLogViewerLayout";
 
 import WellLogViewWithScroller from "./components/WellLogViewWithScroller";
 import type { WellLogViewWithScrollerProps } from "./components/WellLogViewWithScroller";
-import { argTypesWellLogViewScrollerProp } from "./components/WellLogViewWithScroller";
+import { argTypesWellLogViewWithScrollerProp } from "./components/WellLogViewWithScroller";
 import { TemplateType, ColorFunctionType } from "./components/CommonPropTypes";
 import { WellPickPropsType } from "./components/WellLogView";
 //import { _propTypesWellLogView } from "./components/WellLogView";
@@ -52,7 +52,7 @@ export interface WellLogViewerProps extends WellLogViewWithScrollerProps {
 }
 
 export const argTypesWellLogViewerProp = {
-    ...argTypesWellLogViewScrollerProp,
+    ...argTypesWellLogViewWithScrollerProp,
     readoutOptions: {
         description:
             "Options for readout panel.<br/>" +
@@ -114,7 +114,7 @@ export default class WellLogViewer extends Component<
         const collapsedTrackIds = this.collapsedTrackIds;
         /* 
         const controller = this.props.callbackManager.controller;
-        if (controller) { // info.trackId could be for another controller so map iTrack to trackid for the curent controller
+        if (controller) { // info.trackId could be for another controller so map iTrack to trackid for the current controller
             const wellLogView = controller as WellLogView;
             const logController = wellLogView.logController;
             const tracks = logController?.tracks;
@@ -428,7 +428,7 @@ WellLogViewer.propTypes = {
     axisMnemos: PropTypes.object /*Of<Record<string, string>>*/,
 
     /**
-     * Set to true for default titles or to array of individial well log titles
+     * Set to true for default titles or to array of individual well log titles
      */
     viewTitle: PropTypes.oneOfType([
         PropTypes.bool,

@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+
 import React, { Component } from "react";
 
 import PropTypes from "prop-types";
@@ -48,6 +49,7 @@ import {
     isEqDomains,
     isEqualArrays,
     isEqualRanges,
+    filterOutUndefined,
     toggleId,
 } from "./utils/arrays";
 
@@ -340,6 +342,8 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
     constructor(props: SyncLogViewerProps) {
         super(props);
 
+        // this.wellLogCollections is cleaned and safe to be used
+        // while props.welllogs may contain undefined or empty collections, which are not supported and lead to crashes
         this.wellLogCollections = getWellLogCollectionsFromProps(props);
 
         this.spacers = [];
@@ -526,7 +530,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
                 let primary = scale.primary;
                 if (!primary) primary = "tvd"; //!!!!!
                 if (primary && axes) {
-                    if (axes.indexOf(primary) >= 0) primaryAxis = primary;
+                    if (axes.includes(primary)) primaryAxis = primary;
                 }
             }
         }
@@ -646,23 +650,22 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
 
     syncTrackScrollPos(iWellLog: number): void {
         const controller = this.callbackManagers[iWellLog]?.controller;
-        if (!controller) return;
+        if (!controller || !this.props.syncTrackPos) return;
         const trackPos = controller.getTrackScrollPos();
         for (const callbackManager of this.callbackManagers) {
             const _controller = callbackManager?.controller;
             if (!_controller || _controller === controller) continue;
-            if (this.props.syncTrackPos) _controller.scrollTrackTo(trackPos);
+            _controller.scrollTrackTo(trackPos);
         }
     }
     syncTrackSelection(iWellLog: number): void {
         const controller = this.callbackManagers[iWellLog]?.controller;
-        if (!controller) return;
+        if (!controller || !this.props.syncTemplate) return;
         const trackSelection = controller.getSelectedTrackIndices();
         for (const callbackManager of this.callbackManagers) {
             const _controller = callbackManager?.controller;
             if (!_controller || _controller === controller) continue;
-            if (this.props.syncTemplate)
-                _controller.setSelectedTrackIndices(trackSelection);
+            _controller.setSelectedTrackIndices(trackSelection);
         }
     }
 
@@ -983,8 +986,30 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
     createView(index: number): ReactNode {
         const callbacks = this.callbacks[index];
         const wellLog = this.wellLogCollections[index];
-        const templates = this.props.templates;
-        const template = templates[index] ? templates[index] : templates[0];
+        const templates = this.props.templates ?? [
+            {
+                name: "Empty Template",
+                scale: {
+                    primary: "md",
+                },
+                tracks: [
+                    {
+                        title: "",
+                        plots: [
+                            {
+                                name: "Empty",
+                                type: "line",
+                                color: "black",
+                                showLines: false,
+                                showLabels: false,
+                            },
+                        ],
+                    },
+                ],
+                styles: [],
+            },
+        ];
+        const template = templates[index] ?? templates[0];
         const viewTitles = this.props.viewTitles;
         const viewTitle =
             viewTitles && (viewTitles === true ? true : viewTitles[index]);
@@ -1115,13 +1140,24 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
     }
 }
 
-function getWellLogCollectionsFromProps(props: SyncLogViewerProps) {
-    const collectionProp = props.wellLogCollections ?? props.welllogs ?? [];
+function getWellLogCollectionsFromProps(
+    props: SyncLogViewerProps
+): WellLogSet[][] {
+    // Remove undefined and empty arrays from wellLogCollections to avoid crashes in WellLogView
+    if (props.wellLogCollections) {
+        return filterOutUndefined(props.wellLogCollections);
+    }
 
-    return collectionProp.map((setOrCollection) => {
-        if (Array.isArray(setOrCollection)) return setOrCollection;
-        else return [setOrCollection];
-    });
+    // props.welllogs should not be used any more, but we still support it for backward compatibility
+    // But it will not support the corner cases like props.wellLogCollections
+    return (
+        props.welllogs?.map((log) => {
+            if (Array.isArray(log)) {
+                return log;
+            }
+            return [log];
+        }) ?? []
+    );
 }
 
 /**

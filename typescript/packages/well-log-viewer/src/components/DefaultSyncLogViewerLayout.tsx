@@ -19,14 +19,25 @@ export function defaultSidePanel(parent: SyncLogViewer): JSX.Element {
                 callbackManager={parent.callbackManagers[0]}
             />
             {parent.wellLogCollections?.map(
-                (wellLogSets: WellLogSet[], iWellLog: number) => (
-                    <WellLogInfoPanel
-                        key={iWellLog}
-                        header={"Readout " + wellLogSets[0]?.header.well}
-                        readoutOptions={parent.props.readoutOptions}
-                        callbackManager={parent.callbackManagers[iWellLog]}
-                    />
-                )
+                (collection: WellLogSet[], iWellLog: number) => {
+                    // Handle only defined and non-empty collections
+                    const col = collection?.filter(
+                        (item) => item !== undefined
+                    );
+                    if (col?.length > 0 && col[0] !== undefined) {
+                        return (
+                            <WellLogInfoPanel
+                                key={col[0].header.well}
+                                header={"Readout " + col[0].header.well}
+                                readoutOptions={parent.props.readoutOptions}
+                                callbackManager={
+                                    parent.callbackManagers[iWellLog]
+                                }
+                            />
+                        );
+                    }
+                    return null;
+                }
             )}
             <WellLogZoomSlider
                 label="Zoom:"

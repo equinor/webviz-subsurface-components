@@ -1333,7 +1333,29 @@ class WellLogView
 
     componentDidMount(): void {
         this._isMount = true;
-        this.template = deepCopy(this.props.template); // save external template content to current
+        this.template = deepCopy(
+            this.props.template ?? {
+                name: "Empty Template",
+                scale: {
+                    primary: "md",
+                },
+                tracks: [
+                    {
+                        title: "",
+                        plots: [
+                            {
+                                name: "Empty",
+                                type: "line",
+                                color: "black",
+                                showLines: false,
+                                showLabels: false,
+                            },
+                        ],
+                    },
+                ],
+                styles: [],
+            }
+        ); // save external template content to current
 
         if (!this.logController) {
             this.createLogViewer();

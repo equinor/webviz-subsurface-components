@@ -23,7 +23,10 @@ import { getInterpolatedColor } from "./color-table";
 export function getAllWellLogCurves(wellLogSets: WellLogSet[]): WellLogCurve[] {
     const iterator = _.iteratee("curves");
 
-    return _.flatMap<WellLogSet[], WellLogCurve>(wellLogSets, iterator);
+    return _.flatMap<WellLogSet[], WellLogCurve>(
+        wellLogSets.filter((set) => set !== undefined),
+        iterator
+    );
 }
 
 type CurveIndex = { iCurve: number; iSet: number };
@@ -158,22 +161,44 @@ export function getAvailableAxes(
 
 /**
  * Extracts well log sets from the properties of a WellLogView component.
- * Prioritizes the `wellLogSets` property, but uses the depreacted `welllog` property as a fallback.
+ * Prioritizes the `wellLogSets` property, but uses the deprecated `welllog` property as a fallback.
  * A warning is logged if logs for different wells are found.
  * @param props The properties of a WellLogView component (or one extending it)
  * @returns An array of well log sets
  */
 export function getWellLogSetsFromProps(props: WellLogViewProps): WellLogSet[] {
-    let ret: WellLogSet[] = [];
-    const setsProp = props.wellLogSets ?? props.welllog ?? [];
+    const setsProp =
+        props.wellLogSets?.filter((logSet) => logSet !== undefined) ??
+        props.welllog ??
+        [];
 
-    if (Array.isArray(setsProp)) ret = setsProp;
-    else ret = [setsProp];
+    const ret: WellLogSet[] = Array.isArray(setsProp) ? setsProp : [setsProp];
 
-    if (_.chain(ret).map("header.well").uniq().value().length > 1) {
+    const chainMap = _.chain(ret).map("header.well");
+    if (chainMap.uniq().value().length > 1) {
         console.warn(
-            "Got logs for different wells. WellLogView should only receive logs for the same well. For multiple wells, use SyncLogViewer instead."
+            `Got logs for different wells: ${chainMap.uniq().value().join(", ")}.\n WellLogView should only receive logs for the same well. For multiple wells, use SyncLogViewer instead.`
         );
+    }
+
+    if (ret.length === 0) {
+        ret.push({
+            header: { well: "Empty", startIndex: 0, endIndex: 100, step: 1 },
+            curves: [
+                {
+                    name: "MD",
+                    unit: "m",
+                    dimensions: 1,
+                },
+                {
+                    name: "Empty",
+                },
+            ],
+            data: [
+                [0, null],
+                [100, null],
+            ],
+        });
     }
 
     return ret;

@@ -1,3 +1,7 @@
+import "jest";
+
+import { describe, expect, it, jest } from "@jest/globals";
+
 import {
     findIndexByCurveName,
     findSetAndCurveIndex,
@@ -269,7 +273,9 @@ describe("getWellLogSetsFromProps", () => {
     });
 
     it("should warn if logs for different wells are found", () => {
-        const warnSpy = jest.spyOn(console, "warn").mockImplementation();
+        const warnSpy = jest
+            .spyOn(console, "warn")
+            .mockImplementation(() => {});
         // @ts-expect-error TS2739 Prop kept simple for testing purposes
         const prop: WellLogViewProps = {
             welllog: [MOCK_LOG_SET_1, MOCK_LOG_FROM_DIFFERENT_WELL],
