@@ -1,8 +1,14 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import { colorTables } from "@emerson-eps/color-tables";
+import React from "react";
+
+import "jest";
+import { describe, expect, it, jest } from "@jest/globals";
+
 import { render } from "@testing-library/react";
 import "jest-styled-components";
-import React from "react";
+
+import { colorTables } from "@emerson-eps/color-tables";
+
 import SyncLogViewer from "./SyncLogViewer";
 import { axisMnemos, axisTitles } from "./utils/axes";
 import type { ColormapFunction } from "./utils/color-function";
@@ -16,13 +22,16 @@ const exampleColorFunction = colorTables as ColormapFunction[];
 const exampleWellLog = exampleWellLogJson as WellLogSet[];
 const exampleTemplate = exampleTemplateJson as Template;
 
-window.ResizeObserver =
-    window.ResizeObserver ||
+globalThis.ResizeObserver =
+    globalThis.ResizeObserver ||
     jest.fn().mockImplementation(() => ({
         disconnect: jest.fn(),
         observe: jest.fn(),
         unobserve: jest.fn(),
     }));
+
+// disable console.warn to avoid warning messages in the test output
+jest.spyOn(console, "warn").mockImplementation(() => {});
 
 describe("Sync Log Viewer", () => {
     it("snapshot test", () => {

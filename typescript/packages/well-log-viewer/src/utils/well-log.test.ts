@@ -1,5 +1,4 @@
 import "jest";
-
 import { describe, expect, it, jest } from "@jest/globals";
 
 import {
@@ -265,11 +264,16 @@ describe("getWellLogSetsFromProps", () => {
         expect(result).toEqual([MOCK_LOG_SET_2]);
     });
 
-    it("should return an empty array if none of the properties are provided", () => {
+    it("should return an default empty log if none of the properties are provided", () => {
         // @ts-expect-error TS2345 Prop kept simple
         const result = getWellLogSetsFromProps({});
 
-        expect(result).toEqual([]);
+        // test default empty log
+        expect(result.length).toEqual(1);
+        expect(result[0].header.well).toEqual("Empty");
+        expect(result[0].data.length).toEqual(2);
+        expect(result[0].data[0]).toEqual([0, null]);
+        expect(result[0].data[1]).toEqual([100, null]);
     });
 
     it("should warn if logs for different wells are found", () => {

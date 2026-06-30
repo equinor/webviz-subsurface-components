@@ -1,8 +1,14 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import { colorTables } from "@emerson-eps/color-tables";
+import React from "react";
+
+import "jest";
+import { describe, expect, it, jest } from "@jest/globals";
+
 import { render } from "@testing-library/react";
 import "jest-styled-components";
-import React from "react";
+
+import { colorTables } from "@emerson-eps/color-tables";
+
 import WellLogViewer from "./WellLogViewer";
 import type { WellLogController } from "./components/WellLogView";
 import { axisMnemos, axisTitles } from "./utils/axes";
@@ -16,13 +22,16 @@ const exampleTemplate = require("../../../../example-data/welllog_template_1.jso
 const exampleWellLog = require("../../../../example-data/L898MUD.json")[0];
 const exampleColormapFunctions = colorTables as ColormapFunction[];
 
-window.ResizeObserver =
-    window.ResizeObserver ||
+globalThis.ResizeObserver =
+    globalThis.ResizeObserver ||
     jest.fn().mockImplementation(() => ({
         disconnect: jest.fn(),
         observe: jest.fn(),
         unobserve: jest.fn(),
     }));
+
+// disable console.warn to avoid warning messages in the test output
+jest.spyOn(console, "warn").mockImplementation(() => {});
 
 describe("Test Well Log Viewer Component", () => {
     it("snapshot test", () => {

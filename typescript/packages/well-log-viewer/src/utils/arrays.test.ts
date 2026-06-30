@@ -1,5 +1,4 @@
 import "jest";
-
 import { describe, expect, it } from "@jest/globals";
 
 import { filterOutUndefined } from "./arrays";
@@ -25,6 +24,8 @@ describe("arrays", () => {
                 [1, 2],
                 [11, 12],
                 [21, 22, 23],
+                [],
+                [],
                 [31, 32],
                 [41, 42, 43],
             ];

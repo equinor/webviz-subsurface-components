@@ -1,8 +1,13 @@
-import { render, screen } from "@testing-library/react";
-import "jest-styled-components";
-import "@testing-library/jest-dom";
 import React from "react";
+
+import "jest";
+import { describe, expect, it, jest } from "@jest/globals";
+
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import "@testing-library/jest-dom";
+import "jest-styled-components";
+
 import { AxisSelector } from "./AxisSelector";
 
 describe("Test Axis Selector", () => {

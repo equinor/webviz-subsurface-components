@@ -1,11 +1,16 @@
-import { render } from "@testing-library/react";
-import "jest-styled-components";
-import "@testing-library/jest-dom";
 import React from "react";
+
+import "jest";
+import { describe, expect, it, jest } from "@jest/globals";
+
+import { render } from "@testing-library/react";
+import "@testing-library/jest-dom";
+import "jest-styled-components";
+
 import Scroller from "./Scroller";
 
-window.ResizeObserver =
-    window.ResizeObserver ||
+globalThis.ResizeObserver =
+    globalThis.ResizeObserver ||
     jest.fn().mockImplementation(() => ({
         disconnect: jest.fn(),
         observe: jest.fn(),

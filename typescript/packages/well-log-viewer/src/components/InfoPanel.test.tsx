@@ -1,7 +1,12 @@
-import { render } from "@testing-library/react";
-import "jest-styled-components";
-import "@testing-library/jest-dom";
 import React from "react";
+
+import "jest";
+import { describe, expect, it } from "@jest/globals";
+
+import { render } from "@testing-library/react";
+import "@testing-library/jest-dom";
+import "jest-styled-components";
+
 import InfoPanel from "./InfoPanel";
 
 describe("Test Info panel", () => {
