@@ -1,3 +1,13 @@
+## 2.9.0 (2026-07-01)
+
+### 🚀 Features
+
+- fix WLV initial domain handling ([#2794](https://github.com/equinor/webviz-subsurface-components/pull/2794))
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
 ## 2.8.5 (2026-06-29)
 
 ### 🧱 Updated Dependencies
