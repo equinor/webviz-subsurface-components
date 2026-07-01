@@ -12,7 +12,7 @@ export const axisTitles: Record<string, string> = {
     time: "TIME",
 };
 
-// mnemos could be case insentitive ("Depth")
+// mnemos could be case insensitive ("Depth")
 export const axisMnemos: Record<string, string[]> = {
     // depth based logging data
     md: [

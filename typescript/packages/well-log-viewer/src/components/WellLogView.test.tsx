@@ -1,7 +1,13 @@
 import React from "react";
-import { colorTables } from "@emerson-eps/color-tables";
+
+import "jest";
+import { describe, expect, it, jest } from "@jest/globals";
+
 import { render } from "@testing-library/react";
 import "jest-styled-components";
+
+import { colorTables } from "@emerson-eps/color-tables";
+
 import WellLogView from "./WellLogView";
 import type { Template } from "./WellLogTemplateTypes";
 import type { ColormapFunction } from "../utils/color-function";
@@ -16,13 +22,16 @@ const exampleWellLog = {
     data: [],
 };
 
-window.ResizeObserver =
-    window.ResizeObserver ||
+globalThis.ResizeObserver =
+    globalThis.ResizeObserver ||
     jest.fn().mockImplementation(() => ({
         disconnect: jest.fn(),
         observe: jest.fn(),
         unobserve: jest.fn(),
     }));
+
+// disable console.warn to avoid warning messages in the test output
+jest.spyOn(console, "warn").mockImplementation(() => {});
 
 describe("Test Well Log View Component", () => {
     it("snapshot test", () => {

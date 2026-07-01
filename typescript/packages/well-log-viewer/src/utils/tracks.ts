@@ -52,7 +52,7 @@ import {
 } from "./trackFactory";
 import { isStackedTrackTemplate, makeTrackHeader } from "./template";
 
-// Extended track options interface that includes template and index range properties. Used interally in other
+// Extended track options interface that includes template and index range properties. Used internally in other
 interface ExtTrackOptions extends TrackOptions {
     __indexMinMax: Range;
     __template: TemplateTrack;
@@ -103,7 +103,7 @@ function updateGraphTrackScale(track: GraphTrack): void {
     }
 
     if (!track.options.domain) {
-        // could be on reguired track with missed data
+        // could be on required track with missed data
         console.warn("Empty track.options.domain!");
         track.options.domain =
             track.options.scale === "log" ? [1, 100] : [0, 100];

@@ -41,7 +41,10 @@ export class WellLogAxesPanel extends Component<Props, State> {
     constructor(props: Props) {
         super(props);
 
-        this.wellLogSets = this.props.callbackManager.getWellLogSets() ?? [];
+        this.wellLogSets =
+            this.props.callbackManager
+                .getWellLogSets()
+                ?.filter((set) => set !== undefined) ?? [];
         const axes = getAvailableAxes(this.wellLogSets, this.props.axisMnemos);
 
         this.state = {

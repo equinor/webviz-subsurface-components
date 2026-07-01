@@ -137,3 +137,28 @@ export function isEqualArrays(
     }
     return true;
 }
+
+/**
+ * Removes `undefined` values from an array and, for items that are arrays,
+ * also removes `undefined` values inside those nested arrays.
+ *
+ * @param arr - Input array containing values of `T` and optional `undefined` entries.
+ * @returns A cleaned array or array of array stripped from undefined items.
+ */
+export function filterOutUndefined<T>(arr: (T | undefined)[]): T[] {
+    const result = arr
+        .map((item) => {
+            if (Array.isArray(item)) {
+                return item.filter((subItem) => subItem !== undefined);
+            }
+            return item;
+        })
+        .filter((item): item is T => {
+            // if (Array.isArray(item)) {
+            //     return item?.length > 0;
+            // }
+            return item !== undefined;
+        });
+
+    return result;
+}

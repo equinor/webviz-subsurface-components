@@ -4,9 +4,11 @@ import { fn } from "storybook/test";
 import React from "react";
 
 import type { Template as TemplateType } from "./WellLogTemplateTypes";
-import WellLogViewWithScroller from "./WellLogViewWithScroller";
+import WellLogViewWithScroller, {
+    argTypesWellLogViewWithScrollerProp,
+} from "./WellLogViewWithScroller";
 import type { WellLogViewWithScrollerProps } from "./WellLogViewWithScroller";
-import { argTypesWellLogViewScrollerProp } from "./WellLogViewWithScroller";
+
 import { axisTitles, axisMnemos } from "../utils/axes";
 import type { ColormapFunction } from "../utils/color-function";
 
@@ -47,7 +49,7 @@ const stories: Meta<WellLogViewWithScrollerProps> = {
         onContentRescale: fn(),
         onContentSelection: fn(),
     },
-    argTypes: argTypesWellLogViewScrollerProp,
+    argTypes: argTypesWellLogViewWithScrollerProp,
 };
 export default stories;
 
@@ -76,8 +78,8 @@ export const Default: StoryObj<typeof Template> = {
         template: templateJson1 as TemplateType,
         viewTitle: "Well '" + wellLog898MudJson[0].header.well + "'",
         colorMapFunctions: exampleColormapFunctions,
-        axisTitles: axisTitles,
-        axisMnemos: axisMnemos,
+        axisTitles,
+        axisMnemos,
         options: {
             checkDatafileSchema: true,
         },

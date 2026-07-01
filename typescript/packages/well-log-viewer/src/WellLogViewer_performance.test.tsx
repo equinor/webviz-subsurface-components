@@ -1,9 +1,16 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import * as core from "@actions/core";
-import { colorTables } from "@emerson-eps/color-tables";
+import React, { Profiler } from "react";
+
+import "jest";
+import { describe, it, jest } from "@jest/globals";
+
 import { render } from "@testing-library/react";
 import "jest-styled-components";
-import React, { Profiler } from "react";
+
+import * as core from "@actions/core";
+
+import { colorTables } from "@emerson-eps/color-tables";
+
 import WellLogViewer from "./WellLogViewer";
 import logTimes, { obj } from "./test/performanceMetrics";
 import { axisMnemos, axisTitles } from "./utils/axes";
@@ -20,8 +27,8 @@ const exampleWellLog = {
 };
 const exampleColormapFunctions = colorTables as ColormapFunction[];
 
-window.ResizeObserver =
-    window.ResizeObserver ||
+globalThis.ResizeObserver =
+    globalThis.ResizeObserver ||
     jest.fn().mockImplementation(() => ({
         disconnect: jest.fn(),
         observe: jest.fn(),

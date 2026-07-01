@@ -1,20 +1,18 @@
 import React, { Component } from "react";
 
-import WellLogView from "./WellLogView";
-import type { WellLogViewProps } from "./WellLogView";
-import { argTypesWellLogViewProp } from "./WellLogView";
-import { _propTypesWellLogView } from "./WellLogView";
-
-import type { WellLogController } from "./WellLogView";
+import WellLogView, { _propTypesWellLogView } from "./WellLogView";
+import type { WellLogController, WellLogViewProps } from "./WellLogView";
 
 import Scroller from "./Scroller";
 
+export { argTypesWellLogViewProp as argTypesWellLogViewWithScrollerProp } from "./WellLogView";
+
 export type WellLogViewWithScrollerProps = WellLogViewProps;
-export const argTypesWellLogViewScrollerProp = argTypesWellLogViewProp;
 
 class WellLogViewWithScroller extends Component<WellLogViewWithScrollerProps> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public static propTypes: Record<string, any>;
+    public static readonly propTypes: Record<string, any> =
+        _propTypesWellLogView();
 
     controller: WellLogController | null;
     scroller: Scroller | null;
@@ -204,7 +202,5 @@ class WellLogViewWithScroller extends Component<WellLogViewWithScrollerProps> {
         );
     }
 }
-
-WellLogViewWithScroller.propTypes = _propTypesWellLogView(); // WellLogView.propTypes;
 
 export default WellLogViewWithScroller;

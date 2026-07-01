@@ -1,3 +1,6 @@
+import "jest";
+import { describe, expect, it, jest } from "@jest/globals";
+
 import {
     findIndexByCurveName,
     findSetAndCurveIndex,
@@ -261,15 +264,22 @@ describe("getWellLogSetsFromProps", () => {
         expect(result).toEqual([MOCK_LOG_SET_2]);
     });
 
-    it("should return an empty array if none of the properties are provided", () => {
+    it("should return an default empty log if none of the properties are provided", () => {
         // @ts-expect-error TS2345 Prop kept simple
         const result = getWellLogSetsFromProps({});
 
-        expect(result).toEqual([]);
+        // test default empty log
+        expect(result.length).toEqual(1);
+        expect(result[0].header.well).toEqual("Empty");
+        expect(result[0].data.length).toEqual(2);
+        expect(result[0].data[0]).toEqual([0, null]);
+        expect(result[0].data[1]).toEqual([100, null]);
     });
 
     it("should warn if logs for different wells are found", () => {
-        const warnSpy = jest.spyOn(console, "warn").mockImplementation();
+        const warnSpy = jest
+            .spyOn(console, "warn")
+            .mockImplementation(() => {});
         // @ts-expect-error TS2739 Prop kept simple for testing purposes
         const prop: WellLogViewProps = {
             welllog: [MOCK_LOG_SET_1, MOCK_LOG_FROM_DIFFERENT_WELL],

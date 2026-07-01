@@ -8,7 +8,7 @@ import defaultLayout from "./components/DefaultWellLogViewerLayout";
 
 import WellLogViewWithScroller from "./components/WellLogViewWithScroller";
 import type { WellLogViewWithScrollerProps } from "./components/WellLogViewWithScroller";
-import { argTypesWellLogViewScrollerProp } from "./components/WellLogViewWithScroller";
+import { argTypesWellLogViewWithScrollerProp } from "./components/WellLogViewWithScroller";
 import { TemplateType, ColorFunctionType } from "./components/CommonPropTypes";
 import { WellPickPropsType } from "./components/WellLogView";
 //import { _propTypesWellLogView } from "./components/WellLogView";
@@ -52,7 +52,7 @@ export interface WellLogViewerProps extends WellLogViewWithScrollerProps {
 }
 
 export const argTypesWellLogViewerProp = {
-    ...argTypesWellLogViewScrollerProp,
+    ...argTypesWellLogViewWithScrollerProp,
     readoutOptions: {
         description:
             "Options for readout panel.<br/>" +
@@ -114,7 +114,7 @@ export default class WellLogViewer extends Component<
         const collapsedTrackIds = this.collapsedTrackIds;
         /* 
         const controller = this.props.callbackManager.controller;
-        if (controller) { // info.trackId could be for another controller so map iTrack to trackid for the curent controller
+        if (controller) { // info.trackId could be for another controller so map iTrack to trackid for the current controller
             const wellLogView = controller as WellLogView;
             const logController = wellLogView.logController;
             const tracks = logController?.tracks;
@@ -393,12 +393,25 @@ WellLogViewer.propTypes = {
     horizontal: PropTypes.bool,
 
     /**
-     * Initial visible interval of the log data
+     * Initial base domain of the log data, that defines the accessible depth range.
+     * Interactive manipulations (zoom, pan) are limited to this range.
+     *
+     * A single domain applies to all the tracks, an array of domains applies to the tracks in corresponding views.
+     * If not set, the base domain is calculated from the log data as [min, max] of the primary axis values.
      */
     domain: PropTypes.arrayOf(PropTypes.number),
 
     /**
-     * Initial selected interval of the log data
+     * Initial visible range.
+     *
+     * A single range applies to all the tracks, an array of ranges applies to the tracks in corresponding views.
+     * If not set, defaults to the base domain.
+     */
+    visibleRange: PropTypes.arrayOf(PropTypes.number),
+
+    /**
+     * Initial selected range. A single selection applies to all the tracks,
+     * an array of selections applies to the tracks in corresponding views.
      */
     selection: PropTypes.arrayOf(PropTypes.number),
 
@@ -423,7 +436,7 @@ WellLogViewer.propTypes = {
     axisMnemos: PropTypes.object /*Of<Record<string, string>>*/,
 
     /**
-     * Set to true for default titles or to array of individial well log titles
+     * Set to true for default titles or to array of individual well log titles
      */
     viewTitle: PropTypes.oneOfType([
         PropTypes.bool,

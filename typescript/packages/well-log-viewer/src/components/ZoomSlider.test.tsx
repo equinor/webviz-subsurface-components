@@ -1,11 +1,16 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+import React from "react";
+
+import "jest";
+import { describe, expect, it, jest } from "@jest/globals";
+
 import { render } from "@testing-library/react";
 import "jest-styled-components";
-import React from "react";
+
 import ZoomSlider from "./ZoomSlider";
 
-window.ResizeObserver =
-    window.ResizeObserver ||
+globalThis.ResizeObserver =
+    globalThis.ResizeObserver ||
     jest.fn().mockImplementation(() => ({
         disconnect: jest.fn(),
         observe: jest.fn(),
