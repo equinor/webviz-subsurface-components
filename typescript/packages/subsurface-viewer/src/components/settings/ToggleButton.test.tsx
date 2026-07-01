@@ -1,12 +1,16 @@
+import React, { type ChangeEvent } from "react";
+
+import "jest";
+import { describe, expect, it } from "@jest/globals";
+
 import { render } from "@testing-library/react";
+import "@testing-library/jest-dom/jest-globals";
 import "jest-styled-components";
-import "@testing-library/jest-dom";
-import type { ChangeEvent } from "react";
-import React from "react";
+
 import { EmptyWrapper } from "../../test/TestWrapper";
 import ToggleButton from "./ToggleButton";
 
-describe("Test Toggle Input", () => {
+describe("Test ToggleButton", () => {
     it("snapshot test", () => {
         const { container } = render(
             EmptyWrapper({

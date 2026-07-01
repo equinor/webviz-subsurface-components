@@ -1,13 +1,16 @@
-/**
- * @jest-environment jsdom
- */
+import React from "react";
+
+import "jest";
+import { describe, expect, xit } from "@jest/globals";
+
+import { render } from "@testing-library/react";
+import "@testing-library/jest-dom/jest-globals";
+import "jest-styled-components";
 
 import type { LayersList } from "@deck.gl/core";
+
 import { colorTables } from "@emerson-eps/color-tables";
-import "@testing-library/jest-dom";
-import { render } from "@testing-library/react";
-import "jest-styled-components";
-import React from "react";
+
 import {
     ColormapLayer,
     DrawingLayer,

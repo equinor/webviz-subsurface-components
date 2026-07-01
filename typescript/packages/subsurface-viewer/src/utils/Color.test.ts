@@ -1,4 +1,5 @@
 import "jest";
+import { describe, expect, it } from "@jest/globals";
 
 import type { RGBAColor, RGBColor } from "../utils/Color";
 import {
@@ -24,7 +25,7 @@ describe("Color utilities", () => {
         });
 
         it("should return undefined for undefined input", () => {
-            const result = toNormalizedColor(undefined);
+            const result = toNormalizedColor();
             expect(result).toBeUndefined();
         });
 

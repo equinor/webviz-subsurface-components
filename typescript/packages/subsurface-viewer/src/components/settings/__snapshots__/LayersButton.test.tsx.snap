@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
-exports[`test 'layers' button snapshot test 1`] = `
+exports[`test LayersButton snapshot test 1`] = `
 .c0 {
   transform: none;
 }
@@ -36,7 +36,7 @@ exports[`test 'layers' button snapshot test 1`] = `
 </div>
 `;
 
-exports[`test 'layers' button test empty MapState/specbase 1`] = `
+exports[`test LayersButton test empty MapState/specbase 1`] = `
 .c0 {
   transform: none;
 }
@@ -72,4 +72,4 @@ exports[`test 'layers' button test empty MapState/specbase 1`] = `
 </div>
 `;
 
-exports[`test 'layers' button test with no layers present 1`] = `null`;
+exports[`test LayersButton test with no layers present 1`] = `null`;

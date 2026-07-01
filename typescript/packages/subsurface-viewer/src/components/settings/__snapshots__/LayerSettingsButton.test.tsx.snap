@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
-exports[`test layers settings button snapshot test 1`] = `
+exports[`test LayerSettingsButton snapshot test 1`] = `
 .c0 {
   transform: none;
 }

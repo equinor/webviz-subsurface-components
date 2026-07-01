@@ -1,17 +1,23 @@
-import { render } from "@testing-library/react";
-import "jest-styled-components";
-import "@testing-library/jest-dom";
 import React, { Profiler } from "react";
+
+import "jest";
+import { describe, it } from "@jest/globals";
+
+import { render } from "@testing-library/react";
+import "@testing-library/jest-dom/jest-globals";
+import "jest-styled-components";
+
+import * as core from "@actions/core";
+
 import { EmptyWrapper } from "../../test/TestWrapper";
 import LayerProperty from "./LayerProperty";
-import * as core from "@actions/core";
 import logTimes, { obj } from "../../test/performanceMetrics";
 
 import exampleData from "../../../../../../example-data/deckgl-map.json";
 
 const layers: Record<string, unknown>[] = exampleData[0].layers;
 
-describe("Test Layer Property", () => {
+describe("Test LayerProperty", () => {
     it("performance test", () => {
         const drawing_layer = layers.find(
             (item) => item["@@type"] === "DrawingLayer"

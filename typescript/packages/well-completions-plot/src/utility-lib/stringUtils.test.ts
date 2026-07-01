@@ -1,3 +1,6 @@
+import "jest";
+import { describe, expect, it } from "@jest/globals";
+
 import { createWellNameRegexMatcher } from "./stringUtils";
 
 describe("createWellNameRegexMatcher", () => {

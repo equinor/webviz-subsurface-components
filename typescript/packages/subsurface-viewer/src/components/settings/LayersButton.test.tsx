@@ -1,10 +1,16 @@
+import React from "react";
+
+import "jest";
+import { describe, expect, it } from "@jest/globals";
+
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import "@testing-library/jest-dom/jest-globals";
+import "jest-styled-components";
+
 import { layers } from "@equinor/eds-icons";
 import { Icon } from "@equinor/eds-core-react";
-import { render, screen, waitFor } from "@testing-library/react";
-import "jest-styled-components";
-import "@testing-library/jest-dom";
-import React from "react";
-import userEvent from "@testing-library/user-event";
+
 import { EmptyWrapper } from "../../test/TestWrapper";
 import LayersButton from "./LayersButton";
 
@@ -22,7 +28,7 @@ const testLayers: Record<string, unknown>[] = exampleData[0].layers.map(
     }
 );
 
-describe("test 'layers' button", () => {
+describe("test LayersButton", () => {
     it("snapshot test", () => {
         Icon.add({ layers });
         const { container } = render(

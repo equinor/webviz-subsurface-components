@@ -1,13 +1,20 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import { render } from "@testing-library/react";
-import "jest-styled-components";
-import "@testing-library/jest-dom";
 import React from "react";
-import ColorLegend from "./ColorLegend";
-import type { ExtendedLegendLayer } from "../layers/utils/layerTools";
+
+import "jest";
+import { describe, expect, xit } from "@jest/globals";
+
+import { render } from "@testing-library/react";
+import "@testing-library/jest-dom/jest-globals";
+import "jest-styled-components";
+
 import { colorTables } from "@emerson-eps/color-tables";
 
-describe("Test Color Legend component", () => {
+import ColorLegend from "./ColorLegend";
+
+import type { ExtendedLegendLayer } from "../layers/utils/layerTools";
+
+describe("Test ColorLegend component", () => {
     xit("snapshot test", () => {
         const { container } = render(
             <ColorLegend

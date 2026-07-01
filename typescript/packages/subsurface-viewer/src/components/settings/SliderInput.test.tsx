@@ -1,12 +1,16 @@
+import React, { type FormEvent } from "react";
+
+import "jest";
+import { describe, expect, it } from "@jest/globals";
+
 import { render } from "@testing-library/react";
+import "@testing-library/jest-dom/jest-globals";
 import "jest-styled-components";
-import "@testing-library/jest-dom";
-import type { FormEvent } from "react";
-import React from "react";
+
 import { EmptyWrapper } from "../../test/TestWrapper";
 import SliderInput from "./SliderInput";
 
-describe("Test Slider Input", () => {
+describe("Test SliderInput", () => {
     it("snapshot test", () => {
         const { container } = render(
             EmptyWrapper({

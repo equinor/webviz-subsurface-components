@@ -1,17 +1,19 @@
-/**
- * @jest-environment jsdom
- */
+import React from "react";
 
-import type { Layer } from "@deck.gl/core";
-import "@testing-library/jest-dom";
+import "jest";
+import { describe, expect, it } from "@jest/globals";
+
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import "@testing-library/jest-dom/jest-globals";
 import "jest-styled-components";
-import React from "react";
+
+import type { Layer } from "@deck.gl/core";
+
 import type { LayerPickInfo } from "../layers/utils/layerTools";
 import InfoCard from "./InfoCard";
 
-describe("Test Info Card", () => {
+describe("Test InfoCard", () => {
     it("snapshot test with no props", () => {
         const { container } = render(
             <InfoCard

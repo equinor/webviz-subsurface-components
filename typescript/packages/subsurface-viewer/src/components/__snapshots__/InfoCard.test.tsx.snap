@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
-exports[`Test Info Card snapshot test when property value provided 1`] = `
+exports[`Test InfoCard snapshot test when property value provided 1`] = `
 .c1 {
   display: grid;
   grid-gap: var(--eds_button__gap,8px);
@@ -359,7 +359,7 @@ exports[`Test Info Card snapshot test when property value provided 1`] = `
 </div>
 `;
 
-exports[`Test Info Card snapshot test with no props 1`] = `
+exports[`Test InfoCard snapshot test with no props 1`] = `
 .c1 {
   display: grid;
   grid-gap: var(--eds_button__gap,8px);
@@ -595,4 +595,4 @@ exports[`Test Info Card snapshot test with no props 1`] = `
 </div>
 `;
 
-exports[`Test Info Card undefined coordinates 1`] = `null`;
+exports[`Test InfoCard undefined coordinates 1`] = `null`;

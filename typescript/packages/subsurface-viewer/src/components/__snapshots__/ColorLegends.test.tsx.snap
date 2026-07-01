@@ -1,14 +1,14 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
-exports[`Test Color Legend snapshot test 1`] = `
+exports[`Test ColorLegends snapshot test 1`] = `
 <div
   style="position: absolute; display: flex; z-index: 999;"
 />
 `;
 
-exports[`Test Color Legend snapshot test if layers=0 1`] = `null`;
+exports[`Test ColorLegends snapshot test if layers=0 1`] = `null`;
 
-exports[`Test Color Legend snapshot test with props 1`] = `
+exports[`Test ColorLegends snapshot test with props 1`] = `
 <div
   style="position: absolute; display: flex; z-index: 999;"
 />

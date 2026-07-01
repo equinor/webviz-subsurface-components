@@ -1,4 +1,5 @@
 import "jest";
+import { describe, expect, it } from "@jest/globals";
 
 import type { Point3D } from "./Point3D";
 import { add } from "./Point3D";

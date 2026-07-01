@@ -1,17 +1,19 @@
-/**
- * @jest-environment jsdom
- */
-
 /* eslint-disable @typescript-eslint/no-var-requires */
-import type { Layer } from "@deck.gl/core";
-import "@testing-library/jest-dom";
-import { render } from "@testing-library/react";
-import "jest-styled-components";
 import React from "react";
-import { getLayersInViewport } from "../layers/utils/layerTools";
-import ColorLegends from "./ColorLegends";
+
+import "jest";
+import { describe, expect, it } from "@jest/globals";
+
+import { render } from "@testing-library/react";
+import "@testing-library/jest-dom/jest-globals";
+import "jest-styled-components";
+
+import type { Layer } from "@deck.gl/core";
 
 import { colorTables } from "@emerson-eps/color-tables";
+
+import { getLayersInViewport } from "../layers/utils/layerTools";
+import ColorLegends from "./ColorLegends";
 
 const colormapLayer = {
     "@@type": "ColormapLayer",
@@ -24,7 +26,7 @@ const colormapLayer = {
     valueDecoder: {
         rgbScaler: [1, 1, 1],
         // By default, scale the [0, 256*256*256-1] decoded values to [0, 1]
-        floatScaler: 1.0 / (256.0 * 256.0 * 256.0 - 1.0),
+        floatScaler: 1 / (256 * 256 * 256 - 1),
         offset: 0,
         step: 0,
     },
@@ -56,7 +58,7 @@ const wellsLayer = {
 
 const layers = [colormapLayer, wellsLayer];
 
-describe("Test Color Legend", () => {
+describe("Test ColorLegends", () => {
     it("snapshot test", () => {
         const { container } = render(
             <ColorLegends

@@ -1,3 +1,6 @@
+import "jest";
+import { describe, expect, it } from "@jest/globals";
+
 import {
     createGetWellPlotDataCompareValueFunction,
     compareWellPlotDataValues,
