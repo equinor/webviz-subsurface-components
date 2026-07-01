@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import "jest";
+import { describe, expect, it, jest } from "@jest/globals";
+
 import type { Feature } from "geojson";
 
-import type { WellFeature } from "../types";
+import type { SizeAccessor, WellFeature } from "../types";
 import {
     getSize,
     getWellHeadPosition,
@@ -11,6 +13,9 @@ import {
     DEFAULT_LINE_WIDTH,
     DEFAULT_POINT_SIZE,
 } from "./features";
+
+// disable console.warn to avoid warning messages in the test output
+jest.spyOn(console, "warn").mockImplementation(() => {});
 
 describe("features", () => {
     describe("getSize", () => {
@@ -23,8 +28,8 @@ describe("features", () => {
         });
 
         it("should return function that wraps provided accessor function", () => {
-            const mockAccessor1 = jest.fn().mockReturnValue(20);
-            const mockAccessor2 = jest.fn().mockReturnValue(16);
+            const mockAccessor1 = jest.fn().mockReturnValue(20) as SizeAccessor;
+            const mockAccessor2 = jest.fn().mockReturnValue(16) as SizeAccessor;
 
             const mockObject = {} as Feature;
             const mockObjectInfo = { index: 0 };
@@ -45,7 +50,7 @@ describe("features", () => {
         it("should use apply offset value in generated accessors", () => {
             const mockObject = {} as Feature;
             const mockObjectInfo = { index: 0 };
-            const mockAccessor1 = jest.fn().mockReturnValue(12);
+            const mockAccessor1 = jest.fn().mockReturnValue(12) as SizeAccessor;
             const mockAccessor2 = 16;
 
             const result1 = getSize(LINE, mockAccessor1, 6);

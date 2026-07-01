@@ -1,6 +1,8 @@
 import "jest";
+import { describe, expect, it } from "@jest/globals";
 
 import type { Position } from "geojson";
+
 import type { WellFeature } from "../types";
 import {
     getWellObjectByName,

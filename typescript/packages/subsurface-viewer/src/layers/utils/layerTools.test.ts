@@ -1,4 +1,6 @@
 import "jest";
+import { describe, expect, it, jest } from "@jest/globals";
+
 import type { AccessorContext, ChangeFlags } from "@deck.gl/core";
 
 import { getFromAccessor, hasUpdateTriggerChanged } from "./layerTools";
@@ -21,12 +23,15 @@ describe("layerTools", () => {
         });
 
         it("should call accessor function with data and objectInfo", () => {
-            const accessorFn = jest.fn((data: typeof mockData) => {
-                return data.value * 2;
-            });
+            const accessorFn = jest.fn(
+                (data: typeof mockData, objectInfo: unknown) => {
+                    expect(objectInfo).toBe(mockContext);
+                    return data.value * 2;
+                }
+            );
 
             const result = getFromAccessor(accessorFn, mockData, mockContext);
-
+            expect(accessorFn).toHaveBeenCalledTimes(1);
             expect(accessorFn).toHaveBeenCalledWith(mockData, mockContext);
             expect(result).toBe(200);
         });

@@ -23,7 +23,7 @@ interface Props {
 }
 
 const NumericInput: React.FC<Props> = React.memo(
-    ({ label, value, min, max, step, onChange }: Props) => {
+    ({ label, value, min = 0, max, step = 1, onChange }: Props) => {
         return (
             <div
                 style={{
@@ -58,11 +58,6 @@ const NumericInput: React.FC<Props> = React.memo(
         );
     }
 );
-
-NumericInput.defaultProps = {
-    min: 0,
-    step: 1,
-};
 
 NumericInput.displayName = "NumericInput";
 export default NumericInput;

@@ -1,9 +1,16 @@
-import { colorTables } from "@emerson-eps/color-tables";
-import "@testing-library/jest-dom";
-import { render } from "@testing-library/react";
-import type { Unit } from "convert-units";
-import "jest-styled-components";
 import React from "react";
+
+import "jest";
+import { describe, expect, xit } from "@jest/globals";
+
+import { render } from "@testing-library/react";
+import "@testing-library/jest-dom";
+import "jest-styled-components";
+
+import type { Unit } from "convert-units";
+
+import { colorTables } from "@emerson-eps/color-tables";
+
 import mapData from "../../../../example-data/deckgl-map.json";
 import SubsurfaceViewer from "./SubsurfaceViewer";
 

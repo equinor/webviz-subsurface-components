@@ -1,7 +1,12 @@
-import { render } from "@testing-library/react";
-import "jest-styled-components";
-import "@testing-library/jest-dom";
 import React from "react";
+
+import "jest";
+import { describe, expect, it } from "@jest/globals";
+
+import { render } from "@testing-library/react";
+import "@testing-library/jest-dom/jest-globals";
+import "jest-styled-components";
+
 import { EmptyWrapper } from "../../test/TestWrapper";
 import LayerProperty from "./LayerProperty";
 
@@ -21,7 +26,7 @@ const drawingLayer = {
     },
 };
 
-describe("Test Layer Property", () => {
+describe("Test LayerProperty", () => {
     it("snapshot test", () => {
         const { container } = drawingLayer
             ? render(

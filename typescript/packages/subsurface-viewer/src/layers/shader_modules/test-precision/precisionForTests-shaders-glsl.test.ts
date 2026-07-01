@@ -1,5 +1,4 @@
 import "jest";
-
 import { describe, expect, it, afterEach } from "@jest/globals";
 
 import { computePrecision } from "./precisionForTests-shaders-glsl";

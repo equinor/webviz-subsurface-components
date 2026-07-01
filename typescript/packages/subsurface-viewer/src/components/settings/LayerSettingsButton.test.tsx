@@ -1,8 +1,13 @@
-import { render, screen, waitFor } from "@testing-library/react";
-import "jest-styled-components";
 import React from "react";
+
+import "jest";
+import { describe, expect, it } from "@jest/globals";
+
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import "@testing-library/jest-dom";
+import "@testing-library/jest-dom/jest-globals";
+import "jest-styled-components";
+
 import { EmptyWrapper } from "../../test/TestWrapper";
 import LayerSettingsButton from "./LayerSettingsButton";
 
@@ -46,7 +51,7 @@ const wellsLayer = {
 
 const layers = [drawingLayer, wellsLayer];
 
-describe("test layers settings button", () => {
+describe("test LayerSettingsButton", () => {
     it("snapshot test", () => {
         const { container } = drawingLayer
             ? render(

@@ -1,4 +1,5 @@
 import "jest";
+import { describe, expect, it } from "@jest/globals";
 
 import type { BoundingBox2D } from "./BoundingBox2D";
 import { boxCenter, boxUnion, isEmpty } from "./BoundingBox2D";

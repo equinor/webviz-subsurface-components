@@ -1,12 +1,17 @@
-import { render, screen } from "@testing-library/react";
-import "jest-styled-components";
-import "@testing-library/jest-dom";
 import React from "react";
+
+import "jest";
+import { describe, expect, it } from "@jest/globals";
+
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import "@testing-library/jest-dom/jest-globals";
+import "jest-styled-components";
+
 import { EmptyWrapper } from "../../test/TestWrapper";
 import DrawModeSelector from "./DrawModeSelector";
 
-describe("Test draw-mode menu", () => {
+describe("Test DrawModeSelector", () => {
     it("snapshot test", () => {
         const { container } = render(
             EmptyWrapper({

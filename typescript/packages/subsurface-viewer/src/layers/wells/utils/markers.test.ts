@@ -1,5 +1,9 @@
-import { buildMarkerPath2D } from "./markers";
+import "jest";
+import { describe, expect, it } from "@jest/globals";
+
 import type { Position } from "geojson";
+
+import { buildMarkerPath2D } from "./markers";
 
 describe("Marker utilities", () => {
     const anchorPoint: Position = [100, 200, 50];

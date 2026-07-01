@@ -1,4 +1,5 @@
 import "jest";
+import { describe, expect, it } from "@jest/globals";
 
 import type { Config } from "./configTools";
 import { findConfig } from "./configTools";

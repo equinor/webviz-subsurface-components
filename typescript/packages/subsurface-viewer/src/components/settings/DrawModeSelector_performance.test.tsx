@@ -1,13 +1,19 @@
-import { render } from "@testing-library/react";
-import "jest-styled-components";
-import "@testing-library/jest-dom";
 import React, { Profiler } from "react";
+
+import "jest";
+import { describe, it } from "@jest/globals";
+
+import { render } from "@testing-library/react";
+import "@testing-library/jest-dom/jest-globals";
+import "jest-styled-components";
+
+import * as core from "@actions/core";
+
 import { EmptyWrapper } from "../../test/TestWrapper";
 import DrawModeSelector from "./DrawModeSelector";
-import * as core from "@actions/core";
 import logTimes, { obj } from "../../test/performanceMetrics";
 
-describe("Test draw-mode menu", () => {
+describe("Test DrawModeSelector", () => {
     it("performance test", () => {
         render(
             EmptyWrapper({

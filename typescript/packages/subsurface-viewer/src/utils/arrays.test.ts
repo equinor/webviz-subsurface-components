@@ -1,4 +1,5 @@
 import "jest";
+import { describe, expect, it } from "@jest/globals";
 
 import { scaleArray } from "./arrays";
 

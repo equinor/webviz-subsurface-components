@@ -1,3 +1,6 @@
+import "jest";
+import { describe, expect, it } from "@jest/globals";
+
 import { removeConsecutiveDuplicates, splineRefine } from "./spline";
 import type { Point3D } from "../../../utils";
 import type {
