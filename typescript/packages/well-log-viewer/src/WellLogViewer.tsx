@@ -393,17 +393,25 @@ WellLogViewer.propTypes = {
     horizontal: PropTypes.bool,
 
     /**
-     * Initial base domain of the log data
+     * Initial base domain of the log data, that defines the accessible depth range.
+     * Interactive manipulations (zoom, pan) are limited to this range.
+     *
+     * A single domain applies to all the tracks, an array of domains applies to the tracks in corresponding views.
+     * If not set, the base domain is calculated from the log data as [min, max] of the primary axis values.
      */
     domain: PropTypes.arrayOf(PropTypes.number),
 
     /**
-     * Initial visible interval of the log data
+     * Initial visible range.
+     *
+     * A single range applies to all the tracks, an array of ranges applies to the tracks in corresponding views.
+     * If not set, defaults to the base domain.
      */
     visibleRange: PropTypes.arrayOf(PropTypes.number),
 
     /**
-     * Initial selected interval of the log data
+     * Initial selected range. A single selection applies to all the tracks,
+     * an array of selections applies to the tracks in corresponding views.
      */
     selection: PropTypes.arrayOf(PropTypes.number),
 

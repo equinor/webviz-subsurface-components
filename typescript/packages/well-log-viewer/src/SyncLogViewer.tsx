@@ -151,7 +151,9 @@ export interface SyncLogViewerProps {
     axisMnemos: Record<string, string[]>;
 
     /**
-     * Initial base domain of the log data.
+     * Initial base domain of the log data, that defines the accessible depth range.
+     * Interactive manipulations (zoom, pan) are limited to this range.
+     *
      * A single domain applies to all the tracks, an array of domains applies to the tracks in corresponding views.
      * If not set, the base domain is calculated from the log data as [min, max] of the primary axis values.
      */
@@ -159,7 +161,8 @@ export interface SyncLogViewerProps {
 
     /**
      * Initial visible range.
-     * A single domain applies to all the tracks, an array of domains applies to the tracks in corresponding views.
+     *
+     * A single range applies to all the tracks, an array of ranges applies to the tracks in corresponding views.
      * If not set, defaults to the base domain.
      */
     visibleRange?: Range | Range[];
@@ -285,7 +288,8 @@ export const argTypesSyncLogViewerProp = {
         //},
     },
     domain: {
-        description: "Initial base domain of the log data.",
+        description:
+            "Initial base domain of the log data, defining the depth range that can be visualized.",
     },
     visibleRange: {
         description: "Initial visible interval of the log data.",
