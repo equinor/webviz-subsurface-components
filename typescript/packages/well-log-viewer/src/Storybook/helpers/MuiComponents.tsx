@@ -29,7 +29,7 @@ type TooltipProps = Pick<
 const Tooltip: React.FC<TooltipProps> = (props) => {
     const { children, disable = false, ...rest } = props;
     const childrenWrapper = disable ? <span>{children}</span> : children;
-    const ref = React.useRef<HTMLDivElement>();
+    const ref = React.useRef<HTMLDivElement>(null);
     const childrenElement = React.cloneElement(childrenWrapper, { ref: ref });
     const [skipTooltip, setSkipTooltip] = React.useState(false);
     const [open, setOpen] = React.useState(false);
@@ -90,7 +90,7 @@ type TabTitle = {
     label: string;
     "data-tut"?: string;
     attention?: boolean;
-    decoration?: JSX.Element;
+    decoration?: React.JSX.Element;
     tooltip?: string;
 };
 
@@ -226,7 +226,7 @@ const TabPanel: React.FC<TabPanelProps> = (props) => {
  */
 export type TabItem = {
     title: TabTitle;
-    panelContent: JSX.Element;
+    panelContent: React.JSX.Element;
     panelCustomClassName?: string;
 };
 

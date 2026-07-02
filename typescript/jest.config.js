@@ -27,5 +27,8 @@ module.exports = {
     ],
     testPathIgnorePatterns: [path.resolve(__dirname, "node_modules"), "dist"],
     modulePathIgnorePatterns: ["dist"],
-    setupFiles: ["jest-canvas-mock"],
+    setupFiles: [
+        "jest-canvas-mock",
+        path.resolve(__dirname, "config/jest.setup.popover.js"),
+    ],
 };

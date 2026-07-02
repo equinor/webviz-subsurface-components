@@ -14,7 +14,7 @@
         "moduleResolution": "node10",
         "allowSyntheticDefaultImports": true,
         "esModuleInterop": true,
-        "jsx": "react",
+        "jsx": "react-jsx",
         "target": "es2022",
         "allowJs": true,
         "skipLibCheck": true,

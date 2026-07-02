@@ -501,7 +501,7 @@ type StoryTemplateWithCustomPanelProps = Omit<
 
 function StoryTemplateWithCustomPanel(
     props: StoryTemplateWithCustomPanelProps
-): JSX.Element {
+): React.JSX.Element {
     const [infos, setInfos] = React.useState<Info[]>([]);
     const [showPanel, setShowPanel] = React.useState<boolean>(false);
 
@@ -521,7 +521,7 @@ function StoryTemplateWithCustomPanel(
     );
 }
 
-function CustomInfoPanel(props: { infos: Info[] }): JSX.Element {
+function CustomInfoPanel(props: { infos: Info[] }): React.JSX.Element {
     const [mousePosition, setMousePosition] = React.useState({
         x: -1000,
         y: -1000,

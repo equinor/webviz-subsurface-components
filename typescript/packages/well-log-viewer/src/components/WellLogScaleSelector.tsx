@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useState } from "react";
+import type React from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import ScaleSelector from "./ScaleSelector";
 
@@ -7,7 +8,7 @@ import type { CallbackManager } from "./CallbackManager";
 interface Props {
     callbackManager: CallbackManager | undefined;
 
-    label?: string | JSX.Element;
+    label?: string | React.JSX.Element;
     values?: number[]; // Available scale values array
     round?: boolean | number; // round the value to a "good" number
 }

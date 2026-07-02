@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import React, { useState, useEffect, useCallback } from "react";
+import type React from "react";
+import { useState, useEffect, useCallback } from "react";
 import { createRoot } from "react-dom/client";
 
 import type { Track, GraphTrack } from "@equinor/videx-wellog";

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import React, { Component } from "react";
+import type React from "react";
+import { Component } from "react";
 
 import type { Track, GraphTrack } from "@equinor/videx-wellog";
 
@@ -359,7 +360,7 @@ export class PlotPropertiesDialog extends Component<Props, State> {
         return [];
     }
 
-    render(): JSX.Element {
+    render(): React.JSX.Element {
         const trackTemplate = getTrackTemplate(this.props.track);
         const title = this.props.templatePlot ? "Edit plot" : "Add New Plot";
         const skipUsed = this.props.templatePlot ? false : true; /*??*/

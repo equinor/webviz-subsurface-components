@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import React, { Component } from "react";
+import type React from "react";
+import { Component } from "react";
 
 function getScrollbarSizes(): { vertical: number; horizontal: number } {
     // Creating invisible container
@@ -154,16 +155,24 @@ class Scroller extends Component<ScrollerProps> {
         return false;
     }
 
-    render(): JSX.Element {
+    render(): React.JSX.Element {
         return (
             <div
-                ref={(el) => (this.scroller = el as HTMLDivElement)}
+                ref={(el) => {
+                    this.scroller = el as HTMLDivElement;
+                }}
                 style={{ overflow: "scroll", width: "100%", height: "100%" }}
                 onScroll={this.onScroll}
             >
-                <div ref={(el) => (this.scrollable = el as HTMLDivElement)}>
+                <div
+                    ref={(el) => {
+                        this.scrollable = el as HTMLDivElement;
+                    }}
+                >
                     <div
-                        ref={(el) => (this.content = el as HTMLDivElement)}
+                        ref={(el) => {
+                            this.content = el as HTMLDivElement;
+                        }}
                         style={{ position: "absolute" }}
                     >
                         {/* TODO: Fix this the next time the file is edited. */}

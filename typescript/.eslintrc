@@ -9,6 +9,7 @@
     },
     "extends": [
         "plugin:react/recommended",
+        "plugin:react/jsx-runtime",
         "eslint:recommended",
         "plugin:prettier/recommended"
     ],
@@ -18,6 +19,7 @@
             "plugins": ["@typescript-eslint"],
             "extends": [
                 "plugin:react/recommended",
+                "plugin:react/jsx-runtime",
                 "plugin:@typescript-eslint/recommended",
                 // following raises 833 errors, mainly about unsafe handling of `any`
                 // "plugin:@typescript-eslint/recommended-type-checked",

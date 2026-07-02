@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
-import React, { Component } from "react";
+import type React from "react";
+import { Component } from "react";
 
 import PropTypes from "prop-types";
 
@@ -67,6 +68,13 @@ export const WellDistancesType = PropTypes.shape({
 
 export interface SyncLogViewerProps {
     /**
+     * The ID of this component, used to identify dash components
+     * in callbacks. The ID needs to be unique across all of the
+     * components in an app.
+     */
+    id?: string;
+
+    /**
      * An array of JSON well log objects. A synced well log is created per entry.
      * @deprecated use wellLogCollections instead
      */
@@ -90,7 +98,7 @@ export interface SyncLogViewerProps {
     /**
      * Set to true for default titles or to array of individual well log titles
      */
-    viewTitles?: boolean | (boolean | string | JSX.Element)[];
+    viewTitles?: boolean | (boolean | string | React.JSX.Element)[];
 
     /**
      * Well Picks data array
@@ -1114,7 +1122,7 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         );
     }
 
-    render(): JSX.Element {
+    render(): React.JSX.Element {
         return (
             <WellLogLayout
                 parent={this}
