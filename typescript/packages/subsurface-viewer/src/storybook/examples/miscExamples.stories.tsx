@@ -1,8 +1,9 @@
-import { all, create } from "mathjs";
 import React from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-webpack5";
 import { fireEvent, userEvent } from "storybook/test";
+
+import { all, create } from "mathjs";
 
 import type { Layer } from "@deck.gl/core";
 

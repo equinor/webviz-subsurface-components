@@ -1,5 +1,6 @@
-import type { Meta, StoryObj } from "@storybook/react-webpack5";
 import React from "react";
+
+import type { Meta, StoryObj } from "@storybook/react-webpack5";
 
 import { View } from "@deck.gl/core";
 
@@ -31,8 +32,7 @@ const EditDataTemplate = (args) => {
             {...args}
             editedData={editedData}
             setProps={(updatedProps) => {
-                // @ts-expect-error TS4111
-                setEditedData(updatedProps.editedData);
+                setEditedData(updatedProps["editedData"]);
             }}
         >
             <>

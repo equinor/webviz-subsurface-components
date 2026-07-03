@@ -1,7 +1,9 @@
-import type { Meta, StoryObj } from "@storybook/react-webpack5";
 import React from "react";
 
+import type { Meta, StoryObj } from "@storybook/react-webpack5";
+
 import { OrbitView, OrthographicView } from "@deck.gl/core";
+
 import { AxesLayer, WellsLayer } from "../../layers";
 import type { WellLabelLayerProps } from "../../layers/wells/layers/wellLabelLayer";
 import {

@@ -1,5 +1,7 @@
-import type { Meta, StoryObj } from "@storybook/react-webpack5";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React from "react";
+
+import type { Meta, StoryObj } from "@storybook/react-webpack5";
 
 import { View, OrthographicView } from "@deck.gl/core";
 
@@ -23,6 +25,7 @@ const stories: Meta = {
 };
 export default stories;
 
+// ---------Layers and data--------------- //
 const layerProps = {
     minimalMarginH: 80, // Horizontal margin (in pixels)
     minimalMarginV: 30, // Vertical margin (in pixels)

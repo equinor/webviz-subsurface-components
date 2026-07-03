@@ -1,5 +1,6 @@
+import "react";
+
 import type { Meta, StoryObj } from "@storybook/react-webpack5";
-import React from "react";
 
 import SubsurfaceViewer, { TGrid3DColoringMode } from "../../SubsurfaceViewer";
 
@@ -22,14 +23,18 @@ import * as gridPolys from "../../layers/grid3d/test_data/DiscreteProperty/Polys
 import * as gridProps from "../../layers/grid3d/test_data/DiscreteProperty/Props.json";
 
 import { default3DViews, defaultStoryParameters } from "../sharedSettings";
-import {
-    createMathWithSeed,
-    replaceNonJsonArgs,
-} from "../sharedHelperFunctions";
+
+import { createMathWithSeed } from "../sharedHelperFunctions";
+import { getPropsInjectorComponent } from "../sharedHelperComponents";
+
+const SubsurfaceViewerPropsInjector = getPropsInjectorComponent(
+    getInjectedProps,
+    SubsurfaceViewer
+);
 
 const stories: Meta = {
-    component: SubsurfaceViewer,
-    title: "SubsurfaceViewer/Grid3D Layer",
+    component: SubsurfaceViewerPropsInjector,
+    title: "SubsurfaceViewer / Grid3D Layer",
     args: {
         // Add some common controls for all the stories.
         triggerHome: 0,
@@ -37,6 +42,7 @@ const stories: Meta = {
 };
 export default stories;
 
+// ---------Layers and data--------------- //
 type NumberQuad = [number, number, number, number];
 
 const defaultProps = {
@@ -53,7 +59,7 @@ const grid3dLayer = {
     colorMapName: "Rainbow",
     ZIncreasingDownwards: true,
     pickable: true,
-    opacity: 1.0,
+    opacity: 1,
 };
 
 const axes = {
@@ -129,39 +135,39 @@ function discreteProperty(cellCountU: number, cellCountV: number) {
     return values;
 }
 
-/* eslint-disable prettier/prettier */
+/* prettier-ignore */
 const CATEGORICAL_COLOR_TABLE: RGBColor[] = [
-    [0, 0, 255], // 0
-    [0, 255, 0], // 1
-    [0, 255, 255], // 2
-    [255, 0, 0], // 3
-    [255, 0, 255], // 4
-    [255, 255, 0], // 5
-    [0, 0, 100], // 6
-    [0, 100, 0], // 7
-    [0, 100, 100], // 8
-    [100, 0, 0], // 9
-    [100, 0, 100], // 10
-    [100, 100, 0], // 11
-    [100, 100, 255], // 12
+    [  0,    0,  255],  //  0
+    [  0,  255,    0],  //  1
+    [  0,  255,  255],  //  2
+    [255,    0,    0],  //  3
+    [255,    0,  255],  //  4
+    [255,  255,    0],  //  5
+    [  0,    0,  100],  //  6
+    [  0,  100,    0],  //  7
+    [  0,  100,  100],  //  8
+    [100,    0,    0],  //  9
+    [100,    0,  100],  // 10
+    [100,  100,    0],  // 11
+    [100,  100,  255],  // 12
 ];
 
+/* prettier-ignore */
 const propertyValueNames = [
-    { value: 1, name: "blue" }, // 0
-    { value: 2, name: "green" }, // 1
-    { value: 5, name: "cyan" }, // 2
-    { value: 6, name: "red" }, // 3
-    { value: -8, name: "magenta" }, // 4
-    { value: 9, name: "yellow" }, // 5
-    { value: 20, name: "dark blue" }, // 6
-    { value: 30, name: "dark green" }, // 7
-    { value: 15, name: "dark cyan" }, // 8
-    { value: 10, name: "dark red" }, // 9
-    { value: 3, name: "dark magenta" }, // 10
-    { value: -10, name: "dark yellow" }, // 11
-    { value: -10, name: "Lite blue" }, // 12
+    { value:   1,   name: "blue" },         //  0
+    { value:   2,   name: "green" },        //  1
+    { value:   5,   name: "cyan" },         //  2
+    { value:   6,   name: "red" },          //  3
+    { value:  -8,   name: "magenta" },      //  4
+    { value:   9,   name: "yellow" },       //  5
+    { value:  20,   name: "dark blue" },    //  6
+    { value:  30,   name: "dark green" },   //  7
+    { value:  15,   name: "dark cyan" },    //  8
+    { value:  10,   name: "dark red" },     //  9
+    { value:   3,   name: "dark magenta" }, // 10
+    { value: -10,   name: "dark yellow" },  // 11
+    { value: -10,   name: "Lite blue" },    // 12
 ];
-/* eslint-enable prettier/prettier */
 
 const CATEGORICAL_COLOR_MAP = (value: number) => CATEGORICAL_COLOR_TABLE[value];
 
@@ -186,7 +192,7 @@ const discretePropsLayerId = "discrete_props";
 const discretePropsColorfuncLayerId = "discrete_props_colorfunc";
 const zPaintingLayerId = "z_painting";
 
-const nonJsonLayerArgs = {
+const injectedProps = {
     [simpleContinuousLayerId]: {
         pointsData: new Float32Array(SIMPLE_GEOMETRY.points.flat()),
         polysData: new Uint32Array(SIMPLE_GEOMETRY.polygons),
@@ -221,20 +227,23 @@ const nonJsonLayerArgs = {
     },
 };
 
+function getInjectedProps() {
+    return injectedProps;
+}
+
 const SIMPLE_GEOMETRY_LAYER = {
     ...grid3dLayer,
     "@@typedArraySupport": true,
-    pointsData: nonJsonLayerArgs[simpleContinuousLayerId].pointsData,
-    polysData: nonJsonLayerArgs[simpleContinuousLayerId].polysData,
+    pointsData: "pointsData proxy",
+    polysData: "polysData proxy",
     gridLines: SIMPLE_GEOMETRY.points.length < 1000,
 };
 
 const SIMPLE_CONTINUOUS_LAYER = {
     ...SIMPLE_GEOMETRY_LAYER,
     id: simpleContinuousLayerId,
-    propertiesData: nonJsonLayerArgs[simpleContinuousLayerId].propertiesData,
-    colorMapFunction:
-        nonJsonLayerArgs[simpleContinuousLayerId].colorMapFunction,
+    propertiesData: "propertiesData proxy",
+    colorMapFunction: "colorMapFunction proxy",
     colorMapClampColor: true,
     colorMapRange: [-2, 2],
 };
@@ -243,9 +252,9 @@ const SIMPLE_DISCRETE_LAYER = {
     ...SIMPLE_GEOMETRY_LAYER,
     id: simpleDiscreteLayerId,
     coloringMode: TGrid3DColoringMode.DiscreteProperty,
-    propertiesData: nonJsonLayerArgs[simpleDiscreteLayerId].propertiesData,
+    propertiesData: "propertiesData proxy",
     discretePropertyValueNames: propertyValueNames,
-    colorMapFunction: nonJsonLayerArgs[simpleDiscreteLayerId].colorMapFunction,
+    colorMapFunction: "colorMapFunction proxy",
     colorMapClampColor: true,
     colorMapRange: [0, 12],
 };
@@ -325,6 +334,7 @@ export const Simgrid4x: StoryObj<typeof SubsurfaceViewer> = {
                 pointsData: "vtk-grid/Simgrid4x_points.json",
                 polysData: "vtk-grid/Simgrid4x_polys.json",
                 propertiesData: "vtk-grid/Simgrid4x_scalar.json",
+                gridLines: false,
             },
         ],
     },
@@ -343,6 +353,7 @@ export const Simgrid8xIJonly: StoryObj<typeof SubsurfaceViewer> = {
                 pointsData: "vtk-grid/Simgrid8xIJonly_points.json",
                 polysData: "vtk-grid/Simgrid8xIJonly_polys.json",
                 propertiesData: "vtk-grid/Simgrid8xIJonly_scalar.json",
+                gridLines: false,
             },
         ],
     },
@@ -352,16 +363,18 @@ export const Simgrid8xIJonly: StoryObj<typeof SubsurfaceViewer> = {
 const math = createMathWithSeed("1984");
 
 const snubCubePoints = SnubCubePoints.map((v) => 10 * v);
-const snubCubeProperties = Array(SnubCubeVertexCount)
-    .fill(0)
-    .map(() => 100 + math.random() * 50);
+const snubCubeProperties = Array.from(
+    { length: SnubCubeVertexCount },
+    () => 100 + math.random() * 50
+);
 
 const toroidPoints = ToroidPoints.map((v) => 10 * v).map((v, index) =>
     index % 3 === 0 ? v + 30 : v
 );
-const toroidProperties = Array(ToroidVertexCount)
-    .fill(0)
-    .map(() => math.random() * 10);
+const toroidProperties = Array.from(
+    { length: ToroidVertexCount },
+    () => math.random() * 10
+);
 
 export const PolyhedralCells: StoryObj<typeof SubsurfaceViewer> = {
     args: {
@@ -416,9 +429,6 @@ export const ContinuousProperty: StoryObj<typeof SubsurfaceViewer> = {
         ],
     },
     parameters: parameters,
-    render: (args) => (
-        <SubsurfaceViewer {...replaceNonJsonArgs(args, nonJsonLayerArgs)} />
-    ),
 };
 
 export const DiscreteProperty: StoryObj<typeof SubsurfaceViewer> = {
@@ -433,9 +443,6 @@ export const DiscreteProperty: StoryObj<typeof SubsurfaceViewer> = {
         ],
     },
     parameters: parameters,
-    render: (args) => (
-        <SubsurfaceViewer {...replaceNonJsonArgs(args, nonJsonLayerArgs)} />
-    ),
 };
 
 export const DiscretePropertyWithClamping: StoryObj<typeof SubsurfaceViewer> = {
@@ -462,14 +469,12 @@ export const DiscretePropertyWithClamping: StoryObj<typeof SubsurfaceViewer> = {
                 "@@typedArraySupport": true,
                 id: discretePropsLayerId,
                 coloringMode: TGrid3DColoringMode.DiscreteProperty,
-                pointsData: nonJsonLayerArgs[discretePropsLayerId].pointsData,
-                polysData: nonJsonLayerArgs[discretePropsLayerId].polysData,
-                propertiesData:
-                    nonJsonLayerArgs[discretePropsLayerId].propertiesData,
+                pointsData: "pointsData proxy",
+                polysData: "polysData proxy",
+                propertiesData: "propertiesData proxy",
                 discretePropertyValueNames: propertyValueNames,
                 colorMapName: "Seismic",
-                colorMapFunction:
-                    nonJsonLayerArgs[discretePropsLayerId].colorMapFunction,
+                colorMapFunction: "colorMapFunction proxy",
                 material: {
                     ambient: 0.5,
                     diffuse: 0.5,
@@ -482,9 +487,6 @@ export const DiscretePropertyWithClamping: StoryObj<typeof SubsurfaceViewer> = {
         ],
     },
     parameters: parameters,
-    render: (args) => (
-        <SubsurfaceViewer {...replaceNonJsonArgs(args, nonJsonLayerArgs)} />
-    ),
 };
 
 export const DiscretePropertyWithColorFuncAndClamping: StoryObj<
@@ -513,16 +515,10 @@ export const DiscretePropertyWithColorFuncAndClamping: StoryObj<
                 "@@typedArraySupport": true,
                 id: discretePropsColorfuncLayerId,
                 coloringMode: TGrid3DColoringMode.DiscreteProperty,
-                pointsData:
-                    nonJsonLayerArgs[discretePropsColorfuncLayerId].pointsData,
-                polysData:
-                    nonJsonLayerArgs[discretePropsColorfuncLayerId].polysData,
-                propertiesData:
-                    nonJsonLayerArgs[discretePropsColorfuncLayerId]
-                        .propertiesData,
-                colorMapFunction:
-                    nonJsonLayerArgs[discretePropsColorfuncLayerId]
-                        .colorMapFunction,
+                pointsData: "pointsData proxy",
+                polysData: "polysData proxy",
+                propertiesData: "propertiesData proxy",
+                colorMapFunction: "colorMapFunction proxy",
                 material: false,
                 colorMapRange: [3, 10],
                 colorMapClampColor: [100, 100, 100],
@@ -530,9 +526,6 @@ export const DiscretePropertyWithColorFuncAndClamping: StoryObj<
         ],
     },
     parameters: parameters,
-    render: (args) => (
-        <SubsurfaceViewer {...replaceNonJsonArgs(args, nonJsonLayerArgs)} />
-    ),
 };
 
 export const DiscretePropertyWithUndefinedValues: StoryObj<
@@ -561,13 +554,11 @@ export const DiscretePropertyWithUndefinedValues: StoryObj<
                 "@@typedArraySupport": true,
                 id: discretePropsLayerId,
                 coloringMode: TGrid3DColoringMode.DiscreteProperty,
-                colorMapFunction:
-                    nonJsonLayerArgs[discretePropsLayerId].colorMapFunction,
+                colorMapFunction: "colorMapFunction proxy",
                 discretePropertyValueNames: propertyValueNames,
-                pointsData: nonJsonLayerArgs[discretePropsLayerId].pointsData,
-                polysData: nonJsonLayerArgs[discretePropsLayerId].polysData,
-                propertiesData:
-                    nonJsonLayerArgs[discretePropsLayerId].propertiesData,
+                pointsData: "pointsData proxy",
+                polysData: "polysData proxy",
+                propertiesData: "propertiesData proxy",
                 material: {
                     ambient: 0.5,
                     diffuse: 0.5,
@@ -580,9 +571,6 @@ export const DiscretePropertyWithUndefinedValues: StoryObj<
         ],
     },
     parameters: parameters,
-    render: (args) => (
-        <SubsurfaceViewer {...replaceNonJsonArgs(args, nonJsonLayerArgs)} />
-    ),
 };
 
 export const ZPainting: StoryObj<typeof SubsurfaceViewer> = {
@@ -608,8 +596,8 @@ export const ZPainting: StoryObj<typeof SubsurfaceViewer> = {
                 ...grid3dLayer,
                 "@@typedArraySupport": true,
                 id: zPaintingLayerId,
-                pointsData: nonJsonLayerArgs[zPaintingLayerId].pointsData,
-                polysData: nonJsonLayerArgs[zPaintingLayerId].polysData,
+                pointsData: "pointsData proxy",
+                polysData: "polysData proxy",
                 colorMapName: "Seismic",
                 coloringMode: TGrid3DColoringMode.Z,
                 //colorMapFunction: "rainbow",
@@ -625,7 +613,4 @@ export const ZPainting: StoryObj<typeof SubsurfaceViewer> = {
         ],
     },
     parameters: parameters,
-    render: (args) => (
-        <SubsurfaceViewer {...replaceNonJsonArgs(args, nonJsonLayerArgs)} />
-    ),
 };

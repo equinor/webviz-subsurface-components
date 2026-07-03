@@ -1,5 +1,6 @@
-import type { Meta, StoryObj } from "@storybook/react-webpack5";
 import React from "react";
+
+import type { Meta, StoryObj } from "@storybook/react-webpack5";
 
 import { View } from "@deck.gl/core";
 import { ClipExtension } from "@deck.gl/extensions";
@@ -119,8 +120,8 @@ const nodeCenteredPropertiesLayerWithArrayInput = {
         increment: [1, 1],
         rotDeg: 0,
     },
-    meshData: Array.from(Array(20)).map(() => Math.random()), // Array of 20 random numbers
-    propertiesData: Array.from(Array(20)).map(() => Math.random()),
+    meshData: Array.from(new Array(20)).map(() => Math.random()), // Array of 20 random numbers
+    propertiesData: Array.from(new Array(20)).map(() => Math.random()),
     gridLines: true,
     material: true,
     // black to white colors.
@@ -136,17 +137,18 @@ const cellCenteredPropertiesLayer = {
     "@@type": "MapLayer",
     id: "cell-centered-layer",
 
-    /*eslint-disable */
-    // One depth pr node
+    // One depth per node
+    /* prettier-ignore */
     meshData: [
-        1.6, 1.7, 1.8, 1.9, 1.2, 1.3, 1.4, 1.5, 0.8, 0.9, 1.0, 1.1, 0.4, 0.5,
-        0.6, 0.7, 0.0, 0.1, 0.2, 0.3,
+        1.6, 1.7, 1.8, 1.9, 1.2, 1.3, 1.4, 1.5, 0.8, 0.9,
+        1,   1.1, 0.4, 0.5, 0.6, 0.7, 0,   0.1, 0.2, 0.3,
     ],
 
-    // One property pr cell.
+    // One property per cell.
+    /* prettier-ignore */
     propertiesData: [
         0.9,
-        1.0,
+        1,
         1.1,
         0.6,
         undefined,
@@ -154,11 +156,10 @@ const cellCenteredPropertiesLayer = {
         0.3,
         0.4,
         0.5,
-        0.0,
+        0,
         0.1,
         0.2,
     ],
-    /*eslint-enable */
 
     frame: {
         origin: [0, 0],
@@ -669,7 +670,7 @@ const ContourLinesComponent: React.FC<ContourLinesComponentProps> = (
     const noContourMapLayer = new MapLayer({
         ...hugin25mKhNetmapMapLayer,
         id: "no_contours",
-        contours: [-1.0, -1.0],
+        contours: [-1, -1],
     });
 
     const contourMapLayer = new MapLayer({

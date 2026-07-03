@@ -1,8 +1,9 @@
 import { cloneDeep } from "lodash";
 
+import React from "react";
+
 import type { Meta, StoryObj } from "@storybook/react-webpack5";
 import { userEvent, within } from "storybook/test";
-import React from "react";
 
 import { GeoJsonLayer } from "@deck.gl/layers";
 import { SimpleMeshLayer } from "@deck.gl/mesh-layers";

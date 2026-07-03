@@ -1,6 +1,8 @@
+import React from "react";
+
 import type { Color } from "@deck.gl/core";
 import { all, create } from "mathjs";
-import React from "react";
+
 import type {
     WellFeature,
     WellFeatureCollection,

@@ -1,22 +1,29 @@
 import React from "react";
+
 import type { Meta, StoryObj } from "@storybook/react-webpack5";
 
 import { create, all } from "mathjs";
 
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 
-import * as SurfacePoints from "../../layers/triangle/test_data/surfacePoints";
-import * as SurfaceTriangles from "../../layers/triangle/test_data/surfaceTriangles";
+import * as surfacePoints from "../../layers/triangle/test_data/surfacePoints";
+import * as surfaceTriangles from "../../layers/triangle/test_data/surfaceTriangles";
 
 import {
     default3DViews,
     defaultStoryParameters,
     northArrowLayer,
 } from "../sharedSettings";
-import { replaceNonJsonArgs } from "../sharedHelperFunctions";
+
+import { getPropsInjectorComponent } from "../sharedHelperComponents";
+
+const SubsurfaceViewerPropsInjector = getPropsInjectorComponent(
+    getInjectedProps,
+    SubsurfaceViewer
+);
 
 const stories: Meta = {
-    component: SubsurfaceViewer,
+    component: SubsurfaceViewerPropsInjector,
     title: "SubsurfaceViewer / Triangle Layer",
     args: {
         // Add some common controls for all the stories.
@@ -25,61 +32,35 @@ const stories: Meta = {
 };
 export default stories;
 
+// ---------Layers and data--------------- //
 // Small example using triangleLayer.
 const triangleLayer = {
     "@@type": "TriangleLayer",
     id: "triangle-layer",
-
-    /*eslint-disable */
+    /* prettier-ignore */
     pointsData: [
-        0,
-        0,
-        5, // Vertex 1, x, y, z
-        10,
-        0,
-        5, // Vertex 2, x, y, z
-        10,
-        10,
-        5, // ...
-        0,
-        10,
-        0,
-        5,
-        -5,
-        10,
-        11,
-        -4,
-        6,
-        11,
-        0,
-        7,
-        17,
-        0,
-        8,
+        0,   0,  5,     // Vertex 1, x, y, z
+        10,  0,  5,     // Vertex 2, x, y, z
+        10, 10,  5,     // ...
+        0,  10,  0,
+        5,  -5, 10,
+        11, -4,  6,
+        11,  0,  7,
+        17,  0,  8,
     ],
-
+    /* prettier-ignore */
     triangleData: [
-        2,
-        1,
-        0, // Indexs' to first triangle.
-        3,
-        2,
-        0, // ...
-        1,
-        4,
-        0,
-        6,
-        7,
-        5,
+        2,  1,  0,      // Indexes to first triangle.
+        3,  2,  0,      // ...
+        1,  4,  0,
+        6,  7,  5,
     ],
-
     color: [100, 100, 255], // Surface color.
     gridLines: true, // If true will draw lines around triangles.
     material: true, // If true will use triangle normals for shading.
     smoothShading: true, // If true will use vertex calculated mean normals for shading.
     ZIncreasingDownwards: true,
     //contours: [0, 1],          // If used will display contour lines.
-    /*eslint-enable */
 };
 
 const axesLayer = {
@@ -88,29 +69,10 @@ const axesLayer = {
     bounds: [-10, -10, 0, 20, 10, 10],
 };
 
-export const SmallTriangleLayer: StoryObj<typeof SubsurfaceViewer> = {
-    args: {
-        id: "map",
-        layers: [axesLayer, triangleLayer, northArrowLayer],
-        bounds: [-10, -10, 17, 10],
-        views: default3DViews,
-    },
-    parameters: {
-        docs: {
-            ...defaultStoryParameters.docs,
-            description: {
-                story: "Both mesh and property data given as native javascript arrays (as opposed to URL).",
-            },
-        },
-    },
-};
-
 const flipOrientation = (triangles: number[]) => {
     const res: number[] = [];
     for (let i = 0; i < triangles.length; i += 3) {
-        res.push(triangles[i]);
-        res.push(triangles[i + 2]);
-        res.push(triangles[i + 1]);
+        res.push(triangles[i], triangles[i + 2], triangles[i + 1]);
     }
     return res;
 };
@@ -118,20 +80,42 @@ const flipOrientation = (triangles: number[]) => {
 const shiftPointsByZ = (points: number[], shift: number) => {
     const res: number[] = [];
     for (let i = 0; i < points.length; i += 3) {
-        res.push(points[i]);
-        res.push(points[i + 1]);
-        res.push(points[i + 2] + shift);
+        res.push(points[i], points[i + 1], points[i + 2] + shift);
     }
     return res;
 };
 
+// ---------In-place array data handling (storybook fails to rebuild non JSon data)--------------- //
+const typedDataSurfaceLayerId = "typedData_surface_layer";
+const upperSurfaceLayerId = "upper_surface_layer";
+const lowerSurfaceLayerId = "lower_surface_layer";
+
+const injectedProps = {
+    [typedDataSurfaceLayerId]: {
+        pointsData: new Float32Array(surfacePoints.default),
+        triangleData: new Uint32Array(surfaceTriangles.default),
+    },
+    [upperSurfaceLayerId]: {
+        pointsData: surfacePoints.default,
+        triangleData: surfaceTriangles.default,
+    },
+    [lowerSurfaceLayerId]: {
+        pointsData: shiftPointsByZ(surfacePoints.default, 1000),
+        triangleData: flipOrientation(surfaceTriangles.default),
+    },
+};
+
+function getInjectedProps() {
+    return injectedProps;
+}
+
 const upperSurfaceLayer = {
     "@@type": "TriangleLayer",
-    id: "upper_surface_layer",
+    id: upperSurfaceLayerId,
+    "@@typedArraySupport": true,
 
-    /*eslint-disable */
-    pointsData: SurfacePoints.default,
-    triangleData: SurfaceTriangles.default,
+    pointsData: "pointsData proxy",
+    triangleData: "triangleData proxy",
 
     color: [100, 100, 255], // Surface color.
     gridLines: true, // If true will draw lines around triangles.
@@ -144,16 +128,15 @@ const upperSurfaceLayer = {
     smoothShading: true, // If true will use vertex calculated mean normals for shading.
     ZIncreasingDownwards: true,
     debug: true,
-    /*eslint-enable */
 };
 
 const lowerSurfaceLayer = {
     "@@type": "TriangleLayer",
-    id: "lowers_surface_layer",
+    id: lowerSurfaceLayerId,
+    "@@typedArraySupport": true,
 
-    /*eslint-disable */
-    pointsData: shiftPointsByZ(SurfacePoints.default, 1000),
-    triangleData: flipOrientation(SurfaceTriangles.default),
+    pointsData: "pointsData proxy",
+    triangleData: "triangleData proxy",
 
     color: [100, 255, 100], // Surface color.
     gridLines: true, // If true will draw lines around triangles.
@@ -175,7 +158,24 @@ const surfaceAxesLayer = {
     bounds: [-2000, -2000, 1500, 2500, 2000, 3000],
 };
 
-export const TwoSideLighting: StoryObj<typeof SubsurfaceViewer> = {
+export const SmallTriangleLayer: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "map",
+        layers: [axesLayer, triangleLayer, northArrowLayer],
+        bounds: [-10, -10, 17, 10],
+        views: default3DViews,
+    },
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: "Both mesh and property data given as native javascript arrays (as opposed to URL).",
+            },
+        },
+    },
+};
+
+export const TwoSideLighting: StoryObj<typeof SubsurfaceViewerPropsInjector> = {
     args: {
         id: "map",
         layers: [surfaceAxesLayer, upperSurfaceLayer, lowerSurfaceLayer],
@@ -192,24 +192,13 @@ export const TwoSideLighting: StoryObj<typeof SubsurfaceViewer> = {
     },
 };
 
-// ---------In-place array data handling (storybook fails to rebuild non JSon data)--------------- //
-const typedDataSurfaceLayerId = "typedData_surface_layer";
-
-const nonJsonLayerArgs = {
-    [typedDataSurfaceLayerId]: {
-        pointsData: new Float32Array(SurfacePoints.default),
-        triangleData: new Uint32Array(SurfaceTriangles.default),
-    },
-};
-
 const typedDataSurfaceLayer = {
     "@@type": "TriangleLayer",
-    id: "typedData_surface_layer",
+    id: typedDataSurfaceLayerId,
     "@@typedArraySupport": true,
 
-    /*eslint-disable */
-    pointsData: nonJsonLayerArgs[typedDataSurfaceLayerId].pointsData,
-    triangleData: nonJsonLayerArgs[typedDataSurfaceLayerId].triangleData,
+    pointsData: "pointsData proxy",
+    triangleData: "triangleData proxy",
 
     color: [100, 100, 255], // Surface color.
     gridLines: true, // If true will draw lines around triangles.
@@ -224,7 +213,7 @@ const typedDataSurfaceLayer = {
     /*eslint-enable */
 };
 
-export const TypedArrayInput: StoryObj<typeof SubsurfaceViewer> = {
+export const TypedArrayInput: StoryObj<typeof SubsurfaceViewerPropsInjector> = {
     args: {
         id: "map",
         layers: [surfaceAxesLayer, typedDataSurfaceLayer],
@@ -239,9 +228,6 @@ export const TypedArrayInput: StoryObj<typeof SubsurfaceViewer> = {
             },
         },
     },
-    render: (args) => (
-        <SubsurfaceViewer {...replaceNonJsonArgs(args, nonJsonLayerArgs)} />
-    ),
 };
 
 const math = create(all, { randomSeed: "12345" });
@@ -260,12 +246,10 @@ const buildTrgl = (count: number = 1): number[] => {
     count = count || 1;
     // 9 is 3 points for the triangle * 3 vertices
     const trglDataSize = 9;
-    const triangles = Array(trglDataSize * count).fill(0);
+    const triangles = new Array(trglDataSize * count).fill(0);
     for (let i = 0; i < count; ++i) {
         // random triangle center
-        const center = Array(3)
-            .fill(0)
-            .map(() => randomFunc(bboxSize));
+        const center = new Array(3).fill(0).map(() => randomFunc(bboxSize));
         for (let ti = 0; ti < trglDataSize; ++ti) {
             triangles[i * trglDataSize + ti] =
                 center[ti % 3] + randomFunc(trglSize);
@@ -288,7 +272,7 @@ const TriangleLayersGenerator: React.FC<{
 
                 pointsData: buildTrgl(props.triangleCount),
 
-                triangleData: Array(3 * props.triangleCount)
+                triangleData: new Array(3 * props.triangleCount)
                     .fill(0)
                     .map((_, i) => i),
 
