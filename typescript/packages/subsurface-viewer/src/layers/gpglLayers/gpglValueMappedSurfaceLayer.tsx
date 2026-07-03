@@ -573,7 +573,7 @@ export class GpglValueMappedSurfaceLayer extends Layer<GpglValueMappedSurfaceLay
 
         const clampRange =
             this.props.colormapSetup?.clampRange === null
-                ? null
+                ? [0, 1]
                 : (this.props.colormapSetup?.clampRange ?? colormapRange);
 
         // render all the triangle surfaces
