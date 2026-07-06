@@ -1,3 +1,13 @@
+## 1.18.3 (2026-07-06)
+
+### 🩹 Fixes
+
+- crash in seismic display with null clampRange ([#2802](https://github.com/equinor/webviz-subsurface-components/pull/2802))
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
 ## 1.18.2 (2026-06-29)
 
 ### 🩹 Fixes
