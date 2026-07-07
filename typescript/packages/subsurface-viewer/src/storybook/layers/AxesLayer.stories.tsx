@@ -1,5 +1,6 @@
-import type { Meta, StoryObj } from "@storybook/react-webpack5";
 import React from "react";
+
+import type { Meta, StoryObj } from "@storybook/react-webpack5";
 
 import { OrthographicView } from "@deck.gl/core";
 import DeckGL from "@deck.gl/react";
@@ -13,6 +14,7 @@ const stories: Meta = {
 };
 export default stories;
 
+// ---------Layers and data--------------- //
 const layerProps = {
     name: "axes",
     bounds: [-100, -100, 0, 100, 100, 100] as [

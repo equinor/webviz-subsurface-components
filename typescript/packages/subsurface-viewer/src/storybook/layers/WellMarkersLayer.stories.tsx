@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-webpack5";
+
 import { create, all } from "mathjs";
 
 import SubsurfaceViewer from "../../SubsurfaceViewer";
@@ -7,9 +8,16 @@ import type { WellMarkerDataT } from "../../layers/well_markers/wellMarkersLayer
 
 import { defaultStoryParameters } from "../sharedSettings";
 
+import { getPropsInjectorComponent } from "../sharedHelperComponents";
+
+const SubsurfaceViewerPropsInjector = getPropsInjectorComponent(
+    getInjectedProps,
+    SubsurfaceViewer
+);
+
 const stories: Meta = {
-    component: SubsurfaceViewer,
-    title: "SubsurfaceViewer/Well Markers Layer",
+    component: SubsurfaceViewerPropsInjector,
+    title: "SubsurfaceViewer / Well Markers Layer",
     args: {
         // Add some common controls for all the stories.
         triggerHome: 0,
@@ -17,6 +25,7 @@ const stories: Meta = {
 };
 export default stories;
 
+// ---------Layers and data--------------- //
 const math = create(all, { randomSeed: "1984" });
 
 type TRandomNumberFunc = (max: number) => number;
@@ -49,8 +58,8 @@ const generateMarkers = (): WellMarkerDataT[] => {
             const z = 5 * (Math.sin(incl) * Math.cos(az));
             res.push({
                 position: [x, y, z],
-                azimuth: (az * 180.0) / Math.PI,
-                inclination: (Math.asin(Math.cos(incl)) * 180.0) / Math.PI,
+                azimuth: (az * 180) / Math.PI,
+                inclination: (Math.asin(Math.cos(incl)) * 180) / Math.PI,
                 color: [randomFunc(255), randomFunc(255), randomFunc(255), 100],
                 outlineColor: [0, 0, 100, 255],
                 size: 0.02 * Math.sqrt(x * x + y * y),
@@ -60,7 +69,20 @@ const generateMarkers = (): WellMarkerDataT[] => {
     return res;
 };
 
-export const WellMarkers: StoryObj<typeof SubsurfaceViewer> = {
+// ---------In-place array data handling (storybook fails to rebuild non JSon data)--------------- //
+const wellMarkersLayerId = "typedData_surface_layer";
+
+const injectedProps = {
+    [wellMarkersLayerId]: {
+        data: generateMarkers(),
+    },
+};
+
+function getInjectedProps() {
+    return injectedProps;
+}
+
+export const WellMarkers: StoryObj<typeof SubsurfaceViewerPropsInjector> = {
     args: {
         bounds: [-30, -30, 30, 30],
         views: {
@@ -86,11 +108,11 @@ export const WellMarkers: StoryObj<typeof SubsurfaceViewer> = {
             },
             {
                 "@@type": "WellMarkersLayer",
-                id: "well-markers-1",
+                id: wellMarkersLayerId,
                 pickable: true,
                 shape: "circle",
                 sizeUnits: "common",
-                data: generateMarkers(),
+                data: "data proxy",
             },
         ],
     },

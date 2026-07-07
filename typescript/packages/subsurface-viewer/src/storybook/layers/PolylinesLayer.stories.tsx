@@ -1,17 +1,18 @@
-import React from "react";
-
 import type { Meta, StoryObj } from "@storybook/react-webpack5";
 
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 
 import { default3DViews, defaultStoryParameters } from "../sharedSettings";
-import {
-    createMathWithSeed,
-    replaceNonJsonArgs,
-} from "../sharedHelperFunctions";
+import { createMathWithSeed } from "../sharedHelperFunctions";
+import { getPropsInjectorComponent } from "../sharedHelperComponents";
+
+const SubsurfaceViewerPropsInjector = getPropsInjectorComponent(
+    getInjectedProps,
+    SubsurfaceViewer
+);
 
 const stories: Meta = {
-    component: SubsurfaceViewer,
+    component: SubsurfaceViewerPropsInjector,
     title: "SubsurfaceViewer / Polylines Layer",
     args: {
         // Add some common controls for all the stories.
@@ -20,6 +21,7 @@ const stories: Meta = {
 };
 export default stories;
 
+// ---------Layers and data--------------- //
 const sideSize = 10000;
 const pointsCount = 100000;
 
@@ -30,24 +32,31 @@ const hugePoints = new Array(pointsCount * 3)
     .map(() => math.random(sideSize));
 
 // ---------In-place array data handling (storybook fails to rebuild non JSon data)--------------- //
-const hugePolylinesTypedDataLayerId = "huge_polylines_typed_data_layer";
+const typedDataPolylinesLayerId = "huge_polylines_typed_data_layer";
+const hugePolylinesLayerId = "huge_polylines_data_layer";
 
-const nonJsonLayerArgs = {
-    [hugePolylinesTypedDataLayerId]: {
+const injectedProps = {
+    [typedDataPolylinesLayerId]: {
         polylinePoints: new Float32Array(hugePoints),
         startIndices: new Uint32Array([0, pointsCount]),
     },
+    [hugePolylinesLayerId]: {
+        polylinePoints: hugePoints,
+        startIndices: new Uint32Array([0, pointsCount]),
+    },
 };
+
+function getInjectedProps() {
+    return injectedProps;
+}
 
 // Small example using polylinesLayer.
 const smallPolylinesLayer = {
     "@@type": "PolylinesLayer",
     id: "small_polylines_layer",
-    /* eslint-disable */
     polylinePoints: [
         0, 0, 0, 10, 0, 0, 10, 0, 10, -5, -5, 4, 0, -8, 6, 5, 10, 8,
     ],
-    /* eslint-enable */
     startIndices: [0, 3],
     polylinesClosed: [true, false],
     color: [0, 200, 100],
@@ -82,8 +91,10 @@ export const SmallPolylinesLayer: StoryObj<typeof SubsurfaceViewer> = {
 
 const hugePolylinesLayer = {
     "@@type": "PolylinesLayer",
-    id: "huge_polylines_layer",
-    polylinePoints: hugePoints,
+    id: hugePolylinesLayerId,
+    "@@typedArraySupport": true,
+
+    polylinePoints: "hugePoints proxy",
     startIndices: [0],
     color: [0, 100, 100, 40],
 
@@ -99,7 +110,9 @@ const hugeAxesLayer = {
     bounds: [0, 0, 0, sideSize, sideSize, sideSize],
 };
 
-export const HugePolylinesLayer: StoryObj<typeof SubsurfaceViewer> = {
+export const HugePolylinesLayer: StoryObj<
+    typeof SubsurfaceViewerPropsInjector
+> = {
     args: {
         id: "map",
         layers: [hugeAxesLayer, hugePolylinesLayer],
@@ -114,28 +127,23 @@ export const HugePolylinesLayer: StoryObj<typeof SubsurfaceViewer> = {
             },
         },
     },
-    render: (args) => (
-        <SubsurfaceViewer {...replaceNonJsonArgs(args, nonJsonLayerArgs)} />
-    ),
     tags: ["no-test"],
 };
 
-export const HugeLayerTypedArrayInput: StoryObj<typeof SubsurfaceViewer> = {
+export const HugeLayerTypedArrayInput: StoryObj<
+    typeof SubsurfaceViewerPropsInjector
+> = {
     args: {
         id: "map",
         layers: [
             hugeAxesLayer,
             {
                 "@@type": "PolylinesLayer",
-                id: hugePolylinesTypedDataLayerId,
+                id: typedDataPolylinesLayerId,
                 "@@typedArraySupport": true,
 
-                polylinePoints:
-                    nonJsonLayerArgs[hugePolylinesTypedDataLayerId]
-                        .polylinePoints,
-                startIndices:
-                    nonJsonLayerArgs[hugePolylinesTypedDataLayerId]
-                        .startIndices,
+                polylinePoints: "polylinePoints proxy",
+                startIndices: "startIndices proxy",
                 color: [0, 100, 200, 40],
 
                 widthUnits: "pixels",
@@ -155,8 +163,5 @@ export const HugeLayerTypedArrayInput: StoryObj<typeof SubsurfaceViewer> = {
             },
         },
     },
-    render: (args) => (
-        <SubsurfaceViewer {...replaceNonJsonArgs(args, nonJsonLayerArgs)} />
-    ),
     tags: ["no-test"],
 };

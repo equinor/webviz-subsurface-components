@@ -1,14 +1,16 @@
 import React from "react";
 
+import type { Meta, StoryObj } from "@storybook/react-webpack5";
+
+import { clamp, round } from "lodash";
+import type { Position } from "geojson";
+
 import type {
     AccessorContext,
     Position as GlPosition,
     Layer,
 } from "@deck.gl/core";
 import { PathLayer } from "@deck.gl/layers";
-import type { Meta, StoryObj } from "@storybook/react-webpack5";
-import type { Position } from "geojson";
-import { clamp, round } from "lodash";
 
 import { DashedSectionsPathLayer } from "../../layers/wells/layers/dashedSectionsPathLayer";
 import type { WellMarker } from "../../layers/wells/layers/flatWellMarkersLayer";

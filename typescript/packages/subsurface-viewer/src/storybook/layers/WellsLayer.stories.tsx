@@ -1,18 +1,22 @@
-import type { SyntheticEvent } from "react";
-import React, { useState } from "react";
+import React, { type SyntheticEvent, useState } from "react";
+
+import type { Meta, StoryObj } from "@storybook/react-webpack5";
+
+import { Slider } from "@mui/material";
 
 import { OrbitView, OrthographicView, View } from "@deck.gl/core";
 import { PathStyleExtension } from "@deck.gl/extensions";
 import { PathLayer } from "@deck.gl/layers";
+
+import { NativeSelect } from "@equinor/eds-core-react";
+
 import type { ScaleHandler } from "@emerson-eps/color-tables";
 import {
     ColorLegend,
     colorTables,
     createColorMapFunction as createColormapFunction,
 } from "@emerson-eps/color-tables";
-import { NativeSelect } from "@equinor/eds-core-react";
-import { Slider } from "@mui/material";
-import type { Meta, StoryObj } from "@storybook/react-webpack5";
+
 import type { FeatureCollection, GeometryCollection } from "geojson";
 
 import volveBlockingZoneLogJson from "../../../../../../example-data/volve_blocking_zonelog_logs.json";

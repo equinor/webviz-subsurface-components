@@ -1,4 +1,5 @@
 import React from "react";
+
 import type { Meta, StoryObj } from "@storybook/react-webpack5";
 
 import type { Layer } from "@deck.gl/core";
@@ -191,7 +192,11 @@ interface CoordInputProps {
     setValue: (val: number) => void;
 }
 
-function CoordField({ label, value, setValue: setCoord }: CoordInputProps) {
+function CoordField({
+    label,
+    value,
+    setValue: setCoord,
+}: Readonly<CoordInputProps>) {
     // @ts-expect-error TS7006
     const handleChange = (event) => {
         const { value } = event.target;
@@ -227,7 +232,7 @@ function CoordinatesEditor({
     label,
     coordinates,
     setCoordinates,
-}: CoordinatesEditorProps) {
+}: Readonly<CoordinatesEditorProps>) {
     return (
         <>
             <label>{label}</label>
@@ -263,7 +268,11 @@ interface LightEditorProps {
     setLight: any;
 }
 
-function LightEditor({ lightName, light, setLight }: LightEditorProps) {
+function LightEditor({
+    lightName,
+    light,
+    setLight,
+}: Readonly<LightEditorProps>) {
     if (!Array.isArray(light)) {
         return (
             <Stack>
@@ -295,10 +304,8 @@ function LightEditor({ lightName, light, setLight }: LightEditorProps) {
     return (
         <Stack>
             <label>{lightName}</label>
-            {/*
-             // @ts-expect-error TS6133 */}
             {light.map((l, i) => (
-                <div key={i}>
+                <div key={`light-${l.label}-${i}`}>
                     <Stack direction={"row"} alignItems={"center"}>
                         <label>{`Light # ${i}`}</label>
                         <Switch
@@ -394,7 +401,7 @@ const defaultDirectionalLights: ILight[] = [
     {
         label: "Directional Light 1",
         active: false,
-        intensity: 1.0,
+        intensity: 1,
         color: [255, 255, 255],
         coordinates: { x: -1, y: 3, z: -1 },
     },
@@ -552,7 +559,7 @@ export const LightsStory: StoryObj<typeof SubsurfaceViewer> = {
                 colorMapFunction: () => [255, 255, 255],
                 pointsData: SnubCubePoints.map((v) => 35 * v),
                 polysData: SnubCubeFaces,
-                propertiesData: Array(SnubCubeVertexCount).fill(0),
+                propertiesData: new Array(SnubCubeVertexCount).fill(0),
             }) as Layer<Record<string, never>>,
         ],
         views: default3DViews,

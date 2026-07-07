@@ -1,17 +1,21 @@
-import React from "react";
+import "react";
 
 import type { Meta, StoryObj } from "@storybook/react-webpack5";
 
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 
 import { default3DViews, defaultStoryParameters } from "../sharedSettings";
-import {
-    createMathWithSeed,
-    replaceNonJsonArgs,
-} from "../sharedHelperFunctions";
+import { createMathWithSeed } from "../sharedHelperFunctions";
+
+import { getPropsInjectorComponent } from "../sharedHelperComponents";
+
+const SubsurfaceViewerPropsInjector = getPropsInjectorComponent(
+    getInjectedProps,
+    SubsurfaceViewer
+);
 
 const stories: Meta = {
-    component: SubsurfaceViewer,
+    component: SubsurfaceViewerPropsInjector,
     title: "SubsurfaceViewer / Points Layer",
     args: {
         // Add some common controls for all the stories.
@@ -20,7 +24,7 @@ const stories: Meta = {
 };
 export default stories;
 
-/*eslint-disable */
+// ---------Layers and data--------------- //
 /* prettier-ignore */
 const smallPointsData = [
     0,  0,  5,  // Vertex 1, x, y, z
@@ -32,9 +36,6 @@ const smallPointsData = [
     11, 0,  7,  // Vertex 7, x, y, z
     17, 0,  8,  // Vertex 8, x, y, z
 ];
-/*eslint-enable */
-
-const smallPointsTypedDataLayerPoints = new Float32Array(smallPointsData);
 
 // Huge example using PointsLayer.
 const sideSize = 10000;
@@ -42,22 +43,26 @@ const pointsCount = 100000;
 
 const math = createMathWithSeed("1234");
 
-const hugePointsData = Array(pointsCount * 3)
+const hugePointsData = new Array(pointsCount * 3)
     .fill(0)
     .map(() => math.random(sideSize));
 
 // ---------In-place array data handling (storybook fails to rebuild non JSon data)--------------- //
-const smallPointsTypedDataLayerId = "small_points_typed_data_layer";
-const hugePointsTypedDataLayerId = "huge_points_typed_data_layer";
+const smallDataLayerPointsTypedId = "small_points_typed_data_layer";
+const hugeTypedDataPointsLayerId = "huge_points_typed_data_layer";
 
-const nonJsonLayerArgs = {
-    [smallPointsTypedDataLayerId]: {
+const injectedProps = {
+    [smallDataLayerPointsTypedId]: {
         pointsData: new Float32Array(smallPointsData),
     },
-    [hugePointsTypedDataLayerId]: {
+    [hugeTypedDataPointsLayerId]: {
         pointsData: new Float32Array(hugePointsData),
     },
 };
+
+function getInjectedProps() {
+    return injectedProps;
+}
 
 // Small example using PointsLayer.
 const smallPointsLayer = {
@@ -95,9 +100,9 @@ export const SmallPointsLayer: StoryObj<typeof SubsurfaceViewer> = {
 
 const smallPointsTypedDataLayer = {
     "@@type": "PointsLayer",
-    id: smallPointsTypedDataLayerId,
+    id: smallDataLayerPointsTypedId,
     "@@typedArraySupport": true,
-    pointsData: smallPointsTypedDataLayerPoints,
+    pointsData: "pointsData proxy",
     color: [0, 100, 255],
     pointRadius: 10,
     radiusUnits: "pixels",
@@ -105,7 +110,7 @@ const smallPointsTypedDataLayer = {
 };
 
 export const SmallPointsLayerTypedArrayInput: StoryObj<
-    typeof SubsurfaceViewer
+    typeof SubsurfaceViewerPropsInjector
 > = {
     args: {
         id: "small-points-typeddata",
@@ -121,17 +126,14 @@ export const SmallPointsLayerTypedArrayInput: StoryObj<
             },
         },
     },
-    render: (args) => (
-        <SubsurfaceViewer {...replaceNonJsonArgs(args, nonJsonLayerArgs)} />
-    ),
 };
 
 // Huge example using PointsLayer.
 const hugePointsLayer = {
     "@@type": "PointsLayer",
-    id: hugePointsTypedDataLayerId,
+    id: hugeTypedDataPointsLayerId,
     "@@typedArraySupport": true,
-    pointsData: hugePointsData,
+    pointsData: "pointsData proxy",
     color: [255, 100, 100],
     pointRadius: 1,
     radiusUnits: "pixels",
@@ -144,7 +146,7 @@ const hugeAxesLayer = {
     bounds: [0, 0, 0, sideSize, sideSize, sideSize],
 };
 
-export const HugePointsLayer: StoryObj<typeof SubsurfaceViewer> = {
+export const HugePointsLayer: StoryObj<typeof SubsurfaceViewerPropsInjector> = {
     args: {
         id: "huge-points-map",
         layers: [hugeAxesLayer, hugePointsLayer],
@@ -161,8 +163,5 @@ export const HugePointsLayer: StoryObj<typeof SubsurfaceViewer> = {
             },
         },
     },
-    render: (args) => (
-        <SubsurfaceViewer {...replaceNonJsonArgs(args, nonJsonLayerArgs)} />
-    ),
     tags: ["no-test"],
 };

@@ -1,6 +1,6 @@
+import React, { type SyntheticEvent } from "react";
+
 import type { Meta, StoryObj } from "@storybook/react-webpack5";
-import type { SyntheticEvent } from "react";
-import React from "react";
 
 import { Slider } from "@mui/material";
 import { styled } from "@mui/material/styles";
@@ -308,7 +308,7 @@ const MapLayerColorSelectorTemplate: React.FC<SubsurfaceViewerProps> = (
     props
 ) => {
     const [colorName, setColorName] = React.useState("Rainbow");
-    const [colorRange, setRange] = React.useState();
+    const [colorRange, setColorRange] = React.useState();
     const [isAuto, setAuto] = React.useState();
     const [breakPoints, setBreakPoint] = React.useState<number[]>([]);
     const [isLog, setIsLog] = React.useState(false);
@@ -338,7 +338,7 @@ const MapLayerColorSelectorTemplate: React.FC<SubsurfaceViewerProps> = (
             range: React.SetStateAction<undefined>;
             isAuto: React.SetStateAction<undefined>;
         }) => {
-            if (data.range) setRange(data.range);
+            if (data.range) setColorRange(data.range);
             setAuto(data.isAuto);
         },
         []

@@ -1,6 +1,7 @@
+import React from "react";
+
 import type { Meta, StoryObj } from "@storybook/react-webpack5";
 import { fireEvent, userEvent } from "storybook/test";
-import React from "react";
 
 import { View } from "@deck.gl/core";
 import { useMultiViewPicking } from "../../hooks/useMultiViewPicking";
@@ -13,9 +14,12 @@ import Box from "@mui/material/Box";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 
-import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
-import type { ViewStateType } from "../../SubsurfaceViewer";
+import type {
+    SubsurfaceViewerProps,
+    ViewStateType,
+} from "../../SubsurfaceViewer";
+
 import type { MapMouseEvent, ViewsType } from "../../components/Map";
 import { ViewFooter } from "../../components/ViewFooter";
 
@@ -129,10 +133,12 @@ export const MultiViewWithEmptyViewport: StoryObj<typeof SubsurfaceViewer> = {
     ),
 };
 
-function ExampleReadoutComponent(props: {
-    viewId: string;
-    pickingInfoPerView: PickingInfoPerView;
-}): React.ReactNode {
+function ExampleReadoutComponent(
+    props: Readonly<{
+        viewId: string;
+        pickingInfoPerView: PickingInfoPerView;
+    }>
+): React.ReactNode {
     return (
         <div
             style={{

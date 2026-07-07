@@ -1,16 +1,20 @@
-import React from "react";
+import "react";
 
 import type { Meta, StoryObj } from "@storybook/react-webpack5";
 
-import SubsurfaceViewer, {
-    type SubsurfaceViewerProps,
-} from "../../SubsurfaceViewer";
+import SubsurfaceViewer from "../../SubsurfaceViewer";
 
 import { default3DViews, defaultStoryParameters } from "../sharedSettings";
-import { replaceNonJsonArgs, convertUndefNull } from "../sharedHelperFunctions";
+
+import { getPropsInjectorComponent } from "../sharedHelperComponents";
+
+const SubsurfaceViewerPropsInjector = getPropsInjectorComponent(
+    getInjectedProps,
+    SubsurfaceViewer
+);
 
 const stories: Meta = {
-    component: SubsurfaceViewer,
+    component: SubsurfaceViewerPropsInjector,
     title: "SubsurfaceViewer / Seismic Layer",
     args: {
         // Add some common controls for all the stories.
@@ -19,15 +23,7 @@ const stories: Meta = {
 };
 export default stories;
 
-function preprocessProps(
-    props: SubsurfaceViewerProps,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    nonJsonLayerProps: Record<string, any>
-): SubsurfaceViewerProps {
-    convertUndefNull(props.layers as unknown as Record<string, unknown>);
-    return replaceNonJsonArgs(props, nonJsonLayerProps);
-}
-
+// ---------Layers and data--------------- //
 const cage = {
     origin: [-2808.4, -6505.9, 1071.3],
     edgeU: [-275.5, 11609.4, 0],
@@ -45,9 +41,12 @@ const cage = {
 
  sectionZ0Vertices= [ P00, P10, P01, P11 ]
  */
+/* prettier-ignore */
 const sectionZ0Vertices = [
-    -2808.4, -6505.9, 1071.3, 3426.2, -6358.0, 1071.3, -3083.9, 5103.5, 1071.3,
-    3150.7, 5251.4, 1071.3,
+    -2808.4, -6505.9, 1071.3,
+     3426.2, -6358,   1071.3,
+    -3083.9,  5103.5, 1071.3,
+     3150.7,  5251.4, 1071.3,
 ];
 const sectionZ0TexCoords = [0, 0, 1, 0, 0, 1, 1, 1];
 const sectionZ0Indices = [0, 1, 2, 3];
@@ -73,12 +72,16 @@ const seismicBounds = [-3083.9, -6505.9, -1071.3, 3426.2, 5251.4, -2374.3];
 const seismicCageLayerId = "seismic_cage_layer";
 const seismicSectionsLayerId = "seismic_section_layer";
 
-const nonJsonLayerArgs = {
+const injectedProps = {
     //     [seismicCageLayerId]: {
     //         polylinePoints: new Float32Array(cagePoints),
     //         startIndices: new Uint32Array(cageStartIndices),
     //     },
 };
+
+function getInjectedProps() {
+    return injectedProps;
+}
 
 // Small example using polylinesLayer.
 const seismicCageLayer = {
@@ -133,7 +136,7 @@ export const SeismicCage: StoryObj<typeof SubsurfaceViewer> = {
     },
 };
 
-export const SeismicSections: StoryObj<typeof SubsurfaceViewer> = {
+export const SeismicSections: StoryObj<typeof SubsurfaceViewerPropsInjector> = {
     args: {
         id: "seismic_sections",
         layers: [smallAxesLayer, seismicSectionsLayer],
@@ -147,9 +150,6 @@ export const SeismicSections: StoryObj<typeof SubsurfaceViewer> = {
             },
         },
     },
-    render: (args: SubsurfaceViewerProps) => (
-        <SubsurfaceViewer {...preprocessProps(args, nonJsonLayerArgs)} />
-    ),
 };
 
 const seismicSectionsWithMaterialLayer = {
@@ -161,12 +161,11 @@ const seismicSectionsWithMaterialLayer = {
         shininess: 32,
         specularColor: [38, 38, 38],
     },
-    render: (args: SubsurfaceViewerProps) => (
-        <SubsurfaceViewer {...preprocessProps(args, nonJsonLayerArgs)} />
-    ),
 };
 
-export const SeismicSectionsWithMaterial: StoryObj<typeof SubsurfaceViewer> = {
+export const SeismicSectionsWithMaterial: StoryObj<
+    typeof SubsurfaceViewerPropsInjector
+> = {
     args: {
         id: "seismic_sections",
         layers: [smallAxesLayer, seismicSectionsWithMaterialLayer],
@@ -180,7 +179,4 @@ export const SeismicSectionsWithMaterial: StoryObj<typeof SubsurfaceViewer> = {
             },
         },
     },
-    render: (args: SubsurfaceViewerProps) => (
-        <SubsurfaceViewer {...preprocessProps(args, nonJsonLayerArgs)} />
-    ),
 };

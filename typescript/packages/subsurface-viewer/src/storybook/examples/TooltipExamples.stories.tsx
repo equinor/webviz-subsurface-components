@@ -1,6 +1,8 @@
-import type { Meta, StoryObj } from "@storybook/react-webpack5";
-import { format } from "d3-format";
 import React from "react";
+
+import type { Meta, StoryObj } from "@storybook/react-webpack5";
+
+import { format } from "d3-format";
 
 import type { Feature } from "geojson";
 

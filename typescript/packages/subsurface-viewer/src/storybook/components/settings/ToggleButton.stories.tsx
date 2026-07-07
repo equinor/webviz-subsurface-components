@@ -9,7 +9,7 @@ const stories: Meta = {
 export default stories;
 
 export const ToggleButtonStory: StoryObj<typeof ToggleButton> = {
-    name: " ToggleButton",
+    name: "ToggleButton",
     args: {
         label: "test",
     },
