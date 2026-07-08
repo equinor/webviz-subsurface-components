@@ -1,3 +1,13 @@
+## 1.18.4 (2026-07-08)
+
+### 🩹 Fixes
+
+- lighting issues ([#2805](https://github.com/equinor/webviz-subsurface-components/pull/2805))
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
 ## 1.18.3 (2026-07-06)
 
 ### 🩹 Fixes
