@@ -124,7 +124,7 @@
     "style-loader": "^4.0.0",
     "terser-webpack-plugin": "^5.3.14",
     "ts-loader": "^9.6.2",
-    "typedoc": "^0.28.8",
+    "typedoc": "^0.28.20",
     "typescript": "^5.8.3",
     "url-loader": "^4.1.1",
     "vue-style-loader": "^4.1.3"
