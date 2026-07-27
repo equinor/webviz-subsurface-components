@@ -499,6 +499,22 @@ export const DiscreteLogs: StoryObj<typeof TemplateWithSelection> = {
     ),
 };
 
+export const DiscreteLogsWithWellPicks: StoryObj<typeof TemplateWithSelection> =
+    {
+        args: {
+            ...facies3WellsArgs,
+            wellpicks: exampleWellPicks,
+            wellpickFlatting: ["Hor_4"],
+        },
+        // wellLogCollections is used to retrieve the well log sets from the getWellLogCollections() function
+        render: (args) => (
+            <TemplateWithSelection
+                {...args}
+                wellLogCollections="DiscreteLogs"
+            />
+        ),
+    };
+
 export const DiscreteLogsWithUndefined: StoryObj<typeof TemplateWithSelection> =
     {
         args: { ...facies3WellsArgs },
