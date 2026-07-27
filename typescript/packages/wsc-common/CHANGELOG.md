@@ -1,3 +1,7 @@
+## 1.4.11 (2026-07-27)
+
+This was a version bump only for wsc-common to align it with other projects, there were no code changes.
+
 ## 1.4.10 (2026-06-29)
 
 ### 🩹 Fixes
