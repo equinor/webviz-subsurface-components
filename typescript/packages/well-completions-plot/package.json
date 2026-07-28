@@ -1,6 +1,6 @@
 {
   "name": "@webviz/well-completions-plot",
-  "version": "1.9.11",
+  "version": "1.9.12",
   "publishConfig": {
     "access": "public"
   },
