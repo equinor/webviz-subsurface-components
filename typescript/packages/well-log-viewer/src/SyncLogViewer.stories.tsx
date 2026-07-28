@@ -88,7 +88,6 @@ const stories: Meta = {
     component: SyncLogViewer,
     title: "WellLogViewer/Demo/SyncLogViewer",
     argTypes: argTypesSyncLogViewerProp,
-    tags: ["no-screenshot-test"],
     parameters: {
         docs: {
             description: {
@@ -497,7 +496,24 @@ export const DiscreteLogs: StoryObj<typeof TemplateWithSelection> = {
     render: (args) => (
         <TemplateWithSelection {...args} wellLogCollections="DiscreteLogs" />
     ),
+    tags: ["no-screenshot-test"],
 };
+
+export const DiscreteLogsWithWellPicks: StoryObj<typeof TemplateWithSelection> =
+    {
+        args: {
+            ...facies3WellsArgs,
+            wellpicks: exampleWellPicks,
+            wellpickFlatting: ["Hor_4"],
+        },
+        // wellLogCollections is used to retrieve the well log sets from the getWellLogCollections() function
+        render: (args) => (
+            <TemplateWithSelection
+                {...args}
+                wellLogCollections="DiscreteLogs"
+            />
+        ),
+    };
 
 export const DiscreteLogsWithUndefined: StoryObj<typeof TemplateWithSelection> =
     {
@@ -509,6 +525,7 @@ export const DiscreteLogsWithUndefined: StoryObj<typeof TemplateWithSelection> =
                 wellLogCollections="DiscreteLogsWithUndefined"
             />
         ),
+        tags: ["no-screenshot-test"],
     };
 
 export const DiscreteLogsWithIndividualVisibleRange: StoryObj<
@@ -540,6 +557,7 @@ export const DiscreteLogsWithIndividualVisibleRange: StoryObj<
             wellLogCollections="DiscreteLogsWithIndividualDomains"
         />
     ),
+    tags: ["no-screenshot-test"],
 };
 
 export const DiscreteLogsWithIndividualDomainAndVisibleRange: StoryObj<
@@ -574,6 +592,7 @@ export const DiscreteLogsWithIndividualDomainAndVisibleRange: StoryObj<
             wellLogCollections="DiscreteLogsWithIndividualDomains"
         />
     ),
+    tags: ["no-screenshot-test"],
 };
 
 const verySimpleTemplate: TemplateType = {
@@ -726,4 +745,5 @@ export const LogsWithDifferentSets: StoryObj<typeof Template> = {
     render: (args) => (
         <Template {...args} wellLogCollections="LogsWithDifferentSets" />
     ),
+    tags: ["no-screenshot-test"],
 };
