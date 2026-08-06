@@ -1,3 +1,13 @@
+## 2.9.3 (2026-08-06)
+
+### 🩹 Fixes
+
+- well pick name is not clear in dark mode ([#2814](https://github.com/equinor/webviz-subsurface-components/pull/2814))
+
+### ❤️ Thank You
+
+- Amro Abdelfatah
+
 ## 2.9.2 (2026-07-28)
 
 ### 🧱 Updated Dependencies
