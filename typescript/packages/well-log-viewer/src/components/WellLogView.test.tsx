@@ -8,7 +8,7 @@ import "jest-styled-components";
 
 import { colorTables } from "@emerson-eps/color-tables";
 
-import WellLogView from "./WellLogView";
+import WellLogView, { formatWellPickDepthLabel } from "./WellLogView";
 import type { Template } from "./WellLogTemplateTypes";
 import type { ColormapFunction } from "../utils/color-function";
 
@@ -59,5 +59,42 @@ describe("Test Well Log View Component", () => {
             />
         );
         expect(container.firstChild).toMatchSnapshot();
+    });
+});
+
+describe("formatWellPickDepthLabel", () => {
+    it("falls back to toFixed(0) when no formatter callback is provided (default behaviour unchanged)", () => {
+        expect(
+            formatWellPickDepthLabel(2500.789, "Top Reservoir", undefined)
+        ).toBe("2501");
+    });
+
+    it("returns an empty string for non-finite depth values", () => {
+        expect(
+            formatWellPickDepthLabel(undefined, "Top Reservoir", undefined)
+        ).toBe("");
+        expect(
+            formatWellPickDepthLabel(
+                NaN,
+                "Top Reservoir",
+                (name, depth) => `${name}:${depth}`
+            )
+        ).toBe("");
+    });
+
+    it("invokes the custom formatter with the marker name and full-precision depth", () => {
+        const formatWellPickLabel = jest.fn(
+            (_markerName: string, depth: number) => depth.toFixed(2)
+        );
+        const result = formatWellPickDepthLabel(
+            2500.789,
+            "Top Reservoir",
+            formatWellPickLabel
+        );
+        expect(formatWellPickLabel).toHaveBeenCalledWith(
+            "Top Reservoir",
+            2500.789
+        );
+        expect(result).toBe("2500.79");
     });
 });

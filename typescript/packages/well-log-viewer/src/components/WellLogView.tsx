@@ -329,6 +329,13 @@ export interface WellPickProps {
      */
     colorMapFunctions: ColormapFunction[];
     colorMapFunctionName: string; // "Stratigraphy" ..., "Step func", ...
+    /**
+     * Optional callback to override the default well-pick depth label formatting.
+     * Receives the well-pick/marker name and the full-precision depth value and
+     * must return the string to render. When not set, the default behaviour is
+     * preserved (depth rounded to whole units via `toFixed(0)`).
+     */
+    formatWellPickLabel?: (markerName: string, depth: number) => string;
 }
 
 export const WellPickPropsType = PropTypes.shape({
@@ -337,6 +344,7 @@ export const WellPickPropsType = PropTypes.shape({
     md: PropTypes.string,
     colorMapFunctions: PropTypes.arrayOf(ColorFunctionType).isRequired,
     colorMapFunctionName: PropTypes.string.isRequired,
+    formatWellPickLabel: PropTypes.func,
 });
 
 const wpSize = 3; //9;
@@ -510,6 +518,24 @@ function posWellPickTitles(instance: LogViewer, parent: WellLogView) {
     }
 }
 
+/**
+ * Formats a well-pick depth value for display in the marker label.
+ * When `formatWellPickLabel` is provided, it is called with the marker
+ * (horizon) name and the full-precision depth value, and its return value
+ * is used as-is. Otherwise, the default behaviour of rounding to whole
+ * units via `toFixed(0)` is preserved.
+ */
+export function formatWellPickDepthLabel(
+    value: number | undefined,
+    horizon: string,
+    formatWellPickLabel: WellPickProps["formatWellPickLabel"]
+): string {
+    if (!Number.isFinite(value)) return "";
+    return formatWellPickLabel
+        ? formatWellPickLabel(horizon, value as number)
+        : (value as number).toFixed(0);
+}
+
 function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
     {
         /* clear old wellpicks */
@@ -537,20 +563,25 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
     const patternSize = patternsTable?.patternSize;
     const patternImages = patternsTable?.patternImages;
 
+    const formatWellPickLabel = wellpick.formatWellPickLabel;
+
     for (const wp of wps) {
         const horizon = wp.horizon;
         const vPrimary = wp.vPrimary;
         const vSecondary = wp.vSecondary;
         const color = wp.color;
 
-        const txtPrimary = !Number.isFinite(vPrimary)
-            ? ""
-            : vPrimary?.toFixed(0);
-        const txtSecondary = !Number.isFinite(vSecondary)
-            ? ""
-            : /*(primaryAxis === "md" ? "TVD:" : "MD:") +*/ vSecondary?.toFixed(
-                  0
-              );
+        const txtPrimary = formatWellPickDepthLabel(
+            vPrimary,
+            horizon,
+            formatWellPickLabel
+        );
+        // (primaryAxis === "md" ? "TVD:" : "MD:") +
+        const txtSecondary = formatWellPickDepthLabel(
+            vSecondary,
+            horizon,
+            formatWellPickLabel
+        );
 
         const elmName = "wp" + horizon;
         const pinelm = instance.overlay.create(elmName, {});

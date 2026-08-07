@@ -337,6 +337,36 @@ export const ColorByFunction: StoryObj<typeof StoryTemplate> = {
     render: (args) => <StoryTemplate {...args} wellLogSets="ColorByFunction" />,
 };
 
+// Opts in to well-pick marker labels formatted with 2 decimal places, instead
+// of the default whole-unit rounding, via the `formatWellPickLabel` callback.
+const wellpickWithTwoDecimalLabels: WellPickProps = {
+    ...wellpick,
+    formatWellPickLabel: (_markerName: string, depth: number) =>
+        depth.toFixed(2),
+};
+
+export const WellPickLabelWithCustomFormatter: StoryObj<typeof StoryTemplate> =
+    {
+        args: {
+            horizontal: false,
+            template: template1,
+            colorMapFunctions: exampleColormapFunctions,
+            wellpick: wellpickWithTwoDecimalLabels,
+            axisTitles,
+            axisMnemos,
+            viewTitle: true,
+            visibleRange: [2500, 4000],
+            options: {
+                hideTrackTitle: false,
+                hideTrackLegend: false,
+                hideCurrentPosition: false,
+                hideSelectionInterval: false,
+            },
+        },
+        // wellLogSets is used to retrieve the well log sets from the getWellLogSets() function
+        render: (args) => <StoryTemplate {...args} wellLogSets="Default" />,
+    };
+
 const trackTitleTooltipLogSets: WellLogSet[] = [
     {
         header: {
