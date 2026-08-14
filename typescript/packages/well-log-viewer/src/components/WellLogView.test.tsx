@@ -105,9 +105,9 @@ describe("resolveWellPickLabels", () => {
     });
 
     it("invokes the callback exactly once per pick with the full-precision values", () => {
-        const formatWellPickLabel = jest.fn(
-            (_input: WellPickLabelInput) => ({})
-        );
+        const formatWellPickLabel = jest.fn((input: WellPickLabelInput) => ({
+            horizon: input.horizon,
+        }));
         resolveWellPickLabels(pickInput, formatWellPickLabel);
         expect(formatWellPickLabel).toHaveBeenCalledTimes(1);
         expect(formatWellPickLabel).toHaveBeenCalledWith(pickInput);
