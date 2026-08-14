@@ -320,6 +320,29 @@ function addPinnedValueOverlay(instance: LogViewer, parent: WellLogView) {
         .style("position", "absolute");
 }
 
+/**
+ * The three label cells rendered for a well pick: the primary depth label,
+ * the secondary depth label and the horizon (marker) name.
+ */
+export interface WellPickLabels {
+    primary: string;
+    secondary: string;
+    horizon: string;
+}
+
+/**
+ * Source values for a single well pick, passed to `formatWellPickLabel`.
+ * An object is used so that new fields can be added without a breaking change.
+ */
+export interface WellPickLabelInput {
+    /** The raw horizon (marker) name. */
+    horizon: string;
+    /** Full-precision primary axis depth. May be undefined or non-finite. */
+    vPrimary: number | undefined;
+    /** Full-precision secondary axis depth. May be undefined or non-finite. */
+    vSecondary: number | undefined;
+}
+
 export interface WellPickProps {
     wellpick: WellLogSet; // JSON Log Format
     name: string; //  "HORIZON"
@@ -330,12 +353,23 @@ export interface WellPickProps {
     colorMapFunctions: ColormapFunction[];
     colorMapFunctionName: string; // "Stratigraphy" ..., "Step func", ...
     /**
-     * Optional callback to override the default well-pick depth label formatting.
-     * Receives the well-pick/marker name and the full-precision depth value and
-     * must return the string to render. When not set, the default behaviour is
-     * preserved (depth rounded to whole units via `toFixed(0)`).
+     * Optional callback to override the default well-pick label formatting.
+     *
+     * It is called exactly once per well pick and receives the horizon name
+     * together with the full-precision primary and secondary depth values
+     * (either of which may be `undefined` or non-finite).
+     *
+     * It may return any subset of `{ primary, secondary, horizon }`; keys that
+     * are omitted (or `undefined`) keep the default formatting, i.e.
+     * `toFixed(0)` for the depths and the raw name for the horizon. Returning
+     * nothing at all keeps all defaults.
+     *
+     * The returned `horizon` label only affects the rendered text: element
+     * names, colors, patterns and callbacks always use the raw horizon name.
      */
-    formatWellPickLabel?: (markerName: string, depth: number) => string;
+    formatWellPickLabel?: (
+        input: WellPickLabelInput
+    ) => Partial<WellPickLabels> | undefined | null;
 }
 
 export const WellPickPropsType = PropTypes.shape({
@@ -518,22 +552,46 @@ function posWellPickTitles(instance: LogViewer, parent: WellLogView) {
     }
 }
 
+function defaultWellPickDepthLabel(value: number | undefined): string {
+    return Number.isFinite(value) ? (value as number).toFixed(0) : "";
+}
+
 /**
- * Formats a well-pick depth value for display in the marker label.
- * When `formatWellPickLabel` is provided, it is called with the marker
- * (horizon) name and the full-precision depth value, and its return value
- * is used as-is. Otherwise, the default behaviour of rounding to whole
- * units via `toFixed(0)` is preserved.
+ * The well-pick labels as rendered when no `formatWellPickLabel` callback is
+ * given: depths rounded to whole units via `toFixed(0)` (empty string when the
+ * value is not finite) and the raw horizon name.
  */
-export function formatWellPickDepthLabel(
-    value: number | undefined,
-    horizon: string,
+export function defaultWellPickLabels(
+    input: WellPickLabelInput
+): WellPickLabels {
+    return {
+        primary: defaultWellPickDepthLabel(input.vPrimary),
+        secondary: defaultWellPickDepthLabel(input.vSecondary),
+        horizon: input.horizon,
+    };
+}
+
+/**
+ * Resolves the labels of a single well pick: computes the defaults, calls
+ * `formatWellPickLabel` once (when given) and merges the returned partial over
+ * the defaults. A callback returning nothing, or fields that are `undefined`,
+ * leaves the corresponding defaults in place.
+ */
+export function resolveWellPickLabels(
+    input: WellPickLabelInput,
     formatWellPickLabel: WellPickProps["formatWellPickLabel"]
-): string {
-    if (!Number.isFinite(value)) return "";
-    return formatWellPickLabel
-        ? formatWellPickLabel(horizon, value as number)
-        : (value as number).toFixed(0);
+): WellPickLabels {
+    const labels = defaultWellPickLabels(input);
+    if (!formatWellPickLabel) return labels;
+
+    const overrides = formatWellPickLabel(input);
+    if (!overrides) return labels;
+
+    for (const key of ["primary", "secondary", "horizon"] as const) {
+        const value = overrides[key];
+        if (value !== undefined && value !== null) labels[key] = String(value);
+    }
+    return labels;
 }
 
 function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
@@ -571,17 +629,15 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
         const vSecondary = wp.vSecondary;
         const color = wp.color;
 
-        const txtPrimary = formatWellPickDepthLabel(
-            vPrimary,
-            horizon,
+        // Labels are for display only. Element names, color/pattern lookups
+        // and callbacks must keep using the raw `horizon` value below.
+        const labels = resolveWellPickLabels(
+            { horizon, vPrimary, vSecondary },
             formatWellPickLabel
         );
+        const txtPrimary = labels.primary;
         // (primaryAxis === "md" ? "TVD:" : "MD:") +
-        const txtSecondary = formatWellPickDepthLabel(
-            vSecondary,
-            horizon,
-            formatWellPickLabel
-        );
+        const txtSecondary = labels.secondary;
 
         const elmName = "wp" + horizon;
         const pinelm = instance.overlay.create(elmName, {});
@@ -628,7 +684,7 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
                           "<span " +
                           styleText +
                           ">" +
-                          horizon +
+                          labels.horizon +
                           "</span>" +
                           "</td></tr>" +
                           "</table>"
@@ -651,7 +707,7 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
                           "<span " +
                           styleText +
                           ">" +
-                          horizon +
+                          labels.horizon +
                           "</span>" +
                           "</td>" +
                           "</tr></table>"

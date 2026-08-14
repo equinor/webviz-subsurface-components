@@ -337,12 +337,18 @@ export const ColorByFunction: StoryObj<typeof StoryTemplate> = {
     render: (args) => <StoryTemplate {...args} wellLogSets="ColorByFunction" />,
 };
 
-// Opts in to well-pick marker labels formatted with 2 decimal places, instead
-// of the default whole-unit rounding, via the `formatWellPickLabel` callback.
-const wellpickWithTwoDecimalLabels: WellPickProps = {
+// Demonstrates the opt-in `formatWellPickLabel` callback: it is called once per
+// well pick with the horizon name and the full-precision primary/secondary
+// depths, and returns any subset of { primary, secondary, horizon }. Here all
+// three labels are controlled: depths with 2 decimal places instead of the
+// default whole-unit rounding, and an upper-cased horizon name.
+const wellpickWithCustomLabels: WellPickProps = {
     ...wellpick,
-    formatWellPickLabel: (_markerName: string, depth: number) =>
-        depth.toFixed(2),
+    formatWellPickLabel: ({ horizon, vPrimary, vSecondary }) => ({
+        primary: Number.isFinite(vPrimary) ? vPrimary!.toFixed(2) : "",
+        secondary: Number.isFinite(vSecondary) ? vSecondary!.toFixed(2) : "",
+        horizon: horizon.toUpperCase(),
+    }),
 };
 
 export const WellPickLabelWithCustomFormatter: StoryObj<typeof StoryTemplate> =
@@ -351,7 +357,7 @@ export const WellPickLabelWithCustomFormatter: StoryObj<typeof StoryTemplate> =
             horizontal: false,
             template: template1,
             colorMapFunctions: exampleColormapFunctions,
-            wellpick: wellpickWithTwoDecimalLabels,
+            wellpick: wellpickWithCustomLabels,
             axisTitles,
             axisMnemos,
             viewTitle: true,
@@ -365,6 +371,13 @@ export const WellPickLabelWithCustomFormatter: StoryObj<typeof StoryTemplate> =
         },
         // wellLogSets is used to retrieve the well log sets from the getWellLogSets() function
         render: (args) => <StoryTemplate {...args} wellLogSets="Default" />,
+        parameters: {
+            docs: {
+                description: {
+                    story: "Well picks with a custom `formatWellPickLabel` callback on `wellpick`. The callback is optional and is called once per well pick with `{ horizon, vPrimary, vSecondary }`; it returns any subset of `{ primary, secondary, horizon }`, and omitted labels keep their default formatting. Without the callback the labels render exactly as before.",
+                },
+            },
+        },
     };
 
 const trackTitleTooltipLogSets: WellLogSet[] = [
