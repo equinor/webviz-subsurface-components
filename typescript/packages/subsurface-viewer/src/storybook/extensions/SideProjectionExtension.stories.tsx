@@ -11,6 +11,7 @@ import AxesLayer from "../../layers/axes/axesLayer";
 const stories: Meta = {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer / Extensions / SideProjectionExtension",
+    tags: ["no-dom-test"],
 };
 export default stories;
 

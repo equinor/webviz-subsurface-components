@@ -9,6 +9,7 @@ const ComponentCode = "<ZoomSlider value={1} max={128}/>";
 const stories: Meta = {
     component: ZoomSlider,
     title: "WellLogViewer/Components/ZoomSlider",
+    tags: ["no-screenshot-test"],
     parameters: {
         docs: {
             description: {

@@ -31,6 +31,7 @@ import { useSyntheticWellCollection } from "../util/wellSynthesis";
 
 const meta: Meta<typeof SubsurfaceViewerWithSyntheticWells> = {
     title: "SubsurfaceViewer / Sub Layers / Wells Layer",
+    tags: ["no-dom-test"],
     component: SubsurfaceViewerWithSyntheticWells,
     args: {
         wellCount: 150,

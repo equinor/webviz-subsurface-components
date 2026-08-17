@@ -1,0 +1,175 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SubsurfaceViewer/Components/InfoCard MutipleProperties smoke-test 1`] = `
+<div class="MuiTableContainer-root css-1p6ntod">
+  <table class="MuiTable-root css-tik61u"
+         aria-label="info-card"
+  >
+    <tbody class="MuiTableBody-root css-y6j1my">
+      <tr class="MuiTableRow-root css-1nkfo7g">
+        <td class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-1icv65p">
+          <button type="button"
+                  tabindex="0"
+                  class="Button__ButtonBase-sc-1hs0myn-1 fqqEGV"
+                  style="padding: 0px;"
+          >
+            <span class="Button__Inner-sc-1hs0myn-0 jNcrVQ">
+              <svg fill="currentColor"
+                   viewbox="0 0 24 24"
+                   aria-hidden="true"
+                   xmlns="http://www.w3.org/2000/svg"
+                   height="24px"
+                   width="24px"
+                   class="Icon__StyledSvg-sc-6evbi1-0 iMSGDw"
+              >
+                <path data-testid="eds-icon-path"
+                      d="m7 14.5 5-5 5 5H7Z"
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      class="Icon__StyledPath-sc-6evbi1-1"
+                >
+                </path>
+              </svg>
+            </span>
+          </button>
+        </td>
+        <td class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-1plsf6o">
+          Position
+        </td>
+      </tr>
+      <tr class="MuiTableRow-root css-1nkfo7g">
+        <td class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-1plsf6o"
+            colspan="2"
+            style="padding-bottom: 0px; padding-top: 0px;"
+        >
+          <div class="MuiCollapse-root MuiCollapse-vertical MuiCollapse-entered css-1cbf1l2"
+               style="min-height: 0px;"
+          >
+            <div class="MuiCollapse-wrapper MuiCollapse-vertical css-15830to">
+              <div class="MuiCollapse-wrapperInner MuiCollapse-vertical css-9vd5ud">
+                <table class="MuiTable-root css-11wtp55"
+                       aria-label="properties"
+                >
+                  <tbody class="MuiTableBody-root css-y6j1my">
+                    <tr class="MuiTableRow-root css-1nkfo7g">
+                      <td class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall css-1gagiw6"
+                          style="border-width: medium; border-style: none; border-color: currentcolor; border-image: initial; padding-left: 10px; padding-right: 10px;"
+                      >
+                        x
+                      </td>
+                      <td class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall css-1gagiw6"
+                          style="border-width: medium; border-style: none; border-color: currentcolor; border-image: initial; text-align: right;"
+                      >
+                        111.00 m
+                      </td>
+                    </tr>
+                    <tr class="MuiTableRow-root css-1nkfo7g">
+                      <td class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall css-1gagiw6"
+                          style="border-width: medium; border-style: none; border-color: currentcolor; border-image: initial; padding-left: 10px; padding-right: 10px;"
+                      >
+                        y
+                      </td>
+                      <td class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall css-1gagiw6"
+                          style="border-width: medium; border-style: none; border-color: currentcolor; border-image: initial; text-align: right;"
+                      >
+                        222.00 m
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+`;
+
+exports[`SubsurfaceViewer/Components/InfoCard SingleProperty smoke-test 1`] = `
+<div class="MuiTableContainer-root css-1p6ntod">
+  <table class="MuiTable-root css-tik61u"
+         aria-label="info-card"
+  >
+    <tbody class="MuiTableBody-root css-y6j1my">
+      <tr class="MuiTableRow-root css-1nkfo7g">
+        <td class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-1icv65p">
+          <button type="button"
+                  tabindex="0"
+                  class="Button__ButtonBase-sc-1hs0myn-1 fqqEGV"
+                  style="padding: 0px;"
+          >
+            <span class="Button__Inner-sc-1hs0myn-0 jNcrVQ">
+              <svg fill="currentColor"
+                   viewbox="0 0 24 24"
+                   aria-hidden="true"
+                   xmlns="http://www.w3.org/2000/svg"
+                   height="24px"
+                   width="24px"
+                   class="Icon__StyledSvg-sc-6evbi1-0 iMSGDw"
+              >
+                <path data-testid="eds-icon-path"
+                      d="m7 14.5 5-5 5 5H7Z"
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      class="Icon__StyledPath-sc-6evbi1-1"
+                >
+                </path>
+              </svg>
+            </span>
+          </button>
+        </td>
+        <td class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-1plsf6o">
+          Position
+        </td>
+      </tr>
+      <tr class="MuiTableRow-root css-1nkfo7g">
+        <td class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-1plsf6o"
+            colspan="2"
+            style="padding-bottom: 0px; padding-top: 0px;"
+        >
+          <div class="MuiCollapse-root MuiCollapse-vertical MuiCollapse-entered css-1cbf1l2"
+               style="min-height: 0px;"
+          >
+            <div class="MuiCollapse-wrapper MuiCollapse-vertical css-15830to">
+              <div class="MuiCollapse-wrapperInner MuiCollapse-vertical css-9vd5ud">
+                <table class="MuiTable-root css-11wtp55"
+                       aria-label="properties"
+                >
+                  <tbody class="MuiTableBody-root css-y6j1my">
+                    <tr class="MuiTableRow-root css-1nkfo7g">
+                      <td class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall css-1gagiw6"
+                          style="border-width: medium; border-style: none; border-color: currentcolor; border-image: initial; padding-left: 10px; padding-right: 10px;"
+                      >
+                        x
+                      </td>
+                      <td class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall css-1gagiw6"
+                          style="border-width: medium; border-style: none; border-color: currentcolor; border-image: initial; text-align: right;"
+                      >
+                        111.00 m
+                      </td>
+                    </tr>
+                    <tr class="MuiTableRow-root css-1nkfo7g">
+                      <td class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall css-1gagiw6"
+                          style="border-width: medium; border-style: none; border-color: currentcolor; border-image: initial; padding-left: 10px; padding-right: 10px;"
+                      >
+                        y
+                      </td>
+                      <td class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeSmall css-1gagiw6"
+                          style="border-width: medium; border-style: none; border-color: currentcolor; border-image: initial; text-align: right;"
+                      >
+                        222.00 m
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+`;
