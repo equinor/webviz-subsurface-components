@@ -691,10 +691,10 @@ exports[`WellLogViewer/Demo/ExampleData TwoLogs smoke-test 2`] = `
                            aria-orientation="horizontal"
                            aria-valuemax="256"
                            aria-valuemin="1"
-                           type="range"
                            min="0"
                            max="8"
                            step="0.5"
+                           type="range"
                            value="0"
                            style="border: 0px; clip: rect(0px, 0px, 0px, 0px); height: 100%; margin: -1px; overflow: hidden; padding: 0px; position: absolute; white-space: nowrap; width: 100%; direction: ltr;"
                     >

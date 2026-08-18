@@ -3,7 +3,7 @@
 exports[`SubsurfaceViewer/Components/Settings ToggleButtonStory smoke-test 1`] = `
 <div style="display: flex; justify-content: space-between;">
   <label id="test-switch-label"
-         class="Label__LabelBase-sc-1gi2bcn-0 gVSpwr"
+         class="Label__LabelBase-sc-1gi2bcn-0 eAoEZ"
          style="padding-top: 15px; font-size: 15px;"
   >
     <span class="Label__Text-sc-1gi2bcn-1 bfxypJ">
@@ -15,8 +15,8 @@ exports[`SubsurfaceViewer/Components/Settings ToggleButtonStory smoke-test 1`] =
   >
     <input id="test-switch"
            aria-label="test"
-           type="checkbox"
            class="Switchstyles__BaseInput-sc-x39lde-1 SwitchDefault__Input-sc-16ym5pn-0 mnrPd wiqdn"
+           type="checkbox"
     >
     <span class="Switchstyles__BaseInputWrapper-sc-x39lde-0 dytyhT">
       <span class="SwitchDefault__Track-sc-16ym5pn-1 bFHBBj">
