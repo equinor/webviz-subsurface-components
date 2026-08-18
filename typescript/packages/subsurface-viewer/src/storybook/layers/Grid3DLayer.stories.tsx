@@ -35,6 +35,7 @@ const SubsurfaceViewerPropsInjector = getPropsInjectorComponent(
 const stories: Meta = {
     component: SubsurfaceViewerPropsInjector,
     title: "SubsurfaceViewer / Grid3D Layer",
+    tags: ["no-dom-test"],
     args: {
         // Add some common controls for all the stories.
         triggerHome: 0,

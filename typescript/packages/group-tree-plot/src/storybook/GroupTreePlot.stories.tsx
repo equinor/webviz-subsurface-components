@@ -14,6 +14,7 @@ import {
 const stories: Meta<GroupTreePlotProps> = {
     component: GroupTreePlot,
     title: "GroupTreePlot/Demo",
+    tags: ["no-dom-test"],
     argTypes: {
         selectedDateTime: {
             description:
