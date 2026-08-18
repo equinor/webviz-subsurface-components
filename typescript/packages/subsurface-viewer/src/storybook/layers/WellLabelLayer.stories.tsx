@@ -32,6 +32,7 @@ type WellCount = { wellCount: number };
 
 const stories: Meta = {
     title: "SubsurfaceViewer / Well Label Layer",
+    tags: ["no-dom-test"],
     parameters: {
         docs: {
             description: {

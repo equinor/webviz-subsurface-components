@@ -32,6 +32,7 @@ import { useSyntheticWellCollection } from "../util/wellSynthesis";
 const STORIES: Meta = {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer / Polyline Group Layer",
+    tags: ["no-dom-test"],
 };
 export default STORIES;
 

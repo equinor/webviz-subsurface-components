@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SubsurfaceViewer / Components / DistanceScale DarkMode smoke-test 1`] = `
+<div style="position: absolute; color: white;">
+  <label style="color: white;">
+    800m
+  </label>
+  <div style="width: 100px; height: 4px; border-width: medium 2px 2px; border-style: none solid solid; border-color: currentcolor; border-image: initial; display: inline-block; margin-left: 3px;">
+  </div>
+</div>
+`;
+
+exports[`SubsurfaceViewer / Components / DistanceScale LightMode smoke-test 1`] = `
+<div style="position: absolute;">
+  <label>
+    800m
+  </label>
+  <div style="width: 100px; height: 4px; border-width: medium 2px 2px; border-style: none solid solid; border-color: currentcolor; border-image: initial; display: inline-block; margin-left: 3px;">
+  </div>
+</div>
+`;

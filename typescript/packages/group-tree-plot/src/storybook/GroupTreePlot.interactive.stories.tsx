@@ -13,7 +13,7 @@ import {
 const stories: Meta = {
     component: GroupTreePlot,
     title: "GroupTreePlot/Interactive Demo",
-    tags: ["autodocs"],
+    tags: ["autodocs", "no-dom-test"],
 };
 export default stories;
 

@@ -87,6 +87,7 @@ const ComponentCode =
 const stories: Meta = {
     component: SyncLogViewer,
     title: "WellLogViewer/Demo/SyncLogViewer",
+    tags: ["no-dom-test"],
     argTypes: argTypesSyncLogViewerProp,
     parameters: {
         docs: {

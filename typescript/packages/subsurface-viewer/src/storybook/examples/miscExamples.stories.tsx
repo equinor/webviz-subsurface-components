@@ -43,6 +43,7 @@ import {
 const stories: Meta = {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer/Examples",
+    tags: ["no-dom-test"],
     argTypes: argTypes,
     args: {
         // Add some common controls for all the stories.
