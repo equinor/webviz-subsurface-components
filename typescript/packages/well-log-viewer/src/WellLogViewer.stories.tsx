@@ -461,6 +461,11 @@ export const Horizontal: StoryObj<typeof StoryTemplate> = {
             },
         },
     },
+    // The horizontal scale track is rendered by the third-party
+    // @equinor/videx-wellog library using D3, which serializes its DOM
+    // attributes in a non-deterministic order across renders. Use a
+    // screenshot test instead of a DOM snapshot for this story.
+    tags: ["!no-screenshot-test", "no-dom-test"],
     // wellLogSets is used to retrieve the well log sets from the getWellLogSets() function
     render: (args) => <StoryTemplate {...args} wellLogSets="Horizontal" />,
 };
