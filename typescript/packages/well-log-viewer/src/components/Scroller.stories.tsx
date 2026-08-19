@@ -33,6 +33,7 @@ const ComponentCode =
 const stories: Meta = {
     component: Scroller,
     title: "WellLogViewer/Components/Scroller",
+    tags: ["no-screenshot-test"],
     parameters: {
         docs: {
             description: {

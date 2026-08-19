@@ -26,6 +26,7 @@ const ComponentCode =
 const stories: Meta<WellLogViewWithScrollerProps> = {
     component: WellLogViewWithScroller,
     title: "WellLogViewer/Components/WellLogViewWithScroller",
+    tags: ["no-screenshot-test"],
     parameters: {
         docs: {
             description: {

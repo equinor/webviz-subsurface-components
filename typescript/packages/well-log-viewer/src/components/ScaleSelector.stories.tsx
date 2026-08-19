@@ -9,6 +9,7 @@ const ComponentCode = "<ScaleSelector value={1} max={128}/>";
 const stories: Meta = {
     component: ScaleSelector,
     title: "WellLogViewer/Components/ScaleSelector",
+    tags: ["no-screenshot-test"],
     parameters: {
         docs: {
             description: {

@@ -25,6 +25,7 @@ const exampleColormapFunctions = colorTables as ColormapFunction[];
 const stories: Meta<WellLogViewProps> = {
     component: WellLogView,
     title: "WellLogViewer/Components/WellLogView",
+    tags: ["no-screenshot-test"],
     argTypes: argTypesWellLogViewProp,
     parameters: {
         docs: {

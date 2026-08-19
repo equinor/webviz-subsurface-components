@@ -39,7 +39,7 @@ const RTCWellLogViewer: React.FunctionComponent<IRTCWellLogViewerProps> = (
 // storybook page
 const meta: Meta<typeof RTCWellLogViewer> = {
     title: "WellLogViewer/Demo/ClassificationLayout",
-    tags: ["no-dom-test"],
+    tags: ["no-screenshot-test"],
     component: RTCWellLogViewer,
 };
 

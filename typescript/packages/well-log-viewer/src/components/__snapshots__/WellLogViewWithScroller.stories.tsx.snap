@@ -1,11 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`] = `
+exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 1`] = `
 <div style="height: 92vh; display: flex; flex-direction: column;">
   <div style="width: 100%; height: 100%;">
     <div style="overflow: scroll; width: 100%; height: 100%;">
       <div style="width: 3994px; height: 662px;">
-        <div style="position: absolute; width: 1248px; height: 662px;">
+        <div style="position: absolute;">
           <div class="welllogview"
                style="flex-direction: column;"
           >
@@ -15,12 +15,11 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
             <div class="view">
               <div class="container log-controller">
                 <div class="overlay"
-                     style="width: 1248px; left: 0px; top: 69px; overflow: hidden; height: 578px;"
+                     style="width: 88.2969px; left: 0px; top: 48.6px; overflow: hidden;"
                 >
                   <div class="depth"
-                       style="position: absolute; pointer-events: none; visibility: visible;"
+                       style="position: absolute; pointer-events: none; visibility: hidden;"
                   >
-                    Zoom: x1.0
                   </div>
                   <div class="rubber-band"
                        style="position: relative; pointer-events: none; height: 9px; width: 100%; visibility: hidden;"
@@ -40,12 +39,12 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                 >
                   <div class="track-title"
                        title="Multiple"
-                       style="height: 18px; font-size: 12.6px;"
+                       style="height: 12.6px; font-size: 8.82px;"
                   >
                     Multiple
                   </div>
                   <div class="track-legend"
-                       style="height: 50px;"
+                       style="height: 35px;"
                   >
                     <svg width="100%"
                          height="100%"
@@ -59,74 +58,74 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                           <title>
                             Toggle plot on/off
                           </title>
-                          <rect width="410.328125"
-                                height="21"
+                          <rect width="415.671875"
+                                height="13.5"
                                 x="2"
                                 y="2"
                                 visibility="hidden"
                           >
                           </rect>
                           <line x1="2"
-                                x2="412.328125"
-                                y1="12.5"
-                                y2="12.5"
-                                style="stroke-width: 2.5; stroke: red; fill: red;"
+                                x2="417.671875"
+                                y1="8.75"
+                                y2="8.75"
+                                style="stroke-width: 1.75; stroke: red; fill: red;"
                           >
                           </line>
                           <text class="legend-label"
-                                font-size="8.75px"
-                                transform="translate(207.1640625,8.75)"
+                                font-size="6.125px"
+                                transform="translate(209.8359375,6.125)"
                                 style="text-anchor: middle; fill: red;"
                           >
                             MDIA
                           </text>
                           <text class="legend-unit"
-                                font-size="7.4375px"
-                                transform="translate(207.1640625,19.9375)"
+                                font-size="5.20625px"
+                                transform="translate(209.8359375,13.95625)"
                                 style="text-anchor: middle; fill: red;"
                           >
                             KG/L
                           </text>
                           <rect x="0"
-                                y="5.0625"
-                                width="17.359375"
-                                height="15"
+                                y="3.2437496185302734"
+                                width="13.60333251953125"
+                                height="11"
                                 style="fill: white;"
                           >
                           </rect>
-                          <rect x="396.96875"
-                                y="5.0625"
-                                width="17.359375"
-                                height="15"
+                          <rect x="406.328125"
+                                y="3.2437496185302734"
+                                width="13.60333251953125"
+                                height="11"
                                 style="fill: white;"
                           >
                           </rect>
                           <text class="legend-domain"
-                                font-size="9.625px"
+                                font-size="6.737500000000001px"
                                 x="2"
-                                y="16.0625"
+                                y="11.24375"
                                 style="text-anchor: start; fill: red;"
                           >
                             1.5
                           </text>
                           <text class="legend-domain"
-                                font-size="9.625px"
-                                x="412.328125"
-                                y="16.0625"
+                                font-size="6.737500000000001px"
+                                x="417.671875"
+                                y="11.24375"
                                 style="text-anchor: end; fill: red;"
                           >
                             1.6
                           </text>
                         </g>
                         <g class="legend-row"
-                           transform="translate(0,25)"
+                           transform="translate(0,17.5)"
                            style="cursor: pointer;"
                         >
                           <title>
                             Toggle plot on/off
                           </title>
                           <defs>
-                            <linearGradient id="grad31"
+                            <linearGradient id="grad22"
                                             x1="0%"
                                             x2="100%"
                                             y1="0%"
@@ -156,53 +155,53 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                           </defs>
                           <rect x="2"
                                 y="0"
-                                width="410.328125"
-                                height="12.5"
-                                fill="url(#grad31)"
+                                width="415.671875"
+                                height="8.75"
+                                fill="url(#grad22)"
                                 fill-opacity="0.5"
                           >
                           </rect>
                           <line x1="2"
-                                x2="412.328125"
-                                y1="12.5"
-                                y2="12.5"
-                                style="stroke-width: 2.5; stroke: green; fill: green;"
+                                x2="417.671875"
+                                y1="8.75"
+                                y2="8.75"
+                                style="stroke-width: 1.75; stroke: green; fill: green;"
                           >
                           </line>
                           <rect class="label-bg"
                                 fill="white"
-                                x="194.734375"
+                                x="200.8515625"
                                 y="1"
-                                width="25.021484375"
-                                height="10.5"
+                                width="18.884658813476562"
+                                height="6.75"
                           >
                           </rect>
                           <text class="legend-label"
-                                font-size="8.75px"
-                                transform="translate(207.1640625,8.75)"
+                                font-size="6.125px"
+                                transform="translate(209.8359375,6.125)"
                                 style="text-anchor: middle; fill: green;"
                           >
                             HKLA
                           </text>
                           <text class="legend-unit"
-                                font-size="7.4375px"
-                                transform="translate(207.1640625,19.9375)"
+                                font-size="5.20625px"
+                                transform="translate(209.8359375,13.95625)"
                                 style="text-anchor: middle; fill: green;"
                           >
                             T
                           </text>
                           <text class="legend-domain"
-                                font-size="7.4375px"
+                                font-size="5.20625px"
                                 x="2"
-                                y="19.9375"
+                                y="13.95625"
                                 style="text-anchor: start; fill: green;"
                           >
                             0
                           </text>
                           <text class="legend-domain"
-                                font-size="7.4375px"
-                                x="412.328125"
-                                y="19.9375"
+                                font-size="5.20625px"
+                                x="417.671875"
+                                y="13.95625"
                                 style="text-anchor: end; fill: green;"
                           >
                             200
@@ -212,9 +211,9 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                     </svg>
                   </div>
                   <div class="track-container">
-                    <canvas width="414.328125"
-                            height="576"
-                            style="position: absolute; width: 414.328px; height: 576px;"
+                    <canvas width="419.671875"
+                            height="0"
+                            style="position: absolute; width: 419.672px; height: 0px;"
                     >
                     </canvas>
                   </div>
@@ -224,12 +223,12 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                 >
                   <div class="track-title"
                        title="Area"
-                       style="height: 18px; font-size: 12.6px;"
+                       style="height: 12.6px; font-size: 8.82px;"
                   >
                     Area
                   </div>
                   <div class="track-legend"
-                       style="height: 50px;"
+                       style="height: 35px;"
                   >
                     <svg width="100%"
                          height="100%"
@@ -237,7 +236,7 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                     >
                       <g class="svg-legend">
                         <g class="legend-row"
-                           transform="translate(0,25)"
+                           transform="translate(0,17.5)"
                            style="cursor: pointer;"
                         >
                           <title>
@@ -245,68 +244,68 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                           </title>
                           <rect x="2"
                                 y="0"
-                                width="102.578125"
-                                height="12.5"
+                                width="103.9140625"
+                                height="8.75"
                                 fill="blue"
                                 fill-opacity="0.5"
                           >
                           </rect>
-                          <rect x="103.578125"
+                          <rect x="104.9140625"
                                 y="0"
-                                width="102.578125"
-                                height="12.5"
+                                width="103.9140625"
+                                height="8.75"
                                 fill="#00ff00"
                                 fill-opacity="0.5"
                           >
                           </rect>
-                          <rect width="203.15625"
-                                height="21"
+                          <rect width="205.828125"
+                                height="13.5"
                                 x="2"
                                 y="2"
                                 visibility="hidden"
                           >
                           </rect>
                           <line x1="2"
-                                x2="205.15625"
-                                y1="12.5"
-                                y2="12.5"
-                                style="stroke-width: 2.5; stroke: blue; fill: blue;"
+                                x2="207.828125"
+                                y1="8.75"
+                                y2="8.75"
+                                style="stroke-width: 1.75; stroke: blue; fill: blue;"
                           >
                           </line>
                           <rect class="label-bg"
                                 fill="white"
-                                x="91.1484375"
+                                x="95.9296875"
                                 y="1"
-                                width="25.021484375"
-                                height="10.5"
+                                width="18.884658813476562"
+                                height="6.75"
                           >
                           </rect>
                           <text class="legend-label"
-                                font-size="8.75px"
-                                transform="translate(103.578125,8.75)"
+                                font-size="6.125px"
+                                transform="translate(104.9140625,6.125)"
                                 style="text-anchor: middle; fill: blue;"
                           >
                             HKLA
                           </text>
                           <text class="legend-unit"
-                                font-size="7.4375px"
-                                transform="translate(103.578125,19.9375)"
+                                font-size="5.20625px"
+                                transform="translate(104.9140625,13.95625)"
                                 style="text-anchor: middle; fill: blue;"
                           >
                             T
                           </text>
                           <text class="legend-domain"
-                                font-size="7.4375px"
+                                font-size="5.20625px"
                                 x="2"
-                                y="19.9375"
+                                y="13.95625"
                                 style="text-anchor: start; fill: blue;"
                           >
                             0.1
                           </text>
                           <text class="legend-domain"
-                                font-size="7.4375px"
-                                x="205.15625"
-                                y="19.9375"
+                                font-size="5.20625px"
+                                x="207.828125"
+                                y="13.95625"
                                 style="text-anchor: end; fill: blue;"
                           >
                             200
@@ -316,9 +315,9 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                     </svg>
                   </div>
                   <div class="track-container">
-                    <canvas width="207.15625"
-                            height="576"
-                            style="position: absolute; width: 207.156px; height: 576px;"
+                    <canvas width="209.828125"
+                            height="0"
+                            style="position: absolute; width: 209.828px; height: 0px;"
                     >
                     </canvas>
                   </div>
@@ -328,12 +327,12 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                 >
                   <div class="track-title"
                        title="Differential"
-                       style="height: 18px; font-size: 12.6px;"
+                       style="height: 12.6px; font-size: 8.82px;"
                   >
                     Differential
                   </div>
                   <div class="track-legend"
-                       style="height: 50px;"
+                       style="height: 35px;"
                   >
                     <svg width="100%"
                          height="100%"
@@ -349,126 +348,126 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                           </title>
                           <rect x="2"
                                 y="0"
-                                width="101.5859375"
-                                height="12.5"
+                                width="102.921875"
+                                height="8.75"
                                 fill="green"
                                 fill-opacity="0.5"
                           >
                           </rect>
-                          <rect x="103.5859375"
+                          <rect x="104.921875"
                                 y="0"
-                                width="101.5859375"
-                                height="12.5"
+                                width="102.921875"
+                                height="8.75"
                                 fill="red"
                                 fill-opacity="0.5"
                           >
                           </rect>
-                          <rect width="203.171875"
-                                height="21"
+                          <rect width="205.84375"
+                                height="13.5"
                                 x="2"
                                 y="2"
                                 visibility="hidden"
                           >
                           </rect>
                           <line x1="2"
-                                x2="205.171875"
-                                y1="12.5"
-                                y2="12.5"
-                                style="stroke-width: 2.5; stroke: blue; fill: blue;"
+                                x2="207.84375"
+                                y1="8.75"
+                                y2="8.75"
+                                style="stroke-width: 1.75; stroke: blue; fill: blue;"
                           >
                           </line>
                           <rect class="label-bg"
                                 fill="white"
-                                x="91.15625"
+                                x="95.9375"
                                 y="1"
-                                width="25.021484375"
-                                height="10.5"
+                                width="17.96875"
+                                height="6.75"
                           >
                           </rect>
                           <text class="legend-label"
-                                font-size="8.75px"
-                                transform="translate(103.5859375,8.75)"
+                                font-size="6.125px"
+                                transform="translate(104.921875,6.125)"
                                 style="text-anchor: middle; fill: blue;"
                           >
                             HKLX
                           </text>
                           <text class="legend-unit"
-                                font-size="7.4375px"
-                                transform="translate(103.5859375,19.9375)"
+                                font-size="5.20625px"
+                                transform="translate(104.921875,13.95625)"
                                 style="text-anchor: middle; fill: blue;"
                           >
                             T
                           </text>
                           <text class="legend-domain"
-                                font-size="7.4375px"
+                                font-size="5.20625px"
                                 x="2"
-                                y="19.9375"
+                                y="13.95625"
                                 style="text-anchor: start; fill: blue;"
                           >
                             0
                           </text>
                           <text class="legend-domain"
-                                font-size="7.4375px"
-                                x="205.171875"
-                                y="19.9375"
+                                font-size="5.20625px"
+                                x="207.84375"
+                                y="13.95625"
                                 style="text-anchor: end; fill: blue;"
                           >
                             200
                           </text>
-                          <rect width="203.171875"
-                                height="21"
+                          <rect width="205.84375"
+                                height="13.5"
                                 x="2"
                                 y="2"
                                 visibility="hidden"
                           >
                           </rect>
                           <line x1="2"
-                                x2="205.171875"
-                                y1="37.5"
-                                y2="37.5"
-                                style="stroke-width: 2.5; stroke: orange; fill: orange;"
+                                x2="207.84375"
+                                y1="26.25"
+                                y2="26.25"
+                                style="stroke-width: 1.75; stroke: orange; fill: orange;"
                           >
                           </line>
                           <text class="legend-label"
-                                font-size="8.75px"
-                                transform="translate(103.5859375,33.75)"
+                                font-size="6.125px"
+                                transform="translate(104.921875,23.625)"
                                 style="text-anchor: middle; fill: orange;"
                           >
                             HKLA
                           </text>
                           <text class="legend-unit"
-                                font-size="7.4375px"
-                                transform="translate(103.5859375,44.9375)"
+                                font-size="5.20625px"
+                                transform="translate(104.921875,31.45625)"
                                 style="text-anchor: middle; fill: orange;"
                           >
                             T
                           </text>
                           <rect x="0"
-                                y="30.0625"
-                                width="9.359375"
-                                height="15"
+                                y="20.743749618530273"
+                                width="8"
+                                height="11"
                                 style="fill: white;"
                           >
                           </rect>
-                          <rect x="187.125"
-                                y="30.0625"
-                                width="20.046875"
-                                height="15"
+                          <rect x="194.625"
+                                y="20.743749618530273"
+                                width="15.473297119140625"
+                                height="11"
                                 style="fill: white;"
                           >
                           </rect>
                           <text class="legend-domain"
-                                font-size="9.625px"
+                                font-size="6.737500000000001px"
                                 x="2"
-                                y="41.0625"
+                                y="28.74375"
                                 style="text-anchor: start; fill: orange;"
                           >
                             0
                           </text>
                           <text class="legend-domain"
-                                font-size="9.625px"
-                                x="205.171875"
-                                y="41.0625"
+                                font-size="6.737500000000001px"
+                                x="207.84375"
+                                y="28.74375"
                                 style="text-anchor: end; fill: orange;"
                           >
                             200
@@ -478,9 +477,9 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                     </svg>
                   </div>
                   <div class="track-container">
-                    <canvas width="207.171875"
-                            height="576"
-                            style="position: absolute; width: 207.172px; height: 576px;"
+                    <canvas width="209.84375"
+                            height="0"
+                            style="position: absolute; width: 209.844px; height: 0px;"
                     >
                     </canvas>
                   </div>
@@ -490,12 +489,12 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                 >
                   <div class="track-title"
                        title="Gradient Fill &amp; inverse"
-                       style="height: 18px; font-size: 12.6px;"
+                       style="height: 12.6px; font-size: 8.82px;"
                   >
                     Gradient Fill &amp; inverse
                   </div>
                   <div class="track-legend"
-                       style="height: 50px;"
+                       style="height: 35px;"
                   >
                     <svg width="100%"
                          height="100%"
@@ -503,14 +502,14 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                     >
                       <g class="svg-legend">
                         <g class="legend-row"
-                           transform="translate(0,25)"
+                           transform="translate(0,17.5)"
                            style="cursor: pointer;"
                         >
                           <title>
                             Toggle plot on/off
                           </title>
                           <defs>
-                            <linearGradient id="grad32"
+                            <linearGradient id="grad23"
                                             x1="0%"
                                             x2="100%"
                                             y1="0%"
@@ -539,7 +538,7 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                             </linearGradient>
                           </defs>
                           <defs>
-                            <linearGradient id="grad33"
+                            <linearGradient id="grad24"
                                             x1="0%"
                                             x2="100%"
                                             y1="0%"
@@ -569,61 +568,61 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                           </defs>
                           <rect x="2"
                                 y="0"
-                                width="102.5859375"
-                                height="12.5"
-                                fill="url(#grad32)"
+                                width="103.9140625"
+                                height="8.75"
+                                fill="url(#grad23)"
                                 fill-opacity="0.5"
                           >
                           </rect>
-                          <rect x="103.5859375"
+                          <rect x="104.9140625"
                                 y="0"
-                                width="102.5859375"
-                                height="12.5"
-                                fill="url(#grad33)"
+                                width="103.9140625"
+                                height="8.75"
+                                fill="url(#grad24)"
                                 fill-opacity="0.5"
                           >
                           </rect>
                           <line x1="2"
-                                x2="205.171875"
-                                y1="12.5"
-                                y2="12.5"
-                                style="stroke-width: 2.5; stroke: blue; fill: blue;"
+                                x2="207.828125"
+                                y1="8.75"
+                                y2="8.75"
+                                style="stroke-width: 1.75; stroke: blue; fill: blue;"
                           >
                           </line>
                           <rect class="label-bg"
                                 fill="white"
-                                x="91.15625"
+                                x="95.9296875"
                                 y="1"
-                                width="25.021484375"
-                                height="10.5"
+                                width="18.884658813476562"
+                                height="6.75"
                           >
                           </rect>
                           <text class="legend-label"
-                                font-size="8.75px"
-                                transform="translate(103.5859375,8.75)"
+                                font-size="6.125px"
+                                transform="translate(104.9140625,6.125)"
                                 style="text-anchor: middle; fill: blue;"
                           >
                             HKLA
                           </text>
                           <text class="legend-unit"
-                                font-size="7.4375px"
-                                transform="translate(103.5859375,19.9375)"
+                                font-size="5.20625px"
+                                transform="translate(104.9140625,13.95625)"
                                 style="text-anchor: middle; fill: blue;"
                           >
                             T
                           </text>
                           <text class="legend-domain"
-                                font-size="7.4375px"
+                                font-size="5.20625px"
                                 x="2"
-                                y="19.9375"
+                                y="13.95625"
                                 style="text-anchor: start; fill: blue;"
                           >
                             0
                           </text>
                           <text class="legend-domain"
-                                font-size="7.4375px"
-                                x="205.171875"
-                                y="19.9375"
+                                font-size="5.20625px"
+                                x="207.828125"
+                                y="13.95625"
                                 style="text-anchor: end; fill: blue;"
                           >
                             200
@@ -633,9 +632,9 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                     </svg>
                   </div>
                   <div class="track-container">
-                    <canvas width="207.171875"
-                            height="576"
-                            style="position: absolute; width: 207.172px; height: 576px;"
+                    <canvas width="209.828125"
+                            height="0"
+                            style="position: absolute; width: 209.828px; height: 0px;"
                     >
                     </canvas>
                   </div>
@@ -645,12 +644,12 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                 >
                   <div class="track-title"
                        title="MFOA"
-                       style="height: 18px; font-size: 12.6px;"
+                       style="height: 12.6px; font-size: 8.82px;"
                   >
                     MFOA
                   </div>
                   <div class="track-legend"
-                       style="height: 50px;"
+                       style="height: 35px;"
                   >
                     <svg width="100%"
                          height="100%"
@@ -658,66 +657,66 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                     >
                       <g class="svg-legend">
                         <g class="legend-row"
-                           transform="translate(0,25)"
+                           transform="translate(0,17.5)"
                            style="cursor: pointer;"
                         >
                           <title>
                             Toggle plot on/off
                           </title>
-                          <rect width="203.171875"
-                                height="21"
+                          <rect width="205.828125"
+                                height="13.5"
                                 x="2"
                                 y="2"
                                 visibility="hidden"
                           >
                           </rect>
                           <line x1="2"
-                                x2="205.171875"
-                                y1="12.5"
-                                y2="12.5"
-                                style="stroke-width: 2.5; stroke: blue; fill: blue;"
+                                x2="207.828125"
+                                y1="8.75"
+                                y2="8.75"
+                                style="stroke-width: 1.75; stroke: blue; fill: blue;"
                           >
                           </line>
                           <text class="legend-label"
-                                font-size="8.75px"
-                                transform="translate(103.5859375,8.75)"
+                                font-size="6.125px"
+                                transform="translate(104.9140625,6.125)"
                                 style="text-anchor: middle; fill: blue;"
                           >
                             MFOA
                           </text>
                           <text class="legend-unit"
-                                font-size="7.4375px"
-                                transform="translate(103.5859375,19.9375)"
+                                font-size="5.20625px"
+                                transform="translate(104.9140625,13.95625)"
                                 style="text-anchor: middle; fill: blue;"
                           >
                             %
                           </text>
                           <rect x="0"
-                                y="5.0625"
-                                width="17.890625"
-                                height="15"
+                                y="3.2437496185302734"
+                                width="13.974044799804688"
+                                height="11"
                                 style="fill: white;"
                           >
                           </rect>
-                          <rect x="187.125"
-                                y="5.0625"
-                                width="20.046875"
-                                height="15"
+                          <rect x="194.609375"
+                                y="3.2437496185302734"
+                                width="15.473297119140625"
+                                height="11"
                                 style="fill: white;"
                           >
                           </rect>
                           <text class="legend-domain"
-                                font-size="9.625px"
+                                font-size="6.737500000000001px"
                                 x="2"
-                                y="16.0625"
+                                y="11.24375"
                                 style="text-anchor: start; fill: blue;"
                           >
                             -40
                           </text>
                           <text class="legend-domain"
-                                font-size="9.625px"
-                                x="205.171875"
-                                y="16.0625"
+                                font-size="6.737500000000001px"
+                                x="207.828125"
+                                y="11.24375"
                                 style="text-anchor: end; fill: blue;"
                           >
                             180
@@ -727,9 +726,9 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                     </svg>
                   </div>
                   <div class="track-container">
-                    <canvas width="207.171875"
-                            height="576"
-                            style="position: absolute; width: 207.172px; height: 576px;"
+                    <canvas width="209.828125"
+                            height="0"
+                            style="position: absolute; width: 209.828px; height: 0px;"
                     >
                     </canvas>
                   </div>
@@ -739,12 +738,12 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                 >
                   <div class="track-title"
                        title="TQA"
-                       style="height: 18px; font-size: 12.6px;"
+                       style="height: 12.6px; font-size: 8.82px;"
                   >
                     TQA
                   </div>
                   <div class="track-legend"
-                       style="height: 50px;"
+                       style="height: 35px;"
                   >
                     <svg width="100%"
                          height="100%"
@@ -752,7 +751,7 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                     >
                       <g class="svg-legend">
                         <g class="legend-row"
-                           transform="translate(0,25)"
+                           transform="translate(0,17.5)"
                            style="cursor: pointer;"
                         >
                           <title>
@@ -771,31 +770,31 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                           >
                           </circle>
                           <text class="legend-label"
-                                font-size="8.75px"
-                                transform="translate(0,8.75)"
+                                font-size="6.125px"
+                                transform="translate(0,6.125)"
                                 style="text-anchor: middle; fill: red;"
                           >
                             TQA
                           </text>
                           <text class="legend-unit"
-                                font-size="7.4375px"
-                                transform="translate(0,19.9375)"
+                                font-size="5.20625px"
+                                transform="translate(0,13.95625)"
                                 style="text-anchor: middle; fill: red;"
                           >
                             AMPS
                           </text>
                           <text class="legend-domain"
-                                font-size="7.4375px"
+                                font-size="5.20625px"
                                 x="2"
-                                y="19.9375"
+                                y="13.95625"
                                 style="text-anchor: start; fill: red;"
                           >
                             0
                           </text>
                           <text class="legend-domain"
-                                font-size="7.4375px"
+                                font-size="5.20625px"
                                 x="-2"
-                                y="19.9375"
+                                y="13.95625"
                                 style="text-anchor: end; fill: red;"
                           >
                             1200
@@ -817,12 +816,12 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                 >
                   <div class="track-title"
                        title="MFIA"
-                       style="height: 18px; font-size: 12.6px;"
+                       style="height: 12.6px; font-size: 8.82px;"
                   >
                     MFIA
                   </div>
                   <div class="track-legend"
-                       style="height: 50px;"
+                       style="height: 35px;"
                   >
                     <svg width="100%"
                          height="100%"
@@ -830,7 +829,7 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                     >
                       <g class="svg-legend">
                         <g class="legend-row"
-                           transform="translate(0,25)"
+                           transform="translate(0,17.5)"
                            style="cursor: pointer;"
                         >
                           <title>
@@ -849,31 +848,31 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                           >
                           </circle>
                           <text class="legend-label"
-                                font-size="8.75px"
-                                transform="translate(0,8.75)"
+                                font-size="6.125px"
+                                transform="translate(0,6.125)"
                                 style="text-anchor: middle; fill: blue;"
                           >
                             MFIA
                           </text>
                           <text class="legend-unit"
-                                font-size="7.4375px"
-                                transform="translate(0,19.9375)"
+                                font-size="5.20625px"
+                                transform="translate(0,13.95625)"
                                 style="text-anchor: middle; fill: blue;"
                           >
                             L/MN
                           </text>
                           <text class="legend-domain"
-                                font-size="7.4375px"
+                                font-size="5.20625px"
                                 x="2"
-                                y="19.9375"
+                                y="13.95625"
                                 style="text-anchor: start; fill: blue;"
                           >
                             800
                           </text>
                           <text class="legend-domain"
-                                font-size="7.4375px"
+                                font-size="5.20625px"
                                 x="-2"
-                                y="19.9375"
+                                y="13.95625"
                                 style="text-anchor: end; fill: blue;"
                           >
                             2600
@@ -895,12 +894,12 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                 >
                   <div class="track-title"
                        title="MDOA"
-                       style="height: 18px; font-size: 12.6px;"
+                       style="height: 12.6px; font-size: 8.82px;"
                   >
                     MDOA
                   </div>
                   <div class="track-legend"
-                       style="height: 50px;"
+                       style="height: 35px;"
                   >
                     <svg width="100%"
                          height="100%"
@@ -908,7 +907,7 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                     >
                       <g class="svg-legend">
                         <g class="legend-row"
-                           transform="translate(0,25)"
+                           transform="translate(0,17.5)"
                            style="cursor: pointer;"
                         >
                           <title>
@@ -917,13 +916,13 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                           <rect x="2"
                                 y="0"
                                 width="0"
-                                height="12.5"
+                                height="8.75"
                                 fill="blue"
                                 fill-opacity="0.5"
                           >
                           </rect>
                           <rect width="0"
-                                height="21"
+                                height="13.5"
                                 x="2"
                                 y="2"
                                 visibility="hidden"
@@ -931,9 +930,9 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                           </rect>
                           <line x1="2"
                                 x2="2"
-                                y1="12.5"
-                                y2="12.5"
-                                style="stroke-width: 2.5; stroke: blue; fill: blue;"
+                                y1="8.75"
+                                y2="8.75"
+                                style="stroke-width: 1.75; stroke: blue; fill: blue;"
                           >
                           </line>
                           <rect class="label-bg"
@@ -941,35 +940,35 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                                 x="-1"
                                 y="1"
                                 width="2"
-                                height="10.5"
+                                height="6.75"
                           >
                           </rect>
                           <text class="legend-label"
-                                font-size="8.75px"
-                                transform="translate(0,8.75)"
+                                font-size="6.125px"
+                                transform="translate(0,6.125)"
                                 style="text-anchor: middle; fill: blue;"
                           >
                             MDOA
                           </text>
                           <text class="legend-unit"
-                                font-size="7.4375px"
-                                transform="translate(0,19.9375)"
+                                font-size="5.20625px"
+                                transform="translate(0,13.95625)"
                                 style="text-anchor: middle; fill: blue;"
                           >
                             KG/L
                           </text>
                           <text class="legend-domain"
-                                font-size="7.4375px"
+                                font-size="5.20625px"
                                 x="2"
-                                y="19.9375"
+                                y="13.95625"
                                 style="text-anchor: start; fill: blue;"
                           >
                             1.42
                           </text>
                           <text class="legend-domain"
-                                font-size="7.4375px"
+                                font-size="5.20625px"
                                 x="-2"
-                                y="19.9375"
+                                y="13.95625"
                                 style="text-anchor: end; fill: blue;"
                           >
                             1.6
@@ -991,12 +990,12 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                 >
                   <div class="track-title"
                        title="MDIA"
-                       style="height: 18px; font-size: 12.6px;"
+                       style="height: 12.6px; font-size: 8.82px;"
                   >
                     MDIA
                   </div>
                   <div class="track-legend"
-                       style="height: 50px;"
+                       style="height: 35px;"
                   >
                     <svg width="100%"
                          height="100%"
@@ -1004,7 +1003,7 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                     >
                       <g class="svg-legend">
                         <g class="legend-row"
-                           transform="translate(0,25)"
+                           transform="translate(0,17.5)"
                            style="cursor: pointer;"
                         >
                           <title>
@@ -1013,13 +1012,13 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                           <rect x="2"
                                 y="0"
                                 width="0"
-                                height="12.5"
+                                height="8.75"
                                 fill="blue"
                                 fill-opacity="0.5"
                           >
                           </rect>
                           <rect width="0"
-                                height="21"
+                                height="13.5"
                                 x="2"
                                 y="2"
                                 visibility="hidden"
@@ -1027,9 +1026,9 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                           </rect>
                           <line x1="2"
                                 x2="2"
-                                y1="12.5"
-                                y2="12.5"
-                                style="stroke-width: 2.5; stroke: blue; fill: blue;"
+                                y1="8.75"
+                                y2="8.75"
+                                style="stroke-width: 1.75; stroke: blue; fill: blue;"
                           >
                           </line>
                           <rect class="label-bg"
@@ -1037,35 +1036,35 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                                 x="-1"
                                 y="1"
                                 width="2"
-                                height="10.5"
+                                height="6.75"
                           >
                           </rect>
                           <text class="legend-label"
-                                font-size="8.75px"
-                                transform="translate(0,8.75)"
+                                font-size="6.125px"
+                                transform="translate(0,6.125)"
                                 style="text-anchor: middle; fill: blue;"
                           >
                             MDIA
                           </text>
                           <text class="legend-unit"
-                                font-size="7.4375px"
-                                transform="translate(0,19.9375)"
+                                font-size="5.20625px"
+                                transform="translate(0,13.95625)"
                                 style="text-anchor: middle; fill: blue;"
                           >
                             KG/L
                           </text>
                           <text class="legend-domain"
-                                font-size="7.4375px"
+                                font-size="5.20625px"
                                 x="2"
-                                y="19.9375"
+                                y="13.95625"
                                 style="text-anchor: start; fill: blue;"
                           >
                             1.5
                           </text>
                           <text class="legend-domain"
-                                font-size="7.4375px"
+                                font-size="5.20625px"
                                 x="-2"
-                                y="19.9375"
+                                y="13.95625"
                                 style="text-anchor: end; fill: blue;"
                           >
                             1.6
@@ -1087,12 +1086,12 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                 >
                   <div class="track-title"
                        title="MTOA"
-                       style="height: 18px; font-size: 12.6px;"
+                       style="height: 12.6px; font-size: 8.82px;"
                   >
                     MTOA
                   </div>
                   <div class="track-legend"
-                       style="height: 50px;"
+                       style="height: 35px;"
                   >
                     <svg width="100%"
                          height="100%"
@@ -1100,14 +1099,14 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                     >
                       <g class="svg-legend">
                         <g class="legend-row"
-                           transform="translate(0,25)"
+                           transform="translate(0,17.5)"
                            style="cursor: pointer;"
                         >
                           <title>
                             Toggle plot on/off
                           </title>
                           <rect width="0"
-                                height="21"
+                                height="13.5"
                                 x="2"
                                 y="2"
                                 visibility="hidden"
@@ -1115,37 +1114,37 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                           </rect>
                           <line x1="2"
                                 x2="2"
-                                y1="12.5"
-                                y2="12.5"
-                                style="stroke-width: 2.5; stroke: orange; fill: orange;"
+                                y1="8.75"
+                                y2="8.75"
+                                style="stroke-width: 1.75; stroke: orange; fill: orange;"
                           >
                           </line>
                           <text class="legend-label"
-                                font-size="8.75px"
-                                transform="translate(0,8.75)"
+                                font-size="6.125px"
+                                transform="translate(0,6.125)"
                                 style="text-anchor: middle; fill: orange;"
                           >
                             MTOA
                           </text>
                           <text class="legend-unit"
-                                font-size="7.4375px"
-                                transform="translate(0,19.9375)"
+                                font-size="5.20625px"
+                                transform="translate(0,13.95625)"
                                 style="text-anchor: middle; fill: orange;"
                           >
                             DEGC
                           </text>
                           <text class="legend-domain"
-                                font-size="7.4375px"
+                                font-size="5.20625px"
                                 x="2"
-                                y="19.9375"
+                                y="13.95625"
                                 style="text-anchor: start; fill: orange;"
                           >
                             25
                           </text>
                           <text class="legend-domain"
-                                font-size="7.4375px"
+                                font-size="5.20625px"
                                 x="-2"
-                                y="19.9375"
+                                y="13.95625"
                                 style="text-anchor: end; fill: orange;"
                           >
                             80
@@ -1167,12 +1166,12 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                 >
                   <div class="track-title"
                        title="MTIA"
-                       style="height: 18px; font-size: 12.6px;"
+                       style="height: 12.6px; font-size: 8.82px;"
                   >
                     MTIA
                   </div>
                   <div class="track-legend"
-                       style="height: 50px;"
+                       style="height: 35px;"
                   >
                     <svg width="100%"
                          height="100%"
@@ -1180,14 +1179,14 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                     >
                       <g class="svg-legend">
                         <g class="legend-row"
-                           transform="translate(0,25)"
+                           transform="translate(0,17.5)"
                            style="cursor: pointer;"
                         >
                           <title>
                             Toggle plot on/off
                           </title>
                           <rect width="0"
-                                height="21"
+                                height="13.5"
                                 x="2"
                                 y="2"
                                 visibility="hidden"
@@ -1195,37 +1194,37 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                           </rect>
                           <line x1="2"
                                 x2="2"
-                                y1="12.5"
-                                y2="12.5"
-                                style="stroke-width: 2.5; stroke: green; fill: green;"
+                                y1="8.75"
+                                y2="8.75"
+                                style="stroke-width: 1.75; stroke: green; fill: green;"
                           >
                           </line>
                           <text class="legend-label"
-                                font-size="8.75px"
-                                transform="translate(0,8.75)"
+                                font-size="6.125px"
+                                transform="translate(0,6.125)"
                                 style="text-anchor: middle; fill: green;"
                           >
                             MTIA
                           </text>
                           <text class="legend-unit"
-                                font-size="7.4375px"
-                                transform="translate(0,19.9375)"
+                                font-size="5.20625px"
+                                transform="translate(0,13.95625)"
                                 style="text-anchor: middle; fill: green;"
                           >
                             DEGC
                           </text>
                           <text class="legend-domain"
-                                font-size="7.4375px"
+                                font-size="5.20625px"
                                 x="2"
-                                y="19.9375"
+                                y="13.95625"
                                 style="text-anchor: start; fill: green;"
                           >
                             30
                           </text>
                           <text class="legend-domain"
-                                font-size="7.4375px"
+                                font-size="5.20625px"
                                 x="-2"
-                                y="19.9375"
+                                y="13.95625"
                                 style="text-anchor: end; fill: green;"
                           >
                             58
@@ -1247,12 +1246,12 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                 >
                   <div class="track-title"
                        title="ECDT"
-                       style="height: 18px; font-size: 12.6px;"
+                       style="height: 12.6px; font-size: 8.82px;"
                   >
                     ECDT
                   </div>
                   <div class="track-legend"
-                       style="height: 50px;"
+                       style="height: 35px;"
                   >
                     <svg width="100%"
                          height="100%"
@@ -1260,14 +1259,14 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                     >
                       <g class="svg-legend">
                         <g class="legend-row"
-                           transform="translate(0,25)"
+                           transform="translate(0,17.5)"
                            style="cursor: pointer;"
                         >
                           <title>
                             Toggle plot on/off
                           </title>
                           <rect width="0"
-                                height="21"
+                                height="13.5"
                                 x="2"
                                 y="2"
                                 visibility="hidden"
@@ -1275,37 +1274,37 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                           </rect>
                           <line x1="2"
                                 x2="2"
-                                y1="12.5"
-                                y2="12.5"
-                                style="stroke-width: 2.5; stroke: red; fill: red;"
+                                y1="8.75"
+                                y2="8.75"
+                                style="stroke-width: 1.75; stroke: red; fill: red;"
                           >
                           </line>
                           <text class="legend-label"
-                                font-size="8.75px"
-                                transform="translate(0,8.75)"
+                                font-size="6.125px"
+                                transform="translate(0,6.125)"
                                 style="text-anchor: middle; fill: red;"
                           >
                             ECDT
                           </text>
                           <text class="legend-unit"
-                                font-size="7.4375px"
-                                transform="translate(0,19.9375)"
+                                font-size="5.20625px"
+                                transform="translate(0,13.95625)"
                                 style="text-anchor: middle; fill: red;"
                           >
                             KG/L
                           </text>
                           <text class="legend-domain"
-                                font-size="7.4375px"
+                                font-size="5.20625px"
                                 x="2"
-                                y="19.9375"
+                                y="13.95625"
                                 style="text-anchor: start; fill: red;"
                           >
                             1.5
                           </text>
                           <text class="legend-domain"
-                                font-size="7.4375px"
+                                font-size="5.20625px"
                                 x="-2"
-                                y="19.9375"
+                                y="13.95625"
                                 style="text-anchor: end; fill: red;"
                           >
                             1.7
@@ -1327,12 +1326,12 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                 >
                   <div class="track-title"
                        title="BDTI"
-                       style="height: 18px; font-size: 12.6px;"
+                       style="height: 12.6px; font-size: 8.82px;"
                   >
                     BDTI
                   </div>
                   <div class="track-legend"
-                       style="height: 50px;"
+                       style="height: 35px;"
                   >
                     <svg width="100%"
                          height="100%"
@@ -1340,14 +1339,14 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                     >
                       <g class="svg-legend">
                         <g class="legend-row"
-                           transform="translate(0,25)"
+                           transform="translate(0,17.5)"
                            style="cursor: pointer;"
                         >
                           <title>
                             Toggle plot on/off
                           </title>
                           <rect width="0"
-                                height="21"
+                                height="13.5"
                                 x="2"
                                 y="2"
                                 visibility="hidden"
@@ -1355,37 +1354,37 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                           </rect>
                           <line x1="2"
                                 x2="2"
-                                y1="12.5"
-                                y2="12.5"
-                                style="stroke-width: 2.5; stroke: magenta; fill: magenta;"
+                                y1="8.75"
+                                y2="8.75"
+                                style="stroke-width: 1.75; stroke: magenta; fill: magenta;"
                           >
                           </line>
                           <text class="legend-label"
-                                font-size="8.75px"
-                                transform="translate(0,8.75)"
+                                font-size="6.125px"
+                                transform="translate(0,6.125)"
                                 style="text-anchor: middle; fill: magenta;"
                           >
                             BDTI
                           </text>
                           <text class="legend-unit"
-                                font-size="7.4375px"
-                                transform="translate(0,19.9375)"
+                                font-size="5.20625px"
+                                transform="translate(0,13.95625)"
                                 style="text-anchor: middle; fill: magenta;"
                           >
                             H
                           </text>
                           <text class="legend-domain"
-                                font-size="7.4375px"
+                                font-size="5.20625px"
                                 x="2"
-                                y="19.9375"
+                                y="13.95625"
                                 style="text-anchor: start; fill: magenta;"
                           >
                             0
                           </text>
                           <text class="legend-domain"
-                                font-size="7.4375px"
+                                font-size="5.20625px"
                                 x="-2"
-                                y="19.9375"
+                                y="13.95625"
                                 style="text-anchor: end; fill: magenta;"
                           >
                             45
@@ -1407,12 +1406,12 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                 >
                   <div class="track-title"
                        title="BDDI"
-                       style="height: 18px; font-size: 12.6px;"
+                       style="height: 12.6px; font-size: 8.82px;"
                   >
                     BDDI
                   </div>
                   <div class="track-legend"
-                       style="height: 50px;"
+                       style="height: 35px;"
                   >
                     <svg width="100%"
                          height="100%"
@@ -1420,14 +1419,14 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                     >
                       <g class="svg-legend">
                         <g class="legend-row"
-                           transform="translate(0,25)"
+                           transform="translate(0,17.5)"
                            style="cursor: pointer;"
                         >
                           <title>
                             Toggle plot on/off
                           </title>
                           <rect width="0"
-                                height="21"
+                                height="13.5"
                                 x="2"
                                 y="2"
                                 visibility="hidden"
@@ -1435,37 +1434,37 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                           </rect>
                           <line x1="2"
                                 x2="2"
-                                y1="12.5"
-                                y2="12.5"
-                                style="stroke-width: 2.5; stroke: gray; fill: gray;"
+                                y1="8.75"
+                                y2="8.75"
+                                style="stroke-width: 1.75; stroke: gray; fill: gray;"
                           >
                           </line>
                           <text class="legend-label"
-                                font-size="8.75px"
-                                transform="translate(0,8.75)"
+                                font-size="6.125px"
+                                transform="translate(0,6.125)"
                                 style="text-anchor: middle; fill: gray;"
                           >
                             BDDI
                           </text>
                           <text class="legend-unit"
-                                font-size="7.4375px"
-                                transform="translate(0,19.9375)"
+                                font-size="5.20625px"
+                                transform="translate(0,13.95625)"
                                 style="text-anchor: middle; fill: gray;"
                           >
                             M
                           </text>
                           <text class="legend-domain"
-                                font-size="7.4375px"
+                                font-size="5.20625px"
                                 x="2"
-                                y="19.9375"
+                                y="13.95625"
                                 style="text-anchor: start; fill: gray;"
                           >
                             0
                           </text>
                           <text class="legend-domain"
-                                font-size="7.4375px"
+                                font-size="5.20625px"
                                 x="-2"
-                                y="19.9375"
+                                y="13.95625"
                                 style="text-anchor: end; fill: gray;"
                           >
                             600
@@ -1487,12 +1486,12 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                 >
                   <div class="track-title"
                        title="BRVC"
-                       style="height: 18px; font-size: 12.6px;"
+                       style="height: 12.6px; font-size: 8.82px;"
                   >
                     BRVC
                   </div>
                   <div class="track-legend"
-                       style="height: 50px;"
+                       style="height: 35px;"
                   >
                     <svg width="100%"
                          height="100%"
@@ -1500,14 +1499,14 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                     >
                       <g class="svg-legend">
                         <g class="legend-row"
-                           transform="translate(0,25)"
+                           transform="translate(0,17.5)"
                            style="cursor: pointer;"
                         >
                           <title>
                             Toggle plot on/off
                           </title>
                           <rect width="0"
-                                height="21"
+                                height="13.5"
                                 x="2"
                                 y="2"
                                 visibility="hidden"
@@ -1515,37 +1514,37 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                           </rect>
                           <line x1="2"
                                 x2="2"
-                                y1="12.5"
-                                y2="12.5"
-                                style="stroke-width: 2.5; stroke: brown; fill: brown;"
+                                y1="8.75"
+                                y2="8.75"
+                                style="stroke-width: 1.75; stroke: brown; fill: brown;"
                           >
                           </line>
                           <text class="legend-label"
-                                font-size="8.75px"
-                                transform="translate(0,8.75)"
+                                font-size="6.125px"
+                                transform="translate(0,6.125)"
                                 style="text-anchor: middle; fill: brown;"
                           >
                             BRVC
                           </text>
                           <text class="legend-unit"
-                                font-size="7.4375px"
-                                transform="translate(0,19.9375)"
+                                font-size="5.20625px"
+                                transform="translate(0,13.95625)"
                                 style="text-anchor: middle; fill: brown;"
                           >
                             KREV
                           </text>
                           <text class="legend-domain"
-                                font-size="7.4375px"
+                                font-size="5.20625px"
                                 x="2"
-                                y="19.9375"
+                                y="13.95625"
                                 style="text-anchor: start; fill: brown;"
                           >
                             0
                           </text>
                           <text class="legend-domain"
-                                font-size="7.4375px"
+                                font-size="5.20625px"
                                 x="-2"
-                                y="19.9375"
+                                y="13.95625"
                                 style="text-anchor: end; fill: brown;"
                           >
                             600
@@ -1567,12 +1566,12 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                 >
                   <div class="track-title"
                        title="TCTI"
-                       style="height: 18px; font-size: 12.6px;"
+                       style="height: 12.6px; font-size: 8.82px;"
                   >
                     TCTI
                   </div>
                   <div class="track-legend"
-                       style="height: 50px;"
+                       style="height: 35px;"
                   >
                     <svg width="100%"
                          height="100%"
@@ -1580,14 +1579,14 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                     >
                       <g class="svg-legend">
                         <g class="legend-row"
-                           transform="translate(0,25)"
+                           transform="translate(0,17.5)"
                            style="cursor: pointer;"
                         >
                           <title>
                             Toggle plot on/off
                           </title>
                           <rect width="0"
-                                height="21"
+                                height="13.5"
                                 x="2"
                                 y="2"
                                 visibility="hidden"
@@ -1595,37 +1594,37 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 2`]
                           </rect>
                           <line x1="2"
                                 x2="2"
-                                y1="12.5"
-                                y2="12.5"
-                                style="stroke-width: 2.5; stroke: red; fill: red;"
+                                y1="8.75"
+                                y2="8.75"
+                                style="stroke-width: 1.75; stroke: red; fill: red;"
                           >
                           </line>
                           <text class="legend-label"
-                                font-size="8.75px"
-                                transform="translate(0,8.75)"
+                                font-size="6.125px"
+                                transform="translate(0,6.125)"
                                 style="text-anchor: middle; fill: red;"
                           >
                             TCTI
                           </text>
                           <text class="legend-unit"
-                                font-size="7.4375px"
-                                transform="translate(0,19.9375)"
+                                font-size="5.20625px"
+                                transform="translate(0,13.95625)"
                                 style="text-anchor: middle; fill: red;"
                           >
                             H
                           </text>
                           <text class="legend-domain"
-                                font-size="7.4375px"
+                                font-size="5.20625px"
                                 x="2"
-                                y="19.9375"
+                                y="13.95625"
                                 style="text-anchor: start; fill: red;"
                           >
                             0
                           </text>
                           <text class="legend-domain"
-                                font-size="7.4375px"
+                                font-size="5.20625px"
                                 x="-2"
-                                y="19.9375"
+                                y="13.95625"
                                 style="text-anchor: end; fill: red;"
                           >
                             60

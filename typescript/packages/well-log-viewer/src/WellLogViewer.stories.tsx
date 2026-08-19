@@ -77,7 +77,7 @@ const ComponentCode =
 const stories: Meta<WellLogViewerProps> = {
     component: WellLogViewer,
     title: "WellLogViewer/Demo/WellLogViewer",
-    tags: ["no-dom-test"],
+    tags: ["no-screenshot-test"],
     argTypes: argTypesWellLogViewerProp,
     parameters: {
         docs: {
