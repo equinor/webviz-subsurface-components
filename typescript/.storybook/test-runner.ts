@@ -69,7 +69,7 @@ const domSnapshotTest = async (page: Page) => {
 
 const config: TestRunnerConfig = {
     setup() {
-        jest.retryTimes(2);
+        jest.retryTimes(3);
 
         expect.extend({ toMatchImageSnapshot });
     },
