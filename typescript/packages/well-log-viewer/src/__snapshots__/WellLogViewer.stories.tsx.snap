@@ -884,7 +884,7 @@ exports[`WellLogViewer/Demo/WellLogViewer ColorByFunction smoke-test 1`] = `
                                   Toggle plot on/off
                                 </title>
                                 <defs>
-                                  <linearGradient id="grad52"
+                                  <linearGradient id="grad54"
                                                   x1="0%"
                                                   x2="100%"
                                                   y1="0%"
@@ -997,7 +997,7 @@ exports[`WellLogViewer/Demo/WellLogViewer ColorByFunction smoke-test 1`] = `
                                   </linearGradient>
                                 </defs>
                                 <defs>
-                                  <linearGradient id="grad53"
+                                  <linearGradient id="grad55"
                                                   x1="0%"
                                                   x2="100%"
                                                   y1="0%"
@@ -1113,7 +1113,7 @@ exports[`WellLogViewer/Demo/WellLogViewer ColorByFunction smoke-test 1`] = `
                                       y="0"
                                       width="444.5"
                                       height="12.5"
-                                      fill="url(#grad52)"
+                                      fill="url(#grad54)"
                                       fill-opacity="0.5"
                                 >
                                 </rect>
@@ -1121,7 +1121,7 @@ exports[`WellLogViewer/Demo/WellLogViewer ColorByFunction smoke-test 1`] = `
                                       y="0"
                                       width="444.5"
                                       height="12.5"
-                                      fill="url(#grad53)"
+                                      fill="url(#grad55)"
                                       fill-opacity="0.5"
                                 >
                                 </rect>
@@ -7867,8 +7867,9 @@ exports[`WellLogViewer/Demo/WellLogViewer Empty smoke-test 1`] = `
                            style="width: 993px; left: 0px; top: 69px; overflow: hidden; height: 578px;"
                       >
                         <div class="depth"
-                             style="position: absolute; pointer-events: none; visibility: hidden;"
+                             style="position: absolute; pointer-events: none; visibility: visible;"
                         >
+                          Zoom: x1.0
                         </div>
                         <div class="rubber-band"
                              style="position: relative; pointer-events: none; height: 9px; width: 100%; visibility: hidden;"
@@ -7956,6 +7957,106 @@ exports[`WellLogViewer/Demo/WellLogViewer Empty smoke-test 1`] = `
                               </text>
                             </g>
                             <g class="major-tick"
+                               transform="translate(0,57.800000000000004)"
+                            >
+                              <line x1="0"
+                                    x2="50"
+                                    class="major-tick-line"
+                              >
+                              </line>
+                              <rect x="10"
+                                    y="-6"
+                                    class="label-bg"
+                                    width="30"
+                                    height="12"
+                              >
+                              </rect>
+                              <text class="label"
+                                    font-size="12px"
+                                    stroke-width="0.5"
+                                    font-family="Verdana Tahoma Arial"
+                                    transform="translate(25,4)"
+                                    style="text-anchor: middle;"
+                              >
+                                10
+                              </text>
+                            </g>
+                            <g class="major-tick"
+                               transform="translate(0,115.60000000000001)"
+                            >
+                              <line x1="0"
+                                    x2="50"
+                                    class="major-tick-line"
+                              >
+                              </line>
+                              <rect x="10"
+                                    y="-6"
+                                    class="label-bg"
+                                    width="30"
+                                    height="12"
+                              >
+                              </rect>
+                              <text class="label"
+                                    font-size="12px"
+                                    stroke-width="0.5"
+                                    font-family="Verdana Tahoma Arial"
+                                    transform="translate(25,4)"
+                                    style="text-anchor: middle;"
+                              >
+                                20
+                              </text>
+                            </g>
+                            <g class="major-tick"
+                               transform="translate(0,173.4)"
+                            >
+                              <line x1="0"
+                                    x2="50"
+                                    class="major-tick-line"
+                              >
+                              </line>
+                              <rect x="10"
+                                    y="-6"
+                                    class="label-bg"
+                                    width="30"
+                                    height="12"
+                              >
+                              </rect>
+                              <text class="label"
+                                    font-size="12px"
+                                    stroke-width="0.5"
+                                    font-family="Verdana Tahoma Arial"
+                                    transform="translate(25,4)"
+                                    style="text-anchor: middle;"
+                              >
+                                30
+                              </text>
+                            </g>
+                            <g class="major-tick"
+                               transform="translate(0,231.20000000000002)"
+                            >
+                              <line x1="0"
+                                    x2="50"
+                                    class="major-tick-line"
+                              >
+                              </line>
+                              <rect x="10"
+                                    y="-6"
+                                    class="label-bg"
+                                    width="30"
+                                    height="12"
+                              >
+                              </rect>
+                              <text class="label"
+                                    font-size="12px"
+                                    stroke-width="0.5"
+                                    font-family="Verdana Tahoma Arial"
+                                    transform="translate(25,4)"
+                                    style="text-anchor: middle;"
+                              >
+                                40
+                              </text>
+                            </g>
+                            <g class="major-tick"
                                transform="translate(0,289)"
                             >
                               <line x1="0"
@@ -7978,6 +8079,106 @@ exports[`WellLogViewer/Demo/WellLogViewer Empty smoke-test 1`] = `
                                     style="text-anchor: middle;"
                               >
                                 50
+                              </text>
+                            </g>
+                            <g class="major-tick"
+                               transform="translate(0,346.8)"
+                            >
+                              <line x1="0"
+                                    x2="50"
+                                    class="major-tick-line"
+                              >
+                              </line>
+                              <rect x="10"
+                                    y="-6"
+                                    class="label-bg"
+                                    width="30"
+                                    height="12"
+                              >
+                              </rect>
+                              <text class="label"
+                                    font-size="12px"
+                                    stroke-width="0.5"
+                                    font-family="Verdana Tahoma Arial"
+                                    transform="translate(25,4)"
+                                    style="text-anchor: middle;"
+                              >
+                                60
+                              </text>
+                            </g>
+                            <g class="major-tick"
+                               transform="translate(0,404.59999999999997)"
+                            >
+                              <line x1="0"
+                                    x2="50"
+                                    class="major-tick-line"
+                              >
+                              </line>
+                              <rect x="10"
+                                    y="-6"
+                                    class="label-bg"
+                                    width="30"
+                                    height="12"
+                              >
+                              </rect>
+                              <text class="label"
+                                    font-size="12px"
+                                    stroke-width="0.5"
+                                    font-family="Verdana Tahoma Arial"
+                                    transform="translate(25,4)"
+                                    style="text-anchor: middle;"
+                              >
+                                70
+                              </text>
+                            </g>
+                            <g class="major-tick"
+                               transform="translate(0,462.40000000000003)"
+                            >
+                              <line x1="0"
+                                    x2="50"
+                                    class="major-tick-line"
+                              >
+                              </line>
+                              <rect x="10"
+                                    y="-6"
+                                    class="label-bg"
+                                    width="30"
+                                    height="12"
+                              >
+                              </rect>
+                              <text class="label"
+                                    font-size="12px"
+                                    stroke-width="0.5"
+                                    font-family="Verdana Tahoma Arial"
+                                    transform="translate(25,4)"
+                                    style="text-anchor: middle;"
+                              >
+                                80
+                              </text>
+                            </g>
+                            <g class="major-tick"
+                               transform="translate(0,520.2)"
+                            >
+                              <line x1="0"
+                                    x2="50"
+                                    class="major-tick-line"
+                              >
+                              </line>
+                              <rect x="10"
+                                    y="-6"
+                                    class="label-bg"
+                                    width="30"
+                                    height="12"
+                              >
+                              </rect>
+                              <text class="label"
+                                    font-size="12px"
+                                    stroke-width="0.5"
+                                    font-family="Verdana Tahoma Arial"
+                                    transform="translate(25,4)"
+                                    style="text-anchor: middle;"
+                              >
+                                90
                               </text>
                             </g>
                             <g class="major-tick"
@@ -9678,7 +9879,7 @@ exports[`WellLogViewer/Demo/WellLogViewer LogWithDifferentSets smoke-test 1`] = 
                   <div class="view">
                     <div class="container log-controller">
                       <div class="overlay"
-                           style="width: 56.3906px; left: 0px; top: 48.6px; overflow: hidden;"
+                           style="width: 993px; left: 0px; top: 69px; overflow: hidden; height: 578px;"
                       >
                         <div class="depth"
                              style="position: absolute; pointer-events: none; visibility: visible;"
@@ -9703,12 +9904,12 @@ exports[`WellLogViewer/Demo/WellLogViewer LogWithDifferentSets smoke-test 1`] = 
                       >
                         <div class="track-title"
                              title="MD"
-                             style="height: 12.6px; font-size: 8.82px;"
+                             style="height: 18px; font-size: 12.6px;"
                         >
                           MD
                         </div>
                         <div class="track-legend"
-                             style="height: 35px;"
+                             style="height: 50px;"
                         >
                           <svg width="100%"
                                height="100%"
@@ -9718,22 +9919,22 @@ exports[`WellLogViewer/Demo/WellLogViewer LogWithDifferentSets smoke-test 1`] = 
                               <text class="scale-title"
                                     font-weight="600"
                                     style="text-anchor: middle;"
-                                    transform="translate(25,9.949494949494945)"
-                                    font-size="10.606060606060607px"
+                                    transform="translate(25,15.799999999999997)"
+                                    font-size="12px"
                                     fill="#555"
                               >
                                 MD
                               </text>
                               <text class="scale-range"
-                                    transform="translate(25,21.616161616161612)"
-                                    font-size="10.606060606060607px"
+                                    transform="translate(25,28.999999999999996)"
+                                    font-size="12px"
                                     style="text-anchor: middle;"
                               >
                                 425
                               </text>
                               <text class="scale-units"
-                                    transform="translate(25,31.16161616161616)"
-                                    font-size="8.83838383838384px"
+                                    transform="translate(25,39.8)"
+                                    font-size="10px"
                                     style="text-anchor: middle;"
                               >
                                 m
@@ -9743,10 +9944,60 @@ exports[`WellLogViewer/Demo/WellLogViewer LogWithDifferentSets smoke-test 1`] = 
                         </div>
                         <div class="track-container">
                           <svg class="scale-track master-scale"
-                               style="position: absolute; height: 0px; width: 50px;"
+                               style="position: absolute; height: 576px; width: 50px;"
                           >
                             <g class="major-tick"
-                               transform="translate(0,23.52941176470588)"
+                               transform="translate(0,0)"
+                            >
+                              <line x1="0"
+                                    x2="50"
+                                    class="major-tick-line"
+                              >
+                              </line>
+                              <rect x="10"
+                                    y="-6"
+                                    class="label-bg"
+                                    width="30"
+                                    height="12"
+                              >
+                              </rect>
+                              <text class="label"
+                                    font-size="12px"
+                                    stroke-width="0.5"
+                                    font-family="Verdana Tahoma Arial"
+                                    transform="translate(25,4)"
+                                    style="text-anchor: middle;"
+                              >
+                                3700
+                              </text>
+                            </g>
+                            <g class="major-tick"
+                               transform="translate(0,68)"
+                            >
+                              <line x1="0"
+                                    x2="50"
+                                    class="major-tick-line"
+                              >
+                              </line>
+                              <rect x="10"
+                                    y="-6"
+                                    class="label-bg"
+                                    width="30"
+                                    height="12"
+                              >
+                              </rect>
+                              <text class="label"
+                                    font-size="12px"
+                                    stroke-width="0.5"
+                                    font-family="Verdana Tahoma Arial"
+                                    transform="translate(25,4)"
+                                    style="text-anchor: middle;"
+                              >
+                                3750
+                              </text>
+                            </g>
+                            <g class="major-tick"
+                               transform="translate(0,136)"
                             >
                               <line x1="0"
                                     x2="50"
@@ -9771,7 +10022,82 @@ exports[`WellLogViewer/Demo/WellLogViewer LogWithDifferentSets smoke-test 1`] = 
                               </text>
                             </g>
                             <g class="major-tick"
-                               transform="translate(0,70.58823529411765)"
+                               transform="translate(0,204)"
+                            >
+                              <line x1="0"
+                                    x2="50"
+                                    class="major-tick-line"
+                              >
+                              </line>
+                              <rect x="10"
+                                    y="-6"
+                                    class="label-bg"
+                                    width="30"
+                                    height="12"
+                              >
+                              </rect>
+                              <text class="label"
+                                    font-size="12px"
+                                    stroke-width="0.5"
+                                    font-family="Verdana Tahoma Arial"
+                                    transform="translate(25,4)"
+                                    style="text-anchor: middle;"
+                              >
+                                3850
+                              </text>
+                            </g>
+                            <g class="major-tick"
+                               transform="translate(0,272)"
+                            >
+                              <line x1="0"
+                                    x2="50"
+                                    class="major-tick-line"
+                              >
+                              </line>
+                              <rect x="10"
+                                    y="-6"
+                                    class="label-bg"
+                                    width="30"
+                                    height="12"
+                              >
+                              </rect>
+                              <text class="label"
+                                    font-size="12px"
+                                    stroke-width="0.5"
+                                    font-family="Verdana Tahoma Arial"
+                                    transform="translate(25,4)"
+                                    style="text-anchor: middle;"
+                              >
+                                3900
+                              </text>
+                            </g>
+                            <g class="major-tick"
+                               transform="translate(0,340)"
+                            >
+                              <line x1="0"
+                                    x2="50"
+                                    class="major-tick-line"
+                              >
+                              </line>
+                              <rect x="10"
+                                    y="-6"
+                                    class="label-bg"
+                                    width="30"
+                                    height="12"
+                              >
+                              </rect>
+                              <text class="label"
+                                    font-size="12px"
+                                    stroke-width="0.5"
+                                    font-family="Verdana Tahoma Arial"
+                                    transform="translate(25,4)"
+                                    style="text-anchor: middle;"
+                              >
+                                3950
+                              </text>
+                            </g>
+                            <g class="major-tick"
+                               transform="translate(0,408)"
                             >
                               <line x1="0"
                                     x2="50"
@@ -9795,6 +10121,56 @@ exports[`WellLogViewer/Demo/WellLogViewer LogWithDifferentSets smoke-test 1`] = 
                                 4000
                               </text>
                             </g>
+                            <g class="major-tick"
+                               transform="translate(0,476)"
+                            >
+                              <line x1="0"
+                                    x2="50"
+                                    class="major-tick-line"
+                              >
+                              </line>
+                              <rect x="10"
+                                    y="-6"
+                                    class="label-bg"
+                                    width="30"
+                                    height="12"
+                              >
+                              </rect>
+                              <text class="label"
+                                    font-size="12px"
+                                    stroke-width="0.5"
+                                    font-family="Verdana Tahoma Arial"
+                                    transform="translate(25,4)"
+                                    style="text-anchor: middle;"
+                              >
+                                4050
+                              </text>
+                            </g>
+                            <g class="major-tick"
+                               transform="translate(0,544)"
+                            >
+                              <line x1="0"
+                                    x2="50"
+                                    class="major-tick-line"
+                              >
+                              </line>
+                              <rect x="10"
+                                    y="-6"
+                                    class="label-bg"
+                                    width="30"
+                                    height="12"
+                              >
+                              </rect>
+                              <text class="label"
+                                    font-size="12px"
+                                    stroke-width="0.5"
+                                    font-family="Verdana Tahoma Arial"
+                                    transform="translate(25,4)"
+                                    style="text-anchor: middle;"
+                              >
+                                4100
+                              </text>
+                            </g>
                           </svg>
                         </div>
                       </div>
@@ -9803,12 +10179,12 @@ exports[`WellLogViewer/Demo/WellLogViewer LogWithDifferentSets smoke-test 1`] = 
                       >
                         <div class="track-title"
                              title="Discrete, from set 1"
-                             style="height: 12.6px; font-size: 8.82px;"
+                             style="height: 18px; font-size: 12.6px;"
                         >
                           Discrete, from set 1
                         </div>
                         <div class="track-legend"
-                             style="height: 35px;"
+                             style="height: 50px;"
                         >
                           <svg width="100%"
                                height="100%"
@@ -9816,8 +10192,8 @@ exports[`WellLogViewer/Demo/WellLogViewer LogWithDifferentSets smoke-test 1`] = 
                           >
                             <g class="legend">
                               <text class="scale-title"
-                                    transform="translate(150,21.616161616161612)"
-                                    font-size="10.606060606060607px"
+                                    transform="translate(156.6640625,28.999999999999996)"
+                                    font-size="12px"
                                     fill="#555"
                                     style="text-anchor: middle;"
                               >
@@ -9827,49 +10203,49 @@ exports[`WellLogViewer/Demo/WellLogViewer LogWithDifferentSets smoke-test 1`] = 
                           </svg>
                         </div>
                         <div class="track-container">
-                          <svg style="position: absolute; height: 0px; width: 300px;">
+                          <svg style="position: absolute; height: 576px; width: 313.328px;">
                             <g class="area"
-                               transform="translate(0, 23.52941176470588)"
+                               transform="translate(0, 136)"
                             >
                               <rect x="0"
                                     y="0"
-                                    width="300"
-                                    height="16.47058823529412"
+                                    width="313"
+                                    height="95.20000000000002"
                                     fill="rgb(244,237,255)"
                                     fill-opacity="1"
                               >
                               </rect>
-                              <line x1="75"
+                              <line x1="78.25"
                                     y1="0"
-                                    x2="225"
+                                    x2="234.75"
                                     y2="0"
                                     class="line-top"
                                     stroke="black"
                               >
                               </line>
-                              <line x1="75"
-                                    y1="16.47058823529412"
-                                    x2="225"
-                                    y2="16.47058823529412"
+                              <line x1="78.25"
+                                    y1="95.20000000000002"
+                                    x2="234.75"
+                                    y2="95.20000000000002"
                                     class="line-bottom"
                                     stroke="black"
                               >
                               </line>
-                              <line x1="150"
+                              <line x1="156.5"
                                     y1="0"
-                                    x2="150"
-                                    y2="16.47058823529412"
+                                    x2="156.5"
+                                    y2="95.20000000000002"
                                     class="line-middle"
                                     stroke="black"
                               >
                               </line>
                               <g class="label"
-                                 transform="translate(150,8.23529411764706)rotate(90)"
+                                 transform="translate(156.5,47.60000000000001)rotate(90)"
                               >
-                                <rect x="-5.453125"
-                                      y="-5.890625"
-                                      width="11.44921875"
-                                      height="11"
+                                <rect x="-6.296875"
+                                      y="-7.484375"
+                                      width="12.59375"
+                                      height="13"
                                       fill="rgb(244,237,255)"
                                 >
                                 </rect>
@@ -9877,7 +10253,7 @@ exports[`WellLogViewer/Demo/WellLogViewer LogWithDifferentSets smoke-test 1`] = 
                                       fill="black"
                                       stroke="black"
                                       text-anchor="middle"
-                                      font-size="8px"
+                                      font-size="9.520000000000001px"
                                       style="dominant-baseline: middle; text-anchor: middle; text-rendering: optimizespeed; stroke-width: 0.5;"
                                 >
                                   no
@@ -9885,47 +10261,47 @@ exports[`WellLogViewer/Demo/WellLogViewer LogWithDifferentSets smoke-test 1`] = 
                               </g>
                             </g>
                             <g class="area"
-                               transform="translate(0, 40)"
+                               transform="translate(0, 231.20000000000002)"
                             >
                               <rect x="0"
                                     y="0"
-                                    width="300"
-                                    height="30.588235294117652"
+                                    width="313"
+                                    height="176.79999999999998"
                                     fill="rgb(255,171,178)"
                                     fill-opacity="1"
                               >
                               </rect>
-                              <line x1="75"
+                              <line x1="78.25"
                                     y1="0"
-                                    x2="225"
+                                    x2="234.75"
                                     y2="0"
                                     class="line-top"
                                     stroke="black"
                               >
                               </line>
-                              <line x1="75"
-                                    y1="30.588235294117652"
-                                    x2="225"
-                                    y2="30.588235294117652"
+                              <line x1="78.25"
+                                    y1="176.79999999999998"
+                                    x2="234.75"
+                                    y2="176.79999999999998"
                                     class="line-bottom"
                                     stroke="black"
                               >
                               </line>
-                              <line x1="150"
+                              <line x1="156.5"
                                     y1="0"
-                                    x2="150"
-                                    y2="30.588235294117652"
+                                    x2="156.5"
+                                    y2="176.79999999999998"
                                     class="line-middle"
                                     stroke="black"
                               >
                               </line>
                               <g class="label"
-                                 transform="translate(150,15.294117647058826)rotate(90)"
+                                 transform="translate(156.5,88.39999999999999)rotate(90)"
                               >
-                                <rect x="-7.2265625"
-                                      y="-5.890625"
-                                      width="14.453125"
-                                      height="11"
+                                <rect x="-14.7578125"
+                                      y="-12.328125"
+                                      width="29.664199829101562"
+                                      height="22"
                                       fill="rgb(255,171,178)"
                                 >
                                 </rect>
@@ -9933,7 +10309,7 @@ exports[`WellLogViewer/Demo/WellLogViewer LogWithDifferentSets smoke-test 1`] = 
                                       fill="black"
                                       stroke="black"
                                       text-anchor="middle"
-                                      font-size="8px"
+                                      font-size="17.68px"
                                       style="dominant-baseline: middle; text-anchor: middle; text-rendering: optimizespeed; stroke-width: 0.5;"
                                 >
                                   yes
@@ -9948,12 +10324,12 @@ exports[`WellLogViewer/Demo/WellLogViewer LogWithDifferentSets smoke-test 1`] = 
                       >
                         <div class="track-title"
                              title="Continuous, from both sets"
-                             style="height: 12.6px; font-size: 8.82px;"
+                             style="height: 18px; font-size: 12.6px;"
                         >
                           Continuous, from both sets
                         </div>
                         <div class="track-legend"
-                             style="height: 35px;"
+                             style="height: 50px;"
                         >
                           <svg width="100%"
                                height="100%"
@@ -9967,119 +10343,119 @@ exports[`WellLogViewer/Demo/WellLogViewer LogWithDifferentSets smoke-test 1`] = 
                                 <title>
                                   Toggle plot on/off
                                 </title>
-                                <rect width="296"
-                                      height="13.5"
+                                <rect width="309.34375"
+                                      height="21"
                                       x="2"
                                       y="2"
                                       visibility="hidden"
                                 >
                                 </rect>
                                 <line x1="2"
-                                      x2="298"
-                                      y1="8.75"
-                                      y2="8.75"
-                                      style="stroke-width: 1.75; stroke: red; fill: red;"
+                                      x2="311.34375"
+                                      y1="12.5"
+                                      y2="12.5"
+                                      style="stroke-width: 2.5; stroke: red; fill: red;"
                                 >
                                 </line>
                                 <text class="legend-label"
-                                      font-size="6.125px"
-                                      transform="translate(150,6.125)"
+                                      font-size="8.75px"
+                                      transform="translate(156.671875,8.75)"
                                       style="text-anchor: middle; fill: red;"
                                 >
                                   PORO
                                 </text>
                                 <rect x="0"
-                                      y="3.2437496185302734"
-                                      width="11.736648559570312"
-                                      height="11"
+                                      y="5.0625"
+                                      width="14.703125"
+                                      height="15"
                                       style="fill: white;"
                                 >
                                 </rect>
-                                <rect x="288.515625"
-                                      y="3.2437496185302734"
-                                      width="11.73663330078125"
-                                      height="11"
+                                <rect x="298.640625"
+                                      y="5.0625"
+                                      width="14.703125"
+                                      height="15"
                                       style="fill: white;"
                                 >
                                 </rect>
                                 <text class="legend-domain"
-                                      font-size="6.737500000000001px"
+                                      font-size="9.625px"
                                       x="2"
-                                      y="11.24375"
+                                      y="16.0625"
                                       style="text-anchor: start; fill: red;"
                                 >
                                   10
                                 </text>
                                 <text class="legend-domain"
-                                      font-size="6.737500000000001px"
-                                      x="298"
-                                      y="11.24375"
+                                      font-size="9.625px"
+                                      x="311.34375"
+                                      y="16.0625"
                                       style="text-anchor: end; fill: red;"
                                 >
                                   90
                                 </text>
                               </g>
                               <g class="legend-row"
-                                 transform="translate(0,17.5)"
+                                 transform="translate(0,25)"
                                  style="cursor: pointer;"
                               >
                                 <title>
                                   Toggle plot on/off
                                 </title>
-                                <rect width="296"
-                                      height="13.5"
+                                <rect width="309.34375"
+                                      height="21"
                                       x="2"
                                       y="2"
                                       visibility="hidden"
                                 >
                                 </rect>
                                 <line x1="2"
-                                      x2="298"
-                                      y1="8.75"
-                                      y2="8.75"
-                                      style="stroke-width: 1.75; stroke: blue; fill: blue;"
+                                      x2="311.34375"
+                                      y1="12.5"
+                                      y2="12.5"
+                                      style="stroke-width: 2.5; stroke: blue; fill: blue;"
                                 >
                                 </line>
                                 <text class="legend-label"
-                                      font-size="6.125px"
-                                      transform="translate(150,6.125)"
+                                      font-size="8.75px"
+                                      transform="translate(156.671875,8.75)"
                                       style="text-anchor: middle; fill: blue;"
                                 >
                                   BAD_CONT
                                 </text>
                                 <text class="legend-unit"
-                                      font-size="5.20625px"
-                                      transform="translate(150,13.95625)"
+                                      font-size="7.4375px"
+                                      transform="translate(156.671875,19.9375)"
                                       style="text-anchor: middle; fill: blue;"
                                 >
                                   m
                                 </text>
                                 <rect x="0"
-                                      y="3.2437496185302734"
-                                      width="13.60333251953125"
-                                      height="11"
+                                      y="5.0625"
+                                      width="18.014083862304688"
+                                      height="15"
                                       style="fill: white;"
                                 >
                                 </rect>
-                                <rect x="286.65625"
-                                      y="3.2437496185302734"
-                                      width="13.60333251953125"
-                                      height="11"
+                                <rect x="295.984375"
+                                      y="5.0625"
+                                      width="18.01409912109375"
+                                      height="15"
                                       style="fill: white;"
                                 >
                                 </rect>
                                 <text class="legend-domain"
-                                      font-size="6.737500000000001px"
+                                      font-size="9.625px"
                                       x="2"
-                                      y="11.24375"
+                                      y="16.0625"
                                       style="text-anchor: start; fill: blue;"
                                 >
                                   0.4
                                 </text>
                                 <text class="legend-domain"
-                                      font-size="6.737500000000001px"
-                                      x="298"
-                                      y="11.24375"
+                                      font-size="9.625px"
+                                      x="311.34375"
+                                      y="16.0625"
                                       style="text-anchor: end; fill: blue;"
                                 >
                                   2.4
@@ -10089,9 +10465,9 @@ exports[`WellLogViewer/Demo/WellLogViewer LogWithDifferentSets smoke-test 1`] = 
                           </svg>
                         </div>
                         <div class="track-container">
-                          <canvas width="300"
-                                  height="0"
-                                  style="position: absolute; width: 300px; height: 0px;"
+                          <canvas width="313.34375"
+                                  height="576"
+                                  style="position: absolute; width: 313.344px; height: 576px;"
                           >
                           </canvas>
                         </div>
@@ -10101,12 +10477,12 @@ exports[`WellLogViewer/Demo/WellLogViewer LogWithDifferentSets smoke-test 1`] = 
                       >
                         <div class="track-title"
                              title="Continuous, from set 2"
-                             style="height: 12.6px; font-size: 8.82px;"
+                             style="height: 18px; font-size: 12.6px;"
                         >
                           Continuous, from set 2
                         </div>
                         <div class="track-legend"
-                             style="height: 35px;"
+                             style="height: 50px;"
                         >
                           <svg width="100%"
                                height="100%"
@@ -10114,59 +10490,59 @@ exports[`WellLogViewer/Demo/WellLogViewer LogWithDifferentSets smoke-test 1`] = 
                           >
                             <g class="svg-legend">
                               <g class="legend-row"
-                                 transform="translate(0,17.5)"
+                                 transform="translate(0,25)"
                                  style="cursor: pointer;"
                               >
                                 <title>
                                   Toggle plot on/off
                                 </title>
-                                <rect width="296"
-                                      height="13.5"
+                                <rect width="309.328125"
+                                      height="21"
                                       x="2"
                                       y="2"
                                       visibility="hidden"
                                 >
                                 </rect>
                                 <line x1="2"
-                                      x2="298"
-                                      y1="8.75"
-                                      y2="8.75"
-                                      style="stroke-width: 1.75; stroke: red; fill: red;"
+                                      x2="311.328125"
+                                      y1="12.5"
+                                      y2="12.5"
+                                      style="stroke-width: 2.5; stroke: red; fill: red;"
                                 >
                                 </line>
                                 <text class="legend-label"
-                                      font-size="6.125px"
-                                      transform="translate(150,6.125)"
+                                      font-size="8.75px"
+                                      transform="translate(156.6640625,8.75)"
                                       style="text-anchor: middle; fill: red;"
                                 >
                                   PORO
                                 </text>
                                 <rect x="0"
-                                      y="3.2437496185302734"
-                                      width="11.736648559570312"
-                                      height="11"
+                                      y="5.0625"
+                                      width="14.703125"
+                                      height="15"
                                       style="fill: white;"
                                 >
                                 </rect>
-                                <rect x="288.515625"
-                                      y="3.2437496185302734"
-                                      width="11.73663330078125"
-                                      height="11"
+                                <rect x="298.625"
+                                      y="5.0625"
+                                      width="14.703125"
+                                      height="15"
                                       style="fill: white;"
                                 >
                                 </rect>
                                 <text class="legend-domain"
-                                      font-size="6.737500000000001px"
+                                      font-size="9.625px"
                                       x="2"
-                                      y="11.24375"
+                                      y="16.0625"
                                       style="text-anchor: start; fill: red;"
                                 >
                                   10
                                 </text>
                                 <text class="legend-domain"
-                                      font-size="6.737500000000001px"
-                                      x="298"
-                                      y="11.24375"
+                                      font-size="9.625px"
+                                      x="311.328125"
+                                      y="16.0625"
                                       style="text-anchor: end; fill: red;"
                                 >
                                   90
@@ -10176,9 +10552,9 @@ exports[`WellLogViewer/Demo/WellLogViewer LogWithDifferentSets smoke-test 1`] = 
                           </svg>
                         </div>
                         <div class="track-container">
-                          <canvas width="300"
-                                  height="0"
-                                  style="position: absolute; width: 300px; height: 0px;"
+                          <canvas width="313.328125"
+                                  height="576"
+                                  style="position: absolute; width: 313.328px; height: 576px;"
                           >
                           </canvas>
                         </div>
@@ -10405,7 +10781,7 @@ exports[`WellLogViewer/Demo/WellLogViewer LogsWithUndefined smoke-test 1`] = `
                   <div class="view">
                     <div class="container log-controller">
                       <div class="overlay"
-                           style="width: 56.3906px; left: 0px; top: 48.6px; overflow: hidden;"
+                           style="width: 993px; left: 0px; top: 69px; overflow: hidden; height: 578px;"
                       >
                         <div class="depth"
                              style="position: absolute; pointer-events: none; visibility: visible;"
@@ -10430,12 +10806,12 @@ exports[`WellLogViewer/Demo/WellLogViewer LogsWithUndefined smoke-test 1`] = `
                       >
                         <div class="track-title"
                              title="MD"
-                             style="height: 12.6px; font-size: 8.82px;"
+                             style="height: 18px; font-size: 12.6px;"
                         >
                           MD
                         </div>
                         <div class="track-legend"
-                             style="height: 35px;"
+                             style="height: 50px;"
                         >
                           <svg width="100%"
                                height="100%"
@@ -10445,22 +10821,22 @@ exports[`WellLogViewer/Demo/WellLogViewer LogsWithUndefined smoke-test 1`] = `
                               <text class="scale-title"
                                     font-weight="600"
                                     style="text-anchor: middle;"
-                                    transform="translate(25,9.949494949494945)"
-                                    font-size="10.606060606060607px"
+                                    transform="translate(25,15.799999999999997)"
+                                    font-size="12px"
                                     fill="#555"
                               >
                                 MD
                               </text>
                               <text class="scale-range"
-                                    transform="translate(25,21.616161616161612)"
-                                    font-size="10.606060606060607px"
+                                    transform="translate(25,28.999999999999996)"
+                                    font-size="12px"
                                     style="text-anchor: middle;"
                               >
                                 425
                               </text>
                               <text class="scale-units"
-                                    transform="translate(25,31.16161616161616)"
-                                    font-size="8.83838383838384px"
+                                    transform="translate(25,39.8)"
+                                    font-size="10px"
                                     style="text-anchor: middle;"
                               >
                                 m
@@ -10470,10 +10846,60 @@ exports[`WellLogViewer/Demo/WellLogViewer LogsWithUndefined smoke-test 1`] = `
                         </div>
                         <div class="track-container">
                           <svg class="scale-track master-scale"
-                               style="position: absolute; height: 0px; width: 50px;"
+                               style="position: absolute; height: 576px; width: 50px;"
                           >
                             <g class="major-tick"
-                               transform="translate(0,23.52941176470588)"
+                               transform="translate(0,0)"
+                            >
+                              <line x1="0"
+                                    x2="50"
+                                    class="major-tick-line"
+                              >
+                              </line>
+                              <rect x="10"
+                                    y="-6"
+                                    class="label-bg"
+                                    width="30"
+                                    height="12"
+                              >
+                              </rect>
+                              <text class="label"
+                                    font-size="12px"
+                                    stroke-width="0.5"
+                                    font-family="Verdana Tahoma Arial"
+                                    transform="translate(25,4)"
+                                    style="text-anchor: middle;"
+                              >
+                                3700
+                              </text>
+                            </g>
+                            <g class="major-tick"
+                               transform="translate(0,68)"
+                            >
+                              <line x1="0"
+                                    x2="50"
+                                    class="major-tick-line"
+                              >
+                              </line>
+                              <rect x="10"
+                                    y="-6"
+                                    class="label-bg"
+                                    width="30"
+                                    height="12"
+                              >
+                              </rect>
+                              <text class="label"
+                                    font-size="12px"
+                                    stroke-width="0.5"
+                                    font-family="Verdana Tahoma Arial"
+                                    transform="translate(25,4)"
+                                    style="text-anchor: middle;"
+                              >
+                                3750
+                              </text>
+                            </g>
+                            <g class="major-tick"
+                               transform="translate(0,136)"
                             >
                               <line x1="0"
                                     x2="50"
@@ -10498,7 +10924,82 @@ exports[`WellLogViewer/Demo/WellLogViewer LogsWithUndefined smoke-test 1`] = `
                               </text>
                             </g>
                             <g class="major-tick"
-                               transform="translate(0,70.58823529411765)"
+                               transform="translate(0,204)"
+                            >
+                              <line x1="0"
+                                    x2="50"
+                                    class="major-tick-line"
+                              >
+                              </line>
+                              <rect x="10"
+                                    y="-6"
+                                    class="label-bg"
+                                    width="30"
+                                    height="12"
+                              >
+                              </rect>
+                              <text class="label"
+                                    font-size="12px"
+                                    stroke-width="0.5"
+                                    font-family="Verdana Tahoma Arial"
+                                    transform="translate(25,4)"
+                                    style="text-anchor: middle;"
+                              >
+                                3850
+                              </text>
+                            </g>
+                            <g class="major-tick"
+                               transform="translate(0,272)"
+                            >
+                              <line x1="0"
+                                    x2="50"
+                                    class="major-tick-line"
+                              >
+                              </line>
+                              <rect x="10"
+                                    y="-6"
+                                    class="label-bg"
+                                    width="30"
+                                    height="12"
+                              >
+                              </rect>
+                              <text class="label"
+                                    font-size="12px"
+                                    stroke-width="0.5"
+                                    font-family="Verdana Tahoma Arial"
+                                    transform="translate(25,4)"
+                                    style="text-anchor: middle;"
+                              >
+                                3900
+                              </text>
+                            </g>
+                            <g class="major-tick"
+                               transform="translate(0,340)"
+                            >
+                              <line x1="0"
+                                    x2="50"
+                                    class="major-tick-line"
+                              >
+                              </line>
+                              <rect x="10"
+                                    y="-6"
+                                    class="label-bg"
+                                    width="30"
+                                    height="12"
+                              >
+                              </rect>
+                              <text class="label"
+                                    font-size="12px"
+                                    stroke-width="0.5"
+                                    font-family="Verdana Tahoma Arial"
+                                    transform="translate(25,4)"
+                                    style="text-anchor: middle;"
+                              >
+                                3950
+                              </text>
+                            </g>
+                            <g class="major-tick"
+                               transform="translate(0,408)"
                             >
                               <line x1="0"
                                     x2="50"
@@ -10522,6 +11023,56 @@ exports[`WellLogViewer/Demo/WellLogViewer LogsWithUndefined smoke-test 1`] = `
                                 4000
                               </text>
                             </g>
+                            <g class="major-tick"
+                               transform="translate(0,476)"
+                            >
+                              <line x1="0"
+                                    x2="50"
+                                    class="major-tick-line"
+                              >
+                              </line>
+                              <rect x="10"
+                                    y="-6"
+                                    class="label-bg"
+                                    width="30"
+                                    height="12"
+                              >
+                              </rect>
+                              <text class="label"
+                                    font-size="12px"
+                                    stroke-width="0.5"
+                                    font-family="Verdana Tahoma Arial"
+                                    transform="translate(25,4)"
+                                    style="text-anchor: middle;"
+                              >
+                                4050
+                              </text>
+                            </g>
+                            <g class="major-tick"
+                               transform="translate(0,544)"
+                            >
+                              <line x1="0"
+                                    x2="50"
+                                    class="major-tick-line"
+                              >
+                              </line>
+                              <rect x="10"
+                                    y="-6"
+                                    class="label-bg"
+                                    width="30"
+                                    height="12"
+                              >
+                              </rect>
+                              <text class="label"
+                                    font-size="12px"
+                                    stroke-width="0.5"
+                                    font-family="Verdana Tahoma Arial"
+                                    transform="translate(25,4)"
+                                    style="text-anchor: middle;"
+                              >
+                                4100
+                              </text>
+                            </g>
                           </svg>
                         </div>
                       </div>
@@ -10530,12 +11081,12 @@ exports[`WellLogViewer/Demo/WellLogViewer LogsWithUndefined smoke-test 1`] = `
                       >
                         <div class="track-title"
                              title="Discrete, from set 1"
-                             style="height: 12.6px; font-size: 8.82px;"
+                             style="height: 18px; font-size: 12.6px;"
                         >
                           Discrete, from set 1
                         </div>
                         <div class="track-legend"
-                             style="height: 35px;"
+                             style="height: 50px;"
                         >
                           <svg width="100%"
                                height="100%"
@@ -10543,8 +11094,8 @@ exports[`WellLogViewer/Demo/WellLogViewer LogsWithUndefined smoke-test 1`] = `
                           >
                             <g class="legend">
                               <text class="scale-title"
-                                    transform="translate(150,21.616161616161612)"
-                                    font-size="10.606060606060607px"
+                                    transform="translate(156.6640625,28.999999999999996)"
+                                    font-size="12px"
                                     fill="#555"
                                     style="text-anchor: middle;"
                               >
@@ -10554,49 +11105,49 @@ exports[`WellLogViewer/Demo/WellLogViewer LogsWithUndefined smoke-test 1`] = `
                           </svg>
                         </div>
                         <div class="track-container">
-                          <svg style="position: absolute; height: 0px; width: 300px;">
+                          <svg style="position: absolute; height: 576px; width: 313.328px;">
                             <g class="area"
-                               transform="translate(0, 23.52941176470588)"
+                               transform="translate(0, 136)"
                             >
                               <rect x="0"
                                     y="0"
-                                    width="300"
-                                    height="16.47058823529412"
+                                    width="313"
+                                    height="95.20000000000002"
                                     fill="rgb(244,237,255)"
                                     fill-opacity="1"
                               >
                               </rect>
-                              <line x1="75"
+                              <line x1="78.25"
                                     y1="0"
-                                    x2="225"
+                                    x2="234.75"
                                     y2="0"
                                     class="line-top"
                                     stroke="black"
                               >
                               </line>
-                              <line x1="75"
-                                    y1="16.47058823529412"
-                                    x2="225"
-                                    y2="16.47058823529412"
+                              <line x1="78.25"
+                                    y1="95.20000000000002"
+                                    x2="234.75"
+                                    y2="95.20000000000002"
                                     class="line-bottom"
                                     stroke="black"
                               >
                               </line>
-                              <line x1="150"
+                              <line x1="156.5"
                                     y1="0"
-                                    x2="150"
-                                    y2="16.47058823529412"
+                                    x2="156.5"
+                                    y2="95.20000000000002"
                                     class="line-middle"
                                     stroke="black"
                               >
                               </line>
                               <g class="label"
-                                 transform="translate(150,8.23529411764706)rotate(90)"
+                                 transform="translate(156.5,47.60000000000001)rotate(90)"
                               >
-                                <rect x="-5.453125"
-                                      y="-5.890625"
-                                      width="11.44921875"
-                                      height="11"
+                                <rect x="-6.296875"
+                                      y="-7.484375"
+                                      width="12.59375"
+                                      height="13"
                                       fill="rgb(244,237,255)"
                                 >
                                 </rect>
@@ -10604,7 +11155,7 @@ exports[`WellLogViewer/Demo/WellLogViewer LogsWithUndefined smoke-test 1`] = `
                                       fill="black"
                                       stroke="black"
                                       text-anchor="middle"
-                                      font-size="8px"
+                                      font-size="9.520000000000001px"
                                       style="dominant-baseline: middle; text-anchor: middle; text-rendering: optimizespeed; stroke-width: 0.5;"
                                 >
                                   no
@@ -10612,47 +11163,47 @@ exports[`WellLogViewer/Demo/WellLogViewer LogsWithUndefined smoke-test 1`] = `
                               </g>
                             </g>
                             <g class="area"
-                               transform="translate(0, 40)"
+                               transform="translate(0, 231.20000000000002)"
                             >
                               <rect x="0"
                                     y="0"
-                                    width="300"
-                                    height="30.588235294117652"
+                                    width="313"
+                                    height="176.79999999999998"
                                     fill="rgb(255,171,178)"
                                     fill-opacity="1"
                               >
                               </rect>
-                              <line x1="75"
+                              <line x1="78.25"
                                     y1="0"
-                                    x2="225"
+                                    x2="234.75"
                                     y2="0"
                                     class="line-top"
                                     stroke="black"
                               >
                               </line>
-                              <line x1="75"
-                                    y1="30.588235294117652"
-                                    x2="225"
-                                    y2="30.588235294117652"
+                              <line x1="78.25"
+                                    y1="176.79999999999998"
+                                    x2="234.75"
+                                    y2="176.79999999999998"
                                     class="line-bottom"
                                     stroke="black"
                               >
                               </line>
-                              <line x1="150"
+                              <line x1="156.5"
                                     y1="0"
-                                    x2="150"
-                                    y2="30.588235294117652"
+                                    x2="156.5"
+                                    y2="176.79999999999998"
                                     class="line-middle"
                                     stroke="black"
                               >
                               </line>
                               <g class="label"
-                                 transform="translate(150,15.294117647058826)rotate(90)"
+                                 transform="translate(156.5,88.39999999999999)rotate(90)"
                               >
-                                <rect x="-7.2265625"
-                                      y="-5.890625"
-                                      width="14.453125"
-                                      height="11"
+                                <rect x="-14.7578125"
+                                      y="-12.328125"
+                                      width="29.664199829101562"
+                                      height="22"
                                       fill="rgb(255,171,178)"
                                 >
                                 </rect>
@@ -10660,7 +11211,7 @@ exports[`WellLogViewer/Demo/WellLogViewer LogsWithUndefined smoke-test 1`] = `
                                       fill="black"
                                       stroke="black"
                                       text-anchor="middle"
-                                      font-size="8px"
+                                      font-size="17.68px"
                                       style="dominant-baseline: middle; text-anchor: middle; text-rendering: optimizespeed; stroke-width: 0.5;"
                                 >
                                   yes
@@ -10675,12 +11226,12 @@ exports[`WellLogViewer/Demo/WellLogViewer LogsWithUndefined smoke-test 1`] = `
                       >
                         <div class="track-title"
                              title="Continuous, from both sets"
-                             style="height: 12.6px; font-size: 8.82px;"
+                             style="height: 18px; font-size: 12.6px;"
                         >
                           Continuous, from both sets
                         </div>
                         <div class="track-legend"
-                             style="height: 35px;"
+                             style="height: 50px;"
                         >
                           <svg width="100%"
                                height="100%"
@@ -10694,119 +11245,119 @@ exports[`WellLogViewer/Demo/WellLogViewer LogsWithUndefined smoke-test 1`] = `
                                 <title>
                                   Toggle plot on/off
                                 </title>
-                                <rect width="296"
-                                      height="13.5"
+                                <rect width="309.34375"
+                                      height="21"
                                       x="2"
                                       y="2"
                                       visibility="hidden"
                                 >
                                 </rect>
                                 <line x1="2"
-                                      x2="298"
-                                      y1="8.75"
-                                      y2="8.75"
-                                      style="stroke-width: 1.75; stroke: red; fill: red;"
+                                      x2="311.34375"
+                                      y1="12.5"
+                                      y2="12.5"
+                                      style="stroke-width: 2.5; stroke: red; fill: red;"
                                 >
                                 </line>
                                 <text class="legend-label"
-                                      font-size="6.125px"
-                                      transform="translate(150,6.125)"
+                                      font-size="8.75px"
+                                      transform="translate(156.671875,8.75)"
                                       style="text-anchor: middle; fill: red;"
                                 >
                                   PORO
                                 </text>
                                 <rect x="0"
-                                      y="3.2437496185302734"
-                                      width="11.736648559570312"
-                                      height="11"
+                                      y="5.0625"
+                                      width="14.703125"
+                                      height="15"
                                       style="fill: white;"
                                 >
                                 </rect>
-                                <rect x="288.515625"
-                                      y="3.2437496185302734"
-                                      width="11.73663330078125"
-                                      height="11"
+                                <rect x="298.640625"
+                                      y="5.0625"
+                                      width="14.703125"
+                                      height="15"
                                       style="fill: white;"
                                 >
                                 </rect>
                                 <text class="legend-domain"
-                                      font-size="6.737500000000001px"
+                                      font-size="9.625px"
                                       x="2"
-                                      y="11.24375"
+                                      y="16.0625"
                                       style="text-anchor: start; fill: red;"
                                 >
                                   10
                                 </text>
                                 <text class="legend-domain"
-                                      font-size="6.737500000000001px"
-                                      x="298"
-                                      y="11.24375"
+                                      font-size="9.625px"
+                                      x="311.34375"
+                                      y="16.0625"
                                       style="text-anchor: end; fill: red;"
                                 >
                                   90
                                 </text>
                               </g>
                               <g class="legend-row"
-                                 transform="translate(0,17.5)"
+                                 transform="translate(0,25)"
                                  style="cursor: pointer;"
                               >
                                 <title>
                                   Toggle plot on/off
                                 </title>
-                                <rect width="296"
-                                      height="13.5"
+                                <rect width="309.34375"
+                                      height="21"
                                       x="2"
                                       y="2"
                                       visibility="hidden"
                                 >
                                 </rect>
                                 <line x1="2"
-                                      x2="298"
-                                      y1="8.75"
-                                      y2="8.75"
-                                      style="stroke-width: 1.75; stroke: blue; fill: blue;"
+                                      x2="311.34375"
+                                      y1="12.5"
+                                      y2="12.5"
+                                      style="stroke-width: 2.5; stroke: blue; fill: blue;"
                                 >
                                 </line>
                                 <text class="legend-label"
-                                      font-size="6.125px"
-                                      transform="translate(150,6.125)"
+                                      font-size="8.75px"
+                                      transform="translate(156.671875,8.75)"
                                       style="text-anchor: middle; fill: blue;"
                                 >
                                   BAD_CONT
                                 </text>
                                 <text class="legend-unit"
-                                      font-size="5.20625px"
-                                      transform="translate(150,13.95625)"
+                                      font-size="7.4375px"
+                                      transform="translate(156.671875,19.9375)"
                                       style="text-anchor: middle; fill: blue;"
                                 >
                                   m
                                 </text>
                                 <rect x="0"
-                                      y="3.2437496185302734"
-                                      width="13.60333251953125"
-                                      height="11"
+                                      y="5.0625"
+                                      width="18.014083862304688"
+                                      height="15"
                                       style="fill: white;"
                                 >
                                 </rect>
-                                <rect x="286.65625"
-                                      y="3.2437496185302734"
-                                      width="13.60333251953125"
-                                      height="11"
+                                <rect x="295.984375"
+                                      y="5.0625"
+                                      width="18.01409912109375"
+                                      height="15"
                                       style="fill: white;"
                                 >
                                 </rect>
                                 <text class="legend-domain"
-                                      font-size="6.737500000000001px"
+                                      font-size="9.625px"
                                       x="2"
-                                      y="11.24375"
+                                      y="16.0625"
                                       style="text-anchor: start; fill: blue;"
                                 >
                                   0.4
                                 </text>
                                 <text class="legend-domain"
-                                      font-size="6.737500000000001px"
-                                      x="298"
-                                      y="11.24375"
+                                      font-size="9.625px"
+                                      x="311.34375"
+                                      y="16.0625"
                                       style="text-anchor: end; fill: blue;"
                                 >
                                   2.4
@@ -10816,9 +11367,9 @@ exports[`WellLogViewer/Demo/WellLogViewer LogsWithUndefined smoke-test 1`] = `
                           </svg>
                         </div>
                         <div class="track-container">
-                          <canvas width="300"
-                                  height="0"
-                                  style="position: absolute; width: 300px; height: 0px;"
+                          <canvas width="313.34375"
+                                  height="576"
+                                  style="position: absolute; width: 313.344px; height: 576px;"
                           >
                           </canvas>
                         </div>
@@ -10828,12 +11379,12 @@ exports[`WellLogViewer/Demo/WellLogViewer LogsWithUndefined smoke-test 1`] = `
                       >
                         <div class="track-title"
                              title="Continuous, from set 2"
-                             style="height: 12.6px; font-size: 8.82px;"
+                             style="height: 18px; font-size: 12.6px;"
                         >
                           Continuous, from set 2
                         </div>
                         <div class="track-legend"
-                             style="height: 35px;"
+                             style="height: 50px;"
                         >
                           <svg width="100%"
                                height="100%"
@@ -10841,59 +11392,59 @@ exports[`WellLogViewer/Demo/WellLogViewer LogsWithUndefined smoke-test 1`] = `
                           >
                             <g class="svg-legend">
                               <g class="legend-row"
-                                 transform="translate(0,17.5)"
+                                 transform="translate(0,25)"
                                  style="cursor: pointer;"
                               >
                                 <title>
                                   Toggle plot on/off
                                 </title>
-                                <rect width="296"
-                                      height="13.5"
+                                <rect width="309.328125"
+                                      height="21"
                                       x="2"
                                       y="2"
                                       visibility="hidden"
                                 >
                                 </rect>
                                 <line x1="2"
-                                      x2="298"
-                                      y1="8.75"
-                                      y2="8.75"
-                                      style="stroke-width: 1.75; stroke: red; fill: red;"
+                                      x2="311.328125"
+                                      y1="12.5"
+                                      y2="12.5"
+                                      style="stroke-width: 2.5; stroke: red; fill: red;"
                                 >
                                 </line>
                                 <text class="legend-label"
-                                      font-size="6.125px"
-                                      transform="translate(150,6.125)"
+                                      font-size="8.75px"
+                                      transform="translate(156.6640625,8.75)"
                                       style="text-anchor: middle; fill: red;"
                                 >
                                   PORO
                                 </text>
                                 <rect x="0"
-                                      y="3.2437496185302734"
-                                      width="11.736648559570312"
-                                      height="11"
+                                      y="5.0625"
+                                      width="14.703125"
+                                      height="15"
                                       style="fill: white;"
                                 >
                                 </rect>
-                                <rect x="288.515625"
-                                      y="3.2437496185302734"
-                                      width="11.73663330078125"
-                                      height="11"
+                                <rect x="298.625"
+                                      y="5.0625"
+                                      width="14.703125"
+                                      height="15"
                                       style="fill: white;"
                                 >
                                 </rect>
                                 <text class="legend-domain"
-                                      font-size="6.737500000000001px"
+                                      font-size="9.625px"
                                       x="2"
-                                      y="11.24375"
+                                      y="16.0625"
                                       style="text-anchor: start; fill: red;"
                                 >
                                   10
                                 </text>
                                 <text class="legend-domain"
-                                      font-size="6.737500000000001px"
-                                      x="298"
-                                      y="11.24375"
+                                      font-size="9.625px"
+                                      x="311.328125"
+                                      y="16.0625"
                                       style="text-anchor: end; fill: red;"
                                 >
                                   90
@@ -10903,9 +11454,9 @@ exports[`WellLogViewer/Demo/WellLogViewer LogsWithUndefined smoke-test 1`] = `
                           </svg>
                         </div>
                         <div class="track-container">
-                          <canvas width="300"
-                                  height="0"
-                                  style="position: absolute; width: 300px; height: 0px;"
+                          <canvas width="313.328125"
+                                  height="576"
+                                  style="position: absolute; width: 313.328px; height: 576px;"
                           >
                           </canvas>
                         </div>
@@ -13202,11 +13753,12 @@ exports[`WellLogViewer/Demo/WellLogViewer Undefined smoke-test 1`] = `
                   <div class="view">
                     <div class="container log-controller">
                       <div class="overlay"
-                           style="width: 37.3438px; left: 0px; top: 48.6px; overflow: hidden;"
+                           style="width: 993px; left: 0px; top: 69px; overflow: hidden; height: 578px;"
                       >
                         <div class="depth"
-                             style="position: absolute; pointer-events: none; visibility: hidden;"
+                             style="position: absolute; pointer-events: none; visibility: visible;"
                         >
+                          Zoom: x1.0
                         </div>
                         <div class="rubber-band"
                              style="position: relative; pointer-events: none; height: 9px; width: 100%; visibility: hidden;"
@@ -13226,12 +13778,12 @@ exports[`WellLogViewer/Demo/WellLogViewer Undefined smoke-test 1`] = `
                       >
                         <div class="track-title"
                              title="MD"
-                             style="height: 12.6px; font-size: 8.82px;"
+                             style="height: 18px; font-size: 12.6px;"
                         >
                           MD
                         </div>
                         <div class="track-legend"
-                             style="height: 35px;"
+                             style="height: 50px;"
                         >
                           <svg width="100%"
                                height="100%"
@@ -13241,22 +13793,22 @@ exports[`WellLogViewer/Demo/WellLogViewer Undefined smoke-test 1`] = `
                               <text class="scale-title"
                                     font-weight="600"
                                     style="text-anchor: middle;"
-                                    transform="translate(25,9.949494949494945)"
-                                    font-size="10.606060606060607px"
+                                    transform="translate(25,15.799999999999997)"
+                                    font-size="12px"
                                     fill="#555"
                               >
                                 MD
                               </text>
                               <text class="scale-range"
-                                    transform="translate(25,21.616161616161612)"
-                                    font-size="10.606060606060607px"
+                                    transform="translate(25,28.999999999999996)"
+                                    font-size="12px"
                                     style="text-anchor: middle;"
                               >
                                 100
                               </text>
                               <text class="scale-units"
-                                    transform="translate(25,31.16161616161616)"
-                                    font-size="8.83838383838384px"
+                                    transform="translate(25,39.8)"
+                                    font-size="10px"
                                     style="text-anchor: middle;"
                               >
                                 m
@@ -13266,7 +13818,7 @@ exports[`WellLogViewer/Demo/WellLogViewer Undefined smoke-test 1`] = `
                         </div>
                         <div class="track-container">
                           <svg class="scale-track master-scale"
-                               style="position: absolute; height: 0px; width: 50px;"
+                               style="position: absolute; height: 576px; width: 50px;"
                           >
                             <g class="major-tick"
                                transform="translate(0,0)"
@@ -13294,7 +13846,107 @@ exports[`WellLogViewer/Demo/WellLogViewer Undefined smoke-test 1`] = `
                               </text>
                             </g>
                             <g class="major-tick"
-                               transform="translate(0,50)"
+                               transform="translate(0,57.800000000000004)"
+                            >
+                              <line x1="0"
+                                    x2="50"
+                                    class="major-tick-line"
+                              >
+                              </line>
+                              <rect x="10"
+                                    y="-6"
+                                    class="label-bg"
+                                    width="30"
+                                    height="12"
+                              >
+                              </rect>
+                              <text class="label"
+                                    font-size="12px"
+                                    stroke-width="0.5"
+                                    font-family="Verdana Tahoma Arial"
+                                    transform="translate(25,4)"
+                                    style="text-anchor: middle;"
+                              >
+                                10
+                              </text>
+                            </g>
+                            <g class="major-tick"
+                               transform="translate(0,115.60000000000001)"
+                            >
+                              <line x1="0"
+                                    x2="50"
+                                    class="major-tick-line"
+                              >
+                              </line>
+                              <rect x="10"
+                                    y="-6"
+                                    class="label-bg"
+                                    width="30"
+                                    height="12"
+                              >
+                              </rect>
+                              <text class="label"
+                                    font-size="12px"
+                                    stroke-width="0.5"
+                                    font-family="Verdana Tahoma Arial"
+                                    transform="translate(25,4)"
+                                    style="text-anchor: middle;"
+                              >
+                                20
+                              </text>
+                            </g>
+                            <g class="major-tick"
+                               transform="translate(0,173.4)"
+                            >
+                              <line x1="0"
+                                    x2="50"
+                                    class="major-tick-line"
+                              >
+                              </line>
+                              <rect x="10"
+                                    y="-6"
+                                    class="label-bg"
+                                    width="30"
+                                    height="12"
+                              >
+                              </rect>
+                              <text class="label"
+                                    font-size="12px"
+                                    stroke-width="0.5"
+                                    font-family="Verdana Tahoma Arial"
+                                    transform="translate(25,4)"
+                                    style="text-anchor: middle;"
+                              >
+                                30
+                              </text>
+                            </g>
+                            <g class="major-tick"
+                               transform="translate(0,231.20000000000002)"
+                            >
+                              <line x1="0"
+                                    x2="50"
+                                    class="major-tick-line"
+                              >
+                              </line>
+                              <rect x="10"
+                                    y="-6"
+                                    class="label-bg"
+                                    width="30"
+                                    height="12"
+                              >
+                              </rect>
+                              <text class="label"
+                                    font-size="12px"
+                                    stroke-width="0.5"
+                                    font-family="Verdana Tahoma Arial"
+                                    transform="translate(25,4)"
+                                    style="text-anchor: middle;"
+                              >
+                                40
+                              </text>
+                            </g>
+                            <g class="major-tick"
+                               transform="translate(0,289)"
                             >
                               <line x1="0"
                                     x2="50"
@@ -13319,7 +13971,107 @@ exports[`WellLogViewer/Demo/WellLogViewer Undefined smoke-test 1`] = `
                               </text>
                             </g>
                             <g class="major-tick"
-                               transform="translate(0,100)"
+                               transform="translate(0,346.8)"
+                            >
+                              <line x1="0"
+                                    x2="50"
+                                    class="major-tick-line"
+                              >
+                              </line>
+                              <rect x="10"
+                                    y="-6"
+                                    class="label-bg"
+                                    width="30"
+                                    height="12"
+                              >
+                              </rect>
+                              <text class="label"
+                                    font-size="12px"
+                                    stroke-width="0.5"
+                                    font-family="Verdana Tahoma Arial"
+                                    transform="translate(25,4)"
+                                    style="text-anchor: middle;"
+                              >
+                                60
+                              </text>
+                            </g>
+                            <g class="major-tick"
+                               transform="translate(0,404.59999999999997)"
+                            >
+                              <line x1="0"
+                                    x2="50"
+                                    class="major-tick-line"
+                              >
+                              </line>
+                              <rect x="10"
+                                    y="-6"
+                                    class="label-bg"
+                                    width="30"
+                                    height="12"
+                              >
+                              </rect>
+                              <text class="label"
+                                    font-size="12px"
+                                    stroke-width="0.5"
+                                    font-family="Verdana Tahoma Arial"
+                                    transform="translate(25,4)"
+                                    style="text-anchor: middle;"
+                              >
+                                70
+                              </text>
+                            </g>
+                            <g class="major-tick"
+                               transform="translate(0,462.40000000000003)"
+                            >
+                              <line x1="0"
+                                    x2="50"
+                                    class="major-tick-line"
+                              >
+                              </line>
+                              <rect x="10"
+                                    y="-6"
+                                    class="label-bg"
+                                    width="30"
+                                    height="12"
+                              >
+                              </rect>
+                              <text class="label"
+                                    font-size="12px"
+                                    stroke-width="0.5"
+                                    font-family="Verdana Tahoma Arial"
+                                    transform="translate(25,4)"
+                                    style="text-anchor: middle;"
+                              >
+                                80
+                              </text>
+                            </g>
+                            <g class="major-tick"
+                               transform="translate(0,520.2)"
+                            >
+                              <line x1="0"
+                                    x2="50"
+                                    class="major-tick-line"
+                              >
+                              </line>
+                              <rect x="10"
+                                    y="-6"
+                                    class="label-bg"
+                                    width="30"
+                                    height="12"
+                              >
+                              </rect>
+                              <text class="label"
+                                    font-size="12px"
+                                    stroke-width="0.5"
+                                    font-family="Verdana Tahoma Arial"
+                                    transform="translate(25,4)"
+                                    style="text-anchor: middle;"
+                              >
+                                90
+                              </text>
+                            </g>
+                            <g class="major-tick"
+                               transform="translate(0,578)"
                             >
                               <line x1="0"
                                     x2="50"
@@ -13351,12 +14103,12 @@ exports[`WellLogViewer/Demo/WellLogViewer Undefined smoke-test 1`] = `
                       >
                         <div class="track-title"
                              title="Empty"
-                             style="height: 12.6px; font-size: 8.82px;"
+                             style="height: 18px; font-size: 12.6px;"
                         >
                           Empty
                         </div>
                         <div class="track-legend"
-                             style="height: 35px;"
+                             style="height: 50px;"
                         >
                           <svg width="100%"
                                height="100%"
@@ -13364,59 +14116,59 @@ exports[`WellLogViewer/Demo/WellLogViewer Undefined smoke-test 1`] = `
                           >
                             <g class="svg-legend">
                               <g class="legend-row"
-                                 transform="translate(0,17.5)"
+                                 transform="translate(0,25)"
                                  style="cursor: pointer;"
                               >
                                 <title>
                                   Toggle plot on/off
                                 </title>
-                                <rect width="296"
-                                      height="13.5"
+                                <rect width="938"
+                                      height="21"
                                       x="2"
                                       y="2"
                                       visibility="hidden"
                                 >
                                 </rect>
                                 <line x1="2"
-                                      x2="298"
-                                      y1="8.75"
-                                      y2="8.75"
-                                      style="stroke-width: 1.75; stroke: black; fill: black;"
+                                      x2="940"
+                                      y1="12.5"
+                                      y2="12.5"
+                                      style="stroke-width: 2.5; stroke: black; fill: black;"
                                 >
                                 </line>
                                 <text class="legend-label"
-                                      font-size="6.125px"
-                                      transform="translate(150,6.125)"
+                                      font-size="8.75px"
+                                      transform="translate(471,8.75)"
                                       style="text-anchor: middle; fill: black;"
                                 >
                                   Empty
                                 </text>
                                 <rect x="0"
-                                      y="3.2437496185302734"
-                                      width="24.058731079101562"
-                                      height="12"
+                                      y="5.0625"
+                                      width="31.9677734375"
+                                      height="15"
                                       style="fill: white;"
                                 >
                                 </rect>
-                                <rect x="274.34375"
-                                      y="3.2437496185302734"
-                                      width="26.296142578125"
-                                      height="12"
+                                <rect x="907.015625"
+                                      y="5.0625"
+                                      width="35.16778564453125"
+                                      height="15"
                                       style="fill: white;"
                                 >
                                 </rect>
                                 <text class="legend-domain"
-                                      font-size="6.737500000000001px"
+                                      font-size="9.625px"
                                       x="2"
-                                      y="11.24375"
+                                      y="16.0625"
                                       style="text-anchor: start; fill: black;"
                                 >
                                   Infinity
                                 </text>
                                 <text class="legend-domain"
-                                      font-size="6.737500000000001px"
-                                      x="298"
-                                      y="11.24375"
+                                      font-size="9.625px"
+                                      x="940"
+                                      y="16.0625"
                                       style="text-anchor: end; fill: black;"
                                 >
                                   -Infinity
@@ -13426,9 +14178,9 @@ exports[`WellLogViewer/Demo/WellLogViewer Undefined smoke-test 1`] = `
                           </svg>
                         </div>
                         <div class="track-container">
-                          <canvas width="300"
-                                  height="0"
-                                  style="position: absolute; width: 300px; height: 0px;"
+                          <canvas width="942"
+                                  height="576"
+                                  style="position: absolute; width: 942px; height: 576px;"
                           >
                           </canvas>
                         </div>
