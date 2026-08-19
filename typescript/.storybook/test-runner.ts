@@ -41,9 +41,30 @@ const screenshotTest = async (page: Page, context: TestContext) => {
 };
 
 const domSnapshotTest = async (page: Page) => {
-    const elementHandler = await page.$("#storybook-root");
-    const innerHTML = elementHandler ? await elementHandler.innerHTML() : "";
-    expect(innerHTML).toMatchSnapshot();
+    // Some stories render their DOM in multiple passes (e.g. a debounced
+    // ResizeObserver-driven layout for axis ticks), so poll until the
+    // markup stops changing before asserting - mirroring the stability
+    // loop used by screenshotTest above.
+    let previousHTML = "";
+    let stable = false;
+    const maxAttempts = 20;
+    const poll = 500;
+
+    for (let attempt = 0; attempt < maxAttempts && !stable; attempt++) {
+        const elementHandler = await page.$("#storybook-root");
+        const currentHTML = elementHandler
+            ? await elementHandler.innerHTML()
+            : "";
+
+        if (currentHTML === previousHTML) {
+            stable = true;
+        } else {
+            previousHTML = currentHTML;
+            await page.waitForTimeout(poll);
+        }
+    }
+
+    expect(previousHTML).toMatchSnapshot();
 };
 
 const config: TestRunnerConfig = {
