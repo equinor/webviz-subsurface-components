@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/playwright:v1.60.0-noble
+FROM mcr.microsoft.com/playwright:v1.60.0-jammy
 
 RUN mkdir -p /home/pwuser/test && chown -R pwuser:pwuser /home/pwuser/test
 WORKDIR /home/pwuser/test

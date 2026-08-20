@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import React from "react";
 
 import "jest";
 import { describe, expect, it } from "@jest/globals";

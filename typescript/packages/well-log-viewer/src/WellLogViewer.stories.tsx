@@ -77,7 +77,7 @@ const ComponentCode =
 const stories: Meta<WellLogViewerProps> = {
     component: WellLogViewer,
     title: "WellLogViewer/Demo/WellLogViewer",
-    tags: ["no-dom-test"],
+    tags: ["no-screenshot-test"],
     argTypes: argTypesWellLogViewerProp,
     parameters: {
         docs: {
@@ -461,6 +461,11 @@ export const Horizontal: StoryObj<typeof StoryTemplate> = {
             },
         },
     },
+    // The horizontal scale track is rendered by the third-party
+    // @equinor/videx-wellog library using D3, which serializes its DOM
+    // attributes in a non-deterministic order across renders. Use a
+    // screenshot test instead of a DOM snapshot for this story.
+    tags: ["!no-screenshot-test", "no-dom-test"],
     // wellLogSets is used to retrieve the well log sets from the getWellLogSets() function
     render: (args) => <StoryTemplate {...args} wellLogSets="Horizontal" />,
 };
@@ -502,7 +507,7 @@ type StoryTemplateWithCustomPanelProps = Omit<
 
 function StoryTemplateWithCustomPanel(
     props: StoryTemplateWithCustomPanelProps
-): JSX.Element {
+): React.JSX.Element {
     const [infos, setInfos] = React.useState<Info[]>([]);
     const [showPanel, setShowPanel] = React.useState<boolean>(false);
 
@@ -522,7 +527,7 @@ function StoryTemplateWithCustomPanel(
     );
 }
 
-function CustomInfoPanel(props: { infos: Info[] }): JSX.Element {
+function CustomInfoPanel(props: { infos: Info[] }): React.JSX.Element {
     const [mousePosition, setMousePosition] = React.useState({
         x: -1000,
         y: -1000,

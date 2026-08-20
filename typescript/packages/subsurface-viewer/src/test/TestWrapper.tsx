@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import { Provider } from "react-redux";
 import { createStore } from "../redux/store";
 
@@ -7,7 +7,7 @@ emptytestStore.dispatch = jest.fn() as never;
 export const EmptyWrapper = ({
     children,
 }: {
-    children: JSX.Element;
-}): JSX.Element => {
+    children: React.JSX.Element;
+}): React.JSX.Element => {
     return <Provider store={emptytestStore}>{children}</Provider>;
 };

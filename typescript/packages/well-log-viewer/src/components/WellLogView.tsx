@@ -2,7 +2,8 @@ import "./styles.scss";
 
 import { select } from "d3";
 import type { ReactNode } from "react";
-import React, { Component } from "react";
+import type React from "react";
+import { Component } from "react";
 import { createRoot } from "react-dom/client";
 import PropTypes from "prop-types";
 
@@ -1000,6 +1001,13 @@ export interface WellLogViewOptions {
 
 export interface WellLogViewProps {
     /**
+     * The ID of this component, used to identify dash components
+     * in callbacks. The ID needs to be unique across all of the
+     * components in an app.
+     */
+    id?: string;
+
+    /**
      * Object from JSON file describing one or more sets of well log data.
      * @deprecated Use `wellLogSets` instead
      */
@@ -1059,7 +1067,7 @@ export interface WellLogViewProps {
     /**
      * The view title. Set desired string or react element or true for default value from well log file
      */
-    viewTitle?: boolean | string | JSX.Element;
+    viewTitle?: boolean | string | React.JSX.Element;
 
     /**
      * Initial base domain of the log data, that defines the accessible depth range.
@@ -1254,7 +1262,7 @@ interface State {
     infos: Info[];
 
     scrollTrackPos: number; // the first visible non-scale track number
-    errorText?: string | JSX.Element;
+    errorText?: string | React.JSX.Element;
 }
 
 class WellLogView
@@ -2098,14 +2106,14 @@ class WellLogView
     }
 
     createViewTitle(
-        viewTitle: string | boolean | JSX.Element //| undefined
+        viewTitle: string | boolean | React.JSX.Element //| undefined
     ): ReactNode {
         if (typeof viewTitle === "object" /*react element*/) return viewTitle;
         if (viewTitle === true) return this.wellLogSets[0]?.header.well;
         return viewTitle; // string
     }
 
-    render(): JSX.Element {
+    render(): React.JSX.Element {
         const horizontal = this.props.horizontal;
         const viewTitle = this.props.viewTitle;
         return (
@@ -2118,7 +2126,9 @@ class WellLogView
                         className={
                             horizontal ? "title title-horizontal" : "title"
                         }
-                        ref={(el) => (this.title = el as HTMLElement)}
+                        ref={(el) => {
+                            this.title = el as HTMLElement;
+                        }}
                     >
                         {this.createViewTitle(viewTitle)}
                     </div>
@@ -2126,7 +2136,9 @@ class WellLogView
                 <div className="view">
                     <div
                         className="container" // for CSS customization
-                        ref={(el) => (this.container = el as HTMLElement)}
+                        ref={(el) => {
+                            this.container = el as HTMLElement;
+                        }}
                     />
                     {this.state.errorText && (
                         <div className="error">{this.state.errorText}</div>

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`WellLogViewer/Components/ScaleSelector Default smoke-test 2`] = `
+exports[`WellLogViewer/Components/ScaleSelector Default smoke-test 1`] = `
 <div>
   Scale:
   <select>

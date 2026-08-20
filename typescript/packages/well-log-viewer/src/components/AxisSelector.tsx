@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
-import React from "react";
+import type React from "react";
 
 interface Props {
-    header?: string | JSX.Element; // language dependent string
+    header?: string | React.JSX.Element; // language dependent string
     axes: string[];
     axisTitles: Record<string, string>; // language dependent strings
     value: string;

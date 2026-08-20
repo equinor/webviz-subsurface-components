@@ -1,7 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-webpack5";
 import { colorTables } from "@emerson-eps/color-tables";
-import React from "react";
-
 import type { WellLogViewProps } from "./WellLogView";
 import WellLogView, { argTypesWellLogViewProp } from "./WellLogView";
 
@@ -27,6 +25,7 @@ const exampleColormapFunctions = colorTables as ColormapFunction[];
 const stories: Meta<WellLogViewProps> = {
     component: WellLogView,
     title: "WellLogViewer/Components/WellLogView",
+    tags: ["no-screenshot-test"],
     argTypes: argTypesWellLogViewProp,
     parameters: {
         docs: {

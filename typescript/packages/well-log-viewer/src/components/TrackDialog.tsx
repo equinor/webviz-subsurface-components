@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import React, { Component } from "react";
+import type React from "react";
+import { Component } from "react";
 
 import type { TemplateTrack, TemplatePlot } from "./WellLogTemplateTypes";
 
@@ -163,7 +164,7 @@ export class TrackPropertiesDialog extends Component<Props, State> {
         );
     }
 
-    render(): JSX.Element {
+    render(): React.JSX.Element {
         const templateTrack = this.props.templateTrack;
         const title = templateTrack ? "Edit track" : "Add New Track";
         return (

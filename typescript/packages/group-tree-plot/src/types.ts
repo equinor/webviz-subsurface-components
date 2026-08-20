@@ -63,7 +63,7 @@ export const EdgeMetadataPropTypes = PropTypes.shape({
 // Note: This is a solution for recursive definition for RecursiveTreeNode, as children is an optional array of RecursiveTreeNode.
 // - Object.assign() resolves the issue of children being optional.
 // - PropTypes.arrayOf(PropTypes.shape(RecursiveTreeNode).isRequired) resolves the issue of children being recursive.
-const RecursiveTreeNodeShape: React.WeakValidationMap<RecursiveTreeNode> = {
+const RecursiveTreeNodeShape: Record<string, PropTypes.Validator<unknown>> = {
     node_label: PropTypes.string.isRequired,
     edge_label: PropTypes.string.isRequired,
     node_data: NodeDataPropTypes.isRequired,

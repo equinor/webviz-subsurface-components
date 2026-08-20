@@ -10,7 +10,7 @@ exports[`SubsurfaceViewer/Components/InfoCard MutipleProperties smoke-test 1`] =
         <td class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-1icv65p">
           <button type="button"
                   tabindex="0"
-                  class="Button__ButtonBase-sc-1hs0myn-1 fqqEGV"
+                  class="Button__ButtonBase-sc-1hs0myn-1 ccvFFJ"
                   style="padding: 0px;"
           >
             <span class="Button__Inner-sc-1hs0myn-0 jNcrVQ">
@@ -23,7 +23,7 @@ exports[`SubsurfaceViewer/Components/InfoCard MutipleProperties smoke-test 1`] =
                    class="Icon__StyledSvg-sc-6evbi1-0 iMSGDw"
               >
                 <path data-testid="eds-icon-path"
-                      d="m7 14.5 5-5 5 5H7Z"
+                      d="m7 14.5 5-5 5 5z"
                       fill-rule="evenodd"
                       clip-rule="evenodd"
                       class="Icon__StyledPath-sc-6evbi1-1"
@@ -97,7 +97,7 @@ exports[`SubsurfaceViewer/Components/InfoCard SingleProperty smoke-test 1`] = `
         <td class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-1icv65p">
           <button type="button"
                   tabindex="0"
-                  class="Button__ButtonBase-sc-1hs0myn-1 fqqEGV"
+                  class="Button__ButtonBase-sc-1hs0myn-1 ccvFFJ"
                   style="padding: 0px;"
           >
             <span class="Button__Inner-sc-1hs0myn-0 jNcrVQ">
@@ -110,7 +110,7 @@ exports[`SubsurfaceViewer/Components/InfoCard SingleProperty smoke-test 1`] = `
                    class="Icon__StyledSvg-sc-6evbi1-0 iMSGDw"
               >
                 <path data-testid="eds-icon-path"
-                      d="m7 14.5 5-5 5 5H7Z"
+                      d="m7 14.5 5-5 5 5z"
                       fill-rule="evenodd"
                       clip-rule="evenodd"
                       class="Icon__StyledPath-sc-6evbi1-1"

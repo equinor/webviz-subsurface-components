@@ -3,7 +3,7 @@
 exports[`SubsurfaceViewer/Components/Settings NumericInputStory smoke-test 1`] = `
 <div style="display: flex; justify-content: space-between;">
   <label id="test-input-label"
-         class="Label__LabelBase-sc-1gi2bcn-0 gVSpwr"
+         class="Label__LabelBase-sc-1gi2bcn-0 eAoEZ"
          style="padding-top: 5px; padding-bottom: 5px; font-size: 15px;"
   >
     <span class="Label__Text-sc-1gi2bcn-1 bfxypJ">
@@ -13,11 +13,11 @@ exports[`SubsurfaceViewer/Components/Settings NumericInputStory smoke-test 1`] =
   <div class="Input__Container-sc-1ykv024-0 AXbry"
        style="font-size: 15px; text-align: right; width: 3rem;"
   >
-    <input type="number"
-           id="test-input"
+    <input id="test-input"
            min="0"
            step="1"
            class="Input__StyledInput-sc-1ykv024-1 kJWdZl"
+           type="number"
            value="5"
            style="resize: none;"
     >

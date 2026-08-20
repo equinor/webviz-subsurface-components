@@ -1,4 +1,5 @@
-import React, { Component } from "react";
+import type React from "react";
+import { Component } from "react";
 
 import WellLogView, { _propTypesWellLogView } from "./WellLogView";
 import type { WellLogController, WellLogViewProps } from "./WellLogView";
@@ -182,10 +183,12 @@ class WellLogViewWithScroller extends Component<WellLogViewWithScrollerProps> {
         }
     }
 
-    render(): JSX.Element {
+    render(): React.JSX.Element {
         return (
             <Scroller
-                ref={(el) => (this.scroller = el as Scroller)}
+                ref={(el) => {
+                    this.scroller = el as Scroller;
+                }}
                 onScroll={this.onScrollerScroll}
             >
                 <WellLogView

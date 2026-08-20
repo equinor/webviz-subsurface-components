@@ -78,7 +78,7 @@ const stories: Meta = {
 export default stories;
 
 interface TemplateProps {
-    label?: string | JSX.Element;
+    label?: string | React.JSX.Element;
     values?: number[];
     round?: boolean | number;
 }

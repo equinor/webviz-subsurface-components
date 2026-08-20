@@ -1,5 +1,4 @@
 import PropTypes from "prop-types";
-import type React from "react";
 
 export type AttributeType = string | number | boolean | undefined;
 export enum SortDirection {
@@ -60,7 +59,7 @@ export interface PlotData {
 
 // ---------------------------  PropTypes ---------------------------------------
 
-const ZoneShape: React.WeakValidationMap<Zone> = {
+const ZoneShape: Record<string, PropTypes.Validator<unknown>> = {
     name: PropTypes.string.isRequired,
     color: PropTypes.string.isRequired,
 };
