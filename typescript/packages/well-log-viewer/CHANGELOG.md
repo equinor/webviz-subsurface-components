@@ -1,3 +1,22 @@
+# 3.0.0 (2026-08-20)
+
+### 🚀 Features
+
+- ⚠️  migrate to react 19 ([#2821](https://github.com/equinor/webviz-subsurface-components/pull/2821), [#2820](https://github.com/equinor/webviz-subsurface-components/issues/2820))
+
+### ⚠️  Breaking Changes
+
+- migrate to react 19  ([#2821](https://github.com/equinor/webviz-subsurface-components/pull/2821), [#2820](https://github.com/equinor/webviz-subsurface-components/issues/2820))
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 2.0.0
+
+### ❤️ Thank You
+
+- Copilot @Copilot
+- Håvard Bjerke
+
 ## 2.9.3 (2026-08-06)
 
 ### 🩹 Fixes
