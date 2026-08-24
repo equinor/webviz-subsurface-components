@@ -1,6 +1,6 @@
 {
   "name": "@webviz/well-log-viewer",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "publishConfig": {
     "access": "public"
   },
@@ -27,7 +27,7 @@
   "dependencies": {
     "@emerson-eps/color-tables": "^1.1.0",
     "@equinor/videx-wellog": "^0.11.3",
-    "@webviz/wsc-common": "2.0.0",
+    "@webviz/wsc-common": "2.0.1",
     "convert-units": "^2.3.4",
     "d3": "^7.8.2"
   },
