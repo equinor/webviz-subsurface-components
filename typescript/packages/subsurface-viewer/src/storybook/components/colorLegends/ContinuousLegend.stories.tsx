@@ -1,5 +1,4 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import React from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-webpack5";
 
@@ -8,6 +7,7 @@ import { ContinuousLegend, colorTables } from "@emerson-eps/color-tables";
 const stories: Meta = {
     component: ContinuousLegend,
     title: "SubsurfaceViewer/Components/ColorLegends",
+    tags: ["no-dom-test"],
 };
 export default stories;
 

@@ -1,5 +1,4 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import React from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-webpack5";
 
@@ -9,6 +8,7 @@ import { type LayerPickInfo } from "../../layers/utils/layerTools";
 const stories: Meta = {
     component: InfoCard,
     title: "SubsurfaceViewer/Components/InfoCard",
+    tags: ["no-screenshot-test"],
 };
 export default stories;
 

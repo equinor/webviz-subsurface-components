@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import type { Unit } from "convert-units";
 import convert from "convert-units";
 

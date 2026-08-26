@@ -1,6 +1,6 @@
 {
   "name": "@webviz/group-tree-plot",
-  "version": "1.7.11",
+  "version": "2.0.1",
   "publishConfig": {
     "access": "public"
   },
@@ -25,8 +25,8 @@
     "motion": "^11.18.0"
   },
   "peerDependencies": {
-    "react": "^17 || ^18",
-    "react-dom": "^17 || ^18"
+    "react": "^18 || ^19",
+    "react-dom": "^18 || ^19"
   },
   "volta": {
     "node": "22.22.0"

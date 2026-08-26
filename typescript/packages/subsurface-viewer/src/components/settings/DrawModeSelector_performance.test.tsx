@@ -1,4 +1,4 @@
-import React, { Profiler } from "react";
+import { Profiler } from "react";
 
 import "jest";
 import { describe, it } from "@jest/globals";

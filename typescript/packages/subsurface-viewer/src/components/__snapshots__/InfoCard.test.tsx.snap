@@ -44,15 +44,6 @@ exports[`Test InfoCard snapshot test when property value provided 1`] = `
   justify-self: center;
 }
 
-.c0::before {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: auto;
-  min-height: auto;
-  content: '';
-}
-
 .c0::after {
   position: absolute;
   top: -7px;
@@ -151,7 +142,7 @@ exports[`Test InfoCard snapshot test when property value provided 1`] = `
                 <path
                   class=""
                   clip-rule="evenodd"
-                  d="m7 14.5 5-5 5 5H7Z"
+                  d="m7 14.5 5-5 5 5z"
                   data-testid="eds-icon-path"
                   fill-rule="evenodd"
                 />
@@ -274,7 +265,7 @@ exports[`Test InfoCard snapshot test when property value provided 1`] = `
                 <path
                   class=""
                   clip-rule="evenodd"
-                  d="m7 14.5 5-5 5 5H7Z"
+                  d="m7 14.5 5-5 5 5z"
                   data-testid="eds-icon-path"
                   fill-rule="evenodd"
                 />
@@ -403,15 +394,6 @@ exports[`Test InfoCard snapshot test with no props 1`] = `
   justify-self: center;
 }
 
-.c0::before {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: auto;
-  min-height: auto;
-  content: '';
-}
-
 .c0::after {
   position: absolute;
   top: -7px;
@@ -510,7 +492,7 @@ exports[`Test InfoCard snapshot test with no props 1`] = `
                 <path
                   class=""
                   clip-rule="evenodd"
-                  d="m7 14.5 5-5 5 5H7Z"
+                  d="m7 14.5 5-5 5 5z"
                   data-testid="eds-icon-path"
                   fill-rule="evenodd"
                 />

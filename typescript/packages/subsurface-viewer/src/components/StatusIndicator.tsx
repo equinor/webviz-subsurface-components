@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import { CircularProgress } from "@equinor/eds-core-react";
 
 interface StatusIndicatorProps {

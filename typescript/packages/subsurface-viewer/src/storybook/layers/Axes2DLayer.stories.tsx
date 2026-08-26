@@ -1,5 +1,4 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import React from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-webpack5";
 
@@ -18,6 +17,7 @@ import {
 const stories: Meta = {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer / Axes2DLayer",
+    tags: ["no-dom-test"],
     args: {
         // Add some common controls for all the stories.
         triggerHome: 0,

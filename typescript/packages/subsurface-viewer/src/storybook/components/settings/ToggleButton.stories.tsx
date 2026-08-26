@@ -5,6 +5,7 @@ import ToggleButton from "../../../components/settings/ToggleButton";
 const stories: Meta = {
     component: ToggleButton,
     title: "SubsurfaceViewer/Components/Settings",
+    tags: ["no-screenshot-test"],
 };
 export default stories;
 

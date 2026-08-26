@@ -90,7 +90,7 @@ jobs:
 
     container:
       image: mcr.microsoft.com/playwright:v1.60.0-jammy
-      options: --user 1001
+      options: --user 1001 --shm-size=1gb
 
     steps:
       - name: 📖 Checkout commit locally

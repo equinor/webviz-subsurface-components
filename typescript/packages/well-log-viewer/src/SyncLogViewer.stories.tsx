@@ -87,8 +87,8 @@ const ComponentCode =
 const stories: Meta = {
     component: SyncLogViewer,
     title: "WellLogViewer/Demo/SyncLogViewer",
-    argTypes: argTypesSyncLogViewerProp,
     tags: ["no-screenshot-test"],
+    argTypes: argTypesSyncLogViewerProp,
     parameters: {
         docs: {
             description: {
@@ -328,7 +328,6 @@ export const Default: StoryObj<typeof Template> = {
     },
     // wellLogCollections is used to retrieve the well log sets from the getWellLogCollections() function
     render: (args) => <Template {...args} wellLogCollections="Default" />,
-    tags: ["no-screenshot-test"],
 };
 
 export const Empty: StoryObj<typeof Template> = {
@@ -340,7 +339,6 @@ export const Empty: StoryObj<typeof Template> = {
     },
     // wellLogCollections is used to retrieve the well log sets from the getWellLogCollections() function
     render: (args) => <Template {...args} wellLogCollections="Empty" />,
-    tags: ["no-screenshot-test"],
 };
 
 type TemplateWithSelectionProps = Omit<
@@ -498,6 +496,22 @@ export const DiscreteLogs: StoryObj<typeof TemplateWithSelection> = {
         <TemplateWithSelection {...args} wellLogCollections="DiscreteLogs" />
     ),
 };
+
+export const DiscreteLogsWithWellPicks: StoryObj<typeof TemplateWithSelection> =
+    {
+        args: {
+            ...facies3WellsArgs,
+            wellpicks: exampleWellPicks,
+            wellpickFlatting: ["Hor_4"],
+        },
+        // wellLogCollections is used to retrieve the well log sets from the getWellLogCollections() function
+        render: (args) => (
+            <TemplateWithSelection
+                {...args}
+                wellLogCollections="DiscreteLogs"
+            />
+        ),
+    };
 
 export const DiscreteLogsWithUndefined: StoryObj<typeof TemplateWithSelection> =
     {

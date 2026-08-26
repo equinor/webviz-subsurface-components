@@ -1,4 +1,5 @@
-import React, { Component } from "react";
+import type React from "react";
+import { Component } from "react";
 
 import type { CallbackManager } from "./CallbackManager";
 import InfoPanel from "./InfoPanel";
@@ -9,7 +10,7 @@ import "./SidePanel.scss";
 interface Props {
     callbackManager: CallbackManager;
 
-    header?: string | JSX.Element;
+    header?: string | React.JSX.Element;
     readoutOptions?: InfoOptions; // options for readout
 }
 interface State {
@@ -103,7 +104,7 @@ export class WellLogInfoPanel extends Component<Props, State> {
         this.setState({ infos: infos });
     }
 
-    render(): JSX.Element {
+    render(): React.JSX.Element {
         return (
             <InfoPanel
                 // TODO: Fix this the next time the file is edited.

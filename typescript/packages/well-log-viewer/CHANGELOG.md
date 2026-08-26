@@ -1,3 +1,44 @@
+## 3.0.1 (2026-08-24)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 2.0.1
+
+# 3.0.0 (2026-08-20)
+
+### 🚀 Features
+
+- ⚠️  migrate to react 19 ([#2821](https://github.com/equinor/webviz-subsurface-components/pull/2821), [#2820](https://github.com/equinor/webviz-subsurface-components/issues/2820))
+
+### ⚠️  Breaking Changes
+
+- migrate to react 19  ([#2821](https://github.com/equinor/webviz-subsurface-components/pull/2821), [#2820](https://github.com/equinor/webviz-subsurface-components/issues/2820))
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 2.0.0
+
+### ❤️ Thank You
+
+- Copilot @Copilot
+- Håvard Bjerke
+
+## 2.9.3 (2026-08-06)
+
+### 🩹 Fixes
+
+- well pick name is not clear in dark mode ([#2814](https://github.com/equinor/webviz-subsurface-components/pull/2814))
+
+### ❤️ Thank You
+
+- Amro Abdelfatah
+
+## 2.9.2 (2026-07-28)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 1.4.12
+
 ## 2.9.1 (2026-07-27)
 
 ### 🧱 Updated Dependencies

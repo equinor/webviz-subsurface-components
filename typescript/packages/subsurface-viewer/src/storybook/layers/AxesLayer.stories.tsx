@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-webpack5";
 
@@ -11,6 +11,7 @@ import { getRgba } from "../util/color";
 const stories: Meta = {
     component: DeckGL,
     title: "SubsurfaceViewer / AxesLayer",
+    tags: ["no-dom-test"],
 };
 export default stories;
 

@@ -9,6 +9,7 @@ const args = require("../../../../../example-data/two_logs_example.json");
 // storybook page
 const meta: Meta<typeof SyncLogViewer> = {
     title: "WellLogViewer/Demo/ExampleData",
+    tags: ["no-screenshot-test"],
 };
 
 export default meta;

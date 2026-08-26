@@ -1,4 +1,5 @@
-import React, { Component } from "react";
+import type React from "react";
+import { Component } from "react";
 
 import PropTypes from "prop-types";
 
@@ -289,7 +290,7 @@ export default class WellLogViewer extends Component<
         return primaryAxis;
     }
 
-    render(): JSX.Element {
+    render(): React.JSX.Element {
         // Copy and pass all props to view-component, expect primary-axis
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { primaryAxis: _, ...otherProps } = this.props;
