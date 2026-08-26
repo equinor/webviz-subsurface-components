@@ -25,6 +25,7 @@ import { precisionForTests } from "../shader_modules/test-precision/precisionFor
 
 import fsShader from "./marker.fs.glsl";
 import vsShader from "./marker.vs.glsl";
+import { toRadians } from "math.gl";
 
 export type WellMarkersLayerProps = _WellMarkersLayerProps;
 
@@ -100,6 +101,22 @@ export interface _WellMarkersLayerProps extends ExtendedLayerProps {
      * Outline color accessor.
      */
     getOutlineColor?: Accessor<WellMarkerDataT, Color>;
+
+    /**
+     * The modelMatrix props is discarded by default, in order to maintain marker shape and rotation for different vertical scales.
+     * Set this to apply the matrix as normal
+     */
+    applyModelMatrix?: boolean;
+
+    /**
+     * Internal props interface for the WellMarkersLayer component.
+     *
+     * @remarks
+     * This property is intended for internal use only and should not be used directly by external consumers.
+     *
+     * @internal
+     */
+    _verticalScale?: number;
 }
 
 const normalizeColor = (color: Color | undefined): Color => {
@@ -127,6 +144,7 @@ const normalizeColor = (color: Color | undefined): Color => {
 
 const defaultProps: DefaultProps<WellMarkersLayerProps> = {
     "@@type": "WellMarkersLayer",
+    _verticalScale: 1,
     name: "Well Markers",
     id: "well-markers",
     shape: "circle",
@@ -179,9 +197,25 @@ interface IMarkerShape {
 
 export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
     private shapes: Map<string, IMarkerShape> = new Map();
+    declare state: {
+        verticalScale: number;
+        applyModelMatrix: boolean;
+        shapeModel: Model;
+        outlineModel: Model;
+    };
 
     constructor(props: WellMarkersLayerProps) {
-        super(props);
+        const { modelMatrix, ...otherProps } = props;
+
+        // ? I'm unsure if there is a better way to extract the vertical-scale, *and* discard the matrix outside of the constructor (and putting the scale in state).
+        // ? This approach works for now, but should potentially be fixed
+        const verticalScale = modelMatrix ? modelMatrix[10] : 1;
+
+        super({
+            ...otherProps,
+            _verticalScale: verticalScale,
+            modelMatrix: props.applyModelMatrix ? props.modelMatrix : undefined,
+        });
         this.initShapes();
     }
 
@@ -192,6 +226,17 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
                 type: "float64",
                 transition: true,
                 accessor: "getPosition",
+                transform: (value: Position) => {
+                    // The model matrix would already have applied the position at this point
+                    if (this.state.applyModelMatrix) return value;
+                    if (!value) return value;
+                    if (value.length < 3) return value;
+
+                    const newValue = [...value];
+                    newValue[2] *= this.state.verticalScale;
+
+                    return newValue;
+                },
             },
             instanceSizes: {
                 size: 1,
@@ -206,6 +251,7 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
                 transition: true,
                 accessor: "getAzimuth",
                 defaultValue: 0,
+                // ! Technically, we should adjust the azimuth as well, but we generally only care about the z-scale
             },
             instanceInclinations: {
                 size: 1,
@@ -213,6 +259,17 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
                 transition: true,
                 accessor: "getInclination",
                 defaultValue: 0,
+                transform: (value: number) => {
+                    const verticalScale = Math.pow(
+                        this.state.verticalScale,
+                        // As z-scale increases, the disc is stretched upwards, causing it to rotate away from the tangent.
+                        // To compensate, we need to apply a square root to the vertical scale if the model matrix is applied, since it will have already applied the scale once.
+                        this.state.applyModelMatrix ? 2 : 1
+                    );
+
+                    const tangent = Math.tan(toRadians(value));
+                    return Math.atan(tangent / verticalScale) * (180 / Math.PI);
+                },
             },
             instanceColors: {
                 size: 4,
@@ -230,21 +287,40 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
             },
         });
         const models = this._createModels();
-        this.setState({ shapeModel: models[0], outlineModel: models[1] });
+        this.setState({
+            shapeModel: models[0],
+            outlineModel: models[1],
+            verticalScale: 1,
+            applyModelMatrix: false,
+        });
     }
 
     updateState(params: UpdateParameters<Layer<WellMarkersLayerProps>>) {
         super.updateState(params);
+
+        if (
+            params.props.applyModelMatrix !== params.oldProps.applyModelMatrix
+        ) {
+            this.setState({ applyModelMatrix: params.props.applyModelMatrix });
+            this.getAttributeManager()?.invalidateAll();
+        }
+        if (params.props._verticalScale !== params.oldProps._verticalScale) {
+            this.setState({ verticalScale: params.props._verticalScale });
+            this.getAttributeManager()?.invalidate("instancePositions");
+            this.getAttributeManager()?.invalidate("instanceInclinations");
+        }
+
         if (
             params.changeFlags.extensionsChanged ||
             params.changeFlags.propsChanged
         ) {
-            const oldShapeModel = this.state?.["shapeModel"] as Model;
+            const oldShapeModel = this.state?.shapeModel;
             oldShapeModel.destroy();
-            const oldOutlineModel = this.state?.["outlineModel"] as Model;
+            const oldOutlineModel = this.state?.outlineModel;
             oldOutlineModel.destroy();
 
             const models = this._createModels();
+
             this.setState({
                 ...this.state,
                 shapeModel: models[0],
