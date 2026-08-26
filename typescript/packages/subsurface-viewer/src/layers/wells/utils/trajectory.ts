@@ -475,17 +475,17 @@ export function injectMdPoints(
 /**
  * Computes the Azimuth and Inclination angles – in degrees – for a given segment.
  * @param segmentStartPos A 3D world position that the segments starts in
- * @param segmentEndPo A 3D world position that the segment ends in
+ * @param segmentEndPos A 3D world position that the segment ends in
  * @returns An object containing the azimuth and inclination angles in degrees
  */
 export function getAziAndInclForSegment(
     segmentStartPos: Position,
-    segmentEndPo: Position
+    segmentEndPos: Position
 ) {
     const vector = new Vector3(
-        segmentEndPo[0] - segmentStartPos[0],
-        segmentEndPo[1] - segmentStartPos[1],
-        segmentEndPo[2] - segmentStartPos[2]
+        segmentEndPos[0] - segmentStartPos[0],
+        segmentEndPos[1] - segmentStartPos[1],
+        segmentEndPos[2] - segmentStartPos[2]
     ).normalize();
 
     const azimuth = Math.atan2(vector[1], vector[0]) * (180 / Math.PI) + 90;

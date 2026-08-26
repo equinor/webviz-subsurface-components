@@ -486,7 +486,7 @@ export const MarkersAlongWellPath: StoryObj<MarkersAlongWellPath> = {
         }, [mdSteps, partialVolveWells.features]);
 
         const hoverMarkerData = React.useMemo<WellMarkerDataT>(() => {
-            if (!hoveredId || !hoveredMd)
+            if (hoveredId == null || hoveredMd == null)
                 return {
                     position: [-1, -1, -1],
                     size: 20,

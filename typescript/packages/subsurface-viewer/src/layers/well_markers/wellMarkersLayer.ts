@@ -260,12 +260,11 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
                 accessor: "getInclination",
                 defaultValue: 0,
                 transform: (value: number) => {
-                    const verticalScale = Math.pow(
-                        this.state.verticalScale,
-                        // As z-scale increases, the disc is stretched upwards, causing it to rotate away from the tangent.
-                        // To compensate, we need to apply a square root to the vertical scale if the model matrix is applied, since it will have already applied the scale once.
-                        this.state.applyModelMatrix ? 2 : 1
-                    );
+                    // As z-scale increases, the disc is stretched upwards, causing it to rotate away from the tangent.
+                    // To compensate, we need to square the vertical scale, since it will have already applied the scale once.
+                    const verticalScale = this.state.applyModelMatrix
+                        ? Math.pow(this.state.verticalScale, 2)
+                        : this.state.verticalScale;
 
                     const tangent = Math.tan(toRadians(value));
                     return Math.atan(tangent / verticalScale) * (180 / Math.PI);

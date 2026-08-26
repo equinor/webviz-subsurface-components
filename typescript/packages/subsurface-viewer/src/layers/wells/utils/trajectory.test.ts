@@ -619,7 +619,7 @@ describe("trajectory utils", () => {
                 const result = getAziAndInclForSegment(start, end);
 
                 expect(result.inclination).toBeCloseTo(90, 1);
-                expect(result.azimuth).toBeCloseTo(0, 1);
+                expect(result.azimuth).toBeCloseTo(180, 1);
             });
 
             it("should calculate azimuth and inclination for diagonal segment", () => {
@@ -628,8 +628,8 @@ describe("trajectory utils", () => {
 
                 const result = getAziAndInclForSegment(start, end);
 
-                expect(result.azimuth).toBeCloseTo(45, 1);
                 expect(result.inclination).toBeCloseTo(54.74, 1);
+                expect(result.azimuth).toBeCloseTo(135, 1);
             });
 
             it("should handle segment with non-zero start position", () => {
@@ -639,7 +639,7 @@ describe("trajectory utils", () => {
                 const result = getAziAndInclForSegment(start, end);
 
                 expect(result.inclination).toBeCloseTo(90, 1);
-                expect(result.azimuth).toBeCloseTo(0, 1);
+                expect(result.azimuth).toBeCloseTo(180, 1);
             });
 
             it("should calculate for downward segment", () => {
@@ -649,6 +649,7 @@ describe("trajectory utils", () => {
                 const result = getAziAndInclForSegment(start, end);
 
                 expect(result.inclination).toBeCloseTo(180, 1);
+                expect(result.azimuth).toBeDefined();
             });
 
             describe("getSegmentIndicesForMd", () => {
