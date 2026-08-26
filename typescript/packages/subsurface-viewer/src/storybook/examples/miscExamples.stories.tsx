@@ -620,17 +620,12 @@ function getMarkerDataAtMd(
         segStartPos[2] + (segEndPos[2] - segStartPos[2]) * lengthAlong,
     ] as const;
 
-    let wellColor;
-    if (args.overrideColor) wellColor = args.overrideColor;
-    else if (well.properties.color) wellColor = [...well.properties.color];
-    else wellColor = [255, 0, 0];
-
-    wellColor[3] = args.colorAlpha ?? 115;
-
     const { azimuth, inclination } = getAziAndInclForSegment(
         segStartPos,
         segEndPos
     );
+
+    const color = args.overrideColor ?? well.properties.color ?? [255, 0, 0];
 
     return {
         position: position,
@@ -638,7 +633,8 @@ function getMarkerDataAtMd(
         inclination: inclination,
         md: md,
         size: 20,
-        color: wellColor,
+        // Set alpha regardless of other color
+        color: [color[0], color[1], color[2], args.colorAlpha ?? 115],
         outlineColor: [0, 0, 0, args.colorAlpha ?? 115],
     };
 }
