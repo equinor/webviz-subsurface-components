@@ -49,3 +49,7 @@ export type { WellsLayerProps } from "./wells/wellsLayer";
 
 // Export layer utility functions
 export { abscissaTransform } from "./wells/utils/abscissaTransform";
+export {
+    getAziAndInclForSegment,
+    getSegmentIndicesForMd,
+} from "./wells/utils/trajectory";

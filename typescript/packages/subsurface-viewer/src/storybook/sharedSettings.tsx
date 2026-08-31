@@ -6,7 +6,11 @@ import { styled } from "@mui/material/styles";
 
 import exampleData from "../../../../../example-data/deckgl-map.json";
 
-import type { SubsurfaceViewerProps, ViewsType } from "../SubsurfaceViewer";
+import type {
+    SubsurfaceViewerProps,
+    ViewStateType,
+    ViewsType,
+} from "../SubsurfaceViewer";
 import SubsurfaceViewer from "../SubsurfaceViewer";
 import type { BoundingBox2D, BoundingBox3D, Point3D } from "../utils";
 
@@ -139,6 +143,14 @@ export const volveWellsLayer = {
 export const volveWellsBounds: BoundingBox2D = [
     432150, 6475800, 439400, 6481500,
 ];
+
+/** 3D camera settings that looks at the volve wells with a slight downwards angle  */
+export const volveWellsCameraPosition3D: ViewStateType = {
+    rotationOrbit: -18,
+    rotationX: 42,
+    zoom: -4,
+    target: [436063, 6477373, -1447],
+};
 
 export const emptyVolveWellsViewViewport: ViewsType = {
     layout: [1, 1],

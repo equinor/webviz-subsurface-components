@@ -50,6 +50,7 @@ const stories: Meta = {
         triggerHome: 0,
     },
 };
+
 export default stories;
 
 // Layers data for storybook example 1
