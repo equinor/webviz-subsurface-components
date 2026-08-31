@@ -558,6 +558,21 @@ function defaultWellPickDepthLabel(value: number | undefined): string {
 }
 
 /**
+ * Escapes a well-pick label so that it can be safely embedded in the HTML
+ * string used to render the label table. Labels may come from log data or from
+ * a consumer supplied `formatWellPickLabel` callback and must never be
+ * interpreted as markup.
+ */
+export function escapeWellPickLabel(label: string): string {
+    return label
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
+/**
  * The well-pick labels as rendered when no `formatWellPickLabel` callback is
  * given: depths rounded to whole units via `toFixed(0)` (empty string when the
  * value is not finite) and the raw horizon name.
@@ -636,9 +651,13 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
             { horizon, vPrimary, vSecondary },
             formatWellPickLabel
         );
-        const txtPrimary = labels.primary;
+        // Labels are interpolated into an HTML string below, so they must be
+        // escaped: they may contain markup characters, either from the log
+        // data or from a consumer supplied `formatWellPickLabel` callback.
+        const txtPrimary = escapeWellPickLabel(labels.primary);
         // (primaryAxis === "md" ? "TVD:" : "MD:") +
-        const txtSecondary = labels.secondary;
+        const txtSecondary = escapeWellPickLabel(labels.secondary);
+        const txtHorizon = escapeWellPickLabel(labels.horizon);
 
         const elmName = "wp" + horizon;
         const pinelm = instance.overlay.create(elmName, {});
@@ -685,7 +704,7 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
                           "<span " +
                           styleText +
                           ">" +
-                          labels.horizon +
+                          txtHorizon +
                           "</span>" +
                           "</td></tr>" +
                           "</table>"
@@ -708,7 +727,7 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
                           "<span " +
                           styleText +
                           ">" +
-                          labels.horizon +
+                          txtHorizon +
                           "</span>" +
                           "</td>" +
                           "</tr></table>"

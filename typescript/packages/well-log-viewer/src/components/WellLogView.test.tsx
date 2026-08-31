@@ -8,6 +8,7 @@ import { colorTables } from "@emerson-eps/color-tables";
 
 import WellLogView, {
     defaultWellPickLabels,
+    escapeWellPickLabel,
     resolveWellPickLabels,
 } from "./WellLogView";
 import type { WellPickLabelInput, WellPickProps } from "./WellLogView";
@@ -227,5 +228,36 @@ describe("Well pick label rendering", () => {
         const cells = wellPickCells(container);
         expect(cells).toContain("1644.00");
         expect(cells).toContain("HOR_1");
+    });
+
+    it("renders formatter output as text and never as markup", () => {
+        const { container } = renderWithWellPick(() => ({
+            primary: "<b>1644</b>",
+            secondary: "A & B",
+            horizon: "<img src=x onerror=alert(1)>",
+        }));
+        const cells = wellPickCells(container);
+        expect(cells).toContain("<b>1644</b>");
+        expect(cells).toContain("A & B");
+        expect(cells).toContain("<img src=x onerror=alert(1)>");
+        expect(container.querySelectorAll(".wellpick b")).toHaveLength(0);
+        expect(container.querySelectorAll(".wellpick img")).toHaveLength(0);
+    });
+});
+
+describe("escapeWellPickLabel", () => {
+    it("escapes the characters that are significant in HTML", () => {
+        expect(escapeWellPickLabel("<b>a & b</b>")).toBe(
+            "&lt;b&gt;a &amp; b&lt;/b&gt;"
+        );
+        expect(escapeWellPickLabel("\"quoted\" 'single'")).toBe(
+            "&quot;quoted&quot; &#39;single&#39;"
+        );
+    });
+
+    it("leaves plain labels untouched", () => {
+        expect(escapeWellPickLabel("Top Reservoir 2501")).toBe(
+            "Top Reservoir 2501"
+        );
     });
 });
