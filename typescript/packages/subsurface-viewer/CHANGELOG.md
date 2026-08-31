@@ -1,3 +1,13 @@
+## 2.1.0 (2026-08-31)
+
+### 🚀 Features
+
+- Make WellMarkersLayer better in scaled views. ([#2822](https://github.com/equinor/webviz-subsurface-components/pull/2822), [#2823](https://github.com/equinor/webviz-subsurface-components/issues/2823))
+
+### ❤️ Thank You
+
+- Anders Rantala Hunderi
+
 ## 2.0.1 (2026-08-24)
 
 ### 🧱 Updated Dependencies
