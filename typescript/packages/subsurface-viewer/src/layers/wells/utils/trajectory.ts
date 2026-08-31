@@ -471,3 +471,63 @@ export function injectMdPoints(
         },
     };
 }
+
+/**
+ * Computes the Azimuth and Inclination angles – in degrees – for a given segment.
+ * @param segmentStartPos A 3D world position that the segments starts in
+ * @param segmentEndPos A 3D world position that the segment ends in
+ * @returns An object containing the azimuth and inclination angles in degrees
+ */
+export function getAziAndInclForSegment(
+    segmentStartPos: Position,
+    segmentEndPos: Position
+) {
+    const vector = new Vector3(
+        segmentEndPos[0] - segmentStartPos[0],
+        segmentEndPos[1] - segmentStartPos[1],
+        segmentEndPos[2] - segmentStartPos[2]
+    ).normalize();
+
+    const azimuth = Math.atan2(vector[1], vector[0]) * (180 / Math.PI) + 90;
+    const inclination = Math.acos(vector[2]) * (180 / Math.PI);
+
+    return { azimuth, inclination };
+}
+
+/**
+ * Locates the segment of a trajectory that contains a given MD.
+ * @param trajectory_md The measured depth array for a well trajectory. Expected to be sorted and without duplicates.
+ * @param md The target md
+ * @returns A tuple containing the lower and upper segment indices, as well as the fractional position along the segment (0-1, with 0 being the beginning of the segment)
+ */
+export function getSegmentIndicesForMd(
+    trajectory_md: number[],
+    md: number
+): [start: number, end: number, lengthAlong: number] {
+    if (trajectory_md.length < 2) {
+        throw new Error("Expected trajectory to have at least 2 points");
+    }
+
+    const mdMin = trajectory_md[0];
+    const mdMax = trajectory_md[trajectory_md.length - 1];
+
+    if (md < mdMin || md > mdMax) {
+        throw new Error(
+            `MD ${md} is outside of trajectory range ${[mdMin, mdMax].toString()}`
+        );
+    }
+
+    if (md === mdMin) {
+        return [0, 1, 0];
+    }
+
+    // We assume the trajectory is sorted, and without duplicates, so lower and upper is guaranteed to be different
+    const upperIndex = _.sortedIndex(trajectory_md, md);
+    const lowerIndex = upperIndex - 1;
+
+    const fraction =
+        (md - trajectory_md[lowerIndex]) /
+        (trajectory_md[upperIndex] - trajectory_md[lowerIndex]);
+
+    return [lowerIndex, upperIndex, fraction];
+}

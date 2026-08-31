@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import React, { Profiler } from "react";
+import { Profiler } from "react";
 
 import "jest";
 import { describe, it, jest } from "@jest/globals";

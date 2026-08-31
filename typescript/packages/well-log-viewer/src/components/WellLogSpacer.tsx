@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import React, { Component } from "react";
+import type React from "react";
+import { Component } from "react";
 
 import type { WellLogController, WellPickProps } from "./WellLogView";
 import { getWellPicks } from "./WellLogView";
@@ -191,7 +192,7 @@ class WellLogSpacer extends Component<WellLogSpacerProps /*, State*/> {
         this._isMount = false;
     }
 
-    render(): JSX.Element {
+    render(): React.JSX.Element {
         // TODO: Fix this the next time the file is edited.
         // eslint-disable-next-line react/prop-types
         const horizontal = this.props.horizontal;
@@ -426,7 +427,9 @@ class WellLogSpacer extends Component<WellLogSpacerProps /*, State*/> {
             <div
                 className="welllogspacer" // for CSS customization
                 style={{ flexDirection: horizontal ? "row" : "column" }}
-                ref={(el) => (this.container = el as HTMLElement)}
+                ref={(el) => {
+                    this.container = el as HTMLElement;
+                }}
             >
                 <div
                     className={

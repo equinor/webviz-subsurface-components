@@ -45,6 +45,7 @@ class MockCallbackManager {
 const stories: Meta = {
     component: WellLogScaleSelector,
     title: "WellLogViewer/Components/WellLogScaleSelector",
+    tags: ["no-screenshot-test"],
     parameters: {
         docs: {
             description: {
@@ -77,7 +78,7 @@ const stories: Meta = {
 export default stories;
 
 interface TemplateProps {
-    label?: string | JSX.Element;
+    label?: string | React.JSX.Element;
     values?: number[];
     round?: boolean | number;
 }

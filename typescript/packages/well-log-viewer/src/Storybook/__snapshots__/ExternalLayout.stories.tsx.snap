@@ -1,0 +1,223 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`WellLogViewer/Demo/ClassificationLayout RTCTabsLayout smoke-test 1`] = `
+<div class="MuiBox-root css-0"
+     style="width: 100%;"
+>
+  <div class="MuiTabs-root css-pagre9">
+    <div class="MuiTabs-scrollableX MuiTabs-hideScrollbar css-i8yde5"
+         style="width: 99px; height: 99px; position: absolute; top: -9999px; overflow: scroll;"
+    >
+    </div>
+    <div class="MuiTabs-scroller MuiTabs-hideScrollbar MuiTabs-scrollableX css-jb8z7h"
+         style="margin-bottom: 0px;"
+    >
+      <div aria-label="blank-tabs"
+           role="tablist"
+           class="MuiTabs-list MuiTabs-flexContainer css-162tvoi"
+      >
+        <button class="MuiButtonBase-root MuiTab-root MuiTab-textColorPrimary MuiTab-wrapped Mui-selected css-143x3f3"
+                tabindex="0"
+                type="button"
+                role="tab"
+                aria-selected="true"
+                id="blank-tab-0"
+                aria-controls="blank-tabpanel-0"
+                aria-label
+        >
+          <div class="MuiBox-root css-0"
+               id="blank-tablabel-0"
+          >
+            <p class="MuiTypography-root MuiTypography-body2 css-koe4f5">
+              tab 1
+            </p>
+          </div>
+        </button>
+        <button class="MuiButtonBase-root MuiTab-root MuiTab-textColorPrimary MuiTab-wrapped css-143x3f3"
+                tabindex="-1"
+                type="button"
+                role="tab"
+                aria-selected="false"
+                id="blank-tab-1"
+                aria-controls="blank-tabpanel-1"
+                aria-label
+        >
+          <div class="MuiBox-root css-0"
+               id="blank-tablabel-1"
+          >
+            <p class="MuiTypography-root MuiTypography-body2 css-koe4f5">
+              tab 2
+            </p>
+          </div>
+        </button>
+        <button class="MuiButtonBase-root MuiTab-root MuiTab-textColorPrimary MuiTab-wrapped css-143x3f3"
+                tabindex="-1"
+                type="button"
+                role="tab"
+                aria-selected="false"
+                id="blank-tab-2"
+                aria-controls="blank-tabpanel-2"
+                aria-label
+        >
+          <div class="MuiBox-root css-0"
+               id="blank-tablabel-2"
+          >
+            <p class="MuiTypography-root MuiTypography-body2 css-koe4f5">
+              tab 3
+            </p>
+          </div>
+        </button>
+      </div>
+      <span class="MuiTabs-indicator css-jkmkwa"
+            style="left: 0px; width: 90px;"
+      >
+      </span>
+    </div>
+  </div>
+  <div role="tabpanel"
+       id="tab1-tabpanel"
+       data-testid="tab1-tabpanel"
+       aria-labelledby="tab1-tab"
+  >
+    <div>
+      empty tab
+    </div>
+  </div>
+  <div role="tabpanel"
+       hidden
+       id="tab2-tabpanel"
+       data-testid="tab2-tabpanel"
+       aria-labelledby="tab2-tab"
+  >
+    <div style="overflow: auto;">
+      <div class="MuiGrid-root MuiGrid-container MuiGrid-direction-xs-column css-82llv9">
+        <div>
+          tab title
+        </div>
+      </div>
+      <br>
+    </div>
+  </div>
+  <div role="tabpanel"
+       hidden
+       id="tab3-tabpanel"
+       data-testid="tab3-tabpanel"
+       aria-labelledby="tab3-tab"
+  >
+    <div>
+      empty tab
+    </div>
+  </div>
+</div>
+`;
+
+exports[`WellLogViewer/Demo/ClassificationLayout RTCTabsLayoutWithScrollbar smoke-test 1`] = `
+<div class="MuiBox-root css-0"
+     style="width: 100%;"
+>
+  <div class="MuiTabs-root css-pagre9">
+    <div class="MuiTabs-scrollableX MuiTabs-hideScrollbar css-i8yde5"
+         style="width: 99px; height: 99px; position: absolute; top: -9999px; overflow: scroll;"
+    >
+    </div>
+    <div class="MuiTabs-scroller MuiTabs-hideScrollbar MuiTabs-scrollableX css-jb8z7h"
+         style="margin-bottom: 0px;"
+    >
+      <div aria-label="blank-tabs"
+           role="tablist"
+           class="MuiTabs-list MuiTabs-flexContainer css-162tvoi"
+      >
+        <button class="MuiButtonBase-root MuiTab-root MuiTab-textColorPrimary MuiTab-wrapped Mui-selected css-143x3f3"
+                tabindex="0"
+                type="button"
+                role="tab"
+                aria-selected="true"
+                id="blank-tab-0"
+                aria-controls="blank-tabpanel-0"
+                aria-label
+        >
+          <div class="MuiBox-root css-0"
+               id="blank-tablabel-0"
+          >
+            <p class="MuiTypography-root MuiTypography-body2 css-koe4f5">
+              tab 1
+            </p>
+          </div>
+        </button>
+        <button class="MuiButtonBase-root MuiTab-root MuiTab-textColorPrimary MuiTab-wrapped css-143x3f3"
+                tabindex="-1"
+                type="button"
+                role="tab"
+                aria-selected="false"
+                id="blank-tab-1"
+                aria-controls="blank-tabpanel-1"
+                aria-label
+        >
+          <div class="MuiBox-root css-0"
+               id="blank-tablabel-1"
+          >
+            <p class="MuiTypography-root MuiTypography-body2 css-koe4f5">
+              tab 2
+            </p>
+          </div>
+        </button>
+        <button class="MuiButtonBase-root MuiTab-root MuiTab-textColorPrimary MuiTab-wrapped css-143x3f3"
+                tabindex="-1"
+                type="button"
+                role="tab"
+                aria-selected="false"
+                id="blank-tab-2"
+                aria-controls="blank-tabpanel-2"
+                aria-label
+        >
+          <div class="MuiBox-root css-0"
+               id="blank-tablabel-2"
+          >
+            <p class="MuiTypography-root MuiTypography-body2 css-koe4f5">
+              tab 3
+            </p>
+          </div>
+        </button>
+      </div>
+      <span class="MuiTabs-indicator css-jkmkwa"
+            style="left: 0px; width: 90px;"
+      >
+      </span>
+    </div>
+  </div>
+  <div role="tabpanel"
+       id="tab1-tabpanel"
+       data-testid="tab1-tabpanel"
+       aria-labelledby="tab1-tab"
+  >
+    <div>
+      empty tab
+    </div>
+  </div>
+  <div role="tabpanel"
+       hidden
+       id="tab2-tabpanel"
+       data-testid="tab2-tabpanel"
+       aria-labelledby="tab2-tab"
+  >
+    <div style="overflow: auto;">
+      <div class="MuiGrid-root MuiGrid-container MuiGrid-direction-xs-column css-82llv9">
+        <div>
+          tab title
+        </div>
+      </div>
+      <br>
+    </div>
+  </div>
+  <div role="tabpanel"
+       hidden
+       id="tab3-tabpanel"
+       data-testid="tab3-tabpanel"
+       aria-labelledby="tab3-tab"
+  >
+    <div>
+      empty tab
+    </div>
+  </div>
+</div>
+`;

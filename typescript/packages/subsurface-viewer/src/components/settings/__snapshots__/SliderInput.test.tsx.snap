@@ -4,6 +4,7 @@ exports[`Test SliderInput snapshot test 1`] = `
 .c0 {
   display: flex;
   justify-content: space-between;
+  align-items: flex-end;
   position: relative;
   margin: 0;
   color: var(--eds_text__static_icons__tertiary, rgba(111, 111, 111, 1));
@@ -175,11 +176,7 @@ exports[`Test SliderInput snapshot test 1`] = `
   grid-template-columns: 1fr 1fr;
   width: 100%;
   position: relative;
-  background-image: url("data:image/svg+xml,<svg xmlns='http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'><rect x='0' y='11' fill='var(--eds_ui_background__light, rgba(247, 247, 247, 1))' width='100%' height='4' rx='2' /></svg>");background-size:cover;background-repeat:no-repeat;} .c2::after{grid-column:1/span 2;grid-row:2;height:4px;margin-bottom:9px;align-self:end;content:'';background:var(--background);} .c2::after{margin-right:calc( (var(--max) - var(--value)) / var(--dif) * var(--realWidth) );margin-left:3px;} .c2:has(:focus-visible)>output,.c2:hover>output{--showTooltip:1;--tooltip-background:var(--eds_interactive_primary__hover, rgba(0, 79, 85, 1));} @media (hover:hover) and (pointer:fine){.c2:hover:not([data-disabled]){background-image:url("data:image/svg+xml,<svg xmlns='http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'><rect x='0' y='11' fill='var(--eds_ui_background__medium, rgba(220, 220, 220, 1))' width='100%' height='4' rx='2' /></svg>");
-}
-
-.c2:hover:not([data-disabled])::after {
-  background: var(--background-hover);
+  background-image: url("data:image/svg+xml,<svg xmlns='http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'><rect x='0' y='11' fill='var(--eds_ui_background__light%2C%20rgba(247%2C%20247%2C%20247%2C%201))' width='100%' height='4' rx='2' /></svg>");background-size:cover;background-repeat:no-repeat;} .c2::after{grid-column:1/span 2;grid-row:2;height:4px;margin-bottom:9px;align-self:end;content:'';background:var(--background);} .c2::after{margin-right:calc( (var(--max) - var(--value)) / var(--dif) * var(--realWidth) );margin-left:3px;} .c2:has(:focus-visible)>output,.c2:hover>output{--showTooltip:1;--tooltip-background:var(--eds_interactive_primary__hover, rgba(0, 79, 85, 1));} @media (hover:hover) and (pointer:fine){.c2:hover:not([data-disabled]){background-image:url("data:image/svg+xml,<svg xmlns='http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'><rect x='0' y='11' fill='var(--eds_ui_background__medium%2C%20rgba(220%2C%20220%2C%20220%2C%201))' width='100%' height='4' rx='2' /></svg>");
 }
 
 @media (hover:hover) and (pointer:fine) {
@@ -231,7 +228,7 @@ exports[`Test SliderInput snapshot test 1`] = `
   <div
     class="c2"
     id="Opacity-slider"
-    style="padding-top: 5px; padding-right: 10px; padding-bottom: 25px; width: 3rem; --min: 0; --max: 100; --value: 5000; --showTooltip: 0; --background: var(--eds_interactive_primary__resting, rgba(0, 112, 121, 1)); --background-hover: var(--eds_interactive_primary__hover, rgba(0, 79, 85, 1));"
+    style="padding-top: 5px; padding-right: 10px; padding-bottom: 25px; width: 3rem; --min: 0; --max: 100; --value: 5000; --showTooltip: 0; --background: var(--eds_interactive_primary__resting, rgba(0, 112, 121, 1));"
     value="5000"
   >
     <input

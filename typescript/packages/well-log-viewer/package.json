@@ -1,6 +1,6 @@
 {
   "name": "@webviz/well-log-viewer",
-  "version": "2.9.3",
+  "version": "3.0.1",
   "publishConfig": {
     "access": "public"
   },
@@ -25,21 +25,21 @@
   "author": "Equinor <opensource@equinor.com>",
   "license": "MPL-2.0",
   "dependencies": {
-    "@emerson-eps/color-tables": "^1.0.2",
+    "@emerson-eps/color-tables": "^1.1.0",
     "@equinor/videx-wellog": "^0.11.3",
-    "@webviz/wsc-common": "1.4.12",
+    "@webviz/wsc-common": "2.0.1",
     "convert-units": "^2.3.4",
     "d3": "^7.8.2"
   },
   "peerDependencies": {
     "@mui/icons-material": "^5.11 || ^6 || ^7.3",
     "@mui/material": "^5.11 || ^6 || ^7.3",
-    "react": "^17 || ^18",
-    "react-dom": "^17 || ^18"
+    "react": "^18 || ^19",
+    "react-dom": "^18 || ^19"
   },
   "devDependencies": {
-    "@reduxjs/toolkit": "^2.3.0",
-    "react-redux": "^9.1.2"
+    "@reduxjs/toolkit": "^2.12.0",
+    "react-redux": "^9.3.0"
   },
   "volta": {
     "node": "22.22.0"

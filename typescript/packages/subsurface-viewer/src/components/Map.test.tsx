@@ -1,5 +1,3 @@
-import React from "react";
-
 import "jest";
 import { describe, expect, xit } from "@jest/globals";
 

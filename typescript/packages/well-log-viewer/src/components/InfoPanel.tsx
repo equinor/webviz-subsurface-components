@@ -1,15 +1,15 @@
 import type { ReactNode } from "react";
-import React from "react";
+import type React from "react";
 
 import type { Info } from "./InfoTypes";
 
 interface Props {
-    header?: string | JSX.Element;
+    header?: string | React.JSX.Element;
     infos: Info[];
     onGroupClick?: (info: Info) => void;
 }
 
-function createSeparator(info: Info): JSX.Element {
+function createSeparator(info: Info): React.JSX.Element {
     return (
         <tr key={"_separator_" + info.trackId + "." + info.name}>
             {/* Set key prop just for react pleasure. See https://reactjs.org/link/warning-keys for more information */}

@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from "react";
+import type React from "react";
+import { useState, useEffect, useCallback } from "react";
 
 import type { CallbackManager } from "./CallbackManager";
 
@@ -7,7 +8,7 @@ import ZoomSlider from "./ZoomSlider";
 interface Props {
     callbackManager: CallbackManager | undefined;
 
-    label?: string | JSX.Element;
+    label?: string | React.JSX.Element;
     max?: number;
 }
 

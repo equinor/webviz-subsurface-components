@@ -1,3 +1,38 @@
+## 2.1.0 (2026-08-31)
+
+### 🚀 Features
+
+- Make WellMarkersLayer better in scaled views. ([#2822](https://github.com/equinor/webviz-subsurface-components/pull/2822), [#2823](https://github.com/equinor/webviz-subsurface-components/issues/2823))
+
+### ❤️ Thank You
+
+- Anders Rantala Hunderi
+
+## 2.0.1 (2026-08-24)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 2.0.1
+
+# 2.0.0 (2026-08-20)
+
+### 🚀 Features
+
+- ⚠️  migrate to react 19 ([#2821](https://github.com/equinor/webviz-subsurface-components/pull/2821), [#2820](https://github.com/equinor/webviz-subsurface-components/issues/2820))
+
+### ⚠️  Breaking Changes
+
+- migrate to react 19  ([#2821](https://github.com/equinor/webviz-subsurface-components/pull/2821), [#2820](https://github.com/equinor/webviz-subsurface-components/issues/2820))
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 2.0.0
+
+### ❤️ Thank You
+
+- Copilot @Copilot
+- Håvard Bjerke
+
 ## 1.18.6 (2026-07-28)
 
 ### 🧱 Updated Dependencies

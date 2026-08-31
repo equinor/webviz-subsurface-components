@@ -1,4 +1,3 @@
-import React from "react";
 import { createRoot } from "react-dom/client";
 import type { Plot } from "@equinor/videx-wellog";
 import type WellLogView from "../components/WellLogView";

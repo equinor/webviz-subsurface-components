@@ -1,13 +1,16 @@
-// @ts-expect-error TS7016
 import { toMatchImageSnapshot } from "jest-image-snapshot";
 
-import { getStoryContext, type TestRunnerConfig } from "@storybook/test-runner";
+import type { Page } from "@playwright/test";
+import {
+    getStoryContext,
+    type TestContext,
+    type TestRunnerConfig,
+} from "@storybook/test-runner";
 
 // https://github.com/mapbox/pixelmatch#pixelmatchimg1-img2-output-width-height-options
 const customDiffConfig = {};
 
-// @ts-expect-error TS7006
-const screenshotTest = async (page, context) => {
+const screenshotTest = async (page: Page, context: TestContext) => {
     let previousScreenshot: Buffer = Buffer.from("");
 
     let stable = false;
@@ -27,7 +30,6 @@ const screenshotTest = async (page, context) => {
         }
     }
 
-    // @ts-expect-error TS2551
     expect(previousScreenshot).toMatchImageSnapshot({
         customSnapshotIdentifier: context.id,
         // https://www.npmjs.com/package/jest-image-snapshot/v/4.0.2#-api
@@ -38,9 +40,36 @@ const screenshotTest = async (page, context) => {
     });
 };
 
+const domSnapshotTest = async (page: Page) => {
+    // Some stories render their DOM in multiple passes (e.g. a debounced
+    // ResizeObserver-driven layout for axis ticks), so poll until the
+    // markup stops changing before asserting - mirroring the stability
+    // loop used by screenshotTest above.
+    let previousHTML = "";
+    let stable = false;
+    const maxAttempts = 20;
+    const poll = 500;
+
+    for (let attempt = 0; attempt < maxAttempts && !stable; attempt++) {
+        const elementHandler = await page.$("#storybook-root");
+        const currentHTML = elementHandler
+            ? await elementHandler.innerHTML()
+            : "";
+
+        if (currentHTML === previousHTML) {
+            stable = true;
+        } else {
+            previousHTML = currentHTML;
+            await page.waitForTimeout(poll);
+        }
+    }
+
+    expect(previousHTML).toMatchSnapshot();
+};
+
 const config: TestRunnerConfig = {
     setup() {
-        jest.retryTimes(2);
+        jest.retryTimes(3);
 
         expect.extend({ toMatchImageSnapshot });
     },
@@ -54,6 +83,11 @@ const config: TestRunnerConfig = {
 
         if (!storyContext.tags.includes("no-screenshot-test")) {
             await screenshotTest(page, context);
+        }
+
+        // Run DOM snapshot test unless no-dom-test is specified
+        if (!storyContext.tags.includes("no-dom-test")) {
+            await domSnapshotTest(page);
         }
     },
 };

@@ -8,7 +8,6 @@
         "docs",
         "example-data",
         "node_modules",
-        "./package-lock.json",
-        ".storybook/test-runner.ts"
+        "./package-lock.json"
     ]
 }

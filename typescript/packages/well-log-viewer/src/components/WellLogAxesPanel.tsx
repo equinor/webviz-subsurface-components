@@ -1,4 +1,5 @@
-import React, { Component } from "react";
+import type React from "react";
+import { Component } from "react";
 
 import { AxisSelector } from "./AxisSelector";
 
@@ -10,7 +11,7 @@ import type { WellLogSet } from "./WellLogTypes";
 interface Props {
     callbackManager: CallbackManager;
 
-    header?: string | JSX.Element;
+    header?: string | React.JSX.Element;
 
     /**
      * Log mnemonics for axes
@@ -102,7 +103,7 @@ export class WellLogAxesPanel extends Component<Props, State> {
         this.setState({ primaryAxis: value });
     }
 
-    render(): JSX.Element {
+    render(): React.JSX.Element {
         return (
             <div className="axes-selector">
                 <AxisSelector

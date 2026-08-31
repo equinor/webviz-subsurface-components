@@ -7,6 +7,7 @@ import { cloneDeep, reverse, set } from "lodash";
 
 import type { ColorAccessor, WellFeature } from "../types";
 import {
+    getAziAndInclForSegment,
     getColor,
     getCumulativeDistance,
     getFractionPositionSegmentIndices,
@@ -15,6 +16,7 @@ import {
     getMdsInRange,
     getPositionAndAngleOnTrajectoryPath,
     getSegmentIndex,
+    getSegmentIndicesForMd,
     getTrajectory,
     getTvd,
     injectMdPoints,
@@ -597,6 +599,125 @@ describe("trajectory utils", () => {
             );
 
             expect(result.properties.md[0]).toEqual([0, 49, 50, 50, 51, 100]);
+        });
+
+        describe("getAziAndInclForSegment", () => {
+            it("should calculate azimuth and inclination for vertical segment", () => {
+                const start: Position = [0, 0, 0];
+                const end: Position = [0, 0, 100];
+
+                const result = getAziAndInclForSegment(start, end);
+
+                expect(result.inclination).toBeCloseTo(0, 1);
+                expect(result.azimuth).toBeDefined();
+            });
+
+            it("should calculate azimuth and inclination for horizontal segment", () => {
+                const start: Position = [0, 0, 0];
+                const end: Position = [0, 100, 0];
+
+                const result = getAziAndInclForSegment(start, end);
+
+                expect(result.inclination).toBeCloseTo(90, 1);
+                expect(result.azimuth).toBeCloseTo(180, 1);
+            });
+
+            it("should calculate azimuth and inclination for diagonal segment", () => {
+                const start: Position = [0, 0, 0];
+                const end: Position = [100, 100, 100];
+
+                const result = getAziAndInclForSegment(start, end);
+
+                expect(result.inclination).toBeCloseTo(54.74, 1);
+                expect(result.azimuth).toBeCloseTo(135, 1);
+            });
+
+            it("should handle segment with non-zero start position", () => {
+                const start: Position = [50, 50, 50];
+                const end: Position = [50, 150, 50];
+
+                const result = getAziAndInclForSegment(start, end);
+
+                expect(result.inclination).toBeCloseTo(90, 1);
+                expect(result.azimuth).toBeCloseTo(180, 1);
+            });
+
+            it("should calculate for downward segment", () => {
+                const start: Position = [0, 0, 0];
+                const end: Position = [0, 0, -100];
+
+                const result = getAziAndInclForSegment(start, end);
+
+                expect(result.inclination).toBeCloseTo(180, 1);
+                expect(result.azimuth).toBeDefined();
+            });
+
+            describe("getSegmentIndicesForMd", () => {
+                it("should return correct segment indices for md within trajectory", () => {
+                    const trajectory_md = [0, 100, 200, 300];
+                    const result = getSegmentIndicesForMd(trajectory_md, 150);
+
+                    expect(result).toEqual([1, 2, 0.5]);
+                });
+
+                it("should return first segment with fraction 0 when md equals minimum", () => {
+                    const trajectory_md = [0, 100, 200, 300];
+                    const result = getSegmentIndicesForMd(trajectory_md, 0);
+
+                    expect(result).toEqual([0, 1, 0]);
+                });
+
+                it("should return last segment with fraction 1 when md equals maximum", () => {
+                    const trajectory_md = [0, 100, 200, 300];
+                    const result = getSegmentIndicesForMd(trajectory_md, 300);
+
+                    expect(result).toEqual([2, 3, 1]);
+                });
+
+                it("should calculate correct fraction at start of segment", () => {
+                    const trajectory_md = [0, 100, 200, 300];
+                    const result = getSegmentIndicesForMd(trajectory_md, 100);
+
+                    expect(result).toEqual([0, 1, 1]);
+                });
+
+                it("should throw error if trajectory has less than 2 points", () => {
+                    expect(() => getSegmentIndicesForMd([0], 0)).toThrow(
+                        "Expected trajectory to have at least 2 points"
+                    );
+
+                    expect(() => getSegmentIndicesForMd([], 0)).toThrow(
+                        "Expected trajectory to have at least 2 points"
+                    );
+                });
+
+                it("should throw error if md is outside range", () => {
+                    const trajectory_md = [100, 200, 300];
+                    expect(() =>
+                        getSegmentIndicesForMd(trajectory_md, 50)
+                    ).toThrow("MD 50 is outside of trajectory range 100,300");
+
+                    expect(() =>
+                        getSegmentIndicesForMd(trajectory_md, 350)
+                    ).toThrow("MD 350 is outside of trajectory range 100,300");
+                });
+
+                it("should handle non-zero starting md values", () => {
+                    const trajectory_md = [1000, 1100, 1200, 1300];
+                    const result = getSegmentIndicesForMd(trajectory_md, 1150);
+
+                    expect(result).toEqual([1, 2, 0.5]);
+                });
+
+                it("should handle unevenly spaced md values", () => {
+                    const trajectory_md = [0, 50, 200, 500];
+                    const result = getSegmentIndicesForMd(trajectory_md, 100);
+
+                    expect(result[0]).toBe(1);
+                    expect(result[1]).toBe(2);
+                    expect(result[2]).toBeCloseTo(0.333, 2);
+                });
+            });
         });
     });
 });

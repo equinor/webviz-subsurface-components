@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
 
 import SubsurfaceViewer from "@webviz/subsurface-viewer";
-import type { WeakValidationMap } from "react";
 import React from "react";
 import WellLogInfoPanel from "../../components/WellLogInfoPanel";
 import WellLogViewWithScroller from "../../components/WellLogViewWithScroller";
@@ -158,9 +157,7 @@ export class MapAndWellLogViewer extends React.Component<
     MapAndWellLogViewerProps,
     State
 > {
-    public static propTypes?:
-        | WeakValidationMap<MapAndWellLogViewerProps>
-        | undefined;
+    public static propTypes?: Record<string, unknown> | undefined;
     callbackManager: CallbackManager;
 
     constructor(props: MapAndWellLogViewerProps) {
@@ -333,7 +330,7 @@ export class MapAndWellLogViewer extends React.Component<
         }
     }
 
-    render(): JSX.Element {
+    render(): React.JSX.Element {
         const wellName = this.state.wellName;
         const wellColor = this.state.wellColor;
         const wellIndex = this.state.wellIndex;

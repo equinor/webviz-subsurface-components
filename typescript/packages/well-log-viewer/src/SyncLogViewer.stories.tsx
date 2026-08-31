@@ -87,6 +87,7 @@ const ComponentCode =
 const stories: Meta = {
     component: SyncLogViewer,
     title: "WellLogViewer/Demo/SyncLogViewer",
+    tags: ["no-screenshot-test"],
     argTypes: argTypesSyncLogViewerProp,
     parameters: {
         docs: {
@@ -327,7 +328,6 @@ export const Default: StoryObj<typeof Template> = {
     },
     // wellLogCollections is used to retrieve the well log sets from the getWellLogCollections() function
     render: (args) => <Template {...args} wellLogCollections="Default" />,
-    tags: ["no-screenshot-test"],
 };
 
 export const Empty: StoryObj<typeof Template> = {
@@ -339,7 +339,6 @@ export const Empty: StoryObj<typeof Template> = {
     },
     // wellLogCollections is used to retrieve the well log sets from the getWellLogCollections() function
     render: (args) => <Template {...args} wellLogCollections="Empty" />,
-    tags: ["no-screenshot-test"],
 };
 
 type TemplateWithSelectionProps = Omit<
@@ -496,7 +495,6 @@ export const DiscreteLogs: StoryObj<typeof TemplateWithSelection> = {
     render: (args) => (
         <TemplateWithSelection {...args} wellLogCollections="DiscreteLogs" />
     ),
-    tags: ["no-screenshot-test"],
 };
 
 export const DiscreteLogsWithWellPicks: StoryObj<typeof TemplateWithSelection> =
@@ -525,7 +523,6 @@ export const DiscreteLogsWithUndefined: StoryObj<typeof TemplateWithSelection> =
                 wellLogCollections="DiscreteLogsWithUndefined"
             />
         ),
-        tags: ["no-screenshot-test"],
     };
 
 export const DiscreteLogsWithIndividualVisibleRange: StoryObj<
@@ -557,7 +554,6 @@ export const DiscreteLogsWithIndividualVisibleRange: StoryObj<
             wellLogCollections="DiscreteLogsWithIndividualDomains"
         />
     ),
-    tags: ["no-screenshot-test"],
 };
 
 export const DiscreteLogsWithIndividualDomainAndVisibleRange: StoryObj<
@@ -592,7 +588,6 @@ export const DiscreteLogsWithIndividualDomainAndVisibleRange: StoryObj<
             wellLogCollections="DiscreteLogsWithIndividualDomains"
         />
     ),
-    tags: ["no-screenshot-test"],
 };
 
 const verySimpleTemplate: TemplateType = {
@@ -745,5 +740,4 @@ export const LogsWithDifferentSets: StoryObj<typeof Template> = {
     render: (args) => (
         <Template {...args} wellLogCollections="LogsWithDifferentSets" />
     ),
-    tags: ["no-screenshot-test"],
 };

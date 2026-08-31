@@ -1,4 +1,4 @@
-import React, { type ChangeEvent } from "react";
+import { type ChangeEvent } from "react";
 
 import "jest";
 import { describe, expect, it } from "@jest/globals";

@@ -1,4 +1,4 @@
-import React, { type FormEvent } from "react";
+import { type FormEvent } from "react";
 
 import "jest";
 import { describe, expect, it } from "@jest/globals";

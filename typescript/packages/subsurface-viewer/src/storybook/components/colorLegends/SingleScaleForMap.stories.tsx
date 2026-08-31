@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-webpack5";
 
@@ -20,6 +20,7 @@ import {
 const stories: Meta = {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer/Components/ColorLegends",
+    tags: ["no-dom-test"],
 };
 export default stories;
 
