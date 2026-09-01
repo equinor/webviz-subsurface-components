@@ -21,6 +21,8 @@ import type {
 import type { MapAndWellLogViewerProps } from "./Storybook/examples/MapAndWellLogViewer";
 import { MapAndWellLogViewer } from "./Storybook/examples/MapAndWellLogViewer";
 import { axisMnemos, axisTitles } from "./utils/axes";
+import { createColorGenerator } from "./utils/generateColor";
+import { getStyledTemplateTracks } from "./utils/template";
 import type { ColormapFunction, ColorTable } from "./utils/color-function";
 
 import exampleDeckglArgsJson from "../../../../example-data/deckgl-map.json";
@@ -352,11 +354,23 @@ const wellpickWithCustomLabels: WellPickProps = {
     }),
 };
 
+// This story's template is resolved with its own, independent color
+// generator (rather than relying on `template1`'s lazily auto-assigned
+// colors) so that visiting this story in Storybook/test-runner never
+// advances the shared, module-level counter in `generateColor()`. That
+// counter is never reset between stories in the same test file, so any
+// story that consumes from it would otherwise shift the auto-generated
+// colors of every later story relying on defaults (see #2816 follow-up).
+const wellPickLabelTemplate: Template = {
+    ...template1,
+    tracks: getStyledTemplateTracks(template1, createColorGenerator()),
+};
+
 export const WellPickLabelWithCustomFormatter: StoryObj<typeof StoryTemplate> =
     {
         args: {
             horizontal: false,
-            template: template1,
+            template: wellPickLabelTemplate,
             colorMapFunctions: exampleColormapFunctions,
             wellpick: wellpickWithCustomLabels,
             axisTitles,

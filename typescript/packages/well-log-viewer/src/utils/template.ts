@@ -16,22 +16,30 @@ import { elementByName, indexOfElementByName } from "./arrays";
 /**
  * Applies styles in a template to it's tracks, adding defaults values for missing fields
  * @param template The log viewer template.
+ * @param nextColor Optional color generator used to fill in missing plot
+ * colors. Defaults to the shared `generateColor()`; pass an independent
+ * generator (e.g. from `createColorGenerator()`) to resolve colors without
+ * consuming from (or being affected by) the shared, module-level counter.
  * @returns An array of styled template tracks.
  */
-export function getStyledTemplateTracks(template: Template): TemplateTrack[] {
+export function getStyledTemplateTracks(
+    template: Template,
+    nextColor: () => string = generateColor
+): TemplateTrack[] {
     if (!template.styles) return template.tracks;
 
     return template.tracks.map((track) =>
-        applyStylesToTemplateTrack(track, template.styles)
+        applyStylesToTemplateTrack(track, template.styles, nextColor)
     );
 }
 
 function applyStylesToTemplateTrack(
     templateTrack: TemplateTrack,
-    templateStyles?: TemplateStyle[]
+    templateStyles: TemplateStyle[] | undefined,
+    nextColor: () => string
 ): TemplateTrack {
     const styledPlots = templateTrack.plots.map((plot) =>
-        applyTemplateStyle(plot, templateStyles)
+        applyTemplateStyle(plot, templateStyles, nextColor)
     );
 
     return {
@@ -42,7 +50,8 @@ function applyStylesToTemplateTrack(
 
 function applyTemplateStyle(
     templatePlot: TemplatePlot,
-    templateStyles?: TemplateStyle[]
+    templateStyles: TemplateStyle[] | undefined,
+    nextColor: () => string
 ): TemplatePlot {
     const styledTemplate = applyStyleToTemplatePlot(
         templatePlot,
@@ -61,24 +70,24 @@ function applyTemplateStyle(
         styledTemplate.type = DEFAULT_PLOT_TYPE;
     }
     if (styledTemplate.type !== "stacked") {
-        if (!styledTemplate.color) styledTemplate.color = generateColor();
+        if (!styledTemplate.color) styledTemplate.color = nextColor();
     }
 
     if (styledTemplate.type === "area") {
         if (!styledTemplate.fill) {
-            //styledTemplate.fill = generateColor();
+            //styledTemplate.fill = nextColor();
             styledTemplate.fillOpacity = 0.25;
         }
     } else if (styledTemplate.type === "gradientfill") {
         if (!styledTemplate.colorMapFunctionName) {
-            //styledTemplate.fill = generateColor();
+            //styledTemplate.fill = nextColor();
             styledTemplate.fillOpacity = 0.25;
         }
     } else if (styledTemplate.type === "differential") {
         // "differential" plot
-        if (!styledTemplate.fill) styledTemplate.fill = generateColor();
-        if (!styledTemplate.color2) styledTemplate.color2 = generateColor();
-        if (!styledTemplate.fill2) styledTemplate.fill2 = generateColor();
+        if (!styledTemplate.fill) styledTemplate.fill = nextColor();
+        if (!styledTemplate.color2) styledTemplate.color2 = nextColor();
+        if (!styledTemplate.fill2) styledTemplate.fill2 = nextColor();
     }
     return styledTemplate;
 }
