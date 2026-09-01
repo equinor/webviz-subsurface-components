@@ -50,7 +50,11 @@ async function waitUntilStable<T>(
  * clear it without masking genuine screenshot failures, which still throw
  * after exhausting the attempts.
  */
-async function screenshotWithRetry(page: Page, attempts = 3): Promise<Buffer> {
+async function screenshotWithRetry(
+    page: Page,
+    attempts = 4,
+    retryDelay = 250
+): Promise<Buffer> {
     let lastError: unknown;
 
     for (let attempt = 1; attempt <= attempts; attempt++) {
@@ -62,6 +66,14 @@ async function screenshotWithRetry(page: Page, attempts = 3): Promise<Buffer> {
             });
         } catch (error) {
             lastError = error;
+
+            // Give the CDP session a brief moment to recover before
+            // retrying - retrying instantly back-to-back doesn't reliably
+            // clear the transient error, since the compositor may still be
+            // mid-frame from the previous attempt.
+            if (attempt < attempts) {
+                await new Promise((resolve) => setTimeout(resolve, retryDelay));
+            }
         }
     }
 
