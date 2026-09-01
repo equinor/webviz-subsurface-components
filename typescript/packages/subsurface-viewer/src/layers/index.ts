@@ -52,4 +52,6 @@ export { abscissaTransform } from "./wells/utils/abscissaTransform";
 export {
     getAziAndInclForSegment,
     getSegmentIndicesForMd,
+    getSegmentIndicesForCoord,
+    getFractionAlongSegmentForCoord,
 } from "./wells/utils/trajectory";
