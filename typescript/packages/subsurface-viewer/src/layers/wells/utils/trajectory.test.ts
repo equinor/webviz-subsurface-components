@@ -12,15 +12,12 @@ import {
     getCumulativeDistance,
     getFractionPositionSegmentIndices,
     getLineStringGeometry,
-    getMd,
     getMdsInRange,
     getPositionAndAngleOnTrajectoryPath,
-    getSegmentIndex,
+    getSegmentIndicesForCoord,
     getSegmentIndicesForMd,
     getTrajectory,
-    getTvd,
     injectMdPoints,
-    interpolateDataOnTrajectory,
 } from "./trajectory";
 
 describe("trajectory utils", () => {
@@ -122,7 +119,7 @@ describe("trajectory utils", () => {
         });
     });
 
-    describe("getSegmentIndex", () => {
+    describe("getSegmentIndicesForCoord", () => {
         it("should find closest segment to coordinate", () => {
             const path: Position[] = [
                 [0, 0],
@@ -131,180 +128,20 @@ describe("trajectory utils", () => {
                 [3, 0],
             ];
             const coord: Position = [1.5, 0.1];
-            const result = getSegmentIndex(coord, path);
-            expect(result).toBe(1);
+            const result = getSegmentIndicesForCoord(coord, path);
+            expect(result).toEqual([1, 2]);
         });
-    });
 
-    describe("interpolateDataOnTrajectory", () => {
-        it("should interpolate data on trajectory", () => {
-            const coord: Position = [0.5, 0];
-            const data = [100, 200];
-            const trajectory: Position[] = [
-                [0, 0],
-                [1, 0],
+        it("should handle 3D coordinates", () => {
+            const path: Position[] = [
+                [0, 0, 0],
+                [1, 0, 0],
+                [2, 0, 0],
+                [3, 0, 0],
             ];
-
-            const result = interpolateDataOnTrajectory(coord, data, trajectory);
-            expect(result).toBeCloseTo(150, 1);
-        });
-
-        it("should return null if data length is less than 2", () => {
-            const result = interpolateDataOnTrajectory([0, 0], [100], [[0, 0]]);
-            expect(result).toBeNull();
-        });
-
-        it("should return null if data and trajectory lengths differ", () => {
-            const result = interpolateDataOnTrajectory(
-                [0, 0],
-                [100, 200],
-                [
-                    [0, 0],
-                    [1, 1],
-                    [2, 2],
-                ]
-            );
-            expect(result).toBeNull();
-        });
-
-        it("should return null if segment has zero length", () => {
-            const coord: Position = [0, 0];
-            const data = [100, 200];
-            const trajectory: Position[] = [
-                [0, 0],
-                [0, 0],
-            ];
-
-            const result = interpolateDataOnTrajectory(coord, data, trajectory);
-            expect(result).toBeNull();
-        });
-
-        it("should clamp value if position is past ends", () => {
-            const coord1: Position = [2, 0];
-            const coord2: Position = [-1, 0];
-            const data = [100, 200];
-            const trajectory: Position[] = [
-                [0, 0],
-                [1, 0],
-            ];
-
-            const result1 = interpolateDataOnTrajectory(
-                coord1,
-                data,
-                trajectory
-            );
-            const result2 = interpolateDataOnTrajectory(
-                coord2,
-                data,
-                trajectory
-            );
-            expect(result1).toBe(200);
-            expect(result2).toBe(100);
-        });
-    });
-
-    describe("getMd", () => {
-        it("should get an interpolated md value on a trajectory", () => {
-            const result = getMd(
-                [100, 150, -100],
-                mockFeature,
-                [255, 0, 0, 255]
-            );
-            expect(result).toBeCloseTo(100);
-        });
-
-        it("should return null if md property is missing", () => {
-            const mockWithoutMd: WellFeature = {
-                ...mockFeature,
-                properties: {
-                    ...mockFeature.properties,
-                    md: [],
-                },
-            };
-
-            const result = getMd(
-                [100, 150, -100],
-                mockWithoutMd,
-                [255, 0, 0, 255]
-            );
-            expect(result).toBeNull();
-        });
-
-        it("should return null if trajectory is undefined", () => {
-            const mockWithoutTrajectory: WellFeature = set(
-                cloneDeep(mockFeature),
-                "geometry.geometries",
-                []
-            );
-            const result = getMd([0, 0], mockWithoutTrajectory, [255, 0, 0, 0]);
-            expect(result).toBeNull();
-        });
-
-        it("should use a 2D trajectory if coord is 2D", () => {
-            const result = getMd([100, 150], mockFeature, [255, 0, 0, 255]);
-
-            expect(result).toBeCloseTo(100);
-        });
-    });
-
-    describe("getTvd", () => {
-        it("should get an interpolated md value on a trajectory", () => {
-            const result = getTvd(
-                [100, 150, -100],
-                cloneDeep(mockFeature),
-                [255, 0, 0, 255]
-            );
-            expect(result).toBeCloseTo(-100);
-        });
-
-        it("should return wellhead z-coordinate if trajectory is undefined", () => {
-            const mockWithoutTrajectory: WellFeature = set(
-                cloneDeep(mockFeature),
-                "geometry.geometries",
-                [mockFeature.geometry.geometries[0]]
-            );
-
-            const result = getTvd(
-                [0, 0],
-                mockWithoutTrajectory,
-                [255, 0, 0, 0]
-            );
-            expect(result).toBe(-200);
-        });
-
-        it("should return null if trajectory and head is undefined", () => {
-            const mockWithoutTrajectory: WellFeature = set(
-                cloneDeep(mockFeature),
-                "geometry.geometries",
-                []
-            );
-            const result = getTvd(
-                [0, 0],
-                mockWithoutTrajectory,
-                [255, 0, 0, 0]
-            );
-            expect(result).toBeNull();
-        });
-
-        it("should return wellhead z-coordinate if trajectory has single point", () => {
-            const mockWithoutTrajectory: WellFeature = set(
-                cloneDeep(mockFeature),
-                "geometry.geometries[1].coordinates",
-                []
-            );
-
-            const result = getTvd(
-                [0, 0],
-                mockWithoutTrajectory,
-                [255, 0, 0, 255]
-            );
-            expect(result).toBe(-200);
-        });
-
-        it("should use a 2D trajectory if coord is 2D", () => {
-            const result = getTvd([100, 150], mockFeature, [255, 0, 0, 255]);
-
-            expect(result).toBeCloseTo(-100);
+            const coord: Position = [1.5, 0.1, 0];
+            const result = getSegmentIndicesForCoord(coord, path);
+            expect(result).toEqual([1, 2]);
         });
     });
 
@@ -715,7 +552,6 @@ describe("trajectory utils", () => {
 
                     expect(result[0]).toBe(1);
                     expect(result[1]).toBe(2);
-                    expect(result[2]).toBeCloseTo(0.333, 2);
                 });
             });
         });

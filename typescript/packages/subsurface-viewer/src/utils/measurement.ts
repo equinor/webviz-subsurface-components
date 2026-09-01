@@ -68,9 +68,14 @@ function calculateArea(geom: Polygon): number {
 function squared_distance(a: Position, b: Position): number {
     const dx = a[0] - b[0];
     const dy = a[1] - b[1];
-    return dx * dx + dy * dy;
+    const dz = a.length === 3 ? a[2] - b[2] : 0;
+
+    return dx ** 2 + dy ** 2 + dz ** 2;
 }
 
+function anyOfLength(length: number, ...positions: Position[]) {
+    return positions.some((p) => p.length === length);
+}
 /**
  * Calculates the squared distance from a point to a line segment
  * @param v The start position of the segment
@@ -83,15 +88,31 @@ export function distToSegmentSquared(
     w: Position,
     p: Position
 ): number {
-    const l2 = squared_distance(v, w);
-    if (l2 == 0) return squared_distance(p, v);
-    let t =
-        ((p[0] - v[0]) * (w[0] - v[0]) + (p[1] - v[1]) * (w[1] - v[1])) / l2;
+    if (anyOfLength(2, v, w, p) && anyOfLength(3, v, w, p)) {
+        console.warn(":: Dimensions do not match, dropping z");
+        v = v.slice(0, 2);
+        w = w.slice(0, 2);
+        p = p.slice(0, 2);
+    }
+
+    const squareLength = squared_distance(v, w);
+    if (squareLength == 0) return squared_distance(p, v);
+
+    let t = dot(subtract(p, v), subtract(w, v)) / squareLength;
     t = Math.max(0, Math.min(1, t));
-    return squared_distance(p, [
-        v[0] + t * (w[0] - v[0]),
-        v[1] + t * (w[1] - v[1]),
-    ]);
+
+    if (p.length === 2) {
+        return squared_distance(p, [
+            v[0] + t * (w[0] - v[0]),
+            v[1] + t * (w[1] - v[1]),
+        ]);
+    } else {
+        return squared_distance(p, [
+            v[0] + t * (w[0] - v[0]),
+            v[1] + t * (w[1] - v[1]),
+            v[2] + t * (w[2] - v[2]),
+        ]);
+    }
 }
 
 /**

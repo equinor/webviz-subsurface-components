@@ -12,6 +12,7 @@ import { DataFilterExtension, PathStyleExtension } from "@deck.gl/extensions";
 import type { PathLayerProps } from "@deck.gl/layers";
 import { PathLayer } from "@deck.gl/layers";
 import type { PathGeometry } from "@deck.gl/layers/dist/path-layer/path";
+import { interpolateNumber } from "d3-interpolate";
 import type { Position } from "geojson";
 import _ from "lodash";
 
@@ -23,8 +24,10 @@ import {
 import type { DashedSectionsLayerPickInfo } from "../types";
 import {
     getCumulativeDistance,
+    getFractionAlongSegmentForCoord,
     getFractionPositionSegmentIndices,
-    interpolateDataOnTrajectory,
+    getSegmentIndicesForCoord,
+    unScaledPosition,
 } from "../utils/trajectory";
 import type { MarkerData } from "./flatWellMarkersLayer";
 
@@ -308,12 +311,14 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
             sourceInfo.coordinate = sourceInfo.coordinate.slice(0, 2);
         }
 
-        const coordinate = sourceInfo.coordinate;
-
         const zScale = this.props.modelMatrix ? this.props.modelMatrix[10] : 1;
-        if (coordinate[2] !== undefined) {
-            coordinate[2] /= Math.max(0.001, zScale);
-        }
+        const scaleFactor = { z: zScale };
+
+        // Unscale so we're dealing with world-space coords
+        const coordinate = unScaledPosition(
+            sourceInfo.coordinate ?? [0, 0, 0],
+            scaleFactor
+        );
 
         let path = this.state.pathCache.get(sourceInfo.index);
         const sections = this.state.sectionsCache.get(sourceInfo.index);
@@ -330,11 +335,22 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
             path = path.map((v) => v.slice(0, 2));
         }
 
-        const hoveredDistance = interpolateDataOnTrajectory(
-            sourceInfo.coordinate,
-            cumulativePathDistance,
-            path
+        const [segmentStartIdx, segmentEndIdx] = getSegmentIndicesForCoord(
+            coordinate,
+            path,
+            scaleFactor
         );
+        const lengthAlongSegment = getFractionAlongSegmentForCoord(
+            coordinate,
+            path[segmentStartIdx],
+            path[segmentEndIdx],
+            scaleFactor
+        );
+
+        const hoveredDistance = interpolateNumber(
+            cumulativePathDistance[segmentStartIdx],
+            cumulativePathDistance[segmentEndIdx]
+        )(lengthAlongSegment);
 
         if (hoveredDistance == null) return sourceInfo;
 
