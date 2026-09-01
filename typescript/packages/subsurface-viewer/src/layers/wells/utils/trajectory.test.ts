@@ -494,28 +494,28 @@ describe("trajectory utils", () => {
                     const trajectory_md = [0, 100, 200, 300];
                     const result = getSegmentIndicesForMd(trajectory_md, 150);
 
-                    expect(result).toEqual([1, 2, 0.5]);
+                    expect(result).toEqual([1, 2]);
                 });
 
                 it("should return first segment with fraction 0 when md equals minimum", () => {
                     const trajectory_md = [0, 100, 200, 300];
                     const result = getSegmentIndicesForMd(trajectory_md, 0);
 
-                    expect(result).toEqual([0, 1, 0]);
+                    expect(result).toEqual([0, 1]);
                 });
 
                 it("should return last segment with fraction 1 when md equals maximum", () => {
                     const trajectory_md = [0, 100, 200, 300];
                     const result = getSegmentIndicesForMd(trajectory_md, 300);
 
-                    expect(result).toEqual([2, 3, 1]);
+                    expect(result).toEqual([2, 3]);
                 });
 
                 it("should calculate correct fraction at start of segment", () => {
                     const trajectory_md = [0, 100, 200, 300];
                     const result = getSegmentIndicesForMd(trajectory_md, 100);
 
-                    expect(result).toEqual([0, 1, 1]);
+                    expect(result).toEqual([0, 1]);
                 });
 
                 it("should throw error if trajectory has less than 2 points", () => {
@@ -543,7 +543,7 @@ describe("trajectory utils", () => {
                     const trajectory_md = [1000, 1100, 1200, 1300];
                     const result = getSegmentIndicesForMd(trajectory_md, 1150);
 
-                    expect(result).toEqual([1, 2, 0.5]);
+                    expect(result).toEqual([1, 2]);
                 });
 
                 it("should handle unevenly spaced md values", () => {

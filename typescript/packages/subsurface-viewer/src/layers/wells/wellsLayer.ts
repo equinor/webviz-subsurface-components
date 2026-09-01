@@ -1028,6 +1028,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
 
             info.index = marker.sourceIndex;
             info.color = new Uint8Array(newPickColor);
+            accessorCtx.index = marker.sourceIndex;
 
             if (marker.type === "perforation") {
                 // When hovering a perforation, we'll lock to it's position, so related data (MD and TVD) stays with it

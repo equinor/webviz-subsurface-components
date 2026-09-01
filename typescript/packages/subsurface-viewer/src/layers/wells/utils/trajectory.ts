@@ -380,6 +380,10 @@ export function getSegmentIndicesForCoord(
     trajectory_path: Position[],
     scaleFactor?: ScaleFactor
 ): [startIndex: number, endIndex: number] {
+    if (trajectory_path.length < 2) {
+        throw new Error("Expected trajectory to have at least 2 points");
+    }
+
     const dimension = coord.length === 2 ? "2D" : "3D";
     const scaledCoord = fixupPoint(coord, scaleFactor, dimension);
 
