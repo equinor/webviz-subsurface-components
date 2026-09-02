@@ -7,9 +7,8 @@ import "jest-styled-components";
 import { colorTables } from "@emerson-eps/color-tables";
 
 import WellLogView, {
+    applyWellPickLabelFormatting,
     defaultWellPickLabels,
-    escapeWellPickLabel,
-    resolveWellPickLabels,
 } from "./WellLogView";
 import type { WellPickLabelInput, WellPickProps } from "./WellLogView";
 import type { Template } from "./WellLogTemplateTypes";
@@ -96,9 +95,9 @@ describe("defaultWellPickLabels", () => {
     });
 });
 
-describe("resolveWellPickLabels", () => {
+describe("applyWellPickLabelFormatting", () => {
     it("equals the default labels when no callback is provided", () => {
-        expect(resolveWellPickLabels(pickInput, undefined)).toEqual(
+        expect(applyWellPickLabelFormatting(pickInput, undefined)).toEqual(
             defaultWellPickLabels(pickInput)
         );
     });
@@ -107,15 +106,18 @@ describe("resolveWellPickLabels", () => {
         const formatWellPickLabel = jest.fn((input: WellPickLabelInput) => ({
             horizon: input.horizon,
         }));
-        resolveWellPickLabels(pickInput, formatWellPickLabel);
+        applyWellPickLabelFormatting(pickInput, formatWellPickLabel);
         expect(formatWellPickLabel).toHaveBeenCalledTimes(1);
         expect(formatWellPickLabel).toHaveBeenCalledWith(pickInput);
     });
 
     it("lets a partial return override only the given label", () => {
-        const labels = resolveWellPickLabels(pickInput, ({ vPrimary }) => ({
-            primary: (vPrimary as number).toFixed(2),
-        }));
+        const labels = applyWellPickLabelFormatting(
+            pickInput,
+            ({ vPrimary }) => ({
+                primary: (vPrimary as number).toFixed(2),
+            })
+        );
         expect(labels).toEqual({
             primary: "2500.79",
             secondary: "2450",
@@ -124,7 +126,7 @@ describe("resolveWellPickLabels", () => {
     });
 
     it("lets a callback override all three labels, including the horizon", () => {
-        const labels = resolveWellPickLabels(
+        const labels = applyWellPickLabelFormatting(
             pickInput,
             ({ horizon, vPrimary, vSecondary }) => ({
                 primary: (vPrimary as number).toFixed(2),
@@ -140,10 +142,10 @@ describe("resolveWellPickLabels", () => {
     });
 
     it("falls back to the defaults when the callback returns nothing", () => {
-        expect(resolveWellPickLabels(pickInput, () => undefined)).toEqual(
-            defaultWellPickLabels(pickInput)
-        );
-        expect(resolveWellPickLabels(pickInput, () => ({}))).toEqual(
+        expect(
+            applyWellPickLabelFormatting(pickInput, () => undefined)
+        ).toEqual(defaultWellPickLabels(pickInput));
+        expect(applyWellPickLabelFormatting(pickInput, () => ({}))).toEqual(
             defaultWellPickLabels(pickInput)
         );
     });
@@ -154,7 +156,7 @@ describe("resolveWellPickLabels", () => {
             vPrimary: NaN,
             vSecondary: undefined,
         };
-        const labels = resolveWellPickLabels(input, ({ vPrimary }) => ({
+        const labels = applyWellPickLabelFormatting(input, ({ vPrimary }) => ({
             primary: Number.isFinite(vPrimary)
                 ? (vPrimary as number).toFixed(2)
                 : "",
@@ -167,7 +169,7 @@ describe("resolveWellPickLabels", () => {
     });
 
     it("coerces non-string label values to strings", () => {
-        const labels = resolveWellPickLabels(
+        const labels = applyWellPickLabelFormatting(
             pickInput,
             () =>
                 ({ primary: 1234 }) as unknown as ReturnType<
@@ -242,22 +244,5 @@ describe("Well pick label rendering", () => {
         expect(cells).toContain("<img src=x onerror=alert(1)>");
         expect(container.querySelectorAll(".wellpick b")).toHaveLength(0);
         expect(container.querySelectorAll(".wellpick img")).toHaveLength(0);
-    });
-});
-
-describe("escapeWellPickLabel", () => {
-    it("escapes the characters that are significant in HTML", () => {
-        expect(escapeWellPickLabel("<b>a & b</b>")).toBe(
-            "&lt;b&gt;a &amp; b&lt;/b&gt;"
-        );
-        expect(escapeWellPickLabel("\"quoted\" 'single'")).toBe(
-            "&quot;quoted&quot; &#39;single&#39;"
-        );
-    });
-
-    it("leaves plain labels untouched", () => {
-        expect(escapeWellPickLabel("Top Reservoir 2501")).toBe(
-            "Top Reservoir 2501"
-        );
     });
 });

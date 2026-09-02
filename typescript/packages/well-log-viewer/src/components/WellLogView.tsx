@@ -58,6 +58,7 @@ import {
     removeTrackPlot,
 } from "../utils/tracks";
 import { getStyledTemplateTracks } from "../utils/template";
+import { htmlEscape } from "../utils/htmlEscape";
 import {
     getDiscreteColorAndName,
     getDiscreteMeta,
@@ -323,7 +324,11 @@ function addPinnedValueOverlay(instance: LogViewer, parent: WellLogView) {
 
 /**
  * The three label cells rendered for a well pick: the primary depth label,
- * the secondary depth label and the horizon (marker) name.
+ * the secondary depth label and the boundary (marker) name.
+ *
+ * The `horizon` field name mirrors the existing internal `WellPick.horizon`
+ * field it is derived from; it is not restricted to stratigraphic horizons —
+ * any well pick boundary name is valid here.
  */
 export interface WellPickLabels {
     primary: string;
@@ -332,11 +337,12 @@ export interface WellPickLabels {
 }
 
 /**
- * Source values for a single well pick, passed to `formatWellPickLabel`.
- * An object is used so that new fields can be added without a breaking change.
+ * Source values for a single well pick boundary, passed to
+ * `formatWellPickLabel`. An object is used so that new fields can be added
+ * without a breaking change.
  */
 export interface WellPickLabelInput {
-    /** The raw horizon (marker) name. */
+    /** The raw boundary (marker) name. */
     horizon: string;
     /** Full-precision primary axis depth. May be undefined or non-finite. */
     vPrimary: number | undefined;
@@ -356,17 +362,17 @@ export interface WellPickProps {
     /**
      * Optional callback to override the default well-pick label formatting.
      *
-     * It is called exactly once per well pick and receives the horizon name
-     * together with the full-precision primary and secondary depth values
-     * (either of which may be `undefined` or non-finite).
+     * It is called exactly once per well pick boundary and receives the
+     * boundary name together with the full-precision primary and secondary
+     * depth values (either of which may be `undefined` or non-finite).
      *
      * It may return any subset of `{ primary, secondary, horizon }`; keys that
      * are omitted (or `undefined`) keep the default formatting, i.e.
-     * `toFixed(0)` for the depths and the raw name for the horizon. Returning
+     * `toFixed(0)` for the depths and the raw name for the boundary. Returning
      * nothing at all keeps all defaults.
      *
      * The returned `horizon` label only affects the rendered text: element
-     * names, colors, patterns and callbacks always use the raw horizon name.
+     * names, colors, patterns and callbacks always use the raw boundary name.
      */
     formatWellPickLabel?: (
         input: WellPickLabelInput
@@ -558,21 +564,6 @@ function defaultWellPickDepthLabel(value: number | undefined): string {
 }
 
 /**
- * Escapes a well-pick label so that it can be safely embedded in the HTML
- * string used to render the label table. Labels may come from log data or from
- * a consumer supplied `formatWellPickLabel` callback and must never be
- * interpreted as markup.
- */
-export function escapeWellPickLabel(label: string): string {
-    return label
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#39;");
-}
-
-/**
  * The well-pick labels as rendered when no `formatWellPickLabel` callback is
  * given: depths rounded to whole units via `toFixed(0)` (empty string when the
  * value is not finite) and the raw horizon name.
@@ -588,12 +579,12 @@ export function defaultWellPickLabels(
 }
 
 /**
- * Resolves the labels of a single well pick: computes the defaults, calls
- * `formatWellPickLabel` once (when given) and merges the returned partial over
- * the defaults. A callback returning nothing, or fields that are `undefined`,
- * leaves the corresponding defaults in place.
+ * Applies the well-pick label formatting for a single well pick: computes the
+ * defaults, calls `formatWellPickLabel` once (when given) and merges the
+ * returned partial over the defaults. A callback returning nothing, or fields
+ * that are `undefined`, leaves the corresponding defaults in place.
  */
-export function resolveWellPickLabels(
+export function applyWellPickLabelFormatting(
     input: WellPickLabelInput,
     formatWellPickLabel: WellPickProps["formatWellPickLabel"]
 ): WellPickLabels {
@@ -647,17 +638,17 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
 
         // Labels are for display only. Element names, color/pattern lookups
         // and callbacks must keep using the raw `horizon` value below.
-        const labels = resolveWellPickLabels(
+        const labels = applyWellPickLabelFormatting(
             { horizon, vPrimary, vSecondary },
             formatWellPickLabel
         );
         // Labels are interpolated into an HTML string below, so they must be
         // escaped: they may contain markup characters, either from the log
         // data or from a consumer supplied `formatWellPickLabel` callback.
-        const txtPrimary = escapeWellPickLabel(labels.primary);
+        const txtPrimary = htmlEscape(labels.primary);
         // (primaryAxis === "md" ? "TVD:" : "MD:") +
-        const txtSecondary = escapeWellPickLabel(labels.secondary);
-        const txtHorizon = escapeWellPickLabel(labels.horizon);
+        const txtSecondary = htmlEscape(labels.secondary);
+        const txtHorizon = htmlEscape(labels.horizon);
 
         const elmName = "wp" + horizon;
         const pinelm = instance.overlay.create(elmName, {});

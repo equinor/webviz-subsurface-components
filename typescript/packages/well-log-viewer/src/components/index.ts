@@ -2,7 +2,7 @@ export {
     default as WellLogView,
     WellPickPropsType,
     defaultWellPickLabels,
-    resolveWellPickLabels,
+    applyWellPickLabelFormatting,
 } from "./WellLogView";
 export type {
     TrackMouseEvent,
