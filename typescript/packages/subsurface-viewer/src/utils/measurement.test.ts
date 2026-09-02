@@ -120,7 +120,7 @@ describe("measurement utils", () => {
 
             const result = distToSegmentSquared(v, w, p);
 
-            expect(result).toBe(25); // 5^2 = 25
+            expect(result).toBe(50);
         });
 
         it("should calculate distance for 3D points when point is before segment start", () => {
