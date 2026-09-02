@@ -420,12 +420,12 @@ export function getSegmentIndicesForCoord(
 }
 
 /**
- *
+ * Computes the fractional position along a segment that is closest to a given world position.
  * @param coord A world position
  * @param segmentStart The world position where the segment starts
  * @param segmentEnd The world position where the segment endS
  * @param scaleFactor Applies a scaling along axis when picking the "closest" point. For example, a layer applying vertical scaling can use this prop to match the computation what is visually shown to the user
- * @returns
+ * @returns A number between 0 and 1 that describes the fractional position along the segment, where 0 is the start of the segment and 1 is the end of the segment
  */
 export function getFractionAlongSegmentForCoord(
     coord: Position,
@@ -483,8 +483,8 @@ export function getSegmentIndicesForMd(
     return [lowerIndex, upperIndex];
 }
 
+/** Describes scaling to be applied along each axis */
 export type ScaleFactor = { x?: number; y?: number; z?: number };
-export type Dimension = "2D" | "3D";
 
 /**
  * Scales a 2D or 3D point by a given scale factor.
@@ -533,6 +533,8 @@ export function unScaledPosition(
         ];
     }
 }
+
+type Dimension = "2D" | "3D";
 
 function fixDimension(
     point: Position,
