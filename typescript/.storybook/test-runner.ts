@@ -124,6 +124,69 @@ async function waitForMutationQuiescence(
     );
 }
 
+declare global {
+    // eslint-disable-next-line @typescript-eslint/no-namespace
+    // eslint-disable-next-line no-var
+    var __STORYBOOK_ADDONS_CHANNEL__:
+        | {
+              once: (event: string, listener: () => void) => void;
+              emit: (event: string, payload: unknown) => void;
+          }
+        | undefined;
+}
+
+// Tracks how many times postVisit has run for each story id, so a jest
+// retry (`jest.retryTimes` below) can be detected and handled differently
+// from a story's first attempt. Module-scope state is safe here because
+// the test-runner reuses one page/module per worker process across all
+// stories in a file, and each story id only overlaps with itself across
+// retries (never concurrently, since Jest retries a failed test in place
+// before moving on).
+const postVisitAttempts = new Map<string, number>();
+
+/**
+ * Storybook's `setCurrentStory` channel event (what `__test` in
+ * `@storybook/test-runner` uses to navigate to a story) re-renders the
+ * currently-mounted story *in place* when passed the same story id - it
+ * does not tear down and recreate the DOM. That means a Jest retry of a
+ * failed story reuses the exact same DOM nodes as the first attempt: any
+ * failure caused by a mount-time artifact (e.g. non-deterministic
+ * attribute-insertion order, observed once on
+ * `WellLogViewer/Demo/SyncLogViewer`) reproduces byte-for-byte on every
+ * retry, making `jest.retryTimes` a no-op for that whole class of flake.
+ *
+ * `forceRemount` is the channel event Storybook's own toolbar "remount"
+ * button uses - it genuinely tears down and rebuilds the story's DOM.
+ * Emitting it before a retry's assertions run gives the retry a real
+ * second chance instead of re-asserting identical bytes. Never rejects -
+ * this is a best-effort improvement to retries, not a correctness
+ * requirement, so a timeout just means the retry proceeds against
+ * whatever is already on the page.
+ */
+async function forceRemount(page: Page, storyId: string): Promise<void> {
+    await page
+        .evaluate((id) => {
+            return new Promise<void>((resolve) => {
+                const channel = globalThis.__STORYBOOK_ADDONS_CHANNEL__;
+                if (!channel) {
+                    resolve();
+                    return;
+                }
+
+                const timer = setTimeout(resolve, 15000);
+                channel.once("storyRendered", () => {
+                    clearTimeout(timer);
+                    resolve();
+                });
+                channel.emit("forceRemount", { storyId: id });
+            });
+        }, storyId)
+        .catch(() => {
+            // Best-effort only - if this throws (e.g. the page navigated
+            // away), just proceed with the retry as-is.
+        });
+}
+
 /**
  * `page.screenshot()` can intermittently throw
  * `Protocol error (Page.captureScreenshot): Unable to capture screenshot`
@@ -235,6 +298,18 @@ const config: TestRunnerConfig = {
 
         if (storyContext.tags.includes("no-test")) {
             return;
+        }
+
+        // If this is a jest.retryTimes retry (postVisit already ran for
+        // this story id in a prior, failed attempt), force a fresh remount
+        // before asserting anything. Without this, the retry re-renders in
+        // place and reasserts the exact same DOM/pixels as the failed
+        // attempt - see the forceRemount doc comment above for why that
+        // makes retries a no-op for mount-time flakes.
+        const attempts = (postVisitAttempts.get(context.id) ?? 0) + 1;
+        postVisitAttempts.set(context.id, attempts);
+        if (attempts > 1) {
+            await forceRemount(page, context.id);
         }
 
         if (!storyContext.tags.includes("no-screenshot-test")) {
