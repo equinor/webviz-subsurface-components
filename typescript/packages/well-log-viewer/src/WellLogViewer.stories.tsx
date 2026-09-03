@@ -21,6 +21,8 @@ import type {
 import type { MapAndWellLogViewerProps } from "./Storybook/examples/MapAndWellLogViewer";
 import { MapAndWellLogViewer } from "./Storybook/examples/MapAndWellLogViewer";
 import { axisMnemos, axisTitles } from "./utils/axes";
+import { createColorGenerator } from "./utils/generateColor";
+import { getStyledTemplateTracks } from "./utils/template";
 import type { ColormapFunction, ColorTable } from "./utils/color-function";
 
 import exampleDeckglArgsJson from "../../../../example-data/deckgl-map.json";
@@ -337,6 +339,61 @@ export const ColorByFunction: StoryObj<typeof StoryTemplate> = {
     // wellLogSets is used to retrieve the well log sets from the getWellLogSets() function
     render: (args) => <StoryTemplate {...args} wellLogSets="ColorByFunction" />,
 };
+
+// Demonstrates the opt-in `formatWellPickLabel` callback: it is called once per
+// well pick with the horizon name and the full-precision primary/secondary
+// depths, and returns any subset of { primary, secondary, horizon }. Here all
+// three labels are controlled: depths with 2 decimal places instead of the
+// default whole-unit rounding, and an upper-cased horizon name.
+const wellpickWithCustomLabels: WellPickProps = {
+    ...wellpick,
+    formatWellPickLabel: ({ horizon, vPrimary, vSecondary }) => ({
+        primary: Number.isFinite(vPrimary) ? vPrimary!.toFixed(2) : "",
+        secondary: Number.isFinite(vSecondary) ? vSecondary!.toFixed(2) : "",
+        horizon: horizon.toUpperCase(),
+    }),
+};
+
+// This story's template is resolved with its own, independent color
+// generator (rather than relying on `template1`'s lazily auto-assigned
+// colors) so that visiting this story in Storybook/test-runner never
+// advances the shared, module-level counter in `generateColor()`. That
+// counter is never reset between stories in the same test file, so any
+// story that consumes from it would otherwise shift the auto-generated
+// colors of every later story relying on defaults (see #2816 follow-up).
+const wellPickLabelTemplate: Template = {
+    ...template1,
+    tracks: getStyledTemplateTracks(template1, createColorGenerator()),
+};
+
+export const WellPickLabelWithCustomFormatter: StoryObj<typeof StoryTemplate> =
+    {
+        args: {
+            horizontal: false,
+            template: wellPickLabelTemplate,
+            colorMapFunctions: exampleColormapFunctions,
+            wellpick: wellpickWithCustomLabels,
+            axisTitles,
+            axisMnemos,
+            viewTitle: true,
+            visibleRange: [2500, 4000],
+            options: {
+                hideTrackTitle: false,
+                hideTrackLegend: false,
+                hideCurrentPosition: false,
+                hideSelectionInterval: false,
+            },
+        },
+        // wellLogSets is used to retrieve the well log sets from the getWellLogSets() function
+        render: (args) => <StoryTemplate {...args} wellLogSets="Default" />,
+        parameters: {
+            docs: {
+                description: {
+                    story: "Well picks with a custom `formatWellPickLabel` callback on `wellpick`. The callback is optional and is called once per well pick with `{ horizon, vPrimary, vSecondary }`; it returns any subset of `{ primary, secondary, horizon }`, and omitted labels keep their default formatting. Without the callback the labels render exactly as before.",
+                },
+            },
+        },
+    };
 
 const trackTitleTooltipLogSets: WellLogSet[] = [
     {
