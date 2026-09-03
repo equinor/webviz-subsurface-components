@@ -17,6 +17,9 @@ export type {
 
 export * from "./utils";
 
+export { getViewStateFromBounds } from "./components/Map";
+export type { MarginsType, Size } from "./components/Map";
+
 export type {
     ExtendedLayerProps,
     LayerPickInfo,

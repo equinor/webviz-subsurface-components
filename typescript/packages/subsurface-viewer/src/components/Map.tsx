@@ -86,7 +86,8 @@ import { SectionView } from "../views/sectionView";
  */
 export type BoundsAccessor = () => BoundingBox2D;
 
-type Size = {
+/** Size of the map component, in pixels. */
+export type Size = {
     width: number;
     height: number;
 };
@@ -247,7 +248,8 @@ export interface ViewStateType {
     maxRotationX?: number;
 }
 
-interface MarginsType {
+/** Margins in pixels reserved around a viewport, e.g. for the 2D axes rulers. */
+export interface MarginsType {
     left: number;
     right: number;
     top: number;
@@ -1604,8 +1606,30 @@ function computeCameraZoom(
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
-// return viewstate with computed bounds to fit the data in viewport
-function getViewStateFromBounds(
+/**
+ * Computes the view state that fits the given 2D bounds into a viewport.
+ *
+ * This is the auto-fit used by the component when no `cameraPosition` is supplied. It is exported
+ * so that client code can reproduce the exact same framing — for example to derive a camera that
+ * matches the default view before applying its own adjustments, without having to re-implement the
+ * margin, translation and zoom-clamping rules.
+ *
+ * @param viewPortMargins margins in pixels reserved inside the viewport, e.g. for the 2D axes
+ * rulers. The camera target is centred on the viewport minus these margins.
+ * @param bounds_accessor the 2D bounds to fit, either directly or as an accessor function.
+ * @param target camera target. Only its `z` component is used; `x` and `y` are derived from the fit.
+ * @param views view configuration. When a matrix layout is used, the fit is computed for a single
+ * sub-view rather than the full viewport.
+ * @param viewPort the viewport to compute the view state for. Note that `viewPort.target` and
+ * `viewPort.zoom`, when set, take precedence over the computed values, and that
+ * `viewPort.verticalScale` routes the zoom through the deprecated `scaleZoom`; leave it unset
+ * to obtain the plain scalar fit zoom.
+ * @param size size of the map component in pixels. When either dimension is zero or negative, the
+ * margins and view size are ignored and the fit is computed from the bounds alone.
+ * @returns the fitted {@link ViewStateType}, including the `minZoom`/`maxZoom` limits. In 2D the
+ * maximum zoom is reduced for large (e.g. UTM) coordinates to avoid numerical imprecision.
+ */
+export function getViewStateFromBounds(
     viewPortMargins: MarginsType,
     bounds_accessor: BoundingBox2D | BoundsAccessor,
     target: Point3D,
