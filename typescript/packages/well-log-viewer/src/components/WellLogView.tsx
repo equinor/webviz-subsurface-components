@@ -58,6 +58,7 @@ import {
     removeTrackPlot,
 } from "../utils/tracks";
 import { getStyledTemplateTracks } from "../utils/template";
+import { htmlEscape } from "../utils/htmlEscape";
 import {
     getDiscreteColorAndName,
     getDiscreteMeta,
@@ -321,6 +322,34 @@ function addPinnedValueOverlay(instance: LogViewer, parent: WellLogView) {
         .style("position", "absolute");
 }
 
+/**
+ * The three label cells rendered for a well pick: the primary depth label,
+ * the secondary depth label and the boundary (marker) name.
+ *
+ * The `horizon` field name mirrors the existing internal `WellPick.horizon`
+ * field it is derived from; it is not restricted to stratigraphic horizons —
+ * any well pick boundary name is valid here.
+ */
+export interface WellPickLabels {
+    primary: string;
+    secondary: string;
+    horizon: string;
+}
+
+/**
+ * Source values for a single well pick boundary, passed to
+ * `formatWellPickLabel`. An object is used so that new fields can be added
+ * without a breaking change.
+ */
+export interface WellPickLabelInput {
+    /** The raw boundary (marker) name. */
+    horizon: string;
+    /** Full-precision primary axis depth. May be undefined or non-finite. */
+    vPrimary: number | undefined;
+    /** Full-precision secondary axis depth. May be undefined or non-finite. */
+    vSecondary: number | undefined;
+}
+
 export interface WellPickProps {
     wellpick: WellLogSet; // JSON Log Format
     name: string; //  "HORIZON"
@@ -330,6 +359,24 @@ export interface WellPickProps {
      */
     colorMapFunctions: ColormapFunction[];
     colorMapFunctionName: string; // "Stratigraphy" ..., "Step func", ...
+    /**
+     * Optional callback to override the default well-pick label formatting.
+     *
+     * It is called exactly once per well pick boundary and receives the
+     * boundary name together with the full-precision primary and secondary
+     * depth values (either of which may be `undefined` or non-finite).
+     *
+     * It may return any subset of `{ primary, secondary, horizon }`; keys that
+     * are omitted (or `undefined`) keep the default formatting, i.e.
+     * `toFixed(0)` for the depths and the raw name for the boundary. Returning
+     * nothing at all keeps all defaults.
+     *
+     * The returned `horizon` label only affects the rendered text: element
+     * names, colors, patterns and callbacks always use the raw boundary name.
+     */
+    formatWellPickLabel?: (
+        input: WellPickLabelInput
+    ) => Partial<WellPickLabels> | undefined | null;
 }
 
 export const WellPickPropsType = PropTypes.shape({
@@ -338,6 +385,7 @@ export const WellPickPropsType = PropTypes.shape({
     md: PropTypes.string,
     colorMapFunctions: PropTypes.arrayOf(ColorFunctionType).isRequired,
     colorMapFunctionName: PropTypes.string.isRequired,
+    formatWellPickLabel: PropTypes.func,
 });
 
 const wpSize = 3; //9;
@@ -511,6 +559,48 @@ function posWellPickTitles(instance: LogViewer, parent: WellLogView) {
     }
 }
 
+function defaultWellPickDepthLabel(value: number | undefined): string {
+    return Number.isFinite(value) ? (value as number).toFixed(0) : "";
+}
+
+/**
+ * The well-pick labels as rendered when no `formatWellPickLabel` callback is
+ * given: depths rounded to whole units via `toFixed(0)` (empty string when the
+ * value is not finite) and the raw horizon name.
+ */
+export function defaultWellPickLabels(
+    input: WellPickLabelInput
+): WellPickLabels {
+    return {
+        primary: defaultWellPickDepthLabel(input.vPrimary),
+        secondary: defaultWellPickDepthLabel(input.vSecondary),
+        horizon: input.horizon,
+    };
+}
+
+/**
+ * Applies the well-pick label formatting for a single well pick: computes the
+ * defaults, calls `formatWellPickLabel` once (when given) and merges the
+ * returned partial over the defaults. A callback returning nothing, or fields
+ * that are `undefined`, leaves the corresponding defaults in place.
+ */
+export function applyWellPickLabelFormatting(
+    input: WellPickLabelInput,
+    formatWellPickLabel: WellPickProps["formatWellPickLabel"]
+): WellPickLabels {
+    const labels = defaultWellPickLabels(input);
+    if (!formatWellPickLabel) return labels;
+
+    const overrides = formatWellPickLabel(input);
+    if (!overrides) return labels;
+
+    for (const key of ["primary", "secondary", "horizon"] as const) {
+        const value = overrides[key];
+        if (value !== undefined && value !== null) labels[key] = String(value);
+    }
+    return labels;
+}
+
 function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
     {
         /* clear old wellpicks */
@@ -538,20 +628,27 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
     const patternSize = patternsTable?.patternSize;
     const patternImages = patternsTable?.patternImages;
 
+    const formatWellPickLabel = wellpick.formatWellPickLabel;
+
     for (const wp of wps) {
         const horizon = wp.horizon;
         const vPrimary = wp.vPrimary;
         const vSecondary = wp.vSecondary;
         const color = wp.color;
 
-        const txtPrimary = !Number.isFinite(vPrimary)
-            ? ""
-            : vPrimary?.toFixed(0);
-        const txtSecondary = !Number.isFinite(vSecondary)
-            ? ""
-            : /*(primaryAxis === "md" ? "TVD:" : "MD:") +*/ vSecondary?.toFixed(
-                  0
-              );
+        // Labels are for display only. Element names, color/pattern lookups
+        // and callbacks must keep using the raw `horizon` value below.
+        const labels = applyWellPickLabelFormatting(
+            { horizon, vPrimary, vSecondary },
+            formatWellPickLabel
+        );
+        // Labels are interpolated into an HTML string below, so they must be
+        // escaped: they may contain markup characters, either from the log
+        // data or from a consumer supplied `formatWellPickLabel` callback.
+        const txtPrimary = htmlEscape(labels.primary);
+        // (primaryAxis === "md" ? "TVD:" : "MD:") +
+        const txtSecondary = htmlEscape(labels.secondary);
+        const txtHorizon = htmlEscape(labels.horizon);
 
         const elmName = "wp" + horizon;
         const pinelm = instance.overlay.create(elmName, {});
@@ -598,7 +695,7 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
                           "<span " +
                           styleText +
                           ">" +
-                          horizon +
+                          txtHorizon +
                           "</span>" +
                           "</td></tr>" +
                           "</table>"
@@ -621,7 +718,7 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
                           "<span " +
                           styleText +
                           ">" +
-                          horizon +
+                          txtHorizon +
                           "</span>" +
                           "</td>" +
                           "</tr></table>"
