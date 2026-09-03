@@ -162,6 +162,20 @@ const postVisitAttempts = new Map<string, number>();
  * this is a best-effort improvement to retries, not a correctness
  * requirement, so a timeout just means the retry proceeds against
  * whatever is already on the page.
+ *
+ * Deliberately called **at most once per story** (see the `attempts === 2`
+ * check at the call site), not on every retry. Remounting resets any
+ * in-flight `ResizeObserver` convergence (see `waitForMutationQuiescence`)
+ * back to its unmeasured starting state, so a slow-settling story has to
+ * redo its *entire* settle ramp after every remount. Under sustained CI
+ * contention that ramp can take much longer than the bounded stability
+ * wait's budget (observed 10x+ slowdown under CPU throttling) - repeatedly
+ * resetting it on every retry would then fail every attempt identically,
+ * for a *different* reason than the flake this exists to fix. Remounting
+ * once still gives mount-time non-determinism a fresh, independent draw,
+ * while leaving any later retries free to simply keep observing the same
+ * (already remounted) story as it continues settling - accumulating real
+ * wall-clock time across attempts instead of restarting the clock.
  */
 async function forceRemount(page: Page, storyId: string): Promise<void> {
     await page
@@ -300,15 +314,18 @@ const config: TestRunnerConfig = {
             return;
         }
 
-        // If this is a jest.retryTimes retry (postVisit already ran for
-        // this story id in a prior, failed attempt), force a fresh remount
+        // If this is the *first* jest.retryTimes retry for this story
+        // (postVisit already ran once, and failed), force a fresh remount
         // before asserting anything. Without this, the retry re-renders in
         // place and reasserts the exact same DOM/pixels as the failed
         // attempt - see the forceRemount doc comment above for why that
-        // makes retries a no-op for mount-time flakes.
+        // makes retries a no-op for mount-time flakes. Only done once
+        // (attempts === 2, not attempts > 1) - see forceRemount's doc
+        // comment for why repeating it on every retry would be
+        // counterproductive for slow-settling stories.
         const attempts = (postVisitAttempts.get(context.id) ?? 0) + 1;
         postVisitAttempts.set(context.id, attempts);
-        if (attempts > 1) {
+        if (attempts === 2) {
             await forceRemount(page, context.id);
         }
 
