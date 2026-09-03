@@ -513,7 +513,7 @@ exports[`WellLogViewer/Components/WellLogView Default smoke-test 1`] = `
                     Toggle plot on/off
                   </title>
                   <defs>
-                    <linearGradient id="grad2"
+                    <linearGradient id="grad2a"
                                     x1="0%"
                                     x2="100%"
                                     y1="0%"
@@ -542,7 +542,7 @@ exports[`WellLogViewer/Components/WellLogView Default smoke-test 1`] = `
                     </linearGradient>
                   </defs>
                   <defs>
-                    <linearGradient id="grad3"
+                    <linearGradient id="grad2b"
                                     x1="0%"
                                     x2="100%"
                                     y1="0%"
@@ -574,7 +574,7 @@ exports[`WellLogViewer/Components/WellLogView Default smoke-test 1`] = `
                         y="0"
                         width="102.5859375"
                         height="12.5"
-                        fill="url(#grad2)"
+                        fill="url(#grad2a)"
                         fill-opacity="0.5"
                   >
                   </rect>
@@ -582,7 +582,7 @@ exports[`WellLogViewer/Components/WellLogView Default smoke-test 1`] = `
                         y="0"
                         width="102.5859375"
                         height="12.5"
-                        fill="url(#grad3)"
+                        fill="url(#grad2b)"
                         fill-opacity="0.5"
                   >
                   </rect>

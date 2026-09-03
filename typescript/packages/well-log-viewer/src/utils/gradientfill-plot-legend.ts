@@ -16,13 +16,41 @@ import { getInterpolatedColorString } from "./color-table";
 
 import { color4ToString } from "./color-table";
 
-let __idGradient = 0;
+/**
+ * Assigns each `GradientFillPlot` a stable numeric id, keyed by object
+ * identity rather than an incrementing "how many gradients so far" counter.
+ *
+ * `renderGradientFillPlotLegend` (and therefore `createGradient`) is called
+ * again on every legend redraw - e.g. during a `ResizeObserver`-driven
+ * settle ramp, a plot's legend can redraw many times before the layout
+ * stabilizes. A plain incrementing counter would mint a *different* id on
+ * every one of those redraws, baking "how many redraw passes happened"
+ * into the gradient's id - a value with no relation to the component being
+ * rendered, and one that is unstable across machines/CI runners. Keying
+ * off the `plot` instance itself instead means repeated redraws of the
+ * *same* plot reuse the *same* id, so the final id only depends on which
+ * plots exist and their relative creation order - not on redraw count.
+ */
+const __plotIds = new WeakMap<GradientFillPlot, number>();
+let __nextPlotId = 0;
+
+function getPlotId(plot: GradientFillPlot): number {
+    let id = __plotIds.get(plot);
+    if (id === undefined) {
+        id = ++__nextPlotId;
+        __plotIds.set(plot, id);
+    }
+    return id;
+}
+
 function createGradient(
     g: D3Selection,
     colormapFunction: ColormapFunction,
+    plot: GradientFillPlot,
+    idSuffix: string,
     rLogarithmic?: number
 ): string {
-    const id = "grad" + ++__idGradient; // generate unique id
+    const id = "grad" + getPlotId(plot) + idSuffix; // stable, plot-instance-scoped id
     const lg = g
         .append("defs")
         .append("linearGradient")
@@ -115,6 +143,8 @@ export default function renderGradientFillPlotLegend(
             const id = createGradient(
                 g,
                 colormapFunction,
+                plot,
+                "a",
                 options.scale === "linear" && options.colorScale === "log"
                     ? max / min
                     : undefined
@@ -129,6 +159,8 @@ export default function renderGradientFillPlotLegend(
             const id = createGradient(
                 g,
                 colormapFunction,
+                plot,
+                "b",
                 options.scale === "linear" &&
                     (options.inverseColorScale || options.colorScale) === "log"
                     ? max / min
@@ -164,6 +196,8 @@ export default function renderGradientFillPlotLegend(
             const id = createGradient(
                 g,
                 colormapFunction,
+                plot,
+                "",
                 options.scale === "linear" && options.colorScale === "log"
                     ? max / min
                     : undefined

@@ -884,7 +884,7 @@ exports[`WellLogViewer/Demo/WellLogViewer ColorByFunction smoke-test 1`] = `
                                   Toggle plot on/off
                                 </title>
                                 <defs>
-                                  <linearGradient id="grad1"
+                                  <linearGradient id="grad1a"
                                                   x1="0%"
                                                   x2="100%"
                                                   y1="0%"
@@ -997,7 +997,7 @@ exports[`WellLogViewer/Demo/WellLogViewer ColorByFunction smoke-test 1`] = `
                                   </linearGradient>
                                 </defs>
                                 <defs>
-                                  <linearGradient id="grad2"
+                                  <linearGradient id="grad1b"
                                                   x1="0%"
                                                   x2="100%"
                                                   y1="0%"
@@ -1113,7 +1113,7 @@ exports[`WellLogViewer/Demo/WellLogViewer ColorByFunction smoke-test 1`] = `
                                       y="0"
                                       width="444.5"
                                       height="12.5"
-                                      fill="url(#grad1)"
+                                      fill="url(#grad1a)"
                                       fill-opacity="0.5"
                                 >
                                 </rect>
@@ -1121,7 +1121,7 @@ exports[`WellLogViewer/Demo/WellLogViewer ColorByFunction smoke-test 1`] = `
                                       y="0"
                                       width="444.5"
                                       height="12.5"
-                                      fill="url(#grad2)"
+                                      fill="url(#grad1b)"
                                       fill-opacity="0.5"
                                 >
                                 </rect>
@@ -2417,7 +2417,7 @@ exports[`WellLogViewer/Demo/WellLogViewer Default smoke-test 1`] = `
                                   Toggle plot on/off
                                 </title>
                                 <defs>
-                                  <linearGradient id="grad2"
+                                  <linearGradient id="grad2a"
                                                   x1="0%"
                                                   x2="100%"
                                                   y1="0%"
@@ -2446,7 +2446,7 @@ exports[`WellLogViewer/Demo/WellLogViewer Default smoke-test 1`] = `
                                   </linearGradient>
                                 </defs>
                                 <defs>
-                                  <linearGradient id="grad3"
+                                  <linearGradient id="grad2b"
                                                   x1="0%"
                                                   x2="100%"
                                                   y1="0%"
@@ -2478,7 +2478,7 @@ exports[`WellLogViewer/Demo/WellLogViewer Default smoke-test 1`] = `
                                       y="0"
                                       width="72.8359375"
                                       height="12.5"
-                                      fill="url(#grad2)"
+                                      fill="url(#grad2a)"
                                       fill-opacity="0.5"
                                 >
                                 </rect>
@@ -2486,7 +2486,7 @@ exports[`WellLogViewer/Demo/WellLogViewer Default smoke-test 1`] = `
                                       y="0"
                                       width="72.8359375"
                                       height="12.5"
-                                      fill="url(#grad3)"
+                                      fill="url(#grad2b)"
                                       fill-opacity="0.5"
                                 >
                                 </rect>
@@ -14246,7 +14246,7 @@ exports[`WellLogViewer/Demo/WellLogViewer WellPickLabelWithCustomFormatter smoke
                                   Toggle plot on/off
                                 </title>
                                 <defs>
-                                  <linearGradient id="grad2"
+                                  <linearGradient id="grad2a"
                                                   x1="0%"
                                                   x2="100%"
                                                   y1="0%"
@@ -14275,7 +14275,7 @@ exports[`WellLogViewer/Demo/WellLogViewer WellPickLabelWithCustomFormatter smoke
                                   </linearGradient>
                                 </defs>
                                 <defs>
-                                  <linearGradient id="grad3"
+                                  <linearGradient id="grad2b"
                                                   x1="0%"
                                                   x2="100%"
                                                   y1="0%"
@@ -14307,7 +14307,7 @@ exports[`WellLogViewer/Demo/WellLogViewer WellPickLabelWithCustomFormatter smoke
                                       y="0"
                                       width="72.8359375"
                                       height="12.5"
-                                      fill="url(#grad2)"
+                                      fill="url(#grad2a)"
                                       fill-opacity="0.5"
                                 >
                                 </rect>
@@ -14315,7 +14315,7 @@ exports[`WellLogViewer/Demo/WellLogViewer WellPickLabelWithCustomFormatter smoke
                                       y="0"
                                       width="72.8359375"
                                       height="12.5"
-                                      fill="url(#grad3)"
+                                      fill="url(#grad2b)"
                                       fill-opacity="0.5"
                                 >
                                 </rect>
