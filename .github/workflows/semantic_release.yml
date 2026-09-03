@@ -8,6 +8,9 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # Needed for nx to push tags and create GitHub releases
+      id-token: write # Needed for npm trusted publishing (OIDC)
     steps:
       # Inspired by https://medium.com/@michadrabikowski/automated-releases-with-nx-and-github-actions-07f574041293
       - name: 📖 Checkout commit locally
@@ -24,10 +27,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          # Needed for registry authentication in the publish step (https://github.com/actions/setup-node?tab=readme-ov-file#usage)
+          node-version: 24
           registry-url: https://registry.npmjs.org/
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: 📦 Install build dependencies
         working-directory: ./typescript
@@ -44,6 +45,4 @@ jobs:
         run: npx nx release --yes
         env:
           GITHUB_TOKEN: ${{ secrets.SEMANTIC_RELEASE_GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           npm_config_legacy_peer_deps: false # `nx release version` corrupts package-lock.json. See https://github.com/nrwl/nx/issues/22066#issuecomment-2576366862
