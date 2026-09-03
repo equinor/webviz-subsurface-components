@@ -1,3 +1,14 @@
+## 3.0.3 (2026-09-03)
+
+### 🚀 Features
+
+- **WellLogViewer:** add optional formatWellPickLabel callback for we… ([#2816](https://github.com/equinor/webviz-subsurface-components/pull/2816), [#554887](https://github.com/equinor/webviz-subsurface-components/issues/554887))
+
+### ❤️ Thank You
+
+- Copilot @Copilot
+- Håvard Bjerke
+
 ## 3.0.2 (2026-09-02)
 
 ### 🧱 Updated Dependencies
