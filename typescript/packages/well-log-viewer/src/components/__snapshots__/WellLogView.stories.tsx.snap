@@ -129,7 +129,7 @@ exports[`WellLogViewer/Components/WellLogView Default smoke-test 1`] = `
                     Toggle plot on/off
                   </title>
                   <defs>
-                    <linearGradient id="grad37"
+                    <linearGradient id="grad1"
                                     x1="0%"
                                     x2="100%"
                                     y1="0%"
@@ -161,7 +161,7 @@ exports[`WellLogViewer/Components/WellLogView Default smoke-test 1`] = `
                         y="0"
                         width="410.328125"
                         height="12.5"
-                        fill="url(#grad37)"
+                        fill="url(#grad1)"
                         fill-opacity="0.5"
                   >
                   </rect>
@@ -513,7 +513,7 @@ exports[`WellLogViewer/Components/WellLogView Default smoke-test 1`] = `
                     Toggle plot on/off
                   </title>
                   <defs>
-                    <linearGradient id="grad38"
+                    <linearGradient id="grad2"
                                     x1="0%"
                                     x2="100%"
                                     y1="0%"
@@ -542,7 +542,7 @@ exports[`WellLogViewer/Components/WellLogView Default smoke-test 1`] = `
                     </linearGradient>
                   </defs>
                   <defs>
-                    <linearGradient id="grad39"
+                    <linearGradient id="grad3"
                                     x1="0%"
                                     x2="100%"
                                     y1="0%"
@@ -574,7 +574,7 @@ exports[`WellLogViewer/Components/WellLogView Default smoke-test 1`] = `
                         y="0"
                         width="102.5859375"
                         height="12.5"
-                        fill="url(#grad38)"
+                        fill="url(#grad2)"
                         fill-opacity="0.5"
                   >
                   </rect>
@@ -582,7 +582,7 @@ exports[`WellLogViewer/Components/WellLogView Default smoke-test 1`] = `
                         y="0"
                         width="102.5859375"
                         height="12.5"
-                        fill="url(#grad39)"
+                        fill="url(#grad3)"
                         fill-opacity="0.5"
                   >
                   </rect>
@@ -2318,13 +2318,13 @@ exports[`WellLogViewer/Components/WellLogView Discrete smoke-test 1`] = `
                         x2="246.609375"
                         y1="12.5"
                         y2="12.5"
-                        style="stroke-width: 2.5; stroke: blue; fill: blue;"
+                        style="stroke-width: 2.5; stroke: red; fill: red;"
                   >
                   </line>
                   <text class="legend-label"
                         font-size="8.75px"
                         transform="translate(124.3046875,8.75)"
-                        style="text-anchor: middle; fill: blue;"
+                        style="text-anchor: middle; fill: red;"
                   >
                     PORO
                   </text>
@@ -2346,6 +2346,65 @@ exports[`WellLogViewer/Components/WellLogView Discrete smoke-test 1`] = `
                         font-size="9.625px"
                         x="2"
                         y="16.0625"
+                        style="text-anchor: start; fill: red;"
+                  >
+                    0
+                  </text>
+                  <text class="legend-domain"
+                        font-size="9.625px"
+                        x="246.609375"
+                        y="16.0625"
+                        style="text-anchor: end; fill: red;"
+                  >
+                    0.28
+                  </text>
+                </g>
+                <g class="legend-row"
+                   transform="translate(0,25)"
+                   style="cursor: pointer;"
+                >
+                  <title>
+                    Toggle plot on/off
+                  </title>
+                  <rect width="244.609375"
+                        height="21"
+                        x="2"
+                        y="2"
+                        visibility="hidden"
+                  >
+                  </rect>
+                  <line x1="2"
+                        x2="246.609375"
+                        y1="12.5"
+                        y2="12.5"
+                        style="stroke-width: 2.5; stroke: blue; fill: blue;"
+                  >
+                  </line>
+                  <text class="legend-label"
+                        font-size="8.75px"
+                        transform="translate(124.3046875,8.75)"
+                        style="text-anchor: middle; fill: blue;"
+                  >
+                    NTG
+                  </text>
+                  <rect x="0"
+                        y="5.0625"
+                        width="9.359375"
+                        height="15"
+                        style="fill: white;"
+                  >
+                  </rect>
+                  <rect x="239.25"
+                        y="5.0625"
+                        width="9.359375"
+                        height="15"
+                        style="fill: white;"
+                  >
+                  </rect>
+                  <text class="legend-domain"
+                        font-size="9.625px"
+                        x="2"
+                        y="16.0625"
                         style="text-anchor: start; fill: blue;"
                   >
                     0
@@ -2356,11 +2415,11 @@ exports[`WellLogViewer/Components/WellLogView Discrete smoke-test 1`] = `
                         y="16.0625"
                         style="text-anchor: end; fill: blue;"
                   >
-                    0.28
+                    1
                   </text>
                 </g>
                 <g class="legend-row"
-                   transform="translate(0,25)"
+                   transform="translate(0,50)"
                    style="cursor: pointer;"
                 >
                   <title>
@@ -2385,65 +2444,6 @@ exports[`WellLogViewer/Components/WellLogView Discrete smoke-test 1`] = `
                         transform="translate(124.3046875,8.75)"
                         style="text-anchor: middle; fill: orange;"
                   >
-                    NTG
-                  </text>
-                  <rect x="0"
-                        y="5.0625"
-                        width="9.359375"
-                        height="15"
-                        style="fill: white;"
-                  >
-                  </rect>
-                  <rect x="239.25"
-                        y="5.0625"
-                        width="9.359375"
-                        height="15"
-                        style="fill: white;"
-                  >
-                  </rect>
-                  <text class="legend-domain"
-                        font-size="9.625px"
-                        x="2"
-                        y="16.0625"
-                        style="text-anchor: start; fill: orange;"
-                  >
-                    0
-                  </text>
-                  <text class="legend-domain"
-                        font-size="9.625px"
-                        x="246.609375"
-                        y="16.0625"
-                        style="text-anchor: end; fill: orange;"
-                  >
-                    1
-                  </text>
-                </g>
-                <g class="legend-row"
-                   transform="translate(0,50)"
-                   style="cursor: pointer;"
-                >
-                  <title>
-                    Toggle plot on/off
-                  </title>
-                  <rect width="244.609375"
-                        height="21"
-                        x="2"
-                        y="2"
-                        visibility="hidden"
-                  >
-                  </rect>
-                  <line x1="2"
-                        x2="246.609375"
-                        y1="12.5"
-                        y2="12.5"
-                        style="stroke-width: 2.5; stroke: green; fill: green;"
-                  >
-                  </line>
-                  <text class="legend-label"
-                        font-size="8.75px"
-                        transform="translate(124.3046875,8.75)"
-                        style="text-anchor: middle; fill: green;"
-                  >
                     SW
                   </text>
                   <rect x="0"
@@ -2464,7 +2464,7 @@ exports[`WellLogViewer/Components/WellLogView Discrete smoke-test 1`] = `
                         font-size="9.625px"
                         x="2"
                         y="16.0625"
-                        style="text-anchor: start; fill: green;"
+                        style="text-anchor: start; fill: orange;"
                   >
                     0.05
                   </text>
@@ -2472,7 +2472,7 @@ exports[`WellLogViewer/Components/WellLogView Discrete smoke-test 1`] = `
                         font-size="9.625px"
                         x="246.609375"
                         y="16.0625"
-                        style="text-anchor: end; fill: green;"
+                        style="text-anchor: end; fill: orange;"
                   >
                     1
                   </text>

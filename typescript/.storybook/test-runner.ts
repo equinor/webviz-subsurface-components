@@ -30,6 +30,17 @@ const customDiffConfig = {};
  * `requiredStableSamples` so the *total* stable window
  * (`poll * (requiredStableSamples - 1)`) comfortably exceeds the longest
  * observed plateau.
+ *
+ * When `maxAttempts` is exhausted without ever reaching
+ * `requiredStableSamples`, this previously returned the last sample with no
+ * signal that stabilization had failed - a mid-render capture and a
+ * genuinely-settled-but-different-from-baseline capture were
+ * indistinguishable from the failure message alone. `stabilized` makes that
+ * visible: callers should log it (or fold it into their assertion failure
+ * message) so a future silent mid-render capture is self-explaining instead
+ * of appearing as an unexplained diff. Deliberately *not* turned into an
+ * automatic failure here - a story that never fully settles but still
+ * matches its baseline passes today, and this must not regress that.
  */
 async function waitUntilStable<T>(
     sample: () => Promise<T>,
@@ -39,7 +50,7 @@ async function waitUntilStable<T>(
         poll,
         requiredStableSamples = 2,
     }: { maxAttempts: number; poll: number; requiredStableSamples?: number }
-): Promise<T> {
+): Promise<{ value: T; stabilized: boolean }> {
     let previous: T = await sample();
     let stableStreak = 1;
 
@@ -50,7 +61,7 @@ async function waitUntilStable<T>(
         if (isEqual(current, previous)) {
             stableStreak++;
             if (stableStreak >= requiredStableSamples) {
-                return current;
+                return { value: current, stabilized: true };
             }
         } else {
             stableStreak = 1;
@@ -58,7 +69,7 @@ async function waitUntilStable<T>(
         previous = current;
     }
 
-    return previous;
+    return { value: previous, stabilized: false };
 }
 
 /**
@@ -247,11 +258,25 @@ const screenshotTest = async (page: Page, context: TestContext) => {
     // 500ms poll demands a continuous ~2s stable window, comfortably above
     // the longest observed mid-render plateau (~750ms, on a camera-control
     // story) - a 2-sample check does not.
-    const screenshot = await waitUntilStable(
+    const { value: screenshot, stabilized } = await waitUntilStable(
         () => screenshotWithRetry(page),
         (a, b) => a.equals(b),
         { maxAttempts: 20, poll: 500, requiredStableSamples: 5 }
     );
+
+    if (!stabilized) {
+        // Not a failure by itself (see waitUntilStable's doc comment) -
+        // but if the image-snapshot assertion below does fail, this line
+        // in the test output explains *why* a diff might exist: the
+        // capture may be a mid-render frame rather than the story's true
+        // final state.
+        // eslint-disable-next-line no-console
+        console.warn(
+            `[${context.id}] screenshotTest: never reached ${5} consecutive ` +
+                `stable samples within the poll budget - the captured ` +
+                `screenshot may not reflect the story's fully-settled state.`
+        );
+    }
 
     expect(screenshot).toMatchImageSnapshot({
         customSnapshotIdentifier: context.id,
@@ -263,7 +288,45 @@ const screenshotTest = async (page: Page, context: TestContext) => {
     });
 };
 
-const domSnapshotTest = async (page: Page) => {
+/**
+ * `WellLogViewer`'s gradient-fill legend (`gradientfill-plot-legend.ts`)
+ * generates each `<linearGradient>`'s `id` from a module-scope counter
+ * (`"grad" + ++__idGradient`) that is never reset and is shared by every
+ * story rendered on the page before this one - including, notably, the
+ * stories embedded in this component's own auto-generated Storybook Docs
+ * page (`tags: ["autodocs"]` in preview.tsx), which is visited before any
+ * individual story's dedicated test and silently consumes a variable
+ * number of ids depending on test order/sharding/retries. Confirmed
+ * empirically: a story's own gradients are always created once, in a
+ * fixed, self-consistent, sequential run (e.g. `grad31,32,33` with the
+ * `id` and every `url(#...)` reference matching), but the *starting*
+ * number is not a property of the story at all - only unrelated
+ * page/test-execution history. That makes the raw id unstable across
+ * environments/CI runs (observed drifting from `grad86` to `grad152`
+ * between two CI runs of the exact same story) despite being internally
+ * consistent within any one render.
+ *
+ * Renumbering sequentially in document order (first occurrence order)
+ * removes that dependency while still asserting everything that matters:
+ * every `id="gradN"` and its matching `fill="url(#gradN)"` reference are
+ * rewritten together, so a real wiring bug (wrong/missing/misordered
+ * gradient reference) still fails the snapshot - only the meaningless
+ * absolute number is discarded.
+ */
+function normalizeGradientIds(html: string): string {
+    const idMap = new Map<string, string>();
+    let nextId = 1;
+    return html.replace(/grad(\d+)/g, (_match, num: string) => {
+        let mapped = idMap.get(num);
+        if (!mapped) {
+            mapped = `grad${nextId++}`;
+            idMap.set(num, mapped);
+        }
+        return mapped;
+    });
+}
+
+const domSnapshotTest = async (page: Page, context: TestContext) => {
     // Some stories render their DOM in multiple passes (e.g. a
     // ResizeObserver-driven layout feedback loop that converges gradually
     // over ~2s via repeated inline-style writes, with no CSS animation or
@@ -276,14 +339,31 @@ const domSnapshotTest = async (page: Page) => {
         timeoutMs: 5000,
     });
 
-    const html = await waitUntilStable(
+    const { value: html, stabilized } = await waitUntilStable(
         async () => {
             const elementHandler = await page.$("#storybook-root");
-            return elementHandler ? await elementHandler.innerHTML() : "";
+            const raw = elementHandler ? await elementHandler.innerHTML() : "";
+            // Normalized before the stability comparison too, so that
+            // incidental gradient-id churn between polls (e.g. an
+            // unrelated render happening on the shared page) can't be
+            // mistaken for the section itself being unstable.
+            return normalizeGradientIds(raw);
         },
         (a, b) => a === b,
         { maxAttempts: 20, poll: 500, requiredStableSamples: 5 }
     );
+
+    if (!stabilized) {
+        // See screenshotTest's identical warning - not a failure by
+        // itself, but explains a subsequent snapshot mismatch as a
+        // possible mid-render capture rather than an unexplained diff.
+        // eslint-disable-next-line no-console
+        console.warn(
+            `[${context.id}] domSnapshotTest: never reached ${5} consecutive ` +
+                `stable samples within the poll budget - the captured HTML ` +
+                `may not reflect the story's fully-settled state.`
+        );
+    }
 
     expect(html).toMatchSnapshot();
 };
@@ -297,13 +377,16 @@ const config: TestRunnerConfig = {
 
     async preVisit(page) {
         // Tell preview.tsx's motion decorator to skip Framer Motion
-        // animations for this story. Set here (rather than read once at
-        // module load) because the test-runner navigates to iframe.html a
-        // single time in its `prepare` step and reuses that page for every
-        // story - preview.tsx's module body runs before any preVisit hook,
-        // so a flag read at import time would always be stale.
+        // animations for this story, and its color-counter decorator to
+        // reset generateColor()'s shared palette index before rendering.
+        // Set here (rather than read once at module load) because the
+        // test-runner navigates to iframe.html a single time in its
+        // `prepare` step and reuses that page for every story -
+        // preview.tsx's module body runs before any preVisit hook, so a
+        // flag read at import time would always be stale.
         await page.evaluate(() => {
             window.__WEBVIZ_SKIP_MOTION__ = true;
+            window.__WEBVIZ_RESET_COLOR_COUNTER__ = true;
         });
     },
 
@@ -335,7 +418,7 @@ const config: TestRunnerConfig = {
 
         // Run DOM snapshot test unless no-dom-test is specified
         if (!storyContext.tags.includes("no-dom-test")) {
-            await domSnapshotTest(page);
+            await domSnapshotTest(page, context);
         }
     },
 };

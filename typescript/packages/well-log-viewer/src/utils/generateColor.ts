@@ -29,6 +29,25 @@ export function generateColor(): string {
 }
 
 /**
+ * Resets {@link generateColor}'s shared counter back to the start of the
+ * palette.
+ *
+ * This exists solely for the Storybook test harness (see
+ * `.storybook/preview.tsx`), which calls it before every story render so
+ * that a story's assigned colors depend only on its own template, not on
+ * how many other stories/templates called `generateColor()` earlier in the
+ * same test file or worker. It is deliberately **not** called anywhere in
+ * real component rendering: real embedding applications may render several
+ * `WellLogView`s that intentionally share the counter so their
+ * auto-assigned colors don't collide, and resetting mid-session would break
+ * that. Calling this outside of a full page/story reset is unsafe for the
+ * same reason.
+ */
+export function resetColorGenerator(): void {
+    __iPlotColor = 0;
+}
+
+/**
  * Creates an independent color generator over the same 8-entry palette used
  * by {@link generateColor}, with its own counter starting at the beginning of
  * the palette.
