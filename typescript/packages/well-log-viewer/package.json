@@ -1,8 +1,13 @@
 {
   "name": "@webviz/well-log-viewer",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "publishConfig": {
     "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/equinor/webviz-subsurface-components.git",
+    "directory": "typescript/packages/well-log-viewer"
   },
   "description": "",
   "main": "dist/index.js",
@@ -27,7 +32,7 @@
   "dependencies": {
     "@emerson-eps/color-tables": "^1.1.0",
     "@equinor/videx-wellog": "^0.11.3",
-    "@webviz/wsc-common": "2.0.2",
+    "@webviz/wsc-common": "2.0.3",
     "convert-units": "^2.3.4",
     "d3": "^7.8.2"
   },

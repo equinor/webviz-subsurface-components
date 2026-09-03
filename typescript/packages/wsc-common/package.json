@@ -1,8 +1,13 @@
 {
   "name": "@webviz/wsc-common",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "publishConfig": {
     "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/equinor/webviz-subsurface-components.git",
+    "directory": "typescript/packages/wsc-common"
   },
   "description": "Shared functionality for WebViz Subsurface Components",
   "main": "dist/index.js",

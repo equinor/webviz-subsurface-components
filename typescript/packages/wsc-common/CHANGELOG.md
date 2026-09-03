@@ -1,3 +1,7 @@
+## 2.0.3 (2026-09-03)
+
+This was a version bump only for wsc-common to align it with other projects, there were no code changes.
+
 ## 2.0.2 (2026-09-02)
 
 This was a version bump only for wsc-common to align it with other projects, there were no code changes.

@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11"]
+        python-version: ["3.11"]
 
     steps:
       - name: 📖 Checkout commit locally
@@ -74,7 +74,7 @@ jobs:
         run: pip freeze
 
       - name: 🕵️ Check code style, linting and typechecking
-        if: matrix.python-version == '3.8'
+        if: matrix.python-version == '3.11'
         run: |
           npm run validate
           black --check webviz_subsurface_components/__init__.py webviz_subsurface_components/py_expression_eval.py webviz_subsurface_components/VectorCalculatorWrapper.py webviz_subsurface_components/VectorDefinitions.py setup.py
@@ -82,7 +82,7 @@ jobs:
           bandit -r -c ./bandit.yml webviz_subsurface_components/ setup.py
 
       - name: 🚢 Build and deploy Python package
-        if: github.event_name == 'release' && matrix.python-version == '3.8'
+        if: github.event_name == 'release' && matrix.python-version == '3.11'
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.pypi_webviz_token }}
