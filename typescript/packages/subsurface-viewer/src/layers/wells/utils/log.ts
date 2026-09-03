@@ -1,25 +1,24 @@
 import type { Color } from "@deck.gl/core";
 import {
     type ColorTableArray,
-    rgbValues,
     getColors,
+    rgbValues,
 } from "@emerson-eps/color-tables";
 import type { Position } from "geojson";
 
+import type {
+    ContinuousLegendDataType,
+    DiscreteLegendDataType,
+} from "../../../components/ColorLegend";
 import {
     type PropertyDataType,
     createPropertyData,
 } from "../../utils/layerTools";
 import type { ColorAccessor, LogCurveDataType, WellFeature } from "../types";
 import { type WellsLayerProps } from "../wellsLayer";
-import { getSegmentIndex } from "./trajectory";
+import type { ScaleFactor } from "./trajectory";
+import { getSegmentIndicesForCoord, getTrajectory } from "./trajectory";
 import { getPositionByMD, getWellMds, getWellObjectByName } from "./wells";
-import type {
-    ContinuousLegendDataType,
-    DiscreteLegendDataType,
-} from "../../../components/ColorLegend";
-
-import { getTrajectory } from "./trajectory";
 
 const MD_CURVE_NAMES = ["DEPTH::", "DEPT", "MD", "TDEP", "MD_RKB"]; // aliases for MD
 
@@ -123,10 +122,12 @@ function getLogSegmentIndex(
     coord: Position,
     wells_data: WellFeature[],
     log_data: LogCurveDataType,
-    logrun_name: string
+    logrun_name: string,
+    scaleFactor: ScaleFactor
 ): number {
     const trajectory = getLogPath(wells_data, log_data, logrun_name);
-    return getSegmentIndex(coord, trajectory);
+    const [index] = getSegmentIndicesForCoord(coord, trajectory, scaleFactor);
+    return index;
 }
 
 export function getLogProperty(
@@ -134,7 +135,8 @@ export function getLogProperty(
     wells_data: WellFeature[],
     log_data: LogCurveDataType,
     logrun_name: string,
-    log_name: string
+    log_name: string,
+    scaleFactor: ScaleFactor
 ): PropertyDataType | null {
     if (!log_data.data) return null;
 
@@ -142,7 +144,8 @@ export function getLogProperty(
         coord,
         wells_data,
         log_data,
-        logrun_name
+        logrun_name,
+        scaleFactor
     );
     let log_value: number | string = getLogValues(
         log_data,

@@ -17,8 +17,17 @@ import type { GeoJsonLayerProps } from "@deck.gl/layers";
 import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
 import type { BinaryFeatureCollection } from "@loaders.gl/schema";
 import { GL } from "@luma.gl/constants";
-import type { Feature, FeatureCollection, Position } from "geojson";
+import { interpolateNumber } from "d3-interpolate";
+import type { Feature, FeatureCollection } from "geojson";
 
+import type {
+    ContinuousLegendDataType,
+    DiscreteLegendDataType,
+} from "../../components/ColorLegend";
+import { scaleArray } from "../../utils/arrays";
+import { isClose } from "../../utils/measurement";
+import { SectionViewport } from "../../viewports";
+import type { NumberPair } from "../types";
 import type { ColormapFunctionType } from "../utils/colormapTools";
 import type {
     DeckGLLayerContext,
@@ -32,34 +41,25 @@ import {
     getLayersById,
     isDrawingEnabled,
 } from "../utils/layerTools";
-
-import type {
-    ContinuousLegendDataType,
-    DiscreteLegendDataType,
-} from "../../components/ColorLegend";
-import { scaleArray } from "../../utils/arrays";
-import { isClose } from "../../utils/measurement";
-import { SectionViewport } from "../../viewports";
-import type { NumberPair } from "../types";
 import { DashedSectionsPathLayer } from "./layers/dashedSectionsPathLayer";
-import type { LogCurveLayerProps } from "./layers/logCurveLayer";
-import { LogCurveLayer } from "./layers/logCurveLayer";
 import type {
     FlatWellMarkersLayerProps,
     MarkerData,
     WellMarker,
 } from "./layers/flatWellMarkersLayer";
 import { FlatWellMarkersLayer } from "./layers/flatWellMarkersLayer";
+import type { LogCurveLayerProps } from "./layers/logCurveLayer";
+import { LogCurveLayer } from "./layers/logCurveLayer";
 import type { WellLabelLayerProps } from "./layers/wellLabelLayer";
 import { WellLabelLayer } from "./layers/wellLabelLayer";
 import type {
     AbscissaTransform,
-    ColorAccessor,
     DashAccessor,
     DashedSectionsLayerPickInfo,
     LineStyleAccessor,
     LogCurveDataType,
     PerforationProperties,
+    ScreenProperties,
     WellFeature,
     WellFeatureCollection,
     WellHeadStyleAccessor,
@@ -78,10 +78,12 @@ import {
 } from "./utils/spline";
 import {
     getColor,
-    getMd,
+    getFractionAlongSegmentForCoord,
+    getSegmentIndicesForCoord,
     getTrajectory,
-    getTvd,
     injectMdPoints,
+    isTrajectoryTransparent,
+    unScaledPosition,
 } from "./utils/trajectory";
 import {
     getWellMds,
@@ -970,14 +972,98 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         }
 
         const features = this.getWellDataState()?.features ?? [];
-        let coordinate: Position = info.coordinate || [0, 0, 0];
+        const sourceId = info.sourceLayer!.id;
+        // Create readouts for any data found
+        const accessorCtx = {
+            data: this.state.data as unknown as LayerData<WellFeature>,
+            index: info.index,
+            target: [],
+        };
 
         const zScale = this.props.modelMatrix ? this.props.modelMatrix[10] : 1;
-        if (coordinate[2] !== undefined) {
-            coordinate[2] /= Math.max(0.001, zScale);
+        const scaleFactor = { z: zScale };
+
+        // When scaling is applied, the picking coordinate will no longer match world-space coordinates
+        // Unscale so we're dealing with world-space coords
+        let coordinate = unScaledPosition(
+            info.coordinate ?? [0, 0, 0],
+            scaleFactor
+        );
+
+        // --- Sub-layer pick data
+        let wellFeature: WellFeature | null = null;
+        let screen: ScreenProperties | null = null;
+        let marker: MarkerData<WellFeature> | null = null;
+        let wellLog: LogCurveDataType | null = null;
+
+        // When hovering the well head, we don't want to also read trajectory info
+        let readWellHeadOnly = false;
+
+        if (sourceId === this.getSubLayerId(SubLayerId.SCREEN_TRAJECTORY)) {
+            const screenInfo = info as DashedSectionsLayerPickInfo;
+            wellFeature = screenInfo.object!;
+
+            const screenIndex = screenInfo.dashedSectionIndex ?? -1;
+
+            if (screenIndex !== -1) {
+                screen =
+                    wellFeature.properties?.screens?.at(screenIndex) ?? null;
+            }
         }
 
+        if (sourceId === this.getSubLayerId(SubLayerId.MARKERS)) {
+            const markerInfo = info as PickingInfo<MarkerData<WellFeature>>;
+            wellFeature = markerInfo.object!.sourceObject;
+            marker = markerInfo.object!;
+
+            // Re-compute index and color to make autoHighlight apply to the *trajectory*, instead of the individual marker
+            const screenLayer =
+                // One of these two are guaranteed to exist
+                this.getSubLayerById(SubLayerId.COLORS) ||
+                this.getSubLayerById(SubLayerId.SCREEN_TRAJECTORY);
+
+            const newPickColor = screenLayer!.encodePickingColor(
+                marker.sourceIndex
+            );
+
+            info.index = marker.sourceIndex;
+            info.color = new Uint8Array(newPickColor);
+            accessorCtx.index = marker.sourceIndex;
+
+            if (marker.type === "perforation") {
+                // When hovering a perforation, we'll lock to it's position, so related data (MD and TVD) stays with it
+                coordinate = marker.position;
+            }
+        }
+        if (info.sourceLayer?.id === this.getSubLayerId(SubLayerId.COLORS)) {
+            const wellpickInfo = info as WellsPickInfo;
+            wellFeature = wellpickInfo.object!;
+            readWellHeadOnly = wellpickInfo.featureType === "points";
+        }
+
+        if (info.sourceLayer?.id === this.getSubLayerId(SubLayerId.LOG_CURVE)) {
+            const logLayerInfo = info as PickingInfo<LogCurveDataType>;
+            wellLog = logLayerInfo.object ?? null;
+
+            if (wellLog && !wellFeature) {
+                wellFeature =
+                    features.find(
+                        (f) => f.properties.name === wellLog!.header.well
+                    ) ?? null;
+            }
+        }
+
+        // ! Color settings **might** have made well invisible. If so, we wont return any picking info
+        if (
+            !wellFeature ||
+            isTrajectoryTransparent(wellFeature, this.props.lineStyle?.color)
+        ) {
+            return { ...info, ...noLog };
+        }
+
+        // Based on what data objects we found above, we'll make these info properties
         let wellName: string | undefined = undefined;
+        let wellColor: Color | undefined = undefined;
 
         let md_property: PropertyDataType | null = null;
         let tvd_property: PropertyDataType | null = null;
@@ -985,119 +1071,84 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
         let screen_property: PropertyDataType | null = null;
         let perforation_property: PropertyDataType | null = null;
 
-        if (
-            info.sourceLayer?.id ===
-            this.getSubLayerId(SubLayerId.SCREEN_TRAJECTORY)
-        ) {
-            const screenIndex = (info as DashedSectionsLayerPickInfo)
-                .dashedSectionIndex;
-            const data = info.object as WellFeature;
-
-            if (screenIndex !== undefined && screenIndex !== -1) {
-                const hoveredScreen = data.properties?.screens?.at(screenIndex);
-                screen_property = createScreenReadout(hoveredScreen, data);
-            }
+        if (screen && wellFeature) {
+            screen_property = createScreenReadout(screen, wellFeature);
         }
 
-        if (info.sourceLayer?.id === this.getSubLayerId(SubLayerId.MARKERS)) {
-            const markerData = info.object as MarkerData<WellFeature>;
-            const wellData = info.object?.sourceObject as WellFeature;
-            const sourceIndex = markerData.sourceIndex;
+        if (wellFeature && marker && marker.type === "perforation") {
+            const properties = marker.properties as PerforationProperties;
 
-            // Re-compute index and color to make autohighlight apply to the *trajectory*, instead of the individual marker
-            info.index = sourceIndex;
-            info.color = new Uint8Array(
-                this.getSubLayerById(
-                    SubLayerId.SCREEN_TRAJECTORY
-                )!.encodePickingColor(markerData.sourceIndex)
+            perforation_property = createPerforationReadout(
+                properties,
+                wellFeature
             );
-
-            if (markerData.type === "perforation") {
-                const properties =
-                    markerData.properties as PerforationProperties;
-
-                wellName = wellData.properties?.name;
-                perforation_property = createPerforationReadout(
-                    properties,
-                    wellData
-                );
-
-                // We also include the MD readout here, based on the marker position
-                coordinate = markerData.position;
-                if (coordinate[2] !== undefined) {
-                    coordinate[2] /= Math.max(0.001, zScale);
-                }
-
-                md_property = getMdProperty(
-                    coordinate,
-                    wellData,
-                    this.props.lineStyle?.color,
-                    "lines"
-                );
-                tvd_property = getTvdProperty(
-                    coordinate,
-                    wellData,
-                    this.props.lineStyle?.color,
-                    "lines"
-                );
-            }
         }
 
-        // ! This needs to be updated if we ever change the sub-layer id!
-        if (
-            info.sourceLayer?.id === `${this.props.id}-${SubLayerId.LOG_CURVE}`
-        ) {
-            // The user is hovering a well log entry
-            const logPick = info as PickingInfo<LogCurveDataType>;
+        if (wellFeature) {
+            const lineStyleAccessor = this.props.lineStyle?.color;
 
-            wellName = logPick.object?.header?.well;
+            wellName = wellFeature.properties.name;
+            wellColor = lineStyleAccessor
+                ? getFromAccessor(lineStyleAccessor, wellFeature, accessorCtx)
+                : wellFeature.properties.color;
+        }
 
-            md_property = getLogProperty(
-                coordinate,
-                features,
-                logPick.object!,
-                this.props.logrunName,
-                "MD"
-            );
-
-            tvd_property = getLogProperty(
-                coordinate,
-                features,
-                logPick.object!,
-                this.props.logrunName,
-                "TVD"
-            );
-
+        if (wellLog) {
             log_property = getLogProperty(
                 coordinate,
                 features,
                 info.object,
                 this.props.logrunName,
-                this.props.logName
+                this.props.logName,
+                scaleFactor
             );
-        } else if (
-            info.sourceLayer?.id ===
-                this.getSubLayerProps({ id: SubLayerId.COLORS }).id ||
-            info.sourceLayer?.id ===
-                this.getSubLayerProps({ id: SubLayerId.SCREEN_TRAJECTORY }).id
-        ) {
-            // User is hovering a wellbore path
-            const wellpickInfo = info as PickingInfo<WellFeature>;
+        }
 
-            wellName = wellpickInfo.object?.properties?.name;
+        if (wellFeature && !readWellHeadOnly) {
+            const wellTrajectory = getTrajectory(
+                wellFeature,
+                this.props.lineStyle.color
+            );
 
-            md_property = getMdProperty(
-                coordinate,
-                wellpickInfo.object!,
-                this.props.lineStyle?.color,
-                (info as WellsPickInfo).featureType
-            );
-            tvd_property = getTvdProperty(
-                coordinate,
-                info.object,
-                this.props.lineStyle?.color,
-                (info as WellsPickInfo).featureType
-            );
+            if (wellTrajectory) {
+                const wellMd = wellFeature.properties.md[0];
+
+                const [segmentStartIdx, segmentEndIdx] =
+                    getSegmentIndicesForCoord(
+                        coordinate,
+                        wellTrajectory,
+                        scaleFactor
+                    );
+
+                const lengthAlongSegment = getFractionAlongSegmentForCoord(
+                    coordinate,
+                    wellTrajectory[segmentStartIdx],
+                    wellTrajectory[segmentEndIdx],
+                    scaleFactor
+                );
+
+                const interpolatedMd = interpolateNumber(
+                    wellMd[segmentStartIdx],
+                    wellMd[segmentEndIdx]
+                )(lengthAlongSegment);
+
+                const interpolatedTvd = interpolateNumber(
+                    wellTrajectory[segmentStartIdx][2],
+                    wellTrajectory[segmentEndIdx][2]
+                )(lengthAlongSegment);
+
+                md_property = createPropertyData(
+                    "MD " + wellName,
+                    interpolatedMd,
+                    wellColor
+                );
+
+                tvd_property = createPropertyData(
+                    "TVD " + wellName,
+                    interpolatedTvd,
+                    wellColor
+                );
+            }
         }
 
         // Patch for inverting tvd readout to fix issue #830,
@@ -1118,7 +1169,7 @@ export default class WellsLayer extends CompositeLayer<WellsLayerProps> {
             ...info,
             properties: layer_properties,
             logName: log_property?.name,
-            wellName: wellName,
+            wellName: wellFeature?.properties.name,
         };
     }
 }
@@ -1180,44 +1231,6 @@ function dataIsReady(
 ): layerData is WellFeatureCollection {
     // Deck.gl always shows prop.data as `[]` while external data is being loaded
     return !!layerData && !isEmpty(layerData);
-}
-
-function getMdProperty(
-    coord: Position,
-    feature: WellFeature,
-    accessor: ColorAccessor,
-    featureType: string | undefined
-): PropertyDataType | null {
-    if (featureType === "points") {
-        return null;
-    }
-    const md = getMd(coord, feature, accessor);
-    if (md != null) {
-        const prop_name = "MD " + feature.properties?.["name"];
-        return createPropertyData(prop_name, md, feature.properties?.["color"]);
-    }
-    return null;
-}
-
-function getTvdProperty(
-    coord: Position,
-    feature: WellFeature,
-    accessor: ColorAccessor,
-    featureType: string | undefined
-): PropertyDataType | null {
-    if (featureType === "points") {
-        return null;
-    }
-    const tvd = getTvd(coord, feature, accessor);
-    if (tvd != null) {
-        const prop_name = "TVD " + feature.properties?.["name"];
-        return createPropertyData(
-            prop_name,
-            tvd,
-            feature.properties?.["color"]
-        );
-    }
-    return null;
 }
 
 // Injects MD points that will be required for cutting trajectories at the correct points

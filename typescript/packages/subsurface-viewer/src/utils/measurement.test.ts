@@ -20,6 +20,16 @@ describe("measurement utils", () => {
             expect(result).toBe(9);
         });
 
+        it("should calculate distance for 3D points when point is on the segment", () => {
+            const v: Position = [0, 0, 0];
+            const w: Position = [10, 0, 0];
+            const p: Position = [5, 0, 0];
+
+            const result = distToSegmentSquared(v, w, p);
+
+            expect(result).toBe(0);
+        });
+
         it("should calculate distance for a point when line length is zero", () => {
             const v: Position = [5, 5];
             const w: Position = [5, 5];
@@ -81,6 +91,46 @@ describe("measurement utils", () => {
             const result = distToSegmentSquared(v, w, p);
 
             expect(result).toBe(25);
+        });
+
+        it("should handle 3D points and drop z-dimension when dimensions do not match", () => {
+            const v: Position = [0, 0, 0];
+            const w: Position = [10, 0, 0];
+            const p: Position = [5, 3];
+
+            const result = distToSegmentSquared(v, w, p);
+
+            expect(result).toBe(9);
+        });
+
+        it("should calculate distance for 3D points when line length is zero", () => {
+            const v: Position = [5, 5, 5];
+            const w: Position = [5, 5, 5];
+            const p: Position = [8, 9, 10];
+
+            const result = distToSegmentSquared(v, w, p);
+
+            expect(result).toBe(50); // (8-5)^2 + (9-5)^2 + (10-5)^2 = 9 + 16 + 25 = 50
+        });
+
+        it("should calculate distance for 3D points when point is beyond segment end", () => {
+            const v: Position = [0, 0, 0];
+            const w: Position = [10, 0, 0];
+            const p: Position = [15, 0, 5];
+
+            const result = distToSegmentSquared(v, w, p);
+
+            expect(result).toBe(50);
+        });
+
+        it("should calculate distance for 3D points when point is before segment start", () => {
+            const v: Position = [5, 5, 5];
+            const w: Position = [10, 5, 5];
+            const p: Position = [0, 5, 0];
+
+            const result = distToSegmentSquared(v, w, p);
+
+            expect(result).toBe(50);
         });
     });
 
