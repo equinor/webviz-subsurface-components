@@ -258,10 +258,22 @@ const screenshotTest = async (page: Page, context: TestContext) => {
     // 500ms poll demands a continuous ~2s stable window, comfortably above
     // the longest observed mid-render plateau (~750ms, on a camera-control
     // story) - a 2-sample check does not.
+    //
+    // maxAttempts=40 (~20s of polling, well within the 60s testTimeout)
+    // rather than the original 20 (~10s): CI has been observed to exhaust
+    // the 20-attempt budget on heavy WebGL/label stories under contention
+    // (confirmed via the `stabilized` diagnostic below -
+    // `SubsurfaceViewer/WellsLayer/UnfoldedProjection` logged "never
+    // reached 5 consecutive stable samples" immediately before its
+    // image-snapshot mismatch), which is exactly the silent-mid-render
+    // capture this budget is meant to avoid. Raising the ceiling costs
+    // nothing on stories that already stabilize early (the loop exits as
+    // soon as 5 consecutive samples match), and only spends extra time on
+    // the genuinely slow/contended cases this is meant to rescue.
     const { value: screenshot, stabilized } = await waitUntilStable(
         () => screenshotWithRetry(page),
         (a, b) => a.equals(b),
-        { maxAttempts: 20, poll: 500, requiredStableSamples: 5 }
+        { maxAttempts: 40, poll: 500, requiredStableSamples: 5 }
     );
 
     if (!stabilized) {
