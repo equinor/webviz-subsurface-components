@@ -4,6 +4,11 @@
   "publishConfig": {
     "access": "public"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/equinor/webviz-subsurface-components.git",
+    "directory": "typescript/packages/subsurface-viewer"
+  },
   "description": "3D visualization component for subsurface reservoir data",
   "keywords": [
     "subsurface",
