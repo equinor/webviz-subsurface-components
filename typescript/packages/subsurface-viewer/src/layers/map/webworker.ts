@@ -1,3 +1,4 @@
+import { TypedArray } from "math.gl";
 import type { Params } from "./mapLayer";
 
 /** Given the input data will build and return the attributes (vertices and indices for triangles and lines)
@@ -19,10 +20,16 @@ export function makeFullMesh(e: { data: Params }) {
     // Local functions.
     type Vec = [number, number, number];
 
-    function getFloat32ArrayMinMax(data: Float32Array) {
+    function getArrayMinMax(
+        data: TypedArray,
+        isDiscrete: boolean = false
+    ): [number, number] {
         let max = -99999999;
         let min = 99999999;
         for (let i = 0; i < data.length; i++) {
+            if (!isDefined(data[i], isDiscrete)) {
+                continue;
+            }
             max = data[i] > max ? data[i] : max;
             min = data[i] < min ? data[i] : min;
         }
@@ -38,7 +45,10 @@ export function makeFullMesh(e: { data: Params }) {
         return c as Vec;
     }
 
-    function isDefined(x: unknown): boolean {
+    function isDefined(x: unknown, isDiscrete: boolean = false): boolean {
+        if (isDiscrete) {
+            return typeof x === "number" && x !== 0xffff;
+        }
         return typeof x === "number" && !isNaN(x);
     }
 
@@ -150,9 +160,15 @@ export function makeFullMesh(e: { data: Params }) {
         ? inputPropertiesData
         : meshData;
 
+    const isDiscrete =
+        propertiesData instanceof Uint32Array ||
+        propertiesData instanceof Int32Array ||
+        propertiesData instanceof Uint16Array ||
+        propertiesData instanceof Int16Array;
+
     // non mesh grids use z = 0 (see below)
-    const meshZValueRange = isMesh ? getFloat32ArrayMinMax(meshData) : [0, 0];
-    const propertyValueRange = getFloat32ArrayMinMax(propertiesData);
+    const meshZValueRange = isMesh ? getArrayMinMax(meshData) : [0, 0];
+    const propertyValueRange = getArrayMinMax(propertiesData, isDiscrete);
 
     // Dimensions.
     const ox = frame.origin[0];
@@ -184,9 +200,12 @@ export function makeFullMesh(e: { data: Params }) {
         isCellCenteredProperties || !smoothShading ? 0 : nNodes * 3
     );
     const triangleIndices = new Uint32Array(nTriangles * 3);
-    const vertexProperties = new Float32Array(
-        isCellCenteredProperties ? nCells * 6 : nNodes
-    );
+
+    const n = isCellCenteredProperties ? nCells * 6 : nNodes;
+    const vertexProperties = isDiscrete
+        ? new Uint32Array(n)
+        : new Float32Array(n);
+
     let nLineIndices = 0;
     if (gridLines) {
         nLineIndices = isCellCenteredProperties
@@ -375,7 +394,7 @@ export function makeFullMesh(e: { data: Params }) {
                 const propertyIndex = h * (nx - 1) + w; // (nx - 1) -> the width of the property 2D array is one less than for the nodes in this case.
                 const propertyValue = propertiesData[propertyIndex];
 
-                if (!isDefined(propertyValue)) {
+                if (!isDefined(propertyValue, isDiscrete)) {
                     // Inactive cell, dont draw.
                     continue;
                 }
@@ -539,7 +558,7 @@ export function makeFullMesh(e: { data: Params }) {
         Float32Array,
         Float32Array,
         Uint32Array,
-        Float32Array,
+        Float32Array | Uint32Array,
         Uint32Array,
         number[],
         number[],

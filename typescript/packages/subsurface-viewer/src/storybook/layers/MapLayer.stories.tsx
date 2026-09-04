@@ -10,7 +10,7 @@ import SubsurfaceViewer from "../../SubsurfaceViewer";
 import InfoCard from "../../components/InfoCard";
 import type { ViewsType } from "../../components/Map";
 import { useHoverInfo } from "../../components/Map";
-import type { BoundingBox2D, BoundingBox3D } from "../../utils";
+import type { BoundingBox2D, BoundingBox3D, RGBColor } from "../../utils";
 
 import { ViewFooter } from "../../components/ViewFooter";
 import AxesLayer from "../../layers/axes/axesLayer";
@@ -178,6 +178,79 @@ const cellCenteredPropertiesLayer = {
         value * 255,
     ],
     smoothShading: true,
+};
+
+// NB maa vaere like mange som ..??
+const CATEGORICAL_COLOR_TABLE: RGBColor[] = [
+    [0, 0, 255],
+    [0, 255, 0],
+    [0, 255, 255],
+    [255, 0, 0],
+    [255, 0, 255],
+    [255, 255, 0],
+    [0, 0, 100],
+    [0, 100, 0],
+    [0, 100, 100],
+    [100, 0, 0],
+    [100, 0, 100],
+    [100, 100, 0],
+];
+
+// This layer has as (nx-1)*(ny-1) property values and depth values are nx*ny hence each cell will be fixed in color.
+const categoricalPropertiesLayer = {
+    "@@type": "MapLayer",
+    id: "categorical-layer",
+
+    /*eslint-disable */
+    // One depth pr node
+    meshData: [
+        1.6, 1.7, 1.8, 1.9, 1.2, 1.3, 1.4, 1.5, 0.8, 0.9, 1.0, 1.1, 0.4, 0.5,
+        0.6, 0.7, 0.0, 0.1, 0.2, 0.3,
+    ],
+
+    // One property pr cell.
+    propertiesData: [
+         0,
+         1,
+         2,
+         3,
+         65535, // undefined value
+         5,
+         6,
+         1000000, // unknown code (not in discretePropertyValueNames) = undefined
+         8,
+         9,
+         999,
+         11,
+    ],
+
+    discretePropertyValueNames: [
+        { code: 0, name: "Zero" },
+        { code: 1, name: "One" }, 
+        { code: 2, name: "Two" }, 
+        { code: 3, name: "Tree" }, 
+        { code: 4, name: "Four" }, 
+        { code: 5, name: "Five", color: [255, 0, 255] }, // explisit color overrides colortable.
+        { code: 6, name: "Six" }, 
+        { code: 7, name: "Seven" }, 
+        { code: 8, name: "Eight" }, 
+        { code: 9, name: "Nine" }, 
+        { code: 999, name: "999" },
+        { code: 11, name: "Eleven" },
+    ],
+    /*eslint-enable */
+
+    colorMapFunction: (value: number) => CATEGORICAL_COLOR_TABLE[value],
+
+    frame: {
+        origin: [0, 0],
+        count: [4, 5],
+        increment: [1, 1],
+        rotDeg: 0,
+    },
+
+    gridLines: true,
+    material: false,
 };
 
 // Example rotated layer
@@ -390,6 +463,23 @@ export const CellCenteredPropMap: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "map",
         layers: [axes_lite, cellCenteredPropertiesLayer, northArrowLayer],
+        bounds: [-1, -1, 4, 5] as BoundingBox2D,
+        views: default3DViews,
+    },
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: "A small map with properties given at cell centers. Each cell will be constant colored",
+            },
+        },
+    },
+};
+
+export const CategoricalPropMap: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "map",
+        layers: [axes_lite, categoricalPropertiesLayer, northArrowLayer],
         bounds: [-1, -1, 4, 5] as BoundingBox2D,
         views: default3DViews,
     },
