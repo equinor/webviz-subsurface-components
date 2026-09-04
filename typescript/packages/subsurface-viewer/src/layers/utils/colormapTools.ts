@@ -149,6 +149,7 @@ const DISCRETE_TEXTURE_PARAMETERS: SamplerProps = {
     addressModeU: "clamp-to-edge",
     addressModeV: "clamp-to-edge",
 };
+
 export function createColormapTexture(
     colormap: ColormapProps,
     context: DeckGLLayerContext,
@@ -198,4 +199,28 @@ export function createColormapTexture(
         data: data,
     });
     return colormapTexture;
+}
+
+export function getColormapDiscreteColors(
+    colormap: ColormapProps,
+    colormapHints: IColormapHints
+): Uint8Array {
+    if (colormapHints.discreteData) {
+        if (colormapHints.colormapSize === 0) {
+            return new Uint8Array([0, 0, 0, 0, 0, 0]);
+        }
+
+        const colormapData =
+            colormap instanceof Uint8Array
+                ? colormap
+                : getImageData(
+                      colormap,
+                      colormapHints.colormapSize,
+                      colormapHints.discreteData
+                  );
+        return colormapData;
+    }
+
+    const data = getImageData(colormap);
+    return data;
 }
