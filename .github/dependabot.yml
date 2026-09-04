@@ -16,8 +16,10 @@ updates:
       nx:
         applies-to: version-updates # Applies the group rule to version updates
         patterns: # Define patterns to include dependencies in the group (based on dependency name)
+          # A dependency is handled by the first group that matches it, so group order matters.
           - "nx" # Group the "nx" dependency
-          - "@nx/jest" # Group the "@nx/jest" dependency
+          - "@nx/jest"  # Group the "@nx/jest" dependency
+          - "@nx/js"    # Group the "@nx/js" dependency
       # Other groups are not documented ;)
       react:
         applies-to: version-updates
@@ -37,8 +39,18 @@ updates:
           - "patch"
         patterns:
           - "@deck.gl/*"
+      # helper packages for storybook that are not following the same versioning as storybook itself
+      storybook-helpers:
+        applies-to: version-updates
+        patterns:
+          - "@storybook/addon-webpack5-compiler-babel"
+          - "@storybook/test-runner"
+      # remaining storybook packages that are following the same versioning as storybook itself
       storybook:
         applies-to: version-updates
+        update-types:
+          - "minor"
+          - "patch"
         patterns:
           - "storybook"
           - "@storybook/*"
