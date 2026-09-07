@@ -328,6 +328,13 @@ export const Default: StoryObj<typeof Template> = {
     },
     // wellLogCollections is used to retrieve the well log sets from the getWellLogCollections() function
     render: (args) => <Template {...args} wellLogCollections="Default" />,
+    // wellpickFlatting rescales the synced views once their controllers
+    // are ready via an event-driven callback chain
+    // (onCreateController/onContentRescale in SyncLogViewer.tsx) that can
+    // race under CI load and silently never re-apply - see
+    // test-runner.ts's `remount-every-retry` tag doc comment for why a
+    // fresh mount, not a longer wait, is what a retry needs here.
+    tags: ["remount-every-retry"],
 };
 
 export const Empty: StoryObj<typeof Template> = {

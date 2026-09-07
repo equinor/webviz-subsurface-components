@@ -41,6 +41,19 @@ const customDiffConfig = {};
  * of appearing as an unexplained diff. Deliberately *not* turned into an
  * automatic failure here - a story that never fully settles but still
  * matches its baseline passes today, and this must not regress that.
+ *
+ * `samplesTaken` (total samples drawn, including the first) is returned
+ * alongside `stabilized` so a failing caller can tell apart two very
+ * different situations that otherwise produce an identical-looking
+ * "assertion failed" message: `stabilized: false` (the budget ran out
+ * before 5 consecutive samples ever matched - a genuinely slow/contended
+ * render) versus `stabilized: true, samplesTaken: 1` (the very first
+ * sample was already "stable" by never changing again, yet still didn't
+ * match the baseline - a mount-time race that produced a quiet-but-wrong
+ * result; see the `remount-every-retry` tag doc comment on `forceRemount`
+ * for a concrete example). No amount of extra waiting fixes the second
+ * case, so distinguishing it in the log is what tells a future reader
+ * which class of fix even applies.
  */
 async function waitUntilStable<T>(
     sample: () => Promise<T>,
@@ -50,18 +63,20 @@ async function waitUntilStable<T>(
         poll,
         requiredStableSamples = 2,
     }: { maxAttempts: number; poll: number; requiredStableSamples?: number }
-): Promise<{ value: T; stabilized: boolean }> {
+): Promise<{ value: T; stabilized: boolean; samplesTaken: number }> {
     let previous: T = await sample();
     let stableStreak = 1;
+    let samplesTaken = 1;
 
     for (let attempt = 1; attempt < maxAttempts; attempt++) {
         await new Promise((resolve) => setTimeout(resolve, poll));
 
         const current = await sample();
+        samplesTaken++;
         if (isEqual(current, previous)) {
             stableStreak++;
             if (stableStreak >= requiredStableSamples) {
-                return { value: current, stabilized: true };
+                return { value: current, stabilized: true, samplesTaken };
             }
         } else {
             stableStreak = 1;
@@ -69,7 +84,48 @@ async function waitUntilStable<T>(
         previous = current;
     }
 
-    return { value: previous, stabilized: false };
+    return { value: previous, stabilized: false, samplesTaken };
+}
+
+/**
+ * Logs, on assertion failure only (never on the other ~200 passing
+ * stories, to avoid drowning the useful signal in noise), which of two
+ * fundamentally different `waitUntilStable` outcomes preceded the
+ * failure:
+ *
+ * - `stabilized: false` - the poll budget was exhausted before 5
+ *   consecutive samples ever matched. The capture may be a mid-render
+ *   frame; a longer budget (see `screenshotTest`'s `maxAttempts`) or
+ *   removing sources of contention is the applicable fix.
+ * - `stabilized: true, samplesTaken` low (as low as 1) - the very first
+ *   sample(s) were already stable and never changed again, yet still
+ *   didn't match the baseline. This is a *stably-wrong* result, most
+ *   often a mount-time race (see the `remount-every-retry` tag). No
+ *   amount of extra waiting fixes this class - only a fresh mount does.
+ *
+ * Naming the class in the log is what makes a future occurrence
+ * self-explaining instead of requiring the same investigation to be
+ * repeated from scratch.
+ */
+function logStabilityDiagnosticsOnFailure(
+    storyId: string,
+    testName: string,
+    stabilized: boolean,
+    samplesTaken: number
+): void {
+    // eslint-disable-next-line no-console
+    console.warn(
+        `[${storyId}] ${testName} failed after stabilized=${stabilized}, ` +
+            `samplesTaken=${samplesTaken}. ` +
+            (stabilized
+                ? "The capture was quiet and internally consistent " +
+                  "(never changed across polls) but still didn't match " +
+                  "the baseline - likely a stably-wrong mount-time race, " +
+                  "not a slow render. See the remount-every-retry tag."
+                : "The poll budget was exhausted before the capture ever " +
+                  "reached 5 consecutive stable samples - likely a " +
+                  "genuinely slow/contended render captured mid-frame.")
+    );
 }
 
 /**
@@ -174,19 +230,37 @@ const postVisitAttempts = new Map<string, number>();
  * requirement, so a timeout just means the retry proceeds against
  * whatever is already on the page.
  *
- * Deliberately called **at most once per story** (see the `attempts === 2`
- * check at the call site), not on every retry. Remounting resets any
- * in-flight `ResizeObserver` convergence (see `waitForMutationQuiescence`)
- * back to its unmeasured starting state, so a slow-settling story has to
- * redo its *entire* settle ramp after every remount. Under sustained CI
- * contention that ramp can take much longer than the bounded stability
- * wait's budget (observed 10x+ slowdown under CPU throttling) - repeatedly
- * resetting it on every retry would then fail every attempt identically,
- * for a *different* reason than the flake this exists to fix. Remounting
- * once still gives mount-time non-determinism a fresh, independent draw,
- * while leaving any later retries free to simply keep observing the same
- * (already remounted) story as it continues settling - accumulating real
- * wall-clock time across attempts instead of restarting the clock.
+ * Deliberately called **at most once per story by default** (see the
+ * `attempts === 2` check at the call site), not on every retry. Remounting
+ * resets any in-flight `ResizeObserver` convergence (see
+ * `waitForMutationQuiescence`) back to its unmeasured starting state, so a
+ * slow-settling story has to redo its *entire* settle ramp after every
+ * remount. Under sustained CI contention that ramp can take much longer
+ * than the bounded stability wait's budget (observed 10x+ slowdown under
+ * CPU throttling) - repeatedly resetting it on every retry would then fail
+ * every attempt identically, for a *different* reason than the flake this
+ * exists to fix. Remounting once still gives mount-time non-determinism a
+ * fresh, independent draw, while leaving any later retries free to simply
+ * keep observing the same (already remounted) story as it continues
+ * settling - accumulating real wall-clock time across attempts instead of
+ * restarting the clock.
+ *
+ * Some stories need the opposite trade-off: their flake is a **mount-time
+ * race that produces a stably-wrong result**, not a slow settle. Observed
+ * on `WellLogViewer/Demo/SyncLogViewer`'s `Default` story - its
+ * `wellpickFlatting` rescale is applied from an event-driven callback
+ * chain (`onCreateController`/`onContentRescale` in `SyncLogViewer.tsx`)
+ * that can race under CI load and silently never re-apply. Crucially,
+ * `waitUntilStable` reports `stabilized: true` for this case - the
+ * un-flattened DOM is quiet and internally consistent, it is just never
+ * going to become correct on its own, so *no amount of additional waiting
+ * helps*. Only a fresh mount gives the race a new, independent draw. For
+ * these stories specifically, tag them `"remount-every-retry"` (see
+ * `postVisit`) to remount on *every* retry attempt rather than just the
+ * first - turning `jest.retryTimes(3)`'s 3 retries into 3 independent
+ * draws instead of 1 draw asserted three times. This is opt-in per story,
+ * not a global policy change, precisely because it is the wrong trade-off
+ * for the slow-settling case above.
  */
 async function forceRemount(page: Page, storyId: string): Promise<void> {
     await page
@@ -270,7 +344,11 @@ const screenshotTest = async (page: Page, context: TestContext) => {
     // nothing on stories that already stabilize early (the loop exits as
     // soon as 5 consecutive samples match), and only spends extra time on
     // the genuinely slow/contended cases this is meant to rescue.
-    const { value: screenshot, stabilized } = await waitUntilStable(
+    const {
+        value: screenshot,
+        stabilized,
+        samplesTaken,
+    } = await waitUntilStable(
         () => screenshotWithRetry(page),
         (a, b) => a.equals(b),
         { maxAttempts: 40, poll: 500, requiredStableSamples: 5 }
@@ -290,14 +368,24 @@ const screenshotTest = async (page: Page, context: TestContext) => {
         );
     }
 
-    expect(screenshot).toMatchImageSnapshot({
-        customSnapshotIdentifier: context.id,
-        // https://www.npmjs.com/package/jest-image-snapshot/v/4.0.2#-api
-        failureThreshold: 0.01,
-        failureThresholdType: "percent",
-        // https://github.com/mapbox/pixelmatch#pixelmatchimg1-img2-output-width-height-options
-        customDiffConfig,
-    });
+    try {
+        expect(screenshot).toMatchImageSnapshot({
+            customSnapshotIdentifier: context.id,
+            // https://www.npmjs.com/package/jest-image-snapshot/v/4.0.2#-api
+            failureThreshold: 0.01,
+            failureThresholdType: "percent",
+            // https://github.com/mapbox/pixelmatch#pixelmatchimg1-img2-output-width-height-options
+            customDiffConfig,
+        });
+    } catch (error) {
+        logStabilityDiagnosticsOnFailure(
+            context.id,
+            "screenshotTest",
+            stabilized,
+            samplesTaken
+        );
+        throw error;
+    }
 };
 
 /**
@@ -351,7 +439,11 @@ const domSnapshotTest = async (page: Page, context: TestContext) => {
         timeoutMs: 5000,
     });
 
-    const { value: html, stabilized } = await waitUntilStable(
+    const {
+        value: html,
+        stabilized,
+        samplesTaken,
+    } = await waitUntilStable(
         async () => {
             const elementHandler = await page.$("#storybook-root");
             const raw = elementHandler ? await elementHandler.innerHTML() : "";
@@ -377,7 +469,17 @@ const domSnapshotTest = async (page: Page, context: TestContext) => {
         );
     }
 
-    expect(html).toMatchSnapshot();
+    try {
+        expect(html).toMatchSnapshot();
+    } catch (error) {
+        logStabilityDiagnosticsOnFailure(
+            context.id,
+            "domSnapshotTest",
+            stabilized,
+            samplesTaken
+        );
+        throw error;
+    }
 };
 
 const config: TestRunnerConfig = {
@@ -409,18 +511,27 @@ const config: TestRunnerConfig = {
             return;
         }
 
-        // If this is the *first* jest.retryTimes retry for this story
-        // (postVisit already ran once, and failed), force a fresh remount
-        // before asserting anything. Without this, the retry re-renders in
-        // place and reasserts the exact same DOM/pixels as the failed
-        // attempt - see the forceRemount doc comment above for why that
-        // makes retries a no-op for mount-time flakes. Only done once
-        // (attempts === 2, not attempts > 1) - see forceRemount's doc
-        // comment for why repeating it on every retry would be
-        // counterproductive for slow-settling stories.
+        // If this is a retry for this story (postVisit already ran once,
+        // and failed), force a fresh remount before asserting anything.
+        // Without this, the retry re-renders in place and reasserts the
+        // exact same DOM/pixels as the failed attempt - see the
+        // forceRemount doc comment above for why that makes retries a
+        // no-op for mount-time flakes.
+        //
+        // By default this only happens once (attempts === 2, not every
+        // retry) - see forceRemount's doc comment for why repeating it on
+        // every retry would be counterproductive for slow-settling
+        // stories. Stories tagged "remount-every-retry" opt out of that
+        // restriction and get a fresh remount on *every* retry instead,
+        // for the opposite class of flake (a mount-time race producing a
+        // stably-wrong result, where a longer settle wait cannot help -
+        // see forceRemount's doc comment for the concrete example).
         const attempts = (postVisitAttempts.get(context.id) ?? 0) + 1;
         postVisitAttempts.set(context.id, attempts);
-        if (attempts === 2) {
+        const remountEveryRetry = storyContext.tags.includes(
+            "remount-every-retry"
+        );
+        if (attempts === 2 || (remountEveryRetry && attempts > 2)) {
             await forceRemount(page, context.id);
         }
 
