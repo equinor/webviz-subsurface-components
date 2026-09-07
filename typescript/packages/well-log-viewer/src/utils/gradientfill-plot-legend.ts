@@ -18,18 +18,11 @@ import { color4ToString } from "./color-table";
 
 /**
  * Assigns each `GradientFillPlot` a stable numeric id, keyed by object
- * identity rather than an incrementing "how many gradients so far" counter.
- *
- * `renderGradientFillPlotLegend` (and therefore `createGradient`) is called
- * again on every legend redraw - e.g. during a `ResizeObserver`-driven
- * settle ramp, a plot's legend can redraw many times before the layout
- * stabilizes. A plain incrementing counter would mint a *different* id on
- * every one of those redraws, baking "how many redraw passes happened"
- * into the gradient's id - a value with no relation to the component being
- * rendered, and one that is unstable across machines/CI runners. Keying
- * off the `plot` instance itself instead means repeated redraws of the
- * *same* plot reuse the *same* id, so the final id only depends on which
- * plots exist and their relative creation order - not on redraw count.
+ * identity rather than an incrementing "how many gradients so far"
+ * counter. The legend can redraw a plot multiple times before layout
+ * settles, and a plain counter would mint a fresh id on every redraw -
+ * keying off the plot instance instead means the id depends only on which
+ * plots exist, not on how many times each was redrawn.
  */
 const __plotIds = new WeakMap<GradientFillPlot, number>();
 let __nextPlotId = 0;

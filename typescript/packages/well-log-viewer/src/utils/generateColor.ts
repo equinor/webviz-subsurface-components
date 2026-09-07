@@ -11,54 +11,41 @@ const __colors = [
 let __iPlotColor = 0;
 
 /**
- * Returns the next color from a shared 8-entry palette, cycling back to the
- * start once the palette is exhausted.
+ * Returns the next color from a shared 8-entry palette, cycling once
+ * exhausted. The palette index is a module-level counter shared by every
+ * caller in the process, by design: real apps rendering several
+ * `WellLogView`s rely on it to hand out non-colliding default colors across
+ * instances.
  *
- * The palette index is a **module-level counter that is never reset**. Every
- * call anywhere in the process — across all templates and, in Storybook's
- * test-runner, across every story rendered in the same test file — advances
- * the same counter. That makes the colors handed out to any given caller
- * depend on how many times `generateColor()` was called *before* it, i.e. on
- * unrelated code that happened to run first.
- *
- * For a caller that needs colors which do not depend on (and do not affect)
- * this shared state, use {@link createColorGenerator} instead.
+ * That sharing also means the color any one caller gets depends on how many
+ * times `generateColor()` ran before it - unwanted for a caller that needs
+ * colors independent of unrelated call order (e.g. Storybook stories). Use
+ * {@link createColorGenerator} for that case instead.
  */
 export function generateColor(): string {
     return __colors[__iPlotColor++ % __colors.length];
 }
 
 /**
- * Resets {@link generateColor}'s shared counter back to the start of the
- * palette.
+ * Resets {@link generateColor}'s shared counter to the start of the palette.
  *
- * This exists solely for the Storybook test harness (see
- * `.storybook/preview.tsx`), which calls it before every story render so
- * that a story's assigned colors depend only on its own template, not on
- * how many other stories/templates called `generateColor()` earlier in the
- * same test file or worker. It is deliberately **not** called anywhere in
- * real component rendering: real embedding applications may render several
- * `WellLogView`s that intentionally share the counter so their
- * auto-assigned colors don't collide, and resetting mid-session would break
- * that. Calling this outside of a full page/story reset is unsafe for the
- * same reason.
+ * Test-harness-only (see `.storybook/preview.tsx`): resetting mid-session in
+ * a real app would break the cross-instance color assignment this counter
+ * exists for. Only safe to call immediately before a full story/page
+ * remount, never mid-render.
  */
 export function resetColorGenerator(): void {
     __iPlotColor = 0;
 }
 
 /**
- * Creates an independent color generator over the same 8-entry palette used
- * by {@link generateColor}, with its own counter starting at the beginning of
- * the palette.
+ * Creates an independent color generator over the same 8-entry palette as
+ * {@link generateColor}, but with its own counter that never reads or
+ * advances the shared one - safe for callers that need deterministic colors
+ * regardless of unrelated call order (e.g. Storybook stories).
  *
- * Unlike {@link generateColor}, calling the returned function never reads or
- * advances the shared module-level counter, so it is safe to use whenever
- * deterministic, self-contained colors are required — for example to keep a
- * Storybook story's colors independent of story declaration order.
- *
- * @returns A zero-argument function that returns the next color each time
- * it's called, cycling back to the start once the palette is exhausted.
+ * @returns A zero-argument function returning the next color each call,
+ * cycling once the palette is exhausted.
  */
 export function createColorGenerator(): () => string {
     let iPlotColor = 0;

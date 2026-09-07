@@ -10,50 +10,34 @@ import {
 // https://github.com/mapbox/pixelmatch#pixelmatchimg1-img2-output-width-height-options
 const customDiffConfig = {};
 
+// Stability settings for the two waits below. Named and interpolated into
+// their warning messages (rather than hardcoded per call site) so tuning
+// either never desynchronises the prose from the actual behaviour.
+const SCREENSHOT_STABILITY = {
+    maxAttempts: 40,
+    poll: 500,
+    requiredStableSamples: 5,
+};
+const DOM_STABILITY = { maxAttempts: 20, poll: 500, requiredStableSamples: 5 };
+
 /**
  * Polls `sample()` until `requiredStableSamples` *consecutive* samples are
- * all equal (by `isEqual`), or until `maxAttempts` is reached, whichever
- * comes first. Returns the last sample taken.
+ * equal (by `isEqual`), or `maxAttempts` is reached, whichever comes first.
  *
- * Used to wait out stories whose rendering settles asynchronously (debounced
- * `ResizeObserver` layout, animations, etc.) before asserting a screenshot or
- * DOM snapshot against them. Bounded so that a story which never settles
- * fails fast with a diff to inspect, instead of silently consuming the whole
- * Jest `testTimeout`.
+ * Exists because some stories settle asynchronously (debounced
+ * `ResizeObserver` layout, in-flight animations, etc.) and a screenshot or
+ * DOM snapshot taken too early captures a mid-render frame rather than the
+ * final state. `requiredStableSamples` defaults to 2 but should be raised
+ * for stories whose settling can plateau for a while mid-ramp, long enough
+ * to fool a lower count into declaring stability early - see issue #2833
+ * for the background investigation.
  *
- * `requiredStableSamples` defaults to 2 (the historical "two matching
- * samples in a row" check), but some stories are driven by a
- * `ResizeObserver` feedback loop that ramps gradually and can plateau for
- * several hundred ms mid-ramp (observed: up to ~750ms) - long enough to
- * fool a 2-sample check into declaring stability early and capturing a
- * mid-render frame. Callers with that risk should pass a higher
- * `requiredStableSamples` so the *total* stable window
- * (`poll * (requiredStableSamples - 1)`) comfortably exceeds the longest
- * observed plateau.
- *
- * When `maxAttempts` is exhausted without ever reaching
- * `requiredStableSamples`, this previously returned the last sample with no
- * signal that stabilization had failed - a mid-render capture and a
- * genuinely-settled-but-different-from-baseline capture were
- * indistinguishable from the failure message alone. `stabilized` makes that
- * visible: callers should log it (or fold it into their assertion failure
- * message) so a future silent mid-render capture is self-explaining instead
- * of appearing as an unexplained diff. Deliberately *not* turned into an
- * automatic failure here - a story that never fully settles but still
- * matches its baseline passes today, and this must not regress that.
- *
- * `samplesTaken` (total samples drawn, including the first) is returned
- * alongside `stabilized` so a failing caller can tell apart two very
- * different situations that otherwise produce an identical-looking
- * "assertion failed" message: `stabilized: false` (the budget ran out
- * before 5 consecutive samples ever matched - a genuinely slow/contended
- * render) versus `stabilized: true, samplesTaken: 1` (the very first
- * sample was already "stable" by never changing again, yet still didn't
- * match the baseline - a mount-time race that produced a quiet-but-wrong
- * result; see the `remount-every-retry` tag doc comment on `forceRemount`
- * for a concrete example). No amount of extra waiting fixes the second
- * case, so distinguishing it in the log is what tells a future reader
- * which class of fix even applies.
+ * Returns `stabilized: false` (never throws) if the budget runs out first,
+ * and `samplesTaken` alongside it - together these let a caller's failure
+ * handling distinguish "never stabilized" from "stabilized but still wrong"
+ * (see `logStabilityDiagnosticsOnFailure`). Deliberately not turned into an
+ * automatic failure here: a story that never fully settles but still
+ * matches its baseline should keep passing.
  */
 async function waitUntilStable<T>(
     sample: () => Promise<T>,
@@ -88,24 +72,18 @@ async function waitUntilStable<T>(
 }
 
 /**
- * Logs, on assertion failure only (never on the other ~200 passing
- * stories, to avoid drowning the useful signal in noise), which of two
- * fundamentally different `waitUntilStable` outcomes preceded the
- * failure:
+ * Logs, on assertion failure only, which of two distinct causes preceded it:
  *
- * - `stabilized: false` - the poll budget was exhausted before 5
- *   consecutive samples ever matched. The capture may be a mid-render
- *   frame; a longer budget (see `screenshotTest`'s `maxAttempts`) or
- *   removing sources of contention is the applicable fix.
- * - `stabilized: true, samplesTaken` low (as low as 1) - the very first
- *   sample(s) were already stable and never changed again, yet still
- *   didn't match the baseline. This is a *stably-wrong* result, most
- *   often a mount-time race (see the `remount-every-retry` tag). No
- *   amount of extra waiting fixes this class - only a fresh mount does.
+ * - `stabilized: false` - the poll budget ran out before the capture ever
+ *   settled. Likely a genuinely slow/contended render; a longer budget or
+ *   less CI contention is the applicable fix.
+ * - `stabilized: true` with a low `samplesTaken` - the capture was quiet
+ *   from the start but still didn't match the baseline: a *stably-wrong*
+ *   result (typically a mount-time race), which no amount of extra waiting
+ *   can fix - only a fresh mount can (see the `remount-every-retry` tag).
  *
- * Naming the class in the log is what makes a future occurrence
- * self-explaining instead of requiring the same investigation to be
- * repeated from scratch.
+ * Naming the class makes a future failure self-explaining instead of
+ * requiring the investigation in issue #2833 to be redone from scratch.
  */
 function logStabilityDiagnosticsOnFailure(
     storyId: string,
@@ -118,31 +96,27 @@ function logStabilityDiagnosticsOnFailure(
         `[${storyId}] ${testName} failed after stabilized=${stabilized}, ` +
             `samplesTaken=${samplesTaken}. ` +
             (stabilized
-                ? "The capture was quiet and internally consistent " +
-                  "(never changed across polls) but still didn't match " +
-                  "the baseline - likely a stably-wrong mount-time race, " +
-                  "not a slow render. See the remount-every-retry tag."
+                ? "The capture never changed across polls but still didn't " +
+                  "match the baseline - likely a stably-wrong mount-time " +
+                  "race, not a slow render. See the remount-every-retry tag."
                 : "The poll budget was exhausted before the capture ever " +
-                  "reached 5 consecutive stable samples - likely a " +
-                  "genuinely slow/contended render captured mid-frame.")
+                  "settled - likely a genuinely slow/contended render " +
+                  "captured mid-frame.")
     );
 }
 
 /**
- * Waits until `#storybook-root`'s subtree has produced no DOM mutations
- * (childList, attributes, or character data - anywhere in the subtree) for
- * a continuous `quietWindowMs`, or until `timeoutMs` elapses, whichever
- * comes first. Never rejects - a timeout just means the caller proceeds to
- * its own (bounded) sampling loop instead of trusting this gate alone.
+ * Waits until `#storybook-root`'s subtree has produced no DOM mutations for
+ * a continuous `quietWindowMs`, or `timeoutMs` elapses, whichever comes
+ * first. Never rejects - a timeout just means the caller proceeds to its
+ * own bounded sampling loop instead of trusting this gate alone.
  *
- * This directly targets the root cause behind the WellLogViewer/Scroller
- * flake: a `ResizeObserver` callback repeatedly writes inline `style`
- * attributes as it converges on a final layout size, with no CSS animation
- * or Web Animations API entry involved - so it is invisible to any
- * animation-based wait, but is exactly what a `MutationObserver` sees.
- * Cheap relative to screenshot/DOM-string sampling, so running it first
- * lets the more expensive stage 2 sampling only start once the page is
- * already quiet.
+ * Targets layout that converges via repeated inline-style writes (e.g. a
+ * `ResizeObserver` callback), which has no CSS animation or Web Animations
+ * API entry and so is invisible to any animation-based wait, but is exactly
+ * what a `MutationObserver` sees. Cheap relative to screenshot/DOM-string
+ * sampling, so running it first lets the more expensive stage-2 sampling
+ * only start once the page is already quiet.
  */
 async function waitForMutationQuiescence(
     page: Page,
@@ -204,63 +178,40 @@ declare global {
 
 // Tracks how many times postVisit has run for each story id, so a jest
 // retry (`jest.retryTimes` below) can be detected and handled differently
-// from a story's first attempt. Module-scope state is safe here because
-// the test-runner reuses one page/module per worker process across all
-// stories in a file, and each story id only overlaps with itself across
-// retries (never concurrently, since Jest retries a failed test in place
-// before moving on).
+// from a story's first attempt. Module-scope state is safe here because the
+// test-runner reuses one page/module per worker process across all stories
+// in a file, and a story id is never visited concurrently with itself.
 const postVisitAttempts = new Map<string, number>();
 
 /**
- * Storybook's `setCurrentStory` channel event (what `__test` in
- * `@storybook/test-runner` uses to navigate to a story) re-renders the
- * currently-mounted story *in place* when passed the same story id - it
- * does not tear down and recreate the DOM. That means a Jest retry of a
- * failed story reuses the exact same DOM nodes as the first attempt: any
- * failure caused by a mount-time artifact (e.g. non-deterministic
- * attribute-insertion order, observed once on
- * `WellLogViewer/Demo/SyncLogViewer`) reproduces byte-for-byte on every
- * retry, making `jest.retryTimes` a no-op for that whole class of flake.
+ * Storybook's `setCurrentStory` channel event re-renders the currently
+ * mounted story *in place* - it does not tear down and recreate the DOM. A
+ * Jest retry of a failed story therefore reuses the exact same DOM as the
+ * first attempt, so any mount-time flake reproduces byte-for-byte on every
+ * retry, making `jest.retryTimes` a no-op for that class of failure.
  *
  * `forceRemount` is the channel event Storybook's own toolbar "remount"
- * button uses - it genuinely tears down and rebuilds the story's DOM.
- * Emitting it before a retry's assertions run gives the retry a real
- * second chance instead of re-asserting identical bytes. Never rejects -
- * this is a best-effort improvement to retries, not a correctness
- * requirement, so a timeout just means the retry proceeds against
- * whatever is already on the page.
+ * button uses - it genuinely tears down and rebuilds the story's DOM,
+ * giving a retry a real second chance. Never rejects: this is a best-effort
+ * improvement to retries, not a correctness requirement.
  *
- * Deliberately called **at most once per story by default** (see the
- * `attempts === 2` check at the call site), not on every retry. Remounting
- * resets any in-flight `ResizeObserver` convergence (see
- * `waitForMutationQuiescence`) back to its unmeasured starting state, so a
- * slow-settling story has to redo its *entire* settle ramp after every
- * remount. Under sustained CI contention that ramp can take much longer
- * than the bounded stability wait's budget (observed 10x+ slowdown under
- * CPU throttling) - repeatedly resetting it on every retry would then fail
- * every attempt identically, for a *different* reason than the flake this
- * exists to fix. Remounting once still gives mount-time non-determinism a
- * fresh, independent draw, while leaving any later retries free to simply
- * keep observing the same (already remounted) story as it continues
- * settling - accumulating real wall-clock time across attempts instead of
- * restarting the clock.
+ * Called with two different policies, because two distinct flake shapes
+ * need opposite trade-offs (see issue #2833 for both investigations):
  *
- * Some stories need the opposite trade-off: their flake is a **mount-time
- * race that produces a stably-wrong result**, not a slow settle. Observed
- * on `WellLogViewer/Demo/SyncLogViewer`'s `Default` story - its
- * `wellpickFlatting` rescale is applied from an event-driven callback
- * chain (`onCreateController`/`onContentRescale` in `SyncLogViewer.tsx`)
- * that can race under CI load and silently never re-apply. Crucially,
- * `waitUntilStable` reports `stabilized: true` for this case - the
- * un-flattened DOM is quiet and internally consistent, it is just never
- * going to become correct on its own, so *no amount of additional waiting
- * helps*. Only a fresh mount gives the race a new, independent draw. For
- * these stories specifically, tag them `"remount-every-retry"` (see
- * `postVisit`) to remount on *every* retry attempt rather than just the
- * first - turning `jest.retryTimes(3)`'s 3 retries into 3 independent
- * draws instead of 1 draw asserted three times. This is opt-in per story,
- * not a global policy change, precisely because it is the wrong trade-off
- * for the slow-settling case above.
+ * - **Slow-settling stories** (the default): remount **once**, on the
+ *   first retry only. Remounting resets any in-flight settle ramp (see
+ *   `waitForMutationQuiescence`), so remounting on *every* retry would
+ *   force a slow story to redo its entire ramp each time - under CI
+ *   contention that can exceed the stability budget and fail every retry
+ *   for a different reason than the original flake. One remount still
+ *   gives mount-time non-determinism a fresh draw, while later retries
+ *   keep accumulating real settle time instead of restarting it.
+ * - **Mount-time-race stories** (opt in via the `"remount-every-retry"`
+ *   tag): remount on *every* retry. Here the failure is a *stably-wrong*
+ *   result - `waitUntilStable` reports `stabilized: true`, so waiting
+ *   longer cannot help; only a fresh mount gives the race a new,
+ *   independent draw. This turns `jest.retryTimes(3)`'s retries into
+ *   independent draws instead of one draw asserted repeatedly.
  */
 async function forceRemount(page: Page, storyId: string): Promise<void> {
     await page
@@ -287,13 +238,11 @@ async function forceRemount(page: Page, storyId: string): Promise<void> {
 }
 
 /**
- * `page.screenshot()` can intermittently throw
- * `Protocol error (Page.captureScreenshot): Unable to capture screenshot`
- * when Chromium's compositor is captured mid-frame (observed almost
- * exclusively on stories with continuously-running animations). This is a
- * transient CDP failure, not a rendering problem, so a couple of retries
- * clear it without masking genuine screenshot failures, which still throw
- * after exhausting the attempts.
+ * `page.screenshot()` can intermittently throw a CDP "Unable to capture
+ * screenshot" error when Chromium's compositor is captured mid-frame
+ * (observed mostly on stories with continuously-running animations). This
+ * is a transient capture failure, not a rendering problem, so a couple of
+ * retries clear it without masking genuine screenshot failures.
  */
 async function screenshotWithRetry(
     page: Page,
@@ -312,10 +261,8 @@ async function screenshotWithRetry(
         } catch (error) {
             lastError = error;
 
-            // Give the CDP session a brief moment to recover before
-            // retrying - retrying instantly back-to-back doesn't reliably
-            // clear the transient error, since the compositor may still be
-            // mid-frame from the previous attempt.
+            // Give the CDP session a brief moment to recover - the
+            // compositor may still be mid-frame from the previous attempt.
             if (attempt < attempts) {
                 await new Promise((resolve) => setTimeout(resolve, retryDelay));
             }
@@ -326,24 +273,9 @@ async function screenshotWithRetry(
 }
 
 const screenshotTest = async (page: Page, context: TestContext) => {
-    // No cheap in-page signal (canvas/WebGL content doesn't produce DOM
+    // No cheap in-page signal for canvas/WebGL content (it produces no DOM
     // mutations), so stability relies entirely on requiring several
-    // consecutive identical screenshots. requiredStableSamples=5 at a
-    // 500ms poll demands a continuous ~2s stable window, comfortably above
-    // the longest observed mid-render plateau (~750ms, on a camera-control
-    // story) - a 2-sample check does not.
-    //
-    // maxAttempts=40 (~20s of polling, well within the 60s testTimeout)
-    // rather than the original 20 (~10s): CI has been observed to exhaust
-    // the 20-attempt budget on heavy WebGL/label stories under contention
-    // (confirmed via the `stabilized` diagnostic below -
-    // `SubsurfaceViewer/WellsLayer/UnfoldedProjection` logged "never
-    // reached 5 consecutive stable samples" immediately before its
-    // image-snapshot mismatch), which is exactly the silent-mid-render
-    // capture this budget is meant to avoid. Raising the ceiling costs
-    // nothing on stories that already stabilize early (the loop exits as
-    // soon as 5 consecutive samples match), and only spends extra time on
-    // the genuinely slow/contended cases this is meant to rescue.
+    // consecutive identical screenshots - see waitUntilStable's doc comment.
     const {
         value: screenshot,
         stabilized,
@@ -351,18 +283,16 @@ const screenshotTest = async (page: Page, context: TestContext) => {
     } = await waitUntilStable(
         () => screenshotWithRetry(page),
         (a, b) => a.equals(b),
-        { maxAttempts: 40, poll: 500, requiredStableSamples: 5 }
+        SCREENSHOT_STABILITY
     );
 
     if (!stabilized) {
-        // Not a failure by itself (see waitUntilStable's doc comment) -
-        // but if the image-snapshot assertion below does fail, this line
-        // in the test output explains *why* a diff might exist: the
-        // capture may be a mid-render frame rather than the story's true
-        // final state.
+        // Not a failure by itself - but if the assertion below does fail,
+        // this explains a possible cause instead of an unexplained diff.
         // eslint-disable-next-line no-console
         console.warn(
-            `[${context.id}] screenshotTest: never reached ${5} consecutive ` +
+            `[${context.id}] screenshotTest: never reached ` +
+                `${SCREENSHOT_STABILITY.requiredStableSamples} consecutive ` +
                 `stable samples within the poll budget - the captured ` +
                 `screenshot may not reflect the story's fully-settled state.`
         );
@@ -389,29 +319,21 @@ const screenshotTest = async (page: Page, context: TestContext) => {
 };
 
 /**
- * `WellLogViewer`'s gradient-fill legend (`gradientfill-plot-legend.ts`)
- * generates each `<linearGradient>`'s `id` from a module-scope counter
- * (`"grad" + ++__idGradient`) that is never reset and is shared by every
- * story rendered on the page before this one - including, notably, the
- * stories embedded in this component's own auto-generated Storybook Docs
- * page (`tags: ["autodocs"]` in preview.tsx), which is visited before any
- * individual story's dedicated test and silently consumes a variable
- * number of ids depending on test order/sharding/retries. Confirmed
- * empirically: a story's own gradients are always created once, in a
- * fixed, self-consistent, sequential run (e.g. `grad31,32,33` with the
- * `id` and every `url(#...)` reference matching), but the *starting*
- * number is not a property of the story at all - only unrelated
- * page/test-execution history. That makes the raw id unstable across
- * environments/CI runs (observed drifting from `grad86` to `grad152`
- * between two CI runs of the exact same story) despite being internally
- * consistent within any one render.
+ * `WellLogViewer`'s gradient-fill legend gives each `<linearGradient>` a
+ * plot-instance-scoped id (see `gradientfill-plot-legend.ts`), but a
+ * story's own gradients still aren't numbered from zero: Storybook's
+ * autodocs page pre-renders every story in a file before that story's own
+ * dedicated test visit, consuming some ids first, and how many depends on
+ * test order/sharding/retries rather than anything about the story itself
+ * (see issue #2833). That makes the raw id unstable across environments/CI
+ * runs despite being internally self-consistent within any one render.
  *
- * Renumbering sequentially in document order (first occurrence order)
- * removes that dependency while still asserting everything that matters:
- * every `id="gradN"` and its matching `fill="url(#gradN)"` reference are
+ * Renumbering sequentially in first-occurrence order removes that
+ * dependency while still asserting everything that matters: every
+ * `id="gradN"` and its matching `fill="url(#gradN)"` reference are
  * rewritten together, so a real wiring bug (wrong/missing/misordered
- * gradient reference) still fails the snapshot - only the meaningless
- * absolute number is discarded.
+ * reference) still fails the snapshot - only the meaningless absolute
+ * number is discarded.
  */
 function normalizeGradientIds(html: string): string {
     const idMap = new Map<string, string>();
@@ -427,13 +349,11 @@ function normalizeGradientIds(html: string): string {
 }
 
 const domSnapshotTest = async (page: Page, context: TestContext) => {
-    // Some stories render their DOM in multiple passes (e.g. a
-    // ResizeObserver-driven layout feedback loop that converges gradually
-    // over ~2s via repeated inline-style writes, with no CSS animation or
-    // Web Animations API entry involved). First wait for the subtree to go
-    // quiet (cheap), then require several consecutive identical samples
-    // (not just 2) so a mid-ramp plateau can't be mistaken for the final
-    // state - mirroring the stability loop used by screenshotTest above.
+    // Some stories render their DOM in multiple passes as layout settles
+    // (see waitForMutationQuiescence's doc comment). Wait for the subtree
+    // to go quiet first (cheap), then require several consecutive identical
+    // samples so a mid-ramp plateau can't be mistaken for the final state -
+    // mirroring screenshotTest's stability loop above.
     await waitForMutationQuiescence(page, {
         quietWindowMs: 750,
         timeoutMs: 5000,
@@ -447,25 +367,23 @@ const domSnapshotTest = async (page: Page, context: TestContext) => {
         async () => {
             const elementHandler = await page.$("#storybook-root");
             const raw = elementHandler ? await elementHandler.innerHTML() : "";
-            // Normalized before the stability comparison too, so that
-            // incidental gradient-id churn between polls (e.g. an
-            // unrelated render happening on the shared page) can't be
-            // mistaken for the section itself being unstable.
+            // Normalized before the stability comparison too, so incidental
+            // gradient-id churn between polls can't be mistaken for the
+            // section itself being unstable.
             return normalizeGradientIds(raw);
         },
         (a, b) => a === b,
-        { maxAttempts: 20, poll: 500, requiredStableSamples: 5 }
+        DOM_STABILITY
     );
 
     if (!stabilized) {
-        // See screenshotTest's identical warning - not a failure by
-        // itself, but explains a subsequent snapshot mismatch as a
-        // possible mid-render capture rather than an unexplained diff.
+        // See screenshotTest's identical warning above.
         // eslint-disable-next-line no-console
         console.warn(
-            `[${context.id}] domSnapshotTest: never reached ${5} consecutive ` +
-                `stable samples within the poll budget - the captured HTML ` +
-                `may not reflect the story's fully-settled state.`
+            `[${context.id}] domSnapshotTest: never reached ` +
+                `${DOM_STABILITY.requiredStableSamples} consecutive stable ` +
+                `samples within the poll budget - the captured HTML may ` +
+                `not reflect the story's fully-settled state.`
         );
     }
 
@@ -490,14 +408,11 @@ const config: TestRunnerConfig = {
     },
 
     async preVisit(page) {
-        // Tell preview.tsx's motion decorator to skip Framer Motion
-        // animations for this story, and its color-counter decorator to
-        // reset generateColor()'s shared palette index before rendering.
-        // Set here (rather than read once at module load) because the
-        // test-runner navigates to iframe.html a single time in its
-        // `prepare` step and reuses that page for every story -
-        // preview.tsx's module body runs before any preVisit hook, so a
-        // flag read at import time would always be stale.
+        // Tell preview.tsx's test-only decorators to skip Framer Motion
+        // animations and reset generateColor()'s shared palette for this
+        // story. Set here (rather than read once at module load) because
+        // the test-runner navigates once and reuses the page for every
+        // story, so a flag read at import time would always be stale.
         await page.evaluate(() => {
             window.__WEBVIZ_SKIP_MOTION__ = true;
             window.__WEBVIZ_RESET_COLOR_COUNTER__ = true;
@@ -511,21 +426,9 @@ const config: TestRunnerConfig = {
             return;
         }
 
-        // If this is a retry for this story (postVisit already ran once,
-        // and failed), force a fresh remount before asserting anything.
-        // Without this, the retry re-renders in place and reasserts the
-        // exact same DOM/pixels as the failed attempt - see the
-        // forceRemount doc comment above for why that makes retries a
-        // no-op for mount-time flakes.
-        //
-        // By default this only happens once (attempts === 2, not every
-        // retry) - see forceRemount's doc comment for why repeating it on
-        // every retry would be counterproductive for slow-settling
-        // stories. Stories tagged "remount-every-retry" opt out of that
-        // restriction and get a fresh remount on *every* retry instead,
-        // for the opposite class of flake (a mount-time race producing a
-        // stably-wrong result, where a longer settle wait cannot help -
-        // see forceRemount's doc comment for the concrete example).
+        // Force a fresh remount before a retry's assertions run - see
+        // forceRemount's doc comment for the two policies and why they
+        // differ per story.
         const attempts = (postVisitAttempts.get(context.id) ?? 0) + 1;
         postVisitAttempts.set(context.id, attempts);
         const remountEveryRetry = storyContext.tags.includes(
