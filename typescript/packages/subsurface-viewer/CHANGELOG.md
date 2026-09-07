@@ -1,3 +1,14 @@
+## 2.1.3 (2026-09-03)
+
+### 🩹 Fixes
+
+- Improve wells layer md picking ([#2827](https://github.com/equinor/webviz-subsurface-components/pull/2827), [#2823](https://github.com/equinor/webviz-subsurface-components/issues/2823), [#2822](https://github.com/equinor/webviz-subsurface-components/issues/2822))
+
+### ❤️ Thank You
+
+- Anders Rantala Hunderi
+- t0oF @w1nklr
+
 ## 2.1.2 (2026-09-03)
 
 ### 🧱 Updated Dependencies
