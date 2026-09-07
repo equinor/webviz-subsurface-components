@@ -6,21 +6,21 @@ import type { Position } from "geojson";
 import { cloneDeep, reverse, set } from "lodash";
 
 import type { ColorAccessor, WellFeature } from "../types";
+import type { ScaleFactor } from "./trajectory";
 import {
     getAziAndInclForSegment,
     getColor,
     getCumulativeDistance,
     getFractionPositionSegmentIndices,
     getLineStringGeometry,
-    getMd,
     getMdsInRange,
     getPositionAndAngleOnTrajectoryPath,
-    getSegmentIndex,
+    getSegmentIndicesForCoord,
     getSegmentIndicesForMd,
     getTrajectory,
-    getTvd,
     injectMdPoints,
-    interpolateDataOnTrajectory,
+    scaledPosition,
+    unScaledPosition,
 } from "./trajectory";
 
 describe("trajectory utils", () => {
@@ -122,7 +122,7 @@ describe("trajectory utils", () => {
         });
     });
 
-    describe("getSegmentIndex", () => {
+    describe("getSegmentIndicesForCoord", () => {
         it("should find closest segment to coordinate", () => {
             const path: Position[] = [
                 [0, 0],
@@ -131,180 +131,20 @@ describe("trajectory utils", () => {
                 [3, 0],
             ];
             const coord: Position = [1.5, 0.1];
-            const result = getSegmentIndex(coord, path);
-            expect(result).toBe(1);
+            const result = getSegmentIndicesForCoord(coord, path);
+            expect(result).toEqual([1, 2]);
         });
-    });
 
-    describe("interpolateDataOnTrajectory", () => {
-        it("should interpolate data on trajectory", () => {
-            const coord: Position = [0.5, 0];
-            const data = [100, 200];
-            const trajectory: Position[] = [
-                [0, 0],
-                [1, 0],
+        it("should handle 3D coordinates", () => {
+            const path: Position[] = [
+                [0, 0, 0],
+                [1, 0, 0],
+                [2, 0, 0],
+                [3, 0, 0],
             ];
-
-            const result = interpolateDataOnTrajectory(coord, data, trajectory);
-            expect(result).toBeCloseTo(150, 1);
-        });
-
-        it("should return null if data length is less than 2", () => {
-            const result = interpolateDataOnTrajectory([0, 0], [100], [[0, 0]]);
-            expect(result).toBeNull();
-        });
-
-        it("should return null if data and trajectory lengths differ", () => {
-            const result = interpolateDataOnTrajectory(
-                [0, 0],
-                [100, 200],
-                [
-                    [0, 0],
-                    [1, 1],
-                    [2, 2],
-                ]
-            );
-            expect(result).toBeNull();
-        });
-
-        it("should return null if segment has zero length", () => {
-            const coord: Position = [0, 0];
-            const data = [100, 200];
-            const trajectory: Position[] = [
-                [0, 0],
-                [0, 0],
-            ];
-
-            const result = interpolateDataOnTrajectory(coord, data, trajectory);
-            expect(result).toBeNull();
-        });
-
-        it("should clamp value if position is past ends", () => {
-            const coord1: Position = [2, 0];
-            const coord2: Position = [-1, 0];
-            const data = [100, 200];
-            const trajectory: Position[] = [
-                [0, 0],
-                [1, 0],
-            ];
-
-            const result1 = interpolateDataOnTrajectory(
-                coord1,
-                data,
-                trajectory
-            );
-            const result2 = interpolateDataOnTrajectory(
-                coord2,
-                data,
-                trajectory
-            );
-            expect(result1).toBe(200);
-            expect(result2).toBe(100);
-        });
-    });
-
-    describe("getMd", () => {
-        it("should get an interpolated md value on a trajectory", () => {
-            const result = getMd(
-                [100, 150, -100],
-                mockFeature,
-                [255, 0, 0, 255]
-            );
-            expect(result).toBeCloseTo(100);
-        });
-
-        it("should return null if md property is missing", () => {
-            const mockWithoutMd: WellFeature = {
-                ...mockFeature,
-                properties: {
-                    ...mockFeature.properties,
-                    md: [],
-                },
-            };
-
-            const result = getMd(
-                [100, 150, -100],
-                mockWithoutMd,
-                [255, 0, 0, 255]
-            );
-            expect(result).toBeNull();
-        });
-
-        it("should return null if trajectory is undefined", () => {
-            const mockWithoutTrajectory: WellFeature = set(
-                cloneDeep(mockFeature),
-                "geometry.geometries",
-                []
-            );
-            const result = getMd([0, 0], mockWithoutTrajectory, [255, 0, 0, 0]);
-            expect(result).toBeNull();
-        });
-
-        it("should use a 2D trajectory if coord is 2D", () => {
-            const result = getMd([100, 150], mockFeature, [255, 0, 0, 255]);
-
-            expect(result).toBeCloseTo(100);
-        });
-    });
-
-    describe("getTvd", () => {
-        it("should get an interpolated md value on a trajectory", () => {
-            const result = getTvd(
-                [100, 150, -100],
-                cloneDeep(mockFeature),
-                [255, 0, 0, 255]
-            );
-            expect(result).toBeCloseTo(-100);
-        });
-
-        it("should return wellhead z-coordinate if trajectory is undefined", () => {
-            const mockWithoutTrajectory: WellFeature = set(
-                cloneDeep(mockFeature),
-                "geometry.geometries",
-                [mockFeature.geometry.geometries[0]]
-            );
-
-            const result = getTvd(
-                [0, 0],
-                mockWithoutTrajectory,
-                [255, 0, 0, 0]
-            );
-            expect(result).toBe(-200);
-        });
-
-        it("should return null if trajectory and head is undefined", () => {
-            const mockWithoutTrajectory: WellFeature = set(
-                cloneDeep(mockFeature),
-                "geometry.geometries",
-                []
-            );
-            const result = getTvd(
-                [0, 0],
-                mockWithoutTrajectory,
-                [255, 0, 0, 0]
-            );
-            expect(result).toBeNull();
-        });
-
-        it("should return wellhead z-coordinate if trajectory has single point", () => {
-            const mockWithoutTrajectory: WellFeature = set(
-                cloneDeep(mockFeature),
-                "geometry.geometries[1].coordinates",
-                []
-            );
-
-            const result = getTvd(
-                [0, 0],
-                mockWithoutTrajectory,
-                [255, 0, 0, 255]
-            );
-            expect(result).toBe(-200);
-        });
-
-        it("should use a 2D trajectory if coord is 2D", () => {
-            const result = getTvd([100, 150], mockFeature, [255, 0, 0, 255]);
-
-            expect(result).toBeCloseTo(-100);
+            const coord: Position = [1.5, 0.1, 0];
+            const result = getSegmentIndicesForCoord(coord, path);
+            expect(result).toEqual([1, 2]);
         });
     });
 
@@ -600,124 +440,197 @@ describe("trajectory utils", () => {
 
             expect(result.properties.md[0]).toEqual([0, 49, 50, 50, 51, 100]);
         });
+    });
 
-        describe("getAziAndInclForSegment", () => {
-            it("should calculate azimuth and inclination for vertical segment", () => {
-                const start: Position = [0, 0, 0];
-                const end: Position = [0, 0, 100];
+    describe("getAziAndInclForSegment", () => {
+        it("should calculate azimuth and inclination for vertical segment", () => {
+            const start: Position = [0, 0, 0];
+            const end: Position = [0, 0, 100];
 
-                const result = getAziAndInclForSegment(start, end);
+            const result = getAziAndInclForSegment(start, end);
 
-                expect(result.inclination).toBeCloseTo(0, 1);
-                expect(result.azimuth).toBeDefined();
-            });
+            expect(result.inclination).toBeCloseTo(0, 1);
+            expect(result.azimuth).toBeDefined();
+        });
 
-            it("should calculate azimuth and inclination for horizontal segment", () => {
-                const start: Position = [0, 0, 0];
-                const end: Position = [0, 100, 0];
+        it("should calculate azimuth and inclination for horizontal segment", () => {
+            const start: Position = [0, 0, 0];
+            const end: Position = [0, 100, 0];
 
-                const result = getAziAndInclForSegment(start, end);
+            const result = getAziAndInclForSegment(start, end);
 
-                expect(result.inclination).toBeCloseTo(90, 1);
-                expect(result.azimuth).toBeCloseTo(180, 1);
-            });
+            expect(result.inclination).toBeCloseTo(90, 1);
+            expect(result.azimuth).toBeCloseTo(180, 1);
+        });
 
-            it("should calculate azimuth and inclination for diagonal segment", () => {
-                const start: Position = [0, 0, 0];
-                const end: Position = [100, 100, 100];
+        it("should calculate azimuth and inclination for diagonal segment", () => {
+            const start: Position = [0, 0, 0];
+            const end: Position = [100, 100, 100];
 
-                const result = getAziAndInclForSegment(start, end);
+            const result = getAziAndInclForSegment(start, end);
 
-                expect(result.inclination).toBeCloseTo(54.74, 1);
-                expect(result.azimuth).toBeCloseTo(135, 1);
-            });
+            expect(result.inclination).toBeCloseTo(54.74, 1);
+            expect(result.azimuth).toBeCloseTo(135, 1);
+        });
 
-            it("should handle segment with non-zero start position", () => {
-                const start: Position = [50, 50, 50];
-                const end: Position = [50, 150, 50];
+        it("should handle segment with non-zero start position", () => {
+            const start: Position = [50, 50, 50];
+            const end: Position = [50, 150, 50];
 
-                const result = getAziAndInclForSegment(start, end);
+            const result = getAziAndInclForSegment(start, end);
 
-                expect(result.inclination).toBeCloseTo(90, 1);
-                expect(result.azimuth).toBeCloseTo(180, 1);
-            });
+            expect(result.inclination).toBeCloseTo(90, 1);
+            expect(result.azimuth).toBeCloseTo(180, 1);
+        });
 
-            it("should calculate for downward segment", () => {
-                const start: Position = [0, 0, 0];
-                const end: Position = [0, 0, -100];
+        it("should calculate for downward segment", () => {
+            const start: Position = [0, 0, 0];
+            const end: Position = [0, 0, -100];
 
-                const result = getAziAndInclForSegment(start, end);
+            const result = getAziAndInclForSegment(start, end);
 
-                expect(result.inclination).toBeCloseTo(180, 1);
-                expect(result.azimuth).toBeDefined();
-            });
+            expect(result.inclination).toBeCloseTo(180, 1);
+            expect(result.azimuth).toBeDefined();
+        });
+    });
 
-            describe("getSegmentIndicesForMd", () => {
-                it("should return correct segment indices for md within trajectory", () => {
-                    const trajectory_md = [0, 100, 200, 300];
-                    const result = getSegmentIndicesForMd(trajectory_md, 150);
+    describe("getSegmentIndicesForMd", () => {
+        it("should return correct segment indices for md within trajectory", () => {
+            const trajectory_md = [0, 100, 200, 300];
+            const result = getSegmentIndicesForMd(trajectory_md, 150);
 
-                    expect(result).toEqual([1, 2, 0.5]);
-                });
+            expect(result).toEqual([1, 2]);
+        });
 
-                it("should return first segment with fraction 0 when md equals minimum", () => {
-                    const trajectory_md = [0, 100, 200, 300];
-                    const result = getSegmentIndicesForMd(trajectory_md, 0);
+        it("should return first segment with fraction 0 when md equals minimum", () => {
+            const trajectory_md = [0, 100, 200, 300];
+            const result = getSegmentIndicesForMd(trajectory_md, 0);
 
-                    expect(result).toEqual([0, 1, 0]);
-                });
+            expect(result).toEqual([0, 1]);
+        });
 
-                it("should return last segment with fraction 1 when md equals maximum", () => {
-                    const trajectory_md = [0, 100, 200, 300];
-                    const result = getSegmentIndicesForMd(trajectory_md, 300);
+        it("should return last segment with fraction 1 when md equals maximum", () => {
+            const trajectory_md = [0, 100, 200, 300];
+            const result = getSegmentIndicesForMd(trajectory_md, 300);
 
-                    expect(result).toEqual([2, 3, 1]);
-                });
+            expect(result).toEqual([2, 3]);
+        });
 
-                it("should calculate correct fraction at start of segment", () => {
-                    const trajectory_md = [0, 100, 200, 300];
-                    const result = getSegmentIndicesForMd(trajectory_md, 100);
+        it("should calculate correct fraction at start of segment", () => {
+            const trajectory_md = [0, 100, 200, 300];
+            const result = getSegmentIndicesForMd(trajectory_md, 100);
 
-                    expect(result).toEqual([0, 1, 1]);
-                });
+            expect(result).toEqual([0, 1]);
+        });
 
-                it("should throw error if trajectory has less than 2 points", () => {
-                    expect(() => getSegmentIndicesForMd([0], 0)).toThrow(
-                        "Expected trajectory to have at least 2 points"
-                    );
+        it("should throw error if trajectory has less than 2 points", () => {
+            expect(() => getSegmentIndicesForMd([0], 0)).toThrow(
+                "Expected trajectory to have at least 2 points"
+            );
 
-                    expect(() => getSegmentIndicesForMd([], 0)).toThrow(
-                        "Expected trajectory to have at least 2 points"
-                    );
-                });
+            expect(() => getSegmentIndicesForMd([], 0)).toThrow(
+                "Expected trajectory to have at least 2 points"
+            );
+        });
 
-                it("should throw error if md is outside range", () => {
-                    const trajectory_md = [100, 200, 300];
-                    expect(() =>
-                        getSegmentIndicesForMd(trajectory_md, 50)
-                    ).toThrow("MD 50 is outside of trajectory range 100,300");
+        it("should throw error if md is outside range", () => {
+            const trajectory_md = [100, 200, 300];
+            expect(() => getSegmentIndicesForMd(trajectory_md, 50)).toThrow(
+                "MD 50 is outside of trajectory range 100,300"
+            );
 
-                    expect(() =>
-                        getSegmentIndicesForMd(trajectory_md, 350)
-                    ).toThrow("MD 350 is outside of trajectory range 100,300");
-                });
+            expect(() => getSegmentIndicesForMd(trajectory_md, 350)).toThrow(
+                "MD 350 is outside of trajectory range 100,300"
+            );
+        });
 
-                it("should handle non-zero starting md values", () => {
-                    const trajectory_md = [1000, 1100, 1200, 1300];
-                    const result = getSegmentIndicesForMd(trajectory_md, 1150);
+        it("should handle non-zero starting md values", () => {
+            const trajectory_md = [1000, 1100, 1200, 1300];
+            const result = getSegmentIndicesForMd(trajectory_md, 1150);
 
-                    expect(result).toEqual([1, 2, 0.5]);
-                });
+            expect(result).toEqual([1, 2]);
+        });
 
-                it("should handle unevenly spaced md values", () => {
-                    const trajectory_md = [0, 50, 200, 500];
-                    const result = getSegmentIndicesForMd(trajectory_md, 100);
+        it("should handle unevenly spaced md values", () => {
+            const trajectory_md = [0, 50, 200, 500];
+            const result = getSegmentIndicesForMd(trajectory_md, 100);
 
-                    expect(result[0]).toBe(1);
-                    expect(result[1]).toBe(2);
-                    expect(result[2]).toBeCloseTo(0.333, 2);
-                });
-            });
+            expect(result[0]).toBe(1);
+            expect(result[1]).toBe(2);
+        });
+    });
+
+    describe("scaledPosition", () => {
+        it("should scale a 2D point with provided scale factors", () => {
+            const point: Position = [2, 3];
+            const scaleFactor: ScaleFactor = { x: 2, y: 3 };
+            const result = scaledPosition(point, scaleFactor);
+            expect(result).toEqual([4, 9]);
+        });
+
+        it("should scale a 3D point with provided scale factors", () => {
+            const point: Position = [2, 3, 4];
+            const scaleFactor: ScaleFactor = { x: 2, y: 3, z: 4 };
+            const result = scaledPosition(point, scaleFactor);
+            expect(result).toEqual([4, 9, 16]);
+        });
+
+        it("should handle missing scale factors for some dimensions", () => {
+            const point: Position = [2, 3, 4];
+            const scaleFactor: ScaleFactor = { x: 2, z: 4 };
+            const result = scaledPosition(point, scaleFactor);
+            expect(result).toEqual([4, 3, 16]);
+        });
+
+        it("should handle an empty scale factor object", () => {
+            const point: Position = [2, 3, 4];
+            const scaleFactor: ScaleFactor = {};
+            const result = scaledPosition(point, scaleFactor);
+            expect(result).toEqual([2, 3, 4]);
+        });
+    });
+
+    describe("unScaledPosition", () => {
+        it("should unscale a 2D point with provided scale factors", () => {
+            const point: Position = [4, 9];
+            const scaleFactor: ScaleFactor = { x: 2, y: 3 };
+            const result = unScaledPosition(point, scaleFactor);
+            expect(result).toEqual([2, 3]);
+        });
+
+        it("should unscale a 3D point with provided scale factors", () => {
+            const point: Position = [4, 9, 16];
+            const scaleFactor: ScaleFactor = { x: 2, y: 3, z: 4 };
+            const result = unScaledPosition(point, scaleFactor);
+            expect(result).toEqual([2, 3, 4]);
+        });
+
+        it("should handle missing scale factors for some dimensions", () => {
+            const point: Position = [4, 3, 16];
+            const scaleFactor: ScaleFactor = { x: 2, z: 4 };
+            const result = unScaledPosition(point, scaleFactor);
+            expect(result).toEqual([2, 3, 4]);
+        });
+
+        it("should handle an empty scale factor object", () => {
+            const point: Position = [2, 3, 4];
+            const scaleFactor: ScaleFactor = {};
+            const result = unScaledPosition(point, scaleFactor);
+            expect(result).toEqual([2, 3, 4]);
+        });
+
+        it("should handle scale factor of 0 for any dimension", () => {
+            const point: Position = [4, 9, 16];
+            const scaleFactor: ScaleFactor = { x: 0, y: 3, z: 0 };
+            const result = unScaledPosition(point, scaleFactor);
+            expect(result).toEqual([4, 3, 16]);
+        });
+
+        it("should handle 2D points with scale factor of 0", () => {
+            const point: Position = [4, 9];
+            const scaleFactor: ScaleFactor = { x: 0, y: 0 };
+            const result = unScaledPosition(point, scaleFactor);
+            expect(result).toEqual([4, 9]);
         });
     });
 });

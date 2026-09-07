@@ -209,7 +209,7 @@ export const MarkersAlongWellPath: StoryObj<MarkersAlongWellPath> = {
         }, [mdSteps, partialVolveWells.features]);
 
         const hoverMarkerData = React.useMemo<WellMarkerDataT>(() => {
-            if (hoveredId == null || hoveredMd == null)
+            if (hoveredId == null || hoveredMd == null || isNaN(hoveredMd))
                 return {
                     position: [-1, -1, -1],
                     size: 20,
@@ -234,7 +234,8 @@ export const MarkersAlongWellPath: StoryObj<MarkersAlongWellPath> = {
                     data: partialVolveWells,
                     refine: false,
                     ZIncreasingDownwards: false,
-                    pickable: true,
+                    // "3d" needed to make picking coordinates be feature position, not camera position
+                    pickable: "3d",
                     autoHighlight: true,
                     outline: true,
                     onHover(pickingInfo) {
@@ -329,13 +330,13 @@ function getMarkerDataAtMd(
     const wellMds = well.properties.md[0];
     const wellTrajectory = getLineStringGeometry(well)!.coordinates;
 
-    const [segmentStart, segmentEnd, lengthAlong] = getSegmentIndicesForMd(
-        wellMds,
-        md
-    );
+    const [startIdx, endIdx] = getSegmentIndicesForMd(wellMds, md);
+    const mdStart = wellMds[startIdx];
+    const mdEnd = wellMds[endIdx];
+    const lengthAlong = (md - mdStart) / (mdEnd - mdStart);
 
-    const segStartPos = [...wellTrajectory[segmentStart]];
-    const segEndPos = [...wellTrajectory[segmentEnd]];
+    const segStartPos = [...wellTrajectory[startIdx]];
+    const segEndPos = [...wellTrajectory[endIdx]];
 
     const position = [
         segStartPos[0] + (segEndPos[0] - segStartPos[0]) * lengthAlong,
