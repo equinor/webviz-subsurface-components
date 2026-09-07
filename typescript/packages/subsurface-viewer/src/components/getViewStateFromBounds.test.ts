@@ -3,13 +3,13 @@ import { describe, expect, it } from "@jest/globals";
 
 import type { ViewportType } from "../views/viewport";
 import type { BoundingBox2D, Point3D } from "../utils";
-import type { MarginsType, Size } from "./Map";
+import type { MarginsType, MapSize } from "./Map";
 import { getViewStateFromBounds } from "./Map";
 
 const NO_MARGINS: MarginsType = { left: 0, right: 0, top: 0, bottom: 0 };
 
 const BOUNDS: BoundingBox2D = [0, 0, 1000, 500];
-const SIZE: Size = { width: 800, height: 400 };
+const SIZE: MapSize = { width: 800, height: 400 };
 const ORIGIN: Point3D = [0, 0, 0];
 
 /** A plain 2D viewport, i.e. no target/zoom overrides and no deprecated vertical scale. */

@@ -86,8 +86,8 @@ import { SectionView } from "../views/sectionView";
  */
 export type BoundsAccessor = () => BoundingBox2D;
 
-/** Size of the map component, in pixels. */
-export type Size = {
+/** Size of the `Map` component, in pixels. */
+export type MapSize = {
     width: number;
     height: number;
 };
@@ -560,11 +560,11 @@ const Map: React.FC<MapProps> = ({
     const viewController = useMemo(() => new ViewController(forceUpdate), []);
 
     // Extract the needed size from onResize function
-    const [deckSize, setDeckSize] = useState<Size>({ width: 0, height: 0 });
-    const onResize = useCallback((size: Size) => {
+    const [deckSize, setDeckSize] = useState<MapSize>({ width: 0, height: 0 });
+    const onResize = useCallback((size: MapSize) => {
         // exclude {0, 0} size (when rendered hidden pages)
         if (size.width > 0 && size.height > 0) {
-            setDeckSize((prevSize: Size) => {
+            setDeckSize((prevSize: MapSize) => {
                 if (
                     prevSize?.width !== size.width ||
                     prevSize?.height !== size.height
@@ -1181,7 +1181,7 @@ type ViewControllerState = {
     camera: ViewStateType | undefined;
     bounds: BoundingBox2D | BoundsAccessor | undefined;
     boundingBox3d: BoundingBox3D | undefined;
-    deckSize: Size;
+    deckSize: MapSize;
     zScale: number;
     viewPortMargins: MarginsType;
 };
@@ -1530,7 +1530,7 @@ class ViewController {
 function computeCameraZoom(
     camera: ViewStateType,
     boundingBox: BoundingBox3D,
-    size: Size,
+    size: MapSize,
     fovy = 50
 ): number {
     // constants and camera constants
@@ -1635,7 +1635,7 @@ export function getViewStateFromBounds(
     target: Point3D,
     views: ViewsType | undefined,
     viewPort: ViewportType,
-    size: Size
+    size: MapSize
 ): ViewStateType {
     const bounds =
         typeof bounds_accessor == "function"
@@ -1765,7 +1765,7 @@ function getViewType(
     return [OrthographicView, OrthographicController];
 }
 
-function areViewsValid(views: ViewsType | undefined, size: Size): boolean {
+function areViewsValid(views: ViewsType | undefined, size: MapSize): boolean {
     const isInvalid: boolean =
         views?.viewports == undefined ||
         views?.layout == undefined ||
@@ -1805,7 +1805,7 @@ function newView(
     });
 }
 
-function buildDeckGlViews(views: ViewsType | undefined, size: Size): View[] {
+function buildDeckGlViews(views: ViewsType | undefined, size: MapSize): View[] {
     const isOk = areViewsValid(views, size);
     if (!views || !isOk) {
         return [
@@ -1926,7 +1926,7 @@ function canCameraBeDefined(
     camera: ViewStateType | undefined,
     boundingBox: BoundingBox3D | undefined,
     bounds: BoundingBox2D | BoundsAccessor | undefined,
-    size: Size
+    size: MapSize
 ): boolean {
     if (isCameraDefined(camera)) {
         return true;
@@ -2044,7 +2044,7 @@ function inversedZScaled(
 function updateViewState(
     camera: ViewStateType,
     boundingBox: BoundingBox3D,
-    size: Size,
+    size: MapSize,
     is3D = true
 ): ViewStateType {
     if (isCameraDefined(camera)) {
@@ -2087,7 +2087,7 @@ function computeViewState(
     bounds: BoundingBox2D | BoundsAccessor | undefined,
     viewportMargins: MarginsType,
     views: ViewsType | undefined,
-    size: Size
+    size: MapSize
 ): ViewStateType {
     // If the camera is defined, use it
     const isCameraPositionDefined = scaledCamera != undefined;
@@ -2180,7 +2180,7 @@ function buildViewStates(
     scaledCamera: ViewStateType | undefined,
     boundingBox: BoundingBox3D | undefined,
     bounds: BoundingBox2D | BoundsAccessor | undefined,
-    size: Size
+    size: MapSize
 ): Record<string, ViewStateType> {
     const isOk = areViewsValid(views, size);
     if (!views || !isOk) {
