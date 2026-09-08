@@ -395,6 +395,60 @@ export const WellPickLabelWithCustomFormatter: StoryObj<typeof StoryTemplate> =
         },
     };
 
+// A deviated well may cross the same horizon several times, so several picks can
+// legitimately share a horizon name. Each occurrence must be drawn at its own
+// depth; identifying a pick by its horizon name alone leaves all but the last of
+// them untracked, and an untracked pick is never positioned, never hidden and
+// never removed.
+const wellpickWithRepeatedHorizons: WellPickProps = {
+    ...wellpick,
+    wellpick: {
+        ...wellpicksJson[0],
+        data: [
+            [2788, "Hor_2"],
+            [3050, "Hor_2"],
+            [3288, "Hor_3"],
+            [3450, "Hor_3"],
+            [3611, "Hor_4"],
+        ],
+    } as unknown as WellLogSet,
+};
+
+// See the note on wellPickLabelTemplate: an independent color generator keeps
+// this story from advancing the shared, module-level counter.
+const repeatedHorizonsTemplate: Template = {
+    ...template1,
+    tracks: getStyledTemplateTracks(template1, createColorGenerator()),
+};
+
+export const RepeatedWellPickHorizons: StoryObj<typeof StoryTemplate> = {
+    args: {
+        horizontal: false,
+        template: repeatedHorizonsTemplate,
+        colorMapFunctions: exampleColormapFunctions,
+        wellpick: wellpickWithRepeatedHorizons,
+        axisTitles,
+        axisMnemos,
+        viewTitle: true,
+        visibleRange: [2500, 4000],
+        options: {
+            hideTrackTitle: false,
+            hideTrackLegend: false,
+            hideCurrentPosition: false,
+            hideSelectionInterval: false,
+        },
+    },
+    // wellLogSets is used to retrieve the well log sets from the getWellLogSets() function
+    render: (args) => <StoryTemplate {...args} wellLogSets="Default" />,
+    parameters: {
+        docs: {
+            description: {
+                story: "Well picks where a horizon name repeats, as happens when a deviated well re-crosses a horizon. `Hor_2` is picked at 2788 and 3050, and `Hor_3` at 3288 and 3450; every occurrence is drawn at its own depth.",
+            },
+        },
+    },
+};
+
 const trackTitleTooltipLogSets: WellLogSet[] = [
     {
         header: {
