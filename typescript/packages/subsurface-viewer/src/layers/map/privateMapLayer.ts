@@ -7,7 +7,7 @@ import type {
     Attribute,
 } from "@deck.gl/core";
 import { COORDINATE_SYSTEM, Layer, project32, picking } from "@deck.gl/core";
-import type { Device, Texture, UniformValue } from "@luma.gl/core";
+import type { Device, UniformValue } from "@luma.gl/core";
 import type { ShaderModule } from "@luma.gl/shadertools";
 import { lighting } from "@luma.gl/shadertools";
 import { Model, Geometry } from "@luma.gl/engine";
@@ -26,7 +26,6 @@ import {
     type ColormapFunctionType,
     createColormapTexture,
     getColormapDiscreteColors,
-    getImageData,
 } from "../utils/colormapTools";
 import type { RGBColor } from "../../utils";
 import fs from "./map.fs.glsl";
@@ -60,6 +59,7 @@ export interface PrivateMapLayerProps extends ExtendedLayerProps {
     colormapClampColor: Color | undefined | boolean;
     colormapFunction?: ColormapFunctionType;
     undefinedPropertyColor: RGBColor;
+    undefinedPropertyValue: number;
     propertyValueRange: [number, number];
     smoothShading: boolean;
     depthTest: boolean;
@@ -313,7 +313,10 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
             let color = this.props.discretePropertyValueNames?.[index]?.color; // Use this color if set.
 
             if (typeof color === "undefined") {
-                if (index !== -1 && property !== 0xffff) {
+                if (
+                    index !== -1 &&
+                    property !== this.props.undefinedPropertyValue
+                ) {
                     const i = index % colormapSize;
                     color = [
                         colors[i * 3 + 0],

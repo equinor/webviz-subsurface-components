@@ -1,4 +1,4 @@
-import { TypedArray } from "math.gl";
+import type { TypedArray } from "math.gl";
 import type { Params } from "./mapLayer";
 
 /** Given the input data will build and return the attributes (vertices and indices for triangles and lines)
@@ -12,6 +12,7 @@ export function makeFullMesh(e: { data: Params }) {
         frame,
         smoothShading,
         gridLines,
+        undefinedPropertyValue,
     ] = e.data;
 
     // Keep
@@ -45,11 +46,8 @@ export function makeFullMesh(e: { data: Params }) {
         return c as Vec;
     }
 
-    function isDefined(x: unknown, isDiscrete: boolean = false): boolean {
-        if (isDiscrete) {
-            return typeof x === "number" && x !== 0xffff;
-        }
-        return typeof x === "number" && !isNaN(x);
+    function isDefined(x: number, isDiscrete: boolean = false): boolean {
+        return isDiscrete ? x !== undefinedPropertyValue : !isNaN(x);
     }
 
     function normalize(a: Vec): void {
