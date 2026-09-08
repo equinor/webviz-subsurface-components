@@ -179,32 +179,23 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
         this.initializeState(context as DeckGLLayerContext);
     }
 
-    isPropertiesDiscrete(): boolean {
+    isPropertiesCategorical(): boolean {
         return (
-            this.props.vertexProperties instanceof Uint32Array ||
+            this.getColoringHints().discreteData &&
             typeof this.props.discretePropertyValueNames !== "undefined"
         );
     }
 
-    getLinearModel(device: Device) {
-        const colormap: Texture = device.createTexture({
-            sampler: {
-                addressModeU: "clamp-to-edge",
-                addressModeV: "clamp-to-edge",
-                minFilter: "linear",
-                magFilter: "linear",
+    getLinearModel() {
+        const colormap = createColormapTexture(
+            this.props.colormapFunction ?? {
+                colormapName: this.props.colormapName,
+                colorTables: (this.context as DeckGLLayerContext).userData
+                    .colorTables,
             },
-            width: 256,
-            height: 1,
-            format: "rgb8unorm-webgl",
-            data: getImageData(
-                this.props.colormapFunction ?? {
-                    colormapName: this.props.colormapName,
-                    colorTables: (this.context as DeckGLLayerContext).userData
-                        .colorTables,
-                }
-            ),
-        });
+            this.context as DeckGLLayerContext,
+            this.getColoringHints()
+        );
 
         // MESH MODEL
         const contourReferencePoint = this.props.contours[0] ?? -1.0;
@@ -300,16 +291,6 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
         const isContoursDepth = this.props.isContoursDepth;
 
         const hints = this.getColoringHints();
-        // console.log("hints", hints)
-        const colormap = createColormapTexture(
-            this.props.colormapFunction ?? {
-                colormapName: this.props.colormapName,
-                colorTables: (this.context as DeckGLLayerContext).userData
-                    .colorTables,
-            },
-            this.context as DeckGLLayerContext,
-            hints
-        );
         const colors = getColormapDiscreteColors(
             this.props.colormapFunction ?? {
                 colormapName: this.props.colormapName,
@@ -379,9 +360,6 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
                 indices: { value: this.props.triangleIndices, size: 1 },
             }),
             bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
-            bindings: {
-                colormap: colormap,
-            },
             isInstanced: false,
         });
 
@@ -431,9 +409,9 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
     }
 
     _getModels(device: Device) {
-        const mesh_model = this.isPropertiesDiscrete()
+        const mesh_model = this.isPropertiesCategorical()
             ? this.getCategoricalModel()
-            : this.getLinearModel(device);
+            : this.getLinearModel();
 
         const mesh_lines_model = this.getLinesModel(device);
 
@@ -510,7 +488,7 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
             return info;
         }
 
-        if (this.isPropertiesDiscrete()) {
+        if (this.isPropertiesCategorical()) {
             const [r, g, b] = info.color;
             const code = decodeIndexFromRGB([r, g, b]);
 

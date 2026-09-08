@@ -13,9 +13,6 @@ flat in int vertexIndex;
 
 flat in vec3 vertexColor_;
 
-// Uniforms
-uniform sampler2D colormap;
-
 out vec4 fragColor;
 
 
