@@ -180,25 +180,10 @@ const cellCenteredPropertiesLayer = {
     smoothShading: true,
 };
 
-// NB maa vaere like mange som ..??
-const CATEGORICAL_COLOR_TABLE: RGBColor[] = [
-    [0, 0, 255],
-    [0, 255, 0],
-    [0, 255, 255],
-    [255, 0, 0],
-    [255, 0, 255],
-    [255, 255, 0],
-    [0, 0, 100],
-    [0, 100, 0],
-    [0, 100, 100],
-    [100, 0, 0],
-    [100, 0, 100],
-    [100, 100, 0],
-];
-
 // This layer has as (nx-1)*(ny-1) property values and depth values are nx*ny hence each cell will be fixed in color.
 const categoricalPropertiesLayer = {
     "@@type": "MapLayer",
+    "@@typedArraySupport": true,
     id: "categorical-layer",
 
     /*eslint-disable */
@@ -214,13 +199,13 @@ const categoricalPropertiesLayer = {
          1,
          2,
          3,
-         65535, // undefined value
+         65535,  // undefined value
          5,
          6,
-         1000000, // unknown code (not in discretePropertyValueNames) = undefined
+         7,
          8,
          9,
-         999,
+         10, // code not in discretePropertyValueNames hence will use undefinedPropertyColor.
          11,
     ],
 
@@ -230,17 +215,30 @@ const categoricalPropertiesLayer = {
         { code: 2, name: "Two" }, 
         { code: 3, name: "Tree" }, 
         { code: 4, name: "Four" }, 
-        { code: 5, name: "Five", color: [255, 0, 255] }, // explisit color overrides colortable.
+        { code: 5, name: "Five", color: [255, 255, 0] }, // explisit color overrides colortable/colorfunction.
         { code: 6, name: "Six" }, 
         { code: 7, name: "Seven" }, 
         { code: 8, name: "Eight" }, 
         { code: 9, name: "Nine" }, 
-        { code: 999, name: "999" },
+        { code: 123, name: "123" },
         { code: 11, name: "Eleven" },
     ],
-    /*eslint-enable */
 
-    colorMapFunction: (value: number) => CATEGORICAL_COLOR_TABLE[value],
+    colorMapFunction: new Uint8Array([
+        0, 0, 255,
+        0, 255, 0,
+        255, 0, 0,
+        0, 255, 255,
+        255, 0, 255,
+        255, 255, 0,
+        0, 0, 100,
+        0, 100, 0,
+        0, 100, 100,
+        0, 255, 0,
+        255, 0, 0,
+        255, 255, 0,
+    ]),
+    /*eslint-enable */
 
     frame: {
         origin: [0, 0],
