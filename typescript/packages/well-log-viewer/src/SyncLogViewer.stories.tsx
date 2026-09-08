@@ -328,6 +328,10 @@ export const Default: StoryObj<typeof Template> = {
     },
     // wellLogCollections is used to retrieve the well log sets from the getWellLogCollections() function
     render: (args) => <Template {...args} wellLogCollections="Default" />,
+    // This story has a mount-time race (see issue #2833) that can settle
+    // into a stably-wrong state a longer wait cannot fix - only a fresh
+    // mount can. See test-runner.ts's forceRemount doc comment.
+    tags: ["remount-every-retry"],
 };
 
 export const Empty: StoryObj<typeof Template> = {
