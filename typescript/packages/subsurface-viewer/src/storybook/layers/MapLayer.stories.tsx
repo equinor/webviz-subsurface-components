@@ -10,7 +10,7 @@ import SubsurfaceViewer from "../../SubsurfaceViewer";
 import InfoCard from "../../components/InfoCard";
 import type { ViewsType } from "../../components/Map";
 import { useHoverInfo } from "../../components/Map";
-import type { BoundingBox2D, BoundingBox3D, RGBColor } from "../../utils";
+import type { BoundingBox2D, BoundingBox3D } from "../../utils";
 
 import { ViewFooter } from "../../components/ViewFooter";
 import AxesLayer from "../../layers/axes/axesLayer";
@@ -193,13 +193,15 @@ const categoricalPropertiesLayer = {
         0.6, 0.7, 0.0, 0.1, 0.2, 0.3,
     ],
 
+    undefinedPropertyValue: 999,
+
     // One property pr cell.
     propertiesData: [
          0,
          1,
          2,
          3,
-         65535,  // undefined value
+         999, // undefined value
          5,
          6,
          7,
