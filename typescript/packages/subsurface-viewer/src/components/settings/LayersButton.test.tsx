@@ -41,7 +41,7 @@ jest.mock("@equinor/eds-core-react", () => {
         }, [onClose, open]);
 
         const menuProps = { ...props };
-        delete menuProps.anchorEl;
+        delete menuProps["anchorEl"];
 
         if (!open) {
             return (
