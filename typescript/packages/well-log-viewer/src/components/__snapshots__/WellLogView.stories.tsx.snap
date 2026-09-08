@@ -129,7 +129,7 @@ exports[`WellLogViewer/Components/WellLogView Default smoke-test 1`] = `
                     Toggle plot on/off
                   </title>
                   <defs>
-                    <linearGradient id="grad1"
+                    <linearGradient id="grad-0-4-5wroe"
                                     x1="0%"
                                     x2="100%"
                                     y1="0%"
@@ -161,7 +161,7 @@ exports[`WellLogViewer/Components/WellLogView Default smoke-test 1`] = `
                         y="0"
                         width="410.328125"
                         height="12.5"
-                        fill="url(#grad1)"
+                        fill="url(#grad-0-4-5wroe)"
                         fill-opacity="0.5"
                   >
                   </rect>
@@ -513,7 +513,7 @@ exports[`WellLogViewer/Components/WellLogView Default smoke-test 1`] = `
                     Toggle plot on/off
                   </title>
                   <defs>
-                    <linearGradient id="grad2a"
+                    <linearGradient id="grad-0-4-a-5wroe"
                                     x1="0%"
                                     x2="100%"
                                     y1="0%"
@@ -542,7 +542,7 @@ exports[`WellLogViewer/Components/WellLogView Default smoke-test 1`] = `
                     </linearGradient>
                   </defs>
                   <defs>
-                    <linearGradient id="grad2b"
+                    <linearGradient id="grad-0-4-b-5wroe"
                                     x1="0%"
                                     x2="100%"
                                     y1="0%"
@@ -574,7 +574,7 @@ exports[`WellLogViewer/Components/WellLogView Default smoke-test 1`] = `
                         y="0"
                         width="102.5859375"
                         height="12.5"
-                        fill="url(#grad2a)"
+                        fill="url(#grad-0-4-a-5wroe)"
                         fill-opacity="0.5"
                   >
                   </rect>
@@ -582,7 +582,7 @@ exports[`WellLogViewer/Components/WellLogView Default smoke-test 1`] = `
                         y="0"
                         width="102.5859375"
                         height="12.5"
-                        fill="url(#grad2b)"
+                        fill="url(#grad-0-4-b-5wroe)"
                         fill-opacity="0.5"
                   >
                   </rect>

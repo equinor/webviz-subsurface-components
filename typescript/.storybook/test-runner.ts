@@ -318,36 +318,6 @@ const screenshotTest = async (page: Page, context: TestContext) => {
     }
 };
 
-/**
- * `WellLogViewer`'s gradient-fill legend gives each `<linearGradient>` a
- * plot-instance-scoped id (see `gradientfill-plot-legend.ts`), but a
- * story's own gradients still aren't numbered from zero: Storybook's
- * autodocs page pre-renders every story in a file before that story's own
- * dedicated test visit, consuming some ids first, and how many depends on
- * test order/sharding/retries rather than anything about the story itself
- * (see issue #2833). That makes the raw id unstable across environments/CI
- * runs despite being internally self-consistent within any one render.
- *
- * Renumbering sequentially in first-occurrence order removes that
- * dependency while still asserting everything that matters: every
- * `id="gradN"` and its matching `fill="url(#gradN)"` reference are
- * rewritten together, so a real wiring bug (wrong/missing/misordered
- * reference) still fails the snapshot - only the meaningless absolute
- * number is discarded.
- */
-function normalizeGradientIds(html: string): string {
-    const idMap = new Map<string, string>();
-    let nextId = 1;
-    return html.replace(/grad(\d+)/g, (_match, num: string) => {
-        let mapped = idMap.get(num);
-        if (!mapped) {
-            mapped = `grad${nextId++}`;
-            idMap.set(num, mapped);
-        }
-        return mapped;
-    });
-}
-
 const domSnapshotTest = async (page: Page, context: TestContext) => {
     // Some stories render their DOM in multiple passes as layout settles
     // (see waitForMutationQuiescence's doc comment). Wait for the subtree
@@ -366,11 +336,7 @@ const domSnapshotTest = async (page: Page, context: TestContext) => {
     } = await waitUntilStable(
         async () => {
             const elementHandler = await page.$("#storybook-root");
-            const raw = elementHandler ? await elementHandler.innerHTML() : "";
-            // Normalized before the stability comparison too, so incidental
-            // gradient-id churn between polls can't be mistaken for the
-            // section itself being unstable.
-            return normalizeGradientIds(raw);
+            return elementHandler ? await elementHandler.innerHTML() : "";
         },
         (a, b) => a === b,
         DOM_STABILITY

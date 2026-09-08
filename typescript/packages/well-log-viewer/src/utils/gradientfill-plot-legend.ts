@@ -16,24 +16,98 @@ import { getInterpolatedColorString } from "./color-table";
 
 import { color4ToString } from "./color-table";
 
-/**
- * Assigns each `GradientFillPlot` a stable numeric id, keyed by object
- * identity rather than an incrementing "how many gradients so far"
- * counter. The legend can redraw a plot multiple times before layout
- * settles, and a plain counter would mint a fresh id on every redraw -
- * keying off the plot instance instead means the id depends only on which
- * plots exist, not on how many times each was redrawn.
- */
-const __plotIds = new WeakMap<GradientFillPlot, number>();
-let __nextPlotId = 0;
+type GradientStop = {
+    /** Pre-formatted percentage string, e.g. `"40%"`. */
+    offset: string;
+    color: string;
+};
 
-function getPlotId(plot: GradientFillPlot): number {
-    let id = __plotIds.get(plot);
-    if (id === undefined) {
-        id = ++__nextPlotId;
-        __plotIds.set(plot, id);
+/**
+ * Builds the gradient's colour stops. Pure: the result depends only on the
+ * colormap and the optional logarithmic ratio, never on render order or on
+ * how many gradients were built before it. Kept separate from the DOM code
+ * so the stops can be hashed into the gradient's id before being appended.
+ */
+function computeGradientStops(
+    colormapFunction: ColormapFunction,
+    rLogarithmic?: number
+): GradientStop[] {
+    const stops: GradientStop[] = [];
+
+    if (rLogarithmic !== undefined) {
+        const yDelta = Math.log(rLogarithmic); // log(max/min)
+        const d = rLogarithmic - 1;
+        const nIntervals = 25;
+        for (let i = 0; i <= nIntervals; i++) {
+            const fraction = i / nIntervals;
+            const y = 1 + fraction * d;
+            const v = Math.log(y) / yDelta;
+            stops.push({
+                offset: fraction * 100.0 + "%",
+                color: getInterpolatedColorString(colormapFunction, v),
+            });
+        }
+    } else if (isFunction(colormapFunction)) {
+        const nIntervals = 25; // set some not very big value to smooth filling
+        for (let i = 0; i <= nIntervals; i++) {
+            const fraction = i / nIntervals;
+            stops.push({
+                offset: fraction * 100.0 + "%",
+                color: getInterpolatedColorString(colormapFunction, fraction),
+            });
+        }
+    } else {
+        const table = colormapFunction as ColorTable;
+        const colors = table.colors;
+        for (let i = 0; i < colors.length; i++) {
+            const color = colors[i];
+            stops.push({
+                offset: color[0] * 100.0 + "%",
+                color: color4ToString(color),
+            });
+        }
     }
-    return id;
+
+    return stops;
+}
+
+/** FNV-1a, rendered base36. Small, dependency-free and stable across runs. */
+function hashString(text: string): string {
+    let hash = 0x811c9dc5;
+    for (let i = 0; i < text.length; i++) {
+        hash ^= text.charCodeAt(i);
+        hash = Math.imul(hash, 0x01000193);
+    }
+    return (hash >>> 0).toString(36);
+}
+
+/**
+ * Builds the gradient's DOM id from the plot it belongs to plus a hash of
+ * the stops themselves, so the id is fully determined by what the gradient
+ * *is* rather than by how many gradients happened to be created before it.
+ *
+ * Both inputs are order-independent: `plot.id` is derived from the template
+ * (see `buildPlotConfig`), and the stops come from `computeGradientStops`.
+ * Two ids therefore collide only when the plot slot and every stop match -
+ * i.e. the gradients are interchangeable, so sharing one definition renders
+ * identically.
+ */
+function makeGradientId(
+    plot: GradientFillPlot,
+    idSuffix: string,
+    stops: GradientStop[]
+): string {
+    const key = stops.map((s) => s.offset + ":" + s.color).join("|");
+    // The "grad-" prefix keeps the id a valid NCName even when plot.id
+    // starts with a digit, as the template-derived "<set>-<curve>" form does.
+    const base = String(plot.id).replace(/[^A-Za-z0-9_-]/g, "-");
+    return (
+        "grad-" +
+        base +
+        (idSuffix ? "-" + idSuffix : "") +
+        "-" +
+        hashString(key)
+    );
 }
 
 function createGradient(
@@ -43,7 +117,17 @@ function createGradient(
     idSuffix: string,
     rLogarithmic?: number
 ): string {
-    const id = "grad" + getPlotId(plot) + idSuffix; // stable, plot-instance-scoped id
+    const stops = computeGradientStops(colormapFunction, rLogarithmic);
+    const id = makeGradientId(plot, idSuffix, stops);
+
+    // Identical gradients share an id, so reuse an existing definition
+    // rather than emitting a duplicate. Re-checked on every render because
+    // legend groups are cleared and rebuilt on each redraw.
+    const svgRoot = g.node()?.ownerSVGElement;
+    if (svgRoot?.querySelector(`[id="${id}"]`)) {
+        return id;
+    }
+
     const lg = g
         .append("defs")
         .append("linearGradient")
@@ -52,44 +136,13 @@ function createGradient(
         .attr("x2", "100%") //since it's a horizontal linear gradient
         .attr("y1", "0%")
         .attr("y2", "0%");
-    if (rLogarithmic !== undefined) {
-        const yDelta = Math.log(rLogarithmic); // log(max/min)
-        const d = rLogarithmic - 1;
-        const nIntervals = 25;
-        for (let i = 0; i <= nIntervals; i++) {
-            const fraction = i / nIntervals;
-            const y = 1 + fraction * d;
-            const v = Math.log(y) / yDelta;
-            const c = getInterpolatedColorString(colormapFunction, v);
-            lg.append("stop")
-                .attr("offset", fraction * 100.0 + "%")
-                .style("stop-color", c);
-        }
-    } else {
-        if (isFunction(colormapFunction)) {
-            const nIntervals = 25; // set some not very big value to smooth filling
-            for (let i = 0; i <= nIntervals; i++) {
-                const fraction = i / nIntervals;
-                const c = getInterpolatedColorString(
-                    colormapFunction,
-                    fraction
-                );
-                lg.append("stop")
-                    .attr("offset", fraction * 100.0 + "%")
-                    .style("stop-color", c);
-            }
-        } else {
-            const table = colormapFunction as ColorTable;
-            const colors = table.colors;
-            for (let i = 0; i < colors.length; i++) {
-                const color = colors[i];
-                const c = color4ToString(color);
-                lg.append("stop")
-                    .attr("offset", color[0] * 100.0 + "%")
-                    .style("stop-color", c);
-            }
-        }
+
+    for (const stop of stops) {
+        lg.append("stop")
+            .attr("offset", stop.offset)
+            .style("stop-color", stop.color);
     }
+
     return id;
 }
 
