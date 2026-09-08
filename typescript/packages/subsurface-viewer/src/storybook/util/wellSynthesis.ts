@@ -10,26 +10,40 @@ import type {
 import type { Point3D } from "../../utils";
 import type { TrajectorySimulationProps } from "../types/well";
 
-const math = create(all, { randomSeed: "1984" });
-const randomFunc = math?.random ? math.random : Math.random;
+const RANDOM_SEED = "1984";
+
+/**
+ * Create a freshly seeded pseudo-random generator.
+ *
+ * Each generator is independent and always starts from the same seed, so the data
+ * produced by the functions below depends only on their arguments. A single shared
+ * generator would instead make output depend on how many numbers earlier callers had
+ * already drawn, which is not reproducible: Storybook renders every story into one
+ * page, so the draw count varies with story order, sharding and re-renders.
+ */
+const createRandom = (): (() => number) => {
+    const math = create(all, { randomSeed: RANDOM_SEED });
+    return math?.random ? math.random : Math.random;
+};
 
 /**
  * Generate a random deviation
  * @param magnitude maximum deviation in degrees
  * @returns deviation in radians
  */
-const getRandomDeviation = (magnitude = 10, mean = 5) => {
-    return (randomFunc() * (mean * 2 - magnitude * 0.5) * Math.PI) / 180;
+const getRandomDeviation = (random: () => number, magnitude = 10, mean = 5) => {
+    return (random() * (mean * 2 - magnitude * 0.5) * Math.PI) / 180;
 };
 
-const getRandomColor = (): Color => {
-    const r = 100 + Math.floor(randomFunc() * 155);
-    const g = 100 + Math.floor(randomFunc() * 155);
-    const b = 100 + Math.floor(randomFunc() * 155);
+const getRandomColor = (random: () => number): Color => {
+    const r = 100 + Math.floor(random() * 155);
+    const g = 100 + Math.floor(random() * 155);
+    const b = 100 + Math.floor(random() * 155);
     return [r, g, b, 255];
 };
 
 const createSyntheticWell = (
+    random: () => number,
     index: number,
     headPosition: Point3D,
     sampleCount = 20,
@@ -40,8 +54,8 @@ const createSyntheticWell = (
     // Create a random well name
     const name = `Well ${index}`;
 
-    const avgDipDeviation = randomFunc() * dipDeviationMagnitude;
-    const avgAzimuthDeviation = randomFunc() * 5 - 2.5;
+    const avgDipDeviation = random() * dipDeviationMagnitude;
+    const avgAzimuthDeviation = random() * 5 - 2.5;
     const maxDip = Math.PI * 0.5 + 0.05;
 
     // Create a random well geometry
@@ -49,7 +63,7 @@ const createSyntheticWell = (
     const mdArray = [0];
 
     // Lead with at least three vertical segments
-    const leadCount = Math.trunc(randomFunc() * (sampleCount - 2)) + 2;
+    const leadCount = Math.trunc(random() * (sampleCount - 2)) + 2;
     for (let i = 0; i < leadCount; i++) {
         const x = coordinates[coordinates.length - 1][0];
         const y = coordinates[coordinates.length - 1][1];
@@ -58,16 +72,21 @@ const createSyntheticWell = (
         mdArray.push(mdArray.length * segmentLength);
     }
 
-    let previousAzimuth = randomFunc() * Math.PI * 2;
+    let previousAzimuth = random() * Math.PI * 2;
     let previousDip = 0;
 
     for (let i = 0; i < sampleCount - leadCount; i++) {
         const prevSample = coordinates[coordinates.length - 1];
         const azimuth =
-            previousAzimuth + getRandomDeviation(5, avgAzimuthDeviation);
+            previousAzimuth +
+            getRandomDeviation(random, 5, avgAzimuthDeviation);
         const dip = Math.min(
             previousDip +
-                getRandomDeviation(dipDeviationMagnitude, avgDipDeviation),
+                getRandomDeviation(
+                    random,
+                    dipDeviationMagnitude,
+                    avgDipDeviation
+                ),
             maxDip
         );
         const x =
@@ -91,7 +110,7 @@ const createSyntheticWell = (
         properties: {
             name,
             md: [mdArray],
-            color: getRandomColor(),
+            color: getRandomColor(random),
         },
         geometry: {
             type: "GeometryCollection",
@@ -113,10 +132,11 @@ const createSyntheticWell = (
  * Create random well heads
  */
 export const createSyntheticWellHeads = (count = 100): Point3D[] => {
+    const random = createRandom();
     const wellHeads: Point3D[] = [];
     for (let i = 0; i < count; i++) {
-        const dx = randomFunc() * 10000 - 2000;
-        const dy = randomFunc() * 8000 - 2000;
+        const dx = random() * 10000 - 2000;
+        const dy = random() * 8000 - 2000;
         const headPosition: Point3D = [456000 + dx, 6785000 + dy, 0];
         wellHeads.push(headPosition);
     }
@@ -141,6 +161,7 @@ export const createSyntheticWellCollection = (
         zIncreasingDownwards: false,
     }
 ): WellFeatureCollection => {
+    const random = createRandom();
     const wellHeads = SYNTHETIC_WELL_HEADS.slice(0, wellHeadCount);
 
     const wells: WellFeature[] = [];
@@ -152,6 +173,7 @@ export const createSyntheticWellCollection = (
         const headPosition = wellHeads[headIndex];
 
         const syntheticWell = createSyntheticWell(
+            random,
             i,
             headPosition,
             sampleCount,
