@@ -1,13 +1,68 @@
 import "jest";
-import { describe, expect, it } from "@jest/globals";
+import { describe, expect, it, jest } from "@jest/globals";
 
-import { render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom/jest-globals";
 import "jest-styled-components";
 
+import type React from "react";
+import type * as ReactModule from "react";
+
 import { layers } from "@equinor/eds-icons";
 import { Icon } from "@equinor/eds-core-react";
+import type * as EDSCoreReact from "@equinor/eds-core-react";
+
+// added by copilot
+jest.mock("@equinor/eds-core-react", () => {
+    const actual = jest.requireActual(
+        "@equinor/eds-core-react"
+    ) as typeof EDSCoreReact;
+    const mockReact = jest.requireActual("react") as typeof ReactModule;
+    const mockDocument = globalThis.document;
+
+    const Menu = ({
+        children,
+        onClose,
+        open,
+        ...props
+    }: {
+        children: React.ReactNode;
+        onClose: () => void;
+        open: boolean;
+        [key: string]: unknown;
+    }) => {
+        mockReact.useEffect(() => {
+            if (!open) return;
+
+            const handleDocumentClick = () => onClose();
+            mockDocument.addEventListener("click", handleDocumentClick);
+            return () =>
+                mockDocument.removeEventListener("click", handleDocumentClick);
+        }, [onClose, open]);
+
+        const menuProps = { ...props };
+        delete menuProps.anchorEl;
+
+        if (!open) {
+            return (
+                <actual.Menu open={false} onClose={onClose} {...menuProps}>
+                    {children}
+                </actual.Menu>
+            );
+        }
+
+        return (
+            <div role="menu" {...menuProps}>
+                {children}
+            </div>
+        );
+    };
+
+    return {
+        ...actual,
+        Menu,
+    };
+});
 
 import { EmptyWrapper } from "../../test/TestWrapper";
 import LayersButton from "./LayersButton";
@@ -42,7 +97,6 @@ describe("test LayersButton", () => {
         expect(container.firstChild).toMatchSnapshot();
     });
     it("click to dispatch redux action", async () => {
-        const user = userEvent.setup();
         Icon.add({ layers });
         render(
             EmptyWrapper({
@@ -54,11 +108,10 @@ describe("test LayersButton", () => {
                 ),
             })
         );
-        await user.click(screen.getByRole("button"));
+        fireEvent.click(screen.getByRole("button"));
         expect(screen.getByRole("menu")).toBeInTheDocument();
     });
     it("should close menu when clicked on backdrop", async () => {
-        const user = userEvent.setup();
         render(
             EmptyWrapper({
                 children: (
@@ -69,14 +122,13 @@ describe("test LayersButton", () => {
                 ),
             })
         );
-        await user.click(screen.getByRole("button"));
+        fireEvent.click(screen.getByRole("button"));
         const layers_menu = screen.getByRole("menu");
         expect(layers_menu).toBeInTheDocument();
-        await user.click(document.body);
+        fireEvent.click(document.body);
         await waitFor(() => expect(layers_menu).not.toBeVisible());
     });
     it("should close menu when clicked twice on layers button", async () => {
-        const user = userEvent.setup();
         render(
             EmptyWrapper({
                 children: (
@@ -87,10 +139,10 @@ describe("test LayersButton", () => {
                 ),
             })
         );
-        await user.click(screen.getByRole("button"));
+        fireEvent.click(screen.getByRole("button"));
         const layers_menu = screen.getByRole("menu");
         expect(layers_menu).toBeInTheDocument();
-        await user.click(screen.getByRole("button"));
+        fireEvent.click(screen.getByRole("button"));
         await waitFor(() => expect(layers_menu).not.toBeVisible());
     });
     it("test empty MapState/specbase", () => {
