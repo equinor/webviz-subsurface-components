@@ -1,3 +1,19 @@
+## 2.2.0 (2026-09-09)
+
+### 🚀 Features
+
+- **subsurface-viewer:** export getViewStateFromBounds ([#2837](https://github.com/equinor/webviz-subsurface-components/pull/2837))
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 2.0.4
+
+### ❤️ Thank You
+
+- Copilot @Copilot
+- Håvard Bjerke
+- t0oF @w1nklr
+
 ## 2.1.3 (2026-09-03)
 
 ### 🩹 Fixes
