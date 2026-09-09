@@ -1,3 +1,18 @@
+## 3.0.5 (2026-09-09)
+
+### 🩹 Fixes
+
+- **WellLogViewer:** identify well pick overlay elements by index ([#2846](https://github.com/equinor/webviz-subsurface-components/pull/2846))
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 2.0.4
+
+### ❤️ Thank You
+
+- Copilot @Copilot
+- Håvard Bjerke
+
 ## 3.0.4 (2026-09-03)
 
 ### 🧱 Updated Dependencies
