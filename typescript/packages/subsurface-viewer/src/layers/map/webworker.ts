@@ -158,11 +158,9 @@ export function makeFullMesh(e: { data: Params }) {
         ? inputPropertiesData
         : meshData;
 
-    const isDiscrete =
-        propertiesData instanceof Uint32Array ||
-        propertiesData instanceof Int32Array ||
-        propertiesData instanceof Uint16Array ||
-        propertiesData instanceof Int16Array;
+    const isUint32 = propertiesData instanceof Uint32Array;
+    const isUint16 = propertiesData instanceof Uint16Array;
+    const isDiscrete = isUint32 || isUint16;
 
     // non mesh grids use z = 0 (see below)
     const meshZValueRange = isMesh ? getArrayMinMax(meshData) : [0, 0];
@@ -200,9 +198,14 @@ export function makeFullMesh(e: { data: Params }) {
     const triangleIndices = new Uint32Array(nTriangles * 3);
 
     const n = isCellCenteredProperties ? nCells * 6 : nNodes;
-    const vertexProperties = isDiscrete
-        ? new Uint32Array(n)
-        : new Float32Array(n);
+    let vertexProperties: Uint32Array | Uint16Array | Float32Array;
+    if (isDiscrete && isUint32) {
+        vertexProperties = new Uint32Array(n);
+    } else if (isDiscrete) {
+        vertexProperties = new Uint16Array(n);
+    } else {
+        vertexProperties = new Float32Array(n);
+    }
 
     let nLineIndices = 0;
     if (gridLines) {
@@ -556,7 +559,7 @@ export function makeFullMesh(e: { data: Params }) {
         Float32Array,
         Float32Array,
         Uint32Array,
-        Float32Array | Uint32Array,
+        Float32Array | Uint32Array | Uint16Array,
         Uint32Array,
         number[],
         number[],

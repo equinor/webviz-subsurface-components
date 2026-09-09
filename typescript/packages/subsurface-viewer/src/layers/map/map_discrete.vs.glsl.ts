@@ -17,8 +17,8 @@ out vec4 position_commonspace;
 out vec4 vColor;
 out vec3 worldPos;
 
-in int properties;
-flat out int property;
+in uint properties;
+flat out uint property;
 
 flat out lowp int vertexIndex;
 

@@ -27,11 +27,7 @@ import { makeFullMesh } from "./webworker";
 import workerpool from "workerpool";
 import type { RGBColor } from "../../utils";
 
-export type TTypedIntegerArray =
-    | Uint32Array
-    | Int32Array
-    | Uint16Array
-    | Int16Array;
+export type TTypedIntegerArray = Uint32Array | Uint16Array;
 
 // init workerpool
 const workerPoolConfig = findConfig(
@@ -70,14 +66,8 @@ function getUndefinedValueProperties(
     if (propertiesData instanceof Uint16Array) {
         return 0xffff;
     }
-    if (propertiesData instanceof Int16Array) {
-        return 0x7fff;
-    }
     if (propertiesData instanceof Uint32Array) {
         return 0xffffffff;
-    }
-    if (propertiesData instanceof Int32Array) {
-        return 0x7fffffff;
     }
     if (isPropertiesDiscrete) {
         return 0x7fffffff;
@@ -110,13 +100,7 @@ type Frame = {
 
 export type Params = [
     meshData: Float32Array | null,
-    propertiesData:
-        | Float32Array
-        | Int32Array
-        | Uint16Array
-        | Int16Array
-        | Uint32Array
-        | null,
+    propertiesData: Float32Array | TTypedIntegerArray | null,
     isMesh: boolean,
     frame: Frame,
     smoothShading: boolean,
@@ -148,25 +132,26 @@ async function loadMeshAndProperties(
     let properties = undefined;
     if (isPropertiesDiscrete && typeof propertiesData !== "string") {
         switch (true) {
-            case propertiesData instanceof Uint16Array:
-                properties = await loadDataArray(propertiesData, Uint16Array);
-                break;
-            case propertiesData instanceof Int16Array:
-                properties = await loadDataArray(propertiesData, Int16Array);
-                break;
-            case propertiesData instanceof Uint32Array:
-                properties = await loadDataArray(propertiesData, Uint32Array);
-                break;
-            default: {
-                // Replace undefied values with defaultValue of Int32Array
+            case propertiesData instanceof Uint16Array: {
+                // Replace undefined values with defaultValue of Uint16Array
                 // If not, undefined values will be converted to 0 in "loadDataArray"
-                const defaultValue = 0x7fffffff;
+                const defaultValue = 0xffff;
                 for (let i = 0; i < propertiesData.length; i++) {
                     if (propertiesData[i] === undefined) {
                         propertiesData[i] = defaultValue;
                     }
                 }
-                properties = await loadDataArray(propertiesData, Int32Array);
+                properties = await loadDataArray(propertiesData, Uint16Array);
+                break;
+            }
+            default: {
+                const defaultValue = 0xffffffff;
+                for (let i = 0; i < propertiesData.length; i++) {
+                    if (propertiesData[i] === undefined) {
+                        propertiesData[i] = defaultValue;
+                    }
+                }
+                properties = await loadDataArray(propertiesData, Uint32Array);
                 break;
             }
         }
@@ -231,9 +216,7 @@ export interface MapLayerProps extends ExtendedLayerProps {
      * By default these are:
      * - Float32Array: NaN
      * - Uint16Array: 0xFFFF
-     * - Int16Array: 0x7FFF
      * - Uint32Array: 0xFFFFFFFF
-     * - Int32Array: 0x7FFFFFFF
      */
     undefinedPropertyValue?: number;
 
@@ -620,8 +603,6 @@ export default class MapLayer<
                 propertiesData as Float32Array | TTypedIntegerArray,
                 this.isPropertiesCategorical()
             );
-
-        console.log("AHA", undefinedPropertyValue);
 
         const params: Params = [
             meshData,

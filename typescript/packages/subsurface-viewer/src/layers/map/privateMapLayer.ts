@@ -140,6 +140,52 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
         };
     }
 
+    private getVertexColorAttributes(): Float32Array {
+        const hints = this.getColoringHints();
+        const colors = getColormapDiscreteColors(
+            this.props.colormapFunction ?? {
+                colormapName: this.props.colormapName,
+                colorTables: (this.context as DeckGLLayerContext).userData
+                    .colorTables,
+            },
+            hints
+        );
+
+        const colormapSize = colors.length / 3;
+        const length = this.props.vertexProperties.length;
+        const vertexColors = new Float32Array(length * 3);
+        for (let i = 0; i < length; i++) {
+            const property = this.props.vertexProperties[i];
+
+            const index =
+                this.props.discretePropertyValueNames?.findIndex(
+                    (e) => e.code === property
+                ) ?? -1;
+            let color = this.props.discretePropertyValueNames?.[index]?.color; // Use this color if set.
+
+            if (typeof color === "undefined") {
+                if (
+                    index !== -1 &&
+                    property !== this.props.undefinedPropertyValue
+                ) {
+                    const i = index % colormapSize;
+                    color = [
+                        colors[i * 3 + 0],
+                        colors[i * 3 + 1],
+                        colors[i * 3 + 2],
+                    ];
+                } else {
+                    color = this.props.undefinedPropertyColor;
+                }
+            }
+
+            vertexColors[i * 3 + 0] = color[0] / 255;
+            vertexColors[i * 3 + 1] = color[1] / 255;
+            vertexColors[i * 3 + 2] = color[2] / 255;
+        }
+        return vertexColors;
+    }
+
     initializeState(context: DeckGLLayerContext): void {
         const gl = context.device;
         const [mesh_model, mesh_lines_model] = this._getModels(gl);
@@ -186,7 +232,7 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
         );
     }
 
-    getLinearModel() {
+    getContinuousPropModel() {
         const colormap = createColormapTexture(
             this.props.colormapFunction ?? {
                 colormapName: this.props.colormapName,
@@ -285,53 +331,14 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
         return model;
     }
 
-    getCategoricalModel() {
+    getDiscretePropModel() {
         const contourReferencePoint = this.props.contours[0] ?? -1.0;
         const contourInterval = this.props.contours[1] ?? -1.0;
         const isContoursDepth = this.props.isContoursDepth;
 
-        const hints = this.getColoringHints();
-        const colors = getColormapDiscreteColors(
-            this.props.colormapFunction ?? {
-                colormapName: this.props.colormapName,
-                colorTables: (this.context as DeckGLLayerContext).userData
-                    .colorTables,
-            },
-            hints
-        );
+        const isUint32 = this.props.vertexProperties instanceof Uint32Array;
 
-        const colormapSize = colors.length / 3;
-        const length = this.props.vertexProperties.length;
-        const vertexColors = new Float32Array(length * 3);
-        for (let i = 0; i < length; i++) {
-            const property = this.props.vertexProperties[i];
-
-            const index =
-                this.props.discretePropertyValueNames?.findIndex(
-                    (e) => e.code === property
-                ) ?? -1;
-            let color = this.props.discretePropertyValueNames?.[index]?.color; // Use this color if set.
-
-            if (typeof color === "undefined") {
-                if (
-                    index !== -1 &&
-                    property !== this.props.undefinedPropertyValue
-                ) {
-                    const i = index % colormapSize;
-                    color = [
-                        colors[i * 3 + 0],
-                        colors[i * 3 + 1],
-                        colors[i * 3 + 2],
-                    ];
-                } else {
-                    color = this.props.undefinedPropertyColor;
-                }
-            }
-
-            vertexColors[i * 3 + 0] = color[0] / 255;
-            vertexColors[i * 3 + 1] = color[1] / 255;
-            vertexColors[i * 3 + 2] = color[2] / 255;
-        }
+        const vertexColors = this.getVertexColorAttributes();
 
         const model = new Model(this.context.device, {
             id: `${this.props.id}-mesh`,
@@ -355,7 +362,7 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
                     positions: { value: this.props.positions, size: 3 },
                     vertexColor: { value: vertexColors, size: 3 },
                     properties: {
-                        value: Int32Array.from(this.props.vertexProperties),
+                        value: this.props.vertexProperties,
                         size: 1,
                         normalized: false,
                     },
@@ -413,8 +420,8 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
 
     _getModels(device: Device) {
         const mesh_model = this.isPropertiesCategorical()
-            ? this.getCategoricalModel()
-            : this.getLinearModel();
+            ? this.getDiscretePropModel()
+            : this.getContinuousPropModel();
 
         const mesh_lines_model = this.getLinesModel(device);
 

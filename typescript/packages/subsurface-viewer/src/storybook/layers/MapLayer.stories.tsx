@@ -215,9 +215,9 @@ const categoricalPropertiesLayer = {
         { code: 0, name: "Zero" },
         { code: 1, name: "One" }, 
         { code: 2, name: "Two" }, 
-        { code: 3, name: "Tree" }, 
+        { code: 3, name: "Three" }, 
         { code: 4, name: "Four" }, 
-        { code: 5, name: "Five", color: [255, 255, 0] }, // explisit color overrides colortable/colorfunction.
+        { code: 5, name: "Five", color: [255, 255, 0] }, // explicit color overrides colortable/colorfunction.
         { code: 6, name: "Six" }, 
         { code: 7, name: "Seven" }, 
         { code: 8, name: "Eight" }, 
@@ -227,18 +227,18 @@ const categoricalPropertiesLayer = {
     ],
 
     colorMapFunction: new Uint8Array([
+        255, 0, 0,
+        0, 255, 0,
+        0, 0, 255,
         0, 0, 255,
         0, 255, 0,
         255, 0, 0,
-        0, 255, 255,
-        255, 0, 255,
-        255, 255, 0,
-        0, 0, 100,
-        0, 100, 0,
-        0, 100, 100,
+        255, 0, 0,
+        0, 255, 0,
+        0, 0, 255,
+        0, 0, 255,
         0, 255, 0,
         255, 0, 0,
-        255, 255, 0,
     ]),
     /*eslint-enable */
 

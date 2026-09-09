@@ -8,7 +8,7 @@ in vec4 position_commonspace;
 in vec4 vColor;
 in vec3 worldPos;
 
-flat in int property;
+flat in uint property;
 flat in int vertexIndex;
 
 flat in vec3 vertexColor_;
@@ -21,7 +21,7 @@ void main(void) {
 
    vec3 normal = normalize(cross(dFdx(position_commonspace.xyz), dFdy(position_commonspace.xyz)));
 
-   int propertyValue = property;
+   uint propertyValue = property;
 
    vec4 color = vec4(vertexColor_, 1.0);
 
