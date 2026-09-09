@@ -336,8 +336,6 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
         const contourInterval = this.props.contours[1] ?? -1.0;
         const isContoursDepth = this.props.isContoursDepth;
 
-        const isUint32 = this.props.vertexProperties instanceof Uint32Array;
-
         const vertexColors = this.getVertexColorAttributes();
 
         const model = new Model(this.context.device, {
