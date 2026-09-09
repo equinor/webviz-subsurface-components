@@ -232,6 +232,68 @@ describe("Well pick label rendering", () => {
         expect(cells).toContain("HOR_1");
     });
 
+    it("renders one element per pick and removes them all, even when horizons repeat", () => {
+        // A deviated well may cross the same horizon several times, so several picks can share a
+        // horizon name. Naming the overlay elements after the horizon leaves all but the last of
+        // them untracked, and an untracked element is never positioned, never hidden and never
+        // removed - it stays behind as a pick that no data backs.
+        const repeatedHorizons = {
+            ...exampleWellPicks,
+            data: [
+                [1644, "Hor_1"],
+                [1700, "Hor_1"],
+                [1750, "Hor_1"],
+                [2788, "Hor_2"],
+            ],
+        } as unknown as WellLogSet;
+
+        const wellpick: WellPickProps = {
+            wellpick: repeatedHorizons,
+            name: "HORIZON",
+            colorMapFunctions: exampleColormapFunctions,
+            colorMapFunctionName: "Stratigraphy",
+        };
+
+        const { container, rerender } = render(
+            <WellLogView
+                wellLogSets={exampleWellLogL898MUD}
+                options={{ hideTrackLegend: true, hideTrackTitle: true }}
+                template={viewerTemplate}
+                colorMapFunctions={exampleColormapFunctions}
+                primaryAxis={"md"}
+                axisTitles={{ md: "MD", tvd: "TVD", time: "TIME" }}
+                axisMnemos={{
+                    md: ["DEPTH", "DEPT", "MD", "TDEP", "MD_RKB"],
+                    tvd: ["TVD", "TVDSS", "DVER", "TVD_MSL"],
+                    time: ["TIME"],
+                }}
+                wellpick={wellpick}
+            />
+        );
+
+        expect(container.querySelectorAll(".wellpick")).toHaveLength(4);
+
+        // Dropping the picks must leave nothing behind, which is only possible if every element
+        // created is still reachable by name.
+        rerender(
+            <WellLogView
+                wellLogSets={exampleWellLogL898MUD}
+                options={{ hideTrackLegend: true, hideTrackTitle: true }}
+                template={viewerTemplate}
+                colorMapFunctions={exampleColormapFunctions}
+                primaryAxis={"md"}
+                axisTitles={{ md: "MD", tvd: "TVD", time: "TIME" }}
+                axisMnemos={{
+                    md: ["DEPTH", "DEPT", "MD", "TDEP", "MD_RKB"],
+                    tvd: ["TVD", "TVDSS", "DVER", "TVD_MSL"],
+                    time: ["TIME"],
+                }}
+            />
+        );
+
+        expect(container.querySelectorAll(".wellpick")).toHaveLength(0);
+    });
+
     it("renders formatter output as text and never as markup", () => {
         const { container } = renderWithWellPick(() => ({
             primary: "<b>1644</b>",
