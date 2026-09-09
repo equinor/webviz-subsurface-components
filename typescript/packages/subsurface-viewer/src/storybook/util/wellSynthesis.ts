@@ -1,30 +1,15 @@
 import React from "react";
 
 import type { Color } from "@deck.gl/core";
-import { all, create } from "mathjs";
-
 import type {
     WellFeature,
     WellFeatureCollection,
 } from "../../layers/wells/types";
 import type { Point3D } from "../../utils";
 import type { TrajectorySimulationProps } from "../types/well";
+import { createSeededRandom } from "./random";
 
 const RANDOM_SEED = "1984";
-
-/**
- * Create a freshly seeded pseudo-random generator.
- *
- * Each generator is independent and always starts from the same seed, so the data
- * produced by the functions below depends only on their arguments. A single shared
- * generator would instead make output depend on how many numbers earlier callers had
- * already drawn, which is not reproducible: Storybook renders every story into one
- * page, so the draw count varies with story order, sharding and re-renders.
- */
-const createRandom = (): (() => number) => {
-    const math = create(all, { randomSeed: RANDOM_SEED });
-    return math?.random ? math.random : Math.random;
-};
 
 /**
  * Generate a random deviation
@@ -132,7 +117,7 @@ const createSyntheticWell = (
  * Create random well heads
  */
 export const createSyntheticWellHeads = (count = 100): Point3D[] => {
-    const random = createRandom();
+    const random = createSeededRandom(RANDOM_SEED);
     const wellHeads: Point3D[] = [];
     for (let i = 0; i < count; i++) {
         const dx = random() * 10000 - 2000;
@@ -161,7 +146,7 @@ export const createSyntheticWellCollection = (
         zIncreasingDownwards: false,
     }
 ): WellFeatureCollection => {
-    const random = createRandom();
+    const random = createSeededRandom(RANDOM_SEED);
     const wellHeads = SYNTHETIC_WELL_HEADS.slice(0, wellHeadCount);
 
     const wells: WellFeature[] = [];
