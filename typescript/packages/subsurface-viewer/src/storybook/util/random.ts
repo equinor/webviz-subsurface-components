@@ -10,7 +10,9 @@ import { all, create } from "mathjs";
  * not reproducible: Storybook renders every story into one page, so the draw count
  * varies with story order, sharding and re-renders.
  */
-export function createSeededRandom(seed: string): (max?: number) => number {
+export function createSeededRandom(
+    seed: string = "1984"
+): (max?: number) => number {
     const math = create(all, { randomSeed: seed });
     const random = math?.random ?? Math.random;
     return (max = 1) => random() * max;
