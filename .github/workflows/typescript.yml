@@ -26,7 +26,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: 22
 
       - name: 📦 Install build dependencies
         run: |
@@ -70,7 +70,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: 22
 
       - name: 📦 Install build dependencies
         run: |
@@ -107,7 +107,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: 22
 
       - name: 📦 Install build dependencies
         run: |
@@ -154,7 +154,7 @@ jobs:
       - name: 📖 Checkout commit locally
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Fetch full history including tags (needed for nx release)
+          fetch-depth: 0 # Fetch full history including tags (needed for nx release)
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -174,3 +174,25 @@ jobs:
         run: npx nx release --dry-run --yes
         env:
           GITHUB_TOKEN: ${{ secrets.SEMANTIC_RELEASE_GITHUB_TOKEN }}
+
+      # A dry run cannot detect a broken release. `updateLockFile` returns early
+      # on `dryRun` before computing the paths to stage, and `gitAdd` returns
+      # before it would run `git add`, so a bad path is never even executed.
+      # This step therefore performs a *real* version bump - but commits,
+      # tags and pushes nothing - so that `git add` actually runs. All changes
+      # stay in the runner's working tree and are discarded.
+      #
+      # `patch` is passed explicitly so every project is bumped regardless of
+      # which commits the PR contains. Without it, a PR with no releasable
+      # commits would skip the lock file update entirely and report a false pass.
+      #
+      # The git flags must all be passed explicitly: nx rejects `nx release
+      # version` when `release.git` is set in nx.json unless `git-commit`,
+      # `git-tag` and `stage-changes` are all given.
+      - name: 🧪 Verify release staging (real version bump, nothing committed or pushed)
+        working-directory: ./typescript
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          npx nx release version patch \
+            --git-commit=false --git-tag=false --git-push=false --stage-changes=true

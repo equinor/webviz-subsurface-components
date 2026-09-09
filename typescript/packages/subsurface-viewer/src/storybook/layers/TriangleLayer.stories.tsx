@@ -2,12 +2,11 @@ import React from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-webpack5";
 
-import { create, all } from "mathjs";
-
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 
 import * as surfacePoints from "../../layers/triangle/test_data/surfacePoints";
 import * as surfaceTriangles from "../../layers/triangle/test_data/surfaceTriangles";
+import { createSeededRandom } from "../util/random";
 
 import {
     default3DViews,
@@ -231,20 +230,12 @@ export const TypedArrayInput: StoryObj<typeof SubsurfaceViewerPropsInjector> = {
     },
 };
 
-const math = create(all, { randomSeed: "12345" });
-
 const bboxSize = 1000;
 const trglSize = 100;
 
-const randomFunc = (size: number): number => {
-    if (math.random) {
-        return math.random() * size;
-    }
-    return Math.random() * size;
-};
-
 const buildTrgl = (count: number = 1): number[] => {
     count = count || 1;
+    const randomFunc = createSeededRandom("12345");
     // 9 is 3 points for the triangle * 3 vertices
     const trglDataSize = 9;
     const triangles = new Array(trglDataSize * count).fill(0);
