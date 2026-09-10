@@ -124,14 +124,13 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
         }
         if (
             this.props.vertexProperties instanceof Uint32Array ||
-            this.props.vertexProperties instanceof Int32Array ||
             this.props.vertexProperties instanceof Uint16Array ||
-            this.props.vertexProperties instanceof Int16Array ||
             typeof this.props.discretePropertyValueNames !== "undefined"
         ) {
             return {
                 discreteData: true,
-                colormapSize: (this.props.propertyValueRange?.[1] ?? 0) + 1,
+                colormapSize:
+                    this.props.discretePropertyValueNames?.length ?? 0,
             };
         }
         return {
@@ -151,17 +150,22 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
             hints
         );
 
-        const colormapSize = colors.length / 3;
+        const colormapSize = Math.max(colors.length / 3, 1);
+
         const length = this.props.vertexProperties.length;
+
+        const entries = this.props.discretePropertyValueNames ?? [];
+        const codeToIndex = new Map<number, number>();
+        for (let idx = 0; idx < entries.length; idx++) {
+            codeToIndex.set(entries[idx].code, idx);
+        }
+
         const vertexColors = new Float32Array(length * 3);
         for (let i = 0; i < length; i++) {
             const property = this.props.vertexProperties[i];
 
-            const index =
-                this.props.discretePropertyValueNames?.findIndex(
-                    (e) => e.code === property
-                ) ?? -1;
-            let color = this.props.discretePropertyValueNames?.[index]?.color; // Use this color if set.
+            const index = codeToIndex.get(property) ?? -1;
+            let color = entries?.[index]?.color; // Use this color if set.
 
             if (typeof color === "undefined") {
                 if (
