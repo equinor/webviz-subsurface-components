@@ -188,7 +188,9 @@ export interface MapLayerProps extends ExtendedLayerProps {
      * If the number of property values equals one less than the depth values in
      * each direction then the property values will be pr cell and the cell will be constant
      * colored.
-     * Undefined value for discrete (Uint32Array) input is 0xFFFF. For float input (Float32Array) it is NaN.
+     * Undefined value for discrete (Uint16Array) input is 0xFFFF.
+     * Undefined value for discrete (Uint32Array) input is 0xFFFFFFFF.
+     * For float input (Float32Array) it is NaN.
      * For number array use "undefined".
      */
     propertiesUrl: string; // Deprecated
