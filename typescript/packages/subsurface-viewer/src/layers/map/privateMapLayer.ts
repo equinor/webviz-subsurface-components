@@ -7,7 +7,7 @@ import type {
     Attribute,
 } from "@deck.gl/core";
 import { COORDINATE_SYSTEM, Layer, project32, picking } from "@deck.gl/core";
-import type { Device, Texture, UniformValue } from "@luma.gl/core";
+import type { Device, UniformValue } from "@luma.gl/core";
 import type { ShaderModule } from "@luma.gl/shadertools";
 import { lighting } from "@luma.gl/shadertools";
 import { Model, Geometry } from "@luma.gl/engine";
@@ -24,19 +24,31 @@ import type {
 import { createPropertyData } from "../utils/layerTools";
 import {
     type ColormapFunctionType,
-    getImageData,
+    createColormapTexture,
+    getColormapDiscreteColors,
 } from "../utils/colormapTools";
 import type { RGBColor } from "../../utils";
 import fs from "./map.fs.glsl";
 import vs from "./map.vs.glsl";
+import fsDiscrete from "./map_discrete.fs.glsl";
+import vsDiscrete from "./map_discrete.vs.glsl";
 import fsLineShader from "./line.fs.glsl";
 import vsLineShader from "./line.vs.glsl";
+import type {
+    IDiscretePropertyValueName,
+    TTypedIntegerArray,
+} from "./mapLayer";
+
+interface IColormapTextureHints {
+    discreteData: boolean;
+    colormapSize: number;
+}
 
 export interface PrivateMapLayerProps extends ExtendedLayerProps {
     positions: Float32Array;
     normals: Float32Array;
     triangleIndices: Uint32Array;
-    vertexProperties: Float32Array;
+    vertexProperties: Float32Array | TTypedIntegerArray;
     vertexIndices: Int32Array;
     lineIndices: Uint32Array;
     contours: [number, number];
@@ -46,11 +58,14 @@ export interface PrivateMapLayerProps extends ExtendedLayerProps {
     colormapRange: [number, number];
     colormapClampColor: Color | undefined | boolean;
     colormapFunction?: ColormapFunctionType;
+    undefinedPropertyColor: RGBColor;
+    undefinedPropertyValue: number;
     propertyValueRange: [number, number];
     smoothShading: boolean;
     depthTest: boolean;
     ZIncreasingDownwards: boolean;
     enableLighting: boolean;
+    discretePropertyValueNames?: IDiscretePropertyValueName[];
 }
 
 const defaultProps = {
@@ -100,6 +115,81 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
         return;
     }
 
+    private getColoringHints(): IColormapTextureHints {
+        if (this.props.colormapFunction instanceof Uint8Array) {
+            return {
+                discreteData: true,
+                colormapSize: this.props.colormapFunction.length / 3,
+            };
+        }
+        if (
+            this.props.vertexProperties instanceof Uint32Array ||
+            this.props.vertexProperties instanceof Uint16Array ||
+            typeof this.props.discretePropertyValueNames !== "undefined"
+        ) {
+            return {
+                discreteData: true,
+                colormapSize:
+                    this.props.discretePropertyValueNames?.length ?? 0,
+            };
+        }
+        return {
+            discreteData: false,
+            colormapSize: 256,
+        };
+    }
+
+    private getVertexColorAttributes(): Float32Array {
+        const hints = this.getColoringHints();
+        const colors = getColormapDiscreteColors(
+            this.props.colormapFunction ?? {
+                colormapName: this.props.colormapName,
+                colorTables: (this.context as DeckGLLayerContext).userData
+                    .colorTables,
+            },
+            hints
+        );
+
+        const colormapSize = Math.max(colors.length / 3, 1);
+
+        const length = this.props.vertexProperties.length;
+
+        const entries = this.props.discretePropertyValueNames ?? [];
+        const codeToIndex = new Map<number, number>();
+        for (let idx = 0; idx < entries.length; idx++) {
+            codeToIndex.set(entries[idx].code, idx);
+        }
+
+        const vertexColors = new Float32Array(length * 3);
+        for (let i = 0; i < length; i++) {
+            const property = this.props.vertexProperties[i];
+
+            const index = codeToIndex.get(property) ?? -1;
+            let color = entries?.[index]?.color; // Use this color if set.
+
+            if (typeof color === "undefined") {
+                if (
+                    index !== -1 &&
+                    property !== this.props.undefinedPropertyValue
+                ) {
+                    const i = index % colormapSize;
+                    color = [
+                        colors[i * 3 + 0],
+                        colors[i * 3 + 1],
+                        colors[i * 3 + 2],
+                    ];
+                } else {
+                    color = this.props.undefinedPropertyColor;
+                }
+            }
+
+            vertexColors[i * 3 + 0] = color[0] / 255;
+            vertexColors[i * 3 + 1] = color[1] / 255;
+            vertexColors[i * 3 + 2] = color[2] / 255;
+        }
+        return vertexColors;
+    }
+
     initializeState(context: DeckGLLayerContext): void {
         const gl = context.device;
         const [mesh_model, mesh_lines_model] = this._getModels(gl);
@@ -139,25 +229,23 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
         this.initializeState(context as DeckGLLayerContext);
     }
 
-    _getModels(device: Device) {
-        const colormap: Texture = device.createTexture({
-            sampler: {
-                addressModeU: "clamp-to-edge",
-                addressModeV: "clamp-to-edge",
-                minFilter: "linear",
-                magFilter: "linear",
+    isPropertiesCategorical(): boolean {
+        return (
+            this.getColoringHints().discreteData &&
+            typeof this.props.discretePropertyValueNames !== "undefined"
+        );
+    }
+
+    getContinuousPropModel() {
+        const colormap = createColormapTexture(
+            this.props.colormapFunction ?? {
+                colormapName: this.props.colormapName,
+                colorTables: (this.context as DeckGLLayerContext).userData
+                    .colorTables,
             },
-            width: 256,
-            height: 1,
-            format: "rgb8unorm-webgl",
-            data: getImageData(
-                this.props.colormapFunction ?? {
-                    colormapName: this.props.colormapName,
-                    colorTables: (this.context as DeckGLLayerContext).userData
-                        .colorTables,
-                }
-            ),
-        });
+            this.context as DeckGLLayerContext,
+            this.getColoringHints()
+        );
 
         // MESH MODEL
         const contourReferencePoint = this.props.contours[0] ?? -1.0;
@@ -192,9 +280,22 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
 
         const smoothShading =
             this.props.normals.length == 0 ? false : this.props.smoothShading;
-        const mesh_model = new Model(this.context.device, {
+
+        const model = new Model(this.context.device, {
             id: `${this.props.id}-mesh`,
-            ...this.getShaders(),
+            ...super.getShaders({
+                vs,
+                fs,
+                modules: [
+                    project32,
+                    picking,
+                    utilities,
+                    lighting,
+                    phongMaterial,
+                    mapUniforms,
+                    precisionForTests,
+                ],
+            }),
             geometry: new Geometry({
                 topology: "triangle-list",
                 attributes: {
@@ -214,7 +315,7 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
             isInstanced: false,
         });
 
-        mesh_model.shaderInputs.setProps({
+        model.shaderInputs.setProps({
             map: {
                 contourReferencePoint,
                 contourInterval,
@@ -231,13 +332,73 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
             },
         });
 
-        // MESH LINES
-        const mesh_lines_model = new Model(device, {
+        return model;
+    }
+
+    getDiscretePropModel() {
+        const contourReferencePoint = this.props.contours[0] ?? -1.0;
+        const contourInterval = this.props.contours[1] ?? -1.0;
+        const isContoursDepth = this.props.isContoursDepth;
+
+        const vertexColors = this.getVertexColorAttributes();
+
+        const model = new Model(this.context.device, {
+            id: `${this.props.id}-mesh`,
+            ...super.getShaders({
+                vs: vsDiscrete,
+                fs: fsDiscrete,
+                modules: [
+                    project32,
+                    picking,
+                    utilities,
+                    lighting,
+                    phongMaterial,
+                    mapDiscreteUniforms,
+                    precisionForTests,
+                ],
+            }),
+
+            geometry: new Geometry({
+                topology: "triangle-list",
+                attributes: {
+                    positions: { value: this.props.positions, size: 3 },
+                    vertexColor: { value: vertexColors, size: 3 },
+                    properties: {
+                        value: this.props.vertexProperties,
+                        size: 1,
+                        normalized: false,
+                    },
+                },
+                indices: { value: this.props.triangleIndices, size: 1 },
+            }),
+            bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
+            isInstanced: false,
+        });
+
+        model.shaderInputs.setProps({
+            map: {
+                contourReferencePoint,
+                contourInterval,
+                isContoursDepth,
+                ZIncreasingDownwards: this.props.ZIncreasingDownwards,
+            },
+        });
+
+        return model;
+    }
+
+    getLinesModel(device: Device) {
+        const model = new Model(device, {
             id: `${this.props.id}-lines`,
             ...super.getShaders({
                 vs: vsLineShader,
                 fs: fsLineShader,
-                modules: [project32, picking, mapUniforms, precisionForTests],
+                modules: [
+                    project32,
+                    picking,
+                    mapLinesUniforms,
+                    precisionForTests,
+                ],
             }),
             geometry: new Geometry({
                 topology: "line-list",
@@ -249,22 +410,22 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
             bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
             isInstanced: false,
         });
-        mesh_lines_model.shaderInputs.setProps({
+
+        model.shaderInputs.setProps({
             map: {
-                contourReferencePoint,
-                contourInterval,
-                isContoursDepth,
-                valueRangeMin,
-                valueRangeMax,
-                colormapRangeMin,
-                colormapRangeMax,
-                colormapClampColor,
-                isColormapClampColorTransparent,
-                isClampColor,
-                smoothShading,
                 ZIncreasingDownwards: this.props.ZIncreasingDownwards,
             },
         });
+
+        return model;
+    }
+
+    _getModels(device: Device) {
+        const mesh_model = this.isPropertiesCategorical()
+            ? this.getDiscretePropModel()
+            : this.getContinuousPropModel();
+
+        const mesh_lines_model = this.getLinesModel(device);
 
         return [mesh_model, mesh_lines_model];
     }
@@ -339,6 +500,29 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
             return info;
         }
 
+        if (this.isPropertiesCategorical()) {
+            const [r, g, b] = info.color;
+            const code = decodeIndexFromRGB([r, g, b]);
+
+            const layer_properties: PropertyDataType[] = [];
+            layer_properties.push(createPropertyData("Code", code));
+
+            const index =
+                this.props.discretePropertyValueNames?.findIndex(
+                    (e) => e.code === code
+                ) ?? -1;
+            const name =
+                index !== -1
+                    ? this.props.discretePropertyValueNames?.[index]?.name
+                    : "No name";
+            layer_properties.push(createPropertyData("Name", name as string));
+
+            return {
+                ...info,
+                properties: layer_properties,
+            };
+        }
+
         const layer_properties: PropertyDataType[] = [];
 
         // Note these colors are in the  0-255 range.
@@ -366,22 +550,6 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
             ...info,
             properties: layer_properties,
         };
-    }
-
-    getShaders() {
-        return super.getShaders({
-            vs,
-            fs,
-            modules: [
-                project32,
-                picking,
-                utilities,
-                lighting,
-                phongMaterial,
-                mapUniforms,
-                precisionForTests,
-            ],
-        });
     }
 }
 
@@ -443,3 +611,57 @@ const mapUniforms = {
         ZIncreasingDownwards: "u32",
     },
 } as const satisfies ShaderModule<LayerProps, MapUniformsType>;
+
+// Discrete uniforms
+const mapDiscreteUniformsBlock = /*glsl*/ `\
+uniform mapUniforms {
+    bool isContoursDepth;
+    float contourReferencePoint;
+    float contourInterval;
+
+    bool ZIncreasingDownwards;
+} map_d;
+`;
+
+type MapDiscreteUniformsType = {
+    isContoursDepth: boolean;
+    contourReferencePoint: number;
+    contourInterval: number;
+    ZIncreasingDownwards: boolean;
+};
+
+// NOTE: this must exactly the same name as in the uniform block
+const mapDiscreteUniforms = {
+    // Module name
+    name: "map",
+    vs: mapDiscreteUniformsBlock,
+    fs: mapDiscreteUniformsBlock,
+    uniformTypes: {
+        isContoursDepth: "u32",
+        contourReferencePoint: "f32",
+        contourInterval: "f32",
+        ZIncreasingDownwards: "u32",
+    },
+} as const satisfies ShaderModule<LayerProps, MapDiscreteUniformsType>;
+
+// Lines uniforms
+const mapLinesUniformsBlock = /*glsl*/ `\
+uniform mapUniforms {
+    bool ZIncreasingDownwards;
+} map;
+`;
+
+type MapLinesUniformsType = {
+    ZIncreasingDownwards: boolean;
+};
+
+// NOTE: this must exactly the same name as in the uniform block
+const mapLinesUniforms = {
+    // Module name
+    name: "map",
+    vs: mapLinesUniformsBlock,
+    fs: mapLinesUniformsBlock,
+    uniformTypes: {
+        ZIncreasingDownwards: "u32",
+    },
+} as const satisfies ShaderModule<LayerProps, MapLinesUniformsType>;

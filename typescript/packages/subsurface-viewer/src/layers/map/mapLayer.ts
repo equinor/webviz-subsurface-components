@@ -25,6 +25,9 @@ import { rotate } from "./utils";
 import { makeFullMesh } from "./webworker";
 
 import workerpool from "workerpool";
+import type { RGBColor } from "../../utils";
+
+export type TTypedIntegerArray = Uint32Array | Uint16Array;
 
 // init workerpool
 const workerPoolConfig = findConfig(
@@ -46,6 +49,30 @@ function onTerminateWorker() {
     if (stats.busyWorkers === 0 && stats.pendingTasks === 0) {
         pool.terminate();
     }
+}
+
+function getUndefinedValueProperties(
+    propertiesData:
+        | string
+        | number[]
+        | Float32Array
+        | TTypedIntegerArray
+        | undefined,
+    isPropertiesDiscrete: boolean
+): number | undefined {
+    if (propertiesData instanceof Float32Array) {
+        return NaN;
+    }
+    if (propertiesData instanceof Uint16Array) {
+        return 0xffff;
+    }
+    if (propertiesData instanceof Uint32Array) {
+        return 0xffffffff;
+    }
+    if (isPropertiesDiscrete) {
+        return 0x7fffffff;
+    }
+    return undefined;
 }
 
 // This type describes the mesh' extent in the horizontal plane.
@@ -73,12 +100,19 @@ type Frame = {
 
 export type Params = [
     meshData: Float32Array | null,
-    propertiesData: Float32Array | null,
+    propertiesData: Float32Array | TTypedIntegerArray | null,
     isMesh: boolean,
     frame: Frame,
     smoothShading: boolean,
     gridLines: boolean,
+    undefinedPropertyValue: number,
 ];
+
+export interface IDiscretePropertyValueName {
+    code: number;
+    name?: string;
+    color?: RGBColor;
+}
 
 /**
  * Will load data for the mesh and the properties. Both of which may be given as arrays (javascript or typed)
@@ -87,17 +121,43 @@ export type Params = [
  */
 async function loadMeshAndProperties(
     meshData: string | number[] | Float32Array,
-    propertiesData: string | number[] | Float32Array
+    propertiesData: string | number[] | Float32Array | TTypedIntegerArray,
+    isPropertiesDiscrete: boolean = false
 ) {
     // Keep
     //const t0 = performance.now();
 
     const mesh = await loadDataArray(meshData, Float32Array);
-    const properties = await loadDataArray(propertiesData, Float32Array);
 
-    // if (!isMesh && !isProperties) {
-    //     console.error("Error. One or both of texture and mesh must be given!");
-    // }
+    let properties = undefined;
+    if (isPropertiesDiscrete && typeof propertiesData !== "string") {
+        switch (true) {
+            case propertiesData instanceof Uint16Array: {
+                // Replace undefined values with defaultValue of Uint16Array
+                // If not, undefined values will be converted to 0 in "loadDataArray"
+                const defaultValue = 0xffff;
+                for (let i = 0; i < propertiesData.length; i++) {
+                    if (propertiesData[i] === undefined) {
+                        propertiesData[i] = defaultValue;
+                    }
+                }
+                properties = await loadDataArray(propertiesData, Uint16Array);
+                break;
+            }
+            default: {
+                const defaultValue = 0xffffffff;
+                for (let i = 0; i < propertiesData.length; i++) {
+                    if (propertiesData[i] === undefined) {
+                        propertiesData[i] = defaultValue;
+                    }
+                }
+                properties = await loadDataArray(propertiesData, Uint32Array);
+                break;
+            }
+        }
+    } else {
+        properties = await loadDataArray(propertiesData, Float32Array);
+    }
 
     // Keep this.
     // const t1 = performance.now();
@@ -128,9 +188,39 @@ export interface MapLayerProps extends ExtendedLayerProps {
      * If the number of property values equals one less than the depth values in
      * each direction then the property values will be pr cell and the cell will be constant
      * colored.
+     * Undefined value for discrete (Uint16Array) input is 0xFFFF.
+     * Undefined value for discrete (Uint32Array) input is 0xFFFFFFFF.
+     * For float input (Float32Array) it is NaN.
+     * For number array use "undefined".
      */
     propertiesUrl: string; // Deprecated
-    propertiesData: string | number[] | Float32Array;
+    propertiesData:
+        | string
+        | number[]
+        | Float32Array
+        | TTypedIntegerArray
+        | undefined;
+
+    /**
+     * Array of property discrete codes with  optional name and color.
+     */
+    discretePropertyValueNames?: IDiscretePropertyValueName[];
+
+    /**
+     * Color for the cells with undefined property value.
+     * Is not overridden by and used prior to colorMapFunction.
+     * By default, Light gray if not provided.
+     */
+    undefinedPropertyColor?: RGBColor;
+
+    /**
+     * Value in propertiesData indicating that the property is undefined.
+     * By default these are:
+     * - Float32Array: NaN
+     * - Uint16Array: 0xFFFF
+     * - Uint32Array: 0xFFFFFFFF
+     */
+    undefinedPropertyValue?: number;
 
     /**  Contour lines reference point and interval.
      * A value of [-1.0, -1.0] will disable contour lines.
@@ -241,6 +331,18 @@ export default class MapLayer<
         return isLoaded && isFinished;
     }
 
+    isPropertiesCategorical(): boolean {
+        const propertiesData =
+            this.props.propertiesData ?? this.props.propertiesUrl;
+        return (
+            propertiesData instanceof Uint32Array ||
+            propertiesData instanceof Uint16Array ||
+            propertiesData instanceof Int16Array ||
+            propertiesData instanceof Int32Array ||
+            typeof this.props.discretePropertyValueNames !== "undefined"
+        );
+    }
+
     rebuildData(reportBoundingBox: boolean): void {
         if (typeof this.props.meshUrl !== "undefined") {
             console.warn('"meshUrl" is deprecated. Use "meshData"');
@@ -254,7 +356,12 @@ export default class MapLayer<
         const propertiesData =
             this.props.propertiesData ?? this.props.propertiesUrl;
 
-        const p = loadMeshAndProperties(meshData, propertiesData);
+        const isPropertiesCategorical = this.isPropertiesCategorical();
+        const p = loadMeshAndProperties(
+            meshData,
+            propertiesData,
+            isPropertiesCategorical
+        );
 
         p.then(([meshData, propertiesData]) => {
             // Using inline web worker for calculating the triangle mesh from
@@ -264,6 +371,7 @@ export default class MapLayer<
                 meshData,
                 propertiesData
             );
+
             pool.exec(makeFullMesh, [{ data: webworkerParams.params }]).then(
                 (e) => {
                     const [
@@ -438,6 +546,17 @@ export default class MapLayer<
             );
         }
 
+        const undefinedColor = this.props.undefinedPropertyColor ?? [
+            204, 204, 204,
+        ];
+
+        const undefinedPropertyValue =
+            this.props.undefinedPropertyValue ??
+            getUndefinedValueProperties(
+                this.props.propertiesData,
+                this.isPropertiesCategorical()
+            );
+
         const enableLighting: boolean = this.props.material !== false;
         const layer = new PrivateMapLayer(
             this.getSubLayerProps({
@@ -454,7 +573,11 @@ export default class MapLayer<
                 colormapName: this.props.colorMapName,
                 colormapRange: this.props.colorMapRange,
                 colormapClampColor: this.props.colorMapClampColor,
+                undefinedPropertyColor: undefinedColor,
+                undefinedPropertyValue,
                 colormapFunction: this.props.colorMapFunction,
+                discretePropertyValueNames:
+                    this.props.discretePropertyValueNames,
                 propertyValueRange: this.state["propertyValueRange"],
                 material: this.props.material,
                 smoothShading: this.props.smoothShading,
@@ -468,13 +591,20 @@ export default class MapLayer<
 
     private getWebworkerParams(
         meshData: Float32Array | null,
-        propertiesData: Float32Array | null
+        propertiesData: Float32Array | TTypedIntegerArray
     ): { params: Params; transferrables?: Transferable[] } {
         if (!meshData && !propertiesData) {
             throw new Error(
                 "Either mesh or properties or the both must be defined"
             );
         }
+
+        const undefinedPropertyValue =
+            this.props.undefinedPropertyValue ??
+            getUndefinedValueProperties(
+                propertiesData as Float32Array | TTypedIntegerArray,
+                this.isPropertiesCategorical()
+            );
 
         const params: Params = [
             meshData,
@@ -483,6 +613,7 @@ export default class MapLayer<
             this.props.frame,
             this.props.smoothShading,
             this.props.gridLines,
+            undefinedPropertyValue as number,
         ];
         const transferrables = [
             meshData?.buffer,
