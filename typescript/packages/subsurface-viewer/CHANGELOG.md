@@ -1,3 +1,13 @@
+## 2.2.1 (2026-09-10)
+
+### 🩹 Fixes
+
+- bump @turf/simplify from 7.1.0 to 7.4.0 in /typescript ([#2860](https://github.com/equinor/webviz-subsurface-components/pull/2860))
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 2.0.5
+
 ## 2.2.0 (2026-09-09)
 
 ### 🚀 Features
