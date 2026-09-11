@@ -4,13 +4,13 @@ import type { Color, PickingInfo } from "@deck.gl/core";
 import { TextLayer } from "@deck.gl/layers";
 import type { Meta, StoryObj } from "@storybook/react-webpack5";
 import { clamp } from "lodash";
-import { all, create } from "mathjs";
 
 import volveWellsJson from "../../../../../../example-data/volve_wells.json";
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import { WellMarkersLayer, WellsLayer } from "../../layers";
 import type { WellMarkerDataT } from "../../layers/well_markers/wellMarkersLayer";
+import { createSeededRandom } from "../util/random";
 import type {
     WellFeature,
     WellFeatureCollection,
@@ -46,18 +46,7 @@ const stories: Meta = {
 export default stories;
 
 // ---------Layers and data--------------- //
-const math = create(all, { randomSeed: "1984" });
-
-type TRandomNumberFunc = (max: number) => number;
-
-const randomFunc = ((): TRandomNumberFunc => {
-    if (math?.random) {
-        return (max: number) => {
-            return math.random(max);
-        };
-    }
-    return (max: number) => Math.random() * max;
-})();
+const randomFunc = createSeededRandom("1984");
 
 const generateMarkers = (): WellMarkerDataT[] => {
     const N = 40;

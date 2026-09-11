@@ -5,7 +5,7 @@ import type { Meta, StoryObj } from "@storybook/react-webpack5";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 
 import { default3DViews, defaultStoryParameters } from "../sharedSettings";
-import { createMathWithSeed } from "../sharedHelperFunctions";
+import { createSeededRandom } from "../util/random";
 
 import { getPropsInjectorComponent } from "../sharedHelperComponents";
 
@@ -42,11 +42,11 @@ const smallPointsData = [
 const sideSize = 10000;
 const pointsCount = 100000;
 
-const math = createMathWithSeed("1234");
+const random = createSeededRandom("1234");
 
 const hugePointsData = new Array(pointsCount * 3)
     .fill(0)
-    .map(() => math.random(sideSize));
+    .map(() => random(sideSize));
 
 // ---------In-place array data handling (storybook fails to rebuild non JSon data)--------------- //
 const smallDataLayerPointsTypedId = "small_points_typed_data_layer";

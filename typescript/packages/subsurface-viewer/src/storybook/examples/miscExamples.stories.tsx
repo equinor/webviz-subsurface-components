@@ -3,13 +3,12 @@ import React from "react";
 import type { Meta, StoryObj } from "@storybook/react-webpack5";
 import { fireEvent, userEvent } from "storybook/test";
 
-import { all, create } from "mathjs";
-
 import type { Layer } from "@deck.gl/core";
 
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer, { TGrid3DColoringMode } from "../../SubsurfaceViewer";
 import Grid3DLayer from "../../layers/grid3d/grid3dLayer";
+import { createSeededRandom } from "../util/random";
 
 import { argTypes } from "../sharedDoc";
 import type { EditedDataTemplate } from "../sharedSettings";
@@ -309,8 +308,7 @@ export const MapInContainer: StoryObj<typeof SubsurfaceViewer> = {
     ),
 };
 
-const math = create(all, { randomSeed: "1984" });
-const randomFunc = math?.random ? math.random : Math.random;
+const randomFunc = createSeededRandom("1984");
 
 const snubCubePoints = SnubCubePoints.map((v) => 10 * v);
 const snubCubeProperties = Array(SnubCubeVertexCount)
