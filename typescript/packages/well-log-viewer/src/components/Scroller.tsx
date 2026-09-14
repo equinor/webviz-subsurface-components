@@ -2,24 +2,6 @@ import type { ReactNode } from "react";
 import type React from "react";
 import { Component } from "react";
 
-function getScrollbarSizes(): { vertical: number; horizontal: number } {
-    // Creating invisible container
-    const outer = document.createElement("div");
-    outer.style.visibility = "hidden";
-    outer.style.overflow = "scroll"; // forcing scrollbar to appear
-    //!!! commented to avoid error TS2339: Property 'msOverflowStyle' does not exist on type 'CSSStyleDeclaration'.
-    //!!! outer.style.msOverflowStyle = 'scrollbar'; // needed for WinJS apps
-    document.body.appendChild(outer);
-
-    const vertical = outer.offsetWidth - outer.clientWidth;
-    const horizontal = outer.offsetHeight - outer.clientHeight;
-
-    // Removing temporary elements from the DOM
-    document.body.removeChild(outer);
-
-    return { vertical, horizontal };
-}
-
 export interface ScrollerProps {
     /**
      * callback with new scroll positions
@@ -44,14 +26,12 @@ class Scroller extends Component<ScrollerProps> {
             (entries: ResizeObserverEntry[]): void => {
                 const entry = entries[0];
                 if (entry && entry.target) {
-                    const Width = (entry.target as HTMLElement).offsetWidth;
-                    const Height = (entry.target as HTMLElement).offsetHeight;
+                    const width = (entry.target as HTMLElement).clientWidth;
+                    const height = (entry.target as HTMLElement).clientHeight;
 
                     if (this.content) {
-                        const { vertical, horizontal } = getScrollbarSizes();
-
-                        this.content.style.width = Width - vertical + "px";
-                        this.content.style.height = Height - horizontal + "px";
+                        this.content.style.width = width + "px";
+                        this.content.style.height = height + "px";
                     }
                 }
             }
@@ -161,7 +141,13 @@ class Scroller extends Component<ScrollerProps> {
                 ref={(el) => {
                     this.scroller = el as HTMLDivElement;
                 }}
-                style={{ overflow: "scroll", width: "100%", height: "100%" }}
+                style={{
+                    overflow: "scroll",
+                    width: "100%",
+                    height: "100%",
+                    minWidth: 0,
+                    minHeight: 0,
+                }}
                 onScroll={this.onScroll}
             >
                 <div

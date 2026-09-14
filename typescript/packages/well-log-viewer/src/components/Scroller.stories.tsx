@@ -37,7 +37,8 @@ const stories: Meta = {
     parameters: {
         docs: {
             description: {
-                component: "Auxiliary component to create scrolbars.",
+                component:
+                    "Auxiliary component to create scrollbars. The example zooms both axes to exercise horizontal and vertical scrolling.",
             },
         },
         componentSource: {
