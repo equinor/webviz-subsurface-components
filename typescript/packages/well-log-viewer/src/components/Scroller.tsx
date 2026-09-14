@@ -147,6 +147,7 @@ class Scroller extends Component<ScrollerProps> {
                     height: "100%",
                     minWidth: 0,
                     minHeight: 0,
+                    scrollbarColor: "gray transparent",
                 }}
                 onScroll={this.onScroll}
             >
