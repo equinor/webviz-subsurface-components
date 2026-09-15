@@ -350,7 +350,7 @@ export const ScrollbarBehavior: StoryObj<typeof Template> = {
         },
     },
     render: (args) => <Template {...args} wellLogCollections="Default" />,
-    tags: ["sync-scrollbar-test"],
+    tags: ["sync-scrollbar-test", "no-dom-test"],
     parameters: {
         docs: {
             description: {
