@@ -473,7 +473,7 @@ exports[`WellLogViewer/Demo/ExampleData TwoLogs smoke-test 1`] = `
                           <div class="track-container">
                             <canvas width="470.5"
                                     height="576"
-                                    style="position: absolute; z-index: -1; width: 470.5px; height: 576px;"
+                                    style="position: absolute; width: 470.5px; height: 576px;"
                             >
                             </canvas>
                           </div>
@@ -560,7 +560,7 @@ exports[`WellLogViewer/Demo/ExampleData TwoLogs smoke-test 1`] = `
                           <div class="track-container">
                             <canvas width="470.5"
                                     height="576"
-                                    style="position: absolute; z-index: -1; width: 470.5px; height: 576px;"
+                                    style="position: absolute; width: 470.5px; height: 576px;"
                             >
                             </canvas>
                           </div>

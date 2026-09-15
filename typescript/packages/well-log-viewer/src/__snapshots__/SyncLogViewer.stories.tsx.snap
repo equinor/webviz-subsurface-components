@@ -934,7 +934,7 @@ exports[`WellLogViewer/Demo/SyncLogViewer Default smoke-test 1`] = `
                           <div class="track-container">
                             <canvas width="296"
                                     height="555"
-                                    style="position: absolute; z-index: -1; width: 296px; height: 555px;"
+                                    style="position: absolute; width: 296px; height: 555px;"
                             >
                             </canvas>
                           </div>
@@ -1012,7 +1012,7 @@ exports[`WellLogViewer/Demo/SyncLogViewer Default smoke-test 1`] = `
                           <div class="track-container">
                             <canvas width="296"
                                     height="555"
-                                    style="position: absolute; z-index: -1; width: 296px; height: 555px;"
+                                    style="position: absolute; width: 296px; height: 555px;"
                             >
                             </canvas>
                           </div>
@@ -1108,7 +1108,7 @@ exports[`WellLogViewer/Demo/SyncLogViewer Default smoke-test 1`] = `
                           <div class="track-container">
                             <canvas width="296"
                                     height="555"
-                                    style="position: absolute; z-index: -1; width: 296px; height: 555px;"
+                                    style="position: absolute; width: 296px; height: 555px;"
                             >
                             </canvas>
                           </div>
@@ -1204,7 +1204,7 @@ exports[`WellLogViewer/Demo/SyncLogViewer Default smoke-test 1`] = `
                           <div class="track-container">
                             <canvas width="0"
                                     height="0"
-                                    style="position: absolute; z-index: -1; width: 0px; height: 0px;"
+                                    style="position: absolute; width: 0px; height: 0px;"
                             >
                             </canvas>
                           </div>
@@ -1284,7 +1284,7 @@ exports[`WellLogViewer/Demo/SyncLogViewer Default smoke-test 1`] = `
                           <div class="track-container">
                             <canvas width="0"
                                     height="0"
-                                    style="position: absolute; z-index: -1; width: 0px; height: 0px;"
+                                    style="position: absolute; width: 0px; height: 0px;"
                             >
                             </canvas>
                           </div>
@@ -1364,7 +1364,7 @@ exports[`WellLogViewer/Demo/SyncLogViewer Default smoke-test 1`] = `
                           <div class="track-container">
                             <canvas width="0"
                                     height="0"
-                                    style="position: absolute; z-index: -1; width: 0px; height: 0px;"
+                                    style="position: absolute; width: 0px; height: 0px;"
                             >
                             </canvas>
                           </div>
@@ -1444,7 +1444,7 @@ exports[`WellLogViewer/Demo/SyncLogViewer Default smoke-test 1`] = `
                           <div class="track-container">
                             <canvas width="0"
                                     height="0"
-                                    style="position: absolute; z-index: -1; width: 0px; height: 0px;"
+                                    style="position: absolute; width: 0px; height: 0px;"
                             >
                             </canvas>
                           </div>
@@ -1524,7 +1524,7 @@ exports[`WellLogViewer/Demo/SyncLogViewer Default smoke-test 1`] = `
                           <div class="track-container">
                             <canvas width="0"
                                     height="0"
-                                    style="position: absolute; z-index: -1; width: 0px; height: 0px;"
+                                    style="position: absolute; width: 0px; height: 0px;"
                             >
                             </canvas>
                           </div>
@@ -1604,7 +1604,7 @@ exports[`WellLogViewer/Demo/SyncLogViewer Default smoke-test 1`] = `
                           <div class="track-container">
                             <canvas width="0"
                                     height="0"
-                                    style="position: absolute; z-index: -1; width: 0px; height: 0px;"
+                                    style="position: absolute; width: 0px; height: 0px;"
                             >
                             </canvas>
                           </div>
@@ -1684,7 +1684,7 @@ exports[`WellLogViewer/Demo/SyncLogViewer Default smoke-test 1`] = `
                           <div class="track-container">
                             <canvas width="0"
                                     height="0"
-                                    style="position: absolute; z-index: -1; width: 0px; height: 0px;"
+                                    style="position: absolute; width: 0px; height: 0px;"
                             >
                             </canvas>
                           </div>
@@ -1764,7 +1764,7 @@ exports[`WellLogViewer/Demo/SyncLogViewer Default smoke-test 1`] = `
                           <div class="track-container">
                             <canvas width="0"
                                     height="0"
-                                    style="position: absolute; z-index: -1; width: 0px; height: 0px;"
+                                    style="position: absolute; width: 0px; height: 0px;"
                             >
                             </canvas>
                           </div>
@@ -53035,7 +53035,7 @@ exports[`WellLogViewer/Demo/SyncLogViewer Empty smoke-test 1`] = `
                           <div class="track-container">
                             <canvas width="942"
                                     height="555"
-                                    style="position: absolute; z-index: -1; width: 942px; height: 555px;"
+                                    style="position: absolute; width: 942px; height: 555px;"
                             >
                             </canvas>
                           </div>
@@ -53808,7 +53808,7 @@ exports[`WellLogViewer/Demo/SyncLogViewer LogsWithDifferentSets smoke-test 1`] =
                           <div class="track-container">
                             <canvas width="177"
                                     height="596"
-                                    style="position: absolute; z-index: -1; width: 177px; height: 596px;"
+                                    style="position: absolute; width: 177px; height: 596px;"
                             >
                             </canvas>
                           </div>
@@ -54729,7 +54729,7 @@ exports[`WellLogViewer/Demo/SyncLogViewer LogsWithDifferentSets smoke-test 1`] =
                           <div class="track-container">
                             <canvas width="355"
                                     height="596"
-                                    style="position: absolute; z-index: -1; width: 355px; height: 596px;"
+                                    style="position: absolute; width: 355px; height: 596px;"
                             >
                             </canvas>
                           </div>
