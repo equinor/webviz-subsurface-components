@@ -5,7 +5,7 @@ import type { Meta, StoryObj } from "@storybook/react-webpack5";
 import { ToggleButton } from "@mui/material";
 
 import { colorTables } from "@emerson-eps/color-tables";
-import { expect, waitFor } from "storybook/test";
+import { expect, fireEvent, userEvent, waitFor } from "storybook/test";
 
 import {
     patternImages,
@@ -559,6 +559,89 @@ export const DiscreteLogs: StoryObj<typeof TemplateWithSelection> = {
     render: (args) => (
         <TemplateWithSelection {...args} wellLogCollections="DiscreteLogs" />
     ),
+};
+
+type ZoomTransform = { k: number; x: number; y: number };
+type ZoomTarget = Element & { __zoom?: ZoomTransform };
+
+function findZoomTarget(scroller: HTMLDivElement): ZoomTarget {
+    const bounds = scroller.getBoundingClientRect();
+    let target = document.elementFromPoint(
+        bounds.left + bounds.width / 2,
+        bounds.top + bounds.height / 2
+    );
+
+    while (target && !("__zoom" in target)) target = target.parentElement;
+
+    if (!target) throw new Error("Well log zoom target was not rendered");
+    return target as ZoomTarget;
+}
+
+export const DiscreteLogsInteraction: StoryObj<typeof TemplateWithSelection> = {
+    args: { ...facies3WellsArgs },
+    render: (args) => (
+        <TemplateWithSelection {...args} wellLogCollections="DiscreteLogs" />
+    ),
+    tags: ["no-dom-test", "interaction-regression"],
+    parameters: {
+        docs: {
+            description: {
+                story: "Verifies that the synchronized viewer keeps wheel zoom and drag panning interactive while native scrolling is enabled.",
+            },
+        },
+    },
+    play: async ({ canvasElement }) => {
+        let scroller: HTMLDivElement | null = null;
+        let zoomTarget: ZoomTarget | undefined;
+
+        await waitFor(() => {
+            scroller = canvasElement.querySelector<HTMLDivElement>(
+                'div[style*="overflow: scroll"]'
+            );
+            if (!scroller)
+                throw new Error("Well log scroller was not rendered");
+            zoomTarget = findZoomTarget(scroller);
+        });
+
+        if (!scroller || !zoomTarget?.__zoom) {
+            throw new Error("Well log zoom target was not ready");
+        }
+
+        const beforeZoom = zoomTarget.__zoom.k;
+        await fireEvent.wheel(zoomTarget, { deltaY: -120 });
+        await waitFor(() => {
+            const zoom = zoomTarget?.__zoom?.k;
+            if (zoom === undefined) throw new Error("Wheel zoom did not run");
+            expect(zoom).toBeGreaterThan(beforeZoom);
+        });
+
+        const beforePan = zoomTarget.__zoom.y;
+        const bounds = zoomTarget.getBoundingClientRect();
+        const startX = bounds.left + bounds.width / 2;
+        const startY = bounds.top + bounds.height / 2;
+        await userEvent.pointer([
+            {
+                target: zoomTarget,
+                coords: { x: startX, y: startY },
+                keys: "[MouseLeft]",
+            },
+            {
+                target: zoomTarget,
+                coords: { x: startX, y: startY + 40 },
+            },
+            {
+                target: zoomTarget,
+                coords: { x: startX, y: startY + 40 },
+                keys: "[/MouseLeft]",
+            },
+        ]);
+
+        await waitFor(() => {
+            const pan = zoomTarget?.__zoom?.y;
+            if (pan === undefined) throw new Error("Track drag did not run");
+            expect(pan).not.toBe(beforePan);
+        });
+    },
 };
 
 export const DiscreteLogsWithWellPicks: StoryObj<typeof TemplateWithSelection> =

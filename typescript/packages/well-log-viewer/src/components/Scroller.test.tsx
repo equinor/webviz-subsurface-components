@@ -37,13 +37,14 @@ describe("Test scroller", () => {
         expect(container.firstChild).toMatchSnapshot();
     });
 
-    it("keeps content below native scrollbars", () => {
+    it("keeps content interactive and reserves native scrollbar space", () => {
         const { container } = render(<Scroller />);
-        const content = (container.firstChild as HTMLDivElement).firstChild
-            ?.firstChild as HTMLDivElement;
+        const scroller = container.firstChild as HTMLDivElement;
+        const content = scroller.firstChild?.firstChild as HTMLDivElement;
 
         expect(content.style.position).toBe("absolute");
-        expect(content.style.zIndex).toBe("-1");
+        expect(content.style.zIndex).toBe("");
+        expect(scroller.className).toBe("well-log-scroller");
     });
 
     it("sizes content to the scroller viewport", () => {

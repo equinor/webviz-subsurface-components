@@ -2,6 +2,8 @@ import type { ReactNode } from "react";
 import type React from "react";
 import { Component } from "react";
 
+import "./Scroller.scss";
+
 export interface ScrollerProps {
     /**
      * callback with new scroll positions
@@ -141,6 +143,7 @@ class Scroller extends Component<ScrollerProps> {
                 ref={(el) => {
                     this.scroller = el as HTMLDivElement;
                 }}
+                className="well-log-scroller"
                 style={{
                     overflow: "scroll",
                     width: "100%",
@@ -160,7 +163,7 @@ class Scroller extends Component<ScrollerProps> {
                         ref={(el) => {
                             this.content = el as HTMLDivElement;
                         }}
-                        style={{ position: "absolute", zIndex: -1 }}
+                        style={{ position: "absolute" }}
                     >
                         {/* TODO: Fix this the next time the file is edited. */}
                         {/* eslint-disable-next-line react/prop-types */}
