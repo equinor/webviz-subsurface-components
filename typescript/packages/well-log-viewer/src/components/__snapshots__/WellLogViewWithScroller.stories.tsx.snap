@@ -8,7 +8,8 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller Default smoke-test 1`]
     >
       <div style="width: 3994px; height: 662px;">
         <div class="well-log-scroller-content"
-             style="position: absolute; width: 1248px; height: 662px;">
+             style="position: absolute; width: 1248px; height: 662px;"
+        >
           <div class="welllogview"
                style="flex-direction: column;"
           >
@@ -1663,7 +1664,8 @@ exports[`WellLogViewer/Components/WellLogViewWithScroller ScrollbarBehavior play
     >
       <div style="width: 3994px; height: 1324px;">
         <div class="well-log-scroller-content"
-             style="position: absolute; width: 1248px; height: 662px;">
+             style="position: absolute; width: 1248px; height: 662px;"
+        >
           <div class="welllogview"
                style="flex-direction: column;"
           >

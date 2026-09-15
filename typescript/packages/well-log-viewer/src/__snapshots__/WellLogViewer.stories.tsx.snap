@@ -11,7 +11,8 @@ exports[`WellLogViewer/Demo/WellLogViewer ColorByFunction smoke-test 1`] = `
           >
             <div style="width: 199px; height: 861px;">
               <div class="well-log-scroller-content"
-                   style="position: absolute; width: 993px; height: 662px;">
+                   style="position: absolute; width: 993px; height: 662px;"
+              >
                 <div class="welllogview"
                      style="flex-direction: column;"
                 >
@@ -1368,7 +1369,8 @@ exports[`WellLogViewer/Demo/WellLogViewer Default smoke-test 1`] = `
           >
             <div style="width: 3178px; height: 662px;">
               <div class="well-log-scroller-content"
-                   style="position: absolute; width: 993px; height: 662px;">
+                   style="position: absolute; width: 993px; height: 662px;"
+              >
                 <div class="welllogview"
                      style="flex-direction: column;"
                 >
@@ -3858,7 +3860,8 @@ exports[`WellLogViewer/Demo/WellLogViewer Discrete smoke-test 1`] = `
           >
             <div style="width: 1589px; height: 662px;">
               <div class="well-log-scroller-content"
-                   style="position: absolute; width: 993px; height: 662px;">
+                   style="position: absolute; width: 993px; height: 662px;"
+              >
                 <div class="welllogview"
                      style="flex-direction: column;"
                 >
@@ -7866,7 +7869,8 @@ exports[`WellLogViewer/Demo/WellLogViewer Empty smoke-test 1`] = `
           >
             <div style="width: 199px; height: 662px;">
               <div class="well-log-scroller-content"
-                   style="position: absolute; width: 993px; height: 662px;">
+                   style="position: absolute; width: 993px; height: 662px;"
+              >
                 <div class="welllogview"
                      style="flex-direction: column;"
                 >
@@ -8465,7 +8469,8 @@ exports[`WellLogViewer/Demo/WellLogViewer LogWithDifferentSets smoke-test 1`] = 
           >
             <div style="width: 596px; height: 662px;">
               <div class="well-log-scroller-content"
-                   style="position: absolute; width: 993px; height: 662px;">
+                   style="position: absolute; width: 993px; height: 662px;"
+              >
                 <div class="welllogview"
                      style="flex-direction: column;"
                 >
@@ -9370,7 +9375,8 @@ exports[`WellLogViewer/Demo/WellLogViewer LogsWithUndefined smoke-test 1`] = `
           >
             <div style="width: 596px; height: 662px;">
               <div class="well-log-scroller-content"
-                   style="position: absolute; width: 993px; height: 662px;">
+                   style="position: absolute; width: 993px; height: 662px;"
+              >
                 <div class="welllogview"
                      style="flex-direction: column;"
                 >
@@ -10276,7 +10282,8 @@ exports[`WellLogViewer/Demo/WellLogViewer OnInfoFilledEvent smoke-test 1`] = `
             >
               <div style="width: 1248px; height: 1324px;">
                 <div class="well-log-scroller-content"
-                     style="position: absolute; width: 1248px; height: 662px;">
+                     style="position: absolute; width: 1248px; height: 662px;"
+                >
                   <div class="welllogview"
                        style="flex-direction: row;"
                   >
@@ -11534,7 +11541,8 @@ exports[`WellLogViewer/Demo/WellLogViewer TrackTitleTooltip play-test 1`] = `
           >
             <div style="width: 397px; height: 662px;">
               <div class="well-log-scroller-content"
-                   style="position: absolute; width: 993px; height: 662px;">
+                   style="position: absolute; width: 993px; height: 662px;"
+              >
                 <div class="welllogview"
                      style="flex-direction: column;"
                 >
@@ -12351,7 +12359,8 @@ exports[`WellLogViewer/Demo/WellLogViewer Undefined smoke-test 1`] = `
           >
             <div style="width: 199px; height: 662px;">
               <div class="well-log-scroller-content"
-                   style="position: absolute; width: 993px; height: 662px;">
+                   style="position: absolute; width: 993px; height: 662px;"
+              >
                 <div class="welllogview"
                      style="flex-direction: column;"
                 >
@@ -12950,7 +12959,8 @@ exports[`WellLogViewer/Demo/WellLogViewer WellPickLabelWithCustomFormatter smoke
           >
             <div style="width: 3178px; height: 861px;">
               <div class="well-log-scroller-content"
-                   style="position: absolute; width: 993px; height: 662px;">
+                   style="position: absolute; width: 993px; height: 662px;"
+              >
                 <div class="welllogview"
                      style="flex-direction: column;"
                 >
