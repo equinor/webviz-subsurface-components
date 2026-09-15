@@ -5,6 +5,7 @@ import type { Meta, StoryObj } from "@storybook/react-webpack5";
 import { ToggleButton } from "@mui/material";
 
 import { colorTables } from "@emerson-eps/color-tables";
+import { expect, waitFor } from "storybook/test";
 
 import {
     patternImages,
@@ -169,6 +170,7 @@ type SyncLogViewerPropsWrapper = Omit<
 };
 
 const Template = (args: SyncLogViewerPropsWrapper) => {
+    const { onCreateController: onCreateControllerProp } = args;
     const infoRef = React.useRef<HTMLDivElement | null>(null);
     const setInfo = function (info: string): void {
         if (infoRef.current) infoRef.current.innerHTML = info;
@@ -179,10 +181,11 @@ const Template = (args: SyncLogViewerPropsWrapper) => {
     ); // all WellLogs
 
     const onCreateController = React.useCallback(
-        (_iWellLog: number, controller: WellLogController): void => {
+        (iWellLog: number, controller: WellLogController): void => {
             setControllers((prev) => [...prev, controller]);
+            onCreateControllerProp?.(iWellLog, controller);
         },
-        []
+        [onCreateControllerProp]
     );
     const onDeleteController = React.useCallback(
         (_iWellLog: number, controller: WellLogController): void => {
@@ -332,6 +335,63 @@ export const Default: StoryObj<typeof Template> = {
     // into a stably-wrong state a longer wait cannot fix - only a fresh
     // mount can. See test-runner.ts's forceRemount doc comment.
     tags: ["remount-every-retry"],
+};
+
+export const ScrollbarBehavior: StoryObj<typeof Template> = {
+    args: {
+        ...Default.args,
+        onCreateController: (
+            _iWellLog: number,
+            controller: WellLogController
+        ): void => {
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => controller.zoomContent(2));
+            });
+        },
+    },
+    render: (args) => <Template {...args} wellLogCollections="Default" />,
+    tags: ["sync-scrollbar-test"],
+    parameters: {
+        docs: {
+            description: {
+                story: "Uses the synchronized well log viewer with content zoom to exercise horizontal and vertical scrolling.",
+            },
+        },
+    },
+    play: async ({ canvasElement }) => {
+        const getScrollers = (): HTMLDivElement[] =>
+            Array.from(
+                canvasElement.querySelectorAll<HTMLDivElement>(
+                    'div[style*="overflow: scroll"]'
+                )
+            );
+
+        await waitFor(() => {
+            const scrollers = getScrollers();
+            expect(scrollers).not.toHaveLength(0);
+            for (const scroller of scrollers) {
+                expect(scroller.scrollWidth).toBeGreaterThan(
+                    scroller.clientWidth
+                );
+                expect(scroller.scrollHeight).toBeGreaterThan(
+                    scroller.clientHeight
+                );
+            }
+        });
+
+        const scrollers = getScrollers();
+        for (const scroller of scrollers) {
+            scroller.scrollLeft = scroller.scrollWidth - scroller.clientWidth;
+            scroller.scrollTop = scroller.scrollHeight - scroller.clientHeight;
+        }
+
+        await waitFor(() => {
+            for (const scroller of scrollers) {
+                expect(scroller.scrollLeft).toBeGreaterThan(0);
+                expect(scroller.scrollTop).toBeGreaterThan(0);
+            }
+        });
+    },
 };
 
 export const Empty: StoryObj<typeof Template> = {
