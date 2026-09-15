@@ -9,7 +9,7 @@ exports[`WellLogViewer/Demo/ExampleData TwoLogs smoke-test 1`] = `
           <div style="height: 0%; flex: 1 1 0%; display: flex; flex-direction: row;">
             <div style="overflow: scroll; width: 100%; height: 100%; min-width: 0px; min-height: 0px; scrollbar-color: gray transparent;">
               <div style="width: 662px; height: 662px;">
-                <div style="position: absolute; width: 993px; height: 662px;">
+                <div style="position: absolute; z-index: -1; width: 993px; height: 662px;">
                   <div class="welllogview"
                        style="flex-direction: column;"
                   >
@@ -473,7 +473,7 @@ exports[`WellLogViewer/Demo/ExampleData TwoLogs smoke-test 1`] = `
                           <div class="track-container">
                             <canvas width="470.5"
                                     height="576"
-                                    style="position: absolute; width: 470.5px; height: 576px;"
+                                    style="position: absolute; z-index: -1; width: 470.5px; height: 576px;"
                             >
                             </canvas>
                           </div>
@@ -560,7 +560,7 @@ exports[`WellLogViewer/Demo/ExampleData TwoLogs smoke-test 1`] = `
                           <div class="track-container">
                             <canvas width="470.5"
                                     height="576"
-                                    style="position: absolute; width: 470.5px; height: 576px;"
+                                    style="position: absolute; z-index: -1; width: 470.5px; height: 576px;"
                             >
                             </canvas>
                           </div>

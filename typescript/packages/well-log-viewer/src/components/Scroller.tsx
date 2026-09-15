@@ -160,7 +160,7 @@ class Scroller extends Component<ScrollerProps> {
                         ref={(el) => {
                             this.content = el as HTMLDivElement;
                         }}
-                        style={{ position: "absolute" }}
+                        style={{ position: "absolute", zIndex: -1 }}
                     >
                         {/* TODO: Fix this the next time the file is edited. */}
                         {/* eslint-disable-next-line react/prop-types */}

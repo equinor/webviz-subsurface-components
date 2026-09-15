@@ -37,6 +37,15 @@ describe("Test scroller", () => {
         expect(container.firstChild).toMatchSnapshot();
     });
 
+    it("keeps content below native scrollbars", () => {
+        const { container } = render(<Scroller />);
+        const content = (container.firstChild as HTMLDivElement).firstChild
+            ?.firstChild as HTMLDivElement;
+
+        expect(content.style.position).toBe("absolute");
+        expect(content.style.zIndex).toBe("-1");
+    });
+
     it("sizes content to the scroller viewport", () => {
         const { container } = render(<Scroller />);
         const scroller = container.firstChild as HTMLDivElement;
