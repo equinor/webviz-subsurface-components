@@ -44,6 +44,7 @@ describe("Test scroller", () => {
 
         expect(content.style.position).toBe("absolute");
         expect(content.style.zIndex).toBe("");
+        expect(content.className).toBe("well-log-scroller-content");
         expect(scroller.className).toBe("well-log-scroller");
     });
 

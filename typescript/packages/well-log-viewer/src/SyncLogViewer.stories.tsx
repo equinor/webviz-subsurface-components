@@ -380,6 +380,16 @@ export const ScrollbarBehavior: StoryObj<typeof Template> = {
         });
 
         const scrollers = getScrollers();
+        if (CSS.supports("(-moz-appearance: none)")) {
+            for (const scroller of scrollers) {
+                const content = scroller.firstElementChild?.firstElementChild;
+                expect(content).toHaveClass("well-log-scroller-content");
+                expect(content && getComputedStyle(content).clipPath).not.toBe(
+                    "none"
+                );
+            }
+        }
+
         for (const scroller of scrollers) {
             scroller.scrollLeft = scroller.scrollWidth - scroller.clientWidth;
             scroller.scrollTop = scroller.scrollHeight - scroller.clientHeight;

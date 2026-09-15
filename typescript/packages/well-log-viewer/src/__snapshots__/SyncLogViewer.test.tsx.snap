@@ -21,6 +21,7 @@ exports[`Sync Log Viewer snapshot test 1`] = `
             style="width: 0px; height: 0px;"
           >
             <div
+              class="well-log-scroller-content"
               style="position: absolute;"
             >
               <div

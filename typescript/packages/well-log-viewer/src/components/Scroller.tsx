@@ -163,6 +163,7 @@ class Scroller extends Component<ScrollerProps> {
                         ref={(el) => {
                             this.content = el as HTMLDivElement;
                         }}
+                        className="well-log-scroller-content"
                         style={{ position: "absolute" }}
                     >
                         {/* TODO: Fix this the next time the file is edited. */}
