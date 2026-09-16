@@ -5,7 +5,7 @@ import type { Meta, StoryObj } from "@storybook/react-webpack5";
 import { ToggleButton } from "@mui/material";
 
 import { colorTables } from "@emerson-eps/color-tables";
-import { expect, fireEvent, userEvent, waitFor } from "storybook/test";
+import { expect, fireEvent, waitFor } from "storybook/test";
 
 import {
     patternImages,
@@ -629,22 +629,25 @@ export const DiscreteLogsInteraction: StoryObj<typeof TemplateWithSelection> = {
         const bounds = zoomTarget.getBoundingClientRect();
         const startX = bounds.left + bounds.width / 2;
         const startY = bounds.top + bounds.height / 2;
-        await userEvent.pointer([
-            {
-                target: zoomTarget,
-                coords: { x: startX, y: startY },
-                keys: "[MouseLeft]",
-            },
-            {
-                target: zoomTarget,
-                coords: { x: startX, y: startY + 40 },
-            },
-            {
-                target: zoomTarget,
-                coords: { x: startX, y: startY + 40 },
-                keys: "[/MouseLeft]",
-            },
-        ]);
+        fireEvent.mouseDown(zoomTarget, {
+            button: 0,
+            buttons: 1,
+            clientX: startX,
+            clientY: startY,
+            view: window,
+        });
+        fireEvent.mouseMove(document, {
+            buttons: 1,
+            clientX: startX,
+            clientY: startY + 40,
+            view: window,
+        });
+        fireEvent.mouseUp(document, {
+            button: 0,
+            clientX: startX,
+            clientY: startY + 40,
+            view: window,
+        });
 
         await waitFor(() => {
             const pan = zoomTarget?.__zoom?.y;
