@@ -27,8 +27,6 @@ import { makeFullMesh } from "./webworker";
 import workerpool from "workerpool";
 import type { RGBColor } from "../../utils";
 
-export type TTypedIntegerArray = Uint16Array;
-
 const DEFAULT_DISCRETE_UNDEFINED_VALUE = 0xffff;
 
 // init workerpool
@@ -57,7 +55,7 @@ type PropertyInput =
     | string
     | Array<number | undefined>
     | Float32Array
-    | TTypedIntegerArray;
+    | Uint16Array;
 
 export function getUndefinedValueProperties(
     propertiesData: PropertyInput | undefined,
@@ -75,7 +73,7 @@ export function getUndefinedValueProperties(
 export function normalizeDiscreteProperties(
     propertiesData: PropertyInput,
     undefinedPropertyValue: number
-): string | number[] | Float32Array | TTypedIntegerArray {
+): string | number[] | Float32Array | Uint16Array {
     if (
         typeof propertiesData === "string" ||
         propertiesData instanceof Uint16Array
@@ -128,7 +126,7 @@ type Frame = {
 
 export type Params = [
     meshData: Float32Array | null,
-    propertiesData: Float32Array | TTypedIntegerArray | null,
+    propertiesData: Float32Array | Uint16Array | null,
     isMesh: boolean,
     frame: Frame,
     smoothShading: boolean,
@@ -210,7 +208,7 @@ export interface MapLayerProps extends ExtendedLayerProps {
         | string
         | Array<number | undefined>
         | Float32Array
-        | TTypedIntegerArray
+        | Uint16Array
         | undefined;
 
     /**
@@ -607,7 +605,7 @@ export default class MapLayer<
 
     private getWebworkerParams(
         meshData: Float32Array | null,
-        propertiesData: Float32Array | TTypedIntegerArray
+        propertiesData: Float32Array | Uint16Array
     ): { params: Params; transferrables?: Transferable[] } {
         if (!meshData && !propertiesData) {
             throw new Error(
@@ -618,7 +616,7 @@ export default class MapLayer<
         const undefinedPropertyValue =
             this.props.undefinedPropertyValue ??
             getUndefinedValueProperties(
-                propertiesData as Float32Array | TTypedIntegerArray,
+                propertiesData as Float32Array | Uint16Array,
                 this.isPropertiesCategorical()
             );
 

@@ -34,10 +34,7 @@ import fsDiscrete from "./map_discrete.fs.glsl";
 import vsDiscrete from "./map_discrete.vs.glsl";
 import fsLineShader from "./line.fs.glsl";
 import vsLineShader from "./line.vs.glsl";
-import type {
-    IDiscretePropertyValueName,
-    TTypedIntegerArray,
-} from "./mapLayer";
+import type { IDiscretePropertyValueName } from "./mapLayer";
 
 interface IColormapTextureHints {
     discreteData: boolean;
@@ -48,7 +45,7 @@ export interface PrivateMapLayerProps extends ExtendedLayerProps {
     positions: Float32Array;
     normals: Float32Array;
     triangleIndices: Uint32Array;
-    vertexProperties: Float32Array | TTypedIntegerArray;
+    vertexProperties: Float32Array | Uint16Array;
     vertexIndices: Int32Array;
     lineIndices: Uint32Array;
     contours: [number, number];
