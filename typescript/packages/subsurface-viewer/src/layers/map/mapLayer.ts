@@ -27,7 +27,9 @@ import { makeFullMesh } from "./webworker";
 import workerpool from "workerpool";
 import type { RGBColor } from "../../utils";
 
-export type TTypedIntegerArray = Uint32Array | Uint16Array;
+export type TTypedIntegerArray = Uint16Array;
+
+const DEFAULT_DISCRETE_UNDEFINED_VALUE = 0xffff;
 
 // init workerpool
 const workerPoolConfig = findConfig(
@@ -51,28 +53,54 @@ function onTerminateWorker() {
     }
 }
 
-function getUndefinedValueProperties(
-    propertiesData:
-        | string
-        | number[]
-        | Float32Array
-        | TTypedIntegerArray
-        | undefined,
+type PropertyInput =
+    | string
+    | Array<number | undefined>
+    | Float32Array
+    | TTypedIntegerArray;
+
+export function getUndefinedValueProperties(
+    propertiesData: PropertyInput | undefined,
     isPropertiesDiscrete: boolean
 ): number | undefined {
     if (propertiesData instanceof Float32Array) {
-        return NaN;
+        return isPropertiesDiscrete ? DEFAULT_DISCRETE_UNDEFINED_VALUE : NaN;
     }
-    if (propertiesData instanceof Uint16Array) {
-        return 0xffff;
-    }
-    if (propertiesData instanceof Uint32Array) {
-        return 0xffffffff;
-    }
-    if (isPropertiesDiscrete) {
-        return 0x7fffffff;
+    if (propertiesData instanceof Uint16Array || isPropertiesDiscrete) {
+        return DEFAULT_DISCRETE_UNDEFINED_VALUE;
     }
     return undefined;
+}
+
+export function normalizeDiscreteProperties(
+    propertiesData: PropertyInput,
+    undefinedPropertyValue: number
+): string | number[] | Float32Array | TTypedIntegerArray {
+    if (
+        typeof propertiesData === "string" ||
+        propertiesData instanceof Uint16Array
+    ) {
+        return propertiesData;
+    }
+    if (propertiesData instanceof Float32Array) {
+        return propertiesData;
+    }
+    return propertiesData.map((value) => value ?? undefinedPropertyValue);
+}
+
+function normalizeContinuousProperties(
+    propertiesData: PropertyInput
+): string | number[] | Float32Array {
+    if (
+        typeof propertiesData === "string" ||
+        propertiesData instanceof Float32Array
+    ) {
+        return propertiesData;
+    }
+    if (propertiesData instanceof Uint16Array) {
+        return Array.from(propertiesData);
+    }
+    return propertiesData.map((value) => value ?? NaN);
 }
 
 // This type describes the mesh' extent in the horizontal plane.
@@ -121,43 +149,27 @@ export interface IDiscretePropertyValueName {
  */
 async function loadMeshAndProperties(
     meshData: string | number[] | Float32Array,
-    propertiesData: string | number[] | Float32Array | TTypedIntegerArray,
-    isPropertiesDiscrete: boolean = false
+    propertiesData: PropertyInput,
+    isPropertiesDiscrete: boolean = false,
+    undefinedPropertyValue: number = DEFAULT_DISCRETE_UNDEFINED_VALUE
 ) {
     // Keep
     //const t0 = performance.now();
 
     const mesh = await loadDataArray(meshData, Float32Array);
 
-    let properties = undefined;
-    if (isPropertiesDiscrete && typeof propertiesData !== "string") {
-        switch (true) {
-            case propertiesData instanceof Uint16Array: {
-                // Replace undefined values with defaultValue of Uint16Array
-                // If not, undefined values will be converted to 0 in "loadDataArray"
-                const defaultValue = 0xffff;
-                for (let i = 0; i < propertiesData.length; i++) {
-                    if (propertiesData[i] === undefined) {
-                        propertiesData[i] = defaultValue;
-                    }
-                }
-                properties = await loadDataArray(propertiesData, Uint16Array);
-                break;
-            }
-            default: {
-                const defaultValue = 0xffffffff;
-                for (let i = 0; i < propertiesData.length; i++) {
-                    if (propertiesData[i] === undefined) {
-                        propertiesData[i] = defaultValue;
-                    }
-                }
-                properties = await loadDataArray(propertiesData, Uint32Array);
-                break;
-            }
-        }
-    } else {
-        properties = await loadDataArray(propertiesData, Float32Array);
-    }
+    const properties = isPropertiesDiscrete
+        ? await loadDataArray(
+              normalizeDiscreteProperties(
+                  propertiesData,
+                  undefinedPropertyValue
+              ),
+              Uint16Array
+          )
+        : await loadDataArray(
+              normalizeContinuousProperties(propertiesData),
+              Float32Array
+          );
 
     // Keep this.
     // const t1 = performance.now();
@@ -188,15 +200,15 @@ export interface MapLayerProps extends ExtendedLayerProps {
      * If the number of property values equals one less than the depth values in
      * each direction then the property values will be pr cell and the cell will be constant
      * colored.
-     * Undefined value for discrete (Uint16Array) input is 0xFFFF.
-     * Undefined value for discrete (Uint32Array) input is 0xFFFFFFFF.
+     * Undefined value for discrete Uint16Array input defaults to 0xFFFF.
      * For float input (Float32Array) it is NaN.
-     * For number array use "undefined".
+     * For number arrays, undefined values are replaced with the configured
+     * undefinedPropertyValue, or 0xFFFF by default in discrete mode.
      */
     propertiesUrl: string; // Deprecated
     propertiesData:
         | string
-        | number[]
+        | Array<number | undefined>
         | Float32Array
         | TTypedIntegerArray
         | undefined;
@@ -218,7 +230,6 @@ export interface MapLayerProps extends ExtendedLayerProps {
      * By default these are:
      * - Float32Array: NaN
      * - Uint16Array: 0xFFFF
-     * - Uint32Array: 0xFFFFFFFF
      */
     undefinedPropertyValue?: number;
 
@@ -335,10 +346,7 @@ export default class MapLayer<
         const propertiesData =
             this.props.propertiesData ?? this.props.propertiesUrl;
         return (
-            propertiesData instanceof Uint32Array ||
             propertiesData instanceof Uint16Array ||
-            propertiesData instanceof Int16Array ||
-            propertiesData instanceof Int32Array ||
             typeof this.props.discretePropertyValueNames !== "undefined"
         );
     }
@@ -357,10 +365,18 @@ export default class MapLayer<
             this.props.propertiesData ?? this.props.propertiesUrl;
 
         const isPropertiesCategorical = this.isPropertiesCategorical();
+        const undefinedPropertyValue =
+            this.props.undefinedPropertyValue ??
+            getUndefinedValueProperties(
+                propertiesData,
+                isPropertiesCategorical
+            ) ??
+            DEFAULT_DISCRETE_UNDEFINED_VALUE;
         const p = loadMeshAndProperties(
             meshData,
             propertiesData,
-            isPropertiesCategorical
+            isPropertiesCategorical,
+            undefinedPropertyValue
         );
 
         p.then(([meshData, propertiesData]) => {
@@ -553,7 +569,7 @@ export default class MapLayer<
         const undefinedPropertyValue =
             this.props.undefinedPropertyValue ??
             getUndefinedValueProperties(
-                this.props.propertiesData,
+                this.props.propertiesData ?? this.props.propertiesUrl,
                 this.isPropertiesCategorical()
             );
 
@@ -613,7 +629,7 @@ export default class MapLayer<
             this.props.frame,
             this.props.smoothShading,
             this.props.gridLines,
-            undefinedPropertyValue as number,
+            undefinedPropertyValue ?? DEFAULT_DISCRETE_UNDEFINED_VALUE,
         ];
         const transferrables = [
             meshData?.buffer,

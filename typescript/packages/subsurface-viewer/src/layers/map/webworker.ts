@@ -25,8 +25,8 @@ export function makeFullMesh(e: { data: Params }) {
         data: TypedArray,
         isDiscrete: boolean = false
     ): [number, number] {
-        let max = -99999999;
-        let min = 99999999;
+        let max = -Infinity;
+        let min = Infinity;
         for (let i = 0; i < data.length; i++) {
             if (!isDefined(data[i], isDiscrete)) {
                 continue;
@@ -34,7 +34,7 @@ export function makeFullMesh(e: { data: Params }) {
             max = data[i] > max ? data[i] : max;
             min = data[i] < min ? data[i] : min;
         }
-        return [min, max];
+        return min === Infinity ? [0, 0] : [min, max];
     }
 
     function crossProduct(a: Vec, b: Vec): Vec {
@@ -158,9 +158,8 @@ export function makeFullMesh(e: { data: Params }) {
         ? inputPropertiesData
         : meshData;
 
-    const isUint32 = propertiesData instanceof Uint32Array;
     const isUint16 = propertiesData instanceof Uint16Array;
-    const isDiscrete = isUint32 || isUint16;
+    const isDiscrete = isUint16;
 
     // non mesh grids use z = 0 (see below)
     const meshZValueRange = isMesh ? getArrayMinMax(meshData) : [0, 0];
@@ -198,10 +197,8 @@ export function makeFullMesh(e: { data: Params }) {
     const triangleIndices = new Uint32Array(nTriangles * 3);
 
     const n = isCellCenteredProperties ? nCells * 6 : nNodes;
-    let vertexProperties: Uint32Array | Uint16Array | Float32Array;
-    if (isDiscrete && isUint32) {
-        vertexProperties = new Uint32Array(n);
-    } else if (isDiscrete) {
+    let vertexProperties: Uint16Array | Float32Array;
+    if (isDiscrete) {
         vertexProperties = new Uint16Array(n);
     } else {
         vertexProperties = new Float32Array(n);
@@ -559,7 +556,7 @@ export function makeFullMesh(e: { data: Params }) {
         Float32Array,
         Float32Array,
         Uint32Array,
-        Float32Array | Uint32Array | Uint16Array,
+        Float32Array | Uint16Array,
         Uint32Array,
         number[],
         number[],

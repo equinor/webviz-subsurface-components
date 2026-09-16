@@ -187,7 +187,7 @@ const categoricalPropertiesLayer = {
     id: "categorical-layer",
 
     /*eslint-disable */
-    // One depth pr node
+    // One depth per node
     meshData: [
         1.6, 1.7, 1.8, 1.9, 1.2, 1.3, 1.4, 1.5, 0.8, 0.9, 1.0, 1.1, 0.4, 0.5,
         0.6, 0.7, 0.0, 0.1, 0.2, 0.3,
@@ -195,7 +195,7 @@ const categoricalPropertiesLayer = {
 
     undefinedPropertyValue: 999,
 
-    // One property pr cell.
+    // One property per cell.
     propertiesData: [
          0,
          1,
@@ -217,7 +217,7 @@ const categoricalPropertiesLayer = {
         { code: 2, name: "Two" }, 
         { code: 3, name: "Three" }, 
         { code: 4, name: "Four" }, 
-        { code: 5, name: "Five", color: [255, 255, 0] }, // explicit color overrides colortable/colorfunction.
+        { code: 5, name: "Five", color: [255, 255, 0] }, // Explicit color overrides the color table and color function.
         { code: 6, name: "Six" }, 
         { code: 7, name: "Seven" }, 
         { code: 8, name: "Eight" }, 
@@ -470,7 +470,7 @@ export const CellCenteredPropMap: StoryObj<typeof SubsurfaceViewer> = {
         docs: {
             ...defaultStoryParameters.docs,
             description: {
-                story: "A small map with properties given at cell centers. Each cell will be constant colored",
+                story: "A small map with cell-centered properties. Each cell is rendered with a constant color.",
             },
         },
     },
@@ -487,7 +487,7 @@ export const CategoricalPropMap: StoryObj<typeof SubsurfaceViewer> = {
         docs: {
             ...defaultStoryParameters.docs,
             description: {
-                story: "A small map with properties given at cell centers. Each cell will be constant colored",
+                story: "A small map with cell-centered properties. Each cell is rendered with a constant color.",
             },
         },
     },

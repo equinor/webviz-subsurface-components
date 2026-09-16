@@ -119,18 +119,29 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
         if (this.props.colormapFunction instanceof Uint8Array) {
             return {
                 discreteData: true,
-                colormapSize: this.props.colormapFunction.length / 3,
+                colormapSize: Math.max(
+                    this.props.colormapFunction.length / 3,
+                    1
+                ),
             };
         }
         if (
-            this.props.vertexProperties instanceof Uint32Array ||
             this.props.vertexProperties instanceof Uint16Array ||
             typeof this.props.discretePropertyValueNames !== "undefined"
         ) {
+            const namedPropertyCount =
+                this.props.discretePropertyValueNames?.length;
+            const maxPropertyValue = Number.isFinite(
+                this.props.propertyValueRange[1]
+            )
+                ? Math.max(0, Math.floor(this.props.propertyValueRange[1]))
+                : 0;
             return {
                 discreteData: true,
                 colormapSize:
-                    this.props.discretePropertyValueNames?.length ?? 0,
+                    namedPropertyCount && namedPropertyCount > 0
+                        ? namedPropertyCount
+                        : Math.max(maxPropertyValue + 1, 1),
             };
         }
         return {
@@ -163,20 +174,31 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
         const vertexColors = new Float32Array(length * 3);
         for (let i = 0; i < length; i++) {
             const property = this.props.vertexProperties[i];
-
-            const index = codeToIndex.get(property) ?? -1;
-            let color = entries?.[index]?.color; // Use this color if set.
+            let index = -1;
+            if (entries.length > 0) {
+                index = codeToIndex.get(property) ?? -1;
+            } else if (Number.isInteger(property)) {
+                index = property;
+            }
+            let color =
+                property === this.props.undefinedPropertyValue
+                    ? undefined
+                    : entries[index]?.color;
 
             if (typeof color === "undefined") {
                 if (
-                    index !== -1 &&
+                    index >= 0 &&
                     property !== this.props.undefinedPropertyValue
                 ) {
-                    const i = index % colormapSize;
+                    const colorIndex = index % colormapSize;
+                    const colorOffset = colorIndex * 3;
                     color = [
-                        colors[i * 3 + 0],
-                        colors[i * 3 + 1],
-                        colors[i * 3 + 2],
+                        colors[colorOffset] ??
+                            this.props.undefinedPropertyColor[0],
+                        colors[colorOffset + 1] ??
+                            this.props.undefinedPropertyColor[1],
+                        colors[colorOffset + 2] ??
+                            this.props.undefinedPropertyColor[2],
                     ];
                 } else {
                     color = this.props.undefinedPropertyColor;
@@ -230,10 +252,7 @@ export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
     }
 
     isPropertiesCategorical(): boolean {
-        return (
-            this.getColoringHints().discreteData &&
-            typeof this.props.discretePropertyValueNames !== "undefined"
-        );
+        return this.getColoringHints().discreteData;
     }
 
     getContinuousPropModel() {

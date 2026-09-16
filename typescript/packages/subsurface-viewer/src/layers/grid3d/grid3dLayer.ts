@@ -71,12 +71,7 @@ function GetBBox(points: Float32Array): BoundingBox3D {
     return [xmin, ymin, zmin, xmax, ymax, zmax];
 }
 
-type TTypedArray =
-    | Float32Array
-    | Uint16Array
-    | Int32Array
-    | Uint32Array
-    | Int16Array;
+type TTypedArray = Float32Array | Uint32Array | Uint16Array;
 
 async function loadData<T extends TTypedArray>(
     data: string | number[] | TTypedArray,

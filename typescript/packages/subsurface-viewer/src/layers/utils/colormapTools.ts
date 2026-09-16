@@ -91,8 +91,8 @@ export function getImageData(
     type funcType = (x: number) => Color;
 
     if (colormapDef instanceof Uint8Array) {
-        // If colormapProps is a Uint8Array, return it directly
-        return colormapDef;
+        // If colormapProps is a Uint8Array, return it directly.
+        return colormapDef.length > 0 ? colormapDef : new Uint8Array([0, 0, 0]);
     }
 
     const isFunctionDefined = colormapDef !== undefined;
@@ -163,29 +163,17 @@ export function createColormapTexture(
     };
 
     if (colormapHints.discreteData) {
-        if (colormapHints.colormapSize === 0) {
-            const colormapTexture = context.device.createTexture({
-                ...textureProps,
-                sampler: DISCRETE_TEXTURE_PARAMETERS,
-                width: colormapHints.colormapSize,
-                data: new Uint8Array([0, 0, 0, 0, 0, 0]),
-            });
-            return colormapTexture;
-        }
-
-        const colormapData =
-            colormap instanceof Uint8Array
-                ? colormap
-                : getImageData(
-                      colormap,
-                      colormapHints.colormapSize,
-                      colormapHints.discreteData
-                  );
+        const colormapSize = Math.max(colormapHints.colormapSize, 1);
+        const colormapData = getImageData(
+            colormap,
+            colormapSize,
+            colormapHints.discreteData
+        );
 
         const colormapTexture = context.device.createTexture({
             ...textureProps,
             sampler: DISCRETE_TEXTURE_PARAMETERS,
-            width: colormapHints.colormapSize,
+            width: colormapSize,
             data: colormapData,
         });
 
@@ -206,18 +194,12 @@ export function getColormapDiscreteColors(
     colormapHints: IColormapHints
 ): Uint8Array {
     if (colormapHints.discreteData) {
-        if (colormapHints.colormapSize === 0) {
-            return new Uint8Array([0, 0, 0]);
-        }
-
-        const colormapData =
-            colormap instanceof Uint8Array
-                ? colormap
-                : getImageData(
-                      colormap,
-                      colormapHints.colormapSize,
-                      colormapHints.discreteData
-                  );
+        const colormapSize = Math.max(colormapHints.colormapSize, 1);
+        const colormapData = getImageData(
+            colormap,
+            colormapSize,
+            colormapHints.discreteData
+        );
         return colormapData;
     }
 
