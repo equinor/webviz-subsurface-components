@@ -25,6 +25,9 @@ import { rotate } from "./utils";
 import { makeFullMesh } from "./webworker";
 
 import workerpool from "workerpool";
+import type { RGBColor } from "../../utils";
+
+const DEFAULT_DISCRETE_UNDEFINED_VALUE = 0xffff;
 
 // init workerpool
 const workerPoolConfig = findConfig(
@@ -46,6 +49,56 @@ function onTerminateWorker() {
     if (stats.busyWorkers === 0 && stats.pendingTasks === 0) {
         pool.terminate();
     }
+}
+
+type PropertyInput =
+    | string
+    | Array<number | undefined>
+    | Float32Array
+    | Uint16Array;
+
+export function getUndefinedValueProperties(
+    propertiesData: PropertyInput | undefined,
+    isPropertiesDiscrete: boolean
+): number | undefined {
+    if (propertiesData instanceof Float32Array) {
+        return isPropertiesDiscrete ? DEFAULT_DISCRETE_UNDEFINED_VALUE : NaN;
+    }
+    if (propertiesData instanceof Uint16Array || isPropertiesDiscrete) {
+        return DEFAULT_DISCRETE_UNDEFINED_VALUE;
+    }
+    return undefined;
+}
+
+export function normalizeDiscreteProperties(
+    propertiesData: PropertyInput,
+    undefinedPropertyValue: number
+): string | number[] | Float32Array | Uint16Array {
+    if (
+        typeof propertiesData === "string" ||
+        propertiesData instanceof Uint16Array
+    ) {
+        return propertiesData;
+    }
+    if (propertiesData instanceof Float32Array) {
+        return propertiesData;
+    }
+    return propertiesData.map((value) => value ?? undefinedPropertyValue);
+}
+
+function normalizeContinuousProperties(
+    propertiesData: PropertyInput
+): string | number[] | Float32Array {
+    if (
+        typeof propertiesData === "string" ||
+        propertiesData instanceof Float32Array
+    ) {
+        return propertiesData;
+    }
+    if (propertiesData instanceof Uint16Array) {
+        return Array.from(propertiesData);
+    }
+    return propertiesData.map((value) => value ?? NaN);
 }
 
 // This type describes the mesh' extent in the horizontal plane.
@@ -73,12 +126,19 @@ type Frame = {
 
 export type Params = [
     meshData: Float32Array | null,
-    propertiesData: Float32Array | null,
+    propertiesData: Float32Array | Uint16Array | null,
     isMesh: boolean,
     frame: Frame,
     smoothShading: boolean,
     gridLines: boolean,
+    undefinedPropertyValue: number,
 ];
+
+export interface IDiscretePropertyValueName {
+    code: number;
+    name?: string;
+    color?: RGBColor;
+}
 
 /**
  * Will load data for the mesh and the properties. Both of which may be given as arrays (javascript or typed)
@@ -87,17 +147,27 @@ export type Params = [
  */
 async function loadMeshAndProperties(
     meshData: string | number[] | Float32Array,
-    propertiesData: string | number[] | Float32Array
+    propertiesData: PropertyInput,
+    isPropertiesDiscrete: boolean = false,
+    undefinedPropertyValue: number = DEFAULT_DISCRETE_UNDEFINED_VALUE
 ) {
     // Keep
     //const t0 = performance.now();
 
     const mesh = await loadDataArray(meshData, Float32Array);
-    const properties = await loadDataArray(propertiesData, Float32Array);
 
-    // if (!isMesh && !isProperties) {
-    //     console.error("Error. One or both of texture and mesh must be given!");
-    // }
+    const properties = isPropertiesDiscrete
+        ? await loadDataArray(
+              normalizeDiscreteProperties(
+                  propertiesData,
+                  undefinedPropertyValue
+              ),
+              Uint16Array
+          )
+        : await loadDataArray(
+              normalizeContinuousProperties(propertiesData),
+              Float32Array
+          );
 
     // Keep this.
     // const t1 = performance.now();
@@ -128,9 +198,38 @@ export interface MapLayerProps extends ExtendedLayerProps {
      * If the number of property values equals one less than the depth values in
      * each direction then the property values will be pr cell and the cell will be constant
      * colored.
+     * Undefined value for discrete Uint16Array input defaults to 0xFFFF.
+     * For float input (Float32Array) it is NaN.
+     * For number arrays, undefined values are replaced with the configured
+     * undefinedPropertyValue, or 0xFFFF by default in discrete mode.
      */
     propertiesUrl: string; // Deprecated
-    propertiesData: string | number[] | Float32Array;
+    propertiesData:
+        | string
+        | Array<number | undefined>
+        | Float32Array
+        | Uint16Array
+        | undefined;
+
+    /**
+     * Array of property discrete codes with  optional name and color.
+     */
+    discretePropertyValueNames?: IDiscretePropertyValueName[];
+
+    /**
+     * Color for the cells with undefined property value.
+     * Is not overridden by and used prior to colorMapFunction.
+     * By default, Light gray if not provided.
+     */
+    undefinedPropertyColor?: RGBColor;
+
+    /**
+     * Value in propertiesData indicating that the property is undefined.
+     * By default these are:
+     * - Float32Array: NaN
+     * - Uint16Array: 0xFFFF
+     */
+    undefinedPropertyValue?: number;
 
     /**  Contour lines reference point and interval.
      * A value of [-1.0, -1.0] will disable contour lines.
@@ -241,6 +340,15 @@ export default class MapLayer<
         return isLoaded && isFinished;
     }
 
+    isPropertiesCategorical(): boolean {
+        const propertiesData =
+            this.props.propertiesData ?? this.props.propertiesUrl;
+        return (
+            propertiesData instanceof Uint16Array ||
+            typeof this.props.discretePropertyValueNames !== "undefined"
+        );
+    }
+
     rebuildData(reportBoundingBox: boolean): void {
         if (typeof this.props.meshUrl !== "undefined") {
             console.warn('"meshUrl" is deprecated. Use "meshData"');
@@ -254,7 +362,20 @@ export default class MapLayer<
         const propertiesData =
             this.props.propertiesData ?? this.props.propertiesUrl;
 
-        const p = loadMeshAndProperties(meshData, propertiesData);
+        const isPropertiesCategorical = this.isPropertiesCategorical();
+        const undefinedPropertyValue =
+            this.props.undefinedPropertyValue ??
+            getUndefinedValueProperties(
+                propertiesData,
+                isPropertiesCategorical
+            ) ??
+            DEFAULT_DISCRETE_UNDEFINED_VALUE;
+        const p = loadMeshAndProperties(
+            meshData,
+            propertiesData,
+            isPropertiesCategorical,
+            undefinedPropertyValue
+        );
 
         p.then(([meshData, propertiesData]) => {
             // Using inline web worker for calculating the triangle mesh from
@@ -264,6 +385,7 @@ export default class MapLayer<
                 meshData,
                 propertiesData
             );
+
             pool.exec(makeFullMesh, [{ data: webworkerParams.params }]).then(
                 (e) => {
                     const [
@@ -438,6 +560,17 @@ export default class MapLayer<
             );
         }
 
+        const undefinedColor = this.props.undefinedPropertyColor ?? [
+            204, 204, 204,
+        ];
+
+        const undefinedPropertyValue =
+            this.props.undefinedPropertyValue ??
+            getUndefinedValueProperties(
+                this.props.propertiesData ?? this.props.propertiesUrl,
+                this.isPropertiesCategorical()
+            );
+
         const enableLighting: boolean = this.props.material !== false;
         const layer = new PrivateMapLayer(
             this.getSubLayerProps({
@@ -454,7 +587,11 @@ export default class MapLayer<
                 colormapName: this.props.colorMapName,
                 colormapRange: this.props.colorMapRange,
                 colormapClampColor: this.props.colorMapClampColor,
+                undefinedPropertyColor: undefinedColor,
+                undefinedPropertyValue,
                 colormapFunction: this.props.colorMapFunction,
+                discretePropertyValueNames:
+                    this.props.discretePropertyValueNames,
                 propertyValueRange: this.state["propertyValueRange"],
                 material: this.props.material,
                 smoothShading: this.props.smoothShading,
@@ -468,13 +605,20 @@ export default class MapLayer<
 
     private getWebworkerParams(
         meshData: Float32Array | null,
-        propertiesData: Float32Array | null
+        propertiesData: Float32Array | Uint16Array
     ): { params: Params; transferrables?: Transferable[] } {
         if (!meshData && !propertiesData) {
             throw new Error(
                 "Either mesh or properties or the both must be defined"
             );
         }
+
+        const undefinedPropertyValue =
+            this.props.undefinedPropertyValue ??
+            getUndefinedValueProperties(
+                propertiesData as Float32Array | Uint16Array,
+                this.isPropertiesCategorical()
+            );
 
         const params: Params = [
             meshData,
@@ -483,6 +627,7 @@ export default class MapLayer<
             this.props.frame,
             this.props.smoothShading,
             this.props.gridLines,
+            undefinedPropertyValue ?? DEFAULT_DISCRETE_UNDEFINED_VALUE,
         ];
         const transferrables = [
             meshData?.buffer,
