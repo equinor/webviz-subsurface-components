@@ -1,3 +1,15 @@
+## 2.3.0 (2026-09-16)
+
+### 🚀 Features
+
+- Support for map categorical discrete input ([#2843](https://github.com/equinor/webviz-subsurface-components/pull/2843))
+
+### ❤️ Thank You
+
+- Copilot @Copilot
+- Håvard Bjerke
+- nilscb @nilscb
+
 ## 2.2.1 (2026-09-10)
 
 ### 🩹 Fixes
