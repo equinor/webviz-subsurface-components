@@ -76,7 +76,6 @@ type TTypedArray =
     | Uint16Array
     | Int32Array
     | Uint32Array
-    | Uint16Array
     | Int16Array;
 
 async function loadData<T extends TTypedArray>(

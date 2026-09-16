@@ -207,7 +207,7 @@ export function getColormapDiscreteColors(
 ): Uint8Array {
     if (colormapHints.discreteData) {
         if (colormapHints.colormapSize === 0) {
-            return new Uint8Array([0, 0, 0, 0, 0, 0]);
+            return new Uint8Array([0, 0, 0]);
         }
 
         const colormapData =
