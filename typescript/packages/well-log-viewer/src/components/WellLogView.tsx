@@ -685,7 +685,7 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
             .style(horizontal ? "top" : "left", `${0}px`)
             .style("position", "absolute")
             .style("background-color", rgba)
-            .style("visibility", "false");
+            .style("visibility", "hidden");
 
         pin.append("div")
             .html(
@@ -751,7 +751,7 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
                     .style(horizontal ? "width" : "height", `${wpSize}px`)
                     .style(horizontal ? "height" : "width", `${100}%`)
                     .style(horizontal ? "top" : "left", `${0}px`)
-                    .style("visibility", "false");
+                    .style("visibility", "hidden");
                 if (wellpickColorFill) {
                     pin.append("div")
                         .classed("wellpick-fill", true) // for CSS customization
@@ -1699,6 +1699,7 @@ class WellLogView
                 this.props.colorMapFunctions
             );
             addWellPickOverlay(this.logController, this);
+            this.showSelection();
             this._updateWellLogTitle();
         }
         this.setControllerZoom();

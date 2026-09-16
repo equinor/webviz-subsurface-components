@@ -232,6 +232,21 @@ describe("Well pick label rendering", () => {
         expect(cells).toContain("HOR_1");
     });
 
+    it("positions marker overlays immediately after creating them", () => {
+        const { container } = renderWithWellPick();
+        const markers = Array.from(
+            container.querySelectorAll<HTMLElement>(".wellpick")
+        );
+
+        expect(markers.length).toBeGreaterThan(0);
+        expect(
+            markers.every((marker) => marker.style.visibility === "visible")
+        ).toBe(true);
+        expect(markers.every((marker) => marker.style.top !== "0px")).toBe(
+            true
+        );
+    });
+
     it("renders one element per pick and removes them all, even when horizons repeat", () => {
         // A deviated well may cross the same horizon several times, so several picks can share a
         // horizon name. Naming the overlay elements after the horizon leaves all but the last of
