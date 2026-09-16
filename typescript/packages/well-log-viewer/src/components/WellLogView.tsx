@@ -408,6 +408,7 @@ function showWellPick(
         return;
     }
 
+    elm.style.removeProperty("visibility");
     elm.style[horizontal ? "left" : "top"] = `${v - wpOffset}px`;
     elm.style.visibility = "visible";
 }
@@ -440,6 +441,7 @@ function fillWellPicks(
         return;
     }
 
+    elm.style.removeProperty("visibility");
     elm.style[horizontal ? "left" : "top"] = `${v}px`; // /*- offset*/
     elm.style[horizontal ? "width" : "height"] = `${v2 - v}px`;
     elm.style.visibility = "visible";
