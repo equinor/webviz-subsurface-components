@@ -12,7 +12,7 @@ exports[`WellLogViewer/Demo/SyncLogViewer Default smoke-test 1`] = `
             >
               <div style="width: 3641px; height: 641px;">
                 <div class="well-log-scroller-content"
-                     style="position: absolute; width: 993px; height: 641px;"
+                     style="position: sticky; top: 0px; left: 0px; width: 993px; height: 641px;"
                 >
                   <div class="welllogview"
                        style="flex-direction: column;"
@@ -2027,7 +2027,7 @@ exports[`WellLogViewer/Demo/SyncLogViewer DiscreteLogs smoke-test 1`] = `
             >
               <div style="width: 264px; height: 662px;">
                 <div class="well-log-scroller-content"
-                     style="position: absolute; width: 264px; height: 662px;"
+                     style="position: sticky; top: 0px; left: 0px; width: 264px; height: 662px;"
                 >
                   <div class="welllogview"
                        style="flex-direction: column;"
@@ -3051,7 +3051,7 @@ exports[`WellLogViewer/Demo/SyncLogViewer DiscreteLogs smoke-test 1`] = `
             >
               <div style="width: 264px; height: 662px;">
                 <div class="well-log-scroller-content"
-                     style="position: absolute; width: 264px; height: 662px;"
+                     style="position: sticky; top: 0px; left: 0px; width: 264px; height: 662px;"
                 >
                   <div class="welllogview"
                        style="flex-direction: column;"
@@ -6071,7 +6071,7 @@ exports[`WellLogViewer/Demo/SyncLogViewer DiscreteLogs smoke-test 1`] = `
             >
               <div style="width: 264px; height: 662px;">
                 <div class="well-log-scroller-content"
-                     style="position: absolute; width: 264px; height: 662px;"
+                     style="position: sticky; top: 0px; left: 0px; width: 264px; height: 662px;"
                 >
                   <div class="welllogview"
                        style="flex-direction: column;"
@@ -9782,7 +9782,7 @@ exports[`WellLogViewer/Demo/SyncLogViewer DiscreteLogsWithIndividualDomainAndVis
             >
               <div style="width: 264px; height: 974px;">
                 <div class="well-log-scroller-content"
-                     style="position: absolute; width: 264px; height: 662px;"
+                     style="position: sticky; top: 0px; left: 0px; width: 264px; height: 662px;"
                 >
                   <div class="welllogview"
                        style="flex-direction: column;"
@@ -15275,7 +15275,7 @@ exports[`WellLogViewer/Demo/SyncLogViewer DiscreteLogsWithIndividualDomainAndVis
             >
               <div style="width: 264px; height: 993px;">
                 <div class="well-log-scroller-content"
-                     style="position: absolute; width: 264px; height: 662px;"
+                     style="position: sticky; top: 0px; left: 0px; width: 264px; height: 662px;"
                 >
                   <div class="welllogview"
                        style="flex-direction: column;"
@@ -18751,7 +18751,7 @@ exports[`WellLogViewer/Demo/SyncLogViewer DiscreteLogsWithIndividualDomainAndVis
             >
               <div style="width: 264px; height: 827px;">
                 <div class="well-log-scroller-content"
-                     style="position: absolute; width: 264px; height: 662px;"
+                     style="position: sticky; top: 0px; left: 0px; width: 264px; height: 662px;"
                 >
                   <div class="welllogview"
                        style="flex-direction: column;"
@@ -24376,7 +24376,7 @@ exports[`WellLogViewer/Demo/SyncLogViewer DiscreteLogsWithIndividualVisibleRange
             >
               <div style="width: 264px; height: 496px;">
                 <div class="well-log-scroller-content"
-                     style="position: absolute; width: 264px; height: 662px;"
+                     style="position: sticky; top: 0px; left: 0px; width: 264px; height: 662px;"
                 >
                   <div class="welllogview"
                        style="flex-direction: column;"
@@ -29821,7 +29821,7 @@ exports[`WellLogViewer/Demo/SyncLogViewer DiscreteLogsWithIndividualVisibleRange
             >
               <div style="width: 264px; height: 333px;">
                 <div class="well-log-scroller-content"
-                     style="position: absolute; width: 264px; height: 662px;"
+                     style="position: sticky; top: 0px; left: 0px; width: 264px; height: 662px;"
                 >
                   <div class="welllogview"
                        style="flex-direction: column;"
@@ -32986,7 +32986,7 @@ exports[`WellLogViewer/Demo/SyncLogViewer DiscreteLogsWithIndividualVisibleRange
             >
               <div style="width: 264px; height: 476px;">
                 <div class="well-log-scroller-content"
-                     style="position: absolute; width: 264px; height: 662px;"
+                     style="position: sticky; top: 0px; left: 0px; width: 264px; height: 662px;"
                 >
                   <div class="welllogview"
                        style="flex-direction: column;"
@@ -38197,7 +38197,7 @@ exports[`WellLogViewer/Demo/SyncLogViewer DiscreteLogsWithUndefined smoke-test 1
             >
               <div style="width: 264px; height: 662px;">
                 <div class="well-log-scroller-content"
-                     style="position: absolute; width: 264px; height: 662px;"
+                     style="position: sticky; top: 0px; left: 0px; width: 264px; height: 662px;"
                 >
                   <div class="welllogview"
                        style="flex-direction: column;"
@@ -41217,7 +41217,7 @@ exports[`WellLogViewer/Demo/SyncLogViewer DiscreteLogsWithUndefined smoke-test 1
             >
               <div style="width: 0px; height: 662px;">
                 <div class="well-log-scroller-content"
-                     style="position: absolute; width: 264px; height: 662px;"
+                     style="position: sticky; top: 0px; left: 0px; width: 264px; height: 662px;"
                 >
                   <div class="welllogview"
                        style="flex-direction: column;"
@@ -41622,7 +41622,7 @@ exports[`WellLogViewer/Demo/SyncLogViewer DiscreteLogsWithUndefined smoke-test 1
             >
               <div style="width: 264px; height: 662px;">
                 <div class="well-log-scroller-content"
-                     style="position: absolute; width: 264px; height: 662px;"
+                     style="position: sticky; top: 0px; left: 0px; width: 264px; height: 662px;"
                 >
                   <div class="welllogview"
                        style="flex-direction: column;"
@@ -45243,7 +45243,7 @@ exports[`WellLogViewer/Demo/SyncLogViewer DiscreteLogsWithWellPicks smoke-test 1
             >
               <div style="width: 264px; height: 662px;">
                 <div class="well-log-scroller-content"
-                     style="position: absolute; width: 264px; height: 662px;"
+                     style="position: sticky; top: 0px; left: 0px; width: 264px; height: 662px;"
                 >
                   <div class="welllogview"
                        style="flex-direction: column;"
@@ -46477,7 +46477,7 @@ exports[`WellLogViewer/Demo/SyncLogViewer DiscreteLogsWithWellPicks smoke-test 1
             >
               <div style="width: 264px; height: 662px;">
                 <div class="well-log-scroller-content"
-                     style="position: absolute; width: 264px; height: 662px;"
+                     style="position: sticky; top: 0px; left: 0px; width: 264px; height: 662px;"
                 >
                   <div class="welllogview"
                        style="flex-direction: column;"
@@ -48803,7 +48803,7 @@ exports[`WellLogViewer/Demo/SyncLogViewer DiscreteLogsWithWellPicks smoke-test 1
             >
               <div style="width: 264px; height: 662px;">
                 <div class="well-log-scroller-content"
-                     style="position: absolute; width: 264px; height: 662px;"
+                     style="position: sticky; top: 0px; left: 0px; width: 264px; height: 662px;"
                 >
                   <div class="welllogview"
                        style="flex-direction: column;"
@@ -52665,7 +52665,7 @@ exports[`WellLogViewer/Demo/SyncLogViewer Empty smoke-test 1`] = `
             >
               <div style="width: 331px; height: 641px;">
                 <div class="well-log-scroller-content"
-                     style="position: absolute; width: 993px; height: 641px;"
+                     style="position: sticky; top: 0px; left: 0px; width: 993px; height: 641px;"
                 >
                   <div class="welllogview"
                        style="flex-direction: column;"
@@ -53210,7 +53210,7 @@ exports[`WellLogViewer/Demo/SyncLogViewer LogsWithDifferentSets smoke-test 1`] =
             >
               <div style="width: 305px; height: 662px;">
                 <div class="well-log-scroller-content"
-                     style="position: absolute; width: 457px; height: 662px;"
+                     style="position: sticky; top: 0px; left: 0px; width: 457px; height: 662px;"
                 >
                   <div class="welllogview"
                        style="flex-direction: column;"
@@ -54067,7 +54067,7 @@ exports[`WellLogViewer/Demo/SyncLogViewer LogsWithDifferentSets smoke-test 1`] =
             >
               <div style="width: 152px; height: 662px;">
                 <div class="well-log-scroller-content"
-                     style="position: absolute; width: 457px; height: 662px;"
+                     style="position: sticky; top: 0px; left: 0px; width: 457px; height: 662px;"
                 >
                   <div class="welllogview"
                        style="flex-direction: column;"

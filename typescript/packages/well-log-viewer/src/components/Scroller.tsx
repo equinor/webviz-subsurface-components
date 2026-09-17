@@ -164,7 +164,7 @@ class Scroller extends Component<ScrollerProps> {
                             this.content = el as HTMLDivElement;
                         }}
                         className="well-log-scroller-content"
-                        style={{ position: "absolute" }}
+                        style={{ position: "sticky", top: 0, left: 0 }}
                     >
                         {/* TODO: Fix this the next time the file is edited. */}
                         {/* eslint-disable-next-line react/prop-types */}

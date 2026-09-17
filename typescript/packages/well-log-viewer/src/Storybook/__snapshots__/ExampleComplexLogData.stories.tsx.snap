@@ -12,7 +12,7 @@ exports[`WellLogViewer/Demo/ExampleData TwoLogs smoke-test 1`] = `
             >
               <div style="width: 662px; height: 662px;">
                 <div class="well-log-scroller-content"
-                     style="position: absolute; width: 993px; height: 662px;"
+                     style="position: sticky; top: 0px; left: 0px; width: 993px; height: 662px;"
                 >
                   <div class="welllogview"
                        style="flex-direction: column;"

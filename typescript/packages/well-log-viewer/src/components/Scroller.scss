@@ -2,9 +2,4 @@
     .well-log-scroller {
         scrollbar-gutter: stable;
     }
-
-    // Firefox can paint absolute descendants over its overlay scrollbars.
-    .well-log-scroller-content {
-        clip-path: inset(0 16px 16px 0);
-    }
 }

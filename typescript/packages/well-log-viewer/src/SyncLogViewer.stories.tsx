@@ -380,14 +380,12 @@ export const ScrollbarBehavior: StoryObj<typeof Template> = {
         });
 
         const scrollers = getScrollers();
-        if (CSS.supports("(-moz-appearance: none)")) {
-            for (const scroller of scrollers) {
-                const content = scroller.firstElementChild?.firstElementChild;
-                expect(content).toHaveClass("well-log-scroller-content");
-                expect(content && getComputedStyle(content).clipPath).not.toBe(
-                    "none"
-                );
-            }
+        for (const scroller of scrollers) {
+            const content = scroller.firstElementChild?.firstElementChild;
+            expect(content).toHaveClass("well-log-scroller-content");
+            expect(content && getComputedStyle(content).position).toBe(
+                "sticky"
+            );
         }
 
         for (const scroller of scrollers) {
@@ -639,13 +637,13 @@ export const DiscreteLogsInteraction: StoryObj<typeof TemplateWithSelection> = {
         fireEvent.mouseMove(document, {
             buttons: 1,
             clientX: startX,
-            clientY: startY + 40,
+            clientY: startY - 40,
             view: window,
         });
         fireEvent.mouseUp(document, {
             button: 0,
             clientX: startX,
-            clientY: startY + 40,
+            clientY: startY - 40,
             view: window,
         });
 
