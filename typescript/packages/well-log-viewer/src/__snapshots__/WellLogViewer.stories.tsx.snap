@@ -10293,7 +10293,7 @@ exports[`WellLogViewer/Demo/WellLogViewer OnInfoFilledEvent smoke-test 1`] = `
                     <div class="view">
                       <div class="container log-controller horizontal">
                         <div class="overlay"
-                             style="height: 662px; top: 0px; overflow: hidden; left: 69px; width: 1164px;"
+                             style="width: 1164px; height: 662px; left: 69px; top: 0px; overflow: hidden;"
                         >
                           <div class="depth"
                                style="position: absolute; pointer-events: none; visibility: visible;"
@@ -11551,7 +11551,7 @@ exports[`WellLogViewer/Demo/WellLogViewer TrackTitleTooltip play-test 1`] = `
                   <div class="view">
                     <div class="container log-controller">
                       <div class="overlay"
-                           style="width: 993px; left: 0px; overflow: hidden; top: 69px; height: 594px;"
+                           style="width: 993px; left: 0px; top: 69px; overflow: hidden; height: 594px;"
                       >
                         <div class="depth"
                              style="position: absolute; pointer-events: none; visibility: visible;"
