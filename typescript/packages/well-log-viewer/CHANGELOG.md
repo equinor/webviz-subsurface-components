@@ -1,3 +1,14 @@
+## 3.0.7 (2026-09-18)
+
+### 🩹 Fixes
+
+- **WellLogViewer:** restore Firefox scrollbars ([#2864](https://github.com/equinor/webviz-subsurface-components/pull/2864))
+
+### ❤️ Thank You
+
+- Copilot @Copilot
+- Håvard Bjerke
+
 ## 3.0.6 (2026-09-10)
 
 ### 🧱 Updated Dependencies
