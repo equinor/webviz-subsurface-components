@@ -15,7 +15,6 @@ import type {
     MapMouseEvent,
     MapProps,
     TooltipCallback,
-    ViewStateType,
     ViewsType,
 } from "./components/Map";
 import Map, { createLayers } from "./components/Map";
@@ -27,7 +26,6 @@ export type {
     ColorTableArray,
     MapMouseEvent,
     TooltipCallback,
-    ViewStateType,
     ViewsType,
 };
 

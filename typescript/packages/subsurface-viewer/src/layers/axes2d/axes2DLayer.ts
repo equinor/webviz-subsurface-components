@@ -49,7 +49,7 @@ type LabelData = {
     //font_size: number; KEEP.
 };
 
-enum ViewSide {
+export enum ViewSide {
     Left,
     Right,
     Bottom,

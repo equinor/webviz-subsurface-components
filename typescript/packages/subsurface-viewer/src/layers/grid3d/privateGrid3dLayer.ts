@@ -40,7 +40,7 @@ import vsLineShader from "./line.vs.glsl";
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import {
     TGrid3DColoringMode,
-    type IDiscretePropertyValueName,
+    type IGrid3DDiscretePropertyValueName,
     isDiscreteProperty,
     isGeometricProperty,
 } from "./grid3dLayer";
@@ -59,7 +59,7 @@ export interface PrivateLayerProps extends ExtendedLayerProps {
     coloringMode: TGrid3DColoringMode.Property;
     gridLines: boolean;
     propertyValueRange: [number, number];
-    discretePropertyValueNames?: IDiscretePropertyValueName[];
+    discretePropertyValueNames?: IGrid3DDiscretePropertyValueName[];
     depthTest: boolean;
     ZIncreasingDownwards: boolean;
     enableLighting: boolean;
@@ -96,7 +96,7 @@ interface IColormapTextureHints {
 }
 
 // This is a private layer used only by the composite Grid3DLayer
-export default class PrivateLayer extends Layer<PrivateLayerProps> {
+export class PrivateGrid3DLayer extends Layer<PrivateLayerProps> {
     get isLoaded(): boolean {
         return (this.state["isLoaded"] as boolean) ?? false;
     }
@@ -397,8 +397,8 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
     }
 }
 
-PrivateLayer.layerName = "PrivateLayer";
-PrivateLayer.defaultProps = defaultProps;
+PrivateGrid3DLayer.layerName = "PrivateGrid3DLayer";
+PrivateGrid3DLayer.defaultProps = defaultProps;
 
 // local shader module for the uniforms
 const gridUniformsBlock = /*glsl*/ `\

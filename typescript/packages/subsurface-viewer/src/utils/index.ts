@@ -10,13 +10,18 @@ export {
     toNormalizedRGBAColor,
 } from "./Color";
 
-export type { TypedArray, TypedFloatArray, TypedIntArray } from "./typedArray";
+export type {
+    TConstructor,
+    TypedArray,
+    TypedFloatArray,
+    TypedIntArray,
+} from "./typedArray";
 export { isNumberArray, isTypedArray, toTypedArray } from "./typedArray";
 
 export { loadDataArray } from "./serialize";
 
 export { proportionalZoom, scaleZoom } from "./camera";
 
-export { findConfig } from "./configTools";
+export { type Config, findConfig } from "./configTools";
 
 export { useScaleFactor } from "./event";

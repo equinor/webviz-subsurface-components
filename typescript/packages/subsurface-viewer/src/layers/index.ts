@@ -1,60 +1,26 @@
-export { default as Axes2DLayer } from "./axes2d/axes2DLayer";
-export { default as AxesLayer } from "./axes/axesLayer";
-export { default as BoxSelectionLayer } from "./BoxSelectionLayer/boxSelectionLayer";
-export { default as ColormapLayer } from "./colormap/colormapLayer";
-export { default as CrosshairLayer } from "./crosshair/crosshairLayer";
-export { default as DrawingLayer } from "./drawing/drawingLayer";
-export { default as FaultPolygonsLayer } from "./fault_polygons/faultPolygonsLayer";
-export { GpglValueMappedSurfaceLayer } from "./gpglLayers/gpglValueMappedSurfaceLayer";
-export { default as Grid3DLayer } from "./grid3d/grid3dLayer";
-export { default as Hillshading2DLayer } from "./hillshading2d/hillshading2dLayer";
-export { default as MapLayer } from "./map/mapLayer";
-export { default as NorthArrow3DLayer } from "./northarrow/northArrow3DLayer";
-export { default as PieChartLayer } from "./piechart/pieChartLayer";
-export { default as PointsLayer } from "./points/pointsLayer";
-export { default as PolylinesLayer } from "./polylines/polylinesLayer";
-export { PolylineGroupLayer } from "./polyline_group/polylineGroupLayer";
-export { default as SeismicLayer } from "./seismic/seismicLayer";
-export { default as SelectableGeoJsonLayer } from "./selectable_geojson/selectableGeoJsonLayer";
-export { default as TriangleLayer } from "./triangle/triangleLayer";
-export { default as WellMarkersLayer } from "./well_markers/wellMarkersLayer";
-export { default as WellsLayer } from "./wells/wellsLayer";
+export * from "./axes";
+export * from "./axes2d";
+export * from "./BoxSelectionLayer";
+export * from "./colormap";
+export * from "./crosshair";
+export * from "./drawing";
+export * from "./fault_polygons";
+export * from "./gpglLayers";
+export * from "./grid3d";
+export * from "./hillshading2d";
+export * from "./map";
+export * from "./northarrow";
+export * from "./piechart";
+export * from "./points";
+export * from "./polyline_group";
+export * from "./polylines";
+export * from "./seismic";
+export * from "./selectable_geojson";
+export * from "./triangle";
+export * from "./well_markers";
+export * from "./wells";
 
-export type { WellMarkersLayerProps } from "./well_markers/wellMarkersLayer";
-export type { Axes2DLayerProps } from "./axes2d/axes2DLayer";
-export type { AxesLayerProps } from "./axes/axesLayer";
-export type { BoxSelectionLayerProps } from "./BoxSelectionLayer/boxSelectionLayer";
-export type { ColormapLayerProps } from "./colormap/colormapLayer";
-export type { CrosshairLayerProps } from "./crosshair/crosshairLayer";
-export type { DrawingLayerProps } from "./drawing/drawingLayer";
-export type { FaultPolygonsLayerProps } from "./fault_polygons/faultPolygonsLayer";
-export type { GpglValueMappedSurfaceLayerProps } from "./gpglLayers/gpglValueMappedSurfaceLayer";
-export type { Grid3DLayerProps } from "./grid3d/grid3dLayer";
-export type { Hillshading2DProps } from "./hillshading2d/hillshading2dLayer";
-export type { MapLayerProps } from "./map/mapLayer";
-export type { NorthArrow3DLayerProps } from "./northarrow/northArrow3DLayer";
-export type { PieChartLayerProps } from "./piechart/pieChartLayer";
-export type { PointsLayerProps } from "./points/pointsLayer";
-export type { PolylinesLayerProps } from "./polylines/polylinesLayer";
-export type {
-    PolylineGroupLayerProps,
-    PolylineStyle,
-    Polyline,
-    PolylineGroup,
-    BinaryPolylines,
-} from "./polyline_group/polylineGroupLayer";
-export type { SeismicLayerProps } from "./seismic/seismicLayer";
-export type { TriangleLayerProps } from "./triangle/triangleLayer";
-export type { WellsLayerProps } from "./wells/wellsLayer";
+export type { NumberPair } from "./types";
 
 // Export layer utility functions
-export { abscissaTransform } from "./wells/utils/abscissaTransform";
-
-export {
-    getAziAndInclForSegment,
-    getSegmentIndicesForMd,
-    getSegmentIndicesForCoord,
-    getFractionAlongSegmentForCoord,
-} from "./wells/utils/trajectory";
-
-export type { ScaleFactor } from "./wells/utils/trajectory";
+export type * from "./utils";
