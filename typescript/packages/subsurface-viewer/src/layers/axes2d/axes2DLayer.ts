@@ -49,7 +49,7 @@ type LabelData = {
     //font_size: number; KEEP.
 };
 
-enum ViewSide {
+export enum ViewSide {
     Left,
     Right,
     Bottom,
@@ -790,21 +790,27 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                     /*eslint-disable */
                     allPositions.push(
                         pos_w[0] + x1 * pixelScale * pixel2worldHor,
-                        pos_w[1] + (0 * pixelScale - y_alignment_offset) * pixel2worldVer,
+                        pos_w[1] +
+                            (0 * pixelScale - y_alignment_offset) *
+                                pixel2worldVer,
                         pos_w[2]
                     );
                     allTexcoords.push(u1, v1);
 
                     allPositions.push(
                         pos_w[0] + x2 * pixelScale * pixel2worldHor,
-                        pos_w[1] + (0 * pixelScale - y_alignment_offset) * pixel2worldVer,
+                        pos_w[1] +
+                            (0 * pixelScale - y_alignment_offset) *
+                                pixel2worldVer,
                         pos_w[2]
                     );
                     allTexcoords.push(u2, v1);
 
                     allPositions.push(
                         pos_w[0] + x1 * pixelScale * pixel2worldHor,
-                        pos_w[1] + (h * pixelScale - y_alignment_offset) * pixel2worldVer,
+                        pos_w[1] +
+                            (h * pixelScale - y_alignment_offset) *
+                                pixel2worldVer,
                         pos_w[2]
                     );
                     allTexcoords.push(u1, v2);
@@ -812,21 +818,27 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                     // t2
                     allPositions.push(
                         pos_w[0] + x1 * pixelScale * pixel2worldHor,
-                        pos_w[1] + (h * pixelScale - y_alignment_offset) * pixel2worldVer,
+                        pos_w[1] +
+                            (h * pixelScale - y_alignment_offset) *
+                                pixel2worldVer,
                         pos_w[2]
                     );
                     allTexcoords.push(u1, v2);
 
                     allPositions.push(
                         pos_w[0] + x2 * pixelScale * pixel2worldHor,
-                        pos_w[1] + (0 * pixelScale - y_alignment_offset) * pixel2worldVer,
+                        pos_w[1] +
+                            (0 * pixelScale - y_alignment_offset) *
+                                pixel2worldVer,
                         pos_w[2]
                     );
                     allTexcoords.push(u2, v1);
 
                     allPositions.push(
                         pos_w[0] + x2 * pixelScale * pixel2worldHor,
-                        pos_w[1] + (h * pixelScale - y_alignment_offset) * pixel2worldVer,
+                        pos_w[1] +
+                            (h * pixelScale - y_alignment_offset) *
+                                pixel2worldVer,
                         pos_w[2]
                     );
                     allTexcoords.push(u2, v2);

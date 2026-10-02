@@ -791,7 +791,7 @@ function projectAbscissa(
 // ---------------------------------------------------------------------------
 
 /**
- * A deck.gl {@link CompositeLayer} that renders collections of polylines
+ * A deck.gl CompositeLayer that renders collections of polylines
  * organised into named groups.
  *
  * **Data formats**

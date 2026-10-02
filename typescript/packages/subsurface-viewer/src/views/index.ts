@@ -1,2 +1,4 @@
 export { SectionView } from "./sectionView";
-export type { ControllerOpts } from "./viewport";
+export type { SectionViewProps, SectionViewState } from "./sectionView";
+
+export type { ControllerOpts, ViewTypeType, ViewportType } from "./viewport";

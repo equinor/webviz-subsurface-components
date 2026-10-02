@@ -97,7 +97,6 @@ export async function loadDataArray<T extends TypedArray>(
     } else {
         return toTypedArray(data, type);
     }
-    return Promise.reject("loadDataArray: unsupported type of input data");
 }
 
 /**
@@ -115,7 +114,7 @@ export function debug_dumpToBinaryFile(
             ? `-${size[0]}x${size[1]}`
             : `-${size}`;
 
-        const blob = new Blob([data.buffer], {
+        const blob = new Blob([new Float32Array(data).buffer], {
             type: "application/octet-stream",
         });
         const url = URL.createObjectURL(blob);
@@ -125,7 +124,7 @@ export function debug_dumpToBinaryFile(
         a.style.display = "none";
         document.body.appendChild(a);
         a.click();
-        document.body.removeChild(a);
+        a.remove();
         URL.revokeObjectURL(url);
     }
 }

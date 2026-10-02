@@ -43,7 +43,7 @@ const roundToSignificant = function (num: number) {
     // Returns two significant figures (non-zero) for numbers with an absolute value less
     // than 1, and two decimal places for numbers with an absolute value greater
     // than 1.
-    return parseFloat(
+    return Number.parseFloat(
         num.toExponential(Math.max(1, 2 + Math.log10(Math.abs(num))))
     );
 };
@@ -154,7 +154,7 @@ function Row(props: { layer_data: InfoCardDataType }) {
     );
 }
 
-const InfoCard: React.FC<InfoCardProps> = (props: InfoCardProps) => {
+export const InfoCard: React.FC<InfoCardProps> = (props: InfoCardProps) => {
     const [infoCardData, setInfoCardData] = React.useState<
         InfoCardDataType[] | null
     >(null);

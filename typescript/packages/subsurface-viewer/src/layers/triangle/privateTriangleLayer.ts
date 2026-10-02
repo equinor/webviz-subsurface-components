@@ -72,7 +72,7 @@ const defaultProps = {
 };
 
 // This is a private layer used only by the composite TriangleLayer
-export default class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProps> {
+export class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProps> {
     get isLoaded(): boolean {
         return (this.state["isLoaded"] as boolean) ?? false;
     }

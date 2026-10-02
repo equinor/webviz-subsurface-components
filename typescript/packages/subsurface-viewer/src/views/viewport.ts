@@ -1,9 +1,12 @@
 import React from "react";
-import type { ViewTypeType } from "../components/Map";
-import type { Controller } from "@deck.gl/core";
+
+import type { Controller, OrbitView, OrthographicView } from "@deck.gl/core";
+
 import type { ConstructorOf } from "@deck.gl/core/dist/types/types";
 import type { ControllerOptions } from "@deck.gl/core/dist/controllers/controller";
 import type { IViewState } from "@deck.gl/core/dist/controllers/view-state";
+
+import type { SectionView } from "../views";
 
 export type ControllerOpts = boolean | ControllerOptions;
 
@@ -71,6 +74,11 @@ export interface ViewportType {
      */
     controller?: ControllerOpts;
 }
+
+export type ViewTypeType =
+    | typeof OrbitView
+    | typeof OrthographicView
+    | typeof SectionView;
 
 export const useVerticalScale = (viewports: ViewportType[] | undefined) => {
     return React.useMemo(() => {

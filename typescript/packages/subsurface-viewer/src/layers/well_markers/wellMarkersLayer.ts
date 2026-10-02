@@ -27,8 +27,6 @@ import fsShader from "./marker.fs.glsl";
 import vsShader from "./marker.vs.glsl";
 import { toRadians } from "math.gl";
 
-export type WellMarkersLayerProps = _WellMarkersLayerProps;
-
 /**
  * Input data of the layer.
  */
@@ -60,7 +58,7 @@ export type WellMarkerDataT = {
     outlineColor: Color;
 };
 
-export interface _WellMarkersLayerProps extends ExtendedLayerProps {
+export interface WellMarkersLayerProps extends ExtendedLayerProps {
     /**
      * Shape of the markers.
      * @default 'circle'
