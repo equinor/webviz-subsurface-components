@@ -105,7 +105,7 @@ function normalizeContinuousProperties(
 export type MapFrame = {
     /** mesh origin
      */
-    origin: [number, number, number] | [number, number];
+    origin: [number, number];
 
     /** cells size in each direction.
      */
@@ -184,7 +184,7 @@ export interface MapLayerProps extends ExtendedLayerProps {
 
     /**  Horizontal extent of the terrain mesh. Format:
      {
-         origin: [number, number, number];  // mesh origin in x, y, z
+         origin: [number, number];     // mesh origin in x, y
          increment: [number, number];  // cell size dx, dy
          count: [number, number];      // number of nodes in both directions.
      }
