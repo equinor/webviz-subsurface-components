@@ -44,7 +44,8 @@
             "PrivatePolylinesLayer",
             //"PrivatePieChartLayer",
             "PrivateTriangleLayer",
-            "TextLayerData"
+            "TextLayerData",
+            "ViewSide"
         ]
     }
 }
