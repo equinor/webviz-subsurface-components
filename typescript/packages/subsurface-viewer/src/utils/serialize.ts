@@ -97,7 +97,6 @@ export async function loadDataArray<T extends TypedArray>(
     } else {
         return toTypedArray(data, type);
     }
-    return Promise.reject("loadDataArray: unsupported type of input data");
 }
 
 /**
@@ -125,7 +124,7 @@ export function debug_dumpToBinaryFile(
         a.style.display = "none";
         document.body.appendChild(a);
         a.click();
-        document.body.removeChild(a);
+        a.remove();
         URL.revokeObjectURL(url);
     }
 }

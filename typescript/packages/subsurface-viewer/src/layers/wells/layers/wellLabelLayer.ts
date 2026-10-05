@@ -15,7 +15,7 @@ import type { MergedTextLayerProps } from "./mergedTextLayer";
 import { MergedTextLayer } from "./mergedTextLayer";
 import { FixedSizeExtension } from "../../../extensions/fixed-size-extension";
 
-type WellLabelLayerData = WellFeature;
+export type WellLabelLayerData = WellFeature;
 
 /**
  * Enum representing the orientation of well labels.

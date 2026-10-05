@@ -43,6 +43,7 @@ import { colorTables as defaultColorTables } from "@emerson-eps/color-tables";
 import type { ColorTableArray } from "@emerson-eps/color-tables";
 
 import { validateColorTables, validateLayers } from "@webviz/wsc-common";
+
 import { Axes2DLayer, NorthArrow3DLayer, WellsLayer } from "../layers";
 import type {
     LayerPickInfo,
@@ -428,7 +429,7 @@ export interface MapProps {
 
     /**
      * Override default cursor with a callback.
-     * @param cursorState
+     * The callback takes a cursor state as input.
      * @returns cursor string
      * @default "grabbing" when dragging, "default" otherwise
      * @see https://developer.mozilla.org/en-US/docs/Web/CSS/cursor
@@ -469,10 +470,8 @@ export interface MapProps {
     deckGlRef?: React.ForwardedRef<DeckGLRef>;
 }
 
-export type ViewTypeType =
-    | typeof OrbitView
-    | typeof OrthographicView
-    | typeof SectionView;
+// export types for client code
+export type { LayersList };
 
 // Helper function to handle deprecated "show3D" property of ViewportType
 function show3D(viewPort: ViewportType): boolean {

@@ -1,6 +1,8 @@
 import "jest";
 import { describe, expect, it } from "@jest/globals";
 
+import { OrthographicView } from "@deck.gl/core";
+
 import type { ViewportType } from "../views/viewport";
 import type { BoundingBox2D, Point3D } from "../utils";
 import type { MarginsType, MapSize } from "./Map";
@@ -13,7 +15,7 @@ const SIZE: MapSize = { width: 800, height: 400 };
 const ORIGIN: Point3D = [0, 0, 0];
 
 /** A plain 2D viewport, i.e. no target/zoom overrides and no deprecated vertical scale. */
-const view2D: ViewportType = { id: "test", show3D: false };
+const view2D: ViewportType = { id: "test", viewType: OrthographicView };
 
 describe("getViewStateFromBounds", () => {
     it("fits the bounds into the viewport when there are no margins", () => {

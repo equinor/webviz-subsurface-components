@@ -209,19 +209,19 @@ export interface WellsLayerProps extends ExtendedLayerProps {
     markers?: {
         /** Enables simple line markers at the start and end of screen sections.
          *
-         * @remark These markers are currently only designed for 2D, so they are not guaranteed to look nice in 3D
+         * @remarks These markers are currently only designed for 2D, so they are not guaranteed to look nice in 3D
          */
         showScreens?: boolean;
         /**
          * Renders screen sections of the trajectory as dashed segments.
          *
-         * @remark If enabled, the COLORS sub-layer will be replaced by the SCREEN_TRAJECTORY sub-layer!
+         * @remarks If enabled, the COLORS sub-layer will be replaced by the SCREEN_TRAJECTORY sub-layer!
          */
         showScreenTrajectoryAsDash?: boolean;
 
         /** Enables visualization of trajectory perforations.
          *
-         * @remark These markers are currently only designed for 2D, so they are not guaranteed to look nice in 3D
+         * @remarks These markers are currently only designed for 2D, so they are not guaranteed to look nice in 3D
          */
         showPerforations?: boolean;
 
@@ -241,7 +241,7 @@ export interface WellsLayerProps extends ExtendedLayerProps {
      * - Return undefined or [-1, -1] to show the entire well
      * Multiple ranges are additive
      *
-     * @remark To make sure trajectories paths disappear at the correct point, each
+     * @remarks To make sure trajectories paths disappear at the correct point, each
      * range value will inject a point into the path array; meaning layers will recompute
      * each time this is changed
      */

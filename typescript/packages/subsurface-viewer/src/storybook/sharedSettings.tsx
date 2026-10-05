@@ -6,12 +6,9 @@ import { styled } from "@mui/material/styles";
 
 import exampleData from "../../../../../example-data/deckgl-map.json";
 
-import type {
-    SubsurfaceViewerProps,
-    ViewStateType,
-    ViewsType,
-} from "../SubsurfaceViewer";
 import SubsurfaceViewer from "../SubsurfaceViewer";
+import type { SubsurfaceViewerProps, ViewStateType, ViewsType } from "..";
+
 import type { BoundingBox2D, BoundingBox3D, Point3D } from "../utils";
 
 export const defaultStoryParameters = {

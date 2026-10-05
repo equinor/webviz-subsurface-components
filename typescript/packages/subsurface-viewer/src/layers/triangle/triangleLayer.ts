@@ -14,7 +14,7 @@ import type {
 
 import type { RGBColor } from "../../utils";
 
-import PrivateTriangleLayer from "./privateTriangleLayer";
+import { PrivateTriangleLayer } from "./privateTriangleLayer";
 import { makeFullMesh } from "./webworker";
 
 import config from "../../SubsurfaceConfig.json";
@@ -230,32 +230,14 @@ export default class TriangleLayer extends CompositeLayer<TriangleLayerProps> {
                     let zmin = 99999999;
 
                     for (let i = 0; i < vertexArray.length / 3; i++) {
-                        xmax =
-                            vertexArray[3 * i + 0] > xmax
-                                ? vertexArray[3 * i + 0]
-                                : xmax; //eslint-disable-line
-                        xmin =
-                            vertexArray[3 * i + 0] < xmin
-                                ? vertexArray[3 * i + 0]
-                                : xmin; //eslint-disable-line
+                        xmax = Math.max(vertexArray[3 * i + 0], xmax);
+                        xmin = Math.min(vertexArray[3 * i + 0], xmin);
 
-                        ymax =
-                            vertexArray[3 * i + 1] > ymax
-                                ? vertexArray[3 * i + 1]
-                                : ymax; //eslint-disable-line
-                        ymin =
-                            vertexArray[3 * i + 1] < ymin
-                                ? vertexArray[3 * i + 1]
-                                : ymin; //eslint-disable-line
+                        ymax = Math.max(vertexArray[3 * i + 1], ymax);
+                        ymin = Math.min(vertexArray[3 * i + 1], ymin);
 
-                        zmax =
-                            vertexArray[3 * i + 2] > zmax
-                                ? vertexArray[3 * i + 2]
-                                : zmax; //eslint-disable-line
-                        zmin =
-                            vertexArray[3 * i + 2] < zmin
-                                ? vertexArray[3 * i + 2]
-                                : zmin; //eslint-disable-line
+                        zmax = Math.max(vertexArray[3 * i + 2], zmax);
+                        zmin = Math.min(vertexArray[3 * i + 2], zmin);
                     }
 
                     if (this.props.ZIncreasingDownwards) {

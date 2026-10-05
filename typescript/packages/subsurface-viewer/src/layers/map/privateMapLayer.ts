@@ -34,7 +34,7 @@ import fsDiscrete from "./map_discrete.fs.glsl";
 import vsDiscrete from "./map_discrete.vs.glsl";
 import fsLineShader from "./line.fs.glsl";
 import vsLineShader from "./line.vs.glsl";
-import type { IDiscretePropertyValueName } from "./mapLayer";
+import type { IMapDiscretePropertyValueName } from "./mapLayer";
 
 interface IColormapTextureHints {
     discreteData: boolean;
@@ -62,7 +62,7 @@ export interface PrivateMapLayerProps extends ExtendedLayerProps {
     depthTest: boolean;
     ZIncreasingDownwards: boolean;
     enableLighting: boolean;
-    discretePropertyValueNames?: IDiscretePropertyValueName[];
+    discretePropertyValueNames?: IMapDiscretePropertyValueName[];
 }
 
 const defaultProps = {
@@ -79,7 +79,7 @@ const defaultProps = {
 };
 
 // This is a private layer used only by the composite MapLayer
-export default class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
+export class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
     get isLoaded(): boolean {
         return (this.state["isLoaded"] as boolean) ?? false;
     }

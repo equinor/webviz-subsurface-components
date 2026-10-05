@@ -20,7 +20,7 @@ import type { ColormapFunctionType } from "../utils/colormapTools";
 import config from "../../SubsurfaceConfig.json";
 import { findConfig } from "../../utils/configTools";
 import { loadDataArray } from "../../utils/serialize";
-import PrivateMapLayer from "./privateMapLayer";
+import { PrivateMapLayer } from "./privateMapLayer";
 import { rotate } from "./utils";
 import { makeFullMesh } from "./webworker";
 
@@ -51,7 +51,7 @@ function onTerminateWorker() {
     }
 }
 
-type PropertyInput =
+export type PropertyInput =
     | string
     | Array<number | undefined>
     | Float32Array
@@ -102,7 +102,7 @@ function normalizeContinuousProperties(
 }
 
 // This type describes the mesh' extent in the horizontal plane.
-type Frame = {
+export type MapFrame = {
     /** mesh origin
      */
     origin: [number, number];
@@ -128,13 +128,13 @@ export type Params = [
     meshData: Float32Array | null,
     propertiesData: Float32Array | Uint16Array | null,
     isMesh: boolean,
-    frame: Frame,
+    frame: MapFrame,
     smoothShading: boolean,
     gridLines: boolean,
     undefinedPropertyValue: number,
 ];
 
-export interface IDiscretePropertyValueName {
+export interface IMapDiscretePropertyValueName {
     code: number;
     name?: string;
     color?: RGBColor;
@@ -189,7 +189,7 @@ export interface MapLayerProps extends ExtendedLayerProps {
          count: [number, number];      // number of nodes in both directions.
      }
      */
-    frame: Frame;
+    frame: MapFrame;
 
     /**  Url to the properties (ex, poro or perm values).
      * If the number of property values equals the number of depth values
@@ -214,7 +214,7 @@ export interface MapLayerProps extends ExtendedLayerProps {
     /**
      * Array of property discrete codes with  optional name and color.
      */
-    discretePropertyValueNames?: IDiscretePropertyValueName[];
+    discretePropertyValueNames?: IMapDiscretePropertyValueName[];
 
     /**
      * Color for the cells with undefined property value.

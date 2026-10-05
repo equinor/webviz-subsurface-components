@@ -6,7 +6,7 @@ import { CompositeLayer } from "@deck.gl/core";
 import workerpool from "workerpool";
 
 import type { Material } from "../gpglLayers/typeDefs";
-import PrivateLayer from "./privateGrid3dLayer";
+import { PrivateGrid3DLayer } from "./privateGrid3dLayer";
 import { makeFullMesh } from "./webworker";
 
 import type {
@@ -157,7 +157,7 @@ export function isDiscreteProperty(coloringMode: TGrid3DColoringMode): boolean {
     return coloringMode === TGrid3DColoringMode.DiscreteProperty;
 }
 
-export interface IDiscretePropertyValueName {
+export interface IGrid3DDiscretePropertyValueName {
     value: number;
     name: string;
 }
@@ -187,7 +187,7 @@ export interface Grid3DLayerProps extends ExtendedLayerProps {
      * Discrete property value-name pairs to be displayed in cursor readouts.
      * The property values are used as the array indices.
      */
-    discretePropertyValueNames?: IDiscretePropertyValueName[];
+    discretePropertyValueNames?: IGrid3DDiscretePropertyValueName[];
 
     /**
      * Defines how the cells are to be colored:
@@ -385,7 +385,7 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
         }
     }
 
-    renderLayers(): [PrivateLayer?] {
+    renderLayers(): [PrivateGrid3DLayer?] {
         if (Object.keys(this.state).length === 1) {
             // isFinishedLoading only in state
             return [];
@@ -394,7 +394,7 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
         const undefinedValue = this.getUndefinedPropertyValue();
 
         const enableLighting: boolean = this.props.material !== false;
-        const layer = new PrivateLayer(
+        const layer = new PrivateGrid3DLayer(
             this.getSubLayerProps({
                 mesh: this.state["mesh"],
                 meshLines: this.state["mesh_lines"],
