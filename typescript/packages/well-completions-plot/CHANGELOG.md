@@ -1,3 +1,7 @@
+## 2.0.6 (2026-10-05)
+
+This was a version bump only for well-completions-plot to align it with other projects, there were no code changes.
+
 ## 2.0.5 (2026-09-10)
 
 This was a version bump only for well-completions-plot to align it with other projects, there were no code changes.
