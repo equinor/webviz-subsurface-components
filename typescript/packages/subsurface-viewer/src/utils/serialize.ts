@@ -114,7 +114,7 @@ export function debug_dumpToBinaryFile(
             ? `-${size[0]}x${size[1]}`
             : `-${size}`;
 
-        const blob = new Blob([new Float32Array(data).buffer], {
+        const blob = new Blob([data.buffer], {
             type: "application/octet-stream",
         });
         const url = URL.createObjectURL(blob);
