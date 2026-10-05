@@ -1,3 +1,17 @@
+## 2.3.2 (2026-10-05)
+
+### 🩹 Fixes
+
+- clean subsurface-viewer package exports ([#2869](https://github.com/equinor/webviz-subsurface-components/pull/2869))
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 2.0.7
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
 ## 2.3.1 (2026-10-05)
 
 ### 🧱 Updated Dependencies
