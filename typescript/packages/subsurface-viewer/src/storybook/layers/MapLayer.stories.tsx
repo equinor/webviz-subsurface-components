@@ -87,21 +87,45 @@ const artefactsMapLayer = {
     colorMapClampColor: [0, 255, 0],
 };
 
-// This layer has as many property values as depth values hence each cell will be interpolated in color.
-const nodeCenteredPropertiesLayer = {
-    "@@type": "MapLayer",
-    id: "node-centered-layer",
+/* prettier-ignore */
+const map_4x5_meshData = [
+    1.6, 1.7, 1.8, 1.9,
+    1.2, 1.3, 1.4, 1.5,
+    0.8, 0.9,   1, 1.1,
+    0.4, 0.5, 0.6, 0.7,
+    0, 0.1, 0.2, 0.3,
+];
 
-    meshUrl:
-        "data:text/plain;base64,zczMP5qZ2T9mZuY/MzPzP5qZmT9mZqY/MzOzPwAAwD/NzEw/ZmZmPwAAgD/NzIw/zczMPgAAAD+amRk/MzMzPwAAAIDNzMw9zcxMPpqZmT4=",
+/* prettier-ignore */
+const map_4x5_nodeCenter_property = [
+    2.6, 2.7, 2.8, 2.9,
+    2.2, 2.3, 2.4, 2.5,
+    1.8, 1.9,   2, 2.1,
+    1.4, 1.5, 1.6, 1.7,
+      1, 1.1, 1.2, 1.3
+];
+
+/* prettier-ignore */
+const map_4x5_cellCenter_property = [
+    0.9,         1, 1.1,
+    0.6, undefined, 0.8,
+    0.3,       0.4, 0.5,
+    0,         0.1, 0.2,
+];
+
+// This layer has as many property values as depth values hence each cell will be interpolated in color.
+const nodeCenterPropertiesLayer = {
+    "@@type": "MapLayer",
+    id: "node-center-layer",
+
+    meshUrl: map_4x5_meshData,
     frame: {
         origin: [0, 0],
         count: [4, 5],
         increment: [1, 1],
         rotDeg: 0,
     },
-    propertiesUrl:
-        "data:text/plain;base64,ZmYmQM3MLEAzMzNAmpk5QM3MDEAzMxNAmpkZQAAAIEBmZuY/MzPzPwAAAEBmZgZAMzOzPwAAwD/NzMw/mpnZPwAAgD/NzIw/mpmZP2Zmpj8=",
+    propertiesUrl: map_4x5_nodeCenter_property,
     gridLines: true,
     material: true,
     // black to white colors.
@@ -112,18 +136,18 @@ const nodeCenteredPropertiesLayer = {
     ],
 };
 
-const nodeCenteredPropertiesLayerWithArrayInput = {
+const nodeCenterPropertiesLayerWithArrayInput = {
     "@@type": "MapLayer",
     "@@typedArraySupport": true,
-    id: "node-centered-layer",
+    id: "node-center-layer",
     frame: {
         origin: [0, 0],
         count: [4, 5],
         increment: [1, 1],
         rotDeg: 0,
     },
-    meshData: Array.from(new Array(20)).map(() => Math.random()), // Array of 20 random numbers
-    propertiesData: Array.from(new Array(20)).map(() => Math.random()),
+    meshData: new Float32Array(map_4x5_meshData),
+    propertiesData: new Float32Array(map_4x5_nodeCenter_property),
     gridLines: true,
     material: true,
     // black to white colors.
@@ -135,34 +159,17 @@ const nodeCenteredPropertiesLayerWithArrayInput = {
 };
 
 // This layer has as (nx-1)*(ny-1) property values and depth values are nx*ny hence each cell will be fixed in color.
-const cellCenteredPropertiesLayer = {
+const cellCenterPropertiesLayer = {
     "@@type": "MapLayer",
-    "@@typedArraySupport": true,
-    id: "cell-centered-layer",
+    id: "cell-center-layer",
 
     // One depth per node
     /* prettier-ignore */
-    meshData: [
-        1.6, 1.7, 1.8, 1.9, 1.2, 1.3, 1.4, 1.5, 0.8, 0.9,
-        1,   1.1, 0.4, 0.5, 0.6, 0.7, 0,   0.1, 0.2, 0.3,
-    ],
+    meshData: map_4x5_meshData,
 
     // One property per cell.
     /* prettier-ignore */
-    propertiesData: [
-        0.9,
-        1,
-        1.1,
-        0.6,
-        undefined,
-        0.8,
-        0.3,
-        0.4,
-        0.5,
-        0,
-        0.1,
-        0.2,
-    ],
+    propertiesData: map_4x5_cellCenter_property,
 
     frame: {
         origin: [0, 0],
@@ -387,11 +394,11 @@ const axes_lite = {
     bounds: [-1, -1, 0, 4, 5, 3],
 };
 
-//-- CellCenteredPropMap --
-export const CellCenteredPropMap: StoryObj<typeof SubsurfaceViewer> = {
+//-- CellCenterPropMap --
+export const CellCenterPropMap: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "map",
-        layers: [axes_lite, cellCenteredPropertiesLayer, northArrowLayer],
+        layers: [axes_lite, cellCenterPropertiesLayer, northArrowLayer],
         bounds: [-1, -1, 4, 5] as BoundingBox2D,
         views: default3DViews,
     },
@@ -399,17 +406,17 @@ export const CellCenteredPropMap: StoryObj<typeof SubsurfaceViewer> = {
         docs: {
             ...defaultStoryParameters.docs,
             description: {
-                story: "A small map with cell-centered properties. Each cell is rendered with a constant color.",
+                story: "A small map with cell-center properties. Each cell is rendered with a constant color.",
             },
         },
     },
 };
 
-//-- NodeCenteredPropMap --
-export const NodeCenteredPropMap: StoryObj<typeof SubsurfaceViewer> = {
+//-- NodeCenterPropMap --
+export const NodeCenterPropMap: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "map",
-        layers: [axes_lite, nodeCenteredPropertiesLayer, northArrowLayer],
+        layers: [axes_lite, nodeCenterPropertiesLayer, northArrowLayer],
         bounds: [-1, -1, 4, 5] as BoundingBox2D,
         views: default3DViews,
     },
@@ -423,15 +430,15 @@ export const NodeCenteredPropMap: StoryObj<typeof SubsurfaceViewer> = {
     },
 };
 
-//-- NodeCenteredPropMap  with native javascript arrays as input --
-export const NodeCenteredPropMapWithArrayInput: StoryObj<
+//-- NodeCenterPropMap  with native javascript arrays as input --
+export const NodeCenterPropMapWithArrayInput: StoryObj<
     typeof SubsurfaceViewer
 > = {
     args: {
         id: "map",
         layers: [
             axes_lite,
-            nodeCenteredPropertiesLayerWithArrayInput,
+            nodeCenterPropertiesLayerWithArrayInput,
             northArrowLayer,
         ],
         bounds: [-1, -1, 4, 5] as BoundingBox2D,
