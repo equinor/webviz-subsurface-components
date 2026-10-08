@@ -72,7 +72,6 @@ const categoricalPropertiesLayerNodeCenter = {
     material: false,
 };
 
-
 // This layer has as (nx-1)*(ny-1) property values and depth values are nx*ny hence each cell will be fixed in color.
 const categoricalPropertiesLayerCellCenter = {
     "@@type": "MapLayer",
@@ -187,7 +186,6 @@ export const NodeCenterSmallCategoricalPropMap: StoryObj<
         },
     },
 };
-
 
 export const CellCenterSmallCategoricalPropMap: StoryObj<
     typeof SubsurfaceViewer
