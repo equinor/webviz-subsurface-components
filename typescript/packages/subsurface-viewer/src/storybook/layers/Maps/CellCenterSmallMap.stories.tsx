@@ -98,7 +98,9 @@ const axes_lite = {
     bounds: [-1, -1, 0, 4, 5, 3],
 };
 
-export const CategoricalPropMapSmall: StoryObj<typeof SubsurfaceViewer> = {
+export const CellCenterSmallCategoricalPropMap: StoryObj<
+    typeof SubsurfaceViewer
+> = {
     args: {
         id: "map",
         layers: [axes_lite, categoricalPropertiesLayer, northArrowLayer],

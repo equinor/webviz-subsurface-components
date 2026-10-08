@@ -80,7 +80,7 @@ const nodeCenterFaciesPropertiesLayer = {
     colorMapFunction: new Uint8Array([255, 255, 0, 0, 128, 0, 255, 68, 0]),
 
     ZIncreasingDownwards: true,
-    gridLines: true,
+    gridLines: false,
     material: false,
 };
 
