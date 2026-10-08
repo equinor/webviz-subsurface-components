@@ -32,10 +32,7 @@ import {
 } from "../utils/colormapTools";
 
 import type {} from "../../utils/Color";
-import {
-    decodeNormalizedValueWithNaNFromRGB,
-    utilities,
-} from "../shader_modules";
+import { utilities } from "../shader_modules";
 
 import type {
     Color,
@@ -52,6 +49,12 @@ import {
 } from "../../utils";
 
 import type { ValueArray2D } from "./typeDefs";
+import {
+    decodeValueFromPickingColor,
+    getFiniteValueRange,
+    mergeValueRanges,
+    type ValueRange,
+} from "./valueRange";
 
 import fsShader from "./triangle.fs.glsl";
 import vsShader from "./triangle.vs.glsl";
@@ -235,6 +238,11 @@ export class GpglValueMappedSurfaceLayer extends Layer<GpglValueMappedSurfaceLay
             params.props.colormap !== params.oldProps.colormap;
         super.updateState(params);
         if (rebuild) {
+            this.setState({
+                ...this.state,
+                pickRange: undefined,
+                valueRange: undefined,
+            });
             this.initializeState(params.context as DeckGLLayerContext);
         }
     }
@@ -296,14 +304,22 @@ export class GpglValueMappedSurfaceLayer extends Layer<GpglValueMappedSurfaceLay
             return undefined;
         }
 
-        if (!this.props.colormapSetup?.valueRange) {
-            let min = Infinity;
-            let max = -Infinity;
-            for (const x of propertiesData) {
-                min = x < min ? x : min;
-                max = x > max ? x : max;
-            }
-            this.setState({ ...this.state, valueRange: [min, max] });
+        const dataRange = getFiniteValueRange(
+            propertiesData,
+            this.props.colormapSetup?.undefinedValue ?? Number.NaN
+        );
+        if (dataRange) {
+            const pickRange = mergeValueRanges(
+                this.state["pickRange"] as ValueRange | undefined,
+                dataRange
+            );
+            this.setState({
+                ...this.state,
+                pickRange,
+                ...(!this.props.colormapSetup?.valueRange
+                    ? { valueRange: dataRange }
+                    : {}),
+            });
         }
 
         const smooth =
@@ -566,15 +582,15 @@ export class GpglValueMappedSurfaceLayer extends Layer<GpglValueMappedSurfaceLay
                 (defaultColormapSetup.clampColor as Color)
         );
 
-        const colormapRange =
-            this.props.colormapSetup?.valueRange ??
-            (this.state["valueRange"] as [number, number]) ??
-            defaultColormapSetup.valueRange;
+        const colormapRange = this.props.colormapSetup?.valueRange ??
+            (this.state["valueRange"] as ValueRange | undefined) ??
+            defaultColormapSetup.valueRange ?? [0, 1];
 
         const clampRange =
             this.props.colormapSetup?.clampRange === null
                 ? [0, 1]
                 : (this.props.colormapSetup?.clampRange ?? colormapRange);
+        const pickRange = this._getPickingRange(colormapRange);
 
         // render all the triangle surfaces
         triangleModels?.forEach((model) => {
@@ -582,6 +598,7 @@ export class GpglValueMappedSurfaceLayer extends Layer<GpglValueMappedSurfaceLay
                 ...args.uniforms,
                 triangles: {
                     colormapRange,
+                    pickRange,
                     clampRange,
                     useClampColors:
                         this.props.colormapSetup?.clampColor !== null &&
@@ -637,6 +654,15 @@ export class GpglValueMappedSurfaceLayer extends Layer<GpglValueMappedSurfaceLay
         return 0;
     }
 
+    private _getPickingRange(fallbackRange: ValueRange): ValueRange {
+        return (
+            (this.state["pickRange"] as ValueRange | undefined) ??
+            this.props.colormapSetup?.valueRange ??
+            (this.state["valueRange"] as ValueRange | undefined) ??
+            fallbackRange
+        );
+    }
+
     getPickingInfo({ info }: { info: PickingInfo }): LayerPickInfo {
         if (!info.color) {
             return info;
@@ -653,14 +679,13 @@ export class GpglValueMappedSurfaceLayer extends Layer<GpglValueMappedSurfaceLay
 
         // Note these colors are in the  0-255 range.
         const [r, g, b] = info.color;
-        const normalizedValue = decodeNormalizedValueWithNaNFromRGB([r, g, b]);
-
-        const valueRange =
-            this.props.colormapSetup?.valueRange ??
-            (this.state["valueRange"] as [number, number]) ??
-            defaultColormapSetup.valueRange;
-        const value =
-            valueRange[0] + normalizedValue * (valueRange[1] - valueRange[0]);
+        const colormapRange = this.props.colormapSetup?.valueRange ??
+            (this.state["valueRange"] as ValueRange | undefined) ??
+            defaultColormapSetup.valueRange ?? [0, 1];
+        const value = decodeValueFromPickingColor(
+            [r, g, b],
+            this._getPickingRange(colormapRange)
+        );
         layer_properties.push(createPropertyData("Property", value));
 
         return {
@@ -720,6 +745,7 @@ const trianglesUniforms = {
 const texTriangleUniformsBlock = /*glsl*/ `\
 uniform trianglesUniforms {
     vec2 colormapRange;
+    vec2 pickRange;
     vec2 clampRange;
     bool useClampColors;
     vec4 lowClampColor;
@@ -733,6 +759,7 @@ uniform trianglesUniforms {
 
 type TexTriangleUniformsType = {
     colormapRange: [number, number];
+    pickRange: [number, number];
     clampRange: [number, number];
     useClampColors: boolean;
     lowClampColor: RGBAColor;
@@ -750,6 +777,7 @@ const texTrianglesUniforms = {
     fs: texTriangleUniformsBlock,
     uniformTypes: {
         colormapRange: "vec2<f32>",
+        pickRange: "vec2<f32>",
         clampRange: "vec2<f32>",
         useClampColors: "u32",
         lowClampColor: "vec4<f32>",

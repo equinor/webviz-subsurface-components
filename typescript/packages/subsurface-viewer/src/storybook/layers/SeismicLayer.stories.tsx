@@ -1,8 +1,12 @@
-import "react";
+import React from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-webpack5";
 
+import { View } from "@deck.gl/core";
+
 import SubsurfaceViewer from "../../SubsurfaceViewer";
+import InfoCard from "../../components/InfoCard";
+import type { MapMouseEvent } from "../../components/Map";
 
 import { default3DViews, defaultStoryParameters } from "../sharedSettings";
 
@@ -148,6 +152,53 @@ export const SeismicSections: StoryObj<typeof SubsurfaceViewerPropsInjector> = {
             ...defaultStoryParameters.docs,
             description: {
                 story: "Display the cage of seismic.",
+            },
+        },
+    },
+};
+
+const seismicSectionsManualRangeLayer = {
+    ...seismicSectionsLayer,
+    id: "seismic_sections_manual_range",
+    colormapSetup: {
+        ...colormapSetup,
+        valueRange: [-0.5, 0.5],
+        clampRange: [-0.5, 0.5],
+    },
+};
+
+const SeismicSectionsManualRangeReadout: React.FC = () => {
+    const [event, setEvent] = React.useState<MapMouseEvent>({
+        type: "hover",
+        infos: [],
+    });
+
+    return (
+        <SubsurfaceViewer
+            id="seismic_sections_manual_range"
+            layers={[smallAxesLayer, seismicSectionsManualRangeLayer]}
+            views={default3DViews}
+            showReadout={false}
+            pickingDepth={1}
+            onMouseEvent={setEvent}
+        >
+            {/* @ts-expect-error Deck.gl View children are not included in SubsurfaceViewer's child type. */}
+            <View id="view_1">
+                <InfoCard pickInfos={event.infos} />
+            </View>
+        </SubsurfaceViewer>
+    );
+};
+
+export const SeismicSectionsManualColorRange: StoryObj<
+    typeof SeismicSectionsManualRangeReadout
+> = {
+    render: () => <SeismicSectionsManualRangeReadout />,
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: "Hover the seismic values outside the manual color interval; the readout shows their sample values.",
             },
         },
     },
