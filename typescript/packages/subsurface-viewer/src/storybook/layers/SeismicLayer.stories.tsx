@@ -1,6 +1,7 @@
 import React from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-webpack5";
+import { expect, userEvent } from "storybook/test";
 
 import { View } from "@deck.gl/core";
 
@@ -172,11 +173,17 @@ const SeismicSectionsManualRangeReadout: React.FC = () => {
         type: "hover",
         infos: [],
     });
+    // Stable layers identity: a new array on every hover re-render would
+    // re-create the seismic layer and drop its picking range.
+    const layers = React.useMemo(
+        () => [smallAxesLayer, seismicSectionsManualRangeLayer],
+        []
+    );
 
     return (
         <SubsurfaceViewer
             id="seismic_sections_manual_range"
-            layers={[smallAxesLayer, seismicSectionsManualRangeLayer]}
+            layers={layers}
             views={default3DViews}
             showReadout={false}
             pickingDepth={1}
@@ -194,11 +201,101 @@ export const SeismicSectionsManualColorRange: StoryObj<
     typeof SeismicSectionsManualRangeReadout
 > = {
     render: () => <SeismicSectionsManualRangeReadout />,
+    play: async ({ canvasElement }) => {
+        const deckCanvas = canvasElement.querySelector("canvas");
+        if (!deckCanvas) {
+            throw new Error("Deck.gl canvas not found");
+        }
+
+        // The readout is split across several properties tables (position,
+        // then depth and layer values), so read all of them.
+        const readoutText = () =>
+            Array.from(
+                canvasElement.querySelectorAll('table[aria-label="properties"]')
+            )
+                .map((table) => table.textContent ?? "")
+                .join("|");
+        const readPropertyValue = (): number | undefined => {
+            const rows = canvasElement.querySelectorAll(
+                'table[aria-label="properties"] tr'
+            );
+            for (const row of rows) {
+                const cells = row.querySelectorAll("td");
+                if (cells[0]?.textContent?.includes("Property")) {
+                    const value = Number.parseFloat(
+                        cells[1]?.textContent ?? ""
+                    );
+                    return Number.isFinite(value) ? value : undefined;
+                }
+            }
+            return undefined;
+        };
+        // A pick can land a few frames after the pointer moves, so wait for
+        // the readout text to stop changing before reading it.
+        const hoverAndSettle = async (
+            x: number,
+            y: number
+        ): Promise<number | undefined> => {
+            const bounds = deckCanvas.getBoundingClientRect();
+            await userEvent.pointer({
+                target: deckCanvas,
+                coords: {
+                    clientX: bounds.left + bounds.width * x,
+                    clientY: bounds.top + bounds.height * y,
+                },
+            });
+            let previous = readoutText();
+            let stableSamples = 1;
+            for (
+                let attempt = 0;
+                attempt < 40 && stableSamples < 4;
+                attempt++
+            ) {
+                await new Promise((resolve) => setTimeout(resolve, 150));
+                const current = readoutText();
+                stableSamples = current === previous ? stableSamples + 1 : 1;
+                previous = current;
+            }
+            return readPropertyValue();
+        };
+
+        let outsideRangePosition: { x: number; y: number } | undefined;
+        for (
+            let y = 0.35;
+            y <= 0.9 && outsideRangePosition === undefined;
+            y += 0.05
+        ) {
+            for (
+                let x = 0.4;
+                x <= 0.7 && outsideRangePosition === undefined;
+                x += 0.05
+            ) {
+                const value = await hoverAndSettle(x, y);
+                if (value !== undefined && Math.abs(value) > 0.6) {
+                    outsideRangePosition = { x, y };
+                }
+            }
+        }
+
+        if (outsideRangePosition === undefined) {
+            throw new Error(
+                "No sample outside the manual color interval was picked"
+            );
+        }
+
+        // Leave the pointer on the found sample so the captured readout
+        // matches the value asserted here.
+        const settledValue = await hoverAndSettle(
+            outsideRangePosition.x,
+            outsideRangePosition.y
+        );
+        expect(Math.abs(settledValue ?? 0)).toBeGreaterThan(0.6);
+    },
     parameters: {
         docs: {
             ...defaultStoryParameters.docs,
             description: {
-                story: "Hover the seismic values outside the manual color interval; the readout shows their sample values.",
+                story: "The interaction hovers a seismic sample outside the manual color interval and verifies its value in the readout.",
             },
         },
     },
