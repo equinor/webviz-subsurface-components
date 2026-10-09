@@ -1,3 +1,14 @@
+## 2.3.3 (2026-10-09)
+
+### 🩹 Fixes
+
+- **SubsurfaceViewer:** decouple seismic readout range ([#2874](https://github.com/equinor/webviz-subsurface-components/pull/2874))
+
+### ❤️ Thank You
+
+- Copilot @Copilot
+- Håvard Bjerke
+
 ## 2.3.2 (2026-10-05)
 
 ### 🩹 Fixes
