@@ -57,7 +57,7 @@
     "@jest/globals": "^30.5.1",
     "@mdx-js/react": "^3.1.1",
     "@mui/icons-material": "^7.3.8",
-    "@mui/material": "^7.3.8",
+    "@mui/material": "^9.4.0",
     "@mui/system": "^7.3.8",
     "@nx/jest": "^23.2.0",
     "@nx/js": "~23.1.3",
