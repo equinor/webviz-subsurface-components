@@ -53,8 +53,6 @@ describe("resampleMesh", () => {
             new Float32Array([1, 2, 3, 4])
         );
 
-        console.log(Array.from(resampledMesh));
-
         expect(resampledFrame).toEqual({
             origin: [-0.5, -0.5],
             increment: [1, 1],
