@@ -39,25 +39,31 @@ describe("MapLayer property input handling", () => {
 describe("resampleMesh", () => {
     it("adds a row and column and averages neighboring mesh values", () => {
         const frame: MapFrame = {
-            origin: [10, 20],
-            increment: [2, 4],
+            origin: [0, 0],
+            increment: [1, 1],
             count: [2, 2],
         };
 
+        // The function expands a node grid by one in each direction,
+        // shifts the origin by half an increment, and averages neighboring
+        // mesh values. A small 2×2 input gives a clear discriminating check
+        // for both the updated frame and the resulting 3×3 values.
         const [resampledFrame, resampledMesh] = resampleMesh(
             frame,
             new Float32Array([1, 2, 3, 4])
         );
 
+        console.log(Array.from(resampledMesh));
+
         expect(resampledFrame).toEqual({
-            origin: [9, 18],
-            increment: [2, 4],
+            origin: [-0.5, -0.5],
+            increment: [1, 1],
             count: [3, 3],
         });
         expect(Array.from(resampledMesh)).toEqual([
             /*eslint-disable */
             1, 1.5, 2,
-            2, 2.5, 1.5,
+            2, 2.5, 3,
             3, 3.5, 4,
             /*eslint-enable */
         ]);
