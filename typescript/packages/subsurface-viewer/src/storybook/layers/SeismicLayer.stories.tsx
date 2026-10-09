@@ -1,6 +1,7 @@
 import React from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-webpack5";
+import { expect, userEvent } from "storybook/test";
 
 import { View } from "@deck.gl/core";
 
@@ -194,11 +195,64 @@ export const SeismicSectionsManualColorRange: StoryObj<
     typeof SeismicSectionsManualRangeReadout
 > = {
     render: () => <SeismicSectionsManualRangeReadout />,
+    play: async ({ canvasElement }) => {
+        const deckCanvas = canvasElement.querySelector("canvas");
+        if (!deckCanvas) {
+            throw new Error("Deck.gl canvas not found");
+        }
+
+        const bounds = deckCanvas.getBoundingClientRect();
+        let outsideRangeValue: number | undefined;
+
+        for (
+            let y = 0.35;
+            y <= 0.9 && outsideRangeValue === undefined;
+            y += 0.05
+        ) {
+            for (
+                let x = 0.4;
+                x <= 0.7 && outsideRangeValue === undefined;
+                x += 0.05
+            ) {
+                await userEvent.pointer({
+                    target: deckCanvas,
+                    coords: {
+                        clientX: bounds.left + bounds.width * x,
+                        clientY: bounds.top + bounds.height * y,
+                    },
+                });
+                await new Promise<void>((resolve) =>
+                    requestAnimationFrame(() => resolve())
+                );
+
+                const propertyRows = canvasElement.querySelectorAll(
+                    'table[aria-label="properties"] tr'
+                );
+                for (const row of propertyRows) {
+                    const cells = row.querySelectorAll("td");
+                    if (!cells[0]?.textContent?.includes("Property")) {
+                        continue;
+                    }
+
+                    const value = Number.parseFloat(
+                        cells[1]?.textContent ?? ""
+                    );
+                    if (Number.isFinite(value) && Math.abs(value) > 0.5) {
+                        outsideRangeValue = value;
+                        break;
+                    }
+                }
+            }
+        }
+
+        await expect(outsideRangeValue).toBeDefined();
+        await expect(Math.abs(outsideRangeValue ?? 0)).toBeGreaterThan(0.5);
+    },
     parameters: {
         docs: {
             ...defaultStoryParameters.docs,
             description: {
-                story: "Hover the seismic values outside the manual color interval; the readout shows their sample values.",
+                story: "The interaction hovers a seismic sample outside the manual color interval and verifies its value in the readout.",
             },
         },
     },
