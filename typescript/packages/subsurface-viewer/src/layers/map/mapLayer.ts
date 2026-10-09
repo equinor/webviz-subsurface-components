@@ -23,7 +23,6 @@ import { loadDataArray } from "../../utils/serialize";
 import { PrivateMapLayer } from "./privateMapLayer";
 import { rotate } from "./utils";
 import { makeFullMesh } from "./webworker";
-
 import workerpool from "workerpool";
 import type { RGBColor } from "../../utils";
 
@@ -35,6 +34,75 @@ const workerPoolConfig = findConfig(
     "config/workerpool",
     "config/layer/MapLayer/workerpool"
 );
+
+function resampleMesh(
+    frame: MapFrame,
+    meshData: Float32Array
+): [MapFrame, Float32Array] {
+    const resampledFrame = structuredClone(frame);
+    resampledFrame.origin[0] = frame.origin[0] - frame.increment[0] / 2;
+    resampledFrame.origin[1] = frame.origin[1] - frame.increment[1] / 2;
+
+    resampledFrame.count[0] = frame.count[0] + 1; // number of nodes in x direction
+    resampledFrame.count[1] = frame.count[1] + 1;
+
+    const nc_ = frame.count[0]; // original number of nodes in x (col) direction
+    const nr_ = frame.count[1]; // original number of nodes in y (row) direction
+
+    const nc = resampledFrame.count[0]; // new number of nodes in x (col) direction
+    const nr = resampledFrame.count[1];
+
+    const resampledMesh = new Float32Array(nc * nr);
+
+    function validRange(r: number, c: number): boolean {
+        return r < nr_ && r >= 0 && c < nc_ && c >= 0;
+    }
+
+    for (let row = 0; row < nr; row++) {
+        for (let col = 0; col < nc; col++) {
+            const i = row * nc + col; // index in the resampled mesh
+
+            /*eslint-disable */
+            // P1
+            let r = row;
+            let c = col;
+            let valid = validRange(r, c);
+            if (valid && isNaN(meshData[r * nc_ + c])) {
+                // Undefined mesh data at this location.
+                resampledMesh[i] = meshData[r * nc_ + c];
+                continue;
+            }
+            const p1 = valid ? meshData[r * nc_ + c] : 0;
+            let divisor = valid ? 1 : 0;
+
+            // P2
+            r = row - 1;
+            c = col;
+            valid = validRange(r, c);
+            const p2 = valid && !isNaN(meshData[r * nc_ + c]) ? meshData[r * nc_ + c] : 0;
+            divisor += p2 !== 0 && valid ? 1 : 0;
+
+            // P3
+            r = row - 1;
+            c = col - 1;
+            valid = validRange(r, c);
+            const p3 = valid && !isNaN(meshData[r * nc_ + c]) ? meshData[r * nc_ + c] : 0;
+            divisor += p3 !== 0 && valid ? 1 : 0;
+
+            // P4
+            r = row;
+            c = col - 1;
+            valid = validRange(r, c);
+            const p4 = valid && !isNaN(meshData[r * nc_ + c]) ? meshData[r * nc_ + c] : 0;
+            divisor += p4 !== 0 && valid ? 1 : 0;
+
+            resampledMesh[i] = divisor !== 0 ? (p1 + p2 + p3 + p4) / divisor : 0;
+            /*eslint-enable */
+        }
+    }
+
+    return [resampledFrame, resampledMesh];
+}
 
 const pool = workerpool.pool({
     ...{
@@ -381,9 +449,31 @@ export default class MapLayer<
             // Using inline web worker for calculating the triangle mesh from
             // loaded input data so not to halt the GUI thread.
 
+            const nx = this.props.frame.count[0]; // number of nodes in x direction
+            const ny = this.props.frame.count[1];
+            const propLength = propertiesData.length;
+            const isNodeCenteredProperties = propLength === nx * ny;
+
+            let frame = structuredClone(this.props.frame);
+            const doResample =
+                isPropertiesCategorical && isNodeCenteredProperties;
+            if (doResample) {
+                console.warn(
+                    "Resampling node-centered properties mesh to center coloring on nodes."
+                );
+
+                const [resampledFrame, resampledMesh] = resampleMesh(
+                    frame,
+                    meshData
+                );
+                meshData = resampledMesh as Float32Array<ArrayBuffer>;
+                frame = resampledFrame;
+            }
+
             const webworkerParams = this.getWebworkerParams(
                 meshData,
-                propertiesData
+                propertiesData,
+                frame
             );
 
             pool.exec(makeFullMesh, [{ data: webworkerParams.params }]).then(
@@ -605,7 +695,8 @@ export default class MapLayer<
 
     private getWebworkerParams(
         meshData: Float32Array | null,
-        propertiesData: Float32Array | Uint16Array
+        propertiesData: Float32Array | Uint16Array,
+        frame: MapFrame
     ): { params: Params; transferrables?: Transferable[] } {
         if (!meshData && !propertiesData) {
             throw new Error(
@@ -624,7 +715,7 @@ export default class MapLayer<
             meshData,
             propertiesData,
             !!meshData,
-            this.props.frame,
+            frame,
             this.props.smoothShading,
             this.props.gridLines,
             undefinedPropertyValue ?? DEFAULT_DISCRETE_UNDEFINED_VALUE,
