@@ -1,7 +1,7 @@
 import React from "react";
 
 import type { Meta, StoryObj } from "@storybook/react-webpack5";
-import { expect, userEvent } from "storybook/test";
+import { expect, userEvent, waitFor } from "storybook/test";
 
 import { View } from "@deck.gl/core";
 
@@ -202,51 +202,66 @@ export const SeismicSectionsManualColorRange: StoryObj<
         }
 
         const bounds = deckCanvas.getBoundingClientRect();
-        let outsideRangeValue: number | undefined;
+        const hoverAt = async (x: number, y: number) => {
+            await userEvent.pointer({
+                target: deckCanvas,
+                coords: {
+                    clientX: bounds.left + bounds.width * x,
+                    clientY: bounds.top + bounds.height * y,
+                },
+            });
+            await new Promise<void>((resolve) =>
+                requestAnimationFrame(() => resolve())
+            );
+        };
+        const readPropertyValue = (): number | undefined => {
+            const propertyRows = canvasElement.querySelectorAll(
+                'table[aria-label="properties"] tr'
+            );
+            for (const row of propertyRows) {
+                const cells = row.querySelectorAll("td");
+                if (cells[0]?.textContent?.includes("Property")) {
+                    const value = Number.parseFloat(
+                        cells[1]?.textContent ?? ""
+                    );
+                    return Number.isFinite(value) ? value : undefined;
+                }
+            }
+            return undefined;
+        };
 
+        let outsideRangePosition: { x: number; y: number } | undefined;
         for (
             let y = 0.35;
-            y <= 0.9 && outsideRangeValue === undefined;
+            y <= 0.9 && outsideRangePosition === undefined;
             y += 0.05
         ) {
             for (
                 let x = 0.4;
-                x <= 0.7 && outsideRangeValue === undefined;
+                x <= 0.7 && outsideRangePosition === undefined;
                 x += 0.05
             ) {
-                await userEvent.pointer({
-                    target: deckCanvas,
-                    coords: {
-                        clientX: bounds.left + bounds.width * x,
-                        clientY: bounds.top + bounds.height * y,
-                    },
-                });
-                await new Promise<void>((resolve) =>
-                    requestAnimationFrame(() => resolve())
-                );
-
-                const propertyRows = canvasElement.querySelectorAll(
-                    'table[aria-label="properties"] tr'
-                );
-                for (const row of propertyRows) {
-                    const cells = row.querySelectorAll("td");
-                    if (!cells[0]?.textContent?.includes("Property")) {
-                        continue;
-                    }
-
-                    const value = Number.parseFloat(
-                        cells[1]?.textContent ?? ""
-                    );
-                    if (Number.isFinite(value) && Math.abs(value) > 0.5) {
-                        outsideRangeValue = value;
-                        break;
-                    }
+                await hoverAt(x, y);
+                const value = readPropertyValue();
+                if (value !== undefined && Math.abs(value) > 0.6) {
+                    outsideRangePosition = { x, y };
                 }
             }
         }
 
-        await expect(outsideRangeValue).toBeDefined();
-        await expect(Math.abs(outsideRangeValue ?? 0)).toBeGreaterThan(0.5);
+        if (outsideRangePosition === undefined) {
+            throw new Error(
+                "No sample outside the manual color interval was picked"
+            );
+        }
+
+        // The readout can lag one pointer event behind, so hover the found
+        // sample again and wait until its value is shown; the screenshot
+        // captures this final state.
+        await hoverAt(outsideRangePosition.x, outsideRangePosition.y);
+        await waitFor(() => {
+            expect(Math.abs(readPropertyValue() ?? 0)).toBeGreaterThan(0.6);
+        });
     },
     parameters: {
         docs: {
