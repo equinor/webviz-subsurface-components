@@ -4,6 +4,8 @@ import { describe, expect, it } from "@jest/globals";
 import {
     getUndefinedValueProperties,
     normalizeDiscreteProperties,
+    resampleMesh,
+    MapFrame,
 } from "./mapLayer";
 
 describe("MapLayer property input handling", () => {
@@ -31,5 +33,33 @@ describe("MapLayer property input handling", () => {
         expect(
             getUndefinedValueProperties(new Float32Array(), false)
         ).toBeNaN();
+    });
+});
+
+describe("resampleMesh", () => {
+    it("adds a row and column and averages neighboring mesh values", () => {
+        const frame: MapFrame = {
+            origin: [10, 20],
+            increment: [2, 4],
+            count: [2, 2],
+        };
+
+        const [resampledFrame, resampledMesh] = resampleMesh(
+            frame,
+            new Float32Array([1, 2, 3, 4])
+        );
+
+        expect(resampledFrame).toEqual({
+            origin: [9, 18],
+            increment: [2, 4],
+            count: [3, 3],
+        });
+        expect(Array.from(resampledMesh)).toEqual([
+            /*eslint-disable */
+            1, 1.5, 2,
+            2, 2.5, 1.5,
+            3, 3.5, 4,
+            /*eslint-enable */
+        ]);
     });
 });
