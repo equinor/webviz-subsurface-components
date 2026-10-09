@@ -1,3 +1,14 @@
+## 2.3.4 (2026-10-09)
+
+### 🩹 Fixes
+
+- Support for categorical node values ([#2873](https://github.com/equinor/webviz-subsurface-components/pull/2873))
+
+### ❤️ Thank You
+
+- Håvard Bjerke
+- nilscb @nilscb
+
 ## 2.3.3 (2026-10-09)
 
 ### 🩹 Fixes
