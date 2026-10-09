@@ -966,6 +966,8 @@ class SyncLogViewer extends Component<SyncLogViewerProps, State> {
         ] of this.callbackManagers.entries()) {
             const controller = callbackManager?.controller;
             if (!controller) continue;
+            // keep the user's zoom when data or domain props change
+            if (controller.isUserZoomed()) continue;
             const domain =
                 getDomain(this.props.visibleRange, index) ??
                 getDomain(this.props.domain, index);
