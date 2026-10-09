@@ -10,7 +10,11 @@ import WellLogView, {
     applyWellPickLabelFormatting,
     defaultWellPickLabels,
 } from "./WellLogView";
-import type { WellPickLabelInput, WellPickProps } from "./WellLogView";
+import type {
+    WellLogController,
+    WellPickLabelInput,
+    WellPickProps,
+} from "./WellLogView";
 import type { Template } from "./WellLogTemplateTypes";
 import type { WellLogSet } from "./WellLogTypes";
 import type { ColormapFunction } from "../utils/color-function";
@@ -66,6 +70,87 @@ describe("Test Well Log View Component", () => {
             />
         );
         expect(container.firstChild).toMatchSnapshot();
+    });
+});
+
+describe("Zoom is kept across domain updates", () => {
+    const wellA = exampleWellLogL898MUD[0];
+
+    const renderProps = (domain?: [number, number]) => ({
+        wellLogSets: [wellA],
+        domain,
+        options: { checkDatafileSchema: true },
+        template: viewerTemplate,
+        colorMapFunctions: exampleColormapFunctions,
+        primaryAxis: "md" as const,
+        axisTitles: { md: "MD", tvd: "TVD", time: "TIME" },
+        axisMnemos: {
+            md: ["DEPTH", "DEPT", "MD", "TDEP", "MD_RKB"],
+            tvd: ["TVD", "TVDSS", "DVER", "TVD_MSL"],
+            time: ["TIME"],
+        },
+    });
+
+    // Zoom through a pointer gesture on the view, as a user would
+    const userZoom = (host: HTMLElement, zoom: () => void) => {
+        host
+            .querySelector(".container")
+            ?.dispatchEvent(new Event("pointerdown", { bubbles: true }));
+        zoom();
+        window.dispatchEvent(new Event("pointerup"));
+    };
+
+    it("keeps a user zoom when the domain grows", () => {
+        let controller: WellLogController | undefined;
+        const onCreateController = (c: WellLogController) => {
+            controller = c;
+        };
+        const { container: host, rerender } = render(
+            <WellLogView
+                {...renderProps()}
+                onCreateController={onCreateController}
+            />
+        );
+        const zoom: [number, number] = [1800, 2000];
+        userZoom(host, () => controller?.zoomContentTo(zoom));
+
+        rerender(
+            <WellLogView
+                {...renderProps([1000, 5000])}
+                onCreateController={onCreateController}
+            />
+        );
+
+        expect(controller?.getContentBaseDomain()[0]).toBeCloseTo(1000, 0);
+        expect(controller?.getContentBaseDomain()[1]).toBeCloseTo(5000, 0);
+        expect(controller?.isUserZoomed()).toBe(true);
+        expect(controller?.getContentDomain()[0]).toBeCloseTo(zoom[0], 0);
+        expect(controller?.getContentDomain()[1]).toBeCloseTo(zoom[1], 0);
+    });
+
+    it("follows the new domain after a programmatic zoom", () => {
+        let controller: WellLogController | undefined;
+        const onCreateController = (c: WellLogController) => {
+            controller = c;
+        };
+        const { rerender } = render(
+            <WellLogView
+                {...renderProps()}
+                onCreateController={onCreateController}
+            />
+        );
+        controller?.zoomContentTo([1800, 2000]);
+
+        rerender(
+            <WellLogView
+                {...renderProps([1000, 5000])}
+                onCreateController={onCreateController}
+            />
+        );
+
+        expect(controller?.isUserZoomed()).toBe(false);
+        expect(controller?.getContentDomain()[0]).toBeCloseTo(1000, 0);
+        expect(controller?.getContentDomain()[1]).toBeCloseTo(5000, 0);
     });
 });
 
