@@ -4,3 +4,5 @@ import { TextDecoder, TextEncoder } from "node:util";
 globalThis.TextDecoder = TextDecoder as any;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 globalThis.TextEncoder = TextEncoder as any;
+globalThis.structuredClone =
+    globalThis.structuredClone || ((val) => JSON.parse(JSON.stringify(val)));
