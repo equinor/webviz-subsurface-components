@@ -35,7 +35,7 @@ const workerPoolConfig = findConfig(
     "config/layer/MapLayer/workerpool"
 );
 
-function resampleMesh(
+export function resampleMesh(
     frame: MapFrame,
     meshData: Float32Array
 ): [MapFrame, Float32Array] {
