@@ -1,5 +1,5 @@
 import type { ColorTableArray } from "@emerson-eps/color-tables";
-import { Matrix4 } from "math.gl";
+import { Matrix4, type Matrix4Like } from "math.gl";
 
 import type {
     Accessor,
@@ -42,6 +42,29 @@ export interface PropertyDataType {
 export interface LayerPickInfo<T = any> extends PickingInfo<T> {
     propertyValue?: number; // for single property
     properties?: PropertyDataType[]; // for multiple properties
+}
+
+/**
+ * Returns an array of property data objects. possibly initialized with the depth information.
+ * @param infoDepth - The depth value to initialize the property data with.
+ * @param ZIncreasingDownwards - Whether the Z axis increases downwards.
+ * @param modelMatrix - Optional model matrix to account for scaling.
+ * @returns An array of property data objects, either empty or including the depth if available.
+ */
+export function initPropertyData(
+    infoDepth: number | undefined,
+    ZIncreasingDownwards: boolean,
+    modelMatrix?: Matrix4Like | null
+): PropertyDataType[] {
+    if (infoDepth !== undefined) {
+        const zScale = modelMatrix?.[10] ?? 1;
+
+        const depth =
+            (ZIncreasingDownwards ? -infoDepth : infoDepth) /
+            Math.max(0.001, zScale);
+        return [createPropertyData("Depth", depth)];
+    }
+    return [];
 }
 
 /**

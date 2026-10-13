@@ -21,7 +21,7 @@ import type {
     LayerPickInfo,
     PropertyDataType,
 } from "../utils/deckglTools";
-import { createPropertyData } from "../utils/deckglTools";
+import { createPropertyData, initPropertyData } from "../utils/deckglTools";
 import {
     type ColormapFunctionType,
     createColormapTexture,
@@ -123,7 +123,7 @@ export class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
         }
         if (
             this.props.vertexProperties instanceof Uint16Array ||
-            typeof this.props.discretePropertyValueNames !== "undefined"
+            this.props.discretePropertyValueNames !== undefined
         ) {
             const namedPropertyCount =
                 this.props.discretePropertyValueNames?.length;
@@ -515,11 +515,16 @@ export class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
             return info;
         }
 
+        const layer_properties: PropertyDataType[] = initPropertyData(
+            info.coordinate?.[2],
+            this.props.ZIncreasingDownwards,
+            this.props.modelMatrix
+        );
+
         if (this.isPropertiesCategorical()) {
             const [r, g, b] = info.color;
             const code = decodeIndexFromRGB([r, g, b]);
 
-            const layer_properties: PropertyDataType[] = [];
             layer_properties.push(createPropertyData("Code", code));
 
             const index =
@@ -538,24 +543,9 @@ export class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
             };
         }
 
-        const layer_properties: PropertyDataType[] = [];
-
         // Note these colors are in the  0-255 range.
         const [r, g, b] = info.color;
         const vertexIndex = decodeIndexFromRGB([r, g, b]);
-
-        if (typeof info.coordinate?.[2] !== "undefined") {
-            const zScale = this.props.modelMatrix
-                ? this.props.modelMatrix[10]
-                : 1;
-
-            const depth =
-                (this.props.ZIncreasingDownwards
-                    ? -info.coordinate[2]
-                    : info.coordinate[2]) / Math.max(0.001, zScale);
-
-            layer_properties.push(createPropertyData("Depth", depth));
-        }
 
         const properties = this.props.vertexProperties;
         const property = properties[vertexIndex];

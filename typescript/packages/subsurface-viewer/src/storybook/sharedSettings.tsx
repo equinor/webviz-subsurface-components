@@ -211,7 +211,7 @@ export const hugin25mKhNetmapMapLayerPng = {
 export const hugin5mKhNetmapMapLayer = {
     "@@type": "MapLayer",
     id: "mesh-layer",
-    meshUrl: "hugin_depth_5_m.float32",
+    meshData: "hugin_depth_5_m.float32",
     frame: {
         origin: hugin2DOrigin,
         count: [1451, 1141],

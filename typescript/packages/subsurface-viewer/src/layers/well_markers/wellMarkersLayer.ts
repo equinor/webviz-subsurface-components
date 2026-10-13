@@ -18,7 +18,7 @@ import type {
     LayerPickInfo,
     PropertyDataType,
 } from "../utils/deckglTools";
-import { createPropertyData } from "../utils/deckglTools";
+import { createPropertyData, initPropertyData } from "../utils/deckglTools";
 import { utilities } from "../shader_modules";
 
 import { precisionForTests } from "../shader_modules/test-precision/precisionForTests";
@@ -374,7 +374,11 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
             return info;
         }
 
-        const layer_properties: PropertyDataType[] = [];
+        const layer_properties: PropertyDataType[] = initPropertyData(
+            info.coordinate?.[2],
+            this.props.ZIncreasingDownwards,
+            this.props.modelMatrix
+        );
 
         const markerIndex = this.decodePickingColor(info.color);
         const markerData = this.props.data as WellMarkerDataT[];
@@ -391,11 +395,6 @@ export default class WellMarkersLayer extends Layer<WellMarkersLayerProps> {
             );
         }
 
-        if (typeof info.coordinate?.[2] !== "undefined") {
-            let depth = info.coordinate[2];
-            depth = this.props.ZIncreasingDownwards ? -depth : depth;
-            layer_properties.push(createPropertyData("Depth", depth));
-        }
         return {
             ...info,
             properties: layer_properties,

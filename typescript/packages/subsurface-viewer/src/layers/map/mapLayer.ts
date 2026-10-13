@@ -110,10 +110,8 @@ export function resampleMesh(
 }
 
 const pool = workerpool.pool({
-    ...{
-        maxWorkers: 10,
-        workerType: "web",
-    },
+    maxWorkers: 10,
+    workerType: "web",
     ...workerPoolConfig,
 });
 
