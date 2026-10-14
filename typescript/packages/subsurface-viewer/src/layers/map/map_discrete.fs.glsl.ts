@@ -21,15 +21,15 @@ void main(void) {
 
    vec3 normal = normalize(cross(dFdx(position_commonspace.xyz), dFdy(position_commonspace.xyz)));
 
+   vec4 color = vec4(vertexColor_, 1.0);
    uint propertyValue = property;
 
-   vec4 color = vec4(vertexColor_, 1.0);
 
 
-   bool is_contours = map_d.contourReferencePoint != -1.0 && map_d.contourInterval != -1.0;
+   bool is_contours = map.contourReferencePoint != -1.0 && map.contourInterval != -1.0;
    if (is_contours) {
-      float val = map_d.isContoursDepth ? (abs(worldPos.z) - map_d.contourReferencePoint) / map_d.contourInterval
-                                  : (float(propertyValue) - map_d.contourReferencePoint) / map_d.contourInterval;
+      float val = map.isContoursDepth ? (abs(worldPos.z) - map.contourReferencePoint) / map.contourInterval
+                                  : (float(propertyValue) - map.contourReferencePoint) / map.contourInterval;
 
       float f  = fract(val);
       float df = fwidth(val);
@@ -39,7 +39,6 @@ void main(void) {
 
       color = color * vec4(c, c, c, 1.0);
    }
-
 
    // Use two sided phong lighting. This has no effect if "material" property is not set.
    vec3 lightColor = lighting_getLightColor(color.rgb, cameraPosition, position_commonspace.xyz, normal);

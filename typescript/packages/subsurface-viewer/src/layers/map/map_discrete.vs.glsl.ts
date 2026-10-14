@@ -2,6 +2,7 @@ export default `\
 #version 300 es
 #define SHADER_NAME map-discrete-vertex-shader
 
+// Primitive attributes
 in vec3 positions;
 
 in vec3 colors;
@@ -20,23 +21,23 @@ out vec3 worldPos;
 in uint properties;
 flat out uint property;
 
-flat out lowp int vertexIndex;
+flat out int vertexIndex;
 
 void main(void) {
-   property = properties;
-
-  vertexColor_ = vertexColor;
-
    geometry.pickingColor = pickingColors;
    vertexIndex = gl_VertexID;
 
+   vertexColor_ = vertexColor;
+
    vec3 position = positions;
-   position[2] *= map_d.ZIncreasingDownwards ? -1.0 : 1.0;
+   position[2] *= map.ZIncreasingDownwards ? -1.0 : 1.0;
 
    cameraPosition = project.cameraPosition;
 
    worldPos = position;
    geometry.worldPosition = position;
+
+   property = properties;
 
    position_commonspace = vec4(project_position(position), 0.0);
    gl_Position = project_common_position_to_clipspace(position_commonspace);
