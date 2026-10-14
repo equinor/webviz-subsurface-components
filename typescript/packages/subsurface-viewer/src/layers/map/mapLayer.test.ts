@@ -10,16 +10,16 @@ import {
 
 describe("MapLayer property input handling", () => {
     it("uses the configured sentinel for undefined discrete array values", () => {
-        expect(normalizeDiscreteProperties([1, undefined, 3], 999)).toEqual([
+        expect(normalizeDiscreteProperties([1, Number.NaN, 3], 999)).toEqual([
             1, 999, 3,
         ]);
     });
 
     it("uses 0xFFFF as the default discrete sentinel", () => {
-        expect(normalizeDiscreteProperties([1, undefined], 0xffff)).toEqual([
+        expect(normalizeDiscreteProperties([1, Number.NaN], 0xffff)).toEqual([
             1, 0xffff,
         ]);
-        expect(getUndefinedValueProperties([1, undefined], true)).toBe(0xffff);
+        expect(getUndefinedValueProperties([1, Number.NaN], true)).toBe(0xffff);
     });
 
     it("keeps typed discrete input unchanged", () => {

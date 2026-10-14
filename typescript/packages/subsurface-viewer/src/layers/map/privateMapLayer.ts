@@ -8,13 +8,16 @@ import type {
 } from "@deck.gl/core";
 import { COORDINATE_SYSTEM, Layer, project32, picking } from "@deck.gl/core";
 import type { Device, UniformValue } from "@luma.gl/core";
+
+import { Model, Geometry } from "@luma.gl/engine";
+
 import type { ShaderModule } from "@luma.gl/shadertools";
 import { lighting } from "@luma.gl/shadertools";
-import { Model, Geometry } from "@luma.gl/engine";
-import { phongMaterial } from "../shader_modules/phong-lighting/phong-material";
-import { precisionForTests } from "../shader_modules/test-precision/precisionForTests";
+
 import { decodeIndexFromRGB, utilities } from "../shader_modules";
 import { encodeIndexToRGB } from "../shader_modules/utilities";
+import { phongMaterial } from "../shader_modules/phong-lighting/phong-material";
+import { precisionForTests } from "../shader_modules/test-precision/precisionForTests";
 import type {
     DeckGLLayerContext,
     ExtendedLayerProps,
@@ -27,14 +30,21 @@ import {
     createColormapTexture,
     getColormapDiscreteColors,
 } from "../utils/colormapTools";
+
 import type { RGBColor } from "../../utils";
+
 import fs from "./map.fs.glsl";
 import vs from "./map.vs.glsl";
 import fsDiscrete from "./map_discrete.fs.glsl";
 import vsDiscrete from "./map_discrete.vs.glsl";
 import fsLineShader from "./line.fs.glsl";
 import vsLineShader from "./line.vs.glsl";
-import type { IMapDiscretePropertyValueName } from "./typeDefs";
+
+import {
+    type IMapDiscretePropertyValueName,
+    TMapColoringMode,
+} from "./typeDefs";
+import { isDiscreteProperty } from "./mapLayer";
 
 interface IColormapTextureHints {
     discreteData: boolean;
@@ -49,7 +59,6 @@ export interface PrivateMapLayerProps extends ExtendedLayerProps {
     vertexIndices: Int32Array;
     lineIndices: Uint32Array;
     contours: [number, number];
-    gridLines: boolean;
     isContoursDepth: boolean;
     colormapName: string;
     colormapRange: [number, number];
@@ -57,12 +66,14 @@ export interface PrivateMapLayerProps extends ExtendedLayerProps {
     colormapFunction?: ColormapFunctionType;
     undefinedPropertyColor: RGBColor;
     undefinedPropertyValue: number;
+    coloringMode: TMapColoringMode;
+    gridLines: boolean;
     propertyValueRange: [number, number];
+    discretePropertyValueNames?: IMapDiscretePropertyValueName[];
     smoothShading: boolean;
     depthTest: boolean;
     ZIncreasingDownwards: boolean;
     enableLighting: boolean;
-    discretePropertyValueNames?: IMapDiscretePropertyValueName[];
 }
 
 const defaultProps = {
@@ -70,6 +81,8 @@ const defaultProps = {
     isContoursDepth: true,
     gridLines: false,
     colormapName: "",
+    colormapClampColor: [200, 200, 200],
+    coloringMode: TMapColoringMode.Property,
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
     propertyValueRange: [0.0, 1.0],
     meshValueRange: [0.0, 1.0],
@@ -121,23 +134,21 @@ export class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
                 ),
             };
         }
-        if (
-            this.props.vertexProperties instanceof Uint16Array ||
-            this.props.discretePropertyValueNames !== undefined
-        ) {
-            const namedPropertyCount =
-                this.props.discretePropertyValueNames?.length;
+        if (isDiscreteProperty(this.props.coloringMode)) {
+            // It is expected that the property values are integers ranging from 0 to N.
+            // Thus this.props.propertyValueRange?.[0] should be 0
+            // and this.props.propertyValueRange?.[1] should be N
             const maxPropertyValue = Number.isFinite(
                 this.props.propertyValueRange[1]
             )
-                ? Math.max(0, Math.floor(this.props.propertyValueRange[1]))
+                ? Math.round(this.props.propertyValueRange[1])
                 : 0;
+            const namedPropertyCount =
+                this.props.discretePropertyValueNames?.length ?? 0;
             return {
                 discreteData: true,
                 colormapSize:
-                    namedPropertyCount && namedPropertyCount > 0
-                        ? namedPropertyCount
-                        : Math.max(maxPropertyValue + 1, 1),
+                    Math.max(maxPropertyValue, namedPropertyCount) + 1,
             };
         }
         return {
@@ -164,7 +175,7 @@ export class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
         const entries = this.props.discretePropertyValueNames ?? [];
         const codeToIndex = new Map<number, number>();
         for (let idx = 0; idx < entries.length; idx++) {
-            codeToIndex.set(entries[idx].code, idx);
+            codeToIndex.set(entries[idx].value, idx);
         }
 
         const vertexColors = new Float32Array(length * 3);
@@ -245,10 +256,6 @@ export class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
 
     updateState({ context }: UpdateParameters<this>): void {
         this.initializeState(context as DeckGLLayerContext);
-    }
-
-    isPropertiesCategorical(): boolean {
-        return this.getColoringHints().discreteData;
     }
 
     getContinuousPropModel() {
@@ -436,7 +443,7 @@ export class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
     }
 
     _getModels(device: Device) {
-        const mesh_model = this.isPropertiesCategorical()
+        const mesh_model = isDiscreteProperty(this.props.coloringMode)
             ? this.getDiscretePropModel()
             : this.getContinuousPropModel();
 
@@ -521,23 +528,24 @@ export class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
             this.props.modelMatrix
         );
 
-        if (this.isPropertiesCategorical()) {
+        if (isDiscreteProperty(this.props.coloringMode)) {
             const [r, g, b] = info.color;
-            const code = decodeIndexFromRGB([r, g, b]);
-
-            const index =
-                this.props.discretePropertyValueNames?.findIndex(
-                    (e) => e.code === code
-                ) ?? -1;
-            const name =
-                index !== -1
-                    ? this.props.discretePropertyValueNames?.[index]?.name
-                    : "No name";
-
-            layer_properties.push(
-                createPropertyData("Property", name as string)
-            );
-            layer_properties.push(createPropertyData("Value", code));
+            const propertyValue = decodeIndexFromRGB([r, g, b]);
+            if (propertyValue != undefined && Number.isFinite(propertyValue)) {
+                const propertyText = this.getPropertyText(propertyValue);
+                if (propertyText) {
+                    layer_properties.push(
+                        createPropertyData("Property", propertyText.text)
+                    );
+                    layer_properties.push(
+                        createPropertyData("Value", propertyText.value)
+                    );
+                } else {
+                    layer_properties.push(
+                        createPropertyData("Property", propertyValue)
+                    );
+                }
+            }
 
             return {
                 ...info,
@@ -556,6 +564,25 @@ export class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
         return {
             ...info,
             properties: layer_properties,
+        };
+    }
+
+    private getPropertyText(
+        index: number
+    ): { text: string | number; value: number } | undefined {
+        if (!this.props.discretePropertyValueNames) {
+            return undefined;
+        }
+        if (
+            index < 0 ||
+            index >= this.props.discretePropertyValueNames.length
+        ) {
+            return undefined;
+        }
+        const valueName = this.props.discretePropertyValueNames[index];
+        return {
+            text: valueName.name,
+            value: valueName.value,
         };
     }
 }

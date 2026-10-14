@@ -43,8 +43,8 @@ import type {
     IGrid3DDiscretePropertyValueName,
     MeshType,
     MeshTypeLines,
-    TGrid3DColoringMode,
 } from "./typeDefs";
+import { TGrid3DColoringMode } from "./typeDefs";
 
 export interface PrivateLayerProps extends ExtendedLayerProps {
     mesh: MeshType;
@@ -52,9 +52,9 @@ export interface PrivateLayerProps extends ExtendedLayerProps {
     colormapName: string;
     colormapRange: [number, number];
     colormapClampColor: Color | undefined | boolean;
+    colormapFunction?: ColormapFunctionType;
     undefinedPropertyValue: number;
     undefinedPropertyColor: RGBColor;
-    colormapFunction?: ColormapFunctionType;
     coloringMode: TGrid3DColoringMode;
     gridLines: boolean;
     propertyValueRange: [number, number];
@@ -67,7 +67,7 @@ export interface PrivateLayerProps extends ExtendedLayerProps {
 const defaultProps = {
     colormapName: "",
     colormapClampColor: [200, 200, 200],
-    coloringMode: 0,
+    coloringMode: TGrid3DColoringMode.Property,
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
     propertyValueRange: [0.0, 1.0],
     depthTest: true,
@@ -278,9 +278,9 @@ export class PrivateGrid3DLayer extends Layer<PrivateLayerProps> {
         const vertexIndex = decodeIndexFromRGB([r, g, b]);
 
         const properties = this.props.mesh.attributes.properties?.value;
-        const propertyIndex = properties?.[vertexIndex];
-        if (propertyIndex != undefined && Number.isFinite(propertyIndex)) {
-            const propertyText = this.getPropertyText(propertyIndex);
+        const propertyValue = properties?.[vertexIndex];
+        if (propertyValue != undefined && Number.isFinite(propertyValue)) {
+            const propertyText = this.getPropertyText(propertyValue);
             if (propertyText) {
                 layer_properties.push(
                     createPropertyData("Property", propertyText.text)
@@ -290,7 +290,7 @@ export class PrivateGrid3DLayer extends Layer<PrivateLayerProps> {
                 );
             } else {
                 layer_properties.push(
-                    createPropertyData("Property", propertyIndex)
+                    createPropertyData("Property", propertyValue)
                 );
             }
         }
@@ -324,16 +324,27 @@ export class PrivateGrid3DLayer extends Layer<PrivateLayerProps> {
         if (this.props.colormapFunction instanceof Uint8Array) {
             return {
                 discreteData: true,
-                colormapSize: this.props.colormapFunction.length / 3,
+                colormapSize: Math.max(
+                    this.props.colormapFunction.length / 3,
+                    1
+                ),
             };
         }
         if (isDiscreteProperty(this.props.coloringMode)) {
             // It is expected that the property values are integers ranging from 0 to N.
             // Thus this.props.propertyValueRange?.[0] should be 0
             // and this.props.propertyValueRange?.[1] should be N
+            const maxPropertyValue = Number.isFinite(
+                this.props.propertyValueRange[1]
+            )
+                ? Math.round(this.props.propertyValueRange[1])
+                : 0;
+            const namedPropertyCount =
+                this.props.discretePropertyValueNames?.length ?? 0;
             return {
                 discreteData: true,
-                colormapSize: (this.props.propertyValueRange?.[1] ?? 0) + 1,
+                colormapSize:
+                    Math.max(maxPropertyValue, namedPropertyCount) + 1,
             };
         }
         return {
