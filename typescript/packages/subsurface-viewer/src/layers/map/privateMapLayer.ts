@@ -525,8 +525,6 @@ export class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
             const [r, g, b] = info.color;
             const code = decodeIndexFromRGB([r, g, b]);
 
-            layer_properties.push(createPropertyData("Code", code));
-
             const index =
                 this.props.discretePropertyValueNames?.findIndex(
                     (e) => e.code === code
@@ -535,7 +533,11 @@ export class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
                 index !== -1
                     ? this.props.discretePropertyValueNames?.[index]?.name
                     : "No name";
-            layer_properties.push(createPropertyData("Name", name as string));
+
+            layer_properties.push(
+                createPropertyData("Property", name as string)
+            );
+            layer_properties.push(createPropertyData("Value", code));
 
             return {
                 ...info,
