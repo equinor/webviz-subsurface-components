@@ -625,7 +625,7 @@ uniform mapUniforms {
     float contourInterval;
 
     bool ZIncreasingDownwards;
-} map_d;
+} map;
 `;
 
 type MapDiscreteUniformsType = {
