@@ -12,7 +12,11 @@ import type { Matrix4 } from "math.gl";
 import workerpool from "workerpool";
 
 import type { Material } from "../gpglLayers/typeDefs";
-import { type IMapDiscretePropertyValueName, type MapFrame } from "./typeDefs";
+import {
+    type IMapDiscretePropertyValueName,
+    TMapColoringMode,
+    type MapFrame,
+} from "./typeDefs";
 import { PrivateMapLayer } from "./privateMapLayer";
 import { type WebWorkerParams, makeFullMesh } from "./webworker";
 
@@ -24,7 +28,7 @@ import type { ColormapFunctionType } from "../utils/colormapTools";
 
 import config from "../../SubsurfaceConfig.json";
 
-import type { Color, RGBColor } from "../../utils";
+import type { Color, RGBColor, TConstructor } from "../../utils";
 import { findConfig, loadDataArray } from "../../utils";
 import { getModelMatrix } from "../utils/deckglTools";
 import { rotate } from "./utils";
@@ -37,6 +41,19 @@ const workerPoolConfig = findConfig(
     "config/workerpool",
     "config/layer/MapLayer/workerpool"
 );
+
+const pool = workerpool.pool({
+    maxWorkers: 10,
+    workerType: "web",
+    ...workerPoolConfig,
+});
+
+function onTerminateWorker() {
+    const stats = pool.stats();
+    if (stats.busyWorkers === 0 && stats.pendingTasks === 0) {
+        pool.terminate();
+    }
+}
 
 export function resampleMesh(
     frame: MapFrame,
@@ -109,31 +126,16 @@ export function resampleMesh(
     return [resampledFrame, resampledMesh];
 }
 
-const pool = workerpool.pool({
-    maxWorkers: 10,
-    workerType: "web",
-    ...workerPoolConfig,
-});
-
-function onTerminateWorker() {
-    const stats = pool.stats();
-    if (stats.busyWorkers === 0 && stats.pendingTasks === 0) {
-        pool.terminate();
-    }
-}
-
-export type PropertyInput =
-    | string
-    | Array<number | undefined>
-    | Float32Array
-    | Uint16Array;
+export type PropertyInput = string | number[] | Float32Array | Uint16Array;
 
 export function getUndefinedValueProperties(
     propertiesData: PropertyInput | undefined,
     isPropertiesDiscrete: boolean
 ): number | undefined {
     if (propertiesData instanceof Float32Array) {
-        return isPropertiesDiscrete ? DEFAULT_DISCRETE_UNDEFINED_VALUE : NaN;
+        return isPropertiesDiscrete
+            ? DEFAULT_DISCRETE_UNDEFINED_VALUE
+            : Number.NaN;
     }
     if (propertiesData instanceof Uint16Array || isPropertiesDiscrete) {
         return DEFAULT_DISCRETE_UNDEFINED_VALUE;
@@ -154,22 +156,35 @@ export function normalizeDiscreteProperties(
     if (propertiesData instanceof Float32Array) {
         return propertiesData;
     }
-    return propertiesData.map((value) => value ?? undefinedPropertyValue);
+    return propertiesData.map((value) =>
+        !Number.isFinite(value) ? undefinedPropertyValue : value
+    );
 }
 
-function normalizeContinuousProperties(
-    propertiesData: PropertyInput
-): string | number[] | Float32Array {
-    if (
-        typeof propertiesData === "string" ||
-        propertiesData instanceof Float32Array
-    ) {
-        return propertiesData;
+type TTypedArray = Float32Array | Uint32Array | Uint16Array;
+
+async function loadData<T extends TTypedArray>(
+    data: string | number[] | TTypedArray,
+    type: TConstructor<T>
+): Promise<T> {
+    const result = await loadDataArray(data, type);
+    if (result !== null) {
+        return result;
     }
-    if (propertiesData instanceof Uint16Array) {
-        return Array.from(propertiesData);
+    throw new Error("Grid3DLayer: Unsupported type of input data");
+}
+
+async function loadPropertiesData(
+    propertiesData: string | number[] | Float32Array | Uint16Array,
+    isDiscrete: boolean
+): Promise<Float32Array | Uint16Array> {
+    const result = isDiscrete
+        ? await loadDataArray(propertiesData, Uint16Array)
+        : await loadDataArray(propertiesData, Float32Array);
+    if (result !== null) {
+        return result;
     }
-    return propertiesData.map((value) => value ?? NaN);
+    throw new Error("Grid3DLayer: Unsupported type of input property data");
 }
 
 /**
@@ -177,35 +192,44 @@ function normalizeContinuousProperties(
  * or as a URL to the data in binary format.
  * Return value: A promise with the data given as typed arrays.
  */
-async function loadMeshAndProperties(
+async function load_data(
     meshData: string | number[] | Float32Array,
-    propertiesData: PropertyInput,
-    isPropertiesDiscrete: boolean = false,
-    undefinedPropertyValue: number = DEFAULT_DISCRETE_UNDEFINED_VALUE
-) {
-    // Keep
-    //const t0 = performance.now();
+    propertiesData: string | number[] | Float32Array | Uint16Array | undefined,
+    coloringMode: TMapColoringMode
+): Promise<[Float32Array, Float32Array | Uint16Array | undefined]> {
+    const mesh = await loadData(meshData, Float32Array);
 
-    const mesh = await loadDataArray(meshData, Float32Array);
+    if (isGeometricProperty(coloringMode)) {
+        return Promise.all([mesh, mesh]);
+    }
 
-    const properties = isPropertiesDiscrete
-        ? await loadDataArray(
-              normalizeDiscreteProperties(
-                  propertiesData,
-                  undefinedPropertyValue
-              ),
-              Uint16Array
+    const properties = propertiesData
+        ? await loadPropertiesData(
+              propertiesData,
+              isDiscreteProperty(coloringMode)
           )
-        : await loadDataArray(
-              normalizeContinuousProperties(propertiesData),
-              Float32Array
-          );
-
-    // Keep this.
-    // const t1 = performance.now();
-    // console.debug(`Task loading took ${(t1 - t0) * 0.001}  seconds.`);
-
+        : undefined;
     return Promise.all([mesh, properties]);
+}
+
+/**
+ * Returns true if the coloring mode is geometric, that is based on the Z coordinates
+ * of the cell nodes. In that case no explicit property data is required.
+ * @param coloringMode coloring mode.
+ * @returns true if the coloring mode is geometric.
+ */
+export function isGeometricProperty(coloringMode: TMapColoringMode): boolean {
+    return coloringMode === TMapColoringMode.Z;
+}
+
+/**
+ * Returns true if the coloring mode is discrete. In that case an explicit property data is required,
+ * with integer values ranging from 0 to N, where N is the number of discrete property values.
+ * @param coloringMode coloring mode
+ * @returns true if the property values are discrete.
+ */
+export function isDiscreteProperty(coloringMode: TMapColoringMode): boolean {
+    return coloringMode === TMapColoringMode.DiscreteProperty;
 }
 
 export interface MapLayerProps extends ExtendedLayerProps {
@@ -236,12 +260,7 @@ export interface MapLayerProps extends ExtendedLayerProps {
      * undefinedPropertyValue, or 0xFFFF by default in discrete mode.
      */
     propertiesUrl: string; // Deprecated
-    propertiesData:
-        | string
-        | Array<number | undefined>
-        | Float32Array
-        | Uint16Array
-        | undefined;
+    propertiesData: string | number[] | Float32Array | Uint16Array | undefined;
 
     /**
      * Array of property discrete codes with  optional name and color.
@@ -249,40 +268,10 @@ export interface MapLayerProps extends ExtendedLayerProps {
     discretePropertyValueNames?: IMapDiscretePropertyValueName[];
 
     /**
-     * Color for the cells with undefined property value.
-     * Is not overridden by and used prior to colorMapFunction.
-     * By default, Light gray if not provided.
+     * Defines how the cells are to be colored:
+     * by property value or by a coordinate.
      */
-    undefinedPropertyColor?: RGBColor;
-
-    /**
-     * Value in propertiesData indicating that the property is undefined.
-     * By default these are:
-     * - Float32Array: NaN
-     * - Uint16Array: 0xFFFF
-     */
-    undefinedPropertyValue?: number;
-
-    /**  Contour lines reference point and interval.
-     * A value of [-1.0, -1.0] will disable contour lines.
-     * Contour lines will also not be activated if cells are constant colored
-     * and "isContoursDepth" is set to false. I.e. constant properties within cells and contour lines
-     * to be calculated for properties and not depths.
-     * default value: [-1.0, -1.0]
-     */
-    contours: [number, number];
-
-    /**  Contour lines may be calculated either on depth/z-value or on property value
-     * If this is set to false, lines will follow properties instead of depth.
-     * In 2D mode this is always the case regardless.
-     * default: true
-     */
-    isContoursDepth: boolean;
-
-    /**  Enable grid lines.
-     * default: false.
-     */
-    gridLines: boolean;
+    coloringMode?: TMapColoringMode;
 
     /**  Name of color map. E.g "PORO"
      */
@@ -307,6 +296,43 @@ export interface MapLayerProps extends ExtendedLayerProps {
      * E.g. [255, 0, 0] for constant red surface.
      */
     colorMapFunction?: ColormapFunctionType;
+
+    /**
+     * Value in propertiesData indicating that the property is undefined.
+     * When propertiesData is Uint16Array the value is index in discretePropertyValueNames if provided.
+     * By default, it is assumed to be NaN for Float32 properties data and 0xFFFF for UInt16.
+     * Note: in case of floating point properties exact comparison is performed so use the same
+     * constant value both in propertiesData array and as undefinedPropertyValue.
+     */
+    undefinedPropertyValue?: number;
+
+    /**
+     * Color for the cells with undefined property value.
+     * Is not overridden by and used prior to colorMapFunction.
+     * By default, Light gray if not provided.
+     */
+    undefinedPropertyColor?: RGBColor;
+
+    /**  Contour lines reference point and interval.
+     * A value of [-1.0, -1.0] will disable contour lines.
+     * Contour lines will also not be activated if cells are constant colored
+     * and "isContoursDepth" is set to false. I.e. constant properties within cells and contour lines
+     * to be calculated for properties and not depths.
+     * default value: [-1.0, -1.0]
+     */
+    contours: [number, number];
+
+    /**  Contour lines may be calculated either on depth/z-value or on property value
+     * If this is set to false, lines will follow properties instead of depth.
+     * In 2D mode this is always the case regardless.
+     * default: true
+     */
+    isContoursDepth: boolean;
+
+    /**  Enable grid lines.
+     * default: false.
+     */
+    gridLines: boolean;
 
     /**  Surface material properties.
      * material: true  = default material, coloring depends on surface orientation and lighting.
@@ -345,14 +371,15 @@ const defaultProps = {
     id: "map3d-layer-float32",
     pickable: true,
     visible: true,
+    material: true,
+    coloringMode: TMapColoringMode.Property,
+    gridLines: false,
     bounds: { type: "object", value: null, false: true, compare: true },
     colorMapRange: { type: "array" },
     contours: [-1.0, -1.0],
     // If contour lines should follow depth or properties.
     isContoursDepth: true,
-    gridLines: false,
     smoothShading: true,
-    material: true,
     depthTest: true,
     ZIncreasingDownwards: true,
 };
@@ -372,13 +399,23 @@ export default class MapLayer<
         return isLoaded && isFinished;
     }
 
-    isPropertiesCategorical(): boolean {
-        const propertiesData =
-            this.props.propertiesData ?? this.props.propertiesUrl;
-        return (
-            propertiesData instanceof Uint16Array ||
-            typeof this.props.discretePropertyValueNames !== "undefined"
-        );
+    coloringMode(): TMapColoringMode {
+        if (this.props.coloringMode !== undefined) {
+            return this.props.coloringMode;
+        }
+        // infer coloring mode based on the available data
+        // tests are done only on propertiesData and meshData:
+        // propertyUrl and meshUrl are encoded data and do not help
+        if (this.props.propertiesData === this.props.meshData) {
+            return TMapColoringMode.Z;
+        }
+        if (
+            this.props.propertiesData instanceof Uint16Array ||
+            this.props.discretePropertyValueNames !== undefined
+        ) {
+            return TMapColoringMode.DiscreteProperty;
+        }
+        return TMapColoringMode.Property;
     }
 
     rebuildData(reportBoundingBox: boolean): void {
@@ -394,20 +431,7 @@ export default class MapLayer<
         const propertiesData =
             this.props.propertiesData ?? this.props.propertiesUrl;
 
-        const isPropertiesCategorical = this.isPropertiesCategorical();
-        const undefinedPropertyValue =
-            this.props.undefinedPropertyValue ??
-            getUndefinedValueProperties(
-                propertiesData,
-                isPropertiesCategorical
-            ) ??
-            DEFAULT_DISCRETE_UNDEFINED_VALUE;
-        const p = loadMeshAndProperties(
-            meshData,
-            propertiesData,
-            isPropertiesCategorical,
-            undefinedPropertyValue
-        );
+        const p = load_data(meshData, propertiesData, this.coloringMode());
 
         p.then(([meshData, propertiesData]) => {
             // Using inline web worker for calculating the triangle mesh from
@@ -419,8 +443,8 @@ export default class MapLayer<
             const isNodeCenteredProperties = propLength === nx * ny;
 
             let frame = structuredClone(this.props.frame);
-            const doResample =
-                isPropertiesCategorical && isNodeCenteredProperties;
+            const isPropertDiscrete = isDiscreteProperty(this.coloringMode());
+            const doResample = isPropertDiscrete && isNodeCenteredProperties;
             if (doResample) {
                 console.warn(
                     "Resampling node-centered properties mesh to center coloring on nodes."
@@ -592,16 +616,8 @@ export default class MapLayer<
             );
         }
 
-        const undefinedColor = this.props.undefinedPropertyColor ?? [
-            204, 204, 204,
-        ];
-
-        const undefinedPropertyValue =
-            this.props.undefinedPropertyValue ??
-            getUndefinedValueProperties(
-                this.props.propertiesData ?? this.props.propertiesUrl,
-                this.isPropertiesCategorical()
-            );
+        const undefinedColor = this.getUndefinedPropertyColor();
+        const undefinedValue = this.getUndefinedPropertyValue();
 
         const enableLighting: boolean = this.props.material !== false;
         const layer = new PrivateMapLayer(
@@ -620,7 +636,7 @@ export default class MapLayer<
                 colormapRange: this.props.colorMapRange,
                 colormapClampColor: this.props.colorMapClampColor,
                 undefinedPropertyColor: undefinedColor,
-                undefinedPropertyValue,
+                undefinedPropertyValue: undefinedValue,
                 colormapFunction: this.props.colorMapFunction,
                 discretePropertyValueNames:
                     this.props.discretePropertyValueNames,
@@ -637,7 +653,7 @@ export default class MapLayer<
 
     private getWebworkerParams(
         meshData: Float32Array | null,
-        propertiesData: Float32Array | Uint16Array,
+        propertiesData: Float32Array | Uint16Array | undefined,
         frame: MapFrame
     ): { params: WebWorkerParams; transferrables?: Transferable[] } {
         if (!meshData && !propertiesData) {
@@ -646,12 +662,7 @@ export default class MapLayer<
             );
         }
 
-        const undefinedPropertyValue =
-            this.props.undefinedPropertyValue ??
-            getUndefinedValueProperties(
-                propertiesData as Float32Array | Uint16Array,
-                this.isPropertiesCategorical()
-            );
+        const undefinedPropertyValue = this.getUndefinedPropertyValue();
 
         const params: WebWorkerParams = [
             meshData,
@@ -660,7 +671,7 @@ export default class MapLayer<
             frame,
             this.props.smoothShading,
             this.props.gridLines,
-            undefinedPropertyValue ?? DEFAULT_DISCRETE_UNDEFINED_VALUE,
+            undefinedPropertyValue,
         ];
         const transferrables = [
             meshData?.buffer,
@@ -671,6 +682,38 @@ export default class MapLayer<
             return { params, transferrables };
         }
         return { params };
+    }
+
+    private getUndefinedPropertyValue(): number {
+        const isDiscrete = isDiscreteProperty(this.coloringMode());
+        if (typeof this.props.undefinedPropertyValue === "number") {
+            // Precision should be reduced to single for correct comparing property values
+            // with undefined property value in the webworker.
+            return isDiscrete
+                ? new Uint16Array([this.props.undefinedPropertyValue])[0]
+                : new Float32Array([this.props.undefinedPropertyValue])[0];
+        }
+        return isDiscrete ? 0xffff : Number.NaN;
+    }
+
+    private getUndefinedPropertyColor(): RGBColor {
+        const colorFunc = this.props.colorMapFunction;
+        if (
+            this.props.propertiesData?.length === 0 &&
+            this.isColormapFunctionConstantColor(colorFunc)
+        ) {
+            return [colorFunc[0], colorFunc[1], colorFunc[2]];
+        }
+        return this.props.undefinedPropertyColor ?? [204, 204, 204];
+    }
+
+    private isColormapFunctionConstantColor(
+        colorFunc: Uint8Array | ColormapFunctionType | undefined
+    ): colorFunc is Uint8Array {
+        return (
+            (Array.isArray(colorFunc) || colorFunc instanceof Uint8Array) &&
+            colorFunc.length >= 3
+        );
     }
 }
 

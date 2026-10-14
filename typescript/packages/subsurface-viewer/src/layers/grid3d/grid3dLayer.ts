@@ -96,7 +96,7 @@ async function load_data(
     pointsData: string | number[] | Float32Array,
     polysData: string | number[] | Uint32Array,
     propertiesData: string | number[] | Float32Array | Uint16Array | undefined,
-    loadProperties: boolean
+    coloringMode: TGrid3DColoringMode
 ): Promise<
     [Float32Array, Uint32Array, Float32Array | Uint16Array | undefined]
 > {
@@ -104,7 +104,7 @@ async function load_data(
     const polys = await loadData(polysData, Uint32Array);
 
     const properties =
-        loadProperties && propertiesData
+        !isGeometricProperty(coloringMode) && propertiesData
             ? await loadPropertiesData(propertiesData)
             : undefined;
     return Promise.all([points, polys, properties]);
@@ -273,9 +273,7 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
             this.props.pointsData,
             this.props.polysData,
             this.props.propertiesData,
-            !isGeometricProperty(
-                this.props.coloringMode ?? TGrid3DColoringMode.Property
-            )
+            this.props.coloringMode ?? TGrid3DColoringMode.Property
         );
 
         p.then(([points, polys, properties]) => {

@@ -40,7 +40,7 @@ export enum TMapColoringMode {
  */
 export interface IMapDiscretePropertyValueName {
     /** Discrete property value represented. */
-    code: number;
+    value: number;
     /** Name for the discrete property value. */
     name: string;
     /** Optional RGB color used for this value. */
