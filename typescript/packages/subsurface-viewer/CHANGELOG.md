@@ -1,3 +1,17 @@
+## 2.3.6 (2026-10-15)
+
+### 🩹 Fixes
+
+- break subsurface-viewer circular dependencies ([#2882](https://github.com/equinor/webviz-subsurface-components/pull/2882))
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 2.0.9
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
 ## 2.3.5 (2026-10-15)
 
 ### 🧱 Updated Dependencies
