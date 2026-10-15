@@ -6,7 +6,7 @@ import type { ConstructorOf } from "@deck.gl/core/dist/types/types";
 import type { ControllerOptions } from "@deck.gl/core/dist/controllers/controller";
 import type { IViewState } from "@deck.gl/core/dist/controllers/view-state";
 
-import type { SectionView } from "../views";
+import type { SectionView } from "../views/sectionView";
 
 export type ControllerOpts = boolean | ControllerOptions;
 

@@ -20,6 +20,7 @@ export { isNumberArray, isTypedArray, toTypedArray } from "./typedArray";
 
 export { loadDataArray } from "./serialize";
 
+export type { ViewStateType } from "./camera";
 export { proportionalZoom, scaleZoom } from "./camera";
 
 export { type Config, findConfig } from "./configTools";

@@ -10,17 +10,17 @@ import * as png from "@vivaxy/png";
 
 import type {
     DeckGLLayerContext,
-    LayerPickInfo,
     ReportBoundingBoxAction,
     TypeAndNameLayerProps,
-} from "../utils/layerTools";
-import { getModelMatrix } from "../utils/layerTools";
+} from "../utils/deckglTools";
+import type { LayerPickInfo } from "../utils/deckglTools";
+import { getModelMatrix } from "../utils/deckglTools";
 import {
     type ColormapFunctionType,
     getImageData,
 } from "../utils/colormapTools";
 import { decodeRGB, type ValueDecoder } from "../utils/propertyMapTools";
-import type { ContinuousLegendDataType } from "../../components/ColorLegend";
+import type { ContinuousLegendDataType } from "../../components/typeDefs";
 import type { RGBColor } from "../../utils";
 import fsColormap from "./colormap.fs.glsl";
 

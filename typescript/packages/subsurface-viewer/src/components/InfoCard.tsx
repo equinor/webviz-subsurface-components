@@ -15,11 +15,11 @@ import { styled } from "@mui/system";
 import { Button, Icon } from "@equinor/eds-core-react";
 import { arrow_drop_up, arrow_drop_down } from "@equinor/eds-icons";
 
+import type { ExtendedLayerProps } from "../layers/utils/deckglTools";
 import type {
-    ExtendedLayerProps,
     LayerPickInfo,
     PropertyDataType,
-} from "../layers/utils/layerTools";
+} from "../layers/utils/deckglTools";
 import { toNormalizedRGBAColor } from "../utils/Color";
 import { WellLabelLayer } from "../layers/wells/layers/wellLabelLayer";
 import { SectionViewport } from "../viewports/sectionViewport";

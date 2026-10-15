@@ -20,8 +20,8 @@ import type {
     ExtendedLayerProps,
     LayerPickInfo,
     PropertyDataType,
-} from "../utils/layerTools";
-import { createPropertyData } from "../utils/layerTools";
+} from "../utils/deckglTools";
+import { createPropertyData } from "../utils/deckglTools";
 import {
     type ColormapFunctionType,
     createColormapTexture,
@@ -34,7 +34,7 @@ import fsDiscrete from "./map_discrete.fs.glsl";
 import vsDiscrete from "./map_discrete.vs.glsl";
 import fsLineShader from "./line.fs.glsl";
 import vsLineShader from "./line.vs.glsl";
-import type { IMapDiscretePropertyValueName } from "./mapLayer";
+import type { IMapDiscretePropertyValueName } from "./typeDefs";
 
 interface IColormapTextureHints {
     discreteData: boolean;
@@ -109,7 +109,6 @@ export class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
             arr[i * 3 + 2] = pickingColor[2];
         }
         attribute.value = arr;
-        return;
     }
 
     private getColoringHints(): IColormapTextureHints {
@@ -182,7 +181,7 @@ export class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
                     ? undefined
                     : entries[index]?.color;
 
-            if (typeof color === "undefined") {
+            if ( color === undefined) {
                 if (
                     index >= 0 &&
                     property !== this.props.undefinedPropertyValue

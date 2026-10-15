@@ -1,7 +1,7 @@
 import { interpolateNumberArray } from "d3-interpolate";
 import type { Position } from "geojson";
 
-import type { WellFeature } from "../types";
+import type { WellFeature } from "../typeDefs";
 
 /**
  * Gets a well feature object based on it's name

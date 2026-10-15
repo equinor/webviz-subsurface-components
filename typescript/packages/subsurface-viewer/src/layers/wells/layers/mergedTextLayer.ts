@@ -13,7 +13,7 @@ import { TextLayer } from "@deck.gl/layers";
 
 import createKdTree from "static-kdtree";
 
-import type { Point3D } from "../../../utils";
+import type { Point3D } from "../../../utils/Point3D";
 
 export type MergedTextLayerProps<DataT = unknown> = TextLayerProps<DataT> & {
     /**

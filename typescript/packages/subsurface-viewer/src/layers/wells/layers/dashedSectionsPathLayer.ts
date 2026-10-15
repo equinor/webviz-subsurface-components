@@ -20,8 +20,8 @@ import { isClose } from "../../../utils/measurement";
 import {
     getFromAccessor,
     hasUpdateTriggerChanged,
-} from "../../utils/layerTools";
-import type { DashedSectionsLayerPickInfo } from "../types";
+} from "../../utils/deckglTools";
+import type { DashedSectionsLayerPickInfo } from "../typeDefs";
 import {
     getCumulativeDistance,
     getFractionAlongSegmentForCoord,

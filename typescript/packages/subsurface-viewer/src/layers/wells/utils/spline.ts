@@ -10,7 +10,7 @@ import type {
 
 import { simplify } from "../../utils/simplify";
 
-import type { Point3D } from "../../../utils";
+import type { Point3D } from "../../../utils/Point3D";
 
 export const DEFAULT_TOLERANCE = 0.01;
 

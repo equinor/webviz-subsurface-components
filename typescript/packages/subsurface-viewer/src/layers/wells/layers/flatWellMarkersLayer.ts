@@ -22,11 +22,11 @@ import _ from "lodash";
 
 import type { RGBAColor, RGBColor } from "../../../utils/Color";
 import { blendColors } from "../../../utils/Color";
-import type { LayerPickInfo } from "../../utils/layerTools";
+import type { LayerPickInfo } from "../../utils/deckglTools";
 import {
     getFromAccessor,
     hasUpdateTriggerChanged,
-} from "../../utils/layerTools";
+} from "../../utils/deckglTools";
 import { getSize, LINE } from "../utils/features";
 import type { MarkerType } from "../utils/markers";
 import { buildMarkerPath2D } from "../utils/markers";

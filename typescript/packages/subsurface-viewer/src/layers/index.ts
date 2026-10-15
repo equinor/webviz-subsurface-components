@@ -20,7 +20,7 @@ export * from "./triangle";
 export * from "./well_markers";
 export * from "./wells";
 
-export type { NumberPair } from "./types";
+export type { NumberPair } from "./typeDefs";
 
 // Export layer utility functions
 export type * from "./utils";

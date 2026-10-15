@@ -18,11 +18,11 @@ import type { ShaderModule } from "@luma.gl/shadertools";
 
 import { vec4 } from "gl-matrix";
 
-import type { Point3D, RGBAColor } from "../../utils";
-import { toNormalizedColor } from "../../utils";
+import type { Point3D } from "../../utils/Point3D";
+import { type RGBAColor, toNormalizedColor } from "../../utils/Color";
 import { SectionViewport } from "../../viewports/sectionViewport";
 import { precisionForTests } from "../shader_modules/test-precision/precisionForTests";
-import type { ExtendedLayerProps } from "../utils/layerTools";
+import type { ExtendedLayerProps } from "../utils/deckglTools";
 import fontAtlasPng from "./font-atlas.png";
 import labelFragmentShader from "./label.fs.glsl";
 import labelVertexShader from "./label.vs.glsl";
@@ -790,21 +790,27 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                     /*eslint-disable */
                     allPositions.push(
                         pos_w[0] + x1 * pixelScale * pixel2worldHor,
-                        pos_w[1] + (0 * pixelScale - y_alignment_offset) * pixel2worldVer,
+                        pos_w[1] +
+                            (0 * pixelScale - y_alignment_offset) *
+                                pixel2worldVer,
                         pos_w[2]
                     );
                     allTexcoords.push(u1, v1);
 
                     allPositions.push(
                         pos_w[0] + x2 * pixelScale * pixel2worldHor,
-                        pos_w[1] + (0 * pixelScale - y_alignment_offset) * pixel2worldVer,
+                        pos_w[1] +
+                            (0 * pixelScale - y_alignment_offset) *
+                                pixel2worldVer,
                         pos_w[2]
                     );
                     allTexcoords.push(u2, v1);
 
                     allPositions.push(
                         pos_w[0] + x1 * pixelScale * pixel2worldHor,
-                        pos_w[1] + (h * pixelScale - y_alignment_offset) * pixel2worldVer,
+                        pos_w[1] +
+                            (h * pixelScale - y_alignment_offset) *
+                                pixel2worldVer,
                         pos_w[2]
                     );
                     allTexcoords.push(u1, v2);
@@ -812,21 +818,27 @@ export default class Axes2DLayer extends Layer<Axes2DLayerProps> {
                     // t2
                     allPositions.push(
                         pos_w[0] + x1 * pixelScale * pixel2worldHor,
-                        pos_w[1] + (h * pixelScale - y_alignment_offset) * pixel2worldVer,
+                        pos_w[1] +
+                            (h * pixelScale - y_alignment_offset) *
+                                pixel2worldVer,
                         pos_w[2]
                     );
                     allTexcoords.push(u1, v2);
 
                     allPositions.push(
                         pos_w[0] + x2 * pixelScale * pixel2worldHor,
-                        pos_w[1] + (0 * pixelScale - y_alignment_offset) * pixel2worldVer,
+                        pos_w[1] +
+                            (0 * pixelScale - y_alignment_offset) *
+                                pixel2worldVer,
                         pos_w[2]
                     );
                     allTexcoords.push(u2, v1);
 
                     allPositions.push(
                         pos_w[0] + x2 * pixelScale * pixel2worldHor,
-                        pos_w[1] + (h * pixelScale - y_alignment_offset) * pixel2worldVer,
+                        pos_w[1] +
+                            (h * pixelScale - y_alignment_offset) *
+                                pixel2worldVer,
                         pos_w[2]
                     );
                     allTexcoords.push(u2, v2);

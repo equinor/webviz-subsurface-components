@@ -9,8 +9,8 @@ import type { ShaderModule } from "@luma.gl/shadertools";
 import type {
     LayerPickInfo,
     ReportBoundingBoxAction,
-} from "../utils/layerTools";
-import { getModelMatrix } from "../utils/layerTools";
+} from "../utils/deckglTools";
+import { getModelMatrix } from "../utils/deckglTools";
 import type { ValueDecoder } from "../utils/propertyMapTools";
 import { decodeRGB } from "../utils/propertyMapTools";
 

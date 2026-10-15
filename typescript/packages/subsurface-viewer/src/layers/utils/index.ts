@@ -1,4 +1,7 @@
-export type { DeckGLLayerContext, ReportBoundingBoxAction } from "./layerTools";
+export type {
+    DeckGLLayerContext,
+    ReportBoundingBoxAction,
+} from "./deckglTools";
 export type {
     ColormapFunctionType,
     ColorTableProps,

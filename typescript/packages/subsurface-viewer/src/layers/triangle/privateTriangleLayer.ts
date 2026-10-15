@@ -16,8 +16,8 @@ import type {
     ExtendedLayerProps,
     LayerPickInfo,
     PropertyDataType,
-} from "../utils/layerTools";
-import { createPropertyData } from "../utils/layerTools";
+} from "../utils/deckglTools";
+import { createPropertyData } from "../utils/deckglTools";
 
 import type { RGBAColor, RGBColor } from "../../utils";
 

@@ -4,7 +4,7 @@ import { CrosshairLayer } from "../../layers";
 
 import type { CrosshairLayerProps } from "../../layers";
 import type { ViewportType } from "../../views/viewport";
-import type { TLayerDefinition } from "../../SubsurfaceViewer";
+import type { TLayerDefinition } from "../../typeDefs";
 
 export type UseMultiViewCursorTrackingProps = {
     worldCoordinates: number[] | null;

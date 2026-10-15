@@ -6,8 +6,9 @@ import { fireEvent, userEvent } from "storybook/test";
 import type { Layer } from "@deck.gl/core";
 
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
-import SubsurfaceViewer, { TGrid3DColoringMode } from "../../SubsurfaceViewer";
+import SubsurfaceViewer from "../../SubsurfaceViewer";
 import Grid3DLayer from "../../layers/grid3d/grid3dLayer";
+import { TGrid3DColoringMode } from "../../layers/grid3d/typeDefs";
 import { createSeededRandom } from "../util/random";
 
 import { argTypes } from "../sharedDoc";
