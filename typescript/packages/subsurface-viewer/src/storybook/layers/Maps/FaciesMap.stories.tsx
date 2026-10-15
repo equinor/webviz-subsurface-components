@@ -107,7 +107,7 @@ export const CellCenterFaciesPropMap: StoryObj<typeof SubsurfaceViewer> = {
                 2291.379638671875, 1662, -1449.6324462890625,
             ] as BoundingBox3D,
             target: undefined,
-    },
+        },
         views: default3DViews,
     },
     parameters: {

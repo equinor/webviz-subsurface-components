@@ -181,7 +181,7 @@ export class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
                     ? undefined
                     : entries[index]?.color;
 
-            if ( color === undefined) {
+            if (color === undefined) {
                 if (
                     index >= 0 &&
                     property !== this.props.undefinedPropertyValue
