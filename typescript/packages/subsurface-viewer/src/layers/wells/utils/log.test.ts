@@ -1,7 +1,7 @@
 import "jest";
 import { describe, expect, it } from "@jest/globals";
 
-import type { LogCurveDataType } from "../types";
+import type { LogCurveDataType } from "../typeDefs";
 import {
     getLogForWellbore,
     getLogValues,

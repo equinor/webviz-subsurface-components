@@ -18,7 +18,7 @@ import { FlatWellMarkersLayer } from "../../layers/wells/layers/flatWellMarkersL
 import type {
     WellFeature,
     WellFeatureCollection,
-} from "../../layers/wells/types";
+} from "../../layers/wells/typeDefs";
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import {

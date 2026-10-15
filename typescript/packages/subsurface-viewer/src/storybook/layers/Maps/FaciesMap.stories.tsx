@@ -18,12 +18,9 @@ const stories: Meta = {
 };
 export default stories;
 
-// This layer has as (nx-1)*(ny-1) property values and depth values are nx*ny hence each cell will be fixed in color.
-const cellCenterFaciesPropertiesLayer = {
+const layerBase = {
     "@@type": "MapLayer",
     "@@typedArraySupport": true,
-    id: "categorical-layer",
-
     frame: {
         origin: [-1608.620361328125, -1838],
         count: [79, 71],
@@ -33,43 +30,32 @@ const cellCenterFaciesPropertiesLayer = {
     },
 
     // One depth per node
-    meshUrl: "top_cells_z_values_79x71.float32",
+    meshData: "top_cells_z_values_79x71.float32",
+    meshValueRange: [1449.6324462890625, 2038.382080078125],
 
-    // One property per cell.
-    propertiesUrl: "facies5_property_78x70.uint16",
-
-    discretePropertyValueNames: [
-        { code: 0, name: "Zero" },
-        { code: 1, name: "One" },
-        { code: 2, name: "Five" },
-    ],
-
-    colorMapFunction: new Uint8Array([255, 255, 0, 0, 128, 0, 255, 68, 0]),
-
-    ZIncreasingDownwards: true,
+    // Map display props
     gridLines: true,
     material: false,
 };
 
-// This layer has as (nx)*(ny) property values and depth values are nx*ny hence each cell will be fixed in color.
-const nodeCenterFaciesPropertiesLayer = {
-    "@@type": "MapLayer",
-    "@@typedArraySupport": true,
-    id: "categorical-layer",
-
-    frame: {
-        origin: [-1608.620361328125, -1838],
-        count: [79, 71],
-        increment: [50, 50],
-        rotDeg: 0,
-        rotPoint: [-1608.620361328125, -1838],
-    },
-
-    // One depth per node
-    meshUrl: "top_cells_z_values_79x71.float32",
+// These layers have as (nx)*(ny) property values and depth values are nx*ny hence each cell will be fixed in color.
+const nodeCenterContinuousPropertyLayer = {
+    ...layerBase,
+    id: "continuous-layer",
 
     // One property per node.
-    propertiesUrl: "facies5_property_79x71.uint16",
+    propertiesData: "rings_property_79x71.float32",
+
+    //colorMapFunction: new Uint8Array([255, 255, 0, 0, 128, 0, 255, 68, 0]),
+    colorMapRange: [-1, 1],
+};
+
+const nodeCenterFaciesPropertyLayer = {
+    ...layerBase,
+    id: "categorical-layer",
+
+    // One property per node.
+    propertiesData: "facies5_property_79x71.uint16",
 
     discretePropertyValueNames: [
         { code: 0, name: "Zero" },
@@ -78,10 +64,34 @@ const nodeCenterFaciesPropertiesLayer = {
     ],
 
     colorMapFunction: new Uint8Array([255, 255, 0, 0, 128, 0, 255, 68, 0]),
+};
 
-    ZIncreasingDownwards: true,
-    gridLines: true,
-    material: false,
+// These layers have as (nx-1)*(ny-1) property values and depth values are nx*ny hence each cell will be fixed in color.
+const cellCenterContinuousPropertyLayer = {
+    ...layerBase,
+    id: "continuous-layer",
+
+    // One property per cell.
+    propertiesData: "rings_property_78x70.float32",
+
+    colorMapName: "Rainbow",
+    colorMapRange: [-1, 1],
+};
+
+const cellCenterFaciesPropertyLayer = {
+    ...layerBase,
+    id: "categorical-layer",
+
+    // One property per cell.
+    propertiesData: "facies5_property_78x70.uint16",
+
+    discretePropertyValueNames: [
+        { code: 0, name: "Zero" },
+        { code: 1, name: "One" },
+        { code: 2, name: "Five" },
+    ],
+
+    colorMapFunction: new Uint8Array([255, 255, 0, 0, 128, 0, 255, 68, 0]),
 };
 
 const axes_categorical = {
@@ -90,31 +100,59 @@ const axes_categorical = {
     bounds: [-1608, -1838, 2038, 2291, 1662, 1449] as BoundingBox3D,
 };
 
-export const CellCenterFaciesPropMap: StoryObj<typeof SubsurfaceViewer> = {
+/* prettier-ignore */
+const zoom: BoundingBox3D = [
+    -1608.620361328125, -1838, -2038.382080078125,
+    2291.379638671875, 1662, -1449.6324462890625,
+];
+
+const cameraPosition = {
+    rotationOrbit: 0,
+    rotationX: 90,
+    zoom,
+    target: undefined,
+};
+
+// Stories
+export const NodeCenterContinuousPropMap: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "map",
         layers: [
             axes_categorical,
-            cellCenterFaciesPropertiesLayer,
+            nodeCenterContinuousPropertyLayer,
             northArrowLayer,
         ],
 
-        cameraPosition: {
-            rotationOrbit: 0,
-            rotationX: 90,
-            zoom: [
-                -1608.620361328125, -1838, -2038.382080078125,
-                2291.379638671875, 1662, -1449.6324462890625,
-            ] as BoundingBox3D,
-            target: undefined,
-        },
+        cameraPosition,
         views: default3DViews,
     },
     parameters: {
         docs: {
             ...defaultStoryParameters.docs,
             description: {
-                story: "Categorical map displaying cell center facies values.",
+                story: "Continuous map displaying node center values.",
+            },
+        },
+    },
+};
+
+export const CellCenterContinuousPropMap: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "map",
+        layers: [
+            axes_categorical,
+            cellCenterContinuousPropertyLayer,
+            northArrowLayer,
+        ],
+
+        cameraPosition,
+        views: default3DViews,
+    },
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: "Continuous map displaying cell center values.",
             },
         },
     },
@@ -125,19 +163,11 @@ export const NodeCenterFaciesPropMap: StoryObj<typeof SubsurfaceViewer> = {
         id: "map",
         layers: [
             axes_categorical,
-            nodeCenterFaciesPropertiesLayer,
+            nodeCenterFaciesPropertyLayer,
             northArrowLayer,
         ],
 
-        cameraPosition: {
-            rotationOrbit: 0,
-            rotationX: 90,
-            zoom: [
-                -1608.620361328125, -1838, -2038.382080078125,
-                2291.379638671875, 1662, -1449.6324462890625,
-            ] as BoundingBox3D,
-            target: undefined,
-        },
+        cameraPosition,
         views: default3DViews,
     },
     parameters: {
@@ -145,6 +175,28 @@ export const NodeCenterFaciesPropMap: StoryObj<typeof SubsurfaceViewer> = {
             ...defaultStoryParameters.docs,
             description: {
                 story: "Categorical map displaying node center facies values.",
+            },
+        },
+    },
+};
+
+export const CellCenterFaciesPropMap: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        id: "map",
+        layers: [
+            axes_categorical,
+            cellCenterFaciesPropertyLayer,
+            northArrowLayer,
+        ],
+
+        cameraPosition,
+        views: default3DViews,
+    },
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: "Categorical map displaying cell center facies values.",
             },
         },
     },

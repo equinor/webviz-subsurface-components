@@ -4,7 +4,7 @@ import { describe, expect, it, jest } from "@jest/globals";
 
 import type { Feature } from "geojson";
 
-import type { SizeAccessor, WellFeature } from "../types";
+import type { SizeAccessor, WellFeature } from "../typeDefs";
 import {
     getSize,
     getWellHeadPosition,
@@ -116,8 +116,7 @@ describe("features", () => {
                         },
                     ],
                 },
-                // @ts-expect-error -- not needed for test
-                properties: {},
+                properties: { name: "", md: [[0]] },
             };
 
             const result = getWellHeadPosition(wellFeature);
@@ -139,8 +138,7 @@ describe("features", () => {
                         },
                     ],
                 },
-                // @ts-expect-error -- not needed for test
-                properties: {},
+                properties: { name: "", md: [[0]] },
             };
 
             const result = getWellHeadPosition(wellFeature);

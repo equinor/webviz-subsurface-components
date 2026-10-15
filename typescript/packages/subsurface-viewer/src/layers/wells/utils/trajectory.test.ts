@@ -5,7 +5,7 @@ import type { Color } from "@deck.gl/core";
 import type { Position } from "geojson";
 import { cloneDeep, reverse, set } from "lodash";
 
-import type { ColorAccessor, WellFeature } from "../types";
+import type { ColorAccessor, WellFeature } from "../typeDefs";
 import type { ScaleFactor } from "./trajectory";
 import {
     getAziAndInclForSegment,
