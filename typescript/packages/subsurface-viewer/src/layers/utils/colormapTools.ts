@@ -7,7 +7,7 @@ import type {
 import { rgbValues } from "@emerson-eps/color-tables";
 import { createDefaultContinuousColorScale } from "@emerson-eps/color-tables/dist/component/Utils/legendCommonFunction";
 
-import type { DeckGLLayerContext } from "./layerTools";
+import type { DeckGLLayerContext } from "./deckglTools";
 
 import type { Color } from "../../utils/Color";
 

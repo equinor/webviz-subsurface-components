@@ -1,8 +1,7 @@
 import "jest";
 import { describe, expect, it } from "@jest/globals";
 
-import type { Params } from "./mapLayer";
-import { makeFullMesh } from "./webworker";
+import { type WebWorkerParams, makeFullMesh } from "./webworker";
 
 const frame = {
     origin: [0, 0] as [number, number],
@@ -10,7 +9,10 @@ const frame = {
     count: [2, 2] as [number, number],
 };
 
-function makeParams(properties: Uint16Array, undefinedValue = 0xffff): Params {
+function makeParams(
+    properties: Uint16Array,
+    undefinedValue = 0xffff
+): WebWorkerParams {
     return [null, properties, false, frame, false, false, undefinedValue];
 }
 

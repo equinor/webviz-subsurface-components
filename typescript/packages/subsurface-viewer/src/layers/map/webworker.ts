@@ -1,10 +1,20 @@
 import type { TypedArray } from "math.gl";
-import type { Params } from "./mapLayer";
+import type { MapFrame } from "./typeDefs";
+
+export type WebWorkerParams = [
+    meshData: Float32Array | null,
+    propertiesData: Float32Array | Uint16Array | null | undefined,
+    isMesh: boolean,
+    frame: MapFrame,
+    smoothShading: boolean,
+    gridLines: boolean,
+    undefinedPropertyValue: number,
+];
 
 /** Given the input data will build and return the attributes (vertices and indices for triangles and lines)
  * that is used by WebGl. Using indice, lines and triangles share common vertices to save memory.
  */
-export function makeFullMesh(e: { data: Params }) {
+export function makeFullMesh(e: { data: WebWorkerParams }) {
     const [
         inputMeshData,
         inputPropertiesData,

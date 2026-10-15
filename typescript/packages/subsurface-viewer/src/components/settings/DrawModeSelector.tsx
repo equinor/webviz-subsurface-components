@@ -4,8 +4,8 @@ import { NativeSelect } from "@equinor/eds-core-react";
 import React, { useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { updateDrawingMode } from "../../redux/actions";
-import type { DrawMode } from "../../redux/types";
-import { DrawModes } from "../../redux/types";
+import type { DrawMode } from "../../redux/typeDefs";
+import { DrawModes } from "../../redux/typeDefs";
 
 interface Props {
     /**

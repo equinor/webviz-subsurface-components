@@ -20,8 +20,8 @@ import type {
     ExtendedLayerProps,
     LayerPickInfo,
     PropertyDataType,
-} from "../utils/layerTools";
-import { createPropertyData } from "../utils/layerTools";
+} from "../utils/deckglTools";
+import { createPropertyData } from "../utils/deckglTools";
 import {
     type ColormapFunctionType,
     createColormapTexture,
@@ -37,15 +37,14 @@ import flatVertexShader from "./cellProperty.vs.glsl";
 import fsLineShader from "./line.fs.glsl";
 import vsLineShader from "./line.vs.glsl";
 
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
-import {
-    TGrid3DColoringMode,
-    type IGrid3DDiscretePropertyValueName,
-    isDiscreteProperty,
-    isGeometricProperty,
-} from "./grid3dLayer";
+import { isDiscreteProperty, isGeometricProperty } from "./grid3dLayer";
 
-import type { MeshType, MeshTypeLines } from "./typeDefs";
+import type {
+    IGrid3DDiscretePropertyValueName,
+    MeshType,
+    MeshTypeLines,
+    TGrid3DColoringMode,
+} from "./typeDefs";
 
 export interface PrivateLayerProps extends ExtendedLayerProps {
     mesh: MeshType;
@@ -56,7 +55,7 @@ export interface PrivateLayerProps extends ExtendedLayerProps {
     undefinedPropertyValue: number;
     undefinedPropertyColor: RGBColor;
     colormapFunction?: ColormapFunctionType;
-    coloringMode: TGrid3DColoringMode.Property;
+    coloringMode: TGrid3DColoringMode;
     gridLines: boolean;
     propertyValueRange: [number, number];
     discretePropertyValueNames?: IGrid3DDiscretePropertyValueName[];

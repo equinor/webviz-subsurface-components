@@ -10,22 +10,15 @@ import type { Material } from "../gpglLayers/typeDefs";
 import type {
     ExtendedLayerProps,
     ReportBoundingBoxAction,
-} from "../utils/layerTools";
+} from "../utils/deckglTools";
 
 import type { RGBColor } from "../../utils";
 
 import { PrivateTriangleLayer } from "./privateTriangleLayer";
-import { makeFullMesh } from "./webworker";
+import { type WebWorkerParams, makeFullMesh } from "./webworker";
 
 import config from "../../SubsurfaceConfig.json";
 import { findConfig } from "../../utils/configTools";
-
-export type Params = {
-    vertexArray: Float32Array;
-    indexArray: Uint32Array;
-    smoothShading: boolean;
-    displayNormals: boolean;
-};
 
 // init workerpool
 const workerPoolConfig = findConfig(
@@ -201,7 +194,7 @@ export default class TriangleLayer extends CompositeLayer<TriangleLayerProps> {
             // Using inline web worker for calculating the triangle mesh from
             // loaded input data so not to halt the GUI thread.
 
-            const webworkerParams: Params = {
+            const webworkerParams: WebWorkerParams = {
                 vertexArray,
                 indexArray,
                 smoothShading: this.props.smoothShading,

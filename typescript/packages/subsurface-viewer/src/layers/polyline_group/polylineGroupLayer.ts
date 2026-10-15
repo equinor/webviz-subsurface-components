@@ -10,14 +10,14 @@ import type { PathLayerProps } from "@deck.gl/layers";
 import { PathLayer } from "@deck.gl/layers";
 
 import type { Position } from "@deck.gl/core";
-import type { Point2D } from "../..";
+import type { Point2D } from "../../utils/BoundingBox2D";
 import { SectionViewport } from "../../viewports";
 import type {
     ExtendedLayerProps,
     LayerPickInfo,
     PropertyDataType,
-} from "../utils/layerTools";
-import { createPropertyData } from "../utils/layerTools";
+} from "../utils/deckglTools";
+import { createPropertyData } from "../utils/deckglTools";
 import _ from "lodash";
 
 // ---------------------------------------------------------------------------

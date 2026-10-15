@@ -1,6 +1,6 @@
 export { default as WellsLayer } from "./wellsLayer";
 
-export type { WellsLayerProps } from "./wellsLayer";
+export type { WellsLayerProps } from "./typeDefs";
 export type {
     ColorAccessor,
     DashAccessor,
@@ -13,7 +13,7 @@ export type {
     SizeAccessor,
     WellHeadStyleAccessor,
     WellsPickInfo,
-} from "./types";
+} from "./typeDefs";
 
 export type { MergedTextLayerProps } from "./layers/mergedTextLayer";
 export type {

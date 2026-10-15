@@ -1,7 +1,7 @@
 import type { GeometryCollection, LineString, Point, Position } from "geojson";
 import { cloneDeep, zip } from "lodash";
 import { distance } from "mathjs";
-import type { WellFeature, WellFeatureCollection } from "../types";
+import type { WellFeature, WellFeatureCollection } from "../typeDefs";
 
 function computeUnfoldedPath(
     worldCoordinates: Position[],

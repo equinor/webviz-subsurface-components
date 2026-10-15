@@ -1,11 +1,11 @@
 import "jest";
 import { describe, expect, it } from "@jest/globals";
 
+import type { MapFrame } from "./typeDefs";
 import {
     getUndefinedValueProperties,
     normalizeDiscreteProperties,
     resampleMesh,
-    MapFrame,
 } from "./mapLayer";
 
 describe("MapLayer property input handling", () => {
@@ -60,9 +60,7 @@ describe("resampleMesh", () => {
         });
         expect(Array.from(resampledMesh)).toEqual([
             /*eslint-disable */
-            1, 1.5, 2,
-            2, 2.5, 3,
-            3, 3.5, 4,
+            1, 1.5, 2, 2, 2.5, 3, 3, 3.5, 4,
             /*eslint-enable */
         ]);
     });

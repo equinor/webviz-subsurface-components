@@ -17,8 +17,8 @@ import type {
     ExtendedLayerProps,
     LayerPickInfo,
     PropertyDataType,
-} from "../utils/layerTools";
-import { createPropertyData } from "../utils/layerTools";
+} from "../utils/deckglTools";
+import { createPropertyData } from "../utils/deckglTools";
 import { utilities } from "../shader_modules";
 
 import { precisionForTests } from "../shader_modules/test-precision/precisionForTests";

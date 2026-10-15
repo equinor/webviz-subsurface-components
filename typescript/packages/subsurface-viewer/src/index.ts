@@ -9,13 +9,13 @@ export { default } from "./SubsurfaceViewer";
 export type {
     BoundsAccessor,
     ColorTableArray,
-    LightsType,
     MapMouseEvent,
     SubsurfaceViewerProps,
-    TLayerDefinition,
     TooltipCallback,
     colorTablesArray,
 } from "./SubsurfaceViewer";
+
+export type { LightsType, TLayerDefinition } from "./typeDefs";
 
 export * from "./components";
 export * from "./utils";
@@ -25,11 +25,11 @@ export * from "./views";
 // layers
 export * from "./layers";
 
+export type { ExtendedLayerProps } from "./layers/utils/deckglTools";
 export type {
-    ExtendedLayerProps,
     LayerPickInfo,
     PropertyDataType,
-} from "./layers/utils/layerTools";
+} from "./layers/utils/deckglTools";
 
 export { useAbscissaTransform } from "./layers/wells/hooks/useAbscissaTransform";
 
@@ -37,4 +37,4 @@ export type {
     AbscissaTransform,
     WellFeature,
     WellFeatureCollection,
-} from "./layers/wells/types";
+} from "./layers/wells/typeDefs";

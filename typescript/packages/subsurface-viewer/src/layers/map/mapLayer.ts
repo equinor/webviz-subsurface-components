@@ -1,30 +1,33 @@
 import { isEqual } from "lodash";
 import type React from "react";
 
+import { CompositeLayer } from "@deck.gl/core";
 import type {
-    Color,
     CompositeLayerProps,
     Layer,
-    Material,
     UpdateParameters,
 } from "@deck.gl/core";
-import { CompositeLayer } from "@deck.gl/core";
 import type { Matrix4 } from "math.gl";
+
+import workerpool from "workerpool";
+
+import type { Material } from "../gpglLayers/typeDefs";
+import { type IMapDiscretePropertyValueName, type MapFrame } from "./typeDefs";
+import { PrivateMapLayer } from "./privateMapLayer";
+import { type WebWorkerParams, makeFullMesh } from "./webworker";
 
 import type {
     ReportBoundingBoxAction,
     ExtendedLayerProps,
-} from "../utils/layerTools";
-import { getModelMatrix } from "../utils/layerTools";
+} from "../utils/deckglTools";
 import type { ColormapFunctionType } from "../utils/colormapTools";
+
 import config from "../../SubsurfaceConfig.json";
-import { findConfig } from "../../utils/configTools";
-import { loadDataArray } from "../../utils/serialize";
-import { PrivateMapLayer } from "./privateMapLayer";
+
+import type { Color, RGBColor } from "../../utils";
+import { findConfig, loadDataArray } from "../../utils";
+import { getModelMatrix } from "../utils/deckglTools";
 import { rotate } from "./utils";
-import { makeFullMesh } from "./webworker";
-import workerpool from "workerpool";
-import type { RGBColor } from "../../utils";
 
 const DEFAULT_DISCRETE_UNDEFINED_VALUE = 0xffff;
 
@@ -62,12 +65,11 @@ export function resampleMesh(
         for (let col = 0; col < nc; col++) {
             const i = row * nc + col; // index in the resampled mesh
 
-            /*eslint-disable */
             // P1
             let r = row;
             let c = col;
             let valid = validRange(r, c);
-            if (valid && isNaN(meshData[r * nc_ + c])) {
+            if (valid && Number.isNaN(meshData[r * nc_ + c])) {
                 // Undefined mesh data at this location.
                 resampledMesh[i] = meshData[r * nc_ + c];
                 continue;
@@ -79,25 +81,28 @@ export function resampleMesh(
             r = row - 1;
             c = col;
             valid = validRange(r, c);
-            const p2 = valid && !isNaN(meshData[r * nc_ + c]) ? meshData[r * nc_ + c] : 0;
+            /* prettier-ignore */
+            const p2 = valid && !Number.isNaN(meshData[r * nc_ + c]) ? meshData[r * nc_ + c] : 0;
             divisor += p2 !== 0 && valid ? 1 : 0;
 
             // P3
             r = row - 1;
             c = col - 1;
             valid = validRange(r, c);
-            const p3 = valid && !isNaN(meshData[r * nc_ + c]) ? meshData[r * nc_ + c] : 0;
+            /* prettier-ignore */
+            const p3 = valid && !Number.isNaN(meshData[r * nc_ + c]) ? meshData[r * nc_ + c] : 0;
             divisor += p3 !== 0 && valid ? 1 : 0;
 
             // P4
             r = row;
             c = col - 1;
             valid = validRange(r, c);
-            const p4 = valid && !isNaN(meshData[r * nc_ + c]) ? meshData[r * nc_ + c] : 0;
+            /* prettier-ignore */
+            const p4 = valid && !Number.isNaN(meshData[r * nc_ + c]) ? meshData[r * nc_ + c] : 0;
             divisor += p4 !== 0 && valid ? 1 : 0;
 
-            resampledMesh[i] = divisor !== 0 ? (p1 + p2 + p3 + p4) / divisor : 0;
-            /*eslint-enable */
+            resampledMesh[i] =
+                divisor !== 0 ? (p1 + p2 + p3 + p4) / divisor : 0;
         }
     }
 
@@ -167,45 +172,6 @@ function normalizeContinuousProperties(
         return Array.from(propertiesData);
     }
     return propertiesData.map((value) => value ?? NaN);
-}
-
-// This type describes the mesh' extent in the horizontal plane.
-export type MapFrame = {
-    /** mesh origin
-     */
-    origin: [number, number];
-
-    /** cells size in each direction.
-     */
-    increment: [number, number];
-
-    /** number of nodes in each direction.
-     */
-    count: [number, number];
-
-    /** Rotates map counterclockwise in degrees around 'rotPoint' specified below.
-     */
-    rotDeg?: number;
-
-    /** Point to rotate around using 'rotDeg'. Defaults to mesh origin.
-     */
-    rotPoint?: [number, number];
-};
-
-export type Params = [
-    meshData: Float32Array | null,
-    propertiesData: Float32Array | Uint16Array | null,
-    isMesh: boolean,
-    frame: MapFrame,
-    smoothShading: boolean,
-    gridLines: boolean,
-    undefinedPropertyValue: number,
-];
-
-export interface IMapDiscretePropertyValueName {
-    code: number;
-    name?: string;
-    color?: RGBColor;
 }
 
 /**
@@ -418,11 +384,11 @@ export default class MapLayer<
     }
 
     rebuildData(reportBoundingBox: boolean): void {
-        if (typeof this.props.meshUrl !== "undefined") {
+        if (this.props.meshUrl !== undefined) {
             console.warn('"meshUrl" is deprecated. Use "meshData"');
         }
 
-        if (typeof this.props.propertiesUrl !== "undefined") {
+        if (this.props.propertiesUrl !== undefined) {
             console.warn('"propertiesUrl" is deprecated. Use "propertiesData"');
         }
 
@@ -451,7 +417,7 @@ export default class MapLayer<
 
             const nx = this.props.frame.count[0]; // number of nodes in x direction
             const ny = this.props.frame.count[1];
-            const propLength = propertiesData.length;
+            const propLength = propertiesData?.length;
             const isNodeCenteredProperties = propLength === nx * ny;
 
             let frame = structuredClone(this.props.frame);
@@ -500,7 +466,7 @@ export default class MapLayer<
                     });
 
                     if (
-                        typeof this.props.reportBoundingBox !== "undefined" &&
+                        this.props.reportBoundingBox !== undefined &&
                         reportBoundingBox
                     ) {
                         const xinc = this.props.frame?.increment?.[0] ?? 0;
@@ -524,34 +490,14 @@ export default class MapLayer<
                         const rotRad = (rotDeg * (2.0 * Math.PI)) / 360.0;
 
                         // Rotate x,y around "center" "rad" radians
-                        const [x0, y0] = rotate(
-                            xMin,
-                            yMin,
-                            center[0],
-                            center[1],
-                            rotRad
-                        ); // eslint-disable-line
-                        const [x1, y1] = rotate(
-                            xMax,
-                            yMin,
-                            center[0],
-                            center[1],
-                            rotRad
-                        ); // eslint-disable-line
-                        const [x2, y2] = rotate(
-                            xMax,
-                            yMax,
-                            center[0],
-                            center[1],
-                            rotRad
-                        ); // eslint-disable-line
-                        const [x3, y3] = rotate(
-                            xMin,
-                            yMax,
-                            center[0],
-                            center[1],
-                            rotRad
-                        ); // eslint-disable-line
+                        /* prettier-ignore */
+                        const [x0, y0] = rotate(xMin, yMin, center[0], center[1], rotRad);
+                        /* prettier-ignore */
+                        const [x1, y1] = rotate(xMax, yMin, center[0], center[1], rotRad);
+                        /* prettier-ignore */
+                        const [x2, y2] = rotate(xMax, yMax, center[0], center[1], rotRad);
+                        /* prettier-ignore */
+                        const [x3, y3] = rotate(xMin, yMax, center[0], center[1], rotRad);
 
                         // Rotated bounds in x/y plane.
                         const x_min = Math.min(x0, x1, x2, x3);
@@ -635,13 +581,11 @@ export default class MapLayer<
         );
 
         const isMesh =
-            (typeof this.props.meshUrl !== "undefined" &&
-                this.props.meshUrl !== "") ||
-            (typeof this.props.meshData !== "undefined" &&
-                this.props.meshData !== "");
+            (this.props.meshUrl !== undefined && this.props.meshUrl !== "") ||
+            (this.props.meshData !== undefined && this.props.meshData !== "");
 
         const isModelMatrix =
-            typeof this.props.modelMatrix !== "undefined" &&
+            this.props.modelMatrix !== undefined &&
             this.props.modelMatrix !== null;
 
         if (isModelMatrix) {
@@ -697,7 +641,7 @@ export default class MapLayer<
         meshData: Float32Array | null,
         propertiesData: Float32Array | Uint16Array,
         frame: MapFrame
-    ): { params: Params; transferrables?: Transferable[] } {
+    ): { params: WebWorkerParams; transferrables?: Transferable[] } {
         if (!meshData && !propertiesData) {
             throw new Error(
                 "Either mesh or properties or the both must be defined"
@@ -711,7 +655,7 @@ export default class MapLayer<
                 this.isPropertiesCategorical()
             );
 
-        const params: Params = [
+        const params: WebWorkerParams = [
             meshData,
             propertiesData,
             !!meshData,

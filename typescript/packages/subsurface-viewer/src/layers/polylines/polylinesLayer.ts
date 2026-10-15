@@ -7,8 +7,9 @@ import type {
     LayerPickInfo,
     PropertyDataType,
     ReportBoundingBoxAction,
-} from "../utils/layerTools";
-import { createPropertyData, computeBoundingBox } from "../utils/layerTools";
+} from "../utils/deckglTools";
+import { createPropertyData } from "../utils/deckglTools";
+import { computeBoundingBox } from "../utils/layerTools";
 
 import type { RGBAColor, RGBColor } from "../../utils";
 

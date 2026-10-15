@@ -9,13 +9,13 @@ import type { Position } from "geojson";
 import type {
     ContinuousLegendDataType,
     DiscreteLegendDataType,
-} from "../../../components/ColorLegend";
+} from "../../../components/typeDefs";
 import {
     type PropertyDataType,
     createPropertyData,
-} from "../../utils/layerTools";
-import type { ColorAccessor, LogCurveDataType, WellFeature } from "../types";
-import { type WellsLayerProps } from "../wellsLayer";
+} from "../../utils/deckglTools";
+import type { ColorAccessor, LogCurveDataType, WellFeature } from "../typeDefs";
+import { type WellsLayerProps } from "../typeDefs";
 import type { ScaleFactor } from "./trajectory";
 import { getSegmentIndicesForCoord, getTrajectory } from "./trajectory";
 import { getPositionByMD, getWellMds, getWellObjectByName } from "./wells";

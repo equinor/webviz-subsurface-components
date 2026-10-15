@@ -13,11 +13,11 @@ import type { ShaderModule } from "@luma.gl/shadertools";
 
 import { Vector3 } from "@math.gl/core";
 
-import type { ExtendedLayerProps } from "../utils/layerTools";
+import type { ExtendedLayerProps } from "../utils/deckglTools";
 
 import { precisionForTests } from "../shader_modules/test-precision/precisionForTests";
 
-import type { RGBAColor } from "../../utils";
+import type { RGBAColor } from "../../utils/Color";
 
 import fragmentShader from "./northarrow.fs.glsl";
 import vertexShader from "./northarrow.vs.glsl";

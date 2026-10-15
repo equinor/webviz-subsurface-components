@@ -2,7 +2,7 @@
 // https://github.com/mourner/simplify-js/blob/3d/simplify.js
 // Modified version of above libary. Port to Typescript. Use subset. Take into account md values.
 
-import type { Point3D } from "../../utils";
+import type { Point3D } from "../../utils/Point3D";
 
 // square distance from a point to a segment
 function getSquareSegmentDistance(p: Point3D, p1: Point3D, p2: Point3D) {

@@ -3,7 +3,7 @@ import { describe, expect, it } from "@jest/globals";
 
 import { renderHook } from "@testing-library/react";
 
-import type { ViewStateType } from "../components/Map";
+import type { ViewStateType } from "./camera";
 import type { ViewportType } from "../views/viewport";
 import { getZoom, useLateralZoom } from "./camera";
 

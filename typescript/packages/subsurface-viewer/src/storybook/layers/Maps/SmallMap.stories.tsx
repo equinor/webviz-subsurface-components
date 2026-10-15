@@ -102,15 +102,15 @@ const categoricalPropertiesLayerCellCenter = {
 
     discretePropertyValueNames: [
         { code: 0, name: "Zero" },
-        { code: 1, name: "One" }, 
-        { code: 2, name: "Two" }, 
-        { code: 3, name: "Three" }, 
-        { code: 4, name: "Four" }, 
+        { code: 1, name: "One" },
+        { code: 2, name: "Two" },
+        { code: 3, name: "Three" },
+        { code: 4, name: "Four" },
         { code: 5, name: "Five", color: [255, 255, 0] }, // Explicit color overrides the color table and color function.
-        { code: 6, name: "Six" }, 
-        { code: 7, name: "Seven" }, 
-        { code: 8, name: "Eight" }, 
-        { code: 9, name: "Nine" }, 
+        { code: 6, name: "Six" },
+        { code: 7, name: "Seven" },
+        { code: 8, name: "Eight" },
+        { code: 9, name: "Nine" },
         { code: 123, name: "123" },
         { code: 11, name: "Eleven" },
     ],

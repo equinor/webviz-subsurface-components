@@ -11,7 +11,7 @@ import {
     ToggleTypeProps,
     MenuTypeProps,
     NumericTypeProps,
-} from "../../redux/types";
+} from "../../redux/typeDefs";
 
 interface Props {
     layer: Record<string, unknown>;

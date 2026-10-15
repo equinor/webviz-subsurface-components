@@ -11,13 +11,14 @@ import {
     type ValueMappedTriangleProps,
 } from "../gpglLayers/gpglValueMappedSurfaceLayer";
 
-import { createPropertyData, computeBoundingBox } from "../utils/layerTools";
 import type {
     ExtendedLayerProps,
     LayerPickInfo,
     PropertyDataType,
     ReportBoundingBoxAction,
-} from "../utils/layerTools";
+} from "../utils/deckglTools";
+import { createPropertyData } from "../utils/deckglTools";
+import { computeBoundingBox } from "../utils/layerTools";
 import type { ColormapProps, ColormapSetup } from "../utils/colormapTools";
 
 import type { Point3D } from "../../utils";

@@ -8,7 +8,7 @@ import { Geometry, Model } from "@luma.gl/engine";
 import type {
     DeckGLLayerContext,
     ExtendedLayerProps,
-} from "../utils/layerTools";
+} from "../utils/deckglTools";
 
 import { precisionForTests } from "../shader_modules/test-precision/precisionForTests";
 
