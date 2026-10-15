@@ -24,7 +24,7 @@ import type {
     LayerPickInfo,
     PropertyDataType,
 } from "../utils/deckglTools";
-import { createPropertyData } from "../utils/deckglTools";
+import { createPropertyData, initPropertyData } from "../utils/deckglTools";
 import {
     type ColormapProps,
     type ColormapSetup,
@@ -667,15 +667,11 @@ export class GpglValueMappedSurfaceLayer extends Layer<GpglValueMappedSurfaceLay
         if (!info.color) {
             return info;
         }
-        const layer_properties: PropertyDataType[] = [];
-        const zScale = this.props.modelMatrix ? this.props.modelMatrix[10] : 1;
-        if (typeof info.coordinate?.[2] !== "undefined") {
-            const depth =
-                (this.props.ZIncreasingDownwards
-                    ? -info.coordinate[2]
-                    : info.coordinate[2]) / Math.max(0.001, zScale);
-            layer_properties.push(createPropertyData("Depth", depth));
-        }
+        const layer_properties: PropertyDataType[] = initPropertyData(
+            info.coordinate?.[2],
+            this.props.ZIncreasingDownwards,
+            this.props.modelMatrix
+        );
 
         // Note these colors are in the  0-255 range.
         const [r, g, b] = info.color;

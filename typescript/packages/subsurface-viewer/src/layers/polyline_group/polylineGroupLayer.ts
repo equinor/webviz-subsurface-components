@@ -1,7 +1,10 @@
+import { isEqual } from "lodash";
+
 import type {
     Color,
     FilterContext,
     PickingInfo,
+    Position,
     UpdateParameters,
 } from "@deck.gl/core";
 import { CompositeLayer } from "@deck.gl/core";
@@ -9,7 +12,6 @@ import { DataFilterExtension, PathStyleExtension } from "@deck.gl/extensions";
 import type { PathLayerProps } from "@deck.gl/layers";
 import { PathLayer } from "@deck.gl/layers";
 
-import type { Position } from "@deck.gl/core";
 import type { Point2D } from "../../utils/BoundingBox2D";
 import { SectionViewport } from "../../viewports";
 import type {
@@ -17,8 +19,7 @@ import type {
     LayerPickInfo,
     PropertyDataType,
 } from "../utils/deckglTools";
-import { createPropertyData } from "../utils/deckglTools";
-import _ from "lodash";
+import { createPropertyData, initPropertyData } from "../utils/deckglTools";
 
 // ---------------------------------------------------------------------------
 // Public data types
@@ -867,7 +868,7 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
             props.getPolylineDashArray !== oldProps.getPolylineDashArray ||
             props.getGroupPolylines !== oldProps.getGroupPolylines ||
             props.getPolylinePath !== oldProps.getPolylinePath ||
-            !_.isEqual(props.defaultGroupStyle, oldProps.defaultGroupStyle) ||
+            !isEqual(props.defaultGroupStyle, oldProps.defaultGroupStyle) ||
             props.ZIncreasingDownwards !== oldProps.ZIncreasingDownwards;
 
         if (needsRebuild) {
@@ -1128,7 +1129,19 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
 
         if (!pickedSource) return info;
 
-        const layerProperties: PropertyDataType[] = [];
+        // Omit Depth property when the pick originated from a SectionView.
+        const viewport = (info as PickingInfo & { viewport?: unknown })
+            .viewport;
+        const isSectionView: boolean =
+            viewport?.constructor === SectionViewport;
+
+        const layerProperties: PropertyDataType[] = !isSectionView
+            ? initPropertyData(
+                  info.coordinate?.[2],
+                  this.props.ZIncreasingDownwards ?? false,
+                  this.props.modelMatrix
+              )
+            : [];
 
         if (pickedGroup?.name) {
             layerProperties.push(createPropertyData("Group", pickedGroup.name));
@@ -1137,19 +1150,6 @@ export class PolylineGroupLayer extends CompositeLayer<PolylineGroupLayerProps> 
             layerProperties.push(
                 createPropertyData("Polyline", String(pickedPolyline.id))
             );
-        }
-
-        const zScale = this.props.modelMatrix ? this.props.modelMatrix[10] : 1;
-        // Omit Depth property when the pick originated from a SectionView.
-        const viewport = (info as PickingInfo & { viewport?: unknown })
-            .viewport;
-        const isSectionView = viewport?.constructor === SectionViewport;
-        if (!isSectionView && typeof info.coordinate?.[2] !== "undefined") {
-            const depth =
-                (this.props.ZIncreasingDownwards
-                    ? -info.coordinate[2]
-                    : info.coordinate[2]) / Math.max(0.001, zScale);
-            layerProperties.push(createPropertyData("Depth", depth));
         }
 
         return {
