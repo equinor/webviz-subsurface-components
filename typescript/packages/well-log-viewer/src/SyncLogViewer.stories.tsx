@@ -5,7 +5,7 @@ import type { Meta, StoryObj } from "@storybook/react-webpack5";
 import { ToggleButton } from "@mui/material";
 
 import { colorTables } from "@emerson-eps/color-tables";
-import { expect, fireEvent, waitFor } from "storybook/test";
+import { expect, fireEvent, userEvent, waitFor, within } from "storybook/test";
 
 import {
     patternImages,
@@ -156,6 +156,10 @@ function getWellLogCollections(
             return facies3WellsCollectionsWithUndefined;
         case "LogsWithDifferentSets":
             return logsWithDifferentSetsCollections;
+        case "TwoWells":
+            return facies3WellsCollections.slice(0, 2);
+        case "SecondWellOnly":
+            return facies3WellsCollections.slice(1, 2);
         case "Empty":
             return [[]];
     }
@@ -898,4 +902,66 @@ export const LogsWithDifferentSets: StoryObj<typeof Template> = {
     render: (args) => (
         <Template {...args} wellLogCollections="LogsWithDifferentSets" />
     ),
+};
+
+const RemoveFirstWellTemplate = (args: SyncLogViewerPropsWrapper) => {
+    const [firstWellRemoved, setFirstWellRemoved] = React.useState(false);
+    return (
+        <>
+            <button
+                onClick={() => setFirstWellRemoved(true)}
+                style={{ marginBottom: 4 }}
+            >
+                Remove first well
+            </button>
+            <Template
+                {...args}
+                wellLogCollections={
+                    firstWellRemoved ? "SecondWellOnly" : "TwoWells"
+                }
+            />
+        </>
+    );
+};
+
+// Bug #80224: zoom on the second well must survive removing the first well
+export const TwoWellsZoomKeptAfterRemovingFirstWell: StoryObj<
+    typeof RemoveFirstWellTemplate
+> = {
+    args: {
+        ...facies3WellsArgs,
+    },
+    render: (args) => <RemoveFirstWellTemplate {...args} />,
+    tags: ["no-dom-test"],
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const wellViews = () =>
+            canvasElement.querySelectorAll<HTMLElement>(".welllogview");
+        const containerOf = (view: HTMLElement) => {
+            const container = view.querySelector<HTMLDivElement>(".container");
+            if (!container) throw new Error("Well container was not rendered");
+            return container;
+        };
+
+        await waitFor(() => expect(wellViews()).toHaveLength(2));
+        const secondZoomTarget = findZoomTarget(containerOf(wellViews()[1]));
+        if (!secondZoomTarget.__zoom) {
+            throw new Error("Second well zoom target was not ready");
+        }
+        fireEvent.wheel(secondZoomTarget, { deltaY: -2000 });
+        await waitFor(() =>
+            expect(secondZoomTarget.__zoom?.k ?? 1).toBeGreaterThan(1)
+        );
+        const zoomedK = secondZoomTarget.__zoom?.k ?? 1;
+
+        await userEvent.click(
+            canvas.getByRole("button", { name: "Remove first well" })
+        );
+        await waitFor(() => expect(wellViews()).toHaveLength(1));
+
+        const remainingZoomTarget = findZoomTarget(containerOf(wellViews()[0]));
+        await waitFor(() =>
+            expect(remainingZoomTarget.__zoom?.k ?? 1).toBeCloseTo(zoomedK, 3)
+        );
+    },
 };
