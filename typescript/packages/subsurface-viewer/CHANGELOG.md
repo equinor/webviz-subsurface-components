@@ -1,3 +1,13 @@
+## 2.3.7 (2026-10-15)
+
+### 🩹 Fixes
+
+- property maps readout info return inverted Depth value for disrete properties ([#2883](https://github.com/equinor/webviz-subsurface-components/pull/2883))
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
 ## 2.3.6 (2026-10-15)
 
 ### 🩹 Fixes
