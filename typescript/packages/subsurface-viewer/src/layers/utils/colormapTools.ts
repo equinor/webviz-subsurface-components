@@ -80,13 +80,11 @@ export interface ColormapSetup {
  * Creates an array of colors as RGB triplets in range [0, 1] using the colormap definition.
  * @param colormapDef Definition of the colormap.
  * @param colormapSize Number of colors in the color map.
- * @param discreteColormapFunction If true, the color map function is targeting indices ranging from 0 to colormapSize.
  * @returns Array of colors.
  */
 export function getImageData(
     colormapDef: ColormapProps,
-    colormapSize: number = 256,
-    discreteColormapFunction: boolean = false
+    colormapSize: number = 256
 ): Uint8Array {
     type funcType = (x: number) => Color;
 
@@ -121,9 +119,7 @@ export function getImageData(
 
     const data = new Uint8Array(colormapSize * 3);
 
-    const scaling = discreteColormapFunction
-        ? 1
-        : 1 / Math.max(colormapSize - 1, 1);
+    const scaling = 1 / Math.max(colormapSize - 1, 1);
     for (let i = 0; i < colormapSize; i++) {
         const color = colormap ? colormap(scaling * i) : [1, 0, 0];
         if (color) {
@@ -164,11 +160,7 @@ export function createColormapTexture(
 
     if (colormapHints.discreteData) {
         const colormapSize = Math.max(colormapHints.colormapSize, 1);
-        const colormapData = getImageData(
-            colormap,
-            colormapSize,
-            colormapHints.discreteData
-        );
+        const colormapData = getImageData(colormap, colormapSize);
 
         const colormapTexture = context.device.createTexture({
             ...textureProps,
@@ -195,11 +187,7 @@ export function getColormapDiscreteColors(
 ): Uint8Array {
     if (colormapHints.discreteData) {
         const colormapSize = Math.max(colormapHints.colormapSize, 1);
-        const colormapData = getImageData(
-            colormap,
-            colormapSize,
-            colormapHints.discreteData
-        );
+        const colormapData = getImageData(colormap, colormapSize);
         return colormapData;
     }
 
