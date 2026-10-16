@@ -58,20 +58,8 @@ void main(void) {
    }
 
    float propertyValue = property;
-   
-   DECKGL_FILTER_COLOR(fragColor, geometry);
 
-   // Below code is modified version of "picking_filterPickingColor" function.
-   // Original function is in deckgl's shader modules/picking.glsl.ts
-   // "GetPickingInfo" retrieves this color as "pickingColor" on the JS side.
-   // Encodes vertexIndex and is used to retrieve picked info from input data.
-   if ( bool(picking.isActive) && !bool(picking.isAttribute) ) {
-      if (picking_vRGBcolor_Avalid.a == 0.0) {
-          discard;
-      }
-      vec4 encodedIndexColor = encodeIndexToRGB(vertexIndex);
-      fragColor = vec4(encodedIndexColor.rgb, picking_vRGBcolor_Avalid.a);
-   }
+
 
    // This may happen due to GPU interpolation precision causing color artifacts.
    // propertyValue = clamp(propertyValue, map.valueRange[0], map.valueRange[1]);
@@ -98,5 +86,18 @@ void main(void) {
    vec3 lightColor = lighting_getLightColor(color.rgb, cameraPosition, position_commonspace.xyz, normal);
 
    fragColor = vec4(lightColor, color.a * vColor.a);
+   DECKGL_FILTER_COLOR(fragColor, geometry);
+
+   // Below code is modified version of "picking_filterPickingColor" function.
+   // Original function is in deckgl's shader modules/picking.glsl.ts
+   // "GetPickingInfo" retrieves this color as "pickingColor" on the JS side.
+   // Encodes vertexIndex and is used to retrieve picked info from input data.
+   if ( bool(picking.isActive) && !bool(picking.isAttribute) ) {
+      if (picking_vRGBcolor_Avalid.a == 0.0) {
+          discard;
+      }
+      vec4 encodedIndexColor = encodeIndexToRGB(vertexIndex);
+      fragColor = vec4(encodedIndexColor.rgb, picking_vRGBcolor_Avalid.a);
+   }
 }
 `;

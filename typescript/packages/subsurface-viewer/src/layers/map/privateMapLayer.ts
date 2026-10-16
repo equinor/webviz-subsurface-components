@@ -356,7 +356,6 @@ export class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
                         this.props.positions.length && {
                         normals: { value: this.props.normals, size: 3 },
                     }),
-                    //vertexColor: { value: vertexColors, size: 3 },
                     properties: {
                         value: this.props.vertexProperties,
                         size: 1,
