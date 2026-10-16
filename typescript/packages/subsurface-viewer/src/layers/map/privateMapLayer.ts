@@ -102,13 +102,16 @@ export class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
             [x: string]: Partial<Record<string, unknown> | undefined>;
         }>
     ): void {
-        super.setShaderModuleProps({
-            ...args,
-            lighting: {
-                ...args["lighting"],
-                enabled: this.props.enableLighting,
-            },
-        });
+        if ("lighting" in args) {
+            super.setShaderModuleProps({
+                ...args,
+                lighting: {
+                    ...args["lighting"],
+                    enabled: this.props.enableLighting,
+                },
+            });
+        }
+        super.setShaderModuleProps(args);
     }
 
     calculatePickingColors(attribute: Attribute) {
@@ -402,6 +405,8 @@ export class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
                     picking,
                     mapLinesUniforms,
                     precisionForTests,
+                    // not used by this model
+                    lighting,
                 ],
             }),
             geometry: new Geometry({

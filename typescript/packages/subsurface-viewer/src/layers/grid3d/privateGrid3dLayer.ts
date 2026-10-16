@@ -202,7 +202,14 @@ export class PrivateGrid3DLayer extends Layer<PrivateLayerProps> {
             ...super.getShaders({
                 vs: vsLineShader,
                 fs: fsLineShader,
-                modules: [project32, picking, gridUniforms, precisionForTests],
+                modules: [
+                    project32,
+                    picking,
+                    gridUniforms,
+                    precisionForTests,
+                    // not used by this model
+                    lighting,
+                ],
             }),
             geometry: new Geometry(this.props.meshLines),
             bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
