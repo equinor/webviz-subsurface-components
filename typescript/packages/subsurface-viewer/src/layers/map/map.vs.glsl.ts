@@ -10,13 +10,15 @@ in vec3 colors;
 in vec3 pickingColors;
 
 // Outputs to fragment shader
+out vec4 position_commonspace;
+out float property;
+out vec3 normals_commonspace;
+out vec4 vColor;
+
 out vec2 vTexCoord;
 out vec3 cameraPosition;
-out vec3 normals_commonspace;
-out vec4 position_commonspace;
-out vec4 vColor;
 out vec3 worldPos;
-out float property;
+
 flat out int vertexIndex;
 
 void main(void) {

@@ -156,10 +156,10 @@ const CATEGORICAL_COLOR_TABLE: RGBColor[] = [
 
 /* prettier-ignore */
 const propertyValueNames = [
-    { value:   1,   name: "blue" },         //  0
+    { value:   6,   name: "red" },          //  3
     { value:   2,   name: "green" },        //  1
     { value:   5,   name: "cyan" },         //  2
-    { value:   6,   name: "red" },          //  3
+    { value:   1,   name: "blue" },         //  0
     { value:  -8,   name: "magenta" },      //  4
     { value:   9,   name: "yellow" },       //  5
     { value:  20,   name: "dark blue" },    //  6

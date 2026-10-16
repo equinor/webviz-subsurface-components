@@ -384,6 +384,11 @@ export class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
                 topology: "triangle-list",
                 attributes: {
                     positions: { value: this.props.positions, size: 3 },
+                    // Only add normals if they are defined.
+                    ...(this.props.normals.length ===
+                        this.props.positions.length && {
+                        normals: { value: this.props.normals, size: 3 },
+                    }),
                     vertexColor: { value: vertexColors, size: 3 },
                     properties: {
                         value: this.props.vertexProperties,
@@ -653,6 +658,7 @@ uniform mapUniforms {
     float contourReferencePoint;
     float contourInterval;
 
+    bool smoothShading;
     bool ZIncreasingDownwards;
 } map;
 `;
@@ -661,6 +667,7 @@ type MapDiscreteUniformsType = {
     isContoursDepth: boolean;
     contourReferencePoint: number;
     contourInterval: number;
+    smoothShading: boolean;
     ZIncreasingDownwards: boolean;
 };
 
@@ -674,6 +681,7 @@ const mapDiscreteUniforms = {
         isContoursDepth: "u32",
         contourReferencePoint: "f32",
         contourInterval: "f32",
+        smoothShading: "u32",
         ZIncreasingDownwards: "u32",
     },
 } as const satisfies ShaderModule<LayerProps, MapDiscreteUniformsType>;

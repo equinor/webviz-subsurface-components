@@ -1,13 +1,16 @@
 export default `#version 300 es
 #define SHADER_NAME map-fragment-shader
 
+// Primitive attributes
+in vec4 position_commonspace;
+in float property;
+in vec3 normals_commonspace;
+in vec4 vColor;
+
 in vec2 vTexCoord;
 in vec3 cameraPosition;
-in vec3 normals_commonspace;
-in vec4 position_commonspace;
-in vec4 vColor;
 in vec3 worldPos;
-in float property;
+
 flat in int vertexIndex;
 
 // Uniforms
