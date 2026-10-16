@@ -368,24 +368,27 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
         const enableLighting: boolean = this.props.material !== false;
         const layer = new PrivateGrid3DLayer(
             this.getSubLayerProps({
+                // GL data
                 mesh: this.state["mesh"],
                 meshLines: this.state["mesh_lines"],
-                pickable: this.props.pickable,
+                // Colormap related settings
                 colormapName: this.props.colorMapName,
+                colormapFunction: this.props.colorMapFunction,
                 colormapRange: this.props.colorMapRange,
                 colormapClampColor: this.props.colorMapClampColor,
                 undefinedPropertyValue: undefinedValue,
                 undefinedPropertyColor: undefinedColor,
-                colormapFunction: this.props.colorMapFunction,
                 coloringMode: this.props.coloringMode,
-                gridLines: this.props.gridLines,
                 propertyValueRange: this.getPropertyValueRange(),
                 discretePropertyValueNames:
                     this.props.discretePropertyValueNames,
+                // Material and rendering settings
+                gridLines: this.props.gridLines,
                 material: this.props.material,
-                depthTest: this.props.depthTest,
-                ZIncreasingDownwards: this.props.ZIncreasingDownwards,
                 enableLighting,
+                depthTest: this.props.depthTest,
+                pickable: this.props.pickable,
+                ZIncreasingDownwards: this.props.ZIncreasingDownwards,
             })
         );
         return [layer];

@@ -1,17 +1,20 @@
 export default `#version 300 es
 #define SHADER_NAME map-discrete-fragment-shader
 
+// Primitive attributes
+in vec4 position_commonspace;
+flat in uint property;
+in vec3 normals_commonspace;
+in vec4 vColor;
+
+flat in vec3 vertexColor_;
 
 in vec2 vTexCoord;
 in vec3 cameraPosition;
-in vec4 position_commonspace;
-in vec4 vColor;
 in vec3 worldPos;
 
-flat in uint property;
 flat in int vertexIndex;
 
-flat in vec3 vertexColor_;
 
 out vec4 fragColor;
 
@@ -19,12 +22,14 @@ out vec4 fragColor;
 void main(void) {
    geometry.uv = vTexCoord;
 
-   vec3 normal = normalize(cross(dFdx(position_commonspace.xyz), dFdy(position_commonspace.xyz)));
+   vec3 normal = normals_commonspace;
+
+   if(!map.smoothShading || (normal[0] == 0.0 && normal[1] == 0.0 && normal[2] == 0.0)) {
+      normal = normalize(cross(dFdx(position_commonspace.xyz), dFdy(position_commonspace.xyz)));
+   }
 
    vec4 color = vec4(vertexColor_, 1.0);
    uint propertyValue = property;
-
-
 
    bool is_contours = map.contourReferencePoint != -1.0 && map.contourInterval != -1.0;
    if (is_contours) {

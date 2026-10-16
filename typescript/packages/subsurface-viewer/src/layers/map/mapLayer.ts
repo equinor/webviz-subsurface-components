@@ -372,7 +372,7 @@ const defaultProps = {
     pickable: true,
     visible: true,
     material: true,
-    coloringMode: TMapColoringMode.Property,
+    coloringMode: undefined,
     gridLines: false,
     bounds: { type: "object", value: null, false: true, compare: true },
     colorMapRange: { type: "array" },
@@ -622,30 +622,35 @@ export default class MapLayer<
         const enableLighting: boolean = this.props.material !== false;
         const layer = new PrivateMapLayer(
             this.getSubLayerProps({
+                // GL data
                 positions: this.state["positions"],
                 normals: this.state["normals"],
                 triangleIndices: this.state["triangleIndices"],
                 vertexProperties: this.state["vertexProperties"],
                 lineIndices: this.state["lineIndices"],
-                pickable: this.props.pickable,
                 modelMatrix: rotatingModelMatrix,
+                // Contour settings
                 contours: this.props.contours,
                 gridLines: this.props.gridLines,
                 isContoursDepth: !isMesh ? false : this.props.isContoursDepth,
+                // Colormap related settings
                 colormapName: this.props.colorMapName,
+                colormapFunction: this.props.colorMapFunction,
                 colormapRange: this.props.colorMapRange,
                 colormapClampColor: this.props.colorMapClampColor,
                 undefinedPropertyColor: undefinedColor,
                 undefinedPropertyValue: undefinedValue,
-                colormapFunction: this.props.colorMapFunction,
+                coloringMode: this.coloringMode(),
+                propertyValueRange: this.state["propertyValueRange"],
                 discretePropertyValueNames:
                     this.props.discretePropertyValueNames,
-                propertyValueRange: this.state["propertyValueRange"],
+                // Material and rendering settings
                 material: this.props.material,
+                enableLighting,
                 smoothShading: this.props.smoothShading,
                 depthTest: this.props.depthTest,
+                pickable: this.props.pickable,
                 ZIncreasingDownwards: this.props.ZIncreasingDownwards,
-                enableLighting,
             })
         );
         return [layer];

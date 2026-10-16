@@ -4,22 +4,23 @@ export default `\
 
 // Primitive attributes
 in vec3 positions;
-
+in uint properties;
+in vec3 normals;
 in vec3 colors;
 in vec3 pickingColors;
 
 in vec3 vertexColor;
-flat out vec3 vertexColor_;
 
 // Outputs to fragment shader
+out vec4 position_commonspace;
+flat out uint property;
+out vec3 normals_commonspace;
+flat out vec3 vertexColor_;
+out vec4 vColor;
+
 out vec2 vTexCoord;
 out vec3 cameraPosition;
-out vec4 position_commonspace;
-out vec4 vColor;
 out vec3 worldPos;
-
-in uint properties;
-flat out uint property;
 
 flat out int vertexIndex;
 
