@@ -1,5 +1,3 @@
-import type { RGBColor } from "../../utils";
-
 // This type describes the mesh' extent in the horizontal plane.
 export type MapFrame = {
     /** mesh origin
@@ -36,15 +34,12 @@ export enum TMapColoringMode {
 }
 
 /**
- * Describes a discrete property value and its display name and optional color.
+ * Describes a discrete property value and its display name.
  */
 export interface IMapDiscretePropertyValueName {
     /** Discrete property value represented. */
     value: number;
     /** Name for the discrete property value. */
     name: string;
-    /** Optional RGB color used for this value. */
-    color?: RGBColor;
 }
-
 // Internals

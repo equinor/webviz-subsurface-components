@@ -55,7 +55,7 @@ const discretePropertyValueNames = [
     { value: 2, name: "Two" },
     { value: 3, name: "Three" },
     { value: 4, name: "Four" },
-    { value: 5, name: "Five", color: [255, 128, 0] }, // Explicit color overrides the color table and color function.
+    { value: 5, name: "Five" },
     { value: 6, name: "Six" },
     { value: 7, name: "Seven" },
     { value: 8, name: "Eight" },
@@ -119,15 +119,6 @@ const categoricalPropertiesLayerNodeCenter = {
     material: false,
 };
 
-// const categoricalColorFunc = (value: number) => {
-//     const index = Math.round(11 * value);
-//     return [
-//         categoricalColormap[index * 3],
-//         categoricalColormap[index * 3 + 1],
-//         categoricalColormap[index * 3 + 2],
-//     ];
-// };
-
 // This layer has as (nx-1)*(ny-1) property values and depth values are nx*ny hence each cell will be fixed in color.
 const categoricalPropertiesLayerCellCenter = {
     "@@type": "MapLayer",
@@ -152,7 +143,6 @@ const categoricalPropertiesLayerCellCenter = {
     //colorMapRange: [0, 11],
 
     discretePropertyValueNames,
-    //colorMapFunction: categoricalColorFunc,
     colorMapFunction: "colorMapFunction proxy",
 
     frame: {

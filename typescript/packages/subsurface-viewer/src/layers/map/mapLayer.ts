@@ -709,7 +709,7 @@ export default class MapLayer<
         ) {
             return [colorFunc[0], colorFunc[1], colorFunc[2]];
         }
-        return this.props.undefinedPropertyColor ?? [204, 204, 204];
+        return this.props.undefinedPropertyColor;
     }
 
     private isColormapFunctionConstantColor(

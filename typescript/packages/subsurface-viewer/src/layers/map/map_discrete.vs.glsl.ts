@@ -9,13 +9,10 @@ in vec3 normals;
 in vec3 colors;
 in vec3 pickingColors;
 
-in vec3 vertexColor;
-
 // Outputs to fragment shader
 out vec4 position_commonspace;
 flat out uint property;
 out vec3 normals_commonspace;
-flat out vec3 vertexColor_;
 out vec4 vColor;
 
 out vec2 vTexCoord;
@@ -28,8 +25,6 @@ void main(void) {
    geometry.pickingColor = pickingColors;
    vertexIndex = gl_VertexID;
 
-   vertexColor_ = vertexColor;
-
    vec3 position = positions;
    position[2] *= map.ZIncreasingDownwards ? -1.0 : 1.0;
 
@@ -37,6 +32,8 @@ void main(void) {
 
    worldPos = position;
    geometry.worldPosition = position;
+
+   normals_commonspace = normals;
 
    property = properties;
 
