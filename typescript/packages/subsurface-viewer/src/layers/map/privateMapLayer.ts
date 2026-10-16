@@ -6,7 +6,7 @@ import type {
     LayerContext,
     Attribute,
 } from "@deck.gl/core";
-import { COORDINATE_SYSTEM, Layer, project32, picking } from "@deck.gl/core";
+import { Layer, project32, picking } from "@deck.gl/core";
 import type { Device, UniformValue } from "@luma.gl/core";
 
 import { Model, Geometry } from "@luma.gl/engine";
@@ -31,7 +31,7 @@ import {
     getColormapDiscreteColors,
 } from "../utils/colormapTools";
 
-import type { RGBColor } from "../../utils";
+import { type RGBAColor, toNormalizedRGBAColor } from "../../utils";
 
 import fs from "./map.fs.glsl";
 import vs from "./map.vs.glsl";
@@ -64,7 +64,7 @@ export interface PrivateMapLayerProps extends ExtendedLayerProps {
     colormapRange: [number, number];
     colormapClampColor: Color | undefined | boolean;
     colormapFunction?: ColormapFunctionType;
-    undefinedPropertyColor: RGBColor;
+    undefinedPropertyColor: Color;
     undefinedPropertyValue: number;
     coloringMode: TMapColoringMode;
     gridLines: boolean;
@@ -81,9 +81,9 @@ const defaultProps = {
     isContoursDepth: true,
     gridLines: false,
     colormapName: "",
-    colormapClampColor: [200, 200, 200],
+    colormapClampColor: [0, 255, 0, 200], // green color for clamped values
     coloringMode: TMapColoringMode.Property,
-    coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
+    undefinedPropertyColor: [255, 0, 0, 200], // red color for undefined property values
     propertyValueRange: [0.0, 1.0],
     meshValueRange: [0.0, 1.0],
     depthTest: true,
@@ -141,82 +141,19 @@ export class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
             const maxPropertyValue = Number.isFinite(
                 this.props.propertyValueRange[1]
             )
-                ? Math.round(this.props.propertyValueRange[1])
+                ? Math.round(this.props.propertyValueRange[1]) + 1
                 : 0;
             const namedPropertyCount =
                 this.props.discretePropertyValueNames?.length ?? 0;
             return {
                 discreteData: true,
-                colormapSize:
-                    Math.max(maxPropertyValue, namedPropertyCount) + 1,
+                colormapSize: Math.max(maxPropertyValue, namedPropertyCount),
             };
         }
         return {
             discreteData: false,
             colormapSize: 256,
         };
-    }
-
-    private getVertexColorAttributes(): Float32Array {
-        const hints = this.getColoringHints();
-        const colors = getColormapDiscreteColors(
-            this.props.colormapFunction ?? {
-                colormapName: this.props.colormapName,
-                colorTables: (this.context as DeckGLLayerContext).userData
-                    .colorTables,
-            },
-            hints
-        );
-
-        const colormapSize = Math.max(colors.length / 3, 1);
-
-        const length = this.props.vertexProperties.length;
-
-        const entries = this.props.discretePropertyValueNames ?? [];
-        const codeToIndex = new Map<number, number>();
-        for (let idx = 0; idx < entries.length; idx++) {
-            codeToIndex.set(entries[idx].value, idx);
-        }
-
-        const vertexColors = new Float32Array(length * 3);
-        for (let i = 0; i < length; i++) {
-            const property = this.props.vertexProperties[i];
-            let index = -1;
-            if (entries.length > 0) {
-                index = codeToIndex.get(property) ?? -1;
-            } else if (Number.isInteger(property)) {
-                index = property;
-            }
-            let color =
-                property === this.props.undefinedPropertyValue
-                    ? undefined
-                    : entries[index]?.color;
-
-            if (color === undefined) {
-                if (
-                    index >= 0 &&
-                    property !== this.props.undefinedPropertyValue
-                ) {
-                    const colorIndex = index % colormapSize;
-                    const colorOffset = colorIndex * 3;
-                    color = [
-                        colors[colorOffset] ??
-                            this.props.undefinedPropertyColor[0],
-                        colors[colorOffset + 1] ??
-                            this.props.undefinedPropertyColor[1],
-                        colors[colorOffset + 2] ??
-                            this.props.undefinedPropertyColor[2],
-                    ];
-                } else {
-                    color = this.props.undefinedPropertyColor;
-                }
-            }
-
-            vertexColors[i * 3 + 0] = color[0] / 255;
-            vertexColors[i * 3 + 1] = color[1] / 255;
-            vertexColors[i * 3 + 2] = color[2] / 255;
-        }
-        return vertexColors;
     }
 
     initializeState(context: DeckGLLayerContext): void {
@@ -274,31 +211,22 @@ export class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
         const contourInterval = this.props.contours[1] ?? -1.0;
         const isContoursDepth = this.props.isContoursDepth;
 
-        const valueRangeMin = this.props.propertyValueRange[0] ?? 0.0;
-        const valueRangeMax = this.props.propertyValueRange[1] ?? 1.0;
+        const valueRange = this.props.propertyValueRange ?? [0.0, 1.0];
 
         // If specified color map will extend from colormapRangeMin to colormapRangeMax.
         // Otherwise it will extend from valueRangeMin to valueRangeMax.
-        const colormapRangeMin = this.props.colormapRange?.[0] ?? valueRangeMin;
-        const colormapRangeMax = this.props.colormapRange?.[1] ?? valueRangeMax;
+        const colormapRange = this.props.colormapRange ?? valueRange;
 
-        const isClampColor: boolean =
+        const isClampColorDefined: boolean =
             this.props.colormapClampColor !== undefined &&
             this.props.colormapClampColor !== true &&
             this.props.colormapClampColor !== false;
-        let colormapClampColor = isClampColor
-            ? this.props.colormapClampColor
-            : [0, 0, 0];
+        const useClampColor =
+            isClampColorDefined || this.props.colormapClampColor === false;
 
-        // Normalize to [0,1] range.
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        colormapClampColor = (colormapClampColor as Color).map(
-            (x) => (x ?? 0) / 255
-        );
-
-        const isColormapClampColorTransparent: boolean =
-            (this.props.colormapClampColor as boolean) === false;
+        const colormapClampColor = isClampColorDefined
+            ? toNormalizedRGBAColor(this.props.colormapClampColor as Color)
+            : [0, 0, 0, 0];
 
         const smoothShading =
             this.props.normals.length == 0 ? false : this.props.smoothShading;
@@ -339,16 +267,18 @@ export class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
 
         model.shaderInputs.setProps({
             map: {
+                isContoursDepth,
                 contourReferencePoint,
                 contourInterval,
-                isContoursDepth,
-                valueRangeMin,
-                valueRangeMax,
-                colormapRangeMin,
-                colormapRangeMax,
+                valueRange,
+                colormapRange,
                 colormapClampColor,
-                isColormapClampColorTransparent,
-                isClampColor,
+                useClampColor,
+                undefinedValue: this.props.undefinedPropertyValue,
+                undefinedColor: toNormalizedRGBAColor(
+                    this.props.undefinedPropertyColor ??
+                        defaultProps.undefinedPropertyColor
+                ),
                 smoothShading,
                 ZIncreasingDownwards: this.props.ZIncreasingDownwards,
             },
@@ -358,11 +288,45 @@ export class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
     }
 
     getDiscretePropModel() {
+        const hints = this.getColoringHints();
+        const colors = getColormapDiscreteColors(
+            this.props.colormapFunction ?? {
+                colormapName: this.props.colormapName,
+                colorTables: (this.context as DeckGLLayerContext).userData
+                    .colorTables,
+            },
+            hints
+        );
+        const colormap = createColormapTexture(
+            colors,
+            this.context as DeckGLLayerContext,
+            this.getColoringHints()
+        );
+
+        // MESH MODEL
         const contourReferencePoint = this.props.contours[0] ?? -1.0;
         const contourInterval = this.props.contours[1] ?? -1.0;
         const isContoursDepth = this.props.isContoursDepth;
 
-        const vertexColors = this.getVertexColorAttributes();
+        const valueRange = this.props.propertyValueRange ?? [0.0, 1.0];
+
+        // If specified color map will extend from colormapRangeMin to colormapRangeMax.
+        // Otherwise it will extend from valueRangeMin to valueRangeMax.
+        const colormapRange = this.props.colormapRange ?? valueRange;
+
+        const isClampColorDefined: boolean =
+            this.props.colormapClampColor !== undefined &&
+            this.props.colormapClampColor !== true &&
+            this.props.colormapClampColor !== false;
+        const useClampColor =
+            isClampColorDefined || this.props.colormapClampColor === false;
+
+        const colormapClampColor = isClampColorDefined
+            ? toNormalizedRGBAColor(this.props.colormapClampColor as Color)
+            : [0, 0, 0, 0];
+
+        const smoothShading =
+            this.props.normals.length == 0 ? false : this.props.smoothShading;
 
         const model = new Model(this.context.device, {
             id: `${this.props.id}-mesh`,
@@ -389,7 +353,7 @@ export class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
                         this.props.positions.length && {
                         normals: { value: this.props.normals, size: 3 },
                     }),
-                    vertexColor: { value: vertexColors, size: 3 },
+                    //vertexColor: { value: vertexColors, size: 3 },
                     properties: {
                         value: this.props.vertexProperties,
                         size: 1,
@@ -399,14 +363,27 @@ export class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
                 indices: { value: this.props.triangleIndices, size: 1 },
             }),
             bufferLayout: this.getAttributeManager()!.getBufferLayouts(),
+            bindings: {
+                colormap: colormap,
+            },
             isInstanced: false,
         });
 
         model.shaderInputs.setProps({
             map: {
+                isContoursDepth,
                 contourReferencePoint,
                 contourInterval,
-                isContoursDepth,
+                valueRange,
+                colormapRange,
+                colormapClampColor,
+                useClampColor,
+                undefinedValue: this.props.undefinedPropertyValue,
+                undefinedColor: toNormalizedRGBAColor(
+                    this.props.undefinedPropertyColor ??
+                        defaultProps.undefinedPropertyColor
+                ),
+                smoothShading,
                 ZIncreasingDownwards: this.props.ZIncreasingDownwards,
             },
         });
@@ -602,14 +579,15 @@ uniform mapUniforms {
     float contourReferencePoint;
     float contourInterval;
 
-    float valueRangeMin;
-    float valueRangeMax;
-    float colormapRangeMin;
-    float colormapRangeMax;
+    vec2 valueRange;
+    vec2 colormapRange;
 
-    vec3 colormapClampColor;
-    bool isClampColor;
-    bool isColormapClampColorTransparent;
+    vec4 colormapClampColor;
+    bool useClampColor;
+
+    float undefinedValue;
+    vec4 undefinedColor;
+
     bool smoothShading;
     bool ZIncreasingDownwards;
 } map;
@@ -619,13 +597,12 @@ type MapUniformsType = {
     isContoursDepth: boolean;
     contourReferencePoint: number;
     contourInterval: number;
-    valueRangeMin: number;
-    valueRangeMax: number;
-    colormapRangeMin: number;
-    colormapRangeMax: number;
-    colormapClampColor: RGBColor;
-    isClampColor: boolean;
-    isColormapClampColorTransparent: boolean;
+    valueRange: [number, number];
+    colormapRange: [number, number];
+    colormapClampColor: RGBAColor;
+    useClampColor: boolean;
+    undefinedValue: number;
+    undefinedColor: RGBAColor;
     smoothShading: boolean;
     ZIncreasingDownwards: boolean;
 };
@@ -639,13 +616,12 @@ const mapUniforms = {
         isContoursDepth: "u32",
         contourReferencePoint: "f32",
         contourInterval: "f32",
-        valueRangeMin: "f32",
-        valueRangeMax: "f32",
-        colormapRangeMin: "f32",
-        colormapRangeMax: "f32",
-        colormapClampColor: "vec3<f32>",
-        isClampColor: "u32",
-        isColormapClampColorTransparent: "u32",
+        valueRange: "vec2<f32>",
+        colormapRange: "vec2<f32>",
+        colormapClampColor: "vec4<f32>",
+        useClampColor: "u32",
+        undefinedValue: "f32",
+        undefinedColor: "vec4<f32>",
         smoothShading: "u32",
         ZIncreasingDownwards: "u32",
     },
@@ -658,6 +634,15 @@ uniform mapUniforms {
     float contourReferencePoint;
     float contourInterval;
 
+    vec2 valueRange;
+    vec2 colormapRange;
+
+    vec4 colormapClampColor;
+    bool useClampColor;
+
+    uint undefinedValue;
+    vec4 undefinedColor;
+
     bool smoothShading;
     bool ZIncreasingDownwards;
 } map;
@@ -667,6 +652,12 @@ type MapDiscreteUniformsType = {
     isContoursDepth: boolean;
     contourReferencePoint: number;
     contourInterval: number;
+    valueRange: [number, number];
+    colormapRange: [number, number];
+    colormapClampColor: RGBAColor;
+    useClampColor: boolean;
+    undefinedValue: number;
+    undefinedColor: RGBAColor;
     smoothShading: boolean;
     ZIncreasingDownwards: boolean;
 };
@@ -681,6 +672,12 @@ const mapDiscreteUniforms = {
         isContoursDepth: "u32",
         contourReferencePoint: "f32",
         contourInterval: "f32",
+        valueRange: "vec2<u32>",
+        colormapRange: "vec2<f32>",
+        colormapClampColor: "vec4<f32>",
+        useClampColor: "u32",
+        undefinedValue: "u32",
+        undefinedColor: "vec4<f32>",
         smoothShading: "u32",
         ZIncreasingDownwards: "u32",
     },

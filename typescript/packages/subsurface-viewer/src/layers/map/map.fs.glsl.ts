@@ -16,7 +16,37 @@ flat in int vertexIndex;
 // Uniforms
 uniform sampler2D colormap;
 
+// Outputs
 out vec4 fragColor;
+
+// Normalize the value to the range [0, 1]
+float normalizeValue(float value) {
+   if(isNanValue(value)) {
+      return value;
+   }
+   return (value - map.colormapRange[0]) / (map.colormapRange[1] - map.colormapRange[0]);
+}
+
+vec4 valueColor(float value) {
+   if(isNanValue(value) || value == map.undefinedValue) {
+      return map.undefinedColor;
+   }
+   float normalizedValue = normalizeValue(value);
+   // isNanValue(value) fails in shaders due to fragment interpolation,
+   // but if the normalized value is out of the [0, 1] range, treat it as NaN.
+   if(normalizedValue < -1.0 || normalizedValue > 2.0) {
+      return map.undefinedColor;
+   }
+   if(map.useClampColor) {
+      if(normalizedValue < 0.0 || normalizedValue > 1.0) {
+         // Out of range. Use clampcolor.
+         return map.colormapClampColor;
+      }
+   }
+   // apply colormap
+   return texture(colormap, vec2(normalizedValue, 0.5));
+}
+
 
 void main(void) { 
    geometry.uv = vTexCoord;
@@ -27,33 +57,28 @@ void main(void) {
       normal = normalize(cross(dFdx(position_commonspace.xyz), dFdy(position_commonspace.xyz)));
    }
 
-   vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
    float propertyValue = property;
+   
+   DECKGL_FILTER_COLOR(fragColor, geometry);
+
+   // Below code is modified version of "picking_filterPickingColor" function.
+   // Original function is in deckgl's shader modules/picking.glsl.ts
+   // "GetPickingInfo" retrieves this color as "pickingColor" on the JS side.
+   // Encodes vertexIndex and is used to retrieve picked info from input data.
+   if ( bool(picking.isActive) && !bool(picking.isAttribute) ) {
+      if (picking_vRGBcolor_Avalid.a == 0.0) {
+          discard;
+      }
+      vec4 encodedIndexColor = encodeIndexToRGB(vertexIndex);
+      fragColor = vec4(encodedIndexColor.rgb, picking_vRGBcolor_Avalid.a);
+   }
 
    // This may happen due to GPU interpolation precision causing color artifacts.
-   propertyValue = clamp(propertyValue, map.valueRangeMin, map.valueRangeMax);
+   // propertyValue = clamp(propertyValue, map.valueRange[0], map.valueRange[1]);
 
-   float x = (propertyValue - map.colormapRangeMin) / (map.colormapRangeMax - map.colormapRangeMin);
-   if (x < 0.0 || x > 1.0) {
-      // Out of range. Use clampcolor.
-      if (map.isClampColor) {
-         color = vec4(map.colormapClampColor.rgb, 1.0);
-      }
-      else if (map.isColormapClampColorTransparent) {
-         discard;
-         return;
-      }
-      else {
-         // Use min/max color to clamp.
-         x = max(0.0, x);
-         x = min(1.0, x);
-
-         color = texture(colormap, vec2(x, 0.5));
-      }
-   }
-   else {
-      color = texture(colormap, vec2(x, 0.5));
-   }
+   vec4 color = vColor;   
+   // compute color
+   color = valueColor(propertyValue);
 
    bool is_contours = map.contourReferencePoint != -1.0 && map.contourInterval != -1.0;
    if (is_contours) {
@@ -72,19 +97,6 @@ void main(void) {
    // Use two sided phong lighting. This has no effect if "material" property is not set.
    vec3 lightColor = lighting_getLightColor(color.rgb, cameraPosition, position_commonspace.xyz, normal);
 
-   fragColor = vec4(lightColor, vColor.a);
-   DECKGL_FILTER_COLOR(fragColor, geometry);
-
-   // Below code is modified version of "picking_filterPickingColor" function.
-   // Original function is in deckgl's shader modules/picking.glsl.ts
-   // "GetPickingInfo" retrieves this color as "pickingColor" on the JS side.
-   // Encodes vertexIndex and is used to retrieve picked info from input data.
-   if ( bool(picking.isActive) && !bool(picking.isAttribute) ) {
-      if (picking_vRGBcolor_Avalid.a == 0.0) {
-          discard;
-      }
-      vec4 encodedIndexColor = encodeIndexToRGB(vertexIndex);
-      fragColor = vec4(encodedIndexColor.rgb, picking_vRGBcolor_Avalid.a);
-   }
+   fragColor = vec4(lightColor, color.a * vColor.a);
 }
 `;
