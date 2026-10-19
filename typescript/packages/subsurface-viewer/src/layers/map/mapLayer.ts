@@ -122,11 +122,22 @@ function onTerminateWorker() {
     }
 }
 
+export type TypedIntArray = Int16Array | Uint16Array | Int32Array | Uint32Array;
+
+export function isTypedIntegerArray(value: unknown): value is TypedIntArray {
+    return (
+        value instanceof Int16Array ||
+        value instanceof Uint16Array ||
+        value instanceof Int32Array ||
+        value instanceof Uint32Array
+    );
+}
+
 export type PropertyInput =
     | string
     | Array<number | undefined>
     | Float32Array
-    | Uint16Array;
+    | TypedIntArray;
 
 export function getUndefinedValueProperties(
     propertiesData: PropertyInput | undefined,
@@ -135,7 +146,17 @@ export function getUndefinedValueProperties(
     if (propertiesData instanceof Float32Array) {
         return isPropertiesDiscrete ? DEFAULT_DISCRETE_UNDEFINED_VALUE : NaN;
     }
-    if (propertiesData instanceof Uint16Array || isPropertiesDiscrete) {
+    if (isTypedIntegerArray(propertiesData) || isPropertiesDiscrete) {
+        if (propertiesData instanceof Int16Array) {
+            return 0x7fff;
+        } else if (propertiesData instanceof Uint16Array) {
+            return 0xffff;
+        } else if (propertiesData instanceof Int32Array) {
+            return 0x7fffffff;
+        } else if (propertiesData instanceof Uint32Array) {
+            return 0xffffffff;
+        }
+
         return DEFAULT_DISCRETE_UNDEFINED_VALUE;
     }
     return undefined;
@@ -144,10 +165,10 @@ export function getUndefinedValueProperties(
 export function normalizeDiscreteProperties(
     propertiesData: PropertyInput,
     undefinedPropertyValue: number
-): string | number[] | Float32Array | Uint16Array {
+): string | number[] | Float32Array | TypedIntArray {
     if (
         typeof propertiesData === "string" ||
-        propertiesData instanceof Uint16Array
+        isTypedIntegerArray(propertiesData)
     ) {
         return propertiesData;
     }
@@ -159,14 +180,14 @@ export function normalizeDiscreteProperties(
 
 function normalizeContinuousProperties(
     propertiesData: PropertyInput
-): string | number[] | Float32Array {
+): string | number[] | Float32Array | TypedIntArray {
     if (
         typeof propertiesData === "string" ||
         propertiesData instanceof Float32Array
     ) {
         return propertiesData;
     }
-    if (propertiesData instanceof Uint16Array) {
+    if (isTypedIntegerArray(propertiesData)) {
         return Array.from(propertiesData);
     }
     return propertiesData.map((value) => value ?? NaN);
@@ -188,18 +209,26 @@ async function loadMeshAndProperties(
 
     const mesh = await loadDataArray(meshData, Float32Array);
 
-    const properties = isPropertiesDiscrete
-        ? await loadDataArray(
-              normalizeDiscreteProperties(
-                  propertiesData,
-                  undefinedPropertyValue
-              ),
-              Uint16Array
-          )
-        : await loadDataArray(
-              normalizeContinuousProperties(propertiesData),
-              Float32Array
-          );
+    let properties = null;
+
+    if (isPropertiesDiscrete) {
+        const is32Bit =
+            propertiesData instanceof Int32Array ||
+            propertiesData instanceof Uint32Array;
+
+        const normalized = normalizeDiscreteProperties(
+            propertiesData,
+            undefinedPropertyValue
+        );
+        properties = is32Bit
+            ? await loadDataArray(normalized, Int32Array)
+            : await loadDataArray(normalized, Int16Array);
+    } else {
+        properties = await loadDataArray(
+            normalizeContinuousProperties(propertiesData),
+            Float32Array
+        );
+    }
 
     // Keep this.
     // const t1 = performance.now();
@@ -230,7 +259,11 @@ export interface MapLayerProps extends ExtendedLayerProps {
      * If the number of property values equals one less than the depth values in
      * each direction then the property values will be pr cell and the cell will be constant
      * colored.
-     * Undefined value for discrete Uint16Array input defaults to 0xFFFF.
+     *
+     * Undefined value for discrete Uint16Array input defaults to 0xffff.
+     * Undefined value for discrete Int16Array input defaults to 0x7fff.
+     * Undefined value for discrete Int32Array input defaults to 0x7fffffff.
+     * Undefined value for discrete Uint32Array input defaults to 0xffffffff.
      * For float input (Float32Array) it is NaN.
      * For number arrays, undefined values are replaced with the configured
      * undefinedPropertyValue, or 0xFFFF by default in discrete mode.
@@ -240,7 +273,7 @@ export interface MapLayerProps extends ExtendedLayerProps {
         | string
         | Array<number | undefined>
         | Float32Array
-        | Uint16Array
+        | TypedIntArray
         | undefined;
 
     /**
@@ -376,7 +409,7 @@ export default class MapLayer<
         const propertiesData =
             this.props.propertiesData ?? this.props.propertiesUrl;
         return (
-            propertiesData instanceof Uint16Array ||
+            isTypedIntegerArray(propertiesData) ||
             typeof this.props.discretePropertyValueNames !== "undefined"
         );
     }
@@ -402,6 +435,7 @@ export default class MapLayer<
                 isPropertiesCategorical
             ) ??
             DEFAULT_DISCRETE_UNDEFINED_VALUE;
+
         const p = loadMeshAndProperties(
             meshData,
             propertiesData,
@@ -637,7 +671,7 @@ export default class MapLayer<
 
     private getWebworkerParams(
         meshData: Float32Array | null,
-        propertiesData: Float32Array | Uint16Array,
+        propertiesData: Float32Array | TypedIntArray,
         frame: MapFrame
     ): { params: WebWorkerParams; transferrables?: Transferable[] } {
         if (!meshData && !propertiesData) {
@@ -649,7 +683,7 @@ export default class MapLayer<
         const undefinedPropertyValue =
             this.props.undefinedPropertyValue ??
             getUndefinedValueProperties(
-                propertiesData as Float32Array | Uint16Array,
+                propertiesData as Float32Array | TypedIntArray,
                 this.isPropertiesCategorical()
             );
 

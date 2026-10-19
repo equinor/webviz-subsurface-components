@@ -8,7 +8,7 @@ in vec4 position_commonspace;
 in vec4 vColor;
 in vec3 worldPos;
 
-flat in uint property;
+flat in int property;
 flat in int vertexIndex;
 
 flat in vec3 vertexColor_;
@@ -21,7 +21,7 @@ void main(void) {
 
    vec3 normal = normalize(cross(dFdx(position_commonspace.xyz), dFdy(position_commonspace.xyz)));
 
-   uint propertyValue = property;
+   int propertyValue = property;
 
    vec4 color = vec4(vertexColor_, 1.0);
 
@@ -55,8 +55,8 @@ void main(void) {
       if (picking_vRGBcolor_Avalid.a == 0.0) {
           discard;
       }
-      vec4 encodedProperty = encodeIndexToRGB(int(propertyValue));
-      fragColor = vec4(encodedProperty.rgb, picking_vRGBcolor_Avalid.a);
+      vec4 encodedIndexColor = encodeIndexToRGB(vertexIndex);
+      fragColor = vec4(encodedIndexColor.rgb, picking_vRGBcolor_Avalid.a);
    }
 }
 `;
