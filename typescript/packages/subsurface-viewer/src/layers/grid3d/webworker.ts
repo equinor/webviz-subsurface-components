@@ -1,5 +1,11 @@
 import type { MeshType, MeshTypeLines } from "./typeDefs";
-import type { WebWorkerParams } from "./grid3dLayer";
+
+export type WebWorkerParams = {
+    points: Float32Array;
+    polys: Uint32Array;
+    properties: Float32Array | Uint16Array | undefined;
+    undefinedValue: number;
+};
 
 export function makeFullMesh(e: { data: WebWorkerParams }) {
     class Node {

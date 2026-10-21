@@ -5,7 +5,6 @@ export type {
     MapSize,
     MarginsType,
     LayersList,
-    ViewStateType,
     ViewsType,
 } from "./Map";
 
@@ -15,4 +14,4 @@ export type { InfoCardProps } from "./InfoCard";
 export type {
     ContinuousLegendDataType,
     DiscreteLegendDataType,
-} from "./ColorLegend";
+} from "./typeDefs";

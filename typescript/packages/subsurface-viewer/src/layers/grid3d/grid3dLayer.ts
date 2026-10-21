@@ -6,18 +6,22 @@ import { CompositeLayer } from "@deck.gl/core";
 import workerpool from "workerpool";
 
 import type { Material } from "../gpglLayers/typeDefs";
+import {
+    type IGrid3DDiscretePropertyValueName,
+    TGrid3DColoringMode,
+} from "./typeDefs";
 import { PrivateGrid3DLayer } from "./privateGrid3dLayer";
-import { makeFullMesh } from "./webworker";
+import { type WebWorkerParams, makeFullMesh } from "./webworker";
 
 import type {
     ExtendedLayerProps,
     ReportBoundingBoxAction,
-} from "../utils/layerTools";
+} from "../utils/deckglTools";
 import type { ColormapFunctionType } from "../utils/colormapTools";
 
 import config from "../../SubsurfaceConfig.json";
 
-import type { BoundingBox3D, Color, RGBColor } from "../../utils";
+import type { BoundingBox3D, Color, RGBColor, TConstructor } from "../../utils";
 import { findConfig, loadDataArray } from "../../utils";
 
 // init workerpool
@@ -28,10 +32,8 @@ const workerPoolConfig = findConfig(
 );
 
 const pool = workerpool.pool({
-    ...{
-        maxWorkers: 10,
-        workerType: "web",
-    },
+    maxWorkers: 10,
+    workerType: "web",
     ...workerPoolConfig,
 });
 
@@ -42,14 +44,7 @@ function onTerminateWorker() {
     }
 }
 
-export type WebWorkerParams = {
-    points: Float32Array;
-    polys: Uint32Array;
-    properties: Float32Array | Uint16Array | undefined;
-    undefinedValue: number;
-};
-
-function GetBBox(points: Float32Array): BoundingBox3D {
+function getBBox(points: Float32Array): BoundingBox3D {
     let xmax = -99999999;
     let ymax = -99999999;
     let zmax = -99999999;
@@ -59,14 +54,14 @@ function GetBBox(points: Float32Array): BoundingBox3D {
     let zmin = 99999999;
 
     for (let i = 0; i < points.length / 3; i++) {
-        xmax = points[3 * i + 0] > xmax ? points[3 * i + 0] : xmax;
-        xmin = points[3 * i + 0] < xmin ? points[3 * i + 0] : xmin;
+        xmax = Math.max(points[3 * i + 0], xmax);
+        xmin = Math.min(points[3 * i + 0], xmin);
 
-        ymax = points[3 * i + 1] > ymax ? points[3 * i + 1] : ymax;
-        ymin = points[3 * i + 1] < ymin ? points[3 * i + 1] : ymin;
+        ymax = Math.max(points[3 * i + 1], ymax);
+        ymin = Math.min(points[3 * i + 1], ymin);
 
-        zmax = points[3 * i + 2] > zmax ? points[3 * i + 2] : zmax;
-        zmin = points[3 * i + 2] < zmin ? points[3 * i + 2] : zmin;
+        zmax = Math.max(points[3 * i + 2], zmax);
+        zmin = Math.min(points[3 * i + 2], zmin);
     }
     return [xmin, ymin, zmin, xmax, ymax, zmax];
 }
@@ -75,13 +70,13 @@ type TTypedArray = Float32Array | Uint32Array | Uint16Array;
 
 async function loadData<T extends TTypedArray>(
     data: string | number[] | TTypedArray,
-    type: { new (data: unknown): T }
+    type: TConstructor<T>
 ): Promise<T> {
     const result = await loadDataArray(data, type);
     if (result !== null) {
         return result;
     }
-    return Promise.reject("Grid3DLayer: Unsupported type of input data");
+    throw new Error("Grid3DLayer: Unsupported type of input data");
 }
 
 async function loadPropertiesData(
@@ -94,7 +89,7 @@ async function loadPropertiesData(
     if (result !== null) {
         return result;
     }
-    return Promise.reject("Grid3DLayer: Unsupported type of input data");
+    throw new Error("Grid3DLayer: Unsupported type of input property data");
 }
 
 async function load_data(
@@ -113,22 +108,6 @@ async function load_data(
             ? await loadPropertiesData(propertiesData)
             : undefined;
     return Promise.all([points, polys, properties]);
-}
-
-/**
- * Enumerates possible coloring modes of Grid3D Layer.
- */
-export enum TGrid3DColoringMode {
-    /** A continuous property is provided to colorize the cells. */
-    Property,
-    /** A discrete property is provided to colorize the cells. */
-    DiscreteProperty,
-    /** Coloring using the X value of the cell nodes. */
-    X,
-    /** Coloring using the Y value of the cell nodes. */
-    Y,
-    /** Coloring using the Z value of the cell nodes. */
-    Z,
 }
 
 /**
@@ -155,11 +134,6 @@ export function isGeometricProperty(
  */
 export function isDiscreteProperty(coloringMode: TGrid3DColoringMode): boolean {
     return coloringMode === TGrid3DColoringMode.DiscreteProperty;
-}
-
-export interface IGrid3DDiscretePropertyValueName {
-    value: number;
-    name: string;
 }
 
 export interface Grid3DLayerProps extends ExtendedLayerProps {
@@ -305,7 +279,7 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
         );
 
         p.then(([points, polys, properties]) => {
-            const bbox = GetBBox(points);
+            const bbox = getBBox(points);
 
             // Using inline web worker for calculating the triangle mesh from
             // loaded input data so not to halt the GUI thread.
@@ -336,7 +310,7 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
                 });
 
                 if (
-                    typeof this.props.reportBoundingBox !== "undefined" &&
+                    this.props.reportBoundingBox !== undefined &&
                     reportBoundingBox
                 ) {
                     this.props.reportBoundingBox({ layerBoundingBox: bbox });
@@ -437,7 +411,7 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
 
     private getUndefinedPropertyValue(): number {
         if (typeof this.props.undefinedPropertyValue === "number") {
-            //Precision should be reduced to single for correct comparing property values
+            // Precision should be reduced to single for correct comparing property values
             // with undefined property value in the webworker.
             return new Float32Array([this.props.undefinedPropertyValue])[0];
         }

@@ -1,6 +1,6 @@
 {
   "name": "@webviz/subsurface-viewer",
-  "version": "2.3.4",
+  "version": "2.3.7",
   "publishConfig": {
     "access": "public"
   },
@@ -30,6 +30,7 @@
     "transpile": "tsc --project ./tsconfig.json",
     "copy-files": "copyfiles --up 1 \"src/{layers,assets}/**/*.png\" dist/",
     "build": "git clean -xdff dist && npm run transpile && npm run copy-files",
+    "build:check:circular": "madge --circular --ts-config tsconfig.json --extensions ts,tsx src",
     "test_perf": "jest _performance",
     "test_correctness": "jest --coverage --testPathIgnorePatterns='_performance'",
     "test": "jest --coverage",
@@ -46,7 +47,7 @@
     "@equinor/eds-icons": "^1.5.0",
     "@turf/simplify": "^7.4.0",
     "@vivaxy/png": "^1.3.0",
-    "@webviz/wsc-common": "2.0.7",
+    "@webviz/wsc-common": "2.0.9",
     "ajv": "^8.18.0",
     "convert-units": "^2.3.4",
     "d3": "^7.8.2",

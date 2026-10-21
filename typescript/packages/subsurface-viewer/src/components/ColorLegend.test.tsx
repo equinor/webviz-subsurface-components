@@ -11,7 +11,7 @@ import { colorTables } from "@emerson-eps/color-tables";
 
 import ColorLegend from "./ColorLegend";
 
-import type { ExtendedLegendLayer } from "../layers/utils/layerTools";
+import type { ExtendedLegendLayer } from "./typeDefs";
 
 describe("Test ColorLegend component", () => {
     xit("snapshot test", () => {

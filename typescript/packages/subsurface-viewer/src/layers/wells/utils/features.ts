@@ -1,8 +1,8 @@
 import type { Accessor } from "@deck.gl/core";
 import type { Feature, Point, Position } from "geojson";
 
-import type { SizeAccessor, WellFeature } from "../types";
-import { getFromAccessor } from "../../utils/layerTools";
+import type { SizeAccessor, WellFeature } from "../typeDefs";
+import { getFromAccessor } from "../../utils/deckglTools";
 
 export const LINE = "line";
 export const POINT = "point";

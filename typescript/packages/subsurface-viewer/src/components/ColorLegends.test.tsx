@@ -11,7 +11,7 @@ import type { Layer } from "@deck.gl/core";
 
 import { colorTables } from "@emerson-eps/color-tables";
 
-import { getLayersInViewport } from "../layers/utils/layerTools";
+import { getLayersInViewport } from "../layers/utils/deckglTools";
 import ColorLegends from "./ColorLegends";
 
 const colormapLayer = {

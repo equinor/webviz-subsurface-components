@@ -18,8 +18,8 @@ import type {
     ExtendedLayerProps,
     LayerPickInfo,
     PropertyDataType,
-} from "../../layers/utils/layerTools";
-import type { WellsPickInfo } from "../../layers/wells/types";
+} from "../../layers/utils/deckglTools";
+import type { WellsPickInfo } from "../../layers/wells/typeDefs";
 
 import {
     defaultStoryParameters,

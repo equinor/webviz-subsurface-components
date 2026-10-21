@@ -4,9 +4,12 @@ import { CompositeLayer } from "@deck.gl/core";
 import type { GeoJsonLayerProps } from "@deck.gl/layers";
 import { GeoJsonLayer } from "@deck.gl/layers";
 
-import type { ExtendedLayerProps } from "../utils/layerTools";
+import type { ExtendedLayerProps } from "../utils/deckglTools";
 import { getSize } from "../wells/utils/features";
-import type { LineStyleAccessor, WellHeadStyleAccessor } from "../wells/types";
+import type {
+    LineStyleAccessor,
+    WellHeadStyleAccessor,
+} from "../wells/typeDefs";
 
 export interface BoxSelectionLayerProps extends ExtendedLayerProps {
     mode: string; // One of modes in MODE_MAP

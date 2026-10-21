@@ -17,7 +17,7 @@ import type { BoundingBox3D, Point3D } from "../../utils";
 import type {
     ExtendedLayerProps,
     ReportBoundingBoxAction,
-} from "../utils/layerTools";
+} from "../utils/deckglTools";
 import { FixedSizeExtension } from "../../extensions/fixed-size-extension";
 import BoxLayer from "./boxLayer";
 

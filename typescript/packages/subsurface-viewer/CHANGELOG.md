@@ -1,3 +1,33 @@
+## 2.3.7 (2026-10-15)
+
+### 🩹 Fixes
+
+- property maps readout info return inverted Depth value for disrete properties ([#2883](https://github.com/equinor/webviz-subsurface-components/pull/2883))
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
+## 2.3.6 (2026-10-15)
+
+### 🩹 Fixes
+
+- break subsurface-viewer circular dependencies ([#2882](https://github.com/equinor/webviz-subsurface-components/pull/2882))
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 2.0.9
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
+## 2.3.5 (2026-10-15)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 2.0.8
+
 ## 2.3.4 (2026-10-09)
 
 ### 🩹 Fixes

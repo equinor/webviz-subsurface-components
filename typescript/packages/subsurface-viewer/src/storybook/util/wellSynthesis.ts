@@ -4,7 +4,7 @@ import type { Color } from "@deck.gl/core";
 import type {
     WellFeature,
     WellFeatureCollection,
-} from "../../layers/wells/types";
+} from "../../layers/wells/typeDefs";
 import type { Point3D } from "../../utils";
 import type { TrajectorySimulationProps } from "../types/well";
 import { createSeededRandom } from "./random";

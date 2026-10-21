@@ -2,7 +2,8 @@ import "react";
 
 import type { Meta, StoryObj } from "@storybook/react-webpack5";
 
-import SubsurfaceViewer, { TGrid3DColoringMode } from "../../SubsurfaceViewer";
+import SubsurfaceViewer from "../../SubsurfaceViewer";
+import { TGrid3DColoringMode } from "../../layers/grid3d";
 
 import type { RGBColor } from "../../utils";
 

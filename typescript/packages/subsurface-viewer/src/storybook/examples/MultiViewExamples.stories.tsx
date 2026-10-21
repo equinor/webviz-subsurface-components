@@ -17,11 +17,8 @@ import Tabs from "@mui/material/Tabs";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 
-import type {
-    MapMouseEvent,
-    ViewStateType,
-    ViewsType,
-} from "../../components/Map";
+import type { MapMouseEvent, ViewsType } from "../../components/Map";
+import type { ViewStateType } from "../../utils/camera";
 import { ViewFooter } from "../../components/ViewFooter";
 
 import {

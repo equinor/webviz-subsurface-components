@@ -20,8 +20,8 @@ import type {
     ExtendedLayerProps,
     LayerPickInfo,
     PropertyDataType,
-} from "../utils/layerTools";
-import { createPropertyData } from "../utils/layerTools";
+} from "../utils/deckglTools";
+import { createPropertyData, initPropertyData } from "../utils/deckglTools";
 import {
     type ColormapFunctionType,
     createColormapTexture,
@@ -34,7 +34,7 @@ import fsDiscrete from "./map_discrete.fs.glsl";
 import vsDiscrete from "./map_discrete.vs.glsl";
 import fsLineShader from "./line.fs.glsl";
 import vsLineShader from "./line.vs.glsl";
-import type { IMapDiscretePropertyValueName } from "./mapLayer";
+import type { IMapDiscretePropertyValueName } from "./typeDefs";
 
 interface IColormapTextureHints {
     discreteData: boolean;
@@ -109,7 +109,6 @@ export class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
             arr[i * 3 + 2] = pickingColor[2];
         }
         attribute.value = arr;
-        return;
     }
 
     private getColoringHints(): IColormapTextureHints {
@@ -124,7 +123,7 @@ export class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
         }
         if (
             this.props.vertexProperties instanceof Uint16Array ||
-            typeof this.props.discretePropertyValueNames !== "undefined"
+            this.props.discretePropertyValueNames !== undefined
         ) {
             const namedPropertyCount =
                 this.props.discretePropertyValueNames?.length;
@@ -182,7 +181,7 @@ export class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
                     ? undefined
                     : entries[index]?.color;
 
-            if (typeof color === "undefined") {
+            if (color === undefined) {
                 if (
                     index >= 0 &&
                     property !== this.props.undefinedPropertyValue
@@ -516,11 +515,16 @@ export class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
             return info;
         }
 
+        const layer_properties: PropertyDataType[] = initPropertyData(
+            info.coordinate?.[2],
+            this.props.ZIncreasingDownwards,
+            this.props.modelMatrix
+        );
+
         if (this.isPropertiesCategorical()) {
             const [r, g, b] = info.color;
             const code = decodeIndexFromRGB([r, g, b]);
 
-            const layer_properties: PropertyDataType[] = [];
             layer_properties.push(createPropertyData("Code", code));
 
             const index =
@@ -539,24 +543,9 @@ export class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
             };
         }
 
-        const layer_properties: PropertyDataType[] = [];
-
         // Note these colors are in the  0-255 range.
         const [r, g, b] = info.color;
         const vertexIndex = decodeIndexFromRGB([r, g, b]);
-
-        if (typeof info.coordinate?.[2] !== "undefined") {
-            const zScale = this.props.modelMatrix
-                ? this.props.modelMatrix[10]
-                : 1;
-
-            const depth =
-                (this.props.ZIncreasingDownwards
-                    ? -info.coordinate[2]
-                    : info.coordinate[2]) / Math.max(0.001, zScale);
-
-            layer_properties.push(createPropertyData("Depth", depth));
-        }
 
         const properties = this.props.vertexProperties;
         const property = properties[vertexIndex];

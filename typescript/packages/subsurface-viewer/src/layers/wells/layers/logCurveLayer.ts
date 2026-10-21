@@ -16,7 +16,7 @@ import type {
     WellFeatureCollection,
     WellMdAccessor,
     WellTrajectoryAccessor,
-} from "../types";
+} from "../typeDefs";
 import type { PathLayerProps } from "@deck.gl/layers";
 import { PathLayer } from "@deck.gl/layers";
 
@@ -24,7 +24,7 @@ import type { ColormapFunctionType } from "../../utils/colormapTools";
 import type {
     ContinuousLegendDataType,
     DiscreteLegendDataType,
-} from "../../../components/ColorLegend";
+} from "../../../components/typeDefs";
 import { getPositionByMD } from "../utils/wells";
 import {
     getCurveValueAtMd,
@@ -37,7 +37,7 @@ import {
     injectMdRows,
 } from "../utils/log";
 import { getMdsInRange } from "../utils/trajectory";
-import { getFromAccessor } from "../../utils/layerTools";
+import { getFromAccessor } from "../../utils/deckglTools";
 import type { Position } from "geojson";
 
 export enum SubLayerId {

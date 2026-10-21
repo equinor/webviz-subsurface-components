@@ -1,9 +1,15 @@
 import type { GeometryTriangles, GeometryLines } from "./privateTriangleLayer";
-import type { Params } from "./triangleLayer";
 
 type Vec = [number, number, number];
 
-export function makeFullMesh(e: { data: Params }) {
+export type WebWorkerParams = {
+    vertexArray: Float32Array;
+    indexArray: Uint32Array;
+    smoothShading: boolean;
+    displayNormals: boolean;
+};
+
+export function makeFullMesh(e: { data: WebWorkerParams }) {
     const params = e.data;
 
     const t0 = performance.now();

@@ -1,5 +1,32 @@
 import type { GeometryProps } from "@luma.gl/engine";
 
+/**
+ * Enumerates possible coloring modes of Grid3D Layer.
+ */
+export enum TGrid3DColoringMode {
+    /** A continuous property is provided to colorize the cells nodes. */
+    Property,
+    /** A discrete property is provided to colorize the cells. */
+    DiscreteProperty,
+    /** Coloring using the X value of the cell nodes. */
+    X,
+    /** Coloring using the Y value of the cell nodes. */
+    Y,
+    /** Coloring using the Z value of the cell nodes. */
+    Z,
+}
+
+/**
+ * Describes a discrete property value and its display name and optional color.
+ */
+export interface IGrid3DDiscretePropertyValueName {
+    /** Discrete property value represented. */
+    value: number;
+    /** Name for the discrete property value. */
+    name: string;
+}
+
+// Internals
 export type MeshType = {
     drawMode: GeometryProps["topology"];
     attributes: {
@@ -19,17 +46,4 @@ export type MeshTypeLines = {
         indices: { value: Uint32Array; size: number };
     };
     vertexCount: number;
-};
-
-export type WebWorkerParams = {
-    points: Float32Array;
-    polys: Uint32Array;
-    properties: Float32Array | Uint16Array;
-};
-
-export type WebWorkerResult = {
-    isFinal: boolean;
-    mesh: MeshType;
-    meshLines: MeshTypeLines;
-    propertyRange: [number, number];
 };

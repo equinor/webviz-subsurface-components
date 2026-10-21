@@ -47,7 +47,7 @@ export default stories;
 const smallLayer = {
     "@@type": "MapLayer",
     id: "mesh-layer",
-    meshUrl: "small_depths.float32",
+    meshData: "small_depths.float32",
     frame: {
         origin: [459840.7, 5929826.1],
         count: [5, 6],
@@ -118,7 +118,7 @@ const nodeCenterPropertiesLayer = {
     "@@type": "MapLayer",
     id: "node-center-layer",
 
-    meshUrl: map_4x5_meshData,
+    meshData: map_4x5_meshData,
     frame: {
         origin: [0, 0],
         count: [4, 5],
@@ -635,7 +635,7 @@ const BigMapWithHoleComponent: React.FC = () => {
             layers: [
                 {
                     ...hugin5mKhNetmapMapLayer,
-                    meshUrl: "hugin_depth_5_m_w_hole.float32",
+                    meshData: "hugin_depth_5_m_w_hole.float32",
                     gridLines: false,
                     material: false,
                 },

@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 import type { MapState } from "../../redux/store";
 import LayersButton from "./LayersButton";
 import LayerSettingsButton from "./LayerSettingsButton";
-import { getLayersInViewport } from "../../layers/utils/layerTools";
+import { getLayersInViewport } from "../../layers/utils/deckglTools";
 
 const PREFIX = "Settings";
 

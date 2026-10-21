@@ -6,7 +6,7 @@ import {
     MenuTypeProps,
     NumericTypeProps,
     SliderTypeProps,
-} from "../redux/types";
+} from "../redux/typeDefs";
 
 // return true if layer props are displayable as defined in ../redux/types.tsx
 export const getPropVisibility = (layer: Record<string, unknown>): boolean => {

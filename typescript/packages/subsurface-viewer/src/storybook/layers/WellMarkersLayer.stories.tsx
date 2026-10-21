@@ -15,7 +15,7 @@ import type {
     WellFeature,
     WellFeatureCollection,
     WellsPickInfo,
-} from "../../layers/wells/types";
+} from "../../layers/wells/typeDefs";
 import {
     getAziAndInclForSegment,
     getLineStringGeometry,
