@@ -121,7 +121,7 @@
     "sass": "^1.77.6",
     "sass-loader": "^16.0.3",
     "source-map-loader": "^5.0.0",
-    "storybook": "^9.1.20",
+    "storybook": "^9.1.21",
     "style-loader": "^4.0.0",
     "terser-webpack-plugin": "^5.3.14",
     "ts-loader": "^9.6.2",
