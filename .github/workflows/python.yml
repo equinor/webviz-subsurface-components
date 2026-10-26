@@ -20,7 +20,7 @@ jobs:
   python:
     # Run on all events defined above, except pushes which are not to master
     if: github.event_name != 'push' || github.ref == 'refs/heads/master'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         python-version: ["3.11"]
