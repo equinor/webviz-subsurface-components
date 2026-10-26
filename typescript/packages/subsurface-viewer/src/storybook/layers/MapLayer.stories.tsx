@@ -30,6 +30,13 @@ import {
     northArrowLayer,
 } from "../sharedSettings";
 
+import { getPropsInjectorComponent } from "../sharedHelperComponents";
+
+const SubsurfaceViewerPropsInjector = getPropsInjectorComponent(
+    getInjectedProps,
+    SubsurfaceViewer
+);
+
 const stories: Meta = {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer / Map Layer",
@@ -113,79 +120,72 @@ const map_4x5_cellCenter_property = [
     0,         0.1, 0.2,
 ];
 
+const greyColorFunc = (value: number) => [
+    value * 255,
+    value * 255,
+    value * 255,
+];
+
+// ---------In-place array data handling (storybook fails to rebuild non JSon data)--------------- //
+const nodeCenterLayerId = "node-center-layer";
+const nodeCenterWithArrayLayerId = "node-center-layer-with-array";
+const cellCenterLayerId = "cell-center-layer";
+const injectedProps = {
+    [nodeCenterLayerId]: {
+        colorMapFunction: greyColorFunc,
+    },
+    [nodeCenterWithArrayLayerId]: {
+        meshData: new Float32Array(map_4x5_meshData),
+        propertiesData: new Float32Array(map_4x5_nodeCenter_property),
+        colorMapFunction: greyColorFunc,
+    },
+    [cellCenterLayerId]: {
+        colorMapFunction: greyColorFunc,
+    },
+};
+
+function getInjectedProps() {
+    return injectedProps;
+}
+
 // This layer has as many property values as depth values hence each cell will be interpolated in color.
 const nodeCenterPropertiesLayer = {
     "@@type": "MapLayer",
-    id: "node-center-layer",
+    "@@typedArraySupport": true,
+    id: nodeCenterLayerId,
 
-    meshData: map_4x5_meshData,
     frame: {
         origin: [0, 0],
         count: [4, 5],
         increment: [1, 1],
         rotDeg: 0,
     },
+    meshData: map_4x5_meshData,
     propertiesUrl: map_4x5_nodeCenter_property,
     gridLines: true,
     material: true,
     // black to white colors.
-    colorMapFunction: (value: number) => [
-        value * 255,
-        value * 255,
-        value * 255,
-    ],
+    colorMapFunction: "grey colorMapFunction proxy",
 };
 
 const nodeCenterPropertiesLayerWithArrayInput = {
-    "@@type": "MapLayer",
-    "@@typedArraySupport": true,
-    id: "node-center-layer",
-    frame: {
-        origin: [0, 0],
-        count: [4, 5],
-        increment: [1, 1],
-        rotDeg: 0,
-    },
-    meshData: new Float32Array(map_4x5_meshData),
-    propertiesData: new Float32Array(map_4x5_nodeCenter_property),
-    gridLines: true,
-    material: true,
-    // black to white colors.
-    colorMapFunction: (value: number) => [
-        value * 255,
-        value * 255,
-        value * 255,
-    ],
+    ...nodeCenterPropertiesLayer,
+    id: nodeCenterWithArrayLayerId,
+
+    meshData: "meshData proxy",
+    propertiesData: "propertiesData proxy",
 };
 
 // This layer has as (nx-1)*(ny-1) property values and depth values are nx*ny hence each cell will be fixed in color.
 const cellCenterPropertiesLayer = {
-    "@@type": "MapLayer",
-    id: "cell-center-layer",
+    ...nodeCenterPropertiesLayer,
+    id: cellCenterLayerId,
 
     // One depth per node
-    /* prettier-ignore */
     meshData: map_4x5_meshData,
-
     // One property per cell.
-    /* prettier-ignore */
     propertiesData: map_4x5_cellCenter_property,
 
-    frame: {
-        origin: [0, 0],
-        count: [4, 5],
-        increment: [1, 1],
-        rotDeg: 0,
-    },
-
-    gridLines: true,
-    material: true,
-    // black to white colors.
-    colorMapFunction: (value: number) => [
-        value * 255,
-        value * 255,
-        value * 255,
-    ],
     smoothShading: true,
 };
 
@@ -395,44 +395,48 @@ const axes_lite = {
 };
 
 //-- CellCenterPropMap --
-export const CellCenterPropMap: StoryObj<typeof SubsurfaceViewer> = {
-    args: {
-        id: "map",
-        layers: [axes_lite, cellCenterPropertiesLayer, northArrowLayer],
-        bounds: [-1, -1, 4, 5] as BoundingBox2D,
-        views: default3DViews,
-    },
-    parameters: {
-        docs: {
-            ...defaultStoryParameters.docs,
-            description: {
-                story: "A small map with cell-center properties. Each cell is rendered with a constant color.",
+export const CellCenterPropMap: StoryObj<typeof SubsurfaceViewerPropsInjector> =
+    {
+        args: {
+            id: "map",
+            layers: [axes_lite, cellCenterPropertiesLayer, northArrowLayer],
+            bounds: [-1, -1, 4, 5] as BoundingBox2D,
+            views: default3DViews,
+        },
+        parameters: {
+            docs: {
+                ...defaultStoryParameters.docs,
+                description: {
+                    story: "A small map with cell-center properties. Each cell is rendered with a constant color.",
+                },
             },
         },
-    },
-};
+        render: (args) => <SubsurfaceViewerPropsInjector {...args} />,
+    };
 
 //-- NodeCenterPropMap --
-export const NodeCenterPropMap: StoryObj<typeof SubsurfaceViewer> = {
-    args: {
-        id: "map",
-        layers: [axes_lite, nodeCenterPropertiesLayer, northArrowLayer],
-        bounds: [-1, -1, 4, 5] as BoundingBox2D,
-        views: default3DViews,
-    },
-    parameters: {
-        docs: {
-            ...defaultStoryParameters.docs,
-            description: {
-                story: "A small map with properties given at nodes. Each cell will be interpolated in color.",
+export const NodeCenterPropMap: StoryObj<typeof SubsurfaceViewerPropsInjector> =
+    {
+        args: {
+            id: "map",
+            layers: [axes_lite, nodeCenterPropertiesLayer, northArrowLayer],
+            bounds: [-1, -1, 4, 5] as BoundingBox2D,
+            views: default3DViews,
+        },
+        parameters: {
+            docs: {
+                ...defaultStoryParameters.docs,
+                description: {
+                    story: "A small map with properties given at nodes. Each cell will be interpolated in color.",
+                },
             },
         },
-    },
-};
+        render: (args) => <SubsurfaceViewerPropsInjector {...args} />,
+    };
 
 //-- NodeCenterPropMap  with native javascript arrays as input --
 export const NodeCenterPropMapWithArrayInput: StoryObj<
-    typeof SubsurfaceViewer
+    typeof SubsurfaceViewerPropsInjector
 > = {
     args: {
         id: "map",
@@ -452,6 +456,7 @@ export const NodeCenterPropMapWithArrayInput: StoryObj<
             },
         },
     },
+    render: (args) => <SubsurfaceViewerPropsInjector {...args} />,
     tags: ["no-test"],
 };
 

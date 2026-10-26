@@ -45,9 +45,6 @@ const nodeCenterContinuousPropertyLayer = {
 
     // One property per node.
     propertiesData: "rings_property_79x71.float32",
-
-    //colorMapFunction: new Uint8Array([255, 255, 0, 0, 128, 0, 255, 68, 0]),
-    //colorMapRange: [-1, 1],
 };
 
 const nodeCenterFaciesPropertyLayer = {
@@ -62,8 +59,6 @@ const nodeCenterFaciesPropertyLayer = {
         { value: 1, name: "One" },
         { value: 5, name: "Five" },
     ],
-
-    //colorMapFunction: new Uint8Array([255, 255, 0, 0, 128, 0, 255, 68, 0]),
 };
 
 // These layers have as (nx-1)*(ny-1) property values and depth values are nx*ny hence each cell will be fixed in color.
@@ -90,14 +85,6 @@ const cellCenterFaciesPropertyLayer = {
         { value: 1, name: "One" },
         { value: 5, name: "Five" },
     ],
-
-    // colorMapFunction: new Uint8Array([255, 255, 0, 0, 128, 0, 255, 68, 0]),
-};
-
-const axes_categorical = {
-    "@@type": "AxesLayer",
-    id: "axes_categorical",
-    bounds: [-1608, -1838, 2038, 2291, 1662, 1449] as BoundingBox3D,
 };
 
 /* prettier-ignore */
@@ -105,6 +92,12 @@ const zoom: BoundingBox3D = [
     -1608.620361328125, -1838, -2038.382080078125,
     2291.379638671875, 1662, -1449.6324462890625,
 ];
+
+const axesLayer = {
+    "@@type": "AxesLayer",
+    id: "axes_categorical",
+    bounds: zoom,
+};
 
 const cameraPosition = {
     rotationOrbit: 0,
@@ -117,11 +110,7 @@ const cameraPosition = {
 export const NodeCenterContinuousPropMap: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "map",
-        layers: [
-            axes_categorical,
-            nodeCenterContinuousPropertyLayer,
-            northArrowLayer,
-        ],
+        layers: [axesLayer, nodeCenterContinuousPropertyLayer, northArrowLayer],
 
         cameraPosition,
         views: default3DViews,
@@ -139,11 +128,7 @@ export const NodeCenterContinuousPropMap: StoryObj<typeof SubsurfaceViewer> = {
 export const CellCenterContinuousPropMap: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "map",
-        layers: [
-            axes_categorical,
-            cellCenterContinuousPropertyLayer,
-            northArrowLayer,
-        ],
+        layers: [axesLayer, cellCenterContinuousPropertyLayer, northArrowLayer],
 
         cameraPosition,
         views: default3DViews,
@@ -161,11 +146,7 @@ export const CellCenterContinuousPropMap: StoryObj<typeof SubsurfaceViewer> = {
 export const NodeCenterFaciesPropMap: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "map",
-        layers: [
-            axes_categorical,
-            nodeCenterFaciesPropertyLayer,
-            northArrowLayer,
-        ],
+        layers: [axesLayer, nodeCenterFaciesPropertyLayer, northArrowLayer],
 
         cameraPosition,
         views: default3DViews,
@@ -183,11 +164,7 @@ export const NodeCenterFaciesPropMap: StoryObj<typeof SubsurfaceViewer> = {
 export const CellCenterFaciesPropMap: StoryObj<typeof SubsurfaceViewer> = {
     args: {
         id: "map",
-        layers: [
-            axes_categorical,
-            cellCenterFaciesPropertyLayer,
-            northArrowLayer,
-        ],
+        layers: [axesLayer, cellCenterFaciesPropertyLayer, northArrowLayer],
 
         cameraPosition,
         views: default3DViews,
