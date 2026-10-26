@@ -1,9 +1,10 @@
 import type { TypedArray } from "math.gl";
 import type { MapFrame } from "./typeDefs";
+import type { TypedIntArray } from "./mapLayer";
 
 export type WebWorkerParams = [
     meshData: Float32Array | null,
-    propertiesData: Float32Array | Uint16Array | null | undefined,
+    propertiesData: Float32Array | TypedIntArray | null | undefined,
     isMesh: boolean,
     frame: MapFrame,
     smoothShading: boolean,
@@ -168,8 +169,11 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
         ? inputPropertiesData
         : meshData;
 
-    const isUint16 = propertiesData instanceof Uint16Array;
-    const isDiscrete = isUint16;
+    const isDiscrete =
+        propertiesData instanceof Int16Array ||
+        propertiesData instanceof Uint16Array ||
+        propertiesData instanceof Int32Array ||
+        propertiesData instanceof Uint32Array;
 
     // non mesh grids use z = 0 (see below)
     const meshZValueRange = isMesh ? getArrayMinMax(meshData) : [0, 0];
@@ -207,9 +211,9 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
     const triangleIndices = new Uint32Array(nTriangles * 3);
 
     const n = isCellCenteredProperties ? nCells * 6 : nNodes;
-    let vertexProperties: Uint16Array | Float32Array;
+    let vertexProperties: TypedIntArray | Float32Array;
     if (isDiscrete) {
-        vertexProperties = new Uint16Array(n);
+        vertexProperties = new Int32Array(n);
     } else {
         vertexProperties = new Float32Array(n);
     }
@@ -566,7 +570,7 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
         Float32Array,
         Float32Array,
         Uint32Array,
-        Float32Array | Uint16Array,
+        Float32Array | TypedIntArray,
         Uint32Array,
         number[],
         number[],

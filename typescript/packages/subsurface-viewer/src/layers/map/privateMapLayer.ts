@@ -8,6 +8,7 @@ import type {
 } from "@deck.gl/core";
 import { COORDINATE_SYSTEM, Layer, project32, picking } from "@deck.gl/core";
 import type { Device, UniformValue } from "@luma.gl/core";
+import type { TypedIntArray } from "./mapLayer";
 import type { ShaderModule } from "@luma.gl/shadertools";
 import { lighting } from "@luma.gl/shadertools";
 import { Model, Geometry } from "@luma.gl/engine";
@@ -35,6 +36,7 @@ import vsDiscrete from "./map_discrete.vs.glsl";
 import fsLineShader from "./line.fs.glsl";
 import vsLineShader from "./line.vs.glsl";
 import type { IMapDiscretePropertyValueName } from "./typeDefs";
+import { isTypedIntegerArray } from "./mapLayer";
 
 interface IColormapTextureHints {
     discreteData: boolean;
@@ -45,7 +47,7 @@ export interface PrivateMapLayerProps extends ExtendedLayerProps {
     positions: Float32Array;
     normals: Float32Array;
     triangleIndices: Uint32Array;
-    vertexProperties: Float32Array | Uint16Array;
+    vertexProperties: Float32Array | TypedIntArray;
     vertexIndices: Int32Array;
     lineIndices: Uint32Array;
     contours: [number, number];
@@ -122,7 +124,7 @@ export class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
             };
         }
         if (
-            this.props.vertexProperties instanceof Uint16Array ||
+            isTypedIntegerArray(this.props.vertexProperties) ||
             this.props.discretePropertyValueNames !== undefined
         ) {
             const namedPropertyCount =
@@ -523,7 +525,10 @@ export class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
 
         if (this.isPropertiesCategorical()) {
             const [r, g, b] = info.color;
-            const code = decodeIndexFromRGB([r, g, b]);
+            const vertexIndex = decodeIndexFromRGB([r, g, b]);
+
+            const properties = this.props.vertexProperties;
+            const code = properties[vertexIndex];
 
             layer_properties.push(createPropertyData("Code", code));
 
