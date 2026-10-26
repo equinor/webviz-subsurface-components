@@ -404,7 +404,7 @@ export class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
                     picking,
                     mapLinesUniforms,
                     precisionForTests,
-                    // not used by this model
+                    // not used by this model, but added to fix warnings while picking
                     lighting,
                 ],
             }),

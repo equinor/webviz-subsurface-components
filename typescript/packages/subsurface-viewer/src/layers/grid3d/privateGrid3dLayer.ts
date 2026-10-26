@@ -207,7 +207,7 @@ export class PrivateGrid3DLayer extends Layer<PrivateLayerProps> {
                     picking,
                     gridUniforms,
                     precisionForTests,
-                    // not used by this model
+                    // not used by this model, but added to fix warnings while picking
                     lighting,
                 ],
             }),

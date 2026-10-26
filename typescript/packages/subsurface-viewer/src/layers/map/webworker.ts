@@ -233,8 +233,8 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
     }
     const lineIndices = new Uint32Array(nLineIndices);
 
-    // Note: Assumed layout of the incomming 2D array of data:
-    // First coloumn corresponds to lowest x value. Last column highest x value.
+    // Note: Assumed layout of the incoming 2D array of data:
+    // First column corresponds to lowest x value. Last column highest x value.
     // First row corresponds to max y value. Last row corresponds to lowest y value.
     // This must be taken into account when calculating vertex x,y values and texture coordinates.
 
@@ -279,14 +279,10 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
                 const i2 = (h + 1) * nx + (w + 1);
                 const i3 = (h + 1) * nx + w;
 
-                /* prettier-ignore */
-                const i0_act = !isMesh || (isFloatDefined(meshData[i0]));
-                /* prettier-ignore */
-                const i1_act = !isMesh || (isFloatDefined(meshData[i1]));
-                /* prettier-ignore */
-                const i2_act = !isMesh || (isFloatDefined(meshData[i2]));
-                /* prettier-ignore */
-                const i3_act = !isMesh || (isFloatDefined(meshData[i3]));
+                const i0_act = !isMesh || isFloatDefined(meshData[i0]);
+                const i1_act = !isMesh || isFloatDefined(meshData[i1]);
+                const i2_act = !isMesh || isFloatDefined(meshData[i2]);
+                const i3_act = !isMesh || isFloatDefined(meshData[i3]);
 
                 // Triangles.
                 if (i1_act && i3_act) {
@@ -397,11 +393,6 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
 
                 const propertyIndex = h * (nx - 1) + w; // (nx - 1) -> the width of the property 2D array is one less than for the nodes in this case.
                 const propertyValue = propertiesData[propertyIndex];
-
-                // if (!isPropDefined(propertyValue)) {
-                //     // Inactive cell, do not draw.
-                //     continue;
-                // }
 
                 // Triangles.
                 if (i1_act && i3_act) {

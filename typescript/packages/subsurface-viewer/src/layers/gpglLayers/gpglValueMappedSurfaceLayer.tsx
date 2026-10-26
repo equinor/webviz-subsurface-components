@@ -462,7 +462,7 @@ export class GpglValueMappedSurfaceLayer extends Layer<GpglValueMappedSurfaceLay
                                 picking,
                                 triangleMeshUniforms,
                                 precisionForTests,
-                                // not used by this model
+                                // not used by this model, but added to fix warnings while picking
                                 lighting,
                             ],
                         }),
