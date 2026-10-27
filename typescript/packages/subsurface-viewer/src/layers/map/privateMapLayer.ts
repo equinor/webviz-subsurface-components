@@ -110,8 +110,9 @@ export class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
                     enabled: this.props.enableLighting,
                 },
             });
+        } else {
+            super.setShaderModuleProps(args);
         }
-        super.setShaderModuleProps(args);
     }
 
     calculatePickingColors(attribute: Attribute) {

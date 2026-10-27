@@ -7,6 +7,13 @@ import {
     northArrowLayer,
 } from "../../sharedSettings";
 
+import { getPropsInjectorComponent } from "../../sharedHelperComponents";
+
+const SubsurfaceViewerPropsInjector = getPropsInjectorComponent(
+    getInjectedProps,
+    SubsurfaceViewer
+);
+
 const stories: Meta = {
     component: SubsurfaceViewer,
     title: "SubsurfaceViewer / Map Layer / Categorical Maps",
@@ -18,6 +25,23 @@ const stories: Meta = {
 };
 export default stories;
 
+const faciesColormap = [255, 255, 0, 0, 128, 0, 255, 68, 0];
+
+// ---------In-place array data handling (storybook fails to rebuild non JSon data)--------------- //
+const nodeCenterFaciesLayerId = "facies-node-layer";
+const cellCenterFaciesLayerId = "facies-cell-layer";
+const injectedProps = {
+    [nodeCenterFaciesLayerId]: {
+        colorMapFunction: new Uint8Array(faciesColormap),
+    },
+    [cellCenterFaciesLayerId]: {
+        colorMapFunction: new Uint8Array(faciesColormap),
+    },
+};
+
+function getInjectedProps() {
+    return injectedProps;
+}
 const layerBase = {
     "@@type": "MapLayer",
     "@@typedArraySupport": true,
@@ -49,7 +73,8 @@ const nodeCenterContinuousPropertyLayer = {
 
 const nodeCenterFaciesPropertyLayer = {
     ...layerBase,
-    id: "categorical-layer",
+    "@@typedArraySupport": true,
+    id: nodeCenterFaciesLayerId,
 
     // One property per node.
     propertiesData: "facies5_property_79x71.uint16",
@@ -59,6 +84,9 @@ const nodeCenterFaciesPropertyLayer = {
         { value: 1, name: "One" },
         { value: 5, name: "Five" },
     ],
+
+    // Map display props
+    colorMapFunction: "colorMapFunction proxy",
 };
 
 // These layers have as (nx-1)*(ny-1) property values and depth values are nx*ny hence each cell will be fixed in color.
@@ -75,7 +103,8 @@ const cellCenterContinuousPropertyLayer = {
 
 const cellCenterFaciesPropertyLayer = {
     ...layerBase,
-    id: "categorical-layer",
+    "@@typedArraySupport": true,
+    id: cellCenterFaciesLayerId,
 
     // One property per cell.
     propertiesData: "facies5_property_78x70.uint16",
@@ -85,6 +114,9 @@ const cellCenterFaciesPropertyLayer = {
         { value: 1, name: "One" },
         { value: 5, name: "Five" },
     ],
+
+    // Map display props
+    colorMapFunction: "colorMapFunction proxy",
 };
 
 /* prettier-ignore */
@@ -143,7 +175,9 @@ export const CellCenterContinuousPropMap: StoryObj<typeof SubsurfaceViewer> = {
     },
 };
 
-export const NodeCenterFaciesPropMap: StoryObj<typeof SubsurfaceViewer> = {
+export const NodeCenterFaciesPropMap: StoryObj<
+    typeof SubsurfaceViewerPropsInjector
+> = {
     args: {
         id: "map",
         layers: [axesLayer, nodeCenterFaciesPropertyLayer, northArrowLayer],
@@ -159,9 +193,12 @@ export const NodeCenterFaciesPropMap: StoryObj<typeof SubsurfaceViewer> = {
             },
         },
     },
+    render: (args) => <SubsurfaceViewerPropsInjector {...args} />,
 };
 
-export const CellCenterFaciesPropMap: StoryObj<typeof SubsurfaceViewer> = {
+export const CellCenterFaciesPropMap: StoryObj<
+    typeof SubsurfaceViewerPropsInjector
+> = {
     args: {
         id: "map",
         layers: [axesLayer, cellCenterFaciesPropertyLayer, northArrowLayer],
@@ -177,4 +214,5 @@ export const CellCenterFaciesPropMap: StoryObj<typeof SubsurfaceViewer> = {
             },
         },
     },
+    render: (args) => <SubsurfaceViewerPropsInjector {...args} />,
 };

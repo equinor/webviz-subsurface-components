@@ -59,8 +59,6 @@ void main(void) {
 
    float propertyValue = property;
 
-
-
    // This may happen due to GPU interpolation precision causing color artifacts.
    // propertyValue = clamp(propertyValue, map.valueRange[0], map.valueRange[1]);
 
