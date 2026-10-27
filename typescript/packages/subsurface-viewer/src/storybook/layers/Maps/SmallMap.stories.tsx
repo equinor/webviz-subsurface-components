@@ -17,7 +17,7 @@ const SubsurfaceViewerPropsInjector = getPropsInjectorComponent(
 
 const stories: Meta = {
     component: SubsurfaceViewerPropsInjector,
-    title: "SubsurfaceViewer / Map Layer / Categorical Maps",
+    title: "SubsurfaceViewer / Map Layer / Properties",
     tags: ["no-dom-test"],
     args: {
         // Add some common controls for all the stories.
