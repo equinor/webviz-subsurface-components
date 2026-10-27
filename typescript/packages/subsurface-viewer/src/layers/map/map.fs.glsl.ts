@@ -32,11 +32,6 @@ vec4 valueColor(float value) {
       return map.undefinedColor;
    }
    float normalizedValue = normalizeValue(value);
-   // isNanValue(value) fails in shaders due to fragment interpolation,
-   // but if the normalized value is out of the [0, 1] range, treat it as NaN.
-   if(normalizedValue < -1.0 || normalizedValue > 2.0) {
-      return map.undefinedColor;
-   }
    if(map.useClampColor) {
       if(normalizedValue < 0.0 || normalizedValue > 1.0) {
          // Out of range. Use clampcolor.
@@ -58,9 +53,6 @@ void main(void) {
    }
 
    float propertyValue = property;
-
-   // This may happen due to GPU interpolation precision causing color artifacts.
-   // propertyValue = clamp(propertyValue, map.valueRange[0], map.valueRange[1]);
 
    vec4 color = vColor;   
    // compute color

@@ -28,7 +28,7 @@ import type { ColormapFunctionType } from "../utils/colormapTools";
 
 import config from "../../SubsurfaceConfig.json";
 
-import type { Color, RGBColor, TConstructor } from "../../utils";
+import type { Color, TConstructor } from "../../utils";
 import { findConfig, loadDataArray } from "../../utils";
 import { getModelMatrix } from "../utils/deckglTools";
 import { rotate } from "./utils";
@@ -311,7 +311,7 @@ export interface MapLayerProps extends ExtendedLayerProps {
      * Is not overridden by and used prior to colorMapFunction.
      * By default, Light gray if not provided.
      */
-    undefinedPropertyColor?: RGBColor;
+    undefinedPropertyColor?: Color;
 
     /**  Contour lines reference point and interval.
      * A value of [-1.0, -1.0] will disable contour lines.
@@ -701,7 +701,7 @@ export default class MapLayer<
         return isDiscrete ? 0xffff : Number.NaN;
     }
 
-    private getUndefinedPropertyColor(): RGBColor {
+    private getUndefinedPropertyColor(): Color {
         const colorFunc = this.props.colorMapFunction;
         if (
             this.props.propertiesData?.length === 0 &&

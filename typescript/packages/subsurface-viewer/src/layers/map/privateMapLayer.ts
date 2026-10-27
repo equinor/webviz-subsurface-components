@@ -27,8 +27,9 @@ import type {
 import { createPropertyData, initPropertyData } from "../utils/deckglTools";
 import {
     type ColormapFunctionType,
+    type IColormapHints,
     createColormapTexture,
-    getColormapDiscreteColors,
+    getColormapColorArray,
 } from "../utils/colormapTools";
 
 import { type RGBAColor, toNormalizedRGBAColor } from "../../utils";
@@ -45,11 +46,6 @@ import {
     TMapColoringMode,
 } from "./typeDefs";
 import { isDiscreteProperty } from "./mapLayer";
-
-interface IColormapTextureHints {
-    discreteData: boolean;
-    colormapSize: number;
-}
 
 export interface PrivateMapLayerProps extends ExtendedLayerProps {
     positions: Float32Array;
@@ -128,7 +124,7 @@ export class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
         attribute.value = arr;
     }
 
-    private getColoringHints(): IColormapTextureHints {
+    private getColoringHints(): IColormapHints {
         if (this.props.colormapFunction instanceof Uint8Array) {
             return {
                 discreteData: true,
@@ -293,7 +289,7 @@ export class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
 
     getDiscretePropModel() {
         const hints = this.getColoringHints();
-        const colors = getColormapDiscreteColors(
+        const colors = getColormapColorArray(
             this.props.colormapFunction ?? {
                 colormapName: this.props.colormapName,
                 colorTables: (this.context as DeckGLLayerContext).userData
