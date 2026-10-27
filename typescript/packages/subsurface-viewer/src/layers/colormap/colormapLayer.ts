@@ -17,7 +17,7 @@ import type { LayerPickInfo } from "../utils/deckglTools";
 import { getModelMatrix } from "../utils/deckglTools";
 import {
     type ColormapFunctionType,
-    getImageData,
+    getColormapColorArray,
 } from "../utils/colormapTools";
 import { decodeRGB, type ValueDecoder } from "../utils/propertyMapTools";
 import type { ContinuousLegendDataType } from "../../components/typeDefs";
@@ -229,7 +229,7 @@ export default class ColormapLayer extends BitmapLayer<ColormapLayerProps> {
             width: 256,
             height: 1,
             format: "rgb8unorm-webgl",
-            data: getImageData(
+            data: getColormapColorArray(
                 this.props.colorMapFunction ?? {
                     colormapName: this.props.colorMapName,
                     colorTables: (this.context as DeckGLLayerContext).userData

@@ -3,15 +3,15 @@ import { describe, expect, it } from "@jest/globals";
 
 import { colorTables } from "@emerson-eps/color-tables";
 
-import { getColormapDiscreteColors, getImageData } from "./colormapTools";
+import { getColormapColorArray } from "./colormapTools";
 
 describe("discrete colormap helpers", () => {
     it("provides a fallback color for an empty raw colormap", () => {
-        expect(getImageData(new Uint8Array(), 0)).toEqual(
-            new Uint8Array([0, 0, 0])
-        );
         expect(
-            getColormapDiscreteColors(new Uint8Array(), {
+            getColormapColorArray(new Uint8Array(), { colormapSize: 0 })
+        ).toEqual(new Uint8Array([0, 0, 0]));
+        expect(
+            getColormapColorArray(new Uint8Array(), {
                 discreteData: true,
                 colormapSize: 0,
             })
@@ -29,11 +29,11 @@ describe("discrete colormap helpers", () => {
             255, 0, 0, 0, 255, 128, 255, 0, 255,
         ]);
 
-        const imageData = getImageData(colormapDef, colormapSize);
+        const imageData = getColormapColorArray(colormapDef, { colormapSize });
         expect(imageData).toHaveLength(colorChannels * colormapSize);
         expect(imageData).toEqual(expectedResult);
 
-        const discreteColors = getColormapDiscreteColors(colormapDef, {
+        const discreteColors = getColormapColorArray(colormapDef, {
             discreteData: true,
             colormapSize,
         });
@@ -42,7 +42,7 @@ describe("discrete colormap helpers", () => {
     });
 
     it("generates one fallback entry for an empty discrete function colormap", () => {
-        const colors = getColormapDiscreteColors(() => [255, 0, 0], {
+        const colors = getColormapColorArray(() => [255, 0, 0], {
             discreteData: true,
             colormapSize: 0,
         });
