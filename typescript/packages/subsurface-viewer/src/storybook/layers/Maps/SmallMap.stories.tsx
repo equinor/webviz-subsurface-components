@@ -7,12 +7,14 @@ import {
     northArrowLayer,
 } from "../../sharedSettings";
 import { Play } from "../../util/play";
+
 import { getPropsInjectorComponent } from "../../sharedHelperComponents";
 
 const SubsurfaceViewerPropsInjector = getPropsInjectorComponent(
     getInjectedProps,
     SubsurfaceViewer
 );
+
 const stories: Meta = {
     component: SubsurfaceViewerPropsInjector,
     title: "SubsurfaceViewer / Map Layer / Categorical Maps",
@@ -91,7 +93,7 @@ const categoricalPropertiesLayerNodeCenter = {
     meshData: map_4x5_meshData,
 
     undefinedPropertyValue: 999,
-    undefinedPropertyColor: [200, 40, 40],
+    undefinedPropertyColor: [200, 40, 40, 200],
 
     // One property per node. Note: will cause a resampling of the mesh
     // to match a property per cell.
@@ -129,7 +131,7 @@ const categoricalPropertiesLayerCellCenter = {
     meshData: map_4x5_meshData,
 
     undefinedPropertyValue: 999,
-    undefinedPropertyColor: [200, 40, 40],
+    undefinedPropertyColor: [200, 40, 40, 200],
 
     // One property per cell.
     /* prettier-ignore */
