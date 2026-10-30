@@ -10,8 +10,8 @@ import {
     LabelOrientation,
     WellLabelLayer,
 } from "../../layers/wells/layers/wellLabelLayer";
-import type { ViewStateType, ViewsType } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
+import type { ViewStateType, ViewsType } from "../..";
 import {
     LABEL_ORIENTATION_ARGTYPES,
     LABEL_POSITION_ARGTYPES,

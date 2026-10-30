@@ -36,12 +36,12 @@ import type {
     PerforationProperties,
     ScreenProperties,
     WellFeatureCollection,
-} from "../../layers/wells/types";
+} from "../../layers/wells/typeDefs";
 import {
     coarsenWells,
     DEFAULT_TOLERANCE,
 } from "../../layers/wells/utils/spline";
-import type { WellsLayerProps } from "../../layers/wells/wellsLayer";
+import type { WellsLayerProps } from "../../layers/wells/typeDefs";
 import WellsLayer from "../../layers/wells/wellsLayer";
 import { SectionView } from "../../views/sectionView";
 import {

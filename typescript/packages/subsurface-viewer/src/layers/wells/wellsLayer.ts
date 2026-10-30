@@ -15,7 +15,6 @@ import type { DataFilterExtensionProps } from "@deck.gl/extensions";
 import { DataFilterExtension, PathStyleExtension } from "@deck.gl/extensions";
 import type { GeoJsonLayerProps } from "@deck.gl/layers";
 import { GeoJsonLayer, PathLayer } from "@deck.gl/layers";
-import type { BinaryFeatureCollection } from "@loaders.gl/schema";
 import { GL } from "@luma.gl/constants";
 import { interpolateNumber } from "d3-interpolate";
 import type { Feature, FeatureCollection } from "geojson";
@@ -23,48 +22,40 @@ import type { Feature, FeatureCollection } from "geojson";
 import type {
     ContinuousLegendDataType,
     DiscreteLegendDataType,
-} from "../../components/ColorLegend";
+} from "../../components/typeDefs";
 import { scaleArray } from "../../utils/arrays";
 import { isClose } from "../../utils/measurement";
 import { SectionViewport } from "../../viewports";
-import type { NumberPair } from "../types";
-import type { ColormapFunctionType } from "../utils/colormapTools";
+import type { NumberPair } from "../typeDefs";
+
 import type {
     DeckGLLayerContext,
-    ExtendedLayerProps,
     PropertyDataType,
-    ReportBoundingBoxAction,
-} from "../utils/layerTools";
+} from "../utils/deckglTools";
 import {
     createPropertyData,
     getFromAccessor,
     getLayersById,
-    isDrawingEnabled,
-} from "../utils/layerTools";
+} from "../utils/deckglTools";
+import { isDrawingEnabled } from "../drawing/drawingLayerHelper";
 import { DashedSectionsPathLayer } from "./layers/dashedSectionsPathLayer";
-import type {
-    FlatWellMarkersLayerProps,
-    MarkerData,
-    WellMarker,
-} from "./layers/flatWellMarkersLayer";
+import type { MarkerData, WellMarker } from "./layers/flatWellMarkersLayer";
 import { FlatWellMarkersLayer } from "./layers/flatWellMarkersLayer";
 import type { LogCurveLayerProps } from "./layers/logCurveLayer";
 import { LogCurveLayer } from "./layers/logCurveLayer";
-import type { WellLabelLayerProps } from "./layers/wellLabelLayer";
+
 import { WellLabelLayer } from "./layers/wellLabelLayer";
 import type {
-    AbscissaTransform,
     DashAccessor,
     DashedSectionsLayerPickInfo,
-    LineStyleAccessor,
     LogCurveDataType,
     PerforationProperties,
     ScreenProperties,
     WellFeature,
     WellFeatureCollection,
-    WellHeadStyleAccessor,
+    WellsLayerProps,
     WellsPickInfo,
-} from "./types";
+} from "./typeDefs";
 import { abscissaTransform } from "./utils/abscissaTransform";
 import { DEFAULT_LINE_WIDTH, getSize, LINE, POINT } from "./utils/features";
 import { getLegendData, getLogProperty } from "./utils/log";
@@ -115,148 +106,6 @@ export enum SubLayerId {
     SCREEN_TRAJECTORY = "screen_trajectory",
     SCREEN_TRAJECTORY_OUTLINE = "screen_trajectory_outline",
     TRAJECTORY_FILTER_GHOST = "trajectory_filter_ghost",
-}
-
-export interface WellsLayerProps extends ExtendedLayerProps {
-    /**
-     * Well data to render; described as a single GeoJSON feature collection, which each individual well as a distinct feature.
-     *
-     * Accepted data formats:
-     * * A javascript object.
-     * * A binary/flat GeoJSON object
-     * * A url string pointing to external GeoJSON data.
-     * * A promise returning GeoJSON data.
-     */
-    // String, binary and promise is handled internally in Deck.gl to load external data.
-    // The typing here matches the type used in GeoJsonLayer (but with a more strict feature definition)
-    data:
-        | string
-        | WellFeatureCollection
-        | BinaryFeatureCollection
-        | Promise<WellFeatureCollection | BinaryFeatureCollection>;
-
-    pointRadiusScale: number;
-    lineWidthScale: number;
-    outline: boolean;
-    selectedWell: string;
-    logData: string | LogCurveDataType[];
-    logName: string;
-    logColor: string;
-    logrunName: string;
-    logRadius: number;
-    logCurves: boolean;
-    /** Control to refine the well path by super sampling it using a spline interpolation.
-     * The well path between each pair of original vertices is split into sub-segments along the spline
-     * interpolation.
-     * The number of new sub-segments between each pair of original vertices is specified by refine
-     * and defaults to 5 if refine is true.
-     */
-    refine: boolean | number;
-    wellHeadStyle: WellHeadStyleAccessor;
-    colorMappingFunction: ColormapFunctionType;
-    lineStyle: LineStyleAccessor;
-
-    /**
-     * @deprecated use wellLabel instead
-     */
-    wellNameVisible?: boolean;
-
-    /**
-     * @deprecated use wellLabel instead
-     * It true place name at top, if false at bottom.
-     * If given as a number between 0 and 100,  will place name at this percentage of trajectory from top.
-     */
-    wellNameAtTop?: boolean | number;
-
-    /**
-     * @deprecated use wellLabel instead
-     */
-    wellNameSize?: number;
-
-    /**
-     * @deprecated use wellLabel instead
-     */
-    wellNameColor?: Color;
-    /**
-     * If true will prevent well name cluttering by not displaying overlapping names.
-     * default false.
-     * @deprecated use wellLabel instead
-     */
-    hideOverlappingWellNames?: boolean;
-
-    isLog: boolean;
-    depthTest: boolean;
-
-    /**  If true means that input z values are interpreted as depths.
-     * For example depth of z = 1000 corresponds to -1000 on the z axis. Default true.
-     */
-    ZIncreasingDownwards: boolean;
-
-    /**  If true means that a simplified representation of the wells will be drawn.
-     *   Useful for example during panning and rotation to gain speed.
-     */
-    simplifiedRendering: boolean;
-
-    /** Sectional projection of data */
-    section?: boolean | AbscissaTransform;
-
-    // Non public properties:
-    reportBoundingBox?: React.Dispatch<ReportBoundingBoxAction>;
-
-    wellLabel?: Partial<WellLabelLayerProps>;
-
-    /* --- Screens and perforations --- --- --- --- ---*/
-    markers?: {
-        /** Enables simple line markers at the start and end of screen sections.
-         *
-         * @remark These markers are currently only designed for 2D, so they are not guaranteed to look nice in 3D
-         */
-        showScreens?: boolean;
-        /**
-         * Renders screen sections of the trajectory as dashed segments.
-         *
-         * @remark If enabled, the COLORS sub-layer will be replaced by the SCREEN_TRAJECTORY sub-layer!
-         */
-        showScreenTrajectoryAsDash?: boolean;
-
-        /** Enables visualization of trajectory perforations.
-         *
-         * @remark These markers are currently only designed for 2D, so they are not guaranteed to look nice in 3D
-         */
-        showPerforations?: boolean;
-
-        /** Specifies colors of markers at a per-marker basis */
-        getMarkerColor?: FlatWellMarkersLayerProps<WellFeature>["getMarkerColor"];
-
-        /** Specifies the dash factor for screen sections. */
-        getScreenDashArray?: DashAccessor;
-    };
-
-    /* --- Filtering -- --- --- --- --- --- --- --- --- */
-    /** Enables well filtering  */
-    enableFilters: boolean;
-    /** Filter wells by measured depth (MD).
-     * - Return [min, max] to show only the portion of the well between these MD values
-     * - Return [max, min] (inverted) to show everything OUTSIDE this range
-     * - Return undefined or [-1, -1] to show the entire well
-     * Multiple ranges are additive
-     *
-     * @remark To make sure trajectories paths disappear at the correct point, each
-     * range value will inject a point into the path array; meaning layers will recompute
-     * each time this is changed
-     */
-    mdFilterRange: Accessor<WellFeature, [number, number] | [number, number][]>;
-
-    /**
-     * Filters trajectory paths to formation sections.
-     */
-    formationFilter: Accessor<WellFeature, string[]>;
-
-    /** Filters wells based on name */
-    wellNameFilter: string[];
-
-    /** Shows a simple trajectory in place of filtered sections. If color is not specified, a light gray will be used */
-    showFilterTrajectoryGhost: boolean | Color;
 }
 
 const defaultProps = {

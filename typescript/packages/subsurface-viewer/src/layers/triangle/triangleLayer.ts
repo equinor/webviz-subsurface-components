@@ -10,22 +10,15 @@ import type { Material } from "../gpglLayers/typeDefs";
 import type {
     ExtendedLayerProps,
     ReportBoundingBoxAction,
-} from "../utils/layerTools";
+} from "../utils/deckglTools";
 
 import type { RGBColor } from "../../utils";
 
-import PrivateTriangleLayer from "./privateTriangleLayer";
-import { makeFullMesh } from "./webworker";
+import { PrivateTriangleLayer } from "./privateTriangleLayer";
+import { type WebWorkerParams, makeFullMesh } from "./webworker";
 
 import config from "../../SubsurfaceConfig.json";
 import { findConfig } from "../../utils/configTools";
-
-export type Params = {
-    vertexArray: Float32Array;
-    indexArray: Uint32Array;
-    smoothShading: boolean;
-    displayNormals: boolean;
-};
 
 // init workerpool
 const workerPoolConfig = findConfig(
@@ -201,7 +194,7 @@ export default class TriangleLayer extends CompositeLayer<TriangleLayerProps> {
             // Using inline web worker for calculating the triangle mesh from
             // loaded input data so not to halt the GUI thread.
 
-            const webworkerParams: Params = {
+            const webworkerParams: WebWorkerParams = {
                 vertexArray,
                 indexArray,
                 smoothShading: this.props.smoothShading,
@@ -230,32 +223,14 @@ export default class TriangleLayer extends CompositeLayer<TriangleLayerProps> {
                     let zmin = 99999999;
 
                     for (let i = 0; i < vertexArray.length / 3; i++) {
-                        xmax =
-                            vertexArray[3 * i + 0] > xmax
-                                ? vertexArray[3 * i + 0]
-                                : xmax; //eslint-disable-line
-                        xmin =
-                            vertexArray[3 * i + 0] < xmin
-                                ? vertexArray[3 * i + 0]
-                                : xmin; //eslint-disable-line
+                        xmax = Math.max(vertexArray[3 * i + 0], xmax);
+                        xmin = Math.min(vertexArray[3 * i + 0], xmin);
 
-                        ymax =
-                            vertexArray[3 * i + 1] > ymax
-                                ? vertexArray[3 * i + 1]
-                                : ymax; //eslint-disable-line
-                        ymin =
-                            vertexArray[3 * i + 1] < ymin
-                                ? vertexArray[3 * i + 1]
-                                : ymin; //eslint-disable-line
+                        ymax = Math.max(vertexArray[3 * i + 1], ymax);
+                        ymin = Math.min(vertexArray[3 * i + 1], ymin);
 
-                        zmax =
-                            vertexArray[3 * i + 2] > zmax
-                                ? vertexArray[3 * i + 2]
-                                : zmax; //eslint-disable-line
-                        zmin =
-                            vertexArray[3 * i + 2] < zmin
-                                ? vertexArray[3 * i + 2]
-                                : zmin; //eslint-disable-line
+                        zmax = Math.max(vertexArray[3 * i + 2], zmax);
+                        zmin = Math.min(vertexArray[3 * i + 2], zmin);
                     }
 
                     if (this.props.ZIncreasingDownwards) {

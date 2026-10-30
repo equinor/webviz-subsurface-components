@@ -20,8 +20,8 @@ import type {
     ExtendedLayerProps,
     LayerPickInfo,
     PropertyDataType,
-} from "../utils/layerTools";
-import { createPropertyData } from "../utils/layerTools";
+} from "../utils/deckglTools";
+import { createPropertyData, initPropertyData } from "../utils/deckglTools";
 import {
     type ColormapFunctionType,
     createColormapTexture,
@@ -37,15 +37,14 @@ import flatVertexShader from "./cellProperty.vs.glsl";
 import fsLineShader from "./line.fs.glsl";
 import vsLineShader from "./line.vs.glsl";
 
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
-import {
-    TGrid3DColoringMode,
-    type IDiscretePropertyValueName,
-    isDiscreteProperty,
-    isGeometricProperty,
-} from "./grid3dLayer";
+import { isDiscreteProperty, isGeometricProperty } from "./grid3dLayer";
 
-import type { MeshType, MeshTypeLines } from "./typeDefs";
+import type {
+    IGrid3DDiscretePropertyValueName,
+    MeshType,
+    MeshTypeLines,
+    TGrid3DColoringMode,
+} from "./typeDefs";
 
 export interface PrivateLayerProps extends ExtendedLayerProps {
     mesh: MeshType;
@@ -56,10 +55,10 @@ export interface PrivateLayerProps extends ExtendedLayerProps {
     undefinedPropertyValue: number;
     undefinedPropertyColor: RGBColor;
     colormapFunction?: ColormapFunctionType;
-    coloringMode: TGrid3DColoringMode.Property;
+    coloringMode: TGrid3DColoringMode;
     gridLines: boolean;
     propertyValueRange: [number, number];
-    discretePropertyValueNames?: IDiscretePropertyValueName[];
+    discretePropertyValueNames?: IGrid3DDiscretePropertyValueName[];
     depthTest: boolean;
     ZIncreasingDownwards: boolean;
     enableLighting: boolean;
@@ -96,7 +95,7 @@ interface IColormapTextureHints {
 }
 
 // This is a private layer used only by the composite Grid3DLayer
-export default class PrivateLayer extends Layer<PrivateLayerProps> {
+export class PrivateGrid3DLayer extends Layer<PrivateLayerProps> {
     get isLoaded(): boolean {
         return (this.state["isLoaded"] as boolean) ?? false;
     }
@@ -268,21 +267,15 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
             return info;
         }
 
-        const layer_properties: PropertyDataType[] = [];
+        const layer_properties: PropertyDataType[] = initPropertyData(
+            info.coordinate?.[2],
+            this.props.ZIncreasingDownwards,
+            this.props.modelMatrix
+        );
 
         // Note these colors are in the 0-255 range.
         const [r, g, b] = info.color;
         const vertexIndex = decodeIndexFromRGB([r, g, b]);
-
-        const zScale = this.props.modelMatrix ? this.props.modelMatrix[10] : 1;
-
-        if (typeof info.coordinate?.[2] !== "undefined") {
-            const depth =
-                (this.props.ZIncreasingDownwards
-                    ? -info.coordinate[2]
-                    : info.coordinate[2]) / Math.max(0.001, zScale);
-            layer_properties.push(createPropertyData("Depth", depth));
-        }
 
         const properties = this.props.mesh.attributes.properties?.value;
         const propertyIndex = properties?.[vertexIndex];
@@ -397,8 +390,8 @@ export default class PrivateLayer extends Layer<PrivateLayerProps> {
     }
 }
 
-PrivateLayer.layerName = "PrivateLayer";
-PrivateLayer.defaultProps = defaultProps;
+PrivateGrid3DLayer.layerName = "PrivateGrid3DLayer";
+PrivateGrid3DLayer.defaultProps = defaultProps;
 
 // local shader module for the uniforms
 const gridUniformsBlock = /*glsl*/ `\

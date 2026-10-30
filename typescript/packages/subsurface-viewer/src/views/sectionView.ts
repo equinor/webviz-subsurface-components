@@ -10,7 +10,7 @@ export type SectionViewState = OrthographicViewState;
 export type SectionViewProps = OrthographicViewProps;
 
 export class SectionView extends OrthographicView {
-    static displayName = "SectionView";
+    static readonly displayName = "SectionView";
 
     constructor(props: SectionViewProps = {}) {
         super(props);

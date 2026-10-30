@@ -20,6 +20,14 @@ float normalizeValue(float value) {
    }
    return (value - triangles.colormapRange[0]) / (triangles.colormapRange[1] - triangles.colormapRange[0]);
 }
+
+float normalizePickValue(float value) {
+   if(isNanValue(value)) {
+      return value;
+   }
+   float range = triangles.pickRange[1] - triangles.pickRange[0];
+   return range == 0.0 ? 0.5 : (value - triangles.pickRange[0]) / range;
+}
    
 vec4 valueColor(float value) {
    if(isNanValue(value) || value == triangles.undefinedValue) {
@@ -42,7 +50,7 @@ void main(void) {
    //Picking pass.
    if (picking.isActive > 0.5 && !(picking.isAttribute > 0.5)) {
       float value = texture(valueTexture, vTexCoords).r;
-      float normalizedValue = normalizeValue(value);
+      float normalizedValue = normalizePickValue(value);
       fragColor = encodeNormalizedValueWithNaNToRGB(normalizedValue);
       return;
    }

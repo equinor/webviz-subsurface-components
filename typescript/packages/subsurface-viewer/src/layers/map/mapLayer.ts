@@ -1,30 +1,35 @@
 import { isEqual } from "lodash";
 import type React from "react";
 
+import { CompositeLayer } from "@deck.gl/core";
 import type {
-    Color,
     CompositeLayerProps,
     Layer,
-    Material,
     UpdateParameters,
 } from "@deck.gl/core";
-import { CompositeLayer } from "@deck.gl/core";
 import type { Matrix4 } from "math.gl";
+
+import workerpool from "workerpool";
+
+import type { Material } from "../gpglLayers/typeDefs";
+import { type IMapDiscretePropertyValueName, type MapFrame } from "./typeDefs";
+import { PrivateMapLayer } from "./privateMapLayer";
+import { type WebWorkerParams, makeFullMesh } from "./webworker";
 
 import type {
     ReportBoundingBoxAction,
     ExtendedLayerProps,
-} from "../utils/layerTools";
-import { getModelMatrix } from "../utils/layerTools";
+} from "../utils/deckglTools";
 import type { ColormapFunctionType } from "../utils/colormapTools";
-import config from "../../SubsurfaceConfig.json";
-import { findConfig } from "../../utils/configTools";
-import { loadDataArray } from "../../utils/serialize";
-import PrivateMapLayer from "./privateMapLayer";
-import { rotate } from "./utils";
-import { makeFullMesh } from "./webworker";
 
-import workerpool from "workerpool";
+import config from "../../SubsurfaceConfig.json";
+
+import type { Color, RGBColor } from "../../utils";
+import { findConfig, loadDataArray } from "../../utils";
+import { getModelMatrix } from "../utils/deckglTools";
+import { rotate } from "./utils";
+
+const DEFAULT_DISCRETE_UNDEFINED_VALUE = 0xffff;
 
 // init workerpool
 const workerPoolConfig = findConfig(
@@ -33,11 +38,80 @@ const workerPoolConfig = findConfig(
     "config/layer/MapLayer/workerpool"
 );
 
+export function resampleMesh(
+    frame: MapFrame,
+    meshData: Float32Array
+): [MapFrame, Float32Array] {
+    const resampledFrame = structuredClone(frame);
+    resampledFrame.origin[0] = frame.origin[0] - frame.increment[0] / 2;
+    resampledFrame.origin[1] = frame.origin[1] - frame.increment[1] / 2;
+
+    resampledFrame.count[0] = frame.count[0] + 1; // number of nodes in x direction
+    resampledFrame.count[1] = frame.count[1] + 1;
+
+    const nc_ = frame.count[0]; // original number of nodes in x (col) direction
+    const nr_ = frame.count[1]; // original number of nodes in y (row) direction
+
+    const nc = resampledFrame.count[0]; // new number of nodes in x (col) direction
+    const nr = resampledFrame.count[1];
+
+    const resampledMesh = new Float32Array(nc * nr);
+
+    function validRange(r: number, c: number): boolean {
+        return r < nr_ && r >= 0 && c < nc_ && c >= 0;
+    }
+
+    for (let row = 0; row < nr; row++) {
+        for (let col = 0; col < nc; col++) {
+            const i = row * nc + col; // index in the resampled mesh
+
+            // P1
+            let r = row;
+            let c = col;
+            let valid = validRange(r, c);
+            if (valid && Number.isNaN(meshData[r * nc_ + c])) {
+                // Undefined mesh data at this location.
+                resampledMesh[i] = meshData[r * nc_ + c];
+                continue;
+            }
+            const p1 = valid ? meshData[r * nc_ + c] : 0;
+            let divisor = valid ? 1 : 0;
+
+            // P2
+            r = row - 1;
+            c = col;
+            valid = validRange(r, c);
+            /* prettier-ignore */
+            const p2 = valid && !Number.isNaN(meshData[r * nc_ + c]) ? meshData[r * nc_ + c] : 0;
+            divisor += p2 !== 0 && valid ? 1 : 0;
+
+            // P3
+            r = row - 1;
+            c = col - 1;
+            valid = validRange(r, c);
+            /* prettier-ignore */
+            const p3 = valid && !Number.isNaN(meshData[r * nc_ + c]) ? meshData[r * nc_ + c] : 0;
+            divisor += p3 !== 0 && valid ? 1 : 0;
+
+            // P4
+            r = row;
+            c = col - 1;
+            valid = validRange(r, c);
+            /* prettier-ignore */
+            const p4 = valid && !Number.isNaN(meshData[r * nc_ + c]) ? meshData[r * nc_ + c] : 0;
+            divisor += p4 !== 0 && valid ? 1 : 0;
+
+            resampledMesh[i] =
+                divisor !== 0 ? (p1 + p2 + p3 + p4) / divisor : 0;
+        }
+    }
+
+    return [resampledFrame, resampledMesh];
+}
+
 const pool = workerpool.pool({
-    ...{
-        maxWorkers: 10,
-        workerType: "web",
-    },
+    maxWorkers: 10,
+    workerType: "web",
     ...workerPoolConfig,
 });
 
@@ -48,37 +122,55 @@ function onTerminateWorker() {
     }
 }
 
-// This type describes the mesh' extent in the horizontal plane.
-type Frame = {
-    /** mesh origin
-     */
-    origin: [number, number];
+export type PropertyInput =
+    | string
+    | Array<number | undefined>
+    | Float32Array
+    | Uint16Array;
 
-    /** cells size in each direction.
-     */
-    increment: [number, number];
+export function getUndefinedValueProperties(
+    propertiesData: PropertyInput | undefined,
+    isPropertiesDiscrete: boolean
+): number | undefined {
+    if (propertiesData instanceof Float32Array) {
+        return isPropertiesDiscrete ? DEFAULT_DISCRETE_UNDEFINED_VALUE : NaN;
+    }
+    if (propertiesData instanceof Uint16Array || isPropertiesDiscrete) {
+        return DEFAULT_DISCRETE_UNDEFINED_VALUE;
+    }
+    return undefined;
+}
 
-    /** number of nodes in each direction.
-     */
-    count: [number, number];
+export function normalizeDiscreteProperties(
+    propertiesData: PropertyInput,
+    undefinedPropertyValue: number
+): string | number[] | Float32Array | Uint16Array {
+    if (
+        typeof propertiesData === "string" ||
+        propertiesData instanceof Uint16Array
+    ) {
+        return propertiesData;
+    }
+    if (propertiesData instanceof Float32Array) {
+        return propertiesData;
+    }
+    return propertiesData.map((value) => value ?? undefinedPropertyValue);
+}
 
-    /** Rotates map counterclockwise in degrees around 'rotPoint' specified below.
-     */
-    rotDeg?: number;
-
-    /** Point to rotate around using 'rotDeg'. Defaults to mesh origin.
-     */
-    rotPoint?: [number, number];
-};
-
-export type Params = [
-    meshData: Float32Array | null,
-    propertiesData: Float32Array | null,
-    isMesh: boolean,
-    frame: Frame,
-    smoothShading: boolean,
-    gridLines: boolean,
-];
+function normalizeContinuousProperties(
+    propertiesData: PropertyInput
+): string | number[] | Float32Array {
+    if (
+        typeof propertiesData === "string" ||
+        propertiesData instanceof Float32Array
+    ) {
+        return propertiesData;
+    }
+    if (propertiesData instanceof Uint16Array) {
+        return Array.from(propertiesData);
+    }
+    return propertiesData.map((value) => value ?? NaN);
+}
 
 /**
  * Will load data for the mesh and the properties. Both of which may be given as arrays (javascript or typed)
@@ -87,17 +179,27 @@ export type Params = [
  */
 async function loadMeshAndProperties(
     meshData: string | number[] | Float32Array,
-    propertiesData: string | number[] | Float32Array
+    propertiesData: PropertyInput,
+    isPropertiesDiscrete: boolean = false,
+    undefinedPropertyValue: number = DEFAULT_DISCRETE_UNDEFINED_VALUE
 ) {
     // Keep
     //const t0 = performance.now();
 
     const mesh = await loadDataArray(meshData, Float32Array);
-    const properties = await loadDataArray(propertiesData, Float32Array);
 
-    // if (!isMesh && !isProperties) {
-    //     console.error("Error. One or both of texture and mesh must be given!");
-    // }
+    const properties = isPropertiesDiscrete
+        ? await loadDataArray(
+              normalizeDiscreteProperties(
+                  propertiesData,
+                  undefinedPropertyValue
+              ),
+              Uint16Array
+          )
+        : await loadDataArray(
+              normalizeContinuousProperties(propertiesData),
+              Float32Array
+          );
 
     // Keep this.
     // const t1 = performance.now();
@@ -119,7 +221,7 @@ export interface MapLayerProps extends ExtendedLayerProps {
          count: [number, number];      // number of nodes in both directions.
      }
      */
-    frame: Frame;
+    frame: MapFrame;
 
     /**  Url to the properties (ex, poro or perm values).
      * If the number of property values equals the number of depth values
@@ -128,9 +230,38 @@ export interface MapLayerProps extends ExtendedLayerProps {
      * If the number of property values equals one less than the depth values in
      * each direction then the property values will be pr cell and the cell will be constant
      * colored.
+     * Undefined value for discrete Uint16Array input defaults to 0xFFFF.
+     * For float input (Float32Array) it is NaN.
+     * For number arrays, undefined values are replaced with the configured
+     * undefinedPropertyValue, or 0xFFFF by default in discrete mode.
      */
     propertiesUrl: string; // Deprecated
-    propertiesData: string | number[] | Float32Array;
+    propertiesData:
+        | string
+        | Array<number | undefined>
+        | Float32Array
+        | Uint16Array
+        | undefined;
+
+    /**
+     * Array of property discrete codes with  optional name and color.
+     */
+    discretePropertyValueNames?: IMapDiscretePropertyValueName[];
+
+    /**
+     * Color for the cells with undefined property value.
+     * Is not overridden by and used prior to colorMapFunction.
+     * By default, Light gray if not provided.
+     */
+    undefinedPropertyColor?: RGBColor;
+
+    /**
+     * Value in propertiesData indicating that the property is undefined.
+     * By default these are:
+     * - Float32Array: NaN
+     * - Uint16Array: 0xFFFF
+     */
+    undefinedPropertyValue?: number;
 
     /**  Contour lines reference point and interval.
      * A value of [-1.0, -1.0] will disable contour lines.
@@ -241,12 +372,21 @@ export default class MapLayer<
         return isLoaded && isFinished;
     }
 
+    isPropertiesCategorical(): boolean {
+        const propertiesData =
+            this.props.propertiesData ?? this.props.propertiesUrl;
+        return (
+            propertiesData instanceof Uint16Array ||
+            typeof this.props.discretePropertyValueNames !== "undefined"
+        );
+    }
+
     rebuildData(reportBoundingBox: boolean): void {
-        if (typeof this.props.meshUrl !== "undefined") {
+        if (this.props.meshUrl !== undefined) {
             console.warn('"meshUrl" is deprecated. Use "meshData"');
         }
 
-        if (typeof this.props.propertiesUrl !== "undefined") {
+        if (this.props.propertiesUrl !== undefined) {
             console.warn('"propertiesUrl" is deprecated. Use "propertiesData"');
         }
 
@@ -254,16 +394,52 @@ export default class MapLayer<
         const propertiesData =
             this.props.propertiesData ?? this.props.propertiesUrl;
 
-        const p = loadMeshAndProperties(meshData, propertiesData);
+        const isPropertiesCategorical = this.isPropertiesCategorical();
+        const undefinedPropertyValue =
+            this.props.undefinedPropertyValue ??
+            getUndefinedValueProperties(
+                propertiesData,
+                isPropertiesCategorical
+            ) ??
+            DEFAULT_DISCRETE_UNDEFINED_VALUE;
+        const p = loadMeshAndProperties(
+            meshData,
+            propertiesData,
+            isPropertiesCategorical,
+            undefinedPropertyValue
+        );
 
         p.then(([meshData, propertiesData]) => {
             // Using inline web worker for calculating the triangle mesh from
             // loaded input data so not to halt the GUI thread.
 
+            const nx = this.props.frame.count[0]; // number of nodes in x direction
+            const ny = this.props.frame.count[1];
+            const propLength = propertiesData?.length;
+            const isNodeCenteredProperties = propLength === nx * ny;
+
+            let frame = structuredClone(this.props.frame);
+            const doResample =
+                isPropertiesCategorical && isNodeCenteredProperties;
+            if (doResample) {
+                console.warn(
+                    "Resampling node-centered properties mesh to center coloring on nodes."
+                );
+
+                const [resampledFrame, resampledMesh] = resampleMesh(
+                    frame,
+                    meshData
+                );
+                meshData = resampledMesh as Float32Array<ArrayBuffer>;
+                frame = resampledFrame;
+            }
+
             const webworkerParams = this.getWebworkerParams(
                 meshData,
-                propertiesData
+                propertiesData,
+                frame
             );
+
             pool.exec(makeFullMesh, [{ data: webworkerParams.params }]).then(
                 (e) => {
                     const [
@@ -288,7 +464,7 @@ export default class MapLayer<
                     });
 
                     if (
-                        typeof this.props.reportBoundingBox !== "undefined" &&
+                        this.props.reportBoundingBox !== undefined &&
                         reportBoundingBox
                     ) {
                         const xinc = this.props.frame?.increment?.[0] ?? 0;
@@ -312,34 +488,14 @@ export default class MapLayer<
                         const rotRad = (rotDeg * (2.0 * Math.PI)) / 360.0;
 
                         // Rotate x,y around "center" "rad" radians
-                        const [x0, y0] = rotate(
-                            xMin,
-                            yMin,
-                            center[0],
-                            center[1],
-                            rotRad
-                        ); // eslint-disable-line
-                        const [x1, y1] = rotate(
-                            xMax,
-                            yMin,
-                            center[0],
-                            center[1],
-                            rotRad
-                        ); // eslint-disable-line
-                        const [x2, y2] = rotate(
-                            xMax,
-                            yMax,
-                            center[0],
-                            center[1],
-                            rotRad
-                        ); // eslint-disable-line
-                        const [x3, y3] = rotate(
-                            xMin,
-                            yMax,
-                            center[0],
-                            center[1],
-                            rotRad
-                        ); // eslint-disable-line
+                        /* prettier-ignore */
+                        const [x0, y0] = rotate(xMin, yMin, center[0], center[1], rotRad);
+                        /* prettier-ignore */
+                        const [x1, y1] = rotate(xMax, yMin, center[0], center[1], rotRad);
+                        /* prettier-ignore */
+                        const [x2, y2] = rotate(xMax, yMax, center[0], center[1], rotRad);
+                        /* prettier-ignore */
+                        const [x3, y3] = rotate(xMin, yMax, center[0], center[1], rotRad);
 
                         // Rotated bounds in x/y plane.
                         const x_min = Math.min(x0, x1, x2, x3);
@@ -423,13 +579,11 @@ export default class MapLayer<
         );
 
         const isMesh =
-            (typeof this.props.meshUrl !== "undefined" &&
-                this.props.meshUrl !== "") ||
-            (typeof this.props.meshData !== "undefined" &&
-                this.props.meshData !== "");
+            (this.props.meshUrl !== undefined && this.props.meshUrl !== "") ||
+            (this.props.meshData !== undefined && this.props.meshData !== "");
 
         const isModelMatrix =
-            typeof this.props.modelMatrix !== "undefined" &&
+            this.props.modelMatrix !== undefined &&
             this.props.modelMatrix !== null;
 
         if (isModelMatrix) {
@@ -437,6 +591,17 @@ export default class MapLayer<
                 this.props.modelMatrix as Matrix4
             );
         }
+
+        const undefinedColor = this.props.undefinedPropertyColor ?? [
+            204, 204, 204,
+        ];
+
+        const undefinedPropertyValue =
+            this.props.undefinedPropertyValue ??
+            getUndefinedValueProperties(
+                this.props.propertiesData ?? this.props.propertiesUrl,
+                this.isPropertiesCategorical()
+            );
 
         const enableLighting: boolean = this.props.material !== false;
         const layer = new PrivateMapLayer(
@@ -454,7 +619,11 @@ export default class MapLayer<
                 colormapName: this.props.colorMapName,
                 colormapRange: this.props.colorMapRange,
                 colormapClampColor: this.props.colorMapClampColor,
+                undefinedPropertyColor: undefinedColor,
+                undefinedPropertyValue,
                 colormapFunction: this.props.colorMapFunction,
+                discretePropertyValueNames:
+                    this.props.discretePropertyValueNames,
                 propertyValueRange: this.state["propertyValueRange"],
                 material: this.props.material,
                 smoothShading: this.props.smoothShading,
@@ -468,21 +637,30 @@ export default class MapLayer<
 
     private getWebworkerParams(
         meshData: Float32Array | null,
-        propertiesData: Float32Array | null
-    ): { params: Params; transferrables?: Transferable[] } {
+        propertiesData: Float32Array | Uint16Array,
+        frame: MapFrame
+    ): { params: WebWorkerParams; transferrables?: Transferable[] } {
         if (!meshData && !propertiesData) {
             throw new Error(
                 "Either mesh or properties or the both must be defined"
             );
         }
 
-        const params: Params = [
+        const undefinedPropertyValue =
+            this.props.undefinedPropertyValue ??
+            getUndefinedValueProperties(
+                propertiesData as Float32Array | Uint16Array,
+                this.isPropertiesCategorical()
+            );
+
+        const params: WebWorkerParams = [
             meshData,
             propertiesData,
             !!meshData,
-            this.props.frame,
+            frame,
             this.props.smoothShading,
             this.props.gridLines,
+            undefinedPropertyValue ?? DEFAULT_DISCRETE_UNDEFINED_VALUE,
         ];
         const transferrables = [
             meshData?.buffer,

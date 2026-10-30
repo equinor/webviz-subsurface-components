@@ -1,13 +1,14 @@
+import _ from "lodash";
 import type { AccessorContext, Color } from "@deck.gl/core";
 import type { LineString, Position } from "geojson";
-import _ from "lodash";
 import { Vector2, Vector3 } from "math.gl";
 import { distance, dot, subtract } from "mathjs";
 
-import type { Point2D, Point3D } from "../../../utils";
+import type { Point3D } from "../../../utils/Point3D";
+import type { Point2D } from "../../../utils/BoundingBox2D";
 import { distToSegmentSquared, isClose } from "../../../utils/measurement";
-import type { StyleAccessorFunction } from "../../types";
-import type { ColorAccessor, WellFeature } from "../types";
+import type { StyleAccessorFunction } from "../../typeDefs";
+import type { ColorAccessor, WellFeature } from "../typeDefs";
 
 /**
  * Finds the nested geometry object that describes a well's trajectory

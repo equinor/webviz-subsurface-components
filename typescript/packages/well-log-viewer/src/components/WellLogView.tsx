@@ -601,12 +601,26 @@ export function applyWellPickLabelFormatting(
     return labels;
 }
 
+/**
+ * Names of the overlay elements of the well pick at `index`.
+ *
+ * The index, and not the horizon name, identifies the element: `overlay.create()` appends a new
+ * element on every call but only keeps the last one created under a given name, and
+ * `overlay.remove()` can only reach that one. Naming the elements after the horizon therefore
+ * leaks an element for every well pick sharing a name with an earlier one, and a leaked element is
+ * never positioned, never hidden and never removed - it stays behind at the top of the track as a
+ * pick that no data backs.
+ */
+function wellPickElementNames(index: number) {
+    return { pin: "wp" + index, fill: "wpFill" + index };
+}
+
 function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
     {
         /* clear old wellpicks */
         for (const elmName in instance.overlay.elements) {
             if (elmName.substring(0, 2) === "wp")
-                // "wpFill" + horizon; "wp" + horizon;
+                // "wpFill" + index; "wp" + index;
                 instance.overlay.remove(elmName); // clear old if exists
         }
     }
@@ -630,14 +644,14 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
 
     const formatWellPickLabel = wellpick.formatWellPickLabel;
 
-    for (const wp of wps) {
+    for (const [index, wp] of wps.entries()) {
         const horizon = wp.horizon;
         const vPrimary = wp.vPrimary;
         const vSecondary = wp.vSecondary;
         const color = wp.color;
 
-        // Labels are for display only. Element names, color/pattern lookups
-        // and callbacks must keep using the raw `horizon` value below.
+        // Labels are for display only. Color/pattern lookups and callbacks
+        // must keep using the raw `horizon` value below.
         const labels = applyWellPickLabelFormatting(
             { horizon, vPrimary, vSecondary },
             formatWellPickLabel
@@ -650,7 +664,7 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
         const txtSecondary = htmlEscape(labels.secondary);
         const txtHorizon = htmlEscape(labels.horizon);
 
-        const elmName = "wp" + horizon;
+        const elmName = wellPickElementNames(index).pin;
         const pinelm = instance.overlay.create(elmName, {});
 
         const rgba =
@@ -729,7 +743,7 @@ function addWellPickOverlay(instance: LogViewer, parent: WellLogView) {
             .style("background-color", rgba);
         {
             // Filling
-            const elmName = "wpFill" + horizon;
+            const elmName = wellPickElementNames(index).fill;
             if (wellpickPatternFill || wellpickColorFill) {
                 const pinelm = instance.overlay.create(elmName, {});
                 const pin = select(pinelm)
@@ -1815,20 +1829,17 @@ class WellLogView
         if (wellpick) {
             const wps = getWellPicks(this);
             if (!wps.length) return;
-            let i = 0;
-            for (const wp of wps) {
-                const horizon = wp.horizon;
+            for (const [index, wp] of wps.entries()) {
                 const vPrimary = wp.vPrimary;
-                const elmName = "wp" + horizon;
-                const pinelm = elements[elmName];
+                const { pin, fill } = wellPickElementNames(index);
+                const pinelm = elements[pin];
                 if (!pinelm) continue;
                 showWellPick(pinelm, vPrimary, horizontal, this.logController);
                 if (this.props.patterns) {
-                    const elmName1 = "wpFill" + horizon;
-                    const pinelm1 = elements[elmName1];
+                    const pinelm1 = elements[fill];
                     if (pinelm1) {
-                        const wp2 = wps[i + 1];
-                        const vPrimary2 = wp2?.vPrimary;
+                        // the fill spans from this pick down to the next one
+                        const vPrimary2 = wps[index + 1]?.vPrimary;
                         fillWellPicks(
                             pinelm1,
                             vPrimary,
@@ -1838,7 +1849,6 @@ class WellLogView
                         );
                     }
                 }
-                i++;
             }
             posWellPickTitles(this.logController, this);
         }

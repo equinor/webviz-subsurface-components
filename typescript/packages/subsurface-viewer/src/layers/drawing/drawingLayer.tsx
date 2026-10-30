@@ -30,7 +30,7 @@ import type {
     DeckGLLayerContext,
     ExtendedLayerProps,
     LayerPickInfo,
-} from "../utils/layerTools";
+} from "../utils/deckglTools";
 
 type SimpleFeatureCollectionWrapper = FeatureCollection<
     Geometry,

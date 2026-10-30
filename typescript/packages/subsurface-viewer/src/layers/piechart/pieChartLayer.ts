@@ -17,8 +17,8 @@ import type {
     ExtendedLayerProps,
     LayerPickInfo,
     PropertyDataType,
-} from "../utils/layerTools";
-import { createPropertyData } from "../utils/layerTools";
+} from "../utils/deckglTools";
+import { createPropertyData } from "../utils/deckglTools";
 import { toNormalizedColor } from "../../utils";
 
 import { precisionForTests } from "../shader_modules/test-precision/precisionForTests";
@@ -26,9 +26,9 @@ import { precisionForTests } from "../shader_modules/test-precision/precisionFor
 import fragmentShader from "./piechart.fs.glsl";
 import vertexShader from "./piechart.vs.glsl";
 
-type PieProperties = [{ color: Color; label: string }];
+export type PieProperties = [{ color: Color; label: string }];
 
-type PieData = {
+export type PieData = {
     x: number;
     y: number;
     R: number;
@@ -36,7 +36,7 @@ type PieData = {
 };
 
 // These are the data PieChartLayer expects.
-interface PiesData {
+export interface PiesData {
     pies: PieData[];
     properties: PieProperties;
 }

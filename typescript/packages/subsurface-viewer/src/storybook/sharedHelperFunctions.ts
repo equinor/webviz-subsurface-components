@@ -1,5 +1,3 @@
-import { all, create } from "mathjs";
-
 import { Layer } from "@deck.gl/core";
 
 import { isNumberArray, isTypedArray } from "../utils/typedArray";
@@ -38,15 +36,6 @@ export function convertUndefNull(args: Record<string, unknown>): void {
 
 function isRecord(layer: unknown): layer is Record<string, unknown> {
     return typeof layer === "object" && !(layer instanceof Layer);
-}
-
-/**
- * Creates a MathJs instance with the given seed to allow for deterministic random number generation.
- * @param seed seed to create a MathJs instance.
- * @returns a MathJs instance with the given seed.
- */
-export function createMathWithSeed(seed: string) {
-    return create(all, { randomSeed: seed });
 }
 
 type StorybookHelperMemoEntry<InputType = unknown, InjectedType = unknown> = {

@@ -15,11 +15,11 @@ import { styled } from "@mui/system";
 import { Button, Icon } from "@equinor/eds-core-react";
 import { arrow_drop_up, arrow_drop_down } from "@equinor/eds-icons";
 
+import type { ExtendedLayerProps } from "../layers/utils/deckglTools";
 import type {
-    ExtendedLayerProps,
     LayerPickInfo,
     PropertyDataType,
-} from "../layers/utils/layerTools";
+} from "../layers/utils/deckglTools";
 import { toNormalizedRGBAColor } from "../utils/Color";
 import { WellLabelLayer } from "../layers/wells/layers/wellLabelLayer";
 import { SectionViewport } from "../viewports/sectionViewport";
@@ -43,7 +43,7 @@ const roundToSignificant = function (num: number) {
     // Returns two significant figures (non-zero) for numbers with an absolute value less
     // than 1, and two decimal places for numbers with an absolute value greater
     // than 1.
-    return parseFloat(
+    return Number.parseFloat(
         num.toExponential(Math.max(1, 2 + Math.log10(Math.abs(num))))
     );
 };
@@ -154,7 +154,7 @@ function Row(props: { layer_data: InfoCardDataType }) {
     );
 }
 
-const InfoCard: React.FC<InfoCardProps> = (props: InfoCardProps) => {
+export const InfoCard: React.FC<InfoCardProps> = (props: InfoCardProps) => {
     const [infoCardData, setInfoCardData] = React.useState<
         InfoCardDataType[] | null
     >(null);

@@ -1,6 +1,6 @@
 import React from "react";
 
-import type { Layer, LayersList } from "@deck.gl/core";
+import type { LayersList } from "@deck.gl/core";
 import type { ColorTableArray } from "@emerson-eps/color-tables";
 
 import type { Unit } from "convert-units";
@@ -9,25 +9,22 @@ import PropTypes from "prop-types";
 
 // cannot use these type, they break python build
 // import type { Point3D, RGBColor } from "./utils";
+import type { TLayerDefinition } from "./typeDefs";
 
 import type {
     BoundsAccessor,
     MapMouseEvent,
     MapProps,
     TooltipCallback,
-    ViewStateType,
     ViewsType,
 } from "./components/Map";
 import Map, { createLayers } from "./components/Map";
-
-import { TGrid3DColoringMode } from "./layers/grid3d/grid3dLayer";
 
 export type {
     BoundsAccessor,
     ColorTableArray,
     MapMouseEvent,
     TooltipCallback,
-    ViewStateType,
     ViewsType,
 };
 
@@ -35,39 +32,6 @@ export type {
  * @deprecated Use ColorTableArray instead.
  */
 export type colorTablesArray = ColorTableArray;
-
-export { TGrid3DColoringMode };
-
-export type LightsType = {
-    headLight?: {
-        intensity: number;
-        color?: [number, number, number]; // RGBColor;
-    };
-
-    ambientLight?: {
-        intensity: number;
-        color?: [number, number, number]; // RGBColor;
-    };
-
-    pointLights?: Array<{
-        intensity: number;
-        position: [number, number, number]; // Point3D;
-        color?: [number, number, number]; // RGBColor;
-    }>;
-
-    directionalLights?: Array<{
-        intensity: number;
-        direction: [number, number, number]; // Point3D;
-        color?: [number, number, number]; // RGBColor;
-    }>;
-};
-
-export type TLayerDefinition =
-    | Record<string, unknown>
-    | Layer
-    | false
-    | null
-    | undefined;
 
 /**
  * Properties of the SubsurfaceViewer component.

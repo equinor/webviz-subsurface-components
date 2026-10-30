@@ -3,7 +3,7 @@ import { describe, expect, it, jest } from "@jest/globals";
 
 import type { AccessorContext, ChangeFlags } from "@deck.gl/core";
 
-import { getFromAccessor, hasUpdateTriggerChanged } from "./layerTools";
+import { getFromAccessor, hasUpdateTriggerChanged } from "./deckglTools";
 
 describe("layerTools", () => {
     describe("getFromAccessor", () => {

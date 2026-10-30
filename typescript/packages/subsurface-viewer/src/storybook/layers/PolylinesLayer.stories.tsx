@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-webpack5";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
 
 import { default3DViews, defaultStoryParameters } from "../sharedSettings";
-import { createMathWithSeed } from "../sharedHelperFunctions";
+import { createSeededRandom } from "../util/random";
 import { getPropsInjectorComponent } from "../sharedHelperComponents";
 
 const SubsurfaceViewerPropsInjector = getPropsInjectorComponent(
@@ -26,11 +26,11 @@ export default stories;
 const sideSize = 10000;
 const pointsCount = 100000;
 
-const math = createMathWithSeed("123456789");
+const random = createSeededRandom("123456789");
 
 const hugePoints = new Array(pointsCount * 3)
     .fill(0)
-    .map(() => math.random(sideSize));
+    .map(() => random(sideSize));
 
 // ---------In-place array data handling (storybook fails to rebuild non JSon data)--------------- //
 const typedDataPolylinesLayerId = "huge_polylines_typed_data_layer";

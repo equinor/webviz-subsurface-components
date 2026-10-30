@@ -1,30 +1,17 @@
 /* eslint-disable react-hooks/exhaustive-deps */ // remove when ready to fix these.
 
 import React from "react";
-import type { Color } from "@deck.gl/core";
-
 import type { ColorTableArray, DiscreteCodes } from "@emerson-eps/color-tables";
 import {
     DiscreteColorLegend,
     ContinuousLegend,
 } from "@emerson-eps/color-tables";
 
-import type { ExtendedLegendLayer } from "../layers/utils/layerTools";
-import type { ColormapFunctionType } from "../layers/utils/colormapTools";
-
-interface LegendBaseData {
-    title: string;
-    colorName: string;
-    discrete: boolean;
-    colorMapFunction?: ColormapFunctionType;
-}
-export interface DiscreteLegendDataType extends LegendBaseData {
-    metadata: Record<string, [Color, number]>;
-}
-
-export interface ContinuousLegendDataType extends LegendBaseData {
-    valueRange: [number, number];
-}
+import type {
+    DiscreteLegendDataType,
+    ContinuousLegendDataType,
+    ExtendedLegendLayer,
+} from "./typeDefs";
 
 /**
  * Type guard function that determines if the legend data is discrete or continuous.

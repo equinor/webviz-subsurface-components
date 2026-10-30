@@ -8,14 +8,14 @@ import type { TextLayerProps } from "@deck.gl/layers";
 
 import type { Feature, Position } from "geojson";
 
-import type { Point3D } from "../../../utils";
-import type { WellFeature } from "../types";
+import type { Point3D } from "../../../utils/Point3D";
+import type { WellFeature } from "../typeDefs";
 import { getTrajectory } from "../utils/trajectory";
 import type { MergedTextLayerProps } from "./mergedTextLayer";
 import { MergedTextLayer } from "./mergedTextLayer";
 import { FixedSizeExtension } from "../../../extensions/fixed-size-extension";
 
-type WellLabelLayerData = WellFeature;
+export type WellLabelLayerData = WellFeature;
 
 /**
  * Enum representing the orientation of well labels.

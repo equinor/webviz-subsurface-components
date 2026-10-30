@@ -1,9 +1,20 @@
-import type { Params } from "./mapLayer";
+import type { TypedArray } from "math.gl";
+import type { MapFrame } from "./typeDefs";
+
+export type WebWorkerParams = [
+    meshData: Float32Array | null,
+    propertiesData: Float32Array | Uint16Array | null | undefined,
+    isMesh: boolean,
+    frame: MapFrame,
+    smoothShading: boolean,
+    gridLines: boolean,
+    undefinedPropertyValue: number,
+];
 
 /** Given the input data will build and return the attributes (vertices and indices for triangles and lines)
  * that is used by WebGl. Using indice, lines and triangles share common vertices to save memory.
  */
-export function makeFullMesh(e: { data: Params }) {
+export function makeFullMesh(e: { data: WebWorkerParams }) {
     const [
         inputMeshData,
         inputPropertiesData,
@@ -11,6 +22,7 @@ export function makeFullMesh(e: { data: Params }) {
         frame,
         smoothShading,
         gridLines,
+        undefinedPropertyValue,
     ] = e.data;
 
     // Keep
@@ -19,14 +31,20 @@ export function makeFullMesh(e: { data: Params }) {
     // Local functions.
     type Vec = [number, number, number];
 
-    function getFloat32ArrayMinMax(data: Float32Array) {
-        let max = -99999999;
-        let min = 99999999;
+    function getArrayMinMax(
+        data: TypedArray,
+        isDiscrete: boolean = false
+    ): [number, number] {
+        let max = -Infinity;
+        let min = Infinity;
         for (let i = 0; i < data.length; i++) {
+            if (!isDefined(data[i], isDiscrete)) {
+                continue;
+            }
             max = data[i] > max ? data[i] : max;
             min = data[i] < min ? data[i] : min;
         }
-        return [min, max];
+        return min === Infinity ? [0, 0] : [min, max];
     }
 
     function crossProduct(a: Vec, b: Vec): Vec {
@@ -38,8 +56,8 @@ export function makeFullMesh(e: { data: Params }) {
         return c as Vec;
     }
 
-    function isDefined(x: unknown): boolean {
-        return typeof x === "number" && !isNaN(x);
+    function isDefined(x: number, isDiscrete: boolean = false): boolean {
+        return isDiscrete ? x !== undefinedPropertyValue : !isNaN(x);
     }
 
     function normalize(a: Vec): void {
@@ -150,9 +168,12 @@ export function makeFullMesh(e: { data: Params }) {
         ? inputPropertiesData
         : meshData;
 
+    const isUint16 = propertiesData instanceof Uint16Array;
+    const isDiscrete = isUint16;
+
     // non mesh grids use z = 0 (see below)
-    const meshZValueRange = isMesh ? getFloat32ArrayMinMax(meshData) : [0, 0];
-    const propertyValueRange = getFloat32ArrayMinMax(propertiesData);
+    const meshZValueRange = isMesh ? getArrayMinMax(meshData) : [0, 0];
+    const propertyValueRange = getArrayMinMax(propertiesData, isDiscrete);
 
     // Dimensions.
     const ox = frame.origin[0];
@@ -184,9 +205,15 @@ export function makeFullMesh(e: { data: Params }) {
         isCellCenteredProperties || !smoothShading ? 0 : nNodes * 3
     );
     const triangleIndices = new Uint32Array(nTriangles * 3);
-    const vertexProperties = new Float32Array(
-        isCellCenteredProperties ? nCells * 6 : nNodes
-    );
+
+    const n = isCellCenteredProperties ? nCells * 6 : nNodes;
+    let vertexProperties: Uint16Array | Float32Array;
+    if (isDiscrete) {
+        vertexProperties = new Uint16Array(n);
+    } else {
+        vertexProperties = new Float32Array(n);
+    }
+
     let nLineIndices = 0;
     if (gridLines) {
         nLineIndices = isCellCenteredProperties
@@ -375,7 +402,7 @@ export function makeFullMesh(e: { data: Params }) {
                 const propertyIndex = h * (nx - 1) + w; // (nx - 1) -> the width of the property 2D array is one less than for the nodes in this case.
                 const propertyValue = propertiesData[propertyIndex];
 
-                if (!isDefined(propertyValue)) {
+                if (!isDefined(propertyValue, isDiscrete)) {
                     // Inactive cell, dont draw.
                     continue;
                 }
@@ -539,7 +566,7 @@ export function makeFullMesh(e: { data: Params }) {
         Float32Array,
         Float32Array,
         Uint32Array,
-        Float32Array,
+        Float32Array | Uint16Array,
         Uint32Array,
         number[],
         number[],

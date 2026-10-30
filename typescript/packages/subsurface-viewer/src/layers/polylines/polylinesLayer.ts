@@ -7,8 +7,9 @@ import type {
     LayerPickInfo,
     PropertyDataType,
     ReportBoundingBoxAction,
-} from "../utils/layerTools";
-import { createPropertyData, computeBoundingBox } from "../utils/layerTools";
+} from "../utils/deckglTools";
+import { initPropertyData } from "../utils/deckglTools";
+import { computeBoundingBox } from "../utils/layerTools";
 
 import type { RGBAColor, RGBColor } from "../../utils";
 
@@ -175,16 +176,11 @@ export default class PolylinesLayer extends CompositeLayer<PolylinesLayerProps> 
             return info;
         }
 
-        const layer_properties: PropertyDataType[] = [];
-
-        const zScale = this.props.modelMatrix ? this.props.modelMatrix[10] : 1;
-        if (typeof info.coordinate?.[2] !== "undefined") {
-            const depth =
-                (this.props.ZIncreasingDownwards
-                    ? -info.coordinate[2]
-                    : info.coordinate[2]) / Math.max(0.001, zScale);
-            layer_properties.push(createPropertyData("Depth", depth));
-        }
+        const layer_properties: PropertyDataType[] = initPropertyData(
+            info.coordinate?.[2],
+            this.props.ZIncreasingDownwards ?? false,
+            this.props.modelMatrix
+        );
 
         return {
             ...info,

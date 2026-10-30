@@ -2,8 +2,8 @@ import type { PickingInfo } from "@deck.gl/core";
 import { GeoJsonLayer } from "@deck.gl/layers";
 import type { Feature } from "geojson";
 
-import type { DeckGLLayerContext } from "../utils/layerTools";
-import { isDrawingEnabled } from "../utils/layerTools";
+import type { DeckGLLayerContext } from "../utils/deckglTools";
+import { isDrawingEnabled } from "../drawing/drawingLayerHelper";
 
 export default class SelectableGeoJsonLayer extends GeoJsonLayer<Feature> {
     onClick(info: PickingInfo): boolean {

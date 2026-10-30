@@ -33,6 +33,19 @@
     ],
     "typedocOptions": {
         "entryPoints": ["./src/index.ts"],
-        "out": "docs"
+        "out": "docs",
+        //"treatWarningsAsErrors": true,
+        "intentionallyNotExported": [
+            // local private types
+            "LabelData",
+            "PrivateGrid3DLayer",
+            "PrivateMapLayer",
+            "PrivatePointsLayer",
+            "PrivatePolylinesLayer",
+            //"PrivatePieChartLayer",
+            "PrivateTriangleLayer",
+            "TextLayerData",
+            "ViewSide"
+        ]
     }
 }

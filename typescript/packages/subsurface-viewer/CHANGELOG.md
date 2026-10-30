@@ -1,3 +1,125 @@
+## 2.3.9 (2026-10-26)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 2.0.11
+
+## 2.3.8 (2026-10-26)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 2.0.10
+
+## 2.3.7 (2026-10-15)
+
+### 🩹 Fixes
+
+- property maps readout info return inverted Depth value for disrete properties ([#2883](https://github.com/equinor/webviz-subsurface-components/pull/2883))
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
+## 2.3.6 (2026-10-15)
+
+### 🩹 Fixes
+
+- break subsurface-viewer circular dependencies ([#2882](https://github.com/equinor/webviz-subsurface-components/pull/2882))
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 2.0.9
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
+## 2.3.5 (2026-10-15)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 2.0.8
+
+## 2.3.4 (2026-10-09)
+
+### 🩹 Fixes
+
+- Support for categorical node values ([#2873](https://github.com/equinor/webviz-subsurface-components/pull/2873))
+
+### ❤️ Thank You
+
+- Håvard Bjerke
+- nilscb @nilscb
+
+## 2.3.3 (2026-10-09)
+
+### 🩹 Fixes
+
+- **SubsurfaceViewer:** decouple seismic readout range ([#2874](https://github.com/equinor/webviz-subsurface-components/pull/2874))
+
+### ❤️ Thank You
+
+- Copilot @Copilot
+- Håvard Bjerke
+
+## 2.3.2 (2026-10-05)
+
+### 🩹 Fixes
+
+- clean subsurface-viewer package exports ([#2869](https://github.com/equinor/webviz-subsurface-components/pull/2869))
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 2.0.7
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
+## 2.3.1 (2026-10-05)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 2.0.6
+
+## 2.3.0 (2026-09-16)
+
+### 🚀 Features
+
+- Support for map categorical discrete input ([#2843](https://github.com/equinor/webviz-subsurface-components/pull/2843))
+
+### ❤️ Thank You
+
+- Copilot @Copilot
+- Håvard Bjerke
+- nilscb @nilscb
+
+## 2.2.1 (2026-09-10)
+
+### 🩹 Fixes
+
+- bump @turf/simplify from 7.1.0 to 7.4.0 in /typescript ([#2860](https://github.com/equinor/webviz-subsurface-components/pull/2860))
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 2.0.5
+
+## 2.2.0 (2026-09-09)
+
+### 🚀 Features
+
+- **subsurface-viewer:** export getViewStateFromBounds ([#2837](https://github.com/equinor/webviz-subsurface-components/pull/2837))
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 2.0.4
+
+### ❤️ Thank You
+
+- Copilot @Copilot
+- Håvard Bjerke
+- t0oF @w1nklr
+
 ## 2.1.3 (2026-09-03)
 
 ### 🩹 Fixes

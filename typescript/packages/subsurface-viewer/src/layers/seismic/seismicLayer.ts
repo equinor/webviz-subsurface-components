@@ -11,13 +11,14 @@ import {
     type ValueMappedTriangleProps,
 } from "../gpglLayers/gpglValueMappedSurfaceLayer";
 
-import { createPropertyData, computeBoundingBox } from "../utils/layerTools";
 import type {
     ExtendedLayerProps,
     LayerPickInfo,
     PropertyDataType,
     ReportBoundingBoxAction,
-} from "../utils/layerTools";
+} from "../utils/deckglTools";
+import { initPropertyData } from "../utils/deckglTools";
+import { computeBoundingBox } from "../utils/layerTools";
 import type { ColormapProps, ColormapSetup } from "../utils/colormapTools";
 
 import type { Point3D } from "../../utils";
@@ -289,16 +290,11 @@ export default class SeismicLayer extends CompositeLayer<SeismicLayerProps> {
             return info;
         }
 
-        const layer_properties: PropertyDataType[] = [];
-
-        const zScale = this.props.modelMatrix ? this.props.modelMatrix[10] : 1;
-        if (info.coordinate?.[2] !== undefined) {
-            const depth =
-                (this.props.ZIncreasingDownwards
-                    ? -info.coordinate[2]
-                    : info.coordinate[2]) / Math.max(0.001, zScale);
-            layer_properties.push(createPropertyData("Depth", depth));
-        }
+        const layer_properties: PropertyDataType[] = initPropertyData(
+            info.coordinate?.[2],
+            this.props.ZIncreasingDownwards ?? false,
+            this.props.modelMatrix
+        );
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore

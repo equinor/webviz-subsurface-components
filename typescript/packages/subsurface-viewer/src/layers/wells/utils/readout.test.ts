@@ -5,7 +5,7 @@ import type {
     PerforationProperties,
     ScreenProperties,
     WellFeature,
-} from "../types";
+} from "../typeDefs";
 import { createPerforationReadout, createScreenReadout } from "./readout";
 
 describe("readout utilities", () => {

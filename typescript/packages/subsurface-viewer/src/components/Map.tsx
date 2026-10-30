@@ -43,18 +43,24 @@ import { colorTables as defaultColorTables } from "@emerson-eps/color-tables";
 import type { ColorTableArray } from "@emerson-eps/color-tables";
 
 import { validateColorTables, validateLayers } from "@webviz/wsc-common";
-import { Axes2DLayer, NorthArrow3DLayer, WellsLayer } from "../layers";
+
+import Axes2DLayer from "../layers/axes2d/axes2DLayer";
+import NorthArrow3DLayer from "../layers/northarrow/northArrow3DLayer";
+import WellsLayer from "../layers/wells/wellsLayer";
 import type {
     LayerPickInfo,
     ReportBoundingBoxAction,
-} from "../layers/utils/layerTools";
+} from "../layers/utils/deckglTools";
 import {
     getLayersByType,
     getModelMatrixScale,
-    getWellLayerByTypeAndSelectedWells,
-} from "../layers/utils/layerTools";
-import type { WellsPickInfo } from "../layers/wells/types";
-import type { BoundingBox2D, BoundingBox3D, Point2D, Point3D } from "../utils";
+} from "../layers/utils/deckglTools";
+
+import { getWellLayerByTypeAndSelectedWells } from "../layers/utils/wellTools";
+import type { WellsPickInfo } from "../layers/wells/typeDefs";
+import type { Point3D } from "../utils/Point3D";
+import type { BoundingBox3D } from "../utils/BoundingBox3D";
+import type { BoundingBox2D, Point2D } from "../utils/BoundingBox2D";
 import { isEmpty as isEmptyBox2D } from "../utils/BoundingBox2D";
 import {
     boxCenter,
@@ -70,7 +76,8 @@ import StatusIndicator from "./StatusIndicator";
 
 import type { Unit } from "convert-units";
 
-import type { LightsType, TLayerDefinition } from "../SubsurfaceViewer";
+import type { LightsType, TLayerDefinition } from "../typeDefs";
+import type { ViewStateType } from "../utils/camera";
 import { getZoom, useLateralZoom } from "../utils/camera";
 import { useScaleFactor, useShiftHeld } from "../utils/event";
 
@@ -86,7 +93,8 @@ import { SectionView } from "../views/sectionView";
  */
 export type BoundsAccessor = () => BoundingBox2D;
 
-type Size = {
+/** Size of the `Map` component, in pixels. */
+export type MapSize = {
     width: number;
     height: number;
 };
@@ -190,64 +198,8 @@ export interface ViewsType {
     viewports: ViewportType[];
 }
 
-/**
- * Camera view state.
- */
-export interface ViewStateType {
-    /**
-     * Camera target position.
-     */
-    target: Point2D | Point3D | undefined;
-    /**
-     * Zoom level or bounding box to fit in the view.
-     * - When a number: Represents the zoom level of the camera.
-     * - When a tuple [number, number]: Represents independent zoom levels along the horizontal and vertical axes.
-     * - When a BoundingBox3D: Represents the camera position computed to fit (zoom in) the entire box.
-     */
-    zoom: number | [number, number] | BoundingBox3D | undefined;
-    /**
-     * Rotation around the X axis in degrees. Only for 3D view.
-     */
-    rotationX: number;
-    /**
-     * Rotation around the orbit in degrees. Only for 3D view.
-     */
-    rotationOrbit: number;
-    /**
-     * Minimum zoom level.
-     * Constrains how far out the user can zoom. Lower values allow viewing a larger area.
-     */
-    minZoom?: number;
-    /**
-     * Maximum zoom level.
-     * Constrains how far in the user can zoom. Higher values allow closer inspection.
-     */
-    maxZoom?: number;
-    /**
-     *  Animation transition duration in milliseconds.
-     */
-    transitionDuration?: number;
-    /**
-     * Viewport width in pixels.
-     */
-    width?: number;
-    /**
-     * Viewport height in pixels.
-     */
-    height?: number;
-    /**
-     * Minimum rotation around the X axis in degrees. Only for 3D view.
-     * Constrains the minimum tilt angle of the camera (e.g., 0° = horizontal view).
-     */
-    minRotationX?: number;
-    /**
-     * Maximum rotation around the X axis in degrees. Only for 3D view.
-     * Constrains the maximum tilt angle of the camera (e.g., 90° = top-down view).
-     */
-    maxRotationX?: number;
-}
-
-interface MarginsType {
+/** Margins in pixels reserved around a viewport, e.g. for the 2D axes rulers. */
+export interface MarginsType {
     left: number;
     right: number;
     top: number;
@@ -426,7 +378,7 @@ export interface MapProps {
 
     /**
      * Override default cursor with a callback.
-     * @param cursorState
+     * The callback takes a cursor state as input.
      * @returns cursor string
      * @default "grabbing" when dragging, "default" otherwise
      * @see https://developer.mozilla.org/en-US/docs/Web/CSS/cursor
@@ -467,10 +419,8 @@ export interface MapProps {
     deckGlRef?: React.ForwardedRef<DeckGLRef>;
 }
 
-export type ViewTypeType =
-    | typeof OrbitView
-    | typeof OrthographicView
-    | typeof SectionView;
+// export types for client code
+export type { LayersList };
 
 // Helper function to handle deprecated "show3D" property of ViewportType
 function show3D(viewPort: ViewportType): boolean {
@@ -558,11 +508,11 @@ const Map: React.FC<MapProps> = ({
     const viewController = useMemo(() => new ViewController(forceUpdate), []);
 
     // Extract the needed size from onResize function
-    const [deckSize, setDeckSize] = useState<Size>({ width: 0, height: 0 });
-    const onResize = useCallback((size: Size) => {
+    const [deckSize, setDeckSize] = useState<MapSize>({ width: 0, height: 0 });
+    const onResize = useCallback((size: MapSize) => {
         // exclude {0, 0} size (when rendered hidden pages)
         if (size.width > 0 && size.height > 0) {
-            setDeckSize((prevSize: Size) => {
+            setDeckSize((prevSize: MapSize) => {
                 if (
                     prevSize?.width !== size.width ||
                     prevSize?.height !== size.height
@@ -1179,7 +1129,7 @@ type ViewControllerState = {
     camera: ViewStateType | undefined;
     bounds: BoundingBox2D | BoundsAccessor | undefined;
     boundingBox3d: BoundingBox3D | undefined;
-    deckSize: Size;
+    deckSize: MapSize;
     zScale: number;
     viewPortMargins: MarginsType;
 };
@@ -1528,7 +1478,7 @@ class ViewController {
 function computeCameraZoom(
     camera: ViewStateType,
     boundingBox: BoundingBox3D,
-    size: Size,
+    size: MapSize,
     fovy = 50
 ): number {
     // constants and camera constants
@@ -1604,14 +1554,36 @@ function computeCameraZoom(
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
-// return viewstate with computed bounds to fit the data in viewport
-function getViewStateFromBounds(
+/**
+ * Computes the view state that fits the given 2D bounds into a viewport.
+ *
+ * This is the auto-fit used by the component when no `cameraPosition` is supplied. It is exported
+ * so that client code can reproduce the exact same framing — for example to derive a camera that
+ * matches the default view before applying its own adjustments, without having to re-implement the
+ * margin, translation and zoom-clamping rules.
+ *
+ * @param viewPortMargins margins in pixels reserved inside the viewport, e.g. for the 2D axes
+ * rulers. The camera target is centred on the viewport minus these margins.
+ * @param bounds_accessor the 2D bounds to fit, either directly or as an accessor function.
+ * @param target camera target. Only its `z` component is used; `x` and `y` are derived from the fit.
+ * @param views view configuration. When a matrix layout is used, the fit is computed for a single
+ * sub-view rather than the full viewport.
+ * @param viewPort the viewport to compute the view state for. Note that `viewPort.target` and
+ * `viewPort.zoom`, when set, take precedence over the computed values, and that
+ * `viewPort.verticalScale` routes the zoom through the deprecated `scaleZoom`; leave it unset
+ * to obtain the plain scalar fit zoom.
+ * @param size size of the map component in pixels. When either dimension is zero or negative, the
+ * margins and view size are ignored and the fit is computed from the bounds alone.
+ * @returns the fitted {@link ViewStateType}, including the `minZoom`/`maxZoom` limits. In 2D the
+ * maximum zoom is reduced for large (e.g. UTM) coordinates to avoid numerical imprecision.
+ */
+export function getViewStateFromBounds(
     viewPortMargins: MarginsType,
     bounds_accessor: BoundingBox2D | BoundsAccessor,
     target: Point3D,
     views: ViewsType | undefined,
     viewPort: ViewportType,
-    size: Size
+    size: MapSize
 ): ViewStateType {
     const bounds =
         typeof bounds_accessor == "function"
@@ -1741,7 +1713,7 @@ function getViewType(
     return [OrthographicView, OrthographicController];
 }
 
-function areViewsValid(views: ViewsType | undefined, size: Size): boolean {
+function areViewsValid(views: ViewsType | undefined, size: MapSize): boolean {
     const isInvalid: boolean =
         views?.viewports == undefined ||
         views?.layout == undefined ||
@@ -1781,7 +1753,7 @@ function newView(
     });
 }
 
-function buildDeckGlViews(views: ViewsType | undefined, size: Size): View[] {
+function buildDeckGlViews(views: ViewsType | undefined, size: MapSize): View[] {
     const isOk = areViewsValid(views, size);
     if (!views || !isOk) {
         return [
@@ -1902,7 +1874,7 @@ function canCameraBeDefined(
     camera: ViewStateType | undefined,
     boundingBox: BoundingBox3D | undefined,
     bounds: BoundingBox2D | BoundsAccessor | undefined,
-    size: Size
+    size: MapSize
 ): boolean {
     if (isCameraDefined(camera)) {
         return true;
@@ -2020,7 +1992,7 @@ function inversedZScaled(
 function updateViewState(
     camera: ViewStateType,
     boundingBox: BoundingBox3D,
-    size: Size,
+    size: MapSize,
     is3D = true
 ): ViewStateType {
     if (isCameraDefined(camera)) {
@@ -2063,7 +2035,7 @@ function computeViewState(
     bounds: BoundingBox2D | BoundsAccessor | undefined,
     viewportMargins: MarginsType,
     views: ViewsType | undefined,
-    size: Size
+    size: MapSize
 ): ViewStateType {
     // If the camera is defined, use it
     const isCameraPositionDefined = scaledCamera != undefined;
@@ -2156,7 +2128,7 @@ function buildViewStates(
     scaledCamera: ViewStateType | undefined,
     boundingBox: BoundingBox3D | undefined,
     bounds: BoundingBox2D | BoundsAccessor | undefined,
-    size: Size
+    size: MapSize
 ): Record<string, ViewStateType> {
     const isOk = areViewsValid(views, size);
     if (!views || !isOk) {

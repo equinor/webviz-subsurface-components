@@ -2,7 +2,8 @@ import "react";
 
 import type { Meta, StoryObj } from "@storybook/react-webpack5";
 
-import SubsurfaceViewer, { TGrid3DColoringMode } from "../../SubsurfaceViewer";
+import SubsurfaceViewer from "../../SubsurfaceViewer";
+import { TGrid3DColoringMode } from "../../layers/grid3d";
 
 import type { RGBColor } from "../../utils";
 
@@ -24,7 +25,7 @@ import * as gridProps from "../../layers/grid3d/test_data/DiscreteProperty/Props
 
 import { default3DViews, defaultStoryParameters } from "../sharedSettings";
 
-import { createMathWithSeed } from "../sharedHelperFunctions";
+import { createSeededRandom } from "../util/random";
 import { getPropsInjectorComponent } from "../sharedHelperComponents";
 
 const SubsurfaceViewerPropsInjector = getPropsInjectorComponent(
@@ -361,12 +362,12 @@ export const Simgrid8xIJonly: StoryObj<typeof SubsurfaceViewer> = {
     parameters: parameters,
 };
 
-const math = createMathWithSeed("1984");
+const random = createSeededRandom("1984");
 
 const snubCubePoints = SnubCubePoints.map((v) => 10 * v);
 const snubCubeProperties = Array.from(
     { length: SnubCubeVertexCount },
-    () => 100 + math.random() * 50
+    () => 100 + random() * 50
 );
 
 const toroidPoints = ToroidPoints.map((v) => 10 * v).map((v, index) =>
@@ -374,7 +375,7 @@ const toroidPoints = ToroidPoints.map((v) => 10 * v).map((v, index) =>
 );
 const toroidProperties = Array.from(
     { length: ToroidVertexCount },
-    () => math.random() * 10
+    () => random() * 10
 );
 
 export const PolyhedralCells: StoryObj<typeof SubsurfaceViewer> = {

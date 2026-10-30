@@ -3,7 +3,7 @@
 import type { Meta, StoryObj } from "@storybook/react-webpack5";
 
 import InfoCard from "../../components/InfoCard";
-import { type LayerPickInfo } from "../../layers/utils/layerTools";
+import { type LayerPickInfo } from "../../layers/utils/deckglTools";
 
 const stories: Meta = {
     component: InfoCard,

@@ -15,7 +15,7 @@ import { styled } from "@mui/material/styles";
 
 import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
 import SubsurfaceViewer from "../../SubsurfaceViewer";
-import type { ViewStateType } from "../../components/Map";
+import type { ViewStateType } from "../../utils/camera";
 import type { BoundingBox3D, Point3D } from "../../utils";
 import { Axes2DLayer, AxesLayer } from "../../layers";
 

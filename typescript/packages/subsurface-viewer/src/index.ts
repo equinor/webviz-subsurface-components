@@ -1,29 +1,35 @@
+export type {
+    DashSubsurfaceViewerProps,
+    DashViewsType,
+} from "./DashSubsurfaceViewer";
 export { default as DashSubsurfaceViewer } from "./DashSubsurfaceViewer";
+
 export { default } from "./SubsurfaceViewer";
 
-export { TGrid3DColoringMode } from "./SubsurfaceViewer";
 export type {
     BoundsAccessor,
     ColorTableArray,
-    LightsType,
     MapMouseEvent,
     SubsurfaceViewerProps,
-    TLayerDefinition,
     TooltipCallback,
-    ViewStateType,
-    ViewsType,
     colorTablesArray,
 } from "./SubsurfaceViewer";
 
-export * from "./utils";
+export type { LightsType, TLayerDefinition } from "./typeDefs";
 
+export * from "./components";
+export * from "./utils";
+export * from "./viewports";
+export * from "./views";
+
+// layers
+export * from "./layers";
+
+export type { ExtendedLayerProps } from "./layers/utils/deckglTools";
 export type {
-    ExtendedLayerProps,
     LayerPickInfo,
     PropertyDataType,
-} from "./layers/utils/layerTools";
-
-export type { ViewportType } from "./views/viewport";
+} from "./layers/utils/deckglTools";
 
 export { useAbscissaTransform } from "./layers/wells/hooks/useAbscissaTransform";
 
@@ -31,8 +37,4 @@ export type {
     AbscissaTransform,
     WellFeature,
     WellFeatureCollection,
-} from "./layers/wells/types";
-
-export { SectionView } from "./views/sectionView";
-
-export type { DashSubsurfaceViewerProps } from "./DashSubsurfaceViewer";
+} from "./layers/wells/typeDefs";

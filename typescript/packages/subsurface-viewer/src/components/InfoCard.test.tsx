@@ -8,7 +8,7 @@ import "jest-styled-components";
 
 import type { Layer } from "@deck.gl/core";
 
-import type { LayerPickInfo } from "../layers/utils/layerTools";
+import type { LayerPickInfo } from "../layers/utils/deckglTools";
 import InfoCard from "./InfoCard";
 
 describe("Test InfoCard", () => {

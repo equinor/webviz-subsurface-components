@@ -2,9 +2,13 @@
 
 exports[`WellLogViewer/Components/Scroller Default smoke-test 1`] = `
 <div style="height: 92vh;">
-  <div style="overflow: scroll; width: 100%; height: 100%;">
+  <div class="well-log-scroller"
+       style="overflow: scroll; width: 100%; height: 100%; min-width: 0px; min-height: 0px; scrollbar-color: gray transparent;"
+  >
     <div style="width: 12480px; height: 6620px;">
-      <div style="position: absolute; width: 1248px; height: 662px;">
+      <div class="well-log-scroller-content"
+           style="position: sticky; top: 0px; left: 0px; width: 1248px; height: 662px;"
+      >
         <div>
           Scroll position X=0.20, Y=0.20
         </div>

@@ -1,5 +1,5 @@
 import type React from "react";
-import type { ExtendedLegendLayer } from "../layers/utils/layerTools";
+import type { ExtendedLegendLayer } from "./typeDefs";
 import ColorLegend from "./ColorLegend";
 import type { ColorTableArray } from "@emerson-eps/color-tables";
 

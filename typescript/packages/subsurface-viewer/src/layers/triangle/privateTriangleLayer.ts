@@ -16,8 +16,8 @@ import type {
     ExtendedLayerProps,
     LayerPickInfo,
     PropertyDataType,
-} from "../utils/layerTools";
-import { createPropertyData } from "../utils/layerTools";
+} from "../utils/deckglTools";
+import { initPropertyData } from "../utils/deckglTools";
 
 import type { RGBAColor, RGBColor } from "../../utils";
 
@@ -72,7 +72,7 @@ const defaultProps = {
 };
 
 // This is a private layer used only by the composite TriangleLayer
-export default class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProps> {
+export class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProps> {
     get isLoaded(): boolean {
         return (this.state["isLoaded"] as boolean) ?? false;
     }
@@ -229,15 +229,11 @@ export default class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProp
             return info;
         }
 
-        const layer_properties: PropertyDataType[] = [];
-        const zScale = this.props.modelMatrix ? this.props.modelMatrix[10] : 1;
-        if (typeof info.coordinate?.[2] !== "undefined") {
-            const depth =
-                (this.props.ZIncreasingDownwards
-                    ? -info.coordinate[2]
-                    : info.coordinate[2]) / Math.max(0.001, zScale);
-            layer_properties.push(createPropertyData("Depth", depth));
-        }
+        const layer_properties: PropertyDataType[] = initPropertyData(
+            info.coordinate?.[2],
+            this.props.ZIncreasingDownwards,
+            this.props.modelMatrix
+        );
 
         return {
             ...info,

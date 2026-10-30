@@ -13,7 +13,8 @@ import TextField from "@mui/material/TextField";
 import { styled } from "@mui/material/styles";
 
 import SubsurfaceViewer from "../../SubsurfaceViewer";
-import type { SubsurfaceViewerProps, LightsType } from "../../SubsurfaceViewer";
+import type { SubsurfaceViewerProps } from "../../SubsurfaceViewer";
+import type { LightsType } from "../../typeDefs";
 import { AxesLayer, Grid3DLayer } from "../../layers";
 import {
     Points as SnubCubePoints,

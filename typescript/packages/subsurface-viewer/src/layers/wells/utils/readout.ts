@@ -1,9 +1,9 @@
-import type { PropertyDataType } from "../../utils/layerTools";
+import type { PropertyDataType } from "../../utils/deckglTools";
 import type {
     ScreenProperties,
     WellFeature,
     PerforationProperties,
-} from "../types";
+} from "../typeDefs";
 
 /**
  * Creates a readout object that contains relevant screen information

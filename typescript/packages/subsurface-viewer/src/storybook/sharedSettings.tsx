@@ -6,12 +6,9 @@ import { styled } from "@mui/material/styles";
 
 import exampleData from "../../../../../example-data/deckgl-map.json";
 
-import type {
-    SubsurfaceViewerProps,
-    ViewStateType,
-    ViewsType,
-} from "../SubsurfaceViewer";
 import SubsurfaceViewer from "../SubsurfaceViewer";
+import type { SubsurfaceViewerProps, ViewStateType, ViewsType } from "..";
+
 import type { BoundingBox2D, BoundingBox3D, Point3D } from "../utils";
 
 export const defaultStoryParameters = {
@@ -214,7 +211,7 @@ export const hugin25mKhNetmapMapLayerPng = {
 export const hugin5mKhNetmapMapLayer = {
     "@@type": "MapLayer",
     id: "mesh-layer",
-    meshUrl: "hugin_depth_5_m.float32",
+    meshData: "hugin_depth_5_m.float32",
     frame: {
         origin: hugin2DOrigin,
         count: [1451, 1141],

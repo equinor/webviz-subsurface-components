@@ -1,3 +1,71 @@
+## 3.0.13 (2026-10-26)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 2.0.11
+
+## 3.0.12 (2026-10-26)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 2.0.10
+
+## 3.0.11 (2026-10-15)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 2.0.9
+
+## 3.0.10 (2026-10-15)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 2.0.8
+
+## 3.0.9 (2026-10-05)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 2.0.7
+
+## 3.0.8 (2026-10-05)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 2.0.6
+
+## 3.0.7 (2026-09-18)
+
+### 🩹 Fixes
+
+- **WellLogViewer:** restore Firefox scrollbars ([#2864](https://github.com/equinor/webviz-subsurface-components/pull/2864))
+
+### ❤️ Thank You
+
+- Copilot @Copilot
+- Håvard Bjerke
+
+## 3.0.6 (2026-09-10)
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 2.0.5
+
+## 3.0.5 (2026-09-09)
+
+### 🩹 Fixes
+
+- **WellLogViewer:** identify well pick overlay elements by index ([#2846](https://github.com/equinor/webviz-subsurface-components/pull/2846))
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 2.0.4
+
+### ❤️ Thank You
+
+- Copilot @Copilot
+- Håvard Bjerke
+
 ## 3.0.4 (2026-09-03)
 
 ### 🧱 Updated Dependencies

@@ -6,9 +6,13 @@ exports[`WellLogViewer/Demo/WellLogViewer ColorByFunction smoke-test 1`] = `
     <div class="welllog-layout">
       <div class="interior">
         <div class="middle">
-          <div style="overflow: scroll; width: 100%; height: 100%;">
+          <div class="well-log-scroller"
+               style="overflow: scroll; width: 100%; height: 100%; min-width: 0px; min-height: 0px; scrollbar-color: gray transparent;"
+          >
             <div style="width: 199px; height: 861px;">
-              <div style="position: absolute; width: 993px; height: 662px;">
+              <div class="well-log-scroller-content"
+                   style="position: sticky; top: 0px; left: 0px; width: 993px; height: 662px;"
+              >
                 <div class="welllogview"
                      style="flex-direction: column;"
                 >
@@ -1360,9 +1364,13 @@ exports[`WellLogViewer/Demo/WellLogViewer Default smoke-test 1`] = `
     <div class="welllog-layout">
       <div class="interior">
         <div class="middle">
-          <div style="overflow: scroll; width: 100%; height: 100%;">
+          <div class="well-log-scroller"
+               style="overflow: scroll; width: 100%; height: 100%; min-width: 0px; min-height: 0px; scrollbar-color: gray transparent;"
+          >
             <div style="width: 3178px; height: 662px;">
-              <div style="position: absolute; width: 993px; height: 662px;">
+              <div class="well-log-scroller-content"
+                   style="position: sticky; top: 0px; left: 0px; width: 993px; height: 662px;"
+              >
                 <div class="welllogview"
                      style="flex-direction: column;"
                 >
@@ -3847,9 +3855,13 @@ exports[`WellLogViewer/Demo/WellLogViewer Discrete smoke-test 1`] = `
     <div class="welllog-layout">
       <div class="interior">
         <div class="middle">
-          <div style="overflow: scroll; width: 100%; height: 100%;">
+          <div class="well-log-scroller"
+               style="overflow: scroll; width: 100%; height: 100%; min-width: 0px; min-height: 0px; scrollbar-color: gray transparent;"
+          >
             <div style="width: 1589px; height: 662px;">
-              <div style="position: absolute; width: 993px; height: 662px;">
+              <div class="well-log-scroller-content"
+                   style="position: sticky; top: 0px; left: 0px; width: 993px; height: 662px;"
+              >
                 <div class="welllogview"
                      style="flex-direction: column;"
                 >
@@ -7852,9 +7864,13 @@ exports[`WellLogViewer/Demo/WellLogViewer Empty smoke-test 1`] = `
     <div class="welllog-layout">
       <div class="interior">
         <div class="middle">
-          <div style="overflow: scroll; width: 100%; height: 100%;">
+          <div class="well-log-scroller"
+               style="overflow: scroll; width: 100%; height: 100%; min-width: 0px; min-height: 0px; scrollbar-color: gray transparent;"
+          >
             <div style="width: 199px; height: 662px;">
-              <div style="position: absolute; width: 993px; height: 662px;">
+              <div class="well-log-scroller-content"
+                   style="position: sticky; top: 0px; left: 0px; width: 993px; height: 662px;"
+              >
                 <div class="welllogview"
                      style="flex-direction: column;"
                 >
@@ -8448,9 +8464,13 @@ exports[`WellLogViewer/Demo/WellLogViewer LogWithDifferentSets smoke-test 1`] = 
     <div class="welllog-layout">
       <div class="interior">
         <div class="middle">
-          <div style="overflow: scroll; width: 100%; height: 100%;">
+          <div class="well-log-scroller"
+               style="overflow: scroll; width: 100%; height: 100%; min-width: 0px; min-height: 0px; scrollbar-color: gray transparent;"
+          >
             <div style="width: 596px; height: 662px;">
-              <div style="position: absolute; width: 993px; height: 662px;">
+              <div class="well-log-scroller-content"
+                   style="position: sticky; top: 0px; left: 0px; width: 993px; height: 662px;"
+              >
                 <div class="welllogview"
                      style="flex-direction: column;"
                 >
@@ -9350,9 +9370,13 @@ exports[`WellLogViewer/Demo/WellLogViewer LogsWithUndefined smoke-test 1`] = `
     <div class="welllog-layout">
       <div class="interior">
         <div class="middle">
-          <div style="overflow: scroll; width: 100%; height: 100%;">
+          <div class="well-log-scroller"
+               style="overflow: scroll; width: 100%; height: 100%; min-width: 0px; min-height: 0px; scrollbar-color: gray transparent;"
+          >
             <div style="width: 596px; height: 662px;">
-              <div style="position: absolute; width: 993px; height: 662px;">
+              <div class="well-log-scroller-content"
+                   style="position: sticky; top: 0px; left: 0px; width: 993px; height: 662px;"
+              >
                 <div class="welllogview"
                      style="flex-direction: column;"
                 >
@@ -10253,9 +10277,13 @@ exports[`WellLogViewer/Demo/WellLogViewer OnInfoFilledEvent smoke-test 1`] = `
       <div class="welllog-layout">
         <div class="interior">
           <div class="middle">
-            <div style="overflow: scroll; width: 100%; height: 100%;">
+            <div class="well-log-scroller"
+                 style="overflow: scroll; width: 100%; height: 100%; min-width: 0px; min-height: 0px; scrollbar-color: gray transparent;"
+            >
               <div style="width: 1248px; height: 1324px;">
-                <div style="position: absolute; width: 1248px; height: 662px;">
+                <div class="well-log-scroller-content"
+                     style="position: sticky; top: 0px; left: 0px; width: 1248px; height: 662px;"
+                >
                   <div class="welllogview"
                        style="flex-direction: row;"
                   >
@@ -10265,7 +10293,7 @@ exports[`WellLogViewer/Demo/WellLogViewer OnInfoFilledEvent smoke-test 1`] = `
                     <div class="view">
                       <div class="container log-controller horizontal">
                         <div class="overlay"
-                             style="height: 662px; top: 0px; overflow: hidden; left: 69px; width: 1164px;"
+                             style="width: 1164px; height: 662px; left: 69px; top: 0px; overflow: hidden;"
                         >
                           <div class="depth"
                                style="position: absolute; pointer-events: none; visibility: visible;"
@@ -11508,9 +11536,13 @@ exports[`WellLogViewer/Demo/WellLogViewer TrackTitleTooltip play-test 1`] = `
     <div class="welllog-layout">
       <div class="interior">
         <div class="middle">
-          <div style="overflow: scroll; width: 100%; height: 100%;">
+          <div class="well-log-scroller"
+               style="overflow: scroll; width: 100%; height: 100%; min-width: 0px; min-height: 0px; scrollbar-color: gray transparent;"
+          >
             <div style="width: 397px; height: 662px;">
-              <div style="position: absolute; width: 993px; height: 662px;">
+              <div class="well-log-scroller-content"
+                   style="position: sticky; top: 0px; left: 0px; width: 993px; height: 662px;"
+              >
                 <div class="welllogview"
                      style="flex-direction: column;"
                 >
@@ -11519,7 +11551,7 @@ exports[`WellLogViewer/Demo/WellLogViewer TrackTitleTooltip play-test 1`] = `
                   <div class="view">
                     <div class="container log-controller">
                       <div class="overlay"
-                           style="width: 993px; left: 0px; overflow: hidden; top: 69px; height: 594px;"
+                           style="width: 993px; left: 0px; top: 69px; overflow: hidden; height: 594px;"
                       >
                         <div class="depth"
                              style="position: absolute; pointer-events: none; visibility: visible;"
@@ -12322,9 +12354,13 @@ exports[`WellLogViewer/Demo/WellLogViewer Undefined smoke-test 1`] = `
     <div class="welllog-layout">
       <div class="interior">
         <div class="middle">
-          <div style="overflow: scroll; width: 100%; height: 100%;">
+          <div class="well-log-scroller"
+               style="overflow: scroll; width: 100%; height: 100%; min-width: 0px; min-height: 0px; scrollbar-color: gray transparent;"
+          >
             <div style="width: 199px; height: 662px;">
-              <div style="position: absolute; width: 993px; height: 662px;">
+              <div class="well-log-scroller-content"
+                   style="position: sticky; top: 0px; left: 0px; width: 993px; height: 662px;"
+              >
                 <div class="welllogview"
                      style="flex-direction: column;"
                 >
@@ -12918,9 +12954,13 @@ exports[`WellLogViewer/Demo/WellLogViewer WellPickLabelWithCustomFormatter smoke
     <div class="welllog-layout">
       <div class="interior">
         <div class="middle">
-          <div style="overflow: scroll; width: 100%; height: 100%;">
+          <div class="well-log-scroller"
+               style="overflow: scroll; width: 100%; height: 100%; min-width: 0px; min-height: 0px; scrollbar-color: gray transparent;"
+          >
             <div style="width: 3178px; height: 861px;">
-              <div style="position: absolute; width: 993px; height: 662px;">
+              <div class="well-log-scroller-content"
+                   style="position: sticky; top: 0px; left: 0px; width: 993px; height: 662px;"
+              >
                 <div class="welllogview"
                      style="flex-direction: column;"
                 >
