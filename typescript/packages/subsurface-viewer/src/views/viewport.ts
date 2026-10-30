@@ -1,12 +1,16 @@
 import React from "react";
 
-import type { Controller, OrbitView, OrthographicView } from "@deck.gl/core";
-
-import type { ConstructorOf } from "@deck.gl/core/dist/types/types";
-import type { ControllerOptions } from "@deck.gl/core/dist/controllers/controller";
-import type { IViewState } from "@deck.gl/core/dist/controllers/view-state";
+import type {
+    OrbitController,
+    OrthographicController,
+    OrbitView,
+    OrthographicView,
+    View,
+} from "@deck.gl/core";
 
 import type { SectionView } from "../views/sectionView";
+
+type ControllerOptions = Omit<NonNullable<View["controller"]>, "type">;
 
 export type ControllerOpts = boolean | ControllerOptions;
 
@@ -89,10 +93,8 @@ export const useVerticalScale = (viewports: ViewportType[] | undefined) => {
     }, [viewports]);
 };
 
-export const defineController = <
-    ControllerState extends IViewState<ControllerState>,
->(
-    controllerClass: ConstructorOf<Controller<ControllerState>>,
+export const defineController = (
+    controllerClass: typeof OrbitController | typeof OrthographicController,
     controllerProps?: ControllerOpts
 ) => {
     if (controllerProps === false) {
