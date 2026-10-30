@@ -31,10 +31,10 @@ vec4 valueColor(uint value) {
    float normalizedValue = normalizeValue(value);
 
    if(map.useClampColor) {
-      // if(normalizedValue < map.colormapRange[0] || normalizedValue > map.colormapRange[1]) {
-      //    // Out of range. Use clampcolor.
-      //    return map.colormapClampColor;
-      // }
+      if(normalizedValue < map.colormapRange[0] || normalizedValue > map.colormapRange[1]) {
+         // Out of range. Use clampcolor.
+         return map.colormapClampColor;
+      }
    }
    // apply colormap
    return texture(colormap, vec2(normalizedValue, 0.5));

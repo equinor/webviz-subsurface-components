@@ -571,6 +571,7 @@ export default class MapLayer<
             !isEqual(props.meshData, oldProps.meshData) ||
             !isEqual(props.propertiesData, oldProps.propertiesData) ||
             !isEqual(props.frame, oldProps.frame) ||
+            !isEqual(props.coloringMode, oldProps.coloringMode) ||
             !isEqual(
                 props.ZIncreasingDownwards,
                 oldProps.ZIncreasingDownwards

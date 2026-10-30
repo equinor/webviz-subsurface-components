@@ -344,14 +344,13 @@ export class PrivateGrid3DLayer extends Layer<PrivateLayerProps> {
             const maxPropertyValue = Number.isFinite(
                 this.props.propertyValueRange[1]
             )
-                ? Math.round(this.props.propertyValueRange[1])
+                ? Math.round(this.props.propertyValueRange[1] + 1)
                 : 0;
             const namedPropertyCount =
                 this.props.discretePropertyValueNames?.length ?? 0;
             return {
                 discreteData: true,
-                colormapSize:
-                    Math.max(maxPropertyValue, namedPropertyCount) + 1,
+                colormapSize: Math.max(maxPropertyValue, namedPropertyCount),
             };
         }
         return {
