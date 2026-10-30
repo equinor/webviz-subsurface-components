@@ -121,14 +121,14 @@ const cellCenterFaciesPropertyLayer = {
 
 /* prettier-ignore */
 const zoom: BoundingBox3D = [
-    -1608.620361328125, -1838, -2038.382080078125,
-    2291.379638671875, 1662, -1449.6324462890625,
+    -1608.620361328125, -1838, -1449.6324462890625,
+    2291.379638671875, 1662, -2038.382080078125,
 ];
-
 const axesLayer = {
     "@@type": "AxesLayer",
     id: "axes_categorical",
     bounds: zoom,
+    ZIncreasingDownwards: false,
 };
 
 const cameraPosition = {
