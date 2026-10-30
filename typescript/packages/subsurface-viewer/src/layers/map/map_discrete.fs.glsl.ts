@@ -1,35 +1,66 @@
 export default `#version 300 es
 #define SHADER_NAME map-discrete-fragment-shader
 
+// Primitive attributes
+in vec4 position_commonspace;
+flat in uint property;
+in vec3 normals_commonspace;
+in vec4 vColor;
 
 in vec2 vTexCoord;
 in vec3 cameraPosition;
-in vec4 position_commonspace;
-in vec4 vColor;
 in vec3 worldPos;
 
-flat in uint property;
 flat in int vertexIndex;
 
-flat in vec3 vertexColor_;
+// Uniforms
+uniform sampler2D colormap;
 
+// Outputs
 out vec4 fragColor;
+
+// Normalize the value to the range [0, N]; noop since values are expected in [0, N] range.
+// Keep this function to ease continuous/discrete property algo comparisons
+float normalizeValue(uint value) {
+   return float(value);
+}
+
+vec4 valueColor(uint value) {
+   if(value == map.undefinedValue) {
+      return map.undefinedColor;
+   }
+   float normalizedValue = normalizeValue(value);
+
+   if(map.useClampColor) {
+      if(normalizedValue < map.colormapRange[0] || normalizedValue > map.colormapRange[1]) {
+         // Out of range. Use clampcolor.
+         return map.colormapClampColor;
+      }
+   }
+   // apply colormap
+   return texture(colormap, vec2(normalizedValue, 0.5));
+}
 
 
 void main(void) {
    geometry.uv = vTexCoord;
 
-   vec3 normal = normalize(cross(dFdx(position_commonspace.xyz), dFdy(position_commonspace.xyz)));
+   vec3 normal = normals_commonspace;
+
+   if(!map.smoothShading || (normal[0] == 0.0 && normal[1] == 0.0 && normal[2] == 0.0)) {
+      normal = normalize(cross(dFdx(position_commonspace.xyz), dFdy(position_commonspace.xyz)));
+   }
 
    uint propertyValue = property;
+   
+   vec4 color = vColor;
+   // compute color
+   color = valueColor(propertyValue);
 
-   vec4 color = vec4(vertexColor_, 1.0);
-
-
-   bool is_contours = map_d.contourReferencePoint != -1.0 && map_d.contourInterval != -1.0;
+   bool is_contours = map.contourReferencePoint != -1.0 && map.contourInterval != -1.0;
    if (is_contours) {
-      float val = map_d.isContoursDepth ? (abs(worldPos.z) - map_d.contourReferencePoint) / map_d.contourInterval
-                                  : (float(propertyValue) - map_d.contourReferencePoint) / map_d.contourInterval;
+      float val = map.isContoursDepth ? (abs(worldPos.z) - map.contourReferencePoint) / map.contourInterval
+                                  : (float(propertyValue) - map.contourReferencePoint) / map.contourInterval;
 
       float f  = fract(val);
       float df = fwidth(val);
@@ -40,11 +71,10 @@ void main(void) {
       color = color * vec4(c, c, c, 1.0);
    }
 
-
    // Use two sided phong lighting. This has no effect if "material" property is not set.
    vec3 lightColor = lighting_getLightColor(color.rgb, cameraPosition, position_commonspace.xyz, normal);
 
-   fragColor = vec4(lightColor, vColor.a);
+   fragColor = vec4(lightColor, color.a * vColor.a);
    DECKGL_FILTER_COLOR(fragColor, geometry);
 
    // Below code is modified version of "picking_filterPickingColor" function.

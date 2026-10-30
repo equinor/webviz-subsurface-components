@@ -18,9 +18,15 @@ export type colorMapFunctionType = ColormapFunctionType;
 /** @deprecated Use ColormapFunctionType instead. */
 export type ColorMapFunctionType = ColormapFunctionType;
 
+/**
+ * Optional settings that control how a colormap is sampled and displayed.
+ * When omitted, the colormap is treated as continuous and sampled at 256 colors.
+ */
 export interface IColormapHints {
-    discreteData: boolean;
-    colormapSize: number;
+    /** Whether the colormap represents discrete data values. */
+    discreteData?: boolean;
+    /** Number of colors to generate for the colormap. */
+    colormapSize?: number;
 }
 
 /**
@@ -76,19 +82,34 @@ export interface ColormapSetup {
     smooth?: boolean;
 }
 
+const defaultHints = { discreteData: false, colormapSize: 256 };
+
+function isColorTable(
+    colormapDef: ColormapProps
+): colormapDef is ColorTableProps {
+    return (
+        "colormapName" in colormapDef &&
+        "colorTables" in colormapDef &&
+        !!colormapDef.colorTables
+    );
+}
+
 /**
  * Creates an array of colors as RGB triplets in range [0, 1] using the colormap definition.
  * @param colormapDef Definition of the colormap.
- * @param colormapSize Number of colors in the color map.
- * @param discreteColormapFunction If true, the color map function is targeting indices ranging from 0 to colormapSize.
+ * @param colormapHints Hints for the colormap, such as the number of colors or a discrete property values flag.
  * @returns Array of colors.
  */
-export function getImageData(
+export function getColormapColorArray(
     colormapDef: ColormapProps,
-    colormapSize: number = 256,
-    discreteColormapFunction: boolean = false
+    colormapHints?: IColormapHints
 ): Uint8Array {
     type funcType = (x: number) => Color;
+
+    const { discreteData, colormapSize } = {
+        ...defaultHints,
+        ...colormapHints,
+    };
 
     if (colormapDef instanceof Uint8Array) {
         // If colormapProps is a Uint8Array, return it directly.
@@ -96,10 +117,7 @@ export function getImageData(
     }
 
     const isFunctionDefined = colormapDef !== undefined;
-    const isColorTableDef =
-        "colormapName" in colormapDef &&
-        "colorTables" in colormapDef &&
-        !!colormapDef.colorTables;
+    const isColorTableDef = isColorTable(colormapDef);
 
     let colormap = createDefaultContinuousColorScale() as unknown as funcType;
 
@@ -119,12 +137,12 @@ export function getImageData(
                 : ((() => colormapDef) as unknown as funcType);
     }
 
-    const data = new Uint8Array(colormapSize * 3);
+    const resultSize = Math.max(colormapSize, 1);
+    const data = new Uint8Array(resultSize * 3);
 
-    const scaling = discreteColormapFunction
-        ? 1
-        : 1 / Math.max(colormapSize - 1, 1);
-    for (let i = 0; i < colormapSize; i++) {
+    const scaling =
+        isColorTableDef || !discreteData ? 1 / Math.max(resultSize - 1, 1) : 1;
+    for (let i = 0; i < resultSize; i++) {
         const color = colormap ? colormap(scaling * i) : [1, 0, 0];
         if (color) {
             data[3 * i + 0] = color[0];
@@ -162,14 +180,15 @@ export function createColormapTexture(
         format: "rgb8unorm-webgl",
     };
 
-    if (colormapHints.discreteData) {
-        const colormapSize = Math.max(colormapHints.colormapSize, 1);
-        const colormapData = getImageData(
-            colormap,
-            colormapSize,
-            colormapHints.discreteData
-        );
+    const { discreteData: discreteDataHint, colormapSize: colormapSizeHint } = {
+        ...defaultHints,
+        ...colormapHints,
+    };
 
+    const colormapSize = Math.max(colormapSizeHint, 1);
+    const colormapData = getColormapColorArray(colormap, colormapHints);
+
+    if (discreteDataHint) {
         const colormapTexture = context.device.createTexture({
             ...textureProps,
             sampler: DISCRETE_TEXTURE_PARAMETERS,
@@ -180,29 +199,10 @@ export function createColormapTexture(
         return colormapTexture;
     }
 
-    const data = getImageData(colormap);
-
     const colormapTexture = context.device.createTexture({
         ...textureProps,
-        data: data,
+        width: colormapSize,
+        data: colormapData,
     });
     return colormapTexture;
-}
-
-export function getColormapDiscreteColors(
-    colormap: ColormapProps,
-    colormapHints: IColormapHints
-): Uint8Array {
-    if (colormapHints.discreteData) {
-        const colormapSize = Math.max(colormapHints.colormapSize, 1);
-        const colormapData = getImageData(
-            colormap,
-            colormapSize,
-            colormapHints.discreteData
-        );
-        return colormapData;
-    }
-
-    const data = getImageData(colormap);
-    return data;
 }

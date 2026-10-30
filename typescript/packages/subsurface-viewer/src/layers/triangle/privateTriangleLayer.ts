@@ -147,6 +147,8 @@ export class PrivateTriangleLayer extends Layer<PrivateTriangleLayerProps> {
                     picking,
                     triangleMeshUniforms,
                     precisionForTests,
+                    // not used by this model, but added to fix warnings while picking
+                    lighting,
                 ],
             }),
             bufferLayout: this.getAttributeManager()!.getBufferLayouts(),

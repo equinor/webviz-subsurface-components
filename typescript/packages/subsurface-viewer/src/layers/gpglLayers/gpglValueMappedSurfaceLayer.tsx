@@ -28,7 +28,7 @@ import { createPropertyData, initPropertyData } from "../utils/deckglTools";
 import {
     type ColormapProps,
     type ColormapSetup,
-    getImageData,
+    getColormapColorArray,
 } from "../utils/colormapTools";
 
 import type {} from "../../utils/Color";
@@ -283,7 +283,7 @@ export class GpglValueMappedSurfaceLayer extends Layer<GpglValueMappedSurfaceLay
 
         return device.createTexture({
             ...textureProps,
-            data: getImageData(this._consolidateColormap(colormap)),
+            data: getColormapColorArray(this._consolidateColormap(colormap)),
         });
     }
 
@@ -462,6 +462,8 @@ export class GpglValueMappedSurfaceLayer extends Layer<GpglValueMappedSurfaceLay
                                 picking,
                                 triangleMeshUniforms,
                                 precisionForTests,
+                                // not used by this model, but added to fix warnings while picking
+                                lighting,
                             ],
                         }),
                         bufferLayout:

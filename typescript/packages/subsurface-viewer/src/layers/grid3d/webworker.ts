@@ -1011,14 +1011,14 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
                 propertyValue != undefined &&
                 isPropertyValueDefined(propertyValue, params.undefinedValue)
             ) {
-                propertyValueRangeMin =
-                    propertyValue < propertyValueRangeMin
-                        ? propertyValue
-                        : propertyValueRangeMin;
-                propertyValueRangeMax =
-                    propertyValue > propertyValueRangeMax
-                        ? propertyValue
-                        : propertyValueRangeMax;
+                propertyValueRangeMin = Math.min(
+                    propertyValue,
+                    propertyValueRangeMin
+                );
+                propertyValueRangeMax = Math.max(
+                    propertyValue,
+                    propertyValueRangeMax
+                );
             } else {
                 propertyValue = Number.NaN;
             }
