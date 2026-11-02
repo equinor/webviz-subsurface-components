@@ -3,7 +3,7 @@ import type {
     TargetAndTransition,
     Variants,
     Transition,
-} from "motion/dist/react";
+} from "motion/react";
 import type { D3TreeNode } from "../types";
 import { findClosestVisibleInNewTree } from "../utils/treePlot";
 

@@ -11,7 +11,7 @@
         "noPropertyAccessFromIndexSignature": true,
         "forceConsistentCasingInFileNames": true,
         "module": "es2022",
-        "moduleResolution": "node10",
+        "moduleResolution": "bundler",
         "allowSyntheticDefaultImports": true,
         "esModuleInterop": true,
         "jsx": "react-jsx",

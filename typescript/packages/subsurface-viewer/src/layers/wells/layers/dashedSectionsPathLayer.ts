@@ -1,5 +1,6 @@
 import type {
     Accessor,
+    DefaultProps,
     GetPickingInfoParams,
     Layer,
     LayerData,
@@ -11,7 +12,6 @@ import type { DataFilterExtensionProps } from "@deck.gl/extensions";
 import { DataFilterExtension, PathStyleExtension } from "@deck.gl/extensions";
 import type { PathLayerProps } from "@deck.gl/layers";
 import { PathLayer } from "@deck.gl/layers";
-import type { PathGeometry } from "@deck.gl/layers/dist/path-layer/path";
 import { interpolateNumber } from "d3-interpolate";
 import type { Position } from "geojson";
 import _ from "lodash";
@@ -39,7 +39,7 @@ export enum SubLayerId {
 type ComputedPathSection = {
     id: string;
     pathType: "dashed" | "normal";
-    path: PathGeometry[];
+    path: Position[];
     properties: Record<string, unknown>;
 };
 
@@ -47,7 +47,7 @@ type _DashedSectionsPathLayerProps<TData = unknown> = {
     getSectionDashArray: Accessor<TData, [number, number]>;
     getPath: Accessor<TData, Position[]>;
     getDashedSectionsAlongPath: Accessor<TData, number[] | number[][]>;
-    getCumulativePathDistance: Accessor<TData, number[]>;
+    getCumulativePathDistance?: Accessor<TData, number[]> | undefined;
 };
 
 export type DashedSectionsPathLayerProps<TData = unknown> = Omit<
@@ -60,7 +60,10 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
     DashedSectionsPathLayerProps<TData>
 > {
     static readonly layerName = "DashedSectionsPathLayer";
-    static readonly defaultProps = {
+    static readonly defaultProps: DefaultProps<
+        Omit<DashedSectionsPathLayerProps, "getPath"> &
+            Pick<PathLayerProps, "getPath">
+    > = {
         ...PathLayer.defaultProps,
         getSectionDashArray: { type: "accessor", value: [5, 5] },
         getDashedSectionsAlongPath: {
@@ -69,11 +72,7 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
             value: (object: any) => object.dashSectionsAlongPath,
         },
 
-        getCumulativePathDistance: {
-            type: "accessor",
-            // If not provided, we manually compute it from the path
-            value: undefined,
-        },
+        getCumulativePathDistance: undefined,
     };
 
     declare state: {
@@ -147,11 +146,13 @@ export class DashedSectionsPathLayer<TData = unknown> extends CompositeLayer<
                 }
 
                 if (cumulativePathDistanceChanged || dataChanged) {
-                    let cumulativeDistance = getFromAccessor(
-                        getCumulativePathDistance,
-                        datum,
-                        itemContext
-                    );
+                    let cumulativeDistance = getCumulativePathDistance
+                        ? getFromAccessor(
+                              getCumulativePathDistance,
+                              datum,
+                              itemContext
+                          )
+                        : undefined;
 
                     if (!cumulativeDistance) {
                         cumulativeDistance = getCumulativeDistance(
