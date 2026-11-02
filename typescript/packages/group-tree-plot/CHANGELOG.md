@@ -1,3 +1,13 @@
+## 2.0.12 (2026-11-02)
+
+### 🩹 Fixes
+
+- modernize typescript settings ([#2894](https://github.com/equinor/webviz-subsurface-components/pull/2894))
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
 ## 2.0.11 (2026-10-26)
 
 This was a version bump only for group-tree-plot to align it with other projects, there were no code changes.

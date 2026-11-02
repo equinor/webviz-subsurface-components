@@ -1,3 +1,17 @@
+## 2.3.10 (2026-11-02)
+
+### 🩹 Fixes
+
+- modernize typescript settings ([#2894](https://github.com/equinor/webviz-subsurface-components/pull/2894))
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 2.0.12
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
 ## 2.3.9 (2026-10-26)
 
 ### 🧱 Updated Dependencies
