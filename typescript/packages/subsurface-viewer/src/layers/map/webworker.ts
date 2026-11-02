@@ -31,20 +31,28 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
     // Local functions.
     type Vec = [number, number, number];
 
-    function getArrayMinMax(
-        data: TypedArray,
-        isDiscrete: boolean = false
-    ): [number, number] {
-        let max = -Infinity;
-        let min = Infinity;
-        for (let i = 0; i < data.length; i++) {
-            if (!isDefined(data[i], isDiscrete)) {
-                continue;
+    function isFloatDefined(x: number): boolean {
+        return !Number.isNaN(x);
+    }
+    function isIntDefined(x: number): boolean {
+        return x !== undefinedPropertyValue;
+    }
+
+    function getArrayMinMaxFunc(
+        isDefined: (x: number) => boolean
+    ): (data: TypedArray) => [number, number] {
+        return (data: TypedArray) => {
+            let max = -Infinity;
+            let min = Infinity;
+            for (const element of data) {
+                if (!isDefined(element)) {
+                    continue;
+                }
+                max = Math.max(element, max);
+                min = Math.min(element, min);
             }
-            max = data[i] > max ? data[i] : max;
-            min = data[i] < min ? data[i] : min;
-        }
-        return min === Infinity ? [0, 0] : [min, max];
+            return min === Infinity ? [0, 0] : [min, max];
+        };
     }
 
     function crossProduct(a: Vec, b: Vec): Vec {
@@ -54,10 +62,6 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
             a[0] * b[1] - a[1] * b[0],
         ];
         return c as Vec;
-    }
-
-    function isDefined(x: number, isDiscrete: boolean = false): boolean {
-        return isDiscrete ? x !== undefinedPropertyValue : !isNaN(x);
     }
 
     function normalize(a: Vec): void {
@@ -94,11 +98,11 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
         const i3 = h * nx + (w + 1);
         const i4 = (h - 1) * nx + w;
 
-        const i0_act = isDefined(meshData[i0]); // eslint-disable-line
-        const i1_act = w - 1 >= 0 && isDefined(meshData[i1]); // eslint-disable-line
-        const i2_act = h + 1 < ny && isDefined(meshData[i2]); // eslint-disable-line
-        const i3_act = w + 1 < nx && isDefined(meshData[i3]); // eslint-disable-line
-        const i4_act = h - 1 >= 0 && isDefined(meshData[i4]); // eslint-disable-line
+        const i0_act = isFloatDefined(meshData[i0]);
+        const i1_act = w - 1 >= 0 && isFloatDefined(meshData[i1]);
+        const i2_act = h + 1 < ny && isFloatDefined(meshData[i2]);
+        const i3_act = w + 1 < nx && isFloatDefined(meshData[i3]);
+        const i4_act = h - 1 >= 0 && isFloatDefined(meshData[i4]);
 
         const noNormal = [0, 0, 0]; // signals a normal could not be calculated.
         if (!i0_act) {
@@ -106,11 +110,11 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
         }
 
         const hh = ny - 1 - h; // Note use hh for h for getting y values.
-        const p0 = [ox + w * dx, oy + hh * dy, i0_act ? meshData[i0] : 0]; // eslint-disable-line
-        const p1 = [ox + (w - 1) * dx, oy + hh * dy, i1_act ? meshData[i1] : 0]; // eslint-disable-line
-        const p2 = [ox + w * dx, oy + (hh + 1) * dy, i2_act ? meshData[i2] : 0]; // eslint-disable-line
-        const p3 = [ox + (w + 1) * dx, oy + hh * dy, i3_act ? meshData[i3] : 0]; // eslint-disable-line
-        const p4 = [ox + w * dx, oy + (hh - 1) * dy, i4_act ? meshData[i4] : 0]; // eslint-disable-line
+        const p0 = [ox + w * dx, oy + hh * dy, i0_act ? meshData[i0] : 0];
+        const p1 = [ox + (w - 1) * dx, oy + hh * dy, i1_act ? meshData[i1] : 0];
+        const p2 = [ox + w * dx, oy + (hh + 1) * dy, i2_act ? meshData[i2] : 0];
+        const p3 = [ox + (w + 1) * dx, oy + hh * dy, i3_act ? meshData[i3] : 0];
+        const p4 = [ox + w * dx, oy + (hh - 1) * dy, i4_act ? meshData[i4] : 0];
 
         const v1 = [p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2]] as Vec;
         const v2 = [p2[0] - p0[0], p2[1] - p0[1], p2[2] - p0[2]] as Vec;
@@ -171,9 +175,16 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
     const isUint16 = propertiesData instanceof Uint16Array;
     const isDiscrete = isUint16;
 
+    const getMeshMinMax = getArrayMinMaxFunc(isFloatDefined);
+    const getPropMinMax = getArrayMinMaxFunc(
+        isDiscrete ? isIntDefined : isFloatDefined
+    );
+
+    // const isPropDefined = isDiscrete ? isIntDefined : isFloatDefined;
+
     // non mesh grids use z = 0 (see below)
-    const meshZValueRange = isMesh ? getArrayMinMax(meshData) : [0, 0];
-    const propertyValueRange = getArrayMinMax(propertiesData, isDiscrete);
+    const meshZValueRange = isMesh ? getMeshMinMax(meshData) : [0, 0];
+    const propertyValueRange = getPropMinMax(propertiesData);
 
     // Dimensions.
     const ox = frame.origin[0];
@@ -222,8 +233,8 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
     }
     const lineIndices = new Uint32Array(nLineIndices);
 
-    // Note: Assumed layout of the incomming 2D array of data:
-    // First coloumn corresponds to lowest x value. Last column highest x value.
+    // Note: Assumed layout of the incoming 2D array of data:
+    // First column corresponds to lowest x value. Last column highest x value.
     // First row corresponds to max y value. Last row corresponds to lowest y value.
     // This must be taken into account when calculating vertex x,y values and texture coordinates.
 
@@ -246,19 +257,8 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
                 positions[3 * i + 2] = z;
 
                 if (smoothShading) {
-                    const normal = calcNormal(
-                        w,
-                        h,
-                        nx,
-                        ny,
-                        isMesh,
-                        smoothShading,
-                        meshData,
-                        ox,
-                        oy,
-                        dx,
-                        dy
-                    ); // eslint-disable-line
+                    /* prettier-ignore */
+                    const normal = calcNormal(w, h, nx, ny, isMesh, smoothShading, meshData, ox, oy, dx, dy);
                     normals[3 * i + 0] = normal[0];
                     normals[3 * i + 1] = normal[1];
                     normals[3 * i + 2] = normal[2];
@@ -279,18 +279,10 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
                 const i2 = (h + 1) * nx + (w + 1);
                 const i3 = (h + 1) * nx + w;
 
-                const i0_act =
-                    !isMesh ||
-                    (isDefined(meshData[i0]) && isDefined(propertiesData[i0])); // eslint-disable-line
-                const i1_act =
-                    !isMesh ||
-                    (isDefined(meshData[i1]) && isDefined(propertiesData[i1])); // eslint-disable-line
-                const i2_act =
-                    !isMesh ||
-                    (isDefined(meshData[i2]) && isDefined(propertiesData[i2])); // eslint-disable-line
-                const i3_act =
-                    !isMesh ||
-                    (isDefined(meshData[i3]) && isDefined(propertiesData[i3])); // eslint-disable-line
+                const i0_act = !isMesh || isFloatDefined(meshData[i0]);
+                const i1_act = !isMesh || isFloatDefined(meshData[i1]);
+                const i2_act = !isMesh || isFloatDefined(meshData[i2]);
+                const i3_act = !isMesh || isFloatDefined(meshData[i3]);
 
                 // Triangles.
                 if (i1_act && i3_act) {
@@ -378,10 +370,10 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
                 const i2 = (h + 1) * nx + (w + 1);
                 const i3 = (h + 1) * nx + w;
 
-                const i0_act = !isMesh || isDefined(meshData[i0]); // eslint-disable-line
-                const i1_act = !isMesh || isDefined(meshData[i1]); // eslint-disable-line
-                const i2_act = !isMesh || isDefined(meshData[i2]); // eslint-disable-line
-                const i3_act = !isMesh || isDefined(meshData[i3]); // eslint-disable-line
+                const i0_act = !isMesh || isFloatDefined(meshData[i0]);
+                const i1_act = !isMesh || isFloatDefined(meshData[i1]);
+                const i2_act = !isMesh || isFloatDefined(meshData[i2]);
+                const i3_act = !isMesh || isFloatDefined(meshData[i3]);
 
                 const x0 = ox + w * dx;
                 const y0 = oy + hh * dy;
@@ -401,11 +393,6 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
 
                 const propertyIndex = h * (nx - 1) + w; // (nx - 1) -> the width of the property 2D array is one less than for the nodes in this case.
                 const propertyValue = propertiesData[propertyIndex];
-
-                if (!isDefined(propertyValue, isDiscrete)) {
-                    // Inactive cell, dont draw.
-                    continue;
-                }
 
                 // Triangles.
                 if (i1_act && i3_act) {

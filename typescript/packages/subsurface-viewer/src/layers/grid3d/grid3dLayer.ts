@@ -96,7 +96,7 @@ async function load_data(
     pointsData: string | number[] | Float32Array,
     polysData: string | number[] | Uint32Array,
     propertiesData: string | number[] | Float32Array | Uint16Array | undefined,
-    loadProperties: boolean
+    coloringMode: TGrid3DColoringMode
 ): Promise<
     [Float32Array, Uint32Array, Float32Array | Uint16Array | undefined]
 > {
@@ -104,7 +104,7 @@ async function load_data(
     const polys = await loadData(polysData, Uint32Array);
 
     const properties =
-        loadProperties && propertiesData
+        !isGeometricProperty(coloringMode) && propertiesData
             ? await loadPropertiesData(propertiesData)
             : undefined;
     return Promise.all([points, polys, properties]);
@@ -273,9 +273,7 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
             this.props.pointsData,
             this.props.polysData,
             this.props.propertiesData,
-            !isGeometricProperty(
-                this.props.coloringMode ?? TGrid3DColoringMode.Property
-            )
+            this.props.coloringMode ?? TGrid3DColoringMode.Property
         );
 
         p.then(([points, polys, properties]) => {
@@ -370,24 +368,27 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
         const enableLighting: boolean = this.props.material !== false;
         const layer = new PrivateGrid3DLayer(
             this.getSubLayerProps({
+                // GL data
                 mesh: this.state["mesh"],
                 meshLines: this.state["mesh_lines"],
-                pickable: this.props.pickable,
+                // Colormap related settings
                 colormapName: this.props.colorMapName,
+                colormapFunction: this.props.colorMapFunction,
                 colormapRange: this.props.colorMapRange,
                 colormapClampColor: this.props.colorMapClampColor,
                 undefinedPropertyValue: undefinedValue,
                 undefinedPropertyColor: undefinedColor,
-                colormapFunction: this.props.colorMapFunction,
                 coloringMode: this.props.coloringMode,
-                gridLines: this.props.gridLines,
                 propertyValueRange: this.getPropertyValueRange(),
                 discretePropertyValueNames:
                     this.props.discretePropertyValueNames,
+                // Material and rendering settings
+                gridLines: this.props.gridLines,
                 material: this.props.material,
-                depthTest: this.props.depthTest,
-                ZIncreasingDownwards: this.props.ZIncreasingDownwards,
                 enableLighting,
+                depthTest: this.props.depthTest,
+                pickable: this.props.pickable,
+                ZIncreasingDownwards: this.props.ZIncreasingDownwards,
             })
         );
         return [layer];

@@ -8,9 +8,16 @@ import {
 } from "../../sharedSettings";
 import { Play } from "../../util/play";
 
+import { getPropsInjectorComponent } from "../../sharedHelperComponents";
+
+const SubsurfaceViewerPropsInjector = getPropsInjectorComponent(
+    getInjectedProps,
+    SubsurfaceViewer
+);
+
 const stories: Meta = {
-    component: SubsurfaceViewer,
-    title: "SubsurfaceViewer / Map Layer / Categorical Maps",
+    component: SubsurfaceViewerPropsInjector,
+    title: "SubsurfaceViewer / Map Layer / Properties",
     tags: ["no-dom-test"],
     args: {
         // Add some common controls for all the stories.
@@ -19,47 +26,89 @@ const stories: Meta = {
 };
 export default stories;
 
+/* prettier-ignore */
+const map_4x5_meshData = [
+    1.6, 1.7, 1.8, 1.9, 
+    1.2, Number.NaN, 1.4, 1.5,
+    0.8, 0.9, 1.0, 1.1,
+    0.4, 0.5, 0.6, 0.7,
+    0.0, 0.1, 0.2, 0.3,
+];
+
+/* prettier-ignore */
+const categoricalColormap = [
+    255,   0,   0,
+      0, 255,   0,
+      0,   0, 255,
+    255, 255,   0,
+      0, 255, 255,
+    255,   0, 255,
+    125,   0,   0,
+      0, 125,   0,
+      0,   0, 125,
+    200, 200,   0,
+      0, 200, 200,
+    200,   0, 200,
+];
+
+const discretePropertyValueNames = [
+    { value: 0, name: "Zero" },
+    { value: 1, name: "One" },
+    { value: 2, name: "Two" },
+    { value: 3, name: "Three" },
+    { value: 4, name: "Four" },
+    { value: 5, name: "Five" },
+    { value: 6, name: "Six" },
+    { value: 7, name: "Seven" },
+    { value: 8, name: "Eight" },
+    { value: 9, name: "Nine" },
+    { value: 123, name: "123" },
+    { value: 11, name: "Eleven" },
+];
+
+// ---------In-place array data handling (storybook fails to rebuild non JSon data)--------------- //
+const categoricalNodeLayerId = "categorical-node-layer";
+const categoricalCellLayerId = "categorical-cell-layer";
+const injectedProps = {
+    [categoricalNodeLayerId]: {
+        colorMapFunction: new Uint8Array(categoricalColormap),
+    },
+    [categoricalCellLayerId]: {
+        colorMapFunction: new Uint8Array(categoricalColormap),
+    },
+};
+
+function getInjectedProps() {
+    return injectedProps;
+}
+
 // This layer has as (nx-1)*(ny-1) property values and depth values are nx*ny
 // hence each cell will have constant color.
 const categoricalPropertiesLayerNodeCenter = {
     "@@type": "MapLayer",
     "@@typedArraySupport": true,
-    id: "categorical-layer",
+    id: categoricalNodeLayerId,
 
-    /*eslint-disable */
     // One depth per node
-    meshData: [
-        1.6, 1.7, 1.8, 1.9, 
-        1.2, undefined, 1.4, 1.5,
-        0.8, 0.9, 1.0, 1.1,
-        0.4, 0.5, 0.6, 0.7,
-        0.0, 0.1, 0.2, 0.3,
-    ],
+    meshData: map_4x5_meshData,
 
     undefinedPropertyValue: 999,
+    undefinedPropertyColor: [200, 40, 40, 200],
 
     // One property per node. Note: will cause a resampling of the mesh
     // to match a property per cell.
-    propertiesData: new Uint16Array([
-        0, 1, 2, 0,
-        1, 2, 0, 1,
-        2, 0, 1, 2,
-        0, 1, 2, 0,
-        1, 2, 0, 1,
-    ]),
-
-    discretePropertyValueNames: [
-        { code: 0, name: "Zero" },
-        { code: 1, name: "One" }, 
-        { code: 2, name: "Two" }, 
+    /* prettier-ignore */
+    propertiesData: [
+        0,  1,  2, 0,
+        3,  4,  5, 999,
+        6,  999,  8, 999,
+        9, 10, 11, 999,
+        999, 999, 999, 999,
     ],
 
-    colorMapFunction: new Uint8Array([
-        255, 0, 0,
-        0, 255, 0,
-        0, 0, 255,
-    ]),
-    /*eslint-enable */
+    discretePropertyValueNames,
+
+    colorMapFunction: "colorMapFunction proxy",
 
     frame: {
         origin: [0, 0],
@@ -76,60 +125,27 @@ const categoricalPropertiesLayerNodeCenter = {
 const categoricalPropertiesLayerCellCenter = {
     "@@type": "MapLayer",
     "@@typedArraySupport": true,
-    id: "categorical-layer",
+    id: categoricalCellLayerId,
 
-    /*eslint-disable */
     // One depth per node
-    meshData: [
-        1.6, 1.7, 1.8, 1.9,
-        1.2, 1.3, 1.4, 1.5,
-        0.8, 0.9, 1.0, 1.1,
-        0.4, 0.5, 0.6, 0.7,
-        0.0, 0.1, 0.2, 0.3,
-    ],
+    meshData: map_4x5_meshData,
 
     undefinedPropertyValue: 999,
+    undefinedPropertyColor: [200, 40, 40, 200],
 
     // One property per cell.
-    propertiesData: new Uint16Array([
+    /* prettier-ignore */
+    propertiesData: [
         0,   1,  2,
-        3, 999,  5,
-        6,   7,  8,
+        3,   4,  5,
+        6, 999,  8,
         9,  10, 11,
-        // 10: code not in discretePropertyValueNames hence will use undefinedPropertyColor.
-      
-    ]),
-
-    discretePropertyValueNames: [
-        { code: 0, name: "Zero" },
-        { code: 1, name: "One" },
-        { code: 2, name: "Two" },
-        { code: 3, name: "Three" },
-        { code: 4, name: "Four" },
-        { code: 5, name: "Five", color: [255, 255, 0] }, // Explicit color overrides the color table and color function.
-        { code: 6, name: "Six" },
-        { code: 7, name: "Seven" },
-        { code: 8, name: "Eight" },
-        { code: 9, name: "Nine" },
-        { code: 123, name: "123" },
-        { code: 11, name: "Eleven" },
+        // 10: value not in discretePropertyValueNames hence will use undefinedPropertyColor.
     ],
+    //colorMapRange: [0, 11],
 
-    colorMapFunction: new Uint8Array([
-        255, 0, 0,
-        0, 255, 0,
-        0, 0, 255,
-        0, 0, 255,
-        0, 255, 0,
-        255, 0, 0,
-        255, 0, 0,
-        0, 255, 0,
-        0, 0, 255,
-        0, 0, 255,
-        0, 255, 0,
-        255, 0, 0,
-    ]),
-    /*eslint-enable */
+    discretePropertyValueNames,
+    colorMapFunction: "colorMapFunction proxy",
 
     frame: {
         origin: [0, 0],
@@ -181,7 +197,7 @@ export const NodeCenterSmallCategoricalPropMap: StoryObj<
         docs: {
             ...defaultStoryParameters.docs,
             description: {
-                story: "Small academic example categorical map.",
+                story: "Small academic example of cell-centered categorical map, with a 4 x 5 mesh.",
             },
         },
     },
@@ -220,7 +236,7 @@ export const CellCenterSmallCategoricalPropMap: StoryObj<
         docs: {
             ...defaultStoryParameters.docs,
             description: {
-                story: "Small academic example categorical map.",
+                story: "Small academic example of cell-centered categorical map, with a 4 x 5 mesh.",
             },
         },
     },
