@@ -1,3 +1,13 @@
+## 2.3.11 (2026-11-02)
+
+### 🩹 Fixes
+
+- map discrete property coloring and readout ([#2890](https://github.com/equinor/webviz-subsurface-components/pull/2890))
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
 ## 2.3.10 (2026-11-02)
 
 ### 🩹 Fixes
