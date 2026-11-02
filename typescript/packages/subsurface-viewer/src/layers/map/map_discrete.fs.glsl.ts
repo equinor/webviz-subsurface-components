@@ -19,10 +19,9 @@ uniform sampler2D colormap;
 // Outputs
 out vec4 fragColor;
 
-// Normalize the value to the range [0, N]; noop since values are expected in [0, N] range.
-// Keep this function to ease continuous/discrete property algo comparisons
+// Normalize the value to the range [0, 1]
 float normalizeValue(uint value) {
-   return float(value);
+   return (float(value) - map.colormapRange[0]) / (map.colormapRange[1] - map.colormapRange[0]);
 }
 
 vec4 valueColor(uint value) {
