@@ -18,6 +18,9 @@ export type {
 } from "./typedArray";
 export { isNumberArray, isTypedArray, toTypedArray } from "./typedArray";
 
+export type { ValueRange } from "./valueRange";
+export { getFiniteValueRange, mergeFiniteValueRanges } from "./valueRange";
+
 export { loadDataArray } from "./serialize";
 
 export type { ViewStateType } from "./camera";

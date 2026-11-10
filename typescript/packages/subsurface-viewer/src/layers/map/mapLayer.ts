@@ -702,7 +702,7 @@ export default class MapLayer<
         return isDiscrete ? 0xffff : Number.NaN;
     }
 
-    private getUndefinedPropertyColor(): Color {
+    private getUndefinedPropertyColor(): Color | undefined {
         const colorFunc = this.props.colorMapFunction;
         if (
             this.props.propertiesData?.length === 0 &&

@@ -117,10 +117,20 @@ function continuousProperty(cellCountU: number, cellCountV: number) {
     const values: number[] = [];
     for (let i = 0; i < cellCountU; i++) {
         for (let j = 0; j < cellCountV; j++) {
-            const value =
-                Math.sin((i / cellCountU) * Math.PI * 2) +
-                Math.cos((j / cellCountV) * Math.PI * 2);
-            values.push(value);
+            const indexU = i * cellCountV + j;
+            const indexV = i + j * cellCountU;
+            if (
+                indexU % (cellCountU + 3) === 0 ||
+                indexV % (cellCountU + 5) === 0
+            ) {
+                // add some undefined values
+                values.push(Number.NaN);
+            } else {
+                const value =
+                    Math.sin((i / cellCountU) * Math.PI * 2) +
+                    Math.cos((j / cellCountV) * Math.PI * 2);
+                values.push(value);
+            }
         }
     }
     return values;
@@ -131,8 +141,14 @@ function discreteProperty(cellCountU: number, cellCountV: number) {
     const max = propertyValueNames.length - 1;
     const values = continuousProperty(cellCountU, cellCountV);
     for (let i = 0; i < values.length; i++) {
+        if (Number.isNaN(values[i])) continue;
         // continuous properties are between -2 and 2, thus they must be divided by 2
         values[i] = Math.round(Math.abs(values[i] / 2) * max);
+        // add some NaN values for testing
+        const off = i % cellCountU;
+        if (off === 0 && (i / cellCountU) % cellCountV === 0) {
+            values[i] = Number.NaN;
+        }
     }
     return values;
 }
@@ -167,7 +183,7 @@ const propertyValueNames = [
     { value:  15,   name: "dark cyan" },    //  8
     { value:  10,   name: "dark red" },     //  9
     { value:   3,   name: "dark magenta" }, // 10
-    { value: -10,   name: "dark yellow" },  // 11
+    { value: -10,   name: "Undef (dark yellow)" },  // 11
     { value: -10,   name: "Lite blue" },    // 12
 ];
 
@@ -248,6 +264,7 @@ const SIMPLE_CONTINUOUS_LAYER = {
     colorMapFunction: "colorMapFunction proxy",
     colorMapClampColor: true,
     colorMapRange: [-2, 2],
+    undefinedPropertyColor: [0, 255, 0, 200],
 };
 
 const SIMPLE_DISCRETE_LAYER = {
@@ -259,6 +276,8 @@ const SIMPLE_DISCRETE_LAYER = {
     colorMapFunction: "colorMapFunction proxy",
     colorMapClampColor: true,
     colorMapRange: [0, 12],
+    undefinedPropertyValue: -10,
+    undefinedPropertyColor: [50, 255, 50, 150],
 };
 
 export const Simgrid: StoryObj<typeof SubsurfaceViewer> = {
@@ -421,7 +440,7 @@ export const PolyhedralCells: StoryObj<typeof SubsurfaceViewer> = {
 
 export const ContinuousProperty: StoryObj<typeof SubsurfaceViewer> = {
     args: {
-        id: "grid-property",
+        id: "grid-continuous-property",
         layers: [
             {
                 ...axes,
@@ -435,7 +454,7 @@ export const ContinuousProperty: StoryObj<typeof SubsurfaceViewer> = {
 
 export const DiscreteProperty: StoryObj<typeof SubsurfaceViewer> = {
     args: {
-        id: "grid-property",
+        id: "grid-discrete-property",
         layers: [
             {
                 ...axes,

@@ -180,7 +180,7 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
         isDiscrete ? isIntDefined : isFloatDefined
     );
 
-    // const isPropDefined = isDiscrete ? isIntDefined : isFloatDefined;
+    const isPropDefined = isDiscrete ? isIntDefined : isFloatDefined;
 
     // non mesh grids use z = 0 (see below)
     const meshZValueRange = isMesh ? getMeshMinMax(meshData) : [0, 0];
@@ -279,10 +279,34 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
                 const i2 = (h + 1) * nx + (w + 1);
                 const i3 = (h + 1) * nx + w;
 
-                const i0_act = !isMesh || isFloatDefined(meshData[i0]);
-                const i1_act = !isMesh || isFloatDefined(meshData[i1]);
-                const i2_act = !isMesh || isFloatDefined(meshData[i2]);
-                const i3_act = !isMesh || isFloatDefined(meshData[i3]);
+                /* Expected behavior:
+                 * Mesh enforced:
+                 * - If all four vertices have valid mesh data, use the full quad.
+                 * - If only i1 and i3 are valid, force diagonal i1-i3 and display relevant triangle(s).
+                 * - If only i0 and i2 are valid, force diagonal i0-i2 and display relevant triangle(s).
+                 * Property driven:
+                 * - If all four vertices have valid properties, use the full quad.
+                 * - If only i1 and i3 have valid properties, force diagonal i1-i3 and display relevant triangle(s).
+                 * - If only i0 and i2 have valid properties, force diagonal i0-i2 and display relevant triangle(s).
+                 *
+                 * Second and third conditions can conflict if mesh and property support differ for the diagonals.
+                 * The solution would be to add point in the middle of the diagonal and split the triangle into 2 smaller ones.
+                 *
+                 * For now, revert to previous working approach and discard the undefined values :/
+                 */
+
+                const i0_act =
+                    !isMesh ||
+                    (isFloatDefined(meshData[i0]) && isPropDefined(propertiesData[i0])); // prettier-ignore
+                const i1_act =
+                    !isMesh ||
+                    (isFloatDefined(meshData[i1]) && isPropDefined(propertiesData[i1])); // prettier-ignore
+                const i2_act =
+                    !isMesh ||
+                    (isFloatDefined(meshData[i2]) && isPropDefined(propertiesData[i2])); // prettier-ignore
+                const i3_act =
+                    !isMesh ||
+                    (isFloatDefined(meshData[i3]) && isPropDefined(propertiesData[i3])); // prettier-ignore
 
                 // Triangles.
                 if (i1_act && i3_act) {
@@ -393,6 +417,11 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
 
                 const propertyIndex = h * (nx - 1) + w; // (nx - 1) -> the width of the property 2D array is one less than for the nodes in this case.
                 const propertyValue = propertiesData[propertyIndex];
+
+                if (!isPropDefined(propertyValue)) {
+                    // Inactive cell, dont draw.
+                    continue;
+                }
 
                 // Triangles.
                 if (i1_act && i3_act) {

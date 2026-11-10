@@ -105,19 +105,19 @@ const map_4x5_meshData = [
 
 /* prettier-ignore */
 const map_4x5_nodeCenter_property = [
-    2.6, 2.7, 2.8, 2.9,
-    2.2, 2.3, 2.4, 2.5,
-    1.8, 1.9,   2, 2.1,
-    1.4, 1.5, 1.6, 1.7,
-      1, 1.1, 1.2, 1.3
+    2.6,        2.7, 2.8, 2.9,
+    2.2, Number.NaN, 2.4, 2.5,
+    1.8,        1.9,   2, 2.1,
+    1.4,        1.5, 1.6, 1.7,
+      1,        1.1, 1.2, 1.3
 ];
 
 /* prettier-ignore */
 const map_4x5_cellCenter_property = [
-    0.9,         1, 1.1,
-    0.6, undefined, 0.8,
-    0.3,       0.4, 0.5,
-    0,         0.1, 0.2,
+    0.9,          1, 1.1,
+    0.6, Number.NaN, 0.8,
+    0.3,        0.4, 0.5,
+    0,          0.1, 0.2,
 ];
 
 const greyColorFunc = (value: number) => [

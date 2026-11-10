@@ -52,16 +52,13 @@ void main(void) {
       normal = normalize(cross(dFdx(position_commonspace.xyz), dFdy(position_commonspace.xyz)));
    }
 
-   float propertyValue = property;
-
-   vec4 color = vColor;   
    // compute color
-   color = valueColor(propertyValue);
+   vec4 color = valueColor(property);
 
    bool is_contours = map.contourReferencePoint != -1.0 && map.contourInterval != -1.0;
    if (is_contours) {
       float val = map.isContoursDepth ? (abs(worldPos.z) - map.contourReferencePoint) / map.contourInterval
-                                  : (propertyValue - map.contourReferencePoint) / map.contourInterval;
+                                  : (property - map.contourReferencePoint) / map.contourInterval;
 
       float f  = fract(val);
       float df = fwidth(val);

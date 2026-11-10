@@ -32,7 +32,8 @@ import {
     getColormapColorArray,
 } from "../utils/colormapTools";
 
-import { type RGBAColor, toNormalizedRGBAColor } from "../../utils";
+import type { RGBAColor } from "../../utils";
+import { toNormalizedRGBAColor } from "../../utils";
 
 import fs from "./map.fs.glsl";
 import vs from "./map.vs.glsl";
@@ -60,7 +61,7 @@ export interface PrivateMapLayerProps extends ExtendedLayerProps {
     colormapRange: [number, number];
     colormapClampColor: Color | undefined | boolean;
     colormapFunction?: ColormapFunctionType;
-    undefinedPropertyColor: Color;
+    undefinedPropertyColor?: Color;
     undefinedPropertyValue: number;
     coloringMode: TMapColoringMode;
     gridLines: boolean;
@@ -77,9 +78,9 @@ const defaultProps = {
     isContoursDepth: true,
     gridLines: false,
     colormapName: "",
-    colormapClampColor: [0, 255, 0, 200], // green color for clamped values
+    colormapClampColor: [0, 255, 0, 200] as RGBAColor, // green color for clamped values
     coloringMode: TMapColoringMode.Property,
-    undefinedPropertyColor: [255, 0, 0, 200], // red color for undefined property values
+    undefinedPropertyColor: [255, 0, 0, 200] as RGBAColor, // red color for undefined property values
     propertyValueRange: [0.0, 1.0],
     meshValueRange: [0.0, 1.0],
     depthTest: true,
@@ -300,7 +301,7 @@ export class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
         const colormap = createColormapTexture(
             colors,
             this.context as DeckGLLayerContext,
-            this.getColoringHints()
+            hints
         );
 
         // MESH MODEL

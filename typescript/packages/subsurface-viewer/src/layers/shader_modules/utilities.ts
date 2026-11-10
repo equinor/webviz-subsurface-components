@@ -1,8 +1,15 @@
 const fs = `//
 
 bool isNanValue(float value) {
+    return isnan(value);
    // isnan() does not work in some systems, , neither does (value == value)
-   return (value < 0.0 || value > 0.0 || value == 0.0) ? false : true;
+   // return (value < 0.0 || value > 0.0 || value == 0.0) ? false : true;
+}
+
+bool isNanValue(uint value) {
+    return isnan(float(value));
+   // isnan() does not work in some systems, , neither does (value == value)
+   // return (value < 0.0 || value > 0.0 || value == 0.0) ? false : true;
 }
 
 const int MAX_INDEX = 256 * 256 * 256 - 1; // 16777215
