@@ -9,4 +9,3 @@ export function decodeValueFromPickingColor(
     const normalizedValue = decodeNormalizedValueWithNaNFromRGB(color);
     return valueRange[0] + normalizedValue * (valueRange[1] - valueRange[0]);
 }
-

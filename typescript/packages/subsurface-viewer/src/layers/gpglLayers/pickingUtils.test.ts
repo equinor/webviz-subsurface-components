@@ -33,4 +33,3 @@ describe("seismic value ranges", () => {
         expect(readout).toBeCloseTo(sampleValue, 5);
     });
 });
-
