@@ -1,3 +1,7 @@
+## 2.0.13 (2026-11-13)
+
+This was a version bump only for wsc-common to align it with other projects, there were no code changes.
+
 ## 2.0.12 (2026-11-02)
 
 This was a version bump only for wsc-common to align it with other projects, there were no code changes.
