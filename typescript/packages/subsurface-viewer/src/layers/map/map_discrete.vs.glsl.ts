@@ -6,7 +6,6 @@ export default `\
 in vec3 positions;
 in uint properties;
 in vec3 normals;
-in vec3 colors;
 in vec3 pickingColors;
 
 // Outputs to fragment shader
@@ -42,7 +41,7 @@ void main(void) {
 
    DECKGL_FILTER_GL_POSITION(gl_Position, geometry);
 
-   vColor = vec4(colors.rgb, layer.opacity);
+   vColor = vec4(1.0, 1.0, 1.0, layer.opacity);
    DECKGL_FILTER_COLOR(vColor, geometry);
 }
 `;

@@ -40,21 +40,19 @@ import type {
     RGBColor,
     TypedFloatArray,
     TypedIntArray,
+    ValueRange,
 } from "../../utils";
 import {
+    getFiniteValueRange,
     isTypedArray,
     loadDataArray,
+    mergeFiniteValueRanges,
     toNormalizedColor,
     toTypedArray,
 } from "../../utils";
 
 import type { ValueArray2D } from "./typeDefs";
-import {
-    decodeValueFromPickingColor,
-    getFiniteValueRange,
-    mergeValueRanges,
-    type ValueRange,
-} from "./valueRange";
+import { decodeValueFromPickingColor } from "./pickingUtils";
 
 import fsShader from "./triangle.fs.glsl";
 import vsShader from "./triangle.vs.glsl";
@@ -309,9 +307,9 @@ export class GpglValueMappedSurfaceLayer extends Layer<GpglValueMappedSurfaceLay
             this.props.colormapSetup?.undefinedValue ?? Number.NaN
         );
         if (dataRange) {
-            const pickRange = mergeValueRanges(
-                this.state["pickRange"] as ValueRange | undefined,
-                dataRange
+            const pickRange = mergeFiniteValueRanges(
+                dataRange,
+                this.state["pickRange"] as ValueRange | undefined
             );
             this.setState({
                 ...this.state,

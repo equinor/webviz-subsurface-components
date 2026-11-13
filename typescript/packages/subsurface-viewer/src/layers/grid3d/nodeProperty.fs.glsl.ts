@@ -14,44 +14,57 @@ out vec4 fragColor;
 
 uniform sampler2D colormap;
 
-vec4 getPropertyColor (float propertyValue) {
-   vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
-   float normalizedValue = (propertyValue - grid.colormapRangeMin) / (grid.colormapRangeMax - grid.colormapRangeMin);
-   if (normalizedValue < 0.0 || normalizedValue > 1.0) {
-      // Out of range. Use clampcolor.
-      if (grid.isClampColor) {
-         color = grid.colormapClampColor;
-         if( color[3] == 0.0 ) {
-            discard;
-         }
+// Normalize the value to the range [0, 1]
+float normalizeValue(float value) {
+   return (value - grid.colormapRange[0]) / (grid.colormapRange[1] - grid.colormapRange[0]);
+}
+
+vec4 valueColor(float value) {
+   if(grid.isColoringDiscrete) {
+      if(isNanValue(value) || round(value) == round(grid.undefinedValue)) {
+         return grid.undefinedColor;
       }
-      else {
-         // Use min/max color to clamp.
-         normalizedValue = clamp (normalizedValue, 0.0, 1.0);         
-         color = texture(colormap, vec2(normalizedValue, 0.5));
+   } else {
+      if(isNanValue(value) || value == grid.undefinedValue) {
+         return grid.undefinedColor;
       }
    }
-   else {
-      color = texture(colormap, vec2(normalizedValue, 0.5));
+   float normalizedValue = normalizeValue(value);
+   if(grid.useClampColor) {
+      if(normalizedValue < 0.0 || normalizedValue > 1.0) {
+         // Out of range. Use clampcolor.
+         return grid.colormapClampColor;
+      }
    }
-   return color;
+   // apply colormap
+   return texture(colormap, vec2(normalizedValue, 0.5));
 }
 
 
 void main(void) {
-   if (picking.isActive > 0.5 && !(picking.isAttribute > 0.5)) {
-      fragColor = encodeIndexToRGB(vertexIndex);      
-      return;
+
+   // compute color
+   vec4 color = valueColor(property);
+   if( color[3] == 0.0 ) {
+      discard;
    }
-
-   // This may happen due to GPU interpolation precision causing color artifacts.
-   float propertyValue = clamp(property, grid.valueRangeMin, grid.valueRangeMax);
-
-   vec4 color = getPropertyColor(propertyValue);
 
    // Use two sided phong lighting. This has no effect if "material" property is not set.
    vec3 lightColor = lighting_getLightColor(color.rgb, cameraPosition, position_commonspace.xyz, normal);
-   fragColor = vec4(lightColor, vColor.a);
+
+   fragColor = vec4(lightColor, color.a * vColor.a);
    DECKGL_FILTER_COLOR(fragColor, geometry);
+
+   // Below code is modified version of "picking_filterPickingColor" function.
+   // Original function is in deckgl's shader modules/picking.glsl.ts
+   // "GetPickingInfo" retrieves this color as "pickingColor" on the JS side.
+   // Encodes vertexIndex and is used to retrieve picked info from input data.
+   if ( bool(picking.isActive) && !bool(picking.isAttribute) ) {
+      if (picking_vRGBcolor_Avalid.a == 0.0) {
+          discard;
+      }
+      vec4 encodedIndexColor = encodeIndexToRGB(vertexIndex);
+      fragColor = vec4(encodedIndexColor.rgb, picking_vRGBcolor_Avalid.a);
+   }
 }
 `;
