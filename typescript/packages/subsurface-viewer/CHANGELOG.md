@@ -1,3 +1,13 @@
+## 2.3.12 (2026-11-13)
+
+### 🩹 Fixes
+
+- map graphics not able to handle undef values ([#2897](https://github.com/equinor/webviz-subsurface-components/pull/2897))
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
 ## 2.3.11 (2026-11-02)
 
 ### 🩹 Fixes
