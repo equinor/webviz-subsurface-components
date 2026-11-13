@@ -20,8 +20,14 @@ float normalizeValue(float value) {
 }
 
 vec4 valueColor(float value) {
-   if(isNanValue(value) || value == grid.undefinedValue) {
-      return grid.undefinedColor;
+   if(grid.isColoringDiscrete) {
+      if(isNanValue(value) || round(value) == round(grid.undefinedValue)) {
+         return grid.undefinedColor;
+      }
+   } else {
+      if(isNanValue(value) || value == grid.undefinedValue) {
+         return grid.undefinedColor;
+      }
    }
    float normalizedValue = normalizeValue(value);
    if(grid.useClampColor) {

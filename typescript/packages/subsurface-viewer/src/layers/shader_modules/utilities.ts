@@ -2,14 +2,15 @@ const fs = `//
 
 bool isNanValue(float value) {
     return isnan(value);
-   // isnan() does not work in some systems, , neither does (value == value)
-   // return (value < 0.0 || value > 0.0 || value == 0.0) ? false : true;
+    // This is a tricky problem, because no spec enforces consistent behavior for NaN checks across all systems.
+    // - isnan() caused issues on some systems, following as well (value == value)
+    // - return (value < 0.0 || value > 0.0 || value == 0.0) ? false : true;
+    //   worked for some time, but suddenly failed on some dev systems.
+    // Therefore, we rely on isnan() again, despite its potential issues.
 }
 
 bool isNanValue(uint value) {
-    return isnan(float(value));
-   // isnan() does not work in some systems, , neither does (value == value)
-   // return (value < 0.0 || value > 0.0 || value == 0.0) ? false : true;
+    return isNanValue(float(value));
 }
 
 const int MAX_INDEX = 256 * 256 * 256 - 1; // 16777215

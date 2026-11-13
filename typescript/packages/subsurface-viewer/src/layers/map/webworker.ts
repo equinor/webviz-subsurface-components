@@ -12,7 +12,22 @@ export type WebWorkerParams = [
 ];
 
 /** Given the input data will build and return the attributes (vertices and indices for triangles and lines)
- * that is used by WebGl. Using indice, lines and triangles share common vertices to save memory.
+ * that is used by WebGl. Using indices, lines and triangles share common vertices to save memory.
+ *
+ * Parameters:
+ *   e - An object containing the input data as a property `data` which is an array of WebWorkerParams.
+ *       The array elements correspond to:
+ *         0: meshData - Float32Array or null
+ *         1: propertiesData - Float32Array, Uint16Array, null, or undefined
+ *         2: isMesh - boolean indicating if explicit mesh data is provided
+ *            A value of true indicates that explicit mesh data is provided (ie. Z coordinate stored in meshData);
+ *            NaN values in the mesh data indicate 'dead' vertices.
+ *            If false, the mesh data is a plain flat surface without explicit Z coordinates, which does not
+ *            have any 'dead' vertices.
+ *         3: frame - MapFrame object
+ *         4: smoothShading - boolean indicating if smooth shading is enabled
+ *         5: gridLines - boolean indicating if grid lines are enabled
+ *         6: undefinedPropertyValue - number representing the undefined property value
  */
 export function makeFullMesh(e: { data: WebWorkerParams }) {
     const [
@@ -295,18 +310,15 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
                  * For now, revert to previous working approach and discard the undefined values :/
                  */
 
+                // !isMesh indicates no 'dead' vertices, meaning all vertices are considered valid.
                 const i0_act =
-                    !isMesh ||
-                    (isFloatDefined(meshData[i0]) && isPropDefined(propertiesData[i0])); // prettier-ignore
+                    (!isMesh || isFloatDefined(meshData[i0])) && isPropDefined(propertiesData[i0]); // prettier-ignore
                 const i1_act =
-                    !isMesh ||
-                    (isFloatDefined(meshData[i1]) && isPropDefined(propertiesData[i1])); // prettier-ignore
+                    (!isMesh || isFloatDefined(meshData[i1])) && isPropDefined(propertiesData[i1]); // prettier-ignore
                 const i2_act =
-                    !isMesh ||
-                    (isFloatDefined(meshData[i2]) && isPropDefined(propertiesData[i2])); // prettier-ignore
+                    (!isMesh || isFloatDefined(meshData[i2])) && isPropDefined(propertiesData[i2]); // prettier-ignore
                 const i3_act =
-                    !isMesh ||
-                    (isFloatDefined(meshData[i3]) && isPropDefined(propertiesData[i3])); // prettier-ignore
+                    (!isMesh || isFloatDefined(meshData[i3])) && isPropDefined(propertiesData[i3]); // prettier-ignore
 
                 // Triangles.
                 if (i1_act && i3_act) {
@@ -394,6 +406,7 @@ export function makeFullMesh(e: { data: WebWorkerParams }) {
                 const i2 = (h + 1) * nx + (w + 1);
                 const i3 = (h + 1) * nx + w;
 
+                // !isMesh indicates no 'dead' vertices, meaning all vertices are considered valid.
                 const i0_act = !isMesh || isFloatDefined(meshData[i0]);
                 const i1_act = !isMesh || isFloatDefined(meshData[i1]);
                 const i2_act = !isMesh || isFloatDefined(meshData[i2]);

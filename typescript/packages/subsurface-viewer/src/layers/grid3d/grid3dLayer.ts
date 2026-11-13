@@ -178,7 +178,7 @@ export interface Grid3DLayerProps extends ExtendedLayerProps {
     colorMapRange?: [number, number];
 
     /** Clamp colormap to this color at ends.
-     *   Given as array of three values (r,g,b) e.g: [255, 0, 0]
+     *   Given as array of three  (r,g,b)or four values (r,g,b, a) e.g: [255, 0, 0] or [255, 0, 0, 255].
      *   If not set or set to true, it will clamp to color map min and max values.
      *   If set to false the clamp color will be completely transparent.
      */
@@ -206,7 +206,7 @@ export interface Grid3DLayerProps extends ExtendedLayerProps {
     /**
      * Color for the cells with undefined property value.
      * Is not overridden by and used prior to colorMapFunction.
-     * By default, Light gray if not provided.
+     * By default, slightly transparent red if not provided.
      */
     undefinedPropertyColor?: Color;
 
