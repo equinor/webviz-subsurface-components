@@ -28,7 +28,7 @@ import {
 } from "../utils/colormapTools";
 
 import type { Color, RGBAColor, RGBColor } from "../../utils/Color";
-import { toNormalizedRGBAColor, toNormalizedRGBColor } from "../../utils/Color";
+import { toNormalizedRGBAColor } from "../../utils/Color";
 
 import linearFragmentShader from "./nodeProperty.fs.glsl";
 import linearVertexShader from "./nodeProperty.vs.glsl";
@@ -54,7 +54,7 @@ export interface PrivateLayerProps extends ExtendedLayerProps {
     colormapClampColor: Color | undefined | boolean;
     colormapFunction?: ColormapFunctionType;
     undefinedPropertyValue: number;
-    undefinedPropertyColor: RGBColor;
+    undefinedPropertyColor?: Color;
     coloringMode: TGrid3DColoringMode;
     gridLines: boolean;
     propertyValueRange: [number, number];
@@ -66,7 +66,8 @@ export interface PrivateLayerProps extends ExtendedLayerProps {
 
 const defaultProps = {
     colormapName: "",
-    colormapClampColor: [200, 200, 200],
+    colormapClampColor: [0, 255, 0, 200] as RGBAColor,
+    undefinedPropertyColor: [255, 0, 0, 200] as RGBAColor, // red color for undefined property values
     coloringMode: TGrid3DColoringMode.Property,
     coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
     propertyValueRange: [0.0, 1.0],
@@ -74,20 +75,6 @@ const defaultProps = {
     ZIncreasingDownwards: true,
     enableLighting: true,
 };
-
-interface IUniforms {
-    ZIncreasingDownwards: boolean;
-    valueRangeMin: number;
-    valueRangeMax: number;
-    colormapRangeMin: number;
-    colormapRangeMax: number;
-    colormapClampColor: number[];
-    isClampColor: boolean;
-    coloringMode: TGrid3DColoringMode;
-    undefinedPropertyColor: RGBColor;
-    isColoringDiscrete: boolean;
-    colormapSize: number;
-}
 
 interface IColormapTextureHints {
     discreteData: boolean;
@@ -205,7 +192,7 @@ export class PrivateGrid3DLayer extends Layer<PrivateLayerProps> {
                 modules: [
                     project32,
                     picking,
-                    gridUniforms,
+                    gridLinesUniforms,
                     precisionForTests,
                     // not used by this model, but added to fix warnings while picking
                     lighting,
@@ -286,7 +273,7 @@ export class PrivateGrid3DLayer extends Layer<PrivateLayerProps> {
 
         const properties = this.props.mesh.attributes.properties?.value;
         const propertyValue = properties?.[vertexIndex];
-        if (propertyValue != undefined && Number.isFinite(propertyValue)) {
+        if (propertyValue != undefined) {
             const propertyText = this.getPropertyText(propertyValue);
             if (propertyText) {
                 layer_properties.push(
@@ -311,20 +298,38 @@ export class PrivateGrid3DLayer extends Layer<PrivateLayerProps> {
     private getPropertyText(
         index: number
     ): { text: string | number; value: number } | undefined {
-        if (!this.props.discretePropertyValueNames) {
-            return undefined;
-        }
         if (
+            !this.props.discretePropertyValueNames ||
             index < 0 ||
             index >= this.props.discretePropertyValueNames.length
         ) {
             return undefined;
         }
+        if (Number.isNaN(index)) {
+            return {
+                text: "NaN",
+                value: Number.NaN,
+            };
+        }
+
         const valueName = this.props.discretePropertyValueNames[index];
         return {
             text: valueName.name,
             value: valueName.value,
         };
+    }
+
+    private getUndefinedValue(): number {
+        if (
+            Number.isNaN(this.props.undefinedPropertyValue) ||
+            !this.props.discretePropertyValueNames
+        ) {
+            return Number.NaN;
+        }
+        const index = this.props.discretePropertyValueNames.findIndex(
+            (v) => v.value === this.props.undefinedPropertyValue
+        );
+        return index < 0 ? Number.NaN : index;
     }
 
     private getColoringHints(): IColormapTextureHints {
@@ -359,14 +364,14 @@ export class PrivateGrid3DLayer extends Layer<PrivateLayerProps> {
         };
     }
 
-    private getUniforms(): IUniforms {
-        const valueRangeMin = this.props.propertyValueRange?.[0] ?? 0;
-        const valueRangeMax = this.props.propertyValueRange?.[1] ?? 1;
+    private getUniforms(): GridUniformsType {
+        const valueRange: [number, number] = this.props.propertyValueRange ?? [
+            0, 1,
+        ];
 
-        // If specified color map will extend from colormapRangeMin to colormapRangeMax.
-        // Otherwise it will extend from valueRangeMin to valueRangeMax.
-        const colormapRangeMin = this.props.colormapRange?.[0] ?? valueRangeMin;
-        const colormapRangeMax = this.props.colormapRange?.[1] ?? valueRangeMax;
+        // If specified color map will extend within colormapRange.
+        // Otherwise it will extend within valueRange.
+        const colormapRange = this.props.colormapRange ?? valueRange;
 
         const isColormapClampColorTransparent: boolean =
             (this.props.colormapClampColor as boolean) === false;
@@ -376,33 +381,33 @@ export class PrivateGrid3DLayer extends Layer<PrivateLayerProps> {
             this.props.colormapClampColor !== false;
 
         // Normalize to [0,1] range.
-        const colormapClampColorUniform: RGBAColor = hasClampColor
+        const colormapClampColor: RGBAColor = hasClampColor
             ? toNormalizedRGBAColor(this.props.colormapClampColor as Color)
             : [0, 0, 0, 1];
         if (isColormapClampColorTransparent) {
-            colormapClampColorUniform[3] = 0;
+            colormapClampColor[3] = 0;
         }
 
-        const isClampColor = hasClampColor || isColormapClampColorTransparent;
+        const useClampColor = hasClampColor || isColormapClampColorTransparent;
 
-        const undefinedPropertyColorUniform = toNormalizedRGBColor(
-            this.props.undefinedPropertyColor
-        ) as [number, number, number];
+        const undefinedColor = toNormalizedRGBAColor(
+            this.props.undefinedPropertyColor ??
+                defaultProps.undefinedPropertyColor
+        );
 
         const coloringHints = this.getColoringHints();
 
         return {
-            ZIncreasingDownwards: this.props.ZIncreasingDownwards,
-            valueRangeMin,
-            valueRangeMax,
-            colormapRangeMin: colormapRangeMin,
-            colormapRangeMax: colormapRangeMax,
-            colormapClampColor: colormapClampColorUniform,
-            isClampColor,
             coloringMode: this.props.coloringMode,
-            undefinedPropertyColor: undefinedPropertyColorUniform,
             isColoringDiscrete: coloringHints.discreteData,
             colormapSize: coloringHints.colormapSize,
+            valueRange,
+            colormapRange,
+            colormapClampColor,
+            useClampColor,
+            undefinedValue: this.getUndefinedValue(),
+            undefinedColor,
+            ZIncreasingDownwards: this.props.ZIncreasingDownwards,
         };
     }
 }
@@ -413,32 +418,34 @@ PrivateGrid3DLayer.defaultProps = defaultProps;
 // local shader module for the uniforms
 const gridUniformsBlock = /*glsl*/ `\
 uniform gridUniforms {
-    bool ZIncreasingDownwards;
-    float valueRangeMin;
-    float valueRangeMax;
-    float colormapRangeMin;
-    float colormapRangeMax;
-    vec4 colormapClampColor;
-    bool isClampColor;
-    float coloringMode;
-    vec3 undefinedPropertyColor;
+    uint coloringMode;
     bool isColoringDiscrete;
     float colormapSize;
+
+    vec2 valueRange;
+    vec2 colormapRange;
+
+    vec4 colormapClampColor;
+    bool useClampColor;
+    
+    float undefinedValue;
+    vec4 undefinedColor;
+
+    bool ZIncreasingDownwards;
 } grid;
 `;
 
 type GridUniformsType = {
-    ZIncreasingDownwards: boolean;
-    valueRangeMin: number;
-    valueRangeMax: number;
-    colormapRangeMin: number;
-    colormapRangeMax: number;
-    colormapClampColor: RGBAColor;
-    isClampColor: boolean;
     coloringMode: TGrid3DColoringMode;
-    undefinedPropertyColor: RGBColor;
     isColoringDiscrete: boolean;
     colormapSize: number;
+    valueRange: [number, number];
+    colormapRange: [number, number];
+    colormapClampColor: RGBAColor;
+    useClampColor: boolean;
+    undefinedValue: number;
+    undefinedColor: RGBAColor;
+    ZIncreasingDownwards: boolean;
 };
 
 const gridUniforms = {
@@ -446,16 +453,35 @@ const gridUniforms = {
     vs: gridUniformsBlock,
     fs: gridUniformsBlock,
     uniformTypes: {
-        ZIncreasingDownwards: "u32",
-        valueRangeMin: "f32",
-        valueRangeMax: "f32",
-        colormapRangeMin: "f32",
-        colormapRangeMax: "f32",
-        colormapClampColor: "vec4<f32>",
-        isClampColor: "u32",
-        coloringMode: "f32",
-        undefinedPropertyColor: "vec3<f32>",
+        coloringMode: "u32",
         isColoringDiscrete: "u32",
         colormapSize: "f32",
+        valueRange: "vec2<f32>",
+        colormapRange: "vec2<f32>",
+        colormapClampColor: "vec4<f32>",
+        useClampColor: "u32",
+        undefinedValue: "f32",
+        undefinedColor: "vec4<f32>",
+        ZIncreasingDownwards: "u32",
     },
 } as const satisfies ShaderModule<LayerProps, GridUniformsType>;
+
+// local shader module for the uniforms
+const gridLinesUniformsBlock = /*glsl*/ `\
+uniform gridUniforms {
+    bool ZIncreasingDownwards;
+} grid;
+`;
+
+type GridLinesUniformsType = {
+    ZIncreasingDownwards: boolean;
+};
+
+const gridLinesUniforms = {
+    name: "grid",
+    vs: gridLinesUniformsBlock,
+    fs: gridLinesUniformsBlock,
+    uniformTypes: {
+        ZIncreasingDownwards: "u32",
+    },
+} as const satisfies ShaderModule<LayerProps, GridLinesUniformsType>;

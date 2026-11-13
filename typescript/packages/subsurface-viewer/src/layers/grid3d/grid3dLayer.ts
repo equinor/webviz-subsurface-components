@@ -21,7 +21,7 @@ import type { ColormapFunctionType } from "../utils/colormapTools";
 
 import config from "../../SubsurfaceConfig.json";
 
-import type { BoundingBox3D, Color, RGBColor, TConstructor } from "../../utils";
+import type { BoundingBox3D, Color, TConstructor } from "../../utils";
 import { findConfig, loadDataArray } from "../../utils";
 
 // init workerpool
@@ -178,7 +178,7 @@ export interface Grid3DLayerProps extends ExtendedLayerProps {
     colorMapRange?: [number, number];
 
     /** Clamp colormap to this color at ends.
-     *   Given as array of three values (r,g,b) e.g: [255, 0, 0]
+     *   Given as array of three  (r,g,b)or four values (r,g,b, a) e.g: [255, 0, 0] or [255, 0, 0, 255].
      *   If not set or set to true, it will clamp to color map min and max values.
      *   If set to false the clamp color will be completely transparent.
      */
@@ -206,9 +206,9 @@ export interface Grid3DLayerProps extends ExtendedLayerProps {
     /**
      * Color for the cells with undefined property value.
      * Is not overridden by and used prior to colorMapFunction.
-     * By default, Light gray if not provided.
+     * By default, slightly transparent red if not provided.
      */
-    undefinedPropertyColor?: RGBColor;
+    undefinedPropertyColor?: Color;
 
     /** Enable lines around cell faces.
      *  default: true.
@@ -422,7 +422,7 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
         return Number.NaN;
     }
 
-    private getUndefinedPropertyColor(): RGBColor {
+    private getUndefinedPropertyColor(): Color | undefined {
         const colorFunc = this.props.colorMapFunction;
         if (
             this.props.propertiesData?.length === 0 &&
@@ -430,7 +430,7 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
         ) {
             return [colorFunc[0], colorFunc[1], colorFunc[2]];
         }
-        return this.props.undefinedPropertyColor ?? [204, 204, 204];
+        return this.props.undefinedPropertyColor;
     }
 
     private isColormapFunctionConstantColor(
