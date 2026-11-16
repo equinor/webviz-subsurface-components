@@ -13,16 +13,21 @@ in vec4 vColor;
 
 out vec4 fragColor;
 
+// Note about the use of isNanValue(value + triangles.pickRange[0])
+// During development, isNanValue(value) fails to recognize NaN values correctly.
+// Adding triangles.pickRange[0] helps to work around this issue, probably by forcing the GPU to perform
+// an arithmetic operation that reveals the NaN correctly.
+
 // Normalize the value to the range [0, 1]
 float normalizeValue(float value) {
-   if(isNanValue(value)) {
+   if(isNanValue(value + triangles.pickRange[0])) {
       return value;
    }
    return (value - triangles.colormapRange[0]) / (triangles.colormapRange[1] - triangles.colormapRange[0]);
 }
 
 float normalizePickValue(float value) {
-   if(isNanValue(value)) {
+   if(isNanValue(value + triangles.pickRange[0])) {
       return value;
    }
    float range = triangles.pickRange[1] - triangles.pickRange[0];
@@ -30,7 +35,7 @@ float normalizePickValue(float value) {
 }
    
 vec4 valueColor(float value) {
-   if(isNanValue(value) || value == triangles.undefinedValue) {
+   if(isNanValue(value + triangles.pickRange[0]) || value == triangles.undefinedValue) {
       return triangles.undefinedColor;
    }
    if(triangles.useClampColors) {
