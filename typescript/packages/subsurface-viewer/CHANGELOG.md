@@ -1,3 +1,13 @@
+## 2.3.14 (2026-11-16)
+
+### 🩹 Fixes
+
+- seimics layer fails to display NaN values with undefined color ([#2905](https://github.com/equinor/webviz-subsurface-components/pull/2905))
+
+### ❤️ Thank You
+
+- t0oF @w1nklr
+
 ## 2.3.13 (2026-11-13)
 
 ### 🧱 Updated Dependencies
