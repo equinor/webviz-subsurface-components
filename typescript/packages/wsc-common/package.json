@@ -33,7 +33,7 @@
     "ajv": "^8.18.0"
   },
   "peerDependencies": {
-    "@deck.gl/core": "~9.3.2",
+    "@deck.gl/core": "~9.4.1",
     "@mui/icons-material": "^5.11 || ^6 || ^7.3",
     "react": "^18 || ^19",
     "react-dom": "^18 || ^19"
