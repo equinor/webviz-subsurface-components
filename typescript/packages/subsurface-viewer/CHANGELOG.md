@@ -1,3 +1,13 @@
+## 2.3.15 (2026-11-18)
+
+### 🩹 Fixes
+
+- discrete undefined value overrides value with corresponding code ([#2908](https://github.com/equinor/webviz-subsurface-components/pull/2908))
+
+### ❤️ Thank You
+
+- tof.winkler @w1nklr
+
 ## 2.3.14 (2026-11-16)
 
 ### 🩹 Fixes
