@@ -125,38 +125,6 @@ export class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
         attribute.value = arr;
     }
 
-    private getColoringHints(): IColormapHints {
-        if (this.props.colormapFunction instanceof Uint8Array) {
-            return {
-                discreteData: true,
-                colormapSize: Math.max(
-                    this.props.colormapFunction.length / 3,
-                    1
-                ),
-            };
-        }
-        if (isDiscreteProperty(this.props.coloringMode)) {
-            // It is expected that the property values are integers ranging from 0 to N.
-            // Thus this.props.propertyValueRange?.[0] should be 0
-            // and this.props.propertyValueRange?.[1] should be N
-            const maxPropertyValue = Number.isFinite(
-                this.props.propertyValueRange[1]
-            )
-                ? Math.round(this.props.propertyValueRange[1]) + 1
-                : 0;
-            const namedPropertyCount =
-                this.props.discretePropertyValueNames?.length ?? 0;
-            return {
-                discreteData: true,
-                colormapSize: Math.max(maxPropertyValue, namedPropertyCount),
-            };
-        }
-        return {
-            discreteData: false,
-            colormapSize: 256,
-        };
-    }
-
     initializeState(context: DeckGLLayerContext): void {
         const gl = context.device;
         const [mesh_model, mesh_lines_model] = this._getModels(gl);
@@ -567,6 +535,38 @@ export class PrivateMapLayer extends Layer<PrivateMapLayerProps> {
         return {
             text: valueName.name,
             value: valueName.value,
+        };
+    }
+
+    private getColoringHints(): IColormapHints {
+        if (this.props.colormapFunction instanceof Uint8Array) {
+            return {
+                discreteData: true,
+                colormapSize: Math.max(
+                    this.props.colormapFunction.length / 3,
+                    1
+                ),
+            };
+        }
+        if (isDiscreteProperty(this.props.coloringMode)) {
+            // It is expected that the property values are integers ranging from 0 to N.
+            // Thus this.props.propertyValueRange?.[0] should be 0
+            // and this.props.propertyValueRange?.[1] should be N
+            const maxPropertyValue = Number.isFinite(
+                this.props.propertyValueRange[1]
+            )
+                ? Math.round(this.props.propertyValueRange[1]) + 1
+                : 0;
+            const namedPropertyCount =
+                this.props.discretePropertyValueNames?.length ?? 0;
+            return {
+                discreteData: true,
+                colormapSize: Math.max(maxPropertyValue, namedPropertyCount),
+            };
+        }
+        return {
+            discreteData: false,
+            colormapSize: 256,
         };
     }
 }

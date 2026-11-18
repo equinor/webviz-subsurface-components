@@ -172,10 +172,10 @@ const CATEGORICAL_COLOR_TABLE: RGBColor[] = [
 
 /* prettier-ignore */
 const propertyValueNames = [
-    { value:   6,   name: "red" },          //  3
+    { value:   6,   name: "blue" },         //  0
     { value:   2,   name: "green" },        //  1
-    { value:   5,   name: "cyan" },         //  2
-    { value:   1,   name: "blue" },         //  0
+    { value:   4,   name: "cyan" },         //  2
+    { value:   1,   name: "red" },          //  3
     { value:  -8,   name: "magenta" },      //  4
     { value:   9,   name: "yellow" },       //  5
     { value:  20,   name: "dark blue" },    //  6
@@ -183,7 +183,7 @@ const propertyValueNames = [
     { value:  15,   name: "dark cyan" },    //  8
     { value:  10,   name: "dark red" },     //  9
     { value:   3,   name: "dark magenta" }, // 10
-    { value: -10,   name: "Undef (dark yellow)" },  // 11
+    { value:  13,   name: "dark yellow" },  // 11
     { value: -10,   name: "Lite blue" },    // 12
 ];
 
@@ -276,7 +276,7 @@ const SIMPLE_DISCRETE_LAYER = {
     colorMapFunction: "colorMapFunction proxy",
     colorMapClampColor: true,
     colorMapRange: [0, 12],
-    undefinedPropertyValue: -10,
+    undefinedPropertyValue: 13,
     undefinedPropertyColor: [50, 255, 50, 150],
 };
 
