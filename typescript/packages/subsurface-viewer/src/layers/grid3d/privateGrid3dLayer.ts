@@ -319,19 +319,6 @@ export class PrivateGrid3DLayer extends Layer<PrivateLayerProps> {
         };
     }
 
-    private getUndefinedValue(): number {
-        if (
-            Number.isNaN(this.props.undefinedPropertyValue) ||
-            !this.props.discretePropertyValueNames
-        ) {
-            return Number.NaN;
-        }
-        const index = this.props.discretePropertyValueNames.findIndex(
-            (v) => v.value === this.props.undefinedPropertyValue
-        );
-        return index < 0 ? Number.NaN : index;
-    }
-
     private getColoringHints(): IColormapTextureHints {
         if (this.props.colormapFunction instanceof Uint8Array) {
             return {
@@ -405,7 +392,7 @@ export class PrivateGrid3DLayer extends Layer<PrivateLayerProps> {
             colormapRange,
             colormapClampColor,
             useClampColor,
-            undefinedValue: this.getUndefinedValue(),
+            undefinedValue: this.props.undefinedPropertyValue,
             undefinedColor,
             ZIncreasingDownwards: this.props.ZIncreasingDownwards,
         };
