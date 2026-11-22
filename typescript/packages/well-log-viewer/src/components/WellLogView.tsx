@@ -44,7 +44,7 @@ import {
     removeViewTrack,
 } from "../utils/log-viewer";
 import type { OpenRange, Range } from "../utils/arrayTypes";
-import { isEqualRanges } from "../utils/arrays";
+import { isEqDomains, isEqualRanges } from "../utils/arrays";
 import type { Pattern, PatternsTable } from "../utils/pattern";
 import type { ExtPlotOptions } from "../utils/plots";
 import { getPlotType } from "../utils/plots";
@@ -84,6 +84,8 @@ import type {
 
 const rubberBandSize = 9;
 const rubberBandOffset = rubberBandSize / 2;
+// d3-zoom animates double-click zoom for 550 ms
+const DBLCLICK_ZOOM_MS = 600;
 
 function showSelection(
     rbelm: HTMLElement,
@@ -1017,6 +1019,7 @@ export interface WellLogController {
     setContentScale(value: number): void;
     getContentScale(): number;
     setControllerDefaultZoom(): void;
+    isUserZoomed(): boolean; // true while the user zoom is kept over default zoom changes
 
     scrollTrackTo(pos: number): void;
     scrollTrackBy(delta: number): void;
@@ -1394,6 +1397,10 @@ class WellLogView
     selPersistent: boolean | undefined;
 
     isDefZoom: boolean;
+    // Zoom set by the user; kept through data and domain updates
+    userZoomDomain: Range | undefined;
+    // Visible domain when a user gesture started; undefined outside gestures
+    gestureStartDomain: Range | undefined;
 
     template: Template;
 
@@ -1413,6 +1420,11 @@ class WellLogView
         this.selPersistent = undefined;
 
         this.isDefZoom = false;
+        this.userZoomDomain = undefined;
+        this.gestureStartDomain = undefined;
+
+        this.onUserGestureStart = this.onUserGestureStart.bind(this);
+        this.onUserGestureEnd = this.onUserGestureEnd.bind(this);
 
         this.resizeObserver = new ResizeObserver(
             (entries: ResizeObserverEntry[]): void => {
@@ -1486,10 +1498,66 @@ class WellLogView
             this.createLogViewer();
             this.setTracks(true);
         }
+
+        this.container?.addEventListener(
+            "pointerdown",
+            this.onUserGestureStart,
+            true
+        );
+        this.container?.addEventListener(
+            "wheel",
+            this.onUserGestureStart,
+            true
+        );
+        this.container?.addEventListener(
+            "dblclick",
+            this.onUserGestureStart,
+            true
+        );
+        window.addEventListener("pointerup", this.onUserGestureEnd);
+        window.addEventListener("pointercancel", this.onUserGestureEnd);
     }
 
     componentWillUnmount(): void {
         this._isMount = false;
+
+        this.container?.removeEventListener(
+            "pointerdown",
+            this.onUserGestureStart,
+            true
+        );
+        this.container?.removeEventListener(
+            "wheel",
+            this.onUserGestureStart,
+            true
+        );
+        this.container?.removeEventListener(
+            "dblclick",
+            this.onUserGestureStart,
+            true
+        );
+        window.removeEventListener("pointerup", this.onUserGestureEnd);
+        window.removeEventListener("pointercancel", this.onUserGestureEnd);
+    }
+
+    onUserGestureStart(event: Event): void {
+        if (!this.logController) return;
+        this.gestureStartDomain = getContentDomain(this.logController);
+        // wheel and dblclick have no release event; double-click zoom is animated
+        if (event.type === "wheel") {
+            setTimeout(() => this.onUserGestureEnd());
+        } else if (event.type === "dblclick") {
+            setTimeout(() => this.onUserGestureEnd(), DBLCLICK_ZOOM_MS);
+        }
+    }
+    onUserGestureEnd(): void {
+        const start = this.gestureStartDomain;
+        this.gestureStartDomain = undefined;
+        if (start && this.logController) {
+            // Rescale callbacks are deferred, so compare domains here
+            if (!isEqDomains(getContentDomain(this.logController), start))
+                this.recordUserZoom();
+        }
     }
 
     shouldComponentUpdate(
@@ -1605,7 +1673,12 @@ class WellLogView
                 this.props.visibleRange[0] !== prevProps.visibleRange[0] ||
                 this.props.visibleRange[1] !== prevProps.visibleRange[1])
         ) {
+            // an explicit visibleRange from the caller replaces the user zoom
+            this.userZoomDomain = undefined;
             this.zoomContentTo(this.props.visibleRange);
+        } else if (this.userZoomDomain) {
+            // data or domain updates above may have reset the view
+            this.zoomContentTo(this.userZoomDomain);
         }
 
         if (
@@ -1616,6 +1689,26 @@ class WellLogView
         ) {
             this.setControllerSelection();
         }
+    }
+
+    /**
+     * Stores the current visible domain as user zoom, unless it equals the
+     * default zoom (visibleRange, else domain, else base domain).
+     */
+    recordUserZoom(): void {
+        if (!this.logController) return;
+        const current = getContentDomain(this.logController);
+        const defaultDomain =
+            this.props.visibleRange ??
+            this.props.domain ??
+            this.getContentBaseDomain();
+        this.userZoomDomain =
+            defaultDomain && isEqDomains(current, defaultDomain)
+                ? undefined
+                : current;
+    }
+    isUserZoomed(): boolean {
+        return this.userZoomDomain !== undefined;
     }
 
     createLogViewer(): void {
