@@ -1,9 +1,6 @@
-import type { GeoJsonProperties, Geometry } from "geojson";
-
 import type {
     EditAction,
     Feature,
-    FeatureCollection,
     SimpleFeatureCollection,
     ModeProps,
 } from "@deck.gl-community/editable-layers";
@@ -32,16 +29,11 @@ import type {
     LayerPickInfo,
 } from "../utils/deckglTools";
 
-type SimpleFeatureCollectionWrapper = FeatureCollection<
-    Geometry,
-    GeoJsonProperties
->;
-
 // Custom drawing mode that deletes the selected GeoJson feature when releasing the Delete key.
 class CustomModifyMode extends ModifyMode {
     handleKeyUp(
         event: KeyboardEvent,
-        props: ModeProps<SimpleFeatureCollectionWrapper>
+        props: ModeProps<SimpleFeatureCollection>
     ) {
         super.handleKeyUp(event, props);
 

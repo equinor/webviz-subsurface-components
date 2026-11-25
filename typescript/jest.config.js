@@ -16,7 +16,7 @@ module.exports = {
         "\\.(css|less)$": path.resolve(__dirname, "__mocks__/styleMock.js"),
     },
     transform: {
-        "\\.(js|ts|jsx|tsx)$": [
+        "\\.[cm]?[jt]sx?$": [
             "babel-jest",
             { configFile: path.resolve(__dirname, "config/babel.config.js") },
         ],
