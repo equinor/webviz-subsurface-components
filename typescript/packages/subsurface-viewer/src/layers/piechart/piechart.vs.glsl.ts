@@ -3,7 +3,7 @@ export default `\
 #define SHADER_NAME piechart-vertex-shader
 
 in vec3 positions;
-in vec3 colors;
+in vec4 colors;
 in float do_scale;
 in float mx;
 in float my;
@@ -29,7 +29,7 @@ void main(void) {
 
    vec3 position_commonspace = project_position(v);
 
-   vColor = vec4(colors.rgb, 1.0);
+   vColor = colors;
 
    pie_index_ = pie_index;
 

@@ -173,7 +173,7 @@ export default class PieChartLayer extends Layer<PieChartLayerProps<PiesData>> {
                 topology: "triangle-list",
                 attributes: {
                     positions: { value: new Float32Array(vertexs), size: 3 },
-                    colors: { value: new Float32Array(colors), size: 3 },
+                    colors: { value: new Float32Array(colors), size: 4 },
                     pie_index: { value: new Int32Array(pieInfoIndex), size: 1 },
                     mx: { value: new Float32Array(mx), size: 1 },
                     my: { value: new Float32Array(my), size: 1 },
