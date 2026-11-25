@@ -33,3 +33,29 @@ export const ExampleData: StoryObj<typeof SubsurfaceViewer> = {
         ],
     },
 };
+
+export const WithAlpha: StoryObj<typeof SubsurfaceViewer> = {
+    args: {
+        ...ExampleData.args,
+        id: "pie-chart-alpha-example",
+        layers: [
+            {
+                "@@type": "PieChartLayer",
+                data: {
+                    ...pieData,
+                    properties: pieData.properties.map((property) => ({
+                        ...property,
+                        color: [...property.color, 128],
+                    })),
+                },
+            },
+        ],
+    },
+    parameters: {
+        docs: {
+            description: {
+                story: "RGBA colors use the alpha channel; RGB colors default to fully opaque.",
+            },
+        },
+    },
+};
