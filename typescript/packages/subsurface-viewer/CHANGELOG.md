@@ -1,3 +1,13 @@
+## 2.3.16 (2026-11-25)
+
+### 🩹 Fixes
+
+- bump merge-refs from 1.3.0 to 2.0.1 in /typescript ([#2911](https://github.com/equinor/webviz-subsurface-components/pull/2911))
+
+### 🧱 Updated Dependencies
+
+- Updated wsc-common to 2.0.14
+
 ## 2.3.15 (2026-11-18)
 
 ### 🩹 Fixes
