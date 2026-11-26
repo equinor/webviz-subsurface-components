@@ -102,6 +102,20 @@ describe("Grid3DLayer rebuild lifecycle", () => {
         });
     });
 
+    it("does not draw a first mesh that was superseded before it was drawn", async () => {
+        const { setProps, getSubLayerProps, settlePendingJobs } = setup();
+        await setProps(5, "A");
+        // The rebuild completes, but deck.gl has not updated the layers yet.
+        mockWorkerJobs.splice(0).forEach((job) => job.resolve(workerResult));
+        await flushPromises();
+
+        await setProps(6, "B");
+        expect(getSubLayerProps()).toBeUndefined();
+
+        await settlePendingJobs();
+        expect(getSubLayerProps()?.colormapName).toBe("B");
+    });
+
     it("keeps applying prop changes after a failed rebuild", async () => {
         const consoleError = jest
             .spyOn(console, "error")

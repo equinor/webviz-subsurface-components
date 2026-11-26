@@ -382,9 +382,8 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
     }
 
     renderLayers(): [PrivateGrid3DLayer?] {
-        const existingSubLayers = this.getSubLayers();
-        if (this.state?.["isRebuilding"] && existingSubLayers.length > 0) {
-            return existingSubLayers as [PrivateGrid3DLayer?];
+        if (this.state?.["isRebuilding"]) {
+            return this.getSubLayers() as [PrivateGrid3DLayer?];
         }
         if (!this.state?.["mesh"]) {
             return [];

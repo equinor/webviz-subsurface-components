@@ -610,9 +610,8 @@ export default class MapLayer<
     }
 
     renderLayers(): [PrivateMapLayer?] {
-        const existingSubLayers = this.getSubLayers();
-        if (this.state?.["isRebuilding"] && existingSubLayers.length > 0) {
-            return existingSubLayers as [PrivateMapLayer?];
+        if (this.state?.["isRebuilding"]) {
+            return this.getSubLayers() as [PrivateMapLayer?];
         }
         if (!this.state?.["positions"]) {
             return [];

@@ -210,6 +210,23 @@ describe("MapLayer rebuild lifecycle", () => {
         expect(getSubLayerProps()?.positions[0]).toBe(3);
     });
 
+    it("does not draw a first mesh that was superseded before it was drawn", async () => {
+        const { setProps, getSubLayerProps, settlePendingJobs } = setup();
+        await setProps(1, "A");
+        // The rebuild completes, but deck.gl has not updated the layers yet.
+        mockWorkerJobs
+            .splice(0)
+            .forEach((job) => job.resolve(makeWorkerResult(1)));
+        await flushPromises();
+
+        await setProps(2, "B");
+        expect(getSubLayerProps()).toBeUndefined();
+
+        await settlePendingJobs(2);
+        expect(getSubLayerProps()?.colormapName).toBe("B");
+        expect(getSubLayerProps()?.positions[0]).toBe(2);
+    });
+
     it("keeps applying prop changes after a failed rebuild", async () => {
         const consoleError = jest
             .spyOn(console, "error")
