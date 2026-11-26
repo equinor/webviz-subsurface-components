@@ -869,3 +869,146 @@ export const Extensions: StoryObj<typeof ExtensionsComponent> = {
     },
     render: (args) => <ExtensionsComponent {...args} />,
 };
+
+function makeShiftedGaussian(
+    n: number,
+    amplitude: number,
+    centerX: number,
+    centerY: number,
+    offset: number
+): Float32Array {
+    const f = makeGaussian(amplitude, centerX, centerY, n * 0.15, n * 0.15);
+    const data = new Float32Array(n * n);
+    for (let index = 0; index < data.length; index++) {
+        const x = (index % n) - n / 2;
+        const y = Math.floor(index / n) - n / 2;
+        data[index] = offset + f(x, y);
+    }
+    return data;
+}
+
+const blueYellowColormap: ColormapFunctionType = (x: number) => [
+    x * 255,
+    x * 220,
+    (1 - x) * 255,
+];
+
+const purpleCyanColormap: ColormapFunctionType = (x: number) => [
+    (1 - x) * 220,
+    x * 230,
+    255,
+];
+
+const DataAndColormapSwitchComponent: React.FC<{
+    dimension: number;
+    triggerHome: number;
+}> = ({ dimension, triggerHome }) => {
+    const [realization, setRealization] = React.useState<0 | 1>(0);
+
+    const surfaces = React.useMemo(
+        () => [
+            {
+                meshData: makeShiftedGaussian(
+                    dimension,
+                    100,
+                    -dimension * 0.2,
+                    -dimension * 0.1,
+                    0
+                ),
+                colorMapRange: [0, 100] as [number, number],
+                colorMapFunction: blueYellowColormap,
+            },
+            {
+                meshData: makeShiftedGaussian(
+                    dimension,
+                    100,
+                    dimension * 0.2,
+                    dimension * 0.1,
+                    200
+                ),
+                colorMapRange: [200, 300] as [number, number],
+                colorMapFunction: purpleCyanColormap,
+            },
+        ],
+        [dimension]
+    );
+
+    const active = surfaces[realization];
+    const half = dimension / 2;
+
+    const mapLayer = new MapLayer({
+        id: "data-and-colormap-switch-layer",
+        frame: {
+            origin: [-half, -half],
+            count: [dimension, dimension],
+            increment: [1, 1],
+            rotDeg: 0,
+        },
+        meshData: active.meshData,
+        propertiesData: active.meshData,
+        colorMapRange: active.colorMapRange,
+        colorMapFunction: active.colorMapFunction,
+        gridLines: false,
+        material: true,
+        ZIncreasingDownwards: false,
+    });
+
+    const axesLayer = new AxesLayer({
+        id: "data-and-colormap-switch-axes",
+        ZIncreasingDownwards: false,
+        bounds: [-half, -half, 0, half, half, 320],
+    });
+
+    return (
+        <>
+            <button
+                type="button"
+                onClick={() => setRealization((prev) => (prev === 0 ? 1 : 0))}
+                style={{
+                    position: "absolute",
+                    top: 12,
+                    left: 12,
+                    zIndex: 10,
+                    padding: "6px 12px",
+                }}
+            >
+                Switch realization (current: {realization})
+            </button>
+            <SubsurfaceViewer
+                id="data-and-colormap-switch"
+                layers={[axesLayer, mapLayer]}
+                views={default3DViews}
+                cameraPosition={{
+                    rotationOrbit: 45,
+                    rotationX: 45,
+                    zoom: [-half, -half, 0, half, half, 320] as BoundingBox3D,
+                    target: undefined,
+                }}
+                triggerHome={triggerHome}
+            />
+        </>
+    );
+};
+
+export const DataAndColormapSwitch: StoryObj<
+    typeof DataAndColormapSwitchComponent
+> = {
+    args: {
+        dimension: 600,
+    },
+    argTypes: {
+        dimension: {
+            control: { type: "range", min: 200, max: 1000, step: 50 },
+        },
+    },
+    parameters: {
+        docs: {
+            ...defaultStoryParameters.docs,
+            description: {
+                story: "Switches meshData, colorMapRange, and colorMapFunction together on the same MapLayer ID. Geometry and colormap should update atomically once the Web Worker finishes, without flashing the new colormap on the previous geometry.",
+            },
+        },
+    },
+    render: (args) => <DataAndColormapSwitchComponent {...args} />,
+    tags: ["no-test"],
+};
