@@ -1,8 +1,9 @@
 import "jest";
 import { describe, expect, it } from "@jest/globals";
+import type { Layer } from "@deck.gl/core";
 
 import type { MapFrame } from "./typeDefs";
-import {
+import MapLayer, {
     getUndefinedValueProperties,
     normalizeDiscreteProperties,
     resampleMesh,
@@ -63,5 +64,42 @@ describe("resampleMesh", () => {
             1, 1.5, 2, 2, 2.5, 3, 3, 3.5, 4,
             /*eslint-enable */
         ]);
+    });
+});
+
+describe("MapLayer.renderLayers", () => {
+    it("returns [] on initial mount before positions are built", () => {
+        const layer = new MapLayer({ id: "map-init" });
+        (
+            layer as unknown as {
+                state: Record<string, unknown>;
+                internalState: { subLayers: Layer[] };
+            }
+        ).state = { isFinishedLoading: false, rebuildId: 1 };
+        (
+            layer as unknown as { internalState: { subLayers: Layer[] } }
+        ).internalState = { subLayers: [] };
+
+        expect(layer.renderLayers()).toEqual([]);
+    });
+
+    it("retains existing sublayers while reloading", () => {
+        const layer = new MapLayer({ id: "map-reload" });
+        const existingSubLayer = { id: "prev-sublayer" } as unknown as Layer;
+        (
+            layer as unknown as {
+                state: Record<string, unknown>;
+                internalState: { subLayers: Layer[] };
+            }
+        ).state = {
+            isFinishedLoading: false,
+            rebuildId: 2,
+            positions: new Float32Array([0, 0, 0]),
+        };
+        (
+            layer as unknown as { internalState: { subLayers: Layer[] } }
+        ).internalState = { subLayers: [existingSubLayer] };
+
+        expect(layer.renderLayers()).toEqual([existingSubLayer]);
     });
 });

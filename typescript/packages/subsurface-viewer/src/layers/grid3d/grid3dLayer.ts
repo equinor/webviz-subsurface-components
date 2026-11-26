@@ -269,6 +269,13 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
     }
 
     rebuildData(reportBoundingBox: boolean): void {
+        const rebuildId = ((this.state?.["rebuildId"] as number) ?? 0) + 1;
+        this.setState({
+            ...this.state,
+            rebuildId,
+            isFinishedLoading: false,
+        });
+
         const p = load_data(
             this.props.pointsData,
             this.props.polysData,
@@ -277,6 +284,9 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
         );
 
         p.then(([points, polys, properties]) => {
+            if (this.state?.["rebuildId"] !== rebuildId) {
+                return;
+            }
             const bbox = getBBox(points);
 
             // Using inline web worker for calculating the triangle mesh from
@@ -290,6 +300,10 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
             };
 
             pool.exec(makeFullMesh, [{ data: webworkerParams }]).then((e) => {
+                if (this.state?.["rebuildId"] !== rebuildId) {
+                    onTerminateWorker();
+                    return;
+                }
                 const [mesh, mesh_lines, propertyValueRange] = e;
                 const legend = {
                     discrete: false,
@@ -300,11 +314,13 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
                 };
 
                 this.setState({
+                    ...this.state,
                     mesh,
                     mesh_lines,
                     propertyValueRange,
                     legend,
                     bbox,
+                    isFinishedLoading: true,
                 });
 
                 if (
@@ -313,11 +329,6 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
                 ) {
                     this.props.reportBoundingBox({ layerBoundingBox: bbox });
                 }
-
-                this.setState({
-                    ...this.state,
-                    isFinishedLoading: true,
-                });
 
                 onTerminateWorker();
             });
@@ -358,8 +369,14 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
     }
 
     renderLayers(): [PrivateGrid3DLayer?] {
-        if (Object.keys(this.state).length === 1) {
-            // isFinishedLoading only in state
+        const existingSubLayers = this.getSubLayers();
+        if (
+            !this.state?.["isFinishedLoading"] &&
+            existingSubLayers.length > 0
+        ) {
+            return existingSubLayers as [PrivateGrid3DLayer?];
+        }
+        if (!this.state?.["mesh"]) {
             return [];
         }
         const undefinedColor = this.getUndefinedPropertyColor();

@@ -427,6 +427,13 @@ export default class MapLayer<
             console.warn('"propertiesUrl" is deprecated. Use "propertiesData"');
         }
 
+        const rebuildId = ((this.state?.["rebuildId"] as number) ?? 0) + 1;
+        this.setState({
+            ...this.state,
+            rebuildId,
+            isFinishedLoading: false,
+        });
+
         const meshData = this.props.meshData ?? this.props.meshUrl;
         const propertiesData =
             this.props.propertiesData ?? this.props.propertiesUrl;
@@ -434,6 +441,9 @@ export default class MapLayer<
         const p = load_data(meshData, propertiesData, this.coloringMode());
 
         p.then(([meshData, propertiesData]) => {
+            if (this.state?.["rebuildId"] !== rebuildId) {
+                return;
+            }
             // Using inline web worker for calculating the triangle mesh from
             // loaded input data so not to halt the GUI thread.
 
@@ -466,6 +476,10 @@ export default class MapLayer<
 
             pool.exec(makeFullMesh, [{ data: webworkerParams.params }]).then(
                 (e) => {
+                    if (this.state?.["rebuildId"] !== rebuildId) {
+                        onTerminateWorker();
+                        return;
+                    }
                     const [
                         positions,
                         normals,
@@ -589,8 +603,14 @@ export default class MapLayer<
     }
 
     renderLayers(): [PrivateMapLayer?] {
-        if (Object.keys(this.state).length === 1) {
-            // isFinishedLoading only in state
+        const existingSubLayers = this.getSubLayers();
+        if (
+            !this.state?.["isFinishedLoading"] &&
+            existingSubLayers.length > 0
+        ) {
+            return existingSubLayers as [PrivateMapLayer?];
+        }
+        if (!this.state?.["positions"]) {
             return [];
         }
 
