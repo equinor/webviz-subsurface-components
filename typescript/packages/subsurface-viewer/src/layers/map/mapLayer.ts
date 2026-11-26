@@ -418,7 +418,7 @@ export default class MapLayer<
         return TMapColoringMode.Property;
     }
 
-    rebuildData(reportBoundingBox: boolean): void {
+    rebuildData(requestBoundingBoxReport: boolean): void {
         if (this.props.meshUrl !== undefined) {
             console.warn('"meshUrl" is deprecated. Use "meshData"');
         }
@@ -428,10 +428,16 @@ export default class MapLayer<
         }
 
         const rebuildId = ((this.state?.["rebuildId"] as number) ?? 0) + 1;
+        // A requested report must survive this rebuild being superseded or failing.
+        const reportBoundingBox =
+            requestBoundingBoxReport ||
+            !!this.state?.["isBoundingBoxReportPending"];
         this.setState({
             ...this.state,
             rebuildId,
+            isRebuilding: true,
             isFinishedLoading: false,
+            isBoundingBoxReportPending: reportBoundingBox,
         });
 
         const meshData = this.props.meshData ?? this.props.meshUrl;
@@ -442,7 +448,7 @@ export default class MapLayer<
 
         p.then(([meshData, propertiesData]) => {
             if (this.state?.["rebuildId"] !== rebuildId) {
-                return;
+                return undefined;
             }
             // Using inline web worker for calculating the triangle mesh from
             // loaded input data so not to halt the GUI thread.
@@ -474,8 +480,9 @@ export default class MapLayer<
                 frame
             );
 
-            pool.exec(makeFullMesh, [{ data: webworkerParams.params }]).then(
-                (e) => {
+            return pool
+                .exec(makeFullMesh, [{ data: webworkerParams.params }])
+                .then((e) => {
                     if (this.state?.["rebuildId"] !== rebuildId) {
                         onTerminateWorker();
                         return;
@@ -498,7 +505,9 @@ export default class MapLayer<
                         vertexProperties,
                         lineIndices,
                         propertyValueRange,
+                        isRebuilding: false,
                         isFinishedLoading: true,
+                        isBoundingBoxReportPending: false,
                     });
 
                     if (
@@ -553,17 +562,19 @@ export default class MapLayer<
                         });
                     }
                     onTerminateWorker();
-                }
-            );
+                });
+        }).catch((error) => {
+            if (this.state?.["rebuildId"] === rebuildId) {
+                // Stop deferring sublayer updates, otherwise the layer would
+                // ignore all further prop changes.
+                this.setState({ ...this.state, isRebuilding: false });
+            }
+            console.error("MapLayer: could not rebuild mesh.", error);
+            onTerminateWorker();
         });
     }
 
     initializeState(): void {
-        this.setState({
-            ...this.state,
-            isFinishedLoading: false,
-        });
-
         const reportBoundingBox = true;
         this.rebuildData(reportBoundingBox);
     }
@@ -593,10 +604,6 @@ export default class MapLayer<
             !isEqual(props.gridLines, oldProps.gridLines);
 
         if (needs_reload) {
-            this.setState({
-                ...this.state,
-                isFinishedLoading: false,
-            });
             const reportBoundingBox = false;
             this.rebuildData(reportBoundingBox);
         }
@@ -604,10 +611,7 @@ export default class MapLayer<
 
     renderLayers(): [PrivateMapLayer?] {
         const existingSubLayers = this.getSubLayers();
-        if (
-            !this.state?.["isFinishedLoading"] &&
-            existingSubLayers.length > 0
-        ) {
+        if (this.state?.["isRebuilding"] && existingSubLayers.length > 0) {
             return existingSubLayers as [PrivateMapLayer?];
         }
         if (!this.state?.["positions"]) {

@@ -268,12 +268,18 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
         return isLoaded && isFinished;
     }
 
-    rebuildData(reportBoundingBox: boolean): void {
+    rebuildData(requestBoundingBoxReport: boolean): void {
         const rebuildId = ((this.state?.["rebuildId"] as number) ?? 0) + 1;
+        // A requested report must survive this rebuild being superseded or failing.
+        const reportBoundingBox =
+            requestBoundingBoxReport ||
+            !!this.state?.["isBoundingBoxReportPending"];
         this.setState({
             ...this.state,
             rebuildId,
+            isRebuilding: true,
             isFinishedLoading: false,
+            isBoundingBoxReportPending: reportBoundingBox,
         });
 
         const p = load_data(
@@ -285,7 +291,7 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
 
         p.then(([points, polys, properties]) => {
             if (this.state?.["rebuildId"] !== rebuildId) {
-                return;
+                return undefined;
             }
             const bbox = getBBox(points);
 
@@ -299,47 +305,58 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
                 undefinedValue: this.getUndefinedPropertyValue(),
             };
 
-            pool.exec(makeFullMesh, [{ data: webworkerParams }]).then((e) => {
-                if (this.state?.["rebuildId"] !== rebuildId) {
+            return pool
+                .exec(makeFullMesh, [{ data: webworkerParams }])
+                .then((e) => {
+                    if (this.state?.["rebuildId"] !== rebuildId) {
+                        onTerminateWorker();
+                        return;
+                    }
+                    const [mesh, mesh_lines, propertyValueRange] = e;
+                    const legend = {
+                        discrete: false,
+                        valueRange:
+                            this.props.colorMapRange ?? propertyValueRange,
+                        colorName: this.props.colorMapName,
+                        title: "MapLayer",
+                        colormapFunction: this.props.colorMapFunction,
+                    };
+
+                    this.setState({
+                        ...this.state,
+                        mesh,
+                        mesh_lines,
+                        propertyValueRange,
+                        legend,
+                        bbox,
+                        isRebuilding: false,
+                        isFinishedLoading: true,
+                        isBoundingBoxReportPending: false,
+                    });
+
+                    if (
+                        this.props.reportBoundingBox !== undefined &&
+                        reportBoundingBox
+                    ) {
+                        this.props.reportBoundingBox({
+                            layerBoundingBox: bbox,
+                        });
+                    }
+
                     onTerminateWorker();
-                    return;
-                }
-                const [mesh, mesh_lines, propertyValueRange] = e;
-                const legend = {
-                    discrete: false,
-                    valueRange: this.props.colorMapRange ?? propertyValueRange,
-                    colorName: this.props.colorMapName,
-                    title: "MapLayer",
-                    colormapFunction: this.props.colorMapFunction,
-                };
-
-                this.setState({
-                    ...this.state,
-                    mesh,
-                    mesh_lines,
-                    propertyValueRange,
-                    legend,
-                    bbox,
-                    isFinishedLoading: true,
                 });
-
-                if (
-                    this.props.reportBoundingBox !== undefined &&
-                    reportBoundingBox
-                ) {
-                    this.props.reportBoundingBox({ layerBoundingBox: bbox });
-                }
-
-                onTerminateWorker();
-            });
+        }).catch((error) => {
+            if (this.state?.["rebuildId"] === rebuildId) {
+                // Stop deferring sublayer updates, otherwise the layer would
+                // ignore all further prop changes.
+                this.setState({ ...this.state, isRebuilding: false });
+            }
+            console.error("Grid3DLayer: could not rebuild mesh.", error);
+            onTerminateWorker();
         });
     }
 
     initializeState(): void {
-        this.setState({
-            ...this.state,
-            isFinishedLoading: false,
-        });
         const reportBoundingBox = true;
         this.rebuildData(reportBoundingBox);
     }
@@ -359,10 +376,6 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
             !isEqual(props.ZIncreasingDownwards, oldProps.ZIncreasingDownwards);
 
         if (needs_reload) {
-            this.setState({
-                ...this.state,
-                isFinishedLoading: false,
-            });
             const reportBoundingBox = false;
             this.rebuildData(reportBoundingBox);
         }
@@ -370,10 +383,7 @@ export default class Grid3DLayer extends CompositeLayer<Grid3DLayerProps> {
 
     renderLayers(): [PrivateGrid3DLayer?] {
         const existingSubLayers = this.getSubLayers();
-        if (
-            !this.state?.["isFinishedLoading"] &&
-            existingSubLayers.length > 0
-        ) {
+        if (this.state?.["isRebuilding"] && existingSubLayers.length > 0) {
             return existingSubLayers as [PrivateGrid3DLayer?];
         }
         if (!this.state?.["mesh"]) {
